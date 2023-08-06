@@ -2003,13 +2003,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@csstools/media-query-list-parser@npm:^2.1.2, @csstools/media-query-list-parser@npm:^2.1.3":
+"@csstools/media-query-list-parser@npm:^2.1.2":
   version: 2.1.3
   resolution: "@csstools/media-query-list-parser@npm:2.1.3"
   peerDependencies:
     "@csstools/css-parser-algorithms": ^2.3.1
     "@csstools/css-tokenizer": ^2.2.0
   checksum: dc1af286b6354a9fb9f5b00e1ec834f7697bc43e22137ddd64375a558059cbb084882f9cfed427709556e902d40d2808a47026d50fb1e8196df9b7fa83d70062
+  languageName: node
+  linkType: hard
+
+"@csstools/media-query-list-parser@npm:^2.1.4":
+  version: 2.1.4
+  resolution: "@csstools/media-query-list-parser@npm:2.1.4"
+  peerDependencies:
+    "@csstools/css-parser-algorithms": ^2.3.1
+    "@csstools/css-tokenizer": ^2.2.0
+  checksum: 8fa5be6acea01af39f49e08b2f2e2f7f54c2881c2c8a7a8cc783f8668610404398e81f86092f44ae64914d0f7626a5177d721ce5d1858b1599b26c91687f311e
   languageName: node
   linkType: hard
 
@@ -2159,30 +2169,30 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@csstools/postcss-media-minmax@npm:^1.0.6":
-  version: 1.0.6
-  resolution: "@csstools/postcss-media-minmax@npm:1.0.6"
+"@csstools/postcss-media-minmax@npm:^1.0.7":
+  version: 1.0.7
+  resolution: "@csstools/postcss-media-minmax@npm:1.0.7"
   dependencies:
     "@csstools/css-calc": ^1.1.3
     "@csstools/css-parser-algorithms": ^2.3.1
     "@csstools/css-tokenizer": ^2.2.0
-    "@csstools/media-query-list-parser": ^2.1.3
+    "@csstools/media-query-list-parser": ^2.1.4
   peerDependencies:
     postcss: ^8.4
-  checksum: 18e60b8c9282c91a8e32501d04244878dab04ff5cdf487448041a84614dee9964fc77b98b02498c6d073aedb9fd5e0c48ba5f6c35681f28651256dde85da7c36
+  checksum: 063e36966452d4a1bb8bebadc937f0524f6d075319f025e019f08337bd909ba227f0386e3c74acdec56a4de245623f84c9aa1e9ea772b518760694cfa36d9d16
   languageName: node
   linkType: hard
 
-"@csstools/postcss-media-queries-aspect-ratio-number-values@npm:^2.0.1":
-  version: 2.0.1
-  resolution: "@csstools/postcss-media-queries-aspect-ratio-number-values@npm:2.0.1"
+"@csstools/postcss-media-queries-aspect-ratio-number-values@npm:^2.0.2":
+  version: 2.0.2
+  resolution: "@csstools/postcss-media-queries-aspect-ratio-number-values@npm:2.0.2"
   dependencies:
     "@csstools/css-parser-algorithms": ^2.3.1
     "@csstools/css-tokenizer": ^2.2.0
-    "@csstools/media-query-list-parser": ^2.1.3
+    "@csstools/media-query-list-parser": ^2.1.4
   peerDependencies:
     postcss: ^8.4
-  checksum: 901e074275a9fd090a6b138b4e40b9dff3fdf8c8d2673733cc23e2b6f6bf421c668cd1ee44036e62f4b0f5db7774db34dcb02596fad6681770becbe05ba22cf1
+  checksum: 1a2b3c8df1f79a392864ce7efac48f5a4964243fab915f2c583b615a6a3112b23fecbd638d0252e8e7ad606e227ce1656e63030182eb552503e2b272c54da87c
   languageName: node
   linkType: hard
 
@@ -6125,7 +6135,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"browserslist@npm:^4.0.0, browserslist@npm:^4.14.5, browserslist@npm:^4.21.4, browserslist@npm:^4.21.5, browserslist@npm:^4.21.9":
+"browserslist@npm:^4.0.0, browserslist@npm:^4.14.5, browserslist@npm:^4.21.10, browserslist@npm:^4.21.4, browserslist@npm:^4.21.5, browserslist@npm:^4.21.9":
   version: 4.21.10
   resolution: "browserslist@npm:4.21.10"
   dependencies:
@@ -13972,15 +13982,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss-nesting@npm:^12.0.0":
-  version: 12.0.0
-  resolution: "postcss-nesting@npm:12.0.0"
+"postcss-nesting@npm:^12.0.1":
+  version: 12.0.1
+  resolution: "postcss-nesting@npm:12.0.1"
   dependencies:
     "@csstools/selector-specificity": ^3.0.0
     postcss-selector-parser: ^6.0.13
   peerDependencies:
     postcss: ^8.4
-  checksum: d45803859b44b593a450cf32ebce6650af19cd1c3d837713713a66dc49db8f15958b09082fc2eb2f869f048f8796f8292802a4ea61be5e2260af0043eaa58e42
+  checksum: fa6157fbdc9109b3859cdb925ec8357ea7c9c984110015381a55e63770d1b5aaddaac5f5816a32b9efbb55fbdb87f8187ff7fc2db24331c82b2f74091aa9ba06
   languageName: node
   linkType: hard
 
@@ -14135,9 +14145,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss-preset-env@npm:^9.1.0":
-  version: 9.1.0
-  resolution: "postcss-preset-env@npm:9.1.0"
+"postcss-preset-env@npm:^9.1.1":
+  version: 9.1.1
+  resolution: "postcss-preset-env@npm:9.1.1"
   dependencies:
     "@csstools/postcss-cascade-layers": ^4.0.0
     "@csstools/postcss-color-function": ^3.0.1
@@ -14151,8 +14161,8 @@ __metadata:
     "@csstools/postcss-logical-float-and-clear": ^2.0.0
     "@csstools/postcss-logical-resize": ^2.0.0
     "@csstools/postcss-logical-viewport-units": ^2.0.1
-    "@csstools/postcss-media-minmax": ^1.0.6
-    "@csstools/postcss-media-queries-aspect-ratio-number-values": ^2.0.1
+    "@csstools/postcss-media-minmax": ^1.0.7
+    "@csstools/postcss-media-queries-aspect-ratio-number-values": ^2.0.2
     "@csstools/postcss-nested-calc": ^3.0.0
     "@csstools/postcss-normalize-display-values": ^3.0.0
     "@csstools/postcss-oklab-function": ^3.0.1
@@ -14164,7 +14174,7 @@ __metadata:
     "@csstools/postcss-trigonometric-functions": ^3.0.1
     "@csstools/postcss-unset-value": ^3.0.0
     autoprefixer: ^10.4.14
-    browserslist: ^4.21.9
+    browserslist: ^4.21.10
     css-blank-pseudo: ^6.0.0
     css-has-pseudo: ^6.0.0
     css-prefers-color-scheme: ^9.0.0
@@ -14187,7 +14197,7 @@ __metadata:
     postcss-initial: ^4.0.1
     postcss-lab-function: ^6.0.1
     postcss-logical: ^7.0.0
-    postcss-nesting: ^12.0.0
+    postcss-nesting: ^12.0.1
     postcss-opacity-percentage: ^2.0.0
     postcss-overflow-shorthand: ^5.0.0
     postcss-page-break: ^3.0.4
@@ -14198,7 +14208,7 @@ __metadata:
     postcss-value-parser: ^4.2.0
   peerDependencies:
     postcss: ^8.4
-  checksum: f6b125ff5cc29f4b394b5cd9eb56c9fce52f19e8f923677aa8eaacebc1738555a10346d474b0ded52e24e632ed12149abdfbbca81079159900c5e7084b9dcd3b
+  checksum: f3bccc9e4ab6f839a016b27b486cf56e1a6ed211ffd2e7c05bae8dcdb30036071c4c799cb8e305f9819de4e366d6e4574452258ecfa7789a59eb6dbcb67ae6ca
   languageName: node
   linkType: hard
 
@@ -17834,7 +17844,7 @@ __metadata:
     postcss-import: ^15.1.0
     postcss-less: 6.0.0
     postcss-loader: ^7.3.3
-    postcss-preset-env: ^9.1.0
+    postcss-preset-env: ^9.1.1
     postcss-scss: 4.0.6
     prettier: ^2.8.8
     raf: 3.4.1
