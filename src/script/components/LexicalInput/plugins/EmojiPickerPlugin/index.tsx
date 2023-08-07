@@ -25,7 +25,6 @@ import {
   MenuOption,
   useBasicTypeaheadTriggerMatch,
 } from '@lexical/react/LexicalTypeaheadMenuPlugin';
-import {emoticon} from 'emoticon';
 import {$createTextNode, $getSelection, $isRangeSelection, TextNode} from 'lexical';
 import * as ReactDOM from 'react-dom';
 
@@ -34,23 +33,24 @@ import {sortByPriority} from 'Util/StringUtil';
 
 import {StorageKey} from '../../../../storage';
 import {EmojiItem} from '../../components/EmojiItem';
+import emojiList from '../../utils/emojiList';
 import {getDOMRangeRect} from '../../utils/getDomRangeRect';
 import {ItemProps} from '../LexicalTypeheadMenuPlugin';
 
 export class EmojiOption extends MenuOption {
   title: string;
   emoji: string;
-  keywords: Array<string>;
+  keywords: string[];
 
   constructor(
     title: string,
     emoji: string,
     options: {
-      keywords?: Array<string>;
+      keywords?: string[];
     },
   ) {
     super(title);
-    this.title = title;
+    this.title = title.replace(/_/g, ' ');
     this.emoji = emoji;
     this.keywords = options.keywords || [];
   }
@@ -76,14 +76,12 @@ export function EmojiPickerPlugin() {
 
   const emojiOptions = useMemo(
     () =>
-      emoticon != null
-        ? emoticon.map(
-            ({emoji, name, tags}) =>
-              new EmojiOption(name, emoji, {
-                keywords: [name, ...tags],
-              }),
-          )
-        : [],
+      emojiList.map(
+        ({emoji, aliases, tags}) =>
+          new EmojiOption(aliases[0], emoji, {
+            keywords: [...aliases, ...tags],
+          }),
+      ),
     [],
   );
 
@@ -91,26 +89,36 @@ export function EmojiPickerPlugin() {
     minLength: 1,
   });
 
-  const options: Array<EmojiOption> = useMemo(() => {
-    return emojiOptions
-      .sort((emojiA, emojiB) => {
-        const usageCountA = getUsageCount(emojiA.title);
-        const usageCountB = getUsageCount(emojiB.title);
+  const options: EmojiOption[] = useMemo(() => {
+    const filteredEmojis = emojiOptions.filter((emoji: EmojiOption) => {
+      if (queryString == null) {
+        return false;
+      }
 
-        const sameUsageCount = usageCountA === usageCountB;
+      const expectedWords = (queryString.match(/\s/g) || []).length + 1;
+      const emojiNameWords = emoji.title.split(' ');
 
-        return sameUsageCount
-          ? sortByPriority(emojiA.title, emojiB.title, queryString || '')
-          : usageCountB - usageCountA;
-      })
-      .filter((option: EmojiOption) => {
-        return queryString != null
-          ? new RegExp(queryString, 'gi').exec(option.title) || option.keywords != null
-            ? option.keywords.some((keyword: string) => new RegExp(queryString, 'gi').exec(keyword))
-            : false
-          : emojiOptions;
-      })
-      .slice(0, MAX_EMOJI_SUGGESTION_COUNT);
+      if (emojiNameWords.length < expectedWords) {
+        return false;
+      }
+
+      const queryWords = queryString.split(' ');
+
+      return queryWords.every(queryWord => {
+        return emojiNameWords.some(emojiNameWord => emojiNameWord.startsWith(queryWord));
+      });
+    });
+
+    const sortedEmojiList = filteredEmojis.sort((emojiA, emojiB) => {
+      const usageCountA = getUsageCount(emojiA.title);
+      const usageCountB = getUsageCount(emojiB.title);
+
+      const sameUsageCount = usageCountA === usageCountB;
+
+      return sameUsageCount ? sortByPriority(emojiA.title, emojiB.title, queryString || '') : usageCountB - usageCountA;
+    });
+
+    return sortedEmojiList.slice(0, MAX_EMOJI_SUGGESTION_COUNT);
   }, [emojiOptions, getUsageCount, queryString]);
 
   const onSelectOption = useCallback(

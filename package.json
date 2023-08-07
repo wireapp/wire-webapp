@@ -20,7 +20,6 @@
     "countly-sdk-web": "23.6.0",
     "date-fns": "2.30.0",
     "dexie-batch": "0.4.3",
-    "emoticon": "^4.0.1",
     "highlight.js": "11.8.0",
     "http-status-codes": "2.2.0",
     "jimp": "0.22.10",

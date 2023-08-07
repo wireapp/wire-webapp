@@ -20,19 +20,20 @@
 import {useEffect} from 'react';
 
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
-import {emoticon} from 'emoticon';
 import {TextNode} from 'lexical';
 
 import {isSpaceKey, isTabKey} from 'Util/KeyboardUtil';
 
+import {inlineReplacements} from '../utils/inlineReplacements';
+
 const escapeRegexp = (string: string): string => string.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
 
-const emojiList = emoticon.map(emoji => {
+const emojiList = inlineReplacements.map(emoji => {
   const emoticons = emoji.emoticons || [];
 
   return {
     ...emoji,
-    regexes: emoticons.map(emoticon => new RegExp(`(?:^|\\s)${escapeRegexp(emoticon)}(?=\\s|$)`)),
+    regexes: emoticons.map(emojiIcon => new RegExp(`(?:^|\\s)${escapeRegexp(emojiIcon)}(?=\\s|$)`)),
   };
 });
 
