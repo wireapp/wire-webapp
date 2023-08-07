@@ -15328,15 +15328,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"rtcpeerconnection-shim@npm:^1.2.14":
-  version: 1.2.15
-  resolution: "rtcpeerconnection-shim@npm:1.2.15"
-  dependencies:
-    sdp: ^2.6.0
-  checksum: 42a733d8e3846b7e7e3c33b6d5cddec95659ceb39d3f990f0a4437e6d719ed717237fea02352d4a18d86c825a1493eaeb481cc835267d2288b0ce43582b97f46
-  languageName: node
-  linkType: hard
-
 "run-applescript@npm:^5.0.0":
   version: 5.0.0
   resolution: "run-applescript@npm:5.0.0"
@@ -15456,10 +15447,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sdp@npm:^2.6.0, sdp@npm:^2.9.0":
-  version: 2.12.0
-  resolution: "sdp@npm:2.12.0"
-  checksum: 5deb20ac50a1aeb4dd5ff2e506c22d1674222c21f08ae97105c9552ae979e90ddc42b8526f2c3dcacfeebc45c7b2e6b6b4254ae2cf335263bf3ddf2ad9b8ec76
+"sdp@npm:^3.2.0":
+  version: 3.2.0
+  resolution: "sdp@npm:3.2.0"
+  checksum: 227885bddab9a5845e56ae184ff51e43ec7bc155e7f1ed2f17ca1b012e6767011d5bd01b6c4064ded8e3b6f6bf3c9b26b2cf754b9c8662285988ed27b54f37b1
   languageName: node
   linkType: hard
 
@@ -17512,13 +17503,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webrtc-adapter@npm:6.4.8":
-  version: 6.4.8
-  resolution: "webrtc-adapter@npm:6.4.8"
+"webrtc-adapter@npm:8.2.3":
+  version: 8.2.3
+  resolution: "webrtc-adapter@npm:8.2.3"
   dependencies:
-    rtcpeerconnection-shim: ^1.2.14
-    sdp: ^2.9.0
-  checksum: c485ae6f0ad68929eb822a15dc8d4f679619313ce5afd8097c1d371210fc313572b08661face39eb1e765ee5ae25f55ebfe07ba6ab87463df13353cee2ff7d1b
+    sdp: ^3.2.0
+  checksum: 8239c9452c489c9aad2584b5d00af22462c3e0f1b7885c6e4036b518d2b9411d94c00d2ceadbed987459a3647cfc4ce04c0eb75dd5ae7c3d7df9b810525e6a07
   languageName: node
   linkType: hard
 
@@ -17826,7 +17816,7 @@ __metadata:
     webpack-cli: 5.1.4
     webpack-dev-middleware: 6.1.1
     webpack-hot-middleware: 2.25.4
-    webrtc-adapter: 6.4.8
+    webrtc-adapter: 8.2.3
     workbox-webpack-plugin: 7.0.0
     zustand: 4.4.1
   languageName: unknown
