@@ -35,6 +35,7 @@ export class Account extends EventEmitter {
       renewKeyMaterial: jest.fn(),
       getClientIds: jest.fn(),
       getEpoch: jest.fn(),
+      conversationExists: jest.fn(),
       exportSecretKey: jest.fn(),
       leaveConferenceSubconversation: jest.fn(),
       on: this.on,
