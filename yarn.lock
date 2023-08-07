@@ -9763,12 +9763,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"husky@npm:7.0.4":
-  version: 7.0.4
-  resolution: "husky@npm:7.0.4"
+"husky@npm:8.0.3":
+  version: 8.0.3
+  resolution: "husky@npm:8.0.3"
   bin:
     husky: lib/bin.js
-  checksum: c6ec4af63da2c9522da8674a20ad9b48362cc92704896cc8a58c6a2a39d797feb2b806f93fbd83a6d653fbdceb2c3b6e0b602c6b2e8565206ffc2882ef7db9e9
+  checksum: 837bc7e4413e58c1f2946d38fb050f5d7324c6f16b0fd66411ffce5703b294bd21429e8ba58711cd331951ee86ed529c5be4f76805959ff668a337dbfa82a1b0
   languageName: node
   linkType: hard
 
@@ -11223,10 +11223,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"js-cookie@npm:3.0.1":
-  version: 3.0.1
-  resolution: "js-cookie@npm:3.0.1"
-  checksum: bb48de67e2a6bd1ae3dfd6b2d5a167c33dd0c5a37e909206161eb0358c98f17cb55acd55827a58e9eea3630d89444e7479f7938ef4420dda443218b8c434a4c3
+"js-cookie@npm:3.0.5":
+  version: 3.0.5
+  resolution: "js-cookie@npm:3.0.5"
+  checksum: 2dbd2809c6180fbcf060c6957cb82dbb47edae0ead6bd71cbeedf448aa6b6923115003b995f7d3e3077bfe2cb76295ea6b584eb7196cca8ba0a09f389f64967a
   languageName: node
   linkType: hard
 
@@ -16799,12 +16799,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tsyringe@npm:4.7.0":
-  version: 4.7.0
-  resolution: "tsyringe@npm:4.7.0"
+"tsyringe@npm:4.8.0":
+  version: 4.8.0
+  resolution: "tsyringe@npm:4.8.0"
   dependencies:
     tslib: ^1.9.3
-  checksum: 6d84e0767538fabf60eafb926bd285d08d25847875b635f8a3ab8b3093c8814aca4f47072fbb51837bd431259dc2464572e5c28a838b833c9ef097d5b1a895b3
+  checksum: 6bf13235cc1ae86829169e3a887c3ff6ee2d220678df01dd0fff202b5a533d4eb47a52334b76d2b1b1cf80c8c92ff22173a54ad72c9f1b8ea0ea4957304966f0
   languageName: node
   linkType: hard
 
@@ -17755,7 +17755,7 @@ __metadata:
     highlight.js: 11.8.0
     html-webpack-plugin: ^5.5.3
     http-status-codes: 2.2.0
-    husky: 7.0.4
+    husky: 8.0.3
     i18next-scanner: 4.3.0
     intersection-observer: 0.12.2
     jest: 29.6.2
@@ -17764,7 +17764,7 @@ __metadata:
     jest-jasmine2: 29.6.2
     jimp: 0.22.10
     jquery: 3.7.0
-    js-cookie: 3.0.1
+    js-cookie: 3.0.5
     jsdom-worker: 0.3.0
     jszip: 3.10.1
     keyboardjs: 2.7.0
@@ -17817,7 +17817,7 @@ __metadata:
     text-encoding: 0.7.0
     ts-node: 10.9.1
     tsc-watch: 6.0.4
-    tsyringe: 4.7.0
+    tsyringe: 4.8.0
     typescript: 5.1.6
     uint32: 0.2.1
     underscore: 1.13.6
