@@ -1532,34 +1532,18 @@ export class ConversationRepository {
    * @param proteusConversation - (optional) proteus 1:1 conversation
    */
   private readonly initMLS1to1Conversation = async (
-    conversation: Conversation,
     otherUserId: QualifiedId,
     isMLSSupportedByTheOtherUser: boolean,
-    skipMLSGroupCreation = false,
   ): Promise<MLSConversation> => {
-    this.logger.info(
-      `Initialising MLS 1:1 conversation ${conversation.id} with user ${otherUserId.id}, provided with ${conversation.protocol} protocol`,
-    );
-    const mlsConversation = isMLSConversation(conversation)
-      ? conversation
-      : await this.findMLS1to1Conversation(otherUserId);
-
-    if (skipMLSGroupCreation) {
-      this.logger.info(
-        `Skipping establishement of MLS group for 1:1 conversation ${conversation.id} with user ${otherUserId.id}.`,
-      );
-      if (isProteusConversation(conversation)) {
-        await this.replaceProteus1to1WithMLS(conversation, mlsConversation, false);
-      }
-      return mlsConversation;
-    }
+    this.logger.info(`Initialising MLS 1:1 conversation with user ${otherUserId.id}...`);
+    const mlsConversation = await this.findMLS1to1Conversation(otherUserId);
 
     //if mls is not supported by the other user we do not establish the group yet
     //we just mark the mls conversation as readonly and return it
     if (!isMLSSupportedByTheOtherUser) {
       //TODO: mark conversation as readonly
       this.logger.info(
-        `MLS 1:1 conversation ${conversation.id} with user ${otherUserId.id} is not supported by the other user, conversation will become readonly`,
+        `MLS 1:1 conversation with user ${otherUserId.id} is not supported by the other user, conversation will become readonly`,
       );
       return mlsConversation;
     }
@@ -1570,19 +1554,21 @@ export class ConversationRepository {
       ? mlsConversation
       : await this.establishMLS1to1Conversation(mlsConversation, otherUserId);
 
-    this.logger.info(`MLS 1:1 conversation ${conversation.id} with user ${otherUserId.id} is established.`);
-    //if proteus conversation was provided, we have to replace it with mls 1:1 conversation
-    if (isProteusConversation(conversation)) {
-      await this.replaceProteus1to1WithMLS(conversation, establishedMLSConversation);
-    }
-
+    this.logger.info(`MLS 1:1 conversation with user ${otherUserId.id} is established.`);
     return establishedMLSConversation;
   };
 
   private readonly initProteus1to1Conversation = async (
-    proteusConversation: ProteusConversation,
+    proteusConversationId: QualifiedId,
     doesOtherUserSupportProteus: boolean,
-  ): Promise<Conversation | null> => {
+  ): Promise<ProteusConversation> => {
+    const localProteusConversation = this.conversationState.findConversation(proteusConversationId);
+    const proteusConversation = localProteusConversation || (await this.fetchConversationById(proteusConversationId));
+
+    if (!isProteusConversation(proteusConversation)) {
+      throw new Error('initProteus1to1Conversation provided with conversation id of conversation that is not proteus');
+    }
+
     //if mls is not supported by the other user we have to mark conversation as readonly
     if (!doesOtherUserSupportProteus) {
       //TODO: mark conversation as readonly
@@ -1622,10 +1608,7 @@ export class ConversationRepository {
    * @param conversation - 1:1 conversation to be initialised
    * @param skipMLSGroupCreation - if true, mls group will not be established for this conversation
    */
-  public readonly init1to1Conversation = async (
-    conversation: Conversation,
-    skipMLSGroupCreation = false,
-  ): Promise<Conversation | null> => {
+  public readonly init1to1Conversation = async (conversation: Conversation): Promise<Conversation | null> => {
     if (!conversation.is1to1()) {
       throw new Error('Conversation is not 1:1');
     }
@@ -1652,7 +1635,7 @@ export class ConversationRepository {
     //we never go back to proteus conversation, even if one of the users do not support mls anymore
     //(e.g. due to the change of supported protocols in team configuration)
     if (shouldUseMLSProtocol || isMLSConversation(conversation)) {
-      return this.initMLS1to1Conversation(conversation, otherUserId, isSupportedByTheOtherUser, skipMLSGroupCreation);
+      return this.initMLS1to1Conversation(otherUserId, isSupportedByTheOtherUser);
     }
 
     if (protocol === ConversationProtocol.PROTEUS && isProteusConversation(conversation)) {
@@ -1669,27 +1652,51 @@ export class ConversationRepository {
     //We need to manually check if mls 1:1 conversation can be used instead.
     //If mls 1:1 conversation is used, proteus 1:1 conversation will be deleted locally.
 
-    const {conversationId} = connectionEntity;
+    const {conversationId: proteusConversationId, userId: otherUserId} = connectionEntity;
+    const localProteusConversation = this.conversationState.findConversation(proteusConversationId);
 
-    const localConversation = this.conversationState.findConversation(conversationId);
+    if (connectionEntity.isOutgoingRequest()) {
+      //return type of 3 (connect) conversation
+      //it will be displayed as a connection request
+      return localProteusConversation || this.fetchConversationById(proteusConversationId);
+    }
 
     const isConnectionAccepted = connectionEntity.isConnected();
 
-    const shouldFetchConversation = isConnectionAccepted || connectionEntity.isOutgoingRequest();
+    //check what protocol should be used for 1:1 conversation
+    const {protocol, isSupportedByTheOtherUser} = await this.getProtocolFor1to1Conversation(otherUserId);
 
-    const conversation =
-      localConversation || (shouldFetchConversation ? await this.fetchConversationById(conversationId) : undefined);
+    //if it's not connection request and conversation is not accepted,
+    if (!isConnectionAccepted) {
+      const localMLSConversation = this.conversationState.findMLS1to1Conversation(otherUserId);
 
-    if (!conversation) {
-      return undefined;
+      //if we already know mls 1:1 conversation, we use it, even if proteus protocol was now choosen as common
+      //we do not support switching back to proteus after mls conversation was established
+      //only proteus -> mls migration is supported, never the other way around
+      if (localMLSConversation) {
+        //make sure proteus conversation is gone, we don't want to see it anymore
+        if (localProteusConversation && isProteusConversation(localProteusConversation)) {
+          await this.replaceProteus1to1WithMLS(localProteusConversation, localMLSConversation);
+        }
+        return localMLSConversation;
+      }
+
+      return protocol === ConversationProtocol.PROTEUS ? localProteusConversation : undefined;
     }
 
-    if (isConnectionAccepted) {
-      conversation.type(CONVERSATION_TYPE.ONE_TO_ONE);
-      return this.init1to1Conversation(conversation);
+    //if it's accepted, initialise conversation so it's ready to be used
+    if (protocol === ConversationProtocol.MLS) {
+      const mlsConversation = await this.initMLS1to1Conversation(otherUserId, isSupportedByTheOtherUser);
+      if (localProteusConversation && isProteusConversation(localProteusConversation)) {
+        await this.replaceProteus1to1WithMLS(localProteusConversation, mlsConversation);
+      }
     }
 
-    return conversation;
+    if (protocol === ConversationProtocol.PROTEUS) {
+      return this.initProteus1to1Conversation(proteusConversationId, isSupportedByTheOtherUser);
+    }
+
+    return undefined;
   };
 
   /**
@@ -1712,14 +1719,17 @@ export class ConversationRepository {
         return undefined;
       }
 
-      connectionEntity.conversationId = conversation.qualifiedId;
       conversation.connection(connectionEntity);
 
-      await this.updateParticipatingUserEntities(conversation);
+      if (connectionEntity.isConnected()) {
+        conversation.type(CONVERSATION_TYPE.ONE_TO_ONE);
+      }
+
+      const updatedConversation = await this.updateParticipatingUserEntities(conversation);
 
       this.conversationState.conversations.notifySubscribers();
 
-      return conversation;
+      return updatedConversation;
     } catch (error) {
       const isConversationNotFound =
         error instanceof ConversationError && error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;
