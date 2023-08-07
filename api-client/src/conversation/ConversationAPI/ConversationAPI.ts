@@ -107,7 +107,10 @@ export class ConversationAPI {
     ONE_2_ONE: 'one2one',
   };
 
-  constructor(protected readonly client: HttpClient, protected readonly backendFeatures: BackendFeatures) {}
+  constructor(
+    protected readonly client: HttpClient,
+    protected readonly backendFeatures: BackendFeatures,
+  ) {}
 
   private generateBaseConversationUrl(conversationId: QualifiedId, supportsQualifiedEndpoint: boolean = true): string {
     return supportsQualifiedEndpoint && conversationId.domain

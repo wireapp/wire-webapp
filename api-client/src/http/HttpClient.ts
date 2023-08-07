@@ -60,7 +60,10 @@ export class HttpClient extends EventEmitter {
   public static readonly TOPIC = TOPIC;
   private versionPrefix = '';
 
-  constructor(private readonly config: Config, public accessTokenStore: AccessTokenStore) {
+  constructor(
+    private readonly config: Config,
+    public accessTokenStore: AccessTokenStore,
+  ) {
     super();
 
     this.client = axios.create({

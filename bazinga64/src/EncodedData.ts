@@ -20,5 +20,8 @@
 import {IData} from './IData';
 
 export class EncodedData implements IData {
-  constructor(public asBytes: Uint8Array, public asString: string) {}
+  constructor(
+    public asBytes: Uint8Array,
+    public asString: string,
+  ) {}
 }
