@@ -181,6 +181,7 @@ const Conversations: React.FC<ConversationsProps> = ({
               availability={userAvailability}
               dataUieName="status-availability"
               label={userName}
+              showBadges
             />
           </button>
 

@@ -19,6 +19,7 @@
 
 import {ChangeEvent, FC, KeyboardEvent, useEffect, useRef, useState} from 'react';
 
+import {Badges} from 'Components/Badges';
 import {Icon} from 'Components/Icon';
 import {isEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -146,6 +147,8 @@ const ConversationDetailsHeader: FC<ConversationDetailsHeaderProps> = ({
               data-uie-name="enter-name"
             />
           )}
+
+          <Badges displayBadgeTitle />
         </>
       ) : (
         <div className="conversation-details__name">

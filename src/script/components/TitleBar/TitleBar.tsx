@@ -27,6 +27,7 @@ import {container} from 'tsyringe';
 import {IconButton, IconButtonVariant, useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {Badges} from 'Components/Badges';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {Icon} from 'Components/Icon';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
@@ -276,6 +277,8 @@ export const TitleBar: React.FC<TitleBarProps> = ({
             <span className="conversation-title-bar-name-label" data-uie-name="status-conversation-title-bar-label">
               {displayName}
             </span>
+
+            <Badges />
           </div>
 
           {conversationSubtitle && <div className="conversation-title-bar-name--subtitle">{conversationSubtitle}</div>}

@@ -24,6 +24,7 @@ import cx from 'classnames';
 
 import {Availability} from '@wireapp/protocol-messaging';
 
+import {Badges} from 'Components/Badges';
 import {CSS_SQUARE} from 'Util/CSSMixin';
 import {KEY} from 'Util/KeyboardUtil';
 
@@ -38,6 +39,7 @@ export interface AvailabilityStateProps {
   onClick?: (event: React.MouseEvent | React.KeyboardEvent) => void;
   showArrow?: boolean;
   theme?: boolean;
+  showBadges?: boolean;
 }
 
 const iconStyles: CSSObject = {
@@ -63,6 +65,7 @@ const AvailabilityState: React.FC<AvailabilityStateProps> = ({
   showArrow = false,
   theme = false,
   onClick,
+  showBadges = false,
 }) => {
   const isAvailable = availability === Availability.Type.AVAILABLE;
   const isAway = availability === Availability.Type.AWAY;
@@ -124,6 +127,8 @@ const AvailabilityState: React.FC<AvailabilityStateProps> = ({
           {label}
         </span>
       )}
+
+      {showBadges && <Badges displayBothProtocolBadges />}
 
       {showArrow && (
         <span

@@ -82,6 +82,7 @@ export const UserDetailsComponent: React.FC<UserDetailsProps> = ({
             availability={user.availability}
             label={user.name}
             dataUieName="status-name"
+            showBadges
           />
         ) : (
           <h2
