@@ -22,6 +22,11 @@ updates:
     open-pull-requests-limit: 99
     labels:
       - 'type: chore 🧹'
+    groups:
+      eslint:
+        patterns:
+          - '*eslint*'
+
     ignore:
       - dependency-name: core-js
         versions:
