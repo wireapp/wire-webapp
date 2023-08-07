@@ -38,7 +38,7 @@ export const createNodes = (mentions: MentionEntity[], str: string) => {
 
   return breakWhere(sortedMentions, str)
     .map((string: string, index: number) =>
-      index % 2 == 0 ? {data: string, type: 'text'} : {data: string, type: 'beautifulMention'},
+      index % 2 == 0 ? {data: string, type: 'text'} : {data: string, type: 'Mention'},
     )
     .filter(({data}) => data.length > 0);
 };

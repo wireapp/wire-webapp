@@ -31,7 +31,7 @@ import {
 
 import {Mention} from '../components/Mention';
 
-export type SerializedBeautifulMentionNode = Spread<
+type SerializedMentionNode = Spread<
   {
     value: string;
     trigger: string;
@@ -40,39 +40,41 @@ export type SerializedBeautifulMentionNode = Spread<
 >;
 
 function convertElement(domNode: HTMLElement): DOMConversionOutput | null {
-  const value = domNode.getAttribute('data-lexical-beautiful-mention-value');
-  const trigger = domNode.getAttribute('data-lexical-beautiful-mention-trigger');
+  const value = domNode.getAttribute('data-lexical-mention-value');
+  const trigger = domNode.getAttribute('data-lexical-mention-trigger');
+
   if (value !== null && trigger != null) {
-    const node = $createBeautifulMentionNode(trigger, value);
+    const node = $createMentionNode(trigger, value);
     return {node};
   }
+
   return null;
 }
 
 /**
- * This node is used to represent a mention used in the BeautifulMentionPlugin.
+ * This node is used to represent a mention used in the MentionPlugin.
  */
-export class BeautifulMentionNode extends DecoratorNode<JSX.Element> {
+export class MentionNode extends DecoratorNode<JSX.Element> {
   __value: string;
   __trigger: string;
 
   static getType() {
-    return 'beautifulMention';
+    return 'Mention';
   }
 
-  static clone(node: BeautifulMentionNode) {
-    return new BeautifulMentionNode(node.__trigger, node.__value, node.__key);
+  static clone(node: MentionNode) {
+    return new MentionNode(node.__trigger, node.__value, node.__key);
   }
 
-  static importJSON(serializedNode: SerializedBeautifulMentionNode) {
-    return $createBeautifulMentionNode(serializedNode.trigger, serializedNode.value);
+  static importJSON(serializedNode: SerializedMentionNode) {
+    return $createMentionNode(serializedNode.trigger, serializedNode.value);
   }
 
   exportDOM() {
     const element = document.createElement('span');
-    element.setAttribute('data-lexical-beautiful-mention', 'true');
-    element.setAttribute('data-lexical-beautiful-mention-trigger', this.__trigger);
-    element.setAttribute('data-lexical-beautiful-mention-value', this.__value);
+    element.setAttribute('data-lexical-mention', 'true');
+    element.setAttribute('data-lexical-mention-trigger', this.__trigger);
+    element.setAttribute('data-lexical-mention-value', this.__value);
     element.textContent = this.getTextContent();
     return {element};
   }
@@ -80,7 +82,7 @@ export class BeautifulMentionNode extends DecoratorNode<JSX.Element> {
   static importDOM() {
     return {
       span: (domNode: HTMLElement) => {
-        if (!domNode.hasAttribute('data-lexical-beautiful-mention')) {
+        if (!domNode.hasAttribute('data-lexical-mention')) {
           return null;
         }
         return {
@@ -97,11 +99,11 @@ export class BeautifulMentionNode extends DecoratorNode<JSX.Element> {
     this.__value = value;
   }
 
-  exportJSON(): SerializedBeautifulMentionNode {
+  exportJSON(): SerializedMentionNode {
     return {
       trigger: this.__trigger,
       value: this.__value,
-      type: 'beautifulMention',
+      type: 'Mention',
       version: 1,
     };
   }
@@ -134,7 +136,7 @@ export class BeautifulMentionNode extends DecoratorNode<JSX.Element> {
   }
 
   decorate(_editor: LexicalEditor, config: EditorConfig) {
-    const theme: Record<string, string> = config.theme.beautifulMentions || {};
+    const theme: Record<string, string> = config.theme.mentions || {};
     const entry = Object.entries(theme).find(([trigger]) => new RegExp(trigger).test(this.__trigger));
     const className = entry && entry[1];
     const classNameFocused = entry && theme[`${entry[0]}Focused`];
@@ -149,11 +151,11 @@ export class BeautifulMentionNode extends DecoratorNode<JSX.Element> {
   }
 }
 
-export function $createBeautifulMentionNode(trigger: string, value: string): BeautifulMentionNode {
-  const mentionNode = new BeautifulMentionNode(trigger, value);
+export function $createMentionNode(trigger: string, value: string): MentionNode {
+  const mentionNode = new MentionNode(trigger, value);
   return $applyNodeReplacement(mentionNode);
 }
 
-export function $isBeautifulMentionNode(node: LexicalNode | null | undefined): node is BeautifulMentionNode {
-  return node instanceof BeautifulMentionNode;
+export function $isMentionNode(node: LexicalNode | null | undefined): node is MentionNode {
+  return node instanceof MentionNode;
 }

@@ -29,7 +29,7 @@ import {
   RangeSelection,
 } from 'lexical';
 
-import {$createBeautifulMentionNode} from '../nodes/MentionNode';
+import {$createMentionNode} from '../nodes/MentionNode';
 
 const PUNCTUATION = '\\.,\\*\\?\\$\\|#{}\\(\\)\\^\\[\\]\\\\/!%\'"~=<>_:;\\s';
 
@@ -161,7 +161,7 @@ export function insertMention(triggers: string[], trigger: string, value?: strin
   } = selectionInfo;
 
   // Insert a mention node or a text node with the trigger to open the mention menu.
-  const mentionNode = value ? $createBeautifulMentionNode(trigger, value) : $createTextNode(trigger);
+  const mentionNode = value ? $createMentionNode(trigger, value) : $createTextNode(trigger);
 
   // Insert a mention with a leading space if the node at the cursor is not a text node.
   if (!($isParagraphNode(node) && offset === 0) && !$isTextNode(node)) {
