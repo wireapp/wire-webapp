@@ -51,7 +51,7 @@ function createConversations(
 
 describe('MLSConversations', () => {
   beforeEach(() => {
-    jest.spyOn(useMLSConversationState.getState(), 'sendExternalToPendingJoin').mockReturnValue(undefined);
+    jest.spyOn(useMLSConversationState.getState(), 'joinWithExternalCommit').mockReturnValue(undefined);
   });
 
   describe('initMLSConversations', () => {
@@ -65,7 +65,7 @@ describe('MLSConversations', () => {
 
       await initMLSConversations(conversations, new Account());
 
-      expect(useMLSConversationState.getState().sendExternalToPendingJoin).toHaveBeenCalledWith(
+      expect(useMLSConversationState.getState().joinWithExternalCommit).toHaveBeenCalledWith(
         mlsConversations,
         expect.any(Function),
         expect.any(Function),
