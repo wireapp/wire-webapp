@@ -1635,7 +1635,11 @@ export class ConversationRepository {
     //we never go back to proteus conversation, even if one of the users do not support mls anymore
     //(e.g. due to the change of supported protocols in team configuration)
     if (shouldUseMLSProtocol || isMLSConversation(conversation)) {
-      return this.initMLS1to1Conversation(otherUserId, isSupportedByTheOtherUser);
+      const mlsConversation = await this.initMLS1to1Conversation(otherUserId, isSupportedByTheOtherUser);
+      if (isProteusConversation(conversation)) {
+        await this.replaceProteus1to1WithMLS(conversation, mlsConversation);
+      }
+      return mlsConversation;
     }
 
     if (protocol === ConversationProtocol.PROTEUS && isProteusConversation(conversation)) {
@@ -1690,6 +1694,7 @@ export class ConversationRepository {
       if (localProteusConversation && isProteusConversation(localProteusConversation)) {
         await this.replaceProteus1to1WithMLS(localProteusConversation, mlsConversation);
       }
+      return mlsConversation;
     }
 
     if (protocol === ConversationProtocol.PROTEUS) {
