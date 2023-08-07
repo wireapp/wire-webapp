@@ -51,7 +51,7 @@
     "underscore": "1.13.6",
     "uuidjs": "4.2.13",
     "webrtc-adapter": "6.4.8",
-    "zustand": "4.4.0"
+    "zustand": "4.4.1"
   },
   "devDependencies": {
     "@babel/core": "7.22.9",
