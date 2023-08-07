@@ -2603,19 +2603,10 @@ export class ConversationRepository {
       throw new Error(`groupId not found for MLS conversation ${conversation.id}`);
     }
 
-    const isMLSConversationEstablished = await this.core.service!.conversation.isMLSConversationEstablished(groupId);
+    const isMLSConversationEstablished = await this.isMLSConversationEstablished(groupId);
 
     if (!isMLSConversationEstablished) {
       return;
-    }
-
-    const mlsConversationState = useMLSConversationState.getState();
-
-    const isMLSConversationMarkedAsEstablished = mlsConversationState.isEstablished(groupId);
-
-    if (!isMLSConversationMarkedAsEstablished) {
-      // If the conversation was not previously marked as established and the core if aware of this conversation, we can mark is as established
-      mlsConversationState.markAsEstablished(groupId);
     }
 
     if (isSelfJoin) {
@@ -2632,6 +2623,32 @@ export class ConversationRepository {
       }
     }
   }
+
+  private readonly isMLSConversationEstablished = async (groupId: string) => {
+    const mlsService = this.core.service?.mls;
+
+    if (!mlsService) {
+      throw new Error('MLS service is not available!');
+    }
+
+    const mlsConversationState = useMLSConversationState.getState();
+
+    const isMLSConversationMarkedAsEstablished = mlsConversationState.isEstablished(groupId);
+
+    if (isMLSConversationMarkedAsEstablished) {
+      return true;
+    }
+
+    const isMLSConversationEstablished = await mlsService.conversationExists(groupId);
+
+    if (isMLSConversationEstablished) {
+      //make sure MLS group is marked as established
+      mlsConversationState.markAsEstablished(groupId);
+      return true;
+    }
+
+    return false;
+  };
 
   /**
    * Members of a group conversation were removed or left.
