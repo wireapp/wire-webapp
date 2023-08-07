@@ -940,6 +940,8 @@
   "modalUserCannotBeAddedHeadline": "Gäste können nicht hinzugefügt werden",
   "modalUserCannotConnectLegalHoldHeadline": "Keine Verbindung zu diesem Benutzer ",
   "modalUserCannotConnectLegalHoldMessage": "Aufgrund der gesetzlichen Aufbewahrung können Sie sich mit diesem Nutzer nicht verbinden. [link]Mehr erfahren[/link]",
+  "modalUserCannotConnectNotFederatingHeadline": "Verbindung nicht möglich",
+  "modalUserCannotConnectNotFederatingMessage": "Sie können keine Kontaktanfrage senden, da Ihr Backend nicht mit dem von {{Benutzername}} verbunden ist.",
   "modalUserLearnMore": "Mehr erfahren",
   "modalUserUnblockAction": "Freigeben",
   "modalUserUnblockHeadline": "Freigeben?",
