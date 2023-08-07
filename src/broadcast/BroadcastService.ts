@@ -30,7 +30,10 @@ import {ProteusService} from '../messagingProtocols/proteus';
 export class BroadcastService {
   private readonly messageService: MessageService;
 
-  constructor(private readonly apiClient: APIClient, private readonly proteusService: ProteusService) {
+  constructor(
+    private readonly apiClient: APIClient,
+    private readonly proteusService: ProteusService,
+  ) {
     this.messageService = new MessageService(this.apiClient, this.proteusService);
   }
 

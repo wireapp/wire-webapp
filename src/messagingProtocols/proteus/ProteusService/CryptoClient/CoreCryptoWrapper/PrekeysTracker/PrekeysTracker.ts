@@ -40,7 +40,10 @@ interface PrekeysGeneratorConfig {
 export class PrekeyTracker {
   private prekeyState: PrekeysTrackerStore;
 
-  constructor(private readonly generator: CoreCryptoPrekeyGenerator, private config: PrekeysGeneratorConfig) {
+  constructor(
+    private readonly generator: CoreCryptoPrekeyGenerator,
+    private config: PrekeysGeneratorConfig,
+  ) {
     this.prekeyState = new PrekeysTrackerStore();
   }
 

@@ -78,7 +78,10 @@ export async function buildClient(
 export class CoreCryptoWrapper implements CryptoClient {
   private readonly prekeyTracker: PrekeyTracker;
 
-  constructor(private readonly coreCrypto: CoreCrypto, private readonly config: ClientConfig) {
+  constructor(
+    private readonly coreCrypto: CoreCrypto,
+    private readonly config: ClientConfig,
+  ) {
     this.prekeyTracker = new PrekeyTracker(this, config);
   }
 

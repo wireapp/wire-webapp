@@ -36,7 +36,10 @@ import {isQualifiedIdArray} from '../../util';
 type ClientMismatchError = AxiosError<MessageSendingStatus>;
 
 export class MessageService {
-  constructor(private readonly apiClient: APIClient, private readonly proteusService: ProteusService) {}
+  constructor(
+    private readonly apiClient: APIClient,
+    private readonly proteusService: ProteusService,
+  ) {}
 
   /**
    * Sends a message to a federated backend.

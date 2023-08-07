@@ -35,7 +35,10 @@ export function buildClient(storeEngine: CRUDEngine, config: Config & {nbPrekeys
 }
 
 export class CryptoboxWrapper implements CryptoClient {
-  constructor(private readonly cryptobox: Cryptobox, config: Config) {
+  constructor(
+    private readonly cryptobox: Cryptobox,
+    config: Config,
+  ) {
     this.cryptobox.on(Cryptobox.TOPIC.NEW_PREKEYS, prekeys => {
       const serializedPreKeys = prekeys.map(prekey => this.cryptobox.serialize_prekey(prekey));
       config.onNewPrekeys(serializedPreKeys);
