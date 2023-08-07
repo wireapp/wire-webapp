@@ -4965,15 +4965,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/eslint-config@file:.yalc/@wireapp/eslint-config::locator=wire-webapp%40workspace%3A.":
-  version: 2.2.3
-  resolution: "@wireapp/eslint-config@file:.yalc/@wireapp/eslint-config#.yalc/@wireapp/eslint-config::hash=57e844&locator=wire-webapp%40workspace%3A."
+"@wireapp/eslint-config@npm:3.0.0":
+  version: 3.0.0
+  resolution: "@wireapp/eslint-config@npm:3.0.0"
   dependencies:
     "@types/eslint": ^8
     "@types/prettier": ^3
     "@typescript-eslint/eslint-plugin": ^6.0.0
     "@typescript-eslint/parser": ^6.0.0
-    eslint: ^8.27.0
+    eslint: ^8
     eslint-config-prettier: ^9
     eslint-import-resolver-alias: ^1.1.2
     eslint-import-resolver-typescript: ^3.5.2
@@ -4995,7 +4995,8 @@ __metadata:
     typescript: ^5
   peerDependencies:
     eslint: ^8
-  checksum: 624684e7b40f77c327936428387c24ee3ec4d4356ad3963440bf3b44405256bc82c80568356d5e39c8e86bbea671fabb4254564d160d4e81a7b2457fbeea71c5
+    prettier: ^3
+  checksum: 4e677d6cef4ef50096911276ce4f298047fbc7ce143a0b48c08b50a7a84b405daf765bacee6878f676895357b08db9cd552289cc79a1701f4ea94948a0b021c8
   languageName: node
   linkType: hard
 
@@ -8369,7 +8370,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint@npm:^8.27.0, eslint@npm:^8.46.0":
+"eslint@npm:^8, eslint@npm:^8.46.0":
   version: 8.46.0
   resolution: "eslint@npm:8.46.0"
   dependencies:
@@ -17712,7 +17713,7 @@ __metadata:
     "@wireapp/avs": 9.3.7
     "@wireapp/copy-config": 2.1.1
     "@wireapp/core": 40.8.4
-    "@wireapp/eslint-config": "file:.yalc/@wireapp/eslint-config"
+    "@wireapp/eslint-config": 3.0.0
     "@wireapp/lru-cache": 3.8.1
     "@wireapp/prettier-config": 0.6.0
     "@wireapp/react-ui-kit": 9.7.8
