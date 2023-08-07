@@ -28,9 +28,6 @@ updates:
           - '*eslint*'
 
     ignore:
-      - dependency-name: core-js
-        versions:
-          - '>= 3.a'
       - dependency-name: webrtc-adapter
         versions:
           - '>= 7.a'
