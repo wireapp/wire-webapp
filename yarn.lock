@@ -6760,10 +6760,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"core-js@npm:3.25.5":
-  version: 3.25.5
-  resolution: "core-js@npm:3.25.5"
-  checksum: 208b308c49bc022f90d4349d4c99802a73c9d55053976b3c529f10014c1e37845926defad8c519f2c7f71ea0acf18d2b323ab6aaee34dc85b4c4b3ced0623f3f
+"core-js@npm:3.32.0":
+  version: 3.32.0
+  resolution: "core-js@npm:3.32.0"
+  checksum: 52921395028550e4c9d21d47b9836439bb5b6b9eefc34d45a3948a68d81fdd093acc0fadf69f9cf632b82f01f95f22f484408a93dd9e940b19119ac204cd2925
   languageName: node
   linkType: hard
 
@@ -17727,7 +17727,7 @@ __metadata:
     caniuse-lite: ^1.0.30001519
     classnames: 2.3.2
     copy-webpack-plugin: 11.0.0
-    core-js: 3.25.5
+    core-js: 3.32.0
     countly-sdk-web: 23.6.0
     cross-env: 7.0.3
     cspell: 6.31.2

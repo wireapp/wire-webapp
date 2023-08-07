@@ -28,9 +28,6 @@ updates:
           - '*eslint*'
 
     ignore:
-      - dependency-name: webrtc-adapter
-        versions:
-          - '>= 7.a'
       - dependency-name: '@wireapp/avs'
 
   # Server dependencies
