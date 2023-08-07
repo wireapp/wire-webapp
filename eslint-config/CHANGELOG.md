@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@2.2.3...@wireapp/eslint-config@3.0.0) (2023-08-07)
+
+### Bug Fixes
+
+* **eslint-config:** make eslint plugins direct dependencies ([#5368](https://github.com/wireapp/wire-web-packages/issues/5368)) ([fe70da4](https://github.com/wireapp/wire-web-packages/commit/fe70da4e118350cb6b7594845ecbd75a4404f81c))
+
+### BREAKING CHANGES
+
+* **eslint-config:** upgraded major version of prettier and some eslint plugins
+
 ## [2.2.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@2.2.2...@wireapp/eslint-config@2.2.3) (2023-07-24)
 
 **Note:** Version bump only for package @wireapp/eslint-config
