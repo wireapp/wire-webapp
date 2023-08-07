@@ -31,11 +31,12 @@ import * as ReactDOM from 'react-dom';
 import {loadValue, storeValue} from 'Util/StorageUtil';
 import {sortByPriority} from 'Util/StringUtil';
 
-import {StorageKey} from '../../../../storage';
-import {EmojiItem} from '../../components/EmojiItem';
-import emojis from '../../utils/emoji-list';
-import {getDOMRangeRect} from '../../utils/getDomRangeRect';
-import {ItemProps} from '../LexicalTypeheadMenuPlugin';
+import {ItemProps} from './LexicalTypeheadMenuPlugin';
+
+import {StorageKey} from '../../../storage';
+import {EmojiItem} from '../components/EmojiItem';
+import emojis from '../utils/emoji-list';
+import {getDOMRangeRect} from '../utils/getDomRangeRect';
 
 export class EmojiOption extends MenuOption {
   title: string;

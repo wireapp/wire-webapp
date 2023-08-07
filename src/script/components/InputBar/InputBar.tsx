@@ -32,7 +32,7 @@ import {checkFileSharingPermission} from 'Components/Conversation/utils/checkFil
 import {ClassifiedBar} from 'Components/input/ClassifiedBar';
 import {SendMessageButton} from 'Components/LexicalInput/components/SendMessageButton';
 import {LexicalInput} from 'Components/LexicalInput/LexicalInput';
-import {$createBeautifulMentionNode} from 'Components/LexicalInput/nodes/MentionNode';
+import {$createMentionNode} from 'Components/LexicalInput/nodes/MentionNode';
 import {createNodes} from 'Components/LexicalInput/utils/generateNodes';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
@@ -245,8 +245,8 @@ const InputBar = ({
         const nodes = createNodes(newMentions, firstAsset.text);
 
         const paragraphs = nodes.map(node => {
-          if (node.type === 'beautifulMention') {
-            return $createBeautifulMentionNode('@', node.data.slice(1));
+          if (node.type === 'Mention') {
+            return $createMentionNode('@', node.data.slice(1));
           }
 
           return $createTextNode(node.data);

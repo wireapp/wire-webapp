@@ -46,7 +46,7 @@ import {ItemProps, LexicalTypeaheadMenuPlugin} from './LexicalTypeheadMenuPlugin
 import {User} from '../../../entity/User';
 import {MentionSuggestionsItem} from '../components/Mention/MentionSuggestionsItem';
 import {useIsFocused} from '../hooks/useIsFocused';
-import {$createBeautifulMentionNode, $isBeautifulMentionNode, BeautifulMentionNode} from '../nodes/MentionNode';
+import {$createMentionNode, $isMentionNode, MentionNode} from '../nodes/MentionNode';
 import {
   INSERT_MENTION_COMMAND,
   OPEN_MENTIONS_MENU_COMMAND,
@@ -74,11 +74,11 @@ export class MenuOption extends _MenuOption {
   }
 }
 
-interface BeautifulMentionsPluginProps {
+interface MentionsPluginProps {
   onSearch: (queryString?: string | null) => User[];
 }
 
-export function BeautifulMentionsPlugin({onSearch}: BeautifulMentionsPluginProps) {
+export function MentionsPlugin({onSearch}: MentionsPluginProps) {
   const isEditorFocused = useIsFocused();
   const triggers = useMemo(() => ['@'], []);
   const [editor] = useLexicalComposerContext();
@@ -107,7 +107,7 @@ export function BeautifulMentionsPlugin({onSearch}: BeautifulMentionsPluginProps
         if (!trigger) {
           return;
         }
-        const mentionNode = $createBeautifulMentionNode(trigger, selectedOption.value);
+        const mentionNode = $createMentionNode(trigger, selectedOption.value);
         if (nodeToReplace) {
           nodeToReplace.replace(mentionNode);
         }
@@ -162,7 +162,7 @@ export function BeautifulMentionsPlugin({onSearch}: BeautifulMentionsPluginProps
       const trigger = triggers.find(trigger => queryMatch.replaceableString.startsWith(trigger));
       const end = textContent.search(new RegExp(`${queryMatch.replaceableString}\\s?$`));
       if (trigger && end !== -1) {
-        const mentionNode = $createBeautifulMentionNode(trigger, queryMatch.matchingString);
+        const mentionNode = $createMentionNode(trigger, queryMatch.matchingString);
         node.setTextContent(textContent.substring(0, end));
         node.insertAfter(mentionNode);
         mentionNode.selectNext();
@@ -216,11 +216,11 @@ export function BeautifulMentionsPlugin({onSearch}: BeautifulMentionsPluginProps
             cursorAtStartOfNode,
             cursorAtEndOfNode,
           } = selectionInfo;
-          if (isTextNode && cursorAtStartOfNode && $isBeautifulMentionNode(prevNode)) {
+          if (isTextNode && cursorAtStartOfNode && $isMentionNode(prevNode)) {
             node.insertBefore($createTextNode(' '));
             return true;
           }
-          if (isTextNode && cursorAtEndOfNode && $isBeautifulMentionNode(nextNode)) {
+          if (isTextNode && cursorAtEndOfNode && $isMentionNode(nextNode)) {
             node.insertAfter($createTextNode(' '));
             return true;
           }
@@ -229,7 +229,7 @@ export function BeautifulMentionsPlugin({onSearch}: BeautifulMentionsPluginProps
             node.setTextContent(content);
             return true;
           }
-          if ($isBeautifulMentionNode(node) && nextNode === null) {
+          if ($isMentionNode(node) && nextNode === null) {
             node.insertAfter($createTextNode(' '));
             return true;
           }
@@ -254,7 +254,7 @@ export function BeautifulMentionsPlugin({onSearch}: BeautifulMentionsPluginProps
         ({trigger, value, focus}) => {
           let removed = false;
           setSelection();
-          const mentions = $nodesOfType(BeautifulMentionNode);
+          const mentions = $nodesOfType(MentionNode);
           for (const mention of mentions) {
             const sameTrigger = mention.getTrigger() === trigger;
             const sameValue = mention.getValue() === value;
@@ -285,7 +285,7 @@ export function BeautifulMentionsPlugin({onSearch}: BeautifulMentionsPluginProps
         ({trigger, value, newValue, focus}) => {
           let renamed = false;
           setSelection();
-          const mentions = $nodesOfType(BeautifulMentionNode);
+          const mentions = $nodesOfType(MentionNode);
           for (const mention of mentions) {
             const sameTrigger = mention.getTrigger() === trigger;
             const sameValue = mention.getValue() === value;
@@ -338,24 +338,21 @@ export function BeautifulMentionsPlugin({onSearch}: BeautifulMentionsPluginProps
         >
           <div className="mention-suggestion-list">
             {options
-              .map((option, index) => {
-                const selected = selectedIndex === index;
-                return (
-                  <MentionSuggestionsItem
-                    ref={option.setRefElement}
-                    key={option.user.id}
-                    suggestion={option.user}
-                    isSelected={selected}
-                    onSuggestionClick={() => {
-                      setHighlightedIndex(index);
-                      selectOptionAndCleanUp(option);
-                    }}
-                    onMouseEnter={() => {
-                      setHighlightedIndex(index);
-                    }}
-                  />
-                );
-              })
+              .map((menuOption, index) => (
+                <MentionSuggestionsItem
+                  ref={menuOption.setRefElement}
+                  key={menuOption.user.id}
+                  suggestion={menuOption.user}
+                  isSelected={selectedIndex === index}
+                  onSuggestionClick={() => {
+                    setHighlightedIndex(index);
+                    selectOptionAndCleanUp(menuOption);
+                  }}
+                  onMouseEnter={() => {
+                    setHighlightedIndex(index);
+                  }}
+                />
+              ))
               .reverse()}
           </div>
         </FadingScrollbar>

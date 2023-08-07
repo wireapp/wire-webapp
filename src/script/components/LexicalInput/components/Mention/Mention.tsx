@@ -45,17 +45,17 @@ import {
 
 import {KEY} from 'Util/KeyboardUtil';
 
-import {$isBeautifulMentionNode} from '../../nodes/MentionNode';
+import {$isMentionNode} from '../../nodes/MentionNode';
 import {getNextSibling, getPreviousSibling} from '../../utils/mention-utils';
 
-interface BeautifulMentionComponentProps {
+interface MentionComponentProps {
   mention: string;
   nodeKey: NodeKey;
   className?: string;
   classNameFocused?: string;
 }
 
-export const Mention = (props: BeautifulMentionComponentProps) => {
+export const Mention = (props: MentionComponentProps) => {
   const {mention, className = '', classNameFocused = '', nodeKey} = props;
   const [editor] = useLexicalComposerContext();
   const [isSelected, setSelected, clearSelection] = useLexicalNodeSelection(nodeKey);
@@ -80,7 +80,7 @@ export const Mention = (props: BeautifulMentionComponentProps) => {
 
         const node = $getNodeByKey(nodeKey);
 
-        if ($isBeautifulMentionNode(node)) {
+        if ($isMentionNode(node)) {
           node.remove();
         }
 
@@ -207,7 +207,7 @@ export const Mention = (props: BeautifulMentionComponentProps) => {
   }, [editor, onArrowPress, onClick, onBlur, onDelete]);
 
   return (
-    <span ref={ref} className={classNameFinal} data-beautiful-mention={mention}>
+    <span ref={ref} className={classNameFinal} data-mention={mention}>
       {mention}
     </span>
   );

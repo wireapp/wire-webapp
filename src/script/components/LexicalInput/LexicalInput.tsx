@@ -32,14 +32,14 @@ import {User} from 'src/script/entity/User';
 import {DraftState} from 'Util/DraftStateUtil';
 import {getLogger} from 'Util/Logger';
 
-import {BeautifulMentionNode} from './nodes/MentionNode';
+import {MentionNode} from './nodes/MentionNode';
 import {AutoFocusPlugin} from './plugins/AutoFocusPlugin';
-import {BeautifulMentionsPlugin} from './plugins/BeautifulMentionsPlugin';
 import {DraftStatePlugin} from './plugins/DraftStatePlugin';
 import {EditMessagePlugin} from './plugins/EditMessagePlugin';
 import {EmojiPickerPlugin} from './plugins/EmojiPickerPlugin';
 import {GlobalEventsPlugin} from './plugins/GlobalEventsPlugin';
 import {EditorRefPlugin} from './plugins/LexicalEditorRefPlugin';
+import {MentionsPlugin} from './plugins/MentionsPlugin';
 
 import {MentionEntity} from '../../message/MentionEntity';
 import {PropertiesRepository} from '../../properties/PropertiesRepository';
@@ -50,9 +50,9 @@ const theme = {
   rtl: 'rtl',
   placeholder: 'editor-placeholder',
   paragraph: 'editor-paragraph',
-  beautifulMentions: {
-    '@': `at-beautiful-mentions`, // use the trigger name as the key
-    '@Focused': 'focused-beautiful-mentions', // add the "Focused" suffix to style the focused mention
+  mentions: {
+    '@': `at-mentions`, // use the trigger name as the key
+    '@Focused': 'focused-mentions', // add the "Focused" suffix to style the focused mention
   },
 };
 
@@ -99,10 +99,10 @@ export const LexicalInput = forwardRef<LexicalEditor, LexicalInputProps>(
         logger.error(error);
         throw error;
       },
-      nodes: [BeautifulMentionNode],
+      nodes: [MentionNode],
     };
 
-    const queryMentions = (queryString?: string | null) => {
+    const searchMentions = (queryString?: string | null) => {
       return queryString ? searchRepository.searchUserInSet(queryString, mentionCandidates) : mentionCandidates;
     };
 
@@ -142,7 +142,7 @@ export const LexicalInput = forwardRef<LexicalEditor, LexicalInputProps>(
               ErrorBoundary={LexicalErrorBoundary}
             />
 
-            <BeautifulMentionsPlugin onSearch={queryMentions} />
+            <MentionsPlugin onSearch={searchMentions} />
 
             <OnChangePlugin onChange={onInputChange} />
           </div>

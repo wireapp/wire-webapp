@@ -28,7 +28,7 @@ import {t} from 'Util/LocalizerUtil';
 
 import {User} from '../../../../entity/User';
 import {MentionEntity} from '../../../../message/MentionEntity';
-import {BeautifulMentionNode} from '../../nodes/MentionNode';
+import {MentionNode} from '../../nodes/MentionNode';
 
 const createMentionEntity = (user: Pick<User, 'id' | 'name' | 'domain'>, mentionPosition: number): MentionEntity => {
   const userName = user.name();
@@ -44,9 +44,7 @@ interface SendMessageButtonProps {
 }
 
 export const getMentionsToSend = (editor: LexicalEditor, textValue: string, mentions: User[]) => {
-  const currentMentions = editor
-    .getEditorState()
-    .read(() => $nodesOfType(BeautifulMentionNode).map(node => node.__value));
+  const currentMentions = editor.getEditorState().read(() => $nodesOfType(MentionNode).map(node => node.__value));
 
   const mentionEntities: MentionEntity[] = [];
   let position = -1;
