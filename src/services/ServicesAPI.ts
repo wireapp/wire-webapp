@@ -34,7 +34,10 @@ import {PreKey} from '../auth';
 import {HttpClient, ProgressCallback} from '../http';
 
 export class ServicesAPI {
-  constructor(private readonly client: HttpClient, private readonly assetAPI: AssetAPI) {}
+  constructor(
+    private readonly client: HttpClient,
+    private readonly assetAPI: AssetAPI,
+  ) {}
 
   public static readonly URL = {
     ASSETS: 'assets',

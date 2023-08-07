@@ -92,7 +92,10 @@ export class UserAPI {
     SUPPORTED_PROTOCOLS: 'supported-protocols',
   };
 
-  constructor(private readonly client: HttpClient, private readonly backendFeatures: BackendFeatures) {}
+  constructor(
+    private readonly client: HttpClient,
+    private readonly backendFeatures: BackendFeatures,
+  ) {}
 
   /**
    * Clear all properties.
@@ -610,13 +613,16 @@ export class UserAPI {
     userClientMap: QualifiedUserClients,
     limit: number = UserAPI.DEFAULT_USERS_PREKEY_BUNDLE_CHUNK_SIZE,
   ): Promise<PrekeysResponse> {
-    const flattenUsers = Object.entries(userClientMap).reduce((users, [domain, domainUsersClients]) => {
-      const domainUsers = Object.entries(domainUsersClients).map(([userId, clients]) => ({
-        userId: {id: userId, domain},
-        clients,
-      }));
-      return users.concat(domainUsers);
-    }, [] as {userId: QualifiedId; clients: string[]}[]);
+    const flattenUsers = Object.entries(userClientMap).reduce(
+      (users, [domain, domainUsersClients]) => {
+        const domainUsers = Object.entries(domainUsersClients).map(([userId, clients]) => ({
+          userId: {id: userId, domain},
+          clients,
+        }));
+        return users.concat(domainUsers);
+      },
+      [] as {userId: QualifiedId; clients: string[]}[],
+    );
 
     const chunksPromises = ArrayUtil.chunk(flattenUsers, limit)
       .map(chunk => {

@@ -66,7 +66,10 @@ const ASSET_URLS = {
 } as const;
 
 export class AssetAPI {
-  constructor(private readonly client: HttpClient, private readonly backendFeatures: BackendFeatures) {}
+  constructor(
+    private readonly client: HttpClient,
+    private readonly backendFeatures: BackendFeatures,
+  ) {}
 
   private getAssetShared(
     assetUrl: string,
