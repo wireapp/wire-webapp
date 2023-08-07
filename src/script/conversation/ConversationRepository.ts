@@ -39,6 +39,7 @@ import {
   ConversationRenameEvent,
   ConversationTypingEvent,
   CONVERSATION_EVENT,
+  ConversationMLSWelcomeEvent,
 } from '@wireapp/api-client/lib/event';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import type {BackendError} from '@wireapp/api-client/lib/http/';
@@ -2068,21 +2069,13 @@ export class ConversationRepository {
       ? {domain: '', id: eventData.conversationId}
       : qualified_conversation || {domain: '', id: conversation};
 
+    if (type === CONVERSATION_EVENT.MLS_WELCOME_MESSAGE) {
+      this.handleMLSWelcomeMessageEvent(eventJson);
+    }
+
     const inSelfConversation = this.conversationState.isSelfConversation(conversationId);
     if (inSelfConversation) {
-      const typesInSelfConversation = [
-        CONVERSATION_EVENT.MEMBER_UPDATE,
-        ClientEvent.CONVERSATION.MESSAGE_HIDDEN,
-        /**
-         * As of today (07/07/2022) the backend sends `WELCOME` message to the user's own
-         * conversation (not the actual conversation that the welcome should be part of)
-         */
-        CONVERSATION_EVENT.MLS_WELCOME_MESSAGE,
-      ];
-
-      if (type === CONVERSATION_EVENT.MLS_WELCOME_MESSAGE) {
-        useMLSConversationState.getState().markAsEstablished(eventData);
-      }
+      const typesInSelfConversation = [CONVERSATION_EVENT.MEMBER_UPDATE, ClientEvent.CONVERSATION.MESSAGE_HIDDEN];
 
       const isExpectedType = typesInSelfConversation.includes(type);
       if (!isExpectedType) {
@@ -2150,6 +2143,11 @@ export class ConversationRepository {
           throw error;
         }
       });
+  }
+
+  private handleMLSWelcomeMessageEvent(eventJson: ConversationMLSWelcomeEvent) {
+    const groupId = eventJson.data;
+    return useMLSConversationState.getState().markAsEstablished(groupId);
   }
 
   /**
