@@ -38,7 +38,10 @@ export class UserMapper {
    * Construct a new User Mapper.
    * @param serverTimeHandler Handles time shift between server and client
    */
-  constructor(private readonly serverTimeHandler: ServerTimeHandler, private teamState = container.resolve(TeamState)) {
+  constructor(
+    private readonly serverTimeHandler: ServerTimeHandler,
+    private teamState = container.resolve(TeamState),
+  ) {
     this.logger = getLogger('UserMapper');
   }
 

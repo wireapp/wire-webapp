@@ -927,7 +927,7 @@ export const oauthStrings = defineMessages({
     id: 'oauth.scope.write_conversations_code',
   },
   [Scope.READ_SELF]: {
-    defaultMessage: 'View your team’s feature View your Wire username, profile name, and email',
+    defaultMessage: 'View your Wire username, profile name, and email',
     id: 'oauth.scope.read_self',
   },
   [Scope.READ_FEATURE_CONFIGS]: {

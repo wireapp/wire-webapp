@@ -24,7 +24,10 @@ import {Message} from './Message';
 import {SuperType} from '../../message/SuperType';
 
 export class FailedToAddUsersMessage extends Message {
-  constructor(public qualifiedIds: QualifiedId[], time: number) {
+  constructor(
+    public qualifiedIds: QualifiedId[],
+    time: number,
+  ) {
     super();
     this.super_type = SuperType.FAILED_TO_ADD_USERS;
     this.timestamp(time);
