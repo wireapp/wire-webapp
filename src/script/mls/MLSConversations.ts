@@ -115,11 +115,12 @@ export async function registerUninitializedSelfAndTeamConversations(
   );
 
   await Promise.all(
-    uninitializedConversations.map(conversation =>
-      core.service?.mls.registerConversation(conversation.groupId, [selfUser.qualifiedId], {
-        user: selfUser,
-        client: selfClientId,
-      }),
+    uninitializedConversations.map(
+      conversation =>
+        core.service?.mls.registerConversation(conversation.groupId, [selfUser.qualifiedId], {
+          user: selfUser,
+          client: selfClientId,
+        }),
     ),
   );
 }

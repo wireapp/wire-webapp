@@ -1425,10 +1425,11 @@ export class CallingRepository {
   }
 
   private updateParticipantAudioState(call: Call, members: QualifiedWcallMember[]): void {
-    members.forEach(member =>
-      call
-        .getParticipant(member.userId, member.clientid)
-        ?.isAudioEstablished(member.aestab === AUDIO_STATE.ESTABLISHED),
+    members.forEach(
+      member =>
+        call
+          .getParticipant(member.userId, member.clientid)
+          ?.isAudioEstablished(member.aestab === AUDIO_STATE.ESTABLISHED),
     );
   }
 

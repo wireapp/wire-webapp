@@ -43,7 +43,10 @@ class Server {
   private readonly app: express.Express;
   private server?: http.Server | https.Server;
 
-  constructor(private readonly config: ServerConfig, private readonly clientConfig: ClientConfig) {
+  constructor(
+    private readonly config: ServerConfig,
+    private readonly clientConfig: ClientConfig,
+  ) {
     if (this.config.DEVELOPMENT) {
       console.info(this.config);
     } else if (!this.config.APP_BASE.startsWith('https')) {
