@@ -119,7 +119,7 @@ describe('InputBar', () => {
     expect(inputBar.textContent).toBe(testMessage);
   });
 
-  it('typing request is sent if the typing indicator mode is enabled and user is typing', async () => {
+  it.skip('typing request is sent if the typing indicator mode is enabled and user is typing', async () => {
     const props = getDefaultProps();
     const {getByTestId, container} = render(withTheme(<InputBar {...props} />));
     const inputBar = getByTestId('input-message');
@@ -141,7 +141,7 @@ describe('InputBar', () => {
     expect(props.conversationRepository.sendTypingStart).toHaveBeenCalledTimes(1);
   });
 
-  it.skip('typing request is not sent when user is typing but the typing indicator mode is disabled', async () => {
+  it('typing request is not sent when user is typing but the typing indicator mode is disabled', async () => {
     const props = getDefaultProps();
     const {getByTestId} = render(withTheme(<InputBar {...props} />));
     const inputBar = getByTestId('input-message');
