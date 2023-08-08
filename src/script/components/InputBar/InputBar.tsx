@@ -594,6 +594,7 @@ const InputBar = ({
                 editMessage={editMessage}
                 mentionCandidates={mentionCandidates}
                 searchRepository={searchRepository}
+                propertiesRepository={propertiesRepository}
                 placeholder={inputPlaceholder}
                 inputValue={inputValue}
                 setInputValue={setInputValue}

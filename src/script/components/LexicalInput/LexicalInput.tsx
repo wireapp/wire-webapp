@@ -17,21 +17,26 @@
  *
  */
 
-import {forwardRef, useCallback, ReactElement} from 'react';
+import {forwardRef, useCallback, useEffect, useState, ReactElement} from 'react';
 
 import {InitialConfigType, LexicalComposer} from '@lexical/react/LexicalComposer';
 import {ContentEditable} from '@lexical/react/LexicalContentEditable';
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary';
 import {OnChangePlugin} from '@lexical/react/LexicalOnChangePlugin';
 import {PlainTextPlugin} from '@lexical/react/LexicalPlainTextPlugin';
+import type {WebappProperties} from '@wireapp/api-client/lib/user/data/';
+import {amplify} from 'amplify';
 import cx from 'classnames';
 import {LexicalEditor, EditorState} from 'lexical';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {User} from 'src/script/entity/User';
 import {DraftState} from 'Util/DraftStateUtil';
 import {getLogger} from 'Util/Logger';
 
+import {EmojiNode} from './nodes/EmojiNode';
 import {MentionNode} from './nodes/MentionNode';
 import {AutoFocusPlugin} from './plugins/AutoFocusPlugin';
 import {DraftStatePlugin} from './plugins/DraftStatePlugin';
@@ -40,8 +45,11 @@ import {EmojiPickerPlugin} from './plugins/EmojiPickerPlugin';
 import {GlobalEventsPlugin} from './plugins/GlobalEventsPlugin';
 import {EditorRefPlugin} from './plugins/LexicalEditorRefPlugin';
 import {MentionsPlugin} from './plugins/MentionsPlugin';
+import {ReplaceEmojiPlugin} from './plugins/ReplaceEmojiPlugin';
 
 import {MentionEntity} from '../../message/MentionEntity';
+import {PropertiesRepository} from '../../properties/PropertiesRepository';
+import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
 import {SearchRepository} from '../../search/SearchRepository';
 
 const theme = {
@@ -59,6 +67,7 @@ const logger = getLogger('LexicalInput');
 
 interface LexicalInputProps {
   currentMentions: MentionEntity[];
+  readonly propertiesRepository: PropertiesRepository;
   readonly searchRepository: SearchRepository;
   placeholder: string;
   inputValue: string;
@@ -76,6 +85,7 @@ export const LexicalInput = forwardRef<LexicalEditor, LexicalInputProps>(
   (
     {
       placeholder,
+      propertiesRepository,
       searchRepository,
       inputValue,
       setInputValue,
@@ -89,6 +99,11 @@ export const LexicalInput = forwardRef<LexicalEditor, LexicalInputProps>(
     },
     ref,
   ) => {
+    // Emojis
+    const [shouldReplaceEmoji, setShouldReplaceEmoji] = useState<boolean>(
+      propertiesRepository.getPreference(PROPERTIES_TYPE.EMOJI.REPLACE_INLINE),
+    );
+
     const editorConfig: InitialConfigType = {
       namespace: 'WireLexicalEditor',
       theme,
@@ -96,7 +111,7 @@ export const LexicalInput = forwardRef<LexicalEditor, LexicalInputProps>(
         logger.error(error);
         throw error;
       },
-      nodes: [MentionNode],
+      nodes: [MentionNode, EmojiNode],
     };
 
     const searchMentions = (queryString?: string | null) => {
@@ -115,10 +130,17 @@ export const LexicalInput = forwardRef<LexicalEditor, LexicalInputProps>(
       [saveDraftState, setInputValue],
     );
 
+    useEffect(() => {
+      amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE, setShouldReplaceEmoji);
+      amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, (properties: WebappProperties) => {
+        setShouldReplaceEmoji(properties.settings.emoji.replace_inline);
+      });
+    }, []);
+
     return (
       <LexicalComposer initialConfig={editorConfig}>
         <div className="controls-center">
-          <div className={cx('input-bar--wrapper')}>
+          <div className="input-bar--wrapper">
             <AutoFocusPlugin />
             <GlobalEventsPlugin onShiftTab={onShiftTab} />
             <EditorRefPlugin editorRef={ref} />
@@ -126,6 +148,8 @@ export const LexicalInput = forwardRef<LexicalEditor, LexicalInputProps>(
             <EditMessagePlugin onMessageEdit={editMessage} />
 
             <EmojiPickerPlugin />
+
+            {shouldReplaceEmoji && <ReplaceEmojiPlugin />}
 
             <PlainTextPlugin
               contentEditable={

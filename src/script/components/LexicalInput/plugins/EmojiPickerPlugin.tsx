@@ -28,7 +28,6 @@ import {
 import {$createTextNode, $getSelection, $isRangeSelection, TextNode} from 'lexical';
 import * as ReactDOM from 'react-dom';
 
-import {checkForEmojis} from 'Components/LexicalInput/utils/emojiUtils';
 import {loadValue, storeValue} from 'Util/StorageUtil';
 import {sortByPriority} from 'Util/StringUtil';
 
@@ -36,7 +35,8 @@ import {ItemProps} from './LexicalTypeheadMenuPlugin';
 
 import {StorageKey} from '../../../storage';
 import {EmojiItem} from '../components/EmojiItem';
-import emojis from '../utils/emojiList';
+import emojiList from '../utils/emojiList';
+import {checkForEmojis} from '../utils/emojiUtils';
 import {getDOMRangeRect} from '../utils/getDomRangeRect';
 import {getSelectionInfo} from '../utils/getSelectionInfo';
 
@@ -79,15 +79,13 @@ export function EmojiPickerPlugin() {
 
   const emojiOptions = useMemo(
     () =>
-      emojis != null
-        ? emojis.map(
-            ({emoji, aliases, tags}) =>
-              new EmojiOption(aliases[0], emoji, {
-                keywords: [...aliases, ...tags],
-              }),
-          )
-        : [],
-    [emojis],
+      emojiList.map(
+        ({emoji, aliases, tags}) =>
+          new EmojiOption(aliases[0], emoji, {
+            keywords: [...aliases, ...tags],
+          }),
+      ),
+    [],
   );
 
   const checkForTriggerMatch = useBasicTypeaheadTriggerMatch('/', {
@@ -113,19 +111,30 @@ export function EmojiPickerPlugin() {
 
       return queryMatch?.replaceableString ? queryMatch : null;
     },
-    [lexicalEditor],
+    [checkForTriggerMatch, lexicalEditor],
   );
 
   const options: Array<EmojiOption> = useMemo(() => {
-    return emojiOptions
-      .filter((option: EmojiOption) => {
-        return queryString != null
-          ? new RegExp(queryString, 'gi').exec(option.title) || option.keywords != null
-            ? option.keywords.some((keyword: string) => new RegExp(queryString, 'gi').exec(keyword))
-            : false
-          : emojiOptions;
-      })
-      .slice(0, MAX_EMOJI_SUGGESTION_COUNT)
+    const filteredEmojis = emojiOptions.filter((emoji: EmojiOption) => {
+      if (queryString == null) {
+        return false;
+      }
+
+      const expectedWords = (queryString.match(/\s/g) || []).length + 1;
+      const emojiNameWords = emoji.title.split(' ');
+
+      if (emojiNameWords.length < expectedWords) {
+        return false;
+      }
+
+      const queryWords = queryString.split('_');
+
+      return queryWords.every(queryWord => {
+        return emojiNameWords.some(emojiNameWord => emojiNameWord.startsWith(queryWord));
+      });
+    });
+
+    return filteredEmojis
       .sort((emojiA, emojiB) => {
         const usageCountA = getUsageCount(emojiA.title);
         const usageCountB = getUsageCount(emojiB.title);
@@ -134,8 +143,9 @@ export function EmojiPickerPlugin() {
         return sameUsageCount
           ? sortByPriority(emojiA.title, emojiB.title, queryString || '')
           : usageCountB - usageCountA;
-      });
-  }, [emojiOptions, queryString]);
+      })
+      .slice(0, MAX_EMOJI_SUGGESTION_COUNT);
+  }, [emojiOptions, getUsageCount, queryString]);
 
   const onSelectOption = useCallback(
     (selectedOption: EmojiOption, nodeToRemove: TextNode | null, closeMenu: () => void) => {
@@ -156,7 +166,7 @@ export function EmojiPickerPlugin() {
         closeMenu();
       });
     },
-    [lexicalEditor],
+    [increaseUsageCount, lexicalEditor],
   );
 
   const rootElement = lexicalEditor.getRootElement();
@@ -212,7 +222,6 @@ export function EmojiPickerPlugin() {
     <LexicalTypeaheadMenuPlugin
       onQueryChange={setQueryString}
       onSelectOption={onSelectOption}
-      // triggerFn={checkForTriggerMatch}
       triggerFn={checkForEmojiPickerMatch}
       options={options}
       menuRenderFn={menuRender}
