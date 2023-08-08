@@ -273,7 +273,7 @@ export const InputBar = ({
 
   useEffect(() => {
     if (!isTypingIndicatorEnabled) {
-      return;
+      return () => {};
     }
 
     if (!hasUserTyped.current) {
