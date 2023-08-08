@@ -36,7 +36,9 @@ import {ItemProps} from './LexicalTypeheadMenuPlugin';
 import {StorageKey} from '../../../storage';
 import {EmojiItem} from '../components/EmojiItem';
 import emojiList from '../utils/emojiList';
+import {checkForEmojis} from '../utils/emojiUtils';
 import {getDOMRangeRect} from '../utils/getDomRangeRect';
+import {getSelectionInfo} from '../utils/getSelectionInfo';
 
 export class EmojiOption extends MenuOption {
   title: string;
@@ -86,9 +88,31 @@ export function EmojiPickerPlugin() {
     [],
   );
 
-  const checkForTriggerMatch = useBasicTypeaheadTriggerMatch(':', {
-    minLength: 1,
+  const checkForTriggerMatch = useBasicTypeaheadTriggerMatch('/', {
+    minLength: 0,
   });
+
+  const checkForEmojiPickerMatch = useCallback(
+    (text: string) => {
+      // Don't show the menu if the next character is a word character
+      const info = getSelectionInfo([':']);
+
+      if (info?.isTextNode && info.wordCharAfterCursor) {
+        return null;
+      }
+
+      const slashMatch = checkForTriggerMatch(text, lexicalEditor);
+
+      if (slashMatch !== null) {
+        return null;
+      }
+
+      const queryMatch = checkForEmojis(text);
+
+      return queryMatch?.replaceableString ? queryMatch : null;
+    },
+    [checkForTriggerMatch, lexicalEditor],
+  );
 
   const options: EmojiOption[] = useMemo(() => {
     const filteredEmojis = emojiOptions.filter((emoji: EmojiOption) => {
@@ -197,7 +221,7 @@ export function EmojiPickerPlugin() {
     <LexicalTypeaheadMenuPlugin
       onQueryChange={setQueryString}
       onSelectOption={onSelectOption}
-      triggerFn={checkForTriggerMatch}
+      triggerFn={checkForEmojiPickerMatch}
       options={options}
       menuRenderFn={menuRender}
     />

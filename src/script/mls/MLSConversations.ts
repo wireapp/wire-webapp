@@ -87,7 +87,7 @@ export async function initMLSCallbacks(
  */
 async function joinNewConversations(conversations: MLSConversation[], core: Account): Promise<void> {
   // We send external proposal to all the MLS conversations that are in an unknown state (not established nor pendingWelcome)
-  await useMLSConversationState.getState().sendExternalToPendingJoin(
+  await useMLSConversationState.getState().joinWithExternalCommit(
     conversations,
     groupId => core.service!.conversation.isMLSConversationEstablished(groupId),
     conversationId => core.service!.conversation.joinByExternalCommit(conversationId),
@@ -107,6 +107,12 @@ export async function registerUninitializedSelfAndTeamConversations(
   selfClientId: string,
   core: Account,
 ): Promise<void> {
+  const mlsService = core.service?.mls;
+
+  if (!mlsService) {
+    throw new Error('MLS service not available');
+  }
+
   const uninitializedConversations = conversations.filter(
     (conversation): conversation is MLSConversation =>
       isMLSConversation(conversation) &&
@@ -115,12 +121,11 @@ export async function registerUninitializedSelfAndTeamConversations(
   );
 
   await Promise.all(
-    uninitializedConversations.map(
-      conversation =>
-        core.service?.mls.registerConversation(conversation.groupId, [selfUser.qualifiedId], {
-          user: selfUser,
-          client: selfClientId,
-        }),
+    uninitializedConversations.map(conversation =>
+      mlsService.registerConversation(conversation.groupId, [selfUser.qualifiedId], {
+        user: selfUser,
+        client: selfClientId,
+      }),
     ),
   );
 }

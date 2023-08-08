@@ -359,8 +359,7 @@ const InputBar = ({
 
   const onSend = (messageText: string, mentions: MentionEntity[]): void => {
     if (pastedFile) {
-      sendPastedFile();
-      return;
+      return void sendPastedFile();
     }
 
     const messageTrimmedStart = messageText.trimStart();
@@ -594,8 +593,8 @@ const InputBar = ({
                 ref={lexicalRef}
                 editMessage={editMessage}
                 mentionCandidates={mentionCandidates}
-                propertiesRepository={propertiesRepository}
                 searchRepository={searchRepository}
+                propertiesRepository={propertiesRepository}
                 placeholder={inputPlaceholder}
                 inputValue={inputValue}
                 setInputValue={setInputValue}

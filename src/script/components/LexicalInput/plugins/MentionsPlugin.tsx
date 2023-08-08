@@ -53,14 +53,8 @@ import {
   REMOVE_MENTIONS_COMMAND,
   RENAME_MENTIONS_COMMAND,
 } from '../types/Mention';
-import {
-  checkForMentions,
-  getNextSibling,
-  getPreviousSibling,
-  getSelectionInfo,
-  insertMention,
-  isWordChar,
-} from '../utils/mention-utils';
+import {getNextSibling, getPreviousSibling, getSelectionInfo, isWordChar} from '../utils/getSelectionInfo';
+import {checkForMentions, insertMention} from '../utils/mentionUtils';
 
 export class MenuOption extends _MenuOption {
   user: User;

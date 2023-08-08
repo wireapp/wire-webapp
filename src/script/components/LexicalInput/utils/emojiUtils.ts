@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2022 Wire Swiss GmbH
+ * Copyright (C) 2023 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,26 +17,24 @@
  *
  */
 
-import {getStorage} from 'Util/localStorage';
+import {MenuTextMatch} from '@lexical/react/LexicalTypeaheadMenuPlugin';
 
-import {MLSConversationState} from './mlsConversationState';
+export function checkForEmojis(text: string): MenuTextMatch | null {
+  const match = /(^|[^\w])(:([\w ]+))/.exec(text);
 
-const storageKey = 'mlsConversationsState';
-const storage = getStorage();
-
-export const loadState = (): MLSConversationState => {
-  const storedState = storage?.getItem(storageKey);
-  if (!storedState) {
-    return {
-      established: new Set(),
-    };
+  if (match === null) {
+    return null;
   }
-  const parsedState = JSON.parse(storedState);
-  return {
-    established: new Set(parsedState.established),
-  };
-};
+  const search = match[2];
+  const term = match[3];
 
-export const saveState = ({established}: MLSConversationState) => {
-  storage?.setItem(storageKey, JSON.stringify({established: [...established]}));
-};
+  if (term.length === 0) {
+    return null;
+  }
+
+  return {
+    leadOffset: match.index,
+    matchingString: term.replace(' ', '_'),
+    replaceableString: search,
+  };
+}

@@ -793,6 +793,7 @@ describe('ConversationRepository', () => {
           get: jest.fn(() => mockSelfClientId),
         });
 
+        jest.spyOn(container.resolve(Core).service!.mls!, 'conversationExists').mockResolvedValueOnce(true);
         return testFactory.conversation_repository['handleConversationEvent'](memberJoinEvent).then(() => {
           expect(testFactory.conversation_repository['onMemberJoin']).toHaveBeenCalled();
           expect(testFactory.conversation_repository.updateParticipatingUserEntities).toHaveBeenCalled();
