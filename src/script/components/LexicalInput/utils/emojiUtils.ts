@@ -19,34 +19,21 @@
 
 import {MenuTextMatch} from '@lexical/react/LexicalTypeaheadMenuPlugin';
 
-import {TRIGGERS, VALID_CHARS, VALID_JOINS, LENGTH_LIMIT} from 'Components/LexicalInput/utils/getSelectionInfo';
+export function checkForEmojis(text: string): MenuTextMatch | null {
+  const match = /(^|[^\w])(:([\w ]+))/.exec(text);
 
-function createEmojisRegex(triggers: string[], allowSpaces: boolean) {
-  return new RegExp(
-    `(^|(?<!\\\\s))(${TRIGGERS(triggers)}((?:${
-      VALID_CHARS(triggers) + (allowSpaces ? VALID_JOINS : '')
-    }){0,${LENGTH_LIMIT}})` + `)$`,
-  );
-}
-
-export function checkForEmojis(text: string, triggers: string[], allowSpaces: boolean): MenuTextMatch | null {
-  const match = createEmojisRegex(triggers, allowSpaces).exec(text);
-
-  if (match !== null) {
-    // The strategy ignores leading whitespace, but we need to know its
-    // length to add it to the leadOffset
-    const maybeLeadingWhitespace = match[1];
-    const matchingStringWithTrigger = match[2];
-    const matchingString = match[3];
-
-    if (matchingStringWithTrigger.length >= 1) {
-      return {
-        leadOffset: match.index + maybeLeadingWhitespace.length,
-        matchingString: matchingString,
-        replaceableString: matchingStringWithTrigger,
-      };
-    }
+  if (match === null) {
+    return null;
   }
+  const search = match[2];
+  const term = match[3];
 
-  return null;
+  if (term.length === 0) {
+    return null;
+  }
+  return {
+    leadOffset: match.index,
+    matchingString: term.replace(' ', '_'),
+    replaceableString: search,
+  };
 }

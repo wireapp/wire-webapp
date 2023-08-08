@@ -53,7 +53,7 @@ export class EmojiOption extends MenuOption {
     },
   ) {
     super(title);
-    this.title = title;
+    this.title = title.replace(/_/g, ' ');
     this.emoji = emoji;
     this.keywords = options.keywords || [];
   }
