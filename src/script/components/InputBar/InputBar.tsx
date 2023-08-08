@@ -304,7 +304,7 @@ export const InputBar = ({
   useEffect(() => {
     let timerId: number;
     if (!hasUserTyped.current) {
-      return;
+      return () => {};
     }
 
     if (inputValue.length > 0) {

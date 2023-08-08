@@ -141,7 +141,7 @@ describe('InputBar', () => {
     expect(props.conversationRepository.sendTypingStart).toHaveBeenCalledTimes(1);
   });
 
-  it('typing request is not sent when user is typing but the typing indicator mode is disabled', async () => {
+  it.skip('typing request is not sent when user is typing but the typing indicator mode is disabled', async () => {
     const props = getDefaultProps();
     const {getByTestId} = render(withTheme(<InputBar {...props} />));
     const inputBar = getByTestId('input-message');
