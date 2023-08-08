@@ -290,18 +290,22 @@ export const InputBar = ({
     } else {
       void conversationRepository.sendTypingStop(conversationEntity);
     }
-    return () => {
-      // Send typing stop when component unmounts
-      void conversationRepository.sendTypingStop(conversationEntity);
-    };
+    return () => {};
   }, [isTyping, conversationRepository, conversationEntity, isTypingIndicatorEnabled]);
 
-  useEffect(() => {
-    if (!hasUserTyped.current) {
-      return () => {};
-    }
+  useEffect(
+    () => () => {
+      // sending a typing stop event when the user leaves the conversation
+      void conversationRepository.sendTypingStop(conversationEntity);
+    },
+    [conversationRepository, conversationEntity],
+  );
 
+  useEffect(() => {
     let timerId: number;
+    if (!hasUserTyped.current) {
+      return;
+    }
 
     if (inputValue.length > 0) {
       setIsTyping(true);
