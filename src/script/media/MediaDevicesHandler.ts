@@ -198,7 +198,7 @@ export class MediaDevicesHandler {
     this.currentDeviceId.audioInput.subscribe(mediaDeviceId => {
       const faveAudioInput = loadValue<string[]>(FavoriteDeviceTypes.AUDIO_INPUT) ?? [];
       const newFaveAudioInput =
-        this.previousDeviceSupport.audioInput <= this.availableDevices.audioInput().length
+        this.previousDeviceSupport.audioInput >= this.availableDevices.audioInput().length
           ? [...faveAudioInput!.filter(id => id !== mediaDeviceId), mediaDeviceId]
           : [mediaDeviceId, ...faveAudioInput!.filter(id => id !== mediaDeviceId)];
       storeValue(MediaDeviceType.AUDIO_INPUT, mediaDeviceId);
@@ -207,9 +207,8 @@ export class MediaDevicesHandler {
 
     this.currentDeviceId.audioOutput.subscribe(mediaDeviceId => {
       const faveAudioOutput = loadValue<string[]>(FavoriteDeviceTypes.AUDIO_OUTPUT) ?? [];
-      // console.log(this.previousDeviceSupport.audioOutput, this.availableDevices.audioOutput().length);
       const newFaveAudioOutput =
-        this.previousDeviceSupport.audioOutput <= this.availableDevices.audioOutput().length
+        this.previousDeviceSupport.audioOutput >= this.availableDevices.audioOutput().length
           ? [...faveAudioOutput!.filter(id => id !== mediaDeviceId), mediaDeviceId]
           : [mediaDeviceId, ...faveAudioOutput!.filter(id => id !== mediaDeviceId)];
       storeValue(MediaDeviceType.AUDIO_OUTPUT, mediaDeviceId);
@@ -219,7 +218,7 @@ export class MediaDevicesHandler {
     this.currentDeviceId.videoInput.subscribe(mediaDeviceId => {
       const faveVideoInput = loadValue<string[]>(FavoriteDeviceTypes.VIDEO_INPUT) ?? [];
       const newFaveVideoInput =
-        this.previousDeviceSupport.videoInput <= this.availableDevices.videoInput().length
+        this.previousDeviceSupport.videoInput >= this.availableDevices.videoInput().length
           ? [...faveVideoInput!.filter(id => id !== mediaDeviceId), mediaDeviceId]
           : [mediaDeviceId, ...faveVideoInput!.filter(id => id !== mediaDeviceId)];
       storeValue(MediaDeviceType.VIDEO_INPUT, mediaDeviceId);
@@ -247,7 +246,7 @@ export class MediaDevicesHandler {
       }
       return microphoneList;
     }, {});
-    // console.log(dedupedMicrophones);
+
     const speakers = mediaDevices.filter(device => device.kind === MediaDeviceType.AUDIO_OUTPUT);
     const dedupedSpeakers = speakers.reduce<Record<string, MediaDeviceInfo>>((speakerList, speaker) => {
       if (!speakerList.hasOwnProperty(speaker.groupId) || speaker.deviceId === 'communications') {
@@ -255,7 +254,7 @@ export class MediaDevicesHandler {
       }
       return speakerList;
     }, {});
-    // console.log(dedupedSpeakers);
+
     return {
       cameras: videoInputDevices,
       microphones: Object.values(dedupedMicrophones),
