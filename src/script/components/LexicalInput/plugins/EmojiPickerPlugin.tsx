@@ -109,7 +109,7 @@ export function EmojiPickerPlugin() {
         return null;
       }
 
-      const queryMatch = checkForEmojis(text, [':'], true);
+      const queryMatch = checkForEmojis(text);
 
       return queryMatch?.replaceableString ? queryMatch : null;
     },
