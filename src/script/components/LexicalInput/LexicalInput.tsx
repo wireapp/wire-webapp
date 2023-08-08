@@ -42,7 +42,6 @@ import {EditorRefPlugin} from './plugins/LexicalEditorRefPlugin';
 import {MentionsPlugin} from './plugins/MentionsPlugin';
 
 import {MentionEntity} from '../../message/MentionEntity';
-import {PropertiesRepository} from '../../properties/PropertiesRepository';
 import {SearchRepository} from '../../search/SearchRepository';
 
 const theme = {
@@ -60,7 +59,6 @@ const logger = getLogger('LexicalInput');
 
 interface LexicalInputProps {
   currentMentions: MentionEntity[];
-  readonly propertiesRepository: PropertiesRepository;
   readonly searchRepository: SearchRepository;
   placeholder: string;
   inputValue: string;
@@ -78,7 +76,6 @@ export const LexicalInput = forwardRef<LexicalEditor, LexicalInputProps>(
   (
     {
       placeholder,
-      propertiesRepository,
       searchRepository,
       inputValue,
       setInputValue,

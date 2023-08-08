@@ -593,7 +593,6 @@ const InputBar = ({
                 ref={lexicalRef}
                 editMessage={editMessage}
                 mentionCandidates={mentionCandidates}
-                propertiesRepository={propertiesRepository}
                 searchRepository={searchRepository}
                 placeholder={inputPlaceholder}
                 inputValue={inputValue}
