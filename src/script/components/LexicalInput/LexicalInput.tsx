@@ -17,10 +17,11 @@
  *
  */
 
-import {forwardRef, useCallback, useEffect, useState, ReactElement} from 'react';
+import {useCallback, useEffect, useState, ReactElement} from 'react';
 
 import {InitialConfigType, LexicalComposer} from '@lexical/react/LexicalComposer';
 import {ContentEditable} from '@lexical/react/LexicalContentEditable';
+import {EditorRefPlugin} from '@lexical/react/LexicalEditorRefPlugin';
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary';
 import {OnChangePlugin} from '@lexical/react/LexicalOnChangePlugin';
 import {PlainTextPlugin} from '@lexical/react/LexicalPlainTextPlugin';
@@ -43,7 +44,6 @@ import {DraftStatePlugin} from './plugins/DraftStatePlugin';
 import {EditMessagePlugin} from './plugins/EditMessagePlugin';
 import {EmojiPickerPlugin} from './plugins/EmojiPickerPlugin';
 import {GlobalEventsPlugin} from './plugins/GlobalEventsPlugin';
-import {EditorRefPlugin} from './plugins/LexicalEditorRefPlugin';
 import {MentionsPlugin} from './plugins/MentionsPlugin';
 import {ReplaceEmojiPlugin} from './plugins/ReplaceEmojiPlugin';
 
@@ -79,103 +79,98 @@ interface LexicalInputProps {
   loadDraftState: () => Promise<DraftState>;
   mentionCandidates: User[];
   onShiftTab: () => void;
+  onSetup?: (editor: LexicalEditor) => void;
 }
 
-export const LexicalInput = forwardRef<LexicalEditor, LexicalInputProps>(
-  (
-    {
-      placeholder,
-      propertiesRepository,
-      searchRepository,
-      inputValue,
-      setInputValue,
-      children,
-      hasLocalEphemeralTimer,
-      saveDraftState,
-      loadDraftState,
-      editMessage,
-      mentionCandidates,
-      onShiftTab,
+export const LexicalInput = ({
+  placeholder,
+  propertiesRepository,
+  searchRepository,
+  inputValue,
+  setInputValue,
+  children,
+  hasLocalEphemeralTimer,
+  saveDraftState,
+  loadDraftState,
+  editMessage,
+  mentionCandidates,
+  onShiftTab,
+  onSetup,
+}: LexicalInputProps) => {
+  // Emojis
+  const [shouldReplaceEmoji, setShouldReplaceEmoji] = useState<boolean>(
+    propertiesRepository.getPreference(PROPERTIES_TYPE.EMOJI.REPLACE_INLINE),
+  );
+
+  const editorConfig: InitialConfigType = {
+    namespace: 'WireLexicalEditor',
+    theme,
+    onError(error: unknown) {
+      logger.error(error);
+      throw error;
     },
-    ref,
-  ) => {
-    // Emojis
-    const [shouldReplaceEmoji, setShouldReplaceEmoji] = useState<boolean>(
-      propertiesRepository.getPreference(PROPERTIES_TYPE.EMOJI.REPLACE_INLINE),
-    );
+    nodes: [MentionNode, EmojiNode],
+  };
 
-    const editorConfig: InitialConfigType = {
-      namespace: 'WireLexicalEditor',
-      theme,
-      onError(error: unknown) {
-        logger.error(error);
-        throw error;
-      },
-      nodes: [MentionNode, EmojiNode],
-    };
+  const searchMentions = (queryString?: string | null) => {
+    return queryString ? searchRepository.searchUserInSet(queryString, mentionCandidates) : mentionCandidates;
+  };
 
-    const searchMentions = (queryString?: string | null) => {
-      return queryString ? searchRepository.searchUserInSet(queryString, mentionCandidates) : mentionCandidates;
-    };
-
-    const updateValue = useCallback(
-      (editorState: EditorState, lexicalEditor: LexicalEditor) => {
-        lexicalEditor.registerTextContentListener(textContent => {
-          setInputValue(textContent);
-        });
-
-        const stringifyEditor = JSON.stringify(editorState.toJSON());
-        saveDraftState(stringifyEditor);
-      },
-      [saveDraftState, setInputValue],
-    );
-
-    useEffect(() => {
-      amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE, setShouldReplaceEmoji);
-      amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, (properties: WebappProperties) => {
-        setShouldReplaceEmoji(properties.settings.emoji.replace_inline);
+  const updateValue = useCallback(
+    (editorState: EditorState, lexicalEditor: LexicalEditor) => {
+      lexicalEditor.registerTextContentListener(textContent => {
+        setInputValue(textContent);
       });
-    }, []);
 
-    return (
-      <LexicalComposer initialConfig={editorConfig}>
-        <div className="controls-center">
-          <div className="input-bar--wrapper">
-            <AutoFocusPlugin />
-            <GlobalEventsPlugin onShiftTab={onShiftTab} />
-            <EditorRefPlugin editorRef={ref} />
-            <DraftStatePlugin setInputValue={setInputValue} loadDraftState={loadDraftState} />
-            <EditMessagePlugin onMessageEdit={editMessage} />
+      const stringifyEditor = JSON.stringify(editorState.toJSON());
+      saveDraftState(stringifyEditor);
+    },
+    [saveDraftState, setInputValue],
+  );
 
-            <EmojiPickerPlugin />
+  useEffect(() => {
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE, setShouldReplaceEmoji);
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, (properties: WebappProperties) => {
+      setShouldReplaceEmoji(properties.settings.emoji.replace_inline);
+    });
+  }, []);
 
-            {shouldReplaceEmoji && <ReplaceEmojiPlugin />}
+  return (
+    <LexicalComposer initialConfig={editorConfig}>
+      <div className="controls-center">
+        <div className="input-bar--wrapper">
+          <AutoFocusPlugin />
+          <GlobalEventsPlugin onShiftTab={onShiftTab} />
+          {onSetup && <EditorRefPlugin editorRef={onSetup} />}
+          <DraftStatePlugin setInputValue={setInputValue} loadDraftState={loadDraftState} />
+          <EditMessagePlugin onMessageEdit={editMessage} />
 
-            <PlainTextPlugin
-              contentEditable={
-                <ContentEditable
-                  value={inputValue}
-                  className="conversation-input-bar-text"
-                  data-uie-name="input-message"
-                />
-              }
-              placeholder={<Placeholder text={placeholder} hasLocalEphemeralTimer={hasLocalEphemeralTimer} />}
-              ErrorBoundary={LexicalErrorBoundary}
-            />
+          <EmojiPickerPlugin />
 
-            <MentionsPlugin onSearch={searchMentions} />
+          {shouldReplaceEmoji && <ReplaceEmojiPlugin />}
 
-            <OnChangePlugin onChange={updateValue} />
-          </div>
+          <PlainTextPlugin
+            contentEditable={
+              <ContentEditable
+                value={inputValue}
+                className="conversation-input-bar-text"
+                data-uie-name="input-message"
+              />
+            }
+            placeholder={<Placeholder text={placeholder} hasLocalEphemeralTimer={hasLocalEphemeralTimer} />}
+            ErrorBoundary={LexicalErrorBoundary}
+          />
+
+          <MentionsPlugin onSearch={searchMentions} />
+
+          <OnChangePlugin onChange={updateValue} />
         </div>
+      </div>
 
-        {children}
-      </LexicalComposer>
-    );
-  },
-);
-
-LexicalInput.displayName = 'LexicalInput';
+      {children}
+    </LexicalComposer>
+  );
+};
 
 function Placeholder({text, hasLocalEphemeralTimer}: {text: string; hasLocalEphemeralTimer: boolean}) {
   return (

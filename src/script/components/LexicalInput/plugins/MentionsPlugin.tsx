@@ -17,17 +17,19 @@
  *
  */
 
-import {useCallback, useMemo, useState, MutableRefObject} from 'react';
+import {useCallback, useMemo, useState} from 'react';
 
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
-import {MenuOption as _MenuOption} from '@lexical/react/LexicalTypeaheadMenuPlugin';
+import {
+  MenuOption as _MenuOption,
+  LexicalTypeaheadMenuPlugin,
+  MenuRenderFn,
+} from '@lexical/react/LexicalTypeaheadMenuPlugin';
 import {$createTextNode, TextNode} from 'lexical';
 import * as ReactDOM from 'react-dom';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {IgnoreOutsideClickWrapper} from 'Components/InputBar/util/clickHandlers';
-
-import {ItemProps, LexicalTypeaheadMenuPlugin} from './LexicalTypeheadMenuPlugin';
 
 import {User} from '../../../entity/User';
 import {MentionSuggestionsItem} from '../components/Mention/MentionSuggestionsItem';
@@ -97,9 +99,9 @@ export function MentionsPlugin({onSearch}: MentionsPluginProps) {
     return {bottom: window.innerHeight - boundingClientRect.top + 24, left: boundingClientRect.left};
   };
 
-  const menuRenderFn = (
-    anchorElementRef: MutableRefObject<HTMLElement | null>,
-    {selectedIndex, selectOptionAndCleanUp, setHighlightedIndex}: ItemProps<MenuOption>,
+  const menuRenderFn: MenuRenderFn<MenuOption> = (
+    anchorElementRef,
+    {selectedIndex, selectOptionAndCleanUp, setHighlightedIndex},
   ) => {
     if (!anchorElementRef.current || !options.length) {
       return null;

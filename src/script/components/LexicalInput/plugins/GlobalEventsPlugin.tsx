@@ -72,12 +72,3 @@ export function GlobalEventsPlugin({onShiftTab}: GlobalEventsPluginProps): null 
 
   return null;
 }
-
-// Example of usage global commands, You can use it everywhere in LexicalComposer
-// editor.registerCommand(
-//   ON_SHIFT_TAB,
-//   (event) => {
-//     // Do something with `event`, e.g. `event.preventDefault() && onShiftTab()`
-//   },
-//   COMMAND_PRIORITY_HIGH,
-// )

@@ -45,7 +45,7 @@ export function getPreviousSibling(node: LexicalNode) {
   return previousSibling;
 }
 
-export function isWordChar(char: string, triggers: string[]) {
+function isWordChar(char: string, triggers: string[]) {
   return new RegExp(VALID_CHARS(triggers)).test(char);
 }
 

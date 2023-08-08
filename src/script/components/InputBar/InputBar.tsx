@@ -603,7 +603,7 @@ export const InputBar = ({
 
             {!removedFromConversation && !pastedFile && (
               <LexicalInput
-                ref={lexical => {
+                onSetup={lexical => {
                   lexicalRef.current = lexical;
                   // autofocus the editor when first loaded
                   lexical?.focus();

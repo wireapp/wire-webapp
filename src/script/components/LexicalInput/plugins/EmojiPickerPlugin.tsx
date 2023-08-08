@@ -17,12 +17,13 @@
  *
  */
 
-import {useCallback, useMemo, useState, MutableRefObject} from 'react';
+import {useCallback, useMemo, useState} from 'react';
 
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {
   LexicalTypeaheadMenuPlugin,
   MenuOption,
+  MenuRenderFn,
   useBasicTypeaheadTriggerMatch,
 } from '@lexical/react/LexicalTypeaheadMenuPlugin';
 import {$createTextNode, $getSelection, $isRangeSelection, TextNode} from 'lexical';
@@ -30,8 +31,6 @@ import * as ReactDOM from 'react-dom';
 
 import {loadValue, storeValue} from 'Util/StorageUtil';
 import {sortByPriority} from 'Util/StringUtil';
-
-import {ItemProps} from './LexicalTypeheadMenuPlugin';
 
 import {StorageKey} from '../../../storage';
 import {EmojiItem} from '../components/EmojiItem';
@@ -186,9 +185,9 @@ export function EmojiPickerPlugin() {
     };
   };
 
-  const menuRender = (
-    anchorElementRef: MutableRefObject<HTMLElement | null>,
-    {selectedIndex, selectOptionAndCleanUp, setHighlightedIndex}: ItemProps<EmojiOption>,
+  const menuRender: MenuRenderFn<EmojiOption> = (
+    anchorElementRef,
+    {selectedIndex, selectOptionAndCleanUp, setHighlightedIndex},
   ) => {
     if (!anchorElementRef.current || !options.length) {
       return null;

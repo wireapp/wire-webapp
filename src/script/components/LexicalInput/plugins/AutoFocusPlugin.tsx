@@ -21,6 +21,9 @@ import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 
 import {useTextAreaFocus} from 'Components/InputBar/hooks/useTextAreaFocus';
 
+/**
+ * Will automatically focus the input field when the user types anywhere in the document
+ */
 export function AutoFocusPlugin(): null {
   const [editor] = useLexicalComposerContext();
 
