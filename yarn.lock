@@ -4411,13 +4411,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/uint32@npm:0.2.0":
-  version: 0.2.0
-  resolution: "@types/uint32@npm:0.2.0"
-  checksum: 10e31438f0be48629742ff148f2ae0030008b63d232472bc836dd19c34cdf219ccdfac1d7ff5d89e116c405e4b43e485268375f3343d00a84d1b3f32e3e24691
-  languageName: node
-  linkType: hard
-
 "@types/underscore@npm:1.11.6":
   version: 1.11.6
   resolution: "@types/underscore@npm:1.11.6"
@@ -17703,7 +17696,6 @@ __metadata:
     "@types/seedrandom": ^3
     "@types/sinon": 10.0.16
     "@types/speakingurl": 13.0.3
-    "@types/uint32": 0.2.0
     "@types/underscore": 1.11.6
     "@types/webpack-env": 1.18.1
     "@wireapp/avs": 9.3.7
@@ -17809,7 +17801,6 @@ __metadata:
     tsc-watch: 6.0.4
     tsyringe: 4.8.0
     typescript: 5.1.6
-    uint32: 0.2.1
     underscore: 1.13.6
     uuidjs: 4.2.13
     webpack: 5.88.2
