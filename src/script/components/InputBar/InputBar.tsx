@@ -99,7 +99,7 @@ interface InputBarProps {
 
 const conversationInputBarClassName = 'conversation-input-bar';
 
-const InputBar = ({
+export const InputBar = ({
   conversationEntity,
   conversationRepository,
   eventRepository,
@@ -143,7 +143,7 @@ const InputBar = ({
   ]);
 
   // Lexical
-  const lexicalRef = useRef<LexicalEditor>(null);
+  const lexicalRef = useRef<LexicalEditor | null>(null);
 
   // Typing indicator
   const [isTyping, setIsTyping] = useState<boolean>(false);
@@ -272,8 +272,17 @@ const InputBar = ({
   };
 
   useEffect(() => {
-    if (!hasUserTyped.current || !isTypingIndicatorEnabled) {
+    if (!isTypingIndicatorEnabled) {
       return;
+    }
+
+    if (!hasUserTyped.current) {
+      // If the user hasn't typed yet, we register a callback that will set the flag to true when the user first type
+      const setUserHasTyped = () => {
+        hasUserTyped.current = true;
+      };
+      document.addEventListener('keydown', setUserHasTyped);
+      return () => document.removeEventListener('keydown', setUserHasTyped);
     }
 
     if (isTyping) {
@@ -281,6 +290,10 @@ const InputBar = ({
     } else {
       void conversationRepository.sendTypingStop(conversationEntity);
     }
+    return () => {
+      // Send typing stop when component unmounts
+      void conversationRepository.sendTypingStop(conversationEntity);
+    };
   }, [isTyping, conversationRepository, conversationEntity, isTypingIndicatorEnabled]);
 
   useEffect(() => {
@@ -462,10 +475,6 @@ const InputBar = ({
     };
   }, []);
 
-  useEffect(() => {
-    hasUserTyped.current = false;
-  }, [conversationEntity]);
-
   const saveDraft = async (editor: string) => {
     await saveDraftState(storageRepository, conversationEntity, editor, replyMessageEntity?.id);
   };
@@ -590,7 +599,11 @@ const InputBar = ({
 
             {!removedFromConversation && !pastedFile && (
               <LexicalInput
-                ref={lexicalRef}
+                ref={lexical => {
+                  lexicalRef.current = lexical;
+                  // autofocus the editor when first loaded
+                  lexical?.focus();
+                }}
                 editMessage={editMessage}
                 mentionCandidates={mentionCandidates}
                 searchRepository={searchRepository}
@@ -632,5 +645,3 @@ const InputBar = ({
     </IgnoreOutsideClickWrapper>
   );
 };
-
-export {InputBar};

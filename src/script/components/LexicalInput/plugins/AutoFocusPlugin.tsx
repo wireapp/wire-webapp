@@ -21,14 +21,10 @@ import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 
 import {useTextAreaFocus} from 'Components/InputBar/hooks/useTextAreaFocus';
 
-type AutoFocusPluginProps = {
-  defaultSelection?: 'rootStart' | 'rootEnd';
-};
-
-export function AutoFocusPlugin({defaultSelection = 'rootEnd'}: AutoFocusPluginProps): null {
+export function AutoFocusPlugin(): null {
   const [editor] = useLexicalComposerContext();
 
-  useTextAreaFocus(() => editor.focus(() => undefined, {defaultSelection}));
+  useTextAreaFocus(() => editor.focus());
 
   return null;
 }
