@@ -28,7 +28,7 @@ import {
 import {$createTextNode, $getSelection, $isRangeSelection, TextNode} from 'lexical';
 import * as ReactDOM from 'react-dom';
 
-import {checkForEmojis} from 'Components/LexicalInput/utils/emoji-utils';
+import {checkForEmojis} from 'Components/LexicalInput/utils/emojiUtils';
 import {loadValue, storeValue} from 'Util/StorageUtil';
 import {sortByPriority} from 'Util/StringUtil';
 
@@ -36,7 +36,7 @@ import {ItemProps} from './LexicalTypeheadMenuPlugin';
 
 import {StorageKey} from '../../../storage';
 import {EmojiItem} from '../components/EmojiItem';
-import emojis from '../utils/emoji-list';
+import emojis from '../utils/emojiList';
 import {getDOMRangeRect} from '../utils/getDomRangeRect';
 import {getSelectionInfo} from '../utils/getSelectionInfo';
 
