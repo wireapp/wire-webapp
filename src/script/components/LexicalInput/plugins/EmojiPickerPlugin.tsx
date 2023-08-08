@@ -114,7 +114,7 @@ export function EmojiPickerPlugin() {
     [checkForTriggerMatch, lexicalEditor],
   );
 
-  const options: EmojiOption[] = useMemo(() => {
+  const options: Array<EmojiOption> = useMemo(() => {
     const filteredEmojis = emojiOptions.filter((emoji: EmojiOption) => {
       if (queryString == null) {
         return false;
@@ -127,23 +127,24 @@ export function EmojiPickerPlugin() {
         return false;
       }
 
-      const queryWords = queryString.split(' ');
+      const queryWords = queryString.split('_');
 
       return queryWords.every(queryWord => {
         return emojiNameWords.some(emojiNameWord => emojiNameWord.startsWith(queryWord));
       });
     });
 
-    const sortedEmojiList = filteredEmojis.sort((emojiA, emojiB) => {
-      const usageCountA = getUsageCount(emojiA.title);
-      const usageCountB = getUsageCount(emojiB.title);
+    return filteredEmojis
+      .sort((emojiA, emojiB) => {
+        const usageCountA = getUsageCount(emojiA.title);
+        const usageCountB = getUsageCount(emojiB.title);
 
-      const sameUsageCount = usageCountA === usageCountB;
-
-      return sameUsageCount ? sortByPriority(emojiA.title, emojiB.title, queryString || '') : usageCountB - usageCountA;
-    });
-
-    return sortedEmojiList.slice(0, MAX_EMOJI_SUGGESTION_COUNT);
+        const sameUsageCount = usageCountA === usageCountB;
+        return sameUsageCount
+          ? sortByPriority(emojiA.title, emojiB.title, queryString || '')
+          : usageCountB - usageCountA;
+      })
+      .slice(0, MAX_EMOJI_SUGGESTION_COUNT);
   }, [emojiOptions, getUsageCount, queryString]);
 
   const onSelectOption = useCallback(

@@ -34,7 +34,7 @@ export function checkForEmojis(text: string): MenuTextMatch | null {
 
   return {
     leadOffset: match.index,
-    matchingString: term.replace(' ', '_'),
+    matchingString: term.replaceAll(' ', '_'),
     replaceableString: search,
   };
 }
