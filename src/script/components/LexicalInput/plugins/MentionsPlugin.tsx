@@ -17,25 +17,11 @@
  *
  */
 
-import {useCallback, useEffect, useMemo, useState, MutableRefObject} from 'react';
+import {useCallback, useMemo, useState, MutableRefObject} from 'react';
 
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
-import {MenuOption as _MenuOption, useBasicTypeaheadTriggerMatch} from '@lexical/react/LexicalTypeaheadMenuPlugin';
-import {mergeRegister} from '@lexical/utils';
-import {
-  $createRangeSelection,
-  $createTextNode,
-  $getSelection,
-  $isTextNode,
-  $nodesOfType,
-  $setSelection,
-  COMMAND_PRIORITY_LOW,
-  GridSelection,
-  KEY_DOWN_COMMAND,
-  NodeSelection,
-  RangeSelection,
-  TextNode,
-} from 'lexical';
+import {MenuOption as _MenuOption} from '@lexical/react/LexicalTypeaheadMenuPlugin';
+import {$createTextNode, TextNode} from 'lexical';
 import * as ReactDOM from 'react-dom';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
@@ -45,16 +31,9 @@ import {ItemProps, LexicalTypeaheadMenuPlugin} from './LexicalTypeheadMenuPlugin
 
 import {User} from '../../../entity/User';
 import {MentionSuggestionsItem} from '../components/Mention/MentionSuggestionsItem';
-import {useIsFocused} from '../hooks/useIsFocused';
-import {$createMentionNode, $isMentionNode, MentionNode} from '../nodes/MentionNode';
-import {
-  INSERT_MENTION_COMMAND,
-  OPEN_MENTIONS_MENU_COMMAND,
-  REMOVE_MENTIONS_COMMAND,
-  RENAME_MENTIONS_COMMAND,
-} from '../types/Mention';
-import {getNextSibling, getPreviousSibling, getSelectionInfo, isWordChar} from '../utils/getSelectionInfo';
-import {checkForMentions, insertMention} from '../utils/mentionUtils';
+import {$createMentionNode} from '../nodes/MentionNode';
+import {getSelectionInfo} from '../utils/getSelectionInfo';
+import {TRIGGER, checkForMentions} from '../utils/mentionUtils';
 
 export class MenuOption extends _MenuOption {
   user: User;
@@ -73,235 +52,40 @@ interface MentionsPluginProps {
 }
 
 export function MentionsPlugin({onSearch}: MentionsPluginProps) {
-  const isEditorFocused = useIsFocused();
-  const triggers = useMemo(() => ['@'], []);
   const [editor] = useLexicalComposerContext();
   const [queryString, setQueryString] = useState<string | null>(null);
-  const [trigger, setTrigger] = useState<string | null>(null);
 
   const results = onSearch(queryString);
-
-  const checkForSlashTriggerMatch = useBasicTypeaheadTriggerMatch('/', {
-    minLength: 0,
-  });
-  const [oldSelection, setOldSelection] = useState<RangeSelection | NodeSelection | GridSelection | null>(null);
 
   const options = useMemo(() => {
     // Add options from the lookup service
     return results.map(result => new MenuOption(result, result.name()));
   }, [results]);
 
-  const handleClose = useCallback(() => {
-    setTrigger(null);
-  }, []);
-
   const handleSelectOption = useCallback(
     (selectedOption: MenuOption, nodeToReplace: TextNode | null, closeMenu: () => void) => {
       editor.update(() => {
-        if (!trigger) {
-          return;
-        }
-        const mentionNode = $createMentionNode(trigger, selectedOption.value);
+        const mentionNode = $createMentionNode(TRIGGER, selectedOption.value);
         if (nodeToReplace) {
           nodeToReplace.replace(mentionNode);
+          mentionNode.insertAfter($createTextNode(' '));
         }
         closeMenu();
       });
     },
-    [editor, trigger],
+    [editor],
   );
 
-  const checkForMentionMatch = useCallback(
-    (text: string) => {
-      // Don't show the menu if the next character is a word character
-      const info = getSelectionInfo(triggers);
-      if (info?.isTextNode && info.wordCharAfterCursor) {
-        return null;
-      }
-
-      const slashMatch = checkForSlashTriggerMatch(text, editor);
-      if (slashMatch !== null) {
-        return null;
-      }
-
-      const queryMatch = checkForMentions(text, triggers, true);
-      if (queryMatch) {
-        const {replaceableString, matchingString} = queryMatch;
-        const index = replaceableString.lastIndexOf(matchingString);
-        const trigger =
-          index === -1
-            ? replaceableString
-            : replaceableString.substring(0, index) + replaceableString.substring(index + matchingString.length);
-        setTrigger(trigger || null);
-        if (queryMatch.replaceableString) {
-          return queryMatch;
-        }
-      } else {
-        setTrigger(null);
-      }
+  const checkForMentionMatch = useCallback((text: string) => {
+    // Don't show the menu if the next character is a word character
+    const info = getSelectionInfo([TRIGGER]);
+    if (info?.isTextNode && info.wordCharAfterCursor) {
       return null;
-    },
-    [checkForSlashTriggerMatch, editor, triggers],
-  );
-
-  const insertTextAsMention = useCallback(() => {
-    const info = getSelectionInfo(triggers);
-    if (!info || !info.isTextNode) {
-      return false;
     }
-    const {node} = info;
-    const textContent = node.getTextContent();
-    const queryMatch = checkForMentions(textContent, triggers, false);
-    if (queryMatch && queryMatch.replaceableString.length > 1) {
-      const trigger = triggers.find(trigger => queryMatch.replaceableString.startsWith(trigger));
-      const end = textContent.search(new RegExp(`${queryMatch.replaceableString}\\s?$`));
-      if (trigger && end !== -1) {
-        const mentionNode = $createMentionNode(trigger, queryMatch.matchingString);
-        node.setTextContent(textContent.substring(0, end));
-        node.insertAfter(mentionNode);
-        mentionNode.selectNext();
-      }
-      return true;
-    }
-    return false;
-  }, [triggers]);
-
-  const setSelection = useCallback(() => {
-    const selection = $getSelection();
-    if (!selection) {
-      $setSelection(oldSelection || $createRangeSelection());
-    }
-    if (oldSelection) {
-      setOldSelection(null);
-    }
-  }, [oldSelection]);
-
-  const archiveSelection = useCallback(() => {
-    const selection = $getSelection();
-    if (selection) {
-      setOldSelection(selection);
-      $setSelection(null);
-    }
+    return checkForMentions(text);
   }, []);
 
   const rootElement = editor.getRootElement();
-
-  useEffect(() => {
-    return mergeRegister(
-      editor.registerCommand(
-        KEY_DOWN_COMMAND,
-        event => {
-          const {key, metaKey, ctrlKey} = event;
-          const simpleKey = key.length === 1;
-          const isTrigger = triggers.some(trigger => key === trigger);
-          const wordChar = isWordChar(key, triggers);
-          const selectionInfo = getSelectionInfo(triggers);
-          if (!simpleKey || (!wordChar && !isTrigger) || !selectionInfo || metaKey || ctrlKey) {
-            return false;
-          }
-          const {
-            node,
-            offset,
-            isTextNode,
-            textContent,
-            prevNode,
-            nextNode,
-            wordCharAfterCursor,
-            cursorAtStartOfNode,
-            cursorAtEndOfNode,
-          } = selectionInfo;
-          if (isTextNode && cursorAtStartOfNode && $isMentionNode(prevNode)) {
-            node.insertBefore($createTextNode(' '));
-            return true;
-          }
-          if (isTextNode && cursorAtEndOfNode && $isMentionNode(nextNode)) {
-            node.insertAfter($createTextNode(' '));
-            return true;
-          }
-          if (isTextNode && isTrigger && wordCharAfterCursor) {
-            const content = `${textContent.substring(0, offset)} ${textContent.substring(offset)}`;
-            node.setTextContent(content);
-            return true;
-          }
-          if ($isMentionNode(node) && nextNode === null) {
-            node.insertAfter($createTextNode(' '));
-            return true;
-          }
-          return false;
-        },
-        COMMAND_PRIORITY_LOW,
-      ),
-      editor.registerCommand(
-        INSERT_MENTION_COMMAND,
-        ({trigger, value, focus = true}) => {
-          setSelection();
-          const result = insertMention(triggers, trigger, value);
-          if (!focus) {
-            archiveSelection();
-          }
-          return result;
-        },
-        COMMAND_PRIORITY_LOW,
-      ),
-      editor.registerCommand(
-        REMOVE_MENTIONS_COMMAND,
-        ({trigger, value, focus}) => {
-          let removed = false;
-          setSelection();
-          const mentions = $nodesOfType(MentionNode);
-          for (const mention of mentions) {
-            const sameTrigger = mention.getTrigger() === trigger;
-            const sameValue = mention.getValue() === value;
-            if (sameTrigger && (sameValue || !value)) {
-              const prev = getPreviousSibling(mention);
-              const next = getNextSibling(mention);
-              mention.remove();
-              removed = true;
-              // Prevent double spaces
-              if (prev?.getTextContent().endsWith(' ') && next?.getTextContent().startsWith(' ')) {
-                prev.setTextContent(prev.getTextContent().slice(0, -1));
-              }
-              // Remove trailing space
-              if (next === null && $isTextNode(prev) && prev.getTextContent().endsWith(' ')) {
-                prev.setTextContent(prev.getTextContent().trimEnd());
-              }
-            }
-          }
-          if (removed && !focus) {
-            archiveSelection();
-          }
-          return removed;
-        },
-        COMMAND_PRIORITY_LOW,
-      ),
-      editor.registerCommand(
-        RENAME_MENTIONS_COMMAND,
-        ({trigger, value, newValue, focus}) => {
-          let renamed = false;
-          setSelection();
-          const mentions = $nodesOfType(MentionNode);
-          for (const mention of mentions) {
-            const sameTrigger = mention.getTrigger() === trigger;
-            const sameValue = mention.getValue() === value;
-            if (sameTrigger && (sameValue || !value)) {
-              renamed = true;
-              mention.setValue(newValue);
-            }
-          }
-          if (renamed && !focus) {
-            archiveSelection();
-          }
-          return renamed;
-        },
-        COMMAND_PRIORITY_LOW,
-      ),
-      editor.registerCommand(
-        OPEN_MENTIONS_MENU_COMMAND,
-        ({trigger}) => insertMention(triggers, trigger),
-        COMMAND_PRIORITY_LOW,
-      ),
-    );
-  }, [editor, triggers, isEditorFocused, insertTextAsMention, setSelection, archiveSelection]);
 
   const getPosition = () => {
     if (!rootElement) {
@@ -361,7 +145,6 @@ export function MentionsPlugin({onSearch}: MentionsPluginProps) {
       onSelectOption={handleSelectOption}
       triggerFn={checkForMentionMatch}
       options={options}
-      onClose={handleClose}
       menuRenderFn={menuRenderFn}
     />
   );

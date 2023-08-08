@@ -20,43 +20,30 @@
 import {MenuTextMatch} from '@lexical/react/LexicalTypeaheadMenuPlugin';
 import {$createTextNode, $isParagraphNode, $isTextNode, LexicalNode, TextNode} from 'lexical';
 
-import {getSelectionInfo, LENGTH_LIMIT, TRIGGERS, VALID_CHARS, VALID_JOINS} from './getSelectionInfo';
+import {getSelectionInfo} from './getSelectionInfo';
 
 import {$createMentionNode} from '../nodes/MentionNode';
 
-// Regex used to trigger the mention menu.
-function createMentionsRegex(triggers: string[], allowSpaces: boolean) {
-  return new RegExp(
-    `(^|\\s|\\()(${TRIGGERS(triggers)}((?:${
-      VALID_CHARS(triggers) + (allowSpaces ? VALID_JOINS : '')
-    }){0,${LENGTH_LIMIT}})` + `)$`,
-  );
-}
+export const TRIGGER = '@';
 
-export function checkForMentions(text: string, triggers: string[], allowSpaces: boolean): MenuTextMatch | null {
-  const match = createMentionsRegex(triggers, allowSpaces).exec(text);
+export function checkForMentions(text: string): MenuTextMatch | null {
+  const match = new RegExp(`(^|[^\\w])(${TRIGGER}([\\w ]*))`).exec(text);
 
-  if (match !== null) {
-    // The strategy ignores leading whitespace, but we need to know its
-    // length to add it to the leadOffset
-    const maybeLeadingWhitespace = match[1];
-    const matchingStringWithTrigger = match[2];
-    const matchingString = match[3];
-
-    if (matchingStringWithTrigger.length >= 1) {
-      return {
-        leadOffset: match.index + maybeLeadingWhitespace.length,
-        matchingString: matchingString,
-        replaceableString: matchingStringWithTrigger,
-      };
-    }
+  if (match === null) {
+    return null;
   }
+  const search = match[2];
+  const term = match[3];
 
-  return null;
+  return {
+    leadOffset: match.index,
+    matchingString: term,
+    replaceableString: search,
+  };
 }
 
-export function insertMention(triggers: string[], trigger: string, value?: string) {
-  const selectionInfo = getSelectionInfo(triggers);
+export function insertMention(trigger: string, value?: string) {
+  const selectionInfo = getSelectionInfo([TRIGGER]);
 
   if (!selectionInfo) {
     return false;

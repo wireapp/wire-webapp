@@ -19,8 +19,10 @@
 
 import {MenuTextMatch} from '@lexical/react/LexicalTypeaheadMenuPlugin';
 
+const TRIGGER = ':';
+
 export function checkForEmojis(text: string): MenuTextMatch | null {
-  const match = /(^|[^\w])(:([\w ]+))/.exec(text);
+  const match = new RegExp(`(^|[^\\w])(${TRIGGER}([\\w ]+))`).exec(text);
 
   if (match === null) {
     return null;

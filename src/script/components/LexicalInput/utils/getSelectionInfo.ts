@@ -23,18 +23,7 @@ export const LENGTH_LIMIT = 75;
 
 const PUNCTUATION = '\\.,\\*\\?\\$\\|#{}\\(\\)\\^\\[\\]\\\\/!%\'"~=<>_:;\\s';
 
-// Strings that can trigger the mention menu.
-export const TRIGGERS = (triggers: string[]) => `(?:${triggers.join('|')})`;
-
-// Non-standard series of chars. Each series must be preceded and followed by
-// a valid char.
-export const VALID_JOINS =
-  `(?:` +
-  `\\.[ |$]|` + // E.g. "r. " in "Mr. Smith"
-  `[${PUNCTUATION}]|` + // E.g. "-' in "Salier-Hellendag"
-  `)`;
-
-export const VALID_CHARS = (triggers: string[]) => `(?!${triggers.join('|')})[^${PUNCTUATION}]`;
+const VALID_CHARS = (triggers: string[]) => `(?!${triggers.join('|')})[^${PUNCTUATION}]`;
 
 export function getNextSibling(node: LexicalNode) {
   let nextSibling = node.getNextSibling();
