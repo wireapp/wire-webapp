@@ -33,7 +33,6 @@ const initialState = loadState();
 
 type StoreState = MLSConversationState & {
   isEstablished: (groupId: string) => boolean;
-  filterEstablishedConversations: (conversations: Conversation[]) => Conversation[];
   markAsEstablished: (groupId: string) => void;
   wipeConversationState: (groupId: string) => void;
   /**
@@ -52,8 +51,6 @@ type StoreState = MLSConversationState & {
 export const useMLSConversationState = create<StoreState>((set, get) => {
   return {
     established: initialState.established,
-    filterEstablishedConversations: conversations =>
-      conversations.filter(conversation => !conversation.groupId || get().isEstablished(conversation.groupId)),
 
     isEstablished: groupId => get().established.has(groupId),
 
