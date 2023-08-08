@@ -46,7 +46,6 @@ export class User {
   public isService: boolean;
   public isSingleSignOn: boolean;
   public isNoPasswordSSO: boolean;
-  public joaatHash: number;
   public providerId?: string;
   public readonly accent_color: ko.PureComputed<string>;
   public readonly accent_id: ko.Observable<number>;
@@ -137,7 +136,6 @@ export class User {
     this.providerId = undefined;
     this.serviceId = undefined;
 
-    this.joaatHash = -1;
     this.isAvailable = ko.pureComputed(() => this.id !== '' && this.name() !== '');
 
     this.accent_id = ko.observable(ACCENT_ID.BLUE);

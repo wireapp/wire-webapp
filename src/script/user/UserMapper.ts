@@ -19,7 +19,6 @@
 
 import {container} from 'tsyringe';
 
-import {joaatHash} from 'Util/Crypto';
 import {getLogger, Logger} from 'Util/Logger';
 
 import {isSelfAPIUser} from './UserGuards';
@@ -91,7 +90,6 @@ export class UserMapper {
     const isNewUser = userEntity.id === '' && userData.id !== '';
     if (isNewUser && userData.id) {
       userEntity.id = userData.id;
-      userEntity.joaatHash = joaatHash(userData.id ?? '');
     }
 
     if (userData.qualified_id) {
