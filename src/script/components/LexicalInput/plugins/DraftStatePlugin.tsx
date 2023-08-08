@@ -38,10 +38,13 @@ export function DraftStatePlugin({loadDraftState, setInputValue}: DraftStatePlug
 
     if (draftState.editorState) {
       const initialEditorState = editor.parseEditorState(draftState.editorState);
-      editor.setEditorState(initialEditorState);
 
-      const textValue = getTextValue(editor);
-      setInputValue(textValue);
+      if (!initialEditorState.isEmpty()) {
+        editor.setEditorState(initialEditorState);
+
+        const textValue = getTextValue(editor);
+        setInputValue(textValue);
+      }
     }
   }, [editor, loadDraftState, setInputValue]);
 

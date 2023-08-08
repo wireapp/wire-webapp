@@ -28,6 +28,7 @@ import {
 import {$createTextNode, $getSelection, $isRangeSelection, TextNode} from 'lexical';
 import * as ReactDOM from 'react-dom';
 
+import {checkForEmojis} from 'Components/LexicalInput/utils/emoji-utils';
 import {loadValue, storeValue} from 'Util/StorageUtil';
 import {sortByPriority} from 'Util/StringUtil';
 
@@ -37,17 +38,18 @@ import {StorageKey} from '../../../storage';
 import {EmojiItem} from '../components/EmojiItem';
 import emojis from '../utils/emoji-list';
 import {getDOMRangeRect} from '../utils/getDomRangeRect';
+import {getSelectionInfo} from '../utils/getSelectionInfo';
 
 export class EmojiOption extends MenuOption {
   title: string;
   emoji: string;
-  keywords: Array<string>;
+  keywords: string[];
 
   constructor(
     title: string,
     emoji: string,
     options: {
-      keywords?: Array<string>;
+      keywords?: string[];
     },
   ) {
     super(title);
@@ -88,9 +90,31 @@ export function EmojiPickerPlugin() {
     [emojis],
   );
 
-  const checkForTriggerMatch = useBasicTypeaheadTriggerMatch(':', {
+  const checkForTriggerMatch = useBasicTypeaheadTriggerMatch('/', {
     minLength: 0,
   });
+
+  const checkForEmojiPickerMatch = useCallback(
+    (text: string) => {
+      // Don't show the menu if the next character is a word character
+      const info = getSelectionInfo([':']);
+
+      if (info?.isTextNode && info.wordCharAfterCursor) {
+        return null;
+      }
+
+      const slashMatch = checkForTriggerMatch(text, lexicalEditor);
+
+      if (slashMatch !== null) {
+        return null;
+      }
+
+      const queryMatch = checkForEmojis(text, [':'], true);
+
+      return queryMatch?.replaceableString ? queryMatch : null;
+    },
+    [lexicalEditor],
+  );
 
   const options: Array<EmojiOption> = useMemo(() => {
     return emojiOptions
@@ -188,7 +212,8 @@ export function EmojiPickerPlugin() {
     <LexicalTypeaheadMenuPlugin
       onQueryChange={setQueryString}
       onSelectOption={onSelectOption}
-      triggerFn={checkForTriggerMatch}
+      // triggerFn={checkForTriggerMatch}
+      triggerFn={checkForEmojiPickerMatch}
       options={options}
       menuRenderFn={menuRender}
     />

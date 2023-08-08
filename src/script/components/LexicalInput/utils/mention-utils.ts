@@ -18,36 +18,11 @@
  */
 
 import {MenuTextMatch} from '@lexical/react/LexicalTypeaheadMenuPlugin';
-import {
-  $createTextNode,
-  $getSelection,
-  $isParagraphNode,
-  $isRangeSelection,
-  $isTextNode,
-  LexicalNode,
-  TextNode,
-  RangeSelection,
-} from 'lexical';
+import {$createTextNode, $isParagraphNode, $isTextNode, LexicalNode, TextNode} from 'lexical';
+
+import {getSelectionInfo, LENGTH_LIMIT, TRIGGERS, VALID_CHARS, VALID_JOINS} from './getSelectionInfo';
 
 import {$createMentionNode} from '../nodes/MentionNode';
-
-const PUNCTUATION = '\\.,\\*\\?\\$\\|#{}\\(\\)\\^\\[\\]\\\\/!%\'"~=<>_:;\\s';
-
-// Strings that can trigger the mention menu.
-export const TRIGGERS = (triggers: string[]) => `(?:${triggers.join('|')})`;
-
-// Chars we expect to see in a mention (non-space, non-punctuation).
-export const VALID_CHARS = (triggers: string[]) => `(?!${triggers.join('|')})[^${PUNCTUATION}]`;
-
-// Non-standard series of chars. Each series must be preceded and followed by
-// a valid char.
-const VALID_JOINS =
-  `(?:` +
-  `\\.[ |$]|` + // E.g. "r. " in "Mr. Smith"
-  `[${PUNCTUATION}]|` + // E.g. "-' in "Salier-Hellendag"
-  `)`;
-
-export const LENGTH_LIMIT = 75;
 
 // Regex used to trigger the mention menu.
 function createMentionsRegex(triggers: string[], allowSpaces: boolean) {
@@ -78,67 +53,6 @@ export function checkForMentions(text: string, triggers: string[], allowSpaces: 
   }
 
   return null;
-}
-
-export function isWordChar(char: string, triggers: string[]) {
-  return new RegExp(VALID_CHARS(triggers)).test(char);
-}
-
-type SelectionInfo = {
-  node: LexicalNode;
-  offset: number;
-  isTextNode: boolean;
-  textContent: string;
-  selection: RangeSelection;
-  prevNode: LexicalNode | null;
-  nextNode: LexicalNode | null;
-  cursorAtStartOfNode: boolean;
-  cursorAtEndOfNode: boolean;
-  wordCharBeforeCursor: boolean;
-  wordCharAfterCursor: boolean;
-};
-
-export function getSelectionInfo(triggers: string[]): SelectionInfo | undefined {
-  const selection = $getSelection();
-
-  if (!selection || !$isRangeSelection(selection)) {
-    return undefined;
-  }
-
-  const anchor = selection.anchor;
-  const focus = selection.focus;
-  const nodes = selection.getNodes();
-
-  if (anchor.key !== focus.key || anchor.offset !== focus.offset || nodes.length === 0) {
-    return undefined;
-  }
-
-  const [node] = nodes;
-  const isTextNode = $isTextNode(node) && node.isSimpleText();
-  const offset = anchor.type === 'text' ? anchor.offset : 0;
-  const textContent = node.getTextContent();
-  const cursorAtStartOfNode = offset === 0;
-  const cursorAtEndOfNode = textContent.length === offset;
-  const charBeforeCursor = textContent.charAt(offset - 1);
-  const charAfterCursor = textContent.charAt(offset);
-  const wordCharBeforeCursor = isWordChar(charBeforeCursor, triggers);
-  const wordCharAfterCursor = isWordChar(charAfterCursor, triggers);
-  const prevNode = getPreviousSibling(node);
-  const nextNode = getNextSibling(node);
-
-  return {
-    node,
-    offset,
-    isTextNode,
-    textContent,
-    selection,
-    prevNode,
-    nextNode,
-    cursorAtStartOfNode,
-    cursorAtEndOfNode,
-    wordCharBeforeCursor,
-    wordCharAfterCursor,
-  };
 }
 
 export function insertMention(triggers: string[], trigger: string, value?: string) {
@@ -194,24 +108,4 @@ export function insertMention(triggers: string[], trigger: string, value?: strin
   }
 
   return true;
-}
-
-export function getNextSibling(node: LexicalNode) {
-  let nextSibling = node.getNextSibling();
-
-  while (nextSibling !== null && nextSibling.getType() === 'zeroWidth') {
-    nextSibling = nextSibling.getNextSibling();
-  }
-
-  return nextSibling;
-}
-
-export function getPreviousSibling(node: LexicalNode) {
-  let previousSibling = node.getPreviousSibling();
-
-  while (previousSibling !== null && previousSibling.getType() === 'zeroWidth') {
-    previousSibling = previousSibling.getPreviousSibling();
-  }
-
-  return previousSibling;
 }
