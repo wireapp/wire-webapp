@@ -118,7 +118,7 @@ export const LexicalInput = forwardRef<LexicalEditor, LexicalInputProps>(
       return queryString ? searchRepository.searchUserInSet(queryString, mentionCandidates) : mentionCandidates;
     };
 
-    const onInputChange = useCallback(
+    const updateValue = useCallback(
       (editorState: EditorState, lexicalEditor: LexicalEditor) => {
         lexicalEditor.registerTextContentListener(textContent => {
           setInputValue(textContent);
@@ -165,7 +165,7 @@ export const LexicalInput = forwardRef<LexicalEditor, LexicalInputProps>(
 
             <MentionsPlugin onSearch={searchMentions} />
 
-            <OnChangePlugin onChange={onInputChange} />
+            <OnChangePlugin onChange={updateValue} />
           </div>
         </div>
 
