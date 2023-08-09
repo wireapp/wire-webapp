@@ -19,6 +19,8 @@
 
 import {FC, useEffect, useState} from 'react';
 
+import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
+
 import {Icon} from 'Components/Icon';
 import {LoadingBar} from 'Components/LoadingBar/LoadingBar';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
@@ -28,6 +30,8 @@ import {checkBackupEncryption} from 'Util/BackupUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {loadFileBuffer} from 'Util/util';
+
+import {BackupFileUpload} from './BackupFileUpload';
 
 import {BackupRepository} from '../../backup/BackupRepository';
 import {
@@ -168,14 +172,14 @@ const HistoryImport: FC<HistoryImportProps> = ({user, backupRepository, file, sw
       const password = await getBackUpPassword();
 
       if (password) {
-        await processHistoryImport(password);
+        await processHistoryImport(file, password);
       }
     } else {
-      await processHistoryImport();
+      await processHistoryImport(file);
     }
   };
 
-  const processHistoryImport = async (password?: string) => {
+  const processHistoryImport = async (file, password?: string) => {
     setHistoryImportState(HistoryImportState.PREPARING);
     setError(null);
 
@@ -192,6 +196,14 @@ const HistoryImport: FC<HistoryImportProps> = ({user, backupRepository, file, sw
   useEffect(() => {
     importHistory(file);
   }, []);
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setError(null);
+      await importHistory(file);
+    }
+  };
 
   return (
     <div style={{height: '100%'}}>
@@ -235,9 +247,27 @@ const HistoryImport: FC<HistoryImportProps> = ({user, backupRepository, file, sw
             </p>
 
             <div className="history-message__buttons">
-              <button className="button" onClick={dismissImport} data-uie-name="do-dismiss-history-import-error">
+              <Button
+                variant={ButtonVariant.SECONDARY}
+                className="button button-secondary"
+                onClick={dismissImport}
+                data-uie-name="do-dismiss-history-import-error"
+              >
                 {t('backupCancel')}
-              </button>
+              </Button>
+              <Button
+                variant={ButtonVariant.SECONDARY}
+                className="button button-secondary"
+                onClick={dismissImport}
+                data-uie-name="do-dismiss-history-import-error"
+              >
+                {t('backupCancel')}
+              </Button>
+              <BackupFileUpload
+                onFileChange={handleFileChange}
+                backupImportHeadLine={t('preferencesOptionsBackupTryAgain')}
+                variant={ButtonVariant.PRIMARY}
+              />
             </div>
           </div>
         )}
