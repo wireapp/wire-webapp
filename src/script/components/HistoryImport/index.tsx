@@ -255,14 +255,6 @@ const HistoryImport: FC<HistoryImportProps> = ({user, backupRepository, file, sw
               >
                 {t('backupCancel')}
               </Button>
-              <Button
-                variant={ButtonVariant.SECONDARY}
-                className="button button-secondary"
-                onClick={dismissImport}
-                data-uie-name="do-dismiss-history-import-error"
-              >
-                {t('backupCancel')}
-              </Button>
               <BackupFileUpload
                 onFileChange={handleFileChange}
                 backupImportHeadLine={t('preferencesOptionsBackupTryAgain')}
