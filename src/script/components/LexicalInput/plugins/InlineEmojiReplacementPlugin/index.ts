@@ -17,26 +17,4 @@
  *
  */
 
-import {MenuTextMatch} from '@lexical/react/LexicalTypeaheadMenuPlugin';
-
-const TRIGGER = ':';
-
-export function checkForEmojis(text: string): MenuTextMatch | null {
-  const match = new RegExp(`(^|[^\\w])(${TRIGGER}([\\w ]+))`).exec(text);
-
-  if (match === null) {
-    return null;
-  }
-  const search = match[2];
-  const term = match[3];
-
-  if (term.length === 0) {
-    return null;
-  }
-
-  return {
-    leadOffset: match.index,
-    matchingString: term.replaceAll(' ', '_'),
-    replaceableString: search,
-  };
-}
+export * from './InlineEmojiReplacementPlugin';

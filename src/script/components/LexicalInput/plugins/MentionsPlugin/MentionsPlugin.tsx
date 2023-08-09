@@ -20,7 +20,7 @@
 import {useCallback, useState} from 'react';
 
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
-import {MenuOption as _MenuOption, MenuRenderFn} from '@lexical/react/LexicalTypeaheadMenuPlugin';
+import {MenuOption as _MenuOption, MenuRenderFn, MenuTextMatch} from '@lexical/react/LexicalTypeaheadMenuPlugin';
 import {$createTextNode, TextNode} from 'lexical';
 import * as ReactDOM from 'react-dom';
 
@@ -32,8 +32,29 @@ import {MentionSuggestionsItem} from './MentionSuggestionsItem';
 import {User} from '../../../../entity/User';
 import {$createMentionNode} from '../../nodes/MentionNode';
 import {getSelectionInfo} from '../../utils/getSelectionInfo';
-import {TRIGGER, checkForMentions} from '../../utils/mentionUtils';
 import {ReverseTypeaheadMenuPlugin} from '../ReverseTypeaheadMenuPlugin';
+
+const TRIGGER = '@';
+
+/**
+ * Will detect mentions triggers in a text
+ * @param text the text in which to look for mentions triggers
+ */
+function checkForMentions(text: string): MenuTextMatch | null {
+  const match = new RegExp(`(^|[^\\w])(${TRIGGER}([\\w ]*))`).exec(text);
+
+  if (match === null) {
+    return null;
+  }
+  const search = match[2];
+  const term = match[3];
+
+  return {
+    leadOffset: match.index,
+    matchingString: term,
+    replaceableString: search,
+  };
+}
 
 export class MenuOption extends _MenuOption {
   user: User;

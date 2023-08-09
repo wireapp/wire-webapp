@@ -25,6 +25,9 @@ export type Emoticon = {
   emoticons: string[];
 };
 
+/**
+ * List of all the emojis we live replace while typing
+ */
 export const inlineReplacements: Emoticon[] = [
   {
     name: 'angry',

@@ -24,6 +24,7 @@ import {
   LexicalTypeaheadMenuPlugin,
   MenuOption,
   MenuRenderFn,
+  MenuTextMatch,
   useBasicTypeaheadTriggerMatch,
 } from '@lexical/react/LexicalTypeaheadMenuPlugin';
 import {$createTextNode, $getSelection, $isRangeSelection, TextNode} from 'lexical';
@@ -33,12 +34,37 @@ import {loadValue, storeValue} from 'Util/StorageUtil';
 import {sortByPriority} from 'Util/StringUtil';
 
 import {EmojiItem} from './EmojiItem';
+import emojiList from './emojiList';
 
 import {StorageKey} from '../../../../storage';
-import emojiList from '../../utils/emojiList';
-import {checkForEmojis} from '../../utils/emojiUtils';
 import {getDOMRangeRect} from '../../utils/getDomRangeRect';
 import {getSelectionInfo} from '../../utils/getSelectionInfo';
+
+const TRIGGER = ':';
+
+/**
+ * Will detect emoji triggers in a text
+ * @param text the text in which to look for emoji triggers
+ */
+function checkForEmojis(text: string): MenuTextMatch | null {
+  const match = new RegExp(`(^|[^\\w])(${TRIGGER}([\\w ]+))`).exec(text);
+
+  if (match === null) {
+    return null;
+  }
+  const search = match[2];
+  const term = match[3];
+
+  if (term.length === 0) {
+    return null;
+  }
+
+  return {
+    leadOffset: match.index,
+    matchingString: term.replaceAll(' ', '_'),
+    replaceableString: search,
+  };
+}
 
 export class EmojiOption extends MenuOption {
   title: string;

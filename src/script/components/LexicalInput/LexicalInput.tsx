@@ -45,8 +45,8 @@ import {EditMessagePlugin} from './plugins/EditMessagePlugin';
 import {EmojiPickerPlugin} from './plugins/EmojiPickerPlugin';
 import {GlobalEventsPlugin} from './plugins/GlobalEventsPlugin';
 import {HistoryPlugin} from './plugins/HistoryPlugin';
+import {ReplaceEmojiPlugin} from './plugins/InlineEmojiReplacementPlugin';
 import {MentionsPlugin} from './plugins/MentionsPlugin';
-import {ReplaceEmojiPlugin} from './plugins/ReplaceEmojiPlugin';
 
 import {MentionEntity} from '../../message/MentionEntity';
 import {PropertiesRepository} from '../../properties/PropertiesRepository';

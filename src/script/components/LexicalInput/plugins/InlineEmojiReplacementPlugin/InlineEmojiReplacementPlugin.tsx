@@ -24,7 +24,7 @@ import {TextNode} from 'lexical';
 
 import {isSpaceKey, isTabKey} from 'Util/KeyboardUtil';
 
-import {inlineReplacements} from '../utils/inlineReplacements';
+import {inlineReplacements} from './inlineReplacements';
 
 const escapeRegexp = (string: string): string => string.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
 
