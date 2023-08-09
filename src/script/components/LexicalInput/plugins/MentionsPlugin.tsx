@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useMemo, useState} from 'react';
+import {useCallback, useState} from 'react';
 
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {
@@ -59,10 +59,14 @@ export function MentionsPlugin({onSearch}: MentionsPluginProps) {
 
   const results = onSearch(queryString);
 
-  const options = useMemo(() => {
-    // Add options from the lookup service
-    return results.map(result => new MenuOption(result, result.name()));
-  }, [results]);
+  const options = results
+    .sort((userA, userB) => {
+      if (userA.name() <= userB.name()) {
+        return 1;
+      }
+      return 0;
+    })
+    .map(result => new MenuOption(result, result.name()));
 
   const handleSelectOption = useCallback(
     (selectedOption: MenuOption, nodeToReplace: TextNode | null, closeMenu: () => void) => {
@@ -117,23 +121,21 @@ export function MentionsPlugin({onSearch}: MentionsPluginProps) {
           data-uie-name="list-mention-suggestions"
         >
           <div className="mention-suggestion-list">
-            {options
-              .map((menuOption, index) => (
-                <MentionSuggestionsItem
-                  ref={menuOption.setRefElement}
-                  key={menuOption.user.id}
-                  suggestion={menuOption.user}
-                  isSelected={selectedIndex === index}
-                  onSuggestionClick={() => {
-                    setHighlightedIndex(index);
-                    selectOptionAndCleanUp(menuOption);
-                  }}
-                  onMouseEnter={() => {
-                    setHighlightedIndex(index);
-                  }}
-                />
-              ))
-              .reverse()}
+            {options.map((menuOption, index) => (
+              <MentionSuggestionsItem
+                ref={menuOption.setRefElement}
+                key={menuOption.user.id}
+                suggestion={menuOption.user}
+                isSelected={selectedIndex === index}
+                onSuggestionClick={() => {
+                  setHighlightedIndex(index);
+                  selectOptionAndCleanUp(menuOption);
+                }}
+                onMouseEnter={() => {
+                  setHighlightedIndex(index);
+                }}
+              />
+            ))}
           </div>
         </FadingScrollbar>
       </IgnoreOutsideClickWrapper>,
