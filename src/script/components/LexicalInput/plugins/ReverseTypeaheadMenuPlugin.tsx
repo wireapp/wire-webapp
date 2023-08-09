@@ -258,7 +258,7 @@ function isTriggerVisibleInNearestScrollContainer(targetElement: HTMLElement, co
 }
 
 // Reposition the menu on scroll, window resize, and element resize.
-export function useDynamicPositioning(
+function useDynamicPositioning(
   resolution: Resolution | null,
   targetElement: HTMLElement | null,
   onReposition: () => void,
@@ -406,7 +406,7 @@ function LexicalPopoverMenu<TOption extends TypeaheadOption>({
         if (currentSelectedOption.ref != null && currentSelectedOption.ref.current) {
           scrollIntoViewIfNeeded(currentSelectedOption.ref.current);
         }
-      }, 0);
+      }, 16);
     }
   }, [editor, menuVisible, selectedIndex, options]);
 
@@ -442,7 +442,10 @@ function LexicalPopoverMenu<TOption extends TypeaheadOption>({
             updateSelectedIndex(newSelectedIndex);
             const option = options[newSelectedIndex];
             if (option.ref != null && option.ref.current) {
-              scrollIntoViewIfNeeded(option.ref.current);
+              editor.dispatchCommand(SCROLL_TYPEAHEAD_OPTION_INTO_VIEW_COMMAND, {
+                index: newSelectedIndex,
+                option,
+              });
             }
             event.preventDefault();
             event.stopImmediatePropagation();
