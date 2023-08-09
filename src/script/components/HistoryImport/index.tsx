@@ -179,7 +179,7 @@ const HistoryImport: FC<HistoryImportProps> = ({user, backupRepository, file, sw
     }
   };
 
-  const processHistoryImport = async (file, password?: string) => {
+  const processHistoryImport = async (file: File, password?: string) => {
     setHistoryImportState(HistoryImportState.PREPARING);
     setError(null);
 
