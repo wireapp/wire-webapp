@@ -17,6 +17,13 @@
  *
  */
 
+/**
+ * This is a modified version of https://github.com/facebook/lexical/blob/main/packages/lexical-react/src/LexicalTypeaheadMenuPlugin.tsx
+ * It allows showing a list that is filled from the bottom up instead of the top down (the default selected item is at the bottom of the list).
+ * The only differences lie in:
+ * - the default index we select when the component is instanciated (the last one by default)
+ * - a protection to avoid re-rendering the entire component when the list updates (which makes the scroll flicker)
+ */
 import React, {
   MutableRefObject,
   ReactPortal,
