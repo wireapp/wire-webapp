@@ -28,6 +28,7 @@ import {UserState} from 'src/script/user/UserState';
 import {supportsMLS} from 'Util/util';
 
 import {GracePeriodTimer} from './DelayTimer';
+import {removeUrlParameters} from './helper/uri';
 import {getModalOptions, ModalType} from './Modals';
 
 export enum E2EIHandlerStep {
@@ -130,7 +131,9 @@ class E2EIHandler {
 
       this.currentStep = E2EIHandlerStep.SUCCESS;
       this.showSuccessMessage();
-    } catch (e) {
+      // Remove the url parameters after enrollment
+      removeUrlParameters();
+    } catch (error) {
       this.currentStep = E2EIHandlerStep.ERROR;
       setTimeout(() => {
         removeCurrentModal();
@@ -187,7 +190,6 @@ class E2EIHandler {
   private showE2EINotificationMessage(): void {
     // If the user has already started enrollment, don't show the notification. Instead, show the loading modal
     // This will occur after the redirect from the oauth provider
-    console.log('showE2EINotificationMessage');
     if (AcmeStorage.hasHandle()) {
       this.showLoadingMessage();
       void this.enrollE2EI();
