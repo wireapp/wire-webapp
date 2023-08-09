@@ -17,36 +17,23 @@
  *
  */
 
-import type {EditorConfig, NodeKey, SerializedTextNode, Spread} from 'lexical';
+import type {EditorConfig, SerializedTextNode} from 'lexical';
 import {$applyNodeReplacement, TextNode} from 'lexical';
 
-export type SerializedEmojiNode = Spread<
-  {
-    className: string;
-  },
-  SerializedTextNode
->;
+export type SerializedEmojiNode = SerializedTextNode;
 
 export class EmojiNode extends TextNode {
-  __className: string;
-
   static getType(): string {
     return 'emoji';
   }
 
   static clone(node: EmojiNode): EmojiNode {
-    return new EmojiNode(node.__className, node.__text, node.__key);
-  }
-
-  constructor(className: string, text: string, key?: NodeKey) {
-    super(text, key);
-    this.__className = className;
+    return new EmojiNode(node.__text, node.__key);
   }
 
   createDOM(config: EditorConfig): HTMLElement {
     const dom = document.createElement('span');
     const inner = super.createDOM(config);
-    dom.className = this.__className;
     inner.className = 'emoji-inner';
     dom.appendChild(inner);
     return dom;
@@ -62,7 +49,7 @@ export class EmojiNode extends TextNode {
   }
 
   static importJSON(serializedNode: SerializedEmojiNode): EmojiNode {
-    const node = $createEmojiNode(serializedNode.className, serializedNode.text);
+    const node = $createEmojiNode(serializedNode.text);
     node.setFormat(serializedNode.format);
     node.setDetail(serializedNode.detail);
     node.setMode(serializedNode.mode);
@@ -73,18 +60,12 @@ export class EmojiNode extends TextNode {
   exportJSON(): SerializedEmojiNode {
     return {
       ...super.exportJSON(),
-      className: this.getClassName(),
       type: 'emoji',
     };
   }
-
-  getClassName(): string {
-    const self = this.getLatest();
-    return self.__className;
-  }
 }
 
-function $createEmojiNode(className: string, emojiText: string): EmojiNode {
-  const node = new EmojiNode(className, emojiText).setMode('token');
+function $createEmojiNode(emojiText: string): EmojiNode {
+  const node = new EmojiNode(emojiText).setMode('token');
   return $applyNodeReplacement(node);
 }
