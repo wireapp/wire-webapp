@@ -20,16 +20,14 @@
 import {useCallback, useState} from 'react';
 
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
-import {
-  MenuOption as _MenuOption,
-  LexicalTypeaheadMenuPlugin,
-  MenuRenderFn,
-} from '@lexical/react/LexicalTypeaheadMenuPlugin';
+import {MenuOption as _MenuOption, MenuRenderFn} from '@lexical/react/LexicalTypeaheadMenuPlugin';
 import {$createTextNode, TextNode} from 'lexical';
 import * as ReactDOM from 'react-dom';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {IgnoreOutsideClickWrapper} from 'Components/InputBar/util/clickHandlers';
+
+import {ReverseTypeaheadMenuPlugin} from './ReverseTypeaheadMenuPlugin';
 
 import {User} from '../../../entity/User';
 import {MentionSuggestionsItem} from '../components/Mention/MentionSuggestionsItem';
@@ -59,14 +57,7 @@ export function MentionsPlugin({onSearch}: MentionsPluginProps) {
 
   const results = onSearch(queryString);
 
-  const options = results
-    .sort((userA, userB) => {
-      if (userA.name() <= userB.name()) {
-        return 1;
-      }
-      return 0;
-    })
-    .map(result => new MenuOption(result, result.name()));
+  const options = results.map(result => new MenuOption(result, result.name())).reverse();
 
   const handleSelectOption = useCallback(
     (selectedOption: MenuOption, nodeToReplace: TextNode | null, closeMenu: () => void) => {
@@ -144,7 +135,7 @@ export function MentionsPlugin({onSearch}: MentionsPluginProps) {
   };
 
   return (
-    <LexicalTypeaheadMenuPlugin
+    <ReverseTypeaheadMenuPlugin
       onQueryChange={setQueryString}
       onSelectOption={handleSelectOption}
       triggerFn={checkForMentionMatch}
