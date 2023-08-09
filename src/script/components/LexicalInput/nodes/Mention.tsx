@@ -45,8 +45,8 @@ import {
 
 import {KEY} from 'Util/KeyboardUtil';
 
-import {$isMentionNode} from '../../nodes/MentionNode';
-import {getNextSibling, getPreviousSibling} from '../../utils/getSelectionInfo';
+import {$isMentionNode} from '../nodes/MentionNode';
+import {getNextSibling, getPreviousSibling} from '../utils/getSelectionInfo';
 
 interface MentionComponentProps {
   mention: string;

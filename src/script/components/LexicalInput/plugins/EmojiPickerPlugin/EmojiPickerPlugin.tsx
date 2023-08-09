@@ -32,12 +32,13 @@ import * as ReactDOM from 'react-dom';
 import {loadValue, storeValue} from 'Util/StorageUtil';
 import {sortByPriority} from 'Util/StringUtil';
 
-import {StorageKey} from '../../../storage';
-import {EmojiItem} from '../components/EmojiItem';
-import emojiList from '../utils/emojiList';
-import {checkForEmojis} from '../utils/emojiUtils';
-import {getDOMRangeRect} from '../utils/getDomRangeRect';
-import {getSelectionInfo} from '../utils/getSelectionInfo';
+import {EmojiItem} from './EmojiItem';
+
+import {StorageKey} from '../../../../storage';
+import emojiList from '../../utils/emojiList';
+import {checkForEmojis} from '../../utils/emojiUtils';
+import {getDOMRangeRect} from '../../utils/getDomRangeRect';
+import {getSelectionInfo} from '../../utils/getSelectionInfo';
 
 export class EmojiOption extends MenuOption {
   title: string;

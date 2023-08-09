@@ -29,7 +29,7 @@ import {
   type NodeKey,
 } from 'lexical';
 
-import {Mention} from '../components/Mention';
+import {Mention} from './Mention';
 
 type SerializedMentionNode = Spread<
   {

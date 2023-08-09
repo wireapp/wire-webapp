@@ -27,13 +27,13 @@ import * as ReactDOM from 'react-dom';
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {IgnoreOutsideClickWrapper} from 'Components/InputBar/util/clickHandlers';
 
-import {ReverseTypeaheadMenuPlugin} from './ReverseTypeaheadMenuPlugin';
+import {MentionSuggestionsItem} from './MentionSuggestionsItem';
 
-import {User} from '../../../entity/User';
-import {MentionSuggestionsItem} from '../components/Mention/MentionSuggestionsItem';
-import {$createMentionNode} from '../nodes/MentionNode';
-import {getSelectionInfo} from '../utils/getSelectionInfo';
-import {TRIGGER, checkForMentions} from '../utils/mentionUtils';
+import {User} from '../../../../entity/User';
+import {$createMentionNode} from '../../nodes/MentionNode';
+import {getSelectionInfo} from '../../utils/getSelectionInfo';
+import {TRIGGER, checkForMentions} from '../../utils/mentionUtils';
+import {ReverseTypeaheadMenuPlugin} from '../ReverseTypeaheadMenuPlugin';
 
 export class MenuOption extends _MenuOption {
   user: User;
