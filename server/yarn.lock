@@ -2824,10 +2824,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"helmet@npm:6.1.5":
-  version: 6.1.5
-  resolution: "helmet@npm:6.1.5"
-  checksum: 58cc8f8715e2c486f3c7a58f89fcda3c9e83ab427bfe16d8486d8be53a681afc291f9900b9e60e5d42c63c25ece3da864a33cdd621a12f5a67cbc9046cff393d
+"helmet@npm:7.0.0":
+  version: 7.0.0
+  resolution: "helmet@npm:7.0.0"
+  checksum: 3622b8b68b7ac4736369fe7717adb5b87ddcdcda7c11c13277d79fb5670acab032e8c971835565b1d2144d234f3e0dbcd327a44249b9e61f0f64c0c753faf1bc
   languageName: node
   linkType: hard
 
@@ -4199,10 +4199,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nocache@npm:3.0.4":
-  version: 3.0.4
-  resolution: "nocache@npm:3.0.4"
-  checksum: 6be9ee67eb561ecedc56d805c024c0fda55b9836ecba659c720073b067929aa4fe04bb7121480e004c9cf52989e62d8720f29a7fe0269f1a4941221a1e4be1c2
+"nocache@npm:4.0.0":
+  version: 4.0.0
+  resolution: "nocache@npm:4.0.0"
+  checksum: ba317f7a5b837069c3bf8616c9a25f61bd5ec63ad7aa2ce83e8425116df402ab5b4914bbdfb1ba54893c0f859886cb3ad9a375f1c45ba7a72a9712cf31392292
   languageName: node
   linkType: hard
 
@@ -5684,12 +5684,12 @@ __metadata:
     fs-extra: 11.1.1
     geolite2: 1.3.0
     hbs: 4.2.0
-    helmet: 6.1.5
+    helmet: 7.0.0
     http-status-codes: 2.2.0
     jest: 29.6.2
     logdown: 3.3.1
     maxmind: 4.3.9
-    nocache: 3.0.4
+    nocache: 4.0.0
     opn: 6.0.0
     pm2: 5.3.0
     rimraf: 4.4.1

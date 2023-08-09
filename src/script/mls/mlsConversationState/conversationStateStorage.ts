@@ -29,16 +29,14 @@ export const loadState = (): MLSConversationState => {
   if (!storedState) {
     return {
       established: new Set(),
-      pendingWelcome: new Set(),
     };
   }
   const parsedState = JSON.parse(storedState);
   return {
     established: new Set(parsedState.established),
-    pendingWelcome: new Set(parsedState.pendingWelcome),
   };
 };
 
-export const saveState = ({established, pendingWelcome}: MLSConversationState) => {
-  storage?.setItem(storageKey, JSON.stringify({established: [...established], pendingWelcome: [...pendingWelcome]}));
+export const saveState = ({established}: MLSConversationState) => {
+  storage?.setItem(storageKey, JSON.stringify({established: [...established]}));
 };

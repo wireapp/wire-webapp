@@ -25,70 +25,46 @@ import {loadState, saveState} from './conversationStateStorage';
 import {Conversation} from '../../entity/Conversation';
 
 export interface MLSConversationState {
-  /** list of conversations that are fully joined */
+  /** list of conversations that are already established */
   established: Set<string>;
-  /** list of conversations that are waiting for a welcome */
-  pendingWelcome: Set<string>;
 }
 
 const initialState = loadState();
 
 type StoreState = MLSConversationState & {
   isEstablished: (groupId: string) => boolean;
-  isPendingWelcome: (groupId: string) => boolean;
-  filterEstablishedConversations: (conversations: Conversation[]) => Conversation[];
   markAsEstablished: (groupId: string) => void;
-  markAsPendingWelcome: (groupId: string) => void;
   wipeConversationState: (groupId: string) => void;
   /**
-   * Will send external proposal for all the conversations that are not pendingWelcome or established
-   * @param conversations The conversations that we want to process (only the mls conversations will be considered)
-   * @param sendExternalProposal Callback that will be called with every conversation that needs an external proposal
+   * Will join all the conversations that are not already established  with external commits.
+   * @param conversations conversations that we want to process (only the mls conversations will be considered)
+   * @param isAlreadyEstablished callback to check if a conversation is already established
+   * @param joinWithExternalCommit callback to join a conversation with an external commit
    */
-  sendExternalToPendingJoin(
+  joinWithExternalCommit(
     conversations: Conversation[],
-    isEstablishedConversation: (groupId: string) => Promise<boolean>,
-    sendExternalProposal: (conversationId: QualifiedId) => Promise<unknown>,
+    isAlreadyEstablished: (groupId: string) => Promise<boolean>,
+    joinWithExternalCommit: (conversationId: QualifiedId) => Promise<unknown>,
   ): Promise<void>;
 };
 
 export const useMLSConversationState = create<StoreState>((set, get) => {
   return {
     established: initialState.established,
-    filterEstablishedConversations: conversations =>
-      conversations.filter(conversation => !conversation.groupId || get().isEstablished(conversation.groupId)),
 
     isEstablished: groupId => get().established.has(groupId),
-
-    isPendingWelcome: groupId => get().pendingWelcome.has(groupId),
 
     markAsEstablished: groupId =>
       set(state => {
         const established = new Set(state.established);
         established.add(groupId);
 
-        const pendingWelcome = new Set(state.pendingWelcome);
-        pendingWelcome.delete(groupId);
-
         return {
           established,
-          pendingWelcome,
         };
       }),
 
-    markAsPendingWelcome: groupId =>
-      set(state => {
-        const pendingWelcome = new Set(state.pendingWelcome);
-        pendingWelcome.add(groupId);
-        return {
-          ...state,
-          pendingWelcome,
-        };
-      }),
-
-    pendingWelcome: initialState.pendingWelcome,
-
-    async sendExternalToPendingJoin(conversations, isAlreadyEstablished, sendExternalCommit): Promise<void> {
+    async joinWithExternalCommit(conversations, isAlreadyEstablished, sendExternalCommit): Promise<void> {
       const currentState = get();
       const conversationsToJoin: {groupId: string; conversationId: QualifiedId}[] = [];
       const pendingConversations: string[] = [];
@@ -99,7 +75,7 @@ export const useMLSConversationState = create<StoreState>((set, get) => {
         if (!conversation.isUsingMLSProtocol || !groupId) {
           continue;
         }
-        if (!currentState.isEstablished(groupId) && !currentState.isPendingWelcome(groupId)) {
+        if (!currentState.isEstablished(groupId)) {
           if (await isAlreadyEstablished(groupId)) {
             // check is the conversation is not actually already established
             alreadyEstablishedConversations.push(groupId);
@@ -123,7 +99,6 @@ export const useMLSConversationState = create<StoreState>((set, get) => {
       set({
         ...currentState,
         established: new Set([...currentState.established, ...alreadyEstablishedConversations]),
-        pendingWelcome: new Set([...currentState.pendingWelcome, ...pendingConversations]),
       });
     },
 
@@ -131,12 +106,10 @@ export const useMLSConversationState = create<StoreState>((set, get) => {
       set(state => {
         const established = new Set(state.established);
         established.delete(groupId);
-        const pendingWelcome = new Set(state.pendingWelcome);
-        pendingWelcome.delete(groupId);
+
         return {
           ...state,
           established,
-          pendingWelcome,
         };
       }),
   };

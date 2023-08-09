@@ -39,6 +39,7 @@ import {
   ConversationRenameEvent,
   ConversationTypingEvent,
   CONVERSATION_EVENT,
+  ConversationMLSWelcomeEvent,
 } from '@wireapp/api-client/lib/event';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import type {BackendError} from '@wireapp/api-client/lib/http/';
@@ -2068,21 +2069,13 @@ export class ConversationRepository {
       ? {domain: '', id: eventData.conversationId}
       : qualified_conversation || {domain: '', id: conversation};
 
+    if (type === CONVERSATION_EVENT.MLS_WELCOME_MESSAGE) {
+      this.handleMLSWelcomeMessageEvent(eventJson);
+    }
+
     const inSelfConversation = this.conversationState.isSelfConversation(conversationId);
     if (inSelfConversation) {
-      const typesInSelfConversation = [
-        CONVERSATION_EVENT.MEMBER_UPDATE,
-        ClientEvent.CONVERSATION.MESSAGE_HIDDEN,
-        /**
-         * As of today (07/07/2022) the backend sends `WELCOME` message to the user's own
-         * conversation (not the actual conversation that the welcome should be part of)
-         */
-        CONVERSATION_EVENT.MLS_WELCOME_MESSAGE,
-      ];
-
-      if (type === CONVERSATION_EVENT.MLS_WELCOME_MESSAGE) {
-        useMLSConversationState.getState().markAsEstablished(eventData);
-      }
+      const typesInSelfConversation = [CONVERSATION_EVENT.MEMBER_UPDATE, ClientEvent.CONVERSATION.MESSAGE_HIDDEN];
 
       const isExpectedType = typesInSelfConversation.includes(type);
       if (!isExpectedType) {
@@ -2150,6 +2143,11 @@ export class ConversationRepository {
           throw error;
         }
       });
+  }
+
+  private handleMLSWelcomeMessageEvent(eventJson: ConversationMLSWelcomeEvent) {
+    const groupId = eventJson.data;
+    return useMLSConversationState.getState().markAsEstablished(groupId);
   }
 
   /**
@@ -2605,19 +2603,10 @@ export class ConversationRepository {
       throw new Error(`groupId not found for MLS conversation ${conversation.id}`);
     }
 
-    const isMLSConversationEstablished = await this.core.service!.conversation.isMLSConversationEstablished(groupId);
+    const isMLSConversationEstablished = await this.isMLSConversationEstablished(groupId);
 
     if (!isMLSConversationEstablished) {
       return;
-    }
-
-    const mlsConversationState = useMLSConversationState.getState();
-
-    const isMLSConversationMarkedAsEstablished = mlsConversationState.isEstablished(groupId);
-
-    if (!isMLSConversationMarkedAsEstablished) {
-      // If the conversation was not previously marked as established and the core if aware of this conversation, we can mark is as established
-      mlsConversationState.markAsEstablished(groupId);
     }
 
     if (isSelfJoin) {
@@ -2634,6 +2623,32 @@ export class ConversationRepository {
       }
     }
   }
+
+  private readonly isMLSConversationEstablished = async (groupId: string) => {
+    const mlsService = this.core.service?.mls;
+
+    if (!mlsService) {
+      throw new Error('MLS service is not available!');
+    }
+
+    const mlsConversationState = useMLSConversationState.getState();
+
+    const isMLSConversationMarkedAsEstablished = mlsConversationState.isEstablished(groupId);
+
+    if (isMLSConversationMarkedAsEstablished) {
+      return true;
+    }
+
+    const isMLSConversationEstablished = await mlsService.conversationExists(groupId);
+
+    if (isMLSConversationEstablished) {
+      //make sure MLS group is marked as established
+      mlsConversationState.markAsEstablished(groupId);
+      return true;
+    }
+
+    return false;
+  };
 
   /**
    * Members of a group conversation were removed or left.
@@ -2944,7 +2959,6 @@ export class ConversationRepository {
       if (changes) {
         this.eventService.updateEventSequentially(messageEntity.primary_key, changes);
       }
-      return;
     } catch (error) {
       const isNotFound = error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;
       if (!isNotFound) {
