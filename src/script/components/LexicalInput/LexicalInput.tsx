@@ -44,6 +44,7 @@ import {DraftStatePlugin} from './plugins/DraftStatePlugin';
 import {EditMessagePlugin} from './plugins/EditMessagePlugin';
 import {EmojiPickerPlugin} from './plugins/EmojiPickerPlugin';
 import {GlobalEventsPlugin} from './plugins/GlobalEventsPlugin';
+import {HistoryPlugin} from './plugins/HistoryPlugin';
 import {MentionsPlugin} from './plugins/MentionsPlugin';
 import {ReplaceEmojiPlugin} from './plugins/ReplaceEmojiPlugin';
 
@@ -146,6 +147,7 @@ export const LexicalInput = ({
           <EditMessagePlugin onMessageEdit={editMessage} />
 
           <EmojiPickerPlugin />
+          <HistoryPlugin />
 
           {shouldReplaceEmoji && <ReplaceEmojiPlugin />}
 

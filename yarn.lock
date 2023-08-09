@@ -3536,7 +3536,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@lexical/history@npm:0.11.3":
+"@lexical/history@npm:0.11.3, @lexical/history@npm:^0.11.3":
   version: 0.11.3
   resolution: "@lexical/history@npm:0.11.3"
   dependencies:
@@ -17938,6 +17938,7 @@ __metadata:
     "@faker-js/faker": 8.0.2
     "@formatjs/cli": 6.1.3
     "@koush/wrtc": 0.5.3
+    "@lexical/history": ^0.11.3
     "@lexical/react": ^0.11.1
     "@testing-library/react": 14.0.0
     "@types/adm-zip": 0.5.0
