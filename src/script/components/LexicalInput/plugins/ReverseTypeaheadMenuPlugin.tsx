@@ -579,9 +579,15 @@ function useMenuAnchorRef(opt: UseMenuAnchorRefOptions): MutableRefObject<HTMLEl
     }
   }, [editor, resolution, className]);
 
+  const wasInit = useRef(false);
   useEffect(() => {
     const rootElement = editor.getRootElement();
-    if (resolution !== null && menuVisible) {
+    if (resolution === null) {
+      wasInit.current = false;
+    }
+    if (resolution !== null && menuVisible && !wasInit.current) {
+      // Avoid removing/re-adding the menu when the content changes (causes scroll issues and flickering)
+      wasInit.current = true;
       positionMenu();
       return () => {
         if (rootElement !== null) {
