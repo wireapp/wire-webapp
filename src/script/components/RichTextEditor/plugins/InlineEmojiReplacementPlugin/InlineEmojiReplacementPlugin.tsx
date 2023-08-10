@@ -33,7 +33,7 @@ const emojiList = inlineReplacements.map(emoji => {
 
   return {
     ...emoji,
-    regexes: emoticons.map(emojiIcon => new RegExp(`(?:^|\\s)${escapeRegexp(emojiIcon)}(?=\\s|$)`)),
+    regexes: emoticons.map(emojiIcon => new RegExp(`(^|\\s)${escapeRegexp(emojiIcon)}(?=\\s|$)`)),
   };
 });
 
@@ -44,7 +44,7 @@ function findAndTransformEmoji(text: string): string | null {
         continue;
       }
 
-      return text.replace(regex, ` ${emoji.emoji}`);
+      return text.replace(regex, `$1${emoji.emoji}`);
     }
   }
 
