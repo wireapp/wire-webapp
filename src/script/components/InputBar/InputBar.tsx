@@ -30,12 +30,12 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {checkFileSharingPermission} from 'Components/Conversation/utils/checkFileSharingPermission';
 import {ClassifiedBar} from 'Components/input/ClassifiedBar';
-import {SendMessageButton} from 'Components/LexicalInput/components/SendMessageButton';
-import {LexicalInput} from 'Components/LexicalInput/LexicalInput';
-import {$createMentionNode} from 'Components/LexicalInput/nodes/MentionNode';
-import {createNodes} from 'Components/LexicalInput/utils/generateNodes';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
+import {SendMessageButton} from 'Components/RichTextEditor/components/SendMessageButton';
+import {RichTextEditor} from 'Components/RichTextEditor/LexicalInput';
+import {$createMentionNode} from 'Components/RichTextEditor/nodes/MentionNode';
+import {createNodes} from 'Components/RichTextEditor/utils/generateNodes';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from 'src/script/user/TypingIndicatorMode';
@@ -602,7 +602,7 @@ export const InputBar = ({
             </div>
 
             {!removedFromConversation && !pastedFile && (
-              <LexicalInput
+              <RichTextEditor
                 onSetup={lexical => {
                   lexicalRef.current = lexical;
                   // autofocus the editor when first loaded
@@ -639,7 +639,7 @@ export const InputBar = ({
                     </ul>
                   </>
                 )}
-              </LexicalInput>
+              </RichTextEditor>
             )}
           </>
         )}

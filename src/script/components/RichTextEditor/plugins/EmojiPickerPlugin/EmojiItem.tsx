@@ -21,7 +21,7 @@ import {forwardRef, ForwardRefRenderFunction} from 'react';
 
 import cx from 'classnames';
 
-import {EmojiOption} from 'Components/LexicalInput/plugins/EmojiPickerPlugin/EmojiPickerPlugin';
+import {EmojiOption} from 'Components/RichTextEditor/plugins/EmojiPickerPlugin/EmojiPickerPlugin';
 
 import {itemStyle, symbolStyle, nameStyle} from './EmojiItem.styles';
 

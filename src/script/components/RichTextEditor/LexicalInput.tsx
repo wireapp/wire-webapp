@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useEffect, useState, ReactElement} from 'react';
+import {useEffect, useState, ReactElement} from 'react';
 
 import {InitialConfigType, LexicalComposer} from '@lexical/react/LexicalComposer';
 import {ContentEditable} from '@lexical/react/LexicalContentEditable';
@@ -66,7 +66,7 @@ const theme = {
 
 const logger = getLogger('LexicalInput');
 
-interface LexicalInputProps {
+interface RichTextEditorProps {
   currentMentions: MentionEntity[];
   readonly propertiesRepository: PropertiesRepository;
   readonly searchRepository: SearchRepository;
@@ -83,7 +83,7 @@ interface LexicalInputProps {
   onSetup?: (editor: LexicalEditor) => void;
 }
 
-export const LexicalInput = ({
+export const RichTextEditor = ({
   placeholder,
   propertiesRepository,
   searchRepository,
@@ -97,7 +97,7 @@ export const LexicalInput = ({
   mentionCandidates,
   onShiftTab,
   onSetup,
-}: LexicalInputProps) => {
+}: RichTextEditorProps) => {
   // Emojis
   const [shouldReplaceEmoji, setShouldReplaceEmoji] = useState<boolean>(
     propertiesRepository.getPreference(PROPERTIES_TYPE.EMOJI.REPLACE_INLINE),
@@ -117,17 +117,9 @@ export const LexicalInput = ({
     return queryString ? searchRepository.searchUserInSet(queryString, mentionCandidates) : mentionCandidates;
   };
 
-  const updateValue = useCallback(
-    (editorState: EditorState, lexicalEditor: LexicalEditor) => {
-      lexicalEditor.registerTextContentListener(textContent => {
-        setInputValue(textContent);
-      });
-
-      const stringifyEditor = JSON.stringify(editorState.toJSON());
-      saveDraftState(stringifyEditor);
-    },
-    [saveDraftState, setInputValue],
-  );
+  const saveDraft = (editorState: EditorState) => {
+    saveDraftState(JSON.stringify(editorState.toJSON()));
+  };
 
   useEffect(() => {
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE, setShouldReplaceEmoji);
@@ -165,7 +157,7 @@ export const LexicalInput = ({
 
           <MentionsPlugin onSearch={searchMentions} />
 
-          <OnChangePlugin onChange={updateValue} />
+          <OnChangePlugin onChange={saveDraft} />
         </div>
       </div>
 
