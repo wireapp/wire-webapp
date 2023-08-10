@@ -151,6 +151,7 @@ export const InputBar = ({
   const isTypingIndicatorEnabled = typingIndicatorMode === CONVERSATION_TYPING_INDICATOR_MODE.ON;
 
   // Message
+  /** the messageContent represents the message being edited. It's directly derived from the editor state */
   const [messageContent, setMessageContent] = useState<RichTextContent>({text: ''});
   const [editMessageEntity, setEditMessageEntity] = useState<ContentMessage | null>(null);
   const [replyMessageEntity, setReplyMessageEntity] = useState<ContentMessage | null>(null);
