@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [40.9.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@40.8.5...@wireapp/core@40.9.0) (2023-08-10)
+
+### Features
+
+* bump corecrypto version ([#5376](https://github.com/wireapp/wire-web-packages/issues/5376)) ([a489692](https://github.com/wireapp/wire-web-packages/commit/a489692d9fc9005c9113381cef544541e9659c8f))
+
 ## [40.8.5](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@40.8.4...@wireapp/core@40.8.5) (2023-08-07)
 
 **Note:** Version bump only for package @wireapp/core
