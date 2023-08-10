@@ -17,12 +17,8 @@
  *
  */
 
-import {useEffect} from 'react';
-
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {TextNode} from 'lexical';
-
-import {isSpaceKey, isTabKey} from 'Util/KeyboardUtil';
 
 import {inlineReplacements} from './inlineReplacements';
 
@@ -56,9 +52,7 @@ let lastTextNodeText: string = '';
 // Store words that don't have emojis to avoid unnecessary work
 const wordsWithoutEmojis = new Set<string>();
 // Regex to check if a word is an possible emoticon
-const possibleEmoticons = /^[^\w\s][\w\W_]*$/;
-// Checking if space or tab key pressed to replace emoji
-let isSpaceOrTabKeyPressed = false;
+const possibleEmoticons = /^([^\w\s][\w\W_]){0,4}$/;
 
 export function ReplaceEmojiPlugin(): null {
   const [editor] = useLexicalComposerContext();
@@ -66,8 +60,8 @@ export function ReplaceEmojiPlugin(): null {
   editor.registerNodeTransform(TextNode, newNode => {
     const hasNewContent = lastTextNodeText !== newNode.getTextContent();
 
-    if (isSpaceOrTabKeyPressed && (!lastTextNodeText || hasNewContent)) {
-      lastTextNodeText = `${newNode.getTextContent()}`;
+    if (!lastTextNodeText || hasNewContent) {
+      lastTextNodeText = newNode.getTextContent();
       // Collect new words
       const wordArray = lastTextNodeText.split(' ').filter(word => !wordsWithoutEmojis.has(word));
 
@@ -85,18 +79,6 @@ export function ReplaceEmojiPlugin(): null {
       }
     }
   });
-
-  const onKeyDown = (event: KeyboardEvent) => {
-    isSpaceOrTabKeyPressed = isSpaceKey(event) || isTabKey(event);
-  };
-
-  useEffect(() => {
-    window.addEventListener('keydown', onKeyDown);
-
-    return () => {
-      window.removeEventListener('keydown', onKeyDown);
-    };
-  }, [editor]);
 
   return null;
 }
