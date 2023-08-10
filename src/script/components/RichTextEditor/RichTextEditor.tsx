@@ -61,7 +61,6 @@ const theme = {
   paragraph: 'editor-paragraph',
   mentions: {
     '@': `at-mentions`, // use the trigger name as the key
-    '@Focused': 'focused-mentions', // add the "Focused" suffix to style the focused mention
   },
 };
 
@@ -77,7 +76,6 @@ interface RichTextEditorProps {
   readonly propertiesRepository: PropertiesRepository;
   readonly searchRepository: SearchRepository;
   placeholder: string;
-  inputValue: string;
   onUpdate: (content: RichTextContent) => void;
   editMessage: (messageEntity: ContentMessage, editor: LexicalEditor) => void;
   children: ReactElement;
@@ -114,7 +112,6 @@ export const RichTextEditor = ({
   placeholder,
   propertiesRepository,
   searchRepository,
-  inputValue,
   onUpdate,
   children,
   hasLocalEphemeralTimer,
@@ -123,7 +120,7 @@ export const RichTextEditor = ({
   editMessage,
   mentionCandidates,
   onShiftTab,
-  onSend: onValidate,
+  onSend,
   onSetup,
 }: RichTextEditorProps) => {
   // Emojis
@@ -154,7 +151,7 @@ export const RichTextEditor = ({
             return true;
           }
 
-          onValidate();
+          onSend();
 
           return false;
         },
@@ -214,13 +211,7 @@ export const RichTextEditor = ({
           {shouldReplaceEmoji && <ReplaceEmojiPlugin />}
 
           <PlainTextPlugin
-            contentEditable={
-              <ContentEditable
-                value={inputValue}
-                className="conversation-input-bar-text"
-                data-uie-name="input-message"
-              />
-            }
+            contentEditable={<ContentEditable className="conversation-input-bar-text" data-uie-name="input-message" />}
             placeholder={<Placeholder text={placeholder} hasLocalEphemeralTimer={hasLocalEphemeralTimer} />}
             ErrorBoundary={LexicalErrorBoundary}
           />

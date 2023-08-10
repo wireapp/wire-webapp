@@ -617,7 +617,6 @@ export const InputBar = ({
                 searchRepository={searchRepository}
                 propertiesRepository={propertiesRepository}
                 placeholder={inputPlaceholder}
-                inputValue={messageContent.text}
                 onUpdate={setMessageContent}
                 currentMentions={currentMentions}
                 hasLocalEphemeralTimer={hasLocalEphemeralTimer}
