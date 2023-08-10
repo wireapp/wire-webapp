@@ -293,15 +293,19 @@ export class ConversationMapper {
     return conversationEntity;
   }
 
+  /**
+   * Will merge the locally stored conversations with the new conversations fetched from the backend.
+   * @param localConversations locally stored conversations
+   * @param remoteConversations new conversations fetched from backend
+   * @returns the new conversations from backend merged with the locally stored conversations
+   */
   static mergeConversations(
     localConversations: ConversationDatabaseData[],
     remoteConversations: RemoteConversations,
   ): ConversationDatabaseData[] {
-    localConversations = localConversations.filter(conversationData => conversationData);
+    const foundRemoteConversations = remoteConversations.found;
 
-    const foundConversations = remoteConversations.found;
-
-    if (!foundConversations) {
+    if (!foundRemoteConversations) {
       return localConversations;
     }
 
@@ -312,8 +316,8 @@ export class ConversationMapper {
       conversationsMap.set(conversationId, conversation);
     }
 
-    for (let i = 0; i < foundConversations.length; i++) {
-      const conversation = foundConversations[i];
+    for (let i = 0; i < foundRemoteConversations.length; i++) {
+      const conversation = foundRemoteConversations[i];
       const conversationId = conversation.qualified_id?.id || conversation.id;
       const localConversation = conversationsMap.get(conversationId);
 
