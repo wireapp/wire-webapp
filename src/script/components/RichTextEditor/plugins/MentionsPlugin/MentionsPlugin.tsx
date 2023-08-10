@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useState} from 'react';
+import {MutableRefObject, useCallback, useState} from 'react';
 
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {MenuOption as _MenuOption, MenuRenderFn, MenuTextMatch} from '@lexical/react/LexicalTypeaheadMenuPlugin';
@@ -69,12 +69,11 @@ export class MenuOption extends _MenuOption {
 }
 
 interface MentionsPluginProps {
-  onSearch: (queryString?: string | null) => User[];
-  onOpen: () => void;
-  onClose: () => void;
+  onSearch: (queryString: string | null) => User[];
+  openStateRef: MutableRefObject<boolean>;
 }
 
-export function MentionsPlugin({onSearch, onOpen, onClose}: MentionsPluginProps) {
+export function MentionsPlugin({onSearch, openStateRef}: MentionsPluginProps) {
   const [editor] = useLexicalComposerContext();
   const [queryString, setQueryString] = useState<string | null>(null);
 
@@ -125,7 +124,7 @@ export function MentionsPlugin({onSearch, onOpen, onClose}: MentionsPluginProps)
       return null;
     }
 
-    onOpen();
+    openStateRef.current = true;
     const {bottom, left} = getPosition();
 
     return ReactDOM.createPortal(
@@ -158,17 +157,13 @@ export function MentionsPlugin({onSearch, onOpen, onClose}: MentionsPluginProps)
     );
   };
 
+  openStateRef.current = options.length > 0;
+
   return (
     <ReverseTypeaheadMenuPlugin
       onQueryChange={setQueryString}
       onSelectOption={handleSelectOption}
-      triggerFn={text => {
-        const match = checkForMentionMatch(text);
-        if (!match) {
-          onClose();
-        }
-        return match;
-      }}
+      triggerFn={checkForMentionMatch}
       options={options}
       menuRenderFn={menuRenderFn}
     />

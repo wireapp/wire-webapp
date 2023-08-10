@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useMemo, useState} from 'react';
+import {MutableRefObject, useCallback, useMemo, useState} from 'react';
 
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {
@@ -88,11 +88,10 @@ export class EmojiOption extends MenuOption {
 const MAX_EMOJI_SUGGESTION_COUNT = 5;
 
 type Props = {
-  onOpen: () => void;
-  onClose: () => void;
+  openStateRef: MutableRefObject<boolean>;
 };
 
-export function EmojiPickerPlugin({onOpen, onClose}: Props) {
+export function EmojiPickerPlugin({openStateRef}: Props) {
   const [lexicalEditor] = useLexicalComposerContext();
 
   const [queryString, setQueryString] = useState<string | null>(null);
@@ -178,11 +177,6 @@ export function EmojiPickerPlugin({onOpen, onClose}: Props) {
       .slice(0, MAX_EMOJI_SUGGESTION_COUNT);
   }, [emojiOptions, getUsageCount, queryString]);
 
-  if (options.length === 0) {
-    onClose();
-  } else {
-    onOpen();
-  }
   const onSelectOption = useCallback(
     (selectedOption: EmojiOption, nodeToRemove: TextNode | null, closeMenu: () => void) => {
       lexicalEditor.update(() => {
@@ -253,6 +247,8 @@ export function EmojiPickerPlugin({onOpen, onClose}: Props) {
       anchorElementRef.current,
     );
   };
+
+  openStateRef.current = options.length > 0;
 
   return (
     <LexicalTypeaheadMenuPlugin

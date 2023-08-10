@@ -126,14 +126,8 @@ export const RichTextEditor = ({
   // Emojis
   const editorRef = useRef<LexicalEditor>();
   const cleanupRef = useRef<() => void>();
-  const sendingWithEnterEnabled = useRef<boolean>(true);
-
-  const blockSendingWithEnter = () => {
-    sendingWithEnterEnabled.current = false;
-  };
-  const enableSendingWithEnter = () => {
-    sendingWithEnterEnabled.current = true;
-  };
+  const emojiPickerOpen = useRef<boolean>(true);
+  const mentionsOpen = useRef<boolean>(true);
 
   const setupEditor = (editor: LexicalEditor) => {
     editorRef.current = editor;
@@ -148,7 +142,8 @@ export const RichTextEditor = ({
       editor.registerCommand(
         KEY_ENTER_COMMAND,
         event => {
-          if (!sendingWithEnterEnabled.current) {
+          if (emojiPickerOpen.current || mentionsOpen.current) {
+            // we don't want to send if the user is currently picking an emoji or mention
             return false;
           }
           if (event?.shiftKey) {
@@ -178,13 +173,12 @@ export const RichTextEditor = ({
     theme,
     onError(error: unknown) {
       logger.error(error);
-      throw error;
     },
     nodes: [MentionNode, EmojiNode],
   };
 
-  const searchMentions = (queryString?: string | null) => {
-    return queryString ? searchRepository.searchUserInSet(queryString, mentionCandidates) : mentionCandidates;
+  const searchMentions = (queryString: string | null) => {
+    return queryString !== null ? searchRepository.searchUserInSet(queryString, mentionCandidates) : [];
   };
 
   const saveDraft = (editorState: EditorState) => {
@@ -208,7 +202,7 @@ export const RichTextEditor = ({
           <DraftStatePlugin loadDraftState={loadDraftState} />
           <EditMessagePlugin onMessageEdit={editMessage} />
 
-          <EmojiPickerPlugin onOpen={blockSendingWithEnter} onClose={enableSendingWithEnter} />
+          <EmojiPickerPlugin openStateRef={emojiPickerOpen} />
           <HistoryPlugin />
 
           {shouldReplaceEmoji && <ReplaceEmojiPlugin />}
@@ -219,7 +213,7 @@ export const RichTextEditor = ({
             ErrorBoundary={LexicalErrorBoundary}
           />
 
-          <MentionsPlugin onSearch={searchMentions} onOpen={blockSendingWithEnter} onClose={enableSendingWithEnter} />
+          <MentionsPlugin onSearch={searchMentions} openStateRef={mentionsOpen} />
 
           <OnChangePlugin onChange={saveDraft} />
         </div>
