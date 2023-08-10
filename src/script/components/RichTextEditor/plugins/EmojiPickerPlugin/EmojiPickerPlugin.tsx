@@ -47,7 +47,7 @@ const TRIGGER = ':';
  * @param text the text in which to look for emoji triggers
  */
 function checkForEmojis(text: string): MenuTextMatch | null {
-  const match = new RegExp(`(^|[^\\w])(${TRIGGER}([\\w ]+))`).exec(text);
+  const match = new RegExp(`(^|[^\\w])(${TRIGGER}([\\w ]+))$`).exec(text);
 
   if (match === null) {
     return null;
@@ -91,6 +91,13 @@ type Props = {
   openStateRef: MutableRefObject<boolean>;
 };
 
+const emojiOptions = emojiList.map(
+  ({emoji, aliases, tags}) =>
+    new EmojiOption(aliases[0], emoji, {
+      keywords: [...aliases, ...tags],
+    }),
+);
+
 export function EmojiPickerPlugin({openStateRef}: Props) {
   const [lexicalEditor] = useLexicalComposerContext();
 
@@ -106,17 +113,6 @@ export function EmojiPickerPlugin({openStateRef}: Props) {
       storeValue(StorageKey.CONVERSATION.EMOJI_USAGE_COUNT, emojiUsageCount);
     }
   };
-
-  const emojiOptions = useMemo(
-    () =>
-      emojiList.map(
-        ({emoji, aliases, tags}) =>
-          new EmojiOption(aliases[0], emoji, {
-            keywords: [...aliases, ...tags],
-          }),
-      ),
-    [],
-  );
 
   const checkForTriggerMatch = useBasicTypeaheadTriggerMatch('/', {
     minLength: 0,

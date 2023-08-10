@@ -177,8 +177,8 @@ export const RichTextEditor = ({
     nodes: [MentionNode, EmojiNode],
   };
 
-  const searchMentions = (queryString: string | null) => {
-    return queryString !== null ? searchRepository.searchUserInSet(queryString, mentionCandidates) : [];
+  const searchMentions = (queryString?: string | null) => {
+    return typeof queryString === 'string' ? searchRepository.searchUserInSet(queryString, mentionCandidates) : [];
   };
 
   const saveDraft = (editorState: EditorState) => {
