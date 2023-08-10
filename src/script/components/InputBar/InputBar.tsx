@@ -155,6 +155,7 @@ export const InputBar = ({
   const [messageContent, setMessageContent] = useState<RichTextContent>({text: ''});
   const [editMessageEntity, setEditMessageEntity] = useState<ContentMessage | null>(null);
   const [replyMessageEntity, setReplyMessageEntity] = useState<ContentMessage | null>(null);
+  const textValue = messageContent.text;
 
   // Mentions
   const [currentMentions, setCurrentMentions] = useState<MentionEntity[]>([]);
@@ -377,7 +378,7 @@ export const InputBar = ({
       return void sendPastedFile();
     }
 
-    const messageTrimmedStart = messageContent.text.trimStart();
+    const messageTrimmedStart = textValue.trimStart();
     const text = messageTrimmedStart.trimEnd();
     const isMessageTextTooLong = text.length > CONFIG.MAXIMUM_MESSAGE_LENGTH;
     const mentions = messageContent.mentions ?? [];
@@ -401,7 +402,7 @@ export const InputBar = ({
     editorRef.current?.update(() => $getRoot().clear());
   };
 
-  const onGifClick = () => openGiphy(messageContent.text);
+  const onGifClick = () => openGiphy(textValue);
 
   const pingConversation = () => {
     setIsPingDisabled(true);
@@ -559,7 +560,7 @@ export const InputBar = ({
     conversation: conversationEntity,
     disableFilesharing: !isFileSharingSendingEnabled,
     disablePing: pingDisabled,
-    input: messageContent.text,
+    input: textValue,
     isEditing: isEditing,
     isScaledDown: isScaledDown,
     onCancelEditing: () => cancelMessageEditing(true, true),
@@ -570,7 +571,7 @@ export const InputBar = ({
     showGiphyButton: showGiphyButton,
   };
 
-  const enableSending = messageContent.text.length > 0;
+  const enableSending = textValue.length > 0;
 
   return (
     <IgnoreOutsideClickWrapper
@@ -598,7 +599,7 @@ export const InputBar = ({
         {!isOutgoingRequest && (
           <>
             <div className="controls-left">
-              {!!messageContent.text.length && (
+              {!!textValue.length && (
                 <Avatar className="cursor-default" participant={selfUser} avatarSize={AVATAR_SIZE.X_SMALL} />
               )}
             </div>
