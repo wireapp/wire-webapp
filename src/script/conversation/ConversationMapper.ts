@@ -311,27 +311,27 @@ export class ConversationMapper {
 
     const conversationsMap = new Map<string, ConversationDatabaseData>();
 
-    for (const conversation of localConversations) {
-      const conversationId = conversation.qualified_id?.id || conversation.id;
-      conversationsMap.set(conversationId, conversation);
+    for (const localConversation of localConversations) {
+      const conversationId = localConversation.qualified_id?.id || localConversation.id;
+      conversationsMap.set(conversationId, localConversation);
     }
 
     for (let i = 0; i < foundRemoteConversations.length; i++) {
-      const conversation = foundRemoteConversations[i];
-      const conversationId = conversation.qualified_id?.id || conversation.id;
+      const remoteConversation = foundRemoteConversations[i];
+      const conversationId = remoteConversation.qualified_id?.id || remoteConversation.id;
       const localConversation = conversationsMap.get(conversationId);
 
       if (localConversation) {
-        conversationsMap.set(conversationId, this.mergeSingleConversation(localConversation, conversation, i));
+        conversationsMap.set(conversationId, this.mergeSingleConversation(localConversation, remoteConversation, i));
         continue;
       }
 
-      const localConversationData = (conversation.qualified_id || {
+      const localConversationData = (remoteConversation.qualified_id || {
         id: conversationId,
         domain: '',
       }) as ConversationDatabaseData;
 
-      conversationsMap.set(conversationId, this.mergeSingleConversation(localConversationData, conversation, i));
+      conversationsMap.set(conversationId, this.mergeSingleConversation(localConversationData, remoteConversation, i));
     }
 
     return Array.from(conversationsMap.values());
