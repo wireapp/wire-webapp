@@ -23,14 +23,11 @@ import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 
 import {DraftState} from 'Util/DraftStateUtil';
 
-import {getTextValue} from '../utils/getTextValue';
-
 interface DraftStatePluginProps {
   loadDraftState: () => Promise<any>;
-  setInputValue: (value: string) => void;
 }
 
-export function DraftStatePlugin({loadDraftState, setInputValue}: DraftStatePluginProps): null {
+export function DraftStatePlugin({loadDraftState}: DraftStatePluginProps): null {
   const [editor] = useLexicalComposerContext();
 
   const getDraftState = useCallback(async () => {
@@ -41,12 +38,9 @@ export function DraftStatePlugin({loadDraftState, setInputValue}: DraftStatePlug
 
       if (!initialEditorState.isEmpty()) {
         editor.setEditorState(initialEditorState);
-
-        const textValue = getTextValue(editor);
-        setInputValue(textValue);
       }
     }
-  }, [editor, loadDraftState, setInputValue]);
+  }, [editor, loadDraftState]);
 
   useEffect(() => {
     void getDraftState();

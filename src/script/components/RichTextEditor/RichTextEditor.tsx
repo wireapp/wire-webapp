@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useEffect, useState, ReactElement} from 'react';
+import {useEffect, useState, ReactElement, useRef} from 'react';
 
 import {InitialConfigType, LexicalComposer} from '@lexical/react/LexicalComposer';
 import {ContentEditable} from '@lexical/react/LexicalContentEditable';
@@ -25,10 +25,11 @@ import {EditorRefPlugin} from '@lexical/react/LexicalEditorRefPlugin';
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary';
 import {OnChangePlugin} from '@lexical/react/LexicalOnChangePlugin';
 import {PlainTextPlugin} from '@lexical/react/LexicalPlainTextPlugin';
+import {mergeRegister} from '@lexical/utils';
 import type {WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
 import cx from 'classnames';
-import {LexicalEditor, EditorState} from 'lexical';
+import {LexicalEditor, EditorState, $nodesOfType, KEY_ENTER_COMMAND, COMMAND_PRIORITY_LOW} from 'lexical';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
@@ -60,19 +61,22 @@ const theme = {
   paragraph: 'editor-paragraph',
   mentions: {
     '@': `at-mentions`, // use the trigger name as the key
-    '@Focused': 'focused-mentions', // add the "Focused" suffix to style the focused mention
   },
 };
 
 const logger = getLogger('LexicalInput');
 
-interface LexicalInputProps {
+export type RichTextContent = {
+  text: string;
+  mentions?: MentionEntity[];
+};
+
+interface RichTextEditorProps {
   currentMentions: MentionEntity[];
   readonly propertiesRepository: PropertiesRepository;
   readonly searchRepository: SearchRepository;
   placeholder: string;
-  inputValue: string;
-  setInputValue: (text: string) => void;
+  onUpdate: (content: RichTextContent) => void;
   editMessage: (messageEntity: ContentMessage, editor: LexicalEditor) => void;
   children: ReactElement;
   hasLocalEphemeralTimer: boolean;
@@ -80,15 +84,35 @@ interface LexicalInputProps {
   loadDraftState: () => Promise<DraftState>;
   mentionCandidates: User[];
   onShiftTab: () => void;
+  onSend: () => void;
   onSetup?: (editor: LexicalEditor) => void;
 }
 
-export const LexicalInput = ({
+const createMentionEntity = (user: Pick<User, 'id' | 'name' | 'domain'>, mentionPosition: number): MentionEntity => {
+  const userName = user.name();
+  const mentionLength = userName.length + 1;
+
+  return new MentionEntity(mentionPosition, mentionLength, user.id, user.domain);
+};
+
+const parseMentions = (editor: LexicalEditor, textValue: string, mentions: User[]) => {
+  const editorMentions = editor.getEditorState().read(() => $nodesOfType(MentionNode).map(node => node.__value));
+  let position = -1;
+
+  return editorMentions.flatMap(mention => {
+    const mentionPosition = textValue.indexOf(`@${mention}`, position + 1);
+    const mentionOption = mentions.find(user => user.name() === mention);
+
+    position = mentionPosition;
+    return mentionOption ? [createMentionEntity(mentionOption, mentionPosition)] : [];
+  });
+};
+
+export const RichTextEditor = ({
   placeholder,
   propertiesRepository,
   searchRepository,
-  inputValue,
-  setInputValue,
+  onUpdate,
   children,
   hasLocalEphemeralTimer,
   saveDraftState,
@@ -96,9 +120,55 @@ export const LexicalInput = ({
   editMessage,
   mentionCandidates,
   onShiftTab,
+  onSend,
   onSetup,
-}: LexicalInputProps) => {
+}: RichTextEditorProps) => {
   // Emojis
+  const editorRef = useRef<LexicalEditor>();
+  const cleanupRef = useRef<() => void>();
+  const sendingWithEnterEnabled = useRef<boolean>(true);
+
+  const blockSendingWithEnter = () => {
+    sendingWithEnterEnabled.current = false;
+  };
+  const enableSendingWithEnter = () => {
+    sendingWithEnterEnabled.current = true;
+  };
+
+  const setupEditor = (editor: LexicalEditor) => {
+    editorRef.current = editor;
+    cleanupRef.current = mergeRegister(
+      editor.registerTextContentListener(textContent => {
+        onUpdate({
+          text: textContent,
+          mentions: parseMentions(editor, textContent, mentionCandidates),
+        });
+      }),
+
+      editor.registerCommand(
+        KEY_ENTER_COMMAND,
+        event => {
+          if (!sendingWithEnterEnabled.current) {
+            return false;
+          }
+          if (event?.shiftKey) {
+            return true;
+          }
+
+          onSend();
+          return false;
+        },
+        COMMAND_PRIORITY_LOW,
+      ),
+    );
+
+    onSetup?.(editor);
+  };
+
+  useEffect(() => {
+    return cleanupRef.current;
+  });
+
   const [shouldReplaceEmoji, setShouldReplaceEmoji] = useState<boolean>(
     propertiesRepository.getPreference(PROPERTIES_TYPE.EMOJI.REPLACE_INLINE),
   );
@@ -117,17 +187,9 @@ export const LexicalInput = ({
     return queryString ? searchRepository.searchUserInSet(queryString, mentionCandidates) : mentionCandidates;
   };
 
-  const updateValue = useCallback(
-    (editorState: EditorState, lexicalEditor: LexicalEditor) => {
-      lexicalEditor.registerTextContentListener(textContent => {
-        setInputValue(textContent);
-      });
-
-      const stringifyEditor = JSON.stringify(editorState.toJSON());
-      saveDraftState(stringifyEditor);
-    },
-    [saveDraftState, setInputValue],
-  );
+  const saveDraft = (editorState: EditorState) => {
+    saveDraftState(JSON.stringify(editorState.toJSON()));
+  };
 
   useEffect(() => {
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE, setShouldReplaceEmoji);
@@ -142,30 +204,24 @@ export const LexicalInput = ({
         <div className="input-bar--wrapper">
           <AutoFocusPlugin />
           <GlobalEventsPlugin onShiftTab={onShiftTab} />
-          {onSetup && <EditorRefPlugin editorRef={onSetup} />}
-          <DraftStatePlugin setInputValue={setInputValue} loadDraftState={loadDraftState} />
+          <EditorRefPlugin editorRef={setupEditor} />
+          <DraftStatePlugin loadDraftState={loadDraftState} />
           <EditMessagePlugin onMessageEdit={editMessage} />
 
-          <EmojiPickerPlugin />
+          <EmojiPickerPlugin onOpen={blockSendingWithEnter} onClose={enableSendingWithEnter} />
           <HistoryPlugin />
 
           {shouldReplaceEmoji && <ReplaceEmojiPlugin />}
 
           <PlainTextPlugin
-            contentEditable={
-              <ContentEditable
-                value={inputValue}
-                className="conversation-input-bar-text"
-                data-uie-name="input-message"
-              />
-            }
+            contentEditable={<ContentEditable className="conversation-input-bar-text" data-uie-name="input-message" />}
             placeholder={<Placeholder text={placeholder} hasLocalEphemeralTimer={hasLocalEphemeralTimer} />}
             ErrorBoundary={LexicalErrorBoundary}
           />
 
-          <MentionsPlugin onSearch={searchMentions} />
+          <MentionsPlugin onSearch={searchMentions} onOpen={blockSendingWithEnter} onClose={enableSendingWithEnter} />
 
-          <OnChangePlugin onChange={updateValue} />
+          <OnChangePlugin onChange={saveDraft} />
         </div>
       </div>
 

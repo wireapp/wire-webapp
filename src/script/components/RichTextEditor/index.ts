@@ -17,10 +17,4 @@
  *
  */
 
-import {$getRoot, type LexicalEditor} from 'lexical';
-
-export const getTextValue = (editor: LexicalEditor) => {
-  const stringifiedEditorState = JSON.stringify(editor.getEditorState().toJSON());
-  const parsedEditorState = editor.parseEditorState(stringifiedEditorState);
-  return parsedEditorState.read(() => $getRoot().getTextContent());
-};
+export * from './RichTextEditor';
