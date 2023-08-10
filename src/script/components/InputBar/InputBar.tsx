@@ -398,9 +398,7 @@ export const InputBar = ({
     }
 
     editorRef.current?.focus();
-    editorRef.current?.update(() => {
-      $getRoot().clear();
-    });
+    editorRef.current?.update(() => $getRoot().clear());
   };
 
   const onGifClick = () => openGiphy(messageContent.text);
