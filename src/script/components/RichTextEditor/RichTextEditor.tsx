@@ -126,6 +126,14 @@ export const RichTextEditor = ({
   // Emojis
   const editorRef = useRef<LexicalEditor>();
   const cleanupRef = useRef<() => void>();
+  const sendingWithEnterEnabled = useRef<boolean>(true);
+
+  const blockSendingWithEnter = () => {
+    sendingWithEnterEnabled.current = false;
+  };
+  const enableSendingWithEnter = () => {
+    sendingWithEnterEnabled.current = true;
+  };
 
   const setupEditor = (editor: LexicalEditor) => {
     editorRef.current = editor;
@@ -140,19 +148,14 @@ export const RichTextEditor = ({
       editor.registerCommand(
         KEY_ENTER_COMMAND,
         event => {
-          const isMentionsDropdownActive = document.querySelector('.conversation-input-bar-mention-suggestion');
-          const isEmojisDropdownActive = document.querySelector('.emoji-menu');
-
-          if (isMentionsDropdownActive || isEmojisDropdownActive) {
+          if (!sendingWithEnterEnabled.current) {
             return false;
           }
-
           if (event?.shiftKey) {
             return true;
           }
 
           onSend();
-
           return false;
         },
         COMMAND_PRIORITY_LOW,
@@ -205,7 +208,7 @@ export const RichTextEditor = ({
           <DraftStatePlugin loadDraftState={loadDraftState} />
           <EditMessagePlugin onMessageEdit={editMessage} />
 
-          <EmojiPickerPlugin />
+          <EmojiPickerPlugin onOpen={blockSendingWithEnter} onClose={enableSendingWithEnter} />
           <HistoryPlugin />
 
           {shouldReplaceEmoji && <ReplaceEmojiPlugin />}
@@ -216,7 +219,7 @@ export const RichTextEditor = ({
             ErrorBoundary={LexicalErrorBoundary}
           />
 
-          <MentionsPlugin onSearch={searchMentions} />
+          <MentionsPlugin onSearch={searchMentions} onOpen={blockSendingWithEnter} onClose={enableSendingWithEnter} />
 
           <OnChangePlugin onChange={saveDraft} />
         </div>

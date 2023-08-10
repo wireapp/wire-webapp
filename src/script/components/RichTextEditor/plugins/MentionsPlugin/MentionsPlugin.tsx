@@ -70,9 +70,11 @@ export class MenuOption extends _MenuOption {
 
 interface MentionsPluginProps {
   onSearch: (queryString?: string | null) => User[];
+  onOpen: () => void;
+  onClose: () => void;
 }
 
-export function MentionsPlugin({onSearch}: MentionsPluginProps) {
+export function MentionsPlugin({onSearch, onOpen, onClose}: MentionsPluginProps) {
   const [editor] = useLexicalComposerContext();
   const [queryString, setQueryString] = useState<string | null>(null);
 
@@ -123,6 +125,7 @@ export function MentionsPlugin({onSearch}: MentionsPluginProps) {
       return null;
     }
 
+    onOpen();
     const {bottom, left} = getPosition();
 
     return ReactDOM.createPortal(
@@ -159,7 +162,13 @@ export function MentionsPlugin({onSearch}: MentionsPluginProps) {
     <ReverseTypeaheadMenuPlugin
       onQueryChange={setQueryString}
       onSelectOption={handleSelectOption}
-      triggerFn={checkForMentionMatch}
+      triggerFn={text => {
+        const match = checkForMentionMatch(text);
+        if (!match) {
+          onClose();
+        }
+        return match;
+      }}
       options={options}
       menuRenderFn={menuRenderFn}
     />

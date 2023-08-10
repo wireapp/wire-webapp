@@ -87,7 +87,12 @@ export class EmojiOption extends MenuOption {
 
 const MAX_EMOJI_SUGGESTION_COUNT = 5;
 
-export function EmojiPickerPlugin() {
+type Props = {
+  onOpen: () => void;
+  onClose: () => void;
+};
+
+export function EmojiPickerPlugin({onOpen, onClose}: Props) {
   const [lexicalEditor] = useLexicalComposerContext();
 
   const [queryString, setQueryString] = useState<string | null>(null);
@@ -173,6 +178,11 @@ export function EmojiPickerPlugin() {
       .slice(0, MAX_EMOJI_SUGGESTION_COUNT);
   }, [emojiOptions, getUsageCount, queryString]);
 
+  if (options.length === 0) {
+    onClose();
+  } else {
+    onOpen();
+  }
   const onSelectOption = useCallback(
     (selectedOption: EmojiOption, nodeToRemove: TextNode | null, closeMenu: () => void) => {
       lexicalEditor.update(() => {
