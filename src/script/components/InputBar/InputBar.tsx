@@ -32,8 +32,8 @@ import {checkFileSharingPermission} from 'Components/Conversation/utils/checkFil
 import {ClassifiedBar} from 'Components/input/ClassifiedBar';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
+import {RichTextContent, RichTextEditor} from 'Components/RichTextEditor';
 import {SendMessageButton} from 'Components/RichTextEditor/components/SendMessageButton';
-import {RichTextEditor} from 'Components/RichTextEditor/LexicalInput';
 import {$createMentionNode} from 'Components/RichTextEditor/nodes/MentionNode';
 import {createNodes} from 'Components/RichTextEditor/utils/generateNodes';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
@@ -143,7 +143,7 @@ export const InputBar = ({
   ]);
 
   // Lexical
-  const lexicalRef = useRef<LexicalEditor | null>(null);
+  const editorRef = useRef<LexicalEditor | null>(null);
 
   // Typing indicator
   const [isTyping, setIsTyping] = useState<boolean>(false);
@@ -151,7 +151,7 @@ export const InputBar = ({
   const isTypingIndicatorEnabled = typingIndicatorMode === CONVERSATION_TYPING_INDICATOR_MODE.ON;
 
   // Message
-  const [inputValue, setInputValue] = useState<string>('');
+  const [messageContent, setMessageContent] = useState<RichTextContent>({text: ''});
   const [editMessageEntity, setEditMessageEntity] = useState<ContentMessage | null>(null);
   const [replyMessageEntity, setReplyMessageEntity] = useState<ContentMessage | null>(null);
 
@@ -181,7 +181,7 @@ export const InputBar = ({
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
   const isScaledDown = useMatchMedia('max-width: 768px');
 
-  const showGiphyButton = inputValue.length > 0 && inputValue.length <= config.GIPHY_TEXT_LENGTH;
+  const showGiphyButton = messageContent.text.length > 0 && messageContent.text.length <= config.GIPHY_TEXT_LENGTH;
 
   // Mentions
   const {participating_user_ets: participatingUserEts} = useKoSubscribableChildren(conversationEntity, [
@@ -193,11 +193,9 @@ export const InputBar = ({
     setCurrentMentions([]);
 
     if (resetInputValue) {
-      lexicalRef.current?.update(() => {
+      editorRef.current?.update(() => {
         $getRoot().clear();
       });
-
-      setInputValue('');
     }
   };
 
@@ -239,7 +237,6 @@ export const InputBar = ({
       cancelMessageReply();
       cancelMessageEditing(true, true);
       setEditMessageEntity(messageEntity);
-      setInputValue(firstAsset.text);
       setCurrentMentions(newMentions);
       editor.update(() => {
         const nodes = createNodes(newMentions, firstAsset.text);
@@ -307,7 +304,7 @@ export const InputBar = ({
       return () => {};
     }
 
-    if (inputValue.length > 0) {
+    if (messageContent.text.length > 0) {
       setIsTyping(true);
       timerId = window.setTimeout(() => setIsTyping(false), TYPING_TIMEOUT);
     } else {
@@ -315,7 +312,7 @@ export const InputBar = ({
     }
 
     return () => window.clearTimeout(timerId);
-  }, [inputValue]);
+  }, [messageContent]);
 
   const replyMessage = (messageEntity: ContentMessage): void => {
     if (messageEntity?.isReplyable() && messageEntity !== replyMessageEntity) {
@@ -323,7 +320,7 @@ export const InputBar = ({
       cancelMessageEditing(!!editMessageEntity);
       setReplyMessageEntity(messageEntity);
 
-      lexicalRef.current?.focus();
+      editorRef.current?.focus();
     }
   };
 
@@ -363,7 +360,7 @@ export const InputBar = ({
     }
   };
 
-  const sendMessage = (messageText: string, mentions: MentionEntity[]) => {
+  const sendTextMessage = (messageText: string, mentions: MentionEntity[]) => {
     if (messageText.length) {
       const mentionEntities = mentions.slice(0);
 
@@ -374,14 +371,15 @@ export const InputBar = ({
     }
   };
 
-  const onSend = (messageText: string, mentions: MentionEntity[]): void => {
+  const sendMessage = (): void => {
     if (pastedFile) {
       return void sendPastedFile();
     }
 
-    const messageTrimmedStart = messageText.trimStart();
+    const messageTrimmedStart = messageContent.text.trimStart();
     const text = messageTrimmedStart.trimEnd();
     const isMessageTextTooLong = text.length > CONFIG.MAXIMUM_MESSAGE_LENGTH;
+    const mentions = messageContent.mentions ?? [];
 
     if (isMessageTextTooLong) {
       showWarningModal(
@@ -395,13 +393,16 @@ export const InputBar = ({
     if (isEditing) {
       void sendMessageEdit(text, mentions);
     } else {
-      sendMessage(text, mentions);
+      sendTextMessage(text, mentions);
     }
 
-    lexicalRef.current?.focus();
+    editorRef.current?.focus();
+    editorRef.current?.update(() => {
+      $getRoot().clear();
+    });
   };
 
-  const onGifClick = () => openGiphy(inputValue);
+  const onGifClick = () => openGiphy(messageContent.text);
 
   const pingConversation = () => {
     setIsPingDisabled(true);
@@ -559,7 +560,7 @@ export const InputBar = ({
     conversation: conversationEntity,
     disableFilesharing: !isFileSharingSendingEnabled,
     disablePing: pingDisabled,
-    input: inputValue,
+    input: messageContent.text,
     isEditing: isEditing,
     isScaledDown: isScaledDown,
     onCancelEditing: () => cancelMessageEditing(true, true),
@@ -569,6 +570,8 @@ export const InputBar = ({
     onSelectImages: uploadImages,
     showGiphyButton: showGiphyButton,
   };
+
+  const enableSending = messageContent.text.length > 0;
 
   return (
     <IgnoreOutsideClickWrapper
@@ -596,7 +599,7 @@ export const InputBar = ({
         {!isOutgoingRequest && (
           <>
             <div className="controls-left">
-              {!!inputValue.length && (
+              {!!messageContent.text.length && (
                 <Avatar className="cursor-default" participant={selfUser} avatarSize={AVATAR_SIZE.X_SMALL} />
               )}
             </div>
@@ -604,7 +607,7 @@ export const InputBar = ({
             {!removedFromConversation && !pastedFile && (
               <RichTextEditor
                 onSetup={lexical => {
-                  lexicalRef.current = lexical;
+                  editorRef.current = lexical;
                   // autofocus the editor when first loaded
                   lexical?.focus();
                 }}
@@ -613,19 +616,20 @@ export const InputBar = ({
                 searchRepository={searchRepository}
                 propertiesRepository={propertiesRepository}
                 placeholder={inputPlaceholder}
-                inputValue={inputValue}
-                setInputValue={setInputValue}
+                inputValue={messageContent.text}
+                onUpdate={setMessageContent}
                 currentMentions={currentMentions}
                 hasLocalEphemeralTimer={hasLocalEphemeralTimer}
                 saveDraftState={saveDraft}
                 loadDraftState={loadDraft}
                 onShiftTab={onShiftTab}
+                onSend={sendMessage}
               >
                 {isScaledDown ? (
                   <>
                     <ul className="controls-right buttons-group" css={{minWidth: '95px'}}>
                       {showGiphyButton && <GiphyButton onGifClick={onGifClick} />}
-                      <SendMessageButton textValue={inputValue} onSend={onSend} mentions={mentionCandidates} />
+                      <SendMessageButton disabled={!enableSending} onSend={sendMessage} />
                     </ul>
                     <ul className="controls-right buttons-group" css={{justifyContent: 'center', width: '100%'}}>
                       <ControlButtons {...controlButtonsProps} isScaledDown={isScaledDown} />
@@ -635,7 +639,7 @@ export const InputBar = ({
                   <>
                     <ul className="controls-right buttons-group">
                       <ControlButtons {...controlButtonsProps} showGiphyButton={showGiphyButton} />
-                      <SendMessageButton textValue={inputValue} onSend={onSend} mentions={mentionCandidates} />
+                      <SendMessageButton disabled={!enableSending} onSend={sendMessage} />
                     </ul>
                   </>
                 )}

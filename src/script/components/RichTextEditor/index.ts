@@ -17,28 +17,4 @@
  *
  */
 
-import cx from 'classnames';
-
-import {Icon} from 'Components/Icon';
-import {t} from 'Util/LocalizerUtil';
-
-interface SendMessageButtonProps {
-  disabled?: boolean;
-  onSend: () => void;
-}
-
-export const SendMessageButton = ({disabled, onSend}: SendMessageButtonProps) => {
-  return (
-    <button
-      type="button"
-      className={cx('controls-right-button controls-right-button--send')}
-      disabled={disabled}
-      title={t('tooltipConversationSendMessage')}
-      aria-label={t('tooltipConversationSendMessage')}
-      data-uie-name="do-send-message"
-      onClick={onSend}
-    >
-      <Icon.Send />
-    </button>
-  );
-};
+export * from './RichTextEditor';
