@@ -27,13 +27,10 @@ import {
   DefaultConversationRoleName,
   RemoteConversations,
 } from '@wireapp/api-client/lib/conversation';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
 import {isObject} from 'underscore';
 
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
-
-import {matchQualifiedIds, QualifiedEntity} from 'Util/QualifiedId';
 
 import {ACCESS_STATE} from './AccessState';
 import {ConversationStatus} from './ConversationStatus';
@@ -302,34 +299,38 @@ export class ConversationMapper {
   ): ConversationDatabaseData[] {
     localConversations = localConversations.filter(conversationData => conversationData);
 
-    const failedConversations = (remoteConversations.failed ?? []).reduce(
-      (prev: ConversationDatabaseData[], curr: QualifiedId) => {
-        const convo = localConversations.find(conversationId => matchQualifiedIds(conversationId, curr));
-        return convo ? [...prev, convo] : prev;
-      },
-      [],
-    );
+    const foundConversations = remoteConversations.found;
 
-    const localArchives = localConversations.filter(
-      conversationData =>
-        conversationData.archived_state &&
-        remoteConversations.found?.findIndex(remote => remote.qualified_id.id === conversationData.id) === -1,
-    );
+    if (!foundConversations) {
+      return localConversations;
+    }
 
-    const foundRemoteConversations = remoteConversations.found.map(
-      (remoteConversationData: ConversationBackendData, index: number) => {
-        const remoteConversationId: QualifiedEntity = remoteConversationData.qualified_id || {
-          domain: '',
-          id: remoteConversationData.id,
-        };
-        const localConversationData =
-          localConversations.find(conversationId => matchQualifiedIds(conversationId, remoteConversationId)) ||
-          (remoteConversationId as ConversationDatabaseData);
+    const conversationsMap = new Map<string, ConversationDatabaseData>();
 
-        return this.mergeSingleConversation(localConversationData, remoteConversationData, index);
-      },
-    );
-    return [...foundRemoteConversations, ...failedConversations, ...localArchives];
+    for (const conversation of localConversations) {
+      const conversationId = conversation.qualified_id?.id || conversation.id;
+      conversationsMap.set(conversationId, conversation);
+    }
+
+    for (let i = 0; i < foundConversations.length; i++) {
+      const conversation = foundConversations[i];
+      const conversationId = conversation.qualified_id?.id || conversation.id;
+      const localConversation = conversationsMap.get(conversationId);
+
+      if (localConversation) {
+        conversationsMap.set(conversationId, this.mergeSingleConversation(localConversation, conversation, i));
+        continue;
+      }
+
+      const localConversationData = (conversation.qualified_id || {
+        id: conversationId,
+        domain: '',
+      }) as ConversationDatabaseData;
+
+      conversationsMap.set(conversationId, this.mergeSingleConversation(localConversationData, conversation, i));
+    }
+
+    return Array.from(conversationsMap.values());
   }
 
   /**
