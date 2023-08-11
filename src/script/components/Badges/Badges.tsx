@@ -21,11 +21,13 @@ import React, {CSSProperties} from 'react';
 
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 
-import {CertificateExpiredIcon} from 'Components/Badges/Icons/CertificateExpiredIcon';
-import {CertificateRevokedIcon} from 'Components/Badges/Icons/CertificateRevokedIcon';
-import {ExpiresSoonIcon} from 'Components/Badges/Icons/ExpiresSoonIcon';
-import {MLSVerifiedIcon} from 'Components/Badges/Icons/MLSVerifiedIcon';
-import {ProteusVerifiedIcon} from 'Components/Badges/Icons/ProteusVerifiedIcon';
+import {
+  CertificateExpiredIcon,
+  CertificateRevoked,
+  ExpiresSoon,
+  MLSVerified,
+  ProteusVerified,
+} from '@wireapp/react-ui-kit';
 
 enum MLSStatues {
   NOT_DOWNLOADED = 'not_downloaded',
@@ -95,7 +97,7 @@ export const Badges: React.FC<BadgesProps> = ({
               data-tooltip="Device verified (End-to-end identity)"
               style={iconStyles}
             >
-              <MLSVerifiedIcon data-uie-name="conversation-title-bar-verified-icon" />
+              <MLSVerified data-uie-name="conversation-title-bar-verified-icon" />
             </span>
           )}
 
@@ -105,7 +107,7 @@ export const Badges: React.FC<BadgesProps> = ({
               data-tooltip="End-to-end identity certificate expires soon"
               style={iconStyles}
             >
-              <ExpiresSoonIcon data-uie-name="conversation-title-bar-verified-icon" />
+              <ExpiresSoon data-uie-name="conversation-title-bar-verified-icon" />
             </span>
           )}
 
@@ -125,7 +127,7 @@ export const Badges: React.FC<BadgesProps> = ({
               data-tooltip="End-to-end identity certificate revoked"
               style={iconStyles}
             >
-              <CertificateRevokedIcon data-uie-name="conversation-title-bar-verified-icon" />
+              <CertificateRevoked data-uie-name="conversation-title-bar-verified-icon" />
             </span>
           )}
         </div>
@@ -140,7 +142,7 @@ export const Badges: React.FC<BadgesProps> = ({
             data-tooltip="Device verified (Proteus)"
             style={iconStyles}
           >
-            <ProteusVerifiedIcon data-uie-name="conversation-title-bar-verified-icon" />
+            <ProteusVerified data-uie-name="conversation-title-bar-verified-icon" />
           </span>
         </div>
       )}
