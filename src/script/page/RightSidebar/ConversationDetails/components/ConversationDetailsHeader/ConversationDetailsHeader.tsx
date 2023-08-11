@@ -19,6 +19,8 @@
 
 import {ChangeEvent, FC, KeyboardEvent, useEffect, useRef, useState} from 'react';
 
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
+
 import {Badges} from 'Components/Badges';
 import {Icon} from 'Components/Icon';
 import {isEnterKey} from 'Util/KeyboardUtil';
@@ -40,6 +42,7 @@ interface ConversationDetailsHeaderProps {
   serviceParticipants: ServiceEntity[];
   allUsersCount: number;
   isTeam?: boolean;
+  conversationProtocol?: ConversationProtocol;
 }
 
 const ConversationDetailsHeader: FC<ConversationDetailsHeaderProps> = ({
@@ -52,6 +55,7 @@ const ConversationDetailsHeader: FC<ConversationDetailsHeaderProps> = ({
   serviceParticipants,
   allUsersCount,
   isTeam = false,
+  conversationProtocol,
 }) => {
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
   const isEditGroupNameTouched = useRef(false);
@@ -148,7 +152,7 @@ const ConversationDetailsHeader: FC<ConversationDetailsHeaderProps> = ({
             />
           )}
 
-          <Badges displayBadgeTitle />
+          <Badges conversationProtocol={conversationProtocol} displayTitle />
         </>
       ) : (
         <div className="conversation-details__name">

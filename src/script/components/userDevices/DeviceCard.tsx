@@ -22,6 +22,7 @@ import React from 'react';
 import {ClientClassification} from '@wireapp/api-client/lib/client';
 import cx from 'classnames';
 
+import {Badges} from 'Components/Badges';
 import {DeviceId} from 'Components/DeviceId';
 import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
 import {handleKeyDown} from 'Util/KeyboardUtil';
@@ -30,7 +31,6 @@ import {t} from 'Util/LocalizerUtil';
 import type {ClientEntity} from '../../client/ClientEntity';
 import {Icon} from '../Icon';
 import {LegalHoldDot} from '../LegalHoldDot';
-import {VerifiedIcon} from '../VerifiedIcon';
 
 export interface DeviceCardProps {
   click?: (device: ClientEntity) => void;
@@ -76,20 +76,26 @@ const DeviceCard: React.FC<DeviceCardProps> = ({
           dataUieName="status-legal-hold-device"
         />
       )}
+
       {showDesktopIcon && <Icon.Desktop className="device-card__icon" data-uie-name="status-desktop-device" />}
       {showMobileIcon && <Icon.Devices className="device-card__icon" data-uie-name="status-mobile-device" />}
+
       <div className="device-card__info" data-uie-name="device-card-info" data-uie-value={label}>
-        <div className="label-xs">
+        <div className="device-card__name">
           <span className="device-card__model">{name}</span>
+
+          {showVerified && <Badges isProteusVerified={!!isVerified && isVerified()} />}
         </div>
+
         <p className="text-background label-xs">
           <span>{t('preferencesDevicesId')}</span>
+
           <span data-uie-name="device-id">
             <DeviceId deviceId={id} />
           </span>
         </p>
       </div>
-      {showVerified && <VerifiedIcon isVerified={!!isVerified && isVerified()} />}
+
       {clickable && <Icon.ChevronRight className="disclose-icon" data-uie-name="disclose-icon" />}
     </div>
   );

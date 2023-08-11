@@ -267,18 +267,15 @@ export const TitleBar: React.FC<TitleBarProps> = ({
               />
             )}
 
-            {verificationState === ConversationVerificationState.VERIFIED && (
-              <Icon.Verified
-                data-uie-name="conversation-title-bar-verified-icon"
-                className="conversation-title-bar-name--verified"
-              />
-            )}
-
             <span className="conversation-title-bar-name-label" data-uie-name="status-conversation-title-bar-label">
               {displayName}
             </span>
 
-            <Badges />
+            <Badges
+              conversationProtocol={conversation.protocol}
+              // This one comparing was in Icon.Verified - old verified badge displaying
+              isProteusVerified={verificationState === ConversationVerificationState.VERIFIED}
+            />
           </div>
 
           {conversationSubtitle && <div className="conversation-title-bar-name--subtitle">{conversationSubtitle}</div>}

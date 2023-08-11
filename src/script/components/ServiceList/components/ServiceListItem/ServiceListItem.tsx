@@ -53,7 +53,7 @@ export const ServiceListItem = ({service, onClick}: ServiceListItemProps) => {
       <div css={listItem()}>
         <Avatar avatarSize={AVATAR_SIZE.SMALL} participant={service} aria-hidden="true" css={{margin: '0 16px'}} />
 
-        <ParticipantItemContent name={serviceName} shortDescription={serviceShortDescription} showArrow />
+        <ParticipantItemContent name={serviceName} shortDescription={serviceShortDescription} showArrow isService />
       </div>
     </div>
   );

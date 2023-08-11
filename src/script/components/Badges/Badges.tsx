@@ -19,12 +19,26 @@
 
 import React, {CSSProperties} from 'react';
 
-import {Icon} from 'Components/Icon';
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
+
+import {CertificateExpiredIcon} from 'Components/Badges/Icons/CertificateExpiredIcon';
+import {CertificateRevokedIcon} from 'Components/Badges/Icons/CertificateRevokedIcon';
+import {ExpiresSoonIcon} from 'Components/Badges/Icons/ExpiresSoonIcon';
+import {MLSVerifiedIcon} from 'Components/Badges/Icons/MLSVerifiedIcon';
+import {ProteusVerifiedIcon} from 'Components/Badges/Icons/ProteusVerifiedIcon';
+
+enum MLSStatues {
+  NOT_DOWNLOADED = 'not_downloaded',
+  EXPIRED = 'expired',
+  EXPIRES_SOON = 'expires_soon',
+}
 
 interface BadgesProps {
-  conversationProtocol?: string;
-  displayBothProtocolBadges?: boolean;
-  displayBadgeTitle?: boolean;
+  conversationProtocol?: ConversationProtocol;
+  isMLSVerified?: boolean;
+  isProteusVerified?: boolean;
+  MLSStatus?: MLSStatues;
+  displayTitle?: boolean;
 }
 
 const badgeWrapper: CSSProperties = {
@@ -45,29 +59,43 @@ const title = (isMLSConversation = false): CSSProperties => ({
 });
 
 export const Badges: React.FC<BadgesProps> = ({
-  conversationProtocol = 'MLS',
-  displayBothProtocolBadges = false,
-  displayBadgeTitle = false,
+  conversationProtocol,
+  isMLSVerified = false,
+  isProteusVerified = false,
+  MLSStatus,
+  displayTitle = false,
 }) => {
-  const isMLSConversation = conversationProtocol === 'MLS';
-  const isProteusConversation = conversationProtocol === 'PROTEUS';
+  if (!isMLSVerified && !isProteusVerified) {
+    return null;
+  }
 
-  const isExpired = false;
-  const isNotDownloaded = false;
-  const isExpiresSoon = false;
+  const isExpired = MLSStatus === MLSStatues.EXPIRED;
+  const isNotDownloaded = MLSStatus === MLSStatues.NOT_DOWNLOADED;
+  const isExpiresSoon = MLSStatus === MLSStatues.EXPIRES_SOON;
+
+  const conversationHasProtocol = !!conversationProtocol;
+
+  const showMLSBadge = conversationHasProtocol
+    ? conversationProtocol === ConversationProtocol.MLS && isMLSVerified
+    : isMLSVerified;
+
+  const showProteusBadge = conversationHasProtocol
+    ? conversationProtocol === ConversationProtocol.PROTEUS && isProteusVerified
+    : isProteusVerified;
 
   return (
     <div className="conversation-badges" style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
-      {(displayBothProtocolBadges || isMLSConversation) && (
+      {showMLSBadge && (
         <div style={badgeWrapper}>
-          {displayBadgeTitle && <span style={title(isMLSConversation)}>Verified (End-to-end Identity)</span>}
+          {displayTitle && <span style={title(true)}>Verified (End-to-end Identity)</span>}
+
           {!isExpired && !isNotDownloaded && !isExpiresSoon && (
             <span
               className="with-tooltip with-tooltip--external"
               data-tooltip="Device verified (End-to-end identity)"
               style={iconStyles}
             >
-              <Icon.NotVerified data-uie-name="conversation-title-bar-verified-icon" />
+              <MLSVerifiedIcon data-uie-name="conversation-title-bar-verified-icon" />
             </span>
           )}
 
@@ -77,7 +105,7 @@ export const Badges: React.FC<BadgesProps> = ({
               data-tooltip="End-to-end identity certificate expires soon"
               style={iconStyles}
             >
-              <Icon.NotVerified data-uie-name="conversation-title-bar-verified-icon" />
+              <ExpiresSoonIcon data-uie-name="conversation-title-bar-verified-icon" />
             </span>
           )}
 
@@ -87,7 +115,7 @@ export const Badges: React.FC<BadgesProps> = ({
               data-tooltip="End-to-end identity certificate expired"
               style={iconStyles}
             >
-              <Icon.NotVerified data-uie-name="conversation-title-bar-verified-icon" />
+              <CertificateExpiredIcon data-uie-name="conversation-title-bar-verified-icon" />
             </span>
           )}
 
@@ -97,22 +125,22 @@ export const Badges: React.FC<BadgesProps> = ({
               data-tooltip="End-to-end identity certificate revoked"
               style={iconStyles}
             >
-              <Icon.NotVerified data-uie-name="conversation-title-bar-verified-icon" />
+              <CertificateRevokedIcon data-uie-name="conversation-title-bar-verified-icon" />
             </span>
           )}
         </div>
       )}
 
-      {(displayBothProtocolBadges || isProteusConversation) && (
+      {showProteusBadge && (
         <div style={badgeWrapper}>
-          {displayBadgeTitle && <span style={title(isProteusConversation)}>Verified (Proteus)</span>}
+          {displayTitle && <span style={title(false)}>Verified (Proteus)</span>}
 
           <span
             className="with-tooltip with-tooltip--external"
             data-tooltip="Device verified (Proteus)"
             style={iconStyles}
           >
-            <Icon.Verified data-uie-name="conversation-title-bar-verified-icon" />
+            <ProteusVerifiedIcon data-uie-name="conversation-title-bar-verified-icon" />
           </span>
         </div>
       )}

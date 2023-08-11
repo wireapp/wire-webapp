@@ -83,6 +83,7 @@ export const UserDetailsComponent: React.FC<UserDetailsProps> = ({
             label={user.name}
             dataUieName="status-name"
             showBadges
+            isProteusVerified={isSelfVerified && user.is_verified}
           />
         ) : (
           <h2
@@ -94,12 +95,12 @@ export const UserDetailsComponent: React.FC<UserDetailsProps> = ({
           </h2>
         )}
 
-        {isSelfVerified && user.is_verified && (
-          <Icon.Verified
-            className="panel-participant__head__verified-icon"
-            data-uie-name="status-verified-participant"
-          />
-        )}
+        {/*{isSelfVerified && user.is_verified && (*/}
+        {/*  <Icon.Verified*/}
+        {/*    className="panel-participant__head__verified-icon"*/}
+        {/*    data-uie-name="status-verified-participant"*/}
+        {/*  />*/}
+        {/*)}*/}
       </div>
 
       {participant.handle && (

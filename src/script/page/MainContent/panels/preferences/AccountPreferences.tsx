@@ -24,6 +24,7 @@ import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
 
+import {Badges} from 'Components/Badges';
 import {ErrorFallback} from 'Components/ErrorFallback';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {useEnrichedFields} from 'Components/panel/EnrichedFields';
@@ -90,14 +91,24 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
 }) => {
   const {self: selfUser, isActivatedAccount} = useKoSubscribableChildren(userState, ['self', 'isActivatedAccount']);
   const {isTeam, teamName} = useKoSubscribableChildren(teamState, ['isTeam', 'teamName']);
-  const {name, email, availability, username, managedBy, phone} = useKoSubscribableChildren(selfUser, [
+  const {
+    name,
+    email,
+    availability,
+    username,
+    managedBy,
+    phone,
+    is_verified: isVerified,
+  } = useKoSubscribableChildren(selfUser, [
     'name',
     'email',
     'availability',
     'username',
     'managedBy',
     'phone',
+    'is_verified',
   ]);
+
   const canEditProfile = managedBy === User.CONFIG.MANAGED_BY.WIRE;
   const isDesktop = Runtime.isDesktopApp();
   const isTemporaryAndNonPersistent = useRef(isTemporaryClientAndNonPersistent(loadValue(StorageKey.AUTH.PERSIST)));
@@ -135,26 +146,16 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
 
   return (
     <PreferencesPage title={t('preferencesAccount')}>
-      <div
-        css={{
-          alignItems: 'center',
-          display: 'flex',
-          flexDirection: 'column',
-          width: 'var(--preferences-width)',
-        }}
-      >
-        <h3
-          className="heading-h3 text-center ellipsis"
-          title={name}
-          css={{
-            marginBottom: 16,
-            width: '100%',
-          }}
-        >
-          {name}
-        </h3>
+      <div className="preferences-wrapper">
+        <div className="preferences-account-name">
+          <h3 className="heading-h3 text-center ellipsis" title={name}>
+            {name}
+          </h3>
 
-        <div>
+          <Badges isProteusVerified={isVerified} />
+        </div>
+
+        <div className="preferences-account-image">
           <ErrorBoundary FallbackComponent={ErrorFallback}>
             <AvatarInput {...{isActivatedAccount, selfUser, userRepository}} />
           </ErrorBoundary>
@@ -163,7 +164,7 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
         {isActivatedAccount && isTeam && <AvailabilityButtons {...{availability}} />}
 
         {isActivatedAccount && (
-          <div>
+          <div className="preferences-accent-color-picker">
             <AccentColorPicker user={selfUser} doSetAccentColor={id => userRepository.changeAccentColor(id)} />
           </div>
         )}

@@ -332,6 +332,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
                 serviceParticipants={serviceParticipants}
                 allUsersCount={allUsersCount}
                 isTeam={isTeam}
+                conversationProtocol={activeConversation.protocol}
               />
 
               {showTopActions && showActionAddParticipants && (

@@ -25,6 +25,7 @@ import cx from 'classnames';
 import {Availability} from '@wireapp/protocol-messaging';
 
 import {Badges} from 'Components/Badges';
+import {selfIndicator} from 'Components/ParticipantItemContent/ParticipantItem.styles';
 import {CSS_SQUARE} from 'Util/CSSMixin';
 import {KEY} from 'Util/KeyboardUtil';
 
@@ -35,11 +36,13 @@ export interface AvailabilityStateProps {
   className?: string;
   dataUieName: string;
   label: string;
+  selfString?: string;
   title?: string;
   onClick?: (event: React.MouseEvent | React.KeyboardEvent) => void;
   showArrow?: boolean;
   theme?: boolean;
   showBadges?: boolean;
+  isProteusVerified?: boolean;
 }
 
 const iconStyles: CSSObject = {
@@ -61,11 +64,13 @@ const AvailabilityState: React.FC<AvailabilityStateProps> = ({
   className,
   dataUieName,
   label,
+  selfString,
   title,
   showArrow = false,
   theme = false,
   onClick,
   showBadges = false,
+  isProteusVerified = false,
 }) => {
   const isAvailable = availability === Availability.Type.AVAILABLE;
   const isAway = availability === Availability.Type.AWAY;
@@ -128,7 +133,9 @@ const AvailabilityState: React.FC<AvailabilityStateProps> = ({
         </span>
       )}
 
-      {showBadges && <Badges displayBothProtocolBadges />}
+      {selfString && <span css={selfIndicator}>{selfString}</span>}
+
+      {showBadges && <Badges isProteusVerified={isProteusVerified} />}
 
       {showArrow && (
         <span

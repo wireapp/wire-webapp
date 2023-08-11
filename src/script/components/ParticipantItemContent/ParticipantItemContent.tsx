@@ -22,6 +22,7 @@ import React from 'react';
 import {Availability} from '@wireapp/protocol-messaging';
 
 import {AvailabilityState} from 'Components/AvailabilityState';
+import {Badges} from 'Components/Badges';
 import {Icon} from 'Components/Icon';
 
 import {
@@ -47,6 +48,9 @@ export interface ParticipantItemContentProps {
   showArrow?: boolean;
   onDropdownClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
   showAvailabilityState?: boolean;
+  isService?: boolean;
+  isSelectable?: boolean;
+  isProteusVerified?: boolean;
 }
 
 export const ParticipantItemContent = ({
@@ -58,6 +62,9 @@ export const ParticipantItemContent = ({
   hasUsernameInfo = false,
   showArrow = false,
   showAvailabilityState = false,
+  isService = false,
+  isSelectable = false,
+  isProteusVerified = false,
 }: ParticipantItemContentProps) => {
   return (
     <div css={wrapper}>
@@ -69,14 +76,21 @@ export const ParticipantItemContent = ({
               css={[userName, userAvailability, ellipsis]}
               dataUieName="status-name"
               label={name}
+              selfString={selfString}
+              showBadges={!isService && !isSelectable}
+              isProteusVerified={isProteusVerified}
             />
           ) : (
-            <div css={[userName, ellipsis]} data-uie-name="status-name">
-              {name}
-            </div>
-          )}
+            <>
+              <div css={[userName, ellipsis]} data-uie-name="status-name">
+                {name}
 
-          {selfString && <div css={selfIndicator}>{selfString}</div>}
+                {selfString && <span css={selfIndicator}>{selfString}</span>}
+              </div>
+
+              {!isService && !isSelectable && <Badges isProteusVerified={isProteusVerified} />}
+            </>
+          )}
         </div>
 
         {shortDescription && (
