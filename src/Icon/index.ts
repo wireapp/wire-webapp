@@ -93,3 +93,9 @@ export * from './Brand/LinkedInIcon';
 export * from './Brand/LinuxIcon';
 export * from './Brand/MicrosoftIcon';
 export * from './Brand/TwitterIcon';
+
+export * from './CertificateExpired';
+export * from './CertificateRevoked';
+export * from './ExpiresSoon';
+export * from './MLSVerified';
+export * from './ProteusVerified';
