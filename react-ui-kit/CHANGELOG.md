@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.8.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.7.9...@wireapp/react-ui-kit@9.8.0) (2023-08-11)
+
+### Features
+
+* **react-ui-kit:** add icons for verification protocols ([#5378](https://github.com/wireapp/wire-web-packages/issues/5378)) ([4973da7](https://github.com/wireapp/wire-web-packages/commit/4973da714e3e0a4ff803988f6a67e900de558635))
+
 ## [9.7.9](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.7.8...@wireapp/react-ui-kit@9.7.9) (2023-08-10)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
