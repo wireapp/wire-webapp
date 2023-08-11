@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2023 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,24 +17,18 @@
  *
  */
 
-/** Enum for different message super types */
-export enum SuperType {
-  CALL = 'call',
-  CALL_TIME_OUT = 'call-time-out',
-  FAILED_TO_ADD_USERS = 'failed-to-add-users',
-  CONTENT = 'normal',
-  DELETE = 'delete',
-  DEVICE = 'device',
-  FEDERATION_STOP = 'federation-stop',
-  FILE_TYPE_RESTRICTED = 'file-type-restricted',
-  LEGALHOLD = 'legal-hold',
-  LOCATION = 'location',
-  MEMBER = 'member',
-  MISSED = 'missed',
-  PING = 'ping',
-  REACTION = 'reaction',
-  SPECIAL = 'special',
-  SYSTEM = 'system',
-  UNABLE_TO_DECRYPT = 'unable-to-decrypt',
-  VERIFICATION = 'verification',
+import {Message} from './Message';
+
+import {SuperType} from '../../message/SuperType';
+import {User} from '../User';
+
+/**
+ * Federation stop system message
+ */
+export class FederationStopMessage extends Message {
+  constructor(public readonly deletedUsers: User[], timestamp: number) {
+    super();
+    this.super_type = SuperType.FEDERATION_STOP;
+    this.timestamp(timestamp);
+  }
 }

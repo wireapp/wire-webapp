@@ -39,6 +39,9 @@ import {
   ConversationRenameEvent,
   ConversationTypingEvent,
   CONVERSATION_EVENT,
+  FederationEvent,
+  FEDERATION_EVENT,
+  FederationDeleteEvent,
 } from '@wireapp/api-client/lib/event';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import type {BackendError} from '@wireapp/api-client/lib/http/';
@@ -143,7 +146,7 @@ import {UserState} from '../user/UserState';
 type ConversationDBChange = {obj: EventRecord; oldObj: EventRecord};
 type FetchPromise = {rejectFn: (error: ConversationError) => void; resolveFn: (conversation: Conversation) => void};
 type EntityObject = {conversationEntity: Conversation; messageEntity: Message};
-type IncomingEvent = ConversationEvent | ClientConversationEvent;
+type IncomingEvent = ConversationEvent | ClientConversationEvent | FederationEvent;
 
 export class ConversationRepository {
   private isBlockingNotificationHandling: boolean;
@@ -309,12 +312,66 @@ export class ConversationRepository {
     amplify.subscribe(WebAppEvents.TEAM.MEMBER_LEAVE, this.teamMemberLeave);
     amplify.subscribe(WebAppEvents.USER.UNBLOCKED, this.onUnblockUser);
     amplify.subscribe(WebAppEvents.CONVERSATION.INJECT_LEGAL_HOLD_MESSAGE, this.injectLegalHoldMessage);
+    amplify.subscribe(WebAppEvents.FEDERATION.EVENT_FROM_BACKEND, this.onFederationEvent);
 
     this.eventService.addEventUpdatedListener(this.updateLocalMessageEntity);
     this.eventService.addEventDeletedListener(this.deleteLocalMessageEntity);
 
     window.addEventListener<any>(WebAppEvents.CONVERSATION.JOIN, this.onConversationJoin);
+
+    setTimeout(() => {
+      this.onFederationEvent({
+        type: FEDERATION_EVENT.FEDERATION_DELETE,
+        data: {domain: 'bella.wire.link'} as FederationDeleteEvent,
+      });
+    }, 10000);
   }
+
+  private readonly onFederationEvent = async (event: FederationEvent) => {
+    const {type, data} = event;
+
+    if (type === FEDERATION_EVENT.FEDERATION_DELETE) {
+      const {domain} = data;
+      const conversationsWithUsersToDelete = this.findConversationsWithUsersByDomain(domain);
+      for (const {conversation, users} of conversationsWithUsersToDelete) {
+        if (conversation.is1to1()) {
+          // todo: remove connection at this point.
+          return;
+        }
+
+        for (const user of users) {
+          await this.removeMember(conversation, user.qualifiedId);
+        }
+
+        const selfUser = conversation.selfUser();
+
+        if (!selfUser) {
+          return;
+        }
+
+        const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
+        const event = EventBuilder.buildFederationStop(conversation, selfUser, users, currentTimestamp);
+
+        await this.eventRepository.injectEvent(event, EventRepository.SOURCE.INJECTED);
+      }
+    }
+
+    if (type === FEDERATION_EVENT.FEDERATION_CONNECTION_REMOVED) {
+      // TODO: Implement connection removed event.
+    }
+  };
+
+  private readonly findConversationsWithUsersByDomain = (
+    domain: string,
+  ): {conversation: Conversation; users: User[]}[] => {
+    return this.conversationState.conversations().flatMap(conversation => {
+      const matchingUsers = conversation.participating_user_ets().filter(user => user.domain === domain);
+      if (matchingUsers.length > 0) {
+        return [{conversation, users: matchingUsers}];
+      }
+      return [];
+    });
+  };
 
   private readonly updateLocalMessageEntity = async ({
     obj: updatedEvent,
@@ -2331,6 +2388,7 @@ export class ConversationRepository {
       case ClientEvent.CONVERSATION.KNOCK:
       case ClientEvent.CONVERSATION.CALL_TIME_OUT:
       case ClientEvent.CONVERSATION.FAILED_TO_ADD_USERS:
+      case ClientEvent.CONVERSATION.FEDERATION_STOP:
       case ClientEvent.CONVERSATION.LEGAL_HOLD_UPDATE:
       case ClientEvent.CONVERSATION.LOCATION:
       case ClientEvent.CONVERSATION.MISSED_MESSAGES:

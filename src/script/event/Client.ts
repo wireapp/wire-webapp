@@ -44,6 +44,7 @@ export enum CONVERSATION {
   TEAM_MEMBER_LEAVE = 'conversation.team-member-leave',
   UNABLE_TO_DECRYPT = 'conversation.unable-to-decrypt',
   VERIFICATION = 'conversation.verification',
+  FEDERATION_STOP = 'conversation.federation-stop',
   VOICE_CHANNEL_ACTIVATE = 'conversation.voice-channel-activate',
   VOICE_CHANNEL_DEACTIVATE = 'conversation.voice-channel-deactivate',
 }

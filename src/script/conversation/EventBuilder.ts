@@ -97,6 +97,9 @@ export type DegradedMessageEvent = ConversationEvent<DegradedMessageEventData> &
 export type DeleteEvent = ConversationEvent<{deleted_time: number; message_id: string; time: string}> & {
   type: CONVERSATION.MESSAGE_DELETE;
 };
+export type FederationStopEvent = ConversationEvent<{deletedUsers: User[]}> & {
+  type: CONVERSATION.FEDERATION_STOP;
+};
 export type GroupCreationEventData = {
   allTeamMembers: boolean;
   name: string;
@@ -206,6 +209,7 @@ export type ClientConversationEvent =
   | ErrorEvent
   | CompositeMessageAddEvent
   | ConfirmationEvent
+  | FederationStopEvent
   | DeleteEvent
   | DeleteEverywhereEvent
   | DegradedMessageEvent
@@ -476,6 +480,24 @@ export const EventBuilder = {
       from: removedBySelfUser ? conversationEntity.selfUser().id : userId.id,
       time: conversationEntity.getNextIsoDate(currentTimestamp),
       type: CONVERSATION_EVENT.MEMBER_LEAVE,
+    };
+  },
+
+  buildFederationStop(
+    conversationEntity: Conversation,
+    selfUser: User,
+    deletedUsers: User[],
+    currentTimestamp: number,
+  ): FederationStopEvent {
+    return {
+      ...buildQualifiedId(conversationEntity),
+      data: {
+        deletedUsers,
+      },
+      id: createUuid(),
+      from: selfUser.id,
+      time: conversationEntity.getNextIsoDate(currentTimestamp),
+      type: CONVERSATION.FEDERATION_STOP,
     };
   },
 
