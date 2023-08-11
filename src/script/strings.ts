@@ -454,6 +454,14 @@ export const conversationJoinStrings = defineMessages({
     defaultMessage: 'Join conversation as temporary guest (access expires after 24 hours)',
     id: 'conversationJoin.subhead',
   },
+  joinButton: {
+    defaultMessage: 'Join as temporary user',
+    id: 'conversationJoin.joinButton',
+  },
+  mainHeadline: {
+    defaultMessage: 'Join Conversation',
+    id: 'conversationJoin.mainHeadline',
+  },
 });
 
 export const errorHandlerStrings = defineMessages({
