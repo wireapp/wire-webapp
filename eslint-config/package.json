@@ -30,7 +30,7 @@
     "eslint-plugin-react": "^7.31.10",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-simple-import-sort": "^10.0.0",
-    "eslint-plugin-testing-library": "^5.9.1",
+    "eslint-plugin-testing-library": "^6.0.0",
     "eslint-plugin-unused-imports": "^3",
     "prettier": "^3",
     "typescript": "^5"
