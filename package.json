@@ -99,7 +99,7 @@
     "autoprefixer": "^10.4.13",
     "babel-loader": "9.1.3",
     "babel-plugin-transform-import-meta": "^2.2.1",
-    "caniuse-lite": "^1.0.30001519",
+    "caniuse-lite": "^1.0.30001520",
     "cross-env": "7.0.3",
     "cspell": "6.31.2",
     "css-loader": "^6.8.1",
