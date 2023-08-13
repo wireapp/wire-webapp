@@ -11,7 +11,7 @@
     "@wireapp/store-engine-sqleet": "1.8.9",
     "@wireapp/webapp-events": "0.17.0",
     "amplify": "https://github.com/wireapp/amplify#head=master",
-    "beautiful-react-hooks": "^4.3.0",
+    "beautiful-react-hooks": "^5.0.0",
     "classnames": "2.3.2",
     "copy-webpack-plugin": "11.0.0",
     "core-js": "3.32.0",
