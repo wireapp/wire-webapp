@@ -41,7 +41,7 @@ import {
   CONVERSATION_EVENT,
   FederationEvent,
   FEDERATION_EVENT,
-  FederationDeleteEvent,
+  FederationConnectionRemovedEvent,
 } from '@wireapp/api-client/lib/event';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import type {BackendError} from '@wireapp/api-client/lib/http/';
@@ -321,8 +321,8 @@ export class ConversationRepository {
 
     setTimeout(() => {
       this.onFederationEvent({
-        type: FEDERATION_EVENT.FEDERATION_DELETE,
-        data: {domain: 'bella.wire.link'} as FederationDeleteEvent,
+        type: FEDERATION_EVENT.FEDERATION_CONNECTION_REMOVED,
+        data: {domains: ['bella.wire.link', 'anta.wire.link']} as FederationConnectionRemovedEvent,
       });
     }, 10000);
   }
@@ -337,25 +337,24 @@ export class ConversationRepository {
     }
 
     if (type === FEDERATION_EVENT.FEDERATION_CONNECTION_REMOVED) {
-      // TODO: Implement connection removed event.
+      const {domains: deletedDomains} = data;
+      this.onFederationConnectionRemove(deletedDomains);
     }
   };
 
   private onFederationDelete = async (deletedDomain: string) => {
     const selfUser = this.userState.self();
-
-    const conversationsWithUsersToDelete = this.findConversationsWithUsersByDomain(deletedDomain);
-
-    for (const {conversation, users} of conversationsWithUsersToDelete) {
+    const allConversations = this.conversationState.conversations();
+    allConversations.forEach(async conversation => {
       if (conversation.is1to1()) {
         conversation.status(ConversationStatus.PAST_MEMBER);
       }
-
       try {
         if (conversation.domain === selfUser.qualifiedId.domain) {
-          for (const user of users) {
-            await this.removeMember(conversation, user.qualifiedId);
-          }
+          await this.removeDeletedFederationUsers(
+            conversation,
+            conversation.allUserEntities().filter(user => user.domain === deletedDomain),
+          );
         } else {
           await this.leaveConversation(conversation, false);
         }
@@ -363,23 +362,65 @@ export class ConversationRepository {
         console.warn('failed to remove/leave conversation', error);
       }
 
-      const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-      const event = EventBuilder.buildFederationStop(conversation, selfUser, [deletedDomain], currentTimestamp);
+      await this.insertFederationStopSystemMessage(conversation, [deletedDomain]);
+    });
+  };
 
-      await this.eventRepository.injectEvent(event, EventRepository.SOURCE.INJECTED);
+  private readonly onFederationConnectionRemove = async (domains: string[]) => {
+    const selfUser = this.userState.self();
+    const [domainOne, domainTwo] = domains;
+    const allConversations = this.conversationState.conversations();
+
+    allConversations
+      .filter(conversation => conversation.domain === domainOne)
+      .forEach(async conversation => {
+        await this.removeDeletedFederationUsers(
+          conversation,
+          conversation.allUserEntities().filter(user => user.domain === domainTwo),
+        );
+        await this.insertFederationStopSystemMessage(conversation, [domainOne, domainTwo]);
+      });
+
+    allConversations
+      .filter(conversation => conversation.domain === domainTwo)
+      .forEach(async conversation => {
+        await this.removeDeletedFederationUsers(
+          conversation,
+          conversation.allUserEntities().filter(user => user.domain === domainOne),
+        );
+        await this.insertFederationStopSystemMessage(conversation, [domainOne, domainTwo]);
+      });
+
+    allConversations
+      .filter(conversation => conversation.domain === selfUser.qualifiedId.domain)
+      .forEach(async conversation => {
+        await this.removeDeletedFederationUsers(
+          conversation,
+          conversation.allUserEntities().filter(user => user.domain === domainOne || user.domain === domainTwo),
+        );
+        await this.insertFederationStopSystemMessage(conversation, [domainOne, domainTwo]);
+      });
+  };
+
+  private readonly removeDeletedFederationUsers = async (conversation: Conversation, usersToRemove: User[]) => {
+    if (usersToRemove.length === 0) {
+      return;
+    }
+
+    try {
+      for (const user of usersToRemove) {
+        await this.removeMember(conversation, user.qualifiedId);
+      }
+    } catch (error) {
+      console.warn('failed to remove users', error);
     }
   };
 
-  private readonly findConversationsWithUsersByDomain = (
-    usersDomain: string,
-  ): {conversation: Conversation; users: User[]}[] => {
-    return this.conversationState.conversations().flatMap(conversation => {
-      const matchingUsers = conversation.participating_user_ets().filter(user => user.domain === usersDomain);
-      if (matchingUsers.length > 0) {
-        return [{conversation, users: matchingUsers}];
-      }
-      return [];
-    });
+  private readonly insertFederationStopSystemMessage = async (conversation: Conversation, domains: string[]) => {
+    const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
+    const selfUser = this.userState.self();
+    const event = EventBuilder.buildFederationStop(conversation, selfUser, domains, currentTimestamp);
+    await this.eventRepository.injectEvent(event, EventRepository.SOURCE.INJECTED);
   };
 
   private readonly updateLocalMessageEntity = async ({
