@@ -146,7 +146,7 @@ import {UserState} from '../user/UserState';
 type ConversationDBChange = {obj: EventRecord; oldObj: EventRecord};
 type FetchPromise = {rejectFn: (error: ConversationError) => void; resolveFn: (conversation: Conversation) => void};
 type EntityObject = {conversationEntity: Conversation; messageEntity: Message};
-type IncomingEvent = ConversationEvent | ClientConversationEvent | FederationEvent;
+type IncomingEvent = ConversationEvent | ClientConversationEvent;
 
 export class ConversationRepository {
   private isBlockingNotificationHandling: boolean;
@@ -2131,14 +2131,6 @@ export class ConversationRepository {
   private logConversationEvent(event: IncomingEvent, source: EventSource) {
     if (event.type === CONVERSATION_EVENT.TYPING) {
       // Prevent logging typing events
-      return;
-    }
-
-    if (
-      event.type === FEDERATION_EVENT.FEDERATION_CONNECTION_REMOVED ||
-      event.type === FEDERATION_EVENT.FEDERATION_DELETE
-    ) {
-      this.logger.info(`Federation Event of type ${event.type} received.`);
       return;
     }
 
