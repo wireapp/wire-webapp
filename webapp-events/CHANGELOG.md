@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.18.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.17.0...@wireapp/webapp-events@0.18.0) (2023-08-14)
+
+### Features
+
+* **api-client, webapp-events:** add federation delete & connection remove events (WPB-203) ([#5340](https://github.com/wireapp/wire-web-packages/issues/5340)) ([64df685](https://github.com/wireapp/wire-web-packages/commit/64df68520865fb70fc952a0db1ca631ba4799149))
+
 # [0.17.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.16.0...@wireapp/webapp-events@0.17.0) (2023-05-04)
 
 ### Features
