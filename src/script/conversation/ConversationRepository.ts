@@ -2133,6 +2133,15 @@ export class ConversationRepository {
       // Prevent logging typing events
       return;
     }
+    // event.type
+    if (
+      event.type === FEDERATION_EVENT.FEDERATION_CONNECTION_REMOVED ||
+      event.type === FEDERATION_EVENT.FEDERATION_DELETE
+    ) {
+      this.logger.info(`Federation Event of type ${event.type} received.`);
+      return;
+    }
+
     const {time, from, qualified_conversation, type} = event;
     const extra: Record<string, unknown> = {};
     extra.messageId = 'id' in event && event.id;
