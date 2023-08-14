@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2023 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +17,5 @@
  *
  */
 
-export * from './ConversationEvent';
-export * from './BackendEvent';
-export * from './TeamEvent';
-export * from './UserEvent';
-export * from './FederationEvent';
+export * from './FederationDeleteData';
+export * from './FederationConnectionRemovedData';
