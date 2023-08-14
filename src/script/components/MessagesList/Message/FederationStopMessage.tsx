@@ -26,7 +26,11 @@ export interface FederationStopMessageProps {
 }
 
 const FederationStopMessage: React.FC<FederationStopMessageProps> = ({message: {from}}) => {
-  return <div className="message-header">federation stop message!!!</div>;
+  return (
+    <div className="message-header">
+      <span>Your backend stopped federating with backend URL. Learn more</span>
+    </div>
+  );
 };
 
 export {FederationStopMessage};

@@ -331,29 +331,9 @@ export class ConversationRepository {
     const {type, data} = event;
 
     if (type === FEDERATION_EVENT.FEDERATION_DELETE) {
-      const {domain} = data;
-      const conversationsWithUsersToDelete = this.findConversationsWithUsersByDomain(domain);
-      for (const {conversation, users} of conversationsWithUsersToDelete) {
-        if (conversation.is1to1()) {
-          // todo: remove connection at this point.
-          return;
-        }
+      const {domain: deletedDomain} = data;
 
-        for (const user of users) {
-          await this.removeMember(conversation, user.qualifiedId);
-        }
-
-        const selfUser = conversation.selfUser();
-
-        if (!selfUser) {
-          return;
-        }
-
-        const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-        const event = EventBuilder.buildFederationStop(conversation, selfUser, users, currentTimestamp);
-
-        await this.eventRepository.injectEvent(event, EventRepository.SOURCE.INJECTED);
-      }
+      await this.onFederationDelete(deletedDomain);
     }
 
     if (type === FEDERATION_EVENT.FEDERATION_CONNECTION_REMOVED) {
@@ -361,11 +341,40 @@ export class ConversationRepository {
     }
   };
 
+  private onFederationDelete = async (deletedDomain: string) => {
+    const selfUser = this.userState.self();
+
+    const conversationsWithUsersToDelete = this.findConversationsWithUsersByDomain(deletedDomain);
+
+    for (const {conversation, users} of conversationsWithUsersToDelete) {
+      if (conversation.is1to1()) {
+        conversation.status(ConversationStatus.PAST_MEMBER);
+      }
+
+      try {
+        if (conversation.domain === selfUser.qualifiedId.domain) {
+          for (const user of users) {
+            await this.removeMember(conversation, user.qualifiedId);
+          }
+        } else {
+          await this.leaveConversation(conversation, false);
+        }
+      } catch (error) {
+        console.warn('failed to remove/leave conversation', error);
+      }
+
+      const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
+      const event = EventBuilder.buildFederationStop(conversation, selfUser, users, currentTimestamp);
+
+      await this.eventRepository.injectEvent(event, EventRepository.SOURCE.INJECTED);
+    }
+  };
+
   private readonly findConversationsWithUsersByDomain = (
-    domain: string,
+    usersDomain: string,
   ): {conversation: Conversation; users: User[]}[] => {
     return this.conversationState.conversations().flatMap(conversation => {
-      const matchingUsers = conversation.participating_user_ets().filter(user => user.domain === domain);
+      const matchingUsers = conversation.participating_user_ets().filter(user => user.domain === usersDomain);
       if (matchingUsers.length > 0) {
         return [{conversation, users: matchingUsers}];
       }
