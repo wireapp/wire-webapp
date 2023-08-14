@@ -70,7 +70,6 @@ import {
 } from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {isBackendError} from 'Util/TypePredicateUtil';
-import {supportsMLS1To1Conversations} from 'Util/util';
 import {createUuid} from 'Util/uuid';
 
 import {ACCESS_STATE} from './AccessState';
@@ -1198,7 +1197,6 @@ export class ConversationRepository {
 
     const conversationId = userEntity.connection().conversationId;
     try {
-      //TODO: check if mls conversation will be returned when fetched with this endpoint
       const conversationEntity = await this.getConversationById(conversationId);
       conversationEntity.connection(userEntity.connection());
       await this.updateParticipatingUserEntities(conversationEntity);
@@ -1391,7 +1389,7 @@ export class ConversationRepository {
    * @param otherUserId - id of the other user
    * @returns MLS conversation entity
    */
-  private readonly findMLS1to1Conversation = async (otherUserId: QualifiedId): Promise<MLSConversation> => {
+  private readonly getMLS1to1Conversation = async (otherUserId: QualifiedId): Promise<MLSConversation> => {
     const localMLSConversation = this.conversationState.findMLS1to1Conversation(otherUserId);
 
     if (localMLSConversation) {
@@ -1536,7 +1534,7 @@ export class ConversationRepository {
     isMLSSupportedByTheOtherUser: boolean,
   ): Promise<MLSConversation> => {
     this.logger.info(`Initialising MLS 1:1 conversation with user ${otherUserId.id}...`);
-    const mlsConversation = await this.findMLS1to1Conversation(otherUserId);
+    const mlsConversation = await this.getMLS1to1Conversation(otherUserId);
 
     //if mls is not supported by the other user we do not establish the group yet
     //we just mark the mls conversation as readonly and return it
@@ -1629,12 +1627,10 @@ export class ConversationRepository {
       `Protocol for 1:1 conversation ${conversation.id} with user ${otherUserId.id} is ${protocol}, isSupportedByTheOtherUser: ${isSupportedByTheOtherUser}`,
     );
 
-    const shouldUseMLSProtocol = protocol === ConversationProtocol.MLS && supportsMLS1To1Conversations();
-
     //if both users support mls or mls conversation is already established, we use it
     //we never go back to proteus conversation, even if one of the users do not support mls anymore
     //(e.g. due to the change of supported protocols in team configuration)
-    if (shouldUseMLSProtocol || isMLSConversation(conversation)) {
+    if (protocol === ConversationProtocol.MLS || isMLSConversation(conversation)) {
       const mlsConversation = await this.initMLS1to1Conversation(otherUserId, isSupportedByTheOtherUser);
       if (isProteusConversation(conversation)) {
         await this.replaceProteus1to1WithMLS(conversation, mlsConversation);
