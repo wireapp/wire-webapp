@@ -393,7 +393,20 @@ export class ConversationRepository {
       });
 
     allConversations
-      .filter(conversation => conversation.domain === selfUser.qualifiedId.domain)
+      .filter(conversation => {
+        if (conversation.domain !== selfUser.qualifiedId.domain) {
+          return false;
+        }
+
+        const hasAnyUserFromDomainOne = conversation
+          .allUserEntities()
+          .find(user => user.qualifiedId.domain === domainOne);
+        const hasAnyUserFromDomainTwo = conversation
+          .allUserEntities()
+          .find(user => user.qualifiedId.domain === domainTwo);
+
+        return hasAnyUserFromDomainOne && hasAnyUserFromDomainTwo;
+      })
       .forEach(async conversation => {
         const usersToDelete = conversation
           .allUserEntities()
