@@ -41,7 +41,6 @@ import {
   CONVERSATION_EVENT,
   FederationEvent,
   FEDERATION_EVENT,
-  FederationConnectionRemovedEvent,
 } from '@wireapp/api-client/lib/event';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import type {BackendError} from '@wireapp/api-client/lib/http/';
@@ -318,13 +317,6 @@ export class ConversationRepository {
     this.eventService.addEventDeletedListener(this.deleteLocalMessageEntity);
 
     window.addEventListener<any>(WebAppEvents.CONVERSATION.JOIN, this.onConversationJoin);
-
-    setTimeout(() => {
-      this.onFederationEvent({
-        type: FEDERATION_EVENT.FEDERATION_CONNECTION_REMOVED,
-        data: {domains: ['bella.wire.link', 'anta.wire.link']} as FederationConnectionRemovedEvent,
-      });
-    }, 10000);
   }
 
   private readonly onFederationEvent = async (event: FederationEvent) => {
