@@ -495,7 +495,7 @@ export class EventMapper {
   }
 
   _mapEventFederationStop({data, time}: FederationStopEvent) {
-    return new FederationStopMessage(data.deletedUsers, parseInt(time, 10));
+    return new FederationStopMessage(data.domains, parseInt(time, 10));
   }
 
   _mapEventLegalHoldUpdate({data, timestamp}: LegacyEventRecord) {

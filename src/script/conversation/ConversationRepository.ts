@@ -364,7 +364,7 @@ export class ConversationRepository {
       }
 
       const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-      const event = EventBuilder.buildFederationStop(conversation, selfUser, users, currentTimestamp);
+      const event = EventBuilder.buildFederationStop(conversation, selfUser, [deletedDomain], currentTimestamp);
 
       await this.eventRepository.injectEvent(event, EventRepository.SOURCE.INJECTED);
     }

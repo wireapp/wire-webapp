@@ -19,16 +19,47 @@
 
 import React from 'react';
 
+import {Icon} from 'Components/Icon';
+import {Config} from 'src/script/Config';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {replaceLink, t} from 'Util/LocalizerUtil';
+
+import {MessageTime} from './MessageTime';
+
 import {FederationStopMessage as FederationStopMessageEntity} from '../../../entity/message/FederationStopMessage';
 
 export interface FederationStopMessageProps {
   message: FederationStopMessageEntity;
 }
 
-const FederationStopMessage: React.FC<FederationStopMessageProps> = ({message: {from}}) => {
+const FederationStopMessage: React.FC<FederationStopMessageProps> = ({message}) => {
+  const {timestamp} = useKoSubscribableChildren(message, ['timestamp']);
+  const {id, domains} = message;
+  const link = replaceLink(Config.getConfig().URL.SUPPORT.BUG_REPORT);
+
   return (
     <div className="message-header">
-      <span>Your backend stopped federating with backend URL. Learn more</span>
+      <div className="message-header-icon message-header-icon--svg">
+        <div>
+          <Icon.Info />
+        </div>
+      </div>
+      <div
+        className="message-header-label"
+        data-uie-name="element-message-failed-to-add-users"
+        data-uie-value={`domains-${domains.join('_')}`}
+      >
+        {domains.length === 1
+          ? t('federationDelete', {backendUrl: domains[0]}, link)
+          : t('federationDelete', {backendUrlOne: domains[0], backendUrlTwo: domains[1]}, link)}
+      </div>
+      <p className="message-body-actions">
+        <MessageTime
+          timestamp={timestamp}
+          data-uie-uid={id}
+          data-uie-name="item-message-failed-to-add-users-timestamp"
+        />
+      </p>
     </div>
   );
 };

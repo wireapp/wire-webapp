@@ -20,13 +20,12 @@
 import {Message} from './Message';
 
 import {SuperType} from '../../message/SuperType';
-import {User} from '../User';
 
 /**
  * Federation stop system message
  */
 export class FederationStopMessage extends Message {
-  constructor(public readonly deletedUsers: User[], timestamp: number) {
+  constructor(public readonly domains: string[], timestamp: number) {
     super();
     this.super_type = SuperType.FEDERATION_STOP;
     this.timestamp(timestamp);

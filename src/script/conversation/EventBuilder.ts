@@ -97,7 +97,7 @@ export type DegradedMessageEvent = ConversationEvent<DegradedMessageEventData> &
 export type DeleteEvent = ConversationEvent<{deleted_time: number; message_id: string; time: string}> & {
   type: CONVERSATION.MESSAGE_DELETE;
 };
-export type FederationStopEvent = ConversationEvent<{deletedUsers: User[]}> & {
+export type FederationStopEvent = ConversationEvent<{domains: string[]}> & {
   type: CONVERSATION.FEDERATION_STOP;
 };
 export type GroupCreationEventData = {
@@ -486,13 +486,13 @@ export const EventBuilder = {
   buildFederationStop(
     conversationEntity: Conversation,
     selfUser: User,
-    deletedUsers: User[],
+    domains: string[],
     currentTimestamp: number,
   ): FederationStopEvent {
     return {
       ...buildQualifiedId(conversationEntity),
       data: {
-        deletedUsers,
+        domains,
       },
       id: createUuid(),
       from: selfUser.id,
