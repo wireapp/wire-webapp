@@ -331,32 +331,36 @@ export class ConversationRepository {
 
     if (type === FEDERATION_EVENT.FEDERATION_CONNECTION_REMOVED) {
       const {domains: deletedDomains} = data;
-      this.onFederationConnectionRemove(deletedDomains);
+      await this.onFederationConnectionRemove(deletedDomains);
     }
   };
 
   private onFederationDelete = async (deletedDomain: string) => {
-    const selfUser = this.userState.self();
-    const allConversations = this.conversationState.conversations();
-    allConversations.forEach(async conversation => {
+    const conversationsToLeave = this.conversationState
+      .conversations()
+      .filter(conversation => conversation.domain === deletedDomain);
+
+    conversationsToLeave.forEach(async conversation => {
+      await this.insertFederationStopSystemMessage(conversation, [deletedDomain]);
       if (conversation.is1to1()) {
         conversation.status(ConversationStatus.PAST_MEMBER);
+        return;
       }
+
+      await this.leaveConversation(conversation, false);
+    });
+
+    const conversationsToRemoveTheirDeletedDomainUsers = this.conversationState
+      .conversations()
+      .filter(conversation => conversation.domain !== deletedDomain);
+
+    conversationsToRemoveTheirDeletedDomainUsers.forEach(async conversation => {
       const usersToRemove = conversation.allUserEntities().filter(user => user.domain === deletedDomain);
-
-      try {
-        if (conversation.domain === selfUser.qualifiedId.domain) {
-          await this.removeDeletedFederationUsers(conversation, usersToRemove);
-        } else {
-          await this.leaveConversation(conversation, false);
-        }
-      } catch (error) {
-        console.warn('failed to remove/leave conversation', error);
+      if (usersToRemove.length === 0) {
+        return;
       }
-
-      if (usersToRemove.length > 0) {
-        await this.insertFederationStopSystemMessage(conversation, [deletedDomain]);
-      }
+      await this.insertFederationStopSystemMessage(conversation, [deletedDomain]);
+      await this.removeDeletedFederationUsers(conversation, usersToRemove);
     });
   };
 
@@ -369,8 +373,8 @@ export class ConversationRepository {
       .filter(conversation => conversation.domain === domainOne)
       .forEach(async conversation => {
         const usersToDelete = conversation.allUserEntities().filter(user => user.domain === domainTwo);
-        await this.removeDeletedFederationUsers(conversation, usersToDelete);
         if (usersToDelete.length > 0) {
+          await this.removeDeletedFederationUsers(conversation, usersToDelete);
           await this.insertFederationStopSystemMessage(conversation, [domainOne, domainTwo]);
         }
       });
@@ -379,8 +383,8 @@ export class ConversationRepository {
       .filter(conversation => conversation.domain === domainTwo)
       .forEach(async conversation => {
         const usersToDelete = conversation.allUserEntities().filter(user => user.domain === domainOne);
-        await this.removeDeletedFederationUsers(conversation, usersToDelete);
         if (usersToDelete.length > 0) {
+          await this.removeDeletedFederationUsers(conversation, usersToDelete);
           await this.insertFederationStopSystemMessage(conversation, [domainOne, domainTwo]);
         }
       });
@@ -404,8 +408,8 @@ export class ConversationRepository {
         const usersToDelete = conversation
           .allUserEntities()
           .filter(user => user.domain === domainOne || user.domain === domainTwo);
-        await this.removeDeletedFederationUsers(conversation, usersToDelete);
         if (usersToDelete.length > 0) {
+          await this.removeDeletedFederationUsers(conversation, usersToDelete);
           await this.insertFederationStopSystemMessage(conversation, [domainOne, domainTwo]);
         }
       });
@@ -418,7 +422,7 @@ export class ConversationRepository {
 
     try {
       for (const user of usersToRemove) {
-        await this.removeMember(conversation, user.qualifiedId);
+        await this.removeMember(conversation, user.qualifiedId, {localOnly: true});
       }
     } catch (error) {
       console.warn('failed to remove users', error);
@@ -1730,18 +1734,18 @@ export class ConversationRepository {
    * @param userId ID of member to be removed from the conversation
    * @returns Resolves when member was removed from the conversation
    */
-  private async removeMemberFromConversation(conversationEntity: Conversation, userId: QualifiedId) {
-    const response = await this.core.service!.conversation.removeUserFromConversation(
-      conversationEntity.qualifiedId,
-      userId,
-    );
+  private async removeMemberFromConversation(conversationEntity: Conversation, userId: QualifiedId, localOnly = false) {
+    const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
+    const response = localOnly
+      ? EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp)
+      : await this.core.service!.conversation.removeUserFromConversation(conversationEntity.qualifiedId, userId);
+
     const roles = conversationEntity.roles();
     delete roles[userId.id];
     conversationEntity.roles(roles);
-    const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-    const event = response || EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
-    await this.eventRepository.injectEvent(event, EventRepository.SOURCE.BACKEND_RESPONSE);
-    return event;
+    await this.eventRepository.injectEvent(response, EventRepository.SOURCE.BACKEND_RESPONSE);
+
+    return response;
   }
 
   /**
@@ -1767,7 +1771,11 @@ export class ConversationRepository {
    * @param clearContent Should we clear the conversation content from the database?
    * @returns Resolves when member was removed from the conversation
    */
-  public async removeMember(conversationEntity: Conversation, userId: QualifiedId, clearContent: boolean = false) {
+  public async removeMember(
+    conversationEntity: Conversation,
+    userId: QualifiedId,
+    {clearContent = false, localOnly = false} = {},
+  ) {
     const isUserLeaving = this.userState.self().qualifiedId.id === userId.id;
     const isMLSConversation = conversationEntity.isUsingMLSProtocol;
 
@@ -1777,7 +1785,7 @@ export class ConversationRepository {
 
     return isMLSConversation
       ? this.removeMemberFromMLSConversation(conversationEntity, userId)
-      : this.removeMemberFromConversation(conversationEntity, userId);
+      : this.removeMemberFromConversation(conversationEntity, userId, localOnly);
   }
 
   /**
