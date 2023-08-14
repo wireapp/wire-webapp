@@ -130,6 +130,9 @@ export const WebAppEvents = {
       SHOW: 'wire.webapp.extensions.giphy.show',
     },
   },
+  FEDERATION: {
+    EVENT_FROM_BACKEND: 'wire.webapp.federation.event_from_backend',
+  },
   INPUT: {
     RESIZE: 'wire.webapp.input.resize',
   },
