@@ -25,7 +25,10 @@ import {SuperType} from '../../message/SuperType';
  * Federation stop system message
  */
 export class FederationStopMessage extends Message {
-  constructor(public readonly domains: string[], timestamp: number) {
+  constructor(
+    public readonly domains: string[],
+    timestamp: number,
+  ) {
     super();
     this.super_type = SuperType.FEDERATION_STOP;
     this.timestamp(timestamp);
