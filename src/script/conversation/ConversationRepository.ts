@@ -349,12 +349,11 @@ export class ConversationRepository {
       if (conversation.is1to1()) {
         conversation.status(ConversationStatus.PAST_MEMBER);
       }
+      const usersToRemove = conversation.allUserEntities().filter(user => user.domain === deletedDomain);
+
       try {
         if (conversation.domain === selfUser.qualifiedId.domain) {
-          await this.removeDeletedFederationUsers(
-            conversation,
-            conversation.allUserEntities().filter(user => user.domain === deletedDomain),
-          );
+          await this.removeDeletedFederationUsers(conversation, usersToRemove);
         } else {
           await this.leaveConversation(conversation, false);
         }
@@ -362,7 +361,9 @@ export class ConversationRepository {
         console.warn('failed to remove/leave conversation', error);
       }
 
-      await this.insertFederationStopSystemMessage(conversation, [deletedDomain]);
+      if (usersToRemove.length > 0) {
+        await this.insertFederationStopSystemMessage(conversation, [deletedDomain]);
+      }
     });
   };
 
@@ -374,31 +375,33 @@ export class ConversationRepository {
     allConversations
       .filter(conversation => conversation.domain === domainOne)
       .forEach(async conversation => {
-        await this.removeDeletedFederationUsers(
-          conversation,
-          conversation.allUserEntities().filter(user => user.domain === domainTwo),
-        );
-        await this.insertFederationStopSystemMessage(conversation, [domainOne, domainTwo]);
+        const usersToDelete = conversation.allUserEntities().filter(user => user.domain === domainTwo);
+        await this.removeDeletedFederationUsers(conversation, usersToDelete);
+        if (usersToDelete.length > 0) {
+          await this.insertFederationStopSystemMessage(conversation, [domainOne, domainTwo]);
+        }
       });
 
     allConversations
       .filter(conversation => conversation.domain === domainTwo)
       .forEach(async conversation => {
-        await this.removeDeletedFederationUsers(
-          conversation,
-          conversation.allUserEntities().filter(user => user.domain === domainOne),
-        );
-        await this.insertFederationStopSystemMessage(conversation, [domainOne, domainTwo]);
+        const usersToDelete = conversation.allUserEntities().filter(user => user.domain === domainOne);
+        await this.removeDeletedFederationUsers(conversation, usersToDelete);
+        if (usersToDelete.length > 0) {
+          await this.insertFederationStopSystemMessage(conversation, [domainOne, domainTwo]);
+        }
       });
 
     allConversations
       .filter(conversation => conversation.domain === selfUser.qualifiedId.domain)
       .forEach(async conversation => {
-        await this.removeDeletedFederationUsers(
-          conversation,
-          conversation.allUserEntities().filter(user => user.domain === domainOne || user.domain === domainTwo),
-        );
-        await this.insertFederationStopSystemMessage(conversation, [domainOne, domainTwo]);
+        const usersToDelete = conversation
+          .allUserEntities()
+          .filter(user => user.domain === domainOne || user.domain === domainTwo);
+        await this.removeDeletedFederationUsers(conversation, usersToDelete);
+        if (usersToDelete.length > 0) {
+          await this.insertFederationStopSystemMessage(conversation, [domainOne, domainTwo]);
+        }
       });
   };
 

@@ -20,9 +20,8 @@
 import React from 'react';
 
 import {Icon} from 'Components/Icon';
-import {Config} from 'src/script/Config';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {replaceLink, t} from 'Util/LocalizerUtil';
+import {t} from 'Util/LocalizerUtil';
 
 import {MessageTime} from './MessageTime';
 
@@ -35,7 +34,6 @@ export interface FederationStopMessageProps {
 const FederationStopMessage: React.FC<FederationStopMessageProps> = ({message}) => {
   const {timestamp} = useKoSubscribableChildren(message, ['timestamp']);
   const {id, domains} = message;
-  const link = replaceLink(Config.getConfig().URL.SUPPORT.BUG_REPORT);
 
   return (
     <div className="message-header">
@@ -50,8 +48,8 @@ const FederationStopMessage: React.FC<FederationStopMessageProps> = ({message}) 
         data-uie-value={`domains-${domains.join('_')}`}
       >
         {domains.length === 1
-          ? t('federationDelete', {backendUrl: domains[0]}, link)
-          : t('federationDelete', {backendUrlOne: domains[0], backendUrlTwo: domains[1]}, link)}
+          ? t('federationDelete', {backendUrl: domains[0]})
+          : t('federationConnectionRemove', {backendUrlOne: domains[0], backendUrlTwo: domains[1]})}
       </div>
       <p className="message-body-actions">
         <MessageTime
