@@ -28,6 +28,11 @@ const createClientWithLastActive = (date: Date): RegisteredClient => {
 };
 
 describe('wasClientActiveWithinLast4Weeks', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date('2021-01-01'));
+  });
+
   it('should return false if client was last active 29 days ago', () => {
     const client = createClientWithLastActive(new Date(Date.now() - 29 * TIME_IN_MILLIS.DAY));
     expect(wasClientActiveWithinLast4Weeks(client)).toBe(false);

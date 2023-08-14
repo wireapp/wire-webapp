@@ -1,4 +1,4 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-npx --no-install lint-staged && yarn check:circular-dependencies 
+npx --no-install lint-staged

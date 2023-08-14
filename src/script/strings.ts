@@ -1,24 +1,5 @@
 /*
  * Wire
- * Copyright (C) 2022 Wire Swiss GmbH
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see http://www.gnu.org/licenses/.
- *
- */
-
-/*
- * Wire
  * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
@@ -496,6 +477,10 @@ export const errorHandlerStrings = defineMessages({
     defaultMessage: 'This conversation has reached the limit of participants',
     id: 'BackendError.LABEL.CONVERSATION_TOO_MANY_MEMBERS',
   },
+  [BackendErrorLabel.TOO_MANY_TEAM_MEMBERS]: {
+    defaultMessage: 'This team has reached its maximum size',
+    id: 'BackendError.LABEL.TOO_MANY_MEMBERS',
+  },
   [BackendErrorLabel.ACCESS_DENIED]: {
     defaultMessage: 'Please verify your details and try again',
     id: 'BackendError.LABEL.ACCESS_DENIED',
@@ -558,7 +543,8 @@ export const errorHandlerStrings = defineMessages({
     id: 'BackendError.LABEL.BAD_REQUEST',
   },
   [SyntheticErrorLabel.EMAIL_REQUIRED]: {
-    defaultMessage: 'Log in with an email address is required when two-factor authentication is activated',
+    defaultMessage:
+      'You can’t use your username as two-factor authentication is activated. Please log in with your email instead.',
     id: 'BackendError.LABEL.EMAIL_REQUIRED',
   },
   [BackendErrorLabel.INVALID_OPERATION]: {
@@ -568,10 +554,6 @@ export const errorHandlerStrings = defineMessages({
   [BackendErrorLabel.INVALID_PAYLOAD]: {
     defaultMessage: 'Invalid input',
     id: 'BackendError.LABEL.INVALID_PAYLOAD',
-  },
-  [BackendErrorLabel.NOT_FOUND]: {
-    defaultMessage: 'Could not find resource',
-    id: 'BackendError.LABEL.NOT_FOUND',
   },
   [BackendErrorLabel.OPERATION_DENIED]: {
     defaultMessage: 'You don’t have permission',
@@ -608,10 +590,6 @@ export const errorHandlerStrings = defineMessages({
   [BackendErrorLabel.NO_TEAM_MEMBER]: {
     defaultMessage: 'Could not find team member',
     id: 'BackendError.LABEL.NO_TEAM_MEMBER',
-  },
-  [BackendErrorLabel.TOO_MANY_MEMBERS]: {
-    defaultMessage: 'This team has reached its maximum size',
-    id: 'BackendError.LABEL.TOO_MANY_MEMBERS',
   },
   [BackendErrorLabel.SUSPENDED_ACCOUNT]: {
     defaultMessage: 'This account is no longer authorized to log in',
@@ -924,16 +902,16 @@ export const oauthStrings = defineMessages({
     id: 'oauth.allow',
   },
   subhead: {
-    defaultMessage: '{app} requires your permission to:',
+    defaultMessage: 'Microsoft Outlook requires your permission to:',
     id: 'oauth.subhead',
   },
   learnMore: {
-    defaultMessage: '<learnMore>Learn more</learnMore> about these permissions in the settings.',
+    defaultMessage: '<learnMore>Learn more</learnMore> about these permissions',
     id: 'oauth.learnMore',
   },
   details: {
     defaultMessage:
-      'If you allow the permissions listed, Wire™ will be able to connect to your calendar. It won’t see the content of your calendar, just the ones happening with Wire. If you don’t grant the permissions, you can’t use this add-in.',
+      'If you allow the permissions listed above, your Outlook Calendar will be able to connect to Wire. If you don’t grant the permissions, you can’t use this add-in.',
     id: 'oauth.details',
   },
   privacyPolicy: {
@@ -941,19 +919,19 @@ export const oauthStrings = defineMessages({
     id: 'oauth.privacypolicy',
   },
   [Scope.WRITE_CONVERSATIONS]: {
-    defaultMessage: 'Create conversations',
+    defaultMessage: 'Create conversations in Wire',
     id: 'oauth.scope.write_conversations',
   },
   [Scope.WRITE_CONVERSATIONS_CODE]: {
-    defaultMessage: 'Create conversation guest links',
+    defaultMessage: 'Create guest links to conversations in Wire',
     id: 'oauth.scope.write_conversations_code',
   },
   [Scope.READ_SELF]: {
-    defaultMessage: 'Access user information',
+    defaultMessage: 'View your Wire username, profile name, and email',
     id: 'oauth.scope.read_self',
   },
   [Scope.READ_FEATURE_CONFIGS]: {
-    defaultMessage: 'Access team feature configurations',
+    defaultMessage: 'View your team’s feature configurations',
     id: 'oauth.scope.read_feature_configs',
   },
 });
