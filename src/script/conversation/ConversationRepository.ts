@@ -2133,7 +2133,7 @@ export class ConversationRepository {
       // Prevent logging typing events
       return;
     }
-    // event.type
+
     if (
       event.type === FEDERATION_EVENT.FEDERATION_CONNECTION_REMOVED ||
       event.type === FEDERATION_EVENT.FEDERATION_DELETE
