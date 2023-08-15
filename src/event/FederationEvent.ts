@@ -28,18 +28,12 @@ export type FederationEventData = FederationDeleteData | FederationConnectionRem
 
 export type FederationEvent = FederationDeleteEvent | FederationConnectionRemovedEvent;
 
-export interface BaseFederationEvent {
-  data: FederationEventData;
-  time: string;
-  type: FEDERATION_EVENT;
-}
-
-export interface FederationDeleteEvent extends BaseFederationEvent {
-  data: FederationDeleteData;
+export interface FederationDeleteEvent {
+  domain: string;
   type: FEDERATION_EVENT.FEDERATION_DELETE;
 }
 
-export interface FederationConnectionRemovedEvent extends BaseFederationEvent {
-  data: FederationConnectionRemovedData;
+export interface FederationConnectionRemovedEvent {
+  domains: string[];
   type: FEDERATION_EVENT.FEDERATION_CONNECTION_REMOVED;
 }
