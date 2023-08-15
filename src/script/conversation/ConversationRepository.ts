@@ -318,19 +318,23 @@ export class ConversationRepository {
     this.eventService.addEventDeletedListener(this.deleteLocalMessageEntity);
 
     window.addEventListener<any>(WebAppEvents.CONVERSATION.JOIN, this.onConversationJoin);
+
+    window.fireFederationDelete = () => {
+      this.onFederationEvent({type: FEDERATION_EVENT.FEDERATION_DELETE, domain: 'bella.wire.link'});
+    };
   }
 
   private readonly onFederationEvent = async (event: FederationEvent) => {
-    const {type, data} = event;
+    const {type} = event;
 
     switch (type) {
       case FEDERATION_EVENT.FEDERATION_DELETE:
-        const {domain: deletedDomain} = data;
+        const {domain: deletedDomain} = event;
         await this.onFederationDelete(deletedDomain);
 
         break;
       case FEDERATION_EVENT.FEDERATION_CONNECTION_REMOVED:
-        const {domains: deletedDomains} = data;
+        const {domains: deletedDomains} = event;
         await this.onFederationConnectionRemove(deletedDomains);
 
         break;
@@ -357,7 +361,7 @@ export class ConversationRepository {
         return;
       }
 
-      await this.leaveConversation(conversation, false);
+      await this.leaveConversation(conversation, {clearContent: false, localOnly: true});
     });
 
     const conversationsToRemoveTheirDeletedDomainUsers = this.conversationState
@@ -365,6 +369,11 @@ export class ConversationRepository {
       .filter(conversation => conversation.domain !== deletedDomain);
 
     conversationsToRemoveTheirDeletedDomainUsers.forEach(async conversation => {
+      if (conversation.is1to1() && conversation.firstUserEntity().qualifiedId.domain === deletedDomain) {
+        conversation.status(ConversationStatus.PAST_MEMBER);
+        await this.insertFederationStopSystemMessage(conversation, [deletedDomain]);
+        return;
+      }
       const usersToRemove = conversation.allUserEntities().filter(user => user.domain === deletedDomain);
       if (usersToRemove.length === 0) {
         return;
@@ -1738,13 +1747,20 @@ export class ConversationRepository {
    * @param userId ID of member to be removed from the conversation
    * @returns Resolves when member was removed from the conversation
    */
-  private async removeMemberFromMLSConversation(conversationEntity: Conversation, userId: QualifiedId) {
+  private async removeMemberFromMLSConversation(
+    conversationEntity: Conversation,
+    userId: QualifiedId,
+    {localOnly = false} = {},
+  ) {
+    const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
     const {groupId, qualifiedId} = conversationEntity;
-    const {events} = await this.core.service!.conversation.removeUsersFromMLSConversation({
-      conversationId: qualifiedId,
-      groupId,
-      qualifiedUserIds: [userId],
-    });
+    const {events} = localOnly
+      ? {events: [EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp)]}
+      : await this.core.service!.conversation.removeUsersFromMLSConversation({
+          conversationId: qualifiedId,
+          groupId,
+          qualifiedUserIds: [userId],
+        });
 
     if (!!events.length) {
       events.forEach(event => this.eventRepository.injectEvent(event));
@@ -1758,7 +1774,11 @@ export class ConversationRepository {
    * @param userId ID of member to be removed from the conversation
    * @returns Resolves when member was removed from the conversation
    */
-  private async removeMemberFromConversation(conversationEntity: Conversation, userId: QualifiedId, localOnly = false) {
+  private async removeMemberFromConversation(
+    conversationEntity: Conversation,
+    userId: QualifiedId,
+    {localOnly = false},
+  ) {
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
     const response = localOnly
       ? EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp)
@@ -1779,12 +1799,12 @@ export class ConversationRepository {
    * @param clearContent Should we clear the conversation content from the database?
    * @returns Resolves when user was removed from the conversation
    */
-  private async leaveConversation(conversationEntity: Conversation, clearContent: boolean) {
+  private async leaveConversation(conversationEntity: Conversation, {clearContent = false, localOnly = false} = {}) {
     const userQualifiedId = this.userState.self().qualifiedId;
 
     return clearContent
       ? this.clearConversation(conversationEntity, true)
-      : this.removeMemberFromConversation(conversationEntity, userQualifiedId);
+      : this.removeMemberFromConversation(conversationEntity, userQualifiedId, {localOnly});
   }
 
   /**
@@ -1804,12 +1824,12 @@ export class ConversationRepository {
     const isMLSConversation = conversationEntity.isUsingMLSProtocol;
 
     if (isUserLeaving) {
-      return this.leaveConversation(conversationEntity, clearContent);
+      return this.leaveConversation(conversationEntity, {clearContent});
     }
 
     return isMLSConversation
-      ? this.removeMemberFromMLSConversation(conversationEntity, userId)
-      : this.removeMemberFromConversation(conversationEntity, userId, localOnly);
+      ? this.removeMemberFromMLSConversation(conversationEntity, userId, {localOnly})
+      : this.removeMemberFromConversation(conversationEntity, userId, {localOnly});
   }
 
   /**
