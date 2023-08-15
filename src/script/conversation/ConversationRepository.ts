@@ -424,19 +424,14 @@ export class ConversationRepository {
           return false;
         }
 
-        const hasAnyUserFromDomainOne = conversation
-          .allUserEntities()
-          .find(user => user.qualifiedId.domain === domainOne);
-        const hasAnyUserFromDomainTwo = conversation
-          .allUserEntities()
-          .find(user => user.qualifiedId.domain === domainTwo);
+        const userDomains = new Set(conversation.allUserEntities().map(user => user.qualifiedId.domain));
 
-        return hasAnyUserFromDomainOne && hasAnyUserFromDomainTwo;
+        return userDomains.has(domainOne) && userDomains.has(domainTwo);
       })
       .forEach(async conversation => {
         const usersToDelete = conversation
           .allUserEntities()
-          .filter(user => user.domain === domainOne || user.domain === domainTwo);
+          .filter(user => [domainOne, domainTwo].includes(user.domain));
         if (usersToDelete.length > 0) {
           await this.removeDeletedFederationUsers(conversation, usersToDelete);
           await this.insertFederationStopSystemMessage(conversation, [domainOne, domainTwo]);
