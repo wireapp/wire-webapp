@@ -1116,6 +1116,7 @@
   "preferencesOptionsBackupHeader": "Gesprächsverlauf",
   "preferencesOptionsBackupImportHeadline": "Wiederherstellen",
   "preferencesOptionsBackupImportSecondary": "Es können nur Backup-Dateien derselben Plattform wiederhergestellt werden. Der Inhalt der Backup-Datei ersetzt den Gesprächsverlauf auf diesem Gerät.",
+  "preferencesOptionsBackupTryAgain": "Try again",
   "preferencesOptionsCall": "Anrufe",
   "preferencesOptionsCallLogs": "Fehlerbehebung",
   "preferencesOptionsCallLogsDetail": "Speichern Sie den Anruf-Fehlerbericht. Diese Informationen helfen dem {{BrandName}}-Support bei der Klärung des Problems.",

@@ -1116,6 +1116,7 @@
   "preferencesOptionsBackupHeader": "Geçmiş",
   "preferencesOptionsBackupImportHeadline": "Restore",
   "preferencesOptionsBackupImportSecondary": "Geçmişi yalnızca aynı platformun yedeğinden geri yükleyebilirsiniz. Yedeklemeniz, bu cihazda olabilecek görüşmelerin üzerine yazacaktır.",
+  "preferencesOptionsBackupTryAgain": "Try again",
   "preferencesOptionsCall": "Calls",
   "preferencesOptionsCallLogs": "Sorun Giderme",
   "preferencesOptionsCallLogsDetail": "Save the calling debug report. This information helps {{brandName}} Support diagnose calling problems.",

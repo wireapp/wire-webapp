@@ -1116,6 +1116,7 @@
   "preferencesOptionsBackupHeader": "Historique",
   "preferencesOptionsBackupImportHeadline": "Restore",
   "preferencesOptionsBackupImportSecondary": "Vous pouvez uniquement restaurer l’historique depuis une sauvegarde provenant d’une plateforme identique. Ceci effacera les conversations que vous avez déjà sur cet appareil.",
+  "preferencesOptionsBackupTryAgain": "Try again",
   "preferencesOptionsCall": "Appels",
   "preferencesOptionsCallLogs": "Résolution de problèmes",
   "preferencesOptionsCallLogsDetail": "Save the calling debug report. This information helps {{brandName}} Support diagnose calling problems.",

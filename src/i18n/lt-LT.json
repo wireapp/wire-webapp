@@ -1116,6 +1116,7 @@
   "preferencesOptionsBackupHeader": "Praeitis",
   "preferencesOptionsBackupImportHeadline": "Restore",
   "preferencesOptionsBackupImportSecondary": "Atkurti praeitį iš atsarginės kopijos galite tik toje pačioje platformoje. Atsarginė kopija pakeis visus susirašinėjimus, kuriuos šiame įrenginyje turite.",
+  "preferencesOptionsBackupTryAgain": "Try again",
   "preferencesOptionsCall": "Calls",
   "preferencesOptionsCallLogs": "Trikčių šalinimas",
   "preferencesOptionsCallLogsDetail": "Save the calling debug report. This information helps {{brandName}} Support diagnose calling problems.",

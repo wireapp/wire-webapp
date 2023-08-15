@@ -1116,6 +1116,7 @@
   "preferencesOptionsBackupHeader": "Historik",
   "preferencesOptionsBackupImportHeadline": "Restore",
   "preferencesOptionsBackupImportSecondary": "You can only restore history from a backup of the same platform. Your backup will overwrite the conversations that you may have on this device.",
+  "preferencesOptionsBackupTryAgain": "Try again",
   "preferencesOptionsCall": "Calls",
   "preferencesOptionsCallLogs": "Felsökning",
   "preferencesOptionsCallLogsDetail": "Save the calling debug report. This information helps {{brandName}} Support diagnose calling problems.",

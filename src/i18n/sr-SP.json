@@ -1116,6 +1116,7 @@
   "preferencesOptionsBackupHeader": "Историја",
   "preferencesOptionsBackupImportHeadline": "Restore",
   "preferencesOptionsBackupImportSecondary": "Историју можете да вратите само из резервне копије исте платформе. Резервна копија ће пребрисати разговоре које можете водити на овом уређају.",
+  "preferencesOptionsBackupTryAgain": "Try again",
   "preferencesOptionsCall": "Calls",
   "preferencesOptionsCallLogs": "Решавање проблема",
   "preferencesOptionsCallLogsDetail": "Save the calling debug report. This information helps {{brandName}} Support diagnose calling problems.",
