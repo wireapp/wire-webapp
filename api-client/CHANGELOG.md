@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [24.21.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@24.21.0...@wireapp/api-client@24.21.1) (2023-08-15)
+
+### Bug Fixes
+
+* change data shape of federation events (WPB-203) ([#5392](https://github.com/wireapp/wire-web-packages/issues/5392)) ([62fac19](https://github.com/wireapp/wire-web-packages/commit/62fac1956c350ba4a06197562d9be31adacbb425))
+
 # [24.21.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@24.20.3...@wireapp/api-client@24.21.0) (2023-08-14)
 
 ### Features
