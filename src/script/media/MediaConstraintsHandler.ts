@@ -62,36 +62,36 @@ export class MediaConstraintsHandler {
             },
           },
           DISPLAY_MEDIA: {
-            frameRate: 5,
+            frameRate: 30,
             height: {
               ideal: 1080,
               max: 1080,
             },
           },
           USER_MEDIA: {
-            frameRate: 5,
+            frameRate: 15,
             height: {exact: 720},
             mediaSource: 'screen',
           },
         },
         VIDEO: {
           [VIDEO_QUALITY_MODE.FULL_HD]: {
-            frameRate: 15,
+            frameRate: 30,
             height: 1080,
             width: 1920,
           },
           [VIDEO_QUALITY_MODE.GROUP]: {
-            frameRate: 15,
+            frameRate: 30,
             height: 720,
             width: 1280,
           },
           [VIDEO_QUALITY_MODE.HD]: {
-            frameRate: 15,
+            frameRate: 30,
             height: 720,
             width: 1280,
           },
           [VIDEO_QUALITY_MODE.MOBILE]: {
-            frameRate: 15,
+            frameRate: 30,
             height: 720,
             width: 1280,
           },
