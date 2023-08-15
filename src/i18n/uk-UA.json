@@ -1116,6 +1116,7 @@
   "preferencesOptionsBackupHeader": "Історія",
   "preferencesOptionsBackupImportHeadline": "Restore",
   "preferencesOptionsBackupImportSecondary": "Історію розмов можна відновити тільки з резервної копії, зробленої на тій же платформі. Резервна копія перезапише розмови, які ви, можливо, уже маєте на цьому пристрої.",
+  "preferencesOptionsBackupTryAgain": "Try again",
   "preferencesOptionsCall": "Calls",
   "preferencesOptionsCallLogs": "Усунення проблем",
   "preferencesOptionsCallLogsDetail": "Save the calling debug report. This information helps {{brandName}} Support diagnose calling problems.",

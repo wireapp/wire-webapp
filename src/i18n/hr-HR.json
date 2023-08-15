@@ -1116,6 +1116,7 @@
   "preferencesOptionsBackupHeader": "Povijest",
   "preferencesOptionsBackupImportHeadline": "Restore",
   "preferencesOptionsBackupImportSecondary": "Možete vratiti povijest samo iz sigurnosne kopije iste platforme. Vaša sigurnosna kopija će presnimiti razgovore koje ste imali na ovom uređaju.",
+  "preferencesOptionsBackupTryAgain": "Try again",
   "preferencesOptionsCall": "Calls",
   "preferencesOptionsCallLogs": "Otklanjanje greške",
   "preferencesOptionsCallLogsDetail": "Save the calling debug report. This information helps {{brandName}} Support diagnose calling problems.",

@@ -1116,6 +1116,7 @@
   "preferencesOptionsBackupHeader": "履歴",
   "preferencesOptionsBackupImportHeadline": "Restore",
   "preferencesOptionsBackupImportSecondary": "会話履歴は、同じプラットフォームのバックアップからのみ復元できます。あなたのバックアップは、このデバイス上の会話を上書きします。",
+  "preferencesOptionsBackupTryAgain": "Try again",
   "preferencesOptionsCall": "Calls",
   "preferencesOptionsCallLogs": "トラブルシューティング",
   "preferencesOptionsCallLogsDetail": "Save the calling debug report. This information helps {{brandName}} Support diagnose calling problems.",

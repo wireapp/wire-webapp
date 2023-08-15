@@ -1116,6 +1116,7 @@
   "preferencesOptionsBackupHeader": "Histórico",
   "preferencesOptionsBackupImportHeadline": "Restaurar",
   "preferencesOptionsBackupImportSecondary": "Você só pode restaurar o histórico de um backup da mesma plataforma. Seu backup substituirá as conversas que você pode ter neste dispositivo.",
+  "preferencesOptionsBackupTryAgain": "Try again",
   "preferencesOptionsCall": "Chamadas",
   "preferencesOptionsCallLogs": "Solução de problemas",
   "preferencesOptionsCallLogsDetail": "Salve o relatório de depuração de chamada. Essas informações ajudam o suporte do {{brandName}} a diagnosticar problemas com as chamadas.",

@@ -1116,6 +1116,7 @@
   "preferencesOptionsBackupHeader": "Historik",
   "preferencesOptionsBackupImportHeadline": "Restore",
   "preferencesOptionsBackupImportSecondary": "Du kan kun gendanne historik fra en sikkerhedskopi til den samme platform. Din sikkerhedskopi vil overskrive samtaler du allerede har på denne enhed.",
+  "preferencesOptionsBackupTryAgain": "Try again",
   "preferencesOptionsCall": "Calls",
   "preferencesOptionsCallLogs": "Fejlfinding",
   "preferencesOptionsCallLogsDetail": "Save the calling debug report. This information helps {{brandName}} Support diagnose calling problems.",

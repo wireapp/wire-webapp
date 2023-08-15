@@ -1116,6 +1116,7 @@
   "preferencesOptionsBackupHeader": "Historia",
   "preferencesOptionsBackupImportHeadline": "Restore",
   "preferencesOptionsBackupImportSecondary": "Sólo puede restaurar el historial desde una copia de seguridad de la misma plataforma. Su copia de seguridad sobrescribirá las conversaciones que pueda tener en este dispositivo.",
+  "preferencesOptionsBackupTryAgain": "Try again",
   "preferencesOptionsCall": "Calls",
   "preferencesOptionsCallLogs": "Solución de problemas",
   "preferencesOptionsCallLogsDetail": "Save the calling debug report. This information helps {{brandName}} Support diagnose calling problems.",
