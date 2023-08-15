@@ -335,6 +335,14 @@ export class ConversationRepository {
     }
   };
 
+  /**
+   * For the `federation.delete` event: (Backend A has stopped federating with us)
+      - receive the event from backend
+      - leave the conversations locally that are owned by the backend A which was deleted.
+      - remove the deleted backend A users locally from our own conversations.
+      - insert system message to the affected conversations about federation termination.
+   * @param deletedDomain the domain that stopped federating
+   */
   private onFederationDelete = async (deletedDomain: string) => {
     const conversationsToLeave = this.conversationState
       .conversations()
@@ -364,6 +372,20 @@ export class ConversationRepository {
     });
   };
 
+  /**
+   * For the `federation.connectionRemoved` event: (Backend A & B stopped federating, user is on C)
+    - receive the event from backend
+    - Identify all conversations that are not owned from A or B domain and that contain users from A and B
+      - remove users from A and B from those conversations
+      - insert system message in those conversations about backend A and B stopping to federate
+    - identify all conversations owned by domain A that contains users from B
+      - remove users from B from those conversations
+      - insert system message in those conversations about backend A and B stopping to federate
+    - Identify all conversations owned by domain B that contains users from A
+      - remove users from A from those conversations
+      - insert system message in those conversations about backend A and B stopping to federate
+   * @param domains The domains that stopped federating with each other
+   */
   private readonly onFederationConnectionRemove = async (domains: string[]) => {
     const selfUser = this.userState.self();
     const [domainOne, domainTwo] = domains;
