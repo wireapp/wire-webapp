@@ -29,7 +29,6 @@ import {isMLSConversation, isSelfConversation} from './ConversationSelectors';
 
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
-import {useMLSConversationState} from '../mls';
 import {TeamState} from '../team/TeamState';
 import {UserState} from '../user/UserState';
 
@@ -72,9 +71,6 @@ export class ConversationState {
       this.conversations().find(conversation => isMLSConversation(conversation) && isSelfConversation(conversation)),
     );
 
-    //anytime mls conversation state changes, we notify conversations observable, so filteredConversations is recomputed
-    useMLSConversationState.subscribe(() => this.conversations.notifySubscribers());
-
     this.visibleConversations = ko.pureComputed(() => {
       return this.sortedConversations().filter(
         conversation =>
@@ -111,17 +107,6 @@ export class ConversationState {
           states_to_filter.includes(conversationEntity.connection().status())
         ) {
           return false;
-        }
-
-        if (isMLSConversation(conversationEntity)) {
-          const isMLSConversationEstablished = useMLSConversationState
-            .getState()
-            .isEstablished(conversationEntity.groupId);
-
-          //conversation doesn't need to be established if user was removed
-          if (!isRemoved && !isMLSConversationEstablished) {
-            return false;
-          }
         }
 
         return !(isCleared && isRemoved);
