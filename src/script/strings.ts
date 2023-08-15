@@ -450,6 +450,10 @@ export const conversationJoinStrings = defineMessages({
     defaultMessage: 'Your name',
     id: 'conversationJoin.namePlaceholder',
   },
+  noAccountHead: {
+    defaultMessage: 'Dont have an account?',
+    id: 'conversationJoin.noAccountHead',
+  },
   subhead: {
     defaultMessage: 'Join conversation as temporary guest (access expires after 24 hours)',
     id: 'conversationJoin.subhead',

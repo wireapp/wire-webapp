@@ -421,6 +421,7 @@ const LoginComponent = ({
                 )}
               </ContainerXS>
             </Column>
+            {!embedded && <Column />}
           </Columns>
         </Container>
       )}

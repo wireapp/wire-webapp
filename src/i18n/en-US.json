@@ -385,6 +385,7 @@
   "conversationJoin.unsupportedJoinMobileSubhead": "Open this link on your computer.",
   "conversationJoin.joinButton": "Join as temporary user",
   "conversationJoin.mainHeadline": "Join Conversation",
+  "conversationJoin.noAccountHead": "Dont have an account?",
   "conversationJustNow": "Just now",
   "conversationLabelFavorites": "Favorites",
   "conversationLabelGroups": "Groups",

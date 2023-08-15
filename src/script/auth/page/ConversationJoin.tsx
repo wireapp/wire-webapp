@@ -76,7 +76,7 @@ const Separator = () => {
         flex: 1,
         height: '1px',
         backgroundColor: '#696c6e',
-        minWidth: '11rem',
+        minWidth: '24rem',
       }}
     ></div>
   );
@@ -92,8 +92,6 @@ const Separator = () => {
       }}
     >
       <Line />
-      <Muted style={{padding: '0 1rem', transform: `rotate(${!isMobile ? '-90' : '0'}deg)`}}>or</Muted>
-      <Line />
     </div>
   );
 };
@@ -108,7 +106,7 @@ const ConversationJoinComponent = ({
   selfName,
   conversationError,
 }: Props & ConnectedProps & DispatchProps) => {
-  const nameInput = React.useRef<HTMLInputElement>();
+  const nameInput = React.useRef<HTMLInputElement>(null);
   const {formatMessage: _} = useIntl();
 
   const [accentColor] = useState(AccentColor.random());
@@ -282,7 +280,7 @@ const ConversationJoinComponent = ({
                         }}
                       >
                         <>
-                          <H2 center>Dont have an account?</H2>
+                          <H2 center>{_(conversationJoinStrings.noAccountHead)}</H2>
                           <Muted>{_(conversationJoinStrings.subhead)}</Muted>
                           <Form style={{marginTop: 30}}>
                             <InputBlock>
