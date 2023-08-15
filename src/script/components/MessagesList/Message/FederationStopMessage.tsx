@@ -19,21 +19,29 @@
 
 import React from 'react';
 
+import {Link, LinkVariant} from '@wireapp/react-ui-kit';
+
 import {Icon} from 'Components/Icon';
+import {Config} from 'src/script/Config';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {MessageTime} from './MessageTime';
+import {useMessageFocusedTabIndex} from './util';
 
 import {FederationStopMessage as FederationStopMessageEntity} from '../../../entity/message/FederationStopMessage';
 
 export interface FederationStopMessageProps {
   message: FederationStopMessageEntity;
+  isMessageFocused: boolean;
 }
 
-const FederationStopMessage: React.FC<FederationStopMessageProps> = ({message}) => {
+const config = Config.getConfig();
+
+const FederationStopMessage: React.FC<FederationStopMessageProps> = ({message, isMessageFocused}) => {
   const {timestamp} = useKoSubscribableChildren(message, ['timestamp']);
   const {id, domains} = message;
+  const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
 
   return (
     <div className="message-header">
@@ -47,9 +55,24 @@ const FederationStopMessage: React.FC<FederationStopMessageProps> = ({message}) 
         data-uie-name="element-message-failed-to-add-users"
         data-uie-value={`domains-${domains.join('_')}`}
       >
-        {domains.length === 1
-          ? t('federationDelete', {backendUrl: domains[0]})
-          : t('federationConnectionRemove', {backendUrlOne: domains[0], backendUrlTwo: domains[1]})}
+        <span
+          dangerouslySetInnerHTML={{
+            __html:
+              domains.length === 1
+                ? t('federationDelete', {backendUrl: domains[0]})
+                : t('federationConnectionRemove', {backendUrlOne: domains[0], backendUrlTwo: domains[1]}),
+          }}
+        />
+        <Link
+          css={{fontSize: 'var(--font-size-small)', marginLeft: 2}}
+          tabIndex={messageFocusedTabIndex}
+          targetBlank
+          variant={LinkVariant.PRIMARY}
+          href={config.URL.SUPPORT.FEDERATION_STOP}
+          data-uie-name="go-stop-federation"
+        >
+          {t('offlineBackendLearnMore')}
+        </Link>
       </div>
       <p className="message-body-actions">
         <MessageTime

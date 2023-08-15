@@ -84,8 +84,6 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
   messageRepository,
   messageActions,
   teamState = container.resolve(TeamState),
-  handleFocus,
-  totalMessage,
   isMsgElementsFocusable,
 }) => {
   const findMessage = async (conversation: Conversation, messageId: string) => {
@@ -227,7 +225,7 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
     return <LegalHoldMessage message={message} />;
   }
   if (message.isFederationStop()) {
-    return <FederationStopMessage message={message} />;
+    return <FederationStopMessage isMessageFocused={isMessageFocused} message={message} />;
   }
   if (message.isVerification()) {
     return <VerificationMessage message={message} />;
