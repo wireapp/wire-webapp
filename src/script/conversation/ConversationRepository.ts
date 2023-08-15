@@ -323,15 +323,17 @@ export class ConversationRepository {
   private readonly onFederationEvent = async (event: FederationEvent) => {
     const {type, data} = event;
 
-    if (type === FEDERATION_EVENT.FEDERATION_DELETE) {
-      const {domain: deletedDomain} = data;
+    switch (type) {
+      case FEDERATION_EVENT.FEDERATION_DELETE:
+        const {domain: deletedDomain} = data;
+        await this.onFederationDelete(deletedDomain);
 
-      await this.onFederationDelete(deletedDomain);
-    }
+        break;
+      case FEDERATION_EVENT.FEDERATION_CONNECTION_REMOVED:
+        const {domains: deletedDomains} = data;
+        await this.onFederationConnectionRemove(deletedDomains);
 
-    if (type === FEDERATION_EVENT.FEDERATION_CONNECTION_REMOVED) {
-      const {domains: deletedDomains} = data;
-      await this.onFederationConnectionRemove(deletedDomains);
+        break;
     }
   };
 
