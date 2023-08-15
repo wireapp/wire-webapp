@@ -318,10 +318,6 @@ export class ConversationRepository {
     this.eventService.addEventDeletedListener(this.deleteLocalMessageEntity);
 
     window.addEventListener<any>(WebAppEvents.CONVERSATION.JOIN, this.onConversationJoin);
-
-    window.fireFederationDelete = () => {
-      this.onFederationEvent({type: FEDERATION_EVENT.FEDERATION_DELETE, domain: 'bella.wire.link'});
-    };
   }
 
   private readonly onFederationEvent = async (event: FederationEvent) => {
