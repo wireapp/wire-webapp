@@ -19,7 +19,7 @@
 
 import {chunk} from '@wireapp/commons/lib/util/ArrayUtil';
 import {proteus as ProtobufOTR} from '@wireapp/protocol-messaging/web/otr';
-import {AxiosRequestConfig} from 'axios';
+import {AxiosRequestConfig, isAxiosError} from 'axios';
 
 import {
   Conversation,
@@ -66,6 +66,7 @@ import {
   ConversationReceiptModeUpdateData,
   ConversationTypingData,
 } from '../data';
+import {handleFederationErrors} from '../FederatedBackendsError';
 import {Subconversation, SUBCONVERSATION_ID} from '../Subconversation';
 
 export type PostMlsMessageResponse = {
@@ -572,6 +573,9 @@ export class ConversationAPI {
         case BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT: {
           throw new ConversationLegalholdMissingConsentError(backendError.message);
         }
+      }
+      if (isAxiosError(error)) {
+        handleFederationErrors(error);
       }
       throw error;
     }
