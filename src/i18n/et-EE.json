@@ -1116,6 +1116,7 @@
   "preferencesOptionsBackupHeader": "Ajalugu",
   "preferencesOptionsBackupImportHeadline": "Restore",
   "preferencesOptionsBackupImportSecondary": "Sa saad taastada ajalugu ainult sama platvormi varundusest. Sinu varundus kirjutab üle vestlused, mis sul võivad selles seadmes olla.",
+  "preferencesOptionsBackupTryAgain": "Try again",
   "preferencesOptionsCall": "Calls",
   "preferencesOptionsCallLogs": "Veaotsing",
   "preferencesOptionsCallLogsDetail": "Save the calling debug report. This information helps {{brandName}} Support diagnose calling problems.",

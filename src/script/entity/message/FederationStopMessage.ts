@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2022 Wire Swiss GmbH
+ * Copyright (C) 2023 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,26 +17,20 @@
  *
  */
 
-import {getStorage} from 'Util/localStorage';
+import {Message} from './Message';
 
-import {MLSConversationState} from './mlsConversationState';
+import {SuperType} from '../../message/SuperType';
 
-const storageKey = 'mlsConversationsState';
-const storage = getStorage();
-
-export const loadState = (): MLSConversationState => {
-  const storedState = storage?.getItem(storageKey);
-  if (!storedState) {
-    return {
-      established: new Set(),
-    };
+/**
+ * Federation stop system message
+ */
+export class FederationStopMessage extends Message {
+  constructor(
+    public readonly domains: string[],
+    timestamp: number,
+  ) {
+    super();
+    this.super_type = SuperType.FEDERATION_STOP;
+    this.timestamp(timestamp);
   }
-  const parsedState = JSON.parse(storedState);
-  return {
-    established: new Set(parsedState.established),
-  };
-};
-
-export const saveState = ({established}: MLSConversationState) => {
-  storage?.setItem(storageKey, JSON.stringify({established: [...established]}));
-};
+}

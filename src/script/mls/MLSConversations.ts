@@ -22,8 +22,6 @@ import {KeyPackageClaimUser} from '@wireapp/core/lib/conversation';
 
 import {Account} from '@wireapp/core';
 
-import {useMLSConversationState} from './mlsConversationState';
-
 import {ConversationRepository} from '../conversation/ConversationRepository';
 import {
   isMLSConversation,
@@ -46,15 +44,28 @@ type MLSConversationRepository = Pick<
  * @param core - the instance of the core
  */
 export async function initMLSConversations(conversations: Conversation[], core: Account): Promise<void> {
-  const mlsService = core.service?.mls;
-  if (!mlsService) {
-    throw new Error('MLS service not available');
+  const {mls: mlsService, conversation: conversationService} = core.service || {};
+  if (!mlsService || !conversationService) {
+    throw new Error('MLS or Conversation service is not available!');
   }
 
   const mlsConversations = conversations.filter(isMLSConversation);
-  await joinNewConversations(mlsConversations, core);
 
-  return mlsService.schedulePeriodicKeyMaterialRenewals(mlsConversations.map(({groupId}) => groupId));
+  await Promise.allSettled(
+    mlsConversations.map(async mlsConversation => {
+      const {groupId, qualifiedId} = mlsConversation;
+
+      const isEstablished = await conversationService.isMLSConversationEstablished(groupId);
+
+      //if group is already established, we just schedule periodic key material updates
+      if (isEstablished) {
+        return mlsService.scheduleKeyMaterialRenewal(groupId);
+      }
+
+      //otherwise we should try joining via external commit
+      return conversationService.joinByExternalCommit(qualifiedId);
+    }),
+  );
 }
 
 /**
@@ -77,21 +88,6 @@ export async function initMLSCallbacks(
     authorize: async () => true,
     userAuthorize: async () => true,
   });
-}
-
-/**
- * Will join all the conversation that the current user is part of but that are not joined by the current user's device
- *
- * @param conversations - all the conversations that the user is part of
- * @param core - the instance of the core
- */
-async function joinNewConversations(conversations: MLSConversation[], core: Account): Promise<void> {
-  // We send external proposal to all the MLS conversations that are in an unknown state (not established nor pendingWelcome)
-  await useMLSConversationState.getState().joinWithExternalCommit(
-    conversations,
-    groupId => core.service!.conversation.isMLSConversationEstablished(groupId),
-    conversationId => core.service!.conversation.joinByExternalCommit(conversationId),
-  );
 }
 
 /**

@@ -1116,6 +1116,7 @@
   "preferencesOptionsBackupHeader": "История",
   "preferencesOptionsBackupImportHeadline": "Восстановление",
   "preferencesOptionsBackupImportSecondary": "Восстановить историю можно только из резервной копии одной и той же платформы. Резервная копия перезапишет беседы на этом устройстве.",
+  "preferencesOptionsBackupTryAgain": "Повторить",
   "preferencesOptionsCall": "Звонки",
   "preferencesOptionsCallLogs": "Устранение неполадок",
   "preferencesOptionsCallLogsDetail": "Сохранить отладочный отчет вызова.  Эта информация помогает службе поддержки {{brandName}} диагностировать проблемы со звонками.",
