@@ -39,7 +39,7 @@ import {useMessageFocusedTabIndex} from './util';
 import {FailedToAddUsersMessage as FailedToAddUsersMessageEntity} from '../../../entity/message/FailedToAddUsersMessage';
 
 export enum ErrorMessageType {
-  offlineBackEnd = 'OfflineBackEnd',
+  offlineBackend = 'OfflineBackend',
   nonFullyConnectedGraph = 'NonFullyConnectedGraph',
 }
 

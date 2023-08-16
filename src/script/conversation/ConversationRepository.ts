@@ -594,7 +594,7 @@ export class ConversationRepository {
           failedToAddUsers,
           conversationEntity,
           this.userState.self().id,
-          ErrorMessageType.offlineBackEnd,
+          ErrorMessageType.offlineBackend,
         );
         await this.eventRepository.injectEvent(failedToAddUsersEvent);
       }
@@ -1618,7 +1618,12 @@ export class ConversationRepository {
         }
         if (failedToAdd.length > 0) {
           await this.eventRepository.injectEvent(
-            EventBuilder.buildFailedToAddUsersEvent(failedToAdd, conversation, this.userState.self().id),
+            EventBuilder.buildFailedToAddUsersEvent(
+              failedToAdd,
+              conversation,
+              this.userState.self().id,
+              ErrorMessageType.offlineBackend,
+            ),
             EventRepository.SOURCE.INJECTED,
           );
         }
