@@ -1441,7 +1441,8 @@ export class ConversationRepository {
     }
 
     //TODO:
-    //   this.addCreationMessage(mlsConversation, this.userState.self().isTemporaryGuest());
+    //check if this.addCreationMessage(mlsConversation, this.userState.self().isTemporaryGuest());
+    //is needed
 
     const isActiveConversation = this.conversationState.isActiveConversation(proteusConversation);
 
@@ -1454,6 +1455,8 @@ export class ConversationRepository {
 
     this.logger.info(`Deleting proteus 1:1 conversation ${proteusConversation.id}`);
     await this.deleteConversationLocally(proteusConversation.qualifiedId, true);
+
+    //TODO: maintain the list of retired proteus 1:1 conversations so they are not requested from backend anymore
   };
 
   /**
