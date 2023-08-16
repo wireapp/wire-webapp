@@ -49,7 +49,7 @@ import {MLSReturnType} from '@wireapp/core/lib/conversation';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {container} from 'tsyringe';
-import {flatten} from 'underscore';
+import {debounce, flatten} from 'underscore';
 
 import {Asset as ProtobufAsset, Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -311,7 +311,7 @@ export class ConversationRepository {
     amplify.subscribe(WebAppEvents.TEAM.MEMBER_LEAVE, this.teamMemberLeave);
     amplify.subscribe(WebAppEvents.USER.UNBLOCKED, this.onUnblockUser);
     amplify.subscribe(WebAppEvents.CONVERSATION.INJECT_LEGAL_HOLD_MESSAGE, this.injectLegalHoldMessage);
-    amplify.subscribe(WebAppEvents.FEDERATION.EVENT_FROM_BACKEND, this.onFederationEvent);
+    amplify.subscribe(WebAppEvents.FEDERATION.EVENT_FROM_BACKEND, debounce(this.onFederationEvent, 1000));
 
     this.eventService.addEventUpdatedListener(this.updateLocalMessageEntity);
     this.eventService.addEventDeletedListener(this.deleteLocalMessageEntity);
