@@ -1116,6 +1116,7 @@
   "preferencesOptionsBackupHeader": "Előzmények",
   "preferencesOptionsBackupImportHeadline": "Restore",
   "preferencesOptionsBackupImportSecondary": "Csak ugyanazon platformon készült mentést tudsz visszaállítani. A visszaállítás felülírja az eszközön jelenleg lévő beszélgetéseket.",
+  "preferencesOptionsBackupTryAgain": "Try again",
   "preferencesOptionsCall": "Calls",
   "preferencesOptionsCallLogs": "Hibaelhárítás",
   "preferencesOptionsCallLogsDetail": "Save the calling debug report. This information helps {{brandName}} Support diagnose calling problems.",

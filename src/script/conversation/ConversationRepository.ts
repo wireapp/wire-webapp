@@ -41,7 +41,6 @@ import {
   CONVERSATION_EVENT,
   FederationEvent,
   FEDERATION_EVENT,
-  ConversationMLSWelcomeEvent,
 } from '@wireapp/api-client/lib/event';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import type {BackendError} from '@wireapp/api-client/lib/http/';
@@ -131,7 +130,7 @@ import * as LegalHoldEvaluator from '../legal-hold/LegalHoldEvaluator';
 import {MessageCategory} from '../message/MessageCategory';
 import {SuperType} from '../message/SuperType';
 import {SystemMessageType} from '../message/SystemMessageType';
-import {addOtherSelfClientsToMLSConversation, useMLSConversationState} from '../mls';
+import {addOtherSelfClientsToMLSConversation} from '../mls';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {Core} from '../service/CoreSingleton';
 import type {EventRecord} from '../storage';
@@ -586,10 +585,6 @@ export class ConversationRepository {
         time: new Date().toISOString(),
         type: CONVERSATION_EVENT.CREATE,
       });
-      if (isMLSConversation && conversationEntity.groupId) {
-        // since we are the creator of the conversation, we can safely mark it as established
-        useMLSConversationState.getState().markAsEstablished(conversationEntity.groupId);
-      }
 
       const {failed_to_add: failedToAddUsers} = response.conversation;
 
@@ -2228,10 +2223,6 @@ export class ConversationRepository {
       ? {domain: '', id: eventData.conversationId}
       : qualified_conversation || {domain: '', id: conversation};
 
-    if (type === CONVERSATION_EVENT.MLS_WELCOME_MESSAGE) {
-      this.handleMLSWelcomeMessageEvent(eventJson);
-    }
-
     const inSelfConversation = this.conversationState.isSelfConversation(conversationId);
     if (inSelfConversation) {
       const typesInSelfConversation = [CONVERSATION_EVENT.MEMBER_UPDATE, ClientEvent.CONVERSATION.MESSAGE_HIDDEN];
@@ -2302,11 +2293,6 @@ export class ConversationRepository {
           throw error;
         }
       });
-  }
-
-  private handleMLSWelcomeMessageEvent(eventJson: ConversationMLSWelcomeEvent) {
-    const groupId = eventJson.data;
-    return useMLSConversationState.getState().markAsEstablished(groupId);
   }
 
   /**
@@ -2763,7 +2749,7 @@ export class ConversationRepository {
       throw new Error(`groupId not found for MLS conversation ${conversation.id}`);
     }
 
-    const isMLSConversationEstablished = await this.isMLSConversationEstablished(groupId);
+    const isMLSConversationEstablished = await this.conversationService.isMLSConversationEstablished(groupId);
 
     if (!isMLSConversationEstablished) {
       return;
@@ -2783,32 +2769,6 @@ export class ConversationRepository {
       }
     }
   }
-
-  private readonly isMLSConversationEstablished = async (groupId: string) => {
-    const mlsService = this.core.service?.mls;
-
-    if (!mlsService) {
-      throw new Error('MLS service is not available!');
-    }
-
-    const mlsConversationState = useMLSConversationState.getState();
-
-    const isMLSConversationMarkedAsEstablished = mlsConversationState.isEstablished(groupId);
-
-    if (isMLSConversationMarkedAsEstablished) {
-      return true;
-    }
-
-    const isMLSConversationEstablished = await mlsService.conversationExists(groupId);
-
-    if (isMLSConversationEstablished) {
-      //make sure MLS group is marked as established
-      mlsConversationState.markAsEstablished(groupId);
-      return true;
-    }
-
-    return false;
-  };
 
   /**
    * Members of a group conversation were removed or left.

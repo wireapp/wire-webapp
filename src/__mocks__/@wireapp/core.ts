@@ -41,6 +41,7 @@ export class Account extends EventEmitter {
       on: this.on,
       emit: this.emit,
       off: this.off,
+      scheduleKeyMaterialRenewal: jest.fn(),
     },
     asset: {
       uploadAsset: jest.fn(),
@@ -48,6 +49,7 @@ export class Account extends EventEmitter {
     conversation: {
       send: jest.fn(),
       isMLSConversationEstablished: jest.fn(),
+      joinByExternalCommit: jest.fn(),
       addUsersToMLSConversation: jest.fn(),
       messageTimer: {
         setConversationLevelTimer: jest.fn(),
