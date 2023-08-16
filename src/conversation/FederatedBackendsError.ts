@@ -38,6 +38,10 @@ export class FederatedBackendsError extends Error {
   }
 }
 
+export function isFederatedBackendsError(error: unknown): error is FederatedBackendsError {
+  return !!error && typeof error === 'object' && 'name' in error && error.name === 'FederatedBackendsError';
+}
+
 export function handleFederationErrors(error: AxiosError<any>) {
   switch (error.response?.status) {
     case FederatedBackendsErrorCode.UNREACHABLE: {
