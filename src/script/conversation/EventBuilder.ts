@@ -25,6 +25,7 @@ import {DecryptionError} from '@wireapp/core/lib/errors/DecryptionError';
 import type {REASON as AVS_REASON} from '@wireapp/avs';
 import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
+import {ErrorMessageType} from 'Components/MessagesList/Message/FailedToAddUsersMessage';
 import {createUuid} from 'Util/uuid';
 
 import {CALL_MESSAGE_TYPE} from '../calling/enum/CallMessageType';
@@ -192,7 +193,10 @@ export type FileTypeRestrictedEvent = ConversationEvent<{fileExt: string; isInco
 export type CallingTimeoutEvent = ConversationEvent<{reason: AVS_REASON.NOONE_JOINED | AVS_REASON.EVERYONE_LEFT}> & {
   type: CONVERSATION.CALL_TIME_OUT;
 };
-export type FailedToAddUsersMessageEvent = ConversationEvent<{qualifiedIds: QualifiedId[]}> & {
+export type FailedToAddUsersMessageEvent = ConversationEvent<{
+  qualifiedIds: QualifiedId[];
+  errorMessageType: ErrorMessageType;
+}> & {
   type: CONVERSATION.FAILED_TO_ADD_USERS;
 };
 
@@ -305,11 +309,13 @@ export const EventBuilder = {
     qualifiedIds: QualifiedId[],
     conversation: Conversation,
     userId: string,
+    errorMessageType: ErrorMessageType,
   ): FailedToAddUsersMessageEvent {
     return {
       ...buildQualifiedId(conversation),
       data: {
         qualifiedIds,
+        errorMessageType,
       },
       from: userId,
       id: createUuid(),

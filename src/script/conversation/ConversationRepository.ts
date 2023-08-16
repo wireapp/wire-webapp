@@ -55,6 +55,7 @@ import {Asset as ProtobufAsset, Confirmation, LegalHoldStatus} from '@wireapp/pr
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {TYPING_TIMEOUT, useTypingIndicatorState} from 'Components/InputBar/components/TypingIndicator';
+import {ErrorMessageType} from 'Components/MessagesList/Message/FailedToAddUsersMessage';
 import {getNextItem} from 'Util/ArrayUtil';
 import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from 'Util/FileTypeUtil';
 import {replaceLink, t} from 'Util/LocalizerUtil';
@@ -593,6 +594,7 @@ export class ConversationRepository {
           failedToAddUsers,
           conversationEntity,
           this.userState.self().id,
+          ErrorMessageType.offlineBackEnd,
         );
         await this.eventRepository.injectEvent(failedToAddUsersEvent);
       }

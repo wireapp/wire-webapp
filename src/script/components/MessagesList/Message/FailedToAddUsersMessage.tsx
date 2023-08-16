@@ -46,7 +46,6 @@ export enum ErrorMessageType {
 export interface FailedToAddUsersMessageProps {
   isMessageFocused: boolean;
   message: FailedToAddUsersMessageEntity;
-  errorMessageType?: ErrorMessageType;
   userState?: UserState;
 }
 
@@ -55,7 +54,6 @@ const config = Config.getConfig();
 const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
   isMessageFocused,
   message,
-  errorMessageType = ErrorMessageType.offlineBackEnd,
   userState = container.resolve(UserState),
 }) => {
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
@@ -152,7 +150,7 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
                 <span
                   css={warning}
                   dangerouslySetInnerHTML={{
-                    __html: t(`failedToAddParticipantsPluralDetails${errorMessageType}`, {
+                    __html: t(`failedToAddParticipantsPluralDetails${message.errorMessageType}`, {
                       name: domainUsers[domainUsers.length - 1].name(),
                       names:
                         domainUsers.length === 2
