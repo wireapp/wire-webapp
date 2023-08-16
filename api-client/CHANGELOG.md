@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [25.0.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@24.21.2...@wireapp/api-client@25.0.0) (2023-08-16)
+
+### Features
+
+* Handle adding users that are on an unreachable backend ([#5396](https://github.com/wireapp/wire-web-packages/issues/5396)) ([38e66e9](https://github.com/wireapp/wire-web-packages/commit/38e66e99fa2f83e74b059b74e90ba50eae4a99ba))
+
+### BREAKING CHANGES
+
+* the `addUserToProteusConversation` doesn't just return a `MemberJoinEvent` now. It also returns potential `failToAdd` users. The `MemberJoinEvent` can now be accessed with the `event` property returned by the method
+
 ## [24.21.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@24.21.1...@wireapp/api-client@24.21.2) (2023-08-16)
 
 ### Bug Fixes
