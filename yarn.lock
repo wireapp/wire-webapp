@@ -4818,9 +4818,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^24.20.2":
-  version: 24.20.2
-  resolution: "@wireapp/api-client@npm:24.20.2"
+"@wireapp/api-client@npm:^24.21.2":
+  version: 24.21.2
+  resolution: "@wireapp/api-client@npm:24.21.2"
   dependencies:
     "@wireapp/commons": ^5.1.0
     "@wireapp/priority-queue": ^2.1.1
@@ -4833,7 +4833,7 @@ __metadata:
     spark-md5: 3.0.2
     tough-cookie: 4.1.3
     ws: 8.13.0
-  checksum: 2c7dab29e72246d42d964b67cf04a0517855b2964b604b6ff978a805f613b520c5d43a4ddf81d555332f52bb8961e091696b3bab68637cdd64b61c05736ed6ae
+  checksum: 466e289b2b1e52a40545ee23f69ab14baf1ff96f6d4e3280f0f767764175ce10a485cb58033753abfee1e7e3ccf4a4842dde0ef834fe56e7fbe1419361ad6b08
   languageName: node
   linkType: hard
 
@@ -4879,27 +4879,27 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core-crypto@npm:^1.0.0-rc.1":
-  version: 1.0.0-rc.5
-  resolution: "@wireapp/core-crypto@npm:1.0.0-rc.5"
-  checksum: e7c915d89ffe775f0a393260dfe1aa41fa2c4b7b422390b6538f310f8643352a6115fe2e0f98caa8b087cd03644d81fb2f2c2765d6b177b62cf3601f8f31bad0
+"@wireapp/core-crypto@npm:1.0.0-rc.6":
+  version: 1.0.0-rc.6
+  resolution: "@wireapp/core-crypto@npm:1.0.0-rc.6"
+  checksum: 1ae7a609f265eb3b9d5e90bec15778462f334dfa918d9a3b5bce000f15ae1f0eafbd3e7231794a4381bf5ef93fbc8667661fc6d9a78e123b9a78227edd98492f
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:40.8.5":
-  version: 40.8.5
-  resolution: "@wireapp/core@npm:40.8.5"
+"@wireapp/core@npm:40.9.3":
+  version: 40.9.3
+  resolution: "@wireapp/core@npm:40.9.3"
   dependencies:
-    "@wireapp/api-client": ^24.20.2
+    "@wireapp/api-client": ^24.21.2
     "@wireapp/commons": ^5.1.0
-    "@wireapp/core-crypto": ^1.0.0-rc.1
+    "@wireapp/core-crypto": 1.0.0-rc.6
     "@wireapp/cryptobox": 12.8.0
     "@wireapp/promise-queue": ^2.2.0
     "@wireapp/protocol-messaging": 1.44.0
     "@wireapp/store-engine": 5.1.1
     "@wireapp/store-engine-dexie": ^2.1.3
     axios: 1.4.0
-    bazinga64: 6.1.1
+    bazinga64: 6.1.2
     deepmerge-ts: 5.1.0
     hash.js: 1.1.7
     http-status-codes: 2.2.0
@@ -4907,7 +4907,7 @@ __metadata:
     logdown: 3.3.1
     long: ^5.2.0
     uuidjs: 4.2.13
-  checksum: f0974588c043e7f1b96dec0d787d149147936f5319a55380241a10cbac4ff2e21800de2a106cdb1420ba4a461597308a243e65167778bb7647512fbc919e1ee5
+  checksum: b8ea3cc4f1606bea121e98b4eccf34aa1fdb4716fbfa8c8bf919ff16f0bc4f6658cbe5646f87488667b5283ea819f2db622beaf1e373d57d4ff5ef41004c4c36
   languageName: node
   linkType: hard
 
@@ -5969,10 +5969,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bazinga64@npm:6.1.1":
-  version: 6.1.1
-  resolution: "bazinga64@npm:6.1.1"
-  checksum: efc69a787ea972a009e9b24991403eab3f619dc5bd51b053f2f710c56f7be8c3f023750991c029cc7f9186a8546c0e817e88820cccfc5574689bcf24a84991c7
+"bazinga64@npm:6.1.2":
+  version: 6.1.2
+  resolution: "bazinga64@npm:6.1.2"
+  checksum: 9817214214e2c12e2f586b9dbed29a39a28d482adbc0bae797120225914d515446fa4ee9d35e9c31db4fe984af8ed2c4a44b87a7c5dec73d559fa67e3ddedb98
   languageName: node
   linkType: hard
 
@@ -17700,7 +17700,7 @@ __metadata:
     "@types/webpack-env": 1.18.1
     "@wireapp/avs": 9.3.7
     "@wireapp/copy-config": 2.1.1
-    "@wireapp/core": 40.8.5
+    "@wireapp/core": 40.9.3
     "@wireapp/eslint-config": 3.0.0
     "@wireapp/lru-cache": 3.8.1
     "@wireapp/prettier-config": 0.6.0
