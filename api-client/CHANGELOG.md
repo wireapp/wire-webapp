@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [24.21.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@24.21.1...@wireapp/api-client@24.21.2) (2023-08-16)
+
+### Bug Fixes
+
+* Handle unreachable backends when creating new conversations (WPB-3272) ([#5395](https://github.com/wireapp/wire-web-packages/issues/5395)) ([ce90086](https://github.com/wireapp/wire-web-packages/commit/ce900869a79c6f22a2490a2f9234113de9b1f7a6)), closes [#5394](https://github.com/wireapp/wire-web-packages/issues/5394)
+
 ## [24.21.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@24.21.0...@wireapp/api-client@24.21.1) (2023-08-15)
 
 ### Bug Fixes
