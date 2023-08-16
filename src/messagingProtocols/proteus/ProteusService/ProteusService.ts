@@ -19,8 +19,10 @@
 
 import type {APIClient} from '@wireapp/api-client/lib/APIClient';
 import type {PreKey, Context} from '@wireapp/api-client/lib/auth';
-import type {
+import {
   Conversation,
+  FederatedBackendsError,
+  FederatedBackendsErrorLabel,
   NewConversation,
   QualifiedOTRRecipients,
   QualifiedUserClients,
@@ -169,7 +171,33 @@ export class ProteusService {
       payload = conversationData;
     }
 
-    return this.apiClient.api.conversation.postConversation(payload);
+    return this.apiClient.api.conversation.postConversation(payload).catch(async (error: unknown) => {
+      const backendError = error as FederatedBackendsError;
+      switch (backendError.label) {
+        case FederatedBackendsErrorLabel.UNREACHABLE_BACKENDS: {
+          const {backends} = backendError;
+          const users = payload.qualified_users ?? [];
+          const availableUsers: QualifiedId[] = [];
+          const unreachableUsers: QualifiedId[] = [];
+          users.forEach(user =>
+            backends.includes(user.domain) ? unreachableUsers.push(user) : availableUsers.push(user),
+          );
+          payload = {...payload, qualified_users: availableUsers};
+          // If conversation creation returns an error because a backend is offline,
+          // we try creating the conversation again with users from available backends
+          const response = await this.apiClient.api.conversation.postConversation(payload).catch((error: unknown) => {
+            throw error;
+          });
+
+          // on a succesfull conversation creation with the available users,
+          // we append the users from an unreachable backend to the response
+          response.failed_to_add = unreachableUsers;
+          return response;
+        }
+      }
+
+      throw error;
+    });
   }
 
   public async addUsersToConversation({conversationId, qualifiedUsers}: AddUsersToProteusConversationParams) {
