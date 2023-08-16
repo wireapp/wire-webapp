@@ -20,7 +20,15 @@
 /* eslint-disable import/order */
 import * as Recipients from '../Utility/Recipients';
 
-import {ConversationProtocol, QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
+import {
+  CONVERSATION_ACCESS_ROLE,
+  CONVERSATION_TYPE,
+  Conversation,
+  ConversationProtocol,
+  FederatedBackendsError,
+  FederatedBackendsErrorLabel,
+  QualifiedUserClients,
+} from '@wireapp/api-client/lib/conversation';
 
 import {MessageSendingState, MessageTargetMode} from '../../../conversation';
 import {buildTextMessage} from '../../../conversation/message/MessageBuilder';
@@ -561,6 +569,107 @@ describe('ProteusService', () => {
         expect(result.state).toBe(MessageSendingState.OUTGOING_SENT);
         expect(result.failedToSend?.queued).toEqual({domain2: recipients.domain2});
       });
+    });
+  });
+
+  describe('createConversation', () => {
+    const newConversation: Conversation = {
+      qualified_id: {id: '', domain: ''},
+      id: '',
+      type: CONVERSATION_TYPE.REGULAR,
+      creator: '',
+      access: [],
+      access_role: [CONVERSATION_ACCESS_ROLE.GUEST],
+      members: {
+        others: [],
+        self: {
+          qualified_id: {id: '', domain: ''},
+          hidden_ref: null,
+          id: '',
+          otr_archived_ref: null,
+          otr_muted_ref: null,
+          otr_muted_status: null,
+          service: null,
+          status_ref: '',
+          status_time: '',
+        },
+      },
+      failed_to_add: [],
+      protocol: ConversationProtocol.PROTEUS,
+    };
+
+    const userDomain1 = {id: 'user-1-1', domain: 'domain1'};
+    const user2Domain1 = {id: 'user-2-1', domain: 'domain1'};
+    const userDomain2 = {id: 'user-2-2', domain: 'domain2'};
+
+    it('adds all requested users to a new conversation', async () => {
+      const [proteusService, {apiClient}] = await buildProteusService();
+
+      jest.spyOn(apiClient.api.conversation, 'postConversation').mockResolvedValueOnce({...newConversation});
+
+      const result = await proteusService.createConversation({
+        conversationData: {
+          receipt_mode: null,
+          qualified_users: [userDomain1, user2Domain1, userDomain2],
+        },
+      });
+
+      expect(result).toEqual(newConversation);
+    });
+
+    it('partially add users if some backends are unreachable', async () => {
+      const [proteusService, {apiClient}] = await buildProteusService();
+
+      const postConversationSpy = jest
+        .spyOn(apiClient.api.conversation, 'postConversation')
+        .mockRejectedValueOnce(
+          new FederatedBackendsError(FederatedBackendsErrorLabel.UNREACHABLE_BACKENDS, [userDomain1.domain]),
+        )
+        .mockResolvedValueOnce(newConversation);
+
+      const result = await proteusService.createConversation({
+        conversationData: {
+          receipt_mode: null,
+          qualified_users: [userDomain1, user2Domain1, userDomain2],
+        },
+      });
+
+      expect(postConversationSpy).toHaveBeenCalledTimes(2);
+      expect(postConversationSpy).toHaveBeenCalledWith(
+        expect.objectContaining({qualified_users: [userDomain1, user2Domain1, userDomain2]}),
+      );
+      expect(postConversationSpy).toHaveBeenCalledWith(expect.objectContaining({qualified_users: [userDomain2]}));
+
+      expect(result.failed_to_add).toEqual([userDomain1, user2Domain1]);
+    });
+
+    it('creates an empty conversation if no backend is reachable', async () => {
+      const [proteusService, {apiClient}] = await buildProteusService();
+
+      const postConversationSpy = jest
+        .spyOn(apiClient.api.conversation, 'postConversation')
+        .mockRejectedValueOnce(
+          new FederatedBackendsError(FederatedBackendsErrorLabel.UNREACHABLE_BACKENDS, [
+            userDomain1.domain,
+            userDomain2.domain,
+          ]),
+        )
+        .mockResolvedValueOnce({} as any);
+
+      const result = await proteusService.createConversation({
+        conversationData: {
+          receipt_mode: null,
+          qualified_users: [userDomain1, user2Domain1, userDomain2],
+        },
+      });
+
+      expect(postConversationSpy).toHaveBeenCalledTimes(2);
+      expect(postConversationSpy).toHaveBeenCalledWith(
+        expect.objectContaining({qualified_users: [userDomain1, user2Domain1, userDomain2]}),
+      );
+      expect(postConversationSpy).toHaveBeenCalledWith(expect.objectContaining({qualified_users: []}));
+
+      expect(result.failed_to_add).toEqual([userDomain1, user2Domain1, userDomain2]);
     });
   });
 });
