@@ -1606,12 +1606,19 @@ export class ConversationRepository {
           events.forEach(event => this.eventRepository.injectEvent(event));
         }
       } else {
-        const conversationMemberJoinEvent = await this.core.service!.conversation.addUsersToProteusConversation({
-          conversationId,
-          qualifiedUsers,
-        });
-        if (conversationMemberJoinEvent) {
-          this.eventRepository.injectEvent(conversationMemberJoinEvent, EventRepository.SOURCE.BACKEND_RESPONSE);
+        const {failedToAdd = [], event: memberJoinEvent} =
+          await this.core.service!.conversation.addUsersToProteusConversation({
+            conversationId,
+            qualifiedUsers,
+          });
+        if (memberJoinEvent) {
+          await this.eventRepository.injectEvent(memberJoinEvent, EventRepository.SOURCE.BACKEND_RESPONSE);
+        }
+        if (failedToAdd.length > 0) {
+          await this.eventRepository.injectEvent(
+            EventBuilder.buildFailedToAddUsersEvent(failedToAdd, conversation, this.userState.self().id),
+            EventRepository.SOURCE.INJECTED,
+          );
         }
       }
     } catch (error) {
