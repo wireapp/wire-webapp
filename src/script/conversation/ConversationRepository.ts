@@ -1418,32 +1418,6 @@ export class ConversationRepository {
     return conversation;
   };
 
-  private readonly isMLSConversationEstablished = async (groupId: string) => {
-    const mlsService = this.core.service?.mls;
-
-    if (!mlsService) {
-      throw new Error('MLS service is not available!');
-    }
-
-    const mlsConversationState = useMLSConversationState.getState();
-
-    const isMLSConversationMarkedAsEstablished = mlsConversationState.isEstablished(groupId);
-
-    if (isMLSConversationMarkedAsEstablished) {
-      return true;
-    }
-
-    const isMLSConversationEstablished = await mlsService.conversationExists(groupId);
-
-    if (isMLSConversationEstablished) {
-      //make sure MLS group is marked as established
-      mlsConversationState.markAsEstablished(groupId);
-      return true;
-    }
-
-    return false;
-  };
-
   /**
    * Will migrate proteus 1:1 conversation to mls 1:1 conversation.
    * All the events will be moved to the new conversation and proteus conversation will be deleted locally.
@@ -1467,9 +1441,7 @@ export class ConversationRepository {
     }
 
     //TODO:
-    // if (proteusConversation.isTeam1to1()) {
     //   this.addCreationMessage(mlsConversation, this.userState.self().isTemporaryGuest());
-    // }
 
     const isActiveConversation = this.conversationState.isActiveConversation(proteusConversation);
 
@@ -1492,34 +1464,35 @@ export class ConversationRepository {
    * @param otherUserId - id of the other user
    * @param proteusConversation - (optional) proteus 1:1 conversation
    */
-  private readonly establishMLS1to1Conversation = async (
+  public readonly establishMLS1to1Conversation = async (
     mlsConversation: MLSConversation,
     otherUserId: QualifiedId,
   ): Promise<MLSConversation> => {
-    const mlsService = this.core.service?.mls;
+    const conversationService = this.core.service?.conversation;
 
-    if (!mlsService) {
-      throw new Error('MLS service is not available!');
+    if (!conversationService) {
+      throw new Error('Conversation service is not available!');
     }
 
-    const {groupId} = mlsConversation;
+    const {groupId, qualifiedId} = mlsConversation;
 
-    //if epoch is higher that 0 it means that the group is already established but we don't have it in our local state
-    //we have to join with external commit
+    //if epoch is higher that 0 it means that the group is already established, we have to join with external commit
     if (mlsConversation.epoch > 0) {
-      await joinNewConversations([mlsConversation], this.core);
+      await conversationService.joinByExternalCommit(qualifiedId);
       return mlsConversation;
     }
 
-    //if it's not established, establish it and add the other user to the group
     const selfUserId = this.userState.self().qualifiedId;
-    await mlsService.registerConversation(groupId, [otherUserId, selfUserId], {
-      user: selfUserId,
-      client: this.core.clientId,
-    });
 
-    useMLSConversationState.getState().markAsEstablished(groupId);
-    return mlsConversation;
+    //if it's not established, establish it and add the other user to the group
+    await conversationService.establishMLS1to1Conversation(
+      groupId,
+      {client: this.core.clientId, user: selfUserId},
+      otherUserId,
+    );
+
+    //refetch the conversation to get the letest epoch and updated participants list
+    return this.fetchMLS1to1Conversation(otherUserId);
   };
 
   /**
@@ -1536,6 +1509,10 @@ export class ConversationRepository {
     this.logger.info(`Initialising MLS 1:1 conversation with user ${otherUserId.id}...`);
     const mlsConversation = await this.getMLS1to1Conversation(otherUserId);
 
+    const otherUser = await this.userRepository.getUserById(otherUserId);
+    mlsConversation.connection(otherUser.connection());
+    await this.updateParticipatingUserEntities(mlsConversation);
+
     //if mls is not supported by the other user we do not establish the group yet
     //we just mark the mls conversation as readonly and return it
     if (!isMLSSupportedByTheOtherUser) {
@@ -1546,13 +1523,14 @@ export class ConversationRepository {
       return mlsConversation;
     }
 
-    const isAlreadyEstablished = await this.isMLSConversationEstablished(mlsConversation.groupId);
+    const isAlreadyEstablished = await this.conversationService.isMLSConversationEstablished(mlsConversation.groupId);
 
     const establishedMLSConversation = isAlreadyEstablished
       ? mlsConversation
       : await this.establishMLS1to1Conversation(mlsConversation, otherUserId);
 
     this.logger.info(`MLS 1:1 conversation with user ${otherUserId.id} is established.`);
+
     return establishedMLSConversation;
   };
 
