@@ -2828,10 +2828,6 @@ export class ConversationRepository {
 
       this.verificationStateHandler.onMemberLeft(conversationEntity);
 
-      if (isFromSelf && conversationEntity.removed_from_conversation()) {
-        this.archiveConversation(conversationEntity);
-      }
-
       return {conversationEntity, messageEntity};
     }
 
