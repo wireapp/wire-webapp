@@ -32,6 +32,7 @@ import {
   TeamMemberLeaveEvent,
   ErrorEvent,
   ClientConversationEvent,
+  FederationStopEvent,
 } from './EventBuilder';
 
 import {AssetRemoteData} from '../assets/AssetRemoteData';
@@ -48,6 +49,7 @@ import {ContentMessage} from '../entity/message/ContentMessage';
 import {DecryptErrorMessage} from '../entity/message/DecryptErrorMessage';
 import {DeleteMessage} from '../entity/message/DeleteMessage';
 import {FailedToAddUsersMessage} from '../entity/message/FailedToAddUsersMessage';
+import {FederationStopMessage} from '../entity/message/FederationStopMessage';
 import {FileAsset} from '../entity/message/FileAsset';
 import {FileTypeRestrictedMessage} from '../entity/message/FileTypeRestrictedMessage';
 import {LegalHoldMessage} from '../entity/message/LegalHoldMessage';
@@ -295,6 +297,11 @@ export class EventMapper {
         break;
       }
 
+      case ClientEvent.CONVERSATION.FEDERATION_STOP: {
+        messageEntity = this._mapEventFederationStop(event);
+        break;
+      }
+
       case ClientEvent.CONVERSATION.LEGAL_HOLD_UPDATE: {
         messageEntity = this._mapEventLegalHoldUpdate(event);
         break;
@@ -485,6 +492,10 @@ export class EventMapper {
 
   _mapEventFailedToAddUsers({data, time}: LegacyEventRecord) {
     return new FailedToAddUsersMessage(data.qualifiedIds, parseInt(time, 10));
+  }
+
+  _mapEventFederationStop({data, time}: FederationStopEvent) {
+    return new FederationStopMessage(data.domains, parseInt(time, 10));
   }
 
   _mapEventLegalHoldUpdate({data, timestamp}: LegacyEventRecord) {

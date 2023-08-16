@@ -38,6 +38,7 @@ import {ContentMessageComponent} from './ContentMessage';
 import {DecryptErrorMessage} from './DecryptErrorMessage';
 import {DeleteMessage} from './DeleteMessage';
 import {FailedToAddUsersMessage} from './FailedToAddUsersMessage';
+import {FederationStopMessage} from './FederationStopMessage';
 import {FileTypeRestrictedMessage} from './FileTypeRestrictedMessage';
 import {LegalHoldMessage} from './LegalHoldMessage';
 import {MemberMessage} from './MemberMessage';
@@ -83,8 +84,6 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
   messageRepository,
   messageActions,
   teamState = container.resolve(TeamState),
-  handleFocus,
-  totalMessage,
   isMsgElementsFocusable,
 }) => {
   const findMessage = async (conversation: Conversation, messageId: string) => {
@@ -224,6 +223,9 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
   }
   if (message.isLegalHold()) {
     return <LegalHoldMessage message={message} />;
+  }
+  if (message.isFederationStop()) {
+    return <FederationStopMessage isMessageFocused={isMessageFocused} message={message} />;
   }
   if (message.isVerification()) {
     return <VerificationMessage message={message} />;

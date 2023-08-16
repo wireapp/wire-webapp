@@ -5188,9 +5188,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^24.20.3":
-  version: 24.20.3
-  resolution: "@wireapp/api-client@npm:24.20.3"
+"@wireapp/api-client@npm:^24.21.1":
+  version: 24.21.1
+  resolution: "@wireapp/api-client@npm:24.21.1"
   dependencies:
     "@wireapp/commons": ^5.1.0
     "@wireapp/priority-queue": ^2.1.1
@@ -5203,7 +5203,7 @@ __metadata:
     spark-md5: 3.0.2
     tough-cookie: 4.1.3
     ws: 8.13.0
-  checksum: 29b60507b5f93aae07e89f5c7dc0158b18edb4a9b6699aba99046d68d869659201fd20e72f480823d8f98b554b41eac1ad5feaa5fe2c738a01f123f45173d3cb
+  checksum: b92f08d0b96b43f2c6d34c79d93fa547fbd0ae1a1962eba06cec037d2af74e92037352322cdc1ead13c94b5548f0960dad402f4431a4876a556429cc0fbc1982
   languageName: node
   linkType: hard
 
@@ -5256,11 +5256,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:40.9.0":
-  version: 40.9.0
-  resolution: "@wireapp/core@npm:40.9.0"
+"@wireapp/core@npm:40.9.2":
+  version: 40.9.2
+  resolution: "@wireapp/core@npm:40.9.2"
   dependencies:
-    "@wireapp/api-client": ^24.20.3
+    "@wireapp/api-client": ^24.21.1
     "@wireapp/commons": ^5.1.0
     "@wireapp/core-crypto": 1.0.0-rc.6
     "@wireapp/cryptobox": 12.8.0
@@ -5277,7 +5277,7 @@ __metadata:
     logdown: 3.3.1
     long: ^5.2.0
     uuidjs: 4.2.13
-  checksum: 0a6de1eb4dcfb5b0079a24ca606bc95c0b289bb5c5d413e0189a144160b9f461c670b971ffd0158647043626779286406f134362bd944551ec40c842373b9178
+  checksum: 9d5f07e66345e74307424799b5eb60466bc81244f47b74d8e5fa5f3e850ebc5fa95ab963448658d7a04a71b31c284a4d9061e4d0dce111b4258dacb87cbbccf1
   languageName: node
   linkType: hard
 
@@ -5452,10 +5452,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/webapp-events@npm:0.17.0":
-  version: 0.17.0
-  resolution: "@wireapp/webapp-events@npm:0.17.0"
-  checksum: 9257321dc120d7ac33e11c2ae66cc5f04de64fed029c6d50644d86bf283044b3c74e18d487721793171333261b22de2d032266554b95d36f99da623d11d3cc10
+"@wireapp/webapp-events@npm:0.18.0":
+  version: 0.18.0
+  resolution: "@wireapp/webapp-events@npm:0.18.0"
+  checksum: 8415b690f2faf0da686caa0d909d831ba04e4bd545e612528e5d11c8d2885c7f2e64699ca3396a9b6529e2b1b0e142b61e64e167273361bd7e2c1f665370d411
   languageName: node
   linkType: hard
 
@@ -18181,7 +18181,7 @@ __metadata:
     "@types/webpack-env": 1.18.1
     "@wireapp/avs": 9.3.7
     "@wireapp/copy-config": 2.1.1
-    "@wireapp/core": 40.9.0
+    "@wireapp/core": 40.9.2
     "@wireapp/eslint-config": 3.0.0
     "@wireapp/lru-cache": 3.8.1
     "@wireapp/prettier-config": 0.6.0
@@ -18189,7 +18189,7 @@ __metadata:
     "@wireapp/store-engine": ^5.1.1
     "@wireapp/store-engine-dexie": 2.1.3
     "@wireapp/store-engine-sqleet": 1.8.9
-    "@wireapp/webapp-events": 0.17.0
+    "@wireapp/webapp-events": 0.18.0
     adm-zip: 0.5.10
     amplify: "https://github.com/wireapp/amplify#head=master"
     archiver: ^5.3.1
