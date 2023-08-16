@@ -915,6 +915,9 @@ export class ConversationAPI {
           throw new ConversationLegalholdMissingConsentError(backendError.message);
         }
       }
+      if (isAxiosError(error)) {
+        handleFederationErrors(error);
+      }
       throw error;
     }
   }
