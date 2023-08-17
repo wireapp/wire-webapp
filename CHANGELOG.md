@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [41.2.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@41.1.0...@wireapp/core@41.2.0) (2023-08-17)
+
+### Features
+
+* Handle backend non federating errors ([#5397](https://github.com/wireapp/wire-web-packages/issues/5397)) ([f00c2bf](https://github.com/wireapp/wire-web-packages/commit/f00c2bf84f03ffe98e311661e88624074fbb4425))
+
 # [41.1.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@41.0.0...@wireapp/core@41.1.0) (2023-08-17)
 
 ### Features
