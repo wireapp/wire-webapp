@@ -109,3 +109,10 @@ export interface Conversation {
 
   protocol: ConversationProtocol;
 }
+
+export interface MLSConversation extends Conversation {
+  group_id: string;
+  epoch: number;
+  cipher_suite: number;
+  protocol: ConversationProtocol.MLS;
+}
