@@ -491,7 +491,7 @@ export class EventMapper {
   }
 
   _mapEventFailedToAddUsers({data, time}: LegacyEventRecord) {
-    return new FailedToAddUsersMessage(data.qualifiedIds, parseInt(time, 10));
+    return new FailedToAddUsersMessage(data.qualifiedIds, data.reason, parseInt(time, 10));
   }
 
   _mapEventFederationStop({data, time}: FederationStopEvent) {
