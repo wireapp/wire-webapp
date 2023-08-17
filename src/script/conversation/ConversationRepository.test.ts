@@ -52,6 +52,7 @@ import {ClientEvent} from 'src/script/event/Client';
 import {EventRepository} from 'src/script/event/EventRepository';
 import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';
 import {StorageSchemata} from 'src/script/storage/StorageSchemata';
+import {generateConversation as _generateConversation} from 'test/helper/ConversationGenerator';
 import {escapeRegex} from 'Util/SanitizationUtil';
 import {createUuid} from 'Util/uuid';
 
@@ -64,27 +65,6 @@ import {Core} from '../service/CoreSingleton';
 import {LegacyEventRecord, StorageService} from '../storage';
 
 jest.deepUnmock('axios');
-
-const _generateConversation = (
-  conversation_type = CONVERSATION_TYPE.REGULAR,
-  connection_status = ConnectionStatus.ACCEPTED,
-  conversationProtocol = ConversationProtocol.PROTEUS,
-  domain = '',
-) => {
-  const conversation = new Conversation(createUuid(), domain, conversationProtocol);
-  conversation.type(conversation_type);
-
-  const connectionEntity = new ConnectionEntity();
-  connectionEntity.conversationId = conversation.qualifiedId;
-  connectionEntity.status(connection_status);
-  conversation.connection(connectionEntity);
-
-  if (conversationProtocol === ConversationProtocol.MLS) {
-    conversation.groupId = 'groupId';
-  }
-
-  return conversation;
-};
 
 describe('ConversationRepository', () => {
   const testFactory = new TestFactory();
@@ -1429,7 +1409,7 @@ describe('ConversationRepository', () => {
       spyOn(testFactory.user_repository!, 'refreshUsers').and.callFake(() => {
         unavailableUsers.map(user => {
           user.id = createUuid();
-          user.name(faker.name.fullName());
+          user.name(faker.person.fullName());
         });
       });
 
@@ -1466,11 +1446,11 @@ describe('ConversationRepository', () => {
       spyOn(testFactory.user_repository!, 'refreshUsers').and.callFake(() => {
         unavailableUsers1.map(user => {
           user.id = createUuid();
-          user.name(faker.name.fullName());
+          user.name(faker.person.fullName());
         });
         unavailableUsers2.map(user => {
           user.id = createUuid();
-          user.name(faker.name.fullName());
+          user.name(faker.person.fullName());
         });
       });
 

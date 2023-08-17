@@ -47,7 +47,7 @@ export function generateAPIUser(
     ],
     handle: faker.internet.userName(),
     id: id.id,
-    name: faker.name.fullName(),
+    name: faker.person.fullName(),
     qualified_id: id,
     ...overwites,
   };
