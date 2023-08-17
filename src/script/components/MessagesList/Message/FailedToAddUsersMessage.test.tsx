@@ -18,16 +18,21 @@
  */
 
 import {act, render} from '@testing-library/react';
+import {AddUsersFailureReasons} from '@wireapp/core/lib/conversation';
 import ko from 'knockout';
 
+import en from 'I18n/en-US.json';
 import {withTheme, generateQualifiedIds} from 'src/script/auth/util/test/TestUtil';
 import {FailedToAddUsersMessage as FailedToAddUsersMessageEntity} from 'src/script/entity/message/FailedToAddUsersMessage';
 import {User} from 'src/script/entity/User';
 import {UserRepository} from 'src/script/user/UserRepository';
 import {UserState} from 'src/script/user/UserState';
 import {TestFactory} from 'test/helper/TestFactory';
+import {setStrings} from 'Util/LocalizerUtil';
 
 import {FailedToAddUsersMessage} from './FailedToAddUsersMessage';
+
+setStrings({en});
 
 const createFailedToAddUsersMessage = (partialFailedToAddUsersMessage: Partial<FailedToAddUsersMessageEntity>) => {
   const failedToAddUsersMessage: Partial<FailedToAddUsersMessageEntity> = {
