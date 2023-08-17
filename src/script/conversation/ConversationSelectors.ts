@@ -26,6 +26,11 @@ export type MixedConversation = Conversation & {groupId: string; protocol: Conve
 export type MLSConversation = Conversation & {groupId: string; protocol: ConversationProtocol.MLS};
 export type MLSCapableConversation = MixedConversation | MLSConversation;
 
+export interface ProtocolToConversationType {
+  [ConversationProtocol.PROTEUS]: ProteusConversation;
+  [ConversationProtocol.MLS]: MLSConversation;
+}
+
 export function isProteusConversation(conversation: Conversation): conversation is ProteusConversation {
   return !conversation.groupId && conversation.protocol === ConversationProtocol.PROTEUS;
 }

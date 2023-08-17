@@ -1391,7 +1391,7 @@ export class ConversationRepository {
    * @returns MLS conversation entity
    */
   private readonly getMLS1to1Conversation = async (otherUserId: QualifiedId): Promise<MLSConversation> => {
-    const localMLSConversation = this.conversationState.findMLS1to1Conversation(otherUserId);
+    const localMLSConversation = this.conversationState.find1to1Conversation(otherUserId, ConversationProtocol.MLS);
 
     if (localMLSConversation) {
       return localMLSConversation;
@@ -1614,7 +1614,7 @@ export class ConversationRepository {
     }
 
     //if there's local mls conversation, return it
-    const localMLSConversation = this.conversationState.findMLS1to1Conversation(otherUserId);
+    const localMLSConversation = this.conversationState.find1to1Conversation(otherUserId, ConversationProtocol.MLS);
 
     //if both users support mls or mls conversation is already known, we use it
     //we never go back to proteus conversation, even if one of the users do not support mls anymore
@@ -1655,7 +1655,7 @@ export class ConversationRepository {
     //check what protocol should be used for 1:1 conversation
     const {protocol, isSupportedByTheOtherUser} = await this.getProtocolFor1to1Conversation(otherUserId);
 
-    const localMLSConversation = this.conversationState.findMLS1to1Conversation(otherUserId);
+    const localMLSConversation = this.conversationState.find1to1Conversation(otherUserId, ConversationProtocol.MLS);
 
     // It's not connection request and conversation is not accepted,
     if (!isConnectionAccepted) {
@@ -3469,7 +3469,10 @@ export class ConversationRepository {
       return;
     }
 
-    const proteus1to1Conversation = this.conversationState.findProteus1to1Conversation(otherUserId);
+    const proteus1to1Conversation = this.conversationState.find1to1Conversation(
+      otherUserId,
+      ConversationProtocol.PROTEUS,
+    );
 
     const mlsConversation = await this.initMLS1to1Conversation(otherUserId, true);
     if (proteus1to1Conversation) {
