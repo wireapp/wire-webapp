@@ -37,6 +37,8 @@ import {
   H2,
   Input,
   InputBlock,
+  Link,
+  LinkVariant,
   Loading,
   Muted,
   QUERY,
@@ -76,7 +78,7 @@ const Separator = () => {
         flex: 1,
         height: '1px',
         backgroundColor: '#696c6e',
-        minWidth: '24rem',
+        minWidth: '20rem',
       }}
     ></div>
   );
@@ -109,7 +111,8 @@ const ConversationJoinComponent = ({
   const nameInput = React.useRef<HTMLInputElement>(null);
   const {formatMessage: _} = useIntl();
 
-  const [accentColor] = useState(AccentColor.random());
+  const [isLoggedIn, setIsLoggedIn] = useState(selfName !== undefined);
+  const [accentColor] = useState(AccentColor.STRONG_BLUE);
   const [conversationCode, setConversationCode] = useState<string>();
   const [conversationKey, setConversationKey] = useState<string>();
   const [enteredName, setEnteredName] = useState<string>('');
@@ -228,6 +231,11 @@ const ConversationJoinComponent = ({
     setEnteredName(event.target.value);
   };
 
+  const handleLogout = async () => {
+    setIsLoggedIn(false);
+    await doLogout();
+  };
+
   if (!isValidLink) {
     return <ConversationJoinInvalid />;
   }
@@ -250,17 +258,58 @@ const ConversationJoinComponent = ({
             {_(conversationJoinStrings.mainHeadline)}
           </H1>
           <Muted data-uie-name="status-join-subhead">
-            {selfName
-              ? _(conversationJoinStrings.existentAccountHeadline, {
-                  brandName: Config.getConfig().BRAND_NAME,
-                  name: `${selfName.charAt(0).toUpperCase()}${selfName.slice(1)}`,
-                })
-              : _(conversationJoinStrings.headline, {brandName: Config.getConfig().BRAND_NAME})}
+            {_(conversationJoinStrings.headline, {brandName: Config.getConfig().BRAND_NAME})}
           </Muted>
         </div>
         <Columns style={{display: 'flex', gap: '2rem', alignSelf: 'center', maxWidth: '100%'}}>
           <Column>
-            <Login embedded />
+            {isLoggedIn ? (
+              <Container centerText verticalCenter style={{width: '100%', display: 'flex'}}>
+                <Columns style={{justifyContent: 'center'}}>
+                  <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
+                    <ContainerXS
+                      centerText
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <>
+                        <H2 center>{_(conversationJoinStrings.existentAccountJoinInBrowser)}</H2>
+                        <Muted style={{marginBottom: '1rem'}}>
+                          {_(conversationJoinStrings.existentAccountUserName, {selfName})}
+                        </Muted>
+
+                        <Button
+                          block
+                          type="submit"
+                          formNoValidate
+                          onClick={() => handleSubmit()}
+                          aria-label={_(conversationJoinStrings.join)}
+                          data-uie-name="do-join-as-member"
+                        >
+                          {_(conversationJoinStrings.join)}
+                        </Button>
+                        <Link
+                          variant={LinkVariant.PRIMARY}
+                          block
+                          onClick={handleLogout}
+                          textTransform={'none'}
+                          style={{fontSize: '1rem'}}
+                          data-uie-name="go-logout"
+                        >
+                          {_(conversationJoinStrings.joinWithOtherAccount)}
+                        </Link>
+                      </>
+                    </ContainerXS>
+                  </Column>
+                </Columns>
+              </Container>
+            ) : (
+              <Login embedded />
+            )}
           </Column>
           <Separator />
           <Column>

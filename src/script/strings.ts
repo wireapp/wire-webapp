@@ -389,13 +389,17 @@ export const unsupportedJoinStrings = defineMessages({
 });
 
 export const conversationJoinStrings = defineMessages({
-  existentAccountHeadline: {
-    defaultMessage: '{name}, you have been invited to join a conversation in {brandName}',
-    id: 'conversationJoin.existentAccountHeadline',
-  },
   existentAccountJoinWithoutLink: {
     defaultMessage: 'Join the conversation',
     id: 'conversationJoin.existentAccountJoinWithoutLink',
+  },
+  join: {
+    defaultMessage: 'Join',
+    id: 'conversationJoin.join',
+  },
+  joinWithOtherAccount: {
+    defaultMessage: 'Join with another account',
+    id: 'conversationJoin.joinWithOtherAccount',
   },
   existentAccountJoinWithoutText: {
     defaultMessage: '{existentAccountJoinWithoutLink} without an account',
@@ -404,6 +408,14 @@ export const conversationJoinStrings = defineMessages({
   existentAccountOpenButton: {
     defaultMessage: 'Open in {brandName}',
     id: 'conversationJoin.buttonExistentAccountOpen',
+  },
+  existentAccountJoinInBrowser: {
+    defaultMessage: 'Join in the browser',
+    id: 'conversationJoin.existentAccountJoinInBrowser',
+  },
+  existentAccountUserName: {
+    defaultMessage: 'You are logged in as {selfName}',
+    id: 'conversationJoin.existentAccountUserName',
   },
   existentAccountSubhead: {
     defaultMessage:
@@ -423,7 +435,7 @@ export const conversationJoinStrings = defineMessages({
     id: 'conversationJoin.hasAccount',
   },
   headline: {
-    defaultMessage: 'You have been invited to join a conversation in {brandName}',
+    defaultMessage: 'The conversation is hosted on {brandName}',
     id: 'conversationJoin.headline',
   },
   invalidCreateAccountLink: {
