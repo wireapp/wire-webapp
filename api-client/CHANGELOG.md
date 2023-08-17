@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [25.2.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@25.1.0...@wireapp/api-client@25.2.0) (2023-08-17)
+
+### Features
+
+* Handle backend non federating errors ([#5397](https://github.com/wireapp/wire-web-packages/issues/5397)) ([f00c2bf](https://github.com/wireapp/wire-web-packages/commit/f00c2bf84f03ffe98e311661e88624074fbb4425))
+
 # [25.1.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@25.0.0...@wireapp/api-client@25.1.0) (2023-08-17)
 
 ### Features
