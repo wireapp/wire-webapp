@@ -753,8 +753,9 @@ describe('ConversationRepository', () => {
           CONVERSATION_TYPE.REGULAR,
           undefined,
           ConversationProtocol.MLS,
-          mockDomain,
+          {domain: mockDomain, id: 'test-id'},
         );
+
         testFactory.conversation_repository['saveConversation'](conversationEntity);
 
         const memberJoinEvent = {
