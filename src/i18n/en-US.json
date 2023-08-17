@@ -529,7 +529,7 @@
   "extensionsGiphyRandom": "Random",
   "failedToAddParticipantSingularOfflineBackend": "[bold]{{name}}[/bold] could not be added to the group as the backend of [bold]{{domain}}[/bold] could not be reached.",
   "failedToAddParticipantsPlural": "[bold]{{total}} participants[/bold] could not be added to the group.",
-  "failedToAddParticipantsPluralDetailsNonFullyConnectedGraph": "[bold]{{names}}[/bold] and [bold]{{name}}[/bold] could not be added to the group as their backends do not federate with each other.",
+  "failedToAddParticipantsPluralDetailsNonFederatingBackends": "[bold]{{names}}[/bold] and [bold]{{name}}[/bold] could not be added to the group as their backends do not federate with each other.",
   "failedToAddParticipantsPluralDetailsOfflineBackend": "[bold]{{names}}[/bold] and [bold]{{name}}[/bold] could not be added to the group as the backend of [bold]{{domain}}[/bold] could not be reached.",
   "featureConfigChangeModalApplock": "Mandatory app lock is now disabled. You do not need a passcode or biometric authentication when returning to the app.",
   "featureConfigChangeModalApplockHeadline": "Team settings changed",

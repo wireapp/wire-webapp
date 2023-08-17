@@ -40,7 +40,7 @@ import {FailedToAddUsersMessage as FailedToAddUsersMessageEntity} from '../../..
 
 export enum ErrorMessageType {
   offlineBackend = 'OfflineBackend',
-  nonFullyConnectedGraph = 'NonFullyConnectedGraph',
+  nonFederatingBackends = 'NonFederatingBackends',
 }
 
 export interface FailedToAddUsersMessageProps {
