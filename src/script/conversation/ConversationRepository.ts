@@ -601,23 +601,20 @@ export class ConversationRepository {
 
       return conversationEntity;
     } catch (error) {
-      if (!isBackendError(error)) {
-        this.logger.error(error);
-        throw error;
-      }
-
-      switch (error.label) {
-        case BackendErrorLabel.CLIENT_ERROR:
-          this.handleTooManyMembersError();
-          break;
-        case BackendErrorLabel.NOT_CONNECTED:
-          await this.handleUsersNotConnected(userEntities.map(user => user.qualifiedId));
-          break;
-        case BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT:
-          this.showLegalHoldConsentError();
-          break;
-        default:
-          this.logger.error(error);
+      if (isBackendError(error)) {
+        switch (error.label) {
+          case BackendErrorLabel.CLIENT_ERROR:
+            this.handleTooManyMembersError();
+            break;
+          case BackendErrorLabel.NOT_CONNECTED:
+            await this.handleUsersNotConnected(userEntities.map(user => user.qualifiedId));
+            break;
+          case BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT:
+            this.showLegalHoldConsentError();
+            break;
+          default:
+            this.logger.error(error);
+        }
       }
       throw error;
     }
