@@ -1441,9 +1441,9 @@ export class ConversationRepository {
       await this.eventService.moveEventsToConversation(proteusConversation.id, mlsConversation.id);
     }
 
-    //TODO:
-    //check if this.addCreationMessage(mlsConversation, this.userState.self().isTemporaryGuest());
-    //is needed
+    if (!mlsConversation.hasCreationMessage) {
+      this.addCreationMessage(mlsConversation, this.userState.self().isTemporaryGuest());
+    }
 
     const isActiveConversation = this.conversationState.isActiveConversation(proteusConversation);
 
@@ -1677,9 +1677,11 @@ export class ConversationRepository {
     //if it's accepted, initialise conversation so it's ready to be used
     if (protocol === ConversationProtocol.MLS || localMLSConversation) {
       const mlsConversation = await this.initMLS1to1Conversation(otherUserId, isSupportedByTheOtherUser);
+
       if (localProteusConversation && isProteusConversation(localProteusConversation)) {
         await this.replaceProteus1to1WithMLS(localProteusConversation, mlsConversation);
       }
+
       return mlsConversation;
     }
 
