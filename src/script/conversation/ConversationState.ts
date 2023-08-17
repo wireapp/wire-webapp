@@ -26,7 +26,13 @@ import {container, singleton} from 'tsyringe';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {sortGroupsByLastEvent} from 'Util/util';
 
-import {MLSConversation, isMLSConversation, isSelfConversation} from './ConversationSelectors';
+import {
+  MLSConversation,
+  ProteusConversation,
+  isMLSConversation,
+  isProteusConversation,
+  isSelfConversation,
+} from './ConversationSelectors';
 
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
@@ -197,19 +203,42 @@ export class ConversationState {
    * Find a local MLS 1:1 conversation by user Id.
    * @returns Conversation is locally available
    */
-  findMLS1to1Conversation(userId: QualifiedId): MLSConversation | undefined {
-    return this.conversations().find((conversation): conversation is MLSConversation => {
-      const conversationMembersIds = conversation.participating_user_ids();
-      const otherUserId = conversationMembersIds[0];
+  findMLS1to1Conversation(userId: QualifiedId): MLSConversation | null {
+    return (
+      this.conversations().find((conversation): conversation is MLSConversation => {
+        const conversationMembersIds = conversation.participating_user_ids();
+        const otherUserId = conversationMembersIds[0];
 
-      return (
-        isMLSConversation(conversation) &&
-        conversation.type() === CONVERSATION_TYPE.ONE_TO_ONE &&
-        conversationMembersIds.length === 1 &&
-        otherUserId &&
-        otherUserId.id === userId.id
-      );
-    });
+        return (
+          conversation.type() === CONVERSATION_TYPE.ONE_TO_ONE &&
+          isMLSConversation(conversation) &&
+          conversationMembersIds.length === 1 &&
+          otherUserId &&
+          otherUserId.id === userId.id
+        );
+      }) || null
+    );
+  }
+
+  /**
+   * Find a local Proteus 1:1 conversation by user Id.
+   * @returns Proteus 1:1 conversation if locally available
+   */
+  findProteus1to1Conversation(userId: QualifiedId): ProteusConversation | null {
+    return (
+      this.conversations().find((conversation): conversation is ProteusConversation => {
+        const conversationMembersIds = conversation.participating_user_ids();
+        const otherUserId = conversationMembersIds[0];
+
+        return (
+          conversation.type() === CONVERSATION_TYPE.ONE_TO_ONE &&
+          isProteusConversation(conversation) &&
+          conversationMembersIds.length === 1 &&
+          otherUserId &&
+          otherUserId.id === userId.id
+        );
+      }) || null
+    );
   }
 
   isSelfConversation(conversationId: QualifiedId): boolean {
