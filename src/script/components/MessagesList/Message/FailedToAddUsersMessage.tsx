@@ -111,7 +111,7 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
               <span
                 css={warning}
                 dangerouslySetInnerHTML={{
-                  __html: t(`failedToAddParticipantSingularOfflineBackEnd`, {
+                  __html: t(`failedToAddParticipantSingularOfflineBackend`, {
                     name: users[0].name(),
                     domain: users[0].domain,
                   }),
