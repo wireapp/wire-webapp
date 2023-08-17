@@ -45,7 +45,7 @@ import {
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import type {BackendError} from '@wireapp/api-client/lib/http/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
-import {MLSReturnType} from '@wireapp/core/lib/conversation';
+import {AddUsersFailureReasons, MLSReturnType} from '@wireapp/core/lib/conversation';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {container} from 'tsyringe';
@@ -55,7 +55,6 @@ import {Asset as ProtobufAsset, Confirmation, LegalHoldStatus} from '@wireapp/pr
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {TYPING_TIMEOUT, useTypingIndicatorState} from 'Components/InputBar/components/TypingIndicator';
-import {ErrorMessageType} from 'Components/MessagesList/Message/FailedToAddUsersMessage';
 import {getNextItem} from 'Util/ArrayUtil';
 import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from 'Util/FileTypeUtil';
 import {replaceLink, t} from 'Util/LocalizerUtil';
@@ -594,7 +593,7 @@ export class ConversationRepository {
           failedToAddUsers,
           conversationEntity,
           this.userState.self().id,
-          ErrorMessageType.offlineBackend,
+          AddUsersFailureReasons.UNREACHABLE_BACKENDS,
         );
         await this.eventRepository.injectEvent(failedToAddUsersEvent);
       }
@@ -1605,7 +1604,7 @@ export class ConversationRepository {
           events.forEach(event => this.eventRepository.injectEvent(event));
         }
       } else {
-        const {failedToAdd = [], event: memberJoinEvent} =
+        const {failedToAdd, event: memberJoinEvent} =
           await this.core.service!.conversation.addUsersToProteusConversation({
             conversationId,
             qualifiedUsers,
@@ -1613,13 +1612,13 @@ export class ConversationRepository {
         if (memberJoinEvent) {
           await this.eventRepository.injectEvent(memberJoinEvent, EventRepository.SOURCE.BACKEND_RESPONSE);
         }
-        if (failedToAdd.length > 0) {
+        if (failedToAdd) {
           await this.eventRepository.injectEvent(
             EventBuilder.buildFailedToAddUsersEvent(
-              failedToAdd,
+              failedToAdd.users,
               conversation,
               this.userState.self().id,
-              ErrorMessageType.offlineBackend,
+              failedToAdd.reason,
             ),
             EventRepository.SOURCE.INJECTED,
           );

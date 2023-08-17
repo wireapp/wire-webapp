@@ -19,6 +19,7 @@
 
 import React, {useMemo, useState} from 'react';
 
+import {AddUsersFailureReasons} from '@wireapp/core/lib/conversation';
 import {container} from 'tsyringe';
 import {groupBy} from 'underscore';
 
@@ -38,16 +39,16 @@ import {useMessageFocusedTabIndex} from './util';
 
 import {FailedToAddUsersMessage as FailedToAddUsersMessageEntity} from '../../../entity/message/FailedToAddUsersMessage';
 
-export enum ErrorMessageType {
-  offlineBackend = 'OfflineBackend',
-  nonFederatingBackends = 'NonFederatingBackends',
-}
-
 export interface FailedToAddUsersMessageProps {
   isMessageFocused: boolean;
   message: FailedToAddUsersMessageEntity;
   userState?: UserState;
 }
+
+const errorMessageType = {
+  [AddUsersFailureReasons.NON_FEDERATING_BACKENDS]: 'NonFederatingBackends',
+  [AddUsersFailureReasons.UNREACHABLE_BACKENDS]: 'OfflineBackend',
+} as const;
 
 const config = Config.getConfig();
 
@@ -150,7 +151,7 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
                 <span
                   css={warning}
                   dangerouslySetInnerHTML={{
-                    __html: t(`failedToAddParticipantsPluralDetails${message.errorMessageType}`, {
+                    __html: t(`failedToAddParticipantsPluralDetails${errorMessageType[message.reason]}`, {
                       name: domainUsers[domainUsers.length - 1].name(),
                       names:
                         domainUsers.length === 2

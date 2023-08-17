@@ -20,12 +20,12 @@
 import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data/';
 import {ConversationOtrMessageAddEvent, CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
+import {AddUsersFailureReasons} from '@wireapp/core/lib/conversation';
 import {DecryptionError} from '@wireapp/core/lib/errors/DecryptionError';
 
 import type {REASON as AVS_REASON} from '@wireapp/avs';
 import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
-import {ErrorMessageType} from 'Components/MessagesList/Message/FailedToAddUsersMessage';
 import {createUuid} from 'Util/uuid';
 
 import {CALL_MESSAGE_TYPE} from '../calling/enum/CallMessageType';
@@ -195,7 +195,7 @@ export type CallingTimeoutEvent = ConversationEvent<{reason: AVS_REASON.NOONE_JO
 };
 export type FailedToAddUsersMessageEvent = ConversationEvent<{
   qualifiedIds: QualifiedId[];
-  errorMessageType: ErrorMessageType;
+  reason: AddUsersFailureReasons;
 }> & {
   type: CONVERSATION.FAILED_TO_ADD_USERS;
 };
@@ -309,13 +309,13 @@ export const EventBuilder = {
     qualifiedIds: QualifiedId[],
     conversation: Conversation,
     userId: string,
-    errorMessageType: ErrorMessageType,
+    reason: AddUsersFailureReasons,
   ): FailedToAddUsersMessageEvent {
     return {
       ...buildQualifiedId(conversation),
       data: {
         qualifiedIds,
-        errorMessageType,
+        reason,
       },
       from: userId,
       id: createUuid(),
