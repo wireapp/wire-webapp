@@ -18,7 +18,7 @@
  */
 
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
-import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
 import {container, singleton} from 'tsyringe';
@@ -27,8 +27,7 @@ import {matchQualifiedIds} from 'Util/QualifiedId';
 import {sortGroupsByLastEvent} from 'Util/util';
 
 import {
-  MLSConversation,
-  ProteusConversation,
+  ProtocolToConversationType,
   isMLSConversation,
   isProteusConversation,
   isSelfConversation,
@@ -200,45 +199,37 @@ export class ConversationState {
   }
 
   /**
-   * Find a local MLS 1:1 conversation by user Id.
-   * @returns Conversation is locally available
+   * Find a local 1:1 conversation by user Id and procotol (proteus or mls).
+   * @returns Conversation if locally available, otherwise null
    */
-  findMLS1to1Conversation(userId: QualifiedId): MLSConversation | null {
-    return (
-      this.conversations().find((conversation): conversation is MLSConversation => {
+  find1to1Conversation<Protocol extends ConversationProtocol.PROTEUS | ConversationProtocol.MLS>(
+    userId: QualifiedId,
+    protocol: Protocol,
+  ): ProtocolToConversationType[Protocol] | null {
+    const foundConversation = this.conversations().find(
+      (conversation): conversation is ProtocolToConversationType[Protocol] => {
+        const doesProtocolMatch =
+          protocol === ConversationProtocol.PROTEUS
+            ? isProteusConversation(conversation)
+            : isMLSConversation(conversation);
+
+        if (!doesProtocolMatch) {
+          return false;
+        }
+
+        if (!conversation.is1to1()) {
+          return false;
+        }
+
         const conversationMembersIds = conversation.participating_user_ids();
-        const otherUserId = conversationMembersIds[0];
+        const otherUserQualifiedId = conversationMembersIds.length === 1 ? conversationMembersIds[0] : null;
+        const doesUserIdMatch = !!otherUserQualifiedId && otherUserQualifiedId.id === userId.id;
 
-        return (
-          conversation.type() === CONVERSATION_TYPE.ONE_TO_ONE &&
-          isMLSConversation(conversation) &&
-          conversationMembersIds.length === 1 &&
-          otherUserId &&
-          otherUserId.id === userId.id
-        );
-      }) || null
+        return doesUserIdMatch;
+      },
     );
-  }
 
-  /**
-   * Find a local Proteus 1:1 conversation by user Id.
-   * @returns Proteus 1:1 conversation if locally available
-   */
-  findProteus1to1Conversation(userId: QualifiedId): ProteusConversation | null {
-    return (
-      this.conversations().find((conversation): conversation is ProteusConversation => {
-        const conversationMembersIds = conversation.participating_user_ids();
-        const otherUserId = conversationMembersIds[0];
-
-        return (
-          conversation.type() === CONVERSATION_TYPE.ONE_TO_ONE &&
-          isProteusConversation(conversation) &&
-          conversationMembersIds.length === 1 &&
-          otherUserId &&
-          otherUserId.id === userId.id
-        );
-      }) || null
-    );
+    return foundConversation || null;
   }
 
   isSelfConversation(conversationId: QualifiedId): boolean {
