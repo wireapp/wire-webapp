@@ -434,4 +434,44 @@ export class ConversationService {
       }
     }
   }
+
+  /**
+   * Will try registering mls 1:1 conversation adding the other user.
+   * If it fails and the conversation is already established, it will try joining via external commit instead.
+   *
+   * @param mlsConversation - mls 1:1 conversation
+   * @param selfUser - user and client ids of the self user
+   * @param otherUserId - id of the other user
+   */
+  public readonly establishMLS1to1Conversation = async (
+    groupId: string,
+    selfUser: {user: QualifiedId; client: string},
+    otherUserId: QualifiedId,
+  ): Promise<void> => {
+    try {
+      await this.mlsService.registerConversation(groupId, [otherUserId, selfUser.user], selfUser);
+    } catch (error) {
+      this.logger.info(`Could not register MLS group with id ${groupId}.`);
+
+      const mlsConversation = await this.apiClient.api.conversation.getMLS1to1Conversation(otherUserId);
+
+      if (mlsConversation.epoch > 0) {
+        this.logger.info(
+          `Conversation (id ${mlsConversation.qualified_id.id}) is already established, joining via external commit`,
+        );
+
+        // If its already established, we join with external commit
+        await this.joinByExternalCommit(mlsConversation.qualified_id);
+        return;
+      }
+
+      this.logger.info(
+        `Conversation (id ${mlsConversation.qualified_id.id}) is not established, retrying to establish it`,
+      );
+
+      // If conversation is not established, we can wipe it and try to establish it again
+      await this.wipeMLSConversation(groupId);
+      return this.establishMLS1to1Conversation(groupId, selfUser, otherUserId);
+    }
+  };
 }

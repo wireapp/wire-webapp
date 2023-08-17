@@ -18,7 +18,7 @@
  */
 
 import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client';
-import {Conversation, ConversationProtocol} from '@wireapp/api-client/lib/conversation';
+import {Conversation, ConversationProtocol, MLSConversation} from '@wireapp/api-client/lib/conversation';
 
 import {APIClient} from '@wireapp/api-client';
 import {GenericMessage} from '@wireapp/protocol-messaging';
@@ -48,6 +48,8 @@ const mockedMLSService = {
   commitPendingProposals: () => Promise.resolve(),
   getEpoch: () => Promise.resolve(),
   joinByExternalCommit: jest.fn(),
+  registerConversation: jest.fn(),
+  wipeConversation: jest.fn(),
 } as unknown as MLSService;
 
 const mockedProteusService = {
@@ -211,6 +213,72 @@ describe('ConversationService', () => {
 
       await conversationService.handleEpochMismatch();
       expect(conversationService.joinByExternalCommit).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('establishMLS1to1Conversation', () => {
+    it('successfully register an MLS group if it did not exist before', async () => {
+      const [conversationService, {mlsService}] = buildConversationService();
+
+      const mockGroupId = 'mock-group-id';
+      const selfUser = {user: {id: 'self-user-id', domain: 'staging.zinfra.io'}, client: 'self-user-client-id'};
+      const otherUserId = {id: 'other-user-id', domain: 'staging.zinfra.io'};
+
+      await conversationService.establishMLS1to1Conversation(mockGroupId, selfUser, otherUserId);
+
+      expect(mlsService.registerConversation).toHaveBeenCalledTimes(1);
+      expect(mlsService.registerConversation).toHaveBeenCalledWith(mockGroupId, [otherUserId, selfUser.user], selfUser);
+      expect(mlsService.joinByExternalCommit).not.toHaveBeenCalled();
+      expect(mlsService.wipeConversation).not.toHaveBeenCalled();
+    });
+
+    it('joins with external commit if epoch number is higher than 0', async () => {
+      const [conversationService, {apiClient, mlsService}] = buildConversationService();
+
+      const mockConversationId = {id: 'mock-conversation-id', domain: 'staging.zinfra.io'};
+      const mockGroupId = 'mock-group-id';
+
+      const selfUser = {user: {id: 'self-user-id', domain: 'staging.zinfra.io'}, client: 'self-user-client-id'};
+      const otherUserId = {id: 'other-user-id', domain: 'staging.zinfra.io'};
+
+      jest.spyOn(mlsService, 'registerConversation').mockRejectedValueOnce(undefined);
+      jest.spyOn(apiClient.api.conversation, 'getMLS1to1Conversation').mockResolvedValueOnce({
+        qualified_id: mockConversationId,
+        protocol: ConversationProtocol.MLS,
+        epoch: 1,
+        group_id: mockGroupId,
+      } as unknown as MLSConversation);
+
+      await conversationService.establishMLS1to1Conversation(mockGroupId, selfUser, otherUserId);
+
+      expect(mlsService.registerConversation).toHaveBeenCalledTimes(1);
+      expect(mlsService.registerConversation).toHaveBeenCalledWith(mockGroupId, [otherUserId, selfUser.user], selfUser);
+
+      expect(conversationService.joinByExternalCommit).toHaveBeenCalledWith(mockConversationId);
+    });
+
+    it('retries to register mls group if epoch number is equal 0', async () => {
+      const [conversationService, {apiClient, mlsService}] = buildConversationService();
+
+      const mockConversationId = {id: 'mock-conversation-id', domain: 'staging.zinfra.io'};
+      const mockGroupId = 'mock-group-id';
+
+      const selfUser = {user: {id: 'self-user-id', domain: 'staging.zinfra.io'}, client: 'self-user-client-id'};
+      const otherUserId = {id: 'other-user-id', domain: 'staging.zinfra.io'};
+
+      jest.spyOn(mlsService, 'registerConversation').mockRejectedValueOnce(undefined);
+      jest.spyOn(apiClient.api.conversation, 'getMLS1to1Conversation').mockResolvedValueOnce({
+        qualified_id: mockConversationId,
+        protocol: ConversationProtocol.MLS,
+        epoch: 0,
+        group_id: mockGroupId,
+      } as unknown as MLSConversation);
+
+      await conversationService.establishMLS1to1Conversation(mockGroupId, selfUser, otherUserId);
+
+      expect(mlsService.registerConversation).toHaveBeenCalledWith(mockGroupId, [otherUserId, selfUser.user], selfUser);
+      expect(mlsService.wipeConversation).toHaveBeenCalledWith(mockGroupId);
+      expect(mlsService.registerConversation).toHaveBeenCalledTimes(2);
     });
   });
 
