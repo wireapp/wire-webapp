@@ -21,11 +21,12 @@ import {AxiosError} from 'axios';
 
 export enum FederatedBackendsErrorLabel {
   UNREACHABLE_BACKENDS = 'UnreachableBackendsError',
-  NOT_CONNECTED_BACKENDS = 'NotConnectedBackendsError',
+  NON_FEDERATING_BACKENDS = 'NonFederatingBackendsError',
 }
 
 enum FederatedBackendsErrorCode {
-  UNREACHABLE = 533,
+  NON_FEDERATING = 409, // When 2 users' backend are not connected to each others
+  UNREACHABLE = 533, // When a backend is not reachable for the current user
 }
 
 export class FederatedBackendsError extends Error {
@@ -48,6 +49,13 @@ export function handleFederationErrors(error: AxiosError<any>) {
       throw new FederatedBackendsError(
         FederatedBackendsErrorLabel.UNREACHABLE_BACKENDS,
         error.response.data.unreachable_backends,
+      );
+    }
+
+    case FederatedBackendsErrorCode.NON_FEDERATING: {
+      throw new FederatedBackendsError(
+        FederatedBackendsErrorLabel.NON_FEDERATING_BACKENDS,
+        error.response.data.non_federating_backends,
       );
     }
   }
