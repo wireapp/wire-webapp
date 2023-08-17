@@ -548,6 +548,8 @@
   "featureConfigChangeModalSelfDeletingMessagesDescriptionItemEnabled": "Self-deleting messages are enabled. You can set a timer before writing a message.",
   "featureConfigChangeModalSelfDeletingMessagesDescriptionItemEnforced": "Self-deleting messages are now mandatory. New messages will self-delete after {{timeout}}.",
   "featureConfigChangeModalSelfDeletingMessagesHeadline": "There has been a change in {{brandName}}",
+  "federationConnectionRemove": "The backends [bold]{{backendUrlOne}}[/bold] and [bold]{{backendUrlTwo}}[/bold] stopped federating.",
+  "federationDelete": "[bold]Your backend[/bold] stopped federating with [bold]{{backendUrl}}.[/bold]",
   "fileTypeRestrictedIncoming": "File from&nbsp;[bold]{{name}}[/bold]&nbsp;can’t be opened",
   "fileTypeRestrictedOutgoing": "Sharing files with the {{fileExt}} extension is not permitted by your organization",
   "folderViewTooltip": "Mappák",

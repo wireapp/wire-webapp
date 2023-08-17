@@ -548,6 +548,8 @@
   "featureConfigChangeModalSelfDeletingMessagesDescriptionItemEnabled": "Selbstlöschende Nachrichten sind aktiviert. Sie können einen Timer setzen, bevor Sie eine Nachricht schreiben.",
   "featureConfigChangeModalSelfDeletingMessagesDescriptionItemEnforced": "Selbstlöschende Nachrichten sind ab jetzt verbindlich. Neue Nachrichten werden nach {{timeout}} gelöscht.",
   "featureConfigChangeModalSelfDeletingMessagesHeadline": "Es gab eine Änderung bei {{brandName}}",
+  "federationConnectionRemove": "The backends [bold]{{backendUrlOne}}[/bold] and [bold]{{backendUrlTwo}}[/bold] stopped federating.",
+  "federationDelete": "[bold]Your backend[/bold] stopped federating with [bold]{{backendUrl}}.[/bold]",
   "fileTypeRestrictedIncoming": "Datei von&nbsp;[bold]{{name}}[/bold]&nbsp;kann nicht geöffnet werden",
   "fileTypeRestrictedOutgoing": "Das Senden und Empfangen von Dateien mit der Endung {{fileExt}} ist in Ihrer Organisation nicht erlaubt",
   "folderViewTooltip": "Ordner",
