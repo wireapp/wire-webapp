@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2023 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,11 +17,16 @@
  *
  */
 
-export {Account, ConnectionState, ProcessedEventPayload} from './Account';
-export * as auth from './auth/';
-export * as conversation from './conversation/';
-export {CoreError} from './CoreError';
-export * as cryptography from './cryptography/';
-export * as util from './util';
-export * as MessageBuilder from './conversation/message/MessageBuilder';
-export * as errors from './errors';
+/**
+ * This error means we are trying to add users that are parts of 2 backends that are not federating with each other to a new conversation.
+ */
+export class NonFederatingBackendsError extends Error {
+  constructor(public readonly backends: string[]) {
+    super('2 backends are not connected');
+    this.name = 'NonFederatingBackendError';
+  }
+}
+
+export function isNonFederatingBackendsError(error: unknown): error is NonFederatingBackendsError {
+  return !!error && typeof error === 'object' && 'name' in error && error.name === 'NonFederatingBackendError';
+}

@@ -53,6 +53,11 @@ import {mapQualifiedUserClientIdsToFullyQualifiedClientIds} from '../../util/ful
 import {RemoteData} from '../content';
 import {isSendingMessage, sendMessage} from '../message/messageSender';
 
+export enum AddUsersFailureReasons {
+  NON_FEDERATING_BACKENDS = 'NON_FEDERATING_BACKENDS',
+  UNREACHABLE_BACKENDS = 'UNREACHABLE_BACKENDS',
+}
+
 export class ConversationService {
   public readonly messageTimer: MessageTimer;
   private readonly logger = logdown('@wireapp/core/ConversationService');
@@ -99,18 +104,16 @@ export class ConversationService {
   /**
    * Create a group conversation.
    *
+   * This method might fail with a `BackendsNotConnectedError` if there are users from not connected backends that are part of the payload
+   *
    * @note Do not include yourself as the requestor
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/createGroupConversation
    *
    * @param conversationData Payload object for group creation
    * @returns Resolves when the conversation was created
    */
-  public async createProteusConversation(conversationData: NewConversation): Promise<Conversation>;
-  public async createProteusConversation(
-    conversationData: NewConversation | string,
-    otherUserIds?: string | string[],
-  ): Promise<Conversation> {
-    return this.proteusService.createConversation({conversationData, otherUserIds});
+  public async createProteusConversation(conversationData: NewConversation): Promise<Conversation> {
+    return this.proteusService.createConversation(conversationData);
   }
 
   public async getConversation(conversationId: QualifiedId): Promise<Conversation> {

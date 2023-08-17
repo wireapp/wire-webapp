@@ -91,28 +91,17 @@ describe('createConversation', () => {
     it('when a new conversation object is given', async () => {
       const proteusService = await prepareProteusService();
       const conversationData = createConversationResult as unknown as NewConversation;
-      const returnData = await proteusService.createConversation({conversationData});
+      const returnData = await proteusService.createConversation(conversationData);
 
       expect(returnData).toStrictEqual(createConversationResult);
     });
 
     it('create a new conversation with no name', async () => {
       const proteusService = await prepareProteusService();
-      const otherUserIds = ['user1', 'user2'];
       const conversationData = {users: ['user1', 'user2'], receipt_mode: null};
-      const returnData = await proteusService.createConversation({conversationData, otherUserIds});
+      const returnData = await proteusService.createConversation(conversationData);
 
       expect(returnData).toStrictEqual(conversationData);
-    });
-
-    it('when a conversation string and userIds are given', async () => {
-      const proteusService = await prepareProteusService();
-
-      const otherUserIds = ['user1', 'user2'];
-      const conversationData = 'test';
-      const returnData = await proteusService.createConversation({conversationData, otherUserIds});
-
-      expect(returnData).toStrictEqual(createConversationResult);
     });
   });
 });
