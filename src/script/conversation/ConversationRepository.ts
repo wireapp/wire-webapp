@@ -41,6 +41,7 @@ import {
   CONVERSATION_EVENT,
   FederationEvent,
   FEDERATION_EVENT,
+  ConversationMLSWelcomeEvent,
 } from '@wireapp/api-client/lib/event';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import type {BackendError} from '@wireapp/api-client/lib/http/';
@@ -1446,17 +1447,16 @@ export class ConversationRepository {
 
     const isActiveConversation = this.conversationState.isActiveConversation(proteusConversation);
 
+    this.logger.info(`Deleting proteus 1:1 conversation ${proteusConversation.id}`);
+    await this.deleteConversationLocally(proteusConversation.qualifiedId, true);
+    //TODO: maintain the list of retired proteus 1:1 conversations so they are not requested from backend anymore
+
     if (isActiveConversation) {
       this.logger.info(
         `Proteus 1:1 conversation ${proteusConversation.id} is active conversation, showing mls 1:1 conversation ${mlsConversation.id}`,
       );
       amplify.publish(WebAppEvents.CONVERSATION.SHOW, mlsConversation, {});
     }
-
-    this.logger.info(`Deleting proteus 1:1 conversation ${proteusConversation.id}`);
-    await this.deleteConversationLocally(proteusConversation.qualifiedId, true);
-
-    //TODO: maintain the list of retired proteus 1:1 conversations so they are not requested from backend anymore
   };
 
   /**
@@ -1608,10 +1608,18 @@ export class ConversationRepository {
       `Protocol for 1:1 conversation ${conversation.id} with user ${otherUserId.id} is ${protocol}, isSupportedByTheOtherUser: ${isSupportedByTheOtherUser}`,
     );
 
-    //if both users support mls or mls conversation is already established, we use it
+    //when called with mls conversation, we just initialise it
+    if (isMLSConversation(conversation)) {
+      return this.initMLS1to1Conversation(otherUserId, isSupportedByTheOtherUser);
+    }
+
+    //if there's local mls conversation, return it
+    const localMLSConversation = this.conversationState.findMLS1to1Conversation(otherUserId);
+
+    //if both users support mls or mls conversation is already known, we use it
     //we never go back to proteus conversation, even if one of the users do not support mls anymore
     //(e.g. due to the change of supported protocols in team configuration)
-    if (protocol === ConversationProtocol.MLS || isMLSConversation(conversation)) {
+    if (protocol === ConversationProtocol.MLS || localMLSConversation) {
       const mlsConversation = await this.initMLS1to1Conversation(otherUserId, isSupportedByTheOtherUser);
       if (isProteusConversation(conversation)) {
         await this.replaceProteus1to1WithMLS(conversation, mlsConversation);
@@ -1647,26 +1655,27 @@ export class ConversationRepository {
     //check what protocol should be used for 1:1 conversation
     const {protocol, isSupportedByTheOtherUser} = await this.getProtocolFor1to1Conversation(otherUserId);
 
-    //if it's not connection request and conversation is not accepted,
-    if (!isConnectionAccepted) {
-      const localMLSConversation = this.conversationState.findMLS1to1Conversation(otherUserId);
+    const localMLSConversation = this.conversationState.findMLS1to1Conversation(otherUserId);
 
+    // It's not connection request and conversation is not accepted,
+    if (!isConnectionAccepted) {
       //if we already know mls 1:1 conversation, we use it, even if proteus protocol was now choosen as common
       //we do not support switching back to proteus after mls conversation was established
       //only proteus -> mls migration is supported, never the other way around
-      if (localMLSConversation) {
-        //make sure proteus conversation is gone, we don't want to see it anymore
-        if (localProteusConversation && isProteusConversation(localProteusConversation)) {
-          await this.replaceProteus1to1WithMLS(localProteusConversation, localMLSConversation);
-        }
-        return localMLSConversation;
+      if (!localMLSConversation) {
+        return protocol === ConversationProtocol.PROTEUS ? localProteusConversation : undefined;
       }
 
-      return protocol === ConversationProtocol.PROTEUS ? localProteusConversation : undefined;
+      //make sure proteus conversation is gone, we don't want to see it anymore
+      if (localProteusConversation && isProteusConversation(localProteusConversation)) {
+        await this.replaceProteus1to1WithMLS(localProteusConversation, localMLSConversation);
+      }
+
+      return localMLSConversation;
     }
 
     //if it's accepted, initialise conversation so it's ready to be used
-    if (protocol === ConversationProtocol.MLS) {
+    if (protocol === ConversationProtocol.MLS || localMLSConversation) {
       const mlsConversation = await this.initMLS1to1Conversation(otherUserId, isSupportedByTheOtherUser);
       if (localProteusConversation && isProteusConversation(localProteusConversation)) {
         await this.replaceProteus1to1WithMLS(localProteusConversation, mlsConversation);
@@ -2753,6 +2762,9 @@ export class ConversationRepository {
       case CONVERSATION_EVENT.RENAME:
         return this.onRename(conversationEntity, eventJson, eventSource === EventRepository.SOURCE.WEB_SOCKET);
 
+      case CONVERSATION_EVENT.MLS_WELCOME_MESSAGE:
+        return this.onMLSWelcomeMessage(conversationEntity, eventJson);
+
       case ClientEvent.CONVERSATION.ASSET_ADD:
         return this.onAssetAdd(conversationEntity, eventJson);
 
@@ -3435,6 +3447,34 @@ export class ConversationRepository {
     const {messageEntity} = await this.addEventToConversation(conversationEntity, eventJson);
     ConversationMapper.updateProperties(conversationEntity, eventJson.data);
     return {conversationEntity, messageEntity};
+  }
+
+  /**
+   * User has received a welcome message in a conversation.
+   *
+   * @param conversationEntity Conversation entity user has received a welcome message in
+   * @param eventJson JSON data of 'conversation.mls-welcome' event
+   * @returns Resolves when the event was handled
+   */
+  private async onMLSWelcomeMessage(conversationEntity: Conversation, eventJson: ConversationMLSWelcomeEvent) {
+    // If we receive a welcome message in mls 1:1 conversation, we need to make sure proteus 1:1 is hidden (if it exists)
+
+    if (conversationEntity.type() !== CONVERSATION_TYPE.ONE_TO_ONE || !isMLSConversation(conversationEntity)) {
+      return;
+    }
+
+    const otherUserId = eventJson.qualified_from;
+
+    if (!otherUserId) {
+      return;
+    }
+
+    const proteus1to1Conversation = this.conversationState.findProteus1to1Conversation(otherUserId);
+
+    const mlsConversation = await this.initMLS1to1Conversation(otherUserId, true);
+    if (proteus1to1Conversation) {
+      await this.replaceProteus1to1WithMLS(proteus1to1Conversation, mlsConversation);
+    }
   }
 
   /**
