@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [25.1.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@25.0.0...@wireapp/api-client@25.1.0) (2023-08-17)
+
+### Features
+
+* **core:** establish mls 1to1 ([#5393](https://github.com/wireapp/wire-web-packages/issues/5393)) ([8ee8c83](https://github.com/wireapp/wire-web-packages/commit/8ee8c8349fe2b21ef6574b494cb394e3045a52d4))
+
 # [25.0.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@24.21.2...@wireapp/api-client@25.0.0) (2023-08-16)
 
 ### Features
