@@ -19,12 +19,14 @@
 
 import React from 'react';
 
-import {render, fireEvent, act} from '@testing-library/react';
+import {render, act, fireEvent, waitFor} from '@testing-library/react';
 
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {t} from 'Util/LocalizerUtil';
 
 import {MessageReactions, MessageReactionsProps} from './MessageReactions';
+
+import {MessageActionsId} from '../MessageActions';
 
 const thumbsUpEmoji = '👍';
 const likeEmoji = '❤️';
@@ -45,18 +47,32 @@ describe('MessageReactions', () => {
     jest.clearAllMocks();
   });
 
-  test('outside click should close the emoji picker', () => {
-    const {getByLabelText, getByTestId, queryByTestId} = render(
-      <div ref={wrapperRef}>
-        <MessageReactions {...defaultProps} />
-      </div>,
+  test('outside click should close the emoji picker', async () => {
+    let currentMsgActionName = defaultProps.currentMsgActionName; // preserve initial value
+
+    const MessageReactionsComponent = (props: MessageReactionsProps) => {
+      return (
+        <div ref={wrapperRef}>
+          <MessageReactions {...props} />
+        </div>
+      );
+    };
+    const {getByLabelText, getByTestId, queryByTestId, rerender} = render(
+      <MessageReactionsComponent {...defaultProps} />,
     );
 
     const emojiButton = getByLabelText(t('accessibility.messageActionsMenuEmoji'));
-    fireEvent.click(emojiButton);
+
+    act(() => {
+      fireEvent.click(emojiButton);
+      currentMsgActionName = MessageActionsId.EMOJI; // Update the value
+      rerender(<MessageReactionsComponent {...defaultProps} currentMsgActionName={currentMsgActionName} />);
+    });
 
     const emojiPickerDialogId = 'emoji-picker-dialog';
-    expect(getByTestId(emojiPickerDialogId)).toBeDefined();
+    await waitFor(() => {
+      expect(getByTestId(emojiPickerDialogId)).toBeDefined();
+    });
 
     act(() => {
       fireEvent.click(document);

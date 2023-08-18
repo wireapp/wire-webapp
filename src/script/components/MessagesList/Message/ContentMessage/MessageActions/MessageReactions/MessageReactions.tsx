@@ -17,7 +17,7 @@
  *
  */
 
-import {useState, useEffect, useCallback, RefObject, FC, useRef} from 'react';
+import {useState, useCallback, RefObject, FC, useRef} from 'react';
 
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {KEY} from 'Util/KeyboardUtil';
@@ -83,12 +83,6 @@ const MessageReactions: FC<MessageReactionsProps> = ({
     resetActionMenuStates();
     setShowEmojis(false);
   };
-
-  useEffect(() => {
-    if (currentMsgActionName !== MessageActionsId.EMOJI && showEmojis) {
-      setShowEmojis(false);
-    }
-  }, [currentMsgActionName, showEmojis]);
 
   const handleReactionCurrentState = useCallback(
     (actionName = '') => {
