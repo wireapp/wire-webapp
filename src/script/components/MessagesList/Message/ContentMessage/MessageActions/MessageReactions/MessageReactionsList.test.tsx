@@ -20,6 +20,7 @@
 import {render, fireEvent, within} from '@testing-library/react';
 
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {createUuid} from 'Util/uuid';
 
 import {MessageReactionsList, MessageReactionsListProps} from './MessageReactionsList';
 
@@ -36,6 +37,7 @@ const defaultProps: MessageReactionsListProps = {
   isMessageFocused: false,
   onLastReactionKeyEvent: jest.fn(),
   isRemovedFromConversation: false,
+  userId: createUuid(),
 };
 
 describe('MessageReactionsList', () => {
@@ -56,16 +58,16 @@ describe('MessageReactionsList', () => {
     expect(winkButton).toHaveLength(1);
     expect(thumbsUpButton).toHaveLength(1);
 
-    const smileyFaceCount = within(smileyFace1[0]).getByText('(3)');
+    const smileyFaceCount = within(smileyFace1[0]).getByText('3');
     expect(smileyFaceCount).toBeDefined();
 
-    const winkFaceCount = within(winkButton[0]).getByText('(1)');
+    const winkFaceCount = within(winkButton[0]).getByText('1');
     expect(winkFaceCount).toBeDefined();
 
-    const thumbsUpButtonCount = within(winkButton[0]).getByText('(1)');
+    const thumbsUpButtonCount = within(winkButton[0]).getByText('1');
     expect(thumbsUpButtonCount).toBeDefined();
 
-    const smileyFace2Count = within(winkButton[0]).getByText('(1)');
+    const smileyFace2Count = within(winkButton[0]).getByText('1');
     expect(smileyFace2Count).toBeDefined();
   });
 
