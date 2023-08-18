@@ -231,7 +231,7 @@ export const PrimaryModalComponent: FC = () => {
                     }
                     autoComplete="password"
                     pattern=".{2,64}"
-                    helperText={t('accountForm.passwordHelp', {
+                    helperText={t('backupPasswordHint', {
                       minPasswordLength: Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH.toString(),
                     })}
                   />

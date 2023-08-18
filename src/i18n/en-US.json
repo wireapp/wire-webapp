@@ -230,6 +230,7 @@
   "backupImportIncompatibleErrorHeadline": "Wrong backup",
   "backupImportIncompatibleErrorSecondary": "You cannot restore history from a different account.",
   "backupImportPasswordErrorHeadline": "Wrong Password",
+  "backupPasswordHint": "Use at least {{minPasswordLength}} characters, with one lowercase letter, one capital letter, a number, and a special character.",
   "backupImportPasswordErrorSecondary": "Please verify your input and try again",
   "backupImportProgressHeadline": "Preparing…",
   "backupImportProgressSecondary": "Restoring history · {{processed}} of {{total}} — {{progress}}%",
