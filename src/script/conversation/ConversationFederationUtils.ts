@@ -41,12 +41,16 @@ export function processFederationDeleteEvent(
   };
 
   conversations.forEach(conversation => {
-    if (conversation.domain === deletedDomain && !conversation.is1to1()) {
+    const is1to1 = conversation.is1to1();
+    const firstUserEntity = conversation.firstUserEntity();
+    const allUserEntities = conversation.allUserEntities();
+
+    if (conversation.domain === deletedDomain && !is1to1) {
       result.conversationsToLeave.push(conversation);
-    } else if (conversation.is1to1() && conversation.firstUserEntity().qualifiedId.domain === deletedDomain) {
+    } else if (is1to1 && firstUserEntity.qualifiedId.domain === deletedDomain) {
       result.conversationsToDisable.push(conversation);
     } else {
-      const usersToDelete = conversation.allUserEntities().filter(user => user.domain === deletedDomain);
+      const usersToDelete = allUserEntities.filter(user => user.domain === deletedDomain);
       if (usersToDelete.length > 0) {
         result.conversationsToDeleteUsers.push({conversation, users: usersToDelete});
       }
