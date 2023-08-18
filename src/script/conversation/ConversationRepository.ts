@@ -76,6 +76,7 @@ import {ACCESS_STATE} from './AccessState';
 import {extractClientDiff} from './ClientMismatchUtil';
 import {updateAccessRights} from './ConversationAccessPermission';
 import {ConversationEphemeralHandler} from './ConversationEphemeralHandler';
+import {processFederationDeleteEvent} from './ConversationFederationUtils';
 import {ConversationFilter} from './ConversationFilter';
 import {ConversationLabelRepository} from './ConversationLabelRepository';
 import {ConversationDatabaseData, ConversationMapper} from './ConversationMapper';
@@ -345,36 +346,25 @@ export class ConversationRepository {
    * @param deletedDomain the domain that stopped federating
    */
   private onFederationDelete = async (deletedDomain: string) => {
-    const conversationsToLeave = this.conversationState
-      .conversations()
-      .filter(conversation => conversation.domain === deletedDomain);
+    const {conversationsToDeleteUsers, conversationsToLeave, conversationsToDisable} = processFederationDeleteEvent(
+      deletedDomain,
+      this.conversationState.conversations(),
+    );
 
     conversationsToLeave.forEach(async conversation => {
-      await this.insertFederationStopSystemMessage(conversation, [deletedDomain]);
-      if (conversation.is1to1()) {
-        conversation.status(ConversationStatus.PAST_MEMBER);
-        return;
-      }
-
       await this.leaveConversation(conversation, {clearContent: false, localOnly: true});
+      await this.insertFederationStopSystemMessage(conversation, [deletedDomain]);
     });
 
-    const conversationsToRemoveTheirDeletedDomainUsers = this.conversationState
-      .conversations()
-      .filter(conversation => conversation.domain !== deletedDomain);
-
-    conversationsToRemoveTheirDeletedDomainUsers.forEach(async conversation => {
-      if (conversation.is1to1() && conversation.firstUserEntity().qualifiedId.domain === deletedDomain) {
-        conversation.status(ConversationStatus.PAST_MEMBER);
-        await this.insertFederationStopSystemMessage(conversation, [deletedDomain]);
-        return;
-      }
-      const usersToRemove = conversation.allUserEntities().filter(user => user.domain === deletedDomain);
-      if (usersToRemove.length === 0) {
-        return;
-      }
+    conversationsToDisable.forEach(async conversation => {
+      conversation.status(ConversationStatus.PAST_MEMBER);
+      conversation.firstUserEntity().markConnectionAsUnknown();
       await this.insertFederationStopSystemMessage(conversation, [deletedDomain]);
-      await this.removeDeletedFederationUsers(conversation, usersToRemove);
+    });
+
+    conversationsToDeleteUsers.forEach(async ({conversation, users}) => {
+      await this.insertFederationStopSystemMessage(conversation, [deletedDomain]);
+      await this.removeDeletedFederationUsers(conversation, users);
     });
   };
 
