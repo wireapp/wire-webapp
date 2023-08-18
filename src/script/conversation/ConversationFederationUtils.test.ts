@@ -22,7 +22,7 @@ import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
 import {generateConversation} from 'test/helper/ConversationGenerator';
 import {generateUser} from 'test/helper/UserGenerator';
 
-import {processFederationDeleteEvent, FederationDeleteResult} from './ConversationFederationUtils'; // Update the import path as needed
+import {processFederationDeleteEvent, FederationDeleteResult} from './ConversationFederationUtils';
 
 import {Conversation} from '../entity/Conversation';
 
