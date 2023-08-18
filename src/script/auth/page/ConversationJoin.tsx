@@ -66,7 +66,7 @@ const ConversationJoinComponent = ({
   const nameInput = React.useRef<HTMLInputElement>(null);
   const {formatMessage: _} = useIntl();
 
-  const [isLoggedIn, setIsLoggedIn] = useState(selfName !== undefined);
+  const [isLoggedIn, setIsLoggedIn] = useState(selfName !== null);
   const [accentColor] = useState(AccentColor.STRONG_BLUE);
   const [conversationCode, setConversationCode] = useState<string>();
   const [conversationKey, setConversationKey] = useState<string>();
@@ -208,15 +208,15 @@ const ConversationJoinComponent = ({
         onCookiePolicyBannerClose={() => setShowCookiePolicyBanner(false)}
       >
         <AppAlreadyOpen />
-        <div css={{display: 'flex', alignItems: 'center', flexDirection: 'column', marginBottom: '2rem'}}>
-          <H1 css={{fontWeight: 500, marginTop: '0', marginBottom: '1rem'}} data-uie-name="status-join-headline">
+        <div style={{display: 'flex', alignItems: 'center', flexDirection: 'column', marginBottom: '2rem'}}>
+          <H1 style={{fontWeight: 500, marginTop: '0', marginBottom: '1rem'}} data-uie-name="status-join-headline">
             {_(conversationJoinStrings.mainHeadline)}
           </H1>
           <Muted data-uie-name="status-join-subhead">
             {_(conversationJoinStrings.headline, {brandName: Config.getConfig().BRAND_NAME})}
           </Muted>
         </div>
-        <Columns css={{display: 'flex', gap: '2rem', alignSelf: 'center', maxWidth: '100%'}}>
+        <Columns style={{display: 'flex', gap: '2rem', alignSelf: 'center', maxWidth: '100%'}}>
           <Column>
             {isLoggedIn ? (
               <IsLoggedInColumn selfName={selfName} handleLogout={handleLogout} handleSubmit={handleSubmit} />

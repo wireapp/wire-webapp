@@ -19,7 +19,6 @@
 
 import React from 'react';
 
-import {error} from 'jquery';
 import {useIntl} from 'react-intl';
 
 import {
@@ -43,15 +42,13 @@ import {
 import {conversationJoinStrings} from '../../strings';
 import {parseValidationErrors, parseError} from '../util/errorUtil';
 
-type Props = React.HTMLProps<HTMLDivElement>;
-
-interface IsLoggedInColumnProps extends Props {
+interface IsLoggedInColumnProps {
   selfName: string;
   handleSubmit: () => void;
   handleLogout: () => void;
 }
 
-interface GuestLoginColumnProps extends Props {
+interface GuestLoginColumnProps {
   handleSubmit: () => void;
   enteredName: string;
   onNameChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -67,7 +64,7 @@ const Separator = () => {
   const isMobile = useMatchMedia(QUERY.mobile);
   const Line = () => (
     <div
-      css={{
+      style={{
         flex: 1,
         height: '1px',
         backgroundColor: '#696c6e',
@@ -77,7 +74,7 @@ const Separator = () => {
   );
   return (
     <div
-      css={{
+      style={{
         display: 'flex',
         alignItems: 'center',
         maxWidth: `${!isMobile ? '4rem' : '100%'}`,
@@ -94,12 +91,12 @@ const Separator = () => {
 const IsLoggedInColumn = ({handleLogout, handleSubmit, selfName}: IsLoggedInColumnProps) => {
   const {formatMessage: _} = useIntl();
   return (
-    <Container centerText verticalCenter css={{width: '100%', display: 'flex'}}>
-      <Columns css={{justifyContent: 'center'}}>
-        <Column css={{flexBasis: 384, flexGrow: 0, padding: 0}}>
+    <Container centerText verticalCenter style={{width: '100%', display: 'flex'}}>
+      <Columns style={{justifyContent: 'center'}}>
+        <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
           <ContainerXS
             centerText
-            css={{
+            style={{
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
@@ -108,7 +105,7 @@ const IsLoggedInColumn = ({handleLogout, handleSubmit, selfName}: IsLoggedInColu
           >
             <>
               <H2 center>{_(conversationJoinStrings.existentAccountJoinInBrowser)}</H2>
-              <Muted css={{marginBottom: '1rem'}}>
+              <Muted style={{marginBottom: '1rem'}}>
                 {_(conversationJoinStrings.existentAccountUserName, {selfName})}
               </Muted>
 
@@ -127,7 +124,7 @@ const IsLoggedInColumn = ({handleLogout, handleSubmit, selfName}: IsLoggedInColu
                 block
                 onClick={handleLogout}
                 textTransform={'none'}
-                css={{fontSize: '1rem'}}
+                style={{fontSize: '1rem'}}
                 data-uie-name="go-logout"
               >
                 {_(conversationJoinStrings.joinWithOtherAccount)}
@@ -148,16 +145,17 @@ const GuestLoginColumn = ({
   isValidName,
   checkNameValidity,
   conversationError,
+  error,
 }: GuestLoginColumnProps) => {
   const {formatMessage: _} = useIntl();
 
   return (
-    <Container centerText verticalCenter css={{width: '100%'}}>
-      <Columns>
-        <Column css={{flexBasis: 384, flexGrow: 0, padding: 0}}>
+    <Container centerText verticalCenter style={{width: '100%'}}>
+      <Columns style={{justifyContent: 'center'}}>
+        <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
           <ContainerXS
             centerText
-            css={{
+            style={{
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
@@ -166,7 +164,7 @@ const GuestLoginColumn = ({
             <>
               <H2 center>{_(conversationJoinStrings.noAccountHead)}</H2>
               <Muted>{_(conversationJoinStrings.subhead)}</Muted>
-              <Form css={{marginTop: 30}}>
+              <Form style={{marginTop: 30}}>
                 <InputBlock>
                   <Input
                     id="enter-name"
