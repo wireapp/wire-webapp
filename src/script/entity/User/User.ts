@@ -17,6 +17,8 @@
  *
  */
 
+import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import ko from 'knockout';
@@ -45,7 +47,6 @@ export class User {
   public isService: boolean;
   public isSingleSignOn: boolean;
   public isNoPasswordSSO: boolean;
-  public joaatHash: number;
   public providerId?: string;
   public readonly accent_color: ko.PureComputed<string>;
   public readonly accent_id: ko.Observable<number>;
@@ -98,6 +99,7 @@ export class User {
   /** The federated domain (when the user is on a federated server) */
   public domain: string;
   public readonly isBlockedLegalHold: ko.PureComputed<boolean>;
+  public readonly supportedProtocols: ko.Observable<null | ConversationProtocol[]>;
 
   static get ACCENT_COLOR() {
     return {
@@ -135,7 +137,6 @@ export class User {
     this.providerId = undefined;
     this.serviceId = undefined;
 
-    this.joaatHash = -1;
     this.isAvailable = ko.pureComputed(() => this.id !== '' && this.name() !== '');
 
     this.accent_id = ko.observable(ACCENT_ID.BLUE);
@@ -146,6 +147,8 @@ export class User {
     this.phone = ko.observable();
 
     this.name = ko.observable('');
+
+    this.supportedProtocols = ko.observable<null | ConversationProtocol[]>(null);
 
     this.managedBy = ko.observable(User.CONFIG.MANAGED_BY.WIRE);
 
@@ -239,6 +242,10 @@ export class User {
       return '';
     }
     return this.isFederated ? `@${this.username()}@${this.domain}` : `@${this.username()}`;
+  }
+
+  markConnectionAsUnknown() {
+    this.connection().status(ConnectionStatus.UNKNOWN);
   }
 
   addClient(new_client_et: ClientEntity): boolean {

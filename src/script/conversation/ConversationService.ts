@@ -45,11 +45,14 @@ import {container} from 'tsyringe';
 
 import {getLogger, Logger} from 'Util/Logger';
 
+import {MLSConversation} from './ConversationSelectors';
+
 import type {Conversation as ConversationEntity} from '../entity/Conversation';
 import type {EventService} from '../event/EventService';
 import {MessageCategory} from '../message/MessageCategory';
 import {search as fullTextSearch} from '../search/FullTextSearch';
 import {APIClient} from '../service/APIClientSingleton';
+import {Core} from '../service/CoreSingleton';
 import {StorageService} from '../storage';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
 import {StorageSchemata} from '../storage/StorageSchemata';
@@ -62,6 +65,7 @@ export class ConversationService {
     eventService: EventService,
     private readonly storageService = container.resolve(StorageService),
     private readonly apiClient = container.resolve(APIClient),
+    private readonly core = container.resolve(Core),
   ) {
     this.eventService = eventService;
     this.logger = getLogger('ConversationService');
@@ -394,5 +398,22 @@ export class ConversationService {
     return events
       .filter(record => record.ephemeral_expires !== true)
       .filter(({data: event_data}: any) => fullTextSearch(event_data.content, query));
+  }
+
+  /**
+   * Wipes MLS conversation in corecrypto and deletes the conversation state.
+   * @param mlsConversation mls conversation
+   */
+  async wipeMLSConversation(mlsConversation: MLSConversation) {
+    const {groupId} = mlsConversation;
+    return this.core.service!.conversation.wipeMLSConversation(groupId);
+  }
+
+  /**
+   * Checks if MLS conversation is established.
+   * @param groupId id of the MLS group
+   */
+  async isMLSConversationEstablished(groupId: string): Promise<boolean> {
+    return this.core.service!.conversation.isMLSConversationEstablished(groupId);
   }
 }

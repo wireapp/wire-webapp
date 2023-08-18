@@ -77,7 +77,7 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
   isFederated = false,
 }) => {
   const {isGroup, roles} = useKoSubscribableChildren(activeConversation, ['isGroup', 'roles']);
-  const {isTemporaryGuest} = useKoSubscribableChildren(currentUser, ['isTemporaryGuest']);
+  const {isTemporaryGuest, isAvailable} = useKoSubscribableChildren(currentUser, ['isTemporaryGuest', 'isAvailable']);
   const {classifiedDomains, isTeam, team} = useKoSubscribableChildren(teamState, [
     'classifiedDomains',
     'isTeam',
@@ -156,7 +156,7 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
           classifiedDomains={classifiedDomains}
         />
 
-        {!currentUser.isMe && (
+        {!currentUser.isMe && isAvailable && (
           <div className="conversation-details__devices">
             <button
               className="panel__action-item"
@@ -176,7 +176,7 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
           </div>
         )}
 
-        {canChangeRole && (
+        {canChangeRole && isAvailable && (
           <>
             <div className="conversation-details__admin">
               <div

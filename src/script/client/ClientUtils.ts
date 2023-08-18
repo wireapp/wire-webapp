@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2020 Wire Swiss GmbH
+ * Copyright (C) 2023 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,10 +17,16 @@
  *
  */
 
-import path from 'path';
-import {execSync} from 'child_process';
+import {RegisteredClient} from '@wireapp/api-client/lib/client';
 
-const root = path.resolve(__dirname, '..');
-const config = path.join(root, 'crowdin.yaml');
-const identity = path.join(root, 'keys/crowdin.yaml');
-execSync(`crowdin upload sources --config="${config}" --identity="${identity}"`, {stdio: [0, 1]});
+import {weeksPassedSinceDate} from 'Util/TimeUtil';
+
+export const wasClientActiveWithinLast4Weeks = ({last_active: lastActiveISODate}: RegisteredClient): boolean => {
+  //if client has not requested /notifications endpoint yet with backend supporting last_active field, we assume it is not active
+  if (!lastActiveISODate) {
+    return false;
+  }
+
+  const passedWeeksSinceLastActive = weeksPassedSinceDate(new Date(lastActiveISODate));
+  return passedWeeksSinceLastActive <= 4;
+};

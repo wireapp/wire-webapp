@@ -36,6 +36,8 @@ import {
   LinkVariant,
   COLOR_V2,
   H2,
+  QUERY,
+  useMatchMedia,
 } from '@wireapp/react-ui-kit';
 
 import {Icon} from 'Components/Icon';
@@ -51,6 +53,9 @@ import {
   containerCSS,
   headerCSS,
   listCSS,
+  mobileButtonsCSS,
+  mobileButtonCSS,
+  mobileTextCSS,
   teamImageCSS,
   textCSS,
 } from './OauthPermissions.styles';
@@ -86,6 +91,7 @@ const OAuthPermissionsComponent = ({
 }: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
   const [teamImage, setTeamImage] = React.useState<string | ArrayBuffer | undefined>(undefined);
+  const isMobile = useMatchMedia(QUERY.mobile);
 
   const [oAuthApp, setOAuthApp] = useState<OAuthClient | null>(null);
   const oauthParams = oAuthParams(window.location);
@@ -118,7 +124,11 @@ const OAuthPermissionsComponent = ({
           setTeamImage(teamImageBlob && (await loadDataUrl(teamImageBlob)));
         }
       }
-      setOAuthApp(!!oauthParams.client_id ? await getOAuthApp(oauthParams.client_id) : null);
+      if (oauthParams.client_id) {
+        setOAuthApp(!!oauthParams.client_id ? await getOAuthApp(oauthParams.client_id) : null);
+      } else {
+        throw Error('OAuth client not found');
+      }
     };
     getUserData().catch(error => {
       console.error(error);
@@ -193,13 +203,13 @@ const OAuthPermissionsComponent = ({
                 </Text>
               </Box>
             )}
-            <Text muted css={textCSS} data-uie-name="oauth-details">
+            <Text muted css={isMobile ? mobileTextCSS : textCSS} data-uie-name="oauth-details">
               {_(oauthStrings.details)}
             </Text>
-            <div css={buttonsCSS}>
+            <div css={isMobile ? mobileButtonsCSS : buttonsCSS}>
               <Button
                 variant={ButtonVariant.SECONDARY}
-                css={buttonCSS}
+                css={isMobile ? mobileButtonCSS : buttonCSS}
                 type="button"
                 onClick={onCancel}
                 data-uie-name="do-oauth-cancel"
@@ -212,7 +222,7 @@ const OAuthPermissionsComponent = ({
                 {_(oauthStrings.cancel)}
               </Button>
               <Button
-                css={buttonCSS}
+                css={isMobile ? mobileButtonCSS : buttonCSS}
                 type="button"
                 onClick={onContinue}
                 data-uie-name="do-oauth-allow"

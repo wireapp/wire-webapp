@@ -22,6 +22,7 @@ import {FC, useContext, useEffect, useState} from 'react';
 import {container} from 'tsyringe';
 
 import {LoadingBar} from 'Components/LoadingBar/LoadingBar';
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {ClientState} from 'src/script/client/ClientState';
 import {User} from 'src/script/entity/User';
 import {ContentState} from 'src/script/page/useAppState';
@@ -137,7 +138,37 @@ const HistoryExport: FC<HistoryExportProps> = ({switchContent, user, clientState
 
   const onCancel = () => backupRepository.cancelAction();
 
+  const getBackUpPassword = (): Promise<string> => {
+    return new Promise(resolve => {
+      PrimaryModal.show(PrimaryModal.type.PASSWORD_ADVANCED_SECURITY, {
+        primaryAction: {
+          action: async (password: string) => {
+            resolve(password);
+          },
+          text: t('backupEncryptionModalAction'),
+        },
+        secondaryAction: [
+          {
+            action: () => {
+              resolve('');
+              dismissExport();
+            },
+            text: t('backupEncryptionModalCloseBtn'),
+          },
+        ],
+        passwordOptional: true,
+        text: {
+          closeBtnLabel: t('backupEncryptionModalCloseBtn'),
+          input: t('backupEncryptionModalPlaceholder'),
+          message: t('backupEncryptionModalMessage'),
+          title: t('backupEncryptionModalTitle'),
+        },
+      });
+    });
+  };
+
   const exportHistory = async () => {
+    const password = await getBackUpPassword();
     setHistoryState(ExportState.PREPARING);
     setHasError(false);
 
@@ -148,7 +179,12 @@ const HistoryExport: FC<HistoryExportProps> = ({switchContent, user, clientState
       setNumberOfRecords(numberOfRecords);
       setNumberOfProcessedRecords(0);
 
-      const archiveBlob = await backupRepository.generateHistory(user, clientState.currentClient().id, onProgress);
+      const archiveBlob = await backupRepository.generateHistory(
+        user,
+        clientState.currentClient().id,
+        onProgress,
+        password,
+      );
 
       onSuccess(archiveBlob);
       logger.log(`Completed export of '${numberOfRecords}' records from history`);

@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2022 Wire Swiss GmbH
+ * Copyright (C) 2023 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,4 +17,20 @@
  *
  */
 
-export * from './mlsConversationState';
+import {Message} from './Message';
+
+import {SuperType} from '../../message/SuperType';
+
+/**
+ * Federation stop system message
+ */
+export class FederationStopMessage extends Message {
+  constructor(
+    public readonly domains: string[],
+    timestamp: number,
+  ) {
+    super();
+    this.super_type = SuperType.FEDERATION_STOP;
+    this.timestamp(timestamp);
+  }
+}

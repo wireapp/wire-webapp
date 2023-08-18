@@ -44,7 +44,7 @@ import {PanelState} from '../page/RightSidebar';
 import {useAppMainState} from '../page/state';
 import {ContentState, useAppState} from '../page/useAppState';
 import {generateConversationUrl} from '../router/routeGenerator';
-import {navigate} from '../router/Router';
+import {navigate, setHistoryParam} from '../router/Router';
 import type {UserRepository} from '../user/UserRepository';
 import {UserState} from '../user/UserState';
 
@@ -76,7 +76,10 @@ export class ContentViewModel {
     return this.mainViewModel.isFederated;
   }
 
-  constructor(mainViewModel: MainViewModel, public repositories: ViewModelRepositories) {
+  constructor(
+    mainViewModel: MainViewModel,
+    public repositories: ViewModelRepositories,
+  ) {
     this.userState = container.resolve(UserState);
     this.conversationState = container.resolve(ConversationState);
 
@@ -213,6 +216,9 @@ export class ContentViewModel {
       this.changeConversation(conversationEntity, messageEntity);
       this.showContent(ContentState.CONVERSATION);
       this.previousConversation = this.conversationState.activeConversation();
+      setHistoryParam(
+        generateConversationUrl({id: conversationEntity?.id ?? '', domain: conversationEntity?.domain ?? ''}),
+      );
 
       if (openNotificationSettings) {
         rightSidebar.goTo(PanelState.NOTIFICATIONS, {entity: this.conversationState.activeConversation() ?? null});

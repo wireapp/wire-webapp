@@ -19,16 +19,28 @@
 
 import {FC, useEffect, useState} from 'react';
 
+import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
+
 import {Icon} from 'Components/Icon';
 import {LoadingBar} from 'Components/LoadingBar/LoadingBar';
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {User} from 'src/script/entity/User';
 import {ContentState} from 'src/script/page/useAppState';
+import {checkBackupEncryption} from 'Util/BackupUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {loadFileBuffer} from 'Util/util';
 
+import {BackupFileUpload} from './BackupFileUpload';
+
 import {BackupRepository} from '../../backup/BackupRepository';
-import {CancelError, DifferentAccountError, IncompatibleBackupError} from '../../backup/Error';
+import {
+  CancelError,
+  DifferentAccountError,
+  IncompatibleBackupError,
+  IncompatibleBackupFormatError,
+  InvalidPassword,
+} from '../../backup/Error';
 import {Config} from '../../Config';
 import {MotionDuration} from '../../motion/MotionDuration';
 
@@ -112,20 +124,69 @@ const HistoryImport: FC<HistoryImportProps> = ({user, backupRepository, file, sw
     } else if (error instanceof IncompatibleBackupError) {
       setErrorHeadline(t('backupImportVersionErrorHeadline'));
       setErrorSecondary(t('backupImportVersionErrorSecondary', Config.getConfig().BRAND_NAME));
+    } else if (error instanceof IncompatibleBackupFormatError) {
+      setErrorHeadline(t('backupImportFormatErrorHeadline'));
+      setErrorSecondary(t('backupImportFormatErrorSecondary'));
+    } else if (error instanceof InvalidPassword) {
+      setErrorHeadline(t('backupImportPasswordErrorHeadline'));
+      setErrorSecondary(t('backupImportPasswordErrorSecondary'));
     } else {
       setErrorHeadline(t('backupImportGenericErrorHeadline'));
       setErrorSecondary(t('backupImportGenericErrorSecondary'));
     }
   };
 
+  const getBackUpPassword = (): Promise<string> => {
+    return new Promise(resolve => {
+      PrimaryModal.show(PrimaryModal.type.PASSWORD_ADVANCED_SECURITY, {
+        primaryAction: {
+          action: async (password: string) => {
+            resolve(password);
+          },
+          text: t('backupDecryptionModalAction'),
+        },
+        secondaryAction: [
+          {
+            action: () => {
+              resolve('');
+              dismissImport();
+            },
+            text: t('backupEncryptionModalCloseBtn'),
+          },
+        ],
+        passwordOptional: false,
+        text: {
+          closeBtnLabel: t('backupEncryptionModalCloseBtn'),
+          input: t('backupDecryptionModalPlaceholder'),
+          message: t('backupDecryptionModalMessage'),
+          title: t('backupDecryptionModalTitle'),
+        },
+      });
+    });
+  };
+
   const importHistory = async (file: File) => {
+    const isEncrypted = await checkBackupEncryption(file);
+
+    if (isEncrypted) {
+      const password = await getBackUpPassword();
+
+      if (password) {
+        await processHistoryImport(file, password);
+      }
+    } else {
+      await processHistoryImport(file);
+    }
+  };
+
+  const processHistoryImport = async (file: File, password?: string) => {
     setHistoryImportState(HistoryImportState.PREPARING);
     setError(null);
 
     const data = await loadFileBuffer(file);
 
     try {
-      await backupRepository.importHistory(user, data, onInit, onProgress);
+      await backupRepository.importHistory(user, data, onInit, onProgress, password);
       onSuccess();
     } catch (error) {
       onError(error as Error);
@@ -135,6 +196,14 @@ const HistoryImport: FC<HistoryImportProps> = ({user, backupRepository, file, sw
   useEffect(() => {
     importHistory(file);
   }, []);
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setError(null);
+      await importHistory(file);
+    }
+  };
 
   return (
     <div style={{height: '100%'}}>
@@ -178,9 +247,19 @@ const HistoryImport: FC<HistoryImportProps> = ({user, backupRepository, file, sw
             </p>
 
             <div className="history-message__buttons">
-              <button className="button" onClick={dismissImport} data-uie-name="do-dismiss-history-import-error">
+              <Button
+                variant={ButtonVariant.SECONDARY}
+                className="button button-secondary"
+                onClick={dismissImport}
+                data-uie-name="do-dismiss-history-import-error"
+              >
                 {t('backupCancel')}
-              </button>
+              </Button>
+              <BackupFileUpload
+                onFileChange={handleFileChange}
+                backupImportHeadLine={t('preferencesOptionsBackupTryAgain')}
+                variant={ButtonVariant.PRIMARY}
+              />
             </div>
           </div>
         )}

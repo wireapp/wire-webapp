@@ -84,7 +84,7 @@ async function buildMessageRepository(): Promise<[MessageRepository, MessageRepo
   selfConversation.selfUser(selfUser);
   conversationState.conversations([selfConversation]);
   const dependencies = {
-    conversationRepository: () => ({} as ConversationRepository),
+    conversationRepository: () => ({}) as ConversationRepository,
     cryptographyRepository: new CryptographyRepository({} as any),
     eventRepository: new EventRepository(new EventService({} as any), {} as any, {} as any, {} as any),
     propertiesRepository: new PropertiesRepository({} as any, {} as any),

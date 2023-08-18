@@ -77,6 +77,9 @@ export type Env = {
   /** will enable the MLS protocol */
   FEATURE_ENABLE_MLS?: string;
 
+  /** will enable the user to periodically update the list of supported protocols */
+  FEATURE_ENABLE_SELF_SUPPORTED_PROTOCOLS_UPDATES?: string;
+
   FEATURE_USE_CORE_CRYPTO?: string;
 
   FEATURE_MLS_CONFIG_KEYING_MATERIAL_UPDATE_THRESHOLD?: string;
@@ -101,6 +104,15 @@ export type Env = {
 
   /** Feature toggle for debug utils. Can be set to true or false */
   FEATURE_ENABLE_DEBUG: string;
+
+  /** Feature to open a confirm modal before pinging large groups */
+  FEATURE_ENABLE_PING_CONFIRMATION: string;
+
+  /**
+   * Minimum amount of users required in a conversation to open confirm modal for ping
+   * Must be used with FEATURE_ENABLE_PING_CONFIRMATION
+   */
+  FEATURE_MAX_USERS_TO_PING_WITHOUT_ALERT: string;
 
   /** Feature toggle for domain discovery. Can be set to true or false */
   FEATURE_ENABLE_DOMAIN_DISCOVERY: string;
@@ -230,6 +242,8 @@ export type Env = {
   URL_SUPPORT_SCREEN_ACCESS_DENIED: string;
 
   URL_SUPPORT_OFFLINE_BACKEND: string;
+
+  URL_SUPPORT_FEDERATION_STOP: string;
 
   URL_WHATS_NEW: string;
 

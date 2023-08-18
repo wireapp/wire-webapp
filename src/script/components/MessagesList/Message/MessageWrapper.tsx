@@ -30,6 +30,7 @@ import {OutgoingQuote} from 'src/script/conversation/MessageRepository';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {Text} from 'src/script/entity/message/Text';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {CallMessage} from './CallMessage';
@@ -38,6 +39,7 @@ import {ContentMessageComponent} from './ContentMessage';
 import {DecryptErrorMessage} from './DecryptErrorMessage';
 import {DeleteMessage} from './DeleteMessage';
 import {FailedToAddUsersMessage} from './FailedToAddUsersMessage';
+import {FederationStopMessage} from './FederationStopMessage';
 import {FileTypeRestrictedMessage} from './FileTypeRestrictedMessage';
 import {LegalHoldMessage} from './LegalHoldMessage';
 import {MemberMessage} from './MemberMessage';
@@ -82,8 +84,6 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
   messageRepository,
   messageActions,
   teamState = container.resolve(TeamState),
-  handleFocus,
-  totalMessage,
   isMsgElementsFocusable,
 }) => {
   const findMessage = async (conversation: Conversation, messageId: string) => {
@@ -116,6 +116,7 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
       await messageRepository.retryUploadFile(conversation, file, firstAsset.isImage(), message.id);
     }
   };
+  const {display_name: displayName} = useKoSubscribableChildren(conversation, ['display_name']);
 
   const contextMenuEntries = ko.pureComputed(() => {
     const entries: ContextMenuEntry[] = [];
@@ -213,6 +214,9 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
   if (message.isLegalHold()) {
     return <LegalHoldMessage message={message} />;
   }
+  if (message.isFederationStop()) {
+    return <FederationStopMessage isMessageFocused={isMessageFocused} message={message} />;
+  }
   if (message.isVerification()) {
     return <VerificationMessage message={message} />;
   }
@@ -235,6 +239,7 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
     return (
       <MemberMessage
         message={message}
+        conversationName={displayName}
         onClickInvitePeople={onClickInvitePeople}
         onClickParticipants={onClickParticipants}
         onClickCancelRequest={onClickCancelRequest}

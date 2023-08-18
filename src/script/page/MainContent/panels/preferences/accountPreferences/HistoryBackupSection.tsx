@@ -17,15 +17,12 @@
  *
  */
 
-import {FC, useRef} from 'react';
-
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+import {FC} from 'react';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {CONFIG as HistoryExportConfig} from 'Components/HistoryExport';
+import {BackupFileUpload} from 'Components/HistoryImport/BackupFileUpload';
 import {ContentState} from 'src/script/page/useAppState';
-import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {PreferencesSection} from '../components/PreferencesSection';
@@ -37,10 +34,12 @@ interface HistoryBackupSectionProps {
 }
 
 const HistoryBackupSection: FC<HistoryBackupSectionProps> = ({brandName, importFile, switchContent}) => {
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const fileInputClick = () => fileInputRef.current?.click();
-
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      importFile(file);
+    }
+  };
   return (
     <PreferencesSection
       hasSeparator
@@ -60,39 +59,12 @@ const HistoryBackupSection: FC<HistoryBackupSectionProps> = ({brandName, importF
       <p id="preferences-history-describe-1" className="preferences-detail">
         {t('preferencesOptionsBackupExportSecondary', brandName)}
       </p>
-      <Button
+      <BackupFileUpload
+        onFileChange={handleFileChange}
+        backupImportHeadLine={t('preferencesOptionsBackupImportHeadline')}
         variant={ButtonVariant.TERTIARY}
-        className="preferences-history-restore-button"
-        role="button"
-        tabIndex={TabIndex.FOCUSABLE}
-        onKeyDown={event => handleKeyDown(event, fileInputClick)}
-        aria-labelledby="do-backup-import"
-      >
-        <label
-          className="preferences-history-backup-import-field"
-          data-uie-name="do-backup-import"
-          id="do-backup-import"
-          htmlFor="file-import-input"
-        >
-          <span>{t('preferencesOptionsBackupImportHeadline')}</span>
-          <input
-            id="file-import-input"
-            ref={fileInputRef}
-            tabIndex={TabIndex.UNFOCUSABLE}
-            type="file"
-            accept={`.${HistoryExportConfig.FILE_EXTENSION}`}
-            onChange={event => {
-              const file = event.target.files?.[0];
-              if (file) {
-                importFile(file);
-              }
-            }}
-            onFocus={({target}) => target.blur()}
-            data-uie-name="input-import-file"
-            aria-describedby="preferences-history-describe-2"
-          />
-        </label>
-      </Button>
+        cssClassName="preferences-history-restore-button"
+      />
       <p id="preferences-history-describe-2" className="preferences-detail">
         {t('preferencesOptionsBackupImportSecondary')}
       </p>

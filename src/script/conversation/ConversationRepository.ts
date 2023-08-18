@@ -39,15 +39,17 @@ import {
   ConversationRenameEvent,
   ConversationTypingEvent,
   CONVERSATION_EVENT,
+  FederationEvent,
+  FEDERATION_EVENT,
 } from '@wireapp/api-client/lib/event';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import type {BackendError} from '@wireapp/api-client/lib/http/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
-import {MLSReturnType} from '@wireapp/core/lib/conversation';
+import {AddUsersFailureReasons, MLSReturnType} from '@wireapp/core/lib/conversation';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {container} from 'tsyringe';
-import {flatten} from 'underscore';
+import {debounce, flatten} from 'underscore';
 
 import {Asset as ProtobufAsset, Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -68,17 +70,18 @@ import {
 } from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {isBackendError} from 'Util/TypePredicateUtil';
-import {noop} from 'Util/util';
 import {createUuid} from 'Util/uuid';
 
 import {ACCESS_STATE} from './AccessState';
 import {extractClientDiff} from './ClientMismatchUtil';
 import {updateAccessRights} from './ConversationAccessPermission';
 import {ConversationEphemeralHandler} from './ConversationEphemeralHandler';
+import {processFederationDeleteEvent} from './ConversationFederationUtils';
 import {ConversationFilter} from './ConversationFilter';
 import {ConversationLabelRepository} from './ConversationLabelRepository';
 import {ConversationDatabaseData, ConversationMapper} from './ConversationMapper';
 import {ConversationRoleRepository} from './ConversationRoleRepository';
+import {isMLSConversation} from './ConversationSelectors';
 import {ConversationService} from './ConversationService';
 import {ConversationState} from './ConversationState';
 import {ConversationStateHandler} from './ConversationStateHandler';
@@ -90,6 +93,7 @@ import {MessageRepository} from './MessageRepository';
 import {NOTIFICATION_STATE} from './NotificationSetting';
 
 import {AssetTransferState} from '../assets/AssetTransferState';
+import {CallingRepository} from '../calling/CallingRepository';
 import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
@@ -127,7 +131,7 @@ import * as LegalHoldEvaluator from '../legal-hold/LegalHoldEvaluator';
 import {MessageCategory} from '../message/MessageCategory';
 import {SuperType} from '../message/SuperType';
 import {SystemMessageType} from '../message/SystemMessageType';
-import {addOtherSelfClientsToMLSConversation, useMLSConversationState} from '../mls';
+import {addOtherSelfClientsToMLSConversation} from '../mls';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {Core} from '../service/CoreSingleton';
 import type {EventRecord} from '../storage';
@@ -152,7 +156,6 @@ export class ConversationRepository {
   public readonly conversationRoleRepository: ConversationRoleRepository;
   private readonly event_mapper: EventMapper;
   private readonly eventService: EventService;
-  public leaveCall: (conversationId: QualifiedId, reason: LEAVE_CALL_REASON) => void;
   private readonly logger: Logger;
   public readonly stateHandler: ConversationStateHandler;
   public readonly verificationStateHandler: ConversationVerificationStateHandler;
@@ -177,6 +180,7 @@ export class ConversationRepository {
     private readonly teamRepository: TeamRepository,
     private readonly userRepository: UserRepository,
     private readonly propertyRepository: PropertiesRepository,
+    private readonly callingRepository: CallingRepository,
     private readonly serverTimeHandler: ServerTimeHandler,
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
@@ -288,7 +292,6 @@ export class ConversationRepository {
     );
 
     this.conversationRoleRepository = new ConversationRoleRepository(this.teamRepository, this.conversationService);
-    this.leaveCall = noop;
 
     if (this.core.backendFeatures.isFederated) {
       this.scheduleMissingUsersAndConversationsMetadataRefresh();
@@ -309,12 +312,142 @@ export class ConversationRepository {
     amplify.subscribe(WebAppEvents.TEAM.MEMBER_LEAVE, this.teamMemberLeave);
     amplify.subscribe(WebAppEvents.USER.UNBLOCKED, this.onUnblockUser);
     amplify.subscribe(WebAppEvents.CONVERSATION.INJECT_LEGAL_HOLD_MESSAGE, this.injectLegalHoldMessage);
+    amplify.subscribe(WebAppEvents.FEDERATION.EVENT_FROM_BACKEND, debounce(this.onFederationEvent, 1000));
 
     this.eventService.addEventUpdatedListener(this.updateLocalMessageEntity);
     this.eventService.addEventDeletedListener(this.deleteLocalMessageEntity);
 
     window.addEventListener<any>(WebAppEvents.CONVERSATION.JOIN, this.onConversationJoin);
   }
+
+  private readonly onFederationEvent = async (event: FederationEvent) => {
+    const {type} = event;
+
+    switch (type) {
+      case FEDERATION_EVENT.FEDERATION_DELETE:
+        const {domain: deletedDomain} = event;
+        await this.onFederationDelete(deletedDomain);
+
+        break;
+      case FEDERATION_EVENT.FEDERATION_CONNECTION_REMOVED:
+        const {domains: deletedDomains} = event;
+        await this.onFederationConnectionRemove(deletedDomains);
+
+        break;
+    }
+  };
+
+  /**
+   * For the `federation.delete` event: (Backend A has stopped federating with us)
+      - receive the event from backend
+      - leave the conversations locally that are owned by the backend A which was deleted.
+      - remove the deleted backend A users locally from our own conversations.
+      - insert system message to the affected conversations about federation termination.
+   * @param deletedDomain the domain that stopped federating
+   */
+  private onFederationDelete = async (deletedDomain: string) => {
+    const {conversationsToDeleteUsers, conversationsToLeave, conversationsToDisable} = processFederationDeleteEvent(
+      deletedDomain,
+      this.conversationState.conversations(),
+    );
+
+    conversationsToLeave.forEach(async conversation => {
+      await this.leaveConversation(conversation, {clearContent: false, localOnly: true});
+      await this.insertFederationStopSystemMessage(conversation, [deletedDomain]);
+    });
+
+    conversationsToDisable.forEach(async conversation => {
+      conversation.status(ConversationStatus.PAST_MEMBER);
+      conversation.firstUserEntity().markConnectionAsUnknown();
+      await this.insertFederationStopSystemMessage(conversation, [deletedDomain]);
+    });
+
+    conversationsToDeleteUsers.forEach(async ({conversation, users}) => {
+      await this.insertFederationStopSystemMessage(conversation, [deletedDomain]);
+      await this.removeDeletedFederationUsers(conversation, users);
+    });
+  };
+
+  /**
+   * For the `federation.connectionRemoved` event: (Backend A & B stopped federating, user is on C)
+    - receive the event from backend
+    - Identify all conversations that are not owned from A or B domain and that contain users from A and B
+      - remove users from A and B from those conversations
+      - insert system message in those conversations about backend A and B stopping to federate
+    - identify all conversations owned by domain A that contains users from B
+      - remove users from B from those conversations
+      - insert system message in those conversations about backend A and B stopping to federate
+    - Identify all conversations owned by domain B that contains users from A
+      - remove users from A from those conversations
+      - insert system message in those conversations about backend A and B stopping to federate
+   * @param domains The domains that stopped federating with each other
+   */
+  private readonly onFederationConnectionRemove = async (domains: string[]) => {
+    const selfUser = this.userState.self();
+    const [domainOne, domainTwo] = domains;
+    const allConversations = this.conversationState.conversations();
+
+    allConversations
+      .filter(conversation => conversation.domain === domainOne)
+      .forEach(async conversation => {
+        const usersToDelete = conversation.allUserEntities().filter(user => user.domain === domainTwo);
+        if (usersToDelete.length > 0) {
+          await this.removeDeletedFederationUsers(conversation, usersToDelete);
+          await this.insertFederationStopSystemMessage(conversation, [domainOne, domainTwo]);
+        }
+      });
+
+    allConversations
+      .filter(conversation => conversation.domain === domainTwo)
+      .forEach(async conversation => {
+        const usersToDelete = conversation.allUserEntities().filter(user => user.domain === domainOne);
+        if (usersToDelete.length > 0) {
+          await this.removeDeletedFederationUsers(conversation, usersToDelete);
+          await this.insertFederationStopSystemMessage(conversation, [domainOne, domainTwo]);
+        }
+      });
+
+    allConversations
+      .filter(conversation => {
+        if (conversation.domain !== selfUser.qualifiedId.domain) {
+          return false;
+        }
+
+        const userDomains = new Set(conversation.allUserEntities().map(user => user.qualifiedId.domain));
+
+        return userDomains.has(domainOne) && userDomains.has(domainTwo);
+      })
+      .forEach(async conversation => {
+        const usersToDelete = conversation
+          .allUserEntities()
+          .filter(user => [domainOne, domainTwo].includes(user.domain));
+        if (usersToDelete.length > 0) {
+          await this.removeDeletedFederationUsers(conversation, usersToDelete);
+          await this.insertFederationStopSystemMessage(conversation, [domainOne, domainTwo]);
+        }
+      });
+  };
+
+  private readonly removeDeletedFederationUsers = async (conversation: Conversation, usersToRemove: User[]) => {
+    if (usersToRemove.length === 0) {
+      return;
+    }
+
+    try {
+      for (const user of usersToRemove) {
+        await this.removeMember(conversation, user.qualifiedId, {localOnly: true});
+      }
+    } catch (error) {
+      console.warn('failed to remove users', error);
+    }
+  };
+
+  private readonly insertFederationStopSystemMessage = async (conversation: Conversation, domains: string[]) => {
+    const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
+    const selfUser = this.userState.self();
+    const event = EventBuilder.buildFederationStop(conversation, selfUser, domains, currentTimestamp);
+    await this.eventRepository.injectEvent(event, EventRepository.SOURCE.INJECTED);
+  };
 
   private readonly updateLocalMessageEntity = async ({
     obj: updatedEvent,
@@ -442,10 +575,6 @@ export class ConversationRepository {
         time: new Date().toISOString(),
         type: CONVERSATION_EVENT.CREATE,
       });
-      if (isMLSConversation && conversationEntity.groupId) {
-        // since we are the creator of the conversation, we can safely mark it as established
-        useMLSConversationState.getState().markAsEstablished(conversationEntity.groupId);
-      }
 
       const {failed_to_add: failedToAddUsers} = response.conversation;
 
@@ -454,29 +583,27 @@ export class ConversationRepository {
           failedToAddUsers,
           conversationEntity,
           this.userState.self().id,
+          AddUsersFailureReasons.UNREACHABLE_BACKENDS,
         );
         await this.eventRepository.injectEvent(failedToAddUsersEvent);
       }
 
       return conversationEntity;
     } catch (error) {
-      if (!isBackendError(error)) {
-        this.logger.error(error);
-        throw error;
-      }
-
-      switch (error.label) {
-        case BackendErrorLabel.CLIENT_ERROR:
-          this.handleTooManyMembersError();
-          break;
-        case BackendErrorLabel.NOT_CONNECTED:
-          await this.handleUsersNotConnected(userEntities.map(user => user.qualifiedId));
-          break;
-        case BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT:
-          this.showLegalHoldConsentError();
-          break;
-        default:
-          this.logger.error(error);
+      if (isBackendError(error)) {
+        switch (error.label) {
+          case BackendErrorLabel.CLIENT_ERROR:
+            this.handleTooManyMembersError();
+            break;
+          case BackendErrorLabel.NOT_CONNECTED:
+            await this.handleUsersNotConnected(userEntities.map(user => user.qualifiedId));
+            break;
+          case BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT:
+            this.showLegalHoldConsentError();
+            break;
+          default:
+            this.logger.error(error);
+        }
       }
       throw error;
     }
@@ -934,7 +1061,7 @@ export class ConversationRepository {
       return;
     }
 
-    this.leaveCall(conversationEntity.qualifiedId, LEAVE_CALL_REASON.USER_MANUALY_LEFT_CONVERSATION);
+    this.callingRepository.leaveCall(conversationEntity.qualifiedId, LEAVE_CALL_REASON.USER_MANUALY_LEFT_CONVERSATION);
 
     if (this.conversationState.isActiveConversation(conversationEntity)) {
       const nextConversation = this.getNextConversation(conversationEntity);
@@ -950,11 +1077,8 @@ export class ConversationRepository {
     }
     this.deleteConversationFromRepository(conversationId);
     await this.conversationService.deleteConversationFromDb(conversationId.id);
-    if (conversationEntity.protocol === ConversationProtocol.MLS) {
-      const {groupId} = conversationEntity;
-      if (groupId) {
-        await this.core.service!.conversation.wipeMLSConversation(groupId);
-      }
+    if (isMLSConversation(conversationEntity)) {
+      await this.conversationService.wipeMLSConversation(conversationEntity);
     }
   };
 
@@ -1243,46 +1367,56 @@ export class ConversationRepository {
     }
   };
 
+  private readonly getConnectionConversation = (connectionEntity: ConnectionEntity) => {
+    const {conversationId} = connectionEntity;
+
+    const localConversation = this.conversationState.findConversation(conversationId);
+
+    if (localConversation) {
+      return localConversation;
+    }
+
+    if (connectionEntity.isConnected() || connectionEntity.isOutgoingRequest()) {
+      return this.fetchConversationById(conversationId);
+    }
+
+    return undefined;
+  };
+
   /**
    * Maps user connection to the corresponding conversation.
    *
    * @note If there is no conversation it will request it from the backend
    * @returns Resolves when connection was mapped return value
    */
-  private readonly mapConnection = (connectionEntity: ConnectionEntity): Promise<Conversation | undefined> => {
-    const qualifiedId: QualifiedId = connectionEntity.conversationId;
-    return Promise.resolve(this.conversationState.findConversation(qualifiedId))
-      .then(conversationEntity => {
-        if (!conversationEntity) {
-          if (connectionEntity.isConnected() || connectionEntity.isOutgoingRequest()) {
-            return this.fetchConversationById(qualifiedId);
-          }
-        }
-        return conversationEntity;
-      })
-      .then(conversationEntity => {
-        if (!conversationEntity) {
-          return undefined;
-        }
-        conversationEntity.connection(connectionEntity);
+  private readonly mapConnection = async (connectionEntity: ConnectionEntity): Promise<Conversation | undefined> => {
+    try {
+      const conversation = await this.getConnectionConversation(connectionEntity);
 
-        if (connectionEntity.isConnected()) {
-          conversationEntity.type(CONVERSATION_TYPE.ONE_TO_ONE);
-        }
-
-        return this.updateParticipatingUserEntities(conversationEntity);
-      })
-      .then(updatedConversationEntity => {
-        this.conversationState.conversations.notifySubscribers();
-        return updatedConversationEntity;
-      })
-      .catch(error => {
-        const isConversationNotFound = error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;
-        if (!isConversationNotFound) {
-          throw error;
-        }
+      if (!conversation) {
         return undefined;
-      });
+      }
+
+      conversation.connection(connectionEntity);
+
+      if (connectionEntity.isConnected()) {
+        conversation.type(CONVERSATION_TYPE.ONE_TO_ONE);
+      }
+
+      const updatedConversation = await this.updateParticipatingUserEntities(conversation);
+
+      this.conversationState.conversations.notifySubscribers();
+
+      return updatedConversation;
+    } catch (error) {
+      const isConversationNotFound =
+        error instanceof ConversationError && error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;
+      if (!isConversationNotFound) {
+        throw error;
+      }
+
+      return undefined;
+    }
   };
 
   /**
@@ -1460,12 +1594,24 @@ export class ConversationRepository {
           events.forEach(event => this.eventRepository.injectEvent(event));
         }
       } else {
-        const conversationMemberJoinEvent = await this.core.service!.conversation.addUsersToProteusConversation({
-          conversationId,
-          qualifiedUsers,
-        });
-        if (conversationMemberJoinEvent) {
-          this.eventRepository.injectEvent(conversationMemberJoinEvent, EventRepository.SOURCE.BACKEND_RESPONSE);
+        const {failedToAdd, event: memberJoinEvent} =
+          await this.core.service!.conversation.addUsersToProteusConversation({
+            conversationId,
+            qualifiedUsers,
+          });
+        if (memberJoinEvent) {
+          await this.eventRepository.injectEvent(memberJoinEvent, EventRepository.SOURCE.BACKEND_RESPONSE);
+        }
+        if (failedToAdd) {
+          await this.eventRepository.injectEvent(
+            EventBuilder.buildFailedToAddUsersEvent(
+              failedToAdd.users,
+              conversation,
+              this.userState.self().id,
+              failedToAdd.reason,
+            ),
+            EventRepository.SOURCE.INJECTED,
+          );
         }
       }
     } catch (error) {
@@ -1553,7 +1699,10 @@ export class ConversationRepository {
 
     if (leaveConversation) {
       conversationEntity.status(ConversationStatus.PAST_MEMBER);
-      this.leaveCall(conversationEntity.qualifiedId, LEAVE_CALL_REASON.USER_MANUALY_LEFT_CONVERSATION);
+      this.callingRepository.leaveCall(
+        conversationEntity.qualifiedId,
+        LEAVE_CALL_REASON.USER_MANUALY_LEFT_CONVERSATION,
+      );
     }
 
     await this.messageRepository.updateClearedTimestamp(conversationEntity);
@@ -1584,13 +1733,20 @@ export class ConversationRepository {
    * @param userId ID of member to be removed from the conversation
    * @returns Resolves when member was removed from the conversation
    */
-  private async removeMemberFromMLSConversation(conversationEntity: Conversation, userId: QualifiedId) {
+  private async removeMemberFromMLSConversation(
+    conversationEntity: Conversation,
+    userId: QualifiedId,
+    {localOnly = false} = {},
+  ) {
+    const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
     const {groupId, qualifiedId} = conversationEntity;
-    const {events} = await this.core.service!.conversation.removeUsersFromMLSConversation({
-      conversationId: qualifiedId,
-      groupId,
-      qualifiedUserIds: [userId],
-    });
+    const {events} = localOnly
+      ? {events: [EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp)]}
+      : await this.core.service!.conversation.removeUsersFromMLSConversation({
+          conversationId: qualifiedId,
+          groupId,
+          qualifiedUserIds: [userId],
+        });
 
     if (!!events.length) {
       events.forEach(event => this.eventRepository.injectEvent(event));
@@ -1604,18 +1760,22 @@ export class ConversationRepository {
    * @param userId ID of member to be removed from the conversation
    * @returns Resolves when member was removed from the conversation
    */
-  private async removeMemberFromConversation(conversationEntity: Conversation, userId: QualifiedId) {
-    const response = await this.core.service!.conversation.removeUserFromConversation(
-      conversationEntity.qualifiedId,
-      userId,
-    );
+  private async removeMemberFromConversation(
+    conversationEntity: Conversation,
+    userId: QualifiedId,
+    {localOnly = false},
+  ) {
+    const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
+    const response = localOnly
+      ? EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp)
+      : await this.core.service!.conversation.removeUserFromConversation(conversationEntity.qualifiedId, userId);
+
     const roles = conversationEntity.roles();
     delete roles[userId.id];
     conversationEntity.roles(roles);
-    const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-    const event = response || EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
-    await this.eventRepository.injectEvent(event, EventRepository.SOURCE.BACKEND_RESPONSE);
-    return event;
+    await this.eventRepository.injectEvent(response, EventRepository.SOURCE.BACKEND_RESPONSE);
+
+    return response;
   }
 
   /**
@@ -1625,12 +1785,12 @@ export class ConversationRepository {
    * @param clearContent Should we clear the conversation content from the database?
    * @returns Resolves when user was removed from the conversation
    */
-  private async leaveConversation(conversationEntity: Conversation, clearContent: boolean) {
+  private async leaveConversation(conversationEntity: Conversation, {clearContent = false, localOnly = false} = {}) {
     const userQualifiedId = this.userState.self().qualifiedId;
 
     return clearContent
       ? this.clearConversation(conversationEntity, true)
-      : this.removeMemberFromConversation(conversationEntity, userQualifiedId);
+      : this.removeMemberFromConversation(conversationEntity, userQualifiedId, {localOnly});
   }
 
   /**
@@ -1641,17 +1801,21 @@ export class ConversationRepository {
    * @param clearContent Should we clear the conversation content from the database?
    * @returns Resolves when member was removed from the conversation
    */
-  public async removeMember(conversationEntity: Conversation, userId: QualifiedId, clearContent: boolean = false) {
+  public async removeMember(
+    conversationEntity: Conversation,
+    userId: QualifiedId,
+    {clearContent = false, localOnly = false} = {},
+  ) {
     const isUserLeaving = this.userState.self().qualifiedId.id === userId.id;
     const isMLSConversation = conversationEntity.isUsingMLSProtocol;
 
     if (isUserLeaving) {
-      return this.leaveConversation(conversationEntity, clearContent);
+      return this.leaveConversation(conversationEntity, {clearContent});
     }
 
     return isMLSConversation
-      ? this.removeMemberFromMLSConversation(conversationEntity, userId)
-      : this.removeMemberFromConversation(conversationEntity, userId);
+      ? this.removeMemberFromMLSConversation(conversationEntity, userId, {localOnly})
+      : this.removeMemberFromConversation(conversationEntity, userId, {localOnly});
   }
 
   /**
@@ -2007,6 +2171,7 @@ export class ConversationRepository {
       // Prevent logging typing events
       return;
     }
+
     const {time, from, qualified_conversation, type} = event;
     const extra: Record<string, unknown> = {};
     extra.messageId = 'id' in event && event.id;
@@ -2060,19 +2225,7 @@ export class ConversationRepository {
 
     const inSelfConversation = this.conversationState.isSelfConversation(conversationId);
     if (inSelfConversation) {
-      const typesInSelfConversation = [
-        CONVERSATION_EVENT.MEMBER_UPDATE,
-        ClientEvent.CONVERSATION.MESSAGE_HIDDEN,
-        /**
-         * As of today (07/07/2022) the backend sends `WELCOME` message to the user's own
-         * conversation (not the actual conversation that the welcome should be part of)
-         */
-        CONVERSATION_EVENT.MLS_WELCOME_MESSAGE,
-      ];
-
-      if (type === CONVERSATION_EVENT.MLS_WELCOME_MESSAGE) {
-        useMLSConversationState.getState().markAsEstablished(eventData);
-      }
+      const typesInSelfConversation = [CONVERSATION_EVENT.MEMBER_UPDATE, ClientEvent.CONVERSATION.MESSAGE_HIDDEN];
 
       const isExpectedType = typesInSelfConversation.includes(type);
       if (!isExpectedType) {
@@ -2321,6 +2474,7 @@ export class ConversationRepository {
       case ClientEvent.CONVERSATION.KNOCK:
       case ClientEvent.CONVERSATION.CALL_TIME_OUT:
       case ClientEvent.CONVERSATION.FAILED_TO_ADD_USERS:
+      case ClientEvent.CONVERSATION.FEDERATION_STOP:
       case ClientEvent.CONVERSATION.LEGAL_HOLD_UPDATE:
       case ClientEvent.CONVERSATION.LOCATION:
       case ClientEvent.CONVERSATION.MISSED_MESSAGES:
@@ -2595,19 +2749,10 @@ export class ConversationRepository {
       throw new Error(`groupId not found for MLS conversation ${conversation.id}`);
     }
 
-    const isMLSConversationEstablished = await this.core.service!.conversation.isMLSConversationEstablished(groupId);
+    const isMLSConversationEstablished = await this.conversationService.isMLSConversationEstablished(groupId);
 
     if (!isMLSConversationEstablished) {
       return;
-    }
-
-    const mlsConversationState = useMLSConversationState.getState();
-
-    const isMLSConversationMarkedAsEstablished = mlsConversationState.isEstablished(groupId);
-
-    if (!isMLSConversationMarkedAsEstablished) {
-      // If the conversation was not previously marked as established and the core if aware of this conversation, we can mark is as established
-      mlsConversationState.markAsEstablished(groupId);
     }
 
     if (isSelfJoin) {
@@ -2643,7 +2788,7 @@ export class ConversationRepository {
 
     if (removesSelfUser) {
       conversationEntity.status(ConversationStatus.PAST_MEMBER);
-      this.leaveCall(
+      this.callingRepository.leaveCall(
         conversationEntity.qualifiedId,
         LEAVE_CALL_REASON.USER_IS_REMOVED_BY_AN_ADMIN_OR_LEFT_ON_ANOTHER_CLIENT,
       );
@@ -2652,13 +2797,16 @@ export class ConversationRepository {
         eventJson.from = this.userState.self().id;
       }
 
-      if (conversationEntity.protocol === ConversationProtocol.MLS) {
-        const {groupId} = conversationEntity;
-        if (groupId) {
-          await this.core.service!.conversation.wipeMLSConversation(groupId);
-        }
+      if (isMLSConversation(conversationEntity)) {
+        await this.conversationService.wipeMLSConversation(conversationEntity);
       }
     } else {
+      /**
+       * @note We have to call pushClients -> setClientsForConv avs api whenever
+       * someone is removed from the conversation in order to make conference calling
+       * encryption keys rotate on involuntary participant leave.
+       */
+      await this.callingRepository.pushClients();
       // Update conversation roles (in case the removed user had some special role and it's not the self user)
       await this.conversationRoleRepository.updateConversationRoles(conversationEntity);
     }
@@ -2679,10 +2827,6 @@ export class ConversationRepository {
       await this.updateParticipatingUserEntities(conversationEntity);
 
       this.verificationStateHandler.onMemberLeft(conversationEntity);
-
-      if (isFromSelf && conversationEntity.removed_from_conversation()) {
-        this.archiveConversation(conversationEntity);
-      }
 
       return {conversationEntity, messageEntity};
     }

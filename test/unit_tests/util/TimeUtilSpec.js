@@ -29,6 +29,7 @@ import {
   isThisYear,
   isToday,
   setDateLocale,
+  weeksPassedSinceDate,
 } from 'Util/TimeUtil';
 
 describe('TimeUtil', () => {
@@ -400,6 +401,33 @@ describe('TimeUtil', () => {
 
       expect(formatDayMonthNumeral(new Date('2011-11-05T14:48:00.000'))).toBe('05.11.');
       setDateLocale('en');
+    });
+  });
+
+  const currentDate = new Date('2023-06-13T12:10:00Z');
+  describe(`weeksPassedSinceDate with current date ${currentDate}`, () => {
+    const cases = [
+      ['some date in the future', new Date('2023-06-14T12:10:00Z'), 1],
+      ['current date', currentDate, 1],
+      ['3 days ago', new Date('2023-06-10T12:10:00Z'), 1],
+      ['1 week ago', new Date('2023-06-06T12:10:00Z'), 1],
+      ['8 days ago', new Date('2023-06-05T12:10:00Z'), 2],
+      ['20 days ago', new Date('2023-05-24T12:10:00Z'), 3],
+      ['24 days ago', new Date('2023-05-20T12:10:00Z'), 4],
+      ['28 days ago', new Date('2023-05-16T12:10:00Z'), 4],
+      ['30 days ago', new Date('2023-05-14T12:10:00Z'), 5],
+    ];
+
+    beforeAll(() => {
+      jest.useFakeTimers();
+    });
+
+    afterAll(() => {
+      jest.useRealTimers();
+    });
+    it.each(cases)('for %s (%s) should return %s week(s)', (_, date, weeks) => {
+      jest.setSystemTime(currentDate);
+      expect(weeksPassedSinceDate(date)).toBe(weeks);
     });
   });
 });
