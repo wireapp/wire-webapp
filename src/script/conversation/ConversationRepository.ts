@@ -352,12 +352,13 @@ export class ConversationRepository {
     );
 
     conversationsToLeave.forEach(async conversation => {
-      await this.insertFederationStopSystemMessage(conversation, [deletedDomain]);
       await this.leaveConversation(conversation, {clearContent: false, localOnly: true});
+      await this.insertFederationStopSystemMessage(conversation, [deletedDomain]);
     });
 
     conversationsToDisable.forEach(async conversation => {
       conversation.status(ConversationStatus.PAST_MEMBER);
+      conversation.firstUserEntity().markConnectionAsUnknown();
       await this.insertFederationStopSystemMessage(conversation, [deletedDomain]);
     });
 

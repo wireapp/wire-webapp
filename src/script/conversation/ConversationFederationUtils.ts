@@ -23,6 +23,10 @@ import {User} from '../entity/User';
 export interface FederationDeleteResult {
   conversationsToLeave: Conversation[];
   conversationsToDisable: Conversation[];
+  /**
+   * One to One conversations that must be marked as disabled
+   * and the connection to their user must be deleted
+   */
   conversationsToDeleteUsers: {conversation: Conversation; users: User[]}[];
 }
 
