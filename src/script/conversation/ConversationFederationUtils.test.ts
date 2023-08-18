@@ -17,9 +17,7 @@
  *
  */
 
-import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
-import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
 
 import {generateConversation} from 'test/helper/ConversationGenerator';
 import {generateUser} from 'test/helper/UserGenerator';
@@ -37,50 +35,41 @@ describe('processFederationDeleteEvent', () => {
     const userFromDeletedDomain = generateUser({domain: deletedDomain, id: 'test-id'});
 
     const conversations: Conversation[] = [
-      generateConversation(CONVERSATION_TYPE.REGULAR, ConnectionStatus.ACCEPTED, ConversationProtocol.PROTEUS, {
-        id: 'test-1',
-        domain: 'test.wire.link',
-      }),
-      generateConversation(
-        CONVERSATION_TYPE.REGULAR,
-        ConnectionStatus.ACCEPTED,
-        ConversationProtocol.PROTEUS,
-        {
+      generateConversation({
+        id: {
           id: 'test-1',
           domain: 'test.wire.link',
         },
-        [user1],
-      ),
-      generateConversation(
-        CONVERSATION_TYPE.ONE_TO_ONE,
-        ConnectionStatus.ACCEPTED,
-        ConversationProtocol.PROTEUS,
-        {
+      }),
+      generateConversation({
+        id: {
+          id: 'test-1',
+          domain: 'test.wire.link',
+        },
+        users: [user1],
+      }),
+      generateConversation({
+        type: CONVERSATION_TYPE.ONE_TO_ONE,
+        id: {
           id: 'test-1',
           domain: deletedDomain,
         },
-        [userFromDeletedDomain],
-      ),
-      generateConversation(
-        CONVERSATION_TYPE.REGULAR,
-        ConnectionStatus.ACCEPTED,
-        ConversationProtocol.PROTEUS,
-        {
+        users: [userFromDeletedDomain],
+      }),
+      generateConversation({
+        id: {
           id: 'test-1',
           domain: 'test.wire.link',
         },
-        [user2],
-      ),
-      generateConversation(
-        CONVERSATION_TYPE.REGULAR,
-        ConnectionStatus.ACCEPTED,
-        ConversationProtocol.PROTEUS,
-        {
+        users: [user2],
+      }),
+      generateConversation({
+        id: {
           id: 'test-1',
           domain: 'test.wire.link',
         },
-        [userFromDeletedDomain],
-      ),
+        users: [userFromDeletedDomain],
+      }),
     ];
 
     const result: FederationDeleteResult = processFederationDeleteEvent(deletedDomain, conversations);
@@ -101,46 +90,38 @@ describe('processFederationDeleteEvent', () => {
     const userFromDeletedDomain = generateUser({domain: deletedDomain, id: 'test-id'});
 
     const conversations: Conversation[] = [
-      generateConversation(
-        CONVERSATION_TYPE.ONE_TO_ONE,
-        ConnectionStatus.ACCEPTED,
-        ConversationProtocol.PROTEUS,
-        {
+      generateConversation({
+        type: CONVERSATION_TYPE.ONE_TO_ONE,
+        id: {
           id: 'test-1',
           domain: 'wire.link',
         },
-        [user1],
-      ),
-      generateConversation(
-        CONVERSATION_TYPE.ONE_TO_ONE,
-        ConnectionStatus.ACCEPTED,
-        ConversationProtocol.PROTEUS,
-        {
+        users: [user1],
+      }),
+      generateConversation({
+        type: CONVERSATION_TYPE.ONE_TO_ONE,
+        id: {
           id: 'test-2',
           domain: 'wire.link',
         },
-        [user2],
-      ),
-      generateConversation(
-        CONVERSATION_TYPE.ONE_TO_ONE,
-        ConnectionStatus.ACCEPTED,
-        ConversationProtocol.PROTEUS,
-        {
+        users: [user2],
+      }),
+      generateConversation({
+        type: CONVERSATION_TYPE.ONE_TO_ONE,
+        id: {
           id: 'test-3',
           domain: deletedDomain,
         },
-        [userFromDeletedDomain],
-      ),
-      generateConversation(
-        CONVERSATION_TYPE.ONE_TO_ONE,
-        ConnectionStatus.ACCEPTED,
-        ConversationProtocol.PROTEUS,
-        {
+        users: [userFromDeletedDomain],
+      }),
+      generateConversation({
+        type: CONVERSATION_TYPE.ONE_TO_ONE,
+        id: {
           id: 'test-4',
           domain: deletedDomain,
         },
-        [userFromDeletedDomain],
-      ),
+        users: [userFromDeletedDomain],
+      }),
     ];
 
     const result: FederationDeleteResult = processFederationDeleteEvent(deletedDomain, conversations);
@@ -160,34 +141,32 @@ describe('processFederationDeleteEvent', () => {
     const user2 = generateUser({id: 'test-user-id-1', domain: deletedDomain});
 
     const conversations: Conversation[] = [
-      generateConversation(CONVERSATION_TYPE.REGULAR, ConnectionStatus.ACCEPTED, ConversationProtocol.PROTEUS, {
-        domain: deletedDomain,
-        id: 'test-id-1',
+      generateConversation({
+        id: {
+          domain: deletedDomain,
+          id: 'test-id-1',
+        },
       }),
-      generateConversation(CONVERSATION_TYPE.REGULAR, ConnectionStatus.ACCEPTED, ConversationProtocol.PROTEUS, {
-        domain: deletedDomain,
-        id: 'test-id-2',
+      generateConversation({
+        id: {
+          domain: deletedDomain,
+          id: 'test-id-2',
+        },
       }),
-      generateConversation(
-        CONVERSATION_TYPE.REGULAR,
-        ConnectionStatus.ACCEPTED,
-        ConversationProtocol.PROTEUS,
-        {
+      generateConversation({
+        id: {
           domain: 'other.wire.link',
           id: 'test-id-other-1',
         },
-        [user1],
-      ),
-      generateConversation(
-        CONVERSATION_TYPE.REGULAR,
-        ConnectionStatus.ACCEPTED,
-        ConversationProtocol.PROTEUS,
-        {
+        users: [user1],
+      }),
+      generateConversation({
+        id: {
           domain: 'other.wire.link',
           id: 'test-id-other-2',
         },
-        [user2],
-      ),
+        users: [user2],
+      }),
     ];
 
     const result: FederationDeleteResult = processFederationDeleteEvent(deletedDomain, conversations);
@@ -207,36 +186,28 @@ describe('processFederationDeleteEvent', () => {
     const user1 = generateUser();
 
     const conversations: Conversation[] = [
-      generateConversation(
-        CONVERSATION_TYPE.REGULAR,
-        ConnectionStatus.ACCEPTED,
-        ConversationProtocol.PROTEUS,
-        {
+      generateConversation({
+        id: {
           domain: 'other.wire.link',
           id: 'test-id-other-1',
         },
-        [user1],
-      ),
-      generateConversation(
-        CONVERSATION_TYPE.REGULAR,
-        ConnectionStatus.ACCEPTED,
-        ConversationProtocol.PROTEUS,
-        {
+        users: [user1],
+      }),
+      generateConversation({
+        id: {
           domain: 'other.wire.link',
           id: 'test-id-other-1',
         },
-        [user1],
-      ),
-      generateConversation(
-        CONVERSATION_TYPE.ONE_TO_ONE,
-        ConnectionStatus.ACCEPTED,
-        ConversationProtocol.PROTEUS,
-        {
+        users: [user1],
+      }),
+      generateConversation({
+        type: CONVERSATION_TYPE.ONE_TO_ONE,
+        id: {
           domain: 'other.wire.link',
           id: 'test-id-other-1',
         },
-        [user1],
-      ),
+        users: [user1],
+      }),
     ];
 
     const result: FederationDeleteResult = processFederationDeleteEvent(deletedDomain, conversations);

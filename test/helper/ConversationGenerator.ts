@@ -17,7 +17,6 @@
  *
  */
 
-import {faker} from '@faker-js/faker';
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {CONVERSATION_TYPE, CONVERSATION_ACCESS_ROLE} from '@wireapp/api-client/lib/conversation/';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
@@ -33,17 +32,26 @@ import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import {createUuid} from 'Util/uuid';
 
-export function generateAPIConversation(
-  id: QualifiedId = {id: createUuid(), domain: 'test.wire.link'},
-  conversationType = CONVERSATION_TYPE.REGULAR,
-  conversationProtocol = ConversationProtocol.PROTEUS,
-  overwites?: Partial<ConversationDatabaseData>,
-): ConversationDatabaseData {
+interface GenerateAPIConversationParams {
+  id?: QualifiedId;
+  type?: CONVERSATION_TYPE;
+  protocol?: ConversationProtocol;
+  overwites?: Partial<ConversationDatabaseData>;
+  name?: string;
+}
+
+export function generateAPIConversation({
+  id = {id: createUuid(), domain: 'test.wire.link'},
+  type = CONVERSATION_TYPE.REGULAR,
+  protocol = ConversationProtocol.PROTEUS,
+  overwites = {},
+  name,
+}: GenerateAPIConversationParams): ConversationDatabaseData {
   return {
     id: id.id,
-    name: faker.person.fullName(),
-    type: conversationType,
-    protocol: conversationProtocol,
+    name,
+    type: type,
+    protocol: protocol,
     qualified_id: id,
     access: [],
     verification_state: ConversationVerificationState.UNVERIFIED,
@@ -76,24 +84,30 @@ export function generateAPIConversation(
   };
 }
 
-export function generateConversation(
-  conversationType = CONVERSATION_TYPE.REGULAR,
-  connectionStatus = ConnectionStatus.ACCEPTED,
-  conversationProtocol = ConversationProtocol.PROTEUS,
-  id?: QualifiedId,
-  users?: User[],
-  overwites?: Partial<ConversationDatabaseData>,
-): Conversation {
-  const apiConversation = generateAPIConversation(id, conversationType, conversationProtocol, overwites);
+interface GenerateConversationParams extends GenerateAPIConversationParams {
+  users?: User[];
+  status?: ConnectionStatus;
+}
+
+export function generateConversation({
+  type = CONVERSATION_TYPE.REGULAR,
+  status = ConnectionStatus.ACCEPTED,
+  protocol = ConversationProtocol.PROTEUS,
+  id,
+  name,
+  users = [],
+  overwites = {},
+}: GenerateConversationParams = {}): Conversation {
+  const apiConversation = generateAPIConversation({id, type, protocol, name, overwites});
 
   const conversation = ConversationMapper.mapConversations([apiConversation])[0];
   const connectionEntity = new ConnectionEntity();
   connectionEntity.conversationId = conversation.qualifiedId;
-  connectionEntity.status(connectionStatus);
+  connectionEntity.status(status);
   conversation.connection(connectionEntity);
-  conversation.type(conversationType);
+  conversation.type(type);
 
-  if (conversationProtocol === ConversationProtocol.MLS) {
+  if (protocol === ConversationProtocol.MLS) {
     conversation.groupId = 'groupId';
   }
 
