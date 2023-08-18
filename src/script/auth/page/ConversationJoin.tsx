@@ -26,27 +26,11 @@ import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 
 import {UrlUtil} from '@wireapp/commons';
-import {
-  Button,
-  Column,
-  Columns,
-  Container,
-  ContainerXS,
-  Form,
-  H1,
-  H2,
-  Input,
-  InputBlock,
-  Link,
-  LinkVariant,
-  Loading,
-  Muted,
-  QUERY,
-  useMatchMedia,
-} from '@wireapp/react-ui-kit';
+import {Column, Columns, H1, Muted} from '@wireapp/react-ui-kit';
 
 import {noop} from 'Util/util';
 
+import {GuestLoginColumn, IsLoggedInColumn, Separator} from './ConversationJoinComponents';
 import {ConversationJoinFull, ConversationJoinInvalid} from './ConversationJoinInvalid';
 import {EntropyContainer} from './EntropyContainer';
 import {Login} from './Login';
@@ -66,37 +50,8 @@ import * as ConversationSelector from '../module/selector/ConversationSelector';
 import * as SelfSelector from '../module/selector/SelfSelector';
 import {QUERY_KEY} from '../route';
 import * as AccentColor from '../util/AccentColor';
-import {parseError, parseValidationErrors} from '../util/errorUtil';
 
 type Props = React.HTMLProps<HTMLDivElement>;
-
-const Separator = () => {
-  const isMobile = useMatchMedia(QUERY.mobile);
-  const Line = () => (
-    <div
-      style={{
-        flex: 1,
-        height: '1px',
-        backgroundColor: '#696c6e',
-        minWidth: '20rem',
-      }}
-    ></div>
-  );
-  return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        maxWidth: `${!isMobile ? '4rem' : '100%'}`,
-        justifyContent: 'center',
-        transform: `rotate(${!isMobile ? '90' : '0'}deg)`,
-        marginLeft: `${!isMobile ? '' : '16px'}`,
-      }}
-    >
-      <Line />
-    </div>
-  );
-};
 
 const ConversationJoinComponent = ({
   doCheckConversationCode,
@@ -253,60 +208,18 @@ const ConversationJoinComponent = ({
         onCookiePolicyBannerClose={() => setShowCookiePolicyBanner(false)}
       >
         <AppAlreadyOpen />
-        <div style={{display: 'flex', alignItems: 'center', flexDirection: 'column', marginBottom: '2rem'}}>
-          <H1 style={{fontWeight: 500, marginTop: '0', marginBottom: '1rem'}} data-uie-name="status-join-headline">
+        <div css={{display: 'flex', alignItems: 'center', flexDirection: 'column', marginBottom: '2rem'}}>
+          <H1 css={{fontWeight: 500, marginTop: '0', marginBottom: '1rem'}} data-uie-name="status-join-headline">
             {_(conversationJoinStrings.mainHeadline)}
           </H1>
           <Muted data-uie-name="status-join-subhead">
             {_(conversationJoinStrings.headline, {brandName: Config.getConfig().BRAND_NAME})}
           </Muted>
         </div>
-        <Columns style={{display: 'flex', gap: '2rem', alignSelf: 'center', maxWidth: '100%'}}>
+        <Columns css={{display: 'flex', gap: '2rem', alignSelf: 'center', maxWidth: '100%'}}>
           <Column>
             {isLoggedIn ? (
-              <Container centerText verticalCenter style={{width: '100%', display: 'flex'}}>
-                <Columns style={{justifyContent: 'center'}}>
-                  <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
-                    <ContainerXS
-                      centerText
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                      }}
-                    >
-                      <>
-                        <H2 center>{_(conversationJoinStrings.existentAccountJoinInBrowser)}</H2>
-                        <Muted style={{marginBottom: '1rem'}}>
-                          {_(conversationJoinStrings.existentAccountUserName, {selfName})}
-                        </Muted>
-
-                        <Button
-                          block
-                          type="submit"
-                          formNoValidate
-                          onClick={() => handleSubmit()}
-                          aria-label={_(conversationJoinStrings.join)}
-                          data-uie-name="do-join-as-member"
-                        >
-                          {_(conversationJoinStrings.join)}
-                        </Button>
-                        <Link
-                          variant={LinkVariant.PRIMARY}
-                          block
-                          onClick={handleLogout}
-                          textTransform={'none'}
-                          style={{fontSize: '1rem'}}
-                          data-uie-name="go-logout"
-                        >
-                          {_(conversationJoinStrings.joinWithOtherAccount)}
-                        </Link>
-                      </>
-                    </ContainerXS>
-                  </Column>
-                </Columns>
-              </Container>
+              <IsLoggedInColumn selfName={selfName} handleLogout={handleLogout} handleSubmit={handleSubmit} />
             ) : (
               <Login embedded />
             )}
@@ -317,59 +230,17 @@ const ConversationJoinComponent = ({
               {isEntropyRequired && showEntropyForm ? (
                 <EntropyContainer onSetEntropy={handleSubmit} />
               ) : (
-                <Container centerText verticalCenter style={{width: '100%'}}>
-                  <Columns>
-                    <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
-                      <ContainerXS
-                        centerText
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'column',
-                          justifyContent: 'space-between',
-                        }}
-                      >
-                        <>
-                          <H2 center>{_(conversationJoinStrings.noAccountHead)}</H2>
-                          <Muted>{_(conversationJoinStrings.subhead)}</Muted>
-                          <Form style={{marginTop: 30}}>
-                            <InputBlock>
-                              <Input
-                                id="enter-name"
-                                name="name"
-                                autoComplete="username"
-                                value={enteredName}
-                                ref={nameInput}
-                                onChange={onNameChange}
-                                placeholder={_(conversationJoinStrings.namePlaceholder)}
-                                maxLength={64}
-                                minLength={2}
-                                pattern=".{2,64}"
-                                required
-                                data-uie-name="enter-name"
-                              />
-                            </InputBlock>
-                            {error ? parseValidationErrors(error) : parseError(conversationError)}
-                            {isSubmitingName ? (
-                              <Loading size={32} />
-                            ) : (
-                              <Button
-                                block
-                                type="submit"
-                                disabled={!enteredName || !isValidName || isSubmitingName}
-                                formNoValidate
-                                onClick={checkNameValidity}
-                                aria-label={_(conversationJoinStrings.joinButton)}
-                                data-uie-name="do-join-as-guest"
-                              >
-                                {_(conversationJoinStrings.joinButton)}
-                              </Button>
-                            )}
-                          </Form>
-                        </>
-                      </ContainerXS>
-                    </Column>
-                  </Columns>
-                </Container>
+                <GuestLoginColumn
+                  enteredName={enteredName}
+                  nameInput={nameInput}
+                  onNameChange={onNameChange}
+                  checkNameValidity={checkNameValidity}
+                  handleSubmit={handleSubmit}
+                  isSubmitingName={isSubmitingName}
+                  isValidName={isValidName}
+                  conversationError={conversationError}
+                  error={error}
+                />
               )}
             </Page>
           </Column>
