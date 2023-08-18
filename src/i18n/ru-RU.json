@@ -548,6 +548,8 @@
   "featureConfigChangeModalSelfDeletingMessagesDescriptionItemEnabled": "Самоудаляющиеся сообщения включены. Перед написанием сообщения можно установить таймер.",
   "featureConfigChangeModalSelfDeletingMessagesDescriptionItemEnforced": "Самоудаляющиеся сообщения теперь обязательны. Новые сообщения будут самоудаляться спустя {{timeout}}.",
   "featureConfigChangeModalSelfDeletingMessagesHeadline": "В {{brandName}} произошли изменения",
+  "federationConnectionRemove": "Бэкэнды [bold]{{backendUrlOne}}[/bold] и [bold]{{backendUrlTwo}}[/bold] прекратили взаимодействие.",
+  "federationDelete": "[bold]Ваш бэкэнд[/bold] прекратил взаимодействие с [bold]{{backendUrl}}.[/bold]",
   "fileTypeRestrictedIncoming": "Файл от&nbsp;[bold]{{name}}[/bold]&nbsp; не может быть открыт",
   "fileTypeRestrictedOutgoing": "Совместное использование файлов с расширением {{fileExt}} запрещено вашей организацией",
   "folderViewTooltip": "Папки",

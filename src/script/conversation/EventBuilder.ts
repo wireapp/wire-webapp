@@ -20,6 +20,7 @@
 import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data/';
 import {ConversationOtrMessageAddEvent, CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
+import {AddUsersFailureReasons} from '@wireapp/core/lib/conversation';
 import {DecryptionError} from '@wireapp/core/lib/errors/DecryptionError';
 
 import type {REASON as AVS_REASON} from '@wireapp/avs';
@@ -192,7 +193,10 @@ export type FileTypeRestrictedEvent = ConversationEvent<{fileExt: string; isInco
 export type CallingTimeoutEvent = ConversationEvent<{reason: AVS_REASON.NOONE_JOINED | AVS_REASON.EVERYONE_LEFT}> & {
   type: CONVERSATION.CALL_TIME_OUT;
 };
-export type FailedToAddUsersMessageEvent = ConversationEvent<{qualifiedIds: QualifiedId[]}> & {
+export type FailedToAddUsersMessageEvent = ConversationEvent<{
+  qualifiedIds: QualifiedId[];
+  reason: AddUsersFailureReasons;
+}> & {
   type: CONVERSATION.FAILED_TO_ADD_USERS;
 };
 
@@ -305,11 +309,13 @@ export const EventBuilder = {
     qualifiedIds: QualifiedId[],
     conversation: Conversation,
     userId: string,
+    reason: AddUsersFailureReasons,
   ): FailedToAddUsersMessageEvent {
     return {
       ...buildQualifiedId(conversation),
       data: {
         qualifiedIds,
+        reason,
       },
       from: userId,
       id: createUuid(),

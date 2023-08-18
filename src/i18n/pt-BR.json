@@ -548,6 +548,8 @@
   "featureConfigChangeModalSelfDeletingMessagesDescriptionItemEnabled": "A auto-exclusão de mensagens está habilitada. Você pode definir um temporizador antes de escrever uma mensagem.",
   "featureConfigChangeModalSelfDeletingMessagesDescriptionItemEnforced": "A auto-exclusão de mensagens agora é obrigatório. Novas mensagens serão excluídas automaticamente após {{timeout}}.",
   "featureConfigChangeModalSelfDeletingMessagesHeadline": "Houve uma mudança no {{brandName}}",
+  "federationConnectionRemove": "The backends [bold]{{backendUrlOne}}[/bold] and [bold]{{backendUrlTwo}}[/bold] stopped federating.",
+  "federationDelete": "[bold]Your backend[/bold] stopped federating with [bold]{{backendUrl}}.[/bold]",
   "fileTypeRestrictedIncoming": "O arquivo de &nbsp;[bold]{{name}}[/bold]&nbsp; não pode ser aberto",
   "fileTypeRestrictedOutgoing": "O compartilhamento de arquivos com a extensão {{fileExt}} não é permitido por sua organização",
   "folderViewTooltip": "Pastas",

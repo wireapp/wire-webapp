@@ -45,7 +45,7 @@ import {
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import type {BackendError} from '@wireapp/api-client/lib/http/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
-import {MLSReturnType} from '@wireapp/core/lib/conversation';
+import {AddUsersFailureReasons, MLSReturnType} from '@wireapp/core/lib/conversation';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {container} from 'tsyringe';
@@ -593,29 +593,27 @@ export class ConversationRepository {
           failedToAddUsers,
           conversationEntity,
           this.userState.self().id,
+          AddUsersFailureReasons.UNREACHABLE_BACKENDS,
         );
         await this.eventRepository.injectEvent(failedToAddUsersEvent);
       }
 
       return conversationEntity;
     } catch (error) {
-      if (!isBackendError(error)) {
-        this.logger.error(error);
-        throw error;
-      }
-
-      switch (error.label) {
-        case BackendErrorLabel.CLIENT_ERROR:
-          this.handleTooManyMembersError();
-          break;
-        case BackendErrorLabel.NOT_CONNECTED:
-          await this.handleUsersNotConnected(userEntities.map(user => user.qualifiedId));
-          break;
-        case BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT:
-          this.showLegalHoldConsentError();
-          break;
-        default:
-          this.logger.error(error);
+      if (isBackendError(error)) {
+        switch (error.label) {
+          case BackendErrorLabel.CLIENT_ERROR:
+            this.handleTooManyMembersError();
+            break;
+          case BackendErrorLabel.NOT_CONNECTED:
+            await this.handleUsersNotConnected(userEntities.map(user => user.qualifiedId));
+            break;
+          case BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT:
+            this.showLegalHoldConsentError();
+            break;
+          default:
+            this.logger.error(error);
+        }
       }
       throw error;
     }
@@ -1606,12 +1604,24 @@ export class ConversationRepository {
           events.forEach(event => this.eventRepository.injectEvent(event));
         }
       } else {
-        const conversationMemberJoinEvent = await this.core.service!.conversation.addUsersToProteusConversation({
-          conversationId,
-          qualifiedUsers,
-        });
-        if (conversationMemberJoinEvent) {
-          this.eventRepository.injectEvent(conversationMemberJoinEvent, EventRepository.SOURCE.BACKEND_RESPONSE);
+        const {failedToAdd, event: memberJoinEvent} =
+          await this.core.service!.conversation.addUsersToProteusConversation({
+            conversationId,
+            qualifiedUsers,
+          });
+        if (memberJoinEvent) {
+          await this.eventRepository.injectEvent(memberJoinEvent, EventRepository.SOURCE.BACKEND_RESPONSE);
+        }
+        if (failedToAdd) {
+          await this.eventRepository.injectEvent(
+            EventBuilder.buildFailedToAddUsersEvent(
+              failedToAdd.users,
+              conversation,
+              this.userState.self().id,
+              failedToAdd.reason,
+            ),
+            EventRepository.SOURCE.INJECTED,
+          );
         }
       }
     } catch (error) {
