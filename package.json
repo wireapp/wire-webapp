@@ -91,7 +91,7 @@
     "@types/underscore": "1.11.6",
     "@types/webpack-env": "1.18.1",
     "@wireapp/copy-config": "2.1.1",
-    "@wireapp/eslint-config": "3.0.0",
+    "@wireapp/eslint-config": "3.0.1",
     "@wireapp/prettier-config": "0.6.0",
     "@wireapp/store-engine": "^5.1.1",
     "adm-zip": "0.5.10",

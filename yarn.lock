@@ -5295,9 +5295,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/eslint-config@npm:3.0.0":
-  version: 3.0.0
-  resolution: "@wireapp/eslint-config@npm:3.0.0"
+"@wireapp/eslint-config@npm:3.0.1":
+  version: 3.0.1
+  resolution: "@wireapp/eslint-config@npm:3.0.1"
   dependencies:
     "@types/eslint": ^8
     "@types/prettier": ^3
@@ -5319,14 +5319,14 @@ __metadata:
     eslint-plugin-react: ^7.31.10
     eslint-plugin-react-hooks: ^4.6.0
     eslint-plugin-simple-import-sort: ^10.0.0
-    eslint-plugin-testing-library: ^5.9.1
+    eslint-plugin-testing-library: ^6.0.0
     eslint-plugin-unused-imports: ^3
     prettier: ^3
     typescript: ^5
   peerDependencies:
     eslint: ^8
     prettier: ^3
-  checksum: 4e677d6cef4ef50096911276ce4f298047fbc7ce143a0b48c08b50a7a84b405daf765bacee6878f676895357b08db9cd552289cc79a1701f4ea94948a0b021c8
+  checksum: 124ddfbd9aea79d3204d3ad393e8434e00f6c0badce197c929ceee13c193c9a73a01d9cdd610a27570c314752ff4ae308366952a5b814d6e8ab5defdb0745184
   languageName: node
   linkType: hard
 
@@ -8719,14 +8719,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-testing-library@npm:^5.9.1":
-  version: 5.11.1
-  resolution: "eslint-plugin-testing-library@npm:5.11.1"
+"eslint-plugin-testing-library@npm:^6.0.0":
+  version: 6.0.0
+  resolution: "eslint-plugin-testing-library@npm:6.0.0"
   dependencies:
     "@typescript-eslint/utils": ^5.58.0
   peerDependencies:
     eslint: ^7.5.0 || ^8.0.0
-  checksum: 9f3fc68ef9f13016a4381b33ab5dbffcc189e5de3eaeba184bcf7d2771faa7f54e59c04b652162fb1c0f83fb52428dd909db5450a25508b94be59eba69fcc990
+  checksum: 35ca701bc7cd788b0a1505a191d5c00721ede4bbb6ffd126d6700713dc104397451edefbca52b7c6c3eae2d4b55174ea6630a28dc3642b8b73ee2e2ba997cde4
   languageName: node
   linkType: hard
 
@@ -18182,7 +18182,7 @@ __metadata:
     "@wireapp/avs": 9.3.7
     "@wireapp/copy-config": 2.1.1
     "@wireapp/core": 41.2.0
-    "@wireapp/eslint-config": 3.0.0
+    "@wireapp/eslint-config": 3.0.1
     "@wireapp/lru-cache": 3.8.1
     "@wireapp/prettier-config": 0.6.0
     "@wireapp/react-ui-kit": 9.8.0
