@@ -6094,7 +6094,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"autoprefixer@npm:^10.4.13, autoprefixer@npm:^10.4.14":
+"autoprefixer@npm:^10.4.14":
   version: 10.4.14
   resolution: "autoprefixer@npm:10.4.14"
   dependencies:
@@ -6109,6 +6109,24 @@ __metadata:
   bin:
     autoprefixer: bin/autoprefixer
   checksum: e9f18e664a4e4a54a8f4ec5f6b49ed228ec45afaa76efcae361c93721795dc5ab644f36d2fdfc0dea446b02a8067b9372f91542ea431994399e972781ed46d95
+  languageName: node
+  linkType: hard
+
+"autoprefixer@npm:^10.4.15":
+  version: 10.4.15
+  resolution: "autoprefixer@npm:10.4.15"
+  dependencies:
+    browserslist: ^4.21.10
+    caniuse-lite: ^1.0.30001520
+    fraction.js: ^4.2.0
+    normalize-range: ^0.1.2
+    picocolors: ^1.0.0
+    postcss-value-parser: ^4.2.0
+  peerDependencies:
+    postcss: ^8.1.0
+  bin:
+    autoprefixer: bin/autoprefixer
+  checksum: d490b14fb098c043e109fc13cd23628f146af99a493d35b9df3a26f8ec0b4dd8937c5601cdbaeb465b98ea31d3ea05aa7184711d4d93dfb52358d073dcb67032
   languageName: node
   linkType: hard
 
@@ -18214,7 +18232,7 @@ __metadata:
     adm-zip: 0.5.10
     amplify: "https://github.com/wireapp/amplify#head=master"
     archiver: ^5.3.1
-    autoprefixer: ^10.4.13
+    autoprefixer: ^10.4.15
     babel-loader: 9.1.3
     babel-plugin-transform-import-meta: ^2.2.1
     beautiful-react-hooks: ^5.0.0
