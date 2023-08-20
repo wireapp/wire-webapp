@@ -13161,7 +13161,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"node-fetch@npm:2.6.12, node-fetch@npm:^2.6.1, node-fetch@npm:^2.6.12, node-fetch@npm:^2.6.7":
+"node-fetch@npm:2.6.13":
+  version: 2.6.13
+  resolution: "node-fetch@npm:2.6.13"
+  dependencies:
+    whatwg-url: ^5.0.0
+  peerDependencies:
+    encoding: ^0.1.0
+  peerDependenciesMeta:
+    encoding:
+      optional: true
+  checksum: 055845ae5b4796c78c7053564745345025cf959563b3568b43c385f67d311779e6b00e5fef6ed1b79f86ba4048e4b4b722e1aa948305521b9353eb7e788912c9
+  languageName: node
+  linkType: hard
+
+"node-fetch@npm:^2.6.1, node-fetch@npm:^2.6.12, node-fetch@npm:^2.6.7":
   version: 2.6.12
   resolution: "node-fetch@npm:2.6.12"
   dependencies:
@@ -18240,7 +18254,7 @@ __metadata:
     long: 5.2.3
     markdown-it: 13.0.1
     murmurhash: 2.0.1
-    node-fetch: 2.6.12
+    node-fetch: 2.6.13
     os-browserify: 0.3.0
     path-browserify: 1.0.1
     platform: 1.3.6
