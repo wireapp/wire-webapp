@@ -45,7 +45,7 @@ import {
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import type {BackendError} from '@wireapp/api-client/lib/http/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
-import {AddUsersFailureReasons, MLSReturnType} from '@wireapp/core/lib/conversation';
+import {MLSReturnType} from '@wireapp/core/lib/conversation';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {container} from 'tsyringe';
@@ -559,7 +559,8 @@ export class ConversationRepository {
           this.core.clientId,
         );
       } else {
-        response = {conversation: await this.core.service!.conversation.createProteusConversation(payload), events: []};
+        const {conversation, failedToAdd} = await this.core.service!.conversation.createProteusConversation(payload);
+        response = {conversation, events: [], failedToAdd};
       }
 
       const {conversationEntity} = await this.onCreate({
@@ -576,14 +577,14 @@ export class ConversationRepository {
         type: CONVERSATION_EVENT.CREATE,
       });
 
-      const {failed_to_add: failedToAddUsers} = response.conversation;
+      const {failedToAdd} = response;
 
-      if (failedToAddUsers && failedToAddUsers.length > 0) {
+      if (failedToAdd) {
         const failedToAddUsersEvent = EventBuilder.buildFailedToAddUsersEvent(
-          failedToAddUsers,
+          failedToAdd.users,
           conversationEntity,
           this.userState.self().id,
-          AddUsersFailureReasons.UNREACHABLE_BACKENDS,
+          failedToAdd.reason,
         );
         await this.eventRepository.injectEvent(failedToAddUsersEvent);
       }
