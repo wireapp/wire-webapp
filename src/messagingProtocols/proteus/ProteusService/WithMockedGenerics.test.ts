@@ -93,7 +93,7 @@ describe('createConversation', () => {
       const conversationData = createConversationResult as unknown as NewConversation;
       const returnData = await proteusService.createConversation(conversationData);
 
-      expect(returnData).toStrictEqual(createConversationResult);
+      expect(returnData.conversation).toStrictEqual(createConversationResult);
     });
 
     it('create a new conversation with no name', async () => {
@@ -101,7 +101,7 @@ describe('createConversation', () => {
       const conversationData = {users: ['user1', 'user2'], receipt_mode: null};
       const returnData = await proteusService.createConversation(conversationData);
 
-      expect(returnData).toStrictEqual(conversationData);
+      expect(returnData.conversation).toStrictEqual(conversationData);
     });
   });
 });
