@@ -120,17 +120,11 @@ export class MediaDevicesHandler {
       }
       const isAvailable = this.availableDevices[deviceType]().find(device => {
         return (
-          ((device as MediaDeviceInfo).groupId || (device as ElectronDesktopCapturerSource).id) === currentDeviceId
+          ((device as MediaDeviceInfo).deviceId || (device as ElectronDesktopCapturerSource).id) === currentDeviceId
         );
       });
 
       const isFavorite = loadValue<String[]>(`${deviceType}-fave`)?.find(id => id === currentDeviceId);
-
-      const isDefault = this.availableDevices[deviceType]().find(device => {
-        return (
-          ((device as MediaDeviceInfo).deviceId || (device as ElectronDesktopCapturerSource).id) === currentDeviceId
-        );
-      });
 
       function isMediaDevice(
         device: MediaDeviceInfo | ElectronDesktopCapturerSource | undefined,
@@ -140,14 +134,10 @@ export class MediaDevicesHandler {
 
       if (isFavorite && isAvailable) {
         return currentDeviceId;
-      } else if (!isFavorite && isAvailable) {
-        return isMediaDevice(isAvailable)
-          ? isAvailable?.groupId
-          : isAvailable?.id ?? MediaDevicesHandler.CONFIG.DEFAULT_DEVICE[deviceType];
       }
-      return isMediaDevice(isDefault)
-        ? isDefault?.groupId
-        : isDefault?.id ?? MediaDevicesHandler.CONFIG.DEFAULT_DEVICE[deviceType];
+      return isMediaDevice(isAvailable)
+        ? isAvailable?.deviceId
+        : isAvailable?.id ?? MediaDevicesHandler.CONFIG.DEFAULT_DEVICE[deviceType];
     };
     this.currentAvailableDeviceId = {
       audioInput: ko.pureComputed(() => getCurrentAvailableDeviceId(DeviceTypes.AUDIO_INPUT)),
@@ -200,34 +190,35 @@ export class MediaDevicesHandler {
   private subscribeToObservables(): void {
     this.currentDeviceId.audioInput.subscribe(mediaDeviceId => {
       const faveAudioInput = loadValue<string[]>(FavoriteDeviceTypes.AUDIO_INPUT) ?? [];
-      const newFaveAudioInput =
-        this.previousDeviceSupport.audioInput >= this.availableDevices.audioInput().length
-          ? [...faveAudioInput!.filter(id => id !== mediaDeviceId), mediaDeviceId]
-          : [mediaDeviceId, ...faveAudioInput!.filter(id => id !== mediaDeviceId)];
+      const disconnected = this.previousDeviceSupport.audioInput > this.availableDevices.audioInput().length;
+      const newFaveAudioInput = this.orderFavoriteDevices(mediaDeviceId, faveAudioInput, disconnected);
+
       storeValue(MediaDeviceType.AUDIO_INPUT, mediaDeviceId);
       storeValue(FavoriteDeviceTypes.AUDIO_INPUT, newFaveAudioInput);
     });
 
     this.currentDeviceId.audioOutput.subscribe(mediaDeviceId => {
       const faveAudioOutput = loadValue<string[]>(FavoriteDeviceTypes.AUDIO_OUTPUT) ?? [];
-      const newFaveAudioOutput =
-        this.previousDeviceSupport.audioOutput >= this.availableDevices.audioOutput().length
-          ? [...faveAudioOutput!.filter(id => id !== mediaDeviceId), mediaDeviceId]
-          : [mediaDeviceId, ...faveAudioOutput!.filter(id => id !== mediaDeviceId)];
+      const disconnected = this.previousDeviceSupport.audioOutput > this.availableDevices.audioOutput().length;
+      const newFaveAudioOutput = this.orderFavoriteDevices(mediaDeviceId, faveAudioOutput, disconnected);
+
       storeValue(MediaDeviceType.AUDIO_OUTPUT, mediaDeviceId);
       storeValue(FavoriteDeviceTypes.AUDIO_OUTPUT, newFaveAudioOutput);
     });
 
     this.currentDeviceId.videoInput.subscribe(mediaDeviceId => {
       const faveVideoInput = loadValue<string[]>(FavoriteDeviceTypes.VIDEO_INPUT) ?? [];
-      const newFaveVideoInput =
-        this.previousDeviceSupport.videoInput >= this.availableDevices.videoInput().length
-          ? [...faveVideoInput!.filter(id => id !== mediaDeviceId), mediaDeviceId]
-          : [mediaDeviceId, ...faveVideoInput!.filter(id => id !== mediaDeviceId)];
+      const disconnected = this.previousDeviceSupport.videoInput > this.availableDevices.videoInput().length;
+      const newFaveVideoInput = this.orderFavoriteDevices(mediaDeviceId, faveVideoInput, disconnected);
+
       storeValue(MediaDeviceType.VIDEO_INPUT, mediaDeviceId);
       storeValue(FavoriteDeviceTypes.VIDEO_INPUT, newFaveVideoInput);
     });
   }
+
+  private orderFavoriteDevices = (mediaDevice: string, favoriteDevices: string[], disconnected: boolean): string[] => {
+    return disconnected ? favoriteDevices : [mediaDevice, ...favoriteDevices.filter(id => id !== mediaDevice)];
+  };
 
   private filterMediaDevices(mediaDevices: MediaDeviceInfo[]): {
     cameras: MediaDeviceInfo[];
@@ -244,7 +235,7 @@ export class MediaDevicesHandler {
      */
     const microphones = mediaDevices.filter(device => device.kind === MediaDeviceType.AUDIO_INPUT);
     const dedupedMicrophones = microphones.reduce<Record<string, MediaDeviceInfo>>((microphoneList, microphone) => {
-      if (!microphoneList.hasOwnProperty(microphone.groupId) || microphone.deviceId === 'communications') {
+      if (!microphoneList.hasOwnProperty(microphone.deviceId) || microphone.deviceId === 'communications') {
         microphoneList[microphone.groupId] = microphone;
       }
       return microphoneList;
@@ -252,7 +243,7 @@ export class MediaDevicesHandler {
 
     const speakers = mediaDevices.filter(device => device.kind === MediaDeviceType.AUDIO_OUTPUT);
     const dedupedSpeakers = speakers.reduce<Record<string, MediaDeviceInfo>>((speakerList, speaker) => {
-      if (!speakerList.hasOwnProperty(speaker.groupId) || speaker.deviceId === 'communications') {
+      if (!speakerList.hasOwnProperty(speaker.deviceId) || speaker.deviceId === 'communications') {
         speakerList[speaker.groupId] = speaker;
       }
       return speakerList;
@@ -275,16 +266,16 @@ export class MediaDevicesHandler {
       const currentId = this.currentDeviceId[type];
 
       const favorites = loadValue<string[]>(`${type}-fave`) ?? [];
-      const isFavorite = favorites.map(favorite => devices.some(d => d.groupId === favorite));
+      const isFavorite = favorites.map(favorite => devices.some(d => d.deviceId === favorite));
 
       if (isFavorite.some(favorite => favorite)) {
         const faveIndex = isFavorite.findIndex(favorite => favorite);
         currentId(
-          devices.find(d => d.deviceId === favorites[faveIndex] || d.groupId === favorites[faveIndex])?.groupId ??
-            devices[0]?.groupId,
+          devices.find(d => d.deviceId === favorites[faveIndex] || d.deviceId === favorites[faveIndex])?.deviceId ??
+            devices[0]?.deviceId,
         );
-      } else if (!devices.some(d => d.groupId === currentId())) {
-        currentId(devices[0]?.groupId);
+      } else if (!devices.some(d => d.deviceId === currentId())) {
+        currentId(devices[0]?.deviceId);
       }
     };
 
