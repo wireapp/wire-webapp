@@ -23,8 +23,7 @@ import {
   MessageSendingStatus,
   Conversation,
 } from '@wireapp/api-client/lib/conversation';
-import {ConversationEvent} from '@wireapp/api-client/lib/event';
-import {ConversationMemberJoinEvent} from '@wireapp/api-client/lib/event';
+import {ConversationEvent, ConversationMemberJoinEvent} from '@wireapp/api-client/lib/event';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {GenericMessage} from '@wireapp/protocol-messaging';
