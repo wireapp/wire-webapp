@@ -42,7 +42,7 @@ import {PanelEntity, PanelState, RightSidebar} from './RightSidebar';
 import {RootProvider} from './RootProvider';
 import {useAppMainState, ViewType} from './state';
 import {useAppState, ContentState} from './useAppState';
-import {useWindowTitle} from './useWindowTitle';
+import {WindowTitleUpdater} from './useWindowTitle';
 
 import {ConversationState} from '../conversation/ConversationState';
 import {User} from '../entity/User';
@@ -94,8 +94,6 @@ const AppMain: FC<AppMainProps> = ({
 
   const teamState = container.resolve(TeamState);
   const userState = container.resolve(UserState);
-
-  useWindowTitle();
 
   const {isActivatedAccount} = useKoSubscribableChildren(userState, ['isActivatedAccount']);
 
@@ -214,6 +212,7 @@ const AppMain: FC<AppMainProps> = ({
       data-uie-name="status-webapp"
       data-uie-value="is-loaded"
     >
+      <WindowTitleUpdater />
       <RootProvider value={mainView}>
         <ErrorBoundary FallbackComponent={ErrorFallback}>
           <div id="app" className="app">
