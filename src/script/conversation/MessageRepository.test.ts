@@ -252,4 +252,66 @@ describe('MessageRepository', () => {
       expect(core.service!.conversation.send).toHaveBeenCalled();
     });
   });
+
+  describe('updateUserReactions', () => {
+    it("should add reaction if it doesn't exist", async () => {
+      const [messageRepository] = await buildMessageRepository();
+      const reactions = {
+        user1: 'like,love',
+        user2: 'happy,sad',
+      };
+      const userId = 'user1';
+      const reaction = 'cry';
+      const expectedReactions = {
+        user1: 'like,love,cry',
+        user2: 'happy,sad',
+      };
+      const result = messageRepository.updateUserReactions(reactions, userId, reaction);
+      expect(result).toEqual(expectedReactions[userId]);
+    });
+
+    it('should set the reaction for the user for the first time', async () => {
+      const [messageRepository] = await buildMessageRepository();
+      const reactions = {
+        user1: 'like,love,haha',
+        user2: 'happy,sad',
+      };
+      const userId = 'user3';
+      const reaction = 'like';
+      const expectedReactions = 'like';
+      const result = messageRepository.updateUserReactions(reactions, userId, reaction);
+      expect(result).toEqual(expectedReactions);
+    });
+
+    it('should delete reaction if it exists', async () => {
+      const [messageRepository] = await buildMessageRepository();
+      const reactions = {
+        user1: 'like,love,haha',
+        user2: 'happy,sad',
+      };
+      const userId = 'user1';
+      const reaction = 'haha';
+      const expectedReactions = {
+        user1: 'like,love',
+        user2: 'happy,sad',
+      };
+      const result = messageRepository.updateUserReactions(reactions, userId, reaction);
+      expect(result).toEqual(expectedReactions[userId]);
+    });
+    it('should return an empty string if no reactions for a user', async () => {
+      const [messageRepository] = await buildMessageRepository();
+      const reactions = {
+        user1: 'like',
+        user2: 'happy,sad',
+      };
+      const userId = 'user1';
+      const reaction = 'like';
+      const expectedReactions = {
+        user1: '',
+        user2: 'happy,sad',
+      };
+      const result = messageRepository.updateUserReactions(reactions, userId, reaction);
+      expect(result).toEqual(expectedReactions[userId]);
+    });
+  });
 });
