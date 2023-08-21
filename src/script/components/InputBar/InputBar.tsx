@@ -21,7 +21,7 @@ import {useEffect, useRef, useState} from 'react';
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
-import {$createParagraphNode, $createTextNode, $getRoot, $setSelection, LexicalEditor} from 'lexical';
+import {$getRoot, LexicalEditor} from 'lexical';
 import {container} from 'tsyringe';
 
 import {useMatchMedia} from '@wireapp/react-ui-kit';
@@ -34,13 +34,10 @@ import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
 import {RichTextContent, RichTextEditor} from 'Components/RichTextEditor';
 import {SendMessageButton} from 'Components/RichTextEditor/components/SendMessageButton';
-import {$createMentionNode} from 'Components/RichTextEditor/nodes/MentionNode';
-import {createNodes} from 'Components/RichTextEditor/utils/generateNodes';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from 'src/script/user/TypingIndicatorMode';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {loadDraftState, saveDraftState} from 'Util/DraftStateUtil';
 import {KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatLocale, TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -54,12 +51,12 @@ import {TYPING_TIMEOUT} from './components/TypingIndicator';
 import {TypingIndicator} from './components/TypingIndicator/TypingIndicator';
 import {useFilePaste} from './hooks/useFilePaste';
 import {handleClickOutsideOfInputBar, IgnoreOutsideClickWrapper} from './util/clickHandlers';
+import {loadDraftState, saveDraftState} from './util/DraftStateUtil';
 
 import {Config} from '../../Config';
 import {MessageRepository, OutgoingQuote} from '../../conversation/MessageRepository';
 import {Conversation} from '../../entity/Conversation';
 import {ContentMessage} from '../../entity/message/ContentMessage';
-import {Text as TextAsset} from '../../entity/message/Text';
 import {User} from '../../entity/User';
 import {ConversationError} from '../../error/ConversationError';
 import {EventRepository} from '../../event/EventRepository';
@@ -153,12 +150,9 @@ export const InputBar = ({
   // Message
   /** the messageContent represents the message being edited. It's directly derived from the editor state */
   const [messageContent, setMessageContent] = useState<RichTextContent>({text: ''});
-  const [editMessageEntity, setEditMessageEntity] = useState<ContentMessage | null>(null);
+  const [editedMessage, setEditedMessage] = useState<ContentMessage | undefined>();
   const [replyMessageEntity, setReplyMessageEntity] = useState<ContentMessage | null>(null);
   const textValue = messageContent.text;
-
-  // Mentions
-  const [currentMentions, setCurrentMentions] = useState<MentionEntity[]>([]);
 
   // Files
   const [pastedFile, setPastedFile] = useState<File | null>(null);
@@ -175,7 +169,7 @@ export const InputBar = ({
 
   const inputPlaceholder = messageTimer ? t('tooltipConversationEphemeral') : t('tooltipConversationInputPlaceholder');
 
-  const isEditing = !!editMessageEntity;
+  const isEditing = !!editedMessage;
   const isReplying = !!replyMessageEntity;
   const isConnectionRequest = isOutgoingRequest || isIncomingRequest;
   const hasLocalEphemeralTimer = isSelfDeletingMessagesEnabled && !!localMessageTimer && !hasGlobalMessageTimer;
@@ -192,8 +186,6 @@ export const InputBar = ({
   const mentionCandidates = participatingUserEts.filter(userEntity => !userEntity.isService);
 
   const resetDraftState = (resetInputValue = false) => {
-    setCurrentMentions([]);
-
     if (resetInputValue) {
       editorRef.current?.update(() => {
         $getRoot().clear();
@@ -219,7 +211,7 @@ export const InputBar = ({
   };
 
   const cancelMessageEditing = (resetDraft = true, resetInputValue = false) => {
-    setEditMessageEntity(null);
+    setEditedMessage(undefined);
     setReplyMessageEntity(null);
 
     if (resetDraft) {
@@ -231,36 +223,14 @@ export const InputBar = ({
     cancelMessageReply(false);
   };
 
-  const editMessage = (messageEntity: ContentMessage, editor: LexicalEditor) => {
-    if (messageEntity?.isEditable() && messageEntity !== editMessageEntity) {
-      const firstAsset = messageEntity.getFirstAsset() as TextAsset;
-      const newMentions = firstAsset.mentions().slice();
-
+  const editMessage = (messageEntity: ContentMessage | undefined) => {
+    if (!messageEntity) {
+      cancelMessageEditing(true, true);
+    }
+    if (messageEntity?.isEditable() && messageEntity !== editedMessage) {
       cancelMessageReply();
       cancelMessageEditing(true, true);
-      setEditMessageEntity(messageEntity);
-      setCurrentMentions(newMentions);
-      editor.update(() => {
-        const nodes = createNodes(newMentions, firstAsset.text);
-
-        const paragraphs = nodes.map(node => {
-          if (node.type === 'Mention') {
-            return $createMentionNode('@', node.data.slice(1));
-          }
-
-          return $createTextNode(node.data);
-        });
-
-        const root = $getRoot();
-        const paragraphNode = $createParagraphNode();
-        paragraphNode.append(...paragraphs);
-        root.append(paragraphNode);
-
-        // This behaviour is needed to clear selection, if we not clear selection will be on beginning.
-        $setSelection(null);
-
-        editor.focus();
-      });
+      setEditedMessage(messageEntity);
 
       if (messageEntity.quote() && conversationEntity) {
         void messageRepository
@@ -319,7 +289,7 @@ export const InputBar = ({
   const replyMessage = (messageEntity: ContentMessage): void => {
     if (messageEntity?.isReplyable() && messageEntity !== replyMessageEntity) {
       cancelMessageReply(false);
-      cancelMessageEditing(!!editMessageEntity);
+      cancelMessageEditing(!!editedMessage);
       setReplyMessageEntity(messageEntity);
 
       editorRef.current?.focus();
@@ -345,13 +315,13 @@ export const InputBar = ({
     const mentionEntities = mentions.slice(0);
     cancelMessageEditing(true, true);
 
-    if (!messageText.length && editMessageEntity) {
-      return messageRepository.deleteMessageForEveryone(conversationEntity, editMessageEntity);
+    if (!messageText.length && editedMessage) {
+      return messageRepository.deleteMessageForEveryone(conversationEntity, editedMessage);
     }
 
-    if (editMessageEntity) {
+    if (editedMessage) {
       messageRepository
-        .sendMessageEdit(conversationEntity, messageText, editMessageEntity, mentionEntities)
+        .sendMessageEdit(conversationEntity, messageText, editedMessage, mentionEntities)
         .catch(error => {
           if (error.type !== ConversationError.TYPE.NO_MESSAGE_CHANGES) {
             throw error;
@@ -611,13 +581,13 @@ export const InputBar = ({
                   // autofocus the editor when first loaded
                   lexical?.focus();
                 }}
+                editedMessage={editedMessage}
                 editMessage={editMessage}
                 mentionCandidates={mentionCandidates}
                 searchRepository={searchRepository}
                 propertiesRepository={propertiesRepository}
                 placeholder={inputPlaceholder}
                 onUpdate={setMessageContent}
-                currentMentions={currentMentions}
                 hasLocalEphemeralTimer={hasLocalEphemeralTimer}
                 saveDraftState={saveDraft}
                 loadDraftState={loadDraft}

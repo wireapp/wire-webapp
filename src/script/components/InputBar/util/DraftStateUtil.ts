@@ -17,17 +17,18 @@
  *
  */
 
-import {generateConversationInputStorageKey} from 'Util/util';
-
-import {MessageRepository} from '../conversation/MessageRepository';
-import {Conversation} from '../entity/Conversation';
-import {ContentMessage} from '../entity/message/ContentMessage';
-import {StorageRepository} from '../storage';
+import {MessageRepository} from '../../../conversation/MessageRepository';
+import {Conversation} from '../../../entity/Conversation';
+import {ContentMessage} from '../../../entity/message/ContentMessage';
+import {StorageKey, StorageRepository} from '../../../storage';
 
 export interface DraftState {
   editorState: string | null;
   messageReply?: Promise<ContentMessage>;
 }
+
+const generateConversationInputStorageKey = (conversationEntity: Conversation): string =>
+  `${StorageKey.CONVERSATION.INPUT}|${conversationEntity.id}`;
 
 export const saveDraftState = async (
   storageRepository: StorageRepository,

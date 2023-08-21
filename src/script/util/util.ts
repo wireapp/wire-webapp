@@ -378,9 +378,6 @@ export const setContextMenuPosition = (event: React.KeyboardEvent) => {
   });
 };
 
-export const generateConversationInputStorageKey = (conversationEntity: Conversation): string =>
-  `${StorageKey.CONVERSATION.INPUT}|${conversationEntity.id}`;
-
 const supportsSecretStorage = () => !Runtime.isDesktopApp() || !!window.systemCrypto;
 
 // disables mls for old 'broken' desktop clients, see https://github.com/wireapp/wire-desktop/pull/6094

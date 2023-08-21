@@ -29,13 +29,21 @@ import {mergeRegister} from '@lexical/utils';
 import type {WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
 import cx from 'classnames';
-import {LexicalEditor, EditorState, $nodesOfType, KEY_ENTER_COMMAND, COMMAND_PRIORITY_LOW} from 'lexical';
+import {
+  LexicalEditor,
+  EditorState,
+  $nodesOfType,
+  KEY_ENTER_COMMAND,
+  COMMAND_PRIORITY_LOW,
+  $getRoot,
+  $setSelection,
+} from 'lexical';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {DraftState} from 'Components/InputBar/util/DraftStateUtil';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {User} from 'src/script/entity/User';
-import {DraftState} from 'Util/DraftStateUtil';
 import {getLogger} from 'Util/Logger';
 
 import {EmojiNode} from './nodes/EmojiNode';
@@ -48,6 +56,7 @@ import {GlobalEventsPlugin} from './plugins/GlobalEventsPlugin';
 import {HistoryPlugin} from './plugins/HistoryPlugin';
 import {ReplaceEmojiPlugin} from './plugins/InlineEmojiReplacementPlugin';
 import {MentionsPlugin} from './plugins/MentionsPlugin';
+import {toEditorNodes} from './utils/messageToEditorNodes';
 
 import {MentionEntity} from '../../message/MentionEntity';
 import {PropertiesRepository} from '../../properties/PropertiesRepository';
@@ -72,12 +81,12 @@ export type RichTextContent = {
 };
 
 interface RichTextEditorProps {
-  currentMentions: MentionEntity[];
   readonly propertiesRepository: PropertiesRepository;
   readonly searchRepository: SearchRepository;
   placeholder: string;
   onUpdate: (content: RichTextContent) => void;
-  editMessage: (messageEntity: ContentMessage, editor: LexicalEditor) => void;
+  editMessage: (messageEntity: ContentMessage) => void;
+  editedMessage?: ContentMessage;
   children: ReactElement;
   hasLocalEphemeralTimer: boolean;
   saveDraftState: (editor: string) => void;
@@ -118,6 +127,7 @@ export const RichTextEditor = ({
   saveDraftState,
   loadDraftState,
   editMessage,
+  editedMessage,
   mentionCandidates,
   onShiftTab,
   onSend,
@@ -163,6 +173,19 @@ export const RichTextEditor = ({
   useEffect(() => {
     return cleanupRef.current;
   });
+
+  useEffect(() => {
+    if (editedMessage && editorRef.current) {
+      editorRef.current.update(() => {
+        const root = $getRoot();
+        // Replace the current root with the content of the message being edited
+        root.append(toEditorNodes(editedMessage));
+        // This behaviour is needed to clear selection, if we not clear selection will be on beginning.
+        $setSelection(null);
+        editorRef.current?.focus();
+      });
+    }
+  }, [editedMessage]);
 
   const [shouldReplaceEmoji, setShouldReplaceEmoji] = useState<boolean>(
     propertiesRepository.getPreference(PROPERTIES_TYPE.EMOJI.REPLACE_INLINE),

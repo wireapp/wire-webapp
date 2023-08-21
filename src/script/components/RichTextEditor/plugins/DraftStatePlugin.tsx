@@ -21,7 +21,7 @@ import {useCallback, useEffect} from 'react';
 
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 
-import {DraftState} from 'Util/DraftStateUtil';
+import {DraftState} from 'Components/InputBar/util/DraftStateUtil';
 
 interface DraftStatePluginProps {
   loadDraftState: () => Promise<any>;
