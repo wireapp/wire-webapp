@@ -29,7 +29,7 @@ const defaultOptions = {
 export class PromiseQueue {
   private blocked: boolean;
   private runningTasks: number;
-  private interval?: NodeJS.Timer;
+  private interval?: NodeJS.Timeout;
   private paused: boolean;
   private readonly concurrent: number;
   private readonly logger?: {warn: (...args: any[]) => void};
