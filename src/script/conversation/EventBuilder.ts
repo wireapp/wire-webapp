@@ -21,6 +21,7 @@ import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data/';
 import {ConversationOtrMessageAddEvent, CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {AddUsersFailureReasons} from '@wireapp/core/lib/conversation';
+import {ReactionType} from '@wireapp/core/lib/conversation/ReactionType';
 import {DecryptionError} from '@wireapp/core/lib/errors/DecryptionError';
 
 import type {REASON as AVS_REASON} from '@wireapp/avs';
@@ -30,7 +31,6 @@ import {createUuid} from 'Util/uuid';
 
 import {CALL_MESSAGE_TYPE} from '../calling/enum/CallMessageType';
 import type {Conversation} from '../entity/Conversation';
-import {ReactionType} from '../entity/message/ContentMessage';
 import type {Message} from '../entity/message/Message';
 import type {User} from '../entity/User';
 import {CALL, ClientEvent, CONVERSATION} from '../event/Client';

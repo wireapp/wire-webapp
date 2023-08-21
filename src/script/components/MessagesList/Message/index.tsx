@@ -49,13 +49,12 @@ export interface MessageActions {
   onClickCancelRequest: (message: MemberMessageEntity) => void;
   onClickImage: (message: ContentMessage, event: React.UIEvent) => void;
   onClickInvitePeople: () => void;
-  onClickLikes: (message: BaseMessage) => void;
+  onClickReactionDetails: (message: BaseMessage) => void;
   onClickMessage: (event: MouseEvent | KeyboardEvent, elementType: ElementType, messageDetails: MessageDetails) => void;
   onClickParticipants: (participants: User[]) => void;
-  onClickReceipts: (message: BaseMessage) => void;
+  onClickDetails: (message: BaseMessage) => void;
   onClickResetSession: (messageError: DecryptErrorMessage) => void;
   onClickTimestamp: (messageId: string) => void;
-  onLike: (message: ContentMessage, button?: boolean) => void;
 }
 
 export interface MessageParams extends MessageActions {
@@ -140,6 +139,7 @@ const Message: React.FC<
     }
     if (isTabKey(event)) {
       // don't call arrow key down for tab key
+      // on tab key from message element reset the floating action menu selection
       return;
     }
     handleArrowKeyDown(event);
@@ -161,16 +161,6 @@ const Message: React.FC<
       messageRef.current?.focus();
     }
   }, [isMessageFocused, message]);
-
-  // set message elements focus for non content type mesages
-  // some non content type message has interactive element like invite people for member message
-  useEffect(() => {
-    if (!messageRef.current || message.isContent()) {
-      return;
-    }
-    const interactiveMsgElements = getAllFocusableElements(messageRef.current);
-    setElementsTabIndex(interactiveMsgElements, isMsgElementsFocusable && isMessageFocused);
-  }, [isMessageFocused, isMsgElementsFocusable, message]);
 
   // set message elements focus for non content type mesages
   // some non content type message has interactive element like invite people for member message
@@ -220,21 +210,23 @@ const Message: React.FC<
       data-uie-name="item-message"
       role="list"
     >
-      <div className={cx('message-header message-timestamp', getTimestampClass())}>
-        <div className="message-header-icon">
-          <span className="message-unread-dot" />
+      {markerType !== MessageMarkerType.NONE ? (
+        <div className={cx('message-header message-timestamp', getTimestampClass())}>
+          <div className="message-header-icon">
+            <span className="message-unread-dot" />
+          </div>
+
+          <h3 className="message-header-label">
+            <MessageTime timestamp={timestamp} className="label-xs" data-timestamp-type="normal">
+              {timeAgo}
+            </MessageTime>
+
+            <MessageTime timestamp={timestamp} data-timestamp-type="day" className="label-bold-xs">
+              {timeAgoDay}
+            </MessageTime>
+          </h3>
         </div>
-
-        <h3 className="message-header-label">
-          <MessageTime timestamp={timestamp} className="label-xs" data-timestamp-type="normal">
-            {timeAgo}
-          </MessageTime>
-
-          <MessageTime timestamp={timestamp} data-timestamp-type="day" className="label-bold-xs">
-            {timeAgoDay}
-          </MessageTime>
-        </h3>
-      </div>
+      ) : null}
 
       {/*eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions*/}
       <div
@@ -242,6 +234,9 @@ const Message: React.FC<
         ref={messageRef}
         role="listitem"
         onKeyDown={handleDivKeyDown}
+        onClick={event => {
+          handleFocus(index);
+        }}
         className="message-wrapper"
       >
         {wrappedContent}

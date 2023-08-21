@@ -65,7 +65,8 @@ export const isEnterKey = (keyboardEvent: KeyboardEvent | ReactKeyboardEvent): b
 
 export const isSpaceKey = (keyboardEvent: KeyboardEvent): boolean => isKey(keyboardEvent, KEY.SPACE);
 
-export const isEscapeKey = (keyboardEvent: KeyboardEvent): boolean => isKey(keyboardEvent, KEY.ESC);
+export const isEscapeKey = (keyboardEvent: KeyboardEvent | ReactKeyboardEvent): boolean =>
+  isKey(keyboardEvent, KEY.ESC);
 
 export const isFunctionKey = (keyboardEvent: KeyboardEvent | ReactKeyboardEvent): boolean =>
   keyboardEvent.altKey || keyboardEvent.ctrlKey || keyboardEvent.metaKey || keyboardEvent.shiftKey;
