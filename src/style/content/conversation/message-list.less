@@ -301,6 +301,8 @@
 // MESSAGE - BODY
 .message-body {
   display: flex;
+
+  max-width: @conversation-max-width;
   padding-left: @conversation-message-sender-width;
 
   .text {
@@ -757,7 +759,7 @@
 
 // MESSAGE SPACING
 .message-asset {
-  display: block;
+  flex: 1;
   margin-top: 16px;
 }
 
