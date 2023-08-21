@@ -22,8 +22,7 @@ import {Notification} from '@wireapp/api-client/lib/notification';
 import {APIClient} from '@wireapp/api-client';
 import {MemoryEngine} from '@wireapp/store-engine';
 
-import {MLSService} from '../messagingProtocols/mls';
-import {ProteusService} from '../messagingProtocols/proteus';
+import {ConversationService} from '../conversation';
 
 import {NotificationService, NotificationSource} from '.';
 
@@ -34,8 +33,7 @@ const MOCK_BACKEND = {
   ws: `wss://${BASE_URL}`,
 };
 
-const mockedMLSService = {} as unknown as MLSService;
-const mockedProteusService = {} as unknown as ProteusService;
+const mockedConversationService = {} as unknown as ConversationService;
 
 describe('NotificationService', () => {
   describe('handleEvent', () => {
@@ -45,12 +43,7 @@ describe('NotificationService', () => {
 
       const apiClient = new APIClient({urls: MOCK_BACKEND});
 
-      const notificationService = new NotificationService(
-        apiClient,
-        mockedProteusService,
-        storeEngine,
-        mockedMLSService,
-      );
+      const notificationService = new NotificationService(apiClient, storeEngine, mockedConversationService);
 
       jest.spyOn(notificationService as any, 'handleEvent').mockImplementation(() => {
         throw new Error('Test error');
@@ -83,12 +76,7 @@ describe('NotificationService', () => {
       await storeEngine.init('NotificationService.test');
 
       const apiClient = new APIClient({urls: MOCK_BACKEND});
-      const notificationService = new NotificationService(
-        apiClient,
-        mockedProteusService,
-        storeEngine,
-        mockedMLSService,
-      );
+      const notificationService = new NotificationService(apiClient, storeEngine, mockedConversationService);
 
       jest.spyOn(notificationService as any, 'handleEvent').mockReturnValue({});
       const spySetLastNotificationId = jest
@@ -116,12 +104,7 @@ describe('NotificationService', () => {
       await storeEngine.init('NotificationService.test');
 
       const apiClient = new APIClient({urls: MOCK_BACKEND});
-      const notificationService = new NotificationService(
-        apiClient,
-        mockedProteusService,
-        storeEngine,
-        mockedMLSService,
-      );
+      const notificationService = new NotificationService(apiClient, storeEngine, mockedConversationService);
 
       jest.spyOn(notificationService as any, 'handleEvent').mockReturnValue({});
       const spySetLastNotificationId = jest
@@ -148,12 +131,7 @@ describe('NotificationService', () => {
         await storeEngine.init('NotificationService.test');
 
         const apiClient = new APIClient({urls: MOCK_BACKEND});
-        const notificationService = new NotificationService(
-          apiClient,
-          mockedProteusService,
-          storeEngine,
-          mockedMLSService,
-        );
+        const notificationService = new NotificationService(apiClient, storeEngine, mockedConversationService);
         notificationService.on(NotificationService.TOPIC.NOTIFICATION_ERROR, notificationError => {
           expect(notificationError.error.message).toBe('Test error');
           expect(spySetLastNotificationId).toHaveBeenCalledTimes(0);

@@ -17,7 +17,7 @@
  *
  */
 
-import {BackendEvent, CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
+import {BackendEvent} from '@wireapp/api-client/lib/event';
 import {Notification} from '@wireapp/api-client/lib/notification/';
 import {AbortHandler} from '@wireapp/api-client/lib/tcp';
 import logdown from 'logdown';
@@ -30,10 +30,9 @@ import {NotificationBackendRepository} from './NotificationBackendRepository';
 import {NotificationDatabaseRepository} from './NotificationDatabaseRepository';
 import {NotificationSource} from './Notifications.types';
 
+import {ConversationService} from '../conversation';
 import {CoreError, NotificationError} from '../CoreError';
 import {DecryptionError} from '../errors/DecryptionError';
-import {MLSService} from '../messagingProtocols/mls';
-import {ProteusService} from '../messagingProtocols/proteus';
 import {TypedEventEmitter} from '../util/TypedEventEmitter';
 
 export type HandledEventPayload = {
@@ -71,9 +70,8 @@ export class NotificationService extends TypedEventEmitter<Events> {
 
   constructor(
     apiClient: APIClient,
-    private readonly proteusService: ProteusService,
     storeEngine: CRUDEngine,
-    private readonly mlsService?: MLSService,
+    private readonly conversationService: ConversationService,
   ) {
     super();
     this.apiClient = apiClient;
@@ -205,7 +203,7 @@ export class NotificationService extends TypedEventEmitter<Events> {
         continue;
       }
       try {
-        const data = await this.handleEvent(event, source, dryRun);
+        const data = await this.handleEvent(event, dryRun);
         if (typeof data !== 'undefined') {
           yield data;
         }
@@ -231,43 +229,21 @@ export class NotificationService extends TypedEventEmitter<Events> {
   /**
    * Will process one event
    * @param event The backend event to process
-   * @param source The source of the event (websocket or notication stream)
    * @param dryRun Will not try to decrypt if true
    * @return the decrypted payload and the raw event. Returns `undefined` when the payload is a coreCrypto-only system message
    */
-  private async handleEvent(
-    event: BackendEvent,
-    source: NotificationSource,
-    dryRun: boolean = false,
-  ): Promise<HandledEventPayload | undefined> {
-    // Handle MLS Events
-    const mlsResult = await this.mlsService?.handleEvent({event, source, dryRun});
-    if (mlsResult) {
-      return mlsResult;
+  private async handleEvent(event: BackendEvent, dryRun: boolean = false): Promise<HandledEventPayload | undefined> {
+    if (dryRun) {
+      // In case of a dry run, we do not want to decrypt messages
+      // We just return the raw event to the caller
+      return {event};
     }
 
-    const proteusResult = await this.proteusService.handleEvent({
-      event,
-      source,
-      dryRun,
-    });
-    if (proteusResult) {
-      return proteusResult;
+    const conversationEventResult = await this.conversationService.handleEvent(event);
+    if (conversationEventResult) {
+      return conversationEventResult;
     }
 
-    // Fallback to other events
-    switch (event.type) {
-      // Meta events
-      case CONVERSATION_EVENT.MEMBER_JOIN:
-        // As of today (07/07/2022) the backend sends `WELCOME` message to the user's own conversation (not the actual conversation that the welcome should be part of)
-        // So in order to map conversation Ids and groupId together, we need to first fetch the conversation and get the groupId linked to it.
-        const conversation = await this.apiClient.api.conversation.getConversation(
-          event.qualified_conversation ?? {id: event.conversation, domain: ''},
-        );
-        if (!conversation) {
-          throw new Error('no conv');
-        }
-    }
     return {event};
   }
 }

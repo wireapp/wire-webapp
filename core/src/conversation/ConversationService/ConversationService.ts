@@ -28,7 +28,14 @@ import {
   PostMlsMessageResponse,
 } from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_TYPING, ConversationMemberUpdateData} from '@wireapp/api-client/lib/conversation/data';
-import {ConversationMemberLeaveEvent} from '@wireapp/api-client/lib/event';
+import {
+  BackendEvent,
+  CONVERSATION_EVENT,
+  ConversationMLSMessageAddEvent,
+  ConversationMLSWelcomeEvent,
+  ConversationMemberLeaveEvent,
+  ConversationOtrMessageAddEvent,
+} from '@wireapp/api-client/lib/event';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {XOR} from '@wireapp/commons/lib/util/TypeUtil';
 import {Decoder} from 'bazinga64';
@@ -49,11 +56,13 @@ import {
 import {MessageTimer, MessageSendingState, RemoveUsersParams} from '../../conversation/';
 import {decryptAsset} from '../../cryptography/AssetCryptography';
 import {MLSService, optionalToUint8Array} from '../../messagingProtocols/mls';
+import {handleMLSMessageAdd, handleMLSWelcomeMessage} from '../../messagingProtocols/mls/EventHandler/events';
 import {getConversationQualifiedMembers, ProteusService} from '../../messagingProtocols/proteus';
 import {
   AddUsersToProteusConversationParams,
   SendProteusMessageParams,
 } from '../../messagingProtocols/proteus/ProteusService/ProteusService.types';
+import {HandledEventPayload} from '../../notification';
 import {isMLSConversation} from '../../util';
 import {mapQualifiedUserClientIdsToFullyQualifiedClientIds} from '../../util/fullyQualifiedClientIdUtils';
 import {RemoteData} from '../content';
@@ -478,4 +487,29 @@ export class ConversationService {
       return this.establishMLS1to1Conversation(groupId, selfUser, otherUserId);
     }
   };
+
+  private async handleMLSMessageAddEvent(event: ConversationMLSMessageAddEvent) {
+    return handleMLSMessageAdd({event, mlsService: this.mlsService});
+  }
+
+  private async handleMLSWelcomeMessageEvent(event: ConversationMLSWelcomeEvent) {
+    return handleMLSWelcomeMessage({event, mlsService: this.mlsService});
+  }
+
+  private async handleOtrMessageAddEvent(event: ConversationOtrMessageAddEvent) {
+    return this.proteusService.handleOtrMessageAddEvent(event);
+  }
+
+  public async handleEvent(event: BackendEvent): Promise<HandledEventPayload | undefined> {
+    switch (event.type) {
+      case CONVERSATION_EVENT.MLS_MESSAGE_ADD:
+        return this.handleMLSMessageAddEvent(event);
+      case CONVERSATION_EVENT.MLS_WELCOME_MESSAGE:
+        return this.handleMLSWelcomeMessageEvent(event);
+      case CONVERSATION_EVENT.OTR_MESSAGE_ADD:
+        return this.handleOtrMessageAddEvent(event);
+    }
+
+    return undefined;
+  }
 }

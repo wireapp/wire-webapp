@@ -55,8 +55,6 @@ import {constructFullyQualifiedClientId, parseFullQualifiedClientId} from '../..
 import {cancelRecurringTask, registerRecurringTask} from '../../../util/RecurringTaskScheduler';
 import {TaskScheduler} from '../../../util/TaskScheduler';
 import {TypedEventEmitter} from '../../../util/TypedEventEmitter';
-import {EventHandlerResult} from '../../common.types';
-import {EventHandlerParams, handleBackendEvent} from '../EventHandler';
 import {CommitPendingProposalsParams, HandlePendingProposalsParams, MLSCallbacks} from '../types';
 
 //@todo: this function is temporary, we wait for the update from core-crypto side
@@ -629,17 +627,6 @@ export class MLSService extends TypedEventEmitter<Events> {
 
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
     return this.coreCryptoClient.wipeConversation(groupIdBytes);
-  }
-
-  public async handleEvent(params: Omit<EventHandlerParams, 'mlsService'>): EventHandlerResult {
-    return handleBackendEvent({...params, mlsService: this}, async groupId => {
-      const conversationExists = await this.conversationExists(groupId);
-      if (!conversationExists) {
-        return;
-      }
-      const newEpoch = await this.getEpoch(groupId);
-      this.emit('newEpoch', {groupId, epoch: newEpoch});
-    });
   }
 
   /**

@@ -17,25 +17,23 @@
  *
  */
 
-import {BackendEvent, ConversationMLSMessageAddEvent, CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
+import {ConversationMLSMessageAddEvent} from '@wireapp/api-client/lib/event';
 import {Decoder} from 'bazinga64';
 
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
-import {EventHandlerResult} from '../../../../common.types';
-import {optionalToUint8Array} from '../../../MLSService/MLSService';
-import {EventHandlerParams} from '../../EventHandler.types';
+import {HandledEventPayload} from '../../../../../notification';
+import {MLSService, optionalToUint8Array} from '../../../MLSService/MLSService';
 
-const isMLSMessageAddEvent = (event: BackendEvent): event is ConversationMLSMessageAddEvent =>
-  event.type === CONVERSATION_EVENT.MLS_MESSAGE_ADD;
-
-interface HandleMLSMessageAddParams extends EventHandlerParams {
+interface HandleMLSMessageAddParams {
   event: ConversationMLSMessageAddEvent;
+  mlsService: MLSService;
 }
-const handleMLSMessageAdd = async (
-  {mlsService, event}: HandleMLSMessageAddParams,
-  onEpochChanged: (groupId: string) => Promise<void>,
-): EventHandlerResult => {
+
+export const handleMLSMessageAdd = async ({
+  event,
+  mlsService,
+}: HandleMLSMessageAddParams): Promise<HandledEventPayload | undefined> => {
   const encryptedData = Decoder.fromBase64(event.data).asBytes;
 
   const qualifiedConversationId = event.qualified_conversation ?? {id: event.conversation, domain: ''};
@@ -77,10 +75,9 @@ const handleMLSMessageAdd = async (
   }
 
   if (hasEpochChanged) {
-    await onEpochChanged(groupId);
+    const newEpoch = await mlsService.getEpoch(groupId);
+    mlsService.emit('newEpoch', {groupId, epoch: newEpoch});
   }
 
   return message ? {event, decryptedData: GenericMessage.decode(message)} : undefined;
 };
-
-export {isMLSMessageAddEvent, handleMLSMessageAdd};
