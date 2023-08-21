@@ -98,15 +98,6 @@ export interface Conversation {
   epoch?: number;
   cipher_suite?: number;
 
-  /**
-   * List of users that were originaly requested to be in the conversation
-   * but could not be added due to their backend not being available
-   * @note This field comes only on conversation creation response
-   * @note Added since version 4: https://staging-nginz-https.zinfra.io/v4/api/swagger-ui/#/default/post_conversations
-   * @note Federation only
-   */
-  failed_to_add: QualifiedId[];
-
   protocol: ConversationProtocol;
 }
 

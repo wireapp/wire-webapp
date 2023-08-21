@@ -20,14 +20,12 @@
 import type {APIClient} from '@wireapp/api-client/lib/APIClient';
 import type {PreKey, Context} from '@wireapp/api-client/lib/auth';
 import {
-  Conversation,
   isFederatedBackendsError,
   FederatedBackendsErrorLabel,
   NewConversation,
   QualifiedOTRRecipients,
   QualifiedUserClients,
 } from '@wireapp/api-client/lib/conversation';
-import type {ConversationMemberJoinEvent} from '@wireapp/api-client/lib/event';
 import type {QualifiedId, QualifiedUserPreKeyBundleMap} from '@wireapp/api-client/lib/user';
 import logdown from 'logdown';
 
@@ -46,7 +44,14 @@ import type {
 import {migrateToQualifiedSessionIds} from './sessionIdMigrator';
 import {filterUsersFromDomains} from './userDomainFilters';
 
-import {AddUsersFailureReasons, GenericMessageType, MessageSendingState, SendResult} from '../../../conversation';
+import {
+  AddUsersFailureReasons,
+  ProteusCreateConversationResponse,
+  GenericMessageType,
+  MessageSendingState,
+  SendResult,
+  ProteusAddUsersResponse,
+} from '../../../conversation';
 import {MessageService} from '../../../conversation/message/MessageService';
 import {NonFederatingBackendsError} from '../../../errors';
 import type {EventHandlerResult} from '../../common.types';
@@ -156,9 +161,11 @@ export class ProteusService {
     return this.cryptoClient.getRemoteFingerprint(sessionId);
   }
 
-  public async createConversation(conversationData: NewConversation): Promise<Conversation> {
+  public async createConversation(conversationData: NewConversation): Promise<ProteusCreateConversationResponse> {
     try {
-      return await this.apiClient.api.conversation.postConversation(conversationData);
+      const conversation = await this.apiClient.api.conversation.postConversation(conversationData);
+
+      return {conversation};
     } catch (error: unknown) {
       if (isFederatedBackendsError(error)) {
         switch (error.label) {
@@ -177,10 +184,15 @@ export class ProteusService {
             // we try creating the conversation again with users from available backends
             const response = await this.apiClient.api.conversation.postConversation(conversationData);
 
-            // on a succesfull conversation creation with the available users,
-            // we append the users from an unreachable backend to the response
-            response.failed_to_add = unreachableUsers;
-            return response;
+            return {
+              conversation: response,
+              failedToAdd:
+                // on a succesfull conversation creation with the available users,
+                // we append the users from an unreachable backend to the response
+                unreachableUsers.length > 0
+                  ? {reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS, users: unreachableUsers}
+                  : undefined,
+            };
           }
         }
       }
@@ -193,10 +205,10 @@ export class ProteusService {
    * Tries to add all the given users to the given conversation.
    * If some users are not reachable, it will try to add the remaining users and list them in the `failedToAdd` property of the response.
    */
-  public async addUsersToConversation({conversationId, qualifiedUsers}: AddUsersToProteusConversationParams): Promise<{
-    event?: ConversationMemberJoinEvent;
-    failedToAdd?: {reason: AddUsersFailureReasons; users: QualifiedId[]};
-  }> {
+  public async addUsersToConversation({
+    conversationId,
+    qualifiedUsers,
+  }: AddUsersToProteusConversationParams): Promise<ProteusAddUsersResponse> {
     try {
       return {event: await this.apiClient.api.conversation.postMembers(conversationId, qualifiedUsers)};
     } catch (error) {

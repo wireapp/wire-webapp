@@ -24,6 +24,7 @@ import {
   Conversation,
 } from '@wireapp/api-client/lib/conversation';
 import {ConversationEvent} from '@wireapp/api-client/lib/event';
+import {ConversationMemberJoinEvent} from '@wireapp/api-client/lib/event';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {GenericMessage} from '@wireapp/protocol-messaging';
@@ -114,7 +115,40 @@ export type RemoveUsersParams = {
   groupId: string;
 };
 
-export type MLSReturnType = {events: ConversationEvent[]; conversation: Conversation};
+export enum AddUsersFailureReasons {
+  NON_FEDERATING_BACKENDS = 'NON_FEDERATING_BACKENDS',
+  UNREACHABLE_BACKENDS = 'UNREACHABLE_BACKENDS',
+}
+
+/**
+ * List of users that were originaly requested to be in the conversation
+ * but could not be added due to their backend not being available
+ * @note Added since version 4: https://staging-nginz-https.z
+ ra.io/v4/api/swagger-ui/#/default/post_conversations
+ * @note Federation only
+ */
+export type AddUsersFailure = {
+  users: QualifiedId[];
+  reason: AddUsersFailureReasons;
+};
+
+/**
+ * The backend response of any method that will create (or add users to) a conversation
+ */
+export interface BaseCreateConversationResponse {
+  conversation: Conversation;
+  failedToAdd?: AddUsersFailure;
+}
+
+export type ProteusCreateConversationResponse = BaseCreateConversationResponse;
+export type ProteusAddUsersResponse = {
+  event?: ConversationMemberJoinEvent;
+  failedToAdd?: AddUsersFailure;
+};
+
+export interface MLSCreateConversationResponse extends BaseCreateConversationResponse {
+  events: ConversationEvent[];
+}
 
 export type SendResult = {
   /** The id of the message sent */

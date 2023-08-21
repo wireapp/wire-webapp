@@ -38,7 +38,13 @@ import {APIClient} from '@wireapp/api-client';
 import {Ciphersuite, CredentialType, ExternalProposalType} from '@wireapp/core-crypto';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
-import {AddUsersParams, MLSReturnType, SendMlsMessageParams, SendResult} from './ConversationService.types';
+import {
+  AddUsersFailureReasons,
+  AddUsersParams,
+  MLSCreateConversationResponse,
+  SendMlsMessageParams,
+  SendResult,
+} from './ConversationService.types';
 
 import {MessageTimer, MessageSendingState, RemoveUsersParams} from '../../conversation/';
 import {decryptAsset} from '../../cryptography/AssetCryptography';
@@ -52,11 +58,6 @@ import {isMLSConversation} from '../../util';
 import {mapQualifiedUserClientIdsToFullyQualifiedClientIds} from '../../util/fullyQualifiedClientIdUtils';
 import {RemoteData} from '../content';
 import {isSendingMessage, sendMessage} from '../message/messageSender';
-
-export enum AddUsersFailureReasons {
-  NON_FEDERATING_BACKENDS = 'NON_FEDERATING_BACKENDS',
-  UNREACHABLE_BACKENDS = 'UNREACHABLE_BACKENDS',
-}
 
 export class ConversationService {
   public readonly messageTimer: MessageTimer;
@@ -112,7 +113,7 @@ export class ConversationService {
    * @param conversationData Payload object for group creation
    * @returns Resolves when the conversation was created
    */
-  public async createProteusConversation(conversationData: NewConversation): Promise<Conversation> {
+  public async createProteusConversation(conversationData: NewConversation) {
     return this.proteusService.createConversation(conversationData);
   }
 
@@ -238,7 +239,7 @@ export class ConversationService {
     conversationData: NewConversation,
     selfUserId: QualifiedId,
     selfClientId: string,
-  ): Promise<MLSReturnType> {
+  ): Promise<MLSCreateConversationResponse> {
     const {qualified_users: qualifiedUsers = []} = conversationData;
 
     /**
@@ -264,14 +265,12 @@ export class ConversationService {
     // We fetch the fresh version of the conversation created on backend with the newly added users
     const conversation = await this.apiClient.api.conversation.getConversation(qualifiedId);
 
-    /**
-     * @note Add users whom we could not fetch their keypackages to list of failed to add users.
-     */
-    conversation.failed_to_add = response.failed || [];
-
     return {
       events: response.events,
       conversation,
+      failedToAdd: response.failed
+        ? {users: response.failed, reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS}
+        : undefined,
     };
   }
 
@@ -319,7 +318,7 @@ export class ConversationService {
     qualifiedUsers,
     groupId,
     conversationId,
-  }: Required<AddUsersParams>): Promise<MLSReturnType> {
+  }: Required<AddUsersParams>): Promise<MLSCreateConversationResponse> {
     const {coreCryptoKeyPackagesPayload, failedToFetchKeyPackages} = await this.mlsService.getKeyPackagesPayload(
       qualifiedUsers,
     );
@@ -327,13 +326,15 @@ export class ConversationService {
     const response = await this.mlsService.addUsersToExistingConversation(groupId, coreCryptoKeyPackagesPayload);
     const conversation = await this.getConversation(conversationId);
 
-    conversation.failed_to_add = failedToFetchKeyPackages;
-
     //We store the info when user was added (and key material was created), so we will know when to renew it
     this.mlsService.resetKeyMaterialRenewal(groupId);
     return {
       events: response.events,
       conversation,
+      failedToAdd:
+        failedToFetchKeyPackages.length > 0
+          ? {users: failedToFetchKeyPackages, reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS}
+          : undefined,
     };
   }
 
@@ -341,7 +342,7 @@ export class ConversationService {
     groupId,
     conversationId,
     qualifiedUserIds,
-  }: RemoveUsersParams): Promise<MLSReturnType> {
+  }: RemoveUsersParams): Promise<MLSCreateConversationResponse> {
     const clientsToRemove = await this.apiClient.api.user.postListClients({qualified_users: qualifiedUserIds});
 
     const fullyQualifiedClientIds = mapQualifiedUserClientIdsToFullyQualifiedClientIds(
