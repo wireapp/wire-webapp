@@ -279,8 +279,13 @@ export class ListViewModel {
     }
   };
 
-  readonly openConversations = (): void => {
-    const newState = this.isActivatedAccount() ? ListState.CONVERSATIONS : ListState.TEMPORARY_GUEST;
+  readonly openConversations = (conversation, options): void => {
+    const {archive = false} = options || {};
+    const newState = this.isActivatedAccount()
+      ? archive
+        ? ListState.ARCHIVE
+        : ListState.CONVERSATIONS
+      : ListState.TEMPORARY_GUEST;
     this.switchList(newState, false);
   };
 

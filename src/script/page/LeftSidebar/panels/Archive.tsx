@@ -56,9 +56,7 @@ const Archive = ({
   ]);
 
   const onClickConversation = async (conversation: Conversation) => {
-    await conversationRepository.unarchiveConversation(conversation, true, 'opened conversation from archive');
-    onClose();
-    amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversation, {});
+    amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversation, {archive: true});
   };
 
   useEffect(() => {

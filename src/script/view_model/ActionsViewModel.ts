@@ -336,10 +336,6 @@ export class ActionsViewModel {
   };
 
   private readonly openConversation = async (conversationEntity: Conversation): Promise<void> => {
-    if (conversationEntity.is_archived()) {
-      await this.conversationRepository.unarchiveConversation(conversationEntity, true);
-    }
-
     if (conversationEntity.is_cleared()) {
       conversationEntity.cleared_timestamp(0);
     }
