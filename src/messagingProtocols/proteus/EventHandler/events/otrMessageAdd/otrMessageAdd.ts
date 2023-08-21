@@ -17,32 +17,25 @@
  *
  */
 
-import {BackendEvent, ConversationOtrMessageAddEvent, CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
+import {ConversationOtrMessageAddEvent} from '@wireapp/api-client/lib/event';
 import {Decoder} from 'bazinga64';
 
-import {GenericMessage} from '@wireapp/protocol-messaging';
+import {ClientAction, GenericMessage} from '@wireapp/protocol-messaging';
 
+import {GenericMessageType} from '../../../../../conversation';
 import {DecryptionError} from '../../../../../errors/DecryptionError';
-import {EventHandlerResult} from '../../../../common.types';
-import {EventHandlerParams} from '../../EventHandler.types';
+import {HandledEventPayload} from '../../../../../notification';
+import {ProteusService} from '../../../ProteusService';
 
-const isOtrMessageAddEvent = (event: BackendEvent): event is ConversationOtrMessageAddEvent =>
-  event.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD;
-
-type HandleOtrMessageAddParams = Omit<EventHandlerParams, 'event'> & {
+interface HandleOtrMessageAddParams {
   event: ConversationOtrMessageAddEvent;
-};
+  proteusService: ProteusService;
+}
 
-const handleOtrMessageAdd = async ({
-  decryptMessage,
+export const handleOtrMessageAdd = async ({
   event,
-  dryRun = false,
-}: HandleOtrMessageAddParams): EventHandlerResult => {
-  if (dryRun) {
-    // In case of a dry run, we do not want to decrypt messages
-    // We just return the raw event to the caller
-    return {event};
-  }
+  proteusService,
+}: HandleOtrMessageAddParams): Promise<HandledEventPayload> => {
   try {
     const {
       from,
@@ -51,10 +44,19 @@ const handleOtrMessageAdd = async ({
     } = event;
     const userId = qualified_from || {id: from, domain: ''};
     const messageBytes = Decoder.fromBase64(encodedCiphertext).asBytes;
-    const decryptedData = await decryptMessage(messageBytes, userId, clientId);
+    const decryptedData = await proteusService.decrypt(messageBytes, userId, clientId);
+
+    const decodedData = GenericMessage.decode(decryptedData);
+
+    const isSessionReset = decodedData[GenericMessageType.CLIENT_ACTION] === ClientAction.RESET_SESSION;
+    if (isSessionReset) {
+      // If a session reset message was received, we need to count a consumed prekey (because the sender has created a new session from a new prekey)
+      await proteusService.consumePrekey();
+    }
+
     return {
       event,
-      decryptedData: GenericMessage.decode(decryptedData),
+      decryptedData: decodedData,
     };
   } catch (error) {
     if (error instanceof DecryptionError) {
@@ -63,5 +65,3 @@ const handleOtrMessageAdd = async ({
     throw error;
   }
 };
-
-export {isOtrMessageAddEvent, handleOtrMessageAdd};

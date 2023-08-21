@@ -26,10 +26,10 @@ import {
   QualifiedOTRRecipients,
   QualifiedUserClients,
 } from '@wireapp/api-client/lib/conversation';
+import type {ConversationOtrMessageAddEvent} from '@wireapp/api-client/lib/event';
 import type {QualifiedId, QualifiedUserPreKeyBundleMap} from '@wireapp/api-client/lib/user';
 import logdown from 'logdown';
 
-import {ClientAction} from '@wireapp/protocol-messaging';
 import {CRUDEngine} from '@wireapp/store-engine';
 
 import {CryptoClient} from './CryptoClient';
@@ -47,15 +47,14 @@ import {filterUsersFromDomains} from './userDomainFilters';
 import {
   AddUsersFailureReasons,
   ProteusCreateConversationResponse,
-  GenericMessageType,
   MessageSendingState,
   SendResult,
   ProteusAddUsersResponse,
 } from '../../../conversation';
 import {MessageService} from '../../../conversation/message/MessageService';
 import {NonFederatingBackendsError} from '../../../errors';
-import type {EventHandlerResult} from '../../common.types';
-import {EventHandlerParams, handleBackendEvent} from '../EventHandler';
+import {HandledEventPayload} from '../../../notification';
+import {handleOtrMessageAdd} from '../EventHandler/events';
 import {getGenericMessageParams} from '../Utility/getGenericMessageParams';
 import {isClearFromMismatch} from '../Utility/isClearFromMismatch';
 import {
@@ -87,21 +86,11 @@ export class ProteusService {
     this.messageService = new MessageService(this.apiClient, this);
   }
 
-  public async handleEvent(params: Pick<EventHandlerParams, 'event' | 'source' | 'dryRun'>): EventHandlerResult {
-    const handledEvent = await handleBackendEvent({
-      ...params,
-      decryptMessage: (payload, userId, clientId) => this.decrypt(payload, userId, clientId),
+  public async handleOtrMessageAddEvent(event: ConversationOtrMessageAddEvent): Promise<HandledEventPayload> {
+    return handleOtrMessageAdd({
+      event,
+      proteusService: this,
     });
-    if (handledEvent?.decryptedData) {
-      const isSessionReset =
-        handledEvent.decryptedData[GenericMessageType.CLIENT_ACTION] === ClientAction.RESET_SESSION;
-      if (isSessionReset) {
-        this.logger.debug('A session was reset from a remote device');
-        // If a session reset message was received, we need to count a consumed prekey (because the sender has created a new session from a new prekey)
-        await this.cryptoClient.consumePrekey();
-      }
-    }
-    return handledEvent;
   }
 
   public async initClient(storeEngine: CRUDEngine, context: Context) {
@@ -297,7 +286,7 @@ export class ProteusService {
     };
   }
 
-  private async decrypt(encryptedText: Uint8Array, userId: QualifiedId, clientId: string) {
+  public async decrypt(encryptedText: Uint8Array, userId: QualifiedId, clientId: string) {
     const sessionId = this.constructSessionId(userId, clientId);
     const sessionExists = await this.cryptoClient.sessionExists(sessionId);
 
@@ -318,6 +307,10 @@ export class ProteusService {
     } catch (error) {
       throw generateDecryptionError({userId, clientId}, error);
     }
+  }
+
+  public consumePrekey(): Promise<void> {
+    return this.cryptoClient.consumePrekey();
   }
 
   public deleteSession(userId: QualifiedId, clientId: string) {
