@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [41.2.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@41.2.2...@wireapp/core@41.2.3) (2023-08-21)
+
+### Bug Fixes
+
+* Improve type imports ([#5411](https://github.com/wireapp/wire-web-packages/issues/5411)) ([596b0d5](https://github.com/wireapp/wire-web-packages/commit/596b0d5003d8a51a4d5bae47d5af7563811b17cb))
+
 ## [41.2.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@41.2.1...@wireapp/core@41.2.2) (2023-08-21)
 
 **Note:** Version bump only for package @wireapp/core
