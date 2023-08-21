@@ -210,6 +210,16 @@ export const InputBar = ({
     }
   };
 
+  useEffect(() => {
+    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.EDIT, (messageEntity: ContentMessage) => {
+      editMessage(messageEntity);
+    });
+
+    return () => {
+      amplify.unsubscribeAll(WebAppEvents.CONVERSATION.MESSAGE.EDIT);
+    };
+  });
+
   const cancelMessageEditing = (resetDraft = true, resetInputValue = false) => {
     setEditedMessage(undefined);
     setReplyMessageEntity(null);
@@ -223,10 +233,7 @@ export const InputBar = ({
     cancelMessageReply(false);
   };
 
-  const editMessage = (messageEntity: ContentMessage | undefined) => {
-    if (!messageEntity) {
-      cancelMessageEditing(true, true);
-    }
+  const editMessage = (messageEntity?: ContentMessage) => {
     if (messageEntity?.isEditable() && messageEntity !== editedMessage) {
       cancelMessageReply();
       cancelMessageEditing(true, true);
@@ -582,7 +589,8 @@ export const InputBar = ({
                   lexical?.focus();
                 }}
                 editedMessage={editedMessage}
-                editMessage={editMessage}
+                onCancelMessageEdit={() => cancelMessageEditing(true, true)}
+                onEditLastSentMessage={() => editMessage(conversationEntity.getLastEditableMessage())}
                 mentionCandidates={mentionCandidates}
                 searchRepository={searchRepository}
                 propertiesRepository={propertiesRepository}

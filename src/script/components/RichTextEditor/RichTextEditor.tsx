@@ -85,7 +85,8 @@ interface RichTextEditorProps {
   readonly searchRepository: SearchRepository;
   placeholder: string;
   onUpdate: (content: RichTextContent) => void;
-  editMessage: (messageEntity: ContentMessage) => void;
+  onEditLastSentMessage: () => void;
+  onCancelMessageEdit: () => void;
   editedMessage?: ContentMessage;
   children: ReactElement;
   hasLocalEphemeralTimer: boolean;
@@ -126,7 +127,8 @@ export const RichTextEditor = ({
   hasLocalEphemeralTimer,
   saveDraftState,
   loadDraftState,
-  editMessage,
+  onCancelMessageEdit,
+  onEditLastSentMessage,
   editedMessage,
   mentionCandidates,
   onShiftTab,
@@ -223,7 +225,14 @@ export const RichTextEditor = ({
           <GlobalEventsPlugin onShiftTab={onShiftTab} />
           <EditorRefPlugin editorRef={setupEditor} />
           <DraftStatePlugin loadDraftState={loadDraftState} />
-          <EditMessagePlugin onMessageEdit={editMessage} />
+          <EditMessagePlugin
+            onCancelMessageEdit={() => {
+              if (editedMessage) {
+                onCancelMessageEdit();
+              }
+            }}
+            onEditLastSentMessage={onEditLastSentMessage}
+          />
 
           <EmojiPickerPlugin openStateRef={emojiPickerOpen} />
           <HistoryPlugin />

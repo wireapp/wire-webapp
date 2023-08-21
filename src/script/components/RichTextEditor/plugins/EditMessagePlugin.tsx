@@ -20,38 +20,37 @@
 import {useEffect} from 'react';
 
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
-import {amplify} from 'amplify';
-import {COMMAND_PRIORITY_LOW, KEY_ESCAPE_COMMAND} from 'lexical';
-
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {ContentMessage} from '../../../entity/message/ContentMessage';
+import {mergeRegister} from '@lexical/utils';
+import {COMMAND_PRIORITY_LOW, KEY_ARROW_UP_COMMAND, KEY_ESCAPE_COMMAND} from 'lexical';
 
 interface EditMessageProps {
-  onMessageEdit: (messageEntity: ContentMessage | undefined) => void;
+  onEditLastSentMessage: () => void;
+  onCancelMessageEdit: () => void;
 }
 
-export function EditMessagePlugin({onMessageEdit}: EditMessageProps): null {
+export function EditMessagePlugin({onEditLastSentMessage, onCancelMessageEdit}: EditMessageProps): null {
   const [editor] = useLexicalComposerContext();
 
   useEffect(() => {
-    const unregister = editor.registerCommand(
-      KEY_ESCAPE_COMMAND,
-      () => {
-        onMessageEdit(undefined);
-        return true;
-      },
-      COMMAND_PRIORITY_LOW,
+    return mergeRegister(
+      editor.registerCommand(
+        KEY_ESCAPE_COMMAND,
+        () => {
+          onCancelMessageEdit();
+          return true;
+        },
+        COMMAND_PRIORITY_LOW,
+      ),
+      editor.registerCommand(
+        KEY_ARROW_UP_COMMAND,
+        () => {
+          onEditLastSentMessage();
+          return true;
+        },
+        COMMAND_PRIORITY_LOW,
+      ),
     );
-    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.EDIT, (messageEntity: ContentMessage) => {
-      onMessageEdit(messageEntity);
-    });
-
-    return () => {
-      unregister();
-      amplify.unsubscribeAll(WebAppEvents.CONVERSATION.MESSAGE.EDIT);
-    };
-  }, [editor]);
+  }, [editor, onCancelMessageEdit, onEditLastSentMessage]);
 
   return null;
 }
