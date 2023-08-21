@@ -74,7 +74,7 @@ export const Mention = (props: MentionComponentProps) => {
     return classes.join(' ').trim() || undefined;
   }, [className, classNameFocused, isFocused]);
 
-  const onDelete = useCallback(
+  const deleteMention = useCallback(
     (payload: KeyboardEvent) => {
       if (isSelected && $isNodeSelection($getSelection())) {
         payload.preventDefault();
@@ -93,7 +93,7 @@ export const Mention = (props: MentionComponentProps) => {
     [isSelected, nodeKey, setSelected],
   );
 
-  const onArrowPress = useCallback(
+  const moveCursor = useCallback(
     (event: KeyboardEvent) => {
       const node = $getNodeByKey(nodeKey);
       if (!node || !node.isSelected()) {
@@ -162,7 +162,7 @@ export const Mention = (props: MentionComponentProps) => {
     [nodeKey],
   );
 
-  const onClick = useCallback(
+  const selectMention = useCallback(
     (event: MouseEvent) => {
       if (event.target === ref.current) {
         if (!event.shiftKey) {
@@ -176,7 +176,7 @@ export const Mention = (props: MentionComponentProps) => {
     [isSelected, clearSelection, setSelected],
   );
 
-  const onBlur = useCallback(() => {
+  const unselectMention = useCallback(() => {
     if (isFocused) {
       $setSelection(null);
       return true;
@@ -193,19 +193,19 @@ export const Mention = (props: MentionComponentProps) => {
         }
       }),
 
-      editor.registerCommand<MouseEvent>(CLICK_COMMAND, onClick, COMMAND_PRIORITY_LOW),
-      editor.registerCommand(KEY_DELETE_COMMAND, onDelete, COMMAND_PRIORITY_LOW),
-      editor.registerCommand(KEY_BACKSPACE_COMMAND, onDelete, COMMAND_PRIORITY_LOW),
-      editor.registerCommand(KEY_ARROW_LEFT_COMMAND, onArrowPress, COMMAND_PRIORITY_LOW),
-      editor.registerCommand(KEY_ARROW_RIGHT_COMMAND, onArrowPress, COMMAND_PRIORITY_LOW),
-      editor.registerCommand(BLUR_COMMAND, onBlur, COMMAND_PRIORITY_LOW),
+      editor.registerCommand<MouseEvent>(CLICK_COMMAND, selectMention, COMMAND_PRIORITY_LOW),
+      editor.registerCommand(KEY_DELETE_COMMAND, deleteMention, COMMAND_PRIORITY_LOW),
+      editor.registerCommand(KEY_BACKSPACE_COMMAND, deleteMention, COMMAND_PRIORITY_LOW),
+      editor.registerCommand(KEY_ARROW_LEFT_COMMAND, moveCursor, COMMAND_PRIORITY_LOW),
+      editor.registerCommand(KEY_ARROW_RIGHT_COMMAND, moveCursor, COMMAND_PRIORITY_LOW),
+      editor.registerCommand(BLUR_COMMAND, unselectMention, COMMAND_PRIORITY_LOW),
     );
 
     return () => {
       isMounted = false;
       unregister();
     };
-  }, [editor, onArrowPress, onClick, onBlur, onDelete]);
+  }, [editor, moveCursor, selectMention, unselectMention, deleteMention]);
 
   return (
     <span ref={ref} className={classNameFinal} data-mention={mention}>

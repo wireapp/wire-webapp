@@ -70,6 +70,7 @@ const theme = {
   paragraph: 'editor-paragraph',
   mentions: {
     '@': `at-mentions`, // use the trigger name as the key
+    '@Focused': 'focused-mentions', // add the "Focused" suffix to style the focused mention
   },
 };
 
