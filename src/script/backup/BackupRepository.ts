@@ -396,9 +396,8 @@ export class BackupRepository {
     let importedEntities: Conversation[] = [];
 
     const importConversationChunk = async (conversationChunk: ConversationRecord[]) => {
-      const importedConversationEntities = await this.conversationRepository.updateConversationStates(
-        conversationChunk,
-      );
+      const importedConversationEntities =
+        await this.conversationRepository.updateConversationStates(conversationChunk);
       importedEntities = importedEntities.concat(importedConversationEntities);
       progressCallback(conversationChunk.length);
       return importedEntities.length;
