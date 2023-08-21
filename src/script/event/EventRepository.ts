@@ -324,6 +324,9 @@ export class EventRepository {
       case EVENT_TYPE.CALL:
         amplify.publish(WebAppEvents.CALL.EVENT_FROM_BACKEND, event, source);
         break;
+      case EVENT_TYPE.FEDERATION:
+        amplify.publish(WebAppEvents.FEDERATION.EVENT_FROM_BACKEND, event, source);
+        break;
       case EVENT_TYPE.CONVERSATION:
         amplify.publish(WebAppEvents.CONVERSATION.EVENT_FROM_BACKEND, event, source);
         break;

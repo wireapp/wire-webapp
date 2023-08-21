@@ -253,10 +253,14 @@ export const Conversation: FC<ConversationProps> = ({
     }
   };
 
-  const showMessageDetails = (message: Message, showLikes = false) => {
+  const showMessageDetails = (message: Message, showReactions = false) => {
     if (!is1to1) {
-      openRightSidebar(PanelState.MESSAGE_DETAILS, {entity: message, showLikes}, true);
+      openRightSidebar(PanelState.MESSAGE_DETAILS, {entity: message, showReactions}, true);
     }
+  };
+
+  const showMessageReactions = (message: Message, showReactions = true) => {
+    openRightSidebar(PanelState.MESSAGE_DETAILS, {entity: message, showReactions});
   };
 
   const handleEmailClick = (event: Event, messageDetails: MessageDetails) => {
@@ -343,6 +347,7 @@ export const Conversation: FC<ConversationProps> = ({
       conversationRepository: repositories.conversation,
       currentMessageEntity: messageEntity,
       messageRepository: repositories.message,
+      selfUser,
     });
   };
 
@@ -503,6 +508,7 @@ export const Conversation: FC<ConversationProps> = ({
             cancelConnectionRequest={clickOnCancelRequest}
             showUserDetails={showUserDetails}
             showMessageDetails={showMessageDetails}
+            showMessageReactions={showMessageReactions}
             showParticipants={showParticipants}
             showImageDetails={showDetail}
             resetSession={onSessionResetClick}

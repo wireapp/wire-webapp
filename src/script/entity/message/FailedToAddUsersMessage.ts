@@ -18,6 +18,7 @@
  */
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {AddUsersFailureReasons} from '@wireapp/core/lib/conversation';
 
 import {Message} from './Message';
 
@@ -26,6 +27,7 @@ import {SuperType} from '../../message/SuperType';
 export class FailedToAddUsersMessage extends Message {
   constructor(
     public qualifiedIds: QualifiedId[],
+    public reason: AddUsersFailureReasons,
     time: number,
   ) {
     super();
