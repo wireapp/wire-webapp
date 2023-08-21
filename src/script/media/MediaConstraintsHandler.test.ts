@@ -54,8 +54,8 @@ describe('MediaConstraintsHandler', () => {
       const constraintsHandler = createConstraintsHandler({availableDevices});
       const constraints = constraintsHandler.getMediaStreamConstraints(true, true, false) as any;
 
-      expect(constraints.audio.groupId.exact).toBe(availableDevices.audioInput());
-      expect(constraints.video.groupId.exact).toBe(availableDevices.videoInput());
+      expect(constraints.audio.deviceId.exact).toBe(availableDevices.audioInput());
+      expect(constraints.video.deviceId.exact).toBe(availableDevices.videoInput());
     });
 
     it('returns default constraints when current devices are not defined', () => {
@@ -63,9 +63,9 @@ describe('MediaConstraintsHandler', () => {
       const constraintsHandler = createConstraintsHandler({availableDevices});
       const constraints = constraintsHandler.getMediaStreamConstraints(true, true, false) as any;
 
-      expect(constraints.audio.groupId).not.toBeDefined();
+      expect(constraints.audio.deviceId).not.toBeDefined();
       expect(constraints.audio).toEqual({autoGainControl: false});
-      expect(constraints.video.groupId).not.toBeDefined();
+      expect(constraints.video.deviceId).not.toBeDefined();
       expect(constraints.video).toEqual(
         jasmine.objectContaining({
           frameRate: jasmine.any(Number),

@@ -241,27 +241,27 @@ describe('MediaDevicesHandler', () => {
 
       const devicesHandler = new MediaDevicesHandler();
       setTimeout(() => {
-        devicesHandler.currentDeviceId.videoInput(fakeWorldTestSetup.cameras[0].groupId);
+        devicesHandler.currentDeviceId.videoInput(fakeWorldTestSetup.cameras[0].deviceId);
 
-        expect(devicesHandler.currentAvailableDeviceId.videoInput()).toBe(fakeWorldTestSetup.cameras[0].groupId);
+        expect(devicesHandler.currentAvailableDeviceId.videoInput()).toBe(fakeWorldTestSetup.cameras[0].deviceId);
 
         devicesHandler.currentDeviceId.videoInput('not-existing-id');
         expect(devicesHandler.currentAvailableDeviceId.videoInput()).toBe(
           MediaDevicesHandler.CONFIG.DEFAULT_DEVICE.videoInput,
         );
 
-        devicesHandler.currentDeviceId.audioInput(fakeWorldTestSetup.microphones[0].groupId);
+        devicesHandler.currentDeviceId.audioInput(fakeWorldTestSetup.microphones[0].deviceId);
 
-        expect(devicesHandler.currentAvailableDeviceId.audioInput()).toBe(fakeWorldTestSetup.microphones[0].groupId);
+        expect(devicesHandler.currentAvailableDeviceId.audioInput()).toBe(fakeWorldTestSetup.microphones[0].deviceId);
 
         devicesHandler.currentDeviceId.audioInput('not-existing-id');
         expect(devicesHandler.currentAvailableDeviceId.audioInput()).toBe(
           MediaDevicesHandler.CONFIG.DEFAULT_DEVICE.audioInput,
         );
 
-        devicesHandler.currentDeviceId.audioOutput(fakeWorldTestSetup.speakers[0].groupId);
+        devicesHandler.currentDeviceId.audioOutput(fakeWorldTestSetup.speakers[0].deviceId);
 
-        expect(devicesHandler.currentAvailableDeviceId.audioOutput()).toBe(fakeWorldTestSetup.speakers[0].groupId);
+        expect(devicesHandler.currentAvailableDeviceId.audioOutput()).toBe(fakeWorldTestSetup.speakers[0].deviceId);
 
         devicesHandler.currentDeviceId.audioOutput('inexistant-id');
         expect(devicesHandler.currentAvailableDeviceId.audioOutput()).toBe(
