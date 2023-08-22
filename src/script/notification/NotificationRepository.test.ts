@@ -108,7 +108,7 @@ describe('NotificationRepository', () => {
     selfUserEntity.isMe = true;
     selfUserEntity.inTeam(true);
     conversation.selfUser(selfUserEntity);
-    userState.users([selfUserEntity]);
+    userState.self(selfUserEntity);
 
     // Notification
     const title = conversation.display_name();
