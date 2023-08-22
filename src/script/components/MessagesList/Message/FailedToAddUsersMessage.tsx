@@ -169,7 +169,7 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
           />
         </p>
       </div>
-      <div className="message-body" style={{flexDirection: 'column'}}>
+      <div className="message-body" css={{flexDirection: 'column'}}>
         {isOpen && (
           <>
             {message.reason === AddUsersFailureReasons.UNREACHABLE_BACKENDS && (
