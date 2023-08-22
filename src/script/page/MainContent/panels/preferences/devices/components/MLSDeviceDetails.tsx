@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2022 Wire Swiss GmbH
+ * Copyright (C) 2023 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,20 +17,23 @@
  *
  */
 
-interface FormattedIdProps {
-  idSlices: string[];
-}
+import {splitFingerprint} from 'Util/StringUtil';
 
-export const FormattedId = ({idSlices}: FormattedIdProps) => (
-  <>
-    {idSlices.map((slice, index) => {
-      // const Component = index % 2 === 0 ? 'strong' : 'span';
+import {type DeviceProps} from './DetailedDevice';
+import {FormattedId} from './FormattedId';
 
-      return (
-        <span className="device-id-part" key={slice + index}>
-          {slice}
-        </span>
-      );
-    })}
-  </>
-);
+interface MLSDeviceDetailsProps extends DeviceProps {}
+
+export const MLSDeviceDetails = ({fingerprint}: MLSDeviceDetailsProps) => {
+  return (
+    <div>
+      <h4>MLS with Ed255519 Signature</h4>
+
+      <p className="label preferences-label preferences-devices-fingerprint-label">MLS Thumbprint</p>
+
+      <p className="preferences-devices-fingerprint" css={{width: '300px'}}>
+        <FormattedId idSlices={splitFingerprint(fingerprint)} />
+      </p>
+    </div>
+  );
+};

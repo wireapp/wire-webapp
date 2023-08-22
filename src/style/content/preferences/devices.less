@@ -18,9 +18,23 @@
  */
 
 .preferences-devices-model {
-  font-size: @font-size-base;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-lg);
+}
+
+.preferences-devices-model-name {
+  display: flex;
+  align-items: center;
+
+  margin-bottom: 32px;
+  font-size: @font-size-large;
   font-weight: @font-weight-medium;
   line-height: @line-height-lg;
+
+  .conversation-badges {
+    margin-left: 4px;
+  }
 }
 
 .preferences-devices-activated {
@@ -92,12 +106,12 @@
 }
 
 .preferences-devices-id {
-  font-size: @font-size-small;
-  line-height: @line-height-xs;
+  //font-size: @font-size-small;
+  //line-height: @line-height-xs;
   text-transform: uppercase;
 
   span:first-child {
-    .label-bold;
+    //.label-bold;
   }
 }
 
@@ -106,23 +120,35 @@
 }
 
 .preferences-devices-fingerprint {
-  height: 48px;
-  font-family: monospace;
+  max-width: 300px;
+  //height: 48px;
+  //font-family: monospace;
   line-height: @line-height-lg;
 
   .device-id-part {
-    display: inline;
+    display: inline-block;
+    width: 24px;
+    margin-right: 12px;
+    text-transform: uppercase;
   }
 
-  .device-id-part:nth-child(17)::before {
-    display: block;
-    content: ' ';
+  .device-id-part:nth-child(8n) {
+    margin-right: 0;
+
+    &::after {
+      display: block;
+      content: ' ';
+    }
   }
 }
 
 .preferences-devices-fingerprint-label {
-  margin-top: 32px;
-  margin-bottom: 8px;
+  margin-top: 12px;
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.25px;
+  line-height: var(--line-height-md);
+  //margin-bottom: 8px;
 }
 
 .preferences-devices-session {
@@ -154,4 +180,8 @@ body.theme-dark {
   .preferences-devices-activated {
     color: var(--gray-20);
   }
+}
+
+.preferences-proteus-details {
+  margin-top: 32px;
 }

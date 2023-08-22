@@ -19,52 +19,35 @@
 
 import React from 'react';
 
+import {Badges} from 'Components/Badges';
 import {ClientEntity} from 'src/script/client/ClientEntity';
-import {t} from 'Util/LocalizerUtil';
-import {splitFingerprint} from 'Util/StringUtil';
-import {formatTimestamp} from 'Util/TimeUtil';
 
-import {FormattedId} from './FormattedId';
+import {MLSDeviceDetails} from './MLSDeviceDetails';
+import {ProteusDeviceDetails} from './ProteusDeviceDetails';
 
-interface DeviceProps {
+export interface DeviceProps {
   device: ClientEntity;
   fingerprint: string;
 }
 
-const DetailedDevice: React.FC<DeviceProps> = ({device, fingerprint}) => {
+const TMP_MLS_FINGERPRINT = '3dc87fff07c9296e3dc87fff07c9296e65687fff07c9296e3dc87fff07c9656f';
+
+export const DetailedDevice: React.FC<DeviceProps> = ({device, fingerprint}) => {
+  const isProteusVerified = true;
+
   return (
     <>
-      <h3 className="preferences-devices-model" data-uie-name="device-model">
-        {device.model}
+      <h3 className="preferences-devices-model preferences-devices-model-name" data-uie-name="device-model">
+        <span>{device.model}</span>
+
+        <Badges isProteusVerified={isProteusVerified} />
       </h3>
 
-      <p className="preferences-devices-id">
-        <strong>{t('preferencesDevicesId')}</strong>
+      {/* MLS */}
+      <MLSDeviceDetails device={device} fingerprint={TMP_MLS_FINGERPRINT} />
 
-        <span data-uie-name="preferences-device-current-id">
-          <FormattedId idSlices={splitFingerprint(device.id)} />
-        </span>
-      </p>
-
-      {device.time !== undefined && (
-        <div className="preferences-devices-activated">
-          <p
-            dangerouslySetInnerHTML={{
-              __html: t('preferencesDevicesActivatedOn', {date: formatTimestamp(device.time)}),
-            }}
-          />
-        </div>
-      )}
-
-      <h3 className="label preferences-label preferences-devices-fingerprint-label">
-        {t('preferencesDevicesFingerprint')}
-      </h3>
-
-      <p className="preferences-devices-fingerprint" css={{width: '300px'}}>
-        <FormattedId idSlices={splitFingerprint(fingerprint)} />
-      </p>
+      {/* Proteus */}
+      <ProteusDeviceDetails device={device} fingerprint={fingerprint} isProteusVerified={isProteusVerified} />
     </>
   );
 };
-
-export {DetailedDevice};

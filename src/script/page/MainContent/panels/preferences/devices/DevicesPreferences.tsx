@@ -51,13 +51,15 @@ interface DevicesPreferencesProps {
   verifyDevice: (userId: QualifiedId, device: ClientEntity, isVerified: boolean) => void;
 }
 
-const Device: React.FC<{
+interface DeviceProps {
   device: ClientEntity;
   isSSO: boolean;
   onRemove: (device: ClientEntity) => void;
   onSelect: (device: ClientEntity) => void;
   deviceNumber: number;
-}> = ({device, isSSO, onSelect, onRemove, deviceNumber}) => {
+}
+
+const Device = ({device, isSSO, onSelect, onRemove, deviceNumber}: DeviceProps) => {
   const {isVerified} = useKoSubscribableChildren(device.meta, ['isVerified']);
   const verifiedLabel = isVerified ? t('preferencesDevicesVerification') : t('preferencesDeviceNotVerified');
   const deviceAriaLabel = `${t('preferencesDevice')} ${deviceNumber}, ${device.getName()}, ${verifiedLabel}`;
@@ -146,6 +148,7 @@ const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
     cryptographyRepository.getRemoteFingerprint(self.qualifiedId, device.id);
 
   const [localFingerprint, setLocalFingerprint] = useState('');
+
   useEffect(() => {
     cryptographyRepository.getLocalFingerprint().then(setLocalFingerprint);
   }, [cryptographyRepository]);

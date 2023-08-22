@@ -1098,7 +1098,7 @@
   "preferencesDeviceDetails": "Device Details",
   "preferencesDeviceNotVerified": "not verified",
   "preferencesDevices": "Devices",
-  "preferencesDevicesActivatedOn": "Activated [bold]{{date}}[/bold]",
+  "preferencesDevicesActivatedOn": "Activated",
   "preferencesDevicesActive": "Active",
   "preferencesDevicesActiveDetail": "If you don’t recognize a device above, remove it and reset your password.",
   "preferencesDevicesCurrent": "Current",
