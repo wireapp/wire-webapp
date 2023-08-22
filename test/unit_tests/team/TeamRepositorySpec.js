@@ -50,7 +50,7 @@ describe('TeamRepository', () => {
       const selfUser = new User('self-id');
       selfUser.teamId = 'e6d3adc5-9140-477a-abc1-8279d210ceab';
       selfUser.isMe = true;
-      userState.users([selfUser]);
+      userState.self(selfUser);
       const teamService = {
         getTeamById: jest.fn(team => Promise.resolve(team_metadata)),
       };
@@ -93,7 +93,7 @@ describe('TeamRepository', () => {
       const selfUser = new User();
       selfUser.isMe = true;
       selfUser.teamRole('z.team.TeamRole.ROLE.NONE');
-      userState.users([selfUser]);
+      userState.self(selfUser);
       const teamState = new TeamState(userState);
       teamState.team({
         id: 'team-id',

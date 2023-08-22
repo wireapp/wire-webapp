@@ -177,6 +177,7 @@ export class TestFactory {
     const userState = new UserState();
     const selfUser = new User('self-id');
     selfUser.isMe = true;
+    userState.self(selfUser);
     userState.users([selfUser]);
 
     this.user_repository = new UserRepository(
