@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [41.3.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@41.3.0...@wireapp/core@41.3.1) (2023-08-22)
+
+### Reverts
+
+* Revert "feat: stop leaking the MLS service to the outside (#5414)" (#5415) ([90cf996](https://github.com/wireapp/wire-web-packages/commit/90cf996a8a4a07828238332934161ea6d7cf9825)), closes [#5414](https://github.com/wireapp/wire-web-packages/issues/5414) [#5415](https://github.com/wireapp/wire-web-packages/issues/5415)
+
 # [41.3.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@41.2.5...@wireapp/core@41.3.0) (2023-08-22)
 
 ### Features
