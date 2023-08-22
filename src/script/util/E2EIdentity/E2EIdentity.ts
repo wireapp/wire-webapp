@@ -19,15 +19,12 @@
 
 import {container} from 'tsyringe';
 
-import {AcmeStorage} from '@wireapp/core';
-
 import {PrimaryModal, removeCurrentModal} from 'Components/Modals/PrimaryModal';
 import {Config} from 'src/script/Config';
 import {Core} from 'src/script/service/CoreSingleton';
 import {UserState} from 'src/script/user/UserState';
 import {supportsMLS} from 'Util/util';
 
-import {GracePeriodTimer} from './DelayTimer';
 import {removeUrlParameters} from './helper/uri';
 import {getModalOptions, ModalType} from './Modals';
 
@@ -47,7 +44,8 @@ interface E2EIHandlerParams {
 
 class E2EIHandler {
   private static instance: E2EIHandler | null = null;
-  private timer: GracePeriodTimer;
+  private readonly core = container.resolve(Core);
+  private timer: ReturnType<typeof this.core.e2eiUtils.getDelayTimerInstance>;
   private discoveryUrl: string;
   private gracePeriodInMS: number;
   private currentStep: E2EIHandlerStep | null = E2EIHandlerStep.UNINITIALIZED;
@@ -56,11 +54,7 @@ class E2EIHandler {
     // ToDo: Do these values need to te able to be updated? Should we use a singleton with update fn?
     this.discoveryUrl = discoveryUrl;
     this.gracePeriodInMS = gracePeriodInMS;
-    this.timer = GracePeriodTimer.getInstance({
-      delayPeriodExpiredCallback: () => null,
-      gracePeriodExpiredCallback: () => null,
-      gracePeriodInMS,
-    });
+    this.timer = this.core.e2eiUtils.getDelayTimerInstance(gracePeriodInMS);
   }
 
   /**
@@ -93,17 +87,13 @@ class E2EIHandler {
   public updateParams({gracePeriodInMS, discoveryUrl}: E2EIHandlerParams) {
     this.gracePeriodInMS = gracePeriodInMS;
     this.discoveryUrl = discoveryUrl;
-    this.timer = GracePeriodTimer.getInstance({
-      delayPeriodExpiredCallback: () => null,
-      gracePeriodExpiredCallback: () => null,
-      gracePeriodInMS,
-    });
+    this.timer = this.core.e2eiUtils.getDelayTimerInstance(gracePeriodInMS);
     this.initialize();
   }
 
   public initialize(): void {
     if (this.isE2EIEnabled) {
-      if (!AcmeStorage.hasCertificateData()) {
+      if (!this.core.e2eiUtils.hasActiveCertificate()) {
         this.showE2EINotificationMessage();
       }
     }
@@ -116,11 +106,14 @@ class E2EIHandler {
   private async enrollE2EI() {
     try {
       const userState = container.resolve(UserState);
-      const core = container.resolve(Core);
       // Notify user about E2EI enrollment in progress
       this.currentStep = E2EIHandlerStep.ENROLL;
       this.showLoadingMessage();
-      const success = await core.enrollE2EI(userState.self().name(), userState.self().username(), this.discoveryUrl);
+      const success = await this.core.enrollE2EI(
+        userState.self().name(),
+        userState.self().username(),
+        this.discoveryUrl,
+      );
       if (!success) {
         throw new Error('E2EI enrollment failed');
       }
@@ -190,7 +183,7 @@ class E2EIHandler {
   private showE2EINotificationMessage(): void {
     // If the user has already started enrollment, don't show the notification. Instead, show the loading modal
     // This will occur after the redirect from the oauth provider
-    if (AcmeStorage.hasHandle()) {
+    if (this.core.e2eiUtils.isEnrollmentInProgress()) {
       this.showLoadingMessage();
       void this.enrollE2EI();
       return;
