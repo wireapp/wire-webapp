@@ -123,7 +123,7 @@ describe('NotificationRepository', () => {
         tag: conversation.id,
       },
       timeout: NotificationRepository.CONFIG.TIMEOUT,
-      title: truncate(title, NotificationRepository.CONFIG.TITLE_LENGTH, false),
+      title: truncate(title, NotificationRepository.CONFIG.TITLE_MAX_LENGTH, false),
     };
 
     // Mocks
@@ -153,8 +153,13 @@ describe('NotificationRepository', () => {
         notification_content.trigger = trigger;
 
         if (_conversation.isGroup()) {
-          const titleLength = NotificationRepository.CONFIG.TITLE_LENGTH;
-          const titleText = `${_message.user().name()} in ${_conversation.display_name()}`;
+          const titleLength = NotificationRepository.CONFIG.TITLE_MAX_LENGTH;
+          const titleSectionLength = NotificationRepository.CONFIG.TITLE_LENGTH;
+          const titleText = `${_message.user().name()} in ${truncate(
+            _conversation.display_name(),
+            titleSectionLength,
+            false,
+          )}`;
 
           notification_content.title = truncate(titleText, titleLength, false);
         } else {
@@ -192,8 +197,14 @@ describe('NotificationRepository', () => {
 
         const obfuscateMessage = _setting === NotificationPreference.OBFUSCATE_MESSAGE;
         if (obfuscateMessage) {
-          const titleLength = NotificationRepository.CONFIG.TITLE_LENGTH;
-          const titleText = `${message.user().name()} in ${conversation.display_name()}`;
+          const titleLength = NotificationRepository.CONFIG.TITLE_MAX_LENGTH;
+          const titleSectionLength = NotificationRepository.CONFIG.TITLE_LENGTH;
+
+          const titleText = `${message.user().name()} in ${truncate(
+            conversation.display_name(),
+            titleSectionLength,
+            false,
+          )}`;
 
           notification_content.options.body = t('notificationObfuscated');
           notification_content.title = truncate(titleText, titleLength, false);
@@ -542,8 +553,14 @@ describe('NotificationRepository', () => {
 
   describe('shows a well-formed group notification', () => {
     beforeEach(() => {
-      const titleLength = NotificationRepository.CONFIG.TITLE_LENGTH;
-      const titleText = `${message.user().name()} in ${conversation.display_name()}`;
+      const titleLength = NotificationRepository.CONFIG.TITLE_MAX_LENGTH;
+      const titleSectionLength = NotificationRepository.CONFIG.TITLE_LENGTH;
+
+      const titleText = `${message.user().name()} in ${truncate(
+        conversation.display_name(),
+        titleSectionLength,
+        false,
+      )}`;
 
       notification_content.title = truncate(titleText, titleLength, false);
     });
@@ -604,8 +621,14 @@ describe('NotificationRepository', () => {
       beforeEach(() => {
         memberMessage.type = CONVERSATION_EVENT.MEMBER_JOIN;
 
-        const titleLength = NotificationRepository.CONFIG.TITLE_LENGTH;
-        const titleText = `${memberMessage.user().name()} in ${conversation.display_name()}`;
+        const titleLength = NotificationRepository.CONFIG.TITLE_MAX_LENGTH;
+        const titleSectionLength = NotificationRepository.CONFIG.TITLE_LENGTH;
+
+        const titleText = `${memberMessage.user().name()} in ${truncate(
+          conversation.display_name(),
+          titleSectionLength,
+          false,
+        )}`;
 
         notification_content.title = truncate(titleText, titleLength, false);
       });
@@ -641,8 +664,14 @@ describe('NotificationRepository', () => {
     describe('if people are removed', () => {
       beforeEach(() => {
         memberMessage.type = CONVERSATION_EVENT.MEMBER_LEAVE;
-        const titleLength = NotificationRepository.CONFIG.TITLE_LENGTH;
-        const titleText = `${memberMessage.user().name()} in ${conversation.display_name()}`;
+        const titleLength = NotificationRepository.CONFIG.TITLE_MAX_LENGTH;
+        const titleSectionLength = NotificationRepository.CONFIG.TITLE_LENGTH;
+
+        const titleText = `${memberMessage.user().name()} in ${truncate(
+          conversation.display_name(),
+          titleSectionLength,
+          false,
+        )}`;
 
         notification_content.title = truncate(titleText, titleLength, false);
       });
