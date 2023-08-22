@@ -45,9 +45,9 @@ export const generateDecryptionError = (senderInfo: SenderInfo, error: any): Dec
   const {clientId, userId} = senderInfo;
   const sender = `${userId.id} (${clientId})`;
 
-  const coreCryptoCode = isCoreCryptoError(error) && error.proteusErrorCode;
-  const cryptoboxCode = isCryptoboxError(error) && error.code;
-  const code = coreCryptoCode || cryptoboxCode || ProteusErrors.Unknown;
+  const coreCryptoCode = isCoreCryptoError(error) ? error.proteusErrorCode : null;
+  const cryptoboxCode = isCryptoboxError(error) ? error.code : null;
+  const code = coreCryptoCode ?? cryptoboxCode ?? ProteusErrors.Unknown;
 
   const message = `Decryption error from ${sender} (${error.message})`;
 
