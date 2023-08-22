@@ -17,10 +17,16 @@
  *
  */
 
+import {TEAM_EVENT} from '@wireapp/api-client/lib/event/TeamEvent';
+import {FeatureStatus, FEATURE_KEY} from '@wireapp/api-client/lib/team/feature';
 import {Permissions} from '@wireapp/api-client/lib/team/member';
+import {amplify} from 'amplify';
 
 import {randomUUID} from 'crypto';
 
+import {WebAppEvents} from '@wireapp/webapp-events';
+
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {User} from 'src/script/entity/User';
 import {TeamRepository} from 'src/script/team/TeamRepository';
 import {TeamState} from 'src/script/team/TeamState';
@@ -31,10 +37,37 @@ import {TeamMemberEntity} from './TeamMemberEntity';
 import {TeamService} from './TeamService';
 
 import {AssetRepository} from '../assets/AssetRepository';
+import {EventSource} from '../event/EventSource';
+import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {ROLE} from '../user/UserPermission';
 import {UserRepository} from '../user/UserRepository';
 
+function buildConnectionRepository() {
+  const team = new TeamEntity(randomUUID());
+  const userState = new UserState();
+  const selfUser = new User('self-id', 'self-domain');
+  selfUser.teamId = team.id;
+  selfUser.isMe = true;
+  selfUser.teamRole(ROLE.NONE);
+  userState.self(selfUser);
+
+  const teamState = new TeamState(userState);
+  teamState.team(team);
+  const userRepository = {} as UserRepository;
+  const assetRepository = {} as AssetRepository;
+  const teamService = new TeamService({} as any);
+  return [
+    new TeamRepository(userRepository, assetRepository, teamService, userState, teamState),
+    {userState, teamState, userRepository, assetRepository, teamService},
+  ] as const;
+}
 describe('TeamRepository', () => {
+  afterEach(() => {
+    amplify.unsubscribeAll(WebAppEvents.TEAM.EVENT_FROM_BACKEND);
+    amplify.unsubscribeAll(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE);
+    amplify.unsubscribeAll(WebAppEvents.TEAM.UPDATE_INFO);
+  });
+
   const teams_data = {
     teams: [
       {
@@ -58,23 +91,9 @@ describe('TeamRepository', () => {
 
   describe('getTeam()', () => {
     it('returns the team entity', async () => {
-      const userState = new UserState();
-      const selfUser = new User('self-id');
-      selfUser.teamId = 'e6d3adc5-9140-477a-abc1-8279d210ceab';
-      selfUser.isMe = true;
-      userState.self(selfUser);
-      const teamService = new TeamService();
+      const [teamRepo, {teamService}] = buildConnectionRepository();
       jest.spyOn(teamService, 'getTeamById').mockResolvedValue(team_metadata);
 
-      const teamRepo = new TeamRepository(
-        {
-          mapGuestStatus: jest.fn(),
-        } as unknown as UserRepository,
-        {} as AssetRepository,
-        teamService,
-        userState,
-        new TeamState(userState),
-      );
       jest.spyOn(teamRepo, 'getSelfMember').mockResolvedValue(new TeamMemberEntity(randomUUID()));
 
       const team_et = await teamRepo.getTeam();
@@ -87,10 +106,8 @@ describe('TeamRepository', () => {
 
   describe('getAllTeamMembers()', () => {
     it('returns team member entities', async () => {
-      const userState = new UserState();
-      const teamService = new TeamService();
+      const [teamRepo, {teamService}] = buildConnectionRepository();
       jest.spyOn(teamService, 'getAllTeamMembers').mockResolvedValue({hasMore: false, members: team_members.members});
-      const teamRepo = new TeamRepository({} as any, {} as any, teamService, userState, new TeamState(userState));
       const entities = await teamRepo['getAllTeamMembers'](team_metadata.id);
       expect(entities.length).toEqual(team_members.members.length);
       expect(entities[0].userId).toEqual(team_members.members[0].user);
@@ -100,26 +117,96 @@ describe('TeamRepository', () => {
 
   describe('sendAccountInfo', () => {
     it('does not crash when there is no team logo', async () => {
-      const userState = new UserState();
-      const selfUser = new User();
-      selfUser.isMe = true;
-      selfUser.teamRole(ROLE.NONE);
-      userState.self(selfUser);
-      const teamState = new TeamState(userState);
-      teamState.team(new TeamEntity(randomUUID()));
+      const [teamRepo] = buildConnectionRepository();
 
-      const teamRepo = new TeamRepository(
-        {} as any, // TeamService,
-        {} as any, // UserRepository,
-        {} as any, // AssetRepository,
-        userState,
-        teamState,
-      );
       expect(teamRepo['teamState'].isTeam()).toBe(true);
 
       const accountInfo = await teamRepo.sendAccountInfo(true);
 
       expect(accountInfo.picture).toBeUndefined();
     });
+  });
+
+  describe('feature-config.update event handling', () => {
+    let modalShowSpy: jest.SpyInstance;
+
+    beforeEach(() => {
+      modalShowSpy = jest.spyOn(PrimaryModal, 'show');
+      modalShowSpy.mockClear();
+      localStorage.clear();
+    });
+
+    it('silently update the local state if no previous state was set', async () => {
+      const [teamRepository, {teamService}] = buildConnectionRepository();
+
+      jest.spyOn(teamService, 'getAllTeamFeatures').mockResolvedValue({
+        [FEATURE_KEY.FILE_SHARING]: {
+          status: FeatureStatus.ENABLED,
+        },
+      });
+
+      teamRepository['onTeamEvent']({type: TEAM_EVENT.FEATURE_CONFIG_UPDATE}, EventSource.WEBSOCKET);
+      expect(modalShowSpy).not.toHaveBeenCalled();
+    });
+
+    it.each([
+      [FEATURE_KEY.FILE_SHARING, 'featureConfigChangeModalFileSharingDescriptionItemFileSharingEnabled'],
+      [FEATURE_KEY.VIDEO_CALLING, 'featureConfigChangeModalAudioVideoDescriptionItemCameraEnabled'],
+      [FEATURE_KEY.SELF_DELETING_MESSAGES, 'featureConfigChangeModalSelfDeletingMessagesDescriptionItemEnabled'],
+      [FEATURE_KEY.CONFERENCE_CALLING, 'featureConfigChangeModalConferenceCallingEnabled'],
+      [
+        FEATURE_KEY.CONVERSATION_GUEST_LINKS,
+        'featureConfigChangeModalConversationGuestLinksDescriptionItemConversationGuestLinksEnabled',
+      ],
+    ] as const)(
+      'shows a modal when an update was made to a property that has local value for %s',
+
+      async (feature, expectedString) => {
+        const baseConfig = {
+          [FEATURE_KEY.FILE_SHARING]: {
+            status: FeatureStatus.DISABLED,
+          },
+          [FEATURE_KEY.VIDEO_CALLING]: {
+            status: FeatureStatus.DISABLED,
+          },
+          [FEATURE_KEY.SELF_DELETING_MESSAGES]: {
+            status: FeatureStatus.DISABLED,
+            config: {enforcedTimeoutSeconds: 0},
+          },
+          [FEATURE_KEY.CONFERENCE_CALLING]: {
+            status: FeatureStatus.DISABLED,
+          },
+          [FEATURE_KEY.CONVERSATION_GUEST_LINKS]: {
+            status: FeatureStatus.DISABLED,
+          },
+        };
+        const [teamRepository, {teamService}] = buildConnectionRepository();
+
+        jest
+          .spyOn(teamService, 'getAllTeamFeatures')
+          .mockResolvedValueOnce({
+            ...baseConfig,
+          })
+          .mockResolvedValueOnce({
+            ...baseConfig,
+            [feature]: {
+              ...baseConfig[feature],
+              status: FeatureStatus.ENABLED,
+            },
+          });
+
+        // Tigger a sync end to start fetching the feature config and storing it locally
+        await teamRepository['updateTeamConfig'](NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
+
+        await teamRepository['onTeamEvent']({type: TEAM_EVENT.FEATURE_CONFIG_UPDATE}, EventSource.WEBSOCKET);
+
+        expect(modalShowSpy).toHaveBeenCalledTimes(1);
+        expect(modalShowSpy).toHaveBeenCalledWith(PrimaryModal.type.ACKNOWLEDGE, {
+          text: expect.objectContaining({
+            htmlMessage: expectedString,
+          }),
+        });
+      },
+    );
   });
 });

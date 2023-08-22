@@ -106,7 +106,7 @@ export class TeamRepository {
     };
 
     amplify.subscribe(WebAppEvents.TEAM.EVENT_FROM_BACKEND, this.onTeamEvent);
-    amplify.subscribe(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, this.onNotificationHandlingStateChange);
+    amplify.subscribe(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, this.updateTeamConfig);
     amplify.subscribe(WebAppEvents.TEAM.UPDATE_INFO, this.sendAccountInfo.bind(this));
   }
 
@@ -220,7 +220,7 @@ export class TeamRepository {
     return IntegrationMapper.mapServicesFromArray(servicesData, domain);
   }
 
-  readonly onTeamEvent = (eventJson: any, source: EventSource): void => {
+  readonly onTeamEvent = async (eventJson: any, source: EventSource): void => {
     if (this.teamState.isTeamDeleted()) {
       // We don't want to handle any events after the team has been deleted
       return;
@@ -248,7 +248,7 @@ export class TeamRepository {
         break;
       }
       case TEAM_EVENT.MEMBER_UPDATE: {
-        this.onMemberUpdate(eventJson);
+        await this.onMemberUpdate(eventJson);
         break;
       }
       case TEAM_EVENT.UPDATE: {
@@ -256,7 +256,7 @@ export class TeamRepository {
         break;
       }
       case TEAM_EVENT.FEATURE_CONFIG_UPDATE: {
-        this.onFeatureConfigUpdate(eventJson, source);
+        await this.onFeatureConfigUpdate(eventJson, source);
         break;
       }
       case TEAM_EVENT.CONVERSATION_CREATE:
@@ -393,9 +393,7 @@ export class TeamRepository {
     }
   }
 
-  private readonly onNotificationHandlingStateChange = async (
-    handlingNotifications: NOTIFICATION_HANDLING_STATE,
-  ): Promise<void> => {
+  private readonly updateTeamConfig = async (handlingNotifications: NOTIFICATION_HANDLING_STATE): Promise<void> => {
     const shouldFetchConfig = handlingNotifications === NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
 
     if (shouldFetchConfig) {
@@ -405,13 +403,14 @@ export class TeamRepository {
   };
 
   private readonly onFeatureConfigUpdate = async (
-    eventJson: TeamEvent & {name: FEATURE_KEY},
+    _event: TeamEvent & {name: FEATURE_KEY},
     source: EventSource,
   ): Promise<void> => {
     if (source !== EventSource.WEBSOCKET) {
       // Ignore notification stream events
       return;
     }
+    // When we receive a `feature-config.update` event, we will refetch the entire feature config
     const featureConfigList = await this.updateFeatureConfig();
     this.handleConfigUpdate(featureConfigList);
   };
@@ -429,10 +428,12 @@ export class TeamRepository {
     this.saveFeatureConfig(featureConfigList);
   };
 
-  private readonly handleFileSharingFeatureChange = (previousConfig: FeatureList, newConfig: FeatureList) => {
-    const hasFileSharingChanged =
-      previousConfig?.fileSharing?.status && previousConfig.fileSharing.status !== newConfig?.fileSharing?.status;
-    const hasChangedToEnabled = newConfig?.fileSharing?.status === FeatureStatus.ENABLED;
+  private readonly handleFileSharingFeatureChange = (
+    {fileSharing: previousConfig}: FeatureList,
+    {fileSharing: newConfig}: FeatureList,
+  ) => {
+    const hasFileSharingChanged = previousConfig?.status && previousConfig.status !== newConfig?.status;
+    const hasChangedToEnabled = newConfig?.status === FeatureStatus.ENABLED;
 
     if (hasFileSharingChanged) {
       PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
@@ -446,11 +447,12 @@ export class TeamRepository {
     }
   };
 
-  private readonly handleGuestLinkFeatureChange = (previousConfig: FeatureList, newConfig: FeatureList) => {
-    const hasGuestLinkChanged =
-      previousConfig?.conversationGuestLinks?.status &&
-      previousConfig.conversationGuestLinks.status !== newConfig?.conversationGuestLinks?.status;
-    const hasGuestLinkChangedToEnabled = newConfig?.conversationGuestLinks?.status === FeatureStatus.ENABLED;
+  private readonly handleGuestLinkFeatureChange = (
+    {conversationGuestLinks: previousConfig}: FeatureList,
+    {conversationGuestLinks: newConfig}: FeatureList,
+  ) => {
+    const hasGuestLinkChanged = previousConfig?.status && previousConfig?.status !== newConfig?.status;
+    const hasGuestLinkChangedToEnabled = newConfig?.status === FeatureStatus.ENABLED;
 
     if (hasGuestLinkChanged) {
       PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
@@ -500,10 +502,12 @@ export class TeamRepository {
     }
   };
 
-  private readonly handleAudioVideoFeatureChange = (previousConfig: FeatureList, newConfig: FeatureList) => {
-    const hasVideoCallingChanged =
-      previousConfig?.videoCalling?.status && previousConfig.videoCalling.status !== newConfig?.videoCalling?.status;
-    const hasChangedToEnabled = newConfig?.videoCalling?.status === FeatureStatus.ENABLED;
+  private readonly handleAudioVideoFeatureChange = (
+    {videoCalling: previousConfig}: FeatureList,
+    {videoCalling: newConfig}: FeatureList,
+  ) => {
+    const hasVideoCallingChanged = previousConfig?.status && previousConfig.status !== newConfig?.status;
+    const hasChangedToEnabled = newConfig?.status === FeatureStatus.ENABLED;
 
     if (hasVideoCallingChanged) {
       PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
@@ -517,12 +521,12 @@ export class TeamRepository {
     }
   };
 
-  private readonly handleConferenceCallingFeatureChange = (previousConfig: FeatureList, newConfig: FeatureList) => {
-    if (
-      previousConfig?.conferenceCalling?.status &&
-      previousConfig.conferenceCalling.status !== newConfig?.conferenceCalling?.status
-    ) {
-      const hasChangedToEnabled = newConfig?.conferenceCalling?.status === FeatureStatus.ENABLED;
+  private readonly handleConferenceCallingFeatureChange = (
+    {conferenceCalling: previousConfig}: FeatureList,
+    {conferenceCalling: newConfig}: FeatureList,
+  ) => {
+    if (previousConfig?.status && previousConfig.status !== newConfig?.status) {
+      const hasChangedToEnabled = newConfig?.status === FeatureStatus.ENABLED;
       if (hasChangedToEnabled) {
         const replaceEnterprise = replaceLink(
           Config.getConfig().URL.PRICING,
