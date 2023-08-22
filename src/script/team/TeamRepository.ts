@@ -78,22 +78,20 @@ export interface AccountInfo {
 export class TeamRepository {
   private static readonly LOCAL_STORAGE_FEATURE_CONFIG_KEY = 'FEATURE_CONFIG_KEY';
   private readonly logger: Logger;
-  readonly teamService: TeamService;
   private readonly teamMapper: TeamMapper;
   private readonly userRepository: UserRepository;
   private readonly assetRepository: AssetRepository;
 
   constructor(
-    teamService: TeamService,
     userRepository: UserRepository,
     assetRepository: AssetRepository,
+    readonly teamService: TeamService = new TeamService(),
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
   ) {
     this.logger = getLogger('TeamRepository');
 
     this.teamMapper = new TeamMapper();
-    this.teamService = teamService;
     this.assetRepository = assetRepository;
     this.userRepository = userRepository;
 
