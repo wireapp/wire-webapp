@@ -17,8 +17,9 @@
  *
  */
 
-import React, {useMemo, useState} from 'react';
+import React, {FC, ReactNode, useMemo, useState} from 'react';
 
+import {AddUsersFailureReasons} from '@wireapp/core/lib/conversation';
 import {container} from 'tsyringe';
 import {groupBy} from 'underscore';
 
@@ -38,24 +39,53 @@ import {useMessageFocusedTabIndex} from './util';
 
 import {FailedToAddUsersMessage as FailedToAddUsersMessageEntity} from '../../../entity/message/FailedToAddUsersMessage';
 
-export enum ErrorMessageType {
-  offlineBackEnd = 'OfflineBackEnd',
-  nonFullyConnectedGraph = 'NonFullyConnectedGraph',
-}
-
 export interface FailedToAddUsersMessageProps {
   isMessageFocused: boolean;
   message: FailedToAddUsersMessageEntity;
-  errorMessageType?: ErrorMessageType;
   userState?: UserState;
 }
 
+const errorMessageType = {
+  [AddUsersFailureReasons.NON_FEDERATING_BACKENDS]: 'NonFederatingBackends',
+  [AddUsersFailureReasons.UNREACHABLE_BACKENDS]: 'OfflineBackend',
+} as const;
+
 const config = Config.getConfig();
+
+interface MessageDetailsProps {
+  children: ReactNode;
+  message: FailedToAddUsersMessageEntity;
+  users: User[];
+  domain?: string;
+}
+const MessageDetails: FC<MessageDetailsProps> = ({users, children, message, domain = ''}) => {
+  return (
+    <p
+      data-uie-name="multi-user-not-added-details"
+      data-uie-value={domain}
+      style={{lineHeight: 'var(--line-height-sm)'}}
+    >
+      <span
+        css={warning}
+        dangerouslySetInnerHTML={{
+          __html: t(`failedToAddParticipantsPluralDetails${errorMessageType[message.reason]}`, {
+            name: users[0].name(),
+            names: users
+              .slice(1)
+              .map(user => user.name())
+              .join(', '),
+            domain,
+          }),
+        }}
+      />
+      {children}
+    </p>
+  );
+};
 
 const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
   isMessageFocused,
   message,
-  errorMessageType = ErrorMessageType.offlineBackEnd,
   userState = container.resolve(UserState),
 }) => {
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
@@ -113,7 +143,7 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
               <span
                 css={warning}
                 dangerouslySetInnerHTML={{
-                  __html: t(`failedToAddParticipantSingularOfflineBackEnd`, {
+                  __html: t(`failedToAddParticipantSingularOfflineBackend`, {
                     name: users[0].name(),
                     domain: users[0].domain,
                   }),
@@ -142,29 +172,20 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
       <div className="message-body">
         {isOpen && (
           <>
-            {Object.entries(groupedUsers).map(([domain, domainUsers]) => (
-              <p
-                key={domain}
-                data-uie-name="multi-user-not-added-details"
-                data-uie-value={domain}
-                style={{lineHeight: 'var(--line-height-sm)'}}
-              >
-                <span
-                  css={warning}
-                  dangerouslySetInnerHTML={{
-                    __html: t(`failedToAddParticipantsPluralDetails${errorMessageType}`, {
-                      name: domainUsers[domainUsers.length - 1].name(),
-                      names:
-                        domainUsers.length === 2
-                          ? domainUsers[0].name()
-                          : domainUsers.map(user => user.name()).join(', '),
-                      domain,
-                    }),
-                  }}
-                />
+            {message.reason === AddUsersFailureReasons.UNREACHABLE_BACKENDS && (
+              <>
+                {Object.entries(groupedUsers).map(([domain, domainUsers]) => (
+                  <MessageDetails key={domain} domain={domain} message={message} users={domainUsers}>
+                    {learnMore}
+                  </MessageDetails>
+                ))}
+              </>
+            )}
+            {message.reason === AddUsersFailureReasons.NON_FEDERATING_BACKENDS && (
+              <MessageDetails message={message} users={users}>
                 {learnMore}
-              </p>
-            ))}
+              </MessageDetails>
+            )}
           </>
         )}
         {total > 1 && (

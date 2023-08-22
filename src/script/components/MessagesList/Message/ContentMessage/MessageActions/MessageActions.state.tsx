@@ -17,4 +17,18 @@
  *
  */
 
-export * from './mlsConversationState';
+import {create} from 'zustand';
+
+type MessageActionsState = {
+  isMenuOpen: boolean;
+  handleMenuOpen: (isMenuOpen: boolean) => void;
+  getMenuState: () => boolean;
+};
+
+const useMessageActionsState = create<MessageActionsState>((set, get) => ({
+  isMenuOpen: false,
+  handleMenuOpen: isMenuOpen => set(state => ({...state, isMenuOpen: isMenuOpen})),
+  getMenuState: () => get().isMenuOpen,
+}));
+
+export {useMessageActionsState};

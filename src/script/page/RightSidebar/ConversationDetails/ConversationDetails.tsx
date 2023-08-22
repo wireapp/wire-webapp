@@ -433,7 +433,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
             <>
               <ConversationDetailsBottomActions
                 isDeviceActionEnabled={
-                  firstParticipant && (firstParticipant.isConnected() || firstParticipant.inTeam())
+                  isSingleUserMode && firstParticipant && (firstParticipant.isConnected() || firstParticipant.inTeam())
                 }
                 showDevices={openParticipantDevices}
                 showNotifications={showNotifications}

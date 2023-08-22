@@ -20,6 +20,8 @@
 import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data/';
 import {ConversationOtrMessageAddEvent, CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
+import {AddUsersFailureReasons} from '@wireapp/core/lib/conversation';
+import {ReactionType} from '@wireapp/core/lib/conversation/ReactionType';
 import {DecryptionError} from '@wireapp/core/lib/errors/DecryptionError';
 
 import type {REASON as AVS_REASON} from '@wireapp/avs';
@@ -29,7 +31,6 @@ import {createUuid} from 'Util/uuid';
 
 import {CALL_MESSAGE_TYPE} from '../calling/enum/CallMessageType';
 import type {Conversation} from '../entity/Conversation';
-import {ReactionType} from '../entity/message/ContentMessage';
 import type {Message} from '../entity/message/Message';
 import type {User} from '../entity/User';
 import {CALL, ClientEvent, CONVERSATION} from '../event/Client';
@@ -96,6 +97,9 @@ export type DegradedMessageEvent = ConversationEvent<DegradedMessageEventData> &
 };
 export type DeleteEvent = ConversationEvent<{deleted_time: number; message_id: string; time: string}> & {
   type: CONVERSATION.MESSAGE_DELETE;
+};
+export type FederationStopEvent = ConversationEvent<{domains: string[]}> & {
+  type: CONVERSATION.FEDERATION_STOP;
 };
 export type GroupCreationEventData = {
   allTeamMembers: boolean;
@@ -189,7 +193,10 @@ export type FileTypeRestrictedEvent = ConversationEvent<{fileExt: string; isInco
 export type CallingTimeoutEvent = ConversationEvent<{reason: AVS_REASON.NOONE_JOINED | AVS_REASON.EVERYONE_LEFT}> & {
   type: CONVERSATION.CALL_TIME_OUT;
 };
-export type FailedToAddUsersMessageEvent = ConversationEvent<{qualifiedIds: QualifiedId[]}> & {
+export type FailedToAddUsersMessageEvent = ConversationEvent<{
+  qualifiedIds: QualifiedId[];
+  reason: AddUsersFailureReasons;
+}> & {
   type: CONVERSATION.FAILED_TO_ADD_USERS;
 };
 
@@ -206,6 +213,7 @@ export type ClientConversationEvent =
   | ErrorEvent
   | CompositeMessageAddEvent
   | ConfirmationEvent
+  | FederationStopEvent
   | DeleteEvent
   | DeleteEverywhereEvent
   | DegradedMessageEvent
@@ -301,11 +309,13 @@ export const EventBuilder = {
     qualifiedIds: QualifiedId[],
     conversation: Conversation,
     userId: string,
+    reason: AddUsersFailureReasons,
   ): FailedToAddUsersMessageEvent {
     return {
       ...buildQualifiedId(conversation),
       data: {
         qualifiedIds,
+        reason,
       },
       from: userId,
       id: createUuid(),
@@ -476,6 +486,24 @@ export const EventBuilder = {
       from: removedBySelfUser ? conversationEntity.selfUser().id : userId.id,
       time: conversationEntity.getNextIsoDate(currentTimestamp),
       type: CONVERSATION_EVENT.MEMBER_LEAVE,
+    };
+  },
+
+  buildFederationStop(
+    conversationEntity: Conversation,
+    selfUser: User,
+    domains: string[],
+    currentTimestamp: number,
+  ): FederationStopEvent {
+    return {
+      ...buildQualifiedId(conversationEntity),
+      data: {
+        domains,
+      },
+      id: createUuid(),
+      from: selfUser.id,
+      time: conversationEntity.getNextIsoDate(currentTimestamp),
+      type: CONVERSATION.FEDERATION_STOP,
     };
   },
 

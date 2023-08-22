@@ -17,6 +17,7 @@
  *
  */
 
+import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
@@ -46,7 +47,6 @@ export class User {
   public isService: boolean;
   public isSingleSignOn: boolean;
   public isNoPasswordSSO: boolean;
-  public joaatHash: number;
   public providerId?: string;
   public readonly accent_color: ko.PureComputed<string>;
   public readonly accent_id: ko.Observable<number>;
@@ -137,7 +137,6 @@ export class User {
     this.providerId = undefined;
     this.serviceId = undefined;
 
-    this.joaatHash = -1;
     this.isAvailable = ko.pureComputed(() => this.id !== '' && this.name() !== '');
 
     this.accent_id = ko.observable(ACCENT_ID.BLUE);
@@ -243,6 +242,10 @@ export class User {
       return '';
     }
     return this.isFederated ? `@${this.username()}@${this.domain}` : `@${this.username()}`;
+  }
+
+  markConnectionAsUnknown() {
+    this.connection().status(ConnectionStatus.UNKNOWN);
   }
 
   addClient(new_client_et: ClientEntity): boolean {

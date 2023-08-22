@@ -17,7 +17,7 @@
  *
  */
 
-import {ConversationEvent} from '@wireapp/api-client/lib/event';
+import {ConversationEvent, FederationEvent} from '@wireapp/api-client/lib/event';
 
 import {ClientConversationEvent} from './EventBuilder';
 
@@ -52,7 +52,7 @@ export class AbstractConversationEventHandler {
    */
   handleConversationEvent(
     conversationEntity: Conversation,
-    eventJson: ConversationEvent | ClientConversationEvent,
+    eventJson: ConversationEvent | ClientConversationEvent | FederationEvent,
   ): Promise<void> {
     const handler = this.eventHandlingConfig[eventJson.type] || (() => Promise.resolve());
     return handler.bind(this)(conversationEntity, eventJson);

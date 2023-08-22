@@ -27,7 +27,10 @@ import {SuperType} from '../../message/SuperType';
  * Legal hold system message
  */
 export class LegalHoldMessage extends Message {
-  constructor(public legalHoldStatus: LegalHoldStatus, timestamp: number) {
+  constructor(
+    public legalHoldStatus: LegalHoldStatus,
+    timestamp: number,
+  ) {
     super();
     this.super_type = SuperType.LEGALHOLD;
     this.timestamp(timestamp);

@@ -24,7 +24,10 @@ import {Message} from './Message';
 import {SuperType} from '../../message/SuperType';
 
 export class CallingTimeoutMessage extends Message {
-  constructor(public reason: AVS_REASON.NOONE_JOINED | AVS_REASON.EVERYONE_LEFT, time: number) {
+  constructor(
+    public reason: AVS_REASON.NOONE_JOINED | AVS_REASON.EVERYONE_LEFT,
+    time: number,
+  ) {
     super();
     this.super_type = SuperType.CALL_TIME_OUT;
     this.timestamp(time);
