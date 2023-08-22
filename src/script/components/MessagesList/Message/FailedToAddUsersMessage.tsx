@@ -169,7 +169,7 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
           />
         </p>
       </div>
-      <div className="message-body">
+      <div className="message-body" style={{flexDirection: 'column'}}>
         {isOpen && (
           <>
             {message.reason === AddUsersFailureReasons.UNREACHABLE_BACKENDS && (
@@ -189,16 +189,18 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
           </>
         )}
         {total > 1 && (
-          <Button
-            tabIndex={messageFocusedTabIndex}
-            data-uie-name="toggle-failed-to-add-users"
-            type="button"
-            variant={ButtonVariant.TERTIARY}
-            onClick={() => setIsOpen(state => !state)}
-            style={{marginTop: 4}}
-          >
-            {isOpen ? t('messageFailedToSendHideDetails') : t('messageFailedToSendShowDetails')}
-          </Button>
+          <div>
+            <Button
+              tabIndex={messageFocusedTabIndex}
+              data-uie-name="toggle-failed-to-add-users"
+              type="button"
+              variant={ButtonVariant.TERTIARY}
+              onClick={() => setIsOpen(state => !state)}
+              style={{marginTop: 4}}
+            >
+              {isOpen ? t('messageFailedToSendHideDetails') : t('messageFailedToSendShowDetails')}
+            </Button>
+          </div>
         )}
       </div>
     </>
