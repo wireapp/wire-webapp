@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [41.3.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@41.2.5...@wireapp/core@41.3.0) (2023-08-22)
+
+### Features
+
+* stop leaking the MLS service to the outside ([#5414](https://github.com/wireapp/wire-web-packages/issues/5414)) ([63bb739](https://github.com/wireapp/wire-web-packages/commit/63bb739ff25fad05db03fe9f2af2aedc2f56f5b9))
+
 ## [41.2.5](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@41.2.4...@wireapp/core@41.2.5) (2023-08-22)
 
 **Note:** Version bump only for package @wireapp/core
