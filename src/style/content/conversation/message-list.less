@@ -306,6 +306,14 @@
   justify-content: space-between;
   padding-left: @conversation-message-sender-width;
 
+  &-content {
+    display: flex;
+    max-width: calc(
+      @conversation-max-width - @conversation-message-sender-width - var(--conversation-message-timestamp-width)
+    );
+    flex: 1;
+  }
+
   .text {
     .text-selection;
     .accent-selection;
