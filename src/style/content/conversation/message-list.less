@@ -308,10 +308,12 @@
 
   &-content {
     display: flex;
+    width: calc(100% - var(--conversation-message-timestamp-width));
     max-width: calc(
       @conversation-max-width - @conversation-message-sender-width - var(--conversation-message-timestamp-width)
     );
     flex: 1;
+    flex-direction: column;
   }
 
   .text {
