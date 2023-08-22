@@ -48,6 +48,7 @@ const SystemMessage: React.FC<SystemMessageProps> = ({message}) => {
           {message.system_message_type === SystemMessageType.CONVERSATION_RENAME && <Icon.Edit />}
           {message.system_message_type === SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE && <Icon.Timer />}
           {message.system_message_type === SystemMessageType.CONVERSATION_RECEIPT_MODE_UPDATE && <Icon.Read />}
+          {message.system_message_type === SystemMessageType.MLS_CONVERSATION_RECOVERED && <Icon.ExclamationMark />}
         </div>
         <p className="message-header-label">
           <span className="message-header-label__multiline">
