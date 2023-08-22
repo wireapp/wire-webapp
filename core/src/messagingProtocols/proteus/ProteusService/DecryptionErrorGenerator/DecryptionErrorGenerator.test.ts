@@ -24,16 +24,16 @@ import {DecryptionError} from '../../../../errors/DecryptionError';
 const basePayload = {userId: {id: 'user1', domain: 'domain'}, clientId: 'client1'};
 
 describe('generateDecryptionError', () => {
-  it('handles coreCrypto error', () => {
-    const coreCryptoError = {proteusErrorCode: Math.floor(Math.random() * 100), message: 'decryption error'};
+  it.each([Math.floor(Math.random() * 100), 0])('handles coreCrypto error', proteusErrorCode => {
+    const coreCryptoError = {proteusErrorCode, message: 'decryption error'};
     const error = generateDecryptionError(basePayload, coreCryptoError);
     expect(error).toBeInstanceOf(DecryptionError);
     expect(error.message).toBe(`Decryption error from user1 (client1) (${coreCryptoError.message})`);
     expect(error.code).toBe(coreCryptoError.proteusErrorCode);
   });
 
-  it('handles cryptobox error', () => {
-    const coreCryptoError = {code: Math.floor(Math.random() * 100), message: 'decryption error'};
+  it.each([Math.floor(Math.random() * 100), 0])('handles cryptobox error', code => {
+    const coreCryptoError = {code, message: 'decryption error'};
     const error = generateDecryptionError(basePayload, coreCryptoError);
     expect(error).toBeInstanceOf(DecryptionError);
     expect(error.message).toBe(`Decryption error from user1 (client1) (${coreCryptoError.message})`);
