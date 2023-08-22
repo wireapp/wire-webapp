@@ -42,7 +42,7 @@ import {PanelEntity, PanelState, RightSidebar} from './RightSidebar';
 import {RootProvider} from './RootProvider';
 import {useAppMainState, ViewType} from './state';
 import {useAppState, ContentState} from './useAppState';
-import {WindowTitleUpdater} from './useWindowTitle';
+import {WindowTitleUpdater} from './WindowTitleUpdater';
 
 import {ConversationState} from '../conversation/ConversationState';
 import {User} from '../entity/User';

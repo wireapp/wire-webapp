@@ -163,7 +163,7 @@ const useWindowTitle = () => {
   }, [initiateTitleUpdates, updateNotificationState]);
 };
 
-export function WindowTitleUpdater() {
+export function WindowTitleUpdater(): null {
   useWindowTitle();
 
   return null;
