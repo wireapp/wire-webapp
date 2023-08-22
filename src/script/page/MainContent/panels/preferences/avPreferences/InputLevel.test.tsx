@@ -33,7 +33,7 @@ describe('InputLevel', () => {
           getByteFrequencyData: (arr: Uint8Array) => {
             arr.fill(128);
           },
-        } as AnalyserNode),
+        }) as AnalyserNode,
       createMediaStreamSource: (stream: MediaStream) => ({connect: () => {}, disconnect: () => {}}),
     }));
 

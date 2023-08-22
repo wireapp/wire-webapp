@@ -17,7 +17,7 @@
  *
  */
 
-import type {ConversationRolesList} from '@wireapp/api-client/lib/conversation/ConversationRole';
+import {ConversationRolesList, ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import type {
   TeamConversationDeleteEvent,
   TeamDeleteEvent,
@@ -61,6 +61,7 @@ import {EventSource} from '../event/EventSource';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {IntegrationMapper} from '../integration/IntegrationMapper';
 import {ServiceEntity} from '../integration/ServiceEntity';
+import {MLSMigrationStatus, getMLSMigrationStatus} from '../mls/MLSMigration/migrationStatus';
 import {ROLE, ROLE as TEAM_ROLE, roleFromTeamPermissions} from '../user/UserPermission';
 import {UserRepository} from '../user/UserRepository';
 import {UserState} from '../user/UserState';
@@ -671,5 +672,21 @@ export class TeamRepository {
       this.teamMapper.updateTeamFromObject(teamData, this.teamState.team());
       this.sendAccountInfo();
     }
+  }
+
+  public getTeamSupportedProtocols(): ConversationProtocol[] {
+    const mlsFeature = this.teamState.teamFeatures().mls;
+
+    if (!mlsFeature || mlsFeature.status === FeatureStatus.DISABLED) {
+      return [ConversationProtocol.PROTEUS];
+    }
+
+    return mlsFeature.config.supportedProtocols;
+  }
+
+  public getTeamMLSMigrationStatus(): MLSMigrationStatus {
+    const mlsMigrationFeature = this.teamState.teamFeatures().mlsMigration;
+
+    return getMLSMigrationStatus(mlsMigrationFeature);
   }
 }

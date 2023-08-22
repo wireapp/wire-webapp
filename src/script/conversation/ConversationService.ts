@@ -50,7 +50,6 @@ import {MLSConversation} from './ConversationSelectors';
 import type {Conversation as ConversationEntity} from '../entity/Conversation';
 import type {EventService} from '../event/EventService';
 import {MessageCategory} from '../message/MessageCategory';
-import {useMLSConversationState} from '../mls';
 import {search as fullTextSearch} from '../search/FullTextSearch';
 import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
@@ -407,7 +406,14 @@ export class ConversationService {
    */
   async wipeMLSConversation(mlsConversation: MLSConversation) {
     const {groupId} = mlsConversation;
-    await this.core.service!.conversation.wipeMLSConversation(groupId);
-    return useMLSConversationState.getState().wipeConversationState(groupId);
+    return this.core.service!.conversation.wipeMLSConversation(groupId);
+  }
+
+  /**
+   * Checks if MLS conversation is established.
+   * @param groupId id of the MLS group
+   */
+  async isMLSConversationEstablished(groupId: string): Promise<boolean> {
+    return this.core.service!.conversation.isMLSConversationEstablished(groupId);
   }
 }

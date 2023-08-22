@@ -26,6 +26,7 @@ import {Availability} from '@wireapp/protocol-messaging';
 
 import {Icon} from 'Components/Icon';
 import {IgnoreOutsideClickWrapper} from 'Components/InputBar/util/clickHandlers';
+import {useMessageActionsState} from 'Components/MessagesList/Message/ContentMessage/MessageActions/MessageActions.state';
 import {isEnterKey, isEscapeKey, isKey, isOneOfKeys, isSpaceKey, KEY} from 'Util/KeyboardUtil';
 
 export interface ContextMenuEntry {
@@ -45,6 +46,7 @@ interface ContextMenuProps {
   entries: ContextMenuEntry[];
   posX: number;
   posY: number;
+  resetMenuStates?: () => void;
 }
 
 let container: HTMLDivElement;
@@ -62,12 +64,13 @@ const cleanUp = () => {
 const getButtonId = (label: string): string => `btn-${label?.split(' ').join('-').toLowerCase()}`;
 
 const contextMenuClassName = 'ctx-menu';
-
+const msgMenuIdentifier = 'message-options-menu';
 const ContextMenu: React.FC<ContextMenuProps> = ({
   entries,
   defaultIdentifier = `${contextMenuClassName}-item`,
   posX,
   posY,
+  resetMenuStates,
 }) => {
   const [mainElement, setMainElement] = useState<HTMLUListElement>();
   const [selected, setSelected] = useState<ContextMenuEntry>();
@@ -112,6 +115,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
         // escape/tab key press while the menu is open will close the menu and focus the trigerer
         cleanUp();
         previouslyFocused.focus();
+        resetMsgMenuStates();
       }
 
       if (isOneOfKeys(event, [KEY.ARROW_UP, KEY.ARROW_DOWN])) {
@@ -127,6 +131,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
       if (isEnterKey(event) || isSpaceKey(event)) {
         if (selected) {
           cleanUp();
+          resetMsgMenuStates();
           selected.click?.();
           previouslyFocused.focus();
         }
@@ -137,6 +142,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
       const isOutsideClick = mainElement && !mainElement.contains(event.target as Node);
       if (isOutsideClick) {
         cleanUp();
+        resetMsgMenuStates(isOutsideClick);
       }
     };
 
@@ -153,60 +159,74 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
     };
   }, [mainElement, selected]);
 
+  const {handleMenuOpen} = useMessageActionsState();
+  const resetMsgMenuStates = (isOutsideClick = false) => {
+    if (defaultIdentifier === msgMenuIdentifier) {
+      handleMenuOpen?.(false);
+
+      if (isOutsideClick) {
+        resetMenuStates?.();
+      }
+    }
+  };
+
   return (
     <IgnoreOutsideClickWrapper>
-      <ul
-        className={contextMenuClassName}
-        ref={setMainElement}
-        style={{maxHeight: window.innerHeight, ...style}}
-        role="menu"
-      >
-        {entries.map((entry, index) =>
-          entry.isSeparator ? (
-            <li key={`${index}`} className={`${contextMenuClassName}__separator`} />
-          ) : (
-            <li
-              key={`${index}`}
-              className={cx(`${contextMenuClassName}__item`, {
-                [`${contextMenuClassName}__item--checked`]: entry.isChecked,
-                [`${contextMenuClassName}__item--disabled`]: entry.isDisabled,
-                selected: entry === selected,
-              })}
-              role="menuitem"
-              aria-haspopup="true"
-            >
-              <button
-                id={getButtonId(entry.label!)}
-                className={`${contextMenuClassName}__button`}
-                type="button"
-                data-uie-name={entry.identifier || defaultIdentifier}
-                title={entry.title || entry.label}
-                {...(entry.isDisabled
-                  ? undefined
-                  : {
-                      onClick: event => {
-                        event.preventDefault();
-                        cleanUp();
-                        entry.click?.(event.nativeEvent);
-                      },
-                      onMouseEnter: () => {
-                        setSelected(undefined);
-                      },
-                    })}
+      <div className="overlay">
+        <ul
+          className={contextMenuClassName}
+          ref={setMainElement}
+          style={{maxHeight: window.innerHeight, ...style}}
+          role="menu"
+        >
+          {entries.map((entry, index) =>
+            entry.isSeparator ? (
+              <li key={`${index}`} className={`${contextMenuClassName}__separator`} />
+            ) : (
+              <li
+                key={`${index}`}
+                className={cx(`${contextMenuClassName}__item`, {
+                  [`${contextMenuClassName}__item--checked`]: entry.isChecked,
+                  [`${contextMenuClassName}__item--disabled`]: entry.isDisabled,
+                  selected: entry === selected,
+                })}
+                role="menuitem"
+                aria-haspopup="true"
               >
-                {entry.icon && <Icon name={entry.icon} className={`${contextMenuClassName}__icon`} />}
-                <span>{entry.label}</span>
-                {entry.isChecked && (
-                  <Icon.Check
-                    className={`${contextMenuClassName}__check`}
-                    data-uie-name={`${contextMenuClassName}-check`}
-                  />
-                )}
-              </button>
-            </li>
-          ),
-        )}
-      </ul>
+                <button
+                  id={getButtonId(entry.label!)}
+                  className={`${contextMenuClassName}__button`}
+                  type="button"
+                  data-uie-name={entry.identifier || defaultIdentifier}
+                  title={entry.title || entry.label}
+                  {...(entry.isDisabled
+                    ? undefined
+                    : {
+                        onClick: event => {
+                          event.preventDefault();
+                          cleanUp();
+                          resetMsgMenuStates();
+                          entry.click?.(event.nativeEvent);
+                        },
+                        onMouseEnter: () => {
+                          setSelected(undefined);
+                        },
+                      })}
+                >
+                  {entry.icon && <Icon name={entry.icon} className={`${contextMenuClassName}__icon`} />}
+                  <span>{entry.label}</span>
+                  {entry.isChecked && (
+                    <Icon.Check
+                      className={`${contextMenuClassName}__check`}
+                      data-uie-name={`${contextMenuClassName}-check`}
+                    />
+                  )}
+                </button>
+              </li>
+            ),
+          )}
+        </ul>
+      </div>
     </IgnoreOutsideClickWrapper>
   );
 };
@@ -215,6 +235,7 @@ export const showContextMenu = (
   event: MouseEvent | React.MouseEvent,
   entries: ContextMenuEntry[],
   identifier: string,
+  resetMenuStates?: () => void,
 ) => {
   event.preventDefault();
   event.stopPropagation();
@@ -226,6 +247,12 @@ export const showContextMenu = (
   document.body.appendChild(container);
   reactRoot = createRoot(container);
   reactRoot.render(
-    <ContextMenu entries={entries} defaultIdentifier={identifier} posX={event.clientX} posY={event.clientY} />,
+    <ContextMenu
+      entries={entries}
+      defaultIdentifier={identifier}
+      posX={event.clientX}
+      posY={event.clientY}
+      resetMenuStates={resetMenuStates}
+    />,
   );
 };

@@ -17,8 +17,9 @@
  *
  */
 
-import React, {useMemo, useState} from 'react';
+import React, {FC, ReactNode, useMemo, useState} from 'react';
 
+import {AddUsersFailureReasons} from '@wireapp/core/lib/conversation';
 import {container} from 'tsyringe';
 import {groupBy} from 'underscore';
 
@@ -44,7 +45,43 @@ export interface FailedToAddUsersMessageProps {
   userState?: UserState;
 }
 
+const errorMessageType = {
+  [AddUsersFailureReasons.NON_FEDERATING_BACKENDS]: 'NonFederatingBackends',
+  [AddUsersFailureReasons.UNREACHABLE_BACKENDS]: 'OfflineBackend',
+} as const;
+
 const config = Config.getConfig();
+
+interface MessageDetailsProps {
+  children: ReactNode;
+  message: FailedToAddUsersMessageEntity;
+  users: User[];
+  domain?: string;
+}
+const MessageDetails: FC<MessageDetailsProps> = ({users, children, message, domain = ''}) => {
+  return (
+    <p
+      data-uie-name="multi-user-not-added-details"
+      data-uie-value={domain}
+      style={{lineHeight: 'var(--line-height-sm)'}}
+    >
+      <span
+        css={warning}
+        dangerouslySetInnerHTML={{
+          __html: t(`failedToAddParticipantsPluralDetails${errorMessageType[message.reason]}`, {
+            name: users[0].name(),
+            names: users
+              .slice(1)
+              .map(user => user.name())
+              .join(', '),
+            domain,
+          }),
+        }}
+      />
+      {children}
+    </p>
+  );
+};
 
 const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
   isMessageFocused,
@@ -101,15 +138,28 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
           data-uie-name="element-message-failed-to-add-users"
           data-uie-value={total <= 1 ? '1-user-not-added' : 'multi-users-not-added'}
         >
-          <p
-            css={warning}
-            dangerouslySetInnerHTML={{
-              __html:
-                total <= 1
-                  ? t('failedToAddParticipant', {name: users[0].name(), domain: users[0].domain})
-                  : t('failedToAddParticipants', {total: total.toString()}),
-            }}
-          />
+          {total <= 1 && (
+            <p data-uie-name="1-user-not-added-details" data-uie-value={users[0].id}>
+              <span
+                css={warning}
+                dangerouslySetInnerHTML={{
+                  __html: t(`failedToAddParticipantSingularOfflineBackend`, {
+                    name: users[0].name(),
+                    domain: users[0].domain,
+                  }),
+                }}
+              />
+              {learnMore}
+            </p>
+          )}
+          {total > 1 && (
+            <p
+              css={warning}
+              dangerouslySetInnerHTML={{
+                __html: t(`failedToAddParticipantsPlural`, {total: total.toString()}),
+              }}
+            />
+          )}
         </div>
         <p className="message-body-actions">
           <MessageTime
@@ -122,41 +172,20 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
       <div className="message-body">
         {isOpen && (
           <>
-            {total <= 1 && (
-              <p data-uie-name="1-user-not-added-details" data-uie-value={users[0].id}>
-                <span
-                  css={warning}
-                  dangerouslySetInnerHTML={{
-                    __html: t('failedToAddParticipantDetails', {name: users[0].name(), domain: users[0].domain}),
-                  }}
-                />
-                {learnMore}
-              </p>
+            {message.reason === AddUsersFailureReasons.UNREACHABLE_BACKENDS && (
+              <>
+                {Object.entries(groupedUsers).map(([domain, domainUsers]) => (
+                  <MessageDetails key={domain} domain={domain} message={message} users={domainUsers}>
+                    {learnMore}
+                  </MessageDetails>
+                ))}
+              </>
             )}
-            {total > 1 &&
-              Object.entries(groupedUsers).map(([domain, domainUsers]) => (
-                <p
-                  key={domain}
-                  data-uie-name="multi-user-not-added-details"
-                  data-uie-value={domain}
-                  style={{lineHeight: 'var(--line-height-sm)'}}
-                >
-                  <span
-                    css={warning}
-                    dangerouslySetInnerHTML={{
-                      __html: t('failedToAddParticipantsDetails', {
-                        name: domainUsers[domainUsers.length - 1].name(),
-                        names:
-                          domainUsers.length === 2
-                            ? domainUsers[0].name()
-                            : domainUsers.map(user => user.name()).join(', '),
-                        domain,
-                      }),
-                    }}
-                  />
-                  {learnMore}
-                </p>
-              ))}
+            {message.reason === AddUsersFailureReasons.NON_FEDERATING_BACKENDS && (
+              <MessageDetails message={message} users={users}>
+                {learnMore}
+              </MessageDetails>
+            )}
           </>
         )}
         {total > 1 && (

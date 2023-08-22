@@ -27,13 +27,10 @@ import {
   DefaultConversationRoleName,
   RemoteConversations,
 } from '@wireapp/api-client/lib/conversation';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
 import {isObject} from 'underscore';
 
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
-
-import {matchQualifiedIds, QualifiedEntity} from 'Util/QualifiedId';
 
 import {ACCESS_STATE} from './AccessState';
 import {ConversationStatus} from './ConversationStatus';
@@ -296,40 +293,48 @@ export class ConversationMapper {
     return conversationEntity;
   }
 
+  /**
+   * Will merge the locally stored conversations with the new conversations fetched from the backend.
+   * @param localConversations locally stored conversations
+   * @param remoteConversations new conversations fetched from backend
+   * @returns the new conversations from backend merged with the locally stored conversations
+   */
   static mergeConversations(
     localConversations: ConversationDatabaseData[],
     remoteConversations: RemoteConversations,
   ): ConversationDatabaseData[] {
-    localConversations = localConversations.filter(conversationData => conversationData);
+    const foundRemoteConversations = remoteConversations.found;
 
-    const failedConversations = (remoteConversations.failed ?? []).reduce(
-      (prev: ConversationDatabaseData[], curr: QualifiedId) => {
-        const convo = localConversations.find(conversationId => matchQualifiedIds(conversationId, curr));
-        return convo ? [...prev, convo] : prev;
-      },
-      [],
-    );
+    if (!foundRemoteConversations) {
+      return localConversations;
+    }
 
-    const localArchives = localConversations.filter(
-      conversationData =>
-        conversationData.archived_state &&
-        remoteConversations.found?.findIndex(remote => remote.qualified_id.id === conversationData.id) === -1,
-    );
+    const conversationsMap = new Map<string, ConversationDatabaseData>();
 
-    const foundRemoteConversations = remoteConversations.found.map(
-      (remoteConversationData: ConversationBackendData, index: number) => {
-        const remoteConversationId: QualifiedEntity = remoteConversationData.qualified_id || {
-          domain: '',
-          id: remoteConversationData.id,
-        };
-        const localConversationData =
-          localConversations.find(conversationId => matchQualifiedIds(conversationId, remoteConversationId)) ||
-          (remoteConversationId as ConversationDatabaseData);
+    for (const localConversation of localConversations) {
+      const conversationId = localConversation.qualified_id?.id || localConversation.id;
+      conversationsMap.set(conversationId, localConversation);
+    }
 
-        return this.mergeSingleConversation(localConversationData, remoteConversationData, index);
-      },
-    );
-    return [...foundRemoteConversations, ...failedConversations, ...localArchives];
+    for (let i = 0; i < foundRemoteConversations.length; i++) {
+      const remoteConversation = foundRemoteConversations[i];
+      const conversationId = remoteConversation.qualified_id?.id || remoteConversation.id;
+      const localConversation = conversationsMap.get(conversationId);
+
+      if (localConversation) {
+        conversationsMap.set(conversationId, this.mergeSingleConversation(localConversation, remoteConversation, i));
+        continue;
+      }
+
+      const localConversationData = (remoteConversation.qualified_id || {
+        id: conversationId,
+        domain: '',
+      }) as ConversationDatabaseData;
+
+      conversationsMap.set(conversationId, this.mergeSingleConversation(localConversationData, remoteConversation, i));
+    }
+
+    return Array.from(conversationsMap.values());
   }
 
   /**

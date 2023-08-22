@@ -46,7 +46,10 @@ export class Participant {
   public audioStream: ko.Observable<MediaStream | undefined>;
   public isMuted: ko.Observable<boolean>;
 
-  constructor(public user: User, public clientId: ClientId) {
+  constructor(
+    public user: User,
+    public clientId: ClientId,
+  ) {
     this.videoState = ko.observable(VIDEO_STATE.STOPPED);
     this.hasActiveVideo = ko.pureComputed(() => {
       return (this.sharesCamera() || this.sharesScreen()) && !!this.videoStream();

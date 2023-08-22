@@ -18,6 +18,7 @@
  */
 
 import type {AddedClient, PublicClient} from '@wireapp/api-client/lib/client';
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {
   UserEvent,
   UserLegalHoldDisableEvent,
@@ -749,18 +750,47 @@ export class UserRepository {
   }
 
   /**
+   * Refresh all known users (in local state) from the backend.
+   */
+  async refreshAllKnownUsers() {
+    const userIds = this.userState.users().map(user => user.qualifiedId);
+    return this.refreshUsers(userIds);
+  }
+
+  /**
+   * Will update user entity with provided list of supportedProtocols.
+   * @param userId - id of the user to update
+   * @param supportedProtocols - an array of new supported protocols
+   */
+  async updateUserSupportedProtocols(userId: QualifiedId, supportedProtocols: ConversationProtocol[]): Promise<User> {
+    return this.updateUser(userId, {supported_protocols: supportedProtocols});
+  }
+
+  getSelfSupportedProtocols(): ConversationProtocol[] | null {
+    return this.userState.self().supportedProtocols();
+  }
+
+  public async getAllSelfClients() {
+    return this.clientRepository.getAllSelfClients();
+  }
+
+  /**
    * will update the local user with fresh data from backend
    * @param user user data from backend
    */
-  private updateSavedUser(user: APIClientUser): User {
+  private async updateSavedUser(user: APIClientUser): Promise<User> {
     const localUserEntity = this.findUserById(generateQualifiedId(user)) ?? new User();
     const updatedUser = this.userMapper.updateUserFromObject(localUserEntity, user, this.userState.self().domain);
-    // TODO update the user in db
+    const {qualifiedId: userId} = updatedUser;
+
+    // update the user in db
+    await this.updateUser(userId, user);
+
     if (this.userState.isTeam()) {
       this.mapGuestStatus([updatedUser]);
     }
     if (updatedUser && updatedUser.inTeam() && updatedUser.isDeleted) {
-      amplify.publish(WebAppEvents.TEAM.MEMBER_LEAVE, updatedUser.teamId, updatedUser.qualifiedId);
+      amplify.publish(WebAppEvents.TEAM.MEMBER_LEAVE, updatedUser.teamId, userId);
     }
     return updatedUser;
   }

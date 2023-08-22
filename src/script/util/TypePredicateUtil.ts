@@ -24,7 +24,7 @@ import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 import {ClientRecord} from '../storage/record/ClientRecord';
 
-export function isAxiosError(errorCandidate: any): errorCandidate is AxiosError {
+export function isAxiosError<T>(errorCandidate: any): errorCandidate is AxiosError<T> {
   return errorCandidate && errorCandidate.isAxiosError === true;
 }
 

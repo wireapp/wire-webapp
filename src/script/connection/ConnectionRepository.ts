@@ -31,6 +31,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';
+import {isBackendError} from 'Util/TypePredicateUtil';
 
 import type {ConnectionEntity} from './ConnectionEntity';
 import {ConnectionMapper} from './ConnectionMapper';
@@ -189,21 +190,40 @@ export class ConnectionRepository {
       await this.onUserConnection(connectionEvent, EventRepository.SOURCE.INJECTED);
       return true;
     } catch (error) {
-      if (error.label === BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT) {
-        const replaceLinkLegalHold = replaceLink(
-          Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK,
-          '',
-          'read-more-legal-hold',
-        );
-        PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-          text: {
-            htmlMessage: t('modalUserCannotConnectLegalHoldMessage', {}, replaceLinkLegalHold),
-            title: t('modalUserCannotConnectLegalHoldHeadline'),
-          },
-        });
+      if (isBackendError(error)) {
+        switch (error.label) {
+          case BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT: {
+            const replaceLinkLegalHold = replaceLink(
+              Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK,
+              '',
+              'read-more-legal-hold',
+            );
+            PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
+              text: {
+                htmlMessage: t('modalUserCannotConnectLegalHoldMessage', {}, replaceLinkLegalHold),
+                title: t('modalUserCannotConnectLegalHoldHeadline'),
+              },
+            });
+            break;
+          }
+
+          case BackendErrorLabel.FEDERATION_NOT_ALLOWED: {
+            PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
+              text: {
+                htmlMessage: t('modalUserCannotConnectNotFederatingMessage', userEntity.name()),
+                title: t('modalUserCannotConnectNotFederatingHeadline'),
+              },
+            });
+            break;
+          }
+
+          default: {
+            this.logger.error(`Failed to send connection request to user '${userEntity.id}': ${error.message}`, error);
+            return false;
+          }
+        }
       }
-      this.logger.error(`Failed to send connection request to user '${userEntity.id}': ${error.message}`, error);
-      return false;
+      throw error;
     }
   }
 
