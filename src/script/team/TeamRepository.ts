@@ -220,7 +220,7 @@ export class TeamRepository {
     return IntegrationMapper.mapServicesFromArray(servicesData, domain);
   }
 
-  readonly onTeamEvent = async (eventJson: any, source: EventSource): void => {
+  readonly onTeamEvent = async (eventJson: any, source: EventSource): Promise<void> => {
     if (this.teamState.isTeamDeleted()) {
       // We don't want to handle any events after the team has been deleted
       return;
