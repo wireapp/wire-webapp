@@ -29,7 +29,7 @@ import type {
 } from '@wireapp/api-client/lib/event';
 import {TEAM_EVENT} from '@wireapp/api-client/lib/event/TeamEvent';
 import type {FeatureList} from '@wireapp/api-client/lib/team/feature/';
-import {FeatureStatus, FEATURE_KEY, SelfDeletingTimeout} from '@wireapp/api-client/lib/team/feature/';
+import {FeatureStatus, FEATURE_KEY} from '@wireapp/api-client/lib/team/feature/';
 import type {TeamData} from '@wireapp/api-client/lib/team/team/TeamData';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
@@ -40,9 +40,9 @@ import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Environment} from 'Util/Environment';
-import {replaceLink, t} from 'Util/LocalizerUtil';
+import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
-import {formatDuration, TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {loadDataUrl} from 'Util/util';
 
 import {TeamEntity} from './TeamEntity';
@@ -53,8 +53,6 @@ import {TeamState} from './TeamState';
 
 import {AssetRepository} from '../assets/AssetRepository';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
-import {PrimaryModal} from '../components/Modals/PrimaryModal';
-import {Config} from '../Config';
 import {User} from '../entity/User';
 import {EventSource} from '../event/EventSource';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
@@ -125,6 +123,10 @@ export class TeamRepository {
     teamId?: string,
   ): Promise<{team: TeamEntity; members: QualifiedId[]} | {team: undefined; members: never[]}> => {
     const team = await this.getTeam();
+    const savedFeatureConfig = this.loadPreviousFeatureConfig();
+    // Load the previous feature config.
+    this.teamState.teamFeatures(savedFeatureConfig);
+    // get the fresh feature config from backend
     await this.updateFeatureConfig();
     if (!teamId) {
       return {team: undefined, members: []};
@@ -135,8 +137,9 @@ export class TeamRepository {
   };
 
   private async updateFeatureConfig() {
-    this.teamState.teamFeatures(await this.teamService.getAllTeamFeatures());
-    return this.teamState.teamFeatures();
+    const features = await this.teamService.getAllTeamFeatures();
+    this.teamState.teamFeatures(features);
+    this.saveFeatureConfig(features);
   }
 
   private readonly scheduleTeamRefresh = (): void => {
@@ -397,8 +400,7 @@ export class TeamRepository {
     const shouldFetchConfig = handlingNotifications === NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
 
     if (shouldFetchConfig) {
-      const featureConfigList = await this.updateFeatureConfig();
-      this.handleConfigUpdate(featureConfigList);
+      await this.updateFeatureConfig();
     }
   };
 
@@ -411,149 +413,17 @@ export class TeamRepository {
       return;
     }
     // When we receive a `feature-config.update` event, we will refetch the entire feature config
-    const featureConfigList = await this.updateFeatureConfig();
-    this.handleConfigUpdate(featureConfigList);
+    await this.updateFeatureConfig();
   };
 
-  private readonly handleConfigUpdate = (featureConfigList: FeatureList) => {
-    const previousConfig = this.loadPreviousFeatureConfig();
-
-    if (previousConfig) {
-      this.handleAudioVideoFeatureChange(previousConfig, featureConfigList);
-      this.handleFileSharingFeatureChange(previousConfig, featureConfigList);
-      this.handleSelfDeletingMessagesFeatureChange(previousConfig, featureConfigList);
-      this.handleConferenceCallingFeatureChange(previousConfig, featureConfigList);
-      this.handleGuestLinkFeatureChange(previousConfig, featureConfigList);
-    }
-    this.saveFeatureConfig(featureConfigList);
-  };
-
-  private readonly handleFileSharingFeatureChange = (
-    {fileSharing: previousConfig}: FeatureList,
-    {fileSharing: newConfig}: FeatureList,
-  ) => {
-    const hasFileSharingChanged = previousConfig?.status && previousConfig.status !== newConfig?.status;
-    const hasChangedToEnabled = newConfig?.status === FeatureStatus.ENABLED;
-
-    if (hasFileSharingChanged) {
-      PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-        text: {
-          htmlMessage: hasChangedToEnabled
-            ? t('featureConfigChangeModalFileSharingDescriptionItemFileSharingEnabled')
-            : t('featureConfigChangeModalFileSharingDescriptionItemFileSharingDisabled'),
-          title: t('featureConfigChangeModalFileSharingHeadline', {brandName: Config.getConfig().BRAND_NAME}),
-        },
-      });
-    }
-  };
-
-  private readonly handleGuestLinkFeatureChange = (
-    {conversationGuestLinks: previousConfig}: FeatureList,
-    {conversationGuestLinks: newConfig}: FeatureList,
-  ) => {
-    const hasGuestLinkChanged = previousConfig?.status && previousConfig?.status !== newConfig?.status;
-    const hasGuestLinkChangedToEnabled = newConfig?.status === FeatureStatus.ENABLED;
-
-    if (hasGuestLinkChanged) {
-      PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-        text: {
-          htmlMessage: hasGuestLinkChangedToEnabled
-            ? t('featureConfigChangeModalConversationGuestLinksDescriptionItemConversationGuestLinksEnabled')
-            : t('featureConfigChangeModalConversationGuestLinksDescriptionItemConversationGuestLinksDisabled'),
-          title: t('featureConfigChangeModalConversationGuestLinksHeadline'),
-        },
-      });
-    }
-  };
-
-  private readonly handleSelfDeletingMessagesFeatureChange = (
-    {selfDeletingMessages: previousState}: FeatureList,
-    {selfDeletingMessages: newState}: FeatureList,
-  ) => {
-    if (!previousState?.status) {
-      return;
-    }
-    const previousTimeout = previousState?.config?.enforcedTimeoutSeconds * 1000;
-    const newTimeout = (newState?.config?.enforcedTimeoutSeconds ?? 0) * 1000;
-    const previousStatus = previousState.status;
-    const newStatus = newState?.status;
-
-    const hasTimeoutChanged = previousTimeout !== newTimeout;
-    const isEnforced = newTimeout > SelfDeletingTimeout.OFF;
-    const hasStatusChanged = previousStatus !== newStatus;
-    const hasFeatureChanged = hasStatusChanged || hasTimeoutChanged;
-    const isFeatureEnabled = newStatus === FeatureStatus.ENABLED;
-
-    if (hasFeatureChanged) {
-      PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-        text: {
-          htmlMessage: isFeatureEnabled
-            ? isEnforced
-              ? t('featureConfigChangeModalSelfDeletingMessagesDescriptionItemEnforced', {
-                  timeout: formatDuration(newTimeout).text,
-                })
-              : t('featureConfigChangeModalSelfDeletingMessagesDescriptionItemEnabled')
-            : t('featureConfigChangeModalSelfDeletingMessagesDescriptionItemDisabled'),
-          title: t('featureConfigChangeModalSelfDeletingMessagesHeadline', {
-            brandName: Config.getConfig().BRAND_NAME,
-          }),
-        },
-      });
-    }
-  };
-
-  private readonly handleAudioVideoFeatureChange = (
-    {videoCalling: previousConfig}: FeatureList,
-    {videoCalling: newConfig}: FeatureList,
-  ) => {
-    const hasVideoCallingChanged = previousConfig?.status && previousConfig.status !== newConfig?.status;
-    const hasChangedToEnabled = newConfig?.status === FeatureStatus.ENABLED;
-
-    if (hasVideoCallingChanged) {
-      PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-        text: {
-          htmlMessage: hasChangedToEnabled
-            ? t('featureConfigChangeModalAudioVideoDescriptionItemCameraEnabled')
-            : t('featureConfigChangeModalAudioVideoDescriptionItemCameraDisabled'),
-          title: t('featureConfigChangeModalAudioVideoHeadline', {brandName: Config.getConfig().BRAND_NAME}),
-        },
-      });
-    }
-  };
-
-  private readonly handleConferenceCallingFeatureChange = (
-    {conferenceCalling: previousConfig}: FeatureList,
-    {conferenceCalling: newConfig}: FeatureList,
-  ) => {
-    if (previousConfig?.status && previousConfig.status !== newConfig?.status) {
-      const hasChangedToEnabled = newConfig?.status === FeatureStatus.ENABLED;
-      if (hasChangedToEnabled) {
-        const replaceEnterprise = replaceLink(
-          Config.getConfig().URL.PRICING,
-          'modal__text__read-more',
-          'read-more-pricing',
-        );
-        PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-          text: {
-            htmlMessage: t(
-              'featureConfigChangeModalConferenceCallingEnabled',
-              {brandName: Config.getConfig().BRAND_NAME},
-              replaceEnterprise,
-            ),
-            title: t('featureConfigChangeModalConferenceCallingTitle', {brandName: Config.getConfig().BRAND_NAME}),
-          },
-        });
-      }
-    }
-  };
-
-  private readonly loadPreviousFeatureConfig = (): FeatureList | void => {
+  private readonly loadPreviousFeatureConfig = (): FeatureList | undefined => {
     const featureConfigs: {[selfId: string]: FeatureList} = JSON.parse(
       window.localStorage.getItem(TeamRepository.LOCAL_STORAGE_FEATURE_CONFIG_KEY) ?? '{}',
     );
     if (featureConfigs && featureConfigs[this.userState.self().id]) {
       return featureConfigs[this.userState.self().id];
     }
+    return undefined;
   };
 
   private readonly saveFeatureConfig = (featureConfigList: FeatureList): void =>

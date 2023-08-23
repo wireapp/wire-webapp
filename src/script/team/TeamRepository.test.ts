@@ -38,7 +38,6 @@ import {TeamService} from './TeamService';
 
 import {AssetRepository} from '../assets/AssetRepository';
 import {EventSource} from '../event/EventSource';
-import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {ROLE} from '../user/UserPermission';
 import {UserRepository} from '../user/UserRepository';
 
@@ -148,65 +147,5 @@ describe('TeamRepository', () => {
       teamRepository['onTeamEvent']({type: TEAM_EVENT.FEATURE_CONFIG_UPDATE}, EventSource.WEBSOCKET);
       expect(modalShowSpy).not.toHaveBeenCalled();
     });
-
-    it.each([
-      [FEATURE_KEY.FILE_SHARING, 'featureConfigChangeModalFileSharingDescriptionItemFileSharingEnabled'],
-      [FEATURE_KEY.VIDEO_CALLING, 'featureConfigChangeModalAudioVideoDescriptionItemCameraEnabled'],
-      [FEATURE_KEY.SELF_DELETING_MESSAGES, 'featureConfigChangeModalSelfDeletingMessagesDescriptionItemEnabled'],
-      [FEATURE_KEY.CONFERENCE_CALLING, 'featureConfigChangeModalConferenceCallingEnabled'],
-      [
-        FEATURE_KEY.CONVERSATION_GUEST_LINKS,
-        'featureConfigChangeModalConversationGuestLinksDescriptionItemConversationGuestLinksEnabled',
-      ],
-    ] as const)(
-      'shows a modal when an update was made to a property that has local value for %s',
-
-      async (feature, expectedString) => {
-        const baseConfig = {
-          [FEATURE_KEY.FILE_SHARING]: {
-            status: FeatureStatus.DISABLED,
-          },
-          [FEATURE_KEY.VIDEO_CALLING]: {
-            status: FeatureStatus.DISABLED,
-          },
-          [FEATURE_KEY.SELF_DELETING_MESSAGES]: {
-            status: FeatureStatus.DISABLED,
-            config: {enforcedTimeoutSeconds: 0},
-          },
-          [FEATURE_KEY.CONFERENCE_CALLING]: {
-            status: FeatureStatus.DISABLED,
-          },
-          [FEATURE_KEY.CONVERSATION_GUEST_LINKS]: {
-            status: FeatureStatus.DISABLED,
-          },
-        };
-        const [teamRepository, {teamService}] = buildConnectionRepository();
-
-        jest
-          .spyOn(teamService, 'getAllTeamFeatures')
-          .mockResolvedValueOnce({
-            ...baseConfig,
-          })
-          .mockResolvedValueOnce({
-            ...baseConfig,
-            [feature]: {
-              ...baseConfig[feature],
-              status: FeatureStatus.ENABLED,
-            },
-          });
-
-        // Tigger a sync end to start fetching the feature config and storing it locally
-        await teamRepository['updateTeamConfig'](NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
-
-        await teamRepository['onTeamEvent']({type: TEAM_EVENT.FEATURE_CONFIG_UPDATE}, EventSource.WEBSOCKET);
-
-        expect(modalShowSpy).toHaveBeenCalledTimes(1);
-        expect(modalShowSpy).toHaveBeenCalledWith(PrimaryModal.type.ACKNOWLEDGE, {
-          text: expect.objectContaining({
-            htmlMessage: expectedString,
-          }),
-        });
-      },
-    );
   });
 });
