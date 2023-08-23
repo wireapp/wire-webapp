@@ -34,6 +34,26 @@ import {AssetRepository} from '../assets/AssetRepository';
 import {ROLE} from '../user/UserPermission';
 import {UserRepository} from '../user/UserRepository';
 
+function buildConnectionRepository() {
+  const team = new TeamEntity(randomUUID());
+  const userState = new UserState();
+  const selfUser = new User('self-id', 'self-domain');
+  selfUser.teamId = team.id;
+  selfUser.isMe = true;
+  selfUser.teamRole(ROLE.NONE);
+  userState.self(selfUser);
+
+  const teamState = new TeamState(userState);
+  teamState.team(team);
+  const userRepository = {} as UserRepository;
+  const assetRepository = {} as AssetRepository;
+  const teamService = new TeamService({} as any);
+  return [
+    new TeamRepository(userRepository, assetRepository, teamService, userState, teamState),
+    {userState, teamState, userRepository, assetRepository, teamService},
+  ] as const;
+}
+
 describe('TeamRepository', () => {
   const teams_data = {
     teams: [
@@ -58,23 +78,9 @@ describe('TeamRepository', () => {
 
   describe('getTeam()', () => {
     it('returns the team entity', async () => {
-      const userState = new UserState();
-      const selfUser = new User('self-id');
-      selfUser.teamId = 'e6d3adc5-9140-477a-abc1-8279d210ceab';
-      selfUser.isMe = true;
-      userState.self(selfUser);
-      const teamService = new TeamService();
+      const [teamRepo, {teamService}] = buildConnectionRepository();
       jest.spyOn(teamService, 'getTeamById').mockResolvedValue(team_metadata);
 
-      const teamRepo = new TeamRepository(
-        {
-          mapGuestStatus: jest.fn(),
-        } as unknown as UserRepository,
-        {} as AssetRepository,
-        teamService,
-        userState,
-        new TeamState(userState),
-      );
       jest.spyOn(teamRepo, 'getSelfMember').mockResolvedValue(new TeamMemberEntity(randomUUID()));
 
       const team_et = await teamRepo.getTeam();
@@ -87,10 +93,8 @@ describe('TeamRepository', () => {
 
   describe('getAllTeamMembers()', () => {
     it('returns team member entities', async () => {
-      const userState = new UserState();
-      const teamService = new TeamService();
+      const [teamRepo, {teamService}] = buildConnectionRepository();
       jest.spyOn(teamService, 'getAllTeamMembers').mockResolvedValue({hasMore: false, members: team_members.members});
-      const teamRepo = new TeamRepository({} as any, {} as any, teamService, userState, new TeamState(userState));
       const entities = await teamRepo['getAllTeamMembers'](team_metadata.id);
       expect(entities.length).toEqual(team_members.members.length);
       expect(entities[0].userId).toEqual(team_members.members[0].user);
@@ -100,21 +104,8 @@ describe('TeamRepository', () => {
 
   describe('sendAccountInfo', () => {
     it('does not crash when there is no team logo', async () => {
-      const userState = new UserState();
-      const selfUser = new User();
-      selfUser.isMe = true;
-      selfUser.teamRole(ROLE.NONE);
-      userState.self(selfUser);
-      const teamState = new TeamState(userState);
-      teamState.team(new TeamEntity(randomUUID()));
+      const [teamRepo] = buildConnectionRepository();
 
-      const teamRepo = new TeamRepository(
-        {} as any, // TeamService,
-        {} as any, // UserRepository,
-        {} as any, // AssetRepository,
-        userState,
-        teamState,
-      );
       expect(teamRepo['teamState'].isTeam()).toBe(true);
 
       const accountInfo = await teamRepo.sendAccountInfo(true);

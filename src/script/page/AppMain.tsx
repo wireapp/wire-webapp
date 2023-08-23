@@ -36,6 +36,7 @@ import {showUserModal, UserModal} from 'Components/Modals/UserModal';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {AppLock} from './AppLock';
+import {FeatureConfigChangeNotifier} from './FeatureConfigChangeNotifier';
 import {LeftSidebar} from './LeftSidebar';
 import {MainContent} from './MainContent';
 import {PanelEntity, PanelState, RightSidebar} from './RightSidebar';
@@ -243,6 +244,7 @@ const AppMain: FC<AppMainProps> = ({
 
           <AppLock clientRepository={repositories.client} />
           <WarningsContainer onRefresh={app.refresh} />
+          <FeatureConfigChangeNotifier teamState={teamState} />
 
           <CallingContainer
             multitasking={mainView.multitasking}
