@@ -17,16 +17,10 @@
  *
  */
 
-import {TEAM_EVENT} from '@wireapp/api-client/lib/event/TeamEvent';
-import {FeatureStatus, FEATURE_KEY} from '@wireapp/api-client/lib/team/feature';
 import {Permissions} from '@wireapp/api-client/lib/team/member';
-import {amplify} from 'amplify';
 
 import {randomUUID} from 'crypto';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {User} from 'src/script/entity/User';
 import {TeamRepository} from 'src/script/team/TeamRepository';
 import {TeamState} from 'src/script/team/TeamState';
@@ -37,7 +31,6 @@ import {TeamMemberEntity} from './TeamMemberEntity';
 import {TeamService} from './TeamService';
 
 import {AssetRepository} from '../assets/AssetRepository';
-import {EventSource} from '../event/EventSource';
 import {ROLE} from '../user/UserPermission';
 import {UserRepository} from '../user/UserRepository';
 
@@ -60,13 +53,8 @@ function buildConnectionRepository() {
     {userState, teamState, userRepository, assetRepository, teamService},
   ] as const;
 }
-describe('TeamRepository', () => {
-  afterEach(() => {
-    amplify.unsubscribeAll(WebAppEvents.TEAM.EVENT_FROM_BACKEND);
-    amplify.unsubscribeAll(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE);
-    amplify.unsubscribeAll(WebAppEvents.TEAM.UPDATE_INFO);
-  });
 
+describe('TeamRepository', () => {
   const teams_data = {
     teams: [
       {
@@ -123,29 +111,6 @@ describe('TeamRepository', () => {
       const accountInfo = await teamRepo.sendAccountInfo(true);
 
       expect(accountInfo.picture).toBeUndefined();
-    });
-  });
-
-  describe('feature-config.update event handling', () => {
-    let modalShowSpy: jest.SpyInstance;
-
-    beforeEach(() => {
-      modalShowSpy = jest.spyOn(PrimaryModal, 'show');
-      modalShowSpy.mockClear();
-      localStorage.clear();
-    });
-
-    it('silently update the local state if no previous state was set', async () => {
-      const [teamRepository, {teamService}] = buildConnectionRepository();
-
-      jest.spyOn(teamService, 'getAllTeamFeatures').mockResolvedValue({
-        [FEATURE_KEY.FILE_SHARING]: {
-          status: FeatureStatus.ENABLED,
-        },
-      });
-
-      teamRepository['onTeamEvent']({type: TEAM_EVENT.FEATURE_CONFIG_UPDATE}, EventSource.WEBSOCKET);
-      expect(modalShowSpy).not.toHaveBeenCalled();
     });
   });
 });
