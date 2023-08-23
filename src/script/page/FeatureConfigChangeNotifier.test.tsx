@@ -63,11 +63,6 @@ describe('FeatureConfigChangeNotifier', () => {
       'featureConfigChangeModalAudioVideoDescriptionItemCameraEnabled',
       'featureConfigChangeModalAudioVideoDescriptionItemCameraDisabled',
     ],
-    [
-      FEATURE_KEY.SELF_DELETING_MESSAGES,
-      'featureConfigChangeModalSelfDeletingMessagesDescriptionItemEnabled',
-      'featureConfigChangeModalSelfDeletingMessagesDescriptionItemDisabled',
-    ],
     [FEATURE_KEY.CONFERENCE_CALLING, 'featureConfigChangeModalConferenceCallingEnabled', undefined],
     [
       FEATURE_KEY.CONVERSATION_GUEST_LINKS,
