@@ -30,11 +30,16 @@ import type {ThunkAction} from '../reducer';
 export class RuntimeAction {
   checkSupportedBrowser = (): ThunkAction<void> => {
     return (dispatch, getState, {getConfig}) => {
+      const androidBrowser = 'android browser';
+      const outlookBrowser = 'unknown';
       const isMobileSupportedBrowser = () => {
-        return Runtime.isMobileOS() && (Runtime.isSafari() || Runtime.isChrome());
+        return (
+          Runtime.isMobileOS() &&
+          (Runtime.isSafari() || Runtime.isChrome() || Runtime.getBrowserName() === androidBrowser)
+        );
       };
       const isOutlookApp = () => {
-        return Runtime.getBrowserName() === 'unknown';
+        return Runtime.getBrowserName() === outlookBrowser;
       };
       const isAuthorizationFlow = () => location?.search?.includes(QUERY_KEY.SCOPE) ?? false;
       if (
