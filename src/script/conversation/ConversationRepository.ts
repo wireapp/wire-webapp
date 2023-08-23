@@ -316,9 +316,12 @@ export class ConversationRepository {
 
     this.eventService.addEventUpdatedListener(this.updateLocalMessageEntity);
     this.eventService.addEventDeletedListener(this.deleteLocalMessageEntity);
-    this.conversationService.addMLSConversationRecoveredListener(this.onMLSConversationRecovered);
 
     window.addEventListener<any>(WebAppEvents.CONVERSATION.JOIN, this.onConversationJoin);
+  }
+
+  public initMLSConversationRecoveredListener() {
+    return this.conversationService.addMLSConversationRecoveredListener(this.onMLSConversationRecovered);
   }
 
   private readonly onFederationEvent = async (event: FederationEvent) => {
