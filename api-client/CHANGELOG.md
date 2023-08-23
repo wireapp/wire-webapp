@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [25.2.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@25.2.2...@wireapp/api-client@25.2.3) (2023-08-23)
+
+### Bug Fixes
+
+* Finalize backend api v4 ([#5416](https://github.com/wireapp/wire-web-packages/issues/5416)) ([ebcb333](https://github.com/wireapp/wire-web-packages/commit/ebcb3330bada90fb6eae36ce1649e5a6d09db915))
+
 ## [25.2.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@25.2.1...@wireapp/api-client@25.2.2) (2023-08-21)
 
 **Note:** Version bump only for package @wireapp/api-client
