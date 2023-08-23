@@ -52,7 +52,7 @@ const AccountFormComponent = ({account, ...props}: Props & ConnectedProps & Disp
   const {formatMessage: _} = useIntl();
 
   const [registrationData, setRegistrationData] = useState({
-    accent_id: AccentColor.random().id,
+    accent_id: AccentColor.STRONG_BLUE.id,
     email: '',
     name: '',
     password: '',

@@ -29,7 +29,6 @@ import {isMLSConversation, isSelfConversation} from './ConversationSelectors';
 
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
-import {useMLSConversationState} from '../mls';
 import {TeamState} from '../team/TeamState';
 import {UserState} from '../user/UserState';
 
@@ -72,16 +71,8 @@ export class ConversationState {
       this.conversations().find(conversation => isMLSConversation(conversation) && isSelfConversation(conversation)),
     );
 
-    //anytime mls conversation state changes, we update the sorted conversations that will recalculate visible conversations
-    useMLSConversationState.subscribe(() => {
-      this.sortedConversations.notifySubscribers();
-    });
-
     this.visibleConversations = ko.pureComputed(() => {
-      const filteredMLSConversations = useMLSConversationState
-        .getState()
-        .filterEstablishedConversations(this.sortedConversations());
-      return filteredMLSConversations.filter(
+      return this.sortedConversations().filter(
         conversation =>
           !conversation.is_cleared() &&
           !conversation.is_archived() &&
@@ -96,10 +87,7 @@ export class ConversationState {
     });
 
     this.archivedConversations = ko.pureComputed(() => {
-      const filteredMLSConversations = useMLSConversationState
-        .getState()
-        .filterEstablishedConversations(this.sortedConversations());
-      return filteredMLSConversations.filter(conversation => conversation.is_archived());
+      return this.sortedConversations().filter(conversation => conversation.is_archived());
     });
 
     this.filteredConversations = ko.pureComputed(() => {
@@ -111,6 +99,9 @@ export class ConversationState {
           ConnectionStatus.PENDING,
         ];
 
+        const isCleared = conversationEntity.is_cleared();
+        const isRemoved = conversationEntity.removed_from_conversation();
+
         if (
           isSelfConversation(conversationEntity) ||
           states_to_filter.includes(conversationEntity.connection().status())
@@ -118,7 +109,7 @@ export class ConversationState {
           return false;
         }
 
-        return !(conversationEntity.is_cleared() && conversationEntity.removed_from_conversation());
+        return !(isCleared && isRemoved);
       });
     });
 

@@ -237,7 +237,7 @@ describe('joinConversationsAfterMigrationFinalisation', () => {
       CONVERSATION_TYPE.REGULAR,
       selfUser,
       {
-        localStore: ConversationProtocol.PROTEUS,
+        localStore: ConversationProtocol.MLS,
         backend: ConversationProtocol.MLS,
       },
       conversationGroupId,
@@ -267,7 +267,7 @@ describe('joinConversationsAfterMigrationFinalisation', () => {
     const conversationGroupId = 'groupId1';
     const selfUser = new User(createUuid());
 
-    const {updatedConversation, conversationDatabaseData} = createdMigratedConversationEntities(
+    const {updatedConversation} = createdMigratedConversationEntities(
       conversationId,
       mockDomain,
       CONVERSATION_TYPE.REGULAR,
@@ -281,7 +281,7 @@ describe('joinConversationsAfterMigrationFinalisation', () => {
 
     await joinConversationsAfterMigrationFinalisation({
       updatedConversations: [updatedConversation],
-      initialDatabaseConversations: [conversationDatabaseData],
+      initialDatabaseConversations: [],
       core: mockCore,
       conversationRepository,
     });

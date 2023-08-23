@@ -38,7 +38,10 @@ function extractUserIds<T>(
 export function flattenUserClientsQualifiedIds<T = unknown>(
   userClients: QualifiedUserClientsContainer<T>,
 ): {clients: T[]; userId: QualifiedId}[] {
-  return Object.entries(userClients).reduce((ids, [domain, userClients]) => {
-    return [...ids, ...extractUserIds(userClients, domain)];
-  }, [] as {clients: T[]; userId: QualifiedId}[]);
+  return Object.entries(userClients).reduce(
+    (ids, [domain, userClients]) => {
+      return [...ids, ...extractUserIds(userClients, domain)];
+    },
+    [] as {clients: T[]; userId: QualifiedId}[],
+  );
 }

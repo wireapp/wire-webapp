@@ -19,7 +19,6 @@
 
 import {container} from 'tsyringe';
 
-import {joaatHash} from 'Util/Crypto';
 import {getLogger, Logger} from 'Util/Logger';
 
 import {isSelfAPIUser} from './UserGuards';
@@ -38,7 +37,10 @@ export class UserMapper {
    * Construct a new User Mapper.
    * @param serverTimeHandler Handles time shift between server and client
    */
-  constructor(private readonly serverTimeHandler: ServerTimeHandler, private teamState = container.resolve(TeamState)) {
+  constructor(
+    private readonly serverTimeHandler: ServerTimeHandler,
+    private teamState = container.resolve(TeamState),
+  ) {
     this.logger = getLogger('UserMapper');
   }
 
@@ -88,7 +90,6 @@ export class UserMapper {
     const isNewUser = userEntity.id === '' && userData.id !== '';
     if (isNewUser && userData.id) {
       userEntity.id = userData.id;
-      userEntity.joaatHash = joaatHash(userData.id ?? '');
     }
 
     if (userData.qualified_id) {

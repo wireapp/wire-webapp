@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useMemo} from 'react';
+import React, {useMemo, useState, useEffect} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
@@ -25,23 +25,23 @@ import {Conversation} from 'src/script/entity/Conversation';
 import {CompositeMessage} from 'src/script/entity/message/CompositeMessage';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {Message} from 'src/script/entity/message/Message';
+import {useRelativeTimestamp} from 'src/script/hooks/useRelativeTimestamp';
 import {StatusType} from 'src/script/message/StatusType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getMessageAriaLabel} from 'Util/conversationMessages';
-import {KEY} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
-import {setContextMenuPosition} from 'Util/util';
+import {groupByReactionUsers} from 'Util/ReactionUtil';
 
 import {ContentAsset} from './asset';
-import {MessageFooterLike} from './MessageFooterLike';
+import {MessageActionsMenu} from './MessageActions/MessageActions';
+import {useMessageActionsState} from './MessageActions/MessageActions.state';
+import {MessageReactionsList} from './MessageActions/MessageReactions/MessageReactionsList';
 import {MessageHeader} from './MessageHeader';
-import {MessageLike} from './MessageLike';
 import {Quote} from './MessageQuote';
 import {CompleteFailureToSendWarning, PartialFailureToSendWarning} from './Warnings';
 
 import {MessageActions} from '..';
 import {EphemeralStatusType} from '../../../../message/EphemeralStatusType';
-import {ContextMenuEntry, showContextMenu} from '../../../../ui/ContextMenu';
+import {ContextMenuEntry} from '../../../../ui/ContextMenu';
 import {EphemeralTimer} from '../EphemeralTimer';
 import {MessageTime} from '../MessageTime';
 import {ReadReceiptStatus} from '../ReadReceiptStatus';
@@ -62,6 +62,7 @@ export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetS
   quotedMessage?: ContentMessage;
   selfId: QualifiedId;
   isMsgElementsFocusable: boolean;
+  onClickReaction: (emoji: string) => void;
 }
 
 const ContentMessageComponent: React.FC<ContentMessageProps> = ({
@@ -69,37 +70,36 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
   message,
   findMessage,
   selfId,
-  hasMarker,
+  hasMarker = false,
   isMessageFocused,
   isLastDeliveredMessage,
   contextMenu,
   previousMessage,
-  onClickReceipts,
   onClickAvatar,
   onClickImage,
   onClickTimestamp,
   onClickMessage,
-  onClickLikes,
+  onClickReactionDetails,
   onClickButton,
-  onLike,
   onRetry,
   isMsgElementsFocusable,
+  onClickReaction,
 }) => {
+  // check if current message is focused and its elements focusable
   const msgFocusState = useMemo(
     () => isMsgElementsFocusable && isMessageFocused,
     [isMsgElementsFocusable, isMessageFocused],
   );
   const messageFocusedTabIndex = useMessageFocusedTabIndex(msgFocusState);
-  const {entries: menuEntries} = useKoSubscribableChildren(contextMenu, ['entries']);
   const {
     senderName,
     timestamp,
     ephemeral_caption,
     ephemeral_status,
     assets,
-    other_likes,
     was_edited,
     failedToSend,
+    reactions,
     status,
     user,
   } = useKoSubscribableChildren(message, [
@@ -111,6 +111,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
     'other_likes',
     'was_edited',
     'failedToSend',
+    'reactions',
     'status',
     'user',
   ]);
@@ -126,27 +127,53 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
 
     return !previousMessage.isContent() || previousMessage.user().id !== user.id;
   };
-
-  const handleContextKeyDown = (event: React.KeyboardEvent) => {
-    if ([KEY.SPACE, KEY.ENTER].includes(event.key)) {
-      const newEvent = setContextMenuPosition(event);
-      showContextMenu(newEvent, menuEntries, 'message-options-menu');
-    }
-  };
-
+  const timeAgo = useRelativeTimestamp(message.timestamp());
   const [messageAriaLabel] = getMessageAriaLabel({
     assets,
     displayTimestampShort: message.displayTimestampShort(),
     senderName,
   });
 
+  const [isActionMenuVisible, setActionMenuVisibility] = useState(true);
+  const isMenuOpen = useMessageActionsState(state => state.isMenuOpen);
+  useEffect(() => {
+    if (isMessageFocused || msgFocusState) {
+      setActionMenuVisibility(true);
+    } else {
+      setActionMenuVisibility(false);
+    }
+  }, [msgFocusState, isMessageFocused]);
+
+  const reactionGroupedByUser = groupByReactionUsers(reactions);
+  const reactionsTotalCount = Array.from(reactionGroupedByUser).length;
+
   return (
-    <div aria-label={messageAriaLabel}>
+    <div
+      aria-label={messageAriaLabel}
+      className="content-message-wrapper"
+      onMouseEnter={event => {
+        // open another floating action menu if none already open
+        if (!isMenuOpen) {
+          setActionMenuVisibility(true);
+        }
+      }}
+      onMouseLeave={event => {
+        // close floating message actions when no active menu is open like context menu/emoji picker
+        if (!isMenuOpen) {
+          setActionMenuVisibility(false);
+        }
+      }}
+    >
       {shouldShowAvatar() && (
         <MessageHeader onClickAvatar={onClickAvatar} message={message} focusTabIndex={messageFocusedTabIndex}>
           {was_edited && (
             <span className="message-header-label-icon icon-edit" title={message.displayEditedTimestamp()}></span>
           )}
+          <span className="content-message-timestamp">
+            <MessageTime timestamp={timestamp} className="label-xs" data-timestamp-type="normal">
+              {timeAgo}
+            </MessageTime>
+          </span>
         </MessageHeader>
       )}
       {message.quote() && (
@@ -168,7 +195,6 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
             <EphemeralTimer message={message} />
           </div>
         )}
-
         {assets.map(asset => (
           <ContentAsset
             key={asset.type}
@@ -181,7 +207,6 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
             isMessageFocused={msgFocusState}
           />
         ))}
-
         {failedToSend && (
           <PartialFailureToSendWarning
             isMessageFocused={msgFocusState}
@@ -197,68 +222,37 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
             onRetry={() => onRetry(message)}
           />
         )}
-
-        {!other_likes.length && message.isReactable() && (
-          <div className="message-body-like">
-            <MessageLike
-              className="message-body-like-icon like-button message-show-on-hover"
-              message={message}
-              onLike={onLike}
-              isMessageFocused={msgFocusState}
-            />
-          </div>
-        )}
-
         <div className="message-body-actions">
-          {menuEntries.length > 0 && (
-            <button
-              tabIndex={messageFocusedTabIndex}
-              className="context-menu icon-more font-size-xs"
-              aria-label={t('accessibility.conversationContextMenuOpenLabel')}
-              onKeyDown={handleContextKeyDown}
-              onClick={event => showContextMenu(event, menuEntries, 'message-options-menu')}
-            ></button>
-          )}
-
-          {ephemeral_status === EphemeralStatusType.ACTIVE && (
-            <time
-              className="time"
-              data-uie-uid={message.id}
-              title={ephemeral_caption}
-              data-timestamp={timestamp}
-              data-bind="showAllTimestamps"
-            >
-              {message.displayTimestampShort()}
-            </time>
-          )}
-
-          {ephemeral_status !== EphemeralStatusType.ACTIVE && (
-            <MessageTime data-uie-uid={message.id} timestamp={timestamp}>
-              {message.displayTimestampShort()}
-            </MessageTime>
-          )}
-
           <ReadReceiptStatus
             message={message}
             is1to1Conversation={conversation.is1to1()}
             isLastDeliveredMessage={isLastDeliveredMessage}
-            onClickReceipts={onClickReceipts}
-            isMessageFocused={msgFocusState}
           />
         </div>
+        {isActionMenuVisible && (
+          <MessageActionsMenu
+            isMsgWithHeader={shouldShowAvatar()}
+            message={message}
+            handleActionMenuVisibility={setActionMenuVisibility}
+            contextMenu={contextMenu}
+            isMessageFocused={msgFocusState}
+            messageWithSection={hasMarker}
+            handleReactionClick={onClickReaction}
+            reactionsTotalCount={reactionsTotalCount}
+            isRemovedFromConversation={conversation.removed_from_conversation()}
+          />
+        )}
       </div>
 
-      {other_likes.length > 0 && (
-        <div>
-          <MessageFooterLike
-            message={message}
-            is1to1Conversation={conversation.is1to1()}
-            onLike={onLike}
-            onClickLikes={onClickLikes}
-            isMessageFocused={msgFocusState}
-          />
-        </div>
-      )}
+      <MessageReactionsList
+        reactions={reactions}
+        userId={selfId.id}
+        handleReactionClick={onClickReaction}
+        isMessageFocused={msgFocusState}
+        onTooltipReactionCountClick={() => onClickReactionDetails(message)}
+        onLastReactionKeyEvent={() => setActionMenuVisibility(false)}
+        isRemovedFromConversation={conversation.removed_from_conversation()}
+      />
     </div>
   );
 };

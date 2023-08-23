@@ -18,4 +18,3 @@
  */
 
 export * from './MLSConversations';
-export * from './mlsConversationState';

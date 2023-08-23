@@ -23,12 +23,7 @@ import {randomUUID} from 'crypto';
 
 import {Account} from '@wireapp/core';
 
-import {
-  initialiseEstablishedMLSCapableConversations,
-  joinNewMLSConversations,
-  registerUninitializedSelfAndTeamConversations,
-} from './MLSConversations';
-import {useMLSConversationState} from './mlsConversationState';
+import {initMLSConversations, registerUninitializedSelfAndTeamConversations} from './MLSConversations';
 
 import {MLSConversation} from '../conversation/ConversationSelectors';
 import {Conversation} from '../entity/Conversation';
@@ -44,51 +39,43 @@ function createMLSConversation(type?: CONVERSATION_TYPE): MLSConversation {
   return conversation as MLSConversation;
 }
 
-function createMLSConversations(
-  nbConversations: number,
-  protocol: ConversationProtocol = ConversationProtocol.MLS,
-  type?: CONVERSATION_TYPE,
-) {
+function createMLSConversations(nbConversations: number, type?: CONVERSATION_TYPE) {
   return Array.from(new Array(nbConversations)).map(() => createMLSConversation(type));
 }
 
 describe('MLSConversations', () => {
-  describe('joinNewMLSConversations', () => {
-    it('joins all the MLS conversations', async () => {
-      const nbMLSConversations = 5 + Math.ceil(Math.random() * 10);
-
-      const mlsConversations = createMLSConversations(nbMLSConversations);
-
-      jest.spyOn(useMLSConversationState.getState(), 'sendExternalToPendingJoin');
-
-      await joinNewMLSConversations(mlsConversations, new Account());
-
-      expect(useMLSConversationState.getState().sendExternalToPendingJoin).toHaveBeenCalledWith(
-        mlsConversations,
-        expect.any(Function),
-        expect.any(Function),
-        undefined,
-      );
-    });
-  });
-
-  describe('initialiseEstablishedMLSCapableConversations', () => {
-    it('schedules key renewal intervals for all the established mls groups', async () => {
+  describe('initMLSConversations', () => {
+    it('joins all the unestablished MLS groups', async () => {
       const core = new Account();
       const nbMLSConversations = 5 + Math.ceil(Math.random() * 10);
 
       const mlsConversations = createMLSConversations(nbMLSConversations);
 
-      jest
-        .spyOn(useMLSConversationState, 'getState')
-        .mockReturnValue({established: mlsConversations.map(c => c.groupId)} as any);
+      jest.spyOn(core.service!.conversation, 'isMLSConversationEstablished').mockResolvedValue(false);
+      jest.spyOn(core.service!.conversation, 'joinByExternalCommit');
 
-      await initialiseEstablishedMLSCapableConversations(core);
+      await initMLSConversations(mlsConversations, core);
 
-      expect(core.service!.mls!.schedulePeriodicKeyMaterialRenewals).toHaveBeenCalledWith(
-        mlsConversations.map(c => c.groupId),
-      );
+      for (const conversation of mlsConversations) {
+        expect(core.service?.conversation.joinByExternalCommit).toHaveBeenCalledWith(conversation.qualifiedId);
+      }
     });
+  });
+
+  it('schedules key renewal intervals for all already established mls groups', async () => {
+    const core = new Account();
+    const nbMLSConversations = 5 + Math.ceil(Math.random() * 10);
+
+    const mlsConversations = createMLSConversations(nbMLSConversations);
+
+    jest.spyOn(core.service!.conversation!, 'isMLSConversationEstablished').mockResolvedValue(true);
+    jest.spyOn(core.service!.mls!, 'scheduleKeyMaterialRenewal');
+
+    await initMLSConversations(mlsConversations, core);
+
+    for (const conversation of mlsConversations) {
+      expect(core.service!.mls!.scheduleKeyMaterialRenewal).toHaveBeenCalledWith(conversation.groupId);
+    }
   });
 
   describe('registerUninitializedSelfAndTeamConversations', () => {

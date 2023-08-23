@@ -43,7 +43,7 @@ import {PanelEntity, PanelState, RightSidebar} from './RightSidebar';
 import {RootProvider} from './RootProvider';
 import {useAppMainState, ViewType} from './state';
 import {useAppState, ContentState} from './useAppState';
-import {useWindowTitle} from './useWindowTitle';
+import {WindowTitleUpdater} from './WindowTitleUpdater';
 
 import {ConversationState} from '../conversation/ConversationState';
 import {User} from '../entity/User';
@@ -60,7 +60,7 @@ import {WarningsContainer} from '../view_model/WarningsContainer/WarningsContain
 
 export type RightSidebarParams = {
   entity: PanelEntity | null;
-  showLikes?: boolean;
+  showReactions?: boolean;
   highlighted?: User[];
 };
 
@@ -97,8 +97,6 @@ const AppMain: FC<AppMainProps> = ({
   const teamState = container.resolve(TeamState);
   const userState = container.resolve(UserState);
 
-  useWindowTitle();
-
   const {isActivatedAccount} = useKoSubscribableChildren(userState, ['isActivatedAccount']);
 
   const {
@@ -116,11 +114,9 @@ const AppMain: FC<AppMainProps> = ({
 
     if (isDifferentId || isDifferentState) {
       goTo(panelState, params);
-
-      return;
+    } else {
+      closeRightSidebar();
     }
-
-    closeRightSidebar();
   };
 
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
@@ -228,6 +224,7 @@ const AppMain: FC<AppMainProps> = ({
       data-uie-name="status-webapp"
       data-uie-value="is-loaded"
     >
+      <WindowTitleUpdater />
       <RootProvider value={mainView}>
         <ErrorBoundary FallbackComponent={ErrorFallback}>
           <div id="app" className="app">

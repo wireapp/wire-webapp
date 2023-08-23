@@ -43,6 +43,7 @@ export class Account extends EventEmitter {
       on: this.on,
       emit: this.emit,
       off: this.off,
+      scheduleKeyMaterialRenewal: jest.fn(),
     },
     asset: {
       uploadAsset: jest.fn(),

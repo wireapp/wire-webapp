@@ -22,13 +22,12 @@ import {KeyPackageClaimUser} from '@wireapp/core/lib/conversation';
 
 import {Account} from '@wireapp/core';
 
-import {useMLSConversationState} from './mlsConversationState';
-
 import {ConversationRepository} from '../conversation/ConversationRepository';
 import {
+  isMLSCapableConversation,
+  isMLSConversation,
   isSelfConversation,
   isTeamConversation,
-  MLSCapableConversation,
   MLSConversation,
 } from '../conversation/ConversationSelectors';
 import {Conversation} from '../entity/Conversation';
@@ -45,15 +44,37 @@ type MLSConversationRepository = Pick<
  * @param conversations - all the conversations that the user is part of
  * @param core - the instance of the core
  */
-export async function initialiseEstablishedMLSCapableConversations(core: Account): Promise<void> {
-  const mlsService = core.service?.mls;
-  if (!mlsService) {
-    throw new Error('MLS service not available');
+export async function initMLSConversations(
+  conversations: Conversation[],
+  core: Account,
+  onSuccessfulJoin?: (conversation: Conversation) => void,
+): Promise<void> {
+  const {mls: mlsService, conversation: conversationService} = core.service || {};
+  if (!mlsService || !conversationService) {
+    throw new Error('MLS or Conversation service is not available!');
   }
 
-  // we reinitialize the periodic key material renewal for all the already established groups
-  const alreadyEstablishedGroupIds = Array.from(useMLSConversationState.getState().established);
-  mlsService.schedulePeriodicKeyMaterialRenewals(alreadyEstablishedGroupIds);
+  const mlsConversations = conversations.filter(isMLSCapableConversation);
+
+  await Promise.allSettled(
+    mlsConversations.map(async mlsConversation => {
+      const {groupId, qualifiedId} = mlsConversation;
+
+      const isEstablished = await conversationService.isMLSConversationEstablished(groupId);
+
+      //if group is already established, we just schedule periodic key material updates
+      if (isEstablished) {
+        return mlsService.scheduleKeyMaterialRenewal(groupId);
+      }
+
+      //otherwise we should try joining via external commit
+      await conversationService.joinByExternalCommit(qualifiedId);
+
+      if (onSuccessfulJoin) {
+        return onSuccessfulJoin(mlsConversation);
+      }
+    }),
+  );
 }
 
 /**
@@ -79,26 +100,6 @@ export async function initMLSCallbacks(
 }
 
 /**
- * Will join (with external commit) all the conversation that the current user is part of but that are not joined by the current user's device.
- *
- * @param conversations - all the conversations that the user is part of
- * @param core - the instance of the core
- */
-export async function joinNewMLSConversations(
-  conversations: MLSCapableConversation[],
-  core: Account,
-  onSuccessfulJoin?: (conversation: Conversation) => void,
-): Promise<void> {
-  // We send external proposal to all the MLS conversations that are in an unknown state (not established nor pendingWelcome)
-  return useMLSConversationState.getState().sendExternalToPendingJoin(
-    conversations,
-    groupId => core.service!.conversation.isMLSConversationEstablished(groupId),
-    conversationId => core.service!.conversation.joinByExternalCommit(conversationId),
-    onSuccessfulJoin,
-  );
-}
-
-/**
  * Will register self and team MLS conversations.
  * The self conversation and the team conversation are special conversations created by noone and, thus, need to be manually created by the first device that detects them
  *
@@ -106,7 +107,7 @@ export async function joinNewMLSConversations(
  * @param core instance of the core
  */
 export async function registerUninitializedSelfAndTeamConversations(
-  mlsConversations: MLSConversation[],
+  conversations: Conversation[],
   selfUser: User,
   selfClientId: string,
   core: Account,
@@ -117,8 +118,11 @@ export async function registerUninitializedSelfAndTeamConversations(
     throw new Error('MLS service not available');
   }
 
-  const uninitializedConversations = mlsConversations.filter(
-    conversation => conversation.epoch === 0 && (isSelfConversation(conversation) || isTeamConversation(conversation)),
+  const uninitializedConversations = conversations.filter(
+    (conversation): conversation is MLSConversation =>
+      isMLSConversation(conversation) &&
+      conversation.epoch === 0 &&
+      (isSelfConversation(conversation) || isTeamConversation(conversation)),
   );
 
   await Promise.all(

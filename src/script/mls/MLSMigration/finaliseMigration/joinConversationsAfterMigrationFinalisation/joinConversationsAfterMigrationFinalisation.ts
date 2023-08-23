@@ -25,8 +25,7 @@ import {ConversationDatabaseData} from 'src/script/conversation/ConversationMapp
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {MLSConversation, isMLSConversation} from 'src/script/conversation/ConversationSelectors';
 import {Conversation} from 'src/script/entity/Conversation';
-
-import {joinNewMLSConversations} from '../../../MLSConversations';
+import {initMLSConversations} from 'src/script/mls/MLSConversations';
 
 /**
  * Will compare the list of initial conversations stored in the local database with conversations fetched from the backend.
@@ -56,7 +55,7 @@ export const joinConversationsAfterMigrationFinalisation = async ({
     initialDatabaseConversations,
   );
 
-  await joinNewMLSConversations(
+  await initMLSConversations(
     alreadyMigratedConversations,
     core,
     conversationRepository.injectJoinedAfterMigrationFinalisationMessage,

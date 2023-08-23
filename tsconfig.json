@@ -31,10 +31,10 @@
       "Resource/*": ["./resource/*"],
       "Util/*": ["./src/script/util/*"]
     },
+    "skipLibCheck": true,
     "resolveJsonModule": true,
     "rootDirs": ["src/script"],
     "target": "es2017",
-    "typeRoots": ["src/types", "node_modules/@types", "node_modules/amplify/typings"],
     "strict": true
   },
   "exclude": ["node_modules", "server/", "src/sw.js", "src/worker/"]

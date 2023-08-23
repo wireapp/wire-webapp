@@ -58,7 +58,6 @@ import {ConnectionRepository} from '../connection/ConnectionRepository';
 import {ConnectionService} from '../connection/ConnectionService';
 import {ConversationDatabaseData} from '../conversation/ConversationMapper';
 import {ConversationRepository} from '../conversation/ConversationRepository';
-import {isMLSConversation} from '../conversation/ConversationSelectors';
 import {ConversationService} from '../conversation/ConversationService';
 import {MessageRepository} from '../conversation/MessageRepository';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
@@ -81,12 +80,7 @@ import {IntegrationRepository} from '../integration/IntegrationRepository';
 import {IntegrationService} from '../integration/IntegrationService';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import {MediaRepository} from '../media/MediaRepository';
-import {
-  initMLSCallbacks,
-  initialiseEstablishedMLSCapableConversations,
-  joinNewMLSConversations,
-  registerUninitializedSelfAndTeamConversations,
-} from '../mls';
+import {initMLSCallbacks, initMLSConversations, registerUninitializedSelfAndTeamConversations} from '../mls';
 import {joinConversationsAfterMigrationFinalisation} from '../mls/MLSMigration/finaliseMigration/joinConversationsAfterMigrationFinalisation';
 import {NotificationRepository} from '../notification/NotificationRepository';
 import {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
@@ -101,7 +95,6 @@ import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
 import {StorageKey, StorageRepository, StorageService} from '../storage';
 import {TeamRepository} from '../team/TeamRepository';
-import {TeamService} from '../team/TeamService';
 import {AppInitStatisticsValue} from '../telemetry/app_init/AppInitStatisticsValue';
 import {AppInitTelemetry} from '../telemetry/app_init/AppInitTelemetry';
 import {AppInitTimingsStep} from '../telemetry/app_init/AppInitTimingsStep';
@@ -233,7 +226,7 @@ export class App {
     repositories.connection = new ConnectionRepository(new ConnectionService(), repositories.user);
     repositories.event = new EventRepository(this.service.event, this.service.notification, serverTimeHandler);
     repositories.search = new SearchRepository(new SearchService(), repositories.user);
-    repositories.team = new TeamRepository(new TeamService(), repositories.user, repositories.asset);
+    repositories.team = new TeamRepository(repositories.user, repositories.asset);
 
     repositories.message = new MessageRepository(
       /*
@@ -446,14 +439,8 @@ export class App {
       const notificationsCount = eventRepository.notificationsTotal;
 
       if (supportsMLS()) {
-        // Once all the messages have been processed and the message sending queue freed we can now:
-        const mlsConversations = conversations.filter(isMLSConversation);
-
-        //initialize all the mls groups that are already established (schedule periodic key updates, etc.)
-        await initialiseEstablishedMLSCapableConversations(this.core);
-
         //add the potential `self` and `team` conversations
-        await registerUninitializedSelfAndTeamConversations(mlsConversations, selfUser, clientEntity().id, this.core);
+        await registerUninitializedSelfAndTeamConversations(conversations, selfUser, clientEntity().id, this.core);
 
         if (supportsMLSMigration()) {
           //join all the mls groups that are known by the user but were migrated to mls
@@ -466,7 +453,7 @@ export class App {
         }
 
         //join all the mls groups we're member of and have not yet joined (eg. we were not send welcome message)
-        await joinNewMLSConversations(mlsConversations, this.core);
+        await initMLSConversations(conversations, this.core);
       }
 
       telemetry.timeStep(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);

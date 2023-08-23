@@ -137,6 +137,7 @@ const MainContent: FC<MainContentProps> = ({
                 conversationRepository={repositories.conversation}
                 assetRepository={repositories.asset}
                 messageRepository={repositories.message}
+                userState={userState}
               />
             )}
 

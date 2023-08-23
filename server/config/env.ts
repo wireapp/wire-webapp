@@ -246,6 +246,8 @@ export type Env = {
 
   URL_SUPPORT_OFFLINE_BACKEND: string;
 
+  URL_SUPPORT_FEDERATION_STOP: string;
+
   URL_WHATS_NEW: string;
 
   /** Content Security Policy

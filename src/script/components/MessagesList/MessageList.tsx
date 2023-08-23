@@ -64,7 +64,8 @@ interface MessagesListParams {
   resetSession: (messageError: DecryptErrorMessage) => void;
   selfUser: User;
   showImageDetails: (message: ContentMessage, event: React.UIEvent) => void;
-  showMessageDetails: (message: MessageEntity, showLikes?: boolean) => void;
+  showMessageDetails: (message: MessageEntity, showReactions?: boolean) => void;
+  showMessageReactions: (message: MessageEntity, showReactions?: boolean) => void;
   showParticipants: (users: User[]) => void;
   showUserDetails: (user: User | ServiceEntity) => void;
   isLastReceivedMessage: (messageEntity: MessageEntity, conversationEntity: ConversationEntity) => boolean;
@@ -144,6 +145,7 @@ const MessagesList: FC<MessagesListParams> = ({
   onClickMessage,
   showUserDetails,
   showMessageDetails,
+  showMessageReactions,
   showImageDetails,
   showParticipants,
   cancelConnectionRequest,
@@ -343,10 +345,10 @@ const MessagesList: FC<MessagesListParams> = ({
               onClickCancelRequest={cancelConnectionRequest}
               onClickImage={showImageDetails}
               onClickInvitePeople={() => invitePeople(conversation)}
-              onClickLikes={message => showMessageDetails(message, true)}
+              onClickReactionDetails={message => showMessageReactions(message, true)}
               onClickMessage={onClickMessage}
               onClickParticipants={showParticipants}
-              onClickReceipts={message => showMessageDetails(message)}
+              onClickDetails={message => showMessageDetails(message)}
               onClickResetSession={resetSession}
               onClickTimestamp={async function (messageId: string) {
                 setFocusedMessage(messageId);
@@ -359,7 +361,6 @@ const MessagesList: FC<MessagesListParams> = ({
                   conversationRepository.getMessagesWithOffset(conversation, messageEntity);
                 }
               }}
-              onLike={message => messageRepository.toggleLike(conversation, message)}
               selfId={selfUser.qualifiedId}
               shouldShowInvitePeople={shouldShowInvitePeople}
               totalMessage={filteredMessagesLength}
