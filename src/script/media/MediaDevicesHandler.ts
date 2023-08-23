@@ -264,6 +264,7 @@ export class MediaDevicesHandler {
     const setDevices = (type: DeviceTypes, devices: MediaDeviceInfo[]): void => {
       this.availableDevices[type](devices);
       const currentId = this.currentDeviceId[type];
+      const firstDeviceId = devices[0]?.deviceId;
 
       const favorites = loadValue<string[]>(`${type}-fave`) ?? [];
       const isFavorite = favorites.map(favorite => devices.some(d => d.deviceId === favorite));
@@ -272,10 +273,10 @@ export class MediaDevicesHandler {
         const faveIndex = isFavorite.findIndex(favorite => favorite);
         currentId(
           devices.find(d => d.deviceId === favorites[faveIndex] || d.deviceId === favorites[faveIndex])?.deviceId ??
-            devices[0]?.deviceId,
+            firstDeviceId,
         );
       } else if (!devices.some(d => d.deviceId === currentId())) {
-        currentId(devices[0]?.deviceId);
+        currentId(firstDeviceId);
       }
     };
 
@@ -336,11 +337,10 @@ export class MediaDevicesHandler {
         return window.desktopCapturer.getSources(options);
       }
       // Electron <= 4
-      return new Promise(
-        (resolve, reject) =>
-          window.desktopCapturer?.getSources(options, (error, screenSources) =>
-            error ? reject(error) : resolve(screenSources),
-          ),
+      return new Promise((resolve, reject) =>
+        window.desktopCapturer?.getSources(options, (error, screenSources) =>
+          error ? reject(error) : resolve(screenSources),
+        ),
       );
     };
 
