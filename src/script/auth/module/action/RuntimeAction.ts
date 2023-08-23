@@ -27,20 +27,19 @@ import * as RuntimeSelector from '../../module/selector/RuntimeSelector';
 import {QUERY_KEY} from '../../route';
 import type {ThunkAction} from '../reducer';
 
+const androidBrowser = 'android browser';
+const chromeMobile = 'chrome mobile';
+const outlookBrowser = 'unknown';
+
 export class RuntimeAction {
   checkSupportedBrowser = (): ThunkAction<void> => {
     return (dispatch, getState, {getConfig}) => {
-      const androidBrowser = 'android browser';
-      const chromeMobile = 'chrome mobile';
-      const outlookBrowser = 'unknown';
-
       const isMobileSupportedBrowser = () => {
         return (
           Runtime.isMobileOS() &&
           (Runtime.isSafari() ||
             Runtime.isChrome() ||
-            Runtime.getBrowserName() === androidBrowser ||
-            Runtime.getBrowserName() === chromeMobile)
+            [androidBrowser, chromeMobile].includes(Runtime.getBrowserName()))
         );
       };
       const isOutlookApp = () => {
