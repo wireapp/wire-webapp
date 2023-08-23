@@ -457,15 +457,11 @@ export const InputBar = ({
     };
   }, []);
 
-  const saveDraft = async (editor: string) => {
-    await saveDraftState(storageRepository, conversationEntity, editor, replyMessageEntity?.id);
+  const saveDraft = async (editorState: string) => {
+    await saveDraftState(storageRepository, conversationEntity, editorState, replyMessageEntity?.id);
   };
 
   const loadDraft = async () => {
-    clearPastedFile();
-    cancelMessageEditing(true, true);
-    cancelMessageReply();
-
     const draftState = await loadDraftState(conversationEntity, storageRepository, messageRepository);
 
     if (draftState.messageReply) {
