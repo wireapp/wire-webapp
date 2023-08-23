@@ -72,6 +72,7 @@ export const UnsupportedBrowserComponent = ({
             {_(isTemporaryGuest ? unsupportedJoinStrings.unsupportedJoinHeadline : unsupportedStrings.headlineBrowser, {
               brandName: Config.getConfig().BRAND_NAME,
             })}
+            {Runtime.getBrowserName()}
           </H2>
           {isTemporaryGuest && Runtime.isMobileOS() ? (
             <H3 css={{marginBottom: 10}} data-uie-name="element-unsupported-mobile-guest">
