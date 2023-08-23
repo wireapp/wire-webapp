@@ -88,7 +88,7 @@ export class Conversation {
   public readonly archivedState: ko.Observable<boolean>;
   private readonly incomingMessages: ko.ObservableArray<Message | ContentMessage | MemberMessage>;
   private readonly isManaged: boolean;
-  public readonly isTeam1to1: ko.PureComputed<boolean>;
+  private readonly isTeam1to1: ko.PureComputed<boolean>;
   public readonly last_server_timestamp: ko.Observable<number>;
   private readonly logger: Logger;
   public readonly mutedState: ko.Observable<number>;
