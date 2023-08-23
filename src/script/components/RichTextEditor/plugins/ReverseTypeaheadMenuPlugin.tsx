@@ -42,6 +42,7 @@ import {
   $isRangeSelection,
   $isTextNode,
   COMMAND_PRIORITY_LOW,
+  COMMAND_PRIORITY_NORMAL,
   createCommand,
   KEY_ARROW_DOWN_COMMAND,
   KEY_ARROW_UP_COMMAND,
@@ -459,7 +460,7 @@ function LexicalPopoverMenu<TOption extends TypeaheadOption>({
           }
           return true;
         },
-        COMMAND_PRIORITY_LOW,
+        COMMAND_PRIORITY_NORMAL,
       ),
       editor.registerCommand<KeyboardEvent>(
         KEY_ESCAPE_COMMAND,
