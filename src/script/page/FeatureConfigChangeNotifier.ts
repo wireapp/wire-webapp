@@ -31,14 +31,11 @@ import {
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {StringIdentifer, t} from 'Util/LocalizerUtil';
+import {getLogger} from 'Util/Logger';
 import {formatDuration} from 'Util/TimeUtil';
 
 import {Config} from '../Config';
 import {TeamState} from '../team/TeamState';
-
-type Props = {
-  teamState: TeamState;
-};
 
 const featureNotifications: Partial<
   Record<
@@ -136,6 +133,11 @@ function wasTurnedOnOrOff(oldConfig?: FeatureWithoutConfig, newConfig?: FeatureW
   return false;
 }
 
+const logger = getLogger('FeatureConfigChangeNotifier');
+type Props = {
+  teamState: TeamState;
+};
+
 export function FeatureConfigChangeNotifier({teamState}: Props): null {
   const {teamFeatures: config} = useKoSubscribableChildren(teamState, ['teamFeatures']);
   const previousConfig = useRef<FeatureList>();
@@ -151,6 +153,11 @@ export function FeatureConfigChangeNotifier({teamState}: Props): null {
         if (!message) {
           return;
         }
+        logger.info(
+          `Detected feature config change for "${feature}" from "${JSON.stringify(
+            previous?.[featureKey],
+          )}" to "${JSON.stringify(config[featureKey])}"`,
+        );
         PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
           text: {
             htmlMessage: message.htmlMessage,
