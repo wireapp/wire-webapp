@@ -17,10 +17,42 @@
  *
  */
 
+import {Permissions} from '@wireapp/api-client/lib/team/member';
+
+import {randomUUID} from 'crypto';
+
 import {User} from 'src/script/entity/User';
 import {TeamRepository} from 'src/script/team/TeamRepository';
 import {TeamState} from 'src/script/team/TeamState';
 import {UserState} from 'src/script/user/UserState';
+
+import {TeamEntity} from './TeamEntity';
+import {TeamMemberEntity} from './TeamMemberEntity';
+import {TeamService} from './TeamService';
+
+import {AssetRepository} from '../assets/AssetRepository';
+import {ROLE} from '../user/UserPermission';
+import {UserRepository} from '../user/UserRepository';
+
+function buildConnectionRepository() {
+  const team = new TeamEntity(randomUUID());
+  const userState = new UserState();
+  const selfUser = new User('self-id', 'self-domain');
+  selfUser.teamId = team.id;
+  selfUser.isMe = true;
+  selfUser.teamRole(ROLE.NONE);
+  userState.self(selfUser);
+
+  const teamState = new TeamState(userState);
+  teamState.team(team);
+  const userRepository = {} as UserRepository;
+  const assetRepository = {} as AssetRepository;
+  const teamService = new TeamService({} as any);
+  return [
+    new TeamRepository(userRepository, assetRepository, teamService, userState, teamState),
+    {userState, teamState, userRepository, assetRepository, teamService},
+  ] as const;
+}
 
 describe('TeamRepository', () => {
   const teams_data = {
@@ -28,7 +60,7 @@ describe('TeamRepository', () => {
       {
         binding: true,
         creator: '9ca1bf41-42cd-4ee4-b54e-99e8dcc9d375',
-        icon_key: null,
+        icon_key: '',
         icon: '',
         id: 'e6d3adc5-9140-477a-abc1-8279d210ceab',
         name: 'Wire GmbH',
@@ -39,31 +71,17 @@ describe('TeamRepository', () => {
   const team_metadata = teams_data.teams[0];
   const team_members = {
     members: [
-      {user: 'bac6597b-5396-4a6a-8de9-d5aa75c998bf', permissions: 4},
-      {user: '74fa64dc-8318-4426-9935-82590ff8aa3e', permissions: 8},
+      {user: randomUUID(), permissions: {copy: Permissions.DEFAULT, self: Permissions.DEFAULT}},
+      {user: randomUUID(), permissions: {copy: Permissions.DEFAULT, self: Permissions.DEFAULT}},
     ],
   };
 
   describe('getTeam()', () => {
     it('returns the team entity', async () => {
-      const userState = new UserState();
-      const selfUser = new User('self-id');
-      selfUser.teamId = 'e6d3adc5-9140-477a-abc1-8279d210ceab';
-      selfUser.isMe = true;
-      userState.self(selfUser);
-      const teamService = {
-        getTeamById: jest.fn(team => Promise.resolve(team_metadata)),
-      };
-      const teamRepo = new TeamRepository(
-        teamService,
-        {
-          mapGuestStatus: jest.fn(),
-        },
-        {},
-        userState,
-        new TeamState(userState),
-      );
-      jest.spyOn(teamRepo, 'getSelfMember').mockImplementation(team => Promise.resolve(team_members.members[0]));
+      const [teamRepo, {teamService}] = buildConnectionRepository();
+      jest.spyOn(teamService, 'getTeamById').mockResolvedValue(team_metadata);
+
+      jest.spyOn(teamRepo, 'getSelfMember').mockResolvedValue(new TeamMemberEntity(randomUUID()));
 
       const team_et = await teamRepo.getTeam();
       const [team_data] = teams_data.teams;
@@ -75,12 +93,9 @@ describe('TeamRepository', () => {
 
   describe('getAllTeamMembers()', () => {
     it('returns team member entities', async () => {
-      const userState = new UserState();
-      const teamService = {
-        getAllTeamMembers: jest.fn(() => Promise.resolve(team_members)),
-      };
-      const teamRepo = new TeamRepository(teamService, {}, {}, userState, new TeamState(userState));
-      const entities = await teamRepo.getAllTeamMembers(team_metadata.id);
+      const [teamRepo, {teamService}] = buildConnectionRepository();
+      jest.spyOn(teamService, 'getAllTeamMembers').mockResolvedValue({hasMore: false, members: team_members.members});
+      const entities = await teamRepo['getAllTeamMembers'](team_metadata.id);
       expect(entities.length).toEqual(team_members.members.length);
       expect(entities[0].userId).toEqual(team_members.members[0].user);
       expect(entities[0].permissions).toEqual(team_members.members[0].permissions);
@@ -89,27 +104,9 @@ describe('TeamRepository', () => {
 
   describe('sendAccountInfo', () => {
     it('does not crash when there is no team logo', async () => {
-      const userState = new UserState();
-      const selfUser = new User();
-      selfUser.isMe = true;
-      selfUser.teamRole('z.team.TeamRole.ROLE.NONE');
-      userState.self(selfUser);
-      const teamState = new TeamState(userState);
-      teamState.team({
-        id: 'team-id',
-        members: () => [],
-        getIconResource: () => {},
-        name: () => 'teamName',
-      });
+      const [teamRepo] = buildConnectionRepository();
 
-      const teamRepo = new TeamRepository(
-        {}, // TeamService,
-        {}, // UserRepository,
-        {}, // AssetRepository,
-        userState,
-        teamState,
-      );
-      expect(teamRepo.teamState.isTeam()).toBe(true);
+      expect(teamRepo['teamState'].isTeam()).toBe(true);
 
       const accountInfo = await teamRepo.sendAccountInfo(true);
 

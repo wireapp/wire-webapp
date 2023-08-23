@@ -93,6 +93,7 @@ describe('NotificationRepository', () => {
   let verifyNotificationEphemeral: (...args: any[]) => void;
   let verifyNotificationObfuscated: (...args: any[]) => void;
   let verifyNotificationSystem: (...args: any[]) => void;
+  let createTruncatedTitle: (name: string, conversationName: string) => string;
 
   let notification_content: any;
   const contentViewModelState: any = {};
@@ -123,7 +124,7 @@ describe('NotificationRepository', () => {
         tag: conversation.id,
       },
       timeout: NotificationRepository.CONFIG.TIMEOUT,
-      title: truncate(title, NotificationRepository.CONFIG.TITLE_LENGTH, false),
+      title: truncate(title, NotificationRepository.CONFIG.TITLE_MAX_LENGTH, false),
     };
 
     // Mocks
@@ -143,6 +144,18 @@ describe('NotificationRepository', () => {
 
     const showNotificationSpy = jest.spyOn(notificationRepository as any, 'showNotification');
 
+    createTruncatedTitle = (name, conversationName) => {
+      const titleLength = NotificationRepository.CONFIG.TITLE_MAX_LENGTH;
+      const titleSectionLength = NotificationRepository.CONFIG.TITLE_LENGTH;
+
+      const titleText = `${truncate(name, titleSectionLength, false)} in ${truncate(
+        conversationName,
+        titleSectionLength,
+        false,
+      )}`;
+      return truncate(titleText, titleLength, false);
+    };
+
     verifyNotification = (_conversation, _message, _expected_body) => {
       return notificationRepository.notify(_message, undefined, _conversation).then(() => {
         expect(showNotificationSpy).toHaveBeenCalledTimes(1);
@@ -153,10 +166,7 @@ describe('NotificationRepository', () => {
         notification_content.trigger = trigger;
 
         if (_conversation.isGroup()) {
-          const titleLength = NotificationRepository.CONFIG.TITLE_LENGTH;
-          const titleText = `${_message.user().name()} in ${_conversation.display_name()}`;
-
-          notification_content.title = truncate(titleText, titleLength, false);
+          notification_content.title = createTruncatedTitle(_message.user().name(), _conversation.display_name());
         } else {
           notification_content.title = 'Name not available';
         }
@@ -192,11 +202,8 @@ describe('NotificationRepository', () => {
 
         const obfuscateMessage = _setting === NotificationPreference.OBFUSCATE_MESSAGE;
         if (obfuscateMessage) {
-          const titleLength = NotificationRepository.CONFIG.TITLE_LENGTH;
-          const titleText = `${message.user().name()} in ${conversation.display_name()}`;
-
           notification_content.options.body = t('notificationObfuscated');
-          notification_content.title = truncate(titleText, titleLength, false);
+          notification_content.title = createTruncatedTitle(_message.user().name(), _conversation.display_name());
         } else {
           notification_content.options.body = t('notificationObfuscated');
           notification_content.title = t('notificationObfuscatedTitle');
@@ -542,10 +549,7 @@ describe('NotificationRepository', () => {
 
   describe('shows a well-formed group notification', () => {
     beforeEach(() => {
-      const titleLength = NotificationRepository.CONFIG.TITLE_LENGTH;
-      const titleText = `${message.user().name()} in ${conversation.display_name()}`;
-
-      notification_content.title = truncate(titleText, titleLength, false);
+      notification_content.title = createTruncatedTitle(user.name(), conversation.display_name());
     });
 
     it('if a group is created', () => {
@@ -603,11 +607,7 @@ describe('NotificationRepository', () => {
     describe('if people are added', () => {
       beforeEach(() => {
         memberMessage.type = CONVERSATION_EVENT.MEMBER_JOIN;
-
-        const titleLength = NotificationRepository.CONFIG.TITLE_LENGTH;
-        const titleText = `${memberMessage.user().name()} in ${conversation.display_name()}`;
-
-        notification_content.title = truncate(titleText, titleLength, false);
+        notification_content.title = createTruncatedTitle(user.name(), conversation.display_name());
       });
 
       it('with one user being added to the conversation', () => {
@@ -641,10 +641,8 @@ describe('NotificationRepository', () => {
     describe('if people are removed', () => {
       beforeEach(() => {
         memberMessage.type = CONVERSATION_EVENT.MEMBER_LEAVE;
-        const titleLength = NotificationRepository.CONFIG.TITLE_LENGTH;
-        const titleText = `${memberMessage.user().name()} in ${conversation.display_name()}`;
 
-        notification_content.title = truncate(titleText, titleLength, false);
+        notification_content.title = createTruncatedTitle(user.name(), conversation.display_name());
       });
 
       it('with one user being removed from the conversation', () => {

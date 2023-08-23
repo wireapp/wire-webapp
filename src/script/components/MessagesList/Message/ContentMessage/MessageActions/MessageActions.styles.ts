@@ -106,5 +106,5 @@ export const getActionsMenuCSS = (isActive?: boolean): CSSObject => {
 };
 
 export const messageWithHeaderTop: CSSObject = {
-  top: '45px',
+  top: '-53px',
 };

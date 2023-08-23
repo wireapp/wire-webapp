@@ -1,6 +1,8 @@
 .message-quote {
   position: relative;
-  max-width: @conversation-max-width;
+  max-width: calc(
+    @conversation-max-width - var(--conversation-message-timestamp-width) - @conversation-message-sender-width - 16px
+  );
   padding-right: var(--conversation-message-timestamp-width);
   padding-left: @conversation-message-sender-width + 16;
   margin-bottom: 10px;

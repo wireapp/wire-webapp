@@ -93,7 +93,6 @@ import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
 import {StorageKey, StorageRepository, StorageService} from '../storage';
 import {TeamRepository} from '../team/TeamRepository';
-import {TeamService} from '../team/TeamService';
 import {AppInitStatisticsValue} from '../telemetry/app_init/AppInitStatisticsValue';
 import {AppInitTelemetry} from '../telemetry/app_init/AppInitTelemetry';
 import {AppInitTimingsStep} from '../telemetry/app_init/AppInitTimingsStep';
@@ -225,7 +224,7 @@ export class App {
     repositories.connection = new ConnectionRepository(new ConnectionService(), repositories.user);
     repositories.event = new EventRepository(this.service.event, this.service.notification, serverTimeHandler);
     repositories.search = new SearchRepository(new SearchService(), repositories.user);
-    repositories.team = new TeamRepository(new TeamService(), repositories.user, repositories.asset);
+    repositories.team = new TeamRepository(repositories.user, repositories.asset);
 
     repositories.message = new MessageRepository(
       /*
