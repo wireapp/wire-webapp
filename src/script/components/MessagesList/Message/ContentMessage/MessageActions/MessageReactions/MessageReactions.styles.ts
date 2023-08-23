@@ -119,5 +119,5 @@ export const getReactionsButtonCSS = (isActive?: boolean, isDisabled?: boolean):
 };
 
 export const actionMenuEmojiSize = {
-  width: '1.375rem',
+  width: '16px',
 };
