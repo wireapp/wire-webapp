@@ -26,7 +26,7 @@ import {formatDuration} from 'Util/TimeUtil';
 import {SystemMessage} from './SystemMessage';
 
 import {ConversationEphemeralHandler} from '../../conversation/ConversationEphemeralHandler';
-import {SystemMessageType} from '../../message/SystemMessageType';
+import {SystemMessageIcon, SystemMessageType} from '../../message/SystemMessageType';
 
 export class MessageTimerUpdateMessage extends SystemMessage {
   public readonly message_timer: number;
@@ -49,5 +49,8 @@ export class MessageTimerUpdateMessage extends SystemMessage {
 
       return this.user().isMe ? t('conversationResetTimerYou') : t('conversationResetTimer');
     });
+
+    this.icon = SystemMessageIcon.TIMER;
+    this.includeSenderName = true;
   }
 }

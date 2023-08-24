@@ -23,16 +23,20 @@ import {Message} from './Message';
 import {RenameMessage} from './RenameMessage';
 
 import {SuperType} from '../../message/SuperType';
-import {SystemMessageType} from '../../message/SystemMessageType';
+import {SystemMessageIcon, SystemMessageType} from '../../message/SystemMessageType';
 
 export class SystemMessage extends Message {
   public caption: ko.PureComputed<string>;
   public system_message_type: SystemMessageType;
+  public icon: SystemMessageIcon | null;
+  public includeSenderName: boolean;
 
   constructor() {
     super();
     this.super_type = SuperType.SYSTEM;
     this.system_message_type = SystemMessageType.NORMAL;
+    this.icon = null;
+    this.includeSenderName = false;
   }
 
   isConversationRename(): this is RenameMessage {

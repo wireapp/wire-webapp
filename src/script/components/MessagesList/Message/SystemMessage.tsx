@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import React, {ReactNode} from 'react';
 
 import {Icon} from 'Components/Icon';
 import {SystemMessage as SystemMessageEntity} from 'src/script/entity/message/SystemMessage';
@@ -25,33 +25,30 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {MessageTime} from './MessageTime';
 
-import {RenameMessage} from '../../../entity/message/RenameMessage';
-import {SystemMessageType} from '../../../message/SystemMessageType';
+import {SystemMessageIcon} from '../../../message/SystemMessageType';
 export interface SystemMessageProps {
   message: SystemMessageEntity;
+  children?: ReactNode;
 }
 
-const SystemMessage: React.FC<SystemMessageProps> = ({message}) => {
+const SystemMessage: React.FC<SystemMessageProps> = ({message, children}) => {
   const {unsafeSenderName, timestamp, caption} = useKoSubscribableChildren(message, [
     'unsafeSenderName',
     'timestamp',
     'caption',
   ]);
 
-  // Only set for RenameMessage, MemberMessage has a different super_type
-  const messageName = (message as RenameMessage).name;
-
   return (
     <>
       <div className="message-header" data-uie-name="element-message-system">
-        <div className="message-header-icon message-header-icon--svg text-foreground">
-          {message.system_message_type === SystemMessageType.CONVERSATION_RENAME && <Icon.Edit />}
-          {message.system_message_type === SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE && <Icon.Timer />}
-          {message.system_message_type === SystemMessageType.CONVERSATION_RECEIPT_MODE_UPDATE && <Icon.Read />}
-        </div>
+        {message.icon && (
+          <div className="message-header-icon message-header-icon--svg text-foreground">
+            <IconComponent icon={message.icon} />
+          </div>
+        )}
         <p className="message-header-label">
           <span className="message-header-label__multiline">
-            <span className="message-header-sender-name">{unsafeSenderName}</span>
+            {message.includeSenderName && <span className="message-header-sender-name">{unsafeSenderName}</span>}
             <span className="ellipsis">{caption}</span>
           </span>
         </p>
@@ -59,9 +56,20 @@ const SystemMessage: React.FC<SystemMessageProps> = ({message}) => {
           <MessageTime timestamp={timestamp} data-uie-uid={message.id} data-uie-name="item-message-call-timestamp" />
         </div>
       </div>
-      <div className="message-body font-weight-bold">{messageName}</div>
+      {children}
     </>
   );
 };
 
 export {SystemMessage};
+
+const iconToComponentMap: Record<SystemMessageIcon, React.FC> = {
+  [SystemMessageIcon.EDIT]: () => <Icon.Edit />,
+  [SystemMessageIcon.TIMER]: () => <Icon.Timer />,
+  [SystemMessageIcon.READ]: () => <Icon.Read />,
+};
+
+const IconComponent = ({icon}: {icon: SystemMessageIcon}) => {
+  const IconComponent = iconToComponentMap[icon];
+  return <IconComponent />;
+};
