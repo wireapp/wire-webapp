@@ -146,9 +146,10 @@ describe('NotificationRepository', () => {
     const showNotificationSpy = jest.spyOn(notificationRepository as any, 'showNotification');
 
     calculateTitleLength = sectionString => {
-      const length =
-        NotificationRepository.CONFIG.TITLE_LENGTH - sectionString.length + NotificationRepository.CONFIG.TITLE_LENGTH;
-      return length > NotificationRepository.CONFIG.TITLE_LENGTH ? length : NotificationRepository.CONFIG.TITLE_LENGTH;
+      const defaultSectionLength = NotificationRepository.CONFIG.TITLE_LENGTH;
+      const length = defaultSectionLength - sectionString.length + defaultSectionLength;
+
+      return length > defaultSectionLength ? length : defaultSectionLength;
     };
 
     createTruncatedTitle = (name, conversationName) => {

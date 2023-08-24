@@ -615,9 +615,10 @@ export class NotificationRepository {
    Calculate the length of the opposite title section string and return the extra length
   */
   private calculatedTitleLength = (sectionString: string) => {
-    const length =
-      NotificationRepository.CONFIG.TITLE_LENGTH - sectionString.length + NotificationRepository.CONFIG.TITLE_LENGTH;
-    return length > NotificationRepository.CONFIG.TITLE_LENGTH ? length : NotificationRepository.CONFIG.TITLE_LENGTH;
+    const maxSectionLength = NotificationRepository.CONFIG.TITLE_LENGTH;
+    const length = maxSectionLength - sectionString.length + maxSectionLength;
+
+    return length > maxSectionLength ? length : maxSectionLength;
   };
 
   /**
