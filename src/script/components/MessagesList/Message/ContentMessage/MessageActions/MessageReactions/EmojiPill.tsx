@@ -123,7 +123,13 @@ const EmojiPill: FC<EmojiPillProps> = ({
             }
           }}
         >
-          <EmojiImg emojiUrl={emojiUrl} emojiName={emojiName} />
+          <EmojiImg
+            emojiUrl={emojiUrl}
+            emojiName={emojiName}
+            emojiImgSize={{
+              width: 'var(--font-size-medium)',
+            }}
+          />
           <span css={messageReactionCount(isActive)}>{emojiCount}</span>
         </button>
       </Tooltip>
