@@ -21,6 +21,7 @@ import React from 'react';
 
 import {Icon} from 'Components/Icon';
 import {MessageTimerUpdateMessage} from 'src/script/entity/message/MessageTimerUpdateMessage';
+import {MLSConversationRecoveredMessage} from 'src/script/entity/message/MLSConversationRecoveredMessage';
 import {ReceiptModeUpdateMessage} from 'src/script/entity/message/ReceiptModeUpdateMessage';
 import {RenameMessage} from 'src/script/entity/message/RenameMessage';
 import {SystemMessage as SystemMessageEntity} from 'src/script/entity/message/SystemMessage';
@@ -47,6 +48,10 @@ export const SystemMessage: React.FC<SystemMessageProps> = ({message}) => {
 
   if (message instanceof ReceiptModeUpdateMessage) {
     return <SystemMessageBase message={message} isSenderNameVisible icon={<Icon.Read />} />;
+  }
+
+  if (message instanceof MLSConversationRecoveredMessage) {
+    return <SystemMessageBase message={message} icon={<span className="icon-sysmsg-error text-red" />} />;
   }
 
   return <SystemMessageBase message={message} />;

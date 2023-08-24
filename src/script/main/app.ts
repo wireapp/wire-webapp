@@ -411,6 +411,7 @@ export class App {
       if (supportsMLS()) {
         //if mls is supported, we need to initialize the callbacks (they are used when decrypting messages)
         await initMLSCallbacks(this.core, this.repository.conversation);
+        conversationRepository.initMLSConversationRecoveredListener();
       }
 
       if (connections.length) {

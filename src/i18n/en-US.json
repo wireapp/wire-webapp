@@ -727,6 +727,7 @@
   "messageReactionDetails": "{{emojiCount}} reaction, react with {{emojiName}} emoji",
   "mlsToggleInfo": "When this is on, conversation will use the new messaging layer security (MLS) protocol.",
   "mlsToggleName": "MLS",
+  "mlsConversationRecovered": "The MLS group key was updated without our knowledge. This could happen due to lost messages between backends, or a bug. We have automatically rejoined the conversation, but you may have lost messages. Please contact your administrator.",
   "modalAccountCreateAction": "OK",
   "modalAccountCreateHeadline": "Create an account?",
   "modalAccountCreateMessage": "By creating an account you will lose the conversation history in this guest room.",
