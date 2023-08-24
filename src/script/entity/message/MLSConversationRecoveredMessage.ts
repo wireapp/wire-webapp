@@ -17,8 +17,6 @@
  *
  */
 
-import ko from 'knockout';
-
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
 import {t} from 'Util/LocalizerUtil';
 
@@ -28,6 +26,6 @@ export class MLSConversationRecoveredMessage extends SystemMessage {
   constructor() {
     super();
     this.system_message_type = SystemMessageType.MLS_CONVERSATION_RECOVERED;
-    this.caption = ko.pureComputed(() => t('mlsConversationRecovered'));
+    this.caption = t('mlsConversationRecovered');
   }
 }

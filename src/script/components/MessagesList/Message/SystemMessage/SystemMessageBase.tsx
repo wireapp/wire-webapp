@@ -19,23 +19,19 @@
 
 import React, {ReactNode} from 'react';
 
-import {SystemMessage as SystemMessageEntity} from 'src/script/entity/message/SystemMessage';
+import {SystemMessage} from 'src/script/entity/message/SystemMessage';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {MessageTime} from '../MessageTime';
 
 export interface SystemMessageProps {
-  message: SystemMessageEntity;
+  message: SystemMessage;
   isSenderNameVisible?: boolean;
   icon?: ReactNode;
 }
 
 export const SystemMessageBase: React.FC<SystemMessageProps> = ({message, isSenderNameVisible = false, icon}) => {
-  const {unsafeSenderName, timestamp, caption} = useKoSubscribableChildren(message, [
-    'unsafeSenderName',
-    'timestamp',
-    'caption',
-  ]);
+  const {unsafeSenderName, timestamp} = useKoSubscribableChildren(message, ['unsafeSenderName', 'timestamp']);
 
   return (
     <div className="message-header" data-uie-name="element-message-system">
@@ -43,7 +39,7 @@ export const SystemMessageBase: React.FC<SystemMessageProps> = ({message, isSend
       <p className="message-header-label">
         <span className="message-header-label__multiline">
           {isSenderNameVisible && <span className="message-header-sender-name">{unsafeSenderName}</span>}
-          <span className="ellipsis">{caption}</span>
+          {message.caption && <span className="ellipsis">{message.caption}</span>}
         </span>
       </p>
       <div className="message-body-actions">
