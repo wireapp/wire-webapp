@@ -26,6 +26,7 @@ import {
   ConversationProtocol,
   RemoteConversations,
   PostMlsMessageResponse,
+  MLSConversation,
 } from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_TYPING, ConversationMemberUpdateData} from '@wireapp/api-client/lib/conversation/data';
 import {
@@ -56,7 +57,7 @@ import {
 import {MessageTimer, MessageSendingState, RemoveUsersParams} from '../../conversation/';
 import {decryptAsset} from '../../cryptography/AssetCryptography';
 import {MLSService, optionalToUint8Array} from '../../messagingProtocols/mls';
-import {handleMLSMessageAdd, handleMLSWelcomeMessage} from '../../messagingProtocols/mls/EventHandler/events';
+import {isCoreCryptoMLSWrongEpochError} from '../../messagingProtocols/mls/MLSService/CoreCryptoMLSErrors';
 import {getConversationQualifiedMembers, ProteusService} from '../../messagingProtocols/proteus';
 import {
   AddUsersToProteusConversationParams,
@@ -65,10 +66,15 @@ import {
 import {HandledEventPayload} from '../../notification';
 import {isMLSConversation} from '../../util';
 import {mapQualifiedUserClientIdsToFullyQualifiedClientIds} from '../../util/fullyQualifiedClientIdUtils';
+import {TypedEventEmitter} from '../../util/TypedEventEmitter';
 import {RemoteData} from '../content';
 import {isSendingMessage, sendMessage} from '../message/messageSender';
 
-export class ConversationService {
+type Events = {
+  MLSConversationRecovered: {conversationId: QualifiedId};
+};
+
+export class ConversationService extends TypedEventEmitter<Events> {
   public readonly messageTimer: MessageTimer;
   private readonly logger = logdown('@wireapp/core/ConversationService');
 
@@ -77,6 +83,7 @@ export class ConversationService {
     private readonly proteusService: ProteusService,
     private readonly _mlsService?: MLSService,
   ) {
+    super();
     this.messageTimer = new MessageTimer();
   }
 
@@ -420,7 +427,7 @@ export class ConversationService {
     return BigInt(localEpoch) === BigInt(backendEpoch);
   }
 
-  public async handleEpochMismatch() {
+  public async handleConversationsEpochMismatch() {
     this.logger.info(`There were some missed messages, handling possible epoch mismatch in MLS conversations.`);
 
     //fetch all the mls conversations from backend
@@ -430,21 +437,41 @@ export class ConversationService {
     const mlsConversations = foundConversations.filter(isMLSConversation);
 
     //check all the established conversations' epoch with the core-crypto epoch
-    for (const {qualified_id: qualifiedId, group_id: groupId, epoch} of mlsConversations) {
-      try {
-        //if conversation is not established or epoch does not match -> try to rejoin
-        if (!(await this.isMLSConversationEstablished(groupId)) || !(await this.matchesEpoch(groupId, epoch))) {
-          this.logger.log(
-            `Conversation (id ${qualifiedId.id}) was not established or it's epoch number was out of date, joining via external commit`,
-          );
-          await this.joinByExternalCommit(qualifiedId);
-        }
-      } catch (error) {
-        this.logger.error(
-          `There was an error while handling epoch mismatch in MLS conversation (id: ${qualifiedId.id}):`,
-          error,
+    await Promise.all(mlsConversations.map(mlsConversation => this.handleConversationEpochMismatch(mlsConversation)));
+  }
+
+  /**
+   * Handles epoch mismatch in a single MLS conversation.
+   * Compares the epoch of the local conversation with the epoch of the remote conversation.
+   * If the epochs do not match, it will try to rejoin the conversation via external commit.
+   * @param mlsConversation - mls conversation
+   */
+  private async handleConversationEpochMismatch(
+    remoteMlsConversation: MLSConversation,
+    onSuccessfulRejoin?: () => void,
+  ) {
+    const {qualified_id: qualifiedId, group_id: groupId, epoch} = remoteMlsConversation;
+
+    try {
+      const isEstablished = await this.isMLSConversationEstablished(groupId);
+      const doesEpochMatch = await this.matchesEpoch(groupId, epoch);
+
+      //if conversation is not established or epoch does not match -> try to rejoin
+      if (!isEstablished || !doesEpochMatch) {
+        this.logger.log(
+          `Conversation (id ${qualifiedId.id}) was not established or it's epoch number was out of date, joining via external commit`,
         );
+        await this.joinByExternalCommit(qualifiedId);
+
+        if (onSuccessfulRejoin) {
+          onSuccessfulRejoin();
+        }
       }
+    } catch (error) {
+      this.logger.error(
+        `There was an error while handling epoch mismatch in MLS conversation (id: ${qualifiedId.id}):`,
+        error,
+      );
     }
   }
 
@@ -488,12 +515,38 @@ export class ConversationService {
     }
   };
 
-  private async handleMLSMessageAddEvent(event: ConversationMLSMessageAddEvent) {
-    return handleMLSMessageAdd({event, mlsService: this.mlsService});
+  private async handleMLSMessageAddEvent(
+    event: ConversationMLSMessageAddEvent,
+  ): Promise<HandledEventPayload | undefined> {
+    try {
+      return await this.mlsService.handleMLSMessageAddEvent(event);
+    } catch (error) {
+      if (isCoreCryptoMLSWrongEpochError(error)) {
+        this.logger.info(
+          `Received message for the wrong epoch in conversation ${event.conversation}, handling epoch mismatch...`,
+        );
+        const conversationId = event.qualified_conversation;
+        if (!conversationId) {
+          throw new Error('Qualified conversation id is missing in the event');
+        }
+
+        const mlsConversation = await this.apiClient.api.conversation.getConversation(conversationId);
+
+        if (!isMLSConversation(mlsConversation)) {
+          throw new Error('Conversation is not an MLS conversation');
+        }
+
+        await this.handleConversationEpochMismatch(mlsConversation, () =>
+          this.emit('MLSConversationRecovered', {conversationId}),
+        );
+        return;
+      }
+      throw error;
+    }
   }
 
   private async handleMLSWelcomeMessageEvent(event: ConversationMLSWelcomeEvent) {
-    return handleMLSWelcomeMessage({event, mlsService: this.mlsService});
+    return this.mlsService.handleMLSWelcomeMessageEvent(event);
   }
 
   private async handleOtrMessageAddEvent(event: ConversationOtrMessageAddEvent) {

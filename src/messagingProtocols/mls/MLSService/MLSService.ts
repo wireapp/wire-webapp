@@ -20,6 +20,7 @@
 import type {ClaimedKeyPackages} from '@wireapp/api-client/lib/client';
 import {PostMlsMessageResponse, SUBCONVERSATION_ID} from '@wireapp/api-client/lib/conversation';
 import {Subconversation} from '@wireapp/api-client/lib/conversation/Subconversation';
+import {ConversationMLSMessageAddEvent, ConversationMLSWelcomeEvent} from '@wireapp/api-client/lib/event';
 import {BackendError, StatusCode} from '@wireapp/api-client/lib/http';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
@@ -55,6 +56,7 @@ import {constructFullyQualifiedClientId, parseFullQualifiedClientId} from '../..
 import {cancelRecurringTask, registerRecurringTask} from '../../../util/RecurringTaskScheduler';
 import {TaskScheduler} from '../../../util/TaskScheduler';
 import {TypedEventEmitter} from '../../../util/TypedEventEmitter';
+import {handleMLSMessageAdd, handleMLSWelcomeMessage} from '../EventHandler/events';
 import {CommitPendingProposalsParams, HandlePendingProposalsParams, MLSCallbacks} from '../types';
 
 //@todo: this function is temporary, we wait for the update from core-crypto side
@@ -730,5 +732,13 @@ export class MLSService extends TypedEventEmitter<Events> {
       return {userId: user, clientId: client, domain};
     });
     return clientIds;
+  }
+
+  public async handleMLSMessageAddEvent(event: ConversationMLSMessageAddEvent) {
+    return handleMLSMessageAdd({event, mlsService: this});
+  }
+
+  public async handleMLSWelcomeMessageEvent(event: ConversationMLSWelcomeEvent) {
+    return handleMLSWelcomeMessage({event, mlsService: this});
   }
 }
