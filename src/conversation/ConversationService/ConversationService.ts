@@ -454,7 +454,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
 
     try {
       const isEstablished = await this.isMLSConversationEstablished(groupId);
-      const doesEpochMatch = await this.matchesEpoch(groupId, epoch);
+      const doesEpochMatch = isEstablished && (await this.matchesEpoch(groupId, epoch));
 
       //if conversation is not established or epoch does not match -> try to rejoin
       if (!isEstablished || !doesEpochMatch) {
