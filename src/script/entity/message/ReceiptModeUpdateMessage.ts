@@ -24,7 +24,7 @@ import {t} from 'Util/LocalizerUtil';
 
 import {SystemMessage} from './SystemMessage';
 
-import {SystemMessageIcon, SystemMessageType} from '../../message/SystemMessageType';
+import {SystemMessageType} from '../../message/SystemMessageType';
 
 export class ReceiptModeUpdateMessage extends SystemMessage {
   constructor(isReceiptEnabled: boolean) {
@@ -39,8 +39,5 @@ export class ReceiptModeUpdateMessage extends SystemMessage {
       }
       return this.user().isMe ? t('conversationReceiptsOffYou') : t('conversationReceiptsOff');
     });
-
-    this.icon = SystemMessageIcon.READ;
-    this.includeSenderName = true;
   }
 }

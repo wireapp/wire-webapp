@@ -34,9 +34,3 @@ export enum SystemMessageType {
   MEMBER_LEAVE = 'leave',
   NORMAL = 'normal',
 }
-
-export enum SystemMessageIcon {
-  EDIT = 'edit',
-  TIMER = 'timer',
-  READ = 'read',
-}

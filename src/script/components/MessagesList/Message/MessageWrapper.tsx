@@ -45,7 +45,7 @@ import {LegalHoldMessage} from './LegalHoldMessage';
 import {MemberMessage} from './MemberMessage';
 import {MissedMessage} from './MissedMessage';
 import {PingMessage} from './PingMessage';
-import {SystemMessage} from './SystemMessage';
+import {SystemMessage} from './SystemMessage/SystemMessage';
 import {VerificationMessage} from './VerificationMessage';
 
 import {AssetRepository} from '../../../assets/AssetRepository';
@@ -233,13 +233,6 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
     return <FailedToAddUsersMessage isMessageFocused={isMessageFocused} message={message} />;
   }
   if (message.isSystem()) {
-    if (message.isConversationRename()) {
-      return (
-        <SystemMessage message={message}>
-          <div className="message-body font-weight-bold">{message.name}</div>
-        </SystemMessage>
-      );
-    }
     return <SystemMessage message={message} />;
   }
   if (message.isMember()) {

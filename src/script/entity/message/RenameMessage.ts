@@ -24,7 +24,7 @@ import {t} from 'Util/LocalizerUtil';
 
 import {SystemMessage} from './SystemMessage';
 
-import {SystemMessageIcon, SystemMessageType} from '../../message/SystemMessageType';
+import {SystemMessageType} from '../../message/SystemMessageType';
 
 export class RenameMessage extends SystemMessage {
   public readonly system_message_type: SystemMessageType;
@@ -37,7 +37,5 @@ export class RenameMessage extends SystemMessage {
     this.system_message_type = SystemMessageType.CONVERSATION_RENAME;
     this.name = '';
     this.caption = ko.pureComputed(() => (this.user().isMe ? t('conversationRenameYou') : t('conversationRename')));
-    this.icon = SystemMessageIcon.EDIT;
-    this.includeSenderName = true;
   }
 }
