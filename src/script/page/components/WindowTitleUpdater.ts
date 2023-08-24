@@ -28,12 +28,11 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 
-import {ContentState, useAppState} from './useAppState';
-
-import {Config} from '../Config';
-import {ConversationState} from '../conversation/ConversationState';
-import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
-import {UserState} from '../user/UserState';
+import {Config} from '../../Config';
+import {ConversationState} from '../../conversation/ConversationState';
+import {NOTIFICATION_HANDLING_STATE} from '../../event/NotificationHandlingState';
+import {UserState} from '../../user/UserState';
+import {ContentState, useAppState} from '../useAppState';
 
 const windowTitleLogger = getLogger('WindowTitlesViewModel');
 

@@ -34,8 +34,10 @@ import {StringIdentifer, replaceLink, t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {formatDuration} from 'Util/TimeUtil';
 
-import {Config} from '../Config';
-import {TeamState} from '../team/TeamState';
+import {loadFeatureConfig, saveFeatureConfig} from './FeatureConfigChangeNotifier.store';
+
+import {Config} from '../../../Config';
+import {TeamState} from '../../../team/TeamState';
 
 const featureNotifications: Partial<
   Record<
@@ -146,15 +148,19 @@ function wasTurnedOnOrOff(oldConfig?: FeatureWithoutConfig, newConfig?: FeatureW
 const logger = getLogger('FeatureConfigChangeNotifier');
 type Props = {
   teamState: TeamState;
+  selfUserId: string;
 };
 
-export function FeatureConfigChangeNotifier({teamState}: Props): null {
+export function FeatureConfigChangeNotifier({teamState, selfUserId}: Props): null {
   const {teamFeatures: config} = useKoSubscribableChildren(teamState, ['teamFeatures']);
-  const previousConfig = useRef<FeatureList>();
+  const previousConfig = useRef<FeatureList | undefined>(loadFeatureConfig(selfUserId));
 
   useEffect(() => {
     const previous = previousConfig.current;
-    previousConfig.current = config;
+    if (config) {
+      previousConfig.current = config;
+      saveFeatureConfig(selfUserId, config);
+    }
 
     if (previous && config) {
       Object.entries(featureNotifications).forEach(([feature, getMessage]) => {
@@ -178,7 +184,7 @@ export function FeatureConfigChangeNotifier({teamState}: Props): null {
         });
       });
     }
-  }, [config]);
+  }, [config, selfUserId]);
 
   return null;
 }

@@ -26,7 +26,7 @@ import {setStrings} from 'Util/LocalizerUtil';
 
 import {FeatureConfigChangeNotifier} from './FeatureConfigChangeNotifier';
 
-import {TeamState} from '../team/TeamState';
+import {TeamState} from '../../../team/TeamState';
 
 setStrings({en});
 
@@ -35,6 +35,7 @@ describe('FeatureConfigChangeNotifier', () => {
 
   beforeEach(() => {
     showModalSpy.mockClear();
+    localStorage.clear();
   });
 
   const baseConfig = {
@@ -75,7 +76,7 @@ describe('FeatureConfigChangeNotifier', () => {
     ],
   ] as const)('shows a modal when feature %s is turned on and off', async (feature, enabledString, disabledString) => {
     const teamState = new TeamState();
-    render(<FeatureConfigChangeNotifier teamState={teamState} />);
+    render(<FeatureConfigChangeNotifier selfUserId={'self'} teamState={teamState} />);
     act(() => {
       teamState.teamFeatures(baseConfig);
     });
@@ -121,6 +122,20 @@ describe('FeatureConfigChangeNotifier', () => {
     }
   });
 
+  it('saves previous state of feature and warn of feature change at mount time', async () => {
+    const teamState = new TeamState();
+    teamState.teamFeatures(baseConfig);
+
+    const {unmount} = render(<FeatureConfigChangeNotifier selfUserId={'self'} teamState={teamState} />);
+
+    unmount();
+    expect(showModalSpy).not.toHaveBeenCalled();
+
+    teamState.teamFeatures({...baseConfig, [FEATURE_KEY.FILE_SHARING]: {status: FeatureStatus.ENABLED}});
+    render(<FeatureConfigChangeNotifier selfUserId={'self'} teamState={teamState} />);
+    expect(showModalSpy).toHaveBeenCalledTimes(1);
+  });
+
   it.each([
     [
       {status: FeatureStatus.DISABLED, config: {enforcedTimeoutSeconds: 0}},
@@ -146,7 +161,7 @@ describe('FeatureConfigChangeNotifier', () => {
     'indicates the config change when self deleting messages have changed (%s) to (%s)',
     async (fromStatus, toStatus, expectedText) => {
       const teamState = new TeamState();
-      render(<FeatureConfigChangeNotifier teamState={teamState} />);
+      render(<FeatureConfigChangeNotifier selfUserId={'self'} teamState={teamState} />);
       act(() => {
         teamState.teamFeatures({
           ...baseConfig,
