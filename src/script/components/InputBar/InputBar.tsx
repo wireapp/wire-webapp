@@ -78,7 +78,7 @@ const config = {
 };
 
 interface InputBarProps {
-  readonly conversationEntity: Conversation;
+  readonly conversation: Conversation;
   readonly conversationRepository: ConversationRepository;
   readonly eventRepository: EventRepository;
   readonly messageRepository: MessageRepository;
@@ -97,7 +97,7 @@ interface InputBarProps {
 const conversationInputBarClassName = 'conversation-input-bar';
 
 export const InputBar = ({
-  conversationEntity,
+  conversation,
   conversationRepository,
   eventRepository,
   messageRepository,
@@ -118,16 +118,13 @@ export const InputBar = ({
   );
   const {
     connection,
-    allUserEntities: allUsers,
     localMessageTimer,
     messageTimer,
     hasGlobalMessageTimer,
     removed_from_conversation: removedFromConversation,
     is1to1,
-  } = useKoSubscribableChildren(conversationEntity, [
+  } = useKoSubscribableChildren(conversation, [
     'connection',
-    'firstUserEntity',
-    'allUserEntities',
     'localMessageTimer',
     'messageTimer',
     'hasGlobalMessageTimer',
@@ -180,7 +177,7 @@ export const InputBar = ({
   const showGiphyButton = messageContent.text.length > 0 && messageContent.text.length <= config.GIPHY_TEXT_LENGTH;
 
   // Mentions
-  const {participating_user_ets: participatingUserEts} = useKoSubscribableChildren(conversationEntity, [
+  const {participating_user_ets: participatingUserEts} = useKoSubscribableChildren(conversation, [
     'participating_user_ets',
   ]);
   const mentionCandidates = participatingUserEts.filter(userEntity => !userEntity.isService);
@@ -239,9 +236,9 @@ export const InputBar = ({
       cancelMessageEditing(true, true);
       setEditedMessage(messageEntity);
 
-      if (messageEntity.quote() && conversationEntity) {
+      if (messageEntity.quote() && conversation) {
         void messageRepository
-          .getMessageInConversationById(conversationEntity, messageEntity.quote().messageId)
+          .getMessageInConversationById(conversation, messageEntity.quote().messageId)
           .then(quotedMessage => setReplyMessageEntity(quotedMessage));
       }
     }
@@ -262,19 +259,19 @@ export const InputBar = ({
     }
 
     if (isTyping) {
-      void conversationRepository.sendTypingStart(conversationEntity);
+      void conversationRepository.sendTypingStart(conversation);
     } else {
-      void conversationRepository.sendTypingStop(conversationEntity);
+      void conversationRepository.sendTypingStop(conversation);
     }
     return () => {};
-  }, [isTyping, conversationRepository, conversationEntity, isTypingIndicatorEnabled]);
+  }, [isTyping, conversationRepository, conversation, isTypingIndicatorEnabled]);
 
   useEffect(
     () => () => {
       // sending a typing stop event when the user leaves the conversation
-      void conversationRepository.sendTypingStop(conversationEntity);
+      void conversationRepository.sendTypingStop(conversation);
     },
-    [conversationRepository, conversationEntity],
+    [conversationRepository, conversation],
   );
 
   useEffect(() => {
@@ -323,17 +320,15 @@ export const InputBar = ({
     cancelMessageEditing(true, true);
 
     if (!messageText.length && editedMessage) {
-      return messageRepository.deleteMessageForEveryone(conversationEntity, editedMessage);
+      return messageRepository.deleteMessageForEveryone(conversation, editedMessage);
     }
 
     if (editedMessage) {
-      messageRepository
-        .sendMessageEdit(conversationEntity, messageText, editedMessage, mentionEntities)
-        .catch(error => {
-          if (error.type !== ConversationError.TYPE.NO_MESSAGE_CHANGES) {
-            throw error;
-          }
-        });
+      messageRepository.sendMessageEdit(conversation, messageText, editedMessage, mentionEntities).catch(error => {
+        if (error.type !== ConversationError.TYPE.NO_MESSAGE_CHANGES) {
+          throw error;
+        }
+      });
 
       cancelMessageReply();
     }
@@ -344,7 +339,7 @@ export const InputBar = ({
       const mentionEntities = mentions.slice(0);
 
       void generateQuote().then(quoteEntity => {
-        void messageRepository.sendTextWithLinkPreview(conversationEntity, messageText, mentionEntities, quoteEntity);
+        void messageRepository.sendTextWithLinkPreview(conversation, messageText, mentionEntities, quoteEntity);
         cancelMessageReply();
       });
     }
@@ -383,7 +378,7 @@ export const InputBar = ({
 
   const pingConversation = () => {
     setIsPingDisabled(true);
-    void messageRepository.sendPing(conversationEntity).then(() => {
+    void messageRepository.sendPing(conversation).then(() => {
       window.setTimeout(() => setIsPingDisabled(false), CONFIG.PING_TIMEOUT);
     });
   };
@@ -391,7 +386,7 @@ export const InputBar = ({
   const totalConversationUsers = participatingUserEts.length;
 
   const onPingClick = () => {
-    if (conversationEntity && !pingDisabled) {
+    if (conversation && !pingDisabled) {
       if (
         !CONFIG.FEATURE.ENABLE_PING_CONFIRMATION ||
         is1to1 ||
@@ -432,7 +427,7 @@ export const InputBar = ({
 
   const sendGiphy = (gifUrl: string, tag: string): void => {
     void generateQuote().then(quoteEntity => {
-      void messageRepository.sendGif(conversationEntity, gifUrl, tag, quoteEntity);
+      void messageRepository.sendGif(conversation, gifUrl, tag, quoteEntity);
       cancelMessageEditing(true, true);
     });
   };
@@ -458,11 +453,11 @@ export const InputBar = ({
   }, []);
 
   const saveDraft = async (editorState: string) => {
-    await saveDraftState(storageRepository, conversationEntity, editorState, replyMessageEntity?.id);
+    await saveDraftState(storageRepository, conversation, editorState, replyMessageEntity?.id);
   };
 
   const loadDraft = async () => {
-    const draftState = await loadDraftState(conversationEntity, storageRepository, messageRepository);
+    const draftState = await loadDraftState(conversation, storageRepository, messageRepository);
 
     if (draftState.messageReply) {
       void draftState.messageReply.then(replyEntity => {
@@ -530,7 +525,7 @@ export const InputBar = ({
   }, [pastedFile]);
 
   const controlButtonsProps = {
-    conversation: conversationEntity,
+    conversation: conversation,
     disableFilesharing: !isFileSharingSendingEnabled,
     disablePing: pingDisabled,
     input: textValue,
@@ -552,12 +547,12 @@ export const InputBar = ({
       className={cx(conversationInputBarClassName, {'is-right-panel-open': isRightSidebarOpen})}
       aria-live="assertive"
     >
-      {isTypingIndicatorEnabled && <TypingIndicator conversationId={conversationEntity.id} />}
+      {isTypingIndicatorEnabled && <TypingIndicator conversationId={conversation.id} />}
 
       {classifiedDomains && !isConnectionRequest && (
         <ClassifiedBar
-          conversationDomain={conversationEntity.domain}
-          users={allUsers}
+          conversationDomain={conversation.domain}
+          conversation={conversation}
           classifiedDomains={classifiedDomains}
         />
       )}
@@ -584,7 +579,7 @@ export const InputBar = ({
                 }}
                 editedMessage={editedMessage}
                 onCancelMessageEdit={() => cancelMessageEditing(true, true)}
-                onEditLastSentMessage={() => editMessage(conversationEntity.getLastEditableMessage())}
+                onEditLastSentMessage={() => editMessage(conversation.getLastEditableMessage())}
                 mentionCandidates={mentionCandidates}
                 searchRepository={searchRepository}
                 propertiesRepository={propertiesRepository}
