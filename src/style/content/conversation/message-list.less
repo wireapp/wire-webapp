@@ -307,13 +307,10 @@
   padding-left: @conversation-message-sender-width;
 
   &-content {
-    display: flex;
     width: calc(100% - var(--conversation-message-timestamp-width));
     max-width: calc(
       @conversation-max-width - @conversation-message-sender-width - var(--conversation-message-timestamp-width)
     );
-    flex: 1;
-    flex-direction: column;
   }
 
   .text {
@@ -387,8 +384,8 @@
 .image-asset {
   position: relative;
   display: flex;
-  margin-top: 8px;
-  margin-bottom: 24px;
+  padding-top: 8px;
+  padding-bottom: 24px;
   cursor: pointer;
 
   &--no-image {
