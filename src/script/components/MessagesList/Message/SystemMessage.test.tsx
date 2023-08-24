@@ -24,7 +24,7 @@ import {DeleteConversationMessage} from 'src/script/entity/message/DeleteConvers
 import {MessageTimerUpdateMessage} from 'src/script/entity/message/MessageTimerUpdateMessage';
 import {ReceiptModeUpdateMessage} from 'src/script/entity/message/ReceiptModeUpdateMessage';
 import {RenameMessage} from 'src/script/entity/message/RenameMessage';
-import {SystemMessageType} from 'src/script/message/SystemMessageType';
+import {SystemMessageIcon, SystemMessageType} from 'src/script/message/SystemMessageType';
 
 import {SystemMessage} from './SystemMessage';
 
@@ -63,6 +63,7 @@ describe('SystemMessage', () => {
   it('shows edit icon for RenameMessage', async () => {
     const message = createSystemMessage({
       system_message_type: SystemMessageType.CONVERSATION_RENAME,
+      icon: SystemMessageIcon.EDIT,
     });
 
     render(<SystemMessage message={message} />);
@@ -74,6 +75,7 @@ describe('SystemMessage', () => {
   it('shows timer icon for MessageTimerUpdateMessage', async () => {
     const message = createSystemMessage({
       system_message_type: SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE,
+      icon: SystemMessageIcon.TIMER,
     });
 
     render(<SystemMessage message={message} />);
@@ -85,11 +87,43 @@ describe('SystemMessage', () => {
   it('shows read icon for ReceiptModeUpdateMessage', async () => {
     const message = createSystemMessage({
       system_message_type: SystemMessageType.CONVERSATION_RECEIPT_MODE_UPDATE,
+      icon: SystemMessageIcon.READ,
     });
 
     render(<SystemMessage message={message} />);
 
     expect(screen.queryByTestId('element-message-system')).not.toBeNull();
     expect(screen.queryByTestId('readicon')).not.toBeNull();
+  });
+
+  it('does not include message sender name by default', async () => {
+    const senderName = 'Cool User';
+    const message = createSystemMessage({
+      system_message_type: SystemMessageType.CONVERSATION_RECEIPT_MODE_UPDATE,
+      icon: SystemMessageIcon.READ,
+      unsafeSenderName: ko.pureComputed(() => senderName),
+    });
+
+    const {getByTestId, queryByText} = render(<SystemMessage message={message} />);
+
+    expect(getByTestId('element-message-system')).not.toBeNull();
+    expect(getByTestId('readicon')).not.toBeNull();
+    expect(queryByText(senderName)).toBeNull();
+  });
+
+  it('includes message sender name with includeSenderName', async () => {
+    const senderName = 'Cool User';
+    const message = createSystemMessage({
+      system_message_type: SystemMessageType.CONVERSATION_RECEIPT_MODE_UPDATE,
+      icon: SystemMessageIcon.READ,
+      unsafeSenderName: ko.pureComputed(() => senderName),
+      includeSenderName: true,
+    });
+
+    const {getByTestId, getByText} = render(<SystemMessage message={message} />);
+
+    expect(getByTestId('element-message-system')).not.toBeNull();
+    expect(getByTestId('readicon')).not.toBeNull();
+    expect(getByText(senderName)).not.toBeNull();
   });
 });
