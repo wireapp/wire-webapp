@@ -42,7 +42,7 @@ jest.mock('Components/Icon', () => ({
 
 describe('SystemMessage', () => {
   it('shows edit icon for RenameMessage', async () => {
-    const message = new RenameMessage();
+    const message = new RenameMessage('new name');
 
     render(<SystemMessage message={message} />);
 

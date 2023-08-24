@@ -28,12 +28,12 @@ import {SystemMessageType} from '../../message/SystemMessageType';
 export class RenameMessage extends SystemMessage {
   public name: string;
 
-  constructor() {
+  constructor(name: string) {
     super();
 
     this.type = CONVERSATION_EVENT.RENAME;
     this.system_message_type = SystemMessageType.CONVERSATION_RENAME;
-    this.name = '';
+    this.name = name;
     this.caption = this.user().isMe ? t('conversationRenameYou') : t('conversationRename');
   }
 }
