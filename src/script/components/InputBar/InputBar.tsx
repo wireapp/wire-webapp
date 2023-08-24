@@ -581,8 +581,6 @@ export const InputBar = ({
               <RichTextEditor
                 onSetup={lexical => {
                   editorRef.current = lexical;
-                  // autofocus the editor when first loaded
-                  lexical?.focus();
                 }}
                 editedMessage={editedMessage}
                 onCancelMessageEdit={() => cancelMessageEditing(true, true)}

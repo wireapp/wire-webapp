@@ -17,9 +17,63 @@
  *
  */
 
+import {useEffect} from 'react';
+
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 
-import {useTextAreaFocus} from 'Components/InputBar/hooks/useTextAreaFocus';
+import {
+  isArrowKey,
+  isEnterKey,
+  isFunctionKey,
+  isMetaKey,
+  isPageUpDownKey,
+  isPasteAction,
+  isSpaceKey,
+  isTabKey,
+} from 'Util/KeyboardUtil';
+
+const hasInputAlreadyFocused = () => {
+  return document.activeElement && ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName);
+};
+
+const useTextAreaFocus = (callback: () => void) => {
+  const handleFocusTextarea = (event: KeyboardEvent) => {
+    const detailViewModal = document.querySelector('#detail-view');
+
+    if (detailViewModal?.classList.contains('modal-show')) {
+      return;
+    }
+
+    const isPageupDownKeyPressed = isPageUpDownKey(event);
+
+    if (isPageupDownKeyPressed) {
+      (document.activeElement as HTMLElement).blur();
+    } else if (
+      !hasInputAlreadyFocused() &&
+      !isArrowKey(event) &&
+      !isTabKey(event) &&
+      !isEnterKey(event) &&
+      !isSpaceKey(event) &&
+      !isFunctionKey(event)
+    ) {
+      if (!isMetaKey(event) || isPasteAction(event)) {
+        callback();
+      }
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleFocusTextarea);
+
+    if (!hasInputAlreadyFocused()) {
+      // Focus on the first render if no other input is focused
+      setTimeout(callback);
+    }
+    return () => {
+      window.removeEventListener('keydown', handleFocusTextarea);
+    };
+  }, []);
+};
 
 /**
  * Will automatically focus the input field when the user types anywhere in the document
