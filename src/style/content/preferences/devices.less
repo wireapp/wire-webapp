@@ -18,9 +18,15 @@
  */
 
 .preferences-devices-model {
+  display: flex;
+  align-items: center;
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-semibold);
   line-height: var(--line-height-lg);
+
+  .conversation-badges {
+    margin-left: 4px;
+  }
 }
 
 .preferences-devices-model-name {
@@ -47,11 +53,12 @@
 .preferences-devices-card {
   display: flex;
   width: var(--preferences-width);
-  height: 72px;
   align-items: center;
   justify-content: space-between;
-  padding-top: 8px;
+
+  border-bottom: 1px solid @separator-color;
   cursor: pointer;
+  padding-block: 4px 8px;
 
   .focus-default;
 
@@ -61,29 +68,23 @@
     align-items: center;
     justify-content: space-between;
     fill: var(--background);
+
     &__delete {
       .button-reset-default;
       padding: 8px;
       .focus-default;
     }
+
     &__forward {
       margin-left: auto;
       .button-reset-default;
       .focus-default;
     }
   }
-
-  .preferences-devices-card-data {
-    display: flex;
-  }
-
-  .preferences-devices-card-icon {
-    margin: 8px 16px 0 0;
-  }
 }
 
-.preferences-devices-card + .preferences-devices-card {
-  border-top: 1px solid @separator-color;
+.preferences-devices-card-info {
+  max-width: 372px;
 }
 
 .preferences-devices-details {
@@ -106,12 +107,18 @@
 }
 
 .preferences-devices-id {
-  //font-size: @font-size-small;
-  //line-height: @line-height-xs;
+  display: grid;
+  font-size: var(--font-size-small);
+  grid-template-columns: auto 1fr;
+  line-height: var(--line-height-sm);
   text-transform: uppercase;
 
-  span:first-child {
-    //.label-bold;
+  .preferences-formatted-id {
+    overflow: hidden;
+
+    margin-left: 2px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 }
 
@@ -121,34 +128,36 @@
 
 .preferences-devices-fingerprint {
   max-width: 300px;
-  //height: 48px;
-  //font-family: monospace;
   line-height: @line-height-lg;
 
   .device-id-part {
     display: inline-block;
-    width: 24px;
+    width: 18px;
     margin-right: 12px;
     text-transform: uppercase;
-  }
 
-  .device-id-part:nth-child(8n) {
-    margin-right: 0;
+    &:nth-child(8n) {
+      margin-right: 0;
 
-    &::after {
-      display: block;
-      content: ' ';
+      &::after {
+        display: block;
+        content: ' ';
+      }
     }
+  }
+}
+
+.preferences-devices-verification-details {
+  display: flex;
+  align-items: center;
+
+  .conversation-badges {
+    margin-left: 4px;
   }
 }
 
 .preferences-devices-fingerprint-label {
   margin-top: 12px;
-  font-size: var(--font-size-small);
-  font-weight: var(--font-weight-semibold);
-  letter-spacing: 0.25px;
-  line-height: var(--line-height-md);
-  //margin-bottom: 8px;
 }
 
 .preferences-devices-session {

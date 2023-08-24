@@ -76,6 +76,7 @@ const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
       data-uie-name="preferences-devices-details"
     >
       <h2 className="preferences-titlebar">{t('preferencesDeviceDetails')}</h2>
+
       <div className="preferences-content">
         <fieldset className="preferences-section">
           <legend className="preferences-devices-details">
@@ -87,9 +88,10 @@ const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
               aria-label={t('accessibility.preferencesDeviceDetails.goBack')}
             />
           </legend>
-          <DetailedDevice device={device} fingerprint={fingerprint || ''} />
 
-          <div className="preferences-devices-verification slider">
+          <DetailedDevice device={device} fingerprint={fingerprint || ''} showVerificationStatus={false} />
+
+          <div className="participant-devices__verify slider">
             <input
               className="slider-input"
               type="checkbox"
@@ -101,22 +103,19 @@ const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
 
             <label className="button-label" htmlFor="preferences_device_verification" data-uie-name="do-verify">
               <span className="button-label__switch" />
-              <span className="button-label__text">{t('preferencesDevicesVerification')}</span>
+              <span className="button-label__text paragraph-body-3">{t('preferencesDevicesVerification')}</span>
             </label>
           </div>
 
-          <p className="preferences-detail">{t('preferencesDevicesFingerprintDetail', brandName)}</p>
+          <p className="paragraph-body-1">{t('preferencesDevicesFingerprintDetail', brandName)}</p>
         </fieldset>
 
         <section className="preferences-section">
-          <header className="preferences-header">
-            <hr className="preferences-separator" />
-          </header>
-        </section>
+          <p className="preferences-info preferences-reset-session paragraph-body-1">
+            {t('preferencesDevicesSessionDetail')}
+          </p>
 
-        <section className="preferences-section">
-          <p className="preferences-info">{t('preferencesDevicesSessionDetail')}</p>
-          <div className="preferences-devices-session" data-uie-name="preferences-device-details-session">
+          <div data-uie-name="preferences-device-details-session">
             {resetState === SessionResetState.RESET && (
               <Button
                 variant={ButtonVariant.TERTIARY}
@@ -128,9 +127,11 @@ const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
                 {t('preferencesDevicesSessionReset')}
               </Button>
             )}
+
             {resetState === SessionResetState.ONGOING && (
               <p className="preferences-devices-session-reset">{t('preferencesDevicesSessionOngoing')}</p>
             )}
+
             {resetState === SessionResetState.CONFIRMATION && (
               <p className="preferences-devices-session-confirmation accent-text">
                 {t('preferencesDevicesSessionConfirmation')}
@@ -139,9 +140,16 @@ const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
           </div>
         </section>
 
+        <section className="preferences-section">
+          <header className="preferences-header">
+            <hr className="preferences-separator" />
+          </header>
+        </section>
+
         {!device.isLegalHold() && (
           <section className="preferences-section">
-            <p className="preferences-info">{t('preferencesDevicesRemoveDetail')}</p>
+            <p className="preferences-info paragraph-body-1">{t('preferencesDevicesRemoveDetail')}</p>
+
             <Button
               variant={ButtonVariant.TERTIARY}
               type="button"

@@ -28,11 +28,10 @@ import {ProteusDeviceDetails} from './ProteusDeviceDetails';
 export interface DeviceProps {
   device: ClientEntity;
   fingerprint: string;
+  showVerificationStatus?: boolean;
 }
 
-const TMP_MLS_FINGERPRINT = '3dc87fff07c9296e3dc87fff07c9296e65687fff07c9296e3dc87fff07c9656f';
-
-export const DetailedDevice: React.FC<DeviceProps> = ({device, fingerprint}) => {
+export const DetailedDevice: React.FC<DeviceProps> = ({device, fingerprint, showVerificationStatus = true}) => {
   const isProteusVerified = true;
 
   return (
@@ -43,11 +42,16 @@ export const DetailedDevice: React.FC<DeviceProps> = ({device, fingerprint}) => 
         <Badges isProteusVerified={isProteusVerified} />
       </h3>
 
-      {/* MLS */}
-      <MLSDeviceDetails device={device} fingerprint={TMP_MLS_FINGERPRINT} />
+      {/* MLS - pass proper props */}
+      <MLSDeviceDetails />
 
       {/* Proteus */}
-      <ProteusDeviceDetails device={device} fingerprint={fingerprint} isProteusVerified={isProteusVerified} />
+      <ProteusDeviceDetails
+        device={device}
+        fingerprint={fingerprint}
+        isProteusVerified={isProteusVerified}
+        showVerificationStatus={showVerificationStatus}
+      />
     </>
   );
 };

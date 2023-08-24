@@ -1105,6 +1105,7 @@
   "preferencesDevicesFingerprint": "Key fingerprint",
   "preferencesDevicesFingerprintDetail": "{{brandName}} gives every device a unique fingerprint. Compare them and verify your devices and conversations.",
   "preferencesDevicesId": "ID: ",
+  "preferencesMLSThumbprint": "MLS Thumbprint: ",
   "preferencesDevicesRemove": "Remove Device",
   "preferencesDevicesRemoveCancel": "Cancel",
   "preferencesDevicesRemoveDetail": "Remove this device if you have stopped using it. You will be logged out of this device immediately.",

@@ -19,19 +19,23 @@
 
 import {splitFingerprint} from 'Util/StringUtil';
 
-import {type DeviceProps} from './DetailedDevice';
 import {FormattedId} from './FormattedId';
 
-interface MLSDeviceDetailsProps extends DeviceProps {}
+interface MLSDeviceDetailsProps {
+  fingerprint?: string;
+}
 
-export const MLSDeviceDetails = ({fingerprint}: MLSDeviceDetailsProps) => {
+// TODO: Replace with proper mls id
+const TMP_MLS_FINGERPRINT = '3dc87fff07c9296e3dc87fff07c9296e65687fff07c9296e3dc87fff07c9656f';
+
+export const MLSDeviceDetails = ({fingerprint = TMP_MLS_FINGERPRINT}: MLSDeviceDetailsProps) => {
   return (
-    <div>
-      <h4>MLS with Ed255519 Signature</h4>
+    <div className="mls-device-details">
+      <h4 className="paragraph-body-3">MLS with Ed255519 Signature</h4>
 
-      <p className="label preferences-label preferences-devices-fingerprint-label">MLS Thumbprint</p>
+      <p className="label-2 preferences-label preferences-devices-fingerprint-label">MLS Thumbprint</p>
 
-      <p className="preferences-devices-fingerprint" css={{width: '300px'}}>
+      <p className="preferences-devices-fingerprint" css={{width: '230px'}}>
         <FormattedId idSlices={splitFingerprint(fingerprint)} />
       </p>
     </div>

@@ -27,9 +27,15 @@ import {FormattedId} from './FormattedId';
 
 interface ProteusDeviceDetailsProps extends DeviceProps {
   isProteusVerified?: boolean;
+  showVerificationStatus?: boolean;
 }
 
-export const ProteusDeviceDetails = ({device, fingerprint, isProteusVerified = false}: ProteusDeviceDetailsProps) => {
+export const ProteusDeviceDetails = ({
+  device,
+  fingerprint,
+  isProteusVerified = false,
+  showVerificationStatus = true,
+}: ProteusDeviceDetailsProps) => {
   return (
     <div className="preferences-proteus-details">
       <h4>Proteus Device Details</h4>
@@ -37,7 +43,7 @@ export const ProteusDeviceDetails = ({device, fingerprint, isProteusVerified = f
       <div>
         <p className="label preferences-label preferences-devices-fingerprint-label">Proteus ID</p>
 
-        <p className="preferences-devices-fingerprint" css={{width: '300px'}}>
+        <p className="preferences-devices-fingerprint" css={{width: '230px'}}>
           <FormattedId idSlices={splitFingerprint(device.id)} />
         </p>
       </div>
@@ -57,7 +63,7 @@ export const ProteusDeviceDetails = ({device, fingerprint, isProteusVerified = f
         Proteus Key Fingerprint
       </h3>
 
-      <p className="preferences-devices-fingerprint" css={{width: '300px'}}>
+      <p className="preferences-devices-fingerprint" css={{width: '230px'}}>
         <FormattedId idSlices={splitFingerprint(fingerprint)} />
       </p>
 
@@ -66,15 +72,18 @@ export const ProteusDeviceDetails = ({device, fingerprint, isProteusVerified = f
         Verification Status
       </h3>
 
-      <p className="preferences-devices-fingerprint">
-        {isProteusVerified ? (
-          <>
-            Verified <Badges isProteusVerified />{' '}
-          </>
-        ) : (
-          'Not verified'
-        )}
-      </p>
+      {showVerificationStatus && (
+        <p className="preferences-devices-verification-details">
+          {isProteusVerified ? (
+            <>
+              <span>Verified</span>
+              <Badges isProteusVerified />
+            </>
+          ) : (
+            <span>Not verified</span>
+          )}
+        </p>
+      )}
     </div>
   );
 };

@@ -51,14 +51,15 @@ const DeviceCard: React.FC<DeviceCardProps> = ({
   const clickable = !!click;
   const isVerified = meta.isVerified;
   const showLegalHoldIcon = showIcon && deviceClass === ClientClassification.LEGAL_HOLD;
-  const showDesktopIcon = showIcon && deviceClass === ClientClassification.DESKTOP;
-  const showMobileIcon = showIcon && !showLegalHoldIcon && !showDesktopIcon;
 
   const clickOnDevice = () => {
     if (clickable) {
       click(clientEntity);
     }
   };
+
+  // TODO: Replace with proper mls id
+  const TMP_MLS_FINGERPRINT = '3dc87fff07c9296e3dc87fff07c9296e65687fff07c9296e3dc87fff07c9656f';
 
   return (
     <div
@@ -77,20 +78,29 @@ const DeviceCard: React.FC<DeviceCardProps> = ({
         />
       )}
 
-      {showDesktopIcon && <Icon.Desktop className="device-card__icon" data-uie-name="status-desktop-device" />}
-      {showMobileIcon && <Icon.Devices className="device-card__icon" data-uie-name="status-mobile-device" />}
+      {/*{showDesktopIcon && <Icon.Desktop className="device-card__icon" data-uie-name="status-desktop-device" />}*/}
+      {/*{showMobileIcon && <Icon.Devices className="device-card__icon" data-uie-name="status-mobile-device" />}*/}
 
       <div className="device-card__info" data-uie-name="device-card-info" data-uie-value={label}>
         <div className="device-card__name">
           <span className="device-card__model">{name}</span>
 
           {showVerified && <Badges isProteusVerified={!!isVerified && isVerified()} />}
+          <Badges isMLSVerified isProteusVerified />
         </div>
 
-        <p className="text-background label-xs">
+        <p className="text-background device-card__id">
+          <span>{t('preferencesMLSThumbprint')}</span>
+
+          <span data-uie-name="device-id" className="formatted-id">
+            <DeviceId deviceId={TMP_MLS_FINGERPRINT} />
+          </span>
+        </p>
+
+        <p className="text-background device-card__id">
           <span>{t('preferencesDevicesId')}</span>
 
-          <span data-uie-name="device-id">
+          <span data-uie-name="device-id" className="formatted-id">
             <DeviceId deviceId={id} />
           </span>
         </p>

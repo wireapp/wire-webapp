@@ -37,11 +37,11 @@ device-card,
 
   .disclose-icon {
     display: flex;
-    height: 8px;
+    height: 16px;
     align-self: center;
 
     path {
-      fill: var(--background-fade-40);
+      fill: var(--gray-90);
     }
   }
 
@@ -52,8 +52,6 @@ device-card,
   }
 
   &__name {
-    .label-xs;
-
     display: flex;
     align-items: center;
 
@@ -64,7 +62,9 @@ device-card,
 
   &__label,
   &__model {
+    font-size: var(--font-size-medium);
     font-weight: @font-weight-bold;
+    line-height: var(--line-height-md);
   }
 
   .verified-icon,
@@ -83,6 +83,22 @@ device-card,
 .device-card__legal_hold_icon {
   min-width: 16px;
   min-height: 16px;
+}
+
+.device-card__id {
+  display: grid;
+  font-size: var(--font-size-small);
+  grid-template-columns: auto 1fr;
+  line-height: var(--line-height-sm);
+  text-transform: uppercase;
+
+  .formatted-id {
+    overflow: hidden;
+
+    margin-left: 2px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }
 
 .device-id-part {
