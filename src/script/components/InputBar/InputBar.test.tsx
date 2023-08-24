@@ -72,7 +72,7 @@ describe('InputBar', () => {
 
   const getDefaultProps = () => ({
     assetRepository: new AssetRepository(new AssetService()),
-    conversationEntity: new Conversation(createUuid()),
+    conversation: new Conversation(createUuid()),
     conversationRepository: {
       sendTypingStart: jest.fn(),
       sendTypingStop: jest.fn(),
@@ -108,6 +108,7 @@ describe('InputBar', () => {
     const props = getDefaultProps();
     const {getByTestId} = render(withTheme(<InputBar {...props} />));
 
+    await new Promise(resolve => setTimeout(resolve));
     const inputBar = getByTestId('input-message');
 
     expect(inputBar).not.toBeNull();
@@ -153,6 +154,7 @@ describe('InputBar', () => {
     });
     expect(propertiesRepository.typingIndicatorMode()).not.toBe(defaultValue);
 
+    await new Promise(resolve => setTimeout(resolve));
     await act(async () => {
       fireEvent.input(inputBar, {data: testMessage});
     });
