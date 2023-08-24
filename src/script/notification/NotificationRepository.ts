@@ -108,7 +108,8 @@ export class NotificationRepository {
       BODY_LENGTH: 80,
       ICON_URL: '/image/logo/notification.png',
       TIMEOUT: TIME_IN_MILLIS.SECOND * 5,
-      TITLE_LENGTH: 38,
+      TITLE_LENGTH: 17,
+      TITLE_MAX_LENGTH: 38,
     };
   }
 
@@ -617,16 +618,22 @@ export class NotificationRepository {
    */
   private createTitle(messageEntity: Message, conversationEntity?: Conversation): string {
     const conversationName = conversationEntity && conversationEntity.display_name();
+    const truncatedConversationName = truncate(
+      conversationName ?? '',
+      NotificationRepository.CONFIG.TITLE_LENGTH,
+      false,
+    );
     const userEntity = messageEntity.user();
+    const truncatedName = truncate(userEntity.name(), NotificationRepository.CONFIG.TITLE_LENGTH, false);
 
     let title;
     if (conversationName) {
       title = conversationEntity.isGroup()
-        ? t('notificationTitleGroup', {conversation: conversationName, user: userEntity.name()}, {}, true)
+        ? t('notificationTitleGroup', {conversation: truncatedConversationName, user: truncatedName}, {}, true)
         : conversationName;
     }
 
-    return truncate(title || userEntity.name(), NotificationRepository.CONFIG.TITLE_LENGTH, false);
+    return truncate(title ?? truncatedName, NotificationRepository.CONFIG.TITLE_MAX_LENGTH, false);
   }
 
   /**
@@ -636,7 +643,7 @@ export class NotificationRepository {
    */
   private createTitleObfuscated(): string {
     const obfuscatedTitle = t('notificationObfuscatedTitle');
-    return truncate(obfuscatedTitle, NotificationRepository.CONFIG.TITLE_LENGTH, false);
+    return truncate(obfuscatedTitle, NotificationRepository.CONFIG.TITLE_MAX_LENGTH, false);
   }
 
   /**

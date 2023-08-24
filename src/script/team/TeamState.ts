@@ -36,7 +36,7 @@ export class TeamState {
   public readonly memberRoles: ko.Observable<any>;
   public readonly supportsLegalHold: ko.Observable<boolean>;
   public readonly teamName: ko.PureComputed<string>;
-  public readonly teamFeatures: ko.Observable<FeatureList>;
+  public readonly teamFeatures: ko.Observable<FeatureList | undefined>;
   public readonly classifiedDomains: ko.PureComputed<string[] | undefined>;
   public readonly isConferenceCallingEnabled: ko.PureComputed<boolean>;
   public readonly isFileSharingSendingEnabled: ko.PureComputed<boolean>;
