@@ -168,7 +168,7 @@ describe('ConversationService', () => {
     });
   });
 
-  describe('"handleEpochMismatch"', () => {
+  describe('handleConversationsEpochMismatch', () => {
     beforeEach(() => {
       jest.clearAllMocks();
     });
@@ -183,10 +183,9 @@ describe('ConversationService', () => {
     };
 
     it('re-joins multiple not-established conversations', async () => {
-      const [conversationService, {apiClient, mlsService}] = buildConversationService();
+      const [conversationService, {apiClient}] = buildConversationService();
 
       const remoteEpoch = 1;
-      const localEpoch = 0;
 
       const mlsConversation1 = createConversation(remoteEpoch, 'conversation1');
       const mlsConversation2 = createConversation(remoteEpoch, 'conversation2');
@@ -195,7 +194,6 @@ describe('ConversationService', () => {
       jest.spyOn(apiClient.api.conversation, 'getConversationList').mockResolvedValueOnce({found: mockedDBResponse});
 
       jest.spyOn(conversationService, 'isMLSConversationEstablished').mockResolvedValue(false);
-      jest.spyOn(mlsService, 'getEpoch').mockResolvedValue(localEpoch);
 
       await conversationService.handleConversationsEpochMismatch();
       expect(conversationService.joinByExternalCommit).toHaveBeenCalledWith(mlsConversation1.qualified_id);
