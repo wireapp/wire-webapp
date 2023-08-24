@@ -18,16 +18,21 @@
  */
 
 import {act, render} from '@testing-library/react';
+import {AddUsersFailureReasons} from '@wireapp/core/lib/conversation';
 import ko from 'knockout';
 
+import en from 'I18n/en-US.json';
 import {withTheme, generateQualifiedIds} from 'src/script/auth/util/test/TestUtil';
 import {FailedToAddUsersMessage as FailedToAddUsersMessageEntity} from 'src/script/entity/message/FailedToAddUsersMessage';
 import {User} from 'src/script/entity/User';
 import {UserRepository} from 'src/script/user/UserRepository';
 import {UserState} from 'src/script/user/UserState';
 import {TestFactory} from 'test/helper/TestFactory';
+import {setStrings} from 'Util/LocalizerUtil';
 
 import {FailedToAddUsersMessage} from './FailedToAddUsersMessage';
+
+setStrings({en});
 
 const createFailedToAddUsersMessage = (partialFailedToAddUsersMessage: Partial<FailedToAddUsersMessageEntity>) => {
   const failedToAddUsersMessage: Partial<FailedToAddUsersMessageEntity> = {
@@ -81,6 +86,7 @@ describe('FailedToAddUsersMessage', () => {
 
     const message = createFailedToAddUsersMessage({
       qualifiedIds: [qualifiedId1, qualifiedId2],
+      reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS,
     });
 
     const {getByTestId} = render(
@@ -100,6 +106,7 @@ describe('FailedToAddUsersMessage', () => {
 
     const message = createFailedToAddUsersMessage({
       qualifiedIds: [qualifiedId1, qualifiedId2],
+      reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS,
     });
 
     const {getByTestId} = render(
@@ -129,6 +136,7 @@ describe('FailedToAddUsersMessage', () => {
 
     const message = createFailedToAddUsersMessage({
       qualifiedIds: [qualifiedId1, qualifiedId2],
+      reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS,
     });
 
     const {getByTestId, getAllByTestId} = render(
@@ -147,5 +155,37 @@ describe('FailedToAddUsersMessage', () => {
     const elementMessageFailedToAddDetails = getAllByTestId('multi-user-not-added-details');
     expect(elementMessageFailedToAddDetails[0].getAttribute('data-uie-value')).toEqual(qualifiedId1.domain);
     expect(elementMessageFailedToAddDetails[1].getAttribute('data-uie-value')).toEqual(qualifiedId2.domain);
+  });
+
+  it('shows details of failed to add users from non federating backends', async () => {
+    const [qualifiedId1] = generateQualifiedIds(1, 'test.domain');
+    const [qualifiedId2] = generateQualifiedIds(1, 'test-2.domain');
+
+    const user1 = new User(qualifiedId1.id, qualifiedId1.domain);
+    const user2 = new User(qualifiedId2.id, qualifiedId2.domain);
+    userState.users([user1, user2]);
+
+    const message = createFailedToAddUsersMessage({
+      qualifiedIds: [qualifiedId1, qualifiedId2],
+      reason: AddUsersFailureReasons.NON_FEDERATING_BACKENDS,
+    });
+
+    const {getByTestId, getAllByTestId} = render(
+      withTheme(<FailedToAddUsersMessage isMessageFocused message={message} userState={userState} />),
+    );
+
+    const elementMessageFailedToAdd = getByTestId('element-message-failed-to-add-users');
+    expect(elementMessageFailedToAdd.getAttribute('data-uie-value')).toEqual('multi-users-not-added');
+
+    const toggleButton = getByTestId('toggle-failed-to-add-users');
+
+    act(() => {
+      toggleButton.click();
+    });
+
+    const elementMessageFailedToAddDetails = getAllByTestId('multi-user-not-added-details');
+    expect(elementMessageFailedToAddDetails[0].textContent).toContain(
+      'could not be added to the group as their backends do not federate with each other',
+    );
   });
 });

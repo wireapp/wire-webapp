@@ -52,6 +52,7 @@ import {ClientEvent} from 'src/script/event/Client';
 import {EventRepository} from 'src/script/event/EventRepository';
 import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';
 import {StorageSchemata} from 'src/script/storage/StorageSchemata';
+import {generateConversation as _generateConversation} from 'test/helper/ConversationGenerator';
 import {escapeRegex} from 'Util/SanitizationUtil';
 import {createUuid} from 'Util/uuid';
 
@@ -65,32 +66,11 @@ import {LegacyEventRecord, StorageService} from '../storage';
 
 jest.deepUnmock('axios');
 
-const _generateConversation = (
-  conversation_type = CONVERSATION_TYPE.REGULAR,
-  connection_status = ConnectionStatus.ACCEPTED,
-  conversationProtocol = ConversationProtocol.PROTEUS,
-  domain = '',
-) => {
-  const conversation = new Conversation(createUuid(), domain, conversationProtocol);
-  conversation.type(conversation_type);
-
-  const connectionEntity = new ConnectionEntity();
-  connectionEntity.conversationId = conversation.qualifiedId;
-  connectionEntity.status(connection_status);
-  conversation.connection(connectionEntity);
-
-  if (conversationProtocol === ConversationProtocol.MLS) {
-    conversation.groupId = 'groupId';
-  }
-
-  return conversation;
-};
-
 describe('ConversationRepository', () => {
   const testFactory = new TestFactory();
 
-  let conversation_et = _generateConversation(CONVERSATION_TYPE.REGULAR);
-  const selfConversation = _generateConversation(CONVERSATION_TYPE.SELF);
+  let conversation_et = _generateConversation();
+  const selfConversation = _generateConversation({type: CONVERSATION_TYPE.SELF});
   let self_user_et;
   let server: sinon.SinonFakeServer;
   let storage_service: StorageService;
@@ -149,7 +129,7 @@ describe('ConversationRepository', () => {
 
   describe('filtered_conversations', () => {
     it('should not contain the self conversation', () => {
-      const self_conversation_et = _generateConversation(CONVERSATION_TYPE.SELF);
+      const self_conversation_et = _generateConversation({type: CONVERSATION_TYPE.SELF});
 
       return testFactory.conversation_repository['saveConversation'](self_conversation_et).then(() => {
         expect(
@@ -169,7 +149,10 @@ describe('ConversationRepository', () => {
     });
 
     it('should not contain a blocked conversations', () => {
-      const blocked_conversation_et = _generateConversation(CONVERSATION_TYPE.ONE_TO_ONE, ConnectionStatus.BLOCKED);
+      const blocked_conversation_et = _generateConversation({
+        type: CONVERSATION_TYPE.ONE_TO_ONE,
+        status: ConnectionStatus.BLOCKED,
+      });
 
       return testFactory.conversation_repository['saveConversation'](blocked_conversation_et).then(() => {
         expect(
@@ -189,7 +172,10 @@ describe('ConversationRepository', () => {
     });
 
     it('should not contain the conversation for a cancelled connection request', () => {
-      const cancelled_conversation_et = _generateConversation(CONVERSATION_TYPE.ONE_TO_ONE, ConnectionStatus.CANCELLED);
+      const cancelled_conversation_et = _generateConversation({
+        type: CONVERSATION_TYPE.ONE_TO_ONE,
+        status: ConnectionStatus.CANCELLED,
+      });
 
       return testFactory.conversation_repository['saveConversation'](cancelled_conversation_et).then(() => {
         expect(
@@ -209,7 +195,10 @@ describe('ConversationRepository', () => {
     });
 
     it('should not contain the conversation for a pending connection request', () => {
-      const pending_conversation_et = _generateConversation(CONVERSATION_TYPE.ONE_TO_ONE, ConnectionStatus.PENDING);
+      const pending_conversation_et = _generateConversation({
+        type: CONVERSATION_TYPE.ONE_TO_ONE,
+        status: ConnectionStatus.PENDING,
+      });
 
       return testFactory.conversation_repository['saveConversation'](pending_conversation_et).then(() => {
         expect(
@@ -283,23 +272,23 @@ describe('ConversationRepository', () => {
 
   describe('getGroupsByName', () => {
     beforeEach(() => {
-      const group_a = _generateConversation(CONVERSATION_TYPE.REGULAR);
+      const group_a = _generateConversation();
       group_a.name('Web Dudes');
 
-      const group_b = _generateConversation(CONVERSATION_TYPE.REGULAR);
+      const group_b = _generateConversation();
       group_b.name('René, Benny, Gregor, Lipis');
 
-      const group_c = _generateConversation(CONVERSATION_TYPE.REGULAR);
+      const group_c = _generateConversation();
       self_user_et = new User('id', null);
       self_user_et.name('John');
       group_c.participating_user_ets.push(self_user_et);
 
-      const group_cleared = _generateConversation(CONVERSATION_TYPE.REGULAR);
+      const group_cleared = _generateConversation();
       group_cleared.name('Cleared');
       group_cleared.last_event_timestamp(Date.now() - 1000);
       group_cleared.setTimestamp(Date.now(), Conversation.TIMESTAMP_TYPE.CLEARED);
 
-      const group_removed = _generateConversation(CONVERSATION_TYPE.REGULAR);
+      const group_removed = _generateConversation();
       group_removed.name('Removed');
       group_removed.last_event_timestamp(Date.now() - 1000);
       group_removed.setTimestamp(Date.now(), Conversation.TIMESTAMP_TYPE.CLEARED);
@@ -462,7 +451,7 @@ describe('ConversationRepository', () => {
   describe('handleConversationEvent', () => {
     it('detects events send by a user not in the conversation', () => {
       const selfUser = generateUser();
-      const conversationEntity = _generateConversation(CONVERSATION_TYPE.REGULAR);
+      const conversationEntity = _generateConversation();
       const event = {
         conversation: conversationEntity.id,
         data: {},
@@ -654,7 +643,6 @@ describe('ConversationRepository', () => {
         createEvent = {
           conversation: conversationId,
           data: {
-            failed_to_add: [],
             access: [CONVERSATION_ACCESS.INVITE],
             access_role: CONVERSATION_LEGACY_ACCESS_ROLE.ACTIVATED,
             access_role_v2: [],
@@ -769,12 +757,11 @@ describe('ConversationRepository', () => {
         const mockSelfClientId = 'self-client-id';
         const selfUser = generateUser({id: createUuid(), domain: mockDomain});
 
-        const conversationEntity = _generateConversation(
-          CONVERSATION_TYPE.REGULAR,
-          undefined,
-          ConversationProtocol.MLS,
-          mockDomain,
-        );
+        const conversationEntity = _generateConversation({
+          protocol: ConversationProtocol.MLS,
+          id: {domain: mockDomain, id: 'test-id'},
+        });
+
         testFactory.conversation_repository['saveConversation'](conversationEntity);
 
         const memberJoinEvent = {
@@ -829,7 +816,7 @@ describe('ConversationRepository', () => {
       const selfUser = generateUser();
 
       beforeEach(() => {
-        conversation_et = _generateConversation(CONVERSATION_TYPE.REGULAR);
+        conversation_et = _generateConversation();
         return testFactory.conversation_repository['saveConversation'](conversation_et).then(() => {
           message_et = new Message(createUuid());
           message_et.from = selfUser.id;
@@ -961,7 +948,7 @@ describe('ConversationRepository', () => {
       const selfUser = generateUser();
 
       beforeEach(() => {
-        conversation_et = _generateConversation(CONVERSATION_TYPE.REGULAR);
+        conversation_et = _generateConversation();
 
         return testFactory.conversation_repository['saveConversation'](conversation_et).then(() => {
           const messageToHideEt = new Message(createUuid());
@@ -1162,18 +1149,18 @@ describe('ConversationRepository', () => {
       bob.devices.push(bobs_computer);
       bob.devices.push(bobs_phone);
 
-      const dudes = _generateConversation(CONVERSATION_TYPE.REGULAR);
+      const dudes = _generateConversation();
       dudes.name('Web Dudes');
       dudes.participating_user_ets.push(bob);
       dudes.participating_user_ets.push(john);
 
-      const gals = _generateConversation(CONVERSATION_TYPE.REGULAR);
+      const gals = _generateConversation();
       gals.name('Web Gals');
       gals.participating_user_ets.push(anne);
       gals.participating_user_ets.push(jane);
       gals.participating_user_ets.push(lara);
 
-      const mixed_group = _generateConversation(CONVERSATION_TYPE.REGULAR);
+      const mixed_group = _generateConversation();
       mixed_group.name('Web Dudes & Gals');
       mixed_group.participating_user_ets.push(anne);
       mixed_group.participating_user_ets.push(bob);
@@ -1221,7 +1208,7 @@ describe('ConversationRepository', () => {
       testFactory.propertyRepository.receiptMode(preferenceMode);
 
       // Set the opposite receipt mode on conversation-level
-      const conversationEntity = _generateConversation(CONVERSATION_TYPE.ONE_TO_ONE);
+      const conversationEntity = _generateConversation({type: CONVERSATION_TYPE.ONE_TO_ONE});
       conversationEntity.receiptMode(RECEIPT_MODE.OFF);
 
       // Verify that the account-level preference wins
@@ -1236,7 +1223,7 @@ describe('ConversationRepository', () => {
       testFactory.propertyRepository.receiptMode(preferenceMode);
 
       // Set the opposite receipt mode on conversation-level
-      const conversationEntity = _generateConversation(CONVERSATION_TYPE.REGULAR);
+      const conversationEntity = _generateConversation();
       conversationEntity.receiptMode(RECEIPT_MODE.OFF);
 
       // Verify that the conversation-level preference wins
@@ -1248,8 +1235,8 @@ describe('ConversationRepository', () => {
 
   describe('checkForDeletedConversations', () => {
     it('removes conversations that have been deleted on the backend', async () => {
-      const existingGroup = _generateConversation(CONVERSATION_TYPE.REGULAR);
-      const deletedGroup = _generateConversation(CONVERSATION_TYPE.REGULAR);
+      const existingGroup = _generateConversation();
+      const deletedGroup = _generateConversation();
       const conversationRepository = testFactory.conversation_repository!;
 
       spyOn(testFactory.conversation_service, 'getConversationById').and.callFake(({id}) => {
@@ -1429,7 +1416,7 @@ describe('ConversationRepository', () => {
       spyOn(testFactory.user_repository!, 'refreshUsers').and.callFake(() => {
         unavailableUsers.map(user => {
           user.id = createUuid();
-          user.name(faker.name.fullName());
+          user.name(faker.person.fullName());
         });
       });
 
@@ -1466,11 +1453,11 @@ describe('ConversationRepository', () => {
       spyOn(testFactory.user_repository!, 'refreshUsers').and.callFake(() => {
         unavailableUsers1.map(user => {
           user.id = createUuid();
-          user.name(faker.name.fullName());
+          user.name(faker.person.fullName());
         });
         unavailableUsers2.map(user => {
           user.id = createUuid();
-          user.name(faker.name.fullName());
+          user.name(faker.person.fullName());
         });
       });
 

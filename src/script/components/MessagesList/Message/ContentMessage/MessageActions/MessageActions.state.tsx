@@ -17,26 +17,18 @@
  *
  */
 
-import {getStorage} from 'Util/localStorage';
+import {create} from 'zustand';
 
-import {MLSConversationState} from './mlsConversationState';
-
-const storageKey = 'mlsConversationsState';
-const storage = getStorage();
-
-export const loadState = (): MLSConversationState => {
-  const storedState = storage?.getItem(storageKey);
-  if (!storedState) {
-    return {
-      established: new Set(),
-    };
-  }
-  const parsedState = JSON.parse(storedState);
-  return {
-    established: new Set(parsedState.established),
-  };
+type MessageActionsState = {
+  isMenuOpen: boolean;
+  handleMenuOpen: (isMenuOpen: boolean) => void;
+  getMenuState: () => boolean;
 };
 
-export const saveState = ({established}: MLSConversationState) => {
-  storage?.setItem(storageKey, JSON.stringify({established: [...established]}));
-};
+const useMessageActionsState = create<MessageActionsState>((set, get) => ({
+  isMenuOpen: false,
+  handleMenuOpen: isMenuOpen => set(state => ({...state, isMenuOpen: isMenuOpen})),
+  getMenuState: () => get().isMenuOpen,
+}));
+
+export {useMessageActionsState};

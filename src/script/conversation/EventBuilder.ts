@@ -20,6 +20,8 @@
 import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data/';
 import {ConversationOtrMessageAddEvent, CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
+import {AddUsersFailureReasons} from '@wireapp/core/lib/conversation';
+import {ReactionType} from '@wireapp/core/lib/conversation/ReactionType';
 import {DecryptionError} from '@wireapp/core/lib/errors/DecryptionError';
 
 import type {REASON as AVS_REASON} from '@wireapp/avs';
@@ -29,7 +31,6 @@ import {createUuid} from 'Util/uuid';
 
 import {CALL_MESSAGE_TYPE} from '../calling/enum/CallMessageType';
 import type {Conversation} from '../entity/Conversation';
-import {ReactionType} from '../entity/message/ContentMessage';
 import type {Message} from '../entity/message/Message';
 import type {User} from '../entity/User';
 import {CALL, ClientEvent, CONVERSATION} from '../event/Client';
@@ -97,6 +98,9 @@ export type DegradedMessageEvent = ConversationEvent<DegradedMessageEventData> &
 export type DeleteEvent = ConversationEvent<{deleted_time: number; message_id: string; time: string}> & {
   type: CONVERSATION.MESSAGE_DELETE;
 };
+export type FederationStopEvent = ConversationEvent<{domains: string[]}> & {
+  type: CONVERSATION.FEDERATION_STOP;
+};
 export type GroupCreationEventData = {
   allTeamMembers: boolean;
   name: string;
@@ -136,6 +140,7 @@ export type MessageAddEvent = Omit<
   type: CONVERSATION.MESSAGE_ADD;
 };
 export type MissedEvent = BaseEvent & {id: string; type: CONVERSATION.MISSED_MESSAGES};
+export type MLSConversationRecoveredEvent = BaseEvent & {id: string; type: CONVERSATION.MLS_CONVERSATION_RECOVERED};
 export type OneToOneCreationEvent = ConversationEvent<{userIds: QualifiedId[]}> & {
   type: CONVERSATION.ONE2ONE_CREATION;
 };
@@ -189,7 +194,10 @@ export type FileTypeRestrictedEvent = ConversationEvent<{fileExt: string; isInco
 export type CallingTimeoutEvent = ConversationEvent<{reason: AVS_REASON.NOONE_JOINED | AVS_REASON.EVERYONE_LEFT}> & {
   type: CONVERSATION.CALL_TIME_OUT;
 };
-export type FailedToAddUsersMessageEvent = ConversationEvent<{qualifiedIds: QualifiedId[]}> & {
+export type FailedToAddUsersMessageEvent = ConversationEvent<{
+  qualifiedIds: QualifiedId[];
+  reason: AddUsersFailureReasons;
+}> & {
   type: CONVERSATION.FAILED_TO_ADD_USERS;
 };
 
@@ -206,6 +214,7 @@ export type ClientConversationEvent =
   | ErrorEvent
   | CompositeMessageAddEvent
   | ConfirmationEvent
+  | FederationStopEvent
   | DeleteEvent
   | DeleteEverywhereEvent
   | DegradedMessageEvent
@@ -227,6 +236,7 @@ export type ClientConversationEvent =
   | FailedToAddUsersMessageEvent
   | UnableToDecryptEvent
   | MissedEvent
+  | MLSConversationRecoveredEvent
   | LocationEvent
   | VoiceChannelActivateEvent
   | VerificationEvent;
@@ -301,11 +311,13 @@ export const EventBuilder = {
     qualifiedIds: QualifiedId[],
     conversation: Conversation,
     userId: string,
+    reason: AddUsersFailureReasons,
   ): FailedToAddUsersMessageEvent {
     return {
       ...buildQualifiedId(conversation),
       data: {
         qualifiedIds,
+        reason,
       },
       from: userId,
       id: createUuid(),
@@ -479,6 +491,24 @@ export const EventBuilder = {
     };
   },
 
+  buildFederationStop(
+    conversationEntity: Conversation,
+    selfUser: User,
+    domains: string[],
+    currentTimestamp: number,
+  ): FederationStopEvent {
+    return {
+      ...buildQualifiedId(conversationEntity),
+      data: {
+        domains,
+      },
+      id: createUuid(),
+      from: selfUser.id,
+      time: conversationEntity.getNextIsoDate(currentTimestamp),
+      type: CONVERSATION.FEDERATION_STOP,
+    };
+  },
+
   buildMessageAdd(conversationEntity: Conversation, currentTimestamp: number, senderId: string): MessageAddEvent {
     return {
       ...buildQualifiedId(conversationEntity),
@@ -500,6 +530,19 @@ export const EventBuilder = {
       id: createUuid(),
       time: conversationEntity.getNextIsoDate(currentTimestamp),
       type: ClientEvent.CONVERSATION.MISSED_MESSAGES,
+    };
+  },
+
+  buildMLSConversationRecovered(
+    conversationEntity: Conversation,
+    currentTimestamp: number,
+  ): MLSConversationRecoveredEvent {
+    return {
+      ...buildQualifiedId(conversationEntity),
+      from: conversationEntity.selfUser().id,
+      id: createUuid(),
+      time: conversationEntity.getNextIsoDate(currentTimestamp),
+      type: ClientEvent.CONVERSATION.MLS_CONVERSATION_RECOVERED,
     };
   },
 

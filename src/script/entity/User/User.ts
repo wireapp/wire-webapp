@@ -17,6 +17,7 @@
  *
  */
 
+import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
@@ -241,6 +242,10 @@ export class User {
       return '';
     }
     return this.isFederated ? `@${this.username()}@${this.domain}` : `@${this.username()}`;
+  }
+
+  markConnectionAsUnknown() {
+    this.connection().status(ConnectionStatus.UNKNOWN);
   }
 
   addClient(new_client_et: ClientEntity): boolean {

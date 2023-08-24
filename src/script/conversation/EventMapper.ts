@@ -32,6 +32,7 @@ import {
   TeamMemberLeaveEvent,
   ErrorEvent,
   ClientConversationEvent,
+  FederationStopEvent,
 } from './EventBuilder';
 
 import {AssetRemoteData} from '../assets/AssetRemoteData';
@@ -48,6 +49,7 @@ import {ContentMessage} from '../entity/message/ContentMessage';
 import {DecryptErrorMessage} from '../entity/message/DecryptErrorMessage';
 import {DeleteMessage} from '../entity/message/DeleteMessage';
 import {FailedToAddUsersMessage} from '../entity/message/FailedToAddUsersMessage';
+import {FederationStopMessage} from '../entity/message/FederationStopMessage';
 import {FileAsset} from '../entity/message/FileAsset';
 import {FileTypeRestrictedMessage} from '../entity/message/FileTypeRestrictedMessage';
 import {LegalHoldMessage} from '../entity/message/LegalHoldMessage';
@@ -58,6 +60,7 @@ import {MemberMessage} from '../entity/message/MemberMessage';
 import type {Message} from '../entity/message/Message';
 import {MessageTimerUpdateMessage} from '../entity/message/MessageTimerUpdateMessage';
 import {MissedMessage} from '../entity/message/MissedMessage';
+import {MLSConversationRecoveredMessage} from '../entity/message/MLSConversationRecoveredMessage';
 import {PingMessage} from '../entity/message/PingMessage';
 import {ReceiptModeUpdateMessage} from '../entity/message/ReceiptModeUpdateMessage';
 import {RenameMessage} from '../entity/message/RenameMessage';
@@ -295,6 +298,11 @@ export class EventMapper {
         break;
       }
 
+      case ClientEvent.CONVERSATION.FEDERATION_STOP: {
+        messageEntity = this._mapEventFederationStop(event);
+        break;
+      }
+
       case ClientEvent.CONVERSATION.LEGAL_HOLD_UPDATE: {
         messageEntity = this._mapEventLegalHoldUpdate(event);
         break;
@@ -313,6 +321,11 @@ export class EventMapper {
 
       case ClientEvent.CONVERSATION.MISSED_MESSAGES: {
         messageEntity = this._mapEventMissedMessages();
+        break;
+      }
+
+      case ClientEvent.CONVERSATION.MLS_CONVERSATION_RECOVERED: {
+        messageEntity = this._mapEventMLSConversationRecovered();
         break;
       }
 
@@ -484,7 +497,11 @@ export class EventMapper {
   }
 
   _mapEventFailedToAddUsers({data, time}: LegacyEventRecord) {
-    return new FailedToAddUsersMessage(data.qualifiedIds, parseInt(time, 10));
+    return new FailedToAddUsersMessage(data.qualifiedIds, data.reason, parseInt(time, 10));
+  }
+
+  _mapEventFederationStop({data, time}: FederationStopEvent) {
+    return new FederationStopMessage(data.domains, parseInt(time, 10));
   }
 
   _mapEventLegalHoldUpdate({data, timestamp}: LegacyEventRecord) {
@@ -613,6 +630,13 @@ export class EventMapper {
    */
   private _mapEventMissedMessages(): MissedMessage {
     return new MissedMessage();
+  }
+
+  /**
+   * Maps JSON data of local MLS conversation recovered event to message entity.
+   */
+  private _mapEventMLSConversationRecovered(): MissedMessage {
+    return new MLSConversationRecoveredMessage();
   }
 
   /**

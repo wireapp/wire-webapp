@@ -50,7 +50,6 @@ import {MLSConversation} from './ConversationSelectors';
 import type {Conversation as ConversationEntity} from '../entity/Conversation';
 import type {EventService} from '../event/EventService';
 import {MessageCategory} from '../message/MessageCategory';
-import {useMLSConversationState} from '../mls';
 import {search as fullTextSearch} from '../search/FullTextSearch';
 import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
@@ -70,6 +69,16 @@ export class ConversationService {
   ) {
     this.eventService = eventService;
     this.logger = getLogger('ConversationService');
+  }
+
+  private get coreConversationService() {
+    const conversationService = this.core.service?.conversation;
+
+    if (!conversationService) {
+      throw new Error('Conversation service not available');
+    }
+
+    return conversationService;
   }
 
   //##############################################################################
@@ -407,7 +416,18 @@ export class ConversationService {
    */
   async wipeMLSConversation(mlsConversation: MLSConversation) {
     const {groupId} = mlsConversation;
-    await this.core.service!.conversation.wipeMLSConversation(groupId);
-    return useMLSConversationState.getState().wipeConversationState(groupId);
+    return this.coreConversationService.wipeMLSConversation(groupId);
+  }
+
+  public addMLSConversationRecoveredListener(onRecovered: (conversationId: QualifiedId) => void) {
+    this.coreConversationService.on('MLSConversationRecovered', ({conversationId}) => onRecovered(conversationId));
+  }
+
+  /**
+   * Checks if MLS conversation is established.
+   * @param groupId id of the MLS group
+   */
+  async isMLSConversationEstablished(groupId: string): Promise<boolean> {
+    return this.coreConversationService.isMLSConversationEstablished(groupId);
   }
 }
