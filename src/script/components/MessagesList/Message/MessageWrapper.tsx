@@ -45,7 +45,7 @@ import {LegalHoldMessage} from './LegalHoldMessage';
 import {MemberMessage} from './MemberMessage';
 import {MissedMessage} from './MissedMessage';
 import {PingMessage} from './PingMessage';
-import {SystemMessage} from './SystemMessage/SystemMessage';
+import {SystemMessage} from './SystemMessage';
 import {VerificationMessage} from './VerificationMessage';
 
 import {AssetRepository} from '../../../assets/AssetRepository';
