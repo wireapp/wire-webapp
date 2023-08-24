@@ -50,6 +50,9 @@ const errorMessageType = {
   [AddUsersFailureReasons.UNREACHABLE_BACKENDS]: 'OfflineBackend',
 } as const;
 
+// Mobile platforms are not using the full specs yet, this flag allows to switch to MVP specs if product decides to
+const useMvpString = false;
+
 const config = Config.getConfig();
 
 interface MessageDetailsProps {
@@ -68,14 +71,22 @@ const MessageDetails: FC<MessageDetailsProps> = ({users, children, message, doma
       <span
         css={warning}
         dangerouslySetInnerHTML={{
-          __html: t(`failedToAddParticipantsPluralDetails${errorMessageType[message.reason]}`, {
-            name: users[0].name(),
-            names: users
-              .slice(1)
-              .map(user => user.name())
-              .join(', '),
-            domain,
-          }),
+          __html: useMvpString
+            ? t(`failedToAddParticipantsPluralDetailsMvp`, {
+                name: users[0].name(),
+                names: users
+                  .slice(1)
+                  .map(user => user.name())
+                  .join(', '),
+              })
+            : t(`failedToAddParticipantsPluralDetails${errorMessageType[message.reason]}`, {
+                name: users[0].name(),
+                names: users
+                  .slice(1)
+                  .map(user => user.name())
+                  .join(', '),
+                domain,
+              }),
         }}
       />
       {children}
@@ -143,10 +154,14 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
               <span
                 css={warning}
                 dangerouslySetInnerHTML={{
-                  __html: t(`failedToAddParticipantSingularOfflineBackend`, {
-                    name: users[0].name(),
-                    domain: users[0].domain,
-                  }),
+                  __html: useMvpString
+                    ? t(`failedToAddParticipantSingularMvp`, {
+                        name: users[0].name(),
+                      })
+                    : t(`failedToAddParticipantSingular${errorMessageType[message.reason]}`, {
+                        name: users[0].name(),
+                        domain: users[0].domain,
+                      }),
                 }}
               />
               {learnMore}
