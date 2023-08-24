@@ -126,4 +126,19 @@ describe('SystemMessage', () => {
     expect(getByTestId('readicon')).not.toBeNull();
     expect(getByText(senderName)).not.toBeNull();
   });
+
+  it('renders extra info via children prop', async () => {
+    const extraTextToRender = 'Hello, extra text!';
+
+    const extraComponent = <p data-testid="extra-component">{extraTextToRender}</p>;
+
+    const message = createSystemMessage({
+      system_message_type: SystemMessageType.CONVERSATION_RECEIPT_MODE_UPDATE,
+      icon: SystemMessageIcon.READ,
+    });
+
+    const {getByText} = render(<SystemMessage message={message}>{extraComponent}</SystemMessage>);
+
+    expect(getByText(extraTextToRender)).not.toBeNull();
+  });
 });
