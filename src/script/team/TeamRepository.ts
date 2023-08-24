@@ -28,7 +28,6 @@ import type {
   TeamUpdateEvent,
 } from '@wireapp/api-client/lib/event';
 import {TEAM_EVENT} from '@wireapp/api-client/lib/event/TeamEvent';
-import type {FeatureList} from '@wireapp/api-client/lib/team/feature/';
 import {FeatureStatus, FEATURE_KEY} from '@wireapp/api-client/lib/team/feature/';
 import type {TeamData} from '@wireapp/api-client/lib/team/team/TeamData';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
@@ -74,7 +73,6 @@ export interface AccountInfo {
 }
 
 export class TeamRepository {
-  private static readonly LOCAL_STORAGE_FEATURE_CONFIG_KEY = 'FEATURE_CONFIG_KEY';
   private readonly logger: Logger;
   private readonly teamMapper: TeamMapper;
   private readonly userRepository: UserRepository;
@@ -123,9 +121,6 @@ export class TeamRepository {
     teamId?: string,
   ): Promise<{team: TeamEntity; members: QualifiedId[]} | {team: undefined; members: never[]}> => {
     const team = await this.getTeam();
-    const savedFeatureConfig = this.loadPreviousFeatureConfig();
-    // Load the previous feature config.
-    this.teamState.teamFeatures(savedFeatureConfig);
     // get the fresh feature config from backend
     await this.updateFeatureConfig();
     if (!teamId) {
@@ -139,7 +134,6 @@ export class TeamRepository {
   private async updateFeatureConfig() {
     const features = await this.teamService.getAllTeamFeatures();
     this.teamState.teamFeatures(features);
-    this.saveFeatureConfig(features);
   }
 
   private readonly scheduleTeamRefresh = (): void => {
@@ -415,22 +409,6 @@ export class TeamRepository {
     // When we receive a `feature-config.update` event, we will refetch the entire feature config
     await this.updateFeatureConfig();
   };
-
-  private readonly loadPreviousFeatureConfig = (): FeatureList | undefined => {
-    const featureConfigs: {[selfId: string]: FeatureList} = JSON.parse(
-      window.localStorage.getItem(TeamRepository.LOCAL_STORAGE_FEATURE_CONFIG_KEY) ?? '{}',
-    );
-    if (featureConfigs && featureConfigs[this.userState.self().id]) {
-      return featureConfigs[this.userState.self().id];
-    }
-    return undefined;
-  };
-
-  private readonly saveFeatureConfig = (featureConfigList: FeatureList): void =>
-    window.localStorage.setItem(
-      TeamRepository.LOCAL_STORAGE_FEATURE_CONFIG_KEY,
-      JSON.stringify({[this.userState.self().id]: featureConfigList}),
-    );
 
   private onMemberLeave(eventJson: TeamMemberLeaveEvent): void {
     const {

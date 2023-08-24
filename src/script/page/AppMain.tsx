@@ -36,14 +36,14 @@ import {showUserModal, UserModal} from 'Components/Modals/UserModal';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {AppLock} from './AppLock';
-import {FeatureConfigChangeNotifier} from './FeatureConfigChangeNotifier';
+import {FeatureConfigChangeNotifier} from './components/FeatureConfigChangeNotifier';
+import {WindowTitleUpdater} from './components/WindowTitleUpdater';
 import {LeftSidebar} from './LeftSidebar';
 import {MainContent} from './MainContent';
 import {PanelEntity, PanelState, RightSidebar} from './RightSidebar';
 import {RootProvider} from './RootProvider';
 import {useAppMainState, ViewType} from './state';
 import {useAppState, ContentState} from './useAppState';
-import {WindowTitleUpdater} from './WindowTitleUpdater';
 
 import {ConversationState} from '../conversation/ConversationState';
 import {User} from '../entity/User';
@@ -244,7 +244,7 @@ const AppMain: FC<AppMainProps> = ({
 
           <AppLock clientRepository={repositories.client} />
           <WarningsContainer onRefresh={app.refresh} />
-          <FeatureConfigChangeNotifier teamState={teamState} />
+          <FeatureConfigChangeNotifier selfUserId={selfUser.id} teamState={teamState} />
 
           <CallingContainer
             multitasking={mainView.multitasking}
