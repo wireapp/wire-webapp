@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [41.4.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@41.3.2...@wireapp/core@41.4.0) (2023-08-24)
+
+### Features
+
+* mls decrypt error recovery [WPB-523] ([#5412](https://github.com/wireapp/wire-web-packages/issues/5412)) ([a9e0dc7](https://github.com/wireapp/wire-web-packages/commit/a9e0dc7d59977f5ec86603caca03d533253022b9))
+
 ## [41.3.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@41.3.1...@wireapp/core@41.3.2) (2023-08-23)
 
 **Note:** Version bump only for package @wireapp/core
