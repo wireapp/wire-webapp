@@ -30,7 +30,7 @@ import {
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {StringIdentifer, t} from 'Util/LocalizerUtil';
+import {StringIdentifer, replaceLink, t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {formatDuration} from 'Util/TimeUtil';
 
@@ -106,8 +106,18 @@ const featureNotifications: Partial<
     if (!status || status === FeatureStatus.DISABLED) {
       return undefined;
     }
+    const replaceEnterprise = replaceLink(
+      Config.getConfig().URL.PRICING,
+      'modal__text__read-more',
+      'read-more-pricing',
+    );
+
     return {
-      htmlMessage: t('featureConfigChangeModalConferenceCallingEnabled'),
+      htmlMessage: t(
+        'featureConfigChangeModalConferenceCallingEnabled',
+        {brandName: Config.getConfig().BRAND_NAME},
+        replaceEnterprise,
+      ),
       title: 'featureConfigChangeModalConferenceCallingTitle',
     };
   },
