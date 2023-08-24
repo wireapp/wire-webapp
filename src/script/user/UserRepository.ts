@@ -720,6 +720,7 @@ export class UserRepository {
     if (!user) {
       if (isMe) {
         userEntity.isMe = true;
+        this.userState.self(userEntity);
       }
       this.userState.users.push(userEntity);
     }

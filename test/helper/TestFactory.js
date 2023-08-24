@@ -177,6 +177,7 @@ export class TestFactory {
     const userState = new UserState();
     const selfUser = new User('self-id');
     selfUser.isMe = true;
+    userState.self(selfUser);
     userState.users([selfUser]);
 
     this.user_repository = new UserRepository(
@@ -223,9 +224,9 @@ export class TestFactory {
     this.team_service = new TeamService();
     this.team_service.getAllTeamFeatures = async () => ({});
     this.team_repository = new TeamRepository(
-      this.team_service,
       this.user_repository,
       this.assetRepository,
+      this.team_service,
       this.user_repository['userState'],
       new TeamState(this.user_repository['userState']),
     );

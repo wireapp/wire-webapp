@@ -80,7 +80,7 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
   const [currentMsgActionName, setCurrentMsgAction] = useState('');
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const mesageReactionTop = isMsgWithHeader && messageWithSection ? messageWithHeaderTop : null;
+  const messageReactionTop = isMsgWithHeader ? messageWithHeaderTop : null;
   const {handleMenuOpen, isMenuOpen} = useMessageActionsState();
 
   const resetActionMenuStates = useCallback(() => {
@@ -164,7 +164,7 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
     }
   });
   return (
-    <div css={{...messageBodyActions, ...mesageReactionTop}} ref={wrapperRef}>
+    <div css={{...messageBodyActions, ...messageReactionTop}} ref={wrapperRef}>
       <div
         css={messageActionsGroup}
         role="group"
