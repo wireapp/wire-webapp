@@ -19,16 +19,29 @@
 
 import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client';
 import {Conversation, ConversationProtocol, MLSConversation} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_EVENT, ConversationMLSMessageAddEvent} from '@wireapp/api-client/lib/event';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {APIClient} from '@wireapp/api-client';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {ConversationService, MessageSendingState} from '..';
 import {MLSService} from '../../messagingProtocols/mls';
+import {CoreCryptoMLSErrors} from '../../messagingProtocols/mls/MLSService/CoreCryptoMLSErrors';
 import {ProteusService} from '../../messagingProtocols/proteus';
 import * as MessagingProtocols from '../../messagingProtocols/proteus';
 import * as PayloadHelper from '../../test/PayloadHelper';
 import * as MessageBuilder from '../message/MessageBuilder';
+
+const createMLSMessageAddEventMock = (conversationId: QualifiedId): ConversationMLSMessageAddEvent => ({
+  data: '',
+  conversation: conversationId.id,
+  qualified_conversation: conversationId,
+  from: '',
+  senderClientId: '',
+  type: CONVERSATION_EVENT.MLS_MESSAGE_ADD,
+  time: '2023-08-21T06:47:43.387Z',
+});
 
 jest.mock('../../messagingProtocols/proteus', () => ({
   ...jest.requireActual('../../messagingProtocols/proteus'),
@@ -42,15 +55,6 @@ jest.mock('../message/messageSender', () => ({
   ...jest.requireActual('../message/messageSender'),
   sendMessage: jest.fn().mockImplementation(fn => fn()),
 }));
-
-const mockedMLSService = {
-  encryptMessage: () => {},
-  commitPendingProposals: () => Promise.resolve(),
-  getEpoch: () => Promise.resolve(),
-  joinByExternalCommit: jest.fn(),
-  registerConversation: jest.fn(),
-  wipeConversation: jest.fn(),
-} as unknown as MLSService;
 
 const mockedProteusService = {
   encryptGenericMessage: () => Promise.resolve(),
@@ -92,9 +96,21 @@ describe('ConversationService', () => {
       clientId: PayloadHelper.getUUID(),
     };
 
+    const mockedMLSService = {
+      encryptMessage: () => {},
+      commitPendingProposals: () => Promise.resolve(),
+      getEpoch: () => Promise.resolve(),
+      joinByExternalCommit: jest.fn(),
+      registerConversation: jest.fn(),
+      wipeConversation: jest.fn(),
+      handleMLSMessageAddEvent: jest.fn(),
+      conversationExists: jest.fn(),
+    } as unknown as MLSService;
+
     const conversationService = new ConversationService(client, mockedProteusService, mockedMLSService);
 
     jest.spyOn(conversationService, 'joinByExternalCommit');
+    jest.spyOn(conversationService, 'emit');
 
     return [conversationService, {apiClient: client, mlsService: mockedMLSService}] as const;
   }
@@ -167,17 +183,21 @@ describe('ConversationService', () => {
     };
 
     it('re-joins multiple not-established conversations', async () => {
-      const [conversationService, {apiClient}] = buildConversationService();
+      const [conversationService, {apiClient, mlsService}] = buildConversationService();
 
-      const mlsConversation1 = createConversation(1, 'conversation1');
-      const mlsConversation2 = createConversation(1, 'conversation2');
+      const remoteEpoch = 1;
+      const localEpoch = 0;
+
+      const mlsConversation1 = createConversation(remoteEpoch, 'conversation1');
+      const mlsConversation2 = createConversation(remoteEpoch, 'conversation2');
 
       const mockedDBResponse: Conversation[] = [mlsConversation1, mlsConversation2];
       jest.spyOn(apiClient.api.conversation, 'getConversationList').mockResolvedValueOnce({found: mockedDBResponse});
 
       jest.spyOn(conversationService, 'isMLSConversationEstablished').mockResolvedValue(false);
+      jest.spyOn(mlsService, 'getEpoch').mockResolvedValue(localEpoch);
 
-      await conversationService.handleEpochMismatch();
+      await conversationService.handleConversationsEpochMismatch();
       expect(conversationService.joinByExternalCommit).toHaveBeenCalledWith(mlsConversation1.qualified_id);
       expect(conversationService.joinByExternalCommit).toHaveBeenCalledWith(mlsConversation2.qualified_id);
     });
@@ -194,7 +214,7 @@ describe('ConversationService', () => {
       jest.spyOn(conversationService, 'isMLSConversationEstablished').mockResolvedValue(true);
       jest.spyOn(mlsService, 'getEpoch').mockResolvedValue(2);
 
-      await conversationService.handleEpochMismatch();
+      await conversationService.handleConversationsEpochMismatch();
       expect(conversationService.joinByExternalCommit).toHaveBeenCalledWith(mlsConversation1.qualified_id);
       expect(conversationService.joinByExternalCommit).toHaveBeenCalledWith(mlsConversation2.qualified_id);
     });
@@ -210,8 +230,9 @@ describe('ConversationService', () => {
       jest.spyOn(conversationService, 'isMLSConversationEstablished').mockResolvedValueOnce(true);
 
       jest.spyOn(mlsService, 'getEpoch').mockResolvedValueOnce(1);
+      jest.spyOn(mlsService, 'conversationExists').mockResolvedValueOnce(true);
 
-      await conversationService.handleEpochMismatch();
+      await conversationService.handleConversationsEpochMismatch();
       expect(conversationService.joinByExternalCommit).not.toHaveBeenCalled();
     });
   });
@@ -279,6 +300,38 @@ describe('ConversationService', () => {
       expect(mlsService.registerConversation).toHaveBeenCalledWith(mockGroupId, [otherUserId, selfUser.user], selfUser);
       expect(mlsService.wipeConversation).toHaveBeenCalledWith(mockGroupId);
       expect(mlsService.registerConversation).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  describe('handleEvent', () => {
+    it('rejoins a MLS conversation if epoch mismatch detected when decrypting mls message', async () => {
+      const [conversationService, {apiClient, mlsService}] = buildConversationService();
+      const conversationId = {id: 'conversationId', domain: 'staging.zinfra.io'};
+      const mockGroupId = 'mock-group-id';
+
+      const mockMLSMessageAddEvent = createMLSMessageAddEventMock(conversationId);
+
+      jest
+        .spyOn(mlsService, 'handleMLSMessageAddEvent')
+        .mockRejectedValueOnce(new Error(CoreCryptoMLSErrors.WRONG_EPOCH));
+
+      const remoteEpoch = 5;
+      const localEpoch = 4;
+
+      jest.spyOn(mlsService, 'conversationExists').mockResolvedValueOnce(true);
+      jest.spyOn(mlsService, 'getEpoch').mockResolvedValueOnce(localEpoch);
+
+      jest.spyOn(apiClient.api.conversation, 'getConversation').mockResolvedValueOnce({
+        qualified_id: conversationId,
+        protocol: ConversationProtocol.MLS,
+        epoch: remoteEpoch,
+        group_id: mockGroupId,
+      } as unknown as Conversation);
+
+      await conversationService.handleEvent(mockMLSMessageAddEvent);
+
+      expect(conversationService.joinByExternalCommit).toHaveBeenCalledWith(conversationId);
+      expect(conversationService.emit).toHaveBeenCalledWith('MLSConversationRecovered', {conversationId});
     });
   });
 

@@ -527,7 +527,7 @@ export class Account extends TypedEventEmitter<Events> {
 
     const handleMissedNotifications = async (notificationId: string) => {
       if (this.cryptoProtocolConfig?.mls && this.backendFeatures.supportsMLS) {
-        await this.service?.conversation.handleEpochMismatch();
+        await this.service?.conversation.handleConversationsEpochMismatch();
       }
       return onMissedNotifications(notificationId);
     };
