@@ -337,10 +337,11 @@ export class MediaDevicesHandler {
         return window.desktopCapturer.getSources(options);
       }
       // Electron <= 4
-      return new Promise((resolve, reject) =>
-        window.desktopCapturer?.getSources(options, (error, screenSources) =>
-          error ? reject(error) : resolve(screenSources),
-        ),
+      return new Promise(
+        (resolve, reject) =>
+          window.desktopCapturer?.getSources(options, (error, screenSources) =>
+            error ? reject(error) : resolve(screenSources),
+          ),
       );
     };
 
