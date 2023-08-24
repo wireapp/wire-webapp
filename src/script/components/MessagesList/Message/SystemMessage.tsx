@@ -31,7 +31,7 @@ export interface SystemMessageProps {
   children?: ReactNode;
 }
 
-const SystemMessage: React.FC<SystemMessageProps> = ({message, children}) => {
+export const SystemMessage: React.FC<SystemMessageProps> = ({message, children}) => {
   const {unsafeSenderName, timestamp, caption} = useKoSubscribableChildren(message, [
     'unsafeSenderName',
     'timestamp',
@@ -60,8 +60,6 @@ const SystemMessage: React.FC<SystemMessageProps> = ({message, children}) => {
     </>
   );
 };
-
-export {SystemMessage};
 
 const iconToComponentMap: Record<SystemMessageIcon, React.FC> = {
   [SystemMessageIcon.EDIT]: () => <Icon.Edit />,
