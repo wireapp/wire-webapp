@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [25.2.4](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@25.2.3...@wireapp/api-client@25.2.4) (2023-08-24)
+
+### Bug Fixes
+
+* re-enable mls on api v4 ([#5417](https://github.com/wireapp/wire-web-packages/issues/5417)) ([d05d86b](https://github.com/wireapp/wire-web-packages/commit/d05d86ba2a826e2f12b0c1f54b60219b98ba04a9))
+
 ## [25.2.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@25.2.2...@wireapp/api-client@25.2.3) (2023-08-23)
 
 ### Bug Fixes
