@@ -612,19 +612,30 @@ export class NotificationRepository {
   }
 
   /**
+   Calculate the length of the opposite title section string and return the extra length
+  */
+  private calculatedTitleLength = (sectionString: string) => {
+    const length =
+      NotificationRepository.CONFIG.TITLE_LENGTH - sectionString.length + NotificationRepository.CONFIG.TITLE_LENGTH;
+    return length > NotificationRepository.CONFIG.TITLE_LENGTH ? length : NotificationRepository.CONFIG.TITLE_LENGTH;
+  };
+
+  /**
    * Creates the notification title.
    *
    * @param Notification message title
    */
   private createTitle(messageEntity: Message, conversationEntity?: Conversation): string {
     const conversationName = conversationEntity && conversationEntity.display_name();
+    const userEntity = messageEntity.user();
+
     const truncatedConversationName = truncate(
       conversationName ?? '',
-      NotificationRepository.CONFIG.TITLE_LENGTH,
+      this.calculatedTitleLength(userEntity.name()),
       false,
     );
-    const userEntity = messageEntity.user();
-    const truncatedName = truncate(userEntity.name(), NotificationRepository.CONFIG.TITLE_LENGTH, false);
+
+    const truncatedName = truncate(userEntity.name(), this.calculatedTitleLength(conversationName ?? ''), false);
 
     let title;
     if (conversationName) {
