@@ -28,19 +28,18 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 
-import {ContentState, useAppState} from './useAppState';
-
-import {Config} from '../Config';
-import {ConversationState} from '../conversation/ConversationState';
-import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
-import {UserState} from '../user/UserState';
+import {Config} from '../../Config';
+import {ConversationState} from '../../conversation/ConversationState';
+import {NOTIFICATION_HANDLING_STATE} from '../../event/NotificationHandlingState';
+import {UserState} from '../../user/UserState';
+import {ContentState, useAppState} from '../useAppState';
 
 const windowTitleLogger = getLogger('WindowTitlesViewModel');
 
 const MIN_UNREAD_COUNT = 0;
 const MIN_CONNECTION_REQUEST_COUNT = 1;
 
-export const useWindowTitle = () => {
+const useWindowTitle = () => {
   const userState = container.resolve(UserState);
   const conversationState = container.resolve(ConversationState);
 
@@ -162,3 +161,9 @@ export const useWindowTitle = () => {
     initiateTitleUpdates();
   }, [initiateTitleUpdates, updateNotificationState]);
 };
+
+export function WindowTitleUpdater(): null {
+  useWindowTitle();
+
+  return null;
+}

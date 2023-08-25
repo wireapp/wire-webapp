@@ -643,7 +643,6 @@ describe('ConversationRepository', () => {
         createEvent = {
           conversation: conversationId,
           data: {
-            failed_to_add: [],
             access: [CONVERSATION_ACCESS.INVITE],
             access_role: CONVERSATION_LEGACY_ACCESS_ROLE.ACTIVATED,
             access_role_v2: [],

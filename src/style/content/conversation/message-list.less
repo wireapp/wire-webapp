@@ -300,8 +300,18 @@
 
 // MESSAGE - BODY
 .message-body {
+  position: relative;
   display: flex;
+  max-width: @conversation-max-width;
+  justify-content: space-between;
   padding-left: @conversation-message-sender-width;
+
+  &-content {
+    width: calc(100% - var(--conversation-message-timestamp-width));
+    max-width: calc(
+      @conversation-max-width - @conversation-message-sender-width - var(--conversation-message-timestamp-width)
+    );
+  }
 
   .text {
     .text-selection;
@@ -374,8 +384,7 @@
 .image-asset {
   position: relative;
   display: flex;
-  margin-top: 16px;
-  margin-bottom: 24px;
+  padding: 8px 0 24px;
   cursor: pointer;
 
   &--no-image {
@@ -757,8 +766,8 @@
 
 // MESSAGE SPACING
 .message-asset {
-  display: block;
-  margin-top: 16px;
+  flex: 1;
+  margin-top: 8px;
 }
 
 .message-call,

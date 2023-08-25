@@ -45,7 +45,7 @@ import {
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import type {BackendError} from '@wireapp/api-client/lib/http/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
-import {AddUsersFailureReasons, MLSReturnType} from '@wireapp/core/lib/conversation';
+import {MLSCreateConversationResponse} from '@wireapp/core/lib/conversation';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {container} from 'tsyringe';
@@ -320,6 +320,10 @@ export class ConversationRepository {
     window.addEventListener<any>(WebAppEvents.CONVERSATION.JOIN, this.onConversationJoin);
   }
 
+  public initMLSConversationRecoveredListener() {
+    return this.conversationService.addMLSConversationRecoveredListener(this.onMLSConversationRecovered);
+  }
+
   private readonly onFederationEvent = async (event: FederationEvent) => {
     const {type} = event;
 
@@ -550,7 +554,7 @@ export class ConversationRepository {
        * ToDo: Fetch all MLS Events from backend before doing anything else
        * Needs to be done to receive the latest epoch and avoid epoch mismatch errors
        */
-      let response: MLSReturnType;
+      let response: MLSCreateConversationResponse;
       const isMLSConversation = payload.protocol === ConversationProtocol.MLS;
       if (isMLSConversation) {
         response = await this.core.service!.conversation.createMLSConversation(
@@ -559,7 +563,8 @@ export class ConversationRepository {
           this.core.clientId,
         );
       } else {
-        response = {conversation: await this.core.service!.conversation.createProteusConversation(payload), events: []};
+        const {conversation, failedToAdd} = await this.core.service!.conversation.createProteusConversation(payload);
+        response = {conversation, events: [], failedToAdd};
       }
 
       const {conversationEntity} = await this.onCreate({
@@ -576,14 +581,14 @@ export class ConversationRepository {
         type: CONVERSATION_EVENT.CREATE,
       });
 
-      const {failed_to_add: failedToAddUsers} = response.conversation;
+      const {failedToAdd} = response;
 
-      if (failedToAddUsers && failedToAddUsers.length > 0) {
+      if (failedToAdd) {
         const failedToAddUsersEvent = EventBuilder.buildFailedToAddUsersEvent(
-          failedToAddUsers,
+          failedToAdd.users,
           conversationEntity,
           this.userState.self().id,
-          AddUsersFailureReasons.UNREACHABLE_BACKENDS,
+          failedToAdd.reason,
         );
         await this.eventRepository.injectEvent(failedToAddUsersEvent);
       }
@@ -2478,6 +2483,7 @@ export class ConversationRepository {
       case ClientEvent.CONVERSATION.LEGAL_HOLD_UPDATE:
       case ClientEvent.CONVERSATION.LOCATION:
       case ClientEvent.CONVERSATION.MISSED_MESSAGES:
+      case ClientEvent.CONVERSATION.MLS_CONVERSATION_RECOVERED:
       case ClientEvent.CONVERSATION.UNABLE_TO_DECRYPT:
       case ClientEvent.CONVERSATION.VERIFICATION:
       case ClientEvent.CONVERSATION.VOICE_CHANNEL_ACTIVATE:
@@ -2564,6 +2570,22 @@ export class ConversationRepository {
         const missed_event = EventBuilder.buildMissed(conversationEntity, currentTimestamp);
         this.eventRepository.injectEvent(missed_event);
       });
+  };
+
+  /**
+   * Add "mls conversation recovered" system message to conversation.
+   */
+  private readonly onMLSConversationRecovered = (conversationId: QualifiedId): void => {
+    const conversation = this.conversationState.findConversation(conversationId);
+
+    if (!conversation) {
+      return;
+    }
+    const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
+
+    const event = EventBuilder.buildMLSConversationRecovered(conversation, currentTimestamp);
+
+    void this.eventRepository.injectEvent(event);
   };
 
   private on1to1Creation(conversationEntity: Conversation, eventJson: OneToOneCreationEvent) {

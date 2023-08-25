@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2023 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,25 +17,17 @@
  *
  */
 
-import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import ko from 'knockout';
 
+import {SystemMessageType} from 'src/script/message/SystemMessageType';
 import {t} from 'Util/LocalizerUtil';
 
 import {SystemMessage} from './SystemMessage';
 
-import {SystemMessageType} from '../../message/SystemMessageType';
-
-export class RenameMessage extends SystemMessage {
-  public readonly system_message_type: SystemMessageType;
-  public name: string;
-
+export class MLSConversationRecoveredMessage extends SystemMessage {
   constructor() {
     super();
-
-    this.type = CONVERSATION_EVENT.RENAME;
-    this.system_message_type = SystemMessageType.CONVERSATION_RENAME;
-    this.name = '';
-    this.caption = ko.pureComputed(() => (this.user().isMe ? t('conversationRenameYou') : t('conversationRename')));
+    this.system_message_type = SystemMessageType.MLS_CONVERSATION_RECOVERED;
+    this.caption = ko.pureComputed(() => t('mlsConversationRecovered'));
   }
 }

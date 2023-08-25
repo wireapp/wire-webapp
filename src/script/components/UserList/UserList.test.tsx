@@ -45,6 +45,7 @@ describe('UserList', () => {
     const user = new User('test-id');
     user.isMe = true;
 
+    userState.self(user);
     userState.users([user]);
 
     const users = ['1', '2', '3', '4'].map(id => new User(id));
@@ -67,6 +68,7 @@ describe('UserList', () => {
     const user = new User('test-id');
     user.isMe = true;
 
+    userState.self(user);
     userState.users([user]);
 
     const setStateMock = jest.fn();
