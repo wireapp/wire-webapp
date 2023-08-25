@@ -572,9 +572,8 @@ describe('NotificationRepository', () => {
     });
 
     it('if a group is renamed', () => {
-      const renameMessage = new RenameMessage();
+      const renameMessage = new RenameMessage('Lorem Ipsum Conversation');
       renameMessage.user(user);
-      (renameMessage as any).name = 'Lorem Ipsum Conversation';
 
       const expected_body = `${user.name()} renamed the conversation to ${renameMessage.name}`;
       expect(expected_body).toBeDefined();

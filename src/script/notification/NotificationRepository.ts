@@ -495,7 +495,7 @@ export class NotificationRepository {
         return createBodyMessageTimerUpdate();
       }
       case SystemMessageType.CONVERSATION_DELETE: {
-        return (messageEntity as DeleteConversationMessage).caption();
+        return (messageEntity as DeleteConversationMessage).caption;
       }
     }
   }
