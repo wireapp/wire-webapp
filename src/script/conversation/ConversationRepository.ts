@@ -2534,7 +2534,7 @@ export class ConversationRepository {
       if (previouslyArchived) {
         // Add to check for un-archiving at the end of stream handling
         if (eventFromStream) {
-          return this.conversationsWithNewEvents.set(conversationEntity.id, conversationEntity);
+          this.conversationsWithNewEvents.set(conversationEntity.id, conversationEntity);
         }
       }
     }
