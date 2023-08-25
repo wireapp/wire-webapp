@@ -2552,7 +2552,7 @@ export class ConversationRepository {
         }
 
         if (eventFromWebSocket && conversationEntity.shouldUnarchive()) {
-          return this.unarchiveConversation(conversationEntity, false, 'event from WebSocket');
+          //return this.unarchiveConversation(conversationEntity, false, 'event from WebSocket');
         }
       }
     }
