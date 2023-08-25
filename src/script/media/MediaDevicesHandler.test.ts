@@ -18,8 +18,8 @@
  */
 
 /* eslint-disable */
-import {MediaDeviceType} from 'src/script/media/MediaDeviceType';
-import {MediaDevicesHandler} from 'src/script/media/MediaDevicesHandler';
+import {MediaDeviceType} from './MediaDeviceType';
+import {MediaDevicesHandler} from './MediaDevicesHandler';
 
 /* yarn test:app --specs media/MediaDevicesHandler --nolegacy */
 describe('MediaDevicesHandler', () => {
@@ -217,7 +217,7 @@ describe('MediaDevicesHandler', () => {
 
         const newCameras = [{deviceId: 'newcamera', kind: MediaDeviceType.VIDEO_INPUT}];
         navigator.mediaDevices.enumerateDevices.and.returnValue(Promise.resolve(newCameras));
-        navigator.mediaDevices.ondevicechange();
+        navigator.mediaDevices!.ondevicechange?.(Event.prototype);
 
         setTimeout(() => {
           expect(navigator.mediaDevices.enumerateDevices).toHaveBeenCalledTimes(2);

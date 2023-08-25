@@ -26,6 +26,8 @@ import {loadValue, storeValue} from 'Util/StorageUtil';
 
 import {MediaDeviceType} from './MediaDeviceType';
 
+import {isMediaDevice} from '../guards/MediaDevice';
+
 declare global {
   interface Window {
     desktopCapturer?: {
@@ -124,19 +126,13 @@ export class MediaDevicesHandler {
         );
       });
 
-      const isFavorite = loadValue<String[]>(`${deviceType}-fave`)?.find(id => id === currentDeviceId);
+      const favoriteDeviceId = loadValue<String[]>(`${deviceType}-fave`)?.find(id => id === currentDeviceId);
 
-      function isMediaDevice(
-        device: MediaDeviceInfo | ElectronDesktopCapturerSource | undefined,
-      ): device is MediaDeviceInfo {
-        return (device as MediaDeviceInfo)?.deviceId !== undefined;
-      }
-
-      if (isFavorite && isAvailable) {
+      if (favoriteDeviceId && isAvailable) {
         return currentDeviceId;
       }
       return isMediaDevice(isAvailable)
-        ? isAvailable?.deviceId
+        ? isAvailable.deviceId
         : isAvailable?.id ?? MediaDevicesHandler.CONFIG.DEFAULT_DEVICE[deviceType];
     };
     this.currentAvailableDeviceId = {
@@ -267,10 +263,10 @@ export class MediaDevicesHandler {
       const firstDeviceId = devices[0]?.deviceId;
 
       const favorites = loadValue<string[]>(`${type}-fave`) ?? [];
-      const isFavorite = favorites.map(favorite => devices.some(d => d.deviceId === favorite));
+      const favoriteDeviceId = favorites.map(favorite => devices.some(d => d.deviceId === favorite));
 
-      if (isFavorite.some(favorite => favorite)) {
-        const faveIndex = isFavorite.findIndex(favorite => favorite);
+      if (favoriteDeviceId.some(favorite => favorite)) {
+        const faveIndex = favoriteDeviceId.findIndex(favorite => favorite);
         currentId(
           devices.find(d => d.deviceId === favorites[faveIndex] || d.deviceId === favorites[faveIndex])?.deviceId ??
             firstDeviceId,
