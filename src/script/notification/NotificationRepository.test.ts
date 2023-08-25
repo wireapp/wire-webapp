@@ -94,6 +94,7 @@ describe('NotificationRepository', () => {
   let verifyNotificationObfuscated: (...args: any[]) => void;
   let verifyNotificationSystem: (...args: any[]) => void;
   let createTruncatedTitle: (name: string, conversationName: string) => string;
+  let calculateTitleLength: (sectionString: string) => number;
 
   let notification_content: any;
   const contentViewModelState: any = {};
@@ -144,13 +145,19 @@ describe('NotificationRepository', () => {
 
     const showNotificationSpy = jest.spyOn(notificationRepository as any, 'showNotification');
 
+    calculateTitleLength = sectionString => {
+      const defaultSectionLength = NotificationRepository.CONFIG.TITLE_LENGTH;
+      const length = defaultSectionLength - sectionString.length + defaultSectionLength;
+
+      return length > defaultSectionLength ? length : defaultSectionLength;
+    };
+
     createTruncatedTitle = (name, conversationName) => {
       const titleLength = NotificationRepository.CONFIG.TITLE_MAX_LENGTH;
-      const titleSectionLength = NotificationRepository.CONFIG.TITLE_LENGTH;
 
-      const titleText = `${truncate(name, titleSectionLength, false)} in ${truncate(
+      const titleText = `${truncate(name, calculateTitleLength(conversationName), false)} in ${truncate(
         conversationName,
-        titleSectionLength,
+        calculateTitleLength(name),
         false,
       )}`;
       return truncate(titleText, titleLength, false);
