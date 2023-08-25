@@ -2045,12 +2045,6 @@ export class ConversationRepository {
   }
 
   private checkChangedConversations() {
-    this.conversationsWithNewEvents.forEach(conversationEntity => {
-      if (conversationEntity.shouldUnarchive()) {
-        this.unarchiveConversation(conversationEntity, false, ConversationRepository.eventFromStreamMessage);
-      }
-    });
-
     this.conversationsWithNewEvents.clear();
   }
 
@@ -2258,7 +2252,7 @@ export class ConversationRepository {
           const isMemberJoinType = type === CONVERSATION_EVENT.MEMBER_JOIN;
 
           if (previouslyArchived && isPastMemberStatus && isMemberJoinType) {
-            this.unarchiveConversation(conversationEntity, false, ConversationRepository.eventFromStreamMessage);
+            //this.unarchiveConversation(conversationEntity, false, ConversationRepository.eventFromStreamMessage);
           }
           const isBackendTimestamp = eventSource !== EventSource.INJECTED;
           if (type !== CONVERSATION_EVENT.MEMBER_JOIN && type !== CONVERSATION_EVENT.MEMBER_LEAVE) {
@@ -2549,10 +2543,6 @@ export class ConversationRepository {
         // Add to check for un-archiving at the end of stream handling
         if (eventFromStream) {
           return this.conversationsWithNewEvents.set(conversationEntity.id, conversationEntity);
-        }
-
-        if (eventFromWebSocket && conversationEntity.shouldUnarchive()) {
-          //return this.unarchiveConversation(conversationEntity, false, 'event from WebSocket');
         }
       }
     }
