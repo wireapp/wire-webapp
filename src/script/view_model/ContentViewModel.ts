@@ -52,6 +52,7 @@ interface ShowConversationOptions {
   exposeMessage?: Message;
   openFirstSelfMention?: boolean;
   openNotificationSettings?: boolean;
+  archive?: boolean;
 }
 
 interface ShowConversationOverload {
@@ -186,6 +187,7 @@ export class ContentViewModel {
     isOpenedConversation: boolean,
     openNotificationSettings: boolean,
     conversationEntity: Conversation,
+    isArchive = false,
   ): boolean {
     const {setContentState} = useAppState.getState();
     if (isOpenedConversation) {
@@ -193,7 +195,10 @@ export class ContentViewModel {
       return true;
     }
     setContentState(ContentState.CONVERSATION);
-    this.mainViewModel.list.openConversations();
+
+    if (!isArchive) {
+      this.mainViewModel.list.openConversations(null, {archive: false});
+    }
     return false;
   }
 
@@ -277,7 +282,14 @@ export class ContentViewModel {
 
       const isOpenedConversation = this.isConversationOpen(conversationEntity, isActiveConversation);
 
-      if (this.handleConversationState(isOpenedConversation, openNotificationSettings, conversationEntity)) {
+      if (
+        this.handleConversationState(
+          isOpenedConversation,
+          openNotificationSettings,
+          conversationEntity,
+          options.archive,
+        )
+      ) {
         return;
       }
 
