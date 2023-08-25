@@ -132,7 +132,6 @@ export class ListViewModel {
   }
 
   private readonly _initSubscriptions = () => {
-    amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, this.openConversations);
     amplify.subscribe(WebAppEvents.PREFERENCES.MANAGE_ACCOUNT, this.openPreferencesAccount);
     amplify.subscribe(WebAppEvents.PREFERENCES.MANAGE_DEVICES, this.openPreferencesDevices);
     amplify.subscribe(WebAppEvents.PREFERENCES.SHOW_AV, this.openPreferencesAudioVideo);
@@ -279,8 +278,7 @@ export class ListViewModel {
     }
   };
 
-  readonly openConversations = (conversation, options): void => {
-    const {archive = false} = options || {};
+  readonly openConversations = (archive = false): void => {
     const newState = this.isActivatedAccount()
       ? archive
         ? ListState.ARCHIVE
