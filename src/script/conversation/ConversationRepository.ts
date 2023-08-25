@@ -2241,19 +2241,11 @@ export class ConversationRepository {
     const onEventPromise = isConversationCreate
       ? Promise.resolve(null)
       : this.getConversationById(conversationId, true);
-    let previouslyArchived = false;
+    const previouslyArchived = false;
 
     return onEventPromise
       .then((conversationEntity: Conversation) => {
         if (conversationEntity) {
-          // Check if conversation was archived
-          previouslyArchived = conversationEntity.is_archived();
-          const isPastMemberStatus = conversationEntity.status() === ConversationStatus.PAST_MEMBER;
-          const isMemberJoinType = type === CONVERSATION_EVENT.MEMBER_JOIN;
-
-          if (previouslyArchived && isPastMemberStatus && isMemberJoinType) {
-            //this.unarchiveConversation(conversationEntity, false, ConversationRepository.eventFromStreamMessage);
-          }
           const isBackendTimestamp = eventSource !== EventSource.INJECTED;
           if (type !== CONVERSATION_EVENT.MEMBER_JOIN && type !== CONVERSATION_EVENT.MEMBER_LEAVE) {
             conversationEntity.updateTimestampServer(eventJson.server_time || eventJson.time, isBackendTimestamp);
