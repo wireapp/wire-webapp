@@ -187,7 +187,6 @@ export class ContentViewModel {
     isOpenedConversation: boolean,
     openNotificationSettings: boolean,
     conversationEntity: Conversation,
-    isArchive = false,
   ): boolean {
     const {setContentState} = useAppState.getState();
     if (isOpenedConversation) {
@@ -196,9 +195,8 @@ export class ContentViewModel {
     }
     setContentState(ContentState.CONVERSATION);
 
-    if (!isArchive) {
-      this.mainViewModel.list.openConversations(null, {archive: false});
-    }
+    this.mainViewModel.list.openConversations(conversationEntity.archivedState());
+
     return false;
   }
 
@@ -282,17 +280,7 @@ export class ContentViewModel {
 
       const isOpenedConversation = this.isConversationOpen(conversationEntity, isActiveConversation);
 
-      if (
-        this.handleConversationState(
-          isOpenedConversation,
-          openNotificationSettings,
-          conversationEntity,
-          options.archive,
-        )
-      ) {
-        return;
-      }
-
+      this.handleConversationState(isOpenedConversation, openNotificationSettings, conversationEntity);
       if (!isActiveConversation) {
         this.conversationState.activeConversation(conversationEntity);
       }
