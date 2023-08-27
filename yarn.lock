@@ -4170,13 +4170,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/markdown-it@npm:13.0.0":
-  version: 13.0.0
-  resolution: "@types/markdown-it@npm:13.0.0"
+"@types/markdown-it@npm:13.0.1":
+  version: 13.0.1
+  resolution: "@types/markdown-it@npm:13.0.1"
   dependencies:
     "@types/linkify-it": "*"
     "@types/mdurl": "*"
-  checksum: 7bcf45d0a1c2bc2c28f91460af571b9e8a195d4983cda809af04bf1d400f98902c71849b7cb8c036e35a3be7fa2483117d4faeab24a7de059e04be3e9f641aff
+  checksum: 184d383ac21903a9e6be1639cde2b0cc082d0366b423fd8a69d0f37d9d1d36338f66611226ba4ef1da6148f370a62e08f688e8147ead43d429d6ff213c38c062
   languageName: node
   linkType: hard
 
@@ -17854,7 +17854,7 @@ __metadata:
     "@types/keyboardjs": 2.5.1
     "@types/libsodium-wrappers": ^0
     "@types/linkify-it": 3.0.2
-    "@types/markdown-it": 13.0.0
+    "@types/markdown-it": 13.0.1
     "@types/node": ^20.5.1
     "@types/open-graph": 0.2.2
     "@types/platform": 1.3.4
