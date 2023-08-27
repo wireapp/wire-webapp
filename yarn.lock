@@ -4556,10 +4556,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/underscore@npm:1.11.6":
-  version: 1.11.6
-  resolution: "@types/underscore@npm:1.11.6"
-  checksum: 89b92c35d1b464c9fcddc2683ea41ad1aaa0b298e7243e5ae808ea3dfd545062ca83b0d63515f89578f84cb479de877dbb61f1bb2fcc2a7e5755812f42b09b8b
+"@types/underscore@npm:1.11.8":
+  version: 1.11.8
+  resolution: "@types/underscore@npm:1.11.8"
+  checksum: 9cd1925fb94f1e09c2038375ca8013cc30e20d5e875f034a2586ce26db469462b77282954cb1ac8970f2bf1dbb82dbac87ccbd77fe38039f7d09ebaa6dec12d7
   languageName: node
   linkType: hard
 
@@ -18322,7 +18322,7 @@ __metadata:
     "@types/seedrandom": ^3
     "@types/sinon": 10.0.16
     "@types/speakingurl": 13.0.3
-    "@types/underscore": 1.11.6
+    "@types/underscore": 1.11.8
     "@types/webpack-env": 1.18.1
     "@wireapp/avs": 9.3.7
     "@wireapp/copy-config": 2.1.1
