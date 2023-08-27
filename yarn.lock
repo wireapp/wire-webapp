@@ -5283,15 +5283,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"acorn-dynamic-import@npm:^4.0.0":
-  version: 4.0.0
-  resolution: "acorn-dynamic-import@npm:4.0.0"
-  peerDependencies:
-    acorn: ^6.0.0
-  checksum: ef7298e632e9d107b2be06b47d607de94d7213ca2417fced02af76b0c71e13074d98924e270c7bfec421c1049ed9001a97ed4d0f28020d9cfa1aae16ca20664a
-  languageName: node
-  linkType: hard
-
 "acorn-globals@npm:^7.0.0":
   version: 7.0.1
   resolution: "acorn-globals@npm:7.0.1"
@@ -10079,12 +10070,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"i18next-scanner@npm:4.3.0":
-  version: 4.3.0
-  resolution: "i18next-scanner@npm:4.3.0"
+"i18next-scanner@npm:4.4.0":
+  version: 4.4.0
+  resolution: "i18next-scanner@npm:4.4.0"
   dependencies:
     acorn: ^8.0.4
-    acorn-dynamic-import: ^4.0.0
     acorn-jsx: ^5.3.1
     acorn-stage3: ^4.0.0
     acorn-walk: ^8.0.0
@@ -10105,7 +10095,7 @@ __metadata:
     vinyl-fs: ^4.0.0
   bin:
     i18next-scanner: bin/cli.js
-  checksum: f099cc8ac3e290ef279fbb61ed2cb3923a7a90790f471aafb29c90aee96b548c0c6689b89668d8efc4cf8e367d879fa2c92911442c9b699c2be4a33a44168126
+  checksum: bebbfa7aa4a60144425926304279ec3f0a714a74f50b30283badf1798177d6e6215aec4ef29bd351b47b291541981b7d2605b6b2e043284d3254ae517cb95241
   languageName: node
   linkType: hard
 
@@ -18232,7 +18222,7 @@ __metadata:
     html-webpack-plugin: ^5.5.3
     http-status-codes: 2.2.0
     husky: 8.0.3
-    i18next-scanner: 4.3.0
+    i18next-scanner: 4.4.0
     intersection-observer: 0.12.2
     jest: 29.6.4
     jest-canvas-mock: 2.5.2
