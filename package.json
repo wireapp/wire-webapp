@@ -58,7 +58,7 @@
     "@babel/plugin-proposal-decorators": "7.22.10",
     "@babel/preset-env": "7.22.10",
     "@babel/preset-react": "7.22.5",
-    "@babel/preset-typescript": "7.22.5",
+    "@babel/preset-typescript": "7.22.11",
     "@emotion/eslint-plugin": "^11.11.0",
     "@faker-js/faker": "8.0.2",
     "@formatjs/cli": "6.1.3",
