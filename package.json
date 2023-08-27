@@ -54,7 +54,7 @@
   },
   "devDependencies": {
     "@babel/core": "7.22.10",
-    "@babel/eslint-parser": "7.22.10",
+    "@babel/eslint-parser": "7.22.11",
     "@babel/plugin-proposal-decorators": "7.22.10",
     "@babel/preset-env": "7.22.10",
     "@babel/preset-react": "7.22.5",
@@ -108,7 +108,7 @@
     "dexie": "3.2.4",
     "dotenv": "16.3.1",
     "dpdm": "3.13.1",
-    "eslint": "^8.47.0",
+    "eslint": "^8.48.0",
     "eslint-plugin-prettier": "^5.0.0",
     "fake-indexeddb": "4.0.2",
     "generate-changelog": "1.8.0",
