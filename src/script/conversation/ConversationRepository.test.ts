@@ -255,13 +255,18 @@ describe('ConversationRepository', () => {
       const teamId = team1to1Conversation.team;
       const teamMemberId = team1to1Conversation.members.others[0].id;
       const userEntity = new User(teamMemberId, 'test-domain');
-
-      const selfUser = generateUser();
-      selfUser.teamId = teamId;
-      spyOn(testFactory.conversation_repository['userState'], 'self').and.returnValue(selfUser);
       userEntity.inTeam(true);
       userEntity.isTeamMember(true);
       userEntity.teamId = teamId;
+      userEntity.supportedProtocols([ConversationProtocol.PROTEUS]);
+
+      testFactory.user_repository['userState'].users.push(userEntity);
+
+      const selfUser = generateUser();
+      selfUser.teamId = teamId;
+      selfUser.supportedProtocols([ConversationProtocol.PROTEUS]);
+
+      spyOn(testFactory.conversation_repository['userState'], 'self').and.returnValue(selfUser);
 
       return testFactory.conversation_repository.get1To1Conversation(userEntity).then(conversationEntity => {
         expect(conversationEntity).toBe(newConversationEntity);

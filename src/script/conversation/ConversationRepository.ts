@@ -1619,7 +1619,7 @@ export class ConversationRepository {
     //if both users support mls or mls conversation is already known, we use it
     //we never go back to proteus conversation, even if one of the users do not support mls anymore
     //(e.g. due to the change of supported protocols in team configuration)
-    if (protocol === ConversationProtocol.MLS || localMLSConversation) {
+    if (localMLSConversation || protocol === ConversationProtocol.MLS) {
       const mlsConversation = await this.initMLS1to1Conversation(otherUserId, isSupportedByTheOtherUser);
       if (isProteusConversation(conversation)) {
         await this.replaceProteus1to1WithMLS(conversation, mlsConversation);
