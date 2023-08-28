@@ -131,6 +131,7 @@ export class MediaDevicesHandler {
         ? isAvailable.deviceId
         : isAvailable?.id ?? MediaDevicesHandler.CONFIG.DEFAULT_DEVICE[deviceType];
     };
+
     this.currentAvailableDeviceId = {
       audioinput: ko.pureComputed(() => getCurrentAvailableDeviceId(MediaDeviceType.AUDIO_INPUT)),
       audiooutput: ko.pureComputed(() => getCurrentAvailableDeviceId(MediaDeviceType.AUDIO_OUTPUT)),

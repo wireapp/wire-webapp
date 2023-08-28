@@ -69,10 +69,10 @@ describe('CallingRepository', () => {
   const clientId = createUuid();
 
   const mediaDevices = {
-    audioInput: ko.pureComputed(() => 'test'),
-    audioOutput: ko.pureComputed(() => 'test'),
-    screenInput: ko.pureComputed(() => 'test'),
-    videoInput: ko.pureComputed(() => 'test'),
+    audioinput: ko.pureComputed(() => 'test'),
+    audiooutput: ko.pureComputed(() => 'test'),
+    screeninput: ko.pureComputed(() => 'test'),
+    videoinput: ko.pureComputed(() => 'test'),
   };
 
   beforeAll(() => {
@@ -267,10 +267,10 @@ describe('CallingRepository', () => {
 
 describe('CallingRepository ISO', () => {
   const mediaDevices = {
-    audioInput: ko.pureComputed(() => 'test'),
-    audioOutput: ko.pureComputed(() => 'test'),
-    screenInput: ko.pureComputed(() => 'test'),
-    videoInput: ko.pureComputed(() => 'test'),
+    audioinput: ko.pureComputed(() => 'test'),
+    audiooutput: ko.pureComputed(() => 'test'),
+    screeninput: ko.pureComputed(() => 'test'),
+    videoinput: ko.pureComputed(() => 'test'),
   };
   describe('incoming call', () => {
     let avsUser: number;
