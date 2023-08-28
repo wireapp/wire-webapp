@@ -2261,7 +2261,16 @@ export class ConversationRepository {
             this.unarchiveConversation(conversationEntity, false, ConversationRepository.eventFromStreamMessage);
           }
           const isBackendTimestamp = eventSource !== EventSource.INJECTED;
-          if (type !== CONVERSATION_EVENT.MEMBER_JOIN && type !== CONVERSATION_EVENT.MEMBER_LEAVE) {
+
+          const eventsToSkip: (CLIENT_CONVERSATION_EVENT | CONVERSATION_EVENT)[] = [
+            CONVERSATION_EVENT.MEMBER_LEAVE,
+            CONVERSATION_EVENT.MEMBER_JOIN,
+            CONVERSATION_EVENT.DELETE,
+          ];
+
+          const shouldUpdateTimestampServer = !eventsToSkip.includes(type);
+
+          if (shouldUpdateTimestampServer) {
             conversationEntity.updateTimestampServer(eventJson.server_time || eventJson.time, isBackendTimestamp);
           }
         }
