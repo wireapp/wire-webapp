@@ -53,6 +53,7 @@ import {subconversationGroupIdStore} from './stores/subconversationGroupIdStore/
 import {KeyPackageClaimUser} from '../../../conversation';
 import {sendMessage} from '../../../conversation/message/messageSender';
 import {constructFullyQualifiedClientId, parseFullQualifiedClientId} from '../../../util/fullyQualifiedClientIdUtils';
+import {numberToHex} from '../../../util/numberToHex';
 import {cancelRecurringTask, registerRecurringTask} from '../../../util/RecurringTaskScheduler';
 import {TaskScheduler} from '../../../util/TaskScheduler';
 import {TypedEventEmitter} from '../../../util/TypedEventEmitter';
@@ -198,11 +199,13 @@ export class MLSService extends TypedEventEmitter<Events> {
     const failedToFetchKeyPackages: QualifiedId[] = [];
     const keyPackagesSettledResult = await Promise.allSettled(
       qualifiedUsers.map(({id, domain, skipOwnClientId}) =>
-        this.apiClient.api.client.claimMLSKeyPackages(id, domain, skipOwnClientId).catch(error => {
-          failedToFetchKeyPackages.push({id, domain});
-          // Throw the error so we don't get {status: 'fulfilled', value: undefined}
-          throw error;
-        }),
+        this.apiClient.api.client
+          .claimMLSKeyPackages(id, domain, numberToHex(this.defaultCiphersuite), skipOwnClientId)
+          .catch(error => {
+            failedToFetchKeyPackages.push({id, domain});
+            // Throw the error so we don't get {status: 'fulfilled', value: undefined}
+            throw error;
+          }),
       ),
     );
 
@@ -589,7 +592,10 @@ export class MLSService extends TypedEventEmitter<Events> {
       const clientId = this.apiClient.validatedClientId;
 
       //check numbers of keys on backend
-      const backendKeyPackagesCount = await this.apiClient.api.client.getMLSKeyPackageCount(clientId);
+      const backendKeyPackagesCount = await this.apiClient.api.client.getMLSKeyPackageCount(
+        clientId,
+        numberToHex(this.defaultCiphersuite),
+      );
 
       if (backendKeyPackagesCount <= minAllowedNumberOfKeyPackages) {
         //upload new keys
