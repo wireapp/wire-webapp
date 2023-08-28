@@ -38,7 +38,6 @@ export class Account extends EventEmitter {
       conversationExists: jest.fn(),
       exportSecretKey: jest.fn(),
       leaveConferenceSubconversation: jest.fn(),
-      conversationExists: jest.fn(),
       on: this.on,
       emit: this.emit,
       off: this.off,
