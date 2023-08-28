@@ -219,9 +219,9 @@ export class ConnectionRepository {
 
           default: {
             this.logger.error(`Failed to send connection request to user '${userEntity.id}': ${error.message}`, error);
-            return false;
           }
         }
+        return false;
       }
       throw error;
     }
