@@ -180,6 +180,15 @@ export class DebugUtil {
     );
   }
 
+  reconnectWebSocket({dryRun} = {dryRun: false}) {
+    return this.eventRepository.connectWebSocket(this.core, () => {}, dryRun);
+  }
+
+  async reconnectWebSocketWithLastNotificationIdFromBackend({dryRun} = {dryRun: false}) {
+    await this.core.service?.notification.initializeNotificationStream();
+    return this.eventRepository.connectWebSocket(this.core, () => {}, dryRun);
+  }
+
   /** Used by QA test automation. */
   blockAllConnections(): Promise<void[]> {
     const blockUsers = this.userState.users().map(userEntity => this.connectionRepository.blockUser(userEntity));
