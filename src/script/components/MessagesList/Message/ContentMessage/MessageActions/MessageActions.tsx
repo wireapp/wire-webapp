@@ -82,11 +82,11 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
   const {openMenu, closeMenu, openedMenu} = useMessageActionsState();
   const isMenuOpen = openedMenu === message.id;
 
-  const resetActionMenuStates = useCallback(() => {
+  const resetActionMenuStates = () => {
     setCurrentMsgAction('');
     closeMenu();
     handleActionMenuVisibility(false);
-  }, [handleActionMenuVisibility, closeMenu]);
+  };
 
   const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLButtonElement>) => {
     if (isTabKey(event)) {
