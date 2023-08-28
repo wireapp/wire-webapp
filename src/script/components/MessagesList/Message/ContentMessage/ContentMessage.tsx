@@ -137,11 +137,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
   const [isActionMenuVisible, setActionMenuVisibility] = useState(true);
   const isMenuOpen = useMessageActionsState(state => state.isMenuOpen);
   useEffect(() => {
-    if (isMessageFocused || msgFocusState) {
-      setActionMenuVisibility(true);
-    } else {
-      setActionMenuVisibility(false);
-    }
+    setActionMenuVisibility(isMessageFocused || msgFocusState);
   }, [msgFocusState, isMessageFocused]);
 
   const reactionGroupedByUser = groupByReactionUsers(reactions);
@@ -151,13 +147,21 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
     <div
       aria-label={messageAriaLabel}
       className="content-message-wrapper"
-      onMouseEnter={event => {
+      ref={element => {
+        setTimeout(() => {
+          if (element?.parentElement?.querySelector(':hover') === element) {
+            // Trigger the action menu in case the component is rendered with the mouse already hovering over it
+            setActionMenuVisibility(true);
+          }
+        });
+      }}
+      onMouseEnter={() => {
         // open another floating action menu if none already open
         if (!isMenuOpen) {
           setActionMenuVisibility(true);
         }
       }}
-      onMouseLeave={event => {
+      onMouseLeave={() => {
         // close floating message actions when no active menu is open like context menu/emoji picker
         if (!isMenuOpen) {
           setActionMenuVisibility(false);
