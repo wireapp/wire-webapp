@@ -49,7 +49,7 @@ interface ContextMenuProps {
   resetMenuStates?: () => void;
 }
 
-let container: HTMLDivElement;
+let container: HTMLDivElement | undefined;
 let previouslyFocused: HTMLElement;
 let reactRoot: Root;
 

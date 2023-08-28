@@ -17,7 +17,7 @@
  *
  */
 
-import {useState, RefObject, FC, useRef, useCallback} from 'react';
+import {useState, RefObject, FC, useRef} from 'react';
 
 import {KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -78,19 +78,16 @@ const MessageReactions: FC<MessageReactionsProps> = ({
     setShowEmojis(false);
   };
 
-  const handleReactionCurrentState = useCallback(
-    (actionName = '') => {
-      const isActive = !!actionName;
-      handleCurrentMsgAction(actionName);
-      if (isActive) {
-        openMenu(message.id);
-      } else {
-        closeMenu();
-      }
-      setShowEmojis(isActive);
-    },
-    [handleCurrentMsgAction, openMenu, closeMenu],
-  );
+  const handleReactionCurrentState = (actionName = '') => {
+    const isActive = !!actionName;
+    handleCurrentMsgAction(actionName);
+    if (isActive) {
+      openMenu(message.id);
+    } else {
+      closeMenu();
+    }
+    setShowEmojis(isActive);
+  };
 
   const handleEmojiBtnClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
