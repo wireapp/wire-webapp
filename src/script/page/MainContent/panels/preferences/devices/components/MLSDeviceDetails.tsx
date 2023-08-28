@@ -17,18 +17,25 @@
  *
  */
 
+// import {t} from 'Util/LocalizerUtil';
+
 import {splitFingerprint} from 'Util/StringUtil';
 
+// import {formatTimestamp} from 'Util/TimeUtil';
+import {E2ECertificateDetails} from './E2ECertificateDetails';
 import {FormattedId} from './FormattedId';
 
 interface MLSDeviceDetailsProps {
+  isMLSVerified?: boolean;
   fingerprint?: string;
 }
 
-// TODO: Replace with proper mls id
 const TMP_MLS_FINGERPRINT = '3dc87fff07c9296e3dc87fff07c9296e65687fff07c9296e3dc87fff07c9656f';
 
-export const MLSDeviceDetails = ({fingerprint = TMP_MLS_FINGERPRINT}: MLSDeviceDetailsProps) => {
+export const MLSDeviceDetails = ({fingerprint = TMP_MLS_FINGERPRINT, isMLSVerified = true}: MLSDeviceDetailsProps) => {
+  // const MLSStatus = MLSStatues.NOT_ACTIVATED;
+  const MLSStatus = undefined;
+
   return (
     <div className="mls-device-details">
       <h4 className="paragraph-body-3">MLS with Ed255519 Signature</h4>
@@ -38,6 +45,8 @@ export const MLSDeviceDetails = ({fingerprint = TMP_MLS_FINGERPRINT}: MLSDeviceD
       <p className="preferences-devices-fingerprint" css={{width: '230px'}}>
         <FormattedId idSlices={splitFingerprint(fingerprint)} />
       </p>
+
+      <E2ECertificateDetails MLSStatus={MLSStatus} isMLSVerified={isMLSVerified} />
     </div>
   );
 };
