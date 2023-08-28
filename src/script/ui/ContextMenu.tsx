@@ -46,7 +46,6 @@ interface ContextMenuProps {
   entries: ContextMenuEntry[];
   posX: number;
   posY: number;
-  resetMenuStates?: () => void;
 }
 
 let container: HTMLDivElement | undefined;
@@ -70,7 +69,6 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
   defaultIdentifier = `${contextMenuClassName}-item`,
   posX,
   posY,
-  resetMenuStates,
 }) => {
   const [mainElement, setMainElement] = useState<HTMLUListElement>();
   const [selected, setSelected] = useState<ContextMenuEntry>();
@@ -142,7 +140,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
       const isOutsideClick = mainElement && !mainElement.contains(event.target as Node);
       if (isOutsideClick) {
         cleanUp();
-        resetMsgMenuStates(isOutsideClick);
+        resetMsgMenuStates();
       }
     };
 
@@ -160,13 +158,9 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
   }, [mainElement, selected]);
 
   const {closeMenu} = useMessageActionsState();
-  const resetMsgMenuStates = (isOutsideClick = false) => {
+  const resetMsgMenuStates = () => {
     if (defaultIdentifier === msgMenuIdentifier) {
       closeMenu();
-
-      if (isOutsideClick) {
-        resetMenuStates?.();
-      }
     }
   };
 
@@ -235,7 +229,6 @@ export const showContextMenu = (
   event: MouseEvent | React.MouseEvent,
   entries: ContextMenuEntry[],
   identifier: string,
-  resetMenuStates?: () => void,
 ) => {
   event.preventDefault();
   event.stopPropagation();
@@ -247,12 +240,6 @@ export const showContextMenu = (
   document.body.appendChild(container);
   reactRoot = createRoot(container);
   reactRoot.render(
-    <ContextMenu
-      entries={entries}
-      defaultIdentifier={identifier}
-      posX={event.clientX}
-      posY={event.clientY}
-      resetMenuStates={resetMenuStates}
-    />,
+    <ContextMenu entries={entries} defaultIdentifier={identifier} posX={event.clientX} posY={event.clientY} />,
   );
 };
