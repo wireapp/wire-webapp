@@ -150,7 +150,6 @@ type IncomingEvent = ConversationEvent | ClientConversationEvent;
 
 export class ConversationRepository {
   private isBlockingNotificationHandling: boolean;
-  private readonly conversationsWithNewEvents: Map<any, any>;
   private readonly ephemeralHandler: ConversationEphemeralHandler;
   public readonly conversationLabelRepository: ConversationLabelRepository;
   public readonly conversationRoleRepository: ConversationRoleRepository;
@@ -272,7 +271,6 @@ export class ConversationRepository {
       this.conversationState,
     );
     this.isBlockingNotificationHandling = true;
-    this.conversationsWithNewEvents = new Map();
 
     this.teamState.isTeam.subscribe(() => this.mapGuestStatusSelf());
 
@@ -1533,9 +1531,6 @@ export class ConversationRepository {
     const isFetchingFromStream = handlingState !== NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
 
     if (this.isBlockingNotificationHandling !== isFetchingFromStream) {
-      if (!isFetchingFromStream) {
-        this.checkChangedConversations();
-      }
       this.isBlockingNotificationHandling = isFetchingFromStream;
       this.logger.info(`Block handling of conversation events: ${this.isBlockingNotificationHandling}`);
     }
@@ -2044,10 +2039,6 @@ export class ConversationRepository {
     this.onMemberUpdate(conversationEntity, response);
   }
 
-  private checkChangedConversations() {
-    this.conversationsWithNewEvents.clear();
-  }
-
   /**
    * Clears conversation content from view and the database.
    *
@@ -2241,7 +2232,6 @@ export class ConversationRepository {
     const onEventPromise = isConversationCreate
       ? Promise.resolve(null)
       : this.getConversationById(conversationId, true);
-    const previouslyArchived = false;
 
     return onEventPromise
       .then((conversationEntity: Conversation) => {
@@ -2262,7 +2252,7 @@ export class ConversationRepository {
       )
       .then((entityObject = {} as EntityObject) => {
         if (type !== CONVERSATION_EVENT.MEMBER_JOIN && type !== CONVERSATION_EVENT.MEMBER_LEAVE) {
-          this.handleConversationNotification(entityObject as EntityObject, eventSource, previouslyArchived);
+          this.handleConversationNotification(entityObject as EntityObject, eventSource);
         }
       })
       .catch((error: BaseError) => {
@@ -2500,14 +2490,9 @@ export class ConversationRepository {
    *
    * @param entityObject Object containing the conversation and the message that are targeted by the event
    * @param eventSource Source of event
-   * @param previouslyArchived `true` if the previous state of the conversation was archived
    * @returns Resolves when the conversation was updated
    */
-  private async handleConversationNotification(
-    entityObject: EntityObject,
-    eventSource: EventSource,
-    previouslyArchived: boolean,
-  ) {
+  private async handleConversationNotification(entityObject: EntityObject, eventSource: EventSource) {
     const {conversationEntity, messageEntity} = entityObject;
 
     if (conversationEntity) {
@@ -2527,14 +2512,6 @@ export class ConversationRepository {
 
         if (conversationEntity.is_cleared()) {
           conversationEntity.cleared_timestamp(0);
-        }
-      }
-
-      // Check if event needs to be un-archived
-      if (previouslyArchived) {
-        // Add to check for un-archiving at the end of stream handling
-        if (eventFromStream) {
-          this.conversationsWithNewEvents.set(conversationEntity.id, conversationEntity);
         }
       }
     }

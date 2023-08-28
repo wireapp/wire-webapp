@@ -672,7 +672,7 @@ export class NotificationRepository {
       };
     }
 
-    return () => amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity || conversationId, {archive: conversationEntity?.archivedState()});
+    return () => amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity || conversationId, {});
   }
 
   /**

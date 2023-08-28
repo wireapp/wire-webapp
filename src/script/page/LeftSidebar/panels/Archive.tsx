@@ -56,7 +56,7 @@ const Archive = ({
   ]);
 
   const onClickConversation = async (conversation: Conversation) => {
-    amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversation, {archive: true});
+    amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversation, {});
   };
 
   useEffect(() => {

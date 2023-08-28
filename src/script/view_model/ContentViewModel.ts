@@ -52,7 +52,6 @@ interface ShowConversationOptions {
   exposeMessage?: Message;
   openFirstSelfMention?: boolean;
   openNotificationSettings?: boolean;
-  archive?: boolean;
 }
 
 interface ShowConversationOverload {
@@ -159,14 +158,6 @@ export class ContentViewModel {
     return this.switchContent(ContentState.CONNECTION_REQUESTS);
   }
 
-  private closeRightSidebarAndThrowError(): void {
-    this.closeRightSidebar();
-    throw new ConversationError(
-      ConversationError.TYPE.CONVERSATION_NOT_FOUND,
-      ConversationError.MESSAGE.CONVERSATION_NOT_FOUND,
-    );
-  }
-
   private isConversationOpen(conversationEntity: Conversation, isActiveConversation: boolean): boolean {
     const {contentState} = useAppState.getState();
     const isConversationState = contentState === ContentState.CONVERSATION;
@@ -187,31 +178,16 @@ export class ContentViewModel {
     isOpenedConversation: boolean,
     openNotificationSettings: boolean,
     conversationEntity: Conversation,
-  ): boolean {
+  ): void {
     const {setContentState} = useAppState.getState();
     if (isOpenedConversation) {
       this.switchToNotificationSettingsIfApplicable(openNotificationSettings, conversationEntity);
-      return true;
+      return;
     }
     setContentState(ContentState.CONVERSATION);
 
     this.mainViewModel.list.openConversations(conversationEntity.archivedState());
-
-    return false;
   }
-
-  private processMessageEntity(
-    conversationEntity: Conversation,
-    openFirstSelfMention: boolean,
-    exposeMessageEntity: Message | undefined,
-  ): void {
-    const messageEntity = openFirstSelfMention ? conversationEntity.getFirstUnreadSelfMention() : exposeMessageEntity;
-    if (conversationEntity.is_cleared()) {
-      conversationEntity.cleared_timestamp(0);
-    }
-    this.changeConversation(conversationEntity, messageEntity);
-  }
-
   private showAndNavigate(conversationEntity: Conversation, openNotificationSettings: boolean): void {
     const {rightSidebar} = useAppMainState.getState();
     this.showContent(ContentState.CONVERSATION);
@@ -224,7 +200,7 @@ export class ContentViewModel {
     }
   }
 
-  private showErrorModal(): void {
+  private showConversationNotFoundErrorModal(): void {
     PrimaryModal.show(
       PrimaryModal.type.ACKNOWLEDGE,
       {
@@ -269,7 +245,11 @@ export class ContentViewModel {
       const conversationEntity = await this.getConversationEntity(conversation, domain);
 
       if (!conversationEntity) {
-        return this.closeRightSidebarAndThrowError();
+        this.closeRightSidebar();
+        throw new ConversationError(
+          ConversationError.TYPE.CONVERSATION_NOT_FOUND,
+          ConversationError.MESSAGE.CONVERSATION_NOT_FOUND,
+        );
       }
 
       const isActiveConversation = this.conversationState.isActiveConversation(conversationEntity);
@@ -285,11 +265,15 @@ export class ContentViewModel {
         this.conversationState.activeConversation(conversationEntity);
       }
 
-      this.processMessageEntity(conversationEntity, openFirstSelfMention, exposeMessageEntity);
+      if (conversationEntity.is_cleared()) {
+        conversationEntity.cleared_timestamp(0);
+      }
+      const messageEntity = openFirstSelfMention ? conversationEntity.getFirstUnreadSelfMention() : exposeMessageEntity;
+      this.changeConversation(conversationEntity, messageEntity);
       this.showAndNavigate(conversationEntity, openNotificationSettings);
     } catch (error: any) {
       if (this.isConversationNotFoundError(error)) {
-        this.showErrorModal();
+        this.showConversationNotFoundErrorModal();
       } else {
         throw error;
       }
