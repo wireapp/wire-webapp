@@ -189,6 +189,13 @@ export class DebugUtil {
     return this.reconnectWebSocket({dryRun});
   }
 
+  async updateActiveConversationKeyPackages() {
+    const groupId = this.conversationState.activeConversation()?.groupId;
+    if (groupId) {
+      return this.core.service?.mls?.renewKeyMaterial(groupId);
+    }
+  }
+
   /** Used by QA test automation. */
   blockAllConnections(): Promise<void[]> {
     const blockUsers = this.userState.users().map(userEntity => this.connectionRepository.blockUser(userEntity));
