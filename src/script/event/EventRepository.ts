@@ -183,11 +183,13 @@ export class EventRepository {
    *
    * @param account the account to connect to
    * @param onNotificationStreamProgress callback when a notification for the notification stream has been processed
+   * @param dryRun when set will not decrypt and not store the last notification ID. This is useful if you only want to subscribe to unencrypted backend events
    * @returns Resolves when the notification stream has fully been processed
    */
   async connectWebSocket(
     account: Account,
     onNotificationStreamProgress: (progress: {done: number; total: number}) => void,
+    dryRun = false,
   ): Promise<void> {
     await this.handleTimeDrift();
     const connect = () => {
@@ -204,6 +206,7 @@ export class EventRepository {
           onEvent: this.handleIncomingEvent,
           onMissedNotifications: this.triggerMissedSystemEventMessageRendering,
           onNotificationStreamProgress: onNotificationStreamProgress,
+          dryRun,
         });
       });
     };
