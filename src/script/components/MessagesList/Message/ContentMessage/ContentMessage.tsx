@@ -20,6 +20,7 @@
 import React, {useMemo, useState, useEffect} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import cx from 'classnames';
 
 import {Conversation} from 'src/script/entity/Conversation';
 import {CompositeMessage} from 'src/script/entity/message/CompositeMessage';
@@ -134,39 +135,17 @@ export const ContentMessageComponent: React.FC<ContentMessageProps> = ({
     senderName,
   });
 
-  const [isActionMenuVisible, setActionMenuVisibility] = useState(false);
-  const isMenuOpen = useMessageActionsState(state => state.isMenuOpen);
+  const [isActionMenuVisible, setActionMenuVisibility] = useState(true);
+  const openedMenu = useMessageActionsState(state => state.openedMenu);
+
   useEffect(() => {
-    setActionMenuVisibility(isMessageFocused || msgFocusState);
-  }, [msgFocusState, isMessageFocused]);
+    setActionMenuVisibility(isMessageFocused || msgFocusState || openedMenu === message.id);
+  }, [msgFocusState, isMessageFocused, openedMenu, setActionMenuVisibility, message.id]);
 
   const isConversationReadonly = conversation.readOnlyState() !== null;
 
   return (
-    <div
-      aria-label={messageAriaLabel}
-      className="content-message-wrapper"
-      ref={element => {
-        setTimeout(() => {
-          if (element?.parentElement?.querySelector(':hover') === element) {
-            // Trigger the action menu in case the component is rendered with the mouse already hovering over it
-            setActionMenuVisibility(true);
-          }
-        });
-      }}
-      onMouseEnter={() => {
-        // open another floating action menu if none already open
-        if (!isMenuOpen) {
-          setActionMenuVisibility(true);
-        }
-      }}
-      onMouseLeave={() => {
-        // close floating message actions when no active menu is open like context menu/emoji picker
-        if (!isMenuOpen) {
-          setActionMenuVisibility(false);
-        }
-      }}
-    >
+    <div aria-label={messageAriaLabel} className={cx('content-message-wrapper', {actionable: !openedMenu})}>
       {shouldShowAvatar() && (
         <MessageHeader onClickAvatar={onClickAvatar} message={message} focusTabIndex={messageFocusedTabIndex}>
           {was_edited && (
@@ -227,7 +206,7 @@ export const ContentMessageComponent: React.FC<ContentMessageProps> = ({
             />
           )}
         </div>
-        {!isConversationReadonly && isActionMenuVisible && (
+        <div className={cx('message-actions-wrapper', {visible: isActionMenuVisible})}>
           <MessageActionsMenu
             isMsgWithHeader={shouldShowAvatar()}
             message={message}
@@ -238,7 +217,7 @@ export const ContentMessageComponent: React.FC<ContentMessageProps> = ({
             reactionsTotalCount={reactions.length}
             isRemovedFromConversation={conversation.removed_from_conversation()}
           />
-        )}
+        </div>
 
         <div className="message-body-actions">
           <ReadReceiptStatus

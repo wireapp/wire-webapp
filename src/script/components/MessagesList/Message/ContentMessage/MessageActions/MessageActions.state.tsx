@@ -20,15 +20,19 @@
 import {create} from 'zustand';
 
 type MessageActionsState = {
-  isMenuOpen: boolean;
-  handleMenuOpen: (isMenuOpen: boolean) => void;
-  getMenuState: () => boolean;
+  openedMenu: string | undefined;
+  openMenu: (messageId: string) => void;
+  closeMenu: () => void;
 };
 
 const useMessageActionsState = create<MessageActionsState>((set, get) => ({
-  isMenuOpen: false,
-  handleMenuOpen: isMenuOpen => set(state => ({...state, isMenuOpen: isMenuOpen})),
-  getMenuState: () => get().isMenuOpen,
+  openedMenu: undefined,
+  openMenu(messageId) {
+    set(state => ({...state, openedMenu: messageId}));
+  },
+  closeMenu() {
+    set(state => ({...state, openedMenu: undefined}));
+  },
 }));
 
 export {useMessageActionsState};

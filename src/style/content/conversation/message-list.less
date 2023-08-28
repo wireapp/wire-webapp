@@ -108,6 +108,22 @@
       background-color: var(--gray-90);
     }
   }
+
+  .message-actions-wrapper {
+    display: none;
+    &.visible {
+      display: block;
+    }
+  }
+
+  &.actionable {
+    &:hover,
+    &:focus-visible {
+      .message-actions-wrapper {
+        display: block;
+      }
+    }
+  }
 }
 
 .message-marked {

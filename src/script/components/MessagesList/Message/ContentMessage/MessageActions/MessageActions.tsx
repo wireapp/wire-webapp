@@ -79,13 +79,14 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
   const [currentMsgActionName, setCurrentMsgAction] = useState('');
   const wrapperRef = useRef<HTMLDivElement>(null);
   const messageReactionTop = isMsgWithHeader ? messageWithHeaderTop : null;
-  const {handleMenuOpen, isMenuOpen} = useMessageActionsState();
+  const {openMenu, closeMenu, openedMenu} = useMessageActionsState();
+  const isMenuOpen = openedMenu === message.id;
 
   const resetActionMenuStates = useCallback(() => {
     setCurrentMsgAction('');
-    handleMenuOpen(false);
+    closeMenu();
     handleActionMenuVisibility(false);
-  }, [handleActionMenuVisibility, handleMenuOpen]);
+  }, [handleActionMenuVisibility, closeMenu]);
 
   const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLButtonElement>) => {
     if (isTabKey(event)) {
@@ -99,7 +100,7 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
       if ([KEY.SPACE, KEY.ENTER].includes(event.key)) {
         if (selectedMsgActionName) {
           setCurrentMsgAction(selectedMsgActionName);
-          handleMenuOpen(true);
+          openMenu(message.id);
           const newEvent = setContextMenuPosition(event);
           showContextMenu(newEvent, menuEntries, 'message-options-menu');
         }
@@ -107,7 +108,7 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
         // if there's no reaction then on tab from context menu hide the message actions menu
         setCurrentMsgAction('');
         handleActionMenuVisibility(false);
-        handleMenuOpen(false);
+        closeMenu();
       } else if (isTabKey(event)) {
         // shift+tab/tab will remove the focus from the menu button
         setCurrentMsgAction('');
@@ -122,20 +123,20 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
       if (currentMsgActionName === selectedMsgActionName) {
         // reset on double click
         setCurrentMsgAction('');
-        handleMenuOpen(false);
+        closeMenu();
       } else if (selectedMsgActionName) {
         setCurrentMsgAction(selectedMsgActionName);
-        handleMenuOpen(true);
+        openMenu(message.id);
         showContextMenu(event, menuEntries, 'message-options-menu', resetActionMenuStates);
       }
     },
-    [currentMsgActionName, handleMenuOpen, menuEntries],
+    [currentMsgActionName, closeMenu, openMenu, menuEntries],
   );
 
   const toggleActiveMenu = useCallback(
     (event: React.MouseEvent<HTMLButtonElement> | React.KeyboardEvent<HTMLButtonElement>) => {
       const selectedMsgActionName = event.currentTarget.dataset.uieName;
-      handleMenuOpen(false);
+      closeMenu();
       if (currentMsgActionName === selectedMsgActionName) {
         // reset on double click
         setCurrentMsgAction('');
@@ -143,7 +144,7 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
         setCurrentMsgAction(selectedMsgActionName);
       }
     },
-    [currentMsgActionName, handleMenuOpen],
+    [currentMsgActionName, closeMenu],
   );
 
   const handleMessageReply = useCallback(
