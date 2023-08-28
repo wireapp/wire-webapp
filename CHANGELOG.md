@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [41.5.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@41.4.2...@wireapp/core@41.5.0) (2023-08-28)
+
+### Features
+
+* key packages ciphersuite query param ([#5420](https://github.com/wireapp/wire-web-packages/issues/5420)) ([4cf3b96](https://github.com/wireapp/wire-web-packages/commit/4cf3b96a99b4367b7b9999dc89a570b7c1b57f3a))
+
 ## [41.4.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@41.4.1...@wireapp/core@41.4.2) (2023-08-24)
 
 **Note:** Version bump only for package @wireapp/core
