@@ -17,7 +17,7 @@
  *
  */
 
-import {useState, RefObject, FC, useRef} from 'react';
+import {useState, RefObject, FC, useRef, useCallback} from 'react';
 
 import {KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -58,14 +58,14 @@ const MessageReactions: FC<MessageReactionsProps> = ({
   const isThumbUpAction = currentMsgActionName === MessageActionsId.THUMBSUP;
   const isLikeAction = currentMsgActionName === MessageActionsId.HEART;
   const [showEmojis, setShowEmojis] = useState(false);
-  const {handleMenuOpen} = useMessageActionsState();
+  const {closeMenu, openMenu} = useMessageActionsState();
   const [clientX, setPOSX] = useState(INITIAL_CLIENT_X_POS);
   const [clientY, setPOSY] = useState(INITIAL_CLIENT_Y_POS);
   const emojiButtonRef = useRef<HTMLButtonElement>(null);
 
   const handleEmojiSelectionWithKeyboard = () => {
     if (showEmojis) {
-      handleMenuOpen(false);
+      closeMenu();
       setShowEmojis(false);
     }
     if (emojiButtonRef.current) {
@@ -78,12 +78,19 @@ const MessageReactions: FC<MessageReactionsProps> = ({
     setShowEmojis(false);
   };
 
-  const handleReactionCurrentState = (actionName = '') => {
-    const isActive = !!actionName;
-    handleCurrentMsgAction(actionName);
-    handleMenuOpen(isActive);
-    setShowEmojis(isActive);
-  };
+  const handleReactionCurrentState = useCallback(
+    (actionName = '') => {
+      const isActive = !!actionName;
+      handleCurrentMsgAction(actionName);
+      if (isActive) {
+        openMenu(message.id);
+      } else {
+        closeMenu();
+      }
+      setShowEmojis(isActive);
+    },
+    [handleCurrentMsgAction, openMenu, closeMenu],
+  );
 
   const handleEmojiBtnClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();

@@ -159,10 +159,10 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
     };
   }, [mainElement, selected]);
 
-  const {handleMenuOpen} = useMessageActionsState();
+  const {closeMenu} = useMessageActionsState();
   const resetMsgMenuStates = (isOutsideClick = false) => {
     if (defaultIdentifier === msgMenuIdentifier) {
-      handleMenuOpen?.(false);
+      closeMenu();
 
       if (isOutsideClick) {
         resetMenuStates?.();

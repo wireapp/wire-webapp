@@ -72,11 +72,11 @@ const DetailViewModalFooter: FC<DetailViewModalFooterProps> = ({
     }
     return void messageRepository.toggleReaction(conversationEntity, messageEntity, reaction, selfId);
   };
-  const {handleMenuOpen} = useMessageActionsState();
+  const {closeMenu} = useMessageActionsState();
   const resetActionMenuStates = useCallback(() => {
     setCurrentMsgAction('');
-    handleMenuOpen(false);
-  }, [handleMenuOpen]);
+    closeMenu();
+  }, [closeMenu]);
 
   const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLButtonElement>) => {
     if (isTabKey(event)) {
@@ -87,7 +87,7 @@ const DetailViewModalFooter: FC<DetailViewModalFooterProps> = ({
   const toggleActiveMenu = useCallback(
     (event: React.MouseEvent<HTMLButtonElement> | React.KeyboardEvent<HTMLButtonElement>) => {
       const selectedMsgActionName = event.currentTarget.dataset.uieName;
-      handleMenuOpen(false);
+      closeMenu();
       if (currentMsgActionName === selectedMsgActionName) {
         // reset on double click
         setCurrentMsgAction('');
@@ -95,7 +95,7 @@ const DetailViewModalFooter: FC<DetailViewModalFooterProps> = ({
         setCurrentMsgAction(selectedMsgActionName);
       }
     },
-    [currentMsgActionName, handleMenuOpen],
+    [currentMsgActionName, closeMenu],
   );
 
   const handleMessageReply = useCallback(
