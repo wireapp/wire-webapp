@@ -70,6 +70,7 @@ describe('MLSService', () => {
       expect(apiClient.api.client.claimMLSKeyPackages).toHaveBeenCalledWith(
         selfUser.id,
         selfUser.domain,
+        '0x1',
         creator.client,
       );
       expect(mlsService.scheduleKeyMaterialRenewal).toHaveBeenCalledWith(groupId);
