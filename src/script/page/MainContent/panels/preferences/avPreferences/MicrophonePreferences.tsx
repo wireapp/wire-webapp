@@ -20,6 +20,7 @@
 import React, {useEffect, useState} from 'react';
 
 import {Icon} from 'Components/Icon';
+import {MediaDeviceType} from 'src/script/media/MediaDeviceType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';

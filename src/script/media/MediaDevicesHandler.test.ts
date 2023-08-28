@@ -201,7 +201,8 @@ describe('MediaDevicesHandler', () => {
 
   describe('constructor', () => {
     it('loads available devices and listens to input devices changes', done => {
-      spyOn(navigator.mediaDevices, 'enumerateDevices').and.returnValue(
+      const enumerateDevicesSpy = spyOn(navigator.mediaDevices, 'enumerateDevices');
+      enumerateDevicesSpy.and.returnValue(
         Promise.resolve([
           ...fakeWorldTestSetup.cameras,
           ...fakeWorldTestSetup.microphones,
@@ -216,7 +217,7 @@ describe('MediaDevicesHandler', () => {
         expect(devicesHandler.availableDevices.audiooutput()).toEqual(fakeWorldTestSetup.speakers);
 
         const newCameras = [{deviceId: 'newcamera', kind: MediaDeviceType.VIDEO_INPUT}];
-        navigator.mediaDevices.enumerateDevices.and.returnValue(Promise.resolve(newCameras));
+        enumerateDevicesSpy.and.returnValue(Promise.resolve(newCameras));
         navigator.mediaDevices!.ondevicechange?.(Event.prototype);
 
         setTimeout(() => {

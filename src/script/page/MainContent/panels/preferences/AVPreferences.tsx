@@ -19,6 +19,7 @@
 
 import React from 'react';
 
+import {MediaDeviceType} from 'src/script/media/MediaDeviceType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -30,7 +31,6 @@ import {SaveCallLogs} from './avPreferences/SaveCallLogs';
 import {PreferencesPage} from './components/PreferencesPage';
 
 import type {CallingRepository} from '../../../../calling/CallingRepository';
-import {MediaDeviceType} from '../../../../media/MediaDevicesHandler';
 import type {MediaRepository} from '../../../../media/MediaRepository';
 import type {PropertiesRepository} from '../../../../properties/PropertiesRepository';
 
@@ -53,14 +53,14 @@ const AVPreferences: React.FC<AVPreferencesProps> = ({
 
   return (
     <PreferencesPage title={t('preferencesAV')}>
-      {deviceSupport.audioInput && (
+      {deviceSupport.audioinput && (
         <MicrophonePreferences
           {...{devicesHandler, streamHandler}}
           refreshStream={() => callingRepository.refreshAudioInput()}
         />
       )}
-      {deviceSupport.audioOutput && <AudioOutPreferences {...{devicesHandler}} />}
-      {deviceSupport.videoInput && (
+      {deviceSupport.audiooutput && <AudioOutPreferences {...{devicesHandler}} />}
+      {deviceSupport.videoinput && (
         <CameraPreferences
           {...{devicesHandler, streamHandler}}
           refreshStream={() => callingRepository.refreshVideoInput()}
