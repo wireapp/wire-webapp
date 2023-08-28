@@ -186,7 +186,7 @@ export class DebugUtil {
 
   async reconnectWebSocketWithLastNotificationIdFromBackend({dryRun} = {dryRun: false}) {
     await this.core.service?.notification.initializeNotificationStream();
-    return this.eventRepository.connectWebSocket(this.core, () => {}, dryRun);
+    return this.reconnectWebSocket({dryRun});
   }
 
   /** Used by QA test automation. */
