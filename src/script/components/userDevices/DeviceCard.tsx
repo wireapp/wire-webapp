@@ -78,9 +78,6 @@ const DeviceCard: React.FC<DeviceCardProps> = ({
         />
       )}
 
-      {/*{showDesktopIcon && <Icon.Desktop className="device-card__icon" data-uie-name="status-desktop-device" />}*/}
-      {/*{showMobileIcon && <Icon.Devices className="device-card__icon" data-uie-name="status-mobile-device" />}*/}
-
       <div className="device-card__info" data-uie-name="device-card-info" data-uie-value={label}>
         <div className="device-card__name">
           <span className="device-card__model">{name}</span>
