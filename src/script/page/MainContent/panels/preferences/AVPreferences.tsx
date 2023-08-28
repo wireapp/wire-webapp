@@ -30,7 +30,7 @@ import {SaveCallLogs} from './avPreferences/SaveCallLogs';
 import {PreferencesPage} from './components/PreferencesPage';
 
 import type {CallingRepository} from '../../../../calling/CallingRepository';
-import {DeviceTypes} from '../../../../media/MediaDevicesHandler';
+import {MediaDeviceType} from '../../../../media/MediaDevicesHandler';
 import type {MediaRepository} from '../../../../media/MediaRepository';
 import type {PropertiesRepository} from '../../../../properties/PropertiesRepository';
 
@@ -46,9 +46,9 @@ const AVPreferences: React.FC<AVPreferencesProps> = ({
   callingRepository,
 }) => {
   const deviceSupport = useKoSubscribableChildren(devicesHandler?.deviceSupport, [
-    DeviceTypes.AUDIO_INPUT,
-    DeviceTypes.AUDIO_OUTPUT,
-    DeviceTypes.VIDEO_INPUT,
+    MediaDeviceType.AUDIO_INPUT,
+    MediaDeviceType.AUDIO_OUTPUT,
+    MediaDeviceType.VIDEO_INPUT,
   ]);
 
   return (

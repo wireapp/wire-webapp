@@ -409,11 +409,11 @@ export class CallingViewModel {
         }
       },
       switchCameraInput: (call: Call, deviceId: string) => {
-        this.mediaDevicesHandler.currentDeviceId.videoInput(deviceId);
+        this.mediaDevicesHandler.currentDeviceId.videoinput(deviceId);
         this.callingRepository.refreshVideoInput();
       },
       switchScreenInput: (call: Call, deviceId: string) => {
-        this.mediaDevicesHandler.currentDeviceId.screenInput(deviceId);
+        this.mediaDevicesHandler.currentDeviceId.screeninput(deviceId);
       },
       toggleCamera: (call: Call) => {
         this.callingRepository.toggleCamera(call);
@@ -428,7 +428,7 @@ export class CallingViewModel {
         const showScreenSelection = (): Promise<void> => {
           return new Promise(resolve => {
             this.callingRepository.onChooseScreen = (deviceId: string): void => {
-              this.mediaDevicesHandler.currentDeviceId.screenInput(deviceId);
+              this.mediaDevicesHandler.currentDeviceId.screeninput(deviceId);
               this.callState.selectableScreens([]);
               this.callState.selectableWindows([]);
               resolve();

@@ -30,7 +30,7 @@ import {AudioState} from './AudioState';
 import {AudioType} from './AudioType';
 
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
-import {DeviceTypes, MediaDevicesHandler} from '../media/MediaDevicesHandler';
+import {MediaDevicesHandler} from '../media/MediaDevicesHandler';
 
 enum AUDIO_PLAY_PERMISSION {
   ALLOWED = 0,
@@ -87,7 +87,7 @@ export class AudioRepository {
   }
 
   private updateSinkIds() {
-    const currentOutputDevice = this.devicesHandler?.currentDeviceId[DeviceTypes.AUDIO_OUTPUT]();
+    const currentOutputDevice = this.devicesHandler?.currentDeviceId[MediaDeviceType.AUDIO_OUTPUT]();
     if (!currentOutputDevice) {
       return;
     }

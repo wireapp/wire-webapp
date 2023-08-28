@@ -172,7 +172,7 @@ describe('MediaDevicesHandler', () => {
       const devicesHandler = new MediaDevicesHandler();
 
       setTimeout(() => {
-        expect(devicesHandler.availableDevices.audioInput().length).toEqual(1);
+        expect(devicesHandler.availableDevices.audioinput().length).toEqual(1);
       });
     });
 
@@ -192,9 +192,9 @@ describe('MediaDevicesHandler', () => {
       expect(realWorldTestSetup.speakers.length).toEqual(7);
 
       setTimeout(() => {
-        expect(devicesHandler.availableDevices.videoInput().length).toEqual(2);
-        expect(devicesHandler.availableDevices.audioInput().length).toEqual(3);
-        expect(devicesHandler.availableDevices.audioOutput().length).toEqual(4);
+        expect(devicesHandler.availableDevices.videoinput().length).toEqual(2);
+        expect(devicesHandler.availableDevices.audioinput().length).toEqual(3);
+        expect(devicesHandler.availableDevices.audiooutput().length).toEqual(4);
       });
     });
   });
@@ -212,8 +212,8 @@ describe('MediaDevicesHandler', () => {
       const devicesHandler = new MediaDevicesHandler();
       setTimeout(() => {
         expect(navigator.mediaDevices.enumerateDevices).toHaveBeenCalledTimes(1);
-        expect(devicesHandler.availableDevices.videoInput()).toEqual(fakeWorldTestSetup.cameras);
-        expect(devicesHandler.availableDevices.audioOutput()).toEqual(fakeWorldTestSetup.speakers);
+        expect(devicesHandler.availableDevices.videoinput()).toEqual(fakeWorldTestSetup.cameras);
+        expect(devicesHandler.availableDevices.audiooutput()).toEqual(fakeWorldTestSetup.speakers);
 
         const newCameras = [{deviceId: 'newcamera', kind: MediaDeviceType.VIDEO_INPUT}];
         navigator.mediaDevices.enumerateDevices.and.returnValue(Promise.resolve(newCameras));
@@ -221,8 +221,8 @@ describe('MediaDevicesHandler', () => {
 
         setTimeout(() => {
           expect(navigator.mediaDevices.enumerateDevices).toHaveBeenCalledTimes(2);
-          expect(devicesHandler.availableDevices.videoInput()).toEqual(newCameras);
-          expect(devicesHandler.availableDevices.audioOutput()).toEqual([]);
+          expect(devicesHandler.availableDevices.videoinput()).toEqual(newCameras);
+          expect(devicesHandler.availableDevices.audiooutput()).toEqual([]);
           done();
         });
       });
@@ -241,31 +241,31 @@ describe('MediaDevicesHandler', () => {
 
       const devicesHandler = new MediaDevicesHandler();
       setTimeout(() => {
-        devicesHandler.currentDeviceId.videoInput(fakeWorldTestSetup.cameras[0].deviceId);
+        devicesHandler.currentDeviceId.videoinput(fakeWorldTestSetup.cameras[0].deviceId);
 
-        expect(devicesHandler.currentAvailableDeviceId.videoInput()).toBe(fakeWorldTestSetup.cameras[0].deviceId);
+        expect(devicesHandler.currentAvailableDeviceId.videoinput()).toBe(fakeWorldTestSetup.cameras[0].deviceId);
 
-        devicesHandler.currentDeviceId.videoInput('not-existing-id');
-        expect(devicesHandler.currentAvailableDeviceId.videoInput()).toBe(
-          MediaDevicesHandler.CONFIG.DEFAULT_DEVICE.videoInput,
+        devicesHandler.currentDeviceId.videoinput('not-existing-id');
+        expect(devicesHandler.currentAvailableDeviceId.videoinput()).toBe(
+          MediaDevicesHandler.CONFIG.DEFAULT_DEVICE.videoinput,
         );
 
-        devicesHandler.currentDeviceId.audioInput(fakeWorldTestSetup.microphones[0].deviceId);
+        devicesHandler.currentDeviceId.audioinput(fakeWorldTestSetup.microphones[0].deviceId);
 
-        expect(devicesHandler.currentAvailableDeviceId.audioInput()).toBe(fakeWorldTestSetup.microphones[0].deviceId);
+        expect(devicesHandler.currentAvailableDeviceId.audioinput()).toBe(fakeWorldTestSetup.microphones[0].deviceId);
 
-        devicesHandler.currentDeviceId.audioInput('not-existing-id');
-        expect(devicesHandler.currentAvailableDeviceId.audioInput()).toBe(
-          MediaDevicesHandler.CONFIG.DEFAULT_DEVICE.audioInput,
+        devicesHandler.currentDeviceId.audioinput('not-existing-id');
+        expect(devicesHandler.currentAvailableDeviceId.audioinput()).toBe(
+          MediaDevicesHandler.CONFIG.DEFAULT_DEVICE.audioinput,
         );
 
-        devicesHandler.currentDeviceId.audioOutput(fakeWorldTestSetup.speakers[0].deviceId);
+        devicesHandler.currentDeviceId.audiooutput(fakeWorldTestSetup.speakers[0].deviceId);
 
-        expect(devicesHandler.currentAvailableDeviceId.audioOutput()).toBe(fakeWorldTestSetup.speakers[0].deviceId);
+        expect(devicesHandler.currentAvailableDeviceId.audiooutput()).toBe(fakeWorldTestSetup.speakers[0].deviceId);
 
-        devicesHandler.currentDeviceId.audioOutput('inexistant-id');
-        expect(devicesHandler.currentAvailableDeviceId.audioOutput()).toBe(
-          MediaDevicesHandler.CONFIG.DEFAULT_DEVICE.audioOutput,
+        devicesHandler.currentDeviceId.audiooutput('inexistant-id');
+        expect(devicesHandler.currentAvailableDeviceId.audiooutput()).toBe(
+          MediaDevicesHandler.CONFIG.DEFAULT_DEVICE.audiooutput,
         );
         done();
       });
