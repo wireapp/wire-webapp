@@ -45,7 +45,6 @@ import type {ContentMessage} from './message/ContentMessage';
 import type {MemberMessage} from './message/MemberMessage';
 import type {Message} from './message/Message';
 import {PingMessage} from './message/PingMessage';
-import type {SystemMessage} from './message/SystemMessage';
 import type {User} from './User';
 
 import type {Call} from '../calling/Call';
@@ -86,7 +85,7 @@ enum TIMESTAMP_TYPE {
 export class Conversation {
   private readonly teamState: TeamState;
   public readonly archivedState: ko.Observable<boolean>;
-  private readonly incomingMessages: ko.ObservableArray<Message | ContentMessage | MemberMessage>;
+  private readonly incomingMessages: ko.ObservableArray<Message>;
   private readonly isManaged: boolean;
   private readonly isTeam1to1: ko.PureComputed<boolean>;
   public readonly last_server_timestamp: ko.Observable<number>;
@@ -150,9 +149,9 @@ export class Conversation {
   public readonly last_read_timestamp: ko.Observable<number>;
   public readonly legalHoldStatus: ko.Observable<LegalHoldStatus>;
   public readonly localMessageTimer: ko.Observable<number>;
-  public readonly messages_unordered: ko.ObservableArray<Message | ContentMessage | MemberMessage>;
-  public readonly messages_visible: ko.PureComputed<(Message | ContentMessage | MemberMessage)[]>;
-  public readonly messages: ko.PureComputed<(Message | ContentMessage | MemberMessage)[]>;
+  public readonly messages_unordered: ko.ObservableArray<Message>;
+  public readonly messages_visible: ko.PureComputed<Message[]>;
+  public readonly messages: ko.PureComputed<Message[]>;
   public readonly messageTimer: ko.PureComputed<number>;
   public readonly name: ko.Observable<string>;
   public readonly notificationState: ko.PureComputed<number>;
@@ -677,7 +676,7 @@ export class Conversation {
    * @param messageEntity Message entity to be added to the conversation.
    * @returns If a message was replaced in the conversation
    */
-  addMessage(messageEntity: Message | ContentMessage | MemberMessage): boolean | void {
+  addMessage(messageEntity: Message): boolean | void {
     if (messageEntity) {
       const messageWithLinkPreview = () => this._findDuplicate(messageEntity.id, messageEntity.from);
       const editedMessage = () =>
@@ -866,8 +865,8 @@ export class Conversation {
   }
 
   private _findDuplicate(): undefined;
-  private _findDuplicate(messageId: string, from: string): Message | ContentMessage | MemberMessage;
-  private _findDuplicate(messageId?: string, from?: string): Message | ContentMessage | MemberMessage | undefined {
+  private _findDuplicate(messageId: string, from: string): Message;
+  private _findDuplicate(messageId?: string, from?: string): Message | undefined {
     if (messageId) {
       return this.messages_unordered().find(messageEntity => {
         const sameId = messageEntity.id === messageId;
@@ -894,10 +893,7 @@ export class Conversation {
    * @param message_et Message to be added to conversation
    * @param forceUpdate set the timestamp regardless of previous timestamp value (no checks)
    */
-  updateTimestamps(
-    message_et?: Message | ContentMessage | MemberMessage | SystemMessage,
-    forceUpdate: boolean = false,
-  ): void {
+  updateTimestamps(message_et?: Message, forceUpdate: boolean = false): void {
     if (message_et) {
       const timestamp = message_et.timestamp();
       if (timestamp <= this.last_server_timestamp()) {
@@ -916,21 +912,21 @@ export class Conversation {
     }
   }
 
-  getAllMessages(): (Message | ContentMessage | MemberMessage | SystemMessage)[] {
+  getAllMessages(): Message[] {
     return this.messages();
   }
 
   /**
    * Get the first message of the conversation.
    */
-  getOldestMessage(): Message | ContentMessage | MemberMessage | SystemMessage | undefined {
+  getOldestMessage(): Message | undefined {
     return this.messages()[0];
   }
 
   /**
    * Get the last message of the conversation.
    */
-  getNewestMessage(): Message | ContentMessage | MemberMessage | SystemMessage | undefined {
+  getNewestMessage(): Message | undefined {
     return this.messages()[this.messages().length - 1];
   }
 
@@ -938,7 +934,7 @@ export class Conversation {
    * Get the message before a given message.
    * @param message_et Message to look up from
    */
-  getPreviousMessage(message_et: Message): Message | ContentMessage | MemberMessage | SystemMessage | undefined {
+  getPreviousMessage(message_et: Message): Message | undefined {
     const messages_visible = this.messages_visible();
     const message_index = messages_visible.indexOf(message_et);
     if (message_index > 0) {
@@ -950,7 +946,7 @@ export class Conversation {
   /**
    * Get the last text message that was added by self user.
    */
-  getLastEditableMessage(): Message | ContentMessage | MemberMessage | SystemMessage | undefined {
+  getLastEditableMessage(): Message | undefined {
     const messages = this.messages();
     for (let index = messages.length - 1; index >= 0; index--) {
       const message_et = messages[index];
@@ -964,7 +960,7 @@ export class Conversation {
   /**
    * Get the last delivered message.
    */
-  getLastDeliveredMessage(): Message | ContentMessage | MemberMessage | SystemMessage | undefined {
+  getLastDeliveredMessage(): Message | undefined {
     return this.messages()
       .slice()
       .reverse()
@@ -980,7 +976,7 @@ export class Conversation {
    *
    * @param messageId ID of message to be retrieved
    */
-  getMessage(messageId: string): Message | ContentMessage | MemberMessage | SystemMessage | undefined {
+  getMessage(messageId: string): Message | undefined {
     return this.messages().find(messageEntity => messageEntity.id === messageId);
   }
   /**
@@ -989,7 +985,7 @@ export class Conversation {
    *
    * @param messageId ID of message to be retrieved
    */
-  getMessageByReplacementId(messageId: string): Message | ContentMessage | MemberMessage | SystemMessage | undefined {
+  getMessageByReplacementId(messageId: string): Message | undefined {
     return this.messages().find(
       messageEntity => isContentMessage(messageEntity) && messageEntity.replacing_message_id === messageId,
     );
