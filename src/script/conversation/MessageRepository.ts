@@ -1120,7 +1120,7 @@ export class MessageRepository {
    */
   public async deleteMessageById(conversationEntity: Conversation, messageId: string): Promise<number> {
     const isLastDeleted =
-      conversationEntity.isShowingLastReceivedMessage() && conversationEntity.getNewestMessage()?.id === messageId;
+      conversationEntity.hasLastReceivedMessageLoaded() && conversationEntity.getNewestMessage()?.id === messageId;
 
     const deleteCount = await this.eventService.deleteEvent(conversationEntity.id, messageId);
     const previousMessage = conversationEntity.getNewestMessage();
