@@ -19,7 +19,7 @@
 
 import {waitFor} from '@testing-library/react';
 
-import {configureRoutes, navigate} from './Router';
+import {configureRoutes, navigate, setHistoryParam} from './Router';
 
 describe('Router', () => {
   afterEach(() => {
@@ -75,6 +75,36 @@ describe('Router', () => {
       waitFor(() => {
         expect(handlers.conversation).toHaveBeenCalled();
       });
+    });
+  });
+
+  describe('setHistoryParam', () => {
+    // Mock window.history.replaceState before each test
+    beforeEach(() => {
+      global.history.replaceState = jest.fn();
+    });
+
+    // Restore the original method after each test
+    afterEach(() => {
+      (global.history.replaceState as jest.Mock).mockRestore();
+    });
+
+    it('throws an error if history.state is not empty and stateObj is not provided', () => {
+      Object.defineProperty(window.history, 'state', {value: {}, writable: true});
+
+      expect(() => setHistoryParam('/path')).toThrow('stateObj must be provided when history.state is not empty.');
+    });
+
+    it('does not throw an error if history.state is empty and stateObj is not provided', () => {
+      Object.defineProperty(window.history, 'state', {value: null, writable: true});
+
+      expect(() => setHistoryParam('/path')).not.toThrow();
+    });
+
+    it('does not throw an error if history.state is not empty and stateObj is provided', () => {
+      Object.defineProperty(window.history, 'state', {value: {}, writable: true}); // Temporarily override history.state for this test
+
+      expect(() => setHistoryParam('/path', {})).not.toThrow();
     });
   });
 });
