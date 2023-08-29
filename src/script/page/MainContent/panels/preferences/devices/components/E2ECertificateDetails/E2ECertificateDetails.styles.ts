@@ -36,6 +36,7 @@ type stylesProps = {
   serialNumberWrapper: CSSObject;
   notAvailable: CSSObject;
   serialNumber: CSSObject;
+  delimiter: (position: number) => CSSObject;
 };
 
 export const styles: stylesProps = {
@@ -65,10 +66,22 @@ export const styles: stylesProps = {
     color: 'var(--gray-70)',
   },
   serialNumber: {
-    fontFamily: 'SF Mono',
     fontSize: 'var(--font-size-medium)',
     lineHeight: 'var(--line-height-sm)',
     textTransform: 'uppercase',
     width: '217px',
+    textAlign: 'justify',
   },
+  delimiter: position => ({
+    marginInline: '2px',
+
+    [`:nth-of-type(${position})`]: {
+      marginRight: 0,
+
+      '&::after': {
+        content: '""',
+        display: 'block',
+      },
+    },
+  }),
 };

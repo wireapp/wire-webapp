@@ -17,12 +17,32 @@
  *
  */
 
+import {Fragment} from 'react';
+
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {Badges, MLSStatues} from 'Components/Badges';
 import {t} from 'Util/LocalizerUtil';
 
 import {styles} from './E2ECertificateDetails.styles';
+
+const TMP_SERIAL_NUMBER = 'e5:d5:e6:75:7e:04:86:07:14:3c:a0:ed:9a:8d:e4:fd';
+
+const formattedSerialNumber = (serialNumber: string) => {
+  const splittedSerialNumber = serialNumber.split(':');
+
+  return splittedSerialNumber.map((slice, index) => {
+    const breakLine = splittedSerialNumber.length;
+
+    return (
+      <Fragment key={slice + index}>
+        {index > 0 ? <span css={styles.delimiter(breakLine)}>:</span> : null}
+
+        <span className="serial-number-part">{slice}</span>
+      </Fragment>
+    );
+  });
+};
 
 interface E2ECertificateDetailsProps {
   MLSStatus?: MLSStatues;
@@ -77,7 +97,10 @@ export const E2ECertificateDetails = ({MLSStatus, isMLSVerified}: E2ECertificate
             {t('E2E.notAvailable')}
           </span>
         ) : (
-          <div css={styles.serialNumber}>e5:d5:e6:75:7e:04:86:07: 14:3c:a0:ed:9a:8d:e4:fd</div>
+          <>
+            {/*<div css={styles.serialNumber}>e5:d5:e6:75:7e:04:86:07:14:3c:a0:ed:9a:8d:e4:fd</div>*/}
+            <p css={styles.serialNumber}>{formattedSerialNumber(TMP_SERIAL_NUMBER)}</p>
+          </>
         )}
       </p>
 
