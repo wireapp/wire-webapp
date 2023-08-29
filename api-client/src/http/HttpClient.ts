@@ -131,9 +131,7 @@ export class HttpClient extends EventEmitter {
         config.headers = {
           ...config.headers,
           Authorization: `${token_type} ${access_token}`,
-          // There is a typedef error in axios 1.1.2. This has been fixed with 1.1.3 (that we cannot use as of now because of webpack build https://github.com/axios/axios/issues/5154)
-          // This `any` can be removed when we use axios > 1.1.3
-        } as any;
+        };
       }
     }
 
@@ -278,9 +276,7 @@ export class HttpClient extends EventEmitter {
     config.headers = {
       ...config.headers,
       'Content-Type': ContentType.APPLICATION_JSON,
-      // There is a typedef error in axios 1.1.2. This has been fixed with 1.1.3 (that we cannot use as of now because of webpack build https://github.com/axios/axios/issues/5154)
-      // This `any` can be removed when we use axios > 1.1.3
-    } as any;
+    };
     return this.sendRequest<T>(config, false, isSynchronousRequest);
   }
 
@@ -288,9 +284,7 @@ export class HttpClient extends EventEmitter {
     config.headers = {
       ...config.headers,
       'Content-Type': ContentType.APPLICATION_XML,
-      // There is a typedef error in axios 1.1.2. This has been fixed with 1.1.3 (that we cannot use as of now because of webpack build https://github.com/axios/axios/issues/5154)
-      // This `any` can be removed when we use axios > 1.1.3
-    } as any;
+    };
     return this.sendRequest<T>(config, false, false);
   }
 
@@ -301,9 +295,7 @@ export class HttpClient extends EventEmitter {
     config.headers = {
       ...config.headers,
       'Content-Type': ContentType.APPLICATION_PROTOBUF,
-      // There is a typedef error in axios 1.1.2. This has been fixed with 1.1.3 (that we cannot use as of now because of webpack build https://github.com/axios/axios/issues/5154)
-      // This `any` can be removed when we use axios > 1.1.3
-    } as any;
+    };
     return this.sendRequest<T>(config, false, isSynchronousRequest);
   }
 
@@ -314,9 +306,7 @@ export class HttpClient extends EventEmitter {
     config.headers = {
       ...config.headers,
       'Content-Type': ContentType.MESSAGES_MLS,
-      // There is a typedef error in axios 1.1.2. This has been fixed with 1.1.3 (that we cannot use as of now because of webpack build https://github.com/axios/axios/issues/5154)
-      // This `any` can be removed when we use axios > 1.1.3
-    } as any;
+    };
     return this.sendRequest<T>(config, false, isSynchronousRequest);
   }
 }
