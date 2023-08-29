@@ -46,5 +46,8 @@ export const navigate = (path: string, stateObj?: {}) => {
 };
 
 export const setHistoryParam = (path: string, stateObj?: {}) => {
+  if (window.history.state && !stateObj) {
+    throw new Error('stateObj must be provided when history.state is not empty.');
+  }
   window.history.replaceState(stateObj, '', `#${path}`);
 };
