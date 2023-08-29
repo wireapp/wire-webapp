@@ -17,6 +17,7 @@
  *
  */
 
+import {E2EIUtils} from '@wireapp/core/lib/messagingProtocols/mls/E2EIdentityService';
 import {container} from 'tsyringe';
 
 import {PrimaryModal, removeCurrentModal} from 'Components/Modals/PrimaryModal';
@@ -45,6 +46,7 @@ interface E2EIHandlerParams {
 class E2EIHandler {
   private static instance: E2EIHandler | null = null;
   private readonly core = container.resolve(Core);
+  private readonly userState = container.resolve(UserState);
   private timer: ReturnType<typeof this.core.e2eiUtils.getDelayTimerInstance>;
   private discoveryUrl: string;
   private gracePeriodInMS: number;
@@ -105,19 +107,19 @@ class E2EIHandler {
 
   private async enrollE2EI() {
     try {
-      const userState = container.resolve(UserState);
       // Notify user about E2EI enrollment in progress
       this.currentStep = E2EIHandlerStep.ENROLL;
       this.showLoadingMessage();
       const success = await this.core.enrollE2EI(
-        userState.self().name(),
-        userState.self().username(),
+        this.userState.self().name(),
+        this.userState.self().username(),
         this.discoveryUrl,
       );
       if (!success) {
         throw new Error('E2EI enrollment failed');
       }
       // Notify user about E2EI enrollment success
+      // This setTimeout is needed because there was a timing with the success modal and the loading modal
       setTimeout(() => {
         removeCurrentModal();
       }, 0);
@@ -165,12 +167,14 @@ class E2EIHandler {
       return;
     }
 
+    E2EIUtils.clearAllProgress();
+
     const {modalOptions, modalType} = getModalOptions({
       type: ModalType.ERROR,
       hideClose: true,
-      primaryActionFn: async () => {
+      primaryActionFn: () => {
         this.currentStep = E2EIHandlerStep.INITIALIZED;
-        await this.enrollE2EI();
+        void this.enrollE2EI();
       },
       secondaryActionFn: () => {
         this.showE2EINotificationMessage();
@@ -189,10 +193,12 @@ class E2EIHandler {
       return;
     }
 
+    // If the user has already snoozed the notification, don't show it again until the snooze period has expired
     if (this.currentStep !== E2EIHandlerStep.UNINITIALIZED && this.currentStep !== E2EIHandlerStep.SNOOZE) {
       return;
     }
 
+    // Only initialize the timer when the it is uninitialized
     if (this.currentStep === E2EIHandlerStep.UNINITIALIZED) {
       this.timer.updateParams({
         gracePeriodInMS: this.gracePeriodInMS,
@@ -206,6 +212,7 @@ class E2EIHandler {
       this.currentStep = E2EIHandlerStep.INITIALIZED;
     }
 
+    // If the timer is not active, show the notification
     if (!this.timer.isDelayTimerActive()) {
       const {modalOptions, modalType} = getModalOptions({
         hideSecondary: !this.timer.isSnoozeTimeAvailable(),
