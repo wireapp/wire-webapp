@@ -113,7 +113,7 @@ export class NotificationRepository {
   }
 
   static get EVENTS_TO_NOTIFY(): SuperType[] {
-    return [SuperType.CALL, SuperType.CONTENT, SuperType.MEMBER, SuperType.PING, SuperType.REACTION, SuperType.SYSTEM];
+    return [SuperType.CALL, SuperType.CONTENT, SuperType.MEMBER, SuperType.PING, SuperType.SYSTEM];
   }
 
   /**
