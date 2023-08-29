@@ -89,22 +89,30 @@ describe('Router', () => {
       (global.history.replaceState as jest.Mock).mockRestore();
     });
 
-    it('throws an error if history.state is not empty and stateObj is not provided', () => {
-      Object.defineProperty(window.history, 'state', {value: {}, writable: true});
+    it('uses history.state if it is not empty and stateObj is not provided', () => {
+      const mockState = {eventKey: 'Enter'};
+      Object.defineProperty(window.history, 'state', {value: mockState, writable: true});
 
-      expect(() => setHistoryParam('/path')).toThrow('stateObj must be provided when history.state is not empty.');
+      setHistoryParam('/path');
+      expect(global.history.replaceState).toHaveBeenCalledWith(mockState, '', '#/path');
     });
 
-    it('does not throw an error if history.state is empty and stateObj is not provided', () => {
-      Object.defineProperty(window.history, 'state', {value: null, writable: true});
+    it('uses stateObj even if history.state is not empty', () => {
+      const mockState = {eventKey: 'Tab'};
+      Object.defineProperty(window.history, 'state', {value: mockState, writable: true});
 
-      expect(() => setHistoryParam('/path')).not.toThrow();
+      const newStateObj = {newState: 'state'};
+      setHistoryParam('/path', newStateObj);
+      expect(global.history.replaceState).toHaveBeenCalledWith(newStateObj, '', '#/path');
     });
 
-    it('does not throw an error if history.state is not empty and stateObj is provided', () => {
-      Object.defineProperty(window.history, 'state', {value: {}, writable: true}); // Temporarily override history.state for this test
+    it('explicitely resetting the state is allowed', () => {
+      const mockState = {eventKey: 'Tab'};
+      Object.defineProperty(window.history, 'state', {value: mockState, writable: true});
 
-      expect(() => setHistoryParam('/path', {})).not.toThrow();
+      const newStateObj = {};
+      setHistoryParam('/path', newStateObj);
+      expect(global.history.replaceState).toHaveBeenCalledWith(newStateObj, '', '#/path');
     });
   });
 });
