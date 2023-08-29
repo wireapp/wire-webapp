@@ -20,6 +20,7 @@
 import {Draft} from 'Util/DraftStateUtil';
 
 import {ContentMessage} from '../entity/message/ContentMessage';
+import {DeleteMessage} from '../entity/message/DeleteMessage';
 import {MemberMessage} from '../entity/message/MemberMessage';
 import {SuperType} from '../message/SuperType';
 
@@ -30,6 +31,9 @@ export const isReadableMessage = (message: any): message is ContentMessage =>
 
 export const isContentMessage = (message: any): message is ContentMessage =>
   message && 'super_type' in message && message.super_type === SuperType.CONTENT;
+
+export const isDeleteMessage = (message: any): message is DeleteMessage =>
+  message && 'super_type' in message && message.super_type === SuperType.DELETE;
 
 export const isMemberMessage = (message: any | undefined | null): message is MemberMessage =>
   message && 'super_type' in message && message.super_type === SuperType.MEMBER;

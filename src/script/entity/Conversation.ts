@@ -58,7 +58,7 @@ import {ConversationStatus} from '../conversation/ConversationStatus';
 import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
 import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
 import {ConversationError} from '../error/ConversationError';
-import {isContentMessage} from '../guards/Message';
+import {isContentMessage, isDeleteMessage} from '../guards/Message';
 import {StatusType} from '../message/StatusType';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
 import {TeamState} from '../team/TeamState';
@@ -689,11 +689,13 @@ export class Conversation {
       if (alreadyAdded) {
         return false;
       }
-      if (this.isShowingLastReceivedMessage()) {
+      if (this.hasLastReceivedMessageLoaded()) {
         this.updateTimestamps(messageEntity);
         this.incomingMessages.remove(({id}) => messageEntity.id === id);
+        // If the last received message is currently in memory, we can add this message to the displayed messages
         this.messages_unordered.push(messageEntity);
       } else {
+        // If the conversation is not loaded, we will add this message to the incoming messages (but not to the messages displayed)
         this.incomingMessages.push(messageEntity);
       }
       amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.ADDED, messageEntity);
@@ -917,10 +919,14 @@ export class Conversation {
   }
 
   /**
-   * Get the first message of the conversation.
+   * Get the oldest loaded message of the conversation.
    */
   getOldestMessage(): Message | undefined {
-    return this.messages()[0];
+    return this.messages().find(
+      message =>
+        // Deleted message should be ignored since they might have a timestamp in the past (the timestamp of a delete message is the timestamp of the message that was deleted)
+        !isDeleteMessage(message),
+    );
   }
 
   /**
@@ -1018,10 +1024,9 @@ export class Conversation {
     return participantCount <= config.MAX_VIDEO_PARTICIPANTS;
   }
 
-  readonly isShowingLastReceivedMessage = (): boolean => {
-    return this.getNewestMessage()?.timestamp()
-      ? this.getNewestMessage().timestamp() >= this.last_event_timestamp()
-      : true;
+  readonly hasLastReceivedMessageLoaded = (): boolean => {
+    const newestMessage = this.getNewestMessage();
+    return newestMessage?.timestamp() ? newestMessage.timestamp() >= this.last_event_timestamp() : true;
   };
 
   serialize(): ConversationRecord {
