@@ -23,7 +23,7 @@ import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import {createUuid} from 'Util/uuid';
 
-import {ClassifiedBar} from './ClassifiedBar';
+import {ConversationClassifiedBar} from './ClassifiedBar';
 
 describe('ClassifiedBar', () => {
   const conversation = new Conversation();
@@ -34,7 +34,7 @@ describe('ClassifiedBar', () => {
 
   it.each([[[sameDomainUser]], [[sameDomainUser, otherDomainUser]]])('is empty if no domains are given', users => {
     conversation.participating_user_ets(users);
-    const {container} = render(<ClassifiedBar conversation={conversation} conversationDomain="test" />);
+    const {container} = render(<ConversationClassifiedBar conversation={conversation} conversationDomain="test" />);
 
     expect(container.querySelector('[data-uie-name=classified-label]')).toBe(null);
   });
@@ -44,7 +44,7 @@ describe('ClassifiedBar', () => {
     users => {
       conversation.participating_user_ets(users);
       const {getByText, queryByText} = render(
-        <ClassifiedBar
+        <ConversationClassifiedBar
           conversationDomain={classifiedDomainUser.domain}
           conversation={conversation}
           classifiedDomains={classifiedDomains}
@@ -63,7 +63,7 @@ describe('ClassifiedBar', () => {
   ])('returns non-classified if a single user is from another domain', users => {
     conversation.participating_user_ets(users);
     const {queryByText, getByText} = render(
-      <ClassifiedBar
+      <ConversationClassifiedBar
         conversationDomain={classifiedDomains[0]}
         conversation={conversation}
         classifiedDomains={classifiedDomains}
