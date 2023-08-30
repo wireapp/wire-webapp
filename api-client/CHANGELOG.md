@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [25.4.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@25.3.1...@wireapp/api-client@25.4.0) (2023-08-30)
+
+### Features
+
+* gzip json requests ([#5445](https://github.com/wireapp/wire-web-packages/issues/5445)) ([bab79ec](https://github.com/wireapp/wire-web-packages/commit/bab79ec78f877c28105c4003bf8678aab4ac25d4))
+
 ## [25.3.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@25.3.0...@wireapp/api-client@25.3.1) (2023-08-29)
 
 **Note:** Version bump only for package @wireapp/api-client
