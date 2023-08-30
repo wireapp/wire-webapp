@@ -100,9 +100,8 @@ export const subscribeToEpochUpdates = async (
     keyLength: number;
   }) => void,
 ): Promise<() => void> => {
-  const {epoch: initialEpoch, groupId: subconversationGroupId} = await mlsService.joinConferenceSubconversation(
-    conversationId,
-  );
+  const {epoch: initialEpoch, groupId: subconversationGroupId} =
+    await mlsService.joinConferenceSubconversation(conversationId);
 
   const forwardNewEpoch = async ({groupId, epoch}: {groupId: string; epoch: number}) => {
     if (groupId !== subconversationGroupId) {

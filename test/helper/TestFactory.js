@@ -68,6 +68,7 @@ import {UserService} from 'src/script/user/UserService';
 import {UserState} from 'src/script/user/UserState';
 
 import {entities} from '../api/payloads';
+import {SelfRepository} from 'src/script/self/SelfRepository';
 
 export class TestFactory {
   constructor() {
@@ -229,6 +230,25 @@ export class TestFactory {
       new TeamState(this.user_repository['userState']),
     );
     return this.team_repository;
+  }
+
+  /**
+   * @returns {Promise<SelfRepository>} The self repository.
+   */
+  async exposeSelfActors() {
+    await this.exposeUserActors();
+    await this.exposeTeamActors();
+    await this.exposeClientActors();
+
+    this.self_repository = new SelfRepository(
+      new SelfService(),
+      this.user_repository,
+      this.team_repository,
+      this.client_repository,
+      this.user_repository['userState'],
+    );
+
+    return this.self_repository;
   }
 
   /**

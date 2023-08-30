@@ -17,6 +17,9 @@
  *
  */
 
+import emojies from 'emoji-picker-react/src/data/emojis.json';
+import {groupBy} from 'underscore';
+
 // http://www.unicode.org/Public/emoji/11.0/emoji-data.txt
 // This is the exact copy of unicode-range definition for `emoji` font in CSS.
 export const EMOJI_RANGES =
@@ -39,3 +42,35 @@ const isValidString = (string: string) => typeof string === 'string' && string.l
 
 export const includesOnlyEmojis = (text: string) =>
   isValidString(text) && removeEmojis(removeWhitespace(text)).length === 0;
+
+const emojiesFlatten = Object.values(emojies).flat();
+export const emojiesList = groupBy(emojiesFlatten, 'u');
+export const emojiDictionary: Map<string, string> = new Map();
+
+Object.keys(emojiesList).forEach(key => {
+  // return if already existing in the dictionary
+  if (emojiDictionary.has(key)) {
+    return;
+  }
+  const emojiValue = emojiesList[key];
+  // return if not found in list
+  if (!emojiValue) {
+    return;
+  }
+
+  const emojiObject = emojiValue[0];
+  const emojiNames = emojiObject.n;
+
+  emojiDictionary.set(key, emojiNames[0].replaceAll('-', ' '));
+});
+
+export const getEmojiTitleFromEmojiUnicode = (emojiUnicode: string): string => {
+  return emojiDictionary.has(emojiUnicode) ? emojiDictionary.get(emojiUnicode)! : '';
+};
+
+export function getEmojiUnicode(emojis: string) {
+  const hexCode = 16;
+  const padding = 4;
+  const unicode = [...emojis].map(emoji => emoji.codePointAt(0)?.toString(hexCode).padStart(padding, '0')).join('-');
+  return unicode;
+}

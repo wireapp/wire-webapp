@@ -76,7 +76,10 @@ export class ContentViewModel {
     return this.mainViewModel.isFederated;
   }
 
-  constructor(mainViewModel: MainViewModel, public repositories: ViewModelRepositories) {
+  constructor(
+    mainViewModel: MainViewModel,
+    public repositories: ViewModelRepositories,
+  ) {
     this.userState = container.resolve(UserState);
     this.conversationState = container.resolve(ConversationState);
 

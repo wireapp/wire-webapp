@@ -54,7 +54,6 @@ const getDefaultParams = (): React.ComponentProps<typeof MessagesList> => {
     messageRepository: {
       getMessageInConversationById: jest.fn(),
       sendButtonAction: jest.fn(),
-      toggleLike: jest.fn(),
     } as any,
     onClickMessage: jest.fn(),
     onLoading: jest.fn(),
@@ -66,6 +65,7 @@ const getDefaultParams = (): React.ComponentProps<typeof MessagesList> => {
     showUserDetails: jest.fn(),
     isMsgElementsFocusable: true,
     setMsgElementsFocusable: jest.fn(),
+    showMessageReactions: jest.fn(),
   };
 };
 

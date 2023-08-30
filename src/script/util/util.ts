@@ -23,9 +23,9 @@ import type {ObservableArray} from 'knockout';
 
 import {UrlUtil, Runtime} from '@wireapp/commons';
 
-import {isTabKey} from 'Util/KeyboardUtil';
 import {findMentionAtPosition} from 'Util/MentionUtil';
 
+import {isTabKey} from './KeyboardUtil';
 import {loadValue} from './StorageUtil';
 
 import {QUERY_KEY} from '../auth/route';
@@ -404,6 +404,9 @@ const supportsSecretStorage = () => !Runtime.isDesktopApp() || !!window.systemCr
 
 // disables mls for old 'broken' desktop clients, see https://github.com/wireapp/wire-desktop/pull/6094
 export const supportsMLS = () => Config.getConfig().FEATURE.ENABLE_MLS && supportsSecretStorage();
+
+export const supportsSelfSupportedProtocolsUpdates = () =>
+  Config.getConfig().FEATURE.ENABLE_SELF_SUPPORTED_PROTOCOLS_UPDATES;
 
 export const supportsCoreCryptoProteus = () =>
   Config.getConfig().FEATURE.ENABLE_PROTEUS_CORE_CRYPTO && supportsSecretStorage();

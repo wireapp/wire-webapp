@@ -19,6 +19,7 @@
 
 import React from 'react';
 
+import {ReactionType} from '@wireapp/core/lib/conversation';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
@@ -38,6 +39,7 @@ import {ContentMessageComponent} from './ContentMessage';
 import {DecryptErrorMessage} from './DecryptErrorMessage';
 import {DeleteMessage} from './DeleteMessage';
 import {FailedToAddUsersMessage} from './FailedToAddUsersMessage';
+import {FederationStopMessage} from './FederationStopMessage';
 import {FileTypeRestrictedMessage} from './FileTypeRestrictedMessage';
 import {LegalHoldMessage} from './LegalHoldMessage';
 import {MemberMessage} from './MemberMessage';
@@ -72,19 +74,16 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
   onClickAvatar,
   onClickImage,
   onClickInvitePeople,
-  onClickLikes,
+  onClickReactionDetails,
   onClickMessage,
   onClickTimestamp,
   onClickParticipants,
-  onClickReceipts,
+  onClickDetails,
   onClickResetSession,
   onClickCancelRequest,
-  onLike,
   messageRepository,
   messageActions,
   teamState = container.resolve(TeamState),
-  handleFocus,
-  totalMessage,
   isMsgElementsFocusable,
 }) => {
   const findMessage = async (conversation: Conversation, messageId: string) => {
@@ -137,26 +136,10 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
       });
     }
 
-    if (message.isReactable() && !conversation.removed_from_conversation()) {
-      const label = message.is_liked() ? t('conversationContextMenuUnlike') : t('conversationContextMenuLike');
-
-      entries.push({
-        click: () => onLike(message, false),
-        label,
-      });
-    }
-
     if (canEdit) {
       entries.push({
         click: () => amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.EDIT, message),
         label: t('conversationContextMenuEdit'),
-      });
-    }
-
-    if (message.isReplyable() && !conversation.removed_from_conversation()) {
-      entries.push({
-        click: () => amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.REPLY, message),
-        label: t('conversationContextMenuReply'),
       });
     }
 
@@ -169,7 +152,7 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
 
     if (hasDetails) {
       entries.push({
-        click: () => onClickReceipts(message),
+        click: () => onClickDetails(message),
         label: t('conversationContextMenuDetails'),
       });
     }
@@ -191,6 +174,12 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
     return entries;
   });
 
+  const handleReactionClick = (reaction: ReactionType): void => {
+    if (!message.isContent()) {
+      return;
+    }
+    return void messageRepository.toggleReaction(conversation, message, reaction, selfId.id);
+  };
   if (message.isContent()) {
     return (
       <ContentMessageComponent
@@ -201,10 +190,9 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
         hasMarker={hasMarker}
         selfId={selfId}
         isLastDeliveredMessage={isLastDeliveredMessage}
-        onLike={onLike}
         onClickMessage={onClickMessage}
         onClickTimestamp={onClickTimestamp}
-        onClickLikes={onClickLikes}
+        onClickReactionDetails={onClickReactionDetails}
         onClickButton={clickButton}
         onClickAvatar={onClickAvatar}
         contextMenu={{entries: contextMenuEntries}}
@@ -212,10 +200,11 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
         onClickImage={onClickImage}
         onClickInvitePeople={onClickInvitePeople}
         onClickParticipants={onClickParticipants}
-        onClickReceipts={onClickReceipts}
+        onClickDetails={onClickDetails}
         onRetry={onRetry}
         isMessageFocused={isMessageFocused}
         isMsgElementsFocusable={isMsgElementsFocusable}
+        onClickReaction={handleReactionClick}
       />
     );
   }
@@ -224,6 +213,9 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
   }
   if (message.isLegalHold()) {
     return <LegalHoldMessage message={message} />;
+  }
+  if (message.isFederationStop()) {
+    return <FederationStopMessage isMessageFocused={isMessageFocused} message={message} />;
   }
   if (message.isVerification()) {
     return <VerificationMessage message={message} />;
@@ -259,15 +251,7 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
     );
   }
   if (message.isPing()) {
-    return (
-      <PingMessage
-        message={message}
-        is1to1Conversation={conversation.is1to1()}
-        isLastDeliveredMessage={isLastDeliveredMessage}
-        onClickReceipts={onClickReceipts}
-        isMessageFocused={isMessageFocused}
-      />
-    );
+    return <PingMessage message={message} />;
   }
   if (message.isFileTypeRestricted()) {
     return <FileTypeRestrictedMessage message={message} />;
