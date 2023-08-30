@@ -51,7 +51,7 @@ const Animated: React.FC<{children: React.ReactNode}> = ({children, ...rest}) =>
 const LeftSidebar: React.FC<LeftSidebarProps> = ({listViewModel, selfUser, isActivatedAccount}) => {
   const {conversationRepository, propertiesRepository} = listViewModel;
   const repositories = listViewModel.contentViewModel.repositories;
-  const {listState} = useAppState();
+  const listState = useAppState(state => state.listState);
 
   const switchList = (list: ListState) => listViewModel.switchList(list);
 
