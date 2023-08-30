@@ -40,15 +40,18 @@ function isClassified(users: User[], classifiedDomains: string[], conversationDo
   return true;
 }
 
-interface ClassifiedBarProps {
+interface UserClassifiedBarProps {
   classifiedDomains?: string[];
   style?: CSSObject;
-  conversation: Conversation;
+  users: User[];
   conversationDomain?: string;
 }
-
-const ClassifiedBar: React.FC<ClassifiedBarProps> = ({conversation, classifiedDomains, conversationDomain, style}) => {
-  const {allUserEntities: users} = useKoSubscribableChildren(conversation, ['allUserEntities']);
+export const UserClassifiedBar: React.FC<UserClassifiedBarProps> = ({
+  users,
+  conversationDomain,
+  classifiedDomains,
+  style,
+}) => {
   if (typeof classifiedDomains === 'undefined') {
     return null;
   }
@@ -68,4 +71,25 @@ const ClassifiedBar: React.FC<ClassifiedBarProps> = ({conversation, classifiedDo
   );
 };
 
-export {ClassifiedBar};
+interface ConversationClassifiedBarProps {
+  classifiedDomains?: string[];
+  style?: CSSObject;
+  conversation: Conversation;
+  conversationDomain?: string;
+}
+
+export const ConversationClassifiedBar: React.FC<ConversationClassifiedBarProps> = ({
+  conversation,
+  classifiedDomains,
+  style,
+}) => {
+  const {allUserEntities: users} = useKoSubscribableChildren(conversation, ['allUserEntities']);
+  return (
+    <UserClassifiedBar
+      users={users}
+      conversationDomain={conversation.domain}
+      classifiedDomains={classifiedDomains}
+      style={style}
+    />
+  );
+};

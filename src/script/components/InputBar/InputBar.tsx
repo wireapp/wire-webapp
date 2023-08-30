@@ -29,7 +29,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {checkFileSharingPermission} from 'Components/Conversation/utils/checkFileSharingPermission';
-import {ClassifiedBar} from 'Components/input/ClassifiedBar';
+import {ConversationClassifiedBar} from 'Components/input/ClassifiedBar';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
 import {RichTextContent, RichTextEditor} from 'Components/RichTextEditor';
@@ -550,7 +550,7 @@ export const InputBar = ({
       {isTypingIndicatorEnabled && <TypingIndicator conversationId={conversation.id} />}
 
       {classifiedDomains && !isConnectionRequest && (
-        <ClassifiedBar
+        <ConversationClassifiedBar
           conversationDomain={conversation.domain}
           conversation={conversation}
           classifiedDomains={classifiedDomains}
