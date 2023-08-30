@@ -177,10 +177,10 @@ export const InputBar = ({
   const showGiphyButton = messageContent.text.length > 0 && messageContent.text.length <= config.GIPHY_TEXT_LENGTH;
 
   // Mentions
-  const {participating_user_ets: participatingUserEts} = useKoSubscribableChildren(conversation, [
-    'participating_user_ets',
-  ]);
-  const mentionCandidates = participatingUserEts.filter(userEntity => !userEntity.isService);
+  const getMentionCandidates = (search?: string | null) => {
+    const candidates = conversation.participating_user_ets().filter(userEntity => !userEntity.isService);
+    return typeof search === 'string' ? searchRepository.searchUserInSet(search, candidates) : [];
+  };
 
   const resetDraftState = (resetInputValue = false) => {
     if (resetInputValue) {
@@ -383,27 +383,28 @@ export const InputBar = ({
     });
   };
 
-  const totalConversationUsers = participatingUserEts.length;
-
   const onPingClick = () => {
-    if (conversation && !pingDisabled) {
-      if (
-        !CONFIG.FEATURE.ENABLE_PING_CONFIRMATION ||
-        is1to1 ||
-        totalConversationUsers < CONFIG.FEATURE.MAX_USERS_TO_PING_WITHOUT_ALERT
-      ) {
-        pingConversation();
-      } else {
-        PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-          primaryAction: {
-            action: pingConversation,
-            text: t('tooltipConversationPing'),
-          },
-          text: {
-            title: t('conversationPingConfirmTitle', {memberCount: totalConversationUsers.toString()}),
-          },
-        });
-      }
+    if (pingDisabled) {
+      return;
+    }
+
+    const totalConversationUsers = conversation.participating_user_ets().length;
+    if (
+      !CONFIG.FEATURE.ENABLE_PING_CONFIRMATION ||
+      is1to1 ||
+      totalConversationUsers < CONFIG.FEATURE.MAX_USERS_TO_PING_WITHOUT_ALERT
+    ) {
+      pingConversation();
+    } else {
+      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
+        primaryAction: {
+          action: pingConversation,
+          text: t('tooltipConversationPing'),
+        },
+        text: {
+          title: t('conversationPingConfirmTitle', {memberCount: totalConversationUsers.toString()}),
+        },
+      });
     }
   };
 
@@ -580,7 +581,7 @@ export const InputBar = ({
                 editedMessage={editedMessage}
                 onCancelMessageEdit={() => cancelMessageEditing(true, true)}
                 onEditLastSentMessage={() => editMessage(conversation.getLastEditableMessage())}
-                mentionCandidates={mentionCandidates}
+                getMentionCandidates={getMentionCandidates}
                 searchRepository={searchRepository}
                 propertiesRepository={propertiesRepository}
                 placeholder={inputPlaceholder}

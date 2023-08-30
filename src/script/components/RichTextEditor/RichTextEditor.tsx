@@ -93,7 +93,7 @@ interface RichTextEditorProps {
   hasLocalEphemeralTimer: boolean;
   saveDraftState: (editor: string) => void;
   loadDraftState: () => Promise<DraftState>;
-  mentionCandidates: User[];
+  getMentionCandidates: (search?: string | null) => User[];
   onShiftTab: () => void;
   onSend: () => void;
   onSetup?: (editor: LexicalEditor) => void;
@@ -131,7 +131,7 @@ export const RichTextEditor = ({
   onCancelMessageEdit,
   onEditLastSentMessage,
   editedMessage,
-  mentionCandidates,
+  getMentionCandidates,
   onShiftTab,
   onSend,
   onSetup,
@@ -148,7 +148,7 @@ export const RichTextEditor = ({
       editor.registerTextContentListener(textContent => {
         onUpdate({
           text: textContent,
-          mentions: parseMentions(editor, textContent, mentionCandidates),
+          mentions: parseMentions(editor, textContent, getMentionCandidates()),
         });
       }),
 
@@ -203,10 +203,6 @@ export const RichTextEditor = ({
     nodes: [MentionNode, EmojiNode],
   };
 
-  const searchMentions = (queryString?: string | null) => {
-    return typeof queryString === 'string' ? searchRepository.searchUserInSet(queryString, mentionCandidates) : [];
-  };
-
   const saveDraft = (editorState: EditorState) => {
     saveDraftState(JSON.stringify(editorState.toJSON()));
   };
@@ -246,7 +242,7 @@ export const RichTextEditor = ({
             ErrorBoundary={LexicalErrorBoundary}
           />
 
-          <MentionsPlugin onSearch={searchMentions} openStateRef={mentionsOpen} />
+          <MentionsPlugin onSearch={getMentionCandidates} openStateRef={mentionsOpen} />
 
           <OnChangePlugin onChange={saveDraft} />
         </div>
