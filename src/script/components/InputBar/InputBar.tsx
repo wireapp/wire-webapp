@@ -582,7 +582,6 @@ export const InputBar = ({
                 onCancelMessageEdit={() => cancelMessageEditing(true, true)}
                 onEditLastSentMessage={() => editMessage(conversation.getLastEditableMessage())}
                 getMentionCandidates={getMentionCandidates}
-                searchRepository={searchRepository}
                 propertiesRepository={propertiesRepository}
                 placeholder={inputPlaceholder}
                 onUpdate={setMessageContent}

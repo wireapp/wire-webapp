@@ -61,7 +61,6 @@ import {toEditorNodes} from './utils/messageToEditorNodes';
 import {MentionEntity} from '../../message/MentionEntity';
 import {PropertiesRepository} from '../../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
-import {SearchRepository} from '../../search/SearchRepository';
 
 const theme = {
   ltr: 'ltr',
@@ -83,7 +82,6 @@ export type RichTextContent = {
 
 interface RichTextEditorProps {
   readonly propertiesRepository: PropertiesRepository;
-  readonly searchRepository: SearchRepository;
   placeholder: string;
   onUpdate: (content: RichTextContent) => void;
   onEditLastSentMessage: () => void;
@@ -122,7 +120,6 @@ const parseMentions = (editor: LexicalEditor, textValue: string, mentions: User[
 export const RichTextEditor = ({
   placeholder,
   propertiesRepository,
-  searchRepository,
   onUpdate,
   children,
   hasLocalEphemeralTimer,
