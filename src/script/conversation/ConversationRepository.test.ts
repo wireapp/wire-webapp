@@ -64,8 +64,6 @@ import {generateUser} from '../../../test/helper/UserGenerator';
 import {Core} from '../service/CoreSingleton';
 import {LegacyEventRecord, StorageService} from '../storage';
 
-jest.deepUnmock('axios');
-
 describe('ConversationRepository', () => {
   const testFactory = new TestFactory();
 
@@ -602,6 +600,30 @@ describe('ConversationRepository', () => {
           time: '2017-09-06T16:14:08.165Z',
           type: 'conversation.asset-add',
         };
+
+        const conversation_payload = {
+          creator: conversation_et.id,
+          id: conversation_id,
+          members: {
+            others: [],
+            self: {
+              hidden_ref: null,
+              id: conversation_et.id,
+              otr_archived_ref: null,
+              otr_muted_ref: null,
+              otr_muted_status: 0,
+              service: null,
+              status_ref: '0.0',
+              status_time: '2015-01-28T12:53:41.847Z',
+            },
+          },
+          name: null,
+          type: 0,
+        } as unknown as ConversationDatabaseData;
+
+        jest
+          .spyOn(testFactory.conversation_repository['conversationService'], 'getConversationById')
+          .mockResolvedValue(conversation_payload);
 
         return testFactory.conversation_repository['fetchConversationById']({domain: '', id: conversation_id})
           .then(fetched_conversation => {
