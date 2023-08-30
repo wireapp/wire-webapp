@@ -69,6 +69,8 @@ export const optionalToUint8Array = (array: Uint8Array | []): Uint8Array => {
 const defaultConfig: MLSServiceConfig = {
   keyingMaterialUpdateThreshold: 1000 * 60 * 60 * 24 * 30, //30 days
   nbKeyPackages: 100,
+  defaultCiphersuite: Ciphersuite.MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519,
+  defaultCredentialType: CredentialType.Basic,
 };
 
 export interface SubconversationEpochInfoMember {
@@ -86,8 +88,6 @@ export class MLSService extends TypedEventEmitter<Events> {
   groupIdFromConversationId?: MLSCallbacks['groupIdFromConversationId'];
   private readonly textEncoder = new TextEncoder();
   private readonly textDecoder = new TextDecoder();
-  private readonly defaultCiphersuite = Ciphersuite.MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519;
-  private readonly defaultCredentialType = CredentialType.Basic;
 
   constructor(
     private readonly apiClient: APIClient,
@@ -95,27 +95,31 @@ export class MLSService extends TypedEventEmitter<Events> {
     {
       keyingMaterialUpdateThreshold = defaultConfig.keyingMaterialUpdateThreshold,
       nbKeyPackages = defaultConfig.nbKeyPackages,
+      defaultCiphersuite = defaultConfig.defaultCiphersuite,
+      defaultCredentialType = defaultConfig.defaultCredentialType,
     }: Partial<MLSServiceConfig>,
   ) {
     super();
     this.config = {
       keyingMaterialUpdateThreshold,
       nbKeyPackages,
+      defaultCiphersuite,
+      defaultCredentialType,
     };
   }
 
   public async initClient(userId: QualifiedId, clientId: string) {
     const qualifiedClientId = constructFullyQualifiedClientId(userId.id, clientId, userId.domain);
-    await this.coreCryptoClient.mlsInit(this.textEncoder.encode(qualifiedClientId), [this.defaultCiphersuite]);
+    await this.coreCryptoClient.mlsInit(this.textEncoder.encode(qualifiedClientId), [this.config.defaultCiphersuite]);
   }
 
   public async createClient(userId: QualifiedId, clientId: string) {
     await this.initClient(userId, clientId);
     // If the device is new, we need to upload keypackages and public key to the backend
-    const publicKey = await this.coreCryptoClient.clientPublicKey(this.defaultCiphersuite);
+    const publicKey = await this.coreCryptoClient.clientPublicKey(this.config.defaultCiphersuite);
     const keyPackages = await this.coreCryptoClient.clientKeypackages(
-      this.defaultCiphersuite,
-      this.defaultCredentialType,
+      this.config.defaultCiphersuite,
+      this.config.defaultCredentialType,
       this.config.nbKeyPackages,
     );
     await this.uploadMLSPublicKeys(publicKey, clientId);
@@ -200,7 +204,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     const keyPackagesSettledResult = await Promise.allSettled(
       qualifiedUsers.map(({id, domain, skipOwnClientId}) =>
         this.apiClient.api.client
-          .claimMLSKeyPackages(id, domain, numberToHex(this.defaultCiphersuite), skipOwnClientId)
+          .claimMLSKeyPackages(id, domain, numberToHex(this.config.defaultCiphersuite), skipOwnClientId)
           .catch(error => {
             failedToFetchKeyPackages.push({id, domain});
             // Throw the error so we don't get {status: 'fulfilled', value: undefined}
@@ -250,7 +254,7 @@ export class MLSService extends TypedEventEmitter<Events> {
       const groupInfo = await getGroupInfo();
       const {conversationId, ...commitBundle} = await this.coreCryptoClient.joinByExternalCommit(
         groupInfo,
-        this.defaultCredentialType,
+        this.config.defaultCredentialType,
       );
       return {groupId: conversationId, commitBundle};
     };
@@ -419,10 +423,10 @@ export class MLSService extends TypedEventEmitter<Events> {
     const mlsKeyBytes = Object.values(mlsKeys).map((key: string) => Decoder.fromBase64(key).asBytes);
     const configuration: ConversationConfiguration = {
       externalSenders: mlsKeyBytes,
-      ciphersuite: this.defaultCiphersuite,
+      ciphersuite: this.config.defaultCiphersuite,
     };
 
-    return this.coreCryptoClient.createConversation(groupIdBytes, this.defaultCredentialType, configuration);
+    return this.coreCryptoClient.createConversation(groupIdBytes, this.config.defaultCredentialType, configuration);
   }
 
   /**
@@ -495,13 +499,16 @@ export class MLSService extends TypedEventEmitter<Events> {
   }
 
   public async clientValidKeypackagesCount(): Promise<number> {
-    return this.coreCryptoClient.clientValidKeypackagesCount(this.defaultCiphersuite, this.defaultCredentialType);
+    return this.coreCryptoClient.clientValidKeypackagesCount(
+      this.config.defaultCiphersuite,
+      this.config.defaultCredentialType,
+    );
   }
 
   public async clientKeypackages(amountRequested: number): Promise<Uint8Array[]> {
     return this.coreCryptoClient.clientKeypackages(
-      this.defaultCiphersuite,
-      this.defaultCredentialType,
+      this.config.defaultCiphersuite,
+      this.config.defaultCredentialType,
       amountRequested,
     );
   }
@@ -594,7 +601,7 @@ export class MLSService extends TypedEventEmitter<Events> {
       //check numbers of keys on backend
       const backendKeyPackagesCount = await this.apiClient.api.client.getMLSKeyPackageCount(
         clientId,
-        numberToHex(this.defaultCiphersuite),
+        numberToHex(this.config.defaultCiphersuite),
       );
 
       if (backendKeyPackagesCount <= minAllowedNumberOfKeyPackages) {
