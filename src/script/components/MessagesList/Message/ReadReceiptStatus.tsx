@@ -30,8 +30,8 @@ import {formatTimeShort} from 'Util/TimeUtil';
 export interface ReadReceiptStatusProps {
   is1to1Conversation: boolean;
   isLastDeliveredMessage: boolean;
-  showOnHover?: boolean;
   message: Message;
+  showOnHover?: boolean;
 }
 
 const ReadReceiptStatus: React.FC<ReadReceiptStatusProps> = ({
