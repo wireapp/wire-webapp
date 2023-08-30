@@ -1,8 +1,17 @@
 ## Description
 
-## Checklist before requesting a review
+## Screenshots/Screencast (for UI changes)
 
-- [ ] I have performed a self-review of my code.
-- [ ] I have commented my code, particularly in hard-to-understand areas.
-- [ ] If it is a core feature, I have added thorough tests.
-- [ ] If it has UI changes, I have added screenshots/screencast.
+## Checklist
+
+- [ ] PR has been self reviewed by the author;
+- [ ] Hard-to-understand areas of the code have been commented;
+- [ ] If it is a core feature, unit tests have been added;
+
+### Important details for the reviewers
+
+(Delete this section if unnecessary)
+
+- use (x) data
+- can be reviewed commit-by-commit
+- be sure to look at ...
