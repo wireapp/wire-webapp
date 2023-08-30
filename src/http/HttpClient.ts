@@ -20,6 +20,7 @@
 import axios, {AxiosError, AxiosHeaders, AxiosInstance, AxiosRequestConfig, AxiosResponse} from 'axios';
 import axiosRetry, {isNetworkOrIdempotentRequestError, exponentialDelay} from 'axios-retry';
 import logdown from 'logdown';
+import {gzip} from 'pako';
 
 import {EventEmitter} from 'events';
 
@@ -273,10 +274,21 @@ export class HttpClient extends EventEmitter {
   }
 
   public sendJSON<T>(config: AxiosRequestConfig, isSynchronousRequest: boolean = false): Promise<AxiosResponse<T>> {
+    const shouldGzipData =
+      process.env.NODE_ENV !== 'test' &&
+      !!config.data &&
+      ['post', 'put', 'patch'].includes(config.method?.toLowerCase() ?? '');
+
+    if (shouldGzipData) {
+      config.data = gzip(JSON.stringify(config.data));
+    }
+
     config.headers = {
       ...config.headers,
       'Content-Type': ContentType.APPLICATION_JSON,
+      'Content-Encoding': shouldGzipData ? 'gzip' : config.headers?.['Content-Encoding'],
     };
+
     return this.sendRequest<T>(config, false, isSynchronousRequest);
   }
 
