@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.9.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.8.2...@wireapp/react-ui-kit@9.9.0) (2023-08-30)
+
+### Features
+
+* add red button variant ([#5447](https://github.com/wireapp/wire-web-packages/issues/5447)) ([55e9a99](https://github.com/wireapp/wire-web-packages/commit/55e9a9901469e86c14491b00d6afd8ab8ee74e91))
+
 ## [9.8.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.8.1...@wireapp/react-ui-kit@9.8.2) (2023-08-28)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
