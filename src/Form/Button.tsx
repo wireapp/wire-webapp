@@ -32,6 +32,7 @@ export enum ButtonVariant {
   TERTIARY = 'tertiary',
   QUATERNARY = 'quaternary',
   SEND = 'send',
+  CANCEL = 'cancel',
 }
 
 export interface ButtonProps<T = HTMLButtonElement> extends TextProps<T> {
@@ -174,6 +175,22 @@ export const buttonStyle: <T>(theme: Theme, props: ButtonProps<T>) => CSSObject 
       },
       '&:active': {
         backgroundColor: COLOR_V2.GREEN_LIGHT_700,
+      },
+    }),
+  }),
+  ...(variant === ButtonVariant.CANCEL && {
+    backgroundColor: backgroundColor || (disabled ? COLOR_V2.GRAY_50 : COLOR_V2.RED),
+    color: disabled ? COLOR_V2.GRAY_80 : COLOR_V2.WHITE,
+    lineHeight: '1.5rem',
+    ...(!disabled && {
+      '&:hover, &:focus': {
+        backgroundColor: COLOR_V2.RED_LIGHT_600,
+      },
+      '&:focus': {
+        border: `1px solid ${COLOR_V2.RED_LIGHT_700}`,
+      },
+      '&:active': {
+        backgroundColor: COLOR_V2.RED_LIGHT_700,
       },
     }),
   }),
