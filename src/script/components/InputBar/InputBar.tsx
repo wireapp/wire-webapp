@@ -231,7 +231,7 @@ export const InputBar = ({
   };
 
   const editMessage = (messageEntity?: ContentMessage) => {
-    if (messageEntity?.isEditable() && messageEntity !== editedMessage) {
+    if (messageEntity?.isEditable() && messageEntity !== editedMessage && textValue.length === 0) {
       cancelMessageReply();
       cancelMessageEditing(true, true);
       setEditedMessage(messageEntity);
