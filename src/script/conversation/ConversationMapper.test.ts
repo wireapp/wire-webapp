@@ -339,7 +339,7 @@ describe('ConversationMapper', () => {
     });
   });
 
-  describe('mergeConversation', () => {
+  describe('mergeConversations', () => {
     function getDataWithReadReceiptMode(
       localReceiptMode: RECEIPT_MODE,
       remoteReceiptMode: RECEIPT_MODE,
@@ -539,6 +539,63 @@ describe('ConversationMapper', () => {
 
         expect(merged_conversation.message_timer).toEqual(expected.message_timer);
       });
+    });
+
+    it('returns the local data if the remote data is not present', () => {
+      const localData: Partial<ConversationDatabaseData> = {
+        archived_state: false,
+        archived_timestamp: 1487239601118,
+        cleared_timestamp: 0,
+        ephemeral_timer: 0,
+        global_message_timer: 0,
+        id: 'de7466b0-985c-4dc3-ad57-17877db45b4c',
+        is_guest: false,
+        is_managed: false,
+        last_event_timestamp: 1488387380633,
+        last_read_timestamp: 1488387380633,
+        last_server_timestamp: 1488387380633,
+        muted_state: NOTIFICATION_STATE.EVERYTHING,
+        muted_timestamp: 0,
+        name: 'Family Gathering',
+        others: ['532af01e-1e24-4366-aacf-33b67d4ee376'],
+        receipt_mode: RECEIPT_MODE.ON,
+        status: 0,
+        team_id: '5316fe03-24ee-4b19-b789-6d026bd3ce5f',
+        type: 2,
+        verification_state: 0,
+      };
+
+      const [merged_conversation] = ConversationMapper.mergeConversations(
+        [localData] as ConversationDatabaseData[],
+        {found: []} as RemoteConversations,
+      );
+
+      expect(merged_conversation).toEqual(localData);
+    });
+
+    it('returns the remote data if the local data is not present', () => {
+      const [merged_conversation] = ConversationMapper.mergeConversations([], {
+        found: [remoteData],
+      } as RemoteConversations);
+
+      const mergedConversation = {
+        accessModes: remoteData.access,
+        archived_state: false,
+        archived_timestamp: 1487239601118,
+        creator: '532af01e-1e24-4366-aacf-33b67d4ee376',
+        id: 'de7466b0-985c-4dc3-ad57-17877db45b4c',
+        last_event_timestamp: 1,
+        last_server_timestamp: 1,
+        muted_state: 0,
+        muted_timestamp: 0,
+        name: 'Family Gathering',
+        others: ['532af01e-1e24-4366-aacf-33b67d4ee376'],
+        roles: {},
+        team_id: '5316fe03-24ee-4b19-b789-6d026bd3ce5f',
+        type: 2,
+      };
+
+      expect(merged_conversation).toEqual(mergedConversation);
     });
 
     it('updates local archive and muted timestamps if time of remote data is newer', () => {

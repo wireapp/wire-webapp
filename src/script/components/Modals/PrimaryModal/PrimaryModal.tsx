@@ -22,13 +22,14 @@ import {FC, FormEvent, MouseEvent, useState, useRef, ChangeEvent, useEffect} fro
 import cx from 'classnames';
 
 import {ValidationUtil} from '@wireapp/commons';
-import {Checkbox, CheckboxLabel, Loading} from '@wireapp/react-ui-kit';
+import {Checkbox, CheckboxLabel, Input, Loading} from '@wireapp/react-ui-kit';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Icon} from 'Components/Icon';
 import {ModalComponent} from 'Components/ModalComponent';
 import {Config} from 'src/script/Config';
 import {isEscapeKey} from 'Util/KeyboardUtil';
+import {t} from 'Util/LocalizerUtil';
 
 import {usePrimaryModalState, showNextModalInQueue, defaultContent, removeCurrentModal} from './PrimaryModalState';
 import {Action, PrimaryModalType} from './PrimaryModalTypes';
@@ -219,17 +220,21 @@ export const PrimaryModalComponent: FC = () => {
 
               {hasPasswordWithRules && (
                 <form onSubmit={doAction(confirm, !!closeOnConfirm)}>
-                  <label htmlFor="modal_pswd_with_rules" className="visually-hidden">
-                    {inputPlaceholder}
-                  </label>
-
-                  <input
+                  <Input
                     id="modal_pswd_with_rules"
-                    className="modal__input"
                     type="password"
                     value={passwordInput}
                     placeholder={inputPlaceholder}
-                    onChange={event => updatePasswordWithRules(event.target.value)}
+                    required
+                    data-uie-name="backup-password"
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                      updatePasswordWithRules(event.target.value)
+                    }
+                    autoComplete="password"
+                    pattern=".{2,64}"
+                    helperText={t('backupPasswordHint', {
+                      minPasswordLength: Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH.toString(),
+                    })}
                   />
                 </form>
               )}

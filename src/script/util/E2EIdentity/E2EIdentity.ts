@@ -17,9 +17,8 @@
  *
  */
 
+import {E2EIUtils} from '@wireapp/core/lib/messagingProtocols/mls/E2EIdentityService';
 import {container} from 'tsyringe';
-
-import {AcmeStorage} from '@wireapp/core';
 
 import {PrimaryModal, removeCurrentModal} from 'Components/Modals/PrimaryModal';
 import {Config} from 'src/script/Config';
@@ -27,7 +26,7 @@ import {Core} from 'src/script/service/CoreSingleton';
 import {UserState} from 'src/script/user/UserState';
 import {supportsMLS} from 'Util/util';
 
-import {GracePeriodTimer} from './DelayTimer';
+import {removeUrlParameters} from './helper/uri';
 import {getModalOptions, ModalType} from './Modals';
 
 export enum E2EIHandlerStep {
@@ -46,7 +45,9 @@ interface E2EIHandlerParams {
 
 class E2EIHandler {
   private static instance: E2EIHandler | null = null;
-  private timer: GracePeriodTimer;
+  private readonly core = container.resolve(Core);
+  private readonly userState = container.resolve(UserState);
+  private timer: ReturnType<typeof this.core.e2eiUtils.getDelayTimerInstance>;
   private discoveryUrl: string;
   private gracePeriodInMS: number;
   private currentStep: E2EIHandlerStep | null = E2EIHandlerStep.UNINITIALIZED;
@@ -55,11 +56,7 @@ class E2EIHandler {
     // ToDo: Do these values need to te able to be updated? Should we use a singleton with update fn?
     this.discoveryUrl = discoveryUrl;
     this.gracePeriodInMS = gracePeriodInMS;
-    this.timer = GracePeriodTimer.getInstance({
-      delayPeriodExpiredCallback: () => null,
-      gracePeriodExpiredCallback: () => null,
-      gracePeriodInMS,
-    });
+    this.timer = this.core.e2eiUtils.getDelayTimerInstance(gracePeriodInMS);
   }
 
   /**
@@ -92,17 +89,13 @@ class E2EIHandler {
   public updateParams({gracePeriodInMS, discoveryUrl}: E2EIHandlerParams) {
     this.gracePeriodInMS = gracePeriodInMS;
     this.discoveryUrl = discoveryUrl;
-    this.timer = GracePeriodTimer.getInstance({
-      delayPeriodExpiredCallback: () => null,
-      gracePeriodExpiredCallback: () => null,
-      gracePeriodInMS,
-    });
+    this.timer = this.core.e2eiUtils.getDelayTimerInstance(gracePeriodInMS);
     this.initialize();
   }
 
   public initialize(): void {
     if (this.isE2EIEnabled) {
-      if (!AcmeStorage.hasCertificateData()) {
+      if (!this.core.e2eiUtils.hasActiveCertificate()) {
         this.showE2EINotificationMessage();
       }
     }
@@ -114,23 +107,28 @@ class E2EIHandler {
 
   private async enrollE2EI() {
     try {
-      const userState = container.resolve(UserState);
-      const core = container.resolve(Core);
       // Notify user about E2EI enrollment in progress
       this.currentStep = E2EIHandlerStep.ENROLL;
       this.showLoadingMessage();
-      const success = await core.enrollE2EI(userState.self().name(), userState.self().username(), this.discoveryUrl);
+      const success = await this.core.enrollE2EI(
+        this.userState.self().name(),
+        this.userState.self().username(),
+        this.discoveryUrl,
+      );
       if (!success) {
         throw new Error('E2EI enrollment failed');
       }
       // Notify user about E2EI enrollment success
+      // This setTimeout is needed because there was a timing with the success modal and the loading modal
       setTimeout(() => {
         removeCurrentModal();
       }, 0);
 
       this.currentStep = E2EIHandlerStep.SUCCESS;
       this.showSuccessMessage();
-    } catch (e) {
+      // Remove the url parameters after enrollment
+      removeUrlParameters();
+    } catch (error) {
       this.currentStep = E2EIHandlerStep.ERROR;
       setTimeout(() => {
         removeCurrentModal();
@@ -169,12 +167,14 @@ class E2EIHandler {
       return;
     }
 
+    E2EIUtils.clearAllProgress();
+
     const {modalOptions, modalType} = getModalOptions({
       type: ModalType.ERROR,
       hideClose: true,
-      primaryActionFn: async () => {
+      primaryActionFn: () => {
         this.currentStep = E2EIHandlerStep.INITIALIZED;
-        await this.enrollE2EI();
+        void this.enrollE2EI();
       },
       secondaryActionFn: () => {
         this.showE2EINotificationMessage();
@@ -187,17 +187,18 @@ class E2EIHandler {
   private showE2EINotificationMessage(): void {
     // If the user has already started enrollment, don't show the notification. Instead, show the loading modal
     // This will occur after the redirect from the oauth provider
-    console.log('showE2EINotificationMessage');
-    if (AcmeStorage.hasHandle()) {
+    if (this.core.e2eiUtils.isEnrollmentInProgress()) {
       this.showLoadingMessage();
       void this.enrollE2EI();
       return;
     }
 
+    // If the user has already snoozed the notification, don't show it again until the snooze period has expired
     if (this.currentStep !== E2EIHandlerStep.UNINITIALIZED && this.currentStep !== E2EIHandlerStep.SNOOZE) {
       return;
     }
 
+    // Only initialize the timer when the it is uninitialized
     if (this.currentStep === E2EIHandlerStep.UNINITIALIZED) {
       this.timer.updateParams({
         gracePeriodInMS: this.gracePeriodInMS,
@@ -211,6 +212,7 @@ class E2EIHandler {
       this.currentStep = E2EIHandlerStep.INITIALIZED;
     }
 
+    // If the timer is not active, show the notification
     if (!this.timer.isDelayTimerActive()) {
       const {modalOptions, modalType} = getModalOptions({
         hideSecondary: !this.timer.isSnoozeTimeAvailable(),

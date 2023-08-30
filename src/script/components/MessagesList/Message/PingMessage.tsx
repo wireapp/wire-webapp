@@ -21,29 +21,17 @@ import React from 'react';
 
 import cx from 'classnames';
 
-import {Message} from 'src/script/entity/message/Message';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {MessageTime} from './MessageTime';
-import {ReadReceiptStatus} from './ReadReceiptStatus';
 
 import {PingMessage as PingMessageEntity} from '../../../entity/message/PingMessage';
 
 export interface PingMessageProps {
-  is1to1Conversation: boolean;
-  isLastDeliveredMessage: boolean;
   message: PingMessageEntity;
-  onClickReceipts?: (message: Message) => void;
-  isMessageFocused: boolean;
 }
 
-const PingMessage: React.FC<PingMessageProps> = ({
-  message,
-  is1to1Conversation,
-  isLastDeliveredMessage,
-  onClickReceipts,
-  isMessageFocused,
-}) => {
+const PingMessage: React.FC<PingMessageProps> = ({message}) => {
   const {unsafeSenderName, caption, timestamp, ephemeral_caption, isObfuscated, get_icon_classes} =
     useKoSubscribableChildren(message, [
       'unsafeSenderName',
@@ -73,13 +61,6 @@ const PingMessage: React.FC<PingMessageProps> = ({
       </div>
       <div className="message-body-actions">
         <MessageTime timestamp={timestamp} data-uie-uid={message.id} data-uie-name="item-message-call-timestamp" />
-        <ReadReceiptStatus
-          message={message}
-          is1to1Conversation={is1to1Conversation}
-          isLastDeliveredMessage={isLastDeliveredMessage}
-          onClickReceipts={onClickReceipts}
-          isMessageFocused={isMessageFocused}
-        />
       </div>
     </div>
   );

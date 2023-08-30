@@ -49,21 +49,22 @@ beforeAll(() => {
   });
 });
 
-const getDefaultParams = (showLikes: boolean = false) => {
+const getDefaultParams = (showReactions: boolean = false) => {
   return {
     conversationRepository,
     onClose: jest.fn(),
     searchRepository,
-    showLikes,
+    showReactions,
     teamRepository: {
       conversationHasGuestLinkEnabled: async (conversationId: string) => true,
-    } as TeamRepository,
+      isSelfConnectedTo: () => false,
+    } as unknown as TeamRepository,
     updateEntity: jest.fn(),
   };
 };
 
 describe('MessageDetails', () => {
-  it('renders no likes view', async () => {
+  it('renders no reactions view', async () => {
     const conversation = new Conversation();
     conversation.team_id = 'mock-team-id';
 
@@ -77,8 +78,8 @@ describe('MessageDetails', () => {
     message.timestamp(timestamp);
     message.user(user);
 
-    const getUsersById = jest.fn(async (qid: QualifiedId) => {
-      return [new User('mock-id', 'test-domain.mock')];
+    const getUsersById = jest.fn(async (ids: QualifiedId[]) => {
+      return ids.map(id => new User(id.id, 'test-domain.mock'));
     });
 
     const userRepository = {
@@ -97,9 +98,9 @@ describe('MessageDetails', () => {
     );
 
     await waitFor(() => {
-      getByText('messageDetailsNoLikes');
+      getByText('messageDetailsNoReactions');
     });
 
-    expect(getByText('messageDetailsNoLikes')).not.toBeNull();
+    expect(getByText('messageDetailsNoReactions')).not.toBeNull();
   });
 });

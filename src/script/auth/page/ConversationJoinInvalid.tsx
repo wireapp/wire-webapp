@@ -53,4 +53,22 @@ const ConversationJoinInvalid = ({}: Props) => {
   );
 };
 
-export {ConversationJoinInvalid};
+const ConversationJoinFull = ({}: Props) => {
+  const {formatMessage: _} = useIntl();
+  return (
+    <UnsupportedBrowser isTemporaryGuest>
+      <WirelessContainer>
+        <ContainerXS style={{margin: 'auto 0'}}>
+          <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} data-uie-name="status-full-headline">
+            <FormattedMessage {...conversationJoinStrings.fullConversationHeadline} />
+          </H2>
+          <Text style={{fontSize: '1rem', marginTop: '10px'}} data-uie-name="status-full-text">
+            {_(conversationJoinStrings.fullConversationSubhead)}
+          </Text>
+        </ContainerXS>
+      </WirelessContainer>
+    </UnsupportedBrowser>
+  );
+};
+
+export {ConversationJoinInvalid, ConversationJoinFull};
