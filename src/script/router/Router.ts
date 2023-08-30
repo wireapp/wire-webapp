@@ -45,6 +45,6 @@ export const navigate = (path: string, stateObj?: {}) => {
   parseRoute();
 };
 
-export const setHistoryParam = (path: string, stateObj?: {}) => {
+export const setHistoryParam = (path: string, stateObj: {} = window.history.state) => {
   window.history.replaceState(stateObj, '', `#${path}`);
 };

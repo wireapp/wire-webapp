@@ -320,6 +320,10 @@ export class ConversationRepository {
     window.addEventListener<any>(WebAppEvents.CONVERSATION.JOIN, this.onConversationJoin);
   }
 
+  public initMLSConversationRecoveredListener() {
+    return this.conversationService.addMLSConversationRecoveredListener(this.onMLSConversationRecovered);
+  }
+
   private readonly onFederationEvent = async (event: FederationEvent) => {
     const {type} = event;
 
@@ -2257,7 +2261,16 @@ export class ConversationRepository {
             this.unarchiveConversation(conversationEntity, false, ConversationRepository.eventFromStreamMessage);
           }
           const isBackendTimestamp = eventSource !== EventSource.INJECTED;
-          if (type !== CONVERSATION_EVENT.MEMBER_JOIN && type !== CONVERSATION_EVENT.MEMBER_LEAVE) {
+
+          const eventsToSkip: (CLIENT_CONVERSATION_EVENT | CONVERSATION_EVENT)[] = [
+            CONVERSATION_EVENT.MEMBER_LEAVE,
+            CONVERSATION_EVENT.MEMBER_JOIN,
+            CONVERSATION_EVENT.DELETE,
+          ];
+
+          const shouldUpdateTimestampServer = !eventsToSkip.includes(type);
+
+          if (shouldUpdateTimestampServer) {
             conversationEntity.updateTimestampServer(eventJson.server_time || eventJson.time, isBackendTimestamp);
           }
         }
@@ -2479,6 +2492,7 @@ export class ConversationRepository {
       case ClientEvent.CONVERSATION.LEGAL_HOLD_UPDATE:
       case ClientEvent.CONVERSATION.LOCATION:
       case ClientEvent.CONVERSATION.MISSED_MESSAGES:
+      case ClientEvent.CONVERSATION.MLS_CONVERSATION_RECOVERED:
       case ClientEvent.CONVERSATION.UNABLE_TO_DECRYPT:
       case ClientEvent.CONVERSATION.VERIFICATION:
       case ClientEvent.CONVERSATION.VOICE_CHANNEL_ACTIVATE:
@@ -2565,6 +2579,22 @@ export class ConversationRepository {
         const missed_event = EventBuilder.buildMissed(conversationEntity, currentTimestamp);
         this.eventRepository.injectEvent(missed_event);
       });
+  };
+
+  /**
+   * Add "mls conversation recovered" system message to conversation.
+   */
+  private readonly onMLSConversationRecovered = (conversationId: QualifiedId): void => {
+    const conversation = this.conversationState.findConversation(conversationId);
+
+    if (!conversation) {
+      return;
+    }
+    const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
+
+    const event = EventBuilder.buildMLSConversationRecovered(conversation, currentTimestamp);
+
+    void this.eventRepository.injectEvent(event);
   };
 
   private on1to1Creation(conversationEntity: Conversation, eventJson: OneToOneCreationEvent) {

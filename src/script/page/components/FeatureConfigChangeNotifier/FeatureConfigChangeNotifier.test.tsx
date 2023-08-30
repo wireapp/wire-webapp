@@ -21,16 +21,21 @@ import {act, render, waitFor} from '@testing-library/react';
 import {FeatureStatus, FEATURE_KEY} from '@wireapp/api-client/lib/team/feature';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import en from 'I18n/en-US.json';
+import {setStrings} from 'Util/LocalizerUtil';
 
 import {FeatureConfigChangeNotifier} from './FeatureConfigChangeNotifier';
 
-import {TeamState} from '../team/TeamState';
+import {TeamState} from '../../../team/TeamState';
+
+setStrings({en});
 
 describe('FeatureConfigChangeNotifier', () => {
   const showModalSpy = jest.spyOn(PrimaryModal, 'show');
 
   beforeEach(() => {
     showModalSpy.mockClear();
+    localStorage.clear();
   });
 
   const baseConfig = {
@@ -55,23 +60,23 @@ describe('FeatureConfigChangeNotifier', () => {
   it.each([
     [
       FEATURE_KEY.FILE_SHARING,
-      'featureConfigChangeModalFileSharingDescriptionItemFileSharingEnabled',
-      'featureConfigChangeModalFileSharingDescriptionItemFileSharingDisabled',
+      'Sharing and receiving files of any type is now enabled',
+      'Sharing and receiving files of any type is now disabled',
     ],
+    [FEATURE_KEY.VIDEO_CALLING, 'Camera in calls is enabled', 'Camera in calls is disabled'],
     [
-      FEATURE_KEY.VIDEO_CALLING,
-      'featureConfigChangeModalAudioVideoDescriptionItemCameraEnabled',
-      'featureConfigChangeModalAudioVideoDescriptionItemCameraDisabled',
+      FEATURE_KEY.CONFERENCE_CALLING,
+      'Your team was upgraded to  Enterprise, which gives you access to features such as conference calls and more. <a href="undefined" data-uie-name="read-more-pricing" class="modal__text__read-more" rel="nofollow noopener noreferrer" target="_blank">Learn more about  Enterprise</a>',
+      undefined,
     ],
-    [FEATURE_KEY.CONFERENCE_CALLING, 'featureConfigChangeModalConferenceCallingEnabled', undefined],
     [
       FEATURE_KEY.CONVERSATION_GUEST_LINKS,
-      'featureConfigChangeModalConversationGuestLinksDescriptionItemConversationGuestLinksEnabled',
-      'featureConfigChangeModalConversationGuestLinksDescriptionItemConversationGuestLinksDisabled',
+      'Generating guest links is now enabled for all group admins.',
+      'Generating guest links is now disabled for all group admins.',
     ],
   ] as const)('shows a modal when feature %s is turned on and off', async (feature, enabledString, disabledString) => {
     const teamState = new TeamState();
-    render(<FeatureConfigChangeNotifier teamState={teamState} />);
+    render(<FeatureConfigChangeNotifier selfUserId={'self'} teamState={teamState} />);
     act(() => {
       teamState.teamFeatures(baseConfig);
     });
@@ -117,32 +122,46 @@ describe('FeatureConfigChangeNotifier', () => {
     }
   });
 
+  it('saves previous state of feature and warn of feature change at mount time', async () => {
+    const teamState = new TeamState();
+    teamState.teamFeatures(baseConfig);
+
+    const {unmount} = render(<FeatureConfigChangeNotifier selfUserId={'self'} teamState={teamState} />);
+
+    unmount();
+    expect(showModalSpy).not.toHaveBeenCalled();
+
+    teamState.teamFeatures({...baseConfig, [FEATURE_KEY.FILE_SHARING]: {status: FeatureStatus.ENABLED}});
+    render(<FeatureConfigChangeNotifier selfUserId={'self'} teamState={teamState} />);
+    expect(showModalSpy).toHaveBeenCalledTimes(1);
+  });
+
   it.each([
     [
       {status: FeatureStatus.DISABLED, config: {enforcedTimeoutSeconds: 0}},
       {status: FeatureStatus.ENABLED, config: {enforcedTimeoutSeconds: 10}},
-      'featureConfigChangeModalSelfDeletingMessagesDescriptionItemEnforced',
+      'Self-deleting messages are now mandatory. New messages will self-delete after 10 seconds.',
     ],
     [
       {status: FeatureStatus.DISABLED, config: {enforcedTimeoutSeconds: 0}},
       {status: FeatureStatus.ENABLED, config: {enforcedTimeoutSeconds: 0}},
-      'featureConfigChangeModalSelfDeletingMessagesDescriptionItemEnabled',
+      'Self-deleting messages are enabled. You can set a timer before writing a message.',
     ],
     [
       {status: FeatureStatus.ENABLED, config: {enforcedTimeoutSeconds: 0}},
       {status: FeatureStatus.ENABLED, config: {enforcedTimeoutSeconds: 10}},
-      'featureConfigChangeModalSelfDeletingMessagesDescriptionItemEnforced',
+      'Self-deleting messages are now mandatory. New messages will self-delete after 10 seconds.',
     ],
     [
       {status: FeatureStatus.ENABLED, config: {enforcedTimeoutSeconds: 10}},
       {status: FeatureStatus.DISABLED, config: {enforcedTimeoutSeconds: 0}},
-      'featureConfigChangeModalSelfDeletingMessagesDescriptionItemDisabled',
+      'Self-deleting messages are disabled',
     ],
   ])(
     'indicates the config change when self deleting messages have changed (%s) to (%s)',
     async (fromStatus, toStatus, expectedText) => {
       const teamState = new TeamState();
-      render(<FeatureConfigChangeNotifier teamState={teamState} />);
+      render(<FeatureConfigChangeNotifier selfUserId={'self'} teamState={teamState} />);
       act(() => {
         teamState.teamFeatures({
           ...baseConfig,
