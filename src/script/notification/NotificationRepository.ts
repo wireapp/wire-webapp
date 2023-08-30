@@ -108,7 +108,8 @@ export class NotificationRepository {
       BODY_LENGTH: 80,
       ICON_URL: '/image/logo/notification.png',
       TIMEOUT: TIME_IN_MILLIS.SECOND * 5,
-      TITLE_LENGTH: 38,
+      TITLE_LENGTH: 17,
+      TITLE_MAX_LENGTH: 38,
     };
   }
 
@@ -494,7 +495,7 @@ export class NotificationRepository {
         return createBodyMessageTimerUpdate();
       }
       case SystemMessageType.CONVERSATION_DELETE: {
-        return (messageEntity as DeleteConversationMessage).caption();
+        return (messageEntity as DeleteConversationMessage).caption;
       }
     }
   }
@@ -611,6 +612,16 @@ export class NotificationRepository {
   }
 
   /**
+   Calculate the length of the opposite title section string and return the extra length
+  */
+  private calculatedTitleLength = (sectionString: string) => {
+    const maxSectionLength = NotificationRepository.CONFIG.TITLE_LENGTH;
+    const length = maxSectionLength - sectionString.length + maxSectionLength;
+
+    return length > maxSectionLength ? length : maxSectionLength;
+  };
+
+  /**
    * Creates the notification title.
    *
    * @param Notification message title
@@ -619,14 +630,22 @@ export class NotificationRepository {
     const conversationName = conversationEntity && conversationEntity.display_name();
     const userEntity = messageEntity.user();
 
+    const truncatedConversationName = truncate(
+      conversationName ?? '',
+      this.calculatedTitleLength(userEntity.name()),
+      false,
+    );
+
+    const truncatedName = truncate(userEntity.name(), this.calculatedTitleLength(conversationName ?? ''), false);
+
     let title;
     if (conversationName) {
       title = conversationEntity.isGroup()
-        ? t('notificationTitleGroup', {conversation: conversationName, user: userEntity.name()}, {}, true)
+        ? t('notificationTitleGroup', {conversation: truncatedConversationName, user: truncatedName}, {}, true)
         : conversationName;
     }
 
-    return truncate(title || userEntity.name(), NotificationRepository.CONFIG.TITLE_LENGTH, false);
+    return truncate(title ?? truncatedName, NotificationRepository.CONFIG.TITLE_MAX_LENGTH, false);
   }
 
   /**
@@ -636,7 +655,7 @@ export class NotificationRepository {
    */
   private createTitleObfuscated(): string {
     const obfuscatedTitle = t('notificationObfuscatedTitle');
-    return truncate(obfuscatedTitle, NotificationRepository.CONFIG.TITLE_LENGTH, false);
+    return truncate(obfuscatedTitle, NotificationRepository.CONFIG.TITLE_MAX_LENGTH, false);
   }
 
   /**

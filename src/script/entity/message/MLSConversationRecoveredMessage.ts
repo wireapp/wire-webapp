@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2019 Wire Swiss GmbH
+ * Copyright (C) 2023 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,24 +17,15 @@
  *
  */
 
-import {TEAM_EVENT} from '@wireapp/api-client/lib/event/TeamEvent';
-
+import {SystemMessageType} from 'src/script/message/SystemMessageType';
 import {t} from 'Util/LocalizerUtil';
 
 import {SystemMessage} from './SystemMessage';
 
-import {SystemMessageType} from '../../message/SystemMessageType';
-import type {Conversation} from '../Conversation';
-
-export class DeleteConversationMessage extends SystemMessage {
-  constructor(conversationEntity: Conversation) {
+export class MLSConversationRecoveredMessage extends SystemMessage {
+  constructor() {
     super();
-
-    this.type = TEAM_EVENT.DELETE;
-    this.system_message_type = SystemMessageType.CONVERSATION_DELETE;
-
-    this.caption = conversationEntity
-      ? t('notificationConversationDeletedNamed', conversationEntity.name())
-      : t('notificationConversationDeleted');
+    this.system_message_type = SystemMessageType.MLS_CONVERSATION_RECOVERED;
+    this.caption = t('mlsConversationRecovered');
   }
 }

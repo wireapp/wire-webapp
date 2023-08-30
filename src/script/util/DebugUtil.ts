@@ -180,6 +180,22 @@ export class DebugUtil {
     );
   }
 
+  reconnectWebSocket({dryRun} = {dryRun: false}) {
+    return this.eventRepository.connectWebSocket(this.core, () => {}, dryRun);
+  }
+
+  async reconnectWebSocketWithLastNotificationIdFromBackend({dryRun} = {dryRun: false}) {
+    await this.core.service?.notification.initializeNotificationStream();
+    return this.reconnectWebSocket({dryRun});
+  }
+
+  async updateActiveConversationKeyPackages() {
+    const groupId = this.conversationState.activeConversation()?.groupId;
+    if (groupId) {
+      return this.core.service?.mls?.renewKeyMaterial(groupId);
+    }
+  }
+
   /** Used by QA test automation. */
   blockAllConnections(): Promise<void[]> {
     const blockUsers = this.userState.users().map(userEntity => this.connectionRepository.blockUser(userEntity));
