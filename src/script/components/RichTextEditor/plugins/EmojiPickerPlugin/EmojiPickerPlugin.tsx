@@ -27,7 +27,7 @@ import {
   MenuTextMatch,
   useBasicTypeaheadTriggerMatch,
 } from '@lexical/react/LexicalTypeaheadMenuPlugin';
-import emojiList from 'emoji-picker-react/src/data/emojis';
+import emojiList from 'emoji-picker-react/src/data/emojis.json';
 import {$createTextNode, $getSelection, $isRangeSelection, TextNode} from 'lexical';
 import * as ReactDOM from 'react-dom';
 
