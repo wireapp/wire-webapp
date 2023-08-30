@@ -179,7 +179,7 @@ export const InputBar = ({
   // Mentions
   const getMentionCandidates = (search?: string | null) => {
     const candidates = conversation.participating_user_ets().filter(userEntity => !userEntity.isService);
-    return typeof search === 'string' ? searchRepository.searchUserInSet(search, candidates) : [];
+    return typeof search === 'string' ? searchRepository.searchUserInSet(search, candidates) : candidates;
   };
 
   const resetDraftState = (resetInputValue = false) => {

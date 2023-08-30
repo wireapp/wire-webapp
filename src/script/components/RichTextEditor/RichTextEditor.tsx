@@ -239,7 +239,10 @@ export const RichTextEditor = ({
             ErrorBoundary={LexicalErrorBoundary}
           />
 
-          <MentionsPlugin onSearch={getMentionCandidates} openStateRef={mentionsOpen} />
+          <MentionsPlugin
+            onSearch={search => (typeof search === 'string' ? getMentionCandidates(search) : [])}
+            openStateRef={mentionsOpen}
+          />
 
           <OnChangePlugin onChange={saveDraft} />
         </div>
