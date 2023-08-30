@@ -54,7 +54,7 @@ import {EditMessagePlugin} from './plugins/EditMessagePlugin';
 import {EmojiPickerPlugin} from './plugins/EmojiPickerPlugin';
 import {GlobalEventsPlugin} from './plugins/GlobalEventsPlugin';
 import {HistoryPlugin} from './plugins/HistoryPlugin';
-import {ReplaceEmojiPlugin} from './plugins/InlineEmojiReplacementPlugin';
+import {findAndTransformEmoji, ReplaceEmojiPlugin} from './plugins/InlineEmojiReplacementPlugin';
 import {MentionsPlugin} from './plugins/MentionsPlugin';
 import {toEditorNodes} from './utils/messageToEditorNodes';
 
@@ -144,7 +144,8 @@ export const RichTextEditor = ({
     cleanupRef.current = mergeRegister(
       editor.registerTextContentListener(textContent => {
         onUpdate({
-          text: textContent,
+          // Do a final replacement of emojis before sending
+          text: shouldReplaceEmoji ? findAndTransformEmoji(textContent) : textContent,
           mentions: parseMentions(editor, textContent, getMentionCandidates()),
         });
       }),
