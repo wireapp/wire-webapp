@@ -27,6 +27,7 @@ import {
   MenuTextMatch,
   useBasicTypeaheadTriggerMatch,
 } from '@lexical/react/LexicalTypeaheadMenuPlugin';
+import emojiList from 'emoji-picker-react/src/data/emojis';
 import {$createTextNode, $getSelection, $isRangeSelection, TextNode} from 'lexical';
 import * as ReactDOM from 'react-dom';
 
@@ -34,7 +35,6 @@ import {loadValue, storeValue} from 'Util/StorageUtil';
 import {sortByPriority} from 'Util/StringUtil';
 
 import {EmojiItem} from './EmojiItem';
-import emojiList from './emojiList';
 
 import {StorageKey} from '../../../../storage';
 import {getDOMRangeRect} from '../../utils/getDomRangeRect';
@@ -91,12 +91,14 @@ type Props = {
   openStateRef: MutableRefObject<boolean>;
 };
 
-const emojiOptions = emojiList.map(
-  ({emoji, aliases, tags}) =>
-    new EmojiOption(aliases[0], emoji, {
-      keywords: [...aliases, ...tags],
-    }),
-);
+const emojies = Object.values(emojiList).flat();
+
+const emojiOptions = emojies.map(({n: aliases, u: codepoint}) => {
+  const codepoints = codepoint.split('-').map(code => parseInt(code, 16));
+  return new EmojiOption(aliases[0], String.fromCodePoint(...codepoints), {
+    keywords: aliases,
+  });
+});
 
 export function EmojiPickerPlugin({openStateRef}: Props) {
   const [lexicalEditor] = useLexicalComposerContext();
