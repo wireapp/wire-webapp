@@ -54,9 +54,11 @@
     pointer-events: auto;
   }
 
-  &.hover .message-status-read,
   &:hover .message-status-read {
     opacity: 0;
+    &__show-on-hover {
+      opacity: 1;
+    }
   }
 
   &.hover .time,
@@ -145,9 +147,10 @@
 
 .message-header-icon {
   .flex-center;
-
   width: @conversation-message-sender-width;
   max-height: @avatar-diameter-xs;
+
+  align-self: center;
   color: var(--background);
 
   &--svg {
