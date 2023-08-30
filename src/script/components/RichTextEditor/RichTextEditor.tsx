@@ -25,19 +25,10 @@ import {EditorRefPlugin} from '@lexical/react/LexicalEditorRefPlugin';
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary';
 import {OnChangePlugin} from '@lexical/react/LexicalOnChangePlugin';
 import {PlainTextPlugin} from '@lexical/react/LexicalPlainTextPlugin';
-import {mergeRegister} from '@lexical/utils';
 import type {WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
 import cx from 'classnames';
-import {
-  LexicalEditor,
-  EditorState,
-  $nodesOfType,
-  KEY_ENTER_COMMAND,
-  COMMAND_PRIORITY_LOW,
-  $getRoot,
-  $setSelection,
-} from 'lexical';
+import {LexicalEditor, EditorState, $nodesOfType, $getRoot, $setSelection} from 'lexical';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
@@ -56,6 +47,8 @@ import {GlobalEventsPlugin} from './plugins/GlobalEventsPlugin';
 import {HistoryPlugin} from './plugins/HistoryPlugin';
 import {findAndTransformEmoji, ReplaceEmojiPlugin} from './plugins/InlineEmojiReplacementPlugin';
 import {MentionsPlugin} from './plugins/MentionsPlugin';
+import {SendPlugin} from './plugins/SendPlugin';
+import {TextChangePlugin} from './plugins/TextChangePlugin';
 import {toEditorNodes} from './utils/messageToEditorNodes';
 
 import {MentionEntity} from '../../message/MentionEntity';
@@ -73,12 +66,12 @@ const theme = {
   },
 };
 
-const logger = getLogger('LexicalInput');
-
 export type RichTextContent = {
   text: string;
   mentions?: MentionEntity[];
 };
+
+const logger = getLogger('LexicalInput');
 
 interface RichTextEditorProps {
   readonly propertiesRepository: PropertiesRepository;
@@ -135,45 +128,14 @@ export const RichTextEditor = ({
 }: RichTextEditorProps) => {
   // Emojis
   const editorRef = useRef<LexicalEditor>();
-  const cleanupRef = useRef<() => void>();
   const emojiPickerOpen = useRef<boolean>(true);
   const mentionsOpen = useRef<boolean>(true);
 
   const setupEditor = (editor: LexicalEditor) => {
     editorRef.current = editor;
-    cleanupRef.current = mergeRegister(
-      editor.registerTextContentListener(textContent => {
-        onUpdate({
-          // Do a final replacement of emojis before sending
-          text: shouldReplaceEmoji ? findAndTransformEmoji(textContent) : textContent,
-          mentions: parseMentions(editor, textContent, getMentionCandidates()),
-        });
-      }),
-
-      editor.registerCommand(
-        KEY_ENTER_COMMAND,
-        event => {
-          if (emojiPickerOpen.current || mentionsOpen.current) {
-            // we don't want to send if the user is currently picking an emoji or mention
-            return false;
-          }
-          if (event?.shiftKey) {
-            return true;
-          }
-
-          onSend();
-          return false;
-        },
-        COMMAND_PRIORITY_LOW,
-      ),
-    );
 
     onSetup?.(editor);
   };
-
-  useEffect(() => {
-    return cleanupRef.current;
-  });
 
   useEffect(() => {
     if (editedMessage && editorRef.current) {
@@ -203,6 +165,13 @@ export const RichTextEditor = ({
 
   const saveDraft = (editorState: EditorState) => {
     saveDraftState(JSON.stringify(editorState.toJSON()));
+  };
+
+  const parseUpdatedText = (editor: LexicalEditor, textValue: string) => {
+    onUpdate({
+      text: shouldReplaceEmoji ? findAndTransformEmoji(textValue) : textValue,
+      mentions: parseMentions(editor, textValue, getMentionCandidates()),
+    });
   };
 
   useEffect(() => {
@@ -246,6 +215,14 @@ export const RichTextEditor = ({
           />
 
           <OnChangePlugin onChange={saveDraft} />
+          <TextChangePlugin onUpdate={parseUpdatedText} />
+          <SendPlugin
+            onSend={() => {
+              if (!mentionsOpen.current && !emojiPickerOpen.current) {
+                onSend();
+              }
+            }}
+          />
         </div>
       </div>
 
