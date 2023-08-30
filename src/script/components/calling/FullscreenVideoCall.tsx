@@ -155,7 +155,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   );
   const showSwitchMicrophone = availableMicrophones.length > 1;
 
-  const {unreadMessagesCount} = useAppState();
+  const unreadMessagesCount = useAppState(state => state.unreadMessagesCount);
   const hasUnreadMessages = unreadMessagesCount > 0;
 
   const {showAlert, isGroupCall, clearShowAlert} = useCallAlertState();

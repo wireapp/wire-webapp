@@ -84,7 +84,7 @@ const AppMain: FC<AppMainProps> = ({
     throw new Error('API Context has not been set');
   }
 
-  const {contentState} = useAppState();
+  const contentState = useAppState(state => state.contentState);
 
   const {repository: repositories} = app;
 
