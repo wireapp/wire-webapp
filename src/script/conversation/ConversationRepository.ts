@@ -1513,6 +1513,8 @@ export class ConversationRepository {
     const mlsConversation = await this.getMLS1to1Conversation(otherUserId);
 
     const otherUser = await this.userRepository.getUserById(otherUserId);
+
+    //TODO: for team 1:1 conversation we don't need to have connection assigned
     mlsConversation.connection(otherUser.connection());
     await this.updateParticipatingUserEntities(mlsConversation);
 
