@@ -45,7 +45,7 @@ const PingMessage: React.FC<PingMessageProps> = ({message, is1to1Conversation, i
         <div className={`icon-ping ${get_icon_classes}`} />
       </div>
       <div
-        className={cx('message-header-label', {
+        className={cx('message-body-content', 'message-header-label', {
           'ephemeral-message-obfuscated': isObfuscated,
         })}
         title={ephemeral_caption}
