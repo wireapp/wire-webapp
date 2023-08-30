@@ -267,11 +267,9 @@ export class ActionsViewModel {
       PrimaryModal.show(PrimaryModal.type.OPTION, {
         primaryAction: {
           action: async (clearContent = false) => {
-            await this.conversationRepository.removeMember(
-              conversationEntity,
-              this.userState.self().qualifiedId,
+            await this.conversationRepository.removeMember(conversationEntity, this.userState.self().qualifiedId, {
               clearContent,
-            );
+            });
 
             resolve();
           },

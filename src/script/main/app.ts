@@ -40,7 +40,7 @@ import {getLogger, Logger} from 'Util/Logger';
 import {includesString} from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {appendParameter} from 'Util/UrlUtil';
-import {checkIndexedDb, supportsMLS} from 'Util/util';
+import {checkIndexedDb, supportsMLS, supportsSelfSupportedProtocolsUpdates} from 'Util/util';
 
 import '../../style/default.less';
 import {AssetRepository} from '../assets/AssetRepository';
@@ -87,6 +87,7 @@ import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {PropertiesService} from '../properties/PropertiesService';
 import {SearchRepository} from '../search/SearchRepository';
 import {SearchService} from '../search/SearchService';
+import {SelfRepository} from '../self/SelfRepository';
 import {SelfService} from '../self/SelfService';
 import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
@@ -262,6 +263,8 @@ export class App {
       serverTimeHandler,
     );
 
+    repositories.self = new SelfRepository(selfService, repositories.user, repositories.team, repositories.client);
+
     repositories.eventTracker = new EventTrackingRepository(repositories.message);
 
     const serviceMiddleware = new ServiceMiddleware(repositories.conversation, repositories.user);
@@ -359,6 +362,7 @@ export class App {
         properties: propertiesRepository,
         team: teamRepository,
         user: userRepository,
+        self: selfRepository,
       } = this.repository;
       await checkIndexedDb();
       onProgress(2.5);
@@ -457,6 +461,10 @@ export class App {
       this._handleUrlParams();
       await conversationRepository.updateConversationsOnAppInit();
       await conversationRepository.conversationLabelRepository.loadLabels();
+
+      if (supportsSelfSupportedProtocolsUpdates()) {
+        await selfRepository.initialisePeriodicSelfSupportedProtocolsCheck();
+      }
 
       amplify.publish(WebAppEvents.LIFECYCLE.LOADED);
 

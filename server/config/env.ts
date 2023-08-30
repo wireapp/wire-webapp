@@ -80,6 +80,9 @@ export type Env = {
   /** will enable the E2E-Identification protocol, needs active FEATURE_ENABLE_MLS to work */
   FEATURE_ENABLE_E2EI?: string;
 
+  /** will enable the user to periodically update the list of supported protocols */
+  FEATURE_ENABLE_SELF_SUPPORTED_PROTOCOLS_UPDATES?: string;
+
   FEATURE_USE_CORE_CRYPTO?: string;
 
   FEATURE_MLS_CONFIG_KEYING_MATERIAL_UPDATE_THRESHOLD?: string;
@@ -242,6 +245,8 @@ export type Env = {
   URL_SUPPORT_SCREEN_ACCESS_DENIED: string;
 
   URL_SUPPORT_OFFLINE_BACKEND: string;
+
+  URL_SUPPORT_FEDERATION_STOP: string;
 
   URL_WHATS_NEW: string;
 

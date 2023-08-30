@@ -47,12 +47,11 @@ import {createUuid} from 'Util/uuid';
 
 import {CryptographyMapper} from './CryptographyMapper';
 
-import {ReactionType} from '../entity/message/ContentMessage';
-
 describe('CryptographyMapper', () => {
   const mapper = new CryptographyMapper();
 
   let event: any = undefined;
+  const emojiReaction = '😇';
 
   beforeEach(() => {
     event = {
@@ -444,7 +443,7 @@ describe('CryptographyMapper', () => {
       const messageId = createUuid();
 
       const reaction = new Reaction({
-        emoji: ReactionType.LIKE,
+        emoji: emojiReaction,
         messageId,
       });
       const generic_message = new GenericMessage({
@@ -460,7 +459,7 @@ describe('CryptographyMapper', () => {
         expect(event_json.time).toBe(event.time);
         expect(event_json.id).toBe(generic_message.messageId);
         expect(event_json.data.message_id).toBe(generic_message.messageId);
-        expect(event_json.data.reaction).toBe(ReactionType.LIKE);
+        expect(event_json.data.reaction).toBe(emojiReaction);
       });
     });
 
@@ -573,7 +572,7 @@ describe('CryptographyMapper', () => {
       const messageId = createUuid();
 
       const reaction = new Reaction({
-        emoji: ReactionType.LIKE,
+        emoji: emojiReaction,
         messageId,
       });
       const generic_message = new GenericMessage({
@@ -589,7 +588,7 @@ describe('CryptographyMapper', () => {
         expect(event_json.time).toBe(event.time);
         expect(event_json.id).toBe(generic_message.messageId);
         expect(event_json.data.message_id).toBe(generic_message.messageId);
-        expect(event_json.data.reaction).toBe(ReactionType.LIKE);
+        expect(event_json.data.reaction).toBe(emojiReaction);
       });
     });
 
