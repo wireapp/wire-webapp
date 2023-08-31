@@ -19,8 +19,7 @@
 
 import {render} from '@testing-library/react';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
-
-import {Ciphersuite} from '@wireapp/core-crypto';
+import {Ciphersuite} from '@wireapp/core/lib/messagingProtocols/mls';
 
 import {ConversationProtocolDetails} from './ConversationProtocolDetails';
 
