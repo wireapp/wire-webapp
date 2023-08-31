@@ -102,7 +102,6 @@ const CallOptions: React.FC<CallOptionsProps> = ({constraintsHandler, properties
           }}
           checked={soundlessCallsEnabled}
           data-uie-name="status-preference-soundless-incoming-calls"
-          disabled={isCbrEncodingEnforced}
         >
           <CheckboxLabel htmlFor="status-preference-soundless-incoming-calls">
             {t('preferencesOptionsEnableSoundlessIncomingCalls')}
