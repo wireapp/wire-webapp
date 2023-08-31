@@ -31,11 +31,7 @@ export function useTypingIndicator({text, isEnabled, onTypingChange}: TypingIndi
   const hasHitKeyboard = useRef(false);
 
   useEffect(() => {
-    if (!isEnabled || hasHitKeyboard.current) {
-      return () => {};
-    }
-
-    if (!hasHitKeyboard.current) {
+    if (!hasHitKeyboard.current && isEnabled) {
       // If the user hasn't typed yet, we register a callback that will set the flag to true when the user first type
       const setHasHitKeyboard = () => {
         hasHitKeyboard.current = true;
