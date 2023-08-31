@@ -93,14 +93,14 @@ export class ContentMessage extends Message {
 
     this.like_caption = ko.pureComputed(() => {
       const maxShownNames = 2;
-      const reactionAmount = this.reactions_user_ets().length;
+      const likesAmount = this.reactions_user_ets().length;
       if (this.reactions_user_ets().length <= maxShownNames) {
         return this.reactions_user_ets()
           .map(user => user.name())
           .join(', ');
       }
       const caption =
-        reactionAmount > 1
+        likesAmount > 1
           ? t('conversationLikesCaptionPlural', this.reactions_user_ets().length.toString())
           : t('conversationLikesCaptionSingular', this.reactions_user_ets().length.toString());
 
