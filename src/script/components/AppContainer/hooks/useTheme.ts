@@ -28,7 +28,8 @@ const THEMES_CLASS_PREFIX = 'theme-';
 
 export type Theme = WebappProperties['settings']['interface']['theme'];
 
-const listenenEvents = [WebAppEvents.PROPERTIES.UPDATE.INTERFACE.THEME, WebAppEvents.PROPERTIES.UPDATED];
+const listenedEvents = [WebAppEvents.PROPERTIES.UPDATE.INTERFACE.THEME, WebAppEvents.PROPERTIES.UPDATED];
+
 function setTheme(theme: Theme) {
   const classes = document.body.className
     .split(' ')
@@ -45,9 +46,9 @@ export function useTheme(getTheme: () => Theme) {
   updateTheme();
 
   useEffect(() => {
-    listenenEvents.forEach(event => amplify.subscribe(event, updateTheme));
+    listenedEvents.forEach(event => amplify.subscribe(event, updateTheme));
     return () => {
-      listenenEvents.forEach(event => amplify.unsubscribe(event, updateTheme));
+      listenedEvents.forEach(event => amplify.unsubscribe(event, updateTheme));
     };
   }, [updateTheme]);
 }
