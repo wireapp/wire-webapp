@@ -81,16 +81,8 @@ interface ConversationClassifiedBarProps extends ClassifiedBarProps {
 
 export const ConversationClassifiedBar: React.FC<ConversationClassifiedBarProps> = ({
   conversation,
-  classifiedDomains,
-  style,
+  ...classifiedBarProps
 }) => {
   const {allUserEntities: users} = useKoSubscribableChildren(conversation, ['allUserEntities']);
-  return (
-    <UserClassifiedBar
-      users={users}
-      conversationDomain={conversation.domain}
-      classifiedDomains={classifiedDomains}
-      style={style}
-    />
-  );
+  return <UserClassifiedBar users={users} conversationDomain={conversation.domain} {...classifiedBarProps} />;
 };
