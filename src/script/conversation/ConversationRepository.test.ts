@@ -21,11 +21,12 @@ import {faker} from '@faker-js/faker';
 import {ClientClassification} from '@wireapp/api-client/lib/client/';
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {
+  Conversation as BackendConversation,
   CONVERSATION_ACCESS,
   CONVERSATION_LEGACY_ACCESS_ROLE,
   CONVERSATION_TYPE,
   RemoteConversations,
-} from '@wireapp/api-client/lib/conversation/';
+} from '@wireapp/api-client/lib/conversation';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
 import {ConversationCreateEvent, ConversationMemberJoinEvent, CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
@@ -63,8 +64,6 @@ import {TestFactory} from '../../../test/helper/TestFactory';
 import {generateUser} from '../../../test/helper/UserGenerator';
 import {Core} from '../service/CoreSingleton';
 import {LegacyEventRecord, StorageService} from '../storage';
-
-jest.deepUnmock('axios');
 
 describe('ConversationRepository', () => {
   const testFactory = new TestFactory();
@@ -569,6 +568,7 @@ describe('ConversationRepository', () => {
       it("shows a failed message on the sender's side if the upload fails", () => {
         const selfUser = generateUser();
         const conversation_id = createUuid();
+        const conversationQualifiedId = {domain: '', id: conversation_id};
         const message_id = createUuid();
         const sending_user_id = selfUser.id;
         spyOn(testFactory.conversation_repository['userState'], 'self').and.returnValue(selfUser);
@@ -602,6 +602,31 @@ describe('ConversationRepository', () => {
           time: '2017-09-06T16:14:08.165Z',
           type: 'conversation.asset-add',
         };
+
+        const conversation_payload = {
+          creator: conversation_et.id,
+          id: conversation_id,
+          qualified_id: conversationQualifiedId,
+          members: {
+            others: [],
+            self: {
+              hidden_ref: null,
+              id: conversation_et.id,
+              otr_archived_ref: null,
+              otr_muted_ref: null,
+              otr_muted_status: 0,
+              service: null,
+              status_ref: '0.0',
+              status_time: '2015-01-28T12:53:41.847Z',
+            },
+          },
+          name: '',
+          type: 0,
+        } as unknown as BackendConversation;
+
+        jest
+          .spyOn(testFactory.conversation_repository['conversationService'], 'getConversationById')
+          .mockResolvedValue(conversation_payload);
 
         return testFactory.conversation_repository['fetchConversationById']({domain: '', id: conversation_id})
           .then(fetched_conversation => {
@@ -696,7 +721,7 @@ describe('ConversationRepository', () => {
       it('should process create event for a new conversation created locally', () => {
         jest
           .spyOn(testFactory.conversation_repository['conversationService'], 'getConversationById')
-          .mockResolvedValue(createEvent.data);
+          .mockResolvedValueOnce(createEvent.data);
         return testFactory.conversation_repository['handleConversationEvent'](createEvent).then(() => {
           expect(testFactory.conversation_repository['onCreate']).toHaveBeenCalled();
           expect(testFactory.conversation_repository.mapConversations).toHaveBeenCalledWith([createEvent.data], 1);

@@ -551,11 +551,7 @@ export const InputBar = ({
       {isTypingIndicatorEnabled && <TypingIndicator conversationId={conversation.id} />}
 
       {classifiedDomains && !isConnectionRequest && (
-        <ConversationClassifiedBar
-          conversationDomain={conversation.domain}
-          conversation={conversation}
-          classifiedDomains={classifiedDomains}
-        />
+        <ConversationClassifiedBar conversation={conversation} classifiedDomains={classifiedDomains} />
       )}
 
       {isReplying && !isEditing && <ReplyBar replyMessageEntity={replyMessageEntity} onCancel={handleCancelReply} />}
