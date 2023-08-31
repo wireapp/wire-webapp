@@ -40,12 +40,16 @@ function isClassified(users: User[], classifiedDomains: string[], conversationDo
   return true;
 }
 
-interface UserClassifiedBarProps {
+interface ClassifiedBarProps {
   classifiedDomains?: string[];
   style?: CSSObject;
-  users: User[];
   conversationDomain?: string;
 }
+
+interface UserClassifiedBarProps extends ClassifiedBarProps {
+  users: User[];
+}
+
 export const UserClassifiedBar: React.FC<UserClassifiedBarProps> = ({
   users,
   conversationDomain,
@@ -71,11 +75,8 @@ export const UserClassifiedBar: React.FC<UserClassifiedBarProps> = ({
   );
 };
 
-interface ConversationClassifiedBarProps {
-  classifiedDomains?: string[];
-  style?: CSSObject;
+interface ConversationClassifiedBarProps extends ClassifiedBarProps {
   conversation: Conversation;
-  conversationDomain?: string;
 }
 
 export const ConversationClassifiedBar: React.FC<ConversationClassifiedBarProps> = ({
