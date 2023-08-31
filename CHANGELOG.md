@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [41.7.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@41.6.0...@wireapp/core@41.7.0) (2023-08-31)
+
+### Features
+
+* reexport types from corecrypto ([#5448](https://github.com/wireapp/wire-web-packages/issues/5448)) ([1c27f38](https://github.com/wireapp/wire-web-packages/commit/1c27f3807305860d164a04f9bfbae87d5cd767f8))
+
 # [41.6.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@41.5.2...@wireapp/core@41.6.0) (2023-08-30)
 
 ### Features
