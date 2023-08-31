@@ -18,3 +18,4 @@
  */
 
 export * from './MLSService/';
+export * from './types';
