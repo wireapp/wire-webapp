@@ -109,7 +109,7 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
       {mlsFingerprint && <MLSDeviceDetails fingerprint={mlsFingerprint} />}
 
       <div className="device-proteus-details">
-        <h3 className="device-details-title paragraph-body-3">Proteus Device Verification</h3>
+        <h3 className="device-details-title paragraph-body-3">{t('participantDevicesProteusDeviceVerification')}</h3>
 
         <p className="panel__info-text">
           <span
@@ -130,7 +130,9 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
 
         {fingerprintRemote && (
           <>
-            <p className="label-2 preferences-label preferences-devices-fingerprint-label">Proteus Key Fingerprint</p>
+            <p className="label-2 preferences-label preferences-devices-fingerprint-label">
+              {t('participantDevicesProteusKeyFingerprint')}
+            </p>
 
             <div className="participant-devices__fingerprint" data-uie-name="status-fingerprint">
               <DeviceId deviceId={fingerprintRemote} />
@@ -158,9 +160,8 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
           </div>
         </div>
 
-        {/* TODO: Add translation */}
         <p className="device-details__reset-fingerprint paragraph-body-1">
-          If fingerprints don’t match, reset the session to generate new encryption keys on both sides.
+          {t('preferencesDeviceDetailsFingerprintNotMatch')}
         </p>
 
         {!isMLSConversation && (

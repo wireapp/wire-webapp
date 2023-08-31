@@ -23,14 +23,10 @@ interface FormattedIdProps {
 
 export const FormattedId = ({idSlices}: FormattedIdProps) => (
   <>
-    {idSlices.map((slice, index) => {
-      // const Component = index % 2 === 0 ? 'strong' : 'span';
-
-      return (
-        <span className="device-id-part" key={slice + index}>
-          {slice}
-        </span>
-      );
-    })}
+    {idSlices.map((slice, index) => (
+      <span className="device-id-part" key={slice + index}>
+        {slice}
+      </span>
+    ))}
   </>
 );
