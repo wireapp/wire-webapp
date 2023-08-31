@@ -413,6 +413,7 @@ describe('ConversationRepository', () => {
       spyOn(testFactory.conversation_service, 'getConversationById').and.returnValue(
         Promise.resolve(conversation_payload),
       );
+      spyOn(testFactory.user_repository, 'getUsersById').and.returnValue(Promise.resolve([]));
     });
 
     it('should map a connection to an existing conversation', () => {
