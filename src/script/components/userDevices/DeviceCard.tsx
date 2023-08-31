@@ -29,6 +29,7 @@ import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import type {ClientEntity} from '../../client/ClientEntity';
+import {MLSPublicKeys} from '../../client/ClientEntity';
 import {Icon} from '../Icon';
 import {LegalHoldDot} from '../LegalHoldDot';
 
@@ -50,6 +51,8 @@ const DeviceCard: React.FC<DeviceCardProps> = ({
   const name = clientEntity.getName();
   const clickable = !!click;
   const isVerified = meta.isVerified;
+  const mlsFingerprint = clientEntity.mlsPublicKeys?.[MLSPublicKeys.ED25519];
+
   const showLegalHoldIcon = showIcon && deviceClass === ClientClassification.LEGAL_HOLD;
 
   const clickOnDevice = () => {
@@ -57,9 +60,6 @@ const DeviceCard: React.FC<DeviceCardProps> = ({
       click(clientEntity);
     }
   };
-
-  // TODO: Replace with proper mls id
-  const TMP_MLS_FINGERPRINT = '3dc87fff07c9296e3dc87fff07c9296e65687fff07c9296e3dc87fff07c9656f';
 
   return (
     <div
@@ -86,13 +86,15 @@ const DeviceCard: React.FC<DeviceCardProps> = ({
           <Badges isMLSVerified isProteusVerified />
         </div>
 
-        <p className="text-background device-card__id">
-          <span>{t('preferencesMLSThumbprint')}</span>
+        {mlsFingerprint && (
+          <p className="text-background device-card__id">
+            <span>{t('preferencesMLSThumbprint')}</span>
 
-          <span data-uie-name="device-id" className="formatted-id">
-            <DeviceId deviceId={TMP_MLS_FINGERPRINT} />
-          </span>
-        </p>
+            <span data-uie-name="device-id" className="formatted-id">
+              <DeviceId deviceId={mlsFingerprint} />
+            </span>
+          </p>
+        )}
 
         <p className="text-background device-card__id">
           <span>{t('preferencesDevicesId')}</span>

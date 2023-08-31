@@ -22,13 +22,10 @@ import {splitFingerprint} from 'Util/StringUtil';
 import {FormattedId} from './FormattedId';
 
 interface MLSDeviceDetailsProps {
-  fingerprint?: string;
+  fingerprint: string;
 }
 
-// TODO: Replace with proper mls id
-const TMP_MLS_FINGERPRINT = '3dc87fff07c9296e3dc87fff07c9296e65687fff07c9296e3dc87fff07c9656f';
-
-export const MLSDeviceDetails = ({fingerprint = TMP_MLS_FINGERPRINT}: MLSDeviceDetailsProps) => {
+export const MLSDeviceDetails = ({fingerprint}: MLSDeviceDetailsProps) => {
   return (
     <div className="mls-device-details">
       <h4 className="paragraph-body-3">MLS with Ed255519 Signature</h4>

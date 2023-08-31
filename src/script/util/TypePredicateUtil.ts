@@ -20,6 +20,7 @@
 import type {BackendError} from '@wireapp/api-client/lib/http/';
 import {AxiosError} from 'axios';
 
+import {RegisteredClient} from '../../../.yalc/@wireapp/api-client/lib/client';
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 import {ClientRecord} from '../storage/record/ClientRecord';
@@ -42,4 +43,9 @@ export function isConversationEntity(conversation: any): conversation is Convers
 
 export function isClientRecord(record: any): record is ClientRecord {
   return !!record.meta;
+}
+
+// TODO: Temporary checking for mls_public_keys
+export function hasMlsPublicKeys(client: any): client is RegisteredClient {
+  return !!client && 'mls_public_keys' in client;
 }

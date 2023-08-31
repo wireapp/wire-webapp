@@ -26,6 +26,10 @@ import {ClientMapper} from './ClientMapper';
 
 import {ClientRecord} from '../storage';
 
+export enum MLSPublicKeys {
+  ED25519 = 'ed25519',
+}
+
 export class ClientEntity {
   static CONFIG = {
     DEFAULT_VALUE: '?',
@@ -50,6 +54,7 @@ export class ClientEntity {
   model?: string;
   time?: string;
   type?: ClientType.PERMANENT | ClientType.TEMPORARY;
+  mlsPublicKeys?: Record<MLSPublicKeys, string>;
 
   constructor(isSelfClient: boolean, domain: string | null, id = '') {
     this.isSelfClient = isSelfClient;

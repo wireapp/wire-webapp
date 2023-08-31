@@ -30,6 +30,7 @@ import {t} from 'Util/LocalizerUtil';
 import type {Logger} from 'Util/Logger';
 
 import type {ClientRepository, ClientEntity} from '../../client';
+import {MLSPublicKeys} from '../../client';
 import {Config} from '../../Config';
 import {ConversationState} from '../../conversation/ConversationState';
 import type {MessageRepository} from '../../conversation/MessageRepository';
@@ -101,11 +102,11 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
   };
 
   const isMLSConversation = !!conversationState.activeConversation()?.isUsingMLSProtocol;
+  const mlsFingerprint = selectedClient.mlsPublicKeys?.[MLSPublicKeys.ED25519];
 
   return (
     <div className={cx('participant-devices__header', {'participant-devices__header--padding': !noPadding})}>
-      {/* TODO: Pass proper device fingerprint */}
-      <MLSDeviceDetails />
+      {mlsFingerprint && <MLSDeviceDetails fingerprint={mlsFingerprint} />}
 
       <div className="device-proteus-details">
         <h3 className="device-details-title paragraph-body-3">Proteus Device Verification</h3>

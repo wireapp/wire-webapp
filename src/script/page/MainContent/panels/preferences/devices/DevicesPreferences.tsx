@@ -25,7 +25,7 @@ import {container} from 'tsyringe';
 
 import {Badges} from 'Components/Badges';
 import {Icon} from 'Components/Icon';
-import {ClientEntity} from 'src/script/client/ClientEntity';
+import {ClientEntity, MLSPublicKeys} from 'src/script/client/ClientEntity';
 import {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -64,6 +64,9 @@ const Device = ({device, isSSO, onSelect, onRemove, deviceNumber}: DeviceProps) 
   const {isVerified} = useKoSubscribableChildren(device.meta, ['isVerified']);
   const verifiedLabel = isVerified ? t('preferencesDevicesVerification') : t('preferencesDeviceNotVerified');
   const deviceAriaLabel = `${t('preferencesDevice')} ${deviceNumber}, ${device.getName()}, ${verifiedLabel}`;
+
+  const mlsFingerprint = device.mlsPublicKeys?.[MLSPublicKeys.ED25519];
+
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
     onRemove(device);
@@ -74,9 +77,6 @@ const Device = ({device, isSSO, onSelect, onRemove, deviceNumber}: DeviceProps) 
   };
 
   const onDeviceSelect = () => onSelect(device);
-
-  // TODO: Replace with proper mls fingerprint
-  const TMP_MLS_FINGERPRINT = '3dc87fff07c9296e3dc87fff07c9296e65687fff07c9296e3dc87fff07c9656f';
 
   return (
     <div
@@ -97,13 +97,15 @@ const Device = ({device, isSSO, onSelect, onRemove, deviceNumber}: DeviceProps) 
           <Badges isProteusVerified={isVerified} isMLSVerified={true} />
         </div>
 
-        <p className="preferences-devices-id">
-          <span>{t('preferencesMLSThumbprint')}</span>
+        {mlsFingerprint && (
+          <p className="preferences-devices-id">
+            <span>{t('preferencesMLSThumbprint')}</span>
 
-          <span className="preferences-formatted-id" data-uie-name="preferences-device-active-id">
-            <FormattedId idSlices={splitFingerprint(TMP_MLS_FINGERPRINT)} />
-          </span>
-        </p>
+            <span className="preferences-formatted-id" data-uie-name="preferences-device-active-id">
+              <FormattedId idSlices={splitFingerprint(mlsFingerprint)} />
+            </span>
+          </p>
+        )}
 
         <p className="preferences-devices-id">
           <span>{t('preferencesDevicesId')}</span>

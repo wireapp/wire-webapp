@@ -37,4 +37,5 @@ export interface ClientRecord {
   model?: string;
   time?: string;
   type?: 'permanent' | 'temporary';
+  mls_public_keys?: Record<string, string>;
 }
