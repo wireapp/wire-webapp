@@ -24,7 +24,7 @@ import {container} from 'tsyringe';
 import {Button, ButtonVariant, IconButton, IconButtonVariant, useMatchMedia} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
-import {ClassifiedBar} from 'Components/input/ClassifiedBar';
+import {UserClassifiedBar} from 'Components/input/ClassifiedBar';
 import {UnverifiedUserWarning} from 'Components/Modals/UserModal';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -126,7 +126,7 @@ export const ConnectRequests: FC<ConnectRequestsProps> = ({
               <div className="connect-request-username label-username">{connectRequest.handle}</div>
 
               {classifiedDomains && (
-                <ClassifiedBar users={[userState.self(), connectRequest]} classifiedDomains={classifiedDomains} />
+                <UserClassifiedBar users={[userState.self(), connectRequest]} classifiedDomains={classifiedDomains} />
               )}
 
               <Avatar
