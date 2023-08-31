@@ -29,7 +29,8 @@ import {
   ProteusVerified,
 } from '@wireapp/react-ui-kit';
 
-enum MLSStatues {
+export enum MLSStatues {
+  VALID = 'valid',
   NOT_DOWNLOADED = 'not_downloaded',
   EXPIRED = 'expired',
   EXPIRES_SOON = 'expires_soon',
@@ -96,6 +97,8 @@ export const Badges: React.FC<BadgesProps> = ({
               className="with-tooltip with-tooltip--external"
               data-tooltip="Device verified (End-to-end identity)"
               style={iconStyles}
+              data-uie-name="mls-status"
+              data-uie-value={MLSStatues.VALID}
             >
               <MLSVerified data-uie-name="conversation-title-bar-verified-icon" />
             </span>
@@ -106,6 +109,8 @@ export const Badges: React.FC<BadgesProps> = ({
               className="with-tooltip with-tooltip--external"
               data-tooltip="End-to-end identity certificate expires soon"
               style={iconStyles}
+              data-uie-name="mls-status"
+              data-uie-value={MLSStatues.EXPIRES_SOON}
             >
               <ExpiresSoon data-uie-name="conversation-title-bar-verified-icon" />
             </span>
@@ -116,6 +121,8 @@ export const Badges: React.FC<BadgesProps> = ({
               className="with-tooltip with-tooltip--external"
               data-tooltip="End-to-end identity certificate expired"
               style={iconStyles}
+              data-uie-name="mls-status"
+              data-uie-value={MLSStatues.EXPIRED}
             >
               <CertificateExpiredIcon data-uie-name="conversation-title-bar-verified-icon" />
             </span>
@@ -126,6 +133,8 @@ export const Badges: React.FC<BadgesProps> = ({
               className="with-tooltip with-tooltip--external"
               data-tooltip="End-to-end identity certificate revoked"
               style={iconStyles}
+              data-uie-name="mls-status"
+              data-uie-value={MLSStatues.NOT_DOWNLOADED}
             >
               <CertificateRevoked data-uie-name="conversation-title-bar-verified-icon" />
             </span>
@@ -141,6 +150,7 @@ export const Badges: React.FC<BadgesProps> = ({
             className="with-tooltip with-tooltip--external"
             data-tooltip="Device verified (Proteus)"
             style={iconStyles}
+            data-uie-name="proteus-verified"
           >
             <ProteusVerified data-uie-name="conversation-title-bar-verified-icon" />
           </span>
