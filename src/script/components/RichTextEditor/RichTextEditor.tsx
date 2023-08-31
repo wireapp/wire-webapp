@@ -47,6 +47,7 @@ import {GlobalEventsPlugin} from './plugins/GlobalEventsPlugin';
 import {HistoryPlugin} from './plugins/HistoryPlugin';
 import {findAndTransformEmoji, ReplaceEmojiPlugin} from './plugins/InlineEmojiReplacementPlugin';
 import {MentionsPlugin} from './plugins/MentionsPlugin';
+import {OnBlurPlugin} from './plugins/OnBlurPlugin';
 import {SendPlugin} from './plugins/SendPlugin';
 import {TextChangePlugin} from './plugins/TextChangePlugin';
 import {toEditorNodes} from './utils/messageToEditorNodes';
@@ -87,6 +88,7 @@ interface RichTextEditorProps {
   getMentionCandidates: (search?: string | null) => User[];
   onShiftTab: () => void;
   onSend: () => void;
+  onBlur?: () => void;
   onSetup?: (editor: LexicalEditor) => void;
 }
 
@@ -123,6 +125,7 @@ export const RichTextEditor = ({
   editedMessage,
   getMentionCandidates,
   onShiftTab,
+  onBlur,
   onSend,
   onSetup,
 }: RichTextEditorProps) => {
@@ -215,6 +218,7 @@ export const RichTextEditor = ({
           />
 
           <OnChangePlugin onChange={saveDraft} />
+          {onBlur && <OnBlurPlugin onBlur={onBlur} />}
           <TextChangePlugin onUpdate={parseUpdatedText} />
           <SendPlugin
             onSend={() => {

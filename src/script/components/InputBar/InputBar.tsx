@@ -553,6 +553,7 @@ export const InputBar = ({
                 loadDraftState={loadDraft}
                 onShiftTab={onShiftTab}
                 onSend={sendMessage}
+                onBlur={() => isTypingIndicatorEnabled && conversationRepository.sendTypingStop(conversation)}
               >
                 {isScaledDown ? (
                   <>
