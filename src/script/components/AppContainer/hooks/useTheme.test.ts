@@ -28,12 +28,10 @@ describe('useTheme', () => {
   it.each([
     ['dark', 'theme-dark'],
     ['default', 'theme-default'],
-  ])('should set the initial theme to the body classes', () => {
-    const theme = 'dark';
-
+  ] as const)('should set the initial theme to the body classes', (theme, bodyclass) => {
     renderHook(() => useTheme(() => theme));
 
-    expect(document.body.className).toContain('theme-dark');
+    expect(document.body.className).toContain(bodyclass);
   });
 
   it('live updates as theme changes', () => {
