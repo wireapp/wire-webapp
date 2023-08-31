@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
@@ -47,9 +47,9 @@ import {ControlButtons} from './components/InputBarControls/ControlButtons';
 import {GiphyButton} from './components/InputBarControls/GiphyButton';
 import {PastedFileControls} from './components/PastedFileControls';
 import {ReplyBar} from './components/ReplyBar';
-import {TYPING_TIMEOUT} from './components/TypingIndicator';
 import {TypingIndicator} from './components/TypingIndicator/TypingIndicator';
 import {useFilePaste} from './hooks/useFilePaste';
+import {useTypingIndicator} from './hooks/useTypingIndicator';
 import {handleClickOutsideOfInputBar, IgnoreOutsideClickWrapper} from './util/clickHandlers';
 import {loadDraftState, saveDraftState} from './util/DraftStateUtil';
 
@@ -140,7 +140,6 @@ export const InputBar = ({
   const editorRef = useRef<LexicalEditor | null>(null);
 
   // Typing indicator
-  const [isTyping, setIsTyping] = useState<boolean>(false);
   const {typingIndicatorMode} = useKoSubscribableChildren(propertiesRepository, ['typingIndicatorMode']);
   const isTypingIndicatorEnabled = typingIndicatorMode === CONVERSATION_TYPING_INDICATOR_MODE.ON;
 
@@ -156,7 +155,6 @@ export const InputBar = ({
 
   // Common
   const [pingDisabled, setIsPingDisabled] = useState<boolean>(false);
-  const hasUserTyped = useRef<boolean>(false);
 
   // Right sidebar
   const {rightSidebar} = useAppMainState.getState();
@@ -181,6 +179,21 @@ export const InputBar = ({
     const candidates = conversation.participating_user_ets().filter(userEntity => !userEntity.isService);
     return typeof search === 'string' ? searchRepository.searchUserInSet(search, candidates) : candidates;
   };
+
+  useTypingIndicator({
+    isEnabled: isTypingIndicatorEnabled,
+    text: messageContent.text,
+    onTypingChange: useCallback(
+      isTyping => {
+        if (isTyping) {
+          void conversationRepository.sendTypingStart(conversation);
+        } else {
+          void conversationRepository.sendTypingStop(conversation);
+        }
+      },
+      [conversationRepository, conversation],
+    ),
+  });
 
   const resetDraftState = (resetInputValue = false) => {
     if (resetInputValue) {
@@ -243,52 +256,6 @@ export const InputBar = ({
       }
     }
   };
-
-  useEffect(() => {
-    if (!isTypingIndicatorEnabled) {
-      return () => {};
-    }
-
-    if (!hasUserTyped.current) {
-      // If the user hasn't typed yet, we register a callback that will set the flag to true when the user first type
-      const setUserHasTyped = () => {
-        hasUserTyped.current = true;
-      };
-      document.addEventListener('keydown', setUserHasTyped);
-      return () => document.removeEventListener('keydown', setUserHasTyped);
-    }
-
-    if (isTyping) {
-      void conversationRepository.sendTypingStart(conversation);
-    } else {
-      void conversationRepository.sendTypingStop(conversation);
-    }
-    return () => {};
-  }, [isTyping, conversationRepository, conversation, isTypingIndicatorEnabled]);
-
-  useEffect(
-    () => () => {
-      // sending a typing stop event when the user leaves the conversation
-      void conversationRepository.sendTypingStop(conversation);
-    },
-    [conversationRepository, conversation],
-  );
-
-  useEffect(() => {
-    let timerId: number;
-    if (!hasUserTyped.current) {
-      return () => {};
-    }
-
-    if (messageContent.text.length > 0) {
-      setIsTyping(true);
-      timerId = window.setTimeout(() => setIsTyping(false), TYPING_TIMEOUT);
-    } else {
-      setIsTyping(false);
-    }
-
-    return () => window.clearTimeout(timerId);
-  }, [messageContent]);
 
   const replyMessage = (messageEntity: ContentMessage): void => {
     if (messageEntity?.isReplyable() && messageEntity !== replyMessageEntity) {
