@@ -992,7 +992,7 @@ export class ConversationRepository {
    */
   private readonly onUnblockUser = async (user_et: User): Promise<void> => {
     const conversationEntity = await this.get1To1Conversation(user_et);
-    if (typeof conversationEntity !== 'boolean') {
+    if (conversationEntity) {
       conversationEntity.status(ConversationStatus.CURRENT_MEMBER);
     }
   };
@@ -1217,50 +1217,61 @@ export class ConversationRepository {
    * @param userEntity User entity for whom to get the conversation
    * @returns Resolves with the conversation with requested user
    */
-  async get1To1Conversation(userEntity: User): Promise<Conversation | false> {
-    const inCurrentTeam = userEntity.inTeam() && userEntity.teamId === this.userState.self().teamId;
+  async get1To1Conversation(userEntity: User): Promise<Conversation | null> {
+    const selfUser = this.userState.self();
+    const inCurrentTeam = userEntity.inTeam() && !!selfUser && userEntity.teamId === selfUser.teamId;
 
     if (inCurrentTeam) {
-      const matchingConversationEntity = this.conversationState.conversations().find(conversationEntity => {
-        if (!conversationEntity.is1to1()) {
-          // Disregard conversations that are not 1:1
-          return false;
-        }
-
-        const inTeam = ConversationFilter.isInTeam(conversationEntity, userEntity);
-        if (!inTeam) {
-          // Disregard conversations that are not in the team
-          return false;
-        }
-
-        const isActiveConversation = !conversationEntity.removed_from_conversation();
-        if (!isActiveConversation) {
-          // Disregard conversations that self is no longer part of
-          return false;
-        }
-
-        return ConversationFilter.is1To1WithUser(conversationEntity, userEntity);
-      });
-
-      if (matchingConversationEntity) {
-        return matchingConversationEntity;
-      }
-      return this.createGroupConversation([userEntity]);
+      return this.getOrCreateProteusTeam1to1Conversation(userEntity);
     }
 
     const conversationId = userEntity.connection().conversationId;
     try {
       const conversationEntity = await this.getConversationById(conversationId);
       conversationEntity.connection(userEntity.connection());
-      this.updateParticipatingUserEntities(conversationEntity);
+      await this.updateParticipatingUserEntities(conversationEntity);
       return conversationEntity;
     } catch (error) {
-      const isConversationNotFound = error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;
+      const isConversationNotFound =
+        error instanceof ConversationError && error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;
       if (!isConversationNotFound) {
         throw error;
       }
-      return false;
+      return null;
     }
+  }
+
+  /**
+   * Get or create a proteus team 1to1 conversation with a user. If a conversation does not exist, it will be created.
+   * @param userEntity User entity for whom to get the conversation
+   * @returns Resolves with the conversation with requested user
+   */
+  private async getOrCreateProteusTeam1to1Conversation(userEntity: User): Promise<Conversation> {
+    const matchingConversationEntity = this.conversationState.conversations().find(conversationEntity => {
+      if (!conversationEntity.is1to1()) {
+        // Disregard conversations that are not 1:1
+        return false;
+      }
+
+      const inTeam = ConversationFilter.isInTeam(conversationEntity, userEntity);
+      if (!inTeam) {
+        // Disregard conversations that are not in the team
+        return false;
+      }
+
+      const isActiveConversation = !conversationEntity.removed_from_conversation();
+      if (!isActiveConversation) {
+        // Disregard conversations that self is no longer part of
+        return false;
+      }
+
+      return ConversationFilter.is1To1WithUser(conversationEntity, userEntity);
+    });
+
+    if (matchingConversationEntity) {
+      return matchingConversationEntity;
+    }
+    return this.createGroupConversation([userEntity]);
   }
 
   /**

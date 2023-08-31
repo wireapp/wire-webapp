@@ -30,7 +30,7 @@ import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {checkFileSharingPermission} from 'Components/Conversation/utils/checkFileSharingPermission';
 import {useEmoji} from 'Components/Emoji/useEmoji';
 import {Icon} from 'Components/Icon';
-import {ClassifiedBar} from 'Components/input/ClassifiedBar';
+import {ConversationClassifiedBar} from 'Components/input/ClassifiedBar';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
@@ -126,7 +126,6 @@ const InputBar = ({
   const {
     connection,
     participating_user_ets: participatingUserEts,
-    allUserEntities: allUsers,
     localMessageTimer,
     messageTimer,
     hasGlobalMessageTimer,
@@ -135,7 +134,6 @@ const InputBar = ({
   } = useKoSubscribableChildren(conversationEntity, [
     'connection',
     'firstUserEntity',
-    'allUserEntities',
     'participating_user_ets',
     'localMessageTimer',
     'messageTimer',
@@ -799,11 +797,7 @@ const InputBar = ({
       {!!isTypingIndicatorEnabled && <TypingIndicator conversationId={conversationEntity.id} />}
 
       {classifiedDomains && !isConnectionRequest && (
-        <ClassifiedBar
-          conversationDomain={conversationEntity.domain}
-          users={allUsers}
-          classifiedDomains={classifiedDomains}
-        />
+        <ConversationClassifiedBar conversation={conversationEntity} classifiedDomains={classifiedDomains} />
       )}
 
       {isReplying && !isEditing && <ReplyBar replyMessageEntity={replyMessageEntity} onCancel={handleCancelReply} />}
