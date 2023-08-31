@@ -103,12 +103,7 @@ export const Mention = (props: MentionComponentProps) => {
       const isLeftDirection = event.key === KEY.ARROW_LEFT;
 
       let handled = false;
-      let nodeToSelect = getPreviousSibling(node);
-
-      // Checking if is right direction to handle next sibling element.
-      if (!isLeftDirection) {
-        nodeToSelect = getNextSibling(node);
-      }
+      const nodeToSelect = isLeftDirection ? getPreviousSibling(node) : getNextSibling(node);
 
       // Checking if is a element node, list of specified Element Nodes You can find here:
       // https://lexical.dev/docs/api/classes/lexical.ElementNode
