@@ -17,7 +17,6 @@
  *
  */
 
-import {E2EIUtils} from '@wireapp/core/lib/messagingProtocols/mls/E2EIdentityService';
 import {container} from 'tsyringe';
 
 import {PrimaryModal, removeCurrentModal} from 'Components/Modals/PrimaryModal';
@@ -26,8 +25,11 @@ import {Core} from 'src/script/service/CoreSingleton';
 import {UserState} from 'src/script/user/UserState';
 import {supportsMLS} from 'Util/util';
 
+import {DelayTimerService} from './DelayTimer/DelayTimer';
 import {removeUrlParameters} from './helper/uri';
 import {getModalOptions, ModalType} from './Modals';
+import {getOIDCServiceInstance} from './OIDCService';
+import {OIDCServiceStore} from './OIDCService/OIDCServiceStorage';
 
 export enum E2EIHandlerStep {
   UNINITIALIZED = 'uninitialized',
@@ -47,7 +49,7 @@ class E2EIHandler {
   private static instance: E2EIHandler | null = null;
   private readonly core = container.resolve(Core);
   private readonly userState = container.resolve(UserState);
-  private timer: ReturnType<typeof this.core.e2eiUtils.getDelayTimerInstance>;
+  private timer: DelayTimerService;
   private discoveryUrl: string;
   private gracePeriodInMS: number;
   private currentStep: E2EIHandlerStep | null = E2EIHandlerStep.UNINITIALIZED;
@@ -56,7 +58,11 @@ class E2EIHandler {
     // ToDo: Do these values need to te able to be updated? Should we use a singleton with update fn?
     this.discoveryUrl = discoveryUrl;
     this.gracePeriodInMS = gracePeriodInMS;
-    this.timer = this.core.e2eiUtils.getDelayTimerInstance(gracePeriodInMS);
+    this.timer = DelayTimerService.getInstance({
+      gracePeriodInMS,
+      gracePeriodExpiredCallback: () => null,
+      delayPeriodExpiredCallback: () => null,
+    });
   }
 
   /**
@@ -89,13 +95,17 @@ class E2EIHandler {
   public updateParams({gracePeriodInMS, discoveryUrl}: E2EIHandlerParams) {
     this.gracePeriodInMS = gracePeriodInMS;
     this.discoveryUrl = discoveryUrl;
-    this.timer = this.core.e2eiUtils.getDelayTimerInstance(gracePeriodInMS);
+    this.timer = DelayTimerService.getInstance({
+      gracePeriodInMS,
+      gracePeriodExpiredCallback: () => null,
+      delayPeriodExpiredCallback: () => null,
+    });
     this.initialize();
   }
 
   public initialize(): void {
     if (this.isE2EIEnabled) {
-      if (!this.core.e2eiUtils.hasActiveCertificate()) {
+      if (!this.core.service?.e2eIdentity?.hasActiveCertificate()) {
         this.showE2EINotificationMessage();
       }
     }
@@ -105,19 +115,47 @@ class E2EIHandler {
     return supportsMLS() && Config.getConfig().FEATURE.ENABLE_E2EI;
   }
 
+  private async storeRedirectTargetAndRedirect(targetURL: string): Promise<void> {
+    // store the target url in the persistent oidc service store, since the oidc service will be destroyed after the redirect
+    OIDCServiceStore.store.targetURL(targetURL);
+    const oidcService = getOIDCServiceInstance();
+    await oidcService.authenticate();
+  }
+
   private async enrollE2EI() {
     try {
       // Notify user about E2EI enrollment in progress
       this.currentStep = E2EIHandlerStep.ENROLL;
       this.showLoadingMessage();
-      const success = await this.core.enrollE2EI(
+      let oAuthIdToken: string | undefined;
+
+      // If the enrollment is in progress, we need to get the id token from the oidc service, since oauth should have already been completed
+      if (this.core.service?.e2eIdentity?.isEnrollmentInProgress()) {
+        const oidcService = getOIDCServiceInstance();
+        const userData = await oidcService.handleAuthentication();
+        if (!userData) {
+          throw new Error('Received no user data from OIDC service');
+        }
+        oAuthIdToken = userData?.id_token;
+      }
+
+      const data = await this.core.enrollE2EI(
         this.userState.self().name(),
         this.userState.self().username(),
         this.discoveryUrl,
+        oAuthIdToken,
       );
-      if (!success) {
+
+      // If the data is false or we dont get the ACMEChallenge, enrollment failed
+      if (!data) {
         throw new Error('E2EI enrollment failed');
       }
+
+      // Check if the data is a boolean, if not, we need to handle the oauth redirect
+      if (typeof data !== 'boolean') {
+        await this.storeRedirectTargetAndRedirect(data.target);
+      }
+
       // Notify user about E2EI enrollment success
       // This setTimeout is needed because there was a timing with the success modal and the loading modal
       setTimeout(() => {
@@ -167,7 +205,7 @@ class E2EIHandler {
       return;
     }
 
-    E2EIUtils.clearAllProgress();
+    this.core.service?.e2eIdentity?.clearAllProgress();
 
     const {modalOptions, modalType} = getModalOptions({
       type: ModalType.ERROR,
@@ -187,8 +225,7 @@ class E2EIHandler {
   private showE2EINotificationMessage(): void {
     // If the user has already started enrollment, don't show the notification. Instead, show the loading modal
     // This will occur after the redirect from the oauth provider
-    if (this.core.e2eiUtils.isEnrollmentInProgress()) {
-      this.showLoadingMessage();
+    if (this.core.service?.e2eIdentity?.isEnrollmentInProgress()) {
       void this.enrollE2EI();
       return;
     }
