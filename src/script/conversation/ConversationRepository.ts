@@ -1503,6 +1503,12 @@ export class ConversationRepository {
     mlsConversation: MLSConversation,
     otherUserId: QualifiedId,
   ): Promise<MLSConversation> => {
+    const selfUser = this.userState.self();
+
+    if (!selfUser) {
+      throw new Error('Self user is not available!');
+    }
+
     const conversationService = this.core.service?.conversation;
 
     if (!conversationService) {
@@ -1517,7 +1523,7 @@ export class ConversationRepository {
       return mlsConversation;
     }
 
-    const selfUserId = this.userState.self().qualifiedId;
+    const selfUserId = selfUser.qualifiedId;
 
     //if it's not established, establish it and add the other user to the group
     await conversationService.establishMLS1to1Conversation(
@@ -1527,7 +1533,10 @@ export class ConversationRepository {
     );
 
     //refetch the conversation to get the letest epoch and updated participants list
-    return this.fetchMLS1to1Conversation(otherUserId);
+    const {members, epoch} = await this.conversationService.getMLS1to1Conversation(otherUserId);
+    ConversationMapper.updateProperties(mlsConversation, {participating_user_ids: members.others, epoch});
+    await this.updateParticipatingUserEntities(mlsConversation);
+    return mlsConversation;
   };
 
   /**
@@ -1566,7 +1575,6 @@ export class ConversationRepository {
 
     //TODO: for team 1:1 conversation we don't need to have connection assigned
     mlsConversation.connection(otherUser.connection());
-    await this.updateParticipatingUserEntities(mlsConversation);
     return establishedMLSConversation;
   };
 
