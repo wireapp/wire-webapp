@@ -1202,10 +1202,12 @@ export class ConversationRepository {
     );
 
     if (protocol === ConversationProtocol.MLS || localMLSConversation) {
-      if (localProteusConversation && localMLSConversation) {
-        await this.replaceProteus1to1WithMLS(localProteusConversation, localMLSConversation);
+      const mlsConversation = await this.initMLS1to1Conversation(userEntity, isSupportedByTheOtherUser);
+      if (localProteusConversation) {
+        await this.replaceProteus1to1WithMLS(localProteusConversation, mlsConversation);
       }
-      return this.initMLS1to1Conversation(userEntity, isSupportedByTheOtherUser);
+
+      return mlsConversation;
     }
 
     const proteusConversation = await this.getProteus1To1Conversation(userEntity);
@@ -1475,10 +1477,6 @@ export class ConversationRepository {
       await this.eventService.moveEventsToConversation(proteusConversation.id, mlsConversation.id);
     }
 
-    if (!mlsConversation.hasCreationMessage) {
-      this.addCreationMessage(mlsConversation, !!this.userState.self()?.isTemporaryGuest());
-    }
-
     const isActiveConversation = this.conversationState.isActiveConversation(proteusConversation);
 
     this.logger.info(`Deleting proteus 1:1 conversation ${proteusConversation.id}`);
@@ -1548,10 +1546,6 @@ export class ConversationRepository {
 
     const otherUser = await this.userRepository.getUserById(otherUserId);
 
-    //TODO: for team 1:1 conversation we don't need to have connection assigned
-    mlsConversation.connection(otherUser.connection());
-    await this.updateParticipatingUserEntities(mlsConversation);
-
     //if mls is not supported by the other user we do not establish the group yet
     //we just mark the mls conversation as readonly and return it
     if (!isMLSSupportedByTheOtherUser) {
@@ -1570,6 +1564,9 @@ export class ConversationRepository {
 
     this.logger.info(`MLS 1:1 conversation with user ${otherUserId.id} is established.`);
 
+    //TODO: for team 1:1 conversation we don't need to have connection assigned
+    mlsConversation.connection(otherUser.connection());
+    await this.updateParticipatingUserEntities(mlsConversation);
     return establishedMLSConversation;
   };
 
