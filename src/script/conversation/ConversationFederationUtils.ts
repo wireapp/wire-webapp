@@ -90,10 +90,11 @@ export function processFederationConnectionRemovedEvent(
       return;
     }
 
-    const userDomains = new Set(conversation.allUserEntities().map(user => user.qualifiedId.domain));
+    const allUserEntities = conversation.allUserEntities();
+    const userDomains = new Set(allUserEntities.map(user => user.qualifiedId.domain));
 
     if (userDomains.has(domainOne) && userDomains.has(domainTwo)) {
-      const usersToDelete = conversation.allUserEntities().filter(user => [domainOne, domainTwo].includes(user.domain));
+      const usersToDelete = allUserEntities.filter(user => [domainOne, domainTwo].includes(user.domain));
       if (usersToDelete.length > 0) {
         result.conversationsToDeleteUsers.push({conversation, users: usersToDelete});
       }
