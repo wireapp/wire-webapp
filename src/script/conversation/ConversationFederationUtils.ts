@@ -74,40 +74,31 @@ export function processFederationConnectionRemovedEvent(
 
   const [domainOne, domainTwo] = deletedDomains;
 
-  conversations
-    .filter(conversation => conversation.domain === domainOne)
-    .forEach(async conversation => {
-      const usersToDelete = conversation.allUserEntities().filter(user => user.domain === domainTwo);
+  conversations.forEach(conversation => {
+    if (conversation.domain === domainOne || conversation.domain === domainTwo) {
+      const targetDomain = conversation.domain === domainOne ? domainTwo : domainOne;
+      const usersToDelete = conversation.allUserEntities().filter(user => user.domain === targetDomain);
+
       if (usersToDelete.length > 0) {
         result.conversationsToDeleteUsers.push({conversation, users: usersToDelete});
       }
-    });
+    }
+  });
 
-  conversations
-    .filter(conversation => conversation.domain === domainTwo)
-    .forEach(async conversation => {
-      const usersToDelete = conversation.allUserEntities().filter(user => user.domain === domainOne);
-      if (usersToDelete.length > 0) {
-        result.conversationsToDeleteUsers.push({conversation, users: usersToDelete});
-      }
-    });
+  conversations.forEach(conversation => {
+    if (deletedDomains.includes(conversation.domain)) {
+      return;
+    }
 
-  conversations
-    .filter(conversation => {
-      if (deletedDomains.includes(conversation.domain)) {
-        return false;
-      }
+    const userDomains = new Set(conversation.allUserEntities().map(user => user.qualifiedId.domain));
 
-      const userDomains = new Set(conversation.allUserEntities().map(user => user.qualifiedId.domain));
-
-      return userDomains.has(domainOne) && userDomains.has(domainTwo);
-    })
-    .forEach(async conversation => {
+    if (userDomains.has(domainOne) && userDomains.has(domainTwo)) {
       const usersToDelete = conversation.allUserEntities().filter(user => [domainOne, domainTwo].includes(user.domain));
       if (usersToDelete.length > 0) {
         result.conversationsToDeleteUsers.push({conversation, users: usersToDelete});
       }
-    });
+    }
+  });
 
   return result;
 }
