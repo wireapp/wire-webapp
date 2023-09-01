@@ -22,11 +22,11 @@ import {User} from '../entity/User';
 
 export interface FederationDeleteResult {
   conversationsToLeave: Conversation[];
-  conversationsToDisable: Conversation[];
   /**
    * One to One conversations that must be marked as disabled
    * and the connection to their user must be deleted
    */
+  conversationsToDisable: Conversation[];
   conversationsToDeleteUsers: {conversation: Conversation; users: User[]}[];
 }
 
@@ -56,6 +56,58 @@ export function processFederationDeleteEvent(
       }
     }
   });
+
+  return result;
+}
+
+export interface FederationConnectionRemovedResult {
+  conversationsToDeleteUsers: {conversation: Conversation; users: User[]}[];
+}
+
+export function processFederationConnectionRemovedEvent(
+  deletedDomains: string[],
+  conversations: Conversation[],
+): FederationConnectionRemovedResult {
+  const result: FederationConnectionRemovedResult = {
+    conversationsToDeleteUsers: [],
+  };
+
+  const [domainOne, domainTwo] = deletedDomains;
+
+  conversations
+    .filter(conversation => conversation.domain === domainOne)
+    .forEach(async conversation => {
+      const usersToDelete = conversation.allUserEntities().filter(user => user.domain === domainTwo);
+      if (usersToDelete.length > 0) {
+        result.conversationsToDeleteUsers.push({conversation, users: usersToDelete});
+      }
+    });
+
+  conversations
+    .filter(conversation => conversation.domain === domainTwo)
+    .forEach(async conversation => {
+      const usersToDelete = conversation.allUserEntities().filter(user => user.domain === domainOne);
+      if (usersToDelete.length > 0) {
+        result.conversationsToDeleteUsers.push({conversation, users: usersToDelete});
+      }
+    });
+
+  conversations
+    .filter(conversation => {
+      if (deletedDomains.includes(conversation.domain)) {
+        return false;
+      }
+
+      const userDomains = new Set(conversation.allUserEntities().map(user => user.qualifiedId.domain));
+
+      return userDomains.has(domainOne) && userDomains.has(domainTwo);
+    })
+    .forEach(async conversation => {
+      const usersToDelete = conversation.allUserEntities().filter(user => [domainOne, domainTwo].includes(user.domain));
+      if (usersToDelete.length > 0) {
+        result.conversationsToDeleteUsers.push({conversation, users: usersToDelete});
+      }
+    });
 
   return result;
 }

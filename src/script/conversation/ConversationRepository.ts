@@ -76,7 +76,7 @@ import {ACCESS_STATE} from './AccessState';
 import {extractClientDiff} from './ClientMismatchUtil';
 import {updateAccessRights} from './ConversationAccessPermission';
 import {ConversationEphemeralHandler} from './ConversationEphemeralHandler';
-import {processFederationDeleteEvent} from './ConversationFederationUtils';
+import {processFederationConnectionRemovedEvent, processFederationDeleteEvent} from './ConversationFederationUtils';
 import {ConversationFilter} from './ConversationFilter';
 import {ConversationLabelRepository} from './ConversationLabelRepository';
 import {ConversationDatabaseData, ConversationMapper} from './ConversationMapper';
@@ -387,49 +387,14 @@ export class ConversationRepository {
    * @param domains The domains that stopped federating with each other
    */
   private readonly onFederationConnectionRemove = async (domains: string[]) => {
-    const selfUser = this.userState.self();
-    const [domainOne, domainTwo] = domains;
     const allConversations = this.conversationState.conversations();
 
-    allConversations
-      .filter(conversation => conversation.domain === domainOne)
-      .forEach(async conversation => {
-        const usersToDelete = conversation.allUserEntities().filter(user => user.domain === domainTwo);
-        if (usersToDelete.length > 0) {
-          await this.removeDeletedFederationUsers(conversation, usersToDelete);
-          await this.insertFederationStopSystemMessage(conversation, [domainOne, domainTwo]);
-        }
-      });
+    const result = processFederationConnectionRemovedEvent(domains, allConversations);
 
-    allConversations
-      .filter(conversation => conversation.domain === domainTwo)
-      .forEach(async conversation => {
-        const usersToDelete = conversation.allUserEntities().filter(user => user.domain === domainOne);
-        if (usersToDelete.length > 0) {
-          await this.removeDeletedFederationUsers(conversation, usersToDelete);
-          await this.insertFederationStopSystemMessage(conversation, [domainOne, domainTwo]);
-        }
-      });
-
-    allConversations
-      .filter(conversation => {
-        if (conversation.domain !== selfUser.qualifiedId.domain) {
-          return false;
-        }
-
-        const userDomains = new Set(conversation.allUserEntities().map(user => user.qualifiedId.domain));
-
-        return userDomains.has(domainOne) && userDomains.has(domainTwo);
-      })
-      .forEach(async conversation => {
-        const usersToDelete = conversation
-          .allUserEntities()
-          .filter(user => [domainOne, domainTwo].includes(user.domain));
-        if (usersToDelete.length > 0) {
-          await this.removeDeletedFederationUsers(conversation, usersToDelete);
-          await this.insertFederationStopSystemMessage(conversation, [domainOne, domainTwo]);
-        }
-      });
+    for (const {conversation, users} of result.conversationsToDeleteUsers) {
+      await this.removeDeletedFederationUsers(conversation, users);
+      await this.insertFederationStopSystemMessage(conversation, domains);
+    }
   };
 
   private readonly removeDeletedFederationUsers = async (conversation: Conversation, usersToRemove: User[]) => {
