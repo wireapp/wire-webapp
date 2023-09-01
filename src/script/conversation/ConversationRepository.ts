@@ -1189,6 +1189,40 @@ export class ConversationRepository {
    * @returns Resolves with the conversation with requested user
    */
   async get1To1Conversation(userEntity: User): Promise<Conversation | null> {
+    const {protocol, isSupportedByTheOtherUser} = await this.getProtocolFor1to1Conversation(userEntity);
+
+    const localMLSConversation = this.conversationState.find1to1Conversation(
+      userEntity.qualifiedId,
+      ConversationProtocol.MLS,
+    );
+
+    const localProteusConversation = this.conversationState.find1to1Conversation(
+      userEntity.qualifiedId,
+      ConversationProtocol.PROTEUS,
+    );
+
+    if (protocol === ConversationProtocol.MLS || localMLSConversation) {
+      if (localProteusConversation && localMLSConversation) {
+        await this.replaceProteus1to1WithMLS(localProteusConversation, localMLSConversation);
+      }
+      return this.initMLS1to1Conversation(userEntity, isSupportedByTheOtherUser);
+    }
+
+    const proteusConversation = await this.getProteus1To1Conversation(userEntity);
+
+    if (!proteusConversation) {
+      return null;
+    }
+
+    return this.initProteus1to1Conversation(proteusConversation.qualifiedId, isSupportedByTheOtherUser);
+  }
+
+  /**
+   * Get conversation with a user.
+   * @param userEntity User entity for whom to get the conversation
+   * @returns Resolves with the conversation with requested user
+   */
+  private async getProteus1To1Conversation(userEntity: User): Promise<Conversation | null> {
     const selfUser = this.userState.self();
     const inCurrentTeam = userEntity.inTeam() && !!selfUser && userEntity.teamId === selfUser.teamId;
 
@@ -1442,7 +1476,7 @@ export class ConversationRepository {
     }
 
     if (!mlsConversation.hasCreationMessage) {
-      this.addCreationMessage(mlsConversation, this.userState.self().isTemporaryGuest());
+      this.addCreationMessage(mlsConversation, !!this.userState.self()?.isTemporaryGuest());
     }
 
     const isActiveConversation = this.conversationState.isActiveConversation(proteusConversation);
