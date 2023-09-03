@@ -76,7 +76,7 @@
     "@types/jsdom": "21.1.2",
     "@types/keyboardjs": "2.5.1",
     "@types/libsodium-wrappers": "^0",
-    "@types/linkify-it": "3.0.2",
+    "@types/linkify-it": "3.0.3",
     "@types/markdown-it": "13.0.1",
     "@types/node": "^20.5.7",
     "@types/open-graph": "0.2.2",
