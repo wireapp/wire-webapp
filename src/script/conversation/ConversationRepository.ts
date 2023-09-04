@@ -391,8 +391,8 @@ export class ConversationRepository {
 
     const result = processFederationConnectionRemovedEvent(domains, allConversations);
 
-    for (const {conversation, users} of result.conversationsToDeleteUsers) {
-      await this.removeDeletedFederationUsers(conversation, users);
+    for (const {conversation, usersToRemove} of result) {
+      await this.removeDeletedFederationUsers(conversation, usersToRemove);
       await this.insertFederationStopSystemMessage(conversation, domains);
     }
   };

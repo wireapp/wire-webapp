@@ -264,10 +264,10 @@ describe('ConversationFederationUtils', () => {
         conversations,
       );
 
-      expect(result.conversationsToDeleteUsers).toHaveLength(3);
-      expect(result.conversationsToDeleteUsers[0].users[0].domain).toBe(deletedDomains[1]);
-      expect(result.conversationsToDeleteUsers[1].users[0].domain).toBe(deletedDomains[0]);
-      expect(result.conversationsToDeleteUsers[2].users).toHaveLength(2);
+      expect(result).toHaveLength(3);
+      expect(result[0].usersToRemove[0].domain).toBe(deletedDomains[1]);
+      expect(result[1].usersToRemove[0].domain).toBe(deletedDomains[0]);
+      expect(result[2].usersToRemove).toHaveLength(2);
     });
 
     it('correctly identifies and categorizes conversations to remove users from, handling unrelated domains', () => {
@@ -318,11 +318,11 @@ describe('ConversationFederationUtils', () => {
         conversations,
       );
 
-      expect(result.conversationsToDeleteUsers).toHaveLength(4);
-      expect(result.conversationsToDeleteUsers[0].users[0].domain).toBe(deletedDomains[1]);
-      expect(result.conversationsToDeleteUsers[1].users[0].domain).toBe(deletedDomains[0]);
-      expect(result.conversationsToDeleteUsers[2].users).toHaveLength(2);
-      expect(result.conversationsToDeleteUsers[3].users).toHaveLength(2);
+      expect(result).toHaveLength(4);
+      expect(result[0].usersToRemove[0].domain).toBe(deletedDomains[1]);
+      expect(result[1].usersToRemove[0].domain).toBe(deletedDomains[0]);
+      expect(result[2].usersToRemove).toHaveLength(2);
+      expect(result[3].usersToRemove).toHaveLength(2);
     });
 
     it('handles conversations with no users to remove due to domain criteria', () => {
@@ -360,7 +360,7 @@ describe('ConversationFederationUtils', () => {
         conversations,
       );
 
-      expect(result.conversationsToDeleteUsers).toHaveLength(0);
+      expect(result).toHaveLength(0);
     });
   });
 });

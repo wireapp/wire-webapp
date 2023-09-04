@@ -60,15 +60,13 @@ export function processFederationDeleteEvent(
   return result;
 }
 
-export type FederationConnectionRemovedResult = {conversation: Conversation; usersToRemove: User[]}[]
+export type FederationConnectionRemovedResult = {conversation: Conversation; usersToRemove: User[]}[];
 
 export function processFederationConnectionRemovedEvent(
   deletedDomains: string[],
   conversations: Conversation[],
 ): FederationConnectionRemovedResult {
-  const result: FederationConnectionRemovedResult = {
-    conversationsToDeleteUsers: [],
-  };
+  const result: FederationConnectionRemovedResult = [];
 
   const [domainOne, domainTwo] = deletedDomains;
 
@@ -78,7 +76,7 @@ export function processFederationConnectionRemovedEvent(
       const usersToDelete = conversation.allUserEntities().filter(user => user.domain === targetDomain);
 
       if (usersToDelete.length > 0) {
-        result.conversationsToDeleteUsers.push({conversation, users: usersToDelete});
+        result.push({conversation, usersToRemove: usersToDelete});
       }
     }
   });
@@ -94,7 +92,7 @@ export function processFederationConnectionRemovedEvent(
     if (userDomains.has(domainOne) && userDomains.has(domainTwo)) {
       const usersToDelete = allUserEntities.filter(user => [domainOne, domainTwo].includes(user.domain));
       if (usersToDelete.length > 0) {
-        result.conversationsToDeleteUsers.push({conversation, users: usersToDelete});
+        result.push({conversation, usersToRemove: usersToDelete});
       }
     }
   });
