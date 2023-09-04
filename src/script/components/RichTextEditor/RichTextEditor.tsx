@@ -28,12 +28,9 @@ import {PlainTextPlugin} from '@lexical/react/LexicalPlainTextPlugin';
 import cx from 'classnames';
 import {LexicalEditor, EditorState, $nodesOfType} from 'lexical';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {DraftState} from 'Components/InputBar/util/DraftStateUtil';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {User} from 'src/script/entity/User';
-import {useUserPropertyValue} from 'src/script/hooks/useUserProperty';
 import {getLogger} from 'Util/Logger';
 
 import {EmojiNode} from './nodes/EmojiNode';
@@ -50,8 +47,6 @@ import {SendPlugin} from './plugins/SendPlugin';
 import {TextChangePlugin} from './plugins/TextChangePlugin';
 
 import {MentionEntity} from '../../message/MentionEntity';
-import {PropertiesRepository} from '../../properties/PropertiesRepository';
-import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
 
 const theme = {
   ltr: 'ltr',
@@ -72,8 +67,8 @@ export type RichTextContent = {
 const logger = getLogger('LexicalInput');
 
 interface RichTextEditorProps {
-  readonly propertiesRepository: PropertiesRepository;
   placeholder: string;
+  replaceEmojis?: boolean;
   onUpdate: (content: RichTextContent) => void;
   onArrowUp: () => void;
   onEscape: () => void;
@@ -111,10 +106,10 @@ const parseMentions = (editor: LexicalEditor, textValue: string, mentions: User[
 
 export const RichTextEditor = ({
   placeholder,
-  propertiesRepository,
   onUpdate,
   children,
   hasLocalEphemeralTimer,
+  replaceEmojis,
   saveDraftState,
   loadDraftState,
   onEscape,
@@ -129,11 +124,6 @@ export const RichTextEditor = ({
   // Emojis
   const emojiPickerOpen = useRef<boolean>(true);
   const mentionsOpen = useRef<boolean>(true);
-
-  const shouldReplaceEmoji = useUserPropertyValue(
-    () => propertiesRepository.getPreference(PROPERTIES_TYPE.EMOJI.REPLACE_INLINE),
-    WebAppEvents.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE,
-  );
 
   const editorConfig: InitialConfigType = {
     namespace: 'WireLexicalEditor',
@@ -150,7 +140,7 @@ export const RichTextEditor = ({
 
   const parseUpdatedText = (editor: LexicalEditor, textValue: string) => {
     onUpdate({
-      text: shouldReplaceEmoji ? findAndTransformEmoji(textValue) : textValue,
+      text: replaceEmojis ? findAndTransformEmoji(textValue) : textValue,
       mentions: parseMentions(editor, textValue, getMentionCandidates()),
     });
   };
@@ -168,7 +158,7 @@ export const RichTextEditor = ({
           <EmojiPickerPlugin openStateRef={emojiPickerOpen} />
           <HistoryPlugin />
 
-          {shouldReplaceEmoji && <ReplaceEmojiPlugin />}
+          {replaceEmojis && <ReplaceEmojiPlugin />}
 
           <PlainTextPlugin
             contentEditable={<ContentEditable className="conversation-input-bar-text" data-uie-name="input-message" />}

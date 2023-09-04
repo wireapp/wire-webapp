@@ -35,7 +35,9 @@ import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
 import {RichTextContent, RichTextEditor} from 'Components/RichTextEditor';
 import {SendMessageButton} from 'Components/RichTextEditor/components/SendMessageButton';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
+import {useUserPropertyValue} from 'src/script/hooks/useUserProperty';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
+import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from 'src/script/user/TypingIndicatorMode';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {KEY} from 'Util/KeyboardUtil';
@@ -173,6 +175,11 @@ export const InputBar = ({
   const isScaledDown = useMatchMedia('max-width: 768px');
 
   const showGiphyButton = messageContent.text.length > 0 && messageContent.text.length <= config.GIPHY_TEXT_LENGTH;
+
+  const shouldReplaceEmoji = useUserPropertyValue(
+    () => propertiesRepository.getPreference(PROPERTIES_TYPE.EMOJI.REPLACE_INLINE),
+    WebAppEvents.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE,
+  );
 
   // Mentions
   const getMentionCandidates = (search?: string | null) => {
@@ -555,7 +562,7 @@ export const InputBar = ({
                   }
                 }}
                 getMentionCandidates={getMentionCandidates}
-                propertiesRepository={propertiesRepository}
+                replaceEmojis={shouldReplaceEmoji}
                 placeholder={inputPlaceholder}
                 onUpdate={setMessageContent}
                 hasLocalEphemeralTimer={hasLocalEphemeralTimer}
