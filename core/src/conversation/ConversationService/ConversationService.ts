@@ -500,31 +500,58 @@ export class ConversationService extends TypedEventEmitter<Events> {
     groupId: string,
     selfUser: {user: QualifiedId; client: string},
     otherUserId: QualifiedId,
-  ): Promise<void> => {
+    shouldRetry = true,
+  ): Promise<MLSConversation> => {
+    this.logger.info(`Trying to establish a MLS 1:1 conversation with user ${otherUserId.id}...`);
+
+    // Before trying to register a group, check if the group is already established o backend.
+    // If remote epoch is higher than 0, it means that the group was already established.
+    // It's possible that we've already received a welcome message.
+    const mlsConversation = await this.apiClient.api.conversation.getMLS1to1Conversation(otherUserId);
+
+    if (mlsConversation.epoch > 0) {
+      this.logger.info(
+        `Conversation (id ${mlsConversation.qualified_id.id}) is already established on backend, checking the local epoch...`,
+      );
+
+      const isMLSGroupEstablishedLocally = await this.isMLSGroupEstablishedLocally(groupId);
+
+      // If group is already established locally, there's nothing more to do
+      if (isMLSGroupEstablishedLocally) {
+        this.logger.info(`Conversation (id ${mlsConversation.qualified_id.id}) is already established locally.`);
+        return mlsConversation;
+      }
+
+      // If local epoch is 0 it means that we've not received a welcome message
+      // We try joining via external commit.
+      this.logger.info(
+        `Conversation (id ${mlsConversation.qualified_id.id}) is not yet established locally, joining via external commit...`,
+      );
+
+      await this.joinByExternalCommit(mlsConversation.qualified_id);
+      return this.apiClient.api.conversation.getMLS1to1Conversation(otherUserId);
+    }
+
+    // If group is not established on backend,
+    // we wipe the it locally (in case it exsits in the local store) and try to register it.
+    await this.mlsService.wipeConversation(groupId);
+
     try {
       await this.mlsService.registerConversation(groupId, [otherUserId, selfUser.user], selfUser);
+      this.logger.info(`Conversation (id ${mlsConversation.qualified_id.id}) established successfully.`);
+
+      return this.apiClient.api.conversation.getMLS1to1Conversation(otherUserId);
     } catch (error) {
-      this.logger.info(`Could not register MLS group with id ${groupId}.`);
+      this.logger.info(`Could not register MLS group with id ${groupId}: `, error);
 
-      const mlsConversation = await this.apiClient.api.conversation.getMLS1to1Conversation(otherUserId);
-
-      if (mlsConversation.epoch > 0) {
-        this.logger.info(
-          `Conversation (id ${mlsConversation.qualified_id.id}) is already established, joining via external commit`,
-        );
-
-        // If its already established, we join with external commit
-        await this.joinByExternalCommit(mlsConversation.qualified_id);
-        return;
+      if (!shouldRetry) {
+        throw error;
       }
 
       this.logger.info(
         `Conversation (id ${mlsConversation.qualified_id.id}) is not established, retrying to establish it`,
       );
-
-      // If conversation is not established, we can wipe it and try to establish it again
-      await this.wipeMLSConversation(groupId);
-      return this.establishMLS1to1Conversation(groupId, selfUser, otherUserId);
+      return this.establishMLS1to1Conversation(groupId, selfUser, otherUserId, false);
     }
   };
 
