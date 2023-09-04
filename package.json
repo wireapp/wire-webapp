@@ -187,7 +187,6 @@
     "configure": "copy-config",
     "deploy": "yarn build:prod && eb deploy",
     "dev": "yarn start",
-    "dev:elna": "PORT=8082 FEDERATION=elna FEATURE_ENABLE_FEDERATION=true URL_ACCOUNT_BASE=https://account.elna.wire.link BACKEND_REST=https://nginz-https.elna.wire.link BACKEND_WS=wss://nginz-ssl.elna.wire.link FEATURE_CHECK_CONSENT=false yarn start",
     "docker": "node ./bin/push_docker.js",
     "zip": "node ./bin/zip.js",
     "fix": "yarn fix:other && yarn fix:code",
