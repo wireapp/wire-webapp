@@ -424,10 +424,10 @@ export class ConversationService {
   }
 
   /**
-   * Checks if MLS conversation is established.
+   * Checks if MLS conversation exists locally.
    * @param groupId id of the MLS group
    */
-  async isMLSConversationEstablished(groupId: string): Promise<boolean> {
-    return this.coreConversationService.isMLSConversationEstablished(groupId);
+  async mlsGroupExistsLocally(groupId: string): Promise<boolean> {
+    return this.coreConversationService.mlsGroupExistsLocally(groupId);
   }
 }

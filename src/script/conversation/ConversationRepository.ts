@@ -2791,9 +2791,9 @@ export class ConversationRepository {
       throw new Error(`groupId not found for MLS conversation ${conversation.id}`);
     }
 
-    const isMLSConversationEstablished = await this.conversationService.isMLSConversationEstablished(groupId);
+    const doesMLSGroupExistLocally = await this.conversationService.mlsGroupExistsLocally(groupId);
 
-    if (!isMLSConversationEstablished) {
+    if (!doesMLSGroupExistLocally) {
       return;
     }
 
