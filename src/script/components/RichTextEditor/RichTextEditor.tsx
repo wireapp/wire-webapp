@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useState, ReactElement, useRef} from 'react';
+import {ReactElement, useRef} from 'react';
 
 import {InitialConfigType, LexicalComposer} from '@lexical/react/LexicalComposer';
 import {ContentEditable} from '@lexical/react/LexicalContentEditable';
@@ -25,8 +25,6 @@ import {EditorRefPlugin} from '@lexical/react/LexicalEditorRefPlugin';
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary';
 import {OnChangePlugin} from '@lexical/react/LexicalOnChangePlugin';
 import {PlainTextPlugin} from '@lexical/react/LexicalPlainTextPlugin';
-import type {WebappProperties} from '@wireapp/api-client/lib/user/data/';
-import {amplify} from 'amplify';
 import cx from 'classnames';
 import {LexicalEditor, EditorState, $nodesOfType} from 'lexical';
 
@@ -35,6 +33,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {DraftState} from 'Components/InputBar/util/DraftStateUtil';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {User} from 'src/script/entity/User';
+import {useUserPropertyValue} from 'src/script/hooks/useUserProperty';
 import {getLogger} from 'Util/Logger';
 
 import {EmojiNode} from './nodes/EmojiNode';
@@ -131,8 +130,9 @@ export const RichTextEditor = ({
   const emojiPickerOpen = useRef<boolean>(true);
   const mentionsOpen = useRef<boolean>(true);
 
-  const [shouldReplaceEmoji, setShouldReplaceEmoji] = useState<boolean>(
-    propertiesRepository.getPreference(PROPERTIES_TYPE.EMOJI.REPLACE_INLINE),
+  const shouldReplaceEmoji = useUserPropertyValue(
+    () => propertiesRepository.getPreference(PROPERTIES_TYPE.EMOJI.REPLACE_INLINE),
+    WebAppEvents.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE,
   );
 
   const editorConfig: InitialConfigType = {
@@ -154,13 +154,6 @@ export const RichTextEditor = ({
       mentions: parseMentions(editor, textValue, getMentionCandidates()),
     });
   };
-
-  useEffect(() => {
-    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE, setShouldReplaceEmoji);
-    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, (properties: WebappProperties) => {
-      setShouldReplaceEmoji(properties.settings.emoji.replace_inline);
-    });
-  }, []);
 
   return (
     <LexicalComposer initialConfig={editorConfig}>
