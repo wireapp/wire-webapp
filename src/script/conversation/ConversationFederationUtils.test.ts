@@ -23,16 +23,16 @@ import {generateConversation} from 'test/helper/ConversationGenerator';
 import {generateUser} from 'test/helper/UserGenerator';
 
 import {
-  processFederationDeleteEvent,
+  getFederationDeleteEventUpdates,
   FederationDeleteResult,
-  processFederationConnectionRemovedEvent,
+  getUsersToDeleteFromFederatedConversations,
   FederationConnectionRemovedResult,
 } from './ConversationFederationUtils';
 
 import {Conversation} from '../entity/Conversation';
 
 describe('ConversationFederationUtils', () => {
-  describe('processFederationDeleteEvent', () => {
+  describe('getFederationDeleteEventUpdates', () => {
     it('correctly categorizes conversations for deletion', () => {
       const deletedDomain = 'deleted.wire.link';
 
@@ -78,7 +78,7 @@ describe('ConversationFederationUtils', () => {
         }),
       ];
 
-      const result: FederationDeleteResult = processFederationDeleteEvent(deletedDomain, conversations);
+      const result: FederationDeleteResult = getFederationDeleteEventUpdates(deletedDomain, conversations);
 
       expect(result.conversationsToLeave).toHaveLength(0);
       expect(result.conversationsToDisable).toHaveLength(1);
@@ -130,7 +130,7 @@ describe('ConversationFederationUtils', () => {
         }),
       ];
 
-      const result: FederationDeleteResult = processFederationDeleteEvent(deletedDomain, conversations);
+      const result: FederationDeleteResult = getFederationDeleteEventUpdates(deletedDomain, conversations);
 
       expect(result.conversationsToLeave).toHaveLength(0);
       expect(result.conversationsToDisable).toHaveLength(2);
@@ -175,7 +175,7 @@ describe('ConversationFederationUtils', () => {
         }),
       ];
 
-      const result: FederationDeleteResult = processFederationDeleteEvent(deletedDomain, conversations);
+      const result: FederationDeleteResult = getFederationDeleteEventUpdates(deletedDomain, conversations);
 
       expect(result.conversationsToLeave).toHaveLength(2);
       expect(result.conversationsToDisable).toHaveLength(0);
@@ -216,7 +216,7 @@ describe('ConversationFederationUtils', () => {
         }),
       ];
 
-      const result: FederationDeleteResult = processFederationDeleteEvent(deletedDomain, conversations);
+      const result: FederationDeleteResult = getFederationDeleteEventUpdates(deletedDomain, conversations);
 
       expect(result.conversationsToLeave).toHaveLength(0);
       expect(result.conversationsToDisable).toHaveLength(0);
@@ -224,7 +224,7 @@ describe('ConversationFederationUtils', () => {
     });
   });
 
-  describe('processFederationConnectionRemovedEvent', () => {
+  describe('getUsersToDeleteFromFederatedConversations', () => {
     it('correctly identifies and categorizes conversations to remove users from', () => {
       const selfDomain = 'webapp.wire.link';
       const deletedDomains = ['deleted-1.wire.link', 'deleted-2.wire.link'];
@@ -259,7 +259,7 @@ describe('ConversationFederationUtils', () => {
         }),
       ];
 
-      const result: FederationConnectionRemovedResult = processFederationConnectionRemovedEvent(
+      const result: FederationConnectionRemovedResult = getUsersToDeleteFromFederatedConversations(
         deletedDomains,
         conversations,
       );
@@ -313,7 +313,7 @@ describe('ConversationFederationUtils', () => {
         }),
       ];
 
-      const result: FederationConnectionRemovedResult = processFederationConnectionRemovedEvent(
+      const result: FederationConnectionRemovedResult = getUsersToDeleteFromFederatedConversations(
         deletedDomains,
         conversations,
       );
@@ -355,7 +355,7 @@ describe('ConversationFederationUtils', () => {
         }),
       ];
 
-      const result: FederationConnectionRemovedResult = processFederationConnectionRemovedEvent(
+      const result: FederationConnectionRemovedResult = getUsersToDeleteFromFederatedConversations(
         deletedDomains,
         conversations,
       );

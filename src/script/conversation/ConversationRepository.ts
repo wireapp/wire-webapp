@@ -76,7 +76,10 @@ import {ACCESS_STATE} from './AccessState';
 import {extractClientDiff} from './ClientMismatchUtil';
 import {updateAccessRights} from './ConversationAccessPermission';
 import {ConversationEphemeralHandler} from './ConversationEphemeralHandler';
-import {processFederationConnectionRemovedEvent, processFederationDeleteEvent} from './ConversationFederationUtils';
+import {
+  getUsersToDeleteFromFederatedConversations,
+  getFederationDeleteEventUpdates,
+} from './ConversationFederationUtils';
 import {ConversationFilter} from './ConversationFilter';
 import {ConversationLabelRepository} from './ConversationLabelRepository';
 import {ConversationDatabaseData, ConversationMapper} from './ConversationMapper';
@@ -350,7 +353,7 @@ export class ConversationRepository {
    * @param deletedDomain the domain that stopped federating
    */
   private onFederationDelete = async (deletedDomain: string) => {
-    const {conversationsToDeleteUsers, conversationsToLeave, conversationsToDisable} = processFederationDeleteEvent(
+    const {conversationsToDeleteUsers, conversationsToLeave, conversationsToDisable} = getFederationDeleteEventUpdates(
       deletedDomain,
       this.conversationState.conversations(),
     );
@@ -389,7 +392,7 @@ export class ConversationRepository {
   private readonly onFederationConnectionRemove = async (domains: string[]) => {
     const allConversations = this.conversationState.conversations();
 
-    const result = processFederationConnectionRemovedEvent(domains, allConversations);
+    const result = getUsersToDeleteFromFederatedConversations(domains, allConversations);
 
     for (const {conversation, usersToRemove} of result) {
       await this.removeDeletedFederationUsers(conversation, usersToRemove);

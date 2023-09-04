@@ -30,7 +30,7 @@ export interface FederationDeleteResult {
   conversationsToDeleteUsers: {conversation: Conversation; users: User[]}[];
 }
 
-export function processFederationDeleteEvent(
+export function getFederationDeleteEventUpdates(
   deletedDomain: string,
   conversations: Conversation[],
 ): FederationDeleteResult {
@@ -62,7 +62,7 @@ export function processFederationDeleteEvent(
 
 export type FederationConnectionRemovedResult = {conversation: Conversation; usersToRemove: User[]}[];
 
-export function processFederationConnectionRemovedEvent(
+export function getUsersToDeleteFromFederatedConversations(
   deletedDomains: string[],
   conversations: Conversation[],
 ): FederationConnectionRemovedResult {
