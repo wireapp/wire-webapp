@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2022 Wire Swiss GmbH
+ * Copyright (C) 2023 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,16 +17,24 @@
  *
  */
 
-interface FormattedIdProps {
-  idSlices: string[];
-}
+const TargetURLKey = 'E2EIdentity_OIDCService_TargetURL';
 
-export const FormattedId = ({idSlices}: FormattedIdProps) => (
-  <>
-    {idSlices.map((slice, index) => (
-      <span className="device-id-part" key={slice + index}>
-        {slice}
-      </span>
-    ))}
-  </>
-);
+const OIDCServiceStore = {
+  store: {
+    targetURL: (url: string) => localStorage.setItem(TargetURLKey, url),
+  },
+  get: {
+    targetURL: () => Number(localStorage.getItem(TargetURLKey)),
+  },
+  has: {
+    targetURL: () => localStorage.getItem(TargetURLKey) !== null,
+  },
+  clear: {
+    targetURL: () => localStorage.removeItem(TargetURLKey),
+    all: () => {
+      OIDCServiceStore.clear.targetURL();
+    },
+  },
+};
+
+export {OIDCServiceStore};

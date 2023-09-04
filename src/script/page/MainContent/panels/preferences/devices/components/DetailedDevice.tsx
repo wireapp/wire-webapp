@@ -20,7 +20,7 @@
 import React from 'react';
 
 import {Badges} from 'Components/Badges';
-import {ClientEntity} from 'src/script/client/ClientEntity';
+import {ClientEntity, MLSPublicKeys} from 'src/script/client/ClientEntity';
 
 import {MLSDeviceDetails} from './MLSDeviceDetails';
 import {ProteusDeviceDetails} from './ProteusDeviceDetails';
@@ -34,6 +34,8 @@ export interface DeviceProps {
 export const DetailedDevice: React.FC<DeviceProps> = ({device, fingerprint, showVerificationStatus = true}) => {
   const isProteusVerified = true;
 
+  const mlsFingerprint = device.mlsPublicKeys?.[MLSPublicKeys.ED25519];
+
   return (
     <>
       <h3 className="preferences-devices-model preferences-devices-model-name" data-uie-name="device-model">
@@ -42,8 +44,7 @@ export const DetailedDevice: React.FC<DeviceProps> = ({device, fingerprint, show
         <Badges isProteusVerified={isProteusVerified} />
       </h3>
 
-      {/* MLS - pass proper props */}
-      <MLSDeviceDetails />
+      {mlsFingerprint && <MLSDeviceDetails fingerprint={mlsFingerprint} />}
 
       {/* Proteus */}
       <ProteusDeviceDetails

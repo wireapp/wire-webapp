@@ -24,13 +24,10 @@ import {FormattedId} from './FormattedId';
 
 interface MLSDeviceDetailsProps {
   isMLSVerified?: boolean;
-  fingerprint?: string;
+  fingerprint: string;
 }
 
-// TODO: Replace with proper mls id
-const TMP_MLS_FINGERPRINT = '3dc87fff07c9296e3dc87fff07c9296e65687fff07c9296e3dc87fff07c9656f';
-
-export const MLSDeviceDetails = ({fingerprint = TMP_MLS_FINGERPRINT, isMLSVerified = true}: MLSDeviceDetailsProps) => {
+export const MLSDeviceDetails = ({fingerprint, isMLSVerified = true}: MLSDeviceDetailsProps) => {
   const MLSStatus = undefined;
 
   return (
