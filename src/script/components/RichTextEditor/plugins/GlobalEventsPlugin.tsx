@@ -28,6 +28,7 @@ import {
   KEY_ESCAPE_COMMAND,
   COMMAND_PRIORITY_LOW,
   KEY_ARROW_UP_COMMAND,
+  BLUR_COMMAND,
 } from 'lexical';
 
 import {isTabKey} from 'Util/KeyboardUtil';
@@ -37,9 +38,10 @@ interface GlobalEventsPluginProps {
   onShiftTab: () => void;
   onEscape: () => void;
   onArrowUp: () => void;
+  onBlur: () => void;
 }
 
-export function GlobalEventsPlugin({onShiftTab, onArrowUp, onEscape}: GlobalEventsPluginProps): null {
+export function GlobalEventsPlugin({onShiftTab, onArrowUp, onEscape, onBlur}: GlobalEventsPluginProps): null {
   const [editor] = useLexicalComposerContext();
 
   useLayoutEffect(() => {
@@ -87,6 +89,14 @@ export function GlobalEventsPlugin({onShiftTab, onArrowUp, onEscape}: GlobalEven
         KEY_ARROW_UP_COMMAND,
         () => {
           onArrowUp();
+          return false;
+        },
+        COMMAND_PRIORITY_LOW,
+      ),
+      editor.registerCommand(
+        BLUR_COMMAND,
+        event => {
+          onBlur();
           return false;
         },
         COMMAND_PRIORITY_LOW,
