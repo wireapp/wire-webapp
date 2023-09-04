@@ -91,4 +91,44 @@ describe('MLSService', () => {
       expect(mlsService.cancelKeyMaterialRenewal).toHaveBeenCalledWith(groupId);
     });
   });
+
+  describe('isConversationEstablished', () => {
+    it('returns false if conversation does not exist locally', async () => {
+      const mlsService = new MLSService(apiClient, mockCoreCrypto, {});
+
+      const groupId = 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm3OQFc=';
+
+      jest.spyOn(mlsService, 'conversationExists').mockResolvedValueOnce(false);
+
+      const isEstablshed = await mlsService.isConversationEstablished(groupId);
+
+      expect(isEstablshed).toBe(false);
+    });
+
+    it('returns false if epoch number is 0', async () => {
+      const mlsService = new MLSService(apiClient, mockCoreCrypto, {});
+
+      const groupId = 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm3OQFc=';
+
+      jest.spyOn(mlsService, 'conversationExists').mockResolvedValueOnce(true);
+      jest.spyOn(mlsService, 'getEpoch').mockResolvedValueOnce(0);
+
+      const isEstablshed = await mlsService.isConversationEstablished(groupId);
+
+      expect(isEstablshed).toBe(false);
+    });
+
+    it.each([1, 2, 100])('returns false if epoch number is 1 or more', async epoch => {
+      const mlsService = new MLSService(apiClient, mockCoreCrypto, {});
+
+      const groupId = 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm3OQFc=';
+
+      jest.spyOn(mlsService, 'conversationExists').mockResolvedValueOnce(true);
+      jest.spyOn(mlsService, 'getEpoch').mockResolvedValueOnce(epoch);
+
+      const isEstablshed = await mlsService.isConversationEstablished(groupId);
+
+      expect(isEstablshed).toBe(true);
+    });
+  });
 });

@@ -407,8 +407,21 @@ export class ConversationService extends TypedEventEmitter<Events> {
     });
   }
 
-  public async isMLSConversationEstablished(groupId: string) {
+  /**
+   * Will check if mls group exists locally.
+   * @param groupId groupId of the conversation
+   */
+  public async mlsGroupExistsLocally(groupId: string) {
     return this.mlsService.conversationExists(groupId);
+  }
+
+  /**
+   * Will check if mls group is established locally.
+   * Group is established after the first commit was sent in the group and epoch number is at least 1.
+   * @param groupId groupId of the conversation
+   */
+  public async isMLSGroupEstablishedLocally(groupId: string) {
+    return this.mlsService.isConversationEstablished(groupId);
   }
 
   public async wipeMLSConversation(groupId: string): Promise<void> {
@@ -453,7 +466,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
     const {qualified_id: qualifiedId, group_id: groupId, epoch} = remoteMlsConversation;
 
     try {
-      const isEstablished = await this.isMLSConversationEstablished(groupId);
+      const isEstablished = await this.mlsGroupExistsLocally(groupId);
       const doesEpochMatch = isEstablished && (await this.matchesEpoch(groupId, epoch));
 
       //if conversation is not established or epoch does not match -> try to rejoin
