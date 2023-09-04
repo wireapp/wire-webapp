@@ -69,15 +69,15 @@ const logger = getLogger('LexicalInput');
 interface RichTextEditorProps {
   placeholder: string;
   replaceEmojis?: boolean;
-  onUpdate: (content: RichTextContent) => void;
-  onArrowUp: () => void;
-  onEscape: () => void;
   editedMessage?: ContentMessage;
   children: ReactElement;
   hasLocalEphemeralTimer: boolean;
+  getMentionCandidates: (search?: string | null) => User[];
   saveDraftState: (editor: string) => void;
   loadDraftState: () => Promise<DraftState>;
-  getMentionCandidates: (search?: string | null) => User[];
+  onUpdate: (content: RichTextContent) => void;
+  onArrowUp: () => void;
+  onEscape: () => void;
   onShiftTab: () => void;
   onSend: () => void;
   onBlur: () => void;
@@ -106,15 +106,15 @@ const parseMentions = (editor: LexicalEditor, textValue: string, mentions: User[
 
 export const RichTextEditor = ({
   placeholder,
-  onUpdate,
   children,
   hasLocalEphemeralTimer,
   replaceEmojis,
+  editedMessage,
+  onUpdate,
   saveDraftState,
   loadDraftState,
   onEscape,
   onArrowUp,
-  editedMessage,
   getMentionCandidates,
   onShiftTab,
   onBlur,
