@@ -41,7 +41,7 @@ import {EmojiNode} from './nodes/EmojiNode';
 import {MentionNode} from './nodes/MentionNode';
 import {AutoFocusPlugin} from './plugins/AutoFocusPlugin';
 import {DraftStatePlugin} from './plugins/DraftStatePlugin';
-import {EditMessagePlugin} from './plugins/EditMessagePlugin';
+import {EditActionsPlugin} from './plugins/EditActionsPlugin';
 import {EmojiPickerPlugin} from './plugins/EmojiPickerPlugin';
 import {GlobalEventsPlugin} from './plugins/GlobalEventsPlugin';
 import {HistoryPlugin} from './plugins/HistoryPlugin';
@@ -78,8 +78,8 @@ interface RichTextEditorProps {
   readonly propertiesRepository: PropertiesRepository;
   placeholder: string;
   onUpdate: (content: RichTextContent) => void;
-  onEditLastSentMessage: () => void;
-  onCancelMessageEdit: () => void;
+  onArrowUp: () => void;
+  onEscape: () => void;
   editedMessage?: ContentMessage;
   children: ReactElement;
   hasLocalEphemeralTimer: boolean;
@@ -120,8 +120,8 @@ export const RichTextEditor = ({
   hasLocalEphemeralTimer,
   saveDraftState,
   loadDraftState,
-  onCancelMessageEdit,
-  onEditLastSentMessage,
+  onEscape,
+  onArrowUp,
   editedMessage,
   getMentionCandidates,
   onShiftTab,
@@ -192,14 +192,7 @@ export const RichTextEditor = ({
           <GlobalEventsPlugin onShiftTab={onShiftTab} />
           <EditorRefPlugin editorRef={setupEditor} />
           <DraftStatePlugin loadDraftState={loadDraftState} />
-          <EditMessagePlugin
-            onCancelMessageEdit={() => {
-              if (editedMessage) {
-                onCancelMessageEdit();
-              }
-            }}
-            onEditLastSentMessage={onEditLastSentMessage}
-          />
+          <EditActionsPlugin onEscape={onEscape} onArrowUp={onArrowUp} />
 
           <EmojiPickerPlugin openStateRef={emojiPickerOpen} />
           <HistoryPlugin />

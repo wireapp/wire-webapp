@@ -24,11 +24,11 @@ import {mergeRegister} from '@lexical/utils';
 import {COMMAND_PRIORITY_LOW, KEY_ARROW_UP_COMMAND, KEY_ESCAPE_COMMAND} from 'lexical';
 
 interface EditMessageProps {
-  onEditLastSentMessage: () => void;
-  onCancelMessageEdit: () => void;
+  onEscape: () => void;
+  onArrowUp: () => void;
 }
 
-export function EditMessagePlugin({onEditLastSentMessage, onCancelMessageEdit}: EditMessageProps): null {
+export function EditActionsPlugin({onEscape, onArrowUp}: EditMessageProps): null {
   const [editor] = useLexicalComposerContext();
 
   useEffect(() => {
@@ -36,7 +36,7 @@ export function EditMessagePlugin({onEditLastSentMessage, onCancelMessageEdit}: 
       editor.registerCommand(
         KEY_ESCAPE_COMMAND,
         () => {
-          onCancelMessageEdit();
+          onEscape();
           return true;
         },
         COMMAND_PRIORITY_LOW,
@@ -44,13 +44,13 @@ export function EditMessagePlugin({onEditLastSentMessage, onCancelMessageEdit}: 
       editor.registerCommand(
         KEY_ARROW_UP_COMMAND,
         () => {
-          onEditLastSentMessage();
+          onArrowUp();
           return true;
         },
         COMMAND_PRIORITY_LOW,
       ),
     );
-  }, [editor, onCancelMessageEdit, onEditLastSentMessage]);
+  }, [editor, onArrowUp, onEscape]);
 
   return null;
 }

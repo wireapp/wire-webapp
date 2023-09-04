@@ -244,7 +244,7 @@ export const InputBar = ({
   };
 
   const editMessage = (messageEntity?: ContentMessage) => {
-    if (messageEntity?.isEditable() && messageEntity !== editedMessage && textValue.length === 0) {
+    if (messageEntity?.isEditable() && messageEntity !== editedMessage) {
       cancelMessageReply();
       cancelMessageEditing(true, true);
       setEditedMessage(messageEntity);
@@ -542,8 +542,18 @@ export const InputBar = ({
                   editorRef.current = lexical;
                 }}
                 editedMessage={editedMessage}
-                onCancelMessageEdit={() => cancelMessageEditing(true, true)}
-                onEditLastSentMessage={() => editMessage(conversation.getLastEditableMessage())}
+                onEscape={() => {
+                  if (editedMessage) {
+                    cancelMessageEditing(true, true);
+                  } else if (replyMessageEntity) {
+                    cancelMessageReply();
+                  }
+                }}
+                onArrowUp={() => {
+                  if (textValue.length === 0) {
+                    editMessage(conversation.getLastEditableMessage());
+                  }
+                }}
                 getMentionCandidates={getMentionCandidates}
                 propertiesRepository={propertiesRepository}
                 placeholder={inputPlaceholder}
