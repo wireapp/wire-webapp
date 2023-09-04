@@ -28,7 +28,7 @@ import {PlainTextPlugin} from '@lexical/react/LexicalPlainTextPlugin';
 import type {WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
 import cx from 'classnames';
-import {LexicalEditor, EditorState, $nodesOfType, $getRoot, $setSelection} from 'lexical';
+import {LexicalEditor, EditorState, $nodesOfType} from 'lexical';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
@@ -42,6 +42,7 @@ import {MentionNode} from './nodes/MentionNode';
 import {AutoFocusPlugin} from './plugins/AutoFocusPlugin';
 import {DraftStatePlugin} from './plugins/DraftStatePlugin';
 import {EditActionsPlugin} from './plugins/EditActionsPlugin';
+import {EditedMessagePlugin} from './plugins/EditedMessagePlugin';
 import {EmojiPickerPlugin} from './plugins/EmojiPickerPlugin';
 import {GlobalEventsPlugin} from './plugins/GlobalEventsPlugin';
 import {HistoryPlugin} from './plugins/HistoryPlugin';
@@ -50,7 +51,6 @@ import {MentionsPlugin} from './plugins/MentionsPlugin';
 import {OnBlurPlugin} from './plugins/OnBlurPlugin';
 import {SendPlugin} from './plugins/SendPlugin';
 import {TextChangePlugin} from './plugins/TextChangePlugin';
-import {toEditorNodes} from './utils/messageToEditorNodes';
 
 import {MentionEntity} from '../../message/MentionEntity';
 import {PropertiesRepository} from '../../properties/PropertiesRepository';
@@ -127,31 +127,11 @@ export const RichTextEditor = ({
   onShiftTab,
   onBlur,
   onSend,
-  onSetup,
+  onSetup = () => {},
 }: RichTextEditorProps) => {
   // Emojis
-  const editorRef = useRef<LexicalEditor>();
   const emojiPickerOpen = useRef<boolean>(true);
   const mentionsOpen = useRef<boolean>(true);
-
-  const setupEditor = (editor: LexicalEditor) => {
-    editorRef.current = editor;
-
-    onSetup?.(editor);
-  };
-
-  useEffect(() => {
-    if (editedMessage && editorRef.current) {
-      editorRef.current.update(() => {
-        const root = $getRoot();
-        // Replace the current root with the content of the message being edited
-        root.append(toEditorNodes(editedMessage));
-        // This behaviour is needed to clear selection, if we not clear selection will be on beginning.
-        $setSelection(null);
-        editorRef.current?.focus();
-      });
-    }
-  }, [editedMessage]);
 
   const [shouldReplaceEmoji, setShouldReplaceEmoji] = useState<boolean>(
     propertiesRepository.getPreference(PROPERTIES_TYPE.EMOJI.REPLACE_INLINE),
@@ -190,9 +170,10 @@ export const RichTextEditor = ({
         <div className="input-bar--wrapper">
           <AutoFocusPlugin />
           <GlobalEventsPlugin onShiftTab={onShiftTab} />
-          <EditorRefPlugin editorRef={setupEditor} />
+          <EditorRefPlugin editorRef={onSetup} />
           <DraftStatePlugin loadDraftState={loadDraftState} />
           <EditActionsPlugin onEscape={onEscape} onArrowUp={onArrowUp} />
+          <EditedMessagePlugin message={editedMessage} />
 
           <EmojiPickerPlugin openStateRef={emojiPickerOpen} />
           <HistoryPlugin />
