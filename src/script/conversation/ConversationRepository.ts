@@ -1515,25 +1515,12 @@ export class ConversationRepository {
       throw new Error('Conversation service is not available!');
     }
 
-    const {groupId, qualifiedId} = mlsConversation;
-
-    //if epoch is higher that 0 it means that the group is already established, we have to join with external commit
-    if (mlsConversation.epoch > 0) {
-      await conversationService.joinByExternalCommit(qualifiedId);
-      return mlsConversation;
-    }
-
-    const selfUserId = selfUser.qualifiedId;
-
-    //if it's not established, establish it and add the other user to the group
-    await conversationService.establishMLS1to1Conversation(
-      groupId,
-      {client: this.core.clientId, user: selfUserId},
+    const {members, epoch} = await conversationService.establishMLS1to1Conversation(
+      mlsConversation.groupId,
+      {client: this.core.clientId, user: selfUser.qualifiedId},
       otherUserId,
     );
 
-    //refetch the conversation to get the letest epoch and updated participants list
-    const {members, epoch} = await this.conversationService.getMLS1to1Conversation(otherUserId);
     ConversationMapper.updateProperties(mlsConversation, {participating_user_ids: members.others, epoch});
     await this.updateParticipatingUserEntities(mlsConversation);
     return mlsConversation;
