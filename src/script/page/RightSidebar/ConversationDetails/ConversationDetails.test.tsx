@@ -17,25 +17,34 @@
  *
  */
 
-import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation/';
-import {render} from '@testing-library/react';
-import ko from 'knockout';
+import {act, render} from '@testing-library/react';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 
 import {Conversation} from 'src/script/entity/Conversation';
-import ConversationDetails from './ConversationDetails';
-import {ConversationRepository} from '../../../conversation/ConversationRepository';
+
+import {ConversationDetails} from './ConversationDetails';
+
 import {TestFactory} from '../../../../../test/helper/TestFactory';
-import {SearchRepository} from '../../../search/SearchRepository';
-import {IntegrationRepository} from '../../../integration/IntegrationRepository';
-import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
-import {PanelViewModel} from '../../../view_model/PanelViewModel';
+import {ConversationRepository} from '../../../conversation/ConversationRepository';
 import {ConversationRoleRepository} from '../../../conversation/ConversationRoleRepository';
+import {User} from '../../../entity/User';
+import {IntegrationRepository} from '../../../integration/IntegrationRepository';
+import {SearchRepository} from '../../../search/SearchRepository';
+import {TeamEntity} from '../../../team/TeamEntity';
 import {TeamRepository} from '../../../team/TeamRepository';
 import {TeamState} from '../../../team/TeamState';
 import {UserState} from '../../../user/UserState';
-import {t} from 'Util/LocalizerUtil';
-import {User} from '../../../entity/User';
-import {TeamEntity} from '../../../team/TeamEntity';
+import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
+
+jest.mock('Components/panel/EnrichedFields', () => ({
+  useEnrichedFields: () => [],
+  EnrichedFields: () => <div />,
+  __esModule: true,
+}));
+jest.mock('Components/panel/UserDetails', () => ({
+  UserDetails: () => <div />,
+  __esModule: true,
+}));
 
 const testFactory = new TestFactory();
 let conversationRepository: ConversationRepository;
@@ -60,7 +69,11 @@ const getDefaultParams = () => {
     canLeaveGroup: () => true,
     canRenameGroup: () => true,
     canToggleTimeout: () => true,
+    isUserGroupAdmin: () => true,
   };
+
+  const userState = new UserState();
+  userState.self(new User());
 
   return {
     actionsViewModel: {
@@ -75,34 +88,36 @@ const getDefaultParams = () => {
       toggleMuteConversation: (conversationEntity: Conversation) => {},
     } as ActionsViewModel,
     conversationRepository: {
-      expectReadReceipt: (conversationEntity: Conversation) => true,
-    } as ConversationRepository,
-    integrationRepository: {} as IntegrationRepository,
+      expectReadReceipt: () => true,
+      getNextConversation: () => Promise.resolve(new Conversation()),
+      refreshUnavailableParticipants: () => Promise.resolve(),
+      conversationRoleRepository: conversationRoleRepository as ConversationRoleRepository,
+    } as unknown as ConversationRepository,
+    integrationRepository: {getServiceFromUser: () => null} as unknown as IntegrationRepository,
     isFederated: false,
     isVisible: true,
-    panelViewModel: createPanelViewModel(),
-    roleRepository: conversationRoleRepository as ConversationRoleRepository,
     searchRepository,
     teamRepository: {
       getRoleBadge: (userId: string) => '',
       updateTeamMembersByIds: (teamEntity: TeamEntity, memberIds?: string[], append?: boolean) => Promise.resolve(),
-    } as TeamRepository,
+      isSelfConnectedTo: () => true,
+    } as unknown as TeamRepository,
     teamState: new TeamState(),
-    userState: new UserState(),
+    userState: userState,
   };
 };
 
 describe('ConversationDetails', () => {
   it("returns the right actions depending on the conversation's type for non group creators", () => {
     const conversation = new Conversation();
-    spyOn(conversation, 'firstUserEntity').and.returnValue({isConnected: () => true});
-    spyOn(conversation, 'is_cleared').and.returnValue(false);
-    spyOn(conversation, 'isCreatedBySelf').and.returnValue(false);
+    const otherUser = new User('other-user');
+    jest.spyOn(otherUser, 'isConnected').mockReturnValue(true);
+    jest.spyOn(conversation, 'isClearable').mockReturnValue(true);
+    conversation.participating_user_ets([otherUser]);
 
     const defaultProps = getDefaultParams();
-    const {roleRepository, teamState} = defaultProps;
 
-    const {rerender} = render(<ConversationDetails {...defaultProps} activeConversation={conversation} />);
+    const {rerender, getByTestId} = render(<ConversationDetails {...defaultProps} activeConversation={conversation} />);
 
     const tests = [
       {
@@ -127,101 +142,17 @@ describe('ConversationDetails', () => {
       },
     ];
 
-    const firstParticipant = conversation.firstUserEntity();
-    const is1to1 = conversation.is1to1();
-    const isRequest = conversation.isRequest();
-    const isSingleUserMode = is1to1 || isRequest;
-    const isServiceMode = isSingleUserMode && firstParticipant.isService;
-    const isTeam = teamState.isTeam();
-
     return tests.forEach(({expected, permission, conversationType}) => {
-      conversation.type(conversationType);
+      act(() => {
+        conversation.type(conversationType);
+      });
 
       rerender(<ConversationDetails {...defaultProps} activeConversation={conversation} />);
 
-      const is1to1Action = conversation.is1to1();
-      const isSingleUser = is1to1Action || conversation.isRequest();
-      const firstUser = conversation.firstUserEntity();
-
-      const allMenuElements = [
-        {
-          condition: permission.canCreateGroupConversation() && is1to1Action && !isServiceMode,
-          item: {
-            click: () => jest.fn(),
-            icon: 'group-icon',
-            identifier: 'go-create-group',
-            label: t('conversationDetailsActionCreateGroup'),
-          },
-        },
-        {
-          condition: true,
-          item: {
-            click: () => jest.fn(),
-            icon: 'archive-icon',
-            identifier: 'do-archive',
-            label: t('conversationDetailsActionArchive'),
-          },
-        },
-        {
-          condition: conversation.isRequest(),
-          item: {
-            click: () => jest.fn(),
-            icon: 'close-icon',
-            identifier: 'do-cancel-request',
-            label: t('conversationDetailsActionCancelRequest'),
-          },
-        },
-        {
-          condition: conversation.isClearable(),
-          item: {
-            click: () => jest.fn(),
-            icon: 'eraser-icon',
-            identifier: 'do-clear',
-            label: t('conversationDetailsActionClear'),
-          },
-        },
-        {
-          condition: isSingleUser && (firstUser?.isConnected() || firstUser?.isRequest()),
-          item: {
-            click: () => jest.fn(),
-            icon: 'block-icon',
-            identifier: 'do-block',
-            label: t('conversationDetailsActionBlock'),
-          },
-        },
-        {
-          condition: conversation.isLeavable() && roleRepository.canLeaveGroup(conversation),
-          item: {
-            click: () => jest.fn(),
-            icon: 'leave-icon',
-            identifier: 'do-leave',
-            label: t('conversationDetailsActionLeave'),
-          },
-        },
-        {
-          condition:
-            !isSingleUser && isTeam && roleRepository.canDeleteGroup(conversation) && conversation.isCreatedBySelf(),
-          item: {
-            click: () => jest.fn(),
-            icon: 'delete-icon',
-            identifier: 'do-delete',
-            label: t('conversationDetailsActionDelete'),
-          },
-        },
-      ];
-
-      const items = allMenuElements.filter(menuElement => menuElement.condition).map(menuElement => menuElement.item);
-      const mappedItems = items.map(item => item.identifier);
-
-      expect(mappedItems).toEqual(expected);
+      expected.forEach(action => {
+        const actionItem = getByTestId(action);
+        expect(actionItem).not.toBeNull();
+      });
     });
   });
 });
-
-function createPanelViewModel() {
-  const panelViewModel: Partial<PanelViewModel> = {
-    isVisible: ko.pureComputed<boolean>(() => true),
-    togglePanel: jest.fn(),
-  };
-  return panelViewModel as PanelViewModel;
-}
