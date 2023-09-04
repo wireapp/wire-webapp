@@ -34,11 +34,11 @@ import {t} from 'Util/LocalizerUtil';
 import {PreferencesPage} from './components/PreferencesPage';
 import {PreferencesSection} from './components/PreferencesSection';
 
+import {Theme} from '../../../../components/AppContainer/hooks/useTheme';
 import {RootFontSize, useRootFontSize} from '../../../../hooks/useRootFontSize';
 import {PropertiesRepository} from '../../../../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../../../../properties/PropertiesType';
 import {UserState} from '../../../../user/UserState';
-import {THEMES as ThemeViewModelThemes} from '../../../../view_model/ThemeViewModel';
 interface OptionPreferencesProps {
   propertiesRepository: PropertiesRepository;
   userState?: UserState;
@@ -56,7 +56,7 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
   } = propertiesRepository;
   const [optionAudio, setOptionAudio] = useState<AudioPreference>(settings.sound.alerts);
   const [optionReplaceInlineEmoji, setOptionReplaceInlineEmoji] = useState<boolean>(settings.emoji.replace_inline);
-  const [optionDarkMode, setOptionDarkMode] = useState<boolean>(settings.interface.theme === ThemeViewModelThemes.DARK);
+  const [optionDarkMode, setOptionDarkMode] = useState<boolean>(settings.interface.theme === 'dark');
   const [optionSendPreviews, setOptionSendPreviews] = useState<boolean>(settings.previews.send);
   const [optionNotifications, setOptionNotifications] = useState<NotificationPreference>(settings.notifications);
   const [currentRootFontSize, setCurrentRootFontSize] = useRootFontSize();
@@ -66,7 +66,7 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
     const updateProperties = ({settings}: WebappProperties): void => {
       setOptionAudio(settings.sound.alerts);
       setOptionReplaceInlineEmoji(settings.emoji.replace_inline);
-      setOptionDarkMode(settings.interface.theme === ThemeViewModelThemes.DARK);
+      setOptionDarkMode(settings.interface.theme === 'dark');
       setOptionSendPreviews(settings.previews.send);
       setOptionNotifications(settings.notifications);
     };
@@ -103,7 +103,7 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
   };
 
   const saveOptionNewTheme = (useDarkMode: boolean) => {
-    const newTheme = useDarkMode ? ThemeViewModelThemes.DARK : ThemeViewModelThemes.DEFAULT;
+    const newTheme: Theme = useDarkMode ? 'dark' : 'default';
     propertiesRepository.savePreference(PROPERTIES_TYPE.INTERFACE.THEME, newTheme);
     setOptionDarkMode(useDarkMode);
   };
