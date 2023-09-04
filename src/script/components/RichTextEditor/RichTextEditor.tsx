@@ -41,7 +41,6 @@ import {EmojiNode} from './nodes/EmojiNode';
 import {MentionNode} from './nodes/MentionNode';
 import {AutoFocusPlugin} from './plugins/AutoFocusPlugin';
 import {DraftStatePlugin} from './plugins/DraftStatePlugin';
-import {EditActionsPlugin} from './plugins/EditActionsPlugin';
 import {EditedMessagePlugin} from './plugins/EditedMessagePlugin';
 import {EmojiPickerPlugin} from './plugins/EmojiPickerPlugin';
 import {GlobalEventsPlugin} from './plugins/GlobalEventsPlugin';
@@ -169,10 +168,9 @@ export const RichTextEditor = ({
       <div className="controls-center">
         <div className="input-bar--wrapper">
           <AutoFocusPlugin />
-          <GlobalEventsPlugin onShiftTab={onShiftTab} />
+          <GlobalEventsPlugin onShiftTab={onShiftTab} onEscape={onEscape} onArrowUp={onArrowUp} />
           <EditorRefPlugin editorRef={onSetup} />
           <DraftStatePlugin loadDraftState={loadDraftState} />
-          <EditActionsPlugin onEscape={onEscape} onArrowUp={onArrowUp} />
           <EditedMessagePlugin message={editedMessage} />
 
           <EmojiPickerPlugin openStateRef={emojiPickerOpen} />

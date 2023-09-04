@@ -21,26 +21,34 @@ import {useEffect, useLayoutEffect} from 'react';
 
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {mergeRegister} from '@lexical/utils';
-import {LexicalCommand, createCommand, COMMAND_PRIORITY_HIGH} from 'lexical';
+import {
+  LexicalCommand,
+  createCommand,
+  COMMAND_PRIORITY_HIGH,
+  KEY_ESCAPE_COMMAND,
+  COMMAND_PRIORITY_LOW,
+  KEY_ARROW_UP_COMMAND,
+} from 'lexical';
 
 import {isTabKey} from 'Util/KeyboardUtil';
 
 export const ON_SHIFT_TAB: LexicalCommand<KeyboardEvent> = createCommand('ON_SHIFT_TAB');
 interface GlobalEventsPluginProps {
   onShiftTab: () => void;
+  onEscape: () => void;
+  onArrowUp: () => void;
 }
 
-export function GlobalEventsPlugin({onShiftTab}: GlobalEventsPluginProps): null {
+export function GlobalEventsPlugin({onShiftTab, onArrowUp, onEscape}: GlobalEventsPluginProps): null {
   const [editor] = useLexicalComposerContext();
 
-  const onKeyDown = (event: KeyboardEvent) => {
-    // "Shift" + "Tab"
-    if (event.shiftKey && isTabKey(event)) {
-      editor.dispatchCommand(ON_SHIFT_TAB, event);
-    }
-  };
-
   useLayoutEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      // "Shift" + "Tab"
+      if (event.shiftKey && isTabKey(event)) {
+        editor.dispatchCommand(ON_SHIFT_TAB, event);
+      }
+    };
     const unregister = editor.registerRootListener(
       (rootElement: HTMLElement | null, prevRootElement: HTMLElement | null) => {
         if (prevRootElement !== null) {
@@ -58,17 +66,34 @@ export function GlobalEventsPlugin({onShiftTab}: GlobalEventsPluginProps): null 
   }, [editor]);
 
   useEffect(() => {
-    const removeOnShiftTabCommand = editor.registerCommand(
-      ON_SHIFT_TAB,
-      () => {
-        onShiftTab();
-        return true;
-      },
-      COMMAND_PRIORITY_HIGH,
+    const unregister = mergeRegister(
+      editor.registerCommand(
+        ON_SHIFT_TAB,
+        () => {
+          onShiftTab();
+          return true;
+        },
+        COMMAND_PRIORITY_HIGH,
+      ),
+      editor.registerCommand(
+        KEY_ESCAPE_COMMAND,
+        () => {
+          onEscape();
+          return true;
+        },
+        COMMAND_PRIORITY_LOW,
+      ),
+      editor.registerCommand(
+        KEY_ARROW_UP_COMMAND,
+        () => {
+          onArrowUp();
+          return true;
+        },
+        COMMAND_PRIORITY_LOW,
+      ),
     );
-
-    return mergeRegister(removeOnShiftTabCommand);
-  }, [editor, onShiftTab]);
+    return unregister;
+  }, [editor, onArrowUp, onEscape, onShiftTab]);
 
   return null;
 }
