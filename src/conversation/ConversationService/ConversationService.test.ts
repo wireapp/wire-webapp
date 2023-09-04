@@ -193,7 +193,7 @@ describe('ConversationService', () => {
       const mockedDBResponse: Conversation[] = [mlsConversation1, mlsConversation2];
       jest.spyOn(apiClient.api.conversation, 'getConversationList').mockResolvedValueOnce({found: mockedDBResponse});
 
-      jest.spyOn(conversationService, 'isMLSConversationEstablished').mockResolvedValue(false);
+      jest.spyOn(conversationService, 'mlsGroupExistsLocally').mockResolvedValue(false);
 
       await conversationService.handleConversationsEpochMismatch();
       expect(conversationService.joinByExternalCommit).toHaveBeenCalledWith(mlsConversation1.qualified_id);
@@ -209,7 +209,7 @@ describe('ConversationService', () => {
       const mockedDBResponse: Conversation[] = [mlsConversation1, mlsConversation2];
       jest.spyOn(apiClient.api.conversation, 'getConversationList').mockResolvedValueOnce({found: mockedDBResponse});
 
-      jest.spyOn(conversationService, 'isMLSConversationEstablished').mockResolvedValue(true);
+      jest.spyOn(conversationService, 'mlsGroupExistsLocally').mockResolvedValue(true);
       jest.spyOn(mlsService, 'getEpoch').mockResolvedValue(2);
 
       await conversationService.handleConversationsEpochMismatch();
@@ -225,7 +225,7 @@ describe('ConversationService', () => {
       const mockedDBResponse: Conversation[] = [mlsConversation];
       jest.spyOn(apiClient.api.conversation, 'getConversationList').mockResolvedValueOnce({found: mockedDBResponse});
 
-      jest.spyOn(conversationService, 'isMLSConversationEstablished').mockResolvedValueOnce(true);
+      jest.spyOn(conversationService, 'mlsGroupExistsLocally').mockResolvedValueOnce(true);
 
       jest.spyOn(mlsService, 'getEpoch').mockResolvedValueOnce(1);
       jest.spyOn(mlsService, 'conversationExists').mockResolvedValueOnce(true);

@@ -493,9 +493,23 @@ export class MLSService extends TypedEventEmitter<Events> {
     return commitBundle ? void (await this.uploadCommitBundle(groupId, commitBundle)) : undefined;
   }
 
+  /**
+   * Will check if mls group exists in corecrypto.
+   * @param groupId groupId of the conversation
+   */
   public async conversationExists(groupId: string): Promise<boolean> {
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
     return this.coreCryptoClient.conversationExists(groupIdBytes);
+  }
+
+  /**
+   * Will check if mls group is established in coreCrypto.
+   * Group is established after the first commit was sent in the group and epoch number is at least 1.
+   * @param groupId groupId of the conversation
+   */
+  public async isConversationEstablished(groupId: string): Promise<boolean> {
+    const doesConversationExist = await this.conversationExists(groupId);
+    return doesConversationExist && (await this.getEpoch(groupId)) > 0;
   }
 
   public async clientValidKeypackagesCount(): Promise<number> {
@@ -633,8 +647,8 @@ export class MLSService extends TypedEventEmitter<Events> {
   }
 
   public async wipeConversation(groupId: string): Promise<void> {
-    const isMLSConversationEstablished = await this.conversationExists(groupId);
-    if (!isMLSConversationEstablished) {
+    const doesConversationExist = await this.conversationExists(groupId);
+    if (!doesConversationExist) {
       //if the mls group does not exist, we don't need to wipe it
       return;
     }
