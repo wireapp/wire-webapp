@@ -34,13 +34,16 @@ export function EditedMessagePlugin({message}: Props): null {
 
   useEffect(() => {
     if (message) {
-      editor.update(() => {
-        const root = $getRoot();
-        // This behaviour is needed to clear selection, if we not clear selection will be on beginning.
-        $setSelection(null);
-        // Replace the current root with the content of the message being edited
-        root.append(toEditorNodes(message));
-        editor.focus();
+      // Need to timeout to be sure the editor is in a state to receive the new message (could cause problems with cursor position)
+      setTimeout(() => {
+        editor.update(() => {
+          const root = $getRoot();
+          // This behaviour is needed to clear selection, if we not clear selection will be on beginning.
+          $setSelection(null);
+          // Replace the current root with the content of the message being edited
+          root.append(toEditorNodes(message));
+          editor.focus();
+        });
       });
     }
   }, [editor, message]);

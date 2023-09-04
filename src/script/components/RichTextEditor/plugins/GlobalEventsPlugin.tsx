@@ -87,7 +87,7 @@ export function GlobalEventsPlugin({onShiftTab, onArrowUp, onEscape}: GlobalEven
         KEY_ARROW_UP_COMMAND,
         () => {
           onArrowUp();
-          return true;
+          return false;
         },
         COMMAND_PRIORITY_LOW,
       ),
