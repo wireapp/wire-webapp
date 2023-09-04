@@ -93,7 +93,7 @@ const getDefaultParams = () => {
       refreshUnavailableParticipants: () => Promise.resolve(),
       conversationRoleRepository: conversationRoleRepository as ConversationRoleRepository,
     } as unknown as ConversationRepository,
-    integrationRepository: {getServiceFromUser: () => null} as unknown as IntegrationRepository,
+    integrationRepository: {getServiceFromUser: (): null => null} as unknown as IntegrationRepository,
     isFederated: false,
     isVisible: true,
     searchRepository,
@@ -111,8 +111,8 @@ describe('ConversationDetails', () => {
   it("returns the right actions depending on the conversation's type for non group creators", () => {
     const conversation = new Conversation();
     const otherUser = new User('other-user');
-    jest.spyOn(otherUser, 'isConnected').mockReturnValue(true);
-    jest.spyOn(conversation, 'isClearable').mockReturnValue(true);
+    jest.spyOn(otherUser as any, 'isConnected').mockReturnValue(true);
+    jest.spyOn(conversation as any, 'isClearable').mockReturnValue(true);
     conversation.participating_user_ets([otherUser]);
 
     const defaultProps = getDefaultParams();
