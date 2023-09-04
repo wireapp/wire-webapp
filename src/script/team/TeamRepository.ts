@@ -39,7 +39,7 @@ import {Runtime} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {E2EIHandler} from 'Util/E2EIdentity';
+import {E2EIHandler} from 'src/script/E2EIdentity';
 import {Environment} from 'Util/Environment';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
@@ -435,7 +435,7 @@ export class TeamRepository {
     }
 
     // Trigger E2E identity handler
-    // this.handleE2EIdentityFeatureChange(featureConfigList.mlsE2EId, featureConfigList.mls);
+    this.handleE2EIdentityFeatureChange(featureConfigList.mlsE2EId, featureConfigList.mls);
 
     this.saveFeatureConfig(featureConfigList);
   };
