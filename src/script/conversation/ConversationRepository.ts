@@ -170,6 +170,7 @@ export class ConversationRepository {
     return {
       CONFIRMATION_THRESHOLD: TIME_IN_MILLIS.WEEK,
       EXTERNAL_MESSAGE_THRESHOLD: 200 * 1024,
+      ESTABLISH_MLS_GROUP_AFTER_CONNECTION_IS_ACCEPTED_DELAY: 3000,
       GROUP: {
         MAX_NAME_LENGTH: 64,
         MAX_SIZE: Config.getConfig().MAX_GROUP_PARTICIPANTS,
@@ -1497,9 +1498,8 @@ export class ConversationRepository {
    *
    * @param mlsConversation - mls 1:1 conversation
    * @param otherUserId - id of the other user
-   * @param proteusConversation - (optional) proteus 1:1 conversation
    */
-  public readonly establishMLS1to1Conversation = async (
+  private readonly establishMLS1to1Conversation = async (
     mlsConversation: MLSConversation,
     otherUserId: QualifiedId,
   ): Promise<MLSConversation> => {
@@ -1536,6 +1536,7 @@ export class ConversationRepository {
   private readonly initMLS1to1Conversation = async (
     otherUserId: QualifiedId,
     isMLSSupportedByTheOtherUser: boolean,
+    shouldDelayGroupEstablishment = false,
   ): Promise<MLSConversation> => {
     this.logger.info(`Initialising MLS 1:1 conversation with user ${otherUserId.id}...`);
     const mlsConversation = await this.getMLS1to1Conversation(otherUserId);
@@ -1550,6 +1551,12 @@ export class ConversationRepository {
         `MLS 1:1 conversation with user ${otherUserId.id} is not supported by the other user, conversation will become readonly`,
       );
       return mlsConversation;
+    }
+
+    if (shouldDelayGroupEstablishment) {
+      await new Promise(resolve =>
+        setTimeout(resolve, ConversationRepository.CONFIG.ESTABLISH_MLS_GROUP_AFTER_CONNECTION_IS_ACCEPTED_DELAY),
+      );
     }
 
     const isAlreadyEstablished = await this.conversationService.isMLSGroupEstablishedLocally(mlsConversation.groupId);
@@ -1662,7 +1669,7 @@ export class ConversationRepository {
     return null;
   };
 
-  private readonly getConnectionConversation = async (connectionEntity: ConnectionEntity) => {
+  private readonly getConnectionConversation = async (connectionEntity: ConnectionEntity, source?: EventSource) => {
     //As of how backed works now (August 2023), proteus 1:1 conversations will always be created, even if both users support MLS conversation.
     //Proteus 1:1 conversation is created right after a connection request is sent.
     //Therefore, conversationId filed on connectionEntity will always indicate proteus 1:1 conversation.
@@ -1704,7 +1711,13 @@ export class ConversationRepository {
 
     //if it's accepted, initialise conversation so it's ready to be used
     if (protocol === ConversationProtocol.MLS || localMLSConversation) {
-      const mlsConversation = await this.initMLS1to1Conversation(otherUserId, isSupportedByTheOtherUser);
+      const isWebSocketEvent = source === EventSource.WEBSOCKET;
+
+      const mlsConversation = await this.initMLS1to1Conversation(
+        otherUserId,
+        isSupportedByTheOtherUser,
+        isWebSocketEvent,
+      );
 
       if (localProteusConversation && isProteusConversation(localProteusConversation)) {
         await this.replaceProteus1to1WithMLS(localProteusConversation, mlsConversation);
@@ -1734,7 +1747,7 @@ export class ConversationRepository {
     source?: EventSource,
   ): Promise<Conversation | undefined> => {
     try {
-      const conversation = await this.getConnectionConversation(connectionEntity);
+      const conversation = await this.getConnectionConversation(connectionEntity, source);
 
       if (!conversation) {
         return undefined;
