@@ -104,7 +104,6 @@ import {WindowHandler} from '../ui/WindowHandler';
 import {UserRepository} from '../user/UserRepository';
 import {UserService} from '../user/UserService';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
-import {ThemeViewModel} from '../view_model/ThemeViewModel';
 import {Warnings} from '../view_model/WarningsContainer';
 
 export function doRedirect(signOutReason: SIGN_OUT_REASON) {
@@ -348,7 +347,6 @@ export class App {
     const platformCssClass = Runtime.isDesktopApp() ? 'platform-electron' : 'platform-web';
     document.body.classList.add(osCssClass, platformCssClass);
 
-    new ThemeViewModel(this.repository.properties);
     const telemetry = new AppInitTelemetry();
 
     try {
@@ -416,6 +414,7 @@ export class App {
       if (supportsMLS()) {
         //if mls is supported, we need to initialize the callbacks (they are used when decrypting messages)
         await initMLSCallbacks(this.core, this.repository.conversation);
+        conversationRepository.initMLSConversationRecoveredListener();
       }
 
       if (connections.length) {
@@ -469,7 +468,7 @@ export class App {
       telemetry.addStatistic(AppInitStatisticsValue.CLIENTS, clientEntities.length);
       telemetry.timeStep(AppInitTimingsStep.APP_PRE_LOADED);
 
-      userRepository['userState'].self().devices(clientEntities);
+      selfUser.devices(clientEntities);
       this._handleUrlParams();
       await conversationRepository.updateConversationsOnAppInit();
       await conversationRepository.conversationLabelRepository.loadLabels();

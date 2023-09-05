@@ -144,7 +144,7 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
         }}
       >
         <h3
-          className="heading-h3 text-center ellipsis"
+          className="heading-h3 text-center"
           title={name}
           css={{
             marginBottom: 16,

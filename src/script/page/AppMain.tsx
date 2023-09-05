@@ -37,13 +37,14 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {supportsMLSMigration} from 'Util/util';
 
 import {AppLock} from './AppLock';
+import {FeatureConfigChangeNotifier} from './components/FeatureConfigChangeNotifier';
+import {WindowTitleUpdater} from './components/WindowTitleUpdater';
 import {LeftSidebar} from './LeftSidebar';
 import {MainContent} from './MainContent';
 import {PanelEntity, PanelState, RightSidebar} from './RightSidebar';
 import {RootProvider} from './RootProvider';
 import {useAppMainState, ViewType} from './state';
 import {useAppState, ContentState} from './useAppState';
-import {WindowTitleUpdater} from './WindowTitleUpdater';
 
 import {ConversationState} from '../conversation/ConversationState';
 import {User} from '../entity/User';
@@ -85,7 +86,7 @@ const AppMain: FC<AppMainProps> = ({
     throw new Error('API Context has not been set');
   }
 
-  const {contentState} = useAppState();
+  const contentState = useAppState(state => state.contentState);
 
   const {repository: repositories} = app;
 
@@ -255,6 +256,7 @@ const AppMain: FC<AppMainProps> = ({
 
           <AppLock clientRepository={repositories.client} />
           <WarningsContainer onRefresh={app.refresh} />
+          <FeatureConfigChangeNotifier selfUserId={selfUser.id} teamState={teamState} />
 
           <CallingContainer
             multitasking={mainView.multitasking}

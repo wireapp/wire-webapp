@@ -122,7 +122,7 @@ const filterDuplicatedSystemMessages = (messages: MessageEntity[]) => {
             return [...uniqMessages, currentMessage];
           }
           // Dont show duplicated system messages that follow each other
-          if (prevMessage.caption() === currentMessage.caption()) {
+          if (prevMessage.caption === currentMessage.caption) {
             return uniqMessages;
           }
         }

@@ -43,7 +43,7 @@ describe('tryEstablishingMLSGroupForMixedConversation', () => {
     const mixedConversation3 = createMixedConversation('unestablishedGroup3');
     const mixedConversation4 = createMixedConversation('unestablishedGroup4');
 
-    jest.spyOn(mockCore.service!.conversation!, 'isMLSConversationEstablished').mockImplementation(groupId => {
+    jest.spyOn(mockCore.service!.conversation!, 'mlsGroupExistsLocally').mockImplementation(groupId => {
       return Promise.resolve(!groupId.includes('unestablished'));
     });
 
@@ -54,7 +54,7 @@ describe('tryEstablishingMLSGroupForMixedConversation', () => {
       },
     );
 
-    expect(mockCore.service?.conversation?.isMLSConversationEstablished).toHaveBeenCalledTimes(4);
+    expect(mockCore.service?.conversation?.mlsGroupExistsLocally).toHaveBeenCalledTimes(4);
     expect(mockCore.service?.conversation?.joinByExternalCommit).toHaveBeenCalledTimes(2);
 
     expect(mockCore.service?.conversation?.joinByExternalCommit).toHaveBeenCalledWith(mixedConversation3.qualifiedId);

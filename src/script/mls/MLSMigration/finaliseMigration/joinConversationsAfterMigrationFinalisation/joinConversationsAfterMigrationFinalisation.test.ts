@@ -140,7 +140,7 @@ describe('joinConversationsAfterMigrationFinalisation', () => {
     const mockCore = container.resolve(Core);
     const conversationRepository = await testFactory.exposeConversationActors();
 
-    jest.spyOn(mockCore.service!.conversation, 'isMLSConversationEstablished').mockResolvedValue(false);
+    jest.spyOn(mockCore.service!.conversation, 'mlsGroupExistsLocally').mockResolvedValue(false);
     jest.spyOn(conversationRepository['eventRepository'], 'injectEvent');
 
     const conversationId = 'conversation1';
@@ -187,7 +187,7 @@ describe('joinConversationsAfterMigrationFinalisation', () => {
     const mockCore = container.resolve(Core);
     const conversationRepository = await testFactory.exposeConversationActors();
 
-    jest.spyOn(mockCore.service!.conversation, 'isMLSConversationEstablished').mockResolvedValue(false);
+    jest.spyOn(mockCore.service!.conversation, 'mlsGroupExistsLocally').mockResolvedValue(false);
     jest.spyOn(conversationRepository['eventRepository'], 'injectEvent');
 
     const conversationId = 'conversation1';
@@ -223,7 +223,7 @@ describe('joinConversationsAfterMigrationFinalisation', () => {
     const mockCore = container.resolve(Core);
     const conversationRepository = await testFactory.exposeConversationActors();
 
-    jest.spyOn(mockCore.service!.conversation, 'isMLSConversationEstablished').mockResolvedValue(false);
+    jest.spyOn(mockCore.service!.conversation, 'mlsGroupExistsLocally').mockResolvedValue(false);
     jest.spyOn(conversationRepository['eventRepository'], 'injectEvent');
 
     const conversationId = 'conversation1';
@@ -259,7 +259,7 @@ describe('joinConversationsAfterMigrationFinalisation', () => {
     const mockCore = container.resolve(Core);
     const conversationRepository = await testFactory.exposeConversationActors();
 
-    jest.spyOn(mockCore.service!.conversation, 'isMLSConversationEstablished').mockResolvedValue(false);
+    jest.spyOn(mockCore.service!.conversation, 'mlsGroupExistsLocally').mockResolvedValue(false);
     jest.spyOn(conversationRepository['eventRepository'], 'injectEvent');
 
     const conversationId = 'conversation1';
@@ -295,7 +295,7 @@ describe('joinConversationsAfterMigrationFinalisation', () => {
     const mockCore = container.resolve(Core);
     const conversationRepository = await testFactory.exposeConversationActors();
 
-    jest.spyOn(mockCore.service!.conversation, 'isMLSConversationEstablished').mockResolvedValue(false);
+    jest.spyOn(mockCore.service!.conversation, 'mlsGroupExistsLocally').mockResolvedValue(false);
     jest.spyOn(conversationRepository['eventRepository'], 'injectEvent');
 
     const conversationId = 'conversation1';

@@ -18,7 +18,6 @@
  */
 
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
-import ko from 'knockout';
 
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
 import {t} from 'Util/LocalizerUtil';
@@ -29,10 +28,9 @@ export class ProtocolUpdateMessage extends SystemMessage {
   constructor(public protocol: ConversationProtocol.MIXED | ConversationProtocol.MLS) {
     super();
     this.system_message_type = SystemMessageType.CONVERSATION_PROTOCOL_UPDATE;
-    this.caption = ko.pureComputed(() =>
+    this.caption =
       this.protocol === ConversationProtocol.MIXED
         ? t('conversationProtocolUpdatedToMixed')
-        : t('conversationProtocolUpdatedToMLS'),
-    );
+        : t('conversationProtocolUpdatedToMLS');
   }
 }

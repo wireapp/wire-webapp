@@ -78,7 +78,10 @@ import {ACCESS_STATE} from './AccessState';
 import {extractClientDiff} from './ClientMismatchUtil';
 import {updateAccessRights} from './ConversationAccessPermission';
 import {ConversationEphemeralHandler} from './ConversationEphemeralHandler';
-import {processFederationDeleteEvent} from './ConversationFederationUtils';
+import {
+  getUsersToDeleteFromFederatedConversations,
+  getFederationDeleteEventUpdates,
+} from './ConversationFederationUtils';
 import {ConversationFilter} from './ConversationFilter';
 import {ConversationLabelRepository} from './ConversationLabelRepository';
 import {ConversationDatabaseData, ConversationMapper} from './ConversationMapper';
@@ -328,6 +331,10 @@ export class ConversationRepository {
     window.addEventListener<any>(WebAppEvents.CONVERSATION.JOIN, this.onConversationJoin);
   }
 
+  public initMLSConversationRecoveredListener() {
+    return this.conversationService.addMLSConversationRecoveredListener(this.onMLSConversationRecovered);
+  }
+
   private readonly onFederationEvent = async (event: FederationEvent) => {
     const {type} = event;
 
@@ -354,7 +361,7 @@ export class ConversationRepository {
    * @param deletedDomain the domain that stopped federating
    */
   private onFederationDelete = async (deletedDomain: string) => {
-    const {conversationsToDeleteUsers, conversationsToLeave, conversationsToDisable} = processFederationDeleteEvent(
+    const {conversationsToDeleteUsers, conversationsToLeave, conversationsToDisable} = getFederationDeleteEventUpdates(
       deletedDomain,
       this.conversationState.conversations(),
     );
@@ -391,49 +398,14 @@ export class ConversationRepository {
    * @param domains The domains that stopped federating with each other
    */
   private readonly onFederationConnectionRemove = async (domains: string[]) => {
-    const selfUser = this.userState.self();
-    const [domainOne, domainTwo] = domains;
     const allConversations = this.conversationState.conversations();
 
-    allConversations
-      .filter(conversation => conversation.domain === domainOne)
-      .forEach(async conversation => {
-        const usersToDelete = conversation.allUserEntities().filter(user => user.domain === domainTwo);
-        if (usersToDelete.length > 0) {
-          await this.removeDeletedFederationUsers(conversation, usersToDelete);
-          await this.insertFederationStopSystemMessage(conversation, [domainOne, domainTwo]);
-        }
-      });
+    const result = getUsersToDeleteFromFederatedConversations(domains, allConversations);
 
-    allConversations
-      .filter(conversation => conversation.domain === domainTwo)
-      .forEach(async conversation => {
-        const usersToDelete = conversation.allUserEntities().filter(user => user.domain === domainOne);
-        if (usersToDelete.length > 0) {
-          await this.removeDeletedFederationUsers(conversation, usersToDelete);
-          await this.insertFederationStopSystemMessage(conversation, [domainOne, domainTwo]);
-        }
-      });
-
-    allConversations
-      .filter(conversation => {
-        if (conversation.domain !== selfUser.qualifiedId.domain) {
-          return false;
-        }
-
-        const userDomains = new Set(conversation.allUserEntities().map(user => user.qualifiedId.domain));
-
-        return userDomains.has(domainOne) && userDomains.has(domainTwo);
-      })
-      .forEach(async conversation => {
-        const usersToDelete = conversation
-          .allUserEntities()
-          .filter(user => [domainOne, domainTwo].includes(user.domain));
-        if (usersToDelete.length > 0) {
-          await this.removeDeletedFederationUsers(conversation, usersToDelete);
-          await this.insertFederationStopSystemMessage(conversation, [domainOne, domainTwo]);
-        }
-      });
+    for (const {conversation, usersToRemove} of result) {
+      await this.removeDeletedFederationUsers(conversation, usersToRemove);
+      await this.insertFederationStopSystemMessage(conversation, domains);
+    }
   };
 
   private readonly removeDeletedFederationUsers = async (conversation: Conversation, usersToRemove: User[]) => {
@@ -1002,7 +974,7 @@ export class ConversationRepository {
    */
   private readonly onUnblockUser = async (user_et: User): Promise<void> => {
     const conversationEntity = await this.get1To1Conversation(user_et);
-    if (typeof conversationEntity !== 'boolean') {
+    if (conversationEntity) {
       conversationEntity.status(ConversationStatus.CURRENT_MEMBER);
     }
   };
@@ -1237,50 +1209,61 @@ export class ConversationRepository {
    * @param userEntity User entity for whom to get the conversation
    * @returns Resolves with the conversation with requested user
    */
-  async get1To1Conversation(userEntity: User): Promise<Conversation | false> {
-    const inCurrentTeam = userEntity.inTeam() && userEntity.teamId === this.userState.self().teamId;
+  async get1To1Conversation(userEntity: User): Promise<Conversation | null> {
+    const selfUser = this.userState.self();
+    const inCurrentTeam = userEntity.inTeam() && !!selfUser && userEntity.teamId === selfUser.teamId;
 
     if (inCurrentTeam) {
-      const matchingConversationEntity = this.conversationState.conversations().find(conversationEntity => {
-        if (!conversationEntity.is1to1()) {
-          // Disregard conversations that are not 1:1
-          return false;
-        }
-
-        const inTeam = ConversationFilter.isInTeam(conversationEntity, userEntity);
-        if (!inTeam) {
-          // Disregard conversations that are not in the team
-          return false;
-        }
-
-        const isActiveConversation = !conversationEntity.removed_from_conversation();
-        if (!isActiveConversation) {
-          // Disregard conversations that self is no longer part of
-          return false;
-        }
-
-        return ConversationFilter.is1To1WithUser(conversationEntity, userEntity);
-      });
-
-      if (matchingConversationEntity) {
-        return matchingConversationEntity;
-      }
-      return this.createGroupConversation([userEntity]);
+      return this.getOrCreateProteusTeam1to1Conversation(userEntity);
     }
 
     const conversationId = userEntity.connection().conversationId;
     try {
       const conversationEntity = await this.getConversationById(conversationId);
       conversationEntity.connection(userEntity.connection());
-      this.updateParticipatingUserEntities(conversationEntity);
+      await this.updateParticipatingUserEntities(conversationEntity);
       return conversationEntity;
     } catch (error) {
-      const isConversationNotFound = error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;
+      const isConversationNotFound =
+        error instanceof ConversationError && error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;
       if (!isConversationNotFound) {
         throw error;
       }
-      return false;
+      return null;
     }
+  }
+
+  /**
+   * Get or create a proteus team 1to1 conversation with a user. If a conversation does not exist, it will be created.
+   * @param userEntity User entity for whom to get the conversation
+   * @returns Resolves with the conversation with requested user
+   */
+  private async getOrCreateProteusTeam1to1Conversation(userEntity: User): Promise<Conversation> {
+    const matchingConversationEntity = this.conversationState.conversations().find(conversationEntity => {
+      if (!conversationEntity.is1to1()) {
+        // Disregard conversations that are not 1:1
+        return false;
+      }
+
+      const inTeam = ConversationFilter.isInTeam(conversationEntity, userEntity);
+      if (!inTeam) {
+        // Disregard conversations that are not in the team
+        return false;
+      }
+
+      const isActiveConversation = !conversationEntity.removed_from_conversation();
+      if (!isActiveConversation) {
+        // Disregard conversations that self is no longer part of
+        return false;
+      }
+
+      return ConversationFilter.is1To1WithUser(conversationEntity, userEntity);
+    });
+
+    if (matchingConversationEntity) {
+      return matchingConversationEntity;
+    }
+    return this.createGroupConversation([userEntity]);
   }
 
   /**
@@ -2341,7 +2324,16 @@ export class ConversationRepository {
             this.unarchiveConversation(conversationEntity, false, ConversationRepository.eventFromStreamMessage);
           }
           const isBackendTimestamp = eventSource !== EventSource.INJECTED;
-          if (type !== CONVERSATION_EVENT.MEMBER_JOIN && type !== CONVERSATION_EVENT.MEMBER_LEAVE) {
+
+          const eventsToSkip: (CLIENT_CONVERSATION_EVENT | CONVERSATION_EVENT)[] = [
+            CONVERSATION_EVENT.MEMBER_LEAVE,
+            CONVERSATION_EVENT.MEMBER_JOIN,
+            CONVERSATION_EVENT.DELETE,
+          ];
+
+          const shouldUpdateTimestampServer = !eventsToSkip.includes(type);
+
+          if (shouldUpdateTimestampServer) {
             conversationEntity.updateTimestampServer(eventJson.server_time || eventJson.time, isBackendTimestamp);
           }
         }
@@ -2567,6 +2559,7 @@ export class ConversationRepository {
       case ClientEvent.CONVERSATION.LOCATION:
       case ClientEvent.CONVERSATION.MISSED_MESSAGES:
       case ClientEvent.CONVERSATION.JOINED_AFTER_MLS_MIGRATION_FINALISATION:
+      case ClientEvent.CONVERSATION.MLS_CONVERSATION_RECOVERED:
       case ClientEvent.CONVERSATION.UNABLE_TO_DECRYPT:
       case ClientEvent.CONVERSATION.VERIFICATION:
       case ClientEvent.CONVERSATION.VOICE_CHANNEL_ACTIVATE:
@@ -2662,6 +2655,22 @@ export class ConversationRepository {
       currentTimestamp,
     );
     return void this.eventRepository.injectEvent(joinedAfterMLSMigrationFinalisationEvent);
+  };
+
+  /**
+   * Add "mls conversation recovered" system message to conversation.
+   */
+  private readonly onMLSConversationRecovered = (conversationId: QualifiedId): void => {
+    const conversation = this.conversationState.findConversation(conversationId);
+
+    if (!conversation) {
+      return;
+    }
+    const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
+
+    const event = EventBuilder.buildMLSConversationRecovered(conversation, currentTimestamp);
+
+    void this.eventRepository.injectEvent(event);
   };
 
   private on1to1Creation(conversationEntity: Conversation, eventJson: OneToOneCreationEvent) {
@@ -2847,9 +2856,9 @@ export class ConversationRepository {
       throw new Error(`groupId not found for MLS conversation ${conversation.id}`);
     }
 
-    const isMLSConversationEstablished = await this.conversationService.isMLSConversationEstablished(groupId);
+    const doesMLSGroupExistLocally = await this.conversationService.mlsGroupExistsLocally(groupId);
 
-    if (!isMLSConversationEstablished) {
+    if (!doesMLSGroupExistLocally) {
       return;
     }
 

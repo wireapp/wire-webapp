@@ -73,6 +73,16 @@ export class ConversationService {
     this.logger = getLogger('ConversationService');
   }
 
+  private get coreConversationService() {
+    const conversationService = this.core.service?.conversation;
+
+    if (!conversationService) {
+      throw new Error('Conversation service not available');
+    }
+
+    return conversationService;
+  }
+
   //##############################################################################
   // Get conversations
   //##############################################################################
@@ -427,11 +437,15 @@ export class ConversationService {
     await this.core.service!.conversation.wipeMLSConversation(groupId);
   }
 
+  public addMLSConversationRecoveredListener(onRecovered: (conversationId: QualifiedId) => void) {
+    this.coreConversationService.on('MLSConversationRecovered', ({conversationId}) => onRecovered(conversationId));
+  }
+
   /**
-   * Checks if MLS conversation is established.
+   * Checks if MLS conversation exists locally.
    * @param groupId id of the MLS group
    */
-  async isMLSConversationEstablished(groupId: string): Promise<boolean> {
-    return this.core.service!.conversation.isMLSConversationEstablished(groupId);
+  async mlsGroupExistsLocally(groupId: string): Promise<boolean> {
+    return this.coreConversationService.mlsGroupExistsLocally(groupId);
   }
 }

@@ -251,7 +251,13 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
     );
   }
   if (message.isPing()) {
-    return <PingMessage message={message} />;
+    return (
+      <PingMessage
+        message={message}
+        is1to1Conversation={conversation.is1to1()}
+        isLastDeliveredMessage={isLastDeliveredMessage}
+      />
+    );
   }
   if (message.isFileTypeRestricted()) {
     return <FileTypeRestrictedMessage message={message} />;

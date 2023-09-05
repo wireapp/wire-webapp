@@ -60,10 +60,10 @@ export async function initMLSConversations(
     mlsConversations.map(async mlsConversation => {
       const {groupId, qualifiedId} = mlsConversation;
 
-      const isEstablished = await conversationService.isMLSConversationEstablished(groupId);
+      const doesMLSGroupExist = await conversationService.mlsGroupExistsLocally(groupId);
 
       //if group is already established, we just schedule periodic key material updates
-      if (isEstablished) {
+      if (doesMLSGroupExist) {
         return mlsService.scheduleKeyMaterialRenewal(groupId);
       }
 

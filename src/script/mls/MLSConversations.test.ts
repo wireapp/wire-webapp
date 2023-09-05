@@ -51,7 +51,7 @@ describe('MLSConversations', () => {
 
       const mlsConversations = createMLSConversations(nbMLSConversations);
 
-      jest.spyOn(core.service!.conversation, 'isMLSConversationEstablished').mockResolvedValue(false);
+      jest.spyOn(core.service!.conversation, 'mlsGroupExistsLocally').mockResolvedValue(false);
       jest.spyOn(core.service!.conversation, 'joinByExternalCommit');
 
       await initMLSConversations(mlsConversations, core);
@@ -68,7 +68,7 @@ describe('MLSConversations', () => {
 
     const mlsConversations = createMLSConversations(nbMLSConversations);
 
-    jest.spyOn(core.service!.conversation!, 'isMLSConversationEstablished').mockResolvedValue(true);
+    jest.spyOn(core.service!.conversation!, 'mlsGroupExistsLocally').mockResolvedValue(true);
     jest.spyOn(core.service!.mls!, 'scheduleKeyMaterialRenewal');
 
     await initMLSConversations(mlsConversations, core);
@@ -86,6 +86,8 @@ describe('MLSConversations', () => {
       const selfConversation = createMLSConversation(CONVERSATION_TYPE.SELF);
 
       const teamConversation = createMLSConversation(CONVERSATION_TYPE.GLOBAL_TEAM);
+      jest.spyOn(core.service!.conversation!, 'mlsGroupExistsLocally').mockResolvedValue(true);
+      jest.spyOn(core.service!.mls!, 'scheduleKeyMaterialRenewal');
 
       const mlsConversations = createMLSConversations(nbMLSConversations);
       const conversations = [teamConversation, ...mlsConversations, selfConversation];

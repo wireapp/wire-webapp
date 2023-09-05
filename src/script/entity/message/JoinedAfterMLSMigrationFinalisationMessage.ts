@@ -17,8 +17,6 @@
  *
  */
 
-import ko from 'knockout';
-
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
 import {t} from 'Util/LocalizerUtil';
 
@@ -28,6 +26,6 @@ export class JoinedAfterMLSMigrationFinalisationMessage extends SystemMessage {
   constructor() {
     super();
     this.system_message_type = SystemMessageType.JOINED_AFTER_MLS_MIGRATION_FINALISATION;
-    this.caption = ko.pureComputed(() => t('conversationJoinedAfterMLSMigrationFinalisation'));
+    this.caption = t('conversationJoinedAfterMLSMigrationFinalisation');
   }
 }
