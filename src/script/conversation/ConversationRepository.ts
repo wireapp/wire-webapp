@@ -1373,12 +1373,12 @@ export class ConversationRepository {
    * @note If there is no conversation it will request it from the backend
    *
    * @param connectionEntity Connection entity
-   * @param wasTrigerredByWebsocketEvent Whether the connection was mapped due to a websocket event
+   * @param source Event source that has triggered the mapping
    * @returns Resolves when connection was mapped return value
    */
   private readonly mapConnection = async (
     connectionEntity: ConnectionEntity,
-    source = EventSource,
+    source?: EventSource,
   ): Promise<Conversation | undefined> => {
     try {
       const conversation = await this.getConnectionConversation(connectionEntity);
