@@ -1371,6 +1371,9 @@ export class ConversationRepository {
    * Maps user connection to the corresponding conversation.
    *
    * @note If there is no conversation it will request it from the backend
+   *
+   * @param connectionEntity Connection entity
+   * @param wasTrigerredByWebsocketEvent Whether the connection was mapped due to a websocket event
    * @returns Resolves when connection was mapped return value
    */
   private readonly mapConnection = async (
