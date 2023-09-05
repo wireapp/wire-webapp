@@ -72,7 +72,7 @@ export const ParticipantItemContent = ({
               label={name}
             />
           ) : (
-            <AutoscrollingContainer css={userName} data-uie-name="status-name">
+            <AutoscrollingContainer css={[userName, ellipsis]} data-uie-name="status-name">
               {name}
             </AutoscrollingContainer>
           )}
