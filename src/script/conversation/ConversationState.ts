@@ -217,13 +217,18 @@ export class ConversationState {
           return false;
         }
 
+        const connection = conversation.connection();
+        if (connection.userId) {
+          return matchQualifiedIds(connection.userId, userId);
+        }
+
         if (!conversation.is1to1()) {
           return false;
         }
 
         const conversationMembersIds = conversation.participating_user_ids();
         const otherUserQualifiedId = conversationMembersIds.length === 1 ? conversationMembersIds[0] : null;
-        const doesUserIdMatch = !!otherUserQualifiedId && otherUserQualifiedId.id === userId.id;
+        const doesUserIdMatch = !!otherUserQualifiedId && matchQualifiedIds(otherUserQualifiedId, userId);
 
         return doesUserIdMatch;
       },
