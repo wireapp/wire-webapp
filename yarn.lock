@@ -1097,6 +1097,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babel/plugin-transform-modules-commonjs@npm:^7.22.15":
+  version: 7.22.15
+  resolution: "@babel/plugin-transform-modules-commonjs@npm:7.22.15"
+  dependencies:
+    "@babel/helper-module-transforms": ^7.22.15
+    "@babel/helper-plugin-utils": ^7.22.5
+    "@babel/helper-simple-access": ^7.22.5
+  peerDependencies:
+    "@babel/core": ^7.0.0-0
+  checksum: f8fc85fefa6be8626a378ca38fb84c7359043e7c692c854e9ee250a05121553b7f4a58e127099efe12662ec6bebbfd304ce638a0b4563d7cbd5982f3d877321c
+  languageName: node
+  linkType: hard
+
 "@babel/plugin-transform-modules-systemjs@npm:^7.22.11":
   version: 7.22.11
   resolution: "@babel/plugin-transform-modules-systemjs@npm:7.22.11"
@@ -1413,17 +1426,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/plugin-transform-typescript@npm:^7.22.11":
-  version: 7.22.11
-  resolution: "@babel/plugin-transform-typescript@npm:7.22.11"
+"@babel/plugin-transform-typescript@npm:^7.22.15":
+  version: 7.22.15
+  resolution: "@babel/plugin-transform-typescript@npm:7.22.15"
   dependencies:
     "@babel/helper-annotate-as-pure": ^7.22.5
-    "@babel/helper-create-class-features-plugin": ^7.22.11
+    "@babel/helper-create-class-features-plugin": ^7.22.15
     "@babel/helper-plugin-utils": ^7.22.5
     "@babel/plugin-syntax-typescript": ^7.22.5
   peerDependencies:
     "@babel/core": ^7.0.0-0
-  checksum: a0dc3c2427b55602944705c9a91b4c074524badd5ea87edb603ddeabe7fae531bcbe68475106d7a00079b67bb422dbf2e9f50e15c25ac24d7e9fe77f37ebcfb4
+  checksum: c5d96cdbf0e1512707aa1c1e3ac6b370a25fd9c545d26008ce44eb13a47bd7fd67a1eb799c98b5ccc82e33a345fda55c0055e1fe3ed97646ed405dd13020b226
   languageName: node
   linkType: hard
 
@@ -1593,18 +1606,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/preset-typescript@npm:7.22.11":
-  version: 7.22.11
-  resolution: "@babel/preset-typescript@npm:7.22.11"
+"@babel/preset-typescript@npm:7.22.15":
+  version: 7.22.15
+  resolution: "@babel/preset-typescript@npm:7.22.15"
   dependencies:
     "@babel/helper-plugin-utils": ^7.22.5
-    "@babel/helper-validator-option": ^7.22.5
+    "@babel/helper-validator-option": ^7.22.15
     "@babel/plugin-syntax-jsx": ^7.22.5
-    "@babel/plugin-transform-modules-commonjs": ^7.22.11
-    "@babel/plugin-transform-typescript": ^7.22.11
+    "@babel/plugin-transform-modules-commonjs": ^7.22.15
+    "@babel/plugin-transform-typescript": ^7.22.15
   peerDependencies:
     "@babel/core": ^7.0.0-0
-  checksum: 8ae7162c31db896f5eeecd6f67ab2e58555fdc06fe84e95fe4a3f60b64cd6f782d2d7dfbde0c0eac04b55dac18222752d91dd8786245cccedd7e42f080e07233
+  checksum: 02ac4d5c812a52357c8f517f81584725f06f385d54ccfda89dd082e0ed89a94bd9f4d9b05fa1cbdcf426e3489c1921f04c93c5acc5deea83407a64c22ad2feb4
   languageName: node
   linkType: hard
 
@@ -18072,7 +18085,7 @@ __metadata:
     "@babel/plugin-proposal-decorators": 7.22.15
     "@babel/preset-env": 7.22.14
     "@babel/preset-react": 7.22.15
-    "@babel/preset-typescript": 7.22.11
+    "@babel/preset-typescript": 7.22.15
     "@datadog/browser-logs": ^4.48.1
     "@datadog/browser-rum": ^4.48.1
     "@emotion/eslint-plugin": ^11.11.0
