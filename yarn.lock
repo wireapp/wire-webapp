@@ -4342,10 +4342,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/caniuse-lite@npm:^1.0.1":
-  version: 1.0.1
-  resolution: "@types/caniuse-lite@npm:1.0.1"
-  checksum: a74b02e254cf0c17da98a0fc7f8f3fb6e23d83a86bf683117a645aa9ecc02f8040e437df968cafcaf91dd438f09581e41c6835018cbcecef3c089a132a8b725b
+"@types/caniuse-lite@npm:^1.0.2":
+  version: 1.0.2
+  resolution: "@types/caniuse-lite@npm:1.0.2"
+  checksum: 5172ed4f58e700dbb9e95f76100ef0031a987275e3ef30349a365f87cb2ca52ab46f431236599304aec8bf5d5912544cf4835a3d80a3abd66d8116057fb3c73c
   languageName: node
   linkType: hard
 
@@ -6742,10 +6742,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"caniuse-lite@npm:^1.0.30001525":
-  version: 1.0.30001525
-  resolution: "caniuse-lite@npm:1.0.30001525"
-  checksum: a0d190c185b8e1220dbc72e42f310633059aa175ca3396eb781b249ac3da6c62b30cb8efc5fa24d632cb938f58d90b0c7772d1c9942b6643cf418c27c2cb8632
+"caniuse-lite@npm:^1.0.30001527":
+  version: 1.0.30001527
+  resolution: "caniuse-lite@npm:1.0.30001527"
+  checksum: 7ad99d78d1a30d494471c8a9ead3fc40a816ee61b16fef330bba5bdae5d7ebaa965becc8cd09c7aa6240125ce790a5213a40cd240ceaa211508744ed86b79783
   languageName: node
   linkType: hard
 
@@ -18314,7 +18314,7 @@ __metadata:
     "@koush/wrtc": 0.5.3
     "@testing-library/react": 14.0.0
     "@types/adm-zip": 0.5.0
-    "@types/caniuse-lite": ^1.0.1
+    "@types/caniuse-lite": ^1.0.2
     "@types/dexie-batch": 0.4.3
     "@types/eslint": ^8
     "@types/fs-extra": 11.0.1
@@ -18358,7 +18358,7 @@ __metadata:
     babel-loader: 9.1.3
     babel-plugin-transform-import-meta: ^2.2.1
     beautiful-react-hooks: ^5.0.0
-    caniuse-lite: ^1.0.30001525
+    caniuse-lite: ^1.0.30001527
     classnames: 2.3.2
     copy-webpack-plugin: 11.0.0
     core-js: 3.32.1
