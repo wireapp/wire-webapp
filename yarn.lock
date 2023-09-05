@@ -190,7 +190,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/helper-create-class-features-plugin@npm:^7.22.10, @babel/helper-create-class-features-plugin@npm:^7.22.11, @babel/helper-create-class-features-plugin@npm:^7.22.5":
+"@babel/helper-create-class-features-plugin@npm:^7.22.11, @babel/helper-create-class-features-plugin@npm:^7.22.5":
   version: 7.22.11
   resolution: "@babel/helper-create-class-features-plugin@npm:7.22.11"
   dependencies:
@@ -206,6 +206,25 @@ __metadata:
   peerDependencies:
     "@babel/core": ^7.0.0
   checksum: b7aeb22e29aba5327616328576363522b3b186918faeda605e300822af4a5f29416eb34b5bd825d07ab496550e271d02d7634f0022a62b5b8cbf0eb6389bc3fa
+  languageName: node
+  linkType: hard
+
+"@babel/helper-create-class-features-plugin@npm:^7.22.15":
+  version: 7.22.15
+  resolution: "@babel/helper-create-class-features-plugin@npm:7.22.15"
+  dependencies:
+    "@babel/helper-annotate-as-pure": ^7.22.5
+    "@babel/helper-environment-visitor": ^7.22.5
+    "@babel/helper-function-name": ^7.22.5
+    "@babel/helper-member-expression-to-functions": ^7.22.15
+    "@babel/helper-optimise-call-expression": ^7.22.5
+    "@babel/helper-replace-supers": ^7.22.9
+    "@babel/helper-skip-transparent-expression-wrappers": ^7.22.5
+    "@babel/helper-split-export-declaration": ^7.22.6
+    semver: ^6.3.1
+  peerDependencies:
+    "@babel/core": ^7.0.0
+  checksum: 52c500d8d164abb3a360b1b7c4b8fff77bc4a5920d3a2b41ae6e1d30617b0dc0b972c1f5db35b1752007e04a748908b4a99bc872b73549ae837e87dcdde005a3
   languageName: node
   linkType: hard
 
@@ -260,6 +279,15 @@ __metadata:
   dependencies:
     "@babel/types": ^7.22.5
   checksum: 394ca191b4ac908a76e7c50ab52102669efe3a1c277033e49467913c7ed6f7c64d7eacbeabf3bed39ea1f41731e22993f763b1edce0f74ff8563fd1f380d92cc
+  languageName: node
+  linkType: hard
+
+"@babel/helper-member-expression-to-functions@npm:^7.22.15":
+  version: 7.22.15
+  resolution: "@babel/helper-member-expression-to-functions@npm:7.22.15"
+  dependencies:
+    "@babel/types": ^7.22.15
+  checksum: c7c5d01c402dd8902c2ec3093f203ed0fc3bc5f669328a084d2e663c4c06dd0415480ee8220c6f96ba9b2dc49545c0078f221fc3900ab1e65de69a12fe7b361f
   languageName: node
   linkType: hard
 
@@ -521,18 +549,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/plugin-proposal-decorators@npm:7.22.10":
-  version: 7.22.10
-  resolution: "@babel/plugin-proposal-decorators@npm:7.22.10"
+"@babel/plugin-proposal-decorators@npm:7.22.15":
+  version: 7.22.15
+  resolution: "@babel/plugin-proposal-decorators@npm:7.22.15"
   dependencies:
-    "@babel/helper-create-class-features-plugin": ^7.22.10
+    "@babel/helper-create-class-features-plugin": ^7.22.15
     "@babel/helper-plugin-utils": ^7.22.5
     "@babel/helper-replace-supers": ^7.22.9
     "@babel/helper-split-export-declaration": ^7.22.6
     "@babel/plugin-syntax-decorators": ^7.22.10
   peerDependencies:
     "@babel/core": ^7.0.0-0
-  checksum: dc5d220f94d3d02a4a68d2e29abc038fe1731634569279956438ba4476e930dab76eac71524be89c9f199731f730e7d2537f947acbefaf29a51130a0e714ecbd
+  checksum: bbe8ebf46fa21035db88b751bc4b7becaf3ac87ad2f8d82838794b7396d4c9b198a3906f2409ea063c08834292a15b048cfaf38dea609939840dc53f32ac0e47
   languageName: node
   linkType: hard
 
@@ -18041,7 +18069,7 @@ __metadata:
   dependencies:
     "@babel/core": 7.22.15
     "@babel/eslint-parser": 7.22.15
-    "@babel/plugin-proposal-decorators": 7.22.10
+    "@babel/plugin-proposal-decorators": 7.22.15
     "@babel/preset-env": 7.22.14
     "@babel/preset-react": 7.22.15
     "@babel/preset-typescript": 7.22.11
