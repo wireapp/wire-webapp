@@ -27,6 +27,7 @@ import {Availability} from '@wireapp/protocol-messaging';
 import {CSS_SQUARE} from 'Util/CSSMixin';
 import {KEY} from 'Util/KeyboardUtil';
 
+import {AutoscrollingContainer} from './AutoscrollingContainer';
 import {Icon} from './Icon';
 
 export interface AvailabilityStateProps {
@@ -115,14 +116,14 @@ const AvailabilityState: React.FC<AvailabilityStateProps> = ({
       )}
 
       {label && (
-        <span
+        <AutoscrollingContainer
           className={cx('availability-state-label', {'availability-state-label--active': theme})}
           css={{userSelect: 'none'}}
           data-uie-name="status-label"
           title={title || label}
         >
           {label}
-        </span>
+        </AutoscrollingContainer>
       )}
 
       {showArrow && (

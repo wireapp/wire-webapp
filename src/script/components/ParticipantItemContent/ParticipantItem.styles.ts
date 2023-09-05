@@ -140,7 +140,6 @@ export const nameWrapper: CSSObject = {
 };
 
 export const userAvailability: CSSObject = {
-  '.availability-state-label': ellipsis,
   '.availability-state-icon': {
     display: 'flex',
   },

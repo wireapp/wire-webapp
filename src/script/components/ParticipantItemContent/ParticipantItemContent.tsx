@@ -21,6 +21,7 @@ import React from 'react';
 
 import {Availability} from '@wireapp/protocol-messaging';
 
+import {AutoscrollingContainer} from 'Components/AutoscrollingContainer';
 import {AvailabilityState} from 'Components/AvailabilityState';
 import {Icon} from 'Components/Icon';
 
@@ -66,14 +67,14 @@ export const ParticipantItemContent = ({
           {showAvailabilityState && selfInTeam ? (
             <AvailabilityState
               availability={availability}
-              css={[userName, userAvailability, ellipsis]}
+              css={[userName, userAvailability]}
               dataUieName="status-name"
               label={name}
             />
           ) : (
-            <div css={[userName, ellipsis]} data-uie-name="status-name">
+            <AutoscrollingContainer css={userName} data-uie-name="status-name">
               {name}
-            </div>
+            </AutoscrollingContainer>
           )}
 
           {selfString && <div css={selfIndicator}>{selfString}</div>}
