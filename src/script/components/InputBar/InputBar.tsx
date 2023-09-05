@@ -174,7 +174,7 @@ export const InputBar = ({
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
   const isScaledDown = useMatchMedia('max-width: 768px');
 
-  const showGiphyButton = messageContent.text.length > 0 && messageContent.text.length <= config.GIPHY_TEXT_LENGTH;
+  const showGiphyButton = textValue.length > 0 && textValue.length <= config.GIPHY_TEXT_LENGTH;
 
   const shouldReplaceEmoji = useUserPropertyValue(
     () => propertiesRepository.getPreference(PROPERTIES_TYPE.EMOJI.REPLACE_INLINE),
@@ -189,7 +189,7 @@ export const InputBar = ({
 
   useTypingIndicator({
     isEnabled: isTypingIndicatorEnabled,
-    text: messageContent.text,
+    text: textValue,
     onTypingChange: useCallback(
       isTyping => {
         if (isTyping) {
