@@ -26,9 +26,8 @@ import {
   USER_EVENT,
 } from '@wireapp/api-client/lib/event';
 import type {BackendError, TraceState} from '@wireapp/api-client/lib/http';
-import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {ConsentType, Self as APIClientSelf} from '@wireapp/api-client/lib/self/';
-import type {QualifiedHandle, User as APIClientUser} from '@wireapp/api-client/lib/user';
+import type {User as APIClientUser} from '@wireapp/api-client/lib/user';
 import {
   QualifiedId,
   UserAsset as APIClientUserAsset,
@@ -49,7 +48,7 @@ import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {fixWebsocketString} from 'Util/StringUtil';
-import {isAxiosError, isBackendError} from 'Util/TypePredicateUtil';
+import {isAxiosError} from 'Util/TypePredicateUtil';
 
 import {valueFromType} from './AvailabilityMapper';
 import {showAvailabilityModal} from './AvailabilityModal';
@@ -320,22 +319,6 @@ export class UserRepository {
       amplify.publish(WebAppEvents.TEAM.UPDATE_INFO);
     }
     return userEntity;
-  }
-
-  /**
-   * Update users matching the given connections.
-   */
-  async updateUsersFromConnections(connectionEntities: ConnectionEntity[]): Promise<User[]> {
-    // TODO(Federation): Include domain as soon as connections to federated backends are supported.
-    const userIds = connectionEntities.map(connectionEntity => connectionEntity.userId);
-
-    const userEntities = await this.getUsersById(userIds);
-
-    userEntities.forEach(userEntity => {
-      const connectionEntity = connectionEntities.find(({userId}) => matchQualifiedIds(userId, userEntity));
-      userEntity.connection(connectionEntity);
-    });
-    return this.assignAllClients();
   }
 
   /**
@@ -670,21 +653,6 @@ export class UserRepository {
     }
   }
 
-  async getUserByHandle(fqn: QualifiedHandle): Promise<undefined | APIClientUser> {
-    try {
-      return await this.userService.getUserByFQN(fqn);
-    } catch (error) {
-      // When we search for a non-existent handle, the backend will return a HTTP 404, which tells us that there is no user with that handle.
-      if (
-        !isBackendError(error) ||
-        (error.code !== HTTP_STATUS.NOT_FOUND && error.label !== BackendErrorLabel.FEDERATION_NOT_ALLOWED)
-      ) {
-        throw error;
-      }
-    }
-    return undefined;
-  }
-
   /**
    * Check for users locally and fetch them from the server otherwise.
    */
@@ -751,28 +719,12 @@ export class UserRepository {
   }
 
   /**
-   * Refresh all known users (in local state) from the backend.
-   */
-  async refreshAllKnownUsers() {
-    const userIds = this.userState.users().map(user => user.qualifiedId);
-    return this.refreshUsers(userIds);
-  }
-
-  /**
    * Will update user entity with provided list of supportedProtocols.
    * @param userId - id of the user to update
    * @param supportedProtocols - an array of new supported protocols
    */
   async updateUserSupportedProtocols(userId: QualifiedId, supportedProtocols: ConversationProtocol[]): Promise<User> {
     return this.updateUser(userId, {supported_protocols: supportedProtocols});
-  }
-
-  getSelfSupportedProtocols(): ConversationProtocol[] | null {
-    return this.userState.self().supportedProtocols();
-  }
-
-  public async getAllSelfClients() {
-    return this.clientRepository.getAllSelfClients();
   }
 
   /**
