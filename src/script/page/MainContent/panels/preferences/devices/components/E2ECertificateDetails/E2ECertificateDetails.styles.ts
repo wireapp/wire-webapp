@@ -22,6 +22,7 @@ import {CSSObject} from '@emotion/serialize';
 import {MLSStatues} from 'Components/Badges';
 
 const MLSStatusColor = {
+  [MLSStatues.VALID]: 'var(--green-500)',
   [MLSStatues.NOT_ACTIVATED]: 'var(--red-500)',
   [MLSStatues.EXPIRED]: 'var(--red-500)',
   [MLSStatues.EXPIRES_SOON]: 'var(--green-500)',
@@ -51,6 +52,7 @@ export const styles: stylesProps = {
   e2eStatusContainer: {
     display: 'flex',
     alignItems: 'center',
+    marginBottom: '6px',
 
     '.conversation-badges': {
       marginLeft: '4px',

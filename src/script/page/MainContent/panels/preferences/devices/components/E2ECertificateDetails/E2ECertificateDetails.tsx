@@ -17,32 +17,33 @@
  *
  */
 
-import {Fragment} from 'react';
+import {container} from 'tsyringe';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {Badges, MLSStatues} from 'Components/Badges';
+import {Core} from 'src/script/service/CoreSingleton';
 import {t} from 'Util/LocalizerUtil';
 
 import {styles} from './E2ECertificateDetails.styles';
 
-const TMP_SERIAL_NUMBER = 'e5:d5:e6:75:7e:04:86:07:14:3c:a0:ed:9a:8d:e4:fd';
-
-const formattedSerialNumber = (serialNumber: string) => {
-  const splittedSerialNumber = serialNumber.split(':');
-
-  return splittedSerialNumber.map((slice, index) => {
-    const breakLine = splittedSerialNumber.length;
-
-    return (
-      <Fragment key={slice + index}>
-        {index > 0 ? <span css={styles.delimiter(breakLine)}>:</span> : null}
-
-        <span className="serial-number-part">{slice}</span>
-      </Fragment>
-    );
-  });
-};
+/* For now, we don't display Serial Number */
+// const TMP_SERIAL_NUMBER = 'e5:d5:e6:75:7e:04:86:07:14:3c:a0:ed:9a:8d:e4:fd';
+// const formattedSerialNumber = (serialNumber: string) => {
+//   const splittedSerialNumber = serialNumber.split(':');
+//
+//   return splittedSerialNumber.map((slice, index) => {
+//     const breakLine = splittedSerialNumber.length;
+//
+//     return (
+//       <Fragment key={slice + index}>
+//         {index > 0 ? <span css={styles.delimiter(breakLine)}>:</span> : null}
+//
+//         <span className="serial-number-part">{slice}</span>
+//       </Fragment>
+//     );
+//   });
+// };
 
 interface E2ECertificateDetailsProps {
   MLSStatus?: MLSStatues;
@@ -50,6 +51,15 @@ interface E2ECertificateDetailsProps {
 }
 
 export const E2ECertificateDetails = ({MLSStatus, isMLSVerified}: E2ECertificateDetailsProps) => {
+  const core = container.resolve(Core);
+  const hasActiveCertificateData = core.service?.e2eIdentity?.hasActiveCertificate();
+
+  if (!hasActiveCertificateData) {
+    return null;
+  }
+
+  // const certificateData = core.service?.e2eIdentity?.getCertificateData();
+
   const isExpired = MLSStatus === MLSStatues.EXPIRED;
   const isNotDownloaded = MLSStatus === MLSStatues.NOT_DOWNLOADED;
   const isExpiresSoon = MLSStatus === MLSStatues.EXPIRES_SOON;
@@ -83,26 +93,29 @@ export const E2ECertificateDetails = ({MLSStatus, isMLSVerified}: E2ECertificate
       >
         <p className="label-1">
           <span>{t('E2E.status')}</span>
-          <strong css={styles.e2eStatus(MLSStatus)}>{isValid ? t('E2E.valid') : t(`E2E.${MLSStatus}`)}</strong>
+          <strong css={styles.e2eStatus(isValid ? MLSStatues.VALID : MLSStatus)}>
+            {isValid ? t('E2E.valid') : t(`E2E.${MLSStatus}`)}
+          </strong>
         </p>
 
         <Badges isMLSVerified={isMLSVerified} MLSStatus={MLSStatus} />
       </div>
 
-      <p css={styles.serialNumberWrapper}>
-        <span className="label-1">{t('E2E.serialNumber')}</span>
+      {/* For now, we don't display Serial Number */}
+      {/*<p css={styles.serialNumberWrapper}>*/}
+      {/*  <span className="label-1">{t('E2E.serialNumber')}</span>*/}
 
-        {MLSStatus === MLSStatues.NOT_ACTIVATED ? (
-          <span className="label-1" css={styles.notAvailable}>
-            {t('E2E.notAvailable')}
-          </span>
-        ) : (
-          <>
-            {/*<div css={styles.serialNumber}>e5:d5:e6:75:7e:04:86:07:14:3c:a0:ed:9a:8d:e4:fd</div>*/}
-            <p css={styles.serialNumber}>{formattedSerialNumber(TMP_SERIAL_NUMBER)}</p>
-          </>
-        )}
-      </p>
+      {/*  {MLSStatus === MLSStatues.NOT_ACTIVATED ? (*/}
+      {/*    <span className="label-1" css={styles.notAvailable}>*/}
+      {/*      {t('E2E.notAvailable')}*/}
+      {/*    </span>*/}
+      {/*  ) : (*/}
+      {/*    <>*/}
+      {/*      /!*<div css={styles.serialNumber}>e5:d5:e6:75:7e:04:86:07:14:3c:a0:ed:9a:8d:e4:fd</div>*!/*/}
+      {/*      <p css={styles.serialNumber}>{formattedSerialNumber(TMP_SERIAL_NUMBER)}</p>*/}
+      {/*    </>*/}
+      {/*  )}*/}
+      {/*</p>*/}
 
       <div>
         {!isNotActivated && (

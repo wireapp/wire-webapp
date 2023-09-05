@@ -35,6 +35,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@auth0/auth0-spa-js@npm:^1.6.2":
+  version: 1.22.6
+  resolution: "@auth0/auth0-spa-js@npm:1.22.6"
+  dependencies:
+    abortcontroller-polyfill: ^1.7.3
+    browser-tabs-lock: ^1.2.15
+    core-js: ^3.25.4
+    es-cookie: ~1.3.2
+    fast-text-encoding: ^1.0.6
+    promise-polyfill: ^8.2.3
+    unfetch: ^4.2.0
+  checksum: 0155025b82898bd0533db373d7c8b85938fbae097c6fdf732a315ddee67d84a32c32a3b944465aec0600adb11d6d32e53eabbfc2ea04e6b5c90f92f72607bc30
+  languageName: node
+  linkType: hard
+
 "@babel/code-frame@npm:^7.0.0, @babel/code-frame@npm:^7.10.4, @babel/code-frame@npm:^7.12.13, @babel/code-frame@npm:^7.22.10, @babel/code-frame@npm:^7.22.5":
   version: 7.22.10
   resolution: "@babel/code-frame@npm:7.22.10"
@@ -4905,25 +4920,26 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core-crypto@npm:1.0.0-rc.6":
-  version: 1.0.0-rc.6
-  resolution: "@wireapp/core-crypto@npm:1.0.0-rc.6"
-  checksum: 1ae7a609f265eb3b9d5e90bec15778462f334dfa918d9a3b5bce000f15ae1f0eafbd3e7231794a4381bf5ef93fbc8667661fc6d9a78e123b9a78227edd98492f
+"@wireapp/core-crypto@npm:1.0.0-rc.12":
+  version: 1.0.0-rc.12
+  resolution: "@wireapp/core-crypto@npm:1.0.0-rc.12"
+  checksum: 55673f2cdeceb8da5bc3648c9b60b58cbf77268de6f8dd7a82cc78f4146233048dfce0e8336208fe69b67c7bf605520732299db8611e68fbdd43efee75de1e27
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:41.2.2":
-  version: 41.2.2
-  resolution: "@wireapp/core@npm:41.2.2"
+"@wireapp/core@file:.yalc/@wireapp/core::locator=wire-webapp%40workspace%3A.":
+  version: 41.3.0
+  resolution: "@wireapp/core@file:.yalc/@wireapp/core#.yalc/@wireapp/core::hash=79f9b4&locator=wire-webapp%40workspace%3A."
   dependencies:
     "@wireapp/api-client": ^25.2.2
     "@wireapp/commons": ^5.1.0
-    "@wireapp/core-crypto": 1.0.0-rc.6
+    "@wireapp/core-crypto": 1.0.0-rc.12
     "@wireapp/cryptobox": 12.8.0
     "@wireapp/promise-queue": ^2.2.1
     "@wireapp/protocol-messaging": 1.44.0
     "@wireapp/store-engine": 5.1.1
     "@wireapp/store-engine-dexie": ^2.1.3
+    auth0-spa-js: ^1.6.5
     axios: 1.4.0
     bazinga64: 6.1.2
     deepmerge-ts: 5.1.0
@@ -4933,7 +4949,8 @@ __metadata:
     logdown: 3.3.1
     long: ^5.2.0
     uuidjs: 4.2.13
-  checksum: 62f88d3a0de74bc14a85f2a0f6c96a328f97c6fdaf0ff4972addcc7626b81cf121946c2c284a62e0a6835f46fad0f9db52cbdbcc36b9dc5e22937494a33dab5b
+    zod: 3.21.4
+  checksum: c8e0a233e575a555e6c583de0ea6992227dac0bf729ba2ce1ac7b4bc163eccac2d36057beabd4bab44860cafa846f258e0b1f6dced9867e3e956e9094d5bc954
   languageName: node
   linkType: hard
 
@@ -5152,6 +5169,13 @@ __metadata:
   version: 1.1.1
   resolution: "abbrev@npm:1.1.1"
   checksum: a4a97ec07d7ea112c517036882b2ac22f3109b7b19077dc656316d07d308438aac28e4d9746dc4d84bf6b1e75b4a7b0a5f3cb30592419f128ca9a8cee3bcfa17
+  languageName: node
+  linkType: hard
+
+"abortcontroller-polyfill@npm:^1.7.3":
+  version: 1.7.5
+  resolution: "abortcontroller-polyfill@npm:1.7.5"
+  checksum: daf4169f4228ae0e4f4dbcfa782e501b923667f2666b7c55bd3b7664e5d6b100e333a93371173985fdf21f65d7dfba15bdb2e6031bdc9e57e4ce0297147da3aa
   languageName: node
   linkType: hard
 
@@ -5777,6 +5801,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"auth0-spa-js@npm:^1.6.5":
+  version: 1.6.5
+  resolution: "auth0-spa-js@npm:1.6.5"
+  dependencies:
+    "@auth0/auth0-spa-js": ^1.6.2
+  checksum: daec7a9f2afc1eb24adc0f1173805087e5526508a89e751d37cd8b395374cf7b2806e833a6bce8748a6cb169676692a70d0861e33fe105f0f7511fe77e5b8a21
+  languageName: node
+  linkType: hard
+
 "autoprefixer@npm:^10.4.14, autoprefixer@npm:^10.4.15":
   version: 10.4.15
   resolution: "autoprefixer@npm:10.4.15"
@@ -6142,6 +6175,15 @@ __metadata:
   dependencies:
     fill-range: ^7.0.1
   checksum: e2a8e769a863f3d4ee887b5fe21f63193a891c68b612ddb4b68d82d1b5f3ff9073af066c343e9867a393fe4c2555dcb33e89b937195feb9c1613d259edfcd459
+  languageName: node
+  linkType: hard
+
+"browser-tabs-lock@npm:^1.2.15":
+  version: 1.3.0
+  resolution: "browser-tabs-lock@npm:1.3.0"
+  dependencies:
+    lodash: ">=4.17.21"
+  checksum: 4fcfb6d5fc4bc5e4f53c298d555d8421ca4f815e32c2650b73008868eb70d7ee41aca8f92ad84d9beb77a8ffe0cb99f1efc8d9b3135cc434d48f7bd569f2bb72
   languageName: node
   linkType: hard
 
@@ -6834,7 +6876,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"core-js@npm:3.32.1":
+"core-js@npm:3.32.1, core-js@npm:^3.25.4":
   version: 3.32.1
   resolution: "core-js@npm:3.32.1"
   checksum: e4af91d9c6be7b59235feb3f273d16705126ce09a0b4a787144d131d874f0cd10be3c24fc52e5eea7d7cb03ceabe4be7b255abcd9474b5eb1ff365d2c5611f9a
@@ -8043,6 +8085,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"es-cookie@npm:~1.3.2":
+  version: 1.3.2
+  resolution: "es-cookie@npm:1.3.2"
+  checksum: 8509355a7d00bd2e3fcab4a76a90e0da35b40c1e76f114f8ffe805ab3fdfff51e8fc0e7cdccd9bf1536066150b6b9861e37d78ae14f80680513901902ac4f0df
+  languageName: node
+  linkType: hard
+
 "es-get-iterator@npm:^1.1.3":
   version: 1.1.3
   resolution: "es-get-iterator@npm:1.1.3"
@@ -8814,6 +8863,13 @@ __metadata:
   version: 2.0.6
   resolution: "fast-levenshtein@npm:2.0.6"
   checksum: 92cfec0a8dfafd9c7a15fba8f2cc29cd0b62b85f056d99ce448bbcd9f708e18ab2764bda4dd5158364f4145a7c72788538994f0d1787b956ef0d1062b0f7c24c
+  languageName: node
+  linkType: hard
+
+"fast-text-encoding@npm:^1.0.6":
+  version: 1.0.6
+  resolution: "fast-text-encoding@npm:1.0.6"
+  checksum: 9d58f694314b3283e785bf61954902536da228607ad246905e30256f9ab8331f780ac987e7222c9f5eafd04168d07e12b8054c85cedb76a2c05af0e82387a903
   languageName: node
   linkType: hard
 
@@ -12132,7 +12188,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lodash@npm:^4.0.0, lodash@npm:^4.17.15, lodash@npm:^4.17.20, lodash@npm:^4.17.21, lodash@npm:^4.7.0":
+"lodash@npm:>=4.17.21, lodash@npm:^4.0.0, lodash@npm:^4.17.15, lodash@npm:^4.17.20, lodash@npm:^4.17.21, lodash@npm:^4.7.0":
   version: 4.17.21
   resolution: "lodash@npm:4.17.21"
   checksum: eb835a2e51d381e561e508ce932ea50a8e5a68f4ebdd771ea240d3048244a8d13658acbd502cd4829768c56f2e16bdd4340b9ea141297d472517b83868e677f7
@@ -14622,6 +14678,13 @@ __metadata:
   version: 0.11.10
   resolution: "process@npm:0.11.10"
   checksum: bfcce49814f7d172a6e6a14d5fa3ac92cc3d0c3b9feb1279774708a719e19acd673995226351a082a9ae99978254e320ccda4240ddc474ba31a76c79491ca7c3
+  languageName: node
+  linkType: hard
+
+"promise-polyfill@npm:^8.2.3":
+  version: 8.3.0
+  resolution: "promise-polyfill@npm:8.3.0"
+  checksum: 206373802076c77def0805758d0a8ece64120dfa6603f092404a1004211f8f2f67f33cadbc35953fc2a8ed0b0d38c774e88bdf01e20ce7a920723a60df84b7a5
   languageName: node
   linkType: hard
 
@@ -17215,6 +17278,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"unfetch@npm:^4.2.0":
+  version: 4.2.0
+  resolution: "unfetch@npm:4.2.0"
+  checksum: 6a4b2557e1d921eaa80c4425ce27a404945ec26491ed06e62598f333996a91a44c7908cb26dc7c2746d735762b13276cf4aa41829b4c8f438dde63add3045d7a
+  languageName: node
+  linkType: hard
+
 "unicode-canonical-property-names-ecmascript@npm:^2.0.0":
   version: 2.0.0
   resolution: "unicode-canonical-property-names-ecmascript@npm:2.0.0"
@@ -17939,7 +18009,7 @@ __metadata:
     "@types/webpack-env": 1.18.1
     "@wireapp/avs": 9.3.7
     "@wireapp/copy-config": 2.1.1
-    "@wireapp/core": 41.2.2
+    "@wireapp/core": "file:.yalc/@wireapp/core"
     "@wireapp/eslint-config": 3.0.1
     "@wireapp/lru-cache": 3.8.1
     "@wireapp/prettier-config": 0.6.0
@@ -18554,6 +18624,13 @@ __metadata:
     compress-commons: ^4.1.0
     readable-stream: ^3.6.0
   checksum: 4a73da856738b0634700b52f4ab3fe0bf0a532bea6820ad962d0bda0163d2d5525df4859f89a7238e204a378384e12551985049790c1894c3ac191866e85887f
+  languageName: node
+  linkType: hard
+
+"zod@npm:3.21.4":
+  version: 3.21.4
+  resolution: "zod@npm:3.21.4"
+  checksum: f185ba87342ff16f7a06686767c2b2a7af41110c7edf7c1974095d8db7a73792696bcb4a00853de0d2edeb34a5b2ea6a55871bc864227dace682a0a28de33e1f
   languageName: node
   linkType: hard
 
