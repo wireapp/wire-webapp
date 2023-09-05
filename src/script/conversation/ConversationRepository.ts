@@ -1371,9 +1371,15 @@ export class ConversationRepository {
    * Maps user connection to the corresponding conversation.
    *
    * @note If there is no conversation it will request it from the backend
+   *
+   * @param connectionEntity Connection entity
+   * @param source Event source that has triggered the mapping
    * @returns Resolves when connection was mapped return value
    */
-  private readonly mapConnection = async (connectionEntity: ConnectionEntity): Promise<Conversation | undefined> => {
+  private readonly mapConnection = async (
+    connectionEntity: ConnectionEntity,
+    source?: EventSource,
+  ): Promise<Conversation | undefined> => {
     try {
       const conversation = await this.getConnectionConversation(connectionEntity);
 
