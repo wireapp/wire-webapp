@@ -1378,7 +1378,7 @@ export class ConversationRepository {
    */
   private readonly mapConnection = async (
     connectionEntity: ConnectionEntity,
-    wasTrigerredByWebsocketEvent = false,
+    source = EventSource,
   ): Promise<Conversation | undefined> => {
     try {
       const conversation = await this.getConnectionConversation(connectionEntity);
