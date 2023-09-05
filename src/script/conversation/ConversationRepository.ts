@@ -1552,7 +1552,7 @@ export class ConversationRepository {
       return mlsConversation;
     }
 
-    const isAlreadyEstablished = await this.conversationService.isMLSConversationEstablished(mlsConversation.groupId);
+    const isAlreadyEstablished = await this.conversationService.isMLSGroupEstablishedLocally(mlsConversation.groupId);
 
     const establishedMLSConversation = isAlreadyEstablished
       ? mlsConversation
