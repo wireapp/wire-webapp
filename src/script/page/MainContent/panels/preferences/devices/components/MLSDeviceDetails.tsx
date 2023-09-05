@@ -19,7 +19,7 @@
 
 import {splitFingerprint} from 'Util/StringUtil';
 
-import {E2ECertificateDetails} from './E2ECertificateDetails';
+import {E2EICertificateDetails} from './E2EICertificateDetails';
 import {FormattedId} from './FormattedId';
 
 interface MLSDeviceDetailsProps {
@@ -40,7 +40,7 @@ export const MLSDeviceDetails = ({fingerprint, isMLSVerified = true}: MLSDeviceD
         <FormattedId idSlices={splitFingerprint(fingerprint)} />
       </p>
 
-      <E2ECertificateDetails MLSStatus={MLSStatus} isMLSVerified={isMLSVerified} />
+      <E2EICertificateDetails MLSStatus={MLSStatus} isMLSVerified={isMLSVerified} />
     </div>
   );
 };

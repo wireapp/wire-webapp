@@ -25,7 +25,7 @@ import {Badges, MLSStatues} from 'Components/Badges';
 import {Core} from 'src/script/service/CoreSingleton';
 import {t} from 'Util/LocalizerUtil';
 
-import {styles} from './E2ECertificateDetails.styles';
+import {styles} from './E2EICertificateDetails.styles';
 
 /* For now, we don't display Serial Number */
 // const TMP_SERIAL_NUMBER = 'e5:d5:e6:75:7e:04:86:07:14:3c:a0:ed:9a:8d:e4:fd';
@@ -50,7 +50,7 @@ interface E2ECertificateDetailsProps {
   isMLSVerified?: boolean;
 }
 
-export const E2ECertificateDetails = ({MLSStatus, isMLSVerified}: E2ECertificateDetailsProps) => {
+export const E2EICertificateDetails = ({MLSStatus, isMLSVerified}: E2ECertificateDetailsProps) => {
   const core = container.resolve(Core);
   const hasActiveCertificateData = core.service?.e2eIdentity?.hasActiveCertificate();
 

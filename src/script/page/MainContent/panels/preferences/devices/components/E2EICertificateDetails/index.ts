@@ -17,4 +17,4 @@
  *
  */
 
-export * from './E2ECertificateDetails';
+export * from './E2EICertificateDetails';

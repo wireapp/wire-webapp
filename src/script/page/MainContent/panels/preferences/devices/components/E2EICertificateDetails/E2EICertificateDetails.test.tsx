@@ -22,13 +22,13 @@ import {render} from '@testing-library/react';
 import {MLSStatues} from 'Components/Badges';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 
-import {E2ECertificateDetails} from './E2ECertificateDetails';
+import {E2EICertificateDetails} from './E2EICertificateDetails';
 
 describe('E2ECertificateDetails', () => {
   const isMLSVerified = true;
 
   it('is e2e identity verified', async () => {
-    const {getByTestId} = render(withTheme(<E2ECertificateDetails isMLSVerified={isMLSVerified} />));
+    const {getByTestId} = render(withTheme(<E2EICertificateDetails isMLSVerified={isMLSVerified} />));
 
     const E2EIdentityStatus = getByTestId('e2e-identity-status');
     expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual('Valid');
@@ -36,7 +36,7 @@ describe('E2ECertificateDetails', () => {
 
   it('is e2e identity not downloaded', async () => {
     const {getByTestId} = render(
-      withTheme(<E2ECertificateDetails isMLSVerified={isMLSVerified} MLSStatus={MLSStatues.NOT_DOWNLOADED} />),
+      withTheme(<E2EICertificateDetails isMLSVerified={isMLSVerified} MLSStatus={MLSStatues.NOT_DOWNLOADED} />),
     );
 
     const E2EIdentityStatus = getByTestId('e2e-identity-status');
@@ -45,7 +45,7 @@ describe('E2ECertificateDetails', () => {
 
   it('is e2e identity expired', async () => {
     const {getByTestId} = render(
-      withTheme(<E2ECertificateDetails isMLSVerified={isMLSVerified} MLSStatus={MLSStatues.EXPIRED} />),
+      withTheme(<E2EICertificateDetails isMLSVerified={isMLSVerified} MLSStatus={MLSStatues.EXPIRED} />),
     );
 
     const E2EIdentityStatus = getByTestId('e2e-identity-status');
@@ -54,7 +54,7 @@ describe('E2ECertificateDetails', () => {
 
   it('is e2e identity expires soon', async () => {
     const {getByTestId} = render(
-      withTheme(<E2ECertificateDetails isMLSVerified={isMLSVerified} MLSStatus={MLSStatues.EXPIRES_SOON} />),
+      withTheme(<E2EICertificateDetails isMLSVerified={isMLSVerified} MLSStatus={MLSStatues.EXPIRES_SOON} />),
     );
 
     const E2EIdentityStatus = getByTestId('e2e-identity-status');
@@ -63,7 +63,7 @@ describe('E2ECertificateDetails', () => {
 
   it('is e2e identity not activated', async () => {
     const {getByTestId} = render(
-      withTheme(<E2ECertificateDetails isMLSVerified={isMLSVerified} MLSStatus={MLSStatues.NOT_ACTIVATED} />),
+      withTheme(<E2EICertificateDetails isMLSVerified={isMLSVerified} MLSStatus={MLSStatues.NOT_ACTIVATED} />),
     );
 
     const E2EIdentityStatus = getByTestId('e2e-identity-status');
