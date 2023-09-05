@@ -1373,7 +1373,10 @@ export class ConversationRepository {
    * @note If there is no conversation it will request it from the backend
    * @returns Resolves when connection was mapped return value
    */
-  private readonly mapConnection = async (connectionEntity: ConnectionEntity): Promise<Conversation | undefined> => {
+  private readonly mapConnection = async (
+    connectionEntity: ConnectionEntity,
+    wasTrigerredByWebsocketEvent = false,
+  ): Promise<Conversation | undefined> => {
     try {
       const conversation = await this.getConnectionConversation(connectionEntity);
 
