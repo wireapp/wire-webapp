@@ -202,8 +202,7 @@ export class ConversationAPI {
   }
 
   public async getConversation(conversationId: QualifiedId): Promise<Conversation> {
-    const {id, domain} = conversationId;
-    const url = `${ConversationAPI.URL.CONVERSATIONS}/${domain}/${id}`;
+    const url = this.generateBaseConversationUrl(conversationId);
     const config: AxiosRequestConfig = {
       method: 'get',
       url,
@@ -216,9 +215,9 @@ export class ConversationAPI {
     conversationId: QualifiedId,
     subconversationId: SUBCONVERSATION_ID,
   ): Promise<Subconversation> {
-    const {id, domain} = conversationId;
+    const baseUrl = this.generateBaseConversationUrl(conversationId);
+    const url = `${baseUrl}/${ConversationAPI.URL.SUBCONVERSATIONS}/${subconversationId}`;
 
-    const url = `${ConversationAPI.URL.CONVERSATIONS}/${domain}/${id}/${ConversationAPI.URL.SUBCONVERSATIONS}/${subconversationId}`;
     const config: AxiosRequestConfig = {
       method: 'get',
       url,
@@ -232,9 +231,8 @@ export class ConversationAPI {
     subconversationId: SUBCONVERSATION_ID,
     {groupId, epoch}: {groupId: string; epoch: number},
   ): Promise<void> {
-    const {id, domain} = conversationId;
-
-    const url = `${ConversationAPI.URL.CONVERSATIONS}/${domain}/${id}/${ConversationAPI.URL.SUBCONVERSATIONS}/${subconversationId}`;
+    const baseUrl = this.generateBaseConversationUrl(conversationId);
+    const url = `${baseUrl}/${ConversationAPI.URL.SUBCONVERSATIONS}/${subconversationId}`;
 
     const config: AxiosRequestConfig = {
       method: 'delete',
@@ -249,9 +247,8 @@ export class ConversationAPI {
     conversationId: QualifiedId,
     subconversationId: SUBCONVERSATION_ID,
   ): Promise<void> {
-    const {id, domain} = conversationId;
-
-    const url = `${ConversationAPI.URL.CONVERSATIONS}/${domain}/${id}/${ConversationAPI.URL.SUBCONVERSATIONS}/${subconversationId}/${ConversationAPI.URL.SELF}`;
+    const baseUrl = this.generateBaseConversationUrl(conversationId);
+    const url = `${baseUrl}/${ConversationAPI.URL.SUBCONVERSATIONS}/${subconversationId}/${ConversationAPI.URL.SELF}`;
 
     const config: AxiosRequestConfig = {
       method: 'delete',
@@ -262,9 +259,8 @@ export class ConversationAPI {
   }
 
   public async getSubconversationGroupInfo(conversationId: QualifiedId, subconversationId: SUBCONVERSATION_ID) {
-    const {id, domain} = conversationId;
-
-    const url = `${ConversationAPI.URL.CONVERSATIONS}/${domain}/${id}/${ConversationAPI.URL.SUBCONVERSATIONS}/${subconversationId}/${ConversationAPI.URL.GROUP_INFO}`;
+    const baseUrl = this.generateBaseConversationUrl(conversationId);
+    const url = `${baseUrl}/${ConversationAPI.URL.SUBCONVERSATIONS}/${subconversationId}/${ConversationAPI.URL.GROUP_INFO}`;
 
     const config: AxiosRequestConfig = {
       method: 'get',
@@ -457,10 +453,10 @@ export class ConversationAPI {
    * @param conversationId The Conversation ID to get properties for
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/getSelf
    */
-  public async getMembershipProperties(conversationId: string): Promise<Member> {
+  public async getMembershipProperties(conversationId: QualifiedId): Promise<Member> {
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.SELF}`,
+      url: `${this.generateBaseConversationUrl(conversationId)}/${ConversationAPI.URL.SELF}`,
     };
 
     const response = await this.client.sendJSON<Member>(config);
@@ -855,13 +851,13 @@ export class ConversationAPI {
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/updateConversationMessageTimer
    */
   public async putConversationMessageTimer(
-    conversationId: string,
+    conversationId: QualifiedId,
     messageTimerData: ConversationMessageTimerUpdateData,
   ): Promise<ConversationMessageTimerUpdateEvent> {
     const config: AxiosRequestConfig = {
       data: messageTimerData,
       method: 'put',
-      url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.MESSAGE_TIMER}`,
+      url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId.id}/${ConversationAPI.URL.MESSAGE_TIMER}`,
     };
 
     const response = await this.client.sendJSON<ConversationMessageTimerUpdateEvent>(config);
@@ -875,13 +871,13 @@ export class ConversationAPI {
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/updateConversationReceiptMode
    */
   public async putConversationReceiptMode(
-    conversationId: string,
+    conversationId: QualifiedId,
     receiptModeData: ConversationReceiptModeUpdateData,
   ): Promise<ConversationReceiptModeUpdateEvent> {
     const config: AxiosRequestConfig = {
       data: receiptModeData,
       method: 'put',
-      url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.RECEIPT_MODE}`,
+      url: `${this.generateBaseConversationUrl(conversationId)}/${ConversationAPI.URL.RECEIPT_MODE}`,
     };
 
     const response = await this.client.sendJSON<ConversationReceiptModeUpdateEvent>(config);
@@ -902,7 +898,7 @@ export class ConversationAPI {
       method: 'post',
       url:
         this.backendFeatures.version >= 2
-          ? `${ConversationAPI.URL.CONVERSATIONS}/${conversationId.domain}/${conversationId.id}/${ConversationAPI.URL.MEMBERS}`
+          ? `${this.generateBaseConversationUrl(conversationId)}/${ConversationAPI.URL.MEMBERS}`
           : `${ConversationAPI.URL.CONVERSATIONS}/${conversationId.id}/${ConversationAPI.URL.MEMBERS}/${ConversationAPI.URL.V2}`,
     };
 
@@ -951,13 +947,13 @@ export class ConversationAPI {
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/updateSelf
    */
   public async putMembershipProperties(
-    conversationId: string,
+    conversationId: QualifiedId,
     memberData: Partial<ConversationMemberUpdateData>,
   ): Promise<void> {
     const config: AxiosRequestConfig = {
       data: memberData,
       method: 'put',
-      url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.SELF}`,
+      url: `${this.generateBaseConversationUrl(conversationId)}/${ConversationAPI.URL.SELF}`,
     };
 
     await this.client.sendJSON(config);
@@ -980,7 +976,7 @@ export class ConversationAPI {
     const config: AxiosRequestConfig = {
       data: {protocol},
       method: 'put',
-      url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId.domain}/${conversationId.id}/${ConversationAPI.URL.PROTOCOL}`,
+      url: `${this.generateBaseConversationUrl(conversationId)}/${ConversationAPI.URL.PROTOCOL}`,
     };
 
     const response = await this.client.sendJSON<ConversationProtocolUpdateEvent>(config);
