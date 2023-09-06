@@ -69,7 +69,7 @@ class Server {
     this.initSiteMap(this.config);
     this.app.use(Root());
     this.app.use(HealthCheckRoute());
-    this.app.use(ConfigRoute(this.clientConfig));
+    this.app.use(ConfigRoute(this.config, this.clientConfig));
     this.app.use(GoogleWebmasterRoute(this.config));
     this.app.use(AppleAssociationRoute());
     this.app.use(NotFoundRoute());
