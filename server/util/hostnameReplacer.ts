@@ -23,6 +23,6 @@ export function replaceHostname(template: string, request: Request): string {
   return template.replaceAll('[[hostname]]', request.hostname.replace('webapp.', ''));
 }
 
-export function replaceHostnameInObject<T>(template: T, request: Request): T {
-  return JSON.parse(replaceHostname(JSON.stringify(template), request));
+export function replaceHostnameInObject<T>(object: T, request: Request): T {
+  return JSON.parse(replaceHostname(JSON.stringify(object), request));
 }
