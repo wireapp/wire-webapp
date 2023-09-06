@@ -107,7 +107,7 @@ export function generateConfig(params: ConfigGeneratorParams, env: Env) {
       IMAGE_URL: env.OPEN_GRAPH_IMAGE_URL,
       TITLE: env.OPEN_GRAPH_TITLE,
     },
-    URL_HOSTNAME_SWAP: env.URL_HOSTNAME_SWAP === 'true',
+    ENABLE_DYNAMIC_HOSTNAME: env.ENABLE_DYNAMIC_HOSTNAME === 'true',
     PORT_HTTP: Number(env.PORT) || 21080,
     ROBOTS: {
       ALLOW: readFile(ROBOTS_ALLOW_FILE, 'User-agent: *\r\nDisallow: /'),
