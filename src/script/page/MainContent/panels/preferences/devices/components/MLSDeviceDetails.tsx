@@ -28,8 +28,6 @@ interface MLSDeviceDetailsProps {
 }
 
 export const MLSDeviceDetails = ({fingerprint, isMLSVerified = true}: MLSDeviceDetailsProps) => {
-  const MLSStatus = undefined;
-
   return (
     <div className="mls-device-details">
       <h4 className="paragraph-body-3">MLS with Ed255519 Signature</h4>
@@ -40,7 +38,7 @@ export const MLSDeviceDetails = ({fingerprint, isMLSVerified = true}: MLSDeviceD
         <FormattedId idSlices={splitFingerprint(fingerprint)} />
       </p>
 
-      <E2EICertificateDetails MLSStatus={MLSStatus} isMLSVerified={isMLSVerified} />
+      <E2EICertificateDetails isMLSVerified={isMLSVerified} />
     </div>
   );
 };
