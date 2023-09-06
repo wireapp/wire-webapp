@@ -59,8 +59,17 @@ export const CertificateDetailsModal = ({certificate, onClose, downloadCertifica
   };
 
   return (
-    <div className="modal__certificate-details">
-      <ModalComponent isShown onBgClick={onClose} onClosed={onClose} data-uie-name="modal-certificate-details">
+    <div className="certificate-details__modal">
+      <ModalComponent
+        isShown
+        onBgClick={onClose}
+        onClosed={onClose}
+        data-uie-name="modal-certificate-details"
+        wrapperCSS={{
+          maxWidth: '460px',
+          width: '100%',
+        }}
+      >
         <div className="modal__header">
           <h2 className="modal__header__title" data-uie-name="status-modal-title">
             {t('E2EI.certificateDetails')}
@@ -71,7 +80,7 @@ export const CertificateDetailsModal = ({certificate, onClose, downloadCertifica
           </button>
         </div>
 
-        <div className="modal__body">{certificate}</div>
+        <div className="modal__body certificate-details__modal--content">{certificate}</div>
 
         <div className="modal__buttons">
           <button
