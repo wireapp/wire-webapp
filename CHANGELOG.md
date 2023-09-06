@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [42.0.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@41.7.4...@wireapp/core@42.0.0) (2023-09-06)
+
+### Features
+
+* make /self and /receipt-mode endpoint federation ready ([#5467](https://github.com/wireapp/wire-web-packages/issues/5467)) ([d9250e8](https://github.com/wireapp/wire-web-packages/commit/d9250e8f8e345e2acfc93d01c05e66a4b90daeec))
+
+### BREAKING CHANGES
+
+* the self and receipt-mode endpoint not take a fully qualified id
+
 ## [41.7.4](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@41.7.3...@wireapp/core@41.7.4) (2023-09-06)
 
 **Note:** Version bump only for package @wireapp/core
