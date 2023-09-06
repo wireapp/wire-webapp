@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/certificate-check@0.7.1...@wireapp/certificate-check@0.7.2) (2023-09-06)
+
+**Note:** Version bump only for package @wireapp/certificate-check
+
 ## [0.7.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/certificate-check@0.7.0...@wireapp/certificate-check@0.7.1) (2023-05-08)
 
 **Note:** Version bump only for package @wireapp/certificate-check

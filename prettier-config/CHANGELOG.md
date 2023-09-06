@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/prettier-config@0.6.0...@wireapp/prettier-config@0.6.1) (2023-09-06)
+
+**Note:** Version bump only for package @wireapp/prettier-config
+
 # [0.6.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/prettier-config@0.5.2...@wireapp/prettier-config@0.6.0) (2023-05-04)
 
 ### Features
