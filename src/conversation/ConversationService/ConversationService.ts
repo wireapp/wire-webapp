@@ -198,7 +198,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
   }
 
   public setConversationMutedStatus(
-    conversationId: string,
+    conversationId: QualifiedId,
     status: MutedStatus,
     muteTimestamp: number | Date,
   ): Promise<void> {
@@ -215,7 +215,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
   }
 
   public toggleArchiveConversation(
-    conversationId: string,
+    conversationId: QualifiedId,
     archived: boolean,
     archiveTimestamp: number | Date = new Date(),
   ): Promise<void> {
