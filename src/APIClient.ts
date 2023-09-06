@@ -246,7 +246,7 @@ export class APIClient extends EventEmitter {
       domain: responsePayload?.domain ?? '',
       federationEndpoints: backendVersion > 0,
       isFederated: responsePayload?.federation || false,
-      supportsMLS: backendVersion >= 4,
+      supportsMLS: backendVersion >= 5,
       supportsGuestLinksWithPassword: backendVersion >= 4,
     };
   }
