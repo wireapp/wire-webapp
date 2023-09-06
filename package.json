@@ -4,7 +4,7 @@
     "@datadog/browser-rum": "^4.48.1",
     "@emotion/react": "11.11.1",
     "@wireapp/avs": "9.3.7",
-    "@wireapp/core": "41.7.3",
+    "@wireapp/core": "41.7.4",
     "@wireapp/lru-cache": "3.8.1",
     "@wireapp/react-ui-kit": "9.9.1",
     "@wireapp/store-engine-dexie": "2.1.3",
