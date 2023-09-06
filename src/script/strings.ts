@@ -435,7 +435,7 @@ export const conversationJoinStrings = defineMessages({
     id: 'conversationJoin.hasAccount',
   },
   headline: {
-    defaultMessage: 'The conversation is hosted on {brandName}',
+    defaultMessage: 'The conversation takes place on {brandName}',
     id: 'conversationJoin.headline',
   },
   invalidCreateAccountLink: {
@@ -463,7 +463,7 @@ export const conversationJoinStrings = defineMessages({
     id: 'conversationJoin.namePlaceholder',
   },
   noAccountHead: {
-    defaultMessage: 'Dont have an account?',
+    defaultMessage: "Don't have an account?",
     id: 'conversationJoin.noAccountHead',
   },
   subhead: {
@@ -471,7 +471,7 @@ export const conversationJoinStrings = defineMessages({
     id: 'conversationJoin.subhead',
   },
   joinButton: {
-    defaultMessage: 'Join as temporary user',
+    defaultMessage: 'Join as Temporary Guest',
     id: 'conversationJoin.joinButton',
   },
   mainHeadline: {
