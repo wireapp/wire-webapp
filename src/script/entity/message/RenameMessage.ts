@@ -18,7 +18,6 @@
  */
 
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
-import ko from 'knockout';
 
 import {t} from 'Util/LocalizerUtil';
 
@@ -27,16 +26,14 @@ import {SystemMessage} from './SystemMessage';
 import {SystemMessageType} from '../../message/SystemMessageType';
 
 export class RenameMessage extends SystemMessage {
-  public readonly system_message_type: SystemMessageType;
   public name: string;
 
-  constructor() {
+  constructor(name: string) {
     super();
 
     this.type = CONVERSATION_EVENT.RENAME;
     this.system_message_type = SystemMessageType.CONVERSATION_RENAME;
-    this.name = '';
-
-    this.caption = ko.pureComputed(() => (this.user().isMe ? t('conversationRenameYou') : t('conversationRename')));
+    this.name = name;
+    this.caption = this.user().isMe ? t('conversationRenameYou') : t('conversationRename');
   }
 }

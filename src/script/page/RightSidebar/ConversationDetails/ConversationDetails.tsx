@@ -65,8 +65,8 @@ const CONFIG = {
 };
 
 interface ConversationDetailsProps {
-  onClose: () => void;
-  togglePanel: (panel: PanelState, entity: PanelEntity, addMode?: boolean, direction?: 'left' | 'right') => void;
+  onClose?: () => void;
+  togglePanel?: (panel: PanelState, entity: PanelEntity, addMode?: boolean, direction?: 'left' | 'right') => void;
   actionsViewModel: ActionsViewModel;
   activeConversation: Conversation;
   conversationRepository: ConversationRepository;
@@ -81,8 +81,8 @@ interface ConversationDetailsProps {
 const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>(
   (
     {
-      onClose,
-      togglePanel,
+      onClose = () => {},
+      togglePanel = () => {},
       actionsViewModel,
       activeConversation,
       conversationRepository,
@@ -362,6 +362,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
                   <>
                     <UserSearchableList
                       dataUieName="list-users"
+                      userState={userState}
                       users={userParticipants}
                       onClick={showUser}
                       noUnderline

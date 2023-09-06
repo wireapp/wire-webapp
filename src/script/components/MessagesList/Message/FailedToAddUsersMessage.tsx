@@ -68,14 +68,17 @@ const MessageDetails: FC<MessageDetailsProps> = ({users, children, message, doma
       <span
         css={warning}
         dangerouslySetInnerHTML={{
-          __html: t(`failedToAddParticipantsPluralDetails${errorMessageType[message.reason]}`, {
-            name: users[0].name(),
-            names: users
-              .slice(1)
-              .map(user => user.name())
-              .join(', '),
-            domain,
-          }),
+          __html:
+            // Mobile platforms are not using the full specs yet, we can uncomment this if product decides to go with MVP specs
+            // t(`failedToAddParticipantsPluralDetailsMvp`, {
+            t(`failedToAddParticipantsPluralDetails${errorMessageType[message.reason]}`, {
+              name: users[0].name(),
+              names: users
+                .slice(1)
+                .map(user => user.name())
+                .join(', '),
+              domain,
+            }),
         }}
       />
       {children}
@@ -143,10 +146,13 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
               <span
                 css={warning}
                 dangerouslySetInnerHTML={{
-                  __html: t(`failedToAddParticipantSingularOfflineBackend`, {
-                    name: users[0].name(),
-                    domain: users[0].domain,
-                  }),
+                  __html:
+                    // Mobile platforms are not using the full specs yet, we can uncomment this if product decides to go with MVP specs
+                    // t(`failedToAddParticipantSingularMvp`, {
+                    t(`failedToAddParticipantSingular${errorMessageType[message.reason]}`, {
+                      name: users[0].name(),
+                      domain: users[0].domain,
+                    }),
                 }}
               />
               {learnMore}
@@ -169,7 +175,7 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
           />
         </p>
       </div>
-      <div className="message-body">
+      <div className="message-body" css={{flexDirection: 'column'}}>
         {isOpen && (
           <>
             {message.reason === AddUsersFailureReasons.UNREACHABLE_BACKENDS && (
@@ -189,16 +195,18 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
           </>
         )}
         {total > 1 && (
-          <Button
-            tabIndex={messageFocusedTabIndex}
-            data-uie-name="toggle-failed-to-add-users"
-            type="button"
-            variant={ButtonVariant.TERTIARY}
-            onClick={() => setIsOpen(state => !state)}
-            style={{marginTop: 4}}
-          >
-            {isOpen ? t('messageFailedToSendHideDetails') : t('messageFailedToSendShowDetails')}
-          </Button>
+          <div>
+            <Button
+              tabIndex={messageFocusedTabIndex}
+              data-uie-name="toggle-failed-to-add-users"
+              type="button"
+              variant={ButtonVariant.TERTIARY}
+              onClick={() => setIsOpen(state => !state)}
+              style={{marginTop: 4}}
+            >
+              {isOpen ? t('messageFailedToSendHideDetails') : t('messageFailedToSendShowDetails')}
+            </Button>
+          </div>
         )}
       </div>
     </>

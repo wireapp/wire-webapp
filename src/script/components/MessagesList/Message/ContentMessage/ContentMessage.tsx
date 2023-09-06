@@ -137,11 +137,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
   const [isActionMenuVisible, setActionMenuVisibility] = useState(true);
   const isMenuOpen = useMessageActionsState(state => state.isMenuOpen);
   useEffect(() => {
-    if (isMessageFocused || msgFocusState) {
-      setActionMenuVisibility(true);
-    } else {
-      setActionMenuVisibility(false);
-    }
+    setActionMenuVisibility(isMessageFocused || msgFocusState);
   }, [msgFocusState, isMessageFocused]);
 
   const reactionGroupedByUser = groupByReactionUsers(reactions);
@@ -151,13 +147,21 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
     <div
       aria-label={messageAriaLabel}
       className="content-message-wrapper"
-      onMouseEnter={event => {
+      ref={element => {
+        setTimeout(() => {
+          if (element?.parentElement?.querySelector(':hover') === element) {
+            // Trigger the action menu in case the component is rendered with the mouse already hovering over it
+            setActionMenuVisibility(true);
+          }
+        });
+      }}
+      onMouseEnter={() => {
         // open another floating action menu if none already open
         if (!isMenuOpen) {
           setActionMenuVisibility(true);
         }
       }}
-      onMouseLeave={event => {
+      onMouseLeave={() => {
         // close floating message actions when no active menu is open like context menu/emoji picker
         if (!isMenuOpen) {
           setActionMenuVisibility(false);
@@ -176,58 +180,53 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
           </span>
         </MessageHeader>
       )}
-      {message.quote() && (
-        <Quote
-          conversation={conversation}
-          quote={message.quote()}
-          selfId={selfId}
-          findMessage={findMessage}
-          showDetail={onClickImage}
-          focusMessage={onClickTimestamp}
-          handleClickOnMessage={onClickMessage}
-          showUserDetails={onClickAvatar}
-          isMessageFocused={msgFocusState}
-        />
-      )}
-      <div className="message-body" title={ephemeral_caption}>
-        {ephemeral_status === EphemeralStatusType.ACTIVE && (
-          <div className="message-ephemeral-timer">
-            <EphemeralTimer message={message} />
-          </div>
-        )}
-        {assets.map(asset => (
-          <ContentAsset
-            key={asset.type}
-            asset={asset}
-            message={message}
-            selfId={selfId}
-            onClickButton={onClickButton}
-            onClickImage={onClickImage}
-            onClickMessage={onClickMessage}
-            isMessageFocused={msgFocusState}
-          />
-        ))}
-        {failedToSend && (
-          <PartialFailureToSendWarning
-            isMessageFocused={msgFocusState}
-            failedToSend={failedToSend}
-            knownUsers={conversation.allUserEntities()}
-          />
-        )}
+      <div className="message-body">
+        <div className="message-body-content" title={ephemeral_caption}>
+          {ephemeral_status === EphemeralStatusType.ACTIVE && (
+            <div className="message-ephemeral-timer">
+              <EphemeralTimer message={message} />
+            </div>
+          )}
+          {message.quote() && (
+            <Quote
+              conversation={conversation}
+              quote={message.quote()}
+              selfId={selfId}
+              findMessage={findMessage}
+              showDetail={onClickImage}
+              focusMessage={onClickTimestamp}
+              handleClickOnMessage={onClickMessage}
+              showUserDetails={onClickAvatar}
+              isMessageFocused={msgFocusState}
+            />
+          )}
+          {assets.map(asset => (
+            <ContentAsset
+              key={asset.type}
+              asset={asset}
+              message={message}
+              selfId={selfId}
+              onClickButton={onClickButton}
+              onClickImage={onClickImage}
+              onClickMessage={onClickMessage}
+              isMessageFocused={msgFocusState}
+            />
+          ))}
+          {failedToSend && (
+            <PartialFailureToSendWarning
+              isMessageFocused={msgFocusState}
+              failedToSend={failedToSend}
+              knownUsers={conversation.allUserEntities()}
+            />
+          )}
 
-        {[StatusType.FAILED, StatusType.FEDERATION_ERROR].includes(status) && (
-          <CompleteFailureToSendWarning
-            {...(status === StatusType.FEDERATION_ERROR && {unreachableDomain: conversation.domain})}
-            isMessageFocused={msgFocusState}
-            onRetry={() => onRetry(message)}
-          />
-        )}
-        <div className="message-body-actions">
-          <ReadReceiptStatus
-            message={message}
-            is1to1Conversation={conversation.is1to1()}
-            isLastDeliveredMessage={isLastDeliveredMessage}
-          />
+          {[StatusType.FAILED, StatusType.FEDERATION_ERROR].includes(status) && (
+            <CompleteFailureToSendWarning
+              {...(status === StatusType.FEDERATION_ERROR && {unreachableDomain: conversation.domain})}
+              isMessageFocused={msgFocusState}
+              onRetry={() => onRetry(message)}
+            />
+          )}
         </div>
         {isActionMenuVisible && (
           <MessageActionsMenu
@@ -242,6 +241,14 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
             isRemovedFromConversation={conversation.removed_from_conversation()}
           />
         )}
+
+        <div className="message-body-actions">
+          <ReadReceiptStatus
+            message={message}
+            is1to1Conversation={conversation.is1to1()}
+            isLastDeliveredMessage={isLastDeliveredMessage}
+          />
+        </div>
       </div>
 
       <MessageReactionsList

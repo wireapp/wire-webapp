@@ -124,7 +124,8 @@ export class ConnectionRepository {
       await this.userRepository.refreshUser(connectionEntity.userId);
       // Get conversation related to connection and set its type to 1:1
       // This case is important when the 'user.connection' event arrives after the 'conversation.member-join' event: https://wearezeta.atlassian.net/browse/SQCORE-348
-      amplify.publish(WebAppEvents.CONVERSATION.MAP_CONNECTION, connectionEntity);
+
+      amplify.publish(WebAppEvents.CONVERSATION.MAP_CONNECTION, connectionEntity, source);
     }
 
     await this.sendNotification(connectionEntity, source, previousStatus);
@@ -219,9 +220,9 @@ export class ConnectionRepository {
 
           default: {
             this.logger.error(`Failed to send connection request to user '${userEntity.id}': ${error.message}`, error);
-            return false;
           }
         }
+        return false;
       }
       throw error;
     }

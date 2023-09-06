@@ -36,13 +36,14 @@ import {showUserModal, UserModal} from 'Components/Modals/UserModal';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {AppLock} from './AppLock';
+import {FeatureConfigChangeNotifier} from './components/FeatureConfigChangeNotifier';
+import {WindowTitleUpdater} from './components/WindowTitleUpdater';
 import {LeftSidebar} from './LeftSidebar';
 import {MainContent} from './MainContent';
 import {PanelEntity, PanelState, RightSidebar} from './RightSidebar';
 import {RootProvider} from './RootProvider';
 import {useAppMainState, ViewType} from './state';
 import {useAppState, ContentState} from './useAppState';
-import {useWindowTitle} from './useWindowTitle';
 
 import {ConversationState} from '../conversation/ConversationState';
 import {User} from '../entity/User';
@@ -83,7 +84,7 @@ const AppMain: FC<AppMainProps> = ({
     throw new Error('API Context has not been set');
   }
 
-  const {contentState} = useAppState();
+  const contentState = useAppState(state => state.contentState);
 
   const {repository: repositories} = app;
 
@@ -94,8 +95,6 @@ const AppMain: FC<AppMainProps> = ({
 
   const teamState = container.resolve(TeamState);
   const userState = container.resolve(UserState);
-
-  useWindowTitle();
 
   const {isActivatedAccount} = useKoSubscribableChildren(userState, ['isActivatedAccount']);
 
@@ -214,6 +213,7 @@ const AppMain: FC<AppMainProps> = ({
       data-uie-name="status-webapp"
       data-uie-value="is-loaded"
     >
+      <WindowTitleUpdater />
       <RootProvider value={mainView}>
         <ErrorBoundary FallbackComponent={ErrorFallback}>
           <div id="app" className="app">
@@ -244,6 +244,7 @@ const AppMain: FC<AppMainProps> = ({
 
           <AppLock clientRepository={repositories.client} />
           <WarningsContainer onRefresh={app.refresh} />
+          <FeatureConfigChangeNotifier selfUserId={selfUser.id} teamState={teamState} />
 
           <CallingContainer
             multitasking={mainView.multitasking}

@@ -140,6 +140,7 @@ export type MessageAddEvent = Omit<
   type: CONVERSATION.MESSAGE_ADD;
 };
 export type MissedEvent = BaseEvent & {id: string; type: CONVERSATION.MISSED_MESSAGES};
+export type MLSConversationRecoveredEvent = BaseEvent & {id: string; type: CONVERSATION.MLS_CONVERSATION_RECOVERED};
 export type OneToOneCreationEvent = ConversationEvent<{userIds: QualifiedId[]}> & {
   type: CONVERSATION.ONE2ONE_CREATION;
 };
@@ -235,6 +236,7 @@ export type ClientConversationEvent =
   | FailedToAddUsersMessageEvent
   | UnableToDecryptEvent
   | MissedEvent
+  | MLSConversationRecoveredEvent
   | LocationEvent
   | VoiceChannelActivateEvent
   | VerificationEvent;
@@ -528,6 +530,19 @@ export const EventBuilder = {
       id: createUuid(),
       time: conversationEntity.getNextIsoDate(currentTimestamp),
       type: ClientEvent.CONVERSATION.MISSED_MESSAGES,
+    };
+  },
+
+  buildMLSConversationRecovered(
+    conversationEntity: Conversation,
+    currentTimestamp: number,
+  ): MLSConversationRecoveredEvent {
+    return {
+      ...buildQualifiedId(conversationEntity),
+      from: conversationEntity.selfUser().id,
+      id: createUuid(),
+      time: conversationEntity.getNextIsoDate(currentTimestamp),
+      type: ClientEvent.CONVERSATION.MLS_CONVERSATION_RECOVERED,
     };
   },
 
