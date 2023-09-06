@@ -22,6 +22,7 @@ import {container} from 'tsyringe';
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {Badges, MLSStatues} from 'Components/Badges';
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {Core} from 'src/script/service/CoreSingleton';
 import {t} from 'Util/LocalizerUtil';
 
@@ -45,20 +46,28 @@ import {styles} from './E2EICertificateDetails.styles';
 //   });
 // };
 
+const TMP_CERTIFICATE: string =
+  '-----BEGIN CERTIFICATE-----MIICDzCCAbQCCQDzlU3qembswDAKBggqhkjOPQQDAjCBjjELMAkGA1UEBhMCREUxDzANBgNVBAgMBkJlcmxpbjEOMAwGA1UEBwwFTWl0dGUxDTALBgNVBAoMBFdpcmUxFDASBgNVBAsMC0VuZ2luZWVyaW5nMRQwEgYDVQQDDAtjYS53aXJlLmNvbTEjMCEGCSqGSIb3DQEJARYUZW5naW5lZXJpbmdAd2lyZS5jb20wHhcNMjMwNTE2MTcxNjE3WhcNMjMwNjE1MTcxNjE3WjCBjjELMAkGA1UEBhMCREUxDzANBgNVBAgMBkJlcmxpbjEOMAwGA1UEBwwFTWl0dGUxDTALBgNVBAoMBFdpcmUxFDASBgNVBAsMC0VuZ2luZWVyaW5nMRQwEgYDVQQDDAtjYS53aXJlLmNvbTEjMCEGCSqGSIb3DQEJARYUZW5naW5lZXJpbmdAd2lyZS5jb20wWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAASpxQ3hrzh5fPDan+vbcRT8fCQzaz3fIywUNxTRWzvGpPkRPPDegJ7h4G6aUqDfZFgvSsCCaaGaYYVF1di/tuYpMAoGCCqGSM49BAMCA0kAMEYCIQDHAeMUcjjP5J3Mbs3uIlPLd0tZQb0S6bEekXvHsxhYGAIhAKOoeyMqaHxj3qaHnpCBjY/0slt2QUbtDbpF3Lgz2l2S-----END CERTIFICATE----------BEGIN CERTIFICATE-----SsCCaaGaYYVF1di/tuYpMAoGCCqGSM49BAMCA0kAMEYCIQDHAeMUcjjP5J3Mbs3uIlPLd0tZQb0S6bEekXvHsxhYGAIhAKOoeyMqaHxj3qaHnpCBjY/0slt2QUbtDbpF3Lgz2l2SMIICDzCCAbQCCQDzlU3qembswDAKBggqhkjOPQQDAjCBjjELMAkGA1UEBhMCREUxDzANBgNVBAgMBkJlcmxpbjEOMAwGA1UEBwwFTWl0dGUxDTALBgNVBAoMBFdpcmUxFDASBgNVBAsMC0VuZ2luZWVyaW5nMRQwEgYDVQQDDAtjYS53aXJlLmNvbTEjMCEGCSqGSIb3DQEJARYUZW5naW5lZXJpbmdAd2lyZS5jb20wHhcNMjMwNTE2MTcxNjE3WhcNMjMwNjE1MTcxNjE3WjCBjjELMAkGA1UEBhMCREUxDzANBgNVBAgMBkJlcmxpbjEOMAwGA1UEBwwFTWl0dGUxDTALBgNVBAoMBFdpcmUxFDASBgNVBAsMC0VuZ2luZWVyaW5nMRQwEgYDVQQDDAtjYS53aXJlLmNvbTEjMCEGCSqGSIb3DQEJARYUZW5naW5lZXJpbmdAd2lyZS5jb20wWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAASpxQ3hrzh5fPDan+vbcRT8fCQzaz3fIywUNxTRWzvGpPkRPPDegJ7h4G6aUqDfZFgv-----END CERTIFICATE-----';
+
 interface E2ECertificateDetailsProps {
+  core?: Core;
   MLSStatus?: MLSStatues;
   isMLSVerified?: boolean;
 }
 
-export const E2EICertificateDetails = ({MLSStatus, isMLSVerified}: E2ECertificateDetailsProps) => {
-  const core = container.resolve(Core);
+export const E2EICertificateDetails = ({
+  core = container.resolve(Core),
+  MLSStatus,
+  isMLSVerified,
+}: E2ECertificateDetailsProps) => {
+  // const core = container.resolve(Core);
   const hasActiveCertificateData = core.service?.e2eIdentity?.hasActiveCertificate();
 
   if (!hasActiveCertificateData) {
     return null;
   }
 
-  // const certificateData = core.service?.e2eIdentity?.getCertificateData();
+  const certificateData = core.service?.e2eIdentity?.getCertificateData();
 
   const isExpired = MLSStatus === MLSStatues.EXPIRED;
   const isNotDownloaded = MLSStatus === MLSStatues.NOT_DOWNLOADED;
@@ -68,8 +77,26 @@ export const E2EICertificateDetails = ({MLSStatus, isMLSVerified}: E2ECertificat
   const isValid = !isExpired && !isNotDownloaded && !isExpiresSoon && !isNotActivated;
 
   const showCertificateDetails = () => {
-    // eslint-disable-next-line no-console
-    console.log('Show Certificate Details');
+    PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
+      primaryAction: {
+        action: () => {},
+        text: 'Download',
+      },
+      secondaryAction: {
+        action: async () => {
+          try {
+            await navigator.clipboard.writeText(certificateData || TMP_CERTIFICATE);
+          } catch (err) {
+            console.error('Failed to copy: ', err);
+          }
+        },
+        text: 'Copy To Clipboard',
+      },
+      text: {
+        title: 'Certificate details (PEM format)',
+        htmlMessage: `<pre>${certificateData || TMP_CERTIFICATE}</pre>`,
+      },
+    });
   };
 
   const getCertificate = () => {
