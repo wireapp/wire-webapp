@@ -26,7 +26,7 @@ export const ConfigRoute = (serverConfig: ServerConfig, clientConfig: ClientConf
     const serializedConfig = `window.wire = window.wire || {}; window.wire.env = ${JSON.stringify(clientConfig)};`;
     const payload = serverConfig.ENABLE_DYNAMIC_HOSTNAME
       ? // In case we want URLs that depends on the the hostname, we need to replace the placeholder with the actual hostname.
-        serializedConfig.replaceAll('[[hostname]]', request.hostname)
+        serializedConfig.replaceAll('[[hostname]]', request.hostname.replace('webapp.', ''))
       : serializedConfig;
     res.type('application/javascript').send(payload);
   });
