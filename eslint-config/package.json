@@ -4,7 +4,7 @@
   "description": "Wire ESLint config",
   "repository": "https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config",
   "main": "eslintrc.js",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "peerDependencies": {
     "eslint": "^8",
     "prettier": "^3"
