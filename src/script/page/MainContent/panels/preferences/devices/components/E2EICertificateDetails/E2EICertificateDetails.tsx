@@ -17,12 +17,14 @@
  *
  */
 
+import {useState} from 'react';
+
 import {container} from 'tsyringe';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {Badges, MLSStatues} from 'Components/Badges';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {CertificateDetailsModal} from 'Components/Modals/CertificateDetailsModal';
 import {Core} from 'src/script/service/CoreSingleton';
 import {t} from 'Util/LocalizerUtil';
 
@@ -60,14 +62,16 @@ export const E2EICertificateDetails = ({
   MLSStatus,
   isMLSVerified,
 }: E2ECertificateDetailsProps) => {
-  // const core = container.resolve(Core);
+  const [isCertificateDetailsModalOpen, setIsCertificateDetailsModalOpen] = useState(false);
+
   const hasActiveCertificateData = core.service?.e2eIdentity?.hasActiveCertificate();
 
   if (!hasActiveCertificateData) {
     return null;
   }
 
-  const certificateData = core.service?.e2eIdentity?.getCertificateData();
+  // Temporary assigning TMP_CERTIFICATE, will be removed when all functionality with it will works
+  const certificate = core.service?.e2eIdentity?.getCertificateData() || TMP_CERTIFICATE;
 
   const isExpired = MLSStatus === MLSStatues.EXPIRED;
   const isNotDownloaded = MLSStatus === MLSStatues.NOT_DOWNLOADED;
@@ -75,29 +79,6 @@ export const E2EICertificateDetails = ({
   const isNotActivated = MLSStatus === MLSStatues.NOT_ACTIVATED;
 
   const isValid = !isExpired && !isNotDownloaded && !isExpiresSoon && !isNotActivated;
-
-  const showCertificateDetails = () => {
-    PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-      primaryAction: {
-        action: () => {},
-        text: 'Download',
-      },
-      secondaryAction: {
-        action: async () => {
-          try {
-            await navigator.clipboard.writeText(certificateData || TMP_CERTIFICATE);
-          } catch (err) {
-            console.error('Failed to copy: ', err);
-          }
-        },
-        text: 'Copy To Clipboard',
-      },
-      text: {
-        title: 'Certificate details (PEM format)',
-        htmlMessage: `<pre>${certificateData || TMP_CERTIFICATE}</pre>`,
-      },
-    });
-  };
 
   const getCertificate = () => {
     // eslint-disable-next-line no-console
@@ -148,11 +129,19 @@ export const E2EICertificateDetails = ({
         {!isNotActivated && (
           <Button
             variant={ButtonVariant.TERTIARY}
-            onClick={showCertificateDetails}
+            onClick={() => setIsCertificateDetailsModalOpen(true)}
             data-uie-name="show-certificate-details"
           >
             {t('E2E.showCertificateDetails')}
           </Button>
+        )}
+
+        {isCertificateDetailsModalOpen && (
+          <CertificateDetailsModal
+            certificate={certificate}
+            onClose={() => setIsCertificateDetailsModalOpen(false)}
+            downloadCertificate={getCertificate}
+          />
         )}
 
         {isNotActivated && (
