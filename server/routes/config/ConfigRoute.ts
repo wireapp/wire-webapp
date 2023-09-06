@@ -20,13 +20,14 @@
 import {Router} from 'express';
 
 import {ClientConfig, ServerConfig} from '../../config';
+import {replaceHostname} from '../../util/hostnameReplacer';
 
 export const ConfigRoute = (serverConfig: ServerConfig, clientConfig: ClientConfig) =>
   Router().get('/config.js', (request, res) => {
     const serializedConfig = `window.wire = window.wire || {}; window.wire.env = ${JSON.stringify(clientConfig)};`;
     const payload = serverConfig.ENABLE_DYNAMIC_HOSTNAME
       ? // In case we want URLs that depends on the the hostname, we need to replace the placeholder with the actual hostname.
-        serializedConfig.replaceAll('[[hostname]]', request.hostname.replace('webapp.', ''))
+        replaceHostname(serializedConfig, request)
       : serializedConfig;
     res.type('application/javascript').send(payload);
   });
