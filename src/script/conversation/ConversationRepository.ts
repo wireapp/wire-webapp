@@ -785,6 +785,8 @@ export class ConversationRepository {
     events: EventRecord[],
     conversationEntity: Conversation,
   ): Promise<ContentMessage[]> {
+    // FOR TESTING I ADDED THE CALL HERE
+    await this.markConversationReadOnly(conversationEntity);
     const hasAdditionalMessages = events.length === Config.getConfig().MESSAGES_FETCH_LIMIT;
 
     const mappedMessageEntities = await this.addEventsToConversation(events, conversationEntity);
@@ -1349,6 +1351,14 @@ export class ConversationRepository {
         }
       }
     }
+  };
+
+  private readonly markConversationReadOnly = async (conversationEntity: Conversation) => {
+    //console.log('conversationEntity', conversationEntity.is_conversation_readonly());
+    conversationEntity.mls1To1ConversationState(true);
+    await this.saveConversationStateInDb(conversationEntity);
+
+    //console.log('conversationEntity', conversationEntity.is_conversation_readonly());
   };
 
   private readonly getConnectionConversation = (connectionEntity: ConnectionEntity) => {
