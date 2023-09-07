@@ -1652,17 +1652,17 @@ export class ConversationRepository {
       `Protocol for 1:1 conversation ${conversation.id} with user ${otherUserId.id} is ${protocol}, isSupportedByTheOtherUser: ${isSupportedByTheOtherUser}`,
     );
 
-    //when called with mls conversation, we just initialise it
+    // When called with mls conversation, we just make sure it is initialised.
     if (isMLSConversation(conversation)) {
       return this.initMLS1to1Conversation(otherUserId, isSupportedByTheOtherUser);
     }
 
-    //if there's local mls conversation, return it
+    // If there's local mls conversation, we want to use it
     const localMLSConversation = this.conversationState.find1to1Conversation(otherUserId, ConversationProtocol.MLS);
 
-    //if both users support mls or mls conversation is already known, we use it
-    //we never go back to proteus conversation, even if one of the users do not support mls anymore
-    //(e.g. due to the change of supported protocols in team configuration)
+    // If both users support mls or mls conversation is already known, we use it
+    // we never go back to proteus conversation, even if one of the users do not support mls anymore
+    // (e.g. due to the change of supported protocols in team configuration)
     if (localMLSConversation || protocol === ConversationProtocol.MLS) {
       const mlsConversation = await this.initMLS1to1Conversation(otherUserId, isSupportedByTheOtherUser);
       if (isProteusConversation(conversation)) {
@@ -1679,38 +1679,38 @@ export class ConversationRepository {
   };
 
   private readonly getConnectionConversation = async (connectionEntity: ConnectionEntity, source?: EventSource) => {
-    //As of how backed works now (August 2023), proteus 1:1 conversations will always be created, even if both users support MLS conversation.
-    //Proteus 1:1 conversation is created right after a connection request is sent.
-    //Therefore, conversationId filed on connectionEntity will always indicate proteus 1:1 conversation.
-    //We need to manually check if mls 1:1 conversation can be used instead.
-    //If mls 1:1 conversation is used, proteus 1:1 conversation will be deleted locally.
+    // As of how backed works now (August 2023), proteus 1:1 conversations will always be created, even if both users support MLS conversation.
+    // Proteus 1:1 conversation is created right after a connection request is sent.
+    // Therefore, conversationId filed on connectionEntity will always indicate proteus 1:1 conversation.
+    // We need to manually check if mls 1:1 conversation can be used instead.
+    // If mls 1:1 conversation is used, proteus 1:1 conversation will be deleted locally.
 
     const {conversationId: proteusConversationId, userId: otherUserId} = connectionEntity;
     const localProteusConversation = this.conversationState.findConversation(proteusConversationId);
 
     if (connectionEntity.isOutgoingRequest()) {
-      //return type of 3 (connect) conversation
-      //it will be displayed as a connection request
+      // Return type of 3 (connect) conversation,
+      // it will be displayed as a connection request
       return localProteusConversation || this.fetchConversationById(proteusConversationId);
     }
 
     const isConnectionAccepted = connectionEntity.isConnected();
 
-    //check what protocol should be used for 1:1 conversation
+    // Check what protocol should be used for 1:1 conversation
     const {protocol, isSupportedByTheOtherUser} = await this.getProtocolFor1to1Conversation(otherUserId);
 
     const localMLSConversation = this.conversationState.find1to1Conversation(otherUserId, ConversationProtocol.MLS);
 
     // It's not connection request and conversation is not accepted,
     if (!isConnectionAccepted) {
-      //if we already know mls 1:1 conversation, we use it, even if proteus protocol was now choosen as common
-      //we do not support switching back to proteus after mls conversation was established
-      //only proteus -> mls migration is supported, never the other way around
+      // If we already know mls 1:1 conversation, we use it, even if proteus protocol was now choosen as common,
+      // we do not support switching back to proteus after mls conversation was established,
+      // only proteus -> mls migration is supported, never the other way around.
       if (!localMLSConversation) {
         return protocol === ConversationProtocol.PROTEUS ? localProteusConversation : undefined;
       }
 
-      //make sure proteus conversation is gone, we don't want to see it anymore
+      // Make sure proteus conversation is gone, we don't want to see it anymore
       if (localProteusConversation && isProteusConversation(localProteusConversation)) {
         await this.replaceProteus1to1WithMLS(localProteusConversation, localMLSConversation);
       }
@@ -1718,7 +1718,7 @@ export class ConversationRepository {
       return localMLSConversation;
     }
 
-    //if it's accepted, initialise conversation so it's ready to be used
+    // If it's accepted, initialise conversation so it's ready to be used
     if (protocol === ConversationProtocol.MLS || localMLSConversation) {
       const isWebSocketEvent = source === EventSource.WEBSOCKET;
 
