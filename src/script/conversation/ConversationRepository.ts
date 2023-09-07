@@ -3526,6 +3526,8 @@ export class ConversationRepository {
     );
 
     const mlsConversation = await this.initMLS1to1Conversation(otherUserId, true);
+
+    // When we receive a welcome message for mls 1:1 conversation, we need to make sure proteus 1:1 with this user is deleted (if it exists)
     if (proteus1to1Conversation) {
       await this.replaceProteus1to1WithMLS(proteus1to1Conversation, mlsConversation);
     }
