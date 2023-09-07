@@ -138,6 +138,21 @@ export class ContentViewModel {
     this.conversationState.activeConversation(conversationEntity);
   };
 
+  private readonly getConversationToDisplay = async (
+    conversation: Conversation | string,
+    domain: string | null = null,
+  ): Promise<Conversation | null> => {
+    const conversationEntity = isConversationEntity(conversation)
+      ? conversation
+      : await this.conversationRepository.getConversationById({domain: domain || '', id: conversation});
+
+    if (!conversationEntity.is1to1()) {
+      return conversationEntity;
+    }
+
+    return this.conversationRepository.init1to1Conversation(conversationEntity);
+  };
+
   /**
    * Opens the specified conversation.
    *
@@ -167,9 +182,7 @@ export class ContentViewModel {
     }
 
     try {
-      const conversationEntity = isConversationEntity(conversation)
-        ? conversation
-        : await this.conversationRepository.getConversationById({domain: domain || '', id: conversation});
+      const conversationEntity = await this.getConversationToDisplay(conversation, domain);
 
       if (!conversationEntity) {
         rightSidebar.close();
@@ -180,22 +193,18 @@ export class ContentViewModel {
         );
       }
 
-      const initialisedConversation =
-        (conversationEntity.is1to1() && (await this.conversationRepository.init1to1Conversation(conversationEntity))) ||
-        conversationEntity;
-
-      const isActiveConversation = this.conversationState.isActiveConversation(initialisedConversation);
+      const isActiveConversation = this.conversationState.isActiveConversation(conversationEntity);
 
       if (!isActiveConversation) {
         rightSidebar.close();
       }
 
       const isConversationState = contentState === ContentState.CONVERSATION;
-      const isOpenedConversation = initialisedConversation && isActiveConversation && isConversationState;
+      const isOpenedConversation = conversationEntity && isActiveConversation && isConversationState;
 
       if (isOpenedConversation) {
         if (openNotificationSettings) {
-          rightSidebar.goTo(PanelState.NOTIFICATIONS, {entity: initialisedConversation});
+          rightSidebar.goTo(PanelState.NOTIFICATIONS, {entity: conversationEntity});
         }
         return;
       }
@@ -204,26 +213,24 @@ export class ContentViewModel {
       this.mainViewModel.list.openConversations();
 
       if (!isActiveConversation) {
-        this.conversationState.activeConversation(initialisedConversation);
+        this.conversationState.activeConversation(conversationEntity);
       }
 
-      const messageEntity = openFirstSelfMention
-        ? initialisedConversation.getFirstUnreadSelfMention()
-        : exposeMessageEntity;
+      const messageEntity = openFirstSelfMention ? conversationEntity.getFirstUnreadSelfMention() : exposeMessageEntity;
 
-      if (initialisedConversation.is_cleared()) {
-        initialisedConversation.cleared_timestamp(0);
+      if (conversationEntity.is_cleared()) {
+        conversationEntity.cleared_timestamp(0);
       }
 
-      if (initialisedConversation.is_archived()) {
-        await this.conversationRepository.unarchiveConversation(initialisedConversation);
+      if (conversationEntity.is_archived()) {
+        await this.conversationRepository.unarchiveConversation(conversationEntity);
       }
 
-      this.changeConversation(initialisedConversation, messageEntity);
+      this.changeConversation(conversationEntity, messageEntity);
       this.showContent(ContentState.CONVERSATION);
       this.previousConversation = this.conversationState.activeConversation();
       setHistoryParam(
-        generateConversationUrl({id: initialisedConversation?.id ?? '', domain: initialisedConversation?.domain ?? ''}),
+        generateConversationUrl({id: conversationEntity?.id ?? '', domain: conversationEntity?.domain ?? ''}),
       );
 
       if (openNotificationSettings) {
