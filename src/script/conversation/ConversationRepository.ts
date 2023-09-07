@@ -1698,6 +1698,7 @@ export class ConversationRepository {
       return localProteusConversation || this.fetchConversationById(proteusConversationId);
     }
 
+    const isWebSocketEvent = source === EventSource.WEBSOCKET;
     const isConnectionAccepted = connectionEntity.isConnected();
 
     // Check what protocol should be used for 1:1 conversation
@@ -1709,7 +1710,6 @@ export class ConversationRepository {
     // If it's accepted, initialise conversation so it's ready to be used
     if (isConnectionAccepted) {
       if (protocol === ConversationProtocol.MLS || localMLSConversation) {
-        const isWebSocketEvent = source === EventSource.WEBSOCKET;
         return this.initMLS1to1Conversation(otherUserId, isMLSSupportedByTheOtherUser, isWebSocketEvent);
       }
 
@@ -1723,12 +1723,7 @@ export class ConversationRepository {
     // we do not support switching back to proteus after mls conversation was established,
     // only proteus -> mls migration is supported, never the other way around.
     if (localMLSConversation) {
-      // Make sure proteus conversation is gone, we don't want to display it anymore
-      if (localProteusConversation && isProteusConversation(localProteusConversation)) {
-        await this.replaceProteus1to1WithMLS(localProteusConversation, localMLSConversation);
-      }
-
-      return localMLSConversation;
+      return this.initMLS1to1Conversation(otherUserId, isMLSSupportedByTheOtherUser, isWebSocketEvent);
     }
 
     return protocol === ConversationProtocol.PROTEUS ? localProteusConversation : undefined;
