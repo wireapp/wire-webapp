@@ -1480,9 +1480,12 @@ export class ConversationRepository {
 
     const isActiveConversation = this.conversationState.isActiveConversation(proteusConversation);
 
+    //TODO:
+    // Before we delete the proteus 1:1 conversation, we need to make sure all the local properties are also migrated (eg. archive_state)
+    // ConversationMapper.updateProperties(mlsConversation, {});
+
     this.logger.info(`Deleting proteus 1:1 conversation ${proteusConversation.id}`);
     await this.deleteConversationLocally(proteusConversation.qualifiedId, true);
-    //TODO: maintain the list of retired proteus 1:1 conversations so they are not requested from backend anymore
 
     if (isActiveConversation) {
       this.logger.info(
@@ -1490,6 +1493,8 @@ export class ConversationRepository {
       );
       amplify.publish(WebAppEvents.CONVERSATION.SHOW, mlsConversation, {});
     }
+
+    //TODO: maintain the list of retired proteus 1:1 conversations so they are not requested from backend anymore
   };
 
   /**
