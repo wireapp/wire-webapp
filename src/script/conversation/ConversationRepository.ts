@@ -1576,7 +1576,6 @@ export class ConversationRepository {
 
     this.logger.info(`MLS 1:1 conversation with user ${otherUserId.id} is established.`);
 
-    //TODO: for team 1:1 conversation we don't need to have connection assigned
     mlsConversation.connection(otherUser.connection());
     return establishedMLSConversation;
   };
@@ -1592,7 +1591,7 @@ export class ConversationRepository {
       throw new Error('initProteus1to1Conversation provided with conversation id of conversation that is not proteus');
     }
 
-    //if mls is not supported by the other user we have to mark conversation as readonly
+    // If proteus is not supported by the other user we have to mark conversation as readonly
     if (!doesOtherUserSupportProteus) {
       //TODO: mark conversation as readonly
     }
