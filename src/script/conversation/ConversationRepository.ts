@@ -1190,7 +1190,8 @@ export class ConversationRepository {
    * @returns Resolves with the conversation with requested user
    */
   async get1To1Conversation(userEntity: User): Promise<Conversation | null> {
-    const {protocol, isSupportedByTheOtherUser} = await this.getProtocolFor1to1Conversation(userEntity);
+    const {protocol, isMLSSupportedByTheOtherUser, isProteusSupportedByTheOtherUser} =
+      await this.getProtocolFor1to1Conversation(userEntity);
 
     const localMLSConversation = this.conversationState.find1to1Conversation(
       userEntity.qualifiedId,
@@ -1203,7 +1204,7 @@ export class ConversationRepository {
     );
 
     if (protocol === ConversationProtocol.MLS || localMLSConversation) {
-      const mlsConversation = await this.initMLS1to1Conversation(userEntity, isSupportedByTheOtherUser);
+      const mlsConversation = await this.initMLS1to1Conversation(userEntity, isMLSSupportedByTheOtherUser);
       if (localProteusConversation) {
         await this.replaceProteus1to1WithMLS(localProteusConversation, mlsConversation);
       }
@@ -1217,7 +1218,7 @@ export class ConversationRepository {
       return null;
     }
 
-    return this.initProteus1to1Conversation(proteusConversation.qualifiedId, isSupportedByTheOtherUser);
+    return this.initProteus1to1Conversation(proteusConversation.qualifiedId, isProteusSupportedByTheOtherUser);
   }
 
   /**
@@ -1395,21 +1396,25 @@ export class ConversationRepository {
     otherUserId: QualifiedId,
   ): Promise<{
     protocol: ConversationProtocol.PROTEUS | ConversationProtocol.MLS;
-    isSupportedByTheOtherUser: boolean;
+    isMLSSupportedByTheOtherUser: boolean;
+    isProteusSupportedByTheOtherUser: boolean;
   }> => {
     const otherUserSupportedProtocols = await this.userRepository.getUserSupportedProtocols(otherUserId);
     const selfUserSupportedProtocols = await this.selfRepository.getSelfSupportedProtocols();
+
+    const isMLSSupportedByTheOtherUser = otherUserSupportedProtocols.includes(ConversationProtocol.MLS);
+    const isProteusSupportedByTheOtherUser = otherUserSupportedProtocols.includes(ConversationProtocol.PROTEUS);
 
     const commonProtocols = otherUserSupportedProtocols.filter(protocol =>
       selfUserSupportedProtocols.includes(protocol),
     );
 
     if (commonProtocols.includes(ConversationProtocol.MLS)) {
-      return {protocol: ConversationProtocol.MLS, isSupportedByTheOtherUser: true};
+      return {protocol: ConversationProtocol.MLS, isMLSSupportedByTheOtherUser, isProteusSupportedByTheOtherUser};
     }
 
     if (commonProtocols.includes(ConversationProtocol.PROTEUS)) {
-      return {protocol: ConversationProtocol.PROTEUS, isSupportedByTheOtherUser: true};
+      return {protocol: ConversationProtocol.PROTEUS, isMLSSupportedByTheOtherUser, isProteusSupportedByTheOtherUser};
     }
 
     //if common protocol can't be found, we use preferred protocol of the self user
@@ -1417,7 +1422,7 @@ export class ConversationRepository {
       ? ConversationProtocol.MLS
       : ConversationProtocol.PROTEUS;
 
-    return {protocol: preferredProtocol, isSupportedByTheOtherUser: false};
+    return {protocol: preferredProtocol, isMLSSupportedByTheOtherUser, isProteusSupportedByTheOtherUser};
   };
 
   /**
@@ -1646,14 +1651,15 @@ export class ConversationRepository {
       `Initialising 1:1 conversation ${conversation.id} of type ${conversation.type()} with user ${otherUserId.id}`,
     );
 
-    const {protocol, isSupportedByTheOtherUser} = await this.getProtocolFor1to1Conversation(otherUserId);
+    const {protocol, isMLSSupportedByTheOtherUser, isProteusSupportedByTheOtherUser} =
+      await this.getProtocolFor1to1Conversation(otherUserId);
     this.logger.info(
       `Protocol for 1:1 conversation ${conversation.id} with user ${otherUserId.id} is ${protocol}, isSupportedByTheOtherUser: ${isSupportedByTheOtherUser}`,
     );
 
     // When called with mls conversation, we just make sure it is initialised.
     if (isMLSConversation(conversation)) {
-      return this.initMLS1to1Conversation(otherUserId, isSupportedByTheOtherUser);
+      return this.initMLS1to1Conversation(otherUserId, isMLSSupportedByTheOtherUser);
     }
 
     // If there's local mls conversation, we want to use it
@@ -1662,8 +1668,8 @@ export class ConversationRepository {
     // If both users support mls or mls conversation is already known, we use it
     // we never go back to proteus conversation, even if one of the users do not support mls anymore
     // (e.g. due to the change of supported protocols in team configuration)
-    if (localMLSConversation || protocol === ConversationProtocol.MLS) {
-      const mlsConversation = await this.initMLS1to1Conversation(otherUserId, isSupportedByTheOtherUser);
+    if (protocol === ConversationProtocol.MLS || localMLSConversation) {
+      const mlsConversation = await this.initMLS1to1Conversation(otherUserId, isMLSSupportedByTheOtherUser);
       if (isProteusConversation(conversation)) {
         await this.replaceProteus1to1WithMLS(conversation, mlsConversation);
       }
@@ -1671,7 +1677,7 @@ export class ConversationRepository {
     }
 
     if (protocol === ConversationProtocol.PROTEUS && isProteusConversation(conversation)) {
-      return this.initProteus1to1Conversation(conversation, isSupportedByTheOtherUser);
+      return this.initProteus1to1Conversation(conversation, isProteusSupportedByTheOtherUser);
     }
 
     return null;
@@ -1696,7 +1702,8 @@ export class ConversationRepository {
     const isConnectionAccepted = connectionEntity.isConnected();
 
     // Check what protocol should be used for 1:1 conversation
-    const {protocol, isSupportedByTheOtherUser} = await this.getProtocolFor1to1Conversation(otherUserId);
+    const {protocol, isMLSSupportedByTheOtherUser, isProteusSupportedByTheOtherUser} =
+      await this.getProtocolFor1to1Conversation(otherUserId);
 
     const localMLSConversation = this.conversationState.find1to1Conversation(otherUserId, ConversationProtocol.MLS);
 
@@ -1723,7 +1730,7 @@ export class ConversationRepository {
 
       const mlsConversation = await this.initMLS1to1Conversation(
         otherUserId,
-        isSupportedByTheOtherUser,
+        isMLSSupportedByTheOtherUser,
         isWebSocketEvent,
       );
 
@@ -1735,7 +1742,7 @@ export class ConversationRepository {
     }
 
     if (protocol === ConversationProtocol.PROTEUS) {
-      return this.initProteus1to1Conversation(proteusConversationId, isSupportedByTheOtherUser);
+      return this.initProteus1to1Conversation(proteusConversationId, isProteusSupportedByTheOtherUser);
     }
 
     return undefined;

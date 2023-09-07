@@ -26,6 +26,7 @@ import {
   CONVERSATION_LEGACY_ACCESS_ROLE,
   CONVERSATION_TYPE,
   RemoteConversations,
+  MLSConversation as BackendMLSConversation,
 } from '@wireapp/api-client/lib/conversation';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
@@ -53,7 +54,10 @@ import {ClientEvent} from 'src/script/event/Client';
 import {EventRepository} from 'src/script/event/EventRepository';
 import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';
 import {StorageSchemata} from 'src/script/storage/StorageSchemata';
-import {generateConversation as _generateConversation} from 'test/helper/ConversationGenerator';
+import {
+  generateConversation as _generateConversation,
+  generateAPIConversation,
+} from 'test/helper/ConversationGenerator';
 import {escapeRegex} from 'Util/SanitizationUtil';
 import {createUuid} from 'Util/uuid';
 
@@ -218,7 +222,20 @@ describe('ConversationRepository', () => {
   });
 
   describe('get1To1Conversation', () => {
-    beforeEach(() => testFactory.conversation_repository['conversationState'].conversations([]));
+    beforeEach(() => {
+      testFactory.conversation_repository['conversationState'].conversations([]);
+      testFactory.conversation_repository['userState'].users([]);
+      jest.clearAllMocks();
+    });
+
+    beforeAll(() => {
+      jest
+        .spyOn(testFactory.conversation_repository!, 'saveConversation')
+        .mockImplementation((conversation: Conversation) => {
+          testFactory.conversation_repository['conversationState'].conversations.push(conversation);
+          return Promise.resolve(conversation);
+        });
+    });
 
     it('finds an existing 1:1 conversation within a team', async () => {
       const conversationRepository = testFactory.conversation_repository!;
@@ -274,6 +291,117 @@ describe('ConversationRepository', () => {
       const conversationEntity = await conversationRepository.get1To1Conversation(userEntity);
 
       expect(conversationEntity).toBe(newConversationEntity);
+    });
+
+    it('returns proteus 1:1 conversation if one of the users does not support mls', async () => {
+      const conversationRepository = testFactory.conversation_repository!;
+      const userRepository = testFactory.user_repository!;
+
+      const otherUserId = {id: 'f718410c-3833-479d-bd80-a5df03f38414', domain: 'test-domain'};
+      const otherUser = new User(otherUserId.id, otherUserId.domain);
+      otherUser.supportedProtocols([ConversationProtocol.PROTEUS]);
+      userRepository['userState'].users.push(otherUser);
+
+      const selfUserId = {id: '109da9ca-a495-47a8-ac70-9ffbe924b2d0', domain: 'test-domain'};
+      const selfUser = new User(selfUserId.id, selfUserId.domain);
+      selfUser.supportedProtocols([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]);
+      jest.spyOn(conversationRepository['userState'], 'self').mockReturnValue(selfUser);
+
+      const proteus1to1ConversationResponse = generateAPIConversation({
+        id: {id: '04ab891e-ccf1-4dba-9d74-bacec64b5b1e', domain: 'test-domain'},
+        type: CONVERSATION_TYPE.ONE_TO_ONE,
+        protocol: ConversationProtocol.PROTEUS,
+      }) as BackendConversation;
+
+      const connection = new ConnectionEntity();
+      connection.conversationId = proteus1to1ConversationResponse.qualified_id;
+      otherUser.connection(connection);
+
+      const [proteus1to1Conversation] = conversationRepository.mapConversations([proteus1to1ConversationResponse]);
+
+      jest
+        .spyOn(conversationRepository['conversationService'], 'getConversationById')
+        .mockResolvedValueOnce(proteus1to1ConversationResponse);
+
+      const conversationEntity = await conversationRepository.get1To1Conversation(otherUser);
+
+      expect(conversationEntity?.serialize()).toEqual(proteus1to1Conversation.serialize());
+    });
+
+    it('returns established mls 1:1 conversation if both users support mls', async () => {
+      const conversationRepository = testFactory.conversation_repository!;
+      const userRepository = testFactory.user_repository!;
+
+      const otherUserId = {id: 'f718410c-3833-479d-bd80-a5df03f38414', domain: 'test-domain'};
+      const otherUser = new User(otherUserId.id, otherUserId.domain);
+      otherUser.supportedProtocols([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]);
+      userRepository['userState'].users.push(otherUser);
+
+      const selfUserId = {id: '109da9ca-a495-47a8-ac70-9ffbe924b2d0', domain: 'test-domain'};
+      const selfUser = new User(selfUserId.id, selfUserId.domain);
+      selfUser.supportedProtocols([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]);
+      jest.spyOn(conversationRepository['userState'], 'self').mockReturnValue(selfUser);
+
+      const mls1to1ConversationResponse = generateAPIConversation({
+        id: {id: '04ab891e-ccf1-4dba-9d74-bacec64b5b1e', domain: 'test-domain'},
+        type: CONVERSATION_TYPE.ONE_TO_ONE,
+        protocol: ConversationProtocol.MLS,
+        overwites: {group_id: 'groupId'},
+      }) as BackendMLSConversation;
+
+      const [mls1to1Conversation] = conversationRepository.mapConversations([mls1to1ConversationResponse]);
+
+      jest
+        .spyOn(conversationRepository['conversationService'], 'getMLS1to1Conversation')
+        .mockResolvedValueOnce(mls1to1ConversationResponse);
+
+      jest
+        .spyOn(conversationRepository['conversationService'], 'isMLSGroupEstablishedLocally')
+        .mockResolvedValueOnce(true);
+
+      const conversationEntity = await conversationRepository.get1To1Conversation(otherUser);
+
+      expect(conversationEntity?.serialize()).toEqual(mls1to1Conversation.serialize());
+    });
+
+    it('returns established mls 1:1 conversation if conversation exists locally even when proteus is choosen.', async () => {
+      const conversationRepository = testFactory.conversation_repository!;
+      const userRepository = testFactory.user_repository!;
+
+      const otherUserId = {id: 'f718410c-3833-479d-bd80-a5df03f38414', domain: 'test-domain'};
+      const otherUser = new User(otherUserId.id, otherUserId.domain);
+      otherUser.supportedProtocols([ConversationProtocol.PROTEUS]);
+      userRepository['userState'].users.push(otherUser);
+
+      const selfUserId = {id: '109da9ca-a495-47a8-ac70-9ffbe924b2d0', domain: 'test-domain'};
+      const selfUser = new User(selfUserId.id, selfUserId.domain);
+      selfUser.supportedProtocols([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]);
+      jest.spyOn(conversationRepository['userState'], 'self').mockReturnValue(selfUser);
+
+      const mls1to1ConversationResponse = generateAPIConversation({
+        id: {id: '04ab891e-ccf1-4dba-9d74-bacec64b5b1e', domain: 'test-domain'},
+        type: CONVERSATION_TYPE.ONE_TO_ONE,
+        protocol: ConversationProtocol.MLS,
+        overwites: {group_id: 'groupId'},
+      }) as BackendMLSConversation;
+
+      const [mls1to1Conversation] = conversationRepository.mapConversations([mls1to1ConversationResponse]);
+
+      const connection = new ConnectionEntity();
+      connection.conversationId = mls1to1Conversation.qualifiedId;
+      connection.userId = otherUserId;
+      otherUser.connection(connection);
+      mls1to1Conversation.connection(connection);
+
+      conversationRepository['conversationState'].conversations.push(mls1to1Conversation);
+
+      jest
+        .spyOn(conversationRepository['conversationService'], 'isMLSGroupEstablishedLocally')
+        .mockResolvedValueOnce(true);
+
+      const conversationEntity = await conversationRepository.get1To1Conversation(otherUser);
+
+      expect(conversationEntity?.serialize()).toEqual(mls1to1Conversation.serialize());
     });
   });
 
