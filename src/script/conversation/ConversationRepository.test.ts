@@ -220,7 +220,10 @@ describe('ConversationRepository', () => {
   describe('get1To1Conversation', () => {
     beforeEach(() => testFactory.conversation_repository['conversationState'].conversations([]));
 
-    it('finds an existing 1:1 conversation within a team', () => {
+    it('finds an existing 1:1 conversation within a team', async () => {
+      const conversationRepository = testFactory.conversation_repository!;
+      const userRepository = testFactory.user_repository!;
+
       const team1to1Conversation: Partial<ConversationDatabaseData> = {
         access: [CONVERSATION_ACCESS.INVITE],
         creator: '109da9ca-a495-47a8-ac70-9ffbe924b2d0',
@@ -250,27 +253,27 @@ describe('ConversationRepository', () => {
       const [newConversationEntity] = ConversationMapper.mapConversations([
         team1to1Conversation as ConversationDatabaseData,
       ]);
-      testFactory.conversation_repository['conversationState'].conversations.push(newConversationEntity);
+      conversationRepository['conversationState'].conversations.push(newConversationEntity);
 
       const teamId = team1to1Conversation.team;
-      const teamMemberId = team1to1Conversation.members.others[0].id;
+      const teamMemberId = team1to1Conversation.members?.others[0].id;
       const userEntity = new User(teamMemberId, 'test-domain');
       userEntity.inTeam(true);
       userEntity.isTeamMember(true);
       userEntity.teamId = teamId;
       userEntity.supportedProtocols([ConversationProtocol.PROTEUS]);
 
-      testFactory.user_repository['userState'].users.push(userEntity);
+      userRepository['userState'].users.push(userEntity);
 
       const selfUser = generateUser();
       selfUser.teamId = teamId;
       selfUser.supportedProtocols([ConversationProtocol.PROTEUS]);
 
-      spyOn(testFactory.conversation_repository['userState'], 'self').and.returnValue(selfUser);
+      jest.spyOn(conversationRepository['userState'], 'self').mockReturnValue(selfUser);
 
-      return testFactory.conversation_repository.get1To1Conversation(userEntity).then(conversationEntity => {
-        expect(conversationEntity).toBe(newConversationEntity);
-      });
+      const conversationEntity = await conversationRepository.get1To1Conversation(userEntity);
+
+      expect(conversationEntity).toBe(newConversationEntity);
     });
   });
 
