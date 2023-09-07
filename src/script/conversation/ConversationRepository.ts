@@ -1654,7 +1654,10 @@ export class ConversationRepository {
     const {protocol, isMLSSupportedByTheOtherUser, isProteusSupportedByTheOtherUser} =
       await this.getProtocolFor1to1Conversation(otherUserId);
     this.logger.info(
-      `Protocol for 1:1 conversation ${conversation.id} with user ${otherUserId.id} is ${protocol}, isSupportedByTheOtherUser: ${isSupportedByTheOtherUser}`,
+      `Protocol for 1:1 conversation ${conversation.id} with user ${otherUserId.id} is ${protocol}, ${JSON.stringify({
+        isMLSSupportedByTheOtherUser,
+        isProteusSupportedByTheOtherUser,
+      })}`,
     );
 
     // When called with mls conversation, we just make sure it is initialised.
