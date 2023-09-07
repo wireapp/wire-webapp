@@ -1198,18 +1198,8 @@ export class ConversationRepository {
       ConversationProtocol.MLS,
     );
 
-    const localProteusConversation = this.conversationState.find1to1Conversation(
-      userEntity.qualifiedId,
-      ConversationProtocol.PROTEUS,
-    );
-
     if (protocol === ConversationProtocol.MLS || localMLSConversation) {
-      const mlsConversation = await this.initMLS1to1Conversation(userEntity, isMLSSupportedByTheOtherUser);
-      if (localProteusConversation) {
-        await this.replaceProteus1to1WithMLS(localProteusConversation, mlsConversation);
-      }
-
-      return mlsConversation;
+      return this.initMLS1to1Conversation(userEntity, isMLSSupportedByTheOtherUser);
     }
 
     const proteusConversation = await this.getProteus1To1Conversation(userEntity);
@@ -1582,6 +1572,17 @@ export class ConversationRepository {
     this.logger.info(`MLS 1:1 conversation with user ${otherUserId.id} is established.`);
 
     mlsConversation.connection(otherUser.connection());
+
+    const localProteusConversation = this.conversationState.find1to1Conversation(
+      otherUserId,
+      ConversationProtocol.PROTEUS,
+    );
+
+    // If proteus 1:1 conversation with the same user is known, we have to make sure it is replaced with mls 1:1 conversation
+    if (localProteusConversation) {
+      await this.replaceProteus1to1WithMLS(localProteusConversation, establishedMLSConversation);
+    }
+
     return establishedMLSConversation;
   };
 
@@ -1672,11 +1673,7 @@ export class ConversationRepository {
     // we never go back to proteus conversation, even if one of the users do not support mls anymore
     // (e.g. due to the change of supported protocols in team configuration)
     if (protocol === ConversationProtocol.MLS || localMLSConversation) {
-      const mlsConversation = await this.initMLS1to1Conversation(otherUserId, isMLSSupportedByTheOtherUser);
-      if (isProteusConversation(conversation)) {
-        await this.replaceProteus1to1WithMLS(conversation, mlsConversation);
-      }
-      return mlsConversation;
+      return this.initMLS1to1Conversation(otherUserId, isMLSSupportedByTheOtherUser);
     }
 
     if (protocol === ConversationProtocol.PROTEUS && isProteusConversation(conversation)) {
@@ -1696,9 +1693,8 @@ export class ConversationRepository {
     const {conversationId: proteusConversationId, userId: otherUserId} = connectionEntity;
     const localProteusConversation = this.conversationState.findConversation(proteusConversationId);
 
+    // For connection request, we simply display proteus conversation of type 3 (connect) it will be displayed as a connection request
     if (connectionEntity.isOutgoingRequest()) {
-      // Return type of 3 (connect) conversation,
-      // it will be displayed as a connection request
       return localProteusConversation || this.fetchConversationById(proteusConversationId);
     }
 
@@ -1710,16 +1706,24 @@ export class ConversationRepository {
 
     const localMLSConversation = this.conversationState.find1to1Conversation(otherUserId, ConversationProtocol.MLS);
 
-    // It's not connection request and conversation is not accepted,
-    if (!isConnectionAccepted) {
-      // If we already know mls 1:1 conversation, we use it, even if proteus protocol was now choosen as common,
-      // we do not support switching back to proteus after mls conversation was established,
-      // only proteus -> mls migration is supported, never the other way around.
-      if (!localMLSConversation) {
-        return protocol === ConversationProtocol.PROTEUS ? localProteusConversation : undefined;
+    // If it's accepted, initialise conversation so it's ready to be used
+    if (isConnectionAccepted) {
+      if (protocol === ConversationProtocol.MLS || localMLSConversation) {
+        const isWebSocketEvent = source === EventSource.WEBSOCKET;
+        return this.initMLS1to1Conversation(otherUserId, isMLSSupportedByTheOtherUser, isWebSocketEvent);
       }
 
-      // Make sure proteus conversation is gone, we don't want to see it anymore
+      if (protocol === ConversationProtocol.PROTEUS) {
+        return this.initProteus1to1Conversation(proteusConversationId, isProteusSupportedByTheOtherUser);
+      }
+    }
+
+    // It's not connection request and conversation is not accepted, we never fetch the conversation from backend
+    // If we already know mls 1:1 conversation, we use it, even if proteus protocol was now choosen as common,
+    // we do not support switching back to proteus after mls conversation was established,
+    // only proteus -> mls migration is supported, never the other way around.
+    if (localMLSConversation) {
+      // Make sure proteus conversation is gone, we don't want to display it anymore
       if (localProteusConversation && isProteusConversation(localProteusConversation)) {
         await this.replaceProteus1to1WithMLS(localProteusConversation, localMLSConversation);
       }
@@ -1727,28 +1731,7 @@ export class ConversationRepository {
       return localMLSConversation;
     }
 
-    // If it's accepted, initialise conversation so it's ready to be used
-    if (protocol === ConversationProtocol.MLS || localMLSConversation) {
-      const isWebSocketEvent = source === EventSource.WEBSOCKET;
-
-      const mlsConversation = await this.initMLS1to1Conversation(
-        otherUserId,
-        isMLSSupportedByTheOtherUser,
-        isWebSocketEvent,
-      );
-
-      if (localProteusConversation && isProteusConversation(localProteusConversation)) {
-        await this.replaceProteus1to1WithMLS(localProteusConversation, mlsConversation);
-      }
-
-      return mlsConversation;
-    }
-
-    if (protocol === ConversationProtocol.PROTEUS) {
-      return this.initProteus1to1Conversation(proteusConversationId, isProteusSupportedByTheOtherUser);
-    }
-
-    return undefined;
+    return protocol === ConversationProtocol.PROTEUS ? localProteusConversation : undefined;
   };
 
   /**
@@ -3530,17 +3513,7 @@ export class ConversationRepository {
       return;
     }
 
-    const proteus1to1Conversation = this.conversationState.find1to1Conversation(
-      otherUserId,
-      ConversationProtocol.PROTEUS,
-    );
-
-    const mlsConversation = await this.initMLS1to1Conversation(otherUserId, true);
-
-    // When we receive a welcome message for mls 1:1 conversation, we need to make sure proteus 1:1 with this user is deleted (if it exists)
-    if (proteus1to1Conversation) {
-      await this.replaceProteus1to1WithMLS(proteus1to1Conversation, mlsConversation);
-    }
+    await this.initMLS1to1Conversation(otherUserId, true);
   }
 
   /**
