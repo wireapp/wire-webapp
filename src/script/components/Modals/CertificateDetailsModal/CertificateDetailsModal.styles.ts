@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2019 Wire Swiss GmbH
+ * Copyright (C) 2023 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +17,24 @@
  *
  */
 
-.certificate-details__modal {
-  &--content {
-    overflow: auto;
+import {CSSObject} from '@emotion/serialize';
 
-    max-height: 251px;
-    font-size: var(--font-size-small);
-    letter-spacing: 0.05px;
-    line-height: var(--line-height-md);
-    word-break: break-word;
-  }
+interface Styles {
+  content: CSSObject;
+  modalWrapper: CSSObject;
 }
+
+export const styles: Styles = {
+  modalWrapper: {
+    maxWidth: '460px',
+    width: '100%',
+  },
+  content: {
+    overflow: 'auto',
+    maxHeight: '251px',
+    fontSize: 'var(--font-size-small)',
+    letterSpacing: '0.05px',
+    lineHeight: 'var(--line-height-md)',
+    wordBreak: 'break-word',
+  },
+};

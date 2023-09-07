@@ -23,6 +23,8 @@ import {Icon} from 'Components/Icon';
 import {ModalComponent} from 'Components/ModalComponent';
 import {t} from 'Util/LocalizerUtil';
 
+import {styles} from './CertificateDetailsModal.styles';
+
 const COPY_MESSAGE_TIMEOUT = 3000;
 
 export interface CertificateDetailsModalProps {
@@ -59,51 +61,48 @@ export const CertificateDetailsModal = ({certificate, onClose, downloadCertifica
   };
 
   return (
-    <div className="certificate-details__modal">
-      <ModalComponent
-        isShown
-        onBgClick={onClose}
-        onClosed={onClose}
-        data-uie-name="modal-certificate-details"
-        wrapperCSS={{
-          maxWidth: '460px',
-          width: '100%',
-        }}
-      >
-        <div className="modal__header">
-          <h2 className="modal__header__title" data-uie-name="status-modal-title">
-            {t('E2EI.certificateDetails')}
-          </h2>
+    <ModalComponent
+      isShown
+      onBgClick={onClose}
+      onClosed={onClose}
+      data-uie-name="modal-certificate-details"
+      wrapperCSS={styles.modalWrapper}
+    >
+      <div className="modal__header">
+        <h2 className="modal__header__title" data-uie-name="status-modal-title">
+          {t('E2EI.certificateDetails')}
+        </h2>
 
-          <button type="button" className="modal__header__button" onClick={onClose} data-uie-name="do-close">
-            <Icon.Close />
-          </button>
-        </div>
+        <button type="button" className="modal__header__button" onClick={onClose} data-uie-name="do-close">
+          <Icon.Close />
+        </button>
+      </div>
 
-        <div className="modal__body certificate-details__modal--content">{certificate}</div>
+      <div className="modal__body" css={styles.content}>
+        {certificate}
+      </div>
 
-        <div className="modal__buttons">
-          <button
-            type="button"
-            onClick={onDownload}
-            disabled={isDownloading}
-            className="modal__button modal__button--secondary"
-            data-uie-name="download-certificate"
-          >
-            {t('E2EI.downloadCertificate')}
-          </button>
+      <div className="modal__buttons">
+        <button
+          type="button"
+          onClick={onDownload}
+          disabled={isDownloading}
+          className="modal__button modal__button--secondary"
+          data-uie-name="download-certificate"
+        >
+          {t('E2EI.downloadCertificate')}
+        </button>
 
-          <button
-            type="button"
-            onClick={onCopy}
-            disabled={isTextCopied}
-            className="modal__button modal__button--secondary"
-            data-uie-name="copy-certificate"
-          >
-            {t(isTextCopied ? 'E2EI.certificateCopied' : 'E2EI.copyCertificate')}
-          </button>
-        </div>
-      </ModalComponent>
-    </div>
+        <button
+          type="button"
+          onClick={onCopy}
+          disabled={isTextCopied}
+          className="modal__button modal__button--secondary"
+          data-uie-name="copy-certificate"
+        >
+          {t(isTextCopied ? 'E2EI.certificateCopied' : 'E2EI.copyCertificate')}
+        </button>
+      </div>
+    </ModalComponent>
   );
 };
