@@ -17,11 +17,14 @@
  *
  */
 
+import {useState} from 'react';
+
 import {container} from 'tsyringe';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {Badges, MLSStatues} from 'Components/Badges';
+import {CertificateDetailsModal} from 'Components/Modals/CertificateDetailsModal';
 import {Core} from 'src/script/service/CoreSingleton';
 import {t} from 'Util/LocalizerUtil';
 
@@ -46,19 +49,21 @@ import {styles} from './E2EICertificateDetails.styles';
 // };
 
 interface E2ECertificateDetailsProps {
-  MLSStatus?: MLSStatues;
+  core?: Core;
   isMLSVerified?: boolean;
 }
 
-export const E2EICertificateDetails = ({MLSStatus, isMLSVerified}: E2ECertificateDetailsProps) => {
-  const core = container.resolve(Core);
-  const hasActiveCertificateData = core.service?.e2eIdentity?.hasActiveCertificate();
+export const E2EICertificateDetails = ({core = container.resolve(Core), isMLSVerified}: E2ECertificateDetailsProps) => {
+  // TODO: This functionality need to be added in e2eIdentity service.
+  const MLSStatus = undefined;
 
-  if (!hasActiveCertificateData) {
+  const [isCertificateDetailsModalOpen, setIsCertificateDetailsModalOpen] = useState(false);
+
+  const certificate = core.service?.e2eIdentity?.getCertificateData();
+
+  if (!certificate) {
     return null;
   }
-
-  // const certificateData = core.service?.e2eIdentity?.getCertificateData();
 
   const isExpired = MLSStatus === MLSStatues.EXPIRED;
   const isNotDownloaded = MLSStatus === MLSStatues.NOT_DOWNLOADED;
@@ -66,11 +71,6 @@ export const E2EICertificateDetails = ({MLSStatus, isMLSVerified}: E2ECertificat
   const isNotActivated = MLSStatus === MLSStatues.NOT_ACTIVATED;
 
   const isValid = !isExpired && !isNotDownloaded && !isExpiresSoon && !isNotActivated;
-
-  const showCertificateDetails = () => {
-    // eslint-disable-next-line no-console
-    console.log('Show Certificate Details');
-  };
 
   const getCertificate = () => {
     // eslint-disable-next-line no-console
@@ -121,11 +121,19 @@ export const E2EICertificateDetails = ({MLSStatus, isMLSVerified}: E2ECertificat
         {!isNotActivated && (
           <Button
             variant={ButtonVariant.TERTIARY}
-            onClick={showCertificateDetails}
+            onClick={() => setIsCertificateDetailsModalOpen(true)}
             data-uie-name="show-certificate-details"
           >
             {t('E2E.showCertificateDetails')}
           </Button>
+        )}
+
+        {isCertificateDetailsModalOpen && (
+          <CertificateDetailsModal
+            certificate={certificate}
+            onClose={() => setIsCertificateDetailsModalOpen(false)}
+            downloadCertificate={getCertificate}
+          />
         )}
 
         {isNotActivated && (
