@@ -1474,9 +1474,38 @@ export class ConversationRepository {
 
     const isActiveConversation = this.conversationState.isActiveConversation(proteusConversation);
 
-    //TODO:
-    // Before we delete the proteus 1:1 conversation, we need to make sure all the local properties are also migrated (eg. archive_state)
-    // ConversationMapper.updateProperties(mlsConversation, {});
+    // Before we delete the proteus 1:1 conversation, we need to make sure all the local properties are also migrated
+    const {
+      archivedState,
+      archivedTimestamp,
+      cleared_timestamp,
+      localMessageTimer,
+      last_event_timestamp,
+      last_read_timestamp,
+      last_server_timestamp,
+      legalHoldStatus,
+      mutedState,
+      mutedTimestamp,
+      status,
+      verification_state,
+    } = proteusConversation;
+
+    const updates: Partial<Record<keyof Conversation, any>> = {
+      archivedState,
+      archivedTimestamp,
+      cleared_timestamp,
+      localMessageTimer,
+      last_event_timestamp,
+      last_read_timestamp,
+      last_server_timestamp,
+      legalHoldStatus,
+      mutedState,
+      mutedTimestamp,
+      status,
+      verification_state,
+    };
+
+    ConversationMapper.updateProperties(mlsConversation, updates);
 
     this.logger.info(`Deleting proteus 1:1 conversation ${proteusConversation.id}`);
     await this.deleteConversationLocally(proteusConversation.qualifiedId, true);
