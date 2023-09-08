@@ -1190,16 +1190,15 @@ export class ConversationRepository {
    * @returns Resolves with the conversation with requested user
    */
   async get1To1Conversation(userEntity: User): Promise<Conversation | null> {
-    const {protocol, isMLSSupportedByTheOtherUser, isProteusSupportedByTheOtherUser} =
-      await this.getProtocolFor1to1Conversation(userEntity);
+    const {qualifiedId: otherUserId} = userEntity;
 
-    const localMLSConversation = this.conversationState.find1to1Conversation(
-      userEntity.qualifiedId,
-      ConversationProtocol.MLS,
-    );
+    const {protocol, isMLSSupportedByTheOtherUser, isProteusSupportedByTheOtherUser} =
+      await this.getProtocolFor1to1Conversation(otherUserId);
+
+    const localMLSConversation = this.conversationState.find1to1Conversation(otherUserId, ConversationProtocol.MLS);
 
     if (protocol === ConversationProtocol.MLS || localMLSConversation) {
-      return this.initMLS1to1Conversation(userEntity, isMLSSupportedByTheOtherUser);
+      return this.initMLS1to1Conversation(otherUserId, isMLSSupportedByTheOtherUser);
     }
 
     const proteusConversation = await this.getProteus1To1Conversation(userEntity);
