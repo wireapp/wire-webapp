@@ -2774,17 +2774,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@datadog/browser-logs@npm:^4.48.1":
-  version: 4.48.1
-  resolution: "@datadog/browser-logs@npm:4.48.1"
+"@datadog/browser-core@npm:4.48.2":
+  version: 4.48.2
+  resolution: "@datadog/browser-core@npm:4.48.2"
+  checksum: 28002c637ccdab1f6035e75e87e27a5c73a19391f08465c7e06c7b9b4cdddf26e6702c534455bbbe6e343ed9acb747e9702539b957022780f09ceb4ac2a0920c
+  languageName: node
+  linkType: hard
+
+"@datadog/browser-logs@npm:^4.48.2":
+  version: 4.48.2
+  resolution: "@datadog/browser-logs@npm:4.48.2"
   dependencies:
-    "@datadog/browser-core": 4.48.1
+    "@datadog/browser-core": 4.48.2
   peerDependencies:
-    "@datadog/browser-rum": 4.48.1
+    "@datadog/browser-rum": 4.48.2
   peerDependenciesMeta:
     "@datadog/browser-rum":
       optional: true
-  checksum: 3d8b3f6f2b032b075397ab821dabb32148c037da07865f468c933f075cbbed34a169fb81de79eef5719d77d35244f9d51da546d70a4044b0d8a94d325b7755a2
+  checksum: 4040e585f013522e4b14bfffc3699c08ed712fe435e4f304e03cfce725602e7e723bab8a663a0501574c5702f1418e5ad86b5794f23274b3ce220f2bdc722809
   languageName: node
   linkType: hard
 
@@ -18254,7 +18261,7 @@ __metadata:
     "@babel/preset-env": 7.22.15
     "@babel/preset-react": 7.22.15
     "@babel/preset-typescript": 7.22.15
-    "@datadog/browser-logs": ^4.48.1
+    "@datadog/browser-logs": ^4.48.2
     "@datadog/browser-rum": ^4.48.1
     "@emotion/eslint-plugin": ^11.11.0
     "@emotion/react": 11.11.1
