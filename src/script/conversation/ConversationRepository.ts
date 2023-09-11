@@ -1530,6 +1530,7 @@ export class ConversationRepository {
   private readonly establishMLS1to1Conversation = async (
     mlsConversation: MLSConversation,
     otherUserId: QualifiedId,
+    shouldDelayGroupEstablishment = false,
   ): Promise<MLSConversation> => {
     const selfUser = this.userState.self();
 
@@ -1543,11 +1544,30 @@ export class ConversationRepository {
       throw new Error('Conversation service is not available!');
     }
 
+    // After connection request is accepted, both sides (users) of connection will react to conversation status update event.
+    // We want to reduce the possibility of two users trying to establish an MLS group at the same time.
+    // A user that has previously sent a connection request will wait for a short period of time before establishing an MLS group.
+    // It's very likely that this user will receive a welcome message after the user that has accepted a connection request, establishes an MLS group without any delay.
+    if (shouldDelayGroupEstablishment) {
+      await new Promise(resolve =>
+        setTimeout(resolve, ConversationRepository.CONFIG.ESTABLISH_MLS_GROUP_AFTER_CONNECTION_IS_ACCEPTED_DELAY),
+      );
+    }
+
+    const isAlreadyEstablished = await this.conversationService.isMLSGroupEstablishedLocally(mlsConversation.groupId);
+
+    if (isAlreadyEstablished) {
+      this.logger.info(`MLS 1:1 conversation with user ${otherUserId.id} is already established.`);
+      return mlsConversation;
+    }
+
     const {members, epoch} = await conversationService.establishMLS1to1Conversation(
       mlsConversation.groupId,
       {client: this.core.clientId, user: selfUser.qualifiedId},
       otherUserId,
     );
+
+    this.logger.info(`MLS 1:1 conversation with user ${otherUserId.id} was established.`);
 
     ConversationMapper.updateProperties(mlsConversation, {participating_user_ids: members.others, epoch});
     await this.updateParticipatingUserEntities(mlsConversation);
@@ -1568,8 +1588,13 @@ export class ConversationRepository {
   ): Promise<MLSConversation> => {
     this.logger.info(`Initialising MLS 1:1 conversation with user ${otherUserId.id}...`);
     const mlsConversation = await this.getMLS1to1Conversation(otherUserId);
+    const localProteusConversation = this.conversationState.find1to1Conversation(
+      otherUserId,
+      ConversationProtocol.PROTEUS,
+    );
 
     const otherUser = await this.userRepository.getUserById(otherUserId);
+    mlsConversation.connection(otherUser.connection());
 
     //if mls is not supported by the other user we do not establish the group yet
     //we just mark the mls conversation as readonly and return it
@@ -1578,35 +1603,19 @@ export class ConversationRepository {
       this.logger.info(
         `MLS 1:1 conversation with user ${otherUserId.id} is not supported by the other user, conversation will become readonly`,
       );
+      // If proteus 1:1 conversation with the same user is known, we have to make sure it is replaced with mls 1:1 conversation
+      if (localProteusConversation) {
+        await this.replaceProteus1to1WithMLS(localProteusConversation, mlsConversation);
+      }
       return mlsConversation;
     }
 
-    // After connection request is accepted, both sides (users) of connection will react to conversation status update event.
-    // We want to reduce the possibility of two users trying to establish an MLS group at the same time.
-    // A user that has previously sent a connection request will wait for a short period of time before establishing an MLS group.
-    // It's very likely that this user will receive a welcome message after the user that has accepted a connection request, establishes an MLS group without any delay.
-    if (shouldDelayGroupEstablishment) {
-      await new Promise(resolve =>
-        setTimeout(resolve, ConversationRepository.CONFIG.ESTABLISH_MLS_GROUP_AFTER_CONNECTION_IS_ACCEPTED_DELAY),
-      );
-    }
-
-    const isAlreadyEstablished = await this.conversationService.isMLSGroupEstablishedLocally(mlsConversation.groupId);
-
-    const establishedMLSConversation = isAlreadyEstablished
-      ? mlsConversation
-      : await this.establishMLS1to1Conversation(mlsConversation, otherUserId);
-
-    this.logger.info(`MLS 1:1 conversation with user ${otherUserId.id} is established.`);
-
-    mlsConversation.connection(otherUser.connection());
-
-    const localProteusConversation = this.conversationState.find1to1Conversation(
+    const establishedMLSConversation = await this.establishMLS1to1Conversation(
+      mlsConversation,
       otherUserId,
-      ConversationProtocol.PROTEUS,
+      shouldDelayGroupEstablishment,
     );
 
-    // If proteus 1:1 conversation with the same user is known, we have to make sure it is replaced with mls 1:1 conversation
     if (localProteusConversation) {
       await this.replaceProteus1to1WithMLS(localProteusConversation, establishedMLSConversation);
     }
