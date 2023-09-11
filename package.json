@@ -6,7 +6,7 @@
     "@wireapp/avs": "9.3.7",
     "@wireapp/core": "42.0.3",
     "@wireapp/lru-cache": "3.8.1",
-    "@wireapp/react-ui-kit": "9.9.1",
+    "@wireapp/react-ui-kit": "9.9.4",
     "@wireapp/store-engine-dexie": "2.1.6",
     "@wireapp/store-engine-sqleet": "1.8.9",
     "@wireapp/webapp-events": "0.18.3",
