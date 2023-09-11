@@ -148,7 +148,7 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
     <PreferencesPage title={t('preferencesAccount')}>
       <div className="preferences-wrapper">
         <div className="preferences-account-name">
-          <h3 className="heading-h3 text-center ellipsis" title={name}>
+          <h3 className="heading-h3 text-center" title={name}>
             {name}
           </h3>
 

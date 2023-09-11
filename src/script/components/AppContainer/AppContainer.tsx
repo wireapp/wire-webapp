@@ -24,6 +24,9 @@ import {container} from 'tsyringe';
 
 import {SIGN_OUT_REASON} from 'src/script/auth/SignOutReason';
 import {useSingleInstance} from 'src/script/hooks/useSingleInstance';
+import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
+
+import {useTheme} from './hooks/useTheme';
 
 import {Configuration} from '../../Config';
 import {setAppLocale} from '../../localization/Localizer';
@@ -45,6 +48,7 @@ export const AppContainer: FC<AppProps> = ({config, clientType}) => {
   // Publishing application on the global scope for debug and testing purposes.
   window.wire.app = app;
   const mainView = new MainViewModel(app.repository);
+  useTheme(() => app.repository.properties.getPreference(PROPERTIES_TYPE.INTERFACE.THEME));
 
   const {hasOtherInstance, registerInstance} = useSingleInstance();
 

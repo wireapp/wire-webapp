@@ -18,7 +18,6 @@
  */
 
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
-import ko from 'knockout';
 
 import {t} from 'Util/LocalizerUtil';
 
@@ -33,11 +32,13 @@ export class ReceiptModeUpdateMessage extends SystemMessage {
     this.type = CONVERSATION_EVENT.RECEIPT_MODE_UPDATE;
     this.system_message_type = SystemMessageType.CONVERSATION_RECEIPT_MODE_UPDATE;
 
-    this.caption = ko.pureComputed(() => {
-      if (isReceiptEnabled) {
-        return this.user().isMe ? t('conversationReceiptsOnYou') : t('conversationReceiptsOn');
-      }
-      return this.user().isMe ? t('conversationReceiptsOffYou') : t('conversationReceiptsOff');
-    });
+    this.caption = getCaption(isReceiptEnabled, this.user().isMe);
   }
 }
+
+const getCaption = (isReceiptEnabled: boolean, isSelfUser: boolean) => {
+  if (isReceiptEnabled) {
+    return isSelfUser ? t('conversationReceiptsOnYou') : t('conversationReceiptsOn');
+  }
+  return isSelfUser ? t('conversationReceiptsOffYou') : t('conversationReceiptsOff');
+};

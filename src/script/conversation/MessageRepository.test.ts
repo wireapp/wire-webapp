@@ -74,7 +74,7 @@ type MessageRepositoryDependencies = {
 
 async function buildMessageRepository(): Promise<[MessageRepository, MessageRepositoryDependencies]> {
   const userState = new UserState();
-  userState.users([selfUser]);
+  userState.self(selfUser);
   const clientState = new ClientState();
   clientState.currentClient(new ClientEntity(true, ''));
   const core = new Account();

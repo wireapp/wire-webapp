@@ -60,6 +60,7 @@ import {MemberMessage} from '../entity/message/MemberMessage';
 import type {Message} from '../entity/message/Message';
 import {MessageTimerUpdateMessage} from '../entity/message/MessageTimerUpdateMessage';
 import {MissedMessage} from '../entity/message/MissedMessage';
+import {MLSConversationRecoveredMessage} from '../entity/message/MLSConversationRecoveredMessage';
 import {PingMessage} from '../entity/message/PingMessage';
 import {ReceiptModeUpdateMessage} from '../entity/message/ReceiptModeUpdateMessage';
 import {RenameMessage} from '../entity/message/RenameMessage';
@@ -320,6 +321,11 @@ export class EventMapper {
 
       case ClientEvent.CONVERSATION.MISSED_MESSAGES: {
         messageEntity = this._mapEventMissedMessages();
+        break;
+      }
+
+      case ClientEvent.CONVERSATION.MLS_CONVERSATION_RECOVERED: {
+        messageEntity = this._mapEventMLSConversationRecovered();
         break;
       }
 
@@ -627,6 +633,13 @@ export class EventMapper {
   }
 
   /**
+   * Maps JSON data of local MLS conversation recovered event to message entity.
+   */
+  private _mapEventMLSConversationRecovered(): MissedMessage {
+    return new MLSConversationRecoveredMessage();
+  }
+
+  /**
    * Maps JSON data of `conversation.knock` message into message entity.
    */
   private _mapEventPing(): PingMessage {
@@ -640,9 +653,7 @@ export class EventMapper {
    * @returns Rename message entity
    */
   private _mapEventRename({data: eventData}: LegacyEventRecord) {
-    const messageEntity = new RenameMessage();
-    messageEntity.name = eventData.name;
-    return messageEntity;
+    return new RenameMessage(eventData.name);
   }
 
   /**

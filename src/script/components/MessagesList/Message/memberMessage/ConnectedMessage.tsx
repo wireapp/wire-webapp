@@ -23,7 +23,7 @@ import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {Icon} from 'Components/Icon';
-import {ClassifiedBar} from 'Components/input/ClassifiedBar';
+import {UserClassifiedBar} from 'Components/input/ClassifiedBar';
 import {UnverifiedUserWarning} from 'Components/Modals/UserModal';
 import {User} from 'src/script/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -59,7 +59,9 @@ const ConnectedMessage: React.FC<ConnectedMessageProps> = ({
         <p className="message-connected-username label-username">{handle}</p>
       )}
 
-      {isOutgoingRequest && classifiedDomains && <ClassifiedBar users={[user]} classifiedDomains={classifiedDomains} />}
+      {isOutgoingRequest && classifiedDomains && (
+        <UserClassifiedBar users={[user]} classifiedDomains={classifiedDomains} />
+      )}
 
       <Avatar
         avatarSize={AVATAR_SIZE.X_LARGE}

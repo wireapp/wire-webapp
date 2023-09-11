@@ -18,13 +18,10 @@
  */
 
 import {render, screen} from '@testing-library/react';
-import ko from 'knockout';
 
-import {DeleteConversationMessage} from 'src/script/entity/message/DeleteConversationMessage';
 import {MessageTimerUpdateMessage} from 'src/script/entity/message/MessageTimerUpdateMessage';
 import {ReceiptModeUpdateMessage} from 'src/script/entity/message/ReceiptModeUpdateMessage';
 import {RenameMessage} from 'src/script/entity/message/RenameMessage';
-import {SystemMessageType} from 'src/script/message/SystemMessageType';
 
 import {SystemMessage} from './SystemMessage';
 
@@ -43,27 +40,9 @@ jest.mock('Components/Icon', () => ({
   __esModule: true,
 }));
 
-type SystemMessageUnion =
-  | DeleteConversationMessage
-  | MessageTimerUpdateMessage
-  | ReceiptModeUpdateMessage
-  | RenameMessage;
-
-const createSystemMessage = (partialSystemMessage: Partial<SystemMessageUnion>) => {
-  const systemMessage: Partial<SystemMessageUnion> = {
-    caption: ko.pureComputed(() => '') as any,
-    timestamp: ko.observable(Date.now()),
-    unsafeSenderName: ko.pureComputed(() => ''),
-    ...partialSystemMessage,
-  };
-  return systemMessage as SystemMessageUnion;
-};
-
 describe('SystemMessage', () => {
   it('shows edit icon for RenameMessage', async () => {
-    const message = createSystemMessage({
-      system_message_type: SystemMessageType.CONVERSATION_RENAME,
-    });
+    const message = new RenameMessage('new name');
 
     render(<SystemMessage message={message} />);
 
@@ -72,9 +51,7 @@ describe('SystemMessage', () => {
   });
 
   it('shows timer icon for MessageTimerUpdateMessage', async () => {
-    const message = createSystemMessage({
-      system_message_type: SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE,
-    });
+    const message = new MessageTimerUpdateMessage(0);
 
     render(<SystemMessage message={message} />);
 
@@ -83,9 +60,7 @@ describe('SystemMessage', () => {
   });
 
   it('shows read icon for ReceiptModeUpdateMessage', async () => {
-    const message = createSystemMessage({
-      system_message_type: SystemMessageType.CONVERSATION_RECEIPT_MODE_UPDATE,
-    });
+    const message = new ReceiptModeUpdateMessage(true);
 
     render(<SystemMessage message={message} />);
 

@@ -408,7 +408,7 @@ export class ActionsViewModel {
             await this.connectionRepository.unblockUser(userEntity);
             const conversationEntity = await this.conversationRepository.get1To1Conversation(userEntity);
             resolve();
-            if (typeof conversationEntity !== 'boolean') {
+            if (conversationEntity) {
               await this.conversationRepository.updateParticipatingUserEntities(conversationEntity);
             }
           },

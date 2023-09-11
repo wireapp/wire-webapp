@@ -23,24 +23,21 @@ import cx from 'classnames';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
-import {MessageTime} from './MessageTime';
+import {ReadReceiptStatus} from './ReadReceiptStatus';
 
 import {PingMessage as PingMessageEntity} from '../../../entity/message/PingMessage';
 
 export interface PingMessageProps {
   message: PingMessageEntity;
+  is1to1Conversation: boolean;
+  isLastDeliveredMessage: boolean;
 }
 
-const PingMessage: React.FC<PingMessageProps> = ({message}) => {
-  const {unsafeSenderName, caption, timestamp, ephemeral_caption, isObfuscated, get_icon_classes} =
-    useKoSubscribableChildren(message, [
-      'unsafeSenderName',
-      'caption',
-      'timestamp',
-      'ephemeral_caption',
-      'isObfuscated',
-      'get_icon_classes',
-    ]);
+const PingMessage: React.FC<PingMessageProps> = ({message, is1to1Conversation, isLastDeliveredMessage}) => {
+  const {unsafeSenderName, caption, ephemeral_caption, isObfuscated, get_icon_classes} = useKoSubscribableChildren(
+    message,
+    ['unsafeSenderName', 'caption', 'ephemeral_caption', 'isObfuscated', 'get_icon_classes'],
+  );
 
   return (
     <div className="message-header" data-uie-name="element-message-ping">
@@ -48,7 +45,7 @@ const PingMessage: React.FC<PingMessageProps> = ({message}) => {
         <div className={`icon-ping ${get_icon_classes}`} />
       </div>
       <div
-        className={cx('message-header-label', {
+        className={cx('message-body-content', 'message-header-label', {
           'ephemeral-message-obfuscated': isObfuscated,
         })}
         title={ephemeral_caption}
@@ -60,7 +57,12 @@ const PingMessage: React.FC<PingMessageProps> = ({message}) => {
         </p>
       </div>
       <div className="message-body-actions">
-        <MessageTime timestamp={timestamp} data-uie-uid={message.id} data-uie-name="item-message-call-timestamp" />
+        <ReadReceiptStatus
+          showOnHover
+          message={message}
+          is1to1Conversation={is1to1Conversation}
+          isLastDeliveredMessage={isLastDeliveredMessage}
+        />
       </div>
     </div>
   );
