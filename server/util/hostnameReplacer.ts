@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2023 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,40 +17,12 @@
  *
  */
 
-export const supportedLocales: string[] = [
-  'ar-SA',
-  'cs-CZ',
-  'da-DK',
-  'de-DE',
-  'el-GR',
-  'en-US',
-  'es-ES',
-  'et-EE',
-  'fa-IR',
-  'fi-FI',
-  'fr-FR',
-  'hi-IN',
-  'hr-HR',
-  'hu-HU',
-  'id-ID',
-  'it-IT',
-  'ja-JP',
-  'lt-LT',
-  'lv-LV',
-  'nl-NL',
-  'no-NO',
-  'pl-PL',
-  'pt-PT',
-  'pt-BR',
-  'ro-RO',
-  'ru-RU',
-  'si-LK',
-  'sk-SK',
-  'sl-SI',
-  'sr-SP',
-  'sv-SE',
-  'tr-TR',
-  'uk-UA',
-  'zh-CN',
-  'zh-TW',
-];
+import {Request} from 'express';
+
+export function replaceHostname(template: string, request: Request): string {
+  return template.replaceAll('[[hostname]]', request.hostname.replace('webapp.', ''));
+}
+
+export function replaceHostnameInObject<T>(object: T, request: Request): T {
+  return JSON.parse(replaceHostname(JSON.stringify(object), request));
+}

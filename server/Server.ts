@@ -38,6 +38,7 @@ import {GoogleWebmasterRoute} from './routes/googlewebmaster/GoogleWebmasterRout
 import {RedirectRoutes} from './routes/RedirectRoutes';
 import {Root} from './routes/Root';
 import * as BrowserUtil from './util/BrowserUtil';
+import {replaceHostnameInObject} from './util/hostnameReplacer';
 
 class Server {
   private readonly app: express.Express;
@@ -69,7 +70,7 @@ class Server {
     this.initSiteMap(this.config);
     this.app.use(Root());
     this.app.use(HealthCheckRoute());
-    this.app.use(ConfigRoute(this.clientConfig));
+    this.app.use(ConfigRoute(this.config, this.clientConfig));
     this.app.use(GoogleWebmasterRoute(this.config));
     this.app.use(AppleAssociationRoute());
     this.app.use(NotFoundRoute());
@@ -136,12 +137,14 @@ class Server {
         preload: true,
       }),
     );
-    this.app.use(
+    this.app.use((req, res, next) => {
       helmet.contentSecurityPolicy({
-        directives: this.config.CSP,
+        directives: this.config.ENABLE_DYNAMIC_HOSTNAME
+          ? replaceHostnameInObject(this.config.CSP, req)
+          : this.config.CSP,
         reportOnly: false,
-      }),
-    );
+      })(req, res, next);
+    });
     this.app.use(
       helmet.referrerPolicy({
         policy: 'same-origin',

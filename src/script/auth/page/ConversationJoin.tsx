@@ -65,8 +65,8 @@ const ConversationJoinComponent = ({
 }: Props & ConnectedProps & DispatchProps) => {
   const nameInput = React.useRef<HTMLInputElement>(null);
   const {formatMessage: _} = useIntl();
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
-  const [isLoggedIn, setIsLoggedIn] = useState(selfName !== null);
   const [accentColor] = useState(AccentColor.STRONG_BLUE);
   const [conversationCode, setConversationCode] = useState<string>();
   const [conversationKey, setConversationKey] = useState<string>();
@@ -100,6 +100,12 @@ const ConversationJoinComponent = ({
         setIsValidLink(false);
       });
   }, []);
+
+  useEffect(() => {
+    if (selfName) {
+      setIsLoggedIn(true);
+    }
+  }, [selfName]);
 
   const routeToApp = (conversation: string = '', domain: string = '') => {
     const redirectLocation = `${UrlUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP)}${
@@ -218,7 +224,7 @@ const ConversationJoinComponent = ({
         </div>
         <Columns style={{display: 'flex', gap: '2rem', alignSelf: 'center', maxWidth: '100%'}}>
           <Column>
-            {isLoggedIn ? (
+            {isLoggedIn && selfName ? (
               <IsLoggedInColumn selfName={selfName} handleLogout={handleLogout} handleSubmit={handleSubmit} />
             ) : (
               <Login embedded />
