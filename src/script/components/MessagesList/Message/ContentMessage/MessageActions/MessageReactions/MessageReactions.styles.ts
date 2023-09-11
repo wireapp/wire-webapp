@@ -73,7 +73,7 @@ export const messageReactionButtonTooltipTextLink: CSSObject = {
 export const messageReactionCount = (isActive?: boolean): CSSObject => {
   return {
     color: isActive ? 'var(--accent-color)' : 'var(--message-reactions-count)',
-    fontSize: 'var(--font-size-base)',
+    fontSize: 'var(--font-size-small)',
     letterSpacing: '0.031rem',
   };
 };
@@ -119,5 +119,5 @@ export const getReactionsButtonCSS = (isActive?: boolean, isDisabled?: boolean):
 };
 
 export const actionMenuEmojiSize = {
-  width: '1.375rem',
+  width: '16px',
 };

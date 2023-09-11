@@ -28,11 +28,11 @@ import {AvailabilityState} from 'Components/AvailabilityState';
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {ErrorFallback} from 'Components/ErrorFallback';
 import {Icon} from 'Components/Icon';
-import {ClassifiedBar} from 'Components/input/ClassifiedBar';
+import {UserClassifiedBar} from 'Components/input/ClassifiedBar';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import type {User} from '../../entity/User';
+import {User} from '../../entity/User';
 
 export interface UserDetailsProps {
   badge?: string;
@@ -110,7 +110,7 @@ export const UserDetailsComponent: React.FC<UserDetailsProps> = ({
       )}
 
       {classifiedDomains && (
-        <ClassifiedBar
+        <UserClassifiedBar
           conversationDomain={conversationDomain}
           users={[participant]}
           classifiedDomains={classifiedDomains}

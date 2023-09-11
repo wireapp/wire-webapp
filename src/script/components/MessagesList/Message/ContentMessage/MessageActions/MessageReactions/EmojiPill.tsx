@@ -94,9 +94,13 @@ const EmojiPill: FC<EmojiPillProps> = ({
             <p css={messageReactionButtonTooltipText}>
               {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */}
               <span onClick={onTooltipReactionCountClick} css={messageReactionButtonTooltipTextLink}>
-                {t('conversationLikesCaption', {number: emojiCount.toString()})}
+                {emojiCount > 1
+                  ? t('conversationLikesCaptionPlural', {number: emojiCount.toString()})
+                  : t('conversationLikesCaptionSingular', {number: emojiCount.toString()})}
               </span>{' '}
-              {t('conversationLikesCaptionReacted', {emojiName})}
+              {emojiCount > 1
+                ? t('conversationLikesCaptionReactedPlural', {emojiName})
+                : t('conversationLikesCaptionReactedSingular', {emojiName})}
             </p>
           </div>
         }
@@ -123,7 +127,13 @@ const EmojiPill: FC<EmojiPillProps> = ({
             }
           }}
         >
-          <EmojiImg emojiUrl={emojiUrl} emojiName={emojiName} />
+          <EmojiImg
+            emojiUrl={emojiUrl}
+            emojiName={emojiName}
+            emojiImgSize={{
+              width: 'var(--font-size-medium)',
+            }}
+          />
           <span css={messageReactionCount(isActive)}>{emojiCount}</span>
         </button>
       </Tooltip>
