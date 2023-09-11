@@ -202,7 +202,7 @@ export class ConnectionRepository {
             PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
               text: {
                 htmlMessage: t('modalUserCannotConnectLegalHoldMessage', {}, replaceLinkLegalHold),
-                title: t('modalUserCannotConnectLegalHoldHeadline'),
+                title: t('modalUserCannotConnectHeadline'),
               },
             });
             break;
@@ -212,7 +212,7 @@ export class ConnectionRepository {
             PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
               text: {
                 htmlMessage: t('modalUserCannotConnectNotFederatingMessage', userEntity.name()),
-                title: t('modalUserCannotConnectNotFederatingHeadline'),
+                title: t('modalUserCannotConnectHeadline'),
               },
             });
             break;
@@ -220,6 +220,13 @@ export class ConnectionRepository {
 
           default: {
             this.logger.error(`Failed to send connection request to user '${userEntity.id}': ${error.message}`, error);
+            PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
+              text: {
+                htmlMessage: t('modalUserCannotConnectMessage', userEntity.name()),
+                title: t('modalUserCannotConnectHeadline'),
+              },
+            });
+            break;
           }
         }
         return false;
