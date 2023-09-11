@@ -553,7 +553,7 @@ export class EventService {
    */
   async loadAllConversationEvents(
     conversationId: string,
-    eventTypesToSkip: (CONVERSATION_EVENT | CLIENT_CONVERSATION_EVENT)[],
+    eventTypesToSkip: (CONVERSATION_EVENT | CLIENT_CONVERSATION_EVENT)[] = [],
   ): Promise<EventRecord[]> {
     try {
       if (this.storageService.db) {
@@ -567,9 +567,7 @@ export class EventService {
       }
 
       const records = await this.storageService.getAll<EventRecord>(StorageSchemata.OBJECT_STORE.EVENTS);
-      return records.filter(
-        record => record.conversation === conversationId && !eventTypesToSkip.includes(record.type),
-      );
+      return records;
     } catch (error) {
       const logMessage = `Failed to get events for conversation '${conversationId}': ${error.message}`;
       this.logger.error(logMessage, error);
