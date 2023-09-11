@@ -177,6 +177,7 @@
   "authErrorSignIn": "Please verify your details and try again.",
   "authErrorSuspended": "This account is no longer authorized to log in.",
   "authForgotPasswordTitle": "Change your password",
+  "authSetUsername": "Set username",
   "authHistoryButton": "OK",
   "authHistoryDescription": "For privacy reasons, your conversation history will not appear here.",
   "authHistoryHeadline": "It’s the first time you’re using {{brandName}} on this device.",
