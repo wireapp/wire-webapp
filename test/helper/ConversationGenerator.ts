@@ -60,7 +60,6 @@ export function generateAPIConversation({
     status: ConversationStatus.CURRENT_MEMBER,
     is_guest: false,
     archived_state: false,
-    is_managed: false,
     archived_timestamp: 0,
     last_event_timestamp: 0,
     last_read_timestamp: 0,
