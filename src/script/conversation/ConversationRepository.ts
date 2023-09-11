@@ -1461,16 +1461,13 @@ export class ConversationRepository {
   private readonly replaceProteus1to1WithMLS = async (
     proteusConversation: ProteusConversation,
     mlsConversation: MLSConversation,
-    shouldMoveEvents = true,
   ) => {
     this.logger.info(
       `Replacing proteus 1:1 conversation ${proteusConversation.id} with mls 1:1 conversation ${mlsConversation.id}`,
     );
 
-    if (shouldMoveEvents) {
-      this.logger.info('Moving events from proteus 1:1 conversation to MLS 1:1 conversation');
-      await this.eventService.moveEventsToConversation(proteusConversation.id, mlsConversation.id);
-    }
+    this.logger.info('Moving events from proteus 1:1 conversation to MLS 1:1 conversation');
+    await this.eventService.moveEventsToConversation(proteusConversation.id, mlsConversation.id);
 
     const isActiveConversation = this.conversationState.isActiveConversation(proteusConversation);
 
@@ -1491,18 +1488,18 @@ export class ConversationRepository {
     } = proteusConversation;
 
     const updates: Partial<Record<keyof Conversation, any>> = {
-      archivedState,
-      archivedTimestamp,
-      cleared_timestamp,
-      localMessageTimer,
-      last_event_timestamp,
-      last_read_timestamp,
-      last_server_timestamp,
-      legalHoldStatus,
-      mutedState,
-      mutedTimestamp,
-      status,
-      verification_state,
+      archivedState: archivedState(),
+      archivedTimestamp: archivedTimestamp(),
+      cleared_timestamp: cleared_timestamp(),
+      localMessageTimer: localMessageTimer(),
+      last_event_timestamp: last_event_timestamp(),
+      last_read_timestamp: last_read_timestamp(),
+      last_server_timestamp: last_server_timestamp(),
+      legalHoldStatus: legalHoldStatus(),
+      mutedState: mutedState(),
+      mutedTimestamp: mutedTimestamp(),
+      status: status(),
+      verification_state: verification_state(),
     };
 
     ConversationMapper.updateProperties(mlsConversation, updates);

@@ -66,6 +66,7 @@ import {ConversationRepository} from './ConversationRepository';
 import {entities, payload} from '../../../test/api/payloads';
 import {TestFactory} from '../../../test/helper/TestFactory';
 import {generateUser} from '../../../test/helper/UserGenerator';
+import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
 import {Core} from '../service/CoreSingleton';
 import {LegacyEventRecord, StorageService} from '../storage';
 
@@ -362,6 +363,85 @@ describe('ConversationRepository', () => {
       const conversationEntity = await conversationRepository.get1To1Conversation(otherUser);
 
       expect(conversationEntity?.serialize()).toEqual(mls1to1Conversation.serialize());
+    });
+
+    it('replaces proteus 1:1 with mls 1:1', async () => {
+      const conversationRepository = testFactory.conversation_repository!;
+      const userRepository = testFactory.user_repository!;
+
+      const otherUserId = {id: 'f718410c-3833-479d-bd80-a5df03f38414', domain: 'test-domain'};
+      const otherUser = new User(otherUserId.id, otherUserId.domain);
+      otherUser.supportedProtocols([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]);
+      userRepository['userState'].users.push(otherUser);
+
+      const selfUserId = {id: '109da9ca-a495-47a8-ac70-9ffbe924b2d0', domain: 'test-domain'};
+      const selfUser = new User(selfUserId.id, selfUserId.domain);
+      selfUser.supportedProtocols([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]);
+      jest.spyOn(conversationRepository['userState'], 'self').mockReturnValue(selfUser);
+
+      const mls1to1ConversationResponse = generateAPIConversation({
+        id: {id: '04ab891e-ccf1-4dba-9d74-bacec64b5b1e', domain: 'test-domain'},
+        type: CONVERSATION_TYPE.ONE_TO_ONE,
+        protocol: ConversationProtocol.MLS,
+        overwites: {group_id: 'groupId', archived_state: false, muted_state: NOTIFICATION_STATE.NOTHING},
+      }) as BackendMLSConversation;
+
+      const proteus1to1ConversationResponse = generateAPIConversation({
+        id: {id: '04ab891e-ccf1-4dba-9d74-bacec64b123e', domain: 'test-domain'},
+        type: CONVERSATION_TYPE.ONE_TO_ONE,
+        protocol: ConversationProtocol.PROTEUS,
+        overwites: {archived_state: true, muted_state: NOTIFICATION_STATE.EVERYTHING},
+      }) as BackendMLSConversation;
+
+      const [mls1to1Conversation, proteus1to1Conversation] = conversationRepository.mapConversations([
+        mls1to1ConversationResponse,
+        proteus1to1ConversationResponse,
+      ]);
+
+      const connection = new ConnectionEntity();
+      connection.conversationId = mls1to1Conversation.qualifiedId;
+      connection.userId = otherUserId;
+
+      otherUser.connection(connection);
+      mls1to1Conversation.connection(connection);
+      proteus1to1Conversation.connection(connection);
+
+      conversationRepository['conversationState'].conversations.push(mls1to1Conversation, proteus1to1Conversation);
+
+      jest
+        .spyOn(conversationRepository['conversationService'], 'getMLS1to1Conversation')
+        .mockResolvedValueOnce(mls1to1ConversationResponse);
+
+      jest
+        .spyOn(conversationRepository['conversationService'], 'isMLSGroupEstablishedLocally')
+        .mockResolvedValueOnce(true);
+
+      jest.spyOn(conversationRepository['eventService'], 'moveEventsToConversation');
+      jest
+        .spyOn(conversationRepository['conversationState'], 'activeConversation')
+        .mockReturnValue(proteus1to1Conversation);
+      jest.spyOn(conversationRepository['conversationService'], 'deleteConversationFromDb');
+
+      const conversationEntity = await conversationRepository.get1To1Conversation(otherUser);
+
+      expect(conversationRepository['eventService'].moveEventsToConversation).toHaveBeenCalledWith(
+        proteus1to1Conversation.id,
+        mls1to1Conversation.id,
+      );
+
+      expect(conversationEntity?.serialize()).toEqual(mls1to1Conversation.serialize());
+
+      //Local properties were migrated from proteus to mls conversation
+      expect(conversationEntity?.serialize().archived_state).toEqual(proteus1to1Conversation.archivedState());
+      expect(conversationEntity?.serialize().muted_state).toEqual(proteus1to1Conversation.mutedState());
+
+      //proteus conversation was deleted from the local store
+      expect(conversationRepository['conversationService'].deleteConversationFromDb).toHaveBeenCalledWith(
+        proteus1to1Conversation.id,
+      );
+      expect(conversationRepository['conversationState'].conversations()).not.toEqual(
+        expect.arrayContaining([proteus1to1Conversation]),
+      );
     });
 
     it("establishes MLS 1:1 conversation if it's not yet established", async () => {
