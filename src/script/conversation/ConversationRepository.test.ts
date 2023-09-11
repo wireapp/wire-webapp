@@ -261,7 +261,7 @@ describe('ConversationRepository', () => {
             status_time: '1970-01-01T00:00:00.000Z',
           },
         },
-        name: null,
+        name: '',
         protocol: ConversationProtocol.PROTEUS,
         team: 'cf162e22-20b8-4533-a5ab-d3f5dde39d2c',
         type: 0,
@@ -361,6 +361,72 @@ describe('ConversationRepository', () => {
 
       const conversationEntity = await conversationRepository.get1To1Conversation(otherUser);
 
+      expect(conversationEntity?.serialize()).toEqual(mls1to1Conversation.serialize());
+    });
+
+    it("establishes MLS 1:1 conversation if it's not yet established", async () => {
+      const conversationRepository = testFactory.conversation_repository!;
+      const userRepository = testFactory.user_repository!;
+      const mockedGroupId = 'groupId';
+
+      const otherUserId = {id: 'f718410c-3833-479d-bd80-a5df03f38414', domain: 'test-domain'};
+      const otherUser = new User(otherUserId.id, otherUserId.domain);
+      otherUser.supportedProtocols([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]);
+      userRepository['userState'].users.push(otherUser);
+
+      const mockSelfClientId = 'client-id';
+      const selfUserId = {id: '109da9ca-a495-47a8-ac70-9ffbe924b2d0', domain: 'test-domain'};
+      const selfUser = new User(selfUserId.id, selfUserId.domain);
+      selfUser.supportedProtocols([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]);
+      jest.spyOn(conversationRepository['userState'], 'self').mockReturnValue(selfUser);
+
+      const mls1to1ConversationResponse = generateAPIConversation({
+        id: {id: '04ab891e-ccf1-4dba-9d74-bacec64b5b1e', domain: 'test-domain'},
+        type: CONVERSATION_TYPE.ONE_TO_ONE,
+        protocol: ConversationProtocol.MLS,
+        overwites: {group_id: mockedGroupId},
+      }) as BackendMLSConversation;
+
+      jest
+        .spyOn(conversationRepository['conversationService'], 'getMLS1to1Conversation')
+        .mockResolvedValueOnce(mls1to1ConversationResponse);
+
+      jest
+        .spyOn(conversationRepository['conversationService'], 'isMLSGroupEstablishedLocally')
+        .mockResolvedValueOnce(false);
+
+      const establishedMls1to1ConversationResponse = generateAPIConversation({
+        id: {id: '04ab891e-ccf1-4dba-9d74-bacec64b5b1e', domain: 'test-domain'},
+        type: CONVERSATION_TYPE.ONE_TO_ONE,
+        protocol: ConversationProtocol.MLS,
+        overwites: {
+          group_id: mockedGroupId,
+          epoch: 1,
+          qualified_others: [otherUserId],
+          members: {
+            others: [{id: otherUserId.id, status: 0, qualified_id: otherUserId}],
+          } as any,
+        },
+      }) as BackendMLSConversation;
+
+      jest
+        .spyOn(container.resolve(Core).service!.conversation, 'establishMLS1to1Conversation')
+        .mockResolvedValueOnce(establishedMls1to1ConversationResponse);
+
+      Object.defineProperty(container.resolve(Core), 'clientId', {
+        get: jest.fn(() => mockSelfClientId),
+        configurable: true,
+      });
+
+      const [mls1to1Conversation] = conversationRepository.mapConversations([establishedMls1to1ConversationResponse]);
+
+      const conversationEntity = await conversationRepository.get1To1Conversation(otherUser);
+
+      expect(container.resolve(Core).service!.conversation.establishMLS1to1Conversation).toHaveBeenCalledWith(
+        mockedGroupId,
+        {client: mockSelfClientId, user: selfUserId},
+        otherUserId,
+      );
       expect(conversationEntity?.serialize()).toEqual(mls1to1Conversation.serialize());
     });
 
@@ -946,6 +1012,7 @@ describe('ConversationRepository', () => {
 
         Object.defineProperty(container.resolve(Core), 'clientId', {
           get: jest.fn(() => mockSelfClientId),
+          configurable: true,
         });
 
         jest.spyOn(container.resolve(Core).service!.mls!, 'conversationExists').mockResolvedValueOnce(true);
@@ -1666,6 +1733,7 @@ describe('ConversationRepository', () => {
     it('should call loadMissingConversations & refreshAllConversationsUnavailableParticipants every 3 hours for federated envs', async () => {
       Object.defineProperty(container.resolve(Core).backendFeatures, 'isFederated', {
         get: jest.fn(() => true),
+        configurable: true,
       });
       const conversationRepo = await testFactory.exposeConversationActors();
 

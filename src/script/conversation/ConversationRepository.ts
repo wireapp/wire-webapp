@@ -1569,8 +1569,11 @@ export class ConversationRepository {
 
     this.logger.info(`MLS 1:1 conversation with user ${otherUserId.id} was established.`);
 
-    ConversationMapper.updateProperties(mlsConversation, {participating_user_ids: members.others, epoch});
+    const otherMembers = members.others.map(other => ({domain: other.qualified_id?.domain || '', id: other.id}));
+
+    ConversationMapper.updateProperties(mlsConversation, {participating_user_ids: otherMembers, epoch});
     await this.updateParticipatingUserEntities(mlsConversation);
+
     return mlsConversation;
   };
 
