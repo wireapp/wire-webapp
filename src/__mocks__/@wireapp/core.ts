@@ -48,7 +48,7 @@ export class Account extends EventEmitter {
     },
     conversation: {
       send: jest.fn(),
-      isMLSConversationEstablished: jest.fn(),
+      mlsGroupExistsLocally: jest.fn(),
       joinByExternalCommit: jest.fn(),
       addUsersToMLSConversation: jest.fn(),
       messageTimer: {
