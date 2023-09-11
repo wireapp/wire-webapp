@@ -114,6 +114,25 @@ const ConversationJoinComponent = ({
     window.location.replace(redirectLocation);
   };
 
+  const doGetConversationInfoAndJoin = async () => {
+    try {
+      if (!conversationCode || !conversationKey) {
+        throw Error('Conversation code or key missing');
+      }
+      const conversationEvent = await doJoinConversationByCode(conversationKey, conversationCode);
+      /* When we join a conversation, we create the join event before loading the webapp.
+       * That means that when the webapp loads and tries to fetch the notificationStream is will get the join event once again and will try to handle it
+       * Here we set the core's lastEventDate so that it knows that this duplicated event should be skipped
+       */
+      await setLastEventDate(new Date(conversationEvent.time));
+
+      routeToApp(conversationEvent.conversation, conversationEvent.qualified_conversation?.domain ?? '');
+    } catch (error) {
+      console.warn('Unable to join conversation', error);
+      setShowEntropyForm(false);
+    }
+  };
+
   const handleSubmit = async (entropyData?: Uint8Array) => {
     setIsSubmitingName(true);
     try {
@@ -133,14 +152,7 @@ const ConversationJoinComponent = ({
         },
         entropyData,
       );
-      const conversationEvent = await doJoinConversationByCode(conversationKey, conversationCode);
-      /* When we join a conversation, we create the join event before loading the webapp.
-       * That means that when the webapp loads and tries to fetch the notificationStream is will get the join event once again and will try to handle it
-       * Here we set the core's lastEventDate so that it knows that this duplicated event should be skipped
-       */
-      await setLastEventDate(new Date(conversationEvent.time));
-
-      routeToApp(conversationEvent.conversation, conversationEvent.qualified_conversation?.domain ?? '');
+      await doGetConversationInfoAndJoin();
     } catch (error) {
       setIsSubmitingName(false);
       if (error.label) {
@@ -225,7 +237,11 @@ const ConversationJoinComponent = ({
         <Columns style={{display: 'flex', gap: '2rem', alignSelf: 'center', maxWidth: '100%'}}>
           <Column>
             {isLoggedIn && selfName ? (
-              <IsLoggedInColumn selfName={selfName} handleLogout={handleLogout} handleSubmit={handleSubmit} />
+              <IsLoggedInColumn
+                selfName={selfName}
+                handleLogout={handleLogout}
+                handleSubmit={doGetConversationInfoAndJoin}
+              />
             ) : (
               <Login embedded />
             )}
