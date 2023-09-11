@@ -130,6 +130,7 @@ export class ConversationMapper {
       receipt_mode,
       status,
       verification_state,
+      archived_state,
     } = selfState;
 
     if (archived_timestamp) {
@@ -176,6 +177,10 @@ export class ConversationMapper {
 
     if (verification_state !== undefined) {
       conversationEntity.verification_state(verification_state);
+    }
+
+    if (archived_state !== undefined) {
+      conversationEntity.archivedState(archived_state);
     }
 
     if (legal_hold_status) {
