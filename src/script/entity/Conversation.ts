@@ -52,7 +52,7 @@ import {ClientRepository} from '../client';
 import {Config} from '../Config';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
 import {ACCESS_STATE} from '../conversation/AccessState';
-import {ConversationRepository} from '../conversation/ConversationRepository';
+import {ConversationRepository, ONE_TO_ONE_CONVERSATION_STATE} from '../conversation/ConversationRepository';
 import {isSelfConversation} from '../conversation/ConversationSelectors';
 import {ConversationStatus} from '../conversation/ConversationStatus';
 import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
@@ -85,7 +85,7 @@ enum TIMESTAMP_TYPE {
 export class Conversation {
   private readonly teamState: TeamState;
   public readonly archivedState: ko.Observable<boolean>;
-  public readonly mls1To1ConversationState: ko.Observable<boolean>;
+  public readonly mls1To1ConversationState: ko.Observable<ONE_TO_ONE_CONVERSATION_STATE>;
   private readonly incomingMessages: ko.ObservableArray<Message>;
   private readonly isManaged: boolean;
   private readonly isTeam1to1: ko.PureComputed<boolean>;
@@ -127,7 +127,6 @@ export class Conversation {
   public readonly inTeam: ko.PureComputed<boolean>;
   public readonly lastDeliveredMessage: ko.PureComputed<Message | undefined>;
   public readonly is_archived: ko.Observable<boolean>;
-  public readonly is_conversation_readonly: ko.Observable<boolean>;
   public readonly is_cleared: ko.PureComputed<boolean>;
   public readonly is_loaded: ko.Observable<boolean>;
   public readonly is_pending: ko.Observable<boolean>;
@@ -299,7 +298,9 @@ export class Conversation {
 
     this.call = ko.observable(null);
 
-    this.mls1To1ConversationState = ko.observable(false);
+    this.mls1To1ConversationState = this.mls1To1ConversationState = ko.observable<ONE_TO_ONE_CONVERSATION_STATE>(
+      ONE_TO_ONE_CONVERSATION_STATE.DEFAULT,
+    );
 
     // Conversation states for view
     this.notificationState = ko.pureComputed(() => {
@@ -327,7 +328,6 @@ export class Conversation {
     });
 
     this.is_archived = this.archivedState;
-    this.is_conversation_readonly = this.mls1To1ConversationState;
     this.is_cleared = ko.pureComputed(() => this.last_event_timestamp() <= this.cleared_timestamp());
     this.is_verified = ko.pureComputed(() => {
       if (!this.hasInitializedUsers()) {

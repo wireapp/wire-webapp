@@ -35,6 +35,7 @@ import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
 import {TitleBar} from 'Components/TitleBar';
 import {CallState} from 'src/script/calling/CallState';
 import {Config} from 'src/script/Config';
+import {ONE_TO_ONE_CONVERSATION_STATE} from 'src/script/conversation/ConversationRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {allowsAllFiles, getFileExtensionOrName, hasAllowedExtension} from 'Util/FileTypeUtil';
 import {isHittingUploadLimit} from 'Util/isHittingUploadLimit';
@@ -44,6 +45,7 @@ import {safeMailOpen, safeWindowOpen} from 'Util/SanitizationUtil';
 import {formatBytes, incomingCssClass, removeAnimationsClass} from 'Util/util';
 
 import {useReadReceiptSender} from './hooks/useReadReceipt';
+import {ReadOnlyConversationMessage} from './ReadOnlyConversationMessage';
 import {checkFileSharingPermission} from './utils/checkFileSharingPermission';
 
 import {ConversationState} from '../../conversation/ConversationState';
@@ -71,6 +73,7 @@ interface ConversationProps {
   readonly userState: UserState;
   openRightSidebar: (panelState: PanelState, params: RightSidebarParams, compareEntityId?: boolean) => void;
   isRightSidebarOpen?: boolean;
+  handleMLSUpdate: () => void;
 }
 
 const CONFIG = Config.getConfig();
@@ -81,6 +84,7 @@ export const Conversation: FC<ConversationProps> = ({
   userState,
   openRightSidebar,
   isRightSidebarOpen = false,
+  handleMLSUpdate,
 }) => {
   const messageListLogger = getLogger('ConversationList');
 
@@ -99,7 +103,21 @@ export const Conversation: FC<ConversationProps> = ({
     'classifiedDomains',
     'isFileSharingSendingEnabled',
   ]);
-  const {is1to1, isRequest} = useKoSubscribableChildren(activeConversation!, ['is1to1', 'isRequest']);
+  const {
+    is1to1,
+    isRequest,
+    mls1To1ConversationState,
+    display_name: displayName,
+  } = useKoSubscribableChildren(activeConversation!, [
+    'is1to1',
+    'isRequest',
+    'mls1To1ConversationState',
+    'display_name',
+  ]);
+  const showReadOnlyConversationMessage = [
+    ONE_TO_ONE_CONVERSATION_STATE.READONLY_OTHER_DOES_NOT_SUPPORT_MLS,
+    ONE_TO_ONE_CONVERSATION_STATE.READONLY_SELF_DOES_NOT_SUPPORT_MLS,
+  ].includes(mls1To1ConversationState);
   const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
   const {inTeam} = useKoSubscribableChildren(selfUser, ['inTeam']);
 
@@ -520,22 +538,30 @@ export const Conversation: FC<ConversationProps> = ({
             setMsgElementsFocusable={setMsgElementsFocusable}
           />
 
-          <InputBar
-            conversationEntity={activeConversation}
-            conversationRepository={repositories.conversation}
-            eventRepository={repositories.event}
-            messageRepository={repositories.message}
-            openGiphy={openGiphy}
-            propertiesRepository={repositories.properties}
-            searchRepository={repositories.search}
-            storageRepository={repositories.storage}
-            teamState={teamState}
-            selfUser={selfUser}
-            onShiftTab={() => setMsgElementsFocusable(false)}
-            uploadDroppedFiles={uploadDroppedFiles}
-            uploadImages={uploadImages}
-            uploadFiles={uploadFiles}
-          />
+          {showReadOnlyConversationMessage ? (
+            <ReadOnlyConversationMessage
+              state={mls1To1ConversationState}
+              handleMLSUpdate={handleMLSUpdate}
+              displayName={displayName}
+            />
+          ) : (
+            <InputBar
+              conversationEntity={activeConversation}
+              conversationRepository={repositories.conversation}
+              eventRepository={repositories.event}
+              messageRepository={repositories.message}
+              openGiphy={openGiphy}
+              propertiesRepository={repositories.properties}
+              searchRepository={repositories.search}
+              storageRepository={repositories.storage}
+              teamState={teamState}
+              selfUser={selfUser}
+              onShiftTab={() => setMsgElementsFocusable(false)}
+              uploadDroppedFiles={uploadDroppedFiles}
+              uploadImages={uploadImages}
+              uploadFiles={uploadFiles}
+            />
+          )}
 
           <div className="conversation-loading">
             <div className="icon-spinner spin accent-text"></div>
