@@ -38,10 +38,10 @@ export const ProteusDeviceDetails = ({
 }: ProteusDeviceDetailsProps) => {
   return (
     <div className="preferences-proteus-details">
-      <h4>Proteus Device Details</h4>
+      <h4>{t('proteusDeviceDetails')}</h4>
 
       <div>
-        <p className="label preferences-label preferences-devices-fingerprint-label">Proteus ID</p>
+        <p className="label preferences-label preferences-devices-fingerprint-label">{t('proteusID')}</p>
 
         <p className="preferences-devices-fingerprint" css={{width: '230px'}}>
           <FormattedId idSlices={splitFingerprint(device.id)} />
@@ -59,8 +59,7 @@ export const ProteusDeviceDetails = ({
       )}
 
       <h3 className="label preferences-label preferences-devices-fingerprint-label">
-        {/*{t('preferencesDevicesFingerprint')}*/}
-        Proteus Key Fingerprint
+        {t('participantDevicesProteusKeyFingerprint')}
       </h3>
 
       <p className="preferences-devices-fingerprint" css={{width: '230px'}}>
@@ -68,19 +67,18 @@ export const ProteusDeviceDetails = ({
       </p>
 
       <h3 className="label preferences-label preferences-devices-fingerprint-label">
-        {/*{t('preferencesDevicesFingerprint')}*/}
-        Verification Status
+        {t('preferencesDeviceDetailsVerificationStatus')}
       </h3>
 
       {showVerificationStatus && (
         <p className="preferences-devices-verification-details">
           {isProteusVerified ? (
             <>
-              <span>Verified</span>
+              <span>{t('proteusVerified')}</span>
               <Badges isProteusVerified />
             </>
           ) : (
-            <span>Not verified</span>
+            <span>{t('proteusNotVerified')}</span>
           )}
         </p>
       )}

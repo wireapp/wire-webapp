@@ -23,13 +23,14 @@ import {ClientClassification} from '@wireapp/api-client/lib/client';
 import cx from 'classnames';
 
 import {Badges} from 'Components/Badges';
-import {DeviceId} from 'Components/DeviceId';
 import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
+import {splitFingerprint} from 'Util/StringUtil';
 
 import type {ClientEntity} from '../../client/ClientEntity';
 import {MLSPublicKeys} from '../../client/ClientEntity';
+import {FormattedId} from '../../page/MainContent/panels/preferences/devices/components/FormattedId';
 import {Icon} from '../Icon';
 import {LegalHoldDot} from '../LegalHoldDot';
 
@@ -82,8 +83,7 @@ const DeviceCard: React.FC<DeviceCardProps> = ({
         <div className="device-card__name">
           <span className="device-card__model">{name}</span>
 
-          {showVerified && <Badges isProteusVerified={!!isVerified && isVerified()} />}
-          <Badges isMLSVerified isProteusVerified />
+          {showVerified && <Badges isMLSVerified isProteusVerified={!!isVerified && isVerified()} />}
         </div>
 
         {mlsFingerprint && (
@@ -91,7 +91,7 @@ const DeviceCard: React.FC<DeviceCardProps> = ({
             <span>{t('preferencesMLSThumbprint')}</span>
 
             <span data-uie-name="device-id" className="formatted-id">
-              <DeviceId deviceId={mlsFingerprint} />
+              <FormattedId idSlices={splitFingerprint(mlsFingerprint)} smallPadding />
             </span>
           </p>
         )}
@@ -100,7 +100,7 @@ const DeviceCard: React.FC<DeviceCardProps> = ({
           <span>{t('preferencesDevicesId')}</span>
 
           <span data-uie-name="device-id" className="formatted-id">
-            <DeviceId deviceId={id} />
+            <FormattedId idSlices={splitFingerprint(id)} smallPadding />
           </span>
         </p>
       </div>

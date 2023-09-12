@@ -28,6 +28,7 @@ import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import type {Logger} from 'Util/Logger';
+import {splitFingerprint} from 'Util/StringUtil';
 
 import type {ClientRepository, ClientEntity} from '../../client';
 import {MLSPublicKeys} from '../../client';
@@ -37,8 +38,8 @@ import type {MessageRepository} from '../../conversation/MessageRepository';
 import type {CryptographyRepository} from '../../cryptography/CryptographyRepository';
 import type {User} from '../../entity/User';
 import {MotionDuration} from '../../motion/MotionDuration';
+import {FormattedId} from '../../page/MainContent/panels/preferences/devices/components/FormattedId';
 import {MLSDeviceDetails} from '../../page/MainContent/panels/preferences/devices/components/MLSDeviceDetails';
-import {DeviceId} from '../DeviceId';
 
 interface DeviceDetailsProps {
   clickToShowSelfFingerprint: () => void;
@@ -135,12 +136,15 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
             </p>
 
             <div className="participant-devices__fingerprint" data-uie-name="status-fingerprint">
-              <DeviceId deviceId={fingerprintRemote} />
+              <FormattedId idSlices={splitFingerprint(fingerprintRemote)} smallPadding />
             </div>
           </>
         )}
 
-        <p className="label-2 preferences-label preferences-devices-fingerprint-label">Verification Status</p>
+        <p className="label-2 preferences-label preferences-devices-fingerprint-label">
+          {t('preferencesDeviceDetailsVerificationStatus')}
+          Verification Status
+        </p>
 
         <div className="participant-devices__verify">
           <div className="slider" data-uie-name="do-toggle-verified">

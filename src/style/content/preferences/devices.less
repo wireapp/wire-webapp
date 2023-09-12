@@ -34,9 +34,9 @@
   align-items: center;
 
   margin-bottom: 32px;
-  font-size: @font-size-large;
-  font-weight: @font-weight-medium;
-  line-height: @line-height-lg;
+  font-size: var(--font-size-large);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-lg);
 
   .conversation-badges {
     margin-left: 4px;
@@ -46,8 +46,8 @@
 .preferences-devices-activated {
   margin: 16px 0;
   color: var(--gray-90);
-  font-size: @font-size-xs;
-  line-height: @line-height-sm;
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-sm);
 }
 
 .preferences-devices-card {
@@ -92,7 +92,7 @@
 
   display: flex;
   margin: 0 0 16px -34px;
-  line-height: @line-height-sm;
+  line-height: var(--line-height-sm);
 }
 
 .preferences-devices-icon {
@@ -123,28 +123,12 @@
 }
 
 .preferences-devices-activated-bold {
-  font-weight: @font-weight-bold;
+  font-weight: var(--font-weight-bold);
 }
 
 .preferences-devices-fingerprint {
   max-width: 300px;
-  line-height: @line-height-lg;
-
-  .device-id-part {
-    display: inline-block;
-    width: 18px;
-    margin-right: 12px;
-    text-transform: uppercase;
-
-    &:nth-child(8n) {
-      margin-right: 0;
-
-      &::after {
-        display: block;
-        content: ' ';
-      }
-    }
-  }
+  line-height: var(--line-height-lg);
 }
 
 .preferences-devices-verification-details {
@@ -168,8 +152,8 @@
 .preferences-devices-session-reset {
   height: 16px;
   padding-top: 16px;
-  font-size: @font-size-xs;
-  line-height: @line-height-sm;
+  font-size: var(--font-size-xsmall);
+  line-height: var(--line-height-sm);
 }
 
 .preferences-devices-session-reset {

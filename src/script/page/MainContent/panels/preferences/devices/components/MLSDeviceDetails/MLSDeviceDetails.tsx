@@ -17,10 +17,14 @@
  *
  */
 
+import {t} from 'Util/LocalizerUtil';
 import {splitFingerprint} from 'Util/StringUtil';
 
-import {E2EICertificateDetails} from './E2EICertificateDetails';
-import {FormattedId} from './FormattedId';
+import {styles} from './MLSDeviceDetails.styles';
+
+import {MLSPublicKeys} from '../../../../../../../client';
+import {E2EICertificateDetails} from '../E2EICertificateDetails';
+import {FormattedId} from '../FormattedId';
 
 interface MLSDeviceDetailsProps {
   isMLSVerified?: boolean;
@@ -29,10 +33,10 @@ interface MLSDeviceDetailsProps {
 
 export const MLSDeviceDetails = ({fingerprint, isMLSVerified = true}: MLSDeviceDetailsProps) => {
   return (
-    <div className="mls-device-details">
-      <h4 className="paragraph-body-3">MLS with Ed255519 Signature</h4>
+    <div css={styles.wrapper}>
+      <h4 className="paragraph-body-3">{t('mlsSignature', MLSPublicKeys.ED25519.toUpperCase())}</h4>
 
-      <p className="label-2 preferences-label preferences-devices-fingerprint-label">MLS Thumbprint</p>
+      <p className="label-2 preferences-label preferences-devices-fingerprint-label">{t('mlsThumbprint')}</p>
 
       <p className="preferences-devices-fingerprint" css={{width: '230px'}}>
         <FormattedId idSlices={splitFingerprint(fingerprint)} />
