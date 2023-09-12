@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.3.0](https://github.com/wireapp/wire-web-packages/compare/bazinga64@6.2.0...bazinga64@6.3.0) (2023-09-12)
+
+### Features
+
+* add description and hexStringToArrayBufferView converter ([#5492](https://github.com/wireapp/wire-web-packages/issues/5492)) ([89edc28](https://github.com/wireapp/wire-web-packages/commit/89edc28a95d7328ce6a44c8078918c660203b1d9))
+
 # [6.2.0](https://github.com/wireapp/wire-web-packages/compare/bazinga64@6.1.6...bazinga64@6.2.0) (2023-09-12)
 
 ### Features
