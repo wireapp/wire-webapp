@@ -52,7 +52,7 @@ import {ClientRepository} from '../client';
 import {Config} from '../Config';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
 import {ACCESS_STATE} from '../conversation/AccessState';
-import {ConversationRepository} from '../conversation/ConversationRepository';
+import {ConversationRepository, CONVERSATION_READONLY_STATE} from '../conversation/ConversationRepository';
 import {isSelfConversation} from '../conversation/ConversationSelectors';
 import {ConversationStatus} from '../conversation/ConversationStatus';
 import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
@@ -85,6 +85,7 @@ enum TIMESTAMP_TYPE {
 export class Conversation {
   private readonly teamState: TeamState;
   public readonly archivedState: ko.Observable<boolean>;
+  public readonly readOnlyState: ko.Observable<CONVERSATION_READONLY_STATE | null>;
   private readonly incomingMessages: ko.ObservableArray<Message>;
   private readonly isTeam1to1: ko.PureComputed<boolean>;
   public readonly last_server_timestamp: ko.Observable<number>;
@@ -294,6 +295,8 @@ export class Conversation {
     this.mutedTimestamp = ko.observable(0);
 
     this.call = ko.observable(null);
+
+    this.readOnlyState = ko.observable<CONVERSATION_READONLY_STATE | null>(null);
 
     // Conversation states for view
     this.notificationState = ko.pureComputed(() => {
@@ -567,6 +570,7 @@ export class Conversation {
   private _initSubscriptions() {
     [
       this.archivedState,
+      this.readOnlyState,
       this.archivedTimestamp,
       this.cleared_timestamp,
       this.messageTimer,
@@ -1032,6 +1036,7 @@ export class Conversation {
       access: this.accessModes,
       access_role: this.accessRole,
       archived_state: this.archivedState(),
+      readonly_state: this.readOnlyState(),
       archived_timestamp: this.archivedTimestamp(),
       cipher_suite: this.cipherSuite,
       cleared_timestamp: this.cleared_timestamp(),
