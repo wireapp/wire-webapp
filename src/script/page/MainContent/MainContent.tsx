@@ -237,7 +237,7 @@ const MainContent: FC<MainContentProps> = ({
                 userState={userState}
                 isRightSidebarOpen={isRightSidebarOpen}
                 openRightSidebar={openRightSidebar}
-                handleMLSUpdate={onRefresh}
+                onRefresh={onRefresh}
               />
             )}
 

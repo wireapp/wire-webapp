@@ -152,7 +152,6 @@ type EntityObject = {conversationEntity: Conversation; messageEntity: Message};
 type IncomingEvent = ConversationEvent | ClientConversationEvent;
 
 export enum CONVERSATION_READONLY_STATE {
-  DEFAULT = 'DEFAULT',
   READONLY_SELF_DOES_NOT_SUPPORT_MLS = 'READONLY_SELF_DOES_NOT_SUPPORT_MLS',
   READONLY_OTHER_DOES_NOT_SUPPORT_MLS = 'READONLY_OTHER_DOES_NOT_SUPPORT_MLS',
 }
@@ -1357,8 +1356,11 @@ export class ConversationRepository {
     }
   };
 
-  private readonly markConversationReadOnly = async (conversationEntity: Conversation) => {
-    conversationEntity.readOnlyState(CONVERSATION_READONLY_STATE.READONLY_OTHER_DOES_NOT_SUPPORT_MLS);
+  private readonly markConversationReadOnly = async (
+    conversationEntity: Conversation,
+    conversationReadOnlyState: CONVERSATION_READONLY_STATE,
+  ) => {
+    conversationEntity.readOnlyState(conversationReadOnlyState);
     await this.saveConversationStateInDb(conversationEntity);
   };
 

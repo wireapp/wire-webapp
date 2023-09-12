@@ -85,7 +85,7 @@ enum TIMESTAMP_TYPE {
 export class Conversation {
   private readonly teamState: TeamState;
   public readonly archivedState: ko.Observable<boolean>;
-  public readonly readOnlyState: ko.Observable<CONVERSATION_READONLY_STATE>;
+  public readonly readOnlyState: ko.Observable<CONVERSATION_READONLY_STATE | null>;
   private readonly incomingMessages: ko.ObservableArray<Message>;
   private readonly isManaged: boolean;
   private readonly isTeam1to1: ko.PureComputed<boolean>;
@@ -298,7 +298,7 @@ export class Conversation {
 
     this.call = ko.observable(null);
 
-    this.readOnlyState = ko.observable<CONVERSATION_READONLY_STATE>(CONVERSATION_READONLY_STATE.DEFAULT);
+    this.readOnlyState = ko.observable<CONVERSATION_READONLY_STATE | null>(null);
 
     // Conversation states for view
     this.notificationState = ko.pureComputed(() => {

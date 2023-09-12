@@ -73,7 +73,7 @@ interface ConversationProps {
   readonly userState: UserState;
   openRightSidebar: (panelState: PanelState, params: RightSidebarParams, compareEntityId?: boolean) => void;
   isRightSidebarOpen?: boolean;
-  handleMLSUpdate: () => void;
+  onRefresh: () => void;
 }
 
 const CONFIG = Config.getConfig();
@@ -84,7 +84,7 @@ export const Conversation: FC<ConversationProps> = ({
   userState,
   openRightSidebar,
   isRightSidebarOpen = false,
-  handleMLSUpdate,
+  onRefresh,
 }) => {
   const messageListLogger = getLogger('ConversationList');
 
@@ -109,10 +109,12 @@ export const Conversation: FC<ConversationProps> = ({
     readOnlyState,
     display_name: displayName,
   } = useKoSubscribableChildren(activeConversation!, ['is1to1', 'isRequest', 'readOnlyState', 'display_name']);
-  const showReadOnlyConversationMessage = [
-    CONVERSATION_READONLY_STATE.READONLY_OTHER_DOES_NOT_SUPPORT_MLS,
-    CONVERSATION_READONLY_STATE.READONLY_SELF_DOES_NOT_SUPPORT_MLS,
-  ].includes(readOnlyState);
+  const showReadOnlyConversationMessage =
+    readOnlyState !== null &&
+    [
+      CONVERSATION_READONLY_STATE.READONLY_OTHER_DOES_NOT_SUPPORT_MLS,
+      CONVERSATION_READONLY_STATE.READONLY_SELF_DOES_NOT_SUPPORT_MLS,
+    ].includes(readOnlyState);
   const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
   const {inTeam} = useKoSubscribableChildren(selfUser, ['inTeam']);
 
@@ -535,11 +537,7 @@ export const Conversation: FC<ConversationProps> = ({
           />
 
           {showReadOnlyConversationMessage ? (
-            <ReadOnlyConversationMessage
-              state={readOnlyState}
-              handleMLSUpdate={handleMLSUpdate}
-              displayName={displayName}
-            />
+            <ReadOnlyConversationMessage state={readOnlyState} handleMLSUpdate={onRefresh} displayName={displayName} />
           ) : (
             <InputBar
               conversationEntity={activeConversation}
