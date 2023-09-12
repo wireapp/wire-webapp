@@ -17,6 +17,7 @@
  *
  */
 
+import {t} from 'Util/LocalizerUtil';
 import {splitFingerprint} from 'Util/StringUtil';
 
 import {FormattedId} from './FormattedId';
@@ -28,9 +29,9 @@ interface MLSDeviceDetailsProps {
 export const MLSDeviceDetails = ({fingerprint}: MLSDeviceDetailsProps) => {
   return (
     <div className="mls-device-details">
-      <h4 className="paragraph-body-3">MLS with Ed255519 Signature</h4>
+      <h4 className="paragraph-body-3">{t('mlsSignature')}</h4>
 
-      <p className="label-2 preferences-label preferences-devices-fingerprint-label">MLS Thumbprint</p>
+      <p className="label-2 preferences-label preferences-devices-fingerprint-label">{t('mlsThumbprint')}</p>
 
       <p className="preferences-devices-fingerprint" css={{width: '230px'}}>
         <FormattedId idSlices={splitFingerprint(fingerprint)} />

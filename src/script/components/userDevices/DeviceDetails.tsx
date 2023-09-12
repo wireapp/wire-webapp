@@ -140,7 +140,10 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
           </>
         )}
 
-        <p className="label-2 preferences-label preferences-devices-fingerprint-label">Verification Status</p>
+        <p className="label-2 preferences-label preferences-devices-fingerprint-label">
+          {t('preferencesDeviceDetailsVerificationStatus')}
+          Verification Status
+        </p>
 
         <div className="participant-devices__verify">
           <div className="slider" data-uie-name="do-toggle-verified">
