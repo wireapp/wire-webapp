@@ -11683,24 +11683,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jest-environment-jsdom@npm:29.6.4":
-  version: 29.6.4
-  resolution: "jest-environment-jsdom@npm:29.6.4"
+"jest-environment-jsdom@npm:29.7.0":
+  version: 29.7.0
+  resolution: "jest-environment-jsdom@npm:29.7.0"
   dependencies:
-    "@jest/environment": ^29.6.4
-    "@jest/fake-timers": ^29.6.4
+    "@jest/environment": ^29.7.0
+    "@jest/fake-timers": ^29.7.0
     "@jest/types": ^29.6.3
     "@types/jsdom": ^20.0.0
     "@types/node": "*"
-    jest-mock: ^29.6.3
-    jest-util: ^29.6.3
+    jest-mock: ^29.7.0
+    jest-util: ^29.7.0
     jsdom: ^20.0.0
   peerDependencies:
     canvas: ^2.5.0
   peerDependenciesMeta:
     canvas:
       optional: true
-  checksum: 2afe105f12d7d93ca56e2e6f67ab07ada3dd3da0516d1198f254930683ab9feb2b8c14417baaca53544eed88fd7fb5744f0dbce2e100269746187317ce0347df
+  checksum: 559aac134c196fccc1dfc794d8fc87377e9f78e894bb13012b0831d88dec0abd7ece99abec69da564b8073803be4f04a9eb4f4d1bb80e29eec0cb252c254deb8
   languageName: node
   linkType: hard
 
@@ -18799,7 +18799,7 @@ __metadata:
     intersection-observer: 0.12.2
     jest: 29.7.0
     jest-canvas-mock: 2.5.2
-    jest-environment-jsdom: 29.6.4
+    jest-environment-jsdom: 29.7.0
     jest-jasmine2: 29.6.4
     jimp: 0.22.10
     jquery: 3.7.1
