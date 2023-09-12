@@ -94,6 +94,7 @@ describe('ConversationFilter', () => {
         accessRoleV2: undefined,
         access_role: CONVERSATION_LEGACY_ACCESS_ROLE.PRIVATE,
         archived_state: false,
+        readonly_state: null,
         archived_timestamp: 0,
         cipher_suite: 1,
         cleared_timestamp: 0,
