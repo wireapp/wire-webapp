@@ -59,7 +59,7 @@ describe('MLSConversations', () => {
       const mlsConversations = createConversations(nbMLSConversations);
       const conversations = [...proteusConversations, ...mlsConversations];
 
-      jest.spyOn(core.service!.conversation, 'isMLSConversationEstablished').mockResolvedValue(false);
+      jest.spyOn(core.service!.conversation, 'mlsGroupExistsLocally').mockResolvedValue(false);
       jest.spyOn(core.service!.conversation, 'joinByExternalCommit');
 
       await initMLSConversations(conversations, core);
@@ -75,7 +75,7 @@ describe('MLSConversations', () => {
 
       const mlsConversations = createConversations(nbMLSConversations);
 
-      jest.spyOn(core.service!.conversation!, 'isMLSConversationEstablished').mockResolvedValue(true);
+      jest.spyOn(core.service!.conversation!, 'mlsGroupExistsLocally').mockResolvedValue(true);
       jest.spyOn(core.service!.mls!, 'scheduleKeyMaterialRenewal');
 
       await initMLSConversations(mlsConversations, core);

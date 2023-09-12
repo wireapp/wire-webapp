@@ -61,6 +61,9 @@ export type Env = {
   /** Specifies the name of the brand, e.g. Wire */
   BRAND_NAME: string;
 
+  /** enables replacing all occurences of {{hostname}} in the urls given to the frontend by the hostname of the client*/
+  ENABLE_DYNAMIC_HOSTNAME?: string;
+
   /** Allows a client to use a development version of the api (if present) */
   ENABLE_DEV_BACKEND_API?: string;
 
@@ -83,6 +86,8 @@ export type Env = {
   FEATURE_USE_CORE_CRYPTO?: string;
 
   FEATURE_MLS_CONFIG_KEYING_MATERIAL_UPDATE_THRESHOLD?: string;
+
+  FEATURE_MLS_CONFIG_DEFAULT_CIPHERSUITE?: string;
 
   FEATURE_ENABLE_PROTEUS_CORE_CRYPTO?: string;
 

@@ -78,7 +78,10 @@ const MainContent: FC<MainContentProps> = ({
   const teamState = container.resolve(TeamState);
   const {showRequestModal} = useLegalHoldModalState();
 
-  const {contentState, isShowingConversation} = useAppState();
+  const {isActivatedAccount} = useKoSubscribableChildren(userState, ['self', 'isActivatedAccount']);
+
+  const contentState = useAppState(state => state.contentState);
+  const isShowingConversation = useAppState(state => state.isShowingConversation);
 
   useEffect(() => {
     if (!isShowingConversation() && conversationState.activeConversation()) {
@@ -165,6 +168,8 @@ const MainContent: FC<MainContentProps> = ({
                   conversationRepository={repositories.conversation}
                   propertiesRepository={repositories.properties}
                   userRepository={repositories.user}
+                  selfUser={selfUser}
+                  isActivatedAccount={isActivatedAccount}
                 />
               </div>
             )}

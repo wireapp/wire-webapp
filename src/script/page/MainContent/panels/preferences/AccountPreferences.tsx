@@ -58,7 +58,6 @@ import {StorageKey} from '../../../../storage';
 import {TeamState} from '../../../../team/TeamState';
 import {RichProfileRepository} from '../../../../user/RichProfileRepository';
 import type {UserRepository} from '../../../../user/UserRepository';
-import {UserState} from '../../../../user/UserState';
 import {AccentColorPicker} from '../../../AccentColorPicker';
 
 interface AccountPreferencesProps {
@@ -72,23 +71,24 @@ interface AccountPreferencesProps {
   showDomain?: boolean;
   teamState?: TeamState;
   userRepository: UserRepository;
-  userState?: UserState;
+  selfUser: User;
+  isActivatedAccount?: boolean;
 }
 
 const logger = getLogger('AccountPreferences');
 
-const AccountPreferences: React.FC<AccountPreferencesProps> = ({
+export const AccountPreferences: React.FC<AccountPreferencesProps> = ({
   importFile,
   clientRepository,
   userRepository,
   propertiesRepository,
   switchContent,
   conversationRepository,
+  selfUser,
+  isActivatedAccount = false,
   showDomain = false,
-  userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
 }) => {
-  const {self: selfUser, isActivatedAccount} = useKoSubscribableChildren(userState, ['self', 'isActivatedAccount']);
   const {isTeam, teamName} = useKoSubscribableChildren(teamState, ['isTeam', 'teamName']);
   const {name, email, availability, username, managedBy, phone} = useKoSubscribableChildren(selfUser, [
     'name',
@@ -100,7 +100,8 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
   ]);
   const canEditProfile = managedBy === User.CONFIG.MANAGED_BY.WIRE;
   const isDesktop = Runtime.isDesktopApp();
-  const isTemporaryAndNonPersistent = useRef(isTemporaryClientAndNonPersistent(loadValue(StorageKey.AUTH.PERSIST)));
+  const persistedAuth = loadValue(StorageKey.AUTH.PERSIST);
+  const isTemporaryAndNonPersistent = useRef(isTemporaryClientAndNonPersistent(!!persistedAuth));
   const config = Config.getConfig();
   const brandName = config.BRAND_NAME;
   const isConsentCheckEnabled = config.FEATURE.CHECK_CONSENT;
@@ -117,7 +118,7 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
           action: async (): Promise<void> => {
             try {
               await conversationRepository.leaveGuestRoom();
-              clientRepository.logoutClient();
+              void clientRepository.logoutClient();
             } catch (error) {
               logger.warn('Error while leaving room', error);
             }
@@ -144,7 +145,7 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
         }}
       >
         <h3
-          className="heading-h3 text-center ellipsis"
+          className="heading-h3 text-center"
           title={name}
           css={{
             marginBottom: 16,
@@ -156,11 +157,11 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
 
         <div>
           <ErrorBoundary FallbackComponent={ErrorFallback}>
-            <AvatarInput {...{isActivatedAccount, selfUser, userRepository}} />
+            <AvatarInput selfUser={selfUser} isActivatedAccount={isActivatedAccount} userRepository={userRepository} />
           </ErrorBoundary>
         </div>
 
-        {isActivatedAccount && isTeam && <AvailabilityButtons {...{availability}} />}
+        {isActivatedAccount && isTeam && <AvailabilityButtons availability={availability} />}
 
         {isActivatedAccount && (
           <div>
@@ -179,13 +180,25 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
               marginLeft: '-8px',
             }}
           >
-            <NameInput {...{canEditProfile, name, userRepository}} />
-            <UsernameInput {...{canEditProfile, userRepository, username}} domain={showDomain ? domain : undefined} />
-            {email && !selfUser.isNoPasswordSSO && <EmailInput {...{canEditProfile, email, userRepository}} />}
+            <NameInput canEditProfile={canEditProfile} name={name} userRepository={userRepository} />
+
+            <UsernameInput
+              canEditProfile={canEditProfile}
+              userRepository={userRepository}
+              username={username}
+              domain={showDomain ? domain : undefined}
+            />
+
+            {email && !selfUser.isNoPasswordSSO && (
+              <EmailInput canEditProfile={canEditProfile} email={email} userRepository={userRepository} />
+            )}
+
             {phone && <AccountInput label={t('preferencesAccountPhone')} value={phone} readOnly fieldName="phone" />}
+
             {isTeam && (
               <AccountInput label={t('preferencesAccountTeam')} value={teamName} readOnly fieldName="status-team" />
             )}
+
             {richFields.map(({type, value}) => (
               <AccountInput
                 key={type}
@@ -198,6 +211,7 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
               />
             ))}
           </div>
+
           <AccountLink
             label={t('preferencesAccountLink')}
             value={`${Config.getConfig().URL.ACCOUNT_BASE}/user-profile/?id=${selfUser.id}`}
@@ -214,25 +228,32 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
           >
             {t('preferencesAccountLeaveGuestRoom')}
           </button>
+
           <div className="preferences-leave-disclaimer">{t('preferencesAccountLeaveGuestRoomDescription')}</div>
         </PreferencesSection>
       )}
 
-      {isConsentCheckEnabled && <DataUsageSection {...{brandName, isActivatedAccount, propertiesRepository}} />}
+      {isConsentCheckEnabled && (
+        <DataUsageSection
+          brandName={brandName}
+          isActivatedAccount={isActivatedAccount}
+          propertiesRepository={propertiesRepository}
+        />
+      )}
 
-      <PrivacySection {...{propertiesRepository}} />
+      <PrivacySection propertiesRepository={propertiesRepository} />
 
       {isActivatedAccount && (
         <>
           {!isTemporaryAndNonPersistent.current && (
             <HistoryBackupSection brandName={brandName} importFile={importFile} switchContent={switchContent} />
           )}
-          <AccountSecuritySection {...{selfUser, userRepository}} />
-          {!isDesktop && <LogoutSection {...{clientRepository}} />}
+
+          <AccountSecuritySection selfUser={selfUser} userRepository={userRepository} />
+
+          {!isDesktop && <LogoutSection clientRepository={clientRepository} />}
         </>
       )}
     </PreferencesPage>
   );
 };
-
-export {AccountPreferences};
