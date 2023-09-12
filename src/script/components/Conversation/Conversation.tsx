@@ -490,6 +490,7 @@ export const Conversation: FC<ConversationProps> = ({
             callActions={mainViewModel.calling.callActions}
             openRightSidebar={openRightSidebar}
             isRightSidebarOpen={isRightSidebarOpen}
+            isReadOnlyConversation={showReadOnlyConversationMessage}
           />
 
           {activeCalls.map(call => {

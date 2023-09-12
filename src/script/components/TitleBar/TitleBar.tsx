@@ -60,6 +60,7 @@ export interface TitleBarProps {
   teamState: TeamState;
   isRightSidebarOpen?: boolean;
   callState?: CallState;
+  isReadOnlyConversation?: boolean;
 }
 
 export const TitleBar: React.FC<TitleBarProps> = ({
@@ -71,6 +72,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
   userState = container.resolve(UserState),
   callState = container.resolve(CallState),
   teamState = container.resolve(TeamState),
+  isReadOnlyConversation = false,
 }) => {
   const {calling: callingRepository} = repositories;
   const {
@@ -297,6 +299,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
                   showStartedCallAlert(isGroup, true);
                 }}
                 data-uie-name="do-video-call"
+                disabled={isReadOnlyConversation}
               >
                 <Icon.Camera />
               </button>
@@ -313,6 +316,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
                 showStartedCallAlert(isGroup);
               }}
               data-uie-name="do-call"
+              disabled={isReadOnlyConversation}
             >
               <Icon.Pickup />
             </button>
