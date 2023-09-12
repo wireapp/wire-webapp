@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.2.0](https://github.com/wireapp/wire-web-packages/compare/bazinga64@6.1.6...bazinga64@6.2.0) (2023-09-12)
+
+### Features
+
+* add toBase64Url to Encoder ([#5491](https://github.com/wireapp/wire-web-packages/issues/5491)) ([874feca](https://github.com/wireapp/wire-web-packages/commit/874fecafcb2cfa93990e0138fc805e3b8f089301))
+
 ## [6.1.6](https://github.com/wireapp/wire-web-packages/compare/bazinga64@6.1.5...bazinga64@6.1.6) (2023-09-06)
 
 **Note:** Version bump only for package bazinga64
