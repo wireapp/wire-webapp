@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [42.1.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.0.3...@wireapp/core@42.1.0) (2023-09-12)
+
+### Features
+
+* Gracefully error when adding users with offline backend ([#5489](https://github.com/wireapp/wire-web-packages/issues/5489)) ([a198eb4](https://github.com/wireapp/wire-web-packages/commit/a198eb449780d2f0d94529baf581a582c4b88de3))
+
 ## [42.0.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.0.2...@wireapp/core@42.0.3) (2023-09-06)
 
 **Note:** Version bump only for package @wireapp/core
