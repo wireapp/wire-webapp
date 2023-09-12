@@ -1395,9 +1395,15 @@ export class ConversationRepository {
    * Maps user connection to the corresponding conversation.
    *
    * @note If there is no conversation it will request it from the backend
+   *
+   * @param connectionEntity Connection entity
+   * @param source Event source that has triggered the mapping
    * @returns Resolves when connection was mapped return value
    */
-  private readonly mapConnection = async (connectionEntity: ConnectionEntity): Promise<Conversation | undefined> => {
+  private readonly mapConnection = async (
+    connectionEntity: ConnectionEntity,
+    source?: EventSource,
+  ): Promise<Conversation | undefined> => {
     try {
       const conversation = await this.getConnectionConversation(connectionEntity);
 
@@ -1935,7 +1941,10 @@ export class ConversationRepository {
   ): Promise<ConversationMessageTimerUpdateEvent> {
     messageTimer = ConversationEphemeralHandler.validateTimer(messageTimer);
 
-    const response = await this.conversationService.updateConversationMessageTimer(conversationEntity.id, messageTimer);
+    const response = await this.conversationService.updateConversationMessageTimer(
+      conversationEntity.qualifiedId,
+      messageTimer,
+    );
     if (response) {
       this.eventRepository.injectEvent(response, EventRepository.SOURCE.BACKEND_RESPONSE);
     }
@@ -1946,7 +1955,10 @@ export class ConversationRepository {
     conversationEntity: Conversation,
     receiptMode: ConversationReceiptModeUpdateData,
   ) {
-    const response = await this.conversationService.updateConversationReceiptMode(conversationEntity.id, receiptMode);
+    const response = await this.conversationService.updateConversationReceiptMode(
+      conversationEntity.qualifiedId,
+      receiptMode,
+    );
     if (response) {
       this.eventRepository.injectEvent(response, EventRepository.SOURCE.BACKEND_RESPONSE);
     }
@@ -2008,7 +2020,7 @@ export class ConversationRepository {
     };
 
     try {
-      await this.conversationService.updateMemberProperties(conversationEntity.id, payload);
+      await this.conversationService.updateMemberProperties(conversationEntity.qualifiedId, payload);
       const response = {data: payload, from: this.userState.self().id};
       this.onMemberUpdate(conversationEntity, response);
 
@@ -2085,7 +2097,7 @@ export class ConversationRepository {
       otr_archived_ref: new Date(archiveTimestamp).toISOString(),
     };
 
-    const conversationId = conversationEntity.id;
+    const conversationId = conversationEntity.qualifiedId;
 
     const updatePromise = conversationEntity.removed_from_conversation()
       ? Promise.resolve()

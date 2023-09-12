@@ -165,7 +165,14 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
                 }
               />
               <Route path={ROUTE.SET_EMAIL} element={<ProtectedSetEmail />} />
-              <Route path={ROUTE.SET_HANDLE} element={<ProtectedSetHandle />} />
+              <Route
+                path={ROUTE.SET_HANDLE}
+                element={
+                  <Title title={`${t('authSetUsername')} . ${brandName}`}>
+                    <ProtectedSetHandle />
+                  </Title>
+                }
+              />
               <Route
                 path={ROUTE.SET_PASSWORD}
                 element={

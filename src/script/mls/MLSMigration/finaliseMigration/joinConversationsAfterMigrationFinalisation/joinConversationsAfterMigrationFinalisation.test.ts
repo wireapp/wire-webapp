@@ -66,7 +66,6 @@ const createMockedDBConversationEntry = (
   group_id: 'AAEAAGzYgfBo4k5Eti33a4ZZ78cAYW50YS53aXJlLmxpbms=',
   id,
   is_guest: false,
-  is_managed: false,
   last_event_timestamp: 1688640266515,
   last_read_timestamp: 1688640266515,
   last_server_timestamp: 1688640266515,

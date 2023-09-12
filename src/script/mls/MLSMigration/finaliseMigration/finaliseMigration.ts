@@ -65,7 +65,7 @@ const checkFinalisationCriteria = async (
 const doAllConversationParticipantsSupportMLS = (mixedConversation: MixedConversation): boolean => {
   return mixedConversation
     .participating_user_ets()
-    .every(user => user.supportedProtocols().includes(ConversationProtocol.MLS));
+    .every(user => user.supportedProtocols()?.includes(ConversationProtocol.MLS));
 };
 
 const finaliseMigrationOfMixedConversation = async (

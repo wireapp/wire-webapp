@@ -152,7 +152,7 @@ export class ConversationService {
    * @returns Resolves with the server response
    */
   updateConversationMessageTimer(
-    conversationId: string,
+    conversationId: QualifiedId,
     message_timer: number,
   ): Promise<ConversationMessageTimerUpdateEvent> {
     return this.apiClient.api.conversation.putConversationMessageTimer(conversationId, {message_timer});
@@ -168,7 +168,7 @@ export class ConversationService {
    * @returns Resolves with the server response
    */
   updateConversationReceiptMode(
-    conversationId: string,
+    conversationId: QualifiedId,
     receiptMode: ConversationReceiptModeUpdateData,
   ): Promise<ConversationReceiptModeUpdateEvent> {
     return this.apiClient.api.conversation.putConversationReceiptMode(conversationId, receiptMode);
@@ -183,7 +183,7 @@ export class ConversationService {
    * @param payload Updated properties
    * @returns Resolves with the server response
    */
-  updateMemberProperties(conversationId: string, payload: Partial<ConversationMemberUpdateData>): Promise<void> {
+  updateMemberProperties(conversationId: QualifiedId, payload: Partial<ConversationMemberUpdateData>): Promise<void> {
     return this.apiClient.api.conversation.putMembershipProperties(conversationId, payload);
   }
 
