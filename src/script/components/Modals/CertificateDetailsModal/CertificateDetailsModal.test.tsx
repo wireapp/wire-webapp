@@ -33,18 +33,19 @@ Object.assign(navigator, {
 const defaultProps = {
   certificate,
   onClose: jest.fn(),
-  downloadCertificate: jest.fn(),
 };
 
 describe('CertificateDetailsModal', () => {
   it('is certificate downloaded', async () => {
     const {getByTestId} = render(<CertificateDetailsModal {...defaultProps} />);
 
-    const downloadButton = getByTestId('download-certificate');
+    const downloadButton = getByTestId('download-certificate') as HTMLButtonElement;
     expect(downloadButton).toBeDefined();
+    expect(downloadButton.disabled).toBe(false);
+
     fireEvent.click(downloadButton);
 
-    expect(defaultProps.downloadCertificate).toHaveBeenCalled();
+    expect(downloadButton.disabled).toBe(true);
   });
 
   it('is certificate copied', async () => {

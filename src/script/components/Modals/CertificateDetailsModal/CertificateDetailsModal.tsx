@@ -26,24 +26,36 @@ import {t} from 'Util/LocalizerUtil';
 import {styles} from './CertificateDetailsModal.styles';
 
 const COPY_MESSAGE_TIMEOUT = 3000;
+const CERTIFICATE_NAME = 'certificate.pem';
 
 export interface CertificateDetailsModalProps {
   certificate: string;
   onClose: () => void;
-  downloadCertificate: () => void;
 }
 
-export const CertificateDetailsModal = ({certificate, onClose, downloadCertificate}: CertificateDetailsModalProps) => {
+export const CertificateDetailsModal = ({certificate, onClose}: CertificateDetailsModalProps) => {
   const [isTextCopied, setIsTextCopied] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
 
   const onDownload = () => {
     setIsDownloading(true);
-    downloadCertificate();
 
-    setTimeout(() => {
+    const downloadLink = document.createElement('a');
+    downloadLink.href = `data:application/x-pem-file,${encodeURIComponent(certificate)}`;
+    downloadLink.download = CERTIFICATE_NAME;
+    downloadLink.innerHTML = t('E2EI.downloadCertificate');
+
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+
+    // Wait before removing resource and link. Needed in FF.
+    return window.setTimeout(() => {
+      const objectURL = downloadLink.href;
+      document.body.removeChild(downloadLink);
+      window.URL.revokeObjectURL(objectURL);
+
       setIsDownloading(false);
-    }, COPY_MESSAGE_TIMEOUT);
+    }, 300);
   };
 
   const onCopy = async () => {

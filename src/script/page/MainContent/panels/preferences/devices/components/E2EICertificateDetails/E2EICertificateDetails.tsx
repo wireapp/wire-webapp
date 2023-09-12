@@ -129,11 +129,7 @@ export const E2EICertificateDetails = ({core = container.resolve(Core), isMLSVer
         )}
 
         {isCertificateDetailsModalOpen && (
-          <CertificateDetailsModal
-            certificate={certificate}
-            onClose={() => setIsCertificateDetailsModalOpen(false)}
-            downloadCertificate={getCertificate}
-          />
+          <CertificateDetailsModal certificate={certificate} onClose={() => setIsCertificateDetailsModalOpen(false)} />
         )}
 
         {isNotActivated && (
