@@ -219,14 +219,21 @@ export class ProteusService {
               return {failedToAdd: {reason: failureReasonsMap[error.label], users: unreachableUsers}};
             }
             // In case the request to add users failed with a `UNREACHABLE_BACKENDS` or `NOT_CONNECTED_BACKENDS` errors, we try again with the users from available backends
-            const response = await this.apiClient.api.conversation.postMembers(conversationId, availableUsers);
-            return {
-              event: response,
-              failedToAdd:
-                unreachableUsers.length > 0
-                  ? {reason: failureReasonsMap[error.label], users: unreachableUsers}
-                  : undefined,
-            };
+            try {
+              const response = await this.apiClient.api.conversation.postMembers(conversationId, availableUsers);
+              return {
+                event: response,
+                failedToAdd:
+                  unreachableUsers.length > 0
+                    ? {reason: failureReasonsMap[error.label], users: unreachableUsers}
+                    : undefined,
+              };
+            } catch (error) {
+              if (isFederatedBackendsError(error)) {
+                return {failedToAdd: {reason: failureReasonsMap[error.label], users: qualifiedUsers}};
+              }
+              throw error;
+            }
           }
         }
       }

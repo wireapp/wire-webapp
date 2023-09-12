@@ -631,6 +631,27 @@ describe('ProteusService', () => {
       expect(result.failedToAdd?.users).toEqual([...usersDomain1]);
     });
 
+    it('completely fails to add users if some backends are unreachable', async () => {
+      const [proteusService, {apiClient}] = await buildProteusService();
+
+      const allUsers = [...usersDomain1, ...usersDomain2];
+      const postMembersSpy = jest
+        .spyOn(apiClient.api.conversation, 'postMembers')
+        .mockRejectedValue(new FederatedBackendsError(FederatedBackendsErrorLabel.UNREACHABLE_BACKENDS, [domain1]));
+
+      const result = await proteusService.addUsersToConversation({
+        conversationId,
+        qualifiedUsers: allUsers,
+      });
+
+      expect(postMembersSpy).toHaveBeenCalledTimes(2);
+      expect(postMembersSpy).toHaveBeenCalledWith(conversationId, expect.arrayContaining(allUsers));
+      expect(postMembersSpy).toHaveBeenCalledWith(conversationId, expect.arrayContaining(usersDomain2));
+
+      expect(result.failedToAdd?.reason).toBe(AddUsersFailureReasons.UNREACHABLE_BACKENDS);
+      expect(result.failedToAdd?.users).toEqual(allUsers);
+    });
+
     it('partially add users if some users are part of not-connected backends', async () => {
       const [proteusService, {apiClient}] = await buildProteusService();
 
