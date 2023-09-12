@@ -22,11 +22,11 @@ import {FC} from 'react';
 import {Link, LinkVariant} from '@wireapp/react-ui-kit';
 
 import {Icon} from 'Components/Icon';
-import {ONE_TO_ONE_CONVERSATION_STATE} from 'src/script/conversation/ConversationRepository';
+import {CONVERSATION_READONLY_STATE} from 'src/script/conversation/ConversationRepository';
 import {t} from 'Util/LocalizerUtil';
 
 interface ReadOnlyConversationMessageProps {
-  state: ONE_TO_ONE_CONVERSATION_STATE;
+  state: CONVERSATION_READONLY_STATE;
   handleMLSUpdate: () => void;
   displayName: string;
 }
@@ -36,7 +36,7 @@ export const ReadOnlyConversationMessage: FC<ReadOnlyConversationMessageProps> =
   displayName,
 }) => {
   const mlsCompatibilityMessage =
-    state === ONE_TO_ONE_CONVERSATION_STATE.READONLY_OTHER_DOES_NOT_SUPPORT_MLS
+    state === CONVERSATION_READONLY_STATE.READONLY_OTHER_DOES_NOT_SUPPORT_MLS
       ? t('otherUserNotSupportMLSMsg', displayName)
       : t('selfNotSupportMLSMsgPart1', displayName);
 
@@ -53,7 +53,7 @@ export const ReadOnlyConversationMessage: FC<ReadOnlyConversationMessageProps> =
             __html: mlsCompatibilityMessage,
           }}
         />
-        {state === ONE_TO_ONE_CONVERSATION_STATE.READONLY_SELF_DOES_NOT_SUPPORT_MLS && (
+        {state === CONVERSATION_READONLY_STATE.READONLY_SELF_DOES_NOT_SUPPORT_MLS && (
           <>
             <Link
               css={{fontSize: 'var(--font-size-small)', marginLeft: 2, fontWeight: 600}}

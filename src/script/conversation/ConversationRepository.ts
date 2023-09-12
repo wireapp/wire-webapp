@@ -151,7 +151,7 @@ type FetchPromise = {rejectFn: (error: ConversationError) => void; resolveFn: (c
 type EntityObject = {conversationEntity: Conversation; messageEntity: Message};
 type IncomingEvent = ConversationEvent | ClientConversationEvent;
 
-export enum ONE_TO_ONE_CONVERSATION_STATE {
+export enum CONVERSATION_READONLY_STATE {
   DEFAULT = 'DEFAULT',
   READONLY_SELF_DOES_NOT_SUPPORT_MLS = 'READONLY_SELF_DOES_NOT_SUPPORT_MLS',
   READONLY_OTHER_DOES_NOT_SUPPORT_MLS = 'READONLY_OTHER_DOES_NOT_SUPPORT_MLS',
@@ -791,6 +791,8 @@ export class ConversationRepository {
     events: EventRecord[],
     conversationEntity: Conversation,
   ): Promise<ContentMessage[]> {
+    // FOR TESTING I ADDED THE CALL HERE
+    await this.markConversationReadOnly(conversationEntity);
     const hasAdditionalMessages = events.length === Config.getConfig().MESSAGES_FETCH_LIMIT;
 
     const mappedMessageEntities = await this.addEventsToConversation(events, conversationEntity);
@@ -1358,7 +1360,7 @@ export class ConversationRepository {
   };
 
   private readonly markConversationReadOnly = async (conversationEntity: Conversation) => {
-    conversationEntity.mls1To1ConversationState(ONE_TO_ONE_CONVERSATION_STATE.READONLY_OTHER_DOES_NOT_SUPPORT_MLS);
+    conversationEntity.readOnlyState(CONVERSATION_READONLY_STATE.DEFAULT);
     await this.saveConversationStateInDb(conversationEntity);
   };
 

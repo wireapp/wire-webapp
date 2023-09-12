@@ -35,7 +35,7 @@ import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
 import {TitleBar} from 'Components/TitleBar';
 import {CallState} from 'src/script/calling/CallState';
 import {Config} from 'src/script/Config';
-import {ONE_TO_ONE_CONVERSATION_STATE} from 'src/script/conversation/ConversationRepository';
+import {CONVERSATION_READONLY_STATE} from 'src/script/conversation/ConversationRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {allowsAllFiles, getFileExtensionOrName, hasAllowedExtension} from 'Util/FileTypeUtil';
 import {isHittingUploadLimit} from 'Util/isHittingUploadLimit';
@@ -106,18 +106,13 @@ export const Conversation: FC<ConversationProps> = ({
   const {
     is1to1,
     isRequest,
-    mls1To1ConversationState,
+    readOnlyState,
     display_name: displayName,
-  } = useKoSubscribableChildren(activeConversation!, [
-    'is1to1',
-    'isRequest',
-    'mls1To1ConversationState',
-    'display_name',
-  ]);
+  } = useKoSubscribableChildren(activeConversation!, ['is1to1', 'isRequest', 'readOnlyState', 'display_name']);
   const showReadOnlyConversationMessage = [
-    ONE_TO_ONE_CONVERSATION_STATE.READONLY_OTHER_DOES_NOT_SUPPORT_MLS,
-    ONE_TO_ONE_CONVERSATION_STATE.READONLY_SELF_DOES_NOT_SUPPORT_MLS,
-  ].includes(mls1To1ConversationState);
+    CONVERSATION_READONLY_STATE.READONLY_OTHER_DOES_NOT_SUPPORT_MLS,
+    CONVERSATION_READONLY_STATE.READONLY_SELF_DOES_NOT_SUPPORT_MLS,
+  ].includes(readOnlyState);
   const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
   const {inTeam} = useKoSubscribableChildren(selfUser, ['inTeam']);
 
@@ -541,7 +536,7 @@ export const Conversation: FC<ConversationProps> = ({
 
           {showReadOnlyConversationMessage ? (
             <ReadOnlyConversationMessage
-              state={mls1To1ConversationState}
+              state={readOnlyState}
               handleMLSUpdate={handleMLSUpdate}
               displayName={displayName}
             />

@@ -52,7 +52,7 @@ import {ClientRepository} from '../client';
 import {Config} from '../Config';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
 import {ACCESS_STATE} from '../conversation/AccessState';
-import {ConversationRepository, ONE_TO_ONE_CONVERSATION_STATE} from '../conversation/ConversationRepository';
+import {ConversationRepository, CONVERSATION_READONLY_STATE} from '../conversation/ConversationRepository';
 import {isSelfConversation} from '../conversation/ConversationSelectors';
 import {ConversationStatus} from '../conversation/ConversationStatus';
 import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
@@ -85,7 +85,7 @@ enum TIMESTAMP_TYPE {
 export class Conversation {
   private readonly teamState: TeamState;
   public readonly archivedState: ko.Observable<boolean>;
-  public readonly mls1To1ConversationState: ko.Observable<ONE_TO_ONE_CONVERSATION_STATE>;
+  public readonly readOnlyState: ko.Observable<CONVERSATION_READONLY_STATE>;
   private readonly incomingMessages: ko.ObservableArray<Message>;
   private readonly isManaged: boolean;
   private readonly isTeam1to1: ko.PureComputed<boolean>;
@@ -298,9 +298,7 @@ export class Conversation {
 
     this.call = ko.observable(null);
 
-    this.mls1To1ConversationState = this.mls1To1ConversationState = ko.observable<ONE_TO_ONE_CONVERSATION_STATE>(
-      ONE_TO_ONE_CONVERSATION_STATE.DEFAULT,
-    );
+    this.readOnlyState = ko.observable<CONVERSATION_READONLY_STATE>(CONVERSATION_READONLY_STATE.DEFAULT);
 
     // Conversation states for view
     this.notificationState = ko.pureComputed(() => {
@@ -574,7 +572,7 @@ export class Conversation {
   private _initSubscriptions() {
     [
       this.archivedState,
-      this.mls1To1ConversationState,
+      this.readOnlyState,
       this.archivedTimestamp,
       this.cleared_timestamp,
       this.messageTimer,
@@ -1040,7 +1038,7 @@ export class Conversation {
       access: this.accessModes,
       access_role: this.accessRole,
       archived_state: this.archivedState(),
-      mls_conversation_readonly_state: this.mls1To1ConversationState(),
+      readonly_state: this.readOnlyState(),
       archived_timestamp: this.archivedTimestamp(),
       cipher_suite: this.cipherSuite,
       cleared_timestamp: this.cleared_timestamp(),

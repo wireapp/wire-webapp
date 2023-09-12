@@ -37,7 +37,7 @@ export interface ConversationRecord {
   access_role: CONVERSATION_LEGACY_ACCESS_ROLE | CONVERSATION_ACCESS_ROLE[];
   access: CONVERSATION_ACCESS[];
   archived_state: boolean;
-  mls_conversation_readonly_state: boolean;
+  readonly_state: string;
   archived_timestamp: number;
   cipher_suite: number;
   cleared_timestamp: number;
