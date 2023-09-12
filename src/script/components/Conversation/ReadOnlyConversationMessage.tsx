@@ -36,7 +36,7 @@ export const ReadOnlyConversationMessage: FC<ReadOnlyConversationMessageProps> =
   displayName,
 }) => {
   const mlsCompatibilityMessage =
-    state === CONVERSATION_READONLY_STATE.READONLY_OTHER_DOES_NOT_SUPPORT_MLS
+    state === CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_OTHER_UNSUPPORTED_MLS
       ? t('otherUserNotSupportMLSMsg', displayName)
       : t('selfNotSupportMLSMsgPart1', displayName);
 
@@ -53,7 +53,7 @@ export const ReadOnlyConversationMessage: FC<ReadOnlyConversationMessageProps> =
             __html: mlsCompatibilityMessage,
           }}
         />
-        {state === CONVERSATION_READONLY_STATE.READONLY_SELF_DOES_NOT_SUPPORT_MLS && (
+        {state === CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_SELF_UNSUPPORTED_MLS && (
           <>
             <Link
               css={{fontSize: 'var(--font-size-small)', marginLeft: 2, fontWeight: 600}}

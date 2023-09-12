@@ -112,8 +112,8 @@ export const Conversation: FC<ConversationProps> = ({
   const showReadOnlyConversationMessage =
     readOnlyState !== null &&
     [
-      CONVERSATION_READONLY_STATE.READONLY_OTHER_DOES_NOT_SUPPORT_MLS,
-      CONVERSATION_READONLY_STATE.READONLY_SELF_DOES_NOT_SUPPORT_MLS,
+      CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_OTHER_UNSUPPORTED_MLS,
+      CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_SELF_UNSUPPORTED_MLS,
     ].includes(readOnlyState);
   const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
   const {inTeam} = useKoSubscribableChildren(selfUser, ['inTeam']);

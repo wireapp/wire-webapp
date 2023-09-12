@@ -154,8 +154,8 @@ type EntityObject = {conversationEntity: Conversation; messageEntity: Message};
 type IncomingEvent = ConversationEvent | ClientConversationEvent;
 
 export enum CONVERSATION_READONLY_STATE {
-  READONLY_SELF_DOES_NOT_SUPPORT_MLS = 'READONLY_SELF_DOES_NOT_SUPPORT_MLS',
-  READONLY_OTHER_DOES_NOT_SUPPORT_MLS = 'READONLY_OTHER_DOES_NOT_SUPPORT_MLS',
+  READONLY_ONE_TO_ONE_SELF_UNSUPPORTED_MLS = 'READONLY_ONE_TO_ONE_SELF_UNSUPPORTED_MLS',
+  READONLY_ONE_TO_ONE_OTHER_UNSUPPORTED_MLS = 'READONLY_ONE_TO_ONE_OTHER_UNSUPPORTED_MLS',
 }
 
 export class ConversationRepository {
@@ -1613,6 +1613,10 @@ export class ConversationRepository {
     //we just mark the mls conversation as readonly and return it
     if (!isMLSSupportedByTheOtherUser) {
       //TODO: mark conversation as readonly
+      await this.markConversationReadOnly(
+        mlsConversation,
+        CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_OTHER_UNSUPPORTED_MLS,
+      );
       this.logger.info(
         `MLS 1:1 conversation with user ${otherUserId.id} is not supported by the other user, conversation will become readonly`,
       );
@@ -1650,6 +1654,10 @@ export class ConversationRepository {
     // If proteus is not supported by the other user we have to mark conversation as readonly
     if (!doesOtherUserSupportProteus) {
       //TODO: mark conversation as readonly
+      await this.markConversationReadOnly(
+        proteusConversation,
+        CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_SELF_UNSUPPORTED_MLS,
+      );
     }
 
     return proteusConversation;
