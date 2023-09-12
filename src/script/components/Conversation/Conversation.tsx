@@ -467,7 +467,7 @@ export const Conversation: FC<ConversationProps> = ({
           <TitleBar
             repositories={repositories}
             conversation={activeConversation}
-            userState={userState}
+            selfUser={selfUser}
             teamState={teamState}
             callActions={mainViewModel.calling.callActions}
             openRightSidebar={openRightSidebar}

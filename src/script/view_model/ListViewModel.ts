@@ -96,9 +96,9 @@ export class ListViewModel {
     this.contentViewModel = mainViewModel.content;
     this.callingViewModel = mainViewModel.calling;
 
-    this.isActivatedAccount = this.userState.isActivatedAccount;
     this.isProAccount = this.teamState.isTeam;
     this.selfUser = this.userState.self;
+    this.isActivatedAccount = this.selfUser().isActivatedAccount;
 
     // State
     this.lastUpdate = ko.observable();

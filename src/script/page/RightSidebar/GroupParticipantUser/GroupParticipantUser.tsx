@@ -83,8 +83,11 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
     'isTeam',
     'team',
   ]);
-  const {isActivatedAccount, self: selfUser} = useKoSubscribableChildren(userState, ['isActivatedAccount', 'self']);
-  const {is_verified: isSelfVerified} = useKoSubscribableChildren(selfUser, ['is_verified']);
+  const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
+  const {is_verified: isSelfVerified, isActivatedAccount} = useKoSubscribableChildren(selfUser, [
+    'is_verified',
+    'isActivatedAccount',
+  ]);
 
   const canChangeRole =
     conversationRoleRepository.canChangeParticipantRoles(activeConversation) && !currentUser.isMe && !isTemporaryGuest;
