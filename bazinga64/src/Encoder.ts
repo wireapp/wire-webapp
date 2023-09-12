@@ -29,6 +29,14 @@ export class Encoder {
     return new EncodedData(asBytes, asString);
   }
 
+  public static toBase64Url(data: string | number | number[] | ArrayBuffer | Buffer | Uint8Array): EncodedData {
+    const base64 = Encoder.toBase64(data);
+    const asString = base64.asString.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+    const asBytes = Converter.stringToArrayBufferViewUTF8(asString);
+
+    return new EncodedData(asBytes, asString);
+  }
+
   private static fromByteArray(decoded: Uint8Array): string {
     if (typeof window === 'object') {
       const decodedString = Converter.arrayBufferViewToBaselineString(decoded);

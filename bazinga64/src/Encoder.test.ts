@@ -27,6 +27,8 @@ import {
 
 import * as bazinga64 from './index';
 
+const {Converter, Encoder} = bazinga64;
+
 describe('toBase64', () => {
   it('encodes arrays', () => {
     const encoded = bazinga64.Encoder.toBase64(helloDecodedArray);
@@ -214,5 +216,53 @@ describe('toBase64', () => {
 
     const decoded = bazinga64.Decoder.fromBase64(encodedString);
     expect(decoded.asBytes).toEqual(arrayBufferView);
+  });
+});
+
+describe('toBase64Url', () => {
+  it('should encode a string correctly', () => {
+    const data = 'Hello, World!';
+    const result = Encoder.toBase64Url(data);
+    expect(result.asString).not.toMatch(/[+=/]/);
+    expect(Converter.arrayBufferViewToStringUTF8(result.asBytes)).toBe(result.asString);
+  });
+
+  it('should encode a number correctly', () => {
+    const data = 123456789;
+    const result = Encoder.toBase64Url(data);
+    expect(result.asString).not.toMatch(/[+=/]/);
+    expect(Converter.arrayBufferViewToStringUTF8(result.asBytes)).toBe(result.asString);
+  });
+
+  it('should encode a number array correctly', () => {
+    const data = [65, 66, 67]; // ABC in ASCII
+    const result = Encoder.toBase64Url(data);
+    expect(result.asString).not.toMatch(/[+=/]/);
+    expect(Converter.arrayBufferViewToStringUTF8(result.asBytes)).toBe(result.asString);
+  });
+
+  it('should encode an ArrayBuffer correctly', () => {
+    const buffer = new ArrayBuffer(3);
+    const view = new DataView(buffer);
+    view.setUint8(0, 65); // A
+    view.setUint8(1, 66); // B
+    view.setUint8(2, 67); // C
+    const result = Encoder.toBase64Url(buffer);
+    expect(result.asString).not.toMatch(/[+=/]/);
+    expect(Converter.arrayBufferViewToStringUTF8(result.asBytes)).toBe(result.asString);
+  });
+
+  it('should encode a Buffer correctly', () => {
+    const buffer = Buffer.from('ABC');
+    const result = Encoder.toBase64Url(buffer);
+    expect(result.asString).not.toMatch(/[+=/]/);
+    expect(Converter.arrayBufferViewToStringUTF8(result.asBytes)).toBe(result.asString);
+  });
+
+  it('should encode a Uint8Array correctly', () => {
+    const arr = new Uint8Array([65, 66, 67]);
+    const result = Encoder.toBase64Url(arr);
+    expect(result.asString).not.toMatch(/[+=/]/);
+    expect(Converter.arrayBufferViewToStringUTF8(result.asBytes)).toBe(result.asString);
   });
 });
