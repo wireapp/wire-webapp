@@ -102,7 +102,7 @@ const Device = ({device, isSSO, onSelect, onRemove, deviceNumber}: DeviceProps) 
             <span>{t('preferencesMLSThumbprint')}</span>
 
             <span className="preferences-formatted-id" data-uie-name="preferences-device-active-id">
-              <FormattedId idSlices={splitFingerprint(mlsFingerprint)} />
+              <FormattedId idSlices={splitFingerprint(mlsFingerprint)} smallPadding />
             </span>
           </p>
         )}
@@ -111,7 +111,7 @@ const Device = ({device, isSSO, onSelect, onRemove, deviceNumber}: DeviceProps) 
           <span>{t('preferencesDevicesId')}</span>
 
           <span className="preferences-formatted-id" data-uie-name="preferences-device-active-id">
-            <FormattedId idSlices={device.formatId()} />
+            <FormattedId idSlices={device.formatId()} smallPadding />
           </span>
         </p>
       </div>

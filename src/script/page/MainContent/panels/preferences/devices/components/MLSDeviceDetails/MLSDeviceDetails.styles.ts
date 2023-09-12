@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2022 Wire Swiss GmbH
+ * Copyright (C) 2023 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,19 +17,29 @@
  *
  */
 
-import {devicePart} from './FormattedId.styles';
+import {CSSObject} from '@emotion/react';
 
-interface FormattedIdProps {
-  idSlices: string[];
-  smallPadding?: boolean;
+interface Styles {
+  wrapper: CSSObject;
 }
+export const styles: Styles = {
+  wrapper: {
+    width: '100%',
 
-export const FormattedId = ({idSlices, smallPadding = false}: FormattedIdProps) => (
-  <>
-    {idSlices.map((slice, index) => (
-      <span css={devicePart(smallPadding)} key={slice + index} data-uie-name="element-device-id-part">
-        {slice}
-      </span>
-    ))}
-  </>
-);
+    '.preferences-devices &': {
+      paddingBottom: '32px',
+    },
+
+    '.preferences-device-details &': {
+      borderBottom: '1px solid var(--gray-40)',
+    },
+
+    '.preferences-devices-header &': {
+      borderBottom: '1px solid var(--gray-40)',
+    },
+
+    '.participant-devices__header &': {
+      paddingBottom: '24px',
+    },
+  },
+};

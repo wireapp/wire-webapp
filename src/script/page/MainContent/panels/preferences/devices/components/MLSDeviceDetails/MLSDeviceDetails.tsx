@@ -20,7 +20,10 @@
 import {t} from 'Util/LocalizerUtil';
 import {splitFingerprint} from 'Util/StringUtil';
 
-import {FormattedId} from './FormattedId';
+import {styles} from './MLSDeviceDetails.styles';
+
+import {MLSPublicKeys} from '../../../../../../../client';
+import {FormattedId} from '../FormattedId';
 
 interface MLSDeviceDetailsProps {
   fingerprint: string;
@@ -28,8 +31,8 @@ interface MLSDeviceDetailsProps {
 
 export const MLSDeviceDetails = ({fingerprint}: MLSDeviceDetailsProps) => {
   return (
-    <div className="mls-device-details">
-      <h4 className="paragraph-body-3">{t('mlsSignature')}</h4>
+    <div css={styles.wrapper}>
+      <h4 className="paragraph-body-3">{t('mlsSignature', MLSPublicKeys.ED25519.toUpperCase())}</h4>
 
       <p className="label-2 preferences-label preferences-devices-fingerprint-label">{t('mlsThumbprint')}</p>
 
