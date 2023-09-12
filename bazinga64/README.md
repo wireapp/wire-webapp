@@ -12,6 +12,10 @@ For licensing information, see the attached LICENSE file and the list of third-p
 yarn add bazinga64
 ```
 
+```
+npm -i bazinga64
+```
+
 ```javascript
 const bazinga64 = require('bazinga64');
 ```
@@ -30,7 +34,9 @@ yarn dist
 const encoded = bazinga64.Encoder.toBase64('Hello');
 const base64 = encoded.asString;
 console.log(base64); // "SGVsbG8="
+```
 
+```javascript
 // Decoding
 const decoded = bazinga64.Decoder.fromBase64('SGVsbG8=');
 const text = decoded.asString;
@@ -53,3 +59,17 @@ const typedArray: Uint8Array = Decoder.fromBase64('SGVsbG8=').asBytes;
 ### `Encoder`
 
 - `toBase64`
+- `toBase64Url`
+
+### `Converter`
+
+- `arrayBufferViewToString`
+- `arrayBufferViewToStringUTF8`
+- `arrayBufferViewToBaselineString`
+- `jsonToArrayBufferView`
+- `numberArrayToArrayBufferView`
+- `stringToArrayBufferViewUTF16`
+- `stringToArrayBufferViewUTF8`
+- `hexStringToArrayBufferView`
+- `toArrayBufferView`
+- `toString`

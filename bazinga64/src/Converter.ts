@@ -134,6 +134,27 @@ export class Converter {
     return arrayBufferView;
   }
 
+  public static hexStringToArrayBufferView(data: string): Uint8Array {
+    if (data.length % 2 !== 0) {
+      throw new Error('Invalid hexadecimal string');
+    }
+
+    const arrayBufferView = new Uint8Array(data.length / 2);
+
+    for (let i = 0; i < data.length; i += 2) {
+      const hexByte = data.substr(i, 2);
+      const value = parseInt(hexByte, 16);
+
+      if (isNaN(value)) {
+        throw new Error(`Invalid hexadecimal string at position ${i}: "${hexByte}"`);
+      }
+
+      arrayBufferView[i / 2] = value;
+    }
+
+    return arrayBufferView;
+  }
+
   private static arrayBufferViewToString(arrayBufferView: Uint8Array): string {
     const binaryString = Converter.arrayBufferViewToBaselineString(arrayBufferView);
 

@@ -296,3 +296,31 @@ describe('stringToArrayBufferViewUTF8', () => {
     expect(decoded).toBe(helloDecodedString);
   });
 });
+
+describe('hexStringToArrayBufferView', () => {
+  it('should correctly convert a valid hex string', () => {
+    const hexString = '41d2b365f4a94ba1bddf5afb8aca6786';
+    const byteArray = bazinga64.Converter.hexStringToArrayBufferView(hexString);
+    expect(byteArray).toEqual(
+      new Uint8Array([65, 210, 179, 101, 244, 169, 75, 161, 189, 223, 90, 251, 138, 202, 103, 134]),
+    );
+  });
+
+  it('should throw an error for invalid hex strings (odd length)', () => {
+    const invalidHexString = '41d2b36'; // odd length
+    expect(() => bazinga64.Converter.hexStringToArrayBufferView(invalidHexString)).toThrow(
+      'Invalid hexadecimal string',
+    );
+  });
+
+  it('should throw an error for non-hex characters', () => {
+    const invalidHexString = '41d2b36zzz'; // contains non-hex characters (z)
+    expect(() => bazinga64.Converter.hexStringToArrayBufferView(invalidHexString)).toThrow();
+  });
+
+  it('should handle an empty string', () => {
+    const emptyString = '';
+    const byteArray = bazinga64.Converter.hexStringToArrayBufferView(emptyString);
+    expect(byteArray).toEqual(new Uint8Array([]));
+  });
+});
