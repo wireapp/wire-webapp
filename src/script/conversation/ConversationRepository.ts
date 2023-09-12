@@ -1612,7 +1612,6 @@ export class ConversationRepository {
     //if mls is not supported by the other user we do not establish the group yet
     //we just mark the mls conversation as readonly and return it
     if (!isMLSSupportedByTheOtherUser) {
-      //TODO: mark conversation as readonly
       await this.markConversationReadOnly(
         mlsConversation,
         CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_OTHER_UNSUPPORTED_MLS,
@@ -1653,7 +1652,6 @@ export class ConversationRepository {
 
     // If proteus is not supported by the other user we have to mark conversation as readonly
     if (!doesOtherUserSupportProteus) {
-      //TODO: mark conversation as readonly
       await this.markConversationReadOnly(
         proteusConversation,
         CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_SELF_UNSUPPORTED_MLS,
