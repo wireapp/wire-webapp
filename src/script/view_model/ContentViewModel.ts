@@ -138,6 +138,21 @@ export class ContentViewModel {
     this.conversationState.activeConversation(conversationEntity);
   };
 
+  private readonly getConversationToDisplay = async (
+    conversation: Conversation | string,
+    domain: string | null = null,
+  ): Promise<Conversation | null> => {
+    const conversationEntity = isConversationEntity(conversation)
+      ? conversation
+      : await this.conversationRepository.getConversationById({domain: domain || '', id: conversation});
+
+    if (!conversationEntity.is1to1()) {
+      return conversationEntity;
+    }
+
+    return this.conversationRepository.init1to1Conversation(conversationEntity);
+  };
+
   /**
    * Opens the specified conversation.
    *
@@ -167,9 +182,7 @@ export class ContentViewModel {
     }
 
     try {
-      const conversationEntity = isConversationEntity(conversation)
-        ? conversation
-        : await this.conversationRepository.getConversationById({domain: domain || '', id: conversation});
+      const conversationEntity = await this.getConversationToDisplay(conversation, domain);
 
       if (!conversationEntity) {
         rightSidebar.close();

@@ -91,7 +91,7 @@ export class Conversation {
   public readonly last_server_timestamp: ko.Observable<number>;
   private readonly logger: Logger;
   public readonly mutedState: ko.Observable<number>;
-  private readonly mutedTimestamp: ko.Observable<number>;
+  public readonly mutedTimestamp: ko.Observable<number>;
   private readonly publishPersistState: (() => void) & Cancelable;
   private shouldPersistStateChanges: boolean;
   public blockLegalHoldMessage: boolean;

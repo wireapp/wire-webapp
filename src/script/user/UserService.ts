@@ -17,6 +17,7 @@
  *
  */
 
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import type {User as APIClientUser, QualifiedHandle, QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
@@ -147,5 +148,12 @@ export class UserService {
    */
   getUser(userId: QualifiedId): Promise<APIClientUser> {
     return this.apiClient.api.user.getUser(userId);
+  }
+
+  /**
+   * Get the list of user's supported protocols.
+   */
+  getUserSupportedProtocols(userId: QualifiedId): Promise<ConversationProtocol[]> {
+    return this.apiClient.api.user.getUserSupportedProtocols(userId);
   }
 }
