@@ -791,8 +791,6 @@ export class ConversationRepository {
     events: EventRecord[],
     conversationEntity: Conversation,
   ): Promise<ContentMessage[]> {
-    // FOR TESTING I ADDED THE CALL HERE
-    await this.markConversationReadOnly(conversationEntity);
     const hasAdditionalMessages = events.length === Config.getConfig().MESSAGES_FETCH_LIMIT;
 
     const mappedMessageEntities = await this.addEventsToConversation(events, conversationEntity);
@@ -1360,7 +1358,7 @@ export class ConversationRepository {
   };
 
   private readonly markConversationReadOnly = async (conversationEntity: Conversation) => {
-    conversationEntity.readOnlyState(CONVERSATION_READONLY_STATE.DEFAULT);
+    conversationEntity.readOnlyState(CONVERSATION_READONLY_STATE.READONLY_OTHER_DOES_NOT_SUPPORT_MLS);
     await this.saveConversationStateInDb(conversationEntity);
   };
 
