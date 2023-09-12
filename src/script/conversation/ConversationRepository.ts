@@ -1870,7 +1870,10 @@ export class ConversationRepository {
   ): Promise<ConversationMessageTimerUpdateEvent> {
     messageTimer = ConversationEphemeralHandler.validateTimer(messageTimer);
 
-    const response = await this.conversationService.updateConversationMessageTimer(conversationEntity.id, messageTimer);
+    const response = await this.conversationService.updateConversationMessageTimer(
+      conversationEntity.qualifiedId,
+      messageTimer,
+    );
     if (response) {
       this.eventRepository.injectEvent(response, EventRepository.SOURCE.BACKEND_RESPONSE);
     }
@@ -1881,7 +1884,10 @@ export class ConversationRepository {
     conversationEntity: Conversation,
     receiptMode: ConversationReceiptModeUpdateData,
   ) {
-    const response = await this.conversationService.updateConversationReceiptMode(conversationEntity.id, receiptMode);
+    const response = await this.conversationService.updateConversationReceiptMode(
+      conversationEntity.qualifiedId,
+      receiptMode,
+    );
     if (response) {
       this.eventRepository.injectEvent(response, EventRepository.SOURCE.BACKEND_RESPONSE);
     }
@@ -1943,7 +1949,7 @@ export class ConversationRepository {
     };
 
     try {
-      await this.conversationService.updateMemberProperties(conversationEntity.id, payload);
+      await this.conversationService.updateMemberProperties(conversationEntity.qualifiedId, payload);
       const response = {data: payload, from: this.userState.self().id};
       this.onMemberUpdate(conversationEntity, response);
 
@@ -2020,7 +2026,7 @@ export class ConversationRepository {
       otr_archived_ref: new Date(archiveTimestamp).toISOString(),
     };
 
-    const conversationId = conversationEntity.id;
+    const conversationId = conversationEntity.qualifiedId;
 
     const updatePromise = conversationEntity.removed_from_conversation()
       ? Promise.resolve()

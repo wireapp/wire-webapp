@@ -51,7 +51,6 @@ export interface ConversationRecord {
   epoch: number;
   id: string;
   is_guest: boolean;
-  is_managed: boolean;
   last_event_timestamp: number;
   last_read_timestamp: number;
   last_server_timestamp: number;

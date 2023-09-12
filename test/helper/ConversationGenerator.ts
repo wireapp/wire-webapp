@@ -61,7 +61,6 @@ export function generateAPIConversation({
     is_guest: false,
     archived_state: false,
     readonly_state: null,
-    is_managed: false,
     archived_timestamp: 0,
     last_event_timestamp: 0,
     last_read_timestamp: 0,
