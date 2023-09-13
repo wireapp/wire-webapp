@@ -98,7 +98,7 @@ export class ListViewModel {
 
     this.isProAccount = this.teamState.isTeam;
     this.selfUser = this.userState.self;
-    this.isActivatedAccount = this.selfUser().isActivatedAccount;
+    this.isActivatedAccount = ko.pureComputed(() => this.selfUser()?.isActivatedAccount());
 
     // State
     this.lastUpdate = ko.observable();
