@@ -17,6 +17,8 @@
  *
  */
 
+import {ClientType, RegisteredClient} from '@wireapp/api-client/lib/client';
+
 import {randomUUID} from 'crypto';
 
 import {APIClient} from '@wireapp/api-client';
@@ -36,6 +38,10 @@ describe('MLSService', () => {
     createConversation: jest.fn(),
     conversationExists: jest.fn(),
     wipeConversation: jest.fn(),
+    clientValidKeypackagesCount: jest.fn(),
+    clientKeypackages: jest.fn(),
+    mlsInit: jest.fn(),
+    clientPublicKey: jest.fn(),
   } as unknown as CoreCrypto;
 
   describe('registerConversation', () => {
@@ -129,6 +135,71 @@ describe('MLSService', () => {
       const isEstablshed = await mlsService.isConversationEstablished(groupId);
 
       expect(isEstablshed).toBe(true);
+    });
+  });
+
+  describe('initClient', () => {
+    it('uploads public key only if it was not yet defined on client entity', async () => {
+      const mlsService = new MLSService(apiClient, mockCoreCrypto, {});
+
+      const mockUserId = {id: 'user-1', domain: 'local.zinfra.io'};
+      const mockClientId = 'client-1';
+      const mockClient = {mls_public_keys: {}, id: mockClientId} as unknown as RegisteredClient;
+
+      apiClient.context = {clientType: ClientType.PERMANENT, clientId: mockClientId, userId: ''};
+
+      const mockedClientPublicKey = new Uint8Array();
+
+      jest.spyOn(mockCoreCrypto, 'clientPublicKey').mockResolvedValueOnce(mockedClientPublicKey);
+      jest.spyOn(apiClient.api.client, 'putClient').mockResolvedValueOnce(undefined);
+      jest.spyOn(apiClient.api.client, 'getMLSKeyPackageCount').mockResolvedValueOnce(mlsService.config.nbKeyPackages);
+
+      await mlsService.initClient(mockUserId, mockClient);
+
+      expect(mockCoreCrypto.mlsInit).toHaveBeenCalled();
+      expect(apiClient.api.client.putClient).toHaveBeenCalledWith(mockClientId, expect.anything());
+    });
+
+    it('uploads key packages if there are not enough keys on backend', async () => {
+      const mlsService = new MLSService(apiClient, mockCoreCrypto, {});
+
+      const mockUserId = {id: 'user-1', domain: 'local.zinfra.io'};
+      const mockClientId = 'client-1';
+      const mockClient = {mls_public_keys: {ed25519: 'key'}, id: mockClientId} as unknown as RegisteredClient;
+
+      apiClient.context = {clientType: ClientType.PERMANENT, clientId: mockClientId, userId: ''};
+
+      const mockedClientKeyPackages = [new Uint8Array()];
+      jest.spyOn(mockCoreCrypto, 'clientKeypackages').mockResolvedValueOnce(mockedClientKeyPackages);
+      jest
+        .spyOn(apiClient.api.client, 'getMLSKeyPackageCount')
+        .mockResolvedValueOnce(mlsService.config.minRequiredNumberOfAvailableKeyPackages - 1);
+      jest.spyOn(apiClient.api.client, 'uploadMLSKeyPackages').mockResolvedValueOnce(undefined);
+
+      await mlsService.initClient(mockUserId, mockClient);
+
+      expect(mockCoreCrypto.mlsInit).toHaveBeenCalled();
+      expect(apiClient.api.client.uploadMLSKeyPackages).toHaveBeenCalledWith(mockClientId, expect.anything());
+    });
+
+    it('does not upload public key or key packages if both are already uploaded', async () => {
+      const mlsService = new MLSService(apiClient, mockCoreCrypto, {});
+
+      const mockUserId = {id: 'user-1', domain: 'local.zinfra.io'};
+      const mockClientId = 'client-1';
+      const mockClient = {mls_public_keys: {ed25519: 'key'}, id: mockClientId} as unknown as RegisteredClient;
+
+      apiClient.context = {clientType: ClientType.PERMANENT, clientId: mockClientId, userId: ''};
+
+      jest.spyOn(apiClient.api.client, 'getClient').mockResolvedValueOnce(mockClient);
+
+      jest.spyOn(apiClient.api.client, 'getMLSKeyPackageCount').mockResolvedValueOnce(mlsService.config.nbKeyPackages);
+
+      await mlsService.initClient(mockUserId, mockClient);
+
+      expect(mockCoreCrypto.mlsInit).toHaveBeenCalled();
+      expect(apiClient.api.client.uploadMLSKeyPackages).not.toHaveBeenCalled();
+      expect(apiClient.api.client.putClient).not.toHaveBeenCalled();
     });
   });
 });

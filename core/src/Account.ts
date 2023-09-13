@@ -264,7 +264,7 @@ export class Account extends TypedEventEmitter<Events> {
 
     if (this.service.mls) {
       const {userId, domain = ''} = this.apiClient.context;
-      await this.service.mls.createClient({id: userId, domain}, client.id);
+      await this.service.mls.initClient({id: userId, domain}, client);
     }
     this.logger.info(`Created new client {mls: ${!!this.service.mls}, id: ${client.id}}`);
 
@@ -299,7 +299,7 @@ export class Account extends TypedEventEmitter<Events> {
       const {userId, domain = ''} = this.apiClient.context;
       if (!client) {
         // If the client has been passed to the method, it means it also has been initialized
-        await this.service.mls.initClient({id: userId, domain}, validClient.id);
+        await this.service.mls.initClient({id: userId, domain}, validClient);
       }
       // initialize schedulers for pending mls proposals once client is initialized
       await this.service.mls.checkExistingPendingProposals();
