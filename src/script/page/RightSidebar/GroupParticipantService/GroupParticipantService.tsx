@@ -34,7 +34,6 @@ import {User} from '../../../entity/User';
 import {IntegrationRepository} from '../../../integration/IntegrationRepository';
 import {ServiceEntity} from '../../../integration/ServiceEntity';
 import {generatePermissionHelpers} from '../../../user/UserPermission';
-import {UserState} from '../../../user/UserState';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {PanelHeader} from '../PanelHeader';
 
@@ -47,7 +46,7 @@ interface GroupParticipantServiceProps {
   onClose: () => void;
   serviceEntity: ServiceEntity;
   userEntity: User;
-  userState: UserState;
+  selfUser: User;
   isAddMode?: boolean;
 }
 
@@ -60,7 +59,7 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
   onClose,
   serviceEntity,
   userEntity,
-  userState,
+  selfUser,
   isAddMode = false,
 }) => {
   const {
@@ -68,7 +67,6 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
     isActiveParticipant,
     participating_user_ids: participatingUserIds,
   } = useKoSubscribableChildren(activeConversation, ['inTeam', 'isActiveParticipant', 'participating_user_ids']);
-  const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
   const {teamRole} = useKoSubscribableChildren(selfUser, ['teamRole']);
 
   const {canChatWithServices, canUpdateGroupParticipants} = generatePermissionHelpers(teamRole);

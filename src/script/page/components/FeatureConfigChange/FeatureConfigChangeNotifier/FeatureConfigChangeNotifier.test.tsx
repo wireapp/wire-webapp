@@ -26,7 +26,7 @@ import {setStrings} from 'Util/LocalizerUtil';
 
 import {FeatureConfigChangeNotifier} from './FeatureConfigChangeNotifier';
 
-import {TeamState} from '../../../team/TeamState';
+import {TeamState} from '../../../../team/TeamState';
 
 setStrings({en});
 
