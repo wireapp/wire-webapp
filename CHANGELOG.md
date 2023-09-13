@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [42.3.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.3.0...@wireapp/core@42.3.1) (2023-09-13)
+
+### Bug Fixes
+
+* Add the qualified conversation ID to last read messages ([#5494](https://github.com/wireapp/wire-web-packages/issues/5494)) ([9a6da5d](https://github.com/wireapp/wire-web-packages/commit/9a6da5dbe0dc9f592cffa64c0fc8986db1a59b2b))
+
 # [42.3.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.2.0...@wireapp/core@42.3.0) (2023-09-12)
 
 ### Features
