@@ -1,7 +1,7 @@
 {
   "BackendError.LABEL.ACCESS_DENIED": "Please verify your details and try again",
   "BackendError.LABEL.ALREADY_INVITED": "This email has already been invited",
-  "BackendError.LABEL.BAD_REQUEST": "Invalid input",
+  "BackendError.LABEL.BAD_REQUEST": "Please verify your details and try again",
   "BackendError.LABEL.BLACKLISTED_EMAIL": "This email address is not allowed",
   "BackendError.LABEL.BLACKLISTED_PHONE": "This phone number is not allowed",
   "BackendError.LABEL.CODE_AUTHENTICATION_FAILED": "Please retry, or request another code.",
@@ -18,7 +18,7 @@
   "BackendError.LABEL.INVALID_HANDLE": "This username is invalid",
   "BackendError.LABEL.INVALID_INVITATION_CODE": "Invitation has been revoked or expired",
   "BackendError.LABEL.INVALID_OPERATION": "Invalid operation",
-  "BackendError.LABEL.INVALID_PAYLOAD": "Invalid input",
+  "BackendError.LABEL.INVALID_PAYLOAD": "Please verify your details and try again",
   "BackendError.LABEL.INVALID_PHONE": "This phone number is invalid",
   "BackendError.LABEL.KEY_EXISTS": "This email address has already been registered. {supportEmailExistsLink}",
   "BackendError.LABEL.MISSING_AUTH": "Please verify your details and try again",
