@@ -90,7 +90,7 @@ export const UserDetailsComponent: React.FC<UserDetailsProps> = ({
             data-uie-name="status-name"
             css={user.isAvailable ? undefined : {color: 'var(--gray-70)'}}
           >
-            <UserName user={user} />
+            <UserName user={participant} />
           </h2>
         )}
 
