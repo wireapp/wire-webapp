@@ -260,7 +260,7 @@ export const Conversation: FC<ConversationProps> = ({
   };
 
   const showMessageReactions = (message: Message, showReactions = true) => {
-    openRightSidebar(PanelState.MESSAGE_DETAILS, {entity: message, showReactions});
+    openRightSidebar(PanelState.MESSAGE_DETAILS, {entity: message, showReactions}, true);
   };
 
   const handleEmailClick = (event: Event, messageDetails: MessageDetails) => {
