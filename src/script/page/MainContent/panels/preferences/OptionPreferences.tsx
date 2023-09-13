@@ -22,12 +22,12 @@ import React, {useEffect, useState} from 'react';
 import {AudioPreference, NotificationPreference, WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {amplify} from 'amplify';
-import {container} from 'tsyringe';
 
 import {Checkbox, CheckboxLabel, IndicatorRangeInput} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {RadioGroup} from 'Components/Radio';
+import {User} from 'src/script/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -38,19 +38,15 @@ import {Theme} from '../../../../components/AppContainer/hooks/useTheme';
 import {RootFontSize, useRootFontSize} from '../../../../hooks/useRootFontSize';
 import {PropertiesRepository} from '../../../../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../../../../properties/PropertiesType';
-import {UserState} from '../../../../user/UserState';
 interface OptionPreferencesProps {
   propertiesRepository: PropertiesRepository;
-  userState?: UserState;
+  selfUser: User;
 }
 
 const fontSizes = Object.values(RootFontSize);
 
-const OptionPreferences: React.FC<OptionPreferencesProps> = ({
-  propertiesRepository,
-  userState = container.resolve(UserState),
-}) => {
-  const {isActivatedAccount} = useKoSubscribableChildren(userState, ['self', 'isActivatedAccount']);
+const OptionPreferences: React.FC<OptionPreferencesProps> = ({propertiesRepository, selfUser}) => {
+  const {isActivatedAccount} = useKoSubscribableChildren(selfUser, ['isActivatedAccount']);
   const {
     properties: {settings},
   } = propertiesRepository;
