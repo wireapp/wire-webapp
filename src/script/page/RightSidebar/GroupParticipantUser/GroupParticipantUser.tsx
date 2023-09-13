@@ -42,7 +42,6 @@ import {User} from '../../../entity/User';
 import {ClientEvent} from '../../../event/Client';
 import {TeamRepository} from '../../../team/TeamRepository';
 import {TeamState} from '../../../team/TeamState';
-import {UserState} from '../../../user/UserState';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {PanelHeader} from '../PanelHeader';
 import {PanelEntity} from '../RightSidebar';
@@ -58,7 +57,7 @@ interface GroupParticipantUserProps {
   conversationRoleRepository: ConversationRoleRepository;
   teamRepository: TeamRepository;
   teamState: TeamState;
-  userState: UserState;
+  selfUser: User;
   isFederated?: boolean;
 }
 
@@ -73,7 +72,7 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
   conversationRoleRepository,
   teamRepository,
   teamState,
-  userState,
+  selfUser,
   isFederated = false,
 }) => {
   const {isGroup, roles} = useKoSubscribableChildren(activeConversation, ['isGroup', 'roles']);
@@ -83,7 +82,6 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
     'isTeam',
     'team',
   ]);
-  const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
   const {is_verified: isSelfVerified, isActivatedAccount} = useKoSubscribableChildren(selfUser, [
     'is_verified',
     'isActivatedAccount',

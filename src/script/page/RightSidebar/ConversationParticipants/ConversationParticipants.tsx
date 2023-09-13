@@ -113,6 +113,7 @@ const ConversationParticipants: FC<ConversationParticipantsProps> = ({
             conversationRepository={conversationRepository}
             conversation={activeConversation}
             selfFirst={false}
+            selfUser={selfUser}
             noSelfInteraction
           />
         </FadingScrollbar>

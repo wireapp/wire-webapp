@@ -108,6 +108,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
   const {conversationRoleRepository} = conversationRepository;
   const conversationState = container.resolve(ConversationState);
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
+  const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
 
   const [isAddMode, setIsAddMode] = useState<boolean>(false);
   const [animatePanelToLeft, setAnimatePanelToLeft] = useState<boolean>(true);
@@ -223,7 +224,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
               conversationRoleRepository={conversationRoleRepository}
               teamRepository={teamRepository}
               teamState={teamState}
-              userState={userState}
+              selfUser={selfUser}
               isFederated={isFederated}
             />
           )}
@@ -278,7 +279,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
               onClose={closePanel}
               serviceEntity={serviceEntity}
               userEntity={userServiceEntity}
-              userState={userState}
+              selfUser={selfUser}
               isAddMode={isAddMode}
             />
           )}
@@ -301,6 +302,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
           {currentState === PanelState.MESSAGE_DETAILS && messageEntity && (
             <MessageDetails
               activeConversation={activeConversation}
+              selfUser={selfUser}
               conversationRepository={conversationRepository}
               messageEntity={messageEntity}
               updateEntity={rightSidebar.updateEntity}

@@ -377,6 +377,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
                       truncate
                       showEmptyAdmin
                       selfFirst={false}
+                      selfUser={selfUser}
                       noSelfInteraction
                     />
 
