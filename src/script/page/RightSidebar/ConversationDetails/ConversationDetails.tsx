@@ -155,8 +155,12 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       'team',
     ]);
 
-    const {self: selfUser, isActivatedAccount} = useKoSubscribableChildren(userState, ['self', 'isActivatedAccount']);
-    const {is_verified: isSelfVerified, teamRole} = useKoSubscribableChildren(selfUser, ['is_verified', 'teamRole']);
+    const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
+    const {
+      is_verified: isSelfVerified,
+      teamRole,
+      isActivatedAccount,
+    } = useKoSubscribableChildren(selfUser, ['is_verified', 'teamRole', 'isActivatedAccount']);
 
     const isActiveGroupParticipant = isGroup && !removedFromConversation;
 
@@ -374,6 +378,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
                       truncate
                       showEmptyAdmin
                       selfFirst={false}
+                      selfUser={selfUser}
                       noSelfInteraction
                     />
 

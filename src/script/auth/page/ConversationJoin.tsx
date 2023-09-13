@@ -65,7 +65,6 @@ const ConversationJoinComponent = ({
 }: Props & ConnectedProps & DispatchProps) => {
   const nameInput = React.useRef<HTMLInputElement>(null);
   const {formatMessage: _} = useIntl();
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
   const [accentColor] = useState(AccentColor.STRONG_BLUE);
   const [conversationCode, setConversationCode] = useState<string>();
@@ -101,17 +100,30 @@ const ConversationJoinComponent = ({
       });
   }, []);
 
-  useEffect(() => {
-    if (selfName) {
-      setIsLoggedIn(true);
-    }
-  }, [selfName]);
-
   const routeToApp = (conversation: string = '', domain: string = '') => {
     const redirectLocation = `${UrlUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP)}${
       conversation && `#/conversation/${conversation}${domain && `/${domain}`}`
     }`;
     window.location.replace(redirectLocation);
+  };
+
+  const getConversationInfoAndJoin = async () => {
+    try {
+      if (!conversationCode || !conversationKey) {
+        throw Error('Conversation code or key missing');
+      }
+      const conversationEvent = await doJoinConversationByCode(conversationKey, conversationCode);
+      /* When we join a conversation, we create the join event before loading the webapp.
+       * That means that when the webapp loads and tries to fetch the notificationStream is will get the join event once again and will try to handle it
+       * Here we set the core's lastEventDate so that it knows that this duplicated event should be skipped
+       */
+      await setLastEventDate(new Date(conversationEvent.time));
+
+      routeToApp(conversationEvent.conversation, conversationEvent.qualified_conversation?.domain ?? '');
+    } catch (error) {
+      console.warn('Unable to join conversation', error);
+      setShowEntropyForm(false);
+    }
   };
 
   const handleSubmit = async (entropyData?: Uint8Array) => {
@@ -133,14 +145,7 @@ const ConversationJoinComponent = ({
         },
         entropyData,
       );
-      const conversationEvent = await doJoinConversationByCode(conversationKey, conversationCode);
-      /* When we join a conversation, we create the join event before loading the webapp.
-       * That means that when the webapp loads and tries to fetch the notificationStream is will get the join event once again and will try to handle it
-       * Here we set the core's lastEventDate so that it knows that this duplicated event should be skipped
-       */
-      await setLastEventDate(new Date(conversationEvent.time));
-
-      routeToApp(conversationEvent.conversation, conversationEvent.qualified_conversation?.domain ?? '');
+      await getConversationInfoAndJoin();
     } catch (error) {
       setIsSubmitingName(false);
       if (error.label) {
@@ -192,11 +197,6 @@ const ConversationJoinComponent = ({
     setEnteredName(event.target.value);
   };
 
-  const handleLogout = async () => {
-    setIsLoggedIn(false);
-    await doLogout();
-  };
-
   if (!isValidLink) {
     return <ConversationJoinInvalid />;
   }
@@ -224,8 +224,8 @@ const ConversationJoinComponent = ({
         </div>
         <Columns style={{display: 'flex', gap: '2rem', alignSelf: 'center', maxWidth: '100%'}}>
           <Column>
-            {isLoggedIn && selfName ? (
-              <IsLoggedInColumn selfName={selfName} handleLogout={handleLogout} handleSubmit={handleSubmit} />
+            {selfName ? (
+              <IsLoggedInColumn selfName={selfName} handleLogout={doLogout} handleSubmit={getConversationInfoAndJoin} />
             ) : (
               <Login embedded />
             )}

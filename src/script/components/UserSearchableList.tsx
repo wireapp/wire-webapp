@@ -37,7 +37,6 @@ import {SearchRepository} from '../search/SearchRepository';
 import type {TeamRepository} from '../team/TeamRepository';
 import {TeamState} from '../team/TeamState';
 import {validateHandle} from '../user/UserHandleGenerator';
-import {UserState} from '../user/UserState';
 
 export type UserListProps = React.ComponentProps<typeof UserList> & {
   conversationState?: ConversationState;
@@ -51,7 +50,7 @@ export type UserListProps = React.ComponentProps<typeof UserList> & {
   teamRepository: TeamRepository;
   teamState?: TeamState;
   truncate?: boolean;
-  userState?: UserState;
+  selfUser: User;
   dataUieName?: string;
   /** will prevent showing those users in the list */
   excludeUsers?: QualifiedId[];
@@ -66,16 +65,16 @@ const UserSearchableList: React.FC<UserListProps> = ({
   highlightedUsers,
   selected: selectedUsers,
   allowRemoteSearch,
+  selfUser,
   users,
   ...props
 }) => {
   const {searchRepository, teamRepository, selfFirst, ...userListProps} = props;
-  const {userState = container.resolve(UserState), conversationState = container.resolve(ConversationState)} = props;
+  const {conversationState = container.resolve(ConversationState)} = props;
 
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [remoteTeamMembers, setRemoteTeamMembers] = useState<User[]>([]);
 
-  const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
   const {inTeam: selfInTeam} = useKoSubscribableChildren(selfUser, ['inTeam']);
 
   /**
