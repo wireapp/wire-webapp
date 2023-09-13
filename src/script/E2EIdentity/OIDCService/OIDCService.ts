@@ -55,4 +55,8 @@ export class OIDCService {
       return user;
     });
   }
+
+  public clearProgress(): Promise<void> {
+    return this.userManager.clearStaleState();
+  }
 }

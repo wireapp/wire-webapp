@@ -24,7 +24,6 @@ import {User} from 'src/script/entity/User';
 import {Core} from 'src/script/service/CoreSingleton';
 import {TeamState} from 'src/script/team/TeamState';
 import {UserRepository} from 'src/script/user/UserRepository';
-import {UserState} from 'src/script/user/UserState';
 
 import {UserModal, UserModalProps} from './UserModal';
 import {showUserModal} from './UserModal.state';
@@ -42,7 +41,7 @@ describe('UserModal', () => {
       userRepository: {
         getUserById,
       } as unknown as UserRepository,
-      userState: {} as UserState,
+      selfUser: new User(),
     };
     showUserModal({domain: 'test-domain.mock', id: 'mock-id'});
     const {getByTestId} = render(<UserModal {...props} />);
@@ -65,7 +64,7 @@ describe('UserModal', () => {
       userRepository: {
         getUserById,
       } as unknown as UserRepository,
-      userState: {} as UserState,
+      selfUser: new User(),
     };
 
     showUserModal({domain: 'test-domain.mock', id: 'mock-id'});
