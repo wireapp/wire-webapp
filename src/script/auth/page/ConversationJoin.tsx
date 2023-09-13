@@ -219,7 +219,7 @@ const ConversationJoinComponent = ({
             {_(conversationJoinStrings.mainHeadline)}
           </H1>
           <Muted data-uie-name="status-join-subhead">
-            {_(conversationJoinStrings.headline, {brandName: Config.getConfig().BRAND_NAME})}
+            {_(conversationJoinStrings.headline, {domain: window.location.hostname})}
           </Muted>
         </div>
         <Columns style={{display: 'flex', gap: '2rem', alignSelf: 'center', maxWidth: '100%'}}>
