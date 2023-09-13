@@ -78,6 +78,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
     isMLSEnabled: isMLSEnabledForTeam,
     isProtocolToggleEnabledForUser,
   } = useKoSubscribableChildren(teamState, ['isTeam', 'isMLSEnabled', 'isProtocolToggleEnabledForUser']);
+  const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
 
   const isMLSFeatureEnabled = Config.getConfig().FEATURE.ENABLE_MLS;
 
@@ -406,6 +407,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
           <FadingScrollbar className="group-creation__list">
             {filteredContacts.length > 0 && (
               <UserSearchableList
+                selfUser={selfUser}
                 users={filteredContacts}
                 filter={participantsInput}
                 selected={selectedContacts}

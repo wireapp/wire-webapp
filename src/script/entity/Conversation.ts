@@ -86,7 +86,6 @@ export class Conversation {
   private readonly teamState: TeamState;
   public readonly archivedState: ko.Observable<boolean>;
   private readonly incomingMessages: ko.ObservableArray<Message>;
-  private readonly isManaged: boolean;
   private readonly isTeam1to1: ko.PureComputed<boolean>;
   public readonly last_server_timestamp: ko.Observable<number>;
   private readonly logger: Logger;
@@ -228,7 +227,6 @@ export class Conversation {
     this.availabilityOfUser = ko.pureComputed(() => this.firstUserEntity()?.availability());
 
     this.isGuest = ko.observable(false);
-    this.isManaged = false;
 
     this.inTeam = ko.pureComputed(() => {
       const isSameTeam = this.selfUser()?.teamId === this.team_id;
@@ -1045,7 +1043,6 @@ export class Conversation {
       group_id: this.groupId,
       id: this.id,
       is_guest: this.isGuest(),
-      is_managed: this.isManaged,
       last_event_timestamp: this.last_event_timestamp(),
       last_read_timestamp: this.last_read_timestamp(),
       last_server_timestamp: this.last_server_timestamp(),

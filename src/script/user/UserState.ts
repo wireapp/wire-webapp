@@ -36,8 +36,6 @@ export class UserState {
   /** Note: this does not include the self user */
   public teamUsers: ko.PureComputed<User[]>;
   public readonly connectRequests: ko.PureComputed<User[]>;
-  public readonly isActivatedAccount: ko.PureComputed<boolean>;
-  public readonly isTemporaryGuest: ko.PureComputed<boolean>;
   public readonly numberOfContacts: ko.PureComputed<number>;
   public readonly self = ko.observable<User | undefined>();
 
@@ -55,9 +53,6 @@ export class UserState {
           .sort(sortUsersByPriority);
       })
       .extend({rateLimit: TIME_IN_MILLIS.SECOND});
-
-    this.isActivatedAccount = ko.pureComputed(() => !this.self()?.isTemporaryGuest());
-    this.isTemporaryGuest = ko.pureComputed(() => this.self()?.isTemporaryGuest());
 
     this.isTeam = ko.observable();
     this.teamMembers = ko.pureComputed((): User[] => []);

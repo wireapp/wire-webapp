@@ -260,7 +260,7 @@ export const Conversation: FC<ConversationProps> = ({
   };
 
   const showMessageReactions = (message: Message, showReactions = true) => {
-    openRightSidebar(PanelState.MESSAGE_DETAILS, {entity: message, showReactions});
+    openRightSidebar(PanelState.MESSAGE_DETAILS, {entity: message, showReactions}, true);
   };
 
   const handleEmailClick = (event: Event, messageDetails: MessageDetails) => {
@@ -467,7 +467,7 @@ export const Conversation: FC<ConversationProps> = ({
           <TitleBar
             repositories={repositories}
             conversation={activeConversation}
-            userState={userState}
+            selfUser={selfUser}
             teamState={teamState}
             callActions={mainViewModel.calling.callActions}
             openRightSidebar={openRightSidebar}
