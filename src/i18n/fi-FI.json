@@ -957,7 +957,7 @@
   "modalUserBlockedForLegalHold": "This user is blocked due to legal hold. [link]Learn more[/link]",
   "modalUserCannotAcceptConnectionMessage": "Connection request could not be accepted",
   "modalUserCannotBeAddedHeadline": "Guests cannot be added",
-  "modalUserCannotCancelConnectionMessage": "Connection request could not be cancelled",
+  "modalUserCannotCancelConnectionMessage": "Connection request could not be canceled",
   "modalUserCannotConnectHeadline": "Connecting not possible",
   "modalUserCannotIgnoreConnectionMessage": "Connection request could not be ignored",
   "modalUserCannotSendConnectionLegalHoldMessage": "You cannot connect to this user due to legal hold. [link]Learn more[/link]",
