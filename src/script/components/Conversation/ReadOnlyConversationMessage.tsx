@@ -47,7 +47,7 @@ export const ReadOnlyConversationMessage: FC<ReadOnlyConversationMessageProps> =
           <Icon.Info />
         </div>
       </div>
-      <div className="readonly-message-header-label" data-uie-name="element-readonly-conversation">
+      <p className="readonly-message-header-label" data-uie-name="element-readonly-conversation">
         <span
           dangerouslySetInnerHTML={{
             __html: mlsCompatibilityMessage,
@@ -55,23 +55,23 @@ export const ReadOnlyConversationMessage: FC<ReadOnlyConversationMessageProps> =
         />
         {state === CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_SELF_UNSUPPORTED_MLS && (
           <>
+            {' '}
             <Link
-              css={{fontSize: 'var(--font-size-small)', marginLeft: 2, fontWeight: 600}}
+              css={{fontSize: 'var(--font-size-small)', fontWeight: 600}}
               onClick={handleMLSUpdate}
               variant={LinkVariant.PRIMARY}
               data-uie-name="do-update-mls"
             >
               {t('downloadLatestMLS')}
-            </Link>
+            </Link>{' '}
             <span
-              css={{marginLeft: 5}}
               dangerouslySetInnerHTML={{
                 __html: t('selfNotSupportMLSMsgPart2'),
               }}
             />
           </>
         )}
-      </div>
+      </p>
     </div>
   );
 };
