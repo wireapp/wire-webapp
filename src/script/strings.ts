@@ -401,14 +401,6 @@ export const conversationJoinStrings = defineMessages({
     defaultMessage: 'Join with another account',
     id: 'conversationJoin.joinWithOtherAccount',
   },
-  existentAccountJoinWithoutText: {
-    defaultMessage: '{existentAccountJoinWithoutLink} without an account',
-    id: 'conversationJoin.existentAccountJoinWithoutText',
-  },
-  existentAccountOpenButton: {
-    defaultMessage: 'Open in {brandName}',
-    id: 'conversationJoin.buttonExistentAccountOpen',
-  },
   existentAccountJoinInBrowser: {
     defaultMessage: 'Join in the browser',
     id: 'conversationJoin.existentAccountJoinInBrowser',
@@ -416,11 +408,6 @@ export const conversationJoinStrings = defineMessages({
   existentAccountUserName: {
     defaultMessage: 'You are logged in as {selfName}',
     id: 'conversationJoin.existentAccountUserName',
-  },
-  existentAccountSubhead: {
-    defaultMessage:
-      'Audio and video conferencing, text messaging, file sharing, and screen sharing, all end-to-end-encrypted.',
-    id: 'conversationJoin.existentAccountSubhead',
   },
   fullConversationHeadline: {
     defaultMessage: 'Unable to join conversation',
@@ -435,16 +422,8 @@ export const conversationJoinStrings = defineMessages({
     id: 'conversationJoin.hasAccount',
   },
   headline: {
-    defaultMessage: 'The conversation takes place on {brandName}',
+    defaultMessage: 'The conversation takes place on {domain}',
     id: 'conversationJoin.headline',
-  },
-  invalidCreateAccountLink: {
-    defaultMessage: 'Create an account',
-    id: 'conversationJoin.invalidCreateAccountLink',
-  },
-  invalidCreateAccountText: {
-    defaultMessage: 'for group messaging and conference calls.',
-    id: 'conversationJoin.invalidCreateAccountText',
   },
   invalidHeadline: {
     defaultMessage: 'Conversation not found',
@@ -453,10 +432,6 @@ export const conversationJoinStrings = defineMessages({
   invalidSubhead: {
     defaultMessage: 'The link to this group conversation expired or the conversation was set to private.',
     id: 'conversationJoin.invalidSubhead',
-  },
-  loginLink: {
-    defaultMessage: 'Log in',
-    id: 'conversationJoin.loginLink',
   },
   namePlaceholder: {
     defaultMessage: 'Your name',
