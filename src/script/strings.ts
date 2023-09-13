@@ -563,7 +563,7 @@ export const errorHandlerStrings = defineMessages({
     id: 'BackendError.LABEL.TOO_MANY_REQUESTS',
   },
   [BackendErrorLabel.BAD_REQUEST]: {
-    defaultMessage: 'Invalid input',
+    defaultMessage: 'Please verify your details and try again',
     id: 'BackendError.LABEL.BAD_REQUEST',
   },
   [SyntheticErrorLabel.EMAIL_REQUIRED]: {
@@ -576,7 +576,7 @@ export const errorHandlerStrings = defineMessages({
     id: 'BackendError.LABEL.INVALID_OPERATION',
   },
   [BackendErrorLabel.INVALID_PAYLOAD]: {
-    defaultMessage: 'Invalid input',
+    defaultMessage: 'Please verify your details and try again',
     id: 'BackendError.LABEL.INVALID_PAYLOAD',
   },
   [BackendErrorLabel.OPERATION_DENIED]: {
