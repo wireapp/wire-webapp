@@ -17,7 +17,7 @@
  *
  */
 
-import type {ClaimedKeyPackages} from '@wireapp/api-client/lib/client';
+import type {ClaimedKeyPackages, RegisteredClient} from '@wireapp/api-client/lib/client';
 import {PostMlsMessageResponse, SUBCONVERSATION_ID} from '@wireapp/api-client/lib/conversation';
 import {Subconversation} from '@wireapp/api-client/lib/conversation/Subconversation';
 import {ConversationMLSMessageAddEvent, ConversationMLSWelcomeEvent} from '@wireapp/api-client/lib/event';
@@ -66,6 +66,13 @@ export const optionalToUint8Array = (array: Uint8Array | []): Uint8Array => {
   return Array.isArray(array) ? Uint8Array.from(array) : array;
 };
 
+interface LocalMLSServiceConfig extends MLSServiceConfig {
+  /**
+   * minimum number of key packages client should have available (configured to half of nbKeyPackages)
+   */
+  minRequiredNumberOfAvailableKeyPackages: number;
+}
+
 const defaultConfig: MLSServiceConfig = {
   keyingMaterialUpdateThreshold: 1000 * 60 * 60 * 24 * 30, //30 days
   nbKeyPackages: 100,
@@ -84,7 +91,7 @@ type Events = {
 };
 export class MLSService extends TypedEventEmitter<Events> {
   logger = logdown('@wireapp/core/MLSService');
-  config: MLSServiceConfig;
+  config: LocalMLSServiceConfig;
   groupIdFromConversationId?: MLSCallbacks['groupIdFromConversationId'];
   private readonly textEncoder = new TextEncoder();
   private readonly textDecoder = new TextDecoder();
@@ -105,25 +112,17 @@ export class MLSService extends TypedEventEmitter<Events> {
       nbKeyPackages,
       defaultCiphersuite,
       defaultCredentialType,
+      minRequiredNumberOfAvailableKeyPackages: Math.floor(nbKeyPackages / 2),
     };
   }
 
-  public async initClient(userId: QualifiedId, clientId: string) {
-    const qualifiedClientId = constructFullyQualifiedClientId(userId.id, clientId, userId.domain);
+  public async initClient(userId: QualifiedId, client: RegisteredClient) {
+    const qualifiedClientId = constructFullyQualifiedClientId(userId.id, client.id, userId.domain);
     await this.coreCryptoClient.mlsInit(this.textEncoder.encode(qualifiedClientId), [this.config.defaultCiphersuite]);
-  }
 
-  public async createClient(userId: QualifiedId, clientId: string) {
-    await this.initClient(userId, clientId);
-    // If the device is new, we need to upload keypackages and public key to the backend
-    const publicKey = await this.coreCryptoClient.clientPublicKey(this.config.defaultCiphersuite);
-    const keyPackages = await this.coreCryptoClient.clientKeypackages(
-      this.config.defaultCiphersuite,
-      this.config.defaultCredentialType,
-      this.config.nbKeyPackages,
-    );
-    await this.uploadMLSPublicKeys(publicKey, clientId);
-    await this.uploadMLSKeyPackages(keyPackages, clientId);
+    // We need to make sure keypackages and public key are uploaded to the backend
+    await this.uploadMLSPublicKeys(client);
+    await this.uploadMLSKeyPackages(client.id);
   }
 
   private async uploadCommitBundle(
@@ -607,42 +606,47 @@ export class MLSService extends TypedEventEmitter<Events> {
 
   private async syncKeyPackages() {
     const validKeyPackagesCount = await this.clientValidKeypackagesCount();
-    const minAllowedNumberOfKeyPackages = this.config.nbKeyPackages / 2;
 
-    if (validKeyPackagesCount <= minAllowedNumberOfKeyPackages) {
+    if (validKeyPackagesCount <= this.config.minRequiredNumberOfAvailableKeyPackages) {
       const clientId = this.apiClient.validatedClientId;
-
-      //check numbers of keys on backend
-      const backendKeyPackagesCount = await this.apiClient.api.client.getMLSKeyPackageCount(
-        clientId,
-        numberToHex(this.config.defaultCiphersuite),
-      );
-
-      if (backendKeyPackagesCount <= minAllowedNumberOfKeyPackages) {
-        //upload new keys
-        const newKeyPackages = await this.clientKeypackages(this.config.nbKeyPackages);
-
-        await this.uploadMLSKeyPackages(newKeyPackages, clientId);
-      }
+      await this.uploadMLSKeyPackages(clientId);
     }
   }
 
+  private async getRemoteMLSKeyPackageCount(clientId: string) {
+    return this.apiClient.api.client.getMLSKeyPackageCount(clientId, numberToHex(this.config.defaultCiphersuite));
+  }
+
   /**
-   * Will make the given client mls capable (generate and upload key packages)
+   * Will update the given client on backend with its public key.
    *
    * @param mlsClient Intance of the coreCrypto that represents the mls client
-   * @param clientId The id of the client
+   * @param client Backend client data
    */
-  private async uploadMLSPublicKeys(publicKey: Uint8Array, clientId: string) {
-    return this.apiClient.api.client.putClient(clientId, {
+  private async uploadMLSPublicKeys(client: RegisteredClient) {
+    // If we've already updated a client with its public key, there's no need to do it again.
+    if (client.mls_public_keys?.ed25519) {
+      return;
+    }
+
+    const publicKey = await this.coreCryptoClient.clientPublicKey(this.config.defaultCiphersuite);
+    return this.apiClient.api.client.putClient(client.id, {
       mls_public_keys: {ed25519: btoa(Converter.arrayBufferViewToBaselineString(publicKey))},
     });
   }
 
-  private async uploadMLSKeyPackages(keypackages: Uint8Array[], clientId: string) {
+  private async uploadMLSKeyPackages(clientId: string) {
+    const backendKeyPackagesCount = await this.getRemoteMLSKeyPackageCount(clientId);
+
+    // If we have enough keys uploaded on backend, there's no need to upload more.
+    if (backendKeyPackagesCount > this.config.minRequiredNumberOfAvailableKeyPackages) {
+      return;
+    }
+
+    const keyPackages = await this.clientKeypackages(this.config.nbKeyPackages);
     return this.apiClient.api.client.uploadMLSKeyPackages(
       clientId,
-      keypackages.map(keypackage => btoa(Converter.arrayBufferViewToBaselineString(keypackage))),
+      keyPackages.map(keypackage => btoa(Converter.arrayBufferViewToBaselineString(keypackage))),
     );
   }
 
