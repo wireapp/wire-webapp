@@ -957,7 +957,7 @@
   "modalUserBlockedForLegalHold": "Dieser Nutzer ist aufgrund der gesetzlichen Aufbewahrung gesperrt. [link]Mehr erfahren[/link]",
   "modalUserCannotAcceptConnectionMessage": "Kontaktanfrage konnte nicht angenommen werden",
   "modalUserCannotBeAddedHeadline": "Gäste können nicht hinzugefügt werden",
-  "modalUserCannotCancelConnectionMessage": "Connection request could not be cancelled",
+  "modalUserCannotCancelConnectionMessage": "Connection request could not be canceled",
   "modalUserCannotConnectHeadline": "Verbindung nicht möglich",
   "modalUserCannotIgnoreConnectionMessage": "Kontaktanfrage konnte nicht ignoriert werden",
   "modalUserCannotSendConnectionLegalHoldMessage": "Aufgrund der gesetzlichen Aufbewahrung können Sie sich mit diesem Nutzer nicht verbinden. [link]Mehr erfahren[/link]",
