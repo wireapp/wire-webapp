@@ -200,11 +200,13 @@ class E2EIHandler {
     PrimaryModal.show(modalType, modalOptions);
   }
 
-  private showErrorMessage(): void {
+  private async showErrorMessage(): Promise<void> {
     if (this.currentStep !== E2EIHandlerStep.ERROR) {
       return;
     }
 
+    const oidcService = getOIDCServiceInstance();
+    await oidcService.clearProgress();
     this.core.service?.e2eIdentity?.clearAllProgress();
 
     const {modalOptions, modalType} = getModalOptions({

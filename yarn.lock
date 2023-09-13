@@ -4837,8 +4837,8 @@ __metadata:
   linkType: hard
 
 "@wireapp/api-client@npm:^26.0.3":
-  version: 26.0.3
-  resolution: "@wireapp/api-client@npm:26.0.3"
+  version: 26.0.4
+  resolution: "@wireapp/api-client@npm:26.0.4"
   dependencies:
     "@wireapp/commons": ^5.1.3
     "@wireapp/priority-queue": ^2.1.4
@@ -4851,8 +4851,8 @@ __metadata:
     reconnecting-websocket: 4.4.0
     spark-md5: 3.0.2
     tough-cookie: 4.1.3
-    ws: 8.13.0
-  checksum: 3f9ac886c80d539dc8da4e96803cd20e921af9ac463af2be5612736650a3ba72340f959a68390d07b7b9106b01dff9b21c6a016c4a76eeb87af9577751339234
+    ws: 8.14.1
+  checksum: 21610e5fa2dc323ea8c921e9a4f14caa0544a54a76718b153fd8d383396541d3afcd4f03eb35b4ecce4eeb63a539db1a593e91d3bb592a9b1d4a2b384fe9f499
   languageName: node
   linkType: hard
 
@@ -18305,22 +18305,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ws@npm:8.13.0":
-  version: 8.13.0
-  resolution: "ws@npm:8.13.0"
-  peerDependencies:
-    bufferutil: ^4.0.1
-    utf-8-validate: ">=5.0.2"
-  peerDependenciesMeta:
-    bufferutil:
-      optional: true
-    utf-8-validate:
-      optional: true
-  checksum: 53e991bbf928faf5dc6efac9b8eb9ab6497c69feeb94f963d648b7a3530a720b19ec2e0ec037344257e05a4f35bd9ad04d9de6f289615ffb133282031b18c61c
-  languageName: node
-  linkType: hard
-
-"ws@npm:^8.11.0":
+"ws@npm:8.14.1, ws@npm:^8.11.0":
   version: 8.14.1
   resolution: "ws@npm:8.14.1"
   peerDependencies:
