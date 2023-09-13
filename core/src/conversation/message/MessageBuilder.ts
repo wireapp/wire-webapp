@@ -200,6 +200,7 @@ export function buildLastReadMessage(conversationId: QualifiedId, lastReadTimest
   const lastRead = new LastRead({
     conversationId: conversationId.id,
     lastReadTimestamp,
+    qualifiedConversationId: conversationId,
   });
 
   return GenericMessage.create({
