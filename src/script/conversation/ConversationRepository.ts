@@ -1607,6 +1607,11 @@ export class ConversationRepository {
       await this.replaceProteus1to1WithMLS(localProteusConversation, mlsConversation);
     }
 
+    if (wasProteus1to1ActiveConversation) {
+      // If proteus conversation was previously active conversaiton, we want to make mls 1:1 conversation active.
+      amplify.publish(WebAppEvents.CONVERSATION.SHOW, mlsConversation, {});
+    }
+
     //if mls is not supported by the other user we do not establish the group yet
     //we just mark the mls conversation as readonly and return it
     if (!isMLSSupportedByTheOtherUser) {
@@ -1625,11 +1630,6 @@ export class ConversationRepository {
       otherUserId,
       shouldDelayGroupEstablishment,
     );
-
-    if (wasProteus1to1ActiveConversation) {
-      // If proteus conversation was previously active conversaiton, we want to make mls 1:1 conversation active.
-      amplify.publish(WebAppEvents.CONVERSATION.SHOW, mlsConversation, {});
-    }
 
     return establishedMLSConversation;
   };
