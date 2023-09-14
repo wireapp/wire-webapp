@@ -19,6 +19,8 @@
 
 import {UserManager, User, UserManagerSettings} from 'oidc-client-ts';
 
+import {clearKeysStartingWith} from 'Util/localStorage';
+
 interface OIDCServiceConfig {
   authorityUrl: string;
   audience: string;
@@ -57,6 +59,10 @@ export class OIDCService {
   }
 
   public clearProgress(): Promise<void> {
+    const {localStorage, sessionStorage} = window;
+    // remove all oidc keys from local and session storage to prevent errors and stale state
+    clearKeysStartingWith('oidc.', localStorage);
+    clearKeysStartingWith('oidc.user:', sessionStorage);
     return this.userManager.clearStaleState();
   }
 }
