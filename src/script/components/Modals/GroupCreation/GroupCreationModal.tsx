@@ -87,7 +87,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   //if feature flag is set to false or mls is disabled for current team use proteus as default
   const defaultProtocol =
     isMLSFeatureEnabled && isMLSEnabledForTeam
-      ? teamState.teamFeatures().mls?.config.defaultProtocol
+      ? teamState.teamFeatures()?.mls?.config.defaultProtocol
       : ConversationProtocol.PROTEUS;
 
   const protocolOptions: ProtocolOption[] = ([ConversationProtocol.PROTEUS, ConversationProtocol.MLS] as const).map(
@@ -235,7 +235,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
 
           const backendString = error.backends.join(', and ');
           const replaceBackends = replaceLink(
-            'https://support.wire.com/hc/articles/9357718008093',
+            Config.getConfig().URL.SUPPORT.NON_FEDERATING_INFO,
             'modal__text__read-more',
             'read-more-backends',
           );
@@ -403,7 +403,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
           />
         )}
 
-        {stateIsParticipants && (
+        {stateIsParticipants && selfUser && (
           <FadingScrollbar className="group-creation__list">
             {filteredContacts.length > 0 && (
               <UserSearchableList
