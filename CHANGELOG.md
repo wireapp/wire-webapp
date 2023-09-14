@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [26.1.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@26.0.4...@wireapp/api-client@26.1.0) (2023-09-14)
+
+### Features
+
+* **api-client:** BE error label for mls stale message ([#5496](https://github.com/wireapp/wire-web-packages/issues/5496)) ([95622b6](https://github.com/wireapp/wire-web-packages/commit/95622b6e2a54b3d583e56b875e61f8ebb4f3c915))
+
 ## [26.0.4](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@26.0.3...@wireapp/api-client@26.0.4) (2023-09-12)
 
 **Note:** Version bump only for package @wireapp/api-client
