@@ -205,8 +205,12 @@ class E2EIHandler {
       return;
     }
 
+    // Remove the url parameters of the failed enrollment
+    removeUrlParameters();
+    // Clear the oidc service progress
     const oidcService = getOIDCServiceInstance();
     await oidcService.clearProgress();
+    // Clear the e2e identity progress
     this.core.service?.e2eIdentity?.clearAllProgress();
 
     const {modalOptions, modalType} = getModalOptions({

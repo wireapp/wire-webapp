@@ -43,6 +43,14 @@ export class OIDCService {
     this.userManager = new UserManager(dexioConfig);
   }
 
+  private clearKeysStartingWith(prefix: string, storage: Storage): void {
+    Object.keys(storage)
+      .filter(item => item.startsWith(prefix))
+      .forEach(item => {
+        storage.removeItem(item);
+      });
+  }
+
   public async authenticate(): Promise<void> {
     await this.userManager.signinRedirect();
   }
@@ -57,6 +65,10 @@ export class OIDCService {
   }
 
   public clearProgress(): Promise<void> {
+    const {localStorage, sessionStorage} = window;
+    // remove all oidc keys from local and session storage to prevent errors and stale state
+    this.clearKeysStartingWith('oidc.', localStorage);
+    this.clearKeysStartingWith('oidc.user:', sessionStorage);
     return this.userManager.clearStaleState();
   }
 }
