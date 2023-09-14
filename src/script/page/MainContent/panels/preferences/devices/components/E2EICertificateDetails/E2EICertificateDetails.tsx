@@ -25,8 +25,10 @@ import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {Badges, MLSStatues} from 'Components/Badges';
 import {CertificateDetailsModal} from 'Components/Modals/CertificateDetailsModal';
+import {E2EIHandler} from 'src/script/E2EIdentity';
 import {Core} from 'src/script/service/CoreSingleton';
 import {t} from 'Util/LocalizerUtil';
+import {getLogger} from 'Util/Logger';
 
 import {styles} from './E2EICertificateDetails.styles';
 
@@ -47,67 +49,62 @@ import {styles} from './E2EICertificateDetails.styles';
 //     );
 //   });
 // };
+const logger = getLogger('E2EICertificateDetails');
 
-interface E2ECertificateDetailsProps {
+interface E2EICertificateDetailsProps {
   core?: Core;
   isMLSVerified?: boolean;
+  isOtherDevice?: boolean;
 }
 
-export const E2EICertificateDetails = ({core = container.resolve(Core), isMLSVerified}: E2ECertificateDetailsProps) => {
-  // TODO: This functionality need to be added in e2eIdentity service.
-  const MLSStatus = undefined;
-
+export const E2EICertificateDetails = ({
+  core = container.resolve(Core),
+  isMLSVerified,
+  isOtherDevice = false,
+}: E2EICertificateDetailsProps) => {
   const [isCertificateDetailsModalOpen, setIsCertificateDetailsModalOpen] = useState(false);
 
-  const certificate = core.service?.e2eIdentity?.getCertificateData();
+  const e2eIdentity = core.service?.e2eIdentity;
+  const hasActiveCertificate = e2eIdentity?.hasActiveCertificate();
+  const isValid = !!hasActiveCertificate;
+  const isNotActivated = !hasActiveCertificate;
 
-  if (!certificate) {
-    return null;
-  }
+  const getCertificate = async () => {
+    try {
+      const e2eHandler = E2EIHandler.getInstance();
 
-  const isExpired = MLSStatus === MLSStatues.EXPIRED;
-  const isNotDownloaded = MLSStatus === MLSStatues.NOT_DOWNLOADED;
-  const isExpiresSoon = MLSStatus === MLSStatues.EXPIRES_SOON;
-  const isNotActivated = MLSStatus === MLSStatues.NOT_ACTIVATED;
-
-  const isValid = !isExpired && !isNotDownloaded && !isExpiresSoon && !isNotActivated;
-
-  const getCertificate = () => {
-    // eslint-disable-next-line no-console
-    console.log('Get Certificate');
-  };
-
-  const updateCertificate = () => {
-    // eslint-disable-next-line no-console
-    console.log('Update Certificate');
+      await e2eHandler.enrollE2EI();
+    } catch (error) {
+      logger.error('Cannot get E2EI instance: ', error);
+    }
   };
 
   return (
     <div css={styles.container}>
-      <h5 css={styles.title}>{t('E2E.certificateTitle')}</h5>
+      <h5 css={styles.title}>{t('E2EI.certificateTitle')}</h5>
 
       <div
-        data-uie-name="e2e-identity-status"
-        data-uie-value={isValid ? 'Valid' : MLSStatus}
-        css={styles.e2eStatusContainer}
+        data-uie-name="e2ei-identity-status"
+        data-uie-value={isValid ? 'Valid' : 'Not activated'}
+        css={styles.e2eiStatusContainer}
       >
         <p className="label-1">
-          <span>{t('E2E.status')}</span>
-          <strong css={styles.e2eStatus(isValid ? MLSStatues.VALID : MLSStatus)}>
-            {isValid ? t('E2E.valid') : t(`E2E.${MLSStatus}`)}
+          <span>{t('E2EI.status')}</span>
+          <strong css={styles.e2eiStatus(isValid ? MLSStatues.VALID : MLSStatues.NOT_ACTIVATED)}>
+            {isValid ? t('E2EI.valid') : t(`E2EI.not_activated`)}
           </strong>
         </p>
 
-        <Badges isMLSVerified={isMLSVerified} MLSStatus={MLSStatus} />
+        <Badges isMLSVerified={isMLSVerified} MLSStatus={isValid ? MLSStatues.VALID : MLSStatues.NOT_DOWNLOADED} />
       </div>
 
       {/* For now, we don't display Serial Number */}
       {/*<p css={styles.serialNumberWrapper}>*/}
-      {/*  <span className="label-1">{t('E2E.serialNumber')}</span>*/}
+      {/*  <span className="label-1">{t('E2EI.serialNumber')}</span>*/}
 
       {/*  {MLSStatus === MLSStatues.NOT_ACTIVATED ? (*/}
       {/*    <span className="label-1" css={styles.notAvailable}>*/}
-      {/*      {t('E2E.notAvailable')}*/}
+      {/*      {t('E2EI.notAvailable')}*/}
       {/*    </span>*/}
       {/*  ) : (*/}
       {/*    <>*/}
@@ -124,29 +121,30 @@ export const E2EICertificateDetails = ({core = container.resolve(Core), isMLSVer
             onClick={() => setIsCertificateDetailsModalOpen(true)}
             data-uie-name="show-certificate-details"
           >
-            {t('E2E.showCertificateDetails')}
+            {t('E2EI.showCertificateDetails')}
           </Button>
         )}
 
-        {isCertificateDetailsModalOpen && (
+        {isCertificateDetailsModalOpen && hasActiveCertificate && (
           <CertificateDetailsModal
-            certificate={certificate}
+            certificate={e2eIdentity?.getCertificateData() || ''}
             onClose={() => setIsCertificateDetailsModalOpen(false)}
             downloadCertificate={getCertificate}
           />
         )}
 
-        {isNotActivated && (
+        {!isOtherDevice && isNotActivated && (
           <Button variant={ButtonVariant.TERTIARY} onClick={getCertificate} data-uie-name="get-certificate">
-            {t('E2E.getCertificate')}
+            {t('E2EI.getCertificate')}
           </Button>
         )}
 
-        {(isExpiresSoon || isExpired) && (
-          <Button variant={ButtonVariant.TERTIARY} onClick={updateCertificate} data-uie-name="update-certificate">
-            {t('E2E.updateCertificate')}
-          </Button>
-        )}
+        {/* TODO: Waiting for functionality for updating certificate */}
+        {/*{(isExpiresSoon || isExpired) && (*/}
+        {/*  <Button variant={ButtonVariant.TERTIARY} onClick={updateCertificate} data-uie-name="update-certificate">*/}
+        {/*    {t('E2EI.updateCertificate')}*/}
+        {/*  </Button>*/}
+        {/*)}*/}
       </div>
     </div>
   );
