@@ -129,7 +129,6 @@ export const E2EICertificateDetails = ({
           <CertificateDetailsModal
             certificate={e2eIdentity?.getCertificateData() || ''}
             onClose={() => setIsCertificateDetailsModalOpen(false)}
-            downloadCertificate={getCertificate}
           />
         )}
 

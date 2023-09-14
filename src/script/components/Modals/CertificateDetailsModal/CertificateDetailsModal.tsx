@@ -22,28 +22,33 @@ import {useState} from 'react';
 import {Icon} from 'Components/Icon';
 import {ModalComponent} from 'Components/ModalComponent';
 import {t} from 'Util/LocalizerUtil';
+import {downloadFile} from 'Util/util';
 
 import {styles} from './CertificateDetailsModal.styles';
 
 const COPY_MESSAGE_TIMEOUT = 3000;
+const DOWNLOAD_CERTIFICATE_TIMEOUT = 500;
+const CERTIFICATE_NAME = 'certificate.pem';
+const CERTIFICATE_TYPE = 'application/x-pem-file';
 
 export interface CertificateDetailsModalProps {
   certificate: string;
   onClose: () => void;
-  downloadCertificate: () => void;
 }
 
-export const CertificateDetailsModal = ({certificate, onClose, downloadCertificate}: CertificateDetailsModalProps) => {
+export const CertificateDetailsModal = ({certificate, onClose}: CertificateDetailsModalProps) => {
   const [isTextCopied, setIsTextCopied] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
 
   const onDownload = () => {
     setIsDownloading(true);
-    downloadCertificate();
+
+    const certificateUrl = `data:${CERTIFICATE_TYPE},${encodeURIComponent(certificate)}`;
+    downloadFile(certificateUrl, CERTIFICATE_NAME, CERTIFICATE_TYPE);
 
     setTimeout(() => {
       setIsDownloading(false);
-    }, COPY_MESSAGE_TIMEOUT);
+    }, DOWNLOAD_CERTIFICATE_TIMEOUT);
   };
 
   const onCopy = async () => {
