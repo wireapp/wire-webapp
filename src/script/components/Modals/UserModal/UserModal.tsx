@@ -155,7 +155,7 @@ const UserModal: React.FC<UserModalProps> = ({
   useEffect(() => {
     if (userId) {
       userRepository
-        .getUserById(userId)
+        .refreshUser(userId)
         .then(user => {
           if (user.isDeleted || !user.isAvailable()) {
             setUserNotFound(true);
