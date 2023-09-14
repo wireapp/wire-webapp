@@ -23,10 +23,10 @@ import {PrimaryModal, removeCurrentModal} from 'Components/Modals/PrimaryModal';
 import {Config} from 'src/script/Config';
 import {Core} from 'src/script/service/CoreSingleton';
 import {UserState} from 'src/script/user/UserState';
+import {removeUrlParameters} from 'Util/UrlUtil';
 import {supportsMLS} from 'Util/util';
 
 import {DelayTimerService} from './DelayTimer/DelayTimer';
-import {removeUrlParameters} from './helper/uri';
 import {getModalOptions, ModalType} from './Modals';
 import {getOIDCServiceInstance} from './OIDCService';
 import {OIDCServiceStore} from './OIDCService/OIDCServiceStorage';
