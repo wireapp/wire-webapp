@@ -155,6 +155,7 @@ const UserModal: React.FC<UserModalProps> = ({
   useEffect(() => {
     if (userId) {
       userRepository
+        // We want to get the fresh version of the user from backend (in case the user was deleted)
         .refreshUser(userId)
         .then(user => {
           if (user.isDeleted || !user.isAvailable()) {
