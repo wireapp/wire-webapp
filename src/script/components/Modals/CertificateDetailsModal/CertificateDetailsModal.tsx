@@ -22,11 +22,14 @@ import {useState} from 'react';
 import {Icon} from 'Components/Icon';
 import {ModalComponent} from 'Components/ModalComponent';
 import {t} from 'Util/LocalizerUtil';
+import {downloadFile} from 'Util/util';
 
 import {styles} from './CertificateDetailsModal.styles';
 
 const COPY_MESSAGE_TIMEOUT = 3000;
+const DOWNLOAD_CERTIFICATE_TIMEOUT = 500;
 const CERTIFICATE_NAME = 'certificate.pem';
+const CERTIFICATE_TYPE = 'application/x-pem-file';
 
 export interface CertificateDetailsModalProps {
   certificate: string;
@@ -40,22 +43,12 @@ export const CertificateDetailsModal = ({certificate, onClose}: CertificateDetai
   const onDownload = () => {
     setIsDownloading(true);
 
-    const downloadLink = document.createElement('a');
-    downloadLink.href = `data:application/x-pem-file,${encodeURIComponent(certificate)}`;
-    downloadLink.download = CERTIFICATE_NAME;
-    downloadLink.innerHTML = t('E2EI.downloadCertificate');
+    const certificateUrl = `data:${CERTIFICATE_TYPE},${encodeURIComponent(certificate)}`;
+    downloadFile(certificateUrl, CERTIFICATE_NAME, CERTIFICATE_TYPE);
 
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-
-    // Wait before removing resource and link. Needed in FF.
-    return window.setTimeout(() => {
-      const objectURL = downloadLink.href;
-      document.body.removeChild(downloadLink);
-      window.URL.revokeObjectURL(objectURL);
-
+    setTimeout(() => {
       setIsDownloading(false);
-    }, 300);
+    }, DOWNLOAD_CERTIFICATE_TIMEOUT);
   };
 
   const onCopy = async () => {
