@@ -17,7 +17,6 @@
  *
  */
 
-// ToDo: Use React Router instead of location.replace
 export const removeUrlParameters = () => {
-  location.replace(`${location.origin}/${location.hash}`);
+  history.replaceState({}, '', `${location.origin}/${location.hash}`);
 };
