@@ -791,6 +791,7 @@ export class MessageRepository {
           groupId,
           payload,
           protocol: ConversationProtocol.MLS,
+          conversationId: conversation.qualifiedId,
         }
       : {
           conversationId: conversation.qualifiedId,
