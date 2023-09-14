@@ -94,7 +94,8 @@ const Device = ({device, isSSO, onSelect, onRemove, deviceNumber}: DeviceProps) 
         >
           {device.getName()}
 
-          <Badges isProteusVerified={isVerified} isMLSVerified={true} />
+          {/* TODO: Will be prepared in different task */}
+          <Badges isProteusVerified={isVerified} isMLSVerified={false} />
         </div>
 
         {mlsFingerprint && (

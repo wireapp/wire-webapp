@@ -17,8 +17,10 @@
  *
  */
 
+import {Config} from 'src/script/Config';
 import {t} from 'Util/LocalizerUtil';
 import {splitFingerprint} from 'Util/StringUtil';
+import {supportsMLS} from 'Util/util';
 
 import {styles} from './MLSDeviceDetails.styles';
 
@@ -29,9 +31,12 @@ import {FormattedId} from '../FormattedId';
 interface MLSDeviceDetailsProps {
   isMLSVerified?: boolean;
   fingerprint: string;
+  isOtherDevice?: boolean;
 }
 
-export const MLSDeviceDetails = ({fingerprint, isMLSVerified = true}: MLSDeviceDetailsProps) => {
+export const MLSDeviceDetails = ({fingerprint, isMLSVerified = true, isOtherDevice = false}: MLSDeviceDetailsProps) => {
+  const isE2EIEnabled = supportsMLS() && Config.getConfig().FEATURE.ENABLE_E2EI;
+
   return (
     <div css={styles.wrapper}>
       <h4 className="paragraph-body-3">{t('mlsSignature', MLSPublicKeys.ED25519.toUpperCase())}</h4>
@@ -42,7 +47,7 @@ export const MLSDeviceDetails = ({fingerprint, isMLSVerified = true}: MLSDeviceD
         <FormattedId idSlices={splitFingerprint(fingerprint)} />
       </p>
 
-      <E2EICertificateDetails isMLSVerified={isMLSVerified} />
+      {isE2EIEnabled && <E2EICertificateDetails isMLSVerified={isMLSVerified} isOtherDevice={isOtherDevice} />}
     </div>
   );
 };

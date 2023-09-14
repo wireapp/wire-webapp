@@ -122,7 +122,7 @@ class E2EIHandler {
     await oidcService.authenticate();
   }
 
-  private async enrollE2EI() {
+  public async enrollE2EI() {
     try {
       // Notify user about E2EI enrollment in progress
       this.currentStep = E2EIHandlerStep.ENROLL;

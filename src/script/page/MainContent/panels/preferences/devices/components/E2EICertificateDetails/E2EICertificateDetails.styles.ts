@@ -32,8 +32,8 @@ const MLSStatusColor = {
 type stylesProps = {
   container: CSSObject;
   title: CSSObject;
-  e2eStatusContainer: CSSObject;
-  e2eStatus: (MLSStatus?: MLSStatues) => CSSObject;
+  e2eiStatusContainer: CSSObject;
+  e2eiStatus: (MLSStatus?: MLSStatues) => CSSObject;
   serialNumberWrapper: CSSObject;
   notAvailable: CSSObject;
   serialNumber: CSSObject;
@@ -49,7 +49,7 @@ export const styles: stylesProps = {
   title: {
     marginBottom: '6px',
   },
-  e2eStatusContainer: {
+  e2eiStatusContainer: {
     display: 'flex',
     alignItems: 'center',
     marginBottom: '6px',
@@ -58,7 +58,7 @@ export const styles: stylesProps = {
       marginLeft: '4px',
     },
   },
-  e2eStatus: (MLSStatus?: MLSStatues) => ({
+  e2eiStatus: (MLSStatus?: MLSStatues) => ({
     color: MLSStatus ? MLSStatusColor[MLSStatus] : 'var(--green-500)',
   }),
   serialNumberWrapper: {

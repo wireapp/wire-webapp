@@ -107,7 +107,7 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
 
   return (
     <div className={cx('participant-devices__header', {'participant-devices__header--padding': !noPadding})}>
-      {mlsFingerprint && <MLSDeviceDetails fingerprint={mlsFingerprint} />}
+      {mlsFingerprint && <MLSDeviceDetails fingerprint={mlsFingerprint} isOtherDevice />}
 
       <div className="device-proteus-details">
         <h3 className="device-details-title paragraph-body-3">{t('participantDevicesProteusDeviceVerification')}</h3>
