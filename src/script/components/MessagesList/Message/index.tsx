@@ -152,6 +152,11 @@ const Message: React.FC<
     }
     if (history.state?.eventKey === 'Enter') {
       handleFocus(totalMessage - 1);
+
+      // reset the eventKey to stop focusing on every new message user send/receive afterwards
+      // last message should be focused only when user enters a new conversation using keyboard(press enter)
+      history.state.eventKey = '';
+      window.history.replaceState(history.state, '', window.location.hash);
     }
   }, [totalMessage]);
 
@@ -160,7 +165,7 @@ const Message: React.FC<
     if (isMessageFocused) {
       messageRef.current?.focus();
     }
-  }, [isMessageFocused, message]);
+  }, [isMessageFocused]);
 
   // set message elements focus for non content type mesages
   // some non content type message has interactive element like invite people for member message
