@@ -1775,8 +1775,9 @@ export class CallingRepository {
         htmlMessage: t('modalNoCameraMessage', Config.getConfig().BRAND_NAME, {
           '/faqLink': '</a>',
           br: '<br>',
-          faqLink:
-            '<a href="https://support.wire.com/hc/articles/202935412" data-uie-name="go-no-camera-faq" target="_blank" rel="noopener noreferrer">',
+          faqLink: `<a href="${
+            Config.getConfig().URL.SUPPORT.CAMERA_ACCESS_DENIED
+          }" data-uie-name="go-no-camera-faq" target="_blank" rel="noopener noreferrer">`,
         }),
         title: t('modalNoCameraTitle'),
       },
