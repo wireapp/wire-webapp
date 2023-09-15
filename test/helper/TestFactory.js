@@ -107,13 +107,8 @@ export class TestFactory {
    */
   async exposeClientActors() {
     await this.exposeCryptographyActors();
-    const clientEntity = new ClientEntity(false, null);
-    clientEntity.address = '192.168.0.1';
-    clientEntity.class = ClientClassification.DESKTOP;
-    clientEntity.id = '60aee26b7f55a99f';
 
     const user = new User(entities.user.john_doe.id, null);
-    user.devices.push(clientEntity);
     user.email(entities.user.john_doe.email);
     user.isMe = true;
     user.locale = entities.user.john_doe.locale;
