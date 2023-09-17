@@ -36,7 +36,7 @@
     "@types/jest": "^29.2.0",
     "@types/long": "^5.0.0",
     "@types/rimraf": "^3.0.2",
-    "@types/tough-cookie": "4.0.2",
+    "@types/tough-cookie": "4.0.3",
     "commander": "11.0.0",
     "cross-env": "7.0.3",
     "dotenv-defaults": "5.0.2",
