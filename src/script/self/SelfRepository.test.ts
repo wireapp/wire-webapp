@@ -21,12 +21,15 @@ import {RegisteredClient} from '@wireapp/api-client/lib/client';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {FeatureList, FeatureStatus} from '@wireapp/api-client/lib/team';
 import {act} from 'react-dom/test-utils';
+import {container} from 'tsyringe';
 
 import {TestFactory} from 'test/helper/TestFactory';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
+import {ClientEntity} from '../client';
 import * as mlsSupport from '../mls/isMLSSupportedByEnvironment';
 import {MLSMigrationStatus} from '../mls/MLSMigration/migrationStatus';
+import {Core} from '../service/CoreSingleton';
 
 const testFactory = new TestFactory();
 
@@ -228,7 +231,7 @@ describe('SelfRepository', () => {
     ])('Updates the list of supported protocols', async (initialProtocols, evaluatedProtocols) => {
       const selfRepository = await testFactory.exposeSelfActors();
 
-      const selfUser = selfRepository['userState'].self();
+      const selfUser = selfRepository['userState'].self()!;
 
       selfUser.supportedProtocols(initialProtocols);
 
@@ -246,7 +249,7 @@ describe('SelfRepository', () => {
     it("Does not update supported protocols if they didn't change", async () => {
       const selfRepository = await testFactory.exposeSelfActors();
 
-      const selfUser = selfRepository['userState'].self();
+      const selfUser = selfRepository['userState'].self()!;
 
       const initialProtocols = [ConversationProtocol.PROTEUS];
       selfUser.supportedProtocols(initialProtocols);
@@ -265,7 +268,7 @@ describe('SelfRepository', () => {
     it('Re-evaluates supported protocols every 24h', async () => {
       const selfRepository = await testFactory.exposeSelfActors();
 
-      const selfUser = selfRepository['userState'].self();
+      const selfUser = selfRepository['userState'].self()!;
 
       const initialProtocols = [ConversationProtocol.PROTEUS];
       selfUser.supportedProtocols(initialProtocols);
@@ -290,6 +293,36 @@ describe('SelfRepository', () => {
 
       expect(selfUser.supportedProtocols()).toEqual(evaluatedProtocols2);
       expect(selfRepository['selfService'].putSupportedProtocols).toHaveBeenCalledWith(evaluatedProtocols2);
+    });
+  });
+
+  describe('deleteSelfUserClient', () => {
+    it('deletes the self user client', async () => {
+      const selfRepository = await testFactory.exposeSelfActors();
+
+      const selfUser = selfRepository['userState'].self()!;
+
+      selfRepository['clientRepository'].init(selfUser);
+
+      const client1 = new ClientEntity(true, null, 'client1');
+      const client2 = new ClientEntity(true, null, 'client2');
+
+      const initialClients = [client1, client2];
+      selfUser.devices(initialClients);
+
+      const clientToDelete = initialClients[0];
+
+      jest.spyOn(container.resolve(Core).service?.client!, 'deleteClient');
+      jest.spyOn(selfRepository, 'refreshSelfSupportedProtocols').mockImplementationOnce(jest.fn());
+
+      const expectedClients = [...initialClients].filter(client => client.id !== clientToDelete.id);
+
+      await act(async () => {
+        await selfRepository.deleteSelfUserClient(clientToDelete.id);
+      });
+
+      expect(selfUser.devices()).toEqual(expectedClients);
+      expect(selfRepository.refreshSelfSupportedProtocols).toHaveBeenCalled();
     });
   });
 });
