@@ -91,7 +91,7 @@ const generateMLSFeaturesConfig = (migrationStatus: MLSMigrationStatus, supporte
 
 const createMockClientResponse = (doesSupportMLS = false, wasActiveWithinLast4Weeks = false) => {
   return {
-    mls_public_keys: doesSupportMLS ? {ed25519: 'key'} : undefined,
+    mls_public_keys: doesSupportMLS ? {ed25519: 'key'} : {},
     last_active: wasActiveWithinLast4Weeks
       ? new Date().toISOString()
       : new Date(Date.now() - 5 * 7 * 24 * 60 * 60 * 1000).toISOString(),
