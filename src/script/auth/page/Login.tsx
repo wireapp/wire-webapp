@@ -111,7 +111,7 @@ const LoginComponent = ({
   const [verificationCode, setVerificationCode] = useState('');
   const [twoFactorSubmitFailedOnce, setTwoFactorSubmitFailedOnce] = useState(false);
 
-  const isOauth = UrlUtil.hasURLParameter(QUERY_KEY.SCOPE, window.location.search ?? window.location.hash);
+  const isOauth = UrlUtil.hasURLParameter(QUERY_KEY.SCOPE, window.location.hash);
 
   const [showEntropyForm, setShowEntropyForm] = useState(false);
   const isEntropyRequired = Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY;
@@ -182,7 +182,8 @@ const LoginComponent = ({
       await doInitializeClient(ClientType.PERMANENT, undefined, undefined, entropyData);
 
       if (isOauth) {
-        return navigate(ROUTE.AUTHORIZE);
+        console.info('bardia route', {route: `${ROUTE.AUTHORIZE}/${window.location.hash}`});
+        return navigate(`${ROUTE.AUTHORIZE}/${window.location.hash}`);
       }
       return navigate(ROUTE.HISTORY_INFO);
     } catch (error) {
@@ -206,7 +207,7 @@ const LoginComponent = ({
       await doLogin(login, getEntropy);
 
       if (isOauth) {
-        return navigate(ROUTE.AUTHORIZE);
+        return navigate(`${ROUTE.AUTHORIZE}/${window.location.hash}`);
       }
       return navigate(ROUTE.HISTORY_INFO);
     } catch (error) {
