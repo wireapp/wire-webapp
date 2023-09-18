@@ -229,7 +229,7 @@ const MainContent: FC<MainContentProps> = ({
             )}
 
             {contentState === ContentState.CONNECTION_REQUESTS && (
-              <ConnectRequests teamState={teamState} userState={userState} />
+              <ConnectRequests teamState={teamState} selfUser={selfUser} userState={userState} />
             )}
 
             {contentState === ContentState.CONVERSATION && (

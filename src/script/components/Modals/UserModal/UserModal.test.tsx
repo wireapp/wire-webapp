@@ -31,7 +31,7 @@ import {showUserModal} from './UserModal.state';
 describe('UserModal', () => {
   it('correctly fetches user from user repository', async () => {
     jest.useFakeTimers();
-    const getUserById = jest.fn(async (id: QualifiedId) => {
+    const refreshUser = jest.fn(async (id: QualifiedId) => {
       return new User('mock-id', 'test-domain.mock');
     });
 
@@ -39,7 +39,7 @@ describe('UserModal', () => {
       core: {} as Core,
       teamState: {} as TeamState,
       userRepository: {
-        getUserById,
+        refreshUser,
       } as unknown as UserRepository,
       selfUser: new User(),
     };
@@ -47,12 +47,12 @@ describe('UserModal', () => {
     const {getByTestId} = render(<UserModal {...props} />);
     await waitFor(() => getByTestId('do-close'));
 
-    expect(getUserById).toHaveBeenCalledTimes(1);
+    expect(refreshUser).toHaveBeenCalledTimes(1);
   });
 
   it('shows user not found when user is deleted', async () => {
     jest.useFakeTimers();
-    const getUserById = jest.fn(async (id: QualifiedId) => {
+    const refreshUser = jest.fn(async (id: QualifiedId) => {
       const user = new User('mock-id', 'test-domain.mock');
       user.isDeleted = true;
       return user;
@@ -62,7 +62,7 @@ describe('UserModal', () => {
       core: {} as Core,
       teamState: {} as TeamState,
       userRepository: {
-        getUserById,
+        refreshUser,
       } as unknown as UserRepository,
       selfUser: new User(),
     };
@@ -71,7 +71,7 @@ describe('UserModal', () => {
 
     const {getByTestId} = render(<UserModal {...props} />);
 
-    expect(getUserById).toHaveBeenCalledTimes(1);
+    expect(refreshUser).toHaveBeenCalledTimes(1);
 
     await waitFor(() => {
       expect(getByTestId('status-modal-text')).toBeInstanceOf(HTMLDivElement);
