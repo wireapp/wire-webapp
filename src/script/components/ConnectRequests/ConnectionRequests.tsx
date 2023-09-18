@@ -26,6 +26,7 @@ import {Button, ButtonVariant, IconButton, IconButtonVariant, useMatchMedia} fro
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {UserClassifiedBar} from 'Components/input/ClassifiedBar';
 import {UnverifiedUserWarning} from 'Components/Modals/UserModal';
+import {UserName} from 'Components/UserName';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -38,11 +39,13 @@ import {UserState} from '../../user/UserState';
 interface ConnectRequestsProps {
   readonly userState: UserState;
   readonly teamState: TeamState;
+  readonly selfUser: User;
 }
 
 export const ConnectRequests: FC<ConnectRequestsProps> = ({
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
+  selfUser,
 }) => {
   const connectRequestsRefEnd = useRef<HTMLDivElement | null>(null);
   const temporaryConnectRequestsCount = useRef<number>(0);
@@ -121,12 +124,14 @@ export const ConnectRequests: FC<ConnectRequestsProps> = ({
               data-uie-uid={connectRequest.id}
               data-uie-name="connect-request"
             >
-              <div className="connect-request-name ellipsis">{connectRequest.name()}</div>
+              <div className="connect-request-name ellipsis">
+                <UserName user={connectRequest} />
+              </div>
 
               <div className="connect-request-username label-username">{connectRequest.handle}</div>
 
               {classifiedDomains && (
-                <UserClassifiedBar users={[userState.self(), connectRequest]} classifiedDomains={classifiedDomains} />
+                <UserClassifiedBar users={[selfUser, connectRequest]} classifiedDomains={classifiedDomains} />
               )}
 
               <Avatar

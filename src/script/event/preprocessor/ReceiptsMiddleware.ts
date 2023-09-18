@@ -77,7 +77,7 @@ export class ReceiptsMiddleware {
     }
   }
 
-  isMyMessage(originalEvent: EventRecord): boolean {
+  private isMyMessage(originalEvent: EventRecord): boolean {
     return this.userState.self() && this.userState.self().id === originalEvent.from;
   }
 
