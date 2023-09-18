@@ -297,7 +297,7 @@ describe('SelfRepository', () => {
   });
 
   describe('deleteSelfUserClient', () => {
-    it('deletes the self user client', async () => {
+    it('deletes the self user client and refreshes self supported protocols', async () => {
       const selfRepository = await testFactory.exposeSelfActors();
 
       const selfUser = selfRepository['userState'].self()!;
@@ -323,6 +323,46 @@ describe('SelfRepository', () => {
 
       expect(selfUser.devices()).toEqual(expectedClients);
       expect(selfRepository.refreshSelfSupportedProtocols).toHaveBeenCalled();
+    });
+  });
+
+  describe('refreshSelfSupportedProtocols', () => {
+    it('refreshes self supported protocols and updates backend with the new list', async () => {
+      const selfRepository = await testFactory.exposeSelfActors();
+
+      const selfUser = selfRepository['userState'].self()!;
+
+      const initialProtocols = [ConversationProtocol.PROTEUS];
+      selfUser.supportedProtocols(initialProtocols);
+
+      const evaluatedProtocols = [ConversationProtocol.PROTEUS, ConversationProtocol.MLS];
+
+      jest.spyOn(selfRepository, 'evaluateSelfSupportedProtocols').mockResolvedValueOnce(evaluatedProtocols);
+      jest.spyOn(selfRepository['selfService'], 'putSupportedProtocols');
+
+      await selfRepository.refreshSelfSupportedProtocols();
+
+      expect(selfUser.supportedProtocols()).toEqual(evaluatedProtocols);
+      expect(selfRepository['selfService'].putSupportedProtocols).toHaveBeenCalledWith(evaluatedProtocols);
+    });
+
+    it('does not update backend with supported protocols when not changed', async () => {
+      const selfRepository = await testFactory.exposeSelfActors();
+
+      const selfUser = selfRepository['userState'].self()!;
+
+      const initialProtocols = [ConversationProtocol.PROTEUS, ConversationProtocol.MLS];
+      selfUser.supportedProtocols(initialProtocols);
+
+      const evaluatedProtocols = [ConversationProtocol.PROTEUS, ConversationProtocol.MLS];
+
+      jest.spyOn(selfRepository, 'evaluateSelfSupportedProtocols').mockResolvedValueOnce(evaluatedProtocols);
+      jest.spyOn(selfRepository['selfService'], 'putSupportedProtocols');
+
+      await selfRepository.refreshSelfSupportedProtocols();
+
+      expect(selfUser.supportedProtocols()).toEqual(evaluatedProtocols);
+      expect(selfRepository['selfService'].putSupportedProtocols).not.toHaveBeenCalled();
     });
   });
 });
