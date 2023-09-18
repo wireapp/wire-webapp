@@ -19,6 +19,7 @@
 
 import {AVATAR_SIZE, Avatar} from 'Components/Avatar';
 import {Icon} from 'Components/Icon';
+import {UserName} from 'Components/UserName';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {DeleteMessage} from 'src/script/entity/message/DeleteMessage';
 import {User} from 'src/script/entity/User';
@@ -90,7 +91,7 @@ export function MessageHeader({
   children,
 }: MessageHeaderParams) {
   const {user: sender} = useKoSubscribableChildren(message, ['user']);
-  const {name: senderName, isAvailable} = useKoSubscribableChildren(sender, ['name', 'isAvailable']);
+  const {isAvailable} = useKoSubscribableChildren(sender, ['isAvailable']);
 
   return (
     <div className="message-header">
@@ -110,7 +111,7 @@ export function MessageHeader({
           data-uie-name={uieName ? `${uieName}-sender-name` : 'sender-name'}
           data-uie-uid={sender.id}
         >
-          {!isAvailable ? t('unavailableUser') : senderName}
+          <UserName user={sender} />
         </h4>
 
         {!noBadges && <BadgeSection sender={sender} />}

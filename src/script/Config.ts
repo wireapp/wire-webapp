@@ -76,7 +76,7 @@ const config = {
   ALLOWED_IMAGE_TYPES: ['image/bmp', 'image/gif', 'image/jpeg', 'image/jpg', 'image/png'],
 
   /** Which min and max version of the backend api do we support */
-  SUPPORTED_API_RANGE: [1, env.ENABLE_DEV_BACKEND_API ? Infinity : 3],
+  SUPPORTED_API_RANGE: [1, env.ENABLE_DEV_BACKEND_API ? Infinity : 4],
 
   /** DataDog client api keys acces */
   dataDog: {

@@ -28,6 +28,7 @@ import {ParticipantItemContent} from 'Components/ParticipantItemContent';
 import {listItem, listWrapper} from 'Components/ParticipantItemContent/ParticipantItem.styles';
 import {UserStatusBadges} from 'Components/UserBadges';
 import {UserlistMode} from 'Components/UserList';
+import {useUserName} from 'Components/UserName';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
@@ -79,7 +80,6 @@ const UserListItem = ({
     isDirectGuest,
     availability,
     expirationText,
-    name,
   } = useKoSubscribableChildren(user, ['isDirectGuest', 'is_verified', 'availability', 'expirationText', 'name']);
 
   const {isMe: isSelf, isFederated} = user;
@@ -91,7 +91,7 @@ const UserListItem = ({
 
   const selfString = `(${capitalizeFirstChar(t('conversationYouNominative'))})`;
 
-  const userName = isAvailable ? name : t('unavailableUser');
+  const userName = useUserName(user);
 
   const getContentInfoText = () => {
     if (customInfo) {

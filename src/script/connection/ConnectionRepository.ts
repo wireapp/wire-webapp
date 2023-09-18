@@ -326,6 +326,7 @@ export class ConnectionRepository {
               title: t('modalUserCannotConnectHeadline'),
             },
           });
+          break;
         }
         case ConnectionStatus.CANCELLED: {
           PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
@@ -334,6 +335,7 @@ export class ConnectionRepository {
               title: t('modalUserCannotConnectHeadline'),
             },
           });
+          break;
         }
         case ConnectionStatus.IGNORED: {
           PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
@@ -342,6 +344,7 @@ export class ConnectionRepository {
               title: t('modalUserCannotConnectHeadline'),
             },
           });
+          break;
         }
         default: {
           PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
@@ -349,6 +352,7 @@ export class ConnectionRepository {
               title: t('modalUserCannotConnectHeadline'),
             },
           });
+          break;
         }
       }
     }
