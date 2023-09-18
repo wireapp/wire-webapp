@@ -5,7 +5,7 @@
     "@emotion/react": "11.11.1",
     "@loadable/component": "^5.15.3",
     "@wireapp/avs": "9.3.7",
-    "@wireapp/core": "42.3.3",
+    "@wireapp/core": "42.3.4",
     "@wireapp/lru-cache": "3.8.1",
     "@wireapp/react-ui-kit": "9.9.5",
     "@wireapp/store-engine-dexie": "2.1.6",
