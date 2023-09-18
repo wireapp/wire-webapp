@@ -72,5 +72,7 @@ export function getEmojiUnicode(emojis: string) {
   const hexCode = 16;
   const padding = 4;
   const unicode = [...emojis].map(emoji => emoji.codePointAt(0)?.toString(hexCode).padStart(padding, '0')).join('-');
-  return unicode;
+  // TODO: This is a hack to fix the heart emoji for old android devices. It should be reevaluated at some point in the future and removed.
+  // See https://wearezeta.atlassian.net/browse/WPB-4736
+  return unicode === '2764' ? '2764-fe0f' : unicode;
 }

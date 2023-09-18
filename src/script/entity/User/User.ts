@@ -70,6 +70,7 @@ export class User {
   public readonly isExpired: ko.Observable<boolean>;
   public readonly isExternal: ko.PureComputed<boolean>;
   public readonly isGuest: ko.Observable<boolean>;
+  public readonly isActivatedAccount: ko.PureComputed<boolean>;
   /** indicates whether that user entity is available (if we have metadata for the user, it's considered available) */
   public readonly isAvailable: ko.PureComputed<boolean>;
 
@@ -185,6 +186,7 @@ export class User {
       return this.isGuest() && !this.isFederated;
     });
     this.isTemporaryGuest = ko.observable(false);
+    this.isActivatedAccount = ko.pureComputed(() => !this.isTemporaryGuest());
     this.teamRole = ko.observable(TEAM_ROLE.NONE);
     this.teamId = undefined;
 

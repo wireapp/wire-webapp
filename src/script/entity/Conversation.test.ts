@@ -298,7 +298,7 @@ describe('Conversation', () => {
 
   describe('getLastDeliveredMessage', () => {
     it('returns undefined if conversation has no messages', () => {
-      expect(conversation_et.getLastDeliveredMessage()).not.toBeDefined();
+      expect(conversation_et.lastDeliveredMessage()).not.toBeDefined();
     });
 
     it('returns last delivered message', () => {
@@ -311,35 +311,35 @@ describe('Conversation', () => {
       sentMessageEntity.status(StatusType.SENT);
       conversation_et.addMessage(sentMessageEntity);
 
-      expect(conversation_et.getLastDeliveredMessage()).not.toBeDefined();
+      expect(conversation_et.lastDeliveredMessage()).not.toBeDefined();
 
       const deliveredMessageEntity = new ContentMessage(createUuid());
       deliveredMessageEntity.user(selfUserEntity);
       deliveredMessageEntity.status(StatusType.DELIVERED);
       conversation_et.addMessage(deliveredMessageEntity);
 
-      expect(conversation_et.getLastDeliveredMessage()).toBe(deliveredMessageEntity);
+      expect(conversation_et.lastDeliveredMessage()).toBe(deliveredMessageEntity);
 
       const nextSentMessageEntity = new ContentMessage(createUuid());
       nextSentMessageEntity.user(selfUserEntity);
       nextSentMessageEntity.status(StatusType.SENT);
       conversation_et.addMessage(nextSentMessageEntity);
 
-      expect(conversation_et.getLastDeliveredMessage()).toBe(deliveredMessageEntity);
+      expect(conversation_et.lastDeliveredMessage()).toBe(deliveredMessageEntity);
 
       const nextDeliveredMessageEntity = new ContentMessage(createUuid());
       nextDeliveredMessageEntity.user(selfUserEntity);
       nextDeliveredMessageEntity.status(StatusType.DELIVERED);
       conversation_et.addMessage(nextDeliveredMessageEntity);
 
-      expect(conversation_et.getLastDeliveredMessage()).toBe(nextDeliveredMessageEntity);
+      expect(conversation_et.lastDeliveredMessage()).toBe(nextDeliveredMessageEntity);
 
       const remoteMessageEntity = new ContentMessage(createUuid());
       remoteMessageEntity.user(remoteUserEntity);
       remoteMessageEntity.status(StatusType.DELIVERED);
       conversation_et.addMessage(remoteMessageEntity);
 
-      expect(conversation_et.getLastDeliveredMessage()).toBe(nextDeliveredMessageEntity);
+      expect(conversation_et.lastDeliveredMessage()).toBe(nextDeliveredMessageEntity);
     });
   });
 

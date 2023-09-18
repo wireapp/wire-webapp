@@ -29,6 +29,7 @@ import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {ErrorFallback} from 'Components/ErrorFallback';
 import {Icon} from 'Components/Icon';
 import {UserClassifiedBar} from 'Components/input/ClassifiedBar';
+import {UserName} from 'Components/UserName';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -89,7 +90,7 @@ export const UserDetailsComponent: React.FC<UserDetailsProps> = ({
             data-uie-name="status-name"
             css={user.isAvailable ? undefined : {color: 'var(--gray-70)'}}
           >
-            {user.isAvailable ? user.name : t('unavailableUser')}
+            <UserName user={participant} />
           </h2>
         )}
 

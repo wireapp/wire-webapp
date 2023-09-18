@@ -193,7 +193,7 @@ const OAuthPermissionsComponent = ({
                           target="_blank"
                           rel="noopener noreferrer"
                           data-uie-name="go-learn-more"
-                          href="https://support.wire.com/hc/en-us/articles/9628065287965-Calendar-integration"
+                          href={Config.getConfig().URL.SUPPORT.OAUTH_LEARN_MORE}
                         >
                           {chunks}
                         </a>
