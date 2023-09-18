@@ -38,7 +38,5 @@ export const wasClientActiveWithinLast4Weeks = ({last_active: lastActiveISODate}
  * @returns {boolean}
  */
 export const isClientMLSCapable = ({mls_public_keys: mlsPublicKeys}: RegisteredClient): boolean => {
-  const haveClientUploadedPublicKeys = Object.values(mlsPublicKeys).length > 0;
-
-  return haveClientUploadedPublicKeys;
+  return Object.values(mlsPublicKeys).length > 0;
 };
