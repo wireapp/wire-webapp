@@ -55,6 +55,14 @@ export class SelfRepository {
     amplify.subscribe(WebAppEvents.CLIENT.REMOVE, this.refreshSelfSupportedProtocols);
   }
 
+  private get selfUser() {
+    const selfUser = this.userState.self();
+    if (!selfUser) {
+      throw new Error('Self user is not available');
+    }
+    return selfUser;
+  }
+
   /**
    * Proteus is supported if:
    * - Proteus is in the list of supported protocols
@@ -148,7 +156,7 @@ export class SelfRepository {
   ): Promise<ConversationProtocol[]> {
     this.logger.info('Supported protocols will get updated to:', supportedProtocols);
     await this.selfService.putSupportedProtocols(supportedProtocols);
-    await this.userRepository.updateUserSupportedProtocols(this.userState.self().qualifiedId, supportedProtocols);
+    await this.userRepository.updateUserSupportedProtocols(this.selfUser.qualifiedId, supportedProtocols);
     return supportedProtocols;
   }
 
@@ -158,8 +166,7 @@ export class SelfRepository {
    * @param supportedProtocols - an array of new supported protocols
    */
   public readonly refreshSelfSupportedProtocols = async (): Promise<ConversationProtocol[]> => {
-    const selfUser = this.userState.self();
-    const localSupportedProtocols = selfUser.supportedProtocols();
+    const localSupportedProtocols = this.selfUser.supportedProtocols();
 
     this.logger.info('Evaluating self supported protocols, currently supported protocols:', localSupportedProtocols);
     const refreshedSupportedProtocols = await this.evaluateSelfSupportedProtocols();
