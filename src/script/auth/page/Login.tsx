@@ -111,7 +111,7 @@ const LoginComponent = ({
   const [verificationCode, setVerificationCode] = useState('');
   const [twoFactorSubmitFailedOnce, setTwoFactorSubmitFailedOnce] = useState(false);
 
-  const isOauth = UrlUtil.hasURLParameter(QUERY_KEY.SCOPE);
+  const isOauth = UrlUtil.hasURLParameter(QUERY_KEY.SCOPE, window.location.search ?? window.location.hash);
 
   const [showEntropyForm, setShowEntropyForm] = useState(false);
   const isEntropyRequired = Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY;
