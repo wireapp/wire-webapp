@@ -253,9 +253,9 @@ export class UserRepository {
     const mappedUsers = this.mapUserResponse(userWithAvailability.concat(liveUsers), failed);
 
     // Assign connections to users
-    connections.forEach(connection => {
-      const user = mappedUsers.find(user => matchQualifiedIds(user.qualifiedId, connection.userId));
-      if (user) {
+    mappedUsers.forEach(user => {
+      const connection = connections.find(connection => matchQualifiedIds(connection.userId, user.qualifiedId));
+      if (connection) {
         user.connection(connection);
       }
     });
