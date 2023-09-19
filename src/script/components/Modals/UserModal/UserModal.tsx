@@ -36,7 +36,7 @@ import {handleKeyDown} from 'Util/KeyboardUtil';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 
 import {useUserModalState} from './UserModal.state';
-import {userModalStyle} from './UserModal.styles';
+import {userModalStyle, userModalWrapperStyle} from './UserModal.styles';
 
 import {Config} from '../../../Config';
 import {User} from '../../../entity/User';
@@ -181,9 +181,7 @@ const UserModal: React.FC<UserModalProps> = ({
         onBgClick={hide}
         onClosed={onModalClosed}
         data-uie-name={user ? 'modal-user-profile' : userNotFound ? 'modal-cannot-open-profile' : ''}
-        wrapperCSS={{
-          padding: 0,
-        }}
+        wrapperCSS={userModalWrapperStyle}
       >
         <div className="modal__header">
           {userNotFound && (
