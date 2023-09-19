@@ -968,12 +968,12 @@ export class Conversation {
   /**
    * Get the last delivered message.
    */
-  getLastDeliveredMessage(): Message | undefined {
+  private getLastDeliveredMessage(): Message | undefined {
     return this.messages()
       .slice()
       .reverse()
       .find(messageEntity => {
-        const isDelivered = messageEntity.status() >= StatusType.DELIVERED;
+        const isDelivered = [StatusType.DELIVERED, StatusType.SEEN].includes(messageEntity.status());
         return isDelivered && messageEntity.user().isMe;
       });
   }

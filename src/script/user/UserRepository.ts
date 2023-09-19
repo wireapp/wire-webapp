@@ -790,7 +790,11 @@ export class UserRepository {
    * @param user user data from backend
    */
   private async updateSavedUser(user: APIClientUser): Promise<User> {
-    const localUserEntity = this.findUserById(generateQualifiedId(user)) ?? new User();
+    const localUserEntity = this.findUserById(generateQualifiedId(user));
+    if (!localUserEntity) {
+      // If the user could not be found locally, we will get it and save it locally
+      return this.getUserById(user.qualified_id);
+    }
     const updatedUser = this.userMapper.updateUserFromObject(localUserEntity, user, this.userState.self().domain);
     const {qualifiedId: userId} = updatedUser;
 

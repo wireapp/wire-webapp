@@ -19,14 +19,17 @@
 
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {registerRecurringTask} from '@wireapp/core/lib/util/RecurringTaskScheduler';
+import {amplify} from 'amplify';
 import {container} from 'tsyringe';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Logger, getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {SelfService} from './SelfService';
 
-import {ClientRepository} from '../client';
+import {ClientEntity, ClientRepository} from '../client';
 import {isMLSSupportedByEnvironment} from '../mls/isMLSSupportedByEnvironment';
 import {MLSMigrationStatus} from '../mls/MLSMigration/migrationStatus';
 import {TeamRepository} from '../team/TeamRepository';
@@ -46,6 +49,18 @@ export class SelfRepository {
     private readonly userState = container.resolve(UserState),
   ) {
     this.logger = getLogger('SelfRepository');
+
+    // Every time user's client is deleted, we need to re-evaluate self supported protocols.
+    // It's possible that they have removed proteus client, and now all their clients are mls-capable.
+    amplify.subscribe(WebAppEvents.CLIENT.REMOVE, this.refreshSelfSupportedProtocols);
+  }
+
+  private get selfUser() {
+    const selfUser = this.userState.self();
+    if (!selfUser) {
+      throw new Error('Self user is not available');
+    }
+    return selfUser;
   }
 
   /**
@@ -155,7 +170,7 @@ export class SelfRepository {
   ): Promise<ConversationProtocol[]> {
     this.logger.info('Supported protocols will get updated to:', supportedProtocols);
     await this.selfService.putSupportedProtocols(supportedProtocols);
-    await this.userRepository.updateUserSupportedProtocols(this.userState.self().qualifiedId, supportedProtocols);
+    await this.userRepository.updateUserSupportedProtocols(this.selfUser.qualifiedId, supportedProtocols);
     return supportedProtocols;
   }
 
@@ -164,9 +179,8 @@ export class SelfRepository {
    * It will send a request to the backend to change the supported protocols and then update the user in the local state.
    * @param supportedProtocols - an array of new supported protocols
    */
-  public async refreshSelfSupportedProtocols(): Promise<ConversationProtocol[]> {
-    const selfUser = this.userState.self();
-    const localSupportedProtocols = selfUser.supportedProtocols();
+  public readonly refreshSelfSupportedProtocols = async (): Promise<ConversationProtocol[]> => {
+    const localSupportedProtocols = this.selfUser.supportedProtocols();
 
     this.logger.info('Evaluating self supported protocols, currently supported protocols:', localSupportedProtocols);
     const refreshedSupportedProtocols = await this.evaluateSelfSupportedProtocols();
@@ -185,7 +199,7 @@ export class SelfRepository {
     }
 
     return this.updateSelfSupportedProtocols(refreshedSupportedProtocols);
-  }
+  };
 
   /**
    * Will initialise the intervals for checking (and updating if necessary) self supported protocols.
@@ -211,5 +225,12 @@ export class SelfRepository {
       task: refreshProtocolsTask,
       key: SELF_SUPPORTED_PROTOCOLS_CHECK_KEY,
     });
+  }
+
+  public async deleteSelfUserClient(clientId: string, password?: string): Promise<ClientEntity[]> {
+    const clients = this.clientRepository.deleteClient(clientId, password);
+
+    await this.refreshSelfSupportedProtocols();
+    return clients;
   }
 }
