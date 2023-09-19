@@ -45,10 +45,12 @@ export interface FailedToAddUsersMessageProps {
   userState?: UserState;
 }
 
-const errorMessageType = {
-  [AddUsersFailureReasons.NON_FEDERATING_BACKENDS]: 'NonFederatingBackends',
-  [AddUsersFailureReasons.UNREACHABLE_BACKENDS]: 'OfflineBackend',
-} as const;
+// Mobile platforms are not using the full specs yet, we can uncomment this when they catch up
+// This is not used in the MVP specs
+// const errorMessageType = {
+//   [AddUsersFailureReasons.NON_FEDERATING_BACKENDS]: 'NonFederatingBackends',
+//   [AddUsersFailureReasons.UNREACHABLE_BACKENDS]: 'OfflineBackend',
+// } as const;
 
 const config = Config.getConfig();
 
@@ -69,9 +71,9 @@ const MessageDetails: FC<MessageDetailsProps> = ({users, children, message, doma
         css={warning}
         dangerouslySetInnerHTML={{
           __html:
-            // Mobile platforms are not using the full specs yet, we can uncomment this if product decides to go with MVP specs
-            // t(`failedToAddParticipantsPluralDetailsMvp`, {
-            t(`failedToAddParticipantsPluralDetails${errorMessageType[message.reason]}`, {
+            // Mobile platforms are not using the full specs yet, we can uncomment this when they catch up
+            // t(`failedToAddParticipantsPluralDetails${errorMessageType[message.reason]}`, {
+            t(`failedToAddParticipantsPluralDetailsMvp`, {
               name: users[0].name(),
               names: users
                 .slice(1)
@@ -147,9 +149,9 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
                 css={warning}
                 dangerouslySetInnerHTML={{
                   __html:
-                    // Mobile platforms are not using the full specs yet, we can uncomment this if product decides to go with MVP specs
-                    // t(`failedToAddParticipantSingularMvp`, {
-                    t(`failedToAddParticipantSingular${errorMessageType[message.reason]}`, {
+                    // Mobile platforms are not using the full specs yet, we can uncomment this when they catch up
+                    // t(`failedToAddParticipantSingular${errorMessageType[message.reason]}`, {
+                    t(`failedToAddParticipantSingularMvp`, {
                       name: users[0].name(),
                       domain: users[0].domain,
                     }),

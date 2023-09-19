@@ -185,7 +185,9 @@ describe('FailedToAddUsersMessage', () => {
 
     const elementMessageFailedToAddDetails = getAllByTestId('multi-user-not-added-details');
     expect(elementMessageFailedToAddDetails[0].textContent).toContain(
-      'could not be added to the group as their backends do not federate with each other',
+      // 'We're currently using the MVP implementation of error messages, the full spec will be the following
+      // 'could not be added to the group as their backends do not federate with each other',
+      'could not be added to the group',
     );
   });
 });
