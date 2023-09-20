@@ -34,11 +34,12 @@ const EmojiImg: FC<EmojiImgProps> = ({emojiUrl, styles, emojiName, emojiImgSize 
   return (
     <>
       <img
-        src={emojiUrl}
         alt={emojiName}
-        loading="eager"
-        css={{...emojiImgSize, ...messageReactionEmoji, ...styles}}
         aria-hidden={true}
+        css={{...emojiImgSize, ...messageReactionEmoji, ...styles}}
+        draggable="false"
+        loading="eager"
+        src={emojiUrl}
       />
     </>
   );
