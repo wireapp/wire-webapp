@@ -59,7 +59,7 @@ interface MessageDetailsProps {
   users: User[];
   domain?: string;
 }
-const MessageDetails: FC<MessageDetailsProps> = ({users, children, domain = ''}) => {
+const MessageDetails = ({users, children, domain = ''}: MessageDetailsProps) => {
   return (
     <p
       data-uie-name="multi-user-not-added-details"
@@ -87,7 +87,7 @@ const MessageDetails: FC<MessageDetailsProps> = ({users, children, domain = ''})
   );
 };
 
-const UnreachableBackendMessageDetails: FC<MessageDetailsProps> = props => {
+const UnreachableBackendMessageDetails = (props: MessageDetailsProps) => {
   const groupedUsers = useMemo(() => {
     return groupBy(props.users, user => user.domain);
   }, [props.users]);
@@ -101,7 +101,7 @@ const UnreachableBackendMessageDetails: FC<MessageDetailsProps> = props => {
   );
 };
 
-const NonFederatingBackendMessageDetails: FC<MessageDetailsProps> = props => {
+const NonFederatingBackendMessageDetails = (props: MessageDetailsProps) => {
   return <MessageDetails {...props} />;
 };
 
