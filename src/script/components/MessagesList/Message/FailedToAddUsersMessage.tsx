@@ -56,11 +56,10 @@ const config = Config.getConfig();
 
 interface MessageDetailsProps {
   children: ReactNode;
-  message: FailedToAddUsersMessageEntity;
   users: User[];
   domain?: string;
 }
-const MessageDetails: FC<MessageDetailsProps> = ({users, children, message, domain = ''}) => {
+const MessageDetails: FC<MessageDetailsProps> = ({users, children, domain = ''}) => {
   return (
     <p
       data-uie-name="multi-user-not-added-details"
@@ -88,6 +87,32 @@ const MessageDetails: FC<MessageDetailsProps> = ({users, children, message, doma
   );
 };
 
+const UnreachableBackendMessageDetails: FC<MessageDetailsProps> = props => {
+  const groupedUsers = useMemo(() => {
+    return groupBy(props.users, user => user.domain);
+  }, [props.users]);
+
+  return (
+    <>
+      {Object.entries(groupedUsers).map(([domain, domainUsers]) => (
+        <MessageDetails {...props} key={domain} domain={domain} users={domainUsers} />
+      ))}
+    </>
+  );
+};
+
+const NonFederatingBackendMessageDetails: FC<MessageDetailsProps> = props => {
+  return <MessageDetails {...props} />;
+};
+
+/**
+ * mapping between failure reasons and the details component to display
+ */
+const FailureReasonToDetailsComponent: Record<AddUsersFailureReasons, FC<MessageDetailsProps>> = {
+  [AddUsersFailureReasons.UNREACHABLE_BACKENDS]: UnreachableBackendMessageDetails,
+  [AddUsersFailureReasons.NON_FEDERATING_BACKENDS]: NonFederatingBackendMessageDetails,
+};
+
 const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
   isMessageFocused,
   message,
@@ -100,14 +125,13 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
 
   const {users: allUsers} = useKoSubscribableChildren(userState, ['users']);
 
-  const [users, total, groupedUsers] = useMemo(() => {
+  const [users, total] = useMemo(() => {
     const users: User[] = message.qualifiedIds.reduce<User[]>((previous, current) => {
       const foundUser = allUsers.find(user => matchQualifiedIds(current, user.qualifiedId));
       return foundUser ? [...previous, foundUser] : previous;
     }, []);
-    const groupedUsers = groupBy(users, user => user.domain);
     const total = users.length;
-    return [users, total, groupedUsers];
+    return [users, total];
   }, [allUsers, message.qualifiedIds]);
 
   if (users.length === 0) {
@@ -129,6 +153,10 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
       </Link>
     </>
   );
+
+  const DetailsMessageComponent = FailureReasonToDetailsComponent[message.reason];
+  // FIXME: this is the MVP version, remove when the full specs are implemented
+  //const DetailsMessageComponent = FailureReasonToDetailsComponent[AddUsersFailureReasons.NON_FEDERATING_BACKENDS];
 
   return (
     <>
@@ -178,24 +206,8 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
         </p>
       </div>
       <div className="message-body" css={{flexDirection: 'column'}}>
-        {isOpen && (
-          <>
-            {message.reason === AddUsersFailureReasons.UNREACHABLE_BACKENDS && (
-              <>
-                {Object.entries(groupedUsers).map(([domain, domainUsers]) => (
-                  <MessageDetails key={domain} domain={domain} message={message} users={domainUsers}>
-                    {learnMore}
-                  </MessageDetails>
-                ))}
-              </>
-            )}
-            {message.reason === AddUsersFailureReasons.NON_FEDERATING_BACKENDS && (
-              <MessageDetails message={message} users={users}>
-                {learnMore}
-              </MessageDetails>
-            )}
-          </>
-        )}
+        {isOpen && <DetailsMessageComponent users={users}>{learnMore}</DetailsMessageComponent>}
+
         {total > 1 && (
           <div>
             <Button
