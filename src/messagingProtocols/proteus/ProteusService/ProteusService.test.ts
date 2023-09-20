@@ -739,6 +739,7 @@ describe('ProteusService', () => {
 
       expect(failedToAdd).toEqual({
         reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS,
+        backends: ['domain1'],
         users: expect.arrayContaining([...usersDomain1, ...usersDomain1]),
       });
     });
@@ -766,6 +767,7 @@ describe('ProteusService', () => {
 
       expect(failedToAdd).toEqual({
         reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS,
+        backends: [domain1, domain2],
         users: expect.arrayContaining([...usersDomain1, ...usersDomain1]),
       });
     });

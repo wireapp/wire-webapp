@@ -129,6 +129,8 @@ export enum AddUsersFailureReasons {
 export type AddUsersFailure = {
   users: QualifiedId[];
   reason: AddUsersFailureReasons;
+  /** the backends that caused the failure */
+  backends: string[];
 };
 
 /**
