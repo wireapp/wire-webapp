@@ -154,9 +154,10 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
     </>
   );
 
-  const DetailsMessageComponent = FailureReasonToDetailsComponent[message.reason];
-  // FIXME: this is the MVP version, remove when the full specs are implemented
-  //const DetailsMessageComponent = FailureReasonToDetailsComponent[AddUsersFailureReasons.NON_FEDERATING_BACKENDS];
+  // FIXME: this is the MVP version, remove the condition when full specs are implemented
+  const DetailsMessageComponent = false
+    ? FailureReasonToDetailsComponent[message.reason]
+    : FailureReasonToDetailsComponent[AddUsersFailureReasons.NON_FEDERATING_BACKENDS];
 
   return (
     <>
