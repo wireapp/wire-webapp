@@ -305,7 +305,7 @@ export class Account extends TypedEventEmitter<Events> {
       await this.service.mls.checkExistingPendingProposals();
 
       // initialize scheduler for syncing key packages with backend
-      this.service.mls.checkForKeyPackagesBackendSync();
+      this.service.mls.schedulePeriodicKeyPackagesBackendSync(validClient.id);
 
       // leave stale conference subconversations (e.g after a crash)
       await this.service.mls.leaveStaleConferenceSubconversations();
