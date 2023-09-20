@@ -18,6 +18,7 @@
  */
 
 import {ClientType, RegisteredClient} from '@wireapp/api-client/lib/client';
+import {CONVERSATION_EVENT, ConversationMLSWelcomeEvent} from '@wireapp/api-client/lib/event';
 
 import {randomUUID} from 'crypto';
 
@@ -42,6 +43,7 @@ describe('MLSService', () => {
     clientKeypackages: jest.fn(),
     mlsInit: jest.fn(),
     clientPublicKey: jest.fn(),
+    processWelcomeMessage: jest.fn(),
   } as unknown as CoreCrypto;
 
   describe('registerConversation', () => {
@@ -200,6 +202,112 @@ describe('MLSService', () => {
       expect(mockCoreCrypto.mlsInit).toHaveBeenCalled();
       expect(apiClient.api.client.uploadMLSKeyPackages).not.toHaveBeenCalled();
       expect(apiClient.api.client.putClient).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('handleMLSWelcomeMessageEvent', () => {
+    it("before processing welcome it verifies that there's enough key packages locally", async () => {
+      const mlsService = new MLSService(apiClient, mockCoreCrypto, {});
+
+      const mockClientId = 'client-1';
+      const mockClient = {mls_public_keys: {ed25519: 'key'}, id: mockClientId} as unknown as RegisteredClient;
+
+      apiClient.context = {clientType: ClientType.PERMANENT, clientId: mockClientId, userId: ''};
+
+      const mockedClientKeyPackages = [new Uint8Array()];
+      jest.spyOn(mockCoreCrypto, 'clientKeypackages').mockResolvedValueOnce(mockedClientKeyPackages);
+
+      const numberOfKeysBelowThreshold = mlsService.config.minRequiredNumberOfAvailableKeyPackages - 1;
+      jest.spyOn(apiClient.api.client, 'getMLSKeyPackageCount').mockResolvedValueOnce(numberOfKeysBelowThreshold);
+      jest.spyOn(mockCoreCrypto, 'clientValidKeypackagesCount').mockResolvedValueOnce(numberOfKeysBelowThreshold);
+
+      jest.spyOn(apiClient.api.client, 'uploadMLSKeyPackages').mockResolvedValueOnce(undefined);
+      jest.spyOn(mockCoreCrypto, 'processWelcomeMessage').mockResolvedValueOnce(new Uint8Array());
+
+      jest.spyOn(mlsService, 'scheduleKeyMaterialRenewal').mockImplementation(jest.fn());
+
+      const mockedMLSWelcomeEvent: ConversationMLSWelcomeEvent = {
+        type: CONVERSATION_EVENT.MLS_WELCOME_MESSAGE,
+        conversation: '',
+        data: '',
+        from: '',
+        time: '',
+      };
+
+      await mlsService.handleMLSWelcomeMessageEvent(mockedMLSWelcomeEvent, mockClient.id);
+
+      expect(mockCoreCrypto.processWelcomeMessage).toHaveBeenCalled();
+      expect(apiClient.api.client.uploadMLSKeyPackages).toHaveBeenCalledWith(mockClientId, expect.anything());
+    });
+
+    it('before processing welcome it does not generate new keys if there is enough key packages locally', async () => {
+      const mlsService = new MLSService(apiClient, mockCoreCrypto, {});
+
+      const mockClientId = 'client-1';
+      const mockClient = {mls_public_keys: {ed25519: 'key'}, id: mockClientId} as unknown as RegisteredClient;
+
+      apiClient.context = {clientType: ClientType.PERMANENT, clientId: mockClientId, userId: ''};
+
+      const mockedClientKeyPackages = [new Uint8Array()];
+      jest.spyOn(mockCoreCrypto, 'clientKeypackages').mockResolvedValueOnce(mockedClientKeyPackages);
+
+      const numberOfKeysAboveThreshold = mlsService.config.minRequiredNumberOfAvailableKeyPackages + 1;
+      jest.spyOn(mockCoreCrypto, 'clientValidKeypackagesCount').mockResolvedValueOnce(numberOfKeysAboveThreshold);
+      jest.spyOn(apiClient.api.client, 'getMLSKeyPackageCount').mockResolvedValueOnce(numberOfKeysAboveThreshold);
+
+      jest.spyOn(apiClient.api.client, 'uploadMLSKeyPackages').mockResolvedValueOnce(undefined);
+      jest.spyOn(mockCoreCrypto, 'processWelcomeMessage').mockResolvedValueOnce(new Uint8Array());
+
+      jest.spyOn(mlsService, 'scheduleKeyMaterialRenewal').mockImplementation(jest.fn());
+
+      const mockedMLSWelcomeEvent: ConversationMLSWelcomeEvent = {
+        type: CONVERSATION_EVENT.MLS_WELCOME_MESSAGE,
+        conversation: '',
+        data: '',
+        from: '',
+        time: '',
+      };
+
+      await mlsService.handleMLSWelcomeMessageEvent(mockedMLSWelcomeEvent, mockClient.id);
+
+      expect(mockCoreCrypto.processWelcomeMessage).toHaveBeenCalled();
+      expect(apiClient.api.client.uploadMLSKeyPackages).not.toHaveBeenCalled();
+    });
+
+    it('before processing welcome it does not generate new keys if there is enough key packages uploaded to backend', async () => {
+      const mlsService = new MLSService(apiClient, mockCoreCrypto, {});
+
+      const mockClientId = 'client-1';
+      const mockClient = {mls_public_keys: {ed25519: 'key'}, id: mockClientId} as unknown as RegisteredClient;
+
+      apiClient.context = {clientType: ClientType.PERMANENT, clientId: mockClientId, userId: ''};
+
+      const mockedClientKeyPackages = [new Uint8Array()];
+      jest.spyOn(mockCoreCrypto, 'clientKeypackages').mockResolvedValueOnce(mockedClientKeyPackages);
+
+      const numberOfKeysBelowThreshold = mlsService.config.minRequiredNumberOfAvailableKeyPackages - 1;
+      const numberOfKeysAboveThreshold = mlsService.config.minRequiredNumberOfAvailableKeyPackages + 1;
+
+      jest.spyOn(mockCoreCrypto, 'clientValidKeypackagesCount').mockResolvedValueOnce(numberOfKeysBelowThreshold);
+      jest.spyOn(apiClient.api.client, 'getMLSKeyPackageCount').mockResolvedValueOnce(numberOfKeysAboveThreshold);
+
+      jest.spyOn(apiClient.api.client, 'uploadMLSKeyPackages').mockResolvedValueOnce(undefined);
+      jest.spyOn(mockCoreCrypto, 'processWelcomeMessage').mockResolvedValueOnce(new Uint8Array());
+
+      jest.spyOn(mlsService, 'scheduleKeyMaterialRenewal').mockImplementation(jest.fn());
+
+      const mockedMLSWelcomeEvent: ConversationMLSWelcomeEvent = {
+        type: CONVERSATION_EVENT.MLS_WELCOME_MESSAGE,
+        conversation: '',
+        data: '',
+        from: '',
+        time: '',
+      };
+
+      await mlsService.handleMLSWelcomeMessageEvent(mockedMLSWelcomeEvent, mockClient.id);
+
+      expect(mockCoreCrypto.processWelcomeMessage).toHaveBeenCalled();
+      expect(apiClient.api.client.uploadMLSKeyPackages).not.toHaveBeenCalled();
     });
   });
 });

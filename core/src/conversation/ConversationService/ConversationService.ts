@@ -586,7 +586,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
   }
 
   private async handleMLSWelcomeMessageEvent(event: ConversationMLSWelcomeEvent) {
-    return this.mlsService.handleMLSWelcomeMessageEvent(event);
+    return this.mlsService.handleMLSWelcomeMessageEvent(event, this.apiClient.validatedClientId);
   }
 
   private async handleOtrMessageAddEvent(event: ConversationOtrMessageAddEvent) {
