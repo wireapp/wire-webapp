@@ -433,9 +433,7 @@ export class App {
       });
       const notificationsCount = eventRepository.notificationsTotal;
 
-      if (connections.length) {
-        await Promise.allSettled(conversationRepository.mapConnections(connections));
-      }
+      await conversationRepository.init1To1Conversations(connections, conversations);
 
       if (supportsMLS()) {
         // Once all the messages have been processed and the message sending queue freed we can now:
