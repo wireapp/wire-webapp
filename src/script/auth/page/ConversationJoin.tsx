@@ -265,7 +265,7 @@ const mapStateToProps = (state: RootState) => ({
   isAuthenticated: AuthSelector.isAuthenticated(state),
   isFetching: ConversationSelector.isFetching(state),
   isTemporaryGuest: SelfSelector.isTemporaryGuest(state),
-  selfName: SelfSelector.getSelfName(state),
+  selfName: !SelfSelector.isTemporaryGuest(state) && SelfSelector.getSelfName(state),
 });
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
