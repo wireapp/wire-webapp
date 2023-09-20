@@ -45,20 +45,21 @@ export interface FailedToAddUsersMessageProps {
   userState?: UserState;
 }
 
-const errorMessageType = {
-  [AddUsersFailureReasons.NON_FEDERATING_BACKENDS]: 'NonFederatingBackends',
-  [AddUsersFailureReasons.UNREACHABLE_BACKENDS]: 'OfflineBackend',
-} as const;
+// Mobile platforms are not using the full specs yet, we can uncomment this when they catch up
+// This is not used in the MVP specs
+// const errorMessageType = {
+//   [AddUsersFailureReasons.NON_FEDERATING_BACKENDS]: 'NonFederatingBackends',
+//   [AddUsersFailureReasons.UNREACHABLE_BACKENDS]: 'OfflineBackend',
+// } as const;
 
 const config = Config.getConfig();
 
 interface MessageDetailsProps {
   children: ReactNode;
-  message: FailedToAddUsersMessageEntity;
   users: User[];
   domain?: string;
 }
-const MessageDetails: FC<MessageDetailsProps> = ({users, children, message, domain = ''}) => {
+const MessageDetails = ({users, children, domain = ''}: MessageDetailsProps) => {
   return (
     <p
       data-uie-name="multi-user-not-added-details"
@@ -69,9 +70,9 @@ const MessageDetails: FC<MessageDetailsProps> = ({users, children, message, doma
         css={warning}
         dangerouslySetInnerHTML={{
           __html:
-            // Mobile platforms are not using the full specs yet, we can uncomment this if product decides to go with MVP specs
-            // t(`failedToAddParticipantsPluralDetailsMvp`, {
-            t(`failedToAddParticipantsPluralDetails${errorMessageType[message.reason]}`, {
+            // Mobile platforms are not using the full specs yet, we can uncomment this when they catch up
+            // t(`failedToAddParticipantsPluralDetails${errorMessageType[message.reason]}`, {
+            t(`failedToAddParticipantsPluralDetailsMvp`, {
               name: users[0].name(),
               names: users
                 .slice(1)
@@ -86,6 +87,32 @@ const MessageDetails: FC<MessageDetailsProps> = ({users, children, message, doma
   );
 };
 
+const UnreachableBackendMessageDetails = (props: MessageDetailsProps) => {
+  const groupedUsers = useMemo(() => {
+    return groupBy(props.users, user => user.domain);
+  }, [props.users]);
+
+  return (
+    <>
+      {Object.entries(groupedUsers).map(([domain, domainUsers]) => (
+        <MessageDetails {...props} key={domain} domain={domain} users={domainUsers} />
+      ))}
+    </>
+  );
+};
+
+const NonFederatingBackendMessageDetails = (props: MessageDetailsProps) => {
+  return <MessageDetails {...props} />;
+};
+
+/**
+ * mapping between failure reasons and the details component to display
+ */
+const FailureReasonToDetailsComponent: Record<AddUsersFailureReasons, FC<MessageDetailsProps>> = {
+  [AddUsersFailureReasons.UNREACHABLE_BACKENDS]: UnreachableBackendMessageDetails,
+  [AddUsersFailureReasons.NON_FEDERATING_BACKENDS]: NonFederatingBackendMessageDetails,
+};
+
 const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
   isMessageFocused,
   message,
@@ -98,14 +125,13 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
 
   const {users: allUsers} = useKoSubscribableChildren(userState, ['users']);
 
-  const [users, total, groupedUsers] = useMemo(() => {
+  const [users, total] = useMemo(() => {
     const users: User[] = message.qualifiedIds.reduce<User[]>((previous, current) => {
       const foundUser = allUsers.find(user => matchQualifiedIds(current, user.qualifiedId));
       return foundUser ? [...previous, foundUser] : previous;
     }, []);
-    const groupedUsers = groupBy(users, user => user.domain);
     const total = users.length;
-    return [users, total, groupedUsers];
+    return [users, total];
   }, [allUsers, message.qualifiedIds]);
 
   if (users.length === 0) {
@@ -128,6 +154,11 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
     </>
   );
 
+  // FIXME: this is the MVP version, remove the condition when full specs are implemented
+  const DetailsMessageComponent = false
+    ? FailureReasonToDetailsComponent[message.reason]
+    : FailureReasonToDetailsComponent[AddUsersFailureReasons.NON_FEDERATING_BACKENDS];
+
   return (
     <>
       <div className="message-header">
@@ -147,9 +178,9 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
                 css={warning}
                 dangerouslySetInnerHTML={{
                   __html:
-                    // Mobile platforms are not using the full specs yet, we can uncomment this if product decides to go with MVP specs
-                    // t(`failedToAddParticipantSingularMvp`, {
-                    t(`failedToAddParticipantSingular${errorMessageType[message.reason]}`, {
+                    // Mobile platforms are not using the full specs yet, we can uncomment this when they catch up
+                    // t(`failedToAddParticipantSingular${errorMessageType[message.reason]}`, {
+                    t(`failedToAddParticipantSingularMvp`, {
                       name: users[0].name(),
                       domain: users[0].domain,
                     }),
@@ -176,24 +207,8 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
         </p>
       </div>
       <div className="message-body" css={{flexDirection: 'column'}}>
-        {isOpen && (
-          <>
-            {message.reason === AddUsersFailureReasons.UNREACHABLE_BACKENDS && (
-              <>
-                {Object.entries(groupedUsers).map(([domain, domainUsers]) => (
-                  <MessageDetails key={domain} domain={domain} message={message} users={domainUsers}>
-                    {learnMore}
-                  </MessageDetails>
-                ))}
-              </>
-            )}
-            {message.reason === AddUsersFailureReasons.NON_FEDERATING_BACKENDS && (
-              <MessageDetails message={message} users={users}>
-                {learnMore}
-              </MessageDetails>
-            )}
-          </>
-        )}
+        {isOpen && <DetailsMessageComponent users={users}>{learnMore}</DetailsMessageComponent>}
+
         {total > 1 && (
           <div>
             <Button

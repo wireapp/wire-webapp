@@ -18,6 +18,7 @@
  */
 
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
@@ -27,12 +28,14 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {entities} from 'test/api/payloads';
 import {TestFactory} from 'test/helper/TestFactory';
 import {generateAPIUser} from 'test/helper/UserGenerator';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import {ConsentValue} from './ConsentValue';
 import {UserRepository} from './UserRepository';
 import {UserState} from './UserState';
 
 import {ClientMapper} from '../client/ClientMapper';
+import {ConnectionEntity} from '../connection/ConnectionEntity';
 import {User} from '../entity/User';
 import {EventRepository} from '../event/EventRepository';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
@@ -224,6 +227,29 @@ describe('UserRepository', () => {
 
         expect(userState.users()).toHaveLength(users.length + 1);
         expect(fetchUserSpy).toHaveBeenCalledWith(newUsers.map(user => user.qualified_id!));
+      });
+
+      it('assigns connections with users', async () => {
+        const newUsers = [generateAPIUser(), generateAPIUser()];
+        const users = [...localUsers, ...newUsers];
+        const userIds = users.map(user => user.qualified_id!);
+        jest.spyOn(userRepository['userService'], 'getUsers').mockResolvedValue({found: newUsers});
+
+        const createConnectionWithUser = (userId: QualifiedId) => {
+          const connection = new ConnectionEntity();
+          connection.userId = userId;
+          return connection;
+        };
+
+        const connections = users.map(user => createConnectionWithUser(user.qualified_id));
+
+        await userRepository.loadUsers(new User('self'), connections, [], userIds);
+
+        expect(userState.users()).toHaveLength(users.length + 1);
+        users.forEach(user => {
+          const localUser = userState.users().find(u => matchQualifiedIds(u.qualifiedId, user.qualified_id));
+          expect(localUser?.connection().userId).toEqual(user.qualified_id);
+        });
       });
 
       it('does not load users from backend if they are already in database', async () => {

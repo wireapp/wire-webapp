@@ -60,7 +60,7 @@ const MessageReactionsList: FC<MessageReactionsListProps> = ({reactions, ...prop
             index={index}
             emojiListCount={emojiListCount}
             {...emojiPillProps}
-            key={emojiUnicode}
+            key={emojiUnicode + index}
           />
         );
       })}
