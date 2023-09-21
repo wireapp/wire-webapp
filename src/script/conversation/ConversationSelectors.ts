@@ -18,6 +18,9 @@
  */
 
 import {CONVERSATION_TYPE, ConversationProtocol} from '@wireapp/api-client/lib/conversation/';
+import {QualifiedId} from '@wireapp/api-client/lib/user/';
+
+import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import {Conversation} from '../entity/Conversation';
 
@@ -26,10 +29,8 @@ export type MixedConversation = Conversation & {groupId: string; protocol: Conve
 export type MLSConversation = Conversation & {groupId: string; protocol: ConversationProtocol.MLS};
 export type MLSCapableConversation = MixedConversation | MLSConversation;
 
-export interface ProtocolToConversationType {
-  [ConversationProtocol.PROTEUS]: ProteusConversation;
-  [ConversationProtocol.MLS]: MLSConversation;
-}
+export type ProtocolTo1To1ConversationType<Protocol extends ConversationProtocol.PROTEUS | ConversationProtocol.MLS> =
+  Protocol extends ConversationProtocol.PROTEUS ? ProteusConversation[] : MLSConversation;
 
 export function isProteusConversation(conversation: Conversation): conversation is ProteusConversation {
   return !conversation.groupId && conversation.protocol === ConversationProtocol.PROTEUS;
@@ -54,3 +55,34 @@ export function isSelfConversation(conversation: Conversation): boolean {
 export function isTeamConversation(conversation: Conversation): boolean {
   return conversation.type() === CONVERSATION_TYPE.GLOBAL_TEAM;
 }
+
+interface ProtocolToConversationType {
+  [ConversationProtocol.PROTEUS]: ProteusConversation;
+  [ConversationProtocol.MLS]: MLSConversation;
+}
+
+export const is1to1ConversationWithUser =
+  <Protocol extends ConversationProtocol.PROTEUS | ConversationProtocol.MLS>(userId: QualifiedId, protocol: Protocol) =>
+  (conversation: Conversation): conversation is ProtocolToConversationType[Protocol] => {
+    const doesProtocolMatch =
+      protocol === ConversationProtocol.PROTEUS ? isProteusConversation(conversation) : isMLSConversation(conversation);
+
+    if (!doesProtocolMatch) {
+      return false;
+    }
+
+    const connection = conversation.connection();
+    if (connection.userId) {
+      return matchQualifiedIds(connection.userId, userId);
+    }
+
+    if (!conversation.is1to1()) {
+      return false;
+    }
+
+    const conversationMembersIds = conversation.participating_user_ids();
+    const otherUserQualifiedId = conversationMembersIds.length === 1 ? conversationMembersIds[0] : null;
+    const doesUserIdMatch = !!otherUserQualifiedId && matchQualifiedIds(otherUserQualifiedId, userId);
+
+    return doesUserIdMatch;
+  };

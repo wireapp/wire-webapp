@@ -1200,7 +1200,7 @@ export class ConversationRepository {
     const {protocol, isMLSSupportedByTheOtherUser, isProteusSupportedByTheOtherUser} =
       await this.getProtocolFor1to1Conversation(otherUserId);
 
-    const localMLSConversation = this.conversationState.find1to1Conversation(otherUserId, ConversationProtocol.MLS);
+    const localMLSConversation = this.conversationState.findMLS1to1Conversation(otherUserId);
 
     if (protocol === ConversationProtocol.MLS || localMLSConversation) {
       return this.initMLS1to1Conversation(otherUserId, isMLSSupportedByTheOtherUser);
@@ -1435,7 +1435,7 @@ export class ConversationRepository {
    * @returns MLS conversation entity
    */
   private readonly getMLS1to1Conversation = async (otherUserId: QualifiedId): Promise<MLSConversation> => {
-    const localMLSConversation = this.conversationState.find1to1Conversation(otherUserId, ConversationProtocol.MLS);
+    const localMLSConversation = this.conversationState.findMLS1to1Conversation(otherUserId);
 
     if (localMLSConversation) {
       return localMLSConversation;
@@ -1472,15 +1472,22 @@ export class ConversationRepository {
    * @param mlsConversation - mls 1:1 conversation
    */
   private readonly replaceProteus1to1WithMLS = async (
-    proteusConversation: ProteusConversation,
+    proteusConversations: ProteusConversation[],
     mlsConversation: MLSConversation,
   ) => {
-    this.logger.info(
-      `Replacing proteus 1:1 conversation ${proteusConversation.id} with mls 1:1 conversation ${mlsConversation.id}`,
-    );
+    this.logger.info(`Replacing proteus 1:1 conversation(s) with mls 1:1 conversation ${mlsConversation.id}`);
 
     this.logger.info('Moving events from proteus 1:1 conversation to MLS 1:1 conversation');
-    await this.eventService.moveEventsToConversation(proteusConversation.id, mlsConversation.id);
+
+    await Promise.all(
+      proteusConversations.map(proteusConversation =>
+        this.eventService.moveEventsToConversation(proteusConversation.id, mlsConversation.id),
+      ),
+    );
+
+    const mostRecentlyUsedProteusConversation = proteusConversations.sort(
+      (a, b) => b.last_event_timestamp() - a.last_event_timestamp(),
+    )[0];
 
     // Before we delete the proteus 1:1 conversation, we need to make sure all the local properties are also migrated
     const {
@@ -1496,7 +1503,7 @@ export class ConversationRepository {
       mutedTimestamp,
       status,
       verification_state,
-    } = proteusConversation;
+    } = mostRecentlyUsedProteusConversation;
 
     const updates: Partial<Record<keyof Conversation, any>> = {
       archivedState: archivedState(),
@@ -1515,8 +1522,12 @@ export class ConversationRepository {
 
     ConversationMapper.updateProperties(mlsConversation, updates);
 
-    this.logger.info(`Deleting proteus 1:1 conversation ${proteusConversation.id}`);
-    await this.deleteConversationLocally(proteusConversation.qualifiedId, true);
+    await Promise.all(
+      proteusConversations.map(proteusConversation => {
+        this.logger.info(`Deleting proteus 1:1 conversation ${proteusConversation.id}`);
+        return this.deleteConversationLocally(proteusConversation.qualifiedId, true);
+      }),
+    );
 
     //TODO: maintain the list of retired proteus 1:1 conversations so they are not requested from backend anymore
   };
@@ -1595,16 +1606,15 @@ export class ConversationRepository {
     const otherUser = await this.userRepository.getUserById(otherUserId);
     mlsConversation.connection(otherUser.connection());
 
-    const localProteusConversation = this.conversationState.find1to1Conversation(
-      otherUserId,
-      ConversationProtocol.PROTEUS,
-    );
+    const localProteusConversations = this.conversationState.findProteus1to1Conversations(otherUserId);
+
     const wasProteus1to1ActiveConversation =
-      !!localProteusConversation && this.conversationState.isActiveConversation(localProteusConversation);
+      localProteusConversations &&
+      localProteusConversations.some(conversation => this.conversationState.isActiveConversation(conversation));
 
     // If proteus 1:1 conversation with the same user is known, we have to make sure it is replaced with mls 1:1 conversation
-    if (localProteusConversation) {
-      await this.replaceProteus1to1WithMLS(localProteusConversation, mlsConversation);
+    if (localProteusConversations) {
+      await this.replaceProteus1to1WithMLS(localProteusConversations, mlsConversation);
     }
 
     if (wasProteus1to1ActiveConversation) {
@@ -1718,7 +1728,7 @@ export class ConversationRepository {
     }
 
     // If there's local mls conversation, we want to use it
-    const localMLSConversation = this.conversationState.find1to1Conversation(otherUserId, ConversationProtocol.MLS);
+    const localMLSConversation = this.conversationState.findMLS1to1Conversation(otherUserId);
 
     // If both users support mls or mls conversation is already known, we use it
     // we never go back to proteus conversation, even if one of the users do not support mls anymore
@@ -1756,7 +1766,7 @@ export class ConversationRepository {
     const {protocol, isMLSSupportedByTheOtherUser, isProteusSupportedByTheOtherUser} =
       await this.getProtocolFor1to1Conversation(otherUserId);
 
-    const localMLSConversation = this.conversationState.find1to1Conversation(otherUserId, ConversationProtocol.MLS);
+    const localMLSConversation = this.conversationState.findMLS1to1Conversation(otherUserId);
 
     // If it's accepted, initialise conversation so it's ready to be used
     if (isConnectionAccepted) {

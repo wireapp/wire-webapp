@@ -27,9 +27,10 @@ import {matchQualifiedIds} from 'Util/QualifiedId';
 import {sortGroupsByLastEvent} from 'Util/util';
 
 import {
-  ProtocolToConversationType,
+  MLSConversation,
+  ProteusConversation,
+  is1to1ConversationWithUser,
   isMLSConversation,
-  isProteusConversation,
   isSelfConversation,
 } from './ConversationSelectors';
 
@@ -199,42 +200,26 @@ export class ConversationState {
   }
 
   /**
-   * Find a local 1:1 conversation by user Id and procotol (proteus or mls).
-   * @returns Conversation if locally available, otherwise null
+   * Find a local 1:1 proteus conversation with a user.
+   * Because of team-owned 1:1 conversations work (they are really group conversations),
+   * it's possible that there is more that one proteus 1:1 team conversation with the same user.
+   * @returns ProteusConversation if locally available, otherwise null
    */
-  find1to1Conversation<Protocol extends ConversationProtocol.PROTEUS | ConversationProtocol.MLS>(
-    userId: QualifiedId,
-    protocol: Protocol,
-  ): ProtocolToConversationType[Protocol] | null {
-    const foundConversation = this.conversations().find(
-      (conversation): conversation is ProtocolToConversationType[Protocol] => {
-        const doesProtocolMatch =
-          protocol === ConversationProtocol.PROTEUS
-            ? isProteusConversation(conversation)
-            : isMLSConversation(conversation);
-
-        if (!doesProtocolMatch) {
-          return false;
-        }
-
-        const connection = conversation.connection();
-        if (connection.userId) {
-          return matchQualifiedIds(connection.userId, userId);
-        }
-
-        if (!conversation.is1to1()) {
-          return false;
-        }
-
-        const conversationMembersIds = conversation.participating_user_ids();
-        const otherUserQualifiedId = conversationMembersIds.length === 1 ? conversationMembersIds[0] : null;
-        const doesUserIdMatch = !!otherUserQualifiedId && matchQualifiedIds(otherUserQualifiedId, userId);
-
-        return doesUserIdMatch;
-      },
+  findProteus1to1Conversations(userId: QualifiedId): ProteusConversation[] | null {
+    const foundConversations = this.conversations().filter(
+      is1to1ConversationWithUser(userId, ConversationProtocol.PROTEUS),
     );
 
-    return foundConversation || null;
+    return foundConversations.length > 0 ? foundConversations : null;
+  }
+
+  /**
+   * Find a local 1:1 mls conversation with a user.
+   * @returns Conversation if locally available, otherwise null
+   */
+  findMLS1to1Conversation(userId: QualifiedId): MLSConversation | null {
+    const mlsConversation = this.conversations().find(is1to1ConversationWithUser(userId, ConversationProtocol.MLS));
+    return mlsConversation || null;
   }
 
   isSelfConversation(conversationId: QualifiedId): boolean {
