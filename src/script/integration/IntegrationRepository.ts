@@ -43,7 +43,9 @@ import {TeamState} from '../team/TeamState';
 
 export class IntegrationRepository {
   private readonly logger: Logger;
+
   public readonly isTeam: ko.PureComputed<boolean>;
+
   public readonly services: ko.ObservableArray<ServiceEntity>;
 
   /**

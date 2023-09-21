@@ -91,7 +91,9 @@ declare global {
 const maxGroupSize = 4;
 export class CallingViewModel {
   readonly activeCalls: ko.PureComputed<Call[]>;
+
   readonly callActions: CallActions;
+
   readonly isSelfVerified: ko.Computed<boolean>;
 
   constructor(
@@ -226,7 +228,7 @@ export class CallingViewModel {
         return;
       }
 
-      //we don't want to react to avs callbacks when conversation was not yet established
+      // we don't want to react to avs callbacks when conversation was not yet established
       const doesMLSGroupExist = await this.mlsService.conversationExists(subconversationGroupId);
       if (!doesMLSGroupExist) {
         return;
@@ -303,7 +305,7 @@ export class CallingViewModel {
 
       for (const member of members) {
         const isSelfClient = member.userId.id === this.core.userId && member.clientid === this.core.clientId;
-        //no need to set a timer for selfClient (it will most likely leave or get dropped from the call before the timer could expire)
+        // no need to set a timer for selfClient (it will most likely leave or get dropped from the call before the timer could expire)
         if (isSelfClient) {
           continue;
         }
@@ -355,13 +357,13 @@ export class CallingViewModel {
       }
     };
 
-    //update epoch info when AVS requests new epoch
+    // update epoch info when AVS requests new epoch
     this.callingRepository.onRequestNewEpochCallback(conversationId => updateEpochInfo(conversationId, true));
 
-    //once the call gets closed (eg. we leave a call or get dropped), we remove ourselfes from subconversation and unsubscribe from all the call events
+    // once the call gets closed (eg. we leave a call or get dropped), we remove ourselfes from subconversation and unsubscribe from all the call events
     this.callingRepository.onCallClosed(closeCall);
 
-    //handle participant change avs callback to detect stale clients in subconversations
+    // handle participant change avs callback to detect stale clients in subconversations
     this.callingRepository.onCallParticipantChangedCallback(handleCallParticipantChange);
 
     this.callActions = {

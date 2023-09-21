@@ -53,7 +53,7 @@ export interface UserListItemProps {
   showArrow: boolean;
 }
 
-const UserListItem = ({
+function UserListItem({
   canSelect,
   customInfo,
   external,
@@ -68,7 +68,7 @@ const UserListItem = ({
   selfInTeam,
   onClick,
   onKeyDown,
-}: UserListItemProps) => {
+}: UserListItemProps) {
   const checkboxId = useId();
 
   const {
@@ -110,7 +110,7 @@ const UserListItem = ({
 
   const contentInfoText = getContentInfoText();
 
-  const RenderParticipant = () => {
+  function RenderParticipant() {
     return (
       <div css={listItem(noInteraction)} data-uie-name="item-user" data-uie-value={userName}>
         <Avatar avatarSize={AVATAR_SIZE.SMALL} participant={user} aria-hidden="true" css={{margin: '0 16px'}} />
@@ -135,7 +135,7 @@ const UserListItem = ({
         />
       </div>
     );
-  };
+  }
 
   const dataUieValues = {
     'data-uie-name': 'highlighted',
@@ -181,6 +181,6 @@ const UserListItem = ({
       )}
     </>
   );
-};
+}
 
 export {UserListItem};

@@ -23,7 +23,7 @@ import {DeviceId} from './DeviceId';
 
 describe('DeviceId', () => {
   it('can print device id', () => {
-    const {getAllByTestId} = render(<DeviceId deviceId={'66e66c79e8d1dea4'} />);
+    const {getAllByTestId} = render(<DeviceId deviceId="66e66c79e8d1dea4" />);
 
     const deviceIdParts = getAllByTestId('element-device-id-part').map(node => node.textContent);
 
@@ -31,7 +31,7 @@ describe('DeviceId', () => {
   });
 
   it('can print device id and apply padding', () => {
-    const {getAllByTestId} = render(<DeviceId deviceId={'6e66c79e8d1dea4'} />);
+    const {getAllByTestId} = render(<DeviceId deviceId="6e66c79e8d1dea4" />);
 
     const deviceIdParts = getAllByTestId('element-device-id-part').map(node => node.textContent);
 

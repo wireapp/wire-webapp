@@ -53,7 +53,7 @@ describe('fullscreenVideoCall', () => {
     const props: Partial<FullscreenVideoCallProps> = {
       call,
       canShareScreen: false,
-      conversation: conversation,
+      conversation,
       isChoosingScreen: false,
       isMuted: false,
       mediaDevicesHandler: {

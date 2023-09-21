@@ -144,7 +144,7 @@ const AppMain: FC<AppMainProps> = ({
       const mostRecentConversation = conversationState.getMostRecentConversation();
       if (mostRecentConversation) {
         navigate(generateConversationUrl(mostRecentConversation.qualifiedId));
-      } else if (repositories.user['userState'].connectRequests().length) {
+      } else if (repositories.user.userState.connectRequests().length) {
         amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentState.CONNECTION_REQUESTS);
       }
     };
@@ -261,7 +261,7 @@ const AppMain: FC<AppMainProps> = ({
             cryptographyRepository={repositories.cryptography}
           />
 
-          {/*The order of these elements matter to show proper modals stack upon each other*/}
+          {/* The order of these elements matter to show proper modals stack upon each other */}
           <UserModal selfUser={selfUser} userRepository={repositories.user} />
           <PrimaryModalComponent />
           <GroupCreationModal userState={userState} teamState={teamState} />

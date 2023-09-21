@@ -34,7 +34,7 @@ export function parseError(error: any): JSX.Element | null {
       );
     }
     return (
-      <ErrorMessage data-uie-name="error-message" data-uie-value={'unexpected-error'}>
+      <ErrorMessage data-uie-name="error-message" data-uie-value="unexpected-error">
         <FormattedMessage {...errorHandlerStrings.unexpected} values={error} />
       </ErrorMessage>
     );

@@ -28,7 +28,7 @@ type Payload =
 
 export async function handleZipEvent(payload: Payload) {
   const zip = new JSZip();
-  const encrytionKey = payload.encrytionKey;
+  const {encrytionKey} = payload;
   switch (payload.type) {
     case 'zip':
       for (const [filename, file] of Object.entries(payload.files)) {
@@ -47,7 +47,7 @@ export async function handleZipEvent(payload: Payload) {
     case 'unzip':
       let decryptedBytes;
 
-      if (!!encrytionKey) {
+      if (encrytionKey) {
         // Decrypt the ZIP archive using the provided encrytionKey
         const payloadBytes = new Uint8Array(payload.bytes);
         const headerLength = payload.headerLength ? payload.headerLength : 0;

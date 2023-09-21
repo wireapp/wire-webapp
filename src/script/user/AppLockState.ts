@@ -30,12 +30,19 @@ const defaultTimeoutSecs = 10;
 @singleton()
 export class AppLockState {
   public readonly isAppLockAvailable: ko.PureComputed<boolean>;
+
   public readonly isAppLockEnforced: ko.PureComputed<boolean>;
+
   public readonly isAppLockActivated: ko.PureComputed<boolean>;
+
   public readonly appLockInactivityTimeoutSecs: ko.PureComputed<number>;
+
   public readonly isAppLockEnabled: ko.PureComputed<boolean>;
+
   public readonly hasPassphrase: ko.Observable<boolean>;
+
   public readonly isActivatedInPreferences: ko.Observable<boolean>;
+
   public readonly isAppLockDisabledOnTeam: ko.PureComputed<boolean>;
 
   constructor(teamState = container.resolve(TeamState)) {

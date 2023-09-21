@@ -39,7 +39,9 @@ import type {UserRepository} from '../user/UserRepository';
 
 export class SearchRepository {
   logger: Logger;
+
   private readonly searchService: SearchService;
+
   private readonly userRepository: UserRepository;
 
   static get CONFIG() {

@@ -43,12 +43,12 @@ import {parseError} from '../util/errorUtil';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
-const VerifyPhoneCodeComponent = ({
+function VerifyPhoneCodeComponent({
   doLogin,
   resetAuthError,
   loginData,
   doSendPhoneLoginCode,
-}: Props & ConnectedProps & DispatchProps) => {
+}: Props & ConnectedProps & DispatchProps) {
   const {formatMessage: _} = useIntl();
   const [error, setError] = useState<ValidationError | null>(null);
   const navigate = useNavigate();
@@ -138,7 +138,7 @@ const VerifyPhoneCodeComponent = ({
       </ContainerXS>
     </Page>
   );
-};
+}
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({

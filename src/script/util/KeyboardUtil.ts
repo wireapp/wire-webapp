@@ -105,7 +105,7 @@ export const insertAtCaret = (areaId: string, text: string) => {
   const back = textArea.value.substring(strPos, textArea.value.length);
 
   textArea.value = `${front}${text}${back}`;
-  strPos = strPos + text.length;
+  strPos += text.length;
 
   if (br === 'ie') {
     textArea.focus();

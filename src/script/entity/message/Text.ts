@@ -32,8 +32,11 @@ import type {MentionEntity} from '../../message/MentionEntity';
 
 export class Text extends Asset {
   public readonly mentions: ko.ObservableArray<MentionEntity>;
+
   public readonly previews: ko.ObservableArray<LinkPreview>;
+
   public readonly should_render_text: ko.PureComputed<boolean>;
+
   /** Raw message text */
   public text: string;
 

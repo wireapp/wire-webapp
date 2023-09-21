@@ -26,6 +26,7 @@ import {AvatarImage} from './AvatarImage';
 
 import {AssetRepository} from '../../assets/AssetRepository';
 import {User} from '../../entity/User';
+
 jest.mock('../../auth/util/SVGProvider');
 
 describe('AvatarImage', () => {

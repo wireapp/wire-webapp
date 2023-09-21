@@ -73,7 +73,7 @@ const CollectionDetails: React.FC<CollectionDetailsProps> = ({
             className="content-titlebar-icon icon-back"
             data-uie-name="do-collection-details-close"
             onClick={onClose}
-          ></button>
+          />
         </div>
         <span className="content-titlebar-items-center" data-uie-name="collection-details-conversation-name">
           {display_name}

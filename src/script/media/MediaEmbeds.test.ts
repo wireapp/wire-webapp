@@ -69,7 +69,7 @@ describe('MediaEmbeds', () => {
   };
 
   describe('regex', () => {
-    const regex = MediaEmbeds.regex;
+    const {regex} = MediaEmbeds;
 
     describe('Spotify', () => {
       const re_spotify = regex.spotify;

@@ -498,7 +498,7 @@ const AppLock: React.FC<AppLockProps> = ({
         )}
 
         {state === APPLOCK_STATE.FORGOT && (
-          <React.Fragment>
+          <>
             <div className="modal__text" data-uie-name="label-applock-forgot-text">
               {t('modalAppLockForgotMessage')}
             </div>
@@ -521,11 +521,11 @@ const AppLock: React.FC<AppLockProps> = ({
                 {t('modalAppLockForgotGoBackButton')}
               </button>
             </div>
-          </React.Fragment>
+          </>
         )}
 
         {state === APPLOCK_STATE.WIPE_CONFIRM && (
-          <React.Fragment>
+          <>
             <div className="modal__text" data-uie-name="label-applock-wipe-confirm-text">
               {t('modalAppLockWipeConfirmMessage')}
             </div>
@@ -543,7 +543,7 @@ const AppLock: React.FC<AppLockProps> = ({
                 {t('modalAppLockWipeConfirmConfirmButton')}
               </button>
             </div>
-          </React.Fragment>
+          </>
         )}
 
         {state === APPLOCK_STATE.WIPE_PASSWORD && (

@@ -29,7 +29,7 @@ interface ImageUploadButtonProps {
   acceptedImageTypes: ReadonlyArray<string>;
 }
 
-export const ImageUploadButton = ({onSelectImages, acceptedImageTypes}: ImageUploadButtonProps) => {
+export function ImageUploadButton({onSelectImages, acceptedImageTypes}: ImageUploadButtonProps) {
   const imageRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -68,4 +68,4 @@ export const ImageUploadButton = ({onSelectImages, acceptedImageTypes}: ImageUpl
       </button>
     </form>
   );
-};
+}

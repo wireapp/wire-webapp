@@ -31,7 +31,9 @@ import type {EventService} from '../EventService';
 
 export class ReceiptsMiddleware {
   private readonly eventService: EventService;
+
   private readonly conversationRepository: ConversationRepository;
+
   private readonly logger: Logger;
 
   constructor(
@@ -85,7 +87,7 @@ export class ReceiptsMiddleware {
     originalEvent: EventRecord,
     confirmationEvent: EventRecord,
   ): Promise<EventRecord | void> {
-    const status = confirmationEvent.data.status;
+    const {status} = confirmationEvent.data;
     const currentReceipts = ('read_receipts' in originalEvent && originalEvent.read_receipts) || [];
 
     // I shouldn't receive this read receipt

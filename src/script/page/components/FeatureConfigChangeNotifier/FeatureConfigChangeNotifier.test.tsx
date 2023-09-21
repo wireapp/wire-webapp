@@ -76,7 +76,7 @@ describe('FeatureConfigChangeNotifier', () => {
     ],
   ] as const)('shows a modal when feature %s is turned on and off', async (feature, enabledString, disabledString) => {
     const teamState = new TeamState();
-    render(<FeatureConfigChangeNotifier selfUserId={'self'} teamState={teamState} />);
+    render(<FeatureConfigChangeNotifier selfUserId="self" teamState={teamState} />);
     act(() => {
       teamState.teamFeatures(baseConfig);
     });
@@ -126,13 +126,13 @@ describe('FeatureConfigChangeNotifier', () => {
     const teamState = new TeamState();
     teamState.teamFeatures(baseConfig);
 
-    const {unmount} = render(<FeatureConfigChangeNotifier selfUserId={'self'} teamState={teamState} />);
+    const {unmount} = render(<FeatureConfigChangeNotifier selfUserId="self" teamState={teamState} />);
 
     unmount();
     expect(showModalSpy).not.toHaveBeenCalled();
 
     teamState.teamFeatures({...baseConfig, [FEATURE_KEY.FILE_SHARING]: {status: FeatureStatus.ENABLED}});
-    render(<FeatureConfigChangeNotifier selfUserId={'self'} teamState={teamState} />);
+    render(<FeatureConfigChangeNotifier selfUserId="self" teamState={teamState} />);
     expect(showModalSpy).toHaveBeenCalledTimes(1);
   });
 
@@ -161,7 +161,7 @@ describe('FeatureConfigChangeNotifier', () => {
     'indicates the config change when self deleting messages have changed (%s) to (%s)',
     async (fromStatus, toStatus, expectedText) => {
       const teamState = new TeamState();
-      render(<FeatureConfigChangeNotifier selfUserId={'self'} teamState={teamState} />);
+      render(<FeatureConfigChangeNotifier selfUserId="self" teamState={teamState} />);
       act(() => {
         teamState.teamFeatures({
           ...baseConfig,

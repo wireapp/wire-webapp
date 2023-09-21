@@ -58,7 +58,7 @@ describe('User Mapper', () => {
           id: 'id',
           locale: '',
           name: 'user',
-          qualified_id: {domain: domain, id: 'id'},
+          qualified_id: {domain, id: 'id'},
         },
         'local.test',
       );
@@ -180,7 +180,7 @@ describe('User Mapper', () => {
       const expirationDate = new Date('2018-10-16T09:16:41.294Z');
       const adjustedExpirationDate = new Date('2018-10-16T09:16:59.294Z');
 
-      spyOn(mapper['serverTimeHandler'], 'toLocalTimestamp').and.returnValue(adjustedExpirationDate.getTime());
+      spyOn(mapper.serverTimeHandler, 'toLocalTimestamp').and.returnValue(adjustedExpirationDate.getTime());
       spyOn(userEntity, 'setGuestExpiration').and.callFake(timestamp => {
         expect(timestamp).toEqual(adjustedExpirationDate.getTime());
       });
@@ -188,10 +188,10 @@ describe('User Mapper', () => {
       const data = {expires_at: expirationDate.toISOString(), id: userEntity.id};
       mapper.updateUserFromObject(userEntity, data, '');
 
-      expect(mapper['serverTimeHandler'].toLocalTimestamp).not.toHaveBeenCalledWith();
-      mapper['serverTimeHandler'].timeOffset(10);
+      expect(mapper.serverTimeHandler.toLocalTimestamp).not.toHaveBeenCalledWith();
+      mapper.serverTimeHandler.timeOffset(10);
 
-      expect(mapper['serverTimeHandler'].toLocalTimestamp).toHaveBeenCalledWith(expirationDate.getTime());
+      expect(mapper.serverTimeHandler.toLocalTimestamp).toHaveBeenCalledWith(expirationDate.getTime());
     });
 
     it('cannot update the user name of a wrong user', () => {

@@ -21,9 +21,9 @@ import Cookies from 'js-cookie';
 
 import {Runtime} from '@wireapp/commons';
 
-import {RuntimeActionCreator} from './creator/';
+import {RuntimeActionCreator} from './creator';
 
-import * as RuntimeSelector from '../../module/selector/RuntimeSelector';
+import * as RuntimeSelector from '../selector/RuntimeSelector';
 import {QUERY_KEY} from '../../route';
 import type {ThunkAction} from '../reducer';
 

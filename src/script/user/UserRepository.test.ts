@@ -47,19 +47,17 @@ describe('UserRepository', () => {
 
   beforeAll(async () => {
     userRepository = await testFactory.exposeUserActors();
-    userState = userRepository['userState'];
+    userState = userRepository.userState;
   });
 
   afterEach(() => {
-    userRepository['userState'].users.removeAll();
+    userRepository.userState.users.removeAll();
   });
 
   describe('Account preferences', () => {
     describe('Data usage permissions', () => {
       it('syncs the "Send anonymous data" preference through WebSocket events', () => {
-        const setPropertyMock = jest
-          .spyOn(userRepository['propertyRepository'], 'setProperty')
-          .mockReturnValue(undefined);
+        const setPropertyMock = jest.spyOn(userRepository.propertyRepository, 'setProperty').mockReturnValue(undefined);
         const turnOnErrorReporting = {
           key: 'webapp',
           type: 'user.properties-set',
@@ -98,12 +96,10 @@ describe('UserRepository', () => {
       });
 
       it('syncs the "Receive newsletter" preference through WebSocket events', () => {
-        const setPropertyMock = jest
-          .spyOn(userRepository['propertyRepository'], 'setProperty')
-          .mockReturnValue(undefined);
+        const setPropertyMock = jest.spyOn(userRepository.propertyRepository, 'setProperty').mockReturnValue(undefined);
 
         const deletePropertyMock = jest
-          .spyOn(userRepository['propertyRepository'], 'deleteProperty')
+          .spyOn(userRepository.propertyRepository, 'deleteProperty')
           .mockReturnValue(undefined);
 
         const giveOnMarketingConsent = {
@@ -130,12 +126,10 @@ describe('UserRepository', () => {
 
     describe('Privacy', () => {
       it('syncs the "Read receipts" preference through WebSocket events', () => {
-        const setPropertyMock = jest
-          .spyOn(userRepository['propertyRepository'], 'setProperty')
-          .mockReturnValue(undefined);
+        const setPropertyMock = jest.spyOn(userRepository.propertyRepository, 'setProperty').mockReturnValue(undefined);
 
         const deletePropertyMock = jest
-          .spyOn(userRepository['propertyRepository'], 'deleteProperty')
+          .spyOn(userRepository.propertyRepository, 'deleteProperty')
           .mockReturnValue(undefined);
 
         const turnOnReceiptMode = {
@@ -166,7 +160,7 @@ describe('UserRepository', () => {
 
       beforeEach(() => {
         user = new User(entities.user.john_doe.id);
-        return userRepository['saveUser'](user);
+        return userRepository.saveUser(user);
       });
 
       afterEach(() => {
@@ -190,7 +184,7 @@ describe('UserRepository', () => {
       it('saves a user', () => {
         const user = new User(entities.user.jane_roe.id);
 
-        userRepository['saveUser'](user);
+        userRepository.saveUser(user);
 
         expect(userState.users().length).toBe(1);
         expect(userState.users()[0]).toBe(user);
@@ -199,7 +193,7 @@ describe('UserRepository', () => {
       it('saves self user', () => {
         const user = new User(entities.user.jane_roe.id);
 
-        userRepository['saveUser'](user, true);
+        userRepository.saveUser(user, true);
 
         expect(userState.users().length).toBe(1);
         expect(userState.users()[0]).toBe(user);
@@ -211,7 +205,7 @@ describe('UserRepository', () => {
       const localUsers = [generateAPIUser(), generateAPIUser(), generateAPIUser()];
       beforeEach(async () => {
         jest.resetAllMocks();
-        jest.spyOn(userRepository['userService'], 'loadUserFromDb').mockResolvedValue(localUsers);
+        jest.spyOn(userRepository.userService, 'loadUserFromDb').mockResolvedValue(localUsers);
         const selfUser = new User('self');
         selfUser.isMe = true;
         userState.users([selfUser]);
@@ -221,7 +215,7 @@ describe('UserRepository', () => {
         const newUsers = [generateAPIUser(), generateAPIUser()];
         const users = [...localUsers, ...newUsers];
         const userIds = users.map(user => user.qualified_id!);
-        const fetchUserSpy = jest.spyOn(userRepository['userService'], 'getUsers').mockResolvedValue({found: newUsers});
+        const fetchUserSpy = jest.spyOn(userRepository.userService, 'getUsers').mockResolvedValue({found: newUsers});
 
         await userRepository.loadUsers(new User('self'), [], [], userIds);
 
@@ -233,7 +227,7 @@ describe('UserRepository', () => {
         const newUsers = [generateAPIUser(), generateAPIUser()];
         const users = [...localUsers, ...newUsers];
         const userIds = users.map(user => user.qualified_id!);
-        jest.spyOn(userRepository['userService'], 'getUsers').mockResolvedValue({found: newUsers});
+        jest.spyOn(userRepository.userService, 'getUsers').mockResolvedValue({found: newUsers});
 
         const createConnectionWithUser = (userId: QualifiedId) => {
           const connection = new ConnectionEntity();
@@ -254,7 +248,7 @@ describe('UserRepository', () => {
 
       it('does not load users from backend if they are already in database', async () => {
         const userIds = localUsers.map(user => user.qualified_id!);
-        const fetchUserSpy = jest.spyOn(userRepository['userService'], 'getUsers').mockResolvedValue({found: []});
+        const fetchUserSpy = jest.spyOn(userRepository.userService, 'getUsers').mockResolvedValue({found: []});
 
         await userRepository.loadUsers(new User('self'), [], [], userIds);
 
@@ -269,10 +263,8 @@ describe('UserRepository', () => {
           {id: userIds[1].id, availability: Availability.Type.BUSY},
         ];
 
-        jest.spyOn(userRepository['userService'], 'loadUserFromDb').mockResolvedValue(partialUsers as any);
-        const fetchUserSpy = jest
-          .spyOn(userRepository['userService'], 'getUsers')
-          .mockResolvedValue({found: localUsers});
+        jest.spyOn(userRepository.userService, 'loadUserFromDb').mockResolvedValue(partialUsers as any);
+        const fetchUserSpy = jest.spyOn(userRepository.userService, 'getUsers').mockResolvedValue({found: localUsers});
 
         await userRepository.loadUsers(new User('self'), [], [], userIds);
 
@@ -286,8 +278,8 @@ describe('UserRepository', () => {
       it('deletes users that are not needed', async () => {
         const newUsers = [generateAPIUser(), generateAPIUser()];
         const userIds = newUsers.map(user => user.qualified_id!);
-        const removeUserSpy = jest.spyOn(userRepository['userService'], 'removeUserFromDb').mockResolvedValue();
-        jest.spyOn(userRepository['userService'], 'getUsers').mockResolvedValue({found: newUsers});
+        const removeUserSpy = jest.spyOn(userRepository.userService, 'removeUserFromDb').mockResolvedValue();
+        jest.spyOn(userRepository.userService, 'getUsers').mockResolvedValue({found: newUsers});
 
         await userRepository.loadUsers(new User(), [], [], userIds);
 
@@ -307,7 +299,7 @@ describe('UserRepository', () => {
         userJaneRoe = new User(entities.user.jane_roe.id);
         userJohnDoe = new User(entities.user.john_doe.id);
 
-        userRepository['saveUsers']([userJaneRoe, userJohnDoe]);
+        userRepository.saveUsers([userJaneRoe, userJohnDoe]);
         const permanent_client = ClientMapper.mapClient(entities.clients.john_doe.permanent, false);
         const plain_client = ClientMapper.mapClient(entities.clients.jane_roe.plain, false);
         const temporary_client = ClientMapper.mapClient(entities.clients.john_doe.temporary, false);
@@ -378,11 +370,11 @@ describe('UserRepository', () => {
 
   describe('updateUsers', () => {
     it('should update local users', async () => {
-      const userService = userRepository['userService'];
+      const {userService} = userRepository;
       const user = new User(entities.user.jane_roe.id);
       user.name('initial name');
       user.isMe = true;
-      userRepository['saveUser'](user);
+      userRepository.saveUser(user);
 
       jest.spyOn(userService, 'getUsers').mockResolvedValue({found: [entities.user.jane_roe]});
 

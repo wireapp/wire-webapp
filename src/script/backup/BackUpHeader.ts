@@ -38,17 +38,26 @@ export const ERROR_TYPES = {
 
 export class BackUpHeader {
   private readonly userId: string;
+
   private readonly password: string;
 
   // Defined by given specs on: https://wearezeta.atlassian.net/wiki/spaces/ENGINEERIN/pages/59867179/Exporting+history+v2
   private readonly format = ENCRYPTED_BACKUP_FORMAT;
+
   private readonly version = ENCRYPTED_BACKUP_VERSION;
+
   private readonly MEMLIMIT_INTERACTIVE_VALUE = 33554432;
+
   private readonly OPSLIMIT_INTERACTIVE_VALUE = 4;
+
   private readonly PWD_HASH_OUTPUT_BYTES = 32;
+
   private readonly UNSIGNED_INT_LENGTH = 4;
+
   private readonly BACKUP_HEADER_EXTRA_GAP_LENGTH = 1;
+
   private readonly BACKUP_HEADER_FORMAT_LENGTH = 4;
+
   private readonly BACKUP_HEADER_VERSION_LENGTH = 2;
 
   constructor(userId: string, password: string) {
@@ -137,9 +146,11 @@ export class BackUpHeader {
     const {format, version} = decodedHeader;
     if (!sodium.memcmp(expectedHashedUserId, storedHashedUserId)) {
       return ERROR_TYPES.INVALID_USER_ID;
-    } else if (format !== this.format) {
+    }
+    if (format !== this.format) {
       return ERROR_TYPES.INVALID_FORMAT;
-    } else if (parseInt(version) < parseInt(this.version)) {
+    }
+    if (parseInt(version) < parseInt(this.version)) {
       return ERROR_TYPES.INVALID_VERSION;
     }
     return null;

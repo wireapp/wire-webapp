@@ -56,7 +56,7 @@ interface LeftListWrapperProps {
   onClose?: () => void;
 }
 
-const ListWrapper = ({
+function ListWrapper({
   id,
   header,
   headerElement,
@@ -65,7 +65,7 @@ const ListWrapper = ({
   footer,
   before,
   headerUieName,
-}: LeftListWrapperProps) => {
+}: LeftListWrapperProps) {
   const calculateBorders = throttle((element: HTMLElement) => {
     window.requestAnimationFrame(() => {
       if (element.offsetHeight <= 0 || !isScrollable(element)) {
@@ -89,9 +89,7 @@ const ListWrapper = ({
   return (
     <div id={id} className={`left-list-${id} ${id}`} css={style}>
       <header className={`left-list-header left-list-header-${id}`}>
-        {headerElement ? (
-          headerElement
-        ) : (
+        {headerElement || (
           <>
             <h2 className="left-list-header-text" data-uie-name={headerUieName}>
               {header}
@@ -124,6 +122,6 @@ const ListWrapper = ({
       {footer ?? null}
     </div>
   );
-};
+}
 
 export {ListWrapper};

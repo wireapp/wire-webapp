@@ -49,7 +49,7 @@ export interface CallParticipantItemContentProps {
   onDropdownClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
-export const CallParticipantItemContent = ({
+export function CallParticipantItemContent({
   name,
   selfInTeam = false,
   isAudioEstablished,
@@ -57,7 +57,7 @@ export const CallParticipantItemContent = ({
   isSelf = false,
   showContextMenu,
   onDropdownClick,
-}: CallParticipantItemContentProps) => {
+}: CallParticipantItemContentProps) {
   const selfString = `(${capitalizeFirstChar(t('conversationYouNominative'))})`;
 
   return (
@@ -95,4 +95,4 @@ export const CallParticipantItemContent = ({
       )}
     </div>
   );
-};
+}

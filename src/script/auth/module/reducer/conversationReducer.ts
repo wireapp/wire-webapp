@@ -17,7 +17,7 @@
  *
  */
 
-import {AppActions, CONVERSATION_ACTION} from '../action/creator/';
+import {AppActions, CONVERSATION_ACTION} from '../action/creator';
 
 export interface ConversationState {
   error: Error & {label?: string};

@@ -61,15 +61,23 @@ interface ShowConversationOverload {
 
 export class ContentViewModel {
   private readonly userState: UserState;
+
   private readonly conversationState: ConversationState;
 
   conversationRepository: ConversationRepository;
+
   messageRepository: MessageRepository;
+
   sidebarId: string;
+
   logger: Logger;
+
   mainViewModel: MainViewModel;
+
   previousConversation?: Conversation;
+
   userRepository: UserRepository;
+
   initialMessage?: Message;
 
   get isFederated() {

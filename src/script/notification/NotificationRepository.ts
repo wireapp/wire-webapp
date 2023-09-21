@@ -95,12 +95,19 @@ interface WebappNotifications extends Notification {
  */
 export class NotificationRepository {
   private contentViewModelState: ContentViewModelState;
+
   private readonly conversationRepository: ConversationRepository;
+
   private readonly logger: Logger;
+
   private readonly notifications: WebappNotifications[];
+
   private readonly notificationsPreference: ko.Observable<NotificationPreference>;
+
   private readonly permissionRepository: PermissionRepository;
+
   private readonly permissionState: ko.Observable<PermissionState | PermissionStatusState | NotificationPermission>;
+
   private readonly assetRepository: AssetRepository;
 
   static get CONFIG() {
@@ -574,7 +581,7 @@ export class NotificationRepository {
     return {
       conversationId: this.getConversationId(connectionEntity, conversationEntity),
       messageId: messageId === '0' ? undefined : messageId,
-      messageType: messageType,
+      messageType,
     };
   }
 

@@ -28,13 +28,12 @@ import type {TeamData} from '@wireapp/api-client/lib/team/';
 import {LowDiskSpaceError} from '@wireapp/store-engine/lib/engine/error';
 import {StatusCodes as HTTP_STATUS, StatusCodes} from 'http-status-codes';
 
-import type {CRUDEngine} from '@wireapp/store-engine';
 import {SQLeetEngine} from '@wireapp/store-engine-sqleet';
 
 import {isAxiosError, isBackendError} from 'Util/TypePredicateUtil';
 import {isTemporaryClientAndNonPersistent} from 'Util/util';
 
-import {AuthActionCreator} from './creator/';
+import {AuthActionCreator} from './creator';
 import {LabeledError} from './LabeledError';
 import {LocalStorageAction, LocalStorageKey} from './LocalStorageAction';
 
@@ -47,7 +46,7 @@ type LoginLifecycleFunction = (dispatch: ThunkDispatch, getState: () => RootStat
 export class AuthAction {
   doFlushDatabase = (): ThunkAction => {
     return async (dispatch, getState, {core}) => {
-      const storeEngine: CRUDEngine = (core as any).storeEngine;
+      const {storeEngine} = core as any;
       if (storeEngine instanceof SQLeetEngine) {
         await (core as any).storeEngine.save();
       }
@@ -107,7 +106,7 @@ export class AuthAction {
         await core.login(loginData);
         await this.persistClientData(loginData.clientType, dispatch, localStorageAction);
         await dispatch(selfAction.fetchSelf());
-        let entropyData: Uint8Array | undefined = undefined;
+        let entropyData: Uint8Array | undefined;
         if (getEntropy) {
           const existingClient = await core.service!.client.loadClient();
           entropyData = existingClient ? undefined : await getEntropy();

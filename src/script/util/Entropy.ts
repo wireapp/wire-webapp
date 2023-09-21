@@ -61,6 +61,7 @@ export function calculateDeltaValues(data: Uint8Array, n: number): Uint8Array {
 
 export class EntropyData {
   readonly frames: EntropyFrame[];
+
   constructor() {
     this.frames = [];
   }
@@ -81,7 +82,7 @@ export class EntropyData {
   }
 
   get entropyBits(): number {
-    const entropyData = this.entropyData;
+    const {entropyData} = this;
     const entropy = shannonEntropy(entropyData);
     const valuesPerFrame = ~~(entropyData.length / this.frames.length);
     // 1st derivation

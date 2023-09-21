@@ -50,7 +50,7 @@ const useResizeTarget = (shadowInput: HTMLElement | null, textarea: HTMLElement 
       alignHeights(shadowInput, textarea);
       alignScrollBars(shadowInput, textarea);
 
-      //changing scroll appearance might change elements' height, we need to double check if their heights match
+      // changing scroll appearance might change elements' height, we need to double check if their heights match
       alignHeights(shadowInput, textarea);
     }
   };

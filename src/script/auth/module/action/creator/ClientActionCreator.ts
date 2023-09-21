@@ -19,7 +19,7 @@
 
 import type {RegisteredClient} from '@wireapp/api-client/lib/client/';
 
-import type {AppAction} from './';
+import type {AppAction} from '.';
 
 export enum CLIENT_ACTION {
   CLIENT_INIT_SUCCESS = 'CLIENT_INIT_SUCCESS',
@@ -85,10 +85,12 @@ export class ClientActionCreator {
   static startGetAllClients = (): GetAllClientsStartAction => ({
     type: CLIENT_ACTION.CLIENTS_FETCH_START,
   });
+
   static successfulGetAllClients = (clients: RegisteredClient[]): GetAllClientsSuccessAction => ({
     payload: clients,
     type: CLIENT_ACTION.CLIENTS_FETCH_SUCCESS,
   });
+
   static failedGetAllClients = (error: Error): GetAllClientsFailedAction => ({
     error,
     type: CLIENT_ACTION.CLIENTS_FETCH_FAILED,
@@ -97,10 +99,12 @@ export class ClientActionCreator {
   static startRemoveClient = (): RemoveClientStartAction => ({
     type: CLIENT_ACTION.CLIENT_REMOVE_START,
   });
+
   static successfulRemoveClient = (deletedClientId: string): RemoveClientSuccessAction => ({
     payload: deletedClientId,
     type: CLIENT_ACTION.CLIENT_REMOVE_SUCCESS,
   });
+
   static failedRemoveClient = (error: Error): RemoveClientFailedAction => ({
     error,
     type: CLIENT_ACTION.CLIENT_REMOVE_FAILED,

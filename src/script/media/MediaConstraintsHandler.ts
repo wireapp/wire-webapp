@@ -127,7 +127,7 @@ export class MediaConstraintsHandler {
     requestVideo: boolean = false,
     isGroup: boolean = false,
   ): MediaStreamConstraints {
-    const currentDeviceId = this.currentDeviceId;
+    const {currentDeviceId} = this;
     const mode = isGroup ? VIDEO_QUALITY_MODE.GROUP : VIDEO_QUALITY_MODE.MOBILE;
 
     return {

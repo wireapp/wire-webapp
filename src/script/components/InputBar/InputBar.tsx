@@ -103,7 +103,7 @@ interface InputBarProps {
 
 const conversationInputBarClassName = 'conversation-input-bar';
 
-const InputBar = ({
+function InputBar({
   conversationEntity,
   conversationRepository,
   eventRepository,
@@ -118,7 +118,7 @@ const InputBar = ({
   uploadDroppedFiles,
   uploadImages,
   uploadFiles,
-}: InputBarProps) => {
+}: InputBarProps) {
   const {classifiedDomains, isSelfDeletingMessagesEnabled, isFileSharingSendingEnabled} = useKoSubscribableChildren(
     teamState,
     ['classifiedDomains', 'isSelfDeletingMessagesEnabled', 'isFileSharingSendingEnabled'],
@@ -375,7 +375,7 @@ const InputBar = ({
 
   const updateMentions = (event: ReactKeyboardEvent<HTMLTextAreaElement>) => {
     const textarea = event.currentTarget;
-    const value = textarea.value;
+    const {value} = textarea;
     const lengthDifference = value.length - inputValue.length;
 
     const edgeMention = detectMentionEdgeDeletion(
@@ -778,14 +778,14 @@ const InputBar = ({
     disableFilesharing: !isFileSharingSendingEnabled,
     disablePing: pingDisabled,
     input: inputValue,
-    isEditing: isEditing,
-    isScaledDown: isScaledDown,
+    isEditing,
+    isScaledDown,
     onCancelEditing: () => cancelMessageEditing(true, true),
     onClickPing: onPingClick,
-    onGifClick: onGifClick,
+    onGifClick,
     onSelectFiles: uploadFiles,
     onSelectImages: uploadImages,
-    showGiphyButton: showGiphyButton,
+    showGiphyButton,
   };
 
   return (
@@ -882,6 +882,6 @@ const InputBar = ({
       </div>
     </IgnoreOutsideClickWrapper>
   );
-};
+}
 
 export {InputBar};

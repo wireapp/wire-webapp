@@ -24,7 +24,7 @@ import {APIClient} from '@wireapp/api-client';
 import type {TypeUtil} from '@wireapp/commons';
 import {Account} from '@wireapp/core';
 
-import {ActionRoot, actionRoot} from '../../module/action/';
+import {ActionRoot, actionRoot} from '../../module/action';
 import type {RootState, ThunkDispatch} from '../../module/reducer';
 
 export interface MockStoreParameters {

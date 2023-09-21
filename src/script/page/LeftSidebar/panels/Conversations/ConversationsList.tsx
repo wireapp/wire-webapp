@@ -57,7 +57,7 @@ interface ConversationsListProps {
   handleArrowKeyDown: (index: number) => (e: React.KeyboardEvent) => void;
 }
 
-export const ConversationsList = ({
+export function ConversationsList({
   conversations,
   listViewModel,
   viewStyle,
@@ -68,7 +68,7 @@ export const ConversationsList = ({
   currentFocus,
   resetConversationFocus,
   handleArrowKeyDown,
-}: ConversationsListProps) => {
+}: ConversationsListProps) {
   const contentState = useAppState(state => state.contentState);
 
   const {joinableCalls} = useKoSubscribableChildren(callState, ['joinableCalls']);
@@ -194,4 +194,4 @@ export const ConversationsList = ({
       </ul>
     </>
   );
-};
+}

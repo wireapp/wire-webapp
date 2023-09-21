@@ -61,12 +61,12 @@ import {isValidationError, parseError, parseValidationErrors} from '../util/erro
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
-const PhoneLoginComponent = ({
+function PhoneLoginComponent({
   pushLoginData,
   doSendPhoneLoginCode,
   isFetching,
   loginData,
-}: Props & ConnectedProps & DispatchProps) => {
+}: Props & ConnectedProps & DispatchProps) {
   const {formatMessage: _} = useIntl();
   const navigate = useNavigate();
 
@@ -158,7 +158,7 @@ const PhoneLoginComponent = ({
       </IsMobile>
     </Page>
   );
-};
+}
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({

@@ -43,10 +43,12 @@ export class LanguageActionCreator {
   static startSwitchLanguage = (): LanguageSwitchStartAction => ({
     type: LANGUAGE_ACTION.SWITCH_LANGUAGE_START,
   });
+
   static successfulSwitchLanguage = (language: string): LanguageSwitchSuccessAction => ({
     payload: language,
     type: LANGUAGE_ACTION.SWITCH_LANGUAGE_SUCCESS,
   });
+
   static failedSwitchLanguage = (error: Error): LanguageSwitchFailedAction => ({
     error,
     type: LANGUAGE_ACTION.SWITCH_LANGUAGE_FAILED,

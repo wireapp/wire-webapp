@@ -59,7 +59,7 @@ const WarningsContainer: React.FC<WarningProps> = ({onRefresh}) => {
   }, [warnings]);
 
   const brandName = Config.getConfig().BRAND_NAME;
-  const URL = Config.getConfig().URL;
+  const {URL} = Config.getConfig();
 
   const closeButton = (
     <button

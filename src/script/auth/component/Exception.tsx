@@ -30,9 +30,9 @@ interface ExceptionProps {
   errors: any[];
 }
 
-const Exception = ({errors = []}: ExceptionProps) => {
+function Exception({errors = []}: ExceptionProps) {
   return (
-    <Fragment>
+    <>
       {errors.map(error => {
         const translatedErrors = {...validationErrorStrings, ...errorHandlerStrings};
         if (!error) {
@@ -62,8 +62,8 @@ const Exception = ({errors = []}: ExceptionProps) => {
           </ErrorMessage>
         );
       })}
-    </Fragment>
+    </>
   );
-};
+}
 
 export {Exception};

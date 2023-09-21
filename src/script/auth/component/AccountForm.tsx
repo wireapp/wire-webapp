@@ -34,7 +34,7 @@ import {Exception} from './Exception';
 
 import {Config} from '../../Config';
 import {accountFormStrings} from '../../strings';
-import {actionRoot as ROOT_ACTIONS} from '../module/action/';
+import {actionRoot as ROOT_ACTIONS} from '../module/action';
 import {ValidationError} from '../module/action/ValidationError';
 import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
@@ -48,7 +48,7 @@ interface Props extends React.HTMLProps<HTMLFormElement> {
   submitText?: string;
 }
 
-const AccountFormComponent = ({account, ...props}: Props & ConnectedProps & DispatchProps) => {
+function AccountFormComponent({account, ...props}: Props & ConnectedProps & DispatchProps) {
   const {formatMessage: _} = useIntl();
 
   const [registrationData, setRegistrationData] = useState({
@@ -332,7 +332,7 @@ const AccountFormComponent = ({account, ...props}: Props & ConnectedProps & Disp
       </Button>
     </Form>
   );
-};
+}
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({

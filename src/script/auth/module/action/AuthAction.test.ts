@@ -25,11 +25,11 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import type {APIClient} from '@wireapp/api-client';
 import type {TypeUtil} from '@wireapp/commons';
 
-import {AuthActionCreator} from './creator/';
+import {AuthActionCreator} from './creator';
 
 import {mockStoreFactory} from '../../util/test/mockStoreFactory';
 
-import {ActionRoot, actionRoot} from './';
+import {ActionRoot, actionRoot} from '.';
 
 describe('AuthAction', () => {
   it('authenticates a user successfully', async () => {

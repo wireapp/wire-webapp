@@ -42,6 +42,7 @@ import {replaceHostnameInObject} from './util/hostnameReplacer';
 
 class Server {
   private readonly app: express.Express;
+
   private server?: http.Server | https.Server;
 
   constructor(

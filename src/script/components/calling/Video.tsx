@@ -24,7 +24,7 @@ type VideoProps = VideoHTMLAttributes<HTMLVideoElement> & {
   srcObject: MediaStream;
 };
 
-const Video = ({srcObject, ...props}: VideoProps) => {
+function Video({srcObject, ...props}: VideoProps) {
   const refVideo = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -44,6 +44,6 @@ const Video = ({srcObject, ...props}: VideoProps) => {
   );
 
   return <video ref={refVideo} {...props} />;
-};
+}
 
 export {Video};

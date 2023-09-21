@@ -154,7 +154,7 @@ export const renderMessage = (message: string, selfId?: QualifiedId, mentionEnti
   };
 
   markdownit.set({
-    highlight: function (code, lang): string {
+    highlight(code, lang): string {
       const containsMentions = mentionEntities.some(mention => {
         const hash = createMentionHash(mention);
         return code.includes(hash);
@@ -183,7 +183,7 @@ export const renderMessage = (message: string, selfId?: QualifiedId, mentionEnti
         closeToken.type = 'text';
         closeToken.content = `](${cleanString(href)})`;
       }
-      return '['; //'${cleanString(text)}`;
+      return '['; // '${cleanString(text)}`;
     }
     if (isEmail) {
       link.attrPush(['data-email-link', 'true']);

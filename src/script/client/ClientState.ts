@@ -25,7 +25,9 @@ import {ClientEntity} from './ClientEntity';
 @singleton()
 export class ClientState {
   clients: ko.PureComputed<ClientEntity[]>;
+
   currentClient: ko.Observable<ClientEntity>;
+
   isTemporaryClient: ko.PureComputed<boolean>;
 
   constructor() {

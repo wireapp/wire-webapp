@@ -28,8 +28,11 @@ export interface QuoteEntityOptions {
 
 export class QuoteEntity {
   error?: Error;
+
   hash?: ArrayBuffer;
+
   messageId: string;
+
   userId: string;
 
   static ERROR = {

@@ -40,7 +40,7 @@ const InviteModal: React.FC<InviteModalProps> = ({selfUser, onClose}) => {
   const [isInviteMessageSelected, setIsInviteMessageSelected] = useState<boolean>(false);
   const userName = selfUser.username();
   const inviteMessage = userName
-    ? t('inviteMessage', {brandName: brandName, username: `@${userName}`})
+    ? t('inviteMessage', {brandName, username: `@${userName}`})
     : t('inviteMessageNoEmail', brandName);
 
   const metaKey = Runtime.isMacOS() ? t('inviteMetaKeyMac') : t('inviteMetaKeyPc');

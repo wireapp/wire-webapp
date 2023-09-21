@@ -103,7 +103,7 @@ const getDefaultParams = () => {
       isSelfConnectedTo: () => true,
     } as unknown as TeamRepository,
     teamState: new TeamState(),
-    userState: userState,
+    userState,
   };
 };
 

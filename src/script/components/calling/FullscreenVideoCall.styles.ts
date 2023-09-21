@@ -66,16 +66,16 @@ export const videoControlDisabledStyles = css`
 `;
 
 export const paginationButtonStyles: CSSObject = {
-  ['& svg > path']: {
+  '& svg > path': {
     fill: 'var(--main-color)',
   },
-  ['&:focus-visible']: {
-    ['& svg > path']: {
+  '&:focus-visible': {
+    '& svg > path': {
       fill: 'var(--accent-color)',
     },
     outline: '1px solid var(--accent-color-focus)',
   },
-  ['&:hover svg > path']: {
+  '&:hover svg > path': {
     fill: 'var(--accent-color)',
   },
   alignItems: 'center',

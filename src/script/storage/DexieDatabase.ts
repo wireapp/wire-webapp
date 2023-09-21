@@ -32,15 +32,24 @@ import {StorageSchemata} from './StorageSchemata';
  */
 export class DexieDatabase extends Dexie {
   amplify: Table<AmplifyRecord, string>;
+
   clients: Table<ClientRecord, string>;
+
   /** @deprecated */
   conversation_events: Table<{}, string>;
+
   conversations: Table<ConversationRecord, string>;
+
   events: Table<EventRecord, number>;
+
   keys: Table<CryptoboxRecord, string>;
+
   prekeys: Table<CryptoboxRecord, string>;
+
   sessions: Table<CryptoboxRecord, string>;
+
   users: Table<UserRecord, string>;
+
   groupIds: Table<GroupIdRecord, string>;
 
   private readonly logger: Logger;

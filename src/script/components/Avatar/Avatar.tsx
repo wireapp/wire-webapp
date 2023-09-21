@@ -93,7 +93,7 @@ const Avatar: FC<AvatarProps> = ({
   const handleAvatarInteraction = (
     event: ReactMouseEvent<HTMLDivElement, MouseEvent> | ReactKeyBoardEvent<HTMLDivElement>,
   ) => {
-    const parentNode = event.currentTarget.parentNode;
+    const {parentNode} = event.currentTarget;
     if (parentNode) {
       if (isKeyboardEvent(event)) {
         handleKeyDown(event, () => onAvatarClick?.(participant));

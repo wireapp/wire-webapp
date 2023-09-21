@@ -213,7 +213,7 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
             onKeyDown={event => {
               handleContextKeyDown(event);
             }}
-          ></button>
+          />
         )}
       </div>
     </div>

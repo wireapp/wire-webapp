@@ -48,7 +48,7 @@ import {pathWithParams} from '../util/urlUtil';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
-const SetAccountType = ({}: Props) => {
+function SetAccountType({}: Props) {
   const {formatMessage: _} = useIntl();
   const isMacOsWrapper = Runtime.isDesktopApp() && Runtime.isMacOS();
 
@@ -103,7 +103,7 @@ const SetAccountType = ({}: Props) => {
                       background: COLOR.GREEN,
                     }}
                   >
-                    <ProfileIcon height={31} width={31} color={'white'} />
+                    <ProfileIcon height={31} width={31} color="white" />
                   </div>
                   <Bold fontSize="24px" color={COLOR.LINK}>
                     {_(setAccountTypeStrings.createAccountForPersonalUse)}
@@ -135,7 +135,7 @@ const SetAccountType = ({}: Props) => {
                       background: COLOR.BLUE,
                     }}
                   >
-                    <TeamIcon height={31} width={31} color={'white'} />
+                    <TeamIcon height={31} width={31} color="white" />
                   </div>
                   <Bold fontSize="24px" color={COLOR.LINK}>
                     {_(setAccountTypeStrings.createAccountForOrganizations)}
@@ -165,6 +165,6 @@ const SetAccountType = ({}: Props) => {
       </IsMobile>
     </Page>
   );
-};
+}
 
 export {SetAccountType};

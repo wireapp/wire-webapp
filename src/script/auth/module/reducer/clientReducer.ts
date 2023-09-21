@@ -19,7 +19,7 @@
 
 import type {RegisteredClient} from '@wireapp/api-client/lib/client/';
 
-import {AUTH_ACTION, AppActions, CLIENT_ACTION} from '../action/creator/';
+import {AUTH_ACTION, AppActions, CLIENT_ACTION} from '../action/creator';
 
 export interface ClientState {
   clients: RegisteredClient[] | null;

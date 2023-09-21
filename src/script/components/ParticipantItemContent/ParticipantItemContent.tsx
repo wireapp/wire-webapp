@@ -49,7 +49,7 @@ export interface ParticipantItemContentProps {
   showAvailabilityState?: boolean;
 }
 
-export const ParticipantItemContent = ({
+export function ParticipantItemContent({
   name,
   selfInTeam = false,
   availability = Availability.Type.NONE,
@@ -58,7 +58,7 @@ export const ParticipantItemContent = ({
   hasUsernameInfo = false,
   showArrow = false,
   showAvailabilityState = false,
-}: ParticipantItemContentProps) => {
+}: ParticipantItemContentProps) {
   return (
     <div css={wrapper}>
       <div css={contentText}>
@@ -95,4 +95,4 @@ export const ParticipantItemContent = ({
       {showArrow && <Icon.ChevronRight css={chevronIcon} data-hoverClass="chevron-icon" />}
     </div>
   );
-};
+}

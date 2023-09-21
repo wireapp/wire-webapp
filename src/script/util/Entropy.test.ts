@@ -482,8 +482,8 @@ describe('Entropy', () => {
         const y = inputdata[i + 1];
         const t = inputdata[i + 2];
         data.addFrame({x, y, t});
-        dataNoTime.addFrame({x: x, y: y, t: 0});
-        dataOnlyTime.addFrame({x: 0, y: 0, t: t}, false);
+        dataNoTime.addFrame({x, y, t: 0});
+        dataOnlyTime.addFrame({x: 0, y: 0, t}, false);
       }
       expect(data.entropyData.length).toBe(inputdata.length);
       expect(dataNoTime.entropyData.length).toBe(inputdata.length);

@@ -81,10 +81,15 @@ export interface ViewModelRepositories {
 
 export class MainViewModel {
   actions: ActionsViewModel;
+
   calling: CallingViewModel;
+
   content: ContentViewModel;
+
   list: ListViewModel;
+
   multitasking: Multitasking;
+
   private readonly core = container.resolve(Core);
 
   static get CONFIG() {

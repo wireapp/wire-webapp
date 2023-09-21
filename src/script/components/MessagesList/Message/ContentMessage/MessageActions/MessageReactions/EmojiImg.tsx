@@ -30,18 +30,16 @@ export interface EmojiImgProps {
   styles?: CSSObject;
 }
 
+// eslint-disable-next-line react/function-component-definition
 const EmojiImg: FC<EmojiImgProps> = ({emojiUrl, styles, emojiName, emojiImgSize = reactionImgSize}) => {
   return (
-    <>
-      <img
-        alt={emojiName}
-        aria-hidden={true}
-        css={{...emojiImgSize, ...messageReactionEmoji, ...styles}}
-        draggable="false"
-        loading="eager"
-        src={emojiUrl}
-      />
-    </>
+    <img
+      src={emojiUrl}
+      alt={emojiName}
+      loading="eager"
+      css={{...emojiImgSize, ...messageReactionEmoji, ...styles}}
+      aria-hidden
+    />
   );
 };
 

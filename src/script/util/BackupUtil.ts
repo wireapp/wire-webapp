@@ -38,7 +38,8 @@ export const checkBackupEncryption = async (data: ArrayBuffer | Blob): Promise<b
 const getFileBytes = async (data: ArrayBuffer | Blob): Promise<Uint8Array> => {
   if (data instanceof ArrayBuffer) {
     return Promise.resolve(new Uint8Array(data));
-  } else if (data instanceof Blob) {
+  }
+  if (data instanceof Blob) {
     return readBlobAsArrayBuffer(data).then(arrayBuffer => new Uint8Array(arrayBuffer));
   }
   return Promise.reject(new Error('Invalid data type. Expected ArrayBuffer or Blob.'));

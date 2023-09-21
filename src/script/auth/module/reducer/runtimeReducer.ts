@@ -17,7 +17,7 @@
  *
  */
 
-import {AppActions, RUNTIME_ACTION} from '../action/creator/';
+import {AppActions, RUNTIME_ACTION} from '../action/creator';
 
 export interface RuntimeState {
   hasCookieSupport: boolean;

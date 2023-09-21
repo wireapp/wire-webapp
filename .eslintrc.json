@@ -1,5 +1,6 @@
 {
-  "extends": ["@wireapp/eslint-config"],
+  "extends": ["@wireapp/eslint-config", "airbnb", "airbnb-typescript",
+  "plugin:prettier/recommended", "plugin:@typescript-eslint/recommended"],
   "env": {
     "jasmine": true
   },
@@ -28,7 +29,8 @@
   "parserOptions": {
     "project": ["./tsconfig.build.json", "./server/tsconfig.json"]
   },
-  "plugins": ["@emotion"],
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@emotion", "@typescript-eslint"],
   "rules": {
     "@emotion/pkg-renaming": "error",
     "@emotion/no-vanilla": "error",
@@ -46,7 +48,12 @@
     "no-unsanitized/property": "off",
     "prefer-promise-reject-errors": "off",
     "valid-jsdoc": "off",
-    "jest/no-jasmine-globals": "off"
+    "jest/no-jasmine-globals": "off",
+    "prettier/prettier": "error",
+    "import/extensions": "off",
+    "import/no-extraneous-dependencies": "off",
+    "react/react-in-jsx-scope": "off",
+    "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }]
   },
   "settings": {
     "import/resolver": {

@@ -55,7 +55,7 @@ describe('GroupVideoGrid', () => {
       },
       maximizedParticipant: null,
       minimized: false,
-      selfParticipant: selfParticipant,
+      selfParticipant,
       setMaximizedParticipant: jest.fn(),
     };
 

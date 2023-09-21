@@ -23,16 +23,16 @@ export const radioInputStyles = (isDisabled: boolean): CSSObject => ({
   position: 'absolute',
   opacity: 0,
 
-  ['&[type="radio"]:checked + label::before']: {
+  '&[type="radio"]:checked + label::before': {
     borderWidth: '6px',
     borderColor: 'var(--accent-color-500)',
   },
 
-  ['&[type="radio"]:hover + label::before']: {
+  '&[type="radio"]:hover + label::before': {
     borderColor: isDisabled ? '' : 'var(--accent-color-500)',
   },
 
-  [' &[type="radio"]:focus-visible + label::before']: {
+  ' &[type="radio"]:focus-visible + label::before': {
     borderColor: isDisabled ? '' : 'var(--accent-color-600)',
   },
 });
@@ -45,7 +45,7 @@ export const radioLabelStyles = (isDisabled: boolean): CSSObject => ({
   cursor: 'pointer',
   whiteSpace: 'pre',
 
-  ['&::before, &::after']: {
+  '&::before, &::after': {
     boxSizing: 'border-box',
     borderRadius: '50%',
     marginRight: '16px',
@@ -53,7 +53,7 @@ export const radioLabelStyles = (isDisabled: boolean): CSSObject => ({
     cursor: 'pointer',
   },
 
-  ['&::before']: {
+  '&::before': {
     width: '22px',
     height: '22px',
     border: '2px solid var(--checkbox-border)',
@@ -65,7 +65,7 @@ export const radioLabelStyles = (isDisabled: boolean): CSSObject => ({
 export const radioOptionStyles: CSSObject = {
   marginBottom: '20px',
   position: 'relative',
-  ['&:last-child']: {
+  '&:last-child': {
     marginBottom: 0,
   },
 };

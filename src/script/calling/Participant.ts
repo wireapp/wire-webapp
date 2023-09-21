@@ -32,18 +32,28 @@ export type ClientId = string;
 export class Participant {
   // Video
   public videoState: ko.Observable<VIDEO_STATE>;
+
   public videoStream: ko.Observable<MediaStream | undefined>;
+
   public hasActiveVideo: ko.PureComputed<boolean>;
+
   public hasPausedVideo: ko.PureComputed<boolean>;
+
   public sharesScreen: ko.PureComputed<boolean>;
+
   public sharesCamera: ko.PureComputed<boolean>;
+
   public startedScreenSharingAt: ko.Observable<number>;
+
   public isActivelySpeaking: ko.Observable<boolean>;
+
   public isSendingVideo: ko.PureComputed<boolean>;
+
   public isAudioEstablished: ko.Observable<boolean>;
 
   // Audio
   public audioStream: ko.Observable<MediaStream | undefined>;
+
   public isMuted: ko.Observable<boolean>;
 
   constructor(

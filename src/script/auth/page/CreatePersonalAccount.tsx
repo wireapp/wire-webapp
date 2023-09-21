@@ -33,17 +33,17 @@ import {Config} from '../../Config';
 import {createPersonalAccountStrings} from '../../strings';
 import {AccountForm} from '../component/AccountForm';
 import {RouterLink} from '../component/RouterLink';
-import {actionRoot as ROOT_ACTIONS} from '../module/action/';
+import {actionRoot as ROOT_ACTIONS} from '../module/action';
 import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {ROUTE} from '../route';
 
 type Props = React.HTMLAttributes<HTMLDivElement>;
 
-const CreatePersonalAccountComponent = ({
+function CreatePersonalAccountComponent({
   isPersonalFlow,
   enterPersonalCreationFlow,
-}: Props & ConnectedProps & DispatchProps) => {
+}: Props & ConnectedProps & DispatchProps) {
   const navigate = useNavigate();
   const {formatMessage: _} = useIntl();
   const isMacOsWrapper = Runtime.isDesktopApp() && Runtime.isMacOS();
@@ -104,7 +104,7 @@ const CreatePersonalAccountComponent = ({
       </IsMobile>
     </Page>
   );
-};
+}
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({

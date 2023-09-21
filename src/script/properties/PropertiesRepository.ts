@@ -60,12 +60,19 @@ export class PropertiesRepository {
   }
 
   private readonly logger: Logger;
+
   public readonly propertiesService: PropertiesService;
+
   public readonly receiptMode: ko.Observable<RECEIPT_MODE>;
+
   public readonly typingIndicatorMode: ko.Observable<CONVERSATION_TYPING_INDICATOR_MODE>;
+
   private readonly selfService: SelfService;
+
   private readonly selfUser: ko.Observable<User>;
+
   public properties: WebappProperties;
+
   public readonly marketingConsent: ko.Observable<ConsentValue | boolean>;
 
   constructor(propertiesService: PropertiesService, selfService: SelfService) {

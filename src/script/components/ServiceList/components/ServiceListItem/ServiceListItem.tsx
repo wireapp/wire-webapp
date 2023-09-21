@@ -33,7 +33,7 @@ export interface ServiceListItemProps {
   onClick: (service: ServiceEntity) => void;
 }
 
-export const ServiceListItem = ({service, onClick}: ServiceListItemProps) => {
+export function ServiceListItem({service, onClick}: ServiceListItemProps) {
   const {name: serviceName} = useKoSubscribableChildren(service, ['name']);
   const serviceShortDescription = service.summary;
 
@@ -57,4 +57,4 @@ export const ServiceListItem = ({service, onClick}: ServiceListItemProps) => {
       </div>
     </div>
   );
-};
+}

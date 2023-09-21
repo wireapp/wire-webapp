@@ -22,7 +22,7 @@ import {CSSObject} from '@emotion/react';
 export const getIconCSS = (fill?: string): CSSObject => ({
   alignItems: 'center',
   bottom: 42,
-  fill: fill,
+  fill,
   height: 16,
   margin: 0,
   padding: 0,

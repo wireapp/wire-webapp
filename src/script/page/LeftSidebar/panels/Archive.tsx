@@ -44,13 +44,13 @@ type ArchiveProps = {
   onClose: () => void;
 };
 
-const Archive = ({
+function Archive({
   listViewModel,
   conversationRepository,
   answerCall,
   onClose,
   conversationState = container.resolve(ConversationState),
-}: ArchiveProps) => {
+}: ArchiveProps) {
   const {archivedConversations: conversations} = useKoSubscribableChildren(conversationState, [
     'archivedConversations',
   ]);
@@ -90,6 +90,6 @@ const Archive = ({
       </ul>
     </ListWrapper>
   );
-};
+}
 
 export {Archive};

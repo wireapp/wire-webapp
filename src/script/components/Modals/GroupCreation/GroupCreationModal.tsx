@@ -84,7 +84,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
 
   const enableMLSToggle = isMLSFeatureEnabled && isMLSEnabledForTeam && isProtocolToggleEnabledForUser;
 
-  //if feature flag is set to false or mls is disabled for current team use proteus as default
+  // if feature flag is set to false or mls is disabled for current team use proteus as default
   const defaultProtocol =
     isMLSFeatureEnabled && isMLSEnabledForTeam
       ? teamState.teamFeatures()?.mls?.config.defaultProtocol
@@ -284,7 +284,8 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
     setGroupName(value);
     if (nameTooLong) {
       return setNameError(t('groupCreationPreferencesErrorNameLong'));
-    } else if (nameTooShort) {
+    }
+    if (nameTooShort) {
       return setNameError(t('groupCreationPreferencesErrorNameShort'));
     }
     setNameError('');

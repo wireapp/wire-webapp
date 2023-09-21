@@ -38,6 +38,7 @@ import {Theme} from '../../../../components/AppContainer/hooks/useTheme';
 import {RootFontSize, useRootFontSize} from '../../../../hooks/useRootFontSize';
 import {PropertiesRepository} from '../../../../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../../../../properties/PropertiesType';
+
 interface OptionPreferencesProps {
   propertiesRepository: PropertiesRepository;
   selfUser: User;

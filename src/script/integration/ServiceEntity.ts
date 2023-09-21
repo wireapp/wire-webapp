@@ -35,14 +35,23 @@ export interface ServiceData {
 
 export class ServiceEntity {
   description: string;
+
   id: string;
+
   mediumPictureResource: ko.Observable<AssetRemoteData>;
+
   name: ko.Observable<string>;
+
   previewPictureResource: ko.Observable<AssetRemoteData>;
+
   providerId: string;
+
   providerName: ko.Observable<string>;
+
   summary: string;
+
   tags: string[];
+
   isService: boolean;
 
   constructor(serviceData: ServiceData = {}) {

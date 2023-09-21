@@ -56,7 +56,7 @@ interface UserStatusBadgesProps {
   config: {[key in BadgeKey]?: boolean};
 }
 
-export const UserStatusBadges = ({config}: UserStatusBadgesProps) => {
+export function UserStatusBadges({config}: UserStatusBadgesProps) {
   const badges = Object.entries(config).filter(([_badge, shouldShow]) => shouldShow);
   const badgesCount = badges.length;
 
@@ -71,4 +71,4 @@ export const UserStatusBadges = ({config}: UserStatusBadgesProps) => {
       ))}
     </div>
   );
-};
+}

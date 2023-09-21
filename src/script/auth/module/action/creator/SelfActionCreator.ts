@@ -161,10 +161,12 @@ export class SelfActionCreator {
   static startSetHandle = (): SetHandleStartAction => ({
     type: SELF_ACTION.HANDLE_SET_START,
   });
+
   static successfulSetHandle = (selfUser: Self): SetHandleSuccessAction => ({
     payload: selfUser,
     type: SELF_ACTION.HANDLE_SET_SUCCESS,
   });
+
   static failedSetHandle = (error: Error): SetHandleFailedAction => ({
     error,
     type: SELF_ACTION.HANDLE_SET_FAILED,
@@ -173,10 +175,12 @@ export class SelfActionCreator {
   static startSetPasswordState = (): SetPasswordStateStartAction => ({
     type: SELF_ACTION.SELF_SET_PASSWORD_STATE_START,
   });
+
   static successfulSetPasswordState = ({hasPassword}: {hasPassword: boolean}): SetPasswordStateSuccessAction => ({
     payload: hasPassword,
     type: SELF_ACTION.SELF_SET_PASSWORD_STATE_SUCCESS,
   });
+
   static failedSetPasswordState = (error: Error): SetPasswordStateFailedAction => ({
     error,
     type: SELF_ACTION.SELF_SET_PASSWORD_STATE_FAILED,
@@ -185,10 +189,12 @@ export class SelfActionCreator {
   static startFetchSelf = (): FetchSelfStartAction => ({
     type: SELF_ACTION.SELF_FETCH_START,
   });
+
   static successfulFetchSelf = (selfUser: Self): FetchSelfSuccessAction => ({
     payload: selfUser,
     type: SELF_ACTION.SELF_FETCH_SUCCESS,
   });
+
   static failedFetchSelf = (error: Error): FetchSelfFailedAction => ({
     error,
     type: SELF_ACTION.SELF_FETCH_FAILED,
@@ -197,10 +203,12 @@ export class SelfActionCreator {
   static startGetConsents = (): GetConsentsStartAction => ({
     type: SELF_ACTION.CONSENT_GET_START,
   });
+
   static successfulGetConsents = (consents: Consent[]): GetConsentsSuccessAction => ({
     payload: consents,
     type: SELF_ACTION.CONSENT_GET_SUCCESS,
   });
+
   static failedGetConsents = (error: Error): GetConsentsFailedAction => ({
     error,
     type: SELF_ACTION.CONSENT_GET_FAILED,
@@ -209,10 +217,12 @@ export class SelfActionCreator {
   static startSetConsent = (): SetConsentStartAction => ({
     type: SELF_ACTION.CONSENT_SET_START,
   });
+
   static successfulSetConsent = (consent: Consent): SetConsentSuccessAction => ({
     payload: consent,
     type: SELF_ACTION.CONSENT_SET_SUCCESS,
   });
+
   static failedSetConsent = (error: Error): SetConsentFailedAction => ({
     error,
     type: SELF_ACTION.CONSENT_SET_FAILED,
@@ -221,10 +231,12 @@ export class SelfActionCreator {
   static startSetSelfEmail = (): SetSelfEmailStartAction => ({
     type: SELF_ACTION.SELF_SET_EMAIL_START,
   });
+
   static successfulSetSelfEmail = (email: string): SetSelfEmailSuccessAction => ({
     payload: email,
     type: SELF_ACTION.SELF_SET_EMAIL_SUCCESS,
   });
+
   static failedSetSelfEmail = (error: Error): SetSelfEmailFailedAction => ({
     error,
     type: SELF_ACTION.SELF_SET_EMAIL_FAILED,
@@ -233,9 +245,11 @@ export class SelfActionCreator {
   static startSetSelfPassword = (): SetSelfPasswordStartAction => ({
     type: SELF_ACTION.SELF_SET_PASSWORD_START,
   });
+
   static successfulSetSelfPassword = (): SetSelfPasswordSuccessAction => ({
     type: SELF_ACTION.SELF_SET_PASSWORD_SUCCESS,
   });
+
   static failedSetSelfPassword = (error: Error): SetSelfPasswordFailedAction => ({
     error,
     type: SELF_ACTION.SELF_SET_PASSWORD_FAILED,

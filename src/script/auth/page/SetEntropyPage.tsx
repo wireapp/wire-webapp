@@ -32,7 +32,7 @@ import {ROUTE} from '../route';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
-const SetEntropyPageComponent = ({pushEntropyData}: Props & ConnectedProps & DispatchProps) => {
+function SetEntropyPageComponent({pushEntropyData}: Props & ConnectedProps & DispatchProps) {
   const navigate = useNavigate();
 
   const onSetEntropy = async (entropyData: Uint8Array): Promise<void> => {
@@ -49,7 +49,7 @@ const SetEntropyPageComponent = ({pushEntropyData}: Props & ConnectedProps & Dis
       <EntropyContainer onSetEntropy={onSetEntropy} />
     </Page>
   );
-};
+}
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({});

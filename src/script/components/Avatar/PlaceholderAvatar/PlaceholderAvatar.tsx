@@ -34,7 +34,7 @@ export function PlaceholderAvatar({avatarSize: size, onClick, ...props}: Placeho
   const diameter = DIAMETER[size];
   const ImageComponent = diameter >= DIAMETER[AVATAR_SIZE.LARGE] ? DefaultAvatarImageLarge : DefaultAvatarImageSmall;
   return (
-    <AvatarWrapper avatarSize={size} color={''} onClick={onClick} {...props}>
+    <AvatarWrapper avatarSize={size} color="" onClick={onClick} {...props}>
       <ImageComponent diameter={diameter} />
     </AvatarWrapper>
   );

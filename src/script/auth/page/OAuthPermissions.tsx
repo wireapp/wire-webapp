@@ -79,7 +79,7 @@ export enum Scope {
   READ_FEATURE_CONFIGS = 'read:feature_configs',
 }
 
-const OAuthPermissionsComponent = ({
+function OAuthPermissionsComponent({
   doLogout,
   getOAuthApp,
   selfUser,
@@ -88,7 +88,7 @@ const OAuthPermissionsComponent = ({
   postOauthCode,
   getSelf,
   getTeam,
-}: Props & ConnectedProps & DispatchProps) => {
+}: Props & ConnectedProps & DispatchProps) {
   const {formatMessage: _} = useIntl();
   const [teamImage, setTeamImage] = React.useState<string | ArrayBuffer | undefined>(undefined);
   const isMobile = useMatchMedia(QUERY.mobile);
@@ -125,7 +125,7 @@ const OAuthPermissionsComponent = ({
         }
       }
       if (oauthParams.client_id) {
-        setOAuthApp(!!oauthParams.client_id ? await getOAuthApp(oauthParams.client_id) : null);
+        setOAuthApp(oauthParams.client_id ? await getOAuthApp(oauthParams.client_id) : null);
       } else {
         throw Error('OAuth client not found');
       }
@@ -253,7 +253,7 @@ const OAuthPermissionsComponent = ({
       </ContainerXS>
     </Page>
   );
-};
+}
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({

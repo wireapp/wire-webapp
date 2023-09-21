@@ -65,10 +65,10 @@ const ChooseScreen: React.FC<ChooseScreenProps> = ({cancel, choose, screens = []
       <div className="label-xs text-white">{t('callChooseSharedScreen')}</div>
       <div className="choose-screen-list">{renderPreviews(screens, 'item-screen')}</div>
       {windows.length > 0 && (
-        <Fragment>
+        <>
           <div className="label-xs text-white">{t('callChooseSharedWindow')}</div>
           <div className="choose-screen-list">{renderPreviews(windows, 'item-window')}</div>
-        </Fragment>
+        </>
       )}
       <div id="choose-screen-controls" className="choose-screen-controls">
         <button
@@ -76,7 +76,7 @@ const ChooseScreen: React.FC<ChooseScreenProps> = ({cancel, choose, screens = []
           className="choose-screen-controls-button button-round button-round-dark button-round-md icon-close"
           data-uie-name="do-choose-screen-cancel"
           onClick={cancel}
-        ></button>
+        />
       </div>
     </div>
   );

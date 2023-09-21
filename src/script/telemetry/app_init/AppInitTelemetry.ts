@@ -24,6 +24,7 @@ import type {AppInitTimingsStep} from './AppInitTimingsStep';
 
 export class AppInitTelemetry {
   private readonly timings: AppInitTimings;
+
   private readonly statistics: AppInitStatistics;
 
   constructor() {

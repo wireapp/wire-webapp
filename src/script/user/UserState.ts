@@ -28,15 +28,23 @@ import {User} from '../entity/User';
 @singleton()
 export class UserState {
   public directlyConnectedUsers: ko.PureComputed<User[]>;
+
   public isTeam: ko.Observable<boolean> | ko.PureComputed<boolean>;
+
   /** All the users that are directly connect to the self user (do not include users that are connected through conversations) */
   public readonly connectedUsers: ko.PureComputed<User[]>;
+
   public readonly users: ko.ObservableArray<User>;
+
   public teamMembers: ko.PureComputed<User[]>;
+
   /** Note: this does not include the self user */
   public teamUsers: ko.PureComputed<User[]>;
+
   public readonly connectRequests: ko.PureComputed<User[]>;
+
   public readonly numberOfContacts: ko.PureComputed<number>;
+
   public readonly self = ko.observable<User | undefined>();
 
   constructor() {

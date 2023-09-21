@@ -53,10 +53,12 @@ export class InvitationActionCreator {
   static startAddInvite = (): AddInviteStartAction => ({
     type: INVITATION_ACTION.INVITE_ADD_START,
   });
+
   static successfulAddInvite = (invite: any): AddInviteSuccessAction => ({
     payload: {invite},
     type: INVITATION_ACTION.INVITE_ADD_SUCCESS,
   });
+
   static failedAddInvite = (error: Error): AddInviteFailedAction => ({
     error,
     type: INVITATION_ACTION.INVITE_ADD_FAILED,

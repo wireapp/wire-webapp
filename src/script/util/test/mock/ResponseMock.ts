@@ -20,11 +20,13 @@
 Object.defineProperty(window, 'Response', {
   value: class ResponseMock {
     public responseString;
+
     public ok = true;
 
     constructor(responseString?: string) {
       this.responseString = responseString;
     }
+
     json = jest.fn().mockImplementation(() => (this.responseString ? JSON.parse(this.responseString) : {}));
   },
   writable: true,

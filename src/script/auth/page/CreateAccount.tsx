@@ -26,7 +26,7 @@ import {ArrowIcon, COLOR, Column, Columns, Container, ContainerXS, H1, IsMobile}
 
 import {Page} from './Page';
 
-import {Config} from '../../../script/Config';
+import {Config} from '../../Config';
 import {createAccountStrings} from '../../strings';
 import {AccountForm} from '../component/AccountForm';
 import {RouterLink} from '../component/RouterLink';
@@ -34,7 +34,7 @@ import {ROUTE} from '../route';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
-const CreateAccount = ({}: Props) => {
+function CreateAccount({}: Props) {
   const {formatMessage: _} = useIntl();
   const navigate = useNavigate();
   const backArrow = (
@@ -81,6 +81,6 @@ const CreateAccount = ({}: Props) => {
       </IsMobile>
     </Page>
   );
-};
+}
 
 export {CreateAccount};

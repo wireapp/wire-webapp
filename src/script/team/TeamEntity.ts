@@ -25,12 +25,17 @@ import {assetV3} from '../util/ValidationUtil';
 
 export class TeamEntity {
   creator?: string;
+
   /** Team icon (asset ID) */
   icon: string;
+
   /** Team icon (asset key) */
   iconKey?: string;
+
   id?: string;
+
   members: ko.ObservableArray<User>;
+
   name: ko.Observable<string>;
 
   constructor(id?: string) {

@@ -114,7 +114,7 @@ import {
   OneToOneCreationEvent,
   ReactionEvent,
   TeamMemberLeaveEvent,
-} from '../conversation/EventBuilder';
+} from './EventBuilder';
 import {Conversation} from '../entity/Conversation';
 import {ContentMessage} from '../entity/message/ContentMessage';
 import {DeleteConversationMessage} from '../entity/message/DeleteConversationMessage';
@@ -153,15 +153,25 @@ type IncomingEvent = ConversationEvent | ClientConversationEvent;
 
 export class ConversationRepository {
   private isBlockingNotificationHandling: boolean;
+
   private readonly conversationsWithNewEvents: Map<any, any>;
+
   private readonly ephemeralHandler: ConversationEphemeralHandler;
+
   public readonly conversationLabelRepository: ConversationLabelRepository;
+
   public readonly conversationRoleRepository: ConversationRoleRepository;
+
   private readonly event_mapper: EventMapper;
+
   private readonly eventService: EventService;
+
   private readonly logger: Logger;
+
   public readonly stateHandler: ConversationStateHandler;
+
   public readonly verificationStateHandler: ConversationVerificationStateHandler;
+
   static readonly eventFromStreamMessage = 'event from notification stream';
 
   static get CONFIG() {
@@ -194,9 +204,9 @@ export class ConversationRepository {
     // we register a client mismatch handler agains the message repository so that we can react to missing members
     // FIXME this should be temporary. In the near future we want the core to handle clients/mismatch/verification. So the webapp won't need this logic at all
     this.messageRepository.setClientMismatchHandler(async (mismatch, conversation, silent, consentType) => {
-      //we filter out self client id to omit it in mismatch check
+      // we filter out self client id to omit it in mismatch check
       const {userId, clientId} = this.core;
-      const domain = userState.self().domain;
+      const {domain} = userState.self();
 
       const selfClient = {domain, userId, clientId};
       const filteredMissing = mismatch.missing && removeClientFromUserClientMap(mismatch.missing, selfClient);
@@ -464,9 +474,9 @@ export class ConversationRepository {
     this.cleanupEphemeralMessages();
   }
 
-  //##############################################################################
+  // ##############################################################################
   // Conversation service interactions
-  //##############################################################################
+  // ##############################################################################
 
   /**
    * Create a group conversation.
@@ -680,7 +690,7 @@ export class ConversationRepository {
    * @returns all the missing conversations freshly fetched from backend appended to the locally stored conversations
    */
   public async loadMissingConversations(): Promise<Conversation[]> {
-    const missingConversations = this.conversationState.missingConversations;
+    const {missingConversations} = this.conversationState;
     if (!missingConversations.length) {
       return this.conversationState.conversations();
     }
@@ -999,9 +1009,9 @@ export class ConversationRepository {
     await Promise.all(conversationEntities.map(conversationEntity => this.fetchUsersAndEvents(conversationEntity)));
   }
 
-  //##############################################################################
+  // ##############################################################################
   // Repository interactions
-  //##############################################################################
+  // ##############################################################################
 
   /**
    * Deletes a conversation from the repository.
@@ -1193,7 +1203,7 @@ export class ConversationRepository {
       return this.getOrCreateProteusTeam1to1Conversation(userEntity);
     }
 
-    const conversationId = userEntity.connection().conversationId;
+    const {conversationId} = userEntity.connection();
     try {
       const conversationEntity = await this.getConversationById(conversationId);
       conversationEntity.connection(userEntity.connection());
@@ -1552,9 +1562,9 @@ export class ConversationRepository {
     return conversationEntity;
   }
 
-  //##############################################################################
+  // ##############################################################################
   // Send events
-  //##############################################################################
+  // ##############################################################################
 
   /**
    * Add users to an existing conversation.
@@ -1580,7 +1590,7 @@ export class ConversationRepository {
           groupId,
           qualifiedUsers,
         });
-        if (!!events.length) {
+        if (events.length) {
           events.forEach(event => this.eventRepository.injectEvent(event));
         }
       } else {
@@ -1738,7 +1748,7 @@ export class ConversationRepository {
           qualifiedUserIds: [userId],
         });
 
-    if (!!events.length) {
+    if (events.length) {
       events.forEach(event => this.eventRepository.injectEvent(event));
     }
   }
@@ -2111,9 +2121,9 @@ export class ConversationRepository {
     });
   }
 
-  //##############################################################################
+  // ##############################################################################
   // Send Generic Messages
-  //##############################################################################
+  // ##############################################################################
 
   readonly injectLegalHoldMessage = async ({
     conversationEntity,
@@ -2158,9 +2168,9 @@ export class ConversationRepository {
     await this.eventRepository.injectEvent(fileRestrictionMessage);
   }
 
-  //##############################################################################
+  // ##############################################################################
   // Event callbacks
-  //##############################################################################
+  // ##############################################################################
 
   private logConversationEvent(event: IncomingEvent, source: EventSource) {
     if (event.type === CONVERSATION_EVENT.TYPING) {
@@ -3397,9 +3407,9 @@ export class ConversationRepository {
     this.eventRepository.injectEvent(deleteEvent);
   }
 
-  //##############################################################################
+  // ##############################################################################
   // Message updates
-  //##############################################################################
+  // ##############################################################################
 
   expectReadReceipt(conversationEntity: Conversation): boolean {
     if (conversationEntity.is1to1()) {

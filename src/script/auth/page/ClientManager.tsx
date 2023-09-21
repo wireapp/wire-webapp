@@ -31,13 +31,13 @@ import {Page} from './Page';
 import {Config} from '../../Config';
 import {clientManagerStrings} from '../../strings';
 import {ClientList} from '../component/ClientList';
-import {actionRoot as ROOT_ACTIONS} from '../module/action/';
+import {actionRoot as ROOT_ACTIONS} from '../module/action';
 import {RootState, bindActionCreators} from '../module/reducer';
 import {QUERY_KEY} from '../route';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
-const ClientManagerComponent = ({doGetAllClients, doLogout}: Props & ConnectedProps & DispatchProps) => {
+function ClientManagerComponent({doGetAllClients, doLogout}: Props & ConnectedProps & DispatchProps) {
   const {formatMessage: _} = useIntl();
   const SFAcode = localStorage.getItem(QUERY_KEY.CONVERSATION_CODE);
   const isOauth = UrlUtil.hasURLParameter(QUERY_KEY.SCOPE);
@@ -109,7 +109,7 @@ const ClientManagerComponent = ({doGetAllClients, doLogout}: Props & ConnectedPr
       </ContainerXS>
     </Page>
   );
-};
+}
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({});

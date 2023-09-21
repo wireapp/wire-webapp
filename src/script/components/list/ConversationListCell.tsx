@@ -58,7 +58,7 @@ export interface ConversationListCellProps {
   resetConversationFocus: () => void;
 }
 
-const ConversationListCell = ({
+function ConversationListCell({
   showJoinButton,
   conversation,
   onJoinCall,
@@ -69,7 +69,7 @@ const ConversationListCell = ({
   handleArrowKeyDown,
   isFocused = false,
   resetConversationFocus,
-}: ConversationListCellProps) => {
+}: ConversationListCellProps) {
   const {
     isGroup,
     is1to1,
@@ -341,6 +341,6 @@ const ConversationListCell = ({
       </div>
     </li>
   );
-};
+}
 
 export {ConversationListCell};

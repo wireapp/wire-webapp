@@ -37,7 +37,7 @@ export class AssetService {
     const url = `${this.apiClient.config.urls.rest}${path}`;
     const cachingParam = forceCaching ? '&forceCaching=true' : '';
     const conversationIdParam = `&conv_id=${encodeURIComponent(conversationId)}`;
-    return `${url}?access_token=${this.apiClient['accessTokenStore'].accessToken?.access_token}${conversationIdParam}${cachingParam}`;
+    return `${url}?access_token=${this.apiClient.accessTokenStore.accessToken?.access_token}${conversationIdParam}${cachingParam}`;
   }
 
   async generateAssetUrlV2(assetId: string, conversationId: string, forceCaching: boolean): Promise<string> {
@@ -48,7 +48,7 @@ export class AssetService {
 
     const url = `${this.apiClient.config.urls.rest}${path}`;
     const cachingParam = forceCaching ? '&forceCaching=true' : '';
-    return `${url}?access_token=${this.apiClient['accessTokenStore'].accessToken?.access_token}${cachingParam}`;
+    return `${url}?access_token=${this.apiClient.accessTokenStore.accessToken?.access_token}${cachingParam}`;
   }
 
   async generateAssetUrlV3(assetKey: string, assetToken: string, forceCaching: boolean): Promise<string> {
@@ -60,7 +60,7 @@ export class AssetService {
     const url = `${this.apiClient.config.urls.rest}${path}`;
     const assetTokenParam = assetToken ? `&asset_token=${encodeURIComponent(assetToken)}` : '';
     const cachingParam = forceCaching ? '&forceCaching=true' : '';
-    return `${url}?access_token=${this.apiClient['accessTokenStore'].accessToken?.access_token}${assetTokenParam}${cachingParam}`;
+    return `${url}?access_token=${this.apiClient.accessTokenStore.accessToken?.access_token}${assetTokenParam}${cachingParam}`;
   }
 
   async downloadAssetV1(

@@ -233,7 +233,7 @@ const Message: React.FC<
         </div>
       ) : null}
 
-      {/*eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions*/}
+      {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
       <div
         tabIndex={messageFocusedTabIndex}
         ref={messageRef}

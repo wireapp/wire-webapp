@@ -134,7 +134,7 @@ describe('InputBar', () => {
     });
 
     const property = PropertiesRepository.CONFIG.WIRE_TYPING_INDICATOR_MODE;
-    const defaultValue = property.defaultValue;
+    const {defaultValue} = property;
 
     expect(propertiesRepository.typingIndicatorMode()).toBe(defaultValue);
     expect(props.conversationRepository.sendTypingStart).toHaveBeenCalledTimes(1);
@@ -145,7 +145,7 @@ describe('InputBar', () => {
     const {getByTestId} = render(withTheme(<InputBar {...props} />));
     const textArea = getByTestId('input-message');
     const property = PropertiesRepository.CONFIG.WIRE_TYPING_INDICATOR_MODE;
-    const defaultValue = property.defaultValue;
+    const {defaultValue} = property;
 
     act(() => {
       propertiesRepository.setProperty(property.key, !defaultValue);

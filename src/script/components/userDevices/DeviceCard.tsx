@@ -49,7 +49,7 @@ const DeviceCard: React.FC<DeviceCardProps> = ({
   const {class: deviceClass = '?', id = '', label = '?', meta} = clientEntity;
   const name = clientEntity.getName();
   const clickable = !!click;
-  const isVerified = meta.isVerified;
+  const {isVerified} = meta;
   const showLegalHoldIcon = showIcon && deviceClass === ClientClassification.LEGAL_HOLD;
   const showDesktopIcon = showIcon && deviceClass === ClientClassification.DESKTOP;
   const showMobileIcon = showIcon && !showLegalHoldIcon && !showDesktopIcon;

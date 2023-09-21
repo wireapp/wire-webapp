@@ -47,14 +47,14 @@ export interface CallParticipantsListItemProps {
   isLast?: boolean;
 }
 
-export const CallParticipantsListItem = ({
+export function CallParticipantsListItem({
   callParticipant,
   isSelfVerified = false,
   selfInTeam,
   showContextMenu,
   onContextMenu,
   isLast = false,
-}: CallParticipantsListItemProps) => {
+}: CallParticipantsListItemProps) {
   const {user} = callParticipant;
   const {isMe: isSelf, isFederated} = user;
 
@@ -129,4 +129,4 @@ export const CallParticipantsListItem = ({
       </div>
     </div>
   );
-};
+}

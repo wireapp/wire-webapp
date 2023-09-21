@@ -127,26 +127,43 @@ type SubconversationData = {epoch: number; secretKey: string};
 
 export class CallingRepository {
   private readonly acceptVersionWarning: (conversationId: QualifiedId) => void;
+
   private readonly callLog: string[];
+
   private readonly logger: Logger;
+
   private avsVersion: number = 0;
+
   private incomingCallCallback: (call: Call) => void;
+
   private requestNewEpochCallback: (conversationId: QualifiedId) => void;
+
   private callClosedCallback: (conversationId: QualifiedId, conversationType: CONV_TYPE) => void;
+
   private callParticipantChangedCallback: (conversationId: QualifiedId, members: QualifiedWcallMember[]) => void;
+
   private isReady: boolean = false;
+
   /** will cache the query to media stream (in order to avoid asking the system for streams multiple times when we have multiple peers) */
   private mediaStreamQuery?: Promise<MediaStream>;
+
   private poorCallQualityUsers: {[conversationId: string]: string[]} = {};
+
   private selfClientId: ClientId | null = null;
+
   private selfUser: User | null = null;
+
   private wCall?: Wcall;
+
   private wUser: number = 0;
+
   private nextMuteState: MuteState = MuteState.SELF_MUTED;
+
   /**
    * Keeps track of the size of the avs log once the webapp is initiated. This allows detecting meaningless avs logs (logs that have a length equal to the length when the webapp was initiated)
    */
   private avsInitLogLength: number = 0;
+
   onChooseScreen: (deviceId: string) => void;
 
   static get CONFIG() {
@@ -564,9 +581,9 @@ export class CallingRepository {
     }
   };
 
-  //##############################################################################
+  // ##############################################################################
   // Inbound call events
-  //##############################################################################
+  // ##############################################################################
 
   private abortCall(conversationId: QualifiedId, reason: LEAVE_CALL_REASON): void {
     const call = this.findCall(conversationId);
@@ -690,9 +707,9 @@ export class CallingRepository {
     }
   };
 
-  //##############################################################################
+  // ##############################################################################
   // Call actions
-  //##############################################################################
+  // ##############################################################################
 
   private readonly toggleState = (withVideo: boolean): void => {
     const conversation = this.conversationState.activeConversation();
@@ -1117,7 +1134,7 @@ export class CallingRepository {
     if (call?.blockMessages) {
       return 0;
     }
-    let options: MessageSendingOptions | undefined = undefined;
+    let options: MessageSendingOptions | undefined;
 
     if (typeof targets === 'string') {
       const parsedTargets: SendMessageTarget = JSON.parse(targets);
@@ -1742,9 +1759,9 @@ export class CallingRepository {
     this.wCall?.destroy(this.wUser);
   }
 
-  //##############################################################################
+  // ##############################################################################
   // Calling config
-  //##############################################################################
+  // ##############################################################################
 
   fetchConfig(limit?: number): Promise<CallConfigData> {
     return this.apiClient.api.account.getCallConfig(limit);
@@ -1785,9 +1802,9 @@ export class CallingRepository {
     PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, modalOptions);
   }
 
-  //##############################################################################
+  // ##############################################################################
   // Logging
-  //##############################################################################
+  // ##############################################################################
 
   /**
    * Returns the call log if it is a meaningful log.

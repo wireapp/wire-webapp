@@ -20,7 +20,7 @@
 import {currentLanguage} from './auth/localeConfig';
 import {Config} from './Config';
 
-const env = window.wire.env;
+const {env} = window.wire;
 
 export const URL = {
   ACCOUNT: env.URL?.ACCOUNT_BASE,

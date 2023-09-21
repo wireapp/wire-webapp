@@ -290,7 +290,7 @@ export const Conversation: FC<ConversationProps> = ({
   };
 
   const userMentionClick = (messageDetails: MessageDetails) => {
-    const userId = messageDetails.userId;
+    const {userId} = messageDetails;
     const domain = messageDetails.userDomain;
 
     if (userId) {
@@ -477,7 +477,7 @@ export const Conversation: FC<ConversationProps> = ({
           {activeCalls.map(call => {
             const conversation = conversationState.findConversation(call.conversationId);
             const callingViewModel = mainViewModel.calling;
-            const callingRepository = callingViewModel.callingRepository;
+            const {callingRepository} = callingViewModel;
 
             if (!conversation || !smBreakpoint) {
               return null;
@@ -538,7 +538,7 @@ export const Conversation: FC<ConversationProps> = ({
           />
 
           <div className="conversation-loading">
-            <div className="icon-spinner spin accent-text"></div>
+            <div className="icon-spinner spin accent-text" />
           </div>
         </>
       )}

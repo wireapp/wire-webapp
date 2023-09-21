@@ -138,7 +138,7 @@ export const PeopleTab: React.FC<{
       contacts: [...searchResults.contacts, ...nonExternalContacts].sort((userA, userB) =>
         sortByPriority(userA.name(), userB.name(), query),
       ),
-      others: others,
+      others,
     };
   };
 
@@ -176,7 +176,7 @@ export const PeopleTab: React.FC<{
       const trimmedQuery = searchQuery.trim();
       const isHandle = trimmedQuery.startsWith('@') && validateHandle(query);
 
-      const SEARCHABLE_FIELDS = SearchRepository.CONFIG.SEARCHABLE_FIELDS;
+      const {SEARCHABLE_FIELDS} = SearchRepository.CONFIG;
       const searchFields = isHandle ? [SEARCHABLE_FIELDS.USERNAME] : undefined;
 
       // If the user typed a domain, we will just ignore it when searchng for the user locally
@@ -240,7 +240,7 @@ export const PeopleTab: React.FC<{
         <div className="start-ui-fed-domain-unavailable">
           <div className="start-ui-fed-domain-unavailable__head">{t('searchConnectWithOtherDomain')}</div>
           <span className="start-ui-fed-domain-unavailable__text">{t('searchFederatedDomainNotAvailable')}</span>
-          {/*@todo: re-enable when federation article is available
+          {/* @todo: re-enable when federation article is available
                 <a className="start-ui-fed-domain-unavailable__link" rel="nofollow noopener noreferrer" target="_blank" data-bind="attr: {href: ''}, text: t('searchFederatedDomainNotAvailableLearnMore')"></a>
             */}
         </div>
@@ -257,7 +257,7 @@ export const PeopleTab: React.FC<{
                   onClick={() => safeWindowOpen(manageTeamUrl)}
                   data-uie-name="do-invite-member"
                 >
-                  <span className="left-column-icon icon-envelope"></span>
+                  <span className="left-column-icon icon-envelope" />
                   <span className="column-center">{t('searchMemberInvite')}</span>
                 </button>
               </li>
@@ -327,7 +327,7 @@ export const PeopleTab: React.FC<{
               </span>
               <div className="start-ui-fed-wrapper__text">{t('searchTrySearchFederation')}</div>
               <div className="start-ui-fed-wrapper__button">
-                {/*@todo: re-enable when federation article is available
+                {/* @todo: re-enable when federation article is available
                 <button type="button" data-bind="click: () => {}" data-uie-name="do-search-learn-more">
                   {t('searchTrySearchLearnMore')}
                 </button>

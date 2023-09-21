@@ -40,7 +40,9 @@ export class MediaStreamHandler {
   }
 
   private readonly logger: Logger;
+
   private requestHintTimeout: number | undefined;
+
   private readonly screensharingMethod: ScreensharingMethods;
 
   constructor(
@@ -53,7 +55,7 @@ export class MediaStreamHandler {
     this.screensharingMethod = ScreensharingMethods.NONE;
     if (window.desktopCapturer) {
       this.screensharingMethod = ScreensharingMethods.DESKTOP_CAPTURER;
-    } else if (!!navigator.mediaDevices?.getDisplayMedia) {
+    } else if (navigator.mediaDevices?.getDisplayMedia) {
       this.screensharingMethod = ScreensharingMethods.DISPLAY_MEDIA;
     } else if (Runtime.isFirefox()) {
       this.screensharingMethod = ScreensharingMethods.USER_MEDIA;
@@ -153,7 +155,7 @@ export class MediaStreamHandler {
         return mediaStream;
       })
       .catch((error: Error) => {
-        const message = error.message;
+        const {message} = error;
         const name = error.name as MEDIA_STREAM_ERROR;
         this.logger.warn(
           `MediaStream request for (audio: ${audio}, video: ${video}, screen: ${screen}) failed: ${name} ${message}`,

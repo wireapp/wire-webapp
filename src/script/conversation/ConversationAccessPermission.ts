@@ -130,12 +130,12 @@ export function updateAccessRights(accessState: ACCESS_STATE): UpdatedAccessRigh
   const newAccessRights: UpdatedAccessRights = {accessModes: [], accessRole: []};
 
   teamPermissionsForAccessState(accessState)
-    //turn the permissions into a bitwise value ie. 11011
+    // turn the permissions into a bitwise value ie. 11011
     .toString(2)
     .split('')
-    //reverse so that the index reflects the number of significant figures for finding the feature
+    // reverse so that the index reflects the number of significant figures for finding the feature
     .reverse()
-    //find the name of the feature with the correct sigfigs
+    // find the name of the feature with the correct sigfigs
     .map((bit: '1' | '0', i) => Object.entries(ACCESS).find(([, bitmask]) => bitmask === +bit << i)?.[0])
     .forEach(feature => {
       const accessRole = CONVERSATION_ACCESS_ROLE[feature as keyof typeof CONVERSATION_ACCESS_ROLE];

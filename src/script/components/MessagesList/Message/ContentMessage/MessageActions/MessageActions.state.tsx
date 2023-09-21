@@ -27,7 +27,7 @@ type MessageActionsState = {
 
 const useMessageActionsState = create<MessageActionsState>((set, get) => ({
   isMenuOpen: false,
-  handleMenuOpen: isMenuOpen => set(state => ({...state, isMenuOpen: isMenuOpen})),
+  handleMenuOpen: isMenuOpen => set(state => ({...state, isMenuOpen})),
   getMenuState: () => get().isMenuOpen,
 }));
 

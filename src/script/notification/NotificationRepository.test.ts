@@ -132,7 +132,7 @@ describe('NotificationRepository', () => {
     document.hasFocus = () => false;
     notificationRepository.updatePermissionState(PermissionStatusState.GRANTED);
     spyOn(Runtime, 'isSupportingNotifications').and.returnValue(true);
-    spyOn(notificationRepository['assetRepository'], 'generateAssetUrl').and.returnValue(
+    spyOn(notificationRepository.assetRepository, 'generateAssetUrl').and.returnValue(
       Promise.resolve('/image/logo/notification.png'),
     );
 
@@ -167,7 +167,7 @@ describe('NotificationRepository', () => {
       return notificationRepository.notify(_message, undefined, _conversation).then(() => {
         expect(showNotificationSpy).toHaveBeenCalledTimes(1);
 
-        const trigger = notificationRepository['createTrigger'](message, undefined, conversation);
+        const trigger = notificationRepository.createTrigger(message, undefined, conversation);
         notification_content.options.body = _expected_body;
         notification_content.options.data.messageType = _message.type;
         notification_content.trigger = trigger;
@@ -186,9 +186,9 @@ describe('NotificationRepository', () => {
 
     verifyNotificationEphemeral = (_conversation, _message) => {
       return notificationRepository.notify(_message, undefined, _conversation).then(() => {
-        expect(notificationRepository['showNotification']).toHaveBeenCalledTimes(1);
+        expect(notificationRepository.showNotification).toHaveBeenCalledTimes(1);
 
-        const trigger = notificationRepository['createTrigger'](message, undefined, conversation);
+        const trigger = notificationRepository.createTrigger(message, undefined, conversation);
         notification_content.options.body = t('notificationObfuscated');
         notification_content.options.data.messageType = _message.type;
         notification_content.title = t('notificationObfuscatedTitle');
@@ -202,9 +202,9 @@ describe('NotificationRepository', () => {
 
     verifyNotificationObfuscated = (_conversation, _message, _setting) => {
       return notificationRepository.notify(_message, undefined, _conversation).then(() => {
-        expect(notificationRepository['showNotification']).toHaveBeenCalledTimes(1);
+        expect(notificationRepository.showNotification).toHaveBeenCalledTimes(1);
 
-        const trigger = notificationRepository['createTrigger'](message, undefined, conversation);
+        const trigger = notificationRepository.createTrigger(message, undefined, conversation);
         notification_content.trigger = trigger;
 
         const obfuscateMessage = _setting === NotificationPreference.OBFUSCATE_MESSAGE;
@@ -225,9 +225,9 @@ describe('NotificationRepository', () => {
 
     verifyNotificationSystem = (_conversation, _message, _expected_body, _expected_title) => {
       return notificationRepository.notify(_message, undefined, _conversation).then(() => {
-        expect(notificationRepository['showNotification']).toHaveBeenCalledTimes(1);
+        expect(notificationRepository.showNotification).toHaveBeenCalledTimes(1);
 
-        const trigger = notificationRepository['createTrigger'](message, undefined, conversation);
+        const trigger = notificationRepository.createTrigger(message, undefined, conversation);
         notification_content.trigger = trigger;
         notification_content.options.body = _expected_body;
         notification_content.options.data.messageType = _message.type;
@@ -254,7 +254,7 @@ describe('NotificationRepository', () => {
     it('if the browser does not support them', () => {
       jest.spyOn(Runtime, 'isSupportingNotifications').mockReturnValue(false);
       return notificationRepository.notify(message, undefined, conversation).then(() => {
-        expect(notificationRepository['showNotification']).not.toHaveBeenCalled();
+        expect(notificationRepository.showNotification).not.toHaveBeenCalled();
       });
     });
 
@@ -268,14 +268,14 @@ describe('NotificationRepository', () => {
       return notificationRepository
         .notify(message, undefined, conversation)
         .then(() => {
-          expect(notificationRepository['showNotification']).not.toHaveBeenCalled();
+          expect(notificationRepository.showNotification).not.toHaveBeenCalled();
 
           contentViewModelState.multitasking.isMinimized = () => false;
 
           return notificationRepository.notify(message, undefined, conversation);
         })
         .then(() => {
-          expect(notificationRepository['showNotification']).toHaveBeenCalledTimes(1);
+          expect(notificationRepository.showNotification).toHaveBeenCalledTimes(1);
         });
     });
 
@@ -283,7 +283,7 @@ describe('NotificationRepository', () => {
       message.user().isMe = true;
 
       return notificationRepository.notify(message, undefined, conversation).then(() => {
-        expect(notificationRepository['showNotification']).not.toHaveBeenCalled();
+        expect(notificationRepository.showNotification).not.toHaveBeenCalled();
       });
     });
 
@@ -291,7 +291,7 @@ describe('NotificationRepository', () => {
       conversation.mutedState(NOTIFICATION_STATE.NOTHING);
 
       return notificationRepository.notify(message, undefined, conversation).then(() => {
-        expect(notificationRepository['showNotification']).not.toHaveBeenCalled();
+        expect(notificationRepository.showNotification).not.toHaveBeenCalled();
       });
     });
 
@@ -299,7 +299,7 @@ describe('NotificationRepository', () => {
       message = new CallMessage(CALL_MESSAGE_TYPE.DEACTIVATED, TERMINATION_REASON.COMPLETED) as any;
 
       return notificationRepository.notify(message, undefined, conversation).then(() => {
-        expect(notificationRepository['showNotification']).not.toHaveBeenCalled();
+        expect(notificationRepository.showNotification).not.toHaveBeenCalled();
       });
     });
 
@@ -307,7 +307,7 @@ describe('NotificationRepository', () => {
       notificationRepository.updatedNotificationsProperty(NotificationPreference.NONE);
 
       return notificationRepository.notify(message, undefined, conversation).then(() => {
-        expect(notificationRepository['showNotification']).not.toHaveBeenCalled();
+        expect(notificationRepository.showNotification).not.toHaveBeenCalled();
       });
     });
 
@@ -315,7 +315,7 @@ describe('NotificationRepository', () => {
       notificationRepository.updatePermissionState(PermissionStatusState.DENIED);
 
       return notificationRepository.notify(message, undefined, conversation).then(() => {
-        expect(notificationRepository['showNotification']).not.toHaveBeenCalled();
+        expect(notificationRepository.showNotification).not.toHaveBeenCalled();
       });
     });
   });
@@ -354,9 +354,9 @@ describe('NotificationRepository', () => {
       const testPromises = Object.values(allMessageTypes).map(messageEntity => {
         return notificationRepository.notify(messageEntity, undefined, conversation).then(() => {
           if (messageEntity.isComposite()) {
-            expect(notificationRepository['showNotification']).toHaveBeenCalled();
+            expect(notificationRepository.showNotification).toHaveBeenCalled();
           } else {
-            expect(notificationRepository['showNotification']).not.toHaveBeenCalled();
+            expect(notificationRepository.showNotification).not.toHaveBeenCalled();
           }
         });
       });
@@ -377,7 +377,7 @@ describe('NotificationRepository', () => {
       });
 
       return Promise.all(testPromises).then(() => {
-        expect(notificationRepository['showNotification']).not.toHaveBeenCalled();
+        expect(notificationRepository.showNotification).not.toHaveBeenCalled();
       });
     });
 
@@ -394,7 +394,7 @@ describe('NotificationRepository', () => {
       });
 
       return Promise.all(testPromises).then(() => {
-        expect(notificationRepository['showNotification']).toHaveBeenCalledTimes(notifiedMessages.length);
+        expect(notificationRepository.showNotification).toHaveBeenCalledTimes(notifiedMessages.length);
       });
     });
   });
@@ -655,7 +655,7 @@ describe('NotificationRepository', () => {
         memberMessage.userEntities([otherUser]);
 
         return notificationRepository.notify(memberMessage, undefined, conversation).then(() => {
-          expect(notificationRepository['showNotification']).not.toHaveBeenCalled();
+          expect(notificationRepository.showNotification).not.toHaveBeenCalled();
         });
       });
 
@@ -673,7 +673,7 @@ describe('NotificationRepository', () => {
         memberMessage.userEntities(user_ets);
 
         return notificationRepository.notify(memberMessage, undefined, conversation).then(() => {
-          expect(notificationRepository['showNotification']).not.toHaveBeenCalled();
+          expect(notificationRepository.showNotification).not.toHaveBeenCalled();
         });
       });
 
@@ -681,7 +681,7 @@ describe('NotificationRepository', () => {
         memberMessage.userEntities([memberMessage.user()]);
 
         return notificationRepository.notify(memberMessage, undefined, conversation).then(() => {
-          expect(notificationRepository['showNotification']).not.toHaveBeenCalled();
+          expect(notificationRepository.showNotification).not.toHaveBeenCalled();
         });
       });
     });
@@ -764,14 +764,14 @@ describe('NotificationRepository', () => {
       notificationRepository.updatedNotificationsProperty(NotificationPreference.NONE);
 
       return notificationRepository.notify(compositeMessage, undefined, conversation).then(() => {
-        expect(notificationRepository['showNotification']).toHaveBeenCalled();
+        expect(notificationRepository.showNotification).toHaveBeenCalled();
       });
     });
 
     it('even if notifications are disabled in conversation settings', () => {
       conversation.mutedState(NOTIFICATION_STATE.NOTHING);
       return notificationRepository.notify(compositeMessage, undefined, conversation).then(() => {
-        expect(notificationRepository['showNotification']).toHaveBeenCalled();
+        expect(notificationRepository.showNotification).toHaveBeenCalled();
       });
     });
   });
@@ -781,7 +781,7 @@ describe('NotificationRepository', () => {
     let messageEntity: ContentMessage;
 
     const userId = {domain: '', id: createUuid()};
-    const shouldNotifyInConversation = NotificationRepository.shouldNotifyInConversation;
+    const {shouldNotifyInConversation} = NotificationRepository;
 
     function generateTextAsset(selfMentioned = false) {
       const mentionId = selfMentioned ? userId.id : createUuid();

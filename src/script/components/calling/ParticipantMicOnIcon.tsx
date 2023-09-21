@@ -61,7 +61,7 @@ const ParticipantMicOnIcon: React.FC<ParticipantMicOnIconProps> = ({
         }}
         viewBox="0 0 16 16"
         dangerouslySetInnerHTML={{__html: getSVG('mic-on-icon')?.documentElement?.innerHTML}}
-      ></svg>
+      />
     </span>
   );
 };

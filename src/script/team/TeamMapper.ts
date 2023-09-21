@@ -33,7 +33,9 @@ export class TeamMapper {
   }
 
   updateTeamFromObject(): void;
+
   updateTeamFromObject(teamData: TeamData | TeamUpdateData, teamEntity?: TeamEntity): TeamEntity;
+
   updateTeamFromObject(teamData?: TeamData | TeamUpdateData, teamEntity = new TeamEntity()): TeamEntity | void {
     if (teamData) {
       const {icon, icon_key: iconKey, name} = teamData;

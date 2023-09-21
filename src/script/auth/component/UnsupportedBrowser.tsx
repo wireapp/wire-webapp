@@ -54,7 +54,7 @@ export interface UnsupportedBrowserProps extends React.HTMLProps<HTMLDivElement>
   isTemporaryGuest?: boolean;
 }
 
-export const UnsupportedBrowserComponent = ({
+export function UnsupportedBrowserComponent({
   children,
   hasCookieSupport,
   hasIndexedDbSupport,
@@ -62,7 +62,7 @@ export const UnsupportedBrowserComponent = ({
   isSupportedBrowser,
   isTemporaryGuest,
   hasToUseDesktopApplication,
-}: UnsupportedBrowserProps & ConnectedProps) => {
+}: UnsupportedBrowserProps & ConnectedProps) {
   const {formatMessage: _} = useIntl();
   if (!isSupportedBrowser) {
     return (
@@ -117,7 +117,7 @@ export const UnsupportedBrowserComponent = ({
   }
 
   return <>{children}</>;
-};
+}
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({

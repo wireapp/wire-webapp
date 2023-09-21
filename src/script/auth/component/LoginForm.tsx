@@ -35,7 +35,7 @@ interface LoginFormProps {
   onSubmit: (loginData: Partial<LoginData>, validationErrors: Error[]) => Promise<void>;
 }
 
-const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
+function LoginForm({isFetching, onSubmit}: LoginFormProps) {
   const {formatMessage: _} = useIntl();
   const emailInput = useRef<HTMLInputElement>(null);
   const passwordInput = useRef<HTMLInputElement>(null);
@@ -131,7 +131,7 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
         autoComplete="section-login password"
         type="password"
         placeholder={_(loginStrings.passwordPlaceholder)}
-        pattern={'.{1,1024}'}
+        pattern=".{1,1024}"
         required
         data-uie-name="enter-password"
       />
@@ -153,6 +153,6 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
       )}
     </div>
   );
-};
+}
 
 export {LoginForm};

@@ -53,7 +53,7 @@ import * as AccentColor from '../util/AccentColor';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
-const ConversationJoinComponent = ({
+function ConversationJoinComponent({
   doCheckConversationCode,
   doJoinConversationByCode,
   doInit,
@@ -62,7 +62,7 @@ const ConversationJoinComponent = ({
   doLogout,
   selfName,
   conversationError,
-}: Props & ConnectedProps & DispatchProps) => {
+}: Props & ConnectedProps & DispatchProps) {
   const nameInput = React.useRef<HTMLInputElement>(null);
   const {formatMessage: _} = useIntl();
 
@@ -257,7 +257,7 @@ const ConversationJoinComponent = ({
       </WirelessContainer>
     </UnsupportedBrowser>
   );
-};
+}
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({

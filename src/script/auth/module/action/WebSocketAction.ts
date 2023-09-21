@@ -21,8 +21,8 @@ import {USER_EVENT} from '@wireapp/api-client/lib/event/';
 
 import {getLogger} from 'Util/Logger';
 
-import type {ThunkAction} from '../../module/reducer';
-import * as SelfSelector from '../../module/selector/SelfSelector';
+import type {ThunkAction} from '../reducer';
+import * as SelfSelector from '../selector/SelfSelector';
 
 const logger = getLogger('WebSocketAction');
 export const WebSocketAction = {

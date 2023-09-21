@@ -40,7 +40,7 @@ const defaultProps: MessageReactionsProps = {
   handleKeyDown: jest.fn(),
   handleCurrentMsgAction: jest.fn(),
   resetActionMenuStates: jest.fn(),
-  wrapperRef: wrapperRef,
+  wrapperRef,
 };
 describe('MessageReactions', () => {
   afterEach(() => {
@@ -48,15 +48,15 @@ describe('MessageReactions', () => {
   });
 
   test('outside click should close the emoji picker', async () => {
-    let currentMsgActionName = defaultProps.currentMsgActionName; // preserve initial value
+    let {currentMsgActionName} = defaultProps; // preserve initial value
 
-    const MessageReactionsComponent = (props: MessageReactionsProps) => {
+    function MessageReactionsComponent(props: MessageReactionsProps) {
       return (
         <div ref={wrapperRef}>
           <MessageReactions {...props} />
         </div>
       );
-    };
+    }
     const {getByLabelText, getByTestId, queryByTestId, rerender} = render(
       <MessageReactionsComponent {...defaultProps} />,
     );

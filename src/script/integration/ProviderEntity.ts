@@ -27,9 +27,13 @@ export interface ProviderData {
 
 export class ProviderEntity {
   description: string;
+
   email: string;
+
   id: string;
+
   name: string;
+
   url: string;
 
   constructor(providerData: ProviderData = {}) {

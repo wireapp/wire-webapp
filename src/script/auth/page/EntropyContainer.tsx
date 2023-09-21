@@ -35,7 +35,7 @@ interface Props extends React.HTMLProps<HTMLDivElement> {
   containerSize?: number;
 }
 
-const EntropyContainer = ({onSetEntropy, containerSize = 400}: Props) => {
+function EntropyContainer({onSetEntropy, containerSize = 400}: Props) {
   const {formatMessage: _} = useIntl();
   const [entropy, setEntropy] = useState<EntropyData>(new EntropyData());
   const [pause, setPause] = useState<boolean>();
@@ -109,6 +109,6 @@ const EntropyContainer = ({onSetEntropy, containerSize = 400}: Props) => {
       )}
     </ContainerSM>
   );
-};
+}
 
 export {EntropyContainer};

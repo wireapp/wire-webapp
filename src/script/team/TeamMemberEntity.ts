@@ -22,7 +22,9 @@ import type {PermissionsData} from '@wireapp/api-client/lib/team/member/Permissi
 
 export class TeamMemberEntity {
   permissions?: PermissionsData;
+
   invitedBy?: string;
+
   legalholdStatus?: LegalHoldMemberStatus;
 
   constructor(public readonly userId: string) {

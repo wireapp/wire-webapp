@@ -33,11 +33,17 @@ export interface AssetPayload {
 
 export class Asset {
   public file_type?: string;
+
   public file_name?: string;
+
   public id?: string;
+
   public key: string;
+
   public size: string;
+
   public type: string;
+
   public text: string;
 
   constructor(id?: string) {

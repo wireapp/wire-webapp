@@ -276,8 +276,8 @@ const Conversations: React.FC<ConversationsProps> = ({
     <>
       {activeCalls.map(call => {
         const conversation = conversationState.findConversation(call.conversationId);
-        const callingViewModel = listViewModel.callingViewModel;
-        const callingRepository = callingViewModel.callingRepository;
+        const {callingViewModel} = listViewModel;
+        const {callingRepository} = callingViewModel;
 
         return (
           conversation && (

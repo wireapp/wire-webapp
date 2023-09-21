@@ -65,9 +65,11 @@ export class ConversationActionCreator {
   static startConversationCodeCheck = (): ConversationCodeCheckStartAction => ({
     type: CONVERSATION_ACTION.CONVERSATION_CODE_CHECK_START,
   });
+
   static successfulConversationCodeCheck = (): ConversationCodeCheckSuccessAction => ({
     type: CONVERSATION_ACTION.CONVERSATION_CODE_CHECK_SUCCESS,
   });
+
   static failedConversationCodeCheck = (error: Error): ConversationCodeCheckFailedAction => ({
     error,
     type: CONVERSATION_ACTION.CONVERSATION_CODE_CHECK_FAILED,
@@ -76,10 +78,12 @@ export class ConversationActionCreator {
   static startJoinConversationByCode = (): ConversationCodeJoinStartAction => ({
     type: CONVERSATION_ACTION.CONVERSATION_CODE_JOIN_START,
   });
+
   static successfulJoinConversationByCode = (data: ConversationEvent): ConversationCodeJoinSuccessAction => ({
     payload: data,
     type: CONVERSATION_ACTION.CONVERSATION_CODE_JOIN_SUCCESS,
   });
+
   static failedJoinConversationByCode = (error: Error): ConversationCodeJoinFailedAction => ({
     error,
     type: CONVERSATION_ACTION.CONVERSATION_CODE_JOIN_FAILED,

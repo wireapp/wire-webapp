@@ -95,7 +95,7 @@ const StartUI: React.FC<StartUIProps> = ({
     void conversationRepository.loadMissingConversations();
   }, [conversationRepository]);
 
-  const actions = mainViewModel.actions;
+  const {actions} = mainViewModel;
   const isTeam = teamState.isTeam();
   const teamName = teamState.teamName();
 
@@ -132,8 +132,8 @@ const StartUI: React.FC<StartUIProps> = ({
   const openService = (service: ServiceEntity) => {
     showServiceModal({
       actionsViewModel: mainViewModel.actions,
-      integrationRepository: integrationRepository,
-      service: service,
+      integrationRepository,
+      service,
     });
   };
 
@@ -222,7 +222,7 @@ const StartUI: React.FC<StartUIProps> = ({
 
   const footer = !isTeam ? (
     <button className="start-ui-import" onClick={openInviteModal} data-uie-name="show-invite-modal">
-      <span className="icon-invite start-ui-import-icon"></span>
+      <span className="icon-invite start-ui-import-icon" />
       <span>{t('searchInvite', brandName)}</span>
     </button>
   ) : undefined;

@@ -48,20 +48,26 @@ enum DEXIE_CRUD_EVENT {
 @singleton()
 export class StorageService {
   public db?: DexieDatabase;
+
   private readonly dbListeners: DatabaseListener[] = [];
+
   private hasHookSupport: boolean;
+
   private engine: CRUDEngine;
+
   public isTemporaryAndNonPersistent: boolean;
+
   private readonly logger: Logger;
+
   public dbName?: string;
 
   constructor() {
     this.logger = getLogger('StorageService');
   }
 
-  //##############################################################################
+  // ##############################################################################
   // Initialization
-  //##############################################################################
+  // ##############################################################################
 
   /**
    * Initialize the IndexedDB for a user.
@@ -78,7 +84,7 @@ export class StorageService {
 
     try {
       if (this.hasHookSupport) {
-        this.db = this.engine['db'];
+        this.db = this.engine.db;
         this._initCrudHooks(this.db);
       }
       return this.dbName;
@@ -131,9 +137,9 @@ export class StorageService {
     this.dbListeners.push({callback, store: storeName, type: DEXIE_CRUD_EVENT.DELETING});
   }
 
-  //##############################################################################
+  // ##############################################################################
   // Interactions
-  //##############################################################################
+  // ##############################################################################
 
   /**
    * Clear all stores.

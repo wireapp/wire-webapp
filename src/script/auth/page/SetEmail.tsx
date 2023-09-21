@@ -38,12 +38,12 @@ import {ROUTE} from '../route';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
-const SetEmailComponent = ({
+function SetEmailComponent({
   hasSelfEmail,
   isSelfSSOUser,
   doSetEmail,
   isFetching,
-}: Props & ConnectedProps & DispatchProps) => {
+}: Props & ConnectedProps & DispatchProps) {
   const {formatMessage: _} = useIntl();
 
   const emailInput = useRef<HTMLInputElement>();
@@ -119,7 +119,7 @@ const SetEmailComponent = ({
       </ContainerXS>
     </Page>
   );
-};
+}
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({

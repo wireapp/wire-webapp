@@ -29,6 +29,7 @@ export type AppStatistics = Partial<Record<AppInitStatisticsValue, string | numb
 
 export class AppInitStatistics {
   private readonly logger: Logger;
+
   private readonly statistics: AppStatistics;
 
   static get CONFIG() {

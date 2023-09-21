@@ -84,97 +84,187 @@ enum TIMESTAMP_TYPE {
 
 export class Conversation {
   private readonly teamState: TeamState;
+
   public readonly archivedState: ko.Observable<boolean>;
+
   private readonly incomingMessages: ko.ObservableArray<Message>;
+
   private readonly isTeam1to1: ko.PureComputed<boolean>;
+
   public readonly last_server_timestamp: ko.Observable<number>;
+
   private readonly logger: Logger;
+
   public readonly mutedState: ko.Observable<number>;
+
   private readonly mutedTimestamp: ko.Observable<number>;
+
   private readonly publishPersistState: (() => void) & Cancelable;
+
   private shouldPersistStateChanges: boolean;
+
   public blockLegalHoldMessage: boolean;
+
   public hasCreationMessage: boolean;
+
   public needsLegalHoldApproval: boolean = false;
+
   public readonly accessCode: ko.Observable<string>;
+
   public readonly accessState: ko.Observable<ACCESS_STATE>;
+
   public readonly archivedTimestamp: ko.Observable<number>;
+
   public readonly availabilityOfUser: ko.PureComputed<Availability.Type>;
+
   public readonly call: ko.Observable<Call | null>;
+
   public readonly cleared_timestamp: ko.Observable<number>;
+
   public readonly connection: ko.Observable<ConnectionEntity>;
+
   // TODO(Federation): Currently the 'creator' just refers to a user id but it has to become a qualified id
   public creator: string;
+
   public groupId?: string;
+
   public epoch: number = -1;
+
   public cipherSuite: number = 1;
+
   public readonly isUsingMLSProtocol: boolean;
+
   public readonly display_name: ko.PureComputed<string>;
+
   public readonly firstUserEntity: ko.PureComputed<User>;
+
   public readonly enforcedTeamMessageTimer: ko.PureComputed<number>;
+
   public readonly globalMessageTimer: ko.Observable<number | null>;
+
   public readonly hasContentMessages: ko.Observable<boolean>;
+
   public readonly hasAdditionalMessages: ko.Observable<boolean>;
+
   public readonly hasGlobalMessageTimer: ko.PureComputed<boolean>;
+
   public readonly hasGuest: ko.PureComputed<boolean>;
+
   public readonly hasDirectGuest: ko.PureComputed<boolean>;
+
   public readonly hasLegalHold: ko.Computed<boolean>;
+
   public readonly hasService: ko.PureComputed<boolean>;
+
   public readonly hasUnread: ko.PureComputed<boolean>;
+
   public id: string;
+
   public readonly inTeam: ko.PureComputed<boolean>;
+
   public readonly lastDeliveredMessage: ko.PureComputed<Message | undefined>;
+
   public readonly is_archived: ko.Observable<boolean>;
+
   public readonly is_cleared: ko.PureComputed<boolean>;
+
   public readonly is_loaded: ko.Observable<boolean>;
+
   public readonly is_pending: ko.Observable<boolean>;
+
   public readonly is_verified: ko.PureComputed<boolean | undefined>;
+
   public readonly is1to1: ko.PureComputed<boolean>;
+
   public readonly isActiveParticipant: ko.PureComputed<boolean>;
+
   public readonly isClearable: ko.PureComputed<boolean>;
+
   public readonly isCreatedBySelf: ko.PureComputed<boolean>;
+
   public readonly isGroup: ko.PureComputed<boolean>;
+
   public readonly isGuest: ko.Observable<boolean>;
+
   public readonly isGuestRoom: ko.PureComputed<boolean>;
+
   public readonly isGuestAndServicesRoom: ko.PureComputed<boolean>;
+
   public readonly isServicesRoom: ko.PureComputed<boolean>;
+
   public readonly isLeavable: ko.PureComputed<boolean>;
+
   public readonly isMutable: ko.PureComputed<boolean>;
+
   public readonly isRequest: ko.PureComputed<boolean>;
+
   /** @deprecated use isSelfConversation from conversationSelectors */
   public readonly isSelf: ko.PureComputed<boolean>;
+
   public readonly isTeamOnly: ko.PureComputed<boolean>;
+
   public readonly last_event_timestamp: ko.Observable<number>;
+
   public readonly last_read_timestamp: ko.Observable<number>;
+
   public readonly legalHoldStatus: ko.Observable<LegalHoldStatus>;
+
   public readonly localMessageTimer: ko.Observable<number>;
+
   public readonly messages_unordered: ko.ObservableArray<Message>;
+
   public readonly messages_visible: ko.PureComputed<Message[]>;
+
   public readonly messages: ko.PureComputed<Message[]>;
+
   public readonly messageTimer: ko.PureComputed<number>;
+
   public readonly name: ko.Observable<string>;
+
   public readonly notificationState: ko.PureComputed<number>;
+
   public readonly participating_user_ets: ko.ObservableArray<User>;
+
   public readonly participating_user_ids: ko.ObservableArray<QualifiedId>;
+
   public readonly allUserEntities: ko.PureComputed<User[]>;
+
   public readonly receiptMode: ko.Observable<RECEIPT_MODE>;
+
   public readonly removed_from_conversation: ko.PureComputed<boolean>;
+
   public readonly roles: ko.Observable<Record<string, string>>;
+
   public readonly selfUser: ko.Observable<User | undefined>;
+
   public readonly servicesCount: ko.PureComputed<number>;
+
   public readonly showNotificationsEverything: ko.PureComputed<boolean>;
+
   public readonly showNotificationsMentionsAndReplies: ko.PureComputed<boolean>;
+
   public readonly showNotificationsNothing: ko.PureComputed<boolean>;
+
   public status: ko.Observable<ConversationStatus>;
+
   public team_id: string;
+
   public readonly type: ko.Observable<CONVERSATION_TYPE>;
+
   public readonly unreadState: ko.PureComputed<UnreadState>;
+
   public readonly verification_state: ko.Observable<ConversationVerificationState>;
+
   public readonly withAllTeamMembers: ko.Observable<boolean>;
+
   public readonly hasExternal: ko.PureComputed<boolean>;
+
   public readonly hasFederatedUsers: ko.PureComputed<boolean>;
+
   public accessModes?: CONVERSATION_ACCESS[];
+
   public accessRole?: CONVERSATION_LEGACY_ACCESS_ROLE | CONVERSATION_ACCESS_ROLE[];
+
   public domain: string;
 
   static get TIMESTAMP_TYPE(): typeof TIMESTAMP_TYPE {
@@ -865,7 +955,9 @@ export class Conversation {
   }
 
   private _findDuplicate(): undefined;
+
   private _findDuplicate(messageId: string, from: string): Message;
+
   private _findDuplicate(messageId?: string, from?: string): Message | undefined {
     if (messageId) {
       return this.messages_unordered().find(messageEntity => {
@@ -983,6 +1075,7 @@ export class Conversation {
   getMessage(messageId: string): Message | undefined {
     return this.messages().find(messageEntity => messageEntity.id === messageId);
   }
+
   /**
    * Get a message by its replacing message id. Useful if the message in question is an edit and has replaced the original message.
    * Only lookup in the loaded message list which is a limited view of all the messages in DB.

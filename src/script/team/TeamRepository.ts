@@ -74,8 +74,11 @@ export interface AccountInfo {
 
 export class TeamRepository {
   private readonly logger: Logger;
+
   private readonly teamMapper: TeamMapper;
+
   private readonly userRepository: UserRepository;
+
   private readonly assetRepository: AssetRepository;
 
   constructor(
@@ -148,7 +151,7 @@ export class TeamRepository {
   };
 
   async getTeam(): Promise<TeamEntity> {
-    const teamId = this.userState.self().teamId;
+    const {teamId} = this.userState.self();
     const teamData = !!teamId && (await this.getTeamById(teamId));
 
     const teamEntity = teamData ? this.teamMapper.mapTeamFromObject(teamData, this.teamState.team()) : new TeamEntity();
@@ -223,7 +226,7 @@ export class TeamRepository {
       return;
     }
 
-    const type = eventJson.type;
+    const {type} = eventJson;
 
     this.logger.info(`Team Event: '${type}' (Source: ${source})`);
 
@@ -264,7 +267,9 @@ export class TeamRepository {
   };
 
   async sendAccountInfo(isDesktop: true): Promise<AccountInfo>;
+
   async sendAccountInfo(isDesktop?: false): Promise<void>;
+
   async sendAccountInfo(isDesktop = Runtime.isDesktopApp()): Promise<AccountInfo | void> {
     if (isDesktop) {
       const imageResource = this.teamState.isTeam()
@@ -346,7 +351,7 @@ export class TeamRepository {
   }
 
   private addUserToTeam(userEntity: User): void {
-    const members = this.teamState.team().members;
+    const {members} = this.teamState.team();
 
     if (!members().find(member => member.id === userEntity.id)) {
       members.push(userEntity);

@@ -36,7 +36,7 @@ const _checkAsset = (event: any): MessageCategory | void => {
 
     let category = MessageCategory.IMAGE;
     if (eventData.content_type === 'image/gif') {
-      category = category | MessageCategory.GIF;
+      category |= MessageCategory.GIF;
     }
 
     return category;
@@ -96,7 +96,7 @@ export const categoryFromEvent = (event: Partial<EventRecord>): MessageCategory 
 
     const isReaction = isObject(eventReactions) && !!Object.keys(eventReactions).length;
     if (isReaction) {
-      category = category | MessageCategory.LIKED;
+      category |= MessageCategory.LIKED;
     }
 
     return category;

@@ -28,13 +28,13 @@ import {SystemMessage} from './SystemMessage';
 jest.mock('Components/Icon', () => ({
   Icon: {
     Edit: () => {
-      return <span data-uie-name="editicon" className="editicon"></span>;
+      return <span data-uie-name="editicon" className="editicon" />;
     },
     Read: () => {
-      return <span data-uie-name="readicon" className="readicon"></span>;
+      return <span data-uie-name="readicon" className="readicon" />;
     },
     Timer: () => {
-      return <span data-uie-name="timericon" className="timericon"></span>;
+      return <span data-uie-name="timericon" className="timericon" />;
     },
   },
   __esModule: true,

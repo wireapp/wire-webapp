@@ -46,7 +46,7 @@ import {Page} from './Page';
 import {inviteStrings} from '../../strings';
 import {Exception} from '../component/Exception';
 import {EXTERNAL_ROUTE} from '../externalRoute';
-import {actionRoot as ROOT_ACTIONS} from '../module/action/';
+import {actionRoot as ROOT_ACTIONS} from '../module/action';
 import {ValidationError} from '../module/action/ValidationError';
 import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
@@ -57,7 +57,7 @@ import {pathWithParams} from '../util/urlUtil';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
-const InitialInviteComponent = ({
+function InitialInviteComponent({
   invites,
   isFetching,
   inviteError,
@@ -66,7 +66,7 @@ const InitialInviteComponent = ({
   isTeamFlow,
   doFlushDatabase,
   removeLocalStorage,
-}: Props & ConnectedProps & DispatchProps) => {
+}: Props & ConnectedProps & DispatchProps) {
   const {formatMessage: _} = useIntl();
   const emailInput = React.useRef<HTMLInputElement>();
   const [enteredEmail, setEnteredEmail] = useState('');
@@ -200,7 +200,7 @@ const InitialInviteComponent = ({
       </ContainerXS>
     </Page>
   );
-};
+}
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({

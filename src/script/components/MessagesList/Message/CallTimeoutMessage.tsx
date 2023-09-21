@@ -34,7 +34,7 @@ export interface CallTimeoutMessageProps {
 }
 
 const CallTimeoutMessage: React.FC<CallTimeoutMessageProps> = ({message}) => {
-  const reason = message.reason;
+  const {reason} = message;
   const {timestamp} = useKoSubscribableChildren(message, ['timestamp']);
   const text = `${t('callWasEndedBecause')} `;
 

@@ -34,7 +34,9 @@ describe('ErrorFallback', () => {
 
     render(
       <div>
-        <ErrorBoundary FallbackComponent={ErrorFallback}>{<SimpleError />}</ErrorBoundary>
+        <ErrorBoundary FallbackComponent={ErrorFallback}>
+          <SimpleError />
+        </ErrorBoundary>
       </div>,
     );
 

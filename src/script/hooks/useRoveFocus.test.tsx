@@ -30,19 +30,19 @@ const renderHTML = (currentFocus: number, handleKeyDown: (e: React.KeyboardEvent
 };
 describe('useRoveFocus', () => {
   it('should set the initial focus to the default value', () => {
-    const TestComponent = () => {
+    function TestComponent() {
       const {currentFocus} = useRoveFocus(3);
       return <div data-uie-name="current-focus">{currentFocus}</div>;
-    };
+    }
     const {getByTestId} = render(<TestComponent />);
     expect(getByTestId('current-focus').textContent).toBe('0');
   });
 
   it('should set the initial focus to the specified value', () => {
-    const TestComponent = () => {
+    function TestComponent() {
       const {currentFocus} = useRoveFocus(3, 2);
       return <div data-uie-name="current-focus">{currentFocus}</div>;
-    };
+    }
     const {getByTestId} = render(<TestComponent />);
     expect(getByTestId('current-focus').textContent).toBe('2');
   });

@@ -171,7 +171,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
       {shouldShowAvatar() && (
         <MessageHeader onClickAvatar={onClickAvatar} message={message} focusTabIndex={messageFocusedTabIndex}>
           {was_edited && (
-            <span className="message-header-label-icon icon-edit" title={message.displayEditedTimestamp()}></span>
+            <span className="message-header-label-icon icon-edit" title={message.displayEditedTimestamp()} />
           )}
           <span className="content-message-timestamp">
             <MessageTime timestamp={timestamp} className="label-xs" data-timestamp-type="normal">

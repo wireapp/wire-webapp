@@ -207,8 +207,8 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
       {hasPausedVideo && (
         <div className="group-video-grid__pause-overlay">
           <div className="background">
-            <div className="background-image"></div>
-            <div className="background-darken"></div>
+            <div className="background-image" />
+            <div className="background-darken" />
           </div>
 
           <div

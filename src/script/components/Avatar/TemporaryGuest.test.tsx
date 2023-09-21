@@ -24,6 +24,7 @@ import {TemporaryGuestAvatar} from './TemporaryGuestAvatar';
 import {User} from '../../entity/User';
 
 import {AVATAR_SIZE, STATE} from '.';
+
 jest.mock('../../auth/util/SVGProvider');
 
 describe('TemporaryGuestAvatar', () => {
@@ -34,7 +35,7 @@ describe('TemporaryGuestAvatar', () => {
 
     const props = {
       avatarSize: AVATAR_SIZE.LARGE,
-      participant: participant,
+      participant,
       state: STATE.NONE,
     };
 
@@ -50,7 +51,7 @@ describe('TemporaryGuestAvatar', () => {
 
     const props = {
       avatarSize: AVATAR_SIZE.LARGE,
-      participant: participant,
+      participant,
       state: STATE.NONE,
     };
 
@@ -66,7 +67,7 @@ describe('TemporaryGuestAvatar', () => {
 
     const props = {
       avatarSize: AVATAR_SIZE.LARGE,
-      participant: participant,
+      participant,
       state: STATE.NONE,
     };
 
@@ -82,7 +83,7 @@ describe('TemporaryGuestAvatar', () => {
 
     const props = {
       avatarSize: AVATAR_SIZE.LARGE,
-      participant: participant,
+      participant,
       state: STATE.BLOCKED,
     };
 

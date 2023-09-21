@@ -43,9 +43,13 @@ import type {EventRecord} from '../storage';
 
 export class ConversationEphemeralHandler extends AbstractConversationEventHandler {
   eventListeners: Record<string, (...args: any[]) => void>;
+
   eventService: EventService;
+
   logger: Logger;
+
   timedMessages: ko.ObservableArray<ContentMessage>;
+
   timedMessagesSubscription: ko.Subscription;
 
   static get CONFIG() {
@@ -59,7 +63,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
   }
 
   static validateTimer(messageTimer: number | null): number {
-    const TIMER_RANGE = ConversationEphemeralHandler.CONFIG.TIMER_RANGE;
+    const {TIMER_RANGE} = ConversationEphemeralHandler.CONFIG;
     const isTimerReset = messageTimer === null;
     return isTimerReset ? messageTimer : clamp(messageTimer, TIMER_RANGE.MIN, TIMER_RANGE.MAX);
   }
@@ -91,7 +95,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
 
       const shouldSetInterval = messageEntities.length !== 0 && !updateIntervalId;
       if (shouldSetInterval) {
-        const INTERVAL_TIME = ConversationEphemeralHandler.CONFIG.INTERVAL_TIME;
+        const {INTERVAL_TIME} = ConversationEphemeralHandler.CONFIG;
         updateIntervalId = window.setInterval(() => this._updateTimedMessages(), INTERVAL_TIME);
         this.logger.info('Started ephemeral message check interval');
       }

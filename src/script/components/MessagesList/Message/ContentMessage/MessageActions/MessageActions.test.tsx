@@ -25,6 +25,7 @@ import {t} from 'Util/LocalizerUtil';
 import {createUuid} from 'Util/uuid';
 
 import {MessageActionsMenu, MessageActionsMenuProps} from './MessageActions';
+
 const defaultProps: MessageActionsMenuProps = {
   isMsgWithHeader: true,
   message: new ContentMessage(createUuid()),

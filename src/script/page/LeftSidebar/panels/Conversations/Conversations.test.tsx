@@ -26,7 +26,7 @@ import {User} from 'src/script/entity/User';
 import {ListState} from 'src/script/page/useAppState';
 import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
 
-import {Conversations} from './';
+import {Conversations} from '.';
 
 describe('Conversations', () => {
   const defaultParams: React.ComponentProps<typeof Conversations> = {

@@ -33,20 +33,20 @@ import {Page} from './Page';
 
 import {Config} from '../../Config';
 import {historyInfoStrings} from '../../strings';
-import {actionRoot} from '../module/action/';
+import {actionRoot} from '../module/action';
 import {bindActionCreators, RootState} from '../module/reducer';
 import * as ClientSelector from '../module/selector/ClientSelector';
 import {ROUTE} from '../route';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
-const HistoryInfoComponent = ({
+function HistoryInfoComponent({
   clients,
   currentSelfClient,
   hasLoadedClients,
   isNewCurrentSelfClient,
   doGetAllClients,
-}: Props & ConnectedProps & DispatchProps) => {
+}: Props & ConnectedProps & DispatchProps) {
   const {formatMessage: _} = useIntl();
   const navigate = useNavigate();
   const shouldLoadClients = !hasLoadedClients && isNewCurrentSelfClient;
@@ -109,7 +109,7 @@ const HistoryInfoComponent = ({
       </ContainerXS>
     </Page>
   );
-};
+}
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({

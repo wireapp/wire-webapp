@@ -45,7 +45,9 @@ export interface GetGifOptions {
 
 export class GiphyRepository {
   private readonly giphyService: GiphyService;
+
   private readonly logger: Logger;
+
   private currentOffset: number;
 
   static CONFIG = {
@@ -99,7 +101,7 @@ export class GiphyRepository {
     return {
       animated: animatedGif.url,
       static: staticGif.url,
-      url: url,
+      url,
     };
   }
 

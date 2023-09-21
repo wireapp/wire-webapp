@@ -44,7 +44,7 @@ import {
 
 import {Config} from '../../Config';
 import {loginStrings, logoutReasonStrings, ssoLoginStrings} from '../../strings';
-import {actionRoot as ROOT_ACTIONS} from '../module/action/';
+import {actionRoot as ROOT_ACTIONS} from '../module/action';
 import {ValidationError} from '../module/action/ValidationError';
 import {bindActionCreators, RootState} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
@@ -59,7 +59,7 @@ export interface SingleSignOnFormProps extends React.HTMLAttributes<HTMLDivEleme
 
 const SSO_CODE_PREFIX = 'wire-';
 const SSO_CODE_PREFIX_REGEX = '[wW][iI][rR][eE]-';
-const SingleSignOnFormComponent = ({
+function SingleSignOnFormComponent({
   initialCode,
   isFetching,
   authError,
@@ -71,7 +71,7 @@ const SingleSignOnFormComponent = ({
   doCheckConversationCode,
   doJoinConversationByCode,
   doNavigate,
-}: SingleSignOnFormProps & ConnectedProps & DispatchProps) => {
+}: SingleSignOnFormProps & ConnectedProps & DispatchProps) {
   const codeOrMailInput = useRef<HTMLInputElement>();
   const [codeOrMail, setCodeOrMail] = useState('');
   const [disableInput, setDisableInput] = useState(false);
@@ -318,7 +318,7 @@ const SingleSignOnFormComponent = ({
       )}
     </Form>
   );
-};
+}
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({

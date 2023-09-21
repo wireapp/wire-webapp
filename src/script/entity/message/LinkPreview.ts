@@ -31,8 +31,11 @@ export type LinkPreviewData = {
 };
 export class LinkPreview {
   public url: string;
+
   public title: string;
+
   public image?: AssetRemoteData;
+
   public tweet?: ITweet;
 
   constructor({title = '', url = '', tweet, image}: LinkPreviewData = {}) {

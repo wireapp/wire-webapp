@@ -59,7 +59,7 @@ const ReplyBar: FC<ReplyBarProps> = ({replyMessageEntity, onCancel}) => {
       </button>
 
       <div className="input-bar__reply__body">
-        <div className="input-bar__reply__vert-bar"></div>
+        <div className="input-bar__reply__vert-bar" />
 
         <div className="input-bar__reply__text">
           <div className="input-bar__reply__sender-name">

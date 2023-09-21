@@ -55,35 +55,64 @@ import {User} from '../User';
 
 export class Message {
   private messageTimerStarted: boolean;
+
   protected readonly affect_order: ko.Observable<boolean>;
+
   public category?: MessageCategory;
+
   public conversation_id: string;
+
   public from: string;
+
   // TODO(Federation): Map domain to Message entity
   public fromDomain?: string;
+
   public fromClientId: string;
+
   public id: string;
+
   public primary_key?: string;
+
   public reaction: ReactionType;
+
   public readonly accent_color: ko.PureComputed<string>;
+
   public readonly ephemeral_caption: ko.PureComputed<string>;
+
   public readonly ephemeral_expires: ko.Observable<boolean | number | string>;
+
   public readonly ephemeral_remaining: ko.Observable<number>;
+
   public readonly ephemeral_started: ko.Observable<number>;
+
   public readonly ephemeral_status: ko.Computed<EphemeralStatusType>;
+
   public expectsReadConfirmation: boolean;
+
   public readonly senderName: ko.PureComputed<string>;
+
   public readonly isObfuscated: ko.PureComputed<boolean>;
+
   public legalHoldStatus?: LegalHoldStatus;
+
   public readonly status: ko.Observable<StatusType>;
+
   public readonly timestamp_affects_order: ko.PureComputed<boolean>;
+
   public readonly timestamp: ko.Observable<number>;
+
   public readonly unsafeSenderName: ko.PureComputed<string>;
+
   public readonly user: ko.Observable<User>;
+
   public readonly visible: ko.Observable<boolean>;
+
   public readReceipts: ko.ObservableArray<ReadReceipt>;
+
   public super_type: SuperType;
+
   public type: string;
+
   public version: number;
 
   /**

@@ -57,12 +57,12 @@ export async function initMLSConversations(conversations: Conversation[], core: 
 
       const doesMLSGroupExist = await conversationService.mlsGroupExistsLocally(groupId);
 
-      //if group is already established, we just schedule periodic key material updates
+      // if group is already established, we just schedule periodic key material updates
       if (doesMLSGroupExist) {
         return mlsService.scheduleKeyMaterialRenewal(groupId);
       }
 
-      //otherwise we should try joining via external commit
+      // otherwise we should try joining via external commit
       return conversationService.joinByExternalCommit(qualifiedId);
     }),
   );

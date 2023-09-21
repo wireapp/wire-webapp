@@ -73,7 +73,7 @@ const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({use
                   data-uie-value={id}
                   css={{
                     '& + label > span:first-of-type': {
-                      color: color,
+                      color,
                       cursor: 'pointer',
                       display: 'inline-block',
                       position: 'relative',

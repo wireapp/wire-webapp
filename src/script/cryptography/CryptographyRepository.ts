@@ -40,6 +40,7 @@ export interface ClientKeys {
 
 export class CryptographyRepository {
   cryptographyMapper: CryptographyMapper;
+
   logger: Logger;
 
   constructor(private readonly core = container.resolve(Core)) {

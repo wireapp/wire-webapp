@@ -74,7 +74,7 @@ describe('ConversationFilter', () => {
       };
       const [conversationEntity] = ConversationMapper.mapConversations([conversationData]);
       expect(conversationEntity.is1to1()).toBeFalsy();
-      expect(conversationEntity['isTeam1to1']()).toBeFalsy();
+      expect(conversationEntity.isTeam1to1()).toBeFalsy();
       expect(conversationEntity.isGroup()).toBeFalsy();
       expect(conversationEntity.participating_user_ids().length).toBe(1);
       expect(conversationEntity.removed_from_conversation()).toBeFalsy();
@@ -126,7 +126,7 @@ describe('ConversationFilter', () => {
       };
       const [conversationEntity] = ConversationMapper.mapConversations([conversationData]);
       expect(conversationEntity.is1to1()).toBeTruthy();
-      expect(conversationEntity['isTeam1to1']()).toBeFalsy();
+      expect(conversationEntity.isTeam1to1()).toBeFalsy();
       expect(conversationEntity.isGroup()).toBeFalsy();
       expect(conversationEntity.participating_user_ids().length).toBe(1);
       expect(conversationEntity.removed_from_conversation()).toBeFalsy();

@@ -47,7 +47,7 @@ const MessageTime: React.FC<MessageTimeProps> = ({timestamp, children, ...props}
       data-tooltip={formattedDate}
       {...props}
     >
-      {children ? children : formattedTime}
+      {children || formattedTime}
     </time>
   );
 };

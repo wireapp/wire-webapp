@@ -29,6 +29,7 @@ import type {EventService} from '../EventService';
 
 export class QuotedMessageMiddleware {
   private readonly eventService: EventService;
+
   private readonly logger: Logger;
 
   constructor(eventService: EventService) {

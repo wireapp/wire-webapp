@@ -40,7 +40,9 @@ enum AUDIO_PLAY_PERMISSION {
 
 export class AudioRepository {
   private readonly logger: Logger;
+
   private readonly audioElements: Record<string, HTMLAudioElement>;
+
   private muted: boolean;
 
   constructor(

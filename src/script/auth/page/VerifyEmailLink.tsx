@@ -35,7 +35,7 @@ import {ROUTE} from '../route';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
-const VerifyEmailLinkComponent = ({hasSelfEmail}: Props & ConnectedProps) => {
+function VerifyEmailLinkComponent({hasSelfEmail}: Props & ConnectedProps) {
   const {formatMessage: _} = useIntl();
   const navigate = useNavigate();
 
@@ -72,7 +72,7 @@ const VerifyEmailLinkComponent = ({hasSelfEmail}: Props & ConnectedProps) => {
       </ContainerXS>
     </Page>
   );
-};
+}
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({

@@ -23,7 +23,7 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {Environment} from 'Util/Environment';
 import {getLogger} from 'Util/Logger';
 
-import {SelfActionCreator} from './creator/';
+import {SelfActionCreator} from './creator';
 import {WebSocketAction} from './WebSocketAction';
 
 import type {ThunkAction} from '../reducer';

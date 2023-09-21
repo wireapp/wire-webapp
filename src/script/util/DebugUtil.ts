@@ -63,17 +63,27 @@ import {ViewModelRepositories} from '../view_model/MainViewModel';
 
 export class DebugUtil {
   private readonly logger: Logger;
+
   private readonly callingRepository: CallingRepository;
+
   private readonly clientRepository: ClientRepository;
+
   private readonly connectionRepository: ConnectionRepository;
+
   /** Used by QA test automation. */
   public readonly conversationRepository: ConversationRepository;
+
   private readonly eventRepository: EventRepository;
+
   private readonly storageRepository: StorageRepository;
+
   private readonly messageRepository: MessageRepository;
+
   public readonly $: JQueryStatic;
+
   /** Used by QA test automation. */
   public readonly userRepository: UserRepository;
+
   /** Used by QA test automation. */
   public readonly Dexie: typeof Dexie;
 
@@ -204,14 +214,14 @@ export class DebugUtil {
 
   async resetIdentity(): Promise<void> {
     const proteusService = this.core.service!.proteus;
-    await proteusService['cryptoClient'].debugResetIdentity();
+    await proteusService.cryptoClient.debugResetIdentity();
   }
 
   /** Used by QA test automation. */
   async breakSession(userId: QualifiedId, clientId: string): Promise<void> {
     const proteusService = this.core.service!.proteus;
     const sessionId = proteusService.constructSessionId(userId, clientId);
-    await proteusService['cryptoClient'].debugBreakSession(sessionId);
+    await proteusService.cryptoClient.debugBreakSession(sessionId);
   }
 
   async setTeamSupportedProtocols(supportedProtocols: ConversationProtocol[]) {
@@ -375,7 +385,7 @@ export class DebugUtil {
 
   /** Used by QA test automation. */
   getCallingLogs(): string {
-    return this.callingRepository['callLog'].join('\n');
+    return this.callingRepository.callLog.join('\n');
   }
 
   getActiveCallStats() {
@@ -456,7 +466,7 @@ export class DebugUtil {
     }
     users.push(...conversation.participating_user_ids());
     users = users.slice(0, maxUsers);
-    return this.eventRepository['handleEvent'](
+    return this.eventRepository.handleEvent(
       {
         event: {
           conversation: conversation.id,
@@ -476,7 +486,7 @@ export class DebugUtil {
 
   blockUserForLegalHold(userId: string) {
     const conversation = this.conversationState.activeConversation();
-    return this.eventRepository['handleEvent'](
+    return this.eventRepository.handleEvent(
       {
         event: {
           connection: {

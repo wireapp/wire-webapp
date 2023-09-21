@@ -59,7 +59,7 @@ describe('ConversationVerificationStateHandler', () => {
       selfUserEntity.isMe = true;
       selfUserEntity.devices().forEach(clientEntity => clientEntity.meta.isVerified(true));
 
-      spyOn(conversationRepository['userState'], 'self').and.returnValue(selfUserEntity);
+      spyOn(conversationRepository.userState, 'self').and.returnValue(selfUserEntity);
 
       userA = new User(createUuid(), null);
       userB = new User(createUuid(), null);
@@ -85,11 +85,11 @@ describe('ConversationVerificationStateHandler', () => {
       conversationC.selfUser(selfUserEntity);
       conversationC.verification_state(ConversationVerificationState.VERIFIED);
 
-      conversationRepository['conversationState'].conversations.removeAll();
+      conversationRepository.conversationState.conversations.removeAll();
       return Promise.all([
-        conversationRepository['saveConversation'](conversationAB),
-        conversationRepository['saveConversation'](conversationB),
-        conversationRepository['saveConversation'](conversationC),
+        conversationRepository.saveConversation(conversationAB),
+        conversationRepository.saveConversation(conversationB),
+        conversationRepository.saveConversation(conversationC),
       ]);
     });
   });

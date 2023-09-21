@@ -84,10 +84,12 @@ export class LocalStorageActionCreator {
   static startLocalStorageSet = (): SetStartAction => ({
     type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_SET_START,
   });
+
   static successfulLocalStorageSet = (key: string, value: string | boolean | number): SetSuccessAction => ({
     payload: {key, value},
     type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_SET_SUCCESS,
   });
+
   static failedLocalStorageSet = (error: Error): SetFailedAction => ({
     error,
     type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_SET_FAILED,
@@ -96,10 +98,12 @@ export class LocalStorageActionCreator {
   static startLocalStorageGet = (): GetStartAction => ({
     type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_GET_START,
   });
+
   static successfulLocalStorageGet = (key: string, value: string | boolean | number): GetSuccessAction => ({
     payload: {key, value},
     type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_GET_SUCCESS,
   });
+
   static failedLocalStorageGet = (error: Error): GetFailedAction => ({
     error,
     type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_GET_FAILED,
@@ -108,10 +112,12 @@ export class LocalStorageActionCreator {
   static startLocalStorageDelete = (): DeleteStartAction => ({
     type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_DELETE_START,
   });
+
   static successfulLocalStorageDelete = (key: string): DeleteSuccessAction => ({
     payload: {key},
     type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_DELETE_SUCCESS,
   });
+
   static failedLocalStorageDelete = (error: Error): DeleteFailedAction => ({
     error,
     type: LOCAL_STORAGE_ACTION.LOCAL_STORAGE_DELETE_FAILED,

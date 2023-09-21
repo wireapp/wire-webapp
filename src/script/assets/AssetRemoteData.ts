@@ -48,6 +48,7 @@ export interface AssetUrlDataVersion1 {
 
 export class AssetRemoteData {
   public cancelDownload: () => void;
+
   public readonly downloadProgress: ko.Observable<number>;
 
   constructor(

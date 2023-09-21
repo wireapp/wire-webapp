@@ -104,7 +104,9 @@ interface UserAvailabilityEvent {
 }
 export class UserRepository {
   private readonly logger: Logger;
+
   public readonly userMapper: UserMapper;
+
   public getTeamMembersFromUsers: (users: User[]) => Promise<void>;
 
   static get CONFIG() {
@@ -152,7 +154,7 @@ export class UserRepository {
         this.userDelete(eventJson);
         break;
       case USER_EVENT.UPDATE:
-        const user = eventJson.user;
+        const {user} = eventJson;
         const userId = generateQualifiedId(user);
         await this.updateUser(userId, user, source === EventRepository.SOURCE.WEB_SOCKET);
         break;

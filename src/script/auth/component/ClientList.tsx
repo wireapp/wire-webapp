@@ -31,7 +31,7 @@ import {getLogger} from 'Util/Logger';
 
 import {ClientItem} from './ClientItem';
 
-import {actionRoot as ROOT_ACTIONS} from '../module/action/';
+import {actionRoot as ROOT_ACTIONS} from '../module/action';
 import * as LocalStorageAction from '../module/action/LocalStorageAction';
 import {bindActionCreators, RootState} from '../module/reducer';
 import {getEntropy} from '../module/selector/AuthSelector';
@@ -42,7 +42,7 @@ import {QUERY_KEY, ROUTE} from '../route';
 const logger = getLogger('ClientList');
 
 type Props = React.HTMLProps<HTMLDivElement>;
-const ClientListComponent = ({
+function ClientListComponent({
   clientError,
   isFetching,
   isNoPasswordSSO,
@@ -54,7 +54,7 @@ const ClientListComponent = ({
   resetAuthError,
   resetClientError,
   removeLocalStorage,
-}: Props & ConnectedProps & DispatchProps) => {
+}: Props & ConnectedProps & DispatchProps) {
   const navigate = useNavigate();
   const [showLoading, setShowLoading] = React.useState(false);
   const isOauth = UrlUtil.hasURLParameter(QUERY_KEY.SCOPE);
@@ -116,7 +116,7 @@ const ClientListComponent = ({
       ))}
     </ContainerXS>
   );
-};
+}
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({

@@ -38,22 +38,31 @@ export class ConversationState {
    * all the conversations available
    */
   public readonly conversations = ko.observableArray<Conversation>([]);
+
   /**
    * current conversation that is being viewed
    */
   public readonly activeConversation = ko.observable<Conversation | undefined>();
+
   /**
    * ordered list of conversations that are actives. This is basically the conversations we want to show to the user
    */
   public readonly visibleConversations: ko.PureComputed<Conversation[]>;
+
   public readonly filteredConversations: ko.PureComputed<Conversation[]>;
+
   public readonly archivedConversations: ko.PureComputed<Conversation[]>;
+
   private readonly selfProteusConversation: ko.PureComputed<Conversation | undefined>;
+
   private readonly selfMLSConversation: ko.PureComputed<Conversation | undefined>;
+
   public readonly unreadConversations: ko.PureComputed<Conversation[]>;
+
   public readonly connectedUsers: ko.PureComputed<User[]>;
 
   public readonly sortedConversations: ko.PureComputed<Conversation[]>;
+
   /**
    * conversations that could not be loaded because their back-end is currently offline
    */

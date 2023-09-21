@@ -60,7 +60,7 @@ export const encryptAesAsset = async (plaintext: ArrayBuffer): Promise<Encrypted
   const digest = await window.crypto.subtle.digest('SHA-256', ivCipherText);
   const keyBytes = await window.crypto.subtle.exportKey('raw', key);
 
-  return {cipherText: ivCipherText.buffer, keyBytes: keyBytes, sha256: digest};
+  return {cipherText: ivCipherText.buffer, keyBytes, sha256: digest};
 };
 
 const equalHashes = (bufferA: ArrayBuffer, bufferB: ArrayBuffer): boolean => {

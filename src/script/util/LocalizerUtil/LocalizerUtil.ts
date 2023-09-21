@@ -144,7 +144,7 @@ export function t(
   return LocalizerUtil.translate(identifier, substitutions, dangerousSubstitutions, skipEscape);
 }
 
-export const joinNames = LocalizerUtil.joinNames;
+export const {joinNames} = LocalizerUtil;
 
 export const replaceLink = (href: string, className: string = '', uieName: string = '') => ({
   '/link': '</a>',

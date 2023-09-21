@@ -126,7 +126,7 @@ const EmojiPickerContainer: FC<EmojiPickerContainerProps> = ({
             <EmojiPicker
               onEmojiClick={onEmojiClick}
               getEmojiUrl={getEmojiUrl}
-              lazyLoadEmojis={true}
+              lazyLoadEmojis
               searchPlaceHolder={t('accessibility.emojiPickerSearchPlaceholder')}
               defaultSkinTone={getSkinTone()}
             />

@@ -155,26 +155,26 @@ const Collection: React.FC<CollectionDetailsProps> = ({
       <CollectionSection
         messages={images}
         limit={12}
-        uieName={'collection-section-image'}
+        uieName="collection-section-image"
         onSelect={() => setDetailCategory('images')}
         onImageClick={onImageClick}
         label={t('collectionSectionImages')}
       >
-        <span className={`collection-header-icon icon-library`}></span>
+        <span className="collection-header-icon icon-library" />
       </CollectionSection>
       <CollectionSection
         messages={links}
         limit={4}
-        uieName={'collection-section-link'}
+        uieName="collection-section-link"
         onSelect={() => setDetailCategory('links')}
         label={t('collectionSectionLinks')}
       >
-        <span className={`collection-header-icon icon-link`}></span>
+        <span className="collection-header-icon icon-link" />
       </CollectionSection>
       <CollectionSection
         messages={audio}
         limit={4}
-        uieName={'collection-section-audio'}
+        uieName="collection-section-audio"
         onSelect={() => setDetailCategory('audio')}
         label={t('collectionSectionAudio')}
       >
@@ -183,11 +183,11 @@ const Collection: React.FC<CollectionDetailsProps> = ({
       <CollectionSection
         messages={files}
         limit={4}
-        uieName={'collection-section-file'}
+        uieName="collection-section-file"
         onSelect={() => setDetailCategory('files')}
         label={t('collectionSectionFiles')}
       >
-        <span className={`collection-header-icon icon-file`}></span>
+        <span className="collection-header-icon icon-file" />
       </CollectionSection>
     </>
   );

@@ -17,6 +17,8 @@
  *
  */
 
+
+/* eslint-disable no-unused-vars */
 export enum TYPE {
   CALL_QUALITY_POOR = 'call_quality_poor',
   CONNECTIVITY_RECONNECT = 'connectivity_reconnect',

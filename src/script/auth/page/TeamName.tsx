@@ -50,7 +50,7 @@ import {addLocaleToUrl} from '../../externalRoute';
 import {teamNameStrings} from '../../strings';
 import {RouterLink} from '../component/RouterLink';
 import {EXTERNAL_ROUTE} from '../externalRoute';
-import {actionRoot as ROOT_ACTIONS} from '../module/action/';
+import {actionRoot as ROOT_ACTIONS} from '../module/action';
 import {ValidationError} from '../module/action/ValidationError';
 import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
@@ -59,13 +59,13 @@ import {parseError, parseValidationErrors} from '../util/errorUtil';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
-const TeamNameComponent = ({
+function TeamNameComponent({
   teamName,
   enterTeamCreationFlow,
   resetInviteErrors,
   pushAccountRegistrationData,
   authError,
-}: Props & ConnectedProps & DispatchProps) => {
+}: Props & ConnectedProps & DispatchProps) {
   const logger = getLogger('TeamName');
 
   const {formatMessage: _} = useIntl();
@@ -191,7 +191,7 @@ const TeamNameComponent = ({
       </Container>
     </Page>
   );
-};
+}
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({

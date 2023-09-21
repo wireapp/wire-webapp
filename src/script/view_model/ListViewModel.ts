@@ -55,24 +55,39 @@ import {UserState} from '../user/UserState';
 
 export class ListViewModel {
   private readonly userState: UserState;
+
   private readonly teamState: TeamState;
+
   private readonly conversationState: ConversationState;
 
   readonly isActivatedAccount: ko.PureComputed<boolean>;
+
   readonly lastUpdate: ko.Observable<number>;
+
   readonly repositories: ViewModelRepositories;
 
   public readonly mainViewModel: MainViewModel;
+
   public readonly conversationRepository: ConversationRepository;
+
   public readonly propertiesRepository: PropertiesRepository;
+
   private readonly callingRepository: CallingRepository;
+
   public readonly teamRepository: TeamRepository;
+
   public readonly searchRepository: SearchRepository;
+
   private readonly actionsViewModel: ActionsViewModel;
+
   public readonly contentViewModel: ContentViewModel;
+
   public readonly callingViewModel: CallingViewModel;
+
   private readonly isProAccount: ko.PureComputed<boolean>;
+
   public readonly selfUser: ko.Subscribable<User>;
+
   private readonly visibleListItems: ko.PureComputed<(string | Conversation)[]>;
 
   get isFederated() {

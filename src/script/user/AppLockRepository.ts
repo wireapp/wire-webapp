@@ -29,7 +29,9 @@ const APP_LOCK_ENABLED_STORAGE = 'app_lock_enabled';
 @singleton()
 export class AppLockRepository {
   getPassphraseStorageKey: () => string;
+
   getEnabledStorageKey: () => string;
+
   constructor(
     private readonly userState = container.resolve(UserState),
     private readonly appLockState = container.resolve(AppLockState),

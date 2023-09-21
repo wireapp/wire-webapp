@@ -27,6 +27,7 @@ import {SuperType} from '../../message/SuperType';
 
 export class PingMessage extends Message {
   public readonly caption: ko.PureComputed<string>;
+
   public readonly get_icon_classes: ko.PureComputed<string>;
 
   constructor() {

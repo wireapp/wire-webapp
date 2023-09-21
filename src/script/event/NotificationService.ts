@@ -22,7 +22,7 @@ import {DatabaseKeys} from '@wireapp/core/lib/notification/NotificationDatabaseR
 import {container} from 'tsyringe';
 
 import {APIClient} from '../service/APIClientSingleton';
-import {StorageSchemata, StorageService} from '../storage/';
+import {StorageSchemata, StorageService} from '../storage';
 
 export class NotificationService {
   private readonly AMPLIFY_STORE_NAME: string;

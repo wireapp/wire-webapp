@@ -43,7 +43,7 @@ interface LoginFormProps {
   onSubmit: (loginData: Partial<LoginData>, validationErrors: Error[]) => Promise<void>;
 }
 
-const PhoneLoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
+function PhoneLoginForm({isFetching, onSubmit}: LoginFormProps) {
   const {formatMessage: _} = useIntl();
   const [phoneNumber, setPhoneNumber] = useState('');
   const [countryCode, setCountryCode] = useState('1');
@@ -120,7 +120,7 @@ const PhoneLoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
             markInvalid={!validInput}
             value={phoneNumber}
             autoComplete="section-login phone"
-            pattern={'.{1,1024}'}
+            pattern=".{1,1024}"
             type="tel"
             required
             placeholder="phone number"
@@ -143,5 +143,5 @@ const PhoneLoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
       </InputBlock>
     </div>
   );
-};
+}
 export {PhoneLoginForm};

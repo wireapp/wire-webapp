@@ -30,7 +30,7 @@ import {WirelessContainer} from '../component/WirelessContainer';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
-const ConversationJoinInvalid = ({}: Props) => {
+function ConversationJoinInvalid({}: Props) {
   const {formatMessage: _} = useIntl();
   return (
     <UnsupportedBrowser isTemporaryGuest>
@@ -51,9 +51,9 @@ const ConversationJoinInvalid = ({}: Props) => {
       </WirelessContainer>
     </UnsupportedBrowser>
   );
-};
+}
 
-const ConversationJoinFull = ({}: Props) => {
+function ConversationJoinFull({}: Props) {
   const {formatMessage: _} = useIntl();
   return (
     <UnsupportedBrowser isTemporaryGuest>
@@ -69,6 +69,6 @@ const ConversationJoinFull = ({}: Props) => {
       </WirelessContainer>
     </UnsupportedBrowser>
   );
-};
+}
 
 export {ConversationJoinInvalid, ConversationJoinFull};

@@ -104,7 +104,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
   useEffect(() => {
     const onWheel = (event: MouseEvent) => event.preventDefault();
 
-    //after opening the menu first time, select the first option
+    // after opening the menu first time, select the first option
     if (!selected) {
       setSelected(entries[0]);
     }

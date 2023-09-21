@@ -58,7 +58,7 @@ import {decryptAesAsset} from '../assets/AssetCrypto';
 import {AssetTransferState} from '../assets/AssetTransferState';
 import {ConversationEphemeralHandler} from '../conversation/ConversationEphemeralHandler';
 import {MessageAddEvent} from '../conversation/EventBuilder';
-import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
+import {PROTO_MESSAGE_TYPE} from './ProtoMessageType';
 import {CryptographyError} from '../error/CryptographyError';
 import {ClientEvent, CONVERSATION} from '../event/Client';
 import {StatusType} from '../message/StatusType';
@@ -320,7 +320,7 @@ export class CryptographyMapper {
     }
 
     if (preview) {
-      const remote = preview.remote;
+      const {remote} = preview;
 
       data = {
         ...data,

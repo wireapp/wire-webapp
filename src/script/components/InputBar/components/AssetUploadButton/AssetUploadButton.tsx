@@ -29,7 +29,7 @@ interface AssetUploadButtonProps {
   acceptedFileTypes?: string[];
 }
 
-export const AssetUploadButton = ({onSelectFiles, acceptedFileTypes}: AssetUploadButtonProps) => {
+export function AssetUploadButton({onSelectFiles, acceptedFileTypes}: AssetUploadButtonProps) {
   const fileRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -42,7 +42,7 @@ export const AssetUploadButton = ({onSelectFiles, acceptedFileTypes}: AssetUploa
 
     onSelectFiles(Array.from(files));
 
-    //reset file input's value resetting form wrapper
+    // reset file input's value resetting form wrapper
     formRef.current?.reset();
   };
 
@@ -69,4 +69,4 @@ export const AssetUploadButton = ({onSelectFiles, acceptedFileTypes}: AssetUploa
       </button>
     </form>
   );
-};
+}

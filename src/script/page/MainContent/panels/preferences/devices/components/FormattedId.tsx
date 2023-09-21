@@ -21,16 +21,18 @@ interface FormattedIdProps {
   idSlices: string[];
 }
 
-export const FormattedId = ({idSlices}: FormattedIdProps) => (
-  <>
-    {idSlices.map((slice, index) => {
-      const Component = index % 2 === 0 ? 'strong' : 'span';
+export function FormattedId({idSlices}: FormattedIdProps) {
+  return (
+    <>
+      {idSlices.map((slice, index) => {
+        const Component = index % 2 === 0 ? 'strong' : 'span';
 
-      return (
-        <Component className="device-id-part" key={slice + index}>
-          {slice}
-        </Component>
-      );
-    })}
-  </>
-);
+        return (
+          <Component className="device-id-part" key={slice + index}>
+            {slice}
+          </Component>
+        );
+      })}
+    </>
+  );
+}

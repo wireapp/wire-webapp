@@ -32,23 +32,34 @@ export class ClientEntity {
   };
 
   address?: string;
+
   class: ClientClassification | '?';
+
   cookie?: string;
+
   domain?: string;
+
   id: string;
+
   isSelfClient: boolean;
+
   label?: string;
+
   location?: {
     lat?: number;
     lon?: number;
   };
+
   meta: {
     isVerified?: ko.Observable<boolean>;
     primaryKey?: string;
     userId?: string;
   };
+
   model?: string;
+
   time?: string;
+
   type?: ClientType.PERMANENT | ClientType.TEMPORARY;
 
   constructor(isSelfClient: boolean, domain: string | null, id = '') {

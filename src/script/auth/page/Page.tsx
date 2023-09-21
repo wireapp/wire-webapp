@@ -45,7 +45,7 @@ const redirects = {
   [AuthSelector.REGISTER_FLOW.TEAM]: ROUTE.CREATE_TEAM,
 };
 
-const PageComponent = ({
+function PageComponent({
   hasAccountData,
   hasTeamData,
   currentFlow,
@@ -53,7 +53,7 @@ const PageComponent = ({
   isStateAuthenticated,
   account,
   children,
-}: Props & ConnectedProps) => {
+}: Props & ConnectedProps) {
   if (
     (hasAccountData && hasInvalidAccountData(account) && !isStateAuthenticated) ||
     (hasTeamData && hasInvalidTeamData(account) && !isStateAuthenticated) ||
@@ -62,7 +62,7 @@ const PageComponent = ({
     return <Navigate to={redirects[currentFlow] || ROUTE.INDEX} replace />;
   }
   return <UnsupportedBrowser>{children}</UnsupportedBrowser>;
-};
+}
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({

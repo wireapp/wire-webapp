@@ -81,6 +81,7 @@ import type {EventRecord, LegacyEventRecord} from '../storage';
 // Event Mapper to convert all server side JSON events into core entities.
 export class EventMapper {
   logger: Logger;
+
   /**
    * Construct a new Event Mapper.
    */
@@ -427,9 +428,9 @@ export class EventMapper {
       : messageEntity;
   }
 
-  //##############################################################################
+  // ##############################################################################
   // Event mappers
-  //##############################################################################
+  // ##############################################################################
 
   /**
    * Maps JSON data of conversation.one2one-creation message into message entity.
@@ -515,7 +516,7 @@ export class EventMapper {
    * @returns Location message entity
    */
   private _mapEventLocation({data: eventData}: LegacyEventRecord) {
-    const location = eventData.location;
+    const {location} = eventData;
     const messageEntity = new ContentMessage();
     const assetEntity = new Location();
 
@@ -746,9 +747,9 @@ export class EventMapper {
     return messageEntity;
   }
 
-  //##############################################################################
+  // ##############################################################################
   // Asset mappers
-  //##############################################################################
+  // ##############################################################################
 
   _mapAsset(event: LegacyEventRecord) {
     const eventData = event.data;
@@ -857,7 +858,7 @@ export class EventMapper {
       const linkPreviewData: LinkPreviewData = {
         title: title || article_title || '',
         tweet: tweet ?? undefined,
-        url: url,
+        url,
       };
       const previewImage = image || article_image;
       if (previewImage && previewImage.uploaded) {

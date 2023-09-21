@@ -41,7 +41,7 @@ describe('DevicesPreferences', () => {
   clientState.clients = ko.pureComputed(() => [createDevice(), createDevice()]);
   clientState.currentClient(createDevice());
   const defaultParams = {
-    clientState: clientState,
+    clientState,
     conversationState: new ConversationState(),
     cryptographyRepository: {
       getLocalFingerprint: jest.fn().mockResolvedValue('0000000000000'),

@@ -55,6 +55,7 @@ export type QualifiedUserClientEntityMap = {[domain: string]: UserClientEntityMa
 
 export class ClientRepository {
   private readonly logger: Logger;
+
   public selfUser: ko.Observable<User>;
 
   static get CONFIG() {
@@ -87,9 +88,9 @@ export class ClientRepository {
     this.selfUser(selfUser);
   }
 
-  //##############################################################################
+  // ##############################################################################
   // Service interactions
-  //##############################################################################
+  // ##############################################################################
 
   private deleteClientFromDb(userId: QualifiedId, clientId: string): Promise<string> {
     return this.clientService.deleteClientFromDb(constructClientId(userId, clientId));
@@ -225,9 +226,9 @@ export class ClientRepository {
     return this.saveClientInDb(userId, clientRecord);
   }
 
-  //##############################################################################
+  // ##############################################################################
   // Login and registration
-  //##############################################################################
+  // ##############################################################################
 
   /**
    * Constructs the key for a cookie label.
@@ -248,7 +249,7 @@ export class ClientRepository {
     try {
       const clientEntity = await this.getCurrentClientFromDb();
       await this.getClientByIdFromBackend(clientEntity.id);
-      const currentClient = this.clientState.currentClient;
+      const {currentClient} = this.clientState;
 
       await this.clientService.putClientCapabilities(currentClient().id, {
         capabilities: [ClientCapability.LEGAL_HOLD_IMPLICIT_CONSENT],
@@ -278,9 +279,9 @@ export class ClientRepository {
     return Runtime.isDesktopApp() ? ClientType.PERMANENT : type;
   }
 
-  //##############################################################################
+  // ##############################################################################
   // Client handling
-  //##############################################################################
+  // ##############################################################################
 
   /**
    * Delete client of a user on backend and removes it locally.
@@ -523,9 +524,9 @@ export class ClientRepository {
     return matchQualifiedIds(userId, this.selfUser()) && clientId === this.clientState.currentClient().id;
   }
 
-  //##############################################################################
+  // ##############################################################################
   // Conversation Events
-  //##############################################################################
+  // ##############################################################################
 
   /**
    * Listener for incoming user events.
@@ -587,7 +588,7 @@ export class ClientRepository {
 
   public async haveAllActiveSelfClientsRegisteredMLSDevice(): Promise<boolean> {
     const selfClients = await this.getAllSelfClients();
-    //we consider client active if it was active within last 4 weeks
+    // we consider client active if it was active within last 4 weeks
     const activeClients = selfClients.filter(wasClientActiveWithinLast4Weeks);
     return activeClients.every(isClientMLSCapable);
   }

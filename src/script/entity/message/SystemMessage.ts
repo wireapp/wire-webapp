@@ -25,6 +25,7 @@ import {SystemMessageType} from '../../message/SystemMessageType';
 
 export class SystemMessage extends Message {
   public caption?: string;
+
   public system_message_type: SystemMessageType;
 
   constructor() {

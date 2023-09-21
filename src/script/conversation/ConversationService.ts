@@ -59,6 +59,7 @@ import {StorageSchemata} from '../storage/StorageSchemata';
 
 export class ConversationService {
   private readonly eventService: EventService;
+
   private readonly logger: Logger;
 
   constructor(
@@ -81,9 +82,9 @@ export class ConversationService {
     return conversationService;
   }
 
-  //##############################################################################
+  // ##############################################################################
   // Get conversations
-  //##############################################################################
+  // ##############################################################################
 
   /**
    * Retrieves all the conversations of a user.
@@ -169,9 +170,9 @@ export class ConversationService {
     return this.apiClient.api.conversation.putMembershipProperties(conversationId, payload);
   }
 
-  //##############################################################################
+  // ##############################################################################
   // Conversation access
-  //##############################################################################
+  // ##############################################################################
 
   /**
    * Delete the conversation access code.
@@ -253,9 +254,9 @@ export class ConversationService {
     });
   }
 
-  //##############################################################################
+  // ##############################################################################
   // Send events
-  //##############################################################################
+  // ##############################################################################
 
   /**
    * Remove service from conversation.
@@ -301,9 +302,9 @@ export class ConversationService {
     return this.apiClient.api.conversation.postBot(conversationId, providerId, serviceId);
   }
 
-  //##############################################################################
+  // ##############################################################################
   // Database interactions
-  //##############################################################################
+  // ##############################################################################
 
   /**
    * Deletes a conversation entity from the local database.

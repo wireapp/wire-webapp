@@ -31,7 +31,7 @@ export interface Props extends React.HTMLProps<HTMLDivElement> {
   onDecline: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
-const AcceptNewsModal = ({onConfirm, onDecline}: Props) => {
+function AcceptNewsModal({onConfirm, onDecline}: Props) {
   const {formatMessage: _} = useIntl();
   return (
     <Modal>
@@ -72,6 +72,6 @@ const AcceptNewsModal = ({onConfirm, onDecline}: Props) => {
       </Container>
     </Modal>
   );
-};
+}
 
 export {AcceptNewsModal};

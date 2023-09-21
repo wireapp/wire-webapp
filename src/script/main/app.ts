@@ -123,9 +123,13 @@ export function doRedirect(signOutReason: SIGN_OUT_REASON) {
 
 export class App {
   static readonly LOCAL_STORAGE_LOGIN_REDIRECT_KEY = 'LOGIN_REDIRECT_KEY';
+
   static readonly LOCAL_STORAGE_LOGIN_CONVERSATION_KEY = 'LOGIN_CONVERSATION_KEY';
+
   private isLoggingOut = false;
+
   logger: Logger;
+
   service: {
     asset: AssetService;
     conversation: ConversationService;
@@ -134,8 +138,11 @@ export class App {
     notification: NotificationService;
     storage: StorageService;
   };
+
   repository: ViewModelRepositories = {} as ViewModelRepositories;
+
   debug?: DebugUtil;
+
   util?: {debug: DebugUtil};
 
   static get CONFIG() {
@@ -189,9 +196,9 @@ export class App {
     this.initServiceWorker();
   }
 
-  //##############################################################################
+  // ##############################################################################
   // Instantiation
-  //##############################################################################
+  // ##############################################################################
 
   /**
    * Create all app repositories.
@@ -285,7 +292,7 @@ export class App {
     );
     repositories.permission = new PermissionRepository();
     repositories.notification = new NotificationRepository(repositories.conversation, repositories.permission);
-    repositories.preferenceNotification = new PreferenceNotificationRepository(repositories.user['userState'].self);
+    repositories.preferenceNotification = new PreferenceNotificationRepository(repositories.user.userState.self);
 
     return repositories;
   }
@@ -321,9 +328,9 @@ export class App {
     amplify.subscribe(WebAppEvents.LIFECYCLE.SIGN_OUT, this.logout);
   }
 
-  //##############################################################################
+  // ##############################################################################
   // Initialization
-  //##############################################################################
+  // ##############################################################################
 
   /**
    * Initialize the app.
@@ -408,7 +415,7 @@ export class App {
       await userRepository.loadUsers(selfUser, connections, conversations, teamMembers);
 
       if (supportsMLS()) {
-        //if mls is supported, we need to initialize the callbacks (they are used when decrypting messages)
+        // if mls is supported, we need to initialize the callbacks (they are used when decrypting messages)
         await initMLSCallbacks(this.core, this.repository.conversation);
         conversationRepository.initMLSConversationRecoveredListener();
       }
@@ -436,10 +443,10 @@ export class App {
       if (supportsMLS()) {
         // Once all the messages have been processed and the message sending queue freed we can now:
 
-        //add the potential `self` and `team` conversations
+        // add the potential `self` and `team` conversations
         await registerUninitializedSelfAndTeamConversations(conversations, selfUser, clientEntity().id, this.core);
 
-        //join all the mls groups we're member of and have not yet joined (eg. we were not send welcome message)
+        // join all the mls groups we're member of and have not yet joined (eg. we were not send welcome message)
         await initMLSConversations(conversations, this.core);
       }
 
@@ -591,7 +598,7 @@ export class App {
         this.repository.event.currentClient = clientObservable;
         return this.repository.client.getClientsForSelf();
       })
-      .then(() => this.repository.client['clientState'].currentClient);
+      .then(() => this.repository.client.clientState.currentClient);
   }
 
   /**
@@ -633,9 +640,9 @@ export class App {
     });
   }
 
-  //##############################################################################
+  // ##############################################################################
   // Lifecycle
-  //##############################################################################
+  // ##############################################################################
 
   /**
    * Logs the user out on the backend and deletes cached data.
@@ -677,7 +684,7 @@ export class App {
         keysToKeep.push(StorageKey.AUTH.PERSIST);
       }
 
-      const selfUser = this.repository.user['userState'].self();
+      const selfUser = this.repository.user.userState.self();
       if (selfUser) {
         const cookieLabelKey = this.repository.client.constructCookieLabelKey(selfUser.email() || selfUser.phone());
 
@@ -773,7 +780,7 @@ export class App {
   redirectToLogin(signOutReason: SIGN_OUT_REASON): void {
     this.logger.info(`Redirecting to login after connectivity verification. Reason: ${signOutReason}`);
     const isTemporaryGuestReason = App.CONFIG.SIGN_OUT_REASONS.TEMPORARY_GUEST.includes(signOutReason);
-    const isLeavingGuestRoom = isTemporaryGuestReason && this.repository.user['userState'].self()?.isTemporaryGuest();
+    const isLeavingGuestRoom = isTemporaryGuestReason && this.repository.user.userState.self()?.isTemporaryGuest();
 
     if (isLeavingGuestRoom) {
       const websiteUrl = getWebsiteUrl();

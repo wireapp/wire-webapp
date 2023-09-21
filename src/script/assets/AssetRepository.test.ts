@@ -187,7 +187,7 @@ describe('AssetRepository', () => {
       type: 'conversation.asset-add',
     };
 
-    const asset_et = new EventMapper()['_mapAssetImage'](event);
+    const asset_et = new EventMapper()._mapAssetImage(event);
     await expect(assetRepository.generateAssetUrl(asset_et.resource())).rejects.toThrow(ValidationUtilError);
   });
 

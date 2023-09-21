@@ -17,7 +17,7 @@
  *
  */
 
-import {LocalStorageActionCreator} from './creator/';
+import {LocalStorageActionCreator} from './creator';
 
 import type {ThunkAction} from '../reducer';
 

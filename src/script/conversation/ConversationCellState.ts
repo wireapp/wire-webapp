@@ -341,7 +341,7 @@ const _getStateUnreadMessage = {
         string = t('notificationAssetAdd');
       }
 
-      if (!!string) {
+      if (string) {
         if (messageEntity.isEphemeral()) {
           return conversationEntity.isGroup()
             ? t('conversationsSecondaryLineEphemeralMessageGroup')

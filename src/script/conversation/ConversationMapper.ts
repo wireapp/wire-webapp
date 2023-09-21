@@ -67,7 +67,7 @@ type Roles = {[userId: string]: DefaultConversationRoleName | string};
 export type ConversationDatabaseData = ConversationRecord &
   Partial<ConversationBackendData> & {
     accessModes?: CONVERSATION_ACCESS[];
-    //CONVERSATION_LEGACY_ACCESS_ROLE for api <= v2, CONVERSATION_ACCESS_ROLE[] since api v3
+    // CONVERSATION_LEGACY_ACCESS_ROLE for api <= v2, CONVERSATION_ACCESS_ROLE[] since api v3
     accessRole?: CONVERSATION_LEGACY_ACCESS_ROLE | CONVERSATION_ACCESS_ROLE[];
     accessRoleV2?: CONVERSATION_ACCESS_ROLE[];
     roles: Roles;
@@ -485,12 +485,12 @@ export class ConversationMapper {
 
       let accessState: ACCESS_STATE | undefined;
 
-      //api <= v2/v3
-      //this is important to check this one first (backwards compatibility)
+      // api <= v2/v3
+      // this is important to check this one first (backwards compatibility)
       if (Array.isArray(accessRoleV2)) {
         accessState = this.mapAccessStateV2(accessRoleV2);
 
-        //api v3
+        // api v3
       } else if (Array.isArray(accessRole)) {
         accessState = this.mapAccessStateV2(accessRole);
       }
@@ -499,7 +499,7 @@ export class ConversationMapper {
         return conversationEntity.accessState(accessState);
       }
 
-      //api <= v2 legacy
+      // api <= v2 legacy
       if (!Array.isArray(accessRole)) {
         return conversationEntity.accessState(this.mapLegacyAccessState(accessModes, accessRole));
       }
@@ -529,7 +529,8 @@ export class ConversationMapper {
         return ACCESS_STATE.TEAM.GUESTS_SERVICES;
       }
       return ACCESS_STATE.TEAM.GUEST_ROOM;
-    } else if (accessRole.includes(CONVERSATION_ACCESS_ROLE.SERVICE)) {
+    }
+    if (accessRole.includes(CONVERSATION_ACCESS_ROLE.SERVICE)) {
       return ACCESS_STATE.TEAM.SERVICES;
     }
     return ACCESS_STATE.TEAM.TEAM_ONLY;

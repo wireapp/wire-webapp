@@ -54,7 +54,7 @@ export interface Props extends React.HTMLProps<HTMLDivElement> {
   clientError?: Error;
 }
 
-const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, requirePassword}: Props) => {
+function ClientItem({selected, onClientRemoval, onClick, client, clientError, requirePassword}: Props) {
   const {formatMessage: _} = useIntl();
   const passwordInput = React.useRef<HTMLInputElement>(null);
 
@@ -128,7 +128,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
 
   const formatName = (model: string, clazz: string): string | JSX.Element =>
     model || (
-      <Text bold textTransform={'capitalize'}>
+      <Text bold textTransform="capitalize">
         {clazz}
       </Text>
     ) ||
@@ -227,7 +227,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
     <ContainerXS>
       <ContainerXS
         css={{
-          ['&:focus-within']: {
+          '&:focus-within': {
             boxShadow: `0 0 0 1px ${COLOR.BLUE}`,
           },
           backgroundColor: selected ? '#FFF' : '',
@@ -240,7 +240,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
           onClick={(event: React.MouseEvent<HTMLDivElement>) => requirePassword && handleWrapperClick(event)}
           onKeyDown={(event: React.KeyboardEvent) => requirePassword && onWrapperEnter(event)}
           css={{
-            ['&:focus-visible']: {
+            '&:focus-visible': {
               outline: `none`,
             },
             cursor: requirePassword ? 'pointer' : 'auto',
@@ -342,6 +342,6 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
       ) : null}
     </ContainerXS>
   );
-};
+}
 
 export {ClientItem};

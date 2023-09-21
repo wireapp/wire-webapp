@@ -54,7 +54,7 @@ describe('CheckPassword', () => {
   });
 
   it('navigates to the history page on valid password', async () => {
-    const history = window.history;
+    const {history} = window;
     const historyPushSpy = spyOn(history, 'pushState');
 
     spyOn(actionRoot.authAction, 'doLogin').and.returnValue(() => Promise.resolve());
@@ -123,7 +123,7 @@ describe('CheckPassword', () => {
   });
 
   it('handles too many devices', async () => {
-    const history = window.history;
+    const {history} = window;
     const historyPushSpy = spyOn(history, 'pushState');
 
     const error = new BackendError('', BackendErrorLabel.TOO_MANY_CLIENTS, HTTP_STATUS.NOT_FOUND);

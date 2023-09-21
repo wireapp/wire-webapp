@@ -107,7 +107,7 @@ export const AccountPreferences: React.FC<AccountPreferencesProps> = ({
   const isConsentCheckEnabled = config.FEATURE.CHECK_CONSENT;
 
   const richFields = useEnrichedFields(selfUser, {addDomain: showDomain, addEmail: false});
-  const domain = selfUser.domain;
+  const {domain} = selfUser;
 
   const clickOnLeaveGuestRoom = (): void => {
     PrimaryModal.show(

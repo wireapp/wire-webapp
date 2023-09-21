@@ -50,8 +50,8 @@ export function generateAPIConversation({
   return {
     id: id.id,
     name,
-    type: type,
-    protocol: protocol,
+    type,
+    protocol,
     qualified_id: id,
     access: [],
     verification_state: ConversationVerificationState.UNVERIFIED,

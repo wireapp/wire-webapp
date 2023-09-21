@@ -46,7 +46,7 @@ export type UserReactionMap = {[userId: string]: ReactionType};
  * Represent an event that has been sent by the current device
  */
 type SentEvent = {
-  /** sending status of the event*/
+  /** sending status of the event */
   status: StatusType;
   /** raw content of a file that was supposed to be sent but failed. Is undefined if the message has been successfully sent  */
   fileData?: Blob;

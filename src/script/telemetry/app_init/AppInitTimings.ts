@@ -26,7 +26,9 @@ export type AppTimings = Partial<Record<AppInitTimingsStep, number>>;
 
 export class AppInitTimings {
   private readonly timings: AppTimings;
+
   private readonly init: number;
+
   private readonly logger: Logger;
 
   static get CONFIG() {

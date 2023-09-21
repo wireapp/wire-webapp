@@ -480,7 +480,7 @@ export class EventService {
         }
         const logMessage = 'Failed sequential database update';
         const logObject = {
-          databaseVersion: databaseVersion,
+          databaseVersion,
           updateVersion: changes.version,
         };
         this.logger.error(logMessage, logObject);

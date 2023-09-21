@@ -112,15 +112,15 @@ const TextMessage: FC<TextMessageRendererProps> = ({
     const mentionElement = target.closest('.message-mention');
 
     if (markdownLinkElement) {
-      const href = (markdownLinkElement as HTMLAnchorElement).href;
+      const {href} = markdownLinkElement as HTMLAnchorElement;
       const markdownLinkDetails = {
-        href: href,
+        href,
       };
       forwardEvent(event.nativeEvent, 'markdownLink', markdownLinkDetails);
     } else if (emailElement) {
-      const href = (emailElement as HTMLAnchorElement).href;
+      const {href} = emailElement as HTMLAnchorElement;
       const markdownLinkDetails = {
-        href: href,
+        href,
       };
       forwardEvent(event.nativeEvent, 'email', markdownLinkDetails);
     } else if (mentionElement) {
@@ -140,8 +140,8 @@ const TextMessage: FC<TextMessageRendererProps> = ({
     <>
       {
         // We will register the click event on the paragraph element and determine the type of the element clicked. //
-        //This is because the paragraph element is fed with raw HTML and we cannot register the click event on the
-        //clickabled elements directly.
+        // This is because the paragraph element is fed with raw HTML and we cannot register the click event on the
+        // clickabled elements directly.
       }
       {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
       <p
@@ -155,14 +155,12 @@ const TextMessage: FC<TextMessageRendererProps> = ({
         className={`${className} ${extraClasses}`}
         {...props}
       />
-      {canShowMore && (
-        <ShowMoreButton onClick={toggleShowMore} isFocusable={isFocusable} active={showFullText}></ShowMoreButton>
-      )}
+      {canShowMore && <ShowMoreButton onClick={toggleShowMore} isFocusable={isFocusable} active={showFullText} />}
     </>
   );
 };
 
-export const TextMessageRenderer = (props: TextMessageRendererProps) => {
+export function TextMessageRenderer(props: TextMessageRendererProps) {
   // We want to make sure that this element is re-rendered when the text changes (this will trigger useEffects' calculations to run).
   return <TextMessage key={props.text} {...props} />;
-};
+}

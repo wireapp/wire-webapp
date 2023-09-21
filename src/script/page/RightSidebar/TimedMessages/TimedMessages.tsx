@@ -117,7 +117,7 @@ const TimedMessages: FC<TimedMessagesPanelProps> = ({
             onChange={timedMessageChange}
             options={messageTimes.map(({text, isCustom, value}) => ({
               label: text,
-              value: value,
+              value,
               isDisabled: isCustom || isSelfDeletingMessagesEnforced,
               optionUeiName: 'item-timed-messages-option',
             }))}

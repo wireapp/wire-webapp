@@ -220,7 +220,7 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
             )}
           </div>
 
-          <div className="video-asset__container__sizer"></div>
+          <div className="video-asset__container__sizer" />
         </>
       )}
     </div>

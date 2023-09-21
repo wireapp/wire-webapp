@@ -41,20 +41,31 @@ export enum MuteState {
 @singleton()
 export class CallState {
   public readonly calls: ko.ObservableArray<Call> = ko.observableArray();
+
   /** List of calls that can be joined by the user */
   public readonly joinableCalls: ko.PureComputed<Call[]>;
+
   public readonly acceptedVersionWarnings: ko.ObservableArray<QualifiedId> = ko.observableArray<QualifiedId>();
+
   public readonly cbrEncoding: ko.Observable<number> = ko.observable(
     Config.getConfig().FEATURE.ENFORCE_CONSTANT_BITRATE ? 1 : 0,
   );
+
   public readonly videoSpeakersActiveTab: ko.Observable<string> = ko.observable(CallViewTab.ALL);
+
   readonly selectableScreens: ko.Observable<ElectronDesktopCapturerSource[]> = ko.observable([]);
+
   readonly selectableWindows: ko.Observable<ElectronDesktopCapturerSource[]> = ko.observable([]);
+
   /** call that is current active (connecting or connected) */
   public readonly activeCalls: ko.PureComputed<Call[]>;
+
   public readonly joinedCall: ko.PureComputed<Call | undefined>;
+
   public readonly activeCallViewTab: ko.Observable<string> = ko.observable(CallViewTab.ALL);
+
   readonly isChoosingScreen: ko.PureComputed<boolean>;
+
   readonly isSpeakersViewActive: ko.PureComputed<boolean>;
 
   constructor() {

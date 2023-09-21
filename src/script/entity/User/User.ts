@@ -39,38 +39,70 @@ import {ROLE as TEAM_ROLE} from '../../user/UserPermission';
 
 export class User {
   private expirationIntervalId?: number;
+
   private expirationTimeoutId?: number;
+
   public readonly expirationIsUrgent: ko.Observable<boolean>;
+
   public id: string;
+
   public isDeleted: boolean;
+
   public isMe: boolean;
+
   public isService: boolean;
+
   public isSingleSignOn: boolean;
+
   public isNoPasswordSSO: boolean;
+
   public providerId?: string;
+
   public readonly accent_color: ko.PureComputed<string>;
+
   public readonly accent_id: ko.Observable<number>;
+
   public readonly availability: ko.Observable<Availability.Type>;
+
   public readonly connection: ko.Observable<ConnectionEntity>;
+
   /** does not include current client/device */
   public readonly devices: ko.ObservableArray<ClientEntity>;
+
   public readonly email: ko.Observable<string>;
+
   public locale?: string;
+
   public readonly expirationRemaining: ko.Observable<number>;
+
   public readonly expirationRemainingText: ko.Observable<string>;
+
   public readonly expirationText: ko.Observable<string>;
+
   public readonly hasPendingLegalHold: ko.PureComputed<boolean>;
+
   public readonly initials: ko.PureComputed<string>;
+
   public readonly inTeam: ko.Observable<boolean>;
+
   public readonly is_trusted: ko.PureComputed<boolean>;
+
   public readonly is_verified: ko.PureComputed<boolean>;
+
   public readonly isBlocked: ko.PureComputed<boolean>;
+
   public readonly isCanceled: ko.PureComputed<boolean>;
+
   public readonly isConnected: ko.PureComputed<boolean>;
+
   public readonly isExpired: ko.Observable<boolean>;
+
   public readonly isExternal: ko.PureComputed<boolean>;
+
   public readonly isGuest: ko.Observable<boolean>;
+
   public readonly isActivatedAccount: ko.PureComputed<boolean>;
+
   /** indicates whether that user entity is available (if we have metadata for the user, it's considered available) */
   public readonly isAvailable: ko.PureComputed<boolean>;
 
@@ -78,28 +110,50 @@ export class User {
    * isDirectGuest is true when the user is a guest but not a federated user (a federated user is, by definition, a guest)
    */
   public readonly isDirectGuest: ko.PureComputed<boolean>;
+
   public readonly isIgnored: ko.PureComputed<boolean>;
+
   public readonly isIncomingRequest: ko.PureComputed<boolean>;
+
   public readonly isOnLegalHold: ko.PureComputed<boolean>;
+
   public readonly isOutgoingRequest: ko.PureComputed<boolean>;
+
   public readonly isRequest: ko.PureComputed<boolean>;
+
   public readonly isTeamMember: ko.Observable<boolean> = ko.observable(false);
+
   public readonly isTemporaryGuest: ko.Observable<boolean>;
+
   public readonly isUnknown: ko.PureComputed<boolean>;
+
   public readonly managedBy: ko.Observable<string>;
+
   public readonly mediumPictureResource: ko.Observable<AssetRemoteData>;
+
   public readonly name: ko.Observable<string>;
+
   public readonly phone: ko.Observable<string>;
+
   public readonly previewPictureResource: ko.Observable<AssetRemoteData>;
+
   public readonly providerName: ko.Observable<string | undefined> = ko.observable();
+
   public readonly teamRole: ko.Observable<TEAM_ROLE>;
+
   public readonly username: ko.Observable<string>;
+
   public isFederated: boolean = false;
+
   public serviceId?: string;
+
   public teamId?: string;
+
   /** The federated domain (when the user is on a federated server) */
   public domain: string;
+
   public readonly isBlockedLegalHold: ko.PureComputed<boolean>;
+
   public readonly supportedProtocols: ko.Observable<null | ConversationProtocol[]>;
 
   static get ACCENT_COLOR() {
@@ -230,6 +284,7 @@ export class User {
   get qualifiedId(): QualifiedId {
     return {domain: this.domain, id: this.id};
   }
+
   get hasDomain(): boolean {
     return !!this.domain;
   }

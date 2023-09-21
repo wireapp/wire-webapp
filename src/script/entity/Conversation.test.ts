@@ -17,7 +17,7 @@
  *
  */
 
-//@ts-check
+// @ts-check
 
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
@@ -142,7 +142,7 @@ describe('Conversation', () => {
   });
 
   describe('add message', () => {
-    let initial_message_et: Message = undefined;
+    let initial_message_et: Message;
 
     beforeEach(() => {
       initial_message_et = new Message(createUuid());
@@ -212,7 +212,7 @@ describe('Conversation', () => {
       it('and adding a message should not update it if affect_order is false', () => {
         const message_et = new Message(createUuid());
         message_et.timestamp(second_timestamp);
-        //@ts-ignore
+        // @ts-ignore
         message_et.affect_order(false);
 
         conversation_et.last_event_timestamp(first_timestamp);
@@ -344,7 +344,7 @@ describe('Conversation', () => {
   });
 
   describe('getLastEditableMessage', () => {
-    let self_user_et: User = undefined;
+    let self_user_et: User;
 
     beforeEach(() => {
       self_user_et = new User('', null);
@@ -453,7 +453,7 @@ describe('Conversation', () => {
       const reference_iso_date = new Date(referenceTimestamp).toISOString();
 
       expect(conversation_et.getNextIsoDate(referenceTimestamp)).toBe(reference_iso_date);
-      //@ts-expect-error
+      // @ts-expect-error
       expect(new Date(conversation_et.getNextIsoDate('foo')).getTime()).toBeGreaterThan(
         new Date(reference_iso_date).getTime(),
       );
@@ -463,7 +463,7 @@ describe('Conversation', () => {
       const expected_iso_date = new Date(last_server_timestamp + 1).toISOString();
 
       expect(conversation_et.getNextIsoDate(referenceTimestamp)).toEqual(expected_iso_date);
-      //@ts-expect-error
+      // @ts-expect-error
       expect(conversation_et.getNextIsoDate('foo')).toEqual(expected_iso_date);
     });
   });
@@ -789,7 +789,7 @@ describe('Conversation', () => {
   });
 
   describe('removeMessageById', () => {
-    let message_id: string = undefined;
+    let message_id: string;
 
     beforeEach(() => {
       const message_et = new Message(createUuid());
@@ -824,7 +824,7 @@ describe('Conversation', () => {
   });
 
   describe('removeMessages', () => {
-    let message_et = undefined;
+    let message_et;
 
     beforeEach(() => {
       const first_message_et = new Message(createUuid());
@@ -847,7 +847,7 @@ describe('Conversation', () => {
 
     it('should remove all messages for invalid input timestamp', () => {
       expect(conversation_et.messages().length).toBe(2);
-      //@ts-expect-error
+      // @ts-expect-error
       conversation_et.removeMessages('foo');
 
       expect(conversation_et.messages().length).toBe(0);
@@ -898,12 +898,12 @@ describe('Conversation', () => {
   });
 
   describe('shouldUnarchive', () => {
-    let timestamp: number = undefined;
-    let contentMessage: ContentMessage = undefined;
-    let mutedTimestampMessage: PingMessage = undefined;
-    let outdatedMessage: PingMessage = undefined;
-    let pingMessage: PingMessage = undefined;
-    let selfMentionMessage: ContentMessage = undefined;
+    let timestamp: number;
+    let contentMessage: ContentMessage;
+    let mutedTimestampMessage: PingMessage;
+    let outdatedMessage: PingMessage;
+    let pingMessage: PingMessage;
+    let selfMentionMessage: ContentMessage;
     const conversationEntity = new Conversation(createUuid());
 
     const selfUserEntity = new User(createUuid(), null);
@@ -1051,11 +1051,11 @@ describe('Conversation', () => {
 
   describe('_incrementTimeOnly', () => {
     it('should update only to newer timestamps', () => {
-      //@ts-ignore
+      // @ts-ignore
       expect(conversation_et._incrementTimeOnly(first_timestamp, second_timestamp)).toBe(second_timestamp);
-      //@ts-ignore
+      // @ts-ignore
       expect(conversation_et._incrementTimeOnly(second_timestamp, first_timestamp)).toBeFalsy();
-      //@ts-ignore
+      // @ts-ignore
       expect(conversation_et._incrementTimeOnly(first_timestamp, first_timestamp)).toBeFalsy();
     });
   });
@@ -1139,15 +1139,15 @@ describe('Conversation', () => {
       conversationEntity.mutedState(undefined);
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
-      //@ts-expect-error
+      // @ts-expect-error
       conversationEntity.mutedState('true');
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
-      //@ts-expect-error
+      // @ts-expect-error
       conversationEntity.mutedState(true);
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.NOTHING);
-      //@ts-expect-error
+      // @ts-expect-error
       conversationEntity.mutedState(false);
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
@@ -1164,15 +1164,15 @@ describe('Conversation', () => {
       conversationEntity.mutedState(undefined);
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
-      //@ts-expect-error
+      // @ts-expect-error
       conversationEntity.mutedState('true');
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
-      //@ts-expect-error
+      // @ts-expect-error
       conversationEntity.mutedState(true);
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.MENTIONS_AND_REPLIES);
-      //@ts-expect-error
+      // @ts-expect-error
       conversationEntity.mutedState(false);
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);

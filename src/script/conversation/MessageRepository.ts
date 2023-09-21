@@ -73,7 +73,7 @@ import {AssetTransferState} from '../assets/AssetTransferState';
 import {AudioType} from '../audio/AudioType';
 import {ClientState} from '../client/ClientState';
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
-import {EventBuilder} from '../conversation/EventBuilder';
+import {EventBuilder} from './EventBuilder';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 import {Conversation} from '../entity/Conversation';
@@ -152,9 +152,13 @@ type StoredContentMessage = ContentMessage & {primary_key: string};
 
 export class MessageRepository {
   private readonly logger: Logger;
+
   private readonly eventService: EventService;
+
   private readonly event_mapper: EventMapper;
+
   private isBlockingNotificationHandling: boolean;
+
   private onClientMismatch?: ClientMismatchHandlerFn;
 
   constructor(
@@ -278,7 +282,7 @@ export class MessageRepository {
     const editMessage = MessageBuilder.buildEditedTextMessage(
       this.decorateTextMessage(
         {
-          originalMessageId: originalMessageId,
+          originalMessageId,
           text: message,
         },
         conversation,
@@ -593,11 +597,8 @@ export class MessageRepository {
 
     const metadata = asImage ? ((await buildMetadata(file)) as ImageMetadata) : undefined;
     const assetMessage = metadata
-      ? MessageBuilder.buildImageMessage({asset: asset, image: metadata}, messageId)
-      : MessageBuilder.buildFileDataMessage(
-          {asset: asset, file: {data: Buffer.from(await file.arrayBuffer())}},
-          messageId,
-        );
+      ? MessageBuilder.buildImageMessage({asset, image: metadata}, messageId)
+      : MessageBuilder.buildFileDataMessage({asset, file: {data: Buffer.from(await file.arrayBuffer())}}, messageId);
     return this.sendAndInjectMessage(assetMessage, conversation, {enableEphemeral: true, syncTimestamp: false});
   }
 
@@ -782,7 +783,7 @@ export class MessageRepository {
       }
     };
 
-    const conversationService = this.conversationService;
+    const {conversationService} = this;
     // Configure ephemeral messages
     conversationService.messageTimer.setConversationLevelTimer(conversation.id, conversation.messageTimer());
 
@@ -924,7 +925,7 @@ export class MessageRepository {
 
     if (type === Confirmation.Type.DELIVERED) {
       const otherUserIn1To1 = conversationEntity.is1to1();
-      const CONFIRMATION_THRESHOLD = ConversationRepository.CONFIG.CONFIRMATION_THRESHOLD;
+      const {CONFIRMATION_THRESHOLD} = ConversationRepository.CONFIG;
       const withinThreshold = messageEntity.timestamp() >= Date.now() - CONFIRMATION_THRESHOLD;
 
       if (!otherUserIn1To1 || !withinThreshold) {
@@ -1385,6 +1386,7 @@ export class MessageRepository {
       qualifiedConversationId: targetConversation,
     });
   }
+
   /**
    * Send call message in specified conversation.
    *
@@ -1412,9 +1414,9 @@ export class MessageRepository {
     });
   }
 
-  //##############################################################################
+  // ##############################################################################
   // Tracking helpers
-  //##############################################################################
+  // ##############################################################################
 
   /**
    * Track generic messages for media actions.
@@ -1436,11 +1438,11 @@ export class MessageRepository {
       case 'asset': {
         const protoAsset = genericMessage.asset;
         if (protoAsset?.original) {
-          if (!!protoAsset.original.image) {
+          if (protoAsset.original.image) {
             actionType = 'photo';
-          } else if (!!protoAsset.original.audio) {
+          } else if (protoAsset.original.audio) {
             actionType = 'audio';
-          } else if (!!protoAsset.original.video) {
+          } else if (protoAsset.original.video) {
             actionType = 'video';
           } else {
             actionType = 'file';

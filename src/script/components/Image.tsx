@@ -90,7 +90,7 @@ const Image: React.FC<ImageProps> = ({
       {assetSrc ? (
         <img style={style} onClick={onClick} src={assetSrc} role="presentation" alt="" />
       ) : (
-        <div style={style} className={cx({'loading-dots': assetIsLoading})}></div>
+        <div style={style} className={cx({'loading-dots': assetIsLoading})} />
       )}
     </InViewport>
   );

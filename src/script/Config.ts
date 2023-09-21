@@ -20,7 +20,8 @@
 import {Runtime} from '@wireapp/commons';
 
 import {createUuid} from 'Util/uuid';
-const env = window.wire.env;
+
+const {env} = window.wire;
 
 export const ACCENT_ID = {
   AMBER: 5,

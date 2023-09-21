@@ -85,7 +85,7 @@ const closeWarning = (): void => {
   const {warnings, removeWarning} = useWarningsState.getState();
   const visibleWarning = warnings[warnings.length - 1];
   const warningToClose = visibleWarning;
-  const URL = Config.getConfig().URL;
+  const {URL} = Config.getConfig();
 
   if (warnings.includes(warningToClose)) {
     removeWarning(warningToClose);

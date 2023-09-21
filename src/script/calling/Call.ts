@@ -45,35 +45,52 @@ interface ActiveSpeaker {
 
 export class Call {
   public readonly reason: ko.Observable<number | undefined> = ko.observable();
+
   public readonly startedAt: ko.Observable<number | undefined> = ko.observable();
+
   public readonly state: ko.Observable<CALL_STATE> = ko.observable(CALL_STATE.UNKNOWN);
+
   public readonly muteState: ko.Observable<MuteState> = ko.observable(MuteState.NOT_MUTED);
+
   public readonly participants: ko.ObservableArray<Participant>;
+
   public readonly selfClientId: ClientId;
+
   public readonly initialType: CALL_TYPE;
+
   public readonly isCbrEnabled: ko.Observable<boolean> = ko.observable(
     Config.getConfig().FEATURE.ENFORCE_CONSTANT_BITRATE,
   );
+
   public readonly activeSpeakers: ko.ObservableArray<Participant> = ko.observableArray([]);
+
   public blockMessages: boolean = false;
+
   public type?: CALL_MESSAGE_TYPE;
+
   public currentPage: ko.Observable<number> = ko.observable(0);
+
   public pages: ko.ObservableArray<Participant[]> = ko.observableArray();
+
   readonly maximizedParticipant: ko.Observable<Participant | null>;
 
   private readonly audios: Record<string, {audioElement: HTMLAudioElement; stream: MediaStream}> = {};
+
   /**
    * set to `true` if anyone has enabled their video during a call (used for analytics)
    */
   public analyticsAvSwitchToggle: boolean = false;
+
   /**
    * set to `true` if anyone has shared their screen during a call (used for analytics)
    */
   public analyticsScreenSharing: boolean = false;
+
   /**
    * Maximum number of people joined in a call (used for analytics)
    */
   public analyticsMaximumParticipants: number = 0;
+
   activeAudioOutput: string;
 
   constructor(

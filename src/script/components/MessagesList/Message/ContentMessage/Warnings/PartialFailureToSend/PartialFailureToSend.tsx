@@ -97,7 +97,7 @@ function joinWith(elements: React.ReactNode[], separator: string) {
   }, []);
 }
 
-export const PartialFailureToSendWarning = ({failedToSend, isMessageFocused, knownUsers}: Props) => {
+export function PartialFailureToSendWarning({failedToSend, isMessageFocused, knownUsers}: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const {queued = {}, failed = []} = failedToSend;
 
@@ -202,4 +202,4 @@ export const PartialFailureToSendWarning = ({failedToSend, isMessageFocused, kno
       )}
     </div>
   );
-};
+}

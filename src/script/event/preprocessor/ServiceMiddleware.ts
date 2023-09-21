@@ -48,7 +48,9 @@ type HandledEvents = MemberJoinEvent | One2OneCreationEvent;
 
 export class ServiceMiddleware {
   private readonly userRepository: UserRepository;
+
   private readonly conversationRepository: ConversationRepository;
+
   private readonly logger: Logger;
 
   constructor(

@@ -40,12 +40,12 @@ import {ROUTE} from '../route';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
-const SetPasswordComponent = ({
+function SetPasswordComponent({
   isSelfSSOUser,
   hasSelfPassword,
   doSetPassword,
   isFetching,
-}: Props & ConnectedProps & DispatchProps) => {
+}: Props & ConnectedProps & DispatchProps) {
   const {formatMessage: _} = useIntl();
 
   const passwordInput = useRef<HTMLInputElement>();
@@ -130,7 +130,7 @@ const SetPasswordComponent = ({
       </ContainerXS>
     </Page>
   );
-};
+}
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({

@@ -32,30 +32,55 @@ import {UserState} from '../user/UserState';
 @singleton()
 export class TeamState {
   public readonly isTeamDeleted: ko.Observable<boolean>;
+
   public readonly memberInviters: ko.Observable<any>;
+
   public readonly memberRoles: ko.Observable<any>;
+
   public readonly supportsLegalHold: ko.Observable<boolean>;
+
   public readonly teamName: ko.PureComputed<string>;
+
   public readonly teamFeatures: ko.Observable<FeatureList | undefined>;
+
   public readonly classifiedDomains: ko.PureComputed<string[] | undefined>;
+
   public readonly isConferenceCallingEnabled: ko.PureComputed<boolean>;
+
   public readonly isFileSharingSendingEnabled: ko.PureComputed<boolean>;
+
   public readonly isFileSharingReceivingEnabled: ko.PureComputed<boolean>;
+
   public readonly isVideoCallingEnabled: ko.PureComputed<boolean>;
+
   public readonly isMLSEnabled: ko.PureComputed<boolean>;
+
   public readonly isProtocolToggleEnabledForUser: ko.PureComputed<boolean>;
+
   public readonly isGuestLinkEnabled: ko.PureComputed<boolean>;
+
   public readonly isSelfDeletingMessagesEnabled: ko.PureComputed<boolean>;
+
   public readonly isSelfDeletingMessagesEnforced: ko.PureComputed<boolean>;
+
   public readonly getEnforcedSelfDeletingMessagesTimeout: ko.PureComputed<SelfDeletingTimeout>;
+
   public readonly isAppLockEnabled: ko.PureComputed<boolean>;
+
   public readonly isAppLockEnforced: ko.PureComputed<boolean>;
+
   public readonly appLockInactivityTimeoutSecs: ko.PureComputed<number>;
+
   readonly teamMembers: ko.PureComputed<User[]>;
+
   readonly teamUsers: ko.PureComputed<User[]>;
+
   readonly isTeam: ko.PureComputed<boolean>;
+
   readonly team: ko.Observable<TeamEntity>;
+
   readonly teamDomain: ko.PureComputed<string>;
+
   readonly teamSize: ko.PureComputed<number>;
 
   constructor(private readonly userState = container.resolve(UserState)) {

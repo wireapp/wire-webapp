@@ -147,7 +147,7 @@ describe('FailedToAddUsersMessage', () => {
     expect(elementMessageFailedToAddDetails[0].getAttribute('data-uie-value')).toEqual(
       false ? qualifiedId1.domain : '',
     );
-    //expect(elementMessageFailedToAddDetails[1].getAttribute('data-uie-value')).toEqual(qualifiedId2.domain);
+    // expect(elementMessageFailedToAddDetails[1].getAttribute('data-uie-value')).toEqual(qualifiedId2.domain);
   });
 
   it('shows details of failed to add users from non federating backends', async () => {

@@ -17,7 +17,7 @@
  *
  */
 
-//@ts-check
+// @ts-check
 
 import {FileAsset} from 'src/script/entity/message/FileAsset';
 

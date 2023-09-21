@@ -64,6 +64,7 @@ const defaultMemberRole: ConversationRole = {
 
 export class ConversationRoleRepository {
   readonly logger: Logger;
+
   teamRoles: ConversationRole[];
 
   constructor(

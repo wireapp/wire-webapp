@@ -28,9 +28,9 @@ interface CanvasProps {
   css?: CSSObject;
   'data-uie-name'?: string;
   onProgress: (entropyData: EntropyData, percent: number, pause: boolean) => void;
-  /** width of the canvas in px*/
+  /** width of the canvas in px */
   sizeX: number;
-  /** height of the canvas in px*/
+  /** height of the canvas in px */
   sizeY: number;
   /** minimum number of frames (good default: 300) */
   minFrames: number;
@@ -43,7 +43,7 @@ type Point = {
   y: number;
 };
 
-const EntropyCanvas = (props: CanvasProps) => {
+function EntropyCanvas(props: CanvasProps) {
   const {sizeX, sizeY, onProgress, css, minEntropyBits, minFrames, ...rest} = props;
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [percent, setPercent] = useState(0);
@@ -133,6 +133,6 @@ const EntropyCanvas = (props: CanvasProps) => {
       {...rest}
     />
   );
-};
+}
 
 export {EntropyCanvas};

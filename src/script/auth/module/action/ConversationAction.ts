@@ -19,7 +19,7 @@
 
 import type {ConversationEvent} from '@wireapp/api-client/lib/event/';
 
-import {ConversationActionCreator} from './creator/';
+import {ConversationActionCreator} from './creator';
 
 import type {ThunkAction} from '../reducer';
 

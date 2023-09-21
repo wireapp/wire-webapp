@@ -38,7 +38,7 @@ import {QUERY_KEY} from '../route';
 import {getSVG} from '../util/SVGProvider';
 
 const REDIRECT_DELAY = 5000;
-const CustomEnvironmentRedirectComponent = ({doNavigate, doSendNavigationEvent}: DispatchProps) => {
+function CustomEnvironmentRedirectComponent({doNavigate, doSendNavigationEvent}: DispatchProps) {
   const {formatMessage: _} = useIntl();
 
   const [destinationUrl, setDestinationUrl] = useState<string | null>(null);
@@ -119,7 +119,7 @@ const CustomEnvironmentRedirectComponent = ({doNavigate, doSendNavigationEvent}:
           </FlexBox>
         </FlexBox>
         <ContainerXS centerText style={{marginTop: 48}}>
-          <Text block bold fontSize={'24px'} center style={{marginBottom: 16, marginTop: 0}}>
+          <Text block bold fontSize="24px" center style={{marginBottom: 16, marginTop: 0}}>
             {_(customEnvRedirectStrings.redirectHeadline)}
           </Text>
           <Text block center>
@@ -132,7 +132,7 @@ const CustomEnvironmentRedirectComponent = ({doNavigate, doSendNavigationEvent}:
       </FlexBox>
     </Page>
   );
-};
+}
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
 const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>

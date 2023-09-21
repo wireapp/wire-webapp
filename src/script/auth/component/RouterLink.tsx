@@ -25,6 +25,8 @@ type RouterLinkProps = LinkProps & RouterDOM.LinkProps;
 
 const RRLink = RouterDOM.Link;
 
-const RouterLink = (props: RouterLinkProps) => <RRLink css={(theme: Theme) => linkStyle(theme, props)} {...props} />;
+function RouterLink(props: RouterLinkProps) {
+  return <RRLink css={(theme: Theme) => linkStyle(theme, props)} {...props} />;
+}
 
 export {RouterLink};

@@ -50,7 +50,7 @@ import {CryptographyMapper} from './CryptographyMapper';
 describe('CryptographyMapper', () => {
   const mapper = new CryptographyMapper();
 
-  let event: any = undefined;
+  let event: any;
   const emojiReaction = '😇';
 
   beforeEach(() => {
@@ -347,7 +347,7 @@ describe('CryptographyMapper', () => {
       });
 
       const asset = new Asset({
-        original: original,
+        original,
         uploaded: remote_data,
       });
 
@@ -516,7 +516,7 @@ describe('CryptographyMapper', () => {
     });
 
     it('can map a ping wrapped inside an external message', async () => {
-      let external_message = undefined;
+      let external_message;
 
       const genericMessage = new GenericMessage({
         knock: new Knock({hotKnock: false}),

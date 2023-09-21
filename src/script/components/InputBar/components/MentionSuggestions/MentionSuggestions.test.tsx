@@ -36,7 +36,7 @@ const suggestions = [third, first, fourth, second];
 const onSelectionValidated = jest.fn();
 
 beforeAll(() => {
-  //component uses textArea element by accessing it via querySelector, we need to insert it to the DOM
+  // component uses textArea element by accessing it via querySelector, we need to insert it to the DOM
   const input = document.createElement('textarea');
   document.body.appendChild(input);
   Element.prototype.scrollIntoView = jest.fn();
@@ -57,7 +57,7 @@ describe('MentionSuggestionList', () => {
     fireEvent.keyDown(input, {code: 'Tab', key: 'Tab'});
     expect(onSelectionValidated).toHaveBeenCalledWith(first);
 
-    //suggestions prop changed, component rerenders (
+    // suggestions prop changed, component rerenders (
     rerender(
       <MentionSuggestionList
         onSelectionValidated={onSelectionValidated}

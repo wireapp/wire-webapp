@@ -38,14 +38,14 @@ interface RadioGroupProps<T> {
   uieName?: string;
 }
 
-const RadioGroup = <T extends string | number>({
+function RadioGroup<T extends string | number>({
   ariaLabelledBy,
   name,
   options,
   onChange,
   uieName = name,
   selectedValue,
-}: RadioGroupProps<T>) => {
+}: RadioGroupProps<T>) {
   const radioId = useId();
 
   return (
@@ -79,6 +79,6 @@ const RadioGroup = <T extends string | number>({
       })}
     </div>
   );
-};
+}
 
 export {RadioGroup};

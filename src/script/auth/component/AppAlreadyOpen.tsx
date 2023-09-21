@@ -29,7 +29,7 @@ import {appAlreadyOpenStrings} from '../../strings';
 interface AppAlreadyOpenProps {
   fullscreen?: boolean;
 }
-export const AppAlreadyOpen = ({fullscreen}: AppAlreadyOpenProps) => {
+export function AppAlreadyOpen({fullscreen}: AppAlreadyOpenProps) {
   const {formatMessage: _} = useIntl();
   const {hasOtherInstance, killRunningInstance} = useSingleInstance();
   if (!hasOtherInstance) {
@@ -59,4 +59,4 @@ export const AppAlreadyOpen = ({fullscreen}: AppAlreadyOpenProps) => {
       </Container>
     </Modal>
   );
-};
+}

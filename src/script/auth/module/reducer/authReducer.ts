@@ -25,7 +25,7 @@ import type {TeamData} from '@wireapp/api-client/lib/team/';
 import type {UserAsset} from '@wireapp/api-client/lib/user/';
 
 import {Config} from '../../../Config';
-import {AUTH_ACTION, AppActions, USER_ACTION} from '../action/creator/';
+import {AUTH_ACTION, AppActions, USER_ACTION} from '../action/creator';
 import {REGISTER_FLOW} from '../selector/AuthSelector';
 
 export interface RegistrationDataState {

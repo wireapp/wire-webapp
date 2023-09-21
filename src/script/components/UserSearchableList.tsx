@@ -105,7 +105,7 @@ const UserSearchableList: React.FC<UserListProps> = ({
     if (normalizedQuery) {
       const trimmedQuery = filter.trim();
       const isHandle = trimmedQuery.startsWith('@') && validateHandle(normalizedQuery);
-      const SEARCHABLE_FIELDS = SearchRepository.CONFIG.SEARCHABLE_FIELDS;
+      const {SEARCHABLE_FIELDS} = SearchRepository.CONFIG;
       const properties = isHandle ? [SEARCHABLE_FIELDS.USERNAME] : undefined;
       resultUsers = searchRepository.searchUserInSet(normalizedQuery, users, properties);
       resultUsers = resultUsers.filter(

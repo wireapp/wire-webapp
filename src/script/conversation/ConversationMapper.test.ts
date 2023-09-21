@@ -50,7 +50,7 @@ import {entities, payload} from '../../../test/api/payloads';
 describe('ConversationMapper', () => {
   describe('mapConversations', () => {
     it('throws an error for unexpected parameters', () => {
-      //@ts-expect-error
+      // @ts-expect-error
       const functionCallUndefinedParam = () => ConversationMapper.mapConversations();
 
       expect(functionCallUndefinedParam).toThrow(BaseError.MESSAGE.MISSING_PARAMETER);
@@ -59,7 +59,7 @@ describe('ConversationMapper', () => {
 
       expect(functionCallEmtpyArray).toThrow(BaseError.MESSAGE.INVALID_PARAMETER);
 
-      //@ts-expect-error
+      // @ts-expect-error
       const functionCallWrongType = () => ConversationMapper.mapConversations('Conversation');
 
       expect(functionCallWrongType).toThrow(BaseError.MESSAGE.INVALID_PARAMETER);
@@ -68,14 +68,14 @@ describe('ConversationMapper', () => {
 
       expect(functionCallUndefinedInArray).toThrow(BaseError.MESSAGE.MISSING_PARAMETER);
 
-      //@ts-expect-error
+      // @ts-expect-error
       const functionCallStringInArray = () => ConversationMapper.mapConversations(['Conversation']);
 
       expect(functionCallStringInArray).toThrow(BaseError.MESSAGE.INVALID_PARAMETER);
     });
 
     it('maps a single conversation', () => {
-      const conversation = entities.conversation;
+      const {conversation} = entities;
       const initialTimestamp = Date.now();
       const [conversationEntity] = ConversationMapper.mapConversations([conversation], initialTimestamp);
 
@@ -97,7 +97,7 @@ describe('ConversationMapper', () => {
 
       const expectedMutedTimestamp = new Date(conversation.members.self.otr_muted_ref).getTime();
 
-      expect(conversationEntity['mutedTimestamp']()).toEqual(expectedMutedTimestamp);
+      expect(conversationEntity.mutedTimestamp()).toEqual(expectedMutedTimestamp);
       expect(conversationEntity.last_event_timestamp()).toBe(initialTimestamp);
       expect(conversationEntity.last_server_timestamp()).toBe(initialTimestamp);
     });
@@ -132,7 +132,7 @@ describe('ConversationMapper', () => {
     });
 
     it('maps multiple conversations', () => {
-      const conversations = payload.conversations.get.conversations;
+      const {conversations} = payload.conversations.get;
       const conversationEntities = ConversationMapper.mapConversations(conversations);
 
       expect(conversationEntities.length).toBe(conversations.length);
@@ -209,19 +209,19 @@ describe('ConversationMapper', () => {
 
       const updates: Partial<Record<keyof Conversation, string>> = {
         name: updatedName,
-        //@ts-expect-error
+        // @ts-expect-error
         newProperty: 'abc',
       };
       ConversationMapper.updateProperties(conversationEntity, updates);
 
       expect(conversationEntity.name()).toBe(updatedName);
-      //@ts-expect-error
+      // @ts-expect-error
       expect(conversationEntity.newProperty).toBeUndefined();
     });
   });
 
   describe('updateSelfStatus', () => {
-    let conversationEntity: Conversation = undefined;
+    let conversationEntity: Conversation;
 
     beforeEach(() => {
       const conversationsData = [payload.conversations.get.conversations[0]];
@@ -326,7 +326,7 @@ describe('ConversationMapper', () => {
       const updatedConversationEntity = ConversationMapper.updateSelfStatus(conversationEntity, selfStatus);
 
       expect(updatedConversationEntity.last_event_timestamp()).toBe(timestamp);
-      expect(updatedConversationEntity['mutedTimestamp']()).toBe(timestamp);
+      expect(updatedConversationEntity.mutedTimestamp()).toBe(timestamp);
       expect(updatedConversationEntity.notificationState()).toBe(NOTIFICATION_STATE.NOTHING);
     });
 
@@ -654,12 +654,12 @@ describe('ConversationMapper', () => {
       const othersUpdate: OtherMemberBackendData[] = [
         {
           id: '39b7f597-dfd1-4dff-86f5-fe1b79cb70a0',
-          status: 1 as any /*status 1 is an impossible state, but we want to test that it is ignored*/,
+          status: 1 as any /* status 1 is an impossible state, but we want to test that it is ignored */,
         },
         {id: '5eeba863-44be-43ff-8c47-7565a028f182', status: 0},
         {
           id: 'a187fd3e-479a-4e85-a77f-5e4ab95477cf',
-          status: 1 as any /*status 1 is an impossible state, but we want to test that it is ignored*/,
+          status: 1 as any /* status 1 is an impossible state, but we want to test that it is ignored */,
         },
         {id: 'd270c7b4-6492-4953-b1bf-be817fe665b2', status: 0},
       ];

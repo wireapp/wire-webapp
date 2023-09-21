@@ -105,7 +105,7 @@ const MicrophonePreferences: React.FC<MicrophonePreferencesProps> = ({
       />
       {isRequesting ? (
         <div className="preferences-av-spinner">
-          <div className="icon-spinner spin accent-text"></div>
+          <div className="icon-spinner spin accent-text" />
         </div>
       ) : (
         <InputLevel className="preferences-av-meter accent-text" disabled={!stream} mediaStream={stream} />

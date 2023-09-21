@@ -69,9 +69,13 @@ export interface ElectronDesktopCapturerSource {
 
 export class MediaDevicesHandler {
   private readonly logger: Logger;
+
   public availableDevices: Devices;
+
   public currentDeviceId: DeviceIds;
+
   public currentAvailableDeviceId: CurrentAvailableDeviceId;
+
   public deviceSupport: DeviceSupport;
 
   static get CONFIG() {

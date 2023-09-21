@@ -37,17 +37,17 @@ describe('ConversationRoleRepository', () => {
     roleRepository = new ConversationRoleRepository(
       testFactory.team_repository,
       testFactory.conversation_service,
-      testFactory.user_repository['userState'],
-      testFactory.team_repository['teamState'],
+      testFactory.user_repository.userState,
+      testFactory.team_repository.teamState,
     );
   });
 
   describe('constructor', () => {
     it('knows if you are in a team', () => {
-      expect(roleRepository['teamState'].isTeam()).toBe(false);
-      testFactory.team_repository['teamState'].team(new TeamEntity(createUuid()));
+      expect(roleRepository.teamState.isTeam()).toBe(false);
+      testFactory.team_repository.teamState.team(new TeamEntity(createUuid()));
 
-      expect(roleRepository['teamState'].isTeam()).toBe(true);
+      expect(roleRepository.teamState.isTeam()).toBe(true);
     });
   });
 
@@ -64,7 +64,7 @@ describe('ConversationRoleRepository', () => {
         }),
       );
 
-      testFactory.team_repository['teamState'].team(new TeamEntity(createUuid()));
+      testFactory.team_repository.teamState.team(new TeamEntity(createUuid()));
       await roleRepository.loadTeamRoles();
 
       expect(roleRepository.teamRoles.length).toBe(1);

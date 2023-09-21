@@ -33,8 +33,8 @@ export const RedirectRoutes = (config: ServerConfig, clientConfig: ClientConfig)
     return res.contentType('text/plain; charset=UTF-8').send(robotsContent);
   }),
   router.get('/join/?', (req, res) => {
-    const key = req.query.key;
-    const code = req.query.code;
+    const {key} = req.query;
+    const {code} = req.query;
     res.redirect(HTTP_STATUS.MOVED_TEMPORARILY, `/auth/?join_key=${key}&join_code=${code}#/join-conversation`);
   }),
   router.get('/browser/?', (req, res, next) => {

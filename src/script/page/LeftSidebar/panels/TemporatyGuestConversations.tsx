@@ -70,7 +70,7 @@ const TemporaryGuestConversations: React.FC<TemporaryGuestConversations> = ({
   };
 
   return (
-    <div id="temporary-guest" className={`temporary-guest`}>
+    <div id="temporary-guest" className="temporary-guest">
       {activeCalls.map(call => {
         const conversation = getConversationById(call.conversationId);
         return (

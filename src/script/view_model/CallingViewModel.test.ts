@@ -176,7 +176,7 @@ describe('CallingViewModel', () => {
       await callingViewModel.callActions.answer(call);
       expect(mockCallingRepository.answerCall).toHaveBeenCalledWith(call);
 
-      //at this point we start to listen to the mls service events
+      // at this point we start to listen to the mls service events
       expect(mockCallingRepository.setEpochInfo).toHaveBeenCalledWith(
         conversationId,
         {

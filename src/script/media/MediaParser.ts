@@ -30,6 +30,7 @@ import {Config} from '../Config';
 
 export class MediaParser {
   showEmbed: boolean;
+
   embeds: ((link: HTMLAnchorElement, message: string, themeColor: string) => string)[];
 
   constructor() {

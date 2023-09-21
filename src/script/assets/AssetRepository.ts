@@ -58,7 +58,9 @@ export interface UploadStatus {
 @singleton()
 export class AssetRepository {
   readonly uploadProgressQueue: ko.ObservableArray<UploadStatus> = ko.observableArray();
+
   readonly uploadCancelTokens: {[messageId: string]: () => void} = {};
+
   logger: Logger;
 
   constructor(

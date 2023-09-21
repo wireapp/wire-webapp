@@ -78,7 +78,7 @@ const config = Config.getConfig();
 async function runApp() {
   const [min, max] = config.SUPPORTED_API_RANGE;
   const {domain} = await core.useAPIVersion(min, max, config.ENABLE_DEV_BACKEND_API);
-  await initializeDataDog(config, {domain: domain});
+  await initializeDataDog(config, {domain});
 
   render(Root);
   if (module.hot) {

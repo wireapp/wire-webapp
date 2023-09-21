@@ -33,7 +33,7 @@ export function scrollToBottom(element: HTMLElement): number {
 
 export function isScrolledBottom(element: HTMLElement): boolean {
   const scrollTop = Math.ceil(element.scrollTop);
-  const scrollHeight = element.scrollHeight;
+  const {scrollHeight} = element;
   const height = element.clientHeight;
   return scrollTop + height >= scrollHeight;
 }
@@ -43,7 +43,7 @@ export function isScrolledTop(element: HTMLElement): boolean {
 }
 
 export function scrollBy(element: HTMLElement, distance: number): void {
-  const scrollTop = element.scrollTop;
+  const {scrollTop} = element;
   element.scrollTop = scrollTop + distance;
 }
 

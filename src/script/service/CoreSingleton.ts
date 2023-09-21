@@ -78,7 +78,8 @@ export class Core extends Account {
       nbPrekeys: 100,
     });
   }
+
   get storage() {
-    return this['storeEngine'];
+    return this.storeEngine;
   }
 }

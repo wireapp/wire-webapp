@@ -61,7 +61,7 @@ export type Env = {
   /** Specifies the name of the brand, e.g. Wire */
   BRAND_NAME: string;
 
-  /** enables replacing all occurences of {{hostname}} in the urls given to the frontend by the hostname of the client*/
+  /** enables replacing all occurences of {{hostname}} in the urls given to the frontend by the hostname of the client */
   ENABLE_DYNAMIC_HOSTNAME?: string;
 
   /** Allows a client to use a development version of the api (if present) */

@@ -20,7 +20,7 @@
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {mockStoreFactory} from '../../util/test/mockStoreFactory';
-import {ClientActionCreator} from '../action/creator/';
+import {ClientActionCreator} from './creator';
 
 import {actionRoot} from '.';
 

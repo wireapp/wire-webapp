@@ -25,7 +25,7 @@ interface ProgressProps {
   style?: React.CSSProperties;
   width: number;
 }
-export const ProgressBar = ({width, percent, error, style}: ProgressProps) => {
+export function ProgressBar({width, percent, error, style}: ProgressProps) {
   const progress = (percent / 100) * width;
 
   return (
@@ -37,7 +37,7 @@ export const ProgressBar = ({width, percent, error, style}: ProgressProps) => {
         borderRadius: '5px',
         height: '8px',
         marginTop: '8px',
-        width: width,
+        width,
         ...style,
       }}
     >
@@ -52,4 +52,4 @@ export const ProgressBar = ({width, percent, error, style}: ProgressProps) => {
       />
     </div>
   );
-};
+}

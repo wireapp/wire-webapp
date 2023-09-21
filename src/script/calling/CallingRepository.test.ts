@@ -86,7 +86,7 @@ describe('CallingRepository', () => {
   });
 
   afterEach(() => {
-    callingRepository['callState'].calls([]);
+    callingRepository.callState.calls([]);
   });
 
   afterAll(() => {
@@ -165,9 +165,9 @@ describe('CallingRepository', () => {
       declinedCall.state(CALL_STATE.INCOMING);
       declinedCall.reason(REASON.STILL_ONGOING);
 
-      callingRepository['callState'].calls([incomingCall, activeCall, declinedCall]);
+      callingRepository.callState.calls([incomingCall, activeCall, declinedCall]);
 
-      expect(callingRepository['callState'].joinedCall()).toBe(activeCall);
+      expect(callingRepository.callState.joinedCall()).toBe(activeCall);
     });
   });
 
@@ -193,7 +193,7 @@ describe('CallingRepository', () => {
       spyOn(callingRepository, 'findCall').and.returnValue(call);
 
       const queries = [1, 2, 3, 4].map(() => {
-        return callingRepository['getCallMediaStream']('', true, false, false).then(mediaStream => {
+        return callingRepository.getCallMediaStream('', true, false, false).then(mediaStream => {
           expect(mediaStream.getAudioTracks()[0]).toBe(audioTrack);
         });
       });
@@ -218,18 +218,18 @@ describe('CallingRepository', () => {
       const source = new window.RTCAudioSource();
       const audioTrack = source.createTrack();
       const selfMediaStream = new MediaStream([audioTrack]);
-      spyOn(callingRepository['mediaStreamHandler'], 'requestMediaStream').and.returnValue(
+      spyOn(callingRepository.mediaStreamHandler, 'requestMediaStream').and.returnValue(
         Promise.resolve(selfMediaStream),
       );
       spyOn(callingRepository, 'findCall').and.returnValue(call);
 
       const queries = [1, 2, 3, 4].map(() => {
-        return callingRepository['getCallMediaStream']('', true, false, false).then(mediaStream => {
+        return callingRepository.getCallMediaStream('', true, false, false).then(mediaStream => {
           expect(mediaStream.getAudioTracks()[0]).toBe(audioTrack);
         });
       });
       return Promise.all(queries).then(() => {
-        expect(callingRepository['mediaStreamHandler'].requestMediaStream).toHaveBeenCalledTimes(1);
+        expect(callingRepository.mediaStreamHandler.requestMediaStream).toHaveBeenCalledTimes(1);
         audioTrack.stop();
       });
     });
@@ -251,7 +251,7 @@ describe('CallingRepository', () => {
           currentAvailableDeviceId: mediaDevices,
         } as MediaDevicesHandler,
       );
-      spyOn(callingRepository['callState'], 'joinedCall').and.returnValue(call);
+      spyOn(callingRepository.callState, 'joinedCall').and.returnValue(call);
       callingRepository.stopMediaSource(MediaType.AUDIO);
 
       expect(selfParticipant.releaseAudioStream).toHaveBeenCalledTimes(1);
@@ -398,10 +398,10 @@ describe('CallingRepository ISO', () => {
         type: CALL.E_CALL,
       };
 
-      expect(callingRepo['callState'].calls().length).toBe(0);
+      expect(callingRepo.callState.calls().length).toBe(0);
 
       callingRepo.onIncomingCall(call => {
-        expect(callingRepo['callState'].calls().length).toBe(1);
+        expect(callingRepo.callState.calls().length).toBe(1);
 
         return Promise.resolve();
       });
@@ -469,7 +469,7 @@ describe.skip('E2E audio call', () => {
   let onCallClosed = () => {};
   let onCallConnected = () => {};
   beforeEach(() => {
-    joinedCallSub = client['callState'].joinedCall.subscribe(call => {
+    joinedCallSub = client.callState.joinedCall.subscribe(call => {
       if (call) {
         const audioFlowingInterval = setInterval(() => {
           /* Wait for audio to start flowing before calling the onCallConnected callback.
@@ -488,7 +488,7 @@ describe.skip('E2E audio call', () => {
         }, 30);
       }
     });
-    activeCallsSub = client['callState'].calls.subscribe(calls => {
+    activeCallsSub = client.callState.calls.subscribe(calls => {
       if (calls.length === 0) {
         onCallClosed();
       }
@@ -504,7 +504,7 @@ describe.skip('E2E audio call', () => {
     onCallClosed = done;
     const conversation = createConversation();
     onCallConnected = () => {
-      expect(client['sendMessage']).toHaveBeenCalledTimes(1);
+      expect(client.sendMessage).toHaveBeenCalledTimes(1);
       expect(client.onCallEvent).toHaveBeenCalledTimes(1);
       client
         .getStats(conversation.qualifiedId)
@@ -515,7 +515,7 @@ describe.skip('E2E audio call', () => {
             expect(stats.bytesFlowing).toBeGreaterThan(0);
           });
 
-          expect(client['callState'].joinedCall()).toBeDefined();
+          expect(client.callState.joinedCall()).toBeDefined();
           client.leaveCall(conversation.qualifiedId, LEAVE_CALL_REASON.MANUAL_LEAVE_BY_UI_CLICK);
         })
         .catch(done.fail);
@@ -528,7 +528,7 @@ describe.skip('E2E audio call', () => {
     const conversationId = createConversation().qualifiedId;
     onCallConnected = () => {
       expect(client.onCallEvent).toHaveBeenCalled();
-      expect(client['incomingCallCallback']).toHaveBeenCalled();
+      expect(client.incomingCallCallback).toHaveBeenCalled();
       client
         .getStats(conversationId)
         ?.then(extractAudioStats)

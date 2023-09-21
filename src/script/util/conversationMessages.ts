@@ -25,7 +25,7 @@ import {AssetType} from '../assets/AssetType';
 import {Message} from '../entity/message/Message';
 
 export enum MessageMarkerType {
-  /** The message should be displayed standalone and should not create any section*/
+  /** The message should be displayed standalone and should not create any section */
   NONE,
   /** The message should create a new 'unread' section when rendered */
   UNREAD,

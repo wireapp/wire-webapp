@@ -40,7 +40,7 @@ import {getSVG} from '../util/SVGProvider';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
-const IndexComponent = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
+function IndexComponent({defaultSSOCode}: Props & ConnectedProps & DispatchProps) {
   const {formatMessage: _} = useIntl();
   const navigate = useNavigate();
   const [logoutReason, setLogoutReason] = useState<string>();
@@ -122,7 +122,7 @@ const IndexComponent = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps
       </ContainerXS>
     </Page>
   );
-};
+}
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({

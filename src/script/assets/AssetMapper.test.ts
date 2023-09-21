@@ -42,8 +42,8 @@ describe('AssetMapper', () => {
 
       const mappedAssets = AssetMapper.mapProfileAssets(userId, assets);
 
-      expect(mappedAssets.medium['identifier']).toBe(completePictureId);
-      expect(mappedAssets.preview['identifier']).toBe(previewPictureId);
+      expect(mappedAssets.medium.identifier).toBe(completePictureId);
+      expect(mappedAssets.preview.identifier).toBe(previewPictureId);
     });
   });
 });

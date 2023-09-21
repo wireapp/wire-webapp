@@ -166,7 +166,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
   }
 
   return (
-    <Fragment>
+    <>
       {!isMinimized && !!videoGrid?.grid.length && (
         <FullscreenVideoCall
           key={joinedCall.conversationId.id}
@@ -201,7 +201,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
           windows={selectableWindows as unknown as Screen[]}
         />
       )}
-    </Fragment>
+    </>
   );
 };
 

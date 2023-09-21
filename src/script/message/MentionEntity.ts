@@ -40,10 +40,15 @@ export enum ERROR {
 
 export class MentionEntity {
   static ERROR = ERROR;
+
   startIndex: number;
+
   length: number;
+
   type: PROTO_MESSAGE_TYPE;
+
   userId: string;
+
   domain: string | undefined;
 
   constructor(startIndex: number, length: number, userId: string, domain?: string) {

@@ -86,9 +86,13 @@ const UINT8ARRAY_FIELDS = ['otr_key', 'sha256'];
 
 export class BackupRepository {
   private readonly backupService: BackupService;
+
   private readonly conversationRepository: ConversationRepository;
+
   private readonly logger: Logger;
+
   private canceled: boolean = false;
+
   private worker: WebWorker;
 
   constructor(
@@ -180,6 +184,7 @@ export class BackupRepository {
     });
     return tableData;
   }
+
   private async compressHistoryFiles(
     user: User,
     clientId: string,
@@ -254,6 +259,7 @@ export class BackupRepository {
 
     return concatenatedArray;
   }
+
   public getBackupInitData(): Promise<number> {
     return this.backupService.getHistoryCount();
   }
@@ -261,11 +267,13 @@ export class BackupRepository {
   private async convertToUint8Array(data: ArrayBuffer | Blob): Promise<Uint8Array> {
     if (data instanceof ArrayBuffer) {
       return new Uint8Array(data);
-    } else if (data instanceof Blob) {
+    }
+    if (data instanceof Blob) {
       return await this.readBlobAsUint8Array(data);
     }
     throw new Error('Unsupported data type');
   }
+
   private async readBlobAsUint8Array(blob: Blob): Promise<Uint8Array> {
     return new Promise<Uint8Array>((resolve, reject) => {
       const reader = new FileReader();

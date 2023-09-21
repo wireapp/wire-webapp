@@ -36,23 +36,41 @@ import {User} from '../User';
 
 export class MemberMessage extends SystemMessage {
   public allTeamMembers: User[];
+
   private readonly exceedsMaxVisibleUsers: ko.PureComputed<boolean>;
+
   public readonly hasUsers: ko.PureComputed<boolean>;
+
   private readonly hiddenUserCount: ko.PureComputed<number>;
+
   private readonly joinedUserEntities: ko.PureComputed<User[]>;
+
   public readonly name: ko.Observable<string>;
+
   public readonly otherUser: ko.PureComputed<User>;
+
   public readonly senderName: ko.PureComputed<string>;
+
   public readonly showNamedCreation: ko.PureComputed<boolean>;
+
   private readonly visibleUsers: ko.Observable<User[]>;
+
   public readonly highlightedUsers: ko.PureComputed<User[]>;
+
   public readonly htmlCaption: ko.PureComputed<string>;
+
   public readonly htmlGroupCreationHeader: ko.PureComputed<string>;
+
   public readonly remoteUserEntities: ko.PureComputed<User[]>;
+
   public showServicesWarning: boolean;
+
   public readonly userEntities: ko.ObservableArray<User>;
+
   public readonly userIds: ko.ObservableArray<QualifiedId>;
+
   public memberMessageType: SystemMessageType;
+
   public reason: MemberLeaveReason;
 
   static get CONFIG() {

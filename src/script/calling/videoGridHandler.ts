@@ -23,7 +23,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {Call} from './Call';
 
-import type {Participant} from '../calling/Participant';
+import type {Participant} from './Participant';
 
 export interface Grid {
   grid: Participant[];

@@ -25,7 +25,9 @@ import type {PermissionRepository} from '../permission/PermissionRepository';
 
 export class MediaRepository {
   public constraintsHandler: MediaConstraintsHandler;
+
   public devicesHandler: MediaDevicesHandler;
+
   public streamHandler: MediaStreamHandler;
 
   constructor(permissionRepository: PermissionRepository) {

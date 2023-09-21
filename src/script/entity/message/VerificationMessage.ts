@@ -31,8 +31,11 @@ import type {User} from '../User';
 
 export class VerificationMessage extends Message {
   public readonly userEntities: ko.ObservableArray<User>;
+
   public userIds: ko.ObservableArray<QualifiedUserId>;
+
   public verificationMessageType: ko.Observable<VerificationMessageType>;
+
   public readonly isSelfClient: ko.PureComputed<boolean>;
 
   constructor() {

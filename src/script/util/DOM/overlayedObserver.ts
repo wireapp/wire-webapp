@@ -26,7 +26,7 @@ interface OverlayElement {
  * Keeps track of elements that are overlayed by other elements (thus not visible on screen).
  */
 const overlayedElements = new Map<HTMLElement, OverlayElement>();
-let overlayCheckerInterval: number | undefined = undefined;
+let overlayCheckerInterval: number | undefined;
 
 function checkOverlayedElements() {
   overlayedElements.forEach(({onVisible, onChange}, element) => {

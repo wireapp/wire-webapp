@@ -34,7 +34,7 @@ test('proper render invite modal text', async () => {
 
   user.username(userName);
 
-  const inviteText = t('inviteMessage', {brandName: brandName, username: `@${userName}`});
+  const inviteText = t('inviteMessage', {brandName, username: `@${userName}`});
 
   render(<InviteModal selfUser={user} />);
 

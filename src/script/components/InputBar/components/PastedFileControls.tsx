@@ -44,7 +44,7 @@ const PastedFileControls: FC<PastedFileControlsProps> = ({pastedFile, onClear, o
       data-uie-name="pasted-file-controls"
       aria-label={pastedFile.name}
     >
-      <div className="controls-left"></div>
+      <div className="controls-left" />
 
       <div className="controls-center">
         {pastedFilePreviewUrl ? (

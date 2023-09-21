@@ -37,7 +37,7 @@ interface CallParticipantStatusIconsProps {
 
 const DEFAULT_VISIBLE_ICONS = 1;
 
-export const CallParticipantStatusIcons = ({callParticipant}: CallParticipantStatusIconsProps) => {
+export function CallParticipantStatusIcons({callParticipant}: CallParticipantStatusIconsProps) {
   const {sharesCamera, sharesScreen, isActivelySpeaking, isMuted} = useKoSubscribableChildren(callParticipant, [
     'sharesCamera',
     'sharesScreen',
@@ -66,4 +66,4 @@ export const CallParticipantStatusIcons = ({callParticipant}: CallParticipantSta
       )}
     </div>
   );
-};
+}

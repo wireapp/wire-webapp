@@ -23,7 +23,7 @@ export function chunk(array: Float32Array, size: number): Float32Array[];
 
 export function chunk<T>(array: T[] | Float32Array, size: number) {
   const chunks = [];
-  for (let index = 0, length = array.length; index < length; index += size) {
+  for (let index = 0, {length} = array; index < length; index += size) {
     chunks.push(array.slice(index, index + size));
   }
   return chunks;

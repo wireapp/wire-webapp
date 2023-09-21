@@ -47,7 +47,7 @@ const changeEmailRedirect = {
   [AuthSelector.REGISTER_FLOW.TEAM]: ROUTE.CREATE_TEAM_ACCOUNT,
 };
 
-const VerifyEmailCodeComponent = ({
+function VerifyEmailCodeComponent({
   account,
   authError,
   currentFlow,
@@ -55,7 +55,7 @@ const VerifyEmailCodeComponent = ({
   doRegisterPersonal,
   doRegisterTeam,
   doSendActivationCode,
-}: Props & ConnectedProps & DispatchProps) => {
+}: Props & ConnectedProps & DispatchProps) {
   const navigate = useNavigate();
   const {formatMessage: _} = useIntl();
 
@@ -125,7 +125,7 @@ const VerifyEmailCodeComponent = ({
       </ContainerXS>
     </Page>
   );
-};
+}
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({

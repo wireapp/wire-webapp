@@ -50,7 +50,9 @@ import type {UserRepository} from '../user/UserRepository';
 
 export class ConnectionRepository {
   private readonly connectionService: ConnectionService;
+
   private readonly userRepository: UserRepository;
+
   private readonly logger: Logger;
 
   static get CONFIG(): Record<string, BackendEventType[]> {

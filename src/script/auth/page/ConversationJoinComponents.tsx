@@ -60,18 +60,20 @@ interface GuestLoginColumnProps {
   error: any;
 }
 
-const Separator = () => {
+function Separator() {
   const isMobile = useMatchMedia(QUERY.mobile);
-  const Line = () => (
-    <div
-      style={{
-        flex: 1,
-        height: '1px',
-        backgroundColor: '#696c6e',
-        minWidth: '20rem',
-      }}
-    ></div>
-  );
+  function Line() {
+    return (
+      <div
+        style={{
+          flex: 1,
+          height: '1px',
+          backgroundColor: '#696c6e',
+          minWidth: '20rem',
+        }}
+      />
+    );
+  }
   return (
     <div
       style={{
@@ -86,9 +88,9 @@ const Separator = () => {
       <Line />
     </div>
   );
-};
+}
 
-const IsLoggedInColumn = ({handleLogout, handleSubmit, selfName}: IsLoggedInColumnProps) => {
+function IsLoggedInColumn({handleLogout, handleSubmit, selfName}: IsLoggedInColumnProps) {
   const {formatMessage: _} = useIntl();
   return (
     <Container centerText verticalCenter style={{width: '100%', display: 'flex'}}>
@@ -123,7 +125,7 @@ const IsLoggedInColumn = ({handleLogout, handleSubmit, selfName}: IsLoggedInColu
                 variant={LinkVariant.PRIMARY}
                 block
                 onClick={handleLogout}
-                textTransform={'none'}
+                textTransform="none"
                 style={{fontSize: '1rem'}}
                 data-uie-name="go-logout"
               >
@@ -135,9 +137,9 @@ const IsLoggedInColumn = ({handleLogout, handleSubmit, selfName}: IsLoggedInColu
       </Columns>
     </Container>
   );
-};
+}
 
-const GuestLoginColumn = ({
+function GuestLoginColumn({
   enteredName,
   nameInput,
   onNameChange,
@@ -146,7 +148,7 @@ const GuestLoginColumn = ({
   checkNameValidity,
   conversationError,
   error,
-}: GuestLoginColumnProps) => {
+}: GuestLoginColumnProps) {
   const {formatMessage: _} = useIntl();
 
   return (
@@ -204,6 +206,6 @@ const GuestLoginColumn = ({
       </Columns>
     </Container>
   );
-};
+}
 
 export {IsLoggedInColumn, Separator, GuestLoginColumn};

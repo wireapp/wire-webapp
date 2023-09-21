@@ -30,20 +30,18 @@ export type GiphyButtonProps = {
 
 const GiphyButton: React.FC<GiphyButtonProps> = ({onGifClick}) => {
   return (
-    <>
-      <li>
-        <IconButton
-          type="button"
-          css={{marginBottom: '0'}}
-          title={t('extensionsBubbleButtonGif')}
-          aria-label={t('extensionsBubbleButtonGif')}
-          onClick={onGifClick}
-          data-uie-name="do-giphy-popover"
-        >
-          <Icon.Gif />
-        </IconButton>
-      </li>
-    </>
+    <li>
+      <IconButton
+        type="button"
+        css={{marginBottom: '0'}}
+        title={t('extensionsBubbleButtonGif')}
+        aria-label={t('extensionsBubbleButtonGif')}
+        onClick={onGifClick}
+        data-uie-name="do-giphy-popover"
+      >
+        <Icon.Gif />
+      </IconButton>
+    </li>
   );
 };
 

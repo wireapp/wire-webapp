@@ -30,6 +30,7 @@ interface ErrorTypes {
 
 export class ValidationError extends Error {
   public label: string;
+
   constructor(label: string) {
     super(label);
     this.name = this.constructor.name;

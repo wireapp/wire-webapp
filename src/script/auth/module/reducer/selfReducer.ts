@@ -19,7 +19,7 @@
 
 import type {Self} from '@wireapp/api-client/lib/self/';
 
-import {AUTH_ACTION, AppActions, SELF_ACTION} from '../action/creator/';
+import {AUTH_ACTION, AppActions, SELF_ACTION} from '../action/creator';
 
 export interface SelfState {
   consents: {[key: number]: number};

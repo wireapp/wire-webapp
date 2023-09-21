@@ -18,6 +18,7 @@
  */
 
 import type {Config} from 'jest';
+
 process.env.TZ = 'UTC';
 
 const config: Config = {

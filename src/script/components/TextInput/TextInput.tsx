@@ -84,7 +84,7 @@ const TextInput = forwardRef<HTMLInputElement, UserInputProps>(
       }
     }, [isSuccess, onSuccessDismissed]);
 
-    let changedColor = undefined;
+    let changedColor;
     if (isError) {
       changedColor = 'var(--text-input-alert) !important';
     }

@@ -185,7 +185,7 @@ const AccountInput: FC<AccountInputProps> = ({
           autoFocus
           uieName={`enter-${fieldName}-input`}
           label={label}
-          name={valueUie ? valueUie : fieldName}
+          name={valueUie || fieldName}
           value={input}
           ref={inputWrapperRef}
           onChange={({target}) => updateInput(target.value)}
@@ -200,7 +200,7 @@ const AccountInput: FC<AccountInputProps> = ({
               (event.target as HTMLInputElement).blur();
               // on enter save changes and close the editable field
               setIsEditing(false);
-            } else if (isTabKey(event) && !!!input) {
+            } else if (isTabKey(event) && !input) {
               // after clearing the input i.e field value is empty when user press tab,
               // revert to the last saved value, close the editable field and focus on the next field
               setInput(value);

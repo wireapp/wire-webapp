@@ -55,7 +55,7 @@ import {VerifyPhoneCode} from './VerifyPhoneCode';
 
 import {Config} from '../../Config';
 import {mapLanguage, normalizeLanguage} from '../localeConfig';
-import {actionRoot as ROOT_ACTIONS} from '../module/action/';
+import {actionRoot as ROOT_ACTIONS} from '../module/action';
 import {bindActionCreators, RootState} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as LanguageSelector from '../module/selector/LanguageSelector';
@@ -79,7 +79,7 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
   useEffect(() => {
     // Force the hash url to have a initial `/` (see https://stackoverflow.com/a/71864506)
     const forceSlashAfterHash = () => {
-      const hash = window.location.hash;
+      const {hash} = window.location;
       if (!hash.startsWith('#/')) {
         window.location.hash = `#/${hash.slice(1)}`;
       }

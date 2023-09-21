@@ -51,15 +51,15 @@ const CollectionItem: FC<CollectionItemProps> = ({message, onImageClick}) => {
     );
   }
   if (isOfCategory('links', message)) {
-    return <LinkPreviewAsset message={message} header={true} />;
+    return <LinkPreviewAsset message={message} header />;
   }
 
   if (isOfCategory('files', message)) {
-    return <FileAsset message={message} hasHeader={true} />;
+    return <FileAsset message={message} hasHeader />;
   }
 
   if (isOfCategory('audio', message)) {
-    return <AudioAsset className="collection-file" message={message} hasHeader={true} />;
+    return <AudioAsset className="collection-file" message={message} hasHeader />;
   }
 
   return null;

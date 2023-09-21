@@ -80,7 +80,7 @@ const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
     'accent_color',
     'initials',
   ]);
-  const avatarImgAlt = avatarAlt ? avatarAlt : `${t('userProfileImageAlt')} ${name}`;
+  const avatarImgAlt = avatarAlt || `${t('userProfileImageAlt')} ${name}`;
 
   return (
     <AvatarWrapper

@@ -43,12 +43,19 @@ export interface QueueEntry<T> {
 
 export class PromiseQueue {
   private blocked: boolean;
+
   private current: number;
+
   private interval?: number;
+
   private paused: boolean;
+
   private readonly concurrent: number;
+
   private readonly logger: Logger;
+
   private readonly queue: QueueEntry<any>[];
+
   private readonly timeout: number;
 
   static get CONFIG() {
@@ -175,7 +182,7 @@ export class PromiseQueue {
   unshift<T>(fn: PromiseFn<T>): Promise<T> {
     return new Promise((resolve, reject) => {
       const queueEntry = {
-        fn: fn,
+        fn,
         rejectFn: reject,
         resolveFn: resolve,
       };

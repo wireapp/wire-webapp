@@ -36,16 +36,27 @@ type AssetMetaData = (ProtobufAsset.IAudioMetaData | ProtobufAsset.IImageMetaDat
 
 export class FileAsset extends Asset {
   public readonly original_resource: ko.Observable<AssetRemoteData>;
+
   public readonly preview_resource: ko.Observable<AssetRemoteData>;
+
   protected logger: Logger;
+
   public readonly downloadProgress: ko.PureComputed<number | undefined>;
+
   public readonly cancelDownload: () => void;
+
   public file_name: string;
+
   public file_size: number;
+
   public meta: Partial<AssetMetaData>;
+
   public readonly status: ko.Observable<AssetTransferState>;
+
   public readonly upload_failed_reason: ko.Observable<ProtobufAsset.NotUploaded>;
+
   public conversationId: string;
+
   public correlation_id: string;
 
   constructor(id?: string) {

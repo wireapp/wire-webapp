@@ -44,7 +44,7 @@ import {Button} from '../../../../../entity/message/Button';
 import {CompositeMessage} from '../../../../../entity/message/CompositeMessage';
 import {ContentMessage} from '../../../../../entity/message/ContentMessage';
 
-const ContentAsset = ({
+function ContentAsset({
   asset,
   message,
   selfId,
@@ -60,7 +60,7 @@ const ContentAsset = ({
   onClickMessage: MessageActions['onClickMessage'];
   selfId: QualifiedId;
   isMessageFocused: boolean;
-}) => {
+}) {
   const {isObfuscated, status} = useKoSubscribableChildren(message, ['isObfuscated', 'status']);
 
   switch (asset.type) {
@@ -139,6 +139,6 @@ const ContentAsset = ({
       );
   }
   return null;
-};
+}
 
 export {ContentAsset};

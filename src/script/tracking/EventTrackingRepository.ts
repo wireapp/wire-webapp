@@ -46,9 +46,13 @@ const Countly = require('countly-sdk-web');
 
 export class EventTrackingRepository {
   private isProductReportingActivated: boolean;
+
   private sendAppOpenEvent: boolean = true;
+
   private countlyDeviceId: string;
+
   private readonly logger: Logger;
+
   isErrorReportingActivated: boolean;
 
   static get CONFIG() {
@@ -77,7 +81,7 @@ export class EventTrackingRepository {
   }
 
   readonly onUserEvent = (eventJson: any, source: EventSource) => {
-    const type = eventJson.type;
+    const {type} = eventJson;
     if (type === ClientEvent.USER.DATA_TRANSFER && this.userState.isTeam()) {
       this.migrateDeviceId(eventJson.data.trackingIdentifier);
     }

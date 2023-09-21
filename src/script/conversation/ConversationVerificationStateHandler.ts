@@ -30,7 +30,7 @@ import {ConversationState} from './ConversationState';
 import {ConversationVerificationState} from './ConversationVerificationState';
 
 import type {ClientEntity} from '../client/ClientEntity';
-import {EventBuilder} from '../conversation/EventBuilder';
+import {EventBuilder} from './EventBuilder';
 import type {Conversation} from '../entity/Conversation';
 import type {EventRepository} from '../event/EventRepository';
 import {VerificationMessageType} from '../message/VerificationMessageType';
@@ -202,7 +202,7 @@ export class ConversationVerificationStateHandler {
             userIds.find(userId => matchQualifiedIds(userId, userIdInConversation)),
           );
 
-          if (!!matchingUserIds.length) {
+          if (matchingUserIds.length) {
             return {conversationEntity, userIds: matchingUserIds};
           }
         }

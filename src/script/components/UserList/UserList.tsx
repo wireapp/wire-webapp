@@ -74,7 +74,7 @@ export interface UserListProps {
   isSelectable?: boolean;
 }
 
-export const UserList = ({
+export function UserList({
   onClick,
   conversationRepository,
   users,
@@ -94,7 +94,7 @@ export const UserList = ({
   teamState = container.resolve(TeamState),
   isSelectable = false,
   onSelectUser,
-}: UserListProps) => {
+}: UserListProps) {
   const [maxShownUsers, setMaxShownUsers] = useState(USER_CHUNK_SIZE);
 
   const [expandedFolders, setExpandedFolders] = useState<UserListSections[]>([UserListSections.CONTACTS]);
@@ -303,4 +303,4 @@ export const UserList = ({
       )}
     </>
   );
-};
+}

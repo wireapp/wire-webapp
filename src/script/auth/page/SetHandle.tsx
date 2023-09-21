@@ -54,7 +54,7 @@ import {createSuggestions} from '../util/handleUtil';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
-const SetHandleComponent = ({
+function SetHandleComponent({
   doGetConsents,
   doSetConsent,
   doSetHandle,
@@ -63,7 +63,7 @@ const SetHandleComponent = ({
   checkHandles,
   isFetching,
   name,
-}: Props & ConnectedProps & DispatchProps) => {
+}: Props & ConnectedProps & DispatchProps) {
   const {formatMessage: _} = useIntl();
   const navigate = useNavigate();
   const [error, setError] = useState(null);
@@ -120,7 +120,7 @@ const SetHandleComponent = ({
           <InputBlock>
             <InputSubmitCombo style={{paddingLeft: 0}}>
               <Text center style={{minWidth: 38}}>
-                {'@'}
+                @
               </Text>
               <Input
                 id="handle"
@@ -152,7 +152,7 @@ const SetHandleComponent = ({
       )}
     </Page>
   );
-};
+}
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({

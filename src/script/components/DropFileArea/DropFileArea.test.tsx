@@ -49,7 +49,7 @@ describe('DropFileArea', () => {
       },
     });
 
-    //this is shallow comparison (we could pass any 2 files), that's why we are checking file names also
+    // this is shallow comparison (we could pass any 2 files), that's why we are checking file names also
     expect(props.onFileDropped).toHaveBeenCalledWith([pngFile]);
     expect(props.onFileDropped.mock.calls[0][0][0].name).toEqual(pngFileName);
   });

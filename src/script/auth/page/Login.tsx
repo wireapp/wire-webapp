@@ -67,7 +67,7 @@ import {AppAlreadyOpen} from '../component/AppAlreadyOpen';
 import {LoginForm} from '../component/LoginForm';
 import {RouterLink} from '../component/RouterLink';
 import {EXTERNAL_ROUTE} from '../externalRoute';
-import {actionRoot} from '../module/action/';
+import {actionRoot} from '../module/action';
 import {LabeledError} from '../module/action/LabeledError';
 import {ValidationError} from '../module/action/ValidationError';
 import {bindActionCreators, RootState} from '../module/reducer';
@@ -79,7 +79,7 @@ type Props = React.HTMLProps<HTMLDivElement> & {
   embedded?: boolean;
 };
 
-const LoginComponent = ({
+function LoginComponent({
   authError,
   resetAuthError,
   doCheckConversationCode,
@@ -96,7 +96,7 @@ const LoginComponent = ({
   defaultSSOCode,
   isSendingTwoFactorCode,
   embedded,
-}: Props & ConnectedProps & DispatchProps) => {
+}: Props & ConnectedProps & DispatchProps) {
   const logger = getLogger('Login');
   const {formatMessage: _} = useIntl();
   const navigate = useNavigate();
@@ -430,7 +430,7 @@ const LoginComponent = ({
       </IsMobile>
     </Page>
   );
-};
+}
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({

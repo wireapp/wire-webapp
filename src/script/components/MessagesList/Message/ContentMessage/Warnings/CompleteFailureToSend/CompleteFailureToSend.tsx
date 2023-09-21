@@ -33,7 +33,7 @@ type Props = {
 
 const config = Config.getConfig();
 
-export const CompleteFailureToSendWarning = ({isMessageFocused, onRetry, unreachableDomain}: Props) => {
+export function CompleteFailureToSendWarning({isMessageFocused, onRetry, unreachableDomain}: Props) {
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
   return (
     <>
@@ -66,4 +66,4 @@ export const CompleteFailureToSendWarning = ({isMessageFocused, onRetry, unreach
       </div>
     </>
   );
-};
+}

@@ -402,6 +402,7 @@ export class AuthActionCreator {
     error,
     type: AUTH_ACTION.FETCH_TEAM_FAILED,
   });
+
   static startFetchOAuth = (): FetchApplicationStartAction => ({
     type: AUTH_ACTION.FETCH_OAUTH_APP_START,
   });

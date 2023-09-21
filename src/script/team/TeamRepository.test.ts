@@ -95,7 +95,7 @@ describe('TeamRepository', () => {
     it('returns team member entities', async () => {
       const [teamRepo, {teamService}] = buildConnectionRepository();
       jest.spyOn(teamService, 'getAllTeamMembers').mockResolvedValue({hasMore: false, members: team_members.members});
-      const entities = await teamRepo['getAllTeamMembers'](team_metadata.id);
+      const entities = await teamRepo.getAllTeamMembers(team_metadata.id);
       expect(entities.length).toEqual(team_members.members.length);
       expect(entities[0].userId).toEqual(team_members.members[0].user);
       expect(entities[0].permissions).toEqual(team_members.members[0].permissions);
@@ -106,7 +106,7 @@ describe('TeamRepository', () => {
     it('does not crash when there is no team logo', async () => {
       const [teamRepo] = buildConnectionRepository();
 
-      expect(teamRepo['teamState'].isTeam()).toBe(true);
+      expect(teamRepo.teamState.isTeam()).toBe(true);
 
       const accountInfo = await teamRepo.sendAccountInfo(true);
 

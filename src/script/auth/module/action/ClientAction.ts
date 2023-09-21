@@ -22,7 +22,7 @@ import {ClientInfo} from '@wireapp/core/lib/client/';
 
 import {Runtime} from '@wireapp/commons';
 
-import {ClientActionCreator} from './creator/';
+import {ClientActionCreator} from './creator';
 
 import * as StringUtil from '../../util/stringUtil';
 import type {ThunkAction} from '../reducer';

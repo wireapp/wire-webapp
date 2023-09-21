@@ -64,12 +64,19 @@ type IncomingEvent = BackendEvent | ClientConversationEvent;
 
 export class EventRepository {
   logger: Logger;
+
   currentClient: ko.Observable<ClientEntity> | undefined;
+
   notificationHandlingState: ko.Observable<NOTIFICATION_HANDLING_STATE>;
+
   previousHandlingState: NOTIFICATION_HANDLING_STATE | undefined;
+
   notificationsHandled: number;
+
   notificationsTotal: number;
+
   lastEventDate: ko.Observable<string | undefined>;
+
   eventProcessMiddlewares: Function[];
 
   static get CONFIG() {
@@ -133,9 +140,9 @@ export class EventRepository {
     this.eventProcessMiddlewares = middlewares;
   }
 
-  //##############################################################################
+  // ##############################################################################
   // WebSocket handling
-  //##############################################################################
+  // ##############################################################################
 
   private readonly updateConnectivitityStatus = (state: ConnectionState) => {
     this.logger.log('Websocket connection state changed to', state);
@@ -205,7 +212,7 @@ export class EventRepository {
           },
           onEvent: this.handleIncomingEvent,
           onMissedNotifications: this.triggerMissedSystemEventMessageRendering,
-          onNotificationStreamProgress: onNotificationStreamProgress,
+          onNotificationStreamProgress,
           dryRun,
         });
       });
@@ -229,9 +236,9 @@ export class EventRepository {
    */
   disconnectWebSocket: () => void = () => {};
 
-  //##############################################################################
+  // ##############################################################################
   // Notification Stream handling
-  //##############################################################################
+  // ##############################################################################
   private async handleTimeDrift() {
     try {
       const time = await this.notificationService.getServerTime();
@@ -284,9 +291,9 @@ export class EventRepository {
     }
   }
 
-  //##############################################################################
+  // ##############################################################################
   // Notification/Event handling
-  //##############################################################################
+  // ##############################################################################
 
   /**
    * Inject event into a conversation.

@@ -31,9 +31,9 @@ import {createUuid} from 'Util/uuid';
 import {VerificationMessage} from '../entity/message/VerificationMessage';
 
 describe('EventBuilder', () => {
-  let event_mapper: EventMapper = undefined;
-  let conversation_et: Conversation = undefined;
-  let self_user_et: User = undefined;
+  let event_mapper: EventMapper;
+  let conversation_et: Conversation;
+  let self_user_et: User;
 
   beforeEach(() => {
     self_user_et = new User(createUuid(), null);

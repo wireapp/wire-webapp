@@ -42,7 +42,7 @@ export interface GroupedConversationsFolderProps {
   toggle: (folderId: string) => void;
 }
 
-const GroupedConversationsFolder = ({
+function GroupedConversationsFolder({
   folder,
   toggle,
   onJoinCall,
@@ -50,7 +50,7 @@ const GroupedConversationsFolder = ({
   expandedFolders,
   hasJoinableCall,
   isSelectedConversation,
-}: GroupedConversationsFolderProps) => {
+}: GroupedConversationsFolderProps) {
   const isExpanded: boolean = expandedFolders.includes(folder.id);
   const {conversations} = useKoSubscribableChildren(folder, ['conversations']);
   const {currentFocus, handleKeyDown, resetConversationFocus} = useConversationFocus(conversations);
@@ -84,6 +84,6 @@ const GroupedConversationsFolder = ({
       </ul>
     </li>
   );
-};
+}
 
 export {GroupedConversationsFolder};

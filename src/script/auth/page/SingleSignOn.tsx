@@ -61,7 +61,7 @@ type Props = React.HTMLAttributes<HTMLDivElement>;
 
 const logger = getLogger('SingleSignOn');
 
-const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
+function SingleSignOnComponent({hasDefaultSSOCode}: Props & ConnectedProps & DispatchProps) {
   const {formatMessage: _} = useIntl();
   const ssoWindowRef = useRef<Window>();
   const params = useParams<{code?: string}>();
@@ -73,9 +73,9 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
     const SSO_WINDOW_CLOSE_POLLING_INTERVAL = 1000;
 
     return new Promise<void>((resolve, reject) => {
-      let timerId: number = undefined;
-      let onReceiveChildWindowMessage: (event: MessageEvent) => void = undefined;
-      let onParentWindowClose: (event: Event) => void = undefined;
+      let timerId: number;
+      let onReceiveChildWindowMessage: (event: MessageEvent) => void;
+      let onParentWindowClose: (event: Event) => void;
 
       const onChildWindowClose = () => {
         clearInterval(timerId);
@@ -289,7 +289,7 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
       )}
     </Page>
   );
-};
+}
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({

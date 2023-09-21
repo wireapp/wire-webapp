@@ -18,7 +18,7 @@
  */
 
 import {currentLanguage, findLanguage, mapLanguage} from '../../localeConfig';
-import {AppActions, LANGUAGE_ACTION} from '../action/creator/';
+import {AppActions, LANGUAGE_ACTION} from '../action/creator';
 
 export interface LanguageState {
   language: string;

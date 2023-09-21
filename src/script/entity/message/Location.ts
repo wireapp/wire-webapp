@@ -23,8 +23,11 @@ import {AssetType} from '../../assets/AssetType';
 
 export class Location extends Asset {
   public latitude: string;
+
   public longitude: string;
+
   public name: string;
+
   public zoom: string;
 
   constructor() {

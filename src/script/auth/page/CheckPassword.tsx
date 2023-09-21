@@ -54,12 +54,12 @@ import * as UrlUtil from '../util/urlUtil';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
-const CheckPasswordComponent = ({
+function CheckPasswordComponent({
   loginData,
   doLogin,
   resetAuthError,
   isFetching,
-}: Props & ConnectedProps & DispatchProps) => {
+}: Props & ConnectedProps & DispatchProps) {
   const {formatMessage: _} = useIntl();
   const navigate = useNavigate();
 
@@ -172,7 +172,7 @@ const CheckPasswordComponent = ({
       </ContainerXS>
     </Page>
   );
-};
+}
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({

@@ -71,7 +71,7 @@ export const UserDetailsComponent: React.FC<UserDetailsProps> = ({
     amplify.publish(WebAppEvents.USER.UPDATE, participant.qualifiedId);
   }, [participant]);
 
-  const isFederated = participant.isFederated;
+  const {isFederated} = participant;
   const isGuest = !isFederated && user.isGuest;
 
   return (
