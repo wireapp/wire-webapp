@@ -182,7 +182,6 @@ const LoginComponent = ({
       await doInitializeClient(ClientType.PERMANENT, undefined, undefined, entropyData);
 
       if (isOauth) {
-        console.info('bardia route', {route: `${ROUTE.AUTHORIZE}/${window.location.hash}`});
         return navigate(`${ROUTE.AUTHORIZE}/${window.location.hash}`);
       }
       return navigate(ROUTE.HISTORY_INFO);
