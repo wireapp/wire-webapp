@@ -88,8 +88,10 @@ const VerificationMessage: React.FC<VerificationMessageProps> = ({message}) => {
           <>
             <span className="message-header-plain-sender-name">{nameList}</span>
             <span>
-              {hasMultipleUsers || isSelfClient
+              {hasMultipleUsers
                 ? t('conversationDeviceStartedUsingMany')
+                : isSelfClient
+                ? t('conversationDeviceStartedUsingYou')
                 : t('conversationDeviceStartedUsingOne')}
             </span>
             <button
