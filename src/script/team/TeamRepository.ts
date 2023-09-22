@@ -77,6 +77,7 @@ export class TeamRepository {
   private readonly teamMapper: TeamMapper;
   private readonly userRepository: UserRepository;
   private readonly assetRepository: AssetRepository;
+  private mlsFeatureUpdateCallback: () => void;
 
   constructor(
     userRepository: UserRepository,
@@ -399,15 +400,20 @@ export class TeamRepository {
   };
 
   private readonly onFeatureConfigUpdate = async (
-    _event: TeamEvent & {name: FEATURE_KEY},
+    event: TeamEvent & {name: FEATURE_KEY},
     source: EventSource,
   ): Promise<void> => {
     if (source !== EventSource.WEBSOCKET) {
       // Ignore notification stream events
       return;
     }
+
     // When we receive a `feature-config.update` event, we will refetch the entire feature config
     await this.updateFeatureConfig();
+
+    if (event.name === FEATURE_KEY.MLS) {
+      this.mlsFeatureUpdateCallback?.();
+    }
   };
 
   private onMemberLeave(eventJson: TeamMemberLeaveEvent): void {
@@ -500,5 +506,9 @@ export class TeamRepository {
     const mlsMigrationFeature = this.teamState.teamFeatures().mlsMigration;
 
     return getMLSMigrationStatus(mlsMigrationFeature);
+  }
+
+  public onMLSFeatureUpdate(callback: () => void): void {
+    this.mlsFeatureUpdateCallback = callback;
   }
 }
