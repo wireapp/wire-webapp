@@ -17,11 +17,11 @@
  *
  */
 
-import {FEATURE_KEY} from '../team';
+import {FeatureList} from '../team';
 import {
-  TeamFeatureConfigurationUpdateEventData,
   TeamConversationCreateData,
   TeamConversationDeleteData,
+  TeamFeatureConfigurationUpdateEventData,
   TeamMemberJoinData,
   TeamMemberLeaveData,
   TeamMemberUpdateData,
@@ -46,7 +46,7 @@ export type TeamEventData =
   | TeamMemberLeaveData
   | TeamMemberUpdateData
   | TeamUpdateData
-  | TeamFeatureConfigurationUpdateEventData
+  | TeamFeatureConfigurationUpdateEventData<keyof FeatureList>
   | null;
 
 export type TeamEvent =
@@ -107,8 +107,11 @@ export interface TeamUpdateEvent extends BaseTeamEvent {
   type: TEAM_EVENT.UPDATE;
 }
 
-export interface TeamFeatureConfigurationUpdateEvent extends BaseTeamEvent {
-  data: TeamFeatureConfigurationUpdateEventData;
-  name: FEATURE_KEY;
-  type: TEAM_EVENT.FEATURE_CONFIG_UPDATE;
-}
+export type TeamFeatureConfigurationUpdateEvent = BaseTeamEvent &
+  {
+    [FeatureKey in keyof FeatureList]: {
+      name: FeatureKey;
+      data: TeamFeatureConfigurationUpdateEventData<FeatureKey>;
+      type: TEAM_EVENT.FEATURE_CONFIG_UPDATE;
+    };
+  }[keyof FeatureList];
