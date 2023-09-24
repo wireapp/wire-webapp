@@ -19,7 +19,7 @@
   "devDependencies": {
     "@types/fs-extra": "9.0.13",
     "@types/license-checker": "^25",
-    "@types/npm-registry-package-info": "1.0.1",
+    "@types/npm-registry-package-info": "1.0.2",
     "@types/rimraf": "^3.0.2",
     "license-checker": "^25.0.1",
     "rimraf": "^3.0.2",
