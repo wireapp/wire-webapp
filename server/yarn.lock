@@ -1003,12 +1003,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/express-useragent@npm:1.0.2":
-  version: 1.0.2
-  resolution: "@types/express-useragent@npm:1.0.2"
+"@types/express-useragent@npm:1.0.3":
+  version: 1.0.3
+  resolution: "@types/express-useragent@npm:1.0.3"
   dependencies:
     "@types/express": "*"
-  checksum: b3a7d6b79eee94fc6b999c2b3cfbe5cd898a4041dea77bb2b2a84851eb37ad198fe146a08e4df64d256be477b2b02f75cb705847ffd8d2fd56e00683c02809df
+  checksum: 9c980165ed6d3e208ab5653e3a39c679c174c81cf5ceecca233182848796d7f0234c938ac28163e1f1e645302a7a4050cdd3e5a8acc94dd869e78fd3c0572e8a
   languageName: node
   linkType: hard
 
@@ -5698,7 +5698,7 @@ __metadata:
   dependencies:
     "@types/express": 4.17.17
     "@types/express-sitemap-xml": 3.0.1
-    "@types/express-useragent": 1.0.2
+    "@types/express-useragent": 1.0.3
     "@types/fs-extra": 11.0.2
     "@types/geolite2": 2.0.0
     "@types/hbs": 4.0.2
