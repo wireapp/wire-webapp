@@ -5419,19 +5419,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/copy-config@npm:2.1.7":
-  version: 2.1.7
-  resolution: "@wireapp/copy-config@npm:2.1.7"
+"@wireapp/copy-config@npm:2.1.8":
+  version: 2.1.8
+  resolution: "@wireapp/copy-config@npm:2.1.8"
   dependencies:
     axios: 1.5.0
     copy: 0.3.2
-    cosmiconfig: 8.3.5
+    cosmiconfig: 8.3.6
     fs-extra: 11.1.0
     jszip: 3.10.1
     logdown: 3.3.1
   bin:
     copy-config: lib/cli.js
-  checksum: 96723dc3a27130c89606defabc64b4c2b19e01dd9dd618cac2ae23c1d0a88f712c4995c784e7ef9d6b2716821a3aa83ea606214cd12b4b1ba5037d32b8b6337c
+  checksum: 9f82a8a648d2b2ad950c1c32b897e3ce5a057fc96d1248a678e21e927790629fd50784f070e0a54c10670b6ae1262c30c8923a669694a02e6d75168eab837a10
   languageName: node
   linkType: hard
 
@@ -7391,9 +7391,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cosmiconfig@npm:8.3.5":
-  version: 8.3.5
-  resolution: "cosmiconfig@npm:8.3.5"
+"cosmiconfig@npm:8.3.6":
+  version: 8.3.6
+  resolution: "cosmiconfig@npm:8.3.6"
   dependencies:
     import-fresh: ^3.3.0
     js-yaml: ^4.1.0
@@ -7404,7 +7404,7 @@ __metadata:
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: c6e44bb3cabf268b70049e7bd4ee8ecf00068854e53cbc32f9104794927ef406817f9e64e1c4949bd10776b604c01f7b50674336fcd2d5b9efc4cf8277fdf025
+  checksum: dc339ebea427898c9e03bf01b56ba7afbac07fc7d2a2d5a15d6e9c14de98275a9565da949375aee1809591c152c0a3877bb86dbeaf74d5bd5aaa79955ad9e7a0
   languageName: node
   linkType: hard
 
@@ -18587,7 +18587,7 @@ __metadata:
     "@types/underscore": 1.11.9
     "@types/webpack-env": 1.18.1
     "@wireapp/avs": 9.3.7
-    "@wireapp/copy-config": 2.1.7
+    "@wireapp/copy-config": 2.1.8
     "@wireapp/core": 42.5.1
     "@wireapp/eslint-config": 3.0.4
     "@wireapp/lru-cache": 3.8.1
