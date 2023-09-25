@@ -53,6 +53,9 @@ export class SelfRepository {
     // Every time user's client is deleted, we need to re-evaluate self supported protocols.
     // It's possible that they have removed proteus client, and now all their clients are mls-capable.
     amplify.subscribe(WebAppEvents.CLIENT.REMOVE, this.refreshSelfSupportedProtocols);
+
+    // Every time team admin updates the list of team's supported protocols, we re-evaluate self supported protocols list.
+    teamRepository.onTeamSupportedProtocolsUpdate(this.refreshSelfSupportedProtocols);
   }
 
   private get selfUser() {
