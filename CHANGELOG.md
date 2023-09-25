@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [42.6.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.5.1...@wireapp/core@42.6.0) (2023-09-25)
+
+### Features
+
+* lock websocket when uploading a commit bundle to backend ([#5520](https://github.com/wireapp/wire-web-packages/issues/5520)) ([11bb2bc](https://github.com/wireapp/wire-web-packages/commit/11bb2bcb3aea094e52285a080eaf95135286b7de))
+
 ## [42.5.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.5.0...@wireapp/core@42.5.1) (2023-09-22)
 
 **Note:** Version bump only for package @wireapp/core
