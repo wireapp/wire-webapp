@@ -48,7 +48,6 @@ export class MLSConversationVerificationStateHandler {
   /**
    * Get the singleton instance of MLSConversationVerificationStateHandler or create a new one
    * For the first time, params are required to create the instance
-   * After that, params are optional and can be used to update the grace period timer
    */
   public static getInstance(
     eventRepository: EventRepository,
