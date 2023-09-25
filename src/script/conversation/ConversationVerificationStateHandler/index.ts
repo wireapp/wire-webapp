@@ -17,4 +17,4 @@
  *
  */
 
-export * from './proeteusStateHandler';
+export * from './proteusStateHandler';
