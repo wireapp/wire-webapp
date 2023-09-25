@@ -312,7 +312,6 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
           {isSingleUserMode && !isServiceMode && firstParticipant && (
             <>
               <UserDetails
-                conversationDomain={activeConversation.domain}
                 participant={firstParticipant}
                 isVerified={isVerified}
                 isSelfVerified={isSelfVerified}
