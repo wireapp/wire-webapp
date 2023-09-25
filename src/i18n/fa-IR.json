@@ -364,6 +364,7 @@
   "conversationDeviceNewPeopleJoinedVerify": " دستگاه ها را تایید کنید",
   "conversationDeviceStartedUsingMany": " شروع کردم به استفاده کردن",
   "conversationDeviceStartedUsingOne": " شروع کردم به استفاده کردن",
+  "conversationDeviceStartedUsingYou": " started using",
   "conversationDeviceUnverified": " یکی از تایید نشده‌ها",
   "conversationDeviceUserDevices": " دستگاه های {{user}}",
   "conversationDeviceYourDevices": " دستگاه‌های شما",

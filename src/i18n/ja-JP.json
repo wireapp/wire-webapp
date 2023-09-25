@@ -364,6 +364,7 @@
   "conversationDeviceNewPeopleJoinedVerify": " デバイスを認証します",
   "conversationDeviceStartedUsingMany": " 使用を開始しました",
   "conversationDeviceStartedUsingOne": " 使用を開始しました",
+  "conversationDeviceStartedUsingYou": " started using",
   "conversationDeviceUnverified": " の一つを未認証にしました",
   "conversationDeviceUserDevices": " {{user}} のデバイス",
   "conversationDeviceYourDevices": " あなたのデバイス",

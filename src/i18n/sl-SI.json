@@ -364,6 +364,7 @@
   "conversationDeviceNewPeopleJoinedVerify": " preverite naprave",
   "conversationDeviceStartedUsingMany": " začel(-a) uporabljati",
   "conversationDeviceStartedUsingOne": " začel(-a) uporabljati",
+  "conversationDeviceStartedUsingYou": " started using",
   "conversationDeviceUnverified": " odstranil(-a) preveritev ene izmed",
   "conversationDeviceUserDevices": " Naprave od {{user}}",
   "conversationDeviceYourDevices": " vaših naprav",

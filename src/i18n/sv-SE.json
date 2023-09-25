@@ -364,6 +364,7 @@
   "conversationDeviceNewPeopleJoinedVerify": " verifiera enheter",
   "conversationDeviceStartedUsingMany": " började använda",
   "conversationDeviceStartedUsingOne": " började använda",
+  "conversationDeviceStartedUsingYou": " started using",
   "conversationDeviceUnverified": " unverified one of",
   "conversationDeviceUserDevices": " {{user}}\"s enheter",
   "conversationDeviceYourDevices": " dina enheter",

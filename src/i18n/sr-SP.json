@@ -364,6 +364,7 @@
   "conversationDeviceNewPeopleJoinedVerify": " овери уређаје",
   "conversationDeviceStartedUsingMany": " поче коришћење",
   "conversationDeviceStartedUsingOne": " поче коришћење",
+  "conversationDeviceStartedUsingYou": " started using",
   "conversationDeviceUnverified": " скину поузданост једног",
   "conversationDeviceUserDevices": " {{user}}´s уређаје\n",
   "conversationDeviceYourDevices": " ваши уређаји",

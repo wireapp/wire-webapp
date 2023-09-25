@@ -364,6 +364,7 @@
   "conversationDeviceNewPeopleJoinedVerify": " 设备验证",
   "conversationDeviceStartedUsingMany": " 已开始使用",
   "conversationDeviceStartedUsingOne": " 已开始使用",
+  "conversationDeviceStartedUsingYou": " started using",
   "conversationDeviceUnverified": " 取消信任了",
   "conversationDeviceUserDevices": " {{user}} 的设备",
   "conversationDeviceYourDevices": " 您的设备",

@@ -364,6 +364,7 @@
   "conversationDeviceNewPeopleJoinedVerify": " pārbaudiet ierīces",
   "conversationDeviceStartedUsingMany": " sācis izmantot",
   "conversationDeviceStartedUsingOne": " sācis izmantot",
+  "conversationDeviceStartedUsingYou": " started using",
   "conversationDeviceUnverified": " neapstiprināts viens no",
   "conversationDeviceUserDevices": " {{user}}´s devices",
   "conversationDeviceYourDevices": " jūsu ierīces",

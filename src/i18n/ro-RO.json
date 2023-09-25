@@ -364,6 +364,7 @@
   "conversationDeviceNewPeopleJoinedVerify": " verifică dispozitivele",
   "conversationDeviceStartedUsingMany": " a început să folosească",
   "conversationDeviceStartedUsingOne": " a început să folosească",
+  "conversationDeviceStartedUsingYou": " started using",
   "conversationDeviceUnverified": " unul dintre dispozitivele",
   "conversationDeviceUserDevices": " dispozitivele lui {{user}}",
   "conversationDeviceYourDevices": " tale neverificate",
