@@ -275,7 +275,12 @@ export class ConversationRepository {
       this.userState,
       this.conversationState,
     );
-    new MLSConversationVerificationStateHandler(this.eventRepository, this.conversationState);
+    const mlsConversationVerificationStateHandler = MLSConversationVerificationStateHandler.getInstance(
+      this.eventRepository,
+      this.conversationState,
+      this.core,
+    );
+    mlsConversationVerificationStateHandler.initialize();
     this.isBlockingNotificationHandling = true;
     this.conversationsWithNewEvents = new Map();
 

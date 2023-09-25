@@ -33,27 +33,62 @@ import {EventBuilder} from '../../EventBuilder';
 import {getConversationByGroupId, willChangeToDegraded, willChangeToVerified} from '../shared';
 
 export class MLSConversationVerificationStateHandler {
+  private static instance: MLSConversationVerificationStateHandler | null = null;
   private readonly logger: Logger;
+  private listenerActive: boolean = false;
 
-  constructor(
+  private constructor(
     private readonly eventRepository: EventRepository,
     private readonly conversationState = container.resolve(ConversationState),
     private readonly core = container.resolve(Core),
   ) {
     this.logger = getLogger('MLSConversationVerificationStateHandler');
+  }
 
+  /**
+   * Get the singleton instance of MLSConversationVerificationStateHandler or create a new one
+   * For the first time, params are required to create the instance
+   * After that, params are optional and can be used to update the grace period timer
+   */
+  public static getInstance(
+    eventRepository: EventRepository,
+    conversationState?: ConversationState,
+    core?: Core,
+  ): MLSConversationVerificationStateHandler {
+    if (!MLSConversationVerificationStateHandler.instance) {
+      if (!eventRepository) {
+        throw new Error(
+          'MLSConversationVerificationStateHandler is not initialized. Please call getInstance with params.',
+        );
+      }
+      MLSConversationVerificationStateHandler.instance = new MLSConversationVerificationStateHandler(
+        eventRepository,
+        conversationState,
+        core,
+      );
+    }
+    return MLSConversationVerificationStateHandler.instance;
+  }
+
+  public initialize(): void {
+    // We only want to initialize the listener once
+    if (this.listenerActive) {
+      return;
+    }
+    // We need to check if the core service is available
     if (!this.core.service?.mls) {
       this.logger.error('MLS service not available');
       return;
     }
-
+    // We need to check if the e2eIdentity service is available
     if (!this.core.service?.e2eIdentity) {
       this.logger.error('E2E identity service not available');
       return;
     }
-
     // We hook into the newEpoch event of the MLS service to check if the conversation needs to be verified or degraded
     this.core.service.mls.on('newEpoch', this.checkEpoch);
+    // We set the listenerActive flag to true, so we don't initialize the listener again
+    this.listenerActive = true;
   }
 
   /**
@@ -130,14 +165,14 @@ export class MLSConversationVerificationStateHandler {
   }
 
   private async checkEpoch({groupId, epoch}: {groupId: string; epoch: number}): Promise<void> {
-    this.logger.log(`Epoch changed to ${epoch} for conversation ${groupId}`);
+    this.logger.log(`Epoch changed to ${epoch} for groupId ${groupId}`);
     const conversationEntity = getConversationByGroupId({conversationState: this.conversationState, groupId});
     if (!conversationEntity) {
-      this.logger.error('Epoch changed but conversation not found');
+      this.logger.error(`Epoch changed but conversationEntity can't be found`);
       return;
     }
     if (isProteusConversation(conversationEntity) || isMixedConversation(conversationEntity)) {
-      this.logger.error('Epoch changed but conversation is not using MLS protocol');
+      this.logger.error(`Epoch changed but conversationEntity is not using MLS protocol`);
       return;
     }
 
