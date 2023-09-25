@@ -32,9 +32,15 @@ interface MLSDeviceDetailsProps {
   isMLSVerified?: boolean;
   fingerprint: string;
   isOtherDevice?: boolean;
+  certificate?: string;
 }
 
-export const MLSDeviceDetails = ({fingerprint, isMLSVerified = true, isOtherDevice = false}: MLSDeviceDetailsProps) => {
+export const MLSDeviceDetails = ({
+  fingerprint,
+  isMLSVerified = true,
+  isOtherDevice = false,
+  certificate,
+}: MLSDeviceDetailsProps) => {
   const isE2EIEnabled = supportsMLS() && Config.getConfig().FEATURE.ENABLE_E2EI;
 
   return (
@@ -47,7 +53,9 @@ export const MLSDeviceDetails = ({fingerprint, isMLSVerified = true, isOtherDevi
         <FormattedId idSlices={splitFingerprint(fingerprint)} />
       </p>
 
-      {isE2EIEnabled && <E2EICertificateDetails isMLSVerified={isMLSVerified} isOtherDevice={isOtherDevice} />}
+      {isE2EIEnabled && (
+        <E2EICertificateDetails certificate={certificate} isMLSVerified={isMLSVerified} isOtherDevice={isOtherDevice} />
+      )}
     </div>
   );
 };

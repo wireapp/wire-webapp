@@ -21,20 +21,12 @@ import React, {CSSProperties} from 'react';
 
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 
-import {
-  CertificateExpiredIcon,
-  CertificateRevoked,
-  ExpiresSoon,
-  MLSVerified,
-  ProteusVerified,
-} from '@wireapp/react-ui-kit';
+import {CertificateExpiredIcon, CertificateRevoked, MLSVerified, ProteusVerified} from '@wireapp/react-ui-kit';
 
 export enum MLSStatues {
   VALID = 'valid',
   NOT_DOWNLOADED = 'not_downloaded',
   EXPIRED = 'expired',
-  EXPIRES_SOON = 'expires_soon',
-  NOT_ACTIVATED = 'not_activated',
 }
 
 interface BadgesProps {
@@ -75,7 +67,6 @@ export const Badges: React.FC<BadgesProps> = ({
 
   const isExpired = MLSStatus === MLSStatues.EXPIRED;
   const isNotDownloaded = MLSStatus === MLSStatues.NOT_DOWNLOADED;
-  const isExpiresSoon = MLSStatus === MLSStatues.EXPIRES_SOON;
 
   const conversationHasProtocol = !!conversationProtocol;
 
@@ -93,7 +84,7 @@ export const Badges: React.FC<BadgesProps> = ({
         <div style={badgeWrapper}>
           {displayTitle && <span style={title(true)}>Verified (End-to-end Identity)</span>}
 
-          {!isExpired && !isNotDownloaded && !isExpiresSoon && (
+          {!isExpired && !isNotDownloaded && (
             <span
               className="with-tooltip with-tooltip--external"
               data-tooltip="Device verified (End-to-end identity)"
@@ -102,18 +93,6 @@ export const Badges: React.FC<BadgesProps> = ({
               data-uie-value={MLSStatues.VALID}
             >
               <MLSVerified data-uie-name="conversation-title-bar-verified-icon" />
-            </span>
-          )}
-
-          {isExpiresSoon && (
-            <span
-              className="with-tooltip with-tooltip--external"
-              data-tooltip="End-to-end identity certificate expires soon"
-              style={iconStyles}
-              data-uie-name="mls-status"
-              data-uie-value={MLSStatues.EXPIRES_SOON}
-            >
-              <ExpiresSoon data-uie-name="conversation-title-bar-verified-icon" />
             </span>
           )}
 

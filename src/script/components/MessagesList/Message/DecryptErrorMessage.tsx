@@ -26,7 +26,7 @@ import {t} from 'Util/LocalizerUtil';
 import {splitFingerprint} from 'Util/StringUtil';
 
 import {DecryptErrorMessage as DecryptErrorMessageEntity} from '../../../entity/message/DecryptErrorMessage';
-import {FormattedId} from '../../../page/MainContent/panels/preferences/devices/components/FormattedId';
+import {FormattedId} from '../../../page/MainContent/panels/preferences/DevicesPreferences/components/FormattedId';
 
 export interface DecryptErrorMessageProps {
   message: DecryptErrorMessageEntity;

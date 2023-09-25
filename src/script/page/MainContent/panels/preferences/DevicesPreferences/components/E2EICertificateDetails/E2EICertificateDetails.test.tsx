@@ -28,7 +28,9 @@ describe('E2ECertificateDetails', () => {
   const isMLSVerified = true;
 
   it('is e2e identity verified', async () => {
-    const {getByTestId} = render(withTheme(<E2EICertificateDetails isMLSVerified={isMLSVerified} />));
+    const {getByTestId} = render(
+      withTheme(<E2EICertificateDetails certificate="PEM Cert" isMLSVerified={isMLSVerified} />),
+    );
 
     const E2EIdentityStatus = getByTestId('e2e-identity-status');
     expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual('Valid');
@@ -36,7 +38,7 @@ describe('E2ECertificateDetails', () => {
 
   it('is e2e identity not downloaded', async () => {
     const {getByTestId} = render(
-      withTheme(<E2EICertificateDetails isMLSVerified={isMLSVerified} MLSStatus={MLSStatues.NOT_DOWNLOADED} />),
+      withTheme(<E2EICertificateDetails isMLSVerified={isMLSVerified} certificate="PEM Cert" />),
     );
 
     const E2EIdentityStatus = getByTestId('e2e-identity-status');
@@ -45,28 +47,10 @@ describe('E2ECertificateDetails', () => {
 
   it('is e2e identity expired', async () => {
     const {getByTestId} = render(
-      withTheme(<E2EICertificateDetails isMLSVerified={isMLSVerified} MLSStatus={MLSStatues.EXPIRED} />),
+      withTheme(<E2EICertificateDetails isMLSVerified={isMLSVerified} certificate="PEM Cert" />),
     );
 
     const E2EIdentityStatus = getByTestId('e2e-identity-status');
     expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatues.EXPIRED);
-  });
-
-  it('is e2e identity expires soon', async () => {
-    const {getByTestId} = render(
-      withTheme(<E2EICertificateDetails isMLSVerified={isMLSVerified} MLSStatus={MLSStatues.EXPIRES_SOON} />),
-    );
-
-    const E2EIdentityStatus = getByTestId('e2e-identity-status');
-    expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatues.EXPIRES_SOON);
-  });
-
-  it('is e2e identity not activated', async () => {
-    const {getByTestId} = render(
-      withTheme(<E2EICertificateDetails isMLSVerified={isMLSVerified} MLSStatus={MLSStatues.NOT_ACTIVATED} />),
-    );
-
-    const E2EIdentityStatus = getByTestId('e2e-identity-status');
-    expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatues.NOT_ACTIVATED);
   });
 });

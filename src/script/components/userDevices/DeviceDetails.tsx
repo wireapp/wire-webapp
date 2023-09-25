@@ -38,8 +38,8 @@ import type {MessageRepository} from '../../conversation/MessageRepository';
 import type {CryptographyRepository} from '../../cryptography/CryptographyRepository';
 import type {User} from '../../entity/User';
 import {MotionDuration} from '../../motion/MotionDuration';
-import {FormattedId} from '../../page/MainContent/panels/preferences/devices/components/FormattedId';
-import {MLSDeviceDetails} from '../../page/MainContent/panels/preferences/devices/components/MLSDeviceDetails';
+import {FormattedId} from '../../page/MainContent/panels/preferences/DevicesPreferences/components/FormattedId';
+import {MLSDeviceDetails} from '../../page/MainContent/panels/preferences/DevicesPreferences/components/MLSDeviceDetails';
 
 interface DeviceDetailsProps {
   clickToShowSelfFingerprint: () => void;
@@ -53,7 +53,8 @@ interface DeviceDetailsProps {
   user: User;
 }
 
-const DeviceDetails: React.FC<DeviceDetailsProps> = ({
+// Right sidebar devices
+export const DeviceDetails = ({
   selectedClient,
   cryptographyRepository,
   user,
@@ -63,7 +64,7 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
   noPadding,
   logger,
   conversationState = container.resolve(ConversationState),
-}) => {
+}: DeviceDetailsProps) => {
   const [fingerprintRemote, setFingerprintRemote] = useState<string>();
   const [isResettingSession, setIsResettingSession] = useState(false);
 
@@ -75,7 +76,7 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
   useEffect(() => {
     setFingerprintRemote(undefined);
     if (selectedClient) {
-      cryptographyRepository
+      void cryptographyRepository
         .getRemoteFingerprint(user.qualifiedId, selectedClient.id)
         .then(remoteFingerprint => setFingerprintRemote(remoteFingerprint));
     }
@@ -187,5 +188,3 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
     </div>
   );
 };
-
-export {DeviceDetails};

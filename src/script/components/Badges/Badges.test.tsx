@@ -55,13 +55,4 @@ describe('Badges', () => {
     const E2EIdentityStatus = getByTestId('mls-status');
     expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatues.EXPIRED);
   });
-
-  it('is expires soon', async () => {
-    const {getByTestId} = render(
-      withTheme(<Badges isMLSVerified={isMLSVerified} MLSStatus={MLSStatues.EXPIRES_SOON} />),
-    );
-
-    const E2EIdentityStatus = getByTestId('mls-status');
-    expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatues.EXPIRES_SOON);
-  });
 });

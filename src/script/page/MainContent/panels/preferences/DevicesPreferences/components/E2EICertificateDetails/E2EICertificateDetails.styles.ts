@@ -23,10 +23,8 @@ import {MLSStatues} from 'Components/Badges';
 
 const MLSStatusColor = {
   [MLSStatues.VALID]: 'var(--green-500)',
-  [MLSStatues.NOT_ACTIVATED]: 'var(--red-500)',
   [MLSStatues.EXPIRED]: 'var(--red-500)',
-  [MLSStatues.EXPIRES_SOON]: 'var(--green-500)',
-  [MLSStatues.NOT_DOWNLOADED]: 'var(--green-500)',
+  [MLSStatues.NOT_DOWNLOADED]: 'var(--red-500)',
 };
 
 type stylesProps = {
@@ -38,6 +36,7 @@ type stylesProps = {
   notAvailable: CSSObject;
   serialNumber: CSSObject;
   delimiter: (position: number) => CSSObject;
+  buttonsGroup: CSSObject;
 };
 
 export const styles: stylesProps = {
@@ -86,4 +85,13 @@ export const styles: stylesProps = {
       },
     },
   }),
+  buttonsGroup: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+
+    '> button': {
+      marginBottom: 0,
+    },
+  },
 };

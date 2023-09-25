@@ -38,7 +38,7 @@ import {Collection} from './panels/Collection';
 import {AboutPreferences} from './panels/preferences/AboutPreferences';
 import {AccountPreferences} from './panels/preferences/AccountPreferences';
 import {AVPreferences} from './panels/preferences/AVPreferences';
-import {DevicesPreferences} from './panels/preferences/devices/DevicesPreferences';
+import {DevicesPreferences} from './panels/preferences/DevicesPreferences';
 import {OptionPreferences} from './panels/preferences/OptionPreferences';
 
 import {ClientState} from '../../client/ClientState';
@@ -202,7 +202,7 @@ const MainContent: FC<MainContentProps> = ({
                   resetSession={(userId, device, conversation) =>
                     repositories.message.resetSession(userId, device.id, conversation)
                   }
-                  userState={userState}
+                  selfUser={selfUser}
                   verifyDevice={(userId, device, verified) =>
                     repositories.client.verifyClient(userId, device, verified)
                   }
