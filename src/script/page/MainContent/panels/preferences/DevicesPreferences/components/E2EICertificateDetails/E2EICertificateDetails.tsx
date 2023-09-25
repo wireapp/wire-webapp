@@ -76,38 +76,33 @@ export const E2EICertificateDetails = ({
         <Badges isMLSVerified={isMLSVerified} MLSStatus={certificateState} />
       </div>
 
-      {!isOtherDevice && (
-        <div css={styles.buttonsGroup}>
-          {!isNotDownloaded && (
-            <Button
-              variant={ButtonVariant.TERTIARY}
-              onClick={() => setIsCertificateDetailsModalOpen(true)}
-              data-uie-name="show-certificate-details"
-            >
-              {t('E2EI.showCertificateDetails')}
-            </Button>
-          )}
+      <div css={styles.buttonsGroup}>
+        {!isNotDownloaded && (
+          <Button
+            variant={ButtonVariant.TERTIARY}
+            onClick={() => setIsCertificateDetailsModalOpen(true)}
+            data-uie-name="show-certificate-details"
+          >
+            {t('E2EI.showCertificateDetails')}
+          </Button>
+        )}
 
-          {isCertificateDetailsModalOpen && certificate && (
-            <CertificateDetailsModal
-              certificate={certificate}
-              onClose={() => setIsCertificateDetailsModalOpen(false)}
-            />
-          )}
+        {isCertificateDetailsModalOpen && certificate && (
+          <CertificateDetailsModal certificate={certificate} onClose={() => setIsCertificateDetailsModalOpen(false)} />
+        )}
 
-          {isNotDownloaded && (
-            <Button variant={ButtonVariant.TERTIARY} onClick={getCertificate} data-uie-name="get-certificate">
-              {t('E2EI.getCertificate')}
-            </Button>
-          )}
+        {!isOtherDevice && isNotDownloaded && (
+          <Button variant={ButtonVariant.TERTIARY} onClick={getCertificate} data-uie-name="get-certificate">
+            {t('E2EI.getCertificate')}
+          </Button>
+        )}
 
-          {certificate && !isValid && (
-            <Button variant={ButtonVariant.TERTIARY} onClick={updateCertificate} data-uie-name="update-certificate">
-              {t('E2EI.updateCertificate')}
-            </Button>
-          )}
-        </div>
-      )}
+        {!isOtherDevice && certificate && !isValid && (
+          <Button variant={ButtonVariant.TERTIARY} onClick={updateCertificate} data-uie-name="update-certificate">
+            {t('E2EI.updateCertificate')}
+          </Button>
+        )}
+      </div>
     </div>
   );
 };

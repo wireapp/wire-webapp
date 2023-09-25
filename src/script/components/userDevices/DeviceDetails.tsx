@@ -53,7 +53,6 @@ interface DeviceDetailsProps {
   user: User;
 }
 
-// Right sidebar devices
 export const DeviceDetails = ({
   selectedClient,
   cryptographyRepository,

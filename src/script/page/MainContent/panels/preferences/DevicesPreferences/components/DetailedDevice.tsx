@@ -52,7 +52,7 @@ export const DetailedDevice: React.FC<DeviceProps> = ({
       <h3 className="preferences-devices-model preferences-devices-model-name" data-uie-name="device-model">
         <span>{device.model}</span>
 
-        <Badges isProteusVerified={isProteusVerified} isMLSVerified={isValid} MLSStatus={certificateState} />
+        <Badges isProteusVerified={isProteusVerified} isMLSVerified={!!mlsFingerprint} MLSStatus={certificateState} />
       </h3>
 
       {mlsFingerprint && (

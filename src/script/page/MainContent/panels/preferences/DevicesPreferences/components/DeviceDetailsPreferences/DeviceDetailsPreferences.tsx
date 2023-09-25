@@ -38,7 +38,7 @@ interface DevicesPreferencesProps {
   onRemove: (device: ClientEntity) => void;
   onResetSession: (device: ClientEntity) => Promise<void>;
   onVerify: (device: ClientEntity, verified: boolean) => void;
-  deviceIdentity?: WireIdentity | null;
+  deviceIdentity?: WireIdentity;
 }
 
 enum SessionResetState {

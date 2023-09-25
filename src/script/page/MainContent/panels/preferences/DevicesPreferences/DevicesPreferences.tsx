@@ -62,7 +62,7 @@ export const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
   resetSession,
 }) => {
   const [selectedDevice, setSelectedDevice] = useState<ClientEntity | undefined>();
-  const [selectedDeviceIdentity, setSelectedDeviceIdentity] = useState<WireIdentity | null>();
+  const [selectedDeviceIdentity, setSelectedDeviceIdentity] = useState<WireIdentity>();
   const [localFingerprint, setLocalFingerprint] = useState('');
 
   const {clients, currentClient} = useKoSubscribableChildren(clientState, ['clients', 'currentClient']);
@@ -99,20 +99,15 @@ export const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
   const e2eIdentity = core.service?.e2eIdentity;
   const hasActiveCertificate = e2eIdentity?.hasActiveCertificate();
   const certificate = hasActiveCertificate ? e2eIdentity?.getCertificateData() : undefined;
-  const selfConversation = conversationState?.getSelfMLSConversation();
 
-  const selectDevice = async (device: ClientEntity, selectDevice = true) => {
-    // FIXME: Remove after testing
-    if (selectDevice) {
-      setSelectedDevice(device);
-    }
+  const selectDevice = async (device: ClientEntity) => {
+    setSelectedDevice(device);
 
-    // FIXME: Uncomment after testing
-    // setSelectedDevice(device);
+    const selfConversation = conversationState?.getSelfMLSConversation();
 
     if (isMLSConversation(selfConversation)) {
       const groupId = selfConversation.groupId;
-      const deviceIdentity = await e2eIdentity?.getDeviceIdentities(groupId, [device.id], selfUser as any);
+      const deviceIdentity = await e2eIdentity?.getUserDeviceEntities(groupId, {[device.id]: selfUser});
 
       setSelectedDeviceIdentity(deviceIdentity?.[0]);
     }
@@ -129,9 +124,6 @@ export const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
           certificate={certificate}
           isProteusVerified={isSelfClientVerified}
         />
-
-        {/* FIXME: Remove after testing */}
-        <button onClick={() => selectDevice(currentClient, false)}>Show current device</button>
       </fieldset>
 
       <hr className="preferences-devices-separator preferences-separator" />
