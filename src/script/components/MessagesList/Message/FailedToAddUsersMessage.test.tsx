@@ -111,8 +111,7 @@ describe('FailedToAddUsersMessage', () => {
     });
 
     const elementMessageFailedToAddDetails = getByTestId('multi-user-not-added-details');
-    // TODO: remove this condition when full specs are implemented
-    expect(elementMessageFailedToAddDetails.getAttribute('data-uie-value')).toEqual(false ? qualifiedId1.domain : '');
+    expect(elementMessageFailedToAddDetails.getAttribute('data-uie-value')).toEqual(qualifiedId1.domain);
   });
 
   it('shows details of failed to add multi users from 2 different backends', async () => {
@@ -143,11 +142,8 @@ describe('FailedToAddUsersMessage', () => {
     });
 
     const elementMessageFailedToAddDetails = getAllByTestId('multi-user-not-added-details');
-    // TODO: remove this condition when full specs are implemented
-    expect(elementMessageFailedToAddDetails[0].getAttribute('data-uie-value')).toEqual(
-      false ? qualifiedId1.domain : '',
-    );
-    //expect(elementMessageFailedToAddDetails[1].getAttribute('data-uie-value')).toEqual(qualifiedId2.domain);
+    expect(elementMessageFailedToAddDetails[0].getAttribute('data-uie-value')).toEqual(qualifiedId1.domain);
+    expect(elementMessageFailedToAddDetails[1].getAttribute('data-uie-value')).toEqual(qualifiedId2.domain);
   });
 
   it('shows details of failed to add users from non federating backends', async () => {
@@ -179,9 +175,7 @@ describe('FailedToAddUsersMessage', () => {
 
     const elementMessageFailedToAddDetails = getAllByTestId('multi-user-not-added-details');
     expect(elementMessageFailedToAddDetails[0].textContent).toContain(
-      // 'We're currently using the MVP implementation of error messages, the full spec will be the following
-      // 'could not be added to the group as their backends do not federate with each other',
-      'could not be added to the group',
+      'could not be added to the group as their backends do not federate with each other',
     );
   });
 });
