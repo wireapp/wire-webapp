@@ -129,7 +129,7 @@ export class MLSConversationVerificationStateHandler {
     return isValid && isActive;
   }
 
-  private checkEpoch = async ({groupId, epoch}: {groupId: string; epoch: number}) => {
+  private async checkEpoch({groupId, epoch}: {groupId: string; epoch: number}): Promise<void> {
     this.logger.log(`Epoch changed to ${epoch} for conversation ${groupId}`);
     const conversationEntity = getConversationByGroupId({conversationState: this.conversationState, groupId});
     if (!conversationEntity) {
@@ -160,5 +160,5 @@ export class MLSConversationVerificationStateHandler {
 
     // If we reach this point, all checks have passed and we can set the conversation to verified
     return await this.verifyConversation(conversationEntity);
-  };
+  }
 }
