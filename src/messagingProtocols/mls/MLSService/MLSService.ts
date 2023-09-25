@@ -125,44 +125,48 @@ export class MLSService extends TypedEventEmitter<Events> {
     await this.verifyRemoteMLSKeyPackagesAmount(client.id);
   }
 
-  private async uploadCommitBundle(
-    groupId: Uint8Array,
-    commitBundle: CommitBundle,
-    {regenerateCommitBundle, isExternalCommit}: UploadCommitOptions = {},
-  ): Promise<PostMlsMessageResponse> {
-    const {commit, groupInfo, welcome} = commitBundle;
-    const bundlePayload = new Uint8Array([...commit, ...groupInfo.payload, ...(welcome || [])]);
-    try {
-      const response = await this.apiClient.api.conversation.postMlsCommitBundle(bundlePayload);
-      if (isExternalCommit) {
-        await this.coreCryptoClient.mergePendingGroupFromExternalCommit(groupId);
-      } else {
-        await this.coreCryptoClient.commitAccepted(groupId);
-      }
-      const newEpoch = await this.getEpoch(groupId);
-      const groupIdStr = Encoder.toBase64(groupId).asString;
+  // We need to lock the websocket while commit bundle is being processed by backend,
+  // it's possible that we will be sent some mls messages before we receive the response from backend and accept a commit locally.
+  private readonly uploadCommitBundle = this.apiClient.withLockedWebSocket(
+    async (
+      groupId: Uint8Array,
+      commitBundle: CommitBundle,
+      {regenerateCommitBundle, isExternalCommit}: UploadCommitOptions = {},
+    ): Promise<PostMlsMessageResponse> => {
+      const {commit, groupInfo, welcome} = commitBundle;
+      const bundlePayload = new Uint8Array([...commit, ...groupInfo.payload, ...(welcome || [])]);
+      try {
+        const response = await this.apiClient.api.conversation.postMlsCommitBundle(bundlePayload);
+        if (isExternalCommit) {
+          await this.coreCryptoClient.mergePendingGroupFromExternalCommit(groupId);
+        } else {
+          await this.coreCryptoClient.commitAccepted(groupId);
+        }
+        const newEpoch = await this.getEpoch(groupId);
+        const groupIdStr = Encoder.toBase64(groupId).asString;
 
-      this.emit('newEpoch', {epoch: newEpoch, groupId: groupIdStr});
-      return response;
-    } catch (error) {
-      if (isExternalCommit) {
-        await this.coreCryptoClient.clearPendingGroupFromExternalCommit(groupId);
-      } else {
-        await this.coreCryptoClient.clearPendingCommit(groupId);
-      }
+        this.emit('newEpoch', {epoch: newEpoch, groupId: groupIdStr});
+        return response;
+      } catch (error) {
+        if (isExternalCommit) {
+          await this.coreCryptoClient.clearPendingGroupFromExternalCommit(groupId);
+        } else {
+          await this.coreCryptoClient.clearPendingCommit(groupId);
+        }
 
-      const shouldRetry = error instanceof BackendError && error.code === StatusCode.CONFLICT;
-      if (shouldRetry && regenerateCommitBundle) {
-        // in case of a 409, we want to retry to generate the commit and resend it
-        // could be that we are trying to upload a commit to a conversation that has a different epoch on backend
-        // in this case we will most likely receive a commit from backend that will increase our local epoch
-        this.logger.warn(`Uploading commitBundle failed. Will retry generating a new bundle`);
-        const updatedCommitBundle = await regenerateCommitBundle();
-        return this.uploadCommitBundle(groupId, updatedCommitBundle, {isExternalCommit});
+        const shouldRetry = error instanceof BackendError && error.code === StatusCode.CONFLICT;
+        if (shouldRetry && regenerateCommitBundle) {
+          // in case of a 409, we want to retry to generate the commit and resend it
+          // could be that we are trying to upload a commit to a conversation that has a different epoch on backend
+          // in this case we will most likely receive a commit from backend that will increase our local epoch
+          this.logger.warn(`Uploading commitBundle failed. Will retry generating a new bundle`);
+          const updatedCommitBundle = await regenerateCommitBundle();
+          return this.uploadCommitBundle(groupId, updatedCommitBundle, {isExternalCommit});
+        }
+        throw error;
       }
-      throw error;
-    }
-  }
+    },
+  );
 
   /**
    * Will add users to an existing MLS group and send a commit bundle to backend.
