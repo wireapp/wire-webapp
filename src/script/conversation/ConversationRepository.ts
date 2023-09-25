@@ -270,17 +270,20 @@ export class ConversationRepository {
     this.logger = getLogger('ConversationRepository');
 
     this.event_mapper = new EventMapper();
+
+    // we register and store a handler, that we can manually trigger for incoming events from proteus and mixed conversations
     this.proteusVerificationStateHandler = new ProteusConversationVerificationStateHandler(
       this.eventRepository,
       this.userState,
       this.conversationState,
     );
-    const mlsConversationVerificationStateHandler = MLSConversationVerificationStateHandler.getInstance(
+    // we register a handler that will handle MLS conversations on its own
+    MLSConversationVerificationStateHandler.getInstance(
       this.eventRepository,
       this.conversationState,
       this.core,
-    );
-    mlsConversationVerificationStateHandler.initialize();
+    ).initialize();
+
     this.isBlockingNotificationHandling = true;
     this.conversationsWithNewEvents = new Map();
 

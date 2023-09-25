@@ -30,6 +30,7 @@ import {VerificationMessageType} from 'src/script/message/VerificationMessageTyp
 import {UserState} from 'src/script/user/UserState';
 import {getLogger, Logger} from 'Util/Logger';
 
+import {isMixedConversation, isProteusConversation} from '../../ConversationSelectors';
 import {ConversationState} from '../../ConversationState';
 import {ConversationVerificationState} from '../../ConversationVerificationState';
 import {EventBuilder} from '../../EventBuilder';
@@ -148,10 +149,13 @@ export class ProteusConversationVerificationStateHandler {
    * @returns `true` if state changed
    */
   private checkChangeToVerified(conversationEntity: Conversation): boolean {
-    if (willChangeToVerified({conversationEntity, logger: this.logger})) {
-      const allVerifiedEvent = EventBuilder.buildAllVerified(conversationEntity);
-      this.eventRepository.injectEvent(allVerifiedEvent);
-      return true;
+    // We want to process only Proteus and Mixed conversations
+    if (isProteusConversation(conversationEntity) || isMixedConversation(conversationEntity)) {
+      if (willChangeToVerified({conversationEntity, logger: this.logger})) {
+        const allVerifiedEvent = EventBuilder.buildAllVerified(conversationEntity);
+        this.eventRepository.injectEvent(allVerifiedEvent);
+        return true;
+      }
     }
 
     return false;
@@ -170,32 +174,35 @@ export class ProteusConversationVerificationStateHandler {
     userIds: QualifiedId[],
     type: VerificationMessageType,
   ): boolean {
-    const shouldShowDegradationWarning = type !== VerificationMessageType.UNVERIFIED;
-    const isConversationDegraded = willChangeToDegraded({
-      conversationEntity,
-      shouldShowDegradationWarning,
-      logger: this.logger,
-    });
+    // We want to process only Proteus and MLS conversations
+    if (isProteusConversation(conversationEntity) || isMixedConversation(conversationEntity)) {
+      const shouldShowDegradationWarning = type !== VerificationMessageType.UNVERIFIED;
+      const isConversationDegraded = willChangeToDegraded({
+        conversationEntity,
+        shouldShowDegradationWarning,
+        logger: this.logger,
+      });
 
-    if (isConversationDegraded) {
-      /**
-       * TEMPORARY DEBUGGING FIX:
-       * We have seen conversations in a degraded state without an unverified device in there.
-       * Previously the code would hide this fact, not create a system message and then fail when it tried to prompt
-       * the user to grant subsequent message sending - essentially blocking the conversation.
-       *
-       * As we are unsure of the trigger of the degradation we temporarily throw an error to get to the bottom of this.
-       * The conversation is also reset to the verified state to ensure we can continue to send messages.
-       */
-      if (!userIds.length) {
-        conversationEntity.verification_state(ConversationVerificationState.VERIFIED);
-        throw new Error('Conversation degraded without affected users');
+      if (isConversationDegraded) {
+        /**
+         * TEMPORARY DEBUGGING FIX:
+         * We have seen conversations in a degraded state without an unverified device in there.
+         * Previously the code would hide this fact, not create a system message and then fail when it tried to prompt
+         * the user to grant subsequent message sending - essentially blocking the conversation.
+         *
+         * As we are unsure of the trigger of the degradation we temporarily throw an error to get to the bottom of this.
+         * The conversation is also reset to the verified state to ensure we can continue to send messages.
+         */
+        if (!userIds.length) {
+          conversationEntity.verification_state(ConversationVerificationState.VERIFIED);
+          throw new Error('Conversation degraded without affected users');
+        }
+
+        const event = EventBuilder.buildDegraded(conversationEntity, userIds, type);
+        this.eventRepository.injectEvent(event);
+
+        return true;
       }
-
-      const event = EventBuilder.buildDegraded(conversationEntity, userIds, type);
-      this.eventRepository.injectEvent(event);
-
-      return true;
     }
 
     return false;
