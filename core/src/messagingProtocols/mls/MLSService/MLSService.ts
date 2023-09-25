@@ -46,6 +46,7 @@ import {
   RemoveProposalArgs,
 } from '@wireapp/core-crypto';
 
+import {shouldMLSDecryptionErrorBeIgnored} from './CoreCryptoMLSError';
 import {MLSServiceConfig, UploadCommitOptions} from './MLSService.types';
 import {pendingProposalsStore} from './stores/pendingProposalsStore';
 import {subconversationGroupIdStore} from './stores/subconversationGroupIdStore/subconversationGroupIdStore';
@@ -385,7 +386,20 @@ export class MLSService extends TypedEventEmitter<Events> {
   }
 
   public async decryptMessage(conversationId: ConversationId, payload: Uint8Array): Promise<DecryptedMessage> {
-    return this.coreCryptoClient.decryptMessage(conversationId, payload);
+    try {
+      const decryptedMessage = await this.coreCryptoClient.decryptMessage(conversationId, payload);
+      return decryptedMessage;
+    } catch (error) {
+      // According to CoreCrypto JS doc on .decryptMessage method, we should ignore some errors (corecrypto handle them internally)
+      if (shouldMLSDecryptionErrorBeIgnored(error)) {
+        return {
+          hasEpochChanged: false,
+          isActive: false,
+          proposals: [],
+        };
+      }
+      throw error;
+    }
   }
 
   public async encryptMessage(conversationId: ConversationId, message: Uint8Array): Promise<Uint8Array> {
