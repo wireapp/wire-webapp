@@ -364,6 +364,7 @@
   "conversationDeviceNewPeopleJoinedVerify": "Vérifier les appareils",
   "conversationDeviceStartedUsingMany": " utilise",
   "conversationDeviceStartedUsingOne": " utilise",
+  "conversationDeviceStartedUsingYou": " started using",
   "conversationDeviceUnverified": " a annulé la vérification d’un",
   "conversationDeviceUserDevices": " des appareils de {{user}}",
   "conversationDeviceYourDevices": " de vos appareils",

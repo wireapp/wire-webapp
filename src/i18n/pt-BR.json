@@ -364,6 +364,7 @@
   "conversationDeviceNewPeopleJoinedVerify": "Verificar dispositivos",
   "conversationDeviceStartedUsingMany": " começaram a usar",
   "conversationDeviceStartedUsingOne": " começou a usar",
+  "conversationDeviceStartedUsingYou": " started using",
   "conversationDeviceUnverified": " desautorizou um dos",
   "conversationDeviceUserDevices": " dispositivos de {{user}}",
   "conversationDeviceYourDevices": " seus dispositivos",

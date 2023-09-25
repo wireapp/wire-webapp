@@ -364,6 +364,7 @@
   "conversationDeviceNewPeopleJoinedVerify": " patvirtinkite įrenginius",
   "conversationDeviceStartedUsingMany": " pradėjo naudoti",
   "conversationDeviceStartedUsingOne": " pradėjo naudoti",
+  "conversationDeviceStartedUsingYou": " started using",
   "conversationDeviceUnverified": " panaikinote patvirtinimą vieno iš",
   "conversationDeviceUserDevices": " {{user}} įrenginių",
   "conversationDeviceYourDevices": " savo įrenginių",

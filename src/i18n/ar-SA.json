@@ -364,6 +364,7 @@
   "conversationDeviceNewPeopleJoinedVerify": "التحقق من الأجهزة",
   "conversationDeviceStartedUsingMany": " بدأ باستخدام",
   "conversationDeviceStartedUsingOne": " بدأ باستخدام",
+  "conversationDeviceStartedUsingYou": " started using",
   "conversationDeviceUnverified": " unverified one of",
   "conversationDeviceUserDevices": " {{user}}´s devices",
   "conversationDeviceYourDevices": " الأجهزة الخاصة بك",

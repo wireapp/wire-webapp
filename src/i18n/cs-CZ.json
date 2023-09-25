@@ -364,6 +364,7 @@
   "conversationDeviceNewPeopleJoinedVerify": " ověřit zařízení",
   "conversationDeviceStartedUsingMany": " začal(a) používat",
   "conversationDeviceStartedUsingOne": " začal(a) používat",
+  "conversationDeviceStartedUsingYou": " started using",
   "conversationDeviceUnverified": " neověřen jeden ze",
   "conversationDeviceUserDevices": " přístroje uživatele {{user}}",
   "conversationDeviceYourDevices": " vaše přístroje",
