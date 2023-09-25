@@ -157,7 +157,7 @@
   },
   "engines": {
     "yarn": ">= 1.0.0",
-    "node": ">=16"
+    "node": ">=18"
   },
   "license": "GPL-3.0",
   "lint-staged": {

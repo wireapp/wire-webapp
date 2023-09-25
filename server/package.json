@@ -34,6 +34,9 @@
     "rimraf": "4.4.1",
     "typescript": "5.2.2"
   },
+  "engines": {
+    "node": ">= 18"
+  },
   "scripts": {
     "build": "yarn clean && tsc && yarn generate-version-file && yarn copy-assets",
     "copy-assets": "node ./bin/copy_server_assets.js",
