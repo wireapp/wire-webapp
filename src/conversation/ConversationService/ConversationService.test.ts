@@ -27,7 +27,7 @@ import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {ConversationService, MessageSendingState} from '..';
 import {MLSService} from '../../messagingProtocols/mls';
-import {CoreCryptoMLSErrors} from '../../messagingProtocols/mls/MLSService/CoreCryptoMLSErrors';
+import {CoreCryptoMLSError} from '../../messagingProtocols/mls/MLSService/CoreCryptoMLSError';
 import {ProteusService} from '../../messagingProtocols/proteus';
 import * as MessagingProtocols from '../../messagingProtocols/proteus';
 import * as PayloadHelper from '../../test/PayloadHelper';
@@ -408,7 +408,7 @@ describe('ConversationService', () => {
 
       jest
         .spyOn(mlsService, 'handleMLSMessageAddEvent')
-        .mockRejectedValueOnce(new Error(CoreCryptoMLSErrors.WRONG_EPOCH));
+        .mockRejectedValueOnce(new Error(CoreCryptoMLSError.DECRYPTION.WRONG_EPOCH));
 
       const remoteEpoch = 5;
       const localEpoch = 4;
