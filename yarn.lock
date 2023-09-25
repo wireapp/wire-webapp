@@ -10492,13 +10492,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"http-status-codes@npm:2.2.0":
-  version: 2.2.0
-  resolution: "http-status-codes@npm:2.2.0"
-  checksum: 31e1d730856210445da0907d9b484629e69e4fe92ac032478a7aa4d89e5b215e2b4e75d7ebce40d0537b6850bd281b2f65c7cc36cc2677e5de056d6cea1045ce
-  languageName: node
-  linkType: hard
-
 "http-status-codes@npm:2.3.0":
   version: 2.3.0
   resolution: "http-status-codes@npm:2.3.0"
@@ -18642,7 +18635,7 @@ __metadata:
     generate-changelog: 1.8.0
     highlight.js: 11.8.0
     html-webpack-plugin: ^5.5.3
-    http-status-codes: 2.2.0
+    http-status-codes: 2.3.0
     husky: 8.0.3
     i18next-scanner: 4.4.0
     intersection-observer: 0.12.2
