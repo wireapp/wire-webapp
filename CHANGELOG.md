@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [42.7.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.6.2...@wireapp/core@42.7.0) (2023-09-26)
+
+### Features
+
+* move TypedEventEmitter to commons package ([#5551](https://github.com/wireapp/wire-web-packages/issues/5551)) ([989bc47](https://github.com/wireapp/wire-web-packages/commit/989bc47e649cbc9c2addaf3504f654b8bf44620f))
+
 ## [42.6.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.6.1...@wireapp/core@42.6.2) (2023-09-25)
 
 **Note:** Version bump only for package @wireapp/core
