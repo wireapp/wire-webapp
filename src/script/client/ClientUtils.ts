@@ -30,3 +30,13 @@ export const wasClientActiveWithinLast4Weeks = ({last_active: lastActiveISODate}
   const passedWeeksSinceLastActive = weeksPassedSinceDate(new Date(lastActiveISODate));
   return passedWeeksSinceLastActive <= 4;
 };
+
+/**
+ * Check if client is MLS-capable device.
+ * Client is considered MLS capable if it was registered and has uploaded MLS public keys.
+ * @param client - client to check
+ * @returns {boolean}
+ */
+export const isClientMLSCapable = ({mls_public_keys: mlsPublicKeys}: RegisteredClient): boolean => {
+  return Object.values(mlsPublicKeys).length > 0;
+};

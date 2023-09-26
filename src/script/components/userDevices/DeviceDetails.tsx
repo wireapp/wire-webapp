@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useMemo, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 
 import cx from 'classnames';
 import type {DexieError} from 'dexie';
