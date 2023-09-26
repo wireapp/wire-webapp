@@ -37,18 +37,7 @@ const ConversationListCellStatusIcon = ({conversation}: ConversationListCellStat
     unreadState,
     mutedState,
     isRequest,
-  } = useKoSubscribableChildren(conversation, [
-    'isGroup',
-    'is1to1',
-    'selfUser',
-    'participating_user_ets',
-    'display_name',
-    'removed_from_conversation',
-    'availabilityOfUser',
-    'unreadState',
-    'mutedState',
-    'isRequest',
-  ]);
+  } = useKoSubscribableChildren(conversation, ['participating_user_ets', 'unreadState', 'mutedState', 'isRequest']);
 
   const cellState = useMemo(() => generateCellState(conversation), [unreadState, mutedState, isRequest]);
 
