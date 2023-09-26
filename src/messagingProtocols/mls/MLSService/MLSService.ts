@@ -28,7 +28,7 @@ import {Converter, Decoder, Encoder} from 'bazinga64';
 import logdown from 'logdown';
 
 import {APIClient} from '@wireapp/api-client';
-import {TimeUtil} from '@wireapp/commons';
+import {TimeUtil, TypedEventEmitter} from '@wireapp/commons';
 import {
   AddProposalArgs,
   Ciphersuite,
@@ -57,7 +57,6 @@ import {constructFullyQualifiedClientId, parseFullQualifiedClientId} from '../..
 import {numberToHex} from '../../../util/numberToHex';
 import {cancelRecurringTask, registerRecurringTask} from '../../../util/RecurringTaskScheduler';
 import {TaskScheduler} from '../../../util/TaskScheduler';
-import {TypedEventEmitter} from '../../../util/TypedEventEmitter';
 import {handleMLSMessageAdd, handleMLSWelcomeMessage} from '../EventHandler/events';
 import {CommitPendingProposalsParams, HandlePendingProposalsParams, MLSCallbacks} from '../types';
 

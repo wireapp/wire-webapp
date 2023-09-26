@@ -23,6 +23,7 @@ import {AbortHandler} from '@wireapp/api-client/lib/tcp';
 import logdown from 'logdown';
 
 import {APIClient} from '@wireapp/api-client';
+import {TypedEventEmitter} from '@wireapp/commons';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
 
@@ -33,7 +34,6 @@ import {NotificationSource} from './Notifications.types';
 import {ConversationService} from '../conversation';
 import {CoreError, NotificationError} from '../CoreError';
 import {DecryptionError} from '../errors/DecryptionError';
-import {TypedEventEmitter} from '../util/TypedEventEmitter';
 
 export type HandledEventPayload = {
   /** the raw event received from backend */
