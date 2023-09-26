@@ -35,7 +35,7 @@
     "@types/pako": "2",
     "@types/spark-md5": "3.0.2",
     "@types/tough-cookie": "4.0.3",
-    "@types/ws": "8.5.5",
+    "@types/ws": "8.5.6",
     "@wireapp/store-engine": "workspace:^",
     "@wireapp/store-engine-fs": "workspace:^",
     "browser-sync": "2.29.3",
