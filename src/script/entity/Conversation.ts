@@ -252,7 +252,9 @@ export class Conversation {
       const is1to1Conversation = this.type() === CONVERSATION_TYPE.ONE_TO_ONE;
       return is1to1Conversation || this.isTeam1to1();
     });
-    this.isRequest = ko.pureComputed(() => this.type() === CONVERSATION_TYPE.CONNECT);
+    this.isRequest = ko.pureComputed(
+      () => this.type() === CONVERSATION_TYPE.CONNECT || this.participating_user_ets()[0]?.isRequest(),
+    );
     this.isSelf = ko.pureComputed(() => this.type() === CONVERSATION_TYPE.SELF);
 
     this.hasDirectGuest = ko.pureComputed(() => {
