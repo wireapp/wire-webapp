@@ -55,7 +55,7 @@ export class SelfRepository {
     // It's possible that they have removed proteus client, and now all their clients are mls-capable.
     amplify.subscribe(WebAppEvents.CLIENT.REMOVE, this.refreshSelfSupportedProtocols);
 
-    // Every time team admin updates the list of team's supported protocols, we re-evaluate self supported protocols list.
+    // Every time mls feature config gets updated, we need to re-evaluate self supported protocols.
     teamRepository.on('featureUpdated', async ({name}) => {
       if (name === FEATURE_KEY.MLS) {
         await this.refreshSelfSupportedProtocols();
