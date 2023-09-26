@@ -18,6 +18,7 @@
  */
 
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
+import {FEATURE_KEY} from '@wireapp/api-client/lib/team/feature/';
 import {registerRecurringTask} from '@wireapp/core/lib/util/RecurringTaskScheduler';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
@@ -55,7 +56,11 @@ export class SelfRepository {
     amplify.subscribe(WebAppEvents.CLIENT.REMOVE, this.refreshSelfSupportedProtocols);
 
     // Every time team admin updates the list of team's supported protocols, we re-evaluate self supported protocols list.
-    teamRepository.onTeamSupportedProtocolsUpdate(this.refreshSelfSupportedProtocols);
+    teamRepository.on('featureUpdated', async ({name}) => {
+      if (name === FEATURE_KEY.MLS) {
+        await this.refreshSelfSupportedProtocols();
+      }
+    });
   }
 
   private get selfUser() {

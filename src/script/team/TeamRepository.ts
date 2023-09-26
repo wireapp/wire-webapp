@@ -29,13 +29,13 @@ import type {
   TeamUpdateEvent,
 } from '@wireapp/api-client/lib/event';
 import {TEAM_EVENT} from '@wireapp/api-client/lib/event/TeamEvent';
-import {FeatureStatus, FEATURE_KEY, FeatureList, FeatureMLSConfig} from '@wireapp/api-client/lib/team/feature/';
+import {FeatureStatus} from '@wireapp/api-client/lib/team/feature/';
 import type {TeamData} from '@wireapp/api-client/lib/team/team/TeamData';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
-import {Runtime} from '@wireapp/commons';
+import {Runtime, TypedEventEmitter} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
@@ -73,12 +73,15 @@ export interface AccountInfo {
   userID: string;
 }
 
-export class TeamRepository {
+type Events = {
+  featureUpdated: Omit<TeamFeatureConfigurationUpdateEvent, 'type' | 'time' | 'team'>;
+};
+
+export class TeamRepository extends TypedEventEmitter<Events> {
   private readonly logger: Logger;
   private readonly teamMapper: TeamMapper;
   private readonly userRepository: UserRepository;
   private readonly assetRepository: AssetRepository;
-  private teamSupportedProtocolsUpdateCallback?: () => void;
 
   constructor(
     userRepository: UserRepository,
@@ -87,6 +90,7 @@ export class TeamRepository {
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
   ) {
+    super();
     this.logger = getLogger('TeamRepository');
 
     this.teamMapper = new TeamMapper();
@@ -133,15 +137,9 @@ export class TeamRepository {
     return {team, members};
   };
 
-  private async updateFeatureConfig(): Promise<{prevFeatureList?: FeatureList; newFeatureList: FeatureList}> {
-    const prevFeatureList = this.teamState.teamFeatures();
-    const newFeatureList = await this.teamService.getAllTeamFeatures();
-    this.teamState.teamFeatures(newFeatureList);
-
-    return {
-      prevFeatureList,
-      newFeatureList,
-    };
+  private async updateFeatureConfig() {
+    const features = await this.teamService.getAllTeamFeatures();
+    this.teamState.teamFeatures(features);
   }
 
   private readonly scheduleTeamRefresh = (): void => {
@@ -407,7 +405,7 @@ export class TeamRepository {
   };
 
   private readonly onFeatureConfigUpdate = async (
-    event: TeamFeatureConfigurationUpdateEvent,
+    {name, data}: TeamFeatureConfigurationUpdateEvent,
     source: EventSource,
   ): Promise<void> => {
     if (source !== EventSource.WEBSOCKET) {
@@ -416,26 +414,9 @@ export class TeamRepository {
     }
 
     // When we receive a `feature-config.update` event, we will refetch the entire feature config
-    const {prevFeatureList} = await this.updateFeatureConfig();
-
-    if (event.name === FEATURE_KEY.MLS) {
-      this.handleMLSFeatureConfigUpdate(event.data.config, prevFeatureList?.[FEATURE_KEY.MLS]?.config);
-    }
+    await this.updateFeatureConfig();
+    this.emit('featureUpdated', {name, data});
   };
-
-  private handleMLSFeatureConfigUpdate(newMLSConfig: FeatureMLSConfig, prevMLSConfig?: FeatureMLSConfig) {
-    const prevSupportedProtocols = prevMLSConfig?.supportedProtocols;
-    const newSupportedProtocols = newMLSConfig.supportedProtocols;
-
-    const hasSupportedProtocolsChanged = !(
-      prevSupportedProtocols?.length === newSupportedProtocols.length &&
-      [...prevSupportedProtocols].every(protocol => newSupportedProtocols.includes(protocol))
-    );
-
-    if (hasSupportedProtocolsChanged) {
-      this.teamSupportedProtocolsUpdateCallback?.();
-    }
-  }
 
   private onMemberLeave(eventJson: TeamMemberLeaveEvent): void {
     const {
@@ -527,9 +508,5 @@ export class TeamRepository {
     const mlsMigrationFeature = this.teamState.teamFeatures().mlsMigration;
 
     return getMLSMigrationStatus(mlsMigrationFeature);
-  }
-
-  public onTeamSupportedProtocolsUpdate(callback: () => void): void {
-    this.teamSupportedProtocolsUpdateCallback = callback;
   }
 }
