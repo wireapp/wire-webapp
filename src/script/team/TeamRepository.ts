@@ -74,7 +74,7 @@ export interface AccountInfo {
 }
 
 type Events = {
-  featureUpdated: Omit<TeamFeatureConfigurationUpdateEvent, 'type' | 'time' | 'team'>;
+  featureUpdated: Pick<TeamFeatureConfigurationUpdateEvent, 'name' | 'data'>;
 };
 
 export class TeamRepository extends TypedEventEmitter<Events> {
