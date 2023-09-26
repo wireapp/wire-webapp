@@ -23,12 +23,13 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {container} from 'tsyringe';
 
+import {Badges} from 'Components/Badges';
 import {Icon} from 'Components/Icon';
-import {VerifiedIcon} from 'Components/VerifiedIcon';
-import {ClientEntity} from 'src/script/client/ClientEntity';
+import {ClientEntity, MLSPublicKeys} from 'src/script/client/ClientEntity';
 import {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
+import {splitFingerprint} from 'Util/StringUtil';
 
 import {DetailedDevice} from './components/DetailedDevice';
 import {FormattedId} from './components/FormattedId';
@@ -51,16 +52,21 @@ interface DevicesPreferencesProps {
   verifyDevice: (userId: QualifiedId, device: ClientEntity, isVerified: boolean) => void;
 }
 
-const Device: React.FC<{
+interface DeviceProps {
   device: ClientEntity;
   isSSO: boolean;
   onRemove: (device: ClientEntity) => void;
   onSelect: (device: ClientEntity) => void;
   deviceNumber: number;
-}> = ({device, isSSO, onSelect, onRemove, deviceNumber}) => {
+}
+
+const Device = ({device, isSSO, onSelect, onRemove, deviceNumber}: DeviceProps) => {
   const {isVerified} = useKoSubscribableChildren(device.meta, ['isVerified']);
   const verifiedLabel = isVerified ? t('preferencesDevicesVerification') : t('preferencesDeviceNotVerified');
   const deviceAriaLabel = `${t('preferencesDevice')} ${deviceNumber}, ${device.getName()}, ${verifiedLabel}`;
+
+  const mlsFingerprint = device.mlsPublicKeys?.[MLSPublicKeys.ED25519];
+
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
     onRemove(device);
@@ -80,28 +86,34 @@ const Device: React.FC<{
       tabIndex={TabIndex.FOCUSABLE}
       role="button"
     >
-      <div className="preferences-devices-card-data">
-        <div className="preferences-devices-card-icon" data-uie-value={device.id} data-uie-name="device-id">
-          <VerifiedIcon data-uie-name={`user-device-${isVerified ? '' : 'not-'}verified`} isVerified={!!isVerified} />
+      <div className="preferences-devices-card-info">
+        <div
+          className="preferences-devices-model"
+          data-uie-name="preferences-device-active-model"
+          aria-label={deviceAriaLabel}
+        >
+          {device.getName()}
+
+          <Badges isProteusVerified={isVerified} isMLSVerified={true} />
         </div>
 
-        <div className="preferences-devices-card-info">
-          <div
-            className="preferences-devices-model"
-            data-uie-name="preferences-device-active-model"
-            aria-label={deviceAriaLabel}
-          >
-            {device.getName()}
-          </div>
-
+        {mlsFingerprint && (
           <p className="preferences-devices-id">
-            <strong>{t('preferencesDevicesId')}</strong>
+            <span>{t('preferencesMLSThumbprint')}</span>
 
-            <span data-uie-name="preferences-device-active-id">
-              <FormattedId idSlices={device.formatId()} />
+            <span className="preferences-formatted-id" data-uie-name="preferences-device-active-id">
+              <FormattedId idSlices={splitFingerprint(mlsFingerprint)} smallPadding />
             </span>
           </p>
-        </div>
+        )}
+
+        <p className="preferences-devices-id">
+          <span>{t('preferencesDevicesId')}</span>
+
+          <span className="preferences-formatted-id" data-uie-name="preferences-device-active-id">
+            <FormattedId idSlices={device.formatId()} smallPadding />
+          </span>
+        </p>
       </div>
 
       <div className="preferences-devices-card-action">
@@ -146,6 +158,7 @@ const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
     cryptographyRepository.getRemoteFingerprint(self.qualifiedId, device.id);
 
   const [localFingerprint, setLocalFingerprint] = useState('');
+
   useEffect(() => {
     cryptographyRepository.getLocalFingerprint().then(setLocalFingerprint);
   }, [cryptographyRepository]);

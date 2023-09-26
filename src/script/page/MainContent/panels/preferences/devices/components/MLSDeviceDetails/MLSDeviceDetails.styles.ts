@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2020 Wire Swiss GmbH
+ * Copyright (C) 2023 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,25 +17,29 @@
  *
  */
 
-import type {ClientClassification} from '@wireapp/api-client/lib/client/';
+import {CSSObject} from '@emotion/react';
 
-export interface ClientRecord {
-  address?: string;
-  class: ClientClassification | '?';
-  cookie?: string;
-  domain?: string;
-  id: string;
-  label?: string;
-  location?: {
-    lat?: number;
-    lon?: number;
-  };
-  meta: {
-    is_verified?: boolean;
-    primary_key?: string;
-  };
-  model?: string;
-  time?: string;
-  type?: 'permanent' | 'temporary';
-  mls_public_keys?: Record<string, string>;
+interface Styles {
+  wrapper: CSSObject;
 }
+export const styles: Styles = {
+  wrapper: {
+    width: '100%',
+
+    '.preferences-devices &': {
+      paddingBottom: '32px',
+    },
+
+    '.preferences-device-details &': {
+      borderBottom: '1px solid var(--gray-40)',
+    },
+
+    '.preferences-devices-header &': {
+      borderBottom: '1px solid var(--gray-40)',
+    },
+
+    '.participant-devices__header &': {
+      paddingBottom: '24px',
+    },
+  },
+};

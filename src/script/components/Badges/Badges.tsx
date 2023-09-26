@@ -34,6 +34,7 @@ export enum MLSStatues {
   NOT_DOWNLOADED = 'not_downloaded',
   EXPIRED = 'expired',
   EXPIRES_SOON = 'expires_soon',
+  NOT_ACTIVATED = 'not_activated',
 }
 
 interface BadgesProps {

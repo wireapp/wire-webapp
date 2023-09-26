@@ -19,52 +19,40 @@
 
 import React from 'react';
 
-import {ClientEntity} from 'src/script/client/ClientEntity';
-import {t} from 'Util/LocalizerUtil';
-import {splitFingerprint} from 'Util/StringUtil';
-import {formatTimestamp} from 'Util/TimeUtil';
+import {Badges} from 'Components/Badges';
+import {ClientEntity, MLSPublicKeys} from 'src/script/client/ClientEntity';
 
-import {FormattedId} from './FormattedId';
+import {MLSDeviceDetails} from './MLSDeviceDetails';
+import {ProteusDeviceDetails} from './ProteusDeviceDetails';
 
-interface DeviceProps {
+export interface DeviceProps {
   device: ClientEntity;
   fingerprint: string;
+  showVerificationStatus?: boolean;
 }
 
-const DetailedDevice: React.FC<DeviceProps> = ({device, fingerprint}) => {
+export const DetailedDevice: React.FC<DeviceProps> = ({device, fingerprint, showVerificationStatus = true}) => {
+  const isProteusVerified = true;
+
+  const mlsFingerprint = device.mlsPublicKeys?.[MLSPublicKeys.ED25519];
+
   return (
     <>
-      <h3 className="preferences-devices-model" data-uie-name="device-model">
-        {device.model}
+      <h3 className="preferences-devices-model preferences-devices-model-name" data-uie-name="device-model">
+        <span>{device.model}</span>
+
+        <Badges isProteusVerified={isProteusVerified} />
       </h3>
 
-      <p className="preferences-devices-id">
-        <strong>{t('preferencesDevicesId')}</strong>
+      {mlsFingerprint && <MLSDeviceDetails fingerprint={mlsFingerprint} />}
 
-        <span data-uie-name="preferences-device-current-id">
-          <FormattedId idSlices={splitFingerprint(device.id)} />
-        </span>
-      </p>
-
-      {device.time !== undefined && (
-        <div className="preferences-devices-activated">
-          <p
-            dangerouslySetInnerHTML={{
-              __html: t('preferencesDevicesActivatedOn', {date: formatTimestamp(device.time)}),
-            }}
-          />
-        </div>
-      )}
-
-      <h3 className="label preferences-label preferences-devices-fingerprint-label">
-        {t('preferencesDevicesFingerprint')}
-      </h3>
-
-      <p className="preferences-devices-fingerprint" css={{width: '300px'}}>
-        <FormattedId idSlices={splitFingerprint(fingerprint)} />
-      </p>
+      {/* Proteus */}
+      <ProteusDeviceDetails
+        device={device}
+        fingerprint={fingerprint}
+        isProteusVerified={isProteusVerified}
+        showVerificationStatus={showVerificationStatus}
+      />
     </>
   );
 };
-
-export {DetailedDevice};

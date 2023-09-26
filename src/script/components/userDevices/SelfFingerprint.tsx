@@ -27,12 +27,13 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
+import {splitFingerprint} from 'Util/StringUtil';
 
 import {DeviceCard} from './DeviceCard';
 
 import {ClientState} from '../../client/ClientState';
 import type {CryptographyRepository} from '../../cryptography/CryptographyRepository';
-import {DeviceId} from '../DeviceId';
+import {FormattedId} from '../../page/MainContent/panels/preferences/devices/components/FormattedId';
 
 interface SelfFingerprintProps {
   clientState?: ClientState;
@@ -55,9 +56,11 @@ const SelfFingerprint: React.FC<SelfFingerprintProps> = ({
   return (
     <div className={cx('participant-devices__header', {'participant-devices__header--padding': !noPadding})}>
       <DeviceCard device={currentClient} />
+
       <div className="participant-devices__fingerprint">
-        <DeviceId deviceId={localFingerprint} />
+        <FormattedId idSlices={splitFingerprint(localFingerprint)} smallPadding />
       </div>
+
       <div>
         <button
           type="button"

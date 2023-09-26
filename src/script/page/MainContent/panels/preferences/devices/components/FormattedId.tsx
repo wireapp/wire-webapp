@@ -17,20 +17,19 @@
  *
  */
 
+import {devicePart} from './FormattedId.styles';
+
 interface FormattedIdProps {
   idSlices: string[];
+  smallPadding?: boolean;
 }
 
-export const FormattedId = ({idSlices}: FormattedIdProps) => (
+export const FormattedId = ({idSlices, smallPadding = false}: FormattedIdProps) => (
   <>
-    {idSlices.map((slice, index) => {
-      const Component = index % 2 === 0 ? 'strong' : 'span';
-
-      return (
-        <Component className="device-id-part" key={slice + index}>
-          {slice}
-        </Component>
-      );
-    })}
+    {idSlices.map((slice, index) => (
+      <span css={devicePart(smallPadding)} key={slice + index} data-uie-name="element-device-id-part">
+        {slice}
+      </span>
+    ))}
   </>
 );

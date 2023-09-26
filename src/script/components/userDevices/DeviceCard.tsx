@@ -23,12 +23,14 @@ import {ClientClassification} from '@wireapp/api-client/lib/client';
 import cx from 'classnames';
 
 import {Badges} from 'Components/Badges';
-import {DeviceId} from 'Components/DeviceId';
 import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
+import {splitFingerprint} from 'Util/StringUtil';
 
 import type {ClientEntity} from '../../client/ClientEntity';
+import {MLSPublicKeys} from '../../client/ClientEntity';
+import {FormattedId} from '../../page/MainContent/panels/preferences/devices/components/FormattedId';
 import {Icon} from '../Icon';
 import {LegalHoldDot} from '../LegalHoldDot';
 
@@ -50,9 +52,9 @@ const DeviceCard: React.FC<DeviceCardProps> = ({
   const name = clientEntity.getName();
   const clickable = !!click;
   const isVerified = meta.isVerified;
+  const mlsFingerprint = clientEntity.mlsPublicKeys?.[MLSPublicKeys.ED25519];
+
   const showLegalHoldIcon = showIcon && deviceClass === ClientClassification.LEGAL_HOLD;
-  const showDesktopIcon = showIcon && deviceClass === ClientClassification.DESKTOP;
-  const showMobileIcon = showIcon && !showLegalHoldIcon && !showDesktopIcon;
 
   const clickOnDevice = () => {
     if (clickable) {
@@ -77,21 +79,28 @@ const DeviceCard: React.FC<DeviceCardProps> = ({
         />
       )}
 
-      {showDesktopIcon && <Icon.Desktop className="device-card__icon" data-uie-name="status-desktop-device" />}
-      {showMobileIcon && <Icon.Devices className="device-card__icon" data-uie-name="status-mobile-device" />}
-
       <div className="device-card__info" data-uie-name="device-card-info" data-uie-value={label}>
         <div className="device-card__name">
           <span className="device-card__model">{name}</span>
 
-          {showVerified && <Badges isProteusVerified={!!isVerified && isVerified()} />}
+          {showVerified && <Badges isMLSVerified isProteusVerified={!!isVerified && isVerified()} />}
         </div>
 
-        <p className="text-background label-xs">
+        {mlsFingerprint && (
+          <p className="text-background device-card__id">
+            <span>{t('preferencesMLSThumbprint')}</span>
+
+            <span data-uie-name="device-id" className="formatted-id">
+              <FormattedId idSlices={splitFingerprint(mlsFingerprint)} smallPadding />
+            </span>
+          </p>
+        )}
+
+        <p className="text-background device-card__id">
           <span>{t('preferencesDevicesId')}</span>
 
-          <span data-uie-name="device-id">
-            <DeviceId deviceId={id} />
+          <span data-uie-name="device-id" className="formatted-id">
+            <FormattedId idSlices={splitFingerprint(id)} smallPadding />
           </span>
         </p>
       </div>
