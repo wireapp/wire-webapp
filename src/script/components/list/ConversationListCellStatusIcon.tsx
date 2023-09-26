@@ -32,20 +32,17 @@ export interface ConversationListCellStatusIconProps {
 }
 
 const ConversationListCellStatusIcon = ({conversation}: ConversationListCellStatusIconProps) => {
-  const {
-    participating_user_ets: users,
-    unreadState,
-    mutedState,
-    isRequest,
-  } = useKoSubscribableChildren(conversation, ['participating_user_ets', 'unreadState', 'mutedState', 'isRequest']);
+  const {unreadState, mutedState, isRequest} = useKoSubscribableChildren(conversation, [
+    'unreadState',
+    'mutedState',
+    'isRequest',
+  ]);
 
   const cellState = useMemo(() => generateCellState(conversation), [unreadState, mutedState, isRequest]);
 
-  const {isRequest: isUserRequest} = useKoSubscribableChildren(users[0], ['isRequest']);
-
   return (
     <>
-      {(isUserRequest || cellState.icon === ConversationStatusIcon.PENDING_CONNECTION) && (
+      {cellState.icon === ConversationStatusIcon.PENDING_CONNECTION && (
         <span
           className="conversation-list-cell-badge cell-badge-light"
           data-uie-name="status-pending"
