@@ -55,5 +55,9 @@ export class Account extends EventEmitter {
         setConversationLevelTimer: jest.fn(),
       },
     },
+
+    client: {
+      deleteClient: jest.fn(),
+    },
   };
 }
