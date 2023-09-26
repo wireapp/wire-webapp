@@ -24,7 +24,7 @@ import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import {createUuid} from 'Util/uuid';
 
-import {ProteusConversationVerificationStateHandler} from './proteusStateHandler';
+import {ProteusConversationVerificationStateHandler} from './ProteusStateHandler';
 
 import {TestFactory} from '../../../../../test/helper/TestFactory';
 import {ConversationRepository} from '../../ConversationRepository';
@@ -49,7 +49,7 @@ describe('ProteusConversationVerificationStateHandler', () => {
     return testFactory.exposeConversationActors().then(_conversation_repository => {
       spyOn(testFactory.event_repository, 'injectEvent').and.returnValue(undefined);
       conversationRepository = _conversation_repository;
-      stateHandler = conversationRepository.verificationStateHandler;
+      stateHandler = conversationRepository.proteusVerificationStateHandler;
 
       conversationAB = new Conversation(createUuid());
       conversationB = new Conversation(createUuid());

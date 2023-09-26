@@ -91,7 +91,7 @@ import {ConversationStateHandler} from './ConversationStateHandler';
 import {ConversationStatus} from './ConversationStatus';
 import {ConversationVerificationState} from './ConversationVerificationState';
 import {ProteusConversationVerificationStateHandler} from './ConversationVerificationStateHandler';
-import {MLSConversationVerificationStateHandler} from './ConversationVerificationStateHandler/mlsStateHandler';
+import {MLSConversationVerificationStateHandler} from './ConversationVerificationStateHandler/MLS';
 import {EventMapper} from './EventMapper';
 import {MessageRepository} from './MessageRepository';
 import {NOTIFICATION_STATE} from './NotificationSetting';
@@ -278,11 +278,7 @@ export class ConversationRepository {
       this.conversationState,
     );
     // we register a handler that will handle MLS conversations on its own
-    MLSConversationVerificationStateHandler.getInstance(
-      this.eventRepository,
-      this.conversationState,
-      this.core,
-    ).initialize();
+    new MLSConversationVerificationStateHandler(this.eventRepository, this.conversationState, this.core);
 
     this.isBlockingNotificationHandling = true;
     this.conversationsWithNewEvents = new Map();

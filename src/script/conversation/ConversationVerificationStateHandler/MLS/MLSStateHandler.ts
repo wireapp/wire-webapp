@@ -33,47 +33,14 @@ import {EventBuilder} from '../../EventBuilder';
 import {getConversationByGroupId, willChangeToDegraded, willChangeToVerified} from '../shared';
 
 export class MLSConversationVerificationStateHandler {
-  private static instance: MLSConversationVerificationStateHandler | null = null;
   private readonly logger: Logger;
-  private listenerActive: boolean = false;
 
-  private constructor(
+  public constructor(
     private readonly eventRepository: EventRepository,
     private readonly conversationState = container.resolve(ConversationState),
     private readonly core = container.resolve(Core),
   ) {
     this.logger = getLogger('MLSConversationVerificationStateHandler');
-  }
-
-  /**
-   * Get the singleton instance of MLSConversationVerificationStateHandler or create a new one
-   * For the first time, params are required to create the instance
-   */
-  public static getInstance(
-    eventRepository: EventRepository,
-    conversationState?: ConversationState,
-    core?: Core,
-  ): MLSConversationVerificationStateHandler {
-    if (!MLSConversationVerificationStateHandler.instance) {
-      if (!eventRepository) {
-        throw new Error(
-          'MLSConversationVerificationStateHandler is not initialized. Please call getInstance with params.',
-        );
-      }
-      MLSConversationVerificationStateHandler.instance = new MLSConversationVerificationStateHandler(
-        eventRepository,
-        conversationState,
-        core,
-      );
-    }
-    return MLSConversationVerificationStateHandler.instance;
-  }
-
-  public initialize(): void {
-    // We only want to initialize the listener once
-    if (this.listenerActive) {
-      return;
-    }
     // We need to check if the core service is available
     if (!this.core.service?.mls) {
       this.logger.error('MLS service not available');
@@ -86,8 +53,6 @@ export class MLSConversationVerificationStateHandler {
     }
     // We hook into the newEpoch event of the MLS service to check if the conversation needs to be verified or degraded
     this.core.service.mls.on('newEpoch', this.checkEpoch);
-    // We set the listenerActive flag to true, so we don't initialize the listener again
-    this.listenerActive = true;
   }
 
   /**

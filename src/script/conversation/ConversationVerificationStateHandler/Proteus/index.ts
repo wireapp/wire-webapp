@@ -17,4 +17,4 @@
  *
  */
 
-export * from './mlsStateHandler';
+export * from './ProteusStateHandler';
