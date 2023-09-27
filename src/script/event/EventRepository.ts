@@ -168,7 +168,7 @@ export class EventRepository {
   };
 
   /**
-   * this function will process any incoming event. It is being queue in case 2 events arrive at the same time.
+   * this function will process any incoming event. It is being queued in case 2 events arrive at the same time.
    * Processing events should happen sequentially (thus the queue)
    */
   private readonly handleIncomingEvent = queue(async (payload: HandledEventPayload, source: NotificationSource) => {
