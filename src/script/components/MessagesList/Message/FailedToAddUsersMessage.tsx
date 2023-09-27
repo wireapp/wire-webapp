@@ -55,16 +55,18 @@ interface MessageDetailsProps {
   children: ReactNode;
   users: User[];
   reason: AddUsersFailureReasons;
-  domain?: string;
+  domains: string[];
 }
-const MessageDetails = ({users, children, reason, domain = ''}: MessageDetailsProps) => {
+const MessageDetails = ({users, children, reason, domains}: MessageDetailsProps) => {
   const baseTranslationKey =
     users.length === 1 ? 'failedToAddParticipantsSingularDetails' : 'failedToAddParticipantsPluralDetails';
+
+  const domainStr = domains.join(', ');
 
   return (
     <p
       data-uie-name="multi-user-not-added-details"
-      data-uie-value={domain}
+      data-uie-value={domainStr}
       style={{lineHeight: 'var(--line-height-sm)'}}
     >
       <span
@@ -76,7 +78,7 @@ const MessageDetails = ({users, children, reason, domain = ''}: MessageDetailsPr
               .slice(1)
               .map(user => user.name())
               .join(', '),
-            domain,
+            domain: domainStr,
           }),
         }}
       />
@@ -172,7 +174,7 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
       </div>
       <div className="message-body" css={{flexDirection: 'column'}}>
         {isOpen && (
-          <MessageDetails users={users} reason={message.reason}>
+          <MessageDetails users={users} reason={message.reason} domains={message.backends}>
             {learnMore}
           </MessageDetails>
         )}

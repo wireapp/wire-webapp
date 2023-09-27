@@ -197,6 +197,7 @@ export type CallingTimeoutEvent = ConversationEvent<{reason: AVS_REASON.NOONE_JO
 export type FailedToAddUsersMessageEvent = ConversationEvent<{
   qualifiedIds: QualifiedId[];
   reason: AddUsersFailureReasons;
+  backends: string[];
 }> & {
   type: CONVERSATION.FAILED_TO_ADD_USERS;
 };
@@ -308,16 +309,16 @@ export const EventBuilder = {
   },
 
   buildFailedToAddUsersEvent(
-    qualifiedIds: QualifiedId[],
+    failedToAdd: {users: QualifiedId[]; reason: AddUsersFailureReasons; backends: string[]},
     conversation: Conversation,
     userId: string,
-    reason: AddUsersFailureReasons,
   ): FailedToAddUsersMessageEvent {
     return {
       ...buildQualifiedId(conversation),
       data: {
-        qualifiedIds,
-        reason,
+        qualifiedIds: failedToAdd.users,
+        reason: failedToAdd.reason,
+        backends: failedToAdd.backends,
       },
       from: userId,
       id: createUuid(),
