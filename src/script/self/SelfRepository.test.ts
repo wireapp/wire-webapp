@@ -412,6 +412,25 @@ describe('SelfRepository', () => {
       expect(selfRepository.refreshSelfSupportedProtocols).toHaveBeenCalled();
     });
 
+    it('refreshes self supported protocols on team refresh', async () => {
+      const selfRepository = await testFactory.exposeSelfActors();
+
+      const selfUser = selfRepository['userState'].self()!;
+
+      const initialProtocols = [ConversationProtocol.PROTEUS];
+      selfUser.supportedProtocols(initialProtocols);
+
+      const evaluatedProtocols = [ConversationProtocol.PROTEUS, ConversationProtocol.MLS];
+
+      jest.spyOn(selfRepository, 'evaluateSelfSupportedProtocols').mockResolvedValueOnce(evaluatedProtocols);
+      jest.spyOn(selfRepository['selfService'], 'putSupportedProtocols');
+
+      await act(async () => selfRepository['teamRepository'].emit('teamRefreshed'));
+
+      expect(selfUser.supportedProtocols()).toEqual(evaluatedProtocols);
+      expect(selfRepository['selfService'].putSupportedProtocols).toHaveBeenCalledWith(evaluatedProtocols);
+    });
+
     it('refreshes self supported protocols after mls feature is enabled', async () => {
       const selfRepository = await testFactory.exposeSelfActors();
 
