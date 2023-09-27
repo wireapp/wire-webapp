@@ -85,7 +85,6 @@ export class TeamRepository extends TypedEventEmitter<Events> {
   private readonly teamMapper: TeamMapper;
   private readonly userRepository: UserRepository;
   private readonly assetRepository: AssetRepository;
-  private teamSupportedProtocolsUpdateCallback?: () => void;
 
   constructor(
     userRepository: UserRepository,
@@ -518,9 +517,5 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     const mlsMigrationFeature = this.teamState.teamFeatures().mlsMigration;
 
     return getMLSMigrationStatus(mlsMigrationFeature);
-  }
-
-  public onTeamSupportedProtocolsUpdate(callback: () => void): void {
-    this.teamSupportedProtocolsUpdateCallback = callback;
   }
 }
