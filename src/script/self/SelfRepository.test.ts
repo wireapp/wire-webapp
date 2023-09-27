@@ -19,7 +19,9 @@
 
 import {RegisteredClient} from '@wireapp/api-client/lib/client';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
+import {TeamFeatureConfigurationUpdateEvent, TEAM_EVENT} from '@wireapp/api-client/lib/event';
 import {FeatureList, FeatureStatus} from '@wireapp/api-client/lib/team';
+import {FEATURE_KEY} from '@wireapp/api-client/lib/team/feature';
 import {act} from 'react-dom/test-utils';
 import {container} from 'tsyringe';
 
@@ -90,6 +92,16 @@ const generateMLSFeaturesConfig = (migrationStatus: MLSMigrationStatus, supporte
         },
       };
   }
+};
+
+const generateMLSFeatureConfig = (supportedProtocols: ConversationProtocol[]) => {
+  return {
+    allowedCipherSuites: [1],
+    defaultCipherSuite: 1,
+    defaultProtocol: ConversationProtocol.PROTEUS,
+    protocolToggleUsers: [] as string[],
+    supportedProtocols,
+  };
 };
 
 const createMockClientResponse = (doesSupportMLS = false, wasActiveWithinLast4Weeks = false) => {
@@ -363,6 +375,114 @@ describe('SelfRepository', () => {
 
       expect(selfUser.supportedProtocols()).toEqual(evaluatedProtocols);
       expect(selfRepository['selfService'].putSupportedProtocols).not.toHaveBeenCalled();
+    });
+
+    it('refreshes self supported protocols on team supported protocols update', async () => {
+      const selfRepository = await testFactory.exposeSelfActors();
+
+      const currentSupportedProtocols = [ConversationProtocol.PROTEUS];
+      const newSupportedProtocols = [ConversationProtocol.PROTEUS, ConversationProtocol.MLS];
+
+      const mockedFeatureList: FeatureList = {
+        [FEATURE_KEY.MLS]: {
+          config: generateMLSFeatureConfig(currentSupportedProtocols),
+          status: FeatureStatus.ENABLED,
+        },
+      };
+
+      const mockedMLSFeatureUpdateEvent: TeamFeatureConfigurationUpdateEvent = {
+        name: FEATURE_KEY.MLS,
+        team: '',
+        time: '',
+        data: {
+          status: FeatureStatus.ENABLED,
+          config: generateMLSFeatureConfig(newSupportedProtocols),
+        },
+
+        type: TEAM_EVENT.FEATURE_CONFIG_UPDATE,
+      };
+
+      jest.spyOn(selfRepository, 'refreshSelfSupportedProtocols').mockImplementationOnce(jest.fn());
+
+      selfRepository['teamRepository'].emit('featureUpdated', {
+        event: mockedMLSFeatureUpdateEvent,
+        prevFeatureList: mockedFeatureList,
+      });
+
+      expect(selfRepository.refreshSelfSupportedProtocols).toHaveBeenCalled();
+    });
+
+    it('refreshes self supported protocols after mls feature is enabled', async () => {
+      const selfRepository = await testFactory.exposeSelfActors();
+
+      const currentSupportedProtocols = [ConversationProtocol.PROTEUS, ConversationProtocol.MLS];
+      const currentFeatureStatus = FeatureStatus.DISABLED;
+
+      const newSupportedProtocols = [ConversationProtocol.PROTEUS, ConversationProtocol.MLS];
+      const newFeatureStatus = FeatureStatus.ENABLED;
+
+      const mockedFeatureList: FeatureList = {
+        [FEATURE_KEY.MLS]: {
+          config: generateMLSFeatureConfig(currentSupportedProtocols),
+          status: currentFeatureStatus,
+        },
+      };
+
+      const mockedMLSFeatureUpdateEvent: TeamFeatureConfigurationUpdateEvent = {
+        name: FEATURE_KEY.MLS,
+        team: '',
+        time: '',
+        data: {
+          status: newFeatureStatus,
+          config: generateMLSFeatureConfig(newSupportedProtocols),
+        },
+
+        type: TEAM_EVENT.FEATURE_CONFIG_UPDATE,
+      };
+
+      jest.spyOn(selfRepository, 'refreshSelfSupportedProtocols').mockImplementationOnce(jest.fn());
+
+      selfRepository['teamRepository'].emit('featureUpdated', {
+        event: mockedMLSFeatureUpdateEvent,
+        prevFeatureList: mockedFeatureList,
+      });
+
+      expect(selfRepository.refreshSelfSupportedProtocols).toHaveBeenCalled();
+    });
+
+    it('does not refresh self supported protocols if mls feature is updated without supported protocols change', async () => {
+      const selfRepository = await testFactory.exposeSelfActors();
+
+      const currentSupportedProtocols = [ConversationProtocol.PROTEUS, ConversationProtocol.MLS];
+      const newSupportedProtocols = [ConversationProtocol.PROTEUS, ConversationProtocol.MLS];
+
+      const mockedFeatureList: FeatureList = {
+        [FEATURE_KEY.MLS]: {
+          config: generateMLSFeatureConfig(currentSupportedProtocols),
+          status: FeatureStatus.ENABLED,
+        },
+      };
+
+      const mockedMLSFeatureUpdateEvent: TeamFeatureConfigurationUpdateEvent = {
+        name: FEATURE_KEY.MLS,
+        team: '',
+        time: '',
+        data: {
+          status: FeatureStatus.ENABLED,
+          config: generateMLSFeatureConfig(newSupportedProtocols),
+        },
+
+        type: TEAM_EVENT.FEATURE_CONFIG_UPDATE,
+      };
+
+      jest.spyOn(selfRepository, 'refreshSelfSupportedProtocols').mockImplementationOnce(jest.fn());
+
+      selfRepository['teamRepository'].emit('featureUpdated', {
+        event: mockedMLSFeatureUpdateEvent,
+        prevFeatureList: mockedFeatureList,
+      });
+
+      expect(selfRepository.refreshSelfSupportedProtocols).not.toHaveBeenCalled();
     });
   });
 });

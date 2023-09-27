@@ -22,19 +22,20 @@ import type {
   TeamConversationDeleteEvent,
   TeamDeleteEvent,
   TeamEvent,
+  TeamFeatureConfigurationUpdateEvent,
   TeamMemberJoinEvent,
   TeamMemberLeaveEvent,
   TeamMemberUpdateEvent,
   TeamUpdateEvent,
 } from '@wireapp/api-client/lib/event';
 import {TEAM_EVENT} from '@wireapp/api-client/lib/event/TeamEvent';
-import {FeatureStatus, FEATURE_KEY} from '@wireapp/api-client/lib/team/feature/';
+import {FeatureStatus, FeatureList} from '@wireapp/api-client/lib/team/feature/';
 import type {TeamData} from '@wireapp/api-client/lib/team/team/TeamData';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
-import {Runtime} from '@wireapp/commons';
+import {Runtime, TypedEventEmitter} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
@@ -72,7 +73,14 @@ export interface AccountInfo {
   userID: string;
 }
 
-export class TeamRepository {
+type Events = {
+  featureUpdated: {
+    prevFeatureList?: FeatureList;
+    event: TeamFeatureConfigurationUpdateEvent;
+  };
+};
+
+export class TeamRepository extends TypedEventEmitter<Events> {
   private readonly logger: Logger;
   private readonly teamMapper: TeamMapper;
   private readonly userRepository: UserRepository;
@@ -85,6 +93,7 @@ export class TeamRepository {
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
   ) {
+    super();
     this.logger = getLogger('TeamRepository');
 
     this.teamMapper = new TeamMapper();
@@ -131,9 +140,15 @@ export class TeamRepository {
     return {team, members};
   };
 
-  private async updateFeatureConfig() {
-    const features = await this.teamService.getAllTeamFeatures();
-    this.teamState.teamFeatures(features);
+  private async updateFeatureConfig(): Promise<{newFeatureList: FeatureList; prevFeatureList?: FeatureList}> {
+    const prevFeatureList = this.teamState.teamFeatures();
+    const newFeatureList = await this.teamService.getAllTeamFeatures();
+    this.teamState.teamFeatures(newFeatureList);
+
+    return {
+      newFeatureList,
+      prevFeatureList,
+    };
   }
 
   private readonly scheduleTeamRefresh = (): void => {
@@ -399,15 +414,17 @@ export class TeamRepository {
   };
 
   private readonly onFeatureConfigUpdate = async (
-    _event: TeamEvent & {name: FEATURE_KEY},
+    event: TeamFeatureConfigurationUpdateEvent,
     source: EventSource,
   ): Promise<void> => {
     if (source !== EventSource.WEBSOCKET) {
       // Ignore notification stream events
       return;
     }
+
     // When we receive a `feature-config.update` event, we will refetch the entire feature config
-    await this.updateFeatureConfig();
+    const {prevFeatureList} = await this.updateFeatureConfig();
+    this.emit('featureUpdated', {event, prevFeatureList});
   };
 
   private onMemberLeave(eventJson: TeamMemberLeaveEvent): void {
