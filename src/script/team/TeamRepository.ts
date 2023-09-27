@@ -29,7 +29,7 @@ import type {
   TeamUpdateEvent,
 } from '@wireapp/api-client/lib/event';
 import {TEAM_EVENT} from '@wireapp/api-client/lib/event/TeamEvent';
-import {FeatureStatus} from '@wireapp/api-client/lib/team/feature/';
+import {FeatureStatus, FeatureList} from '@wireapp/api-client/lib/team/feature/';
 import type {TeamData} from '@wireapp/api-client/lib/team/team/TeamData';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
@@ -74,7 +74,10 @@ export interface AccountInfo {
 }
 
 type Events = {
-  featureUpdated: Pick<TeamFeatureConfigurationUpdateEvent, 'name' | 'data'>;
+  featureUpdated: {
+    prevFeatureList?: FeatureList;
+    event: TeamFeatureConfigurationUpdateEvent;
+  };
 };
 
 export class TeamRepository extends TypedEventEmitter<Events> {
@@ -137,9 +140,15 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     return {team, members};
   };
 
-  private async updateFeatureConfig() {
-    const features = await this.teamService.getAllTeamFeatures();
-    this.teamState.teamFeatures(features);
+  private async updateFeatureConfig(): Promise<{newFeatureList: FeatureList; prevFeatureList?: FeatureList}> {
+    const prevFeatureList = this.teamState.teamFeatures();
+    const newFeatureList = await this.teamService.getAllTeamFeatures();
+    this.teamState.teamFeatures(newFeatureList);
+
+    return {
+      newFeatureList,
+      prevFeatureList,
+    };
   }
 
   private readonly scheduleTeamRefresh = (): void => {
@@ -405,7 +414,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
   };
 
   private readonly onFeatureConfigUpdate = async (
-    {name, data}: TeamFeatureConfigurationUpdateEvent,
+    event: TeamFeatureConfigurationUpdateEvent,
     source: EventSource,
   ): Promise<void> => {
     if (source !== EventSource.WEBSOCKET) {
@@ -414,8 +423,8 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     }
 
     // When we receive a `feature-config.update` event, we will refetch the entire feature config
-    await this.updateFeatureConfig();
-    this.emit('featureUpdated', {name, data});
+    const {prevFeatureList} = await this.updateFeatureConfig();
+    this.emit('featureUpdated', {event, prevFeatureList});
   };
 
   private onMemberLeave(eventJson: TeamMemberLeaveEvent): void {

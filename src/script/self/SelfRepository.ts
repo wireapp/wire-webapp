@@ -18,7 +18,7 @@
  */
 
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
-import {FEATURE_KEY} from '@wireapp/api-client/lib/team/feature/';
+import {FEATURE_KEY, FeatureMLS} from '@wireapp/api-client/lib/team/feature/';
 import {registerRecurringTask} from '@wireapp/core/lib/util/RecurringTaskScheduler';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
@@ -55,13 +55,26 @@ export class SelfRepository {
     // It's possible that they have removed proteus client, and now all their clients are mls-capable.
     amplify.subscribe(WebAppEvents.CLIENT.REMOVE, this.refreshSelfSupportedProtocols);
 
-    // Every time mls feature config gets updated, we need to re-evaluate self supported protocols.
-    teamRepository.on('featureUpdated', async ({name}) => {
-      if (name === FEATURE_KEY.MLS) {
-        await this.refreshSelfSupportedProtocols();
+    teamRepository.on('featureUpdated', async ({event, prevFeatureList}) => {
+      if (event.name === FEATURE_KEY.MLS) {
+        void this.handleMLSFeatureUpdate(event.data, prevFeatureList?.[FEATURE_KEY.MLS]);
       }
     });
   }
+
+  private handleMLSFeatureUpdate = async (newMLSFeature: FeatureMLS, prevMLSFeature?: FeatureMLS) => {
+    const prevSupportedProtocols = prevMLSFeature?.config.supportedProtocols ?? [];
+    const newSupportedProtocols = newMLSFeature.config.supportedProtocols ?? [];
+
+    const hasTeamSupportedProtocolsChanged = !(
+      prevSupportedProtocols.length === newSupportedProtocols.length &&
+      [...prevSupportedProtocols].every(protocol => newSupportedProtocols.includes(protocol))
+    );
+
+    if (hasTeamSupportedProtocolsChanged) {
+      await this.refreshSelfSupportedProtocols();
+    }
+  };
 
   private get selfUser() {
     const selfUser = this.userState.self();
