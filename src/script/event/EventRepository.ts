@@ -34,6 +34,7 @@ import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {getLogger, Logger} from 'Util/Logger';
+import {queue} from 'Util/PromiseQueue';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {ClientEvent} from './Client';
@@ -166,7 +167,7 @@ export class EventRepository {
     }
   };
 
-  private readonly handleIncomingEvent = async (payload: HandledEventPayload, source: NotificationSource) => {
+  private readonly handleIncomingEvent = queue(async (payload: HandledEventPayload, source: NotificationSource) => {
     try {
       await this.handleEvent(payload, source);
     } catch (error) {
@@ -176,7 +177,7 @@ export class EventRepository {
         throw error;
       }
     }
-  };
+  });
 
   /**
    * connects to the websocket with the given account

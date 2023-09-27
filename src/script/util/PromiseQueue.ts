@@ -192,3 +192,14 @@ export class PromiseQueue {
     }
   }
 }
+
+/**
+ * Will make sure a function is executed in order. If the function is already running, then the next payload will be queued.
+ * @param callback the function to queue
+ */
+export function queue<ReturnType, Params extends any[]>(
+  callback: (...params: Params) => Promise<ReturnType>,
+): (...params: Params) => Promise<ReturnType> {
+  const promiseQueue = new PromiseQueue({name: 'queue'});
+  return (...params: Params) => promiseQueue.push(() => callback(...params));
+}
