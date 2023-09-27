@@ -99,7 +99,7 @@ const generateMLSFeatureConfig = (supportedProtocols: ConversationProtocol[]) =>
     allowedCipherSuites: [1],
     defaultCipherSuite: 1,
     defaultProtocol: ConversationProtocol.PROTEUS,
-    protocolToggleUsers: [],
+    protocolToggleUsers: [] as string[],
     supportedProtocols,
   };
 };
