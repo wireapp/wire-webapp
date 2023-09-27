@@ -364,6 +364,7 @@
   "conversationDeviceNewPeopleJoinedVerify": " controleer apparaten",
   "conversationDeviceStartedUsingMany": " begon met het gebruik van",
   "conversationDeviceStartedUsingOne": " begon met het gebruik van",
+  "conversationDeviceStartedUsingYou": " started using",
   "conversationDeviceUnverified": " unverified een van",
   "conversationDeviceUserDevices": "{{user}}´s apparaten",
   "conversationDeviceYourDevices": " jou apparaten",

@@ -132,7 +132,7 @@ export const ConnectRequests: FC<ConnectRequestsProps> = ({
               <div className="connect-request-username label-username">{connectRequest.handle}</div>
 
               {classifiedDomains && (
-                <UserClassifiedBar users={[selfUser, connectRequest]} classifiedDomains={classifiedDomains} />
+                <UserClassifiedBar users={[connectRequest]} classifiedDomains={classifiedDomains} />
               )}
 
               <Avatar

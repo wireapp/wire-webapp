@@ -364,6 +364,7 @@
   "conversationDeviceNewPeopleJoinedVerify": " verifikasi perangkat",
   "conversationDeviceStartedUsingMany": " mulai menggunakan",
   "conversationDeviceStartedUsingOne": " mulai menggunakan",
+  "conversationDeviceStartedUsingYou": " started using",
   "conversationDeviceUnverified": " tidak terverifikasi dari salah satu",
   "conversationDeviceUserDevices": " {{user}} ini perangkat",
   "conversationDeviceYourDevices": " perangkat Anda",

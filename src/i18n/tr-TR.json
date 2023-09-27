@@ -364,6 +364,7 @@
   "conversationDeviceNewPeopleJoinedVerify": " cihazları doğrula",
   "conversationDeviceStartedUsingMany": " kullanmaya başladı",
   "conversationDeviceStartedUsingOne": " kullanmaya başladı",
+  "conversationDeviceStartedUsingYou": " started using",
   "conversationDeviceUnverified": " doğrulanmamışlardan bir tane",
   "conversationDeviceUserDevices": " {{user}} ’in cihazları",
   "conversationDeviceYourDevices": " cihazların",

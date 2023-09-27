@@ -364,6 +364,7 @@
   "conversationDeviceNewPeopleJoinedVerify": " vahvista laitteet",
   "conversationDeviceStartedUsingMany": " aloitti käyttämään",
   "conversationDeviceStartedUsingOne": " aloitti käyttämään",
+  "conversationDeviceStartedUsingYou": " started using",
   "conversationDeviceUnverified": " vahvistamattomia yksi",
   "conversationDeviceUserDevices": " {{user}} n laitteet",
   "conversationDeviceYourDevices": " sinun laitteet",

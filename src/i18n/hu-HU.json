@@ -364,6 +364,7 @@
   "conversationDeviceNewPeopleJoinedVerify": " eszközök ellenőrzése",
   "conversationDeviceStartedUsingMany": " elkezdett használni",
   "conversationDeviceStartedUsingOne": " elkezdett használni",
+  "conversationDeviceStartedUsingYou": " started using",
   "conversationDeviceUnverified": " visszavontad az ellenőrzött státuszt",
   "conversationDeviceUserDevices": " {{user}} egyik eszköze",
   "conversationDeviceYourDevices": " az egyik eszközödről",

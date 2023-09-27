@@ -29,13 +29,13 @@ import type {
   TeamUpdateEvent,
 } from '@wireapp/api-client/lib/event';
 import {TEAM_EVENT} from '@wireapp/api-client/lib/event/TeamEvent';
-import {FeatureStatus, FEATURE_KEY, FeatureList, FeatureMLSConfig} from '@wireapp/api-client/lib/team/feature/';
+import {FeatureStatus, FeatureList} from '@wireapp/api-client/lib/team/feature/';
 import type {TeamData} from '@wireapp/api-client/lib/team/team/TeamData';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
-import {Runtime} from '@wireapp/commons';
+import {Runtime, TypedEventEmitter} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
@@ -73,7 +73,14 @@ export interface AccountInfo {
   userID: string;
 }
 
-export class TeamRepository {
+type Events = {
+  featureUpdated: {
+    prevFeatureList?: FeatureList;
+    event: TeamFeatureConfigurationUpdateEvent;
+  };
+};
+
+export class TeamRepository extends TypedEventEmitter<Events> {
   private readonly logger: Logger;
   private readonly teamMapper: TeamMapper;
   private readonly userRepository: UserRepository;
@@ -87,6 +94,7 @@ export class TeamRepository {
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
   ) {
+    super();
     this.logger = getLogger('TeamRepository');
 
     this.teamMapper = new TeamMapper();
@@ -133,14 +141,14 @@ export class TeamRepository {
     return {team, members};
   };
 
-  private async updateFeatureConfig(): Promise<{prevFeatureList?: FeatureList; newFeatureList: FeatureList}> {
+  private async updateFeatureConfig(): Promise<{newFeatureList: FeatureList; prevFeatureList?: FeatureList}> {
     const prevFeatureList = this.teamState.teamFeatures();
     const newFeatureList = await this.teamService.getAllTeamFeatures();
     this.teamState.teamFeatures(newFeatureList);
 
     return {
-      prevFeatureList,
       newFeatureList,
+      prevFeatureList,
     };
   }
 
@@ -417,25 +425,8 @@ export class TeamRepository {
 
     // When we receive a `feature-config.update` event, we will refetch the entire feature config
     const {prevFeatureList} = await this.updateFeatureConfig();
-
-    if (event.name === FEATURE_KEY.MLS) {
-      this.handleMLSFeatureConfigUpdate(event.data.config, prevFeatureList?.[FEATURE_KEY.MLS]?.config);
-    }
+    this.emit('featureUpdated', {event, prevFeatureList});
   };
-
-  private handleMLSFeatureConfigUpdate(newMLSConfig: FeatureMLSConfig, prevMLSConfig?: FeatureMLSConfig) {
-    const prevSupportedProtocols = prevMLSConfig?.supportedProtocols;
-    const newSupportedProtocols = newMLSConfig.supportedProtocols;
-
-    const hasSupportedProtocolsChanged = !(
-      prevSupportedProtocols?.length === newSupportedProtocols.length &&
-      [...prevSupportedProtocols].every(protocol => newSupportedProtocols.includes(protocol))
-    );
-
-    if (hasSupportedProtocolsChanged) {
-      this.teamSupportedProtocolsUpdateCallback?.();
-    }
-  }
 
   private onMemberLeave(eventJson: TeamMemberLeaveEvent): void {
     const {

@@ -364,6 +364,7 @@
   "conversationDeviceNewPeopleJoinedVerify": "Geräte überprüfen",
   "conversationDeviceStartedUsingMany": " haben begonnen,",
   "conversationDeviceStartedUsingOne": " hat begonnen,",
+  "conversationDeviceStartedUsingYou": " haben begonnen,",
   "conversationDeviceUnverified": " haben die Überprüfung für",
   "conversationDeviceUserDevices": " ein Gerät von {{user}} widerrufen",
   "conversationDeviceYourDevices": " eines Ihrer Geräte widerrufen",

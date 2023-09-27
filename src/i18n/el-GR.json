@@ -364,6 +364,7 @@
   "conversationDeviceNewPeopleJoinedVerify": "επαληθευμένες συσκευές",
   "conversationDeviceStartedUsingMany": "έναρξη χρήσεως",
   "conversationDeviceStartedUsingOne": "έναρξη χρήσεως",
+  "conversationDeviceStartedUsingYou": " started using",
   "conversationDeviceUnverified": " μία εξ αυτών είναι μη επαληθευμένη",
   "conversationDeviceUserDevices": " {{user}}´ς συσκευές",
   "conversationDeviceYourDevices": "οι συσκευές σας",

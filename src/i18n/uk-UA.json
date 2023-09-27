@@ -364,6 +364,7 @@
   "conversationDeviceNewPeopleJoinedVerify": "Верифікувати пристрої",
   "conversationDeviceStartedUsingMany": " почав(-ла) використовувати",
   "conversationDeviceStartedUsingOne": " почав(-ла) використовувати",
+  "conversationDeviceStartedUsingYou": " started using",
   "conversationDeviceUnverified": " скасував(-ла) верифікацію одного з",
   "conversationDeviceUserDevices": " пристрої {{user}}",
   "conversationDeviceYourDevices": " ваші пристрої",

@@ -364,6 +364,7 @@
   "conversationDeviceNewPeopleJoinedVerify": "Kinnita seadmeid",
   "conversationDeviceStartedUsingMany": " hakkas kasutama",
   "conversationDeviceStartedUsingOne": " hakkas kasutama",
+  "conversationDeviceStartedUsingYou": " started using",
   "conversationDeviceUnverified": " eemaldasid kinnituse ühel",
   "conversationDeviceUserDevices": " kasutaja {{user}} seadmed",
   "conversationDeviceYourDevices": " oma seadmetest",
