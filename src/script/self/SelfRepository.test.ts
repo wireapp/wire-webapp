@@ -412,6 +412,44 @@ describe('SelfRepository', () => {
       expect(selfRepository.refreshSelfSupportedProtocols).toHaveBeenCalled();
     });
 
+    it('refreshes self supported protocols after mls feature is enabled', async () => {
+      const selfRepository = await testFactory.exposeSelfActors();
+
+      const currentSupportedProtocols = [ConversationProtocol.PROTEUS, ConversationProtocol.MLS];
+      const currentFeatureStatus = FeatureStatus.DISABLED;
+
+      const newSupportedProtocols = [ConversationProtocol.PROTEUS, ConversationProtocol.MLS];
+      const newFeatureStatus = FeatureStatus.ENABLED;
+
+      const mockedFeatureList: FeatureList = {
+        [FEATURE_KEY.MLS]: {
+          config: generateMLSFeatureConfig(currentSupportedProtocols),
+          status: currentFeatureStatus,
+        },
+      };
+
+      const mockedMLSFeatureUpdateEvent: TeamFeatureConfigurationUpdateEvent = {
+        name: FEATURE_KEY.MLS,
+        team: '',
+        time: '',
+        data: {
+          status: newFeatureStatus,
+          config: generateMLSFeatureConfig(newSupportedProtocols),
+        },
+
+        type: TEAM_EVENT.FEATURE_CONFIG_UPDATE,
+      };
+
+      jest.spyOn(selfRepository, 'refreshSelfSupportedProtocols').mockImplementationOnce(jest.fn());
+
+      selfRepository['teamRepository'].emit('featureUpdated', {
+        event: mockedMLSFeatureUpdateEvent,
+        prevFeatureList: mockedFeatureList,
+      });
+
+      expect(selfRepository.refreshSelfSupportedProtocols).toHaveBeenCalled();
+    });
+
     it('does not refresh self supported protocols if mls feature is updated without supported protocols change', async () => {
       const selfRepository = await testFactory.exposeSelfActors();
 

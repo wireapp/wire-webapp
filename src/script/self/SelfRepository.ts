@@ -66,12 +66,14 @@ export class SelfRepository {
     const prevSupportedProtocols = prevMLSFeature?.config.supportedProtocols ?? [];
     const newSupportedProtocols = newMLSFeature.config.supportedProtocols ?? [];
 
+    const hasFeatureStatusChanged = prevMLSFeature?.status !== newMLSFeature.status;
+
     const hasTeamSupportedProtocolsChanged = !(
       prevSupportedProtocols.length === newSupportedProtocols.length &&
       [...prevSupportedProtocols].every(protocol => newSupportedProtocols.includes(protocol))
     );
 
-    if (hasTeamSupportedProtocolsChanged) {
+    if (hasFeatureStatusChanged || hasTeamSupportedProtocolsChanged) {
       await this.refreshSelfSupportedProtocols();
     }
   };
