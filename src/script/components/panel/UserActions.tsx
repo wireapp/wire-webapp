@@ -24,6 +24,7 @@ import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
+import {Button} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {TeamState} from 'src/script/team/TeamState';
@@ -74,6 +75,7 @@ export interface UserActionsProps {
   onAction: (action: Actions) => void;
   selfUser: User;
   user: User;
+  isModal?: boolean;
   teamState?: TeamState;
 }
 
@@ -99,6 +101,7 @@ const UserActions: React.FC<UserActionsProps> = ({
   onAction,
   conversationRoleRepository,
   selfUser,
+  isModal,
   teamState = container.resolve(TeamState),
 }) => {
   const {
@@ -310,7 +313,7 @@ const UserActions: React.FC<UserActionsProps> = ({
     removeUserFromConversation,
   ].filter((item): item is MenuItem => !!item);
 
-  return <PanelActions items={items} />;
+  return items.length > 1 && !isModal ? <PanelActions items={items} /> : <Button>{items[0].label}</Button>;
 };
 
 export {UserActions};
