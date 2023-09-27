@@ -76,14 +76,15 @@ describe('FailedToAddUsersMessage', () => {
 
   it('shows that multiple users could not be added', async () => {
     const userState = new UserState();
-    const [qualifiedId1, qualifiedId2] = generateQualifiedIds(2, 'test.domain');
+    const [qualifiedId1, qualifiedId2, qualifiedId3] = generateQualifiedIds(3, 'test.domain');
 
     const user1 = createUser(qualifiedId1, 'Virgile');
     const user2 = createUser(qualifiedId2, 'Bardia');
-    userState.users([user1, user2]);
+    const user3 = createUser(qualifiedId3, 'Patryk');
+    userState.users([user1, user2, user3]);
 
     const message = createFailedToAddUsersMessage({
-      users: [qualifiedId1, qualifiedId2],
+      users: [qualifiedId1, qualifiedId2, qualifiedId3],
       reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS,
     });
 
@@ -92,21 +93,22 @@ describe('FailedToAddUsersMessage', () => {
     );
 
     const mainMessage = getAllByText(
-      (_, element) => element?.textContent === '2 participants could not be added to the group.',
+      (_, element) => element?.textContent === '3 participants could not be added to the group.',
     );
     expect(mainMessage.length).toBeGreaterThanOrEqual(1);
   });
 
   it('shows details of failed to add multi users', async () => {
     const userState = new UserState();
-    const [qualifiedId1, qualifiedId2] = generateQualifiedIds(2, 'test.domain');
+    const [qualifiedId1, qualifiedId2, qualifiedId3] = generateQualifiedIds(3, 'test.domain');
 
     const user1 = createUser(qualifiedId1, 'Tim');
     const user2 = createUser(qualifiedId2, 'Adrian');
-    userState.users([user1, user2]);
+    const user3 = createUser(qualifiedId3, 'Przemek');
+    userState.users([user1, user2, user3]);
 
     const message = createFailedToAddUsersMessage({
-      users: [qualifiedId1, qualifiedId2],
+      users: [qualifiedId1, qualifiedId2, qualifiedId3],
       backends: ['test.domain'],
       reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS,
     });
@@ -116,7 +118,7 @@ describe('FailedToAddUsersMessage', () => {
     );
 
     const mainMessage = getAllByText(
-      (_, element) => element?.textContent === '2 participants could not be added to the group.',
+      (_, element) => element?.textContent === '3 participants could not be added to the group.',
     );
 
     expect(mainMessage.length).toBeGreaterThanOrEqual(1);
@@ -130,7 +132,7 @@ describe('FailedToAddUsersMessage', () => {
     const details = getAllByText(
       (_, element) =>
         element?.textContent ===
-        'Adrian and Tim could not be added to the group as the backend of test.domain could not be reached.',
+        'Adrian, Przemek and Tim could not be added to the group as the backend of test.domain could not be reached.',
     );
 
     expect(details.length).toBeGreaterThanOrEqual(1);
@@ -180,8 +182,8 @@ describe('FailedToAddUsersMessage', () => {
     const [qualifiedId1] = generateQualifiedIds(1, 'test.domain');
     const [qualifiedId2] = generateQualifiedIds(1, 'test-2.domain');
 
-    const user1 = createUser(qualifiedId1, 'Tom');
-    const user2 = createUser(qualifiedId2, 'Arjita');
+    const user1 = createUser(qualifiedId1, 'Patryk');
+    const user2 = createUser(qualifiedId2, 'Przemek');
     userState.users([user1, user2]);
 
     const message = createFailedToAddUsersMessage({
@@ -189,7 +191,7 @@ describe('FailedToAddUsersMessage', () => {
       reason: AddUsersFailureReasons.NON_FEDERATING_BACKENDS,
     });
 
-    const {getByTestId, getAllByTestId} = render(
+    const {getByTestId, getAllByText} = render(
       withTheme(<FailedToAddUsersMessage isMessageFocused message={message} userState={userState} />),
     );
 
@@ -202,9 +204,12 @@ describe('FailedToAddUsersMessage', () => {
       toggleButton.click();
     });
 
-    const elementMessageFailedToAddDetails = getAllByTestId('multi-user-not-added-details');
-    expect(elementMessageFailedToAddDetails[0].textContent).toContain(
-      'could not be added to the group as their backends do not federate with each other',
+    const details = getAllByText(
+      (_, element) =>
+        element?.textContent ===
+        'Przemek and Patryk could not be added to the group as their backends do not federate with each other.',
     );
+
+    expect(details.length).toBeGreaterThanOrEqual(1);
   });
 });
