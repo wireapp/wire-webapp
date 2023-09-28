@@ -21,12 +21,19 @@ import React, {CSSProperties} from 'react';
 
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 
-import {CertificateExpiredIcon, CertificateRevoked, MLSVerified, ProteusVerified} from '@wireapp/react-ui-kit';
+import {
+  CertificateExpiredIcon,
+  ExpiresSoon,
+  CertificateRevoked,
+  MLSVerified,
+  ProteusVerified,
+} from '@wireapp/react-ui-kit';
 
 export enum MLSStatuses {
   VALID = 'valid',
   NOT_DOWNLOADED = 'not_downloaded',
   EXPIRED = 'expired',
+  EXPIRES_SOON = 'expires_soon',
 }
 
 interface BadgesProps {
@@ -67,6 +74,7 @@ export const Badges: React.FC<BadgesProps> = ({
 
   const isExpired = MLSStatus === MLSStatuses.EXPIRED;
   const isNotDownloaded = MLSStatus === MLSStatuses.NOT_DOWNLOADED;
+  const isExpiresSoon = MLSStatus === MLSStatuses.EXPIRES_SOON;
 
   const conversationHasProtocol = !!conversationProtocol;
 
@@ -84,7 +92,7 @@ export const Badges: React.FC<BadgesProps> = ({
         <div style={badgeWrapper}>
           {displayTitle && <span style={title(true)}>Verified (End-to-end Identity)</span>}
 
-          {!isExpired && !isNotDownloaded && (
+          {!isExpired && !isNotDownloaded && !isExpiresSoon && (
             <span
               className="with-tooltip with-tooltip--external"
               data-tooltip="Device verified (End-to-end identity)"
@@ -105,6 +113,18 @@ export const Badges: React.FC<BadgesProps> = ({
               data-uie-value={MLSStatuses.EXPIRED}
             >
               <CertificateExpiredIcon data-uie-name="conversation-title-bar-verified-icon" />
+            </span>
+          )}
+
+          {isExpiresSoon && (
+            <span
+              className="with-tooltip with-tooltip--external"
+              data-tooltip="End-to-end identity certificate expires soon"
+              style={iconStyles}
+              data-uie-name="mls-status"
+              data-uie-value={MLSStatuses.EXPIRES_SOON}
+            >
+              <ExpiresSoon data-uie-name="conversation-title-bar-verified-icon" />
             </span>
           )}
 

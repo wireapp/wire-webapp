@@ -21,30 +21,47 @@ import * as x509 from '@peculiar/x509';
 
 import {MLSStatuses} from 'Components/Badges';
 
+// TODO: Will be changed when I get information how much hours before we need to display this status.
+const EXPIRATION_HOURS = 32;
+
 export const getCertificateDetails = (certificate?: string) => {
   const currentDate = new Date();
   const parsedCertificate = certificate ? new x509.X509Certificate(certificate) : null;
   const isValid =
     !!parsedCertificate && currentDate > parsedCertificate.notBefore && currentDate < parsedCertificate.notAfter;
 
+  const expireDate = parsedCertificate?.notAfter ? new Date(parsedCertificate.notAfter) : null;
+  const expirationDate = expireDate ? expireDate.setHours(expireDate.getHours() - EXPIRATION_HOURS) : null;
+  const isExpireSoon = isValid && !!expirationDate && parsedCertificate.notAfter > new Date(expirationDate);
+
   return {
     isNotDownloaded: !certificate,
     isValid,
+    isExpireSoon,
   };
 };
 
 interface GetCertificateState {
   isNotDownloaded?: boolean;
   isValid?: boolean;
+  isExpireSoon?: boolean;
 }
 
-export const getCertificateState = ({isNotDownloaded = false, isValid = false}: GetCertificateState): MLSStatuses => {
+export const getCertificateState = ({
+  isNotDownloaded = false,
+  isValid = false,
+  isExpireSoon = false,
+}: GetCertificateState): MLSStatuses => {
   if (isNotDownloaded) {
     return MLSStatuses.NOT_DOWNLOADED;
   }
 
-  if (isValid) {
+  if (isValid && !isExpireSoon) {
     return MLSStatuses.VALID;
+  }
+
+  if (isValid && isExpireSoon) {
+    return MLSStatuses.EXPIRES_SOON;
   }
 
   return MLSStatuses.EXPIRED;

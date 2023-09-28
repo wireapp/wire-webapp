@@ -542,7 +542,7 @@
   "E2EI.valid": "Valid",
   "E2EI.not_downloaded": "Not downloaded",
   "E2EI.expired": "Expired",
-  "E2EI.expires_soon": "Expires soon",
+  "E2EI.expires_soon": "Valid (expires soon)",
   "E2EI.not_activated": "Not activated",
   "E2EI.serialNumber": "Serial number: ",
   "E2EI.notAvailable": "Not available",

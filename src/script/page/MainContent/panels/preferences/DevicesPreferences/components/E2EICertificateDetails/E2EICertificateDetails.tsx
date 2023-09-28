@@ -45,8 +45,8 @@ export const E2EICertificateDetails = ({
 }: E2EICertificateDetailsProps) => {
   const [isCertificateDetailsModalOpen, setIsCertificateDetailsModalOpen] = useState(false);
 
-  const {isNotDownloaded, isValid} = getCertificateDetails(certificate);
-  const certificateState = getCertificateState({isNotDownloaded, isValid});
+  const {isNotDownloaded, isValid, isExpireSoon} = getCertificateDetails(certificate);
+  const certificateState = getCertificateState({isNotDownloaded, isValid, isExpireSoon});
 
   const updateCertificate = async () => {
     // TODO: Waiting for update certificate implementation
