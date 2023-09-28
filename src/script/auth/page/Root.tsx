@@ -107,7 +107,20 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
   };
 
   const isAuthenticatedCheck = (page: any): any => (page ? (isAuthenticated ? page : navigate('/auth')) : null);
-  const isOAuthCheck = (page: any): any => (page ? isAuthenticated ? page : <Navigate to={ROUTE.LOGIN} /> : null);
+  const isOAuthCheck = (page: any): any => {
+    if (page) {
+      if (isAuthenticated) {
+        return page;
+      }
+
+      if (window.location.hash.startsWith('#/authorize/#/login')) {
+        return <Navigate to={window.location.hash.replace('#/authorize/#', '')} />;
+      }
+
+      return <Navigate to={ROUTE.LOGIN} />;
+    }
+    return null;
+  };
 
   const ProtectedHistoryInfo = () => isAuthenticatedCheck(<HistoryInfo />);
   const ProtectedInitialInvite = () => isAuthenticatedCheck(<InitialInvite />);
