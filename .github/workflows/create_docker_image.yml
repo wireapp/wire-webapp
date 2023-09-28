@@ -1,10 +1,10 @@
-name: Create Docker image
+name: Create Release Artifact
 
 on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'tagname for the Docker image'
+        description: 'tagname for the Artifact'
         required: true
         type: string
 
@@ -13,7 +13,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test_build_deploy:
+  create_image:
     runs-on: ubuntu-latest
 
     steps:
@@ -32,10 +32,24 @@ jobs:
         run: yarn --immutable
 
       - name: Test
-        run: yarn test --coverage --coverage-reporters=lcov --detectOpenHandles=false
+        run: |
+          set -o pipefail
+          yarn test --coverage --coverage-reporters=lcov --detectOpenHandles=false 2>&1 | tee ./unit-tests.log
 
       - name: Build
         run: yarn build:prod
+
+      - name: Create GitHub release
+        id: create_release_production
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{github.token}}
+        with:
+          tag_name: ${{inputs.tag}}
+          name: ${{inputs.tag}}
+          files: ./unit-tests.log
+          draft: false
+          prerelease: true
 
       - name: Push Docker image
         env:
