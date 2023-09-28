@@ -8,6 +8,12 @@ on:
         required: true
         type: string
 
+      create_release:
+        description: 'Wether or not a release entry should be created on github'
+        required: false
+        default: true
+        type: boolean
+
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
@@ -46,6 +52,7 @@ jobs:
         run: yarn docker '' "${{inputs.tag}}"
 
       - name: Create GitHub release
+        if: ${{inputs.create_release}}
         id: create_release_production
         uses: softprops/action-gh-release@v1
         env:
