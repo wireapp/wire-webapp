@@ -21,7 +21,7 @@ import {render} from '@testing-library/react';
 
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 
-import {Badges, MLSStatues} from './Badges';
+import {Badges, MLSStatuses} from './Badges';
 
 describe('Badges', () => {
   const isMLSVerified = true;
@@ -30,7 +30,7 @@ describe('Badges', () => {
     const {getByTestId} = render(withTheme(<Badges isMLSVerified={isMLSVerified} />));
 
     const E2EIdentityStatus = getByTestId('mls-status');
-    expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatues.VALID);
+    expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.VALID);
   });
 
   it('is proteus verified', async () => {
@@ -42,17 +42,17 @@ describe('Badges', () => {
 
   it('is not downloaded', async () => {
     const {getByTestId} = render(
-      withTheme(<Badges isMLSVerified={isMLSVerified} MLSStatus={MLSStatues.NOT_DOWNLOADED} />),
+      withTheme(<Badges isMLSVerified={isMLSVerified} MLSStatus={MLSStatuses.NOT_DOWNLOADED} />),
     );
 
     const E2EIdentityStatus = getByTestId('mls-status');
-    expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatues.NOT_DOWNLOADED);
+    expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.NOT_DOWNLOADED);
   });
 
   it('is expired', async () => {
-    const {getByTestId} = render(withTheme(<Badges isMLSVerified={isMLSVerified} MLSStatus={MLSStatues.EXPIRED} />));
+    const {getByTestId} = render(withTheme(<Badges isMLSVerified={isMLSVerified} MLSStatus={MLSStatuses.EXPIRED} />));
 
     const E2EIdentityStatus = getByTestId('mls-status');
-    expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatues.EXPIRED);
+    expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.EXPIRED);
   });
 });

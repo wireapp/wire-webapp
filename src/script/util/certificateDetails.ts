@@ -19,7 +19,7 @@
 
 import * as x509 from '@peculiar/x509';
 
-import {MLSStatues} from 'Components/Badges';
+import {MLSStatuses} from 'Components/Badges';
 
 const EXPIRATION_HOURS = 32;
 
@@ -50,18 +50,18 @@ export const getCertificateState = ({
   isNotDownloaded = false,
   isValid = false,
   isExpireSoon = false,
-}: GetCertificateState): MLSStatues => {
+}: GetCertificateState): MLSStatuses => {
   if (isNotDownloaded) {
-    return MLSStatues.NOT_DOWNLOADED;
+    return MLSStatuses.NOT_DOWNLOADED;
   }
 
   if (isValid && !isExpireSoon) {
-    return MLSStatues.VALID;
+    return MLSStatuses.VALID;
   }
 
   if (isValid && isExpireSoon) {
-    return MLSStatues.EXPIRES_SOON;
+    return MLSStatuses.EXPIRES_SOON;
   }
 
-  return MLSStatues.EXPIRED;
+  return MLSStatuses.EXPIRED;
 };

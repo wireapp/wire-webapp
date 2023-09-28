@@ -19,20 +19,20 @@
 
 import {CSSObject} from '@emotion/serialize';
 
-import {MLSStatues} from 'Components/Badges';
+import {MLSStatuses} from 'Components/Badges';
 
 const MLSStatusColor = {
-  [MLSStatues.VALID]: 'var(--green-500)',
-  [MLSStatues.EXPIRED]: 'var(--red-500)',
-  [MLSStatues.NOT_DOWNLOADED]: 'var(--red-500)',
-  [MLSStatues.EXPIRES_SOON]: 'var(--green-500)',
+  [MLSStatuses.VALID]: 'var(--green-500)',
+  [MLSStatuses.EXPIRED]: 'var(--red-500)',
+  [MLSStatuses.NOT_DOWNLOADED]: 'var(--red-500)',
+  [MLSStatuses.EXPIRES_SOON]: 'var(--green-500)',
 };
 
 type stylesProps = {
   container: CSSObject;
   title: CSSObject;
   e2eiStatusContainer: CSSObject;
-  e2eiStatus: (MLSStatus?: MLSStatues) => CSSObject;
+  e2eiStatus: (MLSStatus?: MLSStatuses) => CSSObject;
   serialNumberWrapper: CSSObject;
   notAvailable: CSSObject;
   serialNumber: CSSObject;
@@ -58,7 +58,7 @@ export const styles: stylesProps = {
       marginLeft: '4px',
     },
   },
-  e2eiStatus: (MLSStatus?: MLSStatues) => ({
+  e2eiStatus: (MLSStatus?: MLSStatuses) => ({
     color: MLSStatus ? MLSStatusColor[MLSStatus] : 'var(--green-500)',
   }),
   serialNumberWrapper: {
