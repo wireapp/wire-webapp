@@ -27,7 +27,6 @@ import {VerificationMessageType} from 'src/script/message/VerificationMessageTyp
 import {Core} from 'src/script/service/CoreSingleton';
 import {Logger, getLogger} from 'Util/Logger';
 
-import {isMLSConversation} from '../../ConversationSelectors';
 import {ConversationState} from '../../ConversationState';
 import {EventBuilder} from '../../EventBuilder';
 import {getConversationByGroupId, willChangeToDegraded, willChangeToVerified} from '../shared';
@@ -133,11 +132,6 @@ export class MLSConversationVerificationStateHandler {
     const conversationEntity = getConversationByGroupId({conversationState: this.conversationState, groupId});
     if (!conversationEntity) {
       this.logger.error(`Epoch changed but conversationEntity can't be found`);
-      return;
-    }
-    // We only want to process MLS conversations
-    if (!isMLSConversation(conversationEntity)) {
-      this.logger.error(`Epoch changed but conversationEntity is not using MLS protocol`);
       return;
     }
 

@@ -19,6 +19,7 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
+import {isMLSConversation, MLSConversation} from 'src/script/conversation/ConversationSelectors';
 import {ConversationState} from 'src/script/conversation/ConversationState';
 import {ConversationVerificationState} from 'src/script/conversation/ConversationVerificationState';
 import {Conversation} from 'src/script/entity/Conversation';
@@ -53,10 +54,7 @@ export const getActiveConversationsWithUsers = ({
       }
       return undefined;
     })
-    .filter(activeConversationInfo => !!activeConversationInfo) as {
-    conversationEntity: Conversation;
-    userIds: QualifiedId[];
-  }[];
+    .flatMap(activeConversationInfo => (!!activeConversationInfo ? [activeConversationInfo] : []));
 };
 
 interface GetConversationByGroupIdParams {
@@ -66,8 +64,12 @@ interface GetConversationByGroupIdParams {
 export const getConversationByGroupId = ({
   conversationState,
   groupId,
-}: GetConversationByGroupIdParams): Conversation | undefined => {
-  return conversationState.filteredConversations().find(conversation => conversation.groupId === groupId);
+}: GetConversationByGroupIdParams): MLSConversation | undefined => {
+  const conversation = conversationState.filteredConversations().find(conversation => conversation.groupId === groupId);
+  if (conversation && isMLSConversation(conversation)) {
+    return conversation;
+  }
+  return undefined;
 };
 
 /**
