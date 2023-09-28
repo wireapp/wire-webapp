@@ -74,6 +74,7 @@ import {bindActionCreators, RootState} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {QUERY_KEY, ROUTE} from '../route';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
+import {getOAuthQueryString} from '../util/oauthUtil';
 
 type Props = React.HTMLProps<HTMLDivElement> & {
   embedded?: boolean;
@@ -111,7 +112,7 @@ const LoginComponent = ({
   const [verificationCode, setVerificationCode] = useState('');
   const [twoFactorSubmitFailedOnce, setTwoFactorSubmitFailedOnce] = useState(false);
 
-  const isOauth = UrlUtil.hasURLParameter(QUERY_KEY.SCOPE);
+  const isOauth = UrlUtil.hasURLParameter(QUERY_KEY.SCOPE, window.location.hash);
 
   const [showEntropyForm, setShowEntropyForm] = useState(false);
   const isEntropyRequired = Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY;
@@ -182,7 +183,8 @@ const LoginComponent = ({
       await doInitializeClient(ClientType.PERMANENT, undefined, undefined, entropyData);
 
       if (isOauth) {
-        return navigate(ROUTE.AUTHORIZE);
+        const queryString = getOAuthQueryString(window.location);
+        return navigate(`${ROUTE.AUTHORIZE}/${queryString}`);
       }
       return navigate(ROUTE.HISTORY_INFO);
     } catch (error) {
@@ -206,7 +208,9 @@ const LoginComponent = ({
       await doLogin(login, getEntropy);
 
       if (isOauth) {
-        return navigate(ROUTE.AUTHORIZE);
+        const queryString = getOAuthQueryString(window.location);
+
+        return navigate(`${ROUTE.AUTHORIZE}/${queryString}`);
       }
       return navigate(ROUTE.HISTORY_INFO);
     } catch (error) {
