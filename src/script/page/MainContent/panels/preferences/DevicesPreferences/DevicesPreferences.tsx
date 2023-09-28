@@ -37,11 +37,10 @@ import {DeviceDetailsPreferences} from './components/DeviceDetailsPreferences';
 import {ClientState} from '../../../../../client/ClientState';
 import {isMLSConversation} from '../../../../../conversation/ConversationSelectors';
 import {ConversationState} from '../../../../../conversation/ConversationState';
-import {Core} from '../../../../../service/CoreSingleton';
+import {E2EIHandler} from '../../../../../E2EIdentity';
 import {PreferencesPage} from '../components/PreferencesPage';
 
 interface DevicesPreferencesProps {
-  core?: Core;
   clientState: ClientState;
   conversationState: ConversationState;
   cryptographyRepository: CryptographyRepository;
@@ -52,7 +51,6 @@ interface DevicesPreferencesProps {
 }
 
 export const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
-  core = container.resolve(Core),
   clientState = container.resolve(ClientState),
   conversationState = container.resolve(ConversationState),
   cryptographyRepository,
@@ -96,9 +94,8 @@ export const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
 
   const isSSO = selfUser.isNoPasswordSSO;
 
-  const e2eIdentity = core.service?.e2eIdentity;
-  const hasActiveCertificate = e2eIdentity?.hasActiveCertificate();
-  const certificate = hasActiveCertificate ? e2eIdentity?.getCertificateData() : undefined;
+  const e2eiIdentity = E2EIHandler.getInstance();
+  const certificate = e2eiIdentity.getCertificateData();
 
   const selectDevice = async (device: ClientEntity) => {
     setSelectedDevice(device);
@@ -107,9 +104,9 @@ export const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
 
     if (isMLSConversation(selfConversation)) {
       const groupId = selfConversation.groupId;
-      const deviceIdentity = await e2eIdentity?.getUserDeviceEntities(groupId, {[device.id]: selfUser});
+      const deviceIdentity = await e2eiIdentity.getUserDeviceEntities(groupId, {[device.id]: selfUser});
 
-      setSelectedDeviceIdentity(deviceIdentity?.[0]);
+      setSelectedDeviceIdentity(deviceIdentity[0]);
     }
   };
 

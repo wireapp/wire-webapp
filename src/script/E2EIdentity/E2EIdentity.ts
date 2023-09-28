@@ -17,6 +17,7 @@
  *
  */
 
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
 import {PrimaryModal, removeCurrentModal} from 'Components/Modals/PrimaryModal';
@@ -65,6 +66,16 @@ class E2EIHandler {
     });
   }
 
+  private get coreE2EIService() {
+    const e2eiService = this.core.service?.e2eIdentity;
+
+    if (!e2eiService) {
+      throw new Error('E2EI Service not available');
+    }
+
+    return e2eiService;
+  }
+
   /**
    * Get the singleton instance of GracePeriodTimer or create a new one
    * For the first time, params are required to create the instance
@@ -105,7 +116,7 @@ class E2EIHandler {
 
   public initialize(): void {
     if (this.isE2EIEnabled) {
-      if (!this.core.service?.e2eIdentity?.hasActiveCertificate()) {
+      if (!this.hasActiveCertificate()) {
         this.showE2EINotificationMessage();
       }
     }
@@ -130,7 +141,7 @@ class E2EIHandler {
       let oAuthIdToken: string | undefined;
 
       // If the enrollment is in progress, we need to get the id token from the oidc service, since oauth should have already been completed
-      if (this.core.service?.e2eIdentity?.isEnrollmentInProgress()) {
+      if (this.coreE2EIService.isEnrollmentInProgress()) {
         const oidcService = getOIDCServiceInstance();
         const userData = await oidcService.handleAuthentication();
         if (!userData) {
@@ -211,7 +222,7 @@ class E2EIHandler {
     const oidcService = getOIDCServiceInstance();
     await oidcService.clearProgress();
     // Clear the e2e identity progress
-    this.core.service?.e2eIdentity?.clearAllProgress();
+    this.coreE2EIService.clearAllProgress();
 
     const {modalOptions, modalType} = getModalOptions({
       type: ModalType.ERROR,
@@ -231,7 +242,7 @@ class E2EIHandler {
   private showE2EINotificationMessage(): void {
     // If the user has already started enrollment, don't show the notification. Instead, show the loading modal
     // This will occur after the redirect from the oauth provider
-    if (this.core.service?.e2eIdentity?.isEnrollmentInProgress()) {
+    if (this.coreE2EIService.isEnrollmentInProgress()) {
       void this.enrollE2EI();
       return;
     }
@@ -269,6 +280,33 @@ class E2EIHandler {
       });
       PrimaryModal.show(modalType, modalOptions);
     }
+  }
+
+  /**
+   * Checks if E2EI has active certificate.
+   */
+  public hasActiveCertificate() {
+    return this.coreE2EIService.hasActiveCertificate();
+  }
+
+  /**
+   * returns E2EI certificate data.
+   */
+  public getCertificateData() {
+    if (!this.hasActiveCertificate()) {
+      return;
+    }
+
+    return this.coreE2EIService.getCertificateData();
+  }
+
+  /**
+   * @param groupId id of the group
+   * @param clientIdsWithUser client ids with user data
+   * Returns devices E2EI certificates
+   */
+  public async getUserDeviceEntities(groupId: string | Uint8Array, clientIdsWithUser: Record<string, QualifiedId>) {
+    return this.coreE2EIService.getUserDeviceEntities(groupId, clientIdsWithUser);
   }
 }
 

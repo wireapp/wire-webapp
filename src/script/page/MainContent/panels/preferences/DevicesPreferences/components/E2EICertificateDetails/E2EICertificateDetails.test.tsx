@@ -19,7 +19,7 @@
 
 import {render} from '@testing-library/react';
 
-import {MLSStatues} from 'Components/Badges';
+import {MLSStatuses} from 'Components/Badges';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 
 import {E2EICertificateDetails} from './E2EICertificateDetails';
@@ -42,7 +42,7 @@ describe('E2ECertificateDetails', () => {
     );
 
     const E2EIdentityStatus = getByTestId('e2e-identity-status');
-    expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatues.NOT_DOWNLOADED);
+    expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.NOT_DOWNLOADED);
   });
 
   it('is e2e identity expired', async () => {
@@ -51,6 +51,6 @@ describe('E2ECertificateDetails', () => {
     );
 
     const E2EIdentityStatus = getByTestId('e2e-identity-status');
-    expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatues.EXPIRED);
+    expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.EXPIRED);
   });
 });

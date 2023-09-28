@@ -23,7 +23,7 @@ import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 
 import {CertificateExpiredIcon, CertificateRevoked, MLSVerified, ProteusVerified} from '@wireapp/react-ui-kit';
 
-export enum MLSStatues {
+export enum MLSStatuses {
   VALID = 'valid',
   NOT_DOWNLOADED = 'not_downloaded',
   EXPIRED = 'expired',
@@ -33,7 +33,7 @@ interface BadgesProps {
   conversationProtocol?: ConversationProtocol;
   isMLSVerified?: boolean;
   isProteusVerified?: boolean;
-  MLSStatus?: MLSStatues;
+  MLSStatus?: MLSStatuses;
   displayTitle?: boolean;
 }
 
@@ -65,8 +65,8 @@ export const Badges: React.FC<BadgesProps> = ({
     return null;
   }
 
-  const isExpired = MLSStatus === MLSStatues.EXPIRED;
-  const isNotDownloaded = MLSStatus === MLSStatues.NOT_DOWNLOADED;
+  const isExpired = MLSStatus === MLSStatuses.EXPIRED;
+  const isNotDownloaded = MLSStatus === MLSStatuses.NOT_DOWNLOADED;
 
   const conversationHasProtocol = !!conversationProtocol;
 
@@ -90,7 +90,7 @@ export const Badges: React.FC<BadgesProps> = ({
               data-tooltip="Device verified (End-to-end identity)"
               style={iconStyles}
               data-uie-name="mls-status"
-              data-uie-value={MLSStatues.VALID}
+              data-uie-value={MLSStatuses.VALID}
             >
               <MLSVerified data-uie-name="conversation-title-bar-verified-icon" />
             </span>
@@ -102,7 +102,7 @@ export const Badges: React.FC<BadgesProps> = ({
               data-tooltip="End-to-end identity certificate expired"
               style={iconStyles}
               data-uie-name="mls-status"
-              data-uie-value={MLSStatues.EXPIRED}
+              data-uie-value={MLSStatuses.EXPIRED}
             >
               <CertificateExpiredIcon data-uie-name="conversation-title-bar-verified-icon" />
             </span>
@@ -114,7 +114,7 @@ export const Badges: React.FC<BadgesProps> = ({
               data-tooltip="End-to-end identity certificate revoked"
               style={iconStyles}
               data-uie-name="mls-status"
-              data-uie-value={MLSStatues.NOT_DOWNLOADED}
+              data-uie-value={MLSStatuses.NOT_DOWNLOADED}
             >
               <CertificateRevoked data-uie-name="conversation-title-bar-verified-icon" />
             </span>

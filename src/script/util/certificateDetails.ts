@@ -19,7 +19,7 @@
 
 import * as x509 from '@peculiar/x509';
 
-import {MLSStatues} from 'Components/Badges';
+import {MLSStatuses} from 'Components/Badges';
 
 export const getCertificateDetails = (certificate?: string) => {
   const currentDate = new Date();
@@ -38,14 +38,14 @@ interface GetCertificateState {
   isValid?: boolean;
 }
 
-export const getCertificateState = ({isNotDownloaded = false, isValid = false}: GetCertificateState): MLSStatues => {
+export const getCertificateState = ({isNotDownloaded = false, isValid = false}: GetCertificateState): MLSStatuses => {
   if (isNotDownloaded) {
-    return MLSStatues.NOT_DOWNLOADED;
+    return MLSStatuses.NOT_DOWNLOADED;
   }
 
   if (isValid) {
-    return MLSStatues.VALID;
+    return MLSStatuses.VALID;
   }
 
-  return MLSStatues.EXPIRED;
+  return MLSStatuses.EXPIRED;
 };
