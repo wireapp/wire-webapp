@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [42.8.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.7.0...@wireapp/core@42.8.0) (2023-09-28)
+
+### Features
+
+* recover from mls stale message error ([#5497](https://github.com/wireapp/wire-web-packages/issues/5497)) ([7d70999](https://github.com/wireapp/wire-web-packages/commit/7d7099968b9e92a93974da683400868ed04cd535))
+
 # [42.7.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.6.2...@wireapp/core@42.7.0) (2023-09-26)
 
 ### Features
