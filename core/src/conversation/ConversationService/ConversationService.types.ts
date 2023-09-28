@@ -90,6 +90,7 @@ export type ProtocolParam = {
  */
 export type SendCommonParams = ProtocolParam & {
   payload: GenericMessage;
+  conversationId: QualifiedId;
 };
 
 export type SendMlsMessageParams = SendCommonParams & {

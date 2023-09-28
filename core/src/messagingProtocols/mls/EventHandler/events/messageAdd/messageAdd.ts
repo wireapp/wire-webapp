@@ -33,7 +33,7 @@ interface HandleMLSMessageAddParams {
 export const handleMLSMessageAdd = async ({
   event,
   mlsService,
-}: HandleMLSMessageAddParams): Promise<HandledEventPayload | undefined> => {
+}: HandleMLSMessageAddParams): Promise<HandledEventPayload | null> => {
   const encryptedData = Decoder.fromBase64(event.data).asBytes;
 
   const qualifiedConversationId = event.qualified_conversation ?? {id: event.conversation, domain: ''};
@@ -79,5 +79,5 @@ export const handleMLSMessageAdd = async ({
     mlsService.emit('newEpoch', {groupId, epoch: newEpoch});
   }
 
-  return message ? {event, decryptedData: GenericMessage.decode(message)} : undefined;
+  return message ? {event, decryptedData: GenericMessage.decode(message)} : null;
 };
