@@ -38,8 +38,6 @@ export type ProteusServiceConfig = {
 
 export type SendProteusMessageParams = SendCommonParams &
   MessageSendingOptions & {
-    conversationId: QualifiedId;
-
     /**
      * Can be either a QualifiedId[] or QualfiedUserClients. The type has some effect on the behavior of the method. (Needed only for Proteus)
      *    When given a QualifiedId[] the method will fetch the freshest list of devices for those users (since they are not given by the consumer). As a consequence no ClientMismatch error will trigger and we will ignore missing clients when sending

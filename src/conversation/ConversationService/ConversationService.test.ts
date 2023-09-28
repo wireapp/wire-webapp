@@ -20,7 +20,9 @@
 import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client';
 import {Conversation, ConversationProtocol, MLSConversation} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_EVENT, ConversationMLSMessageAddEvent} from '@wireapp/api-client/lib/event';
+import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {APIClient} from '@wireapp/api-client';
 import {GenericMessage} from '@wireapp/protocol-messaging';
@@ -161,11 +163,50 @@ describe('ConversationService', () => {
           protocol: ConversationProtocol.MLS,
           groupId,
           payload: message,
+          conversationId: {id: '', domain: ''},
         });
 
         const result = await promise;
         expect(result.state).toBe(MessageSendingState.OUTGOING_SENT);
       });
+    });
+
+    it('rejoins a MLS group when failed encrypting MLS message', async () => {
+      const [conversationService, {apiClient, mlsService}] = buildConversationService();
+
+      const mockGroupId = 'AAEAAH87aajaQ011i+rNLmwpy0sAZGl5YS53aXJlamxpbms=';
+      const mockConversationId = {id: 'mockConversationId', domain: 'staging.zinfra.io'};
+      const mockedMessage = MessageBuilder.buildTextMessage({text: 'test'});
+
+      jest
+        .spyOn(apiClient.api.conversation, 'postMlsMessage')
+        .mockRejectedValueOnce(new BackendError('', BackendErrorLabel.MLS_STALE_MESSAGE, HTTP_STATUS.CONFLICT));
+
+      const remoteEpoch = 5;
+      const localEpoch = 4;
+
+      jest.spyOn(mlsService, 'conversationExists').mockResolvedValueOnce(true);
+      jest.spyOn(mlsService, 'getEpoch').mockResolvedValueOnce(localEpoch);
+
+      jest.spyOn(apiClient.api.conversation, 'getConversation').mockResolvedValueOnce({
+        qualified_id: mockConversationId,
+        protocol: ConversationProtocol.MLS,
+        epoch: remoteEpoch,
+        group_id: mockGroupId,
+      } as unknown as Conversation);
+
+      await conversationService.send({
+        protocol: ConversationProtocol.MLS,
+        groupId: mockGroupId,
+        payload: mockedMessage,
+        conversationId: mockConversationId,
+      });
+
+      expect(conversationService.joinByExternalCommit).toHaveBeenCalledWith(mockConversationId);
+      expect(conversationService.emit).toHaveBeenCalledWith('MLSConversationRecovered', {
+        conversationId: mockConversationId,
+      });
+      expect(apiClient.api.conversation.postMlsMessage).toHaveBeenCalledTimes(2);
     });
   });
 
