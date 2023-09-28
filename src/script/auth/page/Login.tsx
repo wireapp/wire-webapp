@@ -74,6 +74,7 @@ import {bindActionCreators, RootState} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {QUERY_KEY, ROUTE} from '../route';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
+import {getOAuthQueryString} from '../util/oauthUtil';
 
 type Props = React.HTMLProps<HTMLDivElement> & {
   embedded?: boolean;
@@ -180,11 +181,10 @@ const LoginComponent = ({
       await doInit({isImmediateLogin: true, shouldValidateLocalClient: false});
       const entropyData = await getEntropy?.();
       await doInitializeClient(ClientType.PERMANENT, undefined, undefined, entropyData);
-      const hash = window.location.hash;
-      const queryParamIndex = hash.indexOf('?');
 
       if (isOauth) {
-        return navigate(`${ROUTE.AUTHORIZE}/${hash.substring(queryParamIndex)}`);
+        const queryString = getOAuthQueryString(window.location);
+        return navigate(`${ROUTE.AUTHORIZE}/${queryString}`);
       }
       return navigate(ROUTE.HISTORY_INFO);
     } catch (error) {
@@ -208,9 +208,9 @@ const LoginComponent = ({
       await doLogin(login, getEntropy);
 
       if (isOauth) {
-        const hash = window.location.hash;
-        const queryParamIndex = hash.indexOf('?');
-        return navigate(`${ROUTE.AUTHORIZE}/${hash.substring(queryParamIndex)}`);
+        const queryString = getOAuthQueryString(window.location);
+
+        return navigate(`${ROUTE.AUTHORIZE}/${queryString}`);
       }
       return navigate(ROUTE.HISTORY_INFO);
     } catch (error) {

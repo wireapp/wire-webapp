@@ -60,6 +60,7 @@ import {bindActionCreators, RootState} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as LanguageSelector from '../module/selector/LanguageSelector';
 import {ROUTE} from '../route';
+import {getOAuthQueryString} from '../util/oauthUtil';
 
 interface RootProps {}
 
@@ -115,14 +116,8 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
         return page;
       }
 
-      const hash = window.location.hash;
-      const queryParamIndex = hash.indexOf('?');
-
-      if (hash && queryParamIndex > 0) {
-        return <Navigate to={`${ROUTE.LOGIN}/${hash.substring(queryParamIndex)}`} />;
-      }
-
-      return <Navigate to={ROUTE.LOGIN} />;
+      const queryString = getOAuthQueryString(window.location);
+      return queryString ? <Navigate to={`${ROUTE.LOGIN}/${queryString}`} /> : <Navigate to={ROUTE.LOGIN} />;
     }
     return null;
   };
