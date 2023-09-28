@@ -45,7 +45,7 @@ export class RuntimeAction {
       const isOutlookApp = () => {
         return Runtime.getBrowserName() === outlookBrowser;
       };
-      const isAuthorizationFlow = () => location?.search?.includes(QUERY_KEY.SCOPE) ?? false;
+      const isAuthorizationFlow = () => location?.hash?.includes(QUERY_KEY.SCOPE) ?? false;
       if (
         (!RuntimeSelector.hasToUseDesktopApplication(getState()) && Runtime.isWebappSupportedBrowser()) ||
         ((isMobileSupportedBrowser() || isOutlookApp()) && isAuthorizationFlow())
