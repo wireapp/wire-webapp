@@ -180,9 +180,11 @@ const LoginComponent = ({
       await doInit({isImmediateLogin: true, shouldValidateLocalClient: false});
       const entropyData = await getEntropy?.();
       await doInitializeClient(ClientType.PERMANENT, undefined, undefined, entropyData);
+      const hash = window.location.hash;
+      const queryParamIndex = hash.indexOf('?');
 
       if (isOauth) {
-        return navigate(`${ROUTE.AUTHORIZE}/${window.location.hash}`);
+        return navigate(`${ROUTE.AUTHORIZE}/${hash.substring(queryParamIndex)}`);
       }
       return navigate(ROUTE.HISTORY_INFO);
     } catch (error) {
@@ -206,7 +208,9 @@ const LoginComponent = ({
       await doLogin(login, getEntropy);
 
       if (isOauth) {
-        return navigate(`${ROUTE.AUTHORIZE}/${window.location.hash}`);
+        const hash = window.location.hash;
+        const queryParamIndex = hash.indexOf('?');
+        return navigate(`${ROUTE.AUTHORIZE}/${hash.substring(queryParamIndex)}`);
       }
       return navigate(ROUTE.HISTORY_INFO);
     } catch (error) {

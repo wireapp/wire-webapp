@@ -115,8 +115,11 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
         return page;
       }
 
-      if (window.location.hash.startsWith('#/authorize/#/login')) {
-        return <Navigate to={window.location.hash.replace('#/authorize/#', '')} />;
+      const hash = window.location.hash;
+      const queryParamIndex = hash.indexOf('?');
+
+      if (hash && queryParamIndex > 0) {
+        return <Navigate to={`${ROUTE.LOGIN}/${hash.substring(queryParamIndex)}`} />;
       }
 
       return <Navigate to={ROUTE.LOGIN} />;

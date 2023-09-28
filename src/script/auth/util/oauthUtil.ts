@@ -27,11 +27,9 @@ import {Scope} from '../page/OAuthPermissions';
  * @returns OAuthBody
  */
 export const oAuthParams = (location: Location) => {
-  const params = new URLSearchParams(
-    location.hash.startsWith('#/authorize/#/login?')
-      ? location.hash.replace('#/authorize/#/login?', '')
-      : location.hash,
-  );
+  const hash = window.location.hash;
+  const queryParamIndex = hash.indexOf('?');
+  const params = new URLSearchParams(queryParamIndex > 0 ? hash.substring(queryParamIndex) : location.hash);
   return Object.fromEntries(params) as unknown as OAuthBody;
 };
 
