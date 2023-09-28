@@ -25,6 +25,7 @@ const MLSStatusColor = {
   [MLSStatues.VALID]: 'var(--green-500)',
   [MLSStatues.EXPIRED]: 'var(--red-500)',
   [MLSStatues.NOT_DOWNLOADED]: 'var(--red-500)',
+  [MLSStatues.EXPIRES_SOON]: 'var(--green-500)',
 };
 
 type stylesProps = {

@@ -100,17 +100,23 @@ export const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
   const hasActiveCertificate = e2eIdentity?.hasActiveCertificate();
   const certificate = hasActiveCertificate ? e2eIdentity?.getCertificateData() : undefined;
 
-  const selectDevice = async (device: ClientEntity) => {
+  const selectDevice = async (device: ClientEntity, deviceIdentity?: WireIdentity) => {
     setSelectedDevice(device);
 
+    if (deviceIdentity) {
+      setSelectedDeviceIdentity(deviceIdentity);
+    }
+  };
+
+  const getDeviceIdentity = async (deviceId: string) => {
     const selfConversation = conversationState?.getSelfMLSConversation();
 
-    if (isMLSConversation(selfConversation)) {
-      const groupId = selfConversation.groupId;
-      const deviceIdentity = await e2eIdentity?.getUserDeviceEntities(groupId, {[device.id]: selfUser});
-
-      setSelectedDeviceIdentity(deviceIdentity?.[0]);
+    if (!isMLSConversation(selfConversation)) {
+      return null;
     }
+
+    const groupId = selfConversation.groupId;
+    return e2eIdentity?.getUserDeviceEntities(groupId, {[deviceId]: selfUser});
   };
 
   return (
@@ -139,6 +145,7 @@ export const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
               onSelect={selectDevice}
               onRemove={removeDevice}
               deviceNumber={++index}
+              getDeviceIdentity={getDeviceIdentity}
             />
           ))}
           <p className="preferences-detail">{t('preferencesDevicesActiveDetail')}</p>

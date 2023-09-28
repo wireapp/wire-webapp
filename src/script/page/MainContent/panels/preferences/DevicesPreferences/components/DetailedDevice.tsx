@@ -44,14 +44,15 @@ export const DetailedDevice: React.FC<DeviceProps> = ({
   isProteusVerified = false,
 }) => {
   const mlsFingerprint = device.mlsPublicKeys?.[MLSPublicKeys.ED25519];
-  const {isNotDownloaded, isValid} = getCertificateDetails(certificate);
-  const certificateState = getCertificateState({isNotDownloaded, isValid});
+  const {isNotDownloaded, isValid, isExpireSoon} = getCertificateDetails(certificate);
+  const certificateState = getCertificateState({isNotDownloaded, isValid, isExpireSoon});
 
   return (
     <>
       <h3 className="preferences-devices-model preferences-devices-model-name" data-uie-name="device-model">
         <span>{device.model}</span>
 
+        {/* Badges to display: None, Proteus, MLS (Valid), MLS (Not Activated), MLS (Expires Soon), MLS (Expired), , MLS (Revoked) */}
         <Badges isProteusVerified={isProteusVerified} isMLSVerified={!!mlsFingerprint} MLSStatus={certificateState} />
       </h3>
 
