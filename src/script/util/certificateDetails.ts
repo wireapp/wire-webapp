@@ -21,6 +21,7 @@ import * as x509 from '@peculiar/x509';
 
 import {MLSStatuses} from 'Components/Badges';
 
+// TODO: Will be changed when I get information how much hours before we need to display this status.
 const EXPIRATION_HOURS = 32;
 
 export const getCertificateDetails = (certificate?: string) => {
