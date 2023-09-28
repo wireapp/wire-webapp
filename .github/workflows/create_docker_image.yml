@@ -39,6 +39,12 @@ jobs:
       - name: Build
         run: yarn build:prod
 
+      - name: Push Docker image
+        env:
+          DOCKER_PASSWORD: ${{secrets.WEBTEAM_QUAY_PASSWORD}}
+          DOCKER_USERNAME: ${{secrets.WEBTEAM_QUAY_USERNAME}}
+        run: yarn docker '' "${{inputs.tag}}"
+
       - name: Create GitHub release
         id: create_release_production
         uses: softprops/action-gh-release@v1
@@ -50,9 +56,3 @@ jobs:
           files: ./unit-tests.log
           draft: false
           prerelease: true
-
-      - name: Push Docker image
-        env:
-          DOCKER_PASSWORD: ${{secrets.WEBTEAM_QUAY_PASSWORD}}
-          DOCKER_USERNAME: ${{secrets.WEBTEAM_QUAY_USERNAME}}
-        run: yarn docker '' "${{inputs.tag}}"
