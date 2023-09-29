@@ -24,7 +24,7 @@ const OIDCServiceStore = {
     targetURL: (url: string) => localStorage.setItem(TargetURLKey, url),
   },
   get: {
-    targetURL: () => Number(localStorage.getItem(TargetURLKey)),
+    targetURL: () => localStorage.getItem(TargetURLKey),
   },
   has: {
     targetURL: () => localStorage.getItem(TargetURLKey) !== null,

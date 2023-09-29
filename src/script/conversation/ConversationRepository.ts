@@ -91,7 +91,8 @@ import {ConversationStateHandler} from './ConversationStateHandler';
 import {ConversationStatus} from './ConversationStatus';
 import {ConversationVerificationState} from './ConversationVerificationState';
 import {ProteusConversationVerificationStateHandler} from './ConversationVerificationStateHandler';
-import {MLSConversationVerificationStateHandler} from './ConversationVerificationStateHandler/MLS';
+import {registerMLSConversationVerificationStateHandler} from './ConversationVerificationStateHandler/MLS';
+import {OnConversationVerificationStateChange} from './ConversationVerificationStateHandler/shared';
 import {EventMapper} from './EventMapper';
 import {MessageRepository} from './MessageRepository';
 import {NOTIFICATION_STATE} from './NotificationSetting';
@@ -273,12 +274,16 @@ export class ConversationRepository {
 
     // we register and store a handler, that we can manually trigger for incoming events from proteus and mixed conversations
     this.proteusVerificationStateHandler = new ProteusConversationVerificationStateHandler(
-      this.eventRepository,
+      this.onConversationVerificationStateChange,
       this.userState,
       this.conversationState,
     );
     // we register a handler that will handle MLS conversations on its own
-    new MLSConversationVerificationStateHandler(this.eventRepository, this.conversationState, this.core);
+    registerMLSConversationVerificationStateHandler(
+      this.onConversationVerificationStateChange,
+      this.conversationState,
+      this.core,
+    );
 
     this.isBlockingNotificationHandling = true;
     this.conversationsWithNewEvents = new Map();
@@ -1561,6 +1566,30 @@ export class ConversationRepository {
   //##############################################################################
   // Send events
   //##############################################################################
+
+  private onConversationVerificationStateChange: OnConversationVerificationStateChange = async ({
+    conversationEntity,
+    conversationVerificationState,
+    verificationMessageType,
+    userIds = [],
+  }) => {
+    switch (conversationVerificationState) {
+      case ConversationVerificationState.VERIFIED:
+        const allVerifiedEvent = EventBuilder.buildAllVerified(conversationEntity);
+        await this.eventRepository.injectEvent(allVerifiedEvent);
+        break;
+      case ConversationVerificationState.DEGRADED:
+        if (verificationMessageType) {
+          const event = EventBuilder.buildDegraded(conversationEntity, userIds, verificationMessageType);
+          await this.eventRepository.injectEvent(event);
+        } else {
+          this.logger.error('onConversationVerificationStateChange: Missing verificationMessageType while degrading');
+        }
+        break;
+      default:
+        break;
+    }
+  };
 
   /**
    * Add users to an existing conversation.

@@ -17,5 +17,16 @@
  *
  */
 
-export * from './conversation';
-export * from './changeHandler';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
+
+import {ConversationVerificationState} from 'src/script/conversation/ConversationVerificationState';
+import {Conversation} from 'src/script/entity/Conversation';
+import {VerificationMessageType} from 'src/script/message/VerificationMessageType';
+
+interface OnConversationVerificationStateChangeParams {
+  conversationEntity: Conversation;
+  conversationVerificationState: ConversationVerificationState;
+  verificationMessageType?: VerificationMessageType;
+  userIds?: QualifiedId[];
+}
+export type OnConversationVerificationStateChange = (params: OnConversationVerificationStateChangeParams) => void;

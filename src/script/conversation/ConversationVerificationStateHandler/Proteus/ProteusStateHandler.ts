@@ -25,7 +25,6 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ClientEntity} from 'src/script/client';
 import {Conversation} from 'src/script/entity/Conversation';
-import {EventRepository} from 'src/script/event/EventRepository';
 import {VerificationMessageType} from 'src/script/message/VerificationMessageType';
 import {UserState} from 'src/script/user/UserState';
 import {getLogger, Logger} from 'Util/Logger';
@@ -33,14 +32,18 @@ import {getLogger, Logger} from 'Util/Logger';
 import {isMixedConversation, isProteusConversation} from '../../ConversationSelectors';
 import {ConversationState} from '../../ConversationState';
 import {ConversationVerificationState} from '../../ConversationVerificationState';
-import {EventBuilder} from '../../EventBuilder';
-import {getActiveConversationsWithUsers, willChangeToDegraded, willChangeToVerified} from '../shared';
+import {
+  getActiveConversationsWithUsers,
+  attemptChangeToVerified,
+  attemptChangeToDegraded,
+  OnConversationVerificationStateChange,
+} from '../shared';
 
 export class ProteusConversationVerificationStateHandler {
   private readonly logger: Logger;
 
   constructor(
-    private readonly eventRepository: EventRepository,
+    private readonly onConversationVerificationStateChange: OnConversationVerificationStateChange,
     private readonly userState = container.resolve(UserState),
     private readonly conversationState = container.resolve(ConversationState),
   ) {
@@ -151,9 +154,13 @@ export class ProteusConversationVerificationStateHandler {
   private checkChangeToVerified(conversationEntity: Conversation): boolean {
     // We want to process only Proteus and Mixed conversations
     if (isProteusConversation(conversationEntity) || isMixedConversation(conversationEntity)) {
-      if (willChangeToVerified({conversationEntity, logger: this.logger})) {
-        const allVerifiedEvent = EventBuilder.buildAllVerified(conversationEntity);
-        this.eventRepository.injectEvent(allVerifiedEvent);
+      const conversationVerificationState = attemptChangeToVerified({conversationEntity, logger: this.logger});
+
+      if (conversationVerificationState) {
+        this.onConversationVerificationStateChange({
+          conversationEntity,
+          conversationVerificationState,
+        });
         return true;
       }
     }
@@ -177,13 +184,13 @@ export class ProteusConversationVerificationStateHandler {
     // We want to process only Proteus and MLS conversations
     if (isProteusConversation(conversationEntity) || isMixedConversation(conversationEntity)) {
       const shouldShowDegradationWarning = type !== VerificationMessageType.UNVERIFIED;
-      const isConversationDegraded = willChangeToDegraded({
+      const conversationVerificationState = attemptChangeToDegraded({
         conversationEntity,
         shouldShowDegradationWarning,
         logger: this.logger,
       });
 
-      if (isConversationDegraded) {
+      if (conversationVerificationState) {
         /**
          * TEMPORARY DEBUGGING FIX:
          * We have seen conversations in a degraded state without an unverified device in there.
@@ -198,8 +205,12 @@ export class ProteusConversationVerificationStateHandler {
           throw new Error('Conversation degraded without affected users');
         }
 
-        const event = EventBuilder.buildDegraded(conversationEntity, userIds, type);
-        this.eventRepository.injectEvent(event);
+        this.onConversationVerificationStateChange({
+          conversationEntity,
+          conversationVerificationState,
+          userIds,
+          verificationMessageType: type,
+        });
 
         return true;
       }

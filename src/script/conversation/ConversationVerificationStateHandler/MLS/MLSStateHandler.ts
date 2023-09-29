@@ -22,20 +22,23 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
 import {Conversation} from 'src/script/entity/Conversation';
-import {EventRepository} from 'src/script/event/EventRepository';
 import {VerificationMessageType} from 'src/script/message/VerificationMessageType';
 import {Core} from 'src/script/service/CoreSingleton';
 import {Logger, getLogger} from 'Util/Logger';
 
 import {ConversationState} from '../../ConversationState';
-import {EventBuilder} from '../../EventBuilder';
-import {getConversationByGroupId, willChangeToDegraded, willChangeToVerified} from '../shared';
+import {
+  getConversationByGroupId,
+  attemptChangeToDegraded,
+  attemptChangeToVerified,
+  OnConversationVerificationStateChange,
+} from '../shared';
 
 export class MLSConversationVerificationStateHandler {
   private readonly logger: Logger;
 
   public constructor(
-    private readonly eventRepository: EventRepository,
+    private readonly onConversationVerificationStateChange: OnConversationVerificationStateChange,
     private readonly conversationState = container.resolve(ConversationState),
     private readonly core = container.resolve(Core),
   ) {
@@ -61,14 +64,17 @@ export class MLSConversationVerificationStateHandler {
    */
   private degradeConversation = async (conversationEntity: Conversation, userIds: QualifiedId[]) => {
     this.logger.log(`Conversation ${conversationEntity.name} will be degraded`);
-    const statusChanged = willChangeToDegraded({
+    const conversationVerificationState = attemptChangeToDegraded({
       conversationEntity,
       logger: this.logger,
     });
-    if (statusChanged) {
-      const type = VerificationMessageType.UNVERIFIED;
-      const event = EventBuilder.buildDegraded(conversationEntity, userIds, type);
-      await this.eventRepository.injectEvent(event);
+    if (conversationVerificationState) {
+      this.onConversationVerificationStateChange({
+        conversationEntity,
+        conversationVerificationState,
+        verificationMessageType: VerificationMessageType.UNVERIFIED,
+        userIds,
+      });
     }
   };
 
@@ -79,10 +85,14 @@ export class MLSConversationVerificationStateHandler {
    */
   private verifyConversation = async (conversationEntity: Conversation) => {
     this.logger.log(`Conversation ${conversationEntity.name} will be verified`);
-    const statusChanged = willChangeToVerified({conversationEntity, logger: this.logger});
-    if (statusChanged) {
-      const allVerifiedEvent = EventBuilder.buildAllVerified(conversationEntity);
-      await this.eventRepository.injectEvent(allVerifiedEvent);
+
+    const conversationVerificationState = attemptChangeToVerified({conversationEntity, logger: this.logger});
+
+    if (conversationVerificationState) {
+      this.onConversationVerificationStateChange({
+        conversationEntity,
+        conversationVerificationState,
+      });
     }
   };
 
@@ -157,3 +167,11 @@ export class MLSConversationVerificationStateHandler {
     return this.verifyConversation(conversationEntity);
   }
 }
+
+export const registerMLSConversationVerificationStateHandler = (
+  onConversationVerificationStateChange: OnConversationVerificationStateChange,
+  conversationState?: ConversationState,
+  core?: Core,
+): void => {
+  new MLSConversationVerificationStateHandler(onConversationVerificationStateChange, conversationState, core);
+};

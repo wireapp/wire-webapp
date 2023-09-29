@@ -79,35 +79,36 @@ export const getConversationByGroupId = ({
  * @param shouldShowDegradationWarning Should a modal warn about the degradation?
  * @returns `true` if conversation state changed to degraded
  */
-interface WillChangeToDegradedParams {
+interface AttemptChangeToDegradedParams {
   conversationEntity: Conversation;
   shouldShowDegradationWarning?: boolean;
   logger: Logger;
 }
-export const willChangeToDegraded = ({
+export const attemptChangeToDegraded = ({
   conversationEntity,
   logger,
   shouldShowDegradationWarning = true,
-}: WillChangeToDegradedParams): boolean => {
+}: AttemptChangeToDegradedParams): ConversationVerificationState | undefined => {
   const state = conversationEntity.verification_state();
-  const isDegraded = state === ConversationVerificationState.DEGRADED;
+  const isAlreadyDegraded = state === ConversationVerificationState.DEGRADED;
 
-  if (isDegraded) {
-    return false;
+  if (isAlreadyDegraded) {
+    return undefined;
   }
 
   // Explicit Boolean check to prevent state changes on undefined
   const isStateVerified = state === ConversationVerificationState.VERIFIED;
   const isConversationUnverified = conversationEntity.is_verified() === false;
   if (isStateVerified && isConversationUnverified) {
-    conversationEntity.verification_state(
-      shouldShowDegradationWarning ? ConversationVerificationState.DEGRADED : ConversationVerificationState.UNVERIFIED,
-    );
+    const conversationVerificationState = shouldShowDegradationWarning
+      ? ConversationVerificationState.DEGRADED
+      : ConversationVerificationState.UNVERIFIED;
+    conversationEntity.verification_state(conversationVerificationState);
     logger.log(`Verification of conversation '${conversationEntity.id}' changed to degraded`);
-    return true;
+    return conversationVerificationState;
   }
 
-  return false;
+  return undefined;
 };
 
 /**
@@ -116,15 +117,19 @@ export const willChangeToDegraded = ({
  * @param conversationEntity Conversation entity to evaluate
  * @returns `true` if conversation state changed to verified
  */
-interface WillChangeToVerifiedParams {
+interface AttemptChangeToVerifiedParams {
   conversationEntity: Conversation;
   logger: Logger;
 }
-export const willChangeToVerified = ({conversationEntity, logger}: WillChangeToVerifiedParams): boolean => {
+export const attemptChangeToVerified = ({
+  conversationEntity,
+  logger,
+}: AttemptChangeToVerifiedParams): ConversationVerificationState | undefined => {
   const state = conversationEntity.verification_state();
-  const isStateVerified = state === ConversationVerificationState.VERIFIED;
-  if (isStateVerified) {
-    return false;
+  const isAlreadyVerified = state === ConversationVerificationState.VERIFIED;
+
+  if (isAlreadyVerified) {
+    return undefined;
   }
 
   // Explicit Boolean check to prevent state changes on undefined
@@ -132,8 +137,8 @@ export const willChangeToVerified = ({conversationEntity, logger}: WillChangeToV
   if (isConversationVerified) {
     conversationEntity.verification_state(ConversationVerificationState.VERIFIED);
     logger.log(`Verification state of conversation '${conversationEntity.id}' changed to verified`);
-    return true;
+    return ConversationVerificationState.VERIFIED;
   }
 
-  return false;
+  return undefined;
 };
