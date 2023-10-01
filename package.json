@@ -84,7 +84,7 @@
     "@types/react-dom": "18.2.8",
     "@types/react-redux": "7.1.26",
     "@types/react-transition-group": "4.4.6",
-    "@types/redux-mock-store": "1.0.3",
+    "@types/redux-mock-store": "1.0.4",
     "@types/seedrandom": "^3",
     "@types/sinon": "10.0.16",
     "@types/speakingurl": "13.0.4",
