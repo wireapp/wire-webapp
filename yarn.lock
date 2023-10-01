@@ -4902,7 +4902,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-transition-group@npm:4.4.6, @types/react-transition-group@npm:^4.4.0":
+"@types/react-transition-group@npm:4.4.7":
+  version: 4.4.7
+  resolution: "@types/react-transition-group@npm:4.4.7"
+  dependencies:
+    "@types/react": "*"
+  checksum: 3b91486e7aa777a3787e773efce79a0fa9be4ec9e02d51ccda8c7532c5c5d84fbcefe248dacb4007293d85bf0794ac51603bb9cec360db81cf3657d2b7123fb9
+  languageName: node
+  linkType: hard
+
+"@types/react-transition-group@npm:^4.4.0":
   version: 4.4.6
   resolution: "@types/react-transition-group@npm:4.4.6"
   dependencies:
@@ -18635,7 +18644,7 @@ __metadata:
     "@types/react": 18.2.21
     "@types/react-dom": 18.2.8
     "@types/react-redux": 7.1.26
-    "@types/react-transition-group": 4.4.6
+    "@types/react-transition-group": 4.4.7
     "@types/redux-mock-store": 1.0.4
     "@types/seedrandom": ^3
     "@types/sinon": 10.0.16
