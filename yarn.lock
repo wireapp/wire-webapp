@@ -4939,10 +4939,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/speakingurl@npm:13.0.3":
-  version: 13.0.3
-  resolution: "@types/speakingurl@npm:13.0.3"
-  checksum: f941298e92b54f0a68cae6dffd7865739b1c001162cd8b0d778c77362be2e259f0336b5bd6a95f9b2ff86e2f290e3a51522b58e92b65d56ddc56e9d1623a15de
+"@types/speakingurl@npm:13.0.4":
+  version: 13.0.4
+  resolution: "@types/speakingurl@npm:13.0.4"
+  checksum: 1d9d0d5554ebbf8f1752be0c714680a49f414409053d19e7d5f83756c1f0bc2f7d483c46c92154585ac4e23576924585ae242f97ccaa80be0973d8afdbe512fb
   languageName: node
   linkType: hard
 
@@ -18594,7 +18594,7 @@ __metadata:
     "@types/redux-mock-store": 1.0.3
     "@types/seedrandom": ^3
     "@types/sinon": 10.0.16
-    "@types/speakingurl": 13.0.3
+    "@types/speakingurl": 13.0.4
     "@types/underscore": 1.11.9
     "@types/webpack-env": 1.18.1
     "@wireapp/avs": 9.3.7
