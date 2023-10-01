@@ -5577,14 +5577,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/react-ui-kit@npm:9.9.6":
-  version: 9.9.6
-  resolution: "@wireapp/react-ui-kit@npm:9.9.6"
+"@wireapp/react-ui-kit@npm:9.9.9":
+  version: 9.9.9
+  resolution: "@wireapp/react-ui-kit@npm:9.9.9"
   dependencies:
     "@types/color": 3.0.4
     color: 4.2.3
     emotion-normalize: 11.0.1
-    react-select: 5.7.4
+    react-select: 5.7.5
     react-transition-group: 4.4.5
   peerDependencies:
     "@emotion/react": 11.10.4
@@ -5594,7 +5594,7 @@ __metadata:
   peerDependenciesMeta:
     "@types/react":
       optional: true
-  checksum: cdac53b1d2b87f07f90e6b45be1a86d46d8df90ce861f573534f2c0f4ff9cfb9c3bdc203ec636e259ac20fbfbc8b03e68bdcd02bd6f7a3b2e8a93a2f84392865
+  checksum: 5f9aae81fbaa194661bbe07655dcda0d31c0c9acf6e530cd886b729019ad64fd298918c8061e2036c6cd67b34f69f15ae925944005ecf4e147bd7c3791c66295
   languageName: node
   linkType: hard
 
@@ -15604,9 +15604,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-select@npm:5.7.4":
-  version: 5.7.4
-  resolution: "react-select@npm:5.7.4"
+"react-select@npm:5.7.5":
+  version: 5.7.5
+  resolution: "react-select@npm:5.7.5"
   dependencies:
     "@babel/runtime": ^7.12.0
     "@emotion/cache": ^11.4.0
@@ -15620,7 +15620,7 @@ __metadata:
   peerDependencies:
     react: ^16.8.0 || ^17.0.0 || ^18.0.0
     react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
-  checksum: ca72941ad1d2c578ec04c09ed3deb7e373f987e589f403fadedc6fcc3e29935b5425ec4d2628f0fe58c21319bcaf153c0d0172432e09fc6423da869d848de757
+  checksum: 88f2d94c4a6778df525a9fb5d7acac1bf34821f6efcfdc5927ec608f5f933cf3f47e1c4e4fd3b92d7b2ba1d91e44595d45ac4e2fd7528ba420086008ac5a81cf
   languageName: node
   linkType: hard
 
@@ -18603,7 +18603,7 @@ __metadata:
     "@wireapp/eslint-config": 3.0.4
     "@wireapp/lru-cache": 3.8.1
     "@wireapp/prettier-config": 0.6.3
-    "@wireapp/react-ui-kit": 9.9.6
+    "@wireapp/react-ui-kit": 9.9.9
     "@wireapp/store-engine": ^5.1.4
     "@wireapp/store-engine-dexie": 2.1.6
     "@wireapp/store-engine-sqleet": 1.8.9
