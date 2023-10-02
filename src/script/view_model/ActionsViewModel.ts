@@ -392,7 +392,7 @@ export class ActionsViewModel {
    */
   readonly sendConnectionRequest = (
     userEntity: User,
-  ): Promise<{connectionStatus: ConnectionStatus; conversationId: QualifiedId}> => {
+  ): Promise<{connectionStatus: ConnectionStatus; conversationId: QualifiedId} | null> => {
     return this.connectionRepository.createConnection(userEntity);
   };
 

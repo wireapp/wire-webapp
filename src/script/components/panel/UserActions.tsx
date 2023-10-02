@@ -220,24 +220,27 @@ const UserActions: React.FC<UserActionsProps> = ({
     isNotMe && isAvailable && isNotConnectedUser && canConnect
       ? {
           click: async () => {
-            try {
-              const {connectionStatus, conversationId} = await actionsViewModel.sendConnectionRequest(user);
+            const connectionData = await actionsViewModel.sendConnectionRequest(user);
 
-              // If connection's state is SENT, we create a local 1:1 conversation that will act as a placeholder
-              // before the other user has accepted the request.
-              const connectionConversation =
-                connectionStatus === ConnectionStatus.SENT
-                  ? createPlaceholder1to1Conversation(user, selfUser)
-                  : await actionsViewModel.getConversationById(conversationId);
-
-              if (!conversation) {
-                // Only open the new conversation if we aren't currently in a conversation context
-                await actionsViewModel.open1to1Conversation(connectionConversation);
-              }
-              onAction(Actions.SEND_REQUEST);
-            } catch {
+            if (!connectionData) {
               // Sending the connection failed, there is nothing more to do
+              return;
             }
+
+            const {connectionStatus, conversationId} = connectionData;
+
+            // If connection's state is SENT, we create a local 1:1 conversation that will act as a placeholder
+            // before the other user has accepted the request.
+            const connectionConversation =
+              connectionStatus === ConnectionStatus.SENT
+                ? createPlaceholder1to1Conversation(user, selfUser)
+                : await actionsViewModel.getConversationById(conversationId);
+
+            if (!conversation) {
+              // Only open the new conversation if we aren't currently in a conversation context
+              await actionsViewModel.open1to1Conversation(connectionConversation);
+            }
+            onAction(Actions.SEND_REQUEST);
           },
           icon: 'plus-icon',
           identifier: ActionIdentifier[Actions.SEND_REQUEST],

@@ -186,7 +186,7 @@ export class ConnectionRepository {
    */
   public async createConnection(
     userEntity: User,
-  ): Promise<{connectionStatus: ConnectionStatus; conversationId: QualifiedId}> {
+  ): Promise<{connectionStatus: ConnectionStatus; conversationId: QualifiedId} | null> {
     try {
       const response = await this.connectionService.postConnections(userEntity.qualifiedId);
       const connectionEvent = {connection: response, user: {name: userEntity.name()}};
@@ -234,6 +234,7 @@ export class ConnectionRepository {
             break;
           }
         }
+        return null;
       }
       throw error;
     }
