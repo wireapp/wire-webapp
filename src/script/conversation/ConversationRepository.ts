@@ -641,7 +641,7 @@ export class ConversationRepository {
       const response = await this.conversationService.getConversationById(qualifiedId);
       const [conversationEntity] = this.mapConversations([response]);
 
-      this.saveConversation(conversationEntity);
+      await this.saveConversation(conversationEntity);
 
       fetching_conversations[conversationId].forEach(({resolveFn}) => resolveFn(conversationEntity));
       delete fetching_conversations[conversationId];

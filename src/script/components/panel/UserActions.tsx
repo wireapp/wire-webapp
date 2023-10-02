@@ -19,6 +19,7 @@
 
 import React from 'react';
 
+import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {amplify} from 'amplify';
 
@@ -219,17 +220,25 @@ const UserActions: React.FC<UserActionsProps> = ({
     isNotMe && isAvailable && isNotConnectedUser && canConnect
       ? {
           click: async () => {
-            const connectionIsSent = await actionsViewModel.sendConnectionRequest(user);
-            if (!connectionIsSent) {
+            const connectionData = await actionsViewModel.sendConnectionRequest(user);
+
+            if (!connectionData) {
               // Sending the connection failed, there is nothing more to do
               return;
             }
-            // We create a local 1:1 conversation that will act as a placeholder before the other user has accepted the request
-            const newConversation = createPlaceholder1to1Conversation(user, selfUser);
-            const savedConversation = await actionsViewModel.saveConversation(newConversation);
+
+            const {connectionStatus, conversationId} = connectionData;
+
+            // If connection's state is SENT, we create a local 1:1 conversation that will act as a placeholder
+            // before the other user has accepted the request.
+            const connectionConversation =
+              connectionStatus === ConnectionStatus.SENT
+                ? createPlaceholder1to1Conversation(user, selfUser)
+                : await actionsViewModel.getConversationById(conversationId);
+
             if (!conversation) {
               // Only open the new conversation if we aren't currently in a conversation context
-              actionsViewModel.open1to1Conversation(savedConversation);
+              await actionsViewModel.open1to1Conversation(connectionConversation);
             }
             onAction(Actions.SEND_REQUEST);
           },
