@@ -17,7 +17,9 @@
  *
  */
 
+import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
+import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
@@ -305,6 +307,10 @@ export class ActionsViewModel {
     return Promise.reject();
   };
 
+  getConversationById = async (conversation: QualifiedId): Promise<Conversation> => {
+    return this.conversationRepository.getConversationById(conversation);
+  };
+
   saveConversation = async (conversation: Conversation): Promise<Conversation> => {
     return this.conversationRepository.saveConversation(conversation);
   };
@@ -384,7 +390,9 @@ export class ActionsViewModel {
    * @param userEntity User to connect to
    * @returns Promise that resolves to true if the request was successfully sent, false if not
    */
-  readonly sendConnectionRequest = (userEntity: User): Promise<boolean> => {
+  readonly sendConnectionRequest = (
+    userEntity: User,
+  ): Promise<{connectionStatus: ConnectionStatus; conversationId: QualifiedId}> => {
     return this.connectionRepository.createConnection(userEntity);
   };
 
