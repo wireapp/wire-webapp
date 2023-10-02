@@ -159,10 +159,6 @@ export class MLSConversationVerificationStateHandler {
       return this.degradeConversation(conversationEntity, qualifiedIds);
     }
 
-    // We need to check if none of the certificates have been revoked
-    // ToDO: Implement this check, after CoreCrypto added the functionality
-    this.logger.warn('ToDo: Revocation check not implemented yet, this needs to be done after CoreCrypto is updated');
-
     // If we reach this point, all checks have passed and we can set the conversation to verified
     return this.verifyConversation(conversationEntity);
   }
