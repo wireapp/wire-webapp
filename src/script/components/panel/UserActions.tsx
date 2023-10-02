@@ -236,9 +236,10 @@ const UserActions: React.FC<UserActionsProps> = ({
                 ? createPlaceholder1to1Conversation(user, selfUser)
                 : await actionsViewModel.getConversationById(conversationId);
 
+            const savedConversation = await actionsViewModel.saveConversation(connectionConversation);
             if (!conversation) {
               // Only open the new conversation if we aren't currently in a conversation context
-              await actionsViewModel.open1to1Conversation(connectionConversation);
+              await actionsViewModel.open1to1Conversation(savedConversation);
             }
             onAction(Actions.SEND_REQUEST);
           },
