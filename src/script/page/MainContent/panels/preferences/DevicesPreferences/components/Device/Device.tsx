@@ -40,10 +40,10 @@ interface DeviceProps {
   onRemove: (device: ClientEntity) => void;
   onSelect: (device: ClientEntity, currentDeviceIdentity?: WireIdentity) => void;
   deviceNumber: number;
-  getDeviceIdentity: (deviceId: string) => Promise<WireIdentity[] | undefined | null>;
+  getSelfDeviceIdentity: (deviceId: string) => Promise<WireIdentity[] | undefined | null>;
 }
 
-export const Device = ({device, isSSO, onSelect, onRemove, deviceNumber, getDeviceIdentity}: DeviceProps) => {
+export const Device = ({device, isSSO, onSelect, onRemove, deviceNumber, getSelfDeviceIdentity}: DeviceProps) => {
   const {isVerified} = useKoSubscribableChildren(device.meta, ['isVerified']);
   const verifiedLabel = isVerified ? t('preferencesDevicesVerification') : t('preferencesDeviceNotVerified');
   const deviceAriaLabel = `${t('preferencesDevice')} ${deviceNumber}, ${device.getName()}, ${verifiedLabel}`;
@@ -64,9 +64,9 @@ export const Device = ({device, isSSO, onSelect, onRemove, deviceNumber, getDevi
   };
 
   const handleGetDeviceIdentity = useCallback(async () => {
-    const deviceIdentity = await getDeviceIdentity(device.id);
+    const deviceIdentity = await getSelfDeviceIdentity(device.id);
     setCurrentDeviceIdentity(deviceIdentity?.[0]);
-  }, [device.id, getDeviceIdentity]);
+  }, [device.id, getSelfDeviceIdentity]);
 
   useEffect(() => {
     void handleGetDeviceIdentity();

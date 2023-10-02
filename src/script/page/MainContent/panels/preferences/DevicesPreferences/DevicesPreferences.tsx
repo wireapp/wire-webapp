@@ -105,7 +105,7 @@ export const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
     }
   };
 
-  const getDeviceIdentity = async (deviceId: string) => {
+  const getSelfDeviceIdentity = async (deviceId: string) => {
     const selfConversation = conversationState?.getSelfMLSConversation();
 
     if (!isMLSConversation(selfConversation)) {
@@ -142,7 +142,7 @@ export const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
               onSelect={selectDevice}
               onRemove={removeDevice}
               deviceNumber={++index}
-              getDeviceIdentity={getDeviceIdentity}
+              getSelfDeviceIdentity={getSelfDeviceIdentity}
             />
           ))}
           <p className="preferences-detail">{t('preferencesDevicesActiveDetail')}</p>
