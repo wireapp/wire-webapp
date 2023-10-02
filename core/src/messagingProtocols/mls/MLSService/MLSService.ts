@@ -118,7 +118,11 @@ export class MLSService extends TypedEventEmitter<Events> {
 
   public async initClient(userId: QualifiedId, client: RegisteredClient) {
     const qualifiedClientId = constructFullyQualifiedClientId(userId.id, client.id, userId.domain);
-    await this.coreCryptoClient.mlsInit(this.textEncoder.encode(qualifiedClientId), [this.config.defaultCiphersuite]);
+    await this.coreCryptoClient.mlsInit(
+      this.textEncoder.encode(qualifiedClientId),
+      [this.config.defaultCiphersuite],
+      this.config.nbKeyPackages,
+    );
 
     // We need to make sure keypackages and public key are uploaded to the backend
     await this.uploadMLSPublicKeys(client);
