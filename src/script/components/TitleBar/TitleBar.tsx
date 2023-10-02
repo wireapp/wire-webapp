@@ -27,10 +27,10 @@ import {container} from 'tsyringe';
 import {IconButton, IconButtonVariant, useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {Badges} from 'Components/Badges';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {Icon} from 'Components/Icon';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
+import {VerificationBadges} from 'src/script/components/VerificationBadges';
 import {User} from 'src/script/entity/User';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {ContentState} from 'src/script/page/useAppState';
@@ -271,7 +271,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
               {displayName}
             </span>
 
-            <Badges
+            <VerificationBadges
               conversationProtocol={conversation.protocol}
               // This one comparing was in Icon.Verified - old verified badge displaying
               isProteusVerified={verificationState === ConversationVerificationState.VERIFIED}

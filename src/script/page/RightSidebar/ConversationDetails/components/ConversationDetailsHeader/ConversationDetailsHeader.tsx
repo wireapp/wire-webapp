@@ -21,8 +21,8 @@ import {ChangeEvent, FC, KeyboardEvent, useEffect, useRef, useState} from 'react
 
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 
-import {Badges} from 'Components/Badges';
 import {Icon} from 'Components/Icon';
+import {VerificationBadges} from 'src/script/components/VerificationBadges';
 import {isEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {removeLineBreaks} from 'Util/StringUtil';
@@ -152,7 +152,7 @@ const ConversationDetailsHeader: FC<ConversationDetailsHeaderProps> = ({
             />
           )}
 
-          <Badges conversationProtocol={conversationProtocol} displayTitle />
+          <VerificationBadges conversationProtocol={conversationProtocol} displayTitle />
         </>
       ) : (
         <div className="conversation-details__name">

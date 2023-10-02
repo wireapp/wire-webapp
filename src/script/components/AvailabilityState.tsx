@@ -24,8 +24,8 @@ import cx from 'classnames';
 
 import {Availability} from '@wireapp/protocol-messaging';
 
-import {Badges} from 'Components/Badges';
 import {selfIndicator} from 'Components/ParticipantItemContent/ParticipantItem.styles';
+import {VerificationBadges} from 'src/script/components/VerificationBadges';
 import {CSS_SQUARE} from 'Util/CSSMixin';
 import {KEY} from 'Util/KeyboardUtil';
 
@@ -135,7 +135,7 @@ const AvailabilityState: React.FC<AvailabilityStateProps> = ({
 
       {selfString && <span css={selfIndicator}>{selfString}</span>}
 
-      {showBadges && <Badges isProteusVerified={isProteusVerified} />}
+      {showBadges && <VerificationBadges isProteusVerified={isProteusVerified} />}
 
       {showArrow && (
         <span

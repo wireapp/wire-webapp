@@ -23,9 +23,9 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {container} from 'tsyringe';
 
-import {Badges} from 'Components/Badges';
 import {Icon} from 'Components/Icon';
 import {ClientEntity, MLSPublicKeys} from 'src/script/client/ClientEntity';
+import {VerificationBadges} from 'src/script/components/VerificationBadges';
 import {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -94,7 +94,7 @@ const Device = ({device, isSSO, onSelect, onRemove, deviceNumber}: DeviceProps) 
         >
           {device.getName()}
 
-          <Badges isProteusVerified={isVerified} isMLSVerified={true} />
+          <VerificationBadges isProteusVerified={isVerified} isMLSVerified={true} />
         </div>
 
         {mlsFingerprint && (

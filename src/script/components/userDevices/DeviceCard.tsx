@@ -22,8 +22,8 @@ import React from 'react';
 import {ClientClassification} from '@wireapp/api-client/lib/client';
 import cx from 'classnames';
 
-import {Badges} from 'Components/Badges';
 import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
+import {VerificationBadges} from 'src/script/components/VerificationBadges';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {splitFingerprint} from 'Util/StringUtil';
@@ -83,7 +83,7 @@ const DeviceCard: React.FC<DeviceCardProps> = ({
         <div className="device-card__name">
           <span className="device-card__model">{name}</span>
 
-          {showVerified && <Badges isMLSVerified isProteusVerified={!!isVerified && isVerified()} />}
+          {showVerified && <VerificationBadges isMLSVerified isProteusVerified={!!isVerified && isVerified()} />}
         </div>
 
         {mlsFingerprint && (

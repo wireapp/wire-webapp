@@ -19,8 +19,8 @@
 
 import React from 'react';
 
-import {Badges} from 'Components/Badges';
 import {ClientEntity, MLSPublicKeys} from 'src/script/client/ClientEntity';
+import {VerificationBadges} from 'src/script/components/VerificationBadges';
 
 import {MLSDeviceDetails} from './MLSDeviceDetails';
 import {ProteusDeviceDetails} from './ProteusDeviceDetails';
@@ -41,7 +41,7 @@ export const DetailedDevice: React.FC<DeviceProps> = ({device, fingerprint, show
       <h3 className="preferences-devices-model preferences-devices-model-name" data-uie-name="device-model">
         <span>{device.model}</span>
 
-        <Badges isProteusVerified={isProteusVerified} />
+        <VerificationBadges isProteusVerified={isProteusVerified} />
       </h3>
 
       {mlsFingerprint && <MLSDeviceDetails fingerprint={mlsFingerprint} />}

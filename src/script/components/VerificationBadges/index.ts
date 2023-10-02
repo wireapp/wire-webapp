@@ -17,4 +17,4 @@
  *
  */
 
-export * from './Badges';
+export * from './VerificationBadges';

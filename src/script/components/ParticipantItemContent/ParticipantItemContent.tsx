@@ -22,8 +22,8 @@ import React from 'react';
 import {Availability} from '@wireapp/protocol-messaging';
 
 import {AvailabilityState} from 'Components/AvailabilityState';
-import {Badges} from 'Components/Badges';
 import {Icon} from 'Components/Icon';
+import {VerificationBadges} from 'src/script/components/VerificationBadges';
 
 import {
   contentInfoWrapper,
@@ -88,7 +88,7 @@ export const ParticipantItemContent = ({
                 {selfString && <span css={selfIndicator}>{selfString}</span>}
               </div>
 
-              {!isService && !isSelectable && <Badges isProteusVerified={isProteusVerified} />}
+              {!isService && !isSelectable && <VerificationBadges isProteusVerified={isProteusVerified} />}
             </>
           )}
         </div>
