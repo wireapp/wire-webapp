@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [42.9.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.8.0...@wireapp/core@42.9.0) (2023-10-02)
+
+### Features
+
+* specify initial nb of key packages in corecrypto ([#5572](https://github.com/wireapp/wire-web-packages/issues/5572)) ([e603324](https://github.com/wireapp/wire-web-packages/commit/e603324a963673b4eec69ddb3d4b86d56fc5f1c6))
+
 # [42.8.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.7.0...@wireapp/core@42.8.0) (2023-09-28)
 
 ### Features
