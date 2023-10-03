@@ -419,7 +419,7 @@ describe('ConversationRepository', () => {
       jest.spyOn(conversationRepository['eventService'], 'moveEventsToConversation');
       jest
         .spyOn(conversationRepository['conversationState'], 'activeConversation')
-        .mockReturnValue(proteus1to1Conversation);
+        .mockReturnValueOnce(proteus1to1Conversation);
       jest.spyOn(conversationRepository['conversationService'], 'deleteConversationFromDb');
 
       const conversationEntity = await conversationRepository.get1To1Conversation(otherUser);

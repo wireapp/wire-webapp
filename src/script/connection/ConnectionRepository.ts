@@ -184,12 +184,17 @@ export class ConnectionRepository {
    * @param userEntity User to connect to
    * @returns Promise that resolves to true if the request was successfully sent, false if not
    */
-  public async createConnection(userEntity: User): Promise<boolean> {
+  public async createConnection(
+    userEntity: User,
+  ): Promise<{connectionStatus: ConnectionStatus; conversationId: QualifiedId} | null> {
     try {
       const response = await this.connectionService.postConnections(userEntity.qualifiedId);
       const connectionEvent = {connection: response, user: {name: userEntity.name()}};
       await this.onUserConnection(connectionEvent, EventRepository.SOURCE.INJECTED);
-      return true;
+      return {
+        connectionStatus: response.status,
+        conversationId: response.qualified_conversation || {id: response.conversation, domain: ''},
+      };
     } catch (error) {
       if (isBackendError(error)) {
         switch (error.label) {
@@ -229,7 +234,7 @@ export class ConnectionRepository {
             break;
           }
         }
-        return false;
+        return null;
       }
       throw error;
     }
