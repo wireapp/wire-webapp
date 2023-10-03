@@ -23,6 +23,7 @@ import {registerRecurringTask} from '@wireapp/core/lib/util/RecurringTaskSchedul
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
+import {TypedEventEmitter} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Logger, getLogger} from 'Util/Logger';
@@ -39,7 +40,9 @@ import {UserState} from '../user/UserState';
 
 const SELF_SUPPORTED_PROTOCOLS_CHECK_KEY = 'self-supported-protocols-check';
 
-export class SelfRepository {
+type Events = {selfSupportedProtocolsUpdated: ConversationProtocol[]};
+
+export class SelfRepository extends TypedEventEmitter<Events> {
   private readonly logger: Logger;
 
   constructor(
@@ -49,6 +52,7 @@ export class SelfRepository {
     private readonly clientRepository: ClientRepository,
     private readonly userState = container.resolve(UserState),
   ) {
+    super();
     this.logger = getLogger('SelfRepository');
 
     // Every time user's client is deleted, we need to re-evaluate self supported protocols.
@@ -195,6 +199,7 @@ export class SelfRepository {
     this.logger.info('Supported protocols will get updated to:', supportedProtocols);
     await this.selfService.putSupportedProtocols(supportedProtocols);
     await this.userRepository.updateUserSupportedProtocols(this.selfUser.qualifiedId, supportedProtocols);
+    this.emit('selfSupportedProtocolsUpdated', supportedProtocols);
     return supportedProtocols;
   }
 

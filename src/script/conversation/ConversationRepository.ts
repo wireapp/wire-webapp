@@ -85,7 +85,13 @@ import {ConversationFilter} from './ConversationFilter';
 import {ConversationLabelRepository} from './ConversationLabelRepository';
 import {ConversationDatabaseData, ConversationMapper} from './ConversationMapper';
 import {ConversationRoleRepository} from './ConversationRoleRepository';
-import {isMLSConversation, isProteusConversation, MLSConversation, ProteusConversation} from './ConversationSelectors';
+import {
+  is1to1ConversationWithUser,
+  isMLSConversation,
+  isProteusConversation,
+  MLSConversation,
+  ProteusConversation,
+} from './ConversationSelectors';
 import {ConversationService} from './ConversationService';
 import {ConversationState} from './ConversationState';
 import {ConversationStateHandler} from './ConversationStateHandler';
@@ -330,6 +336,8 @@ export class ConversationRepository {
     this.eventService.addEventDeletedListener(this.deleteLocalMessageEntity);
 
     window.addEventListener<any>(WebAppEvents.CONVERSATION.JOIN, this.onConversationJoin);
+
+    this.selfRepository.on('selfSupportedProtocolsUpdated', this.onSelfUserSupportedProtocolsUpdated);
   }
 
   public initMLSConversationRecoveredListener() {
@@ -1268,7 +1276,12 @@ export class ConversationRepository {
         return false;
       }
 
-      return ConversationFilter.is1To1WithUser(conversationEntity, userEntity);
+      const isProteus1to1ConversationWithUser = is1to1ConversationWithUser(
+        userEntity.qualifiedId,
+        ConversationProtocol.PROTEUS,
+      );
+
+      return isProteus1to1ConversationWithUser(conversationEntity);
     });
 
     if (matchingConversationEntity) {
@@ -1848,6 +1861,11 @@ export class ConversationRepository {
       }),
     );
   }
+
+  private readonly onSelfUserSupportedProtocolsUpdated = async () => {
+    const one2oneConversations = this.conversationState.conversations().filter(conversation => conversation.is1to1());
+    await Promise.allSettled(one2oneConversations.map(this.init1to1Conversation));
+  };
 
   /**
    * Maps user connections to the corresponding conversations.
