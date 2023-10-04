@@ -24,9 +24,13 @@ import type {UserUpdate} from '@wireapp/api-client/lib/user/';
 import {container} from 'tsyringe';
 
 import {APIClient} from '../service/APIClientSingleton';
+import {Core} from '../service/CoreSingleton';
 
 export class SelfService {
-  constructor(private readonly apiClient = container.resolve(APIClient)) {}
+  constructor(
+    private readonly apiClient = container.resolve(APIClient),
+    private readonly core = container.resolve(Core),
+  ) {}
 
   deleteSelf(password?: string): Promise<void> {
     return this.apiClient.api.self.deleteSelf({password});
@@ -71,5 +75,9 @@ export class SelfService {
 
   putSupportedProtocols(supportedProtocols: ConversationProtocol[]): Promise<void> {
     return this.apiClient.api.self.putSupportedProtocols(supportedProtocols);
+  }
+
+  registerRecurringTask(taskConfig: {every: number; task: () => Promise<void>; key: string}): Promise<void> {
+    return this.core.recurringTaskScheduler.registerTask(taskConfig);
   }
 }
