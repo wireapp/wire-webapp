@@ -27,7 +27,7 @@ const logger = logdown('@wireapp/core/TaskScheduler', {
 });
 
 type ScheduleTaskParams = {
-  task: () => void;
+  task: () => Promise<void> | void;
   firingDate: number;
   key: string;
   persist?: boolean;
