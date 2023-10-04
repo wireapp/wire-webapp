@@ -32,6 +32,7 @@ import {CoreCrypto, DecryptedMessage} from '@wireapp/core-crypto';
 import {MLSService} from './MLSService';
 
 import {openDB} from '../../../storage/CoreDB';
+import {RecurringTaskScheduler} from '../../../util/RecurringTaskScheduler';
 
 jest.createMockFromModule('@wireapp/api-client');
 
@@ -56,8 +57,15 @@ const createMLSService = async () => {
   } as unknown as CoreCrypto;
 
   const mockedDb = await openDB('core-test-db');
+  const recurringTaskScheduler = new RecurringTaskScheduler({
+    delete: key => mockedDb.delete('recurringTasks', key),
+    get: async key => (await mockedDb.get('recurringTasks', key))?.firingDate,
+    set: async (key, timestamp) => {
+      await mockedDb.put('recurringTasks', {key, firingDate: timestamp});
+    },
+  });
 
-  const mlsService = new MLSService(apiClient, mockCoreCrypto, mockedDb, {});
+  const mlsService = new MLSService(apiClient, mockCoreCrypto, mockedDb, recurringTaskScheduler, {});
 
   return [mlsService, {apiClient, coreCrypto: mockCoreCrypto}] as const;
 };

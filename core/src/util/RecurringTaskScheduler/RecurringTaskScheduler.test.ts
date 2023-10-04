@@ -19,7 +19,27 @@
 
 import {TimeUtil} from '@wireapp/commons';
 
-import {cancelRecurringTask, registerRecurringTask} from './RecurringTaskScheduler';
+import {RecurringTaskScheduler} from './RecurringTaskScheduler';
+
+import {advanceJestTimersWithPromise} from '../../testUtils';
+
+const mockedStore = {
+  storage: new Map<string, number>(),
+  set: async (key: string, timestamp: number) => {
+    mockedStore.storage.set(key, timestamp);
+  },
+  get: async (key: string) => {
+    return mockedStore.storage.get(key);
+  },
+  delete: async (key: string) => {
+    mockedStore.storage.delete(key);
+  },
+  clearAll: async () => {
+    mockedStore.storage.clear();
+  },
+};
+
+const recurringTaskScheduler = new RecurringTaskScheduler(mockedStore);
 
 describe('RecurringTaskScheduler', () => {
   beforeEach(() => {
@@ -30,75 +50,77 @@ describe('RecurringTaskScheduler', () => {
     jest.useRealTimers();
   });
 
-  it('executes a task periodically', () => {
+  it('executes a task periodically', async () => {
     const task = jest.fn();
-    registerRecurringTask({every: TimeUtil.TimeInMillis.MINUTE, task, key: 'test-task'});
-    jest.advanceTimersByTime(TimeUtil.TimeInMillis.MINUTE + 1);
+    await recurringTaskScheduler.registerTask({every: TimeUtil.TimeInMillis.MINUTE, task, key: 'test-task'});
 
+    await advanceJestTimersWithPromise(TimeUtil.TimeInMillis.MINUTE + 1);
     expect(task).toHaveBeenCalledTimes(1);
-    jest.advanceTimersByTime(TimeUtil.TimeInMillis.MINUTE + 1);
 
+    await advanceJestTimersWithPromise(TimeUtil.TimeInMillis.MINUTE + 1);
     expect(task).toHaveBeenCalledTimes(2);
   });
 
-  it('resumes a task after re-registering a recurring task', () => {
+  it('resumes a task after re-registering a recurring task', async () => {
     const task = jest.fn();
 
     // it should fire in a minute
-    registerRecurringTask({every: TimeUtil.TimeInMillis.MINUTE, task, key: 'test-task2'});
-    jest.advanceTimersByTime(TimeUtil.TimeInMillis.MINUTE / 2);
+    await recurringTaskScheduler.registerTask({every: TimeUtil.TimeInMillis.MINUTE, task, key: 'test-task2'});
+    await advanceJestTimersWithPromise(TimeUtil.TimeInMillis.MINUTE / 2);
 
     // re-register the task
-    registerRecurringTask({every: TimeUtil.TimeInMillis.MINUTE, task, key: 'test-task2'});
+    await recurringTaskScheduler.registerTask({every: TimeUtil.TimeInMillis.MINUTE, task, key: 'test-task2'});
 
     // only 30s have passed, so the task should not have fired yet
     expect(task).toHaveBeenCalledTimes(0);
 
     // advance the timer by another 30s (so we have 1 minute in total)
-    jest.advanceTimersByTime(TimeUtil.TimeInMillis.MINUTE / 2);
+    await advanceJestTimersWithPromise(TimeUtil.TimeInMillis.MINUTE / 2);
 
     // the task should have fired once after a minute from the beginning even if we re-registered it
     expect(task).toHaveBeenCalledTimes(1);
   });
 
-  it('cancel a task before it is run', () => {
+  it('cancel a task before it is run', async () => {
     const task = jest.fn();
     const testKey = 'test-task-1';
 
-    registerRecurringTask({
+    await recurringTaskScheduler.registerTask({
       key: testKey,
       every: TimeUtil.TimeInMillis.MINUTE,
       task,
     });
 
-    jest.advanceTimersByTime(TimeUtil.TimeInMillis.MINUTE - 1);
+    await advanceJestTimersWithPromise(TimeUtil.TimeInMillis.MINUTE - 1);
     expect(task).not.toHaveBeenCalled();
 
-    cancelRecurringTask(testKey);
-    jest.advanceTimersByTime(TimeUtil.TimeInMillis.MINUTE);
+    await recurringTaskScheduler.cancelTask(testKey);
+    await advanceJestTimersWithPromise(TimeUtil.TimeInMillis.MINUTE);
+
     expect(task).not.toHaveBeenCalled();
   });
 
-  it('adds multiple tasks to schedule and runs it after given delay', () => {
+  it('adds multiple tasks to schedule and runs it after given delay', async () => {
     const mockedTask1 = jest.fn();
     const mockedTask2 = jest.fn();
 
-    registerRecurringTask({
+    await recurringTaskScheduler.registerTask({
       key: 'test1-key',
       every: TimeUtil.TimeInMillis.MINUTE,
       task: mockedTask1,
     });
 
-    jest.advanceTimersByTime(TimeUtil.TimeInMillis.MINUTE + 1);
+    await advanceJestTimersWithPromise(TimeUtil.TimeInMillis.MINUTE + 1);
+
     expect(mockedTask1).toHaveBeenCalledTimes(1);
 
-    registerRecurringTask({
+    await recurringTaskScheduler.registerTask({
       key: 'test2-key',
       every: TimeUtil.TimeInMillis.MINUTE,
       task: mockedTask2,
     });
 
-    jest.advanceTimersByTime(TimeUtil.TimeInMillis.MINUTE + 1);
+    await advanceJestTimersWithPromise(TimeUtil.TimeInMillis.MINUTE + 1);
 
     expect(mockedTask1).toHaveBeenCalledTimes(2);
     expect(mockedTask2).toHaveBeenCalledTimes(1);

@@ -19,6 +19,8 @@
 
 import {LowPrecisionTaskScheduler} from './LowPrecisionTaskScheduler';
 
+import {advanceJestTimersWithPromise} from '../../testUtils';
+
 describe('LowPrecisionTaskScheduler', () => {
   beforeEach(() => {
     jest.useFakeTimers();
@@ -38,11 +40,7 @@ describe('LowPrecisionTaskScheduler', () => {
       task: mockedTask,
     });
 
-    jest.advanceTimersByTime(2001);
-    await Promise.resolve();
-
-    jest.advanceTimersByTime(2001);
-    await Promise.resolve();
+    await advanceJestTimersWithPromise(5000);
 
     expect(mockedTask).toHaveBeenCalledTimes(1);
   });
@@ -57,8 +55,7 @@ describe('LowPrecisionTaskScheduler', () => {
       task: mockedTask,
     });
 
-    jest.advanceTimersByTime(1001);
-    await Promise.resolve();
+    await advanceJestTimersWithPromise(1001);
 
     expect(mockedTask).toHaveBeenCalled();
   });
@@ -74,7 +71,7 @@ describe('LowPrecisionTaskScheduler', () => {
       task: mockedTask1,
     });
 
-    jest.advanceTimersByTime(1000);
+    await advanceJestTimersWithPromise(1000);
 
     LowPrecisionTaskScheduler.addTask({
       key: 'test2-key',
@@ -83,10 +80,7 @@ describe('LowPrecisionTaskScheduler', () => {
       task: mockedTask2,
     });
 
-    jest.advanceTimersByTime(5001);
-
-    await Promise.resolve();
-    await Promise.resolve();
+    await advanceJestTimersWithPromise(5001);
 
     expect(mockedTask1).toHaveBeenCalled();
     expect(mockedTask2).toHaveBeenCalled();
@@ -103,7 +97,7 @@ describe('LowPrecisionTaskScheduler', () => {
       task: mockedTask3,
     });
 
-    jest.advanceTimersByTime(1000);
+    await advanceJestTimersWithPromise(1000);
 
     LowPrecisionTaskScheduler.addTask({
       key: 'test4-key',
@@ -117,10 +111,7 @@ describe('LowPrecisionTaskScheduler', () => {
       key: 'test3-key',
     });
 
-    jest.advanceTimersByTime(4001);
-
-    await Promise.resolve();
-    await Promise.resolve();
+    await advanceJestTimersWithPromise(4001);
 
     expect(mockedTask3).not.toHaveBeenCalled();
     expect(mockedTask4).toHaveBeenCalled();

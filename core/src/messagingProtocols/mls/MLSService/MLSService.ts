@@ -55,7 +55,7 @@ import {sendMessage} from '../../../conversation/message/messageSender';
 import {CoreDatabase} from '../../../storage/CoreDB';
 import {constructFullyQualifiedClientId, parseFullQualifiedClientId} from '../../../util/fullyQualifiedClientIdUtils';
 import {numberToHex} from '../../../util/numberToHex';
-import {cancelRecurringTask, registerRecurringTask} from '../../../util/RecurringTaskScheduler';
+import {RecurringTaskScheduler} from '../../../util/RecurringTaskScheduler';
 import {TaskScheduler} from '../../../util/TaskScheduler';
 import {handleMLSMessageAdd, handleMLSWelcomeMessage} from '../EventHandler/events';
 import {CommitPendingProposalsParams, HandlePendingProposalsParams, MLSCallbacks} from '../types';
@@ -100,6 +100,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     private readonly apiClient: APIClient,
     private readonly coreCryptoClient: CoreCrypto,
     private readonly coreDatabase: CoreDatabase,
+    private readonly recurringTaskScheduler: RecurringTaskScheduler,
     {
       keyingMaterialUpdateThreshold = defaultConfig.keyingMaterialUpdateThreshold,
       nbKeyPackages = defaultConfig.nbKeyPackages,
@@ -275,7 +276,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     if (mlsResponse) {
       //after we've successfully joined via external commit, we schedule periodic key material renewal
       const groupIdStr = Encoder.toBase64(groupId).asString;
-      this.scheduleKeyMaterialRenewal(groupIdStr);
+      await this.scheduleKeyMaterialRenewal(groupIdStr);
     }
 
     return mlsResponse;
@@ -483,7 +484,7 @@ export class MLSService extends TypedEventEmitter<Events> {
           await this.updateKeyingMaterial(groupId);
 
     // We schedule a periodic key material renewal
-    this.scheduleKeyMaterialRenewal(groupId);
+    await this.scheduleKeyMaterialRenewal(groupId);
 
     /**
      * @note If we can't fetch a user's key packages then we can not add them to mls conversation
@@ -575,9 +576,9 @@ export class MLSService extends TypedEventEmitter<Events> {
    * Will reset the renewal to the threshold given as config
    * @param groupId The group that should have its key material updated
    */
-  public resetKeyMaterialRenewal(groupId: string) {
-    this.cancelKeyMaterialRenewal(groupId);
-    this.scheduleKeyMaterialRenewal(groupId);
+  public async resetKeyMaterialRenewal(groupId: string) {
+    await this.cancelKeyMaterialRenewal(groupId);
+    await this.scheduleKeyMaterialRenewal(groupId);
   }
 
   /**
@@ -585,7 +586,7 @@ export class MLSService extends TypedEventEmitter<Events> {
    * @param groupId The group that should stop having its key material updated
    */
   public cancelKeyMaterialRenewal(groupId: string) {
-    return cancelRecurringTask(this.createKeyMaterialUpdateTaskSchedulerId(groupId));
+    return this.recurringTaskScheduler.cancelTask(this.createKeyMaterialUpdateTaskSchedulerId(groupId));
   }
 
   /**
@@ -595,7 +596,7 @@ export class MLSService extends TypedEventEmitter<Events> {
   public scheduleKeyMaterialRenewal(groupId: string) {
     const key = this.createKeyMaterialUpdateTaskSchedulerId(groupId);
 
-    registerRecurringTask({
+    return this.recurringTaskScheduler.registerTask({
       task: () => this.renewKeyMaterial(groupId),
       every: this.config.keyingMaterialUpdateThreshold,
       key,
@@ -620,7 +621,7 @@ export class MLSService extends TypedEventEmitter<Events> {
    * @param clientId id of the client
    */
   public schedulePeriodicKeyPackagesBackendSync(clientId: string) {
-    registerRecurringTask({
+    return this.recurringTaskScheduler.registerTask({
       every: TimeUtil.TimeInMillis.DAY,
       key: 'try-key-packages-backend-sync',
       task: () => this.verifyRemoteMLSKeyPackagesAmount(clientId),
@@ -687,7 +688,7 @@ export class MLSService extends TypedEventEmitter<Events> {
       //if the mls group does not exist, we don't need to wipe it
       return;
     }
-    this.cancelKeyMaterialRenewal(groupId);
+    await this.cancelKeyMaterialRenewal(groupId);
 
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
     return this.coreCryptoClient.wipeConversation(groupIdBytes);
