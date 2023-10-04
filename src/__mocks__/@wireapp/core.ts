@@ -24,6 +24,11 @@ export class Account extends EventEmitter {
     federationEndpoints: true,
   };
 
+  recurringTaskScheduler = {
+    registerTask: jest.fn(),
+    cancelTask: jest.fn(),
+  };
+
   configureMLSCallbacks = jest.fn();
 
   service = {

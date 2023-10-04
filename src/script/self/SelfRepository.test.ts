@@ -28,6 +28,8 @@ import {container} from 'tsyringe';
 import {TestFactory} from 'test/helper/TestFactory';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
+import {SelfRepository} from './SelfRepository';
+
 import {ClientEntity} from '../client';
 import * as mlsSupport from '../mls/isMLSSupportedByEnvironment';
 import {MLSMigrationStatus} from '../mls/MLSMigration/migrationStatus';
@@ -277,7 +279,7 @@ describe('SelfRepository', () => {
       expect(selfRepository['selfService'].putSupportedProtocols).not.toHaveBeenCalled();
     });
 
-    it('Re-evaluates supported protocols every 24h', async () => {
+    it('registers periodic supported protocols refresh task every 24h', async () => {
       const selfRepository = await testFactory.exposeSelfActors();
 
       const selfUser = selfRepository['userState'].self()!;
@@ -288,23 +290,17 @@ describe('SelfRepository', () => {
       const evaluatedProtocols = [ConversationProtocol.PROTEUS];
 
       jest.spyOn(selfRepository, 'evaluateSelfSupportedProtocols').mockResolvedValueOnce(evaluatedProtocols);
-      jest.spyOn(selfRepository['selfService'], 'putSupportedProtocols');
+      jest.spyOn(selfRepository['selfService'], 'registerRecurringTask');
 
       await act(async () => {
         await selfRepository.initialisePeriodicSelfSupportedProtocolsCheck();
       });
 
-      expect(selfUser.supportedProtocols()).toEqual(evaluatedProtocols);
-
-      const evaluatedProtocols2 = [ConversationProtocol.MLS];
-      jest.spyOn(selfRepository, 'evaluateSelfSupportedProtocols').mockResolvedValueOnce(evaluatedProtocols2);
-
-      await act(async () => {
-        jest.advanceTimersByTime(24 * 60 * 60 * 1000);
+      expect(selfRepository['selfService'].registerRecurringTask).toHaveBeenCalledWith({
+        every: TIME_IN_MILLIS.DAY,
+        key: SelfRepository.SELF_SUPPORTED_PROTOCOLS_CHECK_KEY,
+        task: expect.anything(),
       });
-
-      expect(selfUser.supportedProtocols()).toEqual(evaluatedProtocols2);
-      expect(selfRepository['selfService'].putSupportedProtocols).toHaveBeenCalledWith(evaluatedProtocols2);
     });
   });
 

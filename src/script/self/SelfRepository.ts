@@ -36,10 +36,9 @@ import {TeamRepository} from '../team/TeamRepository';
 import {UserRepository} from '../user/UserRepository';
 import {UserState} from '../user/UserState';
 
-const SELF_SUPPORTED_PROTOCOLS_CHECK_KEY = 'self-supported-protocols-check';
-
 export class SelfRepository {
   private readonly logger: Logger;
+  static SELF_SUPPORTED_PROTOCOLS_CHECK_KEY = 'self-supported-protocols-check';
 
   constructor(
     private readonly selfService: SelfService,
@@ -232,7 +231,7 @@ export class SelfRepository {
     await this.selfService.registerRecurringTask({
       every: TIME_IN_MILLIS.DAY,
       task: refreshProtocolsTask,
-      key: SELF_SUPPORTED_PROTOCOLS_CHECK_KEY,
+      key: SelfRepository.SELF_SUPPORTED_PROTOCOLS_CHECK_KEY,
     });
   }
 
