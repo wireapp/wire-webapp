@@ -279,7 +279,7 @@ describe('SelfRepository', () => {
       expect(selfRepository['selfService'].putSupportedProtocols).not.toHaveBeenCalled();
     });
 
-    it('registers periodic supported protocols refresh task every 24h', async () => {
+    it('registers periodic supported protocols refresh task to be called every 24h', async () => {
       const selfRepository = await testFactory.exposeSelfActors();
 
       const selfUser = selfRepository['userState'].self()!;
