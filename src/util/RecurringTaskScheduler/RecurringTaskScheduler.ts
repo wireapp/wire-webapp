@@ -19,7 +19,7 @@
 
 import {TimeUtil} from '@wireapp/commons';
 
-import {saveState, loadState} from './RecurringTaskScheduler.store';
+import {saveState, loadState, deleteState} from './RecurringTaskScheduler.store';
 
 import {LowPrecisionTaskScheduler} from '../LowPrecisionTaskScheduler';
 import {TaskScheduler} from '../TaskScheduler';
@@ -31,13 +31,14 @@ interface TaskParams {
 }
 
 export function registerRecurringTask({every, task, key}: TaskParams) {
-  const lastFireDate = loadState(key) ?? Date.now();
+  const firingDate = loadState(key) || Date.now() + every;
+  saveState(key, firingDate);
 
   const taskConfig = {
-    firingDate: lastFireDate + every,
+    firingDate,
     key,
-    task() {
-      saveState(key, Date.now());
+    task: () => {
+      deleteState(key);
       task();
       registerRecurringTask({every, task, key});
     },
@@ -53,6 +54,7 @@ export function registerRecurringTask({every, task, key}: TaskParams) {
 }
 
 export function cancelRecurringTask(taskKey: string) {
+  deleteState(taskKey);
   TaskScheduler.cancelTask(taskKey);
   LowPrecisionTaskScheduler.cancelTask({intervalDelay: TimeUtil.TimeInMillis.MINUTE, key: taskKey});
 }
