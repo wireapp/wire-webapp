@@ -48,11 +48,11 @@ import {
 
 import {shouldMLSDecryptionErrorBeIgnored} from './CoreCryptoMLSError';
 import {MLSServiceConfig, UploadCommitOptions} from './MLSService.types';
-import {pendingProposalsStore} from './stores/pendingProposalsStore';
 import {subconversationGroupIdStore} from './stores/subconversationGroupIdStore/subconversationGroupIdStore';
 
 import {KeyPackageClaimUser} from '../../../conversation';
 import {sendMessage} from '../../../conversation/message/messageSender';
+import {CoreDatabase} from '../../../storage/CoreDB';
 import {constructFullyQualifiedClientId, parseFullQualifiedClientId} from '../../../util/fullyQualifiedClientIdUtils';
 import {numberToHex} from '../../../util/numberToHex';
 import {cancelRecurringTask, registerRecurringTask} from '../../../util/RecurringTaskScheduler';
@@ -99,6 +99,7 @@ export class MLSService extends TypedEventEmitter<Events> {
   constructor(
     private readonly apiClient: APIClient,
     private readonly coreCryptoClient: CoreCrypto,
+    private readonly coreDatabase: CoreDatabase,
     {
       keyingMaterialUpdateThreshold = defaultConfig.keyingMaterialUpdateThreshold,
       nbKeyPackages = defaultConfig.nbKeyPackages,
@@ -722,10 +723,7 @@ export class MLSService extends TypedEventEmitter<Events> {
       const eventDate = new Date(eventTime);
       const firingDate = eventDate.setTime(eventDate.getTime() + delayInMs);
 
-      pendingProposalsStore.storeItem({
-        groupId,
-        firingDate,
-      });
+      await this.coreDatabase.put('pendingProposals', {groupId, firingDate}, groupId);
 
       TaskScheduler.addTask({
         task: () => this.commitPendingProposals({groupId}),
@@ -749,7 +747,7 @@ export class MLSService extends TypedEventEmitter<Events> {
 
       if (!skipDelete) {
         TaskScheduler.cancelTask(groupId);
-        pendingProposalsStore.deleteItem({groupId});
+        await this.coreDatabase.delete('pendingProposals', groupId);
       }
     } catch (error) {
       this.logger.error(`Error while committing pending proposals for groupId ${groupId}`, error);
@@ -763,7 +761,7 @@ export class MLSService extends TypedEventEmitter<Events> {
    */
   public async checkExistingPendingProposals() {
     try {
-      const pendingProposals = pendingProposalsStore.getAllItems();
+      const pendingProposals = await this.coreDatabase.getAll('pendingProposals');
       if (pendingProposals.length > 0) {
         pendingProposals.forEach(({groupId, firingDate}) =>
           TaskScheduler.addTask({

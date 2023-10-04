@@ -364,7 +364,7 @@ export class Account extends TypedEventEmitter<Events> {
 
     const mlsService =
       clientType === CryptoClientType.CORE_CRYPTO && enableMLS
-        ? new MLSService(this.apiClient, cryptoClient.getNativeClient(), {
+        ? new MLSService(this.apiClient, cryptoClient.getNativeClient(), this.db, {
             ...this.cryptoProtocolConfig?.mls,
           })
         : undefined;

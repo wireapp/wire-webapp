@@ -18,14 +18,20 @@
  */
 
 import {ClientType, RegisteredClient} from '@wireapp/api-client/lib/client';
-import {CONVERSATION_EVENT, ConversationMLSWelcomeEvent} from '@wireapp/api-client/lib/event';
+import {
+  CONVERSATION_EVENT,
+  ConversationMLSMessageAddEvent,
+  ConversationMLSWelcomeEvent,
+} from '@wireapp/api-client/lib/event';
 
 import {randomUUID} from 'crypto';
 
 import {APIClient} from '@wireapp/api-client';
-import {CoreCrypto} from '@wireapp/core-crypto';
+import {CoreCrypto, DecryptedMessage} from '@wireapp/core-crypto';
 
 import {MLSService} from './MLSService';
+
+import {openDB} from '../../../storage/CoreDB';
 
 jest.createMockFromModule('@wireapp/api-client');
 
@@ -33,7 +39,7 @@ function createUserId() {
   return {id: randomUUID(), domain: ''};
 }
 
-describe('MLSService', () => {
+const createMLSService = async () => {
   const apiClient = new APIClient();
   const mockCoreCrypto = {
     createConversation: jest.fn(),
@@ -44,13 +50,29 @@ describe('MLSService', () => {
     mlsInit: jest.fn(),
     clientPublicKey: jest.fn(),
     processWelcomeMessage: jest.fn(),
+    decryptMessage: jest.fn(),
+    conversationEpoch: jest.fn(),
+    commitPendingProposals: jest.fn(),
   } as unknown as CoreCrypto;
 
+  const mockedDb = await openDB('core-test-db');
+
+  const mlsService = new MLSService(apiClient, mockCoreCrypto, mockedDb, {});
+
+  return [mlsService, {apiClient, coreCrypto: mockCoreCrypto}] as const;
+};
+
+describe('MLSService', () => {
   describe('registerConversation', () => {
     let mlsService: MLSService;
+    let apiClient: APIClient;
+    let coreCrypto: CoreCrypto;
 
-    beforeEach(() => {
-      mlsService = new MLSService(apiClient, mockCoreCrypto, {});
+    beforeEach(async () => {
+      const [mockedMLSService, {apiClient: mockApiClient, coreCrypto: mockCoreCrypto}] = await createMLSService();
+      mlsService = mockedMLSService;
+      apiClient = mockApiClient;
+      coreCrypto = mockCoreCrypto;
       jest
         .spyOn(apiClient.api.client, 'getPublicKeys')
         .mockResolvedValue({removal: {algo: 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm3OQFc='}});
@@ -94,7 +116,7 @@ describe('MLSService', () => {
 
     it('cancels key material timers after group is wiped', async () => {
       const groupId = 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm4OQFc=';
-      jest.spyOn(mockCoreCrypto, 'conversationExists').mockResolvedValueOnce(true);
+      jest.spyOn(coreCrypto, 'conversationExists').mockResolvedValueOnce(true);
       await mlsService.wipeConversation(groupId);
       expect(mlsService.cancelKeyMaterialRenewal).toHaveBeenCalledWith(groupId);
     });
@@ -102,7 +124,7 @@ describe('MLSService', () => {
 
   describe('isConversationEstablished', () => {
     it('returns false if conversation does not exist locally', async () => {
-      const mlsService = new MLSService(apiClient, mockCoreCrypto, {});
+      const [mlsService] = await createMLSService();
 
       const groupId = 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm3OQFc=';
 
@@ -114,7 +136,7 @@ describe('MLSService', () => {
     });
 
     it('returns false if epoch number is 0', async () => {
-      const mlsService = new MLSService(apiClient, mockCoreCrypto, {});
+      const [mlsService] = await createMLSService();
 
       const groupId = 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm3OQFc=';
 
@@ -127,7 +149,7 @@ describe('MLSService', () => {
     });
 
     it.each([1, 2, 100])('returns false if epoch number is 1 or more', async epoch => {
-      const mlsService = new MLSService(apiClient, mockCoreCrypto, {});
+      const [mlsService] = await createMLSService();
 
       const groupId = 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm3OQFc=';
 
@@ -142,7 +164,7 @@ describe('MLSService', () => {
 
   describe('initClient', () => {
     it('uploads public key only if it was not yet defined on client entity', async () => {
-      const mlsService = new MLSService(apiClient, mockCoreCrypto, {});
+      const [mlsService, {apiClient, coreCrypto}] = await createMLSService();
 
       const mockUserId = {id: 'user-1', domain: 'local.zinfra.io'};
       const mockClientId = 'client-1';
@@ -152,18 +174,18 @@ describe('MLSService', () => {
 
       const mockedClientPublicKey = new Uint8Array();
 
-      jest.spyOn(mockCoreCrypto, 'clientPublicKey').mockResolvedValueOnce(mockedClientPublicKey);
+      jest.spyOn(coreCrypto, 'clientPublicKey').mockResolvedValueOnce(mockedClientPublicKey);
       jest.spyOn(apiClient.api.client, 'putClient').mockResolvedValueOnce(undefined);
       jest.spyOn(apiClient.api.client, 'getMLSKeyPackageCount').mockResolvedValueOnce(mlsService.config.nbKeyPackages);
 
       await mlsService.initClient(mockUserId, mockClient);
 
-      expect(mockCoreCrypto.mlsInit).toHaveBeenCalled();
+      expect(coreCrypto.mlsInit).toHaveBeenCalled();
       expect(apiClient.api.client.putClient).toHaveBeenCalledWith(mockClientId, expect.anything());
     });
 
     it('uploads key packages if there are not enough keys on backend', async () => {
-      const mlsService = new MLSService(apiClient, mockCoreCrypto, {});
+      const [mlsService, {apiClient, coreCrypto}] = await createMLSService();
 
       const mockUserId = {id: 'user-1', domain: 'local.zinfra.io'};
       const mockClientId = 'client-1';
@@ -172,7 +194,7 @@ describe('MLSService', () => {
       apiClient.context = {clientType: ClientType.PERMANENT, clientId: mockClientId, userId: ''};
 
       const mockedClientKeyPackages = [new Uint8Array()];
-      jest.spyOn(mockCoreCrypto, 'clientKeypackages').mockResolvedValueOnce(mockedClientKeyPackages);
+      jest.spyOn(coreCrypto, 'clientKeypackages').mockResolvedValueOnce(mockedClientKeyPackages);
       jest
         .spyOn(apiClient.api.client, 'getMLSKeyPackageCount')
         .mockResolvedValueOnce(mlsService.config.minRequiredNumberOfAvailableKeyPackages - 1);
@@ -180,12 +202,12 @@ describe('MLSService', () => {
 
       await mlsService.initClient(mockUserId, mockClient);
 
-      expect(mockCoreCrypto.mlsInit).toHaveBeenCalled();
+      expect(coreCrypto.mlsInit).toHaveBeenCalled();
       expect(apiClient.api.client.uploadMLSKeyPackages).toHaveBeenCalledWith(mockClientId, expect.anything());
     });
 
     it('does not upload public key or key packages if both are already uploaded', async () => {
-      const mlsService = new MLSService(apiClient, mockCoreCrypto, {});
+      const [mlsService, {apiClient, coreCrypto}] = await createMLSService();
 
       const mockUserId = {id: 'user-1', domain: 'local.zinfra.io'};
       const mockClientId = 'client-1';
@@ -196,18 +218,94 @@ describe('MLSService', () => {
       jest.spyOn(apiClient.api.client, 'getClient').mockResolvedValueOnce(mockClient);
 
       jest.spyOn(apiClient.api.client, 'getMLSKeyPackageCount').mockResolvedValueOnce(mlsService.config.nbKeyPackages);
+      jest.spyOn(apiClient.api.client, 'uploadMLSKeyPackages');
+      jest.spyOn(apiClient.api.client, 'putClient');
 
       await mlsService.initClient(mockUserId, mockClient);
 
-      expect(mockCoreCrypto.mlsInit).toHaveBeenCalled();
+      expect(coreCrypto.mlsInit).toHaveBeenCalled();
       expect(apiClient.api.client.uploadMLSKeyPackages).not.toHaveBeenCalled();
       expect(apiClient.api.client.putClient).not.toHaveBeenCalled();
     });
   });
 
+  describe('handleMLSMessageAddEvent', () => {
+    it('decrypts a message and emits new epoch event if epoch has changed', async () => {
+      const [mlsService, {coreCrypto: mockCoreCrypto}] = await createMLSService();
+
+      const mockGroupId = 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm3OQFc=';
+      const mockedNewEpoch = 3;
+
+      jest.spyOn(mlsService, 'getGroupIdFromConversationId').mockResolvedValueOnce(mockGroupId);
+
+      const mockedDecryptoedMessage: DecryptedMessage = {
+        hasEpochChanged: true,
+        isActive: false,
+        proposals: [],
+      };
+
+      jest.spyOn(mockCoreCrypto, 'decryptMessage').mockResolvedValueOnce(mockedDecryptoedMessage);
+      jest.spyOn(mockCoreCrypto, 'conversationEpoch').mockResolvedValueOnce(mockedNewEpoch);
+      jest.spyOn(mlsService, 'emit').mockImplementation(jest.fn());
+
+      const mockedMLSWelcomeEvent: ConversationMLSMessageAddEvent = {
+        type: CONVERSATION_EVENT.MLS_MESSAGE_ADD,
+        senderClientId: '',
+        conversation: '',
+        data: '',
+        from: '',
+        time: '',
+      };
+
+      await mlsService.handleMLSMessageAddEvent(mockedMLSWelcomeEvent);
+      expect(mockCoreCrypto.decryptMessage).toHaveBeenCalled();
+      expect(mlsService.emit).toHaveBeenCalledWith('newEpoch', {epoch: mockedNewEpoch, groupId: mockGroupId});
+    });
+
+    it('handles pending propoals with a delay after decrypting a message', async () => {
+      const [mlsService, {coreCrypto: mockCoreCrypto}] = await createMLSService();
+      jest.useFakeTimers();
+
+      const mockGroupId = 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm3OQFc=';
+      const mockedNewEpoch = 3;
+      const commitDelay = 1000;
+
+      jest.spyOn(mlsService, 'getGroupIdFromConversationId').mockResolvedValueOnce(mockGroupId);
+
+      const mockedDecryptoedMessage: DecryptedMessage = {
+        hasEpochChanged: true,
+        isActive: false,
+        proposals: [],
+        commitDelay,
+      };
+
+      jest.spyOn(mockCoreCrypto, 'decryptMessage').mockResolvedValueOnce(mockedDecryptoedMessage);
+      jest.spyOn(mockCoreCrypto, 'conversationEpoch').mockResolvedValueOnce(mockedNewEpoch);
+
+      jest.spyOn(mlsService, 'commitPendingProposals');
+
+      const mockedMLSWelcomeEvent: ConversationMLSMessageAddEvent = {
+        type: CONVERSATION_EVENT.MLS_MESSAGE_ADD,
+        senderClientId: '',
+        conversation: '',
+        data: '',
+        from: '',
+        time: new Date().toISOString(),
+      };
+
+      await mlsService.handleMLSMessageAddEvent(mockedMLSWelcomeEvent);
+
+      expect(mockCoreCrypto.commitPendingProposals).not.toHaveBeenCalled();
+
+      jest.advanceTimersByTime(commitDelay);
+      expect(mockCoreCrypto.decryptMessage).toHaveBeenCalled();
+      expect(mockCoreCrypto.commitPendingProposals).toHaveBeenCalled();
+    });
+  });
+
   describe('handleMLSWelcomeMessageEvent', () => {
     it("before processing welcome it verifies that there's enough key packages locally", async () => {
-      const mlsService = new MLSService(apiClient, mockCoreCrypto, {});
+      const [mlsService, {apiClient, coreCrypto}] = await createMLSService();
 
       const mockClientId = 'client-1';
       const mockClient = {mls_public_keys: {ed25519: 'key'}, id: mockClientId} as unknown as RegisteredClient;
@@ -215,14 +313,14 @@ describe('MLSService', () => {
       apiClient.context = {clientType: ClientType.PERMANENT, clientId: mockClientId, userId: ''};
 
       const mockedClientKeyPackages = [new Uint8Array()];
-      jest.spyOn(mockCoreCrypto, 'clientKeypackages').mockResolvedValueOnce(mockedClientKeyPackages);
+      jest.spyOn(coreCrypto, 'clientKeypackages').mockResolvedValueOnce(mockedClientKeyPackages);
 
       const numberOfKeysBelowThreshold = mlsService.config.minRequiredNumberOfAvailableKeyPackages - 1;
       jest.spyOn(apiClient.api.client, 'getMLSKeyPackageCount').mockResolvedValueOnce(numberOfKeysBelowThreshold);
-      jest.spyOn(mockCoreCrypto, 'clientValidKeypackagesCount').mockResolvedValueOnce(numberOfKeysBelowThreshold);
+      jest.spyOn(coreCrypto, 'clientValidKeypackagesCount').mockResolvedValueOnce(numberOfKeysBelowThreshold);
 
       jest.spyOn(apiClient.api.client, 'uploadMLSKeyPackages').mockResolvedValueOnce(undefined);
-      jest.spyOn(mockCoreCrypto, 'processWelcomeMessage').mockResolvedValueOnce(new Uint8Array());
+      jest.spyOn(coreCrypto, 'processWelcomeMessage').mockResolvedValueOnce(new Uint8Array());
 
       jest.spyOn(mlsService, 'scheduleKeyMaterialRenewal').mockImplementation(jest.fn());
 
@@ -236,12 +334,12 @@ describe('MLSService', () => {
 
       await mlsService.handleMLSWelcomeMessageEvent(mockedMLSWelcomeEvent, mockClient.id);
 
-      expect(mockCoreCrypto.processWelcomeMessage).toHaveBeenCalled();
+      expect(coreCrypto.processWelcomeMessage).toHaveBeenCalled();
       expect(apiClient.api.client.uploadMLSKeyPackages).toHaveBeenCalledWith(mockClientId, expect.anything());
     });
 
     it('before processing welcome it does not generate new keys if there is enough key packages locally', async () => {
-      const mlsService = new MLSService(apiClient, mockCoreCrypto, {});
+      const [mlsService, {apiClient, coreCrypto}] = await createMLSService();
 
       const mockClientId = 'client-1';
       const mockClient = {mls_public_keys: {ed25519: 'key'}, id: mockClientId} as unknown as RegisteredClient;
@@ -249,14 +347,14 @@ describe('MLSService', () => {
       apiClient.context = {clientType: ClientType.PERMANENT, clientId: mockClientId, userId: ''};
 
       const mockedClientKeyPackages = [new Uint8Array()];
-      jest.spyOn(mockCoreCrypto, 'clientKeypackages').mockResolvedValueOnce(mockedClientKeyPackages);
+      jest.spyOn(coreCrypto, 'clientKeypackages').mockResolvedValueOnce(mockedClientKeyPackages);
 
       const numberOfKeysAboveThreshold = mlsService.config.minRequiredNumberOfAvailableKeyPackages + 1;
-      jest.spyOn(mockCoreCrypto, 'clientValidKeypackagesCount').mockResolvedValueOnce(numberOfKeysAboveThreshold);
+      jest.spyOn(coreCrypto, 'clientValidKeypackagesCount').mockResolvedValueOnce(numberOfKeysAboveThreshold);
       jest.spyOn(apiClient.api.client, 'getMLSKeyPackageCount').mockResolvedValueOnce(numberOfKeysAboveThreshold);
 
       jest.spyOn(apiClient.api.client, 'uploadMLSKeyPackages').mockResolvedValueOnce(undefined);
-      jest.spyOn(mockCoreCrypto, 'processWelcomeMessage').mockResolvedValueOnce(new Uint8Array());
+      jest.spyOn(coreCrypto, 'processWelcomeMessage').mockResolvedValueOnce(new Uint8Array());
 
       jest.spyOn(mlsService, 'scheduleKeyMaterialRenewal').mockImplementation(jest.fn());
 
@@ -270,12 +368,12 @@ describe('MLSService', () => {
 
       await mlsService.handleMLSWelcomeMessageEvent(mockedMLSWelcomeEvent, mockClient.id);
 
-      expect(mockCoreCrypto.processWelcomeMessage).toHaveBeenCalled();
+      expect(coreCrypto.processWelcomeMessage).toHaveBeenCalled();
       expect(apiClient.api.client.uploadMLSKeyPackages).not.toHaveBeenCalled();
     });
 
     it('before processing welcome it does not generate new keys if there is enough key packages uploaded to backend', async () => {
-      const mlsService = new MLSService(apiClient, mockCoreCrypto, {});
+      const [mlsService, {apiClient, coreCrypto}] = await createMLSService();
 
       const mockClientId = 'client-1';
       const mockClient = {mls_public_keys: {ed25519: 'key'}, id: mockClientId} as unknown as RegisteredClient;
@@ -283,16 +381,16 @@ describe('MLSService', () => {
       apiClient.context = {clientType: ClientType.PERMANENT, clientId: mockClientId, userId: ''};
 
       const mockedClientKeyPackages = [new Uint8Array()];
-      jest.spyOn(mockCoreCrypto, 'clientKeypackages').mockResolvedValueOnce(mockedClientKeyPackages);
+      jest.spyOn(coreCrypto, 'clientKeypackages').mockResolvedValueOnce(mockedClientKeyPackages);
 
       const numberOfKeysBelowThreshold = mlsService.config.minRequiredNumberOfAvailableKeyPackages - 1;
       const numberOfKeysAboveThreshold = mlsService.config.minRequiredNumberOfAvailableKeyPackages + 1;
 
-      jest.spyOn(mockCoreCrypto, 'clientValidKeypackagesCount').mockResolvedValueOnce(numberOfKeysBelowThreshold);
+      jest.spyOn(coreCrypto, 'clientValidKeypackagesCount').mockResolvedValueOnce(numberOfKeysBelowThreshold);
       jest.spyOn(apiClient.api.client, 'getMLSKeyPackageCount').mockResolvedValueOnce(numberOfKeysAboveThreshold);
 
       jest.spyOn(apiClient.api.client, 'uploadMLSKeyPackages').mockResolvedValueOnce(undefined);
-      jest.spyOn(mockCoreCrypto, 'processWelcomeMessage').mockResolvedValueOnce(new Uint8Array());
+      jest.spyOn(coreCrypto, 'processWelcomeMessage').mockResolvedValueOnce(new Uint8Array());
 
       jest.spyOn(mlsService, 'scheduleKeyMaterialRenewal').mockImplementation(jest.fn());
 
@@ -306,7 +404,7 @@ describe('MLSService', () => {
 
       await mlsService.handleMLSWelcomeMessageEvent(mockedMLSWelcomeEvent, mockClient.id);
 
-      expect(mockCoreCrypto.processWelcomeMessage).toHaveBeenCalled();
+      expect(coreCrypto.processWelcomeMessage).toHaveBeenCalled();
       expect(apiClient.api.client.uploadMLSKeyPackages).not.toHaveBeenCalled();
     });
   });
