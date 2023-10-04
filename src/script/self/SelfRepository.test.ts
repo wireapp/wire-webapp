@@ -301,6 +301,8 @@ describe('SelfRepository', () => {
         key: SelfRepository.SELF_SUPPORTED_PROTOCOLS_CHECK_KEY,
         task: expect.anything(),
       });
+
+      expect(selfUser.supportedProtocols()).toEqual(evaluatedProtocols);
     });
   });
 
