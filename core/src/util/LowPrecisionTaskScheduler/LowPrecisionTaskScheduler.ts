@@ -52,11 +52,11 @@ const addTask = ({key, firingDate, task, intervalDelay}: ScheduleLowPrecisionTas
     const tasks = intervals[intervalDelay]?.tasks;
     if (tasks?.length !== 0) {
       for (const taskData of tasks) {
-        if (nowTime >= firingDate) {
+        if (nowTime >= taskData.firingDate) {
           const {task, key} = taskData;
           logger.info(`Executing task with key "${key}"`);
-          task();
           cancelTask({intervalDelay, key});
+          task();
         }
       }
     }

@@ -41,6 +41,26 @@ describe('RecurringTaskScheduler', () => {
     expect(task).toHaveBeenCalledTimes(2);
   });
 
+  it('resumes a task after re-registering a recurring task', () => {
+    const task = jest.fn();
+
+    // it should fire in a minute
+    registerRecurringTask({every: TimeUtil.TimeInMillis.MINUTE, task, key: 'test-task2'});
+    jest.advanceTimersByTime(TimeUtil.TimeInMillis.MINUTE / 2);
+
+    // re-register the task
+    registerRecurringTask({every: TimeUtil.TimeInMillis.MINUTE, task, key: 'test-task2'});
+
+    // only 30s have passed, so the task should not have fired yet
+    expect(task).toHaveBeenCalledTimes(0);
+
+    // advance the timer by another 30s (so we have 1 minute in total)
+    jest.advanceTimersByTime(TimeUtil.TimeInMillis.MINUTE / 2);
+
+    // the task should have fired once after a minute from the beginning even if we re-registered it
+    expect(task).toHaveBeenCalledTimes(1);
+  });
+
   it('cancel a task before it is run', () => {
     const task = jest.fn();
     const testKey = 'test-task-1';
