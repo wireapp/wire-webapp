@@ -31,11 +31,11 @@ interface PromiseQueueOptions {
   timeout?: number;
 }
 
-export type PromiseFn<T> = (...args: any[]) => Promise<T>;
-export type PromiseResolveFn = (value?: unknown) => void;
-export type PromiseRejectFn = (reason?: any) => void;
+type PromiseFn<T> = (...args: any[]) => Promise<T>;
+type PromiseResolveFn = (value?: unknown) => void;
+type PromiseRejectFn = (reason?: any) => void;
 
-export interface QueueEntry<T> {
+interface QueueEntry<T> {
   fn: PromiseFn<T>;
   rejectFn: PromiseRejectFn;
   resolveFn?: PromiseResolveFn;

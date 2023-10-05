@@ -19,16 +19,6 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const listItem = (noInteraction = false): CSSObject => ({
-  display: 'flex',
-  overflow: 'hidden',
-  height: '56px',
-  alignItems: 'center',
-  paddingRight: '16px',
-  margin: '0',
-  cursor: noInteraction ? 'default' : 'pointer',
-});
-
 export const chevronIcon: CSSObject = {
   border: 'none',
   background: 'none',

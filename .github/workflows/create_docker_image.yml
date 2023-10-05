@@ -24,7 +24,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -45,11 +45,15 @@ jobs:
       - name: Build
         run: yarn build:prod
 
+      - name: Set short sha
+        id: vars
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
       - name: Push Docker image
         env:
           DOCKER_PASSWORD: ${{secrets.WEBTEAM_QUAY_PASSWORD}}
           DOCKER_USERNAME: ${{secrets.WEBTEAM_QUAY_USERNAME}}
-        run: yarn docker '' "${{inputs.tag}}"
+        run: yarn docker "${{inputs.tag}}-${{ steps.vars.outputs.sha_short }}"
 
       - name: Create GitHub release
         if: ${{inputs.create_release}}

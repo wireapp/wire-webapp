@@ -33,23 +33,16 @@ require('dotenv').config();
  * Note: You must run "yarn build:prod" before creating the Docker image, otherwise the compiled JavaScript code (and other assets) won't be part of the bundle.
  *
  * Demo execution:
- * yarn docker '' staging '2021-08-25' '1240cfda9e609470cf1154e18f5bc582ca8907ff'
+ * yarn docker staging '2021-08-25' '1240cfda9e609470cf1154e18f5bc582ca8907ff'
  */
 
-/** Either empty (for our own cloud releases) or a suffix (i.e. "ey") for custom deployments */
-const distributionParam = process.argv[2] || '';
 /** Either "staging" (for internal releases / staging bumps) or "production" (for cloud releases) */
-const stageParam = process.argv[3] || '';
+const stageParam = process.argv[2] || '';
 /** Version tag of webapp (i.e. "2021-08-25") */
-const versionParam = process.argv[4] || '';
+const versionParam = process.argv[3] || '';
 /** Commit ID of https://github.com/wireapp/wire-webapp (i.e. "1240cfda9e609470cf1154e18f5bc582ca8907ff") */
-const commitSha = process.env.GITHUB_SHA || process.argv[5];
+const commitSha = process.env.GITHUB_SHA || process.argv[4];
 const commitShortSha = commitSha.substring(0, 7);
-/** Defines which config version (listed in "app-config/package.json") is going to be used */
-const configurationEntry = `wire-web-config-default-${
-  distributionParam || stageParam === 'production' ? 'master' : 'staging'
-}`;
-const configVersion = appConfigPkg.dependencies[configurationEntry].split('#')[1];
 const dockerRegistryDomain = 'quay.io';
 const repository = `${dockerRegistryDomain}/wire/webapp${distributionParam ? `-${distributionParam}` : ''}`;
 
@@ -61,6 +54,11 @@ if (stageParam) {
 }
 
 if (['production', 'staging'].includes(stageParam)) {
+  /** Defines which config version (listed in "app-config/package.json") is going to be used */
+  const configurationEntry = `wire-web-config-default-${
+    distributionParam || stageParam === 'production' ? 'master' : 'staging'
+  }`;
+  const configVersion = appConfigPkg.dependencies[configurationEntry].split('#')[1];
   tags.push(`${repository}:${versionParam}-${configVersion}-${commitShortSha}`);
 }
 

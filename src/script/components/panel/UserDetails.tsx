@@ -35,7 +35,7 @@ import {t} from 'Util/LocalizerUtil';
 
 import {User} from '../../entity/User';
 
-export interface UserDetailsProps {
+interface UserDetailsProps {
   badge?: string;
   classifiedDomains?: string[];
   isGroupAdmin?: boolean;
@@ -45,7 +45,7 @@ export interface UserDetailsProps {
   avatarStyles?: React.CSSProperties;
 }
 
-export const UserDetailsComponent: React.FC<UserDetailsProps> = ({
+const UserDetailsComponent: React.FC<UserDetailsProps> = ({
   badge,
   participant,
   isSelfVerified,
