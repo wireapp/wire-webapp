@@ -19,7 +19,6 @@
 
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {FEATURE_KEY, FeatureMLS} from '@wireapp/api-client/lib/team/feature/';
-import {registerRecurringTask} from '@wireapp/core/lib/util/RecurringTaskScheduler';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
@@ -33,14 +32,14 @@ import {SelfService} from './SelfService';
 import {ClientEntity, ClientRepository} from '../client';
 import {isMLSSupportedByEnvironment} from '../mls/isMLSSupportedByEnvironment';
 import {MLSMigrationStatus} from '../mls/MLSMigration/migrationStatus';
+import {Core} from '../service/CoreSingleton';
 import {TeamRepository} from '../team/TeamRepository';
 import {UserRepository} from '../user/UserRepository';
 import {UserState} from '../user/UserState';
 
-const SELF_SUPPORTED_PROTOCOLS_CHECK_KEY = 'self-supported-protocols-check';
-
 export class SelfRepository {
   private readonly logger: Logger;
+  static SELF_SUPPORTED_PROTOCOLS_CHECK_KEY = 'self-supported-protocols-check';
 
   constructor(
     private readonly selfService: SelfService,
@@ -48,6 +47,7 @@ export class SelfRepository {
     private readonly teamRepository: TeamRepository,
     private readonly clientRepository: ClientRepository,
     private readonly userState = container.resolve(UserState),
+    private readonly core = container.resolve(Core),
   ) {
     this.logger = getLogger('SelfRepository');
 
@@ -230,10 +230,10 @@ export class SelfRepository {
     };
     await refreshProtocolsTask();
 
-    return registerRecurringTask({
+    await this.core.recurringTaskScheduler.registerTask({
       every: TIME_IN_MILLIS.DAY,
       task: refreshProtocolsTask,
-      key: SELF_SUPPORTED_PROTOCOLS_CHECK_KEY,
+      key: SelfRepository.SELF_SUPPORTED_PROTOCOLS_CHECK_KEY,
     });
   }
 
