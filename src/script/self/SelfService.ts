@@ -24,13 +24,9 @@ import type {UserUpdate} from '@wireapp/api-client/lib/user/';
 import {container} from 'tsyringe';
 
 import {APIClient} from '../service/APIClientSingleton';
-import {Core} from '../service/CoreSingleton';
 
 export class SelfService {
-  constructor(
-    private readonly apiClient = container.resolve(APIClient),
-    private readonly core = container.resolve(Core),
-  ) {}
+  constructor(private readonly apiClient = container.resolve(APIClient)) {}
 
   deleteSelf(password?: string): Promise<void> {
     return this.apiClient.api.self.deleteSelf({password});
