@@ -142,9 +142,7 @@ export class SelfRepository {
 
     await this.core.recurringTaskScheduler.registerTask({
       every: TIME_IN_MILLIS.DAY,
-      task: async () => {
-        await this.refreshSelfSupportedProtocols();
-      },
+      task: () => this.refreshSelfSupportedProtocols(),
       key: SelfRepository.SELF_SUPPORTED_PROTOCOLS_CHECK_KEY,
     });
   }
