@@ -21,7 +21,6 @@ import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data/';
 import {ConversationOtrMessageAddEvent, CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {AddUsersFailureReasons} from '@wireapp/core/lib/conversation';
-import {ReactionType} from '@wireapp/core/lib/conversation/ReactionType';
 import {DecryptionError} from '@wireapp/core/lib/errors/DecryptionError';
 
 import type {REASON as AVS_REASON} from '@wireapp/avs';
@@ -29,16 +28,15 @@ import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {createUuid} from 'Util/uuid';
 
-import {CALL_MESSAGE_TYPE} from '../calling/enum/CallMessageType';
 import type {Conversation} from '../entity/Conversation';
 import type {Message} from '../entity/message/Message';
 import type {User} from '../entity/User';
-import {CALL, ClientEvent, CONVERSATION} from '../event/Client';
+import {ClientEvent, CONVERSATION} from '../event/Client';
 import {StatusType} from '../message/StatusType';
 import {VerificationMessageType} from '../message/VerificationMessageType';
 import {AssetRecord, EventRecord, ReadReceipt, UserReactionMap} from '../storage';
 
-export interface BaseEvent {
+interface BaseEvent {
   conversation: string;
   data?: unknown;
   from: string;
@@ -50,70 +48,48 @@ export interface BaseEvent {
   time: string;
 }
 
-export interface ConversationEvent<T> extends BaseEvent {
+interface ConversationEvent<T> extends BaseEvent {
   data: T;
   id: string;
   type: CONVERSATION;
 }
 
-export interface CallingEvent {
-  /**
-   * content is an object that comes from avs
-   */
-  content: {
-    type: CALL_MESSAGE_TYPE;
-    version: string;
-  };
-  targetConversation?: QualifiedId;
-  conversation: string;
-  from: string;
-  qualified_conversation?: QualifiedId;
-  qualified_from?: QualifiedId;
-  sender: string;
-  time?: string;
-  type: CALL;
-  senderClientId?: string;
-}
-
-export interface BackendEventMessage<T> extends Omit<BaseEvent, 'id'> {
+interface BackendEventMessage<T> extends Omit<BaseEvent, 'id'> {
   data: T;
   id?: string;
   type: string;
 }
 
-export interface VoiceChannelActivateEvent extends BaseEvent {
+interface VoiceChannelActivateEvent extends BaseEvent {
   protocol_version: number;
   type: CONVERSATION.VOICE_CHANNEL_ACTIVATE;
 }
-export type AllVerifiedEventData = {type: VerificationMessageType.VERIFIED};
-export type AllVerifiedEvent = ConversationEvent<AllVerifiedEventData> & {
+type AllVerifiedEventData = {type: VerificationMessageType.VERIFIED};
+type AllVerifiedEvent = ConversationEvent<AllVerifiedEventData> & {
   type: typeof ClientEvent.CONVERSATION.VERIFICATION;
 };
-export type AssetAddEvent = Omit<ConversationEvent<any>, 'id'> &
+type AssetAddEvent = Omit<ConversationEvent<any>, 'id'> &
   Partial<Pick<ConversationEvent<any>, 'id'>> & {status: StatusType; type: CONVERSATION.ASSET_ADD};
-export type DegradedMessageEventData = {type: VerificationMessageType; userIds: QualifiedId[]};
-export type DegradedMessageEvent = ConversationEvent<DegradedMessageEventData> & {
+type DegradedMessageEventData = {type: VerificationMessageType; userIds: QualifiedId[]};
+type DegradedMessageEvent = ConversationEvent<DegradedMessageEventData> & {
   type: typeof ClientEvent.CONVERSATION.VERIFICATION;
 };
-export type DeleteEvent = ConversationEvent<{deleted_time: number; message_id: string; time: string}> & {
-  type: CONVERSATION.MESSAGE_DELETE;
-};
-export type FederationStopEvent = ConversationEvent<{domains: string[]}> & {
+type FederationStopEvent = ConversationEvent<{domains: string[]}> & {
   type: CONVERSATION.FEDERATION_STOP;
 };
-export type GroupCreationEventData = {
+type GroupCreationEventData = {
   allTeamMembers: boolean;
   name: string;
   userIds: QualifiedId[];
 };
-export type GroupCreationEvent = ConversationEvent<GroupCreationEventData> & {type: CONVERSATION.GROUP_CREATION};
-export type LegalHoldMessageEvent = ConversationEvent<{legal_hold_status: LegalHoldStatus}> & {
+type GroupCreationEvent = ConversationEvent<GroupCreationEventData> & {type: CONVERSATION.GROUP_CREATION};
+type LegalHoldMessageEvent = ConversationEvent<{legal_hold_status: LegalHoldStatus}> & {
   type: CONVERSATION.LEGAL_HOLD_UPDATE;
 };
-export type MemberJoinEvent = BackendEventMessage<{qualified_user_ids?: QualifiedId[]; user_ids: string[]}> & {
+type MemberJoinEvent = BackendEventMessage<{qualified_user_ids?: QualifiedId[]; user_ids: string[]}> & {
   type: CONVERSATION_EVENT.MEMBER_JOIN;
 };
-export type MemberLeaveEvent = BackendEventMessage<{
+type MemberLeaveEvent = BackendEventMessage<{
   name?: string;
   qualified_user_ids?: QualifiedId[];
   reason?: MemberLeaveReason;
@@ -121,7 +97,7 @@ export type MemberLeaveEvent = BackendEventMessage<{
 }> & {
   type: CONVERSATION_EVENT.MEMBER_LEAVE;
 };
-export type MessageAddEvent = Omit<
+type MessageAddEvent = Omit<
   ConversationEvent<{
     sender: string;
     content: string;
@@ -139,62 +115,28 @@ export type MessageAddEvent = Omit<
   status: StatusType;
   type: CONVERSATION.MESSAGE_ADD;
 };
-export type MissedEvent = BaseEvent & {id: string; type: CONVERSATION.MISSED_MESSAGES};
-export type MLSConversationRecoveredEvent = BaseEvent & {id: string; type: CONVERSATION.MLS_CONVERSATION_RECOVERED};
-export type OneToOneCreationEvent = ConversationEvent<{userIds: QualifiedId[]}> & {
+type MissedEvent = BaseEvent & {id: string; type: CONVERSATION.MISSED_MESSAGES};
+type MLSConversationRecoveredEvent = BaseEvent & {id: string; type: CONVERSATION.MLS_CONVERSATION_RECOVERED};
+type OneToOneCreationEvent = ConversationEvent<{userIds: QualifiedId[]}> & {
   type: CONVERSATION.ONE2ONE_CREATION;
 };
-export type TeamMemberLeaveEvent = Omit<MemberLeaveEvent, 'type'> & {
+type TeamMemberLeaveEvent = Omit<MemberLeaveEvent, 'type'> & {
   type: CONVERSATION.TEAM_MEMBER_LEAVE;
 };
-export type ReactionEvent = ConversationEvent<{message_id: string; reaction: ReactionType}> & {
-  type: CONVERSATION.REACTION;
-};
-export type MessageHiddenEvent = ConversationEvent<{conversation_id: string; message_id: string}> & {
-  type: CONVERSATION.MESSAGE_HIDDEN;
-};
-export type ConfirmationEvent = ConversationEvent<{
-  message_id: string;
-  more_message_ids: string[];
-  status: StatusType;
-}> & {
-  type: CONVERSATION.CONFIRMATION;
-};
-export type ButtonActionConfirmationEvent = ConversationEvent<{buttonId: string; messageId: string}> & {
-  type: CONVERSATION.BUTTON_ACTION_CONFIRMATION;
-};
-export type DeleteEverywhereEvent = ConversationEvent<{}> & {
+type DeleteEverywhereEvent = ConversationEvent<{}> & {
   type: CONVERSATION.DELETE_EVERYWHERE;
 };
-export type CompositeMessageAddEvent = ConversationEvent<{}> & {
-  type: CONVERSATION.COMPOSITE_MESSAGE_ADD;
-};
-export type IncomingMessageTooBigEvent = ConversationEvent<{}> & {
-  type: CONVERSATION.INCOMING_MESSAGE_TOO_BIG;
-};
-export type KnockEvent = ConversationEvent<{}> & {
-  type: CONVERSATION.KNOCK;
-};
-export type LocationEvent = ConversationEvent<{}> & {
-  type: CONVERSATION.LOCATION;
-};
-export type UnableToDecryptEvent = ConversationEvent<{}> & {
-  type: CONVERSATION.UNABLE_TO_DECRYPT;
-};
-export type VerificationEvent = ConversationEvent<{}> & {
-  type: CONVERSATION.VERIFICATION;
-};
-export type VoiceChannelDeactivateEvent = ConversationEvent<{duration: number; reason: AVS_REASON}> & {
+type VoiceChannelDeactivateEvent = ConversationEvent<{duration: number; reason: AVS_REASON}> & {
   protocol_version: number;
   type: CONVERSATION.VOICE_CHANNEL_DEACTIVATE;
 };
-export type FileTypeRestrictedEvent = ConversationEvent<{fileExt: string; isIncoming: boolean; name: string}> & {
+type FileTypeRestrictedEvent = ConversationEvent<{fileExt: string; isIncoming: boolean; name: string}> & {
   type: CONVERSATION.FILE_TYPE_RESTRICTED;
 };
-export type CallingTimeoutEvent = ConversationEvent<{reason: AVS_REASON.NOONE_JOINED | AVS_REASON.EVERYONE_LEFT}> & {
+type CallingTimeoutEvent = ConversationEvent<{reason: AVS_REASON.NOONE_JOINED | AVS_REASON.EVERYONE_LEFT}> & {
   type: CONVERSATION.CALL_TIME_OUT;
 };
-export type FailedToAddUsersMessageEvent = ConversationEvent<{
+type FailedToAddUsersMessageEvent = ConversationEvent<{
   qualifiedIds: QualifiedId[];
   reason: AddUsersFailureReasons;
   backends: string[];
@@ -202,45 +144,12 @@ export type FailedToAddUsersMessageEvent = ConversationEvent<{
   type: CONVERSATION.FAILED_TO_ADD_USERS;
 };
 
-export interface ErrorEvent extends BaseEvent {
+interface ErrorEvent extends BaseEvent {
   error: string;
   error_code: number | string;
   id: string;
   type: CONVERSATION.UNABLE_TO_DECRYPT | CONVERSATION.INCOMING_MESSAGE_TOO_BIG;
 }
-
-export type ClientConversationEvent =
-  | AllVerifiedEvent
-  | AssetAddEvent
-  | ErrorEvent
-  | CompositeMessageAddEvent
-  | ConfirmationEvent
-  | FederationStopEvent
-  | DeleteEvent
-  | DeleteEverywhereEvent
-  | DegradedMessageEvent
-  | ButtonActionConfirmationEvent
-  | KnockEvent
-  | IncomingMessageTooBigEvent
-  | GroupCreationEvent
-  | TeamMemberLeaveEvent
-  | ReactionEvent
-  | LegalHoldMessageEvent
-  | MessageAddEvent
-  | MessageHiddenEvent
-  | MemberLeaveEvent
-  | MemberJoinEvent
-  | OneToOneCreationEvent
-  | VoiceChannelDeactivateEvent
-  | FileTypeRestrictedEvent
-  | CallingTimeoutEvent
-  | FailedToAddUsersMessageEvent
-  | UnableToDecryptEvent
-  | MissedEvent
-  | MLSConversationRecoveredEvent
-  | LocationEvent
-  | VoiceChannelActivateEvent
-  | VerificationEvent;
 
 function buildQualifiedId(conversation: QualifiedId | string) {
   const qualifiedId = typeof conversation === 'string' ? {domain: '', id: conversation} : conversation;

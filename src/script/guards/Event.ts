@@ -17,5 +17,4 @@
  *
  */
 
-export const isDragEvent = (event: Event): event is DragEvent => 'dataTransfer' in event;
 export const isKeyDownEvent = (event: Event): event is KeyboardEvent => event.type === 'keydown';

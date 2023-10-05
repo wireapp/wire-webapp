@@ -58,7 +58,7 @@ export interface QuoteProps {
   isMessageFocused: boolean;
 }
 
-const Quote: FC<QuoteProps> = ({
+export const Quote: FC<QuoteProps> = ({
   conversation,
   findMessage,
   focusMessage,
@@ -256,5 +256,3 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
     </>
   );
 };
-
-export {Quote, QuotedMessage};

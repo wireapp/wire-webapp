@@ -19,7 +19,7 @@
 
 /* cspell:disable */
 
-export interface CountryCode {
+interface CountryCode {
   code: number;
   iso: string;
   name: string;
