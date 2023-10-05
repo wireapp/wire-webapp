@@ -506,17 +506,17 @@ export class TeamRepository extends TypedEventEmitter<Events> {
   }
 
   public getTeamSupportedProtocols(): ConversationProtocol[] {
-    const mlsFeature = this.teamState.teamFeatures().mls;
+    const mlsFeature = this.teamState.teamFeatures()?.mls;
 
     if (!mlsFeature || mlsFeature.status === FeatureStatus.DISABLED) {
       return [ConversationProtocol.PROTEUS];
     }
 
-    return mlsFeature.config.supportedProtocols;
+    return mlsFeature.config.supportedProtocols || [ConversationProtocol.PROTEUS];
   }
 
   public getTeamMLSMigrationStatus(): MLSMigrationStatus {
-    const mlsMigrationFeature = this.teamState.teamFeatures().mlsMigration;
+    const mlsMigrationFeature = this.teamState.teamFeatures()?.mlsMigration;
 
     return getMLSMigrationStatus(mlsMigrationFeature);
   }

@@ -40,7 +40,7 @@ interface GenerateAPIConversationParams {
   name?: string;
 }
 
-function generateAPIConversation({
+export function generateAPIConversation({
   id = {id: createUuid(), domain: 'test.wire.link'},
   type = CONVERSATION_TYPE.REGULAR,
   protocol = ConversationProtocol.PROTEUS,
