@@ -33,7 +33,7 @@ import {DeviceCard} from './DeviceCard';
 
 import {ClientState} from '../../client/ClientState';
 import type {CryptographyRepository} from '../../cryptography/CryptographyRepository';
-import {FormattedId} from '../../page/MainContent/panels/preferences/devices/components/FormattedId';
+import {FormattedId} from '../../page/MainContent/panels/preferences/DevicesPreferences/components/FormattedId';
 
 interface SelfFingerprintProps {
   clientState?: ClientState;

@@ -23,25 +23,24 @@ import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 
 import {
   CertificateExpiredIcon,
-  CertificateRevoked,
   ExpiresSoon,
+  CertificateRevoked,
   MLSVerified,
   ProteusVerified,
 } from '@wireapp/react-ui-kit';
 
-export enum MLSStatues {
+export enum MLSStatuses {
   VALID = 'valid',
   NOT_DOWNLOADED = 'not_downloaded',
   EXPIRED = 'expired',
   EXPIRES_SOON = 'expires_soon',
-  NOT_ACTIVATED = 'not_activated',
 }
 
 interface VerificationBadgesProps {
   conversationProtocol?: ConversationProtocol;
   isMLSVerified?: boolean;
   isProteusVerified?: boolean;
-  MLSStatus?: MLSStatues;
+  MLSStatus?: MLSStatuses;
   displayTitle?: boolean;
 }
 
@@ -73,9 +72,9 @@ export const VerificationBadges: React.FC<VerificationBadgesProps> = ({
     return null;
   }
 
-  const isExpired = MLSStatus === MLSStatues.EXPIRED;
-  const isNotDownloaded = MLSStatus === MLSStatues.NOT_DOWNLOADED;
-  const isExpiresSoon = MLSStatus === MLSStatues.EXPIRES_SOON;
+  const isExpired = MLSStatus === MLSStatuses.EXPIRED;
+  const isNotDownloaded = MLSStatus === MLSStatuses.NOT_DOWNLOADED;
+  const isExpiresSoon = MLSStatus === MLSStatuses.EXPIRES_SOON;
 
   const conversationHasProtocol = !!conversationProtocol;
 
@@ -99,21 +98,9 @@ export const VerificationBadges: React.FC<VerificationBadgesProps> = ({
               data-tooltip="Device verified (End-to-end identity)"
               style={iconStyles}
               data-uie-name="mls-status"
-              data-uie-value={MLSStatues.VALID}
+              data-uie-value={MLSStatuses.VALID}
             >
               <MLSVerified data-uie-name="conversation-title-bar-verified-icon" />
-            </span>
-          )}
-
-          {isExpiresSoon && (
-            <span
-              className="with-tooltip with-tooltip--external"
-              data-tooltip="End-to-end identity certificate expires soon"
-              style={iconStyles}
-              data-uie-name="mls-status"
-              data-uie-value={MLSStatues.EXPIRES_SOON}
-            >
-              <ExpiresSoon data-uie-name="conversation-title-bar-verified-icon" />
             </span>
           )}
 
@@ -123,9 +110,21 @@ export const VerificationBadges: React.FC<VerificationBadgesProps> = ({
               data-tooltip="End-to-end identity certificate expired"
               style={iconStyles}
               data-uie-name="mls-status"
-              data-uie-value={MLSStatues.EXPIRED}
+              data-uie-value={MLSStatuses.EXPIRED}
             >
               <CertificateExpiredIcon data-uie-name="conversation-title-bar-verified-icon" />
+            </span>
+          )}
+
+          {isExpiresSoon && (
+            <span
+              className="with-tooltip with-tooltip--external"
+              data-tooltip="End-to-end identity certificate expires soon"
+              style={iconStyles}
+              data-uie-name="mls-status"
+              data-uie-value={MLSStatuses.EXPIRES_SOON}
+            >
+              <ExpiresSoon data-uie-name="conversation-title-bar-verified-icon" />
             </span>
           )}
 
@@ -135,7 +134,7 @@ export const VerificationBadges: React.FC<VerificationBadgesProps> = ({
               data-tooltip="End-to-end identity certificate revoked"
               style={iconStyles}
               data-uie-name="mls-status"
-              data-uie-value={MLSStatues.NOT_DOWNLOADED}
+              data-uie-value={MLSStatuses.NOT_DOWNLOADED}
             >
               <CertificateRevoked data-uie-name="conversation-title-bar-verified-icon" />
             </span>

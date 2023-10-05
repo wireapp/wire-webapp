@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useMemo, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 
 import cx from 'classnames';
 import type {DexieError} from 'dexie';
@@ -38,8 +38,8 @@ import type {MessageRepository} from '../../conversation/MessageRepository';
 import type {CryptographyRepository} from '../../cryptography/CryptographyRepository';
 import type {User} from '../../entity/User';
 import {MotionDuration} from '../../motion/MotionDuration';
-import {FormattedId} from '../../page/MainContent/panels/preferences/devices/components/FormattedId';
-import {MLSDeviceDetails} from '../../page/MainContent/panels/preferences/devices/components/MLSDeviceDetails';
+import {FormattedId} from '../../page/MainContent/panels/preferences/DevicesPreferences/components/FormattedId';
+import {MLSDeviceDetails} from '../../page/MainContent/panels/preferences/DevicesPreferences/components/MLSDeviceDetails';
 
 interface DeviceDetailsProps {
   clickToShowSelfFingerprint: () => void;
@@ -53,7 +53,7 @@ interface DeviceDetailsProps {
   user: User;
 }
 
-const DeviceDetails: React.FC<DeviceDetailsProps> = ({
+export const DeviceDetails = ({
   selectedClient,
   cryptographyRepository,
   user,
@@ -63,7 +63,7 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
   noPadding,
   logger,
   conversationState = container.resolve(ConversationState),
-}) => {
+}: DeviceDetailsProps) => {
   const [fingerprintRemote, setFingerprintRemote] = useState<string>();
   const [isResettingSession, setIsResettingSession] = useState(false);
 
@@ -75,7 +75,7 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
   useEffect(() => {
     setFingerprintRemote(undefined);
     if (selectedClient) {
-      cryptographyRepository
+      void cryptographyRepository
         .getRemoteFingerprint(user.qualifiedId, selectedClient.id)
         .then(remoteFingerprint => setFingerprintRemote(remoteFingerprint));
     }
@@ -107,7 +107,7 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
 
   return (
     <div className={cx('participant-devices__header', {'participant-devices__header--padding': !noPadding})}>
-      {mlsFingerprint && <MLSDeviceDetails fingerprint={mlsFingerprint} />}
+      {mlsFingerprint && <MLSDeviceDetails fingerprint={mlsFingerprint} isOtherDevice />}
 
       <div className="device-proteus-details">
         <h3 className="device-details-title paragraph-body-3">{t('participantDevicesProteusDeviceVerification')}</h3>
@@ -187,5 +187,3 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
     </div>
   );
 };
-
-export {DeviceDetails};

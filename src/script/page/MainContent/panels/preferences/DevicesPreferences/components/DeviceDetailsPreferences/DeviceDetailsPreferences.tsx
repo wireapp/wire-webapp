@@ -19,16 +19,17 @@
 
 import React, {useEffect, useState} from 'react';
 
+import {WireIdentity} from '@wireapp/core-crypto/platforms/web/corecrypto';
+
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import {DetailedDevice} from './components/DetailedDevice';
-
-import {Config} from '../../../../../Config';
-import {MotionDuration} from '../../../../../motion/MotionDuration';
+import {Config} from '../../../../../../../Config';
+import {MotionDuration} from '../../../../../../../motion/MotionDuration';
+import {DetailedDevice} from '../DetailedDevice';
 
 interface DevicesPreferencesProps {
   device: ClientEntity;
@@ -37,6 +38,7 @@ interface DevicesPreferencesProps {
   onRemove: (device: ClientEntity) => void;
   onResetSession: (device: ClientEntity) => Promise<void>;
   onVerify: (device: ClientEntity, verified: boolean) => void;
+  deviceIdentity?: WireIdentity;
 }
 
 enum SessionResetState {
@@ -45,13 +47,14 @@ enum SessionResetState {
   RESET = 'reset',
 }
 
-const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
+export const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
   device,
   getFingerprint,
   onVerify,
   onRemove,
   onClose,
   onResetSession,
+  deviceIdentity,
 }) => {
   const {isVerified} = useKoSubscribableChildren(device.meta, ['isVerified']);
   const [resetState, setResetState] = useState<SessionResetState>(SessionResetState.RESET);
@@ -66,7 +69,7 @@ const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
   };
 
   useEffect(() => {
-    getFingerprint(device).then(setFingerprint);
+    void getFingerprint(device).then(setFingerprint);
   }, [device, getFingerprint]);
 
   return (
@@ -89,7 +92,14 @@ const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
             />
           </legend>
 
-          <DetailedDevice device={device} fingerprint={fingerprint || ''} showVerificationStatus={false} />
+          <DetailedDevice
+            device={device}
+            fingerprint={fingerprint || ''}
+            showVerificationStatus={false}
+            certificate={deviceIdentity?.certificate}
+            isOtherDevice
+            isProteusVerified={isVerified}
+          />
 
           <div className="participant-devices__verify slider">
             <input
@@ -165,5 +175,3 @@ const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
     </div>
   );
 };
-
-export {DeviceDetailsPreferences};
