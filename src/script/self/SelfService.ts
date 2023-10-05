@@ -76,8 +76,4 @@ export class SelfService {
   putSupportedProtocols(supportedProtocols: ConversationProtocol[]): Promise<void> {
     return this.apiClient.api.self.putSupportedProtocols(supportedProtocols);
   }
-
-  registerRecurringTask(taskConfig: {every: number; task: () => Promise<void>; key: string}): Promise<void> {
-    return this.core.recurringTaskScheduler.registerTask(taskConfig);
-  }
 }

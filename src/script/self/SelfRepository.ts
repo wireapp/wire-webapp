@@ -32,6 +32,7 @@ import {SelfService} from './SelfService';
 import {ClientEntity, ClientRepository} from '../client';
 import {isMLSSupportedByEnvironment} from '../mls/isMLSSupportedByEnvironment';
 import {MLSMigrationStatus} from '../mls/MLSMigration/migrationStatus';
+import {Core} from '../service/CoreSingleton';
 import {TeamRepository} from '../team/TeamRepository';
 import {UserRepository} from '../user/UserRepository';
 import {UserState} from '../user/UserState';
@@ -46,6 +47,7 @@ export class SelfRepository {
     private readonly teamRepository: TeamRepository,
     private readonly clientRepository: ClientRepository,
     private readonly userState = container.resolve(UserState),
+    private readonly core = container.resolve(Core),
   ) {
     this.logger = getLogger('SelfRepository');
 
@@ -228,7 +230,7 @@ export class SelfRepository {
     };
     await refreshProtocolsTask();
 
-    await this.selfService.registerRecurringTask({
+    await this.core.recurringTaskScheduler.registerTask({
       every: TIME_IN_MILLIS.DAY,
       task: refreshProtocolsTask,
       key: SelfRepository.SELF_SUPPORTED_PROTOCOLS_CHECK_KEY,

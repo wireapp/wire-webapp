@@ -281,6 +281,7 @@ describe('SelfRepository', () => {
 
     it('registers periodic supported protocols refresh task to be called every 24h', async () => {
       const selfRepository = await testFactory.exposeSelfActors();
+      const core = container.resolve(Core);
 
       const selfUser = selfRepository['userState'].self()!;
 
@@ -290,13 +291,13 @@ describe('SelfRepository', () => {
       const evaluatedProtocols = [ConversationProtocol.PROTEUS];
 
       jest.spyOn(selfRepository, 'evaluateSelfSupportedProtocols').mockResolvedValueOnce(evaluatedProtocols);
-      jest.spyOn(selfRepository['selfService'], 'registerRecurringTask');
+      jest.spyOn(core.recurringTaskScheduler, 'registerTask');
 
       await act(async () => {
         await selfRepository.initialisePeriodicSelfSupportedProtocolsCheck();
       });
 
-      expect(selfRepository['selfService'].registerRecurringTask).toHaveBeenCalledWith({
+      expect(core.recurringTaskScheduler.registerTask).toHaveBeenCalledWith({
         every: TIME_IN_MILLIS.DAY,
         key: SelfRepository.SELF_SUPPORTED_PROTOCOLS_CHECK_KEY,
         task: expect.anything(),
