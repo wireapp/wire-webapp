@@ -30,7 +30,7 @@ interface RecurringTaskSchedulerStorage {
 
 interface TaskParams {
   every: number;
-  task: () => Promise<void> | void;
+  task: () => Promise<unknown> | unknown;
   key: string;
 }
 
