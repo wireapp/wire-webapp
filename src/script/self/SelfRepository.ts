@@ -62,6 +62,14 @@ export class SelfRepository {
     });
   }
 
+  private get selfUser() {
+    const selfUser = this.userState.self();
+    if (!selfUser) {
+      throw new Error('Self user is not available');
+    }
+    return selfUser;
+  }
+
   private handleMLSFeatureUpdate = async (newMLSFeature: FeatureMLS, prevMLSFeature?: FeatureMLS) => {
     const prevSupportedProtocols = prevMLSFeature?.config.supportedProtocols ?? [];
     const newSupportedProtocols = newMLSFeature.config.supportedProtocols ?? [];
@@ -78,32 +86,24 @@ export class SelfRepository {
     }
   };
 
-  private get selfUser() {
-    const selfUser = this.userState.self();
-    if (!selfUser) {
-      throw new Error('Self user is not available');
-    }
-    return selfUser;
-  }
-
   /**
    * Update self user's list of supported protocols.
    * It will send a request to the backend to change the supported protocols and then update the user in the local state.
    * @param supportedProtocols - an array of new supported protocols
    */
-  private async updateSelfSupportedProtocols(
-    supportedProtocols: ConversationProtocol[],
-  ): Promise<ConversationProtocol[]> {
+  private async updateSelfSupportedProtocols(supportedProtocols: ConversationProtocol[]): Promise<void> {
     this.logger.info('Supported protocols will get updated to:', supportedProtocols);
-    await this.selfService.putSupportedProtocols(supportedProtocols);
-    await this.userRepository.updateUserSupportedProtocols(this.selfUser.qualifiedId, supportedProtocols);
-    return supportedProtocols;
+    try {
+      await this.selfService.putSupportedProtocols(supportedProtocols);
+      await this.userRepository.updateUserSupportedProtocols(this.selfUser.qualifiedId, supportedProtocols);
+    } catch (error) {
+      this.logger.error('Failed to update self supported protocols: ', error);
+    }
   }
 
   /**
    * Will re-evaluate self supported protocols and update them if necessary.
    * It will send a request to the backend to change the supported protocols and then update the user in the local state.
-   * @param supportedProtocols - an array of new supported protocols
    */
   public readonly refreshSelfSupportedProtocols = async (): Promise<ConversationProtocol[]> => {
     const localSupportedProtocols = this.selfUser.supportedProtocols();
@@ -115,7 +115,8 @@ export class SelfRepository {
     );
 
     if (!localSupportedProtocols) {
-      return this.updateSelfSupportedProtocols(refreshedSupportedProtocols);
+      await this.updateSelfSupportedProtocols(refreshedSupportedProtocols);
+      return refreshedSupportedProtocols;
     }
 
     const hasSupportedProtocolsChanged = !(
@@ -127,31 +128,23 @@ export class SelfRepository {
       return localSupportedProtocols;
     }
 
-    return this.updateSelfSupportedProtocols(refreshedSupportedProtocols);
+    await this.updateSelfSupportedProtocols(refreshedSupportedProtocols);
+    return refreshedSupportedProtocols;
   };
 
   /**
    * Will initialise the intervals for checking (and updating if necessary) self supported protocols.
    * Should be called only once on app load.
-   *
-   * @param selfUser - self user
-   * @param teamState - team state
-   * @param userRepository - user repository
    */
   public async initialisePeriodicSelfSupportedProtocolsCheck() {
     // We update supported protocols of self user on initial app load and then in 24 hours intervals
-    const refreshProtocolsTask = async () => {
-      await this.refreshSelfSupportedProtocols();
-      try {
-      } catch (error) {
-        this.logger.error('Failed to update self supported protocols, will retry after 24h. Error: ', error);
-      }
-    };
-    await refreshProtocolsTask();
+    await this.refreshSelfSupportedProtocols();
 
     await this.core.recurringTaskScheduler.registerTask({
       every: TIME_IN_MILLIS.DAY,
-      task: refreshProtocolsTask,
+      task: async () => {
+        await this.refreshSelfSupportedProtocols();
+      },
       key: SelfRepository.SELF_SUPPORTED_PROTOCOLS_CHECK_KEY,
     });
   }
