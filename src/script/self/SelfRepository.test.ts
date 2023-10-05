@@ -17,7 +17,6 @@
  *
  */
 
-import {RegisteredClient} from '@wireapp/api-client/lib/client';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {TeamFeatureConfigurationUpdateEvent, TEAM_EVENT} from '@wireapp/api-client/lib/event';
 import {FeatureList, FeatureStatus} from '@wireapp/api-client/lib/team';
@@ -29,72 +28,12 @@ import {TestFactory} from 'test/helper/TestFactory';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {SelfRepository} from './SelfRepository';
+import * as SelfSupportedProtocols from './SelfSupportedProtocols/SelfSupportedProtocols';
 
 import {ClientEntity} from '../client';
-import * as mlsSupport from '../mls/isMLSSupportedByEnvironment';
-import {MLSMigrationStatus} from '../mls/MLSMigration/migrationStatus';
 import {Core} from '../service/CoreSingleton';
 
 const testFactory = new TestFactory();
-
-jest.spyOn(mlsSupport, 'isMLSSupportedByEnvironment').mockResolvedValue(true);
-
-const generateMLSFeaturesConfig = (migrationStatus: MLSMigrationStatus, supportedProtocols: ConversationProtocol[]) => {
-  const now = Date.now();
-
-  switch (migrationStatus) {
-    case MLSMigrationStatus.DISABLED:
-      return {
-        mls: {
-          status: FeatureStatus.ENABLED,
-          config: {supportedProtocols},
-        },
-        mlsMigration: {status: FeatureStatus.DISABLED, config: {}},
-      };
-    case MLSMigrationStatus.NOT_STARTED:
-      return {
-        mls: {
-          status: FeatureStatus.ENABLED,
-          config: {supportedProtocols},
-        },
-        mlsMigration: {
-          status: FeatureStatus.ENABLED,
-          config: {
-            startTime: new Date(now + 1 * TIME_IN_MILLIS.DAY).toISOString(),
-            finaliseRegardlessAfter: new Date(now + 2 * TIME_IN_MILLIS.DAY).toISOString(),
-          },
-        },
-      };
-    case MLSMigrationStatus.ONGOING:
-      return {
-        mls: {
-          status: FeatureStatus.ENABLED,
-          config: {supportedProtocols},
-        },
-        mlsMigration: {
-          status: FeatureStatus.ENABLED,
-          config: {
-            startTime: new Date(now - 1 * TIME_IN_MILLIS.DAY).toISOString(),
-            finaliseRegardlessAfter: new Date(now + 1 * TIME_IN_MILLIS.DAY).toISOString(),
-          },
-        },
-      };
-    case MLSMigrationStatus.FINALISED:
-      return {
-        mls: {
-          status: FeatureStatus.ENABLED,
-          config: {supportedProtocols},
-        },
-        mlsMigration: {
-          status: FeatureStatus.ENABLED,
-          config: {
-            startTime: new Date(now - 2 * TIME_IN_MILLIS.DAY).toISOString(),
-            finaliseRegardlessAfter: new Date(now - 1 * TIME_IN_MILLIS.DAY).toISOString(),
-          },
-        },
-      };
-  }
-};
 
 const generateMLSFeatureConfig = (supportedProtocols: ConversationProtocol[]) => {
   return {
@@ -106,129 +45,7 @@ const generateMLSFeatureConfig = (supportedProtocols: ConversationProtocol[]) =>
   };
 };
 
-const createMockClientResponse = (doesSupportMLS = false, wasActiveWithinLast4Weeks = false) => {
-  return {
-    mls_public_keys: doesSupportMLS ? {ed25519: 'key'} : {},
-    last_active: wasActiveWithinLast4Weeks
-      ? new Date().toISOString()
-      : new Date(Date.now() - 5 * 7 * 24 * 60 * 60 * 1000).toISOString(),
-  } as unknown as RegisteredClient;
-};
-
-const generateListOfSelfClients = ({allActiveClientsMLSCapable}: {allActiveClientsMLSCapable: boolean}) => {
-  const clients: RegisteredClient[] = [];
-
-  new Array(4).fill(0).forEach(() => clients.push(createMockClientResponse(true, true)));
-  if (!allActiveClientsMLSCapable) {
-    new Array(2).fill(0).forEach(() => clients.push(createMockClientResponse(false, true)));
-  }
-
-  return clients;
-};
-
-const evaluateProtocolsScenarios = [
-  [
-    //with given config
-    generateMLSFeaturesConfig(MLSMigrationStatus.DISABLED, [ConversationProtocol.PROTEUS]),
-
-    //we expect the following result based on whether all active clients are MLS capable or not
-    {
-      allActiveClientsMLSCapable: [ConversationProtocol.PROTEUS],
-      someActiveClientsNotMLSCapable: [ConversationProtocol.PROTEUS],
-    },
-  ],
-  [
-    generateMLSFeaturesConfig(MLSMigrationStatus.DISABLED, [ConversationProtocol.PROTEUS, ConversationProtocol.MLS]),
-    {
-      allActiveClientsMLSCapable: [ConversationProtocol.PROTEUS, ConversationProtocol.MLS],
-      someActiveClientsNotMLSCapable: [ConversationProtocol.PROTEUS],
-    },
-  ],
-  [
-    generateMLSFeaturesConfig(MLSMigrationStatus.DISABLED, [ConversationProtocol.MLS]),
-    {
-      allActiveClientsMLSCapable: [ConversationProtocol.MLS],
-      someActiveClientsNotMLSCapable: [ConversationProtocol.MLS],
-    },
-  ],
-  [
-    generateMLSFeaturesConfig(MLSMigrationStatus.NOT_STARTED, [ConversationProtocol.PROTEUS, ConversationProtocol.MLS]),
-    {
-      allActiveClientsMLSCapable: [ConversationProtocol.PROTEUS, ConversationProtocol.MLS],
-      someActiveClientsNotMLSCapable: [ConversationProtocol.PROTEUS],
-    },
-  ],
-  [
-    generateMLSFeaturesConfig(MLSMigrationStatus.NOT_STARTED, [ConversationProtocol.MLS]),
-    {
-      allActiveClientsMLSCapable: [ConversationProtocol.PROTEUS, ConversationProtocol.MLS],
-      someActiveClientsNotMLSCapable: [ConversationProtocol.PROTEUS],
-    },
-  ],
-  [
-    generateMLSFeaturesConfig(MLSMigrationStatus.ONGOING, [ConversationProtocol.PROTEUS, ConversationProtocol.MLS]),
-    {
-      allActiveClientsMLSCapable: [ConversationProtocol.PROTEUS, ConversationProtocol.MLS],
-      someActiveClientsNotMLSCapable: [ConversationProtocol.PROTEUS],
-    },
-  ],
-  [
-    generateMLSFeaturesConfig(MLSMigrationStatus.ONGOING, [ConversationProtocol.MLS]),
-    {
-      allActiveClientsMLSCapable: [ConversationProtocol.PROTEUS, ConversationProtocol.MLS],
-      someActiveClientsNotMLSCapable: [ConversationProtocol.PROTEUS],
-    },
-  ],
-  [
-    generateMLSFeaturesConfig(MLSMigrationStatus.FINALISED, [ConversationProtocol.PROTEUS, ConversationProtocol.MLS]),
-    {
-      allActiveClientsMLSCapable: [ConversationProtocol.PROTEUS, ConversationProtocol.MLS],
-      someActiveClientsNotMLSCapable: [ConversationProtocol.PROTEUS, ConversationProtocol.MLS],
-    },
-  ],
-  [
-    generateMLSFeaturesConfig(MLSMigrationStatus.FINALISED, [ConversationProtocol.MLS]),
-    {
-      allActiveClientsMLSCapable: [ConversationProtocol.MLS],
-      someActiveClientsNotMLSCapable: [ConversationProtocol.MLS],
-    },
-  ],
-] as const;
-
 describe('SelfRepository', () => {
-  describe('evaluateSelfSupportedProtocols', () => {
-    describe.each([{allActiveClientsMLSCapable: true}, {allActiveClientsMLSCapable: false}])(
-      '%o',
-      ({allActiveClientsMLSCapable}) => {
-        const selfClients = generateListOfSelfClients({allActiveClientsMLSCapable});
-
-        it.each(evaluateProtocolsScenarios)(
-          'evaluates self supported protocols',
-          async ({mls, mlsMigration}, expected) => {
-            const selfRepository = await testFactory.exposeSelfActors();
-
-            jest.spyOn(selfRepository['clientRepository'], 'getAllSelfClients').mockResolvedValue(selfClients);
-
-            const teamFeatureList = {
-              mlsMigration,
-              mls,
-            } as unknown as FeatureList;
-
-            jest.spyOn(selfRepository['teamRepository']['teamState'], 'teamFeatures').mockReturnValue(teamFeatureList);
-
-            const supportedProtocols = await selfRepository.evaluateSelfSupportedProtocols();
-
-            expect(supportedProtocols).toEqual(
-              allActiveClientsMLSCapable
-                ? expected.allActiveClientsMLSCapable
-                : expected.someActiveClientsNotMLSCapable,
-            );
-          },
-        );
-      },
-    );
-  });
-
   describe('initialisePeriodicSelfSupportedProtocolsCheck', () => {
     beforeAll(() => {
       jest.useFakeTimers();
@@ -249,7 +66,7 @@ describe('SelfRepository', () => {
 
       selfUser.supportedProtocols(initialProtocols);
 
-      jest.spyOn(selfRepository, 'evaluateSelfSupportedProtocols').mockResolvedValueOnce(evaluatedProtocols);
+      jest.spyOn(SelfSupportedProtocols, 'evaluateSelfSupportedProtocols').mockResolvedValueOnce(evaluatedProtocols);
       jest.spyOn(selfRepository['selfService'], 'putSupportedProtocols');
 
       await act(async () => {
@@ -270,7 +87,7 @@ describe('SelfRepository', () => {
 
       const evaluatedProtocols = [ConversationProtocol.PROTEUS];
 
-      jest.spyOn(selfRepository, 'evaluateSelfSupportedProtocols').mockResolvedValueOnce(evaluatedProtocols);
+      jest.spyOn(SelfSupportedProtocols, 'evaluateSelfSupportedProtocols').mockResolvedValueOnce(evaluatedProtocols);
       jest.spyOn(selfRepository['selfService'], 'putSupportedProtocols');
 
       await selfRepository.initialisePeriodicSelfSupportedProtocolsCheck();
@@ -290,7 +107,7 @@ describe('SelfRepository', () => {
 
       const evaluatedProtocols = [ConversationProtocol.PROTEUS];
 
-      jest.spyOn(selfRepository, 'evaluateSelfSupportedProtocols').mockResolvedValueOnce(evaluatedProtocols);
+      jest.spyOn(SelfSupportedProtocols, 'evaluateSelfSupportedProtocols').mockResolvedValueOnce(evaluatedProtocols);
       jest.spyOn(core.recurringTaskScheduler, 'registerTask');
 
       await act(async () => {
@@ -348,7 +165,7 @@ describe('SelfRepository', () => {
 
       const evaluatedProtocols = [ConversationProtocol.PROTEUS, ConversationProtocol.MLS];
 
-      jest.spyOn(selfRepository, 'evaluateSelfSupportedProtocols').mockResolvedValueOnce(evaluatedProtocols);
+      jest.spyOn(SelfSupportedProtocols, 'evaluateSelfSupportedProtocols').mockResolvedValueOnce(evaluatedProtocols);
       jest.spyOn(selfRepository['selfService'], 'putSupportedProtocols');
 
       await selfRepository.refreshSelfSupportedProtocols();
@@ -367,7 +184,7 @@ describe('SelfRepository', () => {
 
       const evaluatedProtocols = [ConversationProtocol.PROTEUS, ConversationProtocol.MLS];
 
-      jest.spyOn(selfRepository, 'evaluateSelfSupportedProtocols').mockResolvedValueOnce(evaluatedProtocols);
+      jest.spyOn(SelfSupportedProtocols, 'evaluateSelfSupportedProtocols').mockResolvedValueOnce(evaluatedProtocols);
       jest.spyOn(selfRepository['selfService'], 'putSupportedProtocols');
 
       await selfRepository.refreshSelfSupportedProtocols();
@@ -421,7 +238,7 @@ describe('SelfRepository', () => {
 
       const evaluatedProtocols = [ConversationProtocol.PROTEUS, ConversationProtocol.MLS];
 
-      jest.spyOn(selfRepository, 'evaluateSelfSupportedProtocols').mockResolvedValueOnce(evaluatedProtocols);
+      jest.spyOn(SelfSupportedProtocols, 'evaluateSelfSupportedProtocols').mockResolvedValueOnce(evaluatedProtocols);
       jest.spyOn(selfRepository['selfService'], 'putSupportedProtocols');
 
       await act(async () => selfRepository['teamRepository'].emit('teamRefreshed'));

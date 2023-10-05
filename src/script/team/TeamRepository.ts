@@ -512,7 +512,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
       return [ConversationProtocol.PROTEUS];
     }
 
-    return mlsFeature.config.supportedProtocols;
+    return mlsFeature.config.supportedProtocols || [ConversationProtocol.PROTEUS];
   }
 
   public getTeamMLSMigrationStatus(): MLSMigrationStatus {

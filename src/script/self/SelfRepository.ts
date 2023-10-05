@@ -28,10 +28,9 @@ import {Logger, getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {SelfService} from './SelfService';
+import {evaluateSelfSupportedProtocols} from './SelfSupportedProtocols/SelfSupportedProtocols';
 
 import {ClientEntity, ClientRepository} from '../client';
-import {isMLSSupportedByEnvironment} from '../mls/isMLSSupportedByEnvironment';
-import {MLSMigrationStatus} from '../mls/MLSMigration/migrationStatus';
 import {Core} from '../service/CoreSingleton';
 import {TeamRepository} from '../team/TeamRepository';
 import {UserRepository} from '../user/UserRepository';
@@ -88,89 +87,6 @@ export class SelfRepository {
   }
 
   /**
-   * Proteus is supported if:
-   * - Proteus is in the list of supported protocols
-   * - MLS migration is enabled but not finalised
-   */
-  private isProteusSupported(): boolean {
-    const teamSupportedProtocols = this.teamRepository.getTeamSupportedProtocols();
-    const mlsMigrationStatus = this.teamRepository.getTeamMLSMigrationStatus();
-
-    const isProteusSupportedByTeam = teamSupportedProtocols.includes(ConversationProtocol.PROTEUS);
-    return (
-      isProteusSupportedByTeam ||
-      [MLSMigrationStatus.NOT_STARTED, MLSMigrationStatus.ONGOING].includes(mlsMigrationStatus)
-    );
-  }
-
-  /**
-   * MLS is forced if:
-   * - only MLS is in the list of supported protocols
-   * - MLS migration is disabled
-   * - There are still some active clients that do not support MLS
-   * It means that team admin wants to force MLS and drop proteus support, even though not all active clients support MLS
-   */
-  private async isMLSForcedWithoutMigration(): Promise<boolean> {
-    const isMLSSupportedByEnv = await isMLSSupportedByEnvironment();
-
-    if (!isMLSSupportedByEnv) {
-      return false;
-    }
-
-    const teamSupportedProtocols = this.teamRepository.getTeamSupportedProtocols();
-    const mlsMigrationStatus = this.teamRepository.getTeamMLSMigrationStatus();
-
-    const isMLSSupportedByTeam = teamSupportedProtocols.includes(ConversationProtocol.MLS);
-    const isProteusSupportedByTeam = teamSupportedProtocols.includes(ConversationProtocol.PROTEUS);
-    const doActiveClientsSupportMLS = await this.clientRepository.haveAllActiveSelfClientsRegisteredMLSDevice();
-    const isMigrationDisabled = mlsMigrationStatus === MLSMigrationStatus.DISABLED;
-
-    return !doActiveClientsSupportMLS && isMLSSupportedByTeam && !isProteusSupportedByTeam && isMigrationDisabled;
-  }
-
-  /**
-   * MLS is supported if:
-   * - MLS is in the list of supported protocols
-   * - All active clients support MLS, or MLS migration is finalised
-   */
-  private async isMLSSupported(): Promise<boolean> {
-    const isMLSSupportedByEnv = await isMLSSupportedByEnvironment();
-
-    if (!isMLSSupportedByEnv) {
-      return false;
-    }
-
-    const teamSupportedProtocols = this.teamRepository.getTeamSupportedProtocols();
-    const mlsMigrationStatus = this.teamRepository.getTeamMLSMigrationStatus();
-
-    const isMLSSupportedByTeam = teamSupportedProtocols.includes(ConversationProtocol.MLS);
-    const doActiveClientsSupportMLS = await this.clientRepository.haveAllActiveSelfClientsRegisteredMLSDevice();
-    return isMLSSupportedByTeam && (doActiveClientsSupportMLS || mlsMigrationStatus === MLSMigrationStatus.FINALISED);
-  }
-
-  /**
-   * Will evaluate the list of self user's supported protocols and return them.
-   */
-  public async evaluateSelfSupportedProtocols(): Promise<ConversationProtocol[]> {
-    const supportedProtocols: ConversationProtocol[] = [];
-
-    const isProteusProtocolSupported = this.isProteusSupported();
-    if (isProteusProtocolSupported) {
-      supportedProtocols.push(ConversationProtocol.PROTEUS);
-    }
-
-    const isMLSProtocolSupported = await this.isMLSSupported();
-
-    const isMLSForced = await this.isMLSForcedWithoutMigration();
-
-    if (isMLSProtocolSupported || isMLSForced) {
-      supportedProtocols.push(ConversationProtocol.MLS);
-    }
-
-    return supportedProtocols;
-  }
-
-  /**
    * Update self user's list of supported protocols.
    * It will send a request to the backend to change the supported protocols and then update the user in the local state.
    * @param supportedProtocols - an array of new supported protocols
@@ -193,7 +109,10 @@ export class SelfRepository {
     const localSupportedProtocols = this.selfUser.supportedProtocols();
 
     this.logger.info('Evaluating self supported protocols, currently supported protocols:', localSupportedProtocols);
-    const refreshedSupportedProtocols = await this.evaluateSelfSupportedProtocols();
+    const refreshedSupportedProtocols = await evaluateSelfSupportedProtocols(
+      this.teamRepository,
+      this.clientRepository,
+    );
 
     if (!localSupportedProtocols) {
       return this.updateSelfSupportedProtocols(refreshedSupportedProtocols);
