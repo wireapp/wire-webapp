@@ -93,9 +93,17 @@ jobs:
           key: '${{github.ref}}'
           map: |
             {
-              "edge": { "dev_env": "wire-webapp-edge-al2" },
               "dev": { "dev_env": "wire-webapp-dev-al2" },
               "master": { "dev_env": "wire-webapp-master-al2" }
+            }
+
+      - uses: kanga333/variable-mapper@master
+        with:
+          # We try to map a branch to a dev environment
+          key: '${{github.ref}}'
+          map: |
+            {
+              "dev": { "preprod_env": "wire-webapp-edge-al2" },
             }
 
       - uses: kanga333/variable-mapper@master
@@ -140,6 +148,22 @@ jobs:
           aws_secret_key: ${{secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY}}
           deployment_package: ${{env.AWS_BUILD_ZIP_PATH}}
           environment_name: ${{env.dev_env}}
+          region: eu-central-1
+          use_existing_version_if_available: true
+          version_description: ${{github.sha}}
+          version_label: ${{github.run_id}}
+          wait_for_deployment: false
+          wait_for_environment_recovery: ${{env.DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS}}
+
+      - name: Deploy to pre-prod env
+        if: env.preprod_env
+        uses: einaregilsson/beanstalk-deploy@v21
+        with:
+          application_name: ${{env.AWS_APPLICATION_NAME}}
+          aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
+          aws_secret_key: ${{secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY}}
+          deployment_package: ${{env.AWS_BUILD_ZIP_PATH}}
+          environment_name: ${{env.preprod_env}}
           region: eu-central-1
           use_existing_version_if_available: true
           version_description: ${{github.sha}}
