@@ -40,7 +40,7 @@ import {getLogger, Logger} from 'Util/Logger';
 import {includesString} from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {appendParameter} from 'Util/UrlUtil';
-import {checkIndexedDb, supportsMLS, supportsSelfSupportedProtocolsUpdates} from 'Util/util';
+import {checkIndexedDb, supportsMLS} from 'Util/util';
 
 import '../../style/default.less';
 import {AssetRepository} from '../assets/AssetRepository';
@@ -461,9 +461,7 @@ export class App {
       await conversationRepository.updateConversationsOnAppInit();
       await conversationRepository.conversationLabelRepository.loadLabels();
 
-      if (supportsSelfSupportedProtocolsUpdates()) {
-        await selfRepository.initialisePeriodicSelfSupportedProtocolsCheck();
-      }
+      await selfRepository.initialisePeriodicSelfSupportedProtocolsCheck();
 
       amplify.publish(WebAppEvents.LIFECYCLE.LOADED);
 
