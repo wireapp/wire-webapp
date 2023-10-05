@@ -21,6 +21,7 @@ import React, {MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEven
 
 import {COLOR} from '@wireapp/react-ui-kit';
 
+import {useUserName} from 'Components/UserName';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -67,17 +68,16 @@ const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
 }) => {
   const isImageGrey = !noFilter && [STATE.BLOCKED, STATE.IGNORED, STATE.PENDING, STATE.UNKNOWN].includes(state);
   const backgroundColor = state === STATE.UNKNOWN ? COLOR.GRAY : undefined;
+  const name = useUserName(participant);
   const {
     mediumPictureResource,
     previewPictureResource,
     accent_color: accentColor,
-    name,
     initials,
   } = useKoSubscribableChildren(participant, [
     'mediumPictureResource',
     'previewPictureResource',
     'accent_color',
-    'name',
     'initials',
   ]);
   const avatarImgAlt = avatarAlt ? avatarAlt : `${t('userProfileImageAlt')} ${name}`;

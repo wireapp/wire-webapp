@@ -61,6 +61,9 @@ export type Env = {
   /** Specifies the name of the brand, e.g. Wire */
   BRAND_NAME: string;
 
+  /** enables replacing all occurences of {{hostname}} in the urls given to the frontend by the hostname of the client*/
+  ENABLE_DYNAMIC_HOSTNAME?: string;
+
   /** Allows a client to use a development version of the api (if present) */
   ENABLE_DEV_BACKEND_API?: string;
 
@@ -242,6 +245,10 @@ export type Env = {
   URL_SUPPORT_PRIVACY_VERIFY_FINGERPRINT: string;
 
   URL_SUPPORT_SCREEN_ACCESS_DENIED: string;
+
+  URL_SUPPORT_NON_FEDERATING_INFO: string;
+
+  URL_SUPPORT_OAUTH_LEARN_MORE: string;
 
   URL_SUPPORT_OFFLINE_BACKEND: string;
 

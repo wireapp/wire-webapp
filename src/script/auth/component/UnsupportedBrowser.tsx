@@ -50,11 +50,11 @@ const UnsupportedMessage: React.FC<UnsupportedProps> = ({headline, subhead}) => 
   );
 };
 
-export interface UnsupportedBrowserProps extends React.HTMLProps<HTMLDivElement> {
+interface UnsupportedBrowserProps extends React.HTMLProps<HTMLDivElement> {
   isTemporaryGuest?: boolean;
 }
 
-export const UnsupportedBrowserComponent = ({
+const UnsupportedBrowserComponent = ({
   children,
   hasCookieSupport,
   hasIndexedDbSupport,
@@ -128,6 +128,4 @@ const mapStateToProps = (state: RootState) => ({
   isSupportedBrowser: RuntimeSelector.isSupportedBrowser(state),
 });
 
-const UnsupportedBrowser = connect(mapStateToProps)(UnsupportedBrowserComponent);
-
-export {UnsupportedBrowser};
+export const UnsupportedBrowser = connect(mapStateToProps)(UnsupportedBrowserComponent);

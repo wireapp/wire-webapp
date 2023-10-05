@@ -235,6 +235,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
               teamRepository={teamRepository}
               conversationRepository={conversationRepository}
               excludeUsers={participatingUserIds}
+              selfUser={selfUser}
               isSelectable
               allowRemoteSearch
             />

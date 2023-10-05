@@ -76,7 +76,10 @@ import {ACCESS_STATE} from './AccessState';
 import {extractClientDiff} from './ClientMismatchUtil';
 import {updateAccessRights} from './ConversationAccessPermission';
 import {ConversationEphemeralHandler} from './ConversationEphemeralHandler';
-import {processFederationDeleteEvent} from './ConversationFederationUtils';
+import {
+  getUsersToDeleteFromFederatedConversations,
+  getFederationDeleteEventUpdates,
+} from './ConversationFederationUtils';
 import {ConversationFilter} from './ConversationFilter';
 import {ConversationLabelRepository} from './ConversationLabelRepository';
 import {ConversationDatabaseData, ConversationMapper} from './ConversationMapper';
@@ -193,7 +196,7 @@ export class ConversationRepository {
     this.messageRepository.setClientMismatchHandler(async (mismatch, conversation, silent, consentType) => {
       //we filter out self client id to omit it in mismatch check
       const {userId, clientId} = this.core;
-      const domain = userState.self().domain;
+      const domain = userState.self()?.domain;
 
       const selfClient = {domain, userId, clientId};
       const filteredMissing = mismatch.missing && removeClientFromUserClientMap(mismatch.missing, selfClient);
@@ -247,7 +250,7 @@ export class ConversationRepository {
         if (wasVerified && newDevices.length) {
           // if the conversation is verified but some clients were missing, it means the conversation will degrade.
           // We need to warn the user of the degradation and ask his permission to actually send the message
-          conversation.verification_state(ConversationVerificationState.DEGRADED);
+          conversation?.verification_state(ConversationVerificationState.DEGRADED);
         }
         if (conversation) {
           const hasChangedLegalHoldStatus = conversation.legalHoldStatus() !== legalHoldStatus;
@@ -350,7 +353,7 @@ export class ConversationRepository {
    * @param deletedDomain the domain that stopped federating
    */
   private onFederationDelete = async (deletedDomain: string) => {
-    const {conversationsToDeleteUsers, conversationsToLeave, conversationsToDisable} = processFederationDeleteEvent(
+    const {conversationsToDeleteUsers, conversationsToLeave, conversationsToDisable} = getFederationDeleteEventUpdates(
       deletedDomain,
       this.conversationState.conversations(),
     );
@@ -387,49 +390,14 @@ export class ConversationRepository {
    * @param domains The domains that stopped federating with each other
    */
   private readonly onFederationConnectionRemove = async (domains: string[]) => {
-    const selfUser = this.userState.self();
-    const [domainOne, domainTwo] = domains;
     const allConversations = this.conversationState.conversations();
 
-    allConversations
-      .filter(conversation => conversation.domain === domainOne)
-      .forEach(async conversation => {
-        const usersToDelete = conversation.allUserEntities().filter(user => user.domain === domainTwo);
-        if (usersToDelete.length > 0) {
-          await this.removeDeletedFederationUsers(conversation, usersToDelete);
-          await this.insertFederationStopSystemMessage(conversation, [domainOne, domainTwo]);
-        }
-      });
+    const result = getUsersToDeleteFromFederatedConversations(domains, allConversations);
 
-    allConversations
-      .filter(conversation => conversation.domain === domainTwo)
-      .forEach(async conversation => {
-        const usersToDelete = conversation.allUserEntities().filter(user => user.domain === domainOne);
-        if (usersToDelete.length > 0) {
-          await this.removeDeletedFederationUsers(conversation, usersToDelete);
-          await this.insertFederationStopSystemMessage(conversation, [domainOne, domainTwo]);
-        }
-      });
-
-    allConversations
-      .filter(conversation => {
-        if (conversation.domain !== selfUser.qualifiedId.domain) {
-          return false;
-        }
-
-        const userDomains = new Set(conversation.allUserEntities().map(user => user.qualifiedId.domain));
-
-        return userDomains.has(domainOne) && userDomains.has(domainTwo);
-      })
-      .forEach(async conversation => {
-        const usersToDelete = conversation
-          .allUserEntities()
-          .filter(user => [domainOne, domainTwo].includes(user.domain));
-        if (usersToDelete.length > 0) {
-          await this.removeDeletedFederationUsers(conversation, usersToDelete);
-          await this.insertFederationStopSystemMessage(conversation, [domainOne, domainTwo]);
-        }
-      });
+    for (const {conversation, usersToRemove} of result) {
+      await this.removeDeletedFederationUsers(conversation, usersToRemove);
+      await this.insertFederationStopSystemMessage(conversation, domains);
+    }
   };
 
   private readonly removeDeletedFederationUsers = async (conversation: Conversation, usersToRemove: User[]) => {
@@ -585,10 +553,9 @@ export class ConversationRepository {
 
       if (failedToAdd) {
         const failedToAddUsersEvent = EventBuilder.buildFailedToAddUsersEvent(
-          failedToAdd.users,
+          failedToAdd,
           conversationEntity,
           this.userState.self().id,
-          failedToAdd.reason,
         );
         await this.eventRepository.injectEvent(failedToAddUsersEvent);
       }
@@ -673,7 +640,7 @@ export class ConversationRepository {
       const response = await this.conversationService.getConversationById(qualifiedId);
       const [conversationEntity] = this.mapConversations([response]);
 
-      this.saveConversation(conversationEntity);
+      await this.saveConversation(conversationEntity);
 
       fetching_conversations[conversationId].forEach(({resolveFn}) => resolveFn(conversationEntity));
       delete fetching_conversations[conversationId];
@@ -1403,9 +1370,15 @@ export class ConversationRepository {
    * Maps user connection to the corresponding conversation.
    *
    * @note If there is no conversation it will request it from the backend
+   *
+   * @param connectionEntity Connection entity
+   * @param source Event source that has triggered the mapping
    * @returns Resolves when connection was mapped return value
    */
-  private readonly mapConnection = async (connectionEntity: ConnectionEntity): Promise<Conversation | undefined> => {
+  private readonly mapConnection = async (
+    connectionEntity: ConnectionEntity,
+    source?: EventSource,
+  ): Promise<Conversation | undefined> => {
     try {
       const conversation = await this.getConnectionConversation(connectionEntity);
 
@@ -1620,12 +1593,7 @@ export class ConversationRepository {
         }
         if (failedToAdd) {
           await this.eventRepository.injectEvent(
-            EventBuilder.buildFailedToAddUsersEvent(
-              failedToAdd.users,
-              conversation,
-              this.userState.self().id,
-              failedToAdd.reason,
-            ),
+            EventBuilder.buildFailedToAddUsersEvent(failedToAdd, conversation, this.userState.self().id),
             EventRepository.SOURCE.INJECTED,
           );
         }
@@ -1883,7 +1851,10 @@ export class ConversationRepository {
   ): Promise<ConversationMessageTimerUpdateEvent> {
     messageTimer = ConversationEphemeralHandler.validateTimer(messageTimer);
 
-    const response = await this.conversationService.updateConversationMessageTimer(conversationEntity.id, messageTimer);
+    const response = await this.conversationService.updateConversationMessageTimer(
+      conversationEntity.qualifiedId,
+      messageTimer,
+    );
     if (response) {
       this.eventRepository.injectEvent(response, EventRepository.SOURCE.BACKEND_RESPONSE);
     }
@@ -1894,7 +1865,10 @@ export class ConversationRepository {
     conversationEntity: Conversation,
     receiptMode: ConversationReceiptModeUpdateData,
   ) {
-    const response = await this.conversationService.updateConversationReceiptMode(conversationEntity.id, receiptMode);
+    const response = await this.conversationService.updateConversationReceiptMode(
+      conversationEntity.qualifiedId,
+      receiptMode,
+    );
     if (response) {
       this.eventRepository.injectEvent(response, EventRepository.SOURCE.BACKEND_RESPONSE);
     }
@@ -1956,7 +1930,7 @@ export class ConversationRepository {
     };
 
     try {
-      await this.conversationService.updateMemberProperties(conversationEntity.id, payload);
+      await this.conversationService.updateMemberProperties(conversationEntity.qualifiedId, payload);
       const response = {data: payload, from: this.userState.self().id};
       this.onMemberUpdate(conversationEntity, response);
 
@@ -2033,7 +2007,7 @@ export class ConversationRepository {
       otr_archived_ref: new Date(archiveTimestamp).toISOString(),
     };
 
-    const conversationId = conversationEntity.id;
+    const conversationId = conversationEntity.qualifiedId;
 
     const updatePromise = conversationEntity.removed_from_conversation()
       ? Promise.resolve()
@@ -2791,9 +2765,9 @@ export class ConversationRepository {
       throw new Error(`groupId not found for MLS conversation ${conversation.id}`);
     }
 
-    const isMLSConversationEstablished = await this.conversationService.isMLSConversationEstablished(groupId);
+    const doesMLSGroupExistLocally = await this.conversationService.mlsGroupExistsLocally(groupId);
 
-    if (!isMLSConversationEstablished) {
+    if (!doesMLSGroupExistLocally) {
       return;
     }
 

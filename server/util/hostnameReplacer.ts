@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2021 Wire Swiss GmbH
+ * Copyright (C) 2023 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,18 +17,12 @@
  *
  */
 
-import React from 'react';
+import {Request} from 'express';
 
-interface PreferencesLinkProps {
-  children: React.ReactNode;
-  href: string;
-  uie?: string;
+export function replaceHostname(template: string, request: Request): string {
+  return template.replaceAll('[[hostname]]', request.hostname.replace('webapp.', ''));
 }
 
-const PreferencesLink: React.FC<PreferencesLinkProps> = ({href, uie, children}) => (
-  <a className="preferences-link" href={href} rel="nofollow noopener noreferrer" target="_blank" data-uie-name={uie}>
-    {children}
-  </a>
-);
-
-export {PreferencesLink};
+export function replaceHostnameInObject<T>(object: T, request: Request): T {
+  return JSON.parse(replaceHostname(JSON.stringify(object), request));
+}

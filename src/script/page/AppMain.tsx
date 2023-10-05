@@ -88,15 +88,14 @@ const AppMain: FC<AppMainProps> = ({
 
   const {repository: repositories} = app;
 
-  const {accent_id, availability: userAvailability} = useKoSubscribableChildren(selfUser, [
-    'accent_id',
-    'availability',
-  ]);
+  const {
+    accent_id,
+    availability: userAvailability,
+    isActivatedAccount,
+  } = useKoSubscribableChildren(selfUser, ['accent_id', 'availability', 'isActivatedAccount']);
 
   const teamState = container.resolve(TeamState);
   const userState = container.resolve(UserState);
-
-  const {isActivatedAccount} = useKoSubscribableChildren(userState, ['isActivatedAccount']);
 
   const {
     history,
@@ -263,7 +262,7 @@ const AppMain: FC<AppMainProps> = ({
           />
 
           {/*The order of these elements matter to show proper modals stack upon each other*/}
-          <UserModal userRepository={repositories.user} />
+          <UserModal selfUser={selfUser} userRepository={repositories.user} />
           <PrimaryModalComponent />
           <GroupCreationModal userState={userState} teamState={teamState} />
         </ErrorBoundary>

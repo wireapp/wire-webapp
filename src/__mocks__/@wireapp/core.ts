@@ -24,6 +24,11 @@ export class Account extends EventEmitter {
     federationEndpoints: true,
   };
 
+  recurringTaskScheduler = {
+    registerTask: jest.fn(),
+    cancelTask: jest.fn(),
+  };
+
   configureMLSCallbacks = jest.fn();
 
   service = {
@@ -48,12 +53,16 @@ export class Account extends EventEmitter {
     },
     conversation: {
       send: jest.fn(),
-      isMLSConversationEstablished: jest.fn(),
+      mlsGroupExistsLocally: jest.fn(),
       joinByExternalCommit: jest.fn(),
       addUsersToMLSConversation: jest.fn(),
       messageTimer: {
         setConversationLevelTimer: jest.fn(),
       },
+    },
+
+    client: {
+      deleteClient: jest.fn(),
     },
   };
 }

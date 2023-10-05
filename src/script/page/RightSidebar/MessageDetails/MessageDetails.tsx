@@ -93,6 +93,7 @@ interface MessageDetailsProps {
   searchRepository: SearchRepository;
   userRepository: UserRepository;
   showReactions?: boolean;
+  selfUser: User;
   updateEntity: (message: Message) => void;
   togglePanel: (state: PanelState, entity: PanelEntity, addMode?: boolean) => void;
 }
@@ -105,6 +106,7 @@ const MessageDetails: FC<MessageDetailsProps> = ({
   searchRepository,
   showReactions = false,
   userRepository,
+  selfUser,
   onClose,
   updateEntity,
   togglePanel,
@@ -262,6 +264,7 @@ const MessageDetails: FC<MessageDetailsProps> = ({
         {messageState === MESSAGE_STATES.RECEIPTS && (
           <UserSearchableList
             dataUieName="read-list"
+            selfUser={selfUser}
             users={receiptUsers}
             infos={receiptTimes}
             noUnderline
@@ -288,6 +291,7 @@ const MessageDetails: FC<MessageDetailsProps> = ({
                   <span css={reactionsCountAlignment}>({emojiCount})</span>
                 </div>
                 <UserSearchableList
+                  selfUser={selfUser}
                   key={reactionKey}
                   dataUieName="reaction-list"
                   users={users}

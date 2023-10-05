@@ -35,11 +35,6 @@ export class ValidationUtilError extends Error {
 }
 
 export const isValidUsername = (username: string) => /^@?[a-z_0-9.-]{2,256}$/.test(username);
-export const isValidFederationUsername = (username: string) => {
-  const federationUsernameRegex =
-    /^(@?[a-z_0-9.-]{2,256})@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  return federationUsernameRegex.test(username);
-};
 
 /**
  * Checks if input has the format of an international phone number
