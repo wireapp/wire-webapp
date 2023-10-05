@@ -33,7 +33,7 @@ const roots = new Map<
   }
 >();
 
-export const cleanUpElement = (elementId: string) => {
+const cleanUpElement = (elementId: string) => {
   const root = roots.get(elementId);
   if (root && root.elementContainer) {
     root.reactRoot.unmount();

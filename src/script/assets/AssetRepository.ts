@@ -39,7 +39,7 @@ import {FileAsset} from '../entity/message/FileAsset';
 import type {User} from '../entity/User';
 import {Core} from '../service/CoreSingleton';
 
-export interface CompressedImage {
+interface CompressedImage {
   compressedBytes: Uint8Array;
   compressedImage: HTMLImageElement;
 }
@@ -50,7 +50,7 @@ export interface AssetUploadOptions extends AssetOptions {
   legalHoldStatus?: LegalHoldStatus;
 }
 
-export interface UploadStatus {
+interface UploadStatus {
   messageId: string;
   progress: ko.Observable<number>;
 }

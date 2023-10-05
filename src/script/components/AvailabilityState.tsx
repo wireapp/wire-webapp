@@ -29,7 +29,7 @@ import {KEY} from 'Util/KeyboardUtil';
 
 import {Icon} from './Icon';
 
-export interface AvailabilityStateProps {
+interface AvailabilityStateProps {
   availability: Availability.Type;
   className?: string;
   dataUieName: string;
@@ -54,7 +54,7 @@ const buttonCommonStyles: CSSObject = {
   textTransform: 'uppercase',
 };
 
-const AvailabilityState: React.FC<AvailabilityStateProps> = ({
+export const AvailabilityState: React.FC<AvailabilityStateProps> = ({
   availability,
   className,
   dataUieName,
@@ -174,5 +174,3 @@ const AvailabilityState: React.FC<AvailabilityStateProps> = ({
 
   return wrappedContent;
 };
-
-export {AvailabilityState};

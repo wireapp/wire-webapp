@@ -35,7 +35,7 @@ export const ACCESS_MODES = {
   CODE: 1 << 5,
 };
 
-export const ACCESS = {...ACCESS_TYPES, ...ACCESS_MODES};
+const ACCESS = {...ACCESS_TYPES, ...ACCESS_MODES};
 
 export function teamPermissionsForAccessState(state: ACCESS_STATE): number {
   switch (state) {
