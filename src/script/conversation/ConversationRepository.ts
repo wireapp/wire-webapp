@@ -553,10 +553,9 @@ export class ConversationRepository {
 
       if (failedToAdd) {
         const failedToAddUsersEvent = EventBuilder.buildFailedToAddUsersEvent(
-          failedToAdd.users,
+          failedToAdd,
           conversationEntity,
           this.userState.self().id,
-          failedToAdd.reason,
         );
         await this.eventRepository.injectEvent(failedToAddUsersEvent);
       }
@@ -1594,12 +1593,7 @@ export class ConversationRepository {
         }
         if (failedToAdd) {
           await this.eventRepository.injectEvent(
-            EventBuilder.buildFailedToAddUsersEvent(
-              failedToAdd.users,
-              conversation,
-              this.userState.self().id,
-              failedToAdd.reason,
-            ),
+            EventBuilder.buildFailedToAddUsersEvent(failedToAdd, conversation, this.userState.self().id),
             EventRepository.SOURCE.INJECTED,
           );
         }
