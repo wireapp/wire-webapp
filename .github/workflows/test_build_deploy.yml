@@ -103,7 +103,7 @@ jobs:
           key: '${{github.ref}}'
           map: |
             {
-              "dev": { "preprod_env": "wire-webapp-edge-al2" },
+              "dev": { "preprod_env": "wire-webapp-edge-al2" }
             }
 
       - uses: kanga333/variable-mapper@master
