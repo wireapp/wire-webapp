@@ -95,13 +95,6 @@ export const UserDetailsComponent: React.FC<UserDetailsProps> = ({
             <UserName user={participant} />
           </h2>
         )}
-
-        {/*{isSelfVerified && user.is_verified && (*/}
-        {/*  <Icon.Verified*/}
-        {/*    className="panel-participant__head__verified-icon"*/}
-        {/*    data-uie-name="status-verified-participant"*/}
-        {/*  />*/}
-        {/*)}*/}
       </div>
 
       {participant.handle && (
