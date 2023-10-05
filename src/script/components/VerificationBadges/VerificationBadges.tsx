@@ -36,7 +36,7 @@ export enum MLSStatuses {
   EXPIRES_SOON = 'expires_soon',
 }
 
-interface BadgesProps {
+interface VerificationBadgesProps {
   conversationProtocol?: ConversationProtocol;
   isMLSVerified?: boolean;
   isProteusVerified?: boolean;
@@ -61,7 +61,7 @@ const title = (isMLSConversation = false): CSSProperties => ({
   marginRight: '4px',
 });
 
-export const Badges: React.FC<BadgesProps> = ({
+export const VerificationBadges: React.FC<VerificationBadgesProps> = ({
   conversationProtocol,
   isMLSVerified = false,
   isProteusVerified = false,

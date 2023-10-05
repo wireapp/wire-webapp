@@ -19,8 +19,8 @@
 
 import React from 'react';
 
-import {Badges} from 'Components/Badges';
 import {ClientEntity, MLSPublicKeys} from 'src/script/client/ClientEntity';
+import {VerificationBadges} from 'src/script/components/VerificationBadges';
 import {getCertificateDetails, getCertificateState} from 'Util/certificateDetails';
 
 import {MLSDeviceDetails} from './MLSDeviceDetails';
@@ -53,7 +53,11 @@ export const DetailedDevice: React.FC<DeviceProps> = ({
         <span>{device.model}</span>
 
         {/* Badges to display: None, Proteus, MLS (Valid), MLS (Not Activated), MLS (Expires Soon), MLS (Expired), , MLS (Revoked) */}
-        <Badges isProteusVerified={isProteusVerified} isMLSVerified={!!mlsFingerprint} MLSStatus={certificateState} />
+        <VerificationBadges
+          isProteusVerified={isProteusVerified}
+          isMLSVerified={!!mlsFingerprint}
+          MLSStatus={certificateState}
+        />
       </h3>
 
       {mlsFingerprint && (

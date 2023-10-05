@@ -17,7 +17,7 @@
  *
  */
 
-import {Badges} from 'Components/Badges';
+import {VerificationBadges} from 'src/script/components/VerificationBadges';
 import {t} from 'Util/LocalizerUtil';
 import {splitFingerprint} from 'Util/StringUtil';
 import {formatTimestamp} from 'Util/TimeUtil';
@@ -75,7 +75,7 @@ export const ProteusDeviceDetails = ({
           {isProteusVerified ? (
             <>
               <span>{t('proteusVerified')}</span>
-              <Badges isProteusVerified />
+              <VerificationBadges isProteusVerified />
             </>
           ) : (
             <span>{t('proteusNotVerified')}</span>

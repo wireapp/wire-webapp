@@ -24,10 +24,10 @@ import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
 
-import {Badges} from 'Components/Badges';
 import {ErrorFallback} from 'Components/ErrorFallback';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {useEnrichedFields} from 'Components/panel/EnrichedFields';
+import {VerificationBadges} from 'src/script/components/VerificationBadges';
 import {ContentState} from 'src/script/page/useAppState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -153,7 +153,7 @@ export const AccountPreferences: React.FC<AccountPreferencesProps> = ({
             {name}
           </h3>
 
-          <Badges isProteusVerified={isVerified} />
+          <VerificationBadges isProteusVerified={isVerified} />
         </div>
 
         <div className="preferences-account-image">
