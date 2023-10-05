@@ -172,21 +172,21 @@ jobs:
         env:
           DOCKER_PASSWORD: ${{secrets.WEBTEAM_QUAY_PASSWORD}}
           DOCKER_USERNAME: ${{secrets.WEBTEAM_QUAY_USERNAME}}
-        run: yarn docker '' "${{env.BRANCH_NAME}}"
+        run: yarn docker "${{env.BRANCH_NAME}}"
 
       - name: Push staging Docker image
         if: contains(env.TAG, 'staging')
         env:
           DOCKER_PASSWORD: ${{secrets.WEBTEAM_QUAY_PASSWORD}}
           DOCKER_USERNAME: ${{secrets.WEBTEAM_QUAY_USERNAME}}
-        run: yarn docker '' staging "$TAG"
+        run: yarn docker staging "$TAG"
 
       - name: Push production Docker image
         if: contains(env.TAG, 'production')
         env:
           DOCKER_PASSWORD: ${{secrets.WEBTEAM_QUAY_PASSWORD}}
           DOCKER_USERNAME: ${{secrets.WEBTEAM_QUAY_USERNAME}}
-        run: yarn docker '' production "$TAG"
+        run: yarn docker production "$TAG"
 
       - name: Generate changelog for production release
         if: contains(env.TAG, 'production')
