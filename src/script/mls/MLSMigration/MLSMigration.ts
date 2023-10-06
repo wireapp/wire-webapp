@@ -154,7 +154,6 @@ const migrateConversationsToMLS = async ({
   //refetch all known users so we have the latest lists of the protocols they support
   await userRepository.refreshAllKnownUsers();
 
-  //TODO: implement logic for 1on1 conversations (both team owned and federated)
   const conversations = conversationRepository.getAllSelfTeamOwnedGroupConversations();
 
   await initialiseMigrationOfProteusConversations(conversations, {
