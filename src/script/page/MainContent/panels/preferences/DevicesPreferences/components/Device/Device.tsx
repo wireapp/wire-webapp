@@ -23,8 +23,8 @@ import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
 import {WireIdentity} from '@wireapp/core-crypto';
 
-import {Badges} from 'Components/Badges';
 import {Icon} from 'Components/Icon';
+import {VerificationBadges} from 'Components/VerificationBadges';
 import {getCertificateDetails, getCertificateState} from 'Util/certificateDetails';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
@@ -90,7 +90,11 @@ export const Device = ({device, isSSO, onSelect, onRemove, deviceNumber, getDevi
         >
           {device.getName()}
 
-          <Badges isProteusVerified={isVerified} isMLSVerified={!!mlsFingerprint} MLSStatus={certificateState} />
+          <VerificationBadges
+            isProteusVerified={isVerified}
+            isMLSVerified={!!mlsFingerprint}
+            MLSStatus={certificateState}
+          />
         </div>
 
         {mlsFingerprint && (

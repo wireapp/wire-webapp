@@ -19,7 +19,7 @@
 
 import {render} from '@testing-library/react';
 
-import {MLSStatuses} from 'Components/Badges';
+import {MLSStatuses} from 'Components/VerificationBadges';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 
 import {E2EICertificateDetails} from './E2EICertificateDetails';

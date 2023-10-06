@@ -21,8 +21,8 @@ import {useState} from 'react';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {Badges} from 'Components/Badges';
 import {CertificateDetailsModal} from 'Components/Modals/CertificateDetailsModal';
+import {VerificationBadges} from 'Components/VerificationBadges';
 import {E2EIHandler} from 'src/script/E2EIdentity';
 import {getCertificateDetails, getCertificateState} from 'Util/certificateDetails';
 import {t} from 'Util/LocalizerUtil';
@@ -73,7 +73,7 @@ export const E2EICertificateDetails = ({
           <strong css={styles.e2eiStatus(certificateState)}>{t(`E2EI.${certificateState}`)}</strong>
         </p>
 
-        <Badges isMLSVerified={isMLSVerified} MLSStatus={certificateState} />
+        <VerificationBadges isMLSVerified={isMLSVerified} MLSStatus={certificateState} />
       </div>
 
       <div css={styles.buttonsGroup}>

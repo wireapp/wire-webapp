@@ -19,7 +19,7 @@
 
 import * as x509 from '@peculiar/x509';
 
-import {MLSStatuses} from 'Components/Badges';
+import {MLSStatuses} from 'Components/VerificationBadges';
 
 // TODO: Will be changed when I get information how much hours before we need to display this status.
 const EXPIRATION_HOURS = 32;
