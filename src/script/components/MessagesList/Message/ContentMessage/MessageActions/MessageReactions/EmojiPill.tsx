@@ -108,7 +108,11 @@ const EmojiPill: FC<EmojiPillProps> = ({
       >
         <button
           css={{...messageReactionButton, ...getReactionsButtonCSS(isActive, isRemovedFromConversation)}}
-          aria-label={t('messageReactionDetails', {emojiCount: emojiCount.toString(), emojiName})}
+          aria-label={
+            emojiCount > 1
+              ? t('accessibility.messageReactionDetailsPlural', {emojiCount: emojiCount.toString(), emojiName})
+              : t('accessibility.messageReactionDetailsSingular', {emojiCount: emojiCount.toString(), emojiName})
+          }
           title={emojiName}
           aria-pressed={isActive}
           type="button"

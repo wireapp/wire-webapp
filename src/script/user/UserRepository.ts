@@ -217,8 +217,7 @@ export class UserRepository {
     const [localUsers, incompleteUsers] = partition(dbUsers, user => !!user.qualified_id);
 
     /** users we have in the DB that are not matching any loaded users */
-    const [orphanUsers, liveUsers] = partition(
-      localUsers,
+    const orphanUsers = localUsers.filter(
       localUser => !users.find(user => matchQualifiedIds(user, localUser.qualified_id)),
     );
 
@@ -227,14 +226,10 @@ export class UserRepository {
       await this.userService.removeUserFromDb(orphanUser.qualified_id);
     }
 
-    const missingUsers = users.filter(
-      user =>
-        // The self user doesn't need to be re-fetched
-        !matchQualifiedIds(selfUser.qualifiedId, user) &&
-        !liveUsers.find(localUser => matchQualifiedIds(user, localUser.qualified_id)),
-    );
+    // The self user doesn't need to be re-fetched
+    const usersToFetch = users.filter(user => !matchQualifiedIds(selfUser.qualifiedId, user));
 
-    const {found, failed} = await this.fetchRawUsers(missingUsers, selfUser.domain);
+    const {found, failed} = await this.fetchRawUsers(usersToFetch, selfUser.domain);
 
     const userWithAvailability = found.map(user => {
       const availability = incompleteUsers
@@ -250,7 +245,7 @@ export class UserRepository {
     // Save all new users to the database
     await Promise.all(userWithAvailability.map(user => this.saveUserInDb(user)));
 
-    const mappedUsers = this.mapUserResponse(userWithAvailability.concat(liveUsers), failed);
+    const mappedUsers = this.mapUserResponse(userWithAvailability, failed);
 
     // Assign connections to users
     mappedUsers.forEach(user => {
@@ -769,7 +764,7 @@ export class UserRepository {
   }
 
   getSelfSupportedProtocols(): ConversationProtocol[] | null {
-    return this.userState.self().supportedProtocols();
+    return this.userState.self()?.supportedProtocols() || null;
   }
 
   public async getAllSelfClients() {
@@ -781,7 +776,11 @@ export class UserRepository {
    * @param user user data from backend
    */
   private async updateSavedUser(user: APIClientUser): Promise<User> {
-    const localUserEntity = this.findUserById(generateQualifiedId(user)) ?? new User();
+    const localUserEntity = this.findUserById(generateQualifiedId(user));
+    if (!localUserEntity) {
+      // If the user could not be found locally, we will get it and save it locally
+      return this.getUserById(user.qualified_id);
+    }
     const updatedUser = this.userMapper.updateUserFromObject(localUserEntity, user, this.userState.self().domain);
     const {qualifiedId: userId} = updatedUser;
 

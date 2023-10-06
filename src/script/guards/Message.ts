@@ -17,8 +17,6 @@
  *
  */
 
-import {Draft} from 'Util/DraftStateUtil';
-
 import {ContentMessage} from '../entity/message/ContentMessage';
 import {DeleteMessage} from '../entity/message/DeleteMessage';
 import {MemberMessage} from '../entity/message/MemberMessage';
@@ -37,6 +35,3 @@ export const isDeleteMessage = (message: any): message is DeleteMessage =>
 
 export const isMemberMessage = (message: any | undefined | null): message is MemberMessage =>
   message && 'super_type' in message && message.super_type === SuperType.MEMBER;
-
-export const isDraftMessageWithReplyId = (message: any | undefined | null): message is Draft =>
-  message && 'reply' in message && 'messageId' in message.reply;

@@ -30,6 +30,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {Icon} from 'Components/Icon';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
+import {User} from 'src/script/entity/User';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {ContentState} from 'src/script/page/useAppState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -47,7 +48,6 @@ import {PanelState} from '../../page/RightSidebar/RightSidebar';
 import {TeamState} from '../../team/TeamState';
 import {Shortcut} from '../../ui/Shortcut';
 import {ShortcutType} from '../../ui/ShortcutType';
-import {UserState} from '../../user/UserState';
 import {CallActions} from '../../view_model/CallingViewModel';
 import {ViewModelRepositories} from '../../view_model/MainViewModel';
 
@@ -56,7 +56,7 @@ export interface TitleBarProps {
   conversation: Conversation;
   openRightSidebar: (panelState: PanelState, params: RightSidebarParams, compareEntityId?: boolean) => void;
   repositories: ViewModelRepositories;
-  userState: UserState;
+  selfUser: User;
   teamState: TeamState;
   isRightSidebarOpen?: boolean;
   callState?: CallState;
@@ -66,9 +66,9 @@ export const TitleBar: React.FC<TitleBarProps> = ({
   repositories,
   conversation,
   callActions,
+  selfUser,
   openRightSidebar,
   isRightSidebarOpen = false,
-  userState = container.resolve(UserState),
   callState = container.resolve(CallState),
   teamState = container.resolve(TeamState),
 }) => {
@@ -101,7 +101,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
     'verification_state',
   ]);
 
-  const {isActivatedAccount} = useKoSubscribableChildren(userState, ['isActivatedAccount']);
+  const {isActivatedAccount} = useKoSubscribableChildren(selfUser, ['isActivatedAccount']);
   const {joinedCall, activeCalls} = useKoSubscribableChildren(callState, ['joinedCall', 'activeCalls']);
   const {isVideoCallingEnabled} = useKoSubscribableChildren(teamState, ['isVideoCallingEnabled']);
 

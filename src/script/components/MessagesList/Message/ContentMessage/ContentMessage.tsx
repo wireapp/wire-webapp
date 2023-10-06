@@ -134,7 +134,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
     senderName,
   });
 
-  const [isActionMenuVisible, setActionMenuVisibility] = useState(true);
+  const [isActionMenuVisible, setActionMenuVisibility] = useState(false);
   const isMenuOpen = useMessageActionsState(state => state.isMenuOpen);
   useEffect(() => {
     setActionMenuVisibility(isMessageFocused || msgFocusState);

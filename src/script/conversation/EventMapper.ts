@@ -33,6 +33,7 @@ import {
   ErrorEvent,
   ClientConversationEvent,
   FederationStopEvent,
+  FailedToAddUsersMessageEvent,
 } from './EventBuilder';
 
 import {AssetRemoteData} from '../assets/AssetRemoteData';
@@ -507,8 +508,8 @@ export class EventMapper {
     return new CallingTimeoutMessage(data.reason, parseInt(time, 10));
   }
 
-  _mapEventFailedToAddUsers({data, time}: LegacyEventRecord) {
-    return new FailedToAddUsersMessage(data.qualifiedIds, data.reason, parseInt(time, 10));
+  _mapEventFailedToAddUsers({data, time}: FailedToAddUsersMessageEvent) {
+    return new FailedToAddUsersMessage(data.qualifiedIds, data.reason, data.backends, parseInt(time, 10));
   }
 
   _mapEventFederationStop({data, time}: FederationStopEvent) {

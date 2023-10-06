@@ -204,7 +204,7 @@ export class ConversationRepository {
     this.messageRepository.setClientMismatchHandler(async (mismatch, conversation, silent, consentType) => {
       //we filter out self client id to omit it in mismatch check
       const {userId, clientId} = this.core;
-      const domain = userState.self().domain;
+      const domain = userState.self()?.domain;
 
       const selfClient = {domain, userId, clientId};
       const filteredMissing = mismatch.missing && removeClientFromUserClientMap(mismatch.missing, selfClient);
@@ -258,7 +258,7 @@ export class ConversationRepository {
         if (wasVerified && newDevices.length) {
           // if the conversation is verified but some clients were missing, it means the conversation will degrade.
           // We need to warn the user of the degradation and ask his permission to actually send the message
-          conversation.verification_state(ConversationVerificationState.DEGRADED);
+          conversation?.verification_state(ConversationVerificationState.DEGRADED);
         }
         if (conversation) {
           const hasChangedLegalHoldStatus = conversation.legalHoldStatus() !== legalHoldStatus;
@@ -561,10 +561,9 @@ export class ConversationRepository {
 
       if (failedToAdd) {
         const failedToAddUsersEvent = EventBuilder.buildFailedToAddUsersEvent(
-          failedToAdd.users,
+          failedToAdd,
           conversationEntity,
           this.userState.self().id,
-          failedToAdd.reason,
         );
         await this.eventRepository.injectEvent(failedToAddUsersEvent);
       }
@@ -649,7 +648,7 @@ export class ConversationRepository {
       const response = await this.conversationService.getConversationById(qualifiedId);
       const [conversationEntity] = this.mapConversations([response]);
 
-      this.saveConversation(conversationEntity);
+      await this.saveConversation(conversationEntity);
 
       fetching_conversations[conversationId].forEach(({resolveFn}) => resolveFn(conversationEntity));
       delete fetching_conversations[conversationId];
@@ -1609,12 +1608,7 @@ export class ConversationRepository {
         }
         if (failedToAdd) {
           await this.eventRepository.injectEvent(
-            EventBuilder.buildFailedToAddUsersEvent(
-              failedToAdd.users,
-              conversation,
-              this.userState.self().id,
-              failedToAdd.reason,
-            ),
+            EventBuilder.buildFailedToAddUsersEvent(failedToAdd, conversation, this.userState.self().id),
             EventRepository.SOURCE.INJECTED,
           );
         }

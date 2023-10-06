@@ -252,7 +252,10 @@ export class Conversation {
       const is1to1Conversation = this.type() === CONVERSATION_TYPE.ONE_TO_ONE;
       return is1to1Conversation || this.isTeam1to1();
     });
-    this.isRequest = ko.pureComputed(() => this.type() === CONVERSATION_TYPE.CONNECT);
+    this.isRequest = ko.pureComputed(
+      () =>
+        this.type() === CONVERSATION_TYPE.CONNECT || (this.is1to1() && this.participating_user_ets()[0]?.isRequest()),
+    );
     this.isSelf = ko.pureComputed(() => this.type() === CONVERSATION_TYPE.SELF);
 
     this.hasDirectGuest = ko.pureComputed(() => {
@@ -964,12 +967,12 @@ export class Conversation {
   /**
    * Get the last delivered message.
    */
-  getLastDeliveredMessage(): Message | undefined {
+  private getLastDeliveredMessage(): Message | undefined {
     return this.messages()
       .slice()
       .reverse()
       .find(messageEntity => {
-        const isDelivered = messageEntity.status() >= StatusType.DELIVERED;
+        const isDelivered = [StatusType.DELIVERED, StatusType.SEEN].includes(messageEntity.status());
         return isDelivered && messageEntity.user().isMe;
       });
   }

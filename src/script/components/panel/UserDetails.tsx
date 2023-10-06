@@ -29,15 +29,15 @@ import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {ErrorFallback} from 'Components/ErrorFallback';
 import {Icon} from 'Components/Icon';
 import {UserClassifiedBar} from 'Components/input/ClassifiedBar';
+import {UserName} from 'Components/UserName';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {User} from '../../entity/User';
 
-export interface UserDetailsProps {
+interface UserDetailsProps {
   badge?: string;
   classifiedDomains?: string[];
-  conversationDomain?: string;
   isGroupAdmin?: boolean;
   isSelfVerified: boolean;
   isVerified?: boolean;
@@ -45,14 +45,13 @@ export interface UserDetailsProps {
   avatarStyles?: React.CSSProperties;
 }
 
-export const UserDetailsComponent: React.FC<UserDetailsProps> = ({
+const UserDetailsComponent: React.FC<UserDetailsProps> = ({
   badge,
   participant,
   isSelfVerified,
   isGroupAdmin,
   avatarStyles,
   classifiedDomains,
-  conversationDomain,
 }) => {
   const user = useKoSubscribableChildren(participant, [
     'inTeam',
@@ -89,7 +88,7 @@ export const UserDetailsComponent: React.FC<UserDetailsProps> = ({
             data-uie-name="status-name"
             css={user.isAvailable ? undefined : {color: 'var(--gray-70)'}}
           >
-            {user.isAvailable ? user.name : t('unavailableUser')}
+            <UserName user={participant} />
           </h2>
         )}
 
@@ -107,13 +106,7 @@ export const UserDetailsComponent: React.FC<UserDetailsProps> = ({
         </p>
       )}
 
-      {classifiedDomains && (
-        <UserClassifiedBar
-          conversationDomain={conversationDomain}
-          users={[participant]}
-          classifiedDomains={classifiedDomains}
-        />
-      )}
+      {classifiedDomains && <UserClassifiedBar users={[participant]} classifiedDomains={classifiedDomains} />}
 
       <Avatar
         className="panel-participant__avatar"

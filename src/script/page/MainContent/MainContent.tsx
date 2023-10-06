@@ -78,7 +78,7 @@ const MainContent: FC<MainContentProps> = ({
   const teamState = container.resolve(TeamState);
   const {showRequestModal} = useLegalHoldModalState();
 
-  const {isActivatedAccount} = useKoSubscribableChildren(userState, ['self', 'isActivatedAccount']);
+  const {isActivatedAccount} = useKoSubscribableChildren(selfUser, ['isActivatedAccount']);
 
   const contentState = useAppState(state => state.contentState);
   const isShowingConversation = useAppState(state => state.isShowingConversation);
@@ -216,7 +216,7 @@ const MainContent: FC<MainContentProps> = ({
                 className={cx('preferences-page preferences-options', incomingCssClass)}
                 ref={removeAnimationsClass}
               >
-                <OptionPreferences propertiesRepository={repositories.properties} />
+                <OptionPreferences selfUser={selfUser} propertiesRepository={repositories.properties} />
               </div>
             )}
 
@@ -229,7 +229,7 @@ const MainContent: FC<MainContentProps> = ({
             )}
 
             {contentState === ContentState.CONNECTION_REQUESTS && (
-              <ConnectRequests teamState={teamState} userState={userState} />
+              <ConnectRequests teamState={teamState} selfUser={selfUser} userState={userState} />
             )}
 
             {contentState === ContentState.CONVERSATION && (

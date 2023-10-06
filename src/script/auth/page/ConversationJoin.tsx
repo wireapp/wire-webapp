@@ -78,6 +78,7 @@ const ConversationJoinComponent = ({
   const [showCookiePolicyBanner, setShowCookiePolicyBanner] = useState(true);
   const [showEntropyForm, setShowEntropyForm] = useState(false);
   const isEntropyRequired = Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY;
+  const isWirePublicInstance = Config.getConfig().BRAND_NAME === 'Wire';
 
   useEffect(() => {
     const localConversationCode = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_CODE);
@@ -218,9 +219,11 @@ const ConversationJoinComponent = ({
           <H1 style={{fontWeight: 500, marginTop: '0', marginBottom: '1rem'}} data-uie-name="status-join-headline">
             {_(conversationJoinStrings.mainHeadline)}
           </H1>
-          <Muted data-uie-name="status-join-subhead">
-            {_(conversationJoinStrings.headline, {brandName: Config.getConfig().BRAND_NAME})}
-          </Muted>
+          {!isWirePublicInstance && (
+            <Muted data-uie-name="status-join-subhead">
+              {_(conversationJoinStrings.headline, {domain: window.location.hostname})}
+            </Muted>
+          )}
         </div>
         <Columns style={{display: 'flex', gap: '2rem', alignSelf: 'center', maxWidth: '100%'}}>
           <Column>
@@ -262,7 +265,7 @@ const mapStateToProps = (state: RootState) => ({
   isAuthenticated: AuthSelector.isAuthenticated(state),
   isFetching: ConversationSelector.isFetching(state),
   isTemporaryGuest: SelfSelector.isTemporaryGuest(state),
-  selfName: SelfSelector.getSelfName(state),
+  selfName: !SelfSelector.isTemporaryGuest(state) && SelfSelector.getSelfName(state),
 });
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;

@@ -40,7 +40,7 @@ import {getLogger, Logger} from 'Util/Logger';
 import {includesString} from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {appendParameter} from 'Util/UrlUtil';
-import {checkIndexedDb, supportsMLS, supportsMLSMigration, supportsSelfSupportedProtocolsUpdates} from 'Util/util';
+import {checkIndexedDb, supportsMLS, supportsMLSMigration} from 'Util/util';
 
 import '../../style/default.less';
 import {AssetRepository} from '../assets/AssetRepository';
@@ -61,6 +61,7 @@ import {ConversationRepository} from '../conversation/ConversationRepository';
 import {ConversationService} from '../conversation/ConversationService';
 import {MessageRepository} from '../conversation/MessageRepository';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
+import {User} from '../entity/User';
 import {AccessTokenError} from '../error/AccessTokenError';
 import {AuthError} from '../error/AuthError';
 import {BaseError} from '../error/BaseError';
@@ -423,7 +424,7 @@ export class App {
 
       onProgress(25, t('initReceivedUserData'));
       telemetry.addStatistic(AppInitStatisticsValue.CONVERSATIONS, conversations.length, 50);
-      this._subscribeToUnloadEvents();
+      this._subscribeToUnloadEvents(selfUser);
 
       await conversationRepository.conversationRoleRepository.loadTeamRoles();
 
@@ -473,14 +474,12 @@ export class App {
       await conversationRepository.updateConversationsOnAppInit();
       await conversationRepository.conversationLabelRepository.loadLabels();
 
-      if (supportsSelfSupportedProtocolsUpdates()) {
-        await selfRepository.initialisePeriodicSelfSupportedProtocolsCheck();
-      }
+      await selfRepository.initialisePeriodicSelfSupportedProtocolsCheck();
 
       amplify.publish(WebAppEvents.LIFECYCLE.LOADED);
 
       telemetry.timeStep(AppInitTimingsStep.UPDATED_CONVERSATIONS);
-      if (userRepository['userState'].isActivatedAccount()) {
+      if (selfUser.isActivatedAccount()) {
         // start regularly polling the server to check if there is a new version of Wire
         startNewVersionPolling(Environment.version(false), this.update);
       }
@@ -624,13 +623,13 @@ export class App {
   /**
    * Subscribe to 'beforeunload' to stop calls and disconnect the WebSocket.
    */
-  private _subscribeToUnloadEvents(): void {
+  private _subscribeToUnloadEvents(selfUser: User): void {
     window.addEventListener('unload', () => {
       this.logger.info("'window.onunload' was triggered, so we will disconnect from the backend.");
       this.repository.event.disconnectWebSocket();
       this.repository.calling.destroy();
 
-      if (this.repository.user['userState'].isActivatedAccount()) {
+      if (selfUser.isActivatedAccount()) {
         if (this.service.storage.isTemporaryAndNonPersistent) {
           this.logout(SIGN_OUT_REASON.CLIENT_REMOVED, true);
         } else {
@@ -785,7 +784,7 @@ export class App {
   redirectToLogin(signOutReason: SIGN_OUT_REASON): void {
     this.logger.info(`Redirecting to login after connectivity verification. Reason: ${signOutReason}`);
     const isTemporaryGuestReason = App.CONFIG.SIGN_OUT_REASONS.TEMPORARY_GUEST.includes(signOutReason);
-    const isLeavingGuestRoom = isTemporaryGuestReason && this.repository.user['userState'].isTemporaryGuest();
+    const isLeavingGuestRoom = isTemporaryGuestReason && this.repository.user['userState'].self()?.isTemporaryGuest();
 
     if (isLeavingGuestRoom) {
       const websiteUrl = getWebsiteUrl();
