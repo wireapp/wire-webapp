@@ -19,7 +19,6 @@
 
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {registerRecurringTask} from '@wireapp/core/lib/util/RecurringTaskScheduler';
 import {container} from 'tsyringe';
 
 import {Account} from '@wireapp/core';
@@ -72,7 +71,7 @@ export const initialiseMLSMigrationFlow = async ({
         conversationRepository,
         selfUserId,
       }),
-    {teamRepository, userRepository},
+    {teamRepository, userRepository, core},
   );
 };
 
@@ -83,7 +82,7 @@ interface CheckMigrationConfigParams {
 
 const periodicallyCheckMigrationConfig = async (
   onMigrationStartTimeArrived: () => Promise<void>,
-  {teamRepository, userRepository}: CheckMigrationConfigParams,
+  {teamRepository, userRepository, core}: CheckMigrationConfigParams & {core: Account},
 ) => {
   const checkMigrationConfigTask = () =>
     checkMigrationConfig(onMigrationStartTimeArrived, {teamRepository, userRepository});
@@ -91,7 +90,7 @@ const periodicallyCheckMigrationConfig = async (
   // We check the migration config immediately (on app load) and every 24 hours
   await checkMigrationConfigTask();
 
-  registerRecurringTask({
+  return core.recurringTaskScheduler.registerTask({
     every: TIME_IN_MILLIS.DAY,
     task: checkMigrationConfigTask,
     key: MIGRATION_TASK_KEY,
