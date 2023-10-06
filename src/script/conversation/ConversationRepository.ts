@@ -3586,7 +3586,7 @@ export class ConversationRepository {
       return;
     }
 
-    const otherUserId = eventJson.qualified_from;
+    const [otherUserId] = conversationEntity.participating_user_ids();
 
     if (!otherUserId) {
       return;
