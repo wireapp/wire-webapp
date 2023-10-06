@@ -73,7 +73,10 @@ export const is1to1ConversationWithUser =
       return matchQualifiedIds(connection.userId, userId);
     }
 
-    if (!conversation.is1to1()) {
+    const isProteusConnectType =
+      protocol === ConversationProtocol.PROTEUS && conversation.type() === CONVERSATION_TYPE.CONNECT;
+
+    if (!conversation.is1to1() && !isProteusConnectType) {
       return false;
     }
 
