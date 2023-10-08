@@ -4885,11 +4885,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/copy-config@npm:2.1.8":
-  version: 2.1.8
-  resolution: "@wireapp/copy-config@npm:2.1.8"
+"@wireapp/copy-config@npm:2.1.9":
+  version: 2.1.9
+  resolution: "@wireapp/copy-config@npm:2.1.9"
   dependencies:
-    axios: 1.5.0
+    axios: 1.5.1
     copy: 0.3.2
     cosmiconfig: 8.3.6
     fs-extra: 11.1.0
@@ -4897,7 +4897,7 @@ __metadata:
     logdown: 3.3.1
   bin:
     copy-config: lib/cli.js
-  checksum: 9f82a8a648d2b2ad950c1c32b897e3ce5a057fc96d1248a678e21e927790629fd50784f070e0a54c10670b6ae1262c30c8923a669694a02e6d75168eab837a10
+  checksum: 37ee9d82c6eabc33573ede5c0d9e467c2d6c3dd8f0c2717378ef8c4b84b568613d64e33f4f2903b9d4d612b25ea40f22881e0f44b51cd4f72185f0606294a168
   languageName: node
   linkType: hard
 
@@ -5781,17 +5781,6 @@ __metadata:
     "@babel/runtime": ^7.15.4
     is-retry-allowed: ^2.2.0
   checksum: 448d951b971ccd35eaedc0f10ff1129a6bf2b3dfe13ce57749809bd37975332ae0e906ea4e67a41c9c98215bb1bf8a554e6880f1272419c758f91e4d68ca6b55
-  languageName: node
-  linkType: hard
-
-"axios@npm:1.5.0":
-  version: 1.5.0
-  resolution: "axios@npm:1.5.0"
-  dependencies:
-    follow-redirects: ^1.15.0
-    form-data: ^4.0.0
-    proxy-from-env: ^1.1.0
-  checksum: e7405a5dbbea97760d0e6cd58fecba311b0401ddb4a8efbc4108f5537da9b3f278bde566deb777935a960beec4fa18e7b8353881f2f465e4f2c0e949fead35be
   languageName: node
   linkType: hard
 
@@ -17909,7 +17898,7 @@ __metadata:
     "@types/underscore": 1.11.9
     "@types/webpack-env": 1.18.2
     "@wireapp/avs": 9.4.14
-    "@wireapp/copy-config": 2.1.8
+    "@wireapp/copy-config": 2.1.9
     "@wireapp/core": 42.9.4
     "@wireapp/eslint-config": 3.0.4
     "@wireapp/lru-cache": 3.8.1
