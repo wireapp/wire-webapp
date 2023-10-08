@@ -14,7 +14,7 @@
     "beautiful-react-hooks": "^5.0.0",
     "classnames": "2.3.2",
     "copy-webpack-plugin": "11.0.0",
-    "core-js": "3.32.2",
+    "core-js": "3.33.0",
     "countly-sdk-web": "23.6.0",
     "date-fns": "2.30.0",
     "dexie-batch": "0.4.3",
