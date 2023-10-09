@@ -28,7 +28,8 @@ import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 export function HistoryPlugin(): null {
   const [editor] = useLexicalComposerContext();
 
-  useEffect(() => registerHistory(editor, createEmptyHistoryState(), 300), [editor]);
+  const historySavingDelay = 300;
+  useEffect(() => registerHistory(editor, createEmptyHistoryState(), historySavingDelay), [editor]);
 
   return null;
 }
