@@ -51,6 +51,7 @@ import {GenericMessage} from '@wireapp/protocol-messaging';
 import {
   AddUsersFailureReasons,
   AddUsersParams,
+  KeyPackageClaimUser,
   MLSCreateConversationResponse,
   SendMlsMessageParams,
   SendResult,
@@ -565,6 +566,53 @@ export class ConversationService extends TypedEventEmitter<Events> {
       return this.establishMLS1to1Conversation(groupId, selfUser, otherUserId, false);
     }
   };
+
+  /**
+   * Will try to register mls group by sending an empty commit to establish it.
+   * After group was successfully established, it will try to add other users to the group.
+   *
+   * @param groupId - id of the MLS group
+   * @param conversationId - id of the conversation
+   * @param selfUserId - id of the self user
+   * @param qualifiedUsers - list of qualified users to add to the group (should not include the self user)
+   */
+  public async tryEstablishingMLSGroup({
+    groupId,
+    conversationId,
+    selfUserId,
+    qualifiedUsers,
+  }: {
+    groupId: string;
+    conversationId: QualifiedId;
+    selfUserId: QualifiedId;
+    qualifiedUsers: QualifiedId[];
+  }): Promise<void> {
+    const wasGroupEstablishedBySelfClient = await this.mlsService.tryEstablishingMLSGroup(groupId);
+
+    if (!wasGroupEstablishedBySelfClient) {
+      this.logger.info('Group was not established by self client, skipping adding users to the group.');
+      return;
+    }
+
+    this.logger.info('Group was established by self client, adding other users to the group...');
+    const usersToAdd: KeyPackageClaimUser[] = [
+      ...qualifiedUsers,
+      {...selfUserId, skipOwnClientId: this.apiClient.validatedClientId},
+    ];
+
+    const {conversation} = await this.addUsersToMLSConversation({
+      conversationId,
+      groupId,
+      qualifiedUsers: usersToAdd,
+    });
+
+    const addedUsers = conversation.members.others;
+    if (addedUsers.length > 0) {
+      this.logger.info(`Successfully added ${addedUsers} users to the group.`);
+    } else {
+      this.logger.info('No other users were added to the group.');
+    }
+  }
 
   private async handleMLSMessageAddEvent(event: ConversationMLSMessageAddEvent): Promise<HandledEventPayload | null> {
     try {
