@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2022 Wire Swiss GmbH
+ * Copyright (C) 2023 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,26 +17,32 @@
  *
  */
 
-import {useEffect, DependencyList} from 'react';
+import {useEffect} from 'react';
 
-const useScrollSync = (element: HTMLElement | null, targetElement: HTMLElement | null, deps?: DependencyList) => {
-  const syncScroll = () => {
-    if (element && targetElement) {
-      if (element?.scrollTop !== targetElement?.scrollTop) {
-        targetElement.scrollTop = element.scrollTop;
-      }
-    }
-  };
+import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
+import {COMMAND_PRIORITY_LOW, KEY_ENTER_COMMAND} from 'lexical';
 
-  useEffect(() => {
-    window.addEventListener('resize', syncScroll);
-    element?.addEventListener('scroll', syncScroll);
-
-    return () => {
-      window.removeEventListener('resize', syncScroll);
-      element?.removeEventListener('scroll', syncScroll);
-    };
-  }, deps);
+type Props = {
+  onSend: () => void;
 };
 
-export {useScrollSync};
+export function SendPlugin({onSend}: Props): null {
+  const [editor] = useLexicalComposerContext();
+
+  useEffect(() => {
+    return editor.registerCommand(
+      KEY_ENTER_COMMAND,
+      event => {
+        if (event?.shiftKey) {
+          return true;
+        }
+
+        onSend();
+        return false;
+      },
+      COMMAND_PRIORITY_LOW,
+    );
+  }, [editor, onSend]);
+
+  return null;
+}

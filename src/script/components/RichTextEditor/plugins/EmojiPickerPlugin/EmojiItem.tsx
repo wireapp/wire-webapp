@@ -17,32 +17,39 @@
  *
  */
 
-import {FC} from 'react';
+import {forwardRef, ForwardRefRenderFunction} from 'react';
 
 import cx from 'classnames';
 
+import {EmojiOption} from 'Components/RichTextEditor/plugins/EmojiPickerPlugin/EmojiPickerPlugin';
+
 import {itemStyle, symbolStyle, nameStyle} from './EmojiItem.styles';
-import {EmojiListItem} from './useEmoji';
 
 interface EmojiItemProps {
-  emoji: EmojiListItem;
+  emoji: EmojiOption;
   onClick: () => void;
   onMouseEnter: () => void;
   selectedEmoji?: boolean;
 }
 
-const EmojiItem: FC<EmojiItemProps> = ({emoji, onClick, onMouseEnter, selectedEmoji = false}) => (
+const EmojiItemComponent: ForwardRefRenderFunction<HTMLButtonElement, EmojiItemProps> = (
+  {emoji, onClick, onMouseEnter, selectedEmoji = false},
+  ref,
+) => (
   <button
     type="button"
     className={cx('button-reset-default', 'emoji', {selected: selectedEmoji})}
     css={itemStyle}
     onMouseEnter={onMouseEnter}
     onClick={onClick}
-    aria-label={emoji.name}
+    aria-label={emoji.title}
+    ref={ref}
   >
-    <span css={symbolStyle}>{emoji.icon}</span>
-    <span css={nameStyle}>{emoji.name}</span>
+    <span css={symbolStyle}>{emoji.emoji}</span>
+    <span css={nameStyle}>{emoji.title}</span>
   </button>
 );
+
+const EmojiItem = forwardRef(EmojiItemComponent);
 
 export {EmojiItem};
