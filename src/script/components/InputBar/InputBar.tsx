@@ -202,12 +202,11 @@ export const InputBar = ({
     ),
   });
 
-  const resetDraftState = (resetInputValue = false) => {
-    if (resetInputValue) {
-      editorRef.current?.update(() => {
-        $getRoot().clear();
-      });
-    }
+  const resetDraftState = () => {
+    setReplyMessageEntity(null);
+    editorRef.current?.update(() => {
+      $getRoot().clear();
+    });
   };
 
   const clearPastedFile = () => setPastedFile(null);
@@ -237,12 +236,12 @@ export const InputBar = ({
     };
   });
 
-  const cancelMessageEditing = (resetDraft = true, resetInputValue = false) => {
+  const cancelMessageEditing = (resetDraft = true) => {
     setEditedMessage(undefined);
     setReplyMessageEntity(null);
 
     if (resetDraft) {
-      resetDraftState(resetInputValue);
+      resetDraftState();
     }
   };
 
@@ -253,7 +252,7 @@ export const InputBar = ({
   const editMessage = (messageEntity?: ContentMessage) => {
     if (messageEntity?.isEditable() && messageEntity !== editedMessage) {
       cancelMessageReply();
-      cancelMessageEditing(true, true);
+      cancelMessageEditing(true);
       setEditedMessage(messageEntity);
 
       if (messageEntity.quote() && conversation) {
@@ -291,7 +290,7 @@ export const InputBar = ({
 
   const sendMessageEdit = (messageText: string, mentions: MentionEntity[]): void | Promise<any> => {
     const mentionEntities = mentions.slice(0);
-    cancelMessageEditing(true, true);
+    cancelMessageEditing(true);
 
     if (!messageText.length && editedMessage) {
       return messageRepository.deleteMessageForEveryone(conversation, editedMessage);
@@ -345,7 +344,7 @@ export const InputBar = ({
     }
 
     editorRef.current?.focus();
-    editorRef.current?.update(() => $getRoot().clear());
+    resetDraftState();
   };
 
   const onGifClick = () => openGiphy(textValue);
@@ -403,13 +402,13 @@ export const InputBar = ({
   const sendGiphy = (gifUrl: string, tag: string): void => {
     void generateQuote().then(quoteEntity => {
       void messageRepository.sendGif(conversation, gifUrl, tag, quoteEntity);
-      cancelMessageEditing(true, true);
+      cancelMessageEditing(true);
     });
   };
 
   const onWindowClick = (event: Event): void =>
     handleClickOutsideOfInputBar(event, () => {
-      cancelMessageEditing(true, true);
+      cancelMessageEditing(true);
       cancelMessageReply();
     });
 
@@ -506,7 +505,7 @@ export const InputBar = ({
     input: textValue,
     isEditing: isEditing,
     isScaledDown: isScaledDown,
-    onCancelEditing: () => cancelMessageEditing(true, true),
+    onCancelEditing: () => cancelMessageEditing(true),
     onClickPing: onPingClick,
     onGifClick: onGifClick,
     onSelectFiles: uploadFiles,
@@ -551,7 +550,7 @@ export const InputBar = ({
                 editedMessage={editedMessage}
                 onEscape={() => {
                   if (editedMessage) {
-                    cancelMessageEditing(true, true);
+                    cancelMessageEditing(true);
                   } else if (replyMessageEntity) {
                     cancelMessageReply();
                   }

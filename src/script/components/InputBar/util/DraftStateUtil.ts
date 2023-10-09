@@ -37,12 +37,11 @@ export const saveDraftState = async (
   replyMessageId?: string,
 ): Promise<void> => {
   // we only save state for newly written messages
-  const storeReply = replyMessageId;
   const storageKey = generateConversationInputStorageKey(conversationEntity);
 
   await storageRepository.storageService.saveToSimpleStorage<any>(storageKey, {
     editorState,
-    replyId: storeReply,
+    replyId: replyMessageId,
   });
 };
 
