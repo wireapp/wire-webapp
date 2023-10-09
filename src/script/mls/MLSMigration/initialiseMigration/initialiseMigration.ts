@@ -20,8 +20,6 @@
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {Account} from '@wireapp/core';
-
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {
   ProteusConversation,
@@ -30,13 +28,9 @@ import {
 } from 'src/script/conversation/ConversationSelectors';
 import {Conversation} from 'src/script/entity/Conversation';
 
-import {addMixedConversationMembersToMLSGroup} from './addMixedConversationMembersToMLSGroup';
-import {tryEstablishingMLSGroupForMixedConversation} from './tryEstablishingMLSGroupForMixedConversation';
-
 import {mlsMigrationLogger} from '../MLSMigrationLogger';
 
 interface InitialiseMigrationOfProteusConversationParams {
-  core: Account;
   conversationRepository: ConversationRepository;
   selfUserId: QualifiedId;
 }
@@ -51,7 +45,7 @@ interface InitialiseMigrationOfProteusConversationParams {
  */
 export const initialiseMigrationOfProteusConversations = async (
   conversations: Conversation[],
-  {core, conversationRepository, selfUserId}: InitialiseMigrationOfProteusConversationParams,
+  {conversationRepository, selfUserId}: InitialiseMigrationOfProteusConversationParams,
 ) => {
   const proteusConversations = conversations.filter(isProteusConversation);
   if (proteusConversations.length < 1) {
@@ -61,7 +55,6 @@ export const initialiseMigrationOfProteusConversations = async (
   mlsMigrationLogger.info(`Initialising MLS migration for ${proteusConversations.length} "proteus" conversations`);
   for (const proteusConversation of proteusConversations) {
     await initialiseMigrationOfProteusConversation(proteusConversation, {
-      core,
       conversationRepository,
       selfUserId,
     });
@@ -70,7 +63,7 @@ export const initialiseMigrationOfProteusConversations = async (
 
 const initialiseMigrationOfProteusConversation = async (
   proteusConversation: ProteusConversation,
-  {core, conversationRepository, selfUserId}: InitialiseMigrationOfProteusConversationParams,
+  {conversationRepository, selfUserId}: InitialiseMigrationOfProteusConversationParams,
 ) => {
   mlsMigrationLogger.info(
     `Initialising MLS migration for "proteus" conversation: ${proteusConversation.qualifiedId.id}`,
@@ -92,23 +85,14 @@ const initialiseMigrationOfProteusConversation = async (
       `Conversation ${updatedMixedConversation.qualifiedId.id} was updated to mixed protocol successfully, trying to initialise MLS Group...`,
     );
 
-    const hasEstablishedMLSGroup = await tryEstablishingMLSGroupForMixedConversation(updatedMixedConversation, {
-      core,
-      selfUserId,
-      conversationRepository,
+    const otherUsersToAdd = updatedMixedConversation.participating_user_ids();
+
+    await conversationRepository.tryEstablishingMLSGroup({
+      conversationId: updatedMixedConversation.qualifiedId,
+      groupId: updatedMixedConversation.groupId,
+      qualifiedUsers: otherUsersToAdd,
+      selfUserId: selfUserId,
     });
-
-    if (!hasEstablishedMLSGroup) {
-      //we don't want to add members to the group if we have not established it
-      //only client who established the group should add members to it
-      return;
-    }
-
-    mlsMigrationLogger.info(
-      `MLS Group for conversation ${updatedMixedConversation.qualifiedId.id} was initialised successfully, adding other users...`,
-    );
-
-    await addMixedConversationMembersToMLSGroup(updatedMixedConversation, {core, selfUserId});
   } catch (error) {
     mlsMigrationLogger.error(
       `Error while initialising MLS migration for "proteus" conversation: ${proteusConversation.qualifiedId.id}`,

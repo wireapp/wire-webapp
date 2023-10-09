@@ -74,8 +74,7 @@ const finaliseMigrationOfMixedConversation = async (
 ) => {
   mlsMigrationLogger.info(`Finalising migration of mixed conversation ${mixedConversation.id}...`);
   try {
-    //update protocol to mls
-    //update conversation protocol on both backend and local store
+    // Update conversation protocol from "mixed" to "mls".
     const updatedMLSConversation = await conversationRepository.updateConversationProtocol(
       mixedConversation,
       ConversationProtocol.MLS,

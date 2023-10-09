@@ -154,15 +154,15 @@ const migrateConversationsToMLS = async ({
   //refetch all known users so we have the latest lists of the protocols they support
   await userRepository.refreshAllKnownUsers();
 
-  const conversations = conversationRepository.getAllSelfTeamOwnedGroupConversations();
+  const selfTeamGroupConversations = conversationRepository.getAllSelfTeamOwnedGroupConversations();
 
-  await initialiseMigrationOfProteusConversations(conversations, {
-    core,
+  await initialiseMigrationOfProteusConversations(selfTeamGroupConversations, {
     conversationRepository,
     selfUserId,
   });
 
-  await joinUnestablishedMixedConversations(conversations, {core});
+  const allGroupConversations = conversationRepository.getAllGroupConversations();
+  await joinUnestablishedMixedConversations(allGroupConversations, {core});
 
-  await finaliseMigrationOfMixedConversations(conversations, {conversationRepository, teamRepository});
+  await finaliseMigrationOfMixedConversations(selfTeamGroupConversations, {conversationRepository, teamRepository});
 };

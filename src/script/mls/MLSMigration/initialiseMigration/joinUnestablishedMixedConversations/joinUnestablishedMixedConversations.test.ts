@@ -36,7 +36,7 @@ const createMixedConversation = (mockGroupId: string): MixedConversation => {
 
 const mockCore = container.resolve(Core);
 
-describe('tryEstablishingMLSGroupForMixedConversation', () => {
+describe('joinUnestablishedMixedConversations', () => {
   it('Should join known "mixed" conversations with unestablished MLS groups', async () => {
     const mixedConversation1 = createMixedConversation('groupId1');
     const mixedConversation2 = createMixedConversation('groupId2');

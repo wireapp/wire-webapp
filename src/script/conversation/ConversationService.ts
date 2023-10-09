@@ -442,6 +442,24 @@ export class ConversationService {
   }
 
   /**
+   * Will try to register mls group by sending an empty commit to establish it.
+   * After group was successfully established, it will try to add other users to the group.
+   *
+   * @param groupId - id of the MLS group
+   * @param conversationId - id of the conversation
+   * @param selfUserId - id of the self user
+   * @param qualifiedUsers - list of qualified users to add to the group (should not include the self user)
+   */
+  public tryEstablishingMLSGroup(params: {
+    groupId: string;
+    conversationId: QualifiedId;
+    selfUserId: QualifiedId;
+    qualifiedUsers: QualifiedId[];
+  }) {
+    return this.coreConversationService.tryEstablishingMLSGroup(params);
+  }
+
+  /**
    * Checks if MLS conversation exists locally.
    * @param groupId id of the MLS group
    */

@@ -1115,10 +1115,22 @@ export class ConversationRepository {
    * Get all the group conversations owned by self user's team from the local state.
    */
   public getAllSelfTeamOwnedGroupConversations(): Conversation[] {
-    const {teamId: selfUserTeamId} = this.userState.self();
+    const selfUser = this.userState.self();
+    if (!selfUser) {
+      this.logger.error('Failed to get self user');
+      return [];
+    }
+    const {teamId: selfUserTeamId} = selfUser;
     return this.conversationState.conversations().filter(conversation => {
       return conversation.isGroup() && !!selfUserTeamId && conversation.team_id === selfUserTeamId;
     });
+  }
+
+  /**
+   * Get all the group conversations owned by self user's team from the local state.
+   */
+  public getAllGroupConversations(): Conversation[] {
+    return this.conversationState.conversations().filter(conversation => conversation.isGroup());
   }
 
   /**
@@ -1900,6 +1912,24 @@ export class ConversationRepository {
 
     //even if protocol was already updated (no response), we need to refetch the conversation
     return this.refreshConversationProtocolProperties(conversation);
+  }
+
+  /**
+   * Will try to register mls group by sending an empty commit to establish it.
+   * After group was successfully established, it will try to add other users to the group.
+   *
+   * @param groupId - id of the MLS group
+   * @param conversationId - id of the conversation
+   * @param selfUserId - id of the self user
+   * @param qualifiedUsers - list of qualified users to add to the group (should not include the self user)
+   */
+  public tryEstablishingMLSGroup(params: {
+    groupId: string;
+    conversationId: QualifiedId;
+    selfUserId: QualifiedId;
+    qualifiedUsers: QualifiedId[];
+  }) {
+    return this.conversationService.tryEstablishingMLSGroup(params);
   }
 
   /**

@@ -65,6 +65,7 @@ export class Account extends EventEmitter {
       messageTimer: {
         setConversationLevelTimer: jest.fn(),
       },
+      tryEstablishingMLSGroup: jest.fn(),
     },
 
     client: {
