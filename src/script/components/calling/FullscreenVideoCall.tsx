@@ -355,7 +355,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
 
                   {isMuted ? <Icon.MicOff width={16} height={16} /> : <Icon.MicOn width={16} height={16} />}
 
-                  {showSwitchMicrophone && !verticalBreakpoint && (
+                  {/* {showSwitchMicrophone && !verticalBreakpoint && (
                     <DeviceToggleButton
                       styles={css`
                         bottom: -38px;
@@ -367,7 +367,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                       devices={availableMicrophones}
                       onChooseDevice={deviceId => switchMicrophoneInput(call, deviceId)}
                     />
-                  )}
+                  )} */}
                 </button>
               </li>
 
@@ -395,7 +395,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                       {t('videoCallOverlayCamera')}
                     </span>
 
-                    {showSwitchCamera && !verticalBreakpoint && (
+                    {/* {showSwitchCamera && !verticalBreakpoint && (
                       <DeviceToggleButton
                         styles={css`
                           bottom: -38px;
@@ -407,7 +407,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                         devices={availableCameras}
                         onChooseDevice={deviceId => switchCameraInput(call, deviceId)}
                       />
-                    )}
+                    )} */}
                   </div>
                 </li>
               )}
