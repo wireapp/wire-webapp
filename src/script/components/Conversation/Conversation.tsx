@@ -521,7 +521,8 @@ export const Conversation: FC<ConversationProps> = ({
           />
 
           <InputBar
-            conversationEntity={activeConversation}
+            key={activeConversation?.id}
+            conversation={activeConversation}
             conversationRepository={repositories.conversation}
             eventRepository={repositories.event}
             messageRepository={repositories.message}
