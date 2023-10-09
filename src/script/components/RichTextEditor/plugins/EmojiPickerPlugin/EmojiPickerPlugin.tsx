@@ -79,7 +79,7 @@ export class EmojiOption extends MenuOption {
       keywords?: string[];
     },
   ) {
-    super(title);
+    super(title + options.keywords?.join('_'));
     this.title = title.replace(/_/g, ' ');
     this.emoji = emoji;
     this.keywords = options.keywords || [];
