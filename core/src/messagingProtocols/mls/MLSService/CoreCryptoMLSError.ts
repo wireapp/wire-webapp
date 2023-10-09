@@ -25,10 +25,15 @@ export const CoreCryptoMLSError = {
       'You tried to join with an external commit but did not merge it yet. We will reapply this message for you when you merge your external commit',
     FUTURE_EPOCH: 'Incoming message is for a future epoch. We will buffer it until the commit for that epoch arrives',
   },
+  CONVERSATION_ALREADY_EXISTS: 'Conversation already exists',
 } as const;
 
 export const isCoreCryptoMLSWrongEpochError = (error: unknown): boolean => {
   return error instanceof Error && error.message === CoreCryptoMLSError.DECRYPTION.WRONG_EPOCH;
+};
+
+export const isCoreCryptoMLSConversationAlreadyExistsError = (error: unknown): boolean => {
+  return error instanceof Error && error.message === CoreCryptoMLSError.CONVERSATION_ALREADY_EXISTS;
 };
 
 const mlsDecryptionErrorsToIgnore: string[] = [

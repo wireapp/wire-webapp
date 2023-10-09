@@ -23,12 +23,14 @@ import {
   ConversationMLSMessageAddEvent,
   ConversationMLSWelcomeEvent,
 } from '@wireapp/api-client/lib/event';
+import {BackendError, BackendErrorLabel, StatusCode} from '@wireapp/api-client/lib/http';
 
 import {randomUUID} from 'crypto';
 
 import {APIClient} from '@wireapp/api-client';
 import {CoreCrypto, DecryptedMessage} from '@wireapp/core-crypto';
 
+import {CoreCryptoMLSError} from './CoreCryptoMLSError';
 import {MLSService} from './MLSService';
 
 import {openDB} from '../../../storage/CoreDB';
@@ -414,6 +416,72 @@ describe('MLSService', () => {
 
       expect(coreCrypto.processWelcomeMessage).toHaveBeenCalled();
       expect(apiClient.api.client.uploadMLSKeyPackages).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('tryEstablishingMLSGroup', () => {
+    it('returns false if group did already exist locally', async () => {
+      const [mlsService] = await createMLSService();
+
+      const mockGroupId = 'mock-group-id';
+
+      jest.spyOn(mlsService, 'conversationExists').mockResolvedValueOnce(true);
+      jest.spyOn(mlsService, 'registerConversation').mockImplementation(jest.fn());
+
+      const wasConversationEstablished = await mlsService.tryEstablishingMLSGroup(mockGroupId);
+
+      expect(mlsService.registerConversation).not.toHaveBeenCalled();
+      expect(wasConversationEstablished).toBe(false);
+    });
+
+    it('returns false if corecrypto has thrown an error when trying to register group locally', async () => {
+      const [mlsService] = await createMLSService();
+
+      const mockGroupId = 'mock-group-id';
+
+      jest.spyOn(mlsService, 'conversationExists').mockResolvedValueOnce(false);
+      jest
+        .spyOn(mlsService, 'registerConversation')
+        .mockRejectedValueOnce(new Error(CoreCryptoMLSError.CONVERSATION_ALREADY_EXISTS));
+
+      const wasConversationEstablished = await mlsService.tryEstablishingMLSGroup(mockGroupId);
+
+      expect(mlsService.registerConversation).toHaveBeenCalledWith(mockGroupId, []);
+      expect(wasConversationEstablished).toBe(false);
+    });
+
+    it('returns false and wipes group locally if any backend error was thrown', async () => {
+      const [mlsService] = await createMLSService();
+
+      const mockGroupId = 'mock-group-id2';
+
+      jest.spyOn(mlsService, 'conversationExists').mockResolvedValueOnce(false);
+      jest
+        .spyOn(mlsService, 'registerConversation')
+        .mockRejectedValueOnce(new BackendError('', BackendErrorLabel.MLS_STALE_MESSAGE, StatusCode.CONFLICT));
+      jest.spyOn(mlsService, 'wipeConversation').mockImplementation(jest.fn());
+
+      const wasConversationEstablished = await mlsService.tryEstablishingMLSGroup(mockGroupId);
+
+      expect(mlsService.registerConversation).toHaveBeenCalledWith(mockGroupId, []);
+      expect(mlsService.wipeConversation).toHaveBeenCalledWith(mockGroupId);
+      expect(wasConversationEstablished).toBe(false);
+    });
+
+    it('returns true after MLS group was etablished successfully', async () => {
+      const [mlsService] = await createMLSService();
+
+      const mockGroupId = 'mock-group-id2';
+
+      jest.spyOn(mlsService, 'conversationExists').mockResolvedValueOnce(false);
+      jest.spyOn(mlsService, 'registerConversation').mockResolvedValueOnce({events: [], time: ''});
+      jest.spyOn(mlsService, 'wipeConversation').mockImplementation(jest.fn());
+
+      const wasConversationEstablished = await mlsService.tryEstablishingMLSGroup(mockGroupId);
+
+      expect(mlsService.registerConversation).toHaveBeenCalledWith(mockGroupId, []);
+      expect(mlsService.wipeConversation).not.toHaveBeenCalled();
+      expect(wasConversationEstablished).toBe(true);
     });
   });
 });
