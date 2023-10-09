@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [42.10.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.9.4...@wireapp/core@42.10.0) (2023-10-09)
+
+### Features
+
+* try establishing mls group for mixed conversation ([#5578](https://github.com/wireapp/wire-web-packages/issues/5578)) ([17b879b](https://github.com/wireapp/wire-web-packages/commit/17b879b45cfc44c6037cb45495b1fbee7a9a2669))
+
 ## [42.9.4](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.9.3...@wireapp/core@42.9.4) (2023-10-05)
 
 **Note:** Version bump only for package @wireapp/core
