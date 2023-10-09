@@ -28,7 +28,7 @@ import {
   useBasicTypeaheadTriggerMatch,
 } from '@lexical/react/LexicalTypeaheadMenuPlugin';
 // The emoji list comes from the emoji-picker-react package that we also use for reactions. It's a little hacky how we import it but since it's typechecked, we will be warned if this file doesn't exist in the repo with further updates
-import emojiList from 'emoji-picker-react/src/data/emojis';
+import emojiList from 'emoji-picker-react/src/data/emojis.json';
 import {$createTextNode, $getSelection, $isRangeSelection, TextNode} from 'lexical';
 import * as ReactDOM from 'react-dom';
 
