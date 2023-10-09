@@ -44,7 +44,7 @@ const versionParam = process.argv[3] || '';
 const commitSha = process.env.GITHUB_SHA || process.argv[4];
 const commitShortSha = commitSha.substring(0, 7);
 const dockerRegistryDomain = 'quay.io';
-const repository = `${dockerRegistryDomain}/wire/webapp${distributionParam ? `-${distributionParam}` : ''}`;
+const repository = `${dockerRegistryDomain}/wire/webapp`;
 
 const tags = [];
 
@@ -55,9 +55,7 @@ if (stageParam) {
 
 if (['production', 'staging'].includes(stageParam)) {
   /** Defines which config version (listed in "app-config/package.json") is going to be used */
-  const configurationEntry = `wire-web-config-default-${
-    distributionParam || stageParam === 'production' ? 'master' : 'staging'
-  }`;
+  const configurationEntry = `wire-web-config-default-${stageParam === 'production' ? 'master' : 'staging'}`;
   const configVersion = appConfigPkg.dependencies[configurationEntry].split('#')[1];
   tags.push(`${repository}:${versionParam}-${configVersion}-${commitShortSha}`);
 }

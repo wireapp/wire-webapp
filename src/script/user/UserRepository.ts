@@ -763,7 +763,7 @@ export class UserRepository {
   }
 
   getSelfSupportedProtocols(): ConversationProtocol[] | null {
-    return this.userState.self().supportedProtocols();
+    return this.userState.self()?.supportedProtocols() || null;
   }
 
   public async getAllSelfClients() {

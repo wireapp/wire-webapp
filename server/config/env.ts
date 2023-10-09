@@ -80,9 +80,6 @@ export type Env = {
   /** will enable the MLS protocol */
   FEATURE_ENABLE_MLS?: string;
 
-  /** will enable the user to periodically update the list of supported protocols */
-  FEATURE_ENABLE_SELF_SUPPORTED_PROTOCOLS_UPDATES?: string;
-
   FEATURE_USE_CORE_CRYPTO?: string;
 
   FEATURE_MLS_CONFIG_KEYING_MATERIAL_UPDATE_THRESHOLD?: string;
