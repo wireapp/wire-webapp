@@ -23,7 +23,6 @@ import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {ClientEntity} from 'src/script/client';
 import {Conversation} from 'src/script/entity/Conversation';
 import {VerificationMessageType} from 'src/script/message/VerificationMessageType';
 import {UserState} from 'src/script/user/UserState';
@@ -72,7 +71,7 @@ export class ProteusConversationVerificationStateHandler {
    * Self user or other participant added clients.
    * @param userId ID of user that added client (can be self user ID)
    */
-  readonly onClientAdded = (userId: QualifiedId, _clientEntity?: ClientEntity): void => {
+  readonly onClientAdded = (userId: QualifiedId): void => {
     this.onClientsAdded([userId]);
   };
 
