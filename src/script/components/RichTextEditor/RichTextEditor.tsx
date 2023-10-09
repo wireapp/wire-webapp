@@ -190,7 +190,10 @@ export const RichTextEditor = ({
 
 function Placeholder({text, hasLocalEphemeralTimer}: {text: string; hasLocalEphemeralTimer: boolean}) {
   return (
-    <div className={cx('editor-placeholder', {'conversation-input-bar-text--accent': hasLocalEphemeralTimer})}>
+    <div
+      className={cx('editor-placeholder', {'conversation-input-bar-text--accent': hasLocalEphemeralTimer})}
+      data-uie-name="input-placeholder"
+    >
       {text}
     </div>
   );
