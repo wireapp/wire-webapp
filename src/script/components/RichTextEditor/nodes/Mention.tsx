@@ -203,7 +203,7 @@ export const Mention = (props: MentionComponentProps) => {
   }, [editor, moveCursor, selectMention, unselectMention, deleteMention]);
 
   return (
-    <span ref={ref} className={classNameFinal} data-mention={mention}>
+    <span ref={ref} className={classNameFinal} data-mention={mention} data-uie-name="item-input-mention">
       {mention}
     </span>
   );
