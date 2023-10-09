@@ -170,6 +170,7 @@ export class Conversation {
   public readonly type: ko.Observable<CONVERSATION_TYPE>;
   public readonly unreadState: ko.PureComputed<UnreadState>;
   public readonly verification_state: ko.Observable<ConversationVerificationState>;
+  public readonly mlsVerificationState: ko.Observable<ConversationVerificationState>;
   public readonly withAllTeamMembers: ko.Observable<boolean>;
   public readonly hasExternal: ko.PureComputed<boolean>;
   public readonly hasFederatedUsers: ko.PureComputed<boolean>;
@@ -285,6 +286,7 @@ export class Conversation {
     this.archivedState = ko.observable(false).extend({notify: 'always'});
     this.mutedState = ko.observable(NOTIFICATION_STATE.EVERYTHING);
     this.verification_state = ko.observable(ConversationVerificationState.UNVERIFIED);
+    this.mlsVerificationState = ko.observable(ConversationVerificationState.UNVERIFIED);
 
     this.archivedTimestamp = ko.observable(0);
     this.cleared_timestamp = ko.observable(0);
@@ -1013,6 +1015,10 @@ export class Conversation {
     return userEntities.filter(userEntity => !userEntity.is_verified());
   }
 
+  getAllUserEntities(): User[] {
+    return this.participating_user_ets();
+  }
+
   supportsVideoCall(sftEnabled: boolean): boolean {
     if (sftEnabled) {
       return true;
@@ -1059,6 +1065,7 @@ export class Conversation {
       team_id: this.team_id,
       type: this.type(),
       verification_state: this.verification_state(),
+      mlsVerificationState: this.mlsVerificationState(),
     };
   }
 }
