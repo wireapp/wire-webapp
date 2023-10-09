@@ -20,7 +20,7 @@
     "countly-sdk-web": "23.6.1",
     "date-fns": "2.30.0",
     "dexie-batch": "0.4.3",
-    "emoji-picker-react": "^4.5.2",
+    "emoji-picker-react": "4.5.2",
     "highlight.js": "11.8.0",
     "http-status-codes": "2.3.0",
     "jimp": "0.22.10",

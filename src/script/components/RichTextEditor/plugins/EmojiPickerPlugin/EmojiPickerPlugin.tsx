@@ -92,7 +92,7 @@ type Props = {
   openStateRef: MutableRefObject<boolean>;
 };
 
-const emojies = Object.values(emojiList).flat();
+const emojies: {n: string[]; u: string}[] = Object.values(emojiList).flat();
 
 const emojiOptions = emojies.map(({n: aliases, u: codepoint}) => {
   const codepoints = codepoint.split('-').map(code => parseInt(code, 16));

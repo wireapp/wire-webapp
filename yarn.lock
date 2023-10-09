@@ -8072,7 +8072,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"emoji-picker-react@npm:^4.5.2":
+"emoji-picker-react@npm:4.5.2":
   version: 4.5.2
   resolution: "emoji-picker-react@npm:4.5.2"
   dependencies:
@@ -18198,7 +18198,7 @@ __metadata:
     dexie-batch: 0.4.3
     dotenv: 16.3.1
     dpdm: 3.14.0
-    emoji-picker-react: ^4.5.2
+    emoji-picker-react: 4.5.2
     eslint: ^8.51.0
     eslint-plugin-prettier: ^5.0.0
     fake-indexeddb: 4.0.2
