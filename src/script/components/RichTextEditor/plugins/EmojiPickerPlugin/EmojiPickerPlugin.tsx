@@ -86,6 +86,10 @@ export class EmojiOption extends MenuOption {
   }
 }
 
+const emojiUsageCount: Record<string, number> = loadValue(StorageKey.CONVERSATION.EMOJI_USAGE_COUNT) || {};
+
+const getUsageCount = (emojiName: string): number => emojiUsageCount[emojiName] || 0;
+
 const MAX_EMOJI_SUGGESTION_COUNT = 5;
 
 type Props = {
@@ -105,10 +109,6 @@ export function EmojiPickerPlugin({openStateRef}: Props) {
   const [lexicalEditor] = useLexicalComposerContext();
 
   const [queryString, setQueryString] = useState<string | null>(null);
-
-  const emojiUsageCount: Record<string, number> = loadValue(StorageKey.CONVERSATION.EMOJI_USAGE_COUNT) || {};
-
-  const getUsageCount = (emojiName: string): number => emojiUsageCount?.[emojiName] || 0;
 
   const increaseUsageCount = (emojiName: string | null): void => {
     if (emojiName) {
@@ -174,29 +174,26 @@ export function EmojiPickerPlugin({openStateRef}: Props) {
           : usageCountB - usageCountA;
       })
       .slice(0, MAX_EMOJI_SUGGESTION_COUNT);
-  }, [emojiOptions, getUsageCount, queryString]);
+  }, [queryString]);
 
-  const onSelectOption = useCallback(
-    (selectedOption: EmojiOption, nodeToRemove: TextNode | null, closeMenu: () => void) => {
-      lexicalEditor.update(() => {
-        const selection = $getSelection();
+  const onSelectOption = (selectedOption: EmojiOption, nodeToRemove: TextNode | null, closeMenu: () => void) => {
+    lexicalEditor.update(() => {
+      const selection = $getSelection();
 
-        if (!$isRangeSelection(selection) || selectedOption == null) {
-          return;
-        }
+      if (!$isRangeSelection(selection) || selectedOption == null) {
+        return;
+      }
 
-        if (nodeToRemove) {
-          nodeToRemove.remove();
-        }
+      if (nodeToRemove) {
+        nodeToRemove.remove();
+      }
 
-        selection.insertNodes([$createTextNode(selectedOption.emoji)]);
-        increaseUsageCount(selectedOption.title);
+      selection.insertNodes([$createTextNode(selectedOption.emoji)]);
+      increaseUsageCount(selectedOption.title);
 
-        closeMenu();
-      });
-    },
-    [increaseUsageCount, lexicalEditor],
-  );
+      closeMenu();
+    });
+  };
 
   const rootElement = lexicalEditor.getRootElement();
 
