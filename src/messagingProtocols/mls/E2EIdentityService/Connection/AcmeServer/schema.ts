@@ -17,7 +17,7 @@
  *
  */
 
-import z from 'zod';
+import {z} from 'zod';
 
 const nonOptionalString = z.string().min(1);
 const nonOptionalUrl = z.string().url().min(1);
