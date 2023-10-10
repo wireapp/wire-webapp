@@ -286,11 +286,6 @@ export class MemberMessage extends SystemMessage {
     return t('conversationMultipleMembersRemovedMissingLegalHoldConsent', users, replaceLinkLegalHold);
   };
 
-  readonly showLargeAvatar = (): boolean => {
-    const largeAvatarTypes = [SystemMessageType.CONNECTION_ACCEPTED, SystemMessageType.CONNECTION_REQUEST];
-    return largeAvatarTypes.includes(this.memberMessageType);
-  };
-
   private generateNameString(skipAnd = false, declension = Declension.ACCUSATIVE): string {
     return joinNames(this.visibleUsers(), declension, skipAnd, true);
   }
