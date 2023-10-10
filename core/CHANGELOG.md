@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [42.12.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.11.0...@wireapp/core@42.12.0) (2023-10-10)
+
+### Features
+
+* add functionality for E2EI certificate enrollment [fs-749] ([#4948](https://github.com/wireapp/wire-web-packages/issues/4948)) ([f33c49d](https://github.com/wireapp/wire-web-packages/commit/f33c49dae5e9f494a7383f24ea8fcaef36f9298b))
+
 # [42.11.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.10.1...@wireapp/core@42.11.0) (2023-10-10)
 
 ### Features
