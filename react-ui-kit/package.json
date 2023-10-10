@@ -16,7 +16,7 @@
   },
   "devDependencies": {
     "@babel/cli": "7.23.0",
-    "@babel/core": "7.22.17",
+    "@babel/core": "7.23.0",
     "@babel/preset-env": "7.22.20",
     "@babel/preset-react": "7.22.15",
     "@babel/preset-typescript": "7.23.0",
