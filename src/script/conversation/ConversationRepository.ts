@@ -1751,13 +1751,20 @@ export class ConversationRepository {
       : this.removeMembers(conversation, [userQualifiedId]);
   }
 
+  /**
+   * Will inject a `member-leave` that will then trigger the local removal of the user in the conversation
+   * @param conversation the conversation in which we want to remove users
+   * @param userIds the users to remove from the conversation
+   */
   private async removeMembersLocally(conversation: Conversation, userIds: QualifiedId[]) {
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
     const events = userIds.map(userId => EventBuilder.buildMemberLeave(conversation, userId, true, currentTimestamp));
+    // Injecting the event will trigger all the handlers that will then actually remove the users from the conversation
     await this.eventRepository.injectEvents(events, EventRepository.SOURCE.INJECTED);
   }
+
   /**
-   * Umbrella function to remove a member from a conversation, no matter the protocol or type.
+   * Umbrella function to remove a member from a conversation (from backend and locally), no matter the protocol or type.
    *
    * @param conversationEntity Conversation to remove member from
    * @param userId ID of member to be removed from the conversation
