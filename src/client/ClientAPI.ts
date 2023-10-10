@@ -18,6 +18,7 @@
  */
 
 import {AxiosRequestConfig} from 'axios';
+import {z} from 'zod';
 
 import {ClientCapabilityData} from './ClientCapabilityData';
 import {ClientCapabilityRemovedError} from './ClientError';
@@ -52,6 +53,8 @@ export class ClientAPI {
     CAPABILITIES: 'capabilities',
     PREKEYS: 'prekeys',
     PUBLIC_KEYS: 'public-keys',
+    NONCE: 'nonce',
+    ACCESS_TOKEN: 'access-token',
   };
 
   public async postClient(newClient: CreateClientPayload): Promise<RegisteredClient> {
@@ -158,6 +161,28 @@ export class ClientAPI {
   }
 
   /**
+   * Will delete keypackages for an MLS capable client
+   * @see https://nginz-https.elna.wire.link/v4/api/swagger-ui/#/default/delete_mls_key_packages_self__client_
+   * @param {string} clientId The client to delete the key packages for
+   * @param {string[]} keyPackageRefs The key package references to delete
+   */
+  public async deleteMLSKeyPackages(clientId: string, keyPackageRefs: string[]) {
+    const maxKeyPackages = 1000;
+    if (keyPackageRefs.length > maxKeyPackages) {
+      throw new Error(
+        `Too many key packages, max is ${maxKeyPackages}. Please split the request into multiple requests.`,
+      );
+    }
+    const config: AxiosRequestConfig = {
+      data: {key_packages: keyPackageRefs},
+      method: 'DELETE',
+      url: `/${ClientAPI.URL.MLS_CLIENTS}/${ClientAPI.URL.MLS_KEY_PACKAGES}/self/${clientId}`,
+    };
+
+    await this.client.sendJSON<PreKeyBundle>(config, true);
+  }
+
+  /**
    * Claim one key package for each client of the given user
    * @param  {string} userId The user to claim the key packages for
    * @param {string} userDomain The domain of the user
@@ -217,5 +242,41 @@ export class ClientAPI {
 
     const response = await this.client.sendJSON<PublicKeys>(config, true);
     return response.data;
+  }
+
+  public async getNonce(clientId: string): Promise<string> {
+    const NonceKey = 'replay-nonce';
+    const NonceSchema = z.object({
+      [NonceKey]: z.string().min(1),
+    });
+
+    const config: AxiosRequestConfig = {
+      method: 'head',
+      url: `${ClientAPI.URL.CLIENTS}/${clientId}/${ClientAPI.URL.NONCE}`,
+    };
+
+    const {headers} = await this.client.sendRequest(config);
+
+    return NonceSchema.parse(headers)[NonceKey];
+  }
+
+  public async getAccessToken(clientId: string, dpopToken: Uint8Array) {
+    const ResponseSchema = z.object({
+      expires_in: z.number().min(1),
+      token: z.string().min(1),
+      type: z.literal('DPoP'),
+    });
+
+    const config: AxiosRequestConfig = {
+      method: 'post',
+      url: `${ClientAPI.URL.CLIENTS}/${clientId}/${ClientAPI.URL.ACCESS_TOKEN}`,
+      headers: {
+        DPoP: new TextDecoder().decode(dpopToken),
+      },
+    };
+
+    const {data} = await this.client.sendJSON(config);
+
+    return ResponseSchema.parse(data);
   }
 }
