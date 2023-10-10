@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [26.3.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@26.2.5...@wireapp/api-client@26.3.0) (2023-10-10)
+
+### Features
+
+* add functionality for E2EI certificate enrollment [fs-749] ([#4948](https://github.com/wireapp/wire-web-packages/issues/4948)) ([f33c49d](https://github.com/wireapp/wire-web-packages/commit/f33c49dae5e9f494a7383f24ea8fcaef36f9298b))
+
 ## [26.2.5](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@26.2.4...@wireapp/api-client@26.2.5) (2023-10-10)
 
 **Note:** Version bump only for package @wireapp/api-client
