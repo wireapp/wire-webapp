@@ -434,7 +434,7 @@ export class ConversationService {
    */
   async wipeMLSCapableConversation(conversation: MLSCapableConversation) {
     const {groupId} = conversation;
-    await this.core.service!.conversation.wipeMLSConversation(groupId);
+    await this.coreConversationService.wipeMLSConversation(groupId);
   }
 
   public addMLSConversationRecoveredListener(onRecovered: (conversationId: QualifiedId) => void) {
