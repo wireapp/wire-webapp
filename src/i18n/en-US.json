@@ -412,6 +412,7 @@
   "conversationMemberLeftYou": "[bold]You[/bold] left",
   "conversationMemberRemoved": "[bold]{{name}}[/bold] removed {{users}}",
   "conversationMemberRemovedMissingLegalHoldConsent": "{{user}} was removed from this conversation because legal hold has been activated. [link]Learn more[/link]",
+  "conversationMemberWereRemoved": "{{users}} were removed from the conversation",
   "conversationMemberRemovedYou": "[bold]You[/bold] removed {{users}}",
   "conversationMessageDelivered": "Delivered",
   "conversationMissedMessages": "You haven’t used this device for a while. Some messages may not appear here.",

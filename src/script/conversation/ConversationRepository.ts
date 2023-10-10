@@ -334,12 +334,11 @@ export class ConversationRepository {
       case FEDERATION_EVENT.FEDERATION_DELETE:
         const {domain: deletedDomain} = event;
         await this.onFederationDelete(deletedDomain);
-
         break;
+
       case FEDERATION_EVENT.FEDERATION_CONNECTION_REMOVED:
         const {domains: deletedDomains} = event;
         await this.onFederationConnectionRemove(deletedDomains);
-
         break;
     }
   };
@@ -365,7 +364,7 @@ export class ConversationRepository {
 
     conversationsToDisable.forEach(async conversation => {
       conversation.status(ConversationStatus.PAST_MEMBER);
-      conversation.firstUserEntity().markConnectionAsUnknown();
+      conversation.firstUserEntity()?.markConnectionAsUnknown();
       await this.insertFederationStopSystemMessage(conversation, [deletedDomain]);
     });
 
@@ -395,8 +394,8 @@ export class ConversationRepository {
     const result = getUsersToDeleteFromFederatedConversations(domains, allConversations);
 
     for (const {conversation, usersToRemove} of result) {
-      await this.removeDeletedFederationUsers(conversation, usersToRemove);
       await this.insertFederationStopSystemMessage(conversation, domains);
+      await this.removeDeletedFederationUsers(conversation, usersToRemove);
     }
   };
 
