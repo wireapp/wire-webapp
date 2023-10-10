@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2022 Wire Swiss GmbH
+ * Copyright (C) 2023 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,8 @@
 
 import {useEffect} from 'react';
 
+import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
+
 import {
   isArrowKey,
   isEnterKey,
@@ -30,6 +32,10 @@ import {
   isTabKey,
 } from 'Util/KeyboardUtil';
 
+const hasInputAlreadyFocused = () => {
+  return document.activeElement && ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName);
+};
+
 const useTextAreaFocus = (callback: () => void) => {
   const handleFocusTextarea = (event: KeyboardEvent) => {
     const detailViewModal = document.querySelector('#detail-view');
@@ -38,14 +44,12 @@ const useTextAreaFocus = (callback: () => void) => {
       return;
     }
 
-    const isActiveInputElement =
-      document.activeElement && ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName);
     const isPageupDownKeyPressed = isPageUpDownKey(event);
 
     if (isPageupDownKeyPressed) {
       (document.activeElement as HTMLElement).blur();
     } else if (
-      !isActiveInputElement &&
+      !hasInputAlreadyFocused() &&
       !isArrowKey(event) &&
       !isTabKey(event) &&
       !isEnterKey(event) &&
@@ -61,10 +65,23 @@ const useTextAreaFocus = (callback: () => void) => {
   useEffect(() => {
     window.addEventListener('keydown', handleFocusTextarea);
 
+    if (!hasInputAlreadyFocused()) {
+      // Focus on the first render if no other input is focused
+      setTimeout(callback);
+    }
     return () => {
       window.removeEventListener('keydown', handleFocusTextarea);
     };
   }, []);
 };
 
-export {useTextAreaFocus};
+/**
+ * Will automatically focus the input field when the user types anywhere in the document
+ */
+export function AutoFocusPlugin(): null {
+  const [editor] = useLexicalComposerContext();
+
+  useTextAreaFocus(() => editor.focus());
+
+  return null;
+}

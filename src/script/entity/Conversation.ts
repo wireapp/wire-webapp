@@ -953,7 +953,7 @@ export class Conversation {
   /**
    * Get the last text message that was added by self user.
    */
-  getLastEditableMessage(): Message | undefined {
+  getLastEditableMessage(): ContentMessage | undefined {
     const messages = this.messages();
     for (let index = messages.length - 1; index >= 0; index--) {
       const message_et = messages[index];

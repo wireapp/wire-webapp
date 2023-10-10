@@ -17,18 +17,15 @@
  *
  */
 
-import {useCallback, useEffect} from 'react';
-
 import type {WebappProperties} from '@wireapp/api-client/lib/user/data';
-import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
+
+import {useUserPropertyChange} from 'src/script/hooks/useUserProperty';
 
 const THEMES_CLASS_PREFIX = 'theme-';
 
 export type Theme = WebappProperties['settings']['interface']['theme'];
-
-const listenedEvents = [WebAppEvents.PROPERTIES.UPDATE.INTERFACE.THEME, WebAppEvents.PROPERTIES.UPDATED];
 
 function setTheme(theme: Theme) {
   const classes = document.body.className
@@ -39,16 +36,6 @@ function setTheme(theme: Theme) {
 }
 
 export function useTheme(getTheme: () => Theme) {
-  const updateTheme = useCallback(() => {
-    setTheme(getTheme());
-  }, [getTheme]);
-
-  updateTheme();
-
-  useEffect(() => {
-    listenedEvents.forEach(event => amplify.subscribe(event, updateTheme));
-    return () => {
-      listenedEvents.forEach(event => amplify.unsubscribe(event, updateTheme));
-    };
-  }, [updateTheme]);
+  setTheme(getTheme());
+  useUserPropertyChange(getTheme, WebAppEvents.PROPERTIES.UPDATE.INTERFACE.THEME, setTheme);
 }
