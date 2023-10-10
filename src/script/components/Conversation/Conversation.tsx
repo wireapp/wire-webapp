@@ -73,7 +73,7 @@ interface ConversationProps {
   readonly userState: UserState;
   openRightSidebar: (panelState: PanelState, params: RightSidebarParams, compareEntityId?: boolean) => void;
   isRightSidebarOpen?: boolean;
-  onRefresh: () => void;
+  reloadApp: () => void;
 }
 
 const CONFIG = Config.getConfig();
@@ -84,7 +84,7 @@ export const Conversation: FC<ConversationProps> = ({
   userState,
   openRightSidebar,
   isRightSidebarOpen = false,
-  onRefresh,
+  reloadApp,
 }) => {
   const messageListLogger = getLogger('ConversationList');
 
@@ -537,7 +537,7 @@ export const Conversation: FC<ConversationProps> = ({
           />
 
           {showReadOnlyConversationMessage ? (
-            <ReadOnlyConversationMessage state={readOnlyState} handleMLSUpdate={onRefresh} displayName={displayName} />
+            <ReadOnlyConversationMessage state={readOnlyState} handleMLSUpdate={reloadApp} displayName={displayName} />
           ) : (
             <InputBar
               conversationEntity={activeConversation}
