@@ -515,9 +515,9 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     return mlsFeature.config.supportedProtocols || [ConversationProtocol.PROTEUS];
   }
 
-  public getTeamMLSMigrationStatus(): MLSMigrationStatus {
+  public readonly getTeamMLSMigrationStatus = (): MLSMigrationStatus => {
     const mlsMigrationFeature = this.teamState.teamFeatures()?.mlsMigration;
 
     return getMLSMigrationStatus(mlsMigrationFeature);
-  }
+  };
 }

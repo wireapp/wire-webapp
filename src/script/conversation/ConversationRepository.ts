@@ -1897,10 +1897,10 @@ export class ConversationRepository {
    * @param protocol new conversation protocol
    * @returns Resolves with updated conversation entity
    */
-  public async updateConversationProtocol(
+  public readonly updateConversationProtocol = async (
     conversation: Conversation,
     protocol: ConversationProtocol.MIXED | ConversationProtocol.MLS,
-  ): Promise<Conversation> {
+  ): Promise<Conversation> => {
     const protocolUpdateEventResponse = await this.conversationService.updateConversationProtocol(
       conversation.qualifiedId,
       protocol,
@@ -1912,7 +1912,7 @@ export class ConversationRepository {
 
     //even if protocol was already updated (no response), we need to refetch the conversation
     return this.refreshConversationProtocolProperties(conversation);
-  }
+  };
 
   /**
    * Will try to register mls group by sending an empty commit to establish it.

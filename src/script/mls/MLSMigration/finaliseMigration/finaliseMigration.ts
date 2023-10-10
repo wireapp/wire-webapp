@@ -19,20 +19,21 @@
 
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 
-import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {MixedConversation, isMLSConversation, isMixedConversation} from 'src/script/conversation/ConversationSelectors';
 import {Conversation} from 'src/script/entity/Conversation';
-import {TeamRepository} from 'src/script/team/TeamRepository';
 
 import {MLSMigrationStatus} from '../migrationStatus';
 import {mlsMigrationLogger} from '../MLSMigrationLogger';
 
+type UpdateConversationProtocol = (
+  conversation: Conversation,
+  protocol: ConversationProtocol.MLS | ConversationProtocol.MIXED,
+) => Promise<Conversation>;
+
 export const finaliseMigrationOfMixedConversations = async (
   conversations: Conversation[],
-  {
-    teamRepository,
-    conversationRepository,
-  }: {teamRepository: TeamRepository; conversationRepository: ConversationRepository},
+  updateConversationProtocol: UpdateConversationProtocol,
+  getTeamMLSMigrationStatus: () => MLSMigrationStatus,
 ) => {
   const mixedConversatons = conversations.filter(isMixedConversation);
   mlsMigrationLogger.info(
@@ -40,20 +41,18 @@ export const finaliseMigrationOfMixedConversations = async (
   );
 
   for (const mixedConversation of mixedConversatons) {
-    await checkFinalisationCriteria(
-      mixedConversation,
-      () => finaliseMigrationOfMixedConversation(mixedConversation, {conversationRepository}),
-      teamRepository,
+    await checkFinalisationCriteria(mixedConversation, getTeamMLSMigrationStatus, () =>
+      finaliseMigrationOfMixedConversation(mixedConversation, updateConversationProtocol),
     );
   }
 };
 
 const checkFinalisationCriteria = async (
   mixedConversation: MixedConversation,
+  getTeamMLSMigrationStatus: () => MLSMigrationStatus,
   onReadyToFinalise: (mixedConversation: MixedConversation) => Promise<void>,
-  teamRepository: TeamRepository,
 ) => {
-  const migrationStatus = teamRepository.getTeamMLSMigrationStatus();
+  const migrationStatus = getTeamMLSMigrationStatus();
   const isMigrationFinalised = migrationStatus === MLSMigrationStatus.FINALISED;
 
   if (isMigrationFinalised || doAllConversationParticipantsSupportMLS(mixedConversation)) {
@@ -70,15 +69,12 @@ const doAllConversationParticipantsSupportMLS = (mixedConversation: MixedConvers
 
 const finaliseMigrationOfMixedConversation = async (
   mixedConversation: MixedConversation,
-  {conversationRepository}: {conversationRepository: ConversationRepository},
+  updateConversationProtocol: UpdateConversationProtocol,
 ) => {
   mlsMigrationLogger.info(`Finalising migration of mixed conversation ${mixedConversation.id}...`);
   try {
     // Update conversation protocol from "mixed" to "mls".
-    const updatedMLSConversation = await conversationRepository.updateConversationProtocol(
-      mixedConversation,
-      ConversationProtocol.MLS,
-    );
+    const updatedMLSConversation = await updateConversationProtocol(mixedConversation, ConversationProtocol.MLS);
 
     //we have to make sure that conversation's protocol has really changed to MLS
     if (!isMLSConversation(updatedMLSConversation)) {

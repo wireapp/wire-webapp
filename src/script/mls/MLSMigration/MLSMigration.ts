@@ -161,5 +161,9 @@ const migrateConversationsToMLS = async ({
   const allGroupConversations = conversationRepository.getAllGroupConversations();
   await joinUnestablishedMixedConversations(allGroupConversations, {core});
 
-  await finaliseMigrationOfMixedConversations(selfTeamGroupConversations, {conversationRepository, teamRepository});
+  await finaliseMigrationOfMixedConversations(
+    selfTeamGroupConversations,
+    conversationRepository.updateConversationProtocol,
+    teamRepository.getTeamMLSMigrationStatus,
+  );
 };

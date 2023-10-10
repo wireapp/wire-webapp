@@ -86,7 +86,11 @@ describe('finaliseMigrationOfMixedConversations', () => {
 
     jest.spyOn(conversationRepository, 'updateConversationProtocol').mockResolvedValueOnce(mlsConversation);
 
-    await finaliseMigrationOfMixedConversations([mixedConversation], {teamRepository, conversationRepository});
+    await finaliseMigrationOfMixedConversations(
+      [mixedConversation],
+      conversationRepository.updateConversationProtocol,
+      teamRepository.getTeamMLSMigrationStatus,
+    );
 
     expect(conversationRepository.updateConversationProtocol).toHaveBeenCalledWith(
       mixedConversation,
@@ -115,7 +119,11 @@ describe('finaliseMigrationOfMixedConversations', () => {
 
     jest.spyOn(conversationRepository, 'updateConversationProtocol').mockResolvedValueOnce(mlsConversation);
 
-    await finaliseMigrationOfMixedConversations([mixedConversation], {teamRepository, conversationRepository});
+    await finaliseMigrationOfMixedConversations(
+      [mixedConversation],
+      conversationRepository.updateConversationProtocol,
+      teamRepository.getTeamMLSMigrationStatus,
+    );
 
     expect(conversationRepository.updateConversationProtocol).toHaveBeenCalledWith(
       mixedConversation,
@@ -142,7 +150,11 @@ describe('finaliseMigrationOfMixedConversations', () => {
 
     jest.spyOn(conversationRepository, 'updateConversationProtocol');
 
-    await finaliseMigrationOfMixedConversations([mixedConversation], {teamRepository, conversationRepository});
+    await finaliseMigrationOfMixedConversations(
+      [mixedConversation],
+      conversationRepository.updateConversationProtocol,
+      teamRepository.getTeamMLSMigrationStatus,
+    );
 
     expect(conversationRepository.updateConversationProtocol).not.toHaveBeenCalled();
   });
