@@ -748,10 +748,10 @@ export class UserRepository {
   /**
    * Refresh all known users (in local state) from the backend.
    */
-  async refreshAllKnownUsers() {
+  public readonly refreshAllKnownUsers = async (): Promise<void> => {
     const userIds = this.userState.users().map(user => user.qualifiedId);
-    return this.refreshUsers(userIds);
-  }
+    await this.refreshUsers(userIds);
+  };
 
   /**
    * Will update user entity with provided list of supportedProtocols.

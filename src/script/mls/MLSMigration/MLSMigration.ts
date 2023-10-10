@@ -23,10 +23,9 @@ import {container} from 'tsyringe';
 
 import {Account} from '@wireapp/core';
 
-import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
+import {Conversation} from 'src/script/entity/Conversation';
+import {User} from 'src/script/entity/User';
 import {Core as CoreSingleton} from 'src/script/service/CoreSingleton';
-import {TeamRepository} from 'src/script/team/TeamRepository';
-import {UserRepository} from 'src/script/user/UserRepository';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {finaliseMigrationOfMixedConversations} from './finaliseMigration';
@@ -39,53 +38,64 @@ import {isMLSSupportedByEnvironment} from '../isMLSSupportedByEnvironment';
 
 const MIGRATION_TASK_KEY = 'mls-migration';
 
+interface MLSMigrationConversationHandler {
+  getAllGroupConversations: () => Conversation[];
+  getAllSelfTeamOwnedGroupConversations: () => Conversation[];
+  updateConversationProtocol: (
+    conversation: Conversation,
+    protocol: ConversationProtocol.MLS | ConversationProtocol.MIXED,
+  ) => Promise<Conversation>;
+  tryEstablishingMLSGroup: (params: {
+    groupId: string;
+    conversationId: QualifiedId;
+    selfUserId: QualifiedId;
+    qualifiedUsers: QualifiedId[];
+  }) => Promise<void>;
+}
+
 interface InitialiseMLSMigrationFlowParams {
-  teamRepository: TeamRepository;
-  conversationRepository: ConversationRepository;
-  userRepository: UserRepository;
-  selfUserId: QualifiedId;
+  selfUser: User;
+  conversationHandler: MLSMigrationConversationHandler;
+  getTeamMLSMigrationStatus: () => MLSMigrationStatus;
+  refreshAllKnownUsers: () => Promise<void>;
 }
 
 /**
  * Will check the config of MLS migration feature and if the start time has arrived, will start (continue) the migration process based on the current state of the conversations and feature config.
  *
- * @param teamRepository - team repository
- * @param conversationRepository - conversation repository
- * @param userRepository - user repository
- * @param selfUserId - self user id
+ * @param selfUser - the current user
  */
 export const initialiseMLSMigrationFlow = async ({
-  teamRepository,
-  conversationRepository,
-  userRepository,
-  selfUserId,
+  selfUser,
+  conversationHandler,
+  getTeamMLSMigrationStatus,
+  refreshAllKnownUsers,
 }: InitialiseMLSMigrationFlowParams) => {
   const core = container.resolve(CoreSingleton);
 
   return periodicallyCheckMigrationConfig(
+    selfUser,
+    getTeamMLSMigrationStatus,
     () =>
       migrateConversationsToMLS({
-        teamRepository,
-        userRepository,
         core,
-        conversationRepository,
-        selfUserId,
+        selfUserId: selfUser.qualifiedId,
+        conversationHandler,
+        getTeamMLSMigrationStatus,
+        refreshAllKnownUsers,
       }),
-    {teamRepository, userRepository, core},
+    core,
   );
 };
 
-interface CheckMigrationConfigParams {
-  teamRepository: TeamRepository;
-  userRepository: UserRepository;
-}
-
 const periodicallyCheckMigrationConfig = async (
+  selfUser: User,
+  getTeamMLSMigrationStatus: () => MLSMigrationStatus,
   onMigrationStartTimeArrived: () => Promise<void>,
-  {teamRepository, userRepository, core}: CheckMigrationConfigParams & {core: Account},
+  core: Account,
 ) => {
   const checkMigrationConfigTask = () =>
-    checkMigrationConfig(onMigrationStartTimeArrived, {teamRepository, userRepository});
+    checkMigrationConfig(selfUser, getTeamMLSMigrationStatus, onMigrationStartTimeArrived);
 
   // We check the migration config immediately (on app load) and every 24 hours
   await checkMigrationConfigTask();
@@ -98,15 +108,16 @@ const periodicallyCheckMigrationConfig = async (
 };
 
 const checkMigrationConfig = async (
+  selfUser: User,
+  getTeamMLSMigrationStatus: () => MLSMigrationStatus,
   onMigrationStartTimeArrived: () => Promise<void>,
-  {teamRepository, userRepository}: CheckMigrationConfigParams,
 ) => {
   const isMLSSupportedByEnv = await isMLSSupportedByEnvironment();
   if (!isMLSSupportedByEnv) {
     return;
   }
 
-  const isMLSSupportedByUser = userRepository.getSelfSupportedProtocols()?.includes(ConversationProtocol.MLS);
+  const isMLSSupportedByUser = selfUser.supportedProtocols()?.includes(ConversationProtocol.MLS);
   if (!isMLSSupportedByUser) {
     return;
   }
@@ -114,7 +125,7 @@ const checkMigrationConfig = async (
   //at this point we know that MLS is supported by environment, and the user itself we can check MLS migration status
 
   //fetch current mls migration feature config from memory
-  const migrationStatus = teamRepository.getTeamMLSMigrationStatus();
+  const migrationStatus = getTeamMLSMigrationStatus();
 
   if (migrationStatus === MLSMigrationStatus.DISABLED) {
     mlsMigrationLogger.info('MLS migration feature is disabled, will retry in 24 hours or on next app reload.');
@@ -139,31 +150,31 @@ const checkMigrationConfig = async (
 interface MigrateConversationsToMLSParams {
   core: Account;
   selfUserId: QualifiedId;
-  conversationRepository: ConversationRepository;
-  userRepository: UserRepository;
-  teamRepository: TeamRepository;
+  conversationHandler: MLSMigrationConversationHandler;
+  refreshAllKnownUsers: () => Promise<void>;
+  getTeamMLSMigrationStatus: () => MLSMigrationStatus;
 }
 
 const migrateConversationsToMLS = async ({
   core,
   selfUserId,
-  conversationRepository,
-  userRepository,
-  teamRepository,
+  conversationHandler,
+  refreshAllKnownUsers,
+  getTeamMLSMigrationStatus,
 }: MigrateConversationsToMLSParams) => {
   //refetch all known users so we have the latest lists of the protocols they support
-  await userRepository.refreshAllKnownUsers();
+  await refreshAllKnownUsers();
 
-  const selfTeamGroupConversations = conversationRepository.getAllSelfTeamOwnedGroupConversations();
+  const selfTeamGroupConversations = conversationHandler.getAllSelfTeamOwnedGroupConversations();
 
-  await initialiseMigrationOfProteusConversations(selfTeamGroupConversations, selfUserId, conversationRepository);
+  await initialiseMigrationOfProteusConversations(selfTeamGroupConversations, selfUserId, conversationHandler);
 
-  const allGroupConversations = conversationRepository.getAllGroupConversations();
+  const allGroupConversations = conversationHandler.getAllGroupConversations();
   await joinUnestablishedMixedConversations(allGroupConversations, {core});
 
   await finaliseMigrationOfMixedConversations(
     selfTeamGroupConversations,
-    conversationRepository.updateConversationProtocol,
-    teamRepository.getTeamMLSMigrationStatus,
+    conversationHandler.updateConversationProtocol,
+    getTeamMLSMigrationStatus,
   );
 };

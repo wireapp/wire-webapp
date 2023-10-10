@@ -1114,7 +1114,7 @@ export class ConversationRepository {
   /**
    * Get all the group conversations owned by self user's team from the local state.
    */
-  public getAllSelfTeamOwnedGroupConversations(): Conversation[] {
+  public readonly getAllSelfTeamOwnedGroupConversations = (): Conversation[] => {
     const selfUser = this.userState.self();
     if (!selfUser) {
       this.logger.error('Failed to get self user');
@@ -1124,14 +1124,14 @@ export class ConversationRepository {
     return this.conversationState.conversations().filter(conversation => {
       return conversation.isGroup() && !!selfUserTeamId && conversation.team_id === selfUserTeamId;
     });
-  }
+  };
 
   /**
    * Get all the group conversations owned by self user's team from the local state.
    */
-  public getAllGroupConversations(): Conversation[] {
+  public readonly getAllGroupConversations = (): Conversation[] => {
     return this.conversationState.conversations().filter(conversation => conversation.isGroup());
-  }
+  };
 
   /**
    * Get group conversations by name.

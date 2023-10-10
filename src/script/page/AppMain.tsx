@@ -196,10 +196,10 @@ const AppMain: FC<AppMainProps> = ({
     if (supportsMLSMigration()) {
       //after app is loaded, check mls migration configuration and start migration if needed
       await initialiseMLSMigrationFlow({
-        teamRepository: repositories.team,
-        conversationRepository: repositories.conversation,
-        userRepository: repositories.user,
-        selfUserId: selfUser.qualifiedId,
+        selfUser,
+        conversationHandler: repositories.conversation,
+        getTeamMLSMigrationStatus: repositories.team.getTeamMLSMigrationStatus,
+        refreshAllKnownUsers: repositories.user.refreshAllKnownUsers,
       });
     }
   };
