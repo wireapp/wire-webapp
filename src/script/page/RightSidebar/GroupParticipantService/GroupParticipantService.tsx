@@ -41,6 +41,7 @@ interface GroupParticipantServiceProps {
   activeConversation: Conversation;
   actionsViewModel: ActionsViewModel;
   integrationRepository: IntegrationRepository;
+  enableRemove: boolean;
   goToRoot: () => void;
   onBack: () => void;
   onClose: () => void;
@@ -54,6 +55,7 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
   activeConversation,
   actionsViewModel,
   integrationRepository,
+  enableRemove,
   goToRoot,
   onBack,
   onClose,
@@ -69,7 +71,7 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
   } = useKoSubscribableChildren(activeConversation, ['inTeam', 'isActiveParticipant', 'participating_user_ids']);
   const {teamRole} = useKoSubscribableChildren(selfUser, ['teamRole']);
 
-  const {canChatWithServices, canUpdateGroupParticipants} = generatePermissionHelpers(teamRole);
+  const {canChatWithServices} = generatePermissionHelpers(teamRole);
 
   const selectedInConversation = participatingUserIds.some(user => matchQualifiedIds(userEntity, user));
 
@@ -117,7 +119,7 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
           </div>
         )}
 
-        {showActions && canUpdateGroupParticipants() && (
+        {showActions && enableRemove && (
           <div
             role="button"
             tabIndex={TabIndex.FOCUSABLE}
