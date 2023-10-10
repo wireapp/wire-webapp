@@ -7,7 +7,7 @@
     "@lexical/react": "0.12.2",
     "@wireapp/avs": "9.4.14",
     "@wireapp/commons": "5.2.1",
-    "@wireapp/core": "42.9.4",
+    "@wireapp/core": "42.10.1",
     "@wireapp/lru-cache": "3.8.1",
     "@wireapp/react-ui-kit": "9.9.9",
     "@wireapp/store-engine-dexie": "2.1.6",
