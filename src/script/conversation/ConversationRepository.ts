@@ -1752,13 +1752,13 @@ export class ConversationRepository {
   /**
    * Remove the current user from a conversation.
    *
-   * @param conversationEntity Conversation to remove user from
+   * @param conversation Conversation to remove user from
    * @param clearContent Should we clear the conversation content from the database?
    * @returns Resolves when user was removed from the conversation
    */
-  public async leaveConversation(conversationEntity: Conversation, {localOnly = false} = {}) {
+  public async leaveConversation(conversation: Conversation, {localOnly = false} = {}) {
     const userQualifiedId = this.userState.self().qualifiedId;
-    return this.removeMember(conversationEntity, userQualifiedId, {localOnly});
+    return this.removeMember(conversation, userQualifiedId, {localOnly});
   }
 
   /**
