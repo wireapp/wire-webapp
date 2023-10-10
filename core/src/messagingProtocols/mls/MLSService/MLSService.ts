@@ -57,8 +57,9 @@ import {constructFullyQualifiedClientId, parseFullQualifiedClientId} from '../..
 import {numberToHex} from '../../../util/numberToHex';
 import {RecurringTaskScheduler} from '../../../util/RecurringTaskScheduler';
 import {TaskScheduler} from '../../../util/TaskScheduler';
+import {AcmeChallenge, E2EIServiceExternal, E2EIServiceInternal, User} from '../E2EIdentityService';
 import {handleMLSMessageAdd, handleMLSWelcomeMessage} from '../EventHandler/events';
-import {CommitPendingProposalsParams, HandlePendingProposalsParams, MLSCallbacks} from '../types';
+import {ClientId, CommitPendingProposalsParams, HandlePendingProposalsParams, MLSCallbacks} from '../types';
 
 //@todo: this function is temporary, we wait for the update from core-crypto side
 //they are returning regular array instead of Uint8Array for commit and welcome messages
@@ -82,7 +83,7 @@ const defaultConfig: MLSServiceConfig = {
 
 export interface SubconversationEpochInfoMember {
   userid: string;
-  clientid: string;
+  clientid: ClientId;
   in_subconv: boolean;
 }
 
@@ -534,7 +535,7 @@ export class MLSService extends TypedEventEmitter<Events> {
    * @param groupId groupId of the conversation
    * @param clientIds the list of **qualified** ids of the clients we want to remove from the group
    */
-  public removeClientsFromConversation(groupId: string, clientIds: string[]) {
+  public removeClientsFromConversation(groupId: string, clientIds: ClientId[]) {
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
 
     return this.processCommitAction(groupIdBytes, () =>
@@ -817,7 +818,7 @@ export class MLSService extends TypedEventEmitter<Events> {
    *
    * @param groupId groupId of the conversation
    */
-  public async getClientIds(groupId: string): Promise<{userId: string; clientId: string; domain: string}[]> {
+  public async getClientIds(groupId: string): Promise<{userId: string; clientId: ClientId; domain: string}[]> {
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
 
     const rawClientIds = await this.coreCryptoClient.getClientIds(groupIdBytes);
@@ -845,5 +846,76 @@ export class MLSService extends TypedEventEmitter<Events> {
     }
 
     return handleMLSWelcomeMessage({event, mlsService: this});
+  }
+
+  public async deleteMLSKeyPackages(clientId: ClientId, keyPackagRefs: Uint8Array[]) {
+    return this.apiClient.api.client.deleteMLSKeyPackages(
+      clientId,
+      keyPackagRefs.map(keypackage => btoa(Converter.arrayBufferViewToBaselineString(keypackage))),
+    );
+  }
+
+  // E2E Identity Service related methods below this line
+
+  /**
+   *
+   * @param discoveryUrl URL of the acme server
+   * @param user User object
+   * @param clientId The client id of the current device
+   * @param nbPrekeys Amount of prekeys to generate
+   * @param oAuthIdToken The OAuth id token if the user is already authenticated
+   * @returns AcmeChallenge if the user is not authenticated, true if the user is authenticated
+   */
+  public async enrollE2EI(
+    discoveryUrl: string,
+    e2eiServiceExternal: E2EIServiceExternal,
+    user: User,
+    clientId: ClientId,
+    nbPrekeys: number,
+    oAuthIdToken?: string,
+  ): Promise<AcmeChallenge | boolean> {
+    try {
+      const instance = await E2EIServiceInternal.getInstance({
+        apiClient: this.apiClient,
+        coreCryptClient: this.coreCryptoClient,
+        e2eiServiceExternal,
+        user,
+        clientId,
+        discoveryUrl,
+        keyPackagesAmount: nbPrekeys,
+      });
+      if (!oAuthIdToken) {
+        const challengeData = await instance.startCertificateProcess();
+        if (challengeData) {
+          return challengeData;
+        }
+      } else {
+        const rotateBundle = await instance.continueCertificateProcess(oAuthIdToken);
+        if (rotateBundle !== undefined) {
+          // Remove old key packages
+          await this.deleteMLSKeyPackages(clientId, rotateBundle.keyPackageRefsToRemove);
+          // Upload new key packages with x509 certificate
+          await this.uploadMLSKeyPackages(clientId, rotateBundle.newKeyPackages);
+          // Update keying material
+          for (const [groupId, commitBundle] of rotateBundle.commits) {
+            const groupIdAsBytes = Converter.hexStringToArrayBufferView(groupId);
+            // manual copy of the commit bundle data because of a problem while cloning it
+            const newCommitBundle = {
+              commit: commitBundle.commit,
+              // @ts-ignore
+              groupInfo: commitBundle?.group_info || commitBundle.groupInfo,
+              welcome: commitBundle?.welcome,
+            };
+
+            await this.uploadCommitBundle(groupIdAsBytes, newCommitBundle);
+          }
+          return true;
+        }
+      }
+      return false;
+    } catch (error) {
+      this.logger.error('E2EI - Failed to enroll', error);
+      throw error;
+    }
   }
 }

@@ -17,8 +17,20 @@
  *
  */
 
-import {LocalStorageStore} from '../LocalStorageStore';
+const prependKey = (key: string, pKey: string) => `${pKey}_${key}`;
 
-const prependKey = `TaskScheduler`;
-
-export const TaskSchedulerStore = LocalStorageStore<number>(prependKey);
+export const LocalStorageStore = <T = string>(pKey: string) => ({
+  get: (key: string): T | undefined => {
+    const value = localStorage.getItem(prependKey(key, pKey));
+    if (value) {
+      if (!Number.isNaN(Number(value))) {
+        return Number(value) as T;
+      }
+      return value as T;
+    }
+    return undefined;
+  },
+  add: (key: string, value: T) => localStorage.setItem(prependKey(key, pKey), String(value)),
+  remove: (key: string) => localStorage.removeItem(prependKey(key, pKey)),
+  has: (key: string) => !!localStorage.getItem(prependKey(key, pKey)),
+});

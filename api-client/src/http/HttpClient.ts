@@ -104,6 +104,10 @@ export class HttpClient extends EventEmitter {
     });
   }
 
+  public getBaseUrl() {
+    return `${this.config.urls.rest}${this.versionPrefix}`;
+  }
+
   public useVersion(version: number): void {
     this.versionPrefix = version > 0 ? `/v${version}` : '';
   }
@@ -239,7 +243,6 @@ export class HttpClient extends EventEmitter {
       withCredentials: true,
       params: clientId && {client_id: clientId},
     };
-
     if (expiredAccessToken?.access_token && config?.headers) {
       config.headers = new AxiosHeaders(config.headers as AxiosHeaders);
       config.headers.set(
@@ -247,8 +250,8 @@ export class HttpClient extends EventEmitter {
         `${expiredAccessToken.token_type} ${decodeURIComponent(expiredAccessToken.access_token)}`,
       );
     }
-
     const response = await sendRequestWithCookie<AccessTokenData>(this, config);
+
     return response.data;
   }
 
@@ -260,6 +263,7 @@ export class HttpClient extends EventEmitter {
   public async associateClientWithSession(clientId: string): Promise<AccessTokenData> {
     const storedToken = this.accessTokenStore.accessToken;
     const newToken = await this.postAccess(storedToken, clientId);
+
     return this.accessTokenStore.updateToken(newToken);
   }
 

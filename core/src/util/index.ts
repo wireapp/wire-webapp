@@ -18,3 +18,4 @@
  */
 
 export * from './TypePredicateUtil';
+export * from './TaskScheduler';

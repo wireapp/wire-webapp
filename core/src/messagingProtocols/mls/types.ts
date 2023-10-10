@@ -23,6 +23,8 @@ import {CoreCryptoCallbacks} from '@wireapp/core-crypto';
 
 import {MLSServiceConfig} from './MLSService/MLSService.types';
 
+export type ClientId = string;
+
 export type SecretCrypto =
   | {
       encrypt: (value: Uint8Array) => Promise<Uint8Array>;
