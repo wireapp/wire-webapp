@@ -17,7 +17,7 @@
  *
  */
 
-const {DateUtil} = require('@wireapp/commons');
+import {isoFormat} from './DateUtil';
 
 /**
  * @testEnvironment node
@@ -29,7 +29,7 @@ describe('DateUtil', () => {
       const date = new Date(1588599720000);
       const expectedDate = '2020-05-04';
       const expectedTime = '13:42:00';
-      const actual = DateUtil.isoFormat(date);
+      const actual = isoFormat(date);
       expect(actual.date).toEqual(expectedDate);
       expect(actual.time).toEqual(expectedTime);
     });

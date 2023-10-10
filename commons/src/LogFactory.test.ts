@@ -22,7 +22,7 @@ import * as fs from 'fs-extra';
 import os from 'os';
 import path from 'path';
 
-import {LogFactory} from '@wireapp/commons';
+import {LogFactory} from './LogFactory';
 
 describe('LogFactory', () => {
   describe('createLoggerName', () => {

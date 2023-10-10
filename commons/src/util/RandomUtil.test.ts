@@ -17,7 +17,7 @@
  *
  */
 
-const {RandomUtil} = require('@wireapp/commons');
+import * as RandomUtil from './RandomUtil';
 
 jest.useRealTimers();
 

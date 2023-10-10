@@ -19,7 +19,7 @@
 
 /* eslint no-magic-numbers: "off" */
 
-const {ArrayUtil} = require('@wireapp/commons');
+import * as ArrayUtil from './ArrayUtil';
 
 /**
  * @testEnvironment node

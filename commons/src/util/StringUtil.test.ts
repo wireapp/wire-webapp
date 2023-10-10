@@ -17,7 +17,7 @@
  *
  */
 
-const {StringUtil} = require('@wireapp/commons');
+import * as StringUtil from './StringUtil';
 
 /**
  * @testEnvironment node

@@ -17,7 +17,7 @@
  *
  */
 
-import {ValidationUtil} from '@wireapp/commons';
+import * as ValidationUtil from './ValidationUtil';
 
 /**
  * @testEnvironment node
