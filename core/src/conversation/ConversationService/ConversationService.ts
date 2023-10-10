@@ -347,9 +347,8 @@ export class ConversationService extends TypedEventEmitter<Events> {
     groupId,
     conversationId,
   }: Required<AddUsersParams>): Promise<MLSCreateConversationResponse> {
-    const {coreCryptoKeyPackagesPayload, failedToFetchKeyPackages} = await this.mlsService.getKeyPackagesPayload(
-      qualifiedUsers,
-    );
+    const {coreCryptoKeyPackagesPayload, failedToFetchKeyPackages} =
+      await this.mlsService.getKeyPackagesPayload(qualifiedUsers);
 
     const response = await this.mlsService.addUsersToExistingConversation(groupId, coreCryptoKeyPackagesPayload);
     const conversation = await this.getConversation(conversationId);
