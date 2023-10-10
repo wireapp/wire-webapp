@@ -48,6 +48,7 @@ import {getQueueLength, pauseMessageSending, resumeMessageSending} from './conve
 import {GiphyService} from './giphy/';
 import {LinkPreviewService} from './linkPreview';
 import {MLSService} from './messagingProtocols/mls';
+import {AcmeChallenge, E2EIServiceExternal, User} from './messagingProtocols/mls/E2EIdentityService';
 import {MLSCallbacks, CryptoProtocolConfig} from './messagingProtocols/mls/types';
 import {NewClient, ProteusService} from './messagingProtocols/proteus';
 import {buildCryptoClient, CryptoClientType} from './messagingProtocols/proteus/ProteusService/CryptoClient';
@@ -122,13 +123,15 @@ export class Account extends TypedEventEmitter<Events> {
   private readonly apiClient: APIClient;
   private readonly logger: logdown.Logger;
   private readonly createStore: CreateStoreFn;
-  private storeEngine?: CRUDEngine;
-  private db?: CoreDatabase;
   private readonly nbPrekeys: number;
   private readonly cryptoProtocolConfig?: CryptoProtocolConfig;
+  private readonly isMlsEnabled: () => boolean;
+  private storeEngine?: CRUDEngine;
+  private db?: CoreDatabase;
 
   public service?: {
     mls?: MLSService;
+    e2eIdentity?: E2EIServiceExternal;
     proteus: ProteusService;
     account: AccountService;
     asset: AssetService;
@@ -152,13 +155,14 @@ export class Account extends TypedEventEmitter<Events> {
    */
   constructor(
     apiClient: APIClient = new APIClient(),
-    {createStore = () => undefined, nbPrekeys = 2, cryptoProtocolConfig}: AccountOptions = {},
+    {createStore = () => undefined, nbPrekeys = 100, cryptoProtocolConfig}: AccountOptions = {},
   ) {
     super();
     this.apiClient = apiClient;
     this.backendFeatures = this.apiClient.backendFeatures;
     this.cryptoProtocolConfig = cryptoProtocolConfig;
     this.nbPrekeys = nbPrekeys;
+    this.isMlsEnabled = () => this.backendFeatures.supportsMLS && !!this.cryptoProtocolConfig?.mls;
     this.createStore = createStore;
     this.recurringTaskScheduler = new RecurringTaskScheduler({
       get: async key => {
@@ -210,6 +214,37 @@ export class Account extends TypedEventEmitter<Events> {
   private persistCookie(storeEngine: CRUDEngine, cookie: Cookie): Promise<string> {
     const entity = {expiration: cookie.expiration, zuid: cookie.zuid};
     return storeEngine.updateOrCreate(AUTH_TABLE_NAME, AUTH_COOKIE_KEY, entity);
+  }
+
+  public async enrollE2EI(
+    displayName: string,
+    handle: string,
+    discoveryUrl: string,
+    oAuthIdToken?: string,
+  ): Promise<AcmeChallenge | boolean> {
+    const context = this.apiClient.context;
+    const domain = context?.domain ?? '';
+
+    if (!this.isMlsEnabled() || !this.service?.mls || !this.service?.e2eIdentity) {
+      this.logger.info('MLS not initialized, unable to enroll E2EI');
+      return false;
+    }
+
+    const user: User = {
+      displayName,
+      handle,
+      domain,
+      id: this.userId,
+    };
+
+    return this.service.mls.enrollE2EI(
+      discoveryUrl,
+      this.service.e2eIdentity,
+      user,
+      this.clientId,
+      this.nbPrekeys,
+      oAuthIdToken,
+    );
   }
 
   get clientId(): string {
@@ -319,7 +354,7 @@ export class Account extends TypedEventEmitter<Events> {
       await this.service.mls.checkExistingPendingProposals();
 
       // initialize scheduler for syncing key packages with backend
-      this.service.mls.schedulePeriodicKeyPackagesBackendSync(validClient.id);
+      await this.service.mls.schedulePeriodicKeyPackagesBackendSync(validClient.id);
 
       // leave stale conference subconversations (e.g after a crash)
       await this.service.mls.leaveStaleConferenceSubconversations();
@@ -328,14 +363,14 @@ export class Account extends TypedEventEmitter<Events> {
     return validClient;
   }
 
-  private async buildCryptoClient(context: Context, storeEngine: CRUDEngine, enableMLS: boolean) {
+  private async buildCryptoClient(context: Context, storeEngine: CRUDEngine) {
     /* There are 3 cases where we want to instantiate CoreCrypto:
      * 1. MLS is enabled
      * 2. The user has enabled CoreCrypto in the config
      * 3. The user has already used CoreCrypto in the past (cannot rollback to using cryptobox)
      */
     const clientType =
-      enableMLS ||
+      this.isMlsEnabled() ||
       !!this.cryptoProtocolConfig?.useCoreCrypto ||
       cryptoMigrationStore.coreCrypto.isReady(storeEngine.storeName)
         ? CryptoClientType.CORE_CRYPTO
@@ -367,21 +402,28 @@ export class Account extends TypedEventEmitter<Events> {
   }
 
   public async initServices(context: Context): Promise<void> {
-    const enableMLS = this.backendFeatures.supportsMLS && !!this.cryptoProtocolConfig?.mls;
     this.storeEngine = await this.initEngine(context);
     this.db = await openDB(this.generateCoreDbName(context));
     const accountService = new AccountService(this.apiClient);
     const assetService = new AssetService(this.apiClient);
 
-    const cryptoClientDef = await this.buildCryptoClient(context, this.storeEngine, enableMLS);
-    const [clientType, cryptoClient] = cryptoClientDef;
+    const [clientType, cryptoClient] = await this.buildCryptoClient(context, this.storeEngine);
 
-    const mlsService =
-      clientType === CryptoClientType.CORE_CRYPTO && enableMLS
-        ? new MLSService(this.apiClient, cryptoClient.getNativeClient(), this.db, this.recurringTaskScheduler, {
-            ...this.cryptoProtocolConfig?.mls,
-          })
-        : undefined;
+    let mlsService: MLSService | undefined;
+    let e2eIdentityService: E2EIServiceExternal | undefined;
+
+    if (clientType === CryptoClientType.CORE_CRYPTO && this.isMlsEnabled()) {
+      e2eIdentityService = await E2EIServiceExternal.getInstance(cryptoClient.getNativeClient());
+      mlsService = new MLSService(
+        this.apiClient,
+        cryptoClient.getNativeClient(),
+        this.db,
+        this.recurringTaskScheduler,
+        {
+          ...this.cryptoProtocolConfig?.mls,
+        },
+      );
+    }
 
     const proteusService = new ProteusService(this.apiClient, cryptoClient, {
       onNewClient: payload => this.emit(EVENTS.NEW_SESSION, payload),
@@ -402,6 +444,7 @@ export class Account extends TypedEventEmitter<Events> {
     const userService = new UserService(this.apiClient);
 
     this.service = {
+      e2eIdentity: e2eIdentityService,
       mls: mlsService,
       proteus: proteusService,
       account: accountService,

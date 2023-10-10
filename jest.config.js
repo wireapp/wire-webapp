@@ -19,7 +19,7 @@
 
 const baseConfig = require('../../jest.config.base');
 
-const {TextDecoder, TextEncoder} = require('util');
+const { TextDecoder, TextEncoder } = require('util');
 
 module.exports = {
   ...baseConfig,

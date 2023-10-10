@@ -17,8 +17,26 @@
  *
  */
 
-import {LocalStorageStore} from '../LocalStorageStore';
+import {AcmeService} from '../Connection';
+import {E2eiEnrollment, Nonce} from '../E2EIService.types';
 
-const prependKey = `TaskScheduler`;
+interface GetCertificateParams {
+  identity: E2eiEnrollment;
+  connection: AcmeService;
+  nonce: Nonce;
+  certificateUrl: string;
+}
+export const getCertificate = async ({certificateUrl, connection, identity, nonce}: GetCertificateParams) => {
+  const reqBody = identity.certificateRequest(nonce);
 
-export const TaskSchedulerStore = LocalStorageStore<number>(prependKey);
+  const certificateResponse = await connection.getCertificate(certificateUrl, reqBody);
+
+  if (certificateResponse?.data) {
+    return {
+      certificate: certificateResponse.data,
+      nonce: certificateResponse.nonce,
+    };
+  }
+
+  throw new Error('No certificate received');
+};

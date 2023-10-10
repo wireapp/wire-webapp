@@ -17,8 +17,26 @@
  *
  */
 
-import {LocalStorageStore} from '../LocalStorageStore';
+import {ZodSchema} from 'zod';
 
-const prependKey = `TaskScheduler`;
+import {Nonce} from '../../E2EIService.types';
 
-export const TaskSchedulerStore = LocalStorageStore<number>(prependKey);
+export type GetDirectoryReturnValue = Promise<Uint8Array | undefined>;
+
+export type GetInitialNonceReturnValue = Promise<string | undefined>;
+
+export interface PostJoseRequestParams<T> {
+  url: string;
+  payload: Uint8Array;
+  schema: ZodSchema<T>;
+  errorMessage: string;
+  shouldGetLocation?: boolean;
+}
+export type PostJoseRequestReturnValue<T> = Promise<
+  | {
+      data: T;
+      nonce: Nonce;
+      location?: string;
+    }
+  | undefined
+>;

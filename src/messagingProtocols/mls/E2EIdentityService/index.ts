@@ -17,8 +17,6 @@
  *
  */
 
-import {LocalStorageStore} from '../LocalStorageStore';
-
-const prependKey = `TaskScheduler`;
-
-export const TaskSchedulerStore = LocalStorageStore<number>(prependKey);
+export * from './E2EIService.types';
+export * from './E2EIServiceInternal';
+export * from './E2EIServiceExternal';

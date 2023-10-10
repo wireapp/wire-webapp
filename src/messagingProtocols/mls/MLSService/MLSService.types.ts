@@ -48,4 +48,8 @@ export interface MLSServiceConfig {
    * default credential type to use for MLS (Basic = 1 by default)
    */
   defaultCredentialType: CredentialType;
+  /**
+   * signals if the E2E - Identity process should be used
+   */
+  useE2EI?: boolean;
 }

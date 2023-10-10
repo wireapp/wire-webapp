@@ -17,8 +17,4 @@
  *
  */
 
-import {LocalStorageStore} from '../LocalStorageStore';
-
-const prependKey = `TaskScheduler`;
-
-export const TaskSchedulerStore = LocalStorageStore<number>(prependKey);
+export * from './AcmeServer';
