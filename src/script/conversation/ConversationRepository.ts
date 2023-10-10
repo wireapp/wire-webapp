@@ -406,7 +406,7 @@ export class ConversationRepository {
 
     try {
       for (const user of usersToRemove) {
-        await this.removeMembers(conversation, [user.qualifiedId], {localOnly: true});
+        await this.removeMembersLocally(conversation, [user.qualifiedId]);
       }
     } catch (error) {
       console.warn('failed to remove users', error);
@@ -1746,9 +1746,16 @@ export class ConversationRepository {
    */
   public async leaveConversation(conversation: Conversation, {localOnly = false} = {}) {
     const userQualifiedId = this.userState.self().qualifiedId;
-    return this.removeMembers(conversation, [userQualifiedId], {localOnly});
+    return localOnly
+      ? this.removeMembersLocally(conversation, [userQualifiedId])
+      : this.removeMembers(conversation, [userQualifiedId]);
   }
 
+  private async removeMembersLocally(conversation: Conversation, userIds: QualifiedId[]) {
+    const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
+    const events = userIds.map(userId => EventBuilder.buildMemberLeave(conversation, userId, true, currentTimestamp));
+    await this.eventRepository.injectEvents(events, EventRepository.SOURCE.INJECTED);
+  }
   /**
    * Umbrella function to remove a member from a conversation, no matter the protocol or type.
    *
@@ -1757,16 +1764,7 @@ export class ConversationRepository {
    * @param clearContent Should we clear the conversation content from the database?
    * @returns Resolves when member was removed from the conversation
    */
-  public async removeMembers(conversationEntity: Conversation, userIds: QualifiedId[], {localOnly = false} = {}) {
-    if (localOnly) {
-      const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-      const events = userIds.map(userId =>
-        EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp),
-      );
-      await this.eventRepository.injectEvents(events, EventRepository.SOURCE.INJECTED);
-      return;
-    }
-
+  public async removeMembers(conversationEntity: Conversation, userIds: QualifiedId[]) {
     const events = isMLSConversation(conversationEntity)
       ? await this.removeMemberFromMLSConversation(conversationEntity, userIds)
       : await this.removeMemberFromConversation(conversationEntity, userIds);
