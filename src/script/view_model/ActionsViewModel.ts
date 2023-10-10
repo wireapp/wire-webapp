@@ -136,8 +136,11 @@ export class ActionsViewModel {
 
       PrimaryModal.show(modalType, {
         primaryAction: {
-          action: (leaveConversation = false) => {
-            this.conversationRepository.clearConversation(conversationEntity, leaveConversation);
+          action: async (leaveConversation = false) => {
+            if (leaveConversation) {
+              await this.conversationRepository.leaveConversation(conversationEntity);
+            }
+            await this.conversationRepository.clearConversation(conversationEntity);
           },
           text: t('modalConversationClearAction'),
         },
@@ -270,10 +273,7 @@ export class ActionsViewModel {
       PrimaryModal.show(PrimaryModal.type.OPTION, {
         primaryAction: {
           action: async (clearContent = false) => {
-            await this.conversationRepository.removeMember(conversationEntity, this.userState.self().qualifiedId, {
-              clearContent,
-            });
-
+            await this.conversationRepository.leaveConversation(conversationEntity, {clearContent});
             resolve();
           },
           text: t('modalConversationLeaveAction'),

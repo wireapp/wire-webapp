@@ -358,7 +358,7 @@ export class ConversationRepository {
     );
 
     conversationsToLeave.forEach(async conversation => {
-      await this.leaveConversation(conversation, {clearContent: false, localOnly: true});
+      await this.leaveConversation(conversation, {localOnly: true});
       await this.insertFederationStopSystemMessage(conversation, [deletedDomain]);
     });
 
@@ -1673,27 +1673,15 @@ export class ConversationRepository {
    * @note According to spec we archive a conversation when we clear it.
    * It will be unarchived once it is opened through search. We use the archive flag to distinguish states.
    *
-   * @param conversationEntity Conversation to clear
+   * @param conversation Conversation to clear
    * @param leaveConversation Should we leave the conversation before clearing the content?
    */
-  public async clearConversation(conversationEntity: Conversation, leaveConversation = false) {
-    const isActiveConversation = this.conversationState.isActiveConversation(conversationEntity);
-    const nextConversationEntity = this.getNextConversation(conversationEntity);
+  public async clearConversation(conversation: Conversation) {
+    const isActiveConversation = this.conversationState.isActiveConversation(conversation);
+    const nextConversationEntity = this.getNextConversation(conversation);
 
-    if (leaveConversation) {
-      conversationEntity.status(ConversationStatus.PAST_MEMBER);
-      this.callingRepository.leaveCall(
-        conversationEntity.qualifiedId,
-        LEAVE_CALL_REASON.USER_MANUALY_LEFT_CONVERSATION,
-      );
-    }
-
-    await this.messageRepository.updateClearedTimestamp(conversationEntity);
-    await this._clearConversation(conversationEntity);
-
-    if (leaveConversation) {
-      await this.removeMember(conversationEntity, this.userState.self().qualifiedId);
-    }
+    await this.messageRepository.updateClearedTimestamp(conversation);
+    await this._clearConversation(conversation);
 
     if (isActiveConversation) {
       amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversationEntity, {});
@@ -1768,12 +1756,9 @@ export class ConversationRepository {
    * @param clearContent Should we clear the conversation content from the database?
    * @returns Resolves when user was removed from the conversation
    */
-  private async leaveConversation(conversationEntity: Conversation, {clearContent = false, localOnly = false} = {}) {
+  public async leaveConversation(conversationEntity: Conversation, {localOnly = false} = {}) {
     const userQualifiedId = this.userState.self().qualifiedId;
-
-    return clearContent
-      ? this.clearConversation(conversationEntity, true)
-      : this.removeMemberFromConversation(conversationEntity, userQualifiedId, {localOnly});
+    return this.removeMember(conversationEntity, userQualifiedId, {localOnly});
   }
 
   /**
@@ -1784,17 +1769,8 @@ export class ConversationRepository {
    * @param clearContent Should we clear the conversation content from the database?
    * @returns Resolves when member was removed from the conversation
    */
-  public async removeMember(
-    conversationEntity: Conversation,
-    userId: QualifiedId,
-    {clearContent = false, localOnly = false} = {},
-  ) {
-    const isUserLeaving = this.userState.self().qualifiedId.id === userId.id;
+  public async removeMember(conversationEntity: Conversation, userId: QualifiedId, {localOnly = false} = {}) {
     const isMLSConversation = conversationEntity.isUsingMLSProtocol;
-
-    if (isUserLeaving) {
-      return this.leaveConversation(conversationEntity, {clearContent});
-    }
 
     return isMLSConversation
       ? this.removeMemberFromMLSConversation(conversationEntity, userId, {localOnly})
