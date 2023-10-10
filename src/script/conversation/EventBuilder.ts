@@ -476,17 +476,17 @@ export const EventBuilder = {
 
   buildMemberLeave(
     conversationEntity: Conversation,
-    userId: QualifiedId,
-    removedBySelfUser: boolean,
+    userIds: QualifiedId[],
+    from: string,
     currentTimestamp: number,
   ): MemberLeaveEvent {
     return {
       ...buildQualifiedId(conversationEntity),
       data: {
-        qualified_user_ids: [userId],
-        user_ids: [userId.id],
+        qualified_user_ids: userIds,
+        user_ids: userIds.map(({id}) => id),
       },
-      from: removedBySelfUser ? conversationEntity.selfUser().id : userId.id,
+      from: from,
       time: conversationEntity.getNextIsoDate(currentTimestamp),
       type: CONVERSATION_EVENT.MEMBER_LEAVE,
     };
