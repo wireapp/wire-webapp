@@ -501,6 +501,14 @@ export class ConversationService extends TypedEventEmitter<Events> {
   }
 
   /**
+   * Get a MLS 1:1-conversation with a given user.
+   * @param userId - qualified user id
+   */
+  async getMLS1to1Conversation(userId: QualifiedId) {
+    return this.apiClient.api.conversation.getMLS1to1Conversation(userId);
+  }
+
+  /**
    * Will try registering mls 1:1 conversation adding the other user.
    * If it fails and the conversation is already established, it will try joining via external commit instead.
    *
@@ -519,7 +527,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
     // Before trying to register a group, check if the group is already established o backend.
     // If remote epoch is higher than 0, it means that the group was already established.
     // It's possible that we've already received a welcome message.
-    const mlsConversation = await this.apiClient.api.conversation.getMLS1to1Conversation(otherUserId);
+    const mlsConversation = await this.getMLS1to1Conversation(otherUserId);
 
     if (mlsConversation.epoch > 0) {
       this.logger.info(
@@ -541,7 +549,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
       );
 
       await this.joinByExternalCommit(mlsConversation.qualified_id);
-      return this.apiClient.api.conversation.getMLS1to1Conversation(otherUserId);
+      return this.getMLS1to1Conversation(otherUserId);
     }
 
     // If group is not established on backend,
@@ -552,7 +560,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
       await this.mlsService.registerConversation(groupId, [otherUserId, selfUser.user], selfUser);
       this.logger.info(`Conversation (id ${mlsConversation.qualified_id.id}) established successfully.`);
 
-      return this.apiClient.api.conversation.getMLS1to1Conversation(otherUserId);
+      return this.getMLS1to1Conversation(otherUserId);
     } catch (error) {
       this.logger.info(`Could not register MLS group with id ${groupId}: `, error);
 
