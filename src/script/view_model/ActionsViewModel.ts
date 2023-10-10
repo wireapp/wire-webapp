@@ -375,7 +375,7 @@ export class ActionsViewModel {
           primaryAction: {
             action: async () => {
               try {
-                await this.conversationRepository.removeMember(conversationEntity, userEntity.qualifiedId);
+                await this.conversationRepository.removeMembers(conversationEntity, [userEntity.qualifiedId]);
                 resolve();
               } catch (error) {
                 reject(error);
