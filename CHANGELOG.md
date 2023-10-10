@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [42.11.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.10.1...@wireapp/core@42.11.0) (2023-10-10)
+
+### Features
+
+* add getMLS1to1Conversation method to convo service ([#5597](https://github.com/wireapp/wire-web-packages/issues/5597)) ([6fb80fa](https://github.com/wireapp/wire-web-packages/commit/6fb80fac8b26c3d5dad51a7d33ae7d9cc8c15ea9))
+
 ## [42.10.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.10.0...@wireapp/core@42.10.1) (2023-10-10)
 
 **Note:** Version bump only for package @wireapp/core
