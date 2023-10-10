@@ -441,6 +441,6 @@ export class ConversationService {
   }
 
   async getMLS1to1Conversation(userId: QualifiedId) {
-    return this.apiClient.api.conversation.getMLS1to1Conversation(userId);
+    return this.coreConversationService.getMLS1to1Conversation(userId);
   }
 }
