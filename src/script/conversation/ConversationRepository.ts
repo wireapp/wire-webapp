@@ -1704,7 +1704,7 @@ export class ConversationRepository {
    * @param userId ID of member to be removed from the conversation
    * @returns Resolves when member was removed from the conversation
    */
-  private async removeMemberFromMLSConversation(conversationEntity: MLSConversation, userIds: QualifiedId[]) {
+  private async removeMembersFromMLSConversation(conversationEntity: MLSConversation, userIds: QualifiedId[]) {
     const {groupId, qualifiedId} = conversationEntity;
     const {events} = await this.core.service!.conversation.removeUsersFromMLSConversation({
       conversationId: qualifiedId,
@@ -1722,7 +1722,7 @@ export class ConversationRepository {
    * @param userId ID of member to be removed from the conversation
    * @returns Resolves when member was removed from the conversation
    */
-  private async removeMemberFromConversation(conversation: Conversation, userIds: QualifiedId[]) {
+  private async removeMembersFromConversation(conversation: Conversation, userIds: QualifiedId[]) {
     return await Promise.all(
       userIds.map(async userId => {
         const event = await this.core.service!.conversation.removeUserFromConversation(
@@ -1773,8 +1773,8 @@ export class ConversationRepository {
    */
   public async removeMembers(conversationEntity: Conversation, userIds: QualifiedId[]) {
     const events = isMLSConversation(conversationEntity)
-      ? await this.removeMemberFromMLSConversation(conversationEntity, userIds)
-      : await this.removeMemberFromConversation(conversationEntity, userIds);
+      ? await this.removeMembersFromMLSConversation(conversationEntity, userIds)
+      : await this.removeMembersFromConversation(conversationEntity, userIds);
 
     await this.eventRepository.injectEvents(events, EventRepository.SOURCE.BACKEND_RESPONSE);
   }
