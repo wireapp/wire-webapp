@@ -395,22 +395,18 @@ export class ConversationRepository {
 
     for (const {conversation, usersToRemove} of result) {
       await this.insertFederationStopSystemMessage(conversation, domains);
-      await this.removeDeletedFederationUsers(conversation, usersToRemove);
+      await this.removeDeletedFederationUsers(
+        conversation,
+        usersToRemove.map(user => user.qualifiedId),
+      );
     }
   };
 
-  private readonly removeDeletedFederationUsers = async (conversation: Conversation, usersToRemove: User[]) => {
-    if (usersToRemove.length === 0) {
+  private readonly removeDeletedFederationUsers = async (conversation: Conversation, users: QualifiedId[]) => {
+    if (users.length === 0) {
       return;
     }
-
-    try {
-      for (const user of usersToRemove) {
-        await this.removeMembersLocally(conversation, [user.qualifiedId]);
-      }
-    } catch (error) {
-      console.warn('failed to remove users', error);
-    }
+    await this.removeMembersLocally(conversation, users);
   };
 
   private readonly insertFederationStopSystemMessage = async (conversation: Conversation, domains: string[]) => {
