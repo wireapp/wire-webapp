@@ -1923,14 +1923,14 @@ export class ConversationRepository {
    * @param selfUserId - id of the self user
    * @param qualifiedUsers - list of qualified users to add to the group (should not include the self user)
    */
-  public tryEstablishingMLSGroup(params: {
+  public readonly tryEstablishingMLSGroup = (params: {
     groupId: string;
     conversationId: QualifiedId;
     selfUserId: QualifiedId;
     qualifiedUsers: QualifiedId[];
-  }) {
+  }) => {
     return this.conversationService.tryEstablishingMLSGroup(params);
-  }
+  };
 
   /**
    * Refresh conversation protocol properties

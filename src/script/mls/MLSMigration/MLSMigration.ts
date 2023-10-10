@@ -156,10 +156,7 @@ const migrateConversationsToMLS = async ({
 
   const selfTeamGroupConversations = conversationRepository.getAllSelfTeamOwnedGroupConversations();
 
-  await initialiseMigrationOfProteusConversations(selfTeamGroupConversations, {
-    conversationRepository,
-    selfUserId,
-  });
+  await initialiseMigrationOfProteusConversations(selfTeamGroupConversations, selfUserId, conversationRepository);
 
   const allGroupConversations = conversationRepository.getAllGroupConversations();
   await joinUnestablishedMixedConversations(allGroupConversations, {core});

@@ -60,10 +60,7 @@ describe('initialiseMigrationOfProteusConversations', () => {
 
     jest.spyOn(mockedConversationRepository, 'updateConversationProtocol').mockResolvedValueOnce(proteusConversation);
 
-    await initialiseMigrationOfProteusConversations([proteusConversation], {
-      conversationRepository: mockedConversationRepository,
-      selfUserId,
-    });
+    await initialiseMigrationOfProteusConversations([proteusConversation], selfUserId, mockedConversationRepository);
 
     expect(container.resolve(Core).service?.conversation.tryEstablishingMLSGroup).not.toHaveBeenCalled();
   });
@@ -81,10 +78,7 @@ describe('initialiseMigrationOfProteusConversations', () => {
     const mixedConversation = changeConversationProtocolToMixed(proteusConversation, mockGroupId);
     jest.spyOn(mockedConversationRepository, 'updateConversationProtocol').mockResolvedValueOnce(mixedConversation);
 
-    await initialiseMigrationOfProteusConversations([proteusConversation], {
-      conversationRepository: mockedConversationRepository,
-      selfUserId,
-    });
+    await initialiseMigrationOfProteusConversations([proteusConversation], selfUserId, mockedConversationRepository);
 
     expect(mockedConversationRepository.updateConversationProtocol).toHaveBeenCalledTimes(1);
     expect(mockedConversationRepository.updateConversationProtocol).toHaveBeenCalledWith(
