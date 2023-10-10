@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.2.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/commons@5.2.0...@wireapp/commons@5.2.1) (2023-10-10)
+
+### Bug Fixes
+
+* **commons:** Fix email regexp ([#5591](https://github.com/wireapp/wire-web-packages/issues/5591)) ([a55ec0e](https://github.com/wireapp/wire-web-packages/commit/a55ec0ead7bc69d8ba8ecc401a4a6cfe6e0b9fd3))
+
 # [5.2.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/commons@5.1.3...@wireapp/commons@5.2.0) (2023-09-26)
 
 ### Features
