@@ -21,7 +21,7 @@ import {useCallback, useEffect, useRef, useState} from 'react';
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
-import {$getRoot, LexicalEditor} from 'lexical';
+import {CLEAR_EDITOR_COMMAND, LexicalEditor} from 'lexical';
 import {container} from 'tsyringe';
 
 import {useMatchMedia} from '@wireapp/react-ui-kit';
@@ -204,9 +204,7 @@ export const InputBar = ({
 
   const resetDraftState = () => {
     setReplyMessageEntity(null);
-    editorRef.current?.update(() => {
-      $getRoot().clear();
-    });
+    editorRef.current?.dispatchCommand(CLEAR_EDITOR_COMMAND, undefined);
   };
 
   const clearPastedFile = () => setPastedFile(null);
