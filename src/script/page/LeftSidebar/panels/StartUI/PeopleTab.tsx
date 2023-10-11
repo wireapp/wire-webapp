@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useRef, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {amplify} from 'amplify';
@@ -53,7 +53,7 @@ import {UserState} from '../../../../user/UserState';
 
 export type SearchResultsData = {contacts: User[]; groups: Conversation[]; others: User[]};
 
-export const PeopleTab: React.FC<{
+interface PeopleTabProps {
   canCreateGroupConversation: boolean;
   canCreateGuestRoom: boolean;
   canInviteTeamMembers: boolean;
@@ -72,13 +72,17 @@ export const PeopleTab: React.FC<{
   teamState: TeamState;
   userRepository: UserRepository;
   userState: UserState;
-}> = ({
+  selfUser: User;
+}
+
+export const PeopleTab = ({
   searchQuery,
   isTeam,
   isFederated,
   teamRepository,
   teamState,
   userState,
+  selfUser,
   canInviteTeamMembers,
   canSearchUnconnectedUsers,
   canCreateGroupConversation,
@@ -91,7 +95,7 @@ export const PeopleTab: React.FC<{
   onClickConversation,
   onClickUser,
   onSearchResults,
-}) => {
+}: PeopleTabProps) => {
   const logger = getLogger('PeopleSearch');
   const [topPeople, setTopPeople] = useState<User[]>([]);
   const teamSize = teamState.teamSize();
@@ -99,6 +103,8 @@ export const PeopleTab: React.FC<{
   const currentSearchQuery = useRef('');
 
   const {connectedUsers} = useKoSubscribableChildren(conversationState, ['connectedUsers']);
+  const {inTeam} = useKoSubscribableChildren(selfUser, ['inTeam']);
+
   const getLocalUsers = (unfiltered?: boolean) => {
     if (!canSearchUnconnectedUsers) {
       return connectedUsers;
@@ -130,7 +136,7 @@ export const PeopleTab: React.FC<{
     searchResults: SearchResultsData,
     query: string,
   ): Promise<SearchResultsData> => {
-    const selfTeamId = userState.self().teamId;
+    const selfTeamId = selfUser.teamId;
     const [contacts, others] = partition(remoteUsers, user => user.teamId === selfTeamId);
     const nonExternalContacts = await teamRepository.filterExternals(contacts);
     return {
@@ -199,7 +205,7 @@ export const PeopleTab: React.FC<{
           const userEntities = await searchRepository.searchByName(query, isHandle);
           const localUserIds = localSearchResults.contacts.map(({id}) => id);
           const onlyRemoteUsers = userEntities.filter(user => !localUserIds.includes(user.id));
-          const results = userState.self().inTeam()
+          const results = inTeam
             ? await organizeTeamSearchResults(onlyRemoteUsers, localSearchResults, query)
             : {...localSearchResults, others: onlyRemoteUsers};
 
