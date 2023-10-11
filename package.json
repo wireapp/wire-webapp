@@ -92,7 +92,7 @@
     "@types/seedrandom": "^3",
     "@types/sinon": "10.0.19",
     "@types/speakingurl": "13.0.4",
-    "@types/underscore": "1.11.10",
+    "@types/underscore": "1.11.11",
     "@types/webpack-env": "1.18.2",
     "@wireapp/copy-config": "2.1.9",
     "@wireapp/eslint-config": "3.0.4",
