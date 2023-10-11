@@ -1756,7 +1756,7 @@ export class ConversationRepository {
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
     const event = EventBuilder.buildMemberLeave(conversation, userIds, '', currentTimestamp);
     // Injecting the event will trigger all the handlers that will then actually remove the users from the conversation
-    await this.eventRepository.injectEvent(event, EventRepository.SOURCE.INJECTED);
+    await this.eventRepository.injectEvent(event);
   }
 
   /**
