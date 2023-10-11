@@ -35,6 +35,7 @@ import {MLSService} from './MLSService';
 
 import {openDB} from '../../../storage/CoreDB';
 import {RecurringTaskScheduler} from '../../../util/RecurringTaskScheduler';
+import {TaskScheduler} from '../../../util/TaskScheduler';
 
 jest.createMockFromModule('@wireapp/api-client');
 
@@ -69,20 +70,18 @@ const createMLSService = async () => {
 
   const mlsService = new MLSService(apiClient, mockCoreCrypto, mockedDb, recurringTaskScheduler, {});
 
-  return [mlsService, {apiClient, coreCrypto: mockCoreCrypto}] as const;
+  return [mlsService, {apiClient, coreCrypto: mockCoreCrypto, recurringTaskScheduler}] as const;
 };
 
 describe('MLSService', () => {
   describe('registerConversation', () => {
     let mlsService: MLSService;
     let apiClient: APIClient;
-    let coreCrypto: CoreCrypto;
 
     beforeEach(async () => {
-      const [mockedMLSService, {apiClient: mockApiClient, coreCrypto: mockCoreCrypto}] = await createMLSService();
+      const [mockedMLSService, {apiClient: mockApiClient}] = await createMLSService();
       mlsService = mockedMLSService;
       apiClient = mockApiClient;
-      coreCrypto = mockCoreCrypto;
       jest
         .spyOn(apiClient.api.client, 'getPublicKeys')
         .mockResolvedValue({removal: {algo: 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm3OQFc='}});
@@ -122,13 +121,6 @@ describe('MLSService', () => {
       await mlsService.registerConversation(groupId, [createUserId(), createUserId()]);
 
       expect(mlsService.scheduleKeyMaterialRenewal).toHaveBeenCalledWith(groupId);
-    });
-
-    it('cancels key material timers after group is wiped', async () => {
-      const groupId = 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm4OQFc=';
-      jest.spyOn(coreCrypto, 'conversationExists').mockResolvedValueOnce(true);
-      await mlsService.wipeConversation(groupId);
-      expect(mlsService.cancelKeyMaterialRenewal).toHaveBeenCalledWith(groupId);
     });
   });
 
@@ -236,6 +228,38 @@ describe('MLSService', () => {
       expect(coreCrypto.mlsInit).toHaveBeenCalled();
       expect(apiClient.api.client.uploadMLSKeyPackages).not.toHaveBeenCalled();
       expect(apiClient.api.client.putClient).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('wipeConversation', () => {
+    it('wipes a group and cancels its timers', async () => {
+      const [mlsService, {coreCrypto, recurringTaskScheduler}] = await createMLSService();
+      const groupId = 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm4OQFc=';
+
+      jest.spyOn(coreCrypto, 'conversationExists').mockResolvedValueOnce(true);
+      jest.spyOn(recurringTaskScheduler, 'cancelTask');
+      jest.spyOn(TaskScheduler, 'cancelTask');
+
+      await mlsService.wipeConversation(groupId);
+
+      expect(recurringTaskScheduler.cancelTask).toHaveBeenCalledWith(expect.stringContaining(groupId));
+      expect(TaskScheduler.cancelTask).toHaveBeenCalledWith(expect.stringContaining(groupId));
+      expect(coreCrypto.wipeConversation).toHaveBeenCalled();
+    });
+
+    it('does not try to wipe a group if it does not exist already', async () => {
+      const [mlsService, {coreCrypto, recurringTaskScheduler}] = await createMLSService();
+      const groupId = 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm4OQFc=';
+
+      jest.spyOn(coreCrypto, 'conversationExists').mockResolvedValueOnce(false);
+      jest.spyOn(recurringTaskScheduler, 'cancelTask');
+      jest.spyOn(TaskScheduler, 'cancelTask');
+
+      await mlsService.wipeConversation(groupId);
+
+      expect(recurringTaskScheduler.cancelTask).toHaveBeenCalledWith(expect.stringContaining(groupId));
+      expect(TaskScheduler.cancelTask).toHaveBeenCalledWith(expect.stringContaining(groupId));
+      expect(coreCrypto.wipeConversation).not.toHaveBeenCalled();
     });
   });
 
