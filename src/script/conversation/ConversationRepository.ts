@@ -1754,9 +1754,9 @@ export class ConversationRepository {
    */
   private async removeMembersLocally(conversation: Conversation, userIds: QualifiedId[]) {
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-    const events = userIds.map(userId => EventBuilder.buildMemberLeave(conversation, userId, true, currentTimestamp));
+    const event = EventBuilder.buildMemberLeave(conversation, userIds, '', currentTimestamp);
     // Injecting the event will trigger all the handlers that will then actually remove the users from the conversation
-    await this.eventRepository.injectEvents(events, EventRepository.SOURCE.INJECTED);
+    await this.eventRepository.injectEvent(event);
   }
 
   /**
@@ -1789,7 +1789,7 @@ export class ConversationRepository {
       const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
       const event = hasResponse
         ? response.event
-        : EventBuilder.buildMemberLeave(conversationEntity, user, true, currentTimestamp);
+        : EventBuilder.buildMemberLeave(conversationEntity, [user], this.userState.self().id, currentTimestamp);
 
       this.eventRepository.injectEvent(event, EventRepository.SOURCE.BACKEND_RESPONSE);
       return event;
