@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [42.12.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.12.0...@wireapp/core@42.12.1) (2023-10-11)
+
+### Bug Fixes
+
+* change import of zod ([ecba827](https://github.com/wireapp/wire-web-packages/commit/ecba827888da926b73fa57f2c3fb442998d5fb24))
+* prettier error ([015634c](https://github.com/wireapp/wire-web-packages/commit/015634c873de44976532ddb6d0b5de34f601b72d))
+
 # [42.12.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.11.0...@wireapp/core@42.12.0) (2023-10-10)
 
 ### Features
