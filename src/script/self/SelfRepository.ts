@@ -22,6 +22,7 @@ import {FEATURE_KEY, FeatureMLS} from '@wireapp/api-client/lib/team/feature/';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
+import {TypedEventEmitter} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Logger, getLogger} from 'Util/Logger';
@@ -36,7 +37,9 @@ import {TeamRepository} from '../team/TeamRepository';
 import {UserRepository} from '../user/UserRepository';
 import {UserState} from '../user/UserState';
 
-export class SelfRepository {
+type Events = {selfSupportedProtocolsUpdated: ConversationProtocol[]};
+
+export class SelfRepository extends TypedEventEmitter<Events> {
   private readonly logger: Logger;
   static SELF_SUPPORTED_PROTOCOLS_CHECK_KEY = 'self-supported-protocols-check';
 
@@ -48,6 +51,7 @@ export class SelfRepository {
     private readonly userState = container.resolve(UserState),
     private readonly core = container.resolve(Core),
   ) {
+    super();
     this.logger = getLogger('SelfRepository');
 
     // Every time user's client is deleted, we need to re-evaluate self supported protocols.
@@ -96,6 +100,7 @@ export class SelfRepository {
     try {
       await this.selfService.putSupportedProtocols(supportedProtocols);
       await this.userRepository.updateUserSupportedProtocols(this.selfUser.qualifiedId, supportedProtocols);
+      this.emit('selfSupportedProtocolsUpdated', supportedProtocols);
     } catch (error) {
       this.logger.error('Failed to update self supported protocols: ', error);
     }
@@ -145,6 +150,10 @@ export class SelfRepository {
       task: () => this.refreshSelfSupportedProtocols(),
       key: SelfRepository.SELF_SUPPORTED_PROTOCOLS_CHECK_KEY,
     });
+  }
+
+  getSelfSupportedProtocols(): ConversationProtocol[] | null {
+    return this.userState.self()?.supportedProtocols() || null;
   }
 
   public async deleteSelfUserClient(clientId: string, password?: string): Promise<ClientEntity[]> {

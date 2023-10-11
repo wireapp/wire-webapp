@@ -246,6 +246,7 @@ export class TestFactory {
     await this.exposeConnectionActors();
     await this.exposeTeamActors();
     await this.exposeEventActors();
+    await this.exposeSelfActors();
 
     this.conversation_service = new ConversationService(this.event_service);
 
@@ -284,6 +285,7 @@ export class TestFactory {
       this.event_repository,
       this.team_repository,
       this.user_repository,
+      this.self_repository,
       this.propertyRepository,
       this.calling_repository,
       serverTimeHandler,

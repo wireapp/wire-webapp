@@ -430,4 +430,17 @@ export class ConversationService {
   async mlsGroupExistsLocally(groupId: string): Promise<boolean> {
     return this.coreConversationService.mlsGroupExistsLocally(groupId);
   }
+
+  /**
+   * Will check if mls group is established locally.
+   * Group is established after the first commit was sent in the group and epoch number is at least 1.
+   * @param groupId groupId of the conversation
+   */
+  async isMLSGroupEstablishedLocally(groupId: string): Promise<boolean> {
+    return this.coreConversationService.isMLSGroupEstablishedLocally(groupId);
+  }
+
+  async getMLS1to1Conversation(userId: QualifiedId) {
+    return this.coreConversationService.getMLS1to1Conversation(userId);
+  }
 }

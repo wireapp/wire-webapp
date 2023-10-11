@@ -665,6 +665,25 @@ export class UserRepository {
     }
   }
 
+  /**
+   * Check for supported protocols on user entity locally, otherwise fetch them from the backend.
+   * @param userId - the user to fetch the supported protocols for
+   */
+
+  public async getUserSupportedProtocols(userId: QualifiedId): Promise<ConversationProtocol[]> {
+    const localSupportedProtocols = this.findUserById(userId)?.supportedProtocols();
+
+    if (localSupportedProtocols) {
+      return localSupportedProtocols;
+    }
+
+    const supportedProtocols = await this.userService.getUserSupportedProtocols(userId);
+
+    //update local user entity with new supported protocols
+    await this.updateUserSupportedProtocols(userId, supportedProtocols);
+    return supportedProtocols;
+  }
+
   async getUserByHandle(fqn: QualifiedHandle): Promise<undefined | APIClientUser> {
     try {
       return await this.userService.getUserByFQN(fqn);
@@ -760,10 +779,6 @@ export class UserRepository {
    */
   async updateUserSupportedProtocols(userId: QualifiedId, supportedProtocols: ConversationProtocol[]): Promise<User> {
     return this.updateUser(userId, {supported_protocols: supportedProtocols});
-  }
-
-  getSelfSupportedProtocols(): ConversationProtocol[] | null {
-    return this.userState.self()?.supportedProtocols() || null;
   }
 
   public async getAllSelfClients() {

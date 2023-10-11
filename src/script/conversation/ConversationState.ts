@@ -18,6 +18,7 @@
  */
 
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
 import {container, singleton} from 'tsyringe';
@@ -25,7 +26,13 @@ import {container, singleton} from 'tsyringe';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {sortGroupsByLastEvent} from 'Util/util';
 
-import {isMLSConversation, isSelfConversation} from './ConversationSelectors';
+import {
+  MLSConversation,
+  ProteusConversation,
+  is1to1ConversationWithUser,
+  isMLSConversation,
+  isSelfConversation,
+} from './ConversationSelectors';
 
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
@@ -190,6 +197,29 @@ export class ConversationState {
       : this.conversations().find(conversation => {
           return matchQualifiedIds(conversation, conversationId);
         });
+  }
+
+  /**
+   * Find a local 1:1 proteus conversation with a user.
+   * Because of team-owned 1:1 conversations work (they are really group conversations),
+   * it's possible that there is more that one proteus 1:1 team conversation with the same user.
+   * @returns ProteusConversation if locally available, otherwise null
+   */
+  findProteus1to1Conversations(userId: QualifiedId): ProteusConversation[] | null {
+    const foundConversations = this.conversations().filter(
+      is1to1ConversationWithUser(userId, ConversationProtocol.PROTEUS),
+    );
+
+    return foundConversations.length > 0 ? foundConversations : null;
+  }
+
+  /**
+   * Find a local 1:1 mls conversation with a user.
+   * @returns Conversation if locally available, otherwise null
+   */
+  findMLS1to1Conversation(userId: QualifiedId): MLSConversation | null {
+    const mlsConversation = this.conversations().find(is1to1ConversationWithUser(userId, ConversationProtocol.MLS));
+    return mlsConversation || null;
   }
 
   isSelfConversation(conversationId: QualifiedId): boolean {

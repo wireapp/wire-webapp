@@ -63,6 +63,7 @@ interface MainContentProps {
   isRightSidebarOpen?: boolean;
   selfUser: User;
   conversationState?: ConversationState;
+  reloadApp: () => void;
 }
 
 const MainContent: FC<MainContentProps> = ({
@@ -70,6 +71,7 @@ const MainContent: FC<MainContentProps> = ({
   isRightSidebarOpen = false,
   selfUser,
   conversationState = container.resolve(ConversationState),
+  reloadApp,
 }) => {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const mainViewModel = useContext(RootContext);
@@ -239,6 +241,7 @@ const MainContent: FC<MainContentProps> = ({
                 userState={userState}
                 isRightSidebarOpen={isRightSidebarOpen}
                 openRightSidebar={openRightSidebar}
+                reloadApp={reloadApp}
               />
             )}
 

@@ -40,7 +40,7 @@ interface GenerateAPIConversationParams {
   name?: string;
 }
 
-function generateAPIConversation({
+export function generateAPIConversation({
   id = {id: createUuid(), domain: 'test.wire.link'},
   type = CONVERSATION_TYPE.REGULAR,
   protocol = ConversationProtocol.PROTEUS,
@@ -60,6 +60,7 @@ function generateAPIConversation({
     status: ConversationStatus.CURRENT_MEMBER,
     is_guest: false,
     archived_state: false,
+    readonly_state: null,
     archived_timestamp: 0,
     last_event_timestamp: 0,
     last_read_timestamp: 0,

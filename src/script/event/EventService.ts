@@ -17,12 +17,15 @@
  *
  */
 
+import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import type {Dexie} from 'dexie';
 import {container} from 'tsyringe';
 
 import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 
 import {getLogger, Logger} from 'Util/Logger';
+
+import {CONVERSATION as CLIENT_CONVERSATION_EVENT} from './Client';
 
 import {AssetTransferState} from '../assets/AssetTransferState';
 import {BaseError, BASE_ERROR_TYPE} from '../error/BaseError';
@@ -517,5 +520,58 @@ export class EventService {
    */
   async deleteEvents(conversationId: string, isoDate?: string): Promise<number> {
     return this.storageService.deleteEventsByDate(StorageSchemata.OBJECT_STORE.EVENTS, conversationId, isoDate);
+  }
+
+  /**
+   * Will move all the events from one conversation to another.
+   * Events will get moved, not copied, so all the events from the source conversation will be deleted.
+   * This is used when MLS 1:1 conversation is established and we need to move the events from proteus conversation.
+   *
+   * @param conversationId - conversation id from which events should be moved
+   * @param newConversationId - conversation id to which events should be moved
+   */
+  public async moveEventsToConversation(conversationId: string, newConversationId: string) {
+    const eventsToSkip = [CLIENT_CONVERSATION_EVENT.ONE2ONE_CREATION];
+
+    const events = await this.loadAllConversationEvents(conversationId, eventsToSkip);
+
+    const eventsToMove = events.map(event => ({
+      ...event,
+      conversation: newConversationId,
+    }));
+
+    return Promise.all(
+      eventsToMove.map(event => {
+        return this.storageService.save(StorageSchemata.OBJECT_STORE.EVENTS, event.primary_key, event);
+      }),
+    );
+  }
+
+  /**
+   *
+   * @param conversationId The conversation ID
+   */
+  async loadAllConversationEvents(
+    conversationId: string,
+    eventTypesToSkip: (CONVERSATION_EVENT | CLIENT_CONVERSATION_EVENT)[] = [],
+  ): Promise<EventRecord[]> {
+    try {
+      if (this.storageService.db) {
+        const events = await this.storageService.db
+          .table(StorageSchemata.OBJECT_STORE.EVENTS)
+          .where('conversation')
+          .equals(conversationId)
+          .and(record => !eventTypesToSkip.includes(record.type))
+          .toArray();
+        return events;
+      }
+
+      const records = await this.storageService.getAll<EventRecord>(StorageSchemata.OBJECT_STORE.EVENTS);
+      return records;
+    } catch (error) {
+      const logMessage = `Failed to get events for conversation '${conversationId}': ${error.message}`;
+      this.logger.error(logMessage, error);
+      throw error;
+    }
   }
 }
