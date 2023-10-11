@@ -64,7 +64,6 @@ export class Account extends EventEmitter {
       removeUsersFromMLSConversation: jest.fn(),
       removeUserFromConversation: jest.fn(),
     },
-
     client: {
       deleteClient: jest.fn(),
     },

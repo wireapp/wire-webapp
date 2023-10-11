@@ -64,4 +64,5 @@ export interface ConversationRecord {
   team_id: string;
   type: CONVERSATION_TYPE;
   verification_state: ConversationVerificationState;
+  mlsVerificationState: ConversationVerificationState;
 }
