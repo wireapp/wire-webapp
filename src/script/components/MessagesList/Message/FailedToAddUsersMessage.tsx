@@ -17,11 +17,10 @@
  *
  */
 
-import React, {FC, ReactNode, useMemo, useState} from 'react';
+import React, {ReactNode, useMemo, useState} from 'react';
 
 import {AddUsersFailureReasons} from '@wireapp/core/lib/conversation';
 import {container} from 'tsyringe';
-import {groupBy} from 'underscore';
 
 import {Button, ButtonVariant, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
@@ -45,72 +44,47 @@ export interface FailedToAddUsersMessageProps {
   userState?: UserState;
 }
 
-// Mobile platforms are not using the full specs yet, we can uncomment this when they catch up
-// This is not used in the MVP specs
-// const errorMessageType = {
-//   [AddUsersFailureReasons.NON_FEDERATING_BACKENDS]: 'NonFederatingBackends',
-//   [AddUsersFailureReasons.UNREACHABLE_BACKENDS]: 'OfflineBackend',
-// } as const;
+const errorMessageType = {
+  [AddUsersFailureReasons.NON_FEDERATING_BACKENDS]: 'NonFederatingBackends',
+  [AddUsersFailureReasons.UNREACHABLE_BACKENDS]: 'OfflineBackend',
+} as const;
 
 const config = Config.getConfig();
 
 interface MessageDetailsProps {
   children: ReactNode;
   users: User[];
-  domain?: string;
+  reason: AddUsersFailureReasons;
+  domains: string[];
 }
-const MessageDetails = ({users, children, domain = ''}: MessageDetailsProps) => {
+const MessageDetails = ({users, children, reason, domains}: MessageDetailsProps) => {
+  const baseTranslationKey =
+    users.length === 1 ? 'failedToAddParticipantsSingularDetails' : 'failedToAddParticipantsPluralDetails';
+
+  const domainStr = domains.join(', ');
+
   return (
     <p
       data-uie-name="multi-user-not-added-details"
-      data-uie-value={domain}
+      data-uie-value={domainStr}
       style={{lineHeight: 'var(--line-height-sm)'}}
     >
       <span
         css={warning}
         dangerouslySetInnerHTML={{
-          __html:
-            // Mobile platforms are not using the full specs yet, we can uncomment this when they catch up
-            // t(`failedToAddParticipantsPluralDetails${errorMessageType[message.reason]}`, {
-            t(`failedToAddParticipantsPluralDetailsMvp`, {
-              name: users[0].name(),
-              names: users
-                .slice(1)
-                .map(user => user.name())
-                .join(', '),
-              domain,
-            }),
+          __html: t(`${baseTranslationKey}${errorMessageType[reason]}`, {
+            name: users[0].name(),
+            names: users
+              .slice(1)
+              .map(user => user.name())
+              .join(', '),
+            domain: domainStr,
+          }),
         }}
       />
       {children}
     </p>
   );
-};
-
-const UnreachableBackendMessageDetails = (props: MessageDetailsProps) => {
-  const groupedUsers = useMemo(() => {
-    return groupBy(props.users, user => user.domain);
-  }, [props.users]);
-
-  return (
-    <>
-      {Object.entries(groupedUsers).map(([domain, domainUsers]) => (
-        <MessageDetails {...props} key={domain} domain={domain} users={domainUsers} />
-      ))}
-    </>
-  );
-};
-
-const NonFederatingBackendMessageDetails = (props: MessageDetailsProps) => {
-  return <MessageDetails {...props} />;
-};
-
-/**
- * mapping between failure reasons and the details component to display
- */
-const FailureReasonToDetailsComponent: Record<AddUsersFailureReasons, FC<MessageDetailsProps>> = {
-  [AddUsersFailureReasons.UNREACHABLE_BACKENDS]: UnreachableBackendMessageDetails,
-  [AddUsersFailureReasons.NON_FEDERATING_BACKENDS]: NonFederatingBackendMessageDetails,
 };
 
 const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
@@ -154,11 +128,6 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
     </>
   );
 
-  // FIXME: this is the MVP version, remove the condition when full specs are implemented
-  const DetailsMessageComponent = false
-    ? FailureReasonToDetailsComponent[message.reason]
-    : FailureReasonToDetailsComponent[AddUsersFailureReasons.NON_FEDERATING_BACKENDS];
-
   return (
     <>
       <div className="message-header">
@@ -177,13 +146,10 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
               <span
                 css={warning}
                 dangerouslySetInnerHTML={{
-                  __html:
-                    // Mobile platforms are not using the full specs yet, we can uncomment this when they catch up
-                    // t(`failedToAddParticipantSingular${errorMessageType[message.reason]}`, {
-                    t(`failedToAddParticipantSingularMvp`, {
-                      name: users[0].name(),
-                      domain: users[0].domain,
-                    }),
+                  __html: t(`failedToAddParticipantSingular${errorMessageType[message.reason]}`, {
+                    name: users[0].name(),
+                    domain: users[0].domain,
+                  }),
                 }}
               />
               {learnMore}
@@ -207,7 +173,11 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
         </p>
       </div>
       <div className="message-body" css={{flexDirection: 'column'}}>
-        {isOpen && <DetailsMessageComponent users={users}>{learnMore}</DetailsMessageComponent>}
+        {isOpen && (
+          <MessageDetails users={users} reason={message.reason} domains={message.backends}>
+            {learnMore}
+          </MessageDetails>
+        )}
 
         {total > 1 && (
           <div>

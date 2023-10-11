@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, useEffect} from 'react';
+import {FC, ReactNode, useEffect} from 'react';
 
 import loadable from '@loadable/component';
 import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
@@ -56,6 +56,7 @@ import {bindActionCreators, RootState} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as LanguageSelector from '../module/selector/LanguageSelector';
 import {ROUTE} from '../route';
+import {getOAuthQueryString} from '../util/oauthUtil';
 
 /**
  *  Lazy loading components for routes, which can only be accessed by activated feature flags
@@ -78,7 +79,7 @@ const TeamName = loadable(() => import('./TeamName'), {
 
 interface RootProps {}
 
-const Title: FC<{title: string; children: React.ReactNode}> = ({title, children}) => {
+const Title: FC<{title: string; children: ReactNode}> = ({title, children}) => {
   useEffect(() => {
     document.title = title;
   }, [title]);
@@ -121,8 +122,20 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
     return null;
   };
 
-  const isAuthenticatedCheck = (page: any): any => (page ? (isAuthenticated ? page : navigate('/auth')) : null);
-  const isOAuthCheck = (page: any): any => (page ? isAuthenticated ? page : <Navigate to={ROUTE.LOGIN} /> : null);
+  const isAuthenticatedCheck = (page: ReactNode): ReactNode =>
+    page ? (isAuthenticated ? page : navigate('/auth')) : null;
+
+  const isOAuthCheck = (page: ReactNode): ReactNode => {
+    if (page) {
+      if (isAuthenticated) {
+        return page;
+      }
+
+      const queryString = getOAuthQueryString(window.location);
+      return queryString ? <Navigate to={`${ROUTE.LOGIN}/${queryString}`} /> : <Navigate to={ROUTE.LOGIN} />;
+    }
+    return null;
+  };
 
   const ProtectedHistoryInfo = () => isAuthenticatedCheck(<HistoryInfo />);
   const ProtectedInitialInvite = () => isAuthenticatedCheck(<InitialInvite />);

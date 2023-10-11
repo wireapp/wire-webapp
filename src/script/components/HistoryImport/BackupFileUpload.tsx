@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, useRef} from 'react';
+import {useRef} from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
@@ -33,12 +33,12 @@ interface BackupFileUploadProps {
   cssClassName?: string;
 }
 
-const BackupFileUpload: FC<BackupFileUploadProps> = ({
+const BackupFileUpload = ({
   onFileChange,
   backupImportHeadLine,
   variant,
   cssClassName = 'button button-secondary',
-}) => {
+}: BackupFileUploadProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const fileInputClick = () => fileInputRef.current?.click();

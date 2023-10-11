@@ -27,7 +27,13 @@ import * as util from 'Util/util';
 
 import {E2EIHandler, E2EIHandlerStep} from './E2EIdentity';
 import {getModalOptions, ModalType} from './Modals';
+import {OIDCService} from './OIDCService/OIDCService';
 
+jest.mock('./OIDCService', () => ({
+  getOIDCServiceInstance: jest.fn().mockReturnValue({
+    clearProgress: jest.fn(),
+  } as unknown as OIDCService),
+}));
 jest.mock('Util/util');
 jest.mock('src/script/Config');
 jest.mock('tsyringe');

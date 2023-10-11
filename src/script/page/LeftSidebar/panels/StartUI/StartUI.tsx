@@ -32,7 +32,6 @@ import {IntegrationRepository} from 'src/script/integration/IntegrationRepositor
 import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 import {UserRepository} from 'src/script/user/UserRepository';
 import {MainViewModel} from 'src/script/view_model/MainViewModel';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {PeopleTab, SearchResultsData} from './PeopleTab';
@@ -57,6 +56,7 @@ type StartUIProps = {
   onClose: () => void;
   searchRepository: SearchRepository;
   teamRepository: TeamRepository;
+  selfUser: User;
   teamState?: TeamState;
   userRepository: UserRepository;
   userState?: UserState;
@@ -79,9 +79,9 @@ const StartUI: React.FC<StartUIProps> = ({
   mainViewModel,
   userRepository,
   isFederated,
+  selfUser,
 }) => {
   const brandName = Config.getConfig().BRAND_NAME;
-  const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
   const {
     canInviteTeamMembers,
     canSearchUnconnectedUsers,
@@ -137,7 +137,7 @@ const StartUI: React.FC<StartUIProps> = ({
     });
   };
 
-  const openInviteModal = () => showInviteModal({selfUser: userState.self()});
+  const openInviteModal = () => showInviteModal({selfUser});
 
   const openConversation = async (conversation: Conversation): Promise<void> => {
     await actions.openGroupConversation(conversation);
@@ -196,6 +196,7 @@ const StartUI: React.FC<StartUIProps> = ({
           isFederated={isFederated}
           teamRepository={teamRepository}
           teamState={teamState}
+          selfUser={selfUser}
           userState={userState}
           canSearchUnconnectedUsers={canSearchUnconnectedUsers()}
           conversationState={conversationState}

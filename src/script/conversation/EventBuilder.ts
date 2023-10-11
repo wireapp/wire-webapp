@@ -197,6 +197,7 @@ export type CallingTimeoutEvent = ConversationEvent<{reason: AVS_REASON.NOONE_JO
 export type FailedToAddUsersMessageEvent = ConversationEvent<{
   qualifiedIds: QualifiedId[];
   reason: AddUsersFailureReasons;
+  backends: string[];
 }> & {
   type: CONVERSATION.FAILED_TO_ADD_USERS;
 };
@@ -308,16 +309,16 @@ export const EventBuilder = {
   },
 
   buildFailedToAddUsersEvent(
-    qualifiedIds: QualifiedId[],
+    failedToAdd: {users: QualifiedId[]; reason: AddUsersFailureReasons; backends: string[]},
     conversation: Conversation,
     userId: string,
-    reason: AddUsersFailureReasons,
   ): FailedToAddUsersMessageEvent {
     return {
       ...buildQualifiedId(conversation),
       data: {
-        qualifiedIds,
-        reason,
+        qualifiedIds: failedToAdd.users,
+        reason: failedToAdd.reason,
+        backends: failedToAdd.backends,
       },
       from: userId,
       id: createUuid(),
@@ -475,17 +476,17 @@ export const EventBuilder = {
 
   buildMemberLeave(
     conversationEntity: Conversation,
-    userId: QualifiedId,
-    removedBySelfUser: boolean,
+    userIds: QualifiedId[],
+    from: string,
     currentTimestamp: number,
   ): MemberLeaveEvent {
     return {
       ...buildQualifiedId(conversationEntity),
       data: {
-        qualified_user_ids: [userId],
-        user_ids: [userId.id],
+        qualified_user_ids: userIds,
+        user_ids: userIds.map(({id}) => id),
       },
-      from: removedBySelfUser ? conversationEntity.selfUser().id : userId.id,
+      from: from,
       time: conversationEntity.getNextIsoDate(currentTimestamp),
       type: CONVERSATION_EVENT.MEMBER_LEAVE,
     };

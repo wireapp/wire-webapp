@@ -217,23 +217,23 @@ describe('UserRepository', () => {
         userState.users([selfUser]);
       });
 
-      it('loads all users from backend if no users are stored locally', async () => {
+      it('loads all users from backend even when they are already known locally', async () => {
         const newUsers = [generateAPIUser(), generateAPIUser()];
         const users = [...localUsers, ...newUsers];
         const userIds = users.map(user => user.qualified_id!);
-        const fetchUserSpy = jest.spyOn(userRepository['userService'], 'getUsers').mockResolvedValue({found: newUsers});
+        const fetchUserSpy = jest.spyOn(userRepository['userService'], 'getUsers').mockResolvedValue({found: users});
 
         await userRepository.loadUsers(new User('self'), [], [], userIds);
 
         expect(userState.users()).toHaveLength(users.length + 1);
-        expect(fetchUserSpy).toHaveBeenCalledWith(newUsers.map(user => user.qualified_id!));
+        expect(fetchUserSpy).toHaveBeenCalledWith(users.map(user => user.qualified_id!));
       });
 
       it('assigns connections with users', async () => {
         const newUsers = [generateAPIUser(), generateAPIUser()];
         const users = [...localUsers, ...newUsers];
         const userIds = users.map(user => user.qualified_id!);
-        jest.spyOn(userRepository['userService'], 'getUsers').mockResolvedValue({found: newUsers});
+        jest.spyOn(userRepository['userService'], 'getUsers').mockResolvedValue({found: users});
 
         const createConnectionWithUser = (userId: QualifiedId) => {
           const connection = new ConnectionEntity();
@@ -250,16 +250,6 @@ describe('UserRepository', () => {
           const localUser = userState.users().find(u => matchQualifiedIds(u.qualifiedId, user.qualified_id));
           expect(localUser?.connection().userId).toEqual(user.qualified_id);
         });
-      });
-
-      it('does not load users from backend if they are already in database', async () => {
-        const userIds = localUsers.map(user => user.qualified_id!);
-        const fetchUserSpy = jest.spyOn(userRepository['userService'], 'getUsers').mockResolvedValue({found: []});
-
-        await userRepository.loadUsers(new User('self'), [], [], userIds);
-
-        expect(userState.users()).toHaveLength(localUsers.length + 1);
-        expect(fetchUserSpy).not.toHaveBeenCalled();
       });
 
       it('loads users that are partially stored in the DB and maps availability', async () => {

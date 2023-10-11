@@ -17,7 +17,7 @@
  *
  */
 
-export interface EncryptedAsset {
+interface EncryptedAsset {
   cipherText: ArrayBuffer;
   keyBytes: ArrayBuffer;
   sha256: ArrayBuffer;

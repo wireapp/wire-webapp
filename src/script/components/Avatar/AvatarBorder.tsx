@@ -21,11 +21,11 @@ import React from 'react';
 
 import {CSS_FILL_PARENT} from 'Util/CSSMixin';
 
-export interface AvatarBorderProps {
+interface AvatarBorderProps {
   borderRadius?: string;
 }
 
-const AvatarBorder: React.FunctionComponent<AvatarBorderProps> = ({borderRadius = '50%'}) => (
+export const AvatarBorder: React.FunctionComponent<AvatarBorderProps> = ({borderRadius = '50%'}) => (
   <div
     css={{
       ...CSS_FILL_PARENT,
@@ -34,5 +34,3 @@ const AvatarBorder: React.FunctionComponent<AvatarBorderProps> = ({borderRadius 
     }}
   />
 );
-
-export {AvatarBorder};

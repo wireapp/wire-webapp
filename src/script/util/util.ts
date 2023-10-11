@@ -19,11 +19,8 @@
 
 import {Decoder, Encoder} from 'bazinga64';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import type {ObservableArray} from 'knockout';
 
 import {UrlUtil, Runtime} from '@wireapp/commons';
-
-import {findMentionAtPosition} from 'Util/MentionUtil';
 
 import {isTabKey} from './KeyboardUtil';
 import {loadValue} from './StorageUtil';
@@ -32,7 +29,6 @@ import {QUERY_KEY} from '../auth/route';
 import {Config} from '../Config';
 import type {Conversation} from '../entity/Conversation';
 import {AuthError} from '../error/AuthError';
-import {MentionEntity} from '../message/MentionEntity';
 import {StorageKey} from '../storage/StorageKey';
 
 export const isTemporaryClientAndNonPersistent = (persist: boolean): boolean => {
@@ -109,7 +105,7 @@ export const loadDataUrl = (file: Blob): Promise<string | ArrayBuffer> => {
   });
 };
 
-export const loadUrlBuffer = (
+const loadUrlBuffer = (
   url: string,
   xhrAccessorFunction?: (xhr: XMLHttpRequest) => void,
 ): Promise<{buffer: ArrayBuffer; mimeType: string}> => {
@@ -232,7 +228,7 @@ export const downloadBlob = (blob: Blob, filename: string, mimeType?: string): n
   throw new Error('Failed to download blob: Resource not provided');
 };
 
-export const downloadFile = (url: string, fileName: string, mimeType?: string): number => {
+const downloadFile = (url: string, fileName: string, mimeType?: string): number => {
   const anchor = document.createElement('a');
   anchor.download = fileName;
   anchor.href = url;
@@ -254,25 +250,6 @@ export const downloadFile = (url: string, fileName: string, mimeType?: string): 
   }, 100);
 };
 
-// Note: IE10 listens to "transitionend" instead of "animationend"
-export const alias = {
-  animationend: 'transitionend animationend oAnimationEnd MSAnimationEnd mozAnimationEnd webkitAnimationEnd',
-};
-
-export const koPushDeferred = (target: ObservableArray, src: any[], number = 100, delay = 300) => {
-  /** push array deferred to knockout's `observableArray` */
-  let interval: number;
-
-  return (interval = window.setInterval(() => {
-    const chunk = src.splice(0, number);
-    target.push(...chunk);
-
-    if (src.length === 0) {
-      return window.clearInterval(interval);
-    }
-  }, delay));
-};
-
 /**
  * Add zero padding until limit is reached.
  */
@@ -283,21 +260,6 @@ export const zeroPadding = (value: string | number, length = 2): string => {
 
 export const sortGroupsByLastEvent = (groupA: Conversation, groupB: Conversation): number =>
   groupB.last_event_timestamp() - groupA.last_event_timestamp();
-
-export const sortObjectByKeys = (object: Record<string, any>, reverse: boolean) => {
-  const keys = Object.keys(object);
-  keys.sort();
-
-  if (reverse) {
-    keys.reverse();
-  }
-
-  // Returns a copy of an object, which is ordered by the keys of the original object.
-  return keys.reduce<Record<string, any>>((sortedObject, key: string) => {
-    sortedObject[key] = object[key];
-    return sortedObject;
-  }, {});
-};
 
 // Removes url(' and url(" from the beginning of the string and also ") and ') from the end
 export const stripUrlWrapper = (url: string) => url.replace(/^url\(["']?/, '').replace(/["']?\)$/, '');
@@ -320,30 +282,7 @@ export const afterRender = (callback: TimerHandler): number =>
  */
 export const noop = (): void => {};
 
-export function throttle(callback: Function, wait: number, immediate = false) {
-  let timeout: number | null = null;
-  let initialCall = true;
-
-  return function () {
-    const callNow = immediate && initialCall;
-    const next = () => {
-      // eslint-disable-next-line prefer-rest-params
-      callback.apply(this, arguments);
-      timeout = null;
-    };
-
-    if (callNow) {
-      initialCall = false;
-      next();
-    }
-
-    if (!timeout) {
-      timeout = window.setTimeout(next, wait);
-    }
-  };
-}
-
-export const focusableElementsSelector =
+const focusableElementsSelector =
   'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 export const preventFocusOutside = (event: KeyboardEvent, parentId: string): void => {
@@ -381,32 +320,10 @@ export const setContextMenuPosition = (event: React.KeyboardEvent) => {
   });
 };
 
-export const generateConversationInputStorageKey = (conversationEntity: Conversation): string =>
-  `${StorageKey.CONVERSATION.INPUT}|${conversationEntity.id}`;
-
-export const getSelectionPosition = (element: HTMLTextAreaElement, currentMentions: MentionEntity[]) => {
-  const {selectionStart: start, selectionEnd: end} = element;
-  const defaultRange = {endIndex: 0, startIndex: Infinity};
-
-  const firstMention = findMentionAtPosition(start, currentMentions) || defaultRange;
-  const lastMention = findMentionAtPosition(end, currentMentions) || defaultRange;
-
-  const mentionStart = Math.min(firstMention.startIndex, lastMention.startIndex);
-  const mentionEnd = Math.max(firstMention.endIndex, lastMention.endIndex);
-
-  const newStart = Math.min(mentionStart, start);
-  const newEnd = Math.max(mentionEnd, end);
-
-  return {newEnd, newStart};
-};
-
 const supportsSecretStorage = () => !Runtime.isDesktopApp() || !!window.systemCrypto;
 
 // disables mls for old 'broken' desktop clients, see https://github.com/wireapp/wire-desktop/pull/6094
 export const supportsMLS = () => Config.getConfig().FEATURE.ENABLE_MLS && supportsSecretStorage();
-
-export const supportsSelfSupportedProtocolsUpdates = () =>
-  Config.getConfig().FEATURE.ENABLE_SELF_SUPPORTED_PROTOCOLS_UPDATES;
 
 export const supportsCoreCryptoProteus = () =>
   Config.getConfig().FEATURE.ENABLE_PROTEUS_CORE_CRYPTO && supportsSecretStorage();

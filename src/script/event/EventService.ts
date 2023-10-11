@@ -43,7 +43,7 @@ export const eventTimeToDate = (time: string) => new Date(time) || new Date(pars
 export const compareEventsByConversation = (eventA: EventRecord, eventB: EventRecord) =>
   eventA.conversation.localeCompare(eventB.conversation);
 
-export const compareEventsById = (eventA: EventRecord, eventB: EventRecord) => eventA.id.localeCompare(eventB.id);
+const compareEventsById = (eventA: EventRecord, eventB: EventRecord) => eventA.id.localeCompare(eventB.id);
 export const compareEventsByTime = (eventA: EventRecord, eventB: EventRecord) =>
   eventTimeToDate(eventA.time).getTime() - eventTimeToDate(eventB.time).getTime();
 

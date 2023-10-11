@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, useContext, useEffect, useRef} from 'react';
+import {useContext, useEffect, useRef} from 'react';
 
 import {container} from 'tsyringe';
 
@@ -39,14 +39,12 @@ import {UserState} from '../../user/UserState';
 interface ConnectRequestsProps {
   readonly userState: UserState;
   readonly teamState: TeamState;
-  readonly selfUser: User;
 }
 
-export const ConnectRequests: FC<ConnectRequestsProps> = ({
+export const ConnectRequests = ({
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
-  selfUser,
-}) => {
+}: ConnectRequestsProps) => {
   const connectRequestsRefEnd = useRef<HTMLDivElement | null>(null);
   const temporaryConnectRequestsCount = useRef<number>(0);
 
@@ -131,7 +129,7 @@ export const ConnectRequests: FC<ConnectRequestsProps> = ({
               <div className="connect-request-username label-username">{connectRequest.handle}</div>
 
               {classifiedDomains && (
-                <UserClassifiedBar users={[selfUser, connectRequest]} classifiedDomains={classifiedDomains} />
+                <UserClassifiedBar users={[connectRequest]} classifiedDomains={classifiedDomains} />
               )}
 
               <Avatar

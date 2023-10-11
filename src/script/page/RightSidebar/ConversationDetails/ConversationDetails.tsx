@@ -54,7 +54,6 @@ import {TeamRepository} from '../../../team/TeamRepository';
 import {TeamState} from '../../../team/TeamState';
 import {Shortcut} from '../../../ui/Shortcut';
 import {ShortcutType} from '../../../ui/ShortcutType';
-import {UserState} from '../../../user/UserState';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {PanelHeader} from '../PanelHeader';
 import {PanelEntity, PanelState} from '../RightSidebar';
@@ -74,7 +73,7 @@ interface ConversationDetailsProps {
   searchRepository: SearchRepository;
   teamRepository: TeamRepository;
   teamState: TeamState;
-  userState: UserState;
+  selfUser: User;
   isFederated?: boolean;
 }
 
@@ -90,7 +89,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       searchRepository,
       teamRepository,
       teamState,
-      userState,
+      selfUser,
       isFederated = false,
     },
     ref,
@@ -155,7 +154,6 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       'team',
     ]);
 
-    const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
     const {
       is_verified: isSelfVerified,
       teamRole,
@@ -312,7 +310,6 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
           {isSingleUserMode && !isServiceMode && firstParticipant && (
             <>
               <UserDetails
-                conversationDomain={activeConversation.domain}
                 participant={firstParticipant}
                 isVerified={isVerified}
                 isSelfVerified={isSelfVerified}
@@ -366,7 +363,6 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
                   <>
                     <UserSearchableList
                       dataUieName="list-users"
-                      userState={userState}
                       users={userParticipants}
                       onClick={showUser}
                       noUnderline
@@ -439,7 +435,11 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
             <>
               <ConversationDetailsBottomActions
                 isDeviceActionEnabled={
-                  isSingleUserMode && firstParticipant && (firstParticipant.isConnected() || firstParticipant.inTeam())
+                  !!(
+                    isSingleUserMode &&
+                    firstParticipant &&
+                    (firstParticipant.isConnected() || firstParticipant.inTeam())
+                  )
                 }
                 showDevices={openParticipantDevices}
                 showNotifications={showNotifications}

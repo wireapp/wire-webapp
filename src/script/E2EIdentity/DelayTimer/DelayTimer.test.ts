@@ -24,6 +24,7 @@ describe('createGracePeriodTimer', () => {
   let timer: DelayTimerService | undefined;
 
   beforeEach(() => {
+    jest.clearAllMocks();
     jest.useFakeTimers();
     global.localStorage.clear();
     timer = DelayTimerService?.getInstance({

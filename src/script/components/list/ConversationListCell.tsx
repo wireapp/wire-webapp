@@ -33,14 +33,14 @@ import {Availability} from '@wireapp/protocol-messaging';
 
 import {AvailabilityState} from 'Components/AvailabilityState';
 import {Avatar, AVATAR_SIZE, GroupAvatar} from 'Components/Avatar';
-import {Icon} from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isKey, isOneOfKeys, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {noop, setContextMenuPosition} from 'Util/util';
 
+import {ConversationListCellStatusIcon} from './ConversationListCellStatusIcon';
+
 import {generateCellState} from '../../conversation/ConversationCellState';
-import {ConversationStatusIcon} from '../../conversation/ConversationStatusIcon';
 import type {Conversation} from '../../entity/Conversation';
 import {MediaType} from '../../media/MediaType';
 
@@ -252,80 +252,7 @@ const ConversationListCell = ({
             onKeyDown={handleContextKeyDown}
           />
 
-          {!showJoinButton && (
-            <>
-              {cellState.icon === ConversationStatusIcon.PENDING_CONNECTION && (
-                <span
-                  className="conversation-list-cell-badge cell-badge-light"
-                  data-uie-name="status-pending"
-                  title={t('accessibility.conversationStatusPending')}
-                >
-                  <Icon.Pending className="svg-icon" />
-                </span>
-              )}
-
-              {cellState.icon === ConversationStatusIcon.UNREAD_MENTION && (
-                <span
-                  className="conversation-list-cell-badge cell-badge-dark"
-                  data-uie-name="status-mention"
-                  title={t('accessibility.conversationStatusUnreadMention')}
-                >
-                  <Icon.Mention className="svg-icon" />
-                </span>
-              )}
-
-              {cellState.icon === ConversationStatusIcon.UNREAD_REPLY && (
-                <span
-                  className="conversation-list-cell-badge cell-badge-dark"
-                  data-uie-name="status-reply"
-                  title={t('accessibility.conversationStatusUnreadReply')}
-                  aria-label={t('accessibility.conversationStatusUnreadReply')}
-                >
-                  <Icon.Reply className="svg-icon" />
-                </span>
-              )}
-
-              {cellState.icon === ConversationStatusIcon.UNREAD_PING && (
-                <span
-                  className="conversation-list-cell-badge cell-badge-dark"
-                  data-uie-name="status-ping"
-                  title={t('accessibility.conversationStatusUnreadPing')}
-                >
-                  <Icon.Ping className="svg-icon" />
-                </span>
-              )}
-
-              {cellState.icon === ConversationStatusIcon.MISSED_CALL && (
-                <span
-                  className="conversation-list-cell-badge cell-badge-dark"
-                  data-uie-name="status-missed-call"
-                  title={t('accessibility.callStatusMissed')}
-                >
-                  <Icon.Hangup className="svg-icon" />
-                </span>
-              )}
-
-              {cellState.icon === ConversationStatusIcon.MUTED && (
-                <span
-                  className="conversation-list-cell-badge cell-badge-light conversation-muted"
-                  data-uie-name="status-silence"
-                  title={t('accessibility.conversationStatusMuted')}
-                >
-                  <Icon.Mute className="svg-icon" />
-                </span>
-              )}
-
-              {cellState.icon === ConversationStatusIcon.UNREAD_MESSAGES && unreadState.allMessages.length > 0 && (
-                <span
-                  className="conversation-list-cell-badge cell-badge-dark"
-                  data-uie-name="status-unread"
-                  title={t('accessibility.conversationStatusUnread')}
-                >
-                  {unreadState.allMessages.length}
-                </span>
-              )}
-            </>
-          )}
+          {!showJoinButton && <ConversationListCellStatusIcon conversation={conversation} />}
 
           {showJoinButton && (
             <button
