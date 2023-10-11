@@ -28,10 +28,9 @@ import {SystemMessageType} from 'src/script/message/SystemMessageType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import {ConnectedMessage} from './ConnectedMessage';
-import {MessageContent} from './MessageContent';
-
-import {MessageTime} from '../MessageTime';
+import {ConnectedMessage} from './MemberMessage/ConnectedMessage';
+import {MessageContent} from './MemberMessage/MessageContent';
+import {MessageTime} from './MessageTime';
 
 interface MemberMessageProps {
   classifiedDomains?: string[];
