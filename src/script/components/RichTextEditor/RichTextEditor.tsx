@@ -19,6 +19,7 @@
 
 import {ReactElement, useRef} from 'react';
 
+import {ClearEditorPlugin} from '@lexical/react/LexicalClearEditorPlugin';
 import {InitialConfigType, LexicalComposer} from '@lexical/react/LexicalComposer';
 import {ContentEditable} from '@lexical/react/LexicalContentEditable';
 import {EditorRefPlugin} from '@lexical/react/LexicalEditorRefPlugin';
@@ -166,6 +167,7 @@ export const RichTextEditor = ({
             ErrorBoundary={LexicalErrorBoundary}
           />
 
+          <ClearEditorPlugin />
           <MentionsPlugin
             onSearch={search => (typeof search === 'string' ? getMentionCandidates(search) : [])}
             openStateRef={mentionsOpen}

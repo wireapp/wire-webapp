@@ -226,6 +226,9 @@ export class MemberMessage extends SystemMessage {
           }
 
           const allUsers = this.generateNameString();
+          if (!this.user().id) {
+            return t('conversationMemberWereRemoved', allUsers);
+          }
           return this.user().isMe
             ? t('conversationMemberRemovedYou', allUsers)
             : t('conversationMemberRemoved', {name, users: allUsers});

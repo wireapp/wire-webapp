@@ -47,7 +47,7 @@ export function getFederationDeleteEventUpdates(
 
     if (conversation.domain === deletedDomain && !is1to1) {
       result.conversationsToLeave.push(conversation);
-    } else if (is1to1 && firstUserEntity.qualifiedId.domain === deletedDomain) {
+    } else if (is1to1 && firstUserEntity?.qualifiedId.domain === deletedDomain) {
       result.conversationsToDisable.push(conversation);
     } else {
       const usersToDelete = allUserEntities.filter(user => user.domain === deletedDomain);

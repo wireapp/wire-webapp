@@ -130,14 +130,26 @@ export class ActionsViewModel {
     });
   };
 
+  private readonly leaveOrClearConversation = async (
+    conversation: Conversation,
+    {leave, clear}: {leave: boolean; clear: boolean},
+  ): Promise<void> => {
+    if (leave) {
+      await this.conversationRepository.leaveConversation(conversation);
+    }
+    if (clear) {
+      await this.conversationRepository.clearConversation(conversation);
+    }
+  };
+
   readonly clearConversation = (conversationEntity: Conversation): void => {
     if (conversationEntity) {
       const modalType = conversationEntity.isLeavable() ? PrimaryModal.type.OPTION : PrimaryModal.type.CONFIRM;
 
       PrimaryModal.show(modalType, {
         primaryAction: {
-          action: (leaveConversation = false) => {
-            this.conversationRepository.clearConversation(conversationEntity, leaveConversation);
+          action: async (leave = false) => {
+            await this.leaveOrClearConversation(conversationEntity, {clear: true, leave: leave});
           },
           text: t('modalConversationClearAction'),
         },
@@ -261,8 +273,8 @@ export class ActionsViewModel {
     return this.connectionRepository.ignoreRequest(userEntity);
   };
 
-  readonly leaveConversation = (conversationEntity: Conversation): Promise<void> => {
-    if (!conversationEntity) {
+  readonly leaveConversation = (conversation: Conversation): Promise<void> => {
+    if (!conversation) {
       return Promise.reject();
     }
 
@@ -270,19 +282,16 @@ export class ActionsViewModel {
       PrimaryModal.show(PrimaryModal.type.OPTION, {
         primaryAction: {
           action: async (clearContent = false) => {
-            await this.conversationRepository.removeMember(conversationEntity, this.userState.self().qualifiedId, {
-              clearContent,
-            });
-
+            await this.leaveOrClearConversation(conversation, {clear: clearContent, leave: true});
             resolve();
           },
           text: t('modalConversationLeaveAction'),
         },
         text: {
-          closeBtnLabel: t('modalConversationLeaveMessageCloseBtn', conversationEntity.display_name()),
+          closeBtnLabel: t('modalConversationLeaveMessageCloseBtn', conversation.display_name()),
           message: t('modalConversationLeaveMessage'),
           option: t('modalConversationLeaveOption'),
-          title: t('modalConversationLeaveHeadline', conversationEntity.display_name()),
+          title: t('modalConversationLeaveHeadline', conversation.display_name()),
         },
       });
     });
@@ -366,7 +375,7 @@ export class ActionsViewModel {
           primaryAction: {
             action: async () => {
               try {
-                await this.conversationRepository.removeMember(conversationEntity, userEntity.qualifiedId);
+                await this.conversationRepository.removeMembers(conversationEntity, [userEntity.qualifiedId]);
                 resolve();
               } catch (error) {
                 reject(error);
