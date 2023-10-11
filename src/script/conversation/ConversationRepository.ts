@@ -90,7 +90,9 @@ import {ConversationState} from './ConversationState';
 import {ConversationStateHandler} from './ConversationStateHandler';
 import {ConversationStatus} from './ConversationStatus';
 import {ConversationVerificationState} from './ConversationVerificationState';
-import {ConversationVerificationStateHandler} from './ConversationVerificationStateHandler';
+import {ProteusConversationVerificationStateHandler} from './ConversationVerificationStateHandler';
+import {registerMLSConversationVerificationStateHandler} from './ConversationVerificationStateHandler/MLS';
+import {OnConversationVerificationStateChange} from './ConversationVerificationStateHandler/shared';
 import {EventMapper} from './EventMapper';
 import {MessageRepository} from './MessageRepository';
 import {NOTIFICATION_STATE} from './NotificationSetting';
@@ -161,7 +163,7 @@ export class ConversationRepository {
   private readonly eventService: EventService;
   private readonly logger: Logger;
   public readonly stateHandler: ConversationStateHandler;
-  public readonly verificationStateHandler: ConversationVerificationStateHandler;
+  public readonly proteusVerificationStateHandler: ProteusConversationVerificationStateHandler;
   static readonly eventFromStreamMessage = 'event from notification stream';
 
   static get CONFIG() {
@@ -269,11 +271,20 @@ export class ConversationRepository {
     this.logger = getLogger('ConversationRepository');
 
     this.event_mapper = new EventMapper();
-    this.verificationStateHandler = new ConversationVerificationStateHandler(
-      this.eventRepository,
+
+    // we register and store a handler, that we can manually trigger for incoming events from proteus and mixed conversations
+    this.proteusVerificationStateHandler = new ProteusConversationVerificationStateHandler(
+      this.onConversationVerificationStateChange,
       this.userState,
       this.conversationState,
     );
+    // we register a handler that will handle MLS conversations on its own
+    registerMLSConversationVerificationStateHandler(
+      this.onConversationVerificationStateChange,
+      this.conversationState,
+      this.core,
+    );
+
     this.isBlockingNotificationHandling = true;
     this.conversationsWithNewEvents = new Map();
 
@@ -1556,6 +1567,30 @@ export class ConversationRepository {
   // Send events
   //##############################################################################
 
+  private onConversationVerificationStateChange: OnConversationVerificationStateChange = async ({
+    conversationEntity,
+    conversationVerificationState,
+    verificationMessageType,
+    userIds = [],
+  }) => {
+    switch (conversationVerificationState) {
+      case ConversationVerificationState.VERIFIED:
+        const allVerifiedEvent = EventBuilder.buildAllVerified(conversationEntity);
+        await this.eventRepository.injectEvent(allVerifiedEvent);
+        break;
+      case ConversationVerificationState.DEGRADED:
+        if (verificationMessageType) {
+          const event = EventBuilder.buildDegraded(conversationEntity, userIds, verificationMessageType);
+          await this.eventRepository.injectEvent(event);
+        } else {
+          this.logger.error('onConversationVerificationStateChange: Missing verificationMessageType while degrading');
+        }
+        break;
+      default:
+        break;
+    }
+  };
+
   /**
    * Add users to an existing conversation.
    *
@@ -2639,7 +2674,7 @@ export class ConversationRepository {
           this.addCreationMessage(conversationEntity, false, initialTimestamp, eventSource);
         }
         await this.updateParticipatingUserEntities(conversationEntity);
-        this.verificationStateHandler.onConversationCreate(conversationEntity);
+        this.proteusVerificationStateHandler.onConversationCreate(conversationEntity);
         await this.saveConversation(conversationEntity);
       }
       return {conversationEntity};
@@ -2753,7 +2788,7 @@ export class ConversationRepository {
       .then(() => this.updateParticipatingUserEntities(conversationEntity, false, true))
       .then(() => this.addEventToConversation(conversationEntity, eventJson))
       .then(({messageEntity}) => {
-        this.verificationStateHandler.onMemberJoined(conversationEntity, qualifiedUserIds);
+        this.proteusVerificationStateHandler.onMemberJoined(conversationEntity, qualifiedUserIds);
         return {conversationEntity, messageEntity};
       });
   }
@@ -2848,7 +2883,7 @@ export class ConversationRepository {
 
       await this.updateParticipatingUserEntities(conversationEntity);
 
-      this.verificationStateHandler.onMemberLeft(conversationEntity);
+      this.proteusVerificationStateHandler.onMemberLeft(conversationEntity);
 
       return {conversationEntity, messageEntity};
     }

@@ -17,24 +17,5 @@
  *
  */
 
-const TargetURLKey = 'E2EIdentity_OIDCService_TargetURL';
-
-const OIDCServiceStore = {
-  store: {
-    targetURL: (url: string) => localStorage.setItem(TargetURLKey, url),
-  },
-  get: {
-    targetURL: () => localStorage.getItem(TargetURLKey),
-  },
-  has: {
-    targetURL: () => localStorage.getItem(TargetURLKey) !== null,
-  },
-  clear: {
-    targetURL: () => localStorage.removeItem(TargetURLKey),
-    all: () => {
-      OIDCServiceStore.clear.targetURL();
-    },
-  },
-};
-
-export {OIDCServiceStore};
+export * from './Proteus';
+export * from './MLS';

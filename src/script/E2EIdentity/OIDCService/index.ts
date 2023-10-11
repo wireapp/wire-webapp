@@ -23,10 +23,10 @@ import {OIDCServiceStore} from './OIDCServiceStorage';
 // lots of hardcoded values here, but this is just for testing until we have a proper OIDC service
 export const getOIDCServiceInstance = (): OIDCService => {
   // if there is no targetURL, we cannot create an OIDCService
-  if (!OIDCServiceStore.has.targetURL()) {
-    throw new Error('OIDCServiceStore has no targetURL');
-  }
   const targetURL = OIDCServiceStore.get.targetURL();
+  if (!targetURL) {
+    throw new Error('No targetURL found in OIDCServiceStore');
+  }
   const oidcService = new OIDCService({
     audience: '338888153072-ktbh66pv3mr0ua0dn64sphgimeo0p7ss.apps.googleusercontent.com',
     authorityUrl: 'https://accounts.google.com' || targetURL,

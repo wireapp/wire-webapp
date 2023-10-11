@@ -17,24 +17,16 @@
  *
  */
 
-const TargetURLKey = 'E2EIdentity_OIDCService_TargetURL';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-const OIDCServiceStore = {
-  store: {
-    targetURL: (url: string) => localStorage.setItem(TargetURLKey, url),
-  },
-  get: {
-    targetURL: () => localStorage.getItem(TargetURLKey),
-  },
-  has: {
-    targetURL: () => localStorage.getItem(TargetURLKey) !== null,
-  },
-  clear: {
-    targetURL: () => localStorage.removeItem(TargetURLKey),
-    all: () => {
-      OIDCServiceStore.clear.targetURL();
-    },
-  },
-};
+import {ConversationVerificationState} from 'src/script/conversation/ConversationVerificationState';
+import {Conversation} from 'src/script/entity/Conversation';
+import {VerificationMessageType} from 'src/script/message/VerificationMessageType';
 
-export {OIDCServiceStore};
+interface OnConversationVerificationStateChangeParams {
+  conversationEntity: Conversation;
+  conversationVerificationState: ConversationVerificationState;
+  verificationMessageType?: VerificationMessageType;
+  userIds?: QualifiedId[];
+}
+export type OnConversationVerificationStateChange = (params: OnConversationVerificationStateChangeParams) => void;
