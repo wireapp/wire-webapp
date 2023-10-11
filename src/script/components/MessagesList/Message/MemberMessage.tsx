@@ -73,13 +73,6 @@ export const MemberMessage: React.FC<MemberMessageProps> = ({
   const isMemberLeave = message.isMemberLeave();
   const isMemberChange = message.isMemberChange();
 
-  const handleShowMoreClick = (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
-    const clickedOnShowMore = (event.target as HTMLElement).closest('.message-header-show-more');
-    if (clickedOnShowMore) {
-      onClickParticipants(highlightedUsers);
-    }
-  };
-
   const isConnectedMessage = [SystemMessageType.CONNECTION_ACCEPTED, SystemMessageType.CONNECTION_REQUEST].includes(
     message.memberMessageType,
   );
@@ -118,8 +111,8 @@ export const MemberMessage: React.FC<MemberMessageProps> = ({
           </div>
           {/* event is being triggered only when clicked on <a> tag with specified class (keyboard accessible by default) */}
           {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
-          <div onClick={handleShowMoreClick} className="message-header-label">
-            <MessageContent message={message} />
+          <div className="message-header-label">
+            <MessageContent onClickAction={() => onClickParticipants(highlightedUsers)} message={message} />
           </div>
           {isMemberChange && (
             <div className="message-body-actions">
