@@ -351,7 +351,7 @@ export class Account extends TypedEventEmitter<Events> {
         await this.service.mls.initClient({id: userId, domain}, validClient);
       }
       // initialize schedulers for pending mls proposals once client is initialized
-      await this.service.mls.checkExistingPendingProposals();
+      await this.service.mls.initialisePendingProposalsTasks();
 
       // initialize scheduler for syncing key packages with backend
       await this.service.mls.schedulePeriodicKeyPackagesBackendSync(validClient.id);

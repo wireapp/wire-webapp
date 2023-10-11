@@ -605,7 +605,7 @@ export class MLSService extends TypedEventEmitter<Events> {
   }
 
   private createKeyMaterialUpdateTaskSchedulerId(groupId: string) {
-    return `renew-key-material-update-${groupId}`;
+    return `renew-key-material-update-${groupId}` as const;
   }
 
   /**
@@ -621,7 +621,7 @@ export class MLSService extends TypedEventEmitter<Events> {
    * Will cancel the renewal of the key material for a given groupId
    * @param groupId The group that should stop having its key material updated
    */
-  public cancelKeyMaterialRenewal(groupId: string) {
+  private cancelKeyMaterialRenewal(groupId: string) {
     return this.recurringTaskScheduler.cancelTask(this.createKeyMaterialUpdateTaskSchedulerId(groupId));
   }
 
@@ -719,12 +719,14 @@ export class MLSService extends TypedEventEmitter<Events> {
   }
 
   public async wipeConversation(groupId: string): Promise<void> {
+    await this.cancelKeyMaterialRenewal(groupId);
+    await this.cancelPendingProposalsTask(groupId);
+
     const doesConversationExist = await this.conversationExists(groupId);
     if (!doesConversationExist) {
       //if the mls group does not exist, we don't need to wipe it
       return;
     }
-    await this.cancelKeyMaterialRenewal(groupId);
 
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
     return this.coreCryptoClient.wipeConversation(groupIdBytes);
@@ -760,16 +762,29 @@ export class MLSService extends TypedEventEmitter<Events> {
       const eventDate = new Date(eventTime);
       const firingDate = eventDate.setTime(eventDate.getTime() + delayInMs);
 
-      await this.coreDatabase.put('pendingProposals', {groupId, firingDate}, groupId);
-
-      TaskScheduler.addTask({
-        task: () => this.commitPendingProposals({groupId}),
-        firingDate,
-        key: groupId,
-      });
+      await this.schedulePendingProposalsTask(groupId, firingDate);
     } else {
       await this.commitPendingProposals({groupId, skipDelete: true});
     }
+  }
+
+  private async schedulePendingProposalsTask(groupId: string, firingDate: number) {
+    await this.coreDatabase.put('pendingProposals', {groupId, firingDate}, groupId);
+
+    TaskScheduler.addTask({
+      task: () => this.commitPendingProposals({groupId}),
+      firingDate,
+      key: this.createPendingProposalsTaskKey(groupId),
+    });
+  }
+
+  private async cancelPendingProposalsTask(groupId: string) {
+    TaskScheduler.cancelTask(this.createPendingProposalsTaskKey(groupId));
+    await this.coreDatabase.delete('pendingProposals', groupId);
+  }
+
+  private createPendingProposalsTaskKey(groupId: string) {
+    return `pending-proposals-${groupId}` as const;
   }
 
   /**
@@ -783,8 +798,7 @@ export class MLSService extends TypedEventEmitter<Events> {
       await this.commitProposals(Decoder.fromBase64(groupId).asBytes);
 
       if (!skipDelete) {
-        TaskScheduler.cancelTask(groupId);
-        await this.coreDatabase.delete('pendingProposals', groupId);
+        await this.cancelPendingProposalsTask(groupId);
       }
     } catch (error) {
       this.logger.error(`Error while committing pending proposals for groupId ${groupId}`, error);
@@ -796,7 +810,7 @@ export class MLSService extends TypedEventEmitter<Events> {
    * Function must only be called once, after application start
    *
    */
-  public async checkExistingPendingProposals() {
+  public async initialisePendingProposalsTasks() {
     try {
       const pendingProposals = await this.coreDatabase.getAll('pendingProposals');
       if (pendingProposals.length > 0) {
@@ -804,7 +818,7 @@ export class MLSService extends TypedEventEmitter<Events> {
           TaskScheduler.addTask({
             task: () => this.commitPendingProposals({groupId}),
             firingDate,
-            key: groupId,
+            key: this.createPendingProposalsTaskKey(groupId),
           }),
         );
       }
