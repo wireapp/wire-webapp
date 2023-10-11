@@ -28,11 +28,12 @@ import {SystemMessageType} from 'src/script/message/SystemMessageType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import {ConnectedMessage} from './MemberMessageTypes/ConnectedMessage';
+import {ConnectedMessage} from './ConnectedMessage';
+import {MessageContent} from './MessageContent';
 
 import {MessageTime} from '../MessageTime';
 
-export interface MemberMessageProps {
+interface MemberMessageProps {
   classifiedDomains?: string[];
   hasReadReceiptsTurnedOn: boolean;
   isSelfTemporaryGuest: boolean;
@@ -44,7 +45,7 @@ export interface MemberMessageProps {
   conversationName: string;
 }
 
-const MemberMessage: React.FC<MemberMessageProps> = ({
+export const MemberMessage: React.FC<MemberMessageProps> = ({
   message,
   shouldShowInvitePeople,
   isSelfTemporaryGuest,
@@ -55,26 +56,17 @@ const MemberMessage: React.FC<MemberMessageProps> = ({
   classifiedDomains,
   conversationName,
 }) => {
-  const {
-    otherUser,
-    timestamp,
-    user,
-    htmlGroupCreationHeader,
-    htmlCaption,
-    highlightedUsers,
-    showNamedCreation,
-    hasUsers,
-  } = useKoSubscribableChildren(message, [
-    'otherUser',
-    'timestamp',
-    'user',
-    'name',
-    'htmlGroupCreationHeader',
-    'htmlCaption',
-    'highlightedUsers',
-    'showNamedCreation',
-    'hasUsers',
-  ]);
+  const {otherUser, timestamp, user, htmlGroupCreationHeader, highlightedUsers, showNamedCreation, hasUsers} =
+    useKoSubscribableChildren(message, [
+      'otherUser',
+      'timestamp',
+      'user',
+      'name',
+      'htmlGroupCreationHeader',
+      'highlightedUsers',
+      'showNamedCreation',
+      'hasUsers',
+    ]);
 
   const isGroupCreation = message.isGroupCreation();
   const isMemberRemoval = message.isMemberRemoval();
@@ -89,18 +81,19 @@ const MemberMessage: React.FC<MemberMessageProps> = ({
     }
   };
 
-  switch (message.memberMessageType) {
-    case SystemMessageType.CONNECTION_ACCEPTED:
-    case SystemMessageType.CONNECTION_REQUEST:
-      return (
-        <ConnectedMessage
-          user={otherUser}
-          showServicesWarning={message.showServicesWarning}
-          onClickCancelRequest={() => onClickCancelRequest(message)}
-          classifiedDomains={classifiedDomains}
-        />
-      );
-      break;
+  const isConnectedMessage = [SystemMessageType.CONNECTION_ACCEPTED, SystemMessageType.CONNECTION_REQUEST].includes(
+    message.memberMessageType,
+  );
+
+  if (isConnectedMessage) {
+    return (
+      <ConnectedMessage
+        user={otherUser}
+        showServicesWarning={message.showServicesWarning}
+        onClickCancelRequest={() => onClickCancelRequest(message)}
+        classifiedDomains={classifiedDomains}
+      />
+    );
   }
 
   return (
@@ -116,6 +109,7 @@ const MemberMessage: React.FC<MemberMessageProps> = ({
           </h2>
         </div>
       )}
+
       {hasUsers && (
         <div className="message-header">
           <div className="message-header-icon message-header-icon--svg text-foreground">
@@ -126,7 +120,7 @@ const MemberMessage: React.FC<MemberMessageProps> = ({
           {/* event is being triggered only when clicked on <a> tag with specified class (keyboard accessible by default) */}
           {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
           <div onClick={handleShowMoreClick} className="message-header-label">
-            <p className="message-header-caption" dangerouslySetInnerHTML={{__html: htmlCaption}} />
+            <MessageContent message={message} />
           </div>
           {isMemberChange && (
             <div className="message-body-actions">
@@ -139,6 +133,7 @@ const MemberMessage: React.FC<MemberMessageProps> = ({
           )}
         </div>
       )}
+
       {hasUsers && message.showServicesWarning && (
         <p className="message-services-warning" data-uie-name="label-services-warning">
           {t('conversationServicesWarning')}
@@ -167,6 +162,7 @@ const MemberMessage: React.FC<MemberMessageProps> = ({
           <p className="message-member-footer-description">{t('temporaryGuestJoinDescription')}</p>
         </div>
       )}
+
       {isGroupCreation && hasReadReceiptsTurnedOn && (
         <div className="message-header" data-uie-name="label-group-creation-receipts">
           <div className="message-header-icon message-header-icon--svg text-foreground">
@@ -177,11 +173,13 @@ const MemberMessage: React.FC<MemberMessageProps> = ({
           </p>
         </div>
       )}
+
       {isMemberLeave && user.isMe && isSelfTemporaryGuest && (
         <div className="message-member-footer">
           <p className="message-member-footer-description">{t('temporaryGuestLeaveDescription')}</p>
         </div>
       )}
+
       {isGroupCreation && (
         <>
           <div className="message-header">
@@ -199,5 +197,3 @@ const MemberMessage: React.FC<MemberMessageProps> = ({
     </>
   );
 };
-
-export {MemberMessage};
