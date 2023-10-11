@@ -4232,12 +4232,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/dexie-batch@npm:0.4.4":
-  version: 0.4.4
-  resolution: "@types/dexie-batch@npm:0.4.4"
+"@types/dexie-batch@npm:0.4.5":
+  version: 0.4.5
+  resolution: "@types/dexie-batch@npm:0.4.5"
   dependencies:
     dexie: latest
-  checksum: 68b56d71084a720663159c8511fa02e751244213d75f530d99ef78d83126296488acab4980cf025d2295fab899d706b5f74d6251820153ba763ed034ffa336ae
+  checksum: 827a71d6609b2f19a521b4cef3bb6b6cae932af18572237aa0599fce4ce1936ba398510e3b6da5b2e783844f096b3dc2b5b8b942c8569aa22e37c4d187fa5594
   languageName: node
   linkType: hard
 
@@ -18254,7 +18254,7 @@ __metadata:
     "@lexical/react": 0.12.2
     "@testing-library/react": 14.0.0
     "@types/adm-zip": 0.5.2
-    "@types/dexie-batch": 0.4.4
+    "@types/dexie-batch": 0.4.5
     "@types/eslint": ^8
     "@types/fs-extra": 11.0.2
     "@types/generate-changelog": 1.8.1
