@@ -134,21 +134,6 @@ export class MemberMessage extends SystemMessage {
       const name = this.senderName();
 
       switch (this.memberMessageType) {
-        case SystemMessageType.CONNECTION_ACCEPTED:
-        case SystemMessageType.CONNECTION_REQUEST: {
-          if (this.otherUser()) {
-            if (this.otherUser().isBlocked()) {
-              return t('conversationConnectionBlocked');
-            }
-
-            if (this.otherUser().isOutgoingRequest()) {
-              return '';
-            }
-          }
-
-          return t('conversationConnectionAccepted');
-        }
-
         case SystemMessageType.CONVERSATION_CREATE: {
           if (this.name().length) {
             const exceedsMaxTeam = this.joinedUserEntities().length > MemberMessage.CONFIG.MAX_WHOLE_TEAM_USERS_VISIBLE;
@@ -226,6 +211,9 @@ export class MemberMessage extends SystemMessage {
           }
 
           const allUsers = this.generateNameString();
+          if (!this.user().id) {
+            return t('conversationMemberWereRemoved', allUsers);
+          }
           return this.user().isMe
             ? t('conversationMemberRemovedYou', allUsers)
             : t('conversationMemberRemoved', {name, users: allUsers});
@@ -281,11 +269,6 @@ export class MemberMessage extends SystemMessage {
       );
     }
     return t('conversationMultipleMembersRemovedMissingLegalHoldConsent', users, replaceLinkLegalHold);
-  };
-
-  readonly showLargeAvatar = (): boolean => {
-    const largeAvatarTypes = [SystemMessageType.CONNECTION_ACCEPTED, SystemMessageType.CONNECTION_REQUEST];
-    return largeAvatarTypes.includes(this.memberMessageType);
   };
 
   private generateNameString(skipAnd = false, declension = Declension.ACCUSATIVE): string {

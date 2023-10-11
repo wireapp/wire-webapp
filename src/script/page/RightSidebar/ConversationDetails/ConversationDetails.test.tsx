@@ -21,6 +21,7 @@ import {act, render} from '@testing-library/react';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 
 import {Conversation} from 'src/script/entity/Conversation';
+import {createUuid} from 'Util/uuid';
 
 import {ConversationDetails} from './ConversationDetails';
 
@@ -33,7 +34,6 @@ import {SearchRepository} from '../../../search/SearchRepository';
 import {TeamEntity} from '../../../team/TeamEntity';
 import {TeamRepository} from '../../../team/TeamRepository';
 import {TeamState} from '../../../team/TeamState';
-import {UserState} from '../../../user/UserState';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 
 jest.mock('Components/panel/EnrichedFields', () => ({
@@ -72,8 +72,7 @@ const getDefaultParams = () => {
     isUserGroupAdmin: () => true,
   };
 
-  const userState = new UserState();
-  userState.self(new User());
+  const selfUserMock = new User(createUuid());
 
   return {
     actionsViewModel: {
@@ -103,7 +102,7 @@ const getDefaultParams = () => {
       isSelfConnectedTo: () => true,
     } as unknown as TeamRepository,
     teamState: new TeamState(),
-    userState: userState,
+    selfUser: selfUserMock,
   };
 };
 

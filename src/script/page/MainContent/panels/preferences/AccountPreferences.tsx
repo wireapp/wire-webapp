@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useRef} from 'react';
+import {useRef} from 'react';
 
 import {ErrorBoundary} from 'react-error-boundary';
 import {container} from 'tsyringe';
@@ -77,7 +77,7 @@ interface AccountPreferencesProps {
 
 const logger = getLogger('AccountPreferences');
 
-export const AccountPreferences: React.FC<AccountPreferencesProps> = ({
+export const AccountPreferences = ({
   importFile,
   clientRepository,
   userRepository,
@@ -88,7 +88,7 @@ export const AccountPreferences: React.FC<AccountPreferencesProps> = ({
   isActivatedAccount = false,
   showDomain = false,
   teamState = container.resolve(TeamState),
-}) => {
+}: AccountPreferencesProps) => {
   const {isTeam, teamName} = useKoSubscribableChildren(teamState, ['isTeam', 'teamName']);
   const {name, email, availability, username, managedBy, phone} = useKoSubscribableChildren(selfUser, [
     'name',

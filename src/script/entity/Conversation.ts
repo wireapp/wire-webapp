@@ -110,7 +110,7 @@ export class Conversation {
   public cipherSuite: number = 1;
   public readonly isUsingMLSProtocol: boolean;
   public readonly display_name: ko.PureComputed<string>;
-  public readonly firstUserEntity: ko.PureComputed<User>;
+  public readonly firstUserEntity: ko.PureComputed<User | undefined>;
   public readonly enforcedTeamMessageTimer: ko.PureComputed<number>;
   public readonly globalMessageTimer: ko.Observable<number | null>;
   public readonly hasContentMessages: ko.Observable<boolean>;

@@ -293,6 +293,12 @@ export class EventRepository {
   // Notification/Event handling
   //##############################################################################
 
+  async injectEvents(events: (ClientConversationEvent | IncomingEvent)[], source: EventSource = EventSource.INJECTED) {
+    for (const event of events) {
+      await this.injectEvent(event, source);
+    }
+  }
+
   /**
    * Inject event into a conversation.
    * @note Don't add unable to decrypt to self conversation
