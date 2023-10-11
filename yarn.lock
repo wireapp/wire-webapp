@@ -4358,12 +4358,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/dexie-batch@npm:0.4.4":
-  version: 0.4.4
-  resolution: "@types/dexie-batch@npm:0.4.4"
+"@types/dexie-batch@npm:0.4.5":
+  version: 0.4.5
+  resolution: "@types/dexie-batch@npm:0.4.5"
   dependencies:
     dexie: latest
-  checksum: 68b56d71084a720663159c8511fa02e751244213d75f530d99ef78d83126296488acab4980cf025d2295fab899d706b5f74d6251820153ba763ed034ffa336ae
+  checksum: 827a71d6609b2f19a521b4cef3bb6b6cae932af18572237aa0599fce4ce1936ba398510e3b6da5b2e783844f096b3dc2b5b8b942c8569aa22e37c4d187fa5594
   languageName: node
   linkType: hard
 
@@ -4712,16 +4712,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-dom@npm:18.2.12":
-  version: 18.2.12
-  resolution: "@types/react-dom@npm:18.2.12"
-  dependencies:
-    "@types/react": "*"
-  checksum: 64eaf808e91c1d58270ea92dda0e0cbb671f7289be4a5a4e0ccbd85857dd69394970eaa403d958dfbca739735c0af9cde4cf8fe135ff34434838360beae8d306
-  languageName: node
-  linkType: hard
-
-"@types/react-dom@npm:^18.0.0":
+"@types/react-dom@npm:18.2.13, @types/react-dom@npm:^18.0.0":
   version: 18.2.13
   resolution: "@types/react-dom@npm:18.2.13"
   dependencies:
@@ -4852,10 +4843,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/underscore@npm:1.11.10":
-  version: 1.11.10
-  resolution: "@types/underscore@npm:1.11.10"
-  checksum: 8a9f7da160c824e2a25ee2b49e2f89a73a21b601d7e80a1c94950771773a7152823cdd813841334021cc2e0f9d8eecfddd3822ddda4dda886c219493c16b364b
+"@types/underscore@npm:1.11.11":
+  version: 1.11.11
+  resolution: "@types/underscore@npm:1.11.11"
+  checksum: 56fbd04305d0982178f32fd4adcfcf6012f75005a3cf2e33eca7f0bf99dadc31c6c8c4884cb0d3896af16c4e06ccf02810305e970899d4766ec2760b19f61511
   languageName: node
   linkType: hard
 
@@ -5464,9 +5455,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/react-ui-kit@npm:9.9.9":
-  version: 9.9.9
-  resolution: "@wireapp/react-ui-kit@npm:9.9.9"
+"@wireapp/react-ui-kit@npm:9.9.10":
+  version: 9.9.10
+  resolution: "@wireapp/react-ui-kit@npm:9.9.10"
   dependencies:
     "@types/color": 3.0.4
     color: 4.2.3
@@ -5481,7 +5472,7 @@ __metadata:
   peerDependenciesMeta:
     "@types/react":
       optional: true
-  checksum: 5f9aae81fbaa194661bbe07655dcda0d31c0c9acf6e530cd886b729019ad64fd298918c8061e2036c6cd67b34f69f15ae925944005ecf4e147bd7c3791c66295
+  checksum: 6946ac8f7be096e09d9abb8ad5d44d5fd0b4196f9e7581bd026ec04d941f12ec436dd6f9e6793658583ce2d9e494e1bc19bb587130967509685252d1a885d38e
   languageName: node
   linkType: hard
 
@@ -8811,7 +8802,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-prettier@npm:^5, eslint-plugin-prettier@npm:^5.0.0":
+"eslint-plugin-prettier@npm:^5, eslint-plugin-prettier@npm:^5.0.1":
   version: 5.0.1
   resolution: "eslint-plugin-prettier@npm:5.0.1"
   dependencies:
@@ -18374,7 +18365,7 @@ __metadata:
     "@peculiar/x509": 1.9.5
     "@testing-library/react": 14.0.0
     "@types/adm-zip": 0.5.2
-    "@types/dexie-batch": 0.4.4
+    "@types/dexie-batch": 0.4.5
     "@types/eslint": ^8
     "@types/fs-extra": 11.0.2
     "@types/generate-changelog": 1.8.1
@@ -18392,14 +18383,14 @@ __metadata:
     "@types/platform": 1.3.4
     "@types/prettier": ^2.7.3
     "@types/react": 18.2.28
-    "@types/react-dom": 18.2.12
+    "@types/react-dom": 18.2.13
     "@types/react-redux": 7.1.27
     "@types/react-transition-group": 4.4.7
     "@types/redux-mock-store": 1.0.4
     "@types/seedrandom": ^3
     "@types/sinon": 10.0.19
     "@types/speakingurl": 13.0.4
-    "@types/underscore": 1.11.10
+    "@types/underscore": 1.11.11
     "@types/webpack-env": 1.18.2
     "@wireapp/avs": 9.4.14
     "@wireapp/commons": 5.2.1
@@ -18408,7 +18399,7 @@ __metadata:
     "@wireapp/eslint-config": 3.0.4
     "@wireapp/lru-cache": 3.8.1
     "@wireapp/prettier-config": 0.6.3
-    "@wireapp/react-ui-kit": 9.9.9
+    "@wireapp/react-ui-kit": 9.9.10
     "@wireapp/store-engine": ^5.1.4
     "@wireapp/store-engine-dexie": 2.1.6
     "@wireapp/store-engine-sqleet": 1.8.9
@@ -18435,7 +18426,7 @@ __metadata:
     dpdm: 3.14.0
     emoji-picker-react: 4.5.2
     eslint: ^8.51.0
-    eslint-plugin-prettier: ^5.0.0
+    eslint-plugin-prettier: ^5.0.1
     fake-indexeddb: 4.0.2
     generate-changelog: 1.8.0
     highlight.js: 11.9.0
