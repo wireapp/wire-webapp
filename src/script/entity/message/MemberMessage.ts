@@ -49,6 +49,8 @@ export class MemberMessage extends SystemMessage {
   public readonly userIds: ko.ObservableArray<QualifiedId>;
   public memberMessageType: SystemMessageType;
   public reason: MemberLeaveReason;
+  /** this can be used to check uniqueness of the message. It's computed using the timestamp + users involved in the event */
+  public readonly hash: ko.PureComputed<string>;
 
   constructor() {
     super();
@@ -67,6 +69,11 @@ export class MemberMessage extends SystemMessage {
     this.hasUsers = ko.pureComputed(() => !!this.userEntities().length);
     this.allTeamMembers = undefined;
     this.showServicesWarning = false;
+
+    this.hash = ko.pureComputed(() => {
+      const users = this.userIds().map(({id}) => id);
+      return `${this.timestamp}${users.join('')}`;
+    });
 
     // Users joined the conversation without sender
     this.joinedUserEntities = ko.pureComputed(() => {
