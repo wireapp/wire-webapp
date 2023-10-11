@@ -68,6 +68,10 @@ const baseProps = {
 };
 
 describe('MemberMessage', () => {
+  beforeEach(() => {
+    jest.resetAllMocks();
+  });
+
   it('shows connected message', async () => {
     const props = {
       ...baseProps,
@@ -106,7 +110,10 @@ describe('MemberMessage', () => {
       };
 
       const {getByText} = render(<MemberMessage {...props} />);
-      expect(getByText(`${nbUsers - config.REDUCED_USERS_COUNT} more`)).not.toBeNull();
+      const showMoreButton = getByText(`${nbUsers - config.REDUCED_USERS_COUNT} more`);
+      showMoreButton.click();
+
+      expect(props.onClickParticipants).toHaveBeenCalledTimes(1);
     });
 
     it('displays all team members', () => {
@@ -122,7 +129,10 @@ describe('MemberMessage', () => {
       };
 
       const {getByText} = render(<MemberMessage {...props} />);
-      expect(getByText(`all team members`)).not.toBeNull();
+      const showMoreButton = getByText(`all team members`);
+      showMoreButton.click();
+
+      expect(props.onClickParticipants).toHaveBeenCalledTimes(1);
     });
 
     it('displays all team members and one guest message', () => {
