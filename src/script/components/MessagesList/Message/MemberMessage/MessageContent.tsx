@@ -65,7 +65,7 @@ function getContent(message: MemberMessageEntity) {
   }
 
   /** the users that are impacted by the member event */
-  const targetedUsers = message.userEntities().filter(userEntity => !matchQualifiedIds(message.user(), userEntity));
+  const targetedUsers = message.targetedUsers();
   /** the user that triggered the action */
   const actor = message.user();
 
@@ -191,7 +191,13 @@ function getContent(message: MemberMessageEntity) {
   return '';
 }
 
-export function MessageContent({message, onClickAction}: {message: MemberMessageEntity; onClickAction: () => void}) {
+export function MessageContent({
+  message,
+  onClickParticipants,
+}: {
+  message: MemberMessageEntity;
+  onClickParticipants: (participants: User[]) => void;
+}) {
   const htmlCaption = getContent(message);
   const content = replaceReactComponents(htmlCaption, [
     {start: '<strong>', end: '</strong>', render: text => <strong key={text}>{text}</strong>},
@@ -199,7 +205,7 @@ export function MessageContent({message, onClickAction}: {message: MemberMessage
       start: '[showmore]',
       end: '[/showmore]',
       render: text => (
-        <ShowMoreButton key={text} onClick={onClickAction}>
+        <ShowMoreButton key={text} onClick={() => onClickParticipants(message.targetedUsers())}>
           {text}
         </ShowMoreButton>
       ),

@@ -36,17 +36,17 @@ import {User} from '../User';
 export class MemberMessage extends SystemMessage {
   public allTeamMembers: User[];
   public readonly hasUsers: ko.PureComputed<boolean>;
-  private readonly joinedUserEntities: ko.PureComputed<User[]>;
+  public readonly userIds: ko.ObservableArray<QualifiedId>;
+  public readonly userEntities: ko.ObservableArray<User>;
+  /** Users that are affected by the event */
+  public readonly targetedUsers: ko.PureComputed<User[]>;
   public readonly name: ko.Observable<string>;
   public readonly otherUser: ko.PureComputed<User>;
   public readonly senderName: ko.PureComputed<string>;
   public readonly showNamedCreation: ko.PureComputed<boolean>;
-  public readonly highlightedUsers: ko.PureComputed<User[]>;
   public readonly htmlGroupCreationHeader: ko.PureComputed<string>;
   public readonly remoteUserEntities: ko.PureComputed<User[]>;
   public showServicesWarning: boolean;
-  public readonly userEntities: ko.ObservableArray<User>;
-  public readonly userIds: ko.ObservableArray<QualifiedId>;
   public memberMessageType: SystemMessageType;
   public reason: MemberLeaveReason;
   /** this can be used to check uniqueness of the message. It's computed using the timestamp + users involved in the event */
@@ -62,21 +62,16 @@ export class MemberMessage extends SystemMessage {
     this.userIds = ko.observableArray();
     this.name = ko.observable('');
 
-    this.highlightedUsers = ko.pureComputed(() => {
-      return this.type === CONVERSATION_EVENT.MEMBER_JOIN ? this.joinedUserEntities() : [];
-    });
-
     this.hasUsers = ko.pureComputed(() => !!this.userEntities().length);
     this.allTeamMembers = undefined;
     this.showServicesWarning = false;
 
     this.hash = ko.pureComputed(() => {
       const users = this.userIds().map(({id}) => id);
-      return `${this.timestamp}${users.join('')}`;
+      return `${this.timestamp()}${users.join('')}`;
     });
 
-    // Users joined the conversation without sender
-    this.joinedUserEntities = ko.pureComputed(() => {
+    this.targetedUsers = ko.pureComputed(() => {
       return this.userEntities().filter(userEntity => !matchQualifiedIds(this.user(), userEntity));
     });
 
@@ -161,9 +156,5 @@ export class MemberMessage extends SystemMessage {
 
   isUserAffected(userId: QualifiedId): boolean {
     return !!this.userIds().find(user => matchQualifiedIds(user, userId));
-  }
-
-  guestCount(): number {
-    return this.joinedUserEntities().filter(user => user.isGuest()).length;
   }
 }
