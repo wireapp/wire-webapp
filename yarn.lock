@@ -5123,9 +5123,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^26.2.5":
-  version: 26.2.5
-  resolution: "@wireapp/api-client@npm:26.2.5"
+"@wireapp/api-client@npm:^26.3.1":
+  version: 26.3.1
+  resolution: "@wireapp/api-client@npm:26.3.1"
   dependencies:
     "@wireapp/commons": ^5.2.1
     "@wireapp/priority-queue": ^2.1.4
@@ -5139,7 +5139,8 @@ __metadata:
     spark-md5: 3.0.2
     tough-cookie: 4.1.3
     ws: 8.14.2
-  checksum: 96af387e09532eb4098cf819c3ff26a70b4036bedee17f60ecb70ac1efcdc0799d9338a9a58cae5828496f41be83ec5936cd53fcd68af3b2be31b66a0646deae
+    zod: 3.22.4
+  checksum: 33783d4b7e48cb66121be0ef8c5ace81fdc4f698af1c47ed5b91c27896a30724fecefc34ce66b27620ecb2e54a556782904b9d42a1f64c9592cf594f8c3f100e
   languageName: node
   linkType: hard
 
@@ -5192,11 +5193,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:42.10.1":
-  version: 42.10.1
-  resolution: "@wireapp/core@npm:42.10.1"
+"@wireapp/core@npm:42.12.1":
+  version: 42.12.1
+  resolution: "@wireapp/core@npm:42.12.1"
   dependencies:
-    "@wireapp/api-client": ^26.2.5
+    "@wireapp/api-client": ^26.3.1
     "@wireapp/commons": ^5.2.1
     "@wireapp/core-crypto": 1.0.0-rc.13
     "@wireapp/cryptobox": 12.8.0
@@ -5213,7 +5214,8 @@ __metadata:
     logdown: 3.3.1
     long: ^5.2.0
     uuidjs: 4.2.13
-  checksum: cf6378e497f2ff81673fe550a2ff7cb4f704af2d4cf681d91737d7324588ee92b298ffdc786df0a3fe90d97a9ce226839b92df65cad7cc3347678fe06cf928fb
+    zod: 3.22.4
+  checksum: 2c5933f28c72752cb0eaa1554d14c23a4f0204d5bd207bdf770c4dcdc245800316835e236480d0704ae334a5c9f01706446b95e9c70a6d9cfe5e739220bea0ee
   languageName: node
   linkType: hard
 
@@ -18261,7 +18263,7 @@ __metadata:
     "@wireapp/avs": 9.4.14
     "@wireapp/commons": 5.2.1
     "@wireapp/copy-config": 2.1.9
-    "@wireapp/core": 42.10.1
+    "@wireapp/core": 42.12.1
     "@wireapp/eslint-config": 3.0.4
     "@wireapp/lru-cache": 3.8.1
     "@wireapp/prettier-config": 0.6.3
@@ -18875,6 +18877,13 @@ __metadata:
     compress-commons: ^5.0.1
     readable-stream: ^3.6.0
   checksum: 116cee5a2c1ecce7aa440b665470653f58ef56670c6aafa1b5491c9f9335992352145502af5fa865ac82f46336905e37fb7cbc649c2be72e2152c6b91802995c
+  languageName: node
+  linkType: hard
+
+"zod@npm:3.22.4":
+  version: 3.22.4
+  resolution: "zod@npm:3.22.4"
+  checksum: 80bfd7f8039b24fddeb0718a2ec7c02aa9856e4838d6aa4864335a047b6b37a3273b191ef335bf0b2002e5c514ef261ffcda5a589fb084a48c336ffc4cdbab7f
   languageName: node
   linkType: hard
 
