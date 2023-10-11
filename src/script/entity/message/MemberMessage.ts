@@ -134,21 +134,6 @@ export class MemberMessage extends SystemMessage {
       const name = this.senderName();
 
       switch (this.memberMessageType) {
-        case SystemMessageType.CONNECTION_ACCEPTED:
-        case SystemMessageType.CONNECTION_REQUEST: {
-          if (this.otherUser()) {
-            if (this.otherUser().isBlocked()) {
-              return t('conversationConnectionBlocked');
-            }
-
-            if (this.otherUser().isOutgoingRequest()) {
-              return '';
-            }
-          }
-
-          return t('conversationConnectionAccepted');
-        }
-
         case SystemMessageType.CONVERSATION_CREATE: {
           if (this.name().length) {
             const exceedsMaxTeam = this.joinedUserEntities().length > MemberMessage.CONFIG.MAX_WHOLE_TEAM_USERS_VISIBLE;

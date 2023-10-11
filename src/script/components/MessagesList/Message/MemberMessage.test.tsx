@@ -18,63 +18,284 @@
  */
 
 import {render} from '@testing-library/react';
-import ko from 'knockout';
 
+import en from 'I18n/en-US.json';
 import {MemberMessage as MemberMessageEntity} from 'src/script/entity/message/MemberMessage';
 import {User} from 'src/script/entity/User';
+import {SystemMessageType} from 'src/script/message/SystemMessageType';
+import {generateUser} from 'test/helper/UserGenerator';
+import {setStrings} from 'Util/LocalizerUtil';
 
 import {MemberMessage} from './MemberMessage';
+import {config} from './MemberMessage/MessageContent';
 
-const createMemberMessage = (partialMemberMessage: Partial<MemberMessageEntity>) => {
-  const memberMessage: Partial<MemberMessageEntity> = {
-    hasUsers: ko.pureComputed(() => false),
-    isGroupCreation: () => false,
-    isMemberChange: () => false,
-    isMemberJoin: () => false,
-    isMemberLeave: () => false,
-    isMemberRemoval: () => false,
-    showLargeAvatar: () => false,
-    showNamedCreation: ko.pureComputed(() => true),
-    timestamp: ko.observable(Date.now()),
-    ...partialMemberMessage,
-  };
-  return memberMessage as MemberMessageEntity;
+setStrings({en});
+
+function createMemberMessage(type: SystemMessageType, users?: User[]) {
+  const message = new MemberMessageEntity();
+  message.memberMessageType = type;
+  message.user(new User());
+  if (users) {
+    message.userIds(users.map(user => user.qualifiedId));
+    message.userEntities(users);
+  }
+  message.name('message');
+
+  return message;
+}
+
+const baseProps = {
+  hasReadReceiptsTurnedOn: false,
+  isSelfTemporaryGuest: false,
+  onClickCancelRequest: jest.fn(),
+  onClickInvitePeople: jest.fn(),
+  onClickParticipants: jest.fn(),
+  shouldShowInvitePeople: false,
+  conversationName: 'group 1',
 };
 
 describe('MemberMessage', () => {
   it('shows connected message', async () => {
     const props = {
-      hasReadReceiptsTurnedOn: false,
-      isSelfTemporaryGuest: false,
-      message: createMemberMessage({
-        otherUser: ko.pureComputed(() => new User('id')),
-        showLargeAvatar: () => true,
-      }),
-      onClickCancelRequest: () => {},
-      onClickInvitePeople: () => {},
-      onClickParticipants: () => {},
-      shouldShowInvitePeople: false,
-      conversationName: 'group 1',
-    };
-
-    const {queryByTestId} = render(<MemberMessage {...props} />);
-    expect(queryByTestId('element-connected-message')).not.toBeNull();
-  });
-  it('shows conversation title', async () => {
-    const props = {
-      hasReadReceiptsTurnedOn: false,
-      isSelfTemporaryGuest: false,
-      message: createMemberMessage({
-        otherUser: ko.pureComputed(() => new User('id')),
-      }),
-      onClickCancelRequest: () => {},
-      onClickInvitePeople: () => {},
-      onClickParticipants: () => {},
-      shouldShowInvitePeople: false,
-      conversationName: 'group 1',
+      ...baseProps,
+      message: createMemberMessage(SystemMessageType.CONNECTION_ACCEPTED, [new User('id')]),
     };
 
     const {getByTestId} = render(<MemberMessage {...props} />);
-    expect(getByTestId('conversation-name').textContent).toBe(props.conversationName);
+    expect(getByTestId('element-connected-message')).not.toBeNull();
+  });
+
+  describe('CONVERSATION_CREATE', () => {
+    it('displays participants of a newly created conversation', () => {
+      const nbUsers = Math.floor(Math.random() * 10);
+      const users = Array.from({length: nbUsers}, () => generateUser());
+      const message = createMemberMessage(SystemMessageType.CONVERSATION_CREATE, users);
+      const props = {
+        ...baseProps,
+        message,
+      };
+
+      const {getByText} = render(<MemberMessage {...props} />);
+      users.forEach(user => {
+        expect(getByText(user.name())).not.toBeNull();
+      });
+    });
+
+    it('displays a showMore when there are more than 17 users', () => {
+      const nbExtraUsers = Math.floor(Math.random() * 10);
+      const nbUsers = config.MAX_USERS_VISIBLE + nbExtraUsers;
+
+      const users = Array.from({length: nbUsers}, () => generateUser());
+      const message = createMemberMessage(SystemMessageType.CONVERSATION_CREATE, users);
+      const props = {
+        ...baseProps,
+        message,
+      };
+
+      const {getByText} = render(<MemberMessage {...props} />);
+      expect(getByText(`${nbUsers - config.REDUCED_USERS_COUNT} more`)).not.toBeNull();
+    });
+
+    it('displays all team members', () => {
+      const nbExtraUsers = Math.floor(Math.random() * 10);
+      const nbTeamUsers = config.MAX_WHOLE_TEAM_USERS_VISIBLE + nbExtraUsers;
+
+      const teamUsers = Array.from({length: nbTeamUsers}, () => generateUser());
+      const message = createMemberMessage(SystemMessageType.CONVERSATION_CREATE, teamUsers);
+      message.allTeamMembers = teamUsers;
+      const props = {
+        ...baseProps,
+        message,
+      };
+
+      const {getByText} = render(<MemberMessage {...props} />);
+      expect(getByText(`all team members`)).not.toBeNull();
+    });
+
+    it('displays all team members and one guest message', () => {
+      const nbExtraUsers = Math.floor(Math.random() * 10);
+      const nbTeamUsers = config.MAX_WHOLE_TEAM_USERS_VISIBLE + nbExtraUsers;
+
+      const teamUsers = Array.from({length: nbTeamUsers}, () => generateUser());
+      const guest = generateUser();
+      guest.isGuest(true);
+      const message = createMemberMessage(SystemMessageType.CONVERSATION_CREATE, [...teamUsers, guest]);
+      message.allTeamMembers = teamUsers;
+      const props = {
+        ...baseProps,
+        message,
+      };
+
+      const {getByText} = render(<MemberMessage {...props} />);
+      expect(getByText(`all team members and one guest`)).not.toBeNull();
+    });
+
+    it('displays all team members and multiple guests message', () => {
+      const nbGuests = 2 + Math.floor(Math.random() * 10);
+      const nbTeamUsers = config.MAX_WHOLE_TEAM_USERS_VISIBLE;
+
+      const teamUsers = Array.from({length: nbTeamUsers}, () => generateUser());
+      const guests = Array.from({length: nbGuests}, () => {
+        const guest = generateUser();
+        guest.isGuest(true);
+        return guest;
+      });
+      const message = createMemberMessage(SystemMessageType.CONVERSATION_CREATE, [...teamUsers, ...guests]);
+      message.allTeamMembers = teamUsers;
+      const props = {
+        ...baseProps,
+        message,
+      };
+
+      const {getByText} = render(<MemberMessage {...props} />);
+      expect(getByText(`all team members and ${nbGuests} guests`)).not.toBeNull();
+    });
+
+    it('displays that another user created a conversation', () => {
+      const nbUsers = Math.floor(Math.random() * 10);
+      const users = Array.from({length: nbUsers}, () => generateUser());
+      const message = createMemberMessage(SystemMessageType.CONVERSATION_CREATE, users);
+      message.name('');
+      message.user().name('Creator');
+      const props = {
+        ...baseProps,
+        message,
+      };
+
+      const {container} = render(<MemberMessage {...props} />);
+      expect(container.textContent).toContain(`Creator started a conversation with`);
+    });
+
+    it('displays that self user created a conversation', () => {
+      const nbUsers = Math.floor(Math.random() * 10);
+      const users = Array.from({length: nbUsers}, () => generateUser());
+      const message = createMemberMessage(SystemMessageType.CONVERSATION_CREATE, users);
+      message.name('');
+      message.user().isMe = true;
+      const props = {
+        ...baseProps,
+        message,
+      };
+
+      const {container} = render(<MemberMessage {...props} />);
+      expect(container.textContent).toContain(`You started a conversation with`);
+    });
+  });
+
+  describe('MEMBER_JOIN', () => {
+    it('displays participants of a newly created conversation', () => {
+      const nbUsers = Math.floor(Math.random() * 10);
+      const users = Array.from({length: nbUsers}, () => generateUser());
+      const message = createMemberMessage(SystemMessageType.CONVERSATION_CREATE, users);
+      const props = {
+        ...baseProps,
+        message,
+      };
+
+      const {getByText} = render(<MemberMessage {...props} />);
+      users.forEach(user => {
+        expect(getByText(user.name())).not.toBeNull();
+      });
+    });
+
+    it('displays a showMore when there are more than 17 users', () => {
+      const nbExtraUsers = Math.floor(Math.random() * 10);
+      const nbUsers = config.MAX_USERS_VISIBLE + nbExtraUsers;
+
+      const users = Array.from({length: nbUsers}, () => generateUser());
+      const message = createMemberMessage(SystemMessageType.CONVERSATION_CREATE, users);
+      const props = {
+        ...baseProps,
+        message,
+      };
+
+      const {getByText} = render(<MemberMessage {...props} />);
+      expect(getByText(`${nbUsers - config.REDUCED_USERS_COUNT} more`)).not.toBeNull();
+    });
+
+    it('displays all team members', () => {
+      const nbExtraUsers = Math.floor(Math.random() * 10);
+      const nbTeamUsers = config.MAX_WHOLE_TEAM_USERS_VISIBLE + nbExtraUsers;
+
+      const teamUsers = Array.from({length: nbTeamUsers}, () => generateUser());
+      const message = createMemberMessage(SystemMessageType.CONVERSATION_CREATE, teamUsers);
+      message.allTeamMembers = teamUsers;
+      const props = {
+        ...baseProps,
+        message,
+      };
+
+      const {getByText} = render(<MemberMessage {...props} />);
+      expect(getByText(`all team members`)).not.toBeNull();
+    });
+
+    it('displays all team members and one guest message', () => {
+      const nbExtraUsers = Math.floor(Math.random() * 10);
+      const nbTeamUsers = config.MAX_WHOLE_TEAM_USERS_VISIBLE + nbExtraUsers;
+
+      const teamUsers = Array.from({length: nbTeamUsers}, () => generateUser());
+      const guest = generateUser();
+      guest.isGuest(true);
+      const message = createMemberMessage(SystemMessageType.CONVERSATION_CREATE, [...teamUsers, guest]);
+      message.allTeamMembers = teamUsers;
+      const props = {
+        ...baseProps,
+        message,
+      };
+
+      const {getByText} = render(<MemberMessage {...props} />);
+      expect(getByText(`all team members and one guest`)).not.toBeNull();
+    });
+
+    it('displays all team members and multiple guests message', () => {
+      const nbGuests = 2 + Math.floor(Math.random() * 10);
+      const nbTeamUsers = config.MAX_WHOLE_TEAM_USERS_VISIBLE;
+
+      const teamUsers = Array.from({length: nbTeamUsers}, () => generateUser());
+      const guests = Array.from({length: nbGuests}, () => {
+        const guest = generateUser();
+        guest.isGuest(true);
+        return guest;
+      });
+      const message = createMemberMessage(SystemMessageType.CONVERSATION_CREATE, [...teamUsers, ...guests]);
+      message.allTeamMembers = teamUsers;
+      const props = {
+        ...baseProps,
+        message,
+      };
+
+      const {getByText} = render(<MemberMessage {...props} />);
+      expect(getByText(`all team members and ${nbGuests} guests`)).not.toBeNull();
+    });
+
+    it('displays that another user created a conversation', () => {
+      const nbUsers = Math.floor(Math.random() * 10);
+      const users = Array.from({length: nbUsers}, () => generateUser());
+      const message = createMemberMessage(SystemMessageType.CONVERSATION_CREATE, users);
+      message.name('');
+      message.user().name('Creator');
+      const props = {
+        ...baseProps,
+        message,
+      };
+
+      const {container} = render(<MemberMessage {...props} />);
+      expect(container.textContent).toContain(`Creator started a conversation with`);
+    });
+
+    it('displays that self user created a conversation', () => {
+      const nbUsers = Math.floor(Math.random() * 10);
+      const users = Array.from({length: nbUsers}, () => generateUser());
+      const message = createMemberMessage(SystemMessageType.CONVERSATION_CREATE, users);
+      message.name('');
+      message.user().isMe = true;
+      const props = {
+        ...baseProps,
+        message,
+      };
+
+      const {container} = render(<MemberMessage {...props} />);
+      expect(container.textContent).toContain(`You started a conversation with`);
+    });
   });
 });
