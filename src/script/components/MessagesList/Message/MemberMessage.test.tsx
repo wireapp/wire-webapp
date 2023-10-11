@@ -283,5 +283,19 @@ describe('MemberMessage', () => {
       const {container} = render(<MemberMessage {...props} />);
       expect(container.textContent).toContain(`${message.user().name()} removed ${removedUser.name()}`);
     });
+
+    it('displays that many users were removed', () => {
+      const nbUsers = randomInt(1, 10);
+      const users = Array.from({length: nbUsers}, () => generateUser());
+      const message = createMemberMessage({type: CONVERSATION_EVENT.MEMBER_LEAVE}, users);
+      message.user().id = '';
+      const props = {
+        ...baseProps,
+        message,
+      };
+
+      const {container} = render(<MemberMessage {...props} />);
+      expect(container.textContent).toContain(`were removed`);
+    });
   });
 });
