@@ -17,4 +17,10 @@
  *
  */
 
-export * from './HistoryExport';
+import {MemberMessage as MemberMessageEntity} from 'src/script/entity/message/MemberMessage';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+
+export function MessageContent({message}: {message: MemberMessageEntity}) {
+  const {htmlCaption} = useKoSubscribableChildren(message, ['htmlCaption']);
+  return <p className="message-header-caption" dangerouslySetInnerHTML={{__html: htmlCaption}}></p>;
+}

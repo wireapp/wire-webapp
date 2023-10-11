@@ -248,6 +248,7 @@ const AppMain: FC<AppMainProps> = ({
                 actionsViewModel={mainView.actions}
                 isFederated={mainView.isFederated}
                 teamState={teamState}
+                selfUser={selfUser}
                 userState={userState}
               />
             )}

@@ -29,14 +29,14 @@ import {User} from 'src/script/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
-export interface ConnectedMessageProps {
+interface ConnectedMessageProps {
   classifiedDomains?: string[];
   onClickCancelRequest: () => void;
   showServicesWarning?: boolean;
   user: User;
 }
 
-const ConnectedMessage: React.FC<ConnectedMessageProps> = ({
+export const ConnectedMessage: React.FC<ConnectedMessageProps> = ({
   user,
   onClickCancelRequest,
   showServicesWarning = false,
@@ -105,5 +105,3 @@ const ConnectedMessage: React.FC<ConnectedMessageProps> = ({
     </div>
   );
 };
-
-export {ConnectedMessage};

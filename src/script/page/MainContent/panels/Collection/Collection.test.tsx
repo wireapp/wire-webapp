@@ -27,7 +27,6 @@ import {FileAsset} from 'src/script/entity/message/FileAsset';
 import {LinkPreview} from 'src/script/entity/message/LinkPreview';
 import {MediumImage} from 'src/script/entity/message/MediumImage';
 import {MessageCategory} from 'src/script/message/MessageCategory';
-import {UserState} from 'src/script/user/UserState';
 import {createUuid} from 'Util/uuid';
 
 import {Collection} from './Collection';
@@ -35,6 +34,7 @@ import {Collection} from './Collection';
 import {AssetRepository} from '../../../../assets/AssetRepository';
 import {MessageRepository} from '../../../../conversation/MessageRepository';
 import {Text} from '../../../../entity/message/Text';
+import {User} from '../../../../entity/User';
 
 jest.mock('./CollectionDetails', () => ({
   CollectionDetails: () => <div>CollectionDetails</div>,
@@ -89,7 +89,7 @@ describe('Collection', () => {
   };
   const mockAssetRepository = container.resolve(AssetRepository);
   const mockMessageRepository = {} as MessageRepository;
-  const mockUserState = new UserState();
+  const mockSelfUser = new User(createUuid());
 
   it('displays all image assets', async () => {
     const {getAllByText, getByText, queryByText} = render(
@@ -99,7 +99,7 @@ describe('Collection', () => {
           conversation={conversation}
           conversationRepository={mockConversationRepository as any}
           messageRepository={mockMessageRepository}
-          userState={mockUserState}
+          selfUser={mockSelfUser}
         />,
       ),
     );
@@ -125,7 +125,7 @@ describe('Collection', () => {
           messageRepository={mockMessageRepository}
           conversation={conversation}
           conversationRepository={mockConversationRepository as any}
-          userState={mockUserState}
+          selfUser={mockSelfUser}
         />,
       ),
     );
@@ -146,7 +146,7 @@ describe('Collection', () => {
           messageRepository={mockMessageRepository}
           conversation={conversation}
           conversationRepository={mockConversationRepository as any}
-          userState={mockUserState}
+          selfUser={mockSelfUser}
         />,
       ),
     );

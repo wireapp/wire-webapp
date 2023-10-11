@@ -30,9 +30,10 @@ import {
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
 import {
+  ConversationProtocolUpdateEvent,
+  ConversationMemberLeaveEvent,
   ConversationCreateEvent,
   ConversationMemberJoinEvent,
-  ConversationProtocolUpdateEvent,
   CONVERSATION_EVENT,
 } from '@wireapp/api-client/lib/event/';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
@@ -1666,7 +1667,7 @@ describe('ConversationRepository', () => {
     });
   });
 
-  describe('removeMember', () => {
+  describe('removeMembers', () => {
     it.each([ConversationProtocol.PROTEUS, ConversationProtocol.MIXED])(
       'should remove member from %s conversation',
       async protocol => {
@@ -1698,8 +1699,7 @@ describe('ConversationRepository', () => {
     it('should remove member from mls conversation', async () => {
       const conversationRepository = await testFactory.exposeConversationActors();
 
-      const mockGroupId = 'mockGroupId';
-      const conversation = _generateConversation({protocol: ConversationProtocol.MLS, groupId: mockGroupId});
+      const conversation = _generateConversation({protocol: ConversationProtocol.MLS});
 
       const selfUser = generateUser();
       conversation.selfUser(selfUser);
@@ -1714,51 +1714,39 @@ describe('ConversationRepository', () => {
       jest
         .spyOn(coreConversationService, 'removeUsersFromMLSConversation')
         .mockResolvedValueOnce({events: [], conversation: {} as BackendConversation});
+      jest.spyOn(conversationRepository['eventRepository'], 'injectEvent').mockImplementation(jest.fn());
+
+      const mockedMemberLeaveEvent: ConversationMemberLeaveEvent = {
+        conversation: conversation.id,
+        data: {qualified_user_ids: [], user_ids: []},
+        from: '',
+        time: '',
+        type: CONVERSATION_EVENT.MEMBER_LEAVE,
+      };
+      jest
+        .spyOn(coreConversationService, 'removeUsersFromMLSConversation')
+        .mockResolvedValueOnce({events: [mockedMemberLeaveEvent], conversation: {} as BackendConversation});
       await conversationRepository.removeMembers(conversation, [user1.qualifiedId]);
 
       expect(coreConversationService.removeUsersFromMLSConversation).toHaveBeenCalledWith({
         conversationId: conversation.qualifiedId,
         qualifiedUserIds: [user1.qualifiedId],
-        groupId: mockGroupId,
+        groupId: conversation.groupId,
       });
     });
+  });
 
-    describe('leaveConversation', () => {
-      afterEach(() => {
-        jest.clearAllMocks();
-      });
+  describe('leaveConversation', () => {
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
 
-      it.each([ConversationProtocol.PROTEUS, ConversationProtocol.MIXED])(
-        'should leave %s conversation',
-        async protocol => {
-          const conversationRepository = await testFactory.exposeConversationActors();
-
-          const conversation = _generateConversation({protocol});
-
-          const selfUser = generateUser();
-          conversation.selfUser(selfUser);
-
-          spyOn(conversationRepository['userState'], 'self').and.returnValue(selfUser);
-
-          conversation.participating_user_ets([generateUser(), generateUser()]);
-
-          const coreConversationService = container.resolve(Core).service!.conversation;
-
-          jest.spyOn(conversationRepository['eventRepository'], 'injectEvent').mockImplementation(jest.fn());
-
-          await conversationRepository.removeMembers(conversation, [selfUser.qualifiedId]);
-
-          expect(coreConversationService.removeUserFromConversation).toHaveBeenCalledWith(
-            conversation.qualifiedId,
-            selfUser.qualifiedId,
-          );
-        },
-      );
-
-      it('should leave mls conversation', async () => {
+    it.each([ConversationProtocol.PROTEUS, ConversationProtocol.MIXED, ConversationProtocol.MLS])(
+      'should leave %s conversation',
+      async protocol => {
         const conversationRepository = await testFactory.exposeConversationActors();
 
-        const conversation = _generateConversation({protocol: ConversationProtocol.MLS});
+        const conversation = _generateConversation({protocol});
 
         const selfUser = generateUser();
         conversation.selfUser(selfUser);
@@ -1770,18 +1758,15 @@ describe('ConversationRepository', () => {
         const coreConversationService = container.resolve(Core).service!.conversation;
 
         jest.spyOn(conversationRepository['eventRepository'], 'injectEvent').mockImplementation(jest.fn());
-        jest
-          .spyOn(coreConversationService, 'removeUsersFromMLSConversation')
-          .mockResolvedValueOnce({events: []} as any);
 
-        await conversationRepository.removeMembers(conversation, [selfUser.qualifiedId]);
+        await conversationRepository.leaveConversation(conversation);
 
-        expect(coreConversationService.removeUsersFromMLSConversation).toHaveBeenCalledWith({
-          groupId: conversation.groupId,
-          conversationId: conversation.qualifiedId,
-          qualifiedUserIds: [selfUser.qualifiedId],
-        });
-      });
-    });
+        expect(coreConversationService.removeUserFromConversation).toHaveBeenCalledWith(
+          conversation.qualifiedId,
+          selfUser.qualifiedId,
+        );
+        expect(conversationRepository['eventRepository'].injectEvent).toHaveBeenCalled();
+      },
+    );
   });
 });

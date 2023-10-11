@@ -1789,9 +1789,13 @@ export class ConversationRepository {
    */
   public async leaveConversation(conversation: Conversation, {localOnly = false} = {}) {
     const userQualifiedId = this.userState.self().qualifiedId;
-    return localOnly
-      ? this.removeMembersLocally(conversation, [userQualifiedId])
-      : this.removeMembers(conversation, [userQualifiedId]);
+
+    if (localOnly) {
+      return this.removeMembersLocally(conversation, [userQualifiedId]);
+    }
+
+    const events = await this.removeMembersFromConversation(conversation, [userQualifiedId]);
+    await this.eventRepository.injectEvents(events, EventRepository.SOURCE.BACKEND_RESPONSE);
   }
 
   /**
