@@ -247,4 +247,41 @@ describe('MemberMessage', () => {
       expect(container.textContent).toContain(`${message.user().name()} joined`);
     });
   });
+
+  describe('MEMBER_LEAVE', () => {
+    it('displays that self user left the conversation', () => {
+      const message = createMemberMessage({type: CONVERSATION_EVENT.MEMBER_LEAVE});
+      message.user().isMe = true;
+      const props = {
+        ...baseProps,
+        message,
+      };
+
+      const {container} = render(<MemberMessage {...props} />);
+      expect(container.textContent).toContain(`You left`);
+    });
+
+    it('displays that a member left the conversation', () => {
+      const message = createMemberMessage({type: CONVERSATION_EVENT.MEMBER_LEAVE});
+      const props = {
+        ...baseProps,
+        message,
+      };
+
+      const {container} = render(<MemberMessage {...props} />);
+      expect(container.textContent).toContain(`${message.user().name()} left`);
+    });
+
+    it('displays that a member was removed by someone', () => {
+      const removedUser = generateUser();
+      const message = createMemberMessage({type: CONVERSATION_EVENT.MEMBER_LEAVE}, [removedUser]);
+      const props = {
+        ...baseProps,
+        message,
+      };
+
+      const {container} = render(<MemberMessage {...props} />);
+      expect(container.textContent).toContain(`${message.user().name()} removed ${removedUser.name()}`);
+    });
+  });
 });
