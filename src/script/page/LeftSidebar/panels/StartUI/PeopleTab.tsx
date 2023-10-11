@@ -359,6 +359,7 @@ export const PeopleTab = ({
                 conversationRepository={conversationRepository}
                 mode={UserlistMode.COMPACT}
                 users={results.contacts}
+                selfUser={selfUser}
               />
             </div>
           </div>
@@ -386,6 +387,7 @@ export const PeopleTab = ({
                 onClick={onClickUser}
                 mode={UserlistMode.OTHERS}
                 conversationRepository={conversationRepository}
+                selfUser={selfUser}
               />
             </div>
           </div>

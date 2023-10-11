@@ -175,6 +175,7 @@ const UserSearchableList: React.FC<UserListProps> = ({
           selectedUsers={selectedUsers}
           highlightedUsers={highlightedUsers}
           onSelectUser={toggleUserSelection}
+          selfUser={selfUser}
         />
       )}
     </div>
