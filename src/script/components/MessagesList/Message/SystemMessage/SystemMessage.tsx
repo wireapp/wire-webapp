@@ -30,6 +30,8 @@ import {SystemMessage as SystemMessageEntity} from 'src/script/entity/message/Sy
 
 import {SystemMessageBase} from './SystemMessageBase';
 
+import {ProtocolUpdateMessage as ProtocolUpdateMessageComponent} from '../ProtocolUpdateMessage';
+
 export interface SystemMessageProps {
   message: SystemMessageEntity;
 }
@@ -61,7 +63,7 @@ export const SystemMessage: React.FC<SystemMessageProps> = ({message}) => {
   }
 
   if (message instanceof ProtocolUpdateMessage) {
-    return <SystemMessageBase message={message} icon={<Icon.Info />} />;
+    return <ProtocolUpdateMessageComponent message={message} />;
   }
 
   if (message instanceof JoinedAfterMLSMigrationFinalisationMessage) {

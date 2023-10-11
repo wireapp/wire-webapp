@@ -17,15 +17,4 @@
  *
  */
 
-import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
-
-import {SystemMessageType} from 'src/script/message/SystemMessageType';
-
-import {SystemMessage} from './SystemMessage';
-
-export class ProtocolUpdateMessage extends SystemMessage {
-  constructor(public protocol: ConversationProtocol.MIXED | ConversationProtocol.MLS) {
-    super();
-    this.system_message_type = SystemMessageType.CONVERSATION_PROTOCOL_UPDATE;
-  }
-}
+export * from './ProtocolUpdateMessage';
