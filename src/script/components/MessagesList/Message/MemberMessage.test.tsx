@@ -18,6 +18,7 @@
  */
 
 import {render} from '@testing-library/react';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
 
 import {randomInt} from 'crypto';
 
@@ -34,13 +35,22 @@ setStrings({en});
 
 const config = MemberMessageEntity.CONFIG;
 
-function createMemberMessage(type: SystemMessageType, users?: User[]) {
+function createMemberMessage({systemType, type}: {systemType?: SystemMessageType; type?: string}, users?: User[]) {
   const message = new MemberMessageEntity();
-  message.memberMessageType = type;
-  message.user(new User());
+  if (systemType) {
+    message.memberMessageType = systemType;
+  }
+  if (type) {
+    message.type = type;
+  }
+  const actor = generateUser();
+  message.user(actor);
   if (users) {
     message.userIds(users.map(user => user.qualifiedId));
     message.userEntities(users);
+  } else {
+    message.userIds([actor.qualifiedId]);
+    message.userEntities([actor]);
   }
   message.name('message');
 
@@ -61,7 +71,7 @@ describe('MemberMessage', () => {
   it('shows connected message', async () => {
     const props = {
       ...baseProps,
-      message: createMemberMessage(SystemMessageType.CONNECTION_ACCEPTED, [new User('id')]),
+      message: createMemberMessage({systemType: SystemMessageType.CONNECTION_ACCEPTED}, [new User('id')]),
     };
 
     const {getByTestId} = render(<MemberMessage {...props} />);
@@ -72,7 +82,7 @@ describe('MemberMessage', () => {
     it('displays participants of a newly created conversation', () => {
       const nbUsers = randomInt(1, 10);
       const users = Array.from({length: nbUsers}, () => generateUser());
-      const message = createMemberMessage(SystemMessageType.CONVERSATION_CREATE, users);
+      const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, users);
       const props = {
         ...baseProps,
         message,
@@ -89,7 +99,7 @@ describe('MemberMessage', () => {
       const nbUsers = config.MAX_USERS_VISIBLE + nbExtraUsers;
 
       const users = Array.from({length: nbUsers}, () => generateUser());
-      const message = createMemberMessage(SystemMessageType.CONVERSATION_CREATE, users);
+      const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, users);
       const props = {
         ...baseProps,
         message,
@@ -104,7 +114,7 @@ describe('MemberMessage', () => {
       const nbTeamUsers = config.MAX_WHOLE_TEAM_USERS_VISIBLE + nbExtraUsers;
 
       const teamUsers = Array.from({length: nbTeamUsers}, () => generateUser());
-      const message = createMemberMessage(SystemMessageType.CONVERSATION_CREATE, teamUsers);
+      const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, teamUsers);
       message.allTeamMembers = teamUsers;
       const props = {
         ...baseProps,
@@ -122,7 +132,7 @@ describe('MemberMessage', () => {
       const teamUsers = Array.from({length: nbTeamUsers}, () => generateUser());
       const guest = generateUser();
       guest.isGuest(true);
-      const message = createMemberMessage(SystemMessageType.CONVERSATION_CREATE, [...teamUsers, guest]);
+      const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, [...teamUsers, guest]);
       message.allTeamMembers = teamUsers;
       const props = {
         ...baseProps,
@@ -143,7 +153,10 @@ describe('MemberMessage', () => {
         guest.isGuest(true);
         return guest;
       });
-      const message = createMemberMessage(SystemMessageType.CONVERSATION_CREATE, [...teamUsers, ...guests]);
+      const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, [
+        ...teamUsers,
+        ...guests,
+      ]);
       message.allTeamMembers = teamUsers;
       const props = {
         ...baseProps,
@@ -157,7 +170,7 @@ describe('MemberMessage', () => {
     it('displays that another user created a conversation', () => {
       const nbUsers = randomInt(1, 10);
       const users = Array.from({length: nbUsers}, () => generateUser());
-      const message = createMemberMessage(SystemMessageType.CONVERSATION_CREATE, users);
+      const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, users);
       message.name('');
       message.user().name('Creator');
       const props = {
@@ -172,7 +185,7 @@ describe('MemberMessage', () => {
     it('displays that self user created a conversation', () => {
       const nbUsers = randomInt(1, 10);
       const users = Array.from({length: nbUsers}, () => generateUser());
-      const message = createMemberMessage(SystemMessageType.CONVERSATION_CREATE, users);
+      const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, users);
       message.name('');
       message.user().isMe = true;
       const props = {
@@ -185,5 +198,43 @@ describe('MemberMessage', () => {
     });
   });
 
-  describe('MEMBER_JOIN', () => {});
+  describe('MEMBER_JOIN', () => {
+    it('displays that self user added new members', () => {
+      const nbUsers = randomInt(1, 10);
+      const users = Array.from({length: nbUsers}, () => generateUser());
+      const message = createMemberMessage({type: CONVERSATION_EVENT.MEMBER_JOIN}, users);
+      message.user().isMe = true;
+      const props = {
+        ...baseProps,
+        message,
+      };
+
+      const {container} = render(<MemberMessage {...props} />);
+      expect(container.textContent).toContain(`You added `);
+    });
+
+    it('displays that a new members were added by someone', () => {
+      const nbUsers = randomInt(1, 10);
+      const users = Array.from({length: nbUsers}, () => generateUser());
+      const message = createMemberMessage({type: CONVERSATION_EVENT.MEMBER_JOIN}, users);
+      const props = {
+        ...baseProps,
+        message,
+      };
+
+      const {container} = render(<MemberMessage {...props} />);
+      expect(container.textContent).toContain(`${message.user().name()} added `);
+    });
+
+    it('displays that a new members joined the conversation', () => {
+      const message = createMemberMessage({type: CONVERSATION_EVENT.MEMBER_JOIN});
+      const props = {
+        ...baseProps,
+        message,
+      };
+
+      const {container} = render(<MemberMessage {...props} />);
+      expect(container.textContent).toContain(`${message.user().name()} joined`);
+    });
+  });
 });
