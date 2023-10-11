@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, useContext, useEffect, useState} from 'react';
+import {useContext, useEffect, useState} from 'react';
 
 import {container} from 'tsyringe';
 
@@ -52,7 +52,7 @@ interface HistoryExportProps {
   readonly clientState?: ClientState;
 }
 
-const HistoryExport: FC<HistoryExportProps> = ({switchContent, user, clientState = container.resolve(ClientState)}) => {
+const HistoryExport = ({switchContent, user, clientState = container.resolve(ClientState)}: HistoryExportProps) => {
   const logger = getLogger('HistoryExport');
 
   const [historyState, setHistoryState] = useState<ExportState>(ExportState.PREPARING);

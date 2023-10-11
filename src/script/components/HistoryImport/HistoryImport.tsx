@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
@@ -57,7 +57,7 @@ interface HistoryImportProps {
   user: User;
 }
 
-const HistoryImport: FC<HistoryImportProps> = ({user, backupRepository, file, switchContent}) => {
+const HistoryImport = ({user, backupRepository, file, switchContent}: HistoryImportProps) => {
   const logger = getLogger('HistoryImportViewModel');
 
   const [historyImportState, setHistoryImportState] = useState(HistoryImportState.PREPARING);

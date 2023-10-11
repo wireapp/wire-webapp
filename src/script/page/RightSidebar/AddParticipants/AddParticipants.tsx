@@ -68,6 +68,7 @@ interface AddParticipantsProps {
   teamRepository: TeamRepository;
   teamState: TeamState;
   userState: UserState;
+  selfUser: User;
 }
 const AddParticipants: FC<AddParticipantsProps> = ({
   activeConversation,
@@ -80,6 +81,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
   teamRepository,
   teamState,
   userState,
+  selfUser,
 }) => {
   const {
     firstUserEntity,
@@ -99,7 +101,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
     'participating_user_ids',
   ]);
   const {isTeam, teamMembers, teamUsers} = useKoSubscribableChildren(teamState, ['isTeam', 'teamMembers', 'teamUsers']);
-  const {connectedUsers, self: selfUser} = useKoSubscribableChildren(userState, ['connectedUsers', 'self']);
+  const {connectedUsers} = useKoSubscribableChildren(userState, ['connectedUsers']);
   const {teamRole} = useKoSubscribableChildren(selfUser, ['teamRole']);
   const {services} = useKoSubscribableChildren(integrationRepository, ['services']);
 
