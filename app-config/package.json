@@ -1,6 +1,6 @@
 {
   "dependencies": {
     "wire-web-config-default-master": "https://github.com/wireapp/wire-web-config-wire#v0.31.17-0",
-    "wire-web-config-default-staging": "https://github.com/wireapp/wire-web-config-default#v0.31.16"
+    "wire-web-config-default-staging": "https://github.com/wireapp/wire-web-config-default#v0.31.18"
   }
 }
