@@ -20,11 +20,12 @@
 import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data/';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 
+import {Config} from 'src/script/Config';
 import {MemberMessage as MemberMessageEntity} from 'src/script/entity/message/MemberMessage';
 import {User} from 'src/script/entity/User';
 import {ClientEvent} from 'src/script/event/Client';
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
-import {Declension, joinNames, t} from 'Util/LocalizerUtil';
+import {Declension, joinNames, replaceLink, t} from 'Util/LocalizerUtil';
 import {replaceReactComponents} from 'Util/LocalizerUtil/ReactLocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
@@ -34,8 +35,13 @@ export const CONFIG = {
   REDUCED_USERS_COUNT: 15,
 } as const;
 
-function generateNames(users: User[], declension = Declension.ACCUSATIVE, skipAnd = false) {
-  return joinNames(users, declension, skipAnd, true);
+function generateNames(users: User[], declension = Declension.ACCUSATIVE, hasExtra = false) {
+  const visibleUsers = hasExtra ? getVisibleUsers(users) : users;
+  return joinNames(visibleUsers, declension, hasExtra, true);
+}
+
+function getVisibleUsers(users: User[]) {
+  return users.slice(0, CONFIG.REDUCED_USERS_COUNT - 1);
 }
 
 function ShowMoreButton({children, onClick}: {children: React.ReactNode; onClick: () => void}) {
@@ -65,7 +71,9 @@ function getContent(message: MemberMessageEntity) {
 
   const exceedsMaxVisibleUsers = targetedUsers.length > CONFIG.MAX_USERS_VISIBLE;
 
-  const count = message.hiddenUserCount();
+  /** the number of users that will not be displayed on screen */
+  const hiddenUsersCount = exceedsMaxVisibleUsers ? targetedUsers.length - CONFIG.REDUCED_USERS_COUNT : 0;
+
   const dativeUsers = generateNames(targetedUsers, Declension.DATIVE, exceedsMaxVisibleUsers);
   const accusativeUsers = generateNames(targetedUsers, Declension.ACCUSATIVE, exceedsMaxVisibleUsers);
   const name = message.senderName();
@@ -85,18 +93,18 @@ function getContent(message: MemberMessageEntity) {
         }
 
         return exceedsMaxVisibleUsers
-          ? t('conversationCreateWithMore', {count: count.toString(), users: dativeUsers})
+          ? t('conversationCreateWithMore', {count: hiddenUsersCount.toString(), users: dativeUsers})
           : t('conversationCreateWith', dativeUsers);
       }
 
       if (actor.isMe) {
         return exceedsMaxVisibleUsers
-          ? t('conversationCreatedYouMore', {count: count.toString(), users: dativeUsers})
+          ? t('conversationCreatedYouMore', {count: hiddenUsersCount.toString(), users: dativeUsers})
           : t('conversationCreatedYou', dativeUsers);
       }
 
       return exceedsMaxVisibleUsers
-        ? t('conversationCreatedMore', {count: count.toString(), name, users: dativeUsers})
+        ? t('conversationCreatedMore', {count: hiddenUsersCount.toString(), name, users: dativeUsers})
         : t('conversationCreated', {name, users: dativeUsers});
     }
 
@@ -119,17 +127,40 @@ function getContent(message: MemberMessageEntity) {
 
       if (message.user().isMe) {
         return exceedsMaxVisibleUsers
-          ? t('conversationMemberJoinedYouMore', {count: count.toString(), users: accusativeUsers})
+          ? t('conversationMemberJoinedYouMore', {count: hiddenUsersCount.toString(), users: accusativeUsers})
           : t('conversationMemberJoinedYou', accusativeUsers);
       }
       return exceedsMaxVisibleUsers
-        ? t('conversationMemberJoinedMore', {count: count.toString(), name, users: accusativeUsers})
+        ? t('conversationMemberJoinedMore', {count: hiddenUsersCount.toString(), name, users: accusativeUsers})
         : t('conversationMemberJoined', {name, users: accusativeUsers});
     }
 
     case CONVERSATION_EVENT.MEMBER_LEAVE: {
       if (message.reason === MemberLeaveReason.LEGAL_HOLD_POLICY_CONFLICT) {
-        return message.generateLegalHoldLeaveMessage();
+        const replaceLinkLegalHold = replaceLink(
+          Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK,
+          '',
+          'read-more-legal-hold',
+        );
+        if (message.userEntities().some(user => user.isMe)) {
+          return t('conversationYouRemovedMissingLegalHoldConsent', {}, replaceLinkLegalHold);
+        }
+        const users = generateNames(targetedUsers);
+
+        if (message.userEntities().length === 1) {
+          return t('conversationMemberRemovedMissingLegalHoldConsent', users, replaceLinkLegalHold);
+        }
+        if (exceedsMaxVisibleUsers) {
+          return t(
+            'conversationMultipleMembersRemovedMissingLegalHoldConsentMore',
+            {
+              count: hiddenUsersCount.toString(10),
+              users,
+            },
+            replaceLinkLegalHold,
+          );
+        }
+        return t('conversationMultipleMembersRemovedMissingLegalHoldConsent', users, replaceLinkLegalHold);
       }
       const temporaryGuestRemoval = message.otherUser().isMe && message.otherUser().isTemporaryGuest();
       if (temporaryGuestRemoval) {
