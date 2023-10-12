@@ -1871,7 +1871,7 @@ export class ConversationRepository {
 
   private readonly onSelfUserSupportedProtocolsUpdated = async () => {
     const one2oneConversations = this.conversationState.conversations().filter(conversation => conversation.is1to1());
-    await Promise.allSettled(one2oneConversations.map(this.init1to1Conversation));
+    await Promise.allSettled(one2oneConversations.map(conversation => this.init1to1Conversation(conversation)));
   };
 
   /**
@@ -1892,7 +1892,7 @@ export class ConversationRepository {
 
   private readonly initTeam1To1Conversations = async (conversations: Conversation[]) => {
     const team1To1Conversations = conversations.filter(conversation => conversation.isTeam1to1());
-    await Promise.allSettled(team1To1Conversations.map(this.init1to1Conversation));
+    await Promise.allSettled(team1To1Conversations.map(conversation => this.init1to1Conversation(conversation)));
   };
 
   /**
