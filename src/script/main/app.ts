@@ -267,17 +267,6 @@ export class App {
 
     repositories.eventTracker = new EventTrackingRepository(repositories.message);
 
-    const serviceMiddleware = new ServiceMiddleware(repositories.conversation, repositories.user);
-    const quotedMessageMiddleware = new QuotedMessageMiddleware(this.service.event);
-
-    const readReceiptMiddleware = new ReceiptsMiddleware(this.service.event, repositories.conversation);
-
-    repositories.event.setEventProcessMiddlewares([
-      serviceMiddleware.processEvent.bind(serviceMiddleware),
-      quotedMessageMiddleware.processEvent.bind(quotedMessageMiddleware),
-      readReceiptMiddleware.processEvent.bind(readReceiptMiddleware),
-    ]);
-
     repositories.backup = new BackupRepository(new BackupService(), repositories.conversation);
 
     repositories.integration = new IntegrationRepository(
@@ -388,6 +377,12 @@ export class App {
       const selfUser = await this.initiateSelfUser();
       await initializeDataDog(this.config, selfUser.qualifiedId);
 
+      // Setup all event middleware
+      const serviceMiddleware = new ServiceMiddleware(conversationRepository, userRepository, selfUser);
+      const quotedMessageMiddleware = new QuotedMessageMiddleware(this.service.event);
+      const readReceiptMiddleware = new ReceiptsMiddleware(this.service.event, conversationRepository);
+
+      eventRepository.setEventProcessMiddlewares([serviceMiddleware, quotedMessageMiddleware, readReceiptMiddleware]);
       // Setup all the event processors
       const federationEventProcessor = new FederationEventProcessor(eventRepository, serverTimeHandler, selfUser);
       eventRepository.setEventProcessors([federationEventProcessor]);

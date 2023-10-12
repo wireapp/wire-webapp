@@ -28,3 +28,7 @@ export type IncomingEvent = BackendEvent | ClientConversationEvent;
 export interface EventProcessor {
   processEvent(event: IncomingEvent, source: EventSource): Promise<void>;
 }
+
+export interface EventMiddleware {
+  processEvent(event: IncomingEvent): Promise<IncomingEvent>;
+}

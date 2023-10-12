@@ -69,7 +69,7 @@ export class EventRepository {
   notificationsHandled: number;
   notificationsTotal: number;
   lastEventDate: ko.Observable<string | undefined>;
-  eventProcessMiddlewares: Function[] = [];
+  eventProcessMiddlewares: EventMiddleware[] = [];
   /** event processors are classes that are able to react and process an incoming event */
   eventProcessors: EventProcessor[] = [];
 
@@ -128,7 +128,7 @@ export class EventRepository {
    *
    * @param middlewares middlewares to run when a new event is about to be processed
    */
-  setEventProcessMiddlewares(middlewares: Function[]) {
+  setEventProcessMiddlewares(middlewares: EventMiddleware[]) {
     this.eventProcessMiddlewares = middlewares;
   }
 
