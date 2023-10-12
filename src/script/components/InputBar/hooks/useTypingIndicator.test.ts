@@ -125,4 +125,40 @@ describe('useTypingIndicator', () => {
     unmount();
     expect(onTypingChange).toHaveBeenCalledWith(false);
   });
+
+  it('calls the callback only once as user types', () => {
+    const onTypingChange = jest.fn();
+    const {rerender} = renderHook(useTypingIndicator, {
+      initialProps: {text: '', isEnabled: true, onTypingChange},
+    });
+
+    expect(onTypingChange).not.toHaveBeenCalled();
+
+    fireEvent.keyDown(document);
+
+    rerender({text: 'a', isEnabled: true, onTypingChange});
+    expect(onTypingChange).toHaveBeenCalledWith(true);
+
+    rerender({text: 'ab', isEnabled: true, onTypingChange});
+    expect(onTypingChange).toHaveBeenCalledTimes(1);
+
+    rerender({text: 'abc', isEnabled: true, onTypingChange});
+    expect(onTypingChange).toHaveBeenCalledTimes(1);
+
+    jest.advanceTimersByTime(TYPING_TIMEOUT + 1);
+    expect(onTypingChange).toHaveBeenCalledWith(false);
+
+    rerender({text: 'abcd', isEnabled: true, onTypingChange});
+    expect(onTypingChange).toHaveBeenCalledTimes(3);
+  });
+
+  it('does not call the callback with false on unmount when the user has not typed', () => {
+    const onTypingChange = jest.fn();
+    const {unmount} = renderHook(useTypingIndicator, {
+      initialProps: {text: '', isEnabled: true, onTypingChange},
+    });
+
+    unmount();
+    expect(onTypingChange).not.toHaveBeenCalledWith(false);
+  });
 });
