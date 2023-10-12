@@ -150,7 +150,7 @@ export class ContentViewModel {
       return conversationEntity;
     }
 
-    return this.conversationRepository.init1to1Conversation(conversationEntity);
+    return this.conversationRepository.init1to1Conversation(conversationEntity, true);
   };
 
   /**

@@ -1403,12 +1403,16 @@ export class ConversationRepository {
 
   private readonly getProtocolFor1to1Conversation = async (
     otherUserId: QualifiedId,
+    shouldRefreshUser = false,
   ): Promise<{
     protocol: ConversationProtocol.PROTEUS | ConversationProtocol.MLS;
     isMLSSupportedByTheOtherUser: boolean;
     isProteusSupportedByTheOtherUser: boolean;
   }> => {
-    const otherUserSupportedProtocols = await this.userRepository.getUserSupportedProtocols(otherUserId);
+    const otherUserSupportedProtocols = await this.userRepository.getUserSupportedProtocols(
+      otherUserId,
+      shouldRefreshUser,
+    );
     const selfUserSupportedProtocols = await this.selfRepository.getSelfSupportedProtocols();
 
     const isMLSSupportedByTheOtherUser = otherUserSupportedProtocols.includes(ConversationProtocol.MLS);
@@ -1702,9 +1706,12 @@ export class ConversationRepository {
    * When both users support mls, mls conversation will be established, content will be moved to mls and proteus conversation will be deleted locally.
    *
    * @param conversation - 1:1 conversation to be initialised
-   * @param skipMLSGroupCreation - if true, mls group will not be established for this conversation
+   * @param shouldRefreshUser - if true, user will be refreshed from backend before initialising the conversation
    */
-  public readonly init1to1Conversation = async (conversation: Conversation): Promise<Conversation | null> => {
+  public readonly init1to1Conversation = async (
+    conversation: Conversation,
+    shouldRefreshUser = false,
+  ): Promise<Conversation | null> => {
     if (!conversation.is1to1()) {
       throw new Error('Conversation is not 1:1');
     }
@@ -1721,7 +1728,7 @@ export class ConversationRepository {
     );
 
     const {protocol, isMLSSupportedByTheOtherUser, isProteusSupportedByTheOtherUser} =
-      await this.getProtocolFor1to1Conversation(otherUserId);
+      await this.getProtocolFor1to1Conversation(otherUserId, shouldRefreshUser);
     this.logger.info(
       `Protocol for 1:1 conversation ${conversation.id} with user ${otherUserId.id} is ${protocol}, ${JSON.stringify({
         isMLSSupportedByTheOtherUser,
