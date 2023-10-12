@@ -28,7 +28,7 @@ import {IconButton, IconButtonVariant, useMatchMedia} from '@wireapp/react-ui-ki
 
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {Icon} from 'Components/Icon';
-import {ClassifiedBar} from 'Components/input/ClassifiedBar';
+import {ConversationClassifiedBar} from 'Components/input/ClassifiedBar';
 import {MediaDeviceType} from 'src/script/media/MediaDeviceType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {KEY} from 'Util/KeyboardUtil';
@@ -119,10 +119,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     startedAt,
     participants,
   } = useKoSubscribableChildren(call, ['activeSpeakers', 'currentPage', 'pages', 'startedAt', 'participants']);
-  const {display_name: conversationName, allUserEntities: allUsers} = useKoSubscribableChildren(conversation, [
-    'display_name',
-    'allUserEntities',
-  ]);
+  const {display_name: conversationName} = useKoSubscribableChildren(conversation, ['display_name']);
   const {isVideoCallingEnabled, classifiedDomains} = useKoSubscribableChildren(teamState, [
     'isVideoCallingEnabled',
     'classifiedDomains',
@@ -156,7 +153,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   );
   const showSwitchMicrophone = availableMicrophones.length > 1;
 
-  const {unreadMessagesCount} = useAppState();
+  const unreadMessagesCount = useAppState(state => state.unreadMessagesCount);
   const hasUnreadMessages = unreadMessagesCount > 0;
 
   const {showAlert, isGroupCall, clearShowAlert} = useCallAlertState();
@@ -257,9 +254,8 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
           setMaximizedParticipant={participant => setMaximizedParticipant(call, participant)}
         />
         {classifiedDomains && (
-          <ClassifiedBar
-            conversationDomain={conversation.domain}
-            users={allUsers}
+          <ConversationClassifiedBar
+            conversation={conversation}
             classifiedDomains={classifiedDomains}
             style={{
               ...classifiedBarStyles,

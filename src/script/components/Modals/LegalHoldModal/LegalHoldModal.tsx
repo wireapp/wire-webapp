@@ -415,6 +415,7 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
                   searchRepository={searchRepository}
                   teamRepository={teamRepository}
                   onClick={setUserDevices}
+                  selfUser={selfUser}
                   noUnderline
                 />
               </>

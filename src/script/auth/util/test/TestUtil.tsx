@@ -37,16 +37,16 @@ import {createUuid} from 'Util/uuid';
 
 import {Api, RootState} from '../../module/reducer';
 
-export const withStore = (
+const withStore = (
   children: React.ReactNode,
   store: MockStoreEnhanced<RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,
 ) => <Provider store={store}>{children}</Provider>;
 
+const withRouter = (component: React.ReactNode) => <Router>{component}</Router>;
+
 export const withIntl = (component: React.ReactNode) => <IntlProvider locale="en">{component}</IntlProvider>;
 
 export const withTheme = (component: React.ReactNode) => <StyledApp themeId={THEME_ID.DEFAULT}>{component}</StyledApp>;
-
-export const withRouter = (component: React.ReactNode) => <Router>{component}</Router>;
 
 const wrapComponent = (
   component: React.ReactNode,

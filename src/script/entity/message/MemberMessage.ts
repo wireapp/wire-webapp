@@ -22,13 +22,12 @@ import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import ko from 'knockout';
 
-import {Declension, getUserName, joinNames, replaceLink, t} from 'Util/LocalizerUtil';
+import {Declension, getUserName, t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 
 import {SystemMessage} from './SystemMessage';
 
-import {Config} from '../../Config';
 import {ClientEvent} from '../../event/Client';
 import {SuperType} from '../../message/SuperType';
 import {SystemMessageType} from '../../message/SystemMessageType';
@@ -36,32 +35,22 @@ import {User} from '../User';
 
 export class MemberMessage extends SystemMessage {
   public allTeamMembers: User[];
-  private readonly exceedsMaxVisibleUsers: ko.PureComputed<boolean>;
   public readonly hasUsers: ko.PureComputed<boolean>;
-  private readonly hiddenUserCount: ko.PureComputed<number>;
-  private readonly joinedUserEntities: ko.PureComputed<User[]>;
+  public readonly userIds: ko.ObservableArray<QualifiedId>;
+  public readonly userEntities: ko.ObservableArray<User>;
+  /** Users that are affected by the event */
+  public readonly targetedUsers: ko.PureComputed<User[]>;
   public readonly name: ko.Observable<string>;
   public readonly otherUser: ko.PureComputed<User>;
   public readonly senderName: ko.PureComputed<string>;
   public readonly showNamedCreation: ko.PureComputed<boolean>;
-  private readonly visibleUsers: ko.Observable<User[]>;
-  public readonly highlightedUsers: ko.PureComputed<User[]>;
-  public readonly htmlCaption: ko.PureComputed<string>;
   public readonly htmlGroupCreationHeader: ko.PureComputed<string>;
   public readonly remoteUserEntities: ko.PureComputed<User[]>;
   public showServicesWarning: boolean;
-  public readonly userEntities: ko.ObservableArray<User>;
-  public readonly userIds: ko.ObservableArray<QualifiedId>;
   public memberMessageType: SystemMessageType;
   public reason: MemberLeaveReason;
-
-  static get CONFIG() {
-    return {
-      MAX_USERS_VISIBLE: 17,
-      MAX_WHOLE_TEAM_USERS_VISIBLE: 10,
-      REDUCED_USERS_COUNT: 15,
-    };
-  }
+  /** this can be used to check uniqueness of the message. It's computed using the timestamp + users involved in the event */
+  public readonly hash: ko.PureComputed<string>;
 
   constructor() {
     super();
@@ -73,35 +62,17 @@ export class MemberMessage extends SystemMessage {
     this.userIds = ko.observableArray();
     this.name = ko.observable('');
 
-    this.exceedsMaxVisibleUsers = ko.pureComputed(() => {
-      return this.joinedUserEntities().length > MemberMessage.CONFIG.MAX_USERS_VISIBLE;
-    });
-    this.visibleUsers = ko.observable([]);
-    this.hiddenUserCount = ko.pureComputed(() => this.joinedUserEntities().length - this.visibleUsers().length);
-    this.highlightedUsers = ko.pureComputed(() => {
-      return this.type === CONVERSATION_EVENT.MEMBER_JOIN ? this.joinedUserEntities() : [];
-    });
-
     this.hasUsers = ko.pureComputed(() => !!this.userEntities().length);
     this.allTeamMembers = undefined;
     this.showServicesWarning = false;
 
-    // Users joined the conversation without sender
-    this.joinedUserEntities = ko.pureComputed(() => {
-      return this.userEntities().filter(userEntity => !matchQualifiedIds(this.user(), userEntity));
+    this.hash = ko.pureComputed(() => {
+      const users = this.userIds().map(({id}) => id);
+      return `${this.timestamp()}${users.join('')}`;
     });
 
-    this.joinedUserEntities.subscribe(joinedUserEntities => {
-      const selfUser = joinedUserEntities.find(userEntity => userEntity.isMe);
-      const visibleUsers = joinedUserEntities.filter(userEntity => !userEntity.isMe);
-      if (this.exceedsMaxVisibleUsers()) {
-        const spliceCount = MemberMessage.CONFIG.REDUCED_USERS_COUNT;
-        visibleUsers.splice(selfUser ? spliceCount - 1 : spliceCount);
-      }
-      if (selfUser) {
-        visibleUsers.push(selfUser);
-      }
-      this.visibleUsers(visibleUsers);
+    this.targetedUsers = ko.pureComputed(() => {
+      return this.userEntities().filter(userEntity => !matchQualifiedIds(this.user(), userEntity));
     });
 
     // Users joined the conversation without self
@@ -118,129 +89,6 @@ export class MemberMessage extends SystemMessage {
 
     this.otherUser = ko.pureComputed(() => (this.hasUsers() ? this.userEntities()[0] : new User('', null)));
 
-    this.htmlCaption = ko.pureComputed(() => {
-      if (!this.hasUsers()) {
-        return '';
-      }
-
-      const replaceShowMore = {
-        '/showmore': '</a>',
-        showmore: '<a class="message-header-show-more" data-uie-name="do-show-more">',
-      };
-
-      const count = this.hiddenUserCount();
-      const dativeUsers = this.generateNameString(this.exceedsMaxVisibleUsers(), Declension.DATIVE);
-      const accusativeUsers = this.generateNameString(this.exceedsMaxVisibleUsers(), Declension.ACCUSATIVE);
-      const name = this.senderName();
-
-      switch (this.memberMessageType) {
-        case SystemMessageType.CONNECTION_ACCEPTED:
-        case SystemMessageType.CONNECTION_REQUEST: {
-          if (this.otherUser()) {
-            if (this.otherUser().isBlocked()) {
-              return t('conversationConnectionBlocked');
-            }
-
-            if (this.otherUser().isOutgoingRequest()) {
-              return '';
-            }
-          }
-
-          return t('conversationConnectionAccepted');
-        }
-
-        case SystemMessageType.CONVERSATION_CREATE: {
-          if (this.name().length) {
-            const exceedsMaxTeam = this.joinedUserEntities().length > MemberMessage.CONFIG.MAX_WHOLE_TEAM_USERS_VISIBLE;
-            if (this.allTeamMembers && exceedsMaxTeam) {
-              const guestCount = this.joinedUserEntities().filter(userEntity => userEntity.isGuest()).length;
-              if (!guestCount) {
-                return t('conversationCreateTeam', {}, replaceShowMore);
-              }
-
-              const hasSingleGuest = guestCount === 1;
-              return hasSingleGuest
-                ? t('conversationCreateTeamGuest', {}, replaceShowMore)
-                : t('conversationCreateTeamGuests', guestCount, replaceShowMore);
-            }
-
-            return this.exceedsMaxVisibleUsers()
-              ? t('conversationCreateWithMore', {count: count.toString(), users: dativeUsers}, replaceShowMore)
-              : t('conversationCreateWith', dativeUsers);
-          }
-
-          if (this.user().isMe) {
-            return this.exceedsMaxVisibleUsers()
-              ? t('conversationCreatedYouMore', {count: count.toString(), users: dativeUsers}, replaceShowMore)
-              : t('conversationCreatedYou', dativeUsers);
-          }
-
-          return this.exceedsMaxVisibleUsers()
-            ? t('conversationCreatedMore', {count: count.toString(), name, users: dativeUsers}, replaceShowMore)
-            : t('conversationCreated', {name, users: dativeUsers});
-        }
-
-        case SystemMessageType.CONVERSATION_RESUME: {
-          return t('conversationResume', this.generateNameString(false, Declension.DATIVE));
-        }
-
-        default:
-          break;
-      }
-
-      switch (this.type) {
-        case CONVERSATION_EVENT.MEMBER_JOIN: {
-          const senderJoined = matchQualifiedIds(this.otherUser(), this.user());
-          if (senderJoined) {
-            return this.user().isMe
-              ? t('conversationMemberJoinedSelfYou')
-              : t('conversationMemberJoinedSelf', this.senderName());
-          }
-
-          if (this.user().isMe) {
-            return this.exceedsMaxVisibleUsers()
-              ? t('conversationMemberJoinedYouMore', {count: count.toString(), users: accusativeUsers}, replaceShowMore)
-              : t('conversationMemberJoinedYou', accusativeUsers, replaceShowMore);
-          }
-          return this.exceedsMaxVisibleUsers()
-            ? t(
-                'conversationMemberJoinedMore',
-                {count: count.toString(), name, users: accusativeUsers},
-                replaceShowMore,
-              )
-            : t('conversationMemberJoined', {name, users: accusativeUsers}, replaceShowMore);
-        }
-
-        case CONVERSATION_EVENT.MEMBER_LEAVE: {
-          if (this.reason === MemberLeaveReason.LEGAL_HOLD_POLICY_CONFLICT) {
-            return this.generateLegalHoldLeaveMessage();
-          }
-          const temporaryGuestRemoval = this.otherUser().isMe && this.otherUser().isTemporaryGuest();
-          if (temporaryGuestRemoval) {
-            return t('temporaryGuestLeaveMessage');
-          }
-
-          const senderLeft = matchQualifiedIds(this.otherUser(), this.user());
-          if (senderLeft) {
-            return this.user().isMe ? t('conversationMemberLeftYou') : t('conversationMemberLeft', name);
-          }
-
-          const allUsers = this.generateNameString();
-          return this.user().isMe
-            ? t('conversationMemberRemovedYou', allUsers)
-            : t('conversationMemberRemoved', {name, users: allUsers});
-        }
-
-        case ClientEvent.CONVERSATION.TEAM_MEMBER_LEAVE: {
-          return t('conversationTeamLeft', name);
-        }
-
-        default:
-          break;
-      }
-      return '';
-    });
-
     this.htmlGroupCreationHeader = ko.pureComputed(() => {
       if (this.showNamedCreation()) {
         if (this.user().isTemporaryGuest()) {
@@ -254,42 +102,6 @@ export class MemberMessage extends SystemMessage {
       }
       return '';
     });
-  }
-
-  private readonly generateLegalHoldLeaveMessage = () => {
-    const replaceLinkLegalHold = replaceLink(
-      Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK,
-      '',
-      'read-more-legal-hold',
-    );
-    if (this.userEntities().some(user => user.isMe)) {
-      return t('conversationYouRemovedMissingLegalHoldConsent', {}, replaceLinkLegalHold);
-    }
-    const users = this.generateNameString(this.exceedsMaxVisibleUsers());
-
-    if (this.userEntities().length === 1) {
-      return t('conversationMemberRemovedMissingLegalHoldConsent', users, replaceLinkLegalHold);
-    }
-    if (this.exceedsMaxVisibleUsers()) {
-      return t(
-        'conversationMultipleMembersRemovedMissingLegalHoldConsentMore',
-        {
-          count: this.hiddenUserCount().toString(10),
-          users,
-        },
-        replaceLinkLegalHold,
-      );
-    }
-    return t('conversationMultipleMembersRemovedMissingLegalHoldConsent', users, replaceLinkLegalHold);
-  };
-
-  readonly showLargeAvatar = (): boolean => {
-    const largeAvatarTypes = [SystemMessageType.CONNECTION_ACCEPTED, SystemMessageType.CONNECTION_REQUEST];
-    return largeAvatarTypes.includes(this.memberMessageType);
-  };
-
-  private generateNameString(skipAnd = false, declension = Declension.ACCUSATIVE): string {
-    return joinNames(this.visibleUsers(), declension, skipAnd, true);
   }
 
   isConnection(): boolean {
@@ -344,9 +156,5 @@ export class MemberMessage extends SystemMessage {
 
   isUserAffected(userId: QualifiedId): boolean {
     return !!this.userIds().find(user => matchQualifiedIds(user, userId));
-  }
-
-  guestCount(): number {
-    return this.joinedUserEntities().filter(user => user.isGuest()).length;
   }
 }

@@ -791,6 +791,7 @@ export class MessageRepository {
           groupId,
           payload,
           protocol: ConversationProtocol.MLS,
+          conversationId: conversation.qualifiedId,
         }
       : {
           conversationId: conversation.qualifiedId,
@@ -1120,7 +1121,7 @@ export class MessageRepository {
    */
   public async deleteMessageById(conversationEntity: Conversation, messageId: string): Promise<number> {
     const isLastDeleted =
-      conversationEntity.isShowingLastReceivedMessage() && conversationEntity.getNewestMessage()?.id === messageId;
+      conversationEntity.hasLastReceivedMessageLoaded() && conversationEntity.getNewestMessage()?.id === messageId;
 
     const deleteCount = await this.eventService.deleteEvent(conversationEntity.id, messageId);
     const previousMessage = conversationEntity.getNewestMessage();
@@ -1215,12 +1216,12 @@ export class MessageRepository {
   private async updateMessageAsFailed(conversationEntity: Conversation, eventId: string, error: unknown) {
     try {
       const messageEntity = await this.getMessageInConversationById(conversationEntity, eventId);
-      if (isBackendError(error) && error.label === BackendErrorLabel.FEDERATION_REMOTE_ERROR) {
-        messageEntity.status(StatusType.FEDERATION_ERROR);
-        return this.eventService.updateEvent(messageEntity.primary_key, {status: StatusType.FEDERATION_ERROR});
-      }
-      messageEntity.status(StatusType.FAILED);
-      return this.eventService.updateEvent(messageEntity.primary_key, {status: StatusType.FAILED});
+      const errorStatus =
+        isBackendError(error) && error.label === BackendErrorLabel.FEDERATION_REMOTE_ERROR
+          ? StatusType.FEDERATION_ERROR
+          : StatusType.FAILED;
+      messageEntity.status(errorStatus);
+      return this.eventService.updateEvent(messageEntity.primary_key, {status: errorStatus});
     } catch (error) {
       if ((error as any).type !== ConversationError.TYPE.MESSAGE_NOT_FOUND) {
         throw error;

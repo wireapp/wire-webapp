@@ -332,7 +332,9 @@ export class CallingRepository {
     }
     const conversation = this.conversationState.findConversation(call.conversationId);
     if (!conversation) {
-      this.logger.warn(`Unable to find a conversation with id of ${call.conversationId}`);
+      this.logger.warn(
+        `Unable to find a conversation with id of ${call.conversationId.id}@${call.conversationId.domain}`,
+      );
       return false;
     }
     const allClients = await this.core.service!.conversation.fetchAllParticipantsClients(call.conversationId);
@@ -625,7 +627,7 @@ export class CallingRepository {
     const conversation = this.conversationState.findConversation(conversationId);
 
     if (!conversation) {
-      this.logger.warn(`Unable to find a conversation with id of ${conversationId}`);
+      this.logger.warn(`Unable to find a conversation with id of ${conversationId.id}@${conversationId.domain}`);
       return;
     }
     switch (content.type) {
@@ -1238,7 +1240,9 @@ export class CallingRepository {
     if (reason === REASON.NOONE_JOINED || reason === REASON.EVERYONE_LEFT) {
       const conversationEntity = this.conversationState.findConversation(conversationId);
       if (!conversationEntity) {
-        this.logger.warn(`Unable to find a conversation with id of ${call.conversationId}`);
+        this.logger.warn(
+          `Unable to find a conversation with id of ${call.conversationId.id}@${call.conversationId.domain}`,
+        );
       } else {
         const callingEvent = EventBuilder.buildCallingTimeoutEvent(
           reason,
@@ -1771,8 +1775,9 @@ export class CallingRepository {
         htmlMessage: t('modalNoCameraMessage', Config.getConfig().BRAND_NAME, {
           '/faqLink': '</a>',
           br: '<br>',
-          faqLink:
-            '<a href="https://support.wire.com/hc/articles/202935412" data-uie-name="go-no-camera-faq" target="_blank" rel="noopener noreferrer">',
+          faqLink: `<a href="${
+            Config.getConfig().URL.SUPPORT.CAMERA_ACCESS_DENIED
+          }" data-uie-name="go-no-camera-faq" target="_blank" rel="noopener noreferrer">`,
         }),
         title: t('modalNoCameraTitle'),
       },

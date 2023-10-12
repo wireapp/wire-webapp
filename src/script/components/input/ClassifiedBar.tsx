@@ -23,7 +23,9 @@ import {CSSObject} from '@emotion/react';
 import cx from 'classnames';
 
 import {Icon} from 'Components/Icon';
+import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 function isClassified(users: User[], classifiedDomains: string[], conversationDomain?: string): boolean {
@@ -41,11 +43,19 @@ function isClassified(users: User[], classifiedDomains: string[], conversationDo
 interface ClassifiedBarProps {
   classifiedDomains?: string[];
   style?: CSSObject;
-  users: User[];
   conversationDomain?: string;
 }
 
-const ClassifiedBar: React.FC<ClassifiedBarProps> = ({users, classifiedDomains, conversationDomain, style}) => {
+interface UserClassifiedBarProps extends ClassifiedBarProps {
+  users: User[];
+}
+
+export const UserClassifiedBar: React.FC<UserClassifiedBarProps> = ({
+  users,
+  conversationDomain,
+  classifiedDomains,
+  style,
+}) => {
   if (typeof classifiedDomains === 'undefined') {
     return null;
   }
@@ -65,4 +75,14 @@ const ClassifiedBar: React.FC<ClassifiedBarProps> = ({users, classifiedDomains, 
   );
 };
 
-export {ClassifiedBar};
+interface ConversationClassifiedBarProps extends ClassifiedBarProps {
+  conversation: Conversation;
+}
+
+export const ConversationClassifiedBar: React.FC<ConversationClassifiedBarProps> = ({
+  conversation,
+  ...classifiedBarProps
+}) => {
+  const {allUserEntities: users} = useKoSubscribableChildren(conversation, ['allUserEntities']);
+  return <UserClassifiedBar users={users} conversationDomain={conversation.domain} {...classifiedBarProps} />;
+};

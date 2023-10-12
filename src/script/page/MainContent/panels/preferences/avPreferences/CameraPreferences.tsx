@@ -142,8 +142,9 @@ const CameraPreferences: React.FC<CameraPreferencesProps> = ({
                   __html: t('preferencesAVNoCamera', brandName, {
                     '/faqLink': '</a>',
                     br: '<br>',
-                    faqLink:
-                      "<a href='https://support.wire.com/hc/articles/202935412' data-uie-name='go-no-camera-faq' target='_blank' rel='noopener noreferrer'>",
+                    faqLink: `<a href='${
+                      Config.getConfig().URL.SUPPORT.CAMERA_ACCESS_DENIED
+                    }' data-uie-name='go-no-camera-faq' target='_blank' rel='noopener noreferrer'>`,
                   }),
                 }}
               />

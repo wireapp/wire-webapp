@@ -220,7 +220,7 @@ export class DebugUtil {
       throw new Error('teamId of self user is undefined');
     }
 
-    const mlsFeature = this.teamState.teamFeatures().mls;
+    const mlsFeature = this.teamState.teamFeatures()?.mls;
 
     if (!mlsFeature) {
       throw new Error('MLS feature is not enabled');

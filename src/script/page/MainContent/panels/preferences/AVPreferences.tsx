@@ -17,8 +17,6 @@
  *
  */
 
-import React from 'react';
-
 import {MediaDeviceType} from 'src/script/media/MediaDeviceType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -40,11 +38,11 @@ interface AVPreferencesProps {
   propertiesRepository: PropertiesRepository;
 }
 
-const AVPreferences: React.FC<AVPreferencesProps> = ({
+const AVPreferences = ({
   mediaRepository: {devicesHandler, constraintsHandler, streamHandler},
   propertiesRepository,
   callingRepository,
-}) => {
+}: AVPreferencesProps) => {
   const deviceSupport = useKoSubscribableChildren(devicesHandler?.deviceSupport, [
     MediaDeviceType.AUDIO_INPUT,
     MediaDeviceType.AUDIO_OUTPUT,

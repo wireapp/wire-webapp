@@ -51,7 +51,7 @@ export const SystemMessage: React.FC<SystemMessageProps> = ({message}) => {
   }
 
   if (message instanceof MLSConversationRecoveredMessage) {
-    return <SystemMessageBase message={message} icon={<span className="icon-sysmsg-error text-red" />} />;
+    return <SystemMessageBase message={message} icon={<Icon.Info />} />;
   }
 
   return <SystemMessageBase message={message} />;

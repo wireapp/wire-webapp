@@ -22,15 +22,15 @@ import {User} from '../entity/User';
 
 export interface FederationDeleteResult {
   conversationsToLeave: Conversation[];
-  conversationsToDisable: Conversation[];
   /**
    * One to One conversations that must be marked as disabled
    * and the connection to their user must be deleted
    */
+  conversationsToDisable: Conversation[];
   conversationsToDeleteUsers: {conversation: Conversation; users: User[]}[];
 }
 
-export function processFederationDeleteEvent(
+export function getFederationDeleteEventUpdates(
   deletedDomain: string,
   conversations: Conversation[],
 ): FederationDeleteResult {
@@ -47,12 +47,52 @@ export function processFederationDeleteEvent(
 
     if (conversation.domain === deletedDomain && !is1to1) {
       result.conversationsToLeave.push(conversation);
-    } else if (is1to1 && firstUserEntity.qualifiedId.domain === deletedDomain) {
+    } else if (is1to1 && firstUserEntity?.qualifiedId.domain === deletedDomain) {
       result.conversationsToDisable.push(conversation);
     } else {
       const usersToDelete = allUserEntities.filter(user => user.domain === deletedDomain);
       if (usersToDelete.length > 0) {
         result.conversationsToDeleteUsers.push({conversation, users: usersToDelete});
+      }
+    }
+  });
+
+  return result;
+}
+
+export type FederationConnectionRemovedResult = {conversation: Conversation; usersToRemove: User[]}[];
+
+export function getUsersToDeleteFromFederatedConversations(
+  deletedDomains: string[],
+  conversations: Conversation[],
+): FederationConnectionRemovedResult {
+  const result: FederationConnectionRemovedResult = [];
+
+  const [domainOne, domainTwo] = deletedDomains;
+
+  conversations.forEach(conversation => {
+    if (conversation.domain === domainOne || conversation.domain === domainTwo) {
+      const targetDomain = conversation.domain === domainOne ? domainTwo : domainOne;
+      const usersToDelete = conversation.allUserEntities().filter(user => user.domain === targetDomain);
+
+      if (usersToDelete.length > 0) {
+        result.push({conversation, usersToRemove: usersToDelete});
+      }
+    }
+  });
+
+  conversations.forEach(conversation => {
+    if (deletedDomains.includes(conversation.domain)) {
+      return;
+    }
+
+    const allUserEntities = conversation.allUserEntities();
+    const userDomains = new Set(allUserEntities.map(user => user.qualifiedId.domain));
+
+    if (userDomains.has(domainOne) && userDomains.has(domainTwo)) {
+      const usersToDelete = allUserEntities.filter(user => [domainOne, domainTwo].includes(user.domain));
+      if (usersToDelete.length > 0) {
+        result.push({conversation, usersToRemove: usersToDelete});
       }
     }
   });

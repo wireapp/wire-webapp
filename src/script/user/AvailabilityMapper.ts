@@ -19,8 +19,6 @@
 
 import {Availability} from '@wireapp/protocol-messaging';
 
-import {t} from 'Util/LocalizerUtil';
-
 import {BaseError} from '../error/BaseError';
 import {UserError} from '../error/UserError';
 
@@ -42,21 +40,6 @@ export const valueFromType = (availabilityType: Availability.Type): string => {
   const value = TYPE_VALUES[availabilityType];
   if (value) {
     return value;
-  }
-  throw new UserError(BaseError.TYPE.INVALID_PARAMETER, BaseError.MESSAGE.INVALID_PARAMETER);
-};
-
-export const nameFromType = (availabilityType: Availability.Type) => {
-  const TYPE_STRINGS = {
-    [Availability.Type.AVAILABLE]: t('userAvailabilityAvailable'),
-    [Availability.Type.AWAY]: t('userAvailabilityAway'),
-    [Availability.Type.BUSY]: t('userAvailabilityBusy'),
-    [Availability.Type.NONE]: t('userAvailabilityNone'),
-  };
-
-  const string = TYPE_STRINGS[availabilityType];
-  if (string) {
-    return string;
   }
   throw new UserError(BaseError.TYPE.INVALID_PARAMETER, BaseError.MESSAGE.INVALID_PARAMETER);
 };

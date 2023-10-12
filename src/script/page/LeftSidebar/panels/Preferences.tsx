@@ -120,7 +120,7 @@ const Preferences: React.FC<PreferencesProps> = ({
   preferenceNotificationRepository,
   onClose,
 }) => {
-  const {contentState} = useAppState();
+  const contentState = useAppState(state => state.contentState);
 
   useEffect(() => {
     // Update local team

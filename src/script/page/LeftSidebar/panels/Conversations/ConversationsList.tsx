@@ -69,7 +69,7 @@ export const ConversationsList = ({
   resetConversationFocus,
   handleArrowKeyDown,
 }: ConversationsListProps) => {
-  const {contentState} = useAppState();
+  const contentState = useAppState(state => state.contentState);
 
   const {joinableCalls} = useKoSubscribableChildren(callState, ['joinableCalls']);
 

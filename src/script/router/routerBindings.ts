@@ -46,7 +46,7 @@ export const createNavigateKeyboard =
     }
   };
 
-export const setResponsiveView = () => {
+const setResponsiveView = () => {
   const {responsiveView} = useAppMainState.getState();
   responsiveView.setCurrentView(ViewType.CENTRAL_COLUMN);
 };

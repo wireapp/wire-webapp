@@ -17,7 +17,9 @@
  *
  */
 
+import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
+import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
@@ -27,7 +29,7 @@ import {PrimaryModal, removeCurrentModal, usePrimaryModalState} from 'Components
 import {t} from 'Util/LocalizerUtil';
 import {isBackendError} from 'Util/TypePredicateUtil';
 
-import type {ClientRepository, ClientEntity} from '../client';
+import type {ClientEntity} from '../client';
 import type {ConnectionRepository} from '../connection/ConnectionRepository';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
 import type {MessageRepository} from '../conversation/MessageRepository';
@@ -37,11 +39,12 @@ import type {Message} from '../entity/message/Message';
 import type {User} from '../entity/User';
 import type {IntegrationRepository} from '../integration/IntegrationRepository';
 import type {ServiceEntity} from '../integration/ServiceEntity';
+import {SelfRepository} from '../self/SelfRepository';
 import {UserState} from '../user/UserState';
 
 export class ActionsViewModel {
   constructor(
-    private readonly clientRepository: ClientRepository,
+    private readonly selfRepository: SelfRepository,
     private readonly connectionRepository: ConnectionRepository,
     private readonly conversationRepository: ConversationRepository,
     private readonly integrationRepository: IntegrationRepository,
@@ -127,14 +130,26 @@ export class ActionsViewModel {
     });
   };
 
+  private readonly leaveOrClearConversation = async (
+    conversation: Conversation,
+    {leave, clear}: {leave: boolean; clear: boolean},
+  ): Promise<void> => {
+    if (leave) {
+      await this.conversationRepository.leaveConversation(conversation);
+    }
+    if (clear) {
+      await this.conversationRepository.clearConversation(conversation);
+    }
+  };
+
   readonly clearConversation = (conversationEntity: Conversation): void => {
     if (conversationEntity) {
       const modalType = conversationEntity.isLeavable() ? PrimaryModal.type.OPTION : PrimaryModal.type.CONFIRM;
 
       PrimaryModal.show(modalType, {
         primaryAction: {
-          action: (leaveConversation = false) => {
-            this.conversationRepository.clearConversation(conversationEntity, leaveConversation);
+          action: async (leave = false) => {
+            await this.leaveOrClearConversation(conversationEntity, {clear: true, leave: leave});
           },
           text: t('modalConversationClearAction'),
         },
@@ -152,7 +167,7 @@ export class ActionsViewModel {
     const isTemporary = clientEntity.isTemporary();
     if (isSSO || isTemporary) {
       // Temporary clients and clients of SSO users don't require a password to be removed
-      return this.clientRepository.deleteClient(clientEntity.id, undefined);
+      return this.selfRepository.deleteSelfUserClient(clientEntity.id, undefined);
     }
 
     return new Promise<void>(resolve => {
@@ -171,7 +186,7 @@ export class ActionsViewModel {
               if (!isSending) {
                 isSending = true;
                 try {
-                  await this.clientRepository.deleteClient(clientEntity.id, password);
+                  await this.selfRepository.deleteSelfUserClient(clientEntity.id, password);
                   removeCurrentModal();
                   resolve();
                 } catch (error) {
@@ -258,8 +273,8 @@ export class ActionsViewModel {
     return this.connectionRepository.ignoreRequest(userEntity);
   };
 
-  readonly leaveConversation = (conversationEntity: Conversation): Promise<void> => {
-    if (!conversationEntity) {
+  readonly leaveConversation = (conversation: Conversation): Promise<void> => {
+    if (!conversation) {
       return Promise.reject();
     }
 
@@ -267,19 +282,16 @@ export class ActionsViewModel {
       PrimaryModal.show(PrimaryModal.type.OPTION, {
         primaryAction: {
           action: async (clearContent = false) => {
-            await this.conversationRepository.removeMember(conversationEntity, this.userState.self().qualifiedId, {
-              clearContent,
-            });
-
+            await this.leaveOrClearConversation(conversation, {clear: clearContent, leave: true});
             resolve();
           },
           text: t('modalConversationLeaveAction'),
         },
         text: {
-          closeBtnLabel: t('modalConversationLeaveMessageCloseBtn', conversationEntity.display_name()),
+          closeBtnLabel: t('modalConversationLeaveMessageCloseBtn', conversation.display_name()),
           message: t('modalConversationLeaveMessage'),
           option: t('modalConversationLeaveOption'),
-          title: t('modalConversationLeaveHeadline', conversationEntity.display_name()),
+          title: t('modalConversationLeaveHeadline', conversation.display_name()),
         },
       });
     });
@@ -302,6 +314,10 @@ export class ActionsViewModel {
     }
 
     return Promise.reject();
+  };
+
+  getConversationById = async (conversation: QualifiedId): Promise<Conversation> => {
+    return this.conversationRepository.getConversationById(conversation);
   };
 
   saveConversation = async (conversation: Conversation): Promise<Conversation> => {
@@ -359,7 +375,7 @@ export class ActionsViewModel {
           primaryAction: {
             action: async () => {
               try {
-                await this.conversationRepository.removeMember(conversationEntity, userEntity.qualifiedId);
+                await this.conversationRepository.removeMembers(conversationEntity, [userEntity.qualifiedId]);
                 resolve();
               } catch (error) {
                 reject(error);
@@ -383,7 +399,9 @@ export class ActionsViewModel {
    * @param userEntity User to connect to
    * @returns Promise that resolves to true if the request was successfully sent, false if not
    */
-  readonly sendConnectionRequest = (userEntity: User): Promise<boolean> => {
+  readonly sendConnectionRequest = (
+    userEntity: User,
+  ): Promise<{connectionStatus: ConnectionStatus; conversationId: QualifiedId} | null> => {
     return this.connectionRepository.createConnection(userEntity);
   };
 
@@ -408,7 +426,7 @@ export class ActionsViewModel {
             await this.connectionRepository.unblockUser(userEntity);
             const conversationEntity = await this.conversationRepository.get1To1Conversation(userEntity);
             resolve();
-            if (typeof conversationEntity !== 'boolean') {
+            if (conversationEntity) {
               await this.conversationRepository.updateParticipatingUserEntities(conversationEntity);
             }
           },

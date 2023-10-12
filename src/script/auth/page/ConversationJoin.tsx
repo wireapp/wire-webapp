@@ -66,7 +66,6 @@ const ConversationJoinComponent = ({
   const nameInput = React.useRef<HTMLInputElement>(null);
   const {formatMessage: _} = useIntl();
 
-  const [isLoggedIn, setIsLoggedIn] = useState(selfName !== null);
   const [accentColor] = useState(AccentColor.STRONG_BLUE);
   const [conversationCode, setConversationCode] = useState<string>();
   const [conversationKey, setConversationKey] = useState<string>();
@@ -79,6 +78,7 @@ const ConversationJoinComponent = ({
   const [showCookiePolicyBanner, setShowCookiePolicyBanner] = useState(true);
   const [showEntropyForm, setShowEntropyForm] = useState(false);
   const isEntropyRequired = Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY;
+  const isWirePublicInstance = Config.getConfig().BRAND_NAME === 'Wire';
 
   useEffect(() => {
     const localConversationCode = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_CODE);
@@ -108,6 +108,25 @@ const ConversationJoinComponent = ({
     window.location.replace(redirectLocation);
   };
 
+  const getConversationInfoAndJoin = async () => {
+    try {
+      if (!conversationCode || !conversationKey) {
+        throw Error('Conversation code or key missing');
+      }
+      const conversationEvent = await doJoinConversationByCode(conversationKey, conversationCode);
+      /* When we join a conversation, we create the join event before loading the webapp.
+       * That means that when the webapp loads and tries to fetch the notificationStream is will get the join event once again and will try to handle it
+       * Here we set the core's lastEventDate so that it knows that this duplicated event should be skipped
+       */
+      await setLastEventDate(new Date(conversationEvent.time));
+
+      routeToApp(conversationEvent.conversation, conversationEvent.qualified_conversation?.domain ?? '');
+    } catch (error) {
+      console.warn('Unable to join conversation', error);
+      setShowEntropyForm(false);
+    }
+  };
+
   const handleSubmit = async (entropyData?: Uint8Array) => {
     setIsSubmitingName(true);
     try {
@@ -127,14 +146,7 @@ const ConversationJoinComponent = ({
         },
         entropyData,
       );
-      const conversationEvent = await doJoinConversationByCode(conversationKey, conversationCode);
-      /* When we join a conversation, we create the join event before loading the webapp.
-       * That means that when the webapp loads and tries to fetch the notificationStream is will get the join event once again and will try to handle it
-       * Here we set the core's lastEventDate so that it knows that this duplicated event should be skipped
-       */
-      await setLastEventDate(new Date(conversationEvent.time));
-
-      routeToApp(conversationEvent.conversation, conversationEvent.qualified_conversation?.domain ?? '');
+      await getConversationInfoAndJoin();
     } catch (error) {
       setIsSubmitingName(false);
       if (error.label) {
@@ -186,11 +198,6 @@ const ConversationJoinComponent = ({
     setEnteredName(event.target.value);
   };
 
-  const handleLogout = async () => {
-    setIsLoggedIn(false);
-    await doLogout();
-  };
-
   if (!isValidLink) {
     return <ConversationJoinInvalid />;
   }
@@ -212,14 +219,16 @@ const ConversationJoinComponent = ({
           <H1 style={{fontWeight: 500, marginTop: '0', marginBottom: '1rem'}} data-uie-name="status-join-headline">
             {_(conversationJoinStrings.mainHeadline)}
           </H1>
-          <Muted data-uie-name="status-join-subhead">
-            {_(conversationJoinStrings.headline, {brandName: Config.getConfig().BRAND_NAME})}
-          </Muted>
+          {!isWirePublicInstance && (
+            <Muted data-uie-name="status-join-subhead">
+              {_(conversationJoinStrings.headline, {domain: window.location.hostname})}
+            </Muted>
+          )}
         </div>
         <Columns style={{display: 'flex', gap: '2rem', alignSelf: 'center', maxWidth: '100%'}}>
           <Column>
-            {isLoggedIn ? (
-              <IsLoggedInColumn selfName={selfName} handleLogout={handleLogout} handleSubmit={handleSubmit} />
+            {selfName ? (
+              <IsLoggedInColumn selfName={selfName} handleLogout={doLogout} handleSubmit={getConversationInfoAndJoin} />
             ) : (
               <Login embedded />
             )}
@@ -256,7 +265,7 @@ const mapStateToProps = (state: RootState) => ({
   isAuthenticated: AuthSelector.isAuthenticated(state),
   isFetching: ConversationSelector.isFetching(state),
   isTemporaryGuest: SelfSelector.isTemporaryGuest(state),
-  selfName: SelfSelector.getSelfName(state),
+  selfName: !SelfSelector.isTemporaryGuest(state) && SelfSelector.getSelfName(state),
 });
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;

@@ -26,8 +26,9 @@ import {SuperType} from '../../message/SuperType';
 
 export class FailedToAddUsersMessage extends Message {
   constructor(
-    public qualifiedIds: QualifiedId[],
-    public reason: AddUsersFailureReasons,
+    public readonly qualifiedIds: QualifiedId[],
+    public readonly reason: AddUsersFailureReasons,
+    public readonly backends: string[] = [],
     time: number,
   ) {
     super();

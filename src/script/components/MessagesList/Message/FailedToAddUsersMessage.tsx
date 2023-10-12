@@ -17,11 +17,10 @@
  *
  */
 
-import React, {FC, ReactNode, useMemo, useState} from 'react';
+import React, {ReactNode, useMemo, useState} from 'react';
 
 import {AddUsersFailureReasons} from '@wireapp/core/lib/conversation';
 import {container} from 'tsyringe';
-import {groupBy} from 'underscore';
 
 import {Button, ButtonVariant, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
@@ -54,31 +53,33 @@ const config = Config.getConfig();
 
 interface MessageDetailsProps {
   children: ReactNode;
-  message: FailedToAddUsersMessageEntity;
   users: User[];
-  domain?: string;
+  reason: AddUsersFailureReasons;
+  domains: string[];
 }
-const MessageDetails: FC<MessageDetailsProps> = ({users, children, message, domain = ''}) => {
+const MessageDetails = ({users, children, reason, domains}: MessageDetailsProps) => {
+  const baseTranslationKey =
+    users.length === 1 ? 'failedToAddParticipantsSingularDetails' : 'failedToAddParticipantsPluralDetails';
+
+  const domainStr = domains.join(', ');
+
   return (
     <p
       data-uie-name="multi-user-not-added-details"
-      data-uie-value={domain}
+      data-uie-value={domainStr}
       style={{lineHeight: 'var(--line-height-sm)'}}
     >
       <span
         css={warning}
         dangerouslySetInnerHTML={{
-          __html:
-            // Mobile platforms are not using the full specs yet, we can uncomment this if product decides to go with MVP specs
-            // t(`failedToAddParticipantsPluralDetailsMvp`, {
-            t(`failedToAddParticipantsPluralDetails${errorMessageType[message.reason]}`, {
-              name: users[0].name(),
-              names: users
-                .slice(1)
-                .map(user => user.name())
-                .join(', '),
-              domain,
-            }),
+          __html: t(`${baseTranslationKey}${errorMessageType[reason]}`, {
+            name: users[0].name(),
+            names: users
+              .slice(1)
+              .map(user => user.name())
+              .join(', '),
+            domain: domainStr,
+          }),
         }}
       />
       {children}
@@ -98,14 +99,13 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
 
   const {users: allUsers} = useKoSubscribableChildren(userState, ['users']);
 
-  const [users, total, groupedUsers] = useMemo(() => {
+  const [users, total] = useMemo(() => {
     const users: User[] = message.qualifiedIds.reduce<User[]>((previous, current) => {
       const foundUser = allUsers.find(user => matchQualifiedIds(current, user.qualifiedId));
       return foundUser ? [...previous, foundUser] : previous;
     }, []);
-    const groupedUsers = groupBy(users, user => user.domain);
     const total = users.length;
-    return [users, total, groupedUsers];
+    return [users, total];
   }, [allUsers, message.qualifiedIds]);
 
   if (users.length === 0) {
@@ -146,13 +146,10 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
               <span
                 css={warning}
                 dangerouslySetInnerHTML={{
-                  __html:
-                    // Mobile platforms are not using the full specs yet, we can uncomment this if product decides to go with MVP specs
-                    // t(`failedToAddParticipantSingularMvp`, {
-                    t(`failedToAddParticipantSingular${errorMessageType[message.reason]}`, {
-                      name: users[0].name(),
-                      domain: users[0].domain,
-                    }),
+                  __html: t(`failedToAddParticipantSingular${errorMessageType[message.reason]}`, {
+                    name: users[0].name(),
+                    domain: users[0].domain,
+                  }),
                 }}
               />
               {learnMore}
@@ -177,23 +174,11 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
       </div>
       <div className="message-body" css={{flexDirection: 'column'}}>
         {isOpen && (
-          <>
-            {message.reason === AddUsersFailureReasons.UNREACHABLE_BACKENDS && (
-              <>
-                {Object.entries(groupedUsers).map(([domain, domainUsers]) => (
-                  <MessageDetails key={domain} domain={domain} message={message} users={domainUsers}>
-                    {learnMore}
-                  </MessageDetails>
-                ))}
-              </>
-            )}
-            {message.reason === AddUsersFailureReasons.NON_FEDERATING_BACKENDS && (
-              <MessageDetails message={message} users={users}>
-                {learnMore}
-              </MessageDetails>
-            )}
-          </>
+          <MessageDetails users={users} reason={message.reason} domains={message.backends}>
+            {learnMore}
+          </MessageDetails>
         )}
+
         {total > 1 && (
           <div>
             <Button

@@ -43,7 +43,8 @@ const useWindowTitle = () => {
   const userState = container.resolve(UserState);
   const conversationState = container.resolve(ConversationState);
 
-  const {contentState, setUnreadMessagesCount} = useAppState();
+  const contentState = useAppState(state => state.contentState);
+  const setUnreadMessagesCount = useAppState(state => state.setUnreadMessagesCount);
 
   const [updateWindowTitle, setUpdateWindowTitle] = useState(false);
 

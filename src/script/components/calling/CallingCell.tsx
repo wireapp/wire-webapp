@@ -32,7 +32,7 @@ import {GroupVideoGrid} from 'Components/calling/GroupVideoGrid';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Icon} from 'Components/Icon';
-import {ClassifiedBar} from 'Components/input/ClassifiedBar';
+import {ConversationClassifiedBar} from 'Components/input/ClassifiedBar';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isEnterKey, KEY} from 'Util/KeyboardUtil';
@@ -106,14 +106,12 @@ const CallingCell: React.FC<CallingCellProps> = ({
   const {
     isGroup,
     participating_user_ets: userEts,
-    allUserEntities: allUsers,
     selfUser,
     display_name: conversationName,
     roles,
   } = useKoSubscribableChildren(conversation, [
     'isGroup',
     'participating_user_ets',
-    'allUserEntities',
     'selfUser',
     'display_name',
     'roles',
@@ -448,11 +446,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
           )}
 
           {classifiedDomains && (
-            <ClassifiedBar
-              conversationDomain={conversation.domain}
-              users={allUsers}
-              classifiedDomains={classifiedDomains}
-            />
+            <ConversationClassifiedBar conversation={conversation} classifiedDomains={classifiedDomains} />
           )}
 
           {!isDeclined && (

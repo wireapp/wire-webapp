@@ -21,14 +21,20 @@ import {faker} from '@faker-js/faker';
 import {ClientClassification} from '@wireapp/api-client/lib/client/';
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {
+  Conversation as BackendConversation,
   CONVERSATION_ACCESS,
   CONVERSATION_LEGACY_ACCESS_ROLE,
   CONVERSATION_TYPE,
   RemoteConversations,
-} from '@wireapp/api-client/lib/conversation/';
+} from '@wireapp/api-client/lib/conversation';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
-import {ConversationCreateEvent, ConversationMemberJoinEvent, CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
+import {
+  ConversationMemberLeaveEvent,
+  ConversationCreateEvent,
+  ConversationMemberJoinEvent,
+  CONVERSATION_EVENT,
+} from '@wireapp/api-client/lib/event/';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
@@ -63,8 +69,6 @@ import {TestFactory} from '../../../test/helper/TestFactory';
 import {generateUser} from '../../../test/helper/UserGenerator';
 import {Core} from '../service/CoreSingleton';
 import {LegacyEventRecord, StorageService} from '../storage';
-
-jest.deepUnmock('axios');
 
 describe('ConversationRepository', () => {
   const testFactory = new TestFactory();
@@ -569,6 +573,7 @@ describe('ConversationRepository', () => {
       it("shows a failed message on the sender's side if the upload fails", () => {
         const selfUser = generateUser();
         const conversation_id = createUuid();
+        const conversationQualifiedId = {domain: '', id: conversation_id};
         const message_id = createUuid();
         const sending_user_id = selfUser.id;
         spyOn(testFactory.conversation_repository['userState'], 'self').and.returnValue(selfUser);
@@ -602,6 +607,31 @@ describe('ConversationRepository', () => {
           time: '2017-09-06T16:14:08.165Z',
           type: 'conversation.asset-add',
         };
+
+        const conversation_payload = {
+          creator: conversation_et.id,
+          id: conversation_id,
+          qualified_id: conversationQualifiedId,
+          members: {
+            others: [],
+            self: {
+              hidden_ref: null,
+              id: conversation_et.id,
+              otr_archived_ref: null,
+              otr_muted_ref: null,
+              otr_muted_status: 0,
+              service: null,
+              status_ref: '0.0',
+              status_time: '2015-01-28T12:53:41.847Z',
+            },
+          },
+          name: '',
+          type: 0,
+        } as unknown as BackendConversation;
+
+        jest
+          .spyOn(testFactory.conversation_repository['conversationService'], 'getConversationById')
+          .mockResolvedValue(conversation_payload);
 
         return testFactory.conversation_repository['fetchConversationById']({domain: '', id: conversation_id})
           .then(fetched_conversation => {
@@ -696,7 +726,7 @@ describe('ConversationRepository', () => {
       it('should process create event for a new conversation created locally', () => {
         jest
           .spyOn(testFactory.conversation_repository['conversationService'], 'getConversationById')
-          .mockResolvedValue(createEvent.data);
+          .mockResolvedValueOnce(createEvent.data);
         return testFactory.conversation_repository['handleConversationEvent'](createEvent).then(() => {
           expect(testFactory.conversation_repository['onCreate']).toHaveBeenCalled();
           expect(testFactory.conversation_repository.mapConversations).toHaveBeenCalledWith([createEvent.data], 1);
@@ -727,7 +757,7 @@ describe('ConversationRepository', () => {
         spyOn(testFactory.conversation_repository as any, 'onMemberJoin').and.callThrough();
         spyOn(testFactory.conversation_repository, 'updateParticipatingUserEntities').and.callThrough();
         spyOn(testFactory.user_repository, 'getUsersById').and.returnValue(Promise.resolve([]));
-        spyOn(container.resolve(Core).service!.conversation, 'isMLSConversationEstablished').and.returnValue(
+        spyOn(container.resolve(Core).service!.conversation, 'mlsGroupExistsLocally').and.returnValue(
           Promise.resolve(true),
         );
 
@@ -1514,5 +1544,106 @@ describe('ConversationRepository', () => {
       expect(conversationRepo.loadMissingConversations).toHaveBeenCalled();
       expect(conversationRepo['refreshAllConversationsUnavailableParticipants']).toHaveBeenCalled();
     });
+  });
+
+  describe('removeMembers', () => {
+    it.each([ConversationProtocol.PROTEUS, ConversationProtocol.MIXED])(
+      'should remove member from %s conversation',
+      async protocol => {
+        const conversationRepository = await testFactory.exposeConversationActors();
+
+        const conversation = _generateConversation({protocol});
+
+        const selfUser = generateUser();
+        conversation.selfUser(selfUser);
+
+        const user1 = generateUser();
+        const user2 = generateUser();
+
+        conversation.participating_user_ets([user1, user2]);
+
+        const coreConversationService = container.resolve(Core).service!.conversation;
+
+        jest.spyOn(conversationRepository['eventRepository'], 'injectEvent').mockImplementation(jest.fn());
+
+        await conversationRepository.removeMembers(conversation, [user1.qualifiedId]);
+
+        expect(coreConversationService.removeUserFromConversation).toHaveBeenCalledWith(
+          conversation.qualifiedId,
+          user1.qualifiedId,
+        );
+      },
+    );
+
+    it('should remove member from mls conversation', async () => {
+      const conversationRepository = await testFactory.exposeConversationActors();
+
+      const conversation = _generateConversation({protocol: ConversationProtocol.MLS});
+
+      const selfUser = generateUser();
+      conversation.selfUser(selfUser);
+
+      const user1 = generateUser();
+      const user2 = generateUser();
+
+      conversation.participating_user_ets([user1, user2]);
+
+      const coreConversationService = container.resolve(Core).service!.conversation;
+
+      jest.spyOn(conversationRepository['eventRepository'], 'injectEvent').mockImplementation(jest.fn());
+
+      const mockedMemberLeaveEvent: ConversationMemberLeaveEvent = {
+        conversation: conversation.id,
+        data: {qualified_user_ids: [], user_ids: []},
+        from: '',
+        time: '',
+        type: CONVERSATION_EVENT.MEMBER_LEAVE,
+      };
+      jest
+        .spyOn(coreConversationService, 'removeUsersFromMLSConversation')
+        .mockResolvedValueOnce({events: [mockedMemberLeaveEvent], conversation: {} as BackendConversation});
+      await conversationRepository.removeMembers(conversation, [user1.qualifiedId]);
+
+      expect(coreConversationService.removeUsersFromMLSConversation).toHaveBeenCalledWith({
+        conversationId: conversation.qualifiedId,
+        qualifiedUserIds: [user1.qualifiedId],
+        groupId: conversation.groupId,
+      });
+      expect(conversationRepository['eventRepository'].injectEvent).toHaveBeenCalled();
+    });
+  });
+
+  describe('leaveConversation', () => {
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+
+    it.each([ConversationProtocol.PROTEUS, ConversationProtocol.MIXED, ConversationProtocol.MLS])(
+      'should leave %s conversation',
+      async protocol => {
+        const conversationRepository = await testFactory.exposeConversationActors();
+
+        const conversation = _generateConversation({protocol});
+
+        const selfUser = generateUser();
+        conversation.selfUser(selfUser);
+
+        spyOn(conversationRepository['userState'], 'self').and.returnValue(selfUser);
+
+        conversation.participating_user_ets([generateUser(), generateUser()]);
+
+        const coreConversationService = container.resolve(Core).service!.conversation;
+
+        jest.spyOn(conversationRepository['eventRepository'], 'injectEvent').mockImplementation(jest.fn());
+
+        await conversationRepository.leaveConversation(conversation);
+
+        expect(coreConversationService.removeUserFromConversation).toHaveBeenCalledWith(
+          conversation.qualifiedId,
+          selfUser.qualifiedId,
+        );
+        expect(conversationRepository['eventRepository'].injectEvent).toHaveBeenCalled();
+      },
+    );
   });
 });

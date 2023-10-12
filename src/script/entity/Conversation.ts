@@ -45,7 +45,6 @@ import type {ContentMessage} from './message/ContentMessage';
 import type {MemberMessage} from './message/MemberMessage';
 import type {Message} from './message/Message';
 import {PingMessage} from './message/PingMessage';
-import type {SystemMessage} from './message/SystemMessage';
 import type {User} from './User';
 
 import type {Call} from '../calling/Call';
@@ -59,7 +58,7 @@ import {ConversationStatus} from '../conversation/ConversationStatus';
 import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
 import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
 import {ConversationError} from '../error/ConversationError';
-import {isContentMessage} from '../guards/Message';
+import {isContentMessage, isDeleteMessage} from '../guards/Message';
 import {StatusType} from '../message/StatusType';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
 import {TeamState} from '../team/TeamState';
@@ -86,8 +85,7 @@ enum TIMESTAMP_TYPE {
 export class Conversation {
   private readonly teamState: TeamState;
   public readonly archivedState: ko.Observable<boolean>;
-  private readonly incomingMessages: ko.ObservableArray<Message | ContentMessage | MemberMessage>;
-  private readonly isManaged: boolean;
+  private readonly incomingMessages: ko.ObservableArray<Message>;
   private readonly isTeam1to1: ko.PureComputed<boolean>;
   public readonly last_server_timestamp: ko.Observable<number>;
   private readonly logger: Logger;
@@ -112,7 +110,7 @@ export class Conversation {
   public cipherSuite: number = 1;
   public readonly isUsingMLSProtocol: boolean;
   public readonly display_name: ko.PureComputed<string>;
-  public readonly firstUserEntity: ko.PureComputed<User>;
+  public readonly firstUserEntity: ko.PureComputed<User | undefined>;
   public readonly enforcedTeamMessageTimer: ko.PureComputed<number>;
   public readonly globalMessageTimer: ko.Observable<number | null>;
   public readonly hasContentMessages: ko.Observable<boolean>;
@@ -150,9 +148,9 @@ export class Conversation {
   public readonly last_read_timestamp: ko.Observable<number>;
   public readonly legalHoldStatus: ko.Observable<LegalHoldStatus>;
   public readonly localMessageTimer: ko.Observable<number>;
-  public readonly messages_unordered: ko.ObservableArray<Message | ContentMessage | MemberMessage>;
-  public readonly messages_visible: ko.PureComputed<(Message | ContentMessage | MemberMessage)[]>;
-  public readonly messages: ko.PureComputed<(Message | ContentMessage | MemberMessage)[]>;
+  public readonly messages_unordered: ko.ObservableArray<Message>;
+  public readonly messages_visible: ko.PureComputed<Message[]>;
+  public readonly messages: ko.PureComputed<Message[]>;
   public readonly messageTimer: ko.PureComputed<number>;
   public readonly name: ko.Observable<string>;
   public readonly notificationState: ko.PureComputed<number>;
@@ -229,7 +227,6 @@ export class Conversation {
     this.availabilityOfUser = ko.pureComputed(() => this.firstUserEntity()?.availability());
 
     this.isGuest = ko.observable(false);
-    this.isManaged = false;
 
     this.inTeam = ko.pureComputed(() => {
       const isSameTeam = this.selfUser()?.teamId === this.team_id;
@@ -255,7 +252,10 @@ export class Conversation {
       const is1to1Conversation = this.type() === CONVERSATION_TYPE.ONE_TO_ONE;
       return is1to1Conversation || this.isTeam1to1();
     });
-    this.isRequest = ko.pureComputed(() => this.type() === CONVERSATION_TYPE.CONNECT);
+    this.isRequest = ko.pureComputed(
+      () =>
+        this.type() === CONVERSATION_TYPE.CONNECT || (this.is1to1() && this.participating_user_ets()[0]?.isRequest()),
+    );
     this.isSelf = ko.pureComputed(() => this.type() === CONVERSATION_TYPE.SELF);
 
     this.hasDirectGuest = ko.pureComputed(() => {
@@ -677,7 +677,7 @@ export class Conversation {
    * @param messageEntity Message entity to be added to the conversation.
    * @returns If a message was replaced in the conversation
    */
-  addMessage(messageEntity: Message | ContentMessage | MemberMessage): boolean | void {
+  addMessage(messageEntity: Message): boolean | void {
     if (messageEntity) {
       const messageWithLinkPreview = () => this._findDuplicate(messageEntity.id, messageEntity.from);
       const editedMessage = () =>
@@ -690,11 +690,13 @@ export class Conversation {
       if (alreadyAdded) {
         return false;
       }
-      if (this.isShowingLastReceivedMessage()) {
+      if (this.hasLastReceivedMessageLoaded()) {
         this.updateTimestamps(messageEntity);
         this.incomingMessages.remove(({id}) => messageEntity.id === id);
+        // If the last received message is currently in memory, we can add this message to the displayed messages
         this.messages_unordered.push(messageEntity);
       } else {
+        // If the conversation is not loaded, we will add this message to the incoming messages (but not to the messages displayed)
         this.incomingMessages.push(messageEntity);
       }
       amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.ADDED, messageEntity);
@@ -866,8 +868,8 @@ export class Conversation {
   }
 
   private _findDuplicate(): undefined;
-  private _findDuplicate(messageId: string, from: string): Message | ContentMessage | MemberMessage;
-  private _findDuplicate(messageId?: string, from?: string): Message | ContentMessage | MemberMessage | undefined {
+  private _findDuplicate(messageId: string, from: string): Message;
+  private _findDuplicate(messageId?: string, from?: string): Message | undefined {
     if (messageId) {
       return this.messages_unordered().find(messageEntity => {
         const sameId = messageEntity.id === messageId;
@@ -894,10 +896,7 @@ export class Conversation {
    * @param message_et Message to be added to conversation
    * @param forceUpdate set the timestamp regardless of previous timestamp value (no checks)
    */
-  updateTimestamps(
-    message_et?: Message | ContentMessage | MemberMessage | SystemMessage,
-    forceUpdate: boolean = false,
-  ): void {
+  updateTimestamps(message_et?: Message, forceUpdate: boolean = false): void {
     if (message_et) {
       const timestamp = message_et.timestamp();
       if (timestamp <= this.last_server_timestamp()) {
@@ -916,21 +915,25 @@ export class Conversation {
     }
   }
 
-  getAllMessages(): (Message | ContentMessage | MemberMessage | SystemMessage)[] {
+  getAllMessages(): Message[] {
     return this.messages();
   }
 
   /**
-   * Get the first message of the conversation.
+   * Get the oldest loaded message of the conversation.
    */
-  getOldestMessage(): Message | ContentMessage | MemberMessage | SystemMessage | undefined {
-    return this.messages()[0];
+  getOldestMessage(): Message | undefined {
+    return this.messages().find(
+      message =>
+        // Deleted message should be ignored since they might have a timestamp in the past (the timestamp of a delete message is the timestamp of the message that was deleted)
+        !isDeleteMessage(message),
+    );
   }
 
   /**
    * Get the last message of the conversation.
    */
-  getNewestMessage(): Message | ContentMessage | MemberMessage | SystemMessage | undefined {
+  getNewestMessage(): Message | undefined {
     return this.messages()[this.messages().length - 1];
   }
 
@@ -938,7 +941,7 @@ export class Conversation {
    * Get the message before a given message.
    * @param message_et Message to look up from
    */
-  getPreviousMessage(message_et: Message): Message | ContentMessage | MemberMessage | SystemMessage | undefined {
+  getPreviousMessage(message_et: Message): Message | undefined {
     const messages_visible = this.messages_visible();
     const message_index = messages_visible.indexOf(message_et);
     if (message_index > 0) {
@@ -950,7 +953,7 @@ export class Conversation {
   /**
    * Get the last text message that was added by self user.
    */
-  getLastEditableMessage(): Message | ContentMessage | MemberMessage | SystemMessage | undefined {
+  getLastEditableMessage(): ContentMessage | undefined {
     const messages = this.messages();
     for (let index = messages.length - 1; index >= 0; index--) {
       const message_et = messages[index];
@@ -964,12 +967,12 @@ export class Conversation {
   /**
    * Get the last delivered message.
    */
-  getLastDeliveredMessage(): Message | ContentMessage | MemberMessage | SystemMessage | undefined {
+  private getLastDeliveredMessage(): Message | undefined {
     return this.messages()
       .slice()
       .reverse()
       .find(messageEntity => {
-        const isDelivered = messageEntity.status() >= StatusType.DELIVERED;
+        const isDelivered = [StatusType.DELIVERED, StatusType.SEEN].includes(messageEntity.status());
         return isDelivered && messageEntity.user().isMe;
       });
   }
@@ -980,7 +983,7 @@ export class Conversation {
    *
    * @param messageId ID of message to be retrieved
    */
-  getMessage(messageId: string): Message | ContentMessage | MemberMessage | SystemMessage | undefined {
+  getMessage(messageId: string): Message | undefined {
     return this.messages().find(messageEntity => messageEntity.id === messageId);
   }
   /**
@@ -989,7 +992,7 @@ export class Conversation {
    *
    * @param messageId ID of message to be retrieved
    */
-  getMessageByReplacementId(messageId: string): Message | ContentMessage | MemberMessage | SystemMessage | undefined {
+  getMessageByReplacementId(messageId: string): Message | undefined {
     return this.messages().find(
       messageEntity => isContentMessage(messageEntity) && messageEntity.replacing_message_id === messageId,
     );
@@ -1022,10 +1025,9 @@ export class Conversation {
     return participantCount <= config.MAX_VIDEO_PARTICIPANTS;
   }
 
-  readonly isShowingLastReceivedMessage = (): boolean => {
-    return this.getNewestMessage()?.timestamp()
-      ? this.getNewestMessage().timestamp() >= this.last_event_timestamp()
-      : true;
+  readonly hasLastReceivedMessageLoaded = (): boolean => {
+    const newestMessage = this.getNewestMessage();
+    return newestMessage?.timestamp() ? newestMessage.timestamp() >= this.last_event_timestamp() : true;
   };
 
   serialize(): ConversationRecord {
@@ -1044,7 +1046,6 @@ export class Conversation {
       group_id: this.groupId,
       id: this.id,
       is_guest: this.isGuest(),
-      is_managed: this.isManaged,
       last_event_timestamp: this.last_event_timestamp(),
       last_read_timestamp: this.last_read_timestamp(),
       last_server_timestamp: this.last_server_timestamp(),

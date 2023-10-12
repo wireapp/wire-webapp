@@ -70,7 +70,7 @@ export const useUserDevicesHistory = () => {
   };
 };
 
-export const sortUserDevices = (devices: ClientEntity[]): ClientEntity[] => {
+const sortUserDevices = (devices: ClientEntity[]): ClientEntity[] => {
   const [legalholdDevices, otherDevices] = partition(
     devices,
     device => device.class === ClientClassification.LEGAL_HOLD,

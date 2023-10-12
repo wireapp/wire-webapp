@@ -65,10 +65,6 @@ export const messageActionsMenuButton = (isReactable = true): CSSObject => {
   };
 };
 
-export const nonReactableMSgMenu: CSSObject = {
-  borderRadius: '12px',
-};
-
 export const getIconCSS: CSSObject = {
   'body.theme-dark &': {
     'svg path': {

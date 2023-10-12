@@ -18,25 +18,27 @@
  */
 
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
-import {registerRecurringTask} from '@wireapp/core/lib/util/RecurringTaskScheduler';
+import {FEATURE_KEY, FeatureMLS} from '@wireapp/api-client/lib/team/feature/';
+import {amplify} from 'amplify';
 import {container} from 'tsyringe';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Logger, getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {SelfService} from './SelfService';
+import {evaluateSelfSupportedProtocols} from './SelfSupportedProtocols/SelfSupportedProtocols';
 
-import {ClientRepository} from '../client';
-import {isMLSSupportedByEnvironment} from '../mls/isMLSSupportedByEnvironment';
-import {MLSMigrationStatus} from '../mls/MLSMigration/migrationStatus';
+import {ClientEntity, ClientRepository} from '../client';
+import {Core} from '../service/CoreSingleton';
 import {TeamRepository} from '../team/TeamRepository';
 import {UserRepository} from '../user/UserRepository';
 import {UserState} from '../user/UserState';
 
-const SELF_SUPPORTED_PROTOCOLS_CHECK_KEY = 'self-supported-protocols-check';
-
 export class SelfRepository {
   private readonly logger: Logger;
+  static SELF_SUPPORTED_PROTOCOLS_CHECK_KEY = 'self-supported-protocols-check';
 
   constructor(
     private readonly selfService: SelfService,
@@ -44,121 +46,77 @@ export class SelfRepository {
     private readonly teamRepository: TeamRepository,
     private readonly clientRepository: ClientRepository,
     private readonly userState = container.resolve(UserState),
+    private readonly core = container.resolve(Core),
   ) {
     this.logger = getLogger('SelfRepository');
+
+    // Every time user's client is deleted, we need to re-evaluate self supported protocols.
+    // It's possible that they have removed proteus client, and now all their clients are mls-capable.
+    amplify.subscribe(WebAppEvents.CLIENT.REMOVE, this.refreshSelfSupportedProtocols);
+
+    teamRepository.on('teamRefreshed', this.refreshSelfSupportedProtocols);
+    teamRepository.on('featureUpdated', ({event, prevFeatureList}) => {
+      if (event.name === FEATURE_KEY.MLS) {
+        void this.handleMLSFeatureUpdate(event.data, prevFeatureList?.[FEATURE_KEY.MLS]);
+      }
+    });
   }
 
-  /**
-   * Proteus is supported if:
-   * - Proteus is in the list of supported protocols
-   * - MLS migration is enabled but not finalised
-   */
-  private isProteusSupported(): boolean {
-    const teamSupportedProtocols = this.teamRepository.getTeamSupportedProtocols();
-    const mlsMigrationStatus = this.teamRepository.getTeamMLSMigrationStatus();
+  private get selfUser() {
+    const selfUser = this.userState.self();
+    if (!selfUser) {
+      throw new Error('Self user is not available');
+    }
+    return selfUser;
+  }
 
-    const isProteusSupportedByTeam = teamSupportedProtocols.includes(ConversationProtocol.PROTEUS);
-    return (
-      isProteusSupportedByTeam ||
-      [MLSMigrationStatus.NOT_STARTED, MLSMigrationStatus.ONGOING].includes(mlsMigrationStatus)
+  private handleMLSFeatureUpdate = async (newMLSFeature: FeatureMLS, prevMLSFeature?: FeatureMLS) => {
+    const prevSupportedProtocols = prevMLSFeature?.config.supportedProtocols ?? [];
+    const newSupportedProtocols = newMLSFeature.config.supportedProtocols ?? [];
+
+    const hasFeatureStatusChanged = prevMLSFeature?.status !== newMLSFeature.status;
+
+    const hasTeamSupportedProtocolsChanged = !(
+      prevSupportedProtocols.length === newSupportedProtocols.length &&
+      [...prevSupportedProtocols].every(protocol => newSupportedProtocols.includes(protocol))
     );
-  }
 
-  /**
-   * MLS is forced if:
-   * - only MLS is in the list of supported protocols
-   * - MLS migration is disabled
-   * - There are still some active clients that do not support MLS
-   * It means that team admin wants to force MLS and drop proteus support, even though not all active clients support MLS
-   */
-  private async isMLSForcedWithoutMigration(): Promise<boolean> {
-    const isMLSSupportedByEnv = await isMLSSupportedByEnvironment();
-
-    if (!isMLSSupportedByEnv) {
-      return false;
+    if (hasFeatureStatusChanged || hasTeamSupportedProtocolsChanged) {
+      await this.refreshSelfSupportedProtocols();
     }
-
-    const teamSupportedProtocols = this.teamRepository.getTeamSupportedProtocols();
-    const mlsMigrationStatus = this.teamRepository.getTeamMLSMigrationStatus();
-
-    const isMLSSupportedByTeam = teamSupportedProtocols.includes(ConversationProtocol.MLS);
-    const isProteusSupportedByTeam = teamSupportedProtocols.includes(ConversationProtocol.PROTEUS);
-    const doActiveClientsSupportMLS = await this.clientRepository.haveAllActiveSelfClientsRegisteredMLSDevice();
-    const isMigrationDisabled = mlsMigrationStatus === MLSMigrationStatus.DISABLED;
-
-    return !doActiveClientsSupportMLS && isMLSSupportedByTeam && !isProteusSupportedByTeam && isMigrationDisabled;
-  }
-
-  /**
-   * MLS is supported if:
-   * - MLS is in the list of supported protocols
-   * - All active clients support MLS, or MLS migration is finalised
-   */
-  private async isMLSSupported(): Promise<boolean> {
-    const isMLSSupportedByEnv = await isMLSSupportedByEnvironment();
-
-    if (!isMLSSupportedByEnv) {
-      return false;
-    }
-
-    const teamSupportedProtocols = this.teamRepository.getTeamSupportedProtocols();
-    const mlsMigrationStatus = this.teamRepository.getTeamMLSMigrationStatus();
-
-    const isMLSSupportedByTeam = teamSupportedProtocols.includes(ConversationProtocol.MLS);
-    const doActiveClientsSupportMLS = await this.clientRepository.haveAllActiveSelfClientsRegisteredMLSDevice();
-    return isMLSSupportedByTeam && (doActiveClientsSupportMLS || mlsMigrationStatus === MLSMigrationStatus.FINALISED);
-  }
-
-  /**
-   * Will evaluate the list of self user's supported protocols and return them.
-   */
-  public async evaluateSelfSupportedProtocols(): Promise<ConversationProtocol[]> {
-    const supportedProtocols: ConversationProtocol[] = [];
-
-    const isProteusProtocolSupported = this.isProteusSupported();
-    if (isProteusProtocolSupported) {
-      supportedProtocols.push(ConversationProtocol.PROTEUS);
-    }
-
-    const isMLSProtocolSupported = await this.isMLSSupported();
-
-    const isMLSForced = await this.isMLSForcedWithoutMigration();
-
-    if (isMLSProtocolSupported || isMLSForced) {
-      supportedProtocols.push(ConversationProtocol.MLS);
-    }
-
-    return supportedProtocols;
-  }
+  };
 
   /**
    * Update self user's list of supported protocols.
    * It will send a request to the backend to change the supported protocols and then update the user in the local state.
    * @param supportedProtocols - an array of new supported protocols
    */
-  private async updateSelfSupportedProtocols(
-    supportedProtocols: ConversationProtocol[],
-  ): Promise<ConversationProtocol[]> {
+  private async updateSelfSupportedProtocols(supportedProtocols: ConversationProtocol[]): Promise<void> {
     this.logger.info('Supported protocols will get updated to:', supportedProtocols);
-    await this.selfService.putSupportedProtocols(supportedProtocols);
-    await this.userRepository.updateUserSupportedProtocols(this.userState.self().qualifiedId, supportedProtocols);
-    return supportedProtocols;
+    try {
+      await this.selfService.putSupportedProtocols(supportedProtocols);
+      await this.userRepository.updateUserSupportedProtocols(this.selfUser.qualifiedId, supportedProtocols);
+    } catch (error) {
+      this.logger.error('Failed to update self supported protocols: ', error);
+    }
   }
 
   /**
    * Will re-evaluate self supported protocols and update them if necessary.
    * It will send a request to the backend to change the supported protocols and then update the user in the local state.
-   * @param supportedProtocols - an array of new supported protocols
    */
-  public async refreshSelfSupportedProtocols(): Promise<ConversationProtocol[]> {
-    const selfUser = this.userState.self();
-    const localSupportedProtocols = selfUser.supportedProtocols();
+  public readonly refreshSelfSupportedProtocols = async (): Promise<ConversationProtocol[]> => {
+    const localSupportedProtocols = this.selfUser.supportedProtocols();
 
     this.logger.info('Evaluating self supported protocols, currently supported protocols:', localSupportedProtocols);
-    const refreshedSupportedProtocols = await this.evaluateSelfSupportedProtocols();
+    const refreshedSupportedProtocols = await evaluateSelfSupportedProtocols(
+      this.teamRepository,
+      this.clientRepository,
+    );
 
     if (!localSupportedProtocols) {
-      return this.updateSelfSupportedProtocols(refreshedSupportedProtocols);
+      await this.updateSelfSupportedProtocols(refreshedSupportedProtocols);
+      return refreshedSupportedProtocols;
     }
 
     const hasSupportedProtocolsChanged = !(
@@ -170,32 +128,29 @@ export class SelfRepository {
       return localSupportedProtocols;
     }
 
-    return this.updateSelfSupportedProtocols(refreshedSupportedProtocols);
-  }
+    await this.updateSelfSupportedProtocols(refreshedSupportedProtocols);
+    return refreshedSupportedProtocols;
+  };
 
   /**
    * Will initialise the intervals for checking (and updating if necessary) self supported protocols.
    * Should be called only once on app load.
-   *
-   * @param selfUser - self user
-   * @param teamState - team state
-   * @param userRepository - user repository
    */
   public async initialisePeriodicSelfSupportedProtocolsCheck() {
     // We update supported protocols of self user on initial app load and then in 24 hours intervals
-    const refreshProtocolsTask = async () => {
-      await this.refreshSelfSupportedProtocols();
-      try {
-      } catch (error) {
-        this.logger.error('Failed to update self supported protocols, will retry after 24h. Error: ', error);
-      }
-    };
-    await refreshProtocolsTask();
+    await this.refreshSelfSupportedProtocols();
 
-    return registerRecurringTask({
+    await this.core.recurringTaskScheduler.registerTask({
       every: TIME_IN_MILLIS.DAY,
-      task: refreshProtocolsTask,
-      key: SELF_SUPPORTED_PROTOCOLS_CHECK_KEY,
+      task: () => this.refreshSelfSupportedProtocols(),
+      key: SelfRepository.SELF_SUPPORTED_PROTOCOLS_CHECK_KEY,
     });
+  }
+
+  public async deleteSelfUserClient(clientId: string, password?: string): Promise<ClientEntity[]> {
+    const clients = this.clientRepository.deleteClient(clientId, password);
+
+    await this.refreshSelfSupportedProtocols();
+    return clients;
   }
 }
