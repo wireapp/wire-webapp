@@ -21,13 +21,23 @@ import {Conversation} from '../../../entity/Conversation';
 import {User} from '../../../entity/User';
 
 export interface FederationDeleteResult {
+  /**
+   * Conversations the self user is part of that are hosted on the deleted domain
+   */
   conversationsToLeave: Conversation[];
+
   /**
    * One to One conversations that must be marked as disabled
    * and the connection to their user must be deleted
    */
   conversationsToDisable: Conversation[];
+
+  /**
+   * Conversations that contain users from the deleted domain
+   */
   conversationsToDeleteUsers: {conversation: Conversation; users: User[]}[];
+
+  connectionRequestsToDelete: Conversation[];
 }
 
 export function getFederationDeleteEventUpdates(
@@ -38,15 +48,19 @@ export function getFederationDeleteEventUpdates(
     conversationsToLeave: [],
     conversationsToDisable: [],
     conversationsToDeleteUsers: [],
+    connectionRequestsToDelete: [],
   };
 
   conversations.forEach(conversation => {
     const is1to1 = conversation.is1to1();
+    const isConnectionRequest = conversation.isRequest();
     const firstUserEntity = conversation.firstUserEntity();
     const allUserEntities = conversation.allUserEntities();
 
-    if (conversation.domain === deletedDomain && !is1to1) {
+    if (conversation.domain === deletedDomain && !is1to1 && !isConnectionRequest) {
       result.conversationsToLeave.push(conversation);
+    } else if (isConnectionRequest && firstUserEntity?.qualifiedId.domain === deletedDomain) {
+      result.connectionRequestsToDelete.push(conversation);
     } else if (is1to1 && firstUserEntity?.qualifiedId.domain === deletedDomain) {
       result.conversationsToDisable.push(conversation);
     } else {
