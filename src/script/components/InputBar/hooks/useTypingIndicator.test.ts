@@ -125,4 +125,30 @@ describe('useTypingIndicator', () => {
     unmount();
     expect(onTypingChange).toHaveBeenCalledWith(false);
   });
+
+  it('calls the callback only once as user types', () => {
+    const onTypingChange = jest.fn();
+    const {rerender} = renderHook(useTypingIndicator, {
+      initialProps: {text: '', isEnabled: true, onTypingChange},
+    });
+
+    expect(onTypingChange).not.toHaveBeenCalled();
+
+    fireEvent.keyDown(document);
+
+    rerender({text: 'a', isEnabled: true, onTypingChange});
+    expect(onTypingChange).toHaveBeenCalledWith(true);
+
+    rerender({text: 'ab', isEnabled: true, onTypingChange});
+    expect(onTypingChange).toHaveBeenCalledTimes(1);
+
+    rerender({text: 'abc', isEnabled: true, onTypingChange});
+    expect(onTypingChange).toHaveBeenCalledTimes(1);
+
+    jest.advanceTimersByTime(TYPING_TIMEOUT + 1);
+    expect(onTypingChange).toHaveBeenCalledWith(false);
+
+    rerender({text: 'abcd', isEnabled: true, onTypingChange});
+    expect(onTypingChange).toHaveBeenCalledTimes(3);
+  });
 });
