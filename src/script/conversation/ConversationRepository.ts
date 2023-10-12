@@ -1615,21 +1615,27 @@ export class ConversationRepository {
 
     const localProteusConversations = this.conversationState.findProteus1to1Conversations(otherUserId);
 
-    // If proteus 1:1 conversation with the same user is known, we have to make sure it is replaced with mls 1:1 conversation
+    // If proteus 1:1 conversation with the same user is known, we have to make sure it is replaced with mls 1:1 conversation.
     if (localProteusConversations) {
       await this.replaceProteus1to1WithMLS(localProteusConversations, mlsConversation);
     }
 
-    //if mls is not supported by the other user we do not establish the group yet
-    //we just mark the mls conversation as readonly and return it
+    // If mls is not supported by the other user we do not establish the group yet.
     if (!isMLSSupportedByTheOtherUser) {
-      await this.markConversationReadOnly(
-        mlsConversation,
-        CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_OTHER_UNSUPPORTED_MLS,
+      const isMLSGroupEstablishedLocally = await this.conversationService.isMLSGroupEstablishedLocally(
+        mlsConversation.groupId,
       );
-      this.logger.info(
-        `MLS 1:1 conversation with user ${otherUserId.id} is not supported by the other user, conversation will become readonly`,
-      );
+
+      // If group was not yet established, we mark the mls conversation as readonly
+      if (!isMLSGroupEstablishedLocally) {
+        await this.markConversationReadOnly(
+          mlsConversation,
+          CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_OTHER_UNSUPPORTED_MLS,
+        );
+        this.logger.info(
+          `MLS 1:1 conversation with user ${otherUserId.id} is not supported by the other user, conversation will become readonly`,
+        );
+      }
       return mlsConversation;
     }
 
