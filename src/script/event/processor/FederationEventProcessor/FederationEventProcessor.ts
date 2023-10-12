@@ -18,7 +18,6 @@
  */
 
 import {FEDERATION_EVENT} from '@wireapp/api-client/lib/event';
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 import {debounce} from 'underscore';
 
@@ -70,14 +69,20 @@ export class FederationEventProcessor implements EventProcessor {
    * @param deletedDomain the domain that stopped federating
    */
   private onFederationDelete = debounce(async (deletedDomain: string) => {
-    const {conversationsToDeleteUsers, conversationsToLeave, conversationsToDisable} = getFederationDeleteEventUpdates(
-      deletedDomain,
-      this.conversationState.conversations(),
-    );
+    const allConversations = this.conversationState
+      .conversations()
+      .filter(conversation => !this.conversationState.isSelfConversation(conversation));
+
+    const {conversationsToDeleteUsers, conversationsToLeave, connectionRequestsToDelete, conversationsToDisable} =
+      getFederationDeleteEventUpdates(deletedDomain, allConversations);
 
     conversationsToLeave.forEach(async conversation => {
-      await this.removeMembers(conversation, [this.selfUser]);
       await this.insertFederationStopSystemMessage(conversation, [deletedDomain]);
+      await this.removeMembers(conversation, [this.selfUser]);
+    });
+
+    connectionRequestsToDelete.forEach(conversation => {
+      this.conversationState.conversations.remove(conversation);
     });
 
     conversationsToDisable.forEach(async conversation => {
@@ -113,14 +118,11 @@ export class FederationEventProcessor implements EventProcessor {
 
     for (const {conversation, usersToRemove} of result) {
       await this.insertFederationStopSystemMessage(conversation, domains);
-      await this.removeDeletedFederationUsers(
-        conversation,
-        usersToRemove.map(user => user.qualifiedId),
-      );
+      await this.removeDeletedFederationUsers(conversation, usersToRemove);
     }
   }, 1000);
 
-  private async removeDeletedFederationUsers(conversation: Conversation, users: QualifiedId[]) {
+  private async removeDeletedFederationUsers(conversation: Conversation, users: User[]) {
     if (users.length === 0) {
       return;
     }
@@ -136,11 +138,16 @@ export class FederationEventProcessor implements EventProcessor {
   /**
    * Will inject a `member-leave` that will then trigger the local removal of the user in the conversation
    * @param conversation the conversation in which we want to remove users
-   * @param userIds the users to remove from the conversation
+   * @param users the users to remove from the conversation
    */
-  private async removeMembers(conversation: Conversation, userIds: QualifiedId[]) {
+  private async removeMembers(conversation: Conversation, users: User[]) {
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-    const event = EventBuilder.buildMemberLeave(conversation, userIds, '', currentTimestamp);
+    const event = EventBuilder.buildMemberLeave(
+      conversation,
+      users.map(user => user.qualifiedId),
+      '',
+      currentTimestamp,
+    );
     // Injecting the event will trigger all the handlers that will then actually remove the users from the conversation
     await this.eventRepository.injectEvent(event);
   }
