@@ -30,10 +30,9 @@ import {generateUser} from 'test/helper/UserGenerator';
 import {setStrings} from 'Util/LocalizerUtil';
 
 import {MemberMessage} from './MemberMessage';
+import {CONFIG} from './MemberMessage/MessageContent';
 
 setStrings({en});
-
-const config = MemberMessageEntity.CONFIG;
 
 function createMemberMessage({systemType, type}: {systemType?: SystemMessageType; type?: string}, users?: User[]) {
   const message = new MemberMessageEntity();
@@ -98,9 +97,9 @@ describe('MemberMessage', () => {
       });
     });
 
-    it('displays a showMore when there are more than 17 users', () => {
+    it('displays a showMore when there are more than MAX_USERS_VISIBLE users', () => {
       const nbExtraUsers = randomInt(1, 10);
-      const nbUsers = config.MAX_USERS_VISIBLE + nbExtraUsers;
+      const nbUsers = CONFIG.MAX_USERS_VISIBLE + nbExtraUsers;
 
       const users = Array.from({length: nbUsers}, () => generateUser());
       const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, users);
@@ -109,8 +108,10 @@ describe('MemberMessage', () => {
         message,
       };
 
-      const {getByText} = render(<MemberMessage {...props} />);
-      const showMoreButton = getByText(`${nbUsers - config.REDUCED_USERS_COUNT} more`);
+      const {getByText, container} = render(<MemberMessage {...props} />);
+
+      expect(container.querySelectorAll('strong')).toHaveLength(CONFIG.REDUCED_USERS_COUNT);
+      const showMoreButton = getByText(`${nbUsers - CONFIG.REDUCED_USERS_COUNT} more`);
       showMoreButton.click();
 
       expect(props.onClickParticipants).toHaveBeenCalledTimes(1);
@@ -118,7 +119,7 @@ describe('MemberMessage', () => {
 
     it('displays all team members', () => {
       const nbExtraUsers = randomInt(1, 10);
-      const nbTeamUsers = config.MAX_WHOLE_TEAM_USERS_VISIBLE + nbExtraUsers;
+      const nbTeamUsers = CONFIG.MAX_WHOLE_TEAM_USERS_VISIBLE + nbExtraUsers;
 
       const teamUsers = Array.from({length: nbTeamUsers}, () => generateUser());
       const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, teamUsers);
@@ -137,7 +138,7 @@ describe('MemberMessage', () => {
 
     it('displays all team members and one guest message', () => {
       const nbExtraUsers = randomInt(1, 10);
-      const nbTeamUsers = config.MAX_WHOLE_TEAM_USERS_VISIBLE + nbExtraUsers;
+      const nbTeamUsers = CONFIG.MAX_WHOLE_TEAM_USERS_VISIBLE + nbExtraUsers;
 
       const teamUsers = Array.from({length: nbTeamUsers}, () => generateUser());
       const guest = generateUser();
@@ -155,7 +156,7 @@ describe('MemberMessage', () => {
 
     it('displays all team members and multiple guests message', () => {
       const nbGuests = randomInt(2, 10);
-      const nbTeamUsers = config.MAX_WHOLE_TEAM_USERS_VISIBLE;
+      const nbTeamUsers = CONFIG.MAX_WHOLE_TEAM_USERS_VISIBLE;
 
       const teamUsers = Array.from({length: nbTeamUsers}, () => generateUser());
       const guests = Array.from({length: nbGuests}, () => {

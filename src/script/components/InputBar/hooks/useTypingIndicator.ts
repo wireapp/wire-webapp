@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useRef} from 'react';
+import {useCallback, useEffect, useRef} from 'react';
 
 import {TYPING_TIMEOUT} from '../components/TypingIndicator';
 
@@ -29,6 +29,17 @@ type TypingIndicatorProps = {
 
 export function useTypingIndicator({text, isEnabled, onTypingChange}: TypingIndicatorProps) {
   const hasHitKeyboard = useRef(false);
+  const isTypingRef = useRef(false);
+
+  const setTyping = useCallback(
+    (isTyping: boolean) => {
+      if (isTyping !== isTypingRef.current) {
+        isTypingRef.current = isTyping;
+        onTypingChange(isTyping);
+      }
+    },
+    [onTypingChange],
+  );
 
   useEffect(() => {
     if (!hasHitKeyboard.current && isEnabled) {
@@ -50,14 +61,14 @@ export function useTypingIndicator({text, isEnabled, onTypingChange}: TypingIndi
     }
 
     if (text.length > 0) {
-      onTypingChange(true);
-      timerId = window.setTimeout(() => onTypingChange(false), TYPING_TIMEOUT);
+      setTyping(true);
+      timerId = window.setTimeout(() => setTyping(false), TYPING_TIMEOUT);
     } else {
-      onTypingChange(false);
+      setTyping(false);
     }
 
     return () => window.clearTimeout(timerId);
-  }, [text, onTypingChange]);
+  }, [text, setTyping]);
 
-  useEffect(() => () => onTypingChange(false), [onTypingChange]);
+  useEffect(() => () => setTyping(false), [setTyping]);
 }
