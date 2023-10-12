@@ -76,7 +76,7 @@ describe('ReceiptsMiddleware', () => {
       eventService.loadEvents.mockResolvedValue([originalEvent]);
       eventService.replaceEvent.mockResolvedValue(originalEvent);
 
-      const event = createConfirmationEvent(StatusType.SEEN, [], selfUser.id);
+      const event = createConfirmationEvent(StatusType.SEEN, selfUser.id);
 
       await readReceiptMiddleware.processEvent(event);
 
@@ -95,7 +95,7 @@ describe('ReceiptsMiddleware', () => {
       eventService.loadEvents.mockResolvedValue([originalEvent]);
       eventService.replaceEvent.mockResolvedValue(originalEvent);
 
-      const event = createConfirmationEvent(StatusType.DELIVERED, [], selfUser.id);
+      const event = createConfirmationEvent(StatusType.DELIVERED, selfUser.id);
 
       await readReceiptMiddleware.processEvent(event);
 
@@ -108,13 +108,13 @@ describe('ReceiptsMiddleware', () => {
   });
 });
 
-function createConfirmationEvent(status: StatusType, moreMessageIds = [], fromId = createUuid()): ConfirmationEvent {
+function createConfirmationEvent(status: StatusType, fromId = createUuid()): ConfirmationEvent {
   return {
     id: createUuid(),
     conversation: createUuid(),
     data: {
       message_id: createUuid(),
-      more_message_ids: moreMessageIds,
+      more_message_ids: [],
       status,
     },
     from: fromId,

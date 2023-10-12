@@ -37,7 +37,7 @@ import {queue} from 'Util/PromiseQueue';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {ClientEvent} from './Client';
-import {EventProcessor, IncomingEvent} from './EventProcessor';
+import {EventMiddleware, EventProcessor, IncomingEvent} from './EventProcessor';
 import type {EventService} from './EventService';
 import {EventSource} from './EventSource';
 import {EVENT_TYPE} from './EventType';
@@ -427,7 +427,7 @@ export class EventRepository {
    */
   private async processEvent(event: IncomingEvent | ClientConversationEvent, source: EventSource) {
     for (const eventProcessMiddleware of this.eventProcessMiddlewares) {
-      event = await eventProcessMiddleware(event);
+      event = await eventProcessMiddleware.processEvent(event);
     }
 
     const shouldSaveEvent = EventTypeHandling.STORE.includes(event.type as CONVERSATION_EVENT);
