@@ -68,6 +68,7 @@ import {
 } from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {isBackendError} from 'Util/TypePredicateUtil';
+import {supportsMLS} from 'Util/util';
 import {createUuid} from 'Util/uuid';
 
 import {ACCESS_STATE} from './AccessState';
@@ -273,7 +274,7 @@ export class ConversationRepository {
       this.conversationState,
     );
 
-    if (Config.getConfig().FEATURE.ENABLE_MLS === true) {
+    if (supportsMLS()) {
       // we register a handler that will handle MLS conversations on its own
       registerMLSConversationVerificationStateHandler(
         this.onConversationVerificationStateChange,
