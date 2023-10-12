@@ -380,7 +380,7 @@ export class App {
       // Setup all event middleware
       const serviceMiddleware = new ServiceMiddleware(conversationRepository, userRepository, selfUser);
       const quotedMessageMiddleware = new QuotedMessageMiddleware(this.service.event);
-      const readReceiptMiddleware = new ReceiptsMiddleware(this.service.event, conversationRepository);
+      const readReceiptMiddleware = new ReceiptsMiddleware(this.service.event, conversationRepository, selfUser);
 
       eventRepository.setEventProcessMiddlewares([serviceMiddleware, quotedMessageMiddleware, readReceiptMiddleware]);
       // Setup all the event processors
