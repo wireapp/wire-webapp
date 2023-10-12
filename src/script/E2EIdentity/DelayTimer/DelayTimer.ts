@@ -55,7 +55,6 @@ class DelayTimerService {
   /**
    * Get the singleton instance of GracePeriodTimer or create a new one
    * For the first time, params are required to create the instance
-   * After that, params are optional and can be used to update the grace period timer
    * @param params The params to create the grace period timer
    * @returns The singleton instance of GracePeriodTimer
    */

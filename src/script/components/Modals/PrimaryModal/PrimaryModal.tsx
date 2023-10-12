@@ -293,7 +293,7 @@ export const PrimaryModalComponent: FC = () => {
                         key={`${action.text}-${action.uieName}`}
                         type="button"
                         onClick={doAction(action.action, true, true)}
-                        data-uie-name={action?.uieName}
+                        data-uie-name={action.uieName}
                         className={cx('modal__button modal__button--secondary', {
                           'modal__button--full': hasMultipleSecondary,
                         })}
