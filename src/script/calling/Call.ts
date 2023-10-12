@@ -88,8 +88,8 @@ export class Call {
     this.initialType = callType;
     this.selfClientId = selfParticipant?.clientId;
     this.participants = ko.observableArray([selfParticipant]);
-    this.activeAudioOutput = this.mediaDevicesHandler.currentAvailableDeviceId.audioOutput();
-    this.mediaDevicesHandler.currentAvailableDeviceId.audioOutput.subscribe((newActiveAudioOutput: string) => {
+    this.activeAudioOutput = this.mediaDevicesHandler.currentAvailableDeviceId.audiooutput();
+    this.mediaDevicesHandler.currentAvailableDeviceId.audiooutput.subscribe((newActiveAudioOutput: string) => {
       this.activeAudioOutput = newActiveAudioOutput;
       this.updateAudioStreamsSink();
     });

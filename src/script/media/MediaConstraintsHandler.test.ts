@@ -29,10 +29,10 @@ import {UserState} from '../user/UserState';
 
 describe('MediaConstraintsHandler', () => {
   const createAvailableDevices = (deviceId?: string): CurrentAvailableDeviceId => ({
-    audioInput: ko.pureComputed(() => deviceId ?? 'mic'),
-    audioOutput: ko.pureComputed(() => deviceId ?? 'speaker'),
-    screenInput: ko.pureComputed(() => deviceId ?? 'camera'),
-    videoInput: ko.pureComputed(() => deviceId ?? 'screen1'),
+    audioinput: ko.pureComputed(() => deviceId ?? 'mic'),
+    audiooutput: ko.pureComputed(() => deviceId ?? 'speaker'),
+    screeninput: ko.pureComputed(() => deviceId ?? 'camera'),
+    videoinput: ko.pureComputed(() => deviceId ?? 'screen1'),
   });
 
   const createConstraintsHandler = ({
@@ -54,8 +54,8 @@ describe('MediaConstraintsHandler', () => {
       const constraintsHandler = createConstraintsHandler({availableDevices});
       const constraints = constraintsHandler.getMediaStreamConstraints(true, true, false) as any;
 
-      expect(constraints.audio.deviceId.exact).toBe(availableDevices.audioInput());
-      expect(constraints.video.deviceId.exact).toBe(availableDevices.videoInput());
+      expect(constraints.audio.deviceId.exact).toBe(availableDevices.audioinput());
+      expect(constraints.video.deviceId.exact).toBe(availableDevices.videoinput());
     });
 
     it('returns default constraints when current devices are not defined', () => {
