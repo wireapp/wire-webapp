@@ -73,7 +73,7 @@ import {NotificationService} from '../event/NotificationService';
 import {QuotedMessageMiddleware} from '../event/preprocessor/QuotedMessageMiddleware';
 import {ReceiptsMiddleware} from '../event/preprocessor/ReceiptsMiddleware';
 import {ServiceMiddleware} from '../event/preprocessor/ServiceMiddleware';
-import {FederationEventProcessor} from '../event/processor/FederationEventProcessor/FederationEventProcessor';
+import {FederationEventProcessor} from '../event/processor/FederationEventProcessor';
 import {GiphyRepository} from '../extension/GiphyRepository';
 import {GiphyService} from '../extension/GiphyService';
 import {getWebsiteUrl} from '../externalRoute';
