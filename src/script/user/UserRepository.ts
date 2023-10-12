@@ -668,13 +668,16 @@ export class UserRepository {
   /**
    * Check for supported protocols on user entity locally, otherwise fetch them from the backend.
    * @param userId - the user to fetch the supported protocols for
+   * @param forceRefetch - if true, the supported protocols will be fetched from the backend even if they are already stored locally
    */
 
-  public async getUserSupportedProtocols(userId: QualifiedId): Promise<ConversationProtocol[]> {
-    const localSupportedProtocols = this.findUserById(userId)?.supportedProtocols();
+  public async getUserSupportedProtocols(userId: QualifiedId, forceRefetch = false): Promise<ConversationProtocol[]> {
+    if (!forceRefetch) {
+      const localSupportedProtocols = this.findUserById(userId)?.supportedProtocols();
 
-    if (localSupportedProtocols) {
-      return localSupportedProtocols;
+      if (localSupportedProtocols) {
+        return localSupportedProtocols;
+      }
     }
 
     const supportedProtocols = await this.userService.getUserSupportedProtocols(userId);

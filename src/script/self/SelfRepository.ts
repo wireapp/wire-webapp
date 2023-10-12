@@ -152,9 +152,15 @@ export class SelfRepository extends TypedEventEmitter<Events> {
     });
   }
 
-  getSelfSupportedProtocols(): ConversationProtocol[] | null {
-    return this.userState.self()?.supportedProtocols() || null;
-  }
+  public getSelfSupportedProtocols = async (): Promise<ConversationProtocol[]> => {
+    const localSupportedProtocols = this.selfUser.supportedProtocols();
+
+    if (localSupportedProtocols) {
+      return localSupportedProtocols;
+    }
+
+    return this.refreshSelfSupportedProtocols();
+  };
 
   public async deleteSelfUserClient(clientId: string, password?: string): Promise<ClientEntity[]> {
     const clients = this.clientRepository.deleteClient(clientId, password);
