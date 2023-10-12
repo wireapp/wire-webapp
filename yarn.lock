@@ -1454,6 +1454,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babel/runtime@npm:^7.7.7":
+  version: 7.23.2
+  resolution: "@babel/runtime@npm:7.23.2"
+  dependencies:
+    regenerator-runtime: ^0.14.0
+  checksum: 6c4df4839ec75ca10175f636d6362f91df8a3137f86b38f6cd3a4c90668a0fe8e9281d320958f4fbd43b394988958585a17c3aab2a4ea6bf7316b22916a371fb
+  languageName: node
+  linkType: hard
+
 "@babel/template@npm:^7.22.15, @babel/template@npm:^7.22.5, @babel/template@npm:^7.3.3, @babel/template@npm:^7.4.4":
   version: 7.22.15
   resolution: "@babel/template@npm:7.22.15"
@@ -3739,6 +3748,19 @@ __metadata:
     lexical: 0.12.2
     yjs: ">=13.5.22"
   checksum: 552e4b6eaca32e4eae7e7eb754ee8a5d927cc97eb5a4734d9f5a4ce810ed116b932f63c86e5e2c3084957c342da2cedad11dd53e8bcb8dd3ecec1cbd09789b0d
+  languageName: node
+  linkType: hard
+
+"@loadable/component@npm:^5.15.3":
+  version: 5.15.3
+  resolution: "@loadable/component@npm:5.15.3"
+  dependencies:
+    "@babel/runtime": ^7.7.7
+    hoist-non-react-statics: ^3.3.1
+    react-is: ^16.12.0
+  peerDependencies:
+    react: ^16.3.0 || ^17.0.0 || ^18.0.0
+  checksum: 78ac341465f2310db30381bc75e8bf73a33f99af849a6a2d87eb3842da0ba1df265e08045dc4f3fee1d194522a43a030baa91740045b64aad002f159ccce64bf
   languageName: node
   linkType: hard
 
@@ -15277,7 +15299,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-is@npm:^16.13.1, react-is@npm:^16.7.0":
+"react-is@npm:^16.12.0, react-is@npm:^16.13.1, react-is@npm:^16.7.0":
   version: 16.13.1
   resolution: "react-is@npm:16.13.1"
   checksum: f7a19ac3496de32ca9ae12aa030f00f14a3d45374f1ceca0af707c831b2a6098ef0d6bdae51bd437b0a306d7f01d4677fcc8de7c0d331eb47ad0f46130e53c5f
@@ -18348,6 +18370,7 @@ __metadata:
     "@koush/wrtc": 0.5.3
     "@lexical/history": 0.12.2
     "@lexical/react": 0.12.2
+    "@loadable/component": ^5.15.3
     "@peculiar/x509": 1.9.5
     "@testing-library/react": 14.0.0
     "@types/adm-zip": 0.5.2

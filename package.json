@@ -5,6 +5,7 @@
     "@emotion/react": "11.11.1",
     "@lexical/history": "0.12.2",
     "@lexical/react": "0.12.2",
+    "@loadable/component": "5.15.3",
     "@peculiar/x509": "1.9.5",
     "@wireapp/avs": "9.4.18",
     "@wireapp/commons": "5.2.1",
