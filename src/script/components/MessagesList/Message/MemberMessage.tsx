@@ -103,7 +103,7 @@ export const MemberMessage: React.FC<MemberMessageProps> = ({
             {isMemberJoin && <span className="icon-plus" />}
           </div>
           <div className="message-header-label">
-            <MessageContent onClickParticipants={participants => onClickParticipants(participants)} message={message} />
+            <MessageContent onClickParticipants={onClickParticipants} message={message} />
           </div>
           {isMemberChange && (
             <div className="message-body-actions">
