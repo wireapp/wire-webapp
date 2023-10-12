@@ -28,11 +28,9 @@ import {ClientEvent} from '../Client';
 import type {EventService} from '../EventService';
 
 export class QuotedMessageMiddleware {
-  private readonly eventService: EventService;
   private readonly logger: Logger;
 
-  constructor(eventService: EventService) {
-    this.eventService = eventService;
+  constructor(private readonly eventService: EventService) {
     this.logger = getLogger('QuotedMessageMiddleware');
   }
 
