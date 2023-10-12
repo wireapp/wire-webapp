@@ -23,7 +23,6 @@ import {
   ConversationOtrMessageAddEvent,
   ConversationMLSMessageAddEvent,
 } from '@wireapp/api-client/lib/event';
-import type {BackendEvent} from '@wireapp/api-client/lib/event';
 import {NotificationSource, HandledEventPayload} from '@wireapp/core/lib/notification';
 import {amplify} from 'amplify';
 import ko from 'knockout';
@@ -38,6 +37,7 @@ import {queue} from 'Util/PromiseQueue';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {ClientEvent} from './Client';
+import {EventProcessor, IncomingEvent} from './EventProcessor';
 import type {EventService} from './EventService';
 import {EventSource} from './EventSource';
 import {EVENT_TYPE} from './EventType';
@@ -61,8 +61,6 @@ import {EventName} from '../tracking/EventName';
 import {UserState} from '../user/UserState';
 import {Warnings} from '../view_model/WarningsContainer';
 
-type IncomingEvent = BackendEvent | ClientConversationEvent;
-
 export class EventRepository {
   logger: Logger;
   currentClient: ko.Observable<ClientEntity> | undefined;
@@ -71,7 +69,9 @@ export class EventRepository {
   notificationsHandled: number;
   notificationsTotal: number;
   lastEventDate: ko.Observable<string | undefined>;
-  eventProcessMiddlewares: Function[];
+  eventProcessMiddlewares: Function[] = [];
+  /** event processors are classes that are able to react and process an incoming event */
+  eventProcessors: EventProcessor[] = [];
 
   static get CONFIG() {
     return {
@@ -120,8 +120,6 @@ export class EventRepository {
     this.notificationsTotal = 0;
 
     this.lastEventDate = ko.observable();
-
-    this.eventProcessMiddlewares = [];
   }
 
   /**
@@ -132,6 +130,10 @@ export class EventRepository {
    */
   setEventProcessMiddlewares(middlewares: Function[]) {
     this.eventProcessMiddlewares = middlewares;
+  }
+
+  setEventProcessors(processors: EventProcessor[]) {
+    this.eventProcessors = processors;
   }
 
   //##############################################################################
@@ -332,14 +334,13 @@ export class EventRepository {
    * @param source Source of notification
    */
   private async distributeEvent(event: IncomingEvent, source: EventSource) {
+    await Promise.all(this.eventProcessors.map(processor => processor.processEvent(event, source)));
+
     const {type} = event;
     const [category] = type.split('.');
     switch (category) {
       case EVENT_TYPE.CALL:
         amplify.publish(WebAppEvents.CALL.EVENT_FROM_BACKEND, event, source);
-        break;
-      case EVENT_TYPE.FEDERATION:
-        amplify.publish(WebAppEvents.FEDERATION.EVENT_FROM_BACKEND, event, source);
         break;
       case EVENT_TYPE.CONVERSATION:
         amplify.publish(WebAppEvents.CONVERSATION.EVENT_FROM_BACKEND, event, source);

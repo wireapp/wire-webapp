@@ -29,7 +29,7 @@ import {
   FederationConnectionRemovedResult,
 } from './ConversationFederationUtils';
 
-import {Conversation} from '../entity/Conversation';
+import {Conversation} from '../../../entity/Conversation';
 
 describe('ConversationFederationUtils', () => {
   describe('getFederationDeleteEventUpdates', () => {

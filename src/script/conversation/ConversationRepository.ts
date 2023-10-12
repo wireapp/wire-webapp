@@ -39,8 +39,6 @@ import {
   ConversationRenameEvent,
   ConversationTypingEvent,
   CONVERSATION_EVENT,
-  FederationEvent,
-  FEDERATION_EVENT,
 } from '@wireapp/api-client/lib/event';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import type {BackendError} from '@wireapp/api-client/lib/http/';
@@ -49,7 +47,7 @@ import {MLSCreateConversationResponse} from '@wireapp/core/lib/conversation';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {container} from 'tsyringe';
-import {debounce, flatten} from 'underscore';
+import {flatten} from 'underscore';
 
 import {Asset as ProtobufAsset, Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -76,10 +74,6 @@ import {ACCESS_STATE} from './AccessState';
 import {extractClientDiff} from './ClientMismatchUtil';
 import {updateAccessRights} from './ConversationAccessPermission';
 import {ConversationEphemeralHandler} from './ConversationEphemeralHandler';
-import {
-  getUsersToDeleteFromFederatedConversations,
-  getFederationDeleteEventUpdates,
-} from './ConversationFederationUtils';
 import {ConversationFilter} from './ConversationFilter';
 import {ConversationLabelRepository} from './ConversationLabelRepository';
 import {ConversationDatabaseData, ConversationMapper} from './ConversationMapper';
@@ -326,7 +320,6 @@ export class ConversationRepository {
     amplify.subscribe(WebAppEvents.TEAM.MEMBER_LEAVE, this.teamMemberLeave);
     amplify.subscribe(WebAppEvents.USER.UNBLOCKED, this.onUnblockUser);
     amplify.subscribe(WebAppEvents.CONVERSATION.INJECT_LEGAL_HOLD_MESSAGE, this.injectLegalHoldMessage);
-    amplify.subscribe(WebAppEvents.FEDERATION.EVENT_FROM_BACKEND, debounce(this.onFederationEvent, 1000));
 
     this.eventService.addEventUpdatedListener(this.updateLocalMessageEntity);
     this.eventService.addEventDeletedListener(this.deleteLocalMessageEntity);
@@ -337,95 +330,6 @@ export class ConversationRepository {
   public initMLSConversationRecoveredListener() {
     return this.conversationService.addMLSConversationRecoveredListener(this.onMLSConversationRecovered);
   }
-
-  private readonly onFederationEvent = async (event: FederationEvent) => {
-    const {type} = event;
-
-    switch (type) {
-      case FEDERATION_EVENT.FEDERATION_DELETE:
-        const {domain: deletedDomain} = event;
-        await this.onFederationDelete(deletedDomain);
-        break;
-
-      case FEDERATION_EVENT.FEDERATION_CONNECTION_REMOVED:
-        const {domains: deletedDomains} = event;
-        await this.onFederationConnectionRemove(deletedDomains);
-        break;
-    }
-  };
-
-  /**
-   * For the `federation.delete` event: (Backend A has stopped federating with us)
-      - receive the event from backend
-      - leave the conversations locally that are owned by the backend A which was deleted.
-      - remove the deleted backend A users locally from our own conversations.
-      - insert system message to the affected conversations about federation termination.
-   * @param deletedDomain the domain that stopped federating
-   */
-  private onFederationDelete = async (deletedDomain: string) => {
-    const {conversationsToDeleteUsers, conversationsToLeave, conversationsToDisable} = getFederationDeleteEventUpdates(
-      deletedDomain,
-      this.conversationState.conversations(),
-    );
-
-    conversationsToLeave.forEach(async conversation => {
-      await this.leaveConversation(conversation, {localOnly: true});
-      await this.insertFederationStopSystemMessage(conversation, [deletedDomain]);
-    });
-
-    conversationsToDisable.forEach(async conversation => {
-      conversation.status(ConversationStatus.PAST_MEMBER);
-      conversation.firstUserEntity()?.markConnectionAsUnknown();
-      await this.insertFederationStopSystemMessage(conversation, [deletedDomain]);
-    });
-
-    conversationsToDeleteUsers.forEach(async ({conversation, users}) => {
-      await this.insertFederationStopSystemMessage(conversation, [deletedDomain]);
-      await this.removeDeletedFederationUsers(conversation, users);
-    });
-  };
-
-  /**
-   * For the `federation.connectionRemoved` event: (Backend A & B stopped federating, user is on C)
-    - receive the event from backend
-    - Identify all conversations that are not owned from A or B domain and that contain users from A and B
-      - remove users from A and B from those conversations
-      - insert system message in those conversations about backend A and B stopping to federate
-    - identify all conversations owned by domain A that contains users from B
-      - remove users from B from those conversations
-      - insert system message in those conversations about backend A and B stopping to federate
-    - Identify all conversations owned by domain B that contains users from A
-      - remove users from A from those conversations
-      - insert system message in those conversations about backend A and B stopping to federate
-   * @param domains The domains that stopped federating with each other
-   */
-  private readonly onFederationConnectionRemove = async (domains: string[]) => {
-    const allConversations = this.conversationState.conversations();
-
-    const result = getUsersToDeleteFromFederatedConversations(domains, allConversations);
-
-    for (const {conversation, usersToRemove} of result) {
-      await this.insertFederationStopSystemMessage(conversation, domains);
-      await this.removeDeletedFederationUsers(
-        conversation,
-        usersToRemove.map(user => user.qualifiedId),
-      );
-    }
-  };
-
-  private readonly removeDeletedFederationUsers = async (conversation: Conversation, users: QualifiedId[]) => {
-    if (users.length === 0) {
-      return;
-    }
-    await this.removeMembersLocally(conversation, users);
-  };
-
-  private readonly insertFederationStopSystemMessage = async (conversation: Conversation, domains: string[]) => {
-    const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-    const selfUser = this.userState.self();
-    const event = EventBuilder.buildFederationStop(conversation, selfUser, domains, currentTimestamp);
-    await this.eventRepository.injectEvent(event, EventRepository.SOURCE.INJECTED);
-  };
 
   private readonly updateLocalMessageEntity = async ({
     obj: updatedEvent,
@@ -1775,27 +1679,11 @@ export class ConversationRepository {
    * @param clearContent Should we clear the conversation content from the database?
    * @returns Resolves when user was removed from the conversation
    */
-  public async leaveConversation(conversation: Conversation, {localOnly = false} = {}) {
+  public async leaveConversation(conversation: Conversation) {
     const userQualifiedId = this.userState.self().qualifiedId;
-
-    if (localOnly) {
-      return this.removeMembersLocally(conversation, [userQualifiedId]);
-    }
 
     const events = await this.removeMembersFromConversation(conversation, [userQualifiedId]);
     await this.eventRepository.injectEvents(events, EventRepository.SOURCE.BACKEND_RESPONSE);
-  }
-
-  /**
-   * Will inject a `member-leave` that will then trigger the local removal of the user in the conversation
-   * @param conversation the conversation in which we want to remove users
-   * @param userIds the users to remove from the conversation
-   */
-  private async removeMembersLocally(conversation: Conversation, userIds: QualifiedId[]) {
-    const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-    const event = EventBuilder.buildMemberLeave(conversation, userIds, '', currentTimestamp);
-    // Injecting the event will trigger all the handlers that will then actually remove the users from the conversation
-    await this.eventRepository.injectEvent(event);
   }
 
   /**
