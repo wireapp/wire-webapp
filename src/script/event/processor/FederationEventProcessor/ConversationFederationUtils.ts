@@ -17,8 +17,8 @@
  *
  */
 
-import {Conversation} from '../entity/Conversation';
-import {User} from '../entity/User';
+import {Conversation} from '../../../entity/Conversation';
+import {User} from '../../../entity/User';
 
 export interface FederationDeleteResult {
   conversationsToLeave: Conversation[];
