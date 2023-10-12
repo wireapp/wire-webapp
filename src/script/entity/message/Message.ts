@@ -362,7 +362,7 @@ export class Message {
    * Check if message can be edited.
    * @returns `true`, if message can be edited, `false` otherwise.
    */
-  isEditable(): boolean {
+  isEditable(): this is ContentMessage {
     return this.hasAssetText() && this.user().isMe && !this.isEphemeral();
   }
 

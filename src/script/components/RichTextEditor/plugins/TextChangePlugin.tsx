@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2022 Wire Swiss GmbH
+ * Copyright (C) 2023 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,4 +17,23 @@
  *
  */
 
-export * from './MentionSuggestions';
+import {useEffect} from 'react';
+
+import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
+import {LexicalEditor} from 'lexical';
+
+type Props = {
+  onUpdate: (editor: LexicalEditor, text: string) => void;
+};
+
+export function TextChangePlugin({onUpdate}: Props): null {
+  const [editor] = useLexicalComposerContext();
+
+  useEffect(() => {
+    return editor.registerTextContentListener(textContent => {
+      onUpdate(editor, textContent);
+    });
+  }, [editor, onUpdate]);
+
+  return null;
+}

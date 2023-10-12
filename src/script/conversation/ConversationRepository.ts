@@ -351,12 +351,11 @@ export class ConversationRepository {
       case FEDERATION_EVENT.FEDERATION_DELETE:
         const {domain: deletedDomain} = event;
         await this.onFederationDelete(deletedDomain);
-
         break;
+
       case FEDERATION_EVENT.FEDERATION_CONNECTION_REMOVED:
         const {domains: deletedDomains} = event;
         await this.onFederationConnectionRemove(deletedDomains);
-
         break;
     }
   };
@@ -376,13 +375,13 @@ export class ConversationRepository {
     );
 
     conversationsToLeave.forEach(async conversation => {
-      await this.leaveConversation(conversation, {clearContent: false, localOnly: true});
+      await this.leaveConversation(conversation, {localOnly: true});
       await this.insertFederationStopSystemMessage(conversation, [deletedDomain]);
     });
 
     conversationsToDisable.forEach(async conversation => {
       conversation.status(ConversationStatus.PAST_MEMBER);
-      conversation.firstUserEntity().markConnectionAsUnknown();
+      conversation.firstUserEntity()?.markConnectionAsUnknown();
       await this.insertFederationStopSystemMessage(conversation, [deletedDomain]);
     });
 
@@ -412,23 +411,19 @@ export class ConversationRepository {
     const result = getUsersToDeleteFromFederatedConversations(domains, allConversations);
 
     for (const {conversation, usersToRemove} of result) {
-      await this.removeDeletedFederationUsers(conversation, usersToRemove);
       await this.insertFederationStopSystemMessage(conversation, domains);
+      await this.removeDeletedFederationUsers(
+        conversation,
+        usersToRemove.map(user => user.qualifiedId),
+      );
     }
   };
 
-  private readonly removeDeletedFederationUsers = async (conversation: Conversation, usersToRemove: User[]) => {
-    if (usersToRemove.length === 0) {
+  private readonly removeDeletedFederationUsers = async (conversation: Conversation, users: QualifiedId[]) => {
+    if (users.length === 0) {
       return;
     }
-
-    try {
-      for (const user of usersToRemove) {
-        await this.removeMember(conversation, user.qualifiedId, {localOnly: true});
-      }
-    } catch (error) {
-      console.warn('failed to remove users', error);
-    }
+    await this.removeMembersLocally(conversation, users);
   };
 
   private readonly insertFederationStopSystemMessage = async (conversation: Conversation, domains: string[]) => {
@@ -2126,27 +2121,15 @@ export class ConversationRepository {
    * @note According to spec we archive a conversation when we clear it.
    * It will be unarchived once it is opened through search. We use the archive flag to distinguish states.
    *
-   * @param conversationEntity Conversation to clear
+   * @param conversation Conversation to clear
    * @param leaveConversation Should we leave the conversation before clearing the content?
    */
-  public async clearConversation(conversationEntity: Conversation, leaveConversation = false) {
-    const isActiveConversation = this.conversationState.isActiveConversation(conversationEntity);
-    const nextConversationEntity = this.getNextConversation(conversationEntity);
+  public async clearConversation(conversation: Conversation) {
+    const isActiveConversation = this.conversationState.isActiveConversation(conversation);
+    const nextConversationEntity = this.getNextConversation(conversation);
 
-    if (leaveConversation) {
-      conversationEntity.status(ConversationStatus.PAST_MEMBER);
-      this.callingRepository.leaveCall(
-        conversationEntity.qualifiedId,
-        LEAVE_CALL_REASON.USER_MANUALY_LEFT_CONVERSATION,
-      );
-    }
-
-    await this.messageRepository.updateClearedTimestamp(conversationEntity);
-    await this._clearConversation(conversationEntity);
-
-    if (leaveConversation) {
-      await this.removeMember(conversationEntity, this.userState.self().qualifiedId);
-    }
+    await this.messageRepository.updateClearedTimestamp(conversation);
+    await this._clearConversation(conversation);
 
     if (isActiveConversation) {
       amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversationEntity, {});
@@ -2169,89 +2152,83 @@ export class ConversationRepository {
    * @param userId ID of member to be removed from the conversation
    * @returns Resolves when member was removed from the conversation
    */
-  private async removeMemberFromMLSConversation(
-    conversationEntity: Conversation,
-    userId: QualifiedId,
-    {localOnly = false} = {},
-  ) {
-    const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
+  private async removeMembersFromMLSConversation(conversationEntity: MLSConversation, userIds: QualifiedId[]) {
     const {groupId, qualifiedId} = conversationEntity;
-    const {events} = localOnly
-      ? {events: [EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp)]}
-      : await this.core.service!.conversation.removeUsersFromMLSConversation({
-          conversationId: qualifiedId,
-          groupId,
-          qualifiedUserIds: [userId],
-        });
+    const {events} = await this.core.service!.conversation.removeUsersFromMLSConversation({
+      conversationId: qualifiedId,
+      groupId,
+      qualifiedUserIds: userIds,
+    });
 
-    if (!!events.length) {
-      events.forEach(event => this.eventRepository.injectEvent(event));
-    }
+    return events;
   }
 
   /**
    * Remove a member from a Proteus conversation
    *
-   * @param conversationEntity Conversation to remove member from
+   * @param conversation Conversation to remove member from
    * @param userId ID of member to be removed from the conversation
    * @returns Resolves when member was removed from the conversation
    */
-  private async removeMemberFromConversation(
-    conversationEntity: Conversation,
-    userId: QualifiedId,
-    {localOnly = false},
-  ) {
-    const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-    const response = localOnly
-      ? EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp)
-      : await this.core.service!.conversation.removeUserFromConversation(conversationEntity.qualifiedId, userId);
-
-    const roles = conversationEntity.roles();
-    delete roles[userId.id];
-    conversationEntity.roles(roles);
-    await this.eventRepository.injectEvent(response, EventRepository.SOURCE.BACKEND_RESPONSE);
-
-    return response;
+  private async removeMembersFromConversation(conversation: Conversation, userIds: QualifiedId[]) {
+    return await Promise.all(
+      userIds.map(async userId => {
+        const event = await this.core.service!.conversation.removeUserFromConversation(
+          conversation.qualifiedId,
+          userId,
+        );
+        const roles = conversation.roles();
+        delete roles[userId.id];
+        conversation.roles(roles);
+        return event;
+      }),
+    );
   }
 
   /**
    * Remove the current user from a conversation.
    *
-   * @param conversationEntity Conversation to remove user from
+   * @param conversation Conversation to remove user from
    * @param clearContent Should we clear the conversation content from the database?
    * @returns Resolves when user was removed from the conversation
    */
-  private async leaveConversation(conversationEntity: Conversation, {clearContent = false, localOnly = false} = {}) {
+  public async leaveConversation(conversation: Conversation, {localOnly = false} = {}) {
     const userQualifiedId = this.userState.self().qualifiedId;
 
-    return clearContent
-      ? this.clearConversation(conversationEntity, true)
-      : this.removeMemberFromConversation(conversationEntity, userQualifiedId, {localOnly});
+    if (localOnly) {
+      return this.removeMembersLocally(conversation, [userQualifiedId]);
+    }
+
+    const events = await this.removeMembersFromConversation(conversation, [userQualifiedId]);
+    await this.eventRepository.injectEvents(events, EventRepository.SOURCE.BACKEND_RESPONSE);
   }
 
   /**
-   * Umbrella function to remove a member from a conversation, no matter the protocol or type.
+   * Will inject a `member-leave` that will then trigger the local removal of the user in the conversation
+   * @param conversation the conversation in which we want to remove users
+   * @param userIds the users to remove from the conversation
+   */
+  private async removeMembersLocally(conversation: Conversation, userIds: QualifiedId[]) {
+    const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
+    const event = EventBuilder.buildMemberLeave(conversation, userIds, '', currentTimestamp);
+    // Injecting the event will trigger all the handlers that will then actually remove the users from the conversation
+    await this.eventRepository.injectEvent(event);
+  }
+
+  /**
+   * Umbrella function to remove a member from a conversation (from backend and locally), no matter the protocol or type.
    *
    * @param conversationEntity Conversation to remove member from
    * @param userId ID of member to be removed from the conversation
    * @param clearContent Should we clear the conversation content from the database?
    * @returns Resolves when member was removed from the conversation
    */
-  public async removeMember(
-    conversationEntity: Conversation,
-    userId: QualifiedId,
-    {clearContent = false, localOnly = false} = {},
-  ) {
-    const isUserLeaving = this.userState.self().qualifiedId.id === userId.id;
-    const isMLSConversation = conversationEntity.isUsingMLSProtocol;
+  public async removeMembers(conversationEntity: Conversation, userIds: QualifiedId[]) {
+    const events = isMLSConversation(conversationEntity)
+      ? await this.removeMembersFromMLSConversation(conversationEntity, userIds)
+      : await this.removeMembersFromConversation(conversationEntity, userIds);
 
-    if (isUserLeaving) {
-      return this.leaveConversation(conversationEntity, {clearContent});
-    }
-
-    return isMLSConversation
-      ? this.removeMemberFromMLSConversation(conversationEntity, userId, {localOnly})
-      : this.removeMemberFromConversation(conversationEntity, userId, {localOnly});
+    await this.eventRepository.injectEvents(events, EventRepository.SOURCE.BACKEND_RESPONSE);
   }
 
   /**
@@ -2268,7 +2245,7 @@ export class ConversationRepository {
       const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
       const event = hasResponse
         ? response.event
-        : EventBuilder.buildMemberLeave(conversationEntity, user, true, currentTimestamp);
+        : EventBuilder.buildMemberLeave(conversationEntity, [user], this.userState.self().id, currentTimestamp);
 
       this.eventRepository.injectEvent(event, EventRepository.SOURCE.BACKEND_RESPONSE);
       return event;

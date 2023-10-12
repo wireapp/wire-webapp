@@ -142,7 +142,7 @@ const MainContent: FC<MainContentProps> = ({
                 conversationRepository={repositories.conversation}
                 assetRepository={repositories.asset}
                 messageRepository={repositories.message}
-                userState={userState}
+                selfUser={selfUser}
               />
             )}
 
@@ -152,7 +152,7 @@ const MainContent: FC<MainContentProps> = ({
                 className={cx('preferences-page preferences-about', incomingCssClass)}
                 ref={removeAnimationsClass}
               >
-                <AboutPreferences />
+                <AboutPreferences selfUser={selfUser} />
               </div>
             )}
 
@@ -204,7 +204,7 @@ const MainContent: FC<MainContentProps> = ({
                   resetSession={(userId, device, conversation) =>
                     repositories.message.resetSession(userId, device.id, conversation)
                   }
-                  userState={userState}
+                  selfUser={selfUser}
                   verifyDevice={(userId, device, verified) =>
                     repositories.client.verifyClient(userId, device, verified)
                   }
@@ -231,14 +231,14 @@ const MainContent: FC<MainContentProps> = ({
             )}
 
             {contentState === ContentState.CONNECTION_REQUESTS && (
-              <ConnectRequests teamState={teamState} selfUser={selfUser} userState={userState} />
+              <ConnectRequests teamState={teamState} userState={userState} />
             )}
 
             {contentState === ContentState.CONVERSATION && (
               <Conversation
                 initialMessage={initialMessage}
                 teamState={teamState}
-                userState={userState}
+                selfUser={selfUser}
                 isRightSidebarOpen={isRightSidebarOpen}
                 openRightSidebar={openRightSidebar}
                 reloadApp={reloadApp}

@@ -111,7 +111,7 @@ export class Conversation {
   public cipherSuite: number = 1;
   public readonly isUsingMLSProtocol: boolean;
   public readonly display_name: ko.PureComputed<string>;
-  public readonly firstUserEntity: ko.PureComputed<User>;
+  public readonly firstUserEntity: ko.PureComputed<User | undefined>;
   public readonly enforcedTeamMessageTimer: ko.PureComputed<number>;
   public readonly globalMessageTimer: ko.Observable<number | null>;
   public readonly hasContentMessages: ko.Observable<boolean>;
@@ -957,7 +957,7 @@ export class Conversation {
   /**
    * Get the last text message that was added by self user.
    */
-  getLastEditableMessage(): Message | undefined {
+  getLastEditableMessage(): ContentMessage | undefined {
     const messages = this.messages();
     for (let index = messages.length - 1; index >= 0; index--) {
       const message_et = messages[index];

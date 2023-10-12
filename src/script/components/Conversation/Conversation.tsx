@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, UIEvent, useCallback, useState} from 'react';
+import {UIEvent, useCallback, useState} from 'react';
 
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -64,13 +64,12 @@ import {RightSidebarParams} from '../../page/AppMain';
 import {PanelState} from '../../page/RightSidebar';
 import {useMainViewModel} from '../../page/RootProvider';
 import {TeamState} from '../../team/TeamState';
-import {UserState} from '../../user/UserState';
 import {ElementType, MessageDetails} from '../MessagesList/Message/ContentMessage/asset/TextMessageRenderer';
 
 interface ConversationProps {
   readonly initialMessage?: Message;
   readonly teamState: TeamState;
-  readonly userState: UserState;
+  selfUser: User;
   openRightSidebar: (panelState: PanelState, params: RightSidebarParams, compareEntityId?: boolean) => void;
   isRightSidebarOpen?: boolean;
   reloadApp: () => void;
@@ -78,14 +77,14 @@ interface ConversationProps {
 
 const CONFIG = Config.getConfig();
 
-export const Conversation: FC<ConversationProps> = ({
+export const Conversation = ({
   initialMessage,
   teamState,
-  userState,
+  selfUser,
   openRightSidebar,
   isRightSidebarOpen = false,
   reloadApp,
-}) => {
+}: ConversationProps) => {
   const messageListLogger = getLogger('ConversationList');
 
   const mainViewModel = useMainViewModel();
@@ -103,19 +102,21 @@ export const Conversation: FC<ConversationProps> = ({
     'classifiedDomains',
     'isFileSharingSendingEnabled',
   ]);
+
   const {
     is1to1,
     isRequest,
     readOnlyState,
     display_name: displayName,
-  } = useKoSubscribableChildren(activeConversation!, ['is1to1', 'isRequest', 'readOnlyState', 'display_name']);
+  } = useKoSubscribableChildren(activeConversation!, ['is1to1', 'isRequest', 'display_name', 'readOnlyState']);
+
   const showReadOnlyConversationMessage =
     readOnlyState !== null &&
     [
       CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_OTHER_UNSUPPORTED_MLS,
       CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_SELF_UNSUPPORTED_MLS,
     ].includes(readOnlyState);
-  const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
+
   const {inTeam} = useKoSubscribableChildren(selfUser, ['inTeam']);
 
   const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
@@ -540,7 +541,8 @@ export const Conversation: FC<ConversationProps> = ({
             <ReadOnlyConversationMessage state={readOnlyState} handleMLSUpdate={reloadApp} displayName={displayName} />
           ) : (
             <InputBar
-              conversationEntity={activeConversation}
+              key={activeConversation?.id}
+              conversation={activeConversation}
               conversationRepository={repositories.conversation}
               eventRepository={repositories.event}
               messageRepository={repositories.message}
