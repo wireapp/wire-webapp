@@ -123,15 +123,19 @@ export class EventRepository {
   }
 
   /**
-   * Will set a middleware to run before the EventRepository actually processes the event.
-   * Middleware is just a function with the following signature (Event) => Promise<Event>.
-   *
-   * @param middlewares middlewares to run when a new event is about to be processed
+   * Will register a pipeline that transform an event before it is being processed by the EventProcessors.
+   * Those middleware are run sequentially one after the other. Thus the order at which they are defined matters.
+   * When one middleware fails the entire even handling process will stop and no further middleware will be executed.
    */
   setEventProcessMiddlewares(middlewares: EventMiddleware[]) {
     this.eventProcessMiddlewares = middlewares;
   }
 
+  /**
+   * EventProcessors are classes that are able to react and process an incoming event.
+   * They will all be executed in parallel. If one processor fails the other one are not impacted
+   * @param processors
+   */
   setEventProcessors(processors: EventProcessor[]) {
     this.eventProcessors = processors;
   }
