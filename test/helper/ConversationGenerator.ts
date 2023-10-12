@@ -55,6 +55,7 @@ function generateAPIConversation({
     qualified_id: id,
     access: [],
     verification_state: ConversationVerificationState.UNVERIFIED,
+    mlsVerificationState: ConversationVerificationState.UNVERIFIED,
     receipt_mode: RECEIPT_MODE.ON,
     team_id: '',
     status: ConversationStatus.CURRENT_MEMBER,

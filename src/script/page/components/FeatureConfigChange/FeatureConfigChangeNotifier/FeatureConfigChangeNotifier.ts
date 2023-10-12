@@ -36,8 +36,8 @@ import {formatDuration} from 'Util/TimeUtil';
 
 import {loadFeatureConfig, saveFeatureConfig} from './FeatureConfigChangeNotifier.store';
 
-import {Config} from '../../../Config';
-import {TeamState} from '../../../team/TeamState';
+import {Config} from '../../../../Config';
+import {TeamState} from '../../../../team/TeamState';
 
 const featureNotifications: Partial<
   Record<
