@@ -45,12 +45,10 @@ export class MLSConversationVerificationStateHandler {
     this.logger = getLogger('MLSConversationVerificationStateHandler');
     // We need to check if the core service is available
     if (!this.core.service?.mls) {
-      this.logger.info('MLS service is not available');
       return;
     }
     // We need to check if the e2eIdentity service is available
     if (!this.core.service?.e2eIdentity) {
-      this.logger.info('E2EIdentity service is not available');
       return;
     }
     // We hook into the newEpoch event of the MLS service to check if the conversation needs to be verified or degraded
