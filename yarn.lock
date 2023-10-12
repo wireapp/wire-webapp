@@ -1445,7 +1445,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:^7.11.2, @babel/runtime@npm:^7.12.0, @babel/runtime@npm:^7.12.1, @babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.15.4, @babel/runtime@npm:^7.16.3, @babel/runtime@npm:^7.18.3, @babel/runtime@npm:^7.20.7, @babel/runtime@npm:^7.21.0, @babel/runtime@npm:^7.22.5, @babel/runtime@npm:^7.5.5, @babel/runtime@npm:^7.7.7, @babel/runtime@npm:^7.8.4, @babel/runtime@npm:^7.8.7, @babel/runtime@npm:^7.9.2":
+"@babel/runtime@npm:^7.11.2, @babel/runtime@npm:^7.12.0, @babel/runtime@npm:^7.12.1, @babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.15.4, @babel/runtime@npm:^7.16.3, @babel/runtime@npm:^7.18.3, @babel/runtime@npm:^7.20.7, @babel/runtime@npm:^7.21.0, @babel/runtime@npm:^7.22.5, @babel/runtime@npm:^7.5.5, @babel/runtime@npm:^7.8.4, @babel/runtime@npm:^7.8.7, @babel/runtime@npm:^7.9.2":
   version: 7.23.1
   resolution: "@babel/runtime@npm:7.23.1"
   dependencies:
@@ -3742,19 +3742,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@loadable/component@npm:^5.15.3":
-  version: 5.15.3
-  resolution: "@loadable/component@npm:5.15.3"
-  dependencies:
-    "@babel/runtime": ^7.7.7
-    hoist-non-react-statics: ^3.3.1
-    react-is: ^16.12.0
-  peerDependencies:
-    react: ^16.3.0 || ^17.0.0 || ^18.0.0
-  checksum: 78ac341465f2310db30381bc75e8bf73a33f99af849a6a2d87eb3842da0ba1df265e08045dc4f3fee1d194522a43a030baa91740045b64aad002f159ccce64bf
-  languageName: node
-  linkType: hard
-
 "@mapbox/node-pre-gyp@npm:^1.0.8":
   version: 1.0.11
   resolution: "@mapbox/node-pre-gyp@npm:1.0.11"
@@ -4686,13 +4673,6 @@ __metadata:
   version: 1.3.4
   resolution: "@types/platform@npm:1.3.4"
   checksum: dce83952e6af3e488fb2a3c7c7ec226cef4a8606ab63bd40301fe7883ff0c434512210497d6cb79adc4c8e671648ed3e7035438a40f41a5f395c60d2bfb6390d
-  languageName: node
-  linkType: hard
-
-"@types/prettier@npm:^2.7.3":
-  version: 2.7.3
-  resolution: "@types/prettier@npm:2.7.3"
-  checksum: 705384209cea6d1433ff6c187c80dcc0b95d99d5c5ce21a46a9a58060c527973506822e428789d842761e0280d25e3359300f017fbe77b9755bc772ab3dc2f83
   languageName: node
   linkType: hard
 
@@ -15290,7 +15270,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-is@npm:^16.12.0, react-is@npm:^16.13.1, react-is@npm:^16.7.0":
+"react-is@npm:^16.13.1, react-is@npm:^16.7.0":
   version: 16.13.1
   resolution: "react-is@npm:16.13.1"
   checksum: f7a19ac3496de32ca9ae12aa030f00f14a3d45374f1ceca0af707c831b2a6098ef0d6bdae51bd437b0a306d7f01d4677fcc8de7c0d331eb47ad0f46130e53c5f
@@ -18361,7 +18341,6 @@ __metadata:
     "@koush/wrtc": 0.5.3
     "@lexical/history": 0.12.2
     "@lexical/react": 0.12.2
-    "@loadable/component": ^5.15.3
     "@peculiar/x509": 1.9.5
     "@testing-library/react": 14.0.0
     "@types/adm-zip": 0.5.2
@@ -18381,7 +18360,6 @@ __metadata:
     "@types/node": ^20.8.4
     "@types/open-graph": 0.2.3
     "@types/platform": 1.3.4
-    "@types/prettier": ^2.7.3
     "@types/react": 18.2.28
     "@types/react-dom": 18.2.13
     "@types/react-redux": 7.1.27

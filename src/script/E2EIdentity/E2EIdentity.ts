@@ -95,7 +95,7 @@ class E2EIHandler {
   public updateParams({gracePeriodInMS, discoveryUrl}: E2EIHandlerParams) {
     this.gracePeriodInMS = gracePeriodInMS;
     this.discoveryUrl = discoveryUrl;
-    this.timer = DelayTimerService.getInstance({
+    this.timer.updateParams({
       gracePeriodInMS,
       gracePeriodExpiredCallback: () => null,
       delayPeriodExpiredCallback: () => null,
