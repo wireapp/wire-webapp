@@ -272,12 +272,15 @@ export class ConversationRepository {
       this.userState,
       this.conversationState,
     );
-    // we register a handler that will handle MLS conversations on its own
-    registerMLSConversationVerificationStateHandler(
-      this.onConversationVerificationStateChange,
-      this.conversationState,
-      this.core,
-    );
+
+    if (Config.getConfig().FEATURE.ENABLE_MLS === true) {
+      // we register a handler that will handle MLS conversations on its own
+      registerMLSConversationVerificationStateHandler(
+        this.onConversationVerificationStateChange,
+        this.conversationState,
+        this.core,
+      );
+    }
 
     this.isBlockingNotificationHandling = true;
     this.conversationsWithNewEvents = new Map();
