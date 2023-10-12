@@ -55,17 +55,10 @@ export const MemberMessage: React.FC<MemberMessageProps> = ({
   classifiedDomains,
   conversationName,
 }) => {
-  const {otherUser, timestamp, user, htmlGroupCreationHeader, highlightedUsers, showNamedCreation, hasUsers} =
-    useKoSubscribableChildren(message, [
-      'otherUser',
-      'timestamp',
-      'user',
-      'name',
-      'htmlGroupCreationHeader',
-      'highlightedUsers',
-      'showNamedCreation',
-      'hasUsers',
-    ]);
+  const {otherUser, timestamp, user, htmlGroupCreationHeader, showNamedCreation, hasUsers} = useKoSubscribableChildren(
+    message,
+    ['otherUser', 'timestamp', 'user', 'htmlGroupCreationHeader', 'showNamedCreation', 'hasUsers'],
+  );
 
   const isGroupCreation = message.isGroupCreation();
   const isMemberRemoval = message.isMemberRemoval();
@@ -109,10 +102,8 @@ export const MemberMessage: React.FC<MemberMessageProps> = ({
             {isMemberRemoval && <span className="icon-minus" />}
             {isMemberJoin && <span className="icon-plus" />}
           </div>
-          {/* event is being triggered only when clicked on <a> tag with specified class (keyboard accessible by default) */}
-          {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
           <div className="message-header-label">
-            <MessageContent onClickAction={() => onClickParticipants(highlightedUsers)} message={message} />
+            <MessageContent onClickParticipants={onClickParticipants} message={message} />
           </div>
           {isMemberChange && (
             <div className="message-body-actions">
