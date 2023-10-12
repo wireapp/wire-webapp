@@ -1619,6 +1619,10 @@ export class ConversationRepository {
 
     const localProteusConversations = this.conversationState.findProteus1to1Conversations(otherUserId);
 
+    const wasProteus1to1ActiveConversation =
+      localProteusConversations &&
+      localProteusConversations.some(conversation => this.conversationState.isActiveConversation(conversation));
+
     // If proteus 1:1 conversation with the same user is known, we have to make sure it is replaced with mls 1:1 conversation.
     if (localProteusConversations) {
       await this.replaceProteus1to1WithMLS(localProteusConversations, mlsConversation);
@@ -1640,6 +1644,12 @@ export class ConversationRepository {
           `MLS 1:1 conversation with user ${otherUserId.id} is not supported by the other user, conversation will become readonly`,
         );
       }
+
+      if (wasProteus1to1ActiveConversation) {
+        // If proteus conversation was previously active conversaiton, we want to make mls 1:1 conversation active.
+        amplify.publish(WebAppEvents.CONVERSATION.SHOW, mlsConversation, {});
+      }
+
       return mlsConversation;
     }
 
@@ -1648,10 +1658,6 @@ export class ConversationRepository {
       otherUserId,
       shouldDelayGroupEstablishment,
     );
-
-    const wasProteus1to1ActiveConversation =
-      localProteusConversations &&
-      localProteusConversations.some(conversation => this.conversationState.isActiveConversation(conversation));
 
     if (wasProteus1to1ActiveConversation) {
       // If proteus conversation was previously active conversaiton, we want to make mls 1:1 conversation active.
