@@ -17,11 +17,18 @@
  *
  */
 
+import {TaskScheduler} from '@wireapp/core/lib/util';
+
 import {EventEmitter} from 'stream';
 
 export class Account extends EventEmitter {
   backendFeatures = {
     federationEndpoints: true,
+  };
+
+  recurringTaskScheduler = {
+    registerTask: jest.fn(),
+    cancelTask: jest.fn(),
   };
 
   configureMLSCallbacks = jest.fn();
@@ -54,9 +61,15 @@ export class Account extends EventEmitter {
       messageTimer: {
         setConversationLevelTimer: jest.fn(),
       },
+      removeUsersFromMLSConversation: jest.fn(),
+      removeUserFromConversation: jest.fn(),
     },
     client: {
       deleteClient: jest.fn(),
     },
   };
 }
+
+export const util = {
+  TaskScheduler,
+};

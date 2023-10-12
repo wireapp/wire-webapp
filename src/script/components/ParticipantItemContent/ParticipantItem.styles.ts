@@ -111,7 +111,7 @@ export const ellipsis: CSSObject = {
 
 export const wrapper: CSSObject = {
   display: 'flex',
-  minWidth: 0,
+  width: 0,
   height: 'var(--avatar-diameter-m)',
   flex: '1 1',
   alignItems: 'center',

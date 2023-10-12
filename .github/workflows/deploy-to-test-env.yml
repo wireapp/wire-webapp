@@ -9,7 +9,6 @@ on:
         type: choice
         options:
           - wire-webapp-qa-al2-migration
-          - wire-webapp-edge-al2
           - wire-webapp-mls-al2
 
 concurrency:
@@ -32,7 +31,7 @@ jobs:
           echo -e "env = ${{inputs.env}}"
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 

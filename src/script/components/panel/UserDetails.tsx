@@ -35,10 +35,9 @@ import {t} from 'Util/LocalizerUtil';
 
 import {User} from '../../entity/User';
 
-export interface UserDetailsProps {
+interface UserDetailsProps {
   badge?: string;
   classifiedDomains?: string[];
-  conversationDomain?: string;
   isGroupAdmin?: boolean;
   isSelfVerified: boolean;
   isVerified?: boolean;
@@ -46,14 +45,13 @@ export interface UserDetailsProps {
   avatarStyles?: React.CSSProperties;
 }
 
-export const UserDetailsComponent: React.FC<UserDetailsProps> = ({
+const UserDetailsComponent: React.FC<UserDetailsProps> = ({
   badge,
   participant,
   isSelfVerified,
   isGroupAdmin,
   avatarStyles,
   classifiedDomains,
-  conversationDomain,
 }) => {
   const user = useKoSubscribableChildren(participant, [
     'inTeam',
@@ -103,13 +101,7 @@ export const UserDetailsComponent: React.FC<UserDetailsProps> = ({
         </p>
       )}
 
-      {classifiedDomains && (
-        <UserClassifiedBar
-          conversationDomain={conversationDomain}
-          users={[participant]}
-          classifiedDomains={classifiedDomains}
-        />
-      )}
+      {classifiedDomains && <UserClassifiedBar users={[participant]} classifiedDomains={classifiedDomains} />}
 
       <Avatar
         className="panel-participant__avatar"

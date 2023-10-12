@@ -94,7 +94,7 @@ async function encryptFile(fileContent: Uint8Array, encryptionKey: Uint8Array): 
 }
 
 // Decrypt a file
-export async function decryptFile(encryptedDataSource: Uint8Array, encryptionKey: Uint8Array, headerLength: number) {
+async function decryptFile(encryptedDataSource: Uint8Array, encryptionKey: Uint8Array, headerLength: number) {
   await sodium.ready;
 
   const metaDataHeader = headerLength;

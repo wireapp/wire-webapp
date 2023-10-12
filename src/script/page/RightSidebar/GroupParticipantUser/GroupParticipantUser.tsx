@@ -149,7 +149,6 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
 
       <FadingScrollbar className="panel__content">
         <UserDetails
-          conversationDomain={activeConversation.domain}
           participant={currentUser}
           badge={teamRepository.getRoleBadge(currentUser.id)}
           isGroupAdmin={isAdmin}
