@@ -24,7 +24,7 @@ import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {container} from 'tsyringe';
 
 import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
-import {IconButton, IconButtonVariant, useMatchMedia} from '@wireapp/react-ui-kit';
+import {IconButton, IconButtonVariant, Select, useMatchMedia} from '@wireapp/react-ui-kit';
 
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {Icon} from 'Components/Icon';
@@ -35,7 +35,7 @@ import {t} from 'Util/LocalizerUtil';
 import {preventFocusOutside} from 'Util/util';
 
 import {ButtonGroup} from './ButtonGroup';
-import {DeviceToggleButton} from './DeviceToggleButton';
+// import {DeviceToggleButton} from './DeviceToggleButton';
 import {Duration} from './Duration';
 import {
   videoControlActiveStyles,
@@ -144,13 +144,42 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   const {audioInput: currentMicrophoneDevice} = useKoSubscribableChildren(mediaDevicesHandler.currentDeviceId, [
     DeviceTypes.AUDIO_INPUT,
   ]);
-  const {audioInput} = useKoSubscribableChildren(mediaDevicesHandler.availableDevices, [DeviceTypes.AUDIO_INPUT]);
+  const {audioInput, audioOutput} = useKoSubscribableChildren(mediaDevicesHandler.availableDevices, [
+    DeviceTypes.AUDIO_INPUT,
+    DeviceTypes.AUDIO_OUTPUT,
+  ]);
+
   const availableMicrophones = useMemo(
-    () =>
-      audioInput.map(device => (device as MediaDeviceInfo).deviceId || (device as ElectronDesktopCapturerSource).id),
+    () => audioInput.map(device => (device as MediaDeviceInfo) || (device as ElectronDesktopCapturerSource)),
     [audioInput],
   );
+
+  const availableSpeakers = useMemo(
+    () => audioOutput.map(device => (device as MediaDeviceInfo) || (device as ElectronDesktopCapturerSource)),
+    [audioOutput],
+  );
   const showSwitchMicrophone = availableMicrophones.length > 1;
+
+  const audioOptions = [
+    {
+      label: t('audioInputMicrophone'),
+      options: availableMicrophones.map(device => ({
+        label: device.label,
+        value: device.deviceId,
+        dataUieName: device.deviceId,
+        id: device.deviceId,
+      })),
+    },
+    {
+      label: t('audioOutputSpeaker'),
+      options: availableSpeakers.map(device => ({
+        label: device.label,
+        value: device.deviceId,
+        dataUieName: device.deviceId,
+        id: device.deviceId,
+      })),
+    },
+  ];
 
   const unreadMessagesCount = useAppState(state => state.unreadMessagesCount);
   const hasUnreadMessages = unreadMessagesCount > 0;
@@ -355,19 +384,17 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
 
                   {isMuted ? <Icon.MicOff width={16} height={16} /> : <Icon.MicOn width={16} height={16} />}
 
-                  {/* {showSwitchMicrophone && !verticalBreakpoint && (
-                    <DeviceToggleButton
-                      styles={css`
-                        bottom: -38px;
-                        left: 50%;
-                        position: absolute;
-                        transform: translateX(-50%);
-                      `}
-                      currentDevice={currentMicrophoneDevice}
-                      devices={availableMicrophones}
-                      onChooseDevice={deviceId => switchMicrophoneInput(call, deviceId)}
+                  {showSwitchMicrophone && !verticalBreakpoint && (
+                    //TODO: lets try wrapping this in a parent div and see if it works
+                    <Select
+                      controlShouldRenderValue={false}
+                      isClearable={false}
+                      backspaceRemovesValue={false}
+                      className="device-toggle-button"
+                      options={audioOptions}
+                      menuPlacement="top"
                     />
-                  )} */}
+                  )}
                 </button>
               </li>
 
