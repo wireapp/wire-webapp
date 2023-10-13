@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [42.13.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.12.1...@wireapp/core@42.13.0) (2023-10-13)
+
+### Features
+
+* add new value to client in database ([#5603](https://github.com/wireapp/wire-web-packages/issues/5603)) ([ed90509](https://github.com/wireapp/wire-web-packages/commit/ed9050969799a280c37945be519251564a9376cf))
+
 ## [42.12.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.12.0...@wireapp/core@42.12.1) (2023-10-11)
 
 ### Bug Fixes
