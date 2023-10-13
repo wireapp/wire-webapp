@@ -301,13 +301,14 @@ export class UserRepository extends TypedEventEmitter<Events> {
   private async onUserUpdate(eventJson: UserUpdateEvent, source: EventSource): Promise<void> {
     const user = eventJson.user;
     const userId = generateQualifiedId(user);
-    await this.updateUser(userId, user, source === EventRepository.SOURCE.WEB_SOCKET);
 
     // Check if user's supported protocols were updated, if they were, we need to re-evaluate a 1:1 conversation to use with that user
     const newSupportedProtocols = user.supported_protocols;
     if (newSupportedProtocols) {
       await this.onUserSupportedProtocolsUpdate(userId, newSupportedProtocols);
     }
+
+    await this.updateUser(userId, user, source === EventRepository.SOURCE.WEB_SOCKET);
   }
 
   private async onUserSupportedProtocolsUpdate(
@@ -325,7 +326,6 @@ export class UserRepository extends TypedEventEmitter<Events> {
 
     if (hasSupportedProtocolsChanged) {
       const user = await this.getUserById(userId);
-      await this.updateUserSupportedProtocols(userId, newSupportedProtocols);
       this.emit('supportedProtocolsUpdated', {user, supportedProtocols: newSupportedProtocols});
     }
   }

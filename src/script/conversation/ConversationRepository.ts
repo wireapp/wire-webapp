@@ -1887,7 +1887,7 @@ export class ConversationRepository {
     await Promise.allSettled(one2oneConversations.map(conversation => this.init1to1Conversation(conversation)));
   };
 
-  private readonly onUserSupportedProtocolsUpdated = async (user: User) => {
+  private readonly onUserSupportedProtocolsUpdated = async ({user}: {user: User}) => {
     // After user's supported protocols are updated, we want to make sure that 1:1 conversation is initialised.
     await this.get1To1Conversation(user);
   };
