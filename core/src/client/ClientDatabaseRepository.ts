@@ -84,7 +84,7 @@ export class ClientDatabaseRepository {
   }
 
   public async updateClient(userId: QualifiedId, client: RegisteredClient): Promise<MetaClient> {
-    const transformedClient = this.transformClient(userId, client, false);
+    const transformedClient = this.transformClient(userId, client);
     await this.storeEngine.update(
       ClientDatabaseRepository.STORES.CLIENTS,
       constructSessionId({
@@ -97,7 +97,7 @@ export class ClientDatabaseRepository {
   }
 
   public async createClient(userId: QualifiedId, client: RegisteredClient): Promise<MetaClient> {
-    const transformedClient = this.transformClient(userId, client, false);
+    const transformedClient = this.transformClient(userId, client);
     await this.storeEngine.create(
       ClientDatabaseRepository.STORES.CLIENTS,
       constructSessionId({
@@ -109,12 +109,13 @@ export class ClientDatabaseRepository {
     return transformedClient;
   }
 
-  private transformClient(userId: QualifiedId, client: RegisteredClient, verified: boolean): MetaClient {
+  private transformClient(userId: QualifiedId, client: RegisteredClient): MetaClient {
     return {
       ...client,
       domain: userId.domain,
       meta: {
-        is_verified: verified,
+        is_verified: false,
+        is_mls_verified: false,
         primary_key: constructSessionId({
           userId,
           clientId: client.id,
@@ -127,7 +128,7 @@ export class ClientDatabaseRepository {
     return {
       ...client,
       domain,
-      meta: {is_verified: true, primary_key: ClientDatabaseRepository.KEYS.LOCAL_IDENTITY},
+      meta: {is_verified: true, is_mls_verified: false, primary_key: ClientDatabaseRepository.KEYS.LOCAL_IDENTITY},
     };
   }
 }
