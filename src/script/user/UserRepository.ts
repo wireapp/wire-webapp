@@ -104,7 +104,7 @@ interface UserAvailabilityEvent {
   type: USER.AVAILABILITY;
 }
 
-type Events = {supportedProtocolsUpdated: ConversationProtocol[]};
+type Events = {supportedProtocolsUpdated: {user: User; supportedProtocols: ConversationProtocol[]}};
 export class UserRepository extends TypedEventEmitter<Events> {
   private readonly logger: Logger;
   public readonly userMapper: UserMapper;
@@ -324,7 +324,9 @@ export class UserRepository extends TypedEventEmitter<Events> {
       );
 
     if (hasSupportedProtocolsChanged) {
-      this.emit('supportedProtocolsUpdated', newSupportedProtocols);
+      const user = await this.getUserById(userId);
+      await this.updateUserSupportedProtocols(userId, newSupportedProtocols);
+      this.emit('supportedProtocolsUpdated', {user, supportedProtocols: newSupportedProtocols});
     }
   }
 

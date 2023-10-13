@@ -338,6 +338,7 @@ export class ConversationRepository {
     window.addEventListener<any>(WebAppEvents.CONVERSATION.JOIN, this.onConversationJoin);
 
     this.selfRepository.on('selfSupportedProtocolsUpdated', this.onSelfUserSupportedProtocolsUpdated);
+    this.userRepository.on('supportedProtocolsUpdated', this.onUserSupportedProtocolsUpdated);
   }
 
   public initMLSConversationRecoveredListener() {
@@ -1884,6 +1885,11 @@ export class ConversationRepository {
   private readonly onSelfUserSupportedProtocolsUpdated = async () => {
     const one2oneConversations = this.conversationState.conversations().filter(conversation => conversation.is1to1());
     await Promise.allSettled(one2oneConversations.map(conversation => this.init1to1Conversation(conversation)));
+  };
+
+  private readonly onUserSupportedProtocolsUpdated = async (user: User) => {
+    // After user's supported protocols are updated, we want to make sure that 1:1 conversation is initialised.
+    await this.get1To1Conversation(user);
   };
 
   /**
