@@ -114,12 +114,12 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
   };
 
   const switchCameraInput = (call: Call, deviceId: string) => {
-    mediaDevicesHandler.currentDeviceId.videoInput(deviceId);
+    mediaDevicesHandler.currentDeviceId.videoinput(deviceId);
     callingRepository.refreshVideoInput();
   };
 
   const switchMicrophoneInput = (call: Call, deviceId: string) => {
-    mediaDevicesHandler.currentDeviceId.audioInput(deviceId);
+    mediaDevicesHandler.currentDeviceId.audioinput(deviceId);
     callingRepository.refreshAudioInput();
   };
 
@@ -134,7 +134,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
     const showScreenSelection = (): Promise<void> => {
       return new Promise(resolve => {
         callingRepository.onChooseScreen = (deviceId: string): void => {
-          mediaDevicesHandler.currentDeviceId.screenInput(deviceId);
+          mediaDevicesHandler.currentDeviceId.screeninput(deviceId);
           callState.selectableScreens([]);
           callState.selectableWindows([]);
           resolve();

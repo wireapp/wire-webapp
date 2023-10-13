@@ -48,6 +48,7 @@ export class ClientEntity {
   };
   meta: {
     isVerified?: ko.Observable<boolean>;
+    isMLSVerified?: ko.Observable<boolean>;
     primaryKey?: string;
     userId?: string;
   };
@@ -76,6 +77,7 @@ export class ClientEntity {
     // Metadata maintained by us
     this.meta = {
       isVerified: ko.observable(false),
+      isMLSVerified: ko.observable(false),
       primaryKey: undefined,
     };
   }
@@ -120,6 +122,9 @@ export class ClientEntity {
 
     jsonObject.meta.is_verified = jsonObject.meta.isVerified;
     delete jsonObject.meta.isVerified;
+
+    jsonObject.meta.is_mls_verified = jsonObject.meta.isMLSVerified;
+    delete jsonObject.meta.isMLSVerified;
 
     if (jsonObject.meta.primaryKey) {
       jsonObject.meta.primary_key = jsonObject.meta.primaryKey;

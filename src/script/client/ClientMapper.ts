@@ -57,7 +57,8 @@ export class ClientMapper {
     if (isClientRecord(clientPayload)) {
       const {userId} = parseClientId(clientPayload.meta.primary_key);
 
-      clientEntity.meta.isVerified(clientPayload.meta.is_verified);
+      clientEntity.meta.isVerified?.(!!clientPayload.meta.is_verified);
+      clientEntity.meta.isMLSVerified?.(!!clientPayload.meta.is_mls_verified);
       clientEntity.meta.primaryKey = clientPayload.meta.primary_key;
       clientEntity.meta.userId = userId;
     }

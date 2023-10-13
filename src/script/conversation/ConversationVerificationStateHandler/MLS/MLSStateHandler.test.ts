@@ -21,19 +21,14 @@ import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConv
 
 import {Conversation} from 'src/script/entity/Conversation';
 import {Core} from 'src/script/service/CoreSingleton';
-import {getLogger, Logger} from 'Util/Logger';
 import {createUuid} from 'Util/uuid';
 
-import {MLSConversationVerificationStateHandler} from './MLSStateHandler';
+import {
+  MLSConversationVerificationStateHandler,
+  registerMLSConversationVerificationStateHandler,
+} from './MLSStateHandler';
 
 import {ConversationState} from '../../ConversationState';
-
-jest.mock('Util/Logger', () => ({
-  getLogger: jest.fn().mockReturnValue({
-    error: jest.fn(),
-    log: jest.fn(),
-  }),
-}));
 
 describe('MLSConversationVerificationStateHandler', () => {
   const uuid = createUuid();
@@ -41,12 +36,10 @@ describe('MLSConversationVerificationStateHandler', () => {
   let mockOnConversationVerificationStateChange: jest.Mock;
   let mockConversationState: jest.Mocked<ConversationState>;
   let mockCore: jest.Mocked<Core>;
-  let logger: jest.Mocked<Logger>;
   const conversation: Conversation = new Conversation(uuid, '', ConversationProtocol.MLS);
   const groupId = 'groupIdXYZ';
 
   beforeEach(() => {
-    jest.clearAllMocks();
     conversation.groupId = groupId;
 
     mockOnConversationVerificationStateChange = jest.fn();
@@ -67,37 +60,38 @@ describe('MLSConversationVerificationStateHandler', () => {
       mockConversationState,
       mockCore,
     );
-    logger = getLogger('MLSConversationVerificationStateHandler') as jest.Mocked<Logger>;
+
+    jest.clearAllMocks();
   });
 
-  it('should log an error if MLS service is not available', () => {
+  it('should do nothing if MLS service is not available', () => {
     mockCore.service.mls = undefined;
 
-    new MLSConversationVerificationStateHandler(
-      mockOnConversationVerificationStateChange,
-      mockConversationState,
-      mockCore,
-    );
+    const t = () =>
+      registerMLSConversationVerificationStateHandler(
+        mockOnConversationVerificationStateChange,
+        mockConversationState,
+        mockCore,
+      );
 
-    // Assert
-    expect(logger.error).toHaveBeenCalledWith('MLS service not available');
+    expect(t).not.toThrow();
   });
 
-  it('should log an error if e2eIdentity service is not available', () => {
+  it('should do nothing if e2eIdentity service is not available', () => {
     mockCore.service.e2eIdentity = undefined;
 
-    new MLSConversationVerificationStateHandler(
+    registerMLSConversationVerificationStateHandler(
       mockOnConversationVerificationStateChange,
       mockConversationState,
       mockCore,
     );
 
     // Assert
-    expect(logger.error).toHaveBeenCalledWith('E2E identity service not available');
+    expect(mockCore.service?.mls?.on).not.toHaveBeenCalled();
   });
 
   it('should hook into the newEpoch event of the MLS service', () => {
-    new MLSConversationVerificationStateHandler(
+    registerMLSConversationVerificationStateHandler(
       mockOnConversationVerificationStateChange,
       mockConversationState,
       mockCore,
