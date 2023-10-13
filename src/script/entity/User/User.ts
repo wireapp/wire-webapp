@@ -63,7 +63,9 @@ export class User {
   public readonly initials: ko.PureComputed<string>;
   public readonly inTeam: ko.Observable<boolean>;
   public readonly is_trusted: ko.PureComputed<boolean>;
+  // Manual Proteus verification
   public readonly is_verified: ko.PureComputed<boolean>;
+  // MLS certificate verification
   public readonly isMLSVerified: ko.PureComputed<boolean>;
   public readonly isBlocked: ko.PureComputed<boolean>;
   public readonly isCanceled: ko.PureComputed<boolean>;
@@ -200,6 +202,7 @@ export class User {
     });
 
     this.devices = ko.observableArray();
+    // Proteus verification
     this.is_verified = ko.pureComputed(() => {
       if (this.devices().length === 0 && !this.isMe) {
         return false;

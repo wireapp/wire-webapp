@@ -100,6 +100,7 @@ describe('ClientRepository', () => {
       ...clientPayloadServer,
       meta: {
         is_verified: true,
+        is_mls_verified: true,
         primary_key: 'local_identity',
       },
     };
