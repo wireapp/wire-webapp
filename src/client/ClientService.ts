@@ -36,6 +36,7 @@ export interface MetaClient extends RegisteredClient {
   domain?: string;
   meta: {
     is_verified?: boolean;
+    is_mls_verified?: boolean;
     primary_key: string;
   };
 }
