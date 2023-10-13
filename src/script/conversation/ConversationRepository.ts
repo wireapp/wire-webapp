@@ -1687,6 +1687,7 @@ export class ConversationRepository {
         proteusConversation,
         CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_SELF_UNSUPPORTED_MLS,
       );
+      return proteusConversation;
     }
 
     // If proteus is supported by the other user, we just return a proteus conversation and remove readonly state from it.
