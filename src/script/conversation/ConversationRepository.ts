@@ -1393,9 +1393,9 @@ export class ConversationRepository {
     }
   };
 
-  private readonly markConversationReadOnly = async (
+  private readonly updateConversationReadOnlyState = async (
     conversationEntity: Conversation,
-    conversationReadOnlyState: CONVERSATION_READONLY_STATE,
+    conversationReadOnlyState: CONVERSATION_READONLY_STATE | null,
   ) => {
     conversationEntity.readOnlyState(conversationReadOnlyState);
     await this.saveConversationStateInDb(conversationEntity);
@@ -1636,7 +1636,7 @@ export class ConversationRepository {
 
       // If group was not yet established, we mark the mls conversation as readonly
       if (!isMLSGroupEstablishedLocally) {
-        await this.markConversationReadOnly(
+        await this.updateConversationReadOnlyState(
           mlsConversation,
           CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_OTHER_UNSUPPORTED_MLS,
         );
@@ -1652,6 +1652,9 @@ export class ConversationRepository {
 
       return mlsConversation;
     }
+
+    // If mls is supported by the other user, we can establish the group and remove readonly state from the conversation.
+    await this.updateConversationReadOnlyState(mlsConversation, null);
 
     const establishedMLSConversation = await this.establishMLS1to1Conversation(
       mlsConversation,
@@ -1680,12 +1683,14 @@ export class ConversationRepository {
 
     // If proteus is not supported by the other user we have to mark conversation as readonly
     if (!doesOtherUserSupportProteus) {
-      await this.markConversationReadOnly(
+      await this.updateConversationReadOnlyState(
         proteusConversation,
         CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_SELF_UNSUPPORTED_MLS,
       );
     }
 
+    // If proteus is supported by the other user, we just return a proteus conversation and remove readonly state from it.
+    await this.updateConversationReadOnlyState(proteusConversation, null);
     return proteusConversation;
   };
 
