@@ -4616,7 +4616,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:>=13.7.0, @types/node@npm:^20.8.4":
+"@types/node@npm:*, @types/node@npm:>=13.7.0":
   version: 20.8.4
   resolution: "@types/node@npm:20.8.4"
   dependencies:
@@ -4636,6 +4636,15 @@ __metadata:
   version: 16.9.1
   resolution: "@types/node@npm:16.9.1"
   checksum: 41afcf183a22d59323a0199dd7e0f46591247f45fc08a4434edb26d56dc279ae4fdb80f37989ddd7a0f45e3857c4933e6e82057ede09c5a829f77e373e680375
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:^20.8.6":
+  version: 20.8.6
+  resolution: "@types/node@npm:20.8.6"
+  dependencies:
+    undici-types: ~5.25.1
+  checksum: ccfb7ac482c5a96edeb239893c5c099f5257fcc2ed9ae62fefdfbc782b79e16dbc2af9a85b379665237bf759904b44ca2be68e75d239e0297882aad42f61905c
   languageName: node
   linkType: hard
 
@@ -18357,7 +18366,7 @@ __metadata:
     "@types/linkify-it": 3.0.3
     "@types/loadable__component": ^5
     "@types/markdown-it": 13.0.2
-    "@types/node": ^20.8.4
+    "@types/node": ^20.8.6
     "@types/open-graph": 0.2.3
     "@types/platform": 1.3.4
     "@types/react": 18.2.28
