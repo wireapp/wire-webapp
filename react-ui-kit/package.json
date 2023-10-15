@@ -19,7 +19,7 @@
     "@babel/core": "7.23.0",
     "@babel/preset-env": "7.22.20",
     "@babel/preset-react": "7.22.15",
-    "@babel/preset-typescript": "7.23.0",
+    "@babel/preset-typescript": "7.23.2",
     "@emotion/babel-preset-css-prop": "^11.10.0",
     "@emotion/jest": "11.11.0",
     "@emotion/react": "^11.10.4",
