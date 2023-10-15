@@ -401,9 +401,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/plugin-proposal-decorators@npm:7.23.0":
-  version: 7.23.0
-  resolution: "@babel/plugin-proposal-decorators@npm:7.23.0"
+"@babel/plugin-proposal-decorators@npm:7.23.2":
+  version: 7.23.2
+  resolution: "@babel/plugin-proposal-decorators@npm:7.23.2"
   dependencies:
     "@babel/helper-create-class-features-plugin": ^7.22.15
     "@babel/helper-plugin-utils": ^7.22.5
@@ -412,7 +412,7 @@ __metadata:
     "@babel/plugin-syntax-decorators": ^7.22.10
   peerDependencies:
     "@babel/core": ^7.0.0-0
-  checksum: bd678fd06eac4215fe75790c1881e5b3dce97a35afae01c792036de459b5e090cb3839e85ced98c878ac488be45c135c17e679f82e9923d74f2bf3a36ab98b9d
+  checksum: a8f63451c4678ce34268a0493aa4bc702d0ee164b39b53c12d33619ff3b47518c4369163ef49602cde7f0674db6e6e8584ee3d6a414ea0bbc3dc16c0304ef413
   languageName: node
   linkType: hard
 
@@ -18455,7 +18455,7 @@ __metadata:
   dependencies:
     "@babel/core": 7.23.0
     "@babel/eslint-parser": 7.22.15
-    "@babel/plugin-proposal-decorators": 7.23.0
+    "@babel/plugin-proposal-decorators": 7.23.2
     "@babel/preset-env": 7.23.2
     "@babel/preset-react": 7.22.15
     "@babel/preset-typescript": 7.23.2
