@@ -24,7 +24,7 @@ import {getLogger, Logger} from 'Util/Logger';
 import {base64ToArray} from 'Util/util';
 
 import {QuoteEntity} from '../../message/QuoteEntity';
-import {EventRecord, StoredEvent} from '../../storage/record/EventRecord';
+import {StoredEvent} from '../../storage/record/EventRecord';
 import {ClientEvent} from '../Client';
 import {EventMiddleware, IncomingEvent} from '../EventProcessor';
 import type {EventService} from '../EventService';
@@ -135,10 +135,10 @@ export class QuotedMessageMiddleware implements EventMiddleware {
   private async findRepliesToMessage(
     conversationId: string,
     messageId: string,
-  ): Promise<{originalEvent?: EventRecord; replies: StoredEvent<MessageAddEvent>[]}> {
+  ): Promise<{originalEvent?: MessageAddEvent; replies: StoredEvent<MessageAddEvent>[]}> {
     const originalEvent = await this.eventService.loadEvent(conversationId, messageId);
 
-    if (!originalEvent) {
+    if (!originalEvent || originalEvent.type !== ClientEvent.CONVERSATION.MESSAGE_ADD) {
       return {
         replies: [],
       };

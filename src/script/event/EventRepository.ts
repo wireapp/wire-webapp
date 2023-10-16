@@ -605,7 +605,7 @@ export class EventRepository {
       return this.throwValidationError(newEvent, errorMessage);
     }
 
-    const textContentMatches = newEventData.content === originalData.content;
+    const textContentMatches = newEventData.content === (originalData as any).content;
     if (!textContentMatches) {
       const errorMessage = 'ID of link preview reused';
       const logMessage = 'Text content for message duplication not matching';
@@ -642,12 +642,12 @@ export class EventRepository {
   private getUpdatesForMessage(originalEvent: EventRecord, newEvent: MessageAddEvent) {
     const newData = newEvent.data;
     const originalData = originalEvent.data;
-    const updatingLinkPreview = !!originalData.previews.length;
+    const updatingLinkPreview = !!(originalData as any).previews.length;
     if (updatingLinkPreview) {
       this.throwValidationError(newEvent, 'ID of link preview reused');
     }
 
-    const textContentMatches = !newData.previews?.length || newData.content === originalData.content;
+    const textContentMatches = !newData.previews?.length || newData.content === (originalData as any).content;
     if (!textContentMatches) {
       const logMessage = 'Text content for message duplication not matching';
       const errorMessage = 'ID of duplicated message reused';

@@ -29,7 +29,7 @@ import {ReactionType} from '@wireapp/core/lib/conversation/ReactionType';
 import {DecryptionError} from '@wireapp/core/lib/errors/DecryptionError';
 
 import type {REASON as AVS_REASON} from '@wireapp/avs';
-import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
+import type {LegalHoldStatus, Asset} from '@wireapp/protocol-messaging';
 
 import {createUuid} from 'Util/uuid';
 
@@ -104,9 +104,13 @@ export type AssetAddEvent = ConversationEvent<
     expects_read_confirmation?: boolean;
     key?: string;
     preview_key?: string;
+    info?: {
+      name: string;
+    };
     content_type: string;
     content_length: number;
     status: AssetTransferState;
+    reason?: Asset.NotUploaded;
   }
 >;
 
