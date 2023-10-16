@@ -110,7 +110,7 @@ export type AssetAddEvent = ConversationEvent<
     content_type: string;
     content_length: number;
     status: AssetTransferState;
-    reason?: Asset.NotUploaded;
+    reason?: Asset.NotUploaded | AssetTransferState;
   }
 >;
 
