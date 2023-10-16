@@ -24,7 +24,7 @@ import {getLogger, Logger} from 'Util/Logger';
 import {base64ToArray} from 'Util/util';
 
 import {QuoteEntity} from '../../message/QuoteEntity';
-import {EventRecord, StoredEvent} from '../../storage/record/EventRecord';
+import {StoredEvent} from '../../storage/record/EventRecord';
 import {ClientEvent} from '../Client';
 import {EventMiddleware, IncomingEvent} from '../EventProcessor';
 import type {EventService} from '../EventService';
@@ -103,23 +103,17 @@ export class QuotedMessageMiddleware implements EventMiddleware {
 
     const messageId = quote.quotedMessageId;
 
-    let quotedMessage =
-      (await this.eventService.loadEvent(event.conversation, messageId)) ??
-      (await this.eventService.loadReplacingEvent(event.conversation, messageId));
+    const quotedMessage = await this.eventService.loadEvent(event.conversation, messageId);
     if (!quotedMessage) {
-      const replacedMessage = await this.eventService.loadReplacingEvent(event.conversation, messageId);
-      if (!replacedMessage) {
-        this.logger.warn(`Quoted message with ID "${messageId}" not found.`);
-        const quoteData = {
-          error: {
-            type: QuoteEntity.ERROR.MESSAGE_NOT_FOUND,
-          },
-        };
+      this.logger.warn(`Quoted message with ID "${messageId}" not found.`);
+      const quoteData = {
+        error: {
+          type: QuoteEntity.ERROR.MESSAGE_NOT_FOUND,
+        },
+      };
 
-        const decoratedData = {...event.data, quote: quoteData};
-        return {...event, data: decoratedData};
-      }
-      quotedMessage = replacedMessage;
+      const decoratedData = {...event.data, quote: quoteData};
+      return {...event, data: decoratedData};
     }
 
     const quoteData = {
@@ -135,10 +129,10 @@ export class QuotedMessageMiddleware implements EventMiddleware {
   private async findRepliesToMessage(
     conversationId: string,
     messageId: string,
-  ): Promise<{originalEvent?: EventRecord; replies: StoredEvent<MessageAddEvent>[]}> {
+  ): Promise<{originalEvent?: MessageAddEvent; replies: StoredEvent<MessageAddEvent>[]}> {
     const originalEvent = await this.eventService.loadEvent(conversationId, messageId);
 
-    if (!originalEvent) {
+    if (!originalEvent || originalEvent.type !== ClientEvent.CONVERSATION.MESSAGE_ADD) {
       return {
         replies: [],
       };

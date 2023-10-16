@@ -121,12 +121,13 @@ describe('QuotedMessageMiddleware', () => {
       expect(parsedEvent.data.quote.user_id).toEqual('user-id');
     });
 
-    it('updates quotes in DB when a message is edited', () => {
+    it('updates quotes in DB when a message is edited', async () => {
       const [quotedMessageMiddleware, {eventService}] = buildQuotedMessageMiddleware();
       const originalMessage = {
         data: {
           content: 'hello',
         },
+        type: ClientEvent.CONVERSATION.MESSAGE_ADD,
       } as EventRecord;
       const replies = [
         {
@@ -136,6 +137,7 @@ describe('QuotedMessageMiddleware', () => {
               message_id: 'original-id',
             },
           },
+          type: ClientEvent.CONVERSATION.MESSAGE_ADD,
         },
         {
           data: {
@@ -144,6 +146,7 @@ describe('QuotedMessageMiddleware', () => {
               message_id: 'original-id',
             },
           },
+          type: ClientEvent.CONVERSATION.MESSAGE_ADD,
         },
       ];
       eventService.loadEvent.mockResolvedValue(originalMessage);
@@ -160,14 +163,13 @@ describe('QuotedMessageMiddleware', () => {
 
       jest.useFakeTimers();
 
-      return quotedMessageMiddleware.processEvent(event).then(() => {
-        jest.advanceTimersByTime(1);
+      await quotedMessageMiddleware.processEvent(event);
+      jest.advanceTimersByTime(1);
 
-        expect(eventService.replaceEvent).toHaveBeenCalledWith(
-          jasmine.objectContaining({data: jasmine.objectContaining({quote: {message_id: 'new-id'}})}),
-        );
-        jest.useRealTimers();
-      });
+      expect(eventService.replaceEvent).toHaveBeenCalledWith(
+        jasmine.objectContaining({data: jasmine.objectContaining({quote: {message_id: 'new-id'}})}),
+      );
+      jest.useRealTimers();
     });
 
     it('invalidates quotes in DB when a message is deleted', () => {
@@ -176,6 +178,7 @@ describe('QuotedMessageMiddleware', () => {
         data: {
           content: 'hello',
         },
+        type: ClientEvent.CONVERSATION.MESSAGE_ADD,
       };
       const replies = [
         {

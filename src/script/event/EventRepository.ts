@@ -36,7 +36,7 @@ import {getLogger, Logger} from 'Util/Logger';
 import {queue} from 'Util/PromiseQueue';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
-import {ClientEvent} from './Client';
+import {ClientEvent, CONVERSATION} from './Client';
 import {EventMiddleware, EventProcessor, IncomingEvent} from './EventProcessor';
 import type {EventService} from './EventService';
 import {EventSource} from './EventSource';
@@ -476,33 +476,32 @@ export class EventRepository {
    */
   private async handleEventSaving(event: IncomingEvent) {
     const conversationId = 'conversation' in event && event.conversation;
-    const mappedData = ('data' in event && event.data) ?? {};
 
     // first check if a message that should be replaced exists in DB
-    const eventToReplace = mappedData.replacing_message_id
-      ? await this.eventService.loadEvent(conversationId, mappedData.replacing_message_id)
-      : undefined;
+    if (event.type === ClientEvent.CONVERSATION.MESSAGE_ADD) {
+      const mappedData = event.data;
+      const eventToReplace = mappedData.replacing_message_id
+        ? await this.eventService.loadEvent(conversationId, mappedData.replacing_message_id)
+        : undefined;
 
-    const hasLinkPreview = mappedData.previews && mappedData.previews.length;
-    const isReplacementWithoutOriginal = !eventToReplace && mappedData.replacing_message_id;
-    if (isReplacementWithoutOriginal && !hasLinkPreview) {
-      // the only valid case of a replacement with no original message is when an edited message gets a link preview
-      this.throwValidationError(event, 'Edit event without original event');
+      const hasLinkPreview = mappedData.previews && mappedData.previews.length;
+      const isReplacementWithoutOriginal = !eventToReplace && mappedData.replacing_message_id;
+      if (isReplacementWithoutOriginal && !hasLinkPreview) {
+        // the only valid case of a replacement with no original message is when an edited message gets a link preview
+        this.throwValidationError(event, 'Edit event without original event');
+      }
+
+      if (eventToReplace?.type === CONVERSATION.MESSAGE_ADD) {
+        return this.handleEventReplacement(eventToReplace, event);
+      }
     }
 
-    const handleEvent = async (newEvent: IncomingEvent) => {
-      // check for duplicates (same id)
-      const storedEvent = 'id' in newEvent ? await this.eventService.loadEvent(conversationId, newEvent.id) : undefined;
+    // check for duplicates (same id)
+    const storedEvent = 'id' in event ? await this.eventService.loadEvent(conversationId, event.id) : undefined;
 
-      return storedEvent
-        ? this.handleDuplicatedEvent(storedEvent, newEvent)
-        : this.eventService.saveEvent(newEvent as EventRecord);
-    };
-
-    const canReplace =
-      eventToReplace?.type === ClientEvent.CONVERSATION.MESSAGE_ADD &&
-      event.type === ClientEvent.CONVERSATION.MESSAGE_ADD;
-    return canReplace && eventToReplace ? this.handleEventReplacement(eventToReplace, event) : handleEvent(event);
+    return storedEvent
+      ? this.handleDuplicatedEvent(storedEvent, event)
+      : this.eventService.saveEvent(event as EventRecord);
   }
 
   private handleEventReplacement(originalEvent: StoredEvent<MessageAddEvent>, newEvent: MessageAddEvent) {
@@ -541,6 +540,9 @@ export class EventRepository {
   }
 
   private async handleAssetUpdate(originalEvent: EventRecord, newEvent: AssetAddEvent) {
+    if (originalEvent.type !== ClientEvent.CONVERSATION.ASSET_ADD) {
+      this.throwValidationError(newEvent, 'Trying to update a non-asset message as an asset message');
+    }
     const newEventData = newEvent.data;
     // the preview status is not sent by the client so we fake a 'preview' status in order to cleanly handle it in the switch statement
     const ASSET_PREVIEW = 'preview';
@@ -603,7 +605,7 @@ export class EventRepository {
       return this.throwValidationError(newEvent, errorMessage);
     }
 
-    const textContentMatches = newEventData.content === originalData.content;
+    const textContentMatches = newEventData.content === (originalData as any).content;
     if (!textContentMatches) {
       const errorMessage = 'ID of link preview reused';
       const logMessage = 'Text content for message duplication not matching';
@@ -640,12 +642,12 @@ export class EventRepository {
   private getUpdatesForMessage(originalEvent: EventRecord, newEvent: MessageAddEvent) {
     const newData = newEvent.data;
     const originalData = originalEvent.data;
-    const updatingLinkPreview = !!originalData.previews.length;
+    const updatingLinkPreview = !!(originalData as any).previews.length;
     if (updatingLinkPreview) {
       this.throwValidationError(newEvent, 'ID of link preview reused');
     }
 
-    const textContentMatches = !newData.previews?.length || newData.content === originalData.content;
+    const textContentMatches = !newData.previews?.length || newData.content === (originalData as any).content;
     if (!textContentMatches) {
       const logMessage = 'Text content for message duplication not matching';
       const errorMessage = 'ID of duplicated message reused';
