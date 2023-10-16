@@ -2112,9 +2112,10 @@ export class ConversationRepository {
     }
 
     const {conversation, qualified_conversation, data: eventData, type} = eventJson;
+    const dataConversationId: string = (eventData as any).conversationId;
     // data.conversationId is always the conversationId that should be read first. If not found we can fallback to qualified_conversation or conversation
-    const conversationId: QualifiedId = eventData?.conversationId
-      ? {domain: '', id: eventData.conversationId}
+    const conversationId: QualifiedId = dataConversationId
+      ? {domain: '', id: dataConversationId}
       : qualified_conversation || {domain: '', id: conversation};
 
     const inSelfConversation = this.conversationState.isSelfConversation(conversationId);
@@ -2224,18 +2225,15 @@ export class ConversationRepository {
       const isFromUnknownUser = allParticipants.every(participant => participant.id !== senderId);
 
       if (isFromUnknownUser) {
-        const membersUpdateMessages = [
-          CONVERSATION_EVENT.MEMBER_LEAVE,
-          CONVERSATION_EVENT.MEMBER_JOIN,
-          ClientEvent.CONVERSATION.TEAM_MEMBER_LEAVE,
-        ];
-        const isMembersUpdateEvent = membersUpdateMessages.includes(eventJson.type);
-        if (isMembersUpdateEvent) {
-          const isFromUpdatedMember = eventJson.data.user_ids?.includes(senderId);
-          if (isFromUpdatedMember) {
-            // we ignore leave/join events that are sent by the user actually leaving or joining
-            return conversationEntity;
-          }
+        switch (eventJson.type) {
+          case CONVERSATION_EVENT.MEMBER_LEAVE:
+          case CONVERSATION_EVENT.MEMBER_JOIN:
+          case ClientEvent.CONVERSATION.TEAM_MEMBER_LEAVE:
+            const isFromUpdatedMember = eventJson.data.user_ids?.includes(senderId);
+            if (isFromUpdatedMember) {
+              // we ignore leave/join events that are sent by the user actually leaving or joining
+              return conversationEntity;
+            }
         }
 
         const message = `Received '${type}' event from user '${senderId}' unknown in '${conversationEntity.id}'`;

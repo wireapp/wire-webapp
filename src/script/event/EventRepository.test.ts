@@ -422,10 +422,10 @@ describe('EventRepository', () => {
       linkPreviewEvent.data.replacing_message_id = replacingId;
       linkPreviewEvent.data.previews = ['preview'];
 
-      return testFactory.event_repository!['handleEventSaving'](linkPreviewEvent).then((updatedEvent: EventRecord) => {
+      return testFactory.event_repository!['handleEventSaving'](linkPreviewEvent).then((updatedEvent: any) => {
         expect(testFactory.event_service!.replaceEvent).toHaveBeenCalled();
         expect(testFactory.event_service!.saveEvent).not.toHaveBeenCalled();
-        expect(updatedEvent.data.previews[0]).toEqual('preview');
+        expect(updatedEvent?.data.previews[0]).toEqual('preview');
       });
     });
 
@@ -469,10 +469,10 @@ describe('EventRepository', () => {
 
       editEvent.data.replacing_message_id = replacingId;
 
-      return testFactory.event_repository!['handleEventSaving'](editEvent).then((updatedEvent: EventRecord) => {
+      return testFactory.event_repository!['handleEventSaving'](editEvent).then((updatedEvent: any) => {
         expect(testFactory.event_service!.replaceEvent).toHaveBeenCalled();
         expect(testFactory.event_service!.saveEvent).not.toHaveBeenCalled();
-        expect(updatedEvent.data.previews.length).toEqual(0);
+        expect(updatedEvent?.data.previews.length).toEqual(0);
       });
     });
 
