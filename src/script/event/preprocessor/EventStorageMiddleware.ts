@@ -22,6 +22,7 @@ import {ConversationEvent} from '@wireapp/api-client/lib/event';
 import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 
 import {User} from 'src/script/entity/User';
+import {EventError} from 'src/script/error/EventError';
 
 import {AssetTransferState} from '../../assets/AssetTransferState';
 import {
@@ -36,7 +37,6 @@ import {ClientEvent} from '../Client';
 import {EventMiddleware, IncomingEvent} from '../EventProcessor';
 import {EventService} from '../EventService';
 import {eventShouldBeStored} from '../EventTypeHandling';
-import {EventError} from 'src/script/error/EventError';
 
 type HandledEvents = ClientConversationEvent<any> | ConversationEvent;
 
@@ -252,9 +252,6 @@ export class EventStorageMiddleware implements EventMiddleware {
   }
 
   private throwValidationError(event: HandledEvents, errorMessage: string): never {
-    const conversation = event.conversation;
-    const from = event.from;
-
     throw new EventError(EventError.TYPE.VALIDATION_FAILED, `Event validation failed: ${errorMessage}`);
   }
 }
