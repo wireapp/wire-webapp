@@ -79,7 +79,10 @@ export class QuotedMessageMiddleware implements EventMiddleware {
 
     this.logger.info(`Updating '${replies.length}' replies to updated message '${originalMessageId}'`);
     replies.forEach(reply => {
-      (reply.data.quote as any).message_id = (event as any).id;
+      const quote = reply.data.quote;
+      if (quote && typeof quote !== 'string' && 'message_id' in quote && 'id' in event) {
+        quote.message_id = event.id as string;
+      }
       // we want to update the messages quoting the original message later, thus the timeout
       setTimeout(() => this.eventService.replaceEvent(reply));
     });
