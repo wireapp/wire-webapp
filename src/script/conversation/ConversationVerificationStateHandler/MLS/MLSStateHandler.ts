@@ -116,21 +116,21 @@ export class MLSConversationVerificationStateHandler {
         conversation.groupId!,
         deviceUserPairs,
       );
-      identities.forEach(identity => {
-        if (identity.certificate) {
+      identities.forEach(async identity => {
+        const verified = await this.isCertificateActiveAndValid(identity.certificate);
+        if (verified) {
           const device = devices.find(device => device.id === identity.clientId);
           /**
            * ToDo: Change the current implementation of isMLSVerified to be stored in Zustand instead of ko.observable
            */
           device?.meta.isMLSVerified?.(true);
+          allIdentities.push(identity);
         }
       });
-      allIdentities.push(...identities);
       allClients.push(...devices);
     });
 
     return {
-      identities: allIdentities,
       isResultComplete: allClients.length === allIdentities.length,
       qualifiedIds: userEntities.map(userEntity => userEntity.qualifiedId),
     };
@@ -152,16 +152,10 @@ export class MLSConversationVerificationStateHandler {
       return;
     }
 
-    const {isResultComplete, identities, qualifiedIds} = await this.updateUserDevices(conversationEntity);
+    const {isResultComplete, qualifiedIds} = await this.updateUserDevices(conversationEntity);
 
     // If the number of userDevicePairs is not equal to the number of identities, our Conversation is not secure
     if (!isResultComplete) {
-      return this.degradeConversation(conversationEntity, qualifiedIds);
-    }
-
-    // We need to check if identities are valid and not expired
-    const certificates = identities.map(identity => identity.certificate);
-    if (certificates.some(certificate => !this.isCertificateActiveAndValid(certificate))) {
       return this.degradeConversation(conversationEntity, qualifiedIds);
     }
 

@@ -171,6 +171,8 @@ describe('MLSConversationVerificationStateHandler', () => {
       jest.spyOn(handler as any, 'isCertificateActiveAndValid').mockReturnValue(true);
       jest.spyOn(handler as any, 'verifyConversation').mockImplementation(() => null);
 
+      expect(clientEntity.meta.isMLSVerified?.()).toBe(false);
+
       await (handler as any).checkEpoch(mockData); // Calling the private method
 
       expect(clientEntity.meta.isMLSVerified?.()).toBe(true);
