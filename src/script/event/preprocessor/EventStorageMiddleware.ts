@@ -40,7 +40,7 @@ import {eventShouldBeStored} from '../EventTypeHandling';
 
 type HandledEvents = ClientConversationEvent<any> | ConversationEvent;
 
-function getCommonMessageUpdates(originalEvent: StoredEvent<MessageAddEvent>, newEvent: MessageAddEvent) {
+function getCommonMessageUpdates(originalEvent: StoredEvent<MessageAddEvent>, newEvent: ClientConversationEvent<any>) {
   return {
     ...newEvent,
     data: {...newEvent.data, expects_read_confirmation: originalEvent.data.expects_read_confirmation},
@@ -103,16 +103,19 @@ export class EventStorageMiddleware implements EventMiddleware {
         : this.eventService.saveEvent(newEvent as EventRecord);
     };
 
-    const canReplace =
+    if (
       eventToReplace?.type === ClientEvent.CONVERSATION.MESSAGE_ADD &&
-      event.type === ClientEvent.CONVERSATION.MESSAGE_ADD;
-    return canReplace && eventToReplace ? this.handleEventReplacement(eventToReplace, event) : handleEvent(event);
+      event.type === ClientEvent.CONVERSATION.MESSAGE_ADD
+    ) {
+      return this.handleEventReplacement(eventToReplace, event);
+    }
+    return handleEvent(event);
   }
 
-  private handleEventReplacement(originalEvent: StoredEvent<MessageAddEvent>, newEvent: MessageAddEvent) {
+  private handleEventReplacement(originalEvent: StoredEvent<MessageAddEvent>, newEvent: ClientConversationEvent<any>) {
     if (originalEvent.from !== newEvent.from) {
       const errorMessage = 'ID reused by other user';
-      this.throwValidationError(newEvent, errorMessage);
+      this.throwValidationError(errorMessage);
     }
     const newData = newEvent.data;
     const primaryKeyUpdate = {primary_key: originalEvent.primary_key};
@@ -130,7 +133,7 @@ export class EventStorageMiddleware implements EventMiddleware {
     return this.eventService.replaceEvent(identifiedUpdates);
   }
 
-  private handleDuplicatedEvent(originalEvent: HandledEvents, newEvent: IncomingEvent) {
+  private handleDuplicatedEvent(originalEvent: StoredEvent<unknown>, newEvent: HandledEvents) {
     switch (newEvent.type) {
       case ClientEvent.CONVERSATION.ASSET_ADD:
         return this.handleAssetUpdate(originalEvent, newEvent);
@@ -143,7 +146,7 @@ export class EventStorageMiddleware implements EventMiddleware {
     }
   }
 
-  private async handleAssetUpdate(originalEvent: HandledEvents, newEvent: AssetAddEvent) {
+  private async handleAssetUpdate(originalEvent: StoredEvent<unknown>, newEvent: AssetAddEvent) {
     const newEventData = newEvent.data;
     // the preview status is not sent by the client so we fake a 'preview' status in order to cleanly handle it in the switch statement
     const ASSET_PREVIEW = 'preview';
@@ -187,7 +190,7 @@ export class EventStorageMiddleware implements EventMiddleware {
     }
   }
 
-  private handleMessageUpdate(originalEvent: HandledEvents, newEvent: MessageAddEvent) {
+  private handleMessageUpdate(originalEvent: StoredEvent<any>, newEvent: MessageAddEvent) {
     const newEventData = newEvent.data;
     const originalData = originalEvent.data;
 
@@ -221,7 +224,7 @@ export class EventStorageMiddleware implements EventMiddleware {
     return this.eventService.replaceEvent(identifiedUpdates);
   }
 
-  private getUpdatesForMessage(originalEvent: EventRecord, newEvent: MessageAddEvent) {
+  private getUpdatesForMessage(originalEvent: StoredEvent<any>, newEvent: ClientConversationEvent<any>) {
     const newData = newEvent.data;
     const originalData = originalEvent.data;
     const updatingLinkPreview = !!originalData.previews.length;
