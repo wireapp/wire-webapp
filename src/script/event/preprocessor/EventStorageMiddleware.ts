@@ -36,7 +36,7 @@ import {eventShouldBeStored} from '../EventTypeHandling';
 
 type HandledEvents = ClientConversationEvent | ConversationEvent;
 
-function getCommonMessageUpdates(originalEvent: StoredEvent<MessageAddEvent>, newEvent: MessageAddEvent) {
+export function getCommonMessageUpdates(originalEvent: StoredEvent<MessageAddEvent>, newEvent: MessageAddEvent) {
   return {
     ...newEvent,
     data: {...newEvent.data, expects_read_confirmation: originalEvent.data.expects_read_confirmation},

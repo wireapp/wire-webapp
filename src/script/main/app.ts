@@ -70,6 +70,7 @@ import {EventRepository} from '../event/EventRepository';
 import {EventService} from '../event/EventService';
 import {EventServiceNoCompound} from '../event/EventServiceNoCompound';
 import {NotificationService} from '../event/NotificationService';
+import {EventStorageMiddleware} from '../event/preprocessor/EventStorageMiddleware';
 import {QuotedMessageMiddleware} from '../event/preprocessor/QuotedMessageMiddleware';
 import {ReceiptsMiddleware} from '../event/preprocessor/ReceiptsMiddleware';
 import {ServiceMiddleware} from '../event/preprocessor/ServiceMiddleware';
@@ -379,11 +380,17 @@ export class App {
       await initializeDataDog(this.config, selfUser.qualifiedId);
 
       // Setup all event middleware
+      const eventStorageMiddleware = new EventStorageMiddleware(this.service.event, selfUser);
       const serviceMiddleware = new ServiceMiddleware(conversationRepository, userRepository, selfUser);
       const quotedMessageMiddleware = new QuotedMessageMiddleware(this.service.event);
       const readReceiptMiddleware = new ReceiptsMiddleware(this.service.event, conversationRepository, selfUser);
 
-      eventRepository.setEventProcessMiddlewares([serviceMiddleware, quotedMessageMiddleware, readReceiptMiddleware]);
+      eventRepository.setEventProcessMiddlewares([
+        serviceMiddleware,
+        quotedMessageMiddleware,
+        readReceiptMiddleware,
+        eventStorageMiddleware,
+      ]);
       // Setup all the event processors
       const federationEventProcessor = new FederationEventProcessor(eventRepository, serverTimeHandler, selfUser);
       eventRepository.setEventProcessors([federationEventProcessor]);
