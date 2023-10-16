@@ -21,18 +21,24 @@ import {MediaConstraintsHandler} from 'src/script/media/MediaConstraintsHandler'
 import {MediaStreamHandler} from 'src/script/media/MediaStreamHandler';
 import {PermissionRepository} from 'src/script/permission/PermissionRepository';
 
+import {CurrentAvailableDeviceId} from './MediaDevicesHandler';
+
+import {UserState} from '../user/UserState';
+
 describe('MediaStreamHandler', () => {
-  let streamHandler;
+  let streamHandler: MediaStreamHandler;
 
   const availableDevices = {
-    audioInput: () => {},
-    audioOutput: () => {},
-    screenInput: () => {},
-    videoInput: () => {},
-  };
+    audioinput: () => {},
+    audiooutput: () => {},
+    screeninput: () => {},
+    videoinput: () => {},
+  } as CurrentAvailableDeviceId;
+
   const userState = {
     self: () => ({id: ''}),
-  };
+  } as UserState;
+
   const mediaConstraintsHandler = new MediaConstraintsHandler(availableDevices, userState);
 
   beforeEach(() => {

@@ -219,6 +219,7 @@ export class ClientRepository {
       domain: userId.domain,
       meta: {
         is_verified: false,
+        is_mls_verified: false,
         primary_key: constructClientId(userId, clientPayload.id),
       },
     };

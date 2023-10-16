@@ -17,6 +17,8 @@
  *
  */
 
+import {TaskScheduler} from '@wireapp/core/lib/util';
+
 import {EventEmitter} from 'stream';
 
 export class Account extends EventEmitter {
@@ -64,9 +66,12 @@ export class Account extends EventEmitter {
       removeUsersFromMLSConversation: jest.fn(),
       removeUserFromConversation: jest.fn(),
     },
-
     client: {
       deleteClient: jest.fn(),
     },
   };
 }
+
+export const util = {
+  TaskScheduler,
+};

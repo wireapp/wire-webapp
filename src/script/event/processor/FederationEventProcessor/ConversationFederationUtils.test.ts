@@ -29,7 +29,7 @@ import {
   FederationConnectionRemovedResult,
 } from './ConversationFederationUtils';
 
-import {Conversation} from '../entity/Conversation';
+import {Conversation} from '../../../entity/Conversation';
 
 describe('ConversationFederationUtils', () => {
   describe('getFederationDeleteEventUpdates', () => {
@@ -86,6 +86,41 @@ describe('ConversationFederationUtils', () => {
 
       expect(result.conversationsToDeleteUsers[0].conversation).toBe(conversations[4]);
       expect(result.conversationsToDeleteUsers[0].users).toContainEqual(userFromDeletedDomain);
+    });
+
+    it('finds connection requests to delete', () => {
+      const deletedDomain = 'deleted.wire.link';
+
+      const user1 = generateUser();
+      const userFromDeletedDomain = generateUser({domain: deletedDomain, id: 'test-id'});
+
+      const conversations: Conversation[] = [
+        generateConversation({
+          type: CONVERSATION_TYPE.CONNECT,
+          id: {
+            id: 'test-2',
+            domain: 'wire.link',
+          },
+          users: [user1],
+        }),
+        generateConversation({
+          type: CONVERSATION_TYPE.CONNECT,
+          id: {
+            id: 'test-3',
+            domain: deletedDomain,
+          },
+          users: [userFromDeletedDomain],
+        }),
+      ];
+
+      const result: FederationDeleteResult = getFederationDeleteEventUpdates(deletedDomain, conversations);
+
+      expect(result.conversationsToLeave).toHaveLength(0);
+      expect(result.conversationsToDisable).toHaveLength(0);
+      expect(result.conversationsToDeleteUsers).toHaveLength(0);
+      expect(result.connectionRequestsToDelete).toHaveLength(1);
+
+      expect(result.connectionRequestsToDelete[0]).toBe(conversations[1]);
     });
 
     it('correctly finds one to one conversations to disable', () => {

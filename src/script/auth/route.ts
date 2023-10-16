@@ -37,12 +37,29 @@ export const QUERY_KEY = {
   TWO_FACTOR: '2fa',
 };
 
+// These are the query keys that are in the redirect link from the OAuth server
+export const OAUTH_QUERY_KEYS = {
+  CLIENT_ID: 'client_id',
+  REDIRECT_URI: 'redirect_uri',
+  RESPONSE_TYPE: 'response_type',
+  SCOPE: 'scope',
+  STATE: 'state',
+  CODE_CHALLENGE: 'code_challenge',
+  CODE_CHALLENGE_METHOD: 'code_challenge_method',
+  RESPONSE_MODE: 'response_mode',
+  CODE: 'code',
+  AUTH_USER: 'authuser',
+  PROMPT: 'prompt',
+  HD: 'hd',
+};
+
 export const FORWARDED_QUERY_KEYS = [
   QUERY_KEY.ACCOUNT_ID,
   QUERY_KEY.ENVIRONMENT,
   QUERY_KEY.LOCALE,
   QUERY_KEY.PERSIST_TEMPORARY_CLIENTS,
   QUERY_KEY.TRACKING,
+  ...Object.values(OAUTH_QUERY_KEYS),
 ];
 
 export const LOGOUT_REASON = {
@@ -76,4 +93,5 @@ export const ROUTE = {
   VERIFY_EMAIL_CODE: '/verifyemailcode',
   VERIFY_EMAIL_LINK: '/verifyemaillink',
   VERIFY_PHONE_CODE: '/verifyphonecode',
+  E2EI_OAUTH_REDIRECT: '/e2ei-redirect',
 };

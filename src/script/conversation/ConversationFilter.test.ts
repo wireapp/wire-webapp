@@ -27,6 +27,7 @@ import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConv
 import {ConversationFilter} from './ConversationFilter';
 import {ConversationDatabaseData, ConversationMapper} from './ConversationMapper';
 import {ConversationStatus} from './ConversationStatus';
+import {ConversationVerificationState} from './ConversationVerificationState';
 
 import {Conversation} from '../entity/Conversation';
 
@@ -71,7 +72,8 @@ describe('ConversationFilter', () => {
         status: 0,
         team_id: undefined,
         type: 3,
-        verification_state: 0,
+        verification_state: ConversationVerificationState.UNVERIFIED,
+        mlsVerificationState: ConversationVerificationState.UNVERIFIED,
       };
       const [conversationEntity] = ConversationMapper.mapConversations([conversationData]);
       expect(conversationEntity.is1to1()).toBeFalsy();
@@ -124,7 +126,8 @@ describe('ConversationFilter', () => {
         status: 0,
         team_id: null,
         type: 2,
-        verification_state: 0,
+        verification_state: ConversationVerificationState.UNVERIFIED,
+        mlsVerificationState: ConversationVerificationState.UNVERIFIED,
       };
       const [conversationEntity] = ConversationMapper.mapConversations([conversationData]);
       expect(conversationEntity.is1to1()).toBeTruthy();

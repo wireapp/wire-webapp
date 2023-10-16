@@ -60,6 +60,7 @@ describe('ClientMapper', () => {
       expect(clientEntity.location?.lat).toBe(clientPayload.location.lat);
       expect(clientEntity.location?.lon).toBe(clientPayload.location.lon);
       expect(clientEntity.meta.isVerified?.()).toBe(false);
+      expect(clientEntity.meta.isMLSVerified?.()).toBe(false);
       expect(clientEntity.model).toBe(clientPayload.model);
       expect(clientEntity.time).toBe(clientPayload.time);
       expect(clientEntity.type).toBe(ClientType.TEMPORARY);
@@ -75,6 +76,7 @@ describe('ClientMapper', () => {
       expect(clientEntity.id).toBe(clientPayload.id);
       expect(clientEntity.class).toBe(clientPayload.class);
       expect(clientEntity.meta.isVerified?.()).toBe(false);
+      expect(clientEntity.meta.isMLSVerified?.()).toBe(false);
       expect(clientEntity.isPermanent()).toBe(false);
       expect(clientEntity.isTemporary()).toBe(false);
     });
@@ -85,6 +87,7 @@ describe('ClientMapper', () => {
         id: '66d0515a23a0ef25',
         meta: {
           is_verified: true,
+          is_mls_verified: true,
         },
       };
 
@@ -104,6 +107,7 @@ describe('ClientMapper', () => {
         domain: '',
         meta: {
           is_verified: true,
+          is_mls_verified: true,
         },
       };
 
@@ -143,6 +147,7 @@ describe('ClientMapper', () => {
       expect(clientEntity.location?.lat).toBe(clientPayload.location.lat);
       expect(clientEntity.location?.lon).toBe(clientPayload.location.lon);
       expect(clientEntity.meta.isVerified?.()).toBe(false);
+      expect(clientEntity.meta.isMLSVerified?.()).toBe(false);
       expect(clientEntity.model).toBe(clientPayload.model);
       expect(clientEntity.time).toBe(clientPayload.time);
       expect(clientEntity.type).toBe(ClientType.PERMANENT);
@@ -165,6 +170,7 @@ describe('ClientMapper', () => {
       expect(clientEntity.location?.lat).toBe(clientPayload.location.lat);
       expect(clientEntity.location?.lon).toBe(clientPayload.location.lon);
       expect(clientEntity.meta.isVerified?.()).toBe(false);
+      expect(clientEntity.meta.isMLSVerified?.()).toBe(false);
       expect(clientEntity.model).toBe(clientPayload.model);
       expect(clientEntity.time).toBe(clientPayload.time);
       expect(clientEntity.type).toBe(ClientType.PERMANENT);

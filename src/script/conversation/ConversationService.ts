@@ -90,7 +90,7 @@ export class ConversationService {
    * @returns Resolves with the conversation information
    */
   async getAllConversations() {
-    return this.apiClient.api.conversation.getConversationList();
+    return this.coreConversationService.getConversations();
   }
 
   /**

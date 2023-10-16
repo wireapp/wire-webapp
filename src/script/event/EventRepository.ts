@@ -23,7 +23,6 @@ import {
   ConversationOtrMessageAddEvent,
   ConversationMLSMessageAddEvent,
 } from '@wireapp/api-client/lib/event';
-import type {BackendEvent} from '@wireapp/api-client/lib/event';
 import {NotificationSource, HandledEventPayload} from '@wireapp/core/lib/notification';
 import {amplify} from 'amplify';
 import ko from 'knockout';
@@ -38,6 +37,7 @@ import {queue} from 'Util/PromiseQueue';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {ClientEvent} from './Client';
+import {EventMiddleware, EventProcessor, IncomingEvent} from './EventProcessor';
 import type {EventService} from './EventService';
 import {EventSource} from './EventSource';
 import {EVENT_TYPE} from './EventType';
@@ -61,8 +61,6 @@ import {EventName} from '../tracking/EventName';
 import {UserState} from '../user/UserState';
 import {Warnings} from '../view_model/WarningsContainer';
 
-type IncomingEvent = BackendEvent | ClientConversationEvent;
-
 export class EventRepository {
   logger: Logger;
   currentClient: ko.Observable<ClientEntity> | undefined;
@@ -71,7 +69,9 @@ export class EventRepository {
   notificationsHandled: number;
   notificationsTotal: number;
   lastEventDate: ko.Observable<string | undefined>;
-  eventProcessMiddlewares: Function[];
+  eventProcessMiddlewares: EventMiddleware[] = [];
+  /** event processors are classes that are able to react and process an incoming event */
+  eventProcessors: EventProcessor[] = [];
 
   static get CONFIG() {
     return {
@@ -120,18 +120,24 @@ export class EventRepository {
     this.notificationsTotal = 0;
 
     this.lastEventDate = ko.observable();
-
-    this.eventProcessMiddlewares = [];
   }
 
   /**
-   * Will set a middleware to run before the EventRepository actually processes the event.
-   * Middleware is just a function with the following signature (Event) => Promise<Event>.
-   *
-   * @param middlewares middlewares to run when a new event is about to be processed
+   * Will register a pipeline that transforms an event before it is being processed by the EventProcessors.
+   * Those middleware are run sequentially one after the other. Thus the order at which they are defined matters.
+   * When one middleware fails the entire even handling process will stop and no further middleware will be executed.
    */
-  setEventProcessMiddlewares(middlewares: Function[]) {
+  setEventProcessMiddlewares(middlewares: EventMiddleware[]) {
     this.eventProcessMiddlewares = middlewares;
+  }
+
+  /**
+   * EventProcessors are classes that are able to react and process an incoming event.
+   * They will all be executed in parallel. If one processor fails the other ones are not impacted
+   * @param processors
+   */
+  setEventProcessors(processors: EventProcessor[]) {
+    this.eventProcessors = processors;
   }
 
   //##############################################################################
@@ -332,14 +338,13 @@ export class EventRepository {
    * @param source Source of notification
    */
   private async distributeEvent(event: IncomingEvent, source: EventSource) {
+    await Promise.all(this.eventProcessors.map(processor => processor.processEvent(event, source)));
+
     const {type} = event;
     const [category] = type.split('.');
     switch (category) {
       case EVENT_TYPE.CALL:
         amplify.publish(WebAppEvents.CALL.EVENT_FROM_BACKEND, event, source);
-        break;
-      case EVENT_TYPE.FEDERATION:
-        amplify.publish(WebAppEvents.FEDERATION.EVENT_FROM_BACKEND, event, source);
         break;
       case EVENT_TYPE.CONVERSATION:
         amplify.publish(WebAppEvents.CONVERSATION.EVENT_FROM_BACKEND, event, source);
@@ -426,7 +431,7 @@ export class EventRepository {
    */
   private async processEvent(event: IncomingEvent | ClientConversationEvent, source: EventSource) {
     for (const eventProcessMiddleware of this.eventProcessMiddlewares) {
-      event = await eventProcessMiddleware(event);
+      event = await eventProcessMiddleware.processEvent(event);
     }
 
     const shouldSaveEvent = EventTypeHandling.STORE.includes(event.type as CONVERSATION_EVENT);

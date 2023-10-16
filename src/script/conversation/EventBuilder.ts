@@ -128,6 +128,14 @@ export type MessageAddEvent = Omit<
     replacing_message_id?: string;
     previews?: string[];
     expects_read_confirmation?: boolean;
+    quote?:
+      | string
+      | {
+          message_id: string;
+          user_id: string;
+          hash: Uint8Array;
+        }
+      | {error: {type: string}};
   }>,
   'id'
 > & {
