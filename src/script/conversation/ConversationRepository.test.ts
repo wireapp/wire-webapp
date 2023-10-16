@@ -675,7 +675,7 @@ describe('ConversationRepository', () => {
       expect(conversationEntity?.readOnlyState()).toEqual(null);
     });
 
-    it('re-evaluates 1:1 conversations with user after their supported protocols are updated', async () => {
+    it('re-evaluates 1:1 conversation with user after their supported protocols are updated', async () => {
       const conversationRepository = testFactory.conversation_repository!;
       const userRepository = testFactory.user_repository!;
       const mockedGroupId = 'groupId';
@@ -751,7 +751,7 @@ describe('ConversationRepository', () => {
       });
     });
 
-    it('does not re-evaluates 1:1 conversations with user after their supported protocols are updated if conversation did not exist before', async () => {
+    it('does not re-evaluates 1:1 conversation with user after their supported protocols are updated if conversation did not exist before', async () => {
       const conversationRepository = testFactory.conversation_repository!;
       const userRepository = testFactory.user_repository!;
 
