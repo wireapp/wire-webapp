@@ -1889,6 +1889,16 @@ export class ConversationRepository {
 
   private readonly onUserSupportedProtocolsUpdated = async ({user}: {user: User}) => {
     // After user's supported protocols are updated, we want to make sure that 1:1 conversation is initialised.
+    const localMLSConversation = this.conversationState.findMLS1to1Conversation(user.qualifiedId);
+    const localProteusConversation = this.conversationState.findProteus1to1Conversations(user.qualifiedId);
+
+    const does1to1ConversationExist = localMLSConversation || localProteusConversation;
+
+    // If conversation does not exist, we don't want to create it.
+    if (!does1to1ConversationExist) {
+      return;
+    }
+
     await this.get1To1Conversation(user);
   };
 

@@ -698,6 +698,16 @@ describe('ConversationRepository', () => {
         overwites: {group_id: mockedGroupId},
       }) as BackendMLSConversation;
 
+      const [mls1to1Conversation] = conversationRepository.mapConversations([mls1to1ConversationResponse]);
+
+      const connection = new ConnectionEntity();
+      connection.conversationId = mls1to1Conversation.qualifiedId;
+      connection.userId = otherUserId;
+      otherUser.connection(connection);
+      mls1to1Conversation.connection(connection);
+
+      conversationRepository['conversationState'].conversations.push(mls1to1Conversation);
+
       jest
         .spyOn(conversationRepository['conversationService'], 'getMLS1to1Conversation')
         .mockResolvedValueOnce(mls1to1ConversationResponse);
@@ -729,17 +739,36 @@ describe('ConversationRepository', () => {
         configurable: true,
       });
 
+      jest.spyOn(conversationRepository, 'get1To1Conversation');
+
       userRepository.emit('supportedProtocolsUpdated', {
         user: otherUser,
         supportedProtocols: [ConversationProtocol.PROTEUS, ConversationProtocol.MLS],
       });
 
       await waitFor(() => {
-        expect(container.resolve(Core).service!.conversation.establishMLS1to1Conversation).toHaveBeenCalledWith(
-          mockedGroupId,
-          {client: mockSelfClientId, user: selfUserId},
-          otherUserId,
-        );
+        expect(conversationRepository.get1To1Conversation).toHaveBeenCalledWith(otherUser);
+      });
+    });
+
+    it('does not re-evaluates 1:1 conversations with user after their supported protocols are updated if conversation did not exist before', async () => {
+      const conversationRepository = testFactory.conversation_repository!;
+      const userRepository = testFactory.user_repository!;
+
+      const otherUserId = {id: 'f718410c-3833-479d-bd80-a5df03f38414', domain: 'test-domain'};
+      const otherUser = new User(otherUserId.id, otherUserId.domain);
+
+      jest.spyOn(conversationRepository, 'get1To1Conversation');
+
+      conversationRepository['conversationState'].conversations([]);
+
+      userRepository.emit('supportedProtocolsUpdated', {
+        user: otherUser,
+        supportedProtocols: [ConversationProtocol.PROTEUS, ConversationProtocol.MLS],
+      });
+
+      await waitFor(() => {
+        expect(conversationRepository.get1To1Conversation).not.toHaveBeenCalled();
       });
     });
   });
