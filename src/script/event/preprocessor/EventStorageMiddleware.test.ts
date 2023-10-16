@@ -78,7 +78,10 @@ describe('EventStorageMiddleware', () => {
       eventService.loadEvent.mockResolvedValue(eventWithSameId);
 
       await expect(eventStorageMiddleware.processEvent(event)).rejects.toEqual(
-        new EventError(EventError.TYPE.VALIDATION_FAILED, 'Event validation failed: ID reused by other user'),
+        new EventError(
+          EventError.TYPE.VALIDATION_FAILED,
+          'Event validation failed: ID previously used by another user',
+        ),
       );
     });
 
@@ -144,7 +147,10 @@ describe('EventStorageMiddleware', () => {
       const newEvent = {...event, data: {...event.data, content: 'different content', previews: [1]}};
 
       await expect(eventStorageMiddleware.processEvent(newEvent)).rejects.toEqual(
-        new EventError(EventError.TYPE.VALIDATION_FAILED, 'Event validation failed: ID of link preview reused'),
+        new EventError(
+          EventError.TYPE.VALIDATION_FAILED,
+          'Event validation failed: ID of link preview reused: Text content for message duplication not matching',
+        ),
       );
     });
 

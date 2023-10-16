@@ -91,7 +91,7 @@ export class EventStorageMiddleware implements EventMiddleware {
     const isReplacementWithoutOriginal = !eventToReplace && mappedData.replacing_message_id;
     if (isReplacementWithoutOriginal && !hasLinkPreview) {
       // the only valid case of a replacement with no original message is when an edited message gets a link preview
-      this.throwValidationError(event, 'Edit event without original event');
+      this.throwValidationError('Edit event without original event');
     }
 
     const handleEvent = async (newEvent: HandledEvents) => {
@@ -111,9 +111,8 @@ export class EventStorageMiddleware implements EventMiddleware {
 
   private handleEventReplacement(originalEvent: StoredEvent<MessageAddEvent>, newEvent: MessageAddEvent) {
     if (originalEvent.from !== newEvent.from) {
-      const logMessage = `ID previously used by user '${newEvent.from}'`;
       const errorMessage = 'ID reused by other user';
-      this.throwValidationError(newEvent, errorMessage, logMessage);
+      this.throwValidationError(newEvent, errorMessage);
     }
     const newData = newEvent.data;
     const primaryKeyUpdate = {primary_key: originalEvent.primary_key};
@@ -140,7 +139,7 @@ export class EventStorageMiddleware implements EventMiddleware {
         return this.handleMessageUpdate(originalEvent, newEvent);
 
       default:
-        this.throwValidationError(newEvent, `Forbidden type '${newEvent.type}' for duplicate events`);
+        this.throwValidationError(`Forbidden type '${newEvent.type}' for duplicate events`);
     }
   }
 
@@ -183,7 +182,7 @@ export class EventStorageMiddleware implements EventMiddleware {
       }
 
       default: {
-        this.throwValidationError(newEvent, `Unhandled asset status update '${newEvent.data.status}'`);
+        this.throwValidationError(`Unhandled asset status update '${newEvent.data.status}'`);
       }
     }
   }
@@ -193,9 +192,8 @@ export class EventStorageMiddleware implements EventMiddleware {
     const originalData = originalEvent.data;
 
     if (originalEvent.from !== newEvent.from) {
-      const logMessage = `ID previously used by user '${newEvent.from}'`;
-      const errorMessage = 'ID reused by other user';
-      return this.throwValidationError(newEvent, errorMessage, logMessage);
+      const errorMessage = 'ID previously used by another user';
+      return this.throwValidationError(errorMessage);
     }
 
     const containsLinkPreview = newEventData.previews && !!newEventData.previews.length;
@@ -204,19 +202,18 @@ export class EventStorageMiddleware implements EventMiddleware {
     if (!containsLinkPreview && !isRetryAttempt) {
       const errorMessage =
         'Message duplication event invalid: original message did not fail to send and does not contain link preview';
-      return this.throwValidationError(newEvent, errorMessage);
+      return this.throwValidationError(errorMessage);
     }
 
     const textContentMatches = newEventData.content === originalData.content;
     if (!textContentMatches) {
-      const errorMessage = 'ID of link preview reused';
-      const logMessage = 'Text content for message duplication not matching';
-      return this.throwValidationError(newEvent, errorMessage, logMessage);
+      const errorMessage = 'ID of link preview reused: Text content for message duplication not matching';
+      return this.throwValidationError(errorMessage);
     }
 
     const bothAreMessageAddType = newEvent.type === originalEvent.type;
     if (!bothAreMessageAddType) {
-      return this.throwValidationError(newEvent, 'ID reused by same user');
+      return this.throwValidationError('ID reused by same user');
     }
 
     const updates = this.getUpdatesForMessage(originalEvent, newEvent);
@@ -229,14 +226,13 @@ export class EventStorageMiddleware implements EventMiddleware {
     const originalData = originalEvent.data;
     const updatingLinkPreview = !!originalData.previews.length;
     if (updatingLinkPreview) {
-      this.throwValidationError(newEvent, 'ID of link preview reused');
+      this.throwValidationError('ID of link preview reused');
     }
 
     const textContentMatches = !newData.previews?.length || newData.content === originalData.content;
     if (!textContentMatches) {
-      const logMessage = 'Text content for message duplication not matching';
-      const errorMessage = 'ID of duplicated message reused';
-      this.throwValidationError(newEvent, errorMessage, logMessage);
+      const errorMessage = 'ID of duplicated message reused: Text content for message duplication not matching';
+      this.throwValidationError(errorMessage);
     }
 
     return {
@@ -251,7 +247,7 @@ export class EventStorageMiddleware implements EventMiddleware {
     };
   }
 
-  private throwValidationError(event: HandledEvents, errorMessage: string): never {
+  private throwValidationError(errorMessage: string): never {
     throw new EventError(EventError.TYPE.VALIDATION_FAILED, `Event validation failed: ${errorMessage}`);
   }
 }
