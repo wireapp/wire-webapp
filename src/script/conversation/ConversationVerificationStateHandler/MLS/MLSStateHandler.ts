@@ -19,8 +19,10 @@
 
 import {X509Certificate} from '@peculiar/x509';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {WireIdentity} from '@wireapp/core/lib/messagingProtocols/mls';
 import {container} from 'tsyringe';
 
+import {ClientEntity} from 'src/script/client';
 import {Conversation} from 'src/script/entity/Conversation';
 import {VerificationMessageType} from 'src/script/message/VerificationMessageType';
 import {Core} from 'src/script/service/CoreSingleton';
@@ -95,31 +97,41 @@ export class MLSConversationVerificationStateHandler {
    * This function returns the WireIdentity of all userDeviceEntities in a conversation, as long as they have a certificate.
    * If the conversation has userDeviceEntities without a certificate, it will not be included in the returned array
    *
+   * It also updates the isMLSVerified observable of all the devices in the conversation
    */
-  private getAllUserEntitiesInConversation = async (conversation: Conversation) => {
-    if (!conversation.groupId) {
-      this.logger.error('Conversation has no groupId', conversation.name);
-      throw new Error('Conversation has no groupId');
-    }
-
+  private updateUserDevices = async (conversation: Conversation) => {
     const userEntities = conversation.getAllUserEntities();
-
-    const deviceUserPairs = userEntities
-      .flatMap(userEntity => {
-        return userEntity.devices().map(device => ({[device.id]: userEntity.qualifiedId}));
-      })
-      .reduce((acc, current) => {
-        return {...acc, ...current};
-      }, {});
-
-    const identities = await this.core.service!.e2eIdentity!.getUserDeviceEntities(
-      conversation.groupId,
-      deviceUserPairs,
-    );
+    const allClients: ClientEntity[] = [];
+    const allIdentities: WireIdentity[] = [];
+    userEntities.forEach(async userEntity => {
+      const devices = userEntity.devices();
+      const deviceUserPairs = devices
+        .map(device => ({
+          [device.id]: userEntity.qualifiedId,
+        }))
+        .reduce((acc, current) => {
+          return {...acc, ...current};
+        }, {});
+      const identities = await this.core.service!.e2eIdentity!.getUserDeviceEntities(
+        conversation.groupId!,
+        deviceUserPairs,
+      );
+      identities.forEach(identity => {
+        if (identity.certificate) {
+          const device = devices.find(device => device.id === identity.clientId);
+          /**
+           * ToDo: Change the current implementation of isMLSVerified to be stored in Zustand instead of ko.observable
+           */
+          device?.meta.isMLSVerified?.(true);
+        }
+      });
+      allIdentities.push(...identities);
+      allClients.push(...devices);
+    });
 
     return {
-      identities,
-      isResultComplete: Object.keys(deviceUserPairs).length === identities.length,
+      identities: allIdentities,
+      isResultComplete: allClients.length === allIdentities.length,
       qualifiedIds: userEntities.map(userEntity => userEntity.qualifiedId),
     };
   };
@@ -140,8 +152,7 @@ export class MLSConversationVerificationStateHandler {
       return;
     }
 
-    const {isResultComplete, identities, qualifiedIds} =
-      await this.getAllUserEntitiesInConversation(conversationEntity);
+    const {isResultComplete, identities, qualifiedIds} = await this.updateUserDevices(conversationEntity);
 
     // If the number of userDevicePairs is not equal to the number of identities, our Conversation is not secure
     if (!isResultComplete) {
