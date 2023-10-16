@@ -2112,7 +2112,7 @@ export class ConversationRepository {
     }
 
     const {conversation, qualified_conversation, data: eventData, type} = eventJson;
-    const dataConversationId: string = (eventData as any).conversationId;
+    const dataConversationId: string = (eventData as any)?.conversationId;
     // data.conversationId is always the conversationId that should be read first. If not found we can fallback to qualified_conversation or conversation
     const conversationId: QualifiedId = dataConversationId
       ? {domain: '', id: dataConversationId}
