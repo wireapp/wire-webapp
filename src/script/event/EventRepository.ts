@@ -37,7 +37,7 @@ import {queue} from 'Util/PromiseQueue';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {ClientEvent} from './Client';
-import {EventProcessor, IncomingEvent} from './EventProcessor';
+import {EventMiddleware, EventProcessor, IncomingEvent} from './EventProcessor';
 import type {EventService} from './EventService';
 import {EventSource} from './EventSource';
 import {EVENT_TYPE} from './EventType';
@@ -69,7 +69,7 @@ export class EventRepository {
   notificationsHandled: number;
   notificationsTotal: number;
   lastEventDate: ko.Observable<string | undefined>;
-  eventProcessMiddlewares: Function[] = [];
+  eventProcessMiddlewares: EventMiddleware[] = [];
   /** event processors are classes that are able to react and process an incoming event */
   eventProcessors: EventProcessor[] = [];
 
@@ -123,15 +123,19 @@ export class EventRepository {
   }
 
   /**
-   * Will set a middleware to run before the EventRepository actually processes the event.
-   * Middleware is just a function with the following signature (Event) => Promise<Event>.
-   *
-   * @param middlewares middlewares to run when a new event is about to be processed
+   * Will register a pipeline that transforms an event before it is being processed by the EventProcessors.
+   * Those middleware are run sequentially one after the other. Thus the order at which they are defined matters.
+   * When one middleware fails the entire even handling process will stop and no further middleware will be executed.
    */
-  setEventProcessMiddlewares(middlewares: Function[]) {
+  setEventProcessMiddlewares(middlewares: EventMiddleware[]) {
     this.eventProcessMiddlewares = middlewares;
   }
 
+  /**
+   * EventProcessors are classes that are able to react and process an incoming event.
+   * They will all be executed in parallel. If one processor fails the other ones are not impacted
+   * @param processors
+   */
   setEventProcessors(processors: EventProcessor[]) {
     this.eventProcessors = processors;
   }
@@ -427,7 +431,7 @@ export class EventRepository {
    */
   private async processEvent(event: IncomingEvent | ClientConversationEvent, source: EventSource) {
     for (const eventProcessMiddleware of this.eventProcessMiddlewares) {
-      event = await eventProcessMiddleware(event);
+      event = await eventProcessMiddleware.processEvent(event);
     }
 
     const shouldSaveEvent = EventTypeHandling.STORE.includes(event.type as CONVERSATION_EVENT);
