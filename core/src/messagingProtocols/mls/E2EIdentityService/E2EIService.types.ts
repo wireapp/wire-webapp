@@ -18,7 +18,15 @@
  */
 
 import {APIClient} from '@wireapp/api-client';
-import {E2eiEnrollment, Ciphersuite, CoreCrypto, RotateBundle} from '@wireapp/core-crypto';
+import {
+  E2eiEnrollment,
+  Ciphersuite,
+  CoreCrypto,
+  RotateBundle,
+  WireIdentity,
+  E2eiConversationState,
+  CredentialType,
+} from '@wireapp/core-crypto';
 
 import {E2EIServiceExternal} from './E2EIServiceExternal';
 
@@ -34,7 +42,7 @@ export type NewAcmeAuthz = Pick<ReturnType<E2eiEnrollment['newAuthzResponse']>, 
   wireDpopChallenge?: AcmeChallenge;
   wireOidcChallenge?: AcmeChallenge;
 };
-export {E2eiEnrollment, Ciphersuite, CoreCrypto, RotateBundle};
+export {E2eiEnrollment, Ciphersuite, CoreCrypto, RotateBundle, WireIdentity, E2eiConversationState, CredentialType};
 
 export type User = {
   id: string;

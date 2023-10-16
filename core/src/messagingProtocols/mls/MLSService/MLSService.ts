@@ -57,7 +57,8 @@ import {constructFullyQualifiedClientId, parseFullQualifiedClientId} from '../..
 import {numberToHex} from '../../../util/numberToHex';
 import {RecurringTaskScheduler} from '../../../util/RecurringTaskScheduler';
 import {TaskScheduler} from '../../../util/TaskScheduler';
-import {AcmeChallenge, E2EIServiceExternal, E2EIServiceInternal, User} from '../E2EIdentityService';
+import {AcmeChallenge, E2EIServiceExternal, User} from '../E2EIdentityService';
+import {E2EIServiceInternal} from '../E2EIdentityService/E2EIServiceInternal';
 import {handleMLSMessageAdd, handleMLSWelcomeMessage} from '../EventHandler/events';
 import {ClientId, CommitPendingProposalsParams, HandlePendingProposalsParams, MLSCallbacks} from '../types';
 
