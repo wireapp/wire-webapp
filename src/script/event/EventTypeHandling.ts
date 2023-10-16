@@ -17,9 +17,15 @@
  *
  */
 
-import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
+import {CONVERSATION_EVENT, ConversationEvent} from '@wireapp/api-client/lib/event';
 
 import {ClientEvent} from './Client';
+
+import {ConversationEvent as ClientConversationEvent} from '../conversation/EventBuilder';
+
+export function eventShouldBeStored(event: {type: any}): event is ClientConversationEvent<unknown> | ConversationEvent {
+  return EventTypeHandling.STORE.includes(event.type);
+}
 
 export const EventTypeHandling = {
   CONFIRM: [
