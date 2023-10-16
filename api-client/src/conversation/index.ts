@@ -24,7 +24,6 @@ export * from './ConversationError';
 export * from './FederatedBackendsError';
 export * from './ConversationIds';
 export * from './ConversationMembers';
-export * from './Conversations';
 export * from './ConversationRole';
 export * from './Invite';
 export * from './Member';
