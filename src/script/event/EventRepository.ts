@@ -123,7 +123,7 @@ export class EventRepository {
   }
 
   /**
-   * Will register a pipeline that transform an event before it is being processed by the EventProcessors.
+   * Will register a pipeline that transforms an event before it is being processed by the EventProcessors.
    * Those middleware are run sequentially one after the other. Thus the order at which they are defined matters.
    * When one middleware fails the entire even handling process will stop and no further middleware will be executed.
    */
@@ -133,7 +133,7 @@ export class EventRepository {
 
   /**
    * EventProcessors are classes that are able to react and process an incoming event.
-   * They will all be executed in parallel. If one processor fails the other one are not impacted
+   * They will all be executed in parallel. If one processor fails the other ones are not impacted
    * @param processors
    */
   setEventProcessors(processors: EventProcessor[]) {
