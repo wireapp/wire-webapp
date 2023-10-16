@@ -25,22 +25,18 @@ import {User} from 'src/script/entity/User';
 import {EventError} from 'src/script/error/EventError';
 
 import {AssetTransferState} from '../../assets/AssetTransferState';
-import {
-  AssetAddEvent,
-  MessageAddEvent,
-  ConversationEvent as ClientConversationEvent,
-} from '../../conversation/EventBuilder';
+import {AssetAddEvent, MessageAddEvent, ClientConversationEvent} from '../../conversation/EventBuilder';
 import {categoryFromEvent} from '../../message/MessageCategorization';
 import {isEventRecordFailed, isEventRecordWithFederationError} from '../../message/StatusType';
 import type {EventRecord, StoredEvent} from '../../storage';
-import {ClientEvent} from '../Client';
+import {CONVERSATION, ClientEvent} from '../Client';
 import {EventMiddleware, IncomingEvent} from '../EventProcessor';
 import {EventService} from '../EventService';
 import {eventShouldBeStored} from '../EventTypeHandling';
 
-type HandledEvents = ClientConversationEvent<any> | ConversationEvent;
+type HandledEvents = ClientConversationEvent | ConversationEvent;
 
-function getCommonMessageUpdates(originalEvent: StoredEvent<MessageAddEvent>, newEvent: ClientConversationEvent<any>) {
+function getCommonMessageUpdates(originalEvent: StoredEvent<MessageAddEvent>, newEvent: MessageAddEvent) {
   return {
     ...newEvent,
     data: {...newEvent.data, expects_read_confirmation: originalEvent.data.expects_read_confirmation},
@@ -80,39 +76,36 @@ export class EventStorageMiddleware implements EventMiddleware {
    */
   private async handleEventSaving(event: HandledEvents) {
     const conversationId = event.conversation;
-    const mappedData = event.data ?? {};
+    if (event.type === ClientEvent.CONVERSATION.MESSAGE_ADD) {
+      const conversationId = event.conversation;
+      const mappedData = event.data ?? {};
 
-    // first check if a message that should be replaced exists in DB
-    const eventToReplace = mappedData.replacing_message_id
-      ? await this.eventService.loadEvent(conversationId, mappedData.replacing_message_id)
-      : undefined;
+      // first check if a message that should be replaced exists in DB
+      const eventToReplace = mappedData.replacing_message_id
+        ? await this.eventService.loadEvent(conversationId, mappedData.replacing_message_id)
+        : undefined;
 
-    const hasLinkPreview = mappedData.previews && mappedData.previews.length;
-    const isReplacementWithoutOriginal = !eventToReplace && mappedData.replacing_message_id;
-    if (isReplacementWithoutOriginal && !hasLinkPreview) {
-      // the only valid case of a replacement with no original message is when an edited message gets a link preview
-      this.throwValidationError('Edit event without original event');
+      const hasLinkPreview = mappedData.previews && mappedData.previews.length;
+      const isReplacementWithoutOriginal = !eventToReplace && mappedData.replacing_message_id;
+      if (isReplacementWithoutOriginal && !hasLinkPreview) {
+        // the only valid case of a replacement with no original message is when an edited message gets a link preview
+        this.throwValidationError('Edit event without original event');
+      }
+      if (eventToReplace?.type === CONVERSATION.MESSAGE_ADD) {
+        return this.handleEventReplacement(eventToReplace, event);
+      }
     }
 
-    const handleEvent = async (newEvent: HandledEvents) => {
-      // check for duplicates (same id)
-      const storedEvent = 'id' in newEvent ? await this.eventService.loadEvent(conversationId, newEvent.id) : undefined;
+    // check for duplicates (same id)
+    const storedEvent =
+      'id' in event && event.id ? await this.eventService.loadEvent(conversationId, event.id) : undefined;
 
-      return storedEvent
-        ? this.handleDuplicatedEvent(storedEvent, newEvent)
-        : this.eventService.saveEvent(newEvent as EventRecord);
-    };
-
-    if (
-      eventToReplace?.type === ClientEvent.CONVERSATION.MESSAGE_ADD &&
-      event.type === ClientEvent.CONVERSATION.MESSAGE_ADD
-    ) {
-      return this.handleEventReplacement(eventToReplace, event);
-    }
-    return handleEvent(event);
+    return storedEvent
+      ? this.handleDuplicatedEvent(storedEvent, event)
+      : this.eventService.saveEvent(event as EventRecord);
   }
 
-  private handleEventReplacement(originalEvent: StoredEvent<MessageAddEvent>, newEvent: ClientConversationEvent<any>) {
+  private handleEventReplacement(originalEvent: StoredEvent<MessageAddEvent>, newEvent: MessageAddEvent) {
     if (originalEvent.from !== newEvent.from) {
       const errorMessage = 'ID reused by other user';
       this.throwValidationError(errorMessage);
@@ -133,7 +126,7 @@ export class EventStorageMiddleware implements EventMiddleware {
     return this.eventService.replaceEvent(identifiedUpdates);
   }
 
-  private handleDuplicatedEvent(originalEvent: StoredEvent<unknown>, newEvent: HandledEvents) {
+  private handleDuplicatedEvent(originalEvent: EventRecord, newEvent: HandledEvents) {
     switch (newEvent.type) {
       case ClientEvent.CONVERSATION.ASSET_ADD:
         return this.handleAssetUpdate(originalEvent, newEvent);
@@ -146,7 +139,10 @@ export class EventStorageMiddleware implements EventMiddleware {
     }
   }
 
-  private async handleAssetUpdate(originalEvent: StoredEvent<unknown>, newEvent: AssetAddEvent) {
+  private async handleAssetUpdate(originalEvent: EventRecord, newEvent: AssetAddEvent) {
+    if (originalEvent.type !== ClientEvent.CONVERSATION.ASSET_ADD) {
+      this.throwValidationError('Trying to update a non-asset message as an asset message');
+    }
     const newEventData = newEvent.data;
     // the preview status is not sent by the client so we fake a 'preview' status in order to cleanly handle it in the switch statement
     const ASSET_PREVIEW = 'preview';
@@ -181,7 +177,10 @@ export class EventStorageMiddleware implements EventMiddleware {
           await this.eventService.deleteEvent(newEvent.conversation, newEvent.id);
           return newEvent;
         }
-        return this.eventService.updateEventAsUploadFailed(originalEvent.primary_key, newEvent.data.reason);
+        return this.eventService.updateEventAsUploadFailed(
+          originalEvent.primary_key,
+          newEvent.data.reason ?? ProtobufAsset.NotUploaded.FAILED,
+        );
       }
 
       default: {
@@ -224,7 +223,7 @@ export class EventStorageMiddleware implements EventMiddleware {
     return this.eventService.replaceEvent(identifiedUpdates);
   }
 
-  private getUpdatesForMessage(originalEvent: StoredEvent<any>, newEvent: ClientConversationEvent<any>) {
+  private getUpdatesForMessage(originalEvent: StoredEvent<any>, newEvent: MessageAddEvent) {
     const newData = newEvent.data;
     const originalData = originalEvent.data;
     const updatingLinkPreview = !!originalData.previews.length;
