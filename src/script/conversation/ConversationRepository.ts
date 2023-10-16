@@ -338,6 +338,7 @@ export class ConversationRepository {
     window.addEventListener<any>(WebAppEvents.CONVERSATION.JOIN, this.onConversationJoin);
 
     this.selfRepository.on('selfSupportedProtocolsUpdated', this.onSelfUserSupportedProtocolsUpdated);
+    this.userRepository.on('supportedProtocolsUpdated', this.onUserSupportedProtocolsUpdated);
   }
 
   public initMLSConversationRecoveredListener() {
@@ -970,7 +971,7 @@ export class ConversationRepository {
    * Update conversation with a user you just unblocked
    */
   private readonly onUnblockUser = async (user_et: User): Promise<void> => {
-    const conversationEntity = await this.get1To1Conversation(user_et);
+    const conversationEntity = await this.getInitialised1To1Conversation(user_et);
     if (conversationEntity) {
       conversationEntity.status(ConversationStatus.CURRENT_MEMBER);
     }
@@ -1192,11 +1193,16 @@ export class ConversationRepository {
   }
 
   /**
-   * Get conversation with a user.
+   * Get an initialised 1:1 conversation with a user.
+   * If conversation does not exist, it will be created (assuming the user is in the current team or there's a connection with this user).
+   * It will compare the lists of supported protocols of the current user and the requested user and choose the common protocol for the conversation.
+   * If the common protocol is MLS, it will try to initialise the conversation with MLS and establish it.
+   * If the common protocol is Proteus, it will try to initialise the conversation with Proteus.
+   * If there's no common protocol, it will pick the protocol that is supported by the current user and mark conversation as read-only.
    * @param userEntity User entity for whom to get the conversation
-   * @returns Resolves with the conversation with requested user
+   * @returns Resolves with the initialised 1:1 conversation with requested user
    */
-  async get1To1Conversation(userEntity: User): Promise<Conversation | null> {
+  async getInitialised1To1Conversation(userEntity: User): Promise<Conversation | null> {
     const {qualifiedId: otherUserId} = userEntity;
 
     const {protocol, isMLSSupportedByTheOtherUser, isProteusSupportedByTheOtherUser} =
@@ -1208,7 +1214,7 @@ export class ConversationRepository {
       return this.initMLS1to1Conversation(otherUserId, isMLSSupportedByTheOtherUser);
     }
 
-    const proteusConversation = await this.getProteus1To1Conversation(userEntity);
+    const proteusConversation = await this.getOrCreateProteus1To1Conversation(userEntity);
 
     if (!proteusConversation) {
       return null;
@@ -1218,11 +1224,12 @@ export class ConversationRepository {
   }
 
   /**
-   * Get conversation with a user.
+   * Get or create a proteus 1:1 conversation with a user.
+   * If a conversation does not exist, but user is in the current team, or there's a connection with this user, proteus 1:1 conversation will be created and saved.
    * @param userEntity User entity for whom to get the conversation
-   * @returns Resolves with the conversation with requested user
+   * @returns Resolves with the conversation with requested user (if in the current team or there's a connection with this user), otherwise `null`
    */
-  private async getProteus1To1Conversation(userEntity: User): Promise<Conversation | null> {
+  private async getOrCreateProteus1To1Conversation(userEntity: User): Promise<Conversation | null> {
     const selfUser = this.userState.self();
     const inCurrentTeam = userEntity.inTeam() && !!selfUser && userEntity.teamId === selfUser.teamId;
 
@@ -1602,10 +1609,12 @@ export class ConversationRepository {
 
   /**
    * Will initialise mls 1:1 conversation.
+   * If both users support MLS protocol, mls 1:1 conversation will be established (otherwise it will be marked as readonly).
+   * If proteus conversation between the two users exists, it will be replaced with mls 1:1 conversation.
    *
-   * @param mlsConversation - mls 1:1 conversation
    * @param otherUserId - id of the other user
-   * @param proteusConversation - (optional) proteus 1:1 conversation
+   * @param isMLSSupportedByTheOtherUser - whether mls is supported by the other user
+   * @param shouldDelayGroupEstablishment - whether mls group establishment should be delayed
    */
   private readonly initMLS1to1Conversation = async (
     otherUserId: QualifiedId,
@@ -1670,6 +1679,14 @@ export class ConversationRepository {
     return establishedMLSConversation;
   };
 
+  /**
+   * Will initialise proteus 1:1 conversation.
+   * If both users support Proteus protocol, it will simply return the proteus conversation.
+   * If proteus is not supported by the other user, proteus conversation will be marked as readonly.
+   *
+   * @param proteusConversationId - id of the proteus conversation
+   * @param doesOtherUserSupportProteus - whether proteus is supported by the other user
+   */
   private readonly initProteus1to1Conversation = async (
     proteusConversationId: QualifiedId,
     doesOtherUserSupportProteus: boolean,
@@ -1770,7 +1787,7 @@ export class ConversationRepository {
     }
 
     if (protocol === ConversationProtocol.PROTEUS && isProteusConversation(conversation)) {
-      return this.initProteus1to1Conversation(conversation, isProteusSupportedByTheOtherUser);
+      return this.initProteus1to1Conversation(conversation.qualifiedId, isProteusSupportedByTheOtherUser);
     }
 
     return null;
@@ -1884,6 +1901,21 @@ export class ConversationRepository {
   private readonly onSelfUserSupportedProtocolsUpdated = async () => {
     const one2oneConversations = this.conversationState.conversations().filter(conversation => conversation.is1to1());
     await Promise.allSettled(one2oneConversations.map(conversation => this.init1to1Conversation(conversation)));
+  };
+
+  private readonly onUserSupportedProtocolsUpdated = async ({user}: {user: User}) => {
+    // After user's supported protocols are updated, we want to make sure that 1:1 conversation is initialised.
+    const localMLSConversation = this.conversationState.findMLS1to1Conversation(user.qualifiedId);
+    const localProteusConversation = this.conversationState.findProteus1to1Conversations(user.qualifiedId);
+
+    const does1to1ConversationExist = localMLSConversation || localProteusConversation;
+
+    // If conversation does not exist, we don't want to create it.
+    if (!does1to1ConversationExist) {
+      return;
+    }
+
+    await this.getInitialised1To1Conversation(user);
   };
 
   /**

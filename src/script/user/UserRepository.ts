@@ -24,6 +24,7 @@ import {
   UserLegalHoldDisableEvent,
   UserLegalHoldRequestEvent,
   USER_EVENT,
+  UserUpdateEvent,
 } from '@wireapp/api-client/lib/event';
 import type {BackendError, TraceState} from '@wireapp/api-client/lib/http';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
@@ -39,7 +40,7 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {container} from 'tsyringe';
 import {flatten, uniq} from 'underscore';
 
-import type {AccentColor} from '@wireapp/commons';
+import {TypedEventEmitter, type AccentColor} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
@@ -102,7 +103,9 @@ interface UserAvailabilityEvent {
   fromDomain: string | null;
   type: USER.AVAILABILITY;
 }
-export class UserRepository {
+
+type Events = {supportedProtocolsUpdated: {user: User; supportedProtocols: ConversationProtocol[]}};
+export class UserRepository extends TypedEventEmitter<Events> {
   private readonly logger: Logger;
   public readonly userMapper: UserMapper;
   public getTeamMembersFromUsers: (users: User[]) => Promise<void>;
@@ -127,6 +130,7 @@ export class UserRepository {
     private readonly propertyRepository: PropertiesRepository,
     private readonly userState = container.resolve(UserState),
   ) {
+    super();
     this.logger = getLogger('UserRepository');
 
     this.userMapper = new UserMapper(serverTimeHandler);
@@ -152,9 +156,7 @@ export class UserRepository {
         this.userDelete(eventJson);
         break;
       case USER_EVENT.UPDATE:
-        const user = eventJson.user;
-        const userId = generateQualifiedId(user);
-        await this.updateUser(userId, user, source === EventRepository.SOURCE.WEB_SOCKET);
+        await this.onUserUpdate(eventJson, source);
         break;
       case USER.AVAILABILITY:
         const {from, data, fromDomain} = eventJson;
@@ -293,6 +295,38 @@ export class UserRepository {
       window.setTimeout(() => {
         amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.ACCOUNT_DELETED, true);
       }, 100);
+    }
+  }
+
+  private async onUserUpdate(eventJson: UserUpdateEvent, source: EventSource): Promise<void> {
+    const user = eventJson.user;
+    const userId = generateQualifiedId(user);
+
+    // Check if user's supported protocols were updated, if they were, we need to re-evaluate a 1:1 conversation to use with that user
+    const newSupportedProtocols = user.supported_protocols;
+    if (newSupportedProtocols) {
+      await this.onUserSupportedProtocolsUpdate(userId, newSupportedProtocols);
+    }
+
+    await this.updateUser(userId, user, source === EventRepository.SOURCE.WEB_SOCKET);
+  }
+
+  private async onUserSupportedProtocolsUpdate(
+    userId: QualifiedId,
+    newSupportedProtocols: ConversationProtocol[],
+  ): Promise<void> {
+    const localSupportedProtocols = this.findUserById(userId)?.supportedProtocols();
+
+    const hasSupportedProtocolsChanged =
+      !localSupportedProtocols ||
+      !(
+        localSupportedProtocols.length === newSupportedProtocols.length &&
+        [...localSupportedProtocols].every(protocol => newSupportedProtocols.includes(protocol))
+      );
+
+    if (hasSupportedProtocolsChanged) {
+      const user = await this.getUserById(userId);
+      this.emit('supportedProtocolsUpdated', {user, supportedProtocols: newSupportedProtocols});
     }
   }
 
