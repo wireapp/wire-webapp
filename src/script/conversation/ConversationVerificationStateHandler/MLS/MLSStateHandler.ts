@@ -23,11 +23,11 @@ import {WireIdentity} from '@wireapp/core/lib/messagingProtocols/mls';
 import {container} from 'tsyringe';
 
 import {ClientEntity} from 'src/script/client';
-import {Conversation} from 'src/script/entity/Conversation';
 import {VerificationMessageType} from 'src/script/message/VerificationMessageType';
 import {Core} from 'src/script/service/CoreSingleton';
 import {Logger, getLogger} from 'Util/Logger';
 
+import {MLSConversation, isMLSConversation} from '../../ConversationSelectors';
 import {ConversationState} from '../../ConversationState';
 import {
   getConversationByGroupId,
@@ -59,7 +59,7 @@ export class MLSConversationVerificationStateHandler {
    * @param conversationEntity
    * @param userIds
    */
-  private degradeConversation = async (conversationEntity: Conversation, userIds: QualifiedId[]) => {
+  private degradeConversation = async (conversationEntity: MLSConversation, userIds: QualifiedId[]) => {
     this.logger.log(`Conversation ${conversationEntity.name} will be degraded`);
     const conversationVerificationState = attemptChangeToDegraded({
       conversationEntity,
@@ -80,7 +80,7 @@ export class MLSConversationVerificationStateHandler {
    * @param conversationEntity
    * @param userIds
    */
-  private verifyConversation = async (conversationEntity: Conversation) => {
+  private verifyConversation = async (conversationEntity: MLSConversation) => {
     this.logger.log(`Conversation ${conversationEntity.name} will be verified`);
 
     const conversationVerificationState = attemptChangeToVerified({conversationEntity, logger: this.logger});
@@ -99,7 +99,7 @@ export class MLSConversationVerificationStateHandler {
    *
    * It also updates the isMLSVerified observable of all the devices in the conversation
    */
-  private updateUserDevices = async (conversation: Conversation) => {
+  private updateUserDevices = async (conversation: MLSConversation) => {
     const userEntities = conversation.getAllUserEntities();
     const allClients: ClientEntity[] = [];
     const allIdentities: WireIdentity[] = [];
@@ -113,7 +113,7 @@ export class MLSConversationVerificationStateHandler {
           return {...acc, ...current};
         }, {});
       const identities = await this.core.service!.e2eIdentity!.getUserDeviceEntities(
-        conversation.groupId!,
+        conversation.groupId,
         deviceUserPairs,
       );
       identities.forEach(async identity => {
@@ -152,15 +152,17 @@ export class MLSConversationVerificationStateHandler {
       return;
     }
 
-    const {isResultComplete, qualifiedIds} = await this.updateUserDevices(conversationEntity);
+    if (isMLSConversation(conversationEntity)) {
+      const {isResultComplete, qualifiedIds} = await this.updateUserDevices(conversationEntity);
 
-    // If the number of userDevicePairs is not equal to the number of identities, our Conversation is not secure
-    if (!isResultComplete) {
-      return this.degradeConversation(conversationEntity, qualifiedIds);
+      // If the number of userDevicePairs is not equal to the number of identities, our Conversation is not secure
+      if (!isResultComplete) {
+        return this.degradeConversation(conversationEntity, qualifiedIds);
+      }
+
+      // If we reach this point, all checks have passed and we can set the conversation to verified
+      return this.verifyConversation(conversationEntity);
     }
-
-    // If we reach this point, all checks have passed and we can set the conversation to verified
-    return this.verifyConversation(conversationEntity);
   }
 }
 
