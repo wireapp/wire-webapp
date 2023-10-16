@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [42.14.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.13.0...@wireapp/core@42.14.0) (2023-10-16)
+
+### Features
+
+* export needed e2ei types ([#5627](https://github.com/wireapp/wire-web-packages/issues/5627)) ([f407026](https://github.com/wireapp/wire-web-packages/commit/f4070267dfe500fe77c3545f4e1fad270e028fe6))
+
 # [42.13.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.12.1...@wireapp/core@42.13.0) (2023-10-13)
 
 ### Features
