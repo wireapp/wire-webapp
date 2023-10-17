@@ -19,15 +19,16 @@
 
 import {ChangeEvent, FC, KeyboardEvent, useEffect, useRef, useState} from 'react';
 
-import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
-
 import {Icon} from 'Components/Icon';
 import {VerificationBadges} from 'src/script/components/VerificationBadges';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {removeLineBreaks} from 'Util/StringUtil';
 
 import {ConversationRepository} from '../../../../../conversation/ConversationRepository';
+import {ConversationVerificationState} from '../../../../../conversation/ConversationVerificationState';
+import {Conversation} from '../../../../../entity/Conversation';
 import {User} from '../../../../../entity/User';
 import {ServiceEntity} from '../../../../../integration/ServiceEntity';
 import {GroupDetails} from '../GroupDetails/GroupDetails';
@@ -35,28 +36,36 @@ import {GroupDetails} from '../GroupDetails/GroupDetails';
 interface ConversationDetailsHeaderProps {
   isActiveGroupParticipant: boolean;
   canRenameGroup: boolean;
-  displayName: string;
   updateConversationName: (conversationName: string) => void;
-  isGroup: boolean;
   userParticipants: User[];
   serviceParticipants: ServiceEntity[];
   allUsersCount: number;
   isTeam?: boolean;
-  conversationProtocol?: ConversationProtocol;
+  conversation: Conversation;
 }
 
 const ConversationDetailsHeader: FC<ConversationDetailsHeaderProps> = ({
   isActiveGroupParticipant,
   canRenameGroup,
-  displayName,
   updateConversationName,
-  isGroup,
   userParticipants,
   serviceParticipants,
   allUsersCount,
   isTeam = false,
-  conversationProtocol,
+  conversation,
 }) => {
+  const {
+    isGroup,
+    display_name: displayName,
+    verification_state: verificationState,
+    mlsVerificationState,
+  } = useKoSubscribableChildren(conversation, [
+    'isGroup',
+    'display_name',
+    'verification_state',
+    'mlsVerificationState',
+  ]);
+
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
   const isEditGroupNameTouched = useRef(false);
 
@@ -152,7 +161,12 @@ const ConversationDetailsHeader: FC<ConversationDetailsHeaderProps> = ({
             />
           )}
 
-          <VerificationBadges conversationProtocol={conversationProtocol} displayTitle />
+          <VerificationBadges
+            displayTitle
+            conversationProtocol={conversation.protocol}
+            isProteusVerified={verificationState === ConversationVerificationState.VERIFIED}
+            isMLSVerified={mlsVerificationState === ConversationVerificationState.VERIFIED}
+          />
         </>
       ) : (
         <div className="conversation-details__name">

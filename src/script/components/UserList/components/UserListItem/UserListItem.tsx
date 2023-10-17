@@ -80,7 +80,15 @@ const UserListItem = ({
     isDirectGuest,
     availability,
     expirationText,
-  } = useKoSubscribableChildren(user, ['isDirectGuest', 'is_verified', 'availability', 'expirationText', 'name']);
+    isMLSVerified,
+  } = useKoSubscribableChildren(user, [
+    'isDirectGuest',
+    'is_verified',
+    'availability',
+    'expirationText',
+    'name',
+    'isMLSVerified',
+  ]);
 
   const {isMe: isSelf, isFederated} = user;
   const isTemporaryGuest = user.isTemporaryGuest();
@@ -129,6 +137,7 @@ const UserListItem = ({
           showAvailabilityState
           isSelectable={isSelectable}
           isProteusVerified={isSelfVerified && isVerified}
+          isMLSVerified={isMLSVerified}
         />
 
         <UserStatusBadges

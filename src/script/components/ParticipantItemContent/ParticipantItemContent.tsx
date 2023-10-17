@@ -51,6 +51,7 @@ export interface ParticipantItemContentProps {
   isService?: boolean;
   isSelectable?: boolean;
   isProteusVerified?: boolean;
+  isMLSVerified?: boolean;
 }
 
 export const ParticipantItemContent = ({
@@ -65,6 +66,7 @@ export const ParticipantItemContent = ({
   isService = false,
   isSelectable = false,
   isProteusVerified = false,
+  isMLSVerified = false,
 }: ParticipantItemContentProps) => {
   return (
     <div css={wrapper}>
@@ -79,6 +81,7 @@ export const ParticipantItemContent = ({
               selfString={selfString}
               showBadges={!isService && !isSelectable}
               isProteusVerified={isProteusVerified}
+              isMLSVerified={isMLSVerified}
             />
           ) : (
             <>
@@ -88,7 +91,9 @@ export const ParticipantItemContent = ({
                 {selfString && <span css={selfIndicator}>{selfString}</span>}
               </div>
 
-              {!isService && !isSelectable && <VerificationBadges isProteusVerified={isProteusVerified} />}
+              {!isService && !isSelectable && (
+                <VerificationBadges isProteusVerified={isProteusVerified} isMLSVerified={isMLSVerified} />
+              )}
             </>
           )}
         </div>
