@@ -268,6 +268,7 @@ export class DebugUtil {
    * @param text the text to add to the input
    */
   inputText(text: string) {
+    // This is a hacky way of accessing the lexical editor directly from the DOM element
     const lexicalEditor = (document.querySelector<HTMLElement>('[data-uie-name=input-message]') as any)
       .__lexicalEditor as LexicalEditor;
 
