@@ -143,6 +143,7 @@ export class CallingRepository {
   private wCall?: Wcall;
   private wUser: number = 0;
   private nextMuteState: MuteState = MuteState.SELF_MUTED;
+  private supportsConferenceCalling = false;
   /**
    * Keeps track of the size of the avs log once the webapp is initiated. This allows detecting meaningless avs logs (logs that have a length equal to the length when the webapp was initiated)
    */
@@ -255,6 +256,7 @@ export class CallingRepository {
     wCall.setUserMediaHandler(this.getCallMediaStream);
     wCall.setAudioStreamHandler(this.updateCallAudioStreams);
     wCall.setVideoStreamHandler(this.updateParticipantVideoStream);
+    this.supportsConferenceCalling = wCall.isConferenceCallingSupported();
     setInterval(() => wCall.poll(), 500);
     return wCall;
   }
@@ -488,16 +490,6 @@ export class CallingRepository {
     } catch (_error) {
       return false;
     }
-  }
-
-  /**
-   * Checks if browser supports all WebRTC APIs which are required for conference calling. Users with Chrome 83 need to enable "Experimental Web Platform features" (--enable-experimental-web-platform-features) to use all required APIs.
-   *
-   * @returns `true` if browser supports WebRTC Insertable Streams
-   * @see https://www.chromestatus.com/feature/6321945865879552
-   */
-  get supportsConferenceCalling(): boolean {
-    return Runtime.isSupportingConferenceCalling();
   }
 
   /**
