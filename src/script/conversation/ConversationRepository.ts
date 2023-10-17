@@ -1469,6 +1469,10 @@ export class ConversationRepository {
     //TODO: maintain the list of retired proteus 1:1 conversations so they are not requested from backend anymore
   };
 
+  public async blacklistConversation(conversationId: QualifiedId) {
+    return this.conversationService.blacklistConversation(conversationId);
+  }
+
   /**
    * Will establish mls 1:1 conversation.
    * If proteus conversation is provided, it will be replaced with mls 1:1 conversation.
