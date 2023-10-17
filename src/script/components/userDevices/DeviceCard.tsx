@@ -81,8 +81,6 @@ const DeviceCard: React.FC<DeviceCardProps> = ({
         />
       )}
 
-      <span>this one</span>
-
       <div className="device-card__info" data-uie-name="device-card-info" data-uie-value={label}>
         <div className="device-card__name">
           <span className="device-card__model">{name}</span>
