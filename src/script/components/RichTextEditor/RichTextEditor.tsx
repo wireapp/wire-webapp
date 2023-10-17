@@ -173,7 +173,7 @@ export const RichTextEditor = ({
             openStateRef={mentionsOpen}
           />
 
-          <OnChangePlugin onChange={saveDraft} />
+          <OnChangePlugin onChange={saveDraft} ignoreSelectionChange />
           <TextChangePlugin onUpdate={parseUpdatedText} />
           <SendPlugin
             onSend={() => {
