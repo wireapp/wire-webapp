@@ -44,6 +44,17 @@ export type HandledEventPayload = {
   decryptionError?: DecryptionError;
 };
 
+/**
+ * The result of handling an event
+ * - unhandled: The event was not handled by the particular service
+ * - ignored: The event was handled, but it got marked as ignored for whatever reason, it will not be emitted
+ * - handled: The event was handled and its payload will be emitted
+ */
+export type HandledEventResult =
+  | {status: 'unhandled'}
+  | {status: 'ignored'}
+  | {status: 'handled'; payload: HandledEventPayload | null};
+
 enum TOPIC {
   NOTIFICATION_ERROR = 'NotificationService.TOPIC.NOTIFICATION_ERROR',
 }
@@ -203,9 +214,9 @@ export class NotificationService extends TypedEventEmitter<Events> {
         continue;
       }
       try {
-        const data = await this.handleEvent(event, dryRun);
-        if (typeof data !== 'undefined') {
-          yield data;
+        const handledEventResult = await this.handleEvent(event, dryRun);
+        if (handledEventResult.status === 'handled' && handledEventResult.payload) {
+          yield handledEventResult.payload;
         }
       } catch (error) {
         this.logger.error(
@@ -230,20 +241,20 @@ export class NotificationService extends TypedEventEmitter<Events> {
    * Will process one event
    * @param event The backend event to process
    * @param dryRun Will not try to decrypt if true
-   * @return the decrypted payload and the raw event. Returns `undefined` when the payload is a coreCrypto-only system message
+   * @return event handling status and if event was handled, the payload
    */
-  private async handleEvent(event: BackendEvent, dryRun: boolean = false): Promise<HandledEventPayload | undefined> {
+  private async handleEvent(event: BackendEvent, dryRun: boolean = false): Promise<HandledEventResult> {
     if (dryRun) {
       // In case of a dry run, we do not want to decrypt messages
       // We just return the raw event to the caller
-      return {event};
+      return {status: 'handled', payload: {event}};
     }
 
     const conversationEventResult = await this.conversationService.handleEvent(event);
-    if (conversationEventResult) {
+    if (conversationEventResult.status !== 'unhandled') {
       return conversationEventResult;
     }
 
-    return {event};
+    return {status: 'handled', payload: {event}};
   }
 }
