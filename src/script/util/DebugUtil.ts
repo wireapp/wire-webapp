@@ -33,6 +33,7 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {DatabaseKeys} from '@wireapp/core/lib/notification/NotificationDatabaseRepository';
 import Dexie from 'dexie';
 import keyboardjs from 'keyboardjs';
+import {$createTextNode, $getRoot, LexicalEditor} from 'lexical';
 import {container} from 'tsyringe';
 
 import {getLogger, Logger} from 'Util/Logger';
@@ -259,6 +260,23 @@ export class DebugUtil {
   /** Used by QA test automation. */
   triggerVersionCheck(baseVersion: string): Promise<string | void> {
     return checkVersion(baseVersion);
+  }
+
+  /**
+   * will allow to programatically add text in the message input.
+   * This is used by QA to fill the input
+   * @param text the text to add to the input
+   */
+  inputText(text: string) {
+    // This is a hacky way of accessing the lexical editor directly from the DOM element
+    const lexicalEditor = (document.querySelector<HTMLElement>('[data-uie-name=input-message]') as any)
+      .__lexicalEditor as LexicalEditor;
+
+    lexicalEditor.update(() => {
+      const root = $getRoot().getLastChild()!;
+      const textNode = $createTextNode(text);
+      root.append(textNode);
+    });
   }
 
   /**
