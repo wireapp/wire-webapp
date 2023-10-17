@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [42.15.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.14.1...@wireapp/core@42.15.0) (2023-10-17)
+
+### Features
+
+* add ability to blacklist conversations ([#5633](https://github.com/wireapp/wire-web-packages/issues/5633)) ([4e82b87](https://github.com/wireapp/wire-web-packages/commit/4e82b87d62ccbaa8de54ceefa7c60b7f7913e7b3))
+
 ## [42.14.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.14.0...@wireapp/core@42.14.1) (2023-10-16)
 
 **Note:** Version bump only for package @wireapp/core
