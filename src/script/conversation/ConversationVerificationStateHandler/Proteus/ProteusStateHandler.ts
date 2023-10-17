@@ -61,6 +61,7 @@ export class ProteusConversationVerificationStateHandler {
       userState: this.userState,
     }).forEach(({conversationEntity, userIds}) => {
       const isStateChange = this.checkChangeToVerified(conversationEntity);
+
       if (!isStateChange) {
         this.checkChangeToDegraded(conversationEntity, userIds, VerificationMessageType.UNVERIFIED);
       }
@@ -182,10 +183,8 @@ export class ProteusConversationVerificationStateHandler {
   ): boolean {
     // We want to process only Proteus and MLS conversations
     if (isProteusConversation(conversationEntity) || isMixedConversation(conversationEntity)) {
-      const shouldShowDegradationWarning = type !== VerificationMessageType.UNVERIFIED;
       const conversationVerificationState = attemptChangeToDegraded({
         conversationEntity,
-        shouldShowDegradationWarning,
         logger: this.logger,
       });
 
