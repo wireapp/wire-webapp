@@ -81,7 +81,7 @@ export function GlobalEventsPlugin({onShiftTab, onArrowUp, onEscape, onBlur}: Gl
         KEY_ESCAPE_COMMAND,
         () => {
           onEscape();
-          return true;
+          return false;
         },
         COMMAND_PRIORITY_LOW,
       ),
