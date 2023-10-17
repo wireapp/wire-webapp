@@ -41,7 +41,7 @@ function generateNames(users: User[], declension = Declension.ACCUSATIVE, hasExt
 }
 
 function getVisibleUsers(users: User[]) {
-  return users.slice(0, CONFIG.REDUCED_USERS_COUNT - 1);
+  return users.slice(0, CONFIG.REDUCED_USERS_COUNT);
 }
 
 function ShowMoreButton({children, onClick}: {children: React.ReactNode; onClick: () => void}) {
