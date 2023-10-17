@@ -31,14 +31,15 @@ import type {CallMessage} from './CallMessage';
 import type {CompositeMessage} from './CompositeMessage';
 import type {ContentMessage} from './ContentMessage';
 import type {DecryptErrorMessage} from './DecryptErrorMessage';
-import {DeleteMessage} from './DeleteMessage';
-import {FailedToAddUsersMessage} from './FailedToAddUsersMessage';
+import type {DeleteMessage} from './DeleteMessage';
+import type {FailedToAddUsersMessage} from './FailedToAddUsersMessage';
+import type {FederationStopMessage} from './FederationStopMessage';
 import type {FileAsset} from './FileAsset';
-import {FileTypeRestrictedMessage} from './FileTypeRestrictedMessage';
+import type {FileTypeRestrictedMessage} from './FileTypeRestrictedMessage';
 import type {LegalHoldMessage} from './LegalHoldMessage';
 import type {LinkPreview} from './LinkPreview';
 import type {MemberMessage} from './MemberMessage';
-import {MissedMessage} from './MissedMessage';
+import type {MissedMessage} from './MissedMessage';
 import type {PingMessage} from './PingMessage';
 import type {SystemMessage} from './SystemMessage';
 import type {VerificationMessage} from './VerificationMessage';
@@ -340,6 +341,10 @@ export class Message {
     return this.super_type === SuperType.VERIFICATION;
   }
 
+  isFederationStop(): this is FederationStopMessage {
+    return this.super_type === SuperType.FEDERATION_STOP;
+  }
+
   isLegalHold(): this is LegalHoldMessage {
     return this.super_type === SuperType.LEGALHOLD;
   }
@@ -357,7 +362,7 @@ export class Message {
    * Check if message can be edited.
    * @returns `true`, if message can be edited, `false` otherwise.
    */
-  isEditable(): boolean {
+  isEditable(): this is ContentMessage {
     return this.hasAssetText() && this.user().isMe && !this.isEphemeral();
   }
 

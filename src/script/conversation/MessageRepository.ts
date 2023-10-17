@@ -20,7 +20,13 @@
 import {ConversationProtocol, MessageSendingStatus, QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import {QualifiedId, RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/lib/user';
-import {MessageSendingState, MessageTargetMode, GenericMessageType, SendResult} from '@wireapp/core/lib/conversation';
+import {
+  MessageSendingState,
+  MessageTargetMode,
+  ReactionType,
+  GenericMessageType,
+  SendResult,
+} from '@wireapp/core/lib/conversation';
 import {
   AudioMetaData,
   EditedTextContent,
@@ -72,7 +78,7 @@ import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 import {Conversation} from '../entity/Conversation';
 import {CompositeMessage} from '../entity/message/CompositeMessage';
-import {ContentMessage, ReactionType} from '../entity/message/ContentMessage';
+import {ContentMessage} from '../entity/message/ContentMessage';
 import {FileAsset} from '../entity/message/FileAsset';
 import {Message} from '../entity/message/Message';
 import {User} from '../entity/User';
@@ -89,6 +95,7 @@ import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 import {Core} from '../service/CoreSingleton';
 import type {EventRecord} from '../storage';
+import {UserReactionMap} from '../storage/record/EventRecord';
 import {TeamState} from '../team/TeamState';
 import {ServerTimeHandler} from '../time/serverTimeHandler';
 import {UserType} from '../tracking/attribute';
@@ -784,6 +791,7 @@ export class MessageRepository {
           groupId,
           payload,
           protocol: ConversationProtocol.MLS,
+          conversationId: conversation.qualifiedId,
         }
       : {
           conversationId: conversation.qualifiedId,
@@ -814,19 +822,38 @@ export class MessageRepository {
     }
   }
 
-  /**
-   * Toggle like status of message.
-   *
-   * @param conversationEntity Conversation entity
-   * @param message_et Message to react to
-   */
-  public toggleLike(conversationEntity: Conversation, message_et: ContentMessage): void {
-    if (!conversationEntity.removed_from_conversation()) {
-      const reaction = message_et.is_liked() ? ReactionType.NONE : ReactionType.LIKE;
-      message_et.is_liked(!message_et.is_liked());
+  public updateUserReactions(reactions: UserReactionMap, userId: string, reaction: ReactionType) {
+    const userReactions = reactions[userId] || '';
+    const updatedReactions = {...reactions};
 
-      window.setTimeout(() => this.sendReaction(conversationEntity, message_et, reaction), 100);
+    if (userReactions) {
+      const reactionsArr = userReactions.split(',');
+      const reactionIndex = reactionsArr.indexOf(reaction);
+      if (reactionIndex === -1) {
+        reactionsArr.push(reaction);
+      } else {
+        reactionsArr.splice(reactionIndex, 1);
+      }
+      // if all reactions removed return empty string
+      updatedReactions[userId] = reactionsArr.join(',');
+    } else {
+      // first time reacted
+      updatedReactions[userId] = reaction;
     }
+    return updatedReactions[userId];
+  }
+
+  public toggleReaction(
+    conversationEntity: Conversation,
+    message_et: ContentMessage,
+    reaction: string,
+    userId: string,
+  ) {
+    if (conversationEntity.removed_from_conversation()) {
+      return null;
+    }
+    const updatedReactions = this.updateUserReactions(message_et.reactions(), userId, reaction);
+    return this.sendReactions(conversationEntity, message_et, updatedReactions);
   }
 
   async resetSession(userId: QualifiedId, clientId: string, conversation: Conversation): Promise<void> {
@@ -935,8 +962,9 @@ export class MessageRepository {
    * @param reactionType Reaction
    * @returns Resolves after sending the reaction
    */
-  private async sendReaction(conversation: Conversation, messageEntity: Message, reactionType: ReactionType) {
-    const reaction = MessageBuilder.buildReactionMessage({originalMessageId: messageEntity.id, type: reactionType});
+
+  private async sendReactions(conversation: Conversation, messageEntity: Message, reactions: ReactionType) {
+    const reaction = MessageBuilder.buildReactionMessage({originalMessageId: messageEntity.id, type: reactions});
 
     return this.sendAndInjectMessage(reaction, conversation);
   }
@@ -1093,7 +1121,7 @@ export class MessageRepository {
    */
   public async deleteMessageById(conversationEntity: Conversation, messageId: string): Promise<number> {
     const isLastDeleted =
-      conversationEntity.isShowingLastReceivedMessage() && conversationEntity.getNewestMessage()?.id === messageId;
+      conversationEntity.hasLastReceivedMessageLoaded() && conversationEntity.getNewestMessage()?.id === messageId;
 
     const deleteCount = await this.eventService.deleteEvent(conversationEntity.id, messageId);
     const previousMessage = conversationEntity.getNewestMessage();
@@ -1188,12 +1216,12 @@ export class MessageRepository {
   private async updateMessageAsFailed(conversationEntity: Conversation, eventId: string, error: unknown) {
     try {
       const messageEntity = await this.getMessageInConversationById(conversationEntity, eventId);
-      if (isBackendError(error) && error.label === BackendErrorLabel.FEDERATION_REMOTE_ERROR) {
-        messageEntity.status(StatusType.FEDERATION_ERROR);
-        return this.eventService.updateEvent(messageEntity.primary_key, {status: StatusType.FEDERATION_ERROR});
-      }
-      messageEntity.status(StatusType.FAILED);
-      return this.eventService.updateEvent(messageEntity.primary_key, {status: StatusType.FAILED});
+      const errorStatus =
+        isBackendError(error) && error.label === BackendErrorLabel.FEDERATION_REMOTE_ERROR
+          ? StatusType.FEDERATION_ERROR
+          : StatusType.FAILED;
+      messageEntity.status(errorStatus);
+      return this.eventService.updateEvent(messageEntity.primary_key, {status: errorStatus});
     } catch (error) {
       if ((error as any).type !== ConversationError.TYPE.MESSAGE_NOT_FOUND) {
         throw error;

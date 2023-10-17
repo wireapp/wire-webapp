@@ -21,25 +21,25 @@ import ko from 'knockout';
 
 export type AssetUrlData = AssetUrlDataVersion1 | AssetUrlDataVersion2 | AssetUrlDataVersion3 | AssetUrlDataVersion4;
 
-export interface AssetUrlDataVersion3 {
+interface AssetUrlDataVersion3 {
   assetKey: string;
   assetToken: string;
   forceCaching: boolean;
   version: 3;
 }
-export interface AssetUrlDataVersion4 extends Omit<AssetUrlDataVersion3, 'version'> {
+interface AssetUrlDataVersion4 extends Omit<AssetUrlDataVersion3, 'version'> {
   assetDomain: string;
   version: 4;
 }
 
-export interface AssetUrlDataVersion2 {
+interface AssetUrlDataVersion2 {
   assetId: string;
   conversationId: string;
   forceCaching: boolean;
   version: 2;
 }
 
-export interface AssetUrlDataVersion1 {
+interface AssetUrlDataVersion1 {
   assetId: string;
   conversationId: string;
   forceCaching: boolean;

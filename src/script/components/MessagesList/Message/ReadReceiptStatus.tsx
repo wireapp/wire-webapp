@@ -25,40 +25,28 @@ import {Icon} from 'Components/Icon';
 import {Message} from 'src/script/entity/message/Message';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
-import {formatDateNumeral, formatTimeShort} from 'Util/TimeUtil';
-
-import {useMessageFocusedTabIndex} from './util';
+import {formatTimeShort} from 'Util/TimeUtil';
 
 export interface ReadReceiptStatusProps {
   is1to1Conversation: boolean;
   isLastDeliveredMessage: boolean;
   message: Message;
-  onClickReceipts?: (message: Message) => void;
-  isMessageFocused: boolean;
+  showOnHover?: boolean;
 }
 
 const ReadReceiptStatus: React.FC<ReadReceiptStatusProps> = ({
   message,
-  onClickReceipts,
   is1to1Conversation,
   isLastDeliveredMessage,
-  isMessageFocused,
+  showOnHover = false,
 }) => {
-  const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
   const [readReceiptText, setReadReceiptText] = useState('');
-  const [readReceiptTooltip, setReadReceiptTooltip] = useState('');
   const {readReceipts} = useKoSubscribableChildren(message, ['readReceipts']);
 
   useEffect(() => {
     if (message.expectsReadConfirmation && readReceipts.length) {
       const text = is1to1Conversation ? formatTimeShort(readReceipts[0].time) : readReceipts.length.toString(10);
       setReadReceiptText(text);
-    }
-  }, [is1to1Conversation, readReceipts]);
-
-  useEffect(() => {
-    if (readReceipts.length && is1to1Conversation) {
-      setReadReceiptTooltip(formatDateNumeral(readReceipts[0].time));
     }
   }, [is1to1Conversation, readReceipts]);
 
@@ -73,18 +61,12 @@ const ReadReceiptStatus: React.FC<ReadReceiptStatusProps> = ({
         </span>
       )}
       {showEyeIndicator && (
-        <button
-          type="button"
-          tabIndex={messageFocusedTabIndex}
-          className={cx('button-reset-default', 'message-status-read', {
-            'message-status-read--clickable': !is1to1Conversation,
-            'message-status-read--visible': isLastDeliveredMessage,
-            'with-tooltip with-tooltip--receipt': readReceiptTooltip,
-          })}
-          data-tooltip={readReceiptTooltip}
-          {...(!is1to1Conversation && {
-            onClick: () => onClickReceipts?.(message),
-          })}
+        <div
+          className={cx(
+            'message-status-read',
+            is1to1Conversation && 'message-status-read__one-on-one',
+            showOnHover && 'message-status-read__show-on-hover',
+          )}
           data-uie-name="status-message-read-receipts"
           aria-label={t('accessibility.messageDetailsReadReceipts', readReceiptText)}
         >
@@ -92,7 +74,7 @@ const ReadReceiptStatus: React.FC<ReadReceiptStatusProps> = ({
           <span className="message-status-read__count" data-uie-name="status-message-read-receipt-count">
             {readReceiptText}
           </span>
-        </button>
+        </div>
       )}
     </>
   );

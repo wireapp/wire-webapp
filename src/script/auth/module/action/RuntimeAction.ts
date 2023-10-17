@@ -27,16 +27,25 @@ import * as RuntimeSelector from '../../module/selector/RuntimeSelector';
 import {QUERY_KEY} from '../../route';
 import type {ThunkAction} from '../reducer';
 
+const androidBrowser = 'android browser';
+const chromeMobile = 'chrome mobile';
+const outlookBrowser = 'unknown';
+
 export class RuntimeAction {
   checkSupportedBrowser = (): ThunkAction<void> => {
     return (dispatch, getState, {getConfig}) => {
       const isMobileSupportedBrowser = () => {
-        return Runtime.isMobileOS() && (Runtime.isSafari() || Runtime.isChrome());
+        return (
+          Runtime.isMobileOS() &&
+          (Runtime.isSafari() ||
+            Runtime.isChrome() ||
+            [androidBrowser, chromeMobile].includes(Runtime.getBrowserName()))
+        );
       };
       const isOutlookApp = () => {
-        return Runtime.getBrowserName() === 'unknown';
+        return Runtime.getBrowserName() === outlookBrowser;
       };
-      const isAuthorizationFlow = () => location?.search?.includes(QUERY_KEY.SCOPE) ?? false;
+      const isAuthorizationFlow = () => location?.hash?.includes(QUERY_KEY.SCOPE) ?? false;
       if (
         (!RuntimeSelector.hasToUseDesktopApplication(getState()) && Runtime.isWebappSupportedBrowser()) ||
         ((isMobileSupportedBrowser() || isOutlookApp()) && isAuthorizationFlow())

@@ -17,10 +17,10 @@
  *
  */
 
-import React, {useMemo, useState} from 'react';
+import React, {ReactNode, useMemo, useState} from 'react';
 
+import {AddUsersFailureReasons} from '@wireapp/core/lib/conversation';
 import {container} from 'tsyringe';
-import {groupBy} from 'underscore';
 
 import {Button, ButtonVariant, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
@@ -38,24 +38,58 @@ import {useMessageFocusedTabIndex} from './util';
 
 import {FailedToAddUsersMessage as FailedToAddUsersMessageEntity} from '../../../entity/message/FailedToAddUsersMessage';
 
-export enum ErrorMessageType {
-  offlineBackEnd = 'OfflineBackEnd',
-  nonFullyConnectedGraph = 'NonFullyConnectedGraph',
-}
-
 export interface FailedToAddUsersMessageProps {
   isMessageFocused: boolean;
   message: FailedToAddUsersMessageEntity;
-  errorMessageType?: ErrorMessageType;
   userState?: UserState;
 }
 
+const errorMessageType = {
+  [AddUsersFailureReasons.NON_FEDERATING_BACKENDS]: 'NonFederatingBackends',
+  [AddUsersFailureReasons.UNREACHABLE_BACKENDS]: 'OfflineBackend',
+} as const;
+
 const config = Config.getConfig();
+
+interface MessageDetailsProps {
+  children: ReactNode;
+  users: User[];
+  reason: AddUsersFailureReasons;
+  domains: string[];
+}
+const MessageDetails = ({users, children, reason, domains}: MessageDetailsProps) => {
+  const baseTranslationKey =
+    users.length === 1 ? 'failedToAddParticipantsSingularDetails' : 'failedToAddParticipantsPluralDetails';
+
+  const domainStr = domains.join(', ');
+
+  return (
+    <p
+      data-uie-name="multi-user-not-added-details"
+      data-uie-value={domainStr}
+      style={{lineHeight: 'var(--line-height-sm)'}}
+    >
+      <span
+        css={warning}
+        dangerouslySetInnerHTML={{
+          __html: t(`${baseTranslationKey}${errorMessageType[reason]}`, {
+            name: users[0].name(),
+            names: users
+              .slice(1)
+              .map(user => user.name())
+              .join(', '),
+            domain: domainStr,
+          }),
+        }}
+      />
+      {children}
+    </p>
+  );
+};
 
 const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
   isMessageFocused,
   message,
-  errorMessageType = ErrorMessageType.offlineBackEnd,
   userState = container.resolve(UserState),
 }) => {
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
@@ -65,14 +99,13 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
 
   const {users: allUsers} = useKoSubscribableChildren(userState, ['users']);
 
-  const [users, total, groupedUsers] = useMemo(() => {
+  const [users, total] = useMemo(() => {
     const users: User[] = message.qualifiedIds.reduce<User[]>((previous, current) => {
       const foundUser = allUsers.find(user => matchQualifiedIds(current, user.qualifiedId));
       return foundUser ? [...previous, foundUser] : previous;
     }, []);
-    const groupedUsers = groupBy(users, user => user.domain);
     const total = users.length;
-    return [users, total, groupedUsers];
+    return [users, total];
   }, [allUsers, message.qualifiedIds]);
 
   if (users.length === 0) {
@@ -113,7 +146,7 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
               <span
                 css={warning}
                 dangerouslySetInnerHTML={{
-                  __html: t(`failedToAddParticipantSingularOfflineBackEnd`, {
+                  __html: t(`failedToAddParticipantSingular${errorMessageType[message.reason]}`, {
                     name: users[0].name(),
                     domain: users[0].domain,
                   }),
@@ -139,45 +172,26 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
           />
         </p>
       </div>
-      <div className="message-body">
+      <div className="message-body" css={{flexDirection: 'column'}}>
         {isOpen && (
-          <>
-            {Object.entries(groupedUsers).map(([domain, domainUsers]) => (
-              <p
-                key={domain}
-                data-uie-name="multi-user-not-added-details"
-                data-uie-value={domain}
-                style={{lineHeight: 'var(--line-height-sm)'}}
-              >
-                <span
-                  css={warning}
-                  dangerouslySetInnerHTML={{
-                    __html: t(`failedToAddParticipantsPluralDetails${errorMessageType}`, {
-                      name: domainUsers[domainUsers.length - 1].name(),
-                      names:
-                        domainUsers.length === 2
-                          ? domainUsers[0].name()
-                          : domainUsers.map(user => user.name()).join(', '),
-                      domain,
-                    }),
-                  }}
-                />
-                {learnMore}
-              </p>
-            ))}
-          </>
+          <MessageDetails users={users} reason={message.reason} domains={message.backends}>
+            {learnMore}
+          </MessageDetails>
         )}
+
         {total > 1 && (
-          <Button
-            tabIndex={messageFocusedTabIndex}
-            data-uie-name="toggle-failed-to-add-users"
-            type="button"
-            variant={ButtonVariant.TERTIARY}
-            onClick={() => setIsOpen(state => !state)}
-            style={{marginTop: 4}}
-          >
-            {isOpen ? t('messageFailedToSendHideDetails') : t('messageFailedToSendShowDetails')}
-          </Button>
+          <div>
+            <Button
+              tabIndex={messageFocusedTabIndex}
+              data-uie-name="toggle-failed-to-add-users"
+              type="button"
+              variant={ButtonVariant.TERTIARY}
+              onClick={() => setIsOpen(state => !state)}
+              style={{marginTop: 4}}
+            >
+              {isOpen ? t('messageFailedToSendHideDetails') : t('messageFailedToSendShowDetails')}
+            </Button>
+          </div>
         )}
       </div>
     </>

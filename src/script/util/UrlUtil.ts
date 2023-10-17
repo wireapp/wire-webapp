@@ -108,3 +108,10 @@ export const getLinksFromHtml = <T extends HTMLElement>(html: string): T[] => {
  * @returns prepended URL
  */
 export const prependProtocol = (url: string) => (!url.match(/^http[s]?:\/\//i) ? `http://${url}` : url);
+
+/**
+ * Removes all URL parameters from the current URL
+ */
+export const removeUrlParameters = () => {
+  history.replaceState({}, '', `${location.origin}/${location.hash}`);
+};

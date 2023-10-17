@@ -64,7 +64,8 @@ export const getWebsiteUrl = (path: string = '', pkCampaign?: string): string | 
   }
   return undefined;
 };
-export const getHelpCenterUrl = (path: (typeof URL_PATH)[keyof typeof URL_PATH]) => {
+
+const getHelpCenterUrl = (path: (typeof URL_PATH)[keyof typeof URL_PATH]) => {
   if (URL.SUPPORT) {
     const helpcenterUrl = `${URL.SUPPORT}${path}`;
     return addLocaleToHelpCenterUrl(URL.SUPPORT ? helpcenterUrl : undefined);
@@ -88,10 +89,8 @@ export const getManageTeamUrl = (utmSource?: string): string => getTeamSettingsU
 export const getCreateTeamUrl = (): string =>
   Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && `${Config.getConfig().URL.TEAMS_BASE}/register/email`;
 export const getDecryptErrorUrl = (): string => getHelpCenterUrl(URL_PATH.DECRYPT_ERROR_1);
-export const getPrivacyHowUrl = (): string => getWebsiteUrl(URL_PATH.PRIVACY_HOW);
 export const getPrivacyUnverifiedUsersUrl = (): string => getHelpCenterUrl(URL_PATH.PRIVACY_UNVERIFIED_USERS);
 export const getPrivacyWhyUrl = (): string => getHelpCenterUrl(URL_PATH.PRIVACY_WHY);
-export const getSupportUsernameUrl = (): string => getWebsiteUrl(URL_PATH.SUPPORT_USERNAME);
 
 export const addLocaleToUrl = (url?: string): string => {
   if (!url) {

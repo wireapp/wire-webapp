@@ -21,9 +21,9 @@ import React, {useContext, useEffect, useMemo, useState} from 'react';
 
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/ConversationReceiptModeUpdateData';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
+import {isNonFederatingBackendsError} from '@wireapp/core/lib/errors';
 import {amplify} from 'amplify';
 import cx from 'classnames';
-import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {container} from 'tsyringe';
 
 import {Button, ButtonVariant, Select} from '@wireapp/react-ui-kit';
@@ -43,7 +43,6 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleEnterDown, isKeyboardEvent, offEscKey, onEscKey} from 'Util/KeyboardUtil';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
-import {isAxiosError} from 'Util/TypePredicateUtil';
 
 import {Config} from '../../../Config';
 import {ACCESS_STATE} from '../../../conversation/AccessState';
@@ -64,17 +63,11 @@ interface GroupCreationModalProps {
   userState?: UserState;
   teamState?: TeamState;
 }
-
-interface NonFederatingBackendsData {
-  non_federating_backends: string[];
-}
-
 enum GroupCreationModalState {
   DEFAULT = 'GroupCreationModal.STATE.DEFAULT',
   PARTICIPANTS = 'GroupCreationModal.STATE.PARTICIPANTS',
   PREFERENCES = 'GroupCreationModal.STATE.PREFERENCES',
 }
-const NON_FEDERATING_BACKENDS = HTTP_STATUS.CONFLICT;
 
 const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   userState = container.resolve(UserState),
@@ -85,6 +78,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
     isMLSEnabled: isMLSEnabledForTeam,
     isProtocolToggleEnabledForUser,
   } = useKoSubscribableChildren(teamState, ['isTeam', 'isMLSEnabled', 'isProtocolToggleEnabledForUser']);
+  const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
 
   const isMLSFeatureEnabled = Config.getConfig().FEATURE.ENABLE_MLS;
 
@@ -93,7 +87,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   //if feature flag is set to false or mls is disabled for current team use proteus as default
   const defaultProtocol =
     isMLSFeatureEnabled && isMLSEnabledForTeam
-      ? teamState.teamFeatures().mls?.config.defaultProtocol
+      ? teamState.teamFeatures()?.mls?.config.defaultProtocol
       : ConversationProtocol.PROTEUS;
 
   const protocolOptions: ProtocolOption[] = ([ConversationProtocol.PROTEUS, ConversationProtocol.MLS] as const).map(
@@ -235,12 +229,13 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
           createNavigate(generateConversationUrl(conversation.qualifiedId))(event);
         }
       } catch (error) {
-        if (isAxiosError<NonFederatingBackendsData>(error) && error.response?.status === NON_FEDERATING_BACKENDS) {
+        if (isNonFederatingBackendsError(error)) {
           const tempName = groupName;
           setIsShown(false);
-          const backendString = error.response?.data!.non_federating_backends?.join(', and ');
+
+          const backendString = error.backends.join(', and ');
           const replaceBackends = replaceLink(
-            'https://support.wire.com/hc/articles/9357718008093',
+            Config.getConfig().URL.SUPPORT.NON_FEDERATING_INFO,
             'modal__text__read-more',
             'read-more-backends',
           );
@@ -408,10 +403,11 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
           />
         )}
 
-        {stateIsParticipants && (
+        {stateIsParticipants && selfUser && (
           <FadingScrollbar className="group-creation__list">
             {filteredContacts.length > 0 && (
               <UserSearchableList
+                selfUser={selfUser}
                 users={filteredContacts}
                 filter={participantsInput}
                 selected={selectedContacts}

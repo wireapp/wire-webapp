@@ -28,7 +28,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -93,9 +93,17 @@ jobs:
           key: '${{github.ref}}'
           map: |
             {
-              "edge": { "dev_env": "wire-webapp-edge-al2" },
               "dev": { "dev_env": "wire-webapp-dev-al2" },
               "master": { "dev_env": "wire-webapp-master-al2" }
+            }
+
+      - uses: kanga333/variable-mapper@master
+        with:
+          # We try to map a branch to a dev environment
+          key: '${{github.ref}}'
+          map: |
+            {
+              "dev": { "preprod_env": "wire-webapp-edge-al2" }
             }
 
       - uses: kanga333/variable-mapper@master
@@ -147,6 +155,22 @@ jobs:
           wait_for_deployment: false
           wait_for_environment_recovery: ${{env.DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS}}
 
+      - name: Deploy to pre-prod env
+        if: env.preprod_env
+        uses: einaregilsson/beanstalk-deploy@v21
+        with:
+          application_name: ${{env.AWS_APPLICATION_NAME}}
+          aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
+          aws_secret_key: ${{secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY}}
+          deployment_package: ${{env.AWS_BUILD_ZIP_PATH}}
+          environment_name: ${{env.preprod_env}}
+          region: eu-central-1
+          use_existing_version_if_available: true
+          version_description: ${{github.sha}}
+          version_label: ${{github.run_id}}
+          wait_for_deployment: false
+          wait_for_environment_recovery: ${{env.DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS}}
+
       - name: Deploy to prod env
         if: env.prod_env
         uses: einaregilsson/beanstalk-deploy@v21
@@ -172,21 +196,21 @@ jobs:
         env:
           DOCKER_PASSWORD: ${{secrets.WEBTEAM_QUAY_PASSWORD}}
           DOCKER_USERNAME: ${{secrets.WEBTEAM_QUAY_USERNAME}}
-        run: yarn docker '' "${{env.BRANCH_NAME}}"
+        run: yarn docker "${{env.BRANCH_NAME}}"
 
       - name: Push staging Docker image
         if: contains(env.TAG, 'staging')
         env:
           DOCKER_PASSWORD: ${{secrets.WEBTEAM_QUAY_PASSWORD}}
           DOCKER_USERNAME: ${{secrets.WEBTEAM_QUAY_USERNAME}}
-        run: yarn docker '' staging "$TAG"
+        run: yarn docker staging "$TAG"
 
       - name: Push production Docker image
         if: contains(env.TAG, 'production')
         env:
           DOCKER_PASSWORD: ${{secrets.WEBTEAM_QUAY_PASSWORD}}
           DOCKER_USERNAME: ${{secrets.WEBTEAM_QUAY_USERNAME}}
-        run: yarn docker '' production "$TAG"
+        run: yarn docker production "$TAG"
 
       - name: Generate changelog for production release
         if: contains(env.TAG, 'production')
@@ -287,7 +311,7 @@ jobs:
           echo "::set-output name=releaseInfo::$(cat ${ARTIFACT_LOCAL_PATH})"
 
       - name: Checking out 'wire-server'
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         if: ${{ steps.release-info-file.outputs.exists == 'true' }}
         with:
           repository: 'wireapp/wire-server'

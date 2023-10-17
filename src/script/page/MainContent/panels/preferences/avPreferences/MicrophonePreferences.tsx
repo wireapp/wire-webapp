@@ -20,6 +20,7 @@
 import React, {useEffect, useState} from 'react';
 
 import {Icon} from 'Components/Icon';
+import {MediaDeviceType} from 'src/script/media/MediaDeviceType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
@@ -28,7 +29,7 @@ import {DeviceSelect} from './DeviceSelect';
 import {InputLevel} from './InputLevel';
 
 import {Config} from '../../../../../Config';
-import {DeviceTypes, MediaDevicesHandler} from '../../../../../media/MediaDevicesHandler';
+import {MediaDevicesHandler} from '../../../../../media/MediaDevicesHandler';
 import {MediaStreamHandler} from '../../../../../media/MediaStreamHandler';
 import {MediaType} from '../../../../../media/MediaType';
 import {PreferencesSection} from '../components/PreferencesSection';
@@ -48,12 +49,13 @@ const MicrophonePreferences: React.FC<MicrophonePreferencesProps> = ({
 }) => {
   const [isRequesting, setIsRequesting] = useState(false);
   const [stream, setStream] = useState<MediaStream>();
-  const {[DeviceTypes.AUDIO_INPUT]: availableDevices} = useKoSubscribableChildren(devicesHandler?.availableDevices, [
-    DeviceTypes.AUDIO_INPUT,
-  ]);
+  const {[MediaDeviceType.AUDIO_INPUT]: availableDevices} = useKoSubscribableChildren(
+    devicesHandler?.availableDevices,
+    [MediaDeviceType.AUDIO_INPUT],
+  );
 
-  const {[DeviceTypes.AUDIO_INPUT]: currentDeviceId} = useKoSubscribableChildren(devicesHandler?.currentDeviceId, [
-    DeviceTypes.AUDIO_INPUT,
+  const {[MediaDeviceType.AUDIO_INPUT]: currentDeviceId} = useKoSubscribableChildren(devicesHandler?.currentDeviceId, [
+    MediaDeviceType.AUDIO_INPUT,
   ]);
 
   const {URL: urls} = Config.getConfig();
@@ -100,7 +102,7 @@ const MicrophonePreferences: React.FC<MicrophonePreferencesProps> = ({
         defaultDeviceName={t('preferencesAVMicrophone')}
         icon={Icon.MicOn}
         isRequesting={isRequesting}
-        onChange={deviceId => devicesHandler.currentDeviceId[DeviceTypes.AUDIO_INPUT](deviceId)}
+        onChange={deviceId => devicesHandler.currentDeviceId[MediaDeviceType.AUDIO_INPUT](deviceId)}
         title={t('preferencesAVMicrophone')}
       />
       {isRequesting ? (

@@ -389,26 +389,25 @@ export const unsupportedJoinStrings = defineMessages({
 });
 
 export const conversationJoinStrings = defineMessages({
-  existentAccountHeadline: {
-    defaultMessage: '{name}, you have been invited to join a conversation in {brandName}',
-    id: 'conversationJoin.existentAccountHeadline',
-  },
   existentAccountJoinWithoutLink: {
     defaultMessage: 'Join the conversation',
     id: 'conversationJoin.existentAccountJoinWithoutLink',
   },
-  existentAccountJoinWithoutText: {
-    defaultMessage: '{existentAccountJoinWithoutLink} without an account',
-    id: 'conversationJoin.existentAccountJoinWithoutText',
+  join: {
+    defaultMessage: 'Join',
+    id: 'conversationJoin.join',
   },
-  existentAccountOpenButton: {
-    defaultMessage: 'Open in {brandName}',
-    id: 'conversationJoin.buttonExistentAccountOpen',
+  joinWithOtherAccount: {
+    defaultMessage: 'Join with another account',
+    id: 'conversationJoin.joinWithOtherAccount',
   },
-  existentAccountSubhead: {
-    defaultMessage:
-      'Audio and video conferencing, text messaging, file sharing, and screen sharing, all end-to-end-encrypted.',
-    id: 'conversationJoin.existentAccountSubhead',
+  existentAccountJoinInBrowser: {
+    defaultMessage: 'Join in the browser',
+    id: 'conversationJoin.existentAccountJoinInBrowser',
+  },
+  existentAccountUserName: {
+    defaultMessage: 'You are logged in as {selfName}',
+    id: 'conversationJoin.existentAccountUserName',
   },
   fullConversationHeadline: {
     defaultMessage: 'Unable to join conversation',
@@ -423,16 +422,8 @@ export const conversationJoinStrings = defineMessages({
     id: 'conversationJoin.hasAccount',
   },
   headline: {
-    defaultMessage: 'You have been invited to join a conversation in {brandName}',
+    defaultMessage: 'The conversation takes place on {domain}',
     id: 'conversationJoin.headline',
-  },
-  invalidCreateAccountLink: {
-    defaultMessage: 'Create an account',
-    id: 'conversationJoin.invalidCreateAccountLink',
-  },
-  invalidCreateAccountText: {
-    defaultMessage: 'for group messaging and conference calls.',
-    id: 'conversationJoin.invalidCreateAccountText',
   },
   invalidHeadline: {
     defaultMessage: 'Conversation not found',
@@ -442,17 +433,25 @@ export const conversationJoinStrings = defineMessages({
     defaultMessage: 'The link to this group conversation expired or the conversation was set to private.',
     id: 'conversationJoin.invalidSubhead',
   },
-  loginLink: {
-    defaultMessage: 'Log in',
-    id: 'conversationJoin.loginLink',
-  },
   namePlaceholder: {
     defaultMessage: 'Your name',
     id: 'conversationJoin.namePlaceholder',
   },
+  noAccountHead: {
+    defaultMessage: "Don't have an account?",
+    id: 'conversationJoin.noAccountHead',
+  },
   subhead: {
     defaultMessage: 'Join conversation as temporary guest (access expires after 24 hours)',
     id: 'conversationJoin.subhead',
+  },
+  joinButton: {
+    defaultMessage: 'Join as Temporary Guest',
+    id: 'conversationJoin.joinButton',
+  },
+  mainHeadline: {
+    defaultMessage: 'Join Conversation',
+    id: 'conversationJoin.mainHeadline',
   },
 });
 
@@ -539,7 +538,7 @@ export const errorHandlerStrings = defineMessages({
     id: 'BackendError.LABEL.TOO_MANY_REQUESTS',
   },
   [BackendErrorLabel.BAD_REQUEST]: {
-    defaultMessage: 'Invalid input',
+    defaultMessage: 'Please verify your details and try again',
     id: 'BackendError.LABEL.BAD_REQUEST',
   },
   [SyntheticErrorLabel.EMAIL_REQUIRED]: {
@@ -552,7 +551,7 @@ export const errorHandlerStrings = defineMessages({
     id: 'BackendError.LABEL.INVALID_OPERATION',
   },
   [BackendErrorLabel.INVALID_PAYLOAD]: {
-    defaultMessage: 'Invalid input',
+    defaultMessage: 'Please verify your details and try again',
     id: 'BackendError.LABEL.INVALID_PAYLOAD',
   },
   [BackendErrorLabel.OPERATION_DENIED]: {

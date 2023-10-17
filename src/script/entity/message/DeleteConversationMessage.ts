@@ -18,7 +18,6 @@
  */
 
 import {TEAM_EVENT} from '@wireapp/api-client/lib/event/TeamEvent';
-import ko from 'knockout';
 
 import {t} from 'Util/LocalizerUtil';
 
@@ -28,19 +27,14 @@ import {SystemMessageType} from '../../message/SystemMessageType';
 import type {Conversation} from '../Conversation';
 
 export class DeleteConversationMessage extends SystemMessage {
-  public readonly system_message_type: SystemMessageType;
-  public readonly caption: ko.PureComputed<string>;
-
   constructor(conversationEntity: Conversation) {
     super();
 
     this.type = TEAM_EVENT.DELETE;
     this.system_message_type = SystemMessageType.CONVERSATION_DELETE;
 
-    this.caption = ko.pureComputed(() =>
-      conversationEntity
-        ? t('notificationConversationDeletedNamed', conversationEntity.name())
-        : t('notificationConversationDeleted'),
-    );
+    this.caption = conversationEntity
+      ? t('notificationConversationDeletedNamed', conversationEntity.name())
+      : t('notificationConversationDeleted');
   }
 }

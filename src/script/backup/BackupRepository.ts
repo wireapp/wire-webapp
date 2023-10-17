@@ -396,9 +396,8 @@ export class BackupRepository {
     let importedEntities: Conversation[] = [];
 
     const importConversationChunk = async (conversationChunk: ConversationRecord[]) => {
-      const importedConversationEntities = await this.conversationRepository.updateConversationStates(
-        conversationChunk,
-      );
+      const importedConversationEntities =
+        await this.conversationRepository.updateConversationStates(conversationChunk);
       importedEntities = importedEntities.concat(importedConversationEntities);
       progressCallback(conversationChunk.length);
       return importedEntities.length;
@@ -469,11 +468,12 @@ export class BackupRepository {
   }
 
   private prepareEvents(entity: EventRecord) {
-    if (entity.data) {
+    const data = entity.data as any;
+    if (data) {
       UINT8ARRAY_FIELDS.forEach(field => {
-        const dataField = entity.data[field];
+        const dataField = data[field];
         if (dataField) {
-          entity.data[field] = new Uint8Array(Object.values(dataField));
+          data[field] = new Uint8Array(Object.values(dataField));
         }
       });
     }

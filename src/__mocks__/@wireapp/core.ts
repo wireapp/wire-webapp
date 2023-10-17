@@ -17,11 +17,18 @@
  *
  */
 
+import {TaskScheduler} from '@wireapp/core/lib/util';
+
 import {EventEmitter} from 'stream';
 
 export class Account extends EventEmitter {
   backendFeatures = {
     federationEndpoints: true,
+  };
+
+  recurringTaskScheduler = {
+    registerTask: jest.fn(),
+    cancelTask: jest.fn(),
   };
 
   configureMLSCallbacks = jest.fn();
@@ -35,22 +42,34 @@ export class Account extends EventEmitter {
       renewKeyMaterial: jest.fn(),
       getClientIds: jest.fn(),
       getEpoch: jest.fn(),
+      conversationExists: jest.fn(),
       exportSecretKey: jest.fn(),
       leaveConferenceSubconversation: jest.fn(),
       on: this.on,
       emit: this.emit,
       off: this.off,
+      scheduleKeyMaterialRenewal: jest.fn(),
     },
     asset: {
       uploadAsset: jest.fn(),
     },
     conversation: {
       send: jest.fn(),
-      isMLSConversationEstablished: jest.fn(),
+      mlsGroupExistsLocally: jest.fn(),
+      joinByExternalCommit: jest.fn(),
       addUsersToMLSConversation: jest.fn(),
       messageTimer: {
         setConversationLevelTimer: jest.fn(),
       },
+      removeUsersFromMLSConversation: jest.fn(),
+      removeUserFromConversation: jest.fn(),
+    },
+    client: {
+      deleteClient: jest.fn(),
     },
   };
 }
+
+export const util = {
+  TaskScheduler,
+};

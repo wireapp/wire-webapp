@@ -47,7 +47,8 @@ export function generateAPIUser(
     ],
     handle: faker.internet.userName(),
     id: id.id,
-    name: faker.name.fullName(),
+    // replace special chars to avoid escaping problems with querying the DOM
+    name: faker.person.fullName().replace(/[^a-zA-Z ]/, ''),
     qualified_id: id,
     ...overwites,
   };

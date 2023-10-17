@@ -61,6 +61,9 @@ export type Env = {
   /** Specifies the name of the brand, e.g. Wire */
   BRAND_NAME: string;
 
+  /** enables replacing all occurences of {{hostname}} in the urls given to the frontend by the hostname of the client*/
+  ENABLE_DYNAMIC_HOSTNAME?: string;
+
   /** Allows a client to use a development version of the api (if present) */
   ENABLE_DEV_BACKEND_API?: string;
 
@@ -77,12 +80,17 @@ export type Env = {
   /** will enable the MLS protocol */
   FEATURE_ENABLE_MLS?: string;
 
+  /** will enable the E2E-Identification protocol, needs active FEATURE_ENABLE_MLS to work */
+  FEATURE_ENABLE_E2EI?: string;
+
   /** will enable the user to periodically update the list of supported protocols */
   FEATURE_ENABLE_SELF_SUPPORTED_PROTOCOLS_UPDATES?: string;
 
   FEATURE_USE_CORE_CRYPTO?: string;
 
   FEATURE_MLS_CONFIG_KEYING_MATERIAL_UPDATE_THRESHOLD?: string;
+
+  FEATURE_MLS_CONFIG_DEFAULT_CIPHERSUITE?: string;
 
   FEATURE_ENABLE_PROTEUS_CORE_CRYPTO?: string;
 
@@ -241,7 +249,13 @@ export type Env = {
 
   URL_SUPPORT_SCREEN_ACCESS_DENIED: string;
 
+  URL_SUPPORT_NON_FEDERATING_INFO: string;
+
+  URL_SUPPORT_OAUTH_LEARN_MORE: string;
+
   URL_SUPPORT_OFFLINE_BACKEND: string;
+
+  URL_SUPPORT_FEDERATION_STOP: string;
 
   URL_WHATS_NEW: string;
 

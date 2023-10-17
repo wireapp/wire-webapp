@@ -35,7 +35,6 @@ import {ConversationState} from '../../conversation/ConversationState';
 import type {Conversation} from '../../entity/Conversation';
 import type {User} from '../../entity/User';
 import {TeamState} from '../../team/TeamState';
-import {UserState} from '../../user/UserState';
 import {InViewport} from '../utils/InViewport';
 
 export enum UserlistMode {
@@ -70,8 +69,8 @@ export interface UserListProps {
   teamState?: TeamState;
   truncate?: boolean;
   users: User[];
-  userState?: UserState;
   isSelectable?: boolean;
+  selfUser: User;
 }
 
 export const UserList = ({
@@ -90,10 +89,10 @@ export const UserList = ({
   showEmptyAdmin = false,
   noSelfInteraction = false,
   showArrow = false,
-  userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
   isSelectable = false,
   onSelectUser,
+  selfUser,
 }: UserListProps) => {
   const [maxShownUsers, setMaxShownUsers] = useState(USER_CHUNK_SIZE);
 
@@ -102,9 +101,10 @@ export const UserList = ({
   const hasMoreUsers = !truncate && users.length > maxShownUsers;
 
   const highlightedUserIds = highlightedUsers.map(user => user.id);
-  const selfInTeam = userState.self().inTeam();
-  const {self} = useKoSubscribableChildren(userState, ['self']);
-  const {is_verified: isSelfVerified} = useKoSubscribableChildren(self, ['is_verified']);
+  const {is_verified: isSelfVerified, inTeam: selfInTeam} = useKoSubscribableChildren(selfUser, [
+    'is_verified',
+    'inTeam',
+  ]);
 
   // subscribe to roles changes in order to react to them
   useKoSubscribableChildren(conversation, ['roles']);

@@ -180,6 +180,22 @@ export class DebugUtil {
     );
   }
 
+  reconnectWebSocket({dryRun} = {dryRun: false}) {
+    return this.eventRepository.connectWebSocket(this.core, () => {}, dryRun);
+  }
+
+  async reconnectWebSocketWithLastNotificationIdFromBackend({dryRun} = {dryRun: false}) {
+    await this.core.service?.notification.initializeNotificationStream();
+    return this.reconnectWebSocket({dryRun});
+  }
+
+  async updateActiveConversationKeyPackages() {
+    const groupId = this.conversationState.activeConversation()?.groupId;
+    if (groupId) {
+      return this.core.service?.mls?.renewKeyMaterial(groupId);
+    }
+  }
+
   /** Used by QA test automation. */
   blockAllConnections(): Promise<void[]> {
     const blockUsers = this.userState.users().map(userEntity => this.connectionRepository.blockUser(userEntity));
@@ -204,7 +220,7 @@ export class DebugUtil {
       throw new Error('teamId of self user is undefined');
     }
 
-    const mlsFeature = this.teamState.teamFeatures().mls;
+    const mlsFeature = this.teamState.teamFeatures()?.mls;
 
     if (!mlsFeature) {
       throw new Error('MLS feature is not enabled');

@@ -28,7 +28,8 @@ import {IconButton, IconButtonVariant, useMatchMedia} from '@wireapp/react-ui-ki
 
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {Icon} from 'Components/Icon';
-import {ClassifiedBar} from 'Components/input/ClassifiedBar';
+import {ConversationClassifiedBar} from 'Components/input/ClassifiedBar';
+import {MediaDeviceType} from 'src/script/media/MediaDeviceType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -52,7 +53,7 @@ import {MuteState} from '../../calling/CallState';
 import type {Participant} from '../../calling/Participant';
 import type {Grid} from '../../calling/videoGridHandler';
 import type {Conversation} from '../../entity/Conversation';
-import {DeviceTypes, ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../media/MediaDevicesHandler';
+import {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../media/MediaDevicesHandler';
 import type {Multitasking} from '../../notification/NotificationRepository';
 import {useAppState} from '../../page/useAppState';
 import {TeamState} from '../../team/TeamState';
@@ -118,44 +119,44 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     startedAt,
     participants,
   } = useKoSubscribableChildren(call, ['activeSpeakers', 'currentPage', 'pages', 'startedAt', 'participants']);
-  const {display_name: conversationName, allUserEntities: allUsers} = useKoSubscribableChildren(conversation, [
-    'display_name',
-    'allUserEntities',
-  ]);
+  const {display_name: conversationName} = useKoSubscribableChildren(conversation, ['display_name']);
   const {isVideoCallingEnabled, classifiedDomains} = useKoSubscribableChildren(teamState, [
     'isVideoCallingEnabled',
     'classifiedDomains',
   ]);
 
-  const {videoInput: currentCameraDevice} = useKoSubscribableChildren(mediaDevicesHandler.currentDeviceId, [
-    DeviceTypes.VIDEO_INPUT,
+  const {[MediaDeviceType.VIDEO_INPUT]: currentCameraDevice, [MediaDeviceType.AUDIO_INPUT]: currentMicrophoneDevice} =
+    useKoSubscribableChildren(mediaDevicesHandler.currentDeviceId, [
+      MediaDeviceType.VIDEO_INPUT,
+      MediaDeviceType.AUDIO_INPUT,
+    ]);
+
+  const {videoinput, audioinput} = useKoSubscribableChildren(mediaDevicesHandler.availableDevices, [
+    MediaDeviceType.VIDEO_INPUT,
+    MediaDeviceType.AUDIO_INPUT,
   ]);
 
   const minimize = () => multitasking.isMinimized(true);
-  const {videoInput} = useKoSubscribableChildren(mediaDevicesHandler.availableDevices, [DeviceTypes.VIDEO_INPUT]);
+
   const showToggleVideo =
     isVideoCallingEnabled &&
     (call.initialType === CALL_TYPE.VIDEO ||
       conversation.supportsVideoCall(call.conversationType === CONV_TYPE.CONFERENCE));
   const availableCameras = useMemo(
     () =>
-      videoInput.map(device => (device as MediaDeviceInfo).deviceId || (device as ElectronDesktopCapturerSource).id),
-    [videoInput],
+      videoinput.map(device => (device as MediaDeviceInfo).deviceId || (device as ElectronDesktopCapturerSource).id),
+    [videoinput],
   );
   const showSwitchCamera = availableCameras.length > 1;
 
-  const {audioInput: currentMicrophoneDevice} = useKoSubscribableChildren(mediaDevicesHandler.currentDeviceId, [
-    DeviceTypes.AUDIO_INPUT,
-  ]);
-  const {audioInput} = useKoSubscribableChildren(mediaDevicesHandler.availableDevices, [DeviceTypes.AUDIO_INPUT]);
   const availableMicrophones = useMemo(
     () =>
-      audioInput.map(device => (device as MediaDeviceInfo).deviceId || (device as ElectronDesktopCapturerSource).id),
-    [audioInput],
+      audioinput.map(device => (device as MediaDeviceInfo).deviceId || (device as ElectronDesktopCapturerSource).id),
+    [audioinput],
   );
   const showSwitchMicrophone = availableMicrophones.length > 1;
 
-  const {unreadMessagesCount} = useAppState();
+  const unreadMessagesCount = useAppState(state => state.unreadMessagesCount);
   const hasUnreadMessages = unreadMessagesCount > 0;
 
   const {showAlert, isGroupCall, clearShowAlert} = useCallAlertState();
@@ -256,9 +257,8 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
           setMaximizedParticipant={participant => setMaximizedParticipant(call, participant)}
         />
         {classifiedDomains && (
-          <ClassifiedBar
-            conversationDomain={conversation.domain}
-            users={allUsers}
+          <ConversationClassifiedBar
+            conversation={conversation}
             classifiedDomains={classifiedDomains}
             style={{
               ...classifiedBarStyles,

@@ -37,6 +37,15 @@ describe('ClientRepository', () => {
 
   beforeAll(async () => {
     await testFactory.exposeClientActors();
+
+    const user = new User(entities.user.john_doe.id, null);
+    user.email(entities.user.john_doe.email);
+    user.isMe = true;
+    user.locale = entities.user.john_doe.locale;
+    user.name(entities.user.john_doe.name);
+    user.phone(entities.user.john_doe.phone);
+
+    testFactory.client_repository?.init(user);
     userId = testFactory.client_repository.selfUser().id;
   });
 
@@ -91,6 +100,7 @@ describe('ClientRepository', () => {
       ...clientPayloadServer,
       meta: {
         is_verified: true,
+        is_mls_verified: true,
         primary_key: 'local_identity',
       },
     };

@@ -17,6 +17,7 @@
  *
  */
 
+import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
@@ -46,7 +47,6 @@ export class User {
   public isService: boolean;
   public isSingleSignOn: boolean;
   public isNoPasswordSSO: boolean;
-  public joaatHash: number;
   public providerId?: string;
   public readonly accent_color: ko.PureComputed<string>;
   public readonly accent_id: ko.Observable<number>;
@@ -63,13 +63,17 @@ export class User {
   public readonly initials: ko.PureComputed<string>;
   public readonly inTeam: ko.Observable<boolean>;
   public readonly is_trusted: ko.PureComputed<boolean>;
+  // Manual Proteus verification
   public readonly is_verified: ko.PureComputed<boolean>;
+  // MLS certificate verification
+  public readonly isMLSVerified: ko.PureComputed<boolean>;
   public readonly isBlocked: ko.PureComputed<boolean>;
   public readonly isCanceled: ko.PureComputed<boolean>;
   public readonly isConnected: ko.PureComputed<boolean>;
   public readonly isExpired: ko.Observable<boolean>;
   public readonly isExternal: ko.PureComputed<boolean>;
   public readonly isGuest: ko.Observable<boolean>;
+  public readonly isActivatedAccount: ko.PureComputed<boolean>;
   /** indicates whether that user entity is available (if we have metadata for the user, it's considered available) */
   public readonly isAvailable: ko.PureComputed<boolean>;
 
@@ -137,7 +141,6 @@ export class User {
     this.providerId = undefined;
     this.serviceId = undefined;
 
-    this.joaatHash = -1;
     this.isAvailable = ko.pureComputed(() => this.id !== '' && this.name() !== '');
 
     this.accent_id = ko.observable(ACCENT_ID.BLUE);
@@ -186,6 +189,7 @@ export class User {
       return this.isGuest() && !this.isFederated;
     });
     this.isTemporaryGuest = ko.observable(false);
+    this.isActivatedAccount = ko.pureComputed(() => !this.isTemporaryGuest());
     this.teamRole = ko.observable(TEAM_ROLE.NONE);
     this.teamId = undefined;
 
@@ -198,11 +202,18 @@ export class User {
     });
 
     this.devices = ko.observableArray();
+    // Proteus verification
     this.is_verified = ko.pureComputed(() => {
       if (this.devices().length === 0 && !this.isMe) {
         return false;
       }
-      return this.devices().every(client_et => client_et.meta.isVerified());
+      return this.devices().every(client_et => client_et.meta.isVerified?.());
+    });
+    this.isMLSVerified = ko.pureComputed(() => {
+      if (this.devices().length === 0 && !this.isMe) {
+        return false;
+      }
+      return this.devices().every(client_et => client_et.meta.isMLSVerified?.());
     });
     this.isOnLegalHold = ko.pureComputed(() => {
       return this.devices().some(client_et => client_et.isLegalHold());
@@ -243,6 +254,10 @@ export class User {
       return '';
     }
     return this.isFederated ? `@${this.username()}@${this.domain}` : `@${this.username()}`;
+  }
+
+  markConnectionAsUnknown() {
+    this.connection().status(ConnectionStatus.UNKNOWN);
   }
 
   addClient(new_client_et: ClientEntity): boolean {

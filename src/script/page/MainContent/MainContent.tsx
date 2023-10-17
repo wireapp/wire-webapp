@@ -78,7 +78,10 @@ const MainContent: FC<MainContentProps> = ({
   const teamState = container.resolve(TeamState);
   const {showRequestModal} = useLegalHoldModalState();
 
-  const {contentState, isShowingConversation} = useAppState();
+  const {isActivatedAccount} = useKoSubscribableChildren(selfUser, ['isActivatedAccount']);
+
+  const contentState = useAppState(state => state.contentState);
+  const isShowingConversation = useAppState(state => state.isShowingConversation);
 
   useEffect(() => {
     if (!isShowingConversation() && conversationState.activeConversation()) {
@@ -137,6 +140,7 @@ const MainContent: FC<MainContentProps> = ({
                 conversationRepository={repositories.conversation}
                 assetRepository={repositories.asset}
                 messageRepository={repositories.message}
+                selfUser={selfUser}
               />
             )}
 
@@ -146,7 +150,7 @@ const MainContent: FC<MainContentProps> = ({
                 className={cx('preferences-page preferences-about', incomingCssClass)}
                 ref={removeAnimationsClass}
               >
-                <AboutPreferences />
+                <AboutPreferences selfUser={selfUser} />
               </div>
             )}
 
@@ -164,6 +168,8 @@ const MainContent: FC<MainContentProps> = ({
                   conversationRepository={repositories.conversation}
                   propertiesRepository={repositories.properties}
                   userRepository={repositories.user}
+                  selfUser={selfUser}
+                  isActivatedAccount={isActivatedAccount}
                 />
               </div>
             )}
@@ -196,7 +202,7 @@ const MainContent: FC<MainContentProps> = ({
                   resetSession={(userId, device, conversation) =>
                     repositories.message.resetSession(userId, device.id, conversation)
                   }
-                  userState={userState}
+                  selfUser={selfUser}
                   verifyDevice={(userId, device, verified) =>
                     repositories.client.verifyClient(userId, device, verified)
                   }
@@ -210,7 +216,7 @@ const MainContent: FC<MainContentProps> = ({
                 className={cx('preferences-page preferences-options', incomingCssClass)}
                 ref={removeAnimationsClass}
               >
-                <OptionPreferences propertiesRepository={repositories.properties} />
+                <OptionPreferences selfUser={selfUser} propertiesRepository={repositories.properties} />
               </div>
             )}
 
@@ -230,7 +236,7 @@ const MainContent: FC<MainContentProps> = ({
               <Conversation
                 initialMessage={initialMessage}
                 teamState={teamState}
-                userState={userState}
+                selfUser={selfUser}
                 isRightSidebarOpen={isRightSidebarOpen}
                 openRightSidebar={openRightSidebar}
               />
