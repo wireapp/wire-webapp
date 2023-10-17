@@ -29,8 +29,8 @@ import {createUuid} from 'Util/uuid';
 
 import {EventStorageMiddleware, getCommonMessageUpdates} from './EventStorageMiddleware';
 
-import {ClientEvent} from '../Client';
-import {EventService} from '../EventService';
+import {ClientEvent} from '../../Client';
+import {EventService} from '../../EventService';
 
 function buildEventStorageMiddleware() {
   const eventService = {
@@ -116,6 +116,14 @@ describe('EventStorageMiddleware', () => {
   });
 
   describe('processEvent', () => {
+    it('ignores unhandled event', async () => {
+      const event = createEvent({type: 'other'});
+      const [eventStorageMiddleware, {eventService}] = buildEventStorageMiddleware();
+
+      await eventStorageMiddleware.processEvent(event);
+      expect(eventService.saveEvent).not.toHaveBeenCalledWith(event);
+    });
+
     it('saves an event with a new ID', async () => {
       const event = createEvent();
       const [eventStorageMiddleware, {eventService}] = buildEventStorageMiddleware();

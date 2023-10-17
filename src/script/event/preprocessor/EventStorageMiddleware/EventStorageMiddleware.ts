@@ -24,15 +24,19 @@ import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 import {User} from 'src/script/entity/User';
 import {EventError} from 'src/script/error/EventError';
 
-import {AssetTransferState} from '../../assets/AssetTransferState';
-import {AssetAddEvent, MessageAddEvent, ClientConversationEvent} from '../../conversation/EventBuilder';
-import {categoryFromEvent} from '../../message/MessageCategorization';
-import {isEventRecordFailed, isEventRecordWithFederationError} from '../../message/StatusType';
-import type {EventRecord, StoredEvent} from '../../storage';
-import {CONVERSATION, ClientEvent} from '../Client';
-import {EventMiddleware, IncomingEvent} from '../EventProcessor';
-import {EventService} from '../EventService';
-import {eventShouldBeStored} from '../EventTypeHandling';
+import {getEditedMessageId} from './eventSelectors';
+
+import {AssetTransferState} from '../../../assets/AssetTransferState';
+import {AssetAddEvent, MessageAddEvent, ClientConversationEvent} from '../../../conversation/EventBuilder';
+import {categoryFromEvent} from '../../../message/MessageCategorization';
+import {isEventRecordFailed, isEventRecordWithFederationError} from '../../../message/StatusType';
+import type {EventRecord, StoredEvent} from '../../../storage';
+import {ClientEvent} from '../../Client';
+import {EventMiddleware, IncomingEvent} from '../../EventProcessor';
+import {EventService} from '../../EventService';
+import {eventShouldBeStored} from '../../EventTypeHandling';
+import {isValid} from 'date-fns';
+import {isValidEditEvent} from './eventValidator';
 
 type HandledEvents = ClientConversationEvent | ConversationEvent;
 
@@ -64,8 +68,21 @@ export class EventStorageMiddleware implements EventMiddleware {
     if (!shouldSaveEvent) {
       return event;
     }
+    switch (event.type) {
+      case ClientEvent.CONVERSATION.MESSAGE_ADD:
+        const editedMessage = getEditedMessageId(event);
+        if (editedMessage) {
+          return this.processEditMessage(event, editedMessage);
+        }
+    }
     const savedEvent = await this.handleEventSaving(event);
     return savedEvent ?? event;
+  }
+
+  private async processEditMessage(event: MessageAddEvent, editedMessageId: string) {
+    const conversationId = event.conversation;
+    const editedEvent = await this.eventService.loadEvent(conversationId, editedMessageId);
+    return isValidEditEvent(editedEvent, event) ? this.replaceEvent(editedEvent, event) : undefined;
   }
 
   /**
@@ -76,25 +93,6 @@ export class EventStorageMiddleware implements EventMiddleware {
    */
   private async handleEventSaving(event: HandledEvents) {
     const conversationId = event.conversation;
-    if (event.type === ClientEvent.CONVERSATION.MESSAGE_ADD) {
-      const conversationId = event.conversation;
-      const mappedData = event.data ?? {};
-
-      // first check if a message that should be replaced exists in DB
-      const eventToReplace = mappedData.replacing_message_id
-        ? await this.eventService.loadEvent(conversationId, mappedData.replacing_message_id)
-        : undefined;
-
-      const hasLinkPreview = mappedData.previews && mappedData.previews.length;
-      const isReplacementWithoutOriginal = !eventToReplace && mappedData.replacing_message_id;
-      if (isReplacementWithoutOriginal && !hasLinkPreview) {
-        // the only valid case of a replacement with no original message is when an edited message gets a link preview
-        this.throwValidationError('Edit event without original event');
-      }
-      if (eventToReplace?.type === CONVERSATION.MESSAGE_ADD) {
-        return this.handleEventReplacement(eventToReplace, event);
-      }
-    }
 
     // check for duplicates (same id)
     const storedEvent =
@@ -105,11 +103,7 @@ export class EventStorageMiddleware implements EventMiddleware {
       : this.eventService.saveEvent(event as EventRecord);
   }
 
-  private handleEventReplacement(originalEvent: StoredEvent<MessageAddEvent>, newEvent: MessageAddEvent) {
-    if (originalEvent.from !== newEvent.from) {
-      const errorMessage = 'ID reused by other user';
-      this.throwValidationError(errorMessage);
-    }
+  private replaceEvent(originalEvent: StoredEvent<MessageAddEvent>, newEvent: MessageAddEvent) {
     const newData = newEvent.data;
     const primaryKeyUpdate = {primary_key: originalEvent.primary_key};
     const isLinkPreviewEdit = newData?.previews && !!newData?.previews.length;
@@ -194,8 +188,7 @@ export class EventStorageMiddleware implements EventMiddleware {
     const originalData = originalEvent.data;
 
     if (originalEvent.from !== newEvent.from) {
-      const errorMessage = 'ID previously used by another user';
-      return this.throwValidationError(errorMessage);
+      return this.throwValidationError('ID previously used by another user');
     }
 
     const containsLinkPreview = newEventData.previews && !!newEventData.previews.length;
@@ -209,8 +202,7 @@ export class EventStorageMiddleware implements EventMiddleware {
 
     const textContentMatches = newEventData.content === originalData.content;
     if (!textContentMatches) {
-      const errorMessage = 'ID of link preview reused: Text content for message duplication not matching';
-      return this.throwValidationError(errorMessage);
+      return this.throwValidationError('ID of link preview reused: Text content for message duplication not matching');
     }
 
     const bothAreMessageAddType = newEvent.type === originalEvent.type;
