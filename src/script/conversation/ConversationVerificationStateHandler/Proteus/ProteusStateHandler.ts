@@ -181,7 +181,7 @@ export class ProteusConversationVerificationStateHandler {
     userIds: QualifiedId[],
     type: VerificationMessageType,
   ): boolean {
-    // We want to process only Proteus and MLS conversations
+    // We want to process only Proteus or Mixed conversations
     if (isProteusConversation(conversationEntity) || isMixedConversation(conversationEntity)) {
       const conversationVerificationState = attemptChangeToDegraded({
         conversationEntity,
