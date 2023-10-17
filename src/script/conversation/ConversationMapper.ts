@@ -34,7 +34,6 @@ import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {ACCESS_STATE} from './AccessState';
 import {ConversationStatus} from './ConversationStatus';
-import {ConversationVerificationState} from './ConversationVerificationState';
 
 import {Conversation} from '../entity/Conversation';
 import {BaseError, BASE_ERROR_TYPE} from '../error/BaseError';
@@ -61,7 +60,7 @@ export interface SelfStatusUpdateDatabaseData {
   otr_muted_status: number;
   receipt_mode: number;
   status: number;
-  verification_state: ConversationVerificationState;
+  verification_state: number;
 }
 
 type Roles = {[userId: string]: DefaultConversationRoleName | string};

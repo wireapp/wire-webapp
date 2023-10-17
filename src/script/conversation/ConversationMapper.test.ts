@@ -44,7 +44,6 @@ import {BaseError} from 'src/script/error/BaseError';
 import {createUuid} from 'Util/uuid';
 
 import {ACCESS_STATE} from './AccessState';
-import {ConversationVerificationState} from './ConversationVerificationState';
 
 import {entities, payload} from '../../../test/api/payloads';
 
@@ -370,7 +369,7 @@ describe('ConversationMapper', () => {
         status: 0,
         team_id: teamId,
         type: 0,
-        verification_state: ConversationVerificationState.UNVERIFIED,
+        verification_state: 0,
       };
 
       const remoteData: Partial<ConversationDatabaseData> = {
@@ -444,7 +443,7 @@ describe('ConversationMapper', () => {
         last_read_timestamp: 1488387380633,
         muted_state: NOTIFICATION_STATE.EVERYTHING,
         muted_timestamp: 0,
-        verification_state: ConversationVerificationState.UNVERIFIED,
+        verification_state: 0,
       };
 
       const [mergedConversation] = ConversationMapper.mergeConversations(
@@ -477,7 +476,7 @@ describe('ConversationMapper', () => {
         id: 'de7466b0-985c-4dc3-ad57-17877db45b4c',
         last_event_timestamp: 1488387380633,
         last_read_timestamp: 1488387380633,
-        verification_state: ConversationVerificationState.UNVERIFIED,
+        verification_state: 0,
       };
 
       const remoteData2: ConversationBackendData = JSON.parse(JSON.stringify(remoteData));
@@ -561,7 +560,7 @@ describe('ConversationMapper', () => {
         status: 0,
         team_id: '5316fe03-24ee-4b19-b789-6d026bd3ce5f',
         type: 2,
-        verification_state: ConversationVerificationState.UNVERIFIED,
+        verification_state: 0,
       };
 
       const [merged_conversation] = ConversationMapper.mergeConversations(
@@ -608,7 +607,7 @@ describe('ConversationMapper', () => {
         last_read_timestamp: 1488387380633,
         muted_state: NOTIFICATION_STATE.EVERYTHING,
         muted_timestamp: 0,
-        verification_state: ConversationVerificationState.UNVERIFIED,
+        verification_state: 0,
       };
 
       const selfUpdate: Partial<MemberBackendData> = {
@@ -682,7 +681,7 @@ describe('ConversationMapper', () => {
         last_server_timestamp: 1377276270510,
         muted_state: NOTIFICATION_STATE.EVERYTHING,
         muted_timestamp: 0,
-        verification_state: ConversationVerificationState.UNVERIFIED,
+        verification_state: 0,
       };
 
       const [merged_conversation] = ConversationMapper.mergeConversations(
