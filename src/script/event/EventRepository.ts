@@ -36,8 +36,8 @@ import {getLogger, Logger} from 'Util/Logger';
 import {queue} from 'Util/PromiseQueue';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
-import {ClientEvent} from './Client';
-import {EventProcessor, IncomingEvent} from './EventProcessor';
+import {ClientEvent, CONVERSATION} from './Client';
+import {EventMiddleware, EventProcessor, IncomingEvent} from './EventProcessor';
 import type {EventService} from './EventService';
 import {EventSource} from './EventSource';
 import {EVENT_TYPE} from './EventType';
@@ -69,7 +69,7 @@ export class EventRepository {
   notificationsHandled: number;
   notificationsTotal: number;
   lastEventDate: ko.Observable<string | undefined>;
-  eventProcessMiddlewares: Function[] = [];
+  eventProcessMiddlewares: EventMiddleware[] = [];
   /** event processors are classes that are able to react and process an incoming event */
   eventProcessors: EventProcessor[] = [];
 
@@ -123,15 +123,19 @@ export class EventRepository {
   }
 
   /**
-   * Will set a middleware to run before the EventRepository actually processes the event.
-   * Middleware is just a function with the following signature (Event) => Promise<Event>.
-   *
-   * @param middlewares middlewares to run when a new event is about to be processed
+   * Will register a pipeline that transforms an event before it is being processed by the EventProcessors.
+   * Those middleware are run sequentially one after the other. Thus the order at which they are defined matters.
+   * When one middleware fails the entire even handling process will stop and no further middleware will be executed.
    */
-  setEventProcessMiddlewares(middlewares: Function[]) {
+  setEventProcessMiddlewares(middlewares: EventMiddleware[]) {
     this.eventProcessMiddlewares = middlewares;
   }
 
+  /**
+   * EventProcessors are classes that are able to react and process an incoming event.
+   * They will all be executed in parallel. If one processor fails the other ones are not impacted
+   * @param processors
+   */
   setEventProcessors(processors: EventProcessor[]) {
     this.eventProcessors = processors;
   }
@@ -427,7 +431,7 @@ export class EventRepository {
    */
   private async processEvent(event: IncomingEvent | ClientConversationEvent, source: EventSource) {
     for (const eventProcessMiddleware of this.eventProcessMiddlewares) {
-      event = await eventProcessMiddleware(event);
+      event = await eventProcessMiddleware.processEvent(event);
     }
 
     const shouldSaveEvent = EventTypeHandling.STORE.includes(event.type as CONVERSATION_EVENT);
@@ -472,33 +476,32 @@ export class EventRepository {
    */
   private async handleEventSaving(event: IncomingEvent) {
     const conversationId = 'conversation' in event && event.conversation;
-    const mappedData = ('data' in event && event.data) ?? {};
 
     // first check if a message that should be replaced exists in DB
-    const eventToReplace = mappedData.replacing_message_id
-      ? await this.eventService.loadEvent(conversationId, mappedData.replacing_message_id)
-      : undefined;
+    if (event.type === ClientEvent.CONVERSATION.MESSAGE_ADD) {
+      const mappedData = event.data;
+      const eventToReplace = mappedData.replacing_message_id
+        ? await this.eventService.loadEvent(conversationId, mappedData.replacing_message_id)
+        : undefined;
 
-    const hasLinkPreview = mappedData.previews && mappedData.previews.length;
-    const isReplacementWithoutOriginal = !eventToReplace && mappedData.replacing_message_id;
-    if (isReplacementWithoutOriginal && !hasLinkPreview) {
-      // the only valid case of a replacement with no original message is when an edited message gets a link preview
-      this.throwValidationError(event, 'Edit event without original event');
+      const hasLinkPreview = mappedData.previews && mappedData.previews.length;
+      const isReplacementWithoutOriginal = !eventToReplace && mappedData.replacing_message_id;
+      if (isReplacementWithoutOriginal && !hasLinkPreview) {
+        // the only valid case of a replacement with no original message is when an edited message gets a link preview
+        this.throwValidationError(event, 'Edit event without original event');
+      }
+
+      if (eventToReplace?.type === CONVERSATION.MESSAGE_ADD) {
+        return this.handleEventReplacement(eventToReplace, event);
+      }
     }
 
-    const handleEvent = async (newEvent: IncomingEvent) => {
-      // check for duplicates (same id)
-      const storedEvent = 'id' in newEvent ? await this.eventService.loadEvent(conversationId, newEvent.id) : undefined;
+    // check for duplicates (same id)
+    const storedEvent = 'id' in event ? await this.eventService.loadEvent(conversationId, event.id) : undefined;
 
-      return storedEvent
-        ? this.handleDuplicatedEvent(storedEvent, newEvent)
-        : this.eventService.saveEvent(newEvent as EventRecord);
-    };
-
-    const canReplace =
-      eventToReplace?.type === ClientEvent.CONVERSATION.MESSAGE_ADD &&
-      event.type === ClientEvent.CONVERSATION.MESSAGE_ADD;
-    return canReplace && eventToReplace ? this.handleEventReplacement(eventToReplace, event) : handleEvent(event);
+    return storedEvent
+      ? this.handleDuplicatedEvent(storedEvent, event)
+      : this.eventService.saveEvent(event as EventRecord);
   }
 
   private handleEventReplacement(originalEvent: StoredEvent<MessageAddEvent>, newEvent: MessageAddEvent) {
@@ -537,6 +540,9 @@ export class EventRepository {
   }
 
   private async handleAssetUpdate(originalEvent: EventRecord, newEvent: AssetAddEvent) {
+    if (originalEvent.type !== ClientEvent.CONVERSATION.ASSET_ADD) {
+      this.throwValidationError(newEvent, 'Trying to update a non-asset message as an asset message');
+    }
     const newEventData = newEvent.data;
     // the preview status is not sent by the client so we fake a 'preview' status in order to cleanly handle it in the switch statement
     const ASSET_PREVIEW = 'preview';
@@ -599,7 +605,7 @@ export class EventRepository {
       return this.throwValidationError(newEvent, errorMessage);
     }
 
-    const textContentMatches = newEventData.content === originalData.content;
+    const textContentMatches = newEventData.content === (originalData as any).content;
     if (!textContentMatches) {
       const errorMessage = 'ID of link preview reused';
       const logMessage = 'Text content for message duplication not matching';
@@ -636,12 +642,12 @@ export class EventRepository {
   private getUpdatesForMessage(originalEvent: EventRecord, newEvent: MessageAddEvent) {
     const newData = newEvent.data;
     const originalData = originalEvent.data;
-    const updatingLinkPreview = !!originalData.previews.length;
+    const updatingLinkPreview = !!(originalData as any).previews.length;
     if (updatingLinkPreview) {
       this.throwValidationError(newEvent, 'ID of link preview reused');
     }
 
-    const textContentMatches = !newData.previews?.length || newData.content === originalData.content;
+    const textContentMatches = !newData.previews?.length || newData.content === (originalData as any).content;
     if (!textContentMatches) {
       const logMessage = 'Text content for message duplication not matching';
       const errorMessage = 'ID of duplicated message reused';

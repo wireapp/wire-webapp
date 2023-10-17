@@ -19,6 +19,7 @@
 
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
 
+import {ClientEntity} from 'src/script/client';
 import {Conversation} from 'src/script/entity/Conversation';
 import {Core} from 'src/script/service/CoreSingleton';
 import {createUuid} from 'Util/uuid';
@@ -36,11 +37,19 @@ describe('MLSConversationVerificationStateHandler', () => {
   let mockOnConversationVerificationStateChange: jest.Mock;
   let mockConversationState: jest.Mocked<ConversationState>;
   let mockCore: jest.Mocked<Core>;
-  const conversation: Conversation = new Conversation(uuid, '', ConversationProtocol.MLS);
   const groupId = 'groupIdXYZ';
+  const clientEntityId = 'clientIdXYZ';
+  const conversation: Conversation = new Conversation(uuid, '', ConversationProtocol.MLS);
+  const clientEntity: ClientEntity = new ClientEntity(false, '', clientEntityId);
 
   beforeEach(() => {
     conversation.groupId = groupId;
+
+    conversation.getAllUserEntities = jest.fn().mockReturnValue([
+      {
+        devices: () => [clientEntity],
+      },
+    ]);
 
     mockOnConversationVerificationStateChange = jest.fn();
     mockConversationState = {
@@ -51,7 +60,14 @@ describe('MLSConversationVerificationStateHandler', () => {
         mls: {
           on: jest.fn(),
         },
-        e2eIdentity: {},
+        e2eIdentity: {
+          getUserDeviceEntities: jest.fn().mockResolvedValue([
+            {
+              certificate: 'mockCertificate',
+              clientId: clientEntityId,
+            },
+          ]),
+        },
       },
     } as unknown as jest.Mocked<Core>;
 
@@ -110,7 +126,7 @@ describe('MLSConversationVerificationStateHandler', () => {
         epoch: 12345,
       };
 
-      jest.spyOn(handler as any, 'getAllUserEntitiesInConversation').mockResolvedValue({
+      jest.spyOn(handler as any, 'updateUserDevices').mockResolvedValue({
         isResultComplete: false,
         identities: [],
         qualifiedIds: [],
@@ -129,7 +145,7 @@ describe('MLSConversationVerificationStateHandler', () => {
         epoch: 12345,
       };
 
-      jest.spyOn(handler as any, 'getAllUserEntitiesInConversation').mockResolvedValue({
+      jest.spyOn(handler as any, 'updateUserDevices').mockResolvedValue({
         isResultComplete: true,
         identities: [
           {
@@ -144,6 +160,22 @@ describe('MLSConversationVerificationStateHandler', () => {
       await (handler as any).checkEpoch(mockData); // Calling the private method
 
       expect((handler as any).verifyConversation).toHaveBeenCalled();
+    });
+
+    it('should update ClientEntity isMLSVerified observable', async () => {
+      const mockData = {
+        groupId,
+        epoch: 12345,
+      };
+
+      jest.spyOn(handler as any, 'isCertificateActiveAndValid').mockReturnValue(true);
+      jest.spyOn(handler as any, 'verifyConversation').mockImplementation(() => null);
+
+      expect(clientEntity.meta.isMLSVerified?.()).toBe(false);
+
+      await (handler as any).checkEpoch(mockData); // Calling the private method
+
+      expect(clientEntity.meta.isMLSVerified?.()).toBe(true);
     });
   });
 });

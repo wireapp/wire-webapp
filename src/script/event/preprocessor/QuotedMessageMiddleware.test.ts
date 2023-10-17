@@ -19,41 +19,47 @@
 
 import {Quote} from '@wireapp/protocol-messaging';
 
+import {EventBuilder, MessageAddEvent} from 'src/script/conversation/EventBuilder';
+import {Conversation} from 'src/script/entity/Conversation';
+import {User} from 'src/script/entity/User';
 import {ClientEvent} from 'src/script/event/Client';
-import {QuotedMessageMiddleware} from 'src/script/event/preprocessor/QuotedMessageMiddleware';
 import {MessageHasher} from 'src/script/message/MessageHasher';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';
+import {EventRecord} from 'src/script/storage';
 import {arrayToBase64} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
-import {TestFactory} from '../../../helper/TestFactory';
+import {QuotedMessageMiddleware} from './QuotedMessageMiddleware';
+
+import {EventService} from '../EventService';
+
+function buildQuotedMessageMiddleware() {
+  const eventService = {
+    loadEvent: jest.fn(() => []),
+    loadEventsReplyingToMessage: jest.fn(),
+    loadReplacingEvent: jest.fn(),
+    replaceEvent: jest.fn(),
+  } as unknown as jest.Mocked<EventService>;
+
+  return [new QuotedMessageMiddleware(eventService), {eventService}] as const;
+}
 
 describe('QuotedMessageMiddleware', () => {
-  const testFactory = new TestFactory();
-  let quotedMessageMiddleware;
-
-  beforeEach(() => {
-    return testFactory.exposeEventActors().then(() => {
-      quotedMessageMiddleware = new QuotedMessageMiddleware(testFactory.event_service);
-    });
-  });
+  const conversation = new Conversation(createUuid());
+  conversation.selfUser(new User());
 
   describe('processEvent', () => {
-    it('ignores messages that do not have quotes', () => {
-      const event = {
-        data: {
-          content: 'salut',
-          quote: undefined,
-        },
-        type: ClientEvent.CONVERSATION.MESSAGE_ADD,
-      };
+    it('ignores messages that do not have quotes', async () => {
+      const [quotedMessageMiddleware] = buildQuotedMessageMiddleware();
+      const event = EventBuilder.buildMessageAdd(conversation, 0, 'salut');
 
-      return quotedMessageMiddleware.processEvent(event).then(decoratedEvent => {
-        expect(decoratedEvent).toBe(event);
-      });
+      const decoratedEvent = await quotedMessageMiddleware.processEvent(event);
+      expect(decoratedEvent).toEqual(event);
     });
 
     it('adds an error if quoted message is not found', async () => {
-      spyOn(quotedMessageMiddleware.eventService, 'loadEvent').and.returnValue(Promise.resolve(undefined));
+      const [quotedMessageMiddleware, {eventService}] = buildQuotedMessageMiddleware();
+      eventService.loadEvent.mockResolvedValue(undefined);
 
       const expectedError = {
         type: QuoteEntity.ERROR.MESSAGE_NOT_FOUND,
@@ -61,7 +67,7 @@ describe('QuotedMessageMiddleware', () => {
 
       const quote = new Quote({
         quotedMessageId: 'invalid-message-uuid',
-        quotedMessageSha256: '',
+        quotedMessageSha256: new Uint8Array(),
       });
 
       const base64Quote = arrayToBase64(Quote.encode(quote).finish());
@@ -73,29 +79,29 @@ describe('QuotedMessageMiddleware', () => {
           quote: base64Quote,
         },
         type: ClientEvent.CONVERSATION.MESSAGE_ADD,
-      };
+      } as MessageAddEvent;
 
-      const parsedEvent = await quotedMessageMiddleware.processEvent(event);
+      const parsedEvent: any = await quotedMessageMiddleware.processEvent(event);
 
       expect(parsedEvent.data.quote.quotedMessageId).toBeUndefined();
       expect(parsedEvent.data.quote.error).toEqual(expectedError);
     });
 
     it('decorates event with the quote metadata if validation is successful', async () => {
+      const [quotedMessageMiddleware, {eventService}] = buildQuotedMessageMiddleware();
       const quotedMessage = {
         data: {
           content: 'salut',
         },
         from: 'user-id',
-        time: 100,
         type: ClientEvent.CONVERSATION.MESSAGE_ADD,
-      };
-      spyOn(MessageHasher, 'validateHash').and.returnValue(Promise.resolve(true));
-      spyOn(quotedMessageMiddleware.eventService, 'loadEvent').and.returnValue(Promise.resolve(quotedMessage));
+      } as any;
+      jest.spyOn(MessageHasher, 'validateHash').mockResolvedValue(true);
+      eventService.loadEvent.mockResolvedValue(quotedMessage);
 
       const quote = new Quote({
         quotedMessageId: 'message-uuid',
-        quotedMessageSha256: '7fec6710751f67587b6f6109782257cd7c56b5d29570824132e8543e18242f1b',
+        quotedMessageSha256: new Uint8Array(),
       });
 
       const base64Quote = arrayToBase64(Quote.encode(quote).finish());
@@ -106,22 +112,23 @@ describe('QuotedMessageMiddleware', () => {
           content: 'salut',
           quote: base64Quote,
         },
-        time: 100,
         type: ClientEvent.CONVERSATION.MESSAGE_ADD,
-      };
+      } as MessageAddEvent;
 
-      const parsedEvent = await quotedMessageMiddleware.processEvent(event);
+      const parsedEvent: any = await quotedMessageMiddleware.processEvent(event);
 
       expect(parsedEvent.data.quote.message_id).toEqual('message-uuid');
       expect(parsedEvent.data.quote.user_id).toEqual('user-id');
     });
 
-    it('updates quotes in DB when a message is edited', () => {
+    it('updates quotes in DB when a message is edited', async () => {
+      const [quotedMessageMiddleware, {eventService}] = buildQuotedMessageMiddleware();
       const originalMessage = {
         data: {
           content: 'hello',
         },
-      };
+        type: ClientEvent.CONVERSATION.MESSAGE_ADD,
+      } as EventRecord;
       const replies = [
         {
           data: {
@@ -130,6 +137,7 @@ describe('QuotedMessageMiddleware', () => {
               message_id: 'original-id',
             },
           },
+          type: ClientEvent.CONVERSATION.MESSAGE_ADD,
         },
         {
           data: {
@@ -138,13 +146,11 @@ describe('QuotedMessageMiddleware', () => {
               message_id: 'original-id',
             },
           },
+          type: ClientEvent.CONVERSATION.MESSAGE_ADD,
         },
       ];
-      spyOn(quotedMessageMiddleware.eventService, 'loadEvent').and.returnValue(Promise.resolve(originalMessage));
-      spyOn(quotedMessageMiddleware.eventService, 'loadEventsReplyingToMessage').and.returnValue(
-        Promise.resolve(replies),
-      );
-      spyOn(quotedMessageMiddleware.eventService, 'replaceEvent').and.returnValue(Promise.resolve());
+      eventService.loadEvent.mockResolvedValue(originalMessage);
+      eventService.loadEventsReplyingToMessage.mockResolvedValue(replies);
 
       const event = {
         conversation: 'conversation-uuid',
@@ -152,27 +158,27 @@ describe('QuotedMessageMiddleware', () => {
           replacing_message_id: 'original-id',
         },
         id: 'new-id',
-        time: 100,
         type: ClientEvent.CONVERSATION.MESSAGE_ADD,
-      };
+      } as any;
 
       jest.useFakeTimers();
 
-      return quotedMessageMiddleware.processEvent(event).then(() => {
-        jest.advanceTimersByTime(1);
+      await quotedMessageMiddleware.processEvent(event);
+      jest.advanceTimersByTime(1);
 
-        expect(quotedMessageMiddleware.eventService.replaceEvent).toHaveBeenCalledWith(
-          jasmine.objectContaining({data: jasmine.objectContaining({quote: {message_id: 'new-id'}})}),
-        );
-        jest.useRealTimers();
-      });
+      expect(eventService.replaceEvent).toHaveBeenCalledWith(
+        jasmine.objectContaining({data: jasmine.objectContaining({quote: {message_id: 'new-id'}})}),
+      );
+      jest.useRealTimers();
     });
 
     it('invalidates quotes in DB when a message is deleted', () => {
+      const [quotedMessageMiddleware, {eventService}] = buildQuotedMessageMiddleware();
       const originalMessage = {
         data: {
           content: 'hello',
         },
+        type: ClientEvent.CONVERSATION.MESSAGE_ADD,
       };
       const replies = [
         {
@@ -192,11 +198,9 @@ describe('QuotedMessageMiddleware', () => {
           },
         },
       ];
-      spyOn(quotedMessageMiddleware.eventService, 'loadEvent').and.returnValue(Promise.resolve(originalMessage));
-      spyOn(quotedMessageMiddleware.eventService, 'loadEventsReplyingToMessage').and.returnValue(
-        Promise.resolve(replies),
-      );
-      spyOn(quotedMessageMiddleware.eventService, 'replaceEvent').and.returnValue(Promise.resolve());
+      spyOn(eventService, 'loadEvent').and.returnValue(Promise.resolve(originalMessage));
+      spyOn(eventService, 'loadEventsReplyingToMessage').and.returnValue(Promise.resolve(replies));
+      spyOn(eventService, 'replaceEvent').and.returnValue(Promise.resolve());
 
       const event = {
         conversation: 'conversation-uuid',
@@ -204,12 +208,11 @@ describe('QuotedMessageMiddleware', () => {
           replacing_message_id: 'original-id',
         },
         id: 'new-id',
-        time: 100,
         type: ClientEvent.CONVERSATION.MESSAGE_DELETE,
-      };
+      } as any;
 
       return quotedMessageMiddleware.processEvent(event).then(() => {
-        expect(quotedMessageMiddleware.eventService.replaceEvent).toHaveBeenCalledWith(
+        expect(eventService.replaceEvent).toHaveBeenCalledWith(
           jasmine.objectContaining({
             data: jasmine.objectContaining({quote: {error: {type: QuoteEntity.ERROR.MESSAGE_NOT_FOUND}}}),
           }),
