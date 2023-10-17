@@ -150,7 +150,7 @@ export function EmojiPickerPlugin({openStateRef}: Props) {
       }
 
       const expectedWords = (queryString.match(/\s/g) || []).length + 1;
-      const emojiNameWords = emoji.title.split(' ');
+      const emojiNameWords = emoji.keywords.flatMap(keyword => keyword.split(' '));
 
       if (emojiNameWords.length < expectedWords) {
         return false;
