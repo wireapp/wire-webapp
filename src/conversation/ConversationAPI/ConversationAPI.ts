@@ -337,11 +337,15 @@ export class ConversationAPI {
 
   /**
    * Get all local & remote conversations from a federated backend.
+   * @param conversationIdsToSkip Conversation qualified Ids to skip
    */
-  public async getConversationList(): Promise<RemoteConversations> {
+  public async getConversationList(conversationIdsToSkip: QualifiedId[] = []): Promise<RemoteConversations> {
     const allConversationIds = await this.getQualifiedConversationIds();
-    const conversations = await this.getConversationsByQualifiedIds(allConversationIds);
-    return conversations;
+    const filteredConversationIds = allConversationIds.filter(qualifiedId => {
+      return !conversationIdsToSkip.some(({id, domain}) => id === qualifiedId.id && domain === qualifiedId.domain);
+    });
+
+    return this.getConversationsByQualifiedIds(filteredConversationIds);
   }
 
   /**
