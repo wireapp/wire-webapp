@@ -67,6 +67,7 @@ import {
   SendProteusMessageParams,
 } from '../../messagingProtocols/proteus/ProteusService/ProteusService.types';
 import {HandledEventPayload} from '../../notification';
+import {CoreDatabase} from '../../storage/CoreDB';
 import {isMLSConversation} from '../../util';
 import {mapQualifiedUserClientIdsToFullyQualifiedClientIds} from '../../util/fullyQualifiedClientIdUtils';
 import {RemoteData} from '../content';
@@ -83,6 +84,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
   constructor(
     private readonly apiClient: APIClient,
     private readonly proteusService: ProteusService,
+    private readonly coreDatabase: CoreDatabase,
     private readonly _mlsService?: MLSService,
   ) {
     super();
@@ -141,7 +143,8 @@ export class ConversationService extends TypedEventEmitter<Events> {
 
   public async getConversations(conversationIds?: QualifiedId[]): Promise<RemoteConversations> {
     if (!conversationIds) {
-      return this.apiClient.api.conversation.getConversationList();
+      const conversationIdsToSkip = await this.coreDatabase.getAll('conversationBlacklist');
+      return this.apiClient.api.conversation.getConversationList(conversationIdsToSkip);
     }
     return this.apiClient.api.conversation.getConversationsByQualifiedIds(conversationIds);
   }
@@ -191,6 +194,15 @@ export class ConversationService extends TypedEventEmitter<Events> {
   public sendTypingStop(conversationId: QualifiedId): Promise<void> {
     return this.apiClient.api.conversation.postTyping(conversationId, {status: CONVERSATION_TYPING.STOPPED});
   }
+
+  /**
+   * Blacklists a conversation.
+   * When conversations is blacklisted, it means that it will be completely ignored by a client, even though it does exist on backend and we're the conversation member.
+   * @param conversationId id of the conversation to blacklist
+   */
+  public readonly blacklistConversation = async (conversationId: QualifiedId): Promise<void> => {
+    await this.coreDatabase.put('conversationBlacklist', conversationId, conversationId.id);
+  };
 
   /**
    * returns the number of messages that are in the queue expecting to be sent

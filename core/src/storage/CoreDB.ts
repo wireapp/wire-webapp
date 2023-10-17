@@ -18,7 +18,7 @@
  */
 
 import {DBSchema, deleteDB as idbDeleteDB, IDBPDatabase, openDB as idbOpenDb} from 'idb';
-const VERSION = 3;
+const VERSION = 4;
 
 interface CoreDBSchema extends DBSchema {
   prekeys: {
@@ -32,6 +32,10 @@ interface CoreDBSchema extends DBSchema {
   recurringTasks: {
     key: string;
     value: {key: string; firingDate: number};
+  };
+  conversationBlacklist: {
+    key: string;
+    value: {id: string; domain: string};
   };
 }
 
@@ -48,6 +52,8 @@ export async function openDB(dbName: string): Promise<CoreDatabase> {
           db.createObjectStore('pendingProposals');
         case 2:
           db.createObjectStore('recurringTasks');
+        case 3:
+          db.createObjectStore('conversationBlacklist');
       }
     },
   });

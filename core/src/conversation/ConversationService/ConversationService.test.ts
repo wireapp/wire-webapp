@@ -37,6 +37,7 @@ import {MLSService} from '../../messagingProtocols/mls';
 import {CoreCryptoMLSError} from '../../messagingProtocols/mls/MLSService/CoreCryptoMLSError';
 import {ProteusService} from '../../messagingProtocols/proteus';
 import * as MessagingProtocols from '../../messagingProtocols/proteus';
+import {openDB} from '../../storage/CoreDB';
 import * as PayloadHelper from '../../test/PayloadHelper';
 import * as MessageBuilder from '../message/MessageBuilder';
 
@@ -74,7 +75,7 @@ describe('ConversationService', () => {
     jest.setSystemTime(new Date(0));
   });
 
-  function buildConversationService() {
+  async function buildConversationService() {
     const client = new APIClient({urls: APIClient.BACKEND.STAGING});
     jest.spyOn(client.api.conversation, 'postMlsMessage').mockReturnValue(
       Promise.resolve({
@@ -119,7 +120,9 @@ describe('ConversationService', () => {
       resetKeyMaterialRenewal: jest.fn(),
     } as unknown as MLSService;
 
-    const conversationService = new ConversationService(client, mockedProteusService, mockedMLSService);
+    const mockedDb = await openDB('core-test-db');
+
+    const conversationService = new ConversationService(client, mockedProteusService, mockedDb, mockedMLSService);
 
     jest.spyOn(conversationService, 'joinByExternalCommit');
     jest.spyOn(conversationService, 'emit');
@@ -138,7 +141,7 @@ describe('ConversationService', () => {
     ];
     messages.forEach(({type, message}) => {
       it(`calls callbacks when sending '${type}' message is successful`, async () => {
-        const [conversationService] = buildConversationService();
+        const [conversationService] = await buildConversationService();
         const sentTime = new Date().toISOString();
 
         mockedProteusService.sendMessage = jest.fn().mockResolvedValue({sentAt: sentTime});
@@ -167,7 +170,7 @@ describe('ConversationService', () => {
     ];
     messages.forEach(({type, message}) => {
       it(`calls callbacks when sending '${type}' message is starting and successful`, async () => {
-        const [conversationService] = buildConversationService();
+        const [conversationService] = await buildConversationService();
         const promise = conversationService.send({
           protocol: ConversationProtocol.MLS,
           groupId,
@@ -181,7 +184,7 @@ describe('ConversationService', () => {
     });
 
     it('rejoins a MLS group when failed encrypting MLS message', async () => {
-      const [conversationService, {apiClient, mlsService}] = buildConversationService();
+      const [conversationService, {apiClient, mlsService}] = await buildConversationService();
 
       const mockGroupId = 'AAEAAH87aajaQ011i+rNLmwpy0sAZGl5YS53aXJlamxpbms=';
       const mockConversationId = {id: 'mockConversationId', domain: 'staging.zinfra.io'};
@@ -234,7 +237,7 @@ describe('ConversationService', () => {
     };
 
     it('re-joins multiple not-established conversations', async () => {
-      const [conversationService, {apiClient}] = buildConversationService();
+      const [conversationService, {apiClient}] = await buildConversationService();
 
       const remoteEpoch = 1;
 
@@ -252,7 +255,7 @@ describe('ConversationService', () => {
     });
 
     it('re-joins multiple conversations when mismatches detected', async () => {
-      const [conversationService, {apiClient, mlsService}] = buildConversationService();
+      const [conversationService, {apiClient, mlsService}] = await buildConversationService();
 
       const mlsConversation1 = createConversation(1, 'conversation1');
       const mlsConversation2 = createConversation(1, 'conversation2');
@@ -269,7 +272,7 @@ describe('ConversationService', () => {
     });
 
     it("does not re-join when there's no mismatch", async () => {
-      const [conversationService, {apiClient, mlsService}] = buildConversationService();
+      const [conversationService, {apiClient, mlsService}] = await buildConversationService();
 
       const mlsConversation = createConversation(1);
 
@@ -288,7 +291,7 @@ describe('ConversationService', () => {
 
   describe('establishMLS1to1Conversation', () => {
     it('only returns a conversation if a group is already established on backend and locally', async () => {
-      const [conversationService, {apiClient, mlsService}] = buildConversationService();
+      const [conversationService, {apiClient, mlsService}] = await buildConversationService();
 
       const mockConversationId = {id: 'mock-conversation-id', domain: 'staging.zinfra.io'};
       const mockGroupId = 'mock-group-id';
@@ -314,7 +317,7 @@ describe('ConversationService', () => {
     });
 
     it('joins with an external commit if a group is already established on backend but not established locally', async () => {
-      const [conversationService, {apiClient, mlsService}] = buildConversationService();
+      const [conversationService, {apiClient, mlsService}] = await buildConversationService();
 
       const mockConversationId = {id: 'mock-conversation-id', domain: 'staging.zinfra.io'};
       const mockGroupId = 'mock-group-id';
@@ -355,7 +358,7 @@ describe('ConversationService', () => {
     });
 
     it('wipes the conversation and registers it if a group is not yet established on backend', async () => {
-      const [conversationService, {apiClient, mlsService}] = buildConversationService();
+      const [conversationService, {apiClient, mlsService}] = await buildConversationService();
 
       const mockConversationId = {id: 'mock-conversation-id', domain: 'staging.zinfra.io'};
       const mockGroupId = 'mock-group-id';
@@ -397,7 +400,7 @@ describe('ConversationService', () => {
     });
 
     it('retries to register the conversation after it has failed for the first time', async () => {
-      const [conversationService, {apiClient, mlsService}] = buildConversationService();
+      const [conversationService, {apiClient, mlsService}] = await buildConversationService();
 
       const mockConversationId = {id: 'mock-conversation-id', domain: 'staging.zinfra.io'};
       const mockGroupId = 'mock-group-id';
@@ -450,7 +453,7 @@ describe('ConversationService', () => {
 
   describe('handleEvent', () => {
     it('rejoins a MLS conversation if epoch mismatch detected when decrypting mls message', async () => {
-      const [conversationService, {apiClient, mlsService}] = buildConversationService();
+      const [conversationService, {apiClient, mlsService}] = await buildConversationService();
       const conversationId = {id: 'conversationId', domain: 'staging.zinfra.io'};
       const mockGroupId = 'mock-group-id';
 
@@ -480,9 +483,51 @@ describe('ConversationService', () => {
     });
   });
 
+  describe('getConversations', () => {
+    it('returns a list of conversations by conversation ids', async () => {
+      const [conversationService, {apiClient}] = await buildConversationService();
+      const conversationIds = Array.from({length: 10}, () => ({id: PayloadHelper.getUUID(), domain: 'test.zinfra.io'}));
+      jest.spyOn(apiClient.api.conversation, 'getConversationsByQualifiedIds').mockResolvedValueOnce({
+        found: conversationIds as unknown as Conversation[],
+      });
+
+      const conversations = await conversationService.getConversations(conversationIds);
+      expect(conversations.found?.length).toBe(conversationIds.length);
+    });
+
+    it('returns a full list of conversations if a list of conversations is not provided', async () => {
+      const [conversationService, {apiClient}] = await buildConversationService();
+
+      jest.spyOn(apiClient.api.conversation, 'getConversationList').mockImplementation(jest.fn());
+
+      await conversationService.getConversations();
+
+      expect(apiClient.api.conversation.getConversationList).toHaveBeenCalled();
+    });
+
+    it('includes a list of ids to skip if they exist in db store', async () => {
+      const [conversationService, {apiClient}] = await buildConversationService();
+
+      const conversationIdsToSkip = Array.from({length: 2}, () => ({
+        id: PayloadHelper.getUUID(),
+        domain: 'test.zinfra.io',
+      }));
+
+      conversationIdsToSkip.forEach(conversationService.blacklistConversation);
+
+      jest.spyOn(apiClient.api.conversation, 'getConversationList').mockImplementation(jest.fn());
+
+      await conversationService.getConversations();
+
+      expect(apiClient.api.conversation.getConversationList).toHaveBeenCalledWith(
+        expect.arrayContaining(conversationIdsToSkip),
+      );
+    });
+  });
+
   describe('fetchAllParticipantsClients', () => {
     it('gives the members and clients of a federated conversation', async () => {
-      const [conversationService, {apiClient}] = buildConversationService();
+      const [conversationService, {apiClient}] = await buildConversationService();
       jest.spyOn(apiClient.api.conversation, 'getConversation').mockResolvedValue({
         members: {
           others: [
@@ -511,7 +556,7 @@ describe('ConversationService', () => {
 
   describe('addUsersToMLSConversation', () => {
     it('should claim key packages for all the users and add them to the group', async () => {
-      const [conversationService, {apiClient, mlsService}] = buildConversationService();
+      const [conversationService, {apiClient, mlsService}] = await buildConversationService();
 
       const mockGroupId = 'groupId';
       const mockConversationId = {id: PayloadHelper.getUUID(), domain: 'local.wire.com'};
@@ -551,7 +596,7 @@ describe('ConversationService', () => {
 
   describe('tryEstablishingMLSGroup', () => {
     it('should add all the users to a MLS group after group was established by the self client', async () => {
-      const [conversationService, {apiClient, mlsService}] = buildConversationService();
+      const [conversationService, {apiClient, mlsService}] = await buildConversationService();
       const selfUserId = {id: 'self-user-id', domain: 'local.wire.com'};
 
       const mockConversationId = {id: PayloadHelper.getUUID(), domain: 'local.wire.com'};
@@ -580,7 +625,7 @@ describe('ConversationService', () => {
     });
 
     it('should not add any users if MLS group was not established by the self client', async () => {
-      const [conversationService, {mlsService}] = buildConversationService();
+      const [conversationService, {mlsService}] = await buildConversationService();
       const selfUserId = {id: 'self-user-id', domain: 'local.wire.com'};
 
       const mockConversationId = {id: PayloadHelper.getUUID(), domain: 'local.wire.com'};
