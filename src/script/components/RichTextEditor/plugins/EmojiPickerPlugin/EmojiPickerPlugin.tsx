@@ -48,7 +48,7 @@ const TRIGGER = ':';
  * @param text the text in which to look for emoji triggers
  */
 function checkForEmojis(text: string): MenuTextMatch | null {
-  const match = new RegExp(`(^| )(${TRIGGER}([\\w ]+))$`).exec(text);
+  const match = new RegExp(`(^| )(${TRIGGER}([\\w +\-]+))$`).exec(text);
 
   if (match === null) {
     return null;
@@ -145,21 +145,14 @@ export function EmojiPickerPlugin({openStateRef}: Props) {
 
   const options: Array<EmojiOption> = useMemo(() => {
     const filteredEmojis = emojiOptions.filter((emoji: EmojiOption) => {
-      if (queryString == null) {
-        return false;
-      }
-
-      const expectedWords = (queryString.match(/\s/g) || []).length + 1;
-      const emojiNameWords = emoji.keywords.flatMap(keyword => keyword.split(' '));
-
-      if (emojiNameWords.length < expectedWords) {
+      if (queryString === null) {
         return false;
       }
 
       const queryWords = queryString.split('_');
 
       return queryWords.every(queryWord => {
-        return emojiNameWords.some(emojiNameWord => emojiNameWord.startsWith(queryWord));
+        return emoji.keywords.some(emojiNameWord => emojiNameWord.startsWith(queryWord));
       });
     });
 
