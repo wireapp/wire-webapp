@@ -66,7 +66,7 @@ import {
   AddUsersToProteusConversationParams,
   SendProteusMessageParams,
 } from '../../messagingProtocols/proteus/ProteusService/ProteusService.types';
-import {HandledEventPayload} from '../../notification';
+import {HandledEventPayload, HandledEventResult} from '../../notification';
 import {CoreDatabase} from '../../storage/CoreDB';
 import {isMLSConversation} from '../../util';
 import {mapQualifiedUserClientIdsToFullyQualifiedClientIds} from '../../util/fullyQualifiedClientIdUtils';
@@ -673,16 +673,34 @@ export class ConversationService extends TypedEventEmitter<Events> {
     return this.proteusService.handleOtrMessageAddEvent(event);
   }
 
-  public async handleEvent(event: BackendEvent): Promise<HandledEventPayload | null> {
-    switch (event.type) {
-      case CONVERSATION_EVENT.MLS_MESSAGE_ADD:
-        return this.handleMLSMessageAddEvent(event);
-      case CONVERSATION_EVENT.MLS_WELCOME_MESSAGE:
-        return this.handleMLSWelcomeMessageEvent(event);
-      case CONVERSATION_EVENT.OTR_MESSAGE_ADD:
-        return this.handleOtrMessageAddEvent(event);
+  private async isConversationBlacklisted(conversationId: string): Promise<boolean> {
+    const foundEntry = await this.coreDatabase.get('conversationBlacklist', conversationId);
+    return !!foundEntry;
+  }
+
+  /**
+   * Will process one conversation event
+   * @param event The backend event to process
+   * @return Event handling status (if handled successfully also the decrypted payload and the raw event)
+   */
+  public async handleEvent(event: BackendEvent): Promise<HandledEventResult> {
+    if ('conversation' in event) {
+      const isBlacklisted = await this.isConversationBlacklisted(event.conversation);
+      if (isBlacklisted) {
+        this.logger.info(`Conversation ${event.conversation} is blacklisted, ignoring event ${event.type}`);
+        return {status: 'ignored'};
+      }
     }
 
-    return null;
+    switch (event.type) {
+      case CONVERSATION_EVENT.MLS_MESSAGE_ADD:
+        return {status: 'handled', payload: await this.handleMLSMessageAddEvent(event)};
+      case CONVERSATION_EVENT.MLS_WELCOME_MESSAGE:
+        return {status: 'handled', payload: await this.handleMLSWelcomeMessageEvent(event)};
+      case CONVERSATION_EVENT.OTR_MESSAGE_ADD:
+        return {status: 'handled', payload: await this.handleOtrMessageAddEvent(event)};
+    }
+
+    return {status: 'unhandled'};
   }
 }

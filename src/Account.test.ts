@@ -230,7 +230,10 @@ describe('Account', () => {
 
       jest.spyOn(apiClient, 'connect').mockImplementation();
       jest.spyOn(account.service!.notification as any, 'handleEvent').mockReturnValue({
-        event: {type: CONVERSATION_EVENT.OTR_MESSAGE_ADD},
+        status: 'handled',
+        payload: {
+          event: {type: CONVERSATION_EVENT.OTR_MESSAGE_ADD},
+        },
       });
 
       const kill = await account.listen({
