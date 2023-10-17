@@ -110,7 +110,8 @@ describe('MemberMessage', () => {
 
       const {getByText, container} = render(<MemberMessage {...props} />);
 
-      expect(container.querySelectorAll('strong')).toHaveLength(CONFIG.REDUCED_USERS_COUNT);
+      // We expect to see the first 15 users + the user that created the conversation
+      expect(container.querySelectorAll('strong')).toHaveLength(CONFIG.REDUCED_USERS_COUNT + 1);
       const showMoreButton = getByText(`${nbUsers - CONFIG.REDUCED_USERS_COUNT} more`);
       showMoreButton.click();
 
