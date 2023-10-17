@@ -87,6 +87,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
     hasLegalHold,
     display_name: displayName,
     verification_state: verificationState,
+    mlsVerificationState,
   } = useKoSubscribableChildren(conversation, [
     'is1to1',
     'isRequest',
@@ -100,6 +101,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
     'hasLegalHold',
     'display_name',
     'verification_state',
+    'mlsVerificationState',
   ]);
 
   const {isActivatedAccount} = useKoSubscribableChildren(selfUser, ['isActivatedAccount']);
@@ -273,8 +275,8 @@ export const TitleBar: React.FC<TitleBarProps> = ({
 
             <VerificationBadges
               conversationProtocol={conversation.protocol}
-              // This one comparing was in Icon.Verified - old verified badge displaying
               isProteusVerified={verificationState === ConversationVerificationState.VERIFIED}
+              isMLSVerified={mlsVerificationState === ConversationVerificationState.VERIFIED}
             />
           </div>
 

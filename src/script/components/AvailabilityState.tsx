@@ -43,6 +43,7 @@ interface AvailabilityStateProps {
   theme?: boolean;
   showBadges?: boolean;
   isProteusVerified?: boolean;
+  isMLSVerified?: boolean;
 }
 
 const iconStyles: CSSObject = {
@@ -71,6 +72,7 @@ export const AvailabilityState: React.FC<AvailabilityStateProps> = ({
   onClick,
   showBadges = false,
   isProteusVerified = false,
+  isMLSVerified = false,
 }) => {
   const isAvailable = availability === Availability.Type.AVAILABLE;
   const isAway = availability === Availability.Type.AWAY;
@@ -135,7 +137,7 @@ export const AvailabilityState: React.FC<AvailabilityStateProps> = ({
 
       {selfString && <span css={selfIndicator}>{selfString}</span>}
 
-      {showBadges && <VerificationBadges isProteusVerified={isProteusVerified} />}
+      {showBadges && <VerificationBadges isProteusVerified={isProteusVerified} isMLSVerified={isMLSVerified} />}
 
       {showArrow && (
         <span

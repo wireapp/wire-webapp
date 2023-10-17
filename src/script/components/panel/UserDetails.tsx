@@ -62,6 +62,7 @@ const UserDetailsComponent: React.FC<UserDetailsProps> = ({
     'availability',
     'is_verified',
     'isAvailable',
+    'isMLSVerified',
   ]);
 
   useEffect(() => {
@@ -83,6 +84,7 @@ const UserDetailsComponent: React.FC<UserDetailsProps> = ({
             dataUieName="status-name"
             showBadges
             isProteusVerified={isSelfVerified && user.is_verified}
+            isMLSVerified={user.isMLSVerified}
           />
         ) : (
           <h2

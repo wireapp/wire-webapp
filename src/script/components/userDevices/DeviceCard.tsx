@@ -24,6 +24,7 @@ import cx from 'classnames';
 
 import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
 import {VerificationBadges} from 'src/script/components/VerificationBadges';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {splitFingerprint} from 'Util/StringUtil';
@@ -51,7 +52,8 @@ const DeviceCard: React.FC<DeviceCardProps> = ({
   const {class: deviceClass = '?', id = '', label = '?', meta} = clientEntity;
   const name = clientEntity.getName();
   const clickable = !!click;
-  const isVerified = meta.isVerified;
+  const {isVerified, isMLSVerified} = useKoSubscribableChildren(meta, ['isVerified', 'isMLSVerified']);
+
   const mlsFingerprint = clientEntity.mlsPublicKeys?.[MLSPublicKeys.ED25519];
 
   const showLegalHoldIcon = showIcon && deviceClass === ClientClassification.LEGAL_HOLD;
@@ -83,7 +85,13 @@ const DeviceCard: React.FC<DeviceCardProps> = ({
         <div className="device-card__name">
           <span className="device-card__model">{name}</span>
 
-          {showVerified && <VerificationBadges isMLSVerified isProteusVerified={!!isVerified && isVerified()} />}
+          {showVerified && (
+            <VerificationBadges
+              conversationProtocol={undefined}
+              isMLSVerified={isMLSVerified}
+              isProteusVerified={isVerified}
+            />
+          )}
         </div>
 
         {mlsFingerprint && (

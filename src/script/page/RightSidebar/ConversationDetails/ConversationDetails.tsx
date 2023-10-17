@@ -104,7 +104,6 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       verification_state: verificationState,
       isGroup,
       removed_from_conversation: removedFromConversation,
-      display_name: displayName,
       notificationState,
       hasGlobalMessageTimer,
       globalMessageTimer,
@@ -122,7 +121,6 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       'verification_state',
       'isGroup',
       'removed_from_conversation',
-      'display_name',
       'notificationState',
       'hasGlobalMessageTimer',
       'globalMessageTimer',
@@ -326,14 +324,12 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
               <ConversationDetailsHeader
                 isActiveGroupParticipant={isActiveGroupParticipant}
                 canRenameGroup={canRenameGroup}
-                displayName={displayName}
                 updateConversationName={updateConversationName}
-                isGroup={isGroup}
                 userParticipants={userParticipants}
                 serviceParticipants={serviceParticipants}
                 allUsersCount={allUsersCount}
                 isTeam={isTeam}
-                conversationProtocol={activeConversation.protocol}
+                conversation={activeConversation}
               />
 
               {showTopActions && showActionAddParticipants && (
