@@ -41,7 +41,7 @@ const TRIGGER = '@';
  * @param text the text in which to look for mentions triggers
  */
 function checkForMentions(text: string): MenuTextMatch | null {
-  const match = new RegExp(`(^|[^\\w])(${TRIGGER}([\\w ]*))$`).exec(text);
+  const match = new RegExp(`(^| )(${TRIGGER}([\\w ]*))$`).exec(text);
 
   if (match === null) {
     return null;
