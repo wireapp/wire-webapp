@@ -434,7 +434,7 @@ export class Account extends TypedEventEmitter<Events> {
     const connectionService = new ConnectionService(this.apiClient);
     const giphyService = new GiphyService(this.apiClient);
     const linkPreviewService = new LinkPreviewService(assetService);
-    const conversationService = new ConversationService(this.apiClient, proteusService, mlsService);
+    const conversationService = new ConversationService(this.apiClient, proteusService, this.db, mlsService);
     const notificationService = new NotificationService(this.apiClient, this.storeEngine, conversationService);
 
     const selfService = new SelfService(this.apiClient);
