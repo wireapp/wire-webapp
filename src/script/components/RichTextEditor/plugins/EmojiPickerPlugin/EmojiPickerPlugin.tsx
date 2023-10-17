@@ -21,7 +21,6 @@ import {MutableRefObject, useCallback, useMemo, useState} from 'react';
 
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {
-  LexicalTypeaheadMenuPlugin,
   MenuOption,
   MenuRenderFn,
   MenuTextMatch,
@@ -32,6 +31,7 @@ import emojiList from 'emoji-picker-react/src/data/emojis.json';
 import {$createTextNode, $getSelection, $isRangeSelection, TextNode} from 'lexical';
 import * as ReactDOM from 'react-dom';
 
+import {TypeaheadMenuPlugin} from 'Components/RichTextEditor/plugins/TypeaheadMenuPlugin';
 import {loadValue, storeValue} from 'Util/StorageUtil';
 import {sortByPriority} from 'Util/StringUtil';
 
@@ -247,12 +247,13 @@ export function EmojiPickerPlugin({openStateRef}: Props) {
   openStateRef.current = options.length > 0;
 
   return (
-    <LexicalTypeaheadMenuPlugin
+    <TypeaheadMenuPlugin
       onQueryChange={setQueryString}
       onSelectOption={onSelectOption}
       triggerFn={checkForEmojiPickerMatch}
       options={options}
       menuRenderFn={menuRender}
+      containerId="emoji-typeahead-menu"
     />
   );
 }

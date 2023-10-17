@@ -32,7 +32,7 @@ import {MentionSuggestionsItem} from './MentionSuggestionsItem';
 import {User} from '../../../../entity/User';
 import {$createMentionNode} from '../../nodes/MentionNode';
 import {getSelectionInfo} from '../../utils/getSelectionInfo';
-import {ReverseTypeaheadMenuPlugin} from '../ReverseTypeaheadMenuPlugin';
+import {TypeaheadMenuPlugin} from '../TypeaheadMenuPlugin';
 
 const TRIGGER = '@';
 
@@ -160,12 +160,14 @@ export function MentionsPlugin({onSearch, openStateRef}: MentionsPluginProps) {
   openStateRef.current = options.length > 0;
 
   return (
-    <ReverseTypeaheadMenuPlugin
+    <TypeaheadMenuPlugin
       onQueryChange={setQueryString}
       onSelectOption={handleSelectOption}
       triggerFn={checkForMentionMatch}
       options={options}
       menuRenderFn={menuRenderFn}
+      containerId="mentions-typeahead-menu"
+      isReversed
     />
   );
 }
