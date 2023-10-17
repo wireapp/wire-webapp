@@ -18,7 +18,7 @@
  */
 
 export enum ConversationVerificationState {
-  DEGRADED = 'degraded',
-  UNVERIFIED = 'unverified',
-  VERIFIED = 'verified',
+  DEGRADED = 2,
+  UNVERIFIED = 0,
+  VERIFIED = 1,
 }

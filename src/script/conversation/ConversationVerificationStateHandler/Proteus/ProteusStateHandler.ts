@@ -188,7 +188,7 @@ export class ProteusConversationVerificationStateHandler {
         logger: this.logger,
       });
 
-      if (conversationVerificationState) {
+      if (conversationVerificationState !== undefined) {
         /**
          * TEMPORARY DEBUGGING FIX:
          * We have seen conversations in a degraded state without an unverified device in there.
