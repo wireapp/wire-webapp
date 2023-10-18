@@ -90,7 +90,16 @@ const Conversations: React.FC<ConversationsProps> = ({
     availability: userAvailability,
     isOnLegalHold,
     hasPendingLegalHold,
-  } = useKoSubscribableChildren(selfUser, ['hasPendingLegalHold', 'isOnLegalHold', 'name', 'availability']);
+    isMLSVerified,
+    is_verified: isProteusVerified,
+  } = useKoSubscribableChildren(selfUser, [
+    'hasPendingLegalHold',
+    'isOnLegalHold',
+    'name',
+    'availability',
+    'isMLSVerified',
+    'is_verified',
+  ]);
   const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
   const {connectRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
@@ -182,6 +191,8 @@ const Conversations: React.FC<ConversationsProps> = ({
               dataUieName="status-availability"
               label={userName}
               showBadges
+              isMLSVerified={isMLSVerified}
+              isProteusVerified={isProteusVerified}
             />
           </button>
 

@@ -210,7 +210,7 @@ export class User {
       return this.devices().every(client_et => client_et.meta.isVerified?.());
     });
     this.isMLSVerified = ko.pureComputed(() => {
-      if (this.devices().length === 0 && !this.isMe) {
+      if (this.devices().length === 0) {
         return false;
       }
       return this.devices().every(client_et => client_et.meta.isMLSVerified?.());

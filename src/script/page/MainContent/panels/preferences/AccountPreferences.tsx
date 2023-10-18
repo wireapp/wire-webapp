@@ -99,6 +99,7 @@ export const AccountPreferences = ({
     managedBy,
     phone,
     is_verified: isVerified,
+    isMLSVerified,
   } = useKoSubscribableChildren(selfUser, [
     'name',
     'email',
@@ -107,6 +108,7 @@ export const AccountPreferences = ({
     'managedBy',
     'phone',
     'is_verified',
+    'isMLSVerified',
   ]);
 
   const canEditProfile = managedBy === User.CONFIG.MANAGED_BY.WIRE;
@@ -153,7 +155,7 @@ export const AccountPreferences = ({
             {name}
           </h3>
 
-          <VerificationBadges isProteusVerified={isVerified} />
+          <VerificationBadges isProteusVerified={isVerified} isMLSVerified={isMLSVerified} />
         </div>
 
         <div className="preferences-account-image">
