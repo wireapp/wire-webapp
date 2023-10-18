@@ -384,7 +384,10 @@ export class BackupRepository {
     }
 
     await this.conversationRepository.updateConversations(importedConversations);
-    await Promise.all(this.conversationRepository.mapConnections(this.connectionState.connections()));
+    await this.conversationRepository.init1To1Conversations(
+      this.connectionState.connections(),
+      this.conversationRepository.getAllLocalConversations(),
+    );
     // doesn't need to be awaited
     void this.conversationRepository.checkForDeletedConversations();
   }
