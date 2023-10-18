@@ -326,6 +326,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
 
     if (hasSupportedProtocolsChanged) {
       const user = await this.getUserById(userId);
+      await this.updateUserSupportedProtocols(user, newSupportedProtocols);
       this.emit('supportedProtocolsUpdated', {user, supportedProtocols: newSupportedProtocols});
     }
   }
