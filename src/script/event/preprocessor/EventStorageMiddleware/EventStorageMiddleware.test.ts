@@ -148,6 +148,15 @@ describe('EventStorageMiddleware', () => {
       expect(eventService.replaceEvent).toHaveBeenCalled();
     });
 
+    it('saves a link preview even if the original message is not found', async () => {
+      const [eventStorageMiddleware, {eventService}] = buildEventStorageMiddleware();
+      const event = createMessageAddEvent({dataOverrides: {previews: ['1']}});
+
+      await eventStorageMiddleware.processEvent(event);
+      expect(eventService.replaceEvent).not.toHaveBeenCalled();
+      expect(eventService.saveEvent).toHaveBeenCalled();
+    });
+
     it('ignores edit message with missing associated original message', async () => {
       const [eventStorageMiddleware, {eventService}] = buildEventStorageMiddleware();
       const linkPreviewEvent = createMessageAddEvent();

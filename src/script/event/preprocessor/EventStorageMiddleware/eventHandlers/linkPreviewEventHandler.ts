@@ -52,7 +52,7 @@ function validateLinkPreviewEvent(
   }
   if (!originalEvent) {
     // It is fine to receive a linkPreview message without the original event
-    return true;
+    return false;
   }
   if (originalEvent.type !== ClientEvent.CONVERSATION.MESSAGE_ADD) {
     throw new EventValidationError('Link preview event for non-text message');
@@ -78,10 +78,6 @@ function computeEventUpdates(originalEvent: StoredEvent<MessageAddEvent>, newEve
 
 export const handleLinkPreviewEvent: EventHandler = async (event, {duplicateEvent}) => {
   if (event.type !== CONVERSATION.MESSAGE_ADD) {
-    return undefined;
-  }
-  const eventId = 'id' in event && (event.id as string);
-  if (!eventId) {
     return undefined;
   }
   if (validateLinkPreviewEvent(duplicateEvent, event)) {

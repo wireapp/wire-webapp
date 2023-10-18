@@ -76,7 +76,7 @@ function computeEventUpdates(
       const selfCancel = !fromOther && newEvent.data.reason === ProtobufAsset.NotUploaded.CANCELLED;
       // we want to delete the event in the case of an error from the remote client or a cancel on the user's own client
       const shouldDeleteEvent = (fromOther || selfCancel) && sameSender;
-      if (shouldDeleteEvent && 'id' in newEvent && typeof newEvent.id === 'string') {
+      if (shouldDeleteEvent) {
         return {type: 'delete', event: newEvent, id: newEvent.id};
       }
 

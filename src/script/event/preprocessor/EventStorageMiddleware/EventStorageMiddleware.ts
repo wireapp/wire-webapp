@@ -41,7 +41,7 @@ export class EventStorageMiddleware implements EventMiddleware {
     if (!shouldSaveEvent) {
       return event;
     }
-    const eventId = 'id' in event && (event.id as string);
+    const eventId = 'id' in event && event.id;
     const duplicateEvent = eventId ? await this.eventService.loadEvent(event.conversation, eventId) : undefined;
 
     this.validateEvent(event, duplicateEvent);
