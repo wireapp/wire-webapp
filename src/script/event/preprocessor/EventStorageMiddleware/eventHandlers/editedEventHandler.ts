@@ -76,7 +76,8 @@ export const handleEditEvent: EventHandler = async (event, {findEvent}) => {
   }
   const originalEvent = await findEvent(editedEventId);
   if (validateEditEvent(originalEvent, event)) {
-    return {type: 'update', event, updates: computeEventUpdates(originalEvent, event)};
+    const updatedEvent = computeEventUpdates(originalEvent, event);
+    return {type: 'update', event: updatedEvent, updates: updatedEvent};
   }
   return undefined;
 };

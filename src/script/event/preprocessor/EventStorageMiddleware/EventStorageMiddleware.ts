@@ -18,9 +18,9 @@
  */
 
 import {User} from 'src/script/entity/User';
-import {EventError} from 'src/script/error/EventError';
 
 import {handleLinkPreviewEvent, handleEditEvent, handleAssetEvent} from './eventHandlers';
+import {EventValidationError} from './eventHandlers/EventValidationError';
 import {HandledEvents, DBOperation} from './types';
 
 import {isEventRecordFailed, isEventRecordWithFederationError} from '../../../message/StatusType';
@@ -69,11 +69,11 @@ export class EventStorageMiddleware implements EventMiddleware {
       return;
     }
     if (duplicateEvent.from !== event.from) {
-      this.throwValidationError('ID previously used by another user');
+      throw new EventValidationError('ID previously used by another user');
     }
 
     if (event.type !== duplicateEvent.type) {
-      this.throwValidationError('ID already used for a different type of message');
+      throw new EventValidationError('ID already used for a different type of message');
     }
 
     if (event.type === CONVERSATION.MESSAGE_ADD && duplicateEvent.type === CONVERSATION.MESSAGE_ADD) {
@@ -81,7 +81,7 @@ export class EventStorageMiddleware implements EventMiddleware {
       const isRetryAttempt = isEventRecordFailed(duplicateEvent) || isEventRecordWithFederationError(duplicateEvent);
 
       if (!isValidUpdate && !isRetryAttempt) {
-        return this.throwValidationError('ID already used for a successfully sent message');
+        throw new EventValidationError('ID already used for a successfully sent message');
       }
     }
   }
@@ -92,15 +92,12 @@ export class EventStorageMiddleware implements EventMiddleware {
         return this.eventService.saveEvent(operation.event);
 
       case 'update':
-        return this.eventService.replaceEvent(operation.updates);
+        await this.eventService.replaceEvent(operation.updates);
+        break;
 
       case 'delete':
         await this.eventService.deleteEvent(conversationId, operation.id);
-        return operation.event;
     }
-  }
-
-  private throwValidationError(errorMessage: string): never {
-    throw new EventError(EventError.TYPE.VALIDATION_FAILED, `Event validation failed: ${errorMessage}`);
+    return operation.event;
   }
 }

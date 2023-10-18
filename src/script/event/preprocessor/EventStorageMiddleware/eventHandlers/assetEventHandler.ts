@@ -21,15 +21,12 @@ import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';
 import {AssetAddEvent} from 'src/script/conversation/EventBuilder';
-import {EventError} from 'src/script/error/EventError';
 import {StoredEvent} from 'src/script/storage';
+
+import {EventValidationError} from './EventValidationError';
 
 import {CONVERSATION, ClientEvent} from '../../../Client';
 import {DBOperation, EventHandler, HandledEvents} from '../types';
-
-function throwValidationError(message: string): never {
-  throw new EventError(EventError.TYPE.VALIDATION_FAILED, `Event validation failed: ${message}`);
-}
 
 function validateAssetEvent(originalEvent: HandledEvents | undefined): originalEvent is StoredEvent<AssetAddEvent> {
   if (!originalEvent) {
@@ -37,7 +34,7 @@ function validateAssetEvent(originalEvent: HandledEvents | undefined): originalE
   }
 
   if (originalEvent.type !== ClientEvent.CONVERSATION.ASSET_ADD) {
-    throwValidationError('Trying to update a non-asset message as an asset message');
+    throw new EventValidationError('Trying to update a non-asset message as an asset message');
   }
 
   return true;
@@ -83,18 +80,19 @@ function computeEventUpdates(
         return {type: 'delete', event: newEvent, id: newEvent.id};
       }
 
+      const updatedEvent = updateEventData({
+        status: AssetTransferState.UPLOAD_FAILED,
+        reason: newEvent.data.reason ?? ProtobufAsset.NotUploaded.FAILED,
+      });
       return {
         type: 'update',
-        event: newEvent,
-        updates: updateEventData({
-          status: AssetTransferState.UPLOAD_FAILED,
-          reason: newEvent.data.reason ?? ProtobufAsset.NotUploaded.FAILED,
-        }),
+        event: updatedEvent,
+        updates: updatedEvent,
       };
     }
 
     default: {
-      throwValidationError(`Unhandled asset status update '${newEvent.data.status}'`);
+      throw new EventValidationError(`Unhandled asset status update '${newEvent.data.status}'`);
     }
   }
 }

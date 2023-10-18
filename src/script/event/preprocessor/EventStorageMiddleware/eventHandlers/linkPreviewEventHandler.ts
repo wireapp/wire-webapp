@@ -18,18 +18,14 @@
  */
 
 import {MessageAddEvent} from 'src/script/conversation/EventBuilder';
-import {EventError} from 'src/script/error/EventError';
 import {categoryFromEvent} from 'src/script/message/MessageCategorization';
 import {StoredEvent} from 'src/script/storage';
 
+import {EventValidationError} from './EventValidationError';
 import {getCommonMessageUpdates} from './getCommonMessageUpdates';
 
 import {CONVERSATION, ClientEvent} from '../../../Client';
 import {EventHandler, HandledEvents} from '../types';
-
-function throwValidationError(message: string): never {
-  throw new EventError(EventError.TYPE.VALIDATION_FAILED, `Event validation failed: ${message}`);
-}
 
 function getLinkPreviewUpdates(originalEvent: StoredEvent<MessageAddEvent>, newEvent: MessageAddEvent) {
   const commonUpdates = getCommonMessageUpdates(originalEvent, newEvent);
@@ -59,16 +55,16 @@ function validateLinkPreviewEvent(
     return true;
   }
   if (originalEvent.type !== ClientEvent.CONVERSATION.MESSAGE_ADD) {
-    throwValidationError('Link preview event for non-text message');
+    throw new EventValidationError('Link preview event for non-text message');
   }
 
   const {previews: originalPreviews, content: originalContent} = originalEvent.data;
   if (!!originalPreviews?.length) {
-    throwValidationError('Link preview already existing on original message');
+    throw new EventValidationError('Link preview already existing on original message');
   }
 
   if (content !== originalContent) {
-    throwValidationError('Link preview with different text content');
+    throw new EventValidationError('Link preview with different text content');
   }
   return true;
 }
@@ -89,7 +85,8 @@ export const handleLinkPreviewEvent: EventHandler = async (event, {duplicateEven
     return undefined;
   }
   if (validateLinkPreviewEvent(duplicateEvent, event)) {
-    return {type: 'update', event, updates: computeEventUpdates(duplicateEvent, event)};
+    const updatedEvent = computeEventUpdates(duplicateEvent, event);
+    return {type: 'update', event: updatedEvent, updates: updatedEvent};
   }
   return undefined;
 };
