@@ -63,6 +63,9 @@ export class SelfRepository extends TypedEventEmitter<Events> {
       if (event.name === FEATURE_KEY.MLS) {
         void this.handleMLSFeatureUpdate(event.data, prevFeatureList?.[FEATURE_KEY.MLS]);
       }
+      if (event.name === FEATURE_KEY.MLS_MIGRATION) {
+        void this.refreshSelfSupportedProtocols();
+      }
     });
   }
 
