@@ -23,6 +23,7 @@ import {WireIdentity} from '@wireapp/core/lib/messagingProtocols/mls';
 import {container} from 'tsyringe';
 
 import {ClientEntity} from 'src/script/client';
+import {ClientState} from 'src/script/client/ClientState';
 import {VerificationMessageType} from 'src/script/message/VerificationMessageType';
 import {Core} from 'src/script/service/CoreSingleton';
 import {Logger, getLogger} from 'Util/Logger';
@@ -43,6 +44,7 @@ export class MLSConversationVerificationStateHandler {
     private readonly onConversationVerificationStateChange: OnConversationVerificationStateChange,
     private readonly conversationState = container.resolve(ConversationState),
     private readonly core = container.resolve(Core),
+    private readonly clientState = container.resolve(ClientState),
   ) {
     this.logger = getLogger('MLSConversationVerificationStateHandler');
     // We need to check if the core service is available and if the e2eIdentity is available
@@ -104,7 +106,10 @@ export class MLSConversationVerificationStateHandler {
     const allClients: ClientEntity[] = [];
     const allIdentities: WireIdentity[] = [];
     userEntities.forEach(async userEntity => {
-      const devices = userEntity.devices();
+      let devices = userEntity.devices();
+      if (userEntity.isMe) {
+        devices = [...devices, ...[this.clientState.currentClient()]];
+      }
       const deviceUserPairs = devices
         .map(device => ({
           [device.id]: userEntity.qualifiedId,
@@ -170,6 +175,12 @@ export const registerMLSConversationVerificationStateHandler = (
   onConversationVerificationStateChange: OnConversationVerificationStateChange,
   conversationState?: ConversationState,
   core?: Core,
+  clientState?: ClientState,
 ): void => {
-  new MLSConversationVerificationStateHandler(onConversationVerificationStateChange, conversationState, core);
+  new MLSConversationVerificationStateHandler(
+    onConversationVerificationStateChange,
+    conversationState,
+    core,
+    clientState,
+  );
 };

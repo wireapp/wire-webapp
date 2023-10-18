@@ -22,10 +22,12 @@ import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import ko from 'knockout';
+import {container} from 'tsyringe';
 
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {ClientState} from 'src/script/client/ClientState';
 import {t} from 'Util/LocalizerUtil';
 import {clamp} from 'Util/NumberUtil';
 import {getFirstChar} from 'Util/StringUtil';
@@ -210,10 +212,14 @@ export class User {
       return this.devices().every(client_et => client_et.meta.isVerified?.());
     });
     this.isMLSVerified = ko.pureComputed(() => {
-      if (this.devices().length === 0 && !this.isMe) {
-        return false;
+      if (this.devices().length === 0) {
+        if (!this.isMe) {
+          return false;
+        }
+        const clientState = container.resolve(ClientState);
+        return clientState.currentClient().meta.isMLSVerified?.() ?? false;
       }
-      return this.devices().every(client_et => client_et.meta.isMLSVerified?.());
+      return this.devices().every(client_et => client_et.meta.isMLSVerified?.() ?? false);
     });
     this.isOnLegalHold = ko.pureComputed(() => {
       return this.devices().some(client_et => client_et.isLegalHold());

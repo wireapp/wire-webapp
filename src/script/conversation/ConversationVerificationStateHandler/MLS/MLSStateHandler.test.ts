@@ -20,7 +20,9 @@
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
 
 import {ClientEntity} from 'src/script/client';
+import {ClientState} from 'src/script/client/ClientState';
 import {Conversation} from 'src/script/entity/Conversation';
+import {User} from 'src/script/entity/User';
 import {Core} from 'src/script/service/CoreSingleton';
 import {createUuid} from 'Util/uuid';
 
@@ -39,19 +41,20 @@ describe('MLSConversationVerificationStateHandler', () => {
   let mockCore: jest.Mocked<Core>;
   const groupId = 'groupIdXYZ';
   const clientEntityId = 'clientIdXYZ';
-  const conversation: Conversation = new Conversation(uuid, '', ConversationProtocol.MLS);
+  const selfClientEntityId = 'selfClientIdXYZ';
   const clientEntity: ClientEntity = new ClientEntity(false, '', clientEntityId);
+  const selfClientEntity: ClientEntity = new ClientEntity(false, '', selfClientEntityId);
+  const conversation: Conversation = new Conversation(uuid, '', ConversationProtocol.MLS);
 
   beforeEach(() => {
     conversation.groupId = groupId;
-
     conversation.getAllUserEntities = jest.fn().mockReturnValue([
       {
         devices: () => [clientEntity],
       },
     ]);
-
     mockOnConversationVerificationStateChange = jest.fn();
+    // Mock the conversation state
     mockConversationState = {
       filteredConversations: () => [conversation],
     } as unknown as jest.Mocked<ConversationState>;
@@ -66,15 +69,24 @@ describe('MLSConversationVerificationStateHandler', () => {
               certificate: 'mockCertificate',
               clientId: clientEntityId,
             },
+            {
+              certificate: 'mockCertificate',
+              clientId: selfClientEntityId,
+            },
           ]),
         },
       },
     } as unknown as jest.Mocked<Core>;
+    // Mock the client state
+    const mockClientState = {
+      currentClient: () => selfClientEntity,
+    } as unknown as jest.Mocked<ClientState>;
 
     handler = new MLSConversationVerificationStateHandler(
       mockOnConversationVerificationStateChange,
       mockConversationState,
       mockCore,
+      mockClientState,
     );
 
     jest.clearAllMocks();
@@ -176,6 +188,26 @@ describe('MLSConversationVerificationStateHandler', () => {
       await (handler as any).checkEpoch(mockData); // Calling the private method
 
       expect(clientEntity.meta.isMLSVerified?.()).toBe(true);
+    });
+
+    it('should update selfClient isMLSVerified observable', async () => {
+      const mockData = {
+        groupId,
+        epoch: 12345,
+      };
+
+      const user = new User();
+      user.isMe = true;
+      conversation.getAllUserEntities = jest.fn().mockReturnValue([user]);
+
+      jest.spyOn(handler as any, 'isCertificateActiveAndValid').mockReturnValue(true);
+      jest.spyOn(handler as any, 'verifyConversation').mockImplementation(() => null);
+
+      expect(selfClientEntity.meta.isMLSVerified?.()).toBe(false);
+
+      await (handler as any).checkEpoch(mockData); // Calling the private method
+
+      expect(selfClientEntity.meta.isMLSVerified?.()).toBe(true);
     });
   });
 });
