@@ -1416,7 +1416,7 @@ export class ConversationRepository {
 
     this.logger.info('Moving events from proteus 1:1 conversation to MLS 1:1 conversation');
 
-    await Promise.all(
+    await Promise.allSettled(
       proteusConversations.map(proteusConversation =>
         this.eventService.moveEventsToConversation(proteusConversation.id, mlsConversation.id),
       ),
@@ -1459,14 +1459,13 @@ export class ConversationRepository {
 
     ConversationMapper.updateProperties(mlsConversation, updates);
 
-    await Promise.all(
-      proteusConversations.map(proteusConversation => {
+    await Promise.allSettled(
+      proteusConversations.map(async proteusConversation => {
         this.logger.info(`Deleting proteus 1:1 conversation ${proteusConversation.id}`);
-        return this.deleteConversationLocally(proteusConversation.qualifiedId, true);
+        await this.deleteConversationLocally(proteusConversation.qualifiedId, true);
+        return this.blacklistConversation(proteusConversation.qualifiedId);
       }),
     );
-
-    //TODO: maintain the list of retired proteus 1:1 conversations so they are not requested from backend anymore
   };
 
   public async blacklistConversation(conversationId: QualifiedId) {
