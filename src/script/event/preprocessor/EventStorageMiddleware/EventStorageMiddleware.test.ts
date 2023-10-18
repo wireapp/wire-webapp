@@ -20,15 +20,15 @@
 import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';
-import {MessageAddEvent} from 'src/script/conversation/EventBuilder';
+import {AssetAddEvent, MessageAddEvent} from 'src/script/conversation/EventBuilder';
 import {User} from 'src/script/entity/User';
 import {EventError} from 'src/script/error/EventError';
-import {EventRecord} from 'src/script/storage';
+import {StatusType} from 'src/script/message/StatusType';
 import {createUuid} from 'Util/uuid';
 
 import {EventStorageMiddleware} from './EventStorageMiddleware';
 
-import {ClientEvent} from '../../Client';
+import {ClientEvent, CONVERSATION} from '../../Client';
 import {EventService} from '../../EventService';
 
 function buildEventStorageMiddleware() {
@@ -43,7 +43,15 @@ function buildEventStorageMiddleware() {
   return [new EventStorageMiddleware(eventService, selfUser), {eventService, selfUser}] as const;
 }
 
-function createEvent(overwrite: Object = {}): MessageAddEvent {
+function toSavedEvent(event: MessageAddEvent | AssetAddEvent) {
+  return {
+    primary_key: '',
+    category: 1,
+    ...event,
+  };
+}
+
+function createMessageAddEvent(overrides: Object = {}): MessageAddEvent {
   const from = createUuid();
   return {
     conversation: createUuid(),
@@ -56,14 +64,33 @@ function createEvent(overwrite: Object = {}): MessageAddEvent {
     id: createUuid(),
     time: new Date().toISOString(),
     type: ClientEvent.CONVERSATION.MESSAGE_ADD,
-    ...overwrite,
+    status: StatusType.SENT,
+    ...overrides,
+  };
+}
+
+function createAssetAddEvent(overrides: Partial<AssetAddEvent> = {}): AssetAddEvent {
+  const from = createUuid();
+  return {
+    conversation: createUuid(),
+    data: {
+      content_type: '',
+      content_length: 0,
+      status: AssetTransferState.UPLOADING,
+      info: {name: 'test.png'},
+    },
+    from,
+    id: createUuid(),
+    time: new Date().toISOString(),
+    type: CONVERSATION.ASSET_ADD,
+    ...overrides,
   };
 }
 
 describe('EventStorageMiddleware', () => {
   describe('processEvent', () => {
     it('ignores unhandled event', async () => {
-      const event = createEvent({type: 'other'});
+      const event = createMessageAddEvent({type: 'other'});
       const [eventStorageMiddleware, {eventService}] = buildEventStorageMiddleware();
 
       await eventStorageMiddleware.processEvent(event);
@@ -71,7 +98,7 @@ describe('EventStorageMiddleware', () => {
     });
 
     it('saves an event with a new ID', async () => {
-      const event = createEvent();
+      const event = createMessageAddEvent();
       const [eventStorageMiddleware, {eventService}] = buildEventStorageMiddleware();
 
       await eventStorageMiddleware.processEvent(event);
@@ -79,10 +106,10 @@ describe('EventStorageMiddleware', () => {
     });
 
     it('fails for an event with an ID previously used by another user', async () => {
-      const event = createEvent();
+      const event = createMessageAddEvent();
       const [eventStorageMiddleware, {eventService}] = buildEventStorageMiddleware();
       const eventWithSameId = {...event, from: createUuid()};
-      eventService.loadEvent.mockResolvedValue(eventWithSameId);
+      eventService.loadEvent.mockResolvedValue({primary_key: '', category: 1, ...eventWithSameId});
 
       await expect(eventStorageMiddleware.processEvent(event)).rejects.toEqual(
         new EventError(
@@ -94,8 +121,8 @@ describe('EventStorageMiddleware', () => {
 
     it('fails for a non-"text message" with an ID previously used by the same user', async () => {
       const [eventStorageMiddleware, {eventService}] = buildEventStorageMiddleware();
-      const event = createEvent();
-      eventService.loadEvent.mockResolvedValue({...event, type: ClientEvent.CALL.E_CALL});
+      const event = createMessageAddEvent();
+      eventService.loadEvent.mockResolvedValue(toSavedEvent({...event, type: ClientEvent.CALL.E_CALL} as any));
 
       await expect(eventStorageMiddleware.processEvent(event)).rejects.toEqual(
         new EventError(
@@ -107,8 +134,8 @@ describe('EventStorageMiddleware', () => {
 
     it('fails for a plain text message with an ID previously used by the same user', async () => {
       const [eventStorageMiddleware, {eventService}] = buildEventStorageMiddleware();
-      const event = createEvent();
-      eventService.loadEvent.mockResolvedValue(event);
+      const event = createMessageAddEvent();
+      eventService.loadEvent.mockResolvedValue(toSavedEvent(event));
 
       await expect(eventStorageMiddleware.processEvent(event)).rejects.toEqual(
         new EventError(
@@ -120,9 +147,9 @@ describe('EventStorageMiddleware', () => {
 
     it('fails for a text message with link preview with an ID previously used by the same user for a text message with link preview', async () => {
       const [eventStorageMiddleware, {eventService}] = buildEventStorageMiddleware();
-      const event = createEvent();
-      const storedEvent = {...event, data: {...event.data, previews: [1]}};
-      eventService.loadEvent.mockResolvedValue(storedEvent);
+      const event = createMessageAddEvent();
+      const storedEvent = {...event, data: {...event.data, previews: ['1']}};
+      eventService.loadEvent.mockResolvedValue(toSavedEvent(storedEvent));
 
       await expect(eventStorageMiddleware.processEvent(event)).rejects.toEqual(
         new EventError(
@@ -134,11 +161,11 @@ describe('EventStorageMiddleware', () => {
 
     it('ignores a text message with link preview with an ID previously used by the same user for a text message different content', async () => {
       const [eventStorageMiddleware, {eventService}] = buildEventStorageMiddleware();
-      const event = createEvent();
-      const storedEvent = {...event, data: {...event.data, previews: []}};
-      eventService.loadEvent.mockResolvedValue(storedEvent);
+      const event = createMessageAddEvent();
+      const storedEvent = {...event, data: {...event.data, previews: [] as any[]}};
+      eventService.loadEvent.mockResolvedValue(toSavedEvent(storedEvent));
 
-      const newEvent = {...event, data: {...event.data, content: 'different content', previews: [1]}};
+      const newEvent = {...event, data: {...event.data, content: 'different content', previews: ['1']}};
 
       await expect(eventStorageMiddleware.processEvent(newEvent)).rejects.toEqual(
         new EventError(
@@ -150,17 +177,17 @@ describe('EventStorageMiddleware', () => {
 
     it('saves a text message with link preview with an ID previously used by the same user for a plain text message', async () => {
       const [eventStorageMiddleware, {eventService}] = buildEventStorageMiddleware();
-      const event = createEvent();
+      const event = createMessageAddEvent();
       const storedEvent = JSON.parse(JSON.stringify(event));
       eventService.loadEvent.mockResolvedValue(storedEvent);
       eventService.replaceEvent.mockResolvedValue(storedEvent);
 
       const initial_time = event.time;
       const changed_time = new Date(new Date(event.time).getTime() + 60 * 1000).toISOString();
-      event.data.previews.push(1);
+      event.data.previews?.push('1');
       event.time = changed_time;
 
-      const savedEvent = await eventStorageMiddleware.processEvent(event);
+      const savedEvent = (await eventStorageMiddleware.processEvent(event)) as any;
       expect(savedEvent.time).toEqual(initial_time);
       expect(savedEvent.time).not.toEqual(changed_time);
       expect(eventService.replaceEvent).toHaveBeenCalled();
@@ -168,7 +195,7 @@ describe('EventStorageMiddleware', () => {
 
     it('ignores edit message with missing associated original message', async () => {
       const [eventStorageMiddleware, {eventService}] = buildEventStorageMiddleware();
-      const linkPreviewEvent = createEvent();
+      const linkPreviewEvent = createMessageAddEvent();
       eventService.loadEvent.mockResolvedValue(undefined);
 
       linkPreviewEvent.data.replacing_message_id = 'missing';
@@ -181,7 +208,7 @@ describe('EventStorageMiddleware', () => {
     it('updates edited messages when link preview arrives', async () => {
       const [eventStorageMiddleware, {eventService}] = buildEventStorageMiddleware();
       const replacingId = 'old-replaced-message-id';
-      const linkPreviewEvent = createEvent();
+      const linkPreviewEvent = createMessageAddEvent();
       const storedEvent = JSON.parse(
         JSON.stringify({
           ...linkPreviewEvent,
@@ -193,7 +220,7 @@ describe('EventStorageMiddleware', () => {
       linkPreviewEvent.data.replacing_message_id = replacingId;
       linkPreviewEvent.data.previews = ['preview'];
 
-      const updatedEvent = await eventStorageMiddleware.processEvent(linkPreviewEvent);
+      const updatedEvent = (await eventStorageMiddleware.processEvent(linkPreviewEvent)) as any;
       expect(eventService.replaceEvent).toHaveBeenCalled();
       expect(eventService.saveEvent).not.toHaveBeenCalled();
       expect(updatedEvent.data.previews[0]).toEqual('preview');
@@ -201,7 +228,7 @@ describe('EventStorageMiddleware', () => {
 
     it('updates edited messages', async () => {
       const [eventStorageMiddleware, {eventService}] = buildEventStorageMiddleware();
-      const event = createEvent();
+      const event = createMessageAddEvent();
       const originalEvent = JSON.parse(JSON.stringify(event));
       originalEvent.reactions = ['user-id'];
       eventService.loadEvent.mockResolvedValue(originalEvent);
@@ -214,7 +241,7 @@ describe('EventStorageMiddleware', () => {
       event.data.replacing_message_id = originalEvent.id;
       event.time = changed_time;
 
-      const updatedEvent = await eventStorageMiddleware.processEvent(event);
+      const updatedEvent = (await eventStorageMiddleware.processEvent(event)) as any;
       expect(updatedEvent.time).toEqual(initial_time);
       expect(updatedEvent.time).not.toEqual(changed_time);
       expect(updatedEvent.data.content).toEqual('new content');
@@ -225,7 +252,7 @@ describe('EventStorageMiddleware', () => {
 
     it('updates link preview when edited', async () => {
       const [eventStorageMiddleware, {eventService}] = buildEventStorageMiddleware();
-      const event = createEvent();
+      const event = createMessageAddEvent();
 
       const replacingId = 'replaced-message-id';
       const storedEvent = {
@@ -233,11 +260,11 @@ describe('EventStorageMiddleware', () => {
         data: {...event.data, previews: ['preview']},
       };
       const editEvent = {...event};
-      eventService.loadEvent.mockResolvedValue(storedEvent);
+      eventService.loadEvent.mockResolvedValue(toSavedEvent(storedEvent));
 
       editEvent.data.replacing_message_id = replacingId;
 
-      const updatedEvent = await eventStorageMiddleware.processEvent(editEvent);
+      const updatedEvent = (await eventStorageMiddleware.processEvent(editEvent)) as any;
       expect(eventService.replaceEvent).toHaveBeenCalled();
       expect(eventService.saveEvent).not.toHaveBeenCalled();
       expect(updatedEvent.data.previews.length).toEqual(0);
@@ -245,17 +272,15 @@ describe('EventStorageMiddleware', () => {
 
     it('saves a conversation.asset-add event', async () => {
       const [eventStorageMiddleware, {eventService}] = buildEventStorageMiddleware();
-      const event = createEvent();
-      const assetAddEvent = {...event, type: ClientEvent.CONVERSATION.ASSET_ADD};
+      const event = createAssetAddEvent();
 
-      const updatedEvent = await eventStorageMiddleware.processEvent(assetAddEvent);
+      const updatedEvent = await eventStorageMiddleware.processEvent(event);
       expect(updatedEvent.type).toEqual(ClientEvent.CONVERSATION.ASSET_ADD);
       expect(eventService.saveEvent).toHaveBeenCalled();
     });
 
     it('deletes cancelled conversation.asset-add event', async () => {
       const [eventStorageMiddleware, {eventService, selfUser}] = buildEventStorageMiddleware();
-      const event = createEvent();
       const fromIds = [
         // cancel from an other user
         createUuid(),
@@ -264,14 +289,18 @@ describe('EventStorageMiddleware', () => {
       ];
 
       for (const fromId of fromIds) {
-        const assetAddEvent = {...event, from: fromId, type: ClientEvent.CONVERSATION.ASSET_ADD};
+        const assetAddEvent = createAssetAddEvent({from: fromId});
         const assetCancelEvent = {
           ...assetAddEvent,
-          data: {reason: ProtobufAsset.NotUploaded.CANCELLED, status: AssetTransferState.UPLOAD_FAILED},
+          data: {
+            ...assetAddEvent.data,
+            reason: ProtobufAsset.NotUploaded.CANCELLED,
+            status: AssetTransferState.UPLOAD_FAILED,
+          },
           time: '2017-09-06T09:43:36.528Z',
         };
 
-        eventService.loadEvent.mockResolvedValue(assetAddEvent);
+        eventService.loadEvent.mockResolvedValue(toSavedEvent(assetAddEvent));
         eventService.deleteEvent.mockResolvedValue(1);
 
         const savedEvent = await eventStorageMiddleware.processEvent(assetCancelEvent);
@@ -282,15 +311,18 @@ describe('EventStorageMiddleware', () => {
 
     it('deletes other user failed upload for conversation.asset-add event', async () => {
       const [eventStorageMiddleware, {eventService}] = buildEventStorageMiddleware();
-      const event = createEvent();
-      const assetAddEvent = {...event, type: ClientEvent.CONVERSATION.ASSET_ADD};
+      const assetAddEvent = createAssetAddEvent();
       const assetUploadFailedEvent = {
         ...assetAddEvent,
-        data: {reason: ProtobufAsset.NotUploaded.FAILED, status: AssetTransferState.UPLOAD_FAILED},
+        data: {
+          ...assetAddEvent.data,
+          reason: ProtobufAsset.NotUploaded.FAILED,
+          status: AssetTransferState.UPLOAD_FAILED,
+        },
         time: '2017-09-06T09:43:36.528Z',
       };
 
-      eventService.loadEvent.mockResolvedValue(assetAddEvent);
+      eventService.loadEvent.mockResolvedValue(toSavedEvent(assetAddEvent));
       eventService.deleteEvent.mockResolvedValue(1);
 
       const savedEvent = await eventStorageMiddleware.processEvent(assetUploadFailedEvent);
@@ -300,16 +332,19 @@ describe('EventStorageMiddleware', () => {
 
     it('updates self failed upload for conversation.asset-add event', async () => {
       const [eventStorageMiddleware, {eventService, selfUser}] = buildEventStorageMiddleware();
-      const event = createEvent({from: selfUser.id});
 
-      const assetAddEvent: EventRecord = {...event, type: ClientEvent.CONVERSATION.ASSET_ADD};
+      const assetAddEvent = createAssetAddEvent({from: selfUser.id});
       const assetUploadFailedEvent = {
         ...assetAddEvent,
-        data: {reason: ProtobufAsset.NotUploaded.FAILED, status: AssetTransferState.UPLOAD_FAILED},
+        data: {
+          ...assetAddEvent.data,
+          reason: ProtobufAsset.NotUploaded.FAILED,
+          status: AssetTransferState.UPLOAD_FAILED,
+        },
         time: '2017-09-06T09:43:36.528Z',
       } as any;
 
-      eventService.loadEvent.mockResolvedValue(assetAddEvent);
+      eventService.loadEvent.mockResolvedValue(toSavedEvent(assetAddEvent));
 
       const savedEvent = await eventStorageMiddleware.processEvent(assetUploadFailedEvent);
       expect(savedEvent.type).toEqual(ClientEvent.CONVERSATION.ASSET_ADD);
@@ -318,17 +353,17 @@ describe('EventStorageMiddleware', () => {
 
     it('handles conversation.asset-add state update event', async () => {
       const [eventStorageMiddleware, {eventService}] = buildEventStorageMiddleware();
-      const initialAssetEvent = createEvent({type: ClientEvent.CONVERSATION.ASSET_ADD});
+      const initialAssetEvent = createAssetAddEvent({type: ClientEvent.CONVERSATION.ASSET_ADD});
 
       const updateStatusEvent = {
         ...initialAssetEvent,
-        data: {status: AssetTransferState.UPLOADED},
+        data: {...initialAssetEvent.data, status: AssetTransferState.UPLOADED},
         time: '2017-09-06T09:43:36.528Z',
       };
 
-      eventService.loadEvent.mockResolvedValue(initialAssetEvent);
+      eventService.loadEvent.mockResolvedValue(toSavedEvent(initialAssetEvent));
 
-      const updatedEvent = await eventStorageMiddleware.processEvent(updateStatusEvent);
+      const updatedEvent = (await eventStorageMiddleware.processEvent(updateStatusEvent)) as any;
       expect(updatedEvent.type).toEqual(ClientEvent.CONVERSATION.ASSET_ADD);
       expect(updatedEvent.data.status).toEqual(updateStatusEvent.data.status);
       expect(eventService.replaceEvent).toHaveBeenCalled();
@@ -336,15 +371,15 @@ describe('EventStorageMiddleware', () => {
 
     it('updates video when preview is received', async () => {
       const [eventStorageMiddleware, {eventService}] = buildEventStorageMiddleware();
-      const initialAssetEvent = createEvent({type: ClientEvent.CONVERSATION.ASSET_ADD});
+      const initialAssetEvent = createMessageAddEvent({type: ClientEvent.CONVERSATION.ASSET_ADD});
 
       const AssetPreviewEvent = {
         ...initialAssetEvent,
-        data: {status: AssetTransferState.UPLOADED},
+        data: {...initialAssetEvent.data, status: AssetTransferState.UPLOADED},
         time: '2017-09-06T09:43:36.528Z',
       };
 
-      eventService.loadEvent.mockResolvedValue(initialAssetEvent);
+      eventService.loadEvent.mockResolvedValue(toSavedEvent(initialAssetEvent));
 
       const updatedEvent = await eventStorageMiddleware.processEvent(AssetPreviewEvent);
       expect(updatedEvent.type).toEqual(ClientEvent.CONVERSATION.ASSET_ADD);
