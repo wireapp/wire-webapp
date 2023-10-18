@@ -17,59 +17,32 @@
  *
  */
 
-import {ClientEvent} from 'src/script/event/Client';
 import {StatusType} from 'src/script/message/StatusType';
+import {createMessageAddEvent, toSavedEvent} from 'test/helper/EventGenerator';
 
 import {getCommonMessageUpdates} from './getCommonMessageUpdates';
 
 describe('getCommonMessageUpdates', () => {
   /** @see https://wearezeta.atlassian.net/browse/SQCORE-732 */
   it('does not overwrite the seen status if a message gets edited', () => {
-    const originalEvent = {
-      category: 16,
-      conversation: 'a7f1187e-9396-44c9-8242-db9d3051dc89',
-      data: {
-        content: 'Original Text Which Has Been Seen By Someone Else',
-        expects_read_confirmation: true,
-        legal_hold_status: 1,
-        mentions: [],
-        previews: [],
-      },
-      from: '24de8432-03ba-439f-88f8-95bdc68b7bdd',
-      from_client_id: '79618bbe93e6821c',
-      id: 'c6269e58-fa82-4f6e-8264-263e09154871',
-      primary_key: '17',
-      read_receipts: [
-        {
-          time: '2021-06-10T19:47:19.570Z',
-          userId: 'b661e27f-24c6-4c52-a425-87a7b7f3df61',
-        },
-      ],
-      status: StatusType.SEEN,
-      time: '2021-06-10T19:47:16.071Z',
-      type: ClientEvent.CONVERSATION.MESSAGE_ADD,
-    } as any;
+    const originalEvent = toSavedEvent(createMessageAddEvent({overrides: {status: StatusType.SEEN}}));
 
-    const editedEvent = {
-      conversation: 'a7f1187e-9396-44c9-8242-db9d3051dc89',
-      data: {
-        content: 'Edited Text Which Replaces The Original Text',
-        expects_read_confirmation: true,
-        mentions: [],
-        previews: [],
-        replacing_message_id: 'c6269e58-fa82-4f6e-8264-263e09154871',
+    const editedEvent = createMessageAddEvent({
+      text: 'Edited Text Which Replaces The Original Text',
+      overrides: {
+        read_receipts: [
+          {
+            time: '2021-06-10T19:47:19.570Z',
+            userId: 'b661e27f-24c6-4c52-a425-87a7b7f3df61',
+          },
+        ],
       },
-      from: '24de8432-03ba-439f-88f8-95bdc68b7bdd',
-      from_client_id: '79618bbe93e6821c',
-      id: 'caff044b-cb9c-47c6-833a-d4b76c678bcd',
-      status: StatusType.SENT,
-      time: '2021-06-10T19:47:23.706Z',
-      type: ClientEvent.CONVERSATION.MESSAGE_ADD,
-    } as any;
+      dataOverrides: {replacing_message_id: originalEvent.id},
+    });
 
-    const updatedEvent = getCommonMessageUpdates(originalEvent, editedEvent);
+    const updatedEvent = getCommonMessageUpdates(originalEvent, editedEvent) as any;
     expect(updatedEvent.data.content).toBe('Edited Text Which Replaces The Original Text');
     expect(updatedEvent.status).toBe(StatusType.SEEN);
-    expect(Object.keys((updatedEvent as any).read_receipts).length).toBe(1);
+    expect(Object.keys(updatedEvent.read_receipts).length).toBe(1);
   });
 });

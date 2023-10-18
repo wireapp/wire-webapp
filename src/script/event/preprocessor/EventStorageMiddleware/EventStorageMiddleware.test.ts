@@ -20,15 +20,14 @@
 import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';
-import {AssetAddEvent, MessageAddEvent} from 'src/script/conversation/EventBuilder';
 import {User} from 'src/script/entity/User';
 import {EventError} from 'src/script/error/EventError';
-import {StatusType} from 'src/script/message/StatusType';
+import {createAssetAddEvent, createMessageAddEvent, toSavedEvent} from 'test/helper/EventGenerator';
 import {createUuid} from 'Util/uuid';
 
 import {EventStorageMiddleware} from './EventStorageMiddleware';
 
-import {ClientEvent, CONVERSATION} from '../../Client';
+import {ClientEvent} from '../../Client';
 import {EventService} from '../../EventService';
 
 function buildEventStorageMiddleware() {
@@ -43,54 +42,10 @@ function buildEventStorageMiddleware() {
   return [new EventStorageMiddleware(eventService, selfUser), {eventService, selfUser}] as const;
 }
 
-function toSavedEvent(event: MessageAddEvent | AssetAddEvent) {
-  return {
-    primary_key: '',
-    category: 1,
-    ...event,
-  };
-}
-
-function createMessageAddEvent(overrides: Object = {}): MessageAddEvent {
-  const from = createUuid();
-  return {
-    conversation: createUuid(),
-    data: {
-      sender: from,
-      content: 'Lorem Ipsum',
-      previews: [],
-    },
-    from,
-    id: createUuid(),
-    time: new Date().toISOString(),
-    type: ClientEvent.CONVERSATION.MESSAGE_ADD,
-    status: StatusType.SENT,
-    ...overrides,
-  };
-}
-
-function createAssetAddEvent(overrides: Partial<AssetAddEvent> = {}): AssetAddEvent {
-  const from = createUuid();
-  return {
-    conversation: createUuid(),
-    data: {
-      content_type: '',
-      content_length: 0,
-      status: AssetTransferState.UPLOADING,
-      info: {name: 'test.png'},
-    },
-    from,
-    id: createUuid(),
-    time: new Date().toISOString(),
-    type: CONVERSATION.ASSET_ADD,
-    ...overrides,
-  };
-}
-
 describe('EventStorageMiddleware', () => {
   describe('processEvent', () => {
     it('ignores unhandled event', async () => {
-      const event = createMessageAddEvent({type: 'other'});
+      const event = {type: 'other'} as any;
       const [eventStorageMiddleware, {eventService}] = buildEventStorageMiddleware();
 
       await eventStorageMiddleware.processEvent(event);
@@ -371,7 +326,7 @@ describe('EventStorageMiddleware', () => {
 
     it('updates video when preview is received', async () => {
       const [eventStorageMiddleware, {eventService}] = buildEventStorageMiddleware();
-      const initialAssetEvent = createMessageAddEvent({type: ClientEvent.CONVERSATION.ASSET_ADD});
+      const initialAssetEvent = createAssetAddEvent();
 
       const AssetPreviewEvent = {
         ...initialAssetEvent,
