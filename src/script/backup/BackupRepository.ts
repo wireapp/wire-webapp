@@ -468,11 +468,12 @@ export class BackupRepository {
   }
 
   private prepareEvents(entity: EventRecord) {
-    if (entity.data) {
+    const data = entity.data as any;
+    if (data) {
       UINT8ARRAY_FIELDS.forEach(field => {
-        const dataField = entity.data[field];
+        const dataField = data[field];
         if (dataField) {
-          entity.data[field] = new Uint8Array(Object.values(dataField));
+          data[field] = new Uint8Array(Object.values(dataField));
         }
       });
     }

@@ -32,7 +32,7 @@ import {MentionSuggestionsItem} from './MentionSuggestionsItem';
 import {User} from '../../../../entity/User';
 import {$createMentionNode} from '../../nodes/MentionNode';
 import {getSelectionInfo} from '../../utils/getSelectionInfo';
-import {ReverseTypeaheadMenuPlugin} from '../ReverseTypeaheadMenuPlugin';
+import {TypeaheadMenuPlugin} from '../TypeaheadMenuPlugin';
 
 const TRIGGER = '@';
 
@@ -41,7 +41,7 @@ const TRIGGER = '@';
  * @param text the text in which to look for mentions triggers
  */
 function checkForMentions(text: string): MenuTextMatch | null {
-  const match = new RegExp(`(^|[^\\w])(${TRIGGER}([\\w ]*))$`).exec(text);
+  const match = new RegExp(`(^| )(${TRIGGER}([\\w ]*))$`).exec(text);
 
   if (match === null) {
     return null;
@@ -160,12 +160,14 @@ export function MentionsPlugin({onSearch, openStateRef}: MentionsPluginProps) {
   openStateRef.current = options.length > 0;
 
   return (
-    <ReverseTypeaheadMenuPlugin
+    <TypeaheadMenuPlugin
       onQueryChange={setQueryString}
       onSelectOption={handleSelectOption}
       triggerFn={checkForMentionMatch}
       options={options}
       menuRenderFn={menuRenderFn}
+      containerId="mentions-typeahead-menu"
+      isReversed
     />
   );
 }

@@ -94,8 +94,8 @@ export type MenuRenderFn<TOption extends TypeaheadOption> = (
   matchingString: string,
 ) => ReactPortal | JSX.Element | null;
 
-const scrollIntoViewIfNeeded = (target: HTMLElement) => {
-  const typeaheadContainerNode = document.getElementById('typeahead-menu');
+const scrollIntoViewIfNeeded = (target: HTMLElement, containerId: string) => {
+  const typeaheadContainerNode = document.getElementById(containerId);
 
   if (!typeaheadContainerNode) {
     return;
@@ -325,13 +325,16 @@ function LexicalPopoverMenu<TOption extends TypeaheadOption>({
   resolution,
   options,
   menuRenderFn,
+  containerId,
   onSelectOption,
   onMenuVisibilityChange,
+  isReversed = false,
 }: {
   close: () => void;
   editor: LexicalEditor;
   anchorElementRef: MutableRefObject<HTMLElement>;
   resolution: Resolution;
+  containerId: string;
   options: Array<TOption>;
   menuRenderFn: MenuRenderFn<TOption>;
   onSelectOption: (
@@ -341,13 +344,14 @@ function LexicalPopoverMenu<TOption extends TypeaheadOption>({
     matchingString: string,
   ) => void;
   onMenuVisibilityChange?: (visible: boolean) => void;
+  isReversed?: boolean;
 }): JSX.Element | null {
   const [menuVisible, setMenuVisible] = useState(false);
   const [selectedIndex, setHighlightedIndex] = useState<null | number>(null);
 
   useEffect(() => {
-    setHighlightedIndex(options.length - 1);
-  }, [resolution.match.matchingString, options]);
+    setHighlightedIndex(isReversed ? options.length - 1 : 0);
+  }, [resolution.match.matchingString, options, isReversed]);
 
   const selectOptionAndCleanUp = useCallback(
     (selectedEntry: TOption) => {
@@ -394,7 +398,7 @@ function LexicalPopoverMenu<TOption extends TypeaheadOption>({
         SCROLL_TYPEAHEAD_OPTION_INTO_VIEW_COMMAND,
         ({option}) => {
           if (option.ref && option.ref.current != null) {
-            scrollIntoViewIfNeeded(option.ref.current);
+            scrollIntoViewIfNeeded(option.ref.current, containerId);
             return true;
           }
 
@@ -403,7 +407,7 @@ function LexicalPopoverMenu<TOption extends TypeaheadOption>({
         COMMAND_PRIORITY_LOW,
       ),
     );
-  }, [editor, updateSelectedIndex]);
+  }, [editor, updateSelectedIndex, containerId]);
 
   useEffect(() => {
     if (menuVisible && typeof selectedIndex === 'number' && options?.[selectedIndex]) {
@@ -412,11 +416,11 @@ function LexicalPopoverMenu<TOption extends TypeaheadOption>({
       // Using setTimeout because we need to wait for popover render
       setTimeout(() => {
         if (currentSelectedOption.ref != null && currentSelectedOption.ref.current) {
-          scrollIntoViewIfNeeded(currentSelectedOption.ref.current);
+          scrollIntoViewIfNeeded(currentSelectedOption.ref.current, containerId);
         }
       }, 16);
     }
-  }, [editor, menuVisible, selectedIndex, options]);
+  }, [editor, menuVisible, selectedIndex, options, containerId]);
 
   useEffect(() => {
     return mergeRegister(
@@ -532,6 +536,7 @@ function LexicalPopoverMenu<TOption extends TypeaheadOption>({
 
 interface UseMenuAnchorRefOptions {
   resolution: Resolution | null;
+  containerId: string;
   setResolution: (r: Resolution | null) => void;
   className?: string;
   menuVisible?: boolean;
@@ -576,7 +581,7 @@ function useMenuAnchorRef(opt: UseMenuAnchorRefOptions): MutableRefObject<HTMLEl
           containerDiv.className = className;
         }
         containerDiv.setAttribute('aria-label', 'Typeahead menu');
-        containerDiv.setAttribute('id', 'typeahead-menu');
+        containerDiv.setAttribute('id', opt.containerId);
         containerDiv.setAttribute('role', 'listbox');
         containerDiv.style.display = 'block';
         containerDiv.style.position = 'absolute';
@@ -585,7 +590,7 @@ function useMenuAnchorRef(opt: UseMenuAnchorRefOptions): MutableRefObject<HTMLEl
       anchorElementRef.current = containerDiv;
       rootElement.setAttribute('aria-controls', 'typeahead-menu');
     }
-  }, [editor, resolution, className]);
+  }, [editor, resolution, className, opt.containerId]);
 
   const wasInit = useRef(false);
   useEffect(() => {
@@ -609,7 +614,14 @@ function useMenuAnchorRef(opt: UseMenuAnchorRefOptions): MutableRefObject<HTMLEl
       };
     }
 
-    return () => null;
+    return () => {
+      const containerDiv = anchorElementRef.current;
+
+      if (containerDiv !== null) {
+        containerDiv.remove();
+      }
+      return null;
+    };
   }, [editor, positionMenu, resolution, menuVisible]);
 
   const onVisibilityChange = useCallback(
@@ -628,7 +640,7 @@ function useMenuAnchorRef(opt: UseMenuAnchorRefOptions): MutableRefObject<HTMLEl
   return anchorElementRef;
 }
 
-export type ReverseTypeaheadMenuPluginProps<TOption extends TypeaheadOption> = {
+export type TypeaheadMenuPluginProps<TOption extends TypeaheadOption> = {
   onQueryChange: (matchingString: string | null) => void;
   onSelectOption: (
     option: TOption,
@@ -642,11 +654,13 @@ export type ReverseTypeaheadMenuPluginProps<TOption extends TypeaheadOption> = {
   onOpen?: (resolution: Resolution) => void;
   onClose?: () => void;
   anchorClassName?: string;
+  containerId: string;
+  isReversed?: boolean;
 };
 
 export type TriggerFn = (text: string, editor: LexicalEditor) => QueryMatch | null;
 
-export function ReverseTypeaheadMenuPlugin<TOption extends TypeaheadOption>({
+export function TypeaheadMenuPlugin<TOption extends TypeaheadOption>({
   options,
   onQueryChange,
   onSelectOption,
@@ -655,14 +669,17 @@ export function ReverseTypeaheadMenuPlugin<TOption extends TypeaheadOption>({
   menuRenderFn,
   triggerFn,
   anchorClassName,
-}: ReverseTypeaheadMenuPluginProps<TOption>): JSX.Element | null {
+  containerId,
+  isReversed = false,
+}: TypeaheadMenuPluginProps<TOption>): JSX.Element | null {
   const [editor] = useLexicalComposerContext();
   const [resolution, setResolution] = useState<Resolution | null>(null);
   const [menuVisible, setMenuVisible] = useState(false);
   const anchorElementRef = useMenuAnchorRef({
+    containerId,
     resolution,
     setResolution,
-    className: anchorClassName,
+    className: `typeahead-menu ${anchorClassName || ''}`,
     menuVisible,
   });
 
@@ -727,6 +744,7 @@ export function ReverseTypeaheadMenuPlugin<TOption extends TypeaheadOption>({
   return resolution === null || editor === null ? null : (
     <LexicalPopoverMenu
       close={closeTypeahead}
+      containerId={containerId}
       resolution={resolution}
       editor={editor}
       anchorElementRef={anchorElementRef}
@@ -734,6 +752,7 @@ export function ReverseTypeaheadMenuPlugin<TOption extends TypeaheadOption>({
       menuRenderFn={menuRenderFn}
       onSelectOption={onSelectOption}
       onMenuVisibilityChange={setMenuVisible}
+      isReversed={isReversed}
     />
   );
 }

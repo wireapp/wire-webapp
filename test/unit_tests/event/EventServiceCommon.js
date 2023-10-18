@@ -350,6 +350,7 @@ const testEventServiceClass = (testedServiceName, className) => {
         const initialEvent = {
           id: 'event-id',
           data: {content: ''},
+          type: 'conversation.asset-add',
         };
         const reason = AssetTransferState.UPLOAD_FAILED;
         spyOn(testFactory.storage_service, 'load').and.returnValue(Promise.resolve(initialEvent));

@@ -25,7 +25,7 @@ import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 
 import {getLogger, Logger} from 'Util/Logger';
 
-import {CONVERSATION as CLIENT_CONVERSATION_EVENT} from './Client';
+import {ClientEvent, CONVERSATION as CLIENT_CONVERSATION_EVENT} from './Client';
 
 import {AssetTransferState} from '../assets/AssetTransferState';
 import {BaseError, BASE_ERROR_TYPE} from '../error/BaseError';
@@ -157,41 +157,6 @@ export class EventService {
   }
 
   /**
-   * Load a replacing event from database.
-   * To be used in certain cases (during some cases with quoting) when the original message cannot be found.
-   *
-   * @param conversationId ID of conversation
-   * @param eventId ID of event to retrieve
-   */
-  async loadReplacingEvent(conversationId: string, eventId: string): Promise<EventRecord> {
-    if (!conversationId || !eventId) {
-      this.logger.error(`Cannot get event '${eventId}' in conversation '${conversationId}' without IDs`);
-      throw new ConversationError(BASE_ERROR_TYPE.MISSING_PARAMETER, BaseError.MESSAGE.MISSING_PARAMETER);
-    }
-
-    try {
-      if (this.storageService.db) {
-        return await this.storageService.db
-          .table(StorageSchemata.OBJECT_STORE.EVENTS)
-          .where('id')
-          .equals(eventId)
-          .filter(record => record.conversation === conversationId)
-          .first();
-      }
-
-      const records = (await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS)) as EventRecord[];
-      return records
-        .filter(record => record.conversation === conversationId && record.data?.replacing_message_id === eventId)
-        .sort(compareEventsById)
-        .shift();
-    } catch (error) {
-      const logMessage = `Failed to get event '${eventId}' for conversation '${conversationId}': ${error.message}`;
-      this.logger.error(logMessage, error);
-      throw error;
-    }
-  }
-
-  /**
    * Load all events matching a minimum category from the database.
    *
    * @param conversationId ID of conversation to add users to
@@ -242,7 +207,7 @@ export class EventService {
       return events;
     }
 
-    const records = await this.storageService.getAll<EventRecord>(StorageSchemata.OBJECT_STORE.EVENTS);
+    const records = await this.storageService.getAll<any>(StorageSchemata.OBJECT_STORE.EVENTS);
     return records
       .filter(record => {
         return (
@@ -421,7 +386,7 @@ export class EventService {
     reason: ProtobufAsset.NotUploaded | AssetTransferState,
   ): Promise<EventRecord | undefined> {
     const record = await this.storageService.load<EventRecord>(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey);
-    if (!record) {
+    if (!record || record.type !== ClientEvent.CONVERSATION.ASSET_ADD) {
       this.logger.warn('Did not find message to update asset (failed)');
       return undefined;
     }
