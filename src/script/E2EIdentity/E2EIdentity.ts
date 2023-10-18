@@ -294,7 +294,7 @@ class E2EIHandler {
    */
   public getCertificateData() {
     if (!this.hasActiveCertificate()) {
-      return;
+      return undefined;
     }
 
     return this.coreE2EIService.getCertificateData();
