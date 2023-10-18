@@ -18,7 +18,7 @@
  */
 
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';
-import {AssetAddEvent, EventBuilder, MessageAddEvent} from 'src/script/conversation/EventBuilder';
+import {AssetAddEvent, DeleteEvent, EventBuilder, MessageAddEvent} from 'src/script/conversation/EventBuilder';
 import {Conversation} from 'src/script/entity/Conversation';
 import {CONVERSATION} from 'src/script/event/Client';
 import {createUuid} from 'Util/uuid';
@@ -45,6 +45,22 @@ export function createMessageAddEvent({
     },
     from,
     ...overrides,
+  };
+}
+
+export function createDeleteEvent(deleteMessageId: string, conversationId: string = createUuid()): DeleteEvent {
+  return {
+    conversation: conversationId,
+    data: {
+      deleted_time: 0,
+      message_id: deleteMessageId,
+      time: '',
+    },
+    from: createUuid(),
+    id: createUuid(),
+    qualified_conversation: {domain: '', id: conversationId},
+    time: new Date().toISOString(),
+    type: CONVERSATION.MESSAGE_DELETE,
   };
 }
 
