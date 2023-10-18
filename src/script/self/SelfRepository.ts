@@ -63,6 +63,10 @@ export class SelfRepository extends TypedEventEmitter<Events> {
       if (event.name === FEATURE_KEY.MLS) {
         void this.handleMLSFeatureUpdate(event.data, prevFeatureList?.[FEATURE_KEY.MLS]);
       }
+
+      // MLS Migration feature config is also considered when evaluating self supported protocols
+      // We still allow proteus to be used if migration is enabled (but startTime has not been reached yet),
+      // or when migration is enabled, started and not finalised yet (finaliseRegardlessAfter has not arrived yet)
       if (event.name === FEATURE_KEY.MLS_MIGRATION) {
         void this.refreshSelfSupportedProtocols();
       }
