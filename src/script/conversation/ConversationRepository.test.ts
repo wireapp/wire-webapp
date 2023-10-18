@@ -462,6 +462,7 @@ describe('ConversationRepository', () => {
         .spyOn(conversationRepository['conversationState'], 'activeConversation')
         .mockReturnValueOnce(proteus1to1Conversation);
       jest.spyOn(conversationRepository['conversationService'], 'deleteConversationFromDb');
+      jest.spyOn(conversationRepository['conversationService'], 'blacklistConversation');
 
       const conversationEntity = await conversationRepository.getInitialised1To1Conversation(otherUser);
 
@@ -479,6 +480,9 @@ describe('ConversationRepository', () => {
       //proteus conversation was deleted from the local store
       expect(conversationRepository['conversationService'].deleteConversationFromDb).toHaveBeenCalledWith(
         proteus1to1Conversation.id,
+      );
+      expect(conversationRepository['conversationService'].blacklistConversation).toHaveBeenCalledWith(
+        proteus1to1Conversation.qualifiedId,
       );
       expect(conversationRepository['conversationState'].conversations()).not.toEqual(
         expect.arrayContaining([proteus1to1Conversation]),
