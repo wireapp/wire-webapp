@@ -17,10 +17,10 @@
  *
  */
 
-import type {BackendError} from '@wireapp/api-client/lib/http/';
+import {RegisteredClient} from '@wireapp/api-client/lib/client';
+import type {BackendError} from '@wireapp/api-client/lib/http';
 import {AxiosError} from 'axios';
 
-import {RegisteredClient} from '../../../.yalc/@wireapp/api-client/lib/client';
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 import {ClientRecord} from '../storage/record/ClientRecord';
