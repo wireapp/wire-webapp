@@ -17,45 +17,18 @@
  *
  */
 
-import {ConversationEvent} from '@wireapp/api-client/lib/event';
-
-import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
-
 import {User} from 'src/script/entity/User';
 import {EventError} from 'src/script/error/EventError';
 
-import {getEditedMessageId} from './eventSelectors';
+import {handleLinkPreviewEvent, handleEditEvent, handleAssetEvent} from './eventHandlers';
+import {HandledEvents, DBOperation} from './types';
 
-import {AssetTransferState} from '../../../assets/AssetTransferState';
-import {AssetAddEvent, MessageAddEvent, ClientConversationEvent} from '../../../conversation/EventBuilder';
-import {categoryFromEvent} from '../../../message/MessageCategorization';
 import {isEventRecordFailed, isEventRecordWithFederationError} from '../../../message/StatusType';
-import type {EventRecord, StoredEvent} from '../../../storage';
-import {ClientEvent} from '../../Client';
+import type {EventRecord} from '../../../storage';
+import {CONVERSATION} from '../../Client';
 import {EventMiddleware, IncomingEvent} from '../../EventProcessor';
 import {EventService} from '../../EventService';
 import {eventShouldBeStored} from '../../EventTypeHandling';
-import {isValid} from 'date-fns';
-import {isValidEditEvent} from './eventValidator';
-
-type HandledEvents = ClientConversationEvent | ConversationEvent;
-
-export function getCommonMessageUpdates(originalEvent: StoredEvent<MessageAddEvent>, newEvent: MessageAddEvent) {
-  return {
-    ...newEvent,
-    data: {...newEvent.data, expects_read_confirmation: originalEvent.data.expects_read_confirmation},
-    edited_time: newEvent.time,
-    read_receipts: !newEvent.read_receipts ? originalEvent.read_receipts : newEvent.read_receipts,
-    status: !newEvent.status || newEvent.status < originalEvent.status ? originalEvent.status : newEvent.status,
-    time: originalEvent.time,
-    version: 1,
-  };
-}
-
-function getUpdatesForEditMessage(originalEvent: EventRecord, newEvent: MessageAddEvent): MessageAddEvent {
-  // Remove reactions, so that likes (hearts) don't stay when a message's text gets edited
-  return {...newEvent, reactions: {}};
-}
 
 export class EventStorageMiddleware implements EventMiddleware {
   constructor(
@@ -68,177 +41,63 @@ export class EventStorageMiddleware implements EventMiddleware {
     if (!shouldSaveEvent) {
       return event;
     }
-    switch (event.type) {
-      case ClientEvent.CONVERSATION.MESSAGE_ADD:
-        const editedMessage = getEditedMessageId(event);
-        if (editedMessage) {
-          return this.processEditMessage(event, editedMessage);
-        }
-    }
-    const savedEvent = await this.handleEventSaving(event);
-    return savedEvent ?? event;
+    const eventId = 'id' in event && (event.id as string);
+    const duplicateEvent = eventId ? await this.eventService.loadEvent(event.conversation, eventId) : undefined;
+
+    this.validateEvent(event, duplicateEvent);
+    const operation = await this.getDbOperation(event, duplicateEvent);
+    return operation ? this.execDBOperation(operation, event.conversation) : event;
   }
 
-  private async processEditMessage(event: MessageAddEvent, editedMessageId: string) {
-    const conversationId = event.conversation;
-    const editedEvent = await this.eventService.loadEvent(conversationId, editedMessageId);
-    return isValidEditEvent(editedEvent, event) ? this.replaceEvent(editedEvent, event) : undefined;
-  }
-
-  /**
-   * Handle a mapped event, check for malicious ID use and save it.
-   *
-   * @param event Backend event extracted from notification stream
-   * @returns Resolves with the saved event
-   */
-  private async handleEventSaving(event: HandledEvents) {
-    const conversationId = event.conversation;
-
-    // check for duplicates (same id)
-    const storedEvent =
-      'id' in event && event.id ? await this.eventService.loadEvent(conversationId, event.id) : undefined;
-
-    return storedEvent
-      ? this.handleDuplicatedEvent(storedEvent, event)
-      : this.eventService.saveEvent(event as EventRecord);
-  }
-
-  private replaceEvent(originalEvent: StoredEvent<MessageAddEvent>, newEvent: MessageAddEvent) {
-    const newData = newEvent.data;
-    const primaryKeyUpdate = {primary_key: originalEvent.primary_key};
-    const isLinkPreviewEdit = newData?.previews && !!newData?.previews.length;
-
-    const commonUpdates = getCommonMessageUpdates(originalEvent, newEvent);
-
-    const specificUpdates = isLinkPreviewEdit
-      ? this.getUpdatesForMessage(originalEvent, newEvent)
-      : getUpdatesForEditMessage(originalEvent, newEvent);
-
-    const updates = {...specificUpdates, ...commonUpdates};
-
-    const identifiedUpdates = {...primaryKeyUpdate, ...updates};
-    return this.eventService.replaceEvent(identifiedUpdates);
-  }
-
-  private handleDuplicatedEvent(originalEvent: EventRecord, newEvent: HandledEvents) {
-    switch (newEvent.type) {
-      case ClientEvent.CONVERSATION.ASSET_ADD:
-        return this.handleAssetUpdate(originalEvent, newEvent);
-
-      case ClientEvent.CONVERSATION.MESSAGE_ADD:
-        return this.handleMessageUpdate(originalEvent, newEvent);
-
-      default:
-        this.throwValidationError(`Forbidden type '${newEvent.type}' for duplicate events`);
-    }
-  }
-
-  private async handleAssetUpdate(originalEvent: EventRecord, newEvent: AssetAddEvent) {
-    if (originalEvent.type !== ClientEvent.CONVERSATION.ASSET_ADD) {
-      this.throwValidationError('Trying to update a non-asset message as an asset message');
-    }
-    const newEventData = newEvent.data;
-    // the preview status is not sent by the client so we fake a 'preview' status in order to cleanly handle it in the switch statement
-    const ASSET_PREVIEW = 'preview';
-    // similarly, no status is sent by the client when we retry sending a failed message
-    const RETRY_EVENT = 'retry';
-    const isPreviewEvent = !newEventData.status && !!newEventData.preview_key;
-    const isRetryEvent = !!newEventData.content_length;
-    const handledEvent = isRetryEvent ? RETRY_EVENT : newEventData.status;
-    const previewStatus = isPreviewEvent ? ASSET_PREVIEW : handledEvent;
-
-    const updateEvent = () => {
-      const updatedData = {...originalEvent.data, ...newEventData};
-      const updatedEvent = {...originalEvent, data: updatedData};
-      return this.eventService.replaceEvent(updatedEvent);
-    };
-
-    switch (previewStatus) {
-      case ASSET_PREVIEW:
-      case RETRY_EVENT:
-      case AssetTransferState.UPLOADED: {
-        return updateEvent();
+  private async getDbOperation(event: HandledEvents, duplicateEvent?: HandledEvents): Promise<DBOperation | undefined> {
+    const handlers = [handleEditEvent, handleLinkPreviewEvent, handleAssetEvent];
+    for (const handler of handlers) {
+      const operation = await handler(event, {
+        duplicateEvent,
+        selfUserId: this.selfUser.id,
+        findEvent: eventId => this.eventService.loadEvent(event.conversation, eventId),
+      });
+      if (operation) {
+        return operation;
       }
+    }
+    return {type: 'insert', event};
+  }
 
-      case AssetTransferState.UPLOAD_FAILED: {
-        // case of both failed or canceled upload
-        const fromOther = newEvent.from !== this.selfUser.id;
-        const sameSender = newEvent.from === originalEvent.from;
-        const selfCancel = !fromOther && newEvent.data.reason === ProtobufAsset.NotUploaded.CANCELLED;
-        // we want to delete the event in the case of an error from the remote client or a cancel on the user's own client
-        const shouldDeleteEvent = (fromOther || selfCancel) && sameSender;
-        if (shouldDeleteEvent) {
-          await this.eventService.deleteEvent(newEvent.conversation, newEvent.id);
-          return newEvent;
-        }
-        return this.eventService.updateEventAsUploadFailed(
-          originalEvent.primary_key,
-          newEvent.data.reason ?? ProtobufAsset.NotUploaded.FAILED,
-        );
-      }
+  private validateEvent(event: HandledEvents, duplicateEvent?: EventRecord) {
+    if (!duplicateEvent) {
+      return;
+    }
+    if (duplicateEvent.from !== event.from) {
+      this.throwValidationError('ID previously used by another user');
+    }
 
-      default: {
-        this.throwValidationError(`Unhandled asset status update '${newEvent.data.status}'`);
+    if (event.type !== duplicateEvent.type) {
+      this.throwValidationError('ID already used for a different type of message');
+    }
+
+    if (event.type === CONVERSATION.MESSAGE_ADD && duplicateEvent.type === CONVERSATION.MESSAGE_ADD) {
+      const isValidUpdate = !!event.data.previews?.length || event.data.replacing_message_id;
+      const isRetryAttempt = isEventRecordFailed(duplicateEvent) || isEventRecordWithFederationError(duplicateEvent);
+
+      if (!isValidUpdate && !isRetryAttempt) {
+        return this.throwValidationError('ID already used for a successfully sent message');
       }
     }
   }
 
-  private handleMessageUpdate(originalEvent: StoredEvent<any>, newEvent: MessageAddEvent) {
-    const newEventData = newEvent.data;
-    const originalData = originalEvent.data;
+  private async execDBOperation(operation: DBOperation, conversationId: string) {
+    switch (operation.type) {
+      case 'insert':
+        return this.eventService.saveEvent(operation.event);
 
-    if (originalEvent.from !== newEvent.from) {
-      return this.throwValidationError('ID previously used by another user');
+      case 'update':
+        return this.eventService.replaceEvent(operation.updates);
+
+      case 'delete':
+        await this.eventService.deleteEvent(conversationId, operation.id);
+        return operation.event;
     }
-
-    const containsLinkPreview = newEventData.previews && !!newEventData.previews.length;
-    const isRetryAttempt = isEventRecordFailed(originalEvent) || isEventRecordWithFederationError(originalEvent);
-
-    if (!containsLinkPreview && !isRetryAttempt) {
-      const errorMessage =
-        'Message duplication event invalid: original message did not fail to send and does not contain link preview';
-      return this.throwValidationError(errorMessage);
-    }
-
-    const textContentMatches = newEventData.content === originalData.content;
-    if (!textContentMatches) {
-      return this.throwValidationError('ID of link preview reused: Text content for message duplication not matching');
-    }
-
-    const bothAreMessageAddType = newEvent.type === originalEvent.type;
-    if (!bothAreMessageAddType) {
-      return this.throwValidationError('ID reused by same user');
-    }
-
-    const updates = this.getUpdatesForMessage(originalEvent, newEvent);
-    const identifiedUpdates = {primary_key: originalEvent.primary_key, ...updates};
-    return this.eventService.replaceEvent(identifiedUpdates);
-  }
-
-  private getUpdatesForMessage(originalEvent: StoredEvent<any>, newEvent: MessageAddEvent) {
-    const newData = newEvent.data;
-    const originalData = originalEvent.data;
-    const updatingLinkPreview = !!originalData.previews.length;
-    if (updatingLinkPreview) {
-      this.throwValidationError('ID of link preview reused');
-    }
-
-    const textContentMatches = !newData.previews?.length || newData.content === originalData.content;
-    if (!textContentMatches) {
-      const errorMessage = 'ID of duplicated message reused: Text content for message duplication not matching';
-      this.throwValidationError(errorMessage);
-    }
-
-    return {
-      ...newEvent,
-      category: categoryFromEvent(newEvent),
-      ephemeral_expires: originalEvent.ephemeral_expires,
-      ephemeral_started: originalEvent.ephemeral_started,
-      ephemeral_time: originalEvent.ephemeral_time,
-      server_time: newEvent.time,
-      time: originalEvent.time,
-      version: originalEvent.version,
-    };
   }
 
   private throwValidationError(errorMessage: string): never {

@@ -23,22 +23,20 @@ import {AssetTransferState} from 'src/script/assets/AssetTransferState';
 import {MessageAddEvent} from 'src/script/conversation/EventBuilder';
 import {User} from 'src/script/entity/User';
 import {EventError} from 'src/script/error/EventError';
-import {StatusType} from 'src/script/message/StatusType';
 import {EventRecord} from 'src/script/storage';
 import {createUuid} from 'Util/uuid';
 
-import {EventStorageMiddleware, getCommonMessageUpdates} from './EventStorageMiddleware';
+import {EventStorageMiddleware} from './EventStorageMiddleware';
 
 import {ClientEvent} from '../../Client';
 import {EventService} from '../../EventService';
 
 function buildEventStorageMiddleware() {
   const eventService = {
-    saveEvent: jest.fn(),
+    saveEvent: jest.fn(event => event),
     loadEvent: jest.fn(),
-    replaceEvent: jest.fn(),
+    replaceEvent: jest.fn(event => event),
     deleteEvent: jest.fn(),
-    updateEventAsUploadFailed: jest.fn(),
   } as unknown as jest.Mocked<EventService>;
 
   const selfUser = new User(createUuid());
@@ -63,58 +61,6 @@ function createEvent(overwrite: Object = {}): MessageAddEvent {
 }
 
 describe('EventStorageMiddleware', () => {
-  describe('getCommonMessageUpdates', () => {
-    /** @see https://wearezeta.atlassian.net/browse/SQCORE-732 */
-    it('does not overwrite the seen status if a message gets edited', () => {
-      const originalEvent = {
-        category: 16,
-        conversation: 'a7f1187e-9396-44c9-8242-db9d3051dc89',
-        data: {
-          content: 'Original Text Which Has Been Seen By Someone Else',
-          expects_read_confirmation: true,
-          legal_hold_status: 1,
-          mentions: [],
-          previews: [],
-        },
-        from: '24de8432-03ba-439f-88f8-95bdc68b7bdd',
-        from_client_id: '79618bbe93e6821c',
-        id: 'c6269e58-fa82-4f6e-8264-263e09154871',
-        primary_key: '17',
-        read_receipts: [
-          {
-            time: '2021-06-10T19:47:19.570Z',
-            userId: 'b661e27f-24c6-4c52-a425-87a7b7f3df61',
-          },
-        ],
-        status: StatusType.SEEN,
-        time: '2021-06-10T19:47:16.071Z',
-        type: ClientEvent.CONVERSATION.MESSAGE_ADD,
-      } as any;
-
-      const editedEvent = {
-        conversation: 'a7f1187e-9396-44c9-8242-db9d3051dc89',
-        data: {
-          content: 'Edited Text Which Replaces The Original Text',
-          expects_read_confirmation: true,
-          mentions: [],
-          previews: [],
-          replacing_message_id: 'c6269e58-fa82-4f6e-8264-263e09154871',
-        },
-        from: '24de8432-03ba-439f-88f8-95bdc68b7bdd',
-        from_client_id: '79618bbe93e6821c',
-        id: 'caff044b-cb9c-47c6-833a-d4b76c678bcd',
-        status: StatusType.SENT,
-        time: '2021-06-10T19:47:23.706Z',
-        type: ClientEvent.CONVERSATION.MESSAGE_ADD,
-      } as any;
-
-      const updatedEvent = getCommonMessageUpdates(originalEvent, editedEvent);
-      expect(updatedEvent.data.content).toBe('Edited Text Which Replaces The Original Text');
-      expect(updatedEvent.status).toBe(StatusType.SEEN);
-      expect(Object.keys((updatedEvent as any).read_receipts).length).toBe(1);
-    });
-  });
-
   describe('processEvent', () => {
     it('ignores unhandled event', async () => {
       const event = createEvent({type: 'other'});
@@ -132,7 +78,7 @@ describe('EventStorageMiddleware', () => {
       expect(eventService.saveEvent).toHaveBeenCalledWith(event);
     });
 
-    it('ignores an event with an ID previously used by another user', async () => {
+    it('fails for an event with an ID previously used by another user', async () => {
       const event = createEvent();
       const [eventStorageMiddleware, {eventService}] = buildEventStorageMiddleware();
       const eventWithSameId = {...event, from: createUuid()};
@@ -146,7 +92,7 @@ describe('EventStorageMiddleware', () => {
       );
     });
 
-    it('ignores a non-"text message" with an ID previously used by the same user', async () => {
+    it('fails for a non-"text message" with an ID previously used by the same user', async () => {
       const [eventStorageMiddleware, {eventService}] = buildEventStorageMiddleware();
       const event = createEvent();
       eventService.loadEvent.mockResolvedValue({...event, type: ClientEvent.CALL.E_CALL});
@@ -154,25 +100,12 @@ describe('EventStorageMiddleware', () => {
       await expect(eventStorageMiddleware.processEvent(event)).rejects.toEqual(
         new EventError(
           EventError.TYPE.VALIDATION_FAILED,
-          'Event validation failed: Message duplication event invalid: original message did not fail to send and does not contain link preview',
+          'Event validation failed: ID already used for a different type of message',
         ),
       );
     });
 
-    it('ignores a plain text message with an ID previously used by the same user for a non-"text message"', async () => {
-      const [eventStorageMiddleware, {eventService}] = buildEventStorageMiddleware();
-      const newEvent = createEvent();
-      eventService.loadEvent.mockResolvedValue({...newEvent, type: ClientEvent.CALL.E_CALL});
-
-      await expect(eventStorageMiddleware.processEvent(newEvent)).rejects.toEqual(
-        new EventError(
-          EventError.TYPE.VALIDATION_FAILED,
-          'Event validation failed: Message duplication event invalid: original message did not fail to send and does not contain link preview',
-        ),
-      );
-    });
-
-    it('ignores a plain text message with an ID previously used by the same user', async () => {
+    it('fails for a plain text message with an ID previously used by the same user', async () => {
       const [eventStorageMiddleware, {eventService}] = buildEventStorageMiddleware();
       const event = createEvent();
       eventService.loadEvent.mockResolvedValue(event);
@@ -180,12 +113,12 @@ describe('EventStorageMiddleware', () => {
       await expect(eventStorageMiddleware.processEvent(event)).rejects.toEqual(
         new EventError(
           EventError.TYPE.VALIDATION_FAILED,
-          'Event validation failed: Message duplication event invalid: original message did not fail to send and does not contain link preview',
+          'Event validation failed: ID already used for a successfully sent message',
         ),
       );
     });
 
-    it('ignores a text message with link preview with an ID previously used by the same user for a text message with link preview', async () => {
+    it('fails for a text message with link preview with an ID previously used by the same user for a text message with link preview', async () => {
       const [eventStorageMiddleware, {eventService}] = buildEventStorageMiddleware();
       const event = createEvent();
       const storedEvent = {...event, data: {...event.data, previews: [1]}};
@@ -194,7 +127,7 @@ describe('EventStorageMiddleware', () => {
       await expect(eventStorageMiddleware.processEvent(event)).rejects.toEqual(
         new EventError(
           EventError.TYPE.VALIDATION_FAILED,
-          'Event validation failed: Message duplication event invalid: original message did not fail to send and does not contain link preview',
+          'Event validation failed: ID already used for a successfully sent message',
         ),
       );
     });
@@ -202,7 +135,7 @@ describe('EventStorageMiddleware', () => {
     it('ignores a text message with link preview with an ID previously used by the same user for a text message different content', async () => {
       const [eventStorageMiddleware, {eventService}] = buildEventStorageMiddleware();
       const event = createEvent();
-      const storedEvent = {...event, data: {...event.data, previews: [1]}};
+      const storedEvent = {...event, data: {...event.data, previews: []}};
       eventService.loadEvent.mockResolvedValue(storedEvent);
 
       const newEvent = {...event, data: {...event.data, content: 'different content', previews: [1]}};
@@ -210,7 +143,7 @@ describe('EventStorageMiddleware', () => {
       await expect(eventStorageMiddleware.processEvent(newEvent)).rejects.toEqual(
         new EventError(
           EventError.TYPE.VALIDATION_FAILED,
-          'Event validation failed: ID of link preview reused: Text content for message duplication not matching',
+          'Event validation failed: Link preview with different text content',
         ),
       );
     });
@@ -256,7 +189,6 @@ describe('EventStorageMiddleware', () => {
         }),
       );
       eventService.loadEvent.mockResolvedValue(storedEvent);
-      eventService.replaceEvent.mockImplementation(event => event);
 
       linkPreviewEvent.data.replacing_message_id = replacingId;
       linkPreviewEvent.data.previews = ['preview'];
@@ -273,7 +205,6 @@ describe('EventStorageMiddleware', () => {
       const originalEvent = JSON.parse(JSON.stringify(event));
       originalEvent.reactions = ['user-id'];
       eventService.loadEvent.mockResolvedValue(originalEvent);
-      eventService.replaceEvent.mockImplementation(event => event);
 
       const initial_time = event.time;
       const changed_time = new Date(new Date(event.time).getTime() + 60 * 1000).toISOString();
@@ -303,7 +234,6 @@ describe('EventStorageMiddleware', () => {
       };
       const editEvent = {...event};
       eventService.loadEvent.mockResolvedValue(storedEvent);
-      eventService.replaceEvent.mockImplementation(event => event);
 
       editEvent.data.replacing_message_id = replacingId;
 
@@ -317,8 +247,6 @@ describe('EventStorageMiddleware', () => {
       const [eventStorageMiddleware, {eventService}] = buildEventStorageMiddleware();
       const event = createEvent();
       const assetAddEvent = {...event, type: ClientEvent.CONVERSATION.ASSET_ADD};
-
-      jest.spyOn(eventService, 'loadEvent').mockClear();
 
       const updatedEvent = await eventStorageMiddleware.processEvent(assetAddEvent);
       expect(updatedEvent.type).toEqual(ClientEvent.CONVERSATION.ASSET_ADD);
@@ -382,11 +310,10 @@ describe('EventStorageMiddleware', () => {
       } as any;
 
       eventService.loadEvent.mockResolvedValue(assetAddEvent);
-      eventService.updateEventAsUploadFailed.mockResolvedValue(assetAddEvent);
 
       const savedEvent = await eventStorageMiddleware.processEvent(assetUploadFailedEvent);
       expect(savedEvent.type).toEqual(ClientEvent.CONVERSATION.ASSET_ADD);
-      expect(eventService.updateEventAsUploadFailed).toHaveBeenCalled();
+      expect(eventService.replaceEvent).toHaveBeenCalled();
     });
 
     it('handles conversation.asset-add state update event', async () => {
@@ -400,7 +327,6 @@ describe('EventStorageMiddleware', () => {
       };
 
       eventService.loadEvent.mockResolvedValue(initialAssetEvent);
-      eventService.replaceEvent.mockImplementation(event => event);
 
       const updatedEvent = await eventStorageMiddleware.processEvent(updateStatusEvent);
       expect(updatedEvent.type).toEqual(ClientEvent.CONVERSATION.ASSET_ADD);
@@ -419,7 +345,6 @@ describe('EventStorageMiddleware', () => {
       };
 
       eventService.loadEvent.mockResolvedValue(initialAssetEvent);
-      eventService.replaceEvent.mockImplementation(event => event);
 
       const updatedEvent = await eventStorageMiddleware.processEvent(AssetPreviewEvent);
       expect(updatedEvent.type).toEqual(ClientEvent.CONVERSATION.ASSET_ADD);
