@@ -38,6 +38,7 @@ export function EditedMessagePlugin({message}: Props): null {
       setTimeout(() => {
         editor.update(() => {
           const root = $getRoot();
+          root.clear();
           // This behaviour is needed to clear selection, if we not clear selection will be on beginning.
           $setSelection(null);
           // Replace the current root with the content of the message being edited

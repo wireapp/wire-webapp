@@ -252,12 +252,12 @@ describe('ProteusConversationVerificationStateHandler', () => {
   });
 
   describe('onClientVerificationChanged', () => {
-    it('should change state to UNVERIFIED if user unverified client', () => {
+    it('should change state to DEGRADED if user unverified client', () => {
       clientA.meta.isVerified(false);
 
       stateHandler.onClientVerificationChanged(userA.qualifiedId);
 
-      expect(conversationAB.verification_state()).toBe(ConversationVerificationState.UNVERIFIED);
+      expect(conversationAB.verification_state()).toBe(ConversationVerificationState.DEGRADED);
       expect(conversationB.verification_state()).toBe(ConversationVerificationState.VERIFIED);
       expect(conversationAB.is_verified()).toBeFalsy();
     });
