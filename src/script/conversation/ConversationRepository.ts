@@ -1934,6 +1934,14 @@ export class ConversationRepository {
   }
 
   /**
+   * Get all conversations from the local state.
+   * @returns All conversations from the local state
+   */
+  public getAllLocalConversations() {
+    return this.conversationState.conversations();
+  }
+
+  /**
    * Set the notification handling state.
    *
    * @note Temporarily do not unarchive conversations when handling the notification stream
