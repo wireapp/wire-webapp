@@ -375,6 +375,7 @@ export class App {
       });
 
       const selfUser = await this.initiateSelfUser();
+
       await initializeDataDog(this.config, selfUser.qualifiedId);
 
       // Setup all event middleware
@@ -458,6 +459,7 @@ export class App {
       telemetry.timeStep(AppInitTimingsStep.APP_PRE_LOADED);
 
       selfUser.devices(clientEntities);
+
       this._handleUrlParams();
       await conversationRepository.updateConversationsOnAppInit();
       await conversationRepository.conversationLabelRepository.loadLabels();
@@ -475,6 +477,9 @@ export class App {
       conversationRepository.cleanupConversations();
       callingRepository.setReady();
       telemetry.timeStep(AppInitTimingsStep.APP_LOADED);
+
+      // Add the local client to the user
+      selfUser.localClient = await clientRepository.getValidLocalClient();
 
       this.logger.info(`App loaded in ${Date.now() - startTime}ms`);
 

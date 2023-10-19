@@ -22,12 +22,10 @@ import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import ko from 'knockout';
-import {container} from 'tsyringe';
 
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {ClientState} from 'src/script/client/ClientState';
 import {t} from 'Util/LocalizerUtil';
 import {clamp} from 'Util/NumberUtil';
 import {getFirstChar} from 'Util/StringUtil';
@@ -56,6 +54,7 @@ export class User {
   public readonly connection: ko.Observable<ConnectionEntity>;
   /** does not include current client/device */
   public readonly devices: ko.ObservableArray<ClientEntity>;
+  public localClient: ko.Observable<ClientEntity> | undefined;
   public readonly email: ko.Observable<string>;
   public locale?: string;
   public readonly expirationRemaining: ko.Observable<number>;
@@ -216,8 +215,8 @@ export class User {
         if (!this.isMe) {
           return false;
         }
-        const clientState = container.resolve(ClientState);
-        return clientState.currentClient().meta.isMLSVerified?.() ?? false;
+
+        return this.localClient ? this.localClient().meta.isMLSVerified?.() ?? false : false;
       }
       return this.devices().every(client_et => client_et.meta.isMLSVerified?.() ?? false);
     });
