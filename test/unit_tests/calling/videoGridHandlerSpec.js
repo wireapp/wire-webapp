@@ -73,7 +73,7 @@ describe('videoGridHandler', () => {
         selfParticipant.videoStream({});
         const call = new Call('', '', undefined, selfParticipant, CALL_TYPE.NORMAL, {
           currentAvailableDeviceId: {
-            audioOutput: ko.pureComputed(() => 'test'),
+            audiooutput: ko.pureComputed(() => 'test'),
           },
         });
         call.participants = participantsObs;
@@ -95,7 +95,7 @@ describe('videoGridHandler', () => {
         const selfParticipant = generateVideoParticipant('self', true);
         const call = new Call('', '', CONV_TYPE.ONEONONE, selfParticipant, CALL_TYPE.NORMAL, {
           currentAvailableDeviceId: {
-            audioOutput: ko.pureComputed(() => 'test'),
+            audiooutput: ko.pureComputed(() => 'test'),
           },
         });
         call.addParticipant(participants[0]);
@@ -111,7 +111,7 @@ describe('videoGridHandler', () => {
         const selfParticipant = generateVideoParticipant('self', true);
         const call = new Call('', '', CONV_TYPE.GROUP, selfParticipant, CALL_TYPE.NORMAL, {
           currentAvailableDeviceId: {
-            audioOutput: ko.pureComputed(() => 'test'),
+            audiooutput: ko.pureComputed(() => 'test'),
           },
         });
         call.addParticipant(participants[0]);
@@ -127,7 +127,7 @@ describe('videoGridHandler', () => {
         const selfParticipant = generateVideoParticipant('self', true);
         const call = new Call('', '', CONV_TYPE.GROUP, selfParticipant, CALL_TYPE.NORMAL, {
           currentAvailableDeviceId: {
-            audioOutput: ko.pureComputed(() => 'test'),
+            audiooutput: ko.pureComputed(() => 'test'),
           },
         });
         call.updatePages();
@@ -142,7 +142,7 @@ describe('videoGridHandler', () => {
         const selfParticipant = generateVideoParticipant('self', true);
         const call = new Call('', '', CONV_TYPE.GROUP, selfParticipant, CALL_TYPE.NORMAL, {
           currentAvailableDeviceId: {
-            audioOutput: ko.pureComputed(() => 'test'),
+            audiooutput: ko.pureComputed(() => 'test'),
           },
         });
         call.addParticipant(participants[0]);

@@ -37,7 +37,8 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {supportsMLSMigration} from 'Util/util';
 
 import {AppLock} from './AppLock';
-import {FeatureConfigChangeNotifier} from './components/FeatureConfigChangeNotifier';
+import {FeatureConfigChangeHandler} from './components/FeatureConfigChange/FeatureConfigChangeHandler/FeatureConfigChangeHandler';
+import {FeatureConfigChangeNotifier} from './components/FeatureConfigChange/FeatureConfigChangeNotifier';
 import {WindowTitleUpdater} from './components/WindowTitleUpdater';
 import {LeftSidebar} from './LeftSidebar';
 import {MainContent} from './MainContent';
@@ -257,6 +258,7 @@ const AppMain: FC<AppMainProps> = ({
           <AppLock clientRepository={repositories.client} />
           <WarningsContainer onRefresh={app.refresh} />
           <FeatureConfigChangeNotifier selfUserId={selfUser.id} teamState={teamState} />
+          <FeatureConfigChangeHandler teamState={teamState} />
 
           <CallingContainer
             multitasking={mainView.multitasking}

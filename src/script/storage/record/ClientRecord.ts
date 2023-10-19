@@ -32,6 +32,7 @@ export interface ClientRecord {
   };
   meta: {
     is_verified?: boolean;
+    is_mls_verified?: boolean;
     primary_key?: string;
   };
   model?: string;

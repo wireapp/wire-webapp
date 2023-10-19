@@ -53,7 +53,7 @@ const filterDuplicatedSystemMessages = (messages: MessageEntity[]) => {
           case CONVERSATION_EVENT.MEMBER_JOIN:
           case CONVERSATION_EVENT.MEMBER_LEAVE:
             // Dont show duplicated member join/leave messages that follow each other
-            if (uniqMemberMessages?.[uniqMemberMessages.length - 1]?.htmlCaption() === currentMessage.htmlCaption()) {
+            if (uniqMemberMessages?.[uniqMemberMessages.length - 1]?.hash() === currentMessage.hash()) {
               return uniqMessages;
             }
         }

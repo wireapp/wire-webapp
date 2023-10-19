@@ -74,6 +74,7 @@ import {NotificationService} from '../event/NotificationService';
 import {QuotedMessageMiddleware} from '../event/preprocessor/QuotedMessageMiddleware';
 import {ReceiptsMiddleware} from '../event/preprocessor/ReceiptsMiddleware';
 import {ServiceMiddleware} from '../event/preprocessor/ServiceMiddleware';
+import {FederationEventProcessor} from '../event/processor/FederationEventProcessor';
 import {GiphyRepository} from '../extension/GiphyRepository';
 import {GiphyService} from '../extension/GiphyService';
 import {getWebsiteUrl} from '../externalRoute';
@@ -268,16 +269,6 @@ export class App {
 
     repositories.eventTracker = new EventTrackingRepository(repositories.message);
 
-    const serviceMiddleware = new ServiceMiddleware(repositories.conversation, repositories.user);
-    const quotedMessageMiddleware = new QuotedMessageMiddleware(this.service.event);
-
-    const readReceiptMiddleware = new ReceiptsMiddleware(this.service.event, repositories.conversation);
-
-    repositories.event.setEventProcessMiddlewares([
-      serviceMiddleware.processEvent.bind(serviceMiddleware),
-      quotedMessageMiddleware.processEvent.bind(quotedMessageMiddleware),
-      readReceiptMiddleware.processEvent.bind(readReceiptMiddleware),
-    ]);
     repositories.backup = new BackupRepository(new BackupService(), repositories.conversation);
 
     repositories.integration = new IntegrationRepository(
@@ -387,6 +378,16 @@ export class App {
 
       const selfUser = await this.initiateSelfUser();
       await initializeDataDog(this.config, selfUser.qualifiedId);
+
+      // Setup all event middleware
+      const serviceMiddleware = new ServiceMiddleware(conversationRepository, userRepository, selfUser);
+      const quotedMessageMiddleware = new QuotedMessageMiddleware(this.service.event);
+      const readReceiptMiddleware = new ReceiptsMiddleware(this.service.event, conversationRepository, selfUser);
+
+      eventRepository.setEventProcessMiddlewares([serviceMiddleware, quotedMessageMiddleware, readReceiptMiddleware]);
+      // Setup all the event processors
+      const federationEventProcessor = new FederationEventProcessor(eventRepository, serverTimeHandler, selfUser);
+      eventRepository.setEventProcessors([federationEventProcessor]);
 
       onProgress(5, t('initReceivedSelfUser', selfUser.name()));
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_SELF_USER);

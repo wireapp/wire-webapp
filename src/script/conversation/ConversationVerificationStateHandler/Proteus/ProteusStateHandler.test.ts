@@ -24,14 +24,14 @@ import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import {createUuid} from 'Util/uuid';
 
-import {ConversationRepository} from './ConversationRepository';
-import {ConversationVerificationStateHandler} from './ConversationVerificationStateHandler';
+import {ProteusConversationVerificationStateHandler} from './ProteusStateHandler';
 
-import {TestFactory} from '../../../test/helper/TestFactory';
+import {TestFactory} from '../../../../../test/helper/TestFactory';
+import {ConversationRepository} from '../../ConversationRepository';
 
-describe('ConversationVerificationStateHandler', () => {
+describe('ProteusConversationVerificationStateHandler', () => {
   const testFactory = new TestFactory();
-  let stateHandler: ConversationVerificationStateHandler;
+  let stateHandler: ProteusConversationVerificationStateHandler;
   let conversationRepository: ConversationRepository;
 
   let conversationAB: Conversation;
@@ -49,7 +49,7 @@ describe('ConversationVerificationStateHandler', () => {
     return testFactory.exposeConversationActors().then(_conversation_repository => {
       spyOn(testFactory.event_repository, 'injectEvent').and.returnValue(undefined);
       conversationRepository = _conversation_repository;
-      stateHandler = conversationRepository.verificationStateHandler;
+      stateHandler = conversationRepository.proteusVerificationStateHandler;
 
       conversationAB = new Conversation(createUuid());
       conversationB = new Conversation(createUuid());
@@ -252,12 +252,12 @@ describe('ConversationVerificationStateHandler', () => {
   });
 
   describe('onClientVerificationChanged', () => {
-    it('should change state to UNVERIFIED if user unverified client', () => {
+    it('should change state to DEGRADED if user unverified client', () => {
       clientA.meta.isVerified(false);
 
       stateHandler.onClientVerificationChanged(userA.qualifiedId);
 
-      expect(conversationAB.verification_state()).toBe(ConversationVerificationState.UNVERIFIED);
+      expect(conversationAB.verification_state()).toBe(ConversationVerificationState.DEGRADED);
       expect(conversationB.verification_state()).toBe(ConversationVerificationState.VERIFIED);
       expect(conversationAB.is_verified()).toBeFalsy();
     });

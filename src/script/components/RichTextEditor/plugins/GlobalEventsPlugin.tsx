@@ -29,6 +29,7 @@ import {
   COMMAND_PRIORITY_LOW,
   KEY_ARROW_UP_COMMAND,
   BLUR_COMMAND,
+  COMMAND_PRIORITY_EDITOR,
 } from 'lexical';
 
 import {isTabKey} from 'Util/KeyboardUtil';
@@ -81,9 +82,9 @@ export function GlobalEventsPlugin({onShiftTab, onArrowUp, onEscape, onBlur}: Gl
         KEY_ESCAPE_COMMAND,
         () => {
           onEscape();
-          return true;
+          return false;
         },
-        COMMAND_PRIORITY_LOW,
+        COMMAND_PRIORITY_EDITOR,
       ),
       editor.registerCommand(
         KEY_ARROW_UP_COMMAND,

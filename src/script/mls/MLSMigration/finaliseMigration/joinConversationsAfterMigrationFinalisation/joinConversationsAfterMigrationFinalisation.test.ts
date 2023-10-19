@@ -92,6 +92,7 @@ const createMockedDBConversationEntry = (
   verification_state: 0,
   accessModes: [CONVERSATION_ACCESS.INVITE, CONVERSATION_ACCESS.CODE],
   message_timer: 0,
+  mlsVerificationState: 0,
 });
 
 const createConversation = (
