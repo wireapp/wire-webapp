@@ -215,7 +215,7 @@ export class DebugUtil {
     await proteusService['cryptoClient'].debugBreakSession(sessionId);
   }
 
-  async setTeamSupportedProtocols(supportedProtocols: ConversationProtocol[]) {
+  async setTeamSupportedProtocols(supportedProtocols: ConversationProtocol[], defaultProtocol?: ConversationProtocol) {
     const {teamId} = await this.userRepository.getSelf();
     if (!teamId) {
       throw new Error('teamId of self user is undefined');
@@ -228,7 +228,7 @@ export class DebugUtil {
     }
 
     const response = await this.apiClient.api.teams.feature.putMLSFeature(teamId, {
-      config: {...mlsFeature.config, supportedProtocols},
+      config: {...mlsFeature.config, supportedProtocols, defaultProtocol: defaultProtocol || supportedProtocols[0]},
       status: FeatureStatus.ENABLED,
     });
 
