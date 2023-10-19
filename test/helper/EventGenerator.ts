@@ -87,7 +87,9 @@ export function createAssetAddEvent(overrides: Partial<AssetAddEvent> = {}): Ass
  * @param event
  * @returns
  */
-export function toSavedEvent(event: MessageAddEvent | AssetAddEvent) {
+export function toSavedEvent<T extends MessageAddEvent | AssetAddEvent>(
+  event: T,
+): T & {primary_key: string; category: number} {
   return {
     primary_key: createUuid(),
     category: 1,
