@@ -416,7 +416,7 @@
   "conversationMemberRemovedYou": "[bold]You[/bold] removed {{users}}",
   "conversationMessageDelivered": "Delivered",
   "conversationMissedMessages": "You haven’t used this device for a while. Some messages may not appear here.",
-  "conversationJoinedAfterMLSMigrationFinalisation": "You have joined this conversation after the MLS migration was completed. You might miss some messages.",
+  "conversationJoinedAfterMLSMigrationFinalisation": "You haven’t updated this device for a while. In the meantime, the standard messaging protocol changed from Proteus to Messaging Layer Security (MLS). Due to this change, some messages may not appear here. [link]Learn more about MLS[/link]",
   "conversationModalRestrictedFileSharingDescription": "This file could not be shared due to your file sharing restrictions.",
   "conversationModalRestrictedFileSharingHeadline": "File sharing restrictions",
   "conversationMultipleMembersRemovedMissingLegalHoldConsent": "{{users}} were removed from this conversation because legal hold has been activated. [link]Learn more[/link]",
