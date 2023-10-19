@@ -42,10 +42,18 @@ export class EventStorageMiddleware implements EventMiddleware {
       return event;
     }
     const eventId = 'id' in event && event.id;
+    /* We try to load a potential duplicate of the event (same ID, same conversation in the DB). There are multiple valid cases for duplicates:
+     * - The event is a retry of a previously failed event
+     * - The event is a link preview of a text message previously sent
+     * - The event is an asset upload success of a metadata asset message
+     */
     const duplicateEvent = eventId ? await this.eventService.loadEvent(event.conversation, eventId) : undefined;
 
+    // We first validate that the event is valid
     this.validateEvent(event, duplicateEvent);
+    // Then ask the different handlers which DB operations to perform
     const operation = await this.getDbOperation(event, duplicateEvent);
+    // And finally execute the operation
     return operation ? this.execDBOperation(operation, event.conversation) : event;
   }
 
