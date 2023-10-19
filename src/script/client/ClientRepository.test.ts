@@ -244,6 +244,7 @@ describe('ClientRepository', () => {
   });
 
   describe('isCurrentClient', () => {
+    //@ts-ignore
     beforeEach(() => (testFactory.client_repository['clientState'].currentClient = undefined));
 
     it('returns true if user ID and client ID match', () => {
