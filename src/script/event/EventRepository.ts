@@ -48,7 +48,6 @@ import {NOTIFICATION_HANDLING_STATE} from './NotificationHandlingState';
 import type {NotificationService} from './NotificationService';
 
 import {AssetTransferState} from '../assets/AssetTransferState';
-import type {ClientEntity} from '../client/ClientEntity';
 import {AssetAddEvent, ClientConversationEvent, EventBuilder, MessageAddEvent} from '../conversation/EventBuilder';
 import {CryptographyMapper} from '../cryptography/CryptographyMapper';
 import {CryptographyError} from '../error/CryptographyError';
@@ -63,7 +62,6 @@ import {Warnings} from '../view_model/WarningsContainer';
 
 export class EventRepository {
   logger: Logger;
-  currentClient: ko.Observable<ClientEntity> | undefined;
   notificationHandlingState: ko.Observable<NOTIFICATION_HANDLING_STATE>;
   previousHandlingState: NOTIFICATION_HANDLING_STATE | undefined;
   notificationsHandled: number;
@@ -109,8 +107,6 @@ export class EventRepository {
     private readonly userState = container.resolve(UserState),
   ) {
     this.logger = getLogger('EventRepository');
-
-    this.currentClient = undefined;
 
     this.notificationHandlingState = ko.observable(NOTIFICATION_HANDLING_STATE.STREAM);
     this.notificationHandlingState.subscribe(handling_state => {

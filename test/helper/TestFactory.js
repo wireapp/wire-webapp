@@ -123,7 +123,7 @@ export class TestFactory {
     currentClient.time = '2016-10-07T16:01:42.133Z';
     currentClient.type = ClientType.TEMPORARY;
 
-    this.client_repository['clientState'].currentClient(currentClient);
+    this.client_repository['clientState'].currentClient = currentClient;
 
     return this.client_repository;
   }
@@ -145,7 +145,6 @@ export class TestFactory {
       serverTimeHandler,
       this.user_repository['userState'],
     );
-    this.event_repository.currentClient = this.client_repository['clientState'].currentClient;
 
     return this.event_repository;
   }
@@ -262,7 +261,7 @@ export class TestFactory {
     clientEntity.class = ClientClassification.DESKTOP;
     clientEntity.id = '60aee26b7f55a99f';
     const clientState = new ClientState();
-    clientState.currentClient(clientEntity);
+    clientState.currentClient = clientEntity;
 
     this.message_repository = new MessageRepository(
       () => this.conversation_repository,

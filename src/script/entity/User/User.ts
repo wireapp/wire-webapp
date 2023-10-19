@@ -54,6 +54,7 @@ export class User {
   public readonly connection: ko.Observable<ConnectionEntity>;
   /** does not include current client/device */
   public readonly devices: ko.ObservableArray<ClientEntity>;
+  public localClient: ClientEntity | undefined;
   public readonly email: ko.Observable<string>;
   public locale?: string;
   public readonly expirationRemaining: ko.Observable<number>;
@@ -210,10 +211,14 @@ export class User {
       return this.devices().every(client_et => client_et.meta.isVerified?.());
     });
     this.isMLSVerified = ko.pureComputed(() => {
-      if (this.devices().length === 0 && !this.isMe) {
-        return false;
+      if (this.devices().length === 0) {
+        if (!this.isMe) {
+          return false;
+        }
+
+        return this.localClient?.meta.isMLSVerified?.() ?? false;
       }
-      return this.devices().every(client_et => client_et.meta.isMLSVerified?.());
+      return this.devices().every(client_et => client_et.meta.isMLSVerified?.() ?? false);
     });
     this.isOnLegalHold = ko.pureComputed(() => {
       return this.devices().some(client_et => client_et.isLegalHold());
