@@ -54,7 +54,7 @@ export class User {
   public readonly connection: ko.Observable<ConnectionEntity>;
   /** does not include current client/device */
   public readonly devices: ko.ObservableArray<ClientEntity>;
-  public localClient: ko.Observable<ClientEntity> | undefined;
+  public localClient: ClientEntity | undefined;
   public readonly email: ko.Observable<string>;
   public locale?: string;
   public readonly expirationRemaining: ko.Observable<number>;
@@ -216,7 +216,7 @@ export class User {
           return false;
         }
 
-        return this.localClient ? this.localClient().meta.isMLSVerified?.() ?? false : false;
+        return this.localClient?.meta.isMLSVerified?.() ?? false;
       }
       return this.devices().every(client_et => client_et.meta.isMLSVerified?.() ?? false);
     });

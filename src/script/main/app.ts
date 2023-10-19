@@ -390,11 +390,11 @@ export class App {
 
       onProgress(5, t('initReceivedSelfUser', selfUser.name()));
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_SELF_USER);
-      const clientEntity = await this._initiateSelfUserClients();
-      callingRepository.initAvs(selfUser, clientEntity().id);
+      const clientEntity = await this._initiateSelfUserClients(selfUser, clientRepository);
+      callingRepository.initAvs(selfUser, clientEntity.id);
       onProgress(7.5, t('initValidatedClient'));
       telemetry.timeStep(AppInitTimingsStep.VALIDATED_CLIENT);
-      telemetry.addStatistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity().type ?? clientType);
+      telemetry.addStatistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity.type ?? clientType);
 
       onProgress(10);
       telemetry.timeStep(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
@@ -477,9 +477,6 @@ export class App {
       conversationRepository.cleanupConversations();
       callingRepository.setReady();
       telemetry.timeStep(AppInitTimingsStep.APP_LOADED);
-
-      // Add the local client to the user
-      selfUser.localClient = await clientRepository.getValidLocalClient();
 
       this.logger.info(`App loaded in ${Date.now() - startTime}ms`);
 
@@ -588,14 +585,11 @@ export class App {
    * Initiate the current client of the self user.
    * @returns Resolves with the local client entity
    */
-  private _initiateSelfUserClients() {
-    return this.repository.client
-      .getValidLocalClient()
-      .then(clientObservable => {
-        this.repository.event.currentClient = clientObservable;
-        return this.repository.client.getClientsForSelf();
-      })
-      .then(() => this.repository.client['clientState'].currentClient);
+  private async _initiateSelfUserClients(selfUser: User, clientRepository: ClientRepository) {
+    // Add the local client to the user
+    selfUser.localClient = await clientRepository.getValidLocalClient();
+    await this.repository.client.getClientsForSelf();
+    return selfUser.localClient;
   }
 
   /**

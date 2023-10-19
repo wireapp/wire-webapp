@@ -20,7 +20,6 @@
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
 
 import {ClientEntity} from 'src/script/client';
-import {ClientState} from 'src/script/client/ClientState';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import {Core} from 'src/script/service/CoreSingleton';
@@ -77,16 +76,11 @@ describe('MLSConversationVerificationStateHandler', () => {
         },
       },
     } as unknown as jest.Mocked<Core>;
-    // Mock the client state
-    const mockClientState = {
-      currentClient: () => selfClientEntity,
-    } as unknown as jest.Mocked<ClientState>;
 
     handler = new MLSConversationVerificationStateHandler(
       mockOnConversationVerificationStateChange,
       mockConversationState,
       mockCore,
-      mockClientState,
     );
 
     jest.clearAllMocks();
@@ -198,6 +192,7 @@ describe('MLSConversationVerificationStateHandler', () => {
 
       const user = new User();
       user.isMe = true;
+      user.localClient = selfClientEntity;
       conversation.getAllUserEntities = jest.fn().mockReturnValue([user]);
 
       jest.spyOn(handler as any, 'isCertificateActiveAndValid').mockReturnValue(true);
