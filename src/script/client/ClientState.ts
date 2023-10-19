@@ -27,7 +27,5 @@ export class ClientState {
   clients: ko.PureComputed<ClientEntity[]>;
   currentClient: ClientEntity | undefined;
 
-  constructor() {
-    this.isTemporaryClient = this.currentClient?.isTemporary();
-  }
+  constructor() {}
 }
