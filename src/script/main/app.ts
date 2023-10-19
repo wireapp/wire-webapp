@@ -432,15 +432,16 @@ export class App {
 
       await conversationRepository.conversationRoleRepository.loadTeamRoles();
 
+      let totalNotifications = 0;
       await eventRepository.connectWebSocket(this.core, ({done, total}) => {
         const baseMessage = t('initDecryption');
         const extraInfo = this.config.FEATURE.SHOW_LOADING_INFORMATION
           ? ` ${t('initProgress', {number1: done.toString(), number2: total.toString()})}`
           : '';
 
+        totalNotifications = total;
         onProgress(25 + 50 * (done / total), `${baseMessage}${extraInfo}`);
       });
-      const notificationsCount = eventRepository.notificationsTotal;
 
       if (supportsMLS()) {
         // Once all the messages have been processed and the message sending queue freed we can now:
@@ -453,7 +454,7 @@ export class App {
       }
 
       telemetry.timeStep(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
-      telemetry.addStatistic(AppInitStatisticsValue.NOTIFICATIONS, notificationsCount, 100);
+      telemetry.addStatistic(AppInitStatisticsValue.NOTIFICATIONS, totalNotifications, 100);
 
       eventTrackerRepository.init(propertiesRepository.properties.settings.privacy.telemetry_sharing);
       onProgress(97.5, t('initUpdatedFromNotifications', this.config.BRAND_NAME));

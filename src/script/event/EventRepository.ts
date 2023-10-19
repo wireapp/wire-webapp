@@ -56,14 +56,11 @@ import {Warnings} from '../view_model/WarningsContainer';
 
 export class EventRepository {
   logger: Logger;
-  notificationHandlingState: ko.Observable<NOTIFICATION_HANDLING_STATE>;
-  previousHandlingState: NOTIFICATION_HANDLING_STATE | undefined;
-  notificationsHandled: number;
-  notificationsTotal: number;
-  lastEventDate: ko.Observable<string | undefined>;
-  eventProcessMiddlewares: EventMiddleware[] = [];
+  notificationHandlingState = ko.observable(NOTIFICATION_HANDLING_STATE.STREAM);
+  private readonly lastEventDate: ko.Observable<string | undefined> = ko.observable();
+  private eventProcessMiddlewares: EventMiddleware[] = [];
   /** event processors are classes that are able to react and process an incoming event */
-  eventProcessors: EventProcessor[] = [];
+  private eventProcessors: EventProcessor[] = [];
 
   static get CONFIG() {
     return {
@@ -102,14 +99,9 @@ export class EventRepository {
   ) {
     this.logger = getLogger('EventRepository');
 
-    this.notificationHandlingState = ko.observable(NOTIFICATION_HANDLING_STATE.STREAM);
     this.notificationHandlingState.subscribe(handling_state => {
       amplify.publish(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, handling_state);
     });
-    this.notificationsHandled = 0;
-    this.notificationsTotal = 0;
-
-    this.lastEventDate = ko.observable();
   }
 
   /**
