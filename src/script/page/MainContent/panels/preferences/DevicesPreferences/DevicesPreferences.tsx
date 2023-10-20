@@ -63,8 +63,17 @@ export const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
   const [selectedDeviceIdentity, setSelectedDeviceIdentity] = useState<WireIdentity>();
   const [localFingerprint, setLocalFingerprint] = useState('');
 
-  const {clients, currentClient} = useKoSubscribableChildren(clientState, ['clients', 'currentClient']);
-  const {isVerified: isSelfClientVerified} = useKoSubscribableChildren(currentClient.meta, ['isVerified']);
+  const {clients} = useKoSubscribableChildren(clientState, ['clients']);
+  const currentClient = clientState.currentClient;
+
+  const isSelfClientVerified = React.useMemo(() => {
+    if (!currentClient) {
+      return false;
+    }
+    return !!currentClient?.meta.isMLSVerified?.();
+  }, [currentClient]);
+
+  const isSSO = selfUser.isNoPasswordSSO;
 
   const getFingerprint = (device: ClientEntity) =>
     cryptographyRepository.getRemoteFingerprint(selfUser.qualifiedId, device.id);
@@ -92,8 +101,6 @@ export const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
     );
   }
 
-  const isSSO = selfUser.isNoPasswordSSO;
-
   const e2eiIdentity = E2EIHandler.getInstance();
   const certificate = e2eiIdentity.getCertificateData();
 
@@ -120,13 +127,17 @@ export const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
     <PreferencesPage title={t('preferencesDevices')}>
       <fieldset className="preferences-section" data-uie-name="preferences-device-current">
         <legend className="preferences-header">{t('preferencesDevicesCurrent')}</legend>
-
-        <DetailedDevice
-          device={currentClient}
-          fingerprint={localFingerprint}
-          certificate={certificate}
-          isProteusVerified={isSelfClientVerified}
-        />
+        {currentClient && (
+          <>
+            <DetailedDevice
+              device={currentClient}
+              fingerprint={localFingerprint}
+              certificate={certificate}
+              isProteusVerified={isSelfClientVerified}
+            />
+            <DetailedDevice device={currentClient} fingerprint={localFingerprint} />
+          </>
+        )}
       </fieldset>
 
       <hr className="preferences-devices-separator preferences-separator" />

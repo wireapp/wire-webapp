@@ -159,8 +159,8 @@ export class ClientRepository {
         }
 
         const currentClient = ClientMapper.mapClient(clientRecord, true, clientRecord.domain);
-        this.clientState.currentClient(currentClient);
-        return this.clientState.currentClient();
+        this.clientState.currentClient = currentClient;
+        return this.clientState.currentClient;
       });
   }
 
@@ -245,13 +245,16 @@ export class ClientRepository {
    * Get and validate the local client.
    * @returns Resolves with an observable containing the client if valid
    */
-  async getValidLocalClient(): Promise<ko.Observable<ClientEntity>> {
+  async getValidLocalClient(): Promise<ClientEntity> {
     try {
       const clientEntity = await this.getCurrentClientFromDb();
       await this.getClientByIdFromBackend(clientEntity.id);
       const currentClient = this.clientState.currentClient;
 
-      await this.clientService.putClientCapabilities(currentClient().id, {
+      if (!currentClient) {
+        throw new ClientError(ClientError.TYPE.CLIENT_NOT_SET, ClientError.MESSAGE.CLIENT_NOT_SET);
+      }
+      await this.clientService.putClientCapabilities(currentClient.id, {
         capabilities: [ClientCapability.LEGAL_HOLD_IMPLICIT_CONSENT],
       });
 
@@ -270,9 +273,9 @@ export class ClientRepository {
    * Load current client type from amplify store.
    * @returns Type of current client
    */
-  private loadCurrentClientType(): ClientType.PERMANENT | ClientType.TEMPORARY {
-    if (this.clientState.currentClient()) {
-      return this.clientState.currentClient().type;
+  private loadCurrentClientType(): ClientType.PERMANENT | ClientType.TEMPORARY | undefined {
+    if (this.clientState.currentClient) {
+      return this.clientState.currentClient.type;
     }
     const isPermanent = loadValue(StorageKey.AUTH.PERSIST);
     const type = isPermanent ? ClientType.PERMANENT : ClientType.TEMPORARY;
@@ -299,8 +302,8 @@ export class ClientRepository {
   }
 
   logoutClient = async (): Promise<void> => {
-    if (this.clientState.currentClient()) {
-      if (this.clientState.isTemporaryClient()) {
+    if (this.clientState.currentClient) {
+      if (this.clientState.currentClient.isTemporary()) {
         await this.deleteLocalTemporaryClient();
         amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, true);
       } else {
@@ -387,10 +390,10 @@ export class ClientRepository {
    * @returns Type of current client is permanent
    */
   isCurrentClientPermanent(): boolean {
-    if (!this.clientState.currentClient()) {
+    if (!this.clientState.currentClient) {
       throw new ClientError(ClientError.TYPE.CLIENT_NOT_SET, ClientError.MESSAGE.CLIENT_NOT_SET);
     }
-    return Runtime.isDesktopApp() || this.clientState.currentClient().isPermanent();
+    return Runtime.isDesktopApp() || this.clientState.currentClient.isPermanent();
   }
 
   /**
@@ -450,7 +453,7 @@ export class ClientRepository {
 
             delete clientsFromBackend[clientId];
 
-            if (this.clientState.currentClient() && this.isCurrentClient(userId, clientId)) {
+            if (this.clientState.currentClient && this.isCurrentClient(userId, clientId)) {
               this.logger.warn(`Removing duplicate local self client`);
               await this.removeClient(userId, clientId);
             }
@@ -477,7 +480,7 @@ export class ClientRepository {
         for (const clientId in clientsFromBackend) {
           const clientPayload = clientsFromBackend[clientId];
 
-          if (this.clientState.currentClient() && this.isCurrentClient(userId, clientId)) {
+          if (this.clientState.currentClient && this.isCurrentClient(userId, clientId)) {
             continue;
           }
 
@@ -512,7 +515,7 @@ export class ClientRepository {
    * @returns Is the client the current local client
    */
   private isCurrentClient(userId: QualifiedId, clientId: string): boolean {
-    if (!this.clientState.currentClient()) {
+    if (!this.clientState.currentClient) {
       throw new ClientError(ClientError.TYPE.CLIENT_NOT_SET, ClientError.MESSAGE.CLIENT_NOT_SET);
     }
     if (!userId) {
@@ -521,7 +524,7 @@ export class ClientRepository {
     if (!clientId) {
       throw new ClientError(ClientError.TYPE.NO_CLIENT_ID, ClientError.MESSAGE.NO_CLIENT_ID);
     }
-    return matchQualifiedIds(userId, this.selfUser()) && clientId === this.clientState.currentClient().id;
+    return matchQualifiedIds(userId, this.selfUser()) && clientId === this.clientState.currentClient.id;
   }
 
   //##############################################################################
@@ -563,7 +566,7 @@ export class ClientRepository {
       return;
     }
 
-    const isCurrentClient = clientId === this.clientState.currentClient().id;
+    const isCurrentClient = clientId === this.clientState.currentClient.id;
     if (isCurrentClient) {
       // If the current client has been removed, we need to sign out
       amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.CLIENT_REMOVED, true);

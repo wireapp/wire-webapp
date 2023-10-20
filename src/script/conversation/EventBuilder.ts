@@ -144,26 +144,23 @@ export type MemberLeaveEvent = BackendEventMessage<
     user_ids: string[];
   }
 >;
-export type MessageAddEvent = Omit<
-  ConversationEvent<
-    CONVERSATION.MESSAGE_ADD,
-    {
-      sender: string;
-      content: string;
-      replacing_message_id?: string;
-      previews?: string[];
-      expects_read_confirmation?: boolean;
-      quote?:
-        | string
-        | {
-            message_id: string;
-            user_id: string;
-            hash: Uint8Array;
-          }
-        | {error: {type: string}};
-    }
-  >,
-  'id'
+export type MessageAddEvent = ConversationEvent<
+  CONVERSATION.MESSAGE_ADD,
+  {
+    sender: string;
+    content: string;
+    replacing_message_id?: string;
+    previews?: string[];
+    expects_read_confirmation?: boolean;
+    quote?:
+      | string
+      | {
+          message_id: string;
+          user_id: string;
+          hash: Uint8Array;
+        }
+      | {error: {type: string}};
+  }
 > & {
   /** who have received/read the event */
   read_receipts?: ReadReceipt[];
@@ -532,14 +529,20 @@ export const EventBuilder = {
     };
   },
 
-  buildMessageAdd(conversationEntity: Conversation, currentTimestamp: number, senderId: string): MessageAddEvent {
+  buildMessageAdd(
+    conversationEntity: Conversation,
+    currentTimestamp: number,
+    senderId: string,
+    clientId: string,
+  ): MessageAddEvent {
     return {
       ...buildQualifiedId(conversationEntity),
       data: {
         content: '',
-        sender: senderId,
+        sender: clientId,
       },
-      from: conversationEntity.selfUser().id,
+      id: createUuid(),
+      from: senderId,
       status: StatusType.SENDING,
       time: conversationEntity.getNextIsoDate(currentTimestamp),
       type: ClientEvent.CONVERSATION.MESSAGE_ADD,
