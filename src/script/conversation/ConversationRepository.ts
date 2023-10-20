@@ -1559,6 +1559,11 @@ export class ConversationRepository {
       await this.replaceProteus1to1WithMLS(localProteusConversations, mlsConversation);
     }
 
+    if (mlsConversation.participating_user_ids.length === 0) {
+      ConversationMapper.updateProperties(mlsConversation, {participating_user_ids: [otherUser.qualifiedId]});
+      await this.updateParticipatingUserEntities(mlsConversation);
+    }
+
     // If mls is not supported by the other user we do not establish the group yet.
     if (!isMLSSupportedByTheOtherUser) {
       const isMLSGroupEstablishedLocally = await this.conversationService.isMLSGroupEstablishedLocally(

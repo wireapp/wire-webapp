@@ -389,7 +389,7 @@ describe('ConversationRepository', () => {
         id: {id: '04ab891e-ccf1-4dba-9d74-bacec64b5b1e', domain: 'test-domain'},
         type: CONVERSATION_TYPE.ONE_TO_ONE,
         protocol: ConversationProtocol.MLS,
-        overwites: {group_id: 'groupId'},
+        overwites: {group_id: 'groupId', others: [otherUserId.id], qualified_others: [otherUserId]},
       }) as BackendMLSConversation;
 
       const [mls1to1Conversation] = conversationRepository.mapConversations([mls1to1ConversationResponse]);
