@@ -105,6 +105,10 @@ export class ConversationService {
     await this.coreConversationService.blacklistConversation(conversationId);
   }
 
+  public async removeConversationFromBlacklist(conversationId: QualifiedId): Promise<void> {
+    await this.coreConversationService.removeConversationFromBlacklist(conversationId);
+  }
+
   /**
    * Get conversations for a list of conversation IDs.
    * @see https://staging-nginz-https.zinfra.io/v4/api/swagger-ui/#/default/post_conversations_list
