@@ -1119,9 +1119,10 @@ export class ConversationRepository {
    * If the common protocol is Proteus, it will try to initialise the conversation with Proteus.
    * If there's no common protocol, it will pick the protocol that is supported by the current user and mark conversation as read-only.
    * @param userEntity User entity for whom to get the conversation
+   * @param isLiveUpdate Whether the conversation is being initialised because of a live update (e.g. some websocket event)
    * @returns Resolves with the initialised 1:1 conversation with requested user
    */
-  async getInitialised1To1Conversation(userEntity: User): Promise<Conversation | null> {
+  async getInitialised1To1Conversation(userEntity: User, isLiveUpdate = false): Promise<Conversation | null> {
     const {qualifiedId: otherUserId} = userEntity;
 
     const {protocol, isMLSSupportedByTheOtherUser, isProteusSupportedByTheOtherUser} =
@@ -1130,7 +1131,7 @@ export class ConversationRepository {
     const localMLSConversation = this.conversationState.findMLS1to1Conversation(otherUserId);
 
     if (protocol === ConversationProtocol.MLS || localMLSConversation) {
-      return this.initMLS1to1Conversation(otherUserId, isMLSSupportedByTheOtherUser);
+      return this.initMLS1to1Conversation(otherUserId, isMLSSupportedByTheOtherUser, isLiveUpdate);
     }
 
     const proteusConversation = await this.getOrCreateProteus1To1Conversation(userEntity);
@@ -1407,11 +1408,18 @@ export class ConversationRepository {
    *
    * @param proteusConversation - proteus 1:1 conversation
    * @param mlsConversation - mls 1:1 conversation
+   * @returns `true` if mls 1:1 conversation should be opened in the UI, otherwise `false`
    */
   private readonly replaceProteus1to1WithMLS = async (
-    proteusConversations: ProteusConversation[],
+    otherUserId: QualifiedId,
     mlsConversation: MLSConversation,
-  ) => {
+  ): Promise<boolean> => {
+    const proteusConversations = this.conversationState.findProteus1to1Conversations(otherUserId);
+
+    if (!proteusConversations || proteusConversations.length < 1) {
+      return false;
+    }
+
     this.logger.info(`Replacing proteus 1:1 conversation(s) with mls 1:1 conversation ${mlsConversation.id}`);
 
     this.logger.info('Moving events from proteus 1:1 conversation to MLS 1:1 conversation');
@@ -1466,6 +1474,14 @@ export class ConversationRepository {
         return this.blacklistConversation(proteusConversation.qualifiedId);
       }),
     );
+
+    const wasProteus1to1ActiveConversation =
+      !!proteusConversations &&
+      proteusConversations.some(conversation => this.conversationState.isActiveConversation(conversation));
+
+    const isMLS1to1ActiveConversation = this.conversationState.isActiveConversation(mlsConversation);
+
+    return wasProteus1to1ActiveConversation && !isMLS1to1ActiveConversation;
   };
 
   private async blacklistConversation(conversationId: QualifiedId) {
@@ -1486,7 +1502,6 @@ export class ConversationRepository {
   private readonly establishMLS1to1Conversation = async (
     mlsConversation: MLSConversation,
     otherUserId: QualifiedId,
-    shouldDelayGroupEstablishment = false,
   ): Promise<MLSConversation> => {
     const selfUser = this.userState.self();
 
@@ -1498,16 +1513,6 @@ export class ConversationRepository {
 
     if (!conversationService) {
       throw new Error('Conversation service is not available!');
-    }
-
-    // After connection request is accepted, both sides (users) of connection will react to conversation status update event.
-    // We want to reduce the possibility of two users trying to establish an MLS group at the same time.
-    // A user that has previously sent a connection request will wait for a short period of time before establishing an MLS group.
-    // It's very likely that this user will receive a welcome message after the user that has accepted a connection request, establishes an MLS group without any delay.
-    if (shouldDelayGroupEstablishment) {
-      await new Promise(resolve =>
-        setTimeout(resolve, ConversationRepository.CONFIG.ESTABLISH_MLS_GROUP_AFTER_CONNECTION_IS_ACCEPTED_DELAY),
-      );
     }
 
     const isAlreadyEstablished = await this.conversationService.isMLSGroupEstablishedLocally(mlsConversation.groupId);
@@ -1547,21 +1552,24 @@ export class ConversationRepository {
     isMLSSupportedByTheOtherUser: boolean,
     shouldDelayGroupEstablishment = false,
   ): Promise<MLSConversation> => {
+    // When receiving some live updates via websocket, e.g. after connection request is accepted, both sides (users) of connection will react to conversation status update event.
+    // We want to reduce the possibility of two users trying to establish an MLS group at the same time.
+    // A user that has previously sent a connection request will wait for a short period of time before establishing an MLS group.
+    // It's very likely that this user will receive a welcome message after the user that has accepted a connection request, establishes an MLS group without any delay.
+    if (shouldDelayGroupEstablishment) {
+      this.logger.info(`Delaying MLS 1:1 conversation with user ${otherUserId.id}...`);
+      await new Promise(resolve =>
+        setTimeout(resolve, ConversationRepository.CONFIG.ESTABLISH_MLS_GROUP_AFTER_CONNECTION_IS_ACCEPTED_DELAY),
+      );
+    }
+
     this.logger.info(`Initialising MLS 1:1 conversation with user ${otherUserId.id}...`);
     const mlsConversation = await this.getMLS1to1Conversation(otherUserId);
     const otherUser = await this.userRepository.getUserById(otherUserId);
     mlsConversation.connection(otherUser.connection());
 
-    const localProteusConversations = this.conversationState.findProteus1to1Conversations(otherUserId);
-
-    const wasProteus1to1ActiveConversation =
-      localProteusConversations &&
-      localProteusConversations.some(conversation => this.conversationState.isActiveConversation(conversation));
-
     // If proteus 1:1 conversation with the same user is known, we have to make sure it is replaced with mls 1:1 conversation.
-    if (localProteusConversations) {
-      await this.replaceProteus1to1WithMLS(localProteusConversations, mlsConversation);
-    }
+    const shouldOpenMLS1to1Conversation = await this.replaceProteus1to1WithMLS(otherUserId, mlsConversation);
 
     if (mlsConversation.participating_user_ids.length === 0) {
       ConversationMapper.updateProperties(mlsConversation, {participating_user_ids: [otherUser.qualifiedId]});
@@ -1585,7 +1593,7 @@ export class ConversationRepository {
         );
       }
 
-      if (wasProteus1to1ActiveConversation) {
+      if (shouldOpenMLS1to1Conversation) {
         // If proteus conversation was previously active conversaiton, we want to make mls 1:1 conversation active.
         amplify.publish(WebAppEvents.CONVERSATION.SHOW, mlsConversation, {});
       }
@@ -1596,13 +1604,9 @@ export class ConversationRepository {
     // If mls is supported by the other user, we can establish the group and remove readonly state from the conversation.
     await this.updateConversationReadOnlyState(mlsConversation, null);
 
-    const establishedMLSConversation = await this.establishMLS1to1Conversation(
-      mlsConversation,
-      otherUserId,
-      shouldDelayGroupEstablishment,
-    );
+    const establishedMLSConversation = await this.establishMLS1to1Conversation(mlsConversation, otherUserId);
 
-    if (wasProteus1to1ActiveConversation) {
+    if (shouldOpenMLS1to1Conversation) {
       // If proteus conversation was previously active conversaiton, we want to make mls 1:1 conversation active.
       amplify.publish(WebAppEvents.CONVERSATION.SHOW, mlsConversation, {});
     }
@@ -1848,7 +1852,7 @@ export class ConversationRepository {
       return;
     }
 
-    await this.getInitialised1To1Conversation(user);
+    await this.getInitialised1To1Conversation(user, true);
   };
 
   /**
