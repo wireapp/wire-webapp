@@ -17,8 +17,8 @@
  *
  */
 
-import {RegisteredClient} from '@wireapp/api-client/lib/client/index';
-import type {BackendError} from '@wireapp/api-client/lib/http/';
+import {RegisteredClient} from '@wireapp/api-client/lib/client';
+import type {BackendError} from '@wireapp/api-client/lib/http';
 import {AxiosError} from 'axios';
 
 import {Conversation} from '../entity/Conversation';

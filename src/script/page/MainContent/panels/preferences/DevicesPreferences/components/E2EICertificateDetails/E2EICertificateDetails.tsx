@@ -48,7 +48,7 @@ export const E2EICertificateDetails = ({
   const {isNotDownloaded, isValid, isExpireSoon} = getCertificateDetails(certificate);
   const certificateState = getCertificateState({isNotDownloaded, isValid, isExpireSoon});
 
-  const updateCertificate = async () => {
+  const updateCertificate = (): null => {
     // TODO: Waiting for update certificate implementation
     return null;
   };

@@ -125,7 +125,6 @@ export const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
     <PreferencesPage title={t('preferencesDevices')}>
       <fieldset className="preferences-section" data-uie-name="preferences-device-current">
         <legend className="preferences-header">{t('preferencesDevicesCurrent')}</legend>
-
         {currentClient && (
           <>
             <DetailedDevice
