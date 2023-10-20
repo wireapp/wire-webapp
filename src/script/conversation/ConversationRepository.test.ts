@@ -59,6 +59,7 @@ import {EventRepository} from 'src/script/event/EventRepository';
 import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';
 import {StorageSchemata} from 'src/script/storage/StorageSchemata';
 import {generateConversation as _generateConversation} from 'test/helper/ConversationGenerator';
+import {createDeleteEvent} from 'test/helper/EventGenerator';
 import {escapeRegex} from 'Util/SanitizationUtil';
 import {createUuid} from 'Util/uuid';
 
@@ -860,19 +861,7 @@ describe('ConversationRepository', () => {
       afterEach(() => conversation_et.removeMessages());
 
       it('should not delete message if user is not matching', async () => {
-        const message_delete_event: DeleteEvent = {
-          conversation: conversation_et.id,
-          data: {
-            deleted_time: 0,
-            message_id: message_et.id,
-            time: '',
-          },
-          from: createUuid(),
-          id: createUuid(),
-          qualified_conversation: {domain: '', id: conversation_et.id},
-          time: new Date().toISOString(),
-          type: ClientEvent.CONVERSATION.MESSAGE_DELETE,
-        };
+        const message_delete_event: DeleteEvent = createDeleteEvent(message_et.id, conversation_et.id);
 
         spyOn(testFactory.conversation_repository['userState'], 'self').and.returnValue(selfUser);
 
@@ -915,22 +904,9 @@ describe('ConversationRepository', () => {
 
       it('should delete message and add delete message if user is not self', () => {
         spyOn(testFactory.event_service, 'deleteEvent');
-        const other_user_id = createUuid();
-        message_et.from = other_user_id;
 
-        const message_delete_event: DeleteEvent = {
-          conversation: conversation_et.id,
-          data: {
-            deleted_time: 0,
-            message_id: message_et.id,
-            time: '',
-          },
-          from: other_user_id,
-          id: createUuid(),
-          qualified_conversation: {domain: '', id: conversation_et.id},
-          time: new Date().toISOString(),
-          type: ClientEvent.CONVERSATION.MESSAGE_DELETE,
-        };
+        const message_delete_event = createDeleteEvent(message_et.id, conversation_et.id);
+        message_et.from = message_delete_event.from;
 
         spyOn(testFactory.conversation_repository['userState'], 'self').and.returnValue(selfUser);
 
@@ -948,19 +924,7 @@ describe('ConversationRepository', () => {
         message_et.from = other_user_id;
         message_et.ephemeral_expires(true);
 
-        const message_delete_event: DeleteEvent = {
-          conversation: conversation_et.id,
-          data: {
-            deleted_time: 0,
-            message_id: message_et.id,
-            time: '',
-          },
-          from: other_user_id,
-          id: createUuid(),
-          qualified_conversation: {domain: '', id: conversation_et.id},
-          time: new Date().toISOString(),
-          type: ClientEvent.CONVERSATION.MESSAGE_DELETE,
-        };
+        const message_delete_event = createDeleteEvent(message_et.id, conversation_et.id);
 
         spyOn(testFactory.conversation_repository['userState'], 'self').and.returnValue(selfUser);
 

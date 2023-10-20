@@ -94,8 +94,8 @@ export type MenuRenderFn<TOption extends TypeaheadOption> = (
   matchingString: string,
 ) => ReactPortal | JSX.Element | null;
 
-const scrollIntoViewIfNeeded = (target: HTMLElement) => {
-  const typeaheadContainerNode = document.getElementById('typeahead-menu');
+const scrollIntoViewIfNeeded = (target: HTMLElement, containerId: string) => {
+  const typeaheadContainerNode = document.getElementById(containerId);
 
   if (!typeaheadContainerNode) {
     return;
@@ -325,6 +325,7 @@ function LexicalPopoverMenu<TOption extends TypeaheadOption>({
   resolution,
   options,
   menuRenderFn,
+  containerId,
   onSelectOption,
   onMenuVisibilityChange,
   isReversed = false,
@@ -333,6 +334,7 @@ function LexicalPopoverMenu<TOption extends TypeaheadOption>({
   editor: LexicalEditor;
   anchorElementRef: MutableRefObject<HTMLElement>;
   resolution: Resolution;
+  containerId: string;
   options: Array<TOption>;
   menuRenderFn: MenuRenderFn<TOption>;
   onSelectOption: (
@@ -396,7 +398,7 @@ function LexicalPopoverMenu<TOption extends TypeaheadOption>({
         SCROLL_TYPEAHEAD_OPTION_INTO_VIEW_COMMAND,
         ({option}) => {
           if (option.ref && option.ref.current != null) {
-            scrollIntoViewIfNeeded(option.ref.current);
+            scrollIntoViewIfNeeded(option.ref.current, containerId);
             return true;
           }
 
@@ -405,7 +407,7 @@ function LexicalPopoverMenu<TOption extends TypeaheadOption>({
         COMMAND_PRIORITY_LOW,
       ),
     );
-  }, [editor, updateSelectedIndex]);
+  }, [editor, updateSelectedIndex, containerId]);
 
   useEffect(() => {
     if (menuVisible && typeof selectedIndex === 'number' && options?.[selectedIndex]) {
@@ -414,11 +416,11 @@ function LexicalPopoverMenu<TOption extends TypeaheadOption>({
       // Using setTimeout because we need to wait for popover render
       setTimeout(() => {
         if (currentSelectedOption.ref != null && currentSelectedOption.ref.current) {
-          scrollIntoViewIfNeeded(currentSelectedOption.ref.current);
+          scrollIntoViewIfNeeded(currentSelectedOption.ref.current, containerId);
         }
       }, 16);
     }
-  }, [editor, menuVisible, selectedIndex, options]);
+  }, [editor, menuVisible, selectedIndex, options, containerId]);
 
   useEffect(() => {
     return mergeRegister(
@@ -742,6 +744,7 @@ export function TypeaheadMenuPlugin<TOption extends TypeaheadOption>({
   return resolution === null || editor === null ? null : (
     <LexicalPopoverMenu
       close={closeTypeahead}
+      containerId={containerId}
       resolution={resolution}
       editor={editor}
       anchorElementRef={anchorElementRef}

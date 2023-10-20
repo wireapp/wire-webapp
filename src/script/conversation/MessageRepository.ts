@@ -753,9 +753,14 @@ export class MessageRepository {
 
     const injectOptimisticEvent = async () => {
       if (!skipInjection) {
-        const senderId = this.clientState.currentClient().id;
+        const senderId = this.clientState.currentClient?.id;
         const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-        const optimisticEvent = EventBuilder.buildMessageAdd(conversation, currentTimestamp, senderId);
+        const optimisticEvent = EventBuilder.buildMessageAdd(
+          conversation,
+          currentTimestamp,
+          this.userState.self()!.id,
+          senderId,
+        );
         this.trackContributed(conversation, payload);
         const mappedEvent = await this.cryptography_repository.cryptographyMapper.mapGenericMessage(
           payload,
