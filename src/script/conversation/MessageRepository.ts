@@ -753,7 +753,7 @@ export class MessageRepository {
 
     const injectOptimisticEvent = async () => {
       if (!skipInjection) {
-        const senderId = this.clientState.currentClient().id;
+        const senderId = this.clientState.currentClient?.id;
         const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
         const optimisticEvent = EventBuilder.buildMessageAdd(
           conversation,

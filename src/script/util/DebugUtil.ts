@@ -334,7 +334,7 @@ export class DebugUtil {
     messageId: string,
     conversationId: string = this.conversationState.activeConversation().id,
   ): Promise<void> {
-    const clientId = this.clientState.currentClient().id;
+    const clientId = this.clientState.currentClient?.id;
     const userId = this.userState.self().id;
 
     const isOTRMessage = (notification: BackendEvent) => notification.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD;

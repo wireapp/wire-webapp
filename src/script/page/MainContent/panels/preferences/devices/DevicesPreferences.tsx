@@ -141,7 +141,8 @@ const DevicesPreferences = ({
   selfUser,
 }: DevicesPreferencesProps) => {
   const [selectedDevice, setSelectedDevice] = useState<ClientEntity | undefined>();
-  const {clients, currentClient} = useKoSubscribableChildren(clientState, ['clients', 'currentClient']);
+  const {clients} = useKoSubscribableChildren(clientState, ['clients']);
+  const currentClient = clientState.currentClient;
   const isSSO = selfUser.isNoPasswordSSO;
   const getFingerprint = (device: ClientEntity) =>
     cryptographyRepository.getRemoteFingerprint(selfUser.qualifiedId, device.id);
@@ -173,7 +174,7 @@ const DevicesPreferences = ({
     <PreferencesPage title={t('preferencesDevices')}>
       <fieldset className="preferences-section" data-uie-name="preferences-device-current">
         <legend className="preferences-header">{t('preferencesDevicesCurrent')}</legend>
-        <DetailedDevice device={currentClient} fingerprint={localFingerprint} />
+        {currentClient && <DetailedDevice device={currentClient} fingerprint={localFingerprint} />}
       </fieldset>
 
       <hr className="preferences-devices-separator preferences-separator" />
