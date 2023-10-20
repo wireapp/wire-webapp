@@ -327,6 +327,7 @@ describe('ConversationRepository', () => {
 
       const [proteus1to1Conversation] = conversationRepository.mapConversations([proteus1to1ConversationResponse]);
 
+      jest.spyOn(conversationRepository['conversationService'], 'removeConversationFromBlacklist');
       jest
         .spyOn(conversationRepository['conversationService'], 'getConversationById')
         .mockResolvedValueOnce(proteus1to1ConversationResponse);
@@ -334,6 +335,10 @@ describe('ConversationRepository', () => {
       const conversationEntity = await conversationRepository.getInitialised1To1Conversation(otherUser);
 
       expect(conversationEntity?.serialize()).toEqual(proteus1to1Conversation.serialize());
+      expect(conversationEntity?.readOnlyState()).toEqual(null);
+      expect(conversationRepository['conversationService'].removeConversationFromBlacklist).toHaveBeenCalledWith(
+        conversationEntity?.qualifiedId,
+      );
     });
 
     it('returns proteus 1:1 conversation and marks it as readonly if the other user does not support proteus', async () => {
@@ -360,6 +365,7 @@ describe('ConversationRepository', () => {
       connection.conversationId = proteus1to1ConversationResponse.qualified_id;
       otherUser.connection(connection);
 
+      jest.spyOn(conversationRepository['conversationService'], 'blacklistConversation');
       jest
         .spyOn(conversationRepository['conversationService'], 'getConversationById')
         .mockResolvedValueOnce(proteus1to1ConversationResponse);
@@ -368,6 +374,9 @@ describe('ConversationRepository', () => {
 
       expect(conversationEntity?.readOnlyState()).toEqual(
         CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_SELF_UNSUPPORTED_MLS,
+      );
+      expect(conversationRepository['conversationService'].blacklistConversation).toHaveBeenCalledWith(
+        conversationEntity?.qualifiedId,
       );
     });
 
@@ -639,7 +648,7 @@ describe('ConversationRepository', () => {
       );
     });
 
-    it('deos not marks mls 1:1 conversation as read-only if the other user does not support mls but mls 1:1 was already established', async () => {
+    it('deos not mark mls 1:1 conversation as read-only if the other user does not support mls but mls 1:1 was already established', async () => {
       const conversationRepository = testFactory.conversation_repository!;
       const userRepository = testFactory.user_repository!;
 

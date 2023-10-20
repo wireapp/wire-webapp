@@ -1468,8 +1468,12 @@ export class ConversationRepository {
     );
   };
 
-  public async blacklistConversation(conversationId: QualifiedId) {
+  private async blacklistConversation(conversationId: QualifiedId) {
     return this.conversationService.blacklistConversation(conversationId);
+  }
+
+  private async removeConversationFromBlacklist(conversationId: QualifiedId) {
+    return this.conversationService.removeConversationFromBlacklist(conversationId);
   }
 
   /**
@@ -1627,6 +1631,7 @@ export class ConversationRepository {
 
     // If proteus is not supported by the other user we have to mark conversation as readonly
     if (!doesOtherUserSupportProteus) {
+      await this.blacklistConversation(proteusConversationId);
       await this.updateConversationReadOnlyState(
         proteusConversation,
         CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_SELF_UNSUPPORTED_MLS,
@@ -1635,6 +1640,7 @@ export class ConversationRepository {
     }
 
     // If proteus is supported by the other user, we just return a proteus conversation and remove readonly state from it.
+    await this.removeConversationFromBlacklist(proteusConversationId);
     await this.updateConversationReadOnlyState(proteusConversation, null);
     return proteusConversation;
   };
