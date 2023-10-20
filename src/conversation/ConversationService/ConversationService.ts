@@ -205,6 +205,14 @@ export class ConversationService extends TypedEventEmitter<Events> {
   };
 
   /**
+   * Removes a conversation from the blacklists.
+   * @param conversationId id of the conversation to remove from the blacklist
+   */
+  public readonly removeConversationFromBlacklist = async (conversationId: QualifiedId): Promise<void> => {
+    await this.coreDatabase.delete('conversationBlacklist', conversationId.id);
+  };
+
+  /**
    * returns the number of messages that are in the queue expecting to be sent
    */
   isSendingMessage(): boolean {
