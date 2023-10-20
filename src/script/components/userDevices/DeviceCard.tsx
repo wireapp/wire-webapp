@@ -17,8 +17,6 @@
  *
  */
 
-import React from 'react';
-
 import {ClientClassification} from '@wireapp/api-client/lib/client';
 import cx from 'classnames';
 
@@ -29,8 +27,7 @@ import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {splitFingerprint} from 'Util/StringUtil';
 
-import type {ClientEntity} from '../../client/ClientEntity';
-import {MLSPublicKeys} from '../../client/ClientEntity';
+import {type ClientEntity, MLSPublicKeys} from '../../client/ClientEntity';
 import {FormattedId} from '../../page/MainContent/panels/preferences/DevicesPreferences/components/FormattedId';
 import {Icon} from '../Icon';
 import {LegalHoldDot} from '../LegalHoldDot';
@@ -42,12 +39,7 @@ export interface DeviceCardProps {
   showVerified?: boolean;
 }
 
-const DeviceCard: React.FC<DeviceCardProps> = ({
-  click,
-  device: clientEntity,
-  showVerified = false,
-  showIcon = false,
-}) => {
+const DeviceCard = ({click, device: clientEntity, showVerified = false, showIcon = false}: DeviceCardProps) => {
   const messageFocusedTabIndex = useMessageFocusedTabIndex(!!click);
   const {class: deviceClass = '?', id = '', label = '?', meta} = clientEntity;
   const name = clientEntity.getName();
@@ -85,13 +77,7 @@ const DeviceCard: React.FC<DeviceCardProps> = ({
         <div className="device-card__name">
           <span className="device-card__model">{name}</span>
 
-          {showVerified && (
-            <VerificationBadges
-              conversationProtocol={undefined}
-              isMLSVerified={isMLSVerified}
-              isProteusVerified={isVerified}
-            />
-          )}
+          {showVerified && <VerificationBadges isMLSVerified={isMLSVerified} isProteusVerified={isVerified} />}
         </div>
 
         {mlsFingerprint && (

@@ -65,7 +65,6 @@ export const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
 
   const {clients} = useKoSubscribableChildren(clientState, ['clients']);
   const currentClient = clientState.currentClient;
-
   const isSelfClientVerified = React.useMemo(() => {
     if (!currentClient) {
       return false;
@@ -74,7 +73,6 @@ export const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
   }, [currentClient]);
 
   const isSSO = selfUser.isNoPasswordSSO;
-
   const getFingerprint = (device: ClientEntity) =>
     cryptographyRepository.getRemoteFingerprint(selfUser.qualifiedId, device.id);
 
