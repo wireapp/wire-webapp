@@ -34,7 +34,7 @@
     "@types/jest": "^29.2.0",
     "@types/node": "^20.1.0",
     "@types/pako": "2",
-    "@types/spark-md5": "3.0.2",
+    "@types/spark-md5": "3.0.3",
     "@types/tough-cookie": "4.0.4",
     "@types/ws": "8.5.8",
     "@wireapp/store-engine": "workspace:^",
