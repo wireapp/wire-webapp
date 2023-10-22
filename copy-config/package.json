@@ -20,7 +20,7 @@
     "@swc/core": "^1.3.10",
     "@swc/jest": "^0.2.23",
     "@types/axios": "^0.14.0",
-    "@types/copy": "0.3.3",
+    "@types/copy": "0.3.4",
     "@types/fs-extra": "9.0.13",
     "@types/jest": "^29.2.0",
     "@types/rimraf": "^3.0.2",
