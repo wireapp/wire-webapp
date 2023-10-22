@@ -4568,10 +4568,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/keyboardjs@npm:2.5.1":
-  version: 2.5.1
-  resolution: "@types/keyboardjs@npm:2.5.1"
-  checksum: 5fc7ab296af084cb23e87eeabc000dcec68a74e890f6acfddda914e918b7256aacd8ca09b730b2b0ac1645ee7a4178814e19e8ca01bc0d511647cb5af2127705
+"@types/keyboardjs@npm:2.5.2":
+  version: 2.5.2
+  resolution: "@types/keyboardjs@npm:2.5.2"
+  checksum: cdb9590e0ac0fcdc8599acfa3a1bd983c84d72d6c2f8cf2b27bf49f13c48de9fa56f7b68c9ed3e0951bc46fa4fd39ac2a1d76232b8fe5a20b28c57220ca996ae
   languageName: node
   linkType: hard
 
@@ -18484,7 +18484,7 @@ __metadata:
     "@types/jquery": ^3
     "@types/js-cookie": 3.0.4
     "@types/jsdom": 21.1.3
-    "@types/keyboardjs": 2.5.1
+    "@types/keyboardjs": 2.5.2
     "@types/libsodium-wrappers": ^0
     "@types/linkify-it": 3.0.4
     "@types/loadable__component": ^5
