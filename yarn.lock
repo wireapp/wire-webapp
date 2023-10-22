@@ -4523,10 +4523,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/js-cookie@npm:3.0.4":
-  version: 3.0.4
-  resolution: "@types/js-cookie@npm:3.0.4"
-  checksum: 46ac93974776a256f3cedadf60b45ded4d905a5e69986882d8c17baa351cb2e81a691864a1f19c3ca90eaa2cb3eeb7cb5426416b487a7d54cf5ff278d39d7870
+"@types/js-cookie@npm:3.0.5":
+  version: 3.0.5
+  resolution: "@types/js-cookie@npm:3.0.5"
+  checksum: 4d91ae26445499fdde283928aac9ad149be3561ef9b4d959f77e44694608accd5939c8c68ba42c50c2cfc007ccd442cc566a41077d7f2766390088fa91b612ce
   languageName: node
   linkType: hard
 
@@ -18518,7 +18518,7 @@ __metadata:
     "@types/generate-changelog": 1.8.2
     "@types/jest": 29.5.5
     "@types/jquery": ^3
-    "@types/js-cookie": 3.0.4
+    "@types/js-cookie": 3.0.5
     "@types/jsdom": 21.1.3
     "@types/keyboardjs": 2.5.2
     "@types/libsodium-wrappers": ^0
