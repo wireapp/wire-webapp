@@ -938,12 +938,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/express-sitemap-xml@npm:3.0.2":
-  version: 3.0.2
-  resolution: "@types/express-sitemap-xml@npm:3.0.2"
+"@types/express-sitemap-xml@npm:3.0.3":
+  version: 3.0.3
+  resolution: "@types/express-sitemap-xml@npm:3.0.3"
   dependencies:
     "@types/express": "*"
-  checksum: 92118dae76ca4030672be1a85cc5abfc015a54db2b8e8f02e4d3e3ef1ffe47fe9cdaac673fda2d6f21955c2d0da93aa09c019ea1aa3f3ac49df08405ec99d7b2
+  checksum: d6d20da77364589fe7d43160227becb89c8920ce411bf06505f9c97473a022e39d504ff67ab896eb8fe449d5f703129938e61593fe1accb554edf4667114b454
   languageName: node
   linkType: hard
 
@@ -5545,7 +5545,7 @@ __metadata:
   resolution: "wire-web-server@workspace:."
   dependencies:
     "@types/express": 4.17.19
-    "@types/express-sitemap-xml": 3.0.2
+    "@types/express-sitemap-xml": 3.0.3
     "@types/express-useragent": 1.0.4
     "@types/fs-extra": 11.0.3
     "@types/geolite2": 2.0.0
