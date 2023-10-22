@@ -113,7 +113,7 @@
     "dexie": "3.2.4",
     "dotenv": "16.3.1",
     "dpdm": "3.14.0",
-    "eslint": "^8.51.0",
+    "eslint": "^8.52.0",
     "eslint-plugin-prettier": "^5.0.1",
     "fake-indexeddb": "4.0.2",
     "generate-changelog": "1.8.0",
