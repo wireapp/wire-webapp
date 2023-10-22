@@ -4871,10 +4871,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/webpack-env@npm:1.18.2":
-  version: 1.18.2
-  resolution: "@types/webpack-env@npm:1.18.2"
-  checksum: 883908ade827d35a10efc574fb6f2728a7c520d4296cf1507633ac7457204ccd697bc6c8cadac99bc5d96074a6109c658ebfde59f42ba5ba0fdfffc538892b0f
+"@types/webpack-env@npm:1.18.3":
+  version: 1.18.3
+  resolution: "@types/webpack-env@npm:1.18.3"
+  checksum: f24e82485d8e325b1875608766ba6dad2b2f53a0fb182bc96173b4590110c6b791163402cdf19b50c04e8c05292f227a08aafe9230b2bba52c40c5f7ceccc101
   languageName: node
   linkType: hard
 
@@ -18494,7 +18494,7 @@ __metadata:
     "@types/sinon": 10.0.19
     "@types/speakingurl": 13.0.4
     "@types/underscore": 1.11.11
-    "@types/webpack-env": 1.18.2
+    "@types/webpack-env": 1.18.3
     "@wireapp/avs": 9.4.18
     "@wireapp/commons": 5.2.1
     "@wireapp/copy-config": 2.1.9
