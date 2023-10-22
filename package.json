@@ -90,7 +90,7 @@
     "@types/react": "18.2.28",
     "@types/react-dom": "18.2.14",
     "@types/react-redux": "7.1.28",
-    "@types/react-transition-group": "4.4.7",
+    "@types/react-transition-group": "4.4.8",
     "@types/redux-mock-store": "1.0.5",
     "@types/seedrandom": "^3",
     "@types/sinon": "10.0.19",
