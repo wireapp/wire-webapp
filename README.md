@@ -91,7 +91,7 @@ username: your-username
 **Usage:**
 
 1. Add string variable to "src/script/strings.ts" (source for the React part of our app) and text to "i18n/en-US.json" (source for the Knockout part of our app)
-1. Create a PR and merge it after approval. When the PR gets merged, our CI will take care of uploading the english texts to Crowdin.
+1. Create a PR and merge it after approval. When the PR gets merged, our CI will take care of uploading the English texts to Crowdin.
 
 If our CI pipeline is broken, you still have the option to upload new strings manually. For this case do the following:
 
@@ -110,7 +110,7 @@ Once translations are uploaded on Crowdin, our (and external) translators can tr
 
 Contributions are welcome! Feel free to check our [issues page](https://github.com/wireapp/wire-webapp/issues).
 
-The following commits will help you getting started quickly with our code base:
+The following commits will help you get started quickly with our code base:
 
 - [Show a modal / pop-up](https://github.com/wireapp/wire-webapp/commit/00d3d120aacb3f36da80edd1ca829afc045331e9)
 - [Sync setting between via backend](https://github.com/wireapp/wire-webapp/commit/3e4595a208189b7b6b51935fd2c41a74bbd16994)
