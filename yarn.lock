@@ -4694,10 +4694,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/platform@npm:1.3.4":
-  version: 1.3.4
-  resolution: "@types/platform@npm:1.3.4"
-  checksum: dce83952e6af3e488fb2a3c7c7ec226cef4a8606ab63bd40301fe7883ff0c434512210497d6cb79adc4c8e671648ed3e7035438a40f41a5f395c60d2bfb6390d
+"@types/platform@npm:1.3.5":
+  version: 1.3.5
+  resolution: "@types/platform@npm:1.3.5"
+  checksum: acdefc3f58029747d76dc9f985ab1fc3dd62125d53fe807eedf2cf88f5c660e0aa31e4c2737cfe7738cf1972608ea03d06ca368ce1385cd5e5a5d54632d2a18c
   languageName: node
   linkType: hard
 
@@ -18484,7 +18484,7 @@ __metadata:
     "@types/markdown-it": 13.0.2
     "@types/node": ^20.8.6
     "@types/open-graph": 0.2.3
-    "@types/platform": 1.3.4
+    "@types/platform": 1.3.5
     "@types/react": 18.2.28
     "@types/react-dom": 18.2.14
     "@types/react-redux": 7.1.28
