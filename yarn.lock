@@ -4566,10 +4566,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/linkify-it@npm:*, @types/linkify-it@npm:3.0.3":
+"@types/linkify-it@npm:*":
   version: 3.0.3
   resolution: "@types/linkify-it@npm:3.0.3"
   checksum: a734becc4e7476833b0e6951ec133c006a34809639c722d3e28b7cf88f5f6ccbb433f195788be5e56209b1e9e6e0778879291dd2db401acee3bb585c44dcc329
+  languageName: node
+  linkType: hard
+
+"@types/linkify-it@npm:3.0.4":
+  version: 3.0.4
+  resolution: "@types/linkify-it@npm:3.0.4"
+  checksum: cd873857faf77231811a5ee49aadffdbdd7c6309b92ca004cb28320993858d2e30cad7b343c6db928763ed0f766c6ed140e0f995536e488a1447a527b6f8127f
   languageName: node
   linkType: hard
 
@@ -18390,7 +18397,7 @@ __metadata:
     "@types/jsdom": 21.1.3
     "@types/keyboardjs": 2.5.1
     "@types/libsodium-wrappers": ^0
-    "@types/linkify-it": 3.0.3
+    "@types/linkify-it": 3.0.4
     "@types/loadable__component": ^5
     "@types/markdown-it": 13.0.2
     "@types/node": ^20.8.6
