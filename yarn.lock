@@ -4694,12 +4694,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/open-graph@npm:0.2.3":
-  version: 0.2.3
-  resolution: "@types/open-graph@npm:0.2.3"
+"@types/open-graph@npm:0.2.4":
+  version: 0.2.4
+  resolution: "@types/open-graph@npm:0.2.4"
   dependencies:
     "@types/cheerio": "*"
-  checksum: 7d3cf515e10ff7c646c1f9da4c6a865e6b421841e8a2c68568ac21ef9c13210a68c8e7b695f0af77fd1dbc3dbdb3231c407281fbcb49ccda57991b78c11ab928
+  checksum: d073053a5566c0615f2aa5455c0d442d5bb6e6442452716f1aec97431ca63c3d5ad1917829285a47bf209de1c26cc57c29c94e7f9d3ed8216e7806129cc7d925
   languageName: node
   linkType: hard
 
@@ -18508,7 +18508,7 @@ __metadata:
     "@types/loadable__component": ^5
     "@types/markdown-it": 13.0.2
     "@types/node": ^20.8.7
-    "@types/open-graph": 0.2.3
+    "@types/open-graph": 0.2.4
     "@types/platform": 1.3.5
     "@types/react": 18.2.28
     "@types/react-dom": 18.2.14
