@@ -143,6 +143,8 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
   const reactionGroupedByUser = groupByReactionUsers(reactions);
   const reactionsTotalCount = Array.from(reactionGroupedByUser).length;
 
+  const isConversationReadonly = conversation.readOnlyState() !== null;
+
   return (
     <div
       aria-label={messageAriaLabel}
@@ -228,7 +230,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
             />
           )}
         </div>
-        {isActionMenuVisible && (
+        {!isConversationReadonly && isActionMenuVisible && (
           <MessageActionsMenu
             isMsgWithHeader={shouldShowAvatar()}
             message={message}
