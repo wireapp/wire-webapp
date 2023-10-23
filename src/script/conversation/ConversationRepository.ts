@@ -1409,16 +1409,16 @@ export class ConversationRepository {
    *
    * @param proteusConversation - proteus 1:1 conversation
    * @param mlsConversation - mls 1:1 conversation
-   * @returns `true` if mls 1:1 conversation should be opened in the UI, otherwise `false`
+   * @returns {shouldOpenMLS1to1Conversation} - whether proteus 1:1 was active conversation and mls 1:1 conversation should be opened in the UI
    */
   private readonly replaceProteus1to1WithMLS = async (
     otherUserId: QualifiedId,
     mlsConversation: MLSConversation,
-  ): Promise<boolean> => {
+  ): Promise<{shouldOpenMLS1to1Conversation: boolean}> => {
     const proteusConversations = this.conversationState.findProteus1to1Conversations(otherUserId);
 
     if (!proteusConversations || proteusConversations.length < 1) {
-      return false;
+      return {shouldOpenMLS1to1Conversation: false};
     }
 
     this.logger.info(`Replacing proteus 1:1 conversation(s) with mls 1:1 conversation ${mlsConversation.id}`);
@@ -1482,7 +1482,9 @@ export class ConversationRepository {
 
     const isMLS1to1ActiveConversation = this.conversationState.isActiveConversation(mlsConversation);
 
-    return wasProteus1to1ActiveConversation && !isMLS1to1ActiveConversation;
+    const shouldOpenMLS1to1Conversation = wasProteus1to1ActiveConversation && !isMLS1to1ActiveConversation;
+
+    return {shouldOpenMLS1to1Conversation};
   };
 
   private async blacklistConversation(conversationId: QualifiedId) {
@@ -1570,7 +1572,7 @@ export class ConversationRepository {
     mlsConversation.connection(otherUser.connection());
 
     // If proteus 1:1 conversation with the same user is known, we have to make sure it is replaced with mls 1:1 conversation.
-    const shouldOpenMLS1to1Conversation = await this.replaceProteus1to1WithMLS(otherUserId, mlsConversation);
+    const {shouldOpenMLS1to1Conversation} = await this.replaceProteus1to1WithMLS(otherUserId, mlsConversation);
 
     if (mlsConversation.participating_user_ids.length === 0) {
       ConversationMapper.updateProperties(mlsConversation, {participating_user_ids: [otherUser.qualifiedId]});
