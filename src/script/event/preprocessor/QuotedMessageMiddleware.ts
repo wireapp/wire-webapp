@@ -83,7 +83,6 @@ export class QuotedMessageMiddleware implements EventMiddleware {
       if (quote && typeof quote !== 'string' && 'message_id' in quote && 'id' in event) {
         quote.message_id = event.id as string;
       }
-      // we want to update the messages quoting the original message later, thus the timeout
       await this.eventService.replaceEvent(reply);
     });
     const decoratedData = {...event.data, quote: originalEvent.data.quote};
