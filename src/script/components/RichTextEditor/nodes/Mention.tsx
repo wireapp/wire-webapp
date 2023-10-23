@@ -81,14 +81,15 @@ export const Mention = (props: MentionComponentProps) => {
       const rangeSelection = $isRangeSelection(currentSelection) ? currentSelection : null;
 
       const shouldSelect = nodeKey === rangeSelection?.getNodes()[0]?.getKey();
+      // If the cursor is right before the mention, we first select the mention before deleting it
       if (shouldSelect) {
         event.preventDefault();
         setSelected(true);
         return true;
       }
+      // When the mention is selected, we actually delete it
       if (isSelected && $isNodeSelection($getSelection())) {
         event.preventDefault();
-
         const node = $getNodeByKey(nodeKey);
 
         if ($isMentionNode(node)) {
