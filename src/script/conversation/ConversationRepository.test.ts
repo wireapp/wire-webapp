@@ -761,7 +761,7 @@ describe('ConversationRepository', () => {
       });
 
       await waitFor(() => {
-        expect(conversationRepository.getInitialised1To1Conversation).toHaveBeenCalledWith(otherUser);
+        expect(conversationRepository.getInitialised1To1Conversation).toHaveBeenCalledWith(otherUser, true);
       });
     });
 
