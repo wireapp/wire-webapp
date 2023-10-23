@@ -518,23 +518,25 @@ export const Conversation = ({
             setMsgElementsFocusable={setMsgElementsFocusable}
           />
 
-          <InputBar
-            key={activeConversation?.id}
-            conversation={activeConversation}
-            conversationRepository={repositories.conversation}
-            eventRepository={repositories.event}
-            messageRepository={repositories.message}
-            openGiphy={openGiphy}
-            propertiesRepository={repositories.properties}
-            searchRepository={repositories.search}
-            storageRepository={repositories.storage}
-            teamState={teamState}
-            selfUser={selfUser}
-            onShiftTab={() => setMsgElementsFocusable(false)}
-            uploadDroppedFiles={uploadDroppedFiles}
-            uploadImages={uploadImages}
-            uploadFiles={uploadFiles}
-          />
+          {isConversationLoaded && (
+            <InputBar
+              key={activeConversation?.id}
+              conversation={activeConversation}
+              conversationRepository={repositories.conversation}
+              eventRepository={repositories.event}
+              messageRepository={repositories.message}
+              openGiphy={openGiphy}
+              propertiesRepository={repositories.properties}
+              searchRepository={repositories.search}
+              storageRepository={repositories.storage}
+              teamState={teamState}
+              selfUser={selfUser}
+              onShiftTab={() => setMsgElementsFocusable(false)}
+              uploadDroppedFiles={uploadDroppedFiles}
+              uploadImages={uploadImages}
+              uploadFiles={uploadFiles}
+            />
+          )}
 
           <div className="conversation-loading">
             <div className="icon-spinner spin accent-text"></div>
