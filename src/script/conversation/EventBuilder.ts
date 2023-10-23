@@ -167,6 +167,7 @@ export type MessageAddEvent = ConversationEvent<
   reactions?: UserReactionMap;
   edited_time?: string;
   status: StatusType;
+  version?: number;
 };
 export type MissedEvent = BaseEvent & {id: string; type: CONVERSATION.MISSED_MESSAGES};
 export type MLSConversationRecoveredEvent = BaseEvent & {id: string; type: CONVERSATION.MLS_CONVERSATION_RECOVERED};

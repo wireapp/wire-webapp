@@ -51,8 +51,6 @@ export class ContentMessage extends Message {
   // raw content of a file that was supposed to be sent but failed. Is undefined if the message has been successfully sent
   public readonly fileData: ko.Observable<Blob | undefined> = ko.observable();
   public readonly quote: ko.Observable<QuoteEntity>;
-  // TODO: Rename to `reactionsUsers`
-  public readonly reactions_user_ids: ko.PureComputed<string>;
   public readonly was_edited: ko.PureComputed<boolean>;
   public replacing_message_id: null | string = null;
   readonly edited_timestamp: ko.Observable<number | null> = ko.observable(null);
@@ -65,11 +63,6 @@ export class ContentMessage extends Message {
     this.was_edited = ko.pureComputed(() => !!this.edited_timestamp());
 
     this.reactions_user_ets = ko.observableArray();
-    this.reactions_user_ids = ko.pureComputed(() => {
-      return this.reactions_user_ets()
-        .map(user_et => user_et.name())
-        .join(', ');
-    });
 
     this.quote = ko.observable();
     this.readReceipts = ko.observableArray([]);

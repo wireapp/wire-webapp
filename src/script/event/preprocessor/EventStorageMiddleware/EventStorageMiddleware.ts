@@ -19,7 +19,7 @@
 
 import {User} from 'src/script/entity/User';
 
-import {handleLinkPreviewEvent, handleEditEvent, handleAssetEvent} from './eventHandlers';
+import {handleLinkPreviewEvent, handleEditEvent, handleAssetEvent, handleReactionEvent} from './eventHandlers';
 import {EventValidationError} from './eventHandlers/EventValidationError';
 import {HandledEvents, DBOperation} from './types';
 
@@ -54,11 +54,11 @@ export class EventStorageMiddleware implements EventMiddleware {
     // Then ask the different handlers which DB operations to perform
     const operation = await this.getDbOperation(event, duplicateEvent);
     // And finally execute the operation
-    return operation ? this.execDBOperation(operation, event.conversation) : event;
+    return this.execDBOperation(operation, event.conversation);
   }
 
-  private async getDbOperation(event: HandledEvents, duplicateEvent?: HandledEvents): Promise<DBOperation | undefined> {
-    const handlers = [handleEditEvent, handleLinkPreviewEvent, handleAssetEvent];
+  private async getDbOperation(event: HandledEvents, duplicateEvent?: HandledEvents): Promise<DBOperation> {
+    const handlers = [handleEditEvent, handleLinkPreviewEvent, handleAssetEvent, handleReactionEvent];
     for (const handler of handlers) {
       const operation = await handler(event, {
         duplicateEvent,
@@ -101,6 +101,10 @@ export class EventStorageMiddleware implements EventMiddleware {
 
       case 'update':
         await this.eventService.replaceEvent(operation.updates);
+        break;
+
+      case 'sequential-update':
+        await this.eventService.updateEventSequentially(operation.event.primary_key, operation.updates);
         break;
 
       case 'delete':
