@@ -21,14 +21,13 @@ import {Quote} from '@wireapp/protocol-messaging';
 
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
-import {ClientEvent} from 'src/script/event/Client';
 import {MessageHasher} from 'src/script/message/MessageHasher';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';
 import {createMessageAddEvent, toSavedEvent} from 'test/helper/EventGenerator';
 import {arrayToBase64} from 'Util/util';
 import {createUuid} from 'Util/uuid';
 
-import {QuotedMessageMiddleware} from './QuotedMessageMiddleware';
+import {QuotedMessageMiddleware} from './QuoteDecoderMiddleware';
 
 import {EventService} from '../EventService';
 
@@ -100,58 +99,6 @@ describe('QuotedMessageMiddleware', () => {
 
       expect(parsedEvent.data.quote.message_id).toEqual(quotedMessage.id);
       expect(parsedEvent.data.quote.user_id).toEqual(quotedMessage.from);
-    });
-
-    it('updates quotes in DB when a message is edited', async () => {
-      const [quotedMessageMiddleware, {eventService}] = buildQuotedMessageMiddleware();
-      const originalMessage = toSavedEvent(createMessageAddEvent());
-      const replies = [
-        createMessageAddEvent({dataOverrides: {quote: {message_id: originalMessage.id} as any}}),
-        createMessageAddEvent({dataOverrides: {quote: {message_id: originalMessage.id} as any}}),
-      ];
-      eventService.loadEvent.mockResolvedValue(originalMessage);
-      eventService.loadEventsReplyingToMessage.mockResolvedValue(replies);
-
-      const event = createMessageAddEvent({dataOverrides: {replacing_message_id: originalMessage.id}});
-
-      jest.useFakeTimers();
-
-      await quotedMessageMiddleware.processEvent(event);
-      jest.advanceTimersByTime(1);
-
-      expect(eventService.replaceEvent).toHaveBeenCalledWith(
-        jasmine.objectContaining({data: jasmine.objectContaining({quote: {message_id: event.id}})}),
-      );
-      jest.useRealTimers();
-    });
-
-    it('invalidates quotes in DB when a message is deleted', () => {
-      const [quotedMessageMiddleware, {eventService}] = buildQuotedMessageMiddleware();
-      const originalMessage = toSavedEvent(createMessageAddEvent());
-      const replies = [
-        createMessageAddEvent({dataOverrides: {quote: {message_id: originalMessage.id} as any}}),
-        createMessageAddEvent({dataOverrides: {quote: {message_id: originalMessage.id} as any}}),
-      ];
-      spyOn(eventService, 'loadEvent').and.returnValue(Promise.resolve(originalMessage));
-      spyOn(eventService, 'loadEventsReplyingToMessage').and.returnValue(Promise.resolve(replies));
-      spyOn(eventService, 'replaceEvent').and.returnValue(Promise.resolve());
-
-      const event = {
-        conversation: 'conversation-uuid',
-        data: {
-          replacing_message_id: 'original-id',
-        },
-        id: 'new-id',
-        type: ClientEvent.CONVERSATION.MESSAGE_DELETE,
-      } as any;
-
-      return quotedMessageMiddleware.processEvent(event).then(() => {
-        expect(eventService.replaceEvent).toHaveBeenCalledWith(
-          jasmine.objectContaining({
-            data: jasmine.objectContaining({quote: {error: {type: QuoteEntity.ERROR.MESSAGE_NOT_FOUND}}}),
-          }),
-        );
-      });
     });
   });
 });
