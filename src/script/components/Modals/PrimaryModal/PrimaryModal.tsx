@@ -21,7 +21,8 @@ import {FC, FormEvent, MouseEvent, useState, useRef, ChangeEvent, useEffect} fro
 
 import cx from 'classnames';
 
-import {Checkbox, CheckboxLabel, COLOR, Form, Input, Link, Text} from '@wireapp/react-ui-kit';
+import {ValidationUtil} from '@wireapp/commons';
+import {Checkbox, CheckboxLabel, COLOR, Form, Link, Text, Input, Loading} from '@wireapp/react-ui-kit';
 
 import {CopyToClipboardButton} from 'Components/CopyToClipboardButton';
 import {FadingScrollbar} from 'Components/FadingScrollbar';
@@ -40,6 +41,7 @@ import {Action, PrimaryModalType} from './PrimaryModalTypes';
 export const PrimaryModalComponent: FC = () => {
   const [inputValue, updateInputValue] = useState<string>('');
   const [passwordValue, setPasswordValue] = useState<string>('');
+  const [passwordInput, updatePasswordWithRules] = useState<string>('');
   const [passwordConfirmationValue, setPasswordConfirmationValue] = useState<string>('');
   const [didCopyPassword, setDidCopyPassword] = useState<boolean>(false);
   const [optionChecked, updateOptionChecked] = useState<boolean>(false);
@@ -66,26 +68,42 @@ export const PrimaryModalComponent: FC = () => {
     passwordGenerator,
     copyPassword,
     hideCloseBtn = false,
+    passwordOptional = false,
   } = content;
 
   const isPassword = currentType === PrimaryModalType.PASSWORD;
+  const showLoadingIndicator = currentType === PrimaryModalType.LOADING;
+  const hasPasswordWithRules = currentType === PrimaryModalType.PASSWORD_ADVANCED_SECURITY;
   const isInput = currentType === PrimaryModalType.INPUT;
   const isOption = currentType === PrimaryModalType.OPTION;
-  const isMultipleSecondary = currentType === PrimaryModalType.MULTI_ACTIONS;
+  const hasMultipleSecondary = currentType === PrimaryModalType.MULTI_ACTIONS;
   const isGuestLinkPassword = currentType === PrimaryModalType.GUEST_LINK_PASSWORD;
   const isJoinGuestLinkPassword = currentType === PrimaryModalType.JOIN_GUEST_LINK_PASSWORD;
-  const isConfirm = currentType === PrimaryModalType.CONFIRM;
 
   const onModalHidden = () => {
     updateCurrentModalContent(defaultContent);
     updateInputValue('');
     setPasswordValue('');
+    updatePasswordWithRules('');
     updateErrorMessage('');
     updateOptionChecked(false);
     showNextModalInQueue();
     setPasswordConfirmationValue('');
     setDidCopyPassword(false);
   };
+  const isPasswordOptional = () => {
+    const skipValidation = passwordOptional && !passwordInput.trim().length;
+    if (skipValidation) {
+      return true;
+    }
+    return passwordRegex.test(passwordInput);
+  };
+
+  const passwordRegex = new RegExp(
+    ValidationUtil.getNewPasswordPattern(Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH),
+  );
+  const actionEnabled =
+    (!isInput || !!inputValue.trim().length) && (hasPasswordWithRules ? isPasswordOptional() : true);
 
   const checkPassword = (password: string, passwordConfirm: string): boolean => {
     if (password !== passwordConfirm) {
@@ -117,7 +135,7 @@ export const PrimaryModalComponent: FC = () => {
 
   const confirm = () => {
     const action = content?.primaryAction?.action;
-    if (typeof action !== 'function') {
+    if (!action) {
       return;
     }
     if (isGuestLinkPassword) {
@@ -158,6 +176,7 @@ export const PrimaryModalComponent: FC = () => {
     const handleEscape = (event: KeyboardEvent) => {
       if (isEscapeKey(event) && isModalVisible) {
         removeCurrentModal();
+        closeAction();
       }
     };
 
@@ -165,11 +184,11 @@ export const PrimaryModalComponent: FC = () => {
     return () => document.removeEventListener('keydown', handleEscape);
   }, [isModalVisible]);
 
-  const isPrimaryActionDisabled = () => {
-    if (isConfirm) {
-      return false;
+  const closeAction = () => {
+    if (hasPasswordWithRules) {
+      const [closeAction] = secondaryActions;
+      closeAction?.action?.();
     }
-    return !inputActionEnabled || !passwordActionEnabled;
   };
 
   return (
@@ -195,7 +214,10 @@ export const PrimaryModalComponent: FC = () => {
                 <button
                   type="button"
                   className="modal__header__button"
-                  onClick={removeCurrentModal}
+                  onClick={() => {
+                    removeCurrentModal();
+                    closeAction();
+                  }}
                   aria-label={closeBtnTitle}
                   data-uie-name="do-close"
                 >
@@ -334,6 +356,27 @@ export const PrimaryModalComponent: FC = () => {
                 </Form>
               )}
 
+              {hasPasswordWithRules && (
+                <form onSubmit={doAction(confirm, !!closeOnConfirm)}>
+                  <Input
+                    id="modal_pswd_with_rules"
+                    type="password"
+                    value={passwordInput}
+                    placeholder={inputPlaceholder}
+                    required
+                    data-uie-name="backup-password"
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                      updatePasswordWithRules(event.target.value)
+                    }
+                    autoComplete="password"
+                    pattern=".{2,64}"
+                    helperText={t('backupPasswordHint', {
+                      minPasswordLength: Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH.toString(),
+                    })}
+                  />
+                </form>
+              )}
+
               {isInput && (
                 <form onSubmit={doAction(confirm, !!closeOnConfirm)}>
                   <label htmlFor="modal-input" className="visually-hidden">
@@ -368,37 +411,50 @@ export const PrimaryModalComponent: FC = () => {
                 </div>
               )}
 
-              <div className={cx('modal__buttons', {'modal__buttons--column': isMultipleSecondary})}>
-                {secondaryActions
-                  .filter((action): action is Action => action !== null && !!action.text)
-                  .map(action => (
+              {showLoadingIndicator ? (
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    margin: '1.5rem 0 2rem 0',
+                  }}
+                >
+                  <Loading />
+                </div>
+              ) : (
+                <div className={cx('modal__buttons', {'modal__buttons--column': hasMultipleSecondary})}>
+                  {secondaryActions
+                    .filter((action): action is Action => action !== null && !!action.text)
+                    .map(action => (
+                      <button
+                        key={`${action.text}-${action.uieName}`}
+                        type="button"
+                        onClick={doAction(action.action, true, true)}
+                        data-uie-name={action.uieName}
+                        className={cx('modal__button modal__button--secondary', {
+                          'modal__button--full': hasMultipleSecondary,
+                        })}
+                      >
+                        {action.text}
+                      </button>
+                    ))}
+                  {primaryAction?.text && (
                     <button
-                      key={`${action.text}-${action.uieName}`}
+                      ref={primaryActionButtonRef}
                       type="button"
-                      onClick={doAction(action.action, true, true)}
-                      data-uie-name={action?.uieName}
-                      className={cx('modal__button modal__button--secondary', {
-                        'modal__button--full': isMultipleSecondary,
+                      onClick={doAction(confirm, !!closeOnConfirm)}
+                      disabled={!actionEnabled}
+                      className={cx('modal__button modal__button--primary', {
+                        'modal__button--full': hasMultipleSecondary,
                       })}
+                      data-uie-name="do-action"
                     >
-                      {action.text}
+                      {primaryAction.text}
                     </button>
-                  ))}
-                {primaryAction?.text && (
-                  <button
-                    ref={primaryActionButtonRef}
-                    type="button"
-                    onClick={doAction(confirm, !!closeOnConfirm)}
-                    disabled={isPrimaryActionDisabled()}
-                    className={cx('modal__button modal__button--primary', {
-                      'modal__button--full': isMultipleSecondary,
-                    })}
-                    data-uie-name="do-action"
-                  >
-                    {primaryAction.text}
-                  </button>
-                )}
-              </div>
+                  )}
+                </div>
+              )}
             </FadingScrollbar>
           </>
         )}

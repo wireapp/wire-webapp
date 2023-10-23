@@ -47,7 +47,7 @@ const createCall = (state: CALL_STATE, selfUser = new User(createUuid()), selfCl
   const selfParticipant = new Participant(selfUser, selfClientId);
   const call = new Call({domain: '', id: ''}, {domain: '', id: ''}, 0, selfParticipant, CALL_TYPE.NORMAL, {
     currentAvailableDeviceId: {
-      audioOutput: ko.pureComputed(() => 'test'),
+      audiooutput: ko.pureComputed(() => 'test'),
     },
   } as MediaDevicesHandler);
   call.state(state);

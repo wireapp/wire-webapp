@@ -27,6 +27,7 @@ import {Icon} from 'Components/Icon';
 import {VerifiedIcon} from 'Components/VerifiedIcon';
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -37,27 +38,18 @@ import {DeviceDetailsPreferences} from './DeviceDetailsPreferences';
 import {ClientState} from '../../../../../client/ClientState';
 import {ConversationState} from '../../../../../conversation/ConversationState';
 import {Conversation} from '../../../../../entity/Conversation';
-import {UserState} from '../../../../../user/UserState';
-import {useKoSubscribableChildren} from '../../../../../util/ComponentUtil';
+import {User} from '../../../../../entity/User';
 import {PreferencesPage} from '../components/PreferencesPage';
 
-interface DevicesPreferencesProps {
-  clientState: ClientState;
-  conversationState: ConversationState;
-  cryptographyRepository: CryptographyRepository;
-  removeDevice: (device: ClientEntity) => Promise<unknown>;
-  resetSession: (userId: QualifiedId, device: ClientEntity, conversation: Conversation) => Promise<void>;
-  userState: UserState;
-  verifyDevice: (userId: QualifiedId, device: ClientEntity, isVerified: boolean) => void;
-}
-
-const Device: React.FC<{
+interface DeviceProps {
   device: ClientEntity;
   isSSO: boolean;
   onRemove: (device: ClientEntity) => void;
   onSelect: (device: ClientEntity) => void;
   deviceNumber: number;
-}> = ({device, isSSO, onSelect, onRemove, deviceNumber}) => {
+}
+
+const Device = ({device, isSSO, onSelect, onRemove, deviceNumber}: DeviceProps) => {
   const {isVerified} = useKoSubscribableChildren(device.meta, ['isVerified']);
   const verifiedLabel = isVerified ? t('preferencesDevicesVerification') : t('preferencesDeviceNotVerified');
   const deviceAriaLabel = `${t('preferencesDevice')} ${deviceNumber}, ${device.getName()}, ${verifiedLabel}`;
@@ -129,21 +121,31 @@ const Device: React.FC<{
   );
 };
 
-const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
+interface DevicesPreferencesProps {
+  clientState: ClientState;
+  conversationState: ConversationState;
+  cryptographyRepository: CryptographyRepository;
+  removeDevice: (device: ClientEntity) => Promise<unknown>;
+  resetSession: (userId: QualifiedId, device: ClientEntity, conversation: Conversation) => Promise<void>;
+  selfUser: User;
+  verifyDevice: (userId: QualifiedId, device: ClientEntity, isVerified: boolean) => void;
+}
+
+const DevicesPreferences = ({
   clientState = container.resolve(ClientState),
-  userState = container.resolve(UserState),
   conversationState = container.resolve(ConversationState),
   cryptographyRepository,
   removeDevice,
   verifyDevice,
   resetSession,
-}) => {
+  selfUser,
+}: DevicesPreferencesProps) => {
   const [selectedDevice, setSelectedDevice] = useState<ClientEntity | undefined>();
-  const {clients, currentClient} = useKoSubscribableChildren(clientState, ['clients', 'currentClient']);
-  const {self} = useKoSubscribableChildren(userState, ['self']);
-  const isSSO = self?.isNoPasswordSSO;
+  const {clients} = useKoSubscribableChildren(clientState, ['clients']);
+  const currentClient = clientState.currentClient;
+  const isSSO = selfUser.isNoPasswordSSO;
   const getFingerprint = (device: ClientEntity) =>
-    cryptographyRepository.getRemoteFingerprint(self.qualifiedId, device.id);
+    cryptographyRepository.getRemoteFingerprint(selfUser.qualifiedId, device.id);
 
   const [localFingerprint, setLocalFingerprint] = useState('');
   useEffect(() => {
@@ -160,9 +162,9 @@ const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
           setSelectedDevice(undefined);
         }}
         onClose={() => setSelectedDevice(undefined)}
-        onVerify={(device, verified) => verifyDevice(self.qualifiedId, device, verified)}
+        onVerify={(device, verified) => verifyDevice(selfUser.qualifiedId, device, verified)}
         onResetSession={device =>
-          resetSession(self.qualifiedId, device, conversationState.getSelfProteusConversation())
+          resetSession(selfUser.qualifiedId, device, conversationState.getSelfProteusConversation())
         }
       />
     );
@@ -172,7 +174,7 @@ const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
     <PreferencesPage title={t('preferencesDevices')}>
       <fieldset className="preferences-section" data-uie-name="preferences-device-current">
         <legend className="preferences-header">{t('preferencesDevicesCurrent')}</legend>
-        <DetailedDevice device={currentClient} fingerprint={localFingerprint} />
+        {currentClient && <DetailedDevice device={currentClient} fingerprint={localFingerprint} />}
       </fieldset>
 
       <hr className="preferences-devices-separator preferences-separator" />

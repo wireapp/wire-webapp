@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, useCallback, useEffect, useMemo, useState} from 'react';
+import {FC, Fragment, useCallback, useEffect, useMemo, useState} from 'react';
 
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {amplify} from 'amplify';
@@ -27,10 +27,20 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Icon} from 'Components/Icon';
+import {EmojiImg} from 'Components/MessagesList/Message/ContentMessage/MessageActions/MessageReactions/EmojiImg';
+import {
+  messageReactionDetailsMargin,
+  reactionsCountAlignment,
+} from 'Components/MessagesList/Message/ContentMessage/MessageActions/MessageReactions/MessageReactions.styles';
 import {UserSearchableList} from 'Components/UserSearchableList';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {getEmojiTitleFromEmojiUnicode, getEmojiUnicode} from 'Util/EmojiUtil';
 import {t} from 'Util/LocalizerUtil';
+import {getEmojiUrl, groupByReactionUsers} from 'Util/ReactionUtil';
+import {capitalizeFirstChar} from 'Util/StringUtil';
 import {formatLocale} from 'Util/TimeUtil';
+
+import {panelContentTitleStyles} from './MessageDetails.styles';
 
 import {ConversationRepository} from '../../../conversation/ConversationRepository';
 import {Conversation} from '../../../entity/Conversation';
@@ -47,14 +57,27 @@ import {PanelHeader} from '../PanelHeader';
 import {PanelEntity, PanelState} from '../RightSidebar';
 
 const MESSAGE_STATES = {
-  LIKES: 'likes',
-  NO_LIKES: 'no-likes',
+  REACTIONS: 'reactions',
+  NO_REACTIONS: 'no-reactions',
   NO_RECEIPTS: 'no-receipts',
   RECEIPTS: 'receipts',
   RECEIPTS_OFF: 'receipts-off',
 };
 
 const formatUserCount = (users: User[]): string => (users.length ? ` (${users.length})` : '');
+
+const getTotalReactionUsersCount = (reactions: Map<string, User[]>): number => {
+  let total = 0;
+  reactions.forEach(reaction => {
+    total += reaction.length;
+  });
+  return total;
+};
+
+const formatReactionCount = (reactions: Map<string, User[]>): string => {
+  const total = getTotalReactionUsersCount(reactions);
+  return total ? ` (${total})` : '';
+};
 
 const sortUsers = (userA: User, userB: User): number =>
   userA.name().localeCompare(userB.name(), undefined, {sensitivity: 'base'});
@@ -69,7 +92,8 @@ interface MessageDetailsProps {
   teamRepository: TeamRepository;
   searchRepository: SearchRepository;
   userRepository: UserRepository;
-  showLikes?: boolean;
+  showReactions?: boolean;
+  selfUser: User;
   updateEntity: (message: Message) => void;
   togglePanel: (state: PanelState, entity: PanelEntity, addMode?: boolean) => void;
 }
@@ -80,17 +104,18 @@ const MessageDetails: FC<MessageDetailsProps> = ({
   messageEntity,
   teamRepository,
   searchRepository,
-  showLikes = false,
+  showReactions = false,
   userRepository,
+  selfUser,
   onClose,
   updateEntity,
   togglePanel,
 }) => {
   const [receiptUsers, setReceiptUsers] = useState<User[]>([]);
-  const [likeUsers, setLikeUsers] = useState<User[]>([]);
+  const [reactionUsers, setReactionUsers] = useState<Map<string, User[]>>(new Map());
   const [messageId, setMessageId] = useState<string>(messageEntity.id);
 
-  const [isReceiptsOpen, setIsReceiptsOpen] = useState<boolean>(!showLikes);
+  const [isReceiptsOpen, setIsReceiptsOpen] = useState<boolean>(!showReactions);
 
   const {
     timestamp,
@@ -103,7 +128,7 @@ const MessageDetails: FC<MessageDetailsProps> = ({
   const teamId = activeConversation.team_id;
   const supportsReceipts = messageSender.isMe && teamId;
 
-  const supportsLikes = useMemo(() => {
+  const supportsReactions = useMemo(() => {
     const isPing = messageEntity.super_type === SuperType.PING;
     const isEphemeral = messageEntity?.isEphemeral();
 
@@ -119,15 +144,28 @@ const MessageDetails: FC<MessageDetailsProps> = ({
       return receiptUsers.length ? MESSAGE_STATES.RECEIPTS : MESSAGE_STATES.NO_RECEIPTS;
     }
 
-    return likeUsers.length ? MESSAGE_STATES.LIKES : MESSAGE_STATES.NO_LIKES;
-  }, [supportsReceipts, isReceiptsOpen, messageEntity, receiptUsers, likeUsers]);
+    return getTotalReactionUsersCount(reactionUsers) ? MESSAGE_STATES.REACTIONS : MESSAGE_STATES.NO_REACTIONS;
+  }, [supportsReceipts, isReceiptsOpen, messageEntity, receiptUsers, reactionUsers]);
 
-  const getLikes = useCallback(async (reactions: UserReactionMap) => {
-    const currentLikes = Object.keys(reactions);
-    const usersLikes = await userRepository.getUsersById(currentLikes.map(likeId => ({domain: '', id: likeId})));
-    const sortedUsersLikes = usersLikes.sort(sortUsers);
+  const getReactions = useCallback(async (reactions: UserReactionMap) => {
+    const usersMap = new Map<string, User>();
+    const currentReactions = Object.keys(reactions);
+    const usersReactions = await userRepository.getUsersById(
+      currentReactions.map(userId => ({domain: '', id: userId})),
+    );
+    usersReactions.forEach(user => {
+      usersMap.set(user.id, user);
+    });
+    const reactionsGroupByUser = groupByReactionUsers(reactions);
+    const reactionsGroupByUserMap = new Map<string, User[]>();
+    reactionsGroupByUser.forEach((userIds, reaction) => {
+      reactionsGroupByUserMap.set(
+        reaction,
+        userIds.map(userId => usersMap.get(userId)!),
+      );
+    });
 
-    setLikeUsers(sortedUsersLikes);
+    setReactionUsers(reactionsGroupByUserMap);
   }, []);
 
   const receiptTimes = useMemo(() => {
@@ -148,33 +186,33 @@ const MessageDetails: FC<MessageDetailsProps> = ({
     'messageDetailsTitleReceipts',
     messageEntity?.expectsReadConfirmation ? formatUserCount(receiptUsers) : '',
   );
-  const likesTitle = t('messageDetailsTitleLikes', formatUserCount(likeUsers));
+  const reactionsTitle = t('messageDetailsTitleReactions', formatReactionCount(reactionUsers));
 
   const panelTitle = useMemo(() => {
     if (!supportsReceipts) {
-      return likesTitle;
+      return reactionsTitle;
     }
 
-    if (!supportsLikes) {
+    if (!supportsReactions) {
       return receiptsTitle;
     }
 
     return t('messageDetailsTitle');
-  }, [supportsReceipts, supportsLikes, likesTitle, receiptsTitle]);
+  }, [supportsReceipts, supportsReactions, reactionsTitle, receiptsTitle]);
 
-  const showTabs = supportsReceipts && supportsLikes;
+  const showTabs = supportsReceipts && supportsReactions;
 
   const editedFooter = editedTimestamp ? formatTime(editedTimestamp) : '';
 
   const onReceipts = () => setIsReceiptsOpen(true);
 
-  const onLikes = () => setIsReceiptsOpen(false);
+  const onReactions = () => setIsReceiptsOpen(false);
 
   useEffect(() => {
-    if (supportsLikes && reactions) {
-      getLikes(reactions);
+    if (supportsReactions && reactions) {
+      getReactions(reactions);
     }
-  }, [getLikes, supportsLikes, reactions]);
+  }, [getReactions, supportsReactions, reactions]);
 
   useEffect(() => {
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.UPDATED, (oldId: string, updatedMessageEntity: Message) => {
@@ -184,13 +222,13 @@ const MessageDetails: FC<MessageDetailsProps> = ({
         updateEntity(updatedMessageEntity);
         setMessageId(updatedMessageEntity.id);
 
-        if (supportsLikes && isContentMessage(updatedMessageEntity)) {
+        if (supportsReactions && isContentMessage(updatedMessageEntity)) {
           const messageReactions = updatedMessageEntity.reactions();
-          getLikes(messageReactions);
+          getReactions(messageReactions);
         }
       }
     });
-  }, [messageId, supportsLikes]);
+  }, [messageId, supportsReactions]);
 
   const onParticipantClick = (userEntity: User) => togglePanel(PanelState.GROUP_PARTICIPANT_USER, userEntity);
 
@@ -206,18 +244,18 @@ const MessageDetails: FC<MessageDetailsProps> = ({
       {showTabs && (
         <div className="panel__tabs">
           <button
+            className={cx('panel__tab button-reset-default', {'panel__tab--active': !isReceiptsOpen})}
+            onClick={onReactions}
+            data-uie-name="message-details-reaction-tab"
+          >
+            {reactionsTitle}
+          </button>
+          <button
             className={cx('panel__tab button-reset-default', {'panel__tab--active': isReceiptsOpen})}
             onClick={onReceipts}
             data-uie-name="message-details-read-tab"
           >
             {receiptsTitle}
-          </button>
-          <button
-            className={cx('panel__tab button-reset-default', {'panel__tab--active': !isReceiptsOpen})}
-            onClick={onLikes}
-            data-uie-name="message-details-like-tab"
-          >
-            {likesTitle}
           </button>
         </div>
       )}
@@ -226,6 +264,7 @@ const MessageDetails: FC<MessageDetailsProps> = ({
         {messageState === MESSAGE_STATES.RECEIPTS && (
           <UserSearchableList
             dataUieName="read-list"
+            selfUser={selfUser}
             users={receiptUsers}
             infos={receiptTimes}
             noUnderline
@@ -236,17 +275,35 @@ const MessageDetails: FC<MessageDetailsProps> = ({
           />
         )}
 
-        {messageState === MESSAGE_STATES.LIKES && (
-          <UserSearchableList
-            dataUieName="like-list"
-            users={likeUsers}
-            noUnderline
-            conversationRepository={conversationRepository}
-            searchRepository={searchRepository}
-            teamRepository={teamRepository}
-            onClick={onParticipantClick}
-          />
-        )}
+        {messageState === MESSAGE_STATES.REACTIONS &&
+          Array.from(reactionUsers).map(reactions => {
+            const [reactionKey, users] = reactions;
+            const emojiUnicode = getEmojiUnicode(reactionKey);
+            const emojiUrl = getEmojiUrl(emojiUnicode);
+            const emojiName = getEmojiTitleFromEmojiUnicode(emojiUnicode);
+            const capitalizedEmojiName = capitalizeFirstChar(emojiName);
+            const emojiCount = users.length;
+            return (
+              <Fragment key={reactionKey}>
+                <div css={panelContentTitleStyles} className="font-weight-bold">
+                  <EmojiImg emojiUrl={emojiUrl} emojiName={emojiName} styles={messageReactionDetailsMargin} />
+                  <span css={messageReactionDetailsMargin}>{capitalizedEmojiName}</span>
+                  <span css={reactionsCountAlignment}>({emojiCount})</span>
+                </div>
+                <UserSearchableList
+                  selfUser={selfUser}
+                  key={reactionKey}
+                  dataUieName="reaction-list"
+                  users={users}
+                  noUnderline
+                  conversationRepository={conversationRepository}
+                  searchRepository={searchRepository}
+                  teamRepository={teamRepository}
+                  onClick={onParticipantClick}
+                />
+              </Fragment>
+            );
+          })}
 
         {messageState === MESSAGE_STATES.NO_RECEIPTS && (
           <div className="message-details__empty" data-uie-name="message-details-no-receipts-placeholder">
@@ -255,10 +312,10 @@ const MessageDetails: FC<MessageDetailsProps> = ({
           </div>
         )}
 
-        {messageState === MESSAGE_STATES.NO_LIKES && (
-          <div className="message-details__empty" data-uie-name="message-details-no-likes-placeholder">
+        {messageState === MESSAGE_STATES.NO_REACTIONS && (
+          <div className="message-details__empty" data-uie-name="message-details-no-reactions-placeholder">
             <Icon.Like className="message-details__empty__icon" />
-            <p className="message-details__empty__text">{t('messageDetailsNoLikes')}</p>
+            <p className="message-details__empty__text">{t('messageDetailsNoReactions')}</p>
           </div>
         )}
 

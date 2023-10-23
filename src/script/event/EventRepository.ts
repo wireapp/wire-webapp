@@ -23,54 +23,44 @@ import {
   ConversationOtrMessageAddEvent,
   ConversationMLSMessageAddEvent,
 } from '@wireapp/api-client/lib/event';
-import type {BackendEvent} from '@wireapp/api-client/lib/event';
 import {NotificationSource, HandledEventPayload} from '@wireapp/core/lib/notification';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
 import {Account, ConnectionState, ProcessedEventPayload} from '@wireapp/core';
-import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {getLogger, Logger} from 'Util/Logger';
+import {queue} from 'Util/PromiseQueue';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {ClientEvent} from './Client';
+import {EventMiddleware, EventProcessor, IncomingEvent} from './EventProcessor';
 import type {EventService} from './EventService';
 import {EventSource} from './EventSource';
 import {EVENT_TYPE} from './EventType';
-import {EventTypeHandling} from './EventTypeHandling';
 import {EventValidation} from './EventValidation';
 import {validateEvent} from './EventValidator';
 import {NOTIFICATION_HANDLING_STATE} from './NotificationHandlingState';
 import type {NotificationService} from './NotificationService';
 
-import {AssetTransferState} from '../assets/AssetTransferState';
-import type {ClientEntity} from '../client/ClientEntity';
-import {AssetAddEvent, ClientConversationEvent, EventBuilder, MessageAddEvent} from '../conversation/EventBuilder';
+import {ClientConversationEvent, EventBuilder} from '../conversation/EventBuilder';
 import {CryptographyMapper} from '../cryptography/CryptographyMapper';
 import {CryptographyError} from '../error/CryptographyError';
 import {EventError} from '../error/EventError';
-import {categoryFromEvent} from '../message/MessageCategorization';
-import {isEventRecordFailed, isEventRecordWithFederationError} from '../message/StatusType';
-import type {EventRecord, StoredEvent} from '../storage';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import {EventName} from '../tracking/EventName';
 import {UserState} from '../user/UserState';
 import {Warnings} from '../view_model/WarningsContainer';
 
-type IncomingEvent = BackendEvent | ClientConversationEvent;
-
 export class EventRepository {
   logger: Logger;
-  currentClient: ko.Observable<ClientEntity> | undefined;
-  notificationHandlingState: ko.Observable<NOTIFICATION_HANDLING_STATE>;
-  previousHandlingState: NOTIFICATION_HANDLING_STATE | undefined;
-  notificationsHandled: number;
-  notificationsTotal: number;
-  lastEventDate: ko.Observable<string | undefined>;
-  eventProcessMiddlewares: Function[];
+  notificationHandlingState = ko.observable(NOTIFICATION_HANDLING_STATE.STREAM);
+  private readonly lastEventDate: ko.Observable<string | undefined> = ko.observable();
+  private eventProcessMiddlewares: EventMiddleware[] = [];
+  /** event processors are classes that are able to react and process an incoming event */
+  private eventProcessors: EventProcessor[] = [];
 
   static get CONFIG() {
     return {
@@ -109,28 +99,27 @@ export class EventRepository {
   ) {
     this.logger = getLogger('EventRepository');
 
-    this.currentClient = undefined;
-
-    this.notificationHandlingState = ko.observable(NOTIFICATION_HANDLING_STATE.STREAM);
     this.notificationHandlingState.subscribe(handling_state => {
       amplify.publish(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, handling_state);
     });
-    this.notificationsHandled = 0;
-    this.notificationsTotal = 0;
-
-    this.lastEventDate = ko.observable();
-
-    this.eventProcessMiddlewares = [];
   }
 
   /**
-   * Will set a middleware to run before the EventRepository actually processes the event.
-   * Middleware is just a function with the following signature (Event) => Promise<Event>.
-   *
-   * @param middlewares middlewares to run when a new event is about to be processed
+   * Will register a pipeline that transforms an event before it is being processed by the EventProcessors.
+   * Those middleware are run sequentially one after the other. Thus the order at which they are defined matters.
+   * When one middleware fails the entire even handling process will stop and no further middleware will be executed.
    */
-  setEventProcessMiddlewares(middlewares: Function[]) {
+  setEventProcessMiddlewares(middlewares: EventMiddleware[]) {
     this.eventProcessMiddlewares = middlewares;
+  }
+
+  /**
+   * EventProcessors are classes that are able to react and process an incoming event.
+   * They will all be executed in parallel. If one processor fails the other ones are not impacted
+   * @param processors
+   */
+  setEventProcessors(processors: EventProcessor[]) {
+    this.eventProcessors = processors;
   }
 
   //##############################################################################
@@ -166,7 +155,11 @@ export class EventRepository {
     }
   };
 
-  private readonly handleIncomingEvent = async (payload: HandledEventPayload, source: NotificationSource) => {
+  /**
+   * this function will process any incoming event. It is being queued in case 2 events arrive at the same time.
+   * Processing events should happen sequentially (thus the queue)
+   */
+  private readonly handleIncomingEvent = queue(async (payload: HandledEventPayload, source: NotificationSource) => {
     try {
       await this.handleEvent(payload, source);
     } catch (error) {
@@ -176,18 +169,20 @@ export class EventRepository {
         throw error;
       }
     }
-  };
+  });
 
   /**
    * connects to the websocket with the given account
    *
    * @param account the account to connect to
    * @param onNotificationStreamProgress callback when a notification for the notification stream has been processed
+   * @param dryRun when set will not decrypt and not store the last notification ID. This is useful if you only want to subscribe to unencrypted backend events
    * @returns Resolves when the notification stream has fully been processed
    */
   async connectWebSocket(
     account: Account,
     onNotificationStreamProgress: (progress: {done: number; total: number}) => void,
+    dryRun = false,
   ): Promise<void> {
     await this.handleTimeDrift();
     const connect = () => {
@@ -204,6 +199,7 @@ export class EventRepository {
           onEvent: this.handleIncomingEvent,
           onMissedNotifications: this.triggerMissedSystemEventMessageRendering,
           onNotificationStreamProgress: onNotificationStreamProgress,
+          dryRun,
         });
       });
     };
@@ -285,6 +281,12 @@ export class EventRepository {
   // Notification/Event handling
   //##############################################################################
 
+  async injectEvents(events: (ClientConversationEvent | IncomingEvent)[], source: EventSource = EventSource.INJECTED) {
+    for (const event of events) {
+      await this.injectEvent(event, source);
+    }
+  }
+
   /**
    * Inject event into a conversation.
    * @note Don't add unable to decrypt to self conversation
@@ -318,6 +320,8 @@ export class EventRepository {
    * @param source Source of notification
    */
   private async distributeEvent(event: IncomingEvent, source: EventSource) {
+    await Promise.all(this.eventProcessors.map(processor => processor.processEvent(event, source)));
+
     const {type} = event;
     const [category] = type.split('.');
     switch (category) {
@@ -409,13 +413,7 @@ export class EventRepository {
    */
   private async processEvent(event: IncomingEvent | ClientConversationEvent, source: EventSource) {
     for (const eventProcessMiddleware of this.eventProcessMiddlewares) {
-      event = await eventProcessMiddleware(event);
-    }
-
-    const shouldSaveEvent = EventTypeHandling.STORE.includes(event.type as CONVERSATION_EVENT);
-    if (shouldSaveEvent) {
-      const savedEvent = await this.handleEventSaving(event);
-      event = savedEvent ?? event;
+      event = await eventProcessMiddleware.processEvent(event);
     }
 
     return this.handleEventDistribution(event, source);
@@ -444,210 +442,5 @@ export class EventRepository {
       }
     }
     return this.distributeEvent(event, source);
-  }
-
-  /**
-   * Handle a mapped event, check for malicious ID use and save it.
-   *
-   * @param event Backend event extracted from notification stream
-   * @returns Resolves with the saved event
-   */
-  private async handleEventSaving(event: IncomingEvent) {
-    const conversationId = 'conversation' in event && event.conversation;
-    const mappedData = ('data' in event && event.data) ?? {};
-
-    // first check if a message that should be replaced exists in DB
-    const eventToReplace = mappedData.replacing_message_id
-      ? await this.eventService.loadEvent(conversationId, mappedData.replacing_message_id)
-      : undefined;
-
-    const hasLinkPreview = mappedData.previews && mappedData.previews.length;
-    const isReplacementWithoutOriginal = !eventToReplace && mappedData.replacing_message_id;
-    if (isReplacementWithoutOriginal && !hasLinkPreview) {
-      // the only valid case of a replacement with no original message is when an edited message gets a link preview
-      this.throwValidationError(event, 'Edit event without original event');
-    }
-
-    const handleEvent = async (newEvent: IncomingEvent) => {
-      // check for duplicates (same id)
-      const storedEvent = 'id' in newEvent ? await this.eventService.loadEvent(conversationId, newEvent.id) : undefined;
-
-      return storedEvent
-        ? this.handleDuplicatedEvent(storedEvent, newEvent)
-        : this.eventService.saveEvent(newEvent as EventRecord);
-    };
-
-    const canReplace =
-      eventToReplace?.type === ClientEvent.CONVERSATION.MESSAGE_ADD &&
-      event.type === ClientEvent.CONVERSATION.MESSAGE_ADD;
-    return canReplace && eventToReplace ? this.handleEventReplacement(eventToReplace, event) : handleEvent(event);
-  }
-
-  private handleEventReplacement(originalEvent: StoredEvent<MessageAddEvent>, newEvent: MessageAddEvent) {
-    if (originalEvent.from !== newEvent.from) {
-      const logMessage = `ID previously used by user '${newEvent.from}'`;
-      const errorMessage = 'ID reused by other user';
-      this.throwValidationError(newEvent, errorMessage, logMessage);
-    }
-    const newData = newEvent.data;
-    const primaryKeyUpdate = {primary_key: originalEvent.primary_key};
-    const isLinkPreviewEdit = newData?.previews && !!newData?.previews.length;
-
-    const commonUpdates = EventRepository.getCommonMessageUpdates(originalEvent, newEvent);
-
-    const specificUpdates = isLinkPreviewEdit
-      ? this.getUpdatesForMessage(originalEvent, newEvent)
-      : EventRepository.getUpdatesForEditMessage(originalEvent, newEvent);
-
-    const updates = {...specificUpdates, ...commonUpdates};
-
-    const identifiedUpdates = {...primaryKeyUpdate, ...updates};
-    return this.eventService.replaceEvent(identifiedUpdates);
-  }
-
-  private handleDuplicatedEvent(originalEvent: EventRecord, newEvent: IncomingEvent) {
-    switch (newEvent.type) {
-      case ClientEvent.CONVERSATION.ASSET_ADD:
-        return this.handleAssetUpdate(originalEvent, newEvent);
-
-      case ClientEvent.CONVERSATION.MESSAGE_ADD:
-        return this.handleMessageUpdate(originalEvent, newEvent);
-
-      default:
-        this.throwValidationError(newEvent, `Forbidden type '${newEvent.type}' for duplicate events`);
-    }
-  }
-
-  private async handleAssetUpdate(originalEvent: EventRecord, newEvent: AssetAddEvent) {
-    const newEventData = newEvent.data;
-    // the preview status is not sent by the client so we fake a 'preview' status in order to cleanly handle it in the switch statement
-    const ASSET_PREVIEW = 'preview';
-    // similarly, no status is sent by the client when we retry sending a failed message
-    const RETRY_EVENT = 'retry';
-    const isPreviewEvent = !newEventData.status && !!newEventData.preview_key;
-    const isRetryEvent = !!newEventData.content_length;
-    const handledEvent = isRetryEvent ? RETRY_EVENT : newEventData.status;
-    const previewStatus = isPreviewEvent ? ASSET_PREVIEW : handledEvent;
-
-    const updateEvent = () => {
-      const updatedData = {...originalEvent.data, ...newEventData};
-      const updatedEvent = {...originalEvent, data: updatedData};
-      return this.eventService.replaceEvent(updatedEvent);
-    };
-
-    switch (previewStatus) {
-      case ASSET_PREVIEW:
-      case RETRY_EVENT:
-      case AssetTransferState.UPLOADED: {
-        return updateEvent();
-      }
-
-      case AssetTransferState.UPLOAD_FAILED: {
-        // case of both failed or canceled upload
-        const fromOther = newEvent.from !== this.userState.self().id;
-        const sameSender = newEvent.from === originalEvent.from;
-        const selfCancel = !fromOther && newEvent.data.reason === ProtobufAsset.NotUploaded.CANCELLED;
-        // we want to delete the event in the case of an error from the remote client or a cancel on the user's own client
-        const shouldDeleteEvent = (fromOther || selfCancel) && sameSender;
-        if (shouldDeleteEvent) {
-          await this.eventService.deleteEvent(newEvent.conversation, newEvent.id);
-          return newEvent;
-        }
-        return this.eventService.updateEventAsUploadFailed(originalEvent.primary_key, newEvent.data.reason);
-      }
-
-      default: {
-        this.throwValidationError(newEvent, `Unhandled asset status update '${newEvent.data.status}'`);
-      }
-    }
-  }
-
-  private handleMessageUpdate(originalEvent: EventRecord, newEvent: MessageAddEvent) {
-    const newEventData = newEvent.data;
-    const originalData = originalEvent.data;
-
-    if (originalEvent.from !== newEvent.from) {
-      const logMessage = `ID previously used by user '${newEvent.from}'`;
-      const errorMessage = 'ID reused by other user';
-      return this.throwValidationError(newEvent, errorMessage, logMessage);
-    }
-
-    const containsLinkPreview = newEventData.previews && !!newEventData.previews.length;
-    const isRetryAttempt = isEventRecordFailed(originalEvent) || isEventRecordWithFederationError(originalEvent);
-
-    if (!containsLinkPreview && !isRetryAttempt) {
-      const errorMessage =
-        'Message duplication event invalid: original message did not fail to send and does not contain link preview';
-      return this.throwValidationError(newEvent, errorMessage);
-    }
-
-    const textContentMatches = newEventData.content === originalData.content;
-    if (!textContentMatches) {
-      const errorMessage = 'ID of link preview reused';
-      const logMessage = 'Text content for message duplication not matching';
-      return this.throwValidationError(newEvent, errorMessage, logMessage);
-    }
-
-    const bothAreMessageAddType = newEvent.type === originalEvent.type;
-    if (!bothAreMessageAddType) {
-      return this.throwValidationError(newEvent, 'ID reused by same user');
-    }
-
-    const updates = this.getUpdatesForMessage(originalEvent, newEvent);
-    const identifiedUpdates = {primary_key: originalEvent.primary_key, ...updates};
-    return this.eventService.replaceEvent(identifiedUpdates);
-  }
-
-  private static getCommonMessageUpdates(originalEvent: StoredEvent<MessageAddEvent>, newEvent: MessageAddEvent) {
-    return {
-      ...newEvent,
-      data: {...newEvent.data, expects_read_confirmation: originalEvent.data.expects_read_confirmation},
-      edited_time: newEvent.time,
-      read_receipts: !newEvent.read_receipts ? originalEvent.read_receipts : newEvent.read_receipts,
-      status: !newEvent.status || newEvent.status < originalEvent.status ? originalEvent.status : newEvent.status,
-      time: originalEvent.time,
-      version: 1,
-    };
-  }
-
-  private static getUpdatesForEditMessage(originalEvent: EventRecord, newEvent: MessageAddEvent): MessageAddEvent {
-    // Remove reactions, so that likes (hearts) don't stay when a message's text gets edited
-    return {...newEvent, reactions: {}};
-  }
-
-  private getUpdatesForMessage(originalEvent: EventRecord, newEvent: MessageAddEvent) {
-    const newData = newEvent.data;
-    const originalData = originalEvent.data;
-    const updatingLinkPreview = !!originalData.previews.length;
-    if (updatingLinkPreview) {
-      this.throwValidationError(newEvent, 'ID of link preview reused');
-    }
-
-    const textContentMatches = !newData.previews?.length || newData.content === originalData.content;
-    if (!textContentMatches) {
-      const logMessage = 'Text content for message duplication not matching';
-      const errorMessage = 'ID of duplicated message reused';
-      this.throwValidationError(newEvent, errorMessage, logMessage);
-    }
-
-    return {
-      ...newEvent,
-      category: categoryFromEvent(newEvent),
-      ephemeral_expires: originalEvent.ephemeral_expires,
-      ephemeral_started: originalEvent.ephemeral_started,
-      ephemeral_time: originalEvent.ephemeral_time,
-      server_time: newEvent.time,
-      time: originalEvent.time,
-      version: originalEvent.version,
-    };
-  }
-
-  private throwValidationError(event: IncomingEvent, errorMessage: string, logMessage?: string): never {
-    const conversation = 'conversation' in event && event.conversation;
-    const from = 'from' in event && event.from;
-
-    const baseLogMessage = `Ignored '${event.type}' in '${conversation}' from '${from}''`;
-    this.logger.warn(`${baseLogMessage} ${logMessage || errorMessage}`);
-    throw new EventError(EventError.TYPE.VALIDATION_FAILED, `Event validation failed: ${errorMessage}`);
   }
 }

@@ -17,7 +17,8 @@
  *
  */
 
-import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
+import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data/';
 import {
   BackendEvent,
@@ -32,6 +33,7 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {DatabaseKeys} from '@wireapp/core/lib/notification/NotificationDatabaseRepository';
 import Dexie from 'dexie';
 import keyboardjs from 'keyboardjs';
+import {$createTextNode, $getRoot, LexicalEditor} from 'lexical';
 import {container} from 'tsyringe';
 
 import {getLogger, Logger} from 'Util/Logger';
@@ -55,6 +57,7 @@ import {checkVersion} from '../lifecycle/newVersionHandler';
 import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
 import {EventRecord, StorageRepository, StorageSchemata} from '../storage';
+import {TeamState} from '../team/TeamState';
 import {UserRepository} from '../user/UserRepository';
 import {UserState} from '../user/UserState';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
@@ -79,6 +82,7 @@ export class DebugUtil {
     repositories: ViewModelRepositories,
     private readonly clientState = container.resolve(ClientState),
     private readonly userState = container.resolve(UserState),
+    private readonly teamState = container.resolve(TeamState),
     private readonly conversationState = container.resolve(ConversationState),
     private readonly callState = container.resolve(CallState),
     private readonly core = container.resolve(Core),
@@ -177,6 +181,22 @@ export class DebugUtil {
     );
   }
 
+  reconnectWebSocket({dryRun} = {dryRun: false}) {
+    return this.eventRepository.connectWebSocket(this.core, () => {}, dryRun);
+  }
+
+  async reconnectWebSocketWithLastNotificationIdFromBackend({dryRun} = {dryRun: false}) {
+    await this.core.service?.notification.initializeNotificationStream();
+    return this.reconnectWebSocket({dryRun});
+  }
+
+  async updateActiveConversationKeyPackages() {
+    const groupId = this.conversationState.activeConversation()?.groupId;
+    if (groupId) {
+      return this.core.service?.mls?.renewKeyMaterial(groupId);
+    }
+  }
+
   /** Used by QA test automation. */
   blockAllConnections(): Promise<void[]> {
     const blockUsers = this.userState.users().map(userEntity => this.connectionRepository.blockUser(userEntity));
@@ -193,6 +213,26 @@ export class DebugUtil {
     const proteusService = this.core.service!.proteus;
     const sessionId = proteusService.constructSessionId(userId, clientId);
     await proteusService['cryptoClient'].debugBreakSession(sessionId);
+  }
+
+  async setTeamSupportedProtocols(supportedProtocols: ConversationProtocol[], defaultProtocol?: ConversationProtocol) {
+    const {teamId} = await this.userRepository.getSelf();
+    if (!teamId) {
+      throw new Error('teamId of self user is undefined');
+    }
+
+    const mlsFeature = this.teamState.teamFeatures()?.mls;
+
+    if (!mlsFeature) {
+      throw new Error('MLS feature is not enabled');
+    }
+
+    const response = await this.apiClient.api.teams.feature.putMLSFeature(teamId, {
+      config: {...mlsFeature.config, supportedProtocols, defaultProtocol: defaultProtocol || supportedProtocols[0]},
+      status: FeatureStatus.ENABLED,
+    });
+
+    return response;
   }
 
   /** Used by QA test automation. */
@@ -220,6 +260,23 @@ export class DebugUtil {
   /** Used by QA test automation. */
   triggerVersionCheck(baseVersion: string): Promise<string | void> {
     return checkVersion(baseVersion);
+  }
+
+  /**
+   * will allow to programatically add text in the message input.
+   * This is used by QA to fill the input
+   * @param text the text to add to the input
+   */
+  inputText(text: string) {
+    // This is a hacky way of accessing the lexical editor directly from the DOM element
+    const lexicalEditor = (document.querySelector<HTMLElement>('[data-uie-name=input-message]') as any)
+      .__lexicalEditor as LexicalEditor;
+
+    lexicalEditor.update(() => {
+      const root = $getRoot().getLastChild()!;
+      const textNode = $createTextNode(text);
+      root.append(textNode);
+    });
   }
 
   /**
@@ -277,7 +334,7 @@ export class DebugUtil {
     messageId: string,
     conversationId: string = this.conversationState.activeConversation().id,
   ): Promise<void> {
-    const clientId = this.clientState.currentClient().id;
+    const clientId = this.clientState.currentClient?.id;
     const userId = this.userState.self().id;
 
     const isOTRMessage = (notification: BackendEvent) => notification.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD;

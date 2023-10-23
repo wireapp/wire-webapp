@@ -26,6 +26,7 @@ import {Logger, getLogger} from 'Util/Logger';
 import {constructUserPrimaryKey} from 'Util/StorageUtil';
 import {WebWorker} from 'Util/worker';
 
+import {BackUpHeader, ERROR_TYPES} from './BackUpHeader';
 import {BackupService} from './BackupService';
 import {
   CancelError,
@@ -33,8 +34,10 @@ import {
   ExportError,
   ImportError,
   IncompatibleBackupError,
+  IncompatibleBackupFormatError,
   IncompatiblePlatformError,
   InvalidMetaDataError,
+  InvalidPassword,
 } from './Error';
 import {preprocessConversations, preprocessEvents, preprocessUsers} from './recordPreprocessors';
 
@@ -123,12 +126,17 @@ export class BackupRepository {
    * @param progressCallback called on every step of the export
    * @returns The promise that contains all the exported tables
    */
-  public async generateHistory(user: User, clientId: string, progressCallback: ProgressCallback): Promise<Blob> {
+  public async generateHistory(
+    user: User,
+    clientId: string,
+    progressCallback: ProgressCallback,
+    password: string,
+  ): Promise<Blob> {
     this.canceled = false;
 
     try {
       const exportedData = await this._exportHistory(progressCallback);
-      return await this.compressHistoryFiles(user, clientId, exportedData);
+      return await this.compressHistoryFiles(user, clientId, exportedData, password);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : error;
       this.logger.error(`Could not export history: ${errorMessage}`, error);
@@ -172,8 +180,12 @@ export class BackupRepository {
     });
     return tableData;
   }
-
-  private async compressHistoryFiles(user: User, clientId: string, exportedData: Record<string, any>): Promise<Blob> {
+  private async compressHistoryFiles(
+    user: User,
+    clientId: string,
+    exportedData: Record<string, any>,
+    password: string,
+  ): Promise<Blob> {
     const metaData = this.createMetaData(user, clientId);
 
     const files: Record<string, Uint8Array> = {};
@@ -187,15 +199,91 @@ export class BackupRepository {
       const fileName = `${tableName}.json`;
       files[fileName] = encodedData;
     }
-
     files[Filename.METADATA] = encodedMetadata;
 
+    if (password) {
+      return this.createEncryptedBackup(files, user, password);
+    }
+
+    // If no password, return the regular ZIP archive
     const array = await this.worker.post<Uint8Array>({type: 'zip', files});
     return new Blob([array], {type: 'application/zip'});
   }
 
+  private async createEncryptedBackup(files: Record<string, Uint8Array>, user: User, password: string): Promise<Blob> {
+    // encode header
+    const backupCoder = new BackUpHeader(user.id, password);
+    const backupHeader = await this.generateBackupHeader(user, password, backupCoder).catch(error => {
+      throw new Error('Backup error:', error);
+    });
+
+    // Encrypt the ZIP archive using the provided password
+    const {decodedHeader} = backupCoder.readBackupHeader(backupHeader);
+    const chaCha20Key = await backupCoder.generateChaCha20Key(decodedHeader);
+    const array = await this.worker.post<Uint8Array>({type: 'zip', files, encrytionKey: chaCha20Key});
+
+    // Prepend the combinedBytes to the ZIP archive data
+    const combinedArray = this.concatenateByteArrays([backupHeader, array]);
+    return new Blob([combinedArray], {type: 'application/zip'});
+  }
+
+  private async generateBackupHeader(user: User, password: string, backupCoder: BackUpHeader) {
+    const backupHeader = await backupCoder.encodeHeader();
+    if (backupHeader.byteLength === 0) {
+      throw new Error('Backup header is empty');
+    }
+    return backupHeader;
+  }
+
+  private concatenateByteArrays(arrays: Uint8Array[]): Uint8Array {
+    // Calculate the total length of the concatenated array
+    let totalLength = 0;
+    for (const array of arrays) {
+      totalLength += array.length;
+    }
+
+    // Create a new Uint8Array with the total length
+    const concatenatedArray = new Uint8Array(totalLength);
+
+    // Copy each array into the concatenated array
+    let offset = 0;
+    for (const array of arrays) {
+      concatenatedArray.set(array, offset);
+      offset += array.length;
+    }
+
+    return concatenatedArray;
+  }
   public getBackupInitData(): Promise<number> {
     return this.backupService.getHistoryCount();
+  }
+
+  private async convertToUint8Array(data: ArrayBuffer | Blob): Promise<Uint8Array> {
+    if (data instanceof ArrayBuffer) {
+      return new Uint8Array(data);
+    } else if (data instanceof Blob) {
+      return await this.readBlobAsUint8Array(data);
+    }
+    throw new Error('Unsupported data type');
+  }
+  private async readBlobAsUint8Array(blob: Blob): Promise<Uint8Array> {
+    return new Promise<Uint8Array>((resolve, reject) => {
+      const reader = new FileReader();
+
+      reader.onloadend = () => {
+        if (reader.result instanceof ArrayBuffer) {
+          resolve(new Uint8Array(reader.result));
+        } else {
+          reject(new Error('Invalid Blob data'));
+        }
+      };
+
+      reader.onerror = () => {
+        reject(new Error('Failed to read Blob data'));
+      };
+
+      reader.readAsArrayBuffer(blob);
+    });
   }
 
   public async importHistory(
@@ -203,12 +291,25 @@ export class BackupRepository {
     data: ArrayBuffer | Blob,
     initCallback: ProgressCallback,
     progressCallback: ProgressCallback,
+    password?: string,
   ): Promise<void> {
     this.canceled = false;
+    let files;
 
-    const files = await this.worker.post<Record<string, Uint8Array>>({type: 'unzip', bytes: data});
+    if (password) {
+      files = await this.createDecryptedBackup(data, user, password);
+    } else {
+      files = await this.worker.post<Record<string, Uint8Array>>({
+        type: 'unzip',
+        bytes: data,
+      });
+    }
 
     if (files.error) {
+      const error = files.error.toString();
+      if (error === 'WRONG_PASSWORD') {
+        throw new InvalidPassword(error);
+      }
       throw new ImportError(files.error as unknown as string);
     }
 
@@ -232,6 +333,33 @@ export class BackupRepository {
     initCallback(nbEntities);
 
     await this.importHistoryData(fileDescriptors, progressCallback);
+  }
+
+  private async createDecryptedBackup(
+    data: ArrayBuffer | Blob,
+    user: User,
+    password: string,
+  ): Promise<Record<string, Uint8Array>> {
+    const backupCoder = new BackUpHeader(user.id, password);
+
+    // Convert data to Uint8Array
+    const dataArray = await this.convertToUint8Array(data);
+    const {decodingError, decodedHeader, headerSize} = await backupCoder.decodeHeader(dataArray);
+
+    // error decoding the header
+    if (decodingError) {
+      this.mapDecodingError(decodingError);
+    }
+    // We need to read the ChaCha20 generated header prior to the encrypted backup file data to run some sanity checks
+    const chaChaHeaderKey = await backupCoder.generateChaCha20Key(decodedHeader);
+
+    // ChaCha20 header is needed to validate the encrypted data hasn't been tampered with different authentication
+    return await this.worker.post<Record<string, Uint8Array>>({
+      type: 'unzip',
+      bytes: data,
+      encrytionKey: chaChaHeaderKey,
+      headerLength: headerSize,
+    });
   }
 
   private async importHistoryData(
@@ -268,9 +396,8 @@ export class BackupRepository {
     let importedEntities: Conversation[] = [];
 
     const importConversationChunk = async (conversationChunk: ConversationRecord[]) => {
-      const importedConversationEntities = await this.conversationRepository.updateConversationStates(
-        conversationChunk,
-      );
+      const importedConversationEntities =
+        await this.conversationRepository.updateConversationStates(conversationChunk);
       importedEntities = importedEntities.concat(importedConversationEntities);
       progressCallback(conversationChunk.length);
       return importedEntities.length;
@@ -341,11 +468,12 @@ export class BackupRepository {
   }
 
   private prepareEvents(entity: EventRecord) {
-    if (entity.data) {
+    const data = entity.data as any;
+    if (data) {
       UINT8ARRAY_FIELDS.forEach(field => {
-        const dataField = entity.data[field];
+        const dataField = data[field];
         if (dataField) {
-          entity.data[field] = new Uint8Array(Object.values(dataField));
+          data[field] = new Uint8Array(Object.values(dataField));
         }
       });
     }
@@ -387,6 +515,29 @@ export class BackupRepository {
     if (involvesDatabaseMigration) {
       const message = 'History cannot be restored: Database version mismatch';
       throw new IncompatibleBackupError(message);
+    }
+  }
+
+  private mapDecodingError(decodingError: string) {
+    let message = '';
+    switch (decodingError) {
+      case ERROR_TYPES.INVALID_USER_ID: {
+        message = 'The user id in the backup file header does not match the expected one';
+        this.logger.error(message);
+        throw new DifferentAccountError(message);
+        break;
+      }
+      case ERROR_TYPES.INVALID_FORMAT:
+        message = 'The provided backup version is lower than the minimum supported version';
+        this.logger.error(message);
+        throw new IncompatibleBackupError(message);
+        break;
+
+      case ERROR_TYPES.INVALID_VERSION:
+        message = 'The provided backup version is lower than the minimum supported version';
+        this.logger.error('The provided backup format is not supported');
+        throw new IncompatibleBackupFormatError(message);
+        break;
     }
   }
 }

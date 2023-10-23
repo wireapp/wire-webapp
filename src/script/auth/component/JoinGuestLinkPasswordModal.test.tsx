@@ -27,6 +27,7 @@ describe('JoinGuestLinkPasswordModal', () => {
   const onSubmitPasswordMock = jest.fn();
   const props: JoinGuestLinkPasswordModalProps = {
     onSubmitPassword: onSubmitPasswordMock,
+    onClose: jest.fn(),
     conversationName: 'test group',
     error: null,
   };

@@ -61,6 +61,9 @@ export type Env = {
   /** Specifies the name of the brand, e.g. Wire */
   BRAND_NAME: string;
 
+  /** enables replacing all occurences of {{hostname}} in the urls given to the frontend by the hostname of the client*/
+  ENABLE_DYNAMIC_HOSTNAME?: string;
+
   /** Allows a client to use a development version of the api (if present) */
   ENABLE_DEV_BACKEND_API?: string;
 
@@ -77,9 +80,14 @@ export type Env = {
   /** will enable the MLS protocol */
   FEATURE_ENABLE_MLS?: string;
 
+  /** will enable the E2E-Identification protocol, needs active FEATURE_ENABLE_MLS to work */
+  FEATURE_ENABLE_E2EI?: string;
+
   FEATURE_USE_CORE_CRYPTO?: string;
 
   FEATURE_MLS_CONFIG_KEYING_MATERIAL_UPDATE_THRESHOLD?: string;
+
+  FEATURE_MLS_CONFIG_DEFAULT_CIPHERSUITE?: string;
 
   FEATURE_ENABLE_PROTEUS_CORE_CRYPTO?: string;
 
@@ -101,6 +109,15 @@ export type Env = {
 
   /** Feature toggle for debug utils. Can be set to true or false */
   FEATURE_ENABLE_DEBUG: string;
+
+  /** Feature to open a confirm modal before pinging large groups */
+  FEATURE_ENABLE_PING_CONFIRMATION: string;
+
+  /**
+   * Minimum amount of users required in a conversation to open confirm modal for ping
+   * Must be used with FEATURE_ENABLE_PING_CONFIRMATION
+   */
+  FEATURE_MAX_USERS_TO_PING_WITHOUT_ALERT: string;
 
   /** Feature toggle for domain discovery. Can be set to true or false */
   FEATURE_ENABLE_DOMAIN_DISCOVERY: string;
@@ -231,7 +248,13 @@ export type Env = {
 
   URL_LEARN_MORE_ABOUT_GUEST_LINKS: string;
 
+  URL_SUPPORT_NON_FEDERATING_INFO: string;
+
+  URL_SUPPORT_OAUTH_LEARN_MORE: string;
+
   URL_SUPPORT_OFFLINE_BACKEND: string;
+
+  URL_SUPPORT_FEDERATION_STOP: string;
 
   URL_WHATS_NEW: string;
 

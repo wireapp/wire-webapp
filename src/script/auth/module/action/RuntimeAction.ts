@@ -25,20 +25,30 @@ import {RuntimeActionCreator} from './creator/';
 
 import * as RuntimeSelector from '../../module/selector/RuntimeSelector';
 import {QUERY_KEY} from '../../route';
-import {hasURLParameter} from '../../util/urlUtil';
 import type {ThunkAction} from '../reducer';
+
+const androidBrowser = 'android browser';
+const chromeMobile = 'chrome mobile';
+const outlookBrowser = 'unknown';
 
 export class RuntimeAction {
   checkSupportedBrowser = (): ThunkAction<void> => {
     return (dispatch, getState, {getConfig}) => {
-      const isPwaSupportedBrowser = () => {
-        return Runtime.isMobileOS() || Runtime.isSafari();
+      const isMobileSupportedBrowser = () => {
+        return (
+          Runtime.isMobileOS() &&
+          (Runtime.isSafari() ||
+            Runtime.isChrome() ||
+            [androidBrowser, chromeMobile].includes(Runtime.getBrowserName()))
+        );
       };
-      const pwaAware = hasURLParameter(QUERY_KEY.PWA_AWARE);
-      const isPwaEnabled = getConfig().URL.MOBILE_BASE && pwaAware && isPwaSupportedBrowser();
+      const isOutlookApp = () => {
+        return Runtime.getBrowserName() === outlookBrowser;
+      };
+      const isAuthorizationFlow = () => location?.hash?.includes(QUERY_KEY.SCOPE) ?? false;
       if (
         (!RuntimeSelector.hasToUseDesktopApplication(getState()) && Runtime.isWebappSupportedBrowser()) ||
-        isPwaEnabled
+        ((isMobileSupportedBrowser() || isOutlookApp()) && isAuthorizationFlow())
       ) {
         dispatch(RuntimeActionCreator.confirmSupportedBrowser());
       }

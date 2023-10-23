@@ -17,7 +17,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
@@ -37,7 +37,7 @@ jobs:
         run: yarn translate:merge
 
       - name: Download translations
-        uses: crowdin/github-action@v1.11.0
+        uses: crowdin/github-action@v1.13.1
         env:
           GITHUB_TOKEN: ${{secrets.OTTO_THE_BOT_GH_TOKEN}}
           CROWDIN_PROJECT_ID: 342359

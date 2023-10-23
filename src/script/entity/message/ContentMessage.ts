@@ -19,6 +19,7 @@
 
 import type {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {ReactionType} from '@wireapp/core/lib/conversation/ReactionType';
 import ko from 'knockout';
 
 import {copyText} from 'Util/ClipboardUtil';
@@ -36,11 +37,6 @@ import type {QuoteEntity} from '../../message/QuoteEntity';
 import {SuperType} from '../../message/SuperType';
 import {UserReactionMap} from '../../storage';
 import {User} from '../User';
-
-export enum ReactionType {
-  LIKE = '❤️',
-  NONE = '',
-}
 
 export class ContentMessage extends Message {
   private readonly isLikedProvisional: ko.Observable<boolean>;
@@ -97,12 +93,18 @@ export class ContentMessage extends Message {
 
     this.like_caption = ko.pureComputed(() => {
       const maxShownNames = 2;
-      if (this.reactions_user_ets().length <= maxShownNames) {
+      const likesAmount = this.reactions_user_ets().length;
+      if (likesAmount <= maxShownNames) {
         return this.reactions_user_ets()
           .map(user => user.name())
           .join(', ');
       }
-      return t('conversationLikesCaption', this.reactions_user_ets().length);
+      const caption =
+        likesAmount > 1
+          ? t('conversationLikesCaptionPlural', likesAmount.toString())
+          : t('conversationLikesCaptionSingular', likesAmount.toString());
+
+      return caption;
     });
   }
 
@@ -137,24 +139,9 @@ export class ContentMessage extends Message {
     data: {reaction: ReactionType};
     from: string;
   }): false | {reactions: UserReactionMap; version: number} {
-    const reaction = event_data && event_data.reaction;
-    const hasUser = this.reactions()[from];
-    const shouldAdd = reaction && !hasUser;
-    const shouldDelete = !reaction && hasUser;
-
-    if (!shouldAdd && !shouldDelete) {
-      return false;
-    }
-
-    const newReactions = {...this.reactions()};
-
-    if (shouldAdd) {
-      newReactions[from] = reaction;
-    } else {
-      delete newReactions[from];
-    }
-
-    return {reactions: newReactions, version: this.version + 1};
+    const reactions = event_data && event_data.reaction;
+    const userReactions = {...this.reactions(), [from]: reactions};
+    return {reactions: userReactions, version: this.version + 1};
   }
 
   /**

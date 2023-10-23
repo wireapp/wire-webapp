@@ -65,7 +65,8 @@ export const isEnterKey = (keyboardEvent: KeyboardEvent | ReactKeyboardEvent): b
 
 export const isSpaceKey = (keyboardEvent: KeyboardEvent): boolean => isKey(keyboardEvent, KEY.SPACE);
 
-export const isEscapeKey = (keyboardEvent: KeyboardEvent): boolean => isKey(keyboardEvent, KEY.ESC);
+export const isEscapeKey = (keyboardEvent: KeyboardEvent | ReactKeyboardEvent): boolean =>
+  isKey(keyboardEvent, KEY.ESC);
 
 export const isFunctionKey = (keyboardEvent: KeyboardEvent | ReactKeyboardEvent): boolean =>
   keyboardEvent.altKey || keyboardEvent.ctrlKey || keyboardEvent.metaKey || keyboardEvent.shiftKey;
@@ -78,49 +79,6 @@ export const isPasteAction = (keyboardEvent: KeyboardEvent): boolean =>
   isMetaKey(keyboardEvent) && isKey(keyboardEvent, KEY.KEY_V);
 
 export const isRemovalAction = (key: string): boolean => [KEY.BACKSPACE, KEY.DELETE].includes(key);
-
-export const insertAtCaret = (areaId: string, text: string) => {
-  // http://stackoverflow.com/a/1064139
-  const textArea = document.getElementById(areaId) as HTMLTextAreaElement;
-  if (!textArea) {
-    return;
-  }
-
-  const scrollPos = textArea.scrollTop;
-  let strPos = 0;
-  const br =
-    textArea.selectionStart || textArea.selectionStart === 0 ? 'ff' : (document as any).selection ? 'ie' : false;
-
-  if (br === 'ie') {
-    textArea.focus();
-    const range = (document as any).selection.createRange();
-    range.moveStart('character', -textArea.value.length);
-    strPos = range.text.length;
-  } else if (br === 'ff') {
-    strPos = textArea.selectionStart;
-  }
-
-  const front = textArea.value.substring(0, strPos);
-  const back = textArea.value.substring(strPos, textArea.value.length);
-
-  textArea.value = `${front}${text}${back}`;
-  strPos = strPos + text.length;
-
-  if (br === 'ie') {
-    textArea.focus();
-    const ieRange = (document as any).selection.createRange();
-    ieRange.moveStart('character', -textArea.value.length);
-    ieRange.moveStart('character', strPos);
-    ieRange.moveEnd('character', 0);
-    ieRange.select();
-  } else if (br === 'ff') {
-    textArea.selectionStart = strPos;
-    textArea.selectionEnd = strPos;
-    textArea.focus();
-  }
-
-  textArea.scrollTop = scrollPos;
-};
 
 type KeyboardHandler = (event: KeyboardEvent) => void;
 

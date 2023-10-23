@@ -128,7 +128,7 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
 
   private _mapConversationAccessState(
     conversationEntity: Conversation,
-    eventJson: ConversationEvent<ConversationAccessUpdateData>,
+    eventJson: ConversationEvent<CONVERSATION_EVENT.ACCESS_UPDATE, ConversationAccessUpdateData>,
   ): void {
     const {access: accessModes, ...roles} = eventJson.data;
     ConversationMapper.mapAccessState(conversationEntity, accessModes, roles?.access_role, roles?.access_role_v2);
@@ -140,7 +140,7 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
 
   private _updateConversationAccessCode(
     conversationEntity: Conversation,
-    eventJson: ConversationEvent<ConversationCode>,
+    eventJson: ConversationEvent<CONVERSATION_EVENT.CODE_UPDATE, ConversationCode>,
   ): void {
     ConversationMapper.mapAccessCode(conversationEntity, eventJson.data);
   }

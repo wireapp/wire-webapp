@@ -31,6 +31,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';
+import {isBackendError} from 'Util/TypePredicateUtil';
 
 import type {ConnectionEntity} from './ConnectionEntity';
 import {ConnectionMapper} from './ConnectionMapper';
@@ -118,12 +119,16 @@ export class ConnectionRepository {
     await this.attachConnectionToUser(connectionEntity);
 
     // Update info about user when connection gets accepted
-    const shouldUpdateUser = previousStatus === ConnectionStatus.SENT && connectionEntity.isConnected();
-    if (shouldUpdateUser) {
+    const wasConnectionAccepted = previousStatus === ConnectionStatus.SENT && connectionEntity.isConnected();
+    if (wasConnectionAccepted) {
       await this.userRepository.refreshUser(connectionEntity.userId);
+    }
+
+    const isConnectionSent = connectionEntity.isOutgoingRequest();
+    if (isConnectionSent || wasConnectionAccepted) {
       // Get conversation related to connection and set its type to 1:1
       // This case is important when the 'user.connection' event arrives after the 'conversation.member-join' event: https://wearezeta.atlassian.net/browse/SQCORE-348
-      amplify.publish(WebAppEvents.CONVERSATION.MAP_CONNECTION, connectionEntity);
+      amplify.publish(WebAppEvents.CONVERSATION.MAP_CONNECTION, connectionEntity, source);
     }
 
     await this.sendNotification(connectionEntity, source, previousStatus);
@@ -182,28 +187,59 @@ export class ConnectionRepository {
    * @param userEntity User to connect to
    * @returns Promise that resolves to true if the request was successfully sent, false if not
    */
-  public async createConnection(userEntity: User): Promise<boolean> {
+  public async createConnection(
+    userEntity: User,
+  ): Promise<{connectionStatus: ConnectionStatus; conversationId: QualifiedId} | null> {
     try {
       const response = await this.connectionService.postConnections(userEntity.qualifiedId);
       const connectionEvent = {connection: response, user: {name: userEntity.name()}};
       await this.onUserConnection(connectionEvent, EventRepository.SOURCE.INJECTED);
-      return true;
+      return {
+        connectionStatus: response.status,
+        conversationId: response.qualified_conversation || {id: response.conversation, domain: ''},
+      };
     } catch (error) {
-      if (error.label === BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT) {
-        const replaceLinkLegalHold = replaceLink(
-          Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK,
-          '',
-          'read-more-legal-hold',
-        );
-        PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-          text: {
-            htmlMessage: t('modalUserCannotConnectLegalHoldMessage', {}, replaceLinkLegalHold),
-            title: t('modalUserCannotConnectLegalHoldHeadline'),
-          },
-        });
+      if (isBackendError(error)) {
+        switch (error.label) {
+          case BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT: {
+            const replaceLinkLegalHold = replaceLink(
+              Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK,
+              '',
+              'read-more-legal-hold',
+            );
+            PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
+              text: {
+                htmlMessage: t('modalUserCannotSendConnectionLegalHoldMessage', {}, replaceLinkLegalHold),
+                title: t('modalUserCannotConnectHeadline'),
+              },
+            });
+            break;
+          }
+
+          case BackendErrorLabel.FEDERATION_NOT_ALLOWED: {
+            PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
+              text: {
+                htmlMessage: t('modalUserCannotSendConnectionNotFederatingMessage', userEntity.name()),
+                title: t('modalUserCannotConnectHeadline'),
+              },
+            });
+            break;
+          }
+
+          default: {
+            this.logger.error(`Failed to send connection request to user '${userEntity.id}': ${error.message}`, error);
+            PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
+              text: {
+                htmlMessage: t('modalUserCannotSendConnectionMessage'),
+                title: t('modalUserCannotConnectHeadline'),
+              },
+            });
+            break;
+          }
+        }
+        return null;
       }
-      this.logger.error(`Failed to send connection request to user '${userEntity.id}': ${error.message}`, error);
-      return false;
+      throw error;
     }
   }
 
@@ -290,6 +326,43 @@ export class ConnectionRepository {
     } catch (error) {
       const logMessage = `Connection change from '${currentStatus}' to '${newStatus}' failed`;
       this.logger.error(`${logMessage} for '${userEntity.id}' failed: ${error.message}`, error);
+      switch (newStatus) {
+        case ConnectionStatus.ACCEPTED: {
+          PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
+            text: {
+              htmlMessage: t('modalUserCannotAcceptConnectionMessage'),
+              title: t('modalUserCannotConnectHeadline'),
+            },
+          });
+          break;
+        }
+        case ConnectionStatus.CANCELLED: {
+          PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
+            text: {
+              htmlMessage: t('modalUserCannotCancelConnectionMessage'),
+              title: t('modalUserCannotConnectHeadline'),
+            },
+          });
+          break;
+        }
+        case ConnectionStatus.IGNORED: {
+          PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
+            text: {
+              htmlMessage: t('modalUserCannotIgnoreConnectionMessage'),
+              title: t('modalUserCannotConnectHeadline'),
+            },
+          });
+          break;
+        }
+        default: {
+          PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
+            text: {
+              title: t('modalUserCannotConnectHeadline'),
+            },
+          });
+          break;
+        }
+      }
     }
   }
 

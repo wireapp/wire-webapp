@@ -52,6 +52,7 @@ export interface ModalOptions {
   secondaryAction?: Action[] | Action;
   hideCloseBtn?: boolean;
   text?: Text;
+  passwordOptional?: boolean;
 }
 
 export enum PrimaryModalType {
@@ -65,8 +66,10 @@ export enum PrimaryModalType {
   PASSWORD = 'modal-template-password',
   GUEST_LINK_PASSWORD = 'modal-template-guest-link-password',
   JOIN_GUEST_LINK_PASSWORD = 'modal-template-join-guest-link-password',
+  PASSWORD_ADVANCED_SECURITY = 'modal-template-password-advance',
   SESSION_RESET = 'modal-session-reset',
   WITHOUT_TITLE = 'modal-without-title',
+  LOADING = 'modal-loading',
 }
 
 export interface ModalContent {
@@ -86,6 +89,7 @@ export interface ModalContent {
   secondaryAction: Action[] | Action | null;
   titleText: string;
   hideCloseBtn?: boolean;
+  passwordOptional?: boolean;
 }
 
 export type ModalItem = {id: string; options: ModalOptions; type: PrimaryModalType};

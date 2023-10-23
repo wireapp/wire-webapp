@@ -21,13 +21,12 @@ import {GenericMessageType} from '@wireapp/core/lib/conversation';
 
 import {GenericMessage, LegalHoldStatus, Text} from '@wireapp/protocol-messaging';
 
+import {createMessageAddEvent} from 'test/helper/EventGenerator';
 import {createUuid} from 'Util/uuid';
 
 import * as LegalHoldEvaluator from './LegalHoldEvaluator';
 
 import {CryptographyMapper} from '../cryptography/CryptographyMapper';
-import {ClientEvent} from '../event/Client';
-import {StatusType} from '../message/StatusType';
 
 describe('LegalHoldEvaluator', () => {
   describe('hasMessageLegalHoldFlag', () => {
@@ -47,17 +46,7 @@ describe('LegalHoldEvaluator', () => {
         messageId: createUuid(),
       });
 
-      const event: any = {
-        conversation: createUuid(),
-        data: {
-          recipient: 'd4c1a1838944deb1',
-          sender: '494fd7d7613e0358',
-          text: 'something-secure',
-        },
-        from: createUuid(),
-        time: new Date().toISOString(),
-        type: ClientEvent.CONVERSATION.MESSAGE_ADD,
-      };
+      const event = createMessageAddEvent();
 
       const mappedEvent = await cryptographyMapper.mapGenericMessage(legalHoldFlagOn, event);
 
@@ -74,17 +63,7 @@ describe('LegalHoldEvaluator', () => {
         messageId: createUuid(),
       });
 
-      const event: any = {
-        conversation: createUuid(),
-        data: {
-          recipient: 'd4c1a1838944deb1',
-          sender: '494fd7d7613e0358',
-          text: 'something-secure',
-        },
-        from: createUuid(),
-        time: new Date().toISOString(),
-        type: ClientEvent.CONVERSATION.MESSAGE_ADD,
-      };
+      const event = createMessageAddEvent();
 
       const mappedEvent = await cryptographyMapper.mapGenericMessage(legalHoldFlagOff, event);
 
@@ -100,17 +79,7 @@ describe('LegalHoldEvaluator', () => {
         messageId: createUuid(),
       });
 
-      const event: any = {
-        conversation: createUuid(),
-        data: {
-          recipient: 'd4c1a1838944deb1',
-          sender: '494fd7d7613e0358',
-          text: 'something-secure',
-        },
-        from: createUuid(),
-        time: new Date().toISOString(),
-        type: ClientEvent.CONVERSATION.MESSAGE_ADD,
-      };
+      const event = createMessageAddEvent();
 
       const mappedEvent = await cryptographyMapper.mapGenericMessage(legalHoldFlagMissing, event);
 
@@ -132,14 +101,7 @@ describe('LegalHoldEvaluator', () => {
         },
       };
 
-      const mappedEvent: LegalHoldEvaluator.MappedEvent = {
-        conversation: createUuid(),
-        from: createUuid(),
-        id: createUuid(),
-        status: StatusType.SENDING,
-        time: new Date().toISOString(),
-        type: ClientEvent.CONVERSATION.MESSAGE_ADD,
-      };
+      const mappedEvent = createMessageAddEvent();
 
       expect(
         LegalHoldEvaluator.renderLegalHoldMessage({...mappedEvent, ...enabledOnMessage}, LegalHoldStatus.ENABLED),

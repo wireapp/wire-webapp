@@ -36,7 +36,7 @@ import {handleKeyDown} from 'Util/KeyboardUtil';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 
 import {useUserModalState} from './UserModal.state';
-import {userModalStyle} from './UserModal.styles';
+import {userModalStyle, userModalWrapperStyle} from './UserModal.styles';
 
 import {Config} from '../../../Config';
 import {User} from '../../../entity/User';
@@ -44,11 +44,10 @@ import {RootContext} from '../../../page/RootProvider';
 import {Core} from '../../../service/CoreSingleton';
 import {TeamState} from '../../../team/TeamState';
 import {UserRepository} from '../../../user/UserRepository';
-import {UserState} from '../../../user/UserState';
 
 export interface UserModalProps {
   userRepository: UserRepository;
-  userState?: UserState;
+  selfUser: User;
   teamState?: TeamState;
   core?: Core;
 }
@@ -127,8 +126,8 @@ export const UnverifiedUserWarning: React.FC<UnverifiedUserWarningProps> = ({use
 
 const UserModal: React.FC<UserModalProps> = ({
   userRepository,
+  selfUser,
   core = container.resolve(Core),
-  userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
 }) => {
   const onClose = useUserModalState(state => state.onClose);
@@ -146,17 +145,20 @@ const UserModal: React.FC<UserModalProps> = ({
     resetState();
   };
   const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
-  const {self, isActivatedAccount} = useKoSubscribableChildren(userState, ['self', 'isActivatedAccount']);
-  const {is_trusted: isTrusted} = useKoSubscribableChildren(self, ['is_trusted']);
-  const {is_verified: isSelfVerified} = useKoSubscribableChildren(self, ['is_verified']);
+  const {
+    is_trusted: isTrusted,
+    is_verified: isSelfVerified,
+    isActivatedAccount,
+  } = useKoSubscribableChildren(selfUser, ['is_trusted', 'is_verified', 'isActivatedAccount']);
   const isFederated = core.backendFeatures?.isFederated;
 
   useEffect(() => {
     if (userId) {
       userRepository
-        .getUserById(userId)
+        // We want to get the fresh version of the user from backend (in case the user was deleted)
+        .refreshUser(userId)
         .then(user => {
-          if (user.isDeleted) {
+          if (user.isDeleted || !user.isAvailable()) {
             setUserNotFound(true);
             return;
           }
@@ -179,9 +181,7 @@ const UserModal: React.FC<UserModalProps> = ({
         onBgClick={hide}
         onClosed={onModalClosed}
         data-uie-name={user ? 'modal-user-profile' : userNotFound ? 'modal-cannot-open-profile' : ''}
-        wrapperCSS={{
-          padding: 0,
-        }}
+        wrapperCSS={userModalWrapperStyle}
       >
         <div className="modal__header">
           {userNotFound && (
@@ -219,7 +219,7 @@ const UserModal: React.FC<UserModalProps> = ({
                 user={user}
                 onAction={hide}
                 isSelfActivated={isActivatedAccount}
-                selfUser={self}
+                selfUser={selfUser}
               />
             </>
           )}

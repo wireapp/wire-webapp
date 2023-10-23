@@ -50,7 +50,6 @@ import {MLSConversation} from './ConversationSelectors';
 import type {Conversation as ConversationEntity} from '../entity/Conversation';
 import type {EventService} from '../event/EventService';
 import {MessageCategory} from '../message/MessageCategory';
-import {useMLSConversationState} from '../mls';
 import {search as fullTextSearch} from '../search/FullTextSearch';
 import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
@@ -72,6 +71,16 @@ export class ConversationService {
     this.logger = getLogger('ConversationService');
   }
 
+  private get coreConversationService() {
+    const conversationService = this.core.service?.conversation;
+
+    if (!conversationService) {
+      throw new Error('Conversation service not available');
+    }
+
+    return conversationService;
+  }
+
   //##############################################################################
   // Get conversations
   //##############################################################################
@@ -81,7 +90,7 @@ export class ConversationService {
    * @returns Resolves with the conversation information
    */
   async getAllConversations() {
-    return this.apiClient.api.conversation.getConversationList();
+    return this.coreConversationService.getConversations();
   }
 
   /**
@@ -125,7 +134,7 @@ export class ConversationService {
    * @returns Resolves with the server response
    */
   updateConversationMessageTimer(
-    conversationId: string,
+    conversationId: QualifiedId,
     message_timer: number,
   ): Promise<ConversationMessageTimerUpdateEvent> {
     return this.apiClient.api.conversation.putConversationMessageTimer(conversationId, {message_timer});
@@ -141,7 +150,7 @@ export class ConversationService {
    * @returns Resolves with the server response
    */
   updateConversationReceiptMode(
-    conversationId: string,
+    conversationId: QualifiedId,
     receiptMode: ConversationReceiptModeUpdateData,
   ): Promise<ConversationReceiptModeUpdateEvent> {
     return this.apiClient.api.conversation.putConversationReceiptMode(conversationId, receiptMode);
@@ -156,7 +165,7 @@ export class ConversationService {
    * @param payload Updated properties
    * @returns Resolves with the server response
    */
-  updateMemberProperties(conversationId: string, payload: Partial<ConversationMemberUpdateData>): Promise<void> {
+  updateMemberProperties(conversationId: QualifiedId, payload: Partial<ConversationMemberUpdateData>): Promise<void> {
     return this.apiClient.api.conversation.putMembershipProperties(conversationId, payload);
   }
 
@@ -407,7 +416,18 @@ export class ConversationService {
    */
   async wipeMLSConversation(mlsConversation: MLSConversation) {
     const {groupId} = mlsConversation;
-    await this.core.service!.conversation.wipeMLSConversation(groupId);
-    return useMLSConversationState.getState().wipeConversationState(groupId);
+    return this.coreConversationService.wipeMLSConversation(groupId);
+  }
+
+  public addMLSConversationRecoveredListener(onRecovered: (conversationId: QualifiedId) => void) {
+    this.coreConversationService.on('MLSConversationRecovered', ({conversationId}) => onRecovered(conversationId));
+  }
+
+  /**
+   * Checks if MLS conversation exists locally.
+   * @param groupId id of the MLS group
+   */
+  async mlsGroupExistsLocally(groupId: string): Promise<boolean> {
+    return this.coreConversationService.mlsGroupExistsLocally(groupId);
   }
 }

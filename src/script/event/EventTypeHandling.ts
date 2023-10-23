@@ -17,9 +17,15 @@
  *
  */
 
-import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
+import {CONVERSATION_EVENT, ConversationEvent} from '@wireapp/api-client/lib/event';
 
 import {ClientEvent} from './Client';
+
+import {ClientConversationEvent} from '../conversation/EventBuilder';
+
+export function eventShouldBeStored(event: {type: any}): event is ClientConversationEvent | ConversationEvent {
+  return EventTypeHandling.STORE.includes(event.type);
+}
 
 export const EventTypeHandling = {
   CONFIRM: [
@@ -35,6 +41,7 @@ export const EventTypeHandling = {
     CONVERSATION_EVENT.MESSAGE_TIMER_UPDATE,
     CONVERSATION_EVENT.RECEIPT_MODE_UPDATE,
     CONVERSATION_EVENT.RENAME,
+    ClientEvent.CONVERSATION.FEDERATION_STOP,
     ClientEvent.CONVERSATION.ASSET_ADD,
     ClientEvent.CONVERSATION.COMPOSITE_MESSAGE_ADD,
     ClientEvent.CONVERSATION.DELETE_EVERYWHERE,
@@ -47,6 +54,7 @@ export const EventTypeHandling = {
     ClientEvent.CONVERSATION.LOCATION,
     ClientEvent.CONVERSATION.MESSAGE_ADD,
     ClientEvent.CONVERSATION.MISSED_MESSAGES,
+    ClientEvent.CONVERSATION.MLS_CONVERSATION_RECOVERED,
     ClientEvent.CONVERSATION.ONE2ONE_CREATION,
     ClientEvent.CONVERSATION.TEAM_MEMBER_LEAVE,
     ClientEvent.CONVERSATION.UNABLE_TO_DECRYPT,

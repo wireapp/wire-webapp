@@ -43,8 +43,8 @@ import {
   ContainerXS,
   FlexBox,
   Form,
-  H1,
   H2,
+  Heading,
   IsMobile,
   Label,
   Link,
@@ -76,8 +76,11 @@ import * as AuthSelector from '../module/selector/AuthSelector';
 import * as ConversationSelector from '../module/selector/ConversationSelector';
 import {QUERY_KEY, ROUTE} from '../route';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
+import {getOAuthQueryString} from '../util/oauthUtil';
 
-type Props = React.HTMLProps<HTMLDivElement>;
+type Props = React.HTMLProps<HTMLDivElement> & {
+  embedded?: boolean;
+};
 
 const LoginComponent = ({
   authError,
@@ -99,6 +102,7 @@ const LoginComponent = ({
   isSendingTwoFactorCode,
   conversationInfo,
   conversationInfoFetching,
+  embedded,
 }: Props & ConnectedProps & DispatchProps) => {
   const logger = getLogger('Login');
   const {formatMessage: _} = useIntl();
@@ -118,7 +122,7 @@ const LoginComponent = ({
   const [verificationCode, setVerificationCode] = useState('');
   const [twoFactorSubmitFailedOnce, setTwoFactorSubmitFailedOnce] = useState(false);
 
-  const isOauth = UrlUtil.hasURLParameter(QUERY_KEY.SCOPE);
+  const isOauth = UrlUtil.hasURLParameter(QUERY_KEY.SCOPE, window.location.hash);
 
   const [showEntropyForm, setShowEntropyForm] = useState(false);
   const isEntropyRequired = Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY;
@@ -201,7 +205,8 @@ const LoginComponent = ({
       await doInitializeClient(ClientType.PERMANENT, undefined, undefined, entropyData);
 
       if (isOauth) {
-        return navigate(ROUTE.AUTHORIZE);
+        const queryString = getOAuthQueryString(window.location);
+        return navigate(`${ROUTE.AUTHORIZE}/${queryString}`);
       }
       return navigate(ROUTE.HISTORY_INFO);
     } catch (error) {
@@ -248,7 +253,9 @@ const LoginComponent = ({
       }
 
       if (isOauth) {
-        return navigate(ROUTE.AUTHORIZE);
+        const queryString = getOAuthQueryString(window.location);
+
+        return navigate(`${ROUTE.AUTHORIZE}/${queryString}`);
       }
       return navigate(ROUTE.HISTORY_INFO);
     } catch (error) {
@@ -321,7 +328,7 @@ const LoginComponent = ({
     setTwoFactorSubmitError('');
     // Do not auto submit if already failed once
     if (!twoFactorSubmitFailedOnce) {
-      handleSubmit({...twoFactorLoginData, verificationCode: code}, []);
+      void handleSubmit({...twoFactorLoginData, verificationCode: code}, []);
     }
   };
 
@@ -344,19 +351,20 @@ const LoginComponent = ({
 
   return (
     <Page>
-      {(Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY ||
-        Config.getConfig().FEATURE.ENABLE_SSO ||
-        Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION) && (
-        <IsMobile>
-          <div style={{margin: 16}}>{backArrow}</div>
-        </IsMobile>
-      )}
+      {!embedded &&
+        (Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY ||
+          Config.getConfig().FEATURE.ENABLE_SSO ||
+          Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION) && (
+          <IsMobile>
+            <div style={{margin: 16}}>{backArrow}</div>
+          </IsMobile>
+        )}
       {isEntropyRequired && showEntropyForm ? (
         <EntropyContainer onSetEntropy={storeEntropy} />
       ) : (
         <Container centerText verticalCenter style={{width: '100%'}}>
           {!isValidLink && <Navigate to={ROUTE.CONVERSATION_JOIN_INVALID} replace />}
-          <AppAlreadyOpen />
+          {!embedded && <AppAlreadyOpen />}
           {isLinkPasswordModalOpen && (
             <JoinGuestLinkPasswordModal
               onClose={() => setIsLinkPasswordModalOpen(false)}
@@ -367,19 +375,21 @@ const LoginComponent = ({
             />
           )}
           <Columns>
-            <IsMobile not>
-              <Column style={{display: 'flex'}}>
-                {(Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY ||
-                  Config.getConfig().FEATURE.ENABLE_SSO ||
-                  Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION) && (
-                  <div style={{margin: 'auto'}}>{backArrow}</div>
-                )}
-              </Column>
-            </IsMobile>
+            {!embedded && (
+              <IsMobile not>
+                <Column style={{display: 'flex'}}>
+                  {(Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY ||
+                    Config.getConfig().FEATURE.ENABLE_SSO ||
+                    Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION) && (
+                    <div style={{margin: 'auto'}}>{backArrow}</div>
+                  )}
+                </Column>
+              </IsMobile>
+            )}
             <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
               <ContainerXS
                 centerText
-                style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
+                style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between'}}
               >
                 {twoFactorLoginData ? (
                   <div>
@@ -421,7 +431,9 @@ const LoginComponent = ({
                 ) : (
                   <>
                     <div>
-                      <H1 center>{_(loginStrings.headline)}</H1>
+                      <Heading level={embedded ? '2' : '1'} center>
+                        {_(loginStrings.headline)}
+                      </Heading>
                       <Muted>{_(loginStrings.subhead)}</Muted>
                       <Form style={{marginTop: 30}} data-uie-name="login">
                         <LoginForm isFetching={isFetching} onSubmit={handleSubmit} />
@@ -435,7 +447,7 @@ const LoginComponent = ({
                         {!Runtime.isDesktopApp() && (
                           <Checkbox
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                              pushLoginData({
+                              void pushLoginData({
                                 clientType: event.target.checked ? ClientType.TEMPORARY : ClientType.PERMANENT,
                               });
                             }}
@@ -460,7 +472,7 @@ const LoginComponent = ({
                     >
                       {_(loginStrings.forgotPassword)}
                     </Link>
-                    {Config.getConfig().FEATURE.ENABLE_PHONE_LOGIN && (
+                    {!embedded && Config.getConfig().FEATURE.ENABLE_PHONE_LOGIN && (
                       <RouterLink
                         variant={LinkVariant.PRIMARY}
                         style={{paddingTop: '12px', textAlign: 'center'}}
@@ -474,7 +486,7 @@ const LoginComponent = ({
                 )}
               </ContainerXS>
             </Column>
-            <Column />
+            {!embedded && <Column />}
           </Columns>
         </Container>
       )}

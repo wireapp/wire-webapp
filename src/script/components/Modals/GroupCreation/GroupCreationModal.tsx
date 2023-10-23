@@ -21,6 +21,7 @@ import React, {useContext, useEffect, useMemo, useState} from 'react';
 
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/ConversationReceiptModeUpdateData';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
+import {isNonFederatingBackendsError} from '@wireapp/core/lib/errors';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -40,7 +41,7 @@ import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from 'src/script/router/routerBindings';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleEnterDown, isKeyboardEvent, offEscKey, onEscKey} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
+import {replaceLink, t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
 import {Config} from '../../../Config';
@@ -56,12 +57,12 @@ import {isProtocolOption, ProtocolOption} from '../../../guards/Protocol';
 import {RootContext} from '../../../page/RootProvider';
 import {TeamState} from '../../../team/TeamState';
 import {UserState} from '../../../user/UserState';
+import {PrimaryModal} from '../PrimaryModal';
 
 interface GroupCreationModalProps {
   userState?: UserState;
   teamState?: TeamState;
 }
-
 enum GroupCreationModalState {
   DEFAULT = 'GroupCreationModal.STATE.DEFAULT',
   PARTICIPANTS = 'GroupCreationModal.STATE.PARTICIPANTS',
@@ -77,6 +78,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
     isMLSEnabled: isMLSEnabledForTeam,
     isProtocolToggleEnabledForUser,
   } = useKoSubscribableChildren(teamState, ['isTeam', 'isMLSEnabled', 'isProtocolToggleEnabledForUser']);
+  const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
 
   const isMLSFeatureEnabled = Config.getConfig().FEATURE.ENABLE_MLS;
 
@@ -85,7 +87,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   //if feature flag is set to false or mls is disabled for current team use proteus as default
   const defaultProtocol =
     isMLSFeatureEnabled && isMLSEnabledForTeam
-      ? teamState.teamFeatures().mls?.config.defaultProtocol
+      ? teamState.teamFeatures()?.mls?.config.defaultProtocol
       : ConversationProtocol.PROTEUS;
 
   const protocolOptions: ProtocolOption[] = ([ConversationProtocol.PROTEUS, ConversationProtocol.MLS] as const).map(
@@ -227,6 +229,43 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
           createNavigate(generateConversationUrl(conversation.qualifiedId))(event);
         }
       } catch (error) {
+        if (isNonFederatingBackendsError(error)) {
+          const tempName = groupName;
+          setIsShown(false);
+
+          const backendString = error.backends.join(', and ');
+          const replaceBackends = replaceLink(
+            Config.getConfig().URL.SUPPORT.NON_FEDERATING_INFO,
+            'modal__text__read-more',
+            'read-more-backends',
+          );
+          return PrimaryModal.show(PrimaryModal.type.MULTI_ACTIONS, {
+            preventClose: true,
+            primaryAction: {
+              text: t('groupCreationPreferencesNonFederatingEditList'),
+              action: () => {
+                setGroupName(tempName);
+                setIsShown(true);
+                setIsCreatingConversation(false);
+                setGroupCreationState(GroupCreationModalState.PARTICIPANTS);
+              },
+            },
+            secondaryAction: {
+              text: t('groupCreationPreferencesNonFederatingLeave'),
+              action: () => {
+                setIsCreatingConversation(false);
+              },
+            },
+            text: {
+              htmlMessage: t(
+                'groupCreationPreferencesNonFederatingMessage',
+                {backends: backendString},
+                replaceBackends,
+              ),
+              title: t('groupCreationPreferencesNonFederatingHeadline'),
+            },
+          });
+        }
         amplify.publish(WebAppEvents.CONVERSATION.SHOW, undefined, {});
         setIsCreatingConversation(false);
       }
@@ -364,10 +403,11 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
           />
         )}
 
-        {stateIsParticipants && (
+        {stateIsParticipants && selfUser && (
           <FadingScrollbar className="group-creation__list">
             {filteredContacts.length > 0 && (
               <UserSearchableList
+                selfUser={selfUser}
                 users={filteredContacts}
                 filter={participantsInput}
                 selected={selectedContacts}

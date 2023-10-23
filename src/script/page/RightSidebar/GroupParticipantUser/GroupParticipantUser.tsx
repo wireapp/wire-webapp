@@ -42,7 +42,6 @@ import {User} from '../../../entity/User';
 import {ClientEvent} from '../../../event/Client';
 import {TeamRepository} from '../../../team/TeamRepository';
 import {TeamState} from '../../../team/TeamState';
-import {UserState} from '../../../user/UserState';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {PanelHeader} from '../PanelHeader';
 import {PanelEntity} from '../RightSidebar';
@@ -58,7 +57,7 @@ interface GroupParticipantUserProps {
   conversationRoleRepository: ConversationRoleRepository;
   teamRepository: TeamRepository;
   teamState: TeamState;
-  userState: UserState;
+  selfUser: User;
   isFederated?: boolean;
 }
 
@@ -73,18 +72,20 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
   conversationRoleRepository,
   teamRepository,
   teamState,
-  userState,
+  selfUser,
   isFederated = false,
 }) => {
   const {isGroup, roles} = useKoSubscribableChildren(activeConversation, ['isGroup', 'roles']);
-  const {isTemporaryGuest} = useKoSubscribableChildren(currentUser, ['isTemporaryGuest']);
+  const {isTemporaryGuest, isAvailable} = useKoSubscribableChildren(currentUser, ['isTemporaryGuest', 'isAvailable']);
   const {classifiedDomains, isTeam, team} = useKoSubscribableChildren(teamState, [
     'classifiedDomains',
     'isTeam',
     'team',
   ]);
-  const {isActivatedAccount, self: selfUser} = useKoSubscribableChildren(userState, ['isActivatedAccount', 'self']);
-  const {is_verified: isSelfVerified} = useKoSubscribableChildren(selfUser, ['is_verified']);
+  const {is_verified: isSelfVerified, isActivatedAccount} = useKoSubscribableChildren(selfUser, [
+    'is_verified',
+    'isActivatedAccount',
+  ]);
 
   const canChangeRole =
     conversationRoleRepository.canChangeParticipantRoles(activeConversation) && !currentUser.isMe && !isTemporaryGuest;
@@ -148,7 +149,6 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
 
       <FadingScrollbar className="panel__content">
         <UserDetails
-          conversationDomain={activeConversation.domain}
           participant={currentUser}
           badge={teamRepository.getRoleBadge(currentUser.id)}
           isGroupAdmin={isAdmin}
@@ -156,7 +156,7 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
           classifiedDomains={classifiedDomains}
         />
 
-        {!currentUser.isMe && (
+        {!currentUser.isMe && isAvailable && (
           <div className="conversation-details__devices">
             <button
               className="panel__action-item"
@@ -176,7 +176,7 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
           </div>
         )}
 
-        {canChangeRole && (
+        {canChangeRole && isAvailable && (
           <>
             <div className="conversation-details__admin">
               <div

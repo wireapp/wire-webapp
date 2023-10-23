@@ -18,6 +18,7 @@
  */
 
 import type {AddedClient, PublicClient} from '@wireapp/api-client/lib/client';
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {
   UserEvent,
   UserLegalHoldDisableEvent,
@@ -216,8 +217,7 @@ export class UserRepository {
     const [localUsers, incompleteUsers] = partition(dbUsers, user => !!user.qualified_id);
 
     /** users we have in the DB that are not matching any loaded users */
-    const [orphanUsers, liveUsers] = partition(
-      localUsers,
+    const orphanUsers = localUsers.filter(
       localUser => !users.find(user => matchQualifiedIds(user, localUser.qualified_id)),
     );
 
@@ -226,14 +226,10 @@ export class UserRepository {
       await this.userService.removeUserFromDb(orphanUser.qualified_id);
     }
 
-    const missingUsers = users.filter(
-      user =>
-        // The self user doesn't need to be re-fetched
-        !matchQualifiedIds(selfUser.qualifiedId, user) &&
-        !liveUsers.find(localUser => matchQualifiedIds(user, localUser.qualified_id)),
-    );
+    // The self user doesn't need to be re-fetched
+    const usersToFetch = users.filter(user => !matchQualifiedIds(selfUser.qualifiedId, user));
 
-    const {found, failed} = await this.fetchRawUsers(missingUsers, selfUser.domain);
+    const {found, failed} = await this.fetchRawUsers(usersToFetch, selfUser.domain);
 
     const userWithAvailability = found.map(user => {
       const availability = incompleteUsers
@@ -249,7 +245,7 @@ export class UserRepository {
     // Save all new users to the database
     await Promise.all(userWithAvailability.map(user => this.saveUserInDb(user)));
 
-    const mappedUsers = this.mapUserResponse(userWithAvailability.concat(liveUsers), failed);
+    const mappedUsers = this.mapUserResponse(userWithAvailability, failed);
 
     // Assign connections to users
     mappedUsers.forEach(user => {
@@ -719,6 +715,7 @@ export class UserRepository {
     if (!user) {
       if (isMe) {
         userEntity.isMe = true;
+        this.userState.self(userEntity);
       }
       this.userState.users.push(userEntity);
     }
@@ -749,18 +746,51 @@ export class UserRepository {
   }
 
   /**
+   * Refresh all known users (in local state) from the backend.
+   */
+  async refreshAllKnownUsers() {
+    const userIds = this.userState.users().map(user => user.qualifiedId);
+    return this.refreshUsers(userIds);
+  }
+
+  /**
+   * Will update user entity with provided list of supportedProtocols.
+   * @param userId - id of the user to update
+   * @param supportedProtocols - an array of new supported protocols
+   */
+  async updateUserSupportedProtocols(userId: QualifiedId, supportedProtocols: ConversationProtocol[]): Promise<User> {
+    return this.updateUser(userId, {supported_protocols: supportedProtocols});
+  }
+
+  getSelfSupportedProtocols(): ConversationProtocol[] | null {
+    return this.userState.self()?.supportedProtocols() || null;
+  }
+
+  public async getAllSelfClients() {
+    return this.clientRepository.getAllSelfClients();
+  }
+
+  /**
    * will update the local user with fresh data from backend
    * @param user user data from backend
    */
-  private updateSavedUser(user: APIClientUser): User {
-    const localUserEntity = this.findUserById(generateQualifiedId(user)) ?? new User();
+  private async updateSavedUser(user: APIClientUser): Promise<User> {
+    const localUserEntity = this.findUserById(generateQualifiedId(user));
+    if (!localUserEntity) {
+      // If the user could not be found locally, we will get it and save it locally
+      return this.getUserById(user.qualified_id);
+    }
     const updatedUser = this.userMapper.updateUserFromObject(localUserEntity, user, this.userState.self().domain);
-    // TODO update the user in db
+    const {qualifiedId: userId} = updatedUser;
+
+    // update the user in db
+    await this.updateUser(userId, user);
+
     if (this.userState.isTeam()) {
       this.mapGuestStatus([updatedUser]);
     }
     if (updatedUser && updatedUser.inTeam() && updatedUser.isDeleted) {
-      amplify.publish(WebAppEvents.TEAM.MEMBER_LEAVE, updatedUser.teamId, updatedUser.qualifiedId);
+      amplify.publish(WebAppEvents.TEAM.MEMBER_LEAVE, updatedUser.teamId, userId);
     }
     return updatedUser;
   }

@@ -24,7 +24,7 @@ import {getFirstChar} from 'Util/StringUtil';
 
 import {AVATAR_SIZE, INITIALS_SIZE, DIAMETER} from '.';
 
-export interface AvatarInitialsProps {
+interface AvatarInitialsProps {
   avatarSize: AVATAR_SIZE;
   initials: string;
   color?: string;

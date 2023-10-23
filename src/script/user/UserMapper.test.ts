@@ -105,7 +105,6 @@ describe('User Mapper', () => {
       const user_et = mapper.mapUserFromJson(self_user_payload, '');
 
       expect(user_et.name()).toBe('John Doe');
-      expect(user_et.joaatHash).toBe(526273169);
       expect(user_et.accent_id()).toBe(ACCENT_ID.BLUE);
     });
   });

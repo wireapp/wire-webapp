@@ -34,6 +34,7 @@ import {Collection} from './Collection';
 import {AssetRepository} from '../../../../assets/AssetRepository';
 import {MessageRepository} from '../../../../conversation/MessageRepository';
 import {Text} from '../../../../entity/message/Text';
+import {User} from '../../../../entity/User';
 
 jest.mock('./CollectionDetails', () => ({
   CollectionDetails: () => <div>CollectionDetails</div>,
@@ -88,6 +89,7 @@ describe('Collection', () => {
   };
   const mockAssetRepository = container.resolve(AssetRepository);
   const mockMessageRepository = {} as MessageRepository;
+  const mockSelfUser = new User(createUuid());
 
   it('displays all image assets', async () => {
     const {getAllByText, getByText, queryByText} = render(
@@ -97,6 +99,7 @@ describe('Collection', () => {
           conversation={conversation}
           conversationRepository={mockConversationRepository as any}
           messageRepository={mockMessageRepository}
+          selfUser={mockSelfUser}
         />,
       ),
     );
@@ -122,6 +125,7 @@ describe('Collection', () => {
           messageRepository={mockMessageRepository}
           conversation={conversation}
           conversationRepository={mockConversationRepository as any}
+          selfUser={mockSelfUser}
         />,
       ),
     );
@@ -142,6 +146,7 @@ describe('Collection', () => {
           messageRepository={mockMessageRepository}
           conversation={conversation}
           conversationRepository={mockConversationRepository as any}
+          selfUser={mockSelfUser}
         />,
       ),
     );

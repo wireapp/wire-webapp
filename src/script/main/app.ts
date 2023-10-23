@@ -60,6 +60,7 @@ import {ConversationRepository} from '../conversation/ConversationRepository';
 import {ConversationService} from '../conversation/ConversationService';
 import {MessageRepository} from '../conversation/MessageRepository';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
+import {User} from '../entity/User';
 import {AccessTokenError} from '../error/AccessTokenError';
 import {AuthError} from '../error/AuthError';
 import {BaseError} from '../error/BaseError';
@@ -69,9 +70,11 @@ import {EventRepository} from '../event/EventRepository';
 import {EventService} from '../event/EventService';
 import {EventServiceNoCompound} from '../event/EventServiceNoCompound';
 import {NotificationService} from '../event/NotificationService';
+import {EventStorageMiddleware} from '../event/preprocessor/EventStorageMiddleware';
 import {QuotedMessageMiddleware} from '../event/preprocessor/QuotedMessageMiddleware';
 import {ReceiptsMiddleware} from '../event/preprocessor/ReceiptsMiddleware';
 import {ServiceMiddleware} from '../event/preprocessor/ServiceMiddleware';
+import {FederationEventProcessor} from '../event/processor/FederationEventProcessor';
 import {GiphyRepository} from '../extension/GiphyRepository';
 import {GiphyService} from '../extension/GiphyService';
 import {getWebsiteUrl} from '../externalRoute';
@@ -87,12 +90,12 @@ import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {PropertiesService} from '../properties/PropertiesService';
 import {SearchRepository} from '../search/SearchRepository';
 import {SearchService} from '../search/SearchService';
+import {SelfRepository} from '../self/SelfRepository';
 import {SelfService} from '../self/SelfService';
 import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
 import {StorageKey, StorageRepository, StorageService} from '../storage';
 import {TeamRepository} from '../team/TeamRepository';
-import {TeamService} from '../team/TeamService';
 import {AppInitStatisticsValue} from '../telemetry/app_init/AppInitStatisticsValue';
 import {AppInitTelemetry} from '../telemetry/app_init/AppInitTelemetry';
 import {AppInitTimingsStep} from '../telemetry/app_init/AppInitTimingsStep';
@@ -102,7 +105,6 @@ import {WindowHandler} from '../ui/WindowHandler';
 import {UserRepository} from '../user/UserRepository';
 import {UserService} from '../user/UserService';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
-import {ThemeViewModel} from '../view_model/ThemeViewModel';
 import {Warnings} from '../view_model/WarningsContainer';
 
 export function doRedirect(signOutReason: SIGN_OUT_REASON) {
@@ -224,7 +226,7 @@ export class App {
     repositories.connection = new ConnectionRepository(new ConnectionService(), repositories.user);
     repositories.event = new EventRepository(this.service.event, this.service.notification, serverTimeHandler);
     repositories.search = new SearchRepository(new SearchService(), repositories.user);
-    repositories.team = new TeamRepository(new TeamService(), repositories.user, repositories.asset);
+    repositories.team = new TeamRepository(repositories.user, repositories.asset);
 
     repositories.message = new MessageRepository(
       /*
@@ -241,30 +243,6 @@ export class App {
       repositories.asset,
     );
 
-    repositories.conversation = new ConversationRepository(
-      this.service.conversation,
-      repositories.message,
-      repositories.connection,
-      repositories.event,
-      repositories.team,
-      repositories.user,
-      repositories.properties,
-      serverTimeHandler,
-    );
-
-    repositories.eventTracker = new EventTrackingRepository(repositories.message);
-
-    const serviceMiddleware = new ServiceMiddleware(repositories.conversation, repositories.user);
-    const quotedMessageMiddleware = new QuotedMessageMiddleware(this.service.event);
-
-    const readReceiptMiddleware = new ReceiptsMiddleware(this.service.event, repositories.conversation);
-
-    repositories.event.setEventProcessMiddlewares([
-      serviceMiddleware.processEvent.bind(serviceMiddleware),
-      quotedMessageMiddleware.processEvent.bind(quotedMessageMiddleware),
-      readReceiptMiddleware.processEvent.bind(readReceiptMiddleware),
-    ]);
-    repositories.backup = new BackupRepository(new BackupService(), repositories.conversation);
     repositories.calling = new CallingRepository(
       repositories.message,
       repositories.event,
@@ -273,6 +251,25 @@ export class App {
       repositories.media.devicesHandler,
       serverTimeHandler,
     );
+
+    repositories.conversation = new ConversationRepository(
+      this.service.conversation,
+      repositories.message,
+      repositories.connection,
+      repositories.event,
+      repositories.team,
+      repositories.user,
+      repositories.properties,
+      repositories.calling,
+      serverTimeHandler,
+    );
+
+    repositories.self = new SelfRepository(selfService, repositories.user, repositories.team, repositories.client);
+
+    repositories.eventTracker = new EventTrackingRepository(repositories.message);
+
+    repositories.backup = new BackupRepository(new BackupService(), repositories.conversation);
+
     repositories.integration = new IntegrationRepository(
       this.service.integration,
       repositories.conversation,
@@ -282,7 +279,6 @@ export class App {
     repositories.notification = new NotificationRepository(repositories.conversation, repositories.permission);
     repositories.preferenceNotification = new PreferenceNotificationRepository(repositories.user['userState'].self);
 
-    repositories.conversation.leaveCall = repositories.calling.leaveCall;
     return repositories;
   }
 
@@ -342,7 +338,6 @@ export class App {
     const platformCssClass = Runtime.isDesktopApp() ? 'platform-electron' : 'platform-web';
     document.body.classList.add(osCssClass, platformCssClass);
 
-    new ThemeViewModel(this.repository.properties);
     const telemetry = new AppInitTelemetry();
 
     try {
@@ -357,6 +352,7 @@ export class App {
         properties: propertiesRepository,
         team: teamRepository,
         user: userRepository,
+        self: selfRepository,
       } = this.repository;
       await checkIndexedDb();
       onProgress(2.5);
@@ -380,15 +376,32 @@ export class App {
       });
 
       const selfUser = await this.initiateSelfUser();
+
       await initializeDataDog(this.config, selfUser.qualifiedId);
+
+      // Setup all event middleware
+      const eventStorageMiddleware = new EventStorageMiddleware(this.service.event, selfUser);
+      const serviceMiddleware = new ServiceMiddleware(conversationRepository, userRepository, selfUser);
+      const quotedMessageMiddleware = new QuotedMessageMiddleware(this.service.event);
+      const readReceiptMiddleware = new ReceiptsMiddleware(this.service.event, conversationRepository, selfUser);
+
+      eventRepository.setEventProcessMiddlewares([
+        serviceMiddleware,
+        quotedMessageMiddleware,
+        readReceiptMiddleware,
+        eventStorageMiddleware,
+      ]);
+      // Setup all the event processors
+      const federationEventProcessor = new FederationEventProcessor(eventRepository, serverTimeHandler, selfUser);
+      eventRepository.setEventProcessors([federationEventProcessor]);
 
       onProgress(5, t('initReceivedSelfUser', selfUser.name()));
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_SELF_USER);
-      const clientEntity = await this._initiateSelfUserClients();
-      callingRepository.initAvs(selfUser, clientEntity().id);
+      const clientEntity = await this._initiateSelfUserClients(selfUser, clientRepository);
+      callingRepository.initAvs(selfUser, clientEntity.id);
       onProgress(7.5, t('initValidatedClient'));
       telemetry.timeStep(AppInitTimingsStep.VALIDATED_CLIENT);
-      telemetry.addStatistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity().type ?? clientType);
+      telemetry.addStatistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity.type ?? clientType);
 
       onProgress(10);
       telemetry.timeStep(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
@@ -406,6 +419,7 @@ export class App {
       if (supportsMLS()) {
         //if mls is supported, we need to initialize the callbacks (they are used when decrypting messages)
         await initMLSCallbacks(this.core, this.repository.conversation);
+        conversationRepository.initMLSConversationRecoveredListener();
       }
 
       if (connections.length) {
@@ -414,32 +428,33 @@ export class App {
 
       onProgress(25, t('initReceivedUserData'));
       telemetry.addStatistic(AppInitStatisticsValue.CONVERSATIONS, conversations.length, 50);
-      this._subscribeToUnloadEvents();
+      this._subscribeToUnloadEvents(selfUser);
 
       await conversationRepository.conversationRoleRepository.loadTeamRoles();
 
+      let totalNotifications = 0;
       await eventRepository.connectWebSocket(this.core, ({done, total}) => {
         const baseMessage = t('initDecryption');
         const extraInfo = this.config.FEATURE.SHOW_LOADING_INFORMATION
           ? ` ${t('initProgress', {number1: done.toString(), number2: total.toString()})}`
           : '';
 
+        totalNotifications = total;
         onProgress(25 + 50 * (done / total), `${baseMessage}${extraInfo}`);
       });
-      const notificationsCount = eventRepository.notificationsTotal;
 
       if (supportsMLS()) {
         // Once all the messages have been processed and the message sending queue freed we can now:
 
+        //add the potential `self` and `team` conversations
+        await registerUninitializedSelfAndTeamConversations(conversations, selfUser, clientEntity.id, this.core);
+
         //join all the mls groups we're member of and have not yet joined (eg. we were not send welcome message)
         await initMLSConversations(conversations, this.core);
-
-        //add the potential `self` and `team` conversations
-        await registerUninitializedSelfAndTeamConversations(conversations, selfUser, clientEntity().id, this.core);
       }
 
       telemetry.timeStep(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
-      telemetry.addStatistic(AppInitStatisticsValue.NOTIFICATIONS, notificationsCount, 100);
+      telemetry.addStatistic(AppInitStatisticsValue.NOTIFICATIONS, totalNotifications, 100);
 
       eventTrackerRepository.init(propertiesRepository.properties.settings.privacy.telemetry_sharing);
       onProgress(97.5, t('initUpdatedFromNotifications', this.config.BRAND_NAME));
@@ -451,15 +466,18 @@ export class App {
       telemetry.addStatistic(AppInitStatisticsValue.CLIENTS, clientEntities.length);
       telemetry.timeStep(AppInitTimingsStep.APP_PRE_LOADED);
 
-      userRepository['userState'].self().devices(clientEntities);
+      selfUser.devices(clientEntities);
+
       this._handleUrlParams();
       await conversationRepository.updateConversationsOnAppInit();
       await conversationRepository.conversationLabelRepository.loadLabels();
 
+      await selfRepository.initialisePeriodicSelfSupportedProtocolsCheck();
+
       amplify.publish(WebAppEvents.LIFECYCLE.LOADED);
 
       telemetry.timeStep(AppInitTimingsStep.UPDATED_CONVERSATIONS);
-      if (userRepository['userState'].isActivatedAccount()) {
+      if (selfUser.isActivatedAccount()) {
         // start regularly polling the server to check if there is a new version of Wire
         startNewVersionPolling(Environment.version(false), this.update);
       }
@@ -575,14 +593,11 @@ export class App {
    * Initiate the current client of the self user.
    * @returns Resolves with the local client entity
    */
-  private _initiateSelfUserClients() {
-    return this.repository.client
-      .getValidLocalClient()
-      .then(clientObservable => {
-        this.repository.event.currentClient = clientObservable;
-        return this.repository.client.getClientsForSelf();
-      })
-      .then(() => this.repository.client['clientState'].currentClient);
+  private async _initiateSelfUserClients(selfUser: User, clientRepository: ClientRepository) {
+    // Add the local client to the user
+    selfUser.localClient = await clientRepository.getValidLocalClient();
+    await this.repository.client.getClientsForSelf();
+    return selfUser.localClient;
   }
 
   /**
@@ -603,13 +618,13 @@ export class App {
   /**
    * Subscribe to 'beforeunload' to stop calls and disconnect the WebSocket.
    */
-  private _subscribeToUnloadEvents(): void {
+  private _subscribeToUnloadEvents(selfUser: User): void {
     window.addEventListener('unload', () => {
       this.logger.info("'window.onunload' was triggered, so we will disconnect from the backend.");
       this.repository.event.disconnectWebSocket();
       this.repository.calling.destroy();
 
-      if (this.repository.user['userState'].isActivatedAccount()) {
+      if (selfUser.isActivatedAccount()) {
         if (this.service.storage.isTemporaryAndNonPersistent) {
           this.logout(SIGN_OUT_REASON.CLIENT_REMOVED, true);
         } else {
@@ -764,7 +779,7 @@ export class App {
   redirectToLogin(signOutReason: SIGN_OUT_REASON): void {
     this.logger.info(`Redirecting to login after connectivity verification. Reason: ${signOutReason}`);
     const isTemporaryGuestReason = App.CONFIG.SIGN_OUT_REASONS.TEMPORARY_GUEST.includes(signOutReason);
-    const isLeavingGuestRoom = isTemporaryGuestReason && this.repository.user['userState'].isTemporaryGuest();
+    const isLeavingGuestRoom = isTemporaryGuestReason && this.repository.user['userState'].self()?.isTemporaryGuest();
 
     if (isLeavingGuestRoom) {
       const websiteUrl = getWebsiteUrl();

@@ -43,6 +43,7 @@ import type {PreferenceNotificationRepository} from '../notification/PreferenceN
 import type {PermissionRepository} from '../permission/PermissionRepository';
 import type {PropertiesRepository} from '../properties/PropertiesRepository';
 import type {SearchRepository} from '../search/SearchRepository';
+import type {SelfRepository} from '../self/SelfRepository';
 import {Core} from '../service/CoreSingleton';
 import type {StorageRepository} from '../storage';
 import type {TeamRepository} from '../team/TeamRepository';
@@ -75,6 +76,7 @@ export interface ViewModelRepositories {
   storage: StorageRepository;
   team: TeamRepository;
   user: UserRepository;
+  self: SelfRepository;
 }
 
 export class MainViewModel {
@@ -106,7 +108,7 @@ export class MainViewModel {
     };
 
     this.actions = new ActionsViewModel(
-      repositories.client,
+      repositories.self,
       repositories.connection,
       repositories.conversation,
       repositories.integration,

@@ -56,8 +56,6 @@ const Archive = ({
   ]);
 
   const onClickConversation = async (conversation: Conversation) => {
-    await conversationRepository.unarchiveConversation(conversation, true, 'opened conversation from archive');
-    onClose();
     amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversation, {});
   };
 
@@ -68,6 +66,7 @@ const Archive = ({
 
   const {currentFocus, handleKeyDown, resetConversationFocus} = useConversationFocus(conversations);
 
+  const isActiveConversation = (conversation: Conversation) => conversationState.isActiveConversation(conversation);
   return (
     <ListWrapper id="archive" header={t('archiveHeader')} onClose={onClose}>
       <h2 className="visually-hidden">{t('archiveHeader')}</h2>
@@ -85,6 +84,7 @@ const Archive = ({
             conversation={conversation}
             onJoinCall={answerCall}
             showJoinButton={false}
+            isSelected={isActiveConversation}
           />
         ))}
       </ul>

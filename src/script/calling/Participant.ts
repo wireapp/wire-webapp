@@ -39,14 +39,17 @@ export class Participant {
   public sharesCamera: ko.PureComputed<boolean>;
   public startedScreenSharingAt: ko.Observable<number>;
   public isActivelySpeaking: ko.Observable<boolean>;
-  public isSendingVideo: ko.Observable<boolean>;
+  public isSendingVideo: ko.PureComputed<boolean>;
   public isAudioEstablished: ko.Observable<boolean>;
 
   // Audio
   public audioStream: ko.Observable<MediaStream | undefined>;
   public isMuted: ko.Observable<boolean>;
 
-  constructor(public user: User, public clientId: ClientId) {
+  constructor(
+    public user: User,
+    public clientId: ClientId,
+  ) {
     this.videoState = ko.observable(VIDEO_STATE.STOPPED);
     this.hasActiveVideo = ko.pureComputed(() => {
       return (this.sharesCamera() || this.sharesScreen()) && !!this.videoStream();
@@ -65,7 +68,9 @@ export class Participant {
     this.isActivelySpeaking = ko.observable(false);
     this.startedScreenSharingAt = ko.observable();
     this.isMuted = ko.observable(false);
-    this.isSendingVideo = ko.observable(false);
+    this.isSendingVideo = ko.pureComputed(() => {
+      return this.videoState() !== VIDEO_STATE.STOPPED;
+    });
     this.isAudioEstablished = ko.observable(false);
   }
 

@@ -211,7 +211,7 @@ const AppLock: React.FC<AppLockProps> = ({
     const target = event.target as HTMLFormElement & {password: HTMLInputElement};
     try {
       setIsLoading(true);
-      const currentClientId = clientState.currentClient().id;
+      const currentClientId = clientState.currentClient.id;
       await clientRepository.clientService.deleteClient(currentClientId, target.password.value);
       appLockRepository.removeCode();
       amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, true);

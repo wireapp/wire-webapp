@@ -32,6 +32,8 @@ import {
   TeamMemberLeaveEvent,
   ErrorEvent,
   ClientConversationEvent,
+  FederationStopEvent,
+  FailedToAddUsersMessageEvent,
 } from './EventBuilder';
 
 import {AssetRemoteData} from '../assets/AssetRemoteData';
@@ -48,6 +50,7 @@ import {ContentMessage} from '../entity/message/ContentMessage';
 import {DecryptErrorMessage} from '../entity/message/DecryptErrorMessage';
 import {DeleteMessage} from '../entity/message/DeleteMessage';
 import {FailedToAddUsersMessage} from '../entity/message/FailedToAddUsersMessage';
+import {FederationStopMessage} from '../entity/message/FederationStopMessage';
 import {FileAsset} from '../entity/message/FileAsset';
 import {FileTypeRestrictedMessage} from '../entity/message/FileTypeRestrictedMessage';
 import {LegalHoldMessage} from '../entity/message/LegalHoldMessage';
@@ -58,6 +61,7 @@ import {MemberMessage} from '../entity/message/MemberMessage';
 import type {Message} from '../entity/message/Message';
 import {MessageTimerUpdateMessage} from '../entity/message/MessageTimerUpdateMessage';
 import {MissedMessage} from '../entity/message/MissedMessage';
+import {MLSConversationRecoveredMessage} from '../entity/message/MLSConversationRecoveredMessage';
 import {PingMessage} from '../entity/message/PingMessage';
 import {ReceiptModeUpdateMessage} from '../entity/message/ReceiptModeUpdateMessage';
 import {RenameMessage} from '../entity/message/RenameMessage';
@@ -295,6 +299,11 @@ export class EventMapper {
         break;
       }
 
+      case ClientEvent.CONVERSATION.FEDERATION_STOP: {
+        messageEntity = this._mapEventFederationStop(event);
+        break;
+      }
+
       case ClientEvent.CONVERSATION.LEGAL_HOLD_UPDATE: {
         messageEntity = this._mapEventLegalHoldUpdate(event);
         break;
@@ -313,6 +322,11 @@ export class EventMapper {
 
       case ClientEvent.CONVERSATION.MISSED_MESSAGES: {
         messageEntity = this._mapEventMissedMessages();
+        break;
+      }
+
+      case ClientEvent.CONVERSATION.MLS_CONVERSATION_RECOVERED: {
+        messageEntity = this._mapEventMLSConversationRecovered();
         break;
       }
 
@@ -483,8 +497,12 @@ export class EventMapper {
     return new CallingTimeoutMessage(data.reason, parseInt(time, 10));
   }
 
-  _mapEventFailedToAddUsers({data, time}: LegacyEventRecord) {
-    return new FailedToAddUsersMessage(data.qualifiedIds, parseInt(time, 10));
+  _mapEventFailedToAddUsers({data, time}: FailedToAddUsersMessageEvent) {
+    return new FailedToAddUsersMessage(data.qualifiedIds, data.reason, data.backends, parseInt(time, 10));
+  }
+
+  _mapEventFederationStop({data, time}: FederationStopEvent) {
+    return new FederationStopMessage(data.domains, parseInt(time, 10));
   }
 
   _mapEventLegalHoldUpdate({data, timestamp}: LegacyEventRecord) {
@@ -616,6 +634,13 @@ export class EventMapper {
   }
 
   /**
+   * Maps JSON data of local MLS conversation recovered event to message entity.
+   */
+  private _mapEventMLSConversationRecovered(): MissedMessage {
+    return new MLSConversationRecoveredMessage();
+  }
+
+  /**
    * Maps JSON data of `conversation.knock` message into message entity.
    */
   private _mapEventPing(): PingMessage {
@@ -629,9 +654,7 @@ export class EventMapper {
    * @returns Rename message entity
    */
   private _mapEventRename({data: eventData}: LegacyEventRecord) {
-    const messageEntity = new RenameMessage();
-    messageEntity.name = eventData.name;
-    return messageEntity;
+    return new RenameMessage(eventData.name);
   }
 
   /**

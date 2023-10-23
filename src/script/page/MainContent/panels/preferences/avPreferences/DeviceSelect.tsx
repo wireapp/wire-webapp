@@ -75,7 +75,7 @@ const DeviceSelect: React.FC<DeviceSelectProps> = ({
           }}
           dataUieName={uieName}
           options={devicesList}
-          defaultValue={currentValue}
+          value={currentValue}
           label={title}
           isDisabled={disabled}
         />

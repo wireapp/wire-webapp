@@ -33,7 +33,7 @@ import {ServiceEntity} from '../../integration/ServiceEntity';
 
 import {AVATAR_SIZE} from '.';
 
-export interface ServiceAvatarProps extends React.HTMLProps<HTMLDivElement> {
+interface ServiceAvatarProps extends React.HTMLProps<HTMLDivElement> {
   avatarSize: AVATAR_SIZE;
   onClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   participant: ServiceEntity;

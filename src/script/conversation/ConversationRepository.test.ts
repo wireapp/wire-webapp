@@ -21,14 +21,20 @@ import {faker} from '@faker-js/faker';
 import {ClientClassification} from '@wireapp/api-client/lib/client/';
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {
+  Conversation as BackendConversation,
   CONVERSATION_ACCESS,
   CONVERSATION_LEGACY_ACCESS_ROLE,
   CONVERSATION_TYPE,
   RemoteConversations,
-} from '@wireapp/api-client/lib/conversation/';
+} from '@wireapp/api-client/lib/conversation';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
-import {ConversationCreateEvent, ConversationMemberJoinEvent, CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
+import {
+  ConversationMemberLeaveEvent,
+  ConversationCreateEvent,
+  ConversationMemberJoinEvent,
+  CONVERSATION_EVENT,
+} from '@wireapp/api-client/lib/event/';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
@@ -52,6 +58,8 @@ import {ClientEvent} from 'src/script/event/Client';
 import {EventRepository} from 'src/script/event/EventRepository';
 import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';
 import {StorageSchemata} from 'src/script/storage/StorageSchemata';
+import {generateConversation as _generateConversation} from 'test/helper/ConversationGenerator';
+import {createDeleteEvent} from 'test/helper/EventGenerator';
 import {escapeRegex} from 'Util/SanitizationUtil';
 import {createUuid} from 'Util/uuid';
 
@@ -63,34 +71,11 @@ import {generateUser} from '../../../test/helper/UserGenerator';
 import {Core} from '../service/CoreSingleton';
 import {LegacyEventRecord, StorageService} from '../storage';
 
-jest.deepUnmock('axios');
-
-const _generateConversation = (
-  conversation_type = CONVERSATION_TYPE.REGULAR,
-  connection_status = ConnectionStatus.ACCEPTED,
-  conversationProtocol = ConversationProtocol.PROTEUS,
-  domain = '',
-) => {
-  const conversation = new Conversation(createUuid(), domain, conversationProtocol);
-  conversation.type(conversation_type);
-
-  const connectionEntity = new ConnectionEntity();
-  connectionEntity.conversationId = conversation.qualifiedId;
-  connectionEntity.status(connection_status);
-  conversation.connection(connectionEntity);
-
-  if (conversationProtocol === ConversationProtocol.MLS) {
-    conversation.groupId = 'groupId';
-  }
-
-  return conversation;
-};
-
 describe('ConversationRepository', () => {
   const testFactory = new TestFactory();
 
-  let conversation_et = _generateConversation(CONVERSATION_TYPE.REGULAR);
-  const selfConversation = _generateConversation(CONVERSATION_TYPE.SELF);
+  let conversation_et = _generateConversation();
+  const selfConversation = _generateConversation({type: CONVERSATION_TYPE.SELF});
   let self_user_et;
   let server: sinon.SinonFakeServer;
   let storage_service: StorageService;
@@ -120,6 +105,7 @@ describe('ConversationRepository', () => {
     const mark_as_read_url = `${Config.getConfig().BACKEND_REST}/conversations/${conversation_et.id}/self`;
     server.respondWith('PUT', mark_as_read_url, [HTTP_STATUS.OK, {}, '']);
 
+    await testFactory.exposeCallingActors();
     const conversationRepository = await testFactory.exposeConversationActors();
     amplify.publish(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
     storage_service = conversationRepository['conversationService']['storageService'];
@@ -148,7 +134,7 @@ describe('ConversationRepository', () => {
 
   describe('filtered_conversations', () => {
     it('should not contain the self conversation', () => {
-      const self_conversation_et = _generateConversation(CONVERSATION_TYPE.SELF);
+      const self_conversation_et = _generateConversation({type: CONVERSATION_TYPE.SELF});
 
       return testFactory.conversation_repository['saveConversation'](self_conversation_et).then(() => {
         expect(
@@ -168,7 +154,10 @@ describe('ConversationRepository', () => {
     });
 
     it('should not contain a blocked conversations', () => {
-      const blocked_conversation_et = _generateConversation(CONVERSATION_TYPE.ONE_TO_ONE, ConnectionStatus.BLOCKED);
+      const blocked_conversation_et = _generateConversation({
+        type: CONVERSATION_TYPE.ONE_TO_ONE,
+        status: ConnectionStatus.BLOCKED,
+      });
 
       return testFactory.conversation_repository['saveConversation'](blocked_conversation_et).then(() => {
         expect(
@@ -188,7 +177,10 @@ describe('ConversationRepository', () => {
     });
 
     it('should not contain the conversation for a cancelled connection request', () => {
-      const cancelled_conversation_et = _generateConversation(CONVERSATION_TYPE.ONE_TO_ONE, ConnectionStatus.CANCELLED);
+      const cancelled_conversation_et = _generateConversation({
+        type: CONVERSATION_TYPE.ONE_TO_ONE,
+        status: ConnectionStatus.CANCELLED,
+      });
 
       return testFactory.conversation_repository['saveConversation'](cancelled_conversation_et).then(() => {
         expect(
@@ -208,7 +200,10 @@ describe('ConversationRepository', () => {
     });
 
     it('should not contain the conversation for a pending connection request', () => {
-      const pending_conversation_et = _generateConversation(CONVERSATION_TYPE.ONE_TO_ONE, ConnectionStatus.PENDING);
+      const pending_conversation_et = _generateConversation({
+        type: CONVERSATION_TYPE.ONE_TO_ONE,
+        status: ConnectionStatus.PENDING,
+      });
 
       return testFactory.conversation_repository['saveConversation'](pending_conversation_et).then(() => {
         expect(
@@ -282,23 +277,23 @@ describe('ConversationRepository', () => {
 
   describe('getGroupsByName', () => {
     beforeEach(() => {
-      const group_a = _generateConversation(CONVERSATION_TYPE.REGULAR);
+      const group_a = _generateConversation();
       group_a.name('Web Dudes');
 
-      const group_b = _generateConversation(CONVERSATION_TYPE.REGULAR);
+      const group_b = _generateConversation();
       group_b.name('René, Benny, Gregor, Lipis');
 
-      const group_c = _generateConversation(CONVERSATION_TYPE.REGULAR);
+      const group_c = _generateConversation();
       self_user_et = new User('id', null);
       self_user_et.name('John');
       group_c.participating_user_ets.push(self_user_et);
 
-      const group_cleared = _generateConversation(CONVERSATION_TYPE.REGULAR);
+      const group_cleared = _generateConversation();
       group_cleared.name('Cleared');
       group_cleared.last_event_timestamp(Date.now() - 1000);
       group_cleared.setTimestamp(Date.now(), Conversation.TIMESTAMP_TYPE.CLEARED);
 
-      const group_removed = _generateConversation(CONVERSATION_TYPE.REGULAR);
+      const group_removed = _generateConversation();
       group_removed.name('Removed');
       group_removed.last_event_timestamp(Date.now() - 1000);
       group_removed.setTimestamp(Date.now(), Conversation.TIMESTAMP_TYPE.CLEARED);
@@ -461,7 +456,7 @@ describe('ConversationRepository', () => {
   describe('handleConversationEvent', () => {
     it('detects events send by a user not in the conversation', () => {
       const selfUser = generateUser();
-      const conversationEntity = _generateConversation(CONVERSATION_TYPE.REGULAR);
+      const conversationEntity = _generateConversation();
       const event = {
         conversation: conversationEntity.id,
         data: {},
@@ -579,6 +574,7 @@ describe('ConversationRepository', () => {
       it("shows a failed message on the sender's side if the upload fails", () => {
         const selfUser = generateUser();
         const conversation_id = createUuid();
+        const conversationQualifiedId = {domain: '', id: conversation_id};
         const message_id = createUuid();
         const sending_user_id = selfUser.id;
         spyOn(testFactory.conversation_repository['userState'], 'self').and.returnValue(selfUser);
@@ -612,6 +608,31 @@ describe('ConversationRepository', () => {
           time: '2017-09-06T16:14:08.165Z',
           type: 'conversation.asset-add',
         };
+
+        const conversation_payload = {
+          creator: conversation_et.id,
+          id: conversation_id,
+          qualified_id: conversationQualifiedId,
+          members: {
+            others: [],
+            self: {
+              hidden_ref: null,
+              id: conversation_et.id,
+              otr_archived_ref: null,
+              otr_muted_ref: null,
+              otr_muted_status: 0,
+              service: null,
+              status_ref: '0.0',
+              status_time: '2015-01-28T12:53:41.847Z',
+            },
+          },
+          name: '',
+          type: 0,
+        } as unknown as BackendConversation;
+
+        jest
+          .spyOn(testFactory.conversation_repository['conversationService'], 'getConversationById')
+          .mockResolvedValue(conversation_payload);
 
         return testFactory.conversation_repository['fetchConversationById']({domain: '', id: conversation_id})
           .then(fetched_conversation => {
@@ -653,7 +674,6 @@ describe('ConversationRepository', () => {
         createEvent = {
           conversation: conversationId,
           data: {
-            failed_to_add: [],
             access: [CONVERSATION_ACCESS.INVITE],
             access_role: CONVERSATION_LEGACY_ACCESS_ROLE.ACTIVATED,
             access_role_v2: [],
@@ -707,7 +727,7 @@ describe('ConversationRepository', () => {
       it('should process create event for a new conversation created locally', () => {
         jest
           .spyOn(testFactory.conversation_repository['conversationService'], 'getConversationById')
-          .mockResolvedValue(createEvent.data);
+          .mockResolvedValueOnce(createEvent.data);
         return testFactory.conversation_repository['handleConversationEvent'](createEvent).then(() => {
           expect(testFactory.conversation_repository['onCreate']).toHaveBeenCalled();
           expect(testFactory.conversation_repository.mapConversations).toHaveBeenCalledWith([createEvent.data], 1);
@@ -738,7 +758,7 @@ describe('ConversationRepository', () => {
         spyOn(testFactory.conversation_repository as any, 'onMemberJoin').and.callThrough();
         spyOn(testFactory.conversation_repository, 'updateParticipatingUserEntities').and.callThrough();
         spyOn(testFactory.user_repository, 'getUsersById').and.returnValue(Promise.resolve([]));
-        spyOn(container.resolve(Core).service!.conversation, 'isMLSConversationEstablished').and.returnValue(
+        spyOn(container.resolve(Core).service!.conversation, 'mlsGroupExistsLocally').and.returnValue(
           Promise.resolve(true),
         );
 
@@ -768,12 +788,11 @@ describe('ConversationRepository', () => {
         const mockSelfClientId = 'self-client-id';
         const selfUser = generateUser({id: createUuid(), domain: mockDomain});
 
-        const conversationEntity = _generateConversation(
-          CONVERSATION_TYPE.REGULAR,
-          undefined,
-          ConversationProtocol.MLS,
-          mockDomain,
-        );
+        const conversationEntity = _generateConversation({
+          protocol: ConversationProtocol.MLS,
+          id: {domain: mockDomain, id: 'test-id'},
+        });
+
         testFactory.conversation_repository['saveConversation'](conversationEntity);
 
         const memberJoinEvent = {
@@ -792,6 +811,7 @@ describe('ConversationRepository', () => {
           get: jest.fn(() => mockSelfClientId),
         });
 
+        jest.spyOn(container.resolve(Core).service!.mls!, 'conversationExists').mockResolvedValueOnce(true);
         return testFactory.conversation_repository['handleConversationEvent'](memberJoinEvent).then(() => {
           expect(testFactory.conversation_repository['onMemberJoin']).toHaveBeenCalled();
           expect(testFactory.conversation_repository.updateParticipatingUserEntities).toHaveBeenCalled();
@@ -827,7 +847,7 @@ describe('ConversationRepository', () => {
       const selfUser = generateUser();
 
       beforeEach(() => {
-        conversation_et = _generateConversation(CONVERSATION_TYPE.REGULAR);
+        conversation_et = _generateConversation();
         return testFactory.conversation_repository['saveConversation'](conversation_et).then(() => {
           message_et = new Message(createUuid());
           message_et.from = selfUser.id;
@@ -841,19 +861,7 @@ describe('ConversationRepository', () => {
       afterEach(() => conversation_et.removeMessages());
 
       it('should not delete message if user is not matching', async () => {
-        const message_delete_event: DeleteEvent = {
-          conversation: conversation_et.id,
-          data: {
-            deleted_time: 0,
-            message_id: message_et.id,
-            time: '',
-          },
-          from: createUuid(),
-          id: createUuid(),
-          qualified_conversation: {domain: '', id: conversation_et.id},
-          time: new Date().toISOString(),
-          type: ClientEvent.CONVERSATION.MESSAGE_DELETE,
-        };
+        const message_delete_event: DeleteEvent = createDeleteEvent(message_et.id, conversation_et.id);
 
         spyOn(testFactory.conversation_repository['userState'], 'self').and.returnValue(selfUser);
 
@@ -896,22 +904,9 @@ describe('ConversationRepository', () => {
 
       it('should delete message and add delete message if user is not self', () => {
         spyOn(testFactory.event_service, 'deleteEvent');
-        const other_user_id = createUuid();
-        message_et.from = other_user_id;
 
-        const message_delete_event: DeleteEvent = {
-          conversation: conversation_et.id,
-          data: {
-            deleted_time: 0,
-            message_id: message_et.id,
-            time: '',
-          },
-          from: other_user_id,
-          id: createUuid(),
-          qualified_conversation: {domain: '', id: conversation_et.id},
-          time: new Date().toISOString(),
-          type: ClientEvent.CONVERSATION.MESSAGE_DELETE,
-        };
+        const message_delete_event = createDeleteEvent(message_et.id, conversation_et.id);
+        message_et.from = message_delete_event.from;
 
         spyOn(testFactory.conversation_repository['userState'], 'self').and.returnValue(selfUser);
 
@@ -929,19 +924,7 @@ describe('ConversationRepository', () => {
         message_et.from = other_user_id;
         message_et.ephemeral_expires(true);
 
-        const message_delete_event: DeleteEvent = {
-          conversation: conversation_et.id,
-          data: {
-            deleted_time: 0,
-            message_id: message_et.id,
-            time: '',
-          },
-          from: other_user_id,
-          id: createUuid(),
-          qualified_conversation: {domain: '', id: conversation_et.id},
-          time: new Date().toISOString(),
-          type: ClientEvent.CONVERSATION.MESSAGE_DELETE,
-        };
+        const message_delete_event = createDeleteEvent(message_et.id, conversation_et.id);
 
         spyOn(testFactory.conversation_repository['userState'], 'self').and.returnValue(selfUser);
 
@@ -959,7 +942,7 @@ describe('ConversationRepository', () => {
       const selfUser = generateUser();
 
       beforeEach(() => {
-        conversation_et = _generateConversation(CONVERSATION_TYPE.REGULAR);
+        conversation_et = _generateConversation();
 
         return testFactory.conversation_repository['saveConversation'](conversation_et).then(() => {
           const messageToHideEt = new Message(createUuid());
@@ -1160,18 +1143,18 @@ describe('ConversationRepository', () => {
       bob.devices.push(bobs_computer);
       bob.devices.push(bobs_phone);
 
-      const dudes = _generateConversation(CONVERSATION_TYPE.REGULAR);
+      const dudes = _generateConversation();
       dudes.name('Web Dudes');
       dudes.participating_user_ets.push(bob);
       dudes.participating_user_ets.push(john);
 
-      const gals = _generateConversation(CONVERSATION_TYPE.REGULAR);
+      const gals = _generateConversation();
       gals.name('Web Gals');
       gals.participating_user_ets.push(anne);
       gals.participating_user_ets.push(jane);
       gals.participating_user_ets.push(lara);
 
-      const mixed_group = _generateConversation(CONVERSATION_TYPE.REGULAR);
+      const mixed_group = _generateConversation();
       mixed_group.name('Web Dudes & Gals');
       mixed_group.participating_user_ets.push(anne);
       mixed_group.participating_user_ets.push(bob);
@@ -1219,7 +1202,7 @@ describe('ConversationRepository', () => {
       testFactory.propertyRepository.receiptMode(preferenceMode);
 
       // Set the opposite receipt mode on conversation-level
-      const conversationEntity = _generateConversation(CONVERSATION_TYPE.ONE_TO_ONE);
+      const conversationEntity = _generateConversation({type: CONVERSATION_TYPE.ONE_TO_ONE});
       conversationEntity.receiptMode(RECEIPT_MODE.OFF);
 
       // Verify that the account-level preference wins
@@ -1234,7 +1217,7 @@ describe('ConversationRepository', () => {
       testFactory.propertyRepository.receiptMode(preferenceMode);
 
       // Set the opposite receipt mode on conversation-level
-      const conversationEntity = _generateConversation(CONVERSATION_TYPE.REGULAR);
+      const conversationEntity = _generateConversation();
       conversationEntity.receiptMode(RECEIPT_MODE.OFF);
 
       // Verify that the conversation-level preference wins
@@ -1246,8 +1229,8 @@ describe('ConversationRepository', () => {
 
   describe('checkForDeletedConversations', () => {
     it('removes conversations that have been deleted on the backend', async () => {
-      const existingGroup = _generateConversation(CONVERSATION_TYPE.REGULAR);
-      const deletedGroup = _generateConversation(CONVERSATION_TYPE.REGULAR);
+      const existingGroup = _generateConversation();
+      const deletedGroup = _generateConversation();
       const conversationRepository = testFactory.conversation_repository!;
 
       spyOn(testFactory.conversation_service, 'getConversationById').and.callFake(({id}) => {
@@ -1427,7 +1410,7 @@ describe('ConversationRepository', () => {
       spyOn(testFactory.user_repository!, 'refreshUsers').and.callFake(() => {
         unavailableUsers.map(user => {
           user.id = createUuid();
-          user.name(faker.name.fullName());
+          user.name(faker.person.fullName());
         });
       });
 
@@ -1464,11 +1447,11 @@ describe('ConversationRepository', () => {
       spyOn(testFactory.user_repository!, 'refreshUsers').and.callFake(() => {
         unavailableUsers1.map(user => {
           user.id = createUuid();
-          user.name(faker.name.fullName());
+          user.name(faker.person.fullName());
         });
         unavailableUsers2.map(user => {
           user.id = createUuid();
-          user.name(faker.name.fullName());
+          user.name(faker.person.fullName());
         });
       });
 
@@ -1525,5 +1508,106 @@ describe('ConversationRepository', () => {
       expect(conversationRepo.loadMissingConversations).toHaveBeenCalled();
       expect(conversationRepo['refreshAllConversationsUnavailableParticipants']).toHaveBeenCalled();
     });
+  });
+
+  describe('removeMembers', () => {
+    it.each([ConversationProtocol.PROTEUS, ConversationProtocol.MIXED])(
+      'should remove member from %s conversation',
+      async protocol => {
+        const conversationRepository = await testFactory.exposeConversationActors();
+
+        const conversation = _generateConversation({protocol});
+
+        const selfUser = generateUser();
+        conversation.selfUser(selfUser);
+
+        const user1 = generateUser();
+        const user2 = generateUser();
+
+        conversation.participating_user_ets([user1, user2]);
+
+        const coreConversationService = container.resolve(Core).service!.conversation;
+
+        jest.spyOn(conversationRepository['eventRepository'], 'injectEvent').mockImplementation(jest.fn());
+
+        await conversationRepository.removeMembers(conversation, [user1.qualifiedId]);
+
+        expect(coreConversationService.removeUserFromConversation).toHaveBeenCalledWith(
+          conversation.qualifiedId,
+          user1.qualifiedId,
+        );
+      },
+    );
+
+    it('should remove member from mls conversation', async () => {
+      const conversationRepository = await testFactory.exposeConversationActors();
+
+      const conversation = _generateConversation({protocol: ConversationProtocol.MLS});
+
+      const selfUser = generateUser();
+      conversation.selfUser(selfUser);
+
+      const user1 = generateUser();
+      const user2 = generateUser();
+
+      conversation.participating_user_ets([user1, user2]);
+
+      const coreConversationService = container.resolve(Core).service!.conversation;
+
+      jest.spyOn(conversationRepository['eventRepository'], 'injectEvent').mockImplementation(jest.fn());
+
+      const mockedMemberLeaveEvent: ConversationMemberLeaveEvent = {
+        conversation: conversation.id,
+        data: {qualified_user_ids: [], user_ids: []},
+        from: '',
+        time: '',
+        type: CONVERSATION_EVENT.MEMBER_LEAVE,
+      };
+      jest
+        .spyOn(coreConversationService, 'removeUsersFromMLSConversation')
+        .mockResolvedValueOnce({events: [mockedMemberLeaveEvent], conversation: {} as BackendConversation});
+      await conversationRepository.removeMembers(conversation, [user1.qualifiedId]);
+
+      expect(coreConversationService.removeUsersFromMLSConversation).toHaveBeenCalledWith({
+        conversationId: conversation.qualifiedId,
+        qualifiedUserIds: [user1.qualifiedId],
+        groupId: conversation.groupId,
+      });
+      expect(conversationRepository['eventRepository'].injectEvent).toHaveBeenCalled();
+    });
+  });
+
+  describe('leaveConversation', () => {
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+
+    it.each([ConversationProtocol.PROTEUS, ConversationProtocol.MIXED, ConversationProtocol.MLS])(
+      'should leave %s conversation',
+      async protocol => {
+        const conversationRepository = await testFactory.exposeConversationActors();
+
+        const conversation = _generateConversation({protocol});
+
+        const selfUser = generateUser();
+        conversation.selfUser(selfUser);
+
+        spyOn(conversationRepository['userState'], 'self').and.returnValue(selfUser);
+
+        conversation.participating_user_ets([generateUser(), generateUser()]);
+
+        const coreConversationService = container.resolve(Core).service!.conversation;
+
+        jest.spyOn(conversationRepository['eventRepository'], 'injectEvent').mockImplementation(jest.fn());
+
+        await conversationRepository.leaveConversation(conversation);
+
+        expect(coreConversationService.removeUserFromConversation).toHaveBeenCalledWith(
+          conversation.qualifiedId,
+          selfUser.qualifiedId,
+        );
+        expect(conversationRepository['eventRepository'].injectEvent).toHaveBeenCalled();
+      },
+    );
   });
 });

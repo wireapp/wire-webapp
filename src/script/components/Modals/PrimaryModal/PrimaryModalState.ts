@@ -134,6 +134,7 @@ const updateCurrentModalContent = (type: PrimaryModalType, options: ModalOptions
     secondaryAction,
     hideSecondary,
     hideCloseBtn = false,
+    passwordOptional = false,
     text = {} as Text,
   } = options;
 
@@ -154,6 +155,7 @@ const updateCurrentModalContent = (type: PrimaryModalType, options: ModalOptions
     secondaryAction: secondaryAction ?? null,
     hideCloseBtn,
     titleText: text.title ?? '',
+    passwordOptional,
   };
 
   switch (type) {

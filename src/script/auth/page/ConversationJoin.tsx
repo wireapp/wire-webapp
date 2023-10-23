@@ -20,43 +20,31 @@
 import React, {useEffect, useState} from 'react';
 
 import type {RegisterData} from '@wireapp/api-client/lib/auth';
-import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
-import {FormattedMessage, useIntl} from 'react-intl';
+import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
+import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
-import {Navigate} from 'react-router-dom';
+import {Navigate} from 'react-router';
 import {AnyAction, Dispatch} from 'redux';
 
-import {Runtime, UrlUtil} from '@wireapp/commons';
-import {
-  ArrowIcon,
-  Button,
-  ContainerXS,
-  Form,
-  H2,
-  Input,
-  InputBlock,
-  InputSubmitCombo,
-  Link,
-  RoundIconButton,
-  Small,
-  Loading,
-  Text,
-} from '@wireapp/react-ui-kit';
+import {UrlUtil} from '@wireapp/commons';
+import {Column, Columns, H1, Muted} from '@wireapp/react-ui-kit';
 
-import {isBackendError} from 'Util/TypePredicateUtil';
 import {noop} from 'Util/util';
 
+import {GuestLoginColumn, IsLoggedInColumn, Separator} from './ConversationJoinComponents';
+import {ConversationJoinFull, ConversationJoinInvalid} from './ConversationJoinInvalid';
 import {EntropyContainer} from './EntropyContainer';
+import {Login} from './Login';
+import {Page} from './Page';
 
 import {Config} from '../../Config';
 import {conversationJoinStrings} from '../../strings';
 import {AppAlreadyOpen} from '../component/AppAlreadyOpen';
 import {JoinGuestLinkPasswordModal} from '../component/JoinGuestLinkPasswordModal';
-import {RouterLink} from '../component/RouterLink';
 import {UnsupportedBrowser} from '../component/UnsupportedBrowser';
 import {WirelessContainer} from '../component/WirelessContainer';
 import {EXTERNAL_ROUTE} from '../externalRoute';
-import {actionRoot as ROOT_ACTIONS} from '../module/action/';
+import {actionRoot as ROOT_ACTIONS} from '../module/action';
 import {ValidationError} from '../module/action/ValidationError';
 import {bindActionCreators, RootState} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
@@ -64,8 +52,6 @@ import * as ConversationSelector from '../module/selector/ConversationSelector';
 import * as SelfSelector from '../module/selector/SelfSelector';
 import {QUERY_KEY, ROUTE} from '../route';
 import * as AccentColor from '../util/AccentColor';
-import {parseError, parseValidationErrors} from '../util/errorUtil';
-import * as StringUtil from '../util/stringUtil';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
@@ -77,8 +63,6 @@ const ConversationJoinComponent = ({
   setLastEventDate,
   doLogout,
   doGetConversationInfoByCode,
-  isAuthenticated,
-  isTemporaryGuest,
   selfName,
   conversationError,
   isFetchingAuth,
@@ -92,28 +76,25 @@ const ConversationJoinComponent = ({
   const conversationHasPassword = conversationInfo?.has_password;
   const invalidConversationPassword =
     conversationError && conversationError.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD;
-  const [accentColor] = useState(AccentColor.random());
-  const [isPwaEnabled, setIsPwaEnabled] = useState<boolean>();
+  const [accentColor] = useState(AccentColor.STRONG_BLUE);
   const [isJoinGuestLinkPasswordModalOpen, setIsJoinGuestLinkPasswordModalOpen] = useState<boolean>(
     !!conversationHasPassword || !!invalidConversationPassword,
   );
   const [conversationCode, setConversationCode] = useState<string>();
   const [conversationKey, setConversationKey] = useState<string>();
-  const [enteredName, setEnteredName] = useState<string>();
+  const [enteredName, setEnteredName] = useState<string>('');
   const [error, setError] = useState<any>();
   const [expiresIn, setExpiresIn] = useState<number>();
-  const [forceNewTemporaryGuestAccount, setForceNewTemporaryGuestAccount] = useState(false);
   const [isValidLink, setIsValidLink] = useState(true);
   const [isValidName, setIsValidName] = useState(true);
+  const [isSubmitingName, setIsSubmitingName] = useState(false);
   const [showCookiePolicyBanner, setShowCookiePolicyBanner] = useState(true);
   const [showEntropyForm, setShowEntropyForm] = useState(false);
   const isEntropyRequired = Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY;
 
   const isFetching = isFetchingAuth || isFetchingConversation || conversationInfoFetching;
 
-  const isPwaSupportedBrowser = () => {
-    return Runtime.isMobileOS() || Runtime.isSafari();
-  };
+  const isWirePublicInstance = Config.getConfig().BRAND_NAME === 'Wire';
 
   useEffect(() => {
     setIsJoinGuestLinkPasswordModalOpen(!!conversationHasPassword || !!invalidConversationPassword);
@@ -141,61 +122,18 @@ const ConversationJoinComponent = ({
       });
   }, []);
 
-  useEffect(() => {
-    const isEnabled =
-      Config.getConfig().URL.MOBILE_BASE && UrlUtil.hasURLParameter(QUERY_KEY.PWA_AWARE) && isPwaSupportedBrowser();
-    setIsPwaEnabled(!!isEnabled);
-    if (isEnabled) {
-      setForceNewTemporaryGuestAccount(true);
-    }
-  }, []);
-
   const routeToApp = (conversation: string = '', domain: string = '') => {
-    const redirectLocation = isPwaEnabled
-      ? UrlUtil.pathWithParams(EXTERNAL_ROUTE.PWA_LOGIN, {[QUERY_KEY.IMMEDIATE_LOGIN]: 'true'})
-      : `${UrlUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP)}${
-          conversation && `#/conversation/${conversation}${domain && `/${domain}`}`
-        }`;
+    const redirectLocation = `${UrlUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP)}${
+      conversation && `#/conversation/${conversation}${domain && `/${domain}`}`
+    }`;
     window.location.replace(redirectLocation);
   };
 
-  const handleSubmitError = (error: BackendError) => {
-    switch (error.label) {
-      default: {
-        const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>
-          (error as BackendError).label.endsWith(errorType),
-        );
-        if (!isValidationError) {
-          doLogout();
-          console.warn('Unable to create wireless account', error);
-          setShowEntropyForm(false);
-        }
-      }
-    }
-  };
-
-  const handleSubmit = async (entropyData?: Uint8Array, password?: string) => {
-    if (!conversationKey || !conversationCode) {
-      return;
-    }
-    if (!isJoinGuestLinkPasswordModalOpen && !!conversationHasPassword) {
-      setIsJoinGuestLinkPasswordModalOpen(true);
-      return;
-    }
+  const getConversationInfoAndJoin = async (password?: string) => {
     try {
-      const name = enteredName?.trim();
-      const registrationData = {
-        accent_id: accentColor.id,
-        expires_in: expiresIn,
-        name,
-      };
-      await doRegisterWireless(
-        registrationData as RegisterData,
-        {
-          shouldInitializeClient: !isPwaEnabled,
-        },
-        entropyData,
-      );
+      if (!conversationCode || !conversationKey) {
+        throw Error('Conversation code or key missing');
+      }
       const conversationEvent = await doJoinConversationByCode(conversationKey, conversationCode, undefined, password);
       /* When we join a conversation, we create the join event before loading the webapp.
        * That means that when the webapp loads and tries to fetch the notificationStream is will get the join event once again and will try to handle it
@@ -205,8 +143,50 @@ const ConversationJoinComponent = ({
 
       routeToApp(conversationEvent.conversation, conversationEvent.qualified_conversation?.domain ?? '');
     } catch (error) {
-      if (isBackendError(error)) {
-        handleSubmitError(error);
+      console.warn('Unable to join conversation', error);
+      setShowEntropyForm(false);
+    }
+  };
+
+  const handleSubmit = async (entropyData?: Uint8Array, password?: string) => {
+    setIsSubmitingName(true);
+    if (!isJoinGuestLinkPasswordModalOpen && !!conversationHasPassword) {
+      setIsJoinGuestLinkPasswordModalOpen(true);
+      return;
+    }
+    try {
+      if (!conversationCode || !conversationKey) {
+        throw Error('Conversation code or key missing');
+      }
+      const name = enteredName?.trim();
+      const registrationData = {
+        accent_id: accentColor.id,
+        expires_in: expiresIn,
+        name,
+      };
+      await doRegisterWireless(
+        registrationData as RegisterData,
+        {
+          shouldInitializeClient: true,
+        },
+        entropyData,
+      );
+      await getConversationInfoAndJoin(password);
+    } catch (error) {
+      setIsSubmitingName(false);
+      if (error.label) {
+        switch (error.label) {
+          default: {
+            const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>
+              error.label.endsWith(errorType),
+            );
+            if (!isValidationError) {
+              void doLogout();
+              console.warn('Unable to create wireless account', error);
+              setShowEntropyForm(false);
+            }
+          }
+        }
       } else {
         await doLogout();
         console.warn('Unable to create wireless account', error);
@@ -218,7 +198,7 @@ const ConversationJoinComponent = ({
     }
   };
 
-  const checkNameValidity = (event: React.FormEvent) => {
+  const checkNameValidity = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!nameInput.current) {
       return;
@@ -230,7 +210,7 @@ const ConversationJoinComponent = ({
     } else if (isEntropyRequired) {
       setShowEntropyForm(true);
     } else {
-      handleSubmit();
+      await handleSubmit();
     }
   };
 
@@ -244,9 +224,12 @@ const ConversationJoinComponent = ({
     setEnteredName(event.target.value);
   };
 
+  if (!isValidLink) {
+    return <ConversationJoinInvalid />;
+  }
+
   const isFullConversation =
     conversationError && conversationError.label && conversationError.label === BackendErrorLabel.TOO_MANY_MEMBERS;
-  const renderTemporaryGuestAccountCreation = !isAuthenticated || isTemporaryGuest || forceNewTemporaryGuestAccount;
 
   const submitJoinCodeWithPassword = async (password: string) => {
     await handleSubmit(undefined, password);
@@ -254,6 +237,9 @@ const ConversationJoinComponent = ({
 
   if (!isValidLink) {
     return <Navigate to={ROUTE.CONVERSATION_JOIN_INVALID} replace />;
+  }
+  if (isFullConversation) {
+    return <ConversationJoinFull />;
   }
 
   return (
@@ -271,129 +257,46 @@ const ConversationJoinComponent = ({
         showCookiePolicyBanner={showCookiePolicyBanner}
         onCookiePolicyBannerClose={() => setShowCookiePolicyBanner(false)}
       >
-        {isEntropyRequired && showEntropyForm ? (
-          <EntropyContainer onSetEntropy={handleSubmit} />
-        ) : isFullConversation ? (
-          <ContainerXS style={{margin: 'auto 0'}}>
-            <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} data-uie-name="status-full-headline">
-              <FormattedMessage {...conversationJoinStrings.fullConversationHeadline} />
-            </H2>
-            <Text style={{fontSize: '1rem', marginTop: '10px'}} data-uie-name="status-full-text">
-              {_(conversationJoinStrings.fullConversationSubhead)}
-            </Text>
-          </ContainerXS>
-        ) : renderTemporaryGuestAccountCreation ? (
-          <div>
-            <ContainerXS style={{margin: 'auto 0'}}>
-              <AppAlreadyOpen fullscreen={isPwaEnabled} />
-              <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}}>
-                <FormattedMessage
-                  {...conversationJoinStrings.headline}
-                  values={{
-                    brandName: Config.getConfig().BRAND_NAME,
-                  }}
+        <AppAlreadyOpen />
+        <div style={{display: 'flex', alignItems: 'center', flexDirection: 'column', marginBottom: '2rem'}}>
+          <H1 style={{fontWeight: 500, marginTop: '0', marginBottom: '1rem'}} data-uie-name="status-join-headline">
+            {_(conversationJoinStrings.mainHeadline)}
+          </H1>
+          {!isWirePublicInstance && (
+            <Muted data-uie-name="status-join-subhead">
+              {_(conversationJoinStrings.headline, {domain: window.location.hostname})}
+            </Muted>
+          )}
+        </div>
+        <Columns style={{display: 'flex', gap: '2rem', alignSelf: 'center', maxWidth: '100%'}}>
+          <Column>
+            {selfName ? (
+              <IsLoggedInColumn selfName={selfName} handleLogout={doLogout} handleSubmit={getConversationInfoAndJoin} />
+            ) : (
+              <Login embedded />
+            )}
+          </Column>
+          <Separator />
+          <Column>
+            <Page>
+              {isEntropyRequired && showEntropyForm ? (
+                <EntropyContainer onSetEntropy={handleSubmit} />
+              ) : (
+                <GuestLoginColumn
+                  enteredName={enteredName}
+                  nameInput={nameInput}
+                  onNameChange={onNameChange}
+                  checkNameValidity={checkNameValidity}
+                  handleSubmit={handleSubmit}
+                  isSubmitingName={isSubmitingName}
+                  isValidName={isValidName}
+                  conversationError={conversationError}
+                  error={error}
                 />
-              </H2>
-              <Text style={{fontSize: '1rem', marginTop: '10px'}}>
-                <FormattedMessage {...conversationJoinStrings.subhead} />
-              </Text>
-              <Form style={{marginTop: 30}}>
-                <InputBlock>
-                  <InputSubmitCombo>
-                    <Input
-                      id="enter-name"
-                      name="name"
-                      autoComplete="username"
-                      value={enteredName}
-                      ref={nameInput}
-                      onChange={onNameChange}
-                      placeholder={_(conversationJoinStrings.namePlaceholder)}
-                      maxLength={64}
-                      minLength={2}
-                      pattern=".{2,64}"
-                      required
-                      data-uie-name="enter-name"
-                    />
-                    <RoundIconButton
-                      disabled={!enteredName || !isValidName}
-                      type="submit"
-                      formNoValidate
-                      onClick={checkNameValidity}
-                      data-uie-name="do-next"
-                    >
-                      {isFetching ? <Loading /> : <ArrowIcon />}
-                    </RoundIconButton>
-                  </InputSubmitCombo>
-                </InputBlock>
-                {!isJoinGuestLinkPasswordModalOpen &&
-                  (error ? parseValidationErrors(error) : parseError(conversationError))}
-              </Form>
-              {!isPwaEnabled && (
-                <Small block>
-                  {`${_(conversationJoinStrings.hasAccount)} `}
-                  <RouterLink
-                    to={`${ROUTE.LOGIN}/${conversationKey}/${conversationCode}`}
-                    textTransform={'none'}
-                    data-uie-name="go-login"
-                  >
-                    {_(conversationJoinStrings.loginLink)}
-                  </RouterLink>
-                </Small>
               )}
-            </ContainerXS>
-          </div>
-        ) : (
-          <ContainerXS style={{margin: 'auto 0'}}>
-            <AppAlreadyOpen fullscreen={isPwaEnabled} />
-            <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} data-uie-name="status-join-headline">
-              {selfName
-                ? _(conversationJoinStrings.existentAccountHeadline, {
-                    brandName: Config.getConfig().BRAND_NAME,
-                    name: StringUtil.capitalize(selfName),
-                  })
-                : _(conversationJoinStrings.headline, {brandName: Config.getConfig().BRAND_NAME})}
-            </H2>
-            <Text block style={{fontSize: '1rem', marginTop: '10px'}}>
-              {_(conversationJoinStrings.existentAccountSubhead)}
-            </Text>
-            <Button
-              type="button"
-              style={{marginTop: 16}}
-              onClick={async () => {
-                if (!conversationKey || !conversationCode) {
-                  return;
-                }
-                try {
-                  const conversationEvent = await doJoinConversationByCode(conversationKey, conversationCode);
-                  routeToApp(conversationEvent.conversation, conversationEvent.qualified_conversation?.domain ?? '');
-                } catch (error) {
-                  console.warn('Unable to join conversation with existing account', error);
-                  if (isBackendError(error)) {
-                    handleSubmitError(error);
-                  }
-                }
-              }}
-              data-uie-name="do-open"
-            >
-              {_(conversationJoinStrings.existentAccountOpenButton, {brandName: Config.getConfig().BRAND_NAME})}
-            </Button>
-            {!isJoinGuestLinkPasswordModalOpen &&
-              (error ? parseValidationErrors(error) : parseError(conversationError))}
-            <Small block>
-              {_(conversationJoinStrings.existentAccountJoinWithoutText, {
-                existentAccountJoinWithoutLink: (
-                  <Link
-                    onClick={() => setForceNewTemporaryGuestAccount(true)}
-                    textTransform={'none'}
-                    data-uie-name="go-join"
-                  >
-                    {_(conversationJoinStrings.existentAccountJoinWithoutLink)}
-                  </Link>
-                ),
-              })}
-            </Small>
-          </ContainerXS>
-        )}
+            </Page>
+          </Column>
+        </Columns>
       </WirelessContainer>
     </UnsupportedBrowser>
   );
@@ -403,10 +306,10 @@ type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({
   isFetchingAuth: AuthSelector.isFetching(state),
   isAuthenticated: AuthSelector.isAuthenticated(state),
-  selfName: SelfSelector.getSelfName(state),
-  isTemporaryGuest: SelfSelector.isTemporaryGuest(state),
-  conversationError: ConversationSelector.getError(state),
   isFetchingConversation: ConversationSelector.isFetching(state),
+  isTemporaryGuest: SelfSelector.isTemporaryGuest(state),
+  selfName: !SelfSelector.isTemporaryGuest(state) && SelfSelector.getSelfName(state),
+  conversationError: ConversationSelector.getError(state),
   conversationInfo: ConversationSelector.conversationInfo(state),
   conversationInfoFetching: ConversationSelector.conversationInfoFetching(state),
 });
