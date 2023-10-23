@@ -342,6 +342,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
                 css={{marginBottom: 0}}
                 onClick={onClickStartAudio}
                 data-uie-name="do-call"
+                disabled={isReadOnlyConversation}
               >
                 <Icon.Pickup />
               </IconButton>
