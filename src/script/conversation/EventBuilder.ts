@@ -57,7 +57,6 @@ export interface BaseEvent {
 
 export interface ConversationEvent<Type extends CONVERSATION | CONVERSATION_EVENT, Data = undefined> extends BaseEvent {
   data: Data;
-  id: string;
   type: Type;
 }
 

@@ -42,7 +42,6 @@ import {truncate} from 'Util/StringUtil';
 
 import {CallMessage} from './message/CallMessage';
 import type {ContentMessage} from './message/ContentMessage';
-import type {MemberMessage} from './message/MemberMessage';
 import type {Message} from './message/Message';
 import {PingMessage} from './message/PingMessage';
 import type {User} from './User';
@@ -829,38 +828,6 @@ export class Conversation {
       return;
     }
     this.messages_unordered.removeAll();
-  }
-
-  shouldUnarchive(): boolean {
-    if (!this.archivedState() || this.showNotificationsNothing()) {
-      return false;
-    }
-
-    const isNewerMessage = (messageEntity: Message) => messageEntity.timestamp() > this.archivedTimestamp();
-
-    const {allEvents, allMessages, selfMentions, selfReplies} = this.unreadState();
-    if (this.showNotificationsMentionsAndReplies()) {
-      const mentionsAndReplies = selfMentions.concat(selfReplies);
-      return mentionsAndReplies.some(isNewerMessage);
-    }
-
-    const hasNewMessage = allMessages.some(isNewerMessage);
-    if (hasNewMessage) {
-      return true;
-    }
-
-    return allEvents.some(messageEntity => {
-      if (!isNewerMessage(messageEntity)) {
-        return false;
-      }
-
-      const isCallActivation = messageEntity.isCall() && messageEntity.isActivation();
-      const isMemberJoin = messageEntity.isMember() && (messageEntity as MemberMessage).isMemberJoin();
-      const wasSelfUserAdded =
-        isMemberJoin && (messageEntity as MemberMessage).isUserAffected(this.selfUser().qualifiedId);
-
-      return isCallActivation || wasSelfUserAdded;
-    });
   }
 
   /**

@@ -70,6 +70,7 @@ import {EventRepository} from '../event/EventRepository';
 import {EventService} from '../event/EventService';
 import {EventServiceNoCompound} from '../event/EventServiceNoCompound';
 import {NotificationService} from '../event/NotificationService';
+import {EventStorageMiddleware} from '../event/preprocessor/EventStorageMiddleware';
 import {QuotedMessageMiddleware} from '../event/preprocessor/QuotedMessageMiddleware';
 import {ReceiptsMiddleware} from '../event/preprocessor/ReceiptsMiddleware';
 import {ServiceMiddleware} from '../event/preprocessor/ServiceMiddleware';
@@ -380,11 +381,17 @@ export class App {
       await initializeDataDog(this.config, selfUser.qualifiedId);
 
       // Setup all event middleware
+      const eventStorageMiddleware = new EventStorageMiddleware(this.service.event, selfUser);
       const serviceMiddleware = new ServiceMiddleware(conversationRepository, userRepository, selfUser);
       const quotedMessageMiddleware = new QuotedMessageMiddleware(this.service.event);
       const readReceiptMiddleware = new ReceiptsMiddleware(this.service.event, conversationRepository, selfUser);
 
-      eventRepository.setEventProcessMiddlewares([serviceMiddleware, quotedMessageMiddleware, readReceiptMiddleware]);
+      eventRepository.setEventProcessMiddlewares([
+        serviceMiddleware,
+        readReceiptMiddleware,
+        eventStorageMiddleware,
+        quotedMessageMiddleware,
+      ]);
       // Setup all the event processors
       const federationEventProcessor = new FederationEventProcessor(eventRepository, serverTimeHandler, selfUser);
       eventRepository.setEventProcessors([federationEventProcessor]);
@@ -422,15 +429,16 @@ export class App {
 
       await conversationRepository.conversationRoleRepository.loadTeamRoles();
 
+      let totalNotifications = 0;
       await eventRepository.connectWebSocket(this.core, ({done, total}) => {
         const baseMessage = t('initDecryption');
         const extraInfo = this.config.FEATURE.SHOW_LOADING_INFORMATION
           ? ` ${t('initProgress', {number1: done.toString(), number2: total.toString()})}`
           : '';
 
+        totalNotifications = total;
         onProgress(25 + 50 * (done / total), `${baseMessage}${extraInfo}`);
       });
-      const notificationsCount = eventRepository.notificationsTotal;
 
       await conversationRepository.init1To1Conversations(connections, conversations);
 
@@ -445,7 +453,7 @@ export class App {
       }
 
       telemetry.timeStep(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
-      telemetry.addStatistic(AppInitStatisticsValue.NOTIFICATIONS, notificationsCount, 100);
+      telemetry.addStatistic(AppInitStatisticsValue.NOTIFICATIONS, totalNotifications, 100);
 
       eventTrackerRepository.init(propertiesRepository.properties.settings.privacy.telemetry_sharing);
       onProgress(97.5, t('initUpdatedFromNotifications', this.config.BRAND_NAME));

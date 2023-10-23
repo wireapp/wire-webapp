@@ -39,7 +39,7 @@ import {StorageSchemata} from '../storage/StorageSchemata';
 export type Includes = {includeFrom: boolean; includeTo: boolean};
 type DexieCollection = Dexie.Collection<any, any>;
 export type DBEvents = DexieCollection | EventRecord[];
-type IdentifiedUpdatePayload = Partial<EventRecord> & Pick<EventRecord, 'primary_key'>;
+export type IdentifiedUpdatePayload = Partial<EventRecord> & Pick<EventRecord, 'primary_key'>;
 
 export const eventTimeToDate = (time: string) => new Date(time) || new Date(parseInt(time, 10));
 

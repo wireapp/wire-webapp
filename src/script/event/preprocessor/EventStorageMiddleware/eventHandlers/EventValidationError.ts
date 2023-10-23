@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2022 Wire Swiss GmbH
+ * Copyright (C) 2023 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,10 +17,10 @@
  *
  */
 
-declare module '@koush/wrtc' {
-  export const nonstandard: {
-    RTCAudioSource: any;
-    RTCRtpSender: {prototype: {createEncodedVideoStreams: any; createEncodedStreams: any; transform: any}};
-  };
-  export const MediaStream: any;
+import {EventError} from 'src/script/error/EventError';
+
+export class EventValidationError extends EventError {
+  constructor(message: string) {
+    super(EventError.TYPE.VALIDATION_FAILED, `Event validation failed: ${message}`);
+  }
 }
