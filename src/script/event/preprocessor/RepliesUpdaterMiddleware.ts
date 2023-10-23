@@ -70,7 +70,7 @@ export class RepliesUpdaterMiddleware implements EventMiddleware {
    * will update the message ID of all the replies to an edited message
    */
   private async handleEditEvent(event: MessageAddEvent, originalMessageId: string) {
-    const {originalEvent, replies} = await this.findRepliesToMessage(event.conversation, originalMessageId);
+    const {originalEvent, replies} = await this.findRepliesToMessage(event.conversation, originalMessageId, event.id);
     if (!originalEvent) {
       return event;
     }
@@ -89,8 +89,10 @@ export class RepliesUpdaterMiddleware implements EventMiddleware {
   private async findRepliesToMessage(
     conversationId: string,
     messageId: string,
+    /** in case the message was edited, we need to query the DB using the old event ID */
+    previousMessageId?: string,
   ): Promise<{originalEvent?: MessageAddEvent; replies: StoredEvent<MessageAddEvent>[]}> {
-    const originalEvent = await this.eventService.loadEvent(conversationId, messageId);
+    const originalEvent = await this.eventService.loadEvent(conversationId, previousMessageId ?? messageId);
 
     if (!originalEvent || originalEvent.type !== ClientEvent.CONVERSATION.MESSAGE_ADD) {
       return {
