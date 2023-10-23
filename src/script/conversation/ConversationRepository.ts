@@ -1131,6 +1131,10 @@ export class ConversationRepository {
     const localMLSConversation = this.conversationState.findMLS1to1Conversation(otherUserId);
 
     if (protocol === ConversationProtocol.MLS || localMLSConversation) {
+      /**
+       * When mls 1:1 conversation initialisation is triggered by some live update (e.g other user updates their supported protocols), it's very likely that we will also receive a welcome message shortly.
+       * We have to add a delay to make sure the welcome message is not wasted, in case the self client would establish mls group themselves before receiving the welcome.
+       */
       const shouldDelayMLSGroupEstablishment = isLiveUpdate && isMLSSupportedByTheOtherUser;
       return this.initMLS1to1Conversation(otherUserId, isMLSSupportedByTheOtherUser, shouldDelayMLSGroupEstablishment);
     }
