@@ -194,6 +194,7 @@ export class ContentViewModel {
     this.previousConversation = this.conversationState.activeConversation();
     setHistoryParam(
       generateConversationUrl({id: conversationEntity?.id ?? '', domain: conversationEntity?.domain ?? ''}),
+      history.state,
     );
     if (openNotificationSettings) {
       rightSidebar.goTo(PanelState.NOTIFICATIONS, {entity: this.conversationState.activeConversation() ?? null});

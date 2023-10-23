@@ -54,7 +54,6 @@ import {TeamRepository} from '../../../team/TeamRepository';
 import {TeamState} from '../../../team/TeamState';
 import {Shortcut} from '../../../ui/Shortcut';
 import {ShortcutType} from '../../../ui/ShortcutType';
-import {UserState} from '../../../user/UserState';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {PanelHeader} from '../PanelHeader';
 import {PanelEntity, PanelState} from '../RightSidebar';
@@ -65,8 +64,8 @@ const CONFIG = {
 };
 
 interface ConversationDetailsProps {
-  onClose: () => void;
-  togglePanel: (panel: PanelState, entity: PanelEntity, addMode?: boolean, direction?: 'left' | 'right') => void;
+  onClose?: () => void;
+  togglePanel?: (panel: PanelState, entity: PanelEntity, addMode?: boolean, direction?: 'left' | 'right') => void;
   actionsViewModel: ActionsViewModel;
   activeConversation: Conversation;
   conversationRepository: ConversationRepository;
@@ -74,15 +73,15 @@ interface ConversationDetailsProps {
   searchRepository: SearchRepository;
   teamRepository: TeamRepository;
   teamState: TeamState;
-  userState: UserState;
+  selfUser: User;
   isFederated?: boolean;
 }
 
 const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>(
   (
     {
-      onClose,
-      togglePanel,
+      onClose = () => {},
+      togglePanel = () => {},
       actionsViewModel,
       activeConversation,
       conversationRepository,
@@ -90,7 +89,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       searchRepository,
       teamRepository,
       teamState,
-      userState,
+      selfUser,
       isFederated = false,
     },
     ref,
@@ -155,8 +154,11 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       'team',
     ]);
 
-    const {self: selfUser, isActivatedAccount} = useKoSubscribableChildren(userState, ['self', 'isActivatedAccount']);
-    const {is_verified: isSelfVerified, teamRole} = useKoSubscribableChildren(selfUser, ['is_verified', 'teamRole']);
+    const {
+      is_verified: isSelfVerified,
+      teamRole,
+      isActivatedAccount,
+    } = useKoSubscribableChildren(selfUser, ['is_verified', 'teamRole', 'isActivatedAccount']);
 
     const isActiveGroupParticipant = isGroup && !removedFromConversation;
 
@@ -308,7 +310,6 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
           {isSingleUserMode && !isServiceMode && firstParticipant && (
             <>
               <UserDetails
-                conversationDomain={activeConversation.domain}
                 participant={firstParticipant}
                 isVerified={isVerified}
                 isSelfVerified={isSelfVerified}
@@ -372,6 +373,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
                       truncate
                       showEmptyAdmin
                       selfFirst={false}
+                      selfUser={selfUser}
                       noSelfInteraction
                     />
 
@@ -433,7 +435,11 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
             <>
               <ConversationDetailsBottomActions
                 isDeviceActionEnabled={
-                  isSingleUserMode && firstParticipant && (firstParticipant.isConnected() || firstParticipant.inTeam())
+                  !!(
+                    isSingleUserMode &&
+                    firstParticipant &&
+                    (firstParticipant.isConnected() || firstParticipant.inTeam())
+                  )
                 }
                 showDevices={openParticipantDevices}
                 showNotifications={showNotifications}

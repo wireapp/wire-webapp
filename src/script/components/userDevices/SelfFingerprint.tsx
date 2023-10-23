@@ -25,7 +25,6 @@ import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {DeviceCard} from './DeviceCard';
@@ -50,11 +49,11 @@ const SelfFingerprint: React.FC<SelfFingerprintProps> = ({
     cryptographyRepository.getLocalFingerprint().then(setLocalFingerprint);
   }, [cryptographyRepository]);
 
-  const {currentClient} = useKoSubscribableChildren(clientState, ['currentClient']);
+  const currentClient = clientState.currentClient;
 
   return (
     <div className={cx('participant-devices__header', {'participant-devices__header--padding': !noPadding})}>
-      <DeviceCard device={currentClient} />
+      {currentClient && <DeviceCard device={currentClient} />}
       <div className="participant-devices__fingerprint">
         <DeviceId deviceId={localFingerprint} />
       </div>

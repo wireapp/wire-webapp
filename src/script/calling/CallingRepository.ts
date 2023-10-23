@@ -143,6 +143,7 @@ export class CallingRepository {
   private wCall?: Wcall;
   private wUser: number = 0;
   private nextMuteState: MuteState = MuteState.SELF_MUTED;
+  private isConferenceCallingSupported = false;
   /**
    * Keeps track of the size of the avs log once the webapp is initiated. This allows detecting meaningless avs logs (logs that have a length equal to the length when the webapp was initiated)
    */
@@ -255,6 +256,7 @@ export class CallingRepository {
     wCall.setUserMediaHandler(this.getCallMediaStream);
     wCall.setAudioStreamHandler(this.updateCallAudioStreams);
     wCall.setVideoStreamHandler(this.updateParticipantVideoStream);
+    this.isConferenceCallingSupported = wCall.isConferenceCallingSupported();
     setInterval(() => wCall.poll(), 500);
     return wCall;
   }
@@ -332,7 +334,9 @@ export class CallingRepository {
     }
     const conversation = this.conversationState.findConversation(call.conversationId);
     if (!conversation) {
-      this.logger.warn(`Unable to find a conversation with id of ${call.conversationId}`);
+      this.logger.warn(
+        `Unable to find a conversation with id of ${call.conversationId.id}@${call.conversationId.domain}`,
+      );
       return false;
     }
     const allClients = await this.core.service!.conversation.fetchAllParticipantsClients(call.conversationId);
@@ -497,7 +501,7 @@ export class CallingRepository {
    * @see https://www.chromestatus.com/feature/6321945865879552
    */
   get supportsConferenceCalling(): boolean {
-    return Runtime.isSupportingConferenceCalling();
+    return this.isConferenceCallingSupported;
   }
 
   /**
@@ -625,7 +629,7 @@ export class CallingRepository {
     const conversation = this.conversationState.findConversation(conversationId);
 
     if (!conversation) {
-      this.logger.warn(`Unable to find a conversation with id of ${conversationId}`);
+      this.logger.warn(`Unable to find a conversation with id of ${conversationId.id}@${conversationId.domain}`);
       return;
     }
     switch (content.type) {
@@ -1238,7 +1242,9 @@ export class CallingRepository {
     if (reason === REASON.NOONE_JOINED || reason === REASON.EVERYONE_LEFT) {
       const conversationEntity = this.conversationState.findConversation(conversationId);
       if (!conversationEntity) {
-        this.logger.warn(`Unable to find a conversation with id of ${call.conversationId}`);
+        this.logger.warn(
+          `Unable to find a conversation with id of ${call.conversationId.id}@${call.conversationId.domain}`,
+        );
       } else {
         const callingEvent = EventBuilder.buildCallingTimeoutEvent(
           reason,
@@ -1771,8 +1777,9 @@ export class CallingRepository {
         htmlMessage: t('modalNoCameraMessage', Config.getConfig().BRAND_NAME, {
           '/faqLink': '</a>',
           br: '<br>',
-          faqLink:
-            '<a href="https://support.wire.com/hc/articles/202935412" data-uie-name="go-no-camera-faq" target="_blank" rel="noopener noreferrer">',
+          faqLink: `<a href="${
+            Config.getConfig().URL.SUPPORT.CAMERA_ACCESS_DENIED
+          }" data-uie-name="go-no-camera-faq" target="_blank" rel="noopener noreferrer">`,
         }),
         title: t('modalNoCameraTitle'),
       },

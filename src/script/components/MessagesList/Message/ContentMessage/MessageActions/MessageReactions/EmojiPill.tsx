@@ -94,9 +94,13 @@ const EmojiPill: FC<EmojiPillProps> = ({
             <p css={messageReactionButtonTooltipText}>
               {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */}
               <span onClick={onTooltipReactionCountClick} css={messageReactionButtonTooltipTextLink}>
-                {t('conversationLikesCaption', {number: emojiCount.toString()})}
+                {emojiCount > 1
+                  ? t('conversationLikesCaptionPlural', {number: emojiCount.toString()})
+                  : t('conversationLikesCaptionSingular', {number: emojiCount.toString()})}
               </span>{' '}
-              {t('conversationLikesCaptionReacted', {emojiName})}
+              {emojiCount > 1
+                ? t('conversationLikesCaptionReactedPlural', {emojiName})
+                : t('conversationLikesCaptionReactedSingular', {emojiName})}
             </p>
           </div>
         }
@@ -104,7 +108,11 @@ const EmojiPill: FC<EmojiPillProps> = ({
       >
         <button
           css={{...messageReactionButton, ...getReactionsButtonCSS(isActive, isRemovedFromConversation)}}
-          aria-label={t('messageReactionDetails', {emojiCount: emojiCount.toString(), emojiName})}
+          aria-label={
+            emojiCount > 1
+              ? t('accessibility.messageReactionDetailsPlural', {emojiCount: emojiCount.toString(), emojiName})
+              : t('accessibility.messageReactionDetailsSingular', {emojiCount: emojiCount.toString(), emojiName})
+          }
           title={emojiName}
           aria-pressed={isActive}
           type="button"

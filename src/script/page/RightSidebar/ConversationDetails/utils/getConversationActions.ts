@@ -47,7 +47,7 @@ const getConversationActions = (
   const isSingleUser = is1to1Action || conversationEntity.isRequest();
   const userEntity = conversationEntity.firstUserEntity();
 
-  const nextConversationEntity = conversationRepository.getNextConversation(conversationEntity);
+  const getNextConversation = () => conversationRepository.getNextConversation(conversationEntity);
   const userPermissions = UserPermission.generatePermissionHelpers(teamRole);
 
   const allMenuElements = [
@@ -72,7 +72,7 @@ const getConversationActions = (
     {
       condition: conversationEntity.isRequest(),
       item: {
-        click: async () => actionsViewModel.cancelConnectionRequest(userEntity, true, nextConversationEntity),
+        click: async () => actionsViewModel.cancelConnectionRequest(userEntity, true, getNextConversation()),
         icon: 'close-icon',
         identifier: 'do-cancel-request',
         label: t('conversationDetailsActionCancelRequest'),
@@ -90,7 +90,7 @@ const getConversationActions = (
     {
       condition: isSingleUser && (userEntity?.isConnected() || userEntity?.isRequest()),
       item: {
-        click: () => actionsViewModel.blockUser(userEntity, true, nextConversationEntity),
+        click: () => actionsViewModel.blockUser(userEntity, true, getNextConversation()),
         icon: 'block-icon',
         identifier: 'do-block',
         label: t('conversationDetailsActionBlock'),

@@ -108,7 +108,7 @@ export class MainViewModel {
     };
 
     this.actions = new ActionsViewModel(
-      repositories.client,
+      repositories.self,
       repositories.connection,
       repositories.conversation,
       repositories.integration,

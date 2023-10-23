@@ -85,6 +85,7 @@ interface RightSidebarProps {
   repositories: ViewModelRepositories;
   teamState: TeamState;
   userState: UserState;
+  selfUser: User;
   isFederated: boolean;
   lastViewedMessageDetailsEntity: Message | null;
 }
@@ -95,6 +96,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
   repositories,
   teamState,
   userState,
+  selfUser,
   isFederated,
   lastViewedMessageDetailsEntity,
 }) => {
@@ -206,7 +208,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
               searchRepository={searchRepository}
               teamRepository={teamRepository}
               teamState={teamState}
-              userState={userState}
+              selfUser={selfUser}
               isFederated={isFederated}
             />
           )}
@@ -223,7 +225,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
               conversationRoleRepository={conversationRoleRepository}
               teamRepository={teamRepository}
               teamState={teamState}
-              userState={userState}
+              selfUser={selfUser}
               isFederated={isFederated}
             />
           )}
@@ -273,12 +275,13 @@ const RightSidebar: FC<RightSidebarProps> = ({
               activeConversation={activeConversation}
               actionsViewModel={actionsViewModel}
               integrationRepository={integrationRepository}
+              enableRemove={conversationRoleRepository.canRemoveParticipants(activeConversation)}
               goToRoot={goToRoot}
               onBack={onBackClick}
               onClose={closePanel}
               serviceEntity={serviceEntity}
               userEntity={userServiceEntity}
-              userState={userState}
+              selfUser={selfUser}
               isAddMode={isAddMode}
             />
           )}
@@ -295,12 +298,14 @@ const RightSidebar: FC<RightSidebarProps> = ({
               teamRepository={teamRepository}
               teamState={teamState}
               userState={userState}
+              selfUser={selfUser}
             />
           )}
 
           {currentState === PanelState.MESSAGE_DETAILS && messageEntity && (
             <MessageDetails
               activeConversation={activeConversation}
+              selfUser={selfUser}
               conversationRepository={conversationRepository}
               messageEntity={messageEntity}
               updateEntity={rightSidebar.updateEntity}

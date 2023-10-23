@@ -36,7 +36,8 @@ import {showUserModal, UserModal} from 'Components/Modals/UserModal';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {AppLock} from './AppLock';
-import {FeatureConfigChangeNotifier} from './components/FeatureConfigChangeNotifier';
+import {FeatureConfigChangeHandler} from './components/FeatureConfigChange/FeatureConfigChangeHandler/FeatureConfigChangeHandler';
+import {FeatureConfigChangeNotifier} from './components/FeatureConfigChange/FeatureConfigChangeNotifier';
 import {WindowTitleUpdater} from './components/WindowTitleUpdater';
 import {LeftSidebar} from './LeftSidebar';
 import {MainContent} from './MainContent';
@@ -84,19 +85,18 @@ const AppMain: FC<AppMainProps> = ({
     throw new Error('API Context has not been set');
   }
 
-  const {contentState} = useAppState();
+  const contentState = useAppState(state => state.contentState);
 
   const {repository: repositories} = app;
 
-  const {accent_id, availability: userAvailability} = useKoSubscribableChildren(selfUser, [
-    'accent_id',
-    'availability',
-  ]);
+  const {
+    accent_id,
+    availability: userAvailability,
+    isActivatedAccount,
+  } = useKoSubscribableChildren(selfUser, ['accent_id', 'availability', 'isActivatedAccount']);
 
   const teamState = container.resolve(TeamState);
   const userState = container.resolve(UserState);
-
-  const {isActivatedAccount} = useKoSubscribableChildren(userState, ['isActivatedAccount']);
 
   const {
     history,
@@ -237,6 +237,7 @@ const AppMain: FC<AppMainProps> = ({
                 actionsViewModel={mainView.actions}
                 isFederated={mainView.isFederated}
                 teamState={teamState}
+                selfUser={selfUser}
                 userState={userState}
               />
             )}
@@ -245,6 +246,7 @@ const AppMain: FC<AppMainProps> = ({
           <AppLock clientRepository={repositories.client} />
           <WarningsContainer onRefresh={app.refresh} />
           <FeatureConfigChangeNotifier selfUserId={selfUser.id} teamState={teamState} />
+          <FeatureConfigChangeHandler teamState={teamState} />
 
           <CallingContainer
             multitasking={mainView.multitasking}
@@ -263,7 +265,7 @@ const AppMain: FC<AppMainProps> = ({
           />
 
           {/*The order of these elements matter to show proper modals stack upon each other*/}
-          <UserModal userRepository={repositories.user} />
+          <UserModal selfUser={selfUser} userRepository={repositories.user} />
           <PrimaryModalComponent />
           <GroupCreationModal userState={userState} teamState={teamState} />
         </ErrorBoundary>

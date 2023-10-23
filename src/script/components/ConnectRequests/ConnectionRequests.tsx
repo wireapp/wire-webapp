@@ -17,15 +17,16 @@
  *
  */
 
-import {FC, useContext, useEffect, useRef} from 'react';
+import {useContext, useEffect, useRef} from 'react';
 
 import {container} from 'tsyringe';
 
 import {Button, ButtonVariant, IconButton, IconButtonVariant, useMatchMedia} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
-import {ClassifiedBar} from 'Components/input/ClassifiedBar';
+import {UserClassifiedBar} from 'Components/input/ClassifiedBar';
 import {UnverifiedUserWarning} from 'Components/Modals/UserModal';
+import {UserName} from 'Components/UserName';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -40,10 +41,10 @@ interface ConnectRequestsProps {
   readonly teamState: TeamState;
 }
 
-export const ConnectRequests: FC<ConnectRequestsProps> = ({
+export const ConnectRequests = ({
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
-}) => {
+}: ConnectRequestsProps) => {
   const connectRequestsRefEnd = useRef<HTMLDivElement | null>(null);
   const temporaryConnectRequestsCount = useRef<number>(0);
 
@@ -121,12 +122,14 @@ export const ConnectRequests: FC<ConnectRequestsProps> = ({
               data-uie-uid={connectRequest.id}
               data-uie-name="connect-request"
             >
-              <div className="connect-request-name ellipsis">{connectRequest.name()}</div>
+              <div className="connect-request-name ellipsis">
+                <UserName user={connectRequest} />
+              </div>
 
               <div className="connect-request-username label-username">{connectRequest.handle}</div>
 
               {classifiedDomains && (
-                <ClassifiedBar users={[userState.self(), connectRequest]} classifiedDomains={classifiedDomains} />
+                <UserClassifiedBar users={[connectRequest]} classifiedDomains={classifiedDomains} />
               )}
 
               <Avatar

@@ -22,12 +22,13 @@ import React, {useEffect, useState} from 'react';
 import {AudioPreference, NotificationPreference, WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {amplify} from 'amplify';
-import {container} from 'tsyringe';
 
 import {Checkbox, CheckboxLabel, IndicatorRangeInput} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {Theme} from 'Components/AppContainer/hooks/useTheme';
 import {RadioGroup} from 'Components/Radio';
+import {User} from 'src/script/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -37,26 +38,21 @@ import {PreferencesSection} from './components/PreferencesSection';
 import {RootFontSize, useRootFontSize} from '../../../../hooks/useRootFontSize';
 import {PropertiesRepository} from '../../../../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../../../../properties/PropertiesType';
-import {UserState} from '../../../../user/UserState';
-import {THEMES as ThemeViewModelThemes} from '../../../../view_model/ThemeViewModel';
 interface OptionPreferencesProps {
   propertiesRepository: PropertiesRepository;
-  userState?: UserState;
+  selfUser: User;
 }
 
 const fontSizes = Object.values(RootFontSize);
 
-const OptionPreferences: React.FC<OptionPreferencesProps> = ({
-  propertiesRepository,
-  userState = container.resolve(UserState),
-}) => {
-  const {isActivatedAccount} = useKoSubscribableChildren(userState, ['self', 'isActivatedAccount']);
+const OptionPreferences = ({propertiesRepository, selfUser}: OptionPreferencesProps) => {
+  const {isActivatedAccount} = useKoSubscribableChildren(selfUser, ['isActivatedAccount']);
   const {
     properties: {settings},
   } = propertiesRepository;
   const [optionAudio, setOptionAudio] = useState<AudioPreference>(settings.sound.alerts);
   const [optionReplaceInlineEmoji, setOptionReplaceInlineEmoji] = useState<boolean>(settings.emoji.replace_inline);
-  const [optionDarkMode, setOptionDarkMode] = useState<boolean>(settings.interface.theme === ThemeViewModelThemes.DARK);
+  const [optionDarkMode, setOptionDarkMode] = useState<boolean>(settings.interface.theme === 'dark');
   const [optionSendPreviews, setOptionSendPreviews] = useState<boolean>(settings.previews.send);
   const [optionNotifications, setOptionNotifications] = useState<NotificationPreference>(settings.notifications);
   const [currentRootFontSize, setCurrentRootFontSize] = useRootFontSize();
@@ -66,7 +62,7 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
     const updateProperties = ({settings}: WebappProperties): void => {
       setOptionAudio(settings.sound.alerts);
       setOptionReplaceInlineEmoji(settings.emoji.replace_inline);
-      setOptionDarkMode(settings.interface.theme === ThemeViewModelThemes.DARK);
+      setOptionDarkMode(settings.interface.theme === 'dark');
       setOptionSendPreviews(settings.previews.send);
       setOptionNotifications(settings.notifications);
     };
@@ -103,7 +99,7 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
   };
 
   const saveOptionNewTheme = (useDarkMode: boolean) => {
-    const newTheme = useDarkMode ? ThemeViewModelThemes.DARK : ThemeViewModelThemes.DEFAULT;
+    const newTheme: Theme = useDarkMode ? 'dark' : 'default';
     propertiesRepository.savePreference(PROPERTIES_TYPE.INTERFACE.THEME, newTheme);
     setOptionDarkMode(useDarkMode);
   };

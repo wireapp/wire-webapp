@@ -114,7 +114,7 @@ export class NotificationRepository {
   }
 
   static get EVENTS_TO_NOTIFY(): SuperType[] {
-    return [SuperType.CALL, SuperType.CONTENT, SuperType.MEMBER, SuperType.PING, SuperType.REACTION, SuperType.SYSTEM];
+    return [SuperType.CALL, SuperType.CONTENT, SuperType.MEMBER, SuperType.PING, SuperType.SYSTEM];
   }
 
   /**
@@ -495,7 +495,7 @@ export class NotificationRepository {
         return createBodyMessageTimerUpdate();
       }
       case SystemMessageType.CONVERSATION_DELETE: {
-        return (messageEntity as DeleteConversationMessage).caption();
+        return (messageEntity as DeleteConversationMessage).caption;
       }
     }
   }
@@ -612,19 +612,31 @@ export class NotificationRepository {
   }
 
   /**
+   Calculate the length of the opposite title section string and return the extra length
+  */
+  private calculatedTitleLength = (sectionString: string) => {
+    const maxSectionLength = NotificationRepository.CONFIG.TITLE_LENGTH;
+    const length = maxSectionLength - sectionString.length + maxSectionLength;
+
+    return length > maxSectionLength ? length : maxSectionLength;
+  };
+
+  /**
    * Creates the notification title.
    *
    * @param Notification message title
    */
   private createTitle(messageEntity: Message, conversationEntity?: Conversation): string {
     const conversationName = conversationEntity && conversationEntity.display_name();
+    const userEntity = messageEntity.user();
+
     const truncatedConversationName = truncate(
       conversationName ?? '',
-      NotificationRepository.CONFIG.TITLE_LENGTH,
+      this.calculatedTitleLength(userEntity.name()),
       false,
     );
-    const userEntity = messageEntity.user();
-    const truncatedName = truncate(userEntity.name(), NotificationRepository.CONFIG.TITLE_LENGTH, false);
+
+    const truncatedName = truncate(userEntity.name(), this.calculatedTitleLength(conversationName ?? ''), false);
 
     let title;
     if (conversationName) {

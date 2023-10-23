@@ -131,8 +131,8 @@ export class MediaConstraintsHandler {
     const mode = isGroup ? VIDEO_QUALITY_MODE.GROUP : VIDEO_QUALITY_MODE.MOBILE;
 
     return {
-      audio: requestAudio ? this.getAudioStreamConstraints(currentDeviceId.audioInput()) : undefined,
-      video: requestVideo ? this.getVideoStreamConstraints(currentDeviceId.videoInput(), mode) : undefined,
+      audio: requestAudio ? this.getAudioStreamConstraints(currentDeviceId.audioinput()) : undefined,
+      video: requestVideo ? this.getVideoStreamConstraints(currentDeviceId.videoinput(), mode) : undefined,
     };
   }
 
@@ -146,7 +146,7 @@ export class MediaConstraintsHandler {
           video: MediaConstraintsHandler.CONFIG.CONSTRAINTS.SCREEN.DESKTOP_CAPTURER,
         };
 
-        const chromeMediaSourceId = this.currentDeviceId.screenInput();
+        const chromeMediaSourceId = this.currentDeviceId.screeninput();
         streamConstraints.video.mandatory = {...streamConstraints.video.mandatory, chromeMediaSourceId};
 
         return streamConstraints;

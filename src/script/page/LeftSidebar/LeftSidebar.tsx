@@ -51,19 +51,15 @@ const Animated: React.FC<{children: React.ReactNode}> = ({children, ...rest}) =>
 const LeftSidebar: React.FC<LeftSidebarProps> = ({listViewModel, selfUser, isActivatedAccount}) => {
   const {conversationRepository, propertiesRepository} = listViewModel;
   const repositories = listViewModel.contentViewModel.repositories;
-  const {listState} = useAppState();
+  const listState = useAppState(state => state.listState);
 
   const switchList = (list: ListState) => listViewModel.switchList(list);
 
   const goHome = () =>
-    selfUser.isTemporaryGuest()
-      ? listViewModel.switchList(ListState.TEMPORARY_GUEST)
-      : listViewModel.switchList(ListState.CONVERSATIONS);
+    selfUser.isTemporaryGuest() ? switchList(ListState.TEMPORARY_GUEST) : switchList(ListState.CONVERSATIONS);
 
   useEffect(() => {
-    amplify.subscribe(WebAppEvents.SHORTCUT.START, () => {
-      listViewModel.switchList(ListState.START_UI);
-    });
+    amplify.subscribe(WebAppEvents.SHORTCUT.START, () => switchList(ListState.START_UI));
   }, []);
 
   return (
@@ -118,6 +114,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({listViewModel, selfUser, isAct
                 mainViewModel={listViewModel.mainViewModel}
                 userRepository={repositories.user}
                 isFederated={listViewModel.isFederated}
+                selfUser={selfUser}
               />
             )}
           </>

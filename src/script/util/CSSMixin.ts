@@ -19,13 +19,6 @@
 
 import {CSSObject} from '@emotion/serialize';
 
-export const CSS_ABSOLUTE_CENTER: CSSObject = {
-  left: '50%',
-  position: 'absolute',
-  top: '50%',
-  transform: 'translate(-50%, -50%)',
-};
-
 export const CSS_SQUARE: (size: number | string) => CSSObject = size => ({
   height: size,
   width: size,
