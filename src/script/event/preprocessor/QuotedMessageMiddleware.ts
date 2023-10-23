@@ -64,9 +64,9 @@ export class QuotedMessageMiddleware implements EventMiddleware {
     const originalMessageId = event.data.message_id;
     const {replies} = await this.findRepliesToMessage(event.conversation, originalMessageId);
     this.logger.info(`Invalidating '${replies.length}' replies to deleted message '${originalMessageId}'`);
-    replies.forEach(reply => {
+    replies.forEach(async reply => {
       reply.data.quote = {error: {type: QuoteEntity.ERROR.MESSAGE_NOT_FOUND}};
-      this.eventService.replaceEvent(reply);
+      await this.eventService.replaceEvent(reply);
     });
     return event;
   }
@@ -78,13 +78,13 @@ export class QuotedMessageMiddleware implements EventMiddleware {
     }
 
     this.logger.info(`Updating '${replies.length}' replies to updated message '${originalMessageId}'`);
-    replies.forEach(reply => {
+    replies.forEach(async reply => {
       const quote = reply.data.quote;
       if (quote && typeof quote !== 'string' && 'message_id' in quote && 'id' in event) {
         quote.message_id = event.id as string;
       }
       // we want to update the messages quoting the original message later, thus the timeout
-      setTimeout(() => this.eventService.replaceEvent(reply));
+      await this.eventService.replaceEvent(reply);
     });
     const decoratedData = {...event.data, quote: originalEvent.data.quote};
     return {...event, data: decoratedData};

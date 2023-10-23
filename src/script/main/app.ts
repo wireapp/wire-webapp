@@ -387,9 +387,9 @@ export class App {
 
       eventRepository.setEventProcessMiddlewares([
         serviceMiddleware,
-        quotedMessageMiddleware,
         readReceiptMiddleware,
         eventStorageMiddleware,
+        quotedMessageMiddleware,
       ]);
       // Setup all the event processors
       const federationEventProcessor = new FederationEventProcessor(eventRepository, serverTimeHandler, selfUser);
