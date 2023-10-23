@@ -1131,7 +1131,8 @@ export class ConversationRepository {
     const localMLSConversation = this.conversationState.findMLS1to1Conversation(otherUserId);
 
     if (protocol === ConversationProtocol.MLS || localMLSConversation) {
-      return this.initMLS1to1Conversation(otherUserId, isMLSSupportedByTheOtherUser, isLiveUpdate);
+      const shouldDelayMLSGroupEstablishment = isLiveUpdate && isMLSSupportedByTheOtherUser;
+      return this.initMLS1to1Conversation(otherUserId, isMLSSupportedByTheOtherUser, shouldDelayMLSGroupEstablishment);
     }
 
     const proteusConversation = await this.getOrCreateProteus1To1Conversation(userEntity);
@@ -1745,19 +1746,25 @@ export class ConversationRepository {
       return localProteusConversation || this.fetchConversationById(proteusConversationId);
     }
 
-    const isWebSocketEvent = source === EventSource.WEBSOCKET;
     const isConnectionAccepted = connectionEntity.isConnected();
 
     // Check what protocol should be used for 1:1 conversation
     const {protocol, isMLSSupportedByTheOtherUser, isProteusSupportedByTheOtherUser} =
       await this.getProtocolFor1to1Conversation(otherUserId);
 
+    const isWebSocketEvent = source === EventSource.WEBSOCKET;
+    const shouldDelayMLSGroupEstablishment = isWebSocketEvent && isMLSSupportedByTheOtherUser;
+
     const localMLSConversation = this.conversationState.findMLS1to1Conversation(otherUserId);
 
     // If it's accepted, initialise conversation so it's ready to be used
     if (isConnectionAccepted) {
       if (protocol === ConversationProtocol.MLS || localMLSConversation) {
-        return this.initMLS1to1Conversation(otherUserId, isMLSSupportedByTheOtherUser, isWebSocketEvent);
+        return this.initMLS1to1Conversation(
+          otherUserId,
+          isMLSSupportedByTheOtherUser,
+          shouldDelayMLSGroupEstablishment,
+        );
       }
 
       if (protocol === ConversationProtocol.PROTEUS) {
@@ -1770,7 +1777,7 @@ export class ConversationRepository {
     // we do not support switching back to proteus after mls conversation was established,
     // only proteus -> mls migration is supported, never the other way around.
     if (localMLSConversation) {
-      return this.initMLS1to1Conversation(otherUserId, isMLSSupportedByTheOtherUser, isWebSocketEvent);
+      return this.initMLS1to1Conversation(otherUserId, isMLSSupportedByTheOtherUser, shouldDelayMLSGroupEstablishment);
     }
 
     return protocol === ConversationProtocol.PROTEUS ? localProteusConversation : undefined;
