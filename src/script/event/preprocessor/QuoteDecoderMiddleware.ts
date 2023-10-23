@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2023 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 
 import {Quote} from '@wireapp/protocol-messaging';
 
-import {DeleteEvent, MessageAddEvent} from 'src/script/conversation/EventBuilder';
+import {MessageAddEvent} from 'src/script/conversation/EventBuilder';
 import {getLogger, Logger} from 'Util/Logger';
 import {base64ToArray} from 'Util/util';
 
@@ -49,42 +49,18 @@ export class QuotedMessageMiddleware implements EventMiddleware {
         const originalMessageId = event.data.replacing_message_id;
         return originalMessageId ? this.handleEditEvent(event, originalMessageId) : this.handleAddEvent(event);
       }
-
-      case ClientEvent.CONVERSATION.MESSAGE_DELETE: {
-        return this.handleDeleteEvent(event);
-      }
-
-      default: {
-        return event;
-      }
     }
-  }
-
-  private async handleDeleteEvent(event: DeleteEvent): Promise<DeleteEvent> {
-    const originalMessageId = event.data.message_id;
-    const {replies} = await this.findRepliesToMessage(event.conversation, originalMessageId);
-    this.logger.info(`Invalidating '${replies.length}' replies to deleted message '${originalMessageId}'`);
-    replies.forEach(async reply => {
-      reply.data.quote = {error: {type: QuoteEntity.ERROR.MESSAGE_NOT_FOUND}};
-      await this.eventService.replaceEvent(reply);
-    });
     return event;
   }
 
   private async handleEditEvent(event: MessageAddEvent, originalMessageId: string): Promise<MessageAddEvent> {
-    const {originalEvent, replies} = await this.findRepliesToMessage(event.conversation, originalMessageId);
+    const originalEvent = (await this.eventService.loadEvent(event.conversation, originalMessageId)) as StoredEvent<
+      MessageAddEvent | undefined
+    >;
     if (!originalEvent) {
       return event;
     }
 
-    this.logger.info(`Updating '${replies.length}' replies to updated message '${originalMessageId}'`);
-    replies.forEach(async reply => {
-      const quote = reply.data.quote;
-      if (quote && typeof quote !== 'string' && 'message_id' in quote && 'id' in event) {
-        quote.message_id = event.id as string;
-      }
-      await this.eventService.replaceEvent(reply);
-    });
     const decoratedData = {...event.data, quote: originalEvent.data.quote};
     return {...event, data: decoratedData};
   }
@@ -123,25 +99,5 @@ export class QuotedMessageMiddleware implements EventMiddleware {
 
     const decoratedData = {...event.data, quote: quoteData};
     return {...event, data: decoratedData};
-  }
-
-  private async findRepliesToMessage(
-    conversationId: string,
-    messageId: string,
-  ): Promise<{originalEvent?: MessageAddEvent; replies: StoredEvent<MessageAddEvent>[]}> {
-    const originalEvent = await this.eventService.loadEvent(conversationId, messageId);
-
-    if (!originalEvent || originalEvent.type !== ClientEvent.CONVERSATION.MESSAGE_ADD) {
-      return {
-        replies: [],
-      };
-    }
-
-    const replies = await this.eventService.loadEventsReplyingToMessage(conversationId, messageId, originalEvent.time);
-
-    return {
-      originalEvent,
-      replies,
-    };
   }
 }

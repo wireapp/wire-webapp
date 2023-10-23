@@ -71,8 +71,9 @@ import {EventService} from '../event/EventService';
 import {EventServiceNoCompound} from '../event/EventServiceNoCompound';
 import {NotificationService} from '../event/NotificationService';
 import {EventStorageMiddleware} from '../event/preprocessor/EventStorageMiddleware';
-import {QuotedMessageMiddleware} from '../event/preprocessor/QuotedMessageMiddleware';
+import {QuotedMessageMiddleware} from '../event/preprocessor/QuoteDecoderMiddleware';
 import {ReceiptsMiddleware} from '../event/preprocessor/ReceiptsMiddleware';
+import {RepliesUpdaterMiddleware} from '../event/preprocessor/RepliesUpdaterMiddleware';
 import {ServiceMiddleware} from '../event/preprocessor/ServiceMiddleware';
 import {FederationEventProcessor} from '../event/processor/FederationEventProcessor';
 import {GiphyRepository} from '../extension/GiphyRepository';
@@ -384,12 +385,14 @@ export class App {
       const serviceMiddleware = new ServiceMiddleware(conversationRepository, userRepository, selfUser);
       const quotedMessageMiddleware = new QuotedMessageMiddleware(this.service.event);
       const readReceiptMiddleware = new ReceiptsMiddleware(this.service.event, conversationRepository, selfUser);
+      const repliesUpdaterMiddleware = new RepliesUpdaterMiddleware(this.service.event);
 
       eventRepository.setEventProcessMiddlewares([
         serviceMiddleware,
         readReceiptMiddleware,
-        eventStorageMiddleware,
         quotedMessageMiddleware,
+        eventStorageMiddleware,
+        repliesUpdaterMiddleware,
       ]);
       // Setup all the event processors
       const federationEventProcessor = new FederationEventProcessor(eventRepository, serverTimeHandler, selfUser);
