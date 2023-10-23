@@ -109,7 +109,6 @@ import {
   MemberLeaveEvent,
   MessageHiddenEvent,
   OneToOneCreationEvent,
-  ReactionEvent,
   TeamMemberLeaveEvent,
 } from '../conversation/EventBuilder';
 import {Conversation} from '../entity/Conversation';
@@ -129,7 +128,6 @@ import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {isMemberMessage} from '../guards/Message';
 import * as LegalHoldEvaluator from '../legal-hold/LegalHoldEvaluator';
 import {MessageCategory} from '../message/MessageCategory';
-import {SuperType} from '../message/SuperType';
 import {SystemMessageType} from '../message/SystemMessageType';
 import {addOtherSelfClientsToMLSConversation} from '../mls';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
@@ -3109,33 +3107,6 @@ export class ConversationRepository {
       await this.updateParticipatingUserEntities(conversationEntity);
       await this.getUnreadEvents(conversationEntity);
     }
-  }
-
-  /**
-   * Forward the reaction event to the Notification repository for browser and audio notifications.
-   *
-   * @param conversationEntity Conversation that event was received in
-   * @param messageEntity Message that has been reacted upon
-   * @param eventJson JSON data of received reaction event
-   * @returns Resolves when the notification was prepared
-   */
-  private async prepareReactionNotification(
-    conversationEntity: Conversation,
-    messageEntity: ContentMessage,
-    eventJson: ReactionEvent,
-  ) {
-    const {data: event_data, from} = eventJson;
-
-    const messageFromSelf = messageEntity.from === this.userState.self().id;
-    if (messageFromSelf && event_data.reaction) {
-      const userEntity = await this.userRepository.getUserById({domain: messageEntity.fromDomain, id: from});
-      const reactionMessageEntity = new Message(messageEntity.id, SuperType.REACTION);
-      reactionMessageEntity.user(userEntity);
-      reactionMessageEntity.reaction = event_data.reaction;
-      return {conversationEntity, messageEntity: reactionMessageEntity};
-    }
-
-    return {conversationEntity};
   }
 
   private updateMessagesUserEntities(messageEntities: Message[], options: {localOnly?: boolean} = {}) {
