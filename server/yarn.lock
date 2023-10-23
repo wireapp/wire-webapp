@@ -938,21 +938,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/express-sitemap-xml@npm:3.0.2":
-  version: 3.0.2
-  resolution: "@types/express-sitemap-xml@npm:3.0.2"
+"@types/express-sitemap-xml@npm:3.0.3":
+  version: 3.0.3
+  resolution: "@types/express-sitemap-xml@npm:3.0.3"
   dependencies:
     "@types/express": "*"
-  checksum: 92118dae76ca4030672be1a85cc5abfc015a54db2b8e8f02e4d3e3ef1ffe47fe9cdaac673fda2d6f21955c2d0da93aa09c019ea1aa3f3ac49df08405ec99d7b2
+  checksum: d6d20da77364589fe7d43160227becb89c8920ce411bf06505f9c97473a022e39d504ff67ab896eb8fe449d5f703129938e61593fe1accb554edf4667114b454
   languageName: node
   linkType: hard
 
-"@types/express-useragent@npm:1.0.3":
-  version: 1.0.3
-  resolution: "@types/express-useragent@npm:1.0.3"
+"@types/express-useragent@npm:1.0.4":
+  version: 1.0.4
+  resolution: "@types/express-useragent@npm:1.0.4"
   dependencies:
     "@types/express": "*"
-  checksum: 9c980165ed6d3e208ab5653e3a39c679c174c81cf5ceecca233182848796d7f0234c938ac28163e1f1e645302a7a4050cdd3e5a8acc94dd869e78fd3c0572e8a
+  checksum: 20019a130237d3a1063b9265bd997d45722e282ca63c8c362fe55f53a77f9670698be8db1335300574cc9a78c80b4e9212aaec2aebdb0981a8c338b2dbcb0b7c
   languageName: node
   linkType: hard
 
@@ -968,13 +968,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/fs-extra@npm:11.0.2":
-  version: 11.0.2
-  resolution: "@types/fs-extra@npm:11.0.2"
+"@types/fs-extra@npm:11.0.3":
+  version: 11.0.3
+  resolution: "@types/fs-extra@npm:11.0.3"
   dependencies:
     "@types/jsonfile": "*"
     "@types/node": "*"
-  checksum: 5b3e30343ee62d2e393e1029355f13f64bab6f3416226e22492483f99da840e2e53ca22cbfa4ac3749f2f83f7086d19c009005c8fa175da01df0fae59c2d73e1
+  checksum: f196bc216906e7016a6c9c549dbe204fe7e1e87515c7e961f741309e25f8e2f8c268dba3dbf0ca7f3ddab5911d39888472f8624ac0c11a461f1b2d05377e38fa
   languageName: node
   linkType: hard
 
@@ -994,12 +994,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/hbs@npm:4.0.2":
-  version: 4.0.2
-  resolution: "@types/hbs@npm:4.0.2"
+"@types/hbs@npm:4.0.3":
+  version: 4.0.3
+  resolution: "@types/hbs@npm:4.0.3"
   dependencies:
     handlebars: ^4.1.0
-  checksum: 58f24eeab51b13d02e6457cce0069d26d7827b69b21370a62b7acb133eea06456798ca08af7bcd32494bce4777175d7bac2295cfd9d8b004b00cbaa7a50520f1
+  checksum: a3e6e70894154d289da2d7af0b893ab677882a52b4322433d14c8af914eb845b75f16bae820c080e4143a68702e123a13877453f11fc08a63f079bce67ecdc1c
   languageName: node
   linkType: hard
 
@@ -1035,13 +1035,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/jest@npm:^29.5.5":
-  version: 29.5.5
-  resolution: "@types/jest@npm:29.5.5"
+"@types/jest@npm:^29.5.6":
+  version: 29.5.6
+  resolution: "@types/jest@npm:29.5.6"
   dependencies:
     expect: ^29.0.0
     pretty-format: ^29.0.0
-  checksum: 56e55cde9949bcc0ee2fa34ce5b7c32c2bfb20e53424aa4ff3a210859eeaaa3fdf6f42f81a3f655238039cdaaaf108b054b7a8602f394e6c52b903659338d8c6
+  checksum: fa13a27bd1c8efd0381a419478769d0d6d3a8e93e1952d7ac3a16274e8440af6f73ed6f96ac1ff00761198badf2ee226b5ab5583a5d87a78d609ea78da5c5a24
   languageName: node
   linkType: hard
 
@@ -5545,12 +5545,12 @@ __metadata:
   resolution: "wire-web-server@workspace:."
   dependencies:
     "@types/express": 4.17.19
-    "@types/express-sitemap-xml": 3.0.2
-    "@types/express-useragent": 1.0.3
-    "@types/fs-extra": 11.0.2
+    "@types/express-sitemap-xml": 3.0.3
+    "@types/express-useragent": 1.0.4
+    "@types/fs-extra": 11.0.3
     "@types/geolite2": 2.0.0
-    "@types/hbs": 4.0.2
-    "@types/jest": ^29.5.5
+    "@types/hbs": 4.0.3
+    "@types/jest": ^29.5.6
     "@types/node": 18.11.18
     "@wireapp/commons": 5.2.1
     dotenv: 16.3.1

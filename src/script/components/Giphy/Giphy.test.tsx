@@ -27,7 +27,7 @@ import {Giphy, GiphyState} from '.';
 
 const inputValue = 'Yammy yammy';
 const getDefaultProps = () => ({
-  giphyRepository: {getGifs: jest.fn().mockResolvedValue([])} as unknown as GiphyRepository,
+  giphyRepository: {getGifs: jest.fn().mockResolvedValue([]), resetOffset: jest.fn()} as unknown as GiphyRepository,
   inputValue,
   onClose: jest.fn(),
 });

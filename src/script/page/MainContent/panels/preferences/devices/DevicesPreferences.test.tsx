@@ -40,7 +40,7 @@ function createDevice(): ClientEntity {
 describe('DevicesPreferences', () => {
   const clientState = new ClientState();
   clientState.clients = ko.pureComputed(() => [createDevice(), createDevice()]);
-  clientState.currentClient(createDevice());
+  clientState.currentClient = createDevice();
   const defaultParams = {
     clientState: clientState,
     conversationState: new ConversationState(),
