@@ -124,7 +124,6 @@ const DetailViewModalFooter: FC<DetailViewModalFooterProps> = ({
             handleCurrentMsgAction={setCurrentMsgAction}
             resetActionMenuStates={resetActionMenuStates}
             wrapperRef={wrapperRef}
-            message={messageEntity}
             handleReactionClick={handleReactionClick}
             toggleActiveMenu={toggleActiveMenu}
             handleKeyDown={handleKeyDown}
