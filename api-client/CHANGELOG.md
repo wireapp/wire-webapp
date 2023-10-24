@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [26.5.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@26.4.0...@wireapp/api-client@26.5.0) (2023-10-24)
+
+### Features
+
+* check if removal key is available on backend ([#5662](https://github.com/wireapp/wire-web-packages/issues/5662)) ([441762d](https://github.com/wireapp/wire-web-packages/commit/441762d83a620c253650e8425bfe60b03a848265))
+
 # [26.4.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@26.3.3...@wireapp/api-client@26.4.0) (2023-10-17)
 
 ### Features
