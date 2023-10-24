@@ -125,7 +125,7 @@ export class Account extends TypedEventEmitter<Events> {
   private readonly createStore: CreateStoreFn;
   private readonly nbPrekeys: number;
   private readonly cryptoProtocolConfig?: CryptoProtocolConfig;
-  private readonly isMlsEnabled: () => boolean;
+  private readonly isMlsEnabled: () => Promise<boolean>;
   private storeEngine?: CRUDEngine;
   private db?: CoreDatabase;
 
@@ -162,7 +162,7 @@ export class Account extends TypedEventEmitter<Events> {
     this.backendFeatures = this.apiClient.backendFeatures;
     this.cryptoProtocolConfig = cryptoProtocolConfig;
     this.nbPrekeys = nbPrekeys;
-    this.isMlsEnabled = () => this.backendFeatures.supportsMLS && !!this.cryptoProtocolConfig?.mls;
+    this.isMlsEnabled = async () => !!this.cryptoProtocolConfig?.mls && (await this.apiClient.supportsMLS());
     this.createStore = createStore;
     this.recurringTaskScheduler = new RecurringTaskScheduler({
       get: async key => {
@@ -225,7 +225,7 @@ export class Account extends TypedEventEmitter<Events> {
     const context = this.apiClient.context;
     const domain = context?.domain ?? '';
 
-    if (!this.isMlsEnabled() || !this.service?.mls || !this.service?.e2eIdentity) {
+    if (!this.service?.mls || !this.service?.e2eIdentity) {
       this.logger.info('MLS not initialized, unable to enroll E2EI');
       return false;
     }
@@ -370,7 +370,7 @@ export class Account extends TypedEventEmitter<Events> {
      * 3. The user has already used CoreCrypto in the past (cannot rollback to using cryptobox)
      */
     const clientType =
-      this.isMlsEnabled() ||
+      (await this.isMlsEnabled()) ||
       !!this.cryptoProtocolConfig?.useCoreCrypto ||
       cryptoMigrationStore.coreCrypto.isReady(storeEngine.storeName)
         ? CryptoClientType.CORE_CRYPTO
@@ -412,7 +412,7 @@ export class Account extends TypedEventEmitter<Events> {
     let mlsService: MLSService | undefined;
     let e2eIdentityService: E2EIServiceExternal | undefined;
 
-    if (clientType === CryptoClientType.CORE_CRYPTO && this.isMlsEnabled()) {
+    if (clientType === CryptoClientType.CORE_CRYPTO && (await this.isMlsEnabled())) {
       e2eIdentityService = await E2EIServiceExternal.getInstance(cryptoClient.getNativeClient());
       mlsService = new MLSService(
         this.apiClient,
@@ -582,7 +582,7 @@ export class Account extends TypedEventEmitter<Events> {
     });
 
     const handleMissedNotifications = async (notificationId: string) => {
-      if (this.cryptoProtocolConfig?.mls && this.backendFeatures.supportsMLS) {
+      if (this.service?.mls) {
         await this.service?.conversation.handleConversationsEpochMismatch();
       }
       return onMissedNotifications(notificationId);
