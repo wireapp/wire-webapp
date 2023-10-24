@@ -179,7 +179,6 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
               handleKeyDown={handleKeyDown}
               resetActionMenuStates={resetActionMenuStates}
               wrapperRef={wrapperRef}
-              message={message}
               handleReactionClick={handleReactionClick}
             />
             {message.isReplyable() && (
