@@ -260,7 +260,7 @@ export const PrimaryModalComponent: FC = () => {
                     helperText={t('modalGuestLinkJoinHelperText', {
                       minPasswordLength: Config.getConfig().MINIMUM_PASSWORD_LENGTH.toString(),
                     })}
-                    id="modal_pswd_confiramtion"
+                    id="modal_pswd_confirmation"
                     className="modal__input"
                     type="password"
                     autoComplete="off"
@@ -275,7 +275,7 @@ export const PrimaryModalComponent: FC = () => {
                     label={t('modalGuestLinkJoinConfirmLabel')}
                     className="modal__input"
                     type="password"
-                    id="modal_pswd_confiramtion"
+                    id="modal_pswd_confirmation"
                     autoComplete="off"
                     value={passwordConfirmationValue}
                     onChange={event => setPasswordConfirmationValue(event.currentTarget.value)}

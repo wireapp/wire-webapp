@@ -110,10 +110,7 @@ const LoginComponent = ({
   const [conversationCode, setConversationCode] = useState<string | null>(null);
   const [conversationKey, setConversationKey] = useState<string | null>(null);
   const [conversationSubmitData, setConversationSubmitData] = useState<Partial<LoginData> | null>(null);
-  const [isLinkPasswordModalOpen, setIsLinkPasswordModalOpen] = useState<boolean>(
-    !!conversationInfo?.has_password ||
-      (!!conversationError && conversationError.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD),
-  );
+  const [isLinkPasswordModalOpen, setIsLinkPasswordModalOpen] = useState<boolean>(false);
   const [isValidLink, setIsValidLink] = useState(true);
   const [validationErrors, setValidationErrors] = useState<Error[]>([]);
 
@@ -143,13 +140,6 @@ const LoginComponent = ({
         });
       }
     : undefined;
-
-  useEffect(() => {
-    setIsLinkPasswordModalOpen(
-      !!conversationInfo?.has_password ||
-        (!!conversationError && conversationError.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD),
-    );
-  }, [conversationError, conversationInfo?.has_password]);
 
   useEffect(() => {
     const queryClientType = UrlUtil.getURLParameter(QUERY_KEY.CLIENT_TYPE);
@@ -227,6 +217,7 @@ const LoginComponent = ({
       (!!conversationInfo?.has_password ||
         (!!conversationError && conversationError.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD))
     ) {
+      setConversationSubmitData(formLoginData);
       setIsLinkPasswordModalOpen(true);
       return;
     }
@@ -344,6 +335,7 @@ const LoginComponent = ({
 
   const submitJoinCodeWithPassword = async (password: string) => {
     if (!conversationSubmitData) {
+      setIsLinkPasswordModalOpen(false);
       return;
     }
     await handleSubmit(conversationSubmitData, [], password);

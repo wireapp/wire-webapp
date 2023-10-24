@@ -69,6 +69,7 @@ const ConversationJoinComponent = ({
   isFetchingConversation,
   conversationInfo,
   conversationInfoFetching,
+  generalError,
 }: Props & ConnectedProps & DispatchProps) => {
   const nameInput = React.useRef<HTMLInputElement>(null);
   const {formatMessage: _} = useIntl();
@@ -77,9 +78,7 @@ const ConversationJoinComponent = ({
   const invalidConversationPassword =
     conversationError && conversationError.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD;
   const [accentColor] = useState(AccentColor.STRONG_BLUE);
-  const [isJoinGuestLinkPasswordModalOpen, setIsJoinGuestLinkPasswordModalOpen] = useState<boolean>(
-    !!conversationHasPassword || !!invalidConversationPassword,
-  );
+  const [isJoinGuestLinkPasswordModalOpen, setIsJoinGuestLinkPasswordModalOpen] = useState<boolean>(false);
   const [conversationCode, setConversationCode] = useState<string>();
   const [conversationKey, setConversationKey] = useState<string>();
   const [enteredName, setEnteredName] = useState<string>('');
@@ -97,8 +96,8 @@ const ConversationJoinComponent = ({
   const isWirePublicInstance = Config.getConfig().BRAND_NAME === 'Wire';
 
   useEffect(() => {
-    setIsJoinGuestLinkPasswordModalOpen(!!conversationHasPassword || !!invalidConversationPassword);
-  }, [conversationHasPassword, invalidConversationPassword]);
+    setIsJoinGuestLinkPasswordModalOpen(!!invalidConversationPassword);
+  }, [invalidConversationPassword]);
 
   useEffect(() => {
     const localConversationCode = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_CODE);
@@ -149,11 +148,11 @@ const ConversationJoinComponent = ({
   };
 
   const handleSubmit = async (entropyData?: Uint8Array, password?: string) => {
-    setIsSubmitingName(true);
     if (!isJoinGuestLinkPasswordModalOpen && !!conversationHasPassword) {
       setIsJoinGuestLinkPasswordModalOpen(true);
       return;
     }
+    setIsSubmitingName(true);
     try {
       if (!conversationCode || !conversationKey) {
         throw Error('Conversation code or key missing');
@@ -247,7 +246,7 @@ const ConversationJoinComponent = ({
       {isJoinGuestLinkPasswordModalOpen && (
         <JoinGuestLinkPasswordModal
           onClose={() => setIsJoinGuestLinkPasswordModalOpen(false)}
-          error={conversationError}
+          error={conversationError || generalError}
           isLoading={isFetching}
           conversationName={conversationInfo?.name}
           onSubmitPassword={submitJoinCodeWithPassword}
@@ -312,6 +311,7 @@ const mapStateToProps = (state: RootState) => ({
   conversationError: ConversationSelector.getError(state),
   conversationInfo: ConversationSelector.conversationInfo(state),
   conversationInfoFetching: ConversationSelector.conversationInfoFetching(state),
+  generalError: AuthSelector.getError(state),
 });
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;

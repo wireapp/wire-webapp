@@ -675,7 +675,7 @@
   "guestRoomToggleInfoDisabled": "You can't disable the guest option in this conversation, as it has been created by someone from another team.",
   "guestRoomToggleInfoExtended": "Open this conversation to people outside your team. You can always change it later.",
   "guestRoomToggleInfoHead": "Guest Links",
-  "guestLinkPasswordModal.headline": "{{conversationName}} \n Enter password",
+  "guestLinkPasswordModal.headline": "{conversationName} \n Enter password",
   "guestLinkPasswordModal.headlineDefault": "Group Conversation \n Enter password",
   "guestLinkPasswordModal.description": "Please enter the password you have received with the access link for this conversation.",
   "guestLinkPasswordModal.conversationPasswordProtected": "This conversation is password protected.",
