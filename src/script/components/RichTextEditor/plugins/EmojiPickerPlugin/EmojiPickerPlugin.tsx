@@ -20,12 +20,7 @@
 import {MutableRefObject, useCallback, useMemo, useState} from 'react';
 
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
-import {
-  MenuOption,
-  MenuRenderFn,
-  MenuTextMatch,
-  useBasicTypeaheadTriggerMatch,
-} from '@lexical/react/LexicalTypeaheadMenuPlugin';
+import {MenuOption, MenuRenderFn, MenuTextMatch} from '@lexical/react/LexicalTypeaheadMenuPlugin';
 // The emoji list comes from the emoji-picker-react package that we also use for reactions. It's a little hacky how we import it but since it's typechecked, we will be warned if this file doesn't exist in the repo with further updates
 import emojiList from 'emoji-picker-react/src/data/emojis.json';
 import {$createTextNode, $getSelection, $isRangeSelection, TextNode} from 'lexical';
@@ -117,31 +112,18 @@ export function EmojiPickerPlugin({openStateRef}: Props) {
     }
   };
 
-  const checkForTriggerMatch = useBasicTypeaheadTriggerMatch('/', {
-    minLength: 0,
-  });
+  const checkForEmojiPickerMatch = useCallback((text: string) => {
+    const info = getSelectionInfo([':']);
 
-  const checkForEmojiPickerMatch = useCallback(
-    (text: string) => {
+    if (info?.isTextNode && info.wordCharAfterCursor) {
       // Don't show the menu if the next character is a word character
-      const info = getSelectionInfo([':']);
+      return null;
+    }
 
-      if (info?.isTextNode && info.wordCharAfterCursor) {
-        return null;
-      }
+    const queryMatch = checkForEmojis(text);
 
-      const slashMatch = checkForTriggerMatch(text, lexicalEditor);
-
-      if (slashMatch !== null) {
-        return null;
-      }
-
-      const queryMatch = checkForEmojis(text);
-
-      return queryMatch?.replaceableString ? queryMatch : null;
-    },
-    [checkForTriggerMatch, lexicalEditor],
-  );
+    return queryMatch?.replaceableString ? queryMatch : null;
+  }, []);
 
   const options: Array<EmojiOption> = useMemo(() => {
     const filteredEmojis = emojiOptions.filter((emoji: EmojiOption) => {
