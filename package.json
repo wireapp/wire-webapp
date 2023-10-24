@@ -115,7 +115,7 @@
     "dpdm": "3.14.0",
     "eslint": "^8.52.0",
     "eslint-plugin-prettier": "^5.0.1",
-    "fake-indexeddb": "4.0.2",
+    "fake-indexeddb": "5.0.0",
     "generate-changelog": "1.8.0",
     "html-webpack-plugin": "^5.5.3",
     "husky": "8.0.3",
