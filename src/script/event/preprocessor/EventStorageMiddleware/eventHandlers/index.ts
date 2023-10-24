@@ -20,3 +20,4 @@
 export * from './editedEventHandler';
 export * from './linkPreviewEventHandler';
 export * from './assetEventHandler';
+export * from './reactionEventHandler';

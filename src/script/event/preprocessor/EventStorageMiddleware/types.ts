@@ -27,6 +27,7 @@ import {IdentifiedUpdatePayload} from '../../EventService';
 export type HandledEvents = ClientConversationEvent | ConversationEvent;
 export type DBOperation =
   | {type: 'update'; event: HandledEvents; updates: IdentifiedUpdatePayload}
+  | {type: 'sequential-update'; event: EventRecord; updates: Partial<EventRecord>}
   | {type: 'delete'; event: HandledEvents; id: string}
   | {type: 'insert'; event: HandledEvents};
 
@@ -34,7 +35,7 @@ export type EventHandler = (
   event: HandledEvents,
   optionals: {
     selfUserId: string;
-    duplicateEvent: HandledEvents | undefined;
+    duplicateEvent?: HandledEvents | undefined;
     findEvent: (eventId: string) => Promise<EventRecord | undefined>;
   },
 ) => Promise<DBOperation | undefined>;
