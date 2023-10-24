@@ -59,7 +59,6 @@ export interface MessageActionsMenuProps {
   contextMenu: {entries: ko.Subscribable<ContextMenuEntry[]>};
   isMessageFocused: boolean;
   handleActionMenuVisibility: (isVisible: boolean) => void;
-  messageWithSection: boolean;
   handleReactionClick: (emoji: string) => void;
   reactionsTotalCount: number;
   isRemovedFromConversation: boolean;
@@ -71,7 +70,6 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
   isMessageFocused,
   handleActionMenuVisibility,
   message,
-  messageWithSection,
   handleReactionClick,
   reactionsTotalCount,
   isRemovedFromConversation,
