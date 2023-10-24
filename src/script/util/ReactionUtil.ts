@@ -23,8 +23,6 @@ import {matchQualifiedIds} from './QualifiedId';
 
 import {ReactionMap, UserReactionMap} from '../storage';
 
-type ReactionsGroupedByUser = Map<string, string[]>;
-
 function isReactionMap(reactions: UserReactionMap | ReactionMap): reactions is ReactionMap {
   return Array.isArray(reactions);
 }
@@ -70,22 +68,6 @@ export function addReaction(reactions: ReactionMap, reactionsStr: string, userId
       }
     });
   return filteredReactions.filter(([, users]) => users.length > 0);
-}
-
-export function groupByReactionUsers(reactions: ReactionMap): ReactionsGroupedByUser {
-  const reactionsGroupedByUser = new Map<string, string[]>();
-
-  for (const user in reactions) {
-    const userReactions = reactions[user] && reactions[user]?.split(',');
-
-    for (const reaction of userReactions) {
-      const users = reactionsGroupedByUser.get(reaction) || [];
-      users.push(user);
-      reactionsGroupedByUser.set(reaction, users);
-    }
-  }
-
-  return reactionsGroupedByUser;
 }
 
 // Maps to the static server emojis url

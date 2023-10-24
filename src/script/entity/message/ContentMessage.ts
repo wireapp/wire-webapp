@@ -19,7 +19,6 @@
 
 import type {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {ReactionType} from '@wireapp/core/lib/conversation/ReactionType';
 import ko from 'knockout';
 
 import {copyText} from 'Util/ClipboardUtil';
@@ -35,7 +34,7 @@ import {Text as TextAsset} from './Text';
 import {AssetRepository} from '../../assets/AssetRepository';
 import type {QuoteEntity} from '../../message/QuoteEntity';
 import {SuperType} from '../../message/SuperType';
-import {ReactionMap, UserReactionMap} from '../../storage';
+import {ReactionMap} from '../../storage';
 import {User} from '../User';
 
 export class ContentMessage extends Message {
@@ -122,18 +121,6 @@ export class ContentMessage extends Message {
    */
   getFirstAsset(): Asset | FileAsset | TextAsset | MediumImage {
     return this.assets()[0];
-  }
-
-  getUpdatedReactions({
-    data: event_data,
-    from,
-  }: {
-    data: {reaction: ReactionType};
-    from: string;
-  }): false | {reactions: UserReactionMap; version: number} {
-    const reactions = event_data && event_data.reaction;
-    const userReactions = {...this.reactions(), [from]: reactions};
-    return {reactions: userReactions, version: this.version + 1};
   }
 
   /**
