@@ -37,19 +37,19 @@ import {getDOMRangeRect} from '../../utils/getDomRangeRect';
 import {getSelectionInfo} from '../../utils/getSelectionInfo';
 
 const TRIGGER = ':';
+const triggerRegexp = new RegExp(`(\\W|^)(${TRIGGER}([\\w+\\-][\\w \\-]*))$`);
 
 /**
  * Will detect emoji triggers in a text
  * @param text the text in which to look for emoji triggers
  */
 function checkForEmojis(text: string): MenuTextMatch | null {
-  const match = new RegExp(`(^| )(${TRIGGER}([\\w +\\-][\\w \\-]*))$`).exec(text);
+  const match = triggerRegexp.exec(text);
 
   if (match === null) {
     return null;
   }
-  const search = match[2];
-  const term = match[3];
+  const [, , search, term] = match;
 
   if (term.length === 0) {
     return null;
@@ -115,12 +115,12 @@ export function EmojiPickerPlugin({openStateRef}: Props) {
   const checkForEmojiPickerMatch = useCallback((text: string) => {
     const info = getSelectionInfo([':']);
 
-    if (info?.isTextNode && info.wordCharAfterCursor) {
+    if (!info || (info.isTextNode && info.wordCharAfterCursor)) {
       // Don't show the menu if the next character is a word character
       return null;
     }
 
-    const queryMatch = checkForEmojis(text);
+    const queryMatch = checkForEmojis(info.textContent);
 
     return queryMatch?.replaceableString ? queryMatch : null;
   }, []);
