@@ -35,19 +35,19 @@ import {getSelectionInfo} from '../../utils/getSelectionInfo';
 import {TypeaheadMenuPlugin} from '../TypeaheadMenuPlugin';
 
 const TRIGGER = '@';
+const triggerRegexp = new RegExp(`(^| )(${TRIGGER}(\\S*))$`);
 
 /**
  * Will detect mentions triggers in a text
  * @param text the text in which to look for mentions triggers
  */
 function checkForMentions(text: string): MenuTextMatch | null {
-  const match = new RegExp(`(^| )(${TRIGGER}(\\S*))$`).exec(text);
+  const match = triggerRegexp.exec(text);
 
   if (match === null) {
     return null;
   }
-  const search = match[2];
-  const term = match[3];
+  const [, , search, term] = match;
 
   return {
     leadOffset: match.index,
@@ -81,16 +81,16 @@ export function MentionsPlugin({onSearch, openStateRef}: MentionsPluginProps) {
 
   const options = results.map(result => new MenuOption(result, result.name())).reverse();
 
-  const handleSelectOption = useCallback(
+  const insertMention = useCallback(
     (selectedOption: MenuOption, nodeToReplace: TextNode | null, closeMenu: () => void) => {
       editor.update(() => {
-        const mentionNode = $createMentionNode(TRIGGER, selectedOption.value);
         if (nodeToReplace) {
+          const mentionNode = $createMentionNode(TRIGGER, selectedOption.value);
           nodeToReplace.replace(mentionNode);
           mentionNode.insertAfter($createTextNode(' '));
         }
-        closeMenu();
       });
+      closeMenu();
     },
     [editor],
   );
@@ -98,10 +98,10 @@ export function MentionsPlugin({onSearch, openStateRef}: MentionsPluginProps) {
   const checkForMentionMatch = useCallback((text: string) => {
     // Don't show the menu if the next character is a word character
     const info = getSelectionInfo([TRIGGER]);
-    if (info?.isTextNode && info.wordCharAfterCursor) {
+    if (!info || (info.isTextNode && info.wordCharAfterCursor)) {
       return null;
     }
-    return checkForMentions(text);
+    return checkForMentions(info.textContent);
   }, []);
 
   const rootElement = editor.getRootElement();
@@ -124,7 +124,6 @@ export function MentionsPlugin({onSearch, openStateRef}: MentionsPluginProps) {
       return null;
     }
 
-    openStateRef.current = true;
     const {bottom, left} = getPosition();
 
     return ReactDOM.createPortal(
@@ -162,10 +161,11 @@ export function MentionsPlugin({onSearch, openStateRef}: MentionsPluginProps) {
   return (
     <TypeaheadMenuPlugin
       onQueryChange={setQueryString}
-      onSelectOption={handleSelectOption}
+      onSelectOption={insertMention}
       triggerFn={checkForMentionMatch}
       options={options}
       menuRenderFn={menuRenderFn}
+      onClose={() => (openStateRef.current = false)}
       containerId="mentions-typeahead-menu"
       isReversed
     />

@@ -17,13 +17,13 @@
  *
  */
 
-import {MutableRefObject, useCallback, useMemo, useState} from 'react';
+import {MutableRefObject, useMemo, useState} from 'react';
 
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {MenuOption, MenuRenderFn, MenuTextMatch} from '@lexical/react/LexicalTypeaheadMenuPlugin';
 // The emoji list comes from the emoji-picker-react package that we also use for reactions. It's a little hacky how we import it but since it's typechecked, we will be warned if this file doesn't exist in the repo with further updates
 import emojiList from 'emoji-picker-react/src/data/emojis.json';
-import {$createTextNode, $getSelection, $isRangeSelection, TextNode} from 'lexical';
+import {$createTextNode, TextNode} from 'lexical';
 import * as ReactDOM from 'react-dom';
 
 import {TypeaheadMenuPlugin} from 'Components/RichTextEditor/plugins/TypeaheadMenuPlugin';
@@ -112,18 +112,16 @@ export function EmojiPickerPlugin({openStateRef}: Props) {
     }
   };
 
-  const checkForEmojiPickerMatch = useCallback((text: string) => {
-    const info = getSelectionInfo([':']);
+  const checkForEmojiPickerMatch = (text: string) => {
+    const info = getSelectionInfo([TRIGGER]);
 
     if (!info || (info.isTextNode && info.wordCharAfterCursor)) {
       // Don't show the menu if the next character is a word character
       return null;
     }
 
-    const queryMatch = checkForEmojis(info.textContent);
-
-    return queryMatch?.replaceableString ? queryMatch : null;
-  }, []);
+    return checkForEmojis(info.textContent);
+  };
 
   const options: Array<EmojiOption> = useMemo(() => {
     const filteredEmojis = emojiOptions.filter((emoji: EmojiOption) => {
@@ -147,23 +145,12 @@ export function EmojiPickerPlugin({openStateRef}: Props) {
       .slice(0, MAX_EMOJI_SUGGESTION_COUNT);
   }, [queryString]);
 
-  const onSelectOption = (selectedOption: EmojiOption, nodeToRemove: TextNode | null, closeMenu: () => void) => {
+  const insertEmoji = (selectedOption: EmojiOption, nodeToRemove: TextNode | null, closeMenu: () => void) => {
     lexicalEditor.update(() => {
-      const selection = $getSelection();
-
-      if (!$isRangeSelection(selection) || selectedOption == null) {
-        return;
-      }
-
-      if (nodeToRemove) {
-        nodeToRemove.remove();
-      }
-
-      selection.insertNodes([$createTextNode(selectedOption.emoji)]);
-      increaseUsageCount(selectedOption.title);
-
-      closeMenu();
+      nodeToRemove?.replace($createTextNode(selectedOption.emoji));
     });
+    increaseUsageCount(selectedOption.title);
+    closeMenu();
   };
 
   const rootElement = lexicalEditor.getRootElement();
@@ -220,10 +207,11 @@ export function EmojiPickerPlugin({openStateRef}: Props) {
   return (
     <TypeaheadMenuPlugin
       onQueryChange={setQueryString}
-      onSelectOption={onSelectOption}
+      onSelectOption={insertEmoji}
       triggerFn={checkForEmojiPickerMatch}
       options={options}
       menuRenderFn={menuRender}
+      onClose={() => (openStateRef.current = false)}
       containerId="emoji-typeahead-menu"
     />
   );
