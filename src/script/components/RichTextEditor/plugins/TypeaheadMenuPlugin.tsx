@@ -672,6 +672,7 @@ export function TypeaheadMenuPlugin<TOption extends TypeaheadOption>({
   containerId,
   isReversed = false,
 }: TypeaheadMenuPluginProps<TOption>): JSX.Element | null {
+  const previousText = useRef<string>('');
   const [editor] = useLexicalComposerContext();
   const [resolution, setResolution] = useState<Resolution | null>(null);
   const [menuVisible, setMenuVisible] = useState(false);
@@ -715,6 +716,12 @@ export function TypeaheadMenuPlugin<TOption extends TypeaheadOption>({
           return;
         }
 
+        const isInitialTextSet = previousText.current === '' && text.length > 1;
+        previousText.current = text;
+        if (isInitialTextSet) {
+          // Do not trigger the typeahead when the input first loads (goes from empty to a text larger than 1 char)
+          return;
+        }
         const match = triggerFn(text, editor);
         onQueryChange(match ? match.matchingString : null);
 
