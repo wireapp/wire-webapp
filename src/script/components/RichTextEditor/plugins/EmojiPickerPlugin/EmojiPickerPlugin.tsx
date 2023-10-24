@@ -17,18 +17,13 @@
  *
  */
 
-import {MutableRefObject, useCallback, useMemo, useState} from 'react';
+import {MutableRefObject, useMemo, useState} from 'react';
 
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
-import {
-  MenuOption,
-  MenuRenderFn,
-  MenuTextMatch,
-  useBasicTypeaheadTriggerMatch,
-} from '@lexical/react/LexicalTypeaheadMenuPlugin';
+import {MenuOption, MenuRenderFn, MenuTextMatch} from '@lexical/react/LexicalTypeaheadMenuPlugin';
 // The emoji list comes from the emoji-picker-react package that we also use for reactions. It's a little hacky how we import it but since it's typechecked, we will be warned if this file doesn't exist in the repo with further updates
 import emojiList from 'emoji-picker-react/src/data/emojis.json';
-import {$createTextNode, $getSelection, $isRangeSelection, TextNode} from 'lexical';
+import {$createTextNode, TextNode} from 'lexical';
 import * as ReactDOM from 'react-dom';
 
 import {TypeaheadMenuPlugin} from 'Components/RichTextEditor/plugins/TypeaheadMenuPlugin';
@@ -42,19 +37,19 @@ import {getDOMRangeRect} from '../../utils/getDomRangeRect';
 import {getSelectionInfo} from '../../utils/getSelectionInfo';
 
 const TRIGGER = ':';
+const triggerRegexp = new RegExp(`(\\W|^)(${TRIGGER}([\\w+\\-][\\w \\-]*))$`);
 
 /**
  * Will detect emoji triggers in a text
  * @param text the text in which to look for emoji triggers
  */
 function checkForEmojis(text: string): MenuTextMatch | null {
-  const match = new RegExp(`(^| )(${TRIGGER}([\\w +\\-][\\w \\-]*))$`).exec(text);
+  const match = triggerRegexp.exec(text);
 
   if (match === null) {
     return null;
   }
-  const search = match[2];
-  const term = match[3];
+  const [, , search, term] = match;
 
   if (term.length === 0) {
     return null;
@@ -117,31 +112,16 @@ export function EmojiPickerPlugin({openStateRef}: Props) {
     }
   };
 
-  const checkForTriggerMatch = useBasicTypeaheadTriggerMatch('/', {
-    minLength: 0,
-  });
+  const checkForEmojiPickerMatch = (text: string) => {
+    const info = getSelectionInfo([TRIGGER]);
 
-  const checkForEmojiPickerMatch = useCallback(
-    (text: string) => {
+    if (!info || (info.isTextNode && info.wordCharAfterCursor)) {
       // Don't show the menu if the next character is a word character
-      const info = getSelectionInfo([':']);
+      return null;
+    }
 
-      if (info?.isTextNode && info.wordCharAfterCursor) {
-        return null;
-      }
-
-      const slashMatch = checkForTriggerMatch(text, lexicalEditor);
-
-      if (slashMatch !== null) {
-        return null;
-      }
-
-      const queryMatch = checkForEmojis(text);
-
-      return queryMatch?.replaceableString ? queryMatch : null;
-    },
-    [checkForTriggerMatch, lexicalEditor],
-  );
+    return checkForEmojis(info.textContent);
+  };
 
   const options: Array<EmojiOption> = useMemo(() => {
     const filteredEmojis = emojiOptions.filter((emoji: EmojiOption) => {
@@ -165,23 +145,12 @@ export function EmojiPickerPlugin({openStateRef}: Props) {
       .slice(0, MAX_EMOJI_SUGGESTION_COUNT);
   }, [queryString]);
 
-  const onSelectOption = (selectedOption: EmojiOption, nodeToRemove: TextNode | null, closeMenu: () => void) => {
+  const insertEmoji = (selectedOption: EmojiOption, nodeToRemove: TextNode | null, closeMenu: () => void) => {
     lexicalEditor.update(() => {
-      const selection = $getSelection();
-
-      if (!$isRangeSelection(selection) || selectedOption == null) {
-        return;
-      }
-
-      if (nodeToRemove) {
-        nodeToRemove.remove();
-      }
-
-      selection.insertNodes([$createTextNode(selectedOption.emoji)]);
-      increaseUsageCount(selectedOption.title);
-
-      closeMenu();
+      nodeToRemove?.replace($createTextNode(selectedOption.emoji));
     });
+    increaseUsageCount(selectedOption.title);
+    closeMenu();
   };
 
   const rootElement = lexicalEditor.getRootElement();
@@ -238,10 +207,11 @@ export function EmojiPickerPlugin({openStateRef}: Props) {
   return (
     <TypeaheadMenuPlugin
       onQueryChange={setQueryString}
-      onSelectOption={onSelectOption}
+      onSelectOption={insertEmoji}
       triggerFn={checkForEmojiPickerMatch}
       options={options}
       menuRenderFn={menuRender}
+      onClose={() => (openStateRef.current = false)}
       containerId="emoji-typeahead-menu"
     />
   );
