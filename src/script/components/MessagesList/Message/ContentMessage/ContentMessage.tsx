@@ -64,7 +64,7 @@ export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetS
   onClickReaction: (emoji: string) => void;
 }
 
-const ContentMessageComponent: React.FC<ContentMessageProps> = ({
+export const ContentMessageComponent: React.FC<ContentMessageProps> = ({
   conversation,
   message,
   findMessage,
@@ -101,18 +101,19 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
     reactions,
     status,
     user,
+    quote,
   } = useKoSubscribableChildren(message, [
     'senderName',
     'timestamp',
     'ephemeral_caption',
     'ephemeral_status',
     'assets',
-    'other_likes',
     'was_edited',
     'failedToSend',
     'reactions',
     'status',
     'user',
+    'quote',
   ]);
 
   const shouldShowAvatar = (): boolean => {
@@ -183,10 +184,10 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
               <EphemeralTimer message={message} />
             </div>
           )}
-          {message.quote() && (
+          {quote && (
             <Quote
               conversation={conversation}
-              quote={message.quote()}
+              quote={quote}
               selfId={selfId}
               findMessage={findMessage}
               showDetail={onClickImage}
@@ -258,5 +259,3 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
     </div>
   );
 };
-
-export {ContentMessageComponent};
