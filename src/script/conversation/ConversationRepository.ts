@@ -3137,20 +3137,6 @@ export class ConversationRepository {
           return messageEntity;
         });
     }
-    if (messageEntity.isContent()) {
-      const userIds = Object.keys(messageEntity.reactions());
-
-      messageEntity.reactions_user_ets.removeAll();
-      if (userIds.length) {
-        // TODO(Federation): Make code federation-aware.
-        return this.userRepository
-          .getUsersById(userIds.map(userId => ({domain: '', id: userId})))
-          .then(userEntities => {
-            messageEntity.reactions_user_ets(userEntities);
-            return messageEntity;
-          });
-      }
-    }
     return messageEntity;
   }
 

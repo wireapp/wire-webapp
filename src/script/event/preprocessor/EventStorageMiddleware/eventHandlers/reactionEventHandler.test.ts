@@ -32,37 +32,42 @@ describe('reactionEventHandler', () => {
     await expect(operation).rejects.toThrow('Reaction event to a non-existing message');
   });
 
-  it('successfully updates a message with new reactions when they arrive', async () => {
-    const baseReactions = {'first-user': '👍'};
-    const baseVersion = 10;
-    const targetMessage = toSavedEvent(
-      createMessageAddEvent({overrides: {reactions: baseReactions, version: baseVersion}}),
-    );
-    const reactionEvent = createReactionEvent(createUuid(), '🫶');
+  describe('legacy reaction format', () => {
+    it('successfully updates a message on the legacy reaction format with new reactions when they arrive', async () => {
+      const baseReactions = {'first-user': '👍'};
+      const baseVersion = 10;
+      const targetMessage = toSavedEvent(
+        createMessageAddEvent({overrides: {reactions: baseReactions, version: baseVersion}}),
+      );
+      const reactionEvent = createReactionEvent(createUuid(), '🫶');
 
-    const operation: any = await handleReactionEvent(reactionEvent, {
-      findEvent: () => Promise.resolve(targetMessage),
-      selfUserId: createUuid(),
+      const operation: any = await handleReactionEvent(reactionEvent, {
+        findEvent: () => Promise.resolve(targetMessage),
+        selfUserId: createUuid(),
+      });
+
+      expect(operation.type).toBe('sequential-update');
+      expect(operation.updates.reactions).toEqual([
+        ['👍', [{domain: '', id: 'first-user'}]],
+        ['🫶', [{domain: '', id: reactionEvent.from}]],
+      ]);
+      expect(operation.updates.version).toEqual(baseVersion + 1);
     });
 
-    expect(operation.type).toBe('sequential-update');
-    expect(operation.updates.reactions).toEqual({...baseReactions, [reactionEvent.from]: '🫶'});
-    expect(operation.updates.version).toEqual(baseVersion + 1);
-  });
+    it('successfully deletes a reaction from a legacy reaction format', async () => {
+      const reactor = createUuid();
+      const baseReactions = {[reactor]: '👍'};
+      const targetMessage = toSavedEvent(createMessageAddEvent({overrides: {reactions: baseReactions}}));
+      const reactionEvent = createReactionEvent(createUuid(), '');
+      reactionEvent.from = reactor;
 
-  it('successfully deletes a reaction', async () => {
-    const reactor = createUuid();
-    const baseReactions = {[reactor]: '👍'};
-    const targetMessage = toSavedEvent(createMessageAddEvent({overrides: {reactions: baseReactions}}));
-    const reactionEvent = createReactionEvent(createUuid(), '');
-    reactionEvent.from = reactor;
+      const operation: any = await handleReactionEvent(reactionEvent, {
+        findEvent: () => Promise.resolve(targetMessage),
+        selfUserId: createUuid(),
+      });
 
-    const operation: any = await handleReactionEvent(reactionEvent, {
-      findEvent: () => Promise.resolve(targetMessage),
-      selfUserId: createUuid(),
+      expect(operation.type).toBe('sequential-update');
+      expect(operation.updates.reactions).toEqual([]);
     });
-
-    expect(operation.type).toBe('sequential-update');
-    expect(operation.updates.reactions).toEqual({...baseReactions, [reactor]: ''});
   });
 });

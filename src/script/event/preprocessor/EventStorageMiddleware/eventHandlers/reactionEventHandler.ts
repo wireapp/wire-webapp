@@ -19,16 +19,25 @@
 
 import {MessageAddEvent, ReactionEvent} from 'src/script/conversation/EventBuilder';
 import {StoredEvent} from 'src/script/storage';
+import {addReaction, userReactionMapToReactionMap} from 'Util/ReactionUtil';
 
 import {EventValidationError} from './EventValidationError';
 
 import {CONVERSATION} from '../../../Client';
 import {EventHandler} from '../types';
 
-function computeEventUpdates(target: StoredEvent<MessageAddEvent>, reaction: ReactionEvent) {
+function computeEventUpdates(target: StoredEvent<MessageAddEvent>, reactionEvent: ReactionEvent) {
   const version = (target.version ?? 1) + 1;
-  const updatedReactions = {...target.reactions, [reaction.from]: reaction.data.reaction};
-  return {reactions: updatedReactions, version: version};
+  const {
+    data: {reaction},
+    qualified_from,
+    from,
+  } = reactionEvent;
+  const reactionMap = target.reactions ? userReactionMapToReactionMap(target.reactions) : [];
+  return {
+    reactions: addReaction(reactionMap, reaction, qualified_from ?? {id: from, domain: ''}),
+    version: version,
+  };
 }
 
 export const handleReactionEvent: EventHandler = async (event, {findEvent}) => {
