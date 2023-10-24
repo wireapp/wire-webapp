@@ -27,6 +27,13 @@ import type {User} from '../../src/script/entity/User';
 import {serverTimeHandler} from '../../src/script/time/serverTimeHandler';
 import {UserMapper} from '../../src/script/user/UserMapper';
 
+export function generateQualifiedId(): QualifiedId {
+  return {
+    id: createUuid(),
+    domain: 'test.wire.link',
+  };
+}
+
 export function generateAPIUser(
   id: QualifiedId = {id: createUuid(), domain: 'test.wire.link'},
   overwites?: Partial<APIClientUser>,

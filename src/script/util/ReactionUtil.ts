@@ -17,11 +17,62 @@
  *
  */
 
+import type {QualifiedId} from '@wireapp/api-client/lib/user';
+
+import {matchQualifiedIds} from './QualifiedId';
+
+import {ReactionMap, UserReactionMap} from '../storage';
+
 export interface Reactions {
   [key: string]: string;
 }
 
 type ReactionsGroupedByUser = Map<string, string[]>;
+
+function isReactionMap(reactions: UserReactionMap | ReactionMap): reactions is ReactionMap {
+  return Array.isArray(reactions);
+}
+
+/**
+ * Will convert the legacy user reaction map to the new reaction map format.
+ * The new map format will allow keeping track of the order the reactions arrived in.
+ */
+export function userReactionMapToReactionMap(userReactions: UserReactionMap | ReactionMap): ReactionMap {
+  if (isReactionMap(userReactions)) {
+    return userReactions;
+  }
+  return Object.entries(userReactions).reduce<ReactionMap>((acc, [userId, reaction]) => {
+    const existingReaction = acc.find(([r]) => r === reaction);
+    const qualifiedId = {id: userId, domain: ''};
+    if (existingReaction) {
+      existingReaction[1].push(qualifiedId);
+    } else {
+      acc.push([reaction, [qualifiedId]]);
+    }
+    return acc;
+  }, []);
+}
+
+export function addReaction(reactions: ReactionMap, reactionsStr: string, userId: QualifiedId) {
+  const userReactions = reactionsStr.split(',');
+
+  // First step is to remove all of this user's reactions
+  const filteredReactions = reactions.map<ReactionMap[0]>(([reaction, users]) => {
+    return [reaction, users.filter(user => !matchQualifiedIds(user, userId))];
+  });
+
+  userReactions
+    .filter(([reaction]) => !!reaction)
+    .forEach(reaction => {
+      const existingEntry = filteredReactions.find(([r]) => r === reaction);
+      if (existingEntry) {
+        existingEntry[1].push(userId);
+      } else {
+        filteredReactions.push([reaction, [userId]]);
+      }
+    });
+  return filteredReactions.filter(([, users]) => users.length > 0);
+}
 
 export function groupByReactionUsers(reactions: Reactions): ReactionsGroupedByUser {
   const reactionsGroupedByUser = new Map<string, string[]>();
