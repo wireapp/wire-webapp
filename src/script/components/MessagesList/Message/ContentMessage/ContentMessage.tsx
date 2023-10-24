@@ -231,7 +231,6 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
             handleActionMenuVisibility={setActionMenuVisibility}
             contextMenu={contextMenu}
             isMessageFocused={msgFocusState}
-            messageWithSection={hasMarker}
             handleReactionClick={onClickReaction}
             reactionsTotalCount={reactions.length}
             isRemovedFromConversation={conversation.removed_from_conversation()}
