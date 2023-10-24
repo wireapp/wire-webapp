@@ -5354,9 +5354,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/copy-config@npm:2.1.9":
-  version: 2.1.9
-  resolution: "@wireapp/copy-config@npm:2.1.9"
+"@wireapp/copy-config@npm:2.1.10":
+  version: 2.1.10
+  resolution: "@wireapp/copy-config@npm:2.1.10"
   dependencies:
     axios: 1.5.1
     copy: 0.3.2
@@ -5366,7 +5366,7 @@ __metadata:
     logdown: 3.3.1
   bin:
     copy-config: lib/cli.js
-  checksum: 37ee9d82c6eabc33573ede5c0d9e467c2d6c3dd8f0c2717378ef8c4b84b568613d64e33f4f2903b9d4d612b25ea40f22881e0f44b51cd4f72185f0606294a168
+  checksum: 5b7fa44b067c51dc567d29ebcb9e2fa87cd5464fb4bb5fcef93d4fa5596cf729d1549f0c52f2a9241f0e415678af56765925b8329f49c7efe6e93dcc97bdf1b2
   languageName: node
   linkType: hard
 
@@ -18534,7 +18534,7 @@ __metadata:
     "@types/webpack-env": 1.18.3
     "@wireapp/avs": 9.5.2
     "@wireapp/commons": 5.2.1
-    "@wireapp/copy-config": 2.1.9
+    "@wireapp/copy-config": 2.1.10
     "@wireapp/core": 42.18.0
     "@wireapp/eslint-config": 3.0.4
     "@wireapp/lru-cache": 3.8.1

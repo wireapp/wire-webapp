@@ -97,7 +97,7 @@
     "@types/speakingurl": "13.0.5",
     "@types/underscore": "1.11.12",
     "@types/webpack-env": "1.18.3",
-    "@wireapp/copy-config": "2.1.9",
+    "@wireapp/copy-config": "2.1.10",
     "@wireapp/eslint-config": "3.0.4",
     "@wireapp/prettier-config": "0.6.3",
     "@wireapp/store-engine": "^5.1.4",
