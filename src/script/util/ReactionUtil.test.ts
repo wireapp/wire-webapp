@@ -19,11 +19,38 @@
 
 import {generateQualifiedId} from 'test/helper/UserGenerator';
 
-import {addReaction} from './ReactionUtil';
+import {addReaction, userReactionMapToReactionMap} from './ReactionUtil';
+import {createUuid} from './uuid';
 
 import {ReactionMap} from '../storage';
 
 describe('ReactionUtil', () => {
+  describe('userReactionMapToReactionMap', () => {
+    it('converts a user reaction map to a reaction map', () => {
+      const userId = {id: createUuid(), domain: ''};
+      const userReactions = {[userId.id]: '👍,👎'};
+      const reactionMap = userReactionMapToReactionMap(userReactions);
+
+      expect(reactionMap).toEqual([
+        ['👍', [userId]],
+        ['👎', [userId]],
+      ]);
+    });
+
+    it('converts multiple users reactions to a reaction map', () => {
+      const userId = {id: createUuid(), domain: ''};
+      const otherUserId = {id: createUuid(), domain: ''};
+      const userReactions = {[userId.id]: '👍,👎', [otherUserId.id]: '👍,❤️'};
+      const reactionMap = userReactionMapToReactionMap(userReactions);
+
+      expect(reactionMap).toEqual([
+        ['👍', [userId, otherUserId]],
+        ['👎', [userId]],
+        ['❤️', [otherUserId]],
+      ]);
+    });
+  });
+
   describe('addReaction', () => {
     it('adds a single reaction', () => {
       const userId = generateQualifiedId();
@@ -66,6 +93,22 @@ describe('ReactionUtil', () => {
       const updatedReactions = addReaction(reactions.slice(), '👍', userId);
 
       expect(updatedReactions).toEqual([['👍', [userId]]]);
+    });
+
+    it('keeps the order at which the reactions were received', () => {
+      const userId = generateQualifiedId();
+      const reactorId = generateQualifiedId();
+      const reactions: ReactionMap = [
+        ['👍', [userId]],
+        ['👎', [userId]],
+      ];
+      const updatedReactions = addReaction(reactions.slice(), '👍,❤️', reactorId);
+
+      expect(updatedReactions).toEqual([
+        ['👍', [userId, reactorId]],
+        ['👎', [userId]],
+        ['❤️', [reactorId]],
+      ]);
     });
   });
 });

@@ -41,14 +41,16 @@ export function userReactionMapToReactionMap(userReactions: UserReactionMap | Re
   if (isReactionMap(userReactions)) {
     return userReactions;
   }
-  return Object.entries(userReactions).reduce<ReactionMap>((acc, [userId, reaction]) => {
-    const existingReaction = acc.find(([r]) => r === reaction);
-    const qualifiedId = {id: userId, domain: ''};
-    if (existingReaction) {
-      existingReaction[1].push(qualifiedId);
-    } else {
-      acc.push([reaction, [qualifiedId]]);
-    }
+  return Object.entries(userReactions).reduce<ReactionMap>((acc, [userId, reactions]) => {
+    reactions.split(',').forEach(reaction => {
+      const existingReaction = acc.find(([r]) => r === reaction);
+      const qualifiedId = {id: userId, domain: ''};
+      if (existingReaction) {
+        existingReaction[1].push(qualifiedId);
+      } else {
+        acc.push([reaction, [qualifiedId]]);
+      }
+    });
     return acc;
   }, []);
 }
