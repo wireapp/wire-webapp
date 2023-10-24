@@ -255,9 +255,10 @@ export const InputBar = ({
       cancelMessageEditing(true);
       setEditedMessage(messageEntity);
 
-      if (messageEntity.quote() && conversation) {
+      const quote = messageEntity.quote();
+      if (quote && conversation) {
         void messageRepository
-          .getMessageInConversationById(conversation, messageEntity.quote().messageId)
+          .getMessageInConversationById(conversation, quote.messageId)
           .then(quotedMessage => setReplyMessageEntity(quotedMessage));
       }
     }
