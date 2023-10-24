@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [42.18.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.17.0...@wireapp/core@42.18.0) (2023-10-24)
+
+### Features
+
+* check if removal key is available on backend ([#5662](https://github.com/wireapp/wire-web-packages/issues/5662)) ([441762d](https://github.com/wireapp/wire-web-packages/commit/441762d83a620c253650e8425bfe60b03a848265))
+
 # [42.17.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.16.0...@wireapp/core@42.17.0) (2023-10-20)
 
 ### Features
