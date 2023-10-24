@@ -70,7 +70,7 @@ const DetailViewModalFooter: FC<DetailViewModalFooterProps> = ({
     if (!messageEntity.isContent()) {
       return;
     }
-    return void messageRepository.toggleReaction(conversationEntity, messageEntity, reaction, selfId.id);
+    return void messageRepository.toggleReaction(conversationEntity, messageEntity, reaction, selfId);
   };
   const {handleMenuOpen} = useMessageActionsState();
   const resetActionMenuStates = useCallback(() => {

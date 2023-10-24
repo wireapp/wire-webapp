@@ -587,6 +587,10 @@ export class UserRepository {
     return fetchedUserEntities;
   }
 
+  findUsersByIds(userIds: QualifiedId[]): User[] {
+    return this.userState.users().filter(user => userIds.find(userId => matchQualifiedIds(user.qualifiedId, userId)));
+  }
+
   /**
    * Find a local user.
    */

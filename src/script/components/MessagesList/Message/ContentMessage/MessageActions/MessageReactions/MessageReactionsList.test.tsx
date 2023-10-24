@@ -37,7 +37,7 @@ const defaultProps: MessageReactionsListProps = {
   isMessageFocused: false,
   onLastReactionKeyEvent: jest.fn(),
   isRemovedFromConversation: false,
-  userId: createUuid(),
+  selfUserId: createUuid(),
 };
 
 describe('MessageReactionsList', () => {

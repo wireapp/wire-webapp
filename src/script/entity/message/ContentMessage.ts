@@ -35,7 +35,7 @@ import {Text as TextAsset} from './Text';
 import {AssetRepository} from '../../assets/AssetRepository';
 import type {QuoteEntity} from '../../message/QuoteEntity';
 import {SuperType} from '../../message/SuperType';
-import {UserReactionMap} from '../../storage';
+import {ReactionMap, UserReactionMap} from '../../storage';
 import {User} from '../User';
 
 export class ContentMessage extends Message {
@@ -54,8 +54,7 @@ export class ContentMessage extends Message {
   public readonly was_edited: ko.PureComputed<boolean>;
   public replacing_message_id: null | string = null;
   readonly edited_timestamp: ko.Observable<number | null> = ko.observable(null);
-  // TODO(Federation): Make reactions federation-aware.
-  readonly reactions: ko.Observable<UserReactionMap> = ko.observable({});
+  readonly reactions = ko.observable<ReactionMap>([]);
   public super_type = SuperType.CONTENT;
 
   constructor(id?: string) {

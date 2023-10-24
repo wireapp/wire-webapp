@@ -23,10 +23,6 @@ import {matchQualifiedIds} from './QualifiedId';
 
 import {ReactionMap, UserReactionMap} from '../storage';
 
-export interface Reactions {
-  [key: string]: string;
-}
-
 type ReactionsGroupedByUser = Map<string, string[]>;
 
 function isReactionMap(reactions: UserReactionMap | ReactionMap): reactions is ReactionMap {
@@ -76,7 +72,7 @@ export function addReaction(reactions: ReactionMap, reactionsStr: string, userId
   return filteredReactions.filter(([, users]) => users.length > 0);
 }
 
-export function groupByReactionUsers(reactions: Reactions): ReactionsGroupedByUser {
+export function groupByReactionUsers(reactions: ReactionMap): ReactionsGroupedByUser {
   const reactionsGroupedByUser = new Map<string, string[]>();
 
   for (const user in reactions) {
@@ -95,17 +91,4 @@ export function groupByReactionUsers(reactions: Reactions): ReactionsGroupedByUs
 // Maps to the static server emojis url
 export function getEmojiUrl(unicode: string) {
   return `/image/emojis/img-apple-64/${unicode}.png`;
-}
-
-/**
- *
- * @param reactionsList This is an array of tuples, each tuple consists of two elements a
- * string representing an emoji and an array of strings representing users' reactions for that emoji.
- * @returns tuples are sorted in descending order based on the length of the user
- * reactions array for each emoji.
- */
-export function sortReactionsByUserCount(reactionsList: [string, string[]][]) {
-  return reactionsList.sort(
-    ([, reactionAUserList], [, reactionBUserList]) => reactionBUserList.length - reactionAUserList.length,
-  );
 }

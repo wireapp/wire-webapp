@@ -29,7 +29,6 @@ import {useRelativeTimestamp} from 'src/script/hooks/useRelativeTimestamp';
 import {StatusType} from 'src/script/message/StatusType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getMessageAriaLabel} from 'Util/conversationMessages';
-import {groupByReactionUsers} from 'Util/ReactionUtil';
 
 import {ContentAsset} from './asset';
 import {MessageActionsMenu} from './MessageActions/MessageActions';
@@ -140,9 +139,6 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
     setActionMenuVisibility(isMessageFocused || msgFocusState);
   }, [msgFocusState, isMessageFocused]);
 
-  const reactionGroupedByUser = groupByReactionUsers(reactions);
-  const reactionsTotalCount = Array.from(reactionGroupedByUser).length;
-
   return (
     <div
       aria-label={messageAriaLabel}
@@ -237,7 +233,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
             isMessageFocused={msgFocusState}
             messageWithSection={hasMarker}
             handleReactionClick={onClickReaction}
-            reactionsTotalCount={reactionsTotalCount}
+            reactionsTotalCount={reactions.length}
             isRemovedFromConversation={conversation.removed_from_conversation()}
           />
         )}
@@ -253,7 +249,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
 
       <MessageReactionsList
         reactions={reactions}
-        userId={selfId.id}
+        selfUserId={selfId}
         handleReactionClick={onClickReaction}
         isMessageFocused={msgFocusState}
         onTooltipReactionCountClick={() => onClickReactionDetails(message)}
