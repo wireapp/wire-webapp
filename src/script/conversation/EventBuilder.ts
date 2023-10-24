@@ -57,7 +57,6 @@ export interface BaseEvent {
 
 export interface ConversationEvent<Type extends CONVERSATION | CONVERSATION_EVENT, Data = undefined> extends BaseEvent {
   data: Data;
-  id: string;
   type: Type;
 }
 
@@ -168,6 +167,7 @@ export type MessageAddEvent = ConversationEvent<
   reactions?: UserReactionMap;
   edited_time?: string;
   status: StatusType;
+  version?: number;
 };
 export type MissedEvent = BaseEvent & {id: string; type: CONVERSATION.MISSED_MESSAGES};
 export type JoinedAfterMLSMigrationFinalisationEvent = BaseEvent & {

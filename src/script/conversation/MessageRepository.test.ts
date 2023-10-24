@@ -76,7 +76,7 @@ async function buildMessageRepository(): Promise<[MessageRepository, MessageRepo
   const userState = new UserState();
   userState.self(selfUser);
   const clientState = new ClientState();
-  clientState.currentClient(new ClientEntity(true, ''));
+  clientState.currentClient = new ClientEntity(true, '');
   const core = new Account();
 
   const conversationState = new ConversationState(userState);

@@ -1,0 +1,47 @@
+/*
+ * Wire
+ * Copyright (C) 2023 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {MessageAddEvent, ReactionEvent} from 'src/script/conversation/EventBuilder';
+import {StoredEvent} from 'src/script/storage';
+
+import {EventValidationError} from './EventValidationError';
+
+import {CONVERSATION} from '../../../Client';
+import {EventHandler} from '../types';
+
+function computeEventUpdates(target: StoredEvent<MessageAddEvent>, reaction: ReactionEvent) {
+  const version = (target.version ?? 1) + 1;
+  const updatedReactions = {...target.reactions, [reaction.from]: reaction.data.reaction};
+  return {reactions: updatedReactions, version: version};
+}
+
+export const handleReactionEvent: EventHandler = async (event, {findEvent}) => {
+  if (event.type !== CONVERSATION.REACTION) {
+    return undefined;
+  }
+  const targetEvent = (await findEvent(event.data.message_id)) as StoredEvent<MessageAddEvent>;
+  if (!targetEvent) {
+    throw new EventValidationError('Reaction event to a non-existing message');
+  }
+  return {
+    type: 'sequential-update',
+    event: targetEvent,
+    updates: computeEventUpdates(targetEvent, event),
+  };
+};

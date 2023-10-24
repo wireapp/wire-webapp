@@ -71,8 +71,10 @@ import {EventRepository} from '../event/EventRepository';
 import {EventService} from '../event/EventService';
 import {EventServiceNoCompound} from '../event/EventServiceNoCompound';
 import {NotificationService} from '../event/NotificationService';
-import {QuotedMessageMiddleware} from '../event/preprocessor/QuotedMessageMiddleware';
+import {EventStorageMiddleware} from '../event/preprocessor/EventStorageMiddleware';
+import {QuotedMessageMiddleware} from '../event/preprocessor/QuoteDecoderMiddleware';
 import {ReceiptsMiddleware} from '../event/preprocessor/ReceiptsMiddleware';
+import {RepliesUpdaterMiddleware} from '../event/preprocessor/RepliesUpdaterMiddleware';
 import {ServiceMiddleware} from '../event/preprocessor/ServiceMiddleware';
 import {FederationEventProcessor} from '../event/processor/FederationEventProcessor';
 import {GiphyRepository} from '../extension/GiphyRepository';
@@ -377,25 +379,34 @@ export class App {
       });
 
       const selfUser = await this.initiateSelfUser();
+
       await initializeDataDog(this.config, selfUser.qualifiedId);
 
       // Setup all event middleware
+      const eventStorageMiddleware = new EventStorageMiddleware(this.service.event, selfUser);
       const serviceMiddleware = new ServiceMiddleware(conversationRepository, userRepository, selfUser);
       const quotedMessageMiddleware = new QuotedMessageMiddleware(this.service.event);
       const readReceiptMiddleware = new ReceiptsMiddleware(this.service.event, conversationRepository, selfUser);
+      const repliesUpdaterMiddleware = new RepliesUpdaterMiddleware(this.service.event);
 
-      eventRepository.setEventProcessMiddlewares([serviceMiddleware, quotedMessageMiddleware, readReceiptMiddleware]);
+      eventRepository.setEventProcessMiddlewares([
+        serviceMiddleware,
+        readReceiptMiddleware,
+        quotedMessageMiddleware,
+        eventStorageMiddleware,
+        repliesUpdaterMiddleware,
+      ]);
       // Setup all the event processors
       const federationEventProcessor = new FederationEventProcessor(eventRepository, serverTimeHandler, selfUser);
       eventRepository.setEventProcessors([federationEventProcessor]);
 
       onProgress(5, t('initReceivedSelfUser', selfUser.name()));
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_SELF_USER);
-      const clientEntity = await this._initiateSelfUserClients();
-      callingRepository.initAvs(selfUser, clientEntity().id);
+      const clientEntity = await this._initiateSelfUserClients(selfUser, clientRepository);
+      callingRepository.initAvs(selfUser, clientEntity.id);
       onProgress(7.5, t('initValidatedClient'));
       telemetry.timeStep(AppInitTimingsStep.VALIDATED_CLIENT);
-      telemetry.addStatistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity().type ?? clientType);
+      telemetry.addStatistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity.type ?? clientType);
 
       onProgress(10);
       telemetry.timeStep(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
@@ -429,19 +440,20 @@ export class App {
 
       await conversationRepository.conversationRoleRepository.loadTeamRoles();
 
+      let totalNotifications = 0;
       await eventRepository.connectWebSocket(this.core, ({done, total}) => {
         const baseMessage = t('initDecryption');
         const extraInfo = this.config.FEATURE.SHOW_LOADING_INFORMATION
           ? ` ${t('initProgress', {number1: done.toString(), number2: total.toString()})}`
           : '';
 
+        totalNotifications = total;
         onProgress(25 + 50 * (done / total), `${baseMessage}${extraInfo}`);
       });
-      const notificationsCount = eventRepository.notificationsTotal;
 
       if (supportsMLS()) {
         //add the potential `self` and `team` conversations
-        await registerUninitializedSelfAndTeamConversations(conversations, selfUser, clientEntity().id, this.core);
+        await registerUninitializedSelfAndTeamConversations(conversations, selfUser, clientEntity.id, this.core);
 
         if (supportsMLSMigration()) {
           //join all the mls groups that are known by the user but were migrated to mls
@@ -458,7 +470,7 @@ export class App {
       }
 
       telemetry.timeStep(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
-      telemetry.addStatistic(AppInitStatisticsValue.NOTIFICATIONS, notificationsCount, 100);
+      telemetry.addStatistic(AppInitStatisticsValue.NOTIFICATIONS, totalNotifications, 100);
 
       eventTrackerRepository.init(propertiesRepository.properties.settings.privacy.telemetry_sharing);
       onProgress(97.5, t('initUpdatedFromNotifications', this.config.BRAND_NAME));
@@ -471,6 +483,7 @@ export class App {
       telemetry.timeStep(AppInitTimingsStep.APP_PRE_LOADED);
 
       selfUser.devices(clientEntities);
+
       this._handleUrlParams();
       await conversationRepository.updateConversationsOnAppInit();
       await conversationRepository.conversationLabelRepository.loadLabels();
@@ -596,14 +609,11 @@ export class App {
    * Initiate the current client of the self user.
    * @returns Resolves with the local client entity
    */
-  private _initiateSelfUserClients() {
-    return this.repository.client
-      .getValidLocalClient()
-      .then(clientObservable => {
-        this.repository.event.currentClient = clientObservable;
-        return this.repository.client.getClientsForSelf();
-      })
-      .then(() => this.repository.client['clientState'].currentClient);
+  private async _initiateSelfUserClients(selfUser: User, clientRepository: ClientRepository) {
+    // Add the local client to the user
+    selfUser.localClient = await clientRepository.getValidLocalClient();
+    await this.repository.client.getClientsForSelf();
+    return selfUser.localClient;
   }
 
   /**

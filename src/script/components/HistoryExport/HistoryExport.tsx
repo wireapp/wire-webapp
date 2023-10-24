@@ -179,15 +179,19 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
       setNumberOfRecords(numberOfRecords);
       setNumberOfProcessedRecords(0);
 
-      const archiveBlob = await backupRepository.generateHistory(
-        user,
-        clientState.currentClient().id,
-        onProgress,
-        password,
-      );
+      if (clientState.currentClient) {
+        const archiveBlob = await backupRepository.generateHistory(
+          user,
+          clientState.currentClient.id,
+          onProgress,
+          password,
+        );
 
-      onSuccess(archiveBlob);
-      logger.log(`Completed export of '${numberOfRecords}' records from history`);
+        onSuccess(archiveBlob);
+        logger.log(`Completed export of '${numberOfRecords}' records from history`);
+      } else {
+        throw new Error('No local client found');
+      }
     } catch (error) {
       onError(error as Error);
     }

@@ -215,7 +215,7 @@ export class DebugUtil {
     await proteusService['cryptoClient'].debugBreakSession(sessionId);
   }
 
-  async setTeamSupportedProtocols(supportedProtocols: ConversationProtocol[]) {
+  async setTeamSupportedProtocols(supportedProtocols: ConversationProtocol[], defaultProtocol?: ConversationProtocol) {
     const {teamId} = await this.userRepository.getSelf();
     if (!teamId) {
       throw new Error('teamId of self user is undefined');
@@ -228,7 +228,7 @@ export class DebugUtil {
     }
 
     const response = await this.apiClient.api.teams.feature.putMLSFeature(teamId, {
-      config: {...mlsFeature.config, supportedProtocols},
+      config: {...mlsFeature.config, supportedProtocols, defaultProtocol: defaultProtocol || supportedProtocols[0]},
       status: FeatureStatus.ENABLED,
     });
 
@@ -334,7 +334,7 @@ export class DebugUtil {
     messageId: string,
     conversationId: string = this.conversationState.activeConversation().id,
   ): Promise<void> {
-    const clientId = this.clientState.currentClient().id;
+    const clientId = this.clientState.currentClient?.id;
     const userId = this.userState.self().id;
 
     const isOTRMessage = (notification: BackendEvent) => notification.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD;

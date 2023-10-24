@@ -104,7 +104,11 @@ export class MLSConversationVerificationStateHandler {
     const allClients: ClientEntity[] = [];
     const allIdentities: WireIdentity[] = [];
     userEntities.forEach(async userEntity => {
-      const devices = userEntity.devices();
+      let devices = userEntity.devices();
+      // Add the localClient to the devices array if it is the current user
+      if (userEntity.isMe && userEntity.localClient) {
+        devices = [...devices, userEntity.localClient];
+      }
       const deviceUserPairs = devices
         .map(device => ({
           [device.id]: userEntity.qualifiedId,
