@@ -92,36 +92,10 @@ export type MenuRenderFn<TOption extends TypeaheadOption> = (
   matchingString: string,
 ) => ReactPortal | JSX.Element | null;
 
-const scrollToOption = <TOption extends TypeaheadOption>(index: number, options: TOption[], containerId: string) => {
+const scrollToOption = <TOption extends TypeaheadOption>(index: number, options: TOption[]) => {
   const selectedOption = options[index];
-  if (selectedOption && selectedOption.ref?.current) {
-    // when the menu first renders, we scroll to the initially selected element
-    scrollIntoViewIfNeeded(selectedOption.ref?.current, containerId);
-  }
-};
-
-const scrollIntoViewIfNeeded = (target: HTMLElement, containerId: string) => {
-  const typeaheadContainerNode = document.getElementById(containerId);
-
-  if (!typeaheadContainerNode) {
-    return;
-  }
-
-  const typeaheadRect = typeaheadContainerNode.getBoundingClientRect();
-
-  if (typeaheadRect.top + typeaheadRect.height > window.innerHeight) {
-    typeaheadContainerNode.scrollIntoView({
-      block: 'center',
-    });
-  }
-
-  if (typeaheadRect.top < 0) {
-    typeaheadContainerNode.scrollIntoView({
-      block: 'center',
-    });
-  }
-
-  target.scrollIntoView({block: 'nearest'});
+  const element = selectedOption && selectedOption.ref?.current;
+  element?.scrollIntoView({block: 'nearest'});
 };
 
 function getTextUpToAnchor(selection: RangeSelection): string | null {
@@ -360,7 +334,8 @@ function LexicalPopoverMenu<TOption extends TypeaheadOption>({
     className: `typeahead-menu ${anchorClassName || ''}`,
     menuVisible,
     onAdded: () => {
-      scrollToOption(defaultSelectedIndex, options, containerId);
+      // when the menu first renders, we scroll to the initially selected element
+      scrollToOption(defaultSelectedIndex, options);
     },
   });
 
@@ -370,9 +345,9 @@ function LexicalPopoverMenu<TOption extends TypeaheadOption>({
 
   useEffect(() => {
     if (selectedIndex) {
-      scrollToOption(selectedIndex, options, containerId);
+      scrollToOption(selectedIndex, options);
     }
-  }, [containerId, options, selectedIndex]);
+  }, [options, selectedIndex]);
 
   const selectOptionAndCleanUp = useCallback(
     (selectedEntry: TOption) => {
