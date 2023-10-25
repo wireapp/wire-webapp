@@ -254,6 +254,11 @@ function useDynamicPositioning(
 ) {
   const [editor] = useLexicalComposerContext();
   useEffect(() => {
+    // Trigger initial positioning
+    onReposition();
+  }, []);
+
+  useEffect(() => {
     if (targetElement != null && resolution != null) {
       const rootElement = editor.getRootElement();
       const rootScrollParent = rootElement != null ? getScrollParent(rootElement, false) : document.body;
@@ -275,8 +280,6 @@ function useDynamicPositioning(
           }
         }
       };
-      // Trigger initial positioning
-      onReposition();
       const resizeObserver = new ResizeObserver(onReposition);
       window.addEventListener('resize', onReposition);
       document.addEventListener('scroll', handleScroll, {
