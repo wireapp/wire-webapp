@@ -35,6 +35,7 @@ function computeEventUpdates(target: StoredEvent<MessageAddEvent>, reactionEvent
   } = reactionEvent;
   const reactionMap = target.reactions ? userReactionMapToReactionMap(target.reactions) : [];
   return {
+    primary_key: target.primary_key,
     reactions: addReaction(reactionMap, reaction, qualified_from ?? {id: from, domain: ''}),
     version: version,
   };
@@ -50,7 +51,7 @@ export const handleReactionEvent: EventHandler = async (event, {findEvent}) => {
   }
   return {
     type: 'sequential-update',
-    event: targetEvent,
+    event,
     updates: computeEventUpdates(targetEvent, event),
   };
 };

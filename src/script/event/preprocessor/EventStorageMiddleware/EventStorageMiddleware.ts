@@ -104,7 +104,7 @@ export class EventStorageMiddleware implements EventMiddleware {
         break;
 
       case 'sequential-update':
-        await this.eventService.updateEventSequentially(operation.event.primary_key, operation.updates);
+        await this.eventService.updateEventSequentially(operation.updates);
         break;
 
       case 'delete':

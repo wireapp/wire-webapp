@@ -424,12 +424,13 @@ export class EventService {
    * @param primaryKey Event primary key
    * @param changes Changes to update message with
    */
-  async updateEventSequentially(primaryKey: string, changes: Partial<EventRecord> = {}): Promise<number> {
+  async updateEventSequentially(changes: IdentifiedUpdatePayload): Promise<number> {
     const hasVersionedChanges = !!changes.version;
     if (!hasVersionedChanges) {
       throw new ConversationError(ConversationError.TYPE.WRONG_CHANGE, ConversationError.MESSAGE.WRONG_CHANGE);
     }
 
+    const primaryKey = changes.primary_key;
     if (this.storageService.db) {
       // Create a DB transaction to avoid concurrent sequential update.
       return this.storageService.db.transaction('rw', StorageSchemata.OBJECT_STORE.EVENTS, async () => {
