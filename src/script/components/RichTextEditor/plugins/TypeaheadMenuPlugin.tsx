@@ -344,7 +344,7 @@ function LexicalPopoverMenu<TOption extends TypeaheadOption>({
   }, [defaultSelectedIndex]);
 
   useEffect(() => {
-    if (selectedIndex) {
+    if (selectedIndex !== null) {
       scrollToOption(selectedIndex, options);
     }
   }, [options, selectedIndex]);
@@ -380,14 +380,6 @@ function LexicalPopoverMenu<TOption extends TypeaheadOption>({
     };
   }, [editor]);
 
-  useLayoutEffect(() => {
-    if (options === null) {
-      setHighlightedIndex(null);
-    } else if (selectedIndex === null) {
-      updateSelectedIndex(options.length - 1);
-    }
-  }, [options, selectedIndex, updateSelectedIndex]);
-
   useEffect(() => {
     return mergeRegister(
       editor.registerCommand<KeyboardEvent>(
@@ -395,7 +387,7 @@ function LexicalPopoverMenu<TOption extends TypeaheadOption>({
         payload => {
           const event = payload;
           if (options !== null && options.length && selectedIndex !== null) {
-            const newSelectedIndex = selectedIndex !== options.length - 1 ? selectedIndex + 1 : 0;
+            const newSelectedIndex = (selectedIndex + 1) % options.length;
             updateSelectedIndex(newSelectedIndex);
             event.preventDefault();
             event.stopImmediatePropagation();
@@ -409,7 +401,7 @@ function LexicalPopoverMenu<TOption extends TypeaheadOption>({
         payload => {
           const event = payload;
           if (options !== null && options.length && selectedIndex !== null) {
-            const newSelectedIndex = selectedIndex !== 0 ? selectedIndex - 1 : options.length - 1;
+            const newSelectedIndex = selectedIndex > 0 ? selectedIndex - 1 : options.length - 1;
             updateSelectedIndex(newSelectedIndex);
             event.preventDefault();
             event.stopImmediatePropagation();
