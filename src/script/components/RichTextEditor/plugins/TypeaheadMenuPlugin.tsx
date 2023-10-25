@@ -43,13 +43,11 @@ import {
   $isTextNode,
   COMMAND_PRIORITY_LOW,
   COMMAND_PRIORITY_NORMAL,
-  createCommand,
   KEY_ARROW_DOWN_COMMAND,
   KEY_ARROW_UP_COMMAND,
   KEY_ENTER_COMMAND,
   KEY_ESCAPE_COMMAND,
   KEY_TAB_COMMAND,
-  LexicalCommand,
   LexicalEditor,
   RangeSelection,
   TextNode,
@@ -94,28 +92,10 @@ export type MenuRenderFn<TOption extends TypeaheadOption> = (
   matchingString: string,
 ) => ReactPortal | JSX.Element | null;
 
-const scrollIntoViewIfNeeded = (target: HTMLElement, containerId: string) => {
-  const typeaheadContainerNode = document.getElementById(containerId);
-
-  if (!typeaheadContainerNode) {
-    return;
-  }
-
-  const typeaheadRect = typeaheadContainerNode.getBoundingClientRect();
-
-  if (typeaheadRect.top + typeaheadRect.height > window.innerHeight) {
-    typeaheadContainerNode.scrollIntoView({
-      block: 'center',
-    });
-  }
-
-  if (typeaheadRect.top < 0) {
-    typeaheadContainerNode.scrollIntoView({
-      block: 'center',
-    });
-  }
-
-  target.scrollIntoView({block: 'nearest'});
+const scrollToOption = <TOption extends TypeaheadOption>(index: number, options: TOption[]) => {
+  const selectedOption = options[index];
+  const element = selectedOption && selectedOption.ref?.current;
+  element?.scrollIntoView({block: 'nearest'});
 };
 
 function getTextUpToAnchor(selection: RangeSelection): string | null {
@@ -313,11 +293,6 @@ function useDynamicPositioning(
   }, [targetElement, editor, onVisibilityChange, onReposition, resolution]);
 }
 
-export const SCROLL_TYPEAHEAD_OPTION_INTO_VIEW_COMMAND: LexicalCommand<{
-  index: number;
-  option: TypeaheadOption;
-}> = createCommand('SCROLL_TYPEAHEAD_OPTION_INTO_VIEW_COMMAND');
-
 function LexicalPopoverMenu<TOption extends TypeaheadOption>({
   close,
   editor,
@@ -350,6 +325,7 @@ function LexicalPopoverMenu<TOption extends TypeaheadOption>({
 }): JSX.Element | null {
   const [menuVisible, setMenuVisible] = useState(false);
   const [selectedIndex, setHighlightedIndex] = useState<null | number>(null);
+  const defaultSelectedIndex = isReversed ? options.length - 1 : 0;
 
   const anchorElementRef = useMenuAnchorRef({
     containerId,
@@ -357,11 +333,21 @@ function LexicalPopoverMenu<TOption extends TypeaheadOption>({
     setResolution,
     className: `typeahead-menu ${anchorClassName || ''}`,
     menuVisible,
+    onAdded: () => {
+      // when the menu first renders, we scroll to the initially selected element
+      scrollToOption(defaultSelectedIndex, options);
+    },
   });
 
   useEffect(() => {
-    setHighlightedIndex(isReversed ? options.length - 1 : 0);
-  }, [options.length, isReversed]);
+    setHighlightedIndex(defaultSelectedIndex);
+  }, [defaultSelectedIndex]);
+
+  useEffect(() => {
+    if (selectedIndex !== null) {
+      scrollToOption(selectedIndex, options);
+    }
+  }, [options, selectedIndex]);
 
   const selectOptionAndCleanUp = useCallback(
     (selectedEntry: TOption) => {
@@ -394,47 +380,6 @@ function LexicalPopoverMenu<TOption extends TypeaheadOption>({
     };
   }, [editor]);
 
-  useLayoutEffect(() => {
-    if (options === null) {
-      setHighlightedIndex(null);
-    } else if (selectedIndex === null) {
-      updateSelectedIndex(options.length - 1);
-    }
-  }, [options, selectedIndex, updateSelectedIndex]);
-
-  useEffect(() => {
-    return mergeRegister(
-      editor.registerCommand(
-        SCROLL_TYPEAHEAD_OPTION_INTO_VIEW_COMMAND,
-        ({option}) => {
-          if (option.ref && option.ref.current != null) {
-            scrollIntoViewIfNeeded(option.ref.current, containerId);
-            return true;
-          }
-
-          return false;
-        },
-        COMMAND_PRIORITY_LOW,
-      ),
-    );
-  }, [editor, updateSelectedIndex, containerId]);
-
-  useEffect(() => {
-    if (menuVisible && typeof selectedIndex === 'number' && options?.[selectedIndex]) {
-      const currentSelectedOption = options[selectedIndex];
-
-      // Using setTimeout because we need to wait for popover render
-      const timer = setTimeout(() => {
-        if (currentSelectedOption.ref != null && currentSelectedOption.ref.current) {
-          scrollIntoViewIfNeeded(currentSelectedOption.ref.current, containerId);
-        }
-      }, 16);
-
-      return () => clearTimeout(timer);
-    }
-    return undefined;
-  }, [editor, menuVisible, selectedIndex, options, containerId]);
-
   useEffect(() => {
     return mergeRegister(
       editor.registerCommand<KeyboardEvent>(
@@ -442,15 +387,8 @@ function LexicalPopoverMenu<TOption extends TypeaheadOption>({
         payload => {
           const event = payload;
           if (options !== null && options.length && selectedIndex !== null) {
-            const newSelectedIndex = selectedIndex !== options.length - 1 ? selectedIndex + 1 : 0;
+            const newSelectedIndex = (selectedIndex + 1) % options.length;
             updateSelectedIndex(newSelectedIndex);
-            const option = options[newSelectedIndex];
-            if (option.ref != null && option.ref.current) {
-              editor.dispatchCommand(SCROLL_TYPEAHEAD_OPTION_INTO_VIEW_COMMAND, {
-                index: newSelectedIndex,
-                option,
-              });
-            }
             event.preventDefault();
             event.stopImmediatePropagation();
           }
@@ -463,15 +401,8 @@ function LexicalPopoverMenu<TOption extends TypeaheadOption>({
         payload => {
           const event = payload;
           if (options !== null && options.length && selectedIndex !== null) {
-            const newSelectedIndex = selectedIndex !== 0 ? selectedIndex - 1 : options.length - 1;
+            const newSelectedIndex = selectedIndex > 0 ? selectedIndex - 1 : options.length - 1;
             updateSelectedIndex(newSelectedIndex);
-            const option = options[newSelectedIndex];
-            if (option.ref != null && option.ref.current) {
-              editor.dispatchCommand(SCROLL_TYPEAHEAD_OPTION_INTO_VIEW_COMMAND, {
-                index: newSelectedIndex,
-                option,
-              });
-            }
             event.preventDefault();
             event.stopImmediatePropagation();
           }
@@ -553,6 +484,7 @@ interface UseMenuAnchorRefOptions {
   setResolution: (r: Resolution | null) => void;
   className?: string;
   menuVisible?: boolean;
+  onAdded?: () => void;
 }
 
 function useMenuAnchorRef(opt: UseMenuAnchorRefOptions): MutableRefObject<HTMLElement> {
@@ -599,6 +531,7 @@ function useMenuAnchorRef(opt: UseMenuAnchorRefOptions): MutableRefObject<HTMLEl
         containerDiv.style.display = 'block';
         containerDiv.style.position = 'absolute';
         document.body.append(containerDiv);
+        opt.onAdded?.();
       }
       anchorElementRef.current = containerDiv;
       rootElement.setAttribute('aria-controls', 'typeahead-menu');
