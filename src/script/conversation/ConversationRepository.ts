@@ -2905,7 +2905,7 @@ export class ConversationRepository {
       }
       const changes = messageEntity.getSelectionChange(buttonId);
       if (changes) {
-        this.eventService.updateEventSequentially(messageEntity.primary_key, changes);
+        await this.eventService.updateEventSequentially({primary_key: messageEntity.primary_key, ...changes});
       }
     } catch (error) {
       const isNotFound = error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;
