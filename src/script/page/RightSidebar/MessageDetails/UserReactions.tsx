@@ -59,14 +59,9 @@ export function UsersReactions({reactions, selfUser, findUsers, onParticipantCli
           <span css={messageReactionDetailsMargin}>{capitalizedEmojiName}</span>
           <span css={reactionsCountAlignment}>({emojiCount})</span>
         </div>
-        <UserList
-          selfUser={selfUser}
-          key={reactionKey}
-          data-uie-name="reaction-list"
-          users={users}
-          noUnderline
-          onClick={onParticipantClick}
-        />
+        <div data-uie-name="reaction-list">
+          <UserList selfUser={selfUser} key={reactionKey} users={users} noUnderline onClick={onParticipantClick} />
+        </div>
       </Fragment>
     );
   });
