@@ -254,6 +254,11 @@ function useDynamicPositioning(
 ) {
   const [editor] = useLexicalComposerContext();
   useEffect(() => {
+    // Trigger initial positioning
+    onReposition();
+  }, []);
+
+  useEffect(() => {
     if (targetElement != null && resolution != null) {
       const rootElement = editor.getRootElement();
       const rootScrollParent = rootElement != null ? getScrollParent(rootElement, false) : document.body;
@@ -488,7 +493,7 @@ interface UseMenuAnchorRefOptions {
 }
 
 function useMenuAnchorRef(opt: UseMenuAnchorRefOptions): MutableRefObject<HTMLElement> {
-  const {resolution, setResolution, className, containerId} = opt;
+  const {resolution, setResolution, className, containerId, onAdded} = opt;
   const [editor] = useLexicalComposerContext();
   const anchorElementRef = useRef<HTMLElement>(document.createElement('div'));
   const positionMenu = useCallback(() => {
@@ -531,12 +536,12 @@ function useMenuAnchorRef(opt: UseMenuAnchorRefOptions): MutableRefObject<HTMLEl
         containerDiv.style.display = 'block';
         containerDiv.style.position = 'absolute';
         document.body.append(containerDiv);
-        opt.onAdded?.();
+        onAdded?.();
       }
       anchorElementRef.current = containerDiv;
       rootElement.setAttribute('aria-controls', 'typeahead-menu');
     }
-  }, [editor, resolution, className, containerId]);
+  }, [editor, resolution, className, containerId, onAdded]);
 
   useEffect(() => {
     return () => {
