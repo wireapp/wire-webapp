@@ -73,6 +73,50 @@ interface MentionsPluginProps {
   openStateRef: MutableRefObject<boolean>;
 }
 
+function MentionMenu({
+  getPosition,
+  options,
+  selectedIndex,
+  selectOptionAndCleanUp,
+  setHighlightedIndex,
+}: {
+  getPosition: () => {bottom: number; left: number};
+  options: MenuOption[];
+  selectedIndex: number | null;
+  selectOptionAndCleanUp: (option: MenuOption) => void;
+  setHighlightedIndex: (index: number) => void;
+}) {
+  const {bottom, left} = getPosition();
+
+  return (
+    <IgnoreOutsideClickWrapper>
+      <FadingScrollbar
+        className="conversation-input-bar-mention-suggestion"
+        style={{bottom, left, overflowY: 'auto'}}
+        data-uie-name="list-mention-suggestions"
+      >
+        <div className="mention-suggestion-list">
+          {options.map((menuOption, index) => (
+            <MentionSuggestionsItem
+              ref={menuOption.setRefElement}
+              key={menuOption.user.id}
+              suggestion={menuOption.user}
+              isSelected={selectedIndex === index}
+              onSuggestionClick={() => {
+                setHighlightedIndex(index);
+                selectOptionAndCleanUp(menuOption);
+              }}
+              onMouseEnter={() => {
+                setHighlightedIndex(index);
+              }}
+            />
+          ))}
+        </div>
+      </FadingScrollbar>
+    </IgnoreOutsideClickWrapper>
+  );
+}
+
 export function MentionsPlugin({onSearch, openStateRef}: MentionsPluginProps) {
   const [editor] = useLexicalComposerContext();
   const [queryString, setQueryString] = useState<string | null>();
@@ -116,44 +160,12 @@ export function MentionsPlugin({onSearch, openStateRef}: MentionsPluginProps) {
     return {bottom: window.innerHeight - boundingClientRect.top + 24, left: boundingClientRect.left};
   };
 
-  const menuRenderFn: MenuRenderFn<MenuOption> = (
-    anchorElementRef,
-    {selectedIndex, selectOptionAndCleanUp, setHighlightedIndex},
-  ) => {
+  const menuRenderFn: MenuRenderFn<MenuOption> = (anchorElementRef, params) => {
     if (!anchorElementRef.current || !options.length) {
       return null;
     }
 
-    const {bottom, left} = getPosition();
-
-    return ReactDOM.createPortal(
-      <IgnoreOutsideClickWrapper>
-        <FadingScrollbar
-          className="conversation-input-bar-mention-suggestion"
-          style={{bottom, left, overflowY: 'auto'}}
-          data-uie-name="list-mention-suggestions"
-        >
-          <div className="mention-suggestion-list">
-            {options.map((menuOption, index) => (
-              <MentionSuggestionsItem
-                ref={menuOption.setRefElement}
-                key={menuOption.user.id}
-                suggestion={menuOption.user}
-                isSelected={selectedIndex === index}
-                onSuggestionClick={() => {
-                  setHighlightedIndex(index);
-                  selectOptionAndCleanUp(menuOption);
-                }}
-                onMouseEnter={() => {
-                  setHighlightedIndex(index);
-                }}
-              />
-            ))}
-          </div>
-        </FadingScrollbar>
-      </IgnoreOutsideClickWrapper>,
-      anchorElementRef.current,
-    );
+    return ReactDOM.createPortal(<MentionMenu getPosition={getPosition} {...params} />, anchorElementRef.current);
   };
 
   openStateRef.current = options.length > 0;
