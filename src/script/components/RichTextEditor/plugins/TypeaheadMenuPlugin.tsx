@@ -275,6 +275,8 @@ function useDynamicPositioning(
           }
         }
       };
+      // Trigger initial positioning
+      onReposition();
       const resizeObserver = new ResizeObserver(onReposition);
       window.addEventListener('resize', onReposition);
       document.addEventListener('scroll', handleScroll, {
@@ -536,7 +538,7 @@ function useMenuAnchorRef(opt: UseMenuAnchorRefOptions): MutableRefObject<HTMLEl
       anchorElementRef.current = containerDiv;
       rootElement.setAttribute('aria-controls', 'typeahead-menu');
     }
-  }, [editor, resolution, className, containerId]);
+  }, [editor, resolution, className, containerId, opt]);
 
   useEffect(() => {
     return () => {
