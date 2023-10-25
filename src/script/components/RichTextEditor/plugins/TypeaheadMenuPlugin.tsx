@@ -493,7 +493,7 @@ interface UseMenuAnchorRefOptions {
 }
 
 function useMenuAnchorRef(opt: UseMenuAnchorRefOptions): MutableRefObject<HTMLElement> {
-  const {resolution, setResolution, className, containerId} = opt;
+  const {resolution, setResolution, className, containerId, onAdded} = opt;
   const [editor] = useLexicalComposerContext();
   const anchorElementRef = useRef<HTMLElement>(document.createElement('div'));
   const positionMenu = useCallback(() => {
@@ -536,12 +536,12 @@ function useMenuAnchorRef(opt: UseMenuAnchorRefOptions): MutableRefObject<HTMLEl
         containerDiv.style.display = 'block';
         containerDiv.style.position = 'absolute';
         document.body.append(containerDiv);
-        opt.onAdded?.();
+        onAdded?.();
       }
       anchorElementRef.current = containerDiv;
       rootElement.setAttribute('aria-controls', 'typeahead-menu');
     }
-  }, [editor, resolution, className, containerId, opt]);
+  }, [editor, resolution, className, containerId, onAdded]);
 
   useEffect(() => {
     return () => {
