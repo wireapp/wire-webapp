@@ -111,6 +111,10 @@
   background-color: var(--app-bg-secondary);
   transition: opacity 0.25s ease-in-out;
 
+  &__item {
+    position: relative;
+  }
+
   &__centered-items {
     display: flex;
     justify-content: space-between;
@@ -221,15 +225,16 @@
 
 .device-toggle-button {
   .button-reset-default;
-  // margin-left: 55px;
-  // position: absolute;
-  // margin-bottom: 30px;
-  // height: 18px;
-  // width: 18px;
-  // cursor: pointer;
-  // line-height: 0;
-  // border-radius: 50%;
-  // background-color: var(--inactive-call-button-bg);
-  // border: 1px solid var(--inactive-call-button-border);
+  top:-5px;
+  left: 60px;
+  position: absolute;
+  margin-bottom: 30px;
+  height: 18px;
+  width: 18px;
+  cursor: pointer;
+  line-height: 0;
+  border-radius: 50%;
+  background-color: var(--inactive-call-button-bg);
+  border: 1px solid var(--inactive-call-button-border);
   // transition: background-color 0.25s ease-in-out;
 }

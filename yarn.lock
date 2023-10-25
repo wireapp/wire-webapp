@@ -5327,9 +5327,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/react-ui-kit@npm:9.9.9":
-  version: 9.9.9
-  resolution: "@wireapp/react-ui-kit@npm:9.9.9"
+"@wireapp/react-ui-kit@file:.yalc/@wireapp/react-ui-kit::locator=wire-webapp%40workspace%3A.":
+  version: 9.9.10
+  resolution: "@wireapp/react-ui-kit@file:.yalc/@wireapp/react-ui-kit#.yalc/@wireapp/react-ui-kit::hash=b60a14&locator=wire-webapp%40workspace%3A."
   dependencies:
     "@types/color": 3.0.4
     color: 4.2.3
@@ -5344,7 +5344,7 @@ __metadata:
   peerDependenciesMeta:
     "@types/react":
       optional: true
-  checksum: 5f9aae81fbaa194661bbe07655dcda0d31c0c9acf6e530cd886b729019ad64fd298918c8061e2036c6cd67b34f69f15ae925944005ecf4e147bd7c3791c66295
+  checksum: 73a55478e5f0a20915dc7c4f87ce50436c6c562bd3888f031f60d1ae342a10f232167254e40c83c19ca20c4adb8c83a613cdf089ae5ea2949f3735fad660cf30
   languageName: node
   linkType: hard
 
@@ -18265,7 +18265,7 @@ __metadata:
     "@wireapp/eslint-config": 3.0.4
     "@wireapp/lru-cache": 3.8.1
     "@wireapp/prettier-config": 0.6.3
-    "@wireapp/react-ui-kit": 9.9.9
+    "@wireapp/react-ui-kit": "file:.yalc/@wireapp/react-ui-kit"
     "@wireapp/store-engine": ^5.1.4
     "@wireapp/store-engine-dexie": 2.1.6
     "@wireapp/store-engine-sqleet": 1.8.9

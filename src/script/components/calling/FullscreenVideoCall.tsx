@@ -24,7 +24,7 @@ import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {container} from 'tsyringe';
 
 import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
-import {IconButton, IconButtonVariant, Select, useMatchMedia} from '@wireapp/react-ui-kit';
+import {Button, ButtonVariant, IconButton, IconButtonVariant, Select, useMatchMedia} from '@wireapp/react-ui-kit';
 
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {Icon} from 'Components/Icon';
@@ -128,6 +128,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     DeviceTypes.VIDEO_INPUT,
   ]);
 
+  const [isOpen, setIsOpen] = React.useState(false);
   const minimize = () => multitasking.isMinimized(true);
   const {videoInput} = useKoSubscribableChildren(mediaDevicesHandler.availableDevices, [DeviceTypes.VIDEO_INPUT]);
   const showToggleVideo =
@@ -383,19 +384,38 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                   </span>
 
                   {isMuted ? <Icon.MicOff width={16} height={16} /> : <Icon.MicOn width={16} height={16} />}
-
-                  {showSwitchMicrophone && !verticalBreakpoint && (
-                    //TODO: lets try wrapping this in a parent div and see if it works
-                    <Select
-                      controlShouldRenderValue={false}
-                      isClearable={false}
-                      backspaceRemovesValue={false}
-                      className="device-toggle-button"
-                      options={audioOptions}
-                      menuPlacement="top"
-                    />
-                  )}
                 </button>
+
+                {showSwitchMicrophone && !verticalBreakpoint && (
+                  <button
+                    // variant={ButtonVariant.PRIMARY}
+                    className="device-toggle-button"
+                    onClick={() => {
+                      setIsOpen(prev => !prev);
+                    }}
+                    // onBlur={() => setIsOpen(false)}
+                  >
+                    {isOpen ? (
+                      <>
+                        <Icon.Chevron width={12} height={12} />
+                        <Select
+                          id="select-microphone"
+                          dataUieName="select-microphone"
+                          controlShouldRenderValue={false}
+                          isClearable={false}
+                          backspaceRemovesValue={false}
+                          hideSelectedOptions={false}
+                          className="device-toggle-button"
+                          options={audioOptions}
+                          menuPlacement="top"
+                          menuIsOpen
+                        />
+                      </>
+                    ) : (
+                      <Icon.Chevron width={12} height={12} />
+                    )}
+                  </button>
+                )}
               </li>
 
               {showToggleVideo && (
