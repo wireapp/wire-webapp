@@ -17,7 +17,6 @@
  *
  */
 
-import {SUBCONVERSATION_ID} from '@wireapp/api-client/lib/conversation/Subconversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {constructFullyQualifiedClientId} from '@wireapp/core/lib/util/fullyQualifiedClientIdUtils';
 import {TaskScheduler} from '@wireapp/core/lib/util/TaskScheduler';
@@ -41,7 +40,6 @@ import {CallingRepository, QualifiedWcallMember} from '../calling/CallingReposit
 import {callingSubscriptions} from '../calling/callingSubscriptionsHandler';
 import {CallState} from '../calling/CallState';
 import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
-import {getSubconversationEpochInfo, subscribeToEpochUpdates} from '../calling/mlsConference';
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
 import {ConversationState} from '../conversation/ConversationState';
@@ -161,12 +159,10 @@ export class CallingViewModel {
       }
 
       if (conversation.isUsingMLSProtocol) {
-        const unsubscribe = await subscribeToEpochUpdates(
-          {mlsService: this.mlsService, conversationState: this.conversationState},
+        const unsubscribe = await this.subconversationService.subscribeToEpochUpdates(
           conversation.qualifiedId,
-          ({epoch, keyLength, secretKey, members}) => {
-            this.callingRepository.setEpochInfo(conversation.qualifiedId, {epoch, secretKey}, members);
-          },
+          (groupId: string) => this.conversationState.findConversationByGroupId(groupId)?.qualifiedId,
+          data => this.callingRepository.setEpochInfo(conversation.qualifiedId, data),
         );
 
         callingSubscriptions.addCall(call.conversationId, unsubscribe);
@@ -175,12 +171,10 @@ export class CallingViewModel {
     };
 
     const joinOngoingMlsConference = async (call: Call) => {
-      const unsubscribe = await subscribeToEpochUpdates(
-        {mlsService: this.mlsService, conversationState: this.conversationState},
+      const unsubscribe = await this.subconversationService.subscribeToEpochUpdates(
         call.conversationId,
-        ({epoch, keyLength, secretKey, members}) => {
-          this.callingRepository.setEpochInfo(call.conversationId, {epoch, secretKey}, members);
-        },
+        (groupId: string) => this.conversationState.findConversationByGroupId(groupId)?.qualifiedId,
+        data => this.callingRepository.setEpochInfo(call.conversationId, data),
       );
 
       callingSubscriptions.addCall(call.conversationId, unsubscribe);
@@ -217,27 +211,16 @@ export class CallingViewModel {
         return;
       }
 
-      const subconversationGroupId = await this.mlsService.getGroupIdFromConversationId(
-        conversationId,
-        SUBCONVERSATION_ID.CONFERENCE,
-      );
-
-      if (!subconversationGroupId) {
-        return;
-      }
-
-      //we don't want to react to avs callbacks when conversation was not yet established
-      const doesMLSGroupExist = await this.mlsService.conversationExists(subconversationGroupId);
-      if (!doesMLSGroupExist) {
-        return;
-      }
-
-      const {epoch, secretKey, members} = await getSubconversationEpochInfo(
-        {mlsService: this.mlsService},
+      const subconversationEpochInfo = await this.subconversationService.getSubconversationEpochInfo(
         conversationId,
         shouldAdvanceEpoch,
       );
-      this.callingRepository.setEpochInfo(conversationId, {epoch, secretKey}, members);
+
+      if (!subconversationEpochInfo) {
+        return;
+      }
+
+      this.callingRepository.setEpochInfo(conversationId, subconversationEpochInfo);
     };
 
     const closeCall = async (conversationId: QualifiedId, conversationType: CONV_TYPE) => {
@@ -246,7 +229,7 @@ export class CallingViewModel {
         return;
       }
 
-      await this.mlsService.leaveConferenceSubconversation(conversationId);
+      await this.subconversationService.leaveConferenceSubconversation(conversationId);
       callingSubscriptions.removeCall(conversationId);
     };
 
@@ -256,44 +239,6 @@ export class CallingViewModel {
         ring(call);
       }
     });
-
-    const removeStaleClient = async (
-      conversationId: QualifiedId,
-      memberToRemove: QualifiedWcallMember,
-    ): Promise<void> => {
-      const subconversationGroupId = await this.mlsService.getGroupIdFromConversationId(
-        conversationId,
-        SUBCONVERSATION_ID.CONFERENCE,
-      );
-
-      if (!subconversationGroupId) {
-        return;
-      }
-
-      const doesMLSGroupExist = await this.mlsService.conversationExists(subconversationGroupId);
-      if (!doesMLSGroupExist) {
-        return;
-      }
-
-      const {
-        userId: {id: userId, domain},
-        clientid,
-      } = memberToRemove;
-      const clientToRemoveQualifiedId = constructFullyQualifiedClientId(userId, clientid, domain);
-
-      const subconversationMembers = await this.mlsService.getClientIds(subconversationGroupId);
-
-      const isSubconversationMember = subconversationMembers.some(
-        ({userId, clientId, domain}) =>
-          constructFullyQualifiedClientId(userId, clientId, domain) === clientToRemoveQualifiedId,
-      );
-
-      if (!isSubconversationMember) {
-        return;
-      }
-
-      return void this.mlsService.removeClientsFromConversation(subconversationGroupId, [clientToRemoveQualifiedId]);
-    };
 
     const handleCallParticipantChange = (conversationId: QualifiedId, members: QualifiedWcallMember[]) => {
       const conversation = this.getConversationById(conversationId);
@@ -326,7 +271,11 @@ export class CallingViewModel {
           firingDate,
           key,
           // if timer expires = client is stale -> remove client from the subconversation
-          task: () => removeStaleClient(conversationId, member),
+          task: () =>
+            this.subconversationService.removeClientFromConferenceSubconversation(conversationId, {
+              user: {id: member.userId.id, domain: member.userId.domain},
+              clientId: member.clientid,
+            }),
         });
       }
     };
@@ -455,13 +404,13 @@ export class CallingViewModel {
     };
   }
 
-  get mlsService() {
-    const mlsService = this.core.service?.mls;
-    if (!mlsService) {
-      throw new Error('mls service was not initialised');
+  get subconversationService() {
+    const subconversationService = this.core.service?.subconversation;
+    if (!subconversationService) {
+      throw new Error('SubconversationService was not initialised');
     }
 
-    return mlsService;
+    return subconversationService;
   }
 
   /**
