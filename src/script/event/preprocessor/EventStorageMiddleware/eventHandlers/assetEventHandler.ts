@@ -66,7 +66,8 @@ function computeEventUpdates(
     case ASSET_PREVIEW:
     case RETRY_EVENT:
     case AssetTransferState.UPLOADED: {
-      return {type: 'update', event: newEvent, updates: updateEventData(newEventData)};
+      const updatedEvent = updateEventData(newEventData);
+      return {type: 'update', event: updatedEvent, updates: updatedEvent};
     }
 
     case AssetTransferState.UPLOAD_FAILED: {
