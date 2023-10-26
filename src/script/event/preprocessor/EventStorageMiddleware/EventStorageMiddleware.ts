@@ -58,7 +58,7 @@ export class EventStorageMiddleware implements EventMiddleware {
   }
 
   private async getDbOperation(event: HandledEvents, duplicateEvent?: HandledEvents): Promise<DBOperation> {
-    const handlers = [handleEditEvent, handleLinkPreviewEvent, handleAssetEvent, handleReactionEvent];
+    const handlers = [handleLinkPreviewEvent, handleEditEvent, handleAssetEvent, handleReactionEvent];
     for (const handler of handlers) {
       const operation = await handler(event, {
         duplicateEvent,
