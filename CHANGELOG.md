@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [42.19.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.18.0...@wireapp/core@42.19.0) (2023-10-26)
+
+### Features
+
+* bump core-crypto ([#5665](https://github.com/wireapp/wire-web-packages/issues/5665)) ([96de7af](https://github.com/wireapp/wire-web-packages/commit/96de7afbe92d8701e81c0a551ee0a41620f40923))
+
 # [42.18.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.17.0...@wireapp/core@42.18.0) (2023-10-24)
 
 ### Features
