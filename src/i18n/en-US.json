@@ -8,6 +8,7 @@
   "BackendError.LABEL.CONVERSATION_CODE_NOT_FOUND": "This link is no longer valid. Ask the person who invited you how to join.",
   "BackendError.LABEL.CONVERSATION_NOT_FOUND": "CONVERSATION_NOT_FOUND",
   "BackendError.LABEL.CONVERSATION_TOO_MANY_MEMBERS": "This conversation has reached the limit of participants",
+  "BackendErrorLabel.INVALID_CONVERSATION_PASSWORD": "The password is incorrect, please try again.",
   "BackendError.LABEL.EMAIL_EXISTS": "This email address is already in use. {supportEmailExistsLink}",
   "BackendError.LABEL.EMAIL_REQUIRED": "You can’t use your username as two-factor authentication is activated. Please log in with your email instead.",
   "BackendError.LABEL.HANDLE_EXISTS": "This username is already taken",

@@ -685,6 +685,10 @@ export const errorHandlerStrings = defineMessages({
     defaultMessage: 'This email cannot be used for enterprise login. Please enter the SSO code to proceed.',
     id: 'BackendErrorLabel.CUSTOM_BACKEND_NOT_FOUND',
   },
+  [BackendErrorLabel.INVALID_CONVERSATION_PASSWORD]: {
+    defaultMessage: 'Password is incorrect, please try again.',
+    id: 'BackendErrorLabel.INVALID_CONVERSATION_PASSWORD',
+  },
   learnMore: {
     defaultMessage: 'Learn more',
     id: 'BackendError.learnMore',

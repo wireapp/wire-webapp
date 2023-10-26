@@ -252,6 +252,11 @@ const LoginComponent = ({
     } catch (error) {
       if (isBackendError(error)) {
         switch (error.label) {
+          case BackendErrorLabel.INVALID_CONVERSATION_PASSWORD: {
+            setConversationSubmitData(formLoginData);
+            setIsLinkPasswordModalOpen(true);
+            break;
+          }
           case BackendErrorLabel.TOO_MANY_CLIENTS: {
             await resetAuthError();
             if (formLoginData?.verificationCode) {
@@ -359,7 +364,11 @@ const LoginComponent = ({
           {!embedded && <AppAlreadyOpen />}
           {isLinkPasswordModalOpen && (
             <JoinGuestLinkPasswordModal
-              onClose={() => setIsLinkPasswordModalOpen(false)}
+              onClose={() => {
+                setIsLinkPasswordModalOpen(false);
+                void resetAuthError();
+                setValidationErrors([]);
+              }}
               error={conversationError}
               conversationName={conversationInfo?.name}
               isLoading={isFetching || conversationInfoFetching}

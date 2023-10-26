@@ -23,7 +23,6 @@ import type {RegisterData} from '@wireapp/api-client/lib/auth';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
-import {Navigate} from 'react-router';
 import {AnyAction, Dispatch} from 'redux';
 
 import {UrlUtil} from '@wireapp/commons';
@@ -50,7 +49,7 @@ import {bindActionCreators, RootState} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as ConversationSelector from '../module/selector/ConversationSelector';
 import * as SelfSelector from '../module/selector/SelfSelector';
-import {QUERY_KEY, ROUTE} from '../route';
+import {QUERY_KEY} from '../route';
 import * as AccentColor from '../util/AccentColor';
 
 type Props = React.HTMLProps<HTMLDivElement>;
@@ -75,8 +74,7 @@ const ConversationJoinComponent = ({
   const {formatMessage: _} = useIntl();
 
   const conversationHasPassword = conversationInfo?.has_password;
-  const invalidConversationPassword =
-    conversationError && conversationError.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD;
+
   const [accentColor] = useState(AccentColor.STRONG_BLUE);
   const [isJoinGuestLinkPasswordModalOpen, setIsJoinGuestLinkPasswordModalOpen] = useState<boolean>(false);
   const [conversationCode, setConversationCode] = useState<string>();
@@ -94,10 +92,6 @@ const ConversationJoinComponent = ({
   const isFetching = isFetchingAuth || isFetchingConversation || conversationInfoFetching;
 
   const isWirePublicInstance = Config.getConfig().BRAND_NAME === 'Wire';
-
-  useEffect(() => {
-    setIsJoinGuestLinkPasswordModalOpen(!!invalidConversationPassword);
-  }, [invalidConversationPassword]);
 
   useEffect(() => {
     const localConversationCode = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_CODE);
@@ -129,6 +123,10 @@ const ConversationJoinComponent = ({
   };
 
   const getConversationInfoAndJoin = async (password?: string) => {
+    if (!isJoinGuestLinkPasswordModalOpen && !!conversationHasPassword) {
+      setIsJoinGuestLinkPasswordModalOpen(true);
+      return;
+    }
     try {
       if (!conversationCode || !conversationKey) {
         throw Error('Conversation code or key missing');
@@ -138,10 +136,15 @@ const ConversationJoinComponent = ({
        * That means that when the webapp loads and tries to fetch the notificationStream is will get the join event once again and will try to handle it
        * Here we set the core's lastEventDate so that it knows that this duplicated event should be skipped
        */
-      await setLastEventDate(new Date(conversationEvent.time));
+      await setLastEventDate(conversationEvent.time ? new Date(conversationEvent.time) : new Date());
 
       routeToApp(conversationEvent.conversation, conversationEvent.qualified_conversation?.domain ?? '');
     } catch (error) {
+      setIsSubmitingName(false);
+      if (error.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD) {
+        setIsJoinGuestLinkPasswordModalOpen(true);
+        return;
+      }
       console.warn('Unable to join conversation', error);
       setShowEntropyForm(false);
     }
@@ -234,9 +237,6 @@ const ConversationJoinComponent = ({
     await handleSubmit(undefined, password);
   };
 
-  if (!isValidLink) {
-    return <Navigate to={ROUTE.CONVERSATION_JOIN_INVALID} replace />;
-  }
   if (isFullConversation) {
     return <ConversationJoinFull />;
   }
@@ -249,7 +249,7 @@ const ConversationJoinComponent = ({
           error={conversationError || generalError}
           isLoading={isFetching}
           conversationName={conversationInfo?.name}
-          onSubmitPassword={submitJoinCodeWithPassword}
+          onSubmitPassword={selfName && !enteredName ? getConversationInfoAndJoin : submitJoinCodeWithPassword}
         />
       )}
       <WirelessContainer
