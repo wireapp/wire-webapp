@@ -45,6 +45,7 @@ import {ClientInfo, ClientService} from './client/';
 import {ConnectionService} from './connection/';
 import {AssetService, ConversationService} from './conversation/';
 import {getQueueLength, pauseMessageSending, resumeMessageSending} from './conversation/message/messageSender';
+import {SubconversationService} from './conversation/SubconversationService/SubconversationService';
 import {GiphyService} from './giphy/';
 import {LinkPreviewService} from './linkPreview';
 import {MLSService} from './messagingProtocols/mls';
@@ -139,6 +140,7 @@ export class Account extends TypedEventEmitter<Events> {
     client: ClientService;
     connection: ConnectionService;
     conversation: ConversationService;
+    subconversation: SubconversationService;
     giphy: GiphyService;
     linkPreview: LinkPreviewService;
     notification: NotificationService;
@@ -357,7 +359,7 @@ export class Account extends TypedEventEmitter<Events> {
       await this.service.mls.schedulePeriodicKeyPackagesBackendSync(validClient.id);
 
       // leave stale conference subconversations (e.g after a crash)
-      await this.service.mls.leaveStaleConferenceSubconversations();
+      await this.service.subconversation.leaveStaleConferenceSubconversations();
     }
 
     return validClient;
@@ -435,6 +437,7 @@ export class Account extends TypedEventEmitter<Events> {
     const giphyService = new GiphyService(this.apiClient);
     const linkPreviewService = new LinkPreviewService(assetService);
     const conversationService = new ConversationService(this.apiClient, proteusService, this.db, mlsService);
+    const subconversationService = new SubconversationService(this.apiClient, mlsService);
     const notificationService = new NotificationService(this.apiClient, this.storeEngine, conversationService);
 
     const selfService = new SelfService(this.apiClient);
@@ -453,6 +456,7 @@ export class Account extends TypedEventEmitter<Events> {
       client: clientService,
       connection: connectionService,
       conversation: conversationService,
+      subconversation: subconversationService,
       giphy: giphyService,
       linkPreview: linkPreviewService,
       notification: notificationService,
