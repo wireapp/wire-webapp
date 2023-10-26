@@ -24,6 +24,7 @@ export function getCommonMessageUpdates(originalEvent: StoredEvent<MessageAddEve
   return {
     ...newEvent,
     data: {...newEvent.data, expects_read_confirmation: originalEvent.data.expects_read_confirmation},
+    edited_time: originalEvent.edited_time,
     read_receipts: !newEvent.read_receipts ? originalEvent.read_receipts : newEvent.read_receipts,
     status: !newEvent.status || newEvent.status < originalEvent.status ? originalEvent.status : newEvent.status,
     time: originalEvent.time,

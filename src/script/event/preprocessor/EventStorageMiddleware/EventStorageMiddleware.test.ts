@@ -177,6 +177,7 @@ describe('EventStorageMiddleware', () => {
         JSON.stringify({
           ...linkPreviewEvent,
           data: {...linkPreviewEvent.data, replacing_message_id: replacingId},
+          edited_time: new Date().toISOString(),
         }),
       );
       eventService.loadEvent.mockResolvedValue(storedEvent);
