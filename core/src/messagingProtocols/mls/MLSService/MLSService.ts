@@ -19,11 +19,9 @@
 
 import type {ClaimedKeyPackages, RegisteredClient} from '@wireapp/api-client/lib/client';
 import {PostMlsMessageResponse, SUBCONVERSATION_ID} from '@wireapp/api-client/lib/conversation';
-import {Subconversation} from '@wireapp/api-client/lib/conversation/Subconversation';
 import {ConversationMLSMessageAddEvent, ConversationMLSWelcomeEvent} from '@wireapp/api-client/lib/event';
 import {BackendError, StatusCode} from '@wireapp/api-client/lib/http';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import {Converter, Decoder, Encoder} from 'bazinga64';
 import logdown from 'logdown';
 
@@ -81,12 +79,6 @@ const defaultConfig: MLSServiceConfig = {
   defaultCiphersuite: Ciphersuite.MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519,
   defaultCredentialType: CredentialType.Basic,
 };
-
-export interface SubconversationEpochInfoMember {
-  userid: string;
-  clientid: ClientId;
-  in_subconv: boolean;
-}
 
 type Events = {
   newEpoch: {epoch: number; groupId: string};
@@ -282,100 +274,6 @@ export class MLSService extends TypedEventEmitter<Events> {
     }
 
     return mlsResponse;
-  }
-
-  public async getConferenceSubconversation(conversationId: QualifiedId): Promise<Subconversation> {
-    return this.apiClient.api.conversation.getSubconversation(conversationId, SUBCONVERSATION_ID.CONFERENCE);
-  }
-
-  private async deleteConferenceSubconversation(
-    conversationId: QualifiedId,
-    data: {groupId: string; epoch: number},
-  ): Promise<void> {
-    return this.apiClient.api.conversation.deleteSubconversation(conversationId, SUBCONVERSATION_ID.CONFERENCE, data);
-  }
-
-  /**
-   * Will leave conference subconversation if it's known by client and established.
-   *
-   * @param conversationId Id of the parent conversation which subconversation we want to leave
-   */
-  public async leaveConferenceSubconversation(conversationId: QualifiedId): Promise<void> {
-    const subconversationGroupId = subconversationGroupIdStore.getGroupId(
-      conversationId,
-      SUBCONVERSATION_ID.CONFERENCE,
-    );
-
-    if (!subconversationGroupId) {
-      return;
-    }
-
-    const isSubconversationEstablished = await this.conversationExists(subconversationGroupId);
-    if (!isSubconversationEstablished) {
-      // if the subconversation was known by a client but is not established anymore, we can remove it from the store
-      return subconversationGroupIdStore.removeGroupId(conversationId, SUBCONVERSATION_ID.CONFERENCE);
-    }
-
-    try {
-      await this.apiClient.api.conversation.deleteSubconversationSelf(conversationId, SUBCONVERSATION_ID.CONFERENCE);
-    } catch (error) {
-      this.logger.error(`Failed to leave conference subconversation:`, error);
-    }
-
-    await this.wipeConversation(subconversationGroupId);
-
-    // once we've left the subconversation, we can remove it from the store
-    subconversationGroupIdStore.removeGroupId(conversationId, SUBCONVERSATION_ID.CONFERENCE);
-  }
-
-  public async leaveStaleConferenceSubconversations(): Promise<void> {
-    const conversationIds = subconversationGroupIdStore.getAllGroupIdsBySubconversationId(
-      SUBCONVERSATION_ID.CONFERENCE,
-    );
-
-    for (const {parentConversationId} of conversationIds) {
-      await this.leaveConferenceSubconversation(parentConversationId);
-    }
-  }
-
-  /**
-   * Will join or register an mls subconversation for conference calls.
-   * Will return the secret key derived from the subconversation
-   *
-   * @param conversationId Id of the parent conversation in which the call should happen
-   */
-  public async joinConferenceSubconversation(conversationId: QualifiedId): Promise<{groupId: string; epoch: number}> {
-    const subconversation = await this.getConferenceSubconversation(conversationId);
-
-    if (subconversation.epoch === 0) {
-      // if subconversation is not yet established, create it
-      await this.registerConversation(subconversation.group_id, []);
-    } else {
-      const epochUpdateTime = new Date(subconversation.epoch_timestamp).getTime();
-      const epochAge = new Date().getTime() - epochUpdateTime;
-
-      if (epochAge > TimeInMillis.DAY) {
-        // if subconversation does exist, but it's older than 24h, delete and re-join
-        await this.deleteConferenceSubconversation(conversationId, {
-          groupId: subconversation.group_id,
-          epoch: subconversation.epoch,
-        });
-        await this.wipeConversation(subconversation.group_id);
-
-        return this.joinConferenceSubconversation(conversationId);
-      }
-
-      await this.joinByExternalCommit(() =>
-        this.apiClient.api.conversation.getSubconversationGroupInfo(conversationId, SUBCONVERSATION_ID.CONFERENCE),
-      );
-    }
-
-    const epoch = Number(await this.getEpoch(subconversation.group_id));
-
-    // We store the mapping between the subconversation and the parent conversation
-    subconversationGroupIdStore.storeGroupId(conversationId, subconversation.subconv_id, subconversation.group_id);
-
-    return {groupId: subconversation.group_id, epoch};
   }
 
   public async exportSecretKey(groupId: string, keyLength: number): Promise<string> {
