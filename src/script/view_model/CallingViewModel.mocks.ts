@@ -51,9 +51,8 @@ export function buildCall(conversationId: QualifiedId, convType = CONV_TYPE.ONEO
   } as any);
 }
 
-const mockCore = container.resolve(Core);
-
 export function buildCallingViewModel() {
+  const mockCore = container.resolve(Core);
   const callingViewModel = new CallingViewModel(
     mockCallingRepository,
     {} as any,
@@ -70,5 +69,5 @@ export function buildCallingViewModel() {
     mockCore,
   );
 
-  return callingViewModel;
+  return [callingViewModel, {core: mockCore}] as const;
 }

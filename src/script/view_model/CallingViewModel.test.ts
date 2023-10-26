@@ -18,7 +18,6 @@
  */
 
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
-import {container} from 'tsyringe';
 
 import {CALL_TYPE, CONV_TYPE, STATE} from '@wireapp/avs';
 
@@ -29,7 +28,6 @@ import {buildCall, buildCallingViewModel, callState, mockCallingRepository} from
 
 import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
 import {Conversation} from '../entity/Conversation';
-import {Core} from '../service/CoreSingleton';
 
 describe('CallingViewModel', () => {
   afterEach(() => {
@@ -39,7 +37,7 @@ describe('CallingViewModel', () => {
 
   describe('answerCall', () => {
     it('answers a call directly if no call is ongoing', async () => {
-      const callingViewModel = buildCallingViewModel();
+      const [callingViewModel] = buildCallingViewModel();
       const call = buildCall({id: 'conversation1', domain: ''});
       await callingViewModel.callActions.answer(call);
       expect(mockCallingRepository.answerCall).toHaveBeenCalledWith(call);
@@ -47,7 +45,7 @@ describe('CallingViewModel', () => {
 
     it('lets the user leave previous call before answering a new one', async () => {
       jest.useFakeTimers();
-      const callingViewModel = buildCallingViewModel();
+      const [callingViewModel] = buildCallingViewModel();
       const joinedCall = buildCall({id: 'conversation1', domain: ''});
       joinedCall.state(STATE.MEDIA_ESTAB);
       callState.calls.push(joinedCall);
@@ -68,7 +66,7 @@ describe('CallingViewModel', () => {
 
   describe('startCall', () => {
     it('starts a call directly if no call is ongoing', async () => {
-      const callingViewModel = buildCallingViewModel();
+      const [callingViewModel] = buildCallingViewModel();
       const conversation = new Conversation(createUuid());
       await callingViewModel.callActions.startAudio(conversation);
       expect(mockCallingRepository.startCall).toHaveBeenCalledWith(conversation, CALL_TYPE.NORMAL);
@@ -76,7 +74,7 @@ describe('CallingViewModel', () => {
 
     it('lets the user leave previous call before starting a new one', async () => {
       jest.useFakeTimers();
-      const callingViewModel = buildCallingViewModel();
+      const [callingViewModel] = buildCallingViewModel();
       const joinedCall = buildCall({id: 'conversation1', domain: ''});
       joinedCall.state(STATE.MEDIA_ESTAB);
       callState.calls.push(joinedCall);
@@ -101,7 +99,7 @@ describe('CallingViewModel', () => {
     });
 
     it('subscribes to epoch updates after initiating a call', async () => {
-      const callingViewModel = buildCallingViewModel();
+      const [callingViewModel, {core}] = buildCallingViewModel();
       const conversationId = {domain: 'example.com', id: 'conversation1'};
       const mlsConversation = new Conversation(conversationId.id, conversationId.domain, ConversationProtocol.MLS);
 
@@ -112,7 +110,7 @@ describe('CallingViewModel', () => {
 
       expect(mockCallingRepository.startCall).toHaveBeenCalledWith(mlsConversation, CALL_TYPE.NORMAL);
 
-      expect(container.resolve(Core).service?.subconversation.subscribeToEpochUpdates).toHaveBeenCalledWith(
+      expect(core.service?.subconversation.subscribeToEpochUpdates).toHaveBeenCalledWith(
         conversationId,
         expect.any(Function),
         expect.any(Function),
@@ -120,7 +118,7 @@ describe('CallingViewModel', () => {
     });
 
     it('subscribes to epoch updates after answering a call', async () => {
-      const callingViewModel = buildCallingViewModel();
+      const [callingViewModel, {core}] = buildCallingViewModel();
       const conversationId = {domain: 'example.com', id: 'conversation2'};
 
       const call = buildCall(conversationId, CONV_TYPE.CONFERENCE_MLS);
@@ -129,7 +127,7 @@ describe('CallingViewModel', () => {
 
       expect(mockCallingRepository.answerCall).toHaveBeenCalledWith(call);
 
-      expect(container.resolve(Core).service?.subconversation.subscribeToEpochUpdates).toHaveBeenCalledWith(
+      expect(core.service?.subconversation.subscribeToEpochUpdates).toHaveBeenCalledWith(
         conversationId,
         expect.any(Function),
         expect.any(Function),
