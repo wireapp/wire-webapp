@@ -68,10 +68,9 @@ Object.keys(emojiesList).forEach(key => {
   emojiDictionary.set(key, formattedEmojiName);
 });
 
-const skinToneModifiers = new Set(['1f3fd', '1f3fe', '1f3ff', '1f3fc', '1f3fb']);
-
 // Function to get the emoji without skintone modifiers
 const removeSkinToneModifiers = (emojiUnicode: string): string => {
+  const skinToneModifiers = new Set(['1f3fd', '1f3fe', '1f3ff', '1f3fc', '1f3fb']);
   if (!emojiUnicode) {
     return '';
   }
@@ -81,18 +80,13 @@ const removeSkinToneModifiers = (emojiUnicode: string): string => {
   return unicodeWithoutSkinModifier.join('-');
 };
 export const getEmojiTitleFromEmojiUnicode = (emojiUnicode: string): string => {
-  const emojiUnicodeSplitted = emojiUnicode.split('-');
-
-  const hasSkinToneModifier = emojiUnicodeSplitted.some(part => {
-    return skinToneModifiers.has(part);
-  });
-
-  if (hasSkinToneModifier) {
-    const unicodeWithoutSkinModifier = removeSkinToneModifiers(emojiUnicode);
-
-    return emojiDictionary.get(unicodeWithoutSkinModifier) || '';
+  if (emojiDictionary.has(emojiUnicode)) {
+    return emojiDictionary.get(emojiUnicode)!;
   }
-  return emojiDictionary.get(emojiUnicode) || '';
+
+  const unicodeWithoutSkinModifier = removeSkinToneModifiers(emojiUnicode);
+
+  return emojiDictionary.get(unicodeWithoutSkinModifier) || '';
 };
 
 export function getEmojiUnicode(emojis: string) {
