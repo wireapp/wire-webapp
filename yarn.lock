@@ -7412,10 +7412,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"crypto-js@npm:^4.1.1":
-  version: 4.1.1
-  resolution: "crypto-js@npm:4.1.1"
-  checksum: b3747c12ee3a7632fab3b3e171ea50f78b182545f0714f6d3e7e2858385f0f4101a15f2517e033802ce9d12ba50a391575ff4638c9de3dd9b2c4bc47768d5425
+"crypto-js@npm:^4.2.0":
+  version: 4.2.0
+  resolution: "crypto-js@npm:4.2.0"
+  checksum: f051666dbc077c8324777f44fbd3aaea2986f198fe85092535130d17026c7c2ccf2d23ee5b29b36f7a4a07312db2fae23c9094b644cc35f7858b1b4fcaf27774
   languageName: node
   linkType: hard
 
@@ -13690,13 +13690,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"oidc-client-ts@npm:^2.2.5":
-  version: 2.3.0
-  resolution: "oidc-client-ts@npm:2.3.0"
+"oidc-client-ts@npm:^2.4.0":
+  version: 2.4.0
+  resolution: "oidc-client-ts@npm:2.4.0"
   dependencies:
-    crypto-js: ^4.1.1
+    crypto-js: ^4.2.0
     jwt-decode: ^3.1.2
-  checksum: 74e20b8df748f901d67aba176f5f68bd8aa5ff7eed92dc92f34479dddc49e238dc722c757c5ab0f3365d170e3031343f650c789b51baa01062e8975c7580e15d
+  checksum: 8467db689298221f706d3358961efb0ddc789f6bd7d4765e71ae5fe62067999d2ce6e8e7584b9d991b8caa6f7fb383f75841e1cfa9e05808c34632de374f5e68
   languageName: node
   linkType: hard
 
@@ -18575,7 +18575,7 @@ __metadata:
     markdown-it: 13.0.2
     murmurhash: 2.0.1
     node-fetch: 2.7.0
-    oidc-client-ts: ^2.2.5
+    oidc-client-ts: ^2.4.0
     os-browserify: 0.3.0
     path-browserify: 1.0.1
     platform: 1.3.6
