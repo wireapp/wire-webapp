@@ -17,8 +17,10 @@
  *
  */
 
+import {SUBCONVERSATION_ID} from '@wireapp/api-client/lib/conversation';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {DBSchema, deleteDB as idbDeleteDB, IDBPDatabase, openDB as idbOpenDb} from 'idb';
-const VERSION = 4;
+const VERSION = 5;
 
 interface CoreDBSchema extends DBSchema {
   prekeys: {
@@ -37,6 +39,10 @@ interface CoreDBSchema extends DBSchema {
     key: string;
     value: {id: string; domain: string};
   };
+  subconversations: {
+    key: string;
+    value: {parentConversationId: QualifiedId; subconversationId: SUBCONVERSATION_ID; groupId: string};
+  };
 }
 
 export type CoreDatabase = IDBPDatabase<CoreDBSchema>;
@@ -54,6 +60,8 @@ export async function openDB(dbName: string): Promise<CoreDatabase> {
           db.createObjectStore('recurringTasks');
         case 3:
           db.createObjectStore('conversationBlacklist');
+        case 4:
+          db.createObjectStore('subconversations');
       }
     },
   });

@@ -122,7 +122,15 @@ describe('ConversationService', () => {
 
     const mockedDb = await openDB('core-test-db');
 
-    const conversationService = new ConversationService(client, mockedProteusService, mockedDb, mockedMLSService);
+    const groupIdFromConversationId = jest.fn();
+
+    const conversationService = new ConversationService(
+      client,
+      mockedProteusService,
+      mockedDb,
+      groupIdFromConversationId,
+      mockedMLSService,
+    );
 
     jest.spyOn(conversationService, 'joinByExternalCommit');
     jest.spyOn(conversationService, 'emit');

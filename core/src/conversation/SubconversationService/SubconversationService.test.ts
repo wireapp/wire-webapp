@@ -26,7 +26,7 @@ import {APIClient} from '@wireapp/api-client';
 import {SubconversationService} from './SubconversationService';
 
 import {MLSService} from '../../messagingProtocols/mls';
-import {subconversationGroupIdStore} from '../../messagingProtocols/mls/MLSService/stores/subconversationGroupIdStore/subconversationGroupIdStore';
+import {openDB} from '../../storage/CoreDB';
 import {constructFullyQualifiedClientId} from '../../util/fullyQualifiedClientIdUtils';
 
 interface SubconversationMember {
@@ -61,7 +61,7 @@ const getSubconversationResponse = ({
   };
 };
 
-const buildSubconversationService = () => {
+const buildSubconversationService = async () => {
   const apiClient = new APIClient({urls: APIClient.BACKEND.STAGING});
   const mlsService = {
     conversationExists: jest.fn(),
@@ -78,9 +78,11 @@ const buildSubconversationService = () => {
     removeClientsFromConversation: jest.fn(),
   } as unknown as MLSService;
 
-  const subconversationService = new SubconversationService(apiClient, mlsService);
+  const coreDatabase = await openDB('core-test-db');
 
-  return [subconversationService, {apiClient, mlsService}] as const;
+  const subconversationService = new SubconversationService(apiClient, coreDatabase, mlsService);
+
+  return [subconversationService, {apiClient, mlsService, coreDatabase}] as const;
 };
 
 describe('SubconversationService', () => {
@@ -91,7 +93,7 @@ describe('SubconversationService', () => {
     });
 
     it('wipes group locally (if it exists) before registering a group if remote epoch is equal 0', async () => {
-      const [subconversationService, {apiClient, mlsService}] = buildSubconversationService();
+      const [subconversationService, {apiClient, mlsService}] = await buildSubconversationService();
 
       const parentConversationId = {id: 'parentConversationId', domain: 'domain'};
       const subconversationGroupId = 'subconversationGroupId';
@@ -114,7 +116,7 @@ describe('SubconversationService', () => {
     });
 
     it('registers a group if remote epoch is 0 and group does not exist locally', async () => {
-      const [subconversationService, {apiClient, mlsService}] = buildSubconversationService();
+      const [subconversationService, {apiClient, mlsService}] = await buildSubconversationService();
 
       const parentConversationId = {id: 'parentConversationId', domain: 'domain'};
       const subconversationGroupId = 'subconversationGroupId';
@@ -138,7 +140,7 @@ describe('SubconversationService', () => {
 
     it('deletes conference subconversation from backend if group is already established and epoch is older than one day, then rejoins', async () => {
       jest.useFakeTimers();
-      const [subconversationService, {apiClient, mlsService}] = buildSubconversationService();
+      const [subconversationService, {apiClient, mlsService}] = await buildSubconversationService();
 
       const parentConversationId = {id: 'parentConversationId', domain: 'domain'};
       const subconversationGroupId = 'subconversationGroupId';
@@ -191,7 +193,7 @@ describe('SubconversationService', () => {
 
     it('joins conference subconversation with external commit if group is already established and epoch is younger than one day', async () => {
       jest.useFakeTimers();
-      const [subconversationService, {apiClient, mlsService}] = buildSubconversationService();
+      const [subconversationService, {apiClient, mlsService}] = await buildSubconversationService();
 
       const parentConversationId = {id: 'parentConversationId', domain: 'domain'};
       const subconversationGroupId = 'subconversationGroupId';
@@ -224,7 +226,7 @@ describe('SubconversationService', () => {
     });
 
     it('retries to join if registering a conversations throws an error', async () => {
-      const [subconversationService, {apiClient, mlsService}] = buildSubconversationService();
+      const [subconversationService, {apiClient, mlsService}] = await buildSubconversationService();
 
       const parentConversationId = {id: 'parentConversationId', domain: 'domain'};
       const subconversationGroupId = 'subconversationGroupId';
@@ -252,7 +254,7 @@ describe('SubconversationService', () => {
     });
 
     it('returns fresh epoch number after joining the group', async () => {
-      const [subconversationService, {apiClient, mlsService}] = buildSubconversationService();
+      const [subconversationService, {apiClient, mlsService}] = await buildSubconversationService();
 
       const parentConversationId = {id: 'parentConversationId', domain: 'domain'};
       const subconversationGroupId = 'subconversationGroupId';
@@ -281,7 +283,7 @@ describe('SubconversationService', () => {
 
   describe('leaveConferenceSubconversation', () => {
     it('does nothing if subconversation id is not found in the store', async () => {
-      const [subconversationService, {mlsService}] = buildSubconversationService();
+      const [subconversationService, {mlsService}] = await buildSubconversationService();
 
       const parentConversationId = {id: 'parentConversationId', domain: 'domain'};
 
@@ -291,12 +293,12 @@ describe('SubconversationService', () => {
     });
 
     it('removes subconversation id from the store if conversations was known but not established locally', async () => {
-      const [subconversationService, {mlsService}] = buildSubconversationService();
+      const [subconversationService, {mlsService}] = await buildSubconversationService();
 
       const parentConversationId = {id: 'parentConversationId', domain: 'domain'};
       const subconversationGroupId = 'subconversationGroupId';
 
-      subconversationGroupIdStore.storeGroupId(
+      await subconversationService.saveSubconversationGroupId(
         parentConversationId,
         SUBCONVERSATION_ID.CONFERENCE,
         subconversationGroupId,
@@ -305,19 +307,22 @@ describe('SubconversationService', () => {
       jest.spyOn(mlsService, 'conversationExists').mockResolvedValueOnce(false);
 
       await subconversationService.leaveConferenceSubconversation(parentConversationId);
-      const groupId = subconversationGroupIdStore.getGroupId(parentConversationId, SUBCONVERSATION_ID.CONFERENCE);
+      const groupId = await subconversationService.getSubconversationGroupId(
+        parentConversationId,
+        SUBCONVERSATION_ID.CONFERENCE,
+      );
 
       expect(groupId).toEqual(undefined);
       expect(mlsService.wipeConversation).not.toHaveBeenCalled();
     });
 
     it('deletes self client from conference subconversation', async () => {
-      const [subconversationService, {apiClient, mlsService}] = buildSubconversationService();
+      const [subconversationService, {apiClient, mlsService}] = await buildSubconversationService();
 
       const parentConversationId = {id: 'parentConversationId', domain: 'domain'};
       const subconversationGroupId = 'subconversationGroupId';
 
-      subconversationGroupIdStore.storeGroupId(
+      await subconversationService.saveSubconversationGroupId(
         parentConversationId,
         SUBCONVERSATION_ID.CONFERENCE,
         subconversationGroupId,
@@ -327,7 +332,10 @@ describe('SubconversationService', () => {
       jest.spyOn(mlsService, 'conversationExists').mockResolvedValueOnce(true);
 
       await subconversationService.leaveConferenceSubconversation(parentConversationId);
-      const groupId = subconversationGroupIdStore.getGroupId(parentConversationId, SUBCONVERSATION_ID.CONFERENCE);
+      const groupId = await subconversationService.getSubconversationGroupId(
+        parentConversationId,
+        SUBCONVERSATION_ID.CONFERENCE,
+      );
 
       expect(groupId).toEqual(undefined);
       expect(apiClient.api.conversation.deleteSubconversationSelf).toHaveBeenCalledWith(
@@ -340,57 +348,41 @@ describe('SubconversationService', () => {
 
   describe('getSubconversationEpochInfo', () => {
     it('returns null if subconversation id is not known by a client', async () => {
-      const [subconversationService, {mlsService}] = buildSubconversationService();
+      const [subconversationService] = await buildSubconversationService();
 
       const parentConversationId = {id: 'parentConversationId', domain: 'domain'};
+      const parentConversationGroupId = 'parentConversationGroupId';
 
-      jest.spyOn(mlsService, 'getGroupIdFromConversationId').mockResolvedValue(undefined);
-
-      const response = await subconversationService.getSubconversationEpochInfo(parentConversationId);
+      const response = await subconversationService.getSubconversationEpochInfo(
+        parentConversationId,
+        parentConversationGroupId,
+      );
 
       expect(response).toEqual(null);
     });
 
     it('returns null if MLS group for subconversation does not exist locally', async () => {
-      const [subconversationService, {mlsService}] = buildSubconversationService();
+      const [subconversationService, {mlsService}] = await buildSubconversationService();
 
       const parentConversationId = {id: 'parentConversationId', domain: 'domain'};
       const parentConversationGroupId = 'parentConversationGroupId';
-      const subconversationGroupId = 'subconversationGroupId';
-
-      jest
-        .spyOn(mlsService, 'getGroupIdFromConversationId')
-        .mockImplementation(async (_conversationId, subconverstionId): Promise<string> => {
-          if (subconverstionId) {
-            return subconversationGroupId;
-          }
-
-          return parentConversationGroupId;
-        });
 
       jest.spyOn(mlsService, 'conversationExists').mockResolvedValueOnce(false);
 
-      const response = await subconversationService.getSubconversationEpochInfo(parentConversationId);
+      const response = await subconversationService.getSubconversationEpochInfo(
+        parentConversationId,
+        parentConversationGroupId,
+      );
 
       expect(response).toEqual(null);
     });
 
     it('returns epoch info and advances epoch number', async () => {
-      const [subconversationService, {mlsService}] = buildSubconversationService();
+      const [subconversationService, {mlsService}] = await buildSubconversationService();
 
       const parentConversationId = {id: 'parentConversationId', domain: 'domain'};
       const parentConversationGroupId = 'parentConversationGroupId';
       const subconversationGroupId = 'subconversationGroupId';
-
-      jest
-        .spyOn(mlsService, 'getGroupIdFromConversationId')
-        .mockImplementation(async (_conversationId, subconverstionId): Promise<string> => {
-          if (subconverstionId) {
-            return subconversationGroupId;
-          }
-
-          return parentConversationGroupId;
-        });
 
       jest.spyOn(mlsService, 'conversationExists').mockResolvedValueOnce(true);
 
@@ -399,6 +391,12 @@ describe('SubconversationService', () => {
 
       const mockedSecretKey = 'mockedSecretKey';
       jest.spyOn(mlsService, 'exportSecretKey').mockResolvedValueOnce(mockedSecretKey);
+
+      await subconversationService.saveSubconversationGroupId(
+        parentConversationId,
+        SUBCONVERSATION_ID.CONFERENCE,
+        subconversationGroupId,
+      );
 
       const subconversationMemberIds: {
         userId: string;
@@ -423,7 +421,11 @@ describe('SubconversationService', () => {
         return subconversationMemberIds;
       });
 
-      const response = await subconversationService.getSubconversationEpochInfo(parentConversationId, true);
+      const response = await subconversationService.getSubconversationEpochInfo(
+        parentConversationId,
+        parentConversationGroupId,
+        true,
+      );
 
       const expected = {
         epoch: mockedEpoch,
@@ -442,7 +444,7 @@ describe('SubconversationService', () => {
 
   describe('subscribeToEpochUpdates', () => {
     it('should subscribe to newEpoch event', async () => {
-      const [subconversationService, {mlsService}] = buildSubconversationService();
+      const [subconversationService, {mlsService}] = await buildSubconversationService();
 
       const parentConversationId = {id: 'parentConversationId', domain: 'domain'};
       const parentConversationGroupId = 'parentConversationGroupId';
@@ -450,7 +452,11 @@ describe('SubconversationService', () => {
       const subconversationGroupId = 'subconversationGroupId';
       const mockedInitialEpoch = 1;
 
-      jest.spyOn(mlsService, 'getGroupIdFromConversationId').mockResolvedValue(subconversationGroupId);
+      await subconversationService.saveSubconversationGroupId(
+        parentConversationId,
+        SUBCONVERSATION_ID.CONFERENCE,
+        subconversationGroupId,
+      );
 
       const mockedEpochInfo = {epoch: mockedInitialEpoch, keyLength: 32, members: [], secretKey: ''};
       jest.spyOn(subconversationService, 'getSubconversationEpochInfo').mockResolvedValueOnce(mockedEpochInfo);
@@ -470,12 +476,16 @@ describe('SubconversationService', () => {
 
       const unsubscribe = await subconversationService.subscribeToEpochUpdates(
         parentConversationId,
+        parentConversationGroupId,
         findConversationByGroupId,
         onEpochUpdateCallback,
       );
 
       expect(mlsService.on).toHaveBeenCalledWith('newEpoch', expect.any(Function));
-      expect(subconversationService.getSubconversationEpochInfo).toHaveBeenCalledWith(parentConversationId);
+      expect(subconversationService.getSubconversationEpochInfo).toHaveBeenCalledWith(
+        parentConversationId,
+        parentConversationGroupId,
+      );
       expect(onEpochUpdateCallback).toHaveBeenCalledWith(mockedEpochInfo);
 
       unsubscribe();
@@ -485,11 +495,9 @@ describe('SubconversationService', () => {
 
   describe('removeClientFromConferenceSubconversation', () => {
     it('does nothing if subconversation group is not known', async () => {
-      const [subconversationService, {mlsService}] = buildSubconversationService();
+      const [subconversationService, {mlsService}] = await buildSubconversationService();
 
       const parentConversationId = {id: 'parentConversationId', domain: 'domain'};
-
-      jest.spyOn(mlsService, 'getGroupIdFromConversationId').mockResolvedValue(undefined);
 
       const user = {id: 'userId', domain: 'domain'};
       const clientId = 'clientId';
@@ -501,12 +509,17 @@ describe('SubconversationService', () => {
     });
 
     it('does nothing if subconversation group is not established', async () => {
-      const [subconversationService, {mlsService}] = buildSubconversationService();
+      const [subconversationService, {mlsService}] = await buildSubconversationService();
 
       const parentConversationId = {id: 'parentConversationId', domain: 'domain'};
       const subconversationGroupId = 'subconversationGroupId';
 
-      jest.spyOn(mlsService, 'getGroupIdFromConversationId').mockResolvedValue(subconversationGroupId);
+      await subconversationService.saveSubconversationGroupId(
+        parentConversationId,
+        SUBCONVERSATION_ID.CONFERENCE,
+        subconversationGroupId,
+      );
+
       jest.spyOn(mlsService, 'conversationExists').mockResolvedValue(false);
 
       const user = {id: 'userId', domain: 'domain'};
@@ -519,12 +532,17 @@ describe('SubconversationService', () => {
     });
 
     it('does nothing if client is not a subconversation group member', async () => {
-      const [subconversationService, {mlsService}] = buildSubconversationService();
+      const [subconversationService, {mlsService}] = await buildSubconversationService();
 
       const parentConversationId = {id: 'parentConversationId', domain: 'domain'};
       const subconversationGroupId = 'subconversationGroupId';
 
-      jest.spyOn(mlsService, 'getGroupIdFromConversationId').mockResolvedValue(subconversationGroupId);
+      await subconversationService.saveSubconversationGroupId(
+        parentConversationId,
+        SUBCONVERSATION_ID.CONFERENCE,
+        subconversationGroupId,
+      );
+
       jest.spyOn(mlsService, 'conversationExists').mockResolvedValue(true);
 
       const subconversationMemberIds: {
@@ -548,12 +566,17 @@ describe('SubconversationService', () => {
     });
 
     it('removes client from subconversation group', async () => {
-      const [subconversationService, {mlsService}] = buildSubconversationService();
+      const [subconversationService, {mlsService}] = await buildSubconversationService();
 
       const parentConversationId = {id: 'parentConversationId', domain: 'domain'};
       const subconversationGroupId = 'subconversationGroupId';
 
-      jest.spyOn(mlsService, 'getGroupIdFromConversationId').mockResolvedValue(subconversationGroupId);
+      await subconversationService.saveSubconversationGroupId(
+        parentConversationId,
+        SUBCONVERSATION_ID.CONFERENCE,
+        subconversationGroupId,
+      );
+
       jest.spyOn(mlsService, 'conversationExists').mockResolvedValue(true);
 
       const user = {id: 'userId3', domain: 'domain3'};
