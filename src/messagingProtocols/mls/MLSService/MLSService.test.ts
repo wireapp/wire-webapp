@@ -57,6 +57,7 @@ const createMLSService = async () => {
     decryptMessage: jest.fn(),
     conversationEpoch: jest.fn(),
     commitPendingProposals: jest.fn(),
+    registerCallbacks: jest.fn(),
   } as unknown as CoreCrypto;
 
   const mockedDb = await openDB('core-test-db');
@@ -270,7 +271,7 @@ describe('MLSService', () => {
       const mockGroupId = 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm3OQFc=';
       const mockedNewEpoch = 3;
 
-      jest.spyOn(mlsService, 'getGroupIdFromConversationId').mockResolvedValueOnce(mockGroupId);
+      const getGroupIdFromConversationId = () => Promise.resolve(mockGroupId);
 
       const mockedDecryptoedMessage: DecryptedMessage = {
         hasEpochChanged: true,
@@ -291,7 +292,7 @@ describe('MLSService', () => {
         time: '',
       };
 
-      await mlsService.handleMLSMessageAddEvent(mockedMLSWelcomeEvent);
+      await mlsService.handleMLSMessageAddEvent(mockedMLSWelcomeEvent, getGroupIdFromConversationId);
       expect(mockCoreCrypto.decryptMessage).toHaveBeenCalled();
       expect(mlsService.emit).toHaveBeenCalledWith('newEpoch', {epoch: mockedNewEpoch, groupId: mockGroupId});
     });
@@ -304,7 +305,7 @@ describe('MLSService', () => {
       const mockedNewEpoch = 3;
       const commitDelay = 1000;
 
-      jest.spyOn(mlsService, 'getGroupIdFromConversationId').mockResolvedValueOnce(mockGroupId);
+      const getGroupIdFromConversationId = () => Promise.resolve(mockGroupId);
 
       const mockedDecryptoedMessage: DecryptedMessage = {
         hasEpochChanged: true,
@@ -327,7 +328,7 @@ describe('MLSService', () => {
         time: new Date().toISOString(),
       };
 
-      await mlsService.handleMLSMessageAddEvent(mockedMLSWelcomeEvent);
+      await mlsService.handleMLSMessageAddEvent(mockedMLSWelcomeEvent, getGroupIdFromConversationId);
 
       expect(mockCoreCrypto.commitPendingProposals).not.toHaveBeenCalled();
 

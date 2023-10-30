@@ -50,6 +50,7 @@ export class CoreCrypto {
   proteusSessionSave = jest.fn();
   proteusDecrypt = jest.fn().mockResolvedValue(Uint8Array.from([]));
   proteusSessionFromMessage = jest.fn().mockResolvedValue(Uint8Array.from([]));
+  registerCallbacks = jest.fn();
 
   static deferredInit() {
     return new CoreCrypto();

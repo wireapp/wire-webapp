@@ -27,6 +27,7 @@ import {
   RemoteConversations,
   PostMlsMessageResponse,
   MLSConversation,
+  SUBCONVERSATION_ID,
 } from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_TYPING, ConversationMemberUpdateData} from '@wireapp/api-client/lib/conversation/data';
 import {
@@ -85,6 +86,10 @@ export class ConversationService extends TypedEventEmitter<Events> {
     private readonly apiClient: APIClient,
     private readonly proteusService: ProteusService,
     private readonly coreDatabase: CoreDatabase,
+    private readonly groupIdFromConversationId: (
+      conversationId: QualifiedId,
+      subconversationId?: SUBCONVERSATION_ID,
+    ) => Promise<string | undefined>,
     private readonly _mlsService?: MLSService,
   ) {
     super();
@@ -643,7 +648,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
 
   private async handleMLSMessageAddEvent(event: ConversationMLSMessageAddEvent): Promise<HandledEventPayload | null> {
     try {
-      return await this.mlsService.handleMLSMessageAddEvent(event);
+      return await this.mlsService.handleMLSMessageAddEvent(event, this.groupIdFromConversationId);
     } catch (error) {
       if (isCoreCryptoMLSWrongEpochError(error)) {
         this.logger.info(

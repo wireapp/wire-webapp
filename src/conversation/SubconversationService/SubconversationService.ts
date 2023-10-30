@@ -25,8 +25,10 @@ import logdown from 'logdown';
 import {APIClient} from '@wireapp/api-client';
 import {TypedEventEmitter} from '@wireapp/commons';
 
+import {generateSubconversationStoreKey} from './subconversationUtil';
+
 import {MLSService} from '../../messagingProtocols/mls';
-import {subconversationGroupIdStore} from '../../messagingProtocols/mls/MLSService/stores/subconversationGroupIdStore/subconversationGroupIdStore';
+import {CoreDatabase} from '../../storage/CoreDB';
 import {constructFullyQualifiedClientId} from '../../util/fullyQualifiedClientIdUtils';
 
 type Events = {
@@ -46,6 +48,7 @@ export class SubconversationService extends TypedEventEmitter<Events> {
 
   constructor(
     private readonly apiClient: APIClient,
+    private readonly coreDatabase: CoreDatabase,
     private readonly _mlsService?: MLSService,
   ) {
     super();
@@ -105,7 +108,7 @@ export class SubconversationService extends TypedEventEmitter<Events> {
       const epoch = Number(await this.mlsService.getEpoch(subconversationGroupId));
 
       // We store the mapping between the subconversation and the parent conversation
-      subconversationGroupIdStore.storeGroupId(conversationId, subconversationId, subconversationGroupId);
+      await this.saveSubconversationGroupId(conversationId, subconversationId, subconversationGroupId);
 
       return {groupId: subconversationGroupId, epoch};
     } catch (error) {
@@ -122,10 +125,7 @@ export class SubconversationService extends TypedEventEmitter<Events> {
    * @param conversationId Id of the parent conversation which subconversation we want to leave
    */
   public async leaveConferenceSubconversation(conversationId: QualifiedId): Promise<void> {
-    const subconversationGroupId = subconversationGroupIdStore.getGroupId(
-      conversationId,
-      SUBCONVERSATION_ID.CONFERENCE,
-    );
+    const subconversationGroupId = await this.getSubconversationGroupId(conversationId, SUBCONVERSATION_ID.CONFERENCE);
 
     if (!subconversationGroupId) {
       return;
@@ -134,7 +134,7 @@ export class SubconversationService extends TypedEventEmitter<Events> {
     const doesGroupExistLocally = await this.mlsService.conversationExists(subconversationGroupId);
     if (!doesGroupExistLocally) {
       // If the subconversation was known by a client but is does not exist locally, we can remove it from the store.
-      return subconversationGroupIdStore.removeGroupId(conversationId, SUBCONVERSATION_ID.CONFERENCE);
+      return this.clearSubconversationGroupId(conversationId, SUBCONVERSATION_ID.CONFERENCE);
     }
 
     try {
@@ -146,13 +146,11 @@ export class SubconversationService extends TypedEventEmitter<Events> {
     await this.mlsService.wipeConversation(subconversationGroupId);
 
     // once we've left the subconversation, we can remove it from the store
-    subconversationGroupIdStore.removeGroupId(conversationId, SUBCONVERSATION_ID.CONFERENCE);
+    await this.clearSubconversationGroupId(conversationId, SUBCONVERSATION_ID.CONFERENCE);
   }
 
   public async leaveStaleConferenceSubconversations(): Promise<void> {
-    const conversationIds = subconversationGroupIdStore.getAllGroupIdsBySubconversationId(
-      SUBCONVERSATION_ID.CONFERENCE,
-    );
+    const conversationIds = await this.getAllGroupIdsBySubconversationId(SUBCONVERSATION_ID.CONFERENCE);
 
     for (const {parentConversationId} of conversationIds) {
       await this.leaveConferenceSubconversation(parentConversationId);
@@ -160,7 +158,8 @@ export class SubconversationService extends TypedEventEmitter<Events> {
   }
 
   public async getSubconversationEpochInfo(
-    conversationId: QualifiedId,
+    parentConversationId: QualifiedId,
+    parentConversationGroupId: string,
     shouldAdvanceEpoch = false,
   ): Promise<{
     members: SubconversationEpochInfoMember[];
@@ -168,18 +167,16 @@ export class SubconversationService extends TypedEventEmitter<Events> {
     secretKey: string;
     keyLength: number;
   } | null> {
-    const subconversationGroupId = await this.mlsService.getGroupIdFromConversationId(
-      conversationId,
+    const subconversationGroupId = await this.getSubconversationGroupId(
+      parentConversationId,
       SUBCONVERSATION_ID.CONFERENCE,
     );
 
-    const parentGroupId = await this.mlsService.getGroupIdFromConversationId(conversationId);
-
     // this method should not be called if the subconversation (and its parent conversation) is not established
-    if (!subconversationGroupId || !parentGroupId) {
+    if (!subconversationGroupId) {
       this.logger.error(
         `Could not obtain epoch info for conference subconversation of conversation ${JSON.stringify(
-          conversationId,
+          parentConversationId,
         )}: parent or subconversation group ID is missing`,
       );
 
@@ -192,7 +189,7 @@ export class SubconversationService extends TypedEventEmitter<Events> {
       return null;
     }
 
-    const members = await this.generateSubconversationMembers(subconversationGroupId, parentGroupId);
+    const members = await this.generateSubconversationMembers(subconversationGroupId, parentConversationGroupId);
 
     if (shouldAdvanceEpoch) {
       await this.mlsService.renewKeyMaterial(subconversationGroupId);
@@ -206,7 +203,8 @@ export class SubconversationService extends TypedEventEmitter<Events> {
   }
 
   public async subscribeToEpochUpdates(
-    conversationId: QualifiedId,
+    parentConversationId: QualifiedId,
+    parentConversationGroupId: string,
     findConversationByGroupId: (groupId: string) => QualifiedId | undefined,
     onEpochUpdate: (info: {
       members: SubconversationEpochInfoMember[];
@@ -216,7 +214,7 @@ export class SubconversationService extends TypedEventEmitter<Events> {
     }) => void,
   ): Promise<() => void> {
     const {epoch: initialEpoch, groupId: subconversationGroupId} =
-      await this.joinConferenceSubconversation(conversationId);
+      await this.joinConferenceSubconversation(parentConversationId);
 
     const forwardNewEpoch = async ({groupId, epoch}: {groupId: string; epoch: number}) => {
       if (groupId !== subconversationGroupId) {
@@ -226,7 +224,7 @@ export class SubconversationService extends TypedEventEmitter<Events> {
           return;
         }
 
-        const foundSubconversationGroupId = await this.mlsService.getGroupIdFromConversationId?.(
+        const foundSubconversationGroupId = await this.getSubconversationGroupId(
           parentConversationId,
           SUBCONVERSATION_ID.CONFERENCE,
         );
@@ -237,7 +235,10 @@ export class SubconversationService extends TypedEventEmitter<Events> {
         }
       }
 
-      const subconversationEpochInfo = await this.getSubconversationEpochInfo(conversationId);
+      const subconversationEpochInfo = await this.getSubconversationEpochInfo(
+        parentConversationId,
+        parentConversationGroupId,
+      );
 
       if (!subconversationEpochInfo) {
         return;
@@ -257,10 +258,7 @@ export class SubconversationService extends TypedEventEmitter<Events> {
     conversationId: QualifiedId,
     clientToRemove: {user: QualifiedId; clientId: string},
   ): Promise<void> {
-    const subconversationGroupId = await this.mlsService.getGroupIdFromConversationId(
-      conversationId,
-      SUBCONVERSATION_ID.CONFERENCE,
-    );
+    const subconversationGroupId = await this.getSubconversationGroupId(conversationId, SUBCONVERSATION_ID.CONFERENCE);
 
     if (!subconversationGroupId) {
       return;
@@ -329,4 +327,55 @@ export class SubconversationService extends TypedEventEmitter<Events> {
       };
     });
   }
+
+  public getSubconversationGroupId = async (
+    parentConversationId: QualifiedId,
+    subconversationId: SUBCONVERSATION_ID,
+  ): Promise<string | undefined> => {
+    const foundSubconversation = await this.coreDatabase.get(
+      'subconversations',
+      generateSubconversationStoreKey(parentConversationId, subconversationId),
+    );
+
+    return foundSubconversation?.groupId;
+  };
+
+  public getAllGroupIdsBySubconversationId = async (
+    subconversationId: SUBCONVERSATION_ID,
+  ): Promise<
+    {
+      parentConversationId: QualifiedId;
+      subconversationId: SUBCONVERSATION_ID;
+      groupId: string;
+    }[]
+  > => {
+    const allSubconversations = await this.coreDatabase.getAll('subconversations');
+    const foundSubconversations = allSubconversations.filter(
+      subconversation => subconversation.subconversationId === subconversationId,
+    );
+
+    return foundSubconversations;
+  };
+
+  public saveSubconversationGroupId = async (
+    parentConversationId: QualifiedId,
+    subconversationId: SUBCONVERSATION_ID,
+    groupId: string,
+  ) => {
+    return this.coreDatabase.put(
+      'subconversations',
+      {parentConversationId, subconversationId, groupId},
+      generateSubconversationStoreKey(parentConversationId, subconversationId),
+    );
+  };
+
+  public clearSubconversationGroupId = async (
+    parentConversationId: QualifiedId,
+    subconversationId: SUBCONVERSATION_ID,
+  ) => {
+    return this.coreDatabase.delete(
+      'subconversations',
+      generateSubconversationStoreKey(parentConversationId, subconversationId),
+    );
+  };
 }
