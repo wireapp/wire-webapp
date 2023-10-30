@@ -67,7 +67,7 @@ export class ActionsViewModel {
     return this.conversationRepository.archiveConversation(conversationEntity);
   };
 
-  readonly unArchiveConversation = (conversationEntity: Conversation): void => {
+  readonly unarchiveConversation = (conversationEntity: Conversation): void => {
     if (!conversationEntity) {
       return;
     }
