@@ -83,7 +83,7 @@ import {IntegrationRepository} from '../integration/IntegrationRepository';
 import {IntegrationService} from '../integration/IntegrationService';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import {MediaRepository} from '../media/MediaRepository';
-import {initMLSCallbacks, initMLSConversations, registerUninitializedSelfAndTeamConversations} from '../mls';
+import {initMLSConversations, registerUninitializedSelfAndTeamConversations} from '../mls';
 import {NotificationRepository} from '../notification/NotificationRepository';
 import {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
 import {PermissionRepository} from '../permission/PermissionRepository';
@@ -378,6 +378,13 @@ export class App {
 
       const selfUser = await this.initiateSelfUser();
 
+      this.core.configureCoreCallbacks({
+        groupIdFromConversationId: async conversationId => {
+          const conversation = await conversationRepository.getConversationById(conversationId);
+          return conversation?.groupId;
+        },
+      });
+
       await initializeDataDog(this.config, selfUser.qualifiedId);
 
       // Setup all event middleware
@@ -421,7 +428,6 @@ export class App {
 
       if (supportsMLS()) {
         //if mls is supported, we need to initialize the callbacks (they are used when decrypting messages)
-        await initMLSCallbacks(this.core, this.repository.conversation);
         conversationRepository.initMLSConversationRecoveredListener();
       }
 

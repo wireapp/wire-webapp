@@ -18,6 +18,7 @@
  */
 
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {CALL_TYPE, CONV_TYPE, STATE} from '@wireapp/avs';
 
@@ -28,6 +29,12 @@ import {buildCall, buildCallingViewModel, callState, mockCallingRepository} from
 
 import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
 import {Conversation} from '../entity/Conversation';
+
+const createMLSConversation = (conversationId: QualifiedId, groupId: string) => {
+  const mlsConversation = new Conversation(conversationId.id, conversationId.domain, ConversationProtocol.MLS);
+  mlsConversation.groupId = groupId;
+  return mlsConversation;
+};
 
 describe('CallingViewModel', () => {
   afterEach(() => {
@@ -101,7 +108,9 @@ describe('CallingViewModel', () => {
     it('subscribes to epoch updates after initiating a call', async () => {
       const [callingViewModel, {core}] = buildCallingViewModel();
       const conversationId = {domain: 'example.com', id: 'conversation1'};
-      const mlsConversation = new Conversation(conversationId.id, conversationId.domain, ConversationProtocol.MLS);
+
+      const groupId = 'groupId';
+      const mlsConversation = createMLSConversation(conversationId, groupId);
 
       const mockedCall = buildCall(conversationId, CONV_TYPE.CONFERENCE_MLS);
       jest.spyOn(mockCallingRepository, 'startCall').mockResolvedValueOnce(mockedCall);
@@ -112,6 +121,7 @@ describe('CallingViewModel', () => {
 
       expect(core.service?.subconversation.subscribeToEpochUpdates).toHaveBeenCalledWith(
         conversationId,
+        groupId,
         expect.any(Function),
         expect.any(Function),
       );
@@ -121,6 +131,11 @@ describe('CallingViewModel', () => {
       const [callingViewModel, {core}] = buildCallingViewModel();
       const conversationId = {domain: 'example.com', id: 'conversation2'};
 
+      const groupId = 'groupId';
+      const mlsConversation = createMLSConversation(conversationId, groupId);
+
+      callingViewModel['conversationState'].conversations.push(mlsConversation);
+
       const call = buildCall(conversationId, CONV_TYPE.CONFERENCE_MLS);
 
       await callingViewModel.callActions.answer(call);
@@ -129,6 +144,7 @@ describe('CallingViewModel', () => {
 
       expect(core.service?.subconversation.subscribeToEpochUpdates).toHaveBeenCalledWith(
         conversationId,
+        groupId,
         expect.any(Function),
         expect.any(Function),
       );

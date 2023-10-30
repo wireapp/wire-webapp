@@ -4584,7 +4584,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/libsodium-wrappers@npm:*, @types/libsodium-wrappers@npm:^0":
+"@types/libsodium-wrappers@npm:*":
+  version: 0.7.12
+  resolution: "@types/libsodium-wrappers@npm:0.7.12"
+  checksum: 8f25b4ffe6b60c36f3c59b3dea2e952b8790c9b8375ee5235e6d294c1519a578b7882d773f168005eb0f3fdb4f11e06ba27b30b89d2c3b8be3f985c7eedd0491
+  languageName: node
+  linkType: hard
+
+"@types/libsodium-wrappers@npm:^0":
   version: 0.7.11
   resolution: "@types/libsodium-wrappers@npm:0.7.11"
   checksum: e3c3acdfc178a466a04d81c030ba1b748abc9335b1d66421125eb55b32cbaf6a9076e32a98744fcb84ba2fa2af342203ff29054262dcc465c12c4feddddb64ac
@@ -4648,7 +4655,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:>=13.7.0":
+"@types/node@npm:*":
   version: 20.8.6
   resolution: "@types/node@npm:20.8.6"
   dependencies:
@@ -4671,7 +4678,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^20.8.9":
+"@types/node@npm:>=13.7.0, @types/node@npm:^20.8.9":
   version: 20.8.9
   resolution: "@types/node@npm:20.8.9"
   dependencies:
@@ -5295,15 +5302,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^26.5.0":
-  version: 26.5.0
-  resolution: "@wireapp/api-client@npm:26.5.0"
+"@wireapp/api-client@npm:^26.5.1":
+  version: 26.5.1
+  resolution: "@wireapp/api-client@npm:26.5.1"
   dependencies:
     "@wireapp/commons": ^5.2.2
     "@wireapp/priority-queue": ^2.1.4
     "@wireapp/protocol-messaging": 1.44.0
     axios: 1.5.1
-    axios-retry: 3.8.0
+    axios-retry: 3.8.1
     http-status-codes: 2.3.0
     logdown: 3.3.1
     pako: 2.1.0
@@ -5312,7 +5319,7 @@ __metadata:
     tough-cookie: 4.1.3
     ws: 8.14.2
     zod: 3.22.4
-  checksum: 32875d4e0b6dfdde296fc912572d98d2f19fc2d2ef4a8a3c28308604e850b39ffbcefca34a17c45213ec477e7c134a42098b431ccc143e1c1efe738dbc2eb5d6
+  checksum: 71c27b4215532059e1357086e0a3f400ce3bfb78ac45d04e74aec79fe6ef70b241bab29d5bf970edc9e9e4ca52790c68e02ba9ecdf390bb965a44cdb3c8f4b10
   languageName: node
   linkType: hard
 
@@ -5365,11 +5372,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:42.19.1":
-  version: 42.19.1
-  resolution: "@wireapp/core@npm:42.19.1"
+"@wireapp/core@npm:42.19.2":
+  version: 42.19.2
+  resolution: "@wireapp/core@npm:42.19.2"
   dependencies:
-    "@wireapp/api-client": ^26.5.0
+    "@wireapp/api-client": ^26.5.1
     "@wireapp/commons": ^5.2.2
     "@wireapp/core-crypto": 1.0.0-rc.16
     "@wireapp/cryptobox": 12.8.0
@@ -5387,7 +5394,7 @@ __metadata:
     long: ^5.2.0
     uuidjs: 4.2.13
     zod: 3.22.4
-  checksum: 4e63816a11faa1d697ff3ad16e17785205e84153e3339ee2297ded0df24975f5e187e9ab521bd9b8bc23213159990cdb3087b5a61d6321954051e71c20d56825
+  checksum: 24f4b254c7571d10928088db86723350bc73f015cf0b56aafa05892f4417ca098f7a0cc56be407a89ae69f3ff89a74949805f603757f3f6c91f665c97c7d5b69
   languageName: node
   linkType: hard
 
@@ -6244,13 +6251,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios-retry@npm:3.8.0":
-  version: 3.8.0
-  resolution: "axios-retry@npm:3.8.0"
+"axios-retry@npm:3.8.1":
+  version: 3.8.1
+  resolution: "axios-retry@npm:3.8.1"
   dependencies:
     "@babel/runtime": ^7.15.4
     is-retry-allowed: ^2.2.0
-  checksum: 448d951b971ccd35eaedc0f10ff1129a6bf2b3dfe13ce57749809bd37975332ae0e906ea4e67a41c9c98215bb1bf8a554e6880f1272419c758f91e4d68ca6b55
+  checksum: 9233523d34987838504b1ea9d5f90025bf9d1210e10c3851c28d1e97be9f0c2dd401ddc9f0568759c79426533795de9c54bb8429720ace641032c51fef71cb0f
   languageName: node
   linkType: hard
 
@@ -18521,7 +18528,7 @@ __metadata:
     "@wireapp/avs": 9.5.2
     "@wireapp/commons": 5.2.2
     "@wireapp/copy-config": 2.1.10
-    "@wireapp/core": 42.19.1
+    "@wireapp/core": 42.19.2
     "@wireapp/eslint-config": 3.0.4
     "@wireapp/lru-cache": 3.8.1
     "@wireapp/prettier-config": 0.6.3
