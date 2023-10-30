@@ -21,7 +21,7 @@ import {useEffect} from 'react';
 
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {mergeRegister} from '@lexical/utils';
-import {COMMAND_PRIORITY_LOW, KEY_SPACE_COMMAND, TextNode} from 'lexical';
+import {$getSelection, $isRangeSelection, COMMAND_PRIORITY_LOW, KEY_SPACE_COMMAND, TextNode} from 'lexical';
 
 import {inlineReplacements} from './inlineReplacements';
 
@@ -50,11 +50,6 @@ export function findAndTransformEmoji(text: string): string {
   return text;
 }
 
-function transformEmojiNodes(textNode: TextNode): void {
-  const text = textNode.getTextContent();
-  textNode.setTextContent(findAndTransformEmoji(text));
-}
-
 export function ReplaceEmojiPlugin(): null {
   const [editor] = useLexicalComposerContext();
 
@@ -64,7 +59,19 @@ export function ReplaceEmojiPlugin(): null {
         KEY_SPACE_COMMAND,
         () => {
           const unregister = editor.registerNodeTransform(TextNode, newNode => {
-            transformEmojiNodes(newNode);
+            const text = newNode.getTextContent();
+            const selection = $getSelection();
+            const currentSelection = $isRangeSelection(selection) ? selection : undefined;
+            const updatedText = findAndTransformEmoji(text);
+            const sizeDiff = updatedText.length - text.length;
+            newNode.setTextContent(updatedText);
+            // After emoji replacement, the size of the text could vary. We need to reposition the selection so that it stays in place for the user
+            currentSelection?.setTextNodeRange(
+              newNode,
+              currentSelection.anchor.offset + sizeDiff,
+              newNode,
+              currentSelection.focus.offset + sizeDiff,
+            );
             // We register a text transform listener for a single round when the space key is pressed (then the listener is released)
             unregister();
           });
