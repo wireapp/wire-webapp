@@ -145,7 +145,7 @@ export function MentionsPlugin({onSearch, openStateRef}: MentionsPluginProps) {
     if (!info || (info.isTextNode && info.wordCharAfterCursor)) {
       return null;
     }
-    return checkForMentions(info.textContent);
+    return checkForMentions(text);
   }, []);
 
   const rootElement = editor.getRootElement();

@@ -120,7 +120,7 @@ export function EmojiPickerPlugin({openStateRef}: Props) {
       return null;
     }
 
-    return checkForEmojis(info.textContent);
+    return checkForEmojis(text);
   };
 
   const options: Array<EmojiOption> = useMemo(() => {
