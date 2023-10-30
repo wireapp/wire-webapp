@@ -72,7 +72,7 @@ const getConversationActions = (
     {
       condition: conversationEntity.is_archived(),
       item: {
-        click: async () => actionsViewModel.unArchiveConversation(conversationEntity),
+        click: async () => actionsViewModel.unarchiveConversation(conversationEntity),
         icon: 'archive-icon',
         identifier: 'do-unarchive',
         label: t('conversationsPopoverUnarchive'),
