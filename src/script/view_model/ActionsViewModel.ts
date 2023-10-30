@@ -29,9 +29,12 @@ import {PrimaryModal, removeCurrentModal, usePrimaryModalState} from 'Components
 import {t} from 'Util/LocalizerUtil';
 import {isBackendError} from 'Util/TypePredicateUtil';
 
+import type {MainViewModel} from './MainViewModel';
+
 import type {ClientEntity} from '../client';
 import type {ConnectionRepository} from '../connection/ConnectionRepository';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
+import {ConversationState} from '../conversation/ConversationState';
 import type {MessageRepository} from '../conversation/MessageRepository';
 import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
 import type {Conversation} from '../entity/Conversation';
@@ -39,10 +42,13 @@ import type {Message} from '../entity/message/Message';
 import type {User} from '../entity/User';
 import type {IntegrationRepository} from '../integration/IntegrationRepository';
 import type {ServiceEntity} from '../integration/ServiceEntity';
+import {ListState} from '../page/useAppState';
 import {SelfRepository} from '../self/SelfRepository';
 import {UserState} from '../user/UserState';
 
 export class ActionsViewModel {
+  public readonly mainViewModel: MainViewModel;
+  private readonly conversationState: ConversationState;
   constructor(
     private readonly selfRepository: SelfRepository,
     private readonly connectionRepository: ConnectionRepository,
@@ -50,7 +56,11 @@ export class ActionsViewModel {
     private readonly integrationRepository: IntegrationRepository,
     private readonly messageRepository: MessageRepository,
     private readonly userState = container.resolve(UserState),
-  ) {}
+    mainViewModel: MainViewModel,
+  ) {
+    this.mainViewModel = mainViewModel;
+    this.conversationState = container.resolve(ConversationState);
+  }
 
   readonly acceptConnectionRequest = (userEntity: User): Promise<void> => {
     return this.connectionRepository.acceptRequest(userEntity);
@@ -62,6 +72,18 @@ export class ActionsViewModel {
     }
 
     return this.conversationRepository.archiveConversation(conversationEntity);
+  };
+
+  readonly unArchiveConversation = (conversationEntity: Conversation): Promise<void> => {
+    if (!conversationEntity) {
+      return Promise.reject();
+    }
+
+    return this.conversationRepository.unarchiveConversation(conversationEntity, true, 'manual un-archive').then(() => {
+      if (!this.conversationState.archivedConversations().length) {
+        this.mainViewModel.list.switchList(ListState.CONVERSATIONS);
+      }
+    });
   };
 
   /**
