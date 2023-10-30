@@ -128,6 +128,13 @@ const Conversations: React.FC<ConversationsProps> = ({
   };
 
   useEffect(() => {
+    if (!conversationState.isVisible(activeConversation)) {
+      // If the active conversation is not visible, switch to the recent view
+      listViewModel.contentViewModel.loadPreviousContent();
+    }
+  }, [activeConversation, conversationState, listViewModel.contentViewModel, conversations.length]);
+
+  useEffect(() => {
     if (!activeConversation) {
       return () => {};
     }
