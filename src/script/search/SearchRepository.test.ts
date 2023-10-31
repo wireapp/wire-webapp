@@ -19,15 +19,17 @@
 
 import {User} from 'src/script/entity/User';
 
-import {TestFactory} from '../../helper/TestFactory';
+import {SearchRepository} from './SearchRepository';
+
+import {UserRepository} from '../user/UserRepository';
+
+function buildSearchRepository() {
+  const userRepository = {getUsersById: jest.fn()} as unknown as jest.Mocked<UserRepository>;
+  const searchRepository = new SearchRepository(userRepository);
+  return [searchRepository, {userRepository}] as const;
+}
 
 describe('SearchRepository', () => {
-  const testFactory = new TestFactory();
-
-  beforeAll(() => {
-    return testFactory.exposeSearchActors();
-  });
-
   describe('searchUserInSet', () => {
     const sabine = generateUser('jesuissabine', 'Sabine Duchemin');
     const janina = generateUser('yosoyjanina', 'Janina Felix');
@@ -97,40 +99,45 @@ describe('SearchRepository', () => {
       },
     ];
 
+    const [searchRepository] = buildSearchRepository();
+
     tests.forEach(({expected, term, testCase}) => {
       it(`${testCase} term: ${term}`, () => {
-        const suggestions = testFactory.search_repository.searchUserInSet(term, users);
+        const suggestions = searchRepository.searchUserInSet(term, users);
 
         expect(suggestions.map(serializeUser)).toEqual(expected.map(serializeUser));
       });
     });
 
     it('does not replace numbers with emojis', () => {
+      const [searchRepository] = buildSearchRepository();
       const felix10 = generateUser('simple10', 'Felix10');
       const unsortedUsers = [felix10];
-      const suggestions = testFactory.search_repository.searchUserInSet('😋', unsortedUsers);
+      const suggestions = searchRepository.searchUserInSet('😋', unsortedUsers);
 
       expect(suggestions.map(serializeUser)).toEqual([]);
     });
 
     it('prioritize exact matches with special characters', () => {
+      const [searchRepository] = buildSearchRepository();
       const smilyFelix = generateUser('smily', '😋Felix');
       const atFelix = generateUser('at', '@Felix');
       const simplyFelix = generateUser('simple', 'Felix');
 
       const unsortedUsers = [atFelix, smilyFelix, simplyFelix];
 
-      let suggestions = testFactory.search_repository.searchUserInSet('felix', unsortedUsers);
+      let suggestions = searchRepository.searchUserInSet('felix', unsortedUsers);
       let expected = [simplyFelix, smilyFelix, atFelix];
 
       expect(suggestions.map(serializeUser)).toEqual(expected.map(serializeUser));
-      suggestions = testFactory.search_repository.searchUserInSet('😋', unsortedUsers);
+      suggestions = searchRepository.searchUserInSet('😋', unsortedUsers);
       expected = [smilyFelix];
 
       expect(suggestions.map(serializeUser)).toEqual(expected.map(serializeUser));
     });
 
     it('handles sorting matching results', () => {
+      const [searchRepository] = buildSearchRepository();
       const first = generateUser('xxx', '_surname');
       const second = generateUser('xxx', 'surname _lastname');
       const third = generateUser('_xxx', 'surname lastname');
@@ -141,7 +148,7 @@ describe('SearchRepository', () => {
       const unsortedUsers = [sixth, fifth, third, second, first, fourth];
       const expectedUsers = [first, second, third, fourth, fifth, sixth];
 
-      const suggestions = testFactory.search_repository.searchUserInSet('_', unsortedUsers);
+      const suggestions = searchRepository.searchUserInSet('_', unsortedUsers);
 
       expect(suggestions.map(serializeUser)).toEqual(expectedUsers.map(serializeUser));
     });
