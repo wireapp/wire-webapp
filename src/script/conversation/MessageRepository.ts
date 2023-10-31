@@ -1135,8 +1135,8 @@ export class MessageRepository {
       messageId: createUuid(),
     });
 
-    const sortedUsers = this.userState
-      .directlyConnectedUsers()
+    const sortedUsers = this.conversationState
+      .connectedUsers()
       // For the moment, we do not want to send status in federated env
       // we can remove the filter when we actually want this feature in federated env (and we will need to implement federation for the core broadcastService)
       .filter(user => !user.isFederated)
