@@ -23,6 +23,7 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import type {WebappProperties} from '@wireapp/api-client/lib/user/data';
 import {MessageSendingState} from '@wireapp/core/lib/conversation';
 import {flattenUserMap} from '@wireapp/core/lib/conversation/message/UserClientsUtil';
+import {SubconversationEpochInfoMember} from '@wireapp/core/lib/conversation/SubconversationService/SubconversationService';
 import {amplify} from 'amplify';
 import axios from 'axios';
 import ko from 'knockout';
@@ -117,13 +118,7 @@ enum CALL_DIRECTION {
   OUTGOING = 'outgoing',
 }
 
-export interface SubconversationEpochInfoMember {
-  userid: `${string}@${string}`;
-  clientid: string;
-  in_subconv: boolean;
-}
-
-type SubconversationData = {epoch: number; secretKey: string};
+type SubconversationData = {epoch: number; secretKey: string; members: SubconversationEpochInfoMember[]};
 
 export class CallingRepository {
   private readonly acceptVersionWarning: (conversationId: QualifiedId) => void;
@@ -883,13 +878,9 @@ export class CallingRepository {
     }
   }
 
-  setEpochInfo(
-    conversationId: QualifiedId,
-    subconversationData: SubconversationData,
-    members: SubconversationEpochInfoMember[],
-  ) {
+  setEpochInfo(conversationId: QualifiedId, subconversationData: SubconversationData) {
     const serializedConversationId = this.serializeQualifiedId(conversationId);
-    const {epoch, secretKey} = subconversationData;
+    const {epoch, secretKey, members} = subconversationData;
     const clients = {
       convid: serializedConversationId,
       clients: members,

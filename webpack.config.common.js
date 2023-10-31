@@ -146,7 +146,7 @@ module.exports = {
     new CopyPlugin({
       patterns: [
         {
-          context: 'node_modules/@wireapp/core-crypto/platforms/web/assets',
+          context: 'node_modules/@wireapp/core-crypto/platforms/web',
           from: '*.wasm',
           to: `${dist}/min/core-crypto.wasm`,
         },

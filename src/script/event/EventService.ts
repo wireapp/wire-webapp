@@ -425,12 +425,13 @@ export class EventService {
    * @param primaryKey Event primary key
    * @param changes Changes to update message with
    */
-  async updateEventSequentially(primaryKey: string, changes: Partial<EventRecord> = {}): Promise<number> {
+  async updateEventSequentially(changes: IdentifiedUpdatePayload): Promise<number> {
     const hasVersionedChanges = !!changes.version;
     if (!hasVersionedChanges) {
       throw new ConversationError(ConversationError.TYPE.WRONG_CHANGE, ConversationError.MESSAGE.WRONG_CHANGE);
     }
 
+    const {primary_key: primaryKey, ...updates} = changes;
     if (this.storageService.db) {
       // Create a DB transaction to avoid concurrent sequential update.
       return this.storageService.db.transaction('rw', StorageSchemata.OBJECT_STORE.EVENTS, async () => {
@@ -444,7 +445,7 @@ export class EventService {
         const databaseVersion = record.version || 1;
         const isSequentialUpdate = changes.version === databaseVersion + 1;
         if (isSequentialUpdate) {
-          return this.storageService.update(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey, changes);
+          return this.storageService.update(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey, updates);
         }
         const logMessage = 'Failed sequential database update';
         const logObject = {
@@ -455,7 +456,7 @@ export class EventService {
         throw new StorageError(StorageError.TYPE.NON_SEQUENTIAL_UPDATE, StorageError.MESSAGE.NON_SEQUENTIAL_UPDATE);
       });
     }
-    return this.storageService.update(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey, changes);
+    return this.storageService.update(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey, updates);
   }
 
   /**

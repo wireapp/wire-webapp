@@ -32,6 +32,7 @@ import {Message} from 'src/script/entity/message/Message';
 import {Text} from 'src/script/entity/message/Text';
 import {User} from 'src/script/entity/User';
 import {ConversationError} from 'src/script/error/ConversationError';
+import {generateQualifiedId} from 'test/helper/UserGenerator';
 import {createUuid} from 'Util/uuid';
 
 import {ConversationRepository} from './ConversationRepository';
@@ -45,6 +46,7 @@ import {ContentMessage} from '../entity/message/ContentMessage';
 import {EventRepository} from '../event/EventRepository';
 import {EventService} from '../event/EventService';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
+import {ReactionMap} from '../storage';
 import {TeamState} from '../team/TeamState';
 import {ServerTimeHandler, serverTimeHandler} from '../time/serverTimeHandler';
 import {UserRepository} from '../user/UserRepository';
@@ -256,27 +258,26 @@ describe('MessageRepository', () => {
   describe('updateUserReactions', () => {
     it("should add reaction if it doesn't exist", async () => {
       const [messageRepository] = await buildMessageRepository();
-      const reactions = {
-        user1: 'like,love',
-        user2: 'happy,sad',
-      };
-      const userId = 'user1';
+      const userId = generateQualifiedId();
+      const reactions: ReactionMap = [
+        ['like', [userId]],
+        ['love', [userId]],
+        ['sad', [{id: 'user2', domain: ''}]],
+        ['happy', [{id: 'user2', domain: ''}]],
+      ];
       const reaction = 'cry';
-      const expectedReactions = {
-        user1: 'like,love,cry',
-        user2: 'happy,sad',
-      };
+      const expectedReactions = 'like,love,cry';
       const result = messageRepository.updateUserReactions(reactions, userId, reaction);
-      expect(result).toEqual(expectedReactions[userId]);
+      expect(result).toEqual(expectedReactions);
     });
 
     it('should set the reaction for the user for the first time', async () => {
       const [messageRepository] = await buildMessageRepository();
-      const reactions = {
-        user1: 'like,love,haha',
-        user2: 'happy,sad',
-      };
-      const userId = 'user3';
+      const userId = generateQualifiedId();
+      const reactions: ReactionMap = [
+        ['sad', [{id: 'user2', domain: ''}]],
+        ['happy', [{id: 'user2', domain: ''}]],
+      ];
       const reaction = 'like';
       const expectedReactions = 'like';
       const result = messageRepository.updateUserReactions(reactions, userId, reaction);
@@ -285,33 +286,28 @@ describe('MessageRepository', () => {
 
     it('should delete reaction if it exists', async () => {
       const [messageRepository] = await buildMessageRepository();
-      const reactions = {
-        user1: 'like,love,haha',
-        user2: 'happy,sad',
-      };
-      const userId = 'user1';
+      const userId = generateQualifiedId();
+      const reactions: ReactionMap = [
+        ['like', [userId]],
+        ['love', [userId]],
+        ['haha', [userId]],
+        ['sad', [{id: 'user2', domain: ''}]],
+        ['happy', [{id: 'user2', domain: ''}]],
+      ];
       const reaction = 'haha';
-      const expectedReactions = {
-        user1: 'like,love',
-        user2: 'happy,sad',
-      };
+      const expectedReactions = 'like,love';
       const result = messageRepository.updateUserReactions(reactions, userId, reaction);
-      expect(result).toEqual(expectedReactions[userId]);
+      expect(result).toEqual(expectedReactions);
     });
+
     it('should return an empty string if no reactions for a user', async () => {
       const [messageRepository] = await buildMessageRepository();
-      const reactions = {
-        user1: 'like',
-        user2: 'happy,sad',
-      };
-      const userId = 'user1';
+      const userId = generateQualifiedId();
+      const reactions: ReactionMap = [['like', [userId]]];
       const reaction = 'like';
-      const expectedReactions = {
-        user1: '',
-        user2: 'happy,sad',
-      };
+      const expectedReactions = '';
       const result = messageRepository.updateUserReactions(reactions, userId, reaction);
-      expect(result).toEqual(expectedReactions[userId]);
+      expect(result).toEqual(expectedReactions);
     });
   });
 });

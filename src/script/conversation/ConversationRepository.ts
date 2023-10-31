@@ -116,7 +116,6 @@ import {
   MemberLeaveEvent,
   MessageHiddenEvent,
   OneToOneCreationEvent,
-  ReactionEvent,
   TeamMemberLeaveEvent,
 } from '../conversation/EventBuilder';
 import {Conversation} from '../entity/Conversation';
@@ -136,7 +135,6 @@ import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {isMemberMessage} from '../guards/Message';
 import * as LegalHoldEvaluator from '../legal-hold/LegalHoldEvaluator';
 import {MessageCategory} from '../message/MessageCategory';
-import {SuperType} from '../message/SuperType';
 import {SystemMessageType} from '../message/SystemMessageType';
 import {addOtherSelfClientsToMLSConversation} from '../mls';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
@@ -2877,9 +2875,6 @@ export class ConversationRepository {
       case ClientEvent.CONVERSATION.ONE2ONE_CREATION:
         return this.on1to1Creation(conversationEntity, eventJson);
 
-      case ClientEvent.CONVERSATION.REACTION:
-        return this.onReaction(conversationEntity, eventJson);
-
       case CONVERSATION_EVENT.RECEIPT_MODE_UPDATE:
         return this.onReceiptModeChanged(conversationEntity, eventJson);
 
@@ -3447,46 +3442,6 @@ export class ConversationRepository {
     }
   }
 
-  /**
-   * Someone reacted to a message.
-   *
-   * @param conversationEntity Conversation entity that a message was reacted upon in
-   * @param eventJson JSON data of 'conversation.reaction' event
-   * @returns Resolves when the event was handled
-   */
-  private async onReaction(conversationEntity: Conversation, eventJson: ReactionEvent) {
-    const conversationId = conversationEntity.id;
-    const eventData = eventJson.data;
-    const messageId = eventData.message_id;
-
-    try {
-      const messageEntity = await this.messageRepository.getMessageInConversationById(conversationEntity, messageId);
-      if (!messageEntity || !messageEntity.isContent()) {
-        const type = messageEntity ? messageEntity.type : 'unknown';
-
-        this.logger.error(`Cannot react to '${type}' message '${messageId}' in conversation '${conversationId}'`);
-        throw new ConversationError(ConversationError.TYPE.WRONG_TYPE, ConversationError.MESSAGE.WRONG_TYPE);
-      }
-
-      const changes = messageEntity.getUpdatedReactions(eventJson);
-      if (changes) {
-        const logMessage = `Updating reactions of message '${messageId}' in conversation '${conversationId}'`;
-        this.logger.debug(logMessage, {changes, event: eventJson});
-
-        this.eventService.updateEventSequentially(messageEntity.primary_key, changes);
-        return await this.prepareReactionNotification(conversationEntity, messageEntity, eventJson);
-      }
-    } catch (error) {
-      const isNotFound = error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;
-      if (!isNotFound) {
-        const logMessage = `Failed to handle reaction to message '${messageId}' in conversation '${conversationId}'`;
-        this.logger.error(logMessage, error);
-        throw error;
-      }
-    }
-    return undefined;
-  }
-
   private async onButtonActionConfirmation(conversationEntity: Conversation, eventJson: ButtonActionConfirmationEvent) {
     const {messageId, buttonId} = eventJson.data;
     try {
@@ -3501,7 +3456,7 @@ export class ConversationRepository {
       }
       const changes = messageEntity.getSelectionChange(buttonId);
       if (changes) {
-        this.eventService.updateEventSequentially(messageEntity.primary_key, changes);
+        await this.eventService.updateEventSequentially({primary_key: messageEntity.primary_key, ...changes});
       }
     } catch (error) {
       const isNotFound = error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;
@@ -3728,33 +3683,6 @@ export class ConversationRepository {
     }
   }
 
-  /**
-   * Forward the reaction event to the Notification repository for browser and audio notifications.
-   *
-   * @param conversationEntity Conversation that event was received in
-   * @param messageEntity Message that has been reacted upon
-   * @param eventJson JSON data of received reaction event
-   * @returns Resolves when the notification was prepared
-   */
-  private async prepareReactionNotification(
-    conversationEntity: Conversation,
-    messageEntity: ContentMessage,
-    eventJson: ReactionEvent,
-  ) {
-    const {data: event_data, from} = eventJson;
-
-    const messageFromSelf = messageEntity.from === this.userState.self().id;
-    if (messageFromSelf && event_data.reaction) {
-      const userEntity = await this.userRepository.getUserById({domain: messageEntity.fromDomain, id: from});
-      const reactionMessageEntity = new Message(messageEntity.id, SuperType.REACTION);
-      reactionMessageEntity.user(userEntity);
-      reactionMessageEntity.reaction = event_data.reaction;
-      return {conversationEntity, messageEntity: reactionMessageEntity};
-    }
-
-    return {conversationEntity};
-  }
-
   private updateMessagesUserEntities(messageEntities: Message[], options: {localOnly?: boolean} = {}) {
     return Promise.all(messageEntities.map(messageEntity => this.updateMessageUserEntities(messageEntity, options)));
   }
@@ -3782,20 +3710,6 @@ export class ConversationRepository {
           (messageEntity as MemberMessage).userEntities(userEntities);
           return messageEntity;
         });
-    }
-    if (messageEntity.isContent()) {
-      const userIds = Object.keys(messageEntity.reactions());
-
-      messageEntity.reactions_user_ets.removeAll();
-      if (userIds.length) {
-        // TODO(Federation): Make code federation-aware.
-        return this.userRepository
-          .getUsersById(userIds.map(userId => ({domain: '', id: userId})))
-          .then(userEntities => {
-            messageEntity.reactions_user_ets(userEntities);
-            return messageEntity;
-          });
-      }
     }
     return messageEntity;
   }

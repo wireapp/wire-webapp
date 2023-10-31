@@ -37,14 +37,12 @@ export class Account extends EventEmitter {
     mls: {
       schedulePeriodicKeyMaterialRenewals: jest.fn(),
       registerConversation: jest.fn(),
-      joinConferenceSubconversation: jest.fn(),
       getGroupIdFromConversationId: jest.fn(),
       renewKeyMaterial: jest.fn(),
       getClientIds: jest.fn(),
       getEpoch: jest.fn(),
       conversationExists: jest.fn(),
       exportSecretKey: jest.fn(),
-      leaveConferenceSubconversation: jest.fn(),
       on: this.on,
       emit: this.emit,
       off: this.off,
@@ -67,6 +65,11 @@ export class Account extends EventEmitter {
       removeUserFromConversation: jest.fn(),
       blacklistConversation: jest.fn(),
       removeConversationFromBlacklist: jest.fn(),
+    },
+    subconversation: {
+      joinConferenceSubconversation: jest.fn(),
+      leaveConferenceSubconversation: jest.fn(),
+      subscribeToEpochUpdates: jest.fn(),
     },
     client: {
       deleteClient: jest.fn(),

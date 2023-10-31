@@ -78,12 +78,12 @@ describe('MessageDetails', () => {
     message.timestamp(timestamp);
     message.user(user);
 
-    const getUsersById = jest.fn(async (ids: QualifiedId[]) => {
+    const findUsersByIds = jest.fn((ids: QualifiedId[]) => {
       return ids.map(id => new User(id.id, 'test-domain.mock'));
     });
 
     const userRepository = {
-      getUsersById,
+      findUsersByIds,
     } as unknown as UserRepository;
 
     const defaultProps = getDefaultParams();

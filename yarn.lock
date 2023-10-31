@@ -4361,12 +4361,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/color@npm:3.0.4":
-  version: 3.0.4
-  resolution: "@types/color@npm:3.0.4"
+"@types/color@npm:3.0.5":
+  version: 3.0.5
+  resolution: "@types/color@npm:3.0.5"
   dependencies:
     "@types/color-convert": "*"
-  checksum: 46935626ddeb8ae8877488b1f8f2f71b17a529c113673301a1dd7a64d917cb7a748545ac34ed30c188d66a2cd09c33abc24c87bd5b3a80d520cf1f35aaa2e476
+  checksum: 82cce7cb132b5c0898dd69b92a4663e34ad8f19db6a009bef7ef79d4840ddb4d5f7e793e2e64e3b4a60da92dc2ae33d1aa498981d0fcf0562917c9550603a99d
   languageName: node
   linkType: hard
 
@@ -4584,7 +4584,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/libsodium-wrappers@npm:*, @types/libsodium-wrappers@npm:^0":
+"@types/libsodium-wrappers@npm:*":
+  version: 0.7.12
+  resolution: "@types/libsodium-wrappers@npm:0.7.12"
+  checksum: 8f25b4ffe6b60c36f3c59b3dea2e952b8790c9b8375ee5235e6d294c1519a578b7882d773f168005eb0f3fdb4f11e06ba27b30b89d2c3b8be3f985c7eedd0491
+  languageName: node
+  linkType: hard
+
+"@types/libsodium-wrappers@npm:^0":
   version: 0.7.11
   resolution: "@types/libsodium-wrappers@npm:0.7.11"
   checksum: e3c3acdfc178a466a04d81c030ba1b748abc9335b1d66421125eb55b32cbaf6a9076e32a98744fcb84ba2fa2af342203ff29054262dcc465c12c4feddddb64ac
@@ -4614,13 +4621,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/markdown-it@npm:13.0.4":
-  version: 13.0.4
-  resolution: "@types/markdown-it@npm:13.0.4"
+"@types/markdown-it@npm:13.0.5":
+  version: 13.0.5
+  resolution: "@types/markdown-it@npm:13.0.5"
   dependencies:
     "@types/linkify-it": "*"
     "@types/mdurl": "*"
-  checksum: 0af9c349467599f984e8faf548144e5c68ca8926d45e155cbc622897290fadb1fd31fced8194a2a1095406805dd21719d2bc74d8dc0295581d0eed771a4fd58b
+  checksum: 3c87efe8e24f77dc9aa1962b8f18d37530b63e33ab363653e568816de6d5b6185a65690da729e2757ba370a3499635da6b4fc4d9a99df9d85959d8c64c7fe8e9
   languageName: node
   linkType: hard
 
@@ -4648,7 +4655,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:>=13.7.0":
+"@types/node@npm:*":
   version: 20.8.6
   resolution: "@types/node@npm:20.8.6"
   dependencies:
@@ -4671,12 +4678,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^20.8.7":
-  version: 20.8.7
-  resolution: "@types/node@npm:20.8.7"
+"@types/node@npm:>=13.7.0, @types/node@npm:^20.8.9":
+  version: 20.8.9
+  resolution: "@types/node@npm:20.8.9"
   dependencies:
-    undici-types: ~5.25.1
-  checksum: 2173c0c03daefcb60c03a61b1371b28c8fe412e7a40dc6646458b809d14a85fbc7aeb369d957d57f0aaaafd99964e77436f29b3b579232d8f2b20c58abbd1d25
+    undici-types: ~5.26.4
+  checksum: 0c05f3502a9507ff27e91dd6fd574fa6f391b3fafedcfe8e0c8d33351fb22d02c0121f854e5b6b3ecb9a8a468407ddf6e7ac0029fb236d4c7e1361ffc758a01f
   languageName: node
   linkType: hard
 
@@ -5295,15 +5302,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^26.4.0":
-  version: 26.4.0
-  resolution: "@wireapp/api-client@npm:26.4.0"
+"@wireapp/api-client@npm:^26.5.1":
+  version: 26.5.1
+  resolution: "@wireapp/api-client@npm:26.5.1"
   dependencies:
-    "@wireapp/commons": ^5.2.1
+    "@wireapp/commons": ^5.2.2
     "@wireapp/priority-queue": ^2.1.4
     "@wireapp/protocol-messaging": 1.44.0
     axios: 1.5.1
-    axios-retry: 3.8.0
+    axios-retry: 3.8.1
     http-status-codes: 2.3.0
     logdown: 3.3.1
     pako: 2.1.0
@@ -5312,7 +5319,7 @@ __metadata:
     tough-cookie: 4.1.3
     ws: 8.14.2
     zod: 3.22.4
-  checksum: 900233b8ec83803ade60e5ec4121ef21103be33e6587a6065bd82713d0b235b010c89db59be58c50711175bd7518584477adcb06f05ce67ef54e722e3fcb5f1b
+  checksum: 71c27b4215532059e1357086e0a3f400ce3bfb78ac45d04e74aec79fe6ef70b241bab29d5bf970edc9e9e4ca52790c68e02ba9ecdf390bb965a44cdb3c8f4b10
   languageName: node
   linkType: hard
 
@@ -5330,21 +5337,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/commons@npm:5.2.1, @wireapp/commons@npm:^5.2.1":
-  version: 5.2.1
-  resolution: "@wireapp/commons@npm:5.2.1"
+"@wireapp/commons@npm:5.2.2, @wireapp/commons@npm:^5.2.2":
+  version: 5.2.2
+  resolution: "@wireapp/commons@npm:5.2.2"
   dependencies:
     ansi-regex: 5.0.1
     fs-extra: 11.1.0
     logdown: 3.3.1
     platform: 1.3.6
-  checksum: 1510b705a40d45ceaf07b12b5a199d94fe977d3b2faaafc298ff167a65b820471f5863f9f93f27d2003f9f44ee3401423d6e12bb38ecd7808f8b2fc72821d411
+  checksum: ae78630f8299eaae9ee136136981dabdcb4c100c43ec1430882fc154ae21e9fdb17999c1b892140ca5547625e7f502ba83e85ecf62312c8525098865032b6928
   languageName: node
   linkType: hard
 
-"@wireapp/copy-config@npm:2.1.9":
-  version: 2.1.9
-  resolution: "@wireapp/copy-config@npm:2.1.9"
+"@wireapp/copy-config@npm:2.1.10":
+  version: 2.1.10
+  resolution: "@wireapp/copy-config@npm:2.1.10"
   dependencies:
     axios: 1.5.1
     copy: 0.3.2
@@ -5354,31 +5361,31 @@ __metadata:
     logdown: 3.3.1
   bin:
     copy-config: lib/cli.js
-  checksum: 37ee9d82c6eabc33573ede5c0d9e467c2d6c3dd8f0c2717378ef8c4b84b568613d64e33f4f2903b9d4d612b25ea40f22881e0f44b51cd4f72185f0606294a168
+  checksum: 5b7fa44b067c51dc567d29ebcb9e2fa87cd5464fb4bb5fcef93d4fa5596cf729d1549f0c52f2a9241f0e415678af56765925b8329f49c7efe6e93dcc97bdf1b2
   languageName: node
   linkType: hard
 
-"@wireapp/core-crypto@npm:1.0.0-rc.13":
-  version: 1.0.0-rc.13
-  resolution: "@wireapp/core-crypto@npm:1.0.0-rc.13"
-  checksum: 8edbf8ffbda8db2b0a2a9dd93fe5c823fb337bb6f4eef0333d3c96ea8d594739b50511eb8d463e11863205537e505fe78fe8a25fcf6e61c675ad30a335cf1b5d
+"@wireapp/core-crypto@npm:1.0.0-rc.16":
+  version: 1.0.0-rc.16
+  resolution: "@wireapp/core-crypto@npm:1.0.0-rc.16"
+  checksum: 95061f0a0ee69205492ffb254a60c81be604b6a7d76e5f3e512129c2a5669adc39114e343f50002ff77db7302e1cfd39ac8dd684a87d28555b95c1e4fda7a4f3
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:42.17.0":
-  version: 42.17.0
-  resolution: "@wireapp/core@npm:42.17.0"
+"@wireapp/core@npm:42.19.2":
+  version: 42.19.2
+  resolution: "@wireapp/core@npm:42.19.2"
   dependencies:
-    "@wireapp/api-client": ^26.4.0
-    "@wireapp/commons": ^5.2.1
-    "@wireapp/core-crypto": 1.0.0-rc.13
+    "@wireapp/api-client": ^26.5.1
+    "@wireapp/commons": ^5.2.2
+    "@wireapp/core-crypto": 1.0.0-rc.16
     "@wireapp/cryptobox": 12.8.0
-    "@wireapp/promise-queue": ^2.2.6
+    "@wireapp/promise-queue": ^2.2.7
     "@wireapp/protocol-messaging": 1.44.0
     "@wireapp/store-engine": 5.1.4
     "@wireapp/store-engine-dexie": ^2.1.6
     axios: 1.5.1
-    bazinga64: ^6.3.1
+    bazinga64: ^6.3.2
     deepmerge-ts: 5.1.0
     hash.js: 1.1.7
     http-status-codes: 2.3.0
@@ -5387,7 +5394,7 @@ __metadata:
     long: ^5.2.0
     uuidjs: 4.2.13
     zod: 3.22.4
-  checksum: 97176143fbab1c36abb7cb0ec6372347b108729cb49d43c8d332c11bba023b3ccbb49806d6edaea1a116f27e3e34ed7c53ade665e3e59fd0552129c2c10cb4eb
+  checksum: 24f4b254c7571d10928088db86723350bc73f015cf0b56aafa05892f4417ca098f7a0cc56be407a89ae69f3ff89a74949805f603757f3f6c91f665c97c7d5b69
   languageName: node
   linkType: hard
 
@@ -5470,10 +5477,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/promise-queue@npm:^2.2.6":
-  version: 2.2.6
-  resolution: "@wireapp/promise-queue@npm:2.2.6"
-  checksum: 6de05205a44b62dea38b6a0c00ec8d8f9bd96c98d8e4fa6cf711a9fb5cf5fd39f818432d3c676649e1d5cb638fe9386b24cc098b4514c378d995295ed2f8f3d6
+"@wireapp/promise-queue@npm:^2.2.7":
+  version: 2.2.7
+  resolution: "@wireapp/promise-queue@npm:2.2.7"
+  checksum: 0e607b00325fa702c9222da4e424e31d46ba456e0b8d6af795062f79e3c774581f2e9da9860a8123a7315c510e7da09850030336e356965a5429721a9bbc7976
   languageName: node
   linkType: hard
 
@@ -5501,11 +5508,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/react-ui-kit@npm:9.9.11":
-  version: 9.9.11
-  resolution: "@wireapp/react-ui-kit@npm:9.9.11"
+"@wireapp/react-ui-kit@npm:9.9.12":
+  version: 9.9.12
+  resolution: "@wireapp/react-ui-kit@npm:9.9.12"
   dependencies:
-    "@types/color": 3.0.4
+    "@types/color": 3.0.5
     color: 4.2.3
     emotion-normalize: 11.0.1
     react-select: 5.7.5
@@ -5518,7 +5525,7 @@ __metadata:
   peerDependenciesMeta:
     "@types/react":
       optional: true
-  checksum: 2bb5023b171b9b5da5084b783b8a55221f971b60acd8f7f8770f81578dd2edfa05ed8854c856235f0648231278762ac977305d602a953f31c89e762abb396b85
+  checksum: 4129c63b988ccd9471177f3cc2c73d7dff161e0a9f3ebe85e431adf982e5f2a3ddb0cb11f7b66821a39512cddafcb2a99b30b6ada9aedc74bd56e1da0dbf17b5
   languageName: node
   linkType: hard
 
@@ -6244,13 +6251,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios-retry@npm:3.8.0":
-  version: 3.8.0
-  resolution: "axios-retry@npm:3.8.0"
+"axios-retry@npm:3.8.1":
+  version: 3.8.1
+  resolution: "axios-retry@npm:3.8.1"
   dependencies:
     "@babel/runtime": ^7.15.4
     is-retry-allowed: ^2.2.0
-  checksum: 448d951b971ccd35eaedc0f10ff1129a6bf2b3dfe13ce57749809bd37975332ae0e906ea4e67a41c9c98215bb1bf8a554e6880f1272419c758f91e4d68ca6b55
+  checksum: 9233523d34987838504b1ea9d5f90025bf9d1210e10c3851c28d1e97be9f0c2dd401ddc9f0568759c79426533795de9c54bb8429720ace641032c51fef71cb0f
   languageName: node
   linkType: hard
 
@@ -6471,10 +6478,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bazinga64@npm:^6.3.1":
-  version: 6.3.1
-  resolution: "bazinga64@npm:6.3.1"
-  checksum: f720936b3919f8df3b903675a9557f36b5a959ec458d7536756b805a9a1e3c81d5d6a367adb0245b80e1ef870cd5f94491ac9566738016b5613b5e5e3bccce6e
+"bazinga64@npm:^6.3.2":
+  version: 6.3.2
+  resolution: "bazinga64@npm:6.3.2"
+  checksum: 5865c96c45120da1fc8728ef0c464b2cac85ecb955bd173912d6201ad3b96eaab9c4b1d81659e21a983c0fcaf6d6b91948499f917fc616258a032a0f31a7d16d
   languageName: node
   linkType: hard
 
@@ -6976,13 +6983,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"clsx@npm:^1.2.1":
-  version: 1.2.1
-  resolution: "clsx@npm:1.2.1"
-  checksum: 30befca8019b2eb7dbad38cff6266cf543091dae2825c856a62a8ccf2c3ab9c2907c4d12b288b73101196767f66812365400a227581484a05f968b0307cfaf12
-  languageName: node
-  linkType: hard
-
 "co@npm:^4.6.0":
   version: 4.6.0
   resolution: "co@npm:4.6.0"
@@ -7419,10 +7419,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"crypto-js@npm:^4.1.1":
-  version: 4.1.1
-  resolution: "crypto-js@npm:4.1.1"
-  checksum: b3747c12ee3a7632fab3b3e171ea50f78b182545f0714f6d3e7e2858385f0f4101a15f2517e033802ce9d12ba50a391575ff4638c9de3dd9b2c4bc47768d5425
+"crypto-js@npm:^4.2.0":
+  version: 4.2.0
+  resolution: "crypto-js@npm:4.2.0"
+  checksum: f051666dbc077c8324777f44fbd3aaea2986f198fe85092535130d17026c7c2ccf2d23ee5b29b36f7a4a07312db2fae23c9094b644cc35f7858b1b4fcaf27774
   languageName: node
   linkType: hard
 
@@ -8318,14 +8318,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"emoji-picker-react@npm:4.5.3":
-  version: 4.5.3
-  resolution: "emoji-picker-react@npm:4.5.3"
-  dependencies:
-    clsx: ^1.2.1
+"emoji-picker-react@npm:4.5.7":
+  version: 4.5.7
+  resolution: "emoji-picker-react@npm:4.5.7"
   peerDependencies:
     react: ">=16"
-  checksum: 79681d0e4f3a733c9fa715559b8e3e6c20810e745844718d7072d909f9e5eb2870ba782df5d23d74e0b3ce6d733bbe045b42bf4b27bf1cfc0f5ecfbc971cfe61
+  checksum: b599feddfddc6ef20f46603bc19b724b8c0aff8ae341040c500da3bfdc024feb78e6bf949537fd11852bff2e87004eccf2a73c32265fe7f1e3d9dc821304ef89
   languageName: node
   linkType: hard
 
@@ -13699,13 +13697,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"oidc-client-ts@npm:^2.2.5":
-  version: 2.3.0
-  resolution: "oidc-client-ts@npm:2.3.0"
+"oidc-client-ts@npm:^2.4.0":
+  version: 2.4.0
+  resolution: "oidc-client-ts@npm:2.4.0"
   dependencies:
-    crypto-js: ^4.1.1
+    crypto-js: ^4.2.0
     jwt-decode: ^3.1.2
-  checksum: 74e20b8df748f901d67aba176f5f68bd8aa5ff7eed92dc92f34479dddc49e238dc722c757c5ab0f3365d170e3031343f650c789b51baa01062e8975c7580e15d
+  checksum: 8467db689298221f706d3358961efb0ddc789f6bd7d4765e71ae5fe62067999d2ce6e8e7584b9d991b8caa6f7fb383f75841e1cfa9e05808c34632de374f5e68
   languageName: node
   linkType: hard
 
@@ -17797,6 +17795,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"undici-types@npm:~5.26.4":
+  version: 5.26.5
+  resolution: "undici-types@npm:5.26.5"
+  checksum: 3192ef6f3fd5df652f2dc1cd782b49d6ff14dc98e5dced492aa8a8c65425227da5da6aafe22523c67f035a272c599bb89cfe803c1db6311e44bed3042fc25487
+  languageName: node
+  linkType: hard
+
 "unicode-canonical-property-names-ecmascript@npm:^2.0.0":
   version: 2.0.0
   resolution: "unicode-canonical-property-names-ecmascript@npm:2.0.0"
@@ -18506,8 +18511,8 @@ __metadata:
     "@types/libsodium-wrappers": ^0
     "@types/linkify-it": 3.0.4
     "@types/loadable__component": ^5
-    "@types/markdown-it": 13.0.4
-    "@types/node": ^20.8.7
+    "@types/markdown-it": 13.0.5
+    "@types/node": ^20.8.9
     "@types/open-graph": 0.2.4
     "@types/platform": 1.3.5
     "@types/react": 18.2.28
@@ -18521,13 +18526,13 @@ __metadata:
     "@types/underscore": 1.11.12
     "@types/webpack-env": 1.18.3
     "@wireapp/avs": 9.5.2
-    "@wireapp/commons": 5.2.1
-    "@wireapp/copy-config": 2.1.9
-    "@wireapp/core": 42.17.0
+    "@wireapp/commons": 5.2.2
+    "@wireapp/copy-config": 2.1.10
+    "@wireapp/core": 42.19.2
     "@wireapp/eslint-config": 3.0.4
     "@wireapp/lru-cache": 3.8.1
     "@wireapp/prettier-config": 0.6.3
-    "@wireapp/react-ui-kit": 9.9.11
+    "@wireapp/react-ui-kit": 9.9.12
     "@wireapp/store-engine": ^5.1.4
     "@wireapp/store-engine-dexie": 2.1.6
     "@wireapp/store-engine-sqleet": 1.8.9
@@ -18552,7 +18557,7 @@ __metadata:
     dexie-batch: 0.4.3
     dotenv: 16.3.1
     dpdm: 3.14.0
-    emoji-picker-react: 4.5.3
+    emoji-picker-react: 4.5.7
     eslint: ^8.52.0
     eslint-plugin-prettier: ^5.0.1
     fake-indexeddb: 4.0.2
@@ -18584,7 +18589,7 @@ __metadata:
     markdown-it: 13.0.2
     murmurhash: 2.0.1
     node-fetch: 2.7.0
-    oidc-client-ts: ^2.2.5
+    oidc-client-ts: ^2.4.0
     os-browserify: 0.3.0
     path-browserify: 1.0.1
     platform: 1.3.6

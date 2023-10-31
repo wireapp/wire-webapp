@@ -177,6 +177,7 @@ describe('EventStorageMiddleware', () => {
         JSON.stringify({
           ...linkPreviewEvent,
           data: {...linkPreviewEvent.data, replacing_message_id: replacingId},
+          edited_time: new Date().toISOString(),
         }),
       );
       eventService.loadEvent.mockResolvedValue(storedEvent);
@@ -185,6 +186,7 @@ describe('EventStorageMiddleware', () => {
       linkPreviewEvent.data.previews = ['preview'];
 
       const updatedEvent = (await eventStorageMiddleware.processEvent(linkPreviewEvent)) as any;
+      expect(updatedEvent.edited_time).not.toBeUndefined();
       expect(eventService.replaceEvent).toHaveBeenCalled();
       expect(eventService.saveEvent).not.toHaveBeenCalled();
       expect(updatedEvent.data.previews[0]).toEqual('preview');
@@ -208,6 +210,7 @@ describe('EventStorageMiddleware', () => {
       const updatedEvent = (await eventStorageMiddleware.processEvent(event)) as any;
       expect(updatedEvent.time).toEqual(initial_time);
       expect(updatedEvent.time).not.toEqual(changed_time);
+      expect(updatedEvent.edited_time).toEqual(changed_time);
       expect(updatedEvent.data.content).toEqual('new content');
       expect(updatedEvent.primary_key).toEqual(originalEvent.primary_key);
       expect(Object.keys(updatedEvent.reactions).length).toEqual(0);

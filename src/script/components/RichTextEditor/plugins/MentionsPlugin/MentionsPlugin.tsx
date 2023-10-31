@@ -35,19 +35,19 @@ import {getSelectionInfo} from '../../utils/getSelectionInfo';
 import {TypeaheadMenuPlugin} from '../TypeaheadMenuPlugin';
 
 const TRIGGER = '@';
+const triggerRegexp = new RegExp(`(^| )(${TRIGGER}(\\S*))$`);
 
 /**
  * Will detect mentions triggers in a text
  * @param text the text in which to look for mentions triggers
  */
 function checkForMentions(text: string): MenuTextMatch | null {
-  const match = new RegExp(`(^| )(${TRIGGER}(\\S*))$`).exec(text);
+  const match = triggerRegexp.exec(text);
 
   if (match === null) {
     return null;
   }
-  const search = match[2];
-  const term = match[3];
+  const [, , search, term] = match;
 
   return {
     leadOffset: match.index,
@@ -73,6 +73,50 @@ interface MentionsPluginProps {
   openStateRef: MutableRefObject<boolean>;
 }
 
+function MentionMenu({
+  getPosition,
+  options,
+  selectedIndex,
+  selectOptionAndCleanUp,
+  setHighlightedIndex,
+}: {
+  getPosition: () => {bottom: number; left: number};
+  options: MenuOption[];
+  selectedIndex: number | null;
+  selectOptionAndCleanUp: (option: MenuOption) => void;
+  setHighlightedIndex: (index: number) => void;
+}) {
+  const {bottom, left} = getPosition();
+
+  return (
+    <IgnoreOutsideClickWrapper>
+      <FadingScrollbar
+        className="conversation-input-bar-mention-suggestion"
+        style={{bottom, left, overflowY: 'auto'}}
+        data-uie-name="list-mention-suggestions"
+      >
+        <div className="mention-suggestion-list">
+          {options.map((menuOption, index) => (
+            <MentionSuggestionsItem
+              ref={menuOption.setRefElement}
+              key={menuOption.user.id}
+              suggestion={menuOption.user}
+              isSelected={selectedIndex === index}
+              onSuggestionClick={() => {
+                setHighlightedIndex(index);
+                selectOptionAndCleanUp(menuOption);
+              }}
+              onMouseEnter={() => {
+                setHighlightedIndex(index);
+              }}
+            />
+          ))}
+        </div>
+      </FadingScrollbar>
+    </IgnoreOutsideClickWrapper>
+  );
+}
+
 export function MentionsPlugin({onSearch, openStateRef}: MentionsPluginProps) {
   const [editor] = useLexicalComposerContext();
   const [queryString, setQueryString] = useState<string | null>();
@@ -81,16 +125,16 @@ export function MentionsPlugin({onSearch, openStateRef}: MentionsPluginProps) {
 
   const options = results.map(result => new MenuOption(result, result.name())).reverse();
 
-  const handleSelectOption = useCallback(
+  const insertMention = useCallback(
     (selectedOption: MenuOption, nodeToReplace: TextNode | null, closeMenu: () => void) => {
       editor.update(() => {
-        const mentionNode = $createMentionNode(TRIGGER, selectedOption.value);
         if (nodeToReplace) {
+          const mentionNode = $createMentionNode(TRIGGER, selectedOption.value);
           nodeToReplace.replace(mentionNode);
           mentionNode.insertAfter($createTextNode(' '));
         }
-        closeMenu();
       });
+      closeMenu();
     },
     [editor],
   );
@@ -98,7 +142,7 @@ export function MentionsPlugin({onSearch, openStateRef}: MentionsPluginProps) {
   const checkForMentionMatch = useCallback((text: string) => {
     // Don't show the menu if the next character is a word character
     const info = getSelectionInfo([TRIGGER]);
-    if (info?.isTextNode && info.wordCharAfterCursor) {
+    if (!info || (info.isTextNode && info.wordCharAfterCursor)) {
       return null;
     }
     return checkForMentions(text);
@@ -116,45 +160,12 @@ export function MentionsPlugin({onSearch, openStateRef}: MentionsPluginProps) {
     return {bottom: window.innerHeight - boundingClientRect.top + 24, left: boundingClientRect.left};
   };
 
-  const menuRenderFn: MenuRenderFn<MenuOption> = (
-    anchorElementRef,
-    {selectedIndex, selectOptionAndCleanUp, setHighlightedIndex},
-  ) => {
+  const menuRenderFn: MenuRenderFn<MenuOption> = (anchorElementRef, params) => {
     if (!anchorElementRef.current || !options.length) {
       return null;
     }
 
-    openStateRef.current = true;
-    const {bottom, left} = getPosition();
-
-    return ReactDOM.createPortal(
-      <IgnoreOutsideClickWrapper>
-        <FadingScrollbar
-          className="conversation-input-bar-mention-suggestion"
-          style={{bottom, left, overflowY: 'auto'}}
-          data-uie-name="list-mention-suggestions"
-        >
-          <div className="mention-suggestion-list">
-            {options.map((menuOption, index) => (
-              <MentionSuggestionsItem
-                ref={menuOption.setRefElement}
-                key={menuOption.user.id}
-                suggestion={menuOption.user}
-                isSelected={selectedIndex === index}
-                onSuggestionClick={() => {
-                  setHighlightedIndex(index);
-                  selectOptionAndCleanUp(menuOption);
-                }}
-                onMouseEnter={() => {
-                  setHighlightedIndex(index);
-                }}
-              />
-            ))}
-          </div>
-        </FadingScrollbar>
-      </IgnoreOutsideClickWrapper>,
-      anchorElementRef.current,
-    );
+    return ReactDOM.createPortal(<MentionMenu getPosition={getPosition} {...params} />, anchorElementRef.current);
   };
 
   openStateRef.current = options.length > 0;
@@ -162,10 +173,11 @@ export function MentionsPlugin({onSearch, openStateRef}: MentionsPluginProps) {
   return (
     <TypeaheadMenuPlugin
       onQueryChange={setQueryString}
-      onSelectOption={handleSelectOption}
+      onSelectOption={insertMention}
       triggerFn={checkForMentionMatch}
       options={options}
       menuRenderFn={menuRenderFn}
+      onClose={() => (openStateRef.current = false)}
       containerId="mentions-typeahead-menu"
       isReversed
     />

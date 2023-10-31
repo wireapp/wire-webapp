@@ -21,7 +21,6 @@ import React from 'react';
 
 import {render, act, fireEvent, waitFor} from '@testing-library/react';
 
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {t} from 'Util/LocalizerUtil';
 
 import {MessageReactions, MessageReactionsProps} from './MessageReactions';
@@ -32,7 +31,6 @@ const thumbsUpEmoji = '👍';
 const likeEmoji = '❤️';
 const wrapperRef = React.createRef<HTMLDivElement>();
 const defaultProps: MessageReactionsProps = {
-  message: new ContentMessage(),
   handleReactionClick: jest.fn(),
   messageFocusedTabIndex: 0,
   currentMsgActionName: '',
