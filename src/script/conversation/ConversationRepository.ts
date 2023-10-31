@@ -291,8 +291,6 @@ export class ConversationRepository {
       onMessageTimeout: this.handleMessageExpiration,
     });
 
-    this.userState.directlyConnectedUsers = this.conversationState.connectedUsers;
-
     this.conversationLabelRepository = new ConversationLabelRepository(
       this.conversationState.conversations,
       this.conversationState.visibleConversations,

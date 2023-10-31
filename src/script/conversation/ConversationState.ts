@@ -51,6 +51,9 @@ export class ConversationState {
   private readonly selfProteusConversation: ko.PureComputed<Conversation | undefined>;
   private readonly selfMLSConversation: ko.PureComputed<Conversation | undefined>;
   public readonly unreadConversations: ko.PureComputed<Conversation[]>;
+  /**
+   * All the users that are connected to the selfUser through a conversation. Those users are not necessarily **directly** connected to the selfUser (through a connection request)
+   */
   public readonly connectedUsers: ko.PureComputed<User[]>;
 
   public readonly sortedConversations: ko.PureComputed<Conversation[]>;
