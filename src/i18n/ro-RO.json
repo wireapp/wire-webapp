@@ -1121,7 +1121,7 @@
   "preferencesAccountUsername": "Username",
   "preferencesAccountUsernameAvailable": "Disponibil",
   "preferencesAccountUsernameErrorTaken": "Deja folosit",
-  "preferencesAccountUsernameHint": "Cel puțin două caractere. Doar a—z, 0—9 și _ sunt permise.",
+  "preferencesAccountUsernameHint": "At least 2 characters. a—z, 0—9 and '.', '-', '_' only.",
   "preferencesAccountUsernamePlaceholder": "Numele tău complet",
   "preferencesDevice": "Device",
   "preferencesDeviceDetails": "Detalii dispozitiv",

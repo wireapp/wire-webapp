@@ -1121,7 +1121,7 @@
   "preferencesAccountUsername": "Username",
   "preferencesAccountUsernameAvailable": "Dostupné",
   "preferencesAccountUsernameErrorTaken": "Už obsadené",
-  "preferencesAccountUsernameHint": "Aspoň 2 znaky. A výhradne a-z, 0-9.",
+  "preferencesAccountUsernameHint": "At least 2 characters. a—z, 0—9 and '.', '-', '_' only.",
   "preferencesAccountUsernamePlaceholder": "Vaše celé meno",
   "preferencesDevice": "Device",
   "preferencesDeviceDetails": "Podrobnosti o zariadení",

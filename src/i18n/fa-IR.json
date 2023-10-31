@@ -1121,7 +1121,7 @@
   "preferencesAccountUsername": "Username",
   "preferencesAccountUsernameAvailable": "در دسترس",
   "preferencesAccountUsernameErrorTaken": "در حال حاضر موجود نیست",
-  "preferencesAccountUsernameHint": "حداقل ۲کاراکتر. حروف a-z، ارقام 0 تا 9 و _ مورد قبول میباشد.",
+  "preferencesAccountUsernameHint": "At least 2 characters. a—z, 0—9 and '.', '-', '_' only.",
   "preferencesAccountUsernamePlaceholder": "نام کامل شما",
   "preferencesDevice": "Device",
   "preferencesDeviceDetails": "جزییات اطلاعات دستگاه",

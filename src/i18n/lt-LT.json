@@ -1121,7 +1121,7 @@
   "preferencesAccountUsername": "Username",
   "preferencesAccountUsernameAvailable": "Prieinamas",
   "preferencesAccountUsernameErrorTaken": "Jau užimtas",
-  "preferencesAccountUsernameHint": "Bent 2 simboliai. Tik a—z, 0—9 ir _.",
+  "preferencesAccountUsernameHint": "At least 2 characters. a—z, 0—9 and '.', '-', '_' only.",
   "preferencesAccountUsernamePlaceholder": "Jūsų vardas ir pavardė",
   "preferencesDevice": "Device",
   "preferencesDeviceDetails": "Išsamesnė įrenginio informacija",

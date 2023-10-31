@@ -1121,7 +1121,7 @@
   "preferencesAccountUsername": "Username",
   "preferencesAccountUsernameAvailable": "Beschikbaar",
   "preferencesAccountUsernameErrorTaken": "Al in gebruik",
-  "preferencesAccountUsernameHint": "Ten minste 2 tekens. a—z, 0—9, en _ alleen.",
+  "preferencesAccountUsernameHint": "At least 2 characters. a—z, 0—9 and '.', '-', '_' only.",
   "preferencesAccountUsernamePlaceholder": "Je volledige naam",
   "preferencesDevice": "Device",
   "preferencesDeviceDetails": "Apparaat Details",

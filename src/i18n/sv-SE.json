@@ -1121,7 +1121,7 @@
   "preferencesAccountUsername": "Username",
   "preferencesAccountUsernameAvailable": "Tillgängligt",
   "preferencesAccountUsernameErrorTaken": "Upptaget",
-  "preferencesAccountUsernameHint": "Minst 2 tecken. a—z, 0—9 och _ endast.",
+  "preferencesAccountUsernameHint": "At least 2 characters. a—z, 0—9 and '.', '-', '_' only.",
   "preferencesAccountUsernamePlaceholder": "Ditt fullständiga namn",
   "preferencesDevice": "Device",
   "preferencesDeviceDetails": "Enhetsdetaljer",

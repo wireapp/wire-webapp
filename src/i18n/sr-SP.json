@@ -1121,7 +1121,7 @@
   "preferencesAccountUsername": "Username",
   "preferencesAccountUsernameAvailable": "На располагању",
   "preferencesAccountUsernameErrorTaken": "Већ заузето",
-  "preferencesAccountUsernameHint": "Бар 2 знака. Само a—z, 0—9 и _",
+  "preferencesAccountUsernameHint": "At least 2 characters. a—z, 0—9 and '.', '-', '_' only.",
   "preferencesAccountUsernamePlaceholder": "Ваше пуно име",
   "preferencesDevice": "Device",
   "preferencesDeviceDetails": "Детаљи уређаја",

@@ -1121,7 +1121,7 @@
   "preferencesAccountUsername": "Username",
   "preferencesAccountUsernameAvailable": "可用",
   "preferencesAccountUsernameErrorTaken": "已經被用了",
-  "preferencesAccountUsernameHint": "至少要兩個字元，只可使用 a 到 z、0 到 9 或者 _ 這些字元。",
+  "preferencesAccountUsernameHint": "At least 2 characters. a—z, 0—9 and '.', '-', '_' only.",
   "preferencesAccountUsernamePlaceholder": "您的全名",
   "preferencesDevice": "Device",
   "preferencesDeviceDetails": "設備詳細資訊",
