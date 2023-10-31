@@ -197,7 +197,7 @@ describe('SearchRepository', () => {
         .spyOn(apiClient.api.user, 'getSearchContacts')
         .mockResolvedValue({response: {documents: searchResults}} as any);
 
-      const suggestions = await searchRepository.searchByName('felix', true);
+      const suggestions = await searchRepository.searchByName('@felix');
 
       expect(suggestions).toHaveLength(1);
       expect(suggestions[0]).toBe(localUsers[0]);

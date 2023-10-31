@@ -48,18 +48,6 @@ export class SearchRepository {
   }
 
   /**
-   * Trim and remove @.
-   * @param query Search string
-   * @returns Normalized search query
-   */
-  static normalizeQuery(query: string): string {
-    if (typeof query !== 'string') {
-      return '';
-    }
-    return query.trim().replace(/^[@]/, '').toLowerCase();
-  }
-
-  /**
    * @param searchService SearchService
    * @param userRepository Repository for all user interactions
    */
@@ -73,28 +61,30 @@ export class SearchRepository {
    * Search for a user in the given user list and given a search term.
    * Doesn't sort the results and keep the initial order of the given user list.
    *
-   * @param term the search term
+   * @param query the search term
    * @param userEntities entities to match the search term against
    * @param properties list of properties that will be matched against the search term
    *    the order of the properties in the array indicates the priorities by which results will be sorted
    * @returns the filtered list of users
    */
-  searchUserInSet(
-    term: string,
-    userEntities: User[],
-    properties = [SearchRepository.CONFIG.SEARCHABLE_FIELDS.NAME, SearchRepository.CONFIG.SEARCHABLE_FIELDS.USERNAME],
-  ): User[] {
-    if (term === '') {
+  searchUserInSet(term: string, userEntities: User[]): User[] {
+    const {isHandleQuery, query} = this.normalizeQuery(term);
+    if (query === '') {
       return userEntities;
     }
-    const excludedEmojis = Array.from(term).reduce<Record<string, string>>((emojis, char) => {
+    const properties = isHandleQuery
+      ? [SearchRepository.CONFIG.SEARCHABLE_FIELDS.USERNAME]
+      : [SearchRepository.CONFIG.SEARCHABLE_FIELDS.NAME, SearchRepository.CONFIG.SEARCHABLE_FIELDS.USERNAME];
+
+    const excludedEmojis = Array.from(query).reduce<Record<string, string>>((emojis, char) => {
       const isEmoji = EMOJI_RANGES.includes(char);
       if (isEmoji) {
         emojis[char] = char;
       }
       return emojis;
     }, {});
-    const termSlug = computeTransliteration(term, excludedEmojis);
+
+    const termSlug = computeTransliteration(query, excludedEmojis);
     const weightedResults = userEntities.reduce<{user: User; weight: number}[]>((results, userEntity) => {
       /*
         given user of name Bardia and username of bardia_wire this mapping
@@ -113,7 +103,7 @@ export class SearchRepository {
       const uniqueValues = Array.from(new Set(values));
       const matchWeight = uniqueValues.reduce((weight, value, index) => {
         const propertyWeight = 10 * index + 1;
-        const propertyMatchWeight = this.matches(term, termSlug, excludedEmojis, value);
+        const propertyMatchWeight = this.matches(query, termSlug, excludedEmojis, value);
         return weight + propertyMatchWeight * propertyWeight;
       }, 0);
 
@@ -128,6 +118,19 @@ export class SearchRepository {
         return result2.weight - result1.weight;
       })
       .map(result => result.user);
+  }
+
+  /**
+   * Trim and remove @.
+   * @param query Search string
+   * @returns Normalized search query
+   */
+  public normalizeQuery(query: string): {isHandleQuery: boolean; query: string} {
+    const normalizeQuery = query.trim().replace(/^[@]/, '').toLowerCase();
+    return {
+      isHandleQuery: query.startsWith('@') && validateHandle(normalizeQuery),
+      query: normalizeQuery,
+    };
   }
 
   private matches(term: string, termSlug: string, excludedChars?: Record<string, string>, value: string = ''): number {
@@ -181,12 +184,9 @@ export class SearchRepository {
    * @param maxResults Maximum number of results
    * @returns Resolves with the search results
    */
-  async searchByName(
-    query: string,
-    isHandle?: boolean,
-    maxResults = SearchRepository.CONFIG.MAX_SEARCH_RESULTS,
-  ): Promise<User[]> {
-    const [rawName, rawDomain] = this.core.backendFeatures.isFederated ? query.replace(/^@/, '').split('@') : [query];
+  async searchByName(term: string, maxResults = SearchRepository.CONFIG.MAX_SEARCH_RESULTS): Promise<User[]> {
+    const {query, isHandleQuery: isHandle} = this.normalizeQuery(term);
+    const [rawName, rawDomain] = this.core.backendFeatures.isFederated ? query.split('@') : [query];
     const [name, domain] = validateHandle(rawName, rawDomain) ? [rawName, rawDomain] : [query];
 
     const userIds: QualifiedId[] = await this.getContacts(

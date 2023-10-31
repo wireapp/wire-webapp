@@ -48,7 +48,6 @@ import {useDebounce} from '../../../../hooks/useDebounce';
 import {SearchRepository} from '../../../../search/SearchRepository';
 import {TeamRepository} from '../../../../team/TeamRepository';
 import {TeamState} from '../../../../team/TeamState';
-import {validateHandle} from '../../../../user/UserHandleGenerator';
 import {UserState} from '../../../../user/UserState';
 
 export type SearchResultsData = {contacts: User[]; groups: Conversation[]; others: User[]};
@@ -170,7 +169,7 @@ export const PeopleTab = ({
   useDebounce(
     async () => {
       setHasFederationError(false);
-      const query = SearchRepository.normalizeQuery(searchQuery);
+      const {query, isHandleQuery} = searchRepository.normalizeQuery(searchQuery);
       if (!query) {
         setResults({contacts: getLocalUsers(), groups: [], others: []});
         onSearchResults(undefined);
@@ -178,16 +177,9 @@ export const PeopleTab = ({
       }
       const localSearchSources = getLocalUsers(true);
 
-      // Contacts, groups and others
-      const trimmedQuery = searchQuery.trim();
-      const isHandle = trimmedQuery.startsWith('@') && validateHandle(query);
-
-      const SEARCHABLE_FIELDS = SearchRepository.CONFIG.SEARCHABLE_FIELDS;
-      const searchFields = isHandle ? [SEARCHABLE_FIELDS.USERNAME] : undefined;
-
-      // If the user typed a domain, we will just ignore it when searchng for the user locally
+      // If the user typed a domain, we will just ignore it when searching for the user locally
       const [domainFreeQuery] = query.split('@');
-      const contactResults = searchRepository.searchUserInSet(domainFreeQuery, localSearchSources, searchFields);
+      const contactResults = searchRepository.searchUserInSet(domainFreeQuery, localSearchSources);
       const connectedUsers = conversationState.connectedUsers();
       const filteredResults = contactResults.filter(
         user => connectedUsers.includes(user) || teamRepository.isSelfConnectedTo(user.id) || user.username() === query,
@@ -195,14 +187,14 @@ export const PeopleTab = ({
 
       const localSearchResults: SearchResultsData = {
         contacts: filteredResults,
-        groups: conversationRepository.getGroupsByName(query, isHandle),
+        groups: conversationRepository.getGroupsByName(query, isHandleQuery),
         others: [],
       };
       setResults(localSearchResults);
       onSearchResults(localSearchResults);
       if (canSearchUnconnectedUsers) {
         try {
-          const userEntities = await searchRepository.searchByName(query, isHandle);
+          const userEntities = await searchRepository.searchByName(query);
           const localUserIds = localSearchResults.contacts.map(({id}) => id);
           const onlyRemoteUsers = userEntities.filter(user => !localUserIds.includes(user.id));
           const results = inTeam
