@@ -21,6 +21,7 @@ import type {QualifiedId, SearchResult} from '@wireapp/api-client/lib/user/';
 import {container} from 'tsyringe';
 
 import {EMOJI_RANGES} from 'Util/EmojiUtil';
+import {getLogger} from 'Util/Logger';
 import {
   computeTransliteration,
   replaceAccents,
@@ -36,6 +37,8 @@ import {validateHandle} from '../user/UserHandleGenerator';
 import type {UserRepository} from '../user/UserRepository';
 
 export class SearchRepository {
+  private readonly logger = getLogger('SearchRepository');
+
   static get CONFIG() {
     return {
       MAX_DIRECTORY_RESULTS: 30,
@@ -62,14 +65,16 @@ export class SearchRepository {
    * Doesn't sort the results and keep the initial order of the given user list.
    *
    * @param query the search term
-   * @param userEntities entities to match the search term against
+   * @param users entities to match the search term against
    * @returns the filtered list of users
    */
-  searchUserInSet(term: string, userEntities: User[]): User[] {
-    const {isHandleQuery, query} = this.normalizeQuery(term);
-    if (query === '') {
-      return userEntities;
+  searchUserInSet(term: string, users: User[]): User[] {
+    const {isHandleQuery, query: domainQuery} = this.normalizeQuery(term);
+    if (domainQuery === '') {
+      return users;
     }
+    // If the user typed a domain, we will just ignore it when searching for the user locally
+    const [query] = domainQuery.split('@');
     const properties = isHandleQuery
       ? [SearchRepository.CONFIG.SEARCHABLE_FIELDS.USERNAME]
       : [SearchRepository.CONFIG.SEARCHABLE_FIELDS.NAME, SearchRepository.CONFIG.SEARCHABLE_FIELDS.USERNAME];
@@ -83,7 +88,7 @@ export class SearchRepository {
     }, {});
 
     const termSlug = computeTransliteration(query, excludedEmojis);
-    const weightedResults = userEntities.reduce<{user: User; weight: number}[]>((results, userEntity) => {
+    const weightedResults = users.reduce<{user: User; weight: number}[]>((results, userEntity) => {
       /*
         given user of name Bardia and username of bardia_wire this mapping
         will get name & username properties and return an array value like ['Bardia', 'bardia_wire']
@@ -108,6 +113,9 @@ export class SearchRepository {
       return matchWeight === 0 ? results : results.concat({user: userEntity, weight: matchWeight});
     }, []);
 
+    this.logger.info(
+      `local search for ${term} (isHandleQuery: ${isHandleQuery}) returned ${weightedResults.length} results`,
+    );
     return weightedResults
       .sort((result1, result2) => {
         if (result2.weight === result1.weight) {
@@ -183,7 +191,7 @@ export class SearchRepository {
    * @returns Resolves with the search results
    */
   async searchByName(term: string, maxResults = SearchRepository.CONFIG.MAX_SEARCH_RESULTS): Promise<User[]> {
-    const {query, isHandleQuery: isHandle} = this.normalizeQuery(term);
+    const {query, isHandleQuery} = this.normalizeQuery(term);
     const [rawName, rawDomain] = this.core.backendFeatures.isFederated ? query.split('@') : [query];
     const [name, domain] = validateHandle(rawName, rawDomain) ? [rawName, rawDomain] : [query];
 
@@ -195,17 +203,18 @@ export class SearchRepository {
 
     const users = await this.userRepository.getUsersById(userIds);
 
-    return (
-      users
-        // Filter out selfUser
-        .filter(user => !user.isMe)
-        .filter(user => !isHandle || startsWith(user.username(), query))
-        .sort((userA, userB) => {
-          return isHandle
-            ? sortByPriority(userA.username(), userB.username(), query)
-            : sortByPriority(userA.name(), userB.name(), query);
-        })
-        .slice(0, maxResults)
-    );
+    const results = users
+      // Filter out selfUser
+      .filter(user => !user.isMe)
+      .filter(user => !isHandleQuery || startsWith(user.username(), query))
+      .sort((userA, userB) => {
+        return isHandleQuery
+          ? sortByPriority(userA.username(), userB.username(), query)
+          : sortByPriority(userA.name(), userB.name(), query);
+      })
+      .slice(0, maxResults);
+
+    this.logger.info(`remote search for ${term} (isHandleQuery: ${isHandleQuery}) returned ${results.length} results`);
+    return results;
   }
 }

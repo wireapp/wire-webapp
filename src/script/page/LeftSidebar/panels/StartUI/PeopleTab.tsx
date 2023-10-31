@@ -177,9 +177,7 @@ export const PeopleTab = ({
       }
       const localSearchSources = getLocalUsers(true);
 
-      // If the user typed a domain, we will just ignore it when searching for the user locally
-      const [domainFreeQuery] = query.split('@');
-      const contactResults = searchRepository.searchUserInSet(domainFreeQuery, localSearchSources);
+      const contactResults = searchRepository.searchUserInSet(searchQuery, localSearchSources);
       const connectedUsers = conversationState.connectedUsers();
       const filteredResults = contactResults.filter(
         user => connectedUsers.includes(user) || teamRepository.isSelfConnectedTo(user.id) || user.username() === query,
@@ -194,7 +192,7 @@ export const PeopleTab = ({
       onSearchResults(localSearchResults);
       if (canSearchUnconnectedUsers) {
         try {
-          const userEntities = await searchRepository.searchByName(query);
+          const userEntities = await searchRepository.searchByName(searchQuery);
           const localUserIds = localSearchResults.contacts.map(({id}) => id);
           const onlyRemoteUsers = userEntities.filter(user => !localUserIds.includes(user.id));
           const results = inTeam
