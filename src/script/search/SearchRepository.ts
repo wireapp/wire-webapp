@@ -63,8 +63,6 @@ export class SearchRepository {
    *
    * @param query the search term
    * @param userEntities entities to match the search term against
-   * @param properties list of properties that will be matched against the search term
-   *    the order of the properties in the array indicates the priorities by which results will be sorted
    * @returns the filtered list of users
    */
   searchUserInSet(term: string, userEntities: User[]): User[] {

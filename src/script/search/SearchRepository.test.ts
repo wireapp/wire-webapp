@@ -143,6 +143,20 @@ describe('SearchRepository', () => {
       expect(suggestions.map(serializeUser)).toEqual(expected.map(serializeUser));
     });
 
+    it('only search by handle when a handle is given', () => {
+      const [searchRepository] = buildSearchRepository();
+      const felix = createUser('felix', 'Felix');
+      const notmatching1 = createUser('notix', 'Felix');
+      const notmatching2 = createUser('simple', 'Felix');
+
+      const unsortedUsers = [notmatching1, felix, notmatching2];
+
+      const suggestions = searchRepository.searchUserInSet('@felix', unsortedUsers);
+      const expected = [felix];
+
+      expect(suggestions.map(serializeUser)).toEqual(expected.map(serializeUser));
+    });
+
     it('handles sorting matching results', () => {
       const [searchRepository] = buildSearchRepository();
       const first = createUser('xxx', '_surname');
