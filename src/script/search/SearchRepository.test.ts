@@ -18,29 +18,36 @@
  */
 
 import {User} from 'src/script/entity/User';
+import {generateUser} from 'test/helper/UserGenerator';
 
 import {SearchRepository} from './SearchRepository';
 
+import {randomInt} from '../auth/util/randomUtil';
+import {generateUsers} from '../auth/util/test/TestUtil';
+import {APIClient} from '../service/APIClientSingleton';
+import {Core} from '../service/CoreSingleton';
 import {UserRepository} from '../user/UserRepository';
 
 function buildSearchRepository() {
-  const userRepository = {getUsersById: jest.fn()} as unknown as jest.Mocked<UserRepository>;
-  const searchRepository = new SearchRepository(userRepository);
-  return [searchRepository, {userRepository}] as const;
+  const userRepository = {getUsersById: jest.fn(() => [])} as unknown as jest.Mocked<UserRepository>;
+  const core = {backendFeatures: {isFederated: false}} as unknown as jest.Mocked<Core>;
+  const apiClient = {api: {user: {getSearchContacts: jest.fn()}}} as unknown as jest.Mocked<APIClient>;
+  const searchRepository = new SearchRepository(userRepository, core, apiClient);
+  return [searchRepository, {userRepository, core, apiClient}] as const;
 }
 
 describe('SearchRepository', () => {
   describe('searchUserInSet', () => {
-    const sabine = generateUser('jesuissabine', 'Sabine Duchemin');
-    const janina = generateUser('yosoyjanina', 'Janina Felix');
-    const felixa = generateUser('iamfelix', 'Felix Abo');
-    const felix = generateUser('iamfelix', 'Felix Oulala');
-    const felicien = generateUser('ichbinfelicien', 'Felicien Delatour');
-    const lastguy = generateUser('lastfelicien', 'lastsabine lastjanina');
-    const jeanpierre = generateUser('jean-pierre', 'Jean-Pierre Sansbijou');
-    const pierre = generateUser('pierrot', 'Pierre Monsouci');
-    const noMatch1 = generateUser(undefined, 'yyy yyy');
-    const noMatch2 = generateUser('xxx', undefined);
+    const sabine = createUser('jesuissabine', 'Sabine Duchemin');
+    const janina = createUser('yosoyjanina', 'Janina Felix');
+    const felixa = createUser('iamfelix', 'Felix Abo');
+    const felix = createUser('iamfelix', 'Felix Oulala');
+    const felicien = createUser('ichbinfelicien', 'Felicien Delatour');
+    const lastguy = createUser('lastfelicien', 'lastsabine lastjanina');
+    const jeanpierre = createUser('jean-pierre', 'Jean-Pierre Sansbijou');
+    const pierre = createUser('pierrot', 'Pierre Monsouci');
+    const noMatch1 = createUser(undefined, 'yyy yyy');
+    const noMatch2 = createUser('xxx', undefined);
     const users = [lastguy, noMatch1, felix, felicien, sabine, janina, noMatch2, felixa, jeanpierre, pierre];
 
     const tests = [
@@ -111,7 +118,7 @@ describe('SearchRepository', () => {
 
     it('does not replace numbers with emojis', () => {
       const [searchRepository] = buildSearchRepository();
-      const felix10 = generateUser('simple10', 'Felix10');
+      const felix10 = createUser('simple10', 'Felix10');
       const unsortedUsers = [felix10];
       const suggestions = searchRepository.searchUserInSet('😋', unsortedUsers);
 
@@ -120,9 +127,9 @@ describe('SearchRepository', () => {
 
     it('prioritize exact matches with special characters', () => {
       const [searchRepository] = buildSearchRepository();
-      const smilyFelix = generateUser('smily', '😋Felix');
-      const atFelix = generateUser('at', '@Felix');
-      const simplyFelix = generateUser('simple', 'Felix');
+      const smilyFelix = createUser('smily', '😋Felix');
+      const atFelix = createUser('at', '@Felix');
+      const simplyFelix = createUser('simple', 'Felix');
 
       const unsortedUsers = [atFelix, smilyFelix, simplyFelix];
 
@@ -138,12 +145,12 @@ describe('SearchRepository', () => {
 
     it('handles sorting matching results', () => {
       const [searchRepository] = buildSearchRepository();
-      const first = generateUser('xxx', '_surname');
-      const second = generateUser('xxx', 'surname _lastname');
-      const third = generateUser('_xxx', 'surname lastname');
-      const fourth = generateUser('xxx', 'sur_name lastname');
-      const fifth = generateUser('xxx', 'surname last_name');
-      const sixth = generateUser('x_xx', 'surname lastname');
+      const first = createUser('xxx', '_surname');
+      const second = createUser('xxx', 'surname _lastname');
+      const third = createUser('_xxx', 'surname lastname');
+      const fourth = createUser('xxx', 'sur_name lastname');
+      const fifth = createUser('xxx', 'surname last_name');
+      const sixth = createUser('x_xx', 'surname lastname');
 
       const unsortedUsers = [sixth, fifth, third, second, first, fourth];
       const expectedUsers = [first, second, third, fourth, fifth, sixth];
@@ -153,14 +160,78 @@ describe('SearchRepository', () => {
       expect(suggestions.map(serializeUser)).toEqual(expectedUsers.map(serializeUser));
     });
   });
+
+  describe('searchByName', () => {
+    it('returns empty array if no users are found', async () => {
+      const [searchRepository, {apiClient}] = buildSearchRepository();
+      jest.spyOn(apiClient.api.user, 'getSearchContacts').mockResolvedValue({response: {documents: []}} as any);
+
+      const suggestions = await searchRepository.searchByName('term');
+
+      expect(suggestions).toEqual([]);
+    });
+
+    it('matches remote results with local users', async () => {
+      const [searchRepository, {apiClient, userRepository}] = buildSearchRepository();
+      const nbUsers = randomInt(10);
+      const localUsers = generateUsers(nbUsers, 'domain');
+
+      userRepository.getUsersById.mockResolvedValue(localUsers);
+      const searchResults = localUsers.map(({qualifiedId}) => qualifiedId);
+      jest
+        .spyOn(apiClient.api.user, 'getSearchContacts')
+        .mockResolvedValue({response: {documents: searchResults}} as any);
+
+      const suggestions = await searchRepository.searchByName('term');
+
+      expect(suggestions).toHaveLength(nbUsers);
+    });
+
+    it('matches exact handle match', async () => {
+      const [searchRepository, {apiClient, userRepository}] = buildSearchRepository();
+      const localUsers = [createUser('felix', 'felix'), createUser('notfelix', 'notfelix')];
+
+      userRepository.getUsersById.mockResolvedValue(localUsers);
+      const searchResults = localUsers.map(({qualifiedId}) => qualifiedId);
+      jest
+        .spyOn(apiClient.api.user, 'getSearchContacts')
+        .mockResolvedValue({response: {documents: searchResults}} as any);
+
+      const suggestions = await searchRepository.searchByName('felix', true);
+
+      expect(suggestions).toHaveLength(1);
+      expect(suggestions[0]).toBe(localUsers[0]);
+    });
+
+    it('filters out selfUser', async () => {
+      const [searchRepository, {apiClient, userRepository}] = buildSearchRepository();
+      const selfUser = generateUser();
+      selfUser.isMe = true;
+      const localUsers = [generateUser(), generateUser(), generateUser(), selfUser];
+      userRepository.getUsersById.mockResolvedValue(localUsers);
+
+      const searchResults = localUsers.map(({qualifiedId}) => qualifiedId);
+      jest
+        .spyOn(apiClient.api.user, 'getSearchContacts')
+        .mockResolvedValue({response: {documents: searchResults}} as any);
+
+      const suggestions = await searchRepository.searchByName('term');
+
+      expect(suggestions.length).toEqual(localUsers.length - 1);
+    });
+  });
 });
 
-function generateUser(handle, name) {
+function createUser(handle: string | undefined, name: string | undefined) {
   const user = new User();
-  user.username(handle);
-  user.name(name);
+  if (handle) {
+    user.username(handle);
+  }
+  if (name) {
+    user.name(name);
+  }
   return user;
 }
-function serializeUser(userEntity) {
+function serializeUser(userEntity: User) {
   return {name: userEntity.name(), username: userEntity.username()};
 }
