@@ -44,6 +44,7 @@ import {EventValidation} from './EventValidation';
 import {validateEvent} from './EventValidator';
 import {NOTIFICATION_HANDLING_STATE} from './NotificationHandlingState';
 import type {NotificationService} from './NotificationService';
+import {EventValidationError} from './preprocessor/EventStorageMiddleware/eventHandlers/EventValidationError';
 
 import {ClientConversationEvent, EventBuilder} from '../conversation/EventBuilder';
 import {CryptographyMapper} from '../cryptography/CryptographyMapper';
@@ -295,7 +296,10 @@ export class EventRepository {
    * @param source Source of injection
    * @returns Resolves when the event has been processed
    */
-  async injectEvent(event: ClientConversationEvent | IncomingEvent, source: EventSource = EventSource.INJECTED) {
+  async injectEvent(
+    event: ClientConversationEvent | IncomingEvent,
+    source: EventSource = EventSource.INJECTED,
+  ): Promise<void> {
     if (!event) {
       throw new EventError(EventError.TYPE.NO_EVENT, EventError.MESSAGE.NO_EVENT);
     }
@@ -343,7 +347,6 @@ export class EventRepository {
     }
     // Wait for the event handlers to have finished their async tasks
     await new Promise(res => setTimeout(res, 0));
-    return event;
   }
 
   /**
@@ -412,8 +415,16 @@ export class EventRepository {
    * @returns Resolves with the saved record or `true` if the event was skipped
    */
   private async processEvent(event: IncomingEvent | ClientConversationEvent, source: EventSource) {
-    for (const eventProcessMiddleware of this.eventProcessMiddlewares) {
-      event = await eventProcessMiddleware.processEvent(event);
+    try {
+      for (const eventProcessMiddleware of this.eventProcessMiddlewares) {
+        event = await eventProcessMiddleware.processEvent(event);
+      }
+    } catch (error) {
+      if (error instanceof EventValidationError) {
+        this.logger.warn(`Event validation failed: ${error.message}`, error);
+        return;
+      }
+      throw error;
     }
 
     return this.handleEventDistribution(event, source);

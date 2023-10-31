@@ -178,7 +178,7 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
     if (!message.isContent()) {
       return;
     }
-    return void messageRepository.toggleReaction(conversation, message, reaction, selfId.id);
+    return void messageRepository.toggleReaction(conversation, message, reaction, selfId);
   };
   if (message.isContent()) {
     return (

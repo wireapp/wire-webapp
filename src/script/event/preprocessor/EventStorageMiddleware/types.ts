@@ -27,7 +27,7 @@ import {IdentifiedUpdatePayload} from '../../EventService';
 export type HandledEvents = ClientConversationEvent | ConversationEvent;
 export type DBOperation =
   | {type: 'update'; event: HandledEvents; updates: IdentifiedUpdatePayload}
-  | {type: 'sequential-update'; event: EventRecord; updates: Partial<EventRecord>}
+  | {type: 'sequential-update'; event: HandledEvents; updates: IdentifiedUpdatePayload}
   | {type: 'delete'; event: HandledEvents; id: string}
   | {type: 'insert'; event: HandledEvents};
 

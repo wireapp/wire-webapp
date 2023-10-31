@@ -19,16 +19,19 @@
 
 import {FC} from 'react';
 
+import type {QualifiedId} from '@wireapp/api-client/lib/user/';
+
+import {ReactionMap} from 'src/script/storage';
 import {getEmojiUnicode} from 'Util/EmojiUtil';
-import {Reactions, groupByReactionUsers, sortReactionsByUserCount} from 'Util/ReactionUtil';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import {EmojiPill} from './EmojiPill';
 import {messageReactionWrapper} from './MessageReactions.styles';
 
 export interface MessageReactionsListProps {
-  reactions: Reactions;
+  reactions: ReactionMap;
   handleReactionClick: (emoji: string) => void;
-  userId: string;
+  selfUserId: QualifiedId;
   isMessageFocused: boolean;
   onTooltipReactionCountClick: () => void;
   onLastReactionKeyEvent: () => void;
@@ -36,20 +39,14 @@ export interface MessageReactionsListProps {
 }
 
 const MessageReactionsList: FC<MessageReactionsListProps> = ({reactions, ...props}) => {
-  const reactionGroupedByUser = groupByReactionUsers(reactions);
-  const reactionsGroupedByUserArray = Array.from(reactionGroupedByUser);
-  const reactionsList =
-    reactionsGroupedByUserArray.length > 1
-      ? sortReactionsByUserCount(reactionsGroupedByUserArray)
-      : reactionsGroupedByUserArray;
-  const {userId, ...emojiPillProps} = props;
+  const {selfUserId, ...emojiPillProps} = props;
 
   return (
     <div css={messageReactionWrapper} data-uie-name="message-reactions">
-      {reactionsList.map(([emoji, users], index) => {
+      {reactions.map(([emoji, users], index) => {
         const emojiUnicode = getEmojiUnicode(emoji);
-        const emojiListCount = reactionsList.length;
-        const hasUserReacted = users.includes(userId);
+        const emojiListCount = users.length;
+        const hasUserReacted = users.some(user => matchQualifiedIds(selfUserId, user));
 
         return (
           <EmojiPill

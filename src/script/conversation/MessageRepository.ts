@@ -95,8 +95,7 @@ import {StatusType} from '../message/StatusType';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 import {Core} from '../service/CoreSingleton';
-import type {EventRecord} from '../storage';
-import {UserReactionMap} from '../storage/record/EventRecord';
+import type {EventRecord, ReactionMap} from '../storage';
 import {TeamState} from '../team/TeamState';
 import {ServerTimeHandler} from '../time/serverTimeHandler';
 import {UserType} from '../tracking/attribute';
@@ -826,32 +825,21 @@ export class MessageRepository {
     }
   }
 
-  public updateUserReactions(reactions: UserReactionMap, userId: string, reaction: ReactionType) {
-    const userReactions = reactions[userId] || '';
-    const updatedReactions = {...reactions};
-
-    if (userReactions) {
-      const reactionsArr = userReactions.split(',');
-      const reactionIndex = reactionsArr.indexOf(reaction);
-      if (reactionIndex === -1) {
-        reactionsArr.push(reaction);
-      } else {
-        reactionsArr.splice(reactionIndex, 1);
-      }
-      // if all reactions removed return empty string
-      updatedReactions[userId] = reactionsArr.join(',');
-    } else {
-      // first time reacted
-      updatedReactions[userId] = reaction;
-    }
-    return updatedReactions[userId];
+  public updateUserReactions(reactions: ReactionMap, userId: QualifiedId, reaction: ReactionType) {
+    const userReactions = reactions
+      .filter(([, users]) => users.some(user => matchQualifiedIds(user, userId)))
+      .map(([reaction]) => reaction);
+    const updatedReactions = userReactions.includes(reaction)
+      ? userReactions.filter(r => r !== reaction)
+      : [...userReactions, reaction];
+    return updatedReactions.join(',');
   }
 
   public toggleReaction(
     conversationEntity: Conversation,
     message_et: ContentMessage,
     reaction: string,
-    userId: string,
+    userId: QualifiedId,
   ) {
     if (conversationEntity.removed_from_conversation()) {
       return null;

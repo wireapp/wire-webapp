@@ -24,6 +24,7 @@ import {LinkPreview, Mention} from '@wireapp/protocol-messaging';
 
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
+import {userReactionMapToReactionMap} from 'Util/ReactionUtil';
 import {base64ToArray, supportsMLSMigration} from 'Util/util';
 
 import {
@@ -190,7 +191,7 @@ export class EventMapper {
     }
 
     if (event.reactions) {
-      originalEntity.reactions(event.reactions);
+      originalEntity.reactions(userReactionMapToReactionMap(event.reactions));
       originalEntity.version = event.version;
     }
 
@@ -421,7 +422,9 @@ export class EventMapper {
       messageEntity.waitingButtonId(waiting_button_id);
     }
     if (messageEntity.isReactable()) {
-      (messageEntity as ContentMessage).reactions((event as LegacyEventRecord).reactions || {});
+      (messageEntity as ContentMessage).reactions(
+        userReactionMapToReactionMap((event as LegacyEventRecord).reactions ?? {}),
+      );
     }
 
     if (ephemeral_expires) {
