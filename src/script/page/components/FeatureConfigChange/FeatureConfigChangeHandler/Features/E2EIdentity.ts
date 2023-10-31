@@ -47,7 +47,7 @@ export const handleE2EIdentityFeatureChange = (logger: Logger, config: FeatureLi
     // Either get the current E2EIdentity handler instance or create a new one
     const e2eHandler = E2EIHandler.getInstance({
       discoveryUrl: e2eiConfig.config.acmeDiscoveryUrl!,
-      gracePeriodInMS: e2eiConfig.config.verificationExpiration,
+      gracePeriodInSeconds: e2eiConfig.config.verificationExpiration,
     });
     e2eHandler.initialize();
   }
