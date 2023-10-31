@@ -36,19 +36,16 @@ import {Core} from '../service/CoreSingleton';
 import {validateHandle} from '../user/UserHandleGenerator';
 import type {UserRepository} from '../user/UserRepository';
 
+const CONFIG = {
+  MAX_DIRECTORY_RESULTS: 30,
+  MAX_SEARCH_RESULTS: 10,
+  SEARCHABLE_FIELDS: {
+    NAME: 'name',
+    USERNAME: 'username',
+  },
+} as const;
 export class SearchRepository {
   private readonly logger = getLogger('SearchRepository');
-
-  static get CONFIG() {
-    return {
-      MAX_DIRECTORY_RESULTS: 30,
-      MAX_SEARCH_RESULTS: 10,
-      SEARCHABLE_FIELDS: {
-        NAME: 'name',
-        USERNAME: 'username',
-      },
-    };
-  }
 
   /**
    * @param searchService SearchService
@@ -76,8 +73,8 @@ export class SearchRepository {
     // If the user typed a domain, we will just ignore it when searching for the user locally
     const [query] = domainQuery.split('@');
     const properties = isHandleQuery
-      ? [SearchRepository.CONFIG.SEARCHABLE_FIELDS.USERNAME]
-      : [SearchRepository.CONFIG.SEARCHABLE_FIELDS.NAME, SearchRepository.CONFIG.SEARCHABLE_FIELDS.USERNAME];
+      ? [CONFIG.SEARCHABLE_FIELDS.USERNAME]
+      : [CONFIG.SEARCHABLE_FIELDS.NAME, CONFIG.SEARCHABLE_FIELDS.USERNAME];
 
     const excludedEmojis = Array.from(query).reduce<Record<string, string>>((emojis, char) => {
       const isEmoji = EMOJI_RANGES.includes(char);
@@ -190,16 +187,14 @@ export class SearchRepository {
    * @param maxResults Maximum number of results
    * @returns Resolves with the search results
    */
-  async searchByName(term: string, maxResults = SearchRepository.CONFIG.MAX_SEARCH_RESULTS): Promise<User[]> {
+  async searchByName(term: string, maxResults = CONFIG.MAX_SEARCH_RESULTS): Promise<User[]> {
     const {query, isHandleQuery} = this.normalizeQuery(term);
     const [rawName, rawDomain] = this.core.backendFeatures.isFederated ? query.split('@') : [query];
     const [name, domain] = validateHandle(rawName, rawDomain) ? [rawName, rawDomain] : [query];
 
-    const userIds: QualifiedId[] = await this.getContacts(
-      name,
-      SearchRepository.CONFIG.MAX_DIRECTORY_RESULTS,
-      domain,
-    ).then(({documents}) => documents.map(match => ({domain: match.qualified_id?.domain || '', id: match.id})));
+    const userIds: QualifiedId[] = await this.getContacts(name, CONFIG.MAX_DIRECTORY_RESULTS, domain).then(
+      ({documents}) => documents.map(match => ({domain: match.qualified_id?.domain || '', id: match.id})),
+    );
 
     const users = await this.userRepository.getUsersById(userIds);
 
