@@ -21,7 +21,6 @@ import type {QualifiedId, SearchResult} from '@wireapp/api-client/lib/user/';
 import {container} from 'tsyringe';
 
 import {EMOJI_RANGES} from 'Util/EmojiUtil';
-import {getLogger} from 'Util/Logger';
 import {
   computeTransliteration,
   replaceAccents,
@@ -44,9 +43,8 @@ const CONFIG = {
     USERNAME: 'username',
   },
 } as const;
-export class SearchRepository {
-  private readonly logger = getLogger('SearchRepository');
 
+export class SearchRepository {
   /**
    * @param searchService SearchService
    * @param userRepository Repository for all user interactions
@@ -110,9 +108,6 @@ export class SearchRepository {
       return matchWeight === 0 ? results : results.concat({user: userEntity, weight: matchWeight});
     }, []);
 
-    this.logger.info(
-      `local search for ${term} (isHandleQuery: ${isHandleQuery}) returned ${weightedResults.length} results`,
-    );
     return weightedResults
       .sort((result1, result2) => {
         if (result2.weight === result1.weight) {
@@ -198,18 +193,17 @@ export class SearchRepository {
 
     const users = await this.userRepository.getUsersById(userIds);
 
-    const results = users
-      // Filter out selfUser
-      .filter(user => !user.isMe)
-      .filter(user => !isHandleQuery || startsWith(user.username(), query))
-      .sort((userA, userB) => {
-        return isHandleQuery
-          ? sortByPriority(userA.username(), userB.username(), query)
-          : sortByPriority(userA.name(), userB.name(), query);
-      })
-      .slice(0, maxResults);
-
-    this.logger.info(`remote search for ${term} (isHandleQuery: ${isHandleQuery}) returned ${results.length} results`);
-    return results;
+    return (
+      users
+        // Filter out selfUser
+        .filter(user => !user.isMe)
+        .filter(user => !isHandleQuery || startsWith(user.username(), query))
+        .sort((userA, userB) => {
+          return isHandleQuery
+            ? sortByPriority(userA.username(), userB.username(), query)
+            : sortByPriority(userA.name(), userB.name(), query);
+        })
+        .slice(0, maxResults)
+    );
   }
 }
