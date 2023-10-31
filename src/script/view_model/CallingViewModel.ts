@@ -42,6 +42,7 @@ import {CallState} from '../calling/CallState';
 import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
+import {isMLSConversation} from '../conversation/ConversationSelectors';
 import {ConversationState} from '../conversation/ConversationState';
 import type {Conversation} from '../entity/Conversation';
 import type {User} from '../entity/User';
@@ -158,9 +159,10 @@ export class CallingViewModel {
         return;
       }
 
-      if (conversation.isUsingMLSProtocol) {
+      if (isMLSConversation(conversation)) {
         const unsubscribe = await this.subconversationService.subscribeToEpochUpdates(
           conversation.qualifiedId,
+          conversation.groupId,
           (groupId: string) => this.conversationState.findConversationByGroupId(groupId)?.qualifiedId,
           data => this.callingRepository.setEpochInfo(conversation.qualifiedId, data),
         );
@@ -171,8 +173,15 @@ export class CallingViewModel {
     };
 
     const joinOngoingMlsConference = async (call: Call) => {
+      const conversation = this.getConversationById(call.conversationId);
+
+      if (!conversation || !isMLSConversation(conversation)) {
+        return;
+      }
+
       const unsubscribe = await this.subconversationService.subscribeToEpochUpdates(
         call.conversationId,
+        conversation.groupId,
         (groupId: string) => this.conversationState.findConversationByGroupId(groupId)?.qualifiedId,
         data => this.callingRepository.setEpochInfo(call.conversationId, data),
       );
@@ -207,12 +216,13 @@ export class CallingViewModel {
 
     const updateEpochInfo = async (conversationId: QualifiedId, shouldAdvanceEpoch = false) => {
       const conversation = this.getConversationById(conversationId);
-      if (!conversation?.isUsingMLSProtocol) {
+      if (!conversation || !isMLSConversation(conversation)) {
         return;
       }
 
       const subconversationEpochInfo = await this.subconversationService.getSubconversationEpochInfo(
         conversationId,
+        conversation.groupId,
         shouldAdvanceEpoch,
       );
 
