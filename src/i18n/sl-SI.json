@@ -1121,7 +1121,7 @@
   "preferencesAccountUsername": "Username",
   "preferencesAccountUsernameAvailable": "Na voljo",
   "preferencesAccountUsernameErrorTaken": "Že zasedeno",
-  "preferencesAccountUsernameHint": "Vsaj 2 znaka. Le a—z, 0—9 in _.",
+  "preferencesAccountUsernameHint": "At least 2 characters. a—z, 0—9 and '.', '-', '_' only.",
   "preferencesAccountUsernamePlaceholder": "Vaše polno ime",
   "preferencesDevice": "Device",
   "preferencesDeviceDetails": "Podrobnosti naprave",

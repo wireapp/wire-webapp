@@ -1121,7 +1121,7 @@
   "preferencesAccountUsername": "Username",
   "preferencesAccountUsernameAvailable": "Ledig",
   "preferencesAccountUsernameErrorTaken": "Allerede i brug",
-  "preferencesAccountUsernameHint": "Mindst to tegn. Kun a-z, 0-9 og _.",
+  "preferencesAccountUsernameHint": "At least 2 characters. a—z, 0—9 and '.', '-', '_' only.",
   "preferencesAccountUsernamePlaceholder": "Dit fulde navn",
   "preferencesDevice": "Device",
   "preferencesDeviceDetails": "Enheds Detaljer",

@@ -1121,7 +1121,7 @@
   "preferencesAccountUsername": "Username",
   "preferencesAccountUsernameAvailable": "Pieejams",
   "preferencesAccountUsernameErrorTaken": "Jau ir aizņemts",
-  "preferencesAccountUsernameHint": "At least 2 characters. a—z, 0—9 and _ only.",
+  "preferencesAccountUsernameHint": "At least 2 characters. a—z, 0—9 and '.', '-', '_' only.",
   "preferencesAccountUsernamePlaceholder": "Jūsu pilnais vārds",
   "preferencesDevice": "Device",
   "preferencesDeviceDetails": "Ierīces detaļas",

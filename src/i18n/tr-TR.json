@@ -1121,7 +1121,7 @@
   "preferencesAccountUsername": "Username",
   "preferencesAccountUsernameAvailable": "Alınabilir",
   "preferencesAccountUsernameErrorTaken": "Çoktan alınmış",
-  "preferencesAccountUsernameHint": "En az 2 karakter. a—z, 0—9, ve yalnızca _.",
+  "preferencesAccountUsernameHint": "At least 2 characters. a—z, 0—9 and '.', '-', '_' only.",
   "preferencesAccountUsernamePlaceholder": "Tam adınız",
   "preferencesDevice": "Device",
   "preferencesDeviceDetails": "Cihaz Detayları",
