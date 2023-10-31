@@ -335,6 +335,7 @@ export class EventMapper {
 
       case ClientEvent.CONVERSATION.JOINED_AFTER_MLS_MIGRATION_FINALISATION: {
         messageEntity = this._mapEventJoinedAfterMLSMigrationFinalisationMessages();
+        break;
       }
 
       case ClientEvent.CONVERSATION.MLS_CONVERSATION_RECOVERED: {
