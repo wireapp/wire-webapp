@@ -17,11 +17,10 @@
  *
  */
 
-import type {QualifiedId} from '@wireapp/api-client/lib/user/';
+import type {QualifiedId, SearchResult} from '@wireapp/api-client/lib/user/';
 import {container} from 'tsyringe';
 
 import {EMOJI_RANGES} from 'Util/EmojiUtil';
-import {getLogger, Logger} from 'Util/Logger';
 import {
   computeTransliteration,
   replaceAccents,
@@ -30,18 +29,13 @@ import {
   transliterationIndex,
 } from 'Util/StringUtil';
 
-import type {SearchService} from './SearchService';
-
 import type {User} from '../entity/User';
+import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
 import {validateHandle} from '../user/UserHandleGenerator';
 import type {UserRepository} from '../user/UserRepository';
 
 export class SearchRepository {
-  logger: Logger;
-  private readonly searchService: SearchService;
-  private readonly userRepository: UserRepository;
-
   static get CONFIG() {
     return {
       MAX_DIRECTORY_RESULTS: 30,
@@ -70,14 +64,10 @@ export class SearchRepository {
    * @param userRepository Repository for all user interactions
    */
   constructor(
-    searchService: SearchService,
-    userRepository: UserRepository,
+    private readonly userRepository: UserRepository,
     private readonly core = container.resolve(Core),
-  ) {
-    this.searchService = searchService;
-    this.userRepository = userRepository;
-    this.logger = getLogger('SearchRepository');
-  }
+    private readonly apiClient = container.resolve(APIClient),
+  ) {}
 
   /**
    * Search for a user in the given user list and given a search term.
@@ -177,6 +167,11 @@ export class SearchRepository {
     }, 0);
   }
 
+  private async getContacts(query: string, numberOfRequestedUser: number, domain?: string): Promise<SearchResult> {
+    const request = await this.apiClient.api.user.getSearchContacts(query, numberOfRequestedUser, domain);
+    return request.response;
+  }
+
   /**
    * Search for users on the backend by name.
    * @note We skip a few results as connection changes need a while to reflect on the backend.
@@ -194,27 +189,25 @@ export class SearchRepository {
     const [rawName, rawDomain] = this.core.backendFeatures.isFederated ? query.replace(/^@/, '').split('@') : [query];
     const [name, domain] = validateHandle(rawName, rawDomain) ? [rawName, rawDomain] : [query];
 
-    const matchedUserIdsFromDirectorySearch: QualifiedId[] = await this.searchService
-      .getContacts(name, SearchRepository.CONFIG.MAX_DIRECTORY_RESULTS, domain)
-      .then(({documents}) => documents.map(match => ({domain: match.qualified_id?.domain || '', id: match.id})));
+    const userIds: QualifiedId[] = await this.getContacts(
+      name,
+      SearchRepository.CONFIG.MAX_DIRECTORY_RESULTS,
+      domain,
+    ).then(({documents}) => documents.map(match => ({domain: match.qualified_id?.domain || '', id: match.id})));
 
-    const userIds: QualifiedId[] = [...matchedUserIdsFromDirectorySearch];
-    const userEntities = await this.userRepository.getUsersById(userIds);
+    const users = await this.userRepository.getUsersById(userIds);
 
-    return Promise.resolve(userEntities)
-      .then(userEntities => userEntities.filter(userEntity => !userEntity.isMe))
-      .then(userEntities => {
-        if (isHandle) {
-          userEntities = userEntities.filter(userEntity => startsWith(userEntity.username(), query));
-        }
-
-        return userEntities
-          .sort((userA, userB) => {
-            return isHandle
-              ? sortByPriority(userA.username(), userB.username(), query)
-              : sortByPriority(userA.name(), userB.name(), query);
-          })
-          .slice(0, maxResults);
-      });
+    return (
+      users
+        // Filter out selfUser
+        .filter(user => !user.isMe)
+        .filter(user => !isHandle || startsWith(user.username(), query))
+        .sort((userA, userB) => {
+          return isHandle
+            ? sortByPriority(userA.username(), userB.username(), query)
+            : sortByPriority(userA.name(), userB.name(), query);
+        })
+        .slice(0, maxResults)
+    );
   }
 }
