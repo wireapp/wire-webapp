@@ -62,16 +62,20 @@ export function ReplaceEmojiPlugin(): null {
             const text = newNode.getTextContent();
             const selection = $getSelection();
             const currentSelection = $isRangeSelection(selection) ? selection : undefined;
+            const isUpdatedNode =
+              currentSelection?.anchor.key === newNode.getKey() && currentSelection?.focus.key === newNode.getKey();
             const updatedText = findAndTransformEmoji(text);
-            const sizeDiff = updatedText.length - text.length;
-            newNode.setTextContent(updatedText);
-            // After emoji replacement, the size of the text could vary. We need to reposition the selection so that it stays in place for the user
-            currentSelection?.setTextNodeRange(
-              newNode,
-              currentSelection.anchor.offset + sizeDiff,
-              newNode,
-              currentSelection.focus.offset + sizeDiff,
-            );
+            if (isUpdatedNode && updatedText !== text) {
+              const sizeDiff = updatedText.length - text.length;
+              newNode.setTextContent(updatedText);
+              // After emoji replacement, the size of the text could vary. We need to reposition the selection so that it stays in place for the user
+              currentSelection?.setTextNodeRange(
+                newNode,
+                currentSelection.anchor.offset + sizeDiff,
+                newNode,
+                currentSelection.focus.offset + sizeDiff,
+              );
+            }
             // We register a text transform listener for a single round when the space key is pressed (then the listener is released)
             unregister();
           });
