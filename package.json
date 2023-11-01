@@ -144,7 +144,7 @@
     "redux-mock-store": "1.5.4",
     "seedrandom": "^3.0.5",
     "simple-git": "3.20.0",
-    "sinon": "16.1.0",
+    "sinon": "17.0.0",
     "snabbdom": "3.5.1",
     "style-loader": "^3.3.3",
     "stylelint": "^15",
