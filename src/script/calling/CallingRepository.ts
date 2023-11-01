@@ -23,6 +23,7 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import type {WebappProperties} from '@wireapp/api-client/lib/user/data';
 import {MessageSendingState} from '@wireapp/core/lib/conversation';
 import {flattenUserMap} from '@wireapp/core/lib/conversation/message/UserClientsUtil';
+import {SubconversationEpochInfoMember} from '@wireapp/core/lib/conversation/SubconversationService/SubconversationService';
 import {amplify} from 'amplify';
 import axios from 'axios';
 import ko from 'knockout';
@@ -117,13 +118,7 @@ enum CALL_DIRECTION {
   OUTGOING = 'outgoing',
 }
 
-export interface SubconversationEpochInfoMember {
-  userid: `${string}@${string}`;
-  clientid: string;
-  in_subconv: boolean;
-}
-
-type SubconversationData = {epoch: number; secretKey: string};
+type SubconversationData = {epoch: number; secretKey: string; members: SubconversationEpochInfoMember[]};
 
 export class CallingRepository {
   private readonly acceptVersionWarning: (conversationId: QualifiedId) => void;
@@ -143,6 +138,7 @@ export class CallingRepository {
   private wCall?: Wcall;
   private wUser: number = 0;
   private nextMuteState: MuteState = MuteState.SELF_MUTED;
+  private isConferenceCallingSupported = false;
   /**
    * Keeps track of the size of the avs log once the webapp is initiated. This allows detecting meaningless avs logs (logs that have a length equal to the length when the webapp was initiated)
    */
@@ -255,6 +251,7 @@ export class CallingRepository {
     wCall.setUserMediaHandler(this.getCallMediaStream);
     wCall.setAudioStreamHandler(this.updateCallAudioStreams);
     wCall.setVideoStreamHandler(this.updateParticipantVideoStream);
+    this.isConferenceCallingSupported = wCall.isConferenceCallingSupported();
     setInterval(() => wCall.poll(), 500);
     return wCall;
   }
@@ -499,7 +496,7 @@ export class CallingRepository {
    * @see https://www.chromestatus.com/feature/6321945865879552
    */
   get supportsConferenceCalling(): boolean {
-    return Runtime.isSupportingConferenceCalling();
+    return this.isConferenceCallingSupported;
   }
 
   /**
@@ -881,13 +878,9 @@ export class CallingRepository {
     }
   }
 
-  setEpochInfo(
-    conversationId: QualifiedId,
-    subconversationData: SubconversationData,
-    members: SubconversationEpochInfoMember[],
-  ) {
+  setEpochInfo(conversationId: QualifiedId, subconversationData: SubconversationData) {
     const serializedConversationId = this.serializeQualifiedId(conversationId);
-    const {epoch, secretKey} = subconversationData;
+    const {epoch, secretKey, members} = subconversationData;
     const clients = {
       convid: serializedConversationId,
       clients: members,

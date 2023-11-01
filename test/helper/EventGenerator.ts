@@ -18,7 +18,13 @@
  */
 
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';
-import {AssetAddEvent, DeleteEvent, EventBuilder, MessageAddEvent} from 'src/script/conversation/EventBuilder';
+import {
+  AssetAddEvent,
+  DeleteEvent,
+  EventBuilder,
+  MessageAddEvent,
+  ReactionEvent,
+} from 'src/script/conversation/EventBuilder';
 import {Conversation} from 'src/script/entity/Conversation';
 import {CONVERSATION} from 'src/script/event/Client';
 import {createUuid} from 'Util/uuid';
@@ -45,6 +51,20 @@ export function createMessageAddEvent({
     },
     from,
     ...overrides,
+  };
+}
+
+export function createReactionEvent(targetMessageId: string, reaction: string = '👍'): ReactionEvent {
+  return {
+    conversation: createUuid(),
+    data: {
+      message_id: targetMessageId,
+      reaction,
+    },
+    from: createUuid(),
+    id: createUuid(),
+    time: new Date().toISOString(),
+    type: CONVERSATION.REACTION,
   };
 }
 
@@ -87,7 +107,9 @@ export function createAssetAddEvent(overrides: Partial<AssetAddEvent> = {}): Ass
  * @param event
  * @returns
  */
-export function toSavedEvent(event: MessageAddEvent | AssetAddEvent) {
+export function toSavedEvent<T extends MessageAddEvent | AssetAddEvent>(
+  event: T,
+): T & {primary_key: string; category: number} {
   return {
     primary_key: createUuid(),
     category: 1,

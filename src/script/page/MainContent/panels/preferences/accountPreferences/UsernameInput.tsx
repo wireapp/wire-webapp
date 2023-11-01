@@ -123,7 +123,7 @@ const UsernameInput: React.FC<UsernameInputProps> = ({username, domain, userRepo
         isDone={usernameInputDone.isDone}
         onValueChange={changeUsername}
         maxLength={256 - (domain?.length ?? 0)}
-        allowedChars="0-9a-zA-Z_"
+        allowedChars="0-9a-zA-Z_.-"
         fieldName="username"
       />
       {canEditProfile && (

@@ -33,7 +33,6 @@ import {CryptographyRepository} from '../../../cryptography/CryptographyReposito
 import {Conversation} from '../../../entity/Conversation';
 import {User} from '../../../entity/User';
 import {SearchRepository} from '../../../search/SearchRepository';
-import {SearchService} from '../../../search/SearchService';
 import {TeamRepository} from '../../../team/TeamRepository';
 import {UserRepository} from '../../../user/UserRepository';
 
@@ -57,7 +56,7 @@ const defaultProps = () => ({
   messageRepository: {
     updateAllClients: (conversation: Conversation, blockSystemMessage: boolean): Promise<void> => Promise.resolve(),
   } as MessageRepository,
-  searchRepository: new SearchRepository(new SearchService(), userRepository),
+  searchRepository: new SearchRepository(userRepository),
   teamRepository: {} as TeamRepository,
   selfUser: new User('mocked-id'),
 });

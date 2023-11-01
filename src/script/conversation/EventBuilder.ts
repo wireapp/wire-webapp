@@ -41,7 +41,7 @@ import type {User} from '../entity/User';
 import {CALL, ClientEvent, CONVERSATION} from '../event/Client';
 import {StatusType} from '../message/StatusType';
 import {VerificationMessageType} from '../message/VerificationMessageType';
-import {ReadReceipt, UserReactionMap} from '../storage';
+import {ReactionMap, ReadReceipt, UserReactionMap} from '../storage';
 
 export interface BaseEvent {
   conversation: string;
@@ -57,7 +57,6 @@ export interface BaseEvent {
 
 export interface ConversationEvent<Type extends CONVERSATION | CONVERSATION_EVENT, Data = undefined> extends BaseEvent {
   data: Data;
-  id: string;
   type: Type;
 }
 
@@ -165,9 +164,10 @@ export type MessageAddEvent = ConversationEvent<
   /** who have received/read the event */
   read_receipts?: ReadReceipt[];
   /** who reacted to the event */
-  reactions?: UserReactionMap;
+  reactions?: UserReactionMap | ReactionMap;
   edited_time?: string;
   status: StatusType;
+  version?: number;
 };
 export type MissedEvent = BaseEvent & {id: string; type: CONVERSATION.MISSED_MESSAGES};
 export type MLSConversationRecoveredEvent = BaseEvent & {id: string; type: CONVERSATION.MLS_CONVERSATION_RECOVERED};

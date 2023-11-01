@@ -23,6 +23,7 @@ import {PrimaryModal, removeCurrentModal} from 'Components/Modals/PrimaryModal';
 import {Config} from 'src/script/Config';
 import {Core} from 'src/script/service/CoreSingleton';
 import {UserState} from 'src/script/user/UserState';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {removeUrlParameters} from 'Util/UrlUtil';
 import {supportsMLS} from 'Util/util';
 
@@ -42,7 +43,7 @@ export enum E2EIHandlerStep {
 
 interface E2EIHandlerParams {
   discoveryUrl: string;
-  gracePeriodInMS: number;
+  gracePeriodInSeconds: number;
 }
 
 class E2EIHandler {
@@ -54,12 +55,12 @@ class E2EIHandler {
   private gracePeriodInMS: number;
   private currentStep: E2EIHandlerStep | null = E2EIHandlerStep.UNINITIALIZED;
 
-  private constructor({discoveryUrl, gracePeriodInMS}: E2EIHandlerParams) {
+  private constructor({discoveryUrl, gracePeriodInSeconds}: E2EIHandlerParams) {
     // ToDo: Do these values need to te able to be updated? Should we use a singleton with update fn?
     this.discoveryUrl = discoveryUrl;
-    this.gracePeriodInMS = gracePeriodInMS;
+    this.gracePeriodInMS = gracePeriodInSeconds * TIME_IN_MILLIS.SECOND;
     this.timer = DelayTimerService.getInstance({
-      gracePeriodInMS,
+      gracePeriodInMS: this.gracePeriodInMS,
       gracePeriodExpiredCallback: () => null,
       delayPeriodExpiredCallback: () => null,
     });
@@ -92,11 +93,11 @@ class E2EIHandler {
   /**
    * @param E2EIHandlerParams The params to create the grace period timer
    */
-  public updateParams({gracePeriodInMS, discoveryUrl}: E2EIHandlerParams) {
-    this.gracePeriodInMS = gracePeriodInMS;
+  public updateParams({gracePeriodInSeconds, discoveryUrl}: E2EIHandlerParams) {
+    this.gracePeriodInMS = gracePeriodInSeconds * TIME_IN_MILLIS.SECOND;
     this.discoveryUrl = discoveryUrl;
     this.timer.updateParams({
-      gracePeriodInMS,
+      gracePeriodInMS: this.gracePeriodInMS,
       gracePeriodExpiredCallback: () => null,
       delayPeriodExpiredCallback: () => null,
     });
