@@ -35,30 +35,16 @@ import {Core} from '../service/CoreSingleton';
 import {validateHandle} from '../user/UserHandleGenerator';
 import type {UserRepository} from '../user/UserRepository';
 
+const CONFIG = {
+  MAX_DIRECTORY_RESULTS: 30,
+  MAX_SEARCH_RESULTS: 10,
+  SEARCHABLE_FIELDS: {
+    NAME: 'name',
+    USERNAME: 'username',
+  },
+} as const;
+
 export class SearchRepository {
-  static get CONFIG() {
-    return {
-      MAX_DIRECTORY_RESULTS: 30,
-      MAX_SEARCH_RESULTS: 10,
-      SEARCHABLE_FIELDS: {
-        NAME: 'name',
-        USERNAME: 'username',
-      },
-    };
-  }
-
-  /**
-   * Trim and remove @.
-   * @param query Search string
-   * @returns Normalized search query
-   */
-  static normalizeQuery(query: string): string {
-    if (typeof query !== 'string') {
-      return '';
-    }
-    return query.trim().replace(/^[@]/, '').toLowerCase();
-  }
-
   /**
    * @param searchService SearchService
    * @param userRepository Repository for all user interactions
@@ -73,29 +59,31 @@ export class SearchRepository {
    * Search for a user in the given user list and given a search term.
    * Doesn't sort the results and keep the initial order of the given user list.
    *
-   * @param term the search term
-   * @param userEntities entities to match the search term against
-   * @param properties list of properties that will be matched against the search term
-   *    the order of the properties in the array indicates the priorities by which results will be sorted
+   * @param query the search term
+   * @param users entities to match the search term against
    * @returns the filtered list of users
    */
-  searchUserInSet(
-    term: string,
-    userEntities: User[],
-    properties = [SearchRepository.CONFIG.SEARCHABLE_FIELDS.NAME, SearchRepository.CONFIG.SEARCHABLE_FIELDS.USERNAME],
-  ): User[] {
-    if (term === '') {
-      return userEntities;
+  searchUserInSet(term: string, users: User[]): User[] {
+    const {isHandleQuery, query: domainQuery} = this.normalizeQuery(term);
+    if (domainQuery === '') {
+      return users;
     }
-    const excludedEmojis = Array.from(term).reduce<Record<string, string>>((emojis, char) => {
+    // If the user typed a domain, we will just ignore it when searching for the user locally
+    const [query] = domainQuery.split('@');
+    const properties = isHandleQuery
+      ? [CONFIG.SEARCHABLE_FIELDS.USERNAME]
+      : [CONFIG.SEARCHABLE_FIELDS.NAME, CONFIG.SEARCHABLE_FIELDS.USERNAME];
+
+    const excludedEmojis = Array.from(query).reduce<Record<string, string>>((emojis, char) => {
       const isEmoji = EMOJI_RANGES.includes(char);
       if (isEmoji) {
         emojis[char] = char;
       }
       return emojis;
     }, {});
-    const termSlug = computeTransliteration(term, excludedEmojis);
-    const weightedResults = userEntities.reduce<{user: User; weight: number}[]>((results, userEntity) => {
+
+    const termSlug = computeTransliteration(query, excludedEmojis);
+    const weightedResults = users.reduce<{user: User; weight: number}[]>((results, userEntity) => {
       /*
         given user of name Bardia and username of bardia_wire this mapping
         will get name & username properties and return an array value like ['Bardia', 'bardia_wire']
@@ -113,7 +101,7 @@ export class SearchRepository {
       const uniqueValues = Array.from(new Set(values));
       const matchWeight = uniqueValues.reduce((weight, value, index) => {
         const propertyWeight = 10 * index + 1;
-        const propertyMatchWeight = this.matches(term, termSlug, excludedEmojis, value);
+        const propertyMatchWeight = this.matches(query, termSlug, excludedEmojis, value);
         return weight + propertyMatchWeight * propertyWeight;
       }, 0);
 
@@ -128,6 +116,19 @@ export class SearchRepository {
         return result2.weight - result1.weight;
       })
       .map(result => result.user);
+  }
+
+  /**
+   * Trim and remove @.
+   * @param query Search string
+   * @returns Normalized search query
+   */
+  public normalizeQuery(query: string): {isHandleQuery: boolean; query: string} {
+    const normalizeQuery = query.trim().replace(/^[@]/, '').toLowerCase();
+    return {
+      isHandleQuery: query.startsWith('@') && validateHandle(normalizeQuery),
+      query: normalizeQuery,
+    };
   }
 
   private matches(term: string, termSlug: string, excludedChars?: Record<string, string>, value: string = ''): number {
@@ -181,19 +182,14 @@ export class SearchRepository {
    * @param maxResults Maximum number of results
    * @returns Resolves with the search results
    */
-  async searchByName(
-    query: string,
-    isHandle?: boolean,
-    maxResults = SearchRepository.CONFIG.MAX_SEARCH_RESULTS,
-  ): Promise<User[]> {
-    const [rawName, rawDomain] = this.core.backendFeatures.isFederated ? query.replace(/^@/, '').split('@') : [query];
+  async searchByName(term: string, maxResults = CONFIG.MAX_SEARCH_RESULTS): Promise<User[]> {
+    const {query, isHandleQuery} = this.normalizeQuery(term);
+    const [rawName, rawDomain] = this.core.backendFeatures.isFederated ? query.split('@') : [query];
     const [name, domain] = validateHandle(rawName, rawDomain) ? [rawName, rawDomain] : [query];
 
-    const userIds: QualifiedId[] = await this.getContacts(
-      name,
-      SearchRepository.CONFIG.MAX_DIRECTORY_RESULTS,
-      domain,
-    ).then(({documents}) => documents.map(match => ({domain: match.qualified_id?.domain || '', id: match.id})));
+    const userIds: QualifiedId[] = await this.getContacts(name, CONFIG.MAX_DIRECTORY_RESULTS, domain).then(
+      ({documents}) => documents.map(match => ({domain: match.qualified_id?.domain || '', id: match.id})),
+    );
 
     const users = await this.userRepository.getUsersById(userIds);
 
@@ -201,9 +197,9 @@ export class SearchRepository {
       users
         // Filter out selfUser
         .filter(user => !user.isMe)
-        .filter(user => !isHandle || startsWith(user.username(), query))
+        .filter(user => !isHandleQuery || startsWith(user.username(), query))
         .sort((userA, userB) => {
-          return isHandle
+          return isHandleQuery
             ? sortByPriority(userA.username(), userB.username(), query)
             : sortByPriority(userA.name(), userB.name(), query);
         })
