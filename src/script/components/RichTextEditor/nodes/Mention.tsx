@@ -41,6 +41,7 @@ import {
   NodeKey,
   NodeSelection,
   RangeSelection,
+  $isRangeSelection,
 } from 'lexical';
 
 import {KEY} from 'Util/KeyboardUtil';
@@ -75,10 +76,28 @@ export const Mention = (props: MentionComponentProps) => {
   }, [className, classNameFocused, isFocused]);
 
   const deleteMention = useCallback(
-    (payload: KeyboardEvent) => {
-      if (isSelected && $isNodeSelection($getSelection())) {
-        payload.preventDefault();
+    (event: KeyboardEvent) => {
+      const currentSelection = $getSelection();
+      const rangeSelection = $isRangeSelection(currentSelection) ? currentSelection : null;
 
+      let shouldSelectNode = false;
+      if (event.key === 'Backspace') {
+        shouldSelectNode = nodeKey === rangeSelection?.getNodes()[0]?.getKey();
+      } else if (event.key === 'Delete') {
+        const currentNode = rangeSelection?.getNodes()[0];
+        const isOnTheEdgeOfNode = currentNode?.getTextContent().length === rangeSelection?.focus.offset;
+        shouldSelectNode = currentNode?.getNextSibling()?.getKey() === nodeKey && isOnTheEdgeOfNode;
+      }
+      // If the cursor is right before the mention, we first select the mention before deleting it
+      if (shouldSelectNode) {
+        event.preventDefault();
+        setSelected(true);
+        return true;
+      }
+
+      // When the mention is selected, we actually delete it
+      if (isSelected && $isNodeSelection($getSelection())) {
+        event.preventDefault();
         const node = $getNodeByKey(nodeKey);
 
         if ($isMentionNode(node)) {
@@ -87,7 +106,6 @@ export const Mention = (props: MentionComponentProps) => {
 
         setSelected(false);
       }
-
       return false;
     },
     [isSelected, nodeKey, setSelected],

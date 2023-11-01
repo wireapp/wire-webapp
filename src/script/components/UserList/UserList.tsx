@@ -52,7 +52,7 @@ const USER_CHUNK_SIZE = 64;
 
 export interface UserListProps {
   conversation?: Conversation;
-  conversationRepository: ConversationRepository;
+  conversationRepository?: ConversationRepository;
   conversationState?: ConversationState;
   highlightedUsers?: User[];
   infos?: Record<string, string>;
@@ -166,7 +166,7 @@ export const UserList = ({
       if (userEntity.isService) {
         return;
       }
-      if (conversationRepository.conversationRoleRepository.isUserGroupAdmin(conversation, userEntity)) {
+      if (conversationRepository?.conversationRoleRepository.isUserGroupAdmin(conversation, userEntity)) {
         admins.push(userEntity);
       } else {
         members.push(userEntity);

@@ -21,22 +21,17 @@
 
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
-import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {ConnectionMapper} from 'src/script/connection/ConnectionMapper';
 import {ConversationMapper} from 'src/script/conversation/ConversationMapper';
 import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
 import 'src/script/localization/Localizer';
-import {CALL_MESSAGE_TYPE} from 'src/script/message/CallMessageType';
-import {MentionEntity} from 'src/script/message/MentionEntity';
 import {StatusType} from 'src/script/message/StatusType';
 import {createUuid} from 'Util/uuid';
 
 import {Conversation} from './Conversation';
-import {CallMessage} from './message/CallMessage';
 import {ContentMessage} from './message/ContentMessage';
-import {MemberMessage} from './message/MemberMessage';
 import {Message} from './message/Message';
 import {PingMessage} from './message/PingMessage';
 import {Text} from './message/Text';
@@ -894,158 +889,6 @@ describe('Conversation', () => {
       conversation_et.setTimestamp(newTimestamp, Conversation.TIMESTAMP_TYPE.LAST_READ, true);
 
       expect(conversation_et.last_read_timestamp()).toBe(newTimestamp);
-    });
-  });
-
-  describe('shouldUnarchive', () => {
-    let timestamp: number = undefined;
-    let contentMessage: ContentMessage = undefined;
-    let mutedTimestampMessage: PingMessage = undefined;
-    let outdatedMessage: PingMessage = undefined;
-    let pingMessage: PingMessage = undefined;
-    let selfMentionMessage: ContentMessage = undefined;
-    const conversationEntity = new Conversation(createUuid());
-
-    const selfUserEntity = new User(createUuid(), null);
-    selfUserEntity.isMe = true;
-    selfUserEntity.inTeam(true);
-    conversationEntity.selfUser(selfUserEntity);
-
-    beforeEach(() => {
-      timestamp = Date.now();
-      conversationEntity.archivedTimestamp(timestamp);
-      conversationEntity.archivedState(true);
-
-      mutedTimestampMessage = new PingMessage();
-      mutedTimestampMessage.timestamp(timestamp);
-
-      outdatedMessage = new PingMessage();
-      outdatedMessage.timestamp(timestamp - 100);
-
-      contentMessage = new ContentMessage();
-      contentMessage.assets([new Text('id', 'Hello there')]);
-      contentMessage.timestamp(timestamp + 100);
-
-      pingMessage = new PingMessage();
-      pingMessage.timestamp(timestamp + 200);
-
-      selfMentionMessage = new ContentMessage();
-      const mentionEntity = new MentionEntity(0, 7, selfUserEntity.id, selfUserEntity.domain);
-      const textAsset = new Text('id', '@Gregor, Hello there');
-      textAsset.mentions.push(mentionEntity);
-      selfMentionMessage.assets([textAsset]);
-      selfMentionMessage.timestamp(timestamp + 300);
-    });
-
-    afterEach(() => conversationEntity.messages_unordered.removeAll());
-
-    it('returns false if conversation is not archived', () => {
-      conversationEntity.archivedState(false);
-
-      expect(conversationEntity.shouldUnarchive()).toBe(false);
-      conversationEntity.messages_unordered.push(outdatedMessage);
-
-      expect(conversationEntity.shouldUnarchive()).toBe(false);
-      conversationEntity.messages_unordered.push(mutedTimestampMessage);
-
-      expect(conversationEntity.shouldUnarchive()).toBe(false);
-      conversationEntity.messages_unordered.push(contentMessage);
-
-      expect(conversationEntity.shouldUnarchive()).toBe(false);
-      conversationEntity.messages_unordered.push(pingMessage);
-
-      expect(conversationEntity.shouldUnarchive()).toBe(false);
-      conversationEntity.messages_unordered.push(selfMentionMessage);
-
-      expect(conversationEntity.shouldUnarchive()).toBe(false);
-    });
-
-    it('returns false if conversation is in no notification state', () => {
-      conversationEntity.mutedState(NOTIFICATION_STATE.NOTHING);
-
-      expect(conversationEntity.shouldUnarchive()).toBe(false);
-      conversationEntity.messages_unordered.push(outdatedMessage);
-
-      expect(conversationEntity.shouldUnarchive()).toBe(false);
-      conversationEntity.messages_unordered.push(mutedTimestampMessage);
-
-      expect(conversationEntity.shouldUnarchive()).toBe(false);
-      conversationEntity.messages_unordered.push(contentMessage);
-
-      expect(conversationEntity.shouldUnarchive()).toBe(false);
-      conversationEntity.messages_unordered.push(pingMessage);
-
-      expect(conversationEntity.shouldUnarchive()).toBe(false);
-      conversationEntity.messages_unordered.push(selfMentionMessage);
-
-      expect(conversationEntity.shouldUnarchive()).toBe(false);
-    });
-
-    it('returns expected value if conversation is in only mentions notifications state', () => {
-      conversationEntity.mutedState(NOTIFICATION_STATE.MENTIONS_AND_REPLIES);
-
-      expect(conversationEntity.shouldUnarchive()).toBe(false);
-      conversationEntity.messages_unordered.push(outdatedMessage);
-
-      expect(conversationEntity.shouldUnarchive()).toBe(false);
-      conversationEntity.messages_unordered.push(mutedTimestampMessage);
-
-      expect(conversationEntity.shouldUnarchive()).toBe(false);
-      conversationEntity.messages_unordered.push(contentMessage);
-
-      expect(conversationEntity.shouldUnarchive()).toBe(false);
-      conversationEntity.messages_unordered.push(pingMessage);
-
-      expect(conversationEntity.shouldUnarchive()).toBe(false);
-      conversationEntity.messages_unordered.push(selfMentionMessage);
-
-      expect(conversationEntity.shouldUnarchive()).toBe(true);
-    });
-
-    it('returns expected value if conversation is in everything notifications state', () => {
-      conversationEntity.mutedState(NOTIFICATION_STATE.EVERYTHING);
-
-      expect(conversationEntity.shouldUnarchive()).toBe(false);
-      conversationEntity.messages_unordered.push(outdatedMessage);
-
-      expect(conversationEntity.shouldUnarchive()).toBe(false);
-      conversationEntity.messages_unordered.push(mutedTimestampMessage);
-
-      expect(conversationEntity.shouldUnarchive()).toBe(false);
-      conversationEntity.messages_unordered.push(contentMessage);
-
-      expect(conversationEntity.shouldUnarchive()).toBe(true);
-      conversationEntity.messages_unordered.removeAll();
-
-      const memberLeaveMessage = new MemberMessage();
-      memberLeaveMessage.type = CONVERSATION_EVENT.MEMBER_LEAVE;
-      memberLeaveMessage.timestamp(timestamp + 100);
-      conversationEntity.messages_unordered.push(memberLeaveMessage);
-
-      expect(conversationEntity.shouldUnarchive()).toBe(false);
-
-      const callMessage = new CallMessage(CALL_MESSAGE_TYPE.ACTIVATED);
-      callMessage.timestamp(timestamp + 200);
-      conversationEntity.messages_unordered.push(callMessage);
-
-      expect(conversationEntity.shouldUnarchive()).toBe(true);
-      conversationEntity.messages_unordered.removeAll();
-      conversationEntity.messages_unordered.push(memberLeaveMessage);
-
-      expect(conversationEntity.shouldUnarchive()).toBe(false);
-      const memberJoinMessage = new MemberMessage();
-      memberJoinMessage.type = CONVERSATION_EVENT.MEMBER_JOIN;
-      memberJoinMessage.timestamp(timestamp + 200);
-      conversationEntity.messages_unordered.push(memberJoinMessage);
-
-      expect(conversationEntity.shouldUnarchive()).toBe(false);
-      const selfJoinMessage = new MemberMessage();
-      selfJoinMessage.type = CONVERSATION_EVENT.MEMBER_JOIN;
-      selfJoinMessage.userIds.push({domain: selfUserEntity.domain, id: selfUserEntity.id});
-      selfJoinMessage.timestamp(timestamp + 200);
-      conversationEntity.messages_unordered.push(selfJoinMessage);
-
-      expect(conversationEntity.shouldUnarchive()).toBe(true);
     });
   });
 

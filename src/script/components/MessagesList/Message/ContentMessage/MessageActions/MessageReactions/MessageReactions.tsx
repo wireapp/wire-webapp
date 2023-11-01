@@ -17,9 +17,8 @@
  *
  */
 
-import {useState, useCallback, RefObject, FC, useRef} from 'react';
+import {useState, RefObject, FC, useRef} from 'react';
 
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -46,7 +45,6 @@ export interface MessageReactionsProps {
   handleCurrentMsgAction: (actionName: string) => void;
   resetActionMenuStates: () => void;
   wrapperRef: RefObject<HTMLDivElement>;
-  message: ContentMessage;
   handleReactionClick: (emoji: string) => void;
 }
 
@@ -58,7 +56,6 @@ const MessageReactions: FC<MessageReactionsProps> = ({
   handleKeyDown,
   resetActionMenuStates,
   wrapperRef,
-  message,
   handleReactionClick,
 }) => {
   const isThumbUpAction = currentMsgActionName === MessageActionsId.THUMBSUP;
@@ -84,20 +81,30 @@ const MessageReactions: FC<MessageReactionsProps> = ({
     setShowEmojis(false);
   };
 
-  const handleReactionCurrentState = useCallback(
-    (actionName = '') => {
-      const isActive = !!actionName;
-      handleCurrentMsgAction(actionName);
-      handleMenuOpen(isActive);
-      setShowEmojis(isActive);
-    },
-    [handleCurrentMsgAction, handleMenuOpen],
-  );
+  const handleReactionCurrentState = (actionName = '') => {
+    const isActive = !!actionName;
+    handleCurrentMsgAction(actionName);
+    handleMenuOpen(isActive);
+    setShowEmojis(isActive);
+  };
 
-  const handleEmojiBtnClick = useCallback(
-    (event: React.MouseEvent<HTMLButtonElement>) => {
-      event.stopPropagation();
-      const selectedMsgActionName = event.currentTarget.dataset.uieName;
+  const handleEmojiBtnClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    const selectedMsgActionName = event.currentTarget.dataset.uieName;
+    if (currentMsgActionName === selectedMsgActionName) {
+      // reset on double click
+      handleReactionCurrentState('');
+    } else if (selectedMsgActionName) {
+      handleReactionCurrentState(selectedMsgActionName);
+      showReactions(event.currentTarget.getBoundingClientRect());
+    }
+  };
+
+  const handleEmojiKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    const selectedMsgActionName = event.currentTarget.dataset.uieName;
+    handleKeyDown(event);
+    if ([KEY.SPACE, KEY.ENTER].includes(event.key)) {
       if (currentMsgActionName === selectedMsgActionName) {
         // reset on double click
         handleReactionCurrentState('');
@@ -105,72 +112,47 @@ const MessageReactions: FC<MessageReactionsProps> = ({
         handleReactionCurrentState(selectedMsgActionName);
         showReactions(event.currentTarget.getBoundingClientRect());
       }
-    },
-    [currentMsgActionName, handleReactionCurrentState],
-  );
-
-  const handleEmojiKeyDown = useCallback(
-    (event: React.KeyboardEvent<HTMLButtonElement>) => {
-      event.stopPropagation();
-      const selectedMsgActionName = event.currentTarget.dataset.uieName;
-      handleKeyDown(event);
-      if ([KEY.SPACE, KEY.ENTER].includes(event.key)) {
-        if (currentMsgActionName === selectedMsgActionName) {
-          // reset on double click
-          handleReactionCurrentState('');
-        } else if (selectedMsgActionName) {
-          handleReactionCurrentState(selectedMsgActionName);
-          showReactions(event.currentTarget.getBoundingClientRect());
-        }
-      }
-    },
-    [currentMsgActionName, handleKeyDown, handleReactionCurrentState],
-  );
+    }
+  };
 
   const showReactions = (rect: DOMRect) => {
     setPOSX(rect.x);
     setPOSY(rect.y);
   };
 
-  const handleMsgActionClick = useCallback(
-    (event: React.MouseEvent<HTMLButtonElement>) => {
-      event.stopPropagation();
-      const actionType = event.currentTarget.dataset.uieName;
-      switch (actionType) {
-        case MessageActionsId.EMOJI:
-          handleEmojiBtnClick(event);
-          break;
-        case MessageActionsId.THUMBSUP:
-          toggleActiveMenu(event);
-          handleReactionClick(thumbsUpEmoji);
-          break;
-        case MessageActionsId.HEART:
-          toggleActiveMenu(event);
-          handleReactionClick(likeEmoji);
-          break;
-      }
-    },
-    [handleEmojiBtnClick, handleReactionClick, toggleActiveMenu],
-  );
+  const handleMsgActionClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    const actionType = event.currentTarget.dataset.uieName;
+    switch (actionType) {
+      case MessageActionsId.EMOJI:
+        handleEmojiBtnClick(event);
+        break;
+      case MessageActionsId.THUMBSUP:
+        toggleActiveMenu(event);
+        handleReactionClick(thumbsUpEmoji);
+        break;
+      case MessageActionsId.HEART:
+        toggleActiveMenu(event);
+        handleReactionClick(likeEmoji);
+        break;
+    }
+  };
 
-  const handleMsgActionKeyDown = useCallback(
-    (event: React.KeyboardEvent<HTMLButtonElement>) => {
-      event.stopPropagation();
-      const actionType = event.currentTarget.dataset.uieName;
-      switch (actionType) {
-        case MessageActionsId.EMOJI:
-          handleEmojiKeyDown(event);
-          break;
-        case MessageActionsId.THUMBSUP:
-          handleKeyDown(event);
-          break;
-        case MessageActionsId.HEART:
-          handleKeyDown(event);
-          break;
-      }
-    },
-    [handleEmojiKeyDown, handleKeyDown],
-  );
+  const handleMsgActionKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    const actionType = event.currentTarget.dataset.uieName;
+    switch (actionType) {
+      case MessageActionsId.EMOJI:
+        handleEmojiKeyDown(event);
+        break;
+      case MessageActionsId.THUMBSUP:
+        handleKeyDown(event);
+        break;
+      case MessageActionsId.HEART:
+        handleKeyDown(event);
+        break;
+    }
+  };
 
   return (
     <>

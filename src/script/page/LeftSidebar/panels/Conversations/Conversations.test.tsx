@@ -36,7 +36,11 @@ describe('Conversations', () => {
         removeEventListener: jest.fn(),
       },
     } as any,
-    listViewModel: {} as any,
+    listViewModel: {
+      contentViewModel: {
+        loadPreviousContent: jest.fn(),
+      },
+    } as any,
     preferenceNotificationRepository: {notifications: ko.observable([])} as any,
     propertiesRepository: {getPreference: jest.fn(), savePreference: jest.fn()} as any,
     selfUser: new User(),
