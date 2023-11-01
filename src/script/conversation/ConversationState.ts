@@ -196,7 +196,7 @@ export class ConversationState {
   }
 
   /**
-   * indicate whether the selfUser has a conversation with this other user
+   * indicate whether the selfUser has a conversation (1:1 or group conversation) with this other user
    * @param user the user to check
    */
   hasConversationWith(user: User) {
