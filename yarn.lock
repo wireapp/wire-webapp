@@ -4263,12 +4263,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/adm-zip@npm:0.5.2":
-  version: 0.5.2
-  resolution: "@types/adm-zip@npm:0.5.2"
+"@types/adm-zip@npm:0.5.3":
+  version: 0.5.3
+  resolution: "@types/adm-zip@npm:0.5.3"
   dependencies:
     "@types/node": "*"
-  checksum: c25ad926fdd38100e883fbd34e94541c7893f785feb2d9f3261dee837baaf29c161d8c9b44d436d937e11e6f20218f1496bdf1cc4f16262b319033aef495ecf8
+  checksum: 995e21441cc6fe180f12ebf4e722bc6dbde0f9c765e57353018a0969a27cf15542c3f5451bfa1a82b958d5ed5e371fb3cbe55f934076dae22d8bf6a259a536bf
   languageName: node
   linkType: hard
 
@@ -18387,7 +18387,7 @@ __metadata:
     "@lexical/react": 0.12.2
     "@peculiar/x509": 1.9.5
     "@testing-library/react": 14.0.0
-    "@types/adm-zip": 0.5.2
+    "@types/adm-zip": 0.5.3
     "@types/dexie-batch": 0.4.6
     "@types/eslint": ^8
     "@types/fs-extra": 11.0.3
