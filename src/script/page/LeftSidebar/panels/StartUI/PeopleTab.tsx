@@ -101,10 +101,10 @@ export const PeopleTab = ({
   const [hasFederationError, setHasFederationError] = useState(false);
   const currentSearchQuery = useRef('');
 
-  const {connectedUsers} = useKoSubscribableChildren(conversationState, ['connectedUsers']);
   const {inTeam} = useKoSubscribableChildren(selfUser, ['inTeam']);
 
   const getLocalUsers = (unfiltered?: boolean) => {
+    const connectedUsers = conversationState.connectedUsers();
     if (!canSearchUnconnectedUsers) {
       return connectedUsers;
     }
@@ -118,7 +118,9 @@ export const PeopleTab = ({
 
       contacts = unfiltered
         ? teamUsers
-        : teamUsers.filter(user => connectedUsers.includes(user) || teamRepository.isSelfConnectedTo(user.id));
+        : teamUsers.filter(
+            user => conversationState.hasConversationWith(user) || teamRepository.isSelfConnectedTo(user.id),
+          );
     }
 
     return contacts.filter(user => user.isAvailable());
@@ -178,9 +180,11 @@ export const PeopleTab = ({
       const localSearchSources = getLocalUsers(true);
 
       const contactResults = searchRepository.searchUserInSet(searchQuery, localSearchSources);
-      const connectedUsers = conversationState.connectedUsers();
       const filteredResults = contactResults.filter(
-        user => connectedUsers.includes(user) || teamRepository.isSelfConnectedTo(user.id) || user.username() === query,
+        user =>
+          conversationState.hasConversationWith(user) ||
+          teamRepository.isSelfConnectedTo(user.id) ||
+          user.username() === query,
       );
 
       const localSearchResults: SearchResultsData = {

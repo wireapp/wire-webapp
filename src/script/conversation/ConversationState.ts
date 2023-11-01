@@ -195,6 +195,14 @@ export class ConversationState {
         });
   }
 
+  /**
+   * indicate whether the selfUser has a conversation (1:1 or group conversation) with this other user
+   * @param user the user to check
+   */
+  hasConversationWith(user: User) {
+    return this.connectedUsers().some(connectedUser => matchQualifiedIds(connectedUser.qualifiedId, user.qualifiedId));
+  }
+
   isSelfConversation(conversationId: QualifiedId): boolean {
     const selfConversationIds: QualifiedId[] = [this.selfProteusConversation(), this.selfMLSConversation()]
       .filter((conversation): conversation is Conversation => !!conversation)

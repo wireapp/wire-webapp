@@ -98,14 +98,13 @@ const UserSearchableList: React.FC<UserListProps> = ({
   // Filter all list items if a filter is provided
 
   useEffect(() => {
-    const connectedUsers = conversationState.connectedUsers();
     const {query: normalizedQuery} = searchRepository.normalizeQuery(filter);
     const results = searchRepository
       .searchUserInSet(filter, users)
       .filter(
         user =>
           user.isMe ||
-          connectedUsers.includes(user) ||
+          conversationState.hasConversationWith(user) ||
           teamRepository.isSelfConnectedTo(user.id) ||
           user.username() === normalizedQuery,
       );
