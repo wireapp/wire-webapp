@@ -64,8 +64,9 @@ export function ReplaceEmojiPlugin(): null {
             const currentSelection = $isRangeSelection(selection) ? selection : undefined;
             const isUpdatedNode =
               currentSelection?.anchor.key === newNode.getKey() && currentSelection?.focus.key === newNode.getKey();
-            const updatedText = findAndTransformEmoji(text);
-            if (isUpdatedNode && updatedText !== text) {
+            // We only want to trigger emoji replacement for the node being updated (the update listener will trigger for all the node in the editor)
+            if (isUpdatedNode) {
+              const updatedText = findAndTransformEmoji(text);
               const sizeDiff = updatedText.length - text.length;
               newNode.setTextContent(updatedText);
               // After emoji replacement, the size of the text could vary. We need to reposition the selection so that it stays in place for the user
