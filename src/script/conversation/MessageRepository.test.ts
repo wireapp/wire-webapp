@@ -47,7 +47,6 @@ import {EventRepository} from '../event/EventRepository';
 import {EventService} from '../event/EventService';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {ReactionMap} from '../storage';
-import {TeamState} from '../team/TeamState';
 import {ServerTimeHandler, serverTimeHandler} from '../time/serverTimeHandler';
 import {UserRepository} from '../user/UserRepository';
 import {UserState} from '../user/UserState';
@@ -96,7 +95,6 @@ async function buildMessageRepository(): Promise<[MessageRepository, MessageRepo
     } as unknown as UserRepository,
     assetRepository: {} as AssetRepository,
     userState,
-    teamState: new TeamState(),
     clientState,
     conversationState,
     core,

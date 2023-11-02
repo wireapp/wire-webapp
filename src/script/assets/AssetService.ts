@@ -17,7 +17,6 @@
  *
  */
 
-import {ProgressCallback} from '@wireapp/api-client/lib/http/';
 import {singleton, container} from 'tsyringe';
 
 import {legacyAsset, assetV3, isValidApiPath} from 'Util/ValidationUtil';
@@ -61,27 +60,5 @@ export class AssetService {
     const assetTokenParam = assetToken ? `&asset_token=${encodeURIComponent(assetToken)}` : '';
     const cachingParam = forceCaching ? '&forceCaching=true' : '';
     return `${url}?access_token=${this.apiClient['accessTokenStore'].accessToken?.access_token}${assetTokenParam}${cachingParam}`;
-  }
-
-  async downloadAssetV1(
-    assetId: string,
-    conversationId: string,
-    forceCaching?: boolean,
-    progressCallback?: ProgressCallback,
-  ) {
-    return this.apiClient.api.asset.getAssetV1(assetId, conversationId, forceCaching, progressCallback);
-  }
-
-  async downloadAssetV2(
-    assetId: string,
-    conversationId: string,
-    forceCaching?: boolean,
-    progressCallback?: ProgressCallback,
-  ) {
-    return this.apiClient.api.asset.getAssetV2(assetId, conversationId, forceCaching, progressCallback);
-  }
-
-  async downloadAssetV3(assetId: string, token?: string, forceCaching?: boolean, progressCallback?: ProgressCallback) {
-    return this.apiClient.api.asset.getAssetV3(assetId, token, forceCaching, progressCallback);
   }
 }

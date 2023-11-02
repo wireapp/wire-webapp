@@ -62,16 +62,6 @@ export const isBearerToken = (token: string): boolean => /^[a-zA-Z0-9\-._~+/]+[=
 export const isUUID = (string: string): boolean =>
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(string);
 
-export const isBase64 = (string: string): boolean => {
-  try {
-    // Will raise a DOM exception if base64 string is invalid
-    window.atob(string);
-  } catch (error) {
-    return false;
-  }
-  return true;
-};
-
 export const isValidApiPath = (path: string): boolean => {
   const [urlPath] = path.split('?');
   if (!/^\/[a-zA-Z0-9\-_/,]+$/.test(urlPath)) {

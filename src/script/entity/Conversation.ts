@@ -94,7 +94,6 @@ export class Conversation {
   private shouldPersistStateChanges: boolean;
   public blockLegalHoldMessage: boolean;
   public hasCreationMessage: boolean;
-  public needsLegalHoldApproval: boolean = false;
   public readonly accessCode: ko.Observable<string>;
   public readonly accessState: ko.Observable<ACCESS_STATE>;
   public readonly archivedTimestamp: ko.Observable<number>;
@@ -110,7 +109,6 @@ export class Conversation {
   public readonly isUsingMLSProtocol: boolean;
   public readonly display_name: ko.PureComputed<string>;
   public readonly firstUserEntity: ko.PureComputed<User | undefined>;
-  public readonly enforcedTeamMessageTimer: ko.PureComputed<number>;
   public readonly globalMessageTimer: ko.Observable<number | null>;
   public readonly hasContentMessages: ko.Observable<boolean>;
   public readonly hasAdditionalMessages: ko.Observable<boolean>;
@@ -892,10 +890,6 @@ export class Conversation {
     }
   }
 
-  getAllMessages(): Message[] {
-    return this.messages();
-  }
-
   /**
    * Get the oldest loaded message of the conversation.
    */
@@ -912,19 +906,6 @@ export class Conversation {
    */
   getNewestMessage(): Message | undefined {
     return this.messages()[this.messages().length - 1];
-  }
-
-  /**
-   * Get the message before a given message.
-   * @param message_et Message to look up from
-   */
-  getPreviousMessage(message_et: Message): Message | undefined {
-    const messages_visible = this.messages_visible();
-    const message_index = messages_visible.indexOf(message_et);
-    if (message_index > 0) {
-      return messages_visible[message_index - 1];
-    }
-    return undefined;
   }
 
   /**
