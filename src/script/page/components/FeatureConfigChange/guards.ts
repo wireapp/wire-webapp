@@ -19,8 +19,16 @@
 
 import {FeatureMLS, FeatureMLSE2EId} from '@wireapp/api-client/lib/team';
 
-export const isFeatureMLSE2EI = (feature: any): feature is FeatureMLSE2EId =>
-  'config' in feature && 'verificationExpiration' in feature.config;
+const isDefinedObject = (value: unknown): value is {} => typeof value === 'object' && value !== null;
 
-export const isFeatureMLS = (feature: any): feature is FeatureMLS =>
-  'config' in feature && 'defaultProtocol' in feature.config;
+export const isFeatureMLSE2EI = (feature: unknown): feature is FeatureMLSE2EId =>
+  isDefinedObject(feature) &&
+  'config' in feature &&
+  isDefinedObject(feature.config) &&
+  'verificationExpiration' in feature.config;
+
+export const isFeatureMLS = (feature: unknown): feature is FeatureMLS =>
+  isDefinedObject(feature) &&
+  'config' in feature &&
+  isDefinedObject(feature.config) &&
+  'defaultProtocol' in feature.config;
