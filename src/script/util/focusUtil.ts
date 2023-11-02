@@ -58,6 +58,6 @@ export const setElementsTabIndex = (elements: NodeListOf<HTMLElement> | [], isFo
  * @param element an element
  * @param isFocusable current message focus state
  */
-export const setElementTabIndex = (element: Element, isFocusable: boolean) => {
+const setElementTabIndex = (element: Element, isFocusable: boolean) => {
   element.setAttribute('tabindex', isFocusable ? '0' : '-1');
 };

@@ -270,7 +270,6 @@ export class TestFactory {
       this.user_repository,
       this.assetRepository,
       this.user_repository['userState'],
-      this.team_repository['teamState'],
       clientState,
     );
     const core = container.resolve(Core);

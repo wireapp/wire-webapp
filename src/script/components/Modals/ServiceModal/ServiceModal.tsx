@@ -98,6 +98,4 @@ const ServiceModal: React.FC<ServiceModalProps> = ({
   );
 };
 
-const showServiceModal = renderElement<ServiceModalProps>(ServiceModal);
-
-export {ServiceModal, showServiceModal};
+export const showServiceModal = renderElement<ServiceModalProps>(ServiceModal);
