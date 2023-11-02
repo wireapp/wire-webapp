@@ -28,7 +28,7 @@ export const handleE2EIdentityFeatureChange = (logger: Logger, config: FeatureLi
   const e2eiConfig = config[FEATURE_KEY.MLSE2EID];
   const mlsConfig = config[FEATURE_KEY.MLS];
   // Check if MLS or MLS E2EIdentity feature is existent
-  if (!hasE2EIVerificationExpiration(e2eiConfig) && !hasMLSDefaultProtocol(mlsConfig)) {
+  if (!hasE2EIVerificationExpiration(e2eiConfig) || !hasMLSDefaultProtocol(mlsConfig)) {
     return;
   }
 
