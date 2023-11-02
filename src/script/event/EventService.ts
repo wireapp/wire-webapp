@@ -469,15 +469,6 @@ export class EventService {
   }
 
   /**
-   * Delete an event from a conversation with the given primary.
-   *
-   * @param primaryKey ID of the actual message
-   */
-  deleteEventByKey(primaryKey: string): Promise<string> {
-    return this.storageService.delete(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey);
-  }
-
-  /**
    * Delete all events of a conversation.
    *
    * @param conversationId Delete events for this conversation

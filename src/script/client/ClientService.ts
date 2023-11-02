@@ -17,12 +17,7 @@
  *
  */
 
-import type {
-  CreateClientPayload,
-  RegisteredClient,
-  QualifiedUserClientMap,
-  ClientCapabilityData,
-} from '@wireapp/api-client/lib/client';
+import type {RegisteredClient, QualifiedUserClientMap, ClientCapabilityData} from '@wireapp/api-client/lib/client';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
@@ -33,14 +28,6 @@ import {StorageSchemata} from '../storage/StorageSchemata';
 
 export class ClientService {
   private readonly CLIENT_STORE_NAME: string;
-
-  static get URL_CLIENTS(): string {
-    return '/clients';
-  }
-
-  static get URL_USERS(): string {
-    return '/users';
-  }
 
   constructor(
     private readonly storageService = container.resolve(StorageService),
@@ -103,15 +90,6 @@ export class ClientService {
   async getClientsByUserIds(userIds: QualifiedId[]): Promise<QualifiedUserClientMap> {
     const listedClients = await this.apiClient.api.user.postListClients({qualified_users: userIds});
     return listedClients.qualified_user_map;
-  }
-
-  /**
-   * Register a new client.
-   * @param newClient Client payload
-   * @returns Resolves with the registered client information
-   */
-  postClients(newClient: CreateClientPayload): Promise<RegisteredClient> {
-    return this.apiClient.api.client.postClient(newClient);
   }
 
   //##############################################################################
