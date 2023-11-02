@@ -252,7 +252,7 @@ export class CallingViewModel {
 
     const handleCallParticipantChange = (conversationId: QualifiedId, members: QualifiedWcallMember[]) => {
       const conversation = this.getConversationById(conversationId);
-      if (!conversation?.isUsingMLSProtocol) {
+      if (conversation && isMLSConversation(conversation)) {
         return;
       }
 

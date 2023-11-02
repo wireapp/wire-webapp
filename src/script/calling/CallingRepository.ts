@@ -18,7 +18,7 @@
  */
 
 import type {CallConfigData} from '@wireapp/api-client/lib/account/CallConfigData';
-import type {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
+import {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import type {WebappProperties} from '@wireapp/api-client/lib/user/data';
 import {MessageSendingState} from '@wireapp/core/lib/conversation';
@@ -65,6 +65,7 @@ import {ClientId, Participant, UserId} from './Participant';
 
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
+import {isMLSConversation} from '../conversation/ConversationSelectors';
 import {ConversationState} from '../conversation/ConversationState';
 import {CallingEvent, EventBuilder} from '../conversation/EventBuilder';
 import {CONSENT_TYPE, MessageRepository, MessageSendingOptions} from '../conversation/MessageRepository';
@@ -336,7 +337,7 @@ export class CallingRepository {
     }
     const allClients = await this.core.service!.conversation.fetchAllParticipantsClients(call.conversationId);
 
-    if (!conversation.isUsingMLSProtocol) {
+    if (!isMLSConversation(conversation)) {
       const qualifiedClients = flattenUserMap(allClients);
 
       const clients: Clients = flatten(
@@ -671,8 +672,8 @@ export class CallingRepository {
       toSecond(new Date(time).getTime()),
       this.serializeQualifiedId(conversationId),
       this.serializeQualifiedId(userId),
-      conversation?.isUsingMLSProtocol ? senderClientId : clientId,
-      conversation?.isUsingMLSProtocol ? CONV_TYPE.CONFERENCE_MLS : CONV_TYPE.CONFERENCE,
+      conversation && isMLSConversation(conversation) ? senderClientId : clientId,
+      conversation && isMLSConversation(conversation) ? CONV_TYPE.CONFERENCE_MLS : CONV_TYPE.CONFERENCE,
     );
 
     if (res !== 0) {
@@ -709,7 +710,7 @@ export class CallingRepository {
       return CONV_TYPE.ONEONONE;
     }
 
-    if (conversation.isUsingMLSProtocol) {
+    if (isMLSConversation(conversation)) {
       return CONV_TYPE.CONFERENCE_MLS;
     }
     return this.supportsConferenceCalling ? CONV_TYPE.CONFERENCE : CONV_TYPE.GROUP;
@@ -1146,7 +1147,7 @@ export class CallingRepository {
      * This message is used to tell your other clients you have answered or
      * rejected a call and to stop ringing.
      */
-    if (typeof payload === 'string' && conversation.isUsingMLSProtocol && myClientsOnly) {
+    if (typeof payload === 'string' && isMLSConversation(conversation) && myClientsOnly) {
       return void this.messageRepository.sendSelfCallingMessage(payload, conversation.qualifiedId);
     }
 

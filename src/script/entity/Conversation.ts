@@ -106,7 +106,6 @@ export class Conversation {
   public groupId?: string;
   public epoch: number = -1;
   public cipherSuite: number = 1;
-  public readonly isUsingMLSProtocol: boolean;
   public readonly display_name: ko.PureComputed<string>;
   public readonly firstUserEntity: ko.PureComputed<User | undefined>;
   public readonly globalMessageTimer: ko.Observable<number | null>;
@@ -199,13 +198,6 @@ export class Conversation {
     this.name = ko.observable();
     this.team_id = undefined;
     this.type = ko.observable();
-
-    /**
-     * If a conversation has the groupId property it means that it
-     * is MLS protocol based as this property is for MLS conversations only.
-     * @returns boolean
-     */
-    this.isUsingMLSProtocol = protocol === ConversationProtocol.MLS;
 
     this.is_loaded = ko.observable(false);
     this.is_pending = ko.observable(false);
