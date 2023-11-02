@@ -4281,15 +4281,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/adm-zip@npm:0.5.3":
-  version: 0.5.3
-  resolution: "@types/adm-zip@npm:0.5.3"
-  dependencies:
-    "@types/node": "*"
-  checksum: 995e21441cc6fe180f12ebf4e722bc6dbde0f9c765e57353018a0969a27cf15542c3f5451bfa1a82b958d5ed5e371fb3cbe55f934076dae22d8bf6a259a536bf
-  languageName: node
-  linkType: hard
-
 "@types/aria-query@npm:^5.0.1":
   version: 5.0.2
   resolution: "@types/aria-query@npm:5.0.2"
@@ -5682,13 +5673,6 @@ __metadata:
   bin:
     acorn: bin/acorn
   checksum: 538ba38af0cc9e5ef983aee196c4b8b4d87c0c94532334fa7e065b2c8a1f85863467bb774231aae91613fcda5e68740c15d97b1967ae3394d20faddddd8af61d
-  languageName: node
-  linkType: hard
-
-"adm-zip@npm:0.5.10":
-  version: 0.5.10
-  resolution: "adm-zip@npm:0.5.10"
-  checksum: 07ed91cf6423bf5dca4ee63977bc7635e91b8d21829c00829d48dce4c6932e1b19e6cfcbe44f1931c956e68795ae97183fc775913883fa48ce88a1ac11fb2034
   languageName: node
   linkType: hard
 
@@ -16381,13 +16365,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"snabbdom@npm:3.5.1":
-  version: 3.5.1
-  resolution: "snabbdom@npm:3.5.1"
-  checksum: 8f3512c3e1c89deda0db4a185012dc6929a64b46c8ba44e5c7ed51d77c13d389a3605f5914af2c158d9f4a8c23b7face831d9802277fffb345a6fa1f1e330427
-  languageName: node
-  linkType: hard
-
 "socks-proxy-agent@npm:^7.0.0":
   version: 7.0.0
   resolution: "socks-proxy-agent@npm:7.0.0"
@@ -18416,7 +18393,6 @@ __metadata:
     "@lexical/react": 0.12.2
     "@peculiar/x509": 1.9.5
     "@testing-library/react": 14.0.0
-    "@types/adm-zip": 0.5.3
     "@types/dexie-batch": 0.4.6
     "@types/eslint": ^8
     "@types/fs-extra": 11.0.3
@@ -18448,14 +18424,12 @@ __metadata:
     "@wireapp/copy-config": 2.1.10
     "@wireapp/core": 42.19.2
     "@wireapp/eslint-config": 3.0.4
-    "@wireapp/lru-cache": 3.8.1
     "@wireapp/prettier-config": 0.6.3
     "@wireapp/react-ui-kit": 9.9.12
     "@wireapp/store-engine": ^5.1.4
     "@wireapp/store-engine-dexie": 2.1.6
     "@wireapp/store-engine-sqleet": 1.8.9
     "@wireapp/webapp-events": 0.18.3
-    adm-zip: 0.5.10
     amplify: "https://github.com/wireapp/amplify#head=master"
     archiver: ^6.0.1
     autoprefixer: ^10.4.16
@@ -18535,7 +18509,6 @@ __metadata:
     seedrandom: ^3.0.5
     simple-git: 3.20.0
     sinon: 17.0.1
-    snabbdom: 3.5.1
     speakingurl: 14.0.1
     style-loader: ^3.3.3
     stylelint: ^15
