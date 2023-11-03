@@ -22,13 +22,13 @@
     "pm2": "5.3.0"
   },
   "devDependencies": {
-    "@types/express": "4.17.19",
+    "@types/express": "4.17.20",
     "@types/express-sitemap-xml": "3.0.3",
     "@types/express-useragent": "1.0.4",
     "@types/fs-extra": "11.0.3",
     "@types/geolite2": "2.0.0",
     "@types/hbs": "4.0.3",
-    "@types/jest": "^29.5.6",
+    "@types/jest": "^29.5.7",
     "@types/node": "18.11.18",
     "jest": "29.7.0",
     "rimraf": "4.4.1",

@@ -22,13 +22,13 @@ import {FeatureStatus, FEATURE_KEY, FeatureList} from '@wireapp/api-client/lib/t
 import {E2EIHandler} from 'src/script/E2EIdentity';
 import {Logger} from 'Util/Logger';
 
-import {isFeatureMLSE2EI, isFeatureMLS} from '../../guards';
+import {hasE2EIVerificationExpiration, hasMLSDefaultProtocol} from '../../guards';
 
 export const handleE2EIdentityFeatureChange = (logger: Logger, config: FeatureList) => {
   const e2eiConfig = config[FEATURE_KEY.MLSE2EID];
   const mlsConfig = config[FEATURE_KEY.MLS];
   // Check if MLS or MLS E2EIdentity feature is existent
-  if (!isFeatureMLSE2EI(e2eiConfig) && !isFeatureMLS(mlsConfig)) {
+  if (!hasE2EIVerificationExpiration(e2eiConfig) || !hasMLSDefaultProtocol(mlsConfig)) {
     return;
   }
 
@@ -47,7 +47,7 @@ export const handleE2EIdentityFeatureChange = (logger: Logger, config: FeatureLi
     // Either get the current E2EIdentity handler instance or create a new one
     const e2eHandler = E2EIHandler.getInstance({
       discoveryUrl: e2eiConfig.config.acmeDiscoveryUrl!,
-      gracePeriodInMS: e2eiConfig.config.verificationExpiration,
+      gracePeriodInSeconds: e2eiConfig.config.verificationExpiration,
     });
     e2eHandler.initialize();
   }

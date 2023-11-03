@@ -1121,7 +1121,7 @@
   "preferencesAccountUsername": "Username",
   "preferencesAccountUsernameAvailable": "Saadaval",
   "preferencesAccountUsernameErrorTaken": "Juba kasutusel",
-  "preferencesAccountUsernameHint": "Vähemalt 2 tähemärki. Ainult a-z, 0-9 ja _.",
+  "preferencesAccountUsernameHint": "At least 2 characters. a—z, 0—9 and '.', '-', '_' only.",
   "preferencesAccountUsernamePlaceholder": "Sinu täisnimi",
   "preferencesDevice": "Device",
   "preferencesDeviceDetails": "Seadme üksikasjad",

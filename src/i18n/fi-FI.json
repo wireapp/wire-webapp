@@ -1121,7 +1121,7 @@
   "preferencesAccountUsername": "Username",
   "preferencesAccountUsernameAvailable": "Saatavilla",
   "preferencesAccountUsernameErrorTaken": "On jo käytössä",
-  "preferencesAccountUsernameHint": "Vähintään 2 merkkiä, vain a - z, 0 - 9 ja _.",
+  "preferencesAccountUsernameHint": "At least 2 characters. a—z, 0—9 and '.', '-', '_' only.",
   "preferencesAccountUsernamePlaceholder": "Koko nimesi",
   "preferencesDevice": "Device",
   "preferencesDeviceDetails": "Laitteen yksityiskohdat",

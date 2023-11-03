@@ -24,6 +24,7 @@ import type {DexieError} from 'dexie';
 import {container} from 'tsyringe';
 
 import {Icon} from 'Components/Icon';
+import {isMLSConversation} from 'src/script/conversation/ConversationSelectors';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import type {Logger} from 'Util/Logger';
@@ -100,7 +101,8 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
     }
   };
 
-  const isMLSConversation = !!conversationState.activeConversation()?.isUsingMLSProtocol;
+  const activeConversation = conversationState.activeConversation();
+  const isConversationMLS = activeConversation && isMLSConversation(activeConversation);
 
   return (
     <div className={cx('participant-devices__header', {'participant-devices__header--padding': !noPadding})}>
@@ -157,7 +159,7 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
             style={{display: isResettingSession ? 'initial' : 'none'}}
             data-uie-name="status-loading"
           />
-          {!isMLSConversation && (
+          {!isConversationMLS && (
             <button
               type="button"
               className="button-reset-default button-label participant-devices__reset-session accent-text ellipsis"

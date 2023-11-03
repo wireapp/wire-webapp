@@ -1121,7 +1121,7 @@
   "preferencesAccountUsername": "Username",
   "preferencesAccountUsernameAvailable": "متاح",
   "preferencesAccountUsernameErrorTaken": "Already taken",
-  "preferencesAccountUsernameHint": "حرفان على الأقل. مسموح بالحروف a—z والأرقام 0—9 والشَرطة السفلية (_) فقط.",
+  "preferencesAccountUsernameHint": "At least 2 characters. a—z, 0—9 and '.', '-', '_' only.",
   "preferencesAccountUsernamePlaceholder": "اسمك الكامل",
   "preferencesDevice": "Device",
   "preferencesDeviceDetails": "تفاصيل الجهاز",

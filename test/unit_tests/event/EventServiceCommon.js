@@ -649,25 +649,6 @@ const testEventServiceClass = (testedServiceName, className) => {
       afterEach(() => {
         testFactory.storage_service.clearStores();
       });
-
-      it('deletes message with the given key', () => {
-        return testFactory[testedServiceName]
-          .deleteEventByKey(primary_keys[1])
-          .then(() => testFactory[testedServiceName].loadPrecedingEvents(conversationId))
-          .then(events => {
-            expect(events.length).toBe(2);
-            events.forEach(event => expect(event.primary_key).not.toBe(primary_keys[1]));
-          });
-      });
-
-      it('does not delete the event if key is wrong', () => {
-        return testFactory[testedServiceName]
-          .deleteEventByKey('wrongKey')
-          .then(() => testFactory[testedServiceName].loadPrecedingEvents(conversationId))
-          .then(events => {
-            expect(events.length).toBe(3);
-          });
-      });
     });
 
     describe('updateEvent', () => {

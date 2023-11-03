@@ -169,7 +169,6 @@ export class ConversationRepository {
   private readonly logger: Logger;
   public readonly stateHandler: ConversationStateHandler;
   public readonly proteusVerificationStateHandler: ProteusConversationVerificationStateHandler;
-  static readonly eventFromStreamMessage = 'event from notification stream';
 
   static get CONFIG() {
     return {
@@ -305,8 +304,6 @@ export class ConversationRepository {
     this.ephemeralHandler = new ConversationEphemeralHandler(this.eventService, {
       onMessageTimeout: this.handleMessageExpiration,
     });
-
-    this.userState.directlyConnectedUsers = this.conversationState.connectedUsers;
 
     this.conversationLabelRepository = new ConversationLabelRepository(
       this.conversationState.conversations,
@@ -1086,13 +1083,6 @@ export class ConversationRepository {
    */
   getNextConversation(conversationEntity: Conversation) {
     return getNextItem(this.conversationState.visibleConversations(), conversationEntity);
-  }
-
-  /**
-   * @deprecated import the `ConversationState` wherever you need it and call `getMostRecentConversation` directly from there
-   */
-  public getMostRecentConversation() {
-    return this.conversationState.getMostRecentConversation();
   }
 
   /**
@@ -2049,13 +2039,13 @@ export class ConversationRepository {
 
     const qualifiedUsers = userEntities.map(userEntity => userEntity.qualifiedId);
 
-    const {qualifiedId: conversationId, groupId} = conversation;
+    const {qualifiedId: conversationId} = conversation;
 
     try {
-      if (conversation.isUsingMLSProtocol && groupId) {
+      if (isMLSConversation(conversation)) {
         const {events} = await this.core.service!.conversation.addUsersToMLSConversation({
           conversationId,
-          groupId,
+          groupId: conversation.groupId,
           qualifiedUsers,
         });
         if (!!events.length) {
@@ -3145,7 +3135,7 @@ export class ConversationRepository {
     const qualifiedUserIds =
       eventData.users?.map(user => user.qualified_id) || eventData.user_ids.map(userId => ({domain: '', id: userId}));
 
-    if (conversationEntity.isUsingMLSProtocol) {
+    if (isMLSConversation(conversationEntity)) {
       const isSelfJoin = isFromSelf && selfUserJoins;
       await this.handleMLSConversationMemberJoin(conversationEntity, isSelfJoin);
     }
@@ -3754,10 +3744,6 @@ export class ConversationRepository {
     }
 
     return false;
-  }
-
-  findConversationByGroupId(groupId: string): Conversation | undefined {
-    return this.conversationState.findConversationByGroupId(groupId);
   }
 
   public async cleanupEphemeralMessages(): Promise<void> {

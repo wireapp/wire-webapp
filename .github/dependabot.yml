@@ -26,6 +26,9 @@ updates:
       eslint:
         patterns:
           - '*eslint*'
+      datadog:
+        patterns:
+          - '*@datadog*'
 
     ignore:
       - dependency-name: '@wireapp/avs'
