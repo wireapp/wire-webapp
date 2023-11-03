@@ -34,7 +34,7 @@ import {
 
 import {isTabKey} from 'Util/KeyboardUtil';
 
-export const ON_SHIFT_TAB: LexicalCommand<KeyboardEvent> = createCommand('ON_SHIFT_TAB');
+const ON_SHIFT_TAB: LexicalCommand<KeyboardEvent> = createCommand('ON_SHIFT_TAB');
 interface GlobalEventsPluginProps {
   onShiftTab: () => void;
   onEscape: () => void;

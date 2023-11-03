@@ -67,6 +67,7 @@ export async function initializeDataDog(config: Configuration, user: {id?: strin
     beforeSend(event, context) {
       delete event.view.referrer;
       event.view.url = '/';
+      return true;
     },
   });
 
@@ -83,7 +84,7 @@ export async function initializeDataDog(config: Configuration, user: {id?: strin
       }
       log.view = {url: '/'};
       log.message = replaceDomains(replaceAllStrings(removeTimestamp(removeColors(log.message))));
-      return undefined;
+      return true;
     },
   });
 

@@ -47,7 +47,6 @@ export class CallState {
   public readonly cbrEncoding: ko.Observable<number> = ko.observable(
     Config.getConfig().FEATURE.ENFORCE_CONSTANT_BITRATE ? 1 : 0,
   );
-  public readonly videoSpeakersActiveTab: ko.Observable<string> = ko.observable(CallViewTab.ALL);
   readonly selectableScreens: ko.Observable<ElectronDesktopCapturerSource[]> = ko.observable([]);
   readonly selectableWindows: ko.Observable<ElectronDesktopCapturerSource[]> = ko.observable([]);
   /** call that is current active (connecting or connected) */

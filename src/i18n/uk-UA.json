@@ -1121,7 +1121,7 @@
   "preferencesAccountUsername": "Username",
   "preferencesAccountUsernameAvailable": "Доступний",
   "preferencesAccountUsernameErrorTaken": "Уже зарезервований",
-  "preferencesAccountUsernameHint": "Мінімум 2 символи з множини a—z, 0—9, та _.",
+  "preferencesAccountUsernameHint": "At least 2 characters. a—z, 0—9 and '.', '-', '_' only.",
   "preferencesAccountUsernamePlaceholder": "Ваше повне ім’я",
   "preferencesDevice": "Device",
   "preferencesDeviceDetails": "Подробиці пристрою",

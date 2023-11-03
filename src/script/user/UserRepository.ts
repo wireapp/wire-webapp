@@ -76,6 +76,7 @@ import type {EventSource} from '../event/EventSource';
 import type {PropertiesRepository} from '../properties/PropertiesRepository';
 import type {SelfService} from '../self/SelfService';
 import {UserRecord} from '../storage';
+import {TeamState} from '../team/TeamState';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 
 type GetUserOptions = {
@@ -126,6 +127,7 @@ export class UserRepository {
     serverTimeHandler: ServerTimeHandler,
     private readonly propertyRepository: PropertiesRepository,
     private readonly userState = container.resolve(UserState),
+    private readonly teamState = container.resolve(TeamState),
   ) {
     this.logger = getLogger('UserRepository');
 
@@ -561,7 +563,7 @@ export class UserRepository {
       userId => new User(userId.id, userId.domain),
     );
     const mappedUsers = this.userMapper.mapUsersFromJson(found, this.userState.self().domain).concat(failedToLoad);
-    if (this.userState.isTeam()) {
+    if (this.teamState.isTeam()) {
       this.mapGuestStatus(mappedUsers);
     }
     return mappedUsers;
@@ -790,7 +792,7 @@ export class UserRepository {
     // update the user in db
     await this.updateUser(userId, user);
 
-    if (this.userState.isTeam()) {
+    if (this.teamState.isTeam()) {
       this.mapGuestStatus([updatedUser]);
     }
     if (updatedUser && updatedUser.inTeam() && updatedUser.isDeleted) {

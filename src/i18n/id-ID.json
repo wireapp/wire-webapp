@@ -1121,7 +1121,7 @@
   "preferencesAccountUsername": "Username",
   "preferencesAccountUsernameAvailable": "Tersedia",
   "preferencesAccountUsernameErrorTaken": "Telah diambil",
-  "preferencesAccountUsernameHint": "Minimal 2 karakter. a-z, 0-9 dan _ saja.",
+  "preferencesAccountUsernameHint": "At least 2 characters. a—z, 0—9 and '.', '-', '_' only.",
   "preferencesAccountUsernamePlaceholder": "Nama lengkap Anda",
   "preferencesDevice": "Device",
   "preferencesDeviceDetails": "Detil Perangkat",

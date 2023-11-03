@@ -19,7 +19,7 @@
 
 import {ConversationProtocol, MessageSendingStatus, QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
-import {QualifiedId, RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/lib/user';
+import {QualifiedId, RequestCancellationError} from '@wireapp/api-client/lib/user';
 import {
   MessageSendingState,
   MessageTargetMode,
@@ -96,7 +96,6 @@ import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 import {Core} from '../service/CoreSingleton';
 import type {EventRecord, ReactionMap} from '../storage';
-import {TeamState} from '../team/TeamState';
 import {ServerTimeHandler} from '../time/serverTimeHandler';
 import {UserType} from '../tracking/attribute';
 import {EventName} from '../tracking/EventName';
@@ -166,7 +165,6 @@ export class MessageRepository {
     private readonly userRepository: UserRepository,
     private readonly assetRepository: AssetRepository,
     private readonly userState = container.resolve(UserState),
-    private readonly teamState = container.resolve(TeamState),
     private readonly clientState = container.resolve(ClientState),
     private readonly conversationState = container.resolve(ConversationState),
     private readonly core = container.resolve(Core),
@@ -1134,8 +1132,8 @@ export class MessageRepository {
       messageId: createUuid(),
     });
 
-    const sortedUsers = this.userState
-      .directlyConnectedUsers()
+    const sortedUsers = this.conversationState
+      .connectedUsers()
       // For the moment, we do not want to send status in federated env
       // we can remove the filter when we actually want this feature in federated env (and we will need to implement federation for the core broadcastService)
       .filter(user => !user.isFederated)
@@ -1310,19 +1308,6 @@ export class MessageRepository {
       return message as StoredContentMessage;
     }
     return message as StoredContentMessage;
-  }
-
-  async triggerTeamMemberLeaveChecks(users: APIClientUser[]): Promise<void> {
-    for (const user of users) {
-      // Since this is a bare API client user we use `.deleted`
-      const isDeleted = user.deleted === true;
-      if (isDeleted) {
-        await this.conversationRepositoryProvider().teamMemberLeave(this.teamState.team().id ?? '', {
-          domain: this.userState.self().domain,
-          id: user.id,
-        });
-      }
-    }
   }
 
   public async updateAllClients(conversation: Conversation, blockSystemMessage: boolean): Promise<void> {

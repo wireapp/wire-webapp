@@ -92,7 +92,6 @@ import {PermissionRepository} from '../permission/PermissionRepository';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {PropertiesService} from '../properties/PropertiesService';
 import {SearchRepository} from '../search/SearchRepository';
-import {SearchService} from '../search/SearchService';
 import {SelfRepository} from '../self/SelfRepository';
 import {SelfService} from '../self/SelfService';
 import {APIClient} from '../service/APIClientSingleton';
@@ -228,7 +227,7 @@ export class App {
     );
     repositories.connection = new ConnectionRepository(new ConnectionService(), repositories.user);
     repositories.event = new EventRepository(this.service.event, this.service.notification, serverTimeHandler);
-    repositories.search = new SearchRepository(new SearchService(), repositories.user);
+    repositories.search = new SearchRepository(repositories.user);
     repositories.team = new TeamRepository(repositories.user, repositories.asset);
 
     repositories.message = new MessageRepository(
