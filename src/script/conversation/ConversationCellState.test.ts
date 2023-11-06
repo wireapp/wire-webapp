@@ -17,6 +17,8 @@
  *
  */
 
+import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+
 import {generateCellState} from 'src/script/conversation/ConversationCellState';
 import {ConversationStatusIcon} from 'src/script/conversation/ConversationStatusIcon';
 import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
@@ -28,13 +30,16 @@ import {User} from 'src/script/entity/User';
 import {t} from 'Util/LocalizerUtil';
 import {createUuid} from 'Util/uuid';
 
+import {CallMessage} from '../entity/message/CallMessage';
+import {CALL_MESSAGE_TYPE} from '../message/CallMessageType';
+
 describe('ConversationCellState', () => {
   describe('Notification state icon', () => {
     const conversationEntity = new Conversation(createUuid());
 
     const selfUserEntity = new User(createUuid());
     selfUserEntity.isMe = true;
-    selfUserEntity.inTeam(true);
+    selfUserEntity.teamId = createUuid();
     conversationEntity.selfUser(selfUserEntity);
 
     it('returns empty state if notifications are set to everything', () => {
@@ -57,31 +62,28 @@ describe('ConversationCellState', () => {
   });
 
   describe('Second line description for conversations', () => {
-    const defaultUnreadState = {
-      allEvents: [],
-      allMessages: [],
-      calls: [],
-      otherMessages: [],
-      pings: [],
-      selfMentions: [],
-      selfReplies: [],
-    };
-
     const conversationEntity = new Conversation(createUuid());
 
     const selfUserEntity = new User(createUuid());
     selfUserEntity.isMe = true;
-    selfUserEntity.inTeam(true);
+    selfUserEntity.teamId = createUuid();
     conversationEntity.selfUser(selfUserEntity);
 
     conversationEntity.mutedState(NOTIFICATION_STATE.EVERYTHING);
 
+    const sender = new User();
+    sender.name('Felix');
     const contentMessage = new ContentMessage();
     const text = new Text('id', 'Hello there');
-    contentMessage.unsafeSenderName = () => 'Felix';
+    contentMessage.user(sender);
     contentMessage.assets([text]);
 
     const pingMessage = new PingMessage();
+
+    const callMessage = new CallMessage(CALL_MESSAGE_TYPE.ACTIVATED, undefined, 0);
+
+    const mention = new ContentMessage();
+    jest.spyOn(mention, 'isUserMentioned').mockReturnValue(true);
 
     const tests = [
       {
@@ -90,7 +92,7 @@ describe('ConversationCellState', () => {
           description: t('conversationsSecondaryLineSummaryMissedCalls', 2),
           icon: ConversationStatusIcon.MISSED_CALL,
         },
-        unreadState: {...defaultUnreadState, calls: [{}, {}]},
+        messages: [callMessage, callMessage],
       },
       {
         description: "returns unread message's text if there is only a single text message",
@@ -98,7 +100,7 @@ describe('ConversationCellState', () => {
           group: {description: 'Felix: Hello there', icon: ConversationStatusIcon.UNREAD_MESSAGES},
           one2one: {description: 'Hello there', icon: ConversationStatusIcon.UNREAD_MESSAGES},
         },
-        unreadState: {...defaultUnreadState, allMessages: [contentMessage]},
+        messages: [contentMessage],
       },
       {
         description: 'returns the number of pings',
@@ -106,7 +108,7 @@ describe('ConversationCellState', () => {
           description: t('conversationsSecondaryLineSummaryPings', 2),
           icon: ConversationStatusIcon.UNREAD_PING,
         },
-        unreadState: {...defaultUnreadState, pings: [pingMessage, pingMessage]},
+        messages: [pingMessage, pingMessage],
       },
       {
         description: 'returns the number of mentions',
@@ -114,7 +116,7 @@ describe('ConversationCellState', () => {
           description: t('conversationsSecondaryLineSummaryMentions', 2),
           icon: ConversationStatusIcon.UNREAD_MENTION,
         },
-        unreadState: {...defaultUnreadState, selfMentions: [1, 2]},
+        messages: [mention, mention],
       },
       {
         description: 'prioritizes mentions, calls, pings and messages',
@@ -125,14 +127,24 @@ describe('ConversationCellState', () => {
           )}, ${t('conversationsSecondaryLineSummaryPings', 2)}, ${t('conversationsSecondaryLineSummaryMessages', 2)}`,
           icon: ConversationStatusIcon.UNREAD_MENTION,
         },
-        unreadState: {...defaultUnreadState, calls: [1, 2], otherMessages: [1, 2], pings: [1, 2], selfMentions: [1, 2]},
+        messages: [
+          contentMessage,
+          contentMessage,
+          callMessage,
+          callMessage,
+          mention,
+          mention,
+          pingMessage,
+          pingMessage,
+        ],
       },
     ];
 
-    conversationEntity.isGroup = () => false;
-    tests.forEach(({description, expected, unreadState}) => {
+    conversationEntity.type(CONVERSATION_TYPE.ONE_TO_ONE);
+
+    tests.forEach(({description, expected, messages}) => {
       const expectedOne2One = expected.one2one || expected;
-      conversationEntity.unreadState = () => unreadState;
+      conversationEntity.messages_unordered(messages);
       const state = generateCellState(conversationEntity);
 
       it(`${description} (1:1)`, () => {
@@ -140,10 +152,10 @@ describe('ConversationCellState', () => {
       });
     });
 
-    conversationEntity.isGroup = () => true;
-    tests.forEach(({description, expected, unreadState}) => {
+    conversationEntity.type(CONVERSATION_TYPE.REGULAR);
+    tests.forEach(({description, expected, messages}) => {
       const expectedGroup = expected.group || expected;
-      conversationEntity.unreadState = () => unreadState;
+      conversationEntity.messages_unordered(messages);
       const state = generateCellState(conversationEntity);
 
       it(`${description} (group)`, () => {

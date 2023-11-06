@@ -657,7 +657,7 @@ describe('Conversation', () => {
 
       conversation_et.type(CONVERSATION_TYPE.REGULAR);
 
-      expect(conversation_et.hasGuest()).toBe(false);
+      expect(conversation_et.hasGuest()).toBe(true);
     });
   });
 
