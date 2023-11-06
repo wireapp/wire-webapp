@@ -1086,7 +1086,7 @@ export class ConversationRepository {
    */
   async get1To1Conversation(userEntity: User): Promise<Conversation | null> {
     const selfUser = this.userState.self();
-    const inCurrentTeam = selfUser && userEntity.teamId === selfUser.teamId;
+    const inCurrentTeam = selfUser && selfUser.teamId && userEntity.teamId === selfUser.teamId;
 
     if (inCurrentTeam) {
       return this.getOrCreateProteusTeam1to1Conversation(userEntity);
