@@ -62,7 +62,6 @@ export class User {
   public readonly expirationText: ko.Observable<string>;
   public readonly hasPendingLegalHold: ko.PureComputed<boolean>;
   public readonly initials: ko.PureComputed<string>;
-  public readonly inTeam: ko.Observable<boolean>;
   public readonly is_trusted: ko.PureComputed<boolean>;
   // Manual Proteus verification
   public readonly is_verified: ko.PureComputed<boolean>;
@@ -184,7 +183,6 @@ export class User {
     this.isUnknown = ko.pureComputed(() => this.connection().isUnknown());
     this.isExternal = ko.pureComputed(() => this.teamRole() === TEAM_ROLE.PARTNER);
 
-    this.inTeam = ko.observable(false);
     this.isGuest = ko.observable(false);
     this.isDirectGuest = ko.pureComputed(() => {
       return this.isGuest() && !this.isFederated;

@@ -115,7 +115,7 @@ export class PropertiesRepository {
     const isCheckConsentDisabled = !Config.getConfig().FEATURE.CHECK_CONSENT;
     const isPrivacyPreferenceSet = this.getPreference(PROPERTIES_TYPE.PRIVACY) !== undefined;
     const isTelemetryPreferenceSet = this.getPreference(PROPERTIES_TYPE.TELEMETRY_SHARING) !== undefined;
-    const isTeamAccount = this.selfUser().inTeam();
+    const isTeamAccount = !!this.selfUser().teamId;
     const enablePrivacy = () => {
       this.savePreference(PROPERTIES_TYPE.PRIVACY, true);
       this.publishProperties();

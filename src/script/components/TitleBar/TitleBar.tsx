@@ -101,6 +101,10 @@ export const TitleBar: React.FC<TitleBarProps> = ({
     'verification_state',
   ]);
 
+  const inTeam = teamState.isTeam();
+
+  const hasGuest = inTeam && hasDirectGuest;
+
   const {isActivatedAccount} = useKoSubscribableChildren(selfUser, ['isActivatedAccount']);
   const {joinedCall, activeCalls} = useKoSubscribableChildren(callState, ['joinedCall', 'activeCalls']);
   const {isVideoCallingEnabled} = useKoSubscribableChildren(teamState, ['isVideoCallingEnabled']);
@@ -115,7 +119,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
     const translationKey = generateWarningBadgeKey({
       hasExternal,
       hasFederated: hasFederatedUsers,
-      hasGuest: hasDirectGuest,
+      hasGuest,
       hasService,
     });
 

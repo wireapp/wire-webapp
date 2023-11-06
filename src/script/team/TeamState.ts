@@ -25,6 +25,7 @@ import {sortUsersByPriority} from 'Util/StringUtil';
 
 import {TeamEntity} from './TeamEntity';
 
+import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 import {ROLE} from '../user/UserPermission';
 import {UserState} from '../user/UserState';
@@ -132,6 +133,10 @@ export class TeamState {
     this.isGuestLinkEnabled = ko.pureComputed(
       () => this.teamFeatures()?.conversationGuestLinks?.status === FeatureStatus.ENABLED,
     );
+  }
+
+  isInTeam(entity: User | Conversation): boolean {
+    return !!this.team() && entity.teamId === this.team().id;
   }
 
   readonly isExternal = (userId: string): boolean => {

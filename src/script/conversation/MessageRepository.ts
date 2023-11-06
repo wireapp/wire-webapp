@@ -965,7 +965,7 @@ export class MessageRepository {
       return !!this.propertyRepository.receiptMode();
     }
 
-    if (conversationEntity.team_id && conversationEntity.isGroup()) {
+    if (conversationEntity.teamId && conversationEntity.isGroup()) {
       return !!conversationEntity.receiptMode();
     }
 
@@ -1473,7 +1473,7 @@ export class MessageRepository {
         [Segmentation.CONVERSATION.SERVICES]: roundLogarithmic(services, 6),
         [Segmentation.MESSAGE.ACTION]: actionType,
       };
-      const isTeamConversation = !!conversationEntity.team_id;
+      const isTeamConversation = !!conversationEntity.teamId;
       if (isTeamConversation) {
         segmentations = {
           ...segmentations,

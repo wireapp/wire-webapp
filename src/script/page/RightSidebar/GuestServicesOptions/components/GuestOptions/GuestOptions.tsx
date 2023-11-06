@@ -20,6 +20,7 @@
 import {FC, useCallback, useEffect, useMemo, useState} from 'react';
 
 import cx from 'classnames';
+import {container} from 'tsyringe';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
@@ -27,6 +28,7 @@ import {CopyToClipboard} from 'Components/CopyToClipboard';
 import {Icon} from 'Components/Icon';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {BaseToggle} from 'Components/toggle/BaseToggle';
+import {TeamState} from 'src/script/team/TeamState';
 import {copyText} from 'Util/ClipboardUtil';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -49,6 +51,7 @@ interface GuestOptionsProps {
   isRequestOngoing?: boolean;
   isTeamStateGuestLinkEnabled?: boolean;
   isToggleDisabled?: boolean;
+  teamState?: TeamState;
 }
 
 const GuestOptions: FC<GuestOptionsProps> = ({
@@ -60,14 +63,16 @@ const GuestOptions: FC<GuestOptionsProps> = ({
   isRequestOngoing = false,
   isTeamStateGuestLinkEnabled = false,
   isToggleDisabled = false,
+  teamState = container.resolve(TeamState),
 }) => {
   const [isLinkCopied, setIsLinkCopied] = useState<boolean>(false);
   const [conversationHasGuestLinkEnabled, setConversationHasGuestLinkEnabled] = useState<boolean>(false);
 
-  const {accessCode, hasGuest, inTeam, isGuestAndServicesRoom, isGuestRoom, isServicesRoom} = useKoSubscribableChildren(
+  const {accessCode, hasGuest, isGuestAndServicesRoom, isGuestRoom, isServicesRoom} = useKoSubscribableChildren(
     activeConversation,
-    ['accessCode', 'hasGuest', 'inTeam', 'isGuestAndServicesRoom', 'isGuestRoom', 'isServicesRoom'],
+    ['accessCode', 'hasGuest', 'isGuestAndServicesRoom', 'isGuestRoom', 'isServicesRoom'],
   );
+  const inTeam = teamState.isInTeam(activeConversation);
 
   const isGuestEnabled = isGuestRoom || isGuestAndServicesRoom;
   const isGuestLinkEnabled = inTeam

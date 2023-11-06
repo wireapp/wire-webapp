@@ -163,7 +163,7 @@ export class Conversation {
   public readonly showNotificationsMentionsAndReplies: ko.PureComputed<boolean>;
   public readonly showNotificationsNothing: ko.PureComputed<boolean>;
   public status: ko.Observable<ConversationStatus>;
-  public team_id: string;
+  public teamId: string;
   public readonly type: ko.Observable<CONVERSATION_TYPE>;
   public readonly unreadState: ko.PureComputed<UnreadState>;
   public readonly verification_state: ko.Observable<ConversationVerificationState>;
@@ -196,7 +196,7 @@ export class Conversation {
     this.accessCode = ko.observable();
     this.creator = undefined;
     this.name = ko.observable();
-    this.team_id = undefined;
+    this.teamId = undefined;
     this.type = ko.observable();
 
     this.is_loaded = ko.observable(false);
@@ -220,9 +220,9 @@ export class Conversation {
     this.isGuest = ko.observable(false);
 
     this.inTeam = ko.pureComputed(() => {
-      const isSameTeam = this.selfUser()?.teamId === this.team_id;
+      const isSameTeam = this.selfUser()?.teamId === this.teamId;
       const isSameDomain = this.domain === this.selfUser()?.domain;
-      return !!this.team_id && isSameTeam && !this.isGuest() && isSameDomain;
+      return !!this.teamId && isSameTeam && !this.isGuest() && isSameDomain;
     });
     this.isGuestRoom = ko.pureComputed(() => this.accessState() === ACCESS_STATE.TEAM.GUEST_ROOM);
     this.isGuestAndServicesRoom = ko.pureComputed(() => this.accessState() === ACCESS_STATE.TEAM.GUESTS_SERVICES);
@@ -233,7 +233,7 @@ export class Conversation {
     this.isTeam1to1 = ko.pureComputed(() => {
       const isGroupConversation = this.type() === CONVERSATION_TYPE.REGULAR;
       const hasOneParticipant = this.participating_user_ids().length === 1;
-      return isGroupConversation && hasOneParticipant && this.team_id && !this.name();
+      return isGroupConversation && hasOneParticipant && this.teamId && !this.name();
     });
     this.isGroup = ko.pureComputed(() => {
       const isGroupConversation = this.type() === CONVERSATION_TYPE.REGULAR;
@@ -251,11 +251,11 @@ export class Conversation {
 
     this.hasDirectGuest = ko.pureComputed(() => {
       const hasGuestUser = this.participating_user_ets().some(userEntity => userEntity.isDirectGuest());
-      return hasGuestUser && this.isGroup() && this.selfUser()?.inTeam();
+      return hasGuestUser && this.isGroup();
     });
     this.hasGuest = ko.pureComputed(() => {
       const hasGuestUser = this.participating_user_ets().some(userEntity => userEntity.isGuest());
-      return hasGuestUser && this.isGroup() && this.selfUser()?.inTeam();
+      return hasGuestUser && this.isGroup();
     });
     this.hasService = ko.pureComputed(() => this.participating_user_ets().some(userEntity => userEntity.isService));
     this.hasExternal = ko.pureComputed(() => this.participating_user_ets().some(userEntity => userEntity.isExternal()));
@@ -300,13 +300,13 @@ export class Conversation {
       const knownNotificationStates = Object.values(NOTIFICATION_STATE);
       if (knownNotificationStates.includes(mutedState)) {
         const isStateMentionsAndReplies = mutedState === NOTIFICATION_STATE.MENTIONS_AND_REPLIES;
-        const isInvalidState = isStateMentionsAndReplies && !this.selfUser().inTeam();
+        const isInvalidState = isStateMentionsAndReplies && !!this.selfUser()?.teamId;
 
         return isInvalidState ? NOTIFICATION_STATE.NOTHING : mutedState;
       }
 
       if (typeof mutedState === 'boolean') {
-        const migratedMutedState = this.selfUser().inTeam()
+        const migratedMutedState = !!this.selfUser()?.teamId
           ? NOTIFICATION_STATE.MENTIONS_AND_REPLIES
           : NOTIFICATION_STATE.NOTHING;
         return this.mutedState() ? migratedMutedState : NOTIFICATION_STATE.EVERYTHING;
@@ -1020,7 +1020,7 @@ export class Conversation {
       receipt_mode: this.receiptMode(),
       roles: this.roles(),
       status: this.status(),
-      team_id: this.team_id,
+      team_id: this.teamId,
       type: this.type(),
       verification_state: this.verification_state(),
       mlsVerificationState: this.mlsVerificationState(),

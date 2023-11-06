@@ -28,11 +28,13 @@ import React, {
 
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
+import {container} from 'tsyringe';
 
 import {Availability} from '@wireapp/protocol-messaging';
 
 import {AvailabilityState} from 'Components/AvailabilityState';
 import {Avatar, AVATAR_SIZE, GroupAvatar} from 'Components/Avatar';
+import {TeamState} from 'src/script/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isKey, isOneOfKeys, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -56,6 +58,7 @@ export interface ConversationListCellProps {
   isFocused?: boolean;
   // This method resetting the current focused conversation to first conversation on click outside or click tab or shift + tab
   resetConversationFocus: () => void;
+  teamState?: TeamState;
 }
 
 const ConversationListCell = ({
@@ -69,6 +72,7 @@ const ConversationListCell = ({
   handleArrowKeyDown,
   isFocused = false,
   resetConversationFocus,
+  teamState = container.resolve(TeamState),
 }: ConversationListCellProps) => {
   const {
     isGroup,
@@ -208,7 +212,7 @@ const ConversationListCell = ({
           </div>
 
           <div className="conversation-list-cell-center">
-            {is1to1 && selfUser?.inTeam() ? (
+            {is1to1 && selfUser && teamState.isInTeam(selfUser) ? (
               <AvailabilityState
                 className="conversation-list-cell-availability"
                 availability={availabilityOfUser}

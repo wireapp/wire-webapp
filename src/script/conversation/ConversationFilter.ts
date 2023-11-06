@@ -29,7 +29,7 @@ export class ConversationFilter {
   }
 
   static isInTeam(conversationEntity: Conversation, userEntity: User): boolean {
-    return userEntity.teamId === conversationEntity.team_id && conversationEntity.domain === userEntity.domain;
+    return userEntity.teamId === conversationEntity.teamId && conversationEntity.domain === userEntity.domain;
   }
 
   static showCallControls(conversationEntity: Conversation, hasCall: boolean): boolean {
