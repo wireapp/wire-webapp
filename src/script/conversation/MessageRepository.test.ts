@@ -47,6 +47,7 @@ import {EventRepository} from '../event/EventRepository';
 import {EventService} from '../event/EventService';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {ReactionMap} from '../storage';
+import {TeamState} from '../team/TeamState';
 import {ServerTimeHandler, serverTimeHandler} from '../time/serverTimeHandler';
 import {UserRepository} from '../user/UserRepository';
 import {UserState} from '../user/UserState';
@@ -80,6 +81,8 @@ async function buildMessageRepository(): Promise<[MessageRepository, MessageRepo
   clientState.currentClient = new ClientEntity(true, '');
   const core = new Account();
 
+  const teamState = new TeamState();
+
   const conversationState = new ConversationState(userState);
   const selfConversation = new Conversation(selfUser.id);
   selfConversation.selfUser(selfUser);
@@ -97,6 +100,7 @@ async function buildMessageRepository(): Promise<[MessageRepository, MessageRepo
     userState,
     clientState,
     conversationState,
+    teamState,
     core,
   };
 

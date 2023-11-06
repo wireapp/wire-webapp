@@ -95,6 +95,7 @@ import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 import {Core} from '../service/CoreSingleton';
 import type {EventRecord, ReactionMap} from '../storage';
+import {TeamState} from '../team/TeamState';
 import {ServerTimeHandler} from '../time/serverTimeHandler';
 import {UserType} from '../tracking/attribute';
 import {EventName} from '../tracking/EventName';
@@ -166,6 +167,7 @@ export class MessageRepository {
     private readonly userState = container.resolve(UserState),
     private readonly clientState = container.resolve(ClientState),
     private readonly conversationState = container.resolve(ConversationState),
+    private readonly teamState = container.resolve(TeamState),
     private readonly core = container.resolve(Core),
   ) {
     this.logger = getLogger('MessageRepository');
@@ -965,7 +967,7 @@ export class MessageRepository {
       return !!this.propertyRepository.receiptMode();
     }
 
-    if (conversationEntity.team_id && conversationEntity.isGroup()) {
+    if (conversationEntity.teamId && conversationEntity.isGroup()) {
       return !!conversationEntity.receiptMode();
     }
 
@@ -1139,7 +1141,7 @@ export class MessageRepository {
       // we can remove the filter when we actually want this feature in federated env (and we will need to implement federation for the core broadcastService)
       .filter(user => !user.isFederated)
       .sort(({id: idA}, {id: idB}) => idA.localeCompare(idB, undefined, {sensitivity: 'base'}));
-    const [members, other] = partition(sortedUsers, user => user.isTeamMember());
+    const [members, other] = partition(sortedUsers, user => this.teamState.isInTeam(user));
     const users = [this.userState.self(), ...members, ...other].slice(
       0,
       UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST,
@@ -1473,7 +1475,7 @@ export class MessageRepository {
         [Segmentation.CONVERSATION.SERVICES]: roundLogarithmic(services, 6),
         [Segmentation.MESSAGE.ACTION]: actionType,
       };
-      const isTeamConversation = !!conversationEntity.team_id;
+      const isTeamConversation = !!conversationEntity.teamId;
       if (isTeamConversation) {
         segmentations = {
           ...segmentations,
