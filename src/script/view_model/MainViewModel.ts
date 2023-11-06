@@ -113,6 +113,8 @@ export class MainViewModel {
       repositories.conversation,
       repositories.integration,
       repositories.message,
+      userState,
+      this,
     );
 
     this.calling = new CallingViewModel(
