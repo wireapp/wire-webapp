@@ -19,7 +19,7 @@
 
 import {faker} from '@faker-js/faker';
 import {QualifiedId, UserAssetType} from '@wireapp/api-client/lib/user';
-import type {User as APIClientUser} from '@wireapp/api-client/lib/user/';
+import type {User as APIClientUser} from '@wireapp/api-client/lib/user';
 
 import {createUuid} from 'Util/uuid';
 

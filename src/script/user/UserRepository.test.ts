@@ -18,7 +18,7 @@
  */
 
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
+import type {User as APIClientUser} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
@@ -81,6 +81,14 @@ async function buildUserRepository() {
       teamState,
     },
   ] as const;
+}
+
+function createConnections(users: APIClientUser[]) {
+  return users.map(user => {
+    const connection = new ConnectionEntity();
+    connection.userId = user.qualified_id;
+    return connection;
+  });
 }
 
 describe('UserRepository', () => {
@@ -236,22 +244,25 @@ describe('UserRepository', () => {
       const localUsers = [generateAPIUser(), generateAPIUser(), generateAPIUser()];
       let userRepository: UserRepository;
       let userState: UserState;
+      let userService: UserService;
 
       beforeEach(async () => {
-        [userRepository, {userState}] = await buildUserRepository();
+        [userRepository, {userState, userService}] = await buildUserRepository();
         jest.resetAllMocks();
-        jest.spyOn(userRepository['userService'], 'loadUserFromDb').mockResolvedValue(localUsers);
+        jest.spyOn(userService, 'loadUserFromDb').mockResolvedValue(localUsers);
         const selfUser = new User('self');
         selfUser.isMe = true;
+        userState.self(selfUser);
         userState.users([selfUser]);
       });
 
       it('loads all users from backend even when they are already known locally', async () => {
         const newUsers = [generateAPIUser(), generateAPIUser()];
         const users = [...localUsers, ...newUsers];
-        const fetchUserSpy = jest.spyOn(userRepository['userService'], 'getUsers').mockResolvedValue({found: users});
+        const connections = createConnections(users);
+        const fetchUserSpy = jest.spyOn(userService, 'getUsers').mockResolvedValue({found: users});
 
-        await userRepository.loadUsers(new User('self'), [], []);
+        await userRepository.loadUsers(new User('self'), connections, []);
 
         expect(userState.users()).toHaveLength(users.length + 1);
         expect(fetchUserSpy).toHaveBeenCalledWith(users.map(user => user.qualified_id!));
@@ -260,15 +271,8 @@ describe('UserRepository', () => {
       it('assigns connections with users', async () => {
         const newUsers = [generateAPIUser(), generateAPIUser()];
         const users = [...localUsers, ...newUsers];
-        jest.spyOn(userRepository['userService'], 'getUsers').mockResolvedValue({found: users});
-
-        const createConnectionWithUser = (userId: QualifiedId) => {
-          const connection = new ConnectionEntity();
-          connection.userId = userId;
-          return connection;
-        };
-
-        const connections = users.map(user => createConnectionWithUser(user.qualified_id));
+        const connections = createConnections(users);
+        jest.spyOn(userService, 'getUsers').mockResolvedValue({found: users});
 
         await userRepository.loadUsers(new User('self'), connections, []);
 
@@ -281,17 +285,16 @@ describe('UserRepository', () => {
 
       it('loads users that are partially stored in the DB and maps availability', async () => {
         const userIds = localUsers.map(user => user.qualified_id!);
+        const connections = createConnections(localUsers);
         const partialUsers = [
           {id: userIds[0].id, availability: Availability.Type.AVAILABLE},
           {id: userIds[1].id, availability: Availability.Type.BUSY},
         ];
 
         jest.spyOn(userRepository['userService'], 'loadUserFromDb').mockResolvedValue(partialUsers as any);
-        const fetchUserSpy = jest
-          .spyOn(userRepository['userService'], 'getUsers')
-          .mockResolvedValue({found: localUsers});
+        const fetchUserSpy = jest.spyOn(userService, 'getUsers').mockResolvedValue({found: localUsers});
 
-        await userRepository.loadUsers(new User('self'), [], []);
+        await userRepository.loadUsers(new User('self'), connections, []);
 
         expect(userState.users()).toHaveLength(localUsers.length + 1);
         expect(fetchUserSpy).toHaveBeenCalledWith(userIds);
@@ -302,10 +305,11 @@ describe('UserRepository', () => {
 
       it('deletes users that are not needed', async () => {
         const newUsers = [generateAPIUser(), generateAPIUser()];
-        const removeUserSpy = jest.spyOn(userRepository['userService'], 'removeUserFromDb').mockResolvedValue();
-        jest.spyOn(userRepository['userService'], 'getUsers').mockResolvedValue({found: newUsers});
+        const connections = createConnections(newUsers);
+        const removeUserSpy = jest.spyOn(userService, 'removeUserFromDb').mockResolvedValue();
+        jest.spyOn(userService, 'getUsers').mockResolvedValue({found: newUsers});
 
-        await userRepository.loadUsers(new User(), [], []);
+        await userRepository.loadUsers(new User(), connections, []);
 
         expect(userState.users()).toHaveLength(newUsers.length + 1);
         expect(removeUserSpy).toHaveBeenCalledTimes(localUsers.length);
