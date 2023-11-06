@@ -91,7 +91,7 @@
     "@types/react-transition-group": "4.4.8",
     "@types/redux-mock-store": "1.0.5",
     "@types/seedrandom": "^3",
-    "@types/sinon": "10.0.19",
+    "@types/sinon": "17.0.0",
     "@types/speakingurl": "13.0.5",
     "@types/underscore": "1.11.12",
     "@types/webpack-env": "1.18.3",
