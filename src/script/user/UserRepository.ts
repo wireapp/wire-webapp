@@ -194,7 +194,6 @@ export class UserRepository {
    * @param selfUser the user currently logged in (will be excluded from fetch)
    * @param connections the connection to other users
    * @param conversations the conversation the user is part of (used to compute extra users that are part of those conversations but not directly connected to the user)
-   * @param extraUsers other users that would need to be loaded (team users usually that are not direct connections)
    */
   async loadUsers(selfUser: User, connections: ConnectionEntity[], conversations: Conversation[]): Promise<User[]> {
     const conversationMembers = flatten(conversations.map(conversation => conversation.participating_user_ids()));
