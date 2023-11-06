@@ -212,7 +212,7 @@ const ConversationListCell = ({
           </div>
 
           <div className="conversation-list-cell-center">
-            {is1to1 && selfUser && teamState.isInTeam(selfUser) ? (
+            {is1to1 && selfUser?.teamId ? (
               <AvailabilityState
                 className="conversation-list-cell-availability"
                 availability={availabilityOfUser}

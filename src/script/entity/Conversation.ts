@@ -300,7 +300,7 @@ export class Conversation {
       const knownNotificationStates = Object.values(NOTIFICATION_STATE);
       if (knownNotificationStates.includes(mutedState)) {
         const isStateMentionsAndReplies = mutedState === NOTIFICATION_STATE.MENTIONS_AND_REPLIES;
-        const isInvalidState = isStateMentionsAndReplies && !!this.selfUser()?.teamId;
+        const isInvalidState = isStateMentionsAndReplies && !this.selfUser()?.teamId;
 
         return isInvalidState ? NOTIFICATION_STATE.NOTHING : mutedState;
       }
