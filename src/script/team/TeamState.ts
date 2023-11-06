@@ -57,13 +57,11 @@ export class TeamState {
   /** all the members of the team + the users the selfUser is connected with */
   readonly teamUsers: ko.PureComputed<User[]>;
   readonly isTeam: ko.PureComputed<boolean>;
-  readonly team: ko.Observable<TeamEntity>;
+  readonly team = ko.observable(new TeamEntity());
   readonly teamDomain: ko.PureComputed<string>;
   readonly teamSize: ko.PureComputed<number>;
 
   constructor(private readonly userState = container.resolve(UserState)) {
-    this.team = ko.observable();
-
     this.isTeam = ko.pureComputed(() => !!this.team()?.id);
     this.isTeamDeleted = ko.observable(false);
 

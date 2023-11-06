@@ -72,9 +72,6 @@ const UserDetailsComponent: React.FC<UserDetailsProps> = ({
     amplify.publish(WebAppEvents.USER.UPDATE, participant.qualifiedId);
   }, [participant]);
 
-  const isFederated = participant.isFederated;
-  const isGuest = !isFederated && user.isGuest;
-
   return (
     <div className="panel-participant">
       <div className="panel-participant__head">
@@ -126,14 +123,14 @@ const UserDetailsComponent: React.FC<UserDetailsProps> = ({
         </div>
       )}
 
-      {isFederated && (
+      {participant.isFederated && (
         <div className="panel-participant__label" data-uie-name="status-federated-user">
           <Icon.Federation />
           <span>{t('conversationFederationIndicator')}</span>
         </div>
       )}
 
-      {isGuest && user.isAvailable && !isFederated && (
+      {user.isGuest && user.isAvailable && (
         <div className="panel-participant__label" data-uie-name="status-guest">
           <Icon.Guest />
           <span>{t('conversationGuestIndicator')}</span>
