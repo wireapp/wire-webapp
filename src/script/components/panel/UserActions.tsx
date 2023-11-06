@@ -22,9 +22,11 @@ import React from 'react';
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {amplify} from 'amplify';
+import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {TeamState} from 'src/script/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
@@ -72,6 +74,7 @@ export interface UserActionsProps {
   onAction: (action: Actions) => void;
   selfUser: User;
   user: User;
+  teamState?: TeamState;
 }
 
 function createPlaceholder1to1Conversation(user: User, selfUser: User) {
@@ -96,13 +99,13 @@ const UserActions: React.FC<UserActionsProps> = ({
   onAction,
   conversationRoleRepository,
   selfUser,
+  teamState = container.resolve(TeamState),
 }) => {
   const {
     isAvailable,
     isBlocked,
     isCanceled,
     isRequest,
-    isTeamMember,
     isTemporaryGuest,
     isUnknown,
     isConnected,
@@ -111,7 +114,6 @@ const UserActions: React.FC<UserActionsProps> = ({
   } = useKoSubscribableChildren(user, [
     'isAvailable',
     'isTemporaryGuest',
-    'isTeamMember',
     'isBlocked',
     'isOutgoingRequest',
     'isIncomingRequest',
@@ -120,6 +122,7 @@ const UserActions: React.FC<UserActionsProps> = ({
     'isUnknown',
     'isConnected',
   ]);
+  const isTeamMember = teamState.isInTeam(user);
 
   const isNotMe = !user.isMe && isSelfActivated;
 

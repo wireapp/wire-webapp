@@ -911,8 +911,8 @@ export class UserRepository {
     const selfTeamId = this.userState.self().teamId;
     userEntities.forEach(userEntity => {
       if (!userEntity.isMe && selfTeamId) {
-        const isTeamMember = selfTeamId === userEntity.teamId;
-        const isGuest = !userEntity.isService && !isTeamMember && selfTeamId !== userEntity.teamId;
+        const isTeamMember = this.teamState.isInTeam(userEntity);
+        const isGuest = !userEntity.isService && !isTeamMember;
         userEntity.isGuest(isGuest);
         userEntity.isTeamMember(isTeamMember);
       }
