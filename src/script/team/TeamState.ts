@@ -136,7 +136,8 @@ export class TeamState {
   }
 
   isInTeam(entity: User | Conversation): boolean {
-    return !!this.team() && entity.teamId === this.team().id;
+    const team = this.team();
+    return !!team.id && entity.domain === this.teamDomain() && entity.teamId === team.id;
   }
 
   readonly isExternal = (userId: string): boolean => {
