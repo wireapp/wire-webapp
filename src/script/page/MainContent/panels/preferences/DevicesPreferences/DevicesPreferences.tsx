@@ -126,15 +126,12 @@ export const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
       <fieldset className="preferences-section" data-uie-name="preferences-device-current">
         <legend className="preferences-header">{t('preferencesDevicesCurrent')}</legend>
         {currentClient && (
-          <>
-            <DetailedDevice
-              device={currentClient}
-              fingerprint={localFingerprint}
-              certificate={certificate}
-              isProteusVerified={isSelfClientVerified}
-            />
-            <DetailedDevice device={currentClient} fingerprint={localFingerprint} />
-          </>
+          <DetailedDevice
+            device={currentClient}
+            fingerprint={localFingerprint}
+            certificate={certificate}
+            isProteusVerified={isSelfClientVerified}
+          />
         )}
       </fieldset>
 

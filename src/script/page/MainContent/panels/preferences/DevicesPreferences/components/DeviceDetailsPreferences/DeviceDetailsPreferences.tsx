@@ -150,11 +150,7 @@ export const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
           </div>
         </section>
 
-        <section className="preferences-section">
-          <header className="preferences-header">
-            <hr className="preferences-separator" />
-          </header>
-        </section>
+        <hr className="preferences-separator" />
 
         {!device.isLegalHold() && (
           <section className="preferences-section">

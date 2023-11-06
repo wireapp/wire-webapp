@@ -29,6 +29,8 @@ import {
   ProteusVerified,
 } from '@wireapp/react-ui-kit';
 
+import {t} from 'Util/LocalizerUtil';
+
 export enum MLSStatuses {
   VALID = 'valid',
   NOT_DOWNLOADED = 'not_downloaded',
@@ -90,12 +92,12 @@ export const VerificationBadges: React.FC<VerificationBadgesProps> = ({
     <div className="conversation-badges" style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
       {showMLSBadge && (
         <div style={badgeWrapper}>
-          {displayTitle && <span style={title(true)}>Verified (End-to-end Identity)</span>}
+          {displayTitle && <span style={title(true)}>{t('E2EI.verified')}</span>}
 
           {!isExpired && !isNotDownloaded && !isExpiresSoon && (
             <span
               className="with-tooltip with-tooltip--external"
-              data-tooltip="Device verified (End-to-end identity)"
+              data-tooltip={t('E2EI.deviceVerified')}
               style={iconStyles}
               data-uie-name="mls-status"
               data-uie-value={MLSStatuses.VALID}
@@ -107,7 +109,7 @@ export const VerificationBadges: React.FC<VerificationBadgesProps> = ({
           {isExpired && (
             <span
               className="with-tooltip with-tooltip--external"
-              data-tooltip="End-to-end identity certificate expired"
+              data-tooltip={t('E2EI.certificateExpired')}
               style={iconStyles}
               data-uie-name="mls-status"
               data-uie-value={MLSStatuses.EXPIRED}
@@ -119,7 +121,7 @@ export const VerificationBadges: React.FC<VerificationBadgesProps> = ({
           {isExpiresSoon && (
             <span
               className="with-tooltip with-tooltip--external"
-              data-tooltip="End-to-end identity certificate expires soon"
+              data-tooltip={t('E2EI.certificateExpiresSoon')}
               style={iconStyles}
               data-uie-name="mls-status"
               data-uie-value={MLSStatuses.EXPIRES_SOON}
@@ -131,7 +133,7 @@ export const VerificationBadges: React.FC<VerificationBadgesProps> = ({
           {isNotDownloaded && (
             <span
               className="with-tooltip with-tooltip--external"
-              data-tooltip="End-to-end identity certificate revoked"
+              data-tooltip={t('E2EI.certificateRevoked')}
               style={iconStyles}
               data-uie-name="mls-status"
               data-uie-value={MLSStatuses.NOT_DOWNLOADED}
@@ -144,11 +146,11 @@ export const VerificationBadges: React.FC<VerificationBadgesProps> = ({
 
       {showProteusBadge && (
         <div style={badgeWrapper}>
-          {displayTitle && <span style={title(false)}>Verified (Proteus)</span>}
+          {displayTitle && <span style={title(false)}>{t('proteusVerifiedDetails')}</span>}
 
           <span
             className="with-tooltip with-tooltip--external"
-            data-tooltip="Device verified (Proteus)"
+            data-tooltip={t('proteusDeviceVerified')}
             style={iconStyles}
             data-uie-name="proteus-verified"
           >
