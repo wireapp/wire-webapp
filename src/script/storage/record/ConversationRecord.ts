@@ -47,6 +47,7 @@ export interface ConversationRecord {
   group_id: string;
   epoch: number;
   id: string;
+  initial_protocol: ConversationProtocol;
   is_guest: boolean;
   last_event_timestamp: number;
   last_read_timestamp: number;

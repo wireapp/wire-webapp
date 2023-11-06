@@ -106,6 +106,8 @@ export class Conversation {
   public groupId?: string;
   public epoch: number = -1;
   public cipherSuite: number = 1;
+  // Initial protocol is a protocol that was known by a webapp before any protocol update happened. For newly created conversations it is the same as protocol.
+  public initialProtocol: ConversationProtocol = this.protocol;
   public readonly display_name: ko.PureComputed<string>;
   public readonly firstUserEntity: ko.PureComputed<User | undefined>;
   public readonly globalMessageTimer: ko.Observable<number | null>;
@@ -1005,6 +1007,7 @@ export class Conversation {
       epoch: this.epoch,
       global_message_timer: this.globalMessageTimer(),
       group_id: this.groupId,
+      initial_protocol: this.initialProtocol,
       id: this.id,
       is_guest: this.isGuest(),
       last_event_timestamp: this.last_event_timestamp(),

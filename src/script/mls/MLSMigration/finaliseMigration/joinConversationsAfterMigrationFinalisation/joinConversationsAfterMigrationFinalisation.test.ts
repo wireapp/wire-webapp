@@ -25,8 +25,7 @@ import {
 } from '@wireapp/api-client/lib/conversation';
 import {container} from 'tsyringe';
 
-import {ConversationDatabaseData} from 'src/script/conversation/ConversationMapper';
-import {Conversation} from 'src/script/entity/Conversation';
+import {ConversationDatabaseData, ConversationMapper} from 'src/script/conversation/ConversationMapper';
 import {User} from 'src/script/entity/User';
 import {CONVERSATION} from 'src/script/event/Client';
 import {Core} from 'src/script/service/CoreSingleton';
@@ -38,6 +37,7 @@ import {joinConversationsAfterMigrationFinalisation} from './';
 const createMockedDBConversationEntry = (
   id: string,
   domain: string,
+  initialProtocol: ConversationProtocol,
   protocol: ConversationProtocol,
   type: CONVERSATION_TYPE,
 ): ConversationDatabaseData => ({
@@ -65,6 +65,7 @@ const createMockedDBConversationEntry = (
   global_message_timer: 0,
   group_id: 'AAEAAGzYgfBo4k5Eti33a4ZZ78cAYW50YS53aXJlLmxpbms=',
   id,
+  initial_protocol: initialProtocol,
   is_guest: false,
   last_event_timestamp: 1688640266515,
   last_read_timestamp: 1688640266515,
@@ -98,12 +99,15 @@ const createMockedDBConversationEntry = (
 const createConversation = (
   id: string,
   domain: string,
+  initialProtocol: ConversationProtocol,
   protocol: ConversationProtocol,
   type: CONVERSATION_TYPE,
   selfUser: User,
   groupId?: string,
 ) => {
-  const conversation = new Conversation(id, domain, protocol);
+  const conversationRecord = createMockedDBConversationEntry(id, domain, initialProtocol, protocol, type);
+
+  const [conversation] = ConversationMapper.mapConversations([conversationRecord]);
   conversation.type(type);
 
   if (protocol === ConversationProtocol.MLS) {
@@ -113,20 +117,6 @@ const createConversation = (
   conversation.selfUser(selfUser);
 
   return conversation;
-};
-
-const createdMigratedConversationEntities = (
-  id: string,
-  domain: string,
-  type: CONVERSATION_TYPE,
-  selfUser: User,
-  protocols: {localStore: ConversationProtocol; backend: ConversationProtocol},
-  groupId?: string,
-) => {
-  return {
-    conversationDatabaseData: createMockedDBConversationEntry(id, domain, protocols.localStore, type),
-    updatedConversation: createConversation(id, domain, protocols.backend, type, selfUser, groupId),
-  };
 };
 
 const testFactory = new TestFactory();
@@ -148,21 +138,18 @@ describe('joinConversationsAfterMigrationFinalisation', () => {
     const conversationGroupId = 'groupId1';
     const selfUser = new User(createUuid());
 
-    const {updatedConversation, conversationDatabaseData} = createdMigratedConversationEntities(
+    const mockedConversation = createConversation(
       conversationId,
       mockDomain,
+      ConversationProtocol.PROTEUS,
+      ConversationProtocol.MLS,
       CONVERSATION_TYPE.REGULAR,
       selfUser,
-      {
-        localStore: ConversationProtocol.PROTEUS,
-        backend: ConversationProtocol.MLS,
-      },
       conversationGroupId,
     );
 
     await joinConversationsAfterMigrationFinalisation({
-      updatedConversations: [updatedConversation],
-      initialDatabaseConversations: [conversationDatabaseData],
+      conversations: [mockedConversation],
       core: mockCore,
       conversationRepository,
     });
@@ -195,21 +182,18 @@ describe('joinConversationsAfterMigrationFinalisation', () => {
     const conversationGroupId = 'groupId1';
     const selfUser = new User(createUuid());
 
-    const {updatedConversation, conversationDatabaseData} = createdMigratedConversationEntities(
+    const mockedConversations = createConversation(
       conversationId,
       mockDomain,
+      ConversationProtocol.PROTEUS,
+      ConversationProtocol.MLS,
       CONVERSATION_TYPE.ONE_TO_ONE,
       selfUser,
-      {
-        localStore: ConversationProtocol.PROTEUS,
-        backend: ConversationProtocol.MLS,
-      },
       conversationGroupId,
     );
 
     await joinConversationsAfterMigrationFinalisation({
-      updatedConversations: [updatedConversation],
-      initialDatabaseConversations: [conversationDatabaseData],
+      conversations: [mockedConversations],
       core: mockCore,
       conversationRepository,
     });
@@ -231,57 +215,18 @@ describe('joinConversationsAfterMigrationFinalisation', () => {
     const conversationGroupId = 'groupId1';
     const selfUser = new User(createUuid());
 
-    const {updatedConversation, conversationDatabaseData} = createdMigratedConversationEntities(
+    const mockedConversation = createConversation(
       conversationId,
       mockDomain,
+      ConversationProtocol.MLS,
+      ConversationProtocol.MLS,
       CONVERSATION_TYPE.REGULAR,
       selfUser,
-      {
-        localStore: ConversationProtocol.MLS,
-        backend: ConversationProtocol.MLS,
-      },
       conversationGroupId,
     );
 
     await joinConversationsAfterMigrationFinalisation({
-      updatedConversations: [updatedConversation],
-      initialDatabaseConversations: [conversationDatabaseData],
-      core: mockCore,
-      conversationRepository,
-    });
-
-    expect(mockCore.service?.conversation.joinByExternalCommit).not.toHaveBeenCalled();
-
-    expect(conversationRepository['eventRepository'].injectEvent).not.toHaveBeenCalled();
-  });
-
-  it('Should not join MLS conversation if conversation was not in the store before', async () => {
-    const mockCore = container.resolve(Core);
-    const conversationRepository = await testFactory.exposeConversationActors();
-
-    jest.spyOn(mockCore.service!.conversation, 'mlsGroupExistsLocally').mockResolvedValue(false);
-    jest.spyOn(conversationRepository['eventRepository'], 'injectEvent');
-
-    const conversationId = 'conversation1';
-    const mockDomain = 'anta.wire.link';
-    const conversationGroupId = 'groupId1';
-    const selfUser = new User(createUuid());
-
-    const {updatedConversation} = createdMigratedConversationEntities(
-      conversationId,
-      mockDomain,
-      CONVERSATION_TYPE.REGULAR,
-      selfUser,
-      {
-        localStore: ConversationProtocol.PROTEUS,
-        backend: ConversationProtocol.MLS,
-      },
-      conversationGroupId,
-    );
-
-    await joinConversationsAfterMigrationFinalisation({
-      updatedConversations: [updatedConversation],
-      initialDatabaseConversations: [],
+      conversations: [mockedConversation],
       core: mockCore,
       conversationRepository,
     });
@@ -303,21 +248,18 @@ describe('joinConversationsAfterMigrationFinalisation', () => {
     const conversationGroupId = 'groupId1';
     const selfUser = new User(createUuid());
 
-    const {updatedConversation, conversationDatabaseData} = createdMigratedConversationEntities(
+    const mockedConversation = createConversation(
       conversationId,
       mockDomain,
+      ConversationProtocol.PROTEUS,
+      ConversationProtocol.PROTEUS,
       CONVERSATION_TYPE.REGULAR,
       selfUser,
-      {
-        localStore: ConversationProtocol.PROTEUS,
-        backend: ConversationProtocol.PROTEUS,
-      },
       conversationGroupId,
     );
 
     await joinConversationsAfterMigrationFinalisation({
-      updatedConversations: [updatedConversation],
-      initialDatabaseConversations: [conversationDatabaseData],
+      conversations: [mockedConversation],
       core: mockCore,
       conversationRepository,
     });

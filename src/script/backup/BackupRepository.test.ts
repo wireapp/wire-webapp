@@ -198,11 +198,12 @@ describe('BackupRepository', () => {
     it('successfully imports a backup', async () => {
       const [backupRepository, {backupService, conversationRepository}] = await buildBackupRepository();
       const user = new User('user1');
-      jest.spyOn(backupService, 'getDatabaseVersion').mockReturnValue(15);
+      const mockedDBVersion = 20;
+      jest.spyOn(backupService, 'getDatabaseVersion').mockReturnValue(mockedDBVersion);
       const importSpy = jest.spyOn(backupService, 'importEntities').mockResolvedValue(1);
       const users = [generateAPIUser(), generateAPIUser()];
 
-      const metadata = {...backupRepository.createMetaData(user, 'client1'), version: 15};
+      const metadata = {...backupRepository.createMetaData(user, 'client1'), version: mockedDBVersion};
 
       const files = {
         [Filename.METADATA]: JSON.stringify(metadata),

@@ -56,7 +56,6 @@ import {ClientRepository, ClientService} from '../client';
 import {Configuration} from '../Config';
 import {ConnectionRepository} from '../connection/ConnectionRepository';
 import {ConnectionService} from '../connection/ConnectionService';
-import {ConversationDatabaseData} from '../conversation/ConversationMapper';
 import {ConversationRepository} from '../conversation/ConversationRepository';
 import {ConversationService} from '../conversation/ConversationService';
 import {MessageRepository} from '../conversation/MessageRepository';
@@ -423,10 +422,7 @@ export class App {
       const connections = await connectionRepository.getConnections();
       telemetry.addStatistic(AppInitStatisticsValue.CONNECTIONS, connections.length, 50);
 
-      const initialLocalConversations =
-        await this.service.conversation.loadConversationStatesFromDb<ConversationDatabaseData>();
-
-      const conversations = await conversationRepository.loadConversations(initialLocalConversations);
+      const conversations = await conversationRepository.loadConversations();
 
       await userRepository.loadUsers(selfUser, connections, conversations, teamMembers);
 
@@ -463,8 +459,7 @@ export class App {
         if (supportsMLSMigration()) {
           //join all the mls groups that are known by the user but were migrated to mls
           await joinConversationsAfterMigrationFinalisation({
-            updatedConversations: conversations,
-            initialDatabaseConversations: initialLocalConversations,
+            conversations,
             core: this.core,
             conversationRepository: conversationRepository,
           });

@@ -579,15 +579,14 @@ export class ConversationRepository {
 
   /**
    * Will load all the conversations in memory
-   * @param initialLocalConversations conversations stored in the local database
    * @returns all the conversations from backend merged with the locally stored conversations and loaded into memory
    */
-  public async loadConversations(initialLocalConversations?: ConversationDatabaseData[]): Promise<Conversation[]> {
+  public async loadConversations(): Promise<Conversation[]> {
     const remoteConversations = await this.conversationService.getAllConversations().catch(error => {
       this.logger.error(`Failed to get all conversations from backend: ${error.message}`);
       return {found: []} as RemoteConversations;
     });
-    return this.loadRemoteConversations(remoteConversations, initialLocalConversations);
+    return this.loadRemoteConversations(remoteConversations);
   }
 
   /**
@@ -613,13 +612,8 @@ export class ConversationRepository {
    * @param remoteConversations new conversations fetched from backend
    * @returns the new conversations from backend merged with the locally stored conversations
    */
-  private async loadRemoteConversations(
-    remoteConversations: RemoteConversations,
-    initialLocalConversations?: ConversationDatabaseData[],
-  ): Promise<Conversation[]> {
-    const localConversations =
-      initialLocalConversations ||
-      (await this.conversationService.loadConversationStatesFromDb<ConversationDatabaseData>());
+  private async loadRemoteConversations(remoteConversations: RemoteConversations): Promise<Conversation[]> {
+    const localConversations = await this.conversationService.loadConversationStatesFromDb<ConversationDatabaseData>();
     let conversationsData: any[];
 
     if (!remoteConversations.found?.length) {

@@ -234,8 +234,20 @@ export class ConversationMapper {
       throw new ConversationError(BASE_ERROR_TYPE.INVALID_PARAMETER, BaseError.MESSAGE.INVALID_PARAMETER);
     }
 
-    const {creator, id, members, name, others, qualified_others, type, group_id, epoch, protocol, cipher_suite} =
-      conversationData;
+    const {
+      creator,
+      id,
+      members,
+      name,
+      others,
+      qualified_others,
+      type,
+      group_id,
+      epoch,
+      protocol,
+      cipher_suite,
+      initial_protocol,
+    } = conversationData;
 
     let conversationEntity = new Conversation(
       id,
@@ -246,6 +258,7 @@ export class ConversationMapper {
 
     conversationEntity.creator = creator;
     conversationEntity.groupId = group_id;
+    conversationEntity.initialProtocol = initial_protocol;
     conversationEntity.epoch = epoch ?? -1;
     conversationEntity.cipherSuite = cipher_suite;
     conversationEntity.type(type);

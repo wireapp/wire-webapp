@@ -21,7 +21,6 @@ import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 
 import {Account} from '@wireapp/core';
 
-import {ConversationDatabaseData} from 'src/script/conversation/ConversationMapper';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {MLSConversation, isMLSConversation} from 'src/script/conversation/ConversationSelectors';
 import {Conversation} from 'src/script/entity/Conversation';
@@ -32,17 +31,14 @@ import {initMLSConversations} from 'src/script/mls/MLSConversations';
  * Will join the MLS group and send a system message to the conversation if the conversation was previously using proteus and is now using MLS.
  * Should be called before we join new unestablished MLS conversations, otherwise we would join without insterting the system message.
  *
- * @param updatedConversations - list of conversations updated from the backend
- * @param initialDatabaseConversations - list of conversations stored in the local database before being updated from the backend
+ * @param conversations - list of conversations updated from the backend
  */
 export const joinConversationsAfterMigrationFinalisation = async ({
-  updatedConversations,
-  initialDatabaseConversations,
+  conversations,
   conversationRepository,
   core,
 }: {
-  updatedConversations: Conversation[];
-  initialDatabaseConversations: ConversationDatabaseData[];
+  conversations: Conversation[];
   conversationRepository: ConversationRepository;
   core: Account;
 }) => {
@@ -50,10 +46,7 @@ export const joinConversationsAfterMigrationFinalisation = async ({
   //if such conversations were previously using proteus, and now are using MLS,
   //it means that the self user did not take part in the migration and is joining a conversation late
   //we have to join the conversation with external commit and let user know that they might have missed some messages
-  const alreadyMigratedConversations = filterGroupConversationsAlreadyMigratedToMLS(
-    updatedConversations,
-    initialDatabaseConversations,
-  );
+  const alreadyMigratedConversations = filterGroupConversationsAlreadyMigratedToMLS(conversations);
 
   await initMLSConversations(
     alreadyMigratedConversations,
@@ -62,25 +55,12 @@ export const joinConversationsAfterMigrationFinalisation = async ({
   );
 };
 
-const filterGroupConversationsAlreadyMigratedToMLS = (
-  updatedConversations: Conversation[],
-  initialDatabaseConversations: ConversationDatabaseData[],
-) => {
-  return updatedConversations.filter((conversation): conversation is MLSConversation => {
+const filterGroupConversationsAlreadyMigratedToMLS = (conversations: Conversation[]) => {
+  return conversations.filter((conversation): conversation is MLSConversation => {
     if (!conversation.isGroup()) {
       return false;
     }
 
-    const localConversation = initialDatabaseConversations.find(localConversation => {
-      return localConversation.id === conversation.id;
-    });
-
-    if (!localConversation) {
-      return false;
-    }
-
-    const isConversationMigratedToMLS = isMLSConversation(conversation);
-
-    return localConversation.protocol === ConversationProtocol.PROTEUS && isConversationMigratedToMLS;
+    return isMLSConversation(conversation) && conversation.initialProtocol !== ConversationProtocol.MLS;
   });
 };
