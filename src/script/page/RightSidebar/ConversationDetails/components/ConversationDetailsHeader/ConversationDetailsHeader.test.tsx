@@ -31,7 +31,7 @@ import {Conversation} from '../../../../../entity/Conversation';
 const participant = new User('id');
 const service = new ServiceEntity({id: 'id'});
 const conversation = new Conversation(createUuid());
-conversation.display_name('Group Chat');
+conversation.name('Group Chat');
 conversation.type(CONVERSATION_TYPE.REGULAR);
 
 const getDefaultProps = () => ({

@@ -64,6 +64,6 @@ describe('VerificationBadges', () => {
     );
 
     const E2EIdentityStatus = getByTestId('mls-status');
-    expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.EXPIRED);
+    expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.EXPIRES_SOON);
   });
 });
