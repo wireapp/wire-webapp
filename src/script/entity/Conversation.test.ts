@@ -621,7 +621,7 @@ describe('Conversation', () => {
       conversation_et = new Conversation(createUuid());
       const selfUserEntity = new User(createUuid(), null);
       selfUserEntity.isMe = true;
-      selfUserEntity.inTeam(true);
+      selfUserEntity.teamId = createUuid();
       conversation_et.selfUser(selfUserEntity);
 
       // Is false for conversations not containing a guest
@@ -650,7 +650,7 @@ describe('Conversation', () => {
       expect(conversation_et.hasGuest()).toBe(true);
 
       // Is false for conversations containing a guest if the self user is a personal account
-      selfUserEntity.inTeam(false);
+      selfUserEntity.teamId = createUuid();
       conversation_et.type(CONVERSATION_TYPE.ONE_TO_ONE);
 
       expect(conversation_et.hasGuest()).toBe(false);
@@ -1003,7 +1003,7 @@ describe('Conversation', () => {
       conversationEntity.mutedState(NOTIFICATION_STATES.EVERYTHING);
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
-      selfUserEntity.inTeam(true);
+      selfUserEntity.teamId = createUuid();
       conversationEntity.mutedState(undefined);
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);

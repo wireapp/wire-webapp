@@ -795,7 +795,7 @@ export class UserRepository {
     if (this.teamState.isTeam()) {
       this.mapGuestStatus([updatedUser]);
     }
-    if (updatedUser && updatedUser.inTeam() && updatedUser.isDeleted) {
+    if (updatedUser && this.teamState.isInTeam(updatedUser) && updatedUser.isDeleted) {
       amplify.publish(WebAppEvents.TEAM.MEMBER_LEAVE, updatedUser.teamId, userId);
     }
     return updatedUser;
