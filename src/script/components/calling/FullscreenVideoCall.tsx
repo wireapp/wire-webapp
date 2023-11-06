@@ -19,12 +19,11 @@
 
 import React, {useEffect, useMemo} from 'react';
 
-import {css} from '@emotion/react';
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {container} from 'tsyringe';
 
 import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
-import {Button, ButtonVariant, IconButton, IconButtonVariant, Select, useMatchMedia} from '@wireapp/react-ui-kit';
+import {IconButton, IconButtonVariant, Select, useMatchMedia} from '@wireapp/react-ui-kit';
 
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {Icon} from 'Components/Icon';
@@ -35,7 +34,6 @@ import {t} from 'Util/LocalizerUtil';
 import {preventFocusOutside} from 'Util/util';
 
 import {ButtonGroup} from './ButtonGroup';
-// import {DeviceToggleButton} from './DeviceToggleButton';
 import {Duration} from './Duration';
 import {
   videoControlActiveStyles,
@@ -75,11 +73,17 @@ export interface FullscreenVideoCallProps {
   setMaximizedParticipant: (call: Call, participant: Participant | null) => void;
   switchCameraInput: (call: Call, deviceId: string) => void;
   switchMicrophoneInput: (call: Call, deviceId: string) => void;
+  switchSpeakerOutput: (call: Call, deviceId: string) => void;
   teamState?: TeamState;
   toggleCamera: (call: Call) => void;
   toggleMute: (call: Call, muteState: boolean) => void;
   toggleScreenshare: (call: Call) => void;
   videoGrid: Grid;
+}
+
+enum backgroundBlur {
+  isBlurred = 'isBlurred',
+  isNotBlurred = 'isNotBlurred',
 }
 
 const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
@@ -96,6 +100,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   activeCallViewTab,
   switchCameraInput,
   switchMicrophoneInput,
+  switchSpeakerOutput,
   setMaximizedParticipant,
   setActiveCallViewTab,
   toggleMute,
@@ -127,24 +132,24 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   const {videoInput: currentCameraDevice} = useKoSubscribableChildren(mediaDevicesHandler.currentDeviceId, [
     DeviceTypes.VIDEO_INPUT,
   ]);
-
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [audioOptionsOpen, setAudioOptionsOpen] = React.useState(false);
+  const [videoOptionsOpen, setVideoOptionsOpen] = React.useState(false);
   const minimize = () => multitasking.isMinimized(true);
   const {videoInput} = useKoSubscribableChildren(mediaDevicesHandler.availableDevices, [DeviceTypes.VIDEO_INPUT]);
   const showToggleVideo =
     isVideoCallingEnabled &&
     (call.initialType === CALL_TYPE.VIDEO ||
       conversation.supportsVideoCall(call.conversationType === CONV_TYPE.CONFERENCE));
+
   const availableCameras = useMemo(
-    () =>
-      videoInput.map(device => (device as MediaDeviceInfo).deviceId || (device as ElectronDesktopCapturerSource).id),
+    () => videoInput.map(device => (device as MediaDeviceInfo) || (device as ElectronDesktopCapturerSource)),
     [videoInput],
   );
-  const showSwitchCamera = availableCameras.length > 1;
 
-  const {audioInput: currentMicrophoneDevice} = useKoSubscribableChildren(mediaDevicesHandler.currentDeviceId, [
-    DeviceTypes.AUDIO_INPUT,
-  ]);
+  const {audioInput: currentMicrophoneDevice, audioOutput: currentSpeakerDevice} = useKoSubscribableChildren(
+    mediaDevicesHandler.currentDeviceId,
+    [DeviceTypes.AUDIO_INPUT, DeviceTypes.AUDIO_OUTPUT],
+  );
   const {audioInput, audioOutput} = useKoSubscribableChildren(mediaDevicesHandler.availableDevices, [
     DeviceTypes.AUDIO_INPUT,
     DeviceTypes.AUDIO_OUTPUT,
@@ -163,7 +168,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
 
   const audioOptions = [
     {
-      label: t('audioInputMicrophone'),
+      label: t('videoCallaudioInputMicrophone'),
       options: availableMicrophones.map(device => ({
         label: device.label,
         value: device.deviceId,
@@ -172,7 +177,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
       })),
     },
     {
-      label: t('audioOutputSpeaker'),
+      label: t('videoCallaudioOutputSpeaker'),
       options: availableSpeakers.map(device => ({
         label: device.label,
         value: device.deviceId,
@@ -181,6 +186,60 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
       })),
     },
   ];
+  const [selectedAudioOptions, setSelectedAudioOptions] = React.useState(() =>
+    [currentMicrophoneDevice, currentSpeakerDevice].flatMap(
+      device => audioOptions.flatMap(options => options.options.filter(item => item.id === device)) ?? [],
+    ),
+  );
+  const updateAudioOptions = (selectedOption: string) => {
+    const microphone = audioOptions[0].options.find(item => item.value === selectedOption) ?? selectedAudioOptions[0];
+    const speaker = audioOptions[1].options.find(item => item.value === selectedOption) ?? selectedAudioOptions[1];
+
+    setSelectedAudioOptions([microphone, speaker]);
+    switchMicrophoneInput(call, microphone.id);
+    switchSpeakerOutput(call, speaker.id);
+  };
+
+  const videoOptions = [
+    {
+      label: t('videoCallvideoInputCamera'),
+      options: availableCameras.map(device => ({
+        label: device.label,
+        value: device.deviceId,
+        dataUieName: device.deviceId,
+        id: device.deviceId,
+      })),
+    },
+    {
+      label: t('videoCallbackgroundBlurHeadline'),
+      options: [
+        {
+          label: t('videoCallbackgroundBlur'),
+          value: backgroundBlur.isBlurred,
+          dataUieName: backgroundBlur.isBlurred,
+          id: backgroundBlur.isBlurred,
+        },
+        {
+          label: t('videoCallbackgroundNotBlurred'),
+          value: backgroundBlur.isNotBlurred,
+          dataUieName: backgroundBlur.isNotBlurred,
+          id: backgroundBlur.isNotBlurred,
+        },
+      ],
+    },
+  ];
+
+  const [selectedVideoOptions, setSelectedVideoOptions] = React.useState(() =>
+    [currentCameraDevice].flatMap(
+      device => videoOptions.flatMap(options => options.options.filter(item => item.id === device)) ?? [],
+    ),
+  );
+  const updateVideoOptions = (selectedOption: string) => {
+    const camera = videoOptions[0].options.find(item => item.value === selectedOption) ?? selectedVideoOptions[0];
+    const blur = videoOptions[1].options.find(item => item.value === selectedOption) ?? selectedVideoOptions[1];
+    setSelectedVideoOptions([camera, blur]);
+    switchCameraInput(call, camera.id);
+  };
 
   const unreadMessagesCount = useAppState(state => state.unreadMessagesCount);
   const hasUnreadMessages = unreadMessagesCount > 0;
@@ -189,9 +248,10 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
 
   const totalPages = callPages.length;
 
-  const isSpaceOrEnterKey = (event: React.KeyboardEvent<HTMLDivElement>) => [KEY.ENTER, KEY.SPACE].includes(event.key);
+  const isSpaceOrEnterKey = (event: React.KeyboardEvent<HTMLButtonElement>) =>
+    [KEY.ENTER, KEY.SPACE].includes(event.key);
 
-  const handleToggleCameraKeydown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+  const handleToggleCameraKeydown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
     if (isSpaceOrEnterKey(event)) {
       toggleCamera(call);
     }
@@ -386,33 +446,34 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                   {isMuted ? <Icon.MicOff width={16} height={16} /> : <Icon.MicOn width={16} height={16} />}
                 </button>
 
-                {showSwitchMicrophone && !verticalBreakpoint && (
+                {showSwitchMicrophone && (
                   <button
-                    // variant={ButtonVariant.PRIMARY}
                     className="device-toggle-button"
                     onClick={() => {
-                      setIsOpen(prev => !prev);
+                      setAudioOptionsOpen(prev => !prev);
                     }}
-                    // onBlur={() => setIsOpen(false)}
+                    onBlur={() => setAudioOptionsOpen(false)}
                   >
-                    {isOpen ? (
+                    {audioOptionsOpen ? (
                       <>
-                        <Icon.Chevron width={12} height={12} />
                         <Select
+                          value={selectedAudioOptions}
                           id="select-microphone"
                           dataUieName="select-microphone"
                           controlShouldRenderValue={false}
                           isClearable={false}
                           backspaceRemovesValue={false}
                           hideSelectedOptions={false}
-                          className="device-toggle-button"
                           options={audioOptions}
+                          onChange={selectedOption => updateAudioOptions(String(selectedOption?.value))}
                           menuPlacement="top"
                           menuIsOpen
+                          wrapperCSS={{marginBottom: 0}}
                         />
+                        <Icon.Chevron css={{height: '16px'}} />
                       </>
                     ) : (
-                      <Icon.Chevron width={12} height={12} />
+                      <Icon.Chevron css={{rotate: '180deg', height: '16px'}} />
                     )}
                   </button>
                 )}
@@ -420,7 +481,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
 
               {showToggleVideo && (
                 <li className="video-controls__item">
-                  <div
+                  <button
                     className="video-controls__button"
                     data-uie-value={selfSharesCamera ? 'active' : 'inactive'}
                     onClick={() => toggleCamera(call)}
@@ -441,9 +502,39 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                     <span id="video-label" className="video-controls__button__label">
                       {t('videoCallOverlayCamera')}
                     </span>
+                  </button>
 
-                    {/* {showSwitchCamera && !verticalBreakpoint && (
-                      <DeviceToggleButton
+                  <button
+                    className="device-toggle-button"
+                    onClick={() => {
+                      setVideoOptionsOpen(prev => !prev);
+                    }}
+                    onBlur={() => setVideoOptionsOpen(false)}
+                  >
+                    {videoOptionsOpen ? (
+                      <>
+                        <Select
+                          value={selectedVideoOptions}
+                          onChange={selectedOption => updateVideoOptions(String(selectedOption?.value))}
+                          id="select-camera"
+                          dataUieName="select-camera"
+                          controlShouldRenderValue={false}
+                          isClearable={false}
+                          backspaceRemovesValue={false}
+                          hideSelectedOptions={false}
+                          options={videoOptions}
+                          menuPlacement="top"
+                          menuIsOpen
+                          wrapperCSS={{marginBottom: 0}}
+                        />
+                        <Icon.Chevron css={{height: '16px'}} />
+                      </>
+                    ) : (
+                      <Icon.Chevron css={{rotate: '180deg', height: '16px'}} />
+                    )}
+                  </button>
+
+                  {/*  <DeviceToggleButton
                         styles={css`
                           bottom: -38px;
                           left: 50%;
@@ -453,9 +544,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                         currentDevice={currentCameraDevice}
                         devices={availableCameras}
                         onChooseDevice={deviceId => switchCameraInput(call, deviceId)}
-                      />
-                    )} */}
-                  </div>
+                      />*/}
                 </li>
               )}
 

@@ -4223,12 +4223,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/color@npm:3.0.4":
-  version: 3.0.4
-  resolution: "@types/color@npm:3.0.4"
+"@types/color@npm:3.0.5":
+  version: 3.0.5
+  resolution: "@types/color@npm:3.0.5"
   dependencies:
     "@types/color-convert": "*"
-  checksum: 46935626ddeb8ae8877488b1f8f2f71b17a529c113673301a1dd7a64d917cb7a748545ac34ed30c188d66a2cd09c33abc24c87bd5b3a80d520cf1f35aaa2e476
+  checksum: 82cce7cb132b5c0898dd69b92a4663e34ad8f19db6a009bef7ef79d4840ddb4d5f7e793e2e64e3b4a60da92dc2ae33d1aa498981d0fcf0562917c9550603a99d
   languageName: node
   linkType: hard
 
@@ -5328,10 +5328,10 @@ __metadata:
   linkType: hard
 
 "@wireapp/react-ui-kit@file:.yalc/@wireapp/react-ui-kit::locator=wire-webapp%40workspace%3A.":
-  version: 9.9.10
-  resolution: "@wireapp/react-ui-kit@file:.yalc/@wireapp/react-ui-kit#.yalc/@wireapp/react-ui-kit::hash=b60a14&locator=wire-webapp%40workspace%3A."
+  version: 9.9.12
+  resolution: "@wireapp/react-ui-kit@file:.yalc/@wireapp/react-ui-kit#.yalc/@wireapp/react-ui-kit::hash=76c34f&locator=wire-webapp%40workspace%3A."
   dependencies:
-    "@types/color": 3.0.4
+    "@types/color": 3.0.5
     color: 4.2.3
     emotion-normalize: 11.0.1
     react-select: 5.7.5
@@ -5344,7 +5344,7 @@ __metadata:
   peerDependenciesMeta:
     "@types/react":
       optional: true
-  checksum: 73a55478e5f0a20915dc7c4f87ce50436c6c562bd3888f031f60d1ae342a10f232167254e40c83c19ca20c4adb8c83a613cdf089ae5ea2949f3735fad660cf30
+  checksum: 3c808e57297a0c6426425b1198fc38919e277cc0e8e5624de78048828dd4da3974095a7e200892fb9f7331bd394196cf7d83fcf578030a41bef302db3bc91a35
   languageName: node
   linkType: hard
 
