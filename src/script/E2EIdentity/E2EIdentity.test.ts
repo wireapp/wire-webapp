@@ -17,6 +17,7 @@
  *
  */
 
+import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import {container} from 'tsyringe';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
@@ -76,8 +77,8 @@ jest.mock('src/script/user/UserState', () => ({
 }));
 
 describe('E2EIHandler', () => {
-  const params = {discoveryUrl: 'http://example.com', gracePeriodInMS: 30000};
-  const newParams = {discoveryUrl: 'http://new-example.com', gracePeriodInMS: 60000};
+  const params = {discoveryUrl: 'http://example.com', gracePeriodInSeconds: 30};
+  const newParams = {discoveryUrl: 'http://new-example.com', gracePeriodInSeconds: 60};
   const user = {name: () => 'John Doe', username: () => 'johndoe'};
   let coreMock: Core;
   let userStateMock: UserState;
@@ -135,11 +136,11 @@ describe('E2EIHandler', () => {
 
     // Assuming that the instance exposes getters for discoveryUrl and gracePeriodInMS for testing purposes
     expect(instance['discoveryUrl']).toEqual(params.discoveryUrl);
-    expect(instance['gracePeriodInMS']).toEqual(params.gracePeriodInMS);
+    expect(instance['gracePeriodInMS']).toEqual(params.gracePeriodInSeconds * TimeInMillis.SECOND);
 
     instance.updateParams(newParams);
     expect(instance['discoveryUrl']).toEqual(newParams.discoveryUrl);
-    expect(instance['gracePeriodInMS']).toEqual(newParams.gracePeriodInMS);
+    expect(instance['gracePeriodInMS']).toEqual(newParams.gracePeriodInSeconds * TimeInMillis.SECOND);
   });
 
   it('should return true when supportsMLS returns true and ENABLE_E2EI is true', () => {

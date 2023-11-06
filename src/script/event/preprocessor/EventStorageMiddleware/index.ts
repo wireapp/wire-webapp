@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2023 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,16 +17,4 @@
  *
  */
 
-import type {SearchResult} from '@wireapp/api-client/lib/user/';
-import {container} from 'tsyringe';
-
-import {APIClient} from '../service/APIClientSingleton';
-
-export class SearchService {
-  constructor(private readonly apiClient = container.resolve(APIClient)) {}
-
-  async getContacts(query: string, numberOfRequestedUser: number, domain?: string): Promise<SearchResult> {
-    const request = await this.apiClient.api.user.getSearchContacts(query, numberOfRequestedUser, domain);
-    return request.response;
-  }
-}
+export * from './EventStorageMiddleware';

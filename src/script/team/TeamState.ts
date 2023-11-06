@@ -51,7 +51,9 @@ export class TeamState {
   public readonly isAppLockEnabled: ko.PureComputed<boolean>;
   public readonly isAppLockEnforced: ko.PureComputed<boolean>;
   public readonly appLockInactivityTimeoutSecs: ko.PureComputed<number>;
+  /** all the members of the team */
   readonly teamMembers: ko.PureComputed<User[]>;
+  /** all the members of the team + the users the selfUser is connected with */
   readonly teamUsers: ko.PureComputed<User[]>;
   readonly isTeam: ko.PureComputed<boolean>;
   readonly team: ko.Observable<TeamEntity>;
@@ -81,10 +83,6 @@ export class TeamState {
     });
 
     this.supportsLegalHold = ko.observable(false);
-
-    this.userState.isTeam = this.isTeam;
-    this.userState.teamMembers = this.teamMembers;
-    this.userState.teamUsers = this.teamUsers;
 
     this.isFileSharingSendingEnabled = ko.pureComputed(() => {
       const status = this.teamFeatures()?.fileSharing?.status;

@@ -31,7 +31,6 @@ const defaultProps: MessageActionsMenuProps = {
   contextMenu: {entries: ko.observable([{label: 'option1', text: 'option1'}])},
   isMessageFocused: true,
   handleActionMenuVisibility: jest.fn(),
-  messageWithSection: false,
   handleReactionClick: jest.fn(),
   reactionsTotalCount: 0,
   isRemovedFromConversation: false,

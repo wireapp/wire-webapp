@@ -168,7 +168,7 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
       <div className="message-quote__sender">
         <button
           type="button"
-          className="button-reset-default"
+          className="button-reset-default text-left"
           onClick={() => showUserDetails(quotedUser)}
           data-uie-name="label-name-quote"
           tabIndex={messageFocusedTabIndex}

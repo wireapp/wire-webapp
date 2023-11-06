@@ -25,6 +25,7 @@ import {container} from 'tsyringe';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
+import {isMLSConversation} from 'src/script/conversation/ConversationSelectors';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import type {Logger} from 'Util/Logger';
@@ -102,7 +103,8 @@ export const DeviceDetails = ({
     }
   };
 
-  const isMLSConversation = !!conversationState.activeConversation()?.isUsingMLSProtocol;
+  const activeConversation = conversationState.activeConversation();
+  const isConversationMLS = activeConversation && isMLSConversation(activeConversation);
   const mlsFingerprint = selectedClient.mlsPublicKeys?.[MLSPublicKeys.ED25519];
 
   return (
@@ -168,7 +170,7 @@ export const DeviceDetails = ({
           {t('preferencesDeviceDetailsFingerprintNotMatch')}
         </p>
 
-        {!isMLSConversation && (
+        {!isConversationMLS && (
           <Button
             variant={ButtonVariant.TERTIARY}
             showLoading={isResettingSession}
