@@ -17,6 +17,8 @@
  *
  */
 
+import {Permissions} from '@wireapp/api-client/lib/team/member';
+
 import {randomUUID} from 'crypto';
 
 import {User} from 'src/script/entity/User';
@@ -67,6 +69,12 @@ describe('TeamRepository', () => {
     has_more: false,
   };
   const team_metadata = teams_data.teams[0];
+  const team_members = {
+    members: [
+      {user: randomUUID(), permissions: {copy: Permissions.DEFAULT, self: Permissions.DEFAULT}},
+      {user: randomUUID(), permissions: {copy: Permissions.DEFAULT, self: Permissions.DEFAULT}},
+    ],
+  };
 
   describe('getTeam()', () => {
     it('returns the team entity', async () => {
@@ -80,6 +88,17 @@ describe('TeamRepository', () => {
 
       expect(team_et.creator).toEqual(team_data.creator);
       expect(team_et.id).toEqual(team_data.id);
+    });
+  });
+
+  describe('getAllTeamMembers()', () => {
+    it('returns team member entities', async () => {
+      const [teamRepo, {teamService}] = buildConnectionRepository();
+      jest.spyOn(teamService, 'getAllTeamMembers').mockResolvedValue({hasMore: false, members: team_members.members});
+      const entities = await teamRepo['getAllTeamMembers'](team_metadata.id);
+      expect(entities.length).toEqual(team_members.members.length);
+      expect(entities[0].userId).toEqual(team_members.members[0].user);
+      expect(entities[0].permissions).toEqual(team_members.members[0].permissions);
     });
   });
 
