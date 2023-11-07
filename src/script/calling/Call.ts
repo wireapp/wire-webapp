@@ -54,6 +54,7 @@ export class Call {
     Config.getConfig().FEATURE.ENFORCE_CONSTANT_BITRATE,
   );
   public readonly isConference: boolean;
+  public readonly isGroupOrConference: boolean;
   public readonly activeSpeakers: ko.ObservableArray<Participant> = ko.observableArray([]);
   public blockMessages: boolean = false;
   public currentPage: ko.Observable<number> = ko.observable(0);
@@ -95,6 +96,7 @@ export class Call {
     this.maximizedParticipant = ko.observable(null);
     this.muteState(isMuted ? MuteState.SELF_MUTED : MuteState.NOT_MUTED);
     this.isConference = [CONV_TYPE.CONFERENCE, CONV_TYPE.CONFERENCE_MLS].includes(this.conversationType);
+    this.isGroupOrConference = this.isConference || this.conversationType === CONV_TYPE.GROUP;
   }
 
   get hasWorkingAudioInput(): boolean {

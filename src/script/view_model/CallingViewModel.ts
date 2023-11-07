@@ -325,7 +325,7 @@ export class CallingViewModel {
 
     this.callActions = {
       answer: async (call: Call) => {
-        if (call.conversationType === CONV_TYPE.CONFERENCE && !this.callingRepository.supportsConferenceCalling) {
+        if (call.isConference && !this.callingRepository.supportsConferenceCalling) {
           PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
             primaryAction: {
               action: () => {
