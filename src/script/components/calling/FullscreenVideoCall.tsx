@@ -175,8 +175,8 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
       label: t('videoCallaudioInputMicrophone'),
       options: availableMicrophones.map(device => ({
         label: device.label,
-        value: device.deviceId,
-        dataUieName: device.deviceId,
+        value: `${device.deviceId}-input`,
+        dataUieName: `${device.deviceId}-input`,
         id: device.deviceId,
       })),
     },
@@ -184,20 +184,24 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
       label: t('videoCallaudioOutputSpeaker'),
       options: availableSpeakers.map(device => ({
         label: device.label,
-        value: device.deviceId,
-        dataUieName: device.deviceId,
+        value: `${device.deviceId}-output`,
+        dataUieName: `${device.deviceId}-output`,
         id: device.deviceId,
       })),
     },
   ];
   const [selectedAudioOptions, setSelectedAudioOptions] = React.useState(() =>
     [currentMicrophoneDevice, currentSpeakerDevice].flatMap(
-      device => audioOptions.flatMap(options => options.options.filter(item => item.id === device)) ?? [],
+      (device, index) => audioOptions[index].options.find(item => item.id === device) ?? audioOptions[index].options[0],
     ),
   );
-  const updateAudioOptions = (selectedOption: string) => {
-    const microphone = audioOptions[0].options.find(item => item.value === selectedOption) ?? selectedAudioOptions[0];
-    const speaker = audioOptions[1].options.find(item => item.value === selectedOption) ?? selectedAudioOptions[1];
+  const updateAudioOptions = (selectedOption: string, input: boolean) => {
+    const microphone = input
+      ? audioOptions[0].options.find(item => item.value === selectedOption) ?? selectedAudioOptions[0]
+      : selectedAudioOptions[0];
+    const speaker = !input
+      ? audioOptions[1].options.find(item => item.value === selectedOption) ?? selectedAudioOptions[1]
+      : selectedAudioOptions[1];
 
     setSelectedAudioOptions([microphone, speaker]);
     switchMicrophoneInput(call, microphone.id);
@@ -469,7 +473,12 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                           backspaceRemovesValue={false}
                           hideSelectedOptions={false}
                           options={audioOptions}
-                          onChange={selectedOption => updateAudioOptions(String(selectedOption?.value))}
+                          onChange={selectedOption => {
+                            updateAudioOptions(
+                              String(selectedOption?.value),
+                              String(selectedOption?.value).includes('input'),
+                            );
+                          }}
                           menuPlacement="top"
                           menuIsOpen
                           wrapperCSS={{marginBottom: 0}}

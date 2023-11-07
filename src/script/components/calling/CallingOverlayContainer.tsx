@@ -124,7 +124,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
   };
 
   const switchSpeakerOutput = (call: Call, deviceId: string) => {
-    mediaDevicesHandler.currentDeviceId.audioOutput(deviceId);
+    mediaDevicesHandler.currentDeviceId.audiooutput(deviceId);
     // callingRepository.refreshAudioInput();
   };
 
