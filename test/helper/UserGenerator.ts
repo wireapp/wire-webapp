@@ -61,7 +61,7 @@ export function generateAPIUser(
   };
 }
 
-export function generateUser(id?: QualifiedId): User {
-  const apiUser = generateAPIUser(id);
+export function generateUser(id?: QualifiedId, overwites?: Partial<APIClientUser>): User {
+  const apiUser = generateAPIUser(id, overwites);
   return new UserMapper(serverTimeHandler).mapUserFromJson(apiUser, '');
 }
