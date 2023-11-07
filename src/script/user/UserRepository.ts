@@ -194,19 +194,10 @@ export class UserRepository {
    * @param selfUser the user currently logged in (will be excluded from fetch)
    * @param connections the connection to other users
    * @param conversations the conversation the user is part of (used to compute extra users that are part of those conversations but not directly connected to the user)
-   * @param extraUsers other users that would need to be loaded (team users usually that are not direct connections)
    */
-  async loadUsers(
-    selfUser: User,
-    connections: ConnectionEntity[],
-    conversations: Conversation[],
-    extraUsers: QualifiedId[],
-  ): Promise<User[]> {
+  async loadUsers(selfUser: User, connections: ConnectionEntity[], conversations: Conversation[]): Promise<User[]> {
     const conversationMembers = flatten(conversations.map(conversation => conversation.participating_user_ids()));
-    const allUserIds = connections
-      .map(connectionEntity => connectionEntity.userId)
-      .concat(conversationMembers)
-      .concat(extraUsers);
+    const allUserIds = connections.map(connectionEntity => connectionEntity.userId).concat(conversationMembers);
     const users = uniq(allUserIds, false, (userId: QualifiedId) => userId.id);
 
     // Remove all users that have non-qualified Ids in DB (there could be duplicated entries one qualified and one non-qualified)

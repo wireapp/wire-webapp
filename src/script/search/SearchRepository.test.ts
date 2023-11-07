@@ -19,6 +19,7 @@
 
 import {User} from 'src/script/entity/User';
 import {generateUser} from 'test/helper/UserGenerator';
+import {createUuid} from 'Util/uuid';
 
 import {SearchRepository} from './SearchRepository';
 
@@ -232,6 +233,27 @@ describe('SearchRepository', () => {
       const suggestions = await searchRepository.searchByName('term');
 
       expect(suggestions.length).toEqual(localUsers.length - 1);
+    });
+
+    it('returns team users first', async () => {
+      const [searchRepository, {apiClient, userRepository}] = buildSearchRepository();
+      const teamId = createUuid();
+      const teamUsers = [generateUser(undefined, {team: teamId}), generateUser(undefined, {team: teamId})];
+      const otherTeamUsers = [generateUser(undefined, {team: createUuid()})];
+      const localUsers = [generateUser(), generateUser(), generateUser()];
+      const allUsers = [...localUsers, ...otherTeamUsers, ...teamUsers];
+      userRepository.getUsersById.mockResolvedValue(allUsers);
+
+      const searchResults = allUsers.map(({qualifiedId}) => qualifiedId);
+      jest
+        .spyOn(apiClient.api.user, 'getSearchContacts')
+        .mockResolvedValue({response: {documents: searchResults}} as any);
+
+      const suggestions = await searchRepository.searchByName('term', teamId);
+
+      expect(suggestions.length).toEqual(allUsers.length);
+      expect(suggestions[0].teamId).toEqual(teamId);
+      expect(suggestions[1].teamId).toEqual(teamId);
     });
   });
 });
