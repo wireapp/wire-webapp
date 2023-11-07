@@ -472,10 +472,9 @@ export class CallingRepository {
 
   private async warmupMediaStreams(call: Call, audio: boolean, camera: boolean): Promise<boolean> {
     // if it's a video call we query the video user media in order to display the video preview
-    const isGroup = [CONV_TYPE.CONFERENCE, CONV_TYPE.GROUP].includes(call.conversationType);
     try {
       camera = this.teamState.isVideoCallingEnabled() ? camera : false;
-      const mediaStream = await this.getMediaStream({audio, camera}, isGroup);
+      const mediaStream = await this.getMediaStream({audio, camera}, call.isGroupOrConference);
       if (call.state() !== CALL_STATE.NONE) {
         call.getSelfParticipant().updateMediaStream(mediaStream, true);
         if (camera) {
@@ -749,7 +748,7 @@ export class CallingRepository {
       );
       this.storeCall(call);
       const loadPreviewPromise =
-        [CONV_TYPE.CONFERENCE, CONV_TYPE.GROUP].includes(conversationType) && callType === CALL_TYPE.VIDEO
+        call.isGroupOrConference && callType === CALL_TYPE.VIDEO
           ? this.warmupMediaStreams(call, true, true)
           : Promise.resolve(true);
       const success = await loadPreviewPromise;
@@ -825,8 +824,7 @@ export class CallingRepository {
       );
     }
     try {
-      const isGroup = [CONV_TYPE.CONFERENCE, CONV_TYPE.GROUP].includes(call.conversationType);
-      const mediaStream = await this.getMediaStream({audio: true, screen: true}, isGroup);
+      const mediaStream = await this.getMediaStream({audio: true, screen: true}, call.isGroupOrConference);
       // https://stackoverflow.com/a/25179198/451634
       mediaStream.getVideoTracks()[0].onended = () => {
         this.wCall?.setVideoSendState(this.wUser, this.serializeQualifiedId(call.conversationId), VIDEO_STATE.STOPPED);
@@ -1362,7 +1360,9 @@ export class CallingRepository {
     const canRing = !conversation.showNotificationsNothing() && shouldRing && this.isReady;
     const selfParticipant = new Participant(this.selfUser, this.selfClientId);
     const isVideoCall = hasVideo ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL;
-    const isMuted = Config.getConfig().FEATURE.CONFERENCE_AUTO_MUTE && conversationType === CONV_TYPE.CONFERENCE;
+    const isMuted =
+      Config.getConfig().FEATURE.CONFERENCE_AUTO_MUTE &&
+      [CONV_TYPE.CONFERENCE, CONV_TYPE.CONFERENCE_MLS].includes(conversationType);
     const call = new Call(
       qualifiedUserId,
       conversation.qualifiedId,
@@ -1540,13 +1540,12 @@ export class CallingRepository {
         window.setTimeout(() => resolve(selfParticipant.getMediaStream()), 0);
       });
     }
-    const isGroup = [CONV_TYPE.CONFERENCE, CONV_TYPE.GROUP].includes(call.conversationType);
     this.mediaStreamQuery = (async () => {
       try {
         if (missingStreams.screen && selfParticipant.sharesScreen()) {
           return selfParticipant.getMediaStream();
         }
-        const mediaStream = await this.getMediaStream(missingStreams, isGroup);
+        const mediaStream = await this.getMediaStream(missingStreams, call.isGroupOrConference);
         this.mediaStreamQuery = undefined;
         const newStream = selfParticipant.updateMediaStream(mediaStream, true);
         return newStream;
