@@ -24,12 +24,15 @@ import {withTheme} from 'src/script/auth/util/test/TestUtil';
 
 import {E2EICertificateDetails} from './E2EICertificateDetails';
 
+const certificate: string =
+  '-----BEGIN CERTIFICATE-----MIICDzCCAbQCCQDzlU3qembswDAKBggqhkjOPQQDAjCBjjELMAkGA1UEBhMCREUxDzANBgNVBAgMBkJlcmxpbjEOMAwGA1UEBwwFTWl0dGUxDTALBgNVBAoMBFdpcmUxFDASBgNVBAsMC0VuZ2luZWVyaW5nMRQwEgYDVQQDDAtjYS53aXJlLmNvbTEjMCEGCSqGSIb3DQEJARYUZW5naW5lZXJpbmdAd2lyZS5jb20wHhcNMjMwNTE2MTcxNjE3WhcNMjMwNjE1MTcxNjE3WjCBjjELMAkGA1UEBhMCREUxDzANBgNVBAgMBkJlcmxpbjEOMAwGA1UEBwwFTWl0dGUxDTALBgNVBAoMBFdpcmUxFDASBgNVBAsMC0VuZ2luZWVyaW5nMRQwEgYDVQQDDAtjYS53aXJlLmNvbTEjMCEGCSqGSIb3DQEJARYUZW5naW5lZXJpbmdAd2lyZS5jb20wWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAASpxQ3hrzh5fPDan+vbcRT8fCQzaz3fIywUNxTRWzvGpPkRPPDegJ7h4G6aUqDfZFgvSsCCaaGaYYVF1di/tuYpMAoGCCqGSM49BAMCA0kAMEYCIQDHAeMUcjjP5J3Mbs3uIlPLd0tZQb0S6bEekXvHsxhYGAIhAKOoeyMqaHxj3qaHnpCBjY/0slt2QUbtDbpF3Lgz2l2S-----END CERTIFICATE-----';
+
 describe('E2ECertificateDetails', () => {
   const isMLSVerified = true;
 
   it('is e2e identity verified', async () => {
     const {getByTestId} = render(
-      withTheme(<E2EICertificateDetails certificate="PEM Cert" isMLSVerified={isMLSVerified} />),
+      withTheme(<E2EICertificateDetails certificate={certificate} isMLSVerified={isMLSVerified} />),
     );
 
     const E2EIdentityStatus = getByTestId('e2e-identity-status');
@@ -38,7 +41,7 @@ describe('E2ECertificateDetails', () => {
 
   it('is e2e identity not downloaded', async () => {
     const {getByTestId} = render(
-      withTheme(<E2EICertificateDetails isMLSVerified={isMLSVerified} certificate="PEM Cert" />),
+      withTheme(<E2EICertificateDetails isMLSVerified={isMLSVerified} certificate={certificate} />),
     );
 
     const E2EIdentityStatus = getByTestId('e2e-identity-status');
@@ -47,7 +50,7 @@ describe('E2ECertificateDetails', () => {
 
   it('is e2e identity expired', async () => {
     const {getByTestId} = render(
-      withTheme(<E2EICertificateDetails isMLSVerified={isMLSVerified} certificate="PEM Cert" />),
+      withTheme(<E2EICertificateDetails isMLSVerified={isMLSVerified} certificate={certificate} />),
     );
 
     const E2EIdentityStatus = getByTestId('e2e-identity-status');

@@ -45,7 +45,6 @@ export function isClientRecord(record: any): record is ClientRecord {
   return !!record.meta;
 }
 
-// TODO: Temporary checking for mls_public_keys
-export function hasMlsPublicKeys(client: any): client is RegisteredClient {
-  return !!client && 'mls_public_keys' in client;
+export function isRegisteredClient(record: any): record is RegisteredClient {
+  return !!record.cookie;
 }

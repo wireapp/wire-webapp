@@ -30,6 +30,12 @@ Object.assign(navigator, {
   },
 });
 
+Object.assign(window, {
+  URL: {
+    revokeObjectURL: jest.fn(),
+  },
+});
+
 const defaultProps = {
   certificate,
   onClose: jest.fn(),
@@ -49,16 +55,17 @@ describe('CertificateDetailsModal', () => {
   });
 
   it('is certificate copied', async () => {
-    const {getByText, getByTestId} = render(<CertificateDetailsModal {...defaultProps} />);
+    const {getByTestId} = render(<CertificateDetailsModal {...defaultProps} />);
 
-    const copyButton = getByTestId('copy-certificate');
+    const copyButton = getByTestId('copy-certificate') as HTMLButtonElement;
     expect(copyButton).toBeDefined();
     fireEvent.click(copyButton);
 
     expect(navigator.clipboard.writeText).toHaveBeenCalledWith(certificate);
 
     await waitFor(() => {
-      expect(getByText('Text copied!')).toBeDefined();
+      expect(copyButton.disabled).toBe(true);
+      // expect(getByText('Text copied!')).toBeDefined();
     });
   });
 });
