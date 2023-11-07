@@ -82,7 +82,7 @@ const UserSearchableList: React.FC<UserListProps> = ({
    */
   const fetchMembersFromBackend = useCallback(
     debounce(async (query: string, ignoreMembers: User[]) => {
-      const resultUsers = await searchRepository.searchByName(query);
+      const resultUsers = await searchRepository.searchByName(query, selfUser.teamId);
       const selfTeamId = selfUser.teamId;
       const foundMembers = resultUsers.filter(user => user.teamId === selfTeamId);
       const ignoreIds = ignoreMembers.map(member => member.id);
