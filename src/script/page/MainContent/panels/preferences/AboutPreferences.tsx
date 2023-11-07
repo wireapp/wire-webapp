@@ -23,32 +23,33 @@ import {container} from 'tsyringe';
 
 import {Link, LinkVariant} from '@wireapp/react-ui-kit';
 
+import {TeamState} from 'src/script/team/TeamState';
 import {t} from 'Util/LocalizerUtil';
 
 import {PreferencesPage} from './components/PreferencesPage';
 import {PreferencesSection} from './components/PreferencesSection';
 
 import {Config} from '../../../../Config';
+import {User} from '../../../../entity/User';
 import {getPrivacyPolicyUrl, getTermsOfUsePersonalUrl, getTermsOfUseTeamUrl, URL} from '../../../../externalRoute';
-import {UserState} from '../../../../user/UserState';
-import {useKoSubscribableChildren} from '../../../../util/ComponentUtil';
 
 interface AboutPreferencesProps {
-  userState?: UserState;
+  selfUser: User;
+  teamState: TeamState;
 }
 
-const AboutPreferences: React.FC<AboutPreferencesProps> = ({userState = container.resolve(UserState)}) => {
-  const {self} = useKoSubscribableChildren(userState, ['self']);
-  const {inTeam} = useKoSubscribableChildren(self, ['inTeam']);
+const AboutPreferences: React.FC<AboutPreferencesProps> = ({selfUser, teamState = container.resolve(TeamState)}) => {
+  const inTeam = teamState.isInTeam(selfUser);
   const config = Config.getConfig();
   const websiteUrl = URL.WEBSITE;
   const privacyPolicyUrl = getPrivacyPolicyUrl();
+
   const termsOfUseUrl = useMemo(() => {
-    if (self) {
+    if (selfUser) {
       return inTeam ? getTermsOfUseTeamUrl() : getTermsOfUsePersonalUrl();
     }
     return '';
-  }, [self, inTeam]);
+  }, [selfUser, inTeam]);
 
   const showWireSection = !!(termsOfUseUrl || websiteUrl || privacyPolicyUrl);
   const showSupportSection = !!(config.URL.SUPPORT.INDEX || config.URL.SUPPORT.CONTACT);

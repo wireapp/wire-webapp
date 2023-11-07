@@ -27,7 +27,6 @@ import {matchQualifiedIds} from 'Util/QualifiedId';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
 import {MuteState} from './CallState';
-import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import type {ClientId, Participant} from './Participant';
 
 import {Config} from '../Config';
@@ -56,7 +55,6 @@ export class Call {
   );
   public readonly activeSpeakers: ko.ObservableArray<Participant> = ko.observableArray([]);
   public blockMessages: boolean = false;
-  public type?: CALL_MESSAGE_TYPE;
   public currentPage: ko.Observable<number> = ko.observable(0);
   public pages: ko.ObservableArray<Participant[]> = ko.observableArray();
   readonly maximizedParticipant: ko.Observable<Participant | null>;
@@ -88,8 +86,8 @@ export class Call {
     this.initialType = callType;
     this.selfClientId = selfParticipant?.clientId;
     this.participants = ko.observableArray([selfParticipant]);
-    this.activeAudioOutput = this.mediaDevicesHandler.currentAvailableDeviceId.audioOutput();
-    this.mediaDevicesHandler.currentAvailableDeviceId.audioOutput.subscribe((newActiveAudioOutput: string) => {
+    this.activeAudioOutput = this.mediaDevicesHandler.currentAvailableDeviceId.audiooutput();
+    this.mediaDevicesHandler.currentAvailableDeviceId.audiooutput.subscribe((newActiveAudioOutput: string) => {
       this.activeAudioOutput = newActiveAudioOutput;
       this.updateAudioStreamsSink();
     });
@@ -206,12 +204,6 @@ export class Call {
 
   getRemoteParticipants(): Participant[] {
     return this.participants().filter(({user, clientId}) => !user.isMe || this.selfClientId !== clientId);
-  }
-
-  removeParticipant(participant: Participant): void {
-    this.participants.remove(participant);
-    this.activeSpeakers.remove(participant);
-    this.updatePages();
   }
 
   updatePages() {

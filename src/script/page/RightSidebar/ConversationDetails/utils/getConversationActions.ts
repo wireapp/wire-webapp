@@ -61,12 +61,21 @@ const getConversationActions = (
       },
     },
     {
-      condition: true,
+      condition: !conversationEntity.is_archived(),
       item: {
         click: async () => actionsViewModel.archiveConversation(conversationEntity),
         icon: 'archive-icon',
         identifier: 'do-archive',
         label: t('conversationDetailsActionArchive'),
+      },
+    },
+    {
+      condition: conversationEntity.is_archived(),
+      item: {
+        click: async () => actionsViewModel.unarchiveConversation(conversationEntity),
+        icon: 'archive-icon',
+        identifier: 'do-unarchive',
+        label: t('conversationsPopoverUnarchive'),
       },
     },
     {

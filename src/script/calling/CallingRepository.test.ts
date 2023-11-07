@@ -56,6 +56,9 @@ const createConversation = (
   const conversation = new Conversation(createUuid(), '', protocol);
   conversation.participating_user_ets.push(new User(createUuid()));
   conversation.type(type);
+  if (protocol === ConversationProtocol.MLS) {
+    conversation.groupId = 'group-id';
+  }
   return conversation;
 };
 
@@ -69,10 +72,10 @@ describe('CallingRepository', () => {
   const clientId = createUuid();
 
   const mediaDevices = {
-    audioInput: ko.pureComputed(() => 'test'),
-    audioOutput: ko.pureComputed(() => 'test'),
-    screenInput: ko.pureComputed(() => 'test'),
-    videoInput: ko.pureComputed(() => 'test'),
+    audioinput: ko.pureComputed(() => 'test'),
+    audiooutput: ko.pureComputed(() => 'test'),
+    screeninput: ko.pureComputed(() => 'test'),
+    videoinput: ko.pureComputed(() => 'test'),
   };
 
   beforeAll(() => {
@@ -136,7 +139,7 @@ describe('CallingRepository', () => {
         CALL_TYPE.NORMAL,
         {
           currentAvailableDeviceId: mediaDevices,
-        } as MediaDevicesHandler,
+        } as unknown as MediaDevicesHandler,
       );
       incomingCall.state(CALL_STATE.INCOMING);
 
@@ -148,7 +151,7 @@ describe('CallingRepository', () => {
         CALL_TYPE.NORMAL,
         {
           currentAvailableDeviceId: mediaDevices,
-        } as MediaDevicesHandler,
+        } as unknown as MediaDevicesHandler,
       );
       activeCall.state(CALL_STATE.MEDIA_ESTAB);
 
@@ -160,7 +163,7 @@ describe('CallingRepository', () => {
         CALL_TYPE.NORMAL,
         {
           currentAvailableDeviceId: mediaDevices,
-        } as MediaDevicesHandler,
+        } as unknown as MediaDevicesHandler,
       );
       declinedCall.state(CALL_STATE.INCOMING);
       declinedCall.reason(REASON.STILL_ONGOING);
@@ -183,7 +186,7 @@ describe('CallingRepository', () => {
         CALL_TYPE.NORMAL,
         {
           currentAvailableDeviceId: mediaDevices,
-        } as MediaDevicesHandler,
+        } as unknown as MediaDevicesHandler,
       );
       const source = new window.RTCAudioSource();
       const audioTrack = source.createTrack();
@@ -213,7 +216,7 @@ describe('CallingRepository', () => {
         CALL_TYPE.NORMAL,
         {
           currentAvailableDeviceId: mediaDevices,
-        } as MediaDevicesHandler,
+        } as unknown as MediaDevicesHandler,
       );
       const source = new window.RTCAudioSource();
       const audioTrack = source.createTrack();
@@ -249,7 +252,7 @@ describe('CallingRepository', () => {
         CALL_TYPE.NORMAL,
         {
           currentAvailableDeviceId: mediaDevices,
-        } as MediaDevicesHandler,
+        } as unknown as MediaDevicesHandler,
       );
       spyOn(callingRepository['callState'], 'joinedCall').and.returnValue(call);
       callingRepository.stopMediaSource(MediaType.AUDIO);
@@ -267,10 +270,10 @@ describe('CallingRepository', () => {
 
 describe('CallingRepository ISO', () => {
   const mediaDevices = {
-    audioInput: ko.pureComputed(() => 'test'),
-    audioOutput: ko.pureComputed(() => 'test'),
-    screenInput: ko.pureComputed(() => 'test'),
-    videoInput: ko.pureComputed(() => 'test'),
+    audioinput: ko.pureComputed(() => 'test'),
+    audiooutput: ko.pureComputed(() => 'test'),
+    screeninput: ko.pureComputed(() => 'test'),
+    videoinput: ko.pureComputed(() => 'test'),
   };
   describe('incoming call', () => {
     let avsUser: number;
@@ -297,7 +300,7 @@ describe('CallingRepository ISO', () => {
         {} as any, // MediaStreamHandler
         {
           currentAvailableDeviceId: mediaDevices,
-        } as MediaDevicesHandler, // mediaDevicesHandler
+        } as unknown as MediaDevicesHandler, // mediaDevicesHandler
         {
           toServerTimestamp: jest.fn().mockImplementation(() => Date.now()),
         } as any, // ServerTimeHandler

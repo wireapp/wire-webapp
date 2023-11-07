@@ -24,6 +24,8 @@ import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 
 import {getLogger, Logger} from 'Util/Logger';
 
+import {ClientEvent} from './Client';
+
 import {AssetTransferState} from '../assets/AssetTransferState';
 import {BaseError, BASE_ERROR_TYPE} from '../error/BaseError';
 import {ConversationError} from '../error/ConversationError';
@@ -36,7 +38,7 @@ import {StorageSchemata} from '../storage/StorageSchemata';
 export type Includes = {includeFrom: boolean; includeTo: boolean};
 type DexieCollection = Dexie.Collection<any, any>;
 export type DBEvents = DexieCollection | EventRecord[];
-type IdentifiedUpdatePayload = Partial<EventRecord> & Pick<EventRecord, 'primary_key'>;
+export type IdentifiedUpdatePayload = Partial<EventRecord> & Pick<EventRecord, 'primary_key'>;
 
 export const eventTimeToDate = (time: string) => new Date(time) || new Date(parseInt(time, 10));
 
@@ -154,41 +156,6 @@ export class EventService {
   }
 
   /**
-   * Load a replacing event from database.
-   * To be used in certain cases (during some cases with quoting) when the original message cannot be found.
-   *
-   * @param conversationId ID of conversation
-   * @param eventId ID of event to retrieve
-   */
-  async loadReplacingEvent(conversationId: string, eventId: string): Promise<EventRecord> {
-    if (!conversationId || !eventId) {
-      this.logger.error(`Cannot get event '${eventId}' in conversation '${conversationId}' without IDs`);
-      throw new ConversationError(BASE_ERROR_TYPE.MISSING_PARAMETER, BaseError.MESSAGE.MISSING_PARAMETER);
-    }
-
-    try {
-      if (this.storageService.db) {
-        return await this.storageService.db
-          .table(StorageSchemata.OBJECT_STORE.EVENTS)
-          .where('id')
-          .equals(eventId)
-          .filter(record => record.conversation === conversationId)
-          .first();
-      }
-
-      const records = (await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS)) as EventRecord[];
-      return records
-        .filter(record => record.conversation === conversationId && record.data?.replacing_message_id === eventId)
-        .sort(compareEventsById)
-        .shift();
-    } catch (error) {
-      const logMessage = `Failed to get event '${eventId}' for conversation '${conversationId}': ${error.message}`;
-      this.logger.error(logMessage, error);
-      throw error;
-    }
-  }
-
-  /**
    * Load all events matching a minimum category from the database.
    *
    * @param conversationId ID of conversation to add users to
@@ -239,7 +206,7 @@ export class EventService {
       return events;
     }
 
-    const records = await this.storageService.getAll<EventRecord>(StorageSchemata.OBJECT_STORE.EVENTS);
+    const records = await this.storageService.getAll<any>(StorageSchemata.OBJECT_STORE.EVENTS);
     return records
       .filter(record => {
         return (
@@ -418,7 +385,7 @@ export class EventService {
     reason: ProtobufAsset.NotUploaded | AssetTransferState,
   ): Promise<EventRecord | undefined> {
     const record = await this.storageService.load<EventRecord>(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey);
-    if (!record) {
+    if (!record || record.type !== ClientEvent.CONVERSATION.ASSET_ADD) {
       this.logger.warn('Did not find message to update asset (failed)');
       return undefined;
     }
@@ -457,12 +424,13 @@ export class EventService {
    * @param primaryKey Event primary key
    * @param changes Changes to update message with
    */
-  async updateEventSequentially(primaryKey: string, changes: Partial<EventRecord> = {}): Promise<number> {
+  async updateEventSequentially(changes: IdentifiedUpdatePayload): Promise<number> {
     const hasVersionedChanges = !!changes.version;
     if (!hasVersionedChanges) {
       throw new ConversationError(ConversationError.TYPE.WRONG_CHANGE, ConversationError.MESSAGE.WRONG_CHANGE);
     }
 
+    const {primary_key: primaryKey, ...updates} = changes;
     if (this.storageService.db) {
       // Create a DB transaction to avoid concurrent sequential update.
       return this.storageService.db.transaction('rw', StorageSchemata.OBJECT_STORE.EVENTS, async () => {
@@ -476,7 +444,7 @@ export class EventService {
         const databaseVersion = record.version || 1;
         const isSequentialUpdate = changes.version === databaseVersion + 1;
         if (isSequentialUpdate) {
-          return this.storageService.update(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey, changes);
+          return this.storageService.update(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey, updates);
         }
         const logMessage = 'Failed sequential database update';
         const logObject = {
@@ -487,7 +455,7 @@ export class EventService {
         throw new StorageError(StorageError.TYPE.NON_SEQUENTIAL_UPDATE, StorageError.MESSAGE.NON_SEQUENTIAL_UPDATE);
       });
     }
-    return this.storageService.update(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey, changes);
+    return this.storageService.update(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey, updates);
   }
 
   /**
@@ -498,15 +466,6 @@ export class EventService {
    */
   async deleteEvent(conversationId: string, eventId: string): Promise<number> {
     return this.storageService.deleteEventInConversation(StorageSchemata.OBJECT_STORE.EVENTS, conversationId, eventId);
-  }
-
-  /**
-   * Delete an event from a conversation with the given primary.
-   *
-   * @param primaryKey ID of the actual message
-   */
-  deleteEventByKey(primaryKey: string): Promise<string> {
-    return this.storageService.delete(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey);
   }
 
   /**

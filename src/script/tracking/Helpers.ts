@@ -42,7 +42,7 @@ export function getConversationType(conversationEntity: any): ConversationType |
   }
 }
 export function getGuestAttributes(conversationEntity: Conversation): GuestAttributes {
-  const isTeamConversation = !!conversationEntity.team_id;
+  const isTeamConversation = !!conversationEntity.teamId;
   if (isTeamConversation) {
     const isAllowGuests = !conversationEntity.isTeamOnly();
     const _getUserType = (_conversationEntity: Conversation) => {

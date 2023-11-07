@@ -26,6 +26,7 @@ import {amplify} from 'amplify';
 import {Checkbox, CheckboxLabel, IndicatorRangeInput} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {Theme} from 'Components/AppContainer/hooks/useTheme';
 import {RadioGroup} from 'Components/Radio';
 import {User} from 'src/script/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -34,7 +35,6 @@ import {t} from 'Util/LocalizerUtil';
 import {PreferencesPage} from './components/PreferencesPage';
 import {PreferencesSection} from './components/PreferencesSection';
 
-import {Theme} from '../../../../components/AppContainer/hooks/useTheme';
 import {RootFontSize, useRootFontSize} from '../../../../hooks/useRootFontSize';
 import {PropertiesRepository} from '../../../../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../../../../properties/PropertiesType';
@@ -45,7 +45,7 @@ interface OptionPreferencesProps {
 
 const fontSizes = Object.values(RootFontSize);
 
-const OptionPreferences: React.FC<OptionPreferencesProps> = ({propertiesRepository, selfUser}) => {
+const OptionPreferences = ({propertiesRepository, selfUser}: OptionPreferencesProps) => {
   const {isActivatedAccount} = useKoSubscribableChildren(selfUser, ['isActivatedAccount']);
   const {
     properties: {settings},

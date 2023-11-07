@@ -350,6 +350,7 @@ const testEventServiceClass = (testedServiceName, className) => {
         const initialEvent = {
           id: 'event-id',
           data: {content: ''},
+          type: 'conversation.asset-add',
         };
         const reason = AssetTransferState.UPLOAD_FAILED;
         spyOn(testFactory.storage_service, 'load').and.returnValue(Promise.resolve(initialEvent));
@@ -371,7 +372,7 @@ const testEventServiceClass = (testedServiceName, className) => {
       it('fails if changes do not contain version property', () => {
         const updates = {reactions: ['user-id']};
         return testFactory[testedServiceName]
-          .updateEventSequentially(12, updates)
+          .updateEventSequentially({primary_key: 12, ...updates})
           .then(fail)
           .catch(error => {
             expect(error.type).toBe(ConversationError.TYPE.WRONG_CHANGE);
@@ -384,7 +385,7 @@ const testEventServiceClass = (testedServiceName, className) => {
         spyOn(testFactory.storage_service, 'load').and.returnValue(Promise.resolve({version: 2}));
 
         return testFactory[testedServiceName]
-          .updateEventSequentially(12, updates)
+          .updateEventSequentially({primary_key: 12, ...updates})
           .then(fail)
           .catch(error => {
             expect(error.type).toBe(StorageError.TYPE.NON_SEQUENTIAL_UPDATE);
@@ -398,7 +399,7 @@ const testEventServiceClass = (testedServiceName, className) => {
         spyOn(testFactory.storage_service, 'update').and.returnValue(Promise.resolve('ok'));
 
         return testFactory[testedServiceName]
-          .updateEventSequentially(12, updates)
+          .updateEventSequentially({primary_key: 12, ...updates})
           .then(fail)
           .catch(error => {
             expect(error.type).toBe(StorageError.TYPE.NOT_FOUND);
@@ -412,7 +413,7 @@ const testEventServiceClass = (testedServiceName, className) => {
         spyOn(testFactory.storage_service, 'update').and.returnValue(Promise.resolve('ok'));
         spyOn(testFactory.storage_service.db, 'transaction').and.callThrough();
 
-        return testFactory[testedServiceName].updateEventSequentially(12, updates).then(() => {
+        return testFactory[testedServiceName].updateEventSequentially({primary_key: 12, ...updates}).then(() => {
           expect(testFactory.storage_service.update).toHaveBeenCalledWith(eventStoreName, 12, updates);
           expect(testFactory.storage_service.db.transaction).toHaveBeenCalled();
         });
@@ -546,25 +547,6 @@ const testEventServiceClass = (testedServiceName, className) => {
 
       afterEach(() => {
         testFactory.storage_service.clearStores();
-      });
-
-      it('deletes message with the given key', () => {
-        return testFactory[testedServiceName]
-          .deleteEventByKey(primary_keys[1])
-          .then(() => testFactory[testedServiceName].loadPrecedingEvents(conversationId))
-          .then(events => {
-            expect(events.length).toBe(2);
-            events.forEach(event => expect(event.primary_key).not.toBe(primary_keys[1]));
-          });
-      });
-
-      it('does not delete the event if key is wrong', () => {
-        return testFactory[testedServiceName]
-          .deleteEventByKey('wrongKey')
-          .then(() => testFactory[testedServiceName].loadPrecedingEvents(conversationId))
-          .then(events => {
-            expect(events.length).toBe(3);
-          });
       });
     });
 

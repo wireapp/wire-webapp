@@ -35,7 +35,6 @@ import {ConversationState} from '../../conversation/ConversationState';
 import type {Conversation} from '../../entity/Conversation';
 import type {User} from '../../entity/User';
 import {TeamState} from '../../team/TeamState';
-import {UserState} from '../../user/UserState';
 import {InViewport} from '../utils/InViewport';
 
 export enum UserlistMode {
@@ -53,7 +52,7 @@ const USER_CHUNK_SIZE = 64;
 
 export interface UserListProps {
   conversation?: Conversation;
-  conversationRepository: ConversationRepository;
+  conversationRepository?: ConversationRepository;
   conversationState?: ConversationState;
   highlightedUsers?: User[];
   infos?: Record<string, string>;
@@ -70,8 +69,8 @@ export interface UserListProps {
   teamState?: TeamState;
   truncate?: boolean;
   users: User[];
-  userState?: UserState;
   isSelectable?: boolean;
+  selfUser: User;
 }
 
 export const UserList = ({
@@ -90,10 +89,10 @@ export const UserList = ({
   showEmptyAdmin = false,
   noSelfInteraction = false,
   showArrow = false,
-  userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
   isSelectable = false,
   onSelectUser,
+  selfUser,
 }: UserListProps) => {
   const [maxShownUsers, setMaxShownUsers] = useState(USER_CHUNK_SIZE);
 
@@ -102,9 +101,8 @@ export const UserList = ({
   const hasMoreUsers = !truncate && users.length > maxShownUsers;
 
   const highlightedUserIds = highlightedUsers.map(user => user.id);
-  const selfInTeam = userState.self().inTeam();
-  const {self} = useKoSubscribableChildren(userState, ['self']);
-  const {is_verified: isSelfVerified} = useKoSubscribableChildren(self, ['is_verified']);
+  const {is_verified: isSelfVerified} = useKoSubscribableChildren(selfUser, ['is_verified']);
+  const selfInTeam = teamState.isInTeam(selfUser);
 
   // subscribe to roles changes in order to react to them
   useKoSubscribableChildren(conversation, ['roles']);
@@ -166,7 +164,7 @@ export const UserList = ({
       if (userEntity.isService) {
         return;
       }
-      if (conversationRepository.conversationRoleRepository.isUserGroupAdmin(conversation, userEntity)) {
+      if (conversationRepository?.conversationRoleRepository.isUserGroupAdmin(conversation, userEntity)) {
         admins.push(userEntity);
       } else {
         members.push(userEntity);

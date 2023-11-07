@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, UIEvent, useCallback, useState} from 'react';
+import {UIEvent, useCallback, useState} from 'react';
 
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -62,26 +62,25 @@ import {RightSidebarParams} from '../../page/AppMain';
 import {PanelState} from '../../page/RightSidebar';
 import {useMainViewModel} from '../../page/RootProvider';
 import {TeamState} from '../../team/TeamState';
-import {UserState} from '../../user/UserState';
 import {ElementType, MessageDetails} from '../MessagesList/Message/ContentMessage/asset/TextMessageRenderer';
 
 interface ConversationProps {
   readonly initialMessage?: Message;
   readonly teamState: TeamState;
-  readonly userState: UserState;
+  selfUser: User;
   openRightSidebar: (panelState: PanelState, params: RightSidebarParams, compareEntityId?: boolean) => void;
   isRightSidebarOpen?: boolean;
 }
 
 const CONFIG = Config.getConfig();
 
-export const Conversation: FC<ConversationProps> = ({
+export const Conversation = ({
   initialMessage,
   teamState,
-  userState,
+  selfUser,
   openRightSidebar,
   isRightSidebarOpen = false,
-}) => {
+}: ConversationProps) => {
   const messageListLogger = getLogger('ConversationList');
 
   const mainViewModel = useMainViewModel();
@@ -100,8 +99,7 @@ export const Conversation: FC<ConversationProps> = ({
     'isFileSharingSendingEnabled',
   ]);
   const {is1to1, isRequest} = useKoSubscribableChildren(activeConversation!, ['is1to1', 'isRequest']);
-  const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
-  const {inTeam} = useKoSubscribableChildren(selfUser, ['inTeam']);
+  const inTeam = teamState.isInTeam(selfUser);
 
   const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
   const [isMsgElementsFocusable, setMsgElementsFocusable] = useState(true);
@@ -520,23 +518,25 @@ export const Conversation: FC<ConversationProps> = ({
             setMsgElementsFocusable={setMsgElementsFocusable}
           />
 
-          <InputBar
-            key={activeConversation?.id}
-            conversation={activeConversation}
-            conversationRepository={repositories.conversation}
-            eventRepository={repositories.event}
-            messageRepository={repositories.message}
-            openGiphy={openGiphy}
-            propertiesRepository={repositories.properties}
-            searchRepository={repositories.search}
-            storageRepository={repositories.storage}
-            teamState={teamState}
-            selfUser={selfUser}
-            onShiftTab={() => setMsgElementsFocusable(false)}
-            uploadDroppedFiles={uploadDroppedFiles}
-            uploadImages={uploadImages}
-            uploadFiles={uploadFiles}
-          />
+          {isConversationLoaded && (
+            <InputBar
+              key={activeConversation?.id}
+              conversation={activeConversation}
+              conversationRepository={repositories.conversation}
+              eventRepository={repositories.event}
+              messageRepository={repositories.message}
+              openGiphy={openGiphy}
+              propertiesRepository={repositories.properties}
+              searchRepository={repositories.search}
+              storageRepository={repositories.storage}
+              teamState={teamState}
+              selfUser={selfUser}
+              onShiftTab={() => setMsgElementsFocusable(false)}
+              uploadDroppedFiles={uploadDroppedFiles}
+              uploadImages={uploadImages}
+              uploadFiles={uploadFiles}
+            />
+          )}
 
           <div className="conversation-loading">
             <div className="icon-spinner spin accent-text"></div>

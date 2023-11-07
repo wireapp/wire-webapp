@@ -54,7 +54,6 @@ import {TeamRepository} from '../../../team/TeamRepository';
 import {TeamState} from '../../../team/TeamState';
 import {Shortcut} from '../../../ui/Shortcut';
 import {ShortcutType} from '../../../ui/ShortcutType';
-import {UserState} from '../../../user/UserState';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {PanelHeader} from '../PanelHeader';
 import {PanelEntity, PanelState} from '../RightSidebar';
@@ -74,7 +73,7 @@ interface ConversationDetailsProps {
   searchRepository: SearchRepository;
   teamRepository: TeamRepository;
   teamState: TeamState;
-  userState: UserState;
+  selfUser: User;
   isFederated?: boolean;
 }
 
@@ -90,7 +89,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       searchRepository,
       teamRepository,
       teamState,
-      userState,
+      selfUser,
       isFederated = false,
     },
     ref,
@@ -137,7 +136,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       'firstUserEntity',
     ]);
 
-    const teamId = activeConversation.team_id;
+    const teamId = activeConversation.teamId;
 
     const {
       isTeam,
@@ -155,7 +154,6 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       'team',
     ]);
 
-    const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
     const {
       is_verified: isSelfVerified,
       teamRole,
@@ -365,7 +363,6 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
                   <>
                     <UserSearchableList
                       dataUieName="list-users"
-                      userState={userState}
                       users={userParticipants}
                       onClick={showUser}
                       noUnderline
@@ -438,7 +435,11 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
             <>
               <ConversationDetailsBottomActions
                 isDeviceActionEnabled={
-                  isSingleUserMode && firstParticipant && (firstParticipant.isConnected() || firstParticipant.inTeam())
+                  !!(
+                    isSingleUserMode &&
+                    firstParticipant &&
+                    (firstParticipant.isConnected() || teamState.isInTeam(firstParticipant))
+                  )
                 }
                 showDevices={openParticipantDevices}
                 showNotifications={showNotifications}

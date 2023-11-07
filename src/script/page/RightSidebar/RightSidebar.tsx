@@ -85,6 +85,7 @@ interface RightSidebarProps {
   repositories: ViewModelRepositories;
   teamState: TeamState;
   userState: UserState;
+  selfUser: User;
   isFederated: boolean;
   lastViewedMessageDetailsEntity: Message | null;
 }
@@ -95,6 +96,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
   repositories,
   teamState,
   userState,
+  selfUser,
   isFederated,
   lastViewedMessageDetailsEntity,
 }) => {
@@ -108,7 +110,6 @@ const RightSidebar: FC<RightSidebarProps> = ({
   const {conversationRoleRepository} = conversationRepository;
   const conversationState = container.resolve(ConversationState);
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
-  const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
 
   const [isAddMode, setIsAddMode] = useState<boolean>(false);
   const [animatePanelToLeft, setAnimatePanelToLeft] = useState<boolean>(true);
@@ -207,7 +208,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
               searchRepository={searchRepository}
               teamRepository={teamRepository}
               teamState={teamState}
-              userState={userState}
+              selfUser={selfUser}
               isFederated={isFederated}
             />
           )}
@@ -297,6 +298,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
               teamRepository={teamRepository}
               teamState={teamState}
               userState={userState}
+              selfUser={selfUser}
             />
           )}
 
@@ -306,7 +308,6 @@ const RightSidebar: FC<RightSidebarProps> = ({
               selfUser={selfUser}
               conversationRepository={conversationRepository}
               messageEntity={messageEntity}
-              updateEntity={rightSidebar.updateEntity}
               teamRepository={teamRepository}
               searchRepository={searchRepository}
               showReactions={rightSidebar.showReactions}

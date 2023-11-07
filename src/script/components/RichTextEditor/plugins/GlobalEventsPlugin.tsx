@@ -29,11 +29,12 @@ import {
   COMMAND_PRIORITY_LOW,
   KEY_ARROW_UP_COMMAND,
   BLUR_COMMAND,
+  COMMAND_PRIORITY_EDITOR,
 } from 'lexical';
 
 import {isTabKey} from 'Util/KeyboardUtil';
 
-export const ON_SHIFT_TAB: LexicalCommand<KeyboardEvent> = createCommand('ON_SHIFT_TAB');
+const ON_SHIFT_TAB: LexicalCommand<KeyboardEvent> = createCommand('ON_SHIFT_TAB');
 interface GlobalEventsPluginProps {
   onShiftTab: () => void;
   onEscape: () => void;
@@ -81,9 +82,9 @@ export function GlobalEventsPlugin({onShiftTab, onArrowUp, onEscape, onBlur}: Gl
         KEY_ESCAPE_COMMAND,
         () => {
           onEscape();
-          return true;
+          return false;
         },
-        COMMAND_PRIORITY_LOW,
+        COMMAND_PRIORITY_EDITOR,
       ),
       editor.registerCommand(
         KEY_ARROW_UP_COMMAND,

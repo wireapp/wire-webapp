@@ -24,10 +24,11 @@ import {ClientEntity} from 'src/script/client/ClientEntity';
 import {ClientState} from 'src/script/client/ClientState';
 import {ConversationState} from 'src/script/conversation/ConversationState';
 import {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';
-import {UserState} from 'src/script/user/UserState';
 import {createUuid} from 'Util/uuid';
 
 import {DevicesPreferences} from './DevicesPreferences';
+
+import {User} from '../../../../../entity/User';
 
 function createDevice(): ClientEntity {
   const device = new ClientEntity(true, '', createUuid());
@@ -39,7 +40,7 @@ function createDevice(): ClientEntity {
 describe('DevicesPreferences', () => {
   const clientState = new ClientState();
   clientState.clients = ko.pureComputed(() => [createDevice(), createDevice()]);
-  clientState.currentClient(createDevice());
+  clientState.currentClient = createDevice();
   const defaultParams = {
     clientState: clientState,
     conversationState: new ConversationState(),
@@ -49,7 +50,7 @@ describe('DevicesPreferences', () => {
     } as unknown as CryptographyRepository,
     removeDevice: jest.fn(),
     resetSession: jest.fn(),
-    userState: new UserState(),
+    selfUser: new User(createUuid()),
     verifyDevice: jest.fn(),
   };
 

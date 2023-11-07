@@ -18,36 +18,33 @@
  */
 
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
-import {container} from 'tsyringe';
 
+import {ConfirmationEvent} from 'src/script/conversation/EventBuilder';
+import {User} from 'src/script/entity/User';
 import {getLogger, Logger} from 'Util/Logger';
 
 import type {ConversationRepository} from '../../conversation/ConversationRepository';
 import {StatusType} from '../../message/StatusType';
 import type {EventRecord} from '../../storage/record/EventRecord';
-import {UserState} from '../../user/UserState';
 import {ClientEvent} from '../Client';
+import {EventMiddleware, IncomingEvent} from '../EventProcessor';
 import type {EventService} from '../EventService';
 
-export class ReceiptsMiddleware {
-  private readonly eventService: EventService;
-  private readonly conversationRepository: ConversationRepository;
+export class ReceiptsMiddleware implements EventMiddleware {
   private readonly logger: Logger;
 
   constructor(
-    eventService: EventService,
-    conversationRepository: ConversationRepository,
-    private readonly userState = container.resolve(UserState),
+    private readonly eventService: EventService,
+    private readonly conversationRepository: ConversationRepository,
+    private readonly selfUser: User,
   ) {
-    this.eventService = eventService;
-    this.conversationRepository = conversationRepository;
     this.logger = getLogger('ReceiptsMiddleware');
   }
 
   /**
    * Handles incoming (and injected outgoing) events.
    */
-  async processEvent(event: EventRecord): Promise<EventRecord> {
+  async processEvent(event: IncomingEvent): Promise<IncomingEvent> {
     switch (event.type) {
       case ClientEvent.CONVERSATION.ASSET_ADD:
       case ClientEvent.CONVERSATION.KNOCK:
@@ -78,12 +75,12 @@ export class ReceiptsMiddleware {
   }
 
   private isMyMessage(originalEvent: EventRecord): boolean {
-    return this.userState.self() && this.userState.self().id === originalEvent.from;
+    return this.selfUser.id === originalEvent.from;
   }
 
   private updateConfirmationStatus(
     originalEvent: EventRecord,
-    confirmationEvent: EventRecord,
+    confirmationEvent: ConfirmationEvent,
   ): Promise<EventRecord | void> {
     const status = confirmationEvent.data.status;
     const currentReceipts = ('read_receipts' in originalEvent && originalEvent.read_receipts) || [];

@@ -39,8 +39,6 @@ import {
   ConversationRenameEvent,
   ConversationTypingEvent,
   CONVERSATION_EVENT,
-  FederationEvent,
-  FEDERATION_EVENT,
 } from '@wireapp/api-client/lib/event';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import type {BackendError} from '@wireapp/api-client/lib/http/';
@@ -49,7 +47,7 @@ import {MLSCreateConversationResponse} from '@wireapp/core/lib/conversation';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {container} from 'tsyringe';
-import {debounce, flatten} from 'underscore';
+import {flatten} from 'underscore';
 
 import {Asset as ProtobufAsset, Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -70,27 +68,26 @@ import {
 } from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {isBackendError} from 'Util/TypePredicateUtil';
+import {supportsMLS} from 'Util/util';
 import {createUuid} from 'Util/uuid';
 
 import {ACCESS_STATE} from './AccessState';
 import {extractClientDiff} from './ClientMismatchUtil';
 import {updateAccessRights} from './ConversationAccessPermission';
 import {ConversationEphemeralHandler} from './ConversationEphemeralHandler';
-import {
-  getUsersToDeleteFromFederatedConversations,
-  getFederationDeleteEventUpdates,
-} from './ConversationFederationUtils';
 import {ConversationFilter} from './ConversationFilter';
 import {ConversationLabelRepository} from './ConversationLabelRepository';
 import {ConversationDatabaseData, ConversationMapper} from './ConversationMapper';
 import {ConversationRoleRepository} from './ConversationRoleRepository';
-import {isMLSConversation} from './ConversationSelectors';
+import {isMLSConversation, MLSConversation} from './ConversationSelectors';
 import {ConversationService} from './ConversationService';
 import {ConversationState} from './ConversationState';
 import {ConversationStateHandler} from './ConversationStateHandler';
 import {ConversationStatus} from './ConversationStatus';
 import {ConversationVerificationState} from './ConversationVerificationState';
-import {ConversationVerificationStateHandler} from './ConversationVerificationStateHandler';
+import {ProteusConversationVerificationStateHandler} from './ConversationVerificationStateHandler';
+import {registerMLSConversationVerificationStateHandler} from './ConversationVerificationStateHandler/MLS';
+import {OnConversationVerificationStateChange} from './ConversationVerificationStateHandler/shared';
 import {EventMapper} from './EventMapper';
 import {MessageRepository} from './MessageRepository';
 import {NOTIFICATION_STATE} from './NotificationSetting';
@@ -112,7 +109,6 @@ import {
   MemberLeaveEvent,
   MessageHiddenEvent,
   OneToOneCreationEvent,
-  ReactionEvent,
   TeamMemberLeaveEvent,
 } from '../conversation/EventBuilder';
 import {Conversation} from '../entity/Conversation';
@@ -132,7 +128,6 @@ import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {isMemberMessage} from '../guards/Message';
 import * as LegalHoldEvaluator from '../legal-hold/LegalHoldEvaluator';
 import {MessageCategory} from '../message/MessageCategory';
-import {SuperType} from '../message/SuperType';
 import {SystemMessageType} from '../message/SystemMessageType';
 import {addOtherSelfClientsToMLSConversation} from '../mls';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
@@ -153,7 +148,6 @@ type IncomingEvent = ConversationEvent | ClientConversationEvent;
 
 export class ConversationRepository {
   private isBlockingNotificationHandling: boolean;
-  private readonly conversationsWithNewEvents: Map<any, any>;
   private readonly ephemeralHandler: ConversationEphemeralHandler;
   public readonly conversationLabelRepository: ConversationLabelRepository;
   public readonly conversationRoleRepository: ConversationRoleRepository;
@@ -161,8 +155,7 @@ export class ConversationRepository {
   private readonly eventService: EventService;
   private readonly logger: Logger;
   public readonly stateHandler: ConversationStateHandler;
-  public readonly verificationStateHandler: ConversationVerificationStateHandler;
-  static readonly eventFromStreamMessage = 'event from notification stream';
+  public readonly proteusVerificationStateHandler: ProteusConversationVerificationStateHandler;
 
   static get CONFIG() {
     return {
@@ -219,7 +212,7 @@ export class ConversationRepository {
           Promise.all(clients.map(client => this.userRepository.removeClientFromUser(userId, client))),
         ),
       );
-      const removedTeamUserIds = emptyUsers.filter(user => user.inTeam()).map(user => user.qualifiedId);
+      const removedTeamUserIds = emptyUsers.filter(user => teamState.isInTeam(user)).map(user => user.qualifiedId);
 
       if (removedTeamUserIds.length) {
         // If we have found some users that were removed from the conversation, we need to check if those users were also completely removed from the team
@@ -269,13 +262,24 @@ export class ConversationRepository {
     this.logger = getLogger('ConversationRepository');
 
     this.event_mapper = new EventMapper();
-    this.verificationStateHandler = new ConversationVerificationStateHandler(
-      this.eventRepository,
+
+    // we register and store a handler, that we can manually trigger for incoming events from proteus and mixed conversations
+    this.proteusVerificationStateHandler = new ProteusConversationVerificationStateHandler(
+      this.onConversationVerificationStateChange,
       this.userState,
       this.conversationState,
     );
+
+    if (supportsMLS()) {
+      // we register a handler that will handle MLS conversations on its own
+      registerMLSConversationVerificationStateHandler(
+        this.onConversationVerificationStateChange,
+        this.conversationState,
+        this.core,
+      );
+    }
+
     this.isBlockingNotificationHandling = true;
-    this.conversationsWithNewEvents = new Map();
 
     this.teamState.isTeam.subscribe(() => this.mapGuestStatusSelf());
 
@@ -285,8 +289,6 @@ export class ConversationRepository {
     this.ephemeralHandler = new ConversationEphemeralHandler(this.eventService, {
       onMessageTimeout: this.handleMessageExpiration,
     });
-
-    this.userState.directlyConnectedUsers = this.conversationState.connectedUsers;
 
     this.conversationLabelRepository = new ConversationLabelRepository(
       this.conversationState.conversations,
@@ -315,7 +317,6 @@ export class ConversationRepository {
     amplify.subscribe(WebAppEvents.TEAM.MEMBER_LEAVE, this.teamMemberLeave);
     amplify.subscribe(WebAppEvents.USER.UNBLOCKED, this.onUnblockUser);
     amplify.subscribe(WebAppEvents.CONVERSATION.INJECT_LEGAL_HOLD_MESSAGE, this.injectLegalHoldMessage);
-    amplify.subscribe(WebAppEvents.FEDERATION.EVENT_FROM_BACKEND, debounce(this.onFederationEvent, 1000));
 
     this.eventService.addEventUpdatedListener(this.updateLocalMessageEntity);
     this.eventService.addEventDeletedListener(this.deleteLocalMessageEntity);
@@ -326,100 +327,6 @@ export class ConversationRepository {
   public initMLSConversationRecoveredListener() {
     return this.conversationService.addMLSConversationRecoveredListener(this.onMLSConversationRecovered);
   }
-
-  private readonly onFederationEvent = async (event: FederationEvent) => {
-    const {type} = event;
-
-    switch (type) {
-      case FEDERATION_EVENT.FEDERATION_DELETE:
-        const {domain: deletedDomain} = event;
-        await this.onFederationDelete(deletedDomain);
-
-        break;
-      case FEDERATION_EVENT.FEDERATION_CONNECTION_REMOVED:
-        const {domains: deletedDomains} = event;
-        await this.onFederationConnectionRemove(deletedDomains);
-
-        break;
-    }
-  };
-
-  /**
-   * For the `federation.delete` event: (Backend A has stopped federating with us)
-      - receive the event from backend
-      - leave the conversations locally that are owned by the backend A which was deleted.
-      - remove the deleted backend A users locally from our own conversations.
-      - insert system message to the affected conversations about federation termination.
-   * @param deletedDomain the domain that stopped federating
-   */
-  private onFederationDelete = async (deletedDomain: string) => {
-    const {conversationsToDeleteUsers, conversationsToLeave, conversationsToDisable} = getFederationDeleteEventUpdates(
-      deletedDomain,
-      this.conversationState.conversations(),
-    );
-
-    conversationsToLeave.forEach(async conversation => {
-      await this.leaveConversation(conversation, {clearContent: false, localOnly: true});
-      await this.insertFederationStopSystemMessage(conversation, [deletedDomain]);
-    });
-
-    conversationsToDisable.forEach(async conversation => {
-      conversation.status(ConversationStatus.PAST_MEMBER);
-      conversation.firstUserEntity().markConnectionAsUnknown();
-      await this.insertFederationStopSystemMessage(conversation, [deletedDomain]);
-    });
-
-    conversationsToDeleteUsers.forEach(async ({conversation, users}) => {
-      await this.insertFederationStopSystemMessage(conversation, [deletedDomain]);
-      await this.removeDeletedFederationUsers(conversation, users);
-    });
-  };
-
-  /**
-   * For the `federation.connectionRemoved` event: (Backend A & B stopped federating, user is on C)
-    - receive the event from backend
-    - Identify all conversations that are not owned from A or B domain and that contain users from A and B
-      - remove users from A and B from those conversations
-      - insert system message in those conversations about backend A and B stopping to federate
-    - identify all conversations owned by domain A that contains users from B
-      - remove users from B from those conversations
-      - insert system message in those conversations about backend A and B stopping to federate
-    - Identify all conversations owned by domain B that contains users from A
-      - remove users from A from those conversations
-      - insert system message in those conversations about backend A and B stopping to federate
-   * @param domains The domains that stopped federating with each other
-   */
-  private readonly onFederationConnectionRemove = async (domains: string[]) => {
-    const allConversations = this.conversationState.conversations();
-
-    const result = getUsersToDeleteFromFederatedConversations(domains, allConversations);
-
-    for (const {conversation, usersToRemove} of result) {
-      await this.removeDeletedFederationUsers(conversation, usersToRemove);
-      await this.insertFederationStopSystemMessage(conversation, domains);
-    }
-  };
-
-  private readonly removeDeletedFederationUsers = async (conversation: Conversation, usersToRemove: User[]) => {
-    if (usersToRemove.length === 0) {
-      return;
-    }
-
-    try {
-      for (const user of usersToRemove) {
-        await this.removeMember(conversation, user.qualifiedId, {localOnly: true});
-      }
-    } catch (error) {
-      console.warn('failed to remove users', error);
-    }
-  };
-
-  private readonly insertFederationStopSystemMessage = async (conversation: Conversation, domains: string[]) => {
-    const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-    const selfUser = this.userState.self();
-    const event = EventBuilder.buildFederationStop(conversation, selfUser, domains, currentTimestamp);
-    await this.eventRepository.injectEvent(event, EventRepository.SOURCE.INJECTED);
-  };
 
   private readonly updateLocalMessageEntity = async ({
     obj: updatedEvent,
@@ -1161,13 +1068,6 @@ export class ConversationRepository {
   }
 
   /**
-   * @deprecated import the `ConversationState` wherever you need it and call `getMostRecentConversation` directly from there
-   */
-  public getMostRecentConversation() {
-    return this.conversationState.getMostRecentConversation();
-  }
-
-  /**
    * Returns a list of sorted conversation ids based on the number of messages in the last 30 days.
    * @returns Resolve with the most active conversations
    */
@@ -1186,7 +1086,7 @@ export class ConversationRepository {
    */
   async get1To1Conversation(userEntity: User): Promise<Conversation | null> {
     const selfUser = this.userState.self();
-    const inCurrentTeam = userEntity.inTeam() && !!selfUser && userEntity.teamId === selfUser.teamId;
+    const inCurrentTeam = selfUser && selfUser.teamId && userEntity.teamId === selfUser.teamId;
 
     if (inCurrentTeam) {
       return this.getOrCreateProteusTeam1to1Conversation(userEntity);
@@ -1462,13 +1362,12 @@ export class ConversationRepository {
       .forEach(conversationEntity => this._mapGuestStatusSelf(conversationEntity));
 
     if (this.teamState.isTeam()) {
-      this.userState.self().inTeam(true);
-      this.userState.self().isTeamMember(true);
+      this.userState.self()?.isTeamMember(true);
     }
   }
 
   private _mapGuestStatusSelf(conversationEntity: Conversation) {
-    const conversationTeamId = conversationEntity.team_id;
+    const conversationTeamId = conversationEntity.teamId;
     const selfTeamId = this.teamState.team()?.id;
     const isConversationGuest = !!(conversationTeamId && (!selfTeamId || selfTeamId !== conversationTeamId));
     conversationEntity.isGuest(isConversationGuest);
@@ -1517,9 +1416,6 @@ export class ConversationRepository {
     const isFetchingFromStream = handlingState !== NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
 
     if (this.isBlockingNotificationHandling !== isFetchingFromStream) {
-      if (!isFetchingFromStream) {
-        this.checkChangedConversations();
-      }
       this.isBlockingNotificationHandling = isFetchingFromStream;
       this.logger.info(`Block handling of conversation events: ${this.isBlockingNotificationHandling}`);
     }
@@ -1555,6 +1451,30 @@ export class ConversationRepository {
   // Send events
   //##############################################################################
 
+  private onConversationVerificationStateChange: OnConversationVerificationStateChange = async ({
+    conversationEntity,
+    conversationVerificationState,
+    verificationMessageType,
+    userIds = [],
+  }) => {
+    switch (conversationVerificationState) {
+      case ConversationVerificationState.VERIFIED:
+        const allVerifiedEvent = EventBuilder.buildAllVerified(conversationEntity);
+        await this.eventRepository.injectEvent(allVerifiedEvent);
+        break;
+      case ConversationVerificationState.DEGRADED:
+        if (verificationMessageType) {
+          const event = EventBuilder.buildDegraded(conversationEntity, userIds, verificationMessageType);
+          await this.eventRepository.injectEvent(event);
+        } else {
+          this.logger.error('onConversationVerificationStateChange: Missing verificationMessageType while degrading');
+        }
+        break;
+      default:
+        break;
+    }
+  };
+
   /**
    * Add users to an existing conversation.
    *
@@ -1570,13 +1490,13 @@ export class ConversationRepository {
 
     const qualifiedUsers = userEntities.map(userEntity => userEntity.qualifiedId);
 
-    const {qualifiedId: conversationId, groupId} = conversation;
+    const {qualifiedId: conversationId} = conversation;
 
     try {
-      if (conversation.isUsingMLSProtocol && groupId) {
+      if (isMLSConversation(conversation)) {
         const {events} = await this.core.service!.conversation.addUsersToMLSConversation({
           conversationId,
-          groupId,
+          groupId: conversation.groupId,
           qualifiedUsers,
         });
         if (!!events.length) {
@@ -1674,27 +1594,15 @@ export class ConversationRepository {
    * @note According to spec we archive a conversation when we clear it.
    * It will be unarchived once it is opened through search. We use the archive flag to distinguish states.
    *
-   * @param conversationEntity Conversation to clear
+   * @param conversation Conversation to clear
    * @param leaveConversation Should we leave the conversation before clearing the content?
    */
-  public async clearConversation(conversationEntity: Conversation, leaveConversation = false) {
-    const isActiveConversation = this.conversationState.isActiveConversation(conversationEntity);
-    const nextConversationEntity = this.getNextConversation(conversationEntity);
+  public async clearConversation(conversation: Conversation) {
+    const isActiveConversation = this.conversationState.isActiveConversation(conversation);
+    const nextConversationEntity = this.getNextConversation(conversation);
 
-    if (leaveConversation) {
-      conversationEntity.status(ConversationStatus.PAST_MEMBER);
-      this.callingRepository.leaveCall(
-        conversationEntity.qualifiedId,
-        LEAVE_CALL_REASON.USER_MANUALY_LEFT_CONVERSATION,
-      );
-    }
-
-    await this.messageRepository.updateClearedTimestamp(conversationEntity);
-    await this._clearConversation(conversationEntity);
-
-    if (leaveConversation) {
-      await this.removeMember(conversationEntity, this.userState.self().qualifiedId);
-    }
+    await this.messageRepository.updateClearedTimestamp(conversation);
+    await this._clearConversation(conversation);
 
     if (isActiveConversation) {
       amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversationEntity, {});
@@ -1717,89 +1625,67 @@ export class ConversationRepository {
    * @param userId ID of member to be removed from the conversation
    * @returns Resolves when member was removed from the conversation
    */
-  private async removeMemberFromMLSConversation(
-    conversationEntity: Conversation,
-    userId: QualifiedId,
-    {localOnly = false} = {},
-  ) {
-    const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
+  private async removeMembersFromMLSConversation(conversationEntity: MLSConversation, userIds: QualifiedId[]) {
     const {groupId, qualifiedId} = conversationEntity;
-    const {events} = localOnly
-      ? {events: [EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp)]}
-      : await this.core.service!.conversation.removeUsersFromMLSConversation({
-          conversationId: qualifiedId,
-          groupId,
-          qualifiedUserIds: [userId],
-        });
+    const {events} = await this.core.service!.conversation.removeUsersFromMLSConversation({
+      conversationId: qualifiedId,
+      groupId,
+      qualifiedUserIds: userIds,
+    });
 
-    if (!!events.length) {
-      events.forEach(event => this.eventRepository.injectEvent(event));
-    }
+    return events;
   }
 
   /**
    * Remove a member from a Proteus conversation
    *
-   * @param conversationEntity Conversation to remove member from
+   * @param conversation Conversation to remove member from
    * @param userId ID of member to be removed from the conversation
    * @returns Resolves when member was removed from the conversation
    */
-  private async removeMemberFromConversation(
-    conversationEntity: Conversation,
-    userId: QualifiedId,
-    {localOnly = false},
-  ) {
-    const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-    const response = localOnly
-      ? EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp)
-      : await this.core.service!.conversation.removeUserFromConversation(conversationEntity.qualifiedId, userId);
-
-    const roles = conversationEntity.roles();
-    delete roles[userId.id];
-    conversationEntity.roles(roles);
-    await this.eventRepository.injectEvent(response, EventRepository.SOURCE.BACKEND_RESPONSE);
-
-    return response;
+  private async removeMembersFromConversation(conversation: Conversation, userIds: QualifiedId[]) {
+    return await Promise.all(
+      userIds.map(async userId => {
+        const event = await this.core.service!.conversation.removeUserFromConversation(
+          conversation.qualifiedId,
+          userId,
+        );
+        const roles = conversation.roles();
+        delete roles[userId.id];
+        conversation.roles(roles);
+        return event;
+      }),
+    );
   }
 
   /**
    * Remove the current user from a conversation.
    *
-   * @param conversationEntity Conversation to remove user from
+   * @param conversation Conversation to remove user from
    * @param clearContent Should we clear the conversation content from the database?
    * @returns Resolves when user was removed from the conversation
    */
-  private async leaveConversation(conversationEntity: Conversation, {clearContent = false, localOnly = false} = {}) {
+  public async leaveConversation(conversation: Conversation) {
     const userQualifiedId = this.userState.self().qualifiedId;
 
-    return clearContent
-      ? this.clearConversation(conversationEntity, true)
-      : this.removeMemberFromConversation(conversationEntity, userQualifiedId, {localOnly});
+    const events = await this.removeMembersFromConversation(conversation, [userQualifiedId]);
+    await this.eventRepository.injectEvents(events, EventRepository.SOURCE.BACKEND_RESPONSE);
   }
 
   /**
-   * Umbrella function to remove a member from a conversation, no matter the protocol or type.
+   * Umbrella function to remove a member from a conversation (from backend and locally), no matter the protocol or type.
    *
    * @param conversationEntity Conversation to remove member from
    * @param userId ID of member to be removed from the conversation
    * @param clearContent Should we clear the conversation content from the database?
    * @returns Resolves when member was removed from the conversation
    */
-  public async removeMember(
-    conversationEntity: Conversation,
-    userId: QualifiedId,
-    {clearContent = false, localOnly = false} = {},
-  ) {
-    const isUserLeaving = this.userState.self().qualifiedId.id === userId.id;
-    const isMLSConversation = conversationEntity.isUsingMLSProtocol;
+  public async removeMembers(conversationEntity: Conversation, userIds: QualifiedId[]) {
+    const events = isMLSConversation(conversationEntity)
+      ? await this.removeMembersFromMLSConversation(conversationEntity, userIds)
+      : await this.removeMembersFromConversation(conversationEntity, userIds);
 
-    if (isUserLeaving) {
-      return this.leaveConversation(conversationEntity, {clearContent});
-    }
-
-    return isMLSConversation
-      ? this.removeMemberFromMLSConversation(conversationEntity, userId, {localOnly})
-      : this.removeMemberFromConversation(conversationEntity, userId, {localOnly});
+    await this.eventRepository.injectEvents(events, EventRepository.SOURCE.BACKEND_RESPONSE);
   }
 
   /**
@@ -1816,7 +1702,7 @@ export class ConversationRepository {
       const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
       const event = hasResponse
         ? response.event
-        : EventBuilder.buildMemberLeave(conversationEntity, user, true, currentTimestamp);
+        : EventBuilder.buildMemberLeave(conversationEntity, [user], this.userState.self().id, currentTimestamp);
 
       this.eventRepository.injectEvent(event, EventRepository.SOURCE.BACKEND_RESPONSE);
       return event;
@@ -1890,7 +1776,7 @@ export class ConversationRepository {
     const eventInjections = this.conversationState
       .conversations()
       .filter(conversationEntity => {
-        const conversationInTeam = conversationEntity.team_id === teamId;
+        const conversationInTeam = conversationEntity.teamId === teamId;
         const userIsParticipant = UserFilter.isParticipant(conversationEntity, userId);
         return conversationInTeam && userIsParticipant && !conversationEntity.removed_from_conversation();
       })
@@ -2027,16 +1913,6 @@ export class ConversationRepository {
       from: this.userState.self().id,
     };
     this.onMemberUpdate(conversationEntity, response);
-  }
-
-  private checkChangedConversations() {
-    this.conversationsWithNewEvents.forEach(conversationEntity => {
-      if (conversationEntity.shouldUnarchive()) {
-        this.unarchiveConversation(conversationEntity, false, ConversationRepository.eventFromStreamMessage);
-      }
-    });
-
-    this.conversationsWithNewEvents.clear();
   }
 
   /**
@@ -2208,9 +2084,10 @@ export class ConversationRepository {
     }
 
     const {conversation, qualified_conversation, data: eventData, type} = eventJson;
+    const dataConversationId: string = (eventData as any)?.conversationId;
     // data.conversationId is always the conversationId that should be read first. If not found we can fallback to qualified_conversation or conversation
-    const conversationId: QualifiedId = eventData?.conversationId
-      ? {domain: '', id: eventData.conversationId}
+    const conversationId: QualifiedId = dataConversationId
+      ? {domain: '', id: dataConversationId}
       : qualified_conversation || {domain: '', id: conversation};
 
     const inSelfConversation = this.conversationState.isSelfConversation(conversationId);
@@ -2232,19 +2109,10 @@ export class ConversationRepository {
     const onEventPromise = isConversationCreate
       ? Promise.resolve(null)
       : this.getConversationById(conversationId, true);
-    let previouslyArchived = false;
 
     return onEventPromise
       .then((conversationEntity: Conversation) => {
         if (conversationEntity) {
-          // Check if conversation was archived
-          previouslyArchived = conversationEntity.is_archived();
-          const isPastMemberStatus = conversationEntity.status() === ConversationStatus.PAST_MEMBER;
-          const isMemberJoinType = type === CONVERSATION_EVENT.MEMBER_JOIN;
-
-          if (previouslyArchived && isPastMemberStatus && isMemberJoinType) {
-            this.unarchiveConversation(conversationEntity, false, ConversationRepository.eventFromStreamMessage);
-          }
           const isBackendTimestamp = eventSource !== EventSource.INJECTED;
 
           const eventsToSkip: (CLIENT_CONVERSATION_EVENT | CONVERSATION_EVENT)[] = [
@@ -2270,7 +2138,7 @@ export class ConversationRepository {
       )
       .then((entityObject = {} as EntityObject) => {
         if (type !== CONVERSATION_EVENT.MEMBER_JOIN && type !== CONVERSATION_EVENT.MEMBER_LEAVE) {
-          this.handleConversationNotification(entityObject as EntityObject, eventSource, previouslyArchived);
+          this.handleConversationNotification(entityObject as EntityObject, eventSource);
         }
       })
       .catch((error: BaseError) => {
@@ -2320,18 +2188,15 @@ export class ConversationRepository {
       const isFromUnknownUser = allParticipants.every(participant => participant.id !== senderId);
 
       if (isFromUnknownUser) {
-        const membersUpdateMessages = [
-          CONVERSATION_EVENT.MEMBER_LEAVE,
-          CONVERSATION_EVENT.MEMBER_JOIN,
-          ClientEvent.CONVERSATION.TEAM_MEMBER_LEAVE,
-        ];
-        const isMembersUpdateEvent = membersUpdateMessages.includes(eventJson.type);
-        if (isMembersUpdateEvent) {
-          const isFromUpdatedMember = eventJson.data.user_ids?.includes(senderId);
-          if (isFromUpdatedMember) {
-            // we ignore leave/join events that are sent by the user actually leaving or joining
-            return conversationEntity;
-          }
+        switch (eventJson.type) {
+          case CONVERSATION_EVENT.MEMBER_LEAVE:
+          case CONVERSATION_EVENT.MEMBER_JOIN:
+          case ClientEvent.CONVERSATION.TEAM_MEMBER_LEAVE:
+            const isFromUpdatedMember = eventJson.data.user_ids?.includes(senderId);
+            if (isFromUpdatedMember) {
+              // we ignore leave/join events that are sent by the user actually leaving or joining
+              return conversationEntity;
+            }
         }
 
         const message = `Received '${type}' event from user '${senderId}' unknown in '${conversationEntity.id}'`;
@@ -2368,7 +2233,7 @@ export class ConversationRepository {
       data: {legal_hold_status: messageLegalHoldStatus},
       from: userId,
       time: isoTimestamp,
-    } = eventJson;
+    } = eventJson as any;
     const timestamp = new Date(isoTimestamp).getTime();
     const qualifiedConversation = qualified_conversation || {domain: '', id: conversationId};
     const qualifiedUser = qualified_from || {domain: '', id: userId};
@@ -2448,9 +2313,6 @@ export class ConversationRepository {
       case ClientEvent.CONVERSATION.ONE2ONE_CREATION:
         return this.on1to1Creation(conversationEntity, eventJson);
 
-      case ClientEvent.CONVERSATION.REACTION:
-        return this.onReaction(conversationEntity, eventJson);
-
       case CONVERSATION_EVENT.RECEIPT_MODE_UPDATE:
         return this.onReceiptModeChanged(conversationEntity, eventJson);
 
@@ -2508,14 +2370,9 @@ export class ConversationRepository {
    *
    * @param entityObject Object containing the conversation and the message that are targeted by the event
    * @param eventSource Source of event
-   * @param previouslyArchived `true` if the previous state of the conversation was archived
    * @returns Resolves when the conversation was updated
    */
-  private async handleConversationNotification(
-    entityObject: EntityObject,
-    eventSource: EventSource,
-    previouslyArchived: boolean,
-  ) {
+  private async handleConversationNotification(entityObject: EntityObject, eventSource: EventSource) {
     const {conversationEntity, messageEntity} = entityObject;
 
     if (conversationEntity) {
@@ -2535,18 +2392,6 @@ export class ConversationRepository {
 
         if (conversationEntity.is_cleared()) {
           conversationEntity.cleared_timestamp(0);
-        }
-      }
-
-      // Check if event needs to be un-archived
-      if (previouslyArchived) {
-        // Add to check for un-archiving at the end of stream handling
-        if (eventFromStream) {
-          return this.conversationsWithNewEvents.set(conversationEntity.id, conversationEntity);
-        }
-
-        if (eventFromWebSocket && conversationEntity.shouldUnarchive()) {
-          return this.unarchiveConversation(conversationEntity, false, 'event from WebSocket');
         }
       }
     }
@@ -2633,7 +2478,7 @@ export class ConversationRepository {
           this.addCreationMessage(conversationEntity, false, initialTimestamp, eventSource);
         }
         await this.updateParticipatingUserEntities(conversationEntity);
-        this.verificationStateHandler.onConversationCreate(conversationEntity);
+        this.proteusVerificationStateHandler.onConversationCreate(conversationEntity);
         await this.saveConversation(conversationEntity);
       }
       return {conversationEntity};
@@ -2738,7 +2583,7 @@ export class ConversationRepository {
     const qualifiedUserIds =
       eventData.users?.map(user => user.qualified_id) || eventData.user_ids.map(userId => ({domain: '', id: userId}));
 
-    if (conversationEntity.isUsingMLSProtocol) {
+    if (isMLSConversation(conversationEntity)) {
       const isSelfJoin = isFromSelf && selfUserJoins;
       await this.handleMLSConversationMemberJoin(conversationEntity, isSelfJoin);
     }
@@ -2747,7 +2592,7 @@ export class ConversationRepository {
       .then(() => this.updateParticipatingUserEntities(conversationEntity, false, true))
       .then(() => this.addEventToConversation(conversationEntity, eventJson))
       .then(({messageEntity}) => {
-        this.verificationStateHandler.onMemberJoined(conversationEntity, qualifiedUserIds);
+        this.proteusVerificationStateHandler.onMemberJoined(conversationEntity, qualifiedUserIds);
         return {conversationEntity, messageEntity};
       });
   }
@@ -2842,7 +2687,7 @@ export class ConversationRepository {
 
       await this.updateParticipatingUserEntities(conversationEntity);
 
-      this.verificationStateHandler.onMemberLeft(conversationEntity);
+      this.proteusVerificationStateHandler.onMemberLeft(conversationEntity);
 
       return {conversationEntity, messageEntity};
     }
@@ -3035,46 +2880,6 @@ export class ConversationRepository {
     }
   }
 
-  /**
-   * Someone reacted to a message.
-   *
-   * @param conversationEntity Conversation entity that a message was reacted upon in
-   * @param eventJson JSON data of 'conversation.reaction' event
-   * @returns Resolves when the event was handled
-   */
-  private async onReaction(conversationEntity: Conversation, eventJson: ReactionEvent) {
-    const conversationId = conversationEntity.id;
-    const eventData = eventJson.data;
-    const messageId = eventData.message_id;
-
-    try {
-      const messageEntity = await this.messageRepository.getMessageInConversationById(conversationEntity, messageId);
-      if (!messageEntity || !messageEntity.isContent()) {
-        const type = messageEntity ? messageEntity.type : 'unknown';
-
-        this.logger.error(`Cannot react to '${type}' message '${messageId}' in conversation '${conversationId}'`);
-        throw new ConversationError(ConversationError.TYPE.WRONG_TYPE, ConversationError.MESSAGE.WRONG_TYPE);
-      }
-
-      const changes = messageEntity.getUpdatedReactions(eventJson);
-      if (changes) {
-        const logMessage = `Updating reactions of message '${messageId}' in conversation '${conversationId}'`;
-        this.logger.debug(logMessage, {changes, event: eventJson});
-
-        this.eventService.updateEventSequentially(messageEntity.primary_key, changes);
-        return await this.prepareReactionNotification(conversationEntity, messageEntity, eventJson);
-      }
-    } catch (error) {
-      const isNotFound = error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;
-      if (!isNotFound) {
-        const logMessage = `Failed to handle reaction to message '${messageId}' in conversation '${conversationId}'`;
-        this.logger.error(logMessage, error);
-        throw error;
-      }
-    }
-    return undefined;
-  }
-
   private async onButtonActionConfirmation(conversationEntity: Conversation, eventJson: ButtonActionConfirmationEvent) {
     const {messageId, buttonId} = eventJson.data;
     try {
@@ -3089,7 +2894,7 @@ export class ConversationRepository {
       }
       const changes = messageEntity.getSelectionChange(buttonId);
       if (changes) {
-        this.eventService.updateEventSequentially(messageEntity.primary_key, changes);
+        await this.eventService.updateEventSequentially({primary_key: messageEntity.primary_key, ...changes});
       }
     } catch (error) {
       const isNotFound = error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;
@@ -3293,33 +3098,6 @@ export class ConversationRepository {
     }
   }
 
-  /**
-   * Forward the reaction event to the Notification repository for browser and audio notifications.
-   *
-   * @param conversationEntity Conversation that event was received in
-   * @param messageEntity Message that has been reacted upon
-   * @param eventJson JSON data of received reaction event
-   * @returns Resolves when the notification was prepared
-   */
-  private async prepareReactionNotification(
-    conversationEntity: Conversation,
-    messageEntity: ContentMessage,
-    eventJson: ReactionEvent,
-  ) {
-    const {data: event_data, from} = eventJson;
-
-    const messageFromSelf = messageEntity.from === this.userState.self().id;
-    if (messageFromSelf && event_data.reaction) {
-      const userEntity = await this.userRepository.getUserById({domain: messageEntity.fromDomain, id: from});
-      const reactionMessageEntity = new Message(messageEntity.id, SuperType.REACTION);
-      reactionMessageEntity.user(userEntity);
-      reactionMessageEntity.reaction = event_data.reaction;
-      return {conversationEntity, messageEntity: reactionMessageEntity};
-    }
-
-    return {conversationEntity};
-  }
-
   private updateMessagesUserEntities(messageEntities: Message[], options: {localOnly?: boolean} = {}) {
     return Promise.all(messageEntities.map(messageEntity => this.updateMessageUserEntities(messageEntity, options)));
   }
@@ -3347,20 +3125,6 @@ export class ConversationRepository {
           (messageEntity as MemberMessage).userEntities(userEntities);
           return messageEntity;
         });
-    }
-    if (messageEntity.isContent()) {
-      const userIds = Object.keys(messageEntity.reactions());
-
-      messageEntity.reactions_user_ets.removeAll();
-      if (userIds.length) {
-        // TODO(Federation): Make code federation-aware.
-        return this.userRepository
-          .getUsersById(userIds.map(userId => ({domain: '', id: userId})))
-          .then(userEntities => {
-            messageEntity.reactions_user_ets(userEntities);
-            return messageEntity;
-          });
-      }
     }
     return messageEntity;
   }
@@ -3400,15 +3164,11 @@ export class ConversationRepository {
       return !!this.propertyRepository.receiptMode();
     }
 
-    if (conversationEntity.team_id && conversationEntity.isGroup()) {
+    if (conversationEntity.teamId && conversationEntity.isGroup()) {
       return !!conversationEntity.receiptMode();
     }
 
     return false;
-  }
-
-  findConversationByGroupId(groupId: string): Conversation | undefined {
-    return this.conversationState.findConversationByGroupId(groupId);
   }
 
   public async cleanupEphemeralMessages(): Promise<void> {

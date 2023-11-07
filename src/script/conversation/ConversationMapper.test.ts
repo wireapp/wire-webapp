@@ -44,6 +44,7 @@ import {BaseError} from 'src/script/error/BaseError';
 import {createUuid} from 'Util/uuid';
 
 import {ACCESS_STATE} from './AccessState';
+import {ConversationVerificationState} from './ConversationVerificationState';
 
 import {entities, payload} from '../../../test/api/payloads';
 
@@ -92,7 +93,7 @@ describe('ConversationMapper', () => {
       expect(conversationEntity.isGroup()).toBeTruthy();
       expect(conversationEntity.name()).toBe(conversation.name);
       expect(conversationEntity.mutedState()).toBe(0);
-      expect(conversationEntity.team_id).toEqual(conversation.team);
+      expect(conversationEntity.teamId).toEqual(conversation.team);
       expect(conversationEntity.type()).toBe(CONVERSATION_TYPE.REGULAR);
 
       const expectedMutedTimestamp = new Date(conversation.members.self.otr_muted_ref).getTime();
@@ -179,7 +180,7 @@ describe('ConversationMapper', () => {
       const [conversationEntity] = ConversationMapper.mapConversations([payload] as ConversationDatabaseData[]);
 
       expect(conversationEntity.name()).toBe(payload.name);
-      expect(conversationEntity.team_id).toBe(payload.team);
+      expect(conversationEntity.teamId).toBe(payload.team);
     });
   });
 
@@ -369,7 +370,7 @@ describe('ConversationMapper', () => {
         status: 0,
         team_id: teamId,
         type: 0,
-        verification_state: 0,
+        verification_state: ConversationVerificationState.UNVERIFIED,
       };
 
       const remoteData: Partial<ConversationDatabaseData> = {
@@ -443,7 +444,7 @@ describe('ConversationMapper', () => {
         last_read_timestamp: 1488387380633,
         muted_state: NOTIFICATION_STATE.EVERYTHING,
         muted_timestamp: 0,
-        verification_state: 0,
+        verification_state: ConversationVerificationState.UNVERIFIED,
       };
 
       const [mergedConversation] = ConversationMapper.mergeConversations(
@@ -476,7 +477,7 @@ describe('ConversationMapper', () => {
         id: 'de7466b0-985c-4dc3-ad57-17877db45b4c',
         last_event_timestamp: 1488387380633,
         last_read_timestamp: 1488387380633,
-        verification_state: 0,
+        verification_state: ConversationVerificationState.UNVERIFIED,
       };
 
       const remoteData2: ConversationBackendData = JSON.parse(JSON.stringify(remoteData));
@@ -560,7 +561,7 @@ describe('ConversationMapper', () => {
         status: 0,
         team_id: '5316fe03-24ee-4b19-b789-6d026bd3ce5f',
         type: 2,
-        verification_state: 0,
+        verification_state: ConversationVerificationState.UNVERIFIED,
       };
 
       const [merged_conversation] = ConversationMapper.mergeConversations(
@@ -607,7 +608,7 @@ describe('ConversationMapper', () => {
         last_read_timestamp: 1488387380633,
         muted_state: NOTIFICATION_STATE.EVERYTHING,
         muted_timestamp: 0,
-        verification_state: 0,
+        verification_state: ConversationVerificationState.UNVERIFIED,
       };
 
       const selfUpdate: Partial<MemberBackendData> = {
@@ -681,7 +682,7 @@ describe('ConversationMapper', () => {
         last_server_timestamp: 1377276270510,
         muted_state: NOTIFICATION_STATE.EVERYTHING,
         muted_timestamp: 0,
-        verification_state: 0,
+        verification_state: ConversationVerificationState.UNVERIFIED,
       };
 
       const [merged_conversation] = ConversationMapper.mergeConversations(
@@ -736,7 +737,7 @@ describe('ConversationMapper', () => {
       ];
 
       const conversationEntity = new Conversation('conversation-id', 'domain');
-      conversationEntity.team_id = 'team_id';
+      conversationEntity.teamId = 'team_id';
 
       ConversationMapper.mapAccessState(conversationEntity, accessModes, accessRole, accessRoleV2);
       expect(conversationEntity.accessState()).toEqual(ACCESS_STATE.TEAM.GUEST_ROOM);
@@ -755,7 +756,7 @@ describe('ConversationMapper', () => {
       const accessRoleV2: undefined = undefined;
 
       const conversationEntity = new Conversation();
-      conversationEntity.team_id = 'team_id';
+      conversationEntity.teamId = 'team_id';
 
       ConversationMapper.mapAccessState(conversationEntity, accessModes, accessRole, accessRoleV2);
       expect(conversationEntity.accessState()).toEqual(ACCESS_STATE.TEAM.GUESTS_SERVICES);
@@ -819,7 +820,7 @@ describe('ConversationMapper', () => {
 
       it.each(mockRightsLegacy)('sets correct accessState for %s', (state, {accessModes, accessRole}) => {
         const conversationEntity = new Conversation();
-        conversationEntity.team_id = 'team_id';
+        conversationEntity.teamId = 'team_id';
 
         ConversationMapper.mapAccessState(conversationEntity, accessModes, accessRole);
         expect(conversationEntity.accessState()).toEqual(state);
@@ -859,7 +860,7 @@ describe('ConversationMapper', () => {
 
       it.each(mockAccessRights)('sets correct accessState for %s', (state, {accessModes, accessRole}) => {
         const conversationEntity = new Conversation();
-        conversationEntity.team_id = 'team_id';
+        conversationEntity.teamId = 'team_id';
 
         ConversationMapper.mapAccessState(conversationEntity, accessModes, accessRole);
         expect(conversationEntity.accessState()).toEqual(state);

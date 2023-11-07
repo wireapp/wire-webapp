@@ -131,6 +131,13 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
   const ProtectedSetPassword = () => isAuthenticatedCheck(<SetPassword />);
   const ProtectedOAuthPermissions = () => isOAuthCheck(<OAuthPermissions />);
 
+  // Send user back to index page after e2ei oauth redirect
+  // This is needed because the oauth redirect is only done by logged in users
+  // and the user would otherwise be stuck on login page without getting logged in
+  if (window.location.hash.includes(ROUTE.E2EI_OAUTH_REDIRECT)) {
+    navigate(ROUTE.INDEX);
+  }
+
   const brandName = Config.getConfig().BRAND_NAME;
   return (
     <IntlProvider locale={normalizeLanguage(language)} messages={loadLanguage(language)}>

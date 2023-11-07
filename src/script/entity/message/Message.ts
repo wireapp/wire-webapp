@@ -18,7 +18,6 @@
  */
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import type {ReactionType} from '@wireapp/core/lib/conversation/';
 import ko from 'knockout';
 
 import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
@@ -64,7 +63,6 @@ export class Message {
   public fromClientId: string;
   public id: string;
   public primary_key?: string;
-  public reaction: ReactionType;
   public readonly accent_color: ko.PureComputed<string>;
   public readonly ephemeral_caption: ko.PureComputed<string>;
   public readonly ephemeral_expires: ko.Observable<boolean | number | string>;
@@ -85,15 +83,6 @@ export class Message {
   public super_type: SuperType;
   public type: string;
   public version: number;
-
-  /**
-   * Sort messages by timestamp
-   * @param message_ets Message entities
-   * @returns Sorted message entities
-   */
-  static sortByTimestamp(message_ets: Message[]): Message[] {
-    return message_ets.sort((m1, m2) => m1.timestamp() - m2.timestamp());
-  }
 
   constructor(id: string = '0', super_type?: SuperType) {
     this.id = id;
@@ -173,22 +162,12 @@ export class Message {
     return formatDateNumeral(date);
   };
 
-  readonly equals = (messageEntity?: Message) => (messageEntity && this.id ? this.id === messageEntity.id : false);
-
   /**
    * Check if message contains an asset of type file.
    * @returns Message contains any file type asset
    */
   hasAsset(): boolean {
     return this.isContent() ? this.assets().some(assetEntity => assetEntity.type === AssetType.FILE) : false;
-  }
-
-  /**
-   * Check if message contains a file asset.
-   * @returns Message contains a file
-   */
-  hasAssetFile(): boolean {
-    return this.isContent() ? this.assets().some(assetEntity => assetEntity.isFile()) : false;
   }
 
   /**
@@ -443,20 +422,4 @@ export class Message {
     this.ephemeral_remaining(remainingTime);
     this.messageTimerStarted = true;
   };
-
-  /**
-   * Update the status of a message.
-   * @param updated_status New status of message
-   * @returns Returns the new status on a successful update, `false` otherwise
-   */
-  updateStatus(updated_status: StatusType): StatusType | false {
-    if (this.status() >= StatusType.SENT) {
-      if (updated_status > this.status()) {
-        return this.status(updated_status);
-      }
-    } else if (this.status() !== updated_status) {
-      return this.status(updated_status);
-    }
-    return false;
-  }
 }

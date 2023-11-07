@@ -17,8 +17,6 @@
  *
  */
 
-import {container} from 'tsyringe';
-
 import {getLogger, Logger} from 'Util/Logger';
 
 import {isSelfAPIUser} from './UserGuards';
@@ -26,7 +24,6 @@ import {isSelfAPIUser} from './UserGuards';
 import {mapProfileAssets, mapProfileAssetsV1, updateUserEntityAssets} from '../assets/AssetMapper';
 import {User} from '../entity/User';
 import {UserRecord} from '../storage';
-import {TeamState} from '../team/TeamState';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import '../view_model/bindings/CommonBindings';
 
@@ -37,10 +34,7 @@ export class UserMapper {
    * Construct a new User Mapper.
    * @param serverTimeHandler Handles time shift between server and client
    */
-  constructor(
-    private readonly serverTimeHandler: ServerTimeHandler,
-    private teamState = container.resolve(TeamState),
-  ) {
+  constructor(private readonly serverTimeHandler: ServerTimeHandler) {
     this.logger = getLogger('UserMapper');
   }
 
@@ -187,12 +181,8 @@ export class UserMapper {
       }
     }
 
-    const currentTeam = this.teamState.team()?.id;
     if (teamId) {
       userEntity.teamId = teamId;
-      if (!userEntity.isFederated && currentTeam && currentTeam === teamId) {
-        userEntity.inTeam(true);
-      }
     }
 
     if (deleted) {

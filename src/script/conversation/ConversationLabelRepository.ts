@@ -164,7 +164,6 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
   };
 
   readonly getFavoriteLabel = (): ConversationLabel => this.labels().find(({type}) => type === LabelType.Favorite);
-  readonly getLabelById = (labelId: string): ConversationLabel => this.labels().find(({id}) => id === labelId);
 
   readonly getFavorites = (conversations = this.conversations()): Conversation[] =>
     this.getLabelConversations(this.getFavoriteLabel(), conversations);

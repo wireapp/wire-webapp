@@ -54,6 +54,7 @@ export class User {
   public readonly connection: ko.Observable<ConnectionEntity>;
   /** does not include current client/device */
   public readonly devices: ko.ObservableArray<ClientEntity>;
+  public localClient: ClientEntity | undefined;
   public readonly email: ko.Observable<string>;
   public locale?: string;
   public readonly expirationRemaining: ko.Observable<number>;
@@ -61,9 +62,11 @@ export class User {
   public readonly expirationText: ko.Observable<string>;
   public readonly hasPendingLegalHold: ko.PureComputed<boolean>;
   public readonly initials: ko.PureComputed<string>;
-  public readonly inTeam: ko.Observable<boolean>;
   public readonly is_trusted: ko.PureComputed<boolean>;
+  // Manual Proteus verification
   public readonly is_verified: ko.PureComputed<boolean>;
+  // MLS certificate verification
+  public readonly isMLSVerified: ko.PureComputed<boolean>;
   public readonly isBlocked: ko.PureComputed<boolean>;
   public readonly isCanceled: ko.PureComputed<boolean>;
   public readonly isConnected: ko.PureComputed<boolean>;
@@ -83,6 +86,7 @@ export class User {
   public readonly isOnLegalHold: ko.PureComputed<boolean>;
   public readonly isOutgoingRequest: ko.PureComputed<boolean>;
   public readonly isRequest: ko.PureComputed<boolean>;
+  /** @deprecated use teamState.isInTeam method instead */
   public readonly isTeamMember: ko.Observable<boolean> = ko.observable(false);
   public readonly isTemporaryGuest: ko.Observable<boolean>;
   public readonly isUnknown: ko.PureComputed<boolean>;
@@ -180,7 +184,6 @@ export class User {
     this.isUnknown = ko.pureComputed(() => this.connection().isUnknown());
     this.isExternal = ko.pureComputed(() => this.teamRole() === TEAM_ROLE.PARTNER);
 
-    this.inTeam = ko.observable(false);
     this.isGuest = ko.observable(false);
     this.isDirectGuest = ko.pureComputed(() => {
       return this.isGuest() && !this.isFederated;
@@ -199,11 +202,22 @@ export class User {
     });
 
     this.devices = ko.observableArray();
+    // Proteus verification
     this.is_verified = ko.pureComputed(() => {
       if (this.devices().length === 0 && !this.isMe) {
         return false;
       }
-      return this.devices().every(client_et => client_et.meta.isVerified());
+      return this.devices().every(client_et => client_et.meta.isVerified?.());
+    });
+    this.isMLSVerified = ko.pureComputed(() => {
+      if (this.devices().length === 0) {
+        if (!this.isMe) {
+          return false;
+        }
+
+        return this.localClient?.meta.isMLSVerified?.() ?? false;
+      }
+      return this.devices().every(client_et => client_et.meta.isMLSVerified?.() ?? false);
     });
     this.isOnLegalHold = ko.pureComputed(() => {
       return this.devices().some(client_et => client_et.isLegalHold());

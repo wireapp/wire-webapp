@@ -248,14 +248,9 @@ const _getStateGroupActivity = {
     return '';
   },
   icon: (conversationEntity: Conversation): ConversationStatusIcon | void => {
-    const lastMessageEntity = conversationEntity.getNewestMessage();
-    const isMemberRemoval = lastMessageEntity.isMember() && (lastMessageEntity as MemberMessage).isMemberRemoval();
-
-    if (isMemberRemoval) {
-      return conversationEntity.showNotificationsEverything()
-        ? ConversationStatusIcon.UNREAD_MESSAGES
-        : ConversationStatusIcon.MUTED;
-    }
+    return conversationEntity.showNotificationsEverything()
+      ? ConversationStatusIcon.UNREAD_MESSAGES
+      : ConversationStatusIcon.MUTED;
   },
   match: (conversationEntity: Conversation) => {
     const lastMessageEntity = conversationEntity.getNewestMessage();
@@ -307,7 +302,7 @@ const _getStateRemoved = {
 
     return '';
   },
-  icon: () => ConversationStatusIcon.NONE,
+  icon: () => ConversationStatusIcon.UNREAD_MESSAGES,
   match: (conversationEntity: Conversation) => conversationEntity.removed_from_conversation(),
 };
 

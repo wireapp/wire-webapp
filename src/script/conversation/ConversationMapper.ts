@@ -34,6 +34,7 @@ import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {ACCESS_STATE} from './AccessState';
 import {ConversationStatus} from './ConversationStatus';
+import {ConversationVerificationState} from './ConversationVerificationState';
 
 import {Conversation} from '../entity/Conversation';
 import {BaseError, BASE_ERROR_TYPE} from '../error/BaseError';
@@ -60,7 +61,7 @@ export interface SelfStatusUpdateDatabaseData {
   otr_muted_status: number;
   receipt_mode: number;
   status: number;
-  verification_state: number;
+  verification_state: ConversationVerificationState;
 }
 
 type Roles = {[userId: string]: DefaultConversationRoleName | string};
@@ -270,7 +271,7 @@ export class ConversationMapper {
     // Team ID from database or backend payload
     const teamId = conversationData.team_id || conversationData.team;
     if (teamId) {
-      conversationEntity.team_id = teamId;
+      conversationEntity.teamId = teamId;
     }
 
     if (conversationData.is_guest) {
@@ -463,7 +464,7 @@ export class ConversationMapper {
   }
 
   static mapAccessCode(conversation: Conversation, accessCode: ConversationCode): void {
-    const isTeamConversation = conversation && conversation.team_id;
+    const isTeamConversation = conversation && conversation.teamId;
 
     if (accessCode.uri && isTeamConversation) {
       const baseUrl = `${window.wire.env.URL.ACCOUNT_BASE}/conversation-join/?key=${accessCode.key}&code=${accessCode.code}`;
@@ -478,7 +479,7 @@ export class ConversationMapper {
     accessRole: CONVERSATION_LEGACY_ACCESS_ROLE | CONVERSATION_ACCESS_ROLE[],
     accessRoleV2?: CONVERSATION_ACCESS_ROLE[],
   ): typeof ACCESS_STATE {
-    if (conversationEntity.team_id) {
+    if (conversationEntity.teamId) {
       if (conversationEntity.is1to1()) {
         return conversationEntity.accessState(ACCESS_STATE.TEAM.ONE2ONE);
       }

@@ -52,7 +52,6 @@ import {PermissionRepository} from 'src/script/permission/PermissionRepository';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {PropertiesService} from 'src/script/properties/PropertiesService';
 import {SearchRepository} from 'src/script/search/SearchRepository';
-import {SearchService} from 'src/script/search/SearchService';
 import {SelfService} from 'src/script/self/SelfService';
 import {Core} from 'src/script/service/CoreSingleton';
 import {createStorageEngine, DatabaseTypes} from 'src/script/service/StoreEngineProvider';
@@ -123,7 +122,7 @@ export class TestFactory {
     currentClient.time = '2016-10-07T16:01:42.133Z';
     currentClient.type = ClientType.TEMPORARY;
 
-    this.client_repository['clientState'].currentClient(currentClient);
+    this.client_repository['clientState'].currentClient = currentClient;
 
     return this.client_repository;
   }
@@ -145,7 +144,6 @@ export class TestFactory {
       serverTimeHandler,
       this.user_repository['userState'],
     );
-    this.event_repository.currentClient = this.client_repository['clientState'].currentClient;
 
     return this.event_repository;
   }
@@ -197,8 +195,7 @@ export class TestFactory {
    */
   async exposeSearchActors() {
     await this.exposeUserActors();
-    this.search_service = new SearchService();
-    this.search_repository = new SearchRepository(this.search_service, this.user_repository);
+    this.search_repository = new SearchRepository(this.user_repository);
 
     return this.search_repository;
   }
@@ -262,7 +259,7 @@ export class TestFactory {
     clientEntity.class = ClientClassification.DESKTOP;
     clientEntity.id = '60aee26b7f55a99f';
     const clientState = new ClientState();
-    clientState.currentClient(clientEntity);
+    clientState.currentClient = clientEntity;
 
     this.message_repository = new MessageRepository(
       () => this.conversation_repository,
@@ -273,7 +270,6 @@ export class TestFactory {
       this.user_repository,
       this.assetRepository,
       this.user_repository['userState'],
-      this.team_repository['teamState'],
       clientState,
     );
     const core = container.resolve(Core);

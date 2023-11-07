@@ -28,6 +28,7 @@ import {IconButton, IconButtonVariant, Select, useMatchMedia} from '@wireapp/rea
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {Icon} from 'Components/Icon';
 import {ConversationClassifiedBar} from 'Components/input/ClassifiedBar';
+import {MediaDeviceType} from 'src/script/media/MediaDeviceType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -50,7 +51,7 @@ import {MuteState} from '../../calling/CallState';
 import type {Participant} from '../../calling/Participant';
 import type {Grid} from '../../calling/videoGridHandler';
 import type {Conversation} from '../../entity/Conversation';
-import {DeviceTypes, ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../media/MediaDevicesHandler';
+import {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../media/MediaDevicesHandler';
 import type {Multitasking} from '../../notification/NotificationRepository';
 import {useAppState} from '../../page/useAppState';
 import {TeamState} from '../../team/TeamState';
@@ -129,40 +130,43 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     'classifiedDomains',
   ]);
 
-  const {videoInput: currentCameraDevice} = useKoSubscribableChildren(mediaDevicesHandler.currentDeviceId, [
-    DeviceTypes.VIDEO_INPUT,
+  const {
+    [MediaDeviceType.VIDEO_INPUT]: currentCameraDevice,
+    [MediaDeviceType.AUDIO_INPUT]: currentMicrophoneDevice,
+    [MediaDeviceType.AUDIO_OUTPUT]: currentSpeakerDevice,
+  } = useKoSubscribableChildren(mediaDevicesHandler.currentDeviceId, [
+    MediaDeviceType.VIDEO_INPUT,
+    MediaDeviceType.AUDIO_INPUT,
+    MediaDeviceType.AUDIO_OUTPUT,
+  ]);
+
+  const {videoinput, audioinput, audiooutput} = useKoSubscribableChildren(mediaDevicesHandler.availableDevices, [
+    MediaDeviceType.VIDEO_INPUT,
+    MediaDeviceType.AUDIO_INPUT,
+    MediaDeviceType.AUDIO_OUTPUT,
   ]);
   const [audioOptionsOpen, setAudioOptionsOpen] = React.useState(false);
   const [videoOptionsOpen, setVideoOptionsOpen] = React.useState(false);
   const minimize = () => multitasking.isMinimized(true);
-  const {videoInput} = useKoSubscribableChildren(mediaDevicesHandler.availableDevices, [DeviceTypes.VIDEO_INPUT]);
+
   const showToggleVideo =
     isVideoCallingEnabled &&
     (call.initialType === CALL_TYPE.VIDEO ||
       conversation.supportsVideoCall(call.conversationType === CONV_TYPE.CONFERENCE));
 
   const availableCameras = useMemo(
-    () => videoInput.map(device => (device as MediaDeviceInfo) || (device as ElectronDesktopCapturerSource)),
-    [videoInput],
+    () => videoinput.map(device => (device as MediaDeviceInfo) || (device as ElectronDesktopCapturerSource)),
+    [videoinput],
   );
-
-  const {audioInput: currentMicrophoneDevice, audioOutput: currentSpeakerDevice} = useKoSubscribableChildren(
-    mediaDevicesHandler.currentDeviceId,
-    [DeviceTypes.AUDIO_INPUT, DeviceTypes.AUDIO_OUTPUT],
-  );
-  const {audioInput, audioOutput} = useKoSubscribableChildren(mediaDevicesHandler.availableDevices, [
-    DeviceTypes.AUDIO_INPUT,
-    DeviceTypes.AUDIO_OUTPUT,
-  ]);
 
   const availableMicrophones = useMemo(
-    () => audioInput.map(device => (device as MediaDeviceInfo) || (device as ElectronDesktopCapturerSource)),
-    [audioInput],
+    () => audioinput.map(device => (device as MediaDeviceInfo) || (device as ElectronDesktopCapturerSource)),
+    [audioinput],
   );
 
   const availableSpeakers = useMemo(
-    () => audioOutput.map(device => (device as MediaDeviceInfo) || (device as ElectronDesktopCapturerSource)),
-    [audioOutput],
+    () => audiooutput.map(device => (device as MediaDeviceInfo) || (device as ElectronDesktopCapturerSource)),
+    [audiooutput],
   );
   const showSwitchMicrophone = availableMicrophones.length > 1;
 

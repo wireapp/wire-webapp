@@ -22,7 +22,6 @@ import {KeyPackageClaimUser} from '@wireapp/core/lib/conversation';
 
 import {Account} from '@wireapp/core';
 
-import {ConversationRepository} from '../conversation/ConversationRepository';
 import {
   isMLSConversation,
   isSelfConversation,
@@ -31,11 +30,6 @@ import {
 } from '../conversation/ConversationSelectors';
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
-
-type MLSConversationRepository = Pick<
-  ConversationRepository,
-  'findConversationByGroupId' | 'getConversationById' | 'conversationRoleRepository'
->;
 
 /**
  * Will initialize all the MLS conversations that the user is member of but that are not yet locally established.
@@ -66,28 +60,6 @@ export async function initMLSConversations(conversations: Conversation[], core: 
       return conversationService.joinByExternalCommit(qualifiedId);
     }),
   );
-}
-
-/**
- * Will initialise the MLS callbacks for the core.
- * It should be called before processing messages queue as the callbacks are being used when decrypting mls messages.
- *
- * @param core - the instance of the core
- * @param conversationRepository - conversations repository
- */
-export async function initMLSCallbacks(
-  core: Account,
-  conversationRepository: MLSConversationRepository,
-): Promise<void> {
-  return core.configureMLSCallbacks({
-    groupIdFromConversationId: async conversationId => {
-      const conversation = await conversationRepository.getConversationById(conversationId);
-      return conversation?.groupId;
-    },
-    // These rules are enforced by backend, no need to implement them on the client side.
-    authorize: async () => true,
-    userAuthorize: async () => true,
-  });
 }
 
 /**

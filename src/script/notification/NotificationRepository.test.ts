@@ -108,7 +108,7 @@ describe('NotificationRepository', () => {
     [conversation] = ConversationMapper.mapConversations([entities.conversation]);
     const selfUserEntity = new User(createUuid());
     selfUserEntity.isMe = true;
-    selfUserEntity.inTeam(true);
+    selfUserEntity.teamId = createUuid();
     conversation.selfUser(selfUserEntity);
     userState.self(selfUserEntity);
 
@@ -796,7 +796,7 @@ describe('NotificationRepository', () => {
     beforeEach(() => {
       const selfUserEntity = new User(userId.id);
       selfUserEntity.isMe = true;
-      selfUserEntity.inTeam(true);
+      selfUserEntity.teamId = createUuid();
 
       conversationEntity = new Conversation(createUuid());
       conversationEntity.selfUser(selfUserEntity);

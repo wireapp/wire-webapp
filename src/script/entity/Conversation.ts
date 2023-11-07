@@ -42,7 +42,6 @@ import {truncate} from 'Util/StringUtil';
 
 import {CallMessage} from './message/CallMessage';
 import type {ContentMessage} from './message/ContentMessage';
-import type {MemberMessage} from './message/MemberMessage';
 import type {Message} from './message/Message';
 import {PingMessage} from './message/PingMessage';
 import type {User} from './User';
@@ -95,7 +94,6 @@ export class Conversation {
   private shouldPersistStateChanges: boolean;
   public blockLegalHoldMessage: boolean;
   public hasCreationMessage: boolean;
-  public needsLegalHoldApproval: boolean = false;
   public readonly accessCode: ko.Observable<string>;
   public readonly accessState: ko.Observable<ACCESS_STATE>;
   public readonly archivedTimestamp: ko.Observable<number>;
@@ -108,10 +106,8 @@ export class Conversation {
   public groupId?: string;
   public epoch: number = -1;
   public cipherSuite: number = 1;
-  public readonly isUsingMLSProtocol: boolean;
   public readonly display_name: ko.PureComputed<string>;
-  public readonly firstUserEntity: ko.PureComputed<User>;
-  public readonly enforcedTeamMessageTimer: ko.PureComputed<number>;
+  public readonly firstUserEntity: ko.PureComputed<User | undefined>;
   public readonly globalMessageTimer: ko.Observable<number | null>;
   public readonly hasContentMessages: ko.Observable<boolean>;
   public readonly hasAdditionalMessages: ko.Observable<boolean>;
@@ -129,6 +125,7 @@ export class Conversation {
   public readonly is_loaded: ko.Observable<boolean>;
   public readonly is_pending: ko.Observable<boolean>;
   public readonly is_verified: ko.PureComputed<boolean | undefined>;
+  public readonly isMLSVerified: ko.PureComputed<boolean | undefined>;
   public readonly is1to1: ko.PureComputed<boolean>;
   public readonly isActiveParticipant: ko.PureComputed<boolean>;
   public readonly isClearable: ko.PureComputed<boolean>;
@@ -166,10 +163,11 @@ export class Conversation {
   public readonly showNotificationsMentionsAndReplies: ko.PureComputed<boolean>;
   public readonly showNotificationsNothing: ko.PureComputed<boolean>;
   public status: ko.Observable<ConversationStatus>;
-  public team_id: string;
+  public teamId: string;
   public readonly type: ko.Observable<CONVERSATION_TYPE>;
   public readonly unreadState: ko.PureComputed<UnreadState>;
   public readonly verification_state: ko.Observable<ConversationVerificationState>;
+  public readonly mlsVerificationState: ko.Observable<ConversationVerificationState>;
   public readonly withAllTeamMembers: ko.Observable<boolean>;
   public readonly hasExternal: ko.PureComputed<boolean>;
   public readonly hasFederatedUsers: ko.PureComputed<boolean>;
@@ -198,15 +196,8 @@ export class Conversation {
     this.accessCode = ko.observable();
     this.creator = undefined;
     this.name = ko.observable();
-    this.team_id = undefined;
+    this.teamId = undefined;
     this.type = ko.observable();
-
-    /**
-     * If a conversation has the groupId property it means that it
-     * is MLS protocol based as this property is for MLS conversations only.
-     * @returns boolean
-     */
-    this.isUsingMLSProtocol = protocol === ConversationProtocol.MLS;
 
     this.is_loaded = ko.observable(false);
     this.is_pending = ko.observable(false);
@@ -229,9 +220,9 @@ export class Conversation {
     this.isGuest = ko.observable(false);
 
     this.inTeam = ko.pureComputed(() => {
-      const isSameTeam = this.selfUser()?.teamId === this.team_id;
+      const isSameTeam = this.selfUser()?.teamId === this.teamId;
       const isSameDomain = this.domain === this.selfUser()?.domain;
-      return !!this.team_id && isSameTeam && !this.isGuest() && isSameDomain;
+      return !!this.teamId && isSameTeam && !this.isGuest() && isSameDomain;
     });
     this.isGuestRoom = ko.pureComputed(() => this.accessState() === ACCESS_STATE.TEAM.GUEST_ROOM);
     this.isGuestAndServicesRoom = ko.pureComputed(() => this.accessState() === ACCESS_STATE.TEAM.GUESTS_SERVICES);
@@ -242,7 +233,7 @@ export class Conversation {
     this.isTeam1to1 = ko.pureComputed(() => {
       const isGroupConversation = this.type() === CONVERSATION_TYPE.REGULAR;
       const hasOneParticipant = this.participating_user_ids().length === 1;
-      return isGroupConversation && hasOneParticipant && this.team_id && !this.name();
+      return isGroupConversation && hasOneParticipant && this.teamId && !this.name();
     });
     this.isGroup = ko.pureComputed(() => {
       const isGroupConversation = this.type() === CONVERSATION_TYPE.REGULAR;
@@ -260,11 +251,11 @@ export class Conversation {
 
     this.hasDirectGuest = ko.pureComputed(() => {
       const hasGuestUser = this.participating_user_ets().some(userEntity => userEntity.isDirectGuest());
-      return hasGuestUser && this.isGroup() && this.selfUser()?.inTeam();
+      return hasGuestUser && this.isGroup();
     });
     this.hasGuest = ko.pureComputed(() => {
       const hasGuestUser = this.participating_user_ets().some(userEntity => userEntity.isGuest());
-      return hasGuestUser && this.isGroup() && this.selfUser()?.inTeam();
+      return hasGuestUser && this.isGroup();
     });
     this.hasService = ko.pureComputed(() => this.participating_user_ets().some(userEntity => userEntity.isService));
     this.hasExternal = ko.pureComputed(() => this.participating_user_ets().some(userEntity => userEntity.isExternal()));
@@ -288,6 +279,7 @@ export class Conversation {
     this.archivedState = ko.observable(false).extend({notify: 'always'});
     this.mutedState = ko.observable(NOTIFICATION_STATE.EVERYTHING);
     this.verification_state = ko.observable(ConversationVerificationState.UNVERIFIED);
+    this.mlsVerificationState = ko.observable(ConversationVerificationState.UNVERIFIED);
 
     this.archivedTimestamp = ko.observable(0);
     this.cleared_timestamp = ko.observable(0);
@@ -308,13 +300,13 @@ export class Conversation {
       const knownNotificationStates = Object.values(NOTIFICATION_STATE);
       if (knownNotificationStates.includes(mutedState)) {
         const isStateMentionsAndReplies = mutedState === NOTIFICATION_STATE.MENTIONS_AND_REPLIES;
-        const isInvalidState = isStateMentionsAndReplies && !this.selfUser().inTeam();
+        const isInvalidState = isStateMentionsAndReplies && !this.selfUser()?.teamId;
 
         return isInvalidState ? NOTIFICATION_STATE.NOTHING : mutedState;
       }
 
       if (typeof mutedState === 'boolean') {
-        const migratedMutedState = this.selfUser().inTeam()
+        const migratedMutedState = !!this.selfUser()?.teamId
           ? NOTIFICATION_STATE.MENTIONS_AND_REPLIES
           : NOTIFICATION_STATE.NOTHING;
         return this.mutedState() ? migratedMutedState : NOTIFICATION_STATE.EVERYTHING;
@@ -331,6 +323,13 @@ export class Conversation {
       }
 
       return this.allUserEntities().every(userEntity => userEntity.is_verified());
+    });
+    this.isMLSVerified = ko.pureComputed(() => {
+      if (!this.hasInitializedUsers()) {
+        return undefined;
+      }
+
+      return this.allUserEntities().every(userEntity => userEntity.isMLSVerified());
     });
 
     this.legalHoldStatus = ko.observable(LegalHoldStatus.DISABLED);
@@ -817,38 +816,6 @@ export class Conversation {
     this.messages_unordered.removeAll();
   }
 
-  shouldUnarchive(): boolean {
-    if (!this.archivedState() || this.showNotificationsNothing()) {
-      return false;
-    }
-
-    const isNewerMessage = (messageEntity: Message) => messageEntity.timestamp() > this.archivedTimestamp();
-
-    const {allEvents, allMessages, selfMentions, selfReplies} = this.unreadState();
-    if (this.showNotificationsMentionsAndReplies()) {
-      const mentionsAndReplies = selfMentions.concat(selfReplies);
-      return mentionsAndReplies.some(isNewerMessage);
-    }
-
-    const hasNewMessage = allMessages.some(isNewerMessage);
-    if (hasNewMessage) {
-      return true;
-    }
-
-    return allEvents.some(messageEntity => {
-      if (!isNewerMessage(messageEntity)) {
-        return false;
-      }
-
-      const isCallActivation = messageEntity.isCall() && messageEntity.isActivation();
-      const isMemberJoin = messageEntity.isMember() && (messageEntity as MemberMessage).isMemberJoin();
-      const wasSelfUserAdded =
-        isMemberJoin && (messageEntity as MemberMessage).isUserAffected(this.selfUser().qualifiedId);
-
-      return isCallActivation || wasSelfUserAdded;
-    });
-  }
-
   /**
    * Checks for message duplicates.
    *
@@ -915,10 +882,6 @@ export class Conversation {
     }
   }
 
-  getAllMessages(): Message[] {
-    return this.messages();
-  }
-
   /**
    * Get the oldest loaded message of the conversation.
    */
@@ -935,19 +898,6 @@ export class Conversation {
    */
   getNewestMessage(): Message | undefined {
     return this.messages()[this.messages().length - 1];
-  }
-
-  /**
-   * Get the message before a given message.
-   * @param message_et Message to look up from
-   */
-  getPreviousMessage(message_et: Message): Message | undefined {
-    const messages_visible = this.messages_visible();
-    const message_index = messages_visible.indexOf(message_et);
-    if (message_index > 0) {
-      return messages_visible[message_index - 1];
-    }
-    return undefined;
   }
 
   /**
@@ -1016,6 +966,17 @@ export class Conversation {
     return userEntities.filter(userEntity => !userEntity.is_verified());
   }
 
+  getUsersWithUnverifiedMLSClients(): User[] {
+    const userEntities = this.selfUser()
+      ? this.participating_user_ets().concat(this.selfUser())
+      : this.participating_user_ets();
+    return userEntities.filter(userEntity => !userEntity.isMLSVerified());
+  }
+
+  getAllUserEntities(): User[] {
+    return this.participating_user_ets();
+  }
+
   supportsVideoCall(sftEnabled: boolean): boolean {
     if (sftEnabled) {
       return true;
@@ -1059,9 +1020,10 @@ export class Conversation {
       receipt_mode: this.receiptMode(),
       roles: this.roles(),
       status: this.status(),
-      team_id: this.team_id,
+      team_id: this.teamId,
       type: this.type(),
       verification_state: this.verification_state(),
+      mlsVerificationState: this.mlsVerificationState(),
     };
   }
 }
