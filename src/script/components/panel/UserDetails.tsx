@@ -21,6 +21,7 @@ import React, {useEffect} from 'react';
 
 import {amplify} from 'amplify';
 import {ErrorBoundary} from 'react-error-boundary';
+import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
@@ -30,6 +31,7 @@ import {ErrorFallback} from 'Components/ErrorFallback';
 import {Icon} from 'Components/Icon';
 import {UserClassifiedBar} from 'Components/input/ClassifiedBar';
 import {UserName} from 'Components/UserName';
+import {TeamState} from 'src/script/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -43,6 +45,7 @@ interface UserDetailsProps {
   isVerified?: boolean;
   participant: User;
   avatarStyles?: React.CSSProperties;
+  teamState?: TeamState;
 }
 
 const UserDetailsComponent: React.FC<UserDetailsProps> = ({
@@ -52,9 +55,9 @@ const UserDetailsComponent: React.FC<UserDetailsProps> = ({
   isGroupAdmin,
   avatarStyles,
   classifiedDomains,
+  teamState = container.resolve(TeamState),
 }) => {
   const user = useKoSubscribableChildren(participant, [
-    'inTeam',
     'isGuest',
     'isTemporaryGuest',
     'expirationText',
@@ -70,13 +73,10 @@ const UserDetailsComponent: React.FC<UserDetailsProps> = ({
     amplify.publish(WebAppEvents.USER.UPDATE, participant.qualifiedId);
   }, [participant]);
 
-  const isFederated = participant.isFederated;
-  const isGuest = !isFederated && user.isGuest;
-
   return (
     <div className="panel-participant">
       <div className="panel-participant__head">
-        {user.inTeam ? (
+        {teamState.isInTeam(participant) ? (
           <AvailabilityState
             className="panel-participant__head__name"
             availability={user.availability}
@@ -120,14 +120,14 @@ const UserDetailsComponent: React.FC<UserDetailsProps> = ({
         </div>
       )}
 
-      {isFederated && (
+      {participant.isFederated && (
         <div className="panel-participant__label" data-uie-name="status-federated-user">
           <Icon.Federation />
           <span>{t('conversationFederationIndicator')}</span>
         </div>
       )}
 
-      {isGuest && user.isAvailable && !isFederated && (
+      {user.isGuest && user.isAvailable && (
         <div className="panel-participant__label" data-uie-name="status-guest">
           <Icon.Guest />
           <span>{t('conversationGuestIndicator')}</span>

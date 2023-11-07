@@ -101,10 +101,8 @@ export const UserList = ({
   const hasMoreUsers = !truncate && users.length > maxShownUsers;
 
   const highlightedUserIds = highlightedUsers.map(user => user.id);
-  const {is_verified: isSelfVerified, inTeam: selfInTeam} = useKoSubscribableChildren(selfUser, [
-    'is_verified',
-    'inTeam',
-  ]);
+  const {is_verified: isSelfVerified} = useKoSubscribableChildren(selfUser, ['is_verified']);
+  const selfInTeam = teamState.isInTeam(selfUser);
 
   // subscribe to roles changes in order to react to them
   useKoSubscribableChildren(conversation, ['roles']);

@@ -134,7 +134,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       'firstUserEntity',
     ]);
 
-    const teamId = activeConversation.team_id;
+    const teamId = activeConversation.teamId;
 
     const {
       isTeam,
@@ -435,7 +435,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
                   !!(
                     isSingleUserMode &&
                     firstParticipant &&
-                    (firstParticipant.isConnected() || firstParticipant.inTeam())
+                    (firstParticipant.isConnected() || teamState.isInTeam(firstParticipant))
                   )
                 }
                 showDevices={openParticipantDevices}

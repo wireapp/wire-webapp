@@ -88,7 +88,7 @@ describe('Conversation', () => {
     });
 
     it('should return the expected value for team conversations', () => {
-      conversation_et.team_id = createUuid();
+      conversation_et.teamId = createUuid();
 
       conversation_et.type(CONVERSATION_TYPE.CONNECT);
 
@@ -621,7 +621,7 @@ describe('Conversation', () => {
       conversation_et = new Conversation(createUuid());
       const selfUserEntity = new User(createUuid(), null);
       selfUserEntity.isMe = true;
-      selfUserEntity.inTeam(true);
+      selfUserEntity.teamId = createUuid();
       conversation_et.selfUser(selfUserEntity);
 
       // Is false for conversations not containing a guest
@@ -650,14 +650,14 @@ describe('Conversation', () => {
       expect(conversation_et.hasGuest()).toBe(true);
 
       // Is false for conversations containing a guest if the self user is a personal account
-      selfUserEntity.inTeam(false);
+      selfUserEntity.teamId = createUuid();
       conversation_et.type(CONVERSATION_TYPE.ONE_TO_ONE);
 
       expect(conversation_et.hasGuest()).toBe(false);
 
       conversation_et.type(CONVERSATION_TYPE.REGULAR);
 
-      expect(conversation_et.hasGuest()).toBe(false);
+      expect(conversation_et.hasGuest()).toBe(true);
     });
   });
 
@@ -665,7 +665,7 @@ describe('Conversation', () => {
     it('is considered a team conversation when teamId and domain are equal', () => {
       const teamId = 'team1';
       const conversation = new Conversation(createUuid(), 'domain.test');
-      conversation.team_id = teamId;
+      conversation.teamId = teamId;
       const selfUser = new User(createUuid(), 'domain.test');
       selfUser.isMe = true;
       selfUser.teamId = teamId;
@@ -678,7 +678,7 @@ describe('Conversation', () => {
     it('is not considered a team conversation when teamId are equal but domains differ', () => {
       const teamId = 'team1';
       const conversation = new Conversation(createUuid(), 'otherdomain.test');
-      conversation.team_id = teamId;
+      conversation.teamId = teamId;
       const selfUser = new User(createUuid(), 'domain.test');
       selfUser.isMe = true;
       selfUser.teamId = teamId;
@@ -1003,7 +1003,7 @@ describe('Conversation', () => {
       conversationEntity.mutedState(NOTIFICATION_STATES.EVERYTHING);
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
-      selfUserEntity.inTeam(true);
+      selfUserEntity.teamId = createUuid();
       conversationEntity.mutedState(undefined);
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);

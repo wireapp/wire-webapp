@@ -99,7 +99,7 @@ export const Conversation = ({
     'isFileSharingSendingEnabled',
   ]);
   const {is1to1, isRequest} = useKoSubscribableChildren(activeConversation!, ['is1to1', 'isRequest']);
-  const {inTeam} = useKoSubscribableChildren(selfUser, ['inTeam']);
+  const inTeam = teamState.isInTeam(selfUser);
 
   const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
   const [isMsgElementsFocusable, setMsgElementsFocusable] = useState(true);

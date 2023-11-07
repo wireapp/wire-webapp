@@ -125,7 +125,7 @@ export class ConversationRoleRepository {
   };
 
   private readonly getConversationRoles = (conversation: Conversation): ConversationRole[] => {
-    if (this.teamState.isTeam() && this.teamState.team()?.id === conversation.team_id) {
+    if (this.teamState.isTeam() && this.teamState.team()?.id === conversation.teamId) {
       return this.teamRoles;
     }
     return this.teamRoles;

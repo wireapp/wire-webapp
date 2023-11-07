@@ -795,7 +795,7 @@ export class UserRepository {
     if (this.teamState.isTeam()) {
       this.mapGuestStatus([updatedUser]);
     }
-    if (updatedUser && updatedUser.inTeam() && updatedUser.isDeleted) {
+    if (updatedUser && this.teamState.isInTeam(updatedUser) && updatedUser.isDeleted) {
       amplify.publish(WebAppEvents.TEAM.MEMBER_LEAVE, updatedUser.teamId, userId);
     }
     return updatedUser;
@@ -911,8 +911,8 @@ export class UserRepository {
     const selfTeamId = this.userState.self().teamId;
     userEntities.forEach(userEntity => {
       if (!userEntity.isMe && selfTeamId) {
-        const isTeamMember = selfTeamId === userEntity.teamId;
-        const isGuest = !userEntity.isService && !isTeamMember && selfTeamId !== userEntity.teamId;
+        const isTeamMember = this.teamState.isInTeam(userEntity);
+        const isGuest = !userEntity.isService && !isTeamMember;
         userEntity.isGuest(isGuest);
         userEntity.isTeamMember(isTeamMember);
       }
