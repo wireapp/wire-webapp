@@ -109,16 +109,16 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     amplify.subscribe(WebAppEvents.TEAM.UPDATE_INFO, this.sendAccountInfo.bind(this));
   }
 
-  readonly getRoleBadge = (userId: string): string => {
+  getRoleBadge(userId: string): string {
     return this.teamState.isExternal(userId) ? t('rolePartner') : '';
-  };
+  }
 
-  readonly isSelfConnectedTo = (userId: string): boolean => {
+  isSelfConnectedTo(userId: string): boolean {
     return (
       this.teamState.memberRoles()[userId] !== ROLE.PARTNER ||
       this.teamState.memberInviters()[userId] === this.userState.self().id
     );
-  };
+  }
 
   async initTeam(teamId?: string): Promise<QualifiedId[]> {
     const team = await this.getTeam();
