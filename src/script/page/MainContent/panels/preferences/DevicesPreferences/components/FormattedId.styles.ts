@@ -27,7 +27,7 @@ export const devicePart = (smallPadding = false): CSSObject => ({
   ...(!smallPadding && {
     width: '18px',
 
-    '&:nth-child(8n)': {
+    '&:nth-of-type(8n)': {
       marginRight: 0,
 
       '&::after': {

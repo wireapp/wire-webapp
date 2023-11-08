@@ -18,6 +18,7 @@
  */
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {WireIdentity} from '@wireapp/core/lib/messagingProtocols/mls';
 import {container} from 'tsyringe';
 
 import {PrimaryModal, removeCurrentModal} from 'Components/Modals/PrimaryModal';
@@ -65,16 +66,6 @@ class E2EIHandler {
       gracePeriodExpiredCallback: () => null,
       delayPeriodExpiredCallback: () => null,
     });
-  }
-
-  private get coreE2EIService() {
-    const e2eiService = this.core.service?.e2eIdentity;
-
-    if (!e2eiService) {
-      throw new Error('E2EI Service not available');
-    }
-
-    return e2eiService;
   }
 
   /**
@@ -142,7 +133,7 @@ class E2EIHandler {
       let oAuthIdToken: string | undefined;
 
       // If the enrollment is in progress, we need to get the id token from the oidc service, since oauth should have already been completed
-      if (this.coreE2EIService.isEnrollmentInProgress()) {
+      if (this.core.service?.e2eIdentity?.isEnrollmentInProgress()) {
         const oidcService = getOIDCServiceInstance();
         const userData = await oidcService.handleAuthentication();
         if (!userData) {
@@ -223,7 +214,7 @@ class E2EIHandler {
     const oidcService = getOIDCServiceInstance();
     await oidcService.clearProgress();
     // Clear the e2e identity progress
-    this.coreE2EIService.clearAllProgress();
+    this.core.service?.e2eIdentity?.clearAllProgress();
 
     const {modalOptions, modalType} = getModalOptions({
       type: ModalType.ERROR,
@@ -243,7 +234,7 @@ class E2EIHandler {
   private showE2EINotificationMessage(): void {
     // If the user has already started enrollment, don't show the notification. Instead, show the loading modal
     // This will occur after the redirect from the oauth provider
-    if (this.coreE2EIService.isEnrollmentInProgress()) {
+    if (this.core.service?.e2eIdentity?.isEnrollmentInProgress()) {
       void this.enrollE2EI();
       return;
     }
@@ -287,7 +278,7 @@ class E2EIHandler {
    * Checks if E2EI has active certificate.
    */
   public hasActiveCertificate() {
-    return this.coreE2EIService.hasActiveCertificate();
+    return !!this.core.service?.e2eIdentity?.hasActiveCertificate();
   }
 
   /**
@@ -298,7 +289,7 @@ class E2EIHandler {
       return undefined;
     }
 
-    return this.coreE2EIService.getCertificateData();
+    return this.core.service?.e2eIdentity?.getCertificateData();
   }
 
   /**
@@ -306,8 +297,11 @@ class E2EIHandler {
    * @param clientIdsWithUser client ids with user data
    * Returns devices E2EI certificates
    */
-  public async getUserDeviceEntities(groupId: string | Uint8Array, clientIdsWithUser: Record<string, QualifiedId>) {
-    return this.coreE2EIService.getUserDeviceEntities(groupId, clientIdsWithUser);
+  public async getUserDeviceEntities(
+    groupId: string | Uint8Array,
+    clientIdsWithUser: Record<string, QualifiedId>,
+  ): Promise<WireIdentity[]> {
+    return this.core.service?.e2eIdentity?.getUserDeviceEntities(groupId, clientIdsWithUser) || [];
   }
 }
 

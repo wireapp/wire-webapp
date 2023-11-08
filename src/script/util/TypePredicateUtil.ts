@@ -23,6 +23,7 @@ import {AxiosError} from 'axios';
 
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
+import {isObject} from '../guards/common';
 import {ClientRecord} from '../storage/record/ClientRecord';
 
 export function isAxiosError<T>(errorCandidate: any): errorCandidate is AxiosError<T> {
@@ -45,7 +46,6 @@ export function isClientRecord(record: any): record is ClientRecord {
   return !!record.meta;
 }
 
-// TODO: Temporary checking for mls_public_keys
-export function hasMlsPublicKeys(client: any): client is RegisteredClient {
-  return !!client && 'mls_public_keys' in client;
+export function isClientWithMLSPublicKeys(record: unknown): record is RegisteredClient {
+  return isObject(record) && 'mls_public_keys' in record;
 }
