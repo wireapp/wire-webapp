@@ -65,7 +65,6 @@ describe('CertificateDetailsModal', () => {
 
     await waitFor(() => {
       expect(copyButton.disabled).toBe(true);
-      // expect(getByText('Text copied!')).toBeDefined();
     });
   });
 });

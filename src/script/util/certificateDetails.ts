@@ -22,17 +22,23 @@ import * as x509 from '@peculiar/x509';
 import {MLSStatuses} from 'Components/VerificationBadges';
 
 // TODO: Will be changed when I get information how much hours before we need to display this status.
-const EXPIRATION_HOURS = 32;
+const EXPIRATION_HOURS = 4;
+
+const checkExpirationDate = (notAfter: Date) => {
+  const endDate = new Date(notAfter);
+  const currentDate = new Date();
+  const dateBeforeEnd = new Date(notAfter);
+  dateBeforeEnd.setHours(endDate.getHours() - EXPIRATION_HOURS);
+
+  return currentDate > dateBeforeEnd;
+};
 
 export const getCertificateDetails = (certificate?: string) => {
   const currentDate = new Date();
   const parsedCertificate = certificate ? new x509.X509Certificate(certificate) : null;
   const isValid =
     !!parsedCertificate && currentDate > parsedCertificate.notBefore && currentDate < parsedCertificate.notAfter;
-
-  const expireDate = parsedCertificate?.notAfter ? new Date(parsedCertificate.notAfter) : null;
-  const expirationDate = expireDate ? expireDate.setHours(expireDate.getHours() - EXPIRATION_HOURS) : null;
-  const isExpireSoon = isValid && !!expirationDate && parsedCertificate.notAfter > new Date(expirationDate);
+  const isExpireSoon = isValid && !!parsedCertificate?.notAfter && checkExpirationDate(parsedCertificate.notAfter);
 
   return {
     isNotDownloaded: !certificate,

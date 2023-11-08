@@ -22,7 +22,7 @@ import {FeatureStatus, FEATURE_KEY, FeatureList} from '@wireapp/api-client/lib/t
 import {E2EIHandler} from 'src/script/E2EIdentity';
 import {Logger} from 'Util/Logger';
 
-import {hasE2EIVerificationExpiration, hasMLSDefaultProtocol} from '../../guards';
+import {hasE2EIVerificationExpiration, hasMLSDefaultProtocol} from '../../../../../guards/Protocol';
 
 export const handleE2EIdentityFeatureChange = (logger: Logger, config: FeatureList) => {
   const e2eiConfig = config[FEATURE_KEY.MLSE2EID];

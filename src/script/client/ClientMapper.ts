@@ -23,7 +23,7 @@ import {ClientEntity} from './ClientEntity';
 import {parseClientId} from './ClientIdUtil';
 
 import {ClientRecord} from '../storage';
-import {isClientRecord, isRegisteredClient} from '../util/TypePredicateUtil';
+import {isClientRecord, isClientWithMLSPublicKeys} from '../util/TypePredicateUtil';
 
 export class ClientMapper {
   static get CONFIG() {
@@ -63,7 +63,7 @@ export class ClientMapper {
       clientEntity.meta.userId = userId;
     }
 
-    if (isClientRecord(clientPayload) || isRegisteredClient(clientPayload)) {
+    if (isClientWithMLSPublicKeys(clientPayload)) {
       clientEntity.mlsPublicKeys = clientPayload.mls_public_keys;
     }
 
