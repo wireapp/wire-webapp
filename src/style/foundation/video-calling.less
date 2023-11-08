@@ -45,7 +45,7 @@
 
 .video-element-remote {
   display: flex;
-  height: calc(100% - 125px);
+  height: calc(100% - 110px);
   flex-direction: column;
   // fade in animation
   animation: video-fade-in @animation-timing-slower @ease-out-quart forwards;
@@ -72,9 +72,8 @@
 
 .video-title {
   display: flex;
-  height: 45px;
-  align-items: center;
-  justify-content: space-around;
+  align-items: baseline;
+  justify-content: center;
   background-color: var(--sidebar-bg);
 
   @media (max-height: @screen-height-sm) {
@@ -89,6 +88,13 @@
     background-color: var(--accent-color);
     color: var(--app-bg-secondary);
   }
+}
+
+.pagination-wrapper {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  background-color: var(--app-bg-secondary);
 }
 
 .video-remote-name {
@@ -140,7 +146,7 @@
     display: flex;
     width: 100%;
     justify-content: space-between;
-    padding: 15px 40px 0 40px;
+    padding: 5px 40px 0 40px;
     margin: 0;
 
     @media (max-width: @call-ui-sm) {

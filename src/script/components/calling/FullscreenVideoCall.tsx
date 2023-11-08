@@ -359,52 +359,53 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
             }}
           />
         )}
+        {!maximizedParticipant && activeCallViewTab === CallViewTab.ALL && totalPages > 1 && (
+          <>
+            {currentPage !== totalPages - 1 && (
+              <button
+                data-uie-name="pagination-next"
+                onClick={() => changePage(currentPage + 1, call)}
+                type="button"
+                className="button-reset-default"
+                css={{
+                  ...paginationButtonStyles,
+                  borderBottomLeftRadius: 32,
+                  borderTopLeftRadius: 32,
+                  right: 0,
+                }}
+              >
+                <Icon.ArrowNext css={{left: 4, position: 'relative'}} />
+              </button>
+            )}
+            {currentPage !== 0 && (
+              <button
+                data-uie-name="pagination-previous"
+                type="button"
+                onClick={() => changePage(currentPage - 1, call)}
+                className="button-reset-default"
+                css={{
+                  ...paginationButtonStyles,
+                  borderBottomRightRadius: 32,
+                  borderTopRightRadius: 32,
+                  left: 0,
+                }}
+              >
+                <Icon.ArrowNext css={{position: 'relative', right: 4, transform: 'rotate(180deg)'}} />
+              </button>
+            )}
+            {!verticalBreakpoint && (
+              <div className="pagination-wrapper">
+                <Pagination
+                  totalPages={totalPages}
+                  currentPage={currentPage}
+                  onChangePage={newPage => changePage(newPage, call)}
+                />
+              </div>
+            )}
+          </>
+        )}
       </div>
-      {!maximizedParticipant && activeCallViewTab === CallViewTab.ALL && totalPages > 1 && (
-        <>
-          {currentPage !== totalPages - 1 && (
-            <button
-              data-uie-name="pagination-next"
-              onClick={() => changePage(currentPage + 1, call)}
-              type="button"
-              className="button-reset-default"
-              css={{
-                ...paginationButtonStyles,
-                borderBottomLeftRadius: 32,
-                borderTopLeftRadius: 32,
-                right: 0,
-              }}
-            >
-              <Icon.ArrowNext css={{left: 4, position: 'relative'}} />
-            </button>
-          )}
-          {currentPage !== 0 && (
-            <button
-              data-uie-name="pagination-previous"
-              type="button"
-              onClick={() => changePage(currentPage - 1, call)}
-              className="button-reset-default"
-              css={{
-                ...paginationButtonStyles,
-                borderBottomRightRadius: 32,
-                borderTopRightRadius: 32,
-                left: 0,
-              }}
-            >
-              <Icon.ArrowNext css={{position: 'relative', right: 4, transform: 'rotate(180deg)'}} />
-            </button>
-          )}
-          {!verticalBreakpoint && (
-            <div css={{bottom: 108, display: 'flex', justifyContent: 'center', position: 'absolute', width: '100%'}}>
-              <Pagination
-                totalPages={totalPages}
-                currentPage={currentPage}
-                onChangePage={newPage => changePage(newPage, call)}
-              />
-            </div>
-          )}
-        </>
-      )}
+
       {!isChoosingScreen && (
         <div id="video-controls" className="video-controls">
           <ul className="video-controls__wrapper">
@@ -546,18 +547,6 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                       <Icon.Chevron css={{rotate: '180deg', height: '16px'}} />
                     )}
                   </button>
-
-                  {/*  <DeviceToggleButton
-                        styles={css`
-                          bottom: -38px;
-                          left: 50%;
-                          position: absolute;
-                          transform: translateX(-50%);
-                        `}
-                        currentDevice={currentCameraDevice}
-                        devices={availableCameras}
-                        onChooseDevice={deviceId => switchCameraInput(call, deviceId)}
-                      />*/}
                 </li>
               )}
 
@@ -574,7 +563,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                   }
                   onClick={() => toggleScreenshare(call)}
                   type="button"
-                  aria-labelledby="screnn-share-label"
+                  aria-labelledby="screen-share-label"
                   data-uie-value={selfSharesScreen ? 'active' : 'inactive'}
                   data-uie-enabled={canShareScreen ? 'true' : 'false'}
                   data-uie-name="do-toggle-screen"
