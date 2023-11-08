@@ -20,7 +20,6 @@
 import ko from 'knockout';
 
 import {AssetRemoteData} from '../assets/AssetRemoteData';
-import type {User} from '../entity/User';
 import {assetV3} from '../util/ValidationUtil';
 
 export class TeamEntity {
@@ -30,14 +29,12 @@ export class TeamEntity {
   /** Team icon (asset key) */
   iconKey?: string;
   id?: string;
-  members: ko.ObservableArray<User>;
   name: ko.Observable<string>;
 
   constructor(id?: string) {
     this.creator = undefined;
     this.icon = '';
     this.iconKey = undefined;
-    this.members = ko.observableArray<User>([]);
     this.id = id;
     this.name = ko.observable('');
   }
@@ -46,7 +43,7 @@ export class TeamEntity {
     let hasIcon = false;
 
     try {
-      hasIcon = this.icon && assetV3(this.icon);
+      hasIcon = !!this.icon && assetV3(this.icon);
     } catch (error) {}
 
     if (hasIcon) {
