@@ -416,18 +416,15 @@ export class App {
       onProgress(10);
       telemetry.timeStep(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
 
-      const connections = await connectionRepository.getConnections();
-
+      const {members: teamMembers} = await teamRepository.initTeam(selfUser.teamId);
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_USER_DATA);
 
+      const connections = await connectionRepository.getConnections();
       telemetry.addStatistic(AppInitStatisticsValue.CONNECTIONS, connections.length, 50);
 
       const conversations = await conversationRepository.loadConversations();
 
-      const contacts = await userRepository.loadUsers(selfUser, connections, conversations);
-      if (selfUser.teamId) {
-        await teamRepository.initTeam(selfUser.teamId, contacts);
-      }
+      await userRepository.loadUsers(selfUser, connections, conversations, teamMembers);
 
       if (supportsMLS()) {
         //if mls is supported, we need to initialize the callbacks (they are used when decrypting messages)

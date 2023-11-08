@@ -24,7 +24,7 @@ import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {CALL_TYPE, CONV_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
+import {CALL_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 
 import {Avatar, AVATAR_SIZE, GroupAvatar} from 'Components/Avatar';
 import {Duration} from 'Components/calling/Duration';
@@ -169,8 +169,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
   const {activeSpeakers} = useKoSubscribableChildren(call, ['activeSpeakers']);
 
   const isOutgoingVideoCall = isOutgoing && selfSharesCamera;
-  const isVideoUnsupported =
-    !selfSharesCamera && !conversation?.supportsVideoCall(call.conversationType === CONV_TYPE.CONFERENCE);
+  const isVideoUnsupported = !selfSharesCamera && !conversation?.supportsVideoCall(call.isConference);
   const disableVideoButton = isOutgoingVideoCall || isVideoUnsupported;
   const disableScreenButton = !callingRepository.supportsScreenSharing;
 
