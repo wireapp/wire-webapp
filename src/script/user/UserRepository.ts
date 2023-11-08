@@ -196,19 +196,10 @@ export class UserRepository extends TypedEventEmitter<Events> {
    * @param selfUser the user currently logged in (will be excluded from fetch)
    * @param connections the connection to other users
    * @param conversations the conversation the user is part of (used to compute extra users that are part of those conversations but not directly connected to the user)
-   * @param extraUsers other users that would need to be loaded (team users usually that are not direct connections)
    */
-  async loadUsers(
-    selfUser: User,
-    connections: ConnectionEntity[],
-    conversations: Conversation[],
-    extraUsers: QualifiedId[],
-  ): Promise<User[]> {
+  async loadUsers(selfUser: User, connections: ConnectionEntity[], conversations: Conversation[]): Promise<User[]> {
     const conversationMembers = flatten(conversations.map(conversation => conversation.participating_user_ids()));
-    const allUserIds = connections
-      .map(connectionEntity => connectionEntity.userId)
-      .concat(conversationMembers)
-      .concat(extraUsers);
+    const allUserIds = connections.map(connectionEntity => connectionEntity.userId).concat(conversationMembers);
     const users = uniq(allUserIds, false, (userId: QualifiedId) => userId.id);
 
     // Remove all users that have non-qualified Ids in DB (there could be duplicated entries one qualified and one non-qualified)
@@ -848,7 +839,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
     if (this.teamState.isTeam()) {
       this.mapGuestStatus([updatedUser]);
     }
-    if (updatedUser && updatedUser.inTeam() && updatedUser.isDeleted) {
+    if (updatedUser && this.teamState.isInTeam(updatedUser) && updatedUser.isDeleted) {
       amplify.publish(WebAppEvents.TEAM.MEMBER_LEAVE, updatedUser.teamId, userId);
     }
     return updatedUser;
@@ -964,8 +955,8 @@ export class UserRepository extends TypedEventEmitter<Events> {
     const selfTeamId = this.userState.self().teamId;
     userEntities.forEach(userEntity => {
       if (!userEntity.isMe && selfTeamId) {
-        const isTeamMember = selfTeamId === userEntity.teamId;
-        const isGuest = !userEntity.isService && !isTeamMember && selfTeamId !== userEntity.teamId;
+        const isTeamMember = this.teamState.isInTeam(userEntity);
+        const isGuest = !userEntity.isService && !isTeamMember;
         userEntity.isGuest(isGuest);
         userEntity.isTeamMember(isTeamMember);
       }

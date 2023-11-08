@@ -21,7 +21,7 @@
     "countly-sdk-web": "23.6.2",
     "date-fns": "2.30.0",
     "dexie-batch": "0.4.3",
-    "emoji-picker-react": "4.5.7",
+    "emoji-picker-react": "4.5.14",
     "highlight.js": "11.9.0",
     "http-status-codes": "2.3.0",
     "jimp": "0.22.10",
@@ -55,7 +55,7 @@
     "underscore": "1.13.6",
     "uuidjs": "4.2.13",
     "webrtc-adapter": "8.2.3",
-    "zustand": "4.4.5"
+    "zustand": "4.4.6"
   },
   "devDependencies": {
     "@babel/core": "7.23.2",
@@ -91,7 +91,7 @@
     "@types/react-transition-group": "4.4.8",
     "@types/redux-mock-store": "1.0.5",
     "@types/seedrandom": "^3",
-    "@types/sinon": "10.0.19",
+    "@types/sinon": "17.0.0",
     "@types/speakingurl": "13.0.5",
     "@types/underscore": "1.11.12",
     "@types/webpack-env": "1.18.3",
@@ -110,7 +110,7 @@
     "dexie": "3.2.4",
     "dotenv": "16.3.1",
     "dpdm": "3.14.0",
-    "eslint": "^8.52.0",
+    "eslint": "^8.53.0",
     "eslint-plugin-prettier": "^5.0.1",
     "fake-indexeddb": "4.0.2",
     "generate-changelog": "1.8.0",

@@ -81,7 +81,6 @@ describe('User Mapper', () => {
       );
 
       expect(user.isFederated).toBe(true);
-      expect(user.inTeam()).toBe(false);
     });
 
     it('can convert users with profile images marked as non public', () => {

@@ -152,7 +152,7 @@ const MainContent: FC<MainContentProps> = ({
                 className={cx('preferences-page preferences-about', incomingCssClass)}
                 ref={removeAnimationsClass}
               >
-                <AboutPreferences selfUser={selfUser} />
+                <AboutPreferences selfUser={selfUser} teamState={teamState} />
               </div>
             )}
 

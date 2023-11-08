@@ -30,7 +30,6 @@ import {Icon} from 'Components/Icon';
 import {UserList, UserlistMode} from 'Components/UserList';
 import {Conversation} from 'src/script/entity/Conversation';
 import {UserRepository} from 'src/script/user/UserRepository';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
@@ -101,7 +100,7 @@ export const PeopleTab = ({
   const [hasFederationError, setHasFederationError] = useState(false);
   const currentSearchQuery = useRef('');
 
-  const {inTeam} = useKoSubscribableChildren(selfUser, ['inTeam']);
+  const inTeam = teamState.isInTeam(selfUser);
 
   const getLocalUsers = (unfiltered?: boolean) => {
     const connectedUsers = conversationState.connectedUsers();
@@ -196,7 +195,7 @@ export const PeopleTab = ({
       onSearchResults(localSearchResults);
       if (canSearchUnconnectedUsers) {
         try {
-          const userEntities = await searchRepository.searchByName(searchQuery);
+          const userEntities = await searchRepository.searchByName(searchQuery, selfUser.teamId);
           const localUserIds = localSearchResults.contacts.map(({id}) => id);
           const onlyRemoteUsers = userEntities.filter(user => !localUserIds.includes(user.id));
           const results = inTeam

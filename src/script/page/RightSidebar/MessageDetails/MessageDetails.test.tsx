@@ -66,7 +66,7 @@ const getDefaultParams = (showReactions: boolean = false) => {
 describe('MessageDetails', () => {
   it('renders no reactions view', async () => {
     const conversation = new Conversation();
-    conversation.team_id = 'mock-team-id';
+    conversation.teamId = 'mock-team-id';
 
     const timestamp = new Date('2022-01-21T15:08:14.225Z').getTime();
     const userName = 'Jan Kowalski';

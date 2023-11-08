@@ -283,14 +283,17 @@ describe('ConversationRepository', () => {
       const teamId = team1to1Conversation.team;
       const teamMemberId = team1to1Conversation.members?.others[0].id;
       const userEntity = new User(teamMemberId, 'test-domain');
-      userEntity.inTeam(true);
+
+      const selfUser = generateUser();
+      selfUser.teamId = teamId;
+      spyOn(testFactory.conversation_repository['userState'], 'self').and.returnValue(selfUser);
+      userEntity.teamId = teamId;
       userEntity.isTeamMember(true);
       userEntity.teamId = teamId;
       userEntity.supportedProtocols([ConversationProtocol.PROTEUS]);
 
       userRepository['userState'].users.push(userEntity);
 
-      const selfUser = generateUser();
       selfUser.teamId = teamId;
       selfUser.supportedProtocols([ConversationProtocol.PROTEUS]);
 

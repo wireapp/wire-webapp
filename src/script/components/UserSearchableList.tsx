@@ -24,7 +24,6 @@ import {container} from 'tsyringe';
 import {debounce} from 'underscore';
 
 import {partition} from 'Util/ArrayUtil';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {sortByPriority} from 'Util/StringUtil';
@@ -66,6 +65,7 @@ const UserSearchableList: React.FC<UserListProps> = ({
   allowRemoteSearch,
   selfUser,
   users,
+  teamState = container.resolve(TeamState),
   ...props
 }) => {
   const {searchRepository, teamRepository, selfFirst, ...userListProps} = props;
@@ -74,7 +74,7 @@ const UserSearchableList: React.FC<UserListProps> = ({
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [remoteTeamMembers, setRemoteTeamMembers] = useState<User[]>([]);
 
-  const {inTeam: selfInTeam} = useKoSubscribableChildren(selfUser, ['inTeam']);
+  const selfInTeam = teamState.isInTeam(selfUser);
 
   /**
    * Try to load additional members from the backend.
@@ -82,7 +82,7 @@ const UserSearchableList: React.FC<UserListProps> = ({
    */
   const fetchMembersFromBackend = useCallback(
     debounce(async (query: string, ignoreMembers: User[]) => {
-      const resultUsers = await searchRepository.searchByName(query);
+      const resultUsers = await searchRepository.searchByName(query, selfUser.teamId);
       const selfTeamId = selfUser.teamId;
       const foundMembers = resultUsers.filter(user => user.teamId === selfTeamId);
       const ignoreIds = ignoreMembers.map(member => member.id);

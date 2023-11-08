@@ -92,7 +92,7 @@ const MessageDetails: FC<MessageDetailsProps> = ({
   } = useKoSubscribableChildren(messageEntity, ['timestamp', 'user', 'reactions', 'readReceipts', 'edited_timestamp']);
   const totalNbReactions = reactions.reduce((acc, [, users]) => acc + users.length, 0);
 
-  const teamId = activeConversation.team_id;
+  const teamId = activeConversation.teamId;
   const supportsReceipts = messageSender.isMe && teamId;
 
   const receiptUsers = userRepository

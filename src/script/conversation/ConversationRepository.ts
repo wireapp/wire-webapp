@@ -227,7 +227,7 @@ export class ConversationRepository {
           Promise.all(clients.map(client => this.userRepository.removeClientFromUser(userId, client))),
         ),
       );
-      const removedTeamUserIds = emptyUsers.filter(user => user.inTeam()).map(user => user.qualifiedId);
+      const removedTeamUserIds = emptyUsers.filter(user => teamState.isInTeam(user)).map(user => user.qualifiedId);
 
       if (removedTeamUserIds.length) {
         // If we have found some users that were removed from the conversation, we need to check if those users were also completely removed from the team
@@ -1142,7 +1142,7 @@ export class ConversationRepository {
    */
   private async getOrCreateProteus1To1Conversation(userEntity: User): Promise<Conversation | null> {
     const selfUser = this.userState.self();
-    const inCurrentTeam = userEntity.inTeam() && !!selfUser && userEntity.teamId === selfUser.teamId;
+    const inCurrentTeam = selfUser && selfUser.teamId && userEntity.teamId === selfUser.teamId;
 
     if (inCurrentTeam) {
       return this.getOrCreateProteusTeam1to1Conversation(userEntity);
@@ -1902,13 +1902,12 @@ export class ConversationRepository {
       .forEach(conversationEntity => this._mapGuestStatusSelf(conversationEntity));
 
     if (this.teamState.isTeam()) {
-      this.userState.self().inTeam(true);
-      this.userState.self().isTeamMember(true);
+      this.userState.self()?.isTeamMember(true);
     }
   }
 
   private _mapGuestStatusSelf(conversationEntity: Conversation) {
-    const conversationTeamId = conversationEntity.team_id;
+    const conversationTeamId = conversationEntity.teamId;
     const selfTeamId = this.teamState.team()?.id;
     const isConversationGuest = !!(conversationTeamId && (!selfTeamId || selfTeamId !== conversationTeamId));
     conversationEntity.isGuest(isConversationGuest);
@@ -2325,7 +2324,7 @@ export class ConversationRepository {
     const eventInjections = this.conversationState
       .conversations()
       .filter(conversationEntity => {
-        const conversationInTeam = conversationEntity.team_id === teamId;
+        const conversationInTeam = conversationEntity.teamId === teamId;
         const userIsParticipant = UserFilter.isParticipant(conversationEntity, userId);
         return conversationInTeam && userIsParticipant && !conversationEntity.removed_from_conversation();
       })
@@ -3739,7 +3738,7 @@ export class ConversationRepository {
       return !!this.propertyRepository.receiptMode();
     }
 
-    if (conversationEntity.team_id && conversationEntity.isGroup()) {
+    if (conversationEntity.teamId && conversationEntity.isGroup()) {
       return !!conversationEntity.receiptMode();
     }
 
