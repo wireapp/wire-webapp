@@ -19,7 +19,6 @@
 
 import {FC, ReactNode, useEffect} from 'react';
 
-import loadable from '@loadable/component';
 import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
 import {IntlProvider} from 'react-intl';
 import {connect} from 'react-redux';
@@ -34,6 +33,8 @@ import {CheckPassword} from './CheckPassword';
 import {ClientManager} from './ClientManager';
 import {ConversationJoin} from './ConversationJoin';
 import {ConversationJoinInvalid} from './ConversationJoinInvalid';
+import {CreateAccount} from './CreateAccount';
+import {CreatePersonalAccount} from './CreatePersonalAccount';
 import {CustomEnvironmentRedirect} from './CustomEnvironmentRedirect';
 import {HistoryInfo} from './HistoryInfo';
 import {Index} from './Index';
@@ -43,9 +44,12 @@ import {OAuthPermissions} from './OAuthPermissions';
 import {PhoneLogin} from './PhoneLogin';
 import {SetAccountType} from './SetAccountType';
 import {SetEmail} from './SetEmail';
+import {SetEntropyPage} from './SetEntropyPage';
 import {SetHandle} from './SetHandle';
 import {SetPassword} from './SetPassword';
 import {SingleSignOn} from './SingleSignOn';
+import {TeamName} from './TeamName';
+import {VerifyEmailCode} from './VerifyEmailCode';
 import {VerifyEmailLink} from './VerifyEmailLink';
 import {VerifyPhoneCode} from './VerifyPhoneCode';
 
@@ -57,25 +61,6 @@ import * as AuthSelector from '../module/selector/AuthSelector';
 import * as LanguageSelector from '../module/selector/LanguageSelector';
 import {ROUTE} from '../route';
 import {getOAuthQueryString} from '../util/oauthUtil';
-
-/**
- *  Lazy loading components for routes, which can only be accessed by activated feature flags
- */
-const CreateAccount = loadable(() => import('./CreateAccount'), {
-  resolveComponent: component => component.CreateAccount,
-});
-const CreatePersonalAccount = loadable(() => import('./CreatePersonalAccount'), {
-  resolveComponent: component => component.CreatePersonalAccount,
-});
-const VerifyEmailCode = loadable(() => import('./VerifyEmailCode'), {
-  resolveComponent: component => component.VerifyEmailCode,
-});
-const SetEntropyPage = loadable(() => import('./SetEntropyPage'), {
-  resolveComponent: component => component.SetEntropyPage,
-});
-const TeamName = loadable(() => import('./TeamName'), {
-  resolveComponent: component => component.TeamName,
-});
 
 interface RootProps {}
 
