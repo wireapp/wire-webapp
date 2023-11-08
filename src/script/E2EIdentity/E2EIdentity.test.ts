@@ -54,13 +54,11 @@ jest.mock('tsyringe');
 jest.mock('src/script/service/CoreSingleton', () => ({
   Core: jest.fn(),
 }));
-jest.mock('src/script/user/UserState', () => {
-  return {
-    UserState: jest.fn().mockImplementation(() => {
-      return {self: jest.fn()};
-    }),
-  };
-});
+jest.mock('src/script/user/UserState', () => ({
+  UserState: jest.fn().mockImplementation(() => ({
+    self: jest.fn(),
+  })),
+}));
 jest.mock('Components/Modals/PrimaryModal');
 jest.mock('./Modals', () => ({
   getModalOptions: jest.fn().mockReturnValue({
@@ -73,11 +71,6 @@ jest.mock('./Modals', () => ({
     ERROR: 'error',
     ENROLL: 'enroll',
   },
-}));
-jest.mock('src/script/user/UserState', () => ({
-  UserState: jest.fn().mockImplementation(() => ({
-    self: jest.fn(),
-  })),
 }));
 
 describe('E2EIHandler', () => {
