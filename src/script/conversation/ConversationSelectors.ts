@@ -58,7 +58,7 @@ interface ProtocolToConversationType {
   [ConversationProtocol.MLS]: MLSConversation;
 }
 
-export const is1to1ConversationWithUser =
+const is1to1ConversationWithUser =
   <Protocol extends ConversationProtocol.PROTEUS | ConversationProtocol.MLS>(userId: QualifiedId, protocol: Protocol) =>
   (conversation: Conversation): conversation is ProtocolToConversationType[Protocol] => {
     const doesProtocolMatch =
@@ -86,3 +86,9 @@ export const is1to1ConversationWithUser =
 
     return doesUserIdMatch;
   };
+
+export const isProteus1to1ConversationWithUser = (userId: QualifiedId) =>
+  is1to1ConversationWithUser(userId, ConversationProtocol.PROTEUS);
+
+export const isMLS1to1ConversationWithUser = (userId: QualifiedId) =>
+  is1to1ConversationWithUser(userId, ConversationProtocol.MLS);

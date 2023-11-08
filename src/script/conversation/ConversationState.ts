@@ -18,7 +18,6 @@
  */
 
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
-import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
 import {container, singleton} from 'tsyringe';
@@ -29,8 +28,9 @@ import {sortGroupsByLastEvent} from 'Util/util';
 import {
   MLSConversation,
   ProteusConversation,
-  is1to1ConversationWithUser,
+  isMLS1to1ConversationWithUser,
   isMLSConversation,
+  isProteus1to1ConversationWithUser,
   isSelfConversation,
 } from './ConversationSelectors';
 
@@ -217,9 +217,7 @@ export class ConversationState {
    * @returns ProteusConversation if locally available, otherwise null
    */
   findProteus1to1Conversations(userId: QualifiedId): ProteusConversation[] | null {
-    const foundConversations = this.conversations().filter(
-      is1to1ConversationWithUser(userId, ConversationProtocol.PROTEUS),
-    );
+    const foundConversations = this.conversations().filter(isProteus1to1ConversationWithUser(userId));
 
     return foundConversations.length > 0 ? foundConversations : null;
   }
@@ -229,7 +227,7 @@ export class ConversationState {
    * @returns Conversation if locally available, otherwise null
    */
   findMLS1to1Conversation(userId: QualifiedId): MLSConversation | null {
-    const mlsConversation = this.conversations().find(is1to1ConversationWithUser(userId, ConversationProtocol.MLS));
+    const mlsConversation = this.conversations().find(isMLS1to1ConversationWithUser(userId));
     return mlsConversation || null;
   }
 

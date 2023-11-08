@@ -81,8 +81,8 @@ import {ConversationLabelRepository} from './ConversationLabelRepository';
 import {ConversationDatabaseData, ConversationMapper} from './ConversationMapper';
 import {ConversationRoleRepository} from './ConversationRoleRepository';
 import {
-  is1to1ConversationWithUser,
   isMLSConversation,
+  isProteus1to1ConversationWithUser,
   isProteusConversation,
   MLSConversation,
   ProteusConversation,
@@ -1187,11 +1187,6 @@ export class ConversationRepository {
         // Disregard conversations that self is no longer part of
         return false;
       }
-
-      const isProteus1to1ConversationWithUser = is1to1ConversationWithUser(
-        userEntity.qualifiedId,
-        ConversationProtocol.PROTEUS,
-      );
 
       return isProteus1to1ConversationWithUser(conversationEntity);
     });
