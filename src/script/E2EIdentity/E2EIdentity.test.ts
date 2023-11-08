@@ -30,6 +30,19 @@ import {E2EIHandler, E2EIHandlerStep} from './E2EIdentity';
 import {getModalOptions, ModalType} from './Modals';
 import {OIDCService} from './OIDCService/OIDCService';
 
+const CoreSingletonMock = {
+  enrollE2EI: jest.fn(),
+  service: {
+    e2eIdentity: {
+      isEnrollmentInProgress: jest.fn(),
+      clearAllProgress: jest.fn(),
+      hasActiveCertificate: jest.fn(),
+      getCertificateData: jest.fn(),
+      getUserDeviceEntities: jest.fn(),
+    },
+  },
+};
+
 jest.mock('./OIDCService', () => ({
   getOIDCServiceInstance: jest.fn().mockReturnValue({
     clearProgress: jest.fn(),
@@ -38,13 +51,9 @@ jest.mock('./OIDCService', () => ({
 jest.mock('Util/util');
 jest.mock('src/script/Config');
 jest.mock('tsyringe');
-jest.mock('src/script/service/CoreSingleton', () => {
-  return {
-    Core: jest.fn().mockImplementation(() => {
-      return {enrollE2EI: jest.fn()};
-    }),
-  };
-});
+jest.mock('src/script/service/CoreSingleton', () => ({
+  Core: jest.fn(),
+}));
 jest.mock('src/script/user/UserState', () => {
   return {
     UserState: jest.fn().mockImplementation(() => {
@@ -65,11 +74,6 @@ jest.mock('./Modals', () => ({
     ENROLL: 'enroll',
   },
 }));
-jest.mock('src/script/service/CoreSingleton', () => ({
-  Core: jest.fn().mockImplementation(() => ({
-    enrollE2EI: jest.fn(),
-  })),
-}));
 jest.mock('src/script/user/UserState', () => ({
   UserState: jest.fn().mockImplementation(() => ({
     self: jest.fn(),
@@ -80,7 +84,6 @@ describe('E2EIHandler', () => {
   const params = {discoveryUrl: 'http://example.com', gracePeriodInSeconds: 30};
   const newParams = {discoveryUrl: 'http://new-example.com', gracePeriodInSeconds: 60};
   const user = {name: () => 'John Doe', username: () => 'johndoe'};
-  let coreMock: Core;
   let userStateMock: UserState;
 
   beforeEach(() => {
@@ -90,14 +93,12 @@ describe('E2EIHandler', () => {
     // Clear all mocks before each test
     jest.clearAllMocks();
     // Setup the Core and UserState services mocks
-    coreMock = new Core();
     userStateMock = new UserState();
     (userStateMock.self as unknown as jest.Mock).mockReturnValue({name: () => 'John Doe', username: () => 'johndoe'});
-    (coreMock.enrollE2EI as jest.Mock).mockResolvedValue(true);
 
     (container.resolve as jest.Mock).mockImplementation(service => {
       if (service === Core) {
-        return coreMock;
+        return {...CoreSingletonMock, enrollE2EI: jest.fn(() => Promise.resolve(true))};
       }
       if (service === UserState) {
         return userStateMock;
@@ -178,7 +179,7 @@ describe('E2EIHandler', () => {
     // Mock the Core service to return an error
     (container.resolve as any) = jest.fn(service => {
       if (service === Core) {
-        return {enrollE2EI: jest.fn(() => Promise.reject())};
+        return {...CoreSingletonMock, enrollE2EI: jest.fn(() => Promise.reject())};
       }
       return {self: () => user};
     });
@@ -222,7 +223,7 @@ describe('E2EIHandler', () => {
   it('should display error message when enrollment fails', async () => {
     (container.resolve as jest.Mock).mockImplementation(service => {
       if (service === Core) {
-        return {startE2EIEnrollment: jest.fn(() => Promise.reject(false))};
+        return {...CoreSingletonMock, startE2EIEnrollment: jest.fn(() => Promise.reject(false))};
       }
       if (service === UserState) {
         return userStateMock;
