@@ -39,7 +39,9 @@ export const mockCallingRepository = {
   onCallParticipantChangedCallback: jest.fn(),
   onCallClosed: jest.fn(),
   leaveCall: jest.fn(),
+  rejectCall: jest.fn(),
   setEpochInfo: jest.fn(),
+  supportsConferenceCalling: true,
 } as unknown as CallingRepository;
 
 export const callState = new CallState();

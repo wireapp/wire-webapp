@@ -23,7 +23,7 @@ import {css} from '@emotion/react';
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {container} from 'tsyringe';
 
-import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
+import {CALL_TYPE} from '@wireapp/avs';
 import {IconButton, IconButtonVariant, useMatchMedia} from '@wireapp/react-ui-kit';
 
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
@@ -140,8 +140,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
 
   const showToggleVideo =
     isVideoCallingEnabled &&
-    (call.initialType === CALL_TYPE.VIDEO ||
-      conversation.supportsVideoCall(call.conversationType === CONV_TYPE.CONFERENCE));
+    (call.initialType === CALL_TYPE.VIDEO || conversation.supportsVideoCall(call.isConference));
   const availableCameras = useMemo(
     () =>
       videoinput.map(device => (device as MediaDeviceInfo).deviceId || (device as ElectronDesktopCapturerSource).id),
