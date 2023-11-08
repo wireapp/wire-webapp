@@ -1579,6 +1579,8 @@ export class ConversationRepository {
         this.logger.info(
           `MLS 1:1 conversation with user ${otherUserId.id} is not supported by the other user, conversation will become readonly`,
         );
+      } else {
+        await this.updateConversationReadOnlyState(mlsConversation, null);
       }
 
       if (shouldOpenMLS1to1Conversation) {
@@ -1647,7 +1649,7 @@ export class ConversationRepository {
     const connection = conversation.connection();
     const connectionUserId = connection && connection.userId;
     if (connectionUserId) {
-      return connection.userId;
+      return connectionUserId;
     }
 
     const conversationMembersIds = conversation.participating_user_ids();
