@@ -33,8 +33,8 @@ import {UserState} from '../user/UserState';
 @singleton()
 export class TeamState {
   public readonly isTeamDeleted: ko.Observable<boolean>;
-  public readonly memberInviters: ko.Observable<any>;
-  public readonly memberRoles: ko.Observable<any>;
+  public readonly memberInviters: ko.Observable<Record<string, string>>;
+  public readonly memberRoles: ko.Observable<Record<string, ROLE>>;
   public readonly supportsLegalHold: ko.Observable<boolean>;
   public readonly teamName: ko.PureComputed<string>;
   public readonly teamFeatures: ko.Observable<FeatureList | undefined>;
@@ -138,7 +138,7 @@ export class TeamState {
     return !!team.id && entity.domain === this.teamDomain() && entity.teamId === team.id;
   }
 
-  readonly isExternal = (userId: string): boolean => {
+  isExternal(userId: string): boolean {
     return this.memberRoles()[userId] === ROLE.PARTNER;
-  };
+  }
 }
