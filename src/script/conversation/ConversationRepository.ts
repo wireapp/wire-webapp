@@ -1188,7 +1188,7 @@ export class ConversationRepository {
         return false;
       }
 
-      return isProteus1to1ConversationWithUser(conversationEntity);
+      return isProteus1to1ConversationWithUser(userEntity.qualifiedId)(conversationEntity);
     });
 
     if (matchingConversationEntity) {
