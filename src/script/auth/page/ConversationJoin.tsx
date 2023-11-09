@@ -128,7 +128,7 @@ const ConversationJoinComponent = ({
       return;
     }
     try {
-      if (!conversationCode || !conversationKey) {
+      if (!conversationCode || !conversationKey || !password) {
         throw Error('Conversation code or key missing');
       }
       const conversationEvent = await doJoinConversationByCode(conversationKey, conversationCode, undefined, password);
@@ -136,9 +136,9 @@ const ConversationJoinComponent = ({
        * That means that when the webapp loads and tries to fetch the notificationStream is will get the join event once again and will try to handle it
        * Here we set the core's lastEventDate so that it knows that this duplicated event should be skipped
        */
-      await setLastEventDate(conversationEvent.time ? new Date(conversationEvent.time) : new Date());
+      await setLastEventDate(conversationEvent?.time ? new Date(conversationEvent.time) : new Date());
 
-      routeToApp(conversationEvent.conversation, conversationEvent.qualified_conversation?.domain ?? '');
+      routeToApp(conversationEvent?.conversation, conversationEvent?.qualified_conversation?.domain ?? '');
     } catch (error) {
       setIsSubmitingName(false);
       if (error.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD) {

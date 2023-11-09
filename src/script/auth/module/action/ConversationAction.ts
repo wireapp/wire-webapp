@@ -46,7 +46,7 @@ export class ConversationAction {
     code: string,
     uri?: string,
     password?: string,
-  ): ThunkAction<Promise<ConversationEvent>> => {
+  ): ThunkAction<Promise<ConversationEvent | undefined>> => {
     return async (dispatch, getState, {apiClient}) => {
       dispatch(ConversationActionCreator.startJoinConversationByCode());
       try {
@@ -66,7 +66,7 @@ export class ConversationAction {
               has_password: true,
             } as ConversationJoinData),
           );
-          throw error;
+          return undefined;
         }
         dispatch(ConversationActionCreator.failedJoinConversationByCode(error));
         throw error;
