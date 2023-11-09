@@ -153,7 +153,11 @@ export class UserService {
   /**
    * Get the list of user's supported protocols.
    */
-  getUserSupportedProtocols(userId: QualifiedId): Promise<ConversationProtocol[]> {
+  public async getUserSupportedProtocols(userId: QualifiedId): Promise<ConversationProtocol[]> {
+    // Clients that uses version below the one supporting MLS, are not aware of MLS, we default to Proteus in this case.
+    if (!this.apiClient.backendFeatures.supportsMLS) {
+      return [ConversationProtocol.PROTEUS];
+    }
     return this.apiClient.api.user.getUserSupportedProtocols(userId);
   }
 }
