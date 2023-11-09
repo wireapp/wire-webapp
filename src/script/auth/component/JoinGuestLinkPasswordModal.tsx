@@ -45,7 +45,8 @@ const JoinGuestLinkPasswordModal: React.FC<JoinGuestLinkPasswordModalProps> = ({
   const {formatMessage: _} = useIntl();
   const [passwordValue, setPasswordValue] = useState<string>('');
 
-  const onSubmit = () => {
+  const onSubmit = (event: React.FormEvent<HTMLFormElement | HTMLButtonElement>) => {
+    event.preventDefault();
     onSubmitPassword(passwordValue);
   };
 
@@ -70,7 +71,7 @@ const JoinGuestLinkPasswordModal: React.FC<JoinGuestLinkPasswordModalProps> = ({
         <Form
           name="guest-password-join-form"
           data-uie-name="guest-password-join-form"
-          onSubmit={onSubmit}
+          onSubmit={(event: React.FormEvent<HTMLFormElement>) => onSubmit(event)}
           autoComplete="off"
         >
           <Input
@@ -98,7 +99,7 @@ const JoinGuestLinkPasswordModal: React.FC<JoinGuestLinkPasswordModalProps> = ({
           block
           type="button"
           disabled={!passwordValue}
-          onClick={onSubmit}
+          onClick={(event: React.FormEvent<HTMLButtonElement>) => onSubmit(event)}
           data-uie-name="guest-link-join-submit-button"
         >
           {_(joinGuestLinkPasswordModalStrings.joinConversation)}
