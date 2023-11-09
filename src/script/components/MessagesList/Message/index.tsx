@@ -239,7 +239,7 @@ const Message: React.FC<
         ref={messageRef}
         role="listitem"
         onKeyDown={handleDivKeyDown}
-        onClick={({target}) => {
+        onClick={event => {
           handleFocus(index);
         }}
         className="message-wrapper"
