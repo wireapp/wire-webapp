@@ -32,8 +32,15 @@ export class Account extends EventEmitter {
   };
 
   configureMLSCallbacks = jest.fn();
-
+  enrollE2EI = jest.fn();
   service = {
+    e2eIdentity: {
+      isEnrollmentInProgress: jest.fn(),
+      clearAllProgress: jest.fn(),
+      hasActiveCertificate: jest.fn(),
+      getCertificateData: jest.fn(),
+      getUserDeviceEntities: jest.fn(),
+    },
     mls: {
       schedulePeriodicKeyMaterialRenewals: jest.fn(),
       registerConversation: jest.fn(),

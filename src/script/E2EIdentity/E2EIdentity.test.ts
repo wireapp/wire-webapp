@@ -35,23 +35,9 @@ jest.mock('./OIDCService', () => ({
     clearProgress: jest.fn(),
   } as unknown as OIDCService),
 }));
+
 jest.mock('Util/util');
 jest.mock('src/script/Config');
-jest.mock('tsyringe');
-jest.mock('src/script/service/CoreSingleton', () => {
-  return {
-    Core: jest.fn().mockImplementation(() => {
-      return {enrollE2EI: jest.fn()};
-    }),
-  };
-});
-jest.mock('src/script/user/UserState', () => {
-  return {
-    UserState: jest.fn().mockImplementation(() => {
-      return {self: jest.fn()};
-    }),
-  };
-});
 jest.mock('Components/Modals/PrimaryModal');
 jest.mock('./Modals', () => ({
   getModalOptions: jest.fn().mockReturnValue({
@@ -65,23 +51,11 @@ jest.mock('./Modals', () => ({
     ENROLL: 'enroll',
   },
 }));
-jest.mock('src/script/service/CoreSingleton', () => ({
-  Core: jest.fn().mockImplementation(() => ({
-    enrollE2EI: jest.fn(),
-  })),
-}));
-jest.mock('src/script/user/UserState', () => ({
-  UserState: jest.fn().mockImplementation(() => ({
-    self: jest.fn(),
-  })),
-}));
 
 describe('E2EIHandler', () => {
   const params = {discoveryUrl: 'http://example.com', gracePeriodInSeconds: 30};
   const newParams = {discoveryUrl: 'http://new-example.com', gracePeriodInSeconds: 60};
   const user = {name: () => 'John Doe', username: () => 'johndoe'};
-  let coreMock: Core;
-  let userStateMock: UserState;
 
   beforeEach(() => {
     (util.supportsMLS as jest.Mock).mockReturnValue(true);
@@ -89,21 +63,6 @@ describe('E2EIHandler', () => {
     E2EIHandler.resetInstance();
     // Clear all mocks before each test
     jest.clearAllMocks();
-    // Setup the Core and UserState services mocks
-    coreMock = new Core();
-    userStateMock = new UserState();
-    (userStateMock.self as unknown as jest.Mock).mockReturnValue({name: () => 'John Doe', username: () => 'johndoe'});
-    (coreMock.enrollE2EI as jest.Mock).mockResolvedValue(true);
-
-    (container.resolve as jest.Mock).mockImplementation(service => {
-      if (service === Core) {
-        return coreMock;
-      }
-      if (service === UserState) {
-        return userStateMock;
-      }
-      return null;
-    });
 
     // Mock the Config service to return true for ENABLE_E2EI
     (util.supportsMLS as jest.Mock).mockReturnValue(true);
@@ -112,6 +71,11 @@ describe('E2EIHandler', () => {
     // Mock the PrimaryModal service to return a mock modal
     (PrimaryModal.show as jest.Mock).mockClear();
     (getModalOptions as jest.Mock).mockClear();
+
+    jest
+      .spyOn(container.resolve(UserState), 'self')
+      .mockReturnValue({name: () => 'John Doe', username: () => 'johndoe'});
+    jest.spyOn(container.resolve(Core), 'enrollE2EI').mockResolvedValue(true);
   });
 
   it('should create instance with valid params', () => {
@@ -168,20 +132,23 @@ describe('E2EIHandler', () => {
     expect(instance['currentStep']).toBe(E2EIHandlerStep.INITIALIZED);
   });
 
-  it('should set currentStep to ENROLL when enrollE2EI is called and enrollment succeeds', async () => {
+  it('should set currentStep to SUCCESS when enrollE2EI is called and enrollment succeeds', async () => {
+    jest
+      .spyOn(container.resolve(UserState), 'self')
+      .mockReturnValue({name: () => 'John Doe', username: () => 'johndoe'});
+
+    jest.spyOn(container.resolve(Core), 'enrollE2EI').mockResolvedValueOnce(true);
+
     const instance = E2EIHandler.getInstance(params);
     await instance['enrollE2EI']();
+
     expect(instance['currentStep']).toBe(E2EIHandlerStep.SUCCESS);
   });
 
   it('should set currentStep to ERROR when enrollE2EI is called and enrollment fails', async () => {
     // Mock the Core service to return an error
-    (container.resolve as any) = jest.fn(service => {
-      if (service === Core) {
-        return {enrollE2EI: jest.fn(() => Promise.reject())};
-      }
-      return {self: () => user};
-    });
+    jest.spyOn(container.resolve(Core), 'enrollE2EI').mockImplementationOnce(jest.fn(() => Promise.reject()));
+    jest.spyOn(container.resolve(UserState), 'self').mockImplementationOnce(() => user);
 
     const instance = E2EIHandler.getInstance(params);
     await instance['enrollE2EI']();
@@ -209,6 +176,8 @@ describe('E2EIHandler', () => {
   });
 
   it('should display success message when enrollment is done', async () => {
+    jest.spyOn(container.resolve(Core), 'enrollE2EI').mockResolvedValueOnce(true);
+
     const handler = E2EIHandler.getInstance(params);
     handler['showLoadingMessage'] = jest.fn();
     await handler['enrollE2EI']();
@@ -220,15 +189,8 @@ describe('E2EIHandler', () => {
   });
 
   it('should display error message when enrollment fails', async () => {
-    (container.resolve as jest.Mock).mockImplementation(service => {
-      if (service === Core) {
-        return {startE2EIEnrollment: jest.fn(() => Promise.reject(false))};
-      }
-      if (service === UserState) {
-        return userStateMock;
-      }
-      return null;
-    });
+    jest.spyOn(container.resolve(Core), 'enrollE2EI').mockRejectedValueOnce(false);
+
     const handler = E2EIHandler.getInstance(params);
     handler['showLoadingMessage'] = jest.fn();
     await handler['enrollE2EI']();
