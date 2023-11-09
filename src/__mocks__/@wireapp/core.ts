@@ -32,7 +32,7 @@ export class Account extends EventEmitter {
   };
 
   configureMLSCallbacks = jest.fn();
-
+  enrollE2EI = jest.fn();
   service = {
     e2eIdentity: {
       isEnrollmentInProgress: jest.fn(),
