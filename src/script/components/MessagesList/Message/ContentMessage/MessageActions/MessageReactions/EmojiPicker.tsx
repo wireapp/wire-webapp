@@ -123,6 +123,8 @@ const EmojiPickerContainer: FC<EmojiPickerContainerProps> = ({
             style={{maxHeight: window.innerHeight, ...style}}
             role="dialog"
             data-uie-name="emoji-picker-dialog"
+            // stop propagation to prevent emoji picker search input from losing focus
+            // due to message element's handleFocus
             onClick={event => {
               event.stopPropagation();
             }}
