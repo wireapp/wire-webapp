@@ -240,9 +240,7 @@ const Message: React.FC<
         role="listitem"
         onKeyDown={handleDivKeyDown}
         onClick={({target}) => {
-          if (target instanceof Element && messageRef.current?.contains(target)) {
-            handleFocus(index);
-          }
+          handleFocus(index);
         }}
         className="message-wrapper"
       >
