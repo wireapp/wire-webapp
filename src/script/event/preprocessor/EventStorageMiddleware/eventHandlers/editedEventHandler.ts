@@ -56,7 +56,7 @@ function getUpdatesForEditMessage(
   // Remove reactions, so that likes (hearts) don't stay when a message's text gets edited
   const commonUpdates = getCommonMessageUpdates(originalEvent, newEvent);
 
-  return {...newEvent, ...commonUpdates, reactions: {}};
+  return {...newEvent, ...commonUpdates, edited_time: newEvent.time, reactions: {}};
 }
 
 function computeEventUpdates(originalEvent: StoredEvent<MessageAddEvent>, newEvent: MessageAddEvent) {

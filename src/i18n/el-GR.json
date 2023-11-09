@@ -1121,7 +1121,7 @@
   "preferencesAccountUsername": "Username",
   "preferencesAccountUsernameAvailable": "Διαθέσιμο",
   "preferencesAccountUsernameErrorTaken": "Χρησιμοποιείται ήδη",
-  "preferencesAccountUsernameHint": "Τουλάχιστον 2 χαρακτήρες. a—z, 0—9 και _ μόνο.",
+  "preferencesAccountUsernameHint": "At least 2 characters. a—z, 0—9 and '.', '-', '_' only.",
   "preferencesAccountUsernamePlaceholder": "Ονοματεπώνυμο",
   "preferencesDevice": "Device",
   "preferencesDeviceDetails": "Λεπτομέρειες Συσκευής",

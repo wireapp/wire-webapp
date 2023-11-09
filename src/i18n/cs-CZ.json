@@ -1121,7 +1121,7 @@
   "preferencesAccountUsername": "Username",
   "preferencesAccountUsernameAvailable": "Dostupný",
   "preferencesAccountUsernameErrorTaken": "Již uděleno",
-  "preferencesAccountUsernameHint": "Alespoň 2 znaky. Pouze a—z, 0—9 a _",
+  "preferencesAccountUsernameHint": "At least 2 characters. a—z, 0—9 and '.', '-', '_' only.",
   "preferencesAccountUsernamePlaceholder": "Celé jméno",
   "preferencesDevice": "Device",
   "preferencesDeviceDetails": "Podrobnosti o přístroji",

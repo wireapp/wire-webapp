@@ -265,7 +265,7 @@ describe('ConversationRepository', () => {
       const selfUser = generateUser();
       selfUser.teamId = teamId;
       spyOn(testFactory.conversation_repository['userState'], 'self').and.returnValue(selfUser);
-      userEntity.inTeam(true);
+      userEntity.teamId = teamId;
       userEntity.isTeamMember(true);
       userEntity.teamId = teamId;
 

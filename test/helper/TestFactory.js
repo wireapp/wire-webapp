@@ -52,7 +52,6 @@ import {PermissionRepository} from 'src/script/permission/PermissionRepository';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {PropertiesService} from 'src/script/properties/PropertiesService';
 import {SearchRepository} from 'src/script/search/SearchRepository';
-import {SearchService} from 'src/script/search/SearchService';
 import {SelfService} from 'src/script/self/SelfService';
 import {Core} from 'src/script/service/CoreSingleton';
 import {createStorageEngine, DatabaseTypes} from 'src/script/service/StoreEngineProvider';
@@ -196,8 +195,7 @@ export class TestFactory {
    */
   async exposeSearchActors() {
     await this.exposeUserActors();
-    this.search_service = new SearchService();
-    this.search_repository = new SearchRepository(this.search_service, this.user_repository);
+    this.search_repository = new SearchRepository(this.user_repository);
 
     return this.search_repository;
   }
@@ -272,7 +270,6 @@ export class TestFactory {
       this.user_repository,
       this.assetRepository,
       this.user_repository['userState'],
-      this.team_repository['teamState'],
       clientState,
     );
     const core = container.resolve(Core);

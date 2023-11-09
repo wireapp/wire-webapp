@@ -52,7 +52,7 @@ const USER_CHUNK_SIZE = 64;
 
 export interface UserListProps {
   conversation?: Conversation;
-  conversationRepository: ConversationRepository;
+  conversationRepository?: ConversationRepository;
   conversationState?: ConversationState;
   highlightedUsers?: User[];
   infos?: Record<string, string>;
@@ -101,10 +101,8 @@ export const UserList = ({
   const hasMoreUsers = !truncate && users.length > maxShownUsers;
 
   const highlightedUserIds = highlightedUsers.map(user => user.id);
-  const {is_verified: isSelfVerified, inTeam: selfInTeam} = useKoSubscribableChildren(selfUser, [
-    'is_verified',
-    'inTeam',
-  ]);
+  const {is_verified: isSelfVerified} = useKoSubscribableChildren(selfUser, ['is_verified']);
+  const selfInTeam = teamState.isInTeam(selfUser);
 
   // subscribe to roles changes in order to react to them
   useKoSubscribableChildren(conversation, ['roles']);
@@ -166,7 +164,7 @@ export const UserList = ({
       if (userEntity.isService) {
         return;
       }
-      if (conversationRepository.conversationRoleRepository.isUserGroupAdmin(conversation, userEntity)) {
+      if (conversationRepository?.conversationRoleRepository.isUserGroupAdmin(conversation, userEntity)) {
         admins.push(userEntity);
       } else {
         members.push(userEntity);

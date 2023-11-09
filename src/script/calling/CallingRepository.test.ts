@@ -56,6 +56,9 @@ const createConversation = (
   const conversation = new Conversation(createUuid(), '', protocol);
   conversation.participating_user_ets.push(new User(createUuid()));
   conversation.type(type);
+  if (protocol === ConversationProtocol.MLS) {
+    conversation.groupId = 'group-id';
+  }
   return conversation;
 };
 

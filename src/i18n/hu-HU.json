@@ -1121,7 +1121,7 @@
   "preferencesAccountUsername": "Username",
   "preferencesAccountUsernameAvailable": "Elérhető",
   "preferencesAccountUsernameErrorTaken": "Már foglalt",
-  "preferencesAccountUsernameHint": "Legalább 2 karakter, és kizárólag a—z, 0—9 és _ karakterek.",
+  "preferencesAccountUsernameHint": "At least 2 characters. a—z, 0—9 and '.', '-', '_' only.",
   "preferencesAccountUsernamePlaceholder": "Teljes neved",
   "preferencesDevice": "Device",
   "preferencesDeviceDetails": "Eszköz részletei",

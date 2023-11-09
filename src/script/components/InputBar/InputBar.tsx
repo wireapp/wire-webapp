@@ -170,6 +170,7 @@ export const InputBar = ({
   const isReplying = !!replyMessageEntity;
   const isConnectionRequest = isOutgoingRequest || isIncomingRequest;
   const hasLocalEphemeralTimer = isSelfDeletingMessagesEnabled && !!localMessageTimer && !hasGlobalMessageTimer;
+  const isTypingRef = useRef(false);
 
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
   const isScaledDown = useMatchMedia('max-width: 768px');
@@ -192,6 +193,7 @@ export const InputBar = ({
     text: textValue,
     onTypingChange: useCallback(
       isTyping => {
+        isTypingRef.current = isTyping;
         if (isTyping) {
           void conversationRepository.sendTypingStart(conversation);
         } else {
@@ -253,9 +255,10 @@ export const InputBar = ({
       cancelMessageEditing(true);
       setEditedMessage(messageEntity);
 
-      if (messageEntity.quote() && conversation) {
+      const quote = messageEntity.quote();
+      if (quote && conversation) {
         void messageRepository
-          .getMessageInConversationById(conversation, messageEntity.quote().messageId)
+          .getMessageInConversationById(conversation, quote.messageId)
           .then(quotedMessage => setReplyMessageEntity(quotedMessage));
       }
     }
@@ -567,7 +570,7 @@ export const InputBar = ({
                 loadDraftState={loadDraft}
                 onShiftTab={onShiftTab}
                 onSend={sendMessage}
-                onBlur={() => isTypingIndicatorEnabled && conversationRepository.sendTypingStop(conversation)}
+                onBlur={() => isTypingRef.current && conversationRepository.sendTypingStop(conversation)}
               >
                 {isScaledDown ? (
                   <>

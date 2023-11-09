@@ -29,6 +29,8 @@ import {PrimaryModal, removeCurrentModal, usePrimaryModalState} from 'Components
 import {t} from 'Util/LocalizerUtil';
 import {isBackendError} from 'Util/TypePredicateUtil';
 
+import type {MainViewModel} from './MainViewModel';
+
 import type {ClientEntity} from '../client';
 import type {ConnectionRepository} from '../connection/ConnectionRepository';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
@@ -50,6 +52,7 @@ export class ActionsViewModel {
     private readonly integrationRepository: IntegrationRepository,
     private readonly messageRepository: MessageRepository,
     private readonly userState = container.resolve(UserState),
+    private readonly mainViewModel: MainViewModel,
   ) {}
 
   readonly acceptConnectionRequest = (userEntity: User): Promise<void> => {
@@ -62,6 +65,14 @@ export class ActionsViewModel {
     }
 
     return this.conversationRepository.archiveConversation(conversationEntity);
+  };
+
+  readonly unarchiveConversation = (conversationEntity: Conversation): void => {
+    if (!conversationEntity) {
+      return;
+    }
+
+    return this.mainViewModel.list.clickToUnarchive(conversationEntity);
   };
 
   /**

@@ -1121,7 +1121,7 @@
   "preferencesAccountUsername": "Benutzername",
   "preferencesAccountUsernameAvailable": "Verfügbar",
   "preferencesAccountUsernameErrorTaken": "Bereits vergeben",
-  "preferencesAccountUsernameHint": "Mindestens zwei Zeichen. a—z, 0—9, und _.",
+  "preferencesAccountUsernameHint": "At least 2 characters. a—z, 0—9 and '.', '-', '_' only.",
   "preferencesAccountUsernamePlaceholder": "Ihr vollständiger Name",
   "preferencesDevice": "Gerät",
   "preferencesDeviceDetails": "Gerätedetails",

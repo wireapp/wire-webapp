@@ -1121,7 +1121,7 @@
   "preferencesAccountUsername": "Username",
   "preferencesAccountUsernameAvailable": "利用できます",
   "preferencesAccountUsernameErrorTaken": "すでに利用されています",
-  "preferencesAccountUsernameHint": "少なくとも２文字。a-z, 0-9, および _ のみが利用できます。",
+  "preferencesAccountUsernameHint": "At least 2 characters. a—z, 0—9 and '.', '-', '_' only.",
   "preferencesAccountUsernamePlaceholder": "あなたの氏名",
   "preferencesDevice": "Device",
   "preferencesDeviceDetails": "デバイスの詳細",

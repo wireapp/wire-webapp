@@ -19,7 +19,7 @@
 
 import {ConversationProtocol, MessageSendingStatus, QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
-import {QualifiedId, RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/lib/user';
+import {QualifiedId, RequestCancellationError} from '@wireapp/api-client/lib/user';
 import {
   MessageSendingState,
   MessageTargetMode,
@@ -94,8 +94,7 @@ import {StatusType} from '../message/StatusType';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 import {Core} from '../service/CoreSingleton';
-import type {EventRecord} from '../storage';
-import {UserReactionMap} from '../storage/record/EventRecord';
+import type {EventRecord, ReactionMap} from '../storage';
 import {TeamState} from '../team/TeamState';
 import {ServerTimeHandler} from '../time/serverTimeHandler';
 import {UserType} from '../tracking/attribute';
@@ -166,9 +165,9 @@ export class MessageRepository {
     private readonly userRepository: UserRepository,
     private readonly assetRepository: AssetRepository,
     private readonly userState = container.resolve(UserState),
-    private readonly teamState = container.resolve(TeamState),
     private readonly clientState = container.resolve(ClientState),
     private readonly conversationState = container.resolve(ConversationState),
+    private readonly teamState = container.resolve(TeamState),
     private readonly core = container.resolve(Core),
   ) {
     this.logger = getLogger('MessageRepository');
@@ -827,32 +826,21 @@ export class MessageRepository {
     }
   }
 
-  public updateUserReactions(reactions: UserReactionMap, userId: string, reaction: ReactionType) {
-    const userReactions = reactions[userId] || '';
-    const updatedReactions = {...reactions};
-
-    if (userReactions) {
-      const reactionsArr = userReactions.split(',');
-      const reactionIndex = reactionsArr.indexOf(reaction);
-      if (reactionIndex === -1) {
-        reactionsArr.push(reaction);
-      } else {
-        reactionsArr.splice(reactionIndex, 1);
-      }
-      // if all reactions removed return empty string
-      updatedReactions[userId] = reactionsArr.join(',');
-    } else {
-      // first time reacted
-      updatedReactions[userId] = reaction;
-    }
-    return updatedReactions[userId];
+  public updateUserReactions(reactions: ReactionMap, userId: QualifiedId, reaction: ReactionType) {
+    const userReactions = reactions
+      .filter(([, users]) => users.some(user => matchQualifiedIds(user, userId)))
+      .map(([reaction]) => reaction);
+    const updatedReactions = userReactions.includes(reaction)
+      ? userReactions.filter(r => r !== reaction)
+      : [...userReactions, reaction];
+    return updatedReactions.join(',');
   }
 
   public toggleReaction(
     conversationEntity: Conversation,
     message_et: ContentMessage,
     reaction: string,
-    userId: string,
+    userId: QualifiedId,
   ) {
     if (conversationEntity.removed_from_conversation()) {
       return null;
@@ -979,7 +967,7 @@ export class MessageRepository {
       return !!this.propertyRepository.receiptMode();
     }
 
-    if (conversationEntity.team_id && conversationEntity.isGroup()) {
+    if (conversationEntity.teamId && conversationEntity.isGroup()) {
       return !!conversationEntity.receiptMode();
     }
 
@@ -1147,13 +1135,13 @@ export class MessageRepository {
       messageId: createUuid(),
     });
 
-    const sortedUsers = this.userState
-      .directlyConnectedUsers()
+    const sortedUsers = this.conversationState
+      .connectedUsers()
       // For the moment, we do not want to send status in federated env
       // we can remove the filter when we actually want this feature in federated env (and we will need to implement federation for the core broadcastService)
       .filter(user => !user.isFederated)
       .sort(({id: idA}, {id: idB}) => idA.localeCompare(idB, undefined, {sensitivity: 'base'}));
-    const [members, other] = partition(sortedUsers, user => user.isTeamMember());
+    const [members, other] = partition(sortedUsers, user => this.teamState.isInTeam(user));
     const users = [this.userState.self(), ...members, ...other].slice(
       0,
       UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST,
@@ -1325,19 +1313,6 @@ export class MessageRepository {
     return message as StoredContentMessage;
   }
 
-  async triggerTeamMemberLeaveChecks(users: APIClientUser[]): Promise<void> {
-    for (const user of users) {
-      // Since this is a bare API client user we use `.deleted`
-      const isDeleted = user.deleted === true;
-      if (isDeleted) {
-        await this.conversationRepositoryProvider().teamMemberLeave(this.teamState.team().id ?? '', {
-          domain: this.userState.self().domain,
-          id: user.id,
-        });
-      }
-    }
-  }
-
   public async updateAllClients(conversation: Conversation, blockSystemMessage: boolean): Promise<void> {
     if (blockSystemMessage) {
       conversation.blockLegalHoldMessage = true;
@@ -1500,7 +1475,7 @@ export class MessageRepository {
         [Segmentation.CONVERSATION.SERVICES]: roundLogarithmic(services, 6),
         [Segmentation.MESSAGE.ACTION]: actionType,
       };
-      const isTeamConversation = !!conversationEntity.team_id;
+      const isTeamConversation = !!conversationEntity.teamId;
       if (isTeamConversation) {
         segmentations = {
           ...segmentations,

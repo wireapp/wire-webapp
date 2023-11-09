@@ -18,11 +18,12 @@
  */
 
 import type {CallConfigData} from '@wireapp/api-client/lib/account/CallConfigData';
-import type {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
+import {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import type {WebappProperties} from '@wireapp/api-client/lib/user/data';
 import {MessageSendingState} from '@wireapp/core/lib/conversation';
 import {flattenUserMap} from '@wireapp/core/lib/conversation/message/UserClientsUtil';
+import {SubconversationEpochInfoMember} from '@wireapp/core/lib/conversation/SubconversationService/SubconversationService';
 import {amplify} from 'amplify';
 import axios from 'axios';
 import ko from 'knockout';
@@ -64,6 +65,7 @@ import {ClientId, Participant, UserId} from './Participant';
 
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
+import {isMLSConversation} from '../conversation/ConversationSelectors';
 import {ConversationState} from '../conversation/ConversationState';
 import {CallingEvent, EventBuilder} from '../conversation/EventBuilder';
 import {CONSENT_TYPE, MessageRepository, MessageSendingOptions} from '../conversation/MessageRepository';
@@ -117,13 +119,7 @@ enum CALL_DIRECTION {
   OUTGOING = 'outgoing',
 }
 
-export interface SubconversationEpochInfoMember {
-  userid: `${string}@${string}`;
-  clientid: string;
-  in_subconv: boolean;
-}
-
-type SubconversationData = {epoch: number; secretKey: string};
+type SubconversationData = {epoch: number; secretKey: string; members: SubconversationEpochInfoMember[]};
 
 export class CallingRepository {
   private readonly acceptVersionWarning: (conversationId: QualifiedId) => void;
@@ -341,7 +337,7 @@ export class CallingRepository {
     }
     const allClients = await this.core.service!.conversation.fetchAllParticipantsClients(call.conversationId);
 
-    if (!conversation.isUsingMLSProtocol) {
+    if (!isMLSConversation(conversation)) {
       const qualifiedClients = flattenUserMap(allClients);
 
       const clients: Clients = flatten(
@@ -476,10 +472,9 @@ export class CallingRepository {
 
   private async warmupMediaStreams(call: Call, audio: boolean, camera: boolean): Promise<boolean> {
     // if it's a video call we query the video user media in order to display the video preview
-    const isGroup = [CONV_TYPE.CONFERENCE, CONV_TYPE.GROUP].includes(call.conversationType);
     try {
       camera = this.teamState.isVideoCallingEnabled() ? camera : false;
-      const mediaStream = await this.getMediaStream({audio, camera}, isGroup);
+      const mediaStream = await this.getMediaStream({audio, camera}, call.isGroupOrConference);
       if (call.state() !== CALL_STATE.NONE) {
         call.getSelfParticipant().updateMediaStream(mediaStream, true);
         if (camera) {
@@ -676,8 +671,8 @@ export class CallingRepository {
       toSecond(new Date(time).getTime()),
       this.serializeQualifiedId(conversationId),
       this.serializeQualifiedId(userId),
-      conversation?.isUsingMLSProtocol ? senderClientId : clientId,
-      conversation?.isUsingMLSProtocol ? CONV_TYPE.CONFERENCE_MLS : CONV_TYPE.CONFERENCE,
+      conversation && isMLSConversation(conversation) ? senderClientId : clientId,
+      conversation && isMLSConversation(conversation) ? CONV_TYPE.CONFERENCE_MLS : CONV_TYPE.CONFERENCE,
     );
 
     if (res !== 0) {
@@ -714,7 +709,7 @@ export class CallingRepository {
       return CONV_TYPE.ONEONONE;
     }
 
-    if (conversation.isUsingMLSProtocol) {
+    if (isMLSConversation(conversation)) {
       return CONV_TYPE.CONFERENCE_MLS;
     }
     return this.supportsConferenceCalling ? CONV_TYPE.CONFERENCE : CONV_TYPE.GROUP;
@@ -753,7 +748,7 @@ export class CallingRepository {
       );
       this.storeCall(call);
       const loadPreviewPromise =
-        [CONV_TYPE.CONFERENCE, CONV_TYPE.GROUP].includes(conversationType) && callType === CALL_TYPE.VIDEO
+        call.isGroupOrConference && callType === CALL_TYPE.VIDEO
           ? this.warmupMediaStreams(call, true, true)
           : Promise.resolve(true);
       const success = await loadPreviewPromise;
@@ -829,8 +824,7 @@ export class CallingRepository {
       );
     }
     try {
-      const isGroup = [CONV_TYPE.CONFERENCE, CONV_TYPE.GROUP].includes(call.conversationType);
-      const mediaStream = await this.getMediaStream({audio: true, screen: true}, isGroup);
+      const mediaStream = await this.getMediaStream({audio: true, screen: true}, call.isGroupOrConference);
       // https://stackoverflow.com/a/25179198/451634
       mediaStream.getVideoTracks()[0].onended = () => {
         this.wCall?.setVideoSendState(this.wUser, this.serializeQualifiedId(call.conversationId), VIDEO_STATE.STOPPED);
@@ -883,13 +877,9 @@ export class CallingRepository {
     }
   }
 
-  setEpochInfo(
-    conversationId: QualifiedId,
-    subconversationData: SubconversationData,
-    members: SubconversationEpochInfoMember[],
-  ) {
+  setEpochInfo(conversationId: QualifiedId, subconversationData: SubconversationData) {
     const serializedConversationId = this.serializeQualifiedId(conversationId);
-    const {epoch, secretKey} = subconversationData;
+    const {epoch, secretKey, members} = subconversationData;
     const clients = {
       convid: serializedConversationId,
       clients: members,
@@ -1155,7 +1145,7 @@ export class CallingRepository {
      * This message is used to tell your other clients you have answered or
      * rejected a call and to stop ringing.
      */
-    if (typeof payload === 'string' && conversation.isUsingMLSProtocol && myClientsOnly) {
+    if (typeof payload === 'string' && isMLSConversation(conversation) && myClientsOnly) {
       return void this.messageRepository.sendSelfCallingMessage(payload, conversation.qualifiedId);
     }
 
@@ -1370,7 +1360,9 @@ export class CallingRepository {
     const canRing = !conversation.showNotificationsNothing() && shouldRing && this.isReady;
     const selfParticipant = new Participant(this.selfUser, this.selfClientId);
     const isVideoCall = hasVideo ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL;
-    const isMuted = Config.getConfig().FEATURE.CONFERENCE_AUTO_MUTE && conversationType === CONV_TYPE.CONFERENCE;
+    const isMuted =
+      Config.getConfig().FEATURE.CONFERENCE_AUTO_MUTE &&
+      [CONV_TYPE.CONFERENCE, CONV_TYPE.CONFERENCE_MLS].includes(conversationType);
     const call = new Call(
       qualifiedUserId,
       conversation.qualifiedId,
@@ -1548,13 +1540,12 @@ export class CallingRepository {
         window.setTimeout(() => resolve(selfParticipant.getMediaStream()), 0);
       });
     }
-    const isGroup = [CONV_TYPE.CONFERENCE, CONV_TYPE.GROUP].includes(call.conversationType);
     this.mediaStreamQuery = (async () => {
       try {
         if (missingStreams.screen && selfParticipant.sharesScreen()) {
           return selfParticipant.getMediaStream();
         }
-        const mediaStream = await this.getMediaStream(missingStreams, isGroup);
+        const mediaStream = await this.getMediaStream(missingStreams, call.isGroupOrConference);
         this.mediaStreamQuery = undefined;
         const newStream = selfParticipant.updateMediaStream(mediaStream, true);
         return newStream;

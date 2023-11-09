@@ -19,9 +19,11 @@
 
 import React, {useMemo} from 'react';
 
+import {container} from 'tsyringe';
+
 import {Link, LinkVariant} from '@wireapp/react-ui-kit';
 
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {TeamState} from 'src/script/team/TeamState';
 import {t} from 'Util/LocalizerUtil';
 
 import {PreferencesPage} from './components/PreferencesPage';
@@ -33,10 +35,11 @@ import {getPrivacyPolicyUrl, getTermsOfUsePersonalUrl, getTermsOfUseTeamUrl, URL
 
 interface AboutPreferencesProps {
   selfUser: User;
+  teamState: TeamState;
 }
 
-const AboutPreferences: React.FC<AboutPreferencesProps> = ({selfUser}) => {
-  const {inTeam} = useKoSubscribableChildren(selfUser, ['inTeam']);
+const AboutPreferences: React.FC<AboutPreferencesProps> = ({selfUser, teamState = container.resolve(TeamState)}) => {
+  const inTeam = teamState.isInTeam(selfUser);
   const config = Config.getConfig();
   const websiteUrl = URL.WEBSITE;
   const privacyPolicyUrl = getPrivacyPolicyUrl();

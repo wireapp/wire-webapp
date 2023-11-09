@@ -71,8 +71,9 @@ import {EventService} from '../event/EventService';
 import {EventServiceNoCompound} from '../event/EventServiceNoCompound';
 import {NotificationService} from '../event/NotificationService';
 import {EventStorageMiddleware} from '../event/preprocessor/EventStorageMiddleware';
-import {QuotedMessageMiddleware} from '../event/preprocessor/QuotedMessageMiddleware';
+import {QuotedMessageMiddleware} from '../event/preprocessor/QuoteDecoderMiddleware';
 import {ReceiptsMiddleware} from '../event/preprocessor/ReceiptsMiddleware';
+import {RepliesUpdaterMiddleware} from '../event/preprocessor/RepliesUpdaterMiddleware';
 import {ServiceMiddleware} from '../event/preprocessor/ServiceMiddleware';
 import {FederationEventProcessor} from '../event/processor/FederationEventProcessor';
 import {GiphyRepository} from '../extension/GiphyRepository';
@@ -82,14 +83,13 @@ import {IntegrationRepository} from '../integration/IntegrationRepository';
 import {IntegrationService} from '../integration/IntegrationService';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import {MediaRepository} from '../media/MediaRepository';
-import {initMLSCallbacks, initMLSConversations, registerUninitializedSelfAndTeamConversations} from '../mls';
+import {initMLSConversations, registerUninitializedSelfAndTeamConversations} from '../mls';
 import {NotificationRepository} from '../notification/NotificationRepository';
 import {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
 import {PermissionRepository} from '../permission/PermissionRepository';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {PropertiesService} from '../properties/PropertiesService';
 import {SearchRepository} from '../search/SearchRepository';
-import {SearchService} from '../search/SearchService';
 import {SelfRepository} from '../self/SelfRepository';
 import {SelfService} from '../self/SelfService';
 import {APIClient} from '../service/APIClientSingleton';
@@ -225,7 +225,7 @@ export class App {
     );
     repositories.connection = new ConnectionRepository(new ConnectionService(), repositories.user);
     repositories.event = new EventRepository(this.service.event, this.service.notification, serverTimeHandler);
-    repositories.search = new SearchRepository(new SearchService(), repositories.user);
+    repositories.search = new SearchRepository(repositories.user);
     repositories.team = new TeamRepository(repositories.user, repositories.asset);
 
     repositories.message = new MessageRepository(
@@ -377,6 +377,13 @@ export class App {
 
       const selfUser = await this.initiateSelfUser();
 
+      this.core.configureCoreCallbacks({
+        groupIdFromConversationId: async conversationId => {
+          const conversation = await conversationRepository.getConversationById(conversationId);
+          return conversation?.groupId;
+        },
+      });
+
       await initializeDataDog(this.config, selfUser.qualifiedId);
 
       // Setup all event middleware
@@ -384,12 +391,14 @@ export class App {
       const serviceMiddleware = new ServiceMiddleware(conversationRepository, userRepository, selfUser);
       const quotedMessageMiddleware = new QuotedMessageMiddleware(this.service.event);
       const readReceiptMiddleware = new ReceiptsMiddleware(this.service.event, conversationRepository, selfUser);
+      const repliesUpdaterMiddleware = new RepliesUpdaterMiddleware(this.service.event);
 
       eventRepository.setEventProcessMiddlewares([
         serviceMiddleware,
-        quotedMessageMiddleware,
         readReceiptMiddleware,
+        quotedMessageMiddleware,
         eventStorageMiddleware,
+        repliesUpdaterMiddleware,
       ]);
       // Setup all the event processors
       const federationEventProcessor = new FederationEventProcessor(eventRepository, serverTimeHandler, selfUser);
@@ -406,7 +415,7 @@ export class App {
       onProgress(10);
       telemetry.timeStep(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
 
-      const {members: teamMembers} = await teamRepository.initTeam(selfUser.teamId);
+      const teamMembers = await teamRepository.initTeam(selfUser.teamId);
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_USER_DATA);
 
       const connections = await connectionRepository.getConnections();
@@ -418,7 +427,6 @@ export class App {
 
       if (supportsMLS()) {
         //if mls is supported, we need to initialize the callbacks (they are used when decrypting messages)
-        await initMLSCallbacks(this.core, this.repository.conversation);
         conversationRepository.initMLSConversationRecoveredListener();
       }
 

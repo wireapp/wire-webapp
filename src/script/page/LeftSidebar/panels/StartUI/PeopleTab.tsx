@@ -30,7 +30,6 @@ import {Icon} from 'Components/Icon';
 import {UserList, UserlistMode} from 'Components/UserList';
 import {Conversation} from 'src/script/entity/Conversation';
 import {UserRepository} from 'src/script/user/UserRepository';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
@@ -48,7 +47,6 @@ import {useDebounce} from '../../../../hooks/useDebounce';
 import {SearchRepository} from '../../../../search/SearchRepository';
 import {TeamRepository} from '../../../../team/TeamRepository';
 import {TeamState} from '../../../../team/TeamState';
-import {validateHandle} from '../../../../user/UserHandleGenerator';
 import {UserState} from '../../../../user/UserState';
 
 export type SearchResultsData = {contacts: User[]; groups: Conversation[]; others: User[]};
@@ -102,10 +100,10 @@ export const PeopleTab = ({
   const [hasFederationError, setHasFederationError] = useState(false);
   const currentSearchQuery = useRef('');
 
-  const {connectedUsers} = useKoSubscribableChildren(conversationState, ['connectedUsers']);
-  const {inTeam} = useKoSubscribableChildren(selfUser, ['inTeam']);
+  const inTeam = teamState.isInTeam(selfUser);
 
   const getLocalUsers = (unfiltered?: boolean) => {
+    const connectedUsers = conversationState.connectedUsers();
     if (!canSearchUnconnectedUsers) {
       return connectedUsers;
     }
@@ -119,7 +117,9 @@ export const PeopleTab = ({
 
       contacts = unfiltered
         ? teamUsers
-        : teamUsers.filter(user => connectedUsers.includes(user) || teamRepository.isSelfConnectedTo(user.id));
+        : teamUsers.filter(
+            user => conversationState.hasConversationWith(user) || teamRepository.isSelfConnectedTo(user.id),
+          );
     }
 
     return contacts.filter(user => user.isAvailable());
@@ -170,7 +170,7 @@ export const PeopleTab = ({
   useDebounce(
     async () => {
       setHasFederationError(false);
-      const query = SearchRepository.normalizeQuery(searchQuery);
+      const {query, isHandleQuery} = searchRepository.normalizeQuery(searchQuery);
       if (!query) {
         setResults({contacts: getLocalUsers(), groups: [], others: []});
         onSearchResults(undefined);
@@ -178,31 +178,24 @@ export const PeopleTab = ({
       }
       const localSearchSources = getLocalUsers(true);
 
-      // Contacts, groups and others
-      const trimmedQuery = searchQuery.trim();
-      const isHandle = trimmedQuery.startsWith('@') && validateHandle(query);
-
-      const SEARCHABLE_FIELDS = SearchRepository.CONFIG.SEARCHABLE_FIELDS;
-      const searchFields = isHandle ? [SEARCHABLE_FIELDS.USERNAME] : undefined;
-
-      // If the user typed a domain, we will just ignore it when searchng for the user locally
-      const [domainFreeQuery] = query.split('@');
-      const contactResults = searchRepository.searchUserInSet(domainFreeQuery, localSearchSources, searchFields);
-      const connectedUsers = conversationState.connectedUsers();
+      const contactResults = searchRepository.searchUserInSet(searchQuery, localSearchSources);
       const filteredResults = contactResults.filter(
-        user => connectedUsers.includes(user) || teamRepository.isSelfConnectedTo(user.id) || user.username() === query,
+        user =>
+          conversationState.hasConversationWith(user) ||
+          teamRepository.isSelfConnectedTo(user.id) ||
+          user.username() === query,
       );
 
       const localSearchResults: SearchResultsData = {
         contacts: filteredResults,
-        groups: conversationRepository.getGroupsByName(query, isHandle),
+        groups: conversationRepository.getGroupsByName(query, isHandleQuery),
         others: [],
       };
       setResults(localSearchResults);
       onSearchResults(localSearchResults);
       if (canSearchUnconnectedUsers) {
         try {
-          const userEntities = await searchRepository.searchByName(query, isHandle);
+          const userEntities = await searchRepository.searchByName(searchQuery);
           const localUserIds = localSearchResults.contacts.map(({id}) => id);
           const onlyRemoteUsers = userEntities.filter(user => !localUserIds.includes(user.id));
           const results = inTeam

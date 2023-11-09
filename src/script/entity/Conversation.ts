@@ -94,7 +94,6 @@ export class Conversation {
   private shouldPersistStateChanges: boolean;
   public blockLegalHoldMessage: boolean;
   public hasCreationMessage: boolean;
-  public needsLegalHoldApproval: boolean = false;
   public readonly accessCode: ko.Observable<string>;
   public readonly accessCodeHasPassword: ko.Observable<boolean | undefined>;
   public readonly accessState: ko.Observable<ACCESS_STATE>;
@@ -108,10 +107,8 @@ export class Conversation {
   public groupId?: string;
   public epoch: number = -1;
   public cipherSuite: number = 1;
-  public readonly isUsingMLSProtocol: boolean;
   public readonly display_name: ko.PureComputed<string>;
   public readonly firstUserEntity: ko.PureComputed<User | undefined>;
-  public readonly enforcedTeamMessageTimer: ko.PureComputed<number>;
   public readonly globalMessageTimer: ko.Observable<number | null>;
   public readonly hasContentMessages: ko.Observable<boolean>;
   public readonly hasAdditionalMessages: ko.Observable<boolean>;
@@ -167,7 +164,7 @@ export class Conversation {
   public readonly showNotificationsMentionsAndReplies: ko.PureComputed<boolean>;
   public readonly showNotificationsNothing: ko.PureComputed<boolean>;
   public status: ko.Observable<ConversationStatus>;
-  public team_id: string;
+  public teamId: string;
   public readonly type: ko.Observable<CONVERSATION_TYPE>;
   public readonly unreadState: ko.PureComputed<UnreadState>;
   public readonly verification_state: ko.Observable<ConversationVerificationState>;
@@ -201,15 +198,8 @@ export class Conversation {
     this.accessCodeHasPassword = ko.observable();
     this.creator = undefined;
     this.name = ko.observable();
-    this.team_id = undefined;
+    this.teamId = undefined;
     this.type = ko.observable();
-
-    /**
-     * If a conversation has the groupId property it means that it
-     * is MLS protocol based as this property is for MLS conversations only.
-     * @returns boolean
-     */
-    this.isUsingMLSProtocol = protocol === ConversationProtocol.MLS;
 
     this.is_loaded = ko.observable(false);
     this.is_pending = ko.observable(false);
@@ -232,9 +222,9 @@ export class Conversation {
     this.isGuest = ko.observable(false);
 
     this.inTeam = ko.pureComputed(() => {
-      const isSameTeam = this.selfUser()?.teamId === this.team_id;
+      const isSameTeam = this.selfUser()?.teamId === this.teamId;
       const isSameDomain = this.domain === this.selfUser()?.domain;
-      return !!this.team_id && isSameTeam && !this.isGuest() && isSameDomain;
+      return !!this.teamId && isSameTeam && !this.isGuest() && isSameDomain;
     });
     this.isGuestRoom = ko.pureComputed(() => this.accessState() === ACCESS_STATE.TEAM.GUEST_ROOM);
     this.isGuestAndServicesRoom = ko.pureComputed(() => this.accessState() === ACCESS_STATE.TEAM.GUESTS_SERVICES);
@@ -245,7 +235,7 @@ export class Conversation {
     this.isTeam1to1 = ko.pureComputed(() => {
       const isGroupConversation = this.type() === CONVERSATION_TYPE.REGULAR;
       const hasOneParticipant = this.participating_user_ids().length === 1;
-      return isGroupConversation && hasOneParticipant && this.team_id && !this.name();
+      return isGroupConversation && hasOneParticipant && this.teamId && !this.name();
     });
     this.isGroup = ko.pureComputed(() => {
       const isGroupConversation = this.type() === CONVERSATION_TYPE.REGULAR;
@@ -263,11 +253,11 @@ export class Conversation {
 
     this.hasDirectGuest = ko.pureComputed(() => {
       const hasGuestUser = this.participating_user_ets().some(userEntity => userEntity.isDirectGuest());
-      return hasGuestUser && this.isGroup() && this.selfUser()?.inTeam();
+      return hasGuestUser && this.isGroup();
     });
     this.hasGuest = ko.pureComputed(() => {
       const hasGuestUser = this.participating_user_ets().some(userEntity => userEntity.isGuest());
-      return hasGuestUser && this.isGroup() && this.selfUser()?.inTeam();
+      return hasGuestUser && this.isGroup();
     });
     this.hasService = ko.pureComputed(() => this.participating_user_ets().some(userEntity => userEntity.isService));
     this.hasExternal = ko.pureComputed(() => this.participating_user_ets().some(userEntity => userEntity.isExternal()));
@@ -312,13 +302,13 @@ export class Conversation {
       const knownNotificationStates = Object.values(NOTIFICATION_STATE);
       if (knownNotificationStates.includes(mutedState)) {
         const isStateMentionsAndReplies = mutedState === NOTIFICATION_STATE.MENTIONS_AND_REPLIES;
-        const isInvalidState = isStateMentionsAndReplies && !this.selfUser().inTeam();
+        const isInvalidState = isStateMentionsAndReplies && !this.selfUser()?.teamId;
 
         return isInvalidState ? NOTIFICATION_STATE.NOTHING : mutedState;
       }
 
       if (typeof mutedState === 'boolean') {
-        const migratedMutedState = this.selfUser().inTeam()
+        const migratedMutedState = !!this.selfUser()?.teamId
           ? NOTIFICATION_STATE.MENTIONS_AND_REPLIES
           : NOTIFICATION_STATE.NOTHING;
         return this.mutedState() ? migratedMutedState : NOTIFICATION_STATE.EVERYTHING;
@@ -894,10 +884,6 @@ export class Conversation {
     }
   }
 
-  getAllMessages(): Message[] {
-    return this.messages();
-  }
-
   /**
    * Get the oldest loaded message of the conversation.
    */
@@ -914,19 +900,6 @@ export class Conversation {
    */
   getNewestMessage(): Message | undefined {
     return this.messages()[this.messages().length - 1];
-  }
-
-  /**
-   * Get the message before a given message.
-   * @param message_et Message to look up from
-   */
-  getPreviousMessage(message_et: Message): Message | undefined {
-    const messages_visible = this.messages_visible();
-    const message_index = messages_visible.indexOf(message_et);
-    if (message_index > 0) {
-      return messages_visible[message_index - 1];
-    }
-    return undefined;
   }
 
   /**
@@ -1049,7 +1022,7 @@ export class Conversation {
       receipt_mode: this.receiptMode(),
       roles: this.roles(),
       status: this.status(),
-      team_id: this.team_id,
+      team_id: this.teamId,
       type: this.type(),
       verification_state: this.verification_state(),
       mlsVerificationState: this.mlsVerificationState(),

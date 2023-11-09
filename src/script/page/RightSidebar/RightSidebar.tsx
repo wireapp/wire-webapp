@@ -312,7 +312,6 @@ const RightSidebar: FC<RightSidebarProps> = ({
               selfUser={selfUser}
               conversationRepository={conversationRepository}
               messageEntity={messageEntity}
-              updateEntity={rightSidebar.updateEntity}
               teamRepository={teamRepository}
               searchRepository={searchRepository}
               showReactions={rightSidebar.showReactions}

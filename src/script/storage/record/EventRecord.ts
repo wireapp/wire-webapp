@@ -40,7 +40,9 @@ export interface AssetRecord {
   token?: string;
 }
 
+/** @deprecated as of Oct 2023, this is the old format we stored reactions in */
 export type UserReactionMap = {[userId: string]: ReactionType};
+export type ReactionMap = [reaction: string, userIds: QualifiedId[]][];
 
 /**
  * Represent an event that has been sent by the current device
@@ -96,7 +98,7 @@ export type LegacyEventRecord<T = any> = {
   previews?: string[];
   qualified_conversation?: QualifiedId;
   qualified_from?: QualifiedId;
-  reactions?: UserReactionMap;
+  reactions?: ReactionMap | UserReactionMap;
   read_receipts?: ReadReceipt[];
   selected_button_id?: string;
   server_time?: string;
