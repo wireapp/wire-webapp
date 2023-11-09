@@ -416,7 +416,7 @@ export class App {
       onProgress(10);
       telemetry.timeStep(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
 
-      const {members: teamMembers} = await teamRepository.initTeam(selfUser.teamId);
+      const teamMembers = await teamRepository.initTeam(selfUser.teamId);
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_USER_DATA);
 
       const connections = await connectionRepository.getConnections();

@@ -42,6 +42,7 @@ import {
   NodeSelection,
   RangeSelection,
   $isRangeSelection,
+  $createRangeSelection,
 } from 'lexical';
 
 import {KEY} from 'Util/KeyboardUtil';
@@ -81,12 +82,21 @@ export const Mention = (props: MentionComponentProps) => {
       const rangeSelection = $isRangeSelection(currentSelection) ? currentSelection : null;
 
       let shouldSelectNode = false;
-      if (event.key === 'Backspace') {
-        shouldSelectNode = nodeKey === rangeSelection?.getNodes()[0]?.getKey();
-      } else if (event.key === 'Delete') {
-        const currentNode = rangeSelection?.getNodes()[0];
-        const isOnTheEdgeOfNode = currentNode?.getTextContent().length === rangeSelection?.focus.offset;
-        shouldSelectNode = currentNode?.getNextSibling()?.getKey() === nodeKey && isOnTheEdgeOfNode;
+      const selectedNode = rangeSelection?.getNodes().length === 1 && rangeSelection?.getNodes()[0];
+      if (selectedNode) {
+        const isCurrentNode = nodeKey === selectedNode?.getKey();
+        if (event.key === 'Backspace') {
+          // When backspace is hit, we want to select the mention if the cursor is right after it
+          const isNextNode =
+            selectedNode?.getPreviousSibling()?.getKey() === nodeKey && rangeSelection?.focus.offset === 0;
+          shouldSelectNode = isCurrentNode || isNextNode;
+        } else if (event.key === 'Delete') {
+          // When backspace is hit, we want to select the mention if the cursor is right before it
+          const isNextNode =
+            selectedNode?.getNextSibling()?.getKey() === nodeKey &&
+            rangeSelection?.focus.offset === selectedNode?.getTextContent().length;
+          shouldSelectNode = isCurrentNode || isNextNode;
+        }
       }
       // If the cursor is right before the mention, we first select the mention before deleting it
       if (shouldSelectNode) {
@@ -101,9 +111,16 @@ export const Mention = (props: MentionComponentProps) => {
         const node = $getNodeByKey(nodeKey);
 
         if ($isMentionNode(node)) {
+          const previousNode = node.getPreviousSibling();
+          if ($isTextNode(previousNode)) {
+            const newSelection = $createRangeSelection();
+            const contentLength = previousNode.getTextContent().length;
+            newSelection.setTextNodeRange(previousNode, contentLength, previousNode, contentLength);
+            $setSelection(newSelection);
+          }
           node.remove();
+          return true;
         }
-
         setSelected(false);
       }
       return false;
