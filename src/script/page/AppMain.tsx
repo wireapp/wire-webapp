@@ -226,6 +226,7 @@ const AppMain: FC<AppMainProps> = ({
                 selfUser={selfUser}
                 isRightSidebarOpen={!!currentState}
                 openRightSidebar={toggleRightSidebar}
+                reloadApp={app.refresh}
               />
             )}
 

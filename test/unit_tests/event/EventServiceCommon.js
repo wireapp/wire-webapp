@@ -508,6 +508,107 @@ const testEventServiceClass = (testedServiceName, className) => {
       });
     });
 
+    describe('loadAllConversationEvents', () => {
+      const conversationId = 'conversation-id';
+
+      afterEach(() => {
+        testFactory.storage_service.clearStores();
+      });
+
+      it('Loads all the events by conversation id', async () => {
+        const numberOfConversationEvents = 3;
+        const numberOfOtherConversationEvents = 1;
+
+        const conversationEvents = Array.from({length: numberOfConversationEvents}, () => ({
+          conversation: conversationId,
+          id: createUuid(),
+          time: '2016-08-04T13:27:55.182Z',
+        }));
+
+        const otherConversationEvents = Array.from({length: numberOfOtherConversationEvents}, () => ({
+          conversation: 'other-conversation-id',
+          id: createUuid(),
+          time: '2016-08-04T13:27:55.182Z',
+        }));
+
+        const events = [...conversationEvents, ...otherConversationEvents];
+
+        Promise.all(events.map(event => testFactory.storage_service.save(eventStoreName, undefined, event)));
+
+        const eventService = testFactory[testedServiceName];
+
+        const foundConversationEvents = await eventService.loadAllConversationEvents(conversationId);
+
+        expect(foundConversationEvents.length).toBe(numberOfConversationEvents);
+      });
+
+      it('Skips types of events included in the skip array', async () => {
+        const numberOfConversationEvents = 3;
+        const skipTypes = ['conversation.message-add'];
+        const numberOfEventsToSkip = 2;
+
+        const conversationEvents = Array.from({length: numberOfConversationEvents}, () => ({
+          conversation: conversationId,
+          id: createUuid(),
+          time: '2016-08-04T13:27:55.182Z',
+        }));
+
+        const conversationEventsToSkip = Array.from({length: numberOfEventsToSkip}, () => ({
+          conversation: conversationId,
+          id: createUuid(),
+          time: '2016-08-04T13:27:55.182Z',
+          type: skipTypes[0],
+        }));
+
+        const events = [...conversationEvents, ...conversationEventsToSkip];
+
+        Promise.all(events.map(event => testFactory.storage_service.save(eventStoreName, undefined, event)));
+
+        const eventService = testFactory[testedServiceName];
+
+        const foundConversationEvents = await eventService.loadAllConversationEvents(conversationId, skipTypes);
+
+        expect(foundConversationEvents.length).toBe(numberOfConversationEvents);
+      });
+    });
+
+    describe('moveEventsToConversation', () => {
+      const oldConversationId = 'old-conversation-id';
+      const newConversationId = 'new-conversation-id';
+
+      afterEach(() => {
+        testFactory.storage_service.clearStores();
+      });
+
+      it('Loads all the events by conversation id', async () => {
+        const numberOfConversationEvents = 3;
+
+        const conversationEvents = Array.from({length: numberOfConversationEvents}, () => ({
+          conversation: oldConversationId,
+          id: createUuid(),
+          time: '2016-08-04T13:27:55.182Z',
+        }));
+
+        Promise.all(
+          conversationEvents.map(event => testFactory.storage_service.save(eventStoreName, undefined, event)),
+        );
+
+        const eventService = testFactory[testedServiceName];
+
+        const loadedOldConversationEvents = await eventService.loadAllConversationEvents(oldConversationId);
+        const loadedNewConversationEvents = await eventService.loadAllConversationEvents(newConversationId);
+        expect(loadedOldConversationEvents.length).toBe(numberOfConversationEvents);
+        expect(loadedNewConversationEvents.length).toBe(0);
+
+        await eventService.moveEventsToConversation(oldConversationId, newConversationId);
+
+        const loadedOldConversationEventsAfterMove = await eventService.loadAllConversationEvents(oldConversationId);
+        const loadedNewConversationEventsAfterMove = await eventService.loadAllConversationEvents(newConversationId);
+        expect(loadedOldConversationEventsAfterMove.length).toBe(0);
+        expect(loadedNewConversationEventsAfterMove.length).toBe(numberOfConversationEvents);
+      });
+    });
+
     describe('deleteEventByKey', () => {
       let primary_keys = undefined;
 
