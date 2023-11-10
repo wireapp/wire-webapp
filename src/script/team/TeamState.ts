@@ -25,6 +25,7 @@ import {sortUsersByPriority} from 'Util/StringUtil';
 
 import {TeamEntity} from './TeamEntity';
 
+import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 import {ROLE} from '../user/UserPermission';
 import {UserState} from '../user/UserState';
@@ -32,8 +33,8 @@ import {UserState} from '../user/UserState';
 @singleton()
 export class TeamState {
   public readonly isTeamDeleted: ko.Observable<boolean>;
-  public readonly memberInviters: ko.Observable<any>;
-  public readonly memberRoles: ko.Observable<any>;
+  public readonly memberInviters: ko.Observable<Record<string, string>>;
+  public readonly memberRoles: ko.Observable<Record<string, ROLE>>;
   public readonly supportsLegalHold: ko.Observable<boolean>;
   public readonly teamName: ko.PureComputed<string>;
   public readonly teamFeatures: ko.Observable<FeatureList | undefined>;
@@ -56,18 +57,16 @@ export class TeamState {
   /** all the members of the team + the users the selfUser is connected with */
   readonly teamUsers: ko.PureComputed<User[]>;
   readonly isTeam: ko.PureComputed<boolean>;
-  readonly team: ko.Observable<TeamEntity>;
+  readonly team = ko.observable(new TeamEntity());
   readonly teamDomain: ko.PureComputed<string>;
   readonly teamSize: ko.PureComputed<number>;
 
   constructor(private readonly userState = container.resolve(UserState)) {
-    this.team = ko.observable();
-
     this.isTeam = ko.pureComputed(() => !!this.team()?.id);
     this.isTeamDeleted = ko.observable(false);
 
     /** Note: this does not include the self user */
-    this.teamMembers = ko.pureComputed(() => this.userState.users().filter(user => !user.isMe && user.isTeamMember()));
+    this.teamMembers = ko.pureComputed(() => this.userState.users().filter(user => !user.isMe && this.isInTeam(user)));
     this.memberRoles = ko.observable({});
     this.memberInviters = ko.observable({});
     this.teamFeatures = ko.observable();
@@ -134,7 +133,12 @@ export class TeamState {
     );
   }
 
-  readonly isExternal = (userId: string): boolean => {
+  isInTeam(entity: User | Conversation): boolean {
+    const team = this.team();
+    return !!team.id && entity.domain === this.teamDomain() && entity.teamId === team.id;
+  }
+
+  isExternal(userId: string): boolean {
     return this.memberRoles()[userId] === ROLE.PARTNER;
-  };
+  }
 }

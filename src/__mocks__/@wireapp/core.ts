@@ -66,6 +66,10 @@ export class Account extends EventEmitter {
         setConversationLevelTimer: jest.fn(),
       },
       tryEstablishingMLSGroup: jest.fn(),
+      isMLSGroupEstablishedLocally: jest.fn(),
+      establishMLS1to1Conversation: jest.fn(),
+      blacklistConversation: jest.fn(),
+      removeConversationFromBlacklist: jest.fn(),
     },
     subconversation: {
       joinConferenceSubconversation: jest.fn(),

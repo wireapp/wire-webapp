@@ -63,6 +63,7 @@ interface MainContentProps {
   isRightSidebarOpen?: boolean;
   selfUser: User;
   conversationState?: ConversationState;
+  reloadApp: () => void;
 }
 
 const MainContent: FC<MainContentProps> = ({
@@ -70,6 +71,7 @@ const MainContent: FC<MainContentProps> = ({
   isRightSidebarOpen = false,
   selfUser,
   conversationState = container.resolve(ConversationState),
+  reloadApp,
 }) => {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const mainViewModel = useContext(RootContext);
@@ -150,7 +152,7 @@ const MainContent: FC<MainContentProps> = ({
                 className={cx('preferences-page preferences-about', incomingCssClass)}
                 ref={removeAnimationsClass}
               >
-                <AboutPreferences selfUser={selfUser} />
+                <AboutPreferences selfUser={selfUser} teamState={teamState} />
               </div>
             )}
 
@@ -239,6 +241,7 @@ const MainContent: FC<MainContentProps> = ({
                 selfUser={selfUser}
                 isRightSidebarOpen={isRightSidebarOpen}
                 openRightSidebar={openRightSidebar}
+                reloadApp={reloadApp}
               />
             )}
 

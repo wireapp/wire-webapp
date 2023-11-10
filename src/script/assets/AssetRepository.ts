@@ -38,6 +38,7 @@ import {Conversation} from '../entity/Conversation';
 import {FileAsset} from '../entity/message/FileAsset';
 import type {User} from '../entity/User';
 import {Core} from '../service/CoreSingleton';
+import {TeamState} from '../team/TeamState';
 
 interface CompressedImage {
   compressedBytes: Uint8Array;
@@ -64,6 +65,7 @@ export class AssetRepository {
   constructor(
     private readonly assetService = container.resolve(AssetService),
     private readonly core = container.resolve(Core),
+    private readonly teamState = container.resolve(TeamState),
   ) {
     this.logger = getLogger('AssetRepository');
   }
@@ -225,11 +227,11 @@ export class AssetRepository {
   }
 
   getAssetRetention(userEntity: User, conversationEntity: Conversation): AssetRetentionPolicy {
-    const isTeamMember = userEntity.inTeam();
-    const isTeamConversation = conversationEntity.inTeam();
+    const isTeamMember = this.teamState.isInTeam(userEntity);
+    const isTeamConversation = this.teamState.isInTeam(conversationEntity);
     const isTeamUserInConversation = conversationEntity
       .participating_user_ets()
-      .some(conversationParticipant => conversationParticipant.inTeam());
+      .some(conversationParticipant => this.teamState.isInTeam(conversationParticipant));
 
     const isEternalInfrequentAccess = isTeamMember || isTeamConversation || isTeamUserInConversation;
     return isEternalInfrequentAccess ? AssetRetentionPolicy.ETERNAL_INFREQUENT_ACCESS : AssetRetentionPolicy.EXPIRING;

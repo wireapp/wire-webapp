@@ -2589,10 +2589,34 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@eslint/eslintrc@npm:^2.1.3":
+  version: 2.1.3
+  resolution: "@eslint/eslintrc@npm:2.1.3"
+  dependencies:
+    ajv: ^6.12.4
+    debug: ^4.3.2
+    espree: ^9.6.0
+    globals: ^13.19.0
+    ignore: ^5.2.0
+    import-fresh: ^3.2.1
+    js-yaml: ^4.1.0
+    minimatch: ^3.1.2
+    strip-json-comments: ^3.1.1
+  checksum: 5c6c3878192fe0ddffa9aff08b4e2f3bcc8f1c10d6449b7295a5f58b662019896deabfc19890455ffd7e60a5bd28d25d0eaefb2f78b2d230aae3879af92b89e5
+  languageName: node
+  linkType: hard
+
 "@eslint/js@npm:8.52.0":
   version: 8.52.0
   resolution: "@eslint/js@npm:8.52.0"
   checksum: 490893b8091a66415f4ac98b963d23eb287264ea3bd6af7ec788f0570705cf64fd6ab84b717785980f55e39d08ff5c7fde6d8e4391ccb507169370ce3a6d091a
+  languageName: node
+  linkType: hard
+
+"@eslint/js@npm:8.53.0":
+  version: 8.53.0
+  resolution: "@eslint/js@npm:8.53.0"
+  checksum: e0d5cfb0000aaee237c8e6d6d6e366faa60b1ef7f928ce17778373aa44d3b886368f6d5e1f97f913f0f16801aad016db8b8df78418c9d18825c15590328028af
   languageName: node
   linkType: hard
 
@@ -4799,12 +4823,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/sinon@npm:10.0.19":
-  version: 10.0.19
-  resolution: "@types/sinon@npm:10.0.19"
+"@types/sinon@npm:17.0.0":
+  version: 17.0.0
+  resolution: "@types/sinon@npm:17.0.0"
   dependencies:
     "@types/sinonjs__fake-timers": "*"
-  checksum: 79cab4cfc618a37a11e519795a297aa641b30eb05e2d2c7a9b03f40845b54ef631af80bddbef3e57dcd4be6c67bd78dce5210ea9860617d870f1d365c78468b6
+  checksum: 19850ffb787bea148e6429fd0d6207de2f38aa22e6ac5e856f304b4f2eb7d612aa04f315bc715b38a8605a8ff12dc40bd633096bb996472b1dff925a0e25e872
   languageName: node
   linkType: hard
 
@@ -8272,12 +8296,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"emoji-picker-react@npm:4.5.7":
-  version: 4.5.7
-  resolution: "emoji-picker-react@npm:4.5.7"
+"emoji-picker-react@npm:4.5.14":
+  version: 4.5.14
+  resolution: "emoji-picker-react@npm:4.5.14"
   peerDependencies:
     react: ">=16"
-  checksum: b599feddfddc6ef20f46603bc19b724b8c0aff8ae341040c500da3bfdc024feb78e6bf949537fd11852bff2e87004eccf2a73c32265fe7f1e3d9dc821304ef89
+  checksum: c25f47effd79128b597ea5fad57dff93ce95e698a858349cdc1b2fde7c3203a227fb63cc365ee3f3a351a64ae4519e6a775aa22419ebe92cc7d72f65974b361a
   languageName: node
   linkType: hard
 
@@ -8930,7 +8954,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint@npm:^8, eslint@npm:^8.52.0":
+"eslint@npm:^8":
   version: 8.52.0
   resolution: "eslint@npm:8.52.0"
   dependencies:
@@ -8975,6 +8999,54 @@ __metadata:
   bin:
     eslint: bin/eslint.js
   checksum: fd22d1e9bd7090e31b00cbc7a3b98f3b76020a4c4641f987ae7d0c8f52e1b88c3b268bdfdabac2e1a93513e5d11339b718ff45cbff48a44c35d7e52feba510ed
+  languageName: node
+  linkType: hard
+
+"eslint@npm:^8.53.0":
+  version: 8.53.0
+  resolution: "eslint@npm:8.53.0"
+  dependencies:
+    "@eslint-community/eslint-utils": ^4.2.0
+    "@eslint-community/regexpp": ^4.6.1
+    "@eslint/eslintrc": ^2.1.3
+    "@eslint/js": 8.53.0
+    "@humanwhocodes/config-array": ^0.11.13
+    "@humanwhocodes/module-importer": ^1.0.1
+    "@nodelib/fs.walk": ^1.2.8
+    "@ungap/structured-clone": ^1.2.0
+    ajv: ^6.12.4
+    chalk: ^4.0.0
+    cross-spawn: ^7.0.2
+    debug: ^4.3.2
+    doctrine: ^3.0.0
+    escape-string-regexp: ^4.0.0
+    eslint-scope: ^7.2.2
+    eslint-visitor-keys: ^3.4.3
+    espree: ^9.6.1
+    esquery: ^1.4.2
+    esutils: ^2.0.2
+    fast-deep-equal: ^3.1.3
+    file-entry-cache: ^6.0.1
+    find-up: ^5.0.0
+    glob-parent: ^6.0.2
+    globals: ^13.19.0
+    graphemer: ^1.4.0
+    ignore: ^5.2.0
+    imurmurhash: ^0.1.4
+    is-glob: ^4.0.0
+    is-path-inside: ^3.0.3
+    js-yaml: ^4.1.0
+    json-stable-stringify-without-jsonify: ^1.0.1
+    levn: ^0.4.1
+    lodash.merge: ^4.6.2
+    minimatch: ^3.1.2
+    natural-compare: ^1.4.0
+    optionator: ^0.9.3
+    strip-ansi: ^6.0.1
+    text-table: ^0.2.0
+  bin:
+    eslint: bin/eslint.js
+  checksum: 2da808655c7aa4b33f8970ba30d96b453c3071cc4d6cd60d367163430677e32ff186b65270816b662d29139283138bff81f28dddeb2e73265495245a316ed02c
   languageName: node
   linkType: hard
 
@@ -18415,7 +18487,7 @@ __metadata:
     "@types/react-transition-group": 4.4.8
     "@types/redux-mock-store": 1.0.5
     "@types/seedrandom": ^3
-    "@types/sinon": 10.0.19
+    "@types/sinon": 17.0.0
     "@types/speakingurl": 13.0.5
     "@types/underscore": 1.11.12
     "@types/webpack-env": 1.18.3
@@ -18449,8 +18521,8 @@ __metadata:
     dexie-batch: 0.4.3
     dotenv: 16.3.1
     dpdm: 3.14.0
-    emoji-picker-react: 4.5.7
-    eslint: ^8.52.0
+    emoji-picker-react: 4.5.14
+    eslint: ^8.53.0
     eslint-plugin-prettier: ^5.0.1
     fake-indexeddb: 4.0.2
     generate-changelog: 1.8.0
@@ -18530,7 +18602,7 @@ __metadata:
     webpack-hot-middleware: 2.25.4
     webrtc-adapter: 8.2.3
     workbox-webpack-plugin: 7.0.0
-    zustand: 4.4.5
+    zustand: 4.4.6
   languageName: unknown
   linkType: soft
 
@@ -19044,9 +19116,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zustand@npm:4.4.5":
-  version: 4.4.5
-  resolution: "zustand@npm:4.4.5"
+"zustand@npm:4.4.6":
+  version: 4.4.6
+  resolution: "zustand@npm:4.4.6"
   dependencies:
     use-sync-external-store: 1.2.0
   peerDependencies:
@@ -19060,6 +19132,6 @@ __metadata:
       optional: true
     react:
       optional: true
-  checksum: 2519dac2586f33aa12a2e2ed966d8d57820714e0568b80d192dbd3abd3c9854ba4f45843c89642218dca92ee2df345f28fb48eed20bffa4a61f6df7cc9dea176
+  checksum: da7b00cc6dbe5cf5fc2e3fbca745317da4bbaf53bf4a6909bbd3e335242704df9689027f613461aff07eb5f672d5570bc1a2ef99d0ad7bc868920a3b331613d4
   languageName: node
   linkType: hard

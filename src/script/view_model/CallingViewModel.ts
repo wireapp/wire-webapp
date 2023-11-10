@@ -101,7 +101,7 @@ export class CallingViewModel {
     readonly permissionRepository: PermissionRepository,
     readonly teamRepository: TeamRepository,
     readonly propertiesRepository: PropertiesRepository,
-    private readonly selfUser: ko.Subscribable<User>,
+    private readonly selfUser: ko.Observable<User>,
     readonly multitasking: Multitasking,
     private readonly conversationState = container.resolve(ConversationState),
     readonly callState = container.resolve(CallState),
@@ -325,7 +325,7 @@ export class CallingViewModel {
 
     this.callActions = {
       answer: async (call: Call) => {
-        if (call.conversationType === CONV_TYPE.CONFERENCE && !this.callingRepository.supportsConferenceCalling) {
+        if (call.isConference && !this.callingRepository.supportsConferenceCalling) {
           PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
             primaryAction: {
               action: () => {
@@ -478,7 +478,7 @@ export class CallingViewModel {
   }
 
   private showRestrictedConferenceCallingModal() {
-    if (this.selfUser().inTeam()) {
+    if (this.teamState.isInTeam(this.selfUser())) {
       if (this.selfUser().teamRole() === ROLE.OWNER) {
         const replaceEnterprise = replaceLink(
           Config.getConfig().URL.PRICING,

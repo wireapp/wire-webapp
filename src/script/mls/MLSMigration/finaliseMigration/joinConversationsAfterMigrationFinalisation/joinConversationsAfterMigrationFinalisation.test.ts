@@ -76,6 +76,7 @@ const createMockedDBConversationEntry = (
   name: 'siema siema',
   others: ['5cb88781-164d-4d9f-94e2-87294fb4d63c'],
   protocol,
+  readonly_state: null,
   qualified_others: [
     {
       domain: 'anta.wire.link',

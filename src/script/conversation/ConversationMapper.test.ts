@@ -93,7 +93,7 @@ describe('ConversationMapper', () => {
       expect(conversationEntity.isGroup()).toBeTruthy();
       expect(conversationEntity.name()).toBe(conversation.name);
       expect(conversationEntity.mutedState()).toBe(0);
-      expect(conversationEntity.team_id).toEqual(conversation.team);
+      expect(conversationEntity.teamId).toEqual(conversation.team);
       expect(conversationEntity.type()).toBe(CONVERSATION_TYPE.REGULAR);
 
       const expectedMutedTimestamp = new Date(conversation.members.self.otr_muted_ref).getTime();
@@ -180,7 +180,7 @@ describe('ConversationMapper', () => {
       const [conversationEntity] = ConversationMapper.mapConversations([payload] as ConversationDatabaseData[]);
 
       expect(conversationEntity.name()).toBe(payload.name);
-      expect(conversationEntity.team_id).toBe(payload.team);
+      expect(conversationEntity.teamId).toBe(payload.team);
     });
   });
 
@@ -737,7 +737,7 @@ describe('ConversationMapper', () => {
       ];
 
       const conversationEntity = new Conversation('conversation-id', 'domain');
-      conversationEntity.team_id = 'team_id';
+      conversationEntity.teamId = 'team_id';
 
       ConversationMapper.mapAccessState(conversationEntity, accessModes, accessRole, accessRoleV2);
       expect(conversationEntity.accessState()).toEqual(ACCESS_STATE.TEAM.GUEST_ROOM);
@@ -756,7 +756,7 @@ describe('ConversationMapper', () => {
       const accessRoleV2: undefined = undefined;
 
       const conversationEntity = new Conversation();
-      conversationEntity.team_id = 'team_id';
+      conversationEntity.teamId = 'team_id';
 
       ConversationMapper.mapAccessState(conversationEntity, accessModes, accessRole, accessRoleV2);
       expect(conversationEntity.accessState()).toEqual(ACCESS_STATE.TEAM.GUESTS_SERVICES);
@@ -820,7 +820,7 @@ describe('ConversationMapper', () => {
 
       it.each(mockRightsLegacy)('sets correct accessState for %s', (state, {accessModes, accessRole}) => {
         const conversationEntity = new Conversation();
-        conversationEntity.team_id = 'team_id';
+        conversationEntity.teamId = 'team_id';
 
         ConversationMapper.mapAccessState(conversationEntity, accessModes, accessRole);
         expect(conversationEntity.accessState()).toEqual(state);
@@ -860,7 +860,7 @@ describe('ConversationMapper', () => {
 
       it.each(mockAccessRights)('sets correct accessState for %s', (state, {accessModes, accessRole}) => {
         const conversationEntity = new Conversation();
-        conversationEntity.team_id = 'team_id';
+        conversationEntity.teamId = 'team_id';
 
         ConversationMapper.mapAccessState(conversationEntity, accessModes, accessRole);
         expect(conversationEntity.accessState()).toEqual(state);

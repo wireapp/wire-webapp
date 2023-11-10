@@ -44,6 +44,7 @@ describe('Preferences', () => {
   const defaultParams = {
     openRightSidebar: jest.fn(),
     selfUser: new User('selfUser'),
+    reloadApp: jest.fn(),
   };
 
   it('renders the right component according to view state', () => {
