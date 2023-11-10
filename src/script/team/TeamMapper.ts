@@ -19,13 +19,9 @@
 
 import type {MemberData, TeamData} from '@wireapp/api-client/lib/team/';
 import type {TeamUpdateData} from '@wireapp/api-client/lib/team/data/';
-import type {PermissionsData} from '@wireapp/api-client/lib/team/member/PermissionsData';
 
 import {TeamEntity} from './TeamEntity';
 import {TeamMemberEntity} from './TeamMemberEntity';
-
-import type {User} from '../entity/User';
-import {roleFromTeamPermissions} from '../user/UserPermission';
 
 export class TeamMapper {
   mapTeamFromObject(data: TeamData, teamEntity?: TeamEntity): TeamEntity {
@@ -80,12 +76,5 @@ export class TeamMapper {
     }
 
     return member;
-  }
-
-  mapRole(userEntity: User, permissions?: PermissionsData): void {
-    if (permissions) {
-      const teamRole = roleFromTeamPermissions(permissions);
-      userEntity.teamRole(teamRole);
-    }
   }
 }

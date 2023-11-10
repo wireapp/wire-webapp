@@ -17,6 +17,7 @@
  *
  */
 
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import type {User as APIClientUser, QualifiedHandle, QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
@@ -147,5 +148,16 @@ export class UserService {
    */
   getUser(userId: QualifiedId): Promise<APIClientUser> {
     return this.apiClient.api.user.getUser(userId);
+  }
+
+  /**
+   * Get the list of user's supported protocols.
+   */
+  public async getUserSupportedProtocols(userId: QualifiedId): Promise<ConversationProtocol[]> {
+    // Clients that uses version below the one supporting MLS, are not aware of MLS, we default to Proteus in this case.
+    if (!this.apiClient.backendFeatures.supportsMLS) {
+      return [ConversationProtocol.PROTEUS];
+    }
+    return this.apiClient.api.user.getUserSupportedProtocols(userId);
   }
 }

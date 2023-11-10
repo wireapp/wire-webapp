@@ -17,8 +17,11 @@
  *
  */
 
+import {generateUUID} from '@datadog/browser-core';
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {USER_EVENT, UserUpdateEvent} from '@wireapp/api-client/lib/event';
+import type {User as APIClientUser} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
@@ -32,34 +35,71 @@ import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import {ConsentValue} from './ConsentValue';
 import {UserRepository} from './UserRepository';
+import {UserService} from './UserService';
 import {UserState} from './UserState';
 
+import {AssetRepository} from '../assets/AssetRepository';
+import {ClientRepository} from '../client';
 import {ClientMapper} from '../client/ClientMapper';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
 import {User} from '../entity/User';
 import {EventRepository} from '../event/EventRepository';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
+import {SelfService} from '../self/SelfService';
+import {TeamState} from '../team/TeamState';
+import {serverTimeHandler} from '../time/serverTimeHandler';
+
+const testFactory = new TestFactory();
+async function buildUserRepository() {
+  const storageRepo = await testFactory.exposeStorageActors();
+
+  const userService = new UserService(storageRepo['storageService']);
+  const assetRepository = new AssetRepository();
+  const selfService = new SelfService();
+  const clientRepository = new ClientRepository({} as any, {} as any);
+  const propertyRepository = new PropertiesRepository({} as any, {} as any);
+  const userState = new UserState();
+  const teamState = new TeamState();
+
+  const userRepository = new UserRepository(
+    userService,
+    assetRepository,
+    selfService,
+    clientRepository,
+    serverTimeHandler,
+    propertyRepository,
+    userState,
+    teamState,
+  );
+  return [
+    userRepository,
+    {
+      userService,
+      assetRepository,
+      selfService,
+      clientRepository,
+      serverTimeHandler,
+      propertyRepository,
+      userState,
+      teamState,
+    },
+  ] as const;
+}
+
+function createConnections(users: APIClientUser[]) {
+  return users.map(user => {
+    const connection = new ConnectionEntity();
+    connection.userId = user.qualified_id;
+    return connection;
+  });
+}
 
 describe('UserRepository', () => {
-  const testFactory = new TestFactory();
-  let userRepository: UserRepository;
-  let userState: UserState;
-
-  beforeAll(async () => {
-    userRepository = await testFactory.exposeUserActors();
-    userState = userRepository['userState'];
-  });
-
-  afterEach(() => {
-    userRepository['userState'].users.removeAll();
-  });
-
   describe('Account preferences', () => {
     describe('Data usage permissions', () => {
-      it('syncs the "Send anonymous data" preference through WebSocket events', () => {
-        const setPropertyMock = jest
-          .spyOn(userRepository['propertyRepository'], 'setProperty')
-          .mockReturnValue(undefined);
+      it('syncs the "Send anonymous data" preference through WebSocket events', async () => {
+        const [, {propertyRepository}] = await buildUserRepository();
+        const setPropertyMock = jest.spyOn(propertyRepository, 'setProperty').mockReturnValue(undefined);
         const turnOnErrorReporting = {
           key: 'webapp',
           type: 'user.properties-set',
@@ -97,10 +137,9 @@ describe('UserRepository', () => {
         expect(setPropertyMock).toHaveBeenCalledWith(turnOffErrorReporting.key, turnOffErrorReporting.value);
       });
 
-      it('syncs the "Receive newsletter" preference through WebSocket events', () => {
-        const setPropertyMock = jest
-          .spyOn(userRepository['propertyRepository'], 'setProperty')
-          .mockReturnValue(undefined);
+      it('syncs the "Receive newsletter" preference through WebSocket events', async () => {
+        const [userRepository, {propertyRepository}] = await buildUserRepository();
+        const setPropertyMock = jest.spyOn(propertyRepository, 'setProperty').mockReturnValue(undefined);
 
         const deletePropertyMock = jest
           .spyOn(userRepository['propertyRepository'], 'deleteProperty')
@@ -129,14 +168,11 @@ describe('UserRepository', () => {
     });
 
     describe('Privacy', () => {
-      it('syncs the "Read receipts" preference through WebSocket events', () => {
-        const setPropertyMock = jest
-          .spyOn(userRepository['propertyRepository'], 'setProperty')
-          .mockReturnValue(undefined);
+      it('syncs the "Read receipts" preference through WebSocket events', async () => {
+        const [, {propertyRepository}] = await buildUserRepository();
+        const setPropertyMock = jest.spyOn(propertyRepository, 'setProperty').mockReturnValue(undefined);
 
-        const deletePropertyMock = jest
-          .spyOn(userRepository['propertyRepository'], 'deleteProperty')
-          .mockReturnValue(undefined);
+        const deletePropertyMock = jest.spyOn(propertyRepository, 'deleteProperty').mockReturnValue(undefined);
 
         const turnOnReceiptMode = {
           key: PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key,
@@ -163,14 +199,12 @@ describe('UserRepository', () => {
   describe('User handling', () => {
     describe('findUserById', () => {
       let user: User;
+      let userRepository: UserRepository;
 
-      beforeEach(() => {
+      beforeEach(async () => {
+        [userRepository] = await buildUserRepository();
         user = new User(entities.user.john_doe.id);
         return userRepository['saveUser'](user);
-      });
-
-      afterEach(() => {
-        userState.users.removeAll();
       });
 
       it('should find an existing user', () => {
@@ -187,7 +221,8 @@ describe('UserRepository', () => {
     });
 
     describe('saveUser', () => {
-      it('saves a user', () => {
+      it('saves a user', async () => {
+        const [userRepository, {userState}] = await buildUserRepository();
         const user = new User(entities.user.jane_roe.id);
 
         userRepository['saveUser'](user);
@@ -196,7 +231,8 @@ describe('UserRepository', () => {
         expect(userState.users()[0]).toBe(user);
       });
 
-      it('saves self user', () => {
+      it('saves self user', async () => {
+        const [userRepository, {userState}] = await buildUserRepository();
         const user = new User(entities.user.jane_roe.id);
 
         userRepository['saveUser'](user, true);
@@ -209,21 +245,27 @@ describe('UserRepository', () => {
 
     describe('loadUsers', () => {
       const localUsers = [generateAPIUser(), generateAPIUser(), generateAPIUser()];
+      let userRepository: UserRepository;
+      let userState: UserState;
+      let userService: UserService;
+
       beforeEach(async () => {
+        [userRepository, {userState, userService}] = await buildUserRepository();
         jest.resetAllMocks();
-        jest.spyOn(userRepository['userService'], 'loadUserFromDb').mockResolvedValue(localUsers);
+        jest.spyOn(userService, 'loadUserFromDb').mockResolvedValue(localUsers);
         const selfUser = new User('self');
         selfUser.isMe = true;
+        userState.self(selfUser);
         userState.users([selfUser]);
       });
 
       it('loads all users from backend even when they are already known locally', async () => {
         const newUsers = [generateAPIUser(), generateAPIUser()];
         const users = [...localUsers, ...newUsers];
-        const userIds = users.map(user => user.qualified_id!);
-        const fetchUserSpy = jest.spyOn(userRepository['userService'], 'getUsers').mockResolvedValue({found: users});
+        const connections = createConnections(users);
+        const fetchUserSpy = jest.spyOn(userService, 'getUsers').mockResolvedValue({found: users});
 
-        await userRepository.loadUsers(new User('self'), [], [], userIds);
+        await userRepository.loadUsers(new User('self'), connections, [], []);
 
         expect(userState.users()).toHaveLength(users.length + 1);
         expect(fetchUserSpy).toHaveBeenCalledWith(users.map(user => user.qualified_id!));
@@ -232,18 +274,10 @@ describe('UserRepository', () => {
       it('assigns connections with users', async () => {
         const newUsers = [generateAPIUser(), generateAPIUser()];
         const users = [...localUsers, ...newUsers];
-        const userIds = users.map(user => user.qualified_id!);
-        jest.spyOn(userRepository['userService'], 'getUsers').mockResolvedValue({found: users});
+        const connections = createConnections(users);
+        jest.spyOn(userService, 'getUsers').mockResolvedValue({found: users});
 
-        const createConnectionWithUser = (userId: QualifiedId) => {
-          const connection = new ConnectionEntity();
-          connection.userId = userId;
-          return connection;
-        };
-
-        const connections = users.map(user => createConnectionWithUser(user.qualified_id));
-
-        await userRepository.loadUsers(new User('self'), connections, [], userIds);
+        await userRepository.loadUsers(new User('self'), connections, [], []);
 
         expect(userState.users()).toHaveLength(users.length + 1);
         users.forEach(user => {
@@ -254,17 +288,16 @@ describe('UserRepository', () => {
 
       it('loads users that are partially stored in the DB and maps availability', async () => {
         const userIds = localUsers.map(user => user.qualified_id!);
+        const connections = createConnections(localUsers);
         const partialUsers = [
           {id: userIds[0].id, availability: Availability.Type.AVAILABLE},
           {id: userIds[1].id, availability: Availability.Type.BUSY},
         ];
 
         jest.spyOn(userRepository['userService'], 'loadUserFromDb').mockResolvedValue(partialUsers as any);
-        const fetchUserSpy = jest
-          .spyOn(userRepository['userService'], 'getUsers')
-          .mockResolvedValue({found: localUsers});
+        const fetchUserSpy = jest.spyOn(userService, 'getUsers').mockResolvedValue({found: localUsers});
 
-        await userRepository.loadUsers(new User('self'), [], [], userIds);
+        await userRepository.loadUsers(new User('self'), connections, [], []);
 
         expect(userState.users()).toHaveLength(localUsers.length + 1);
         expect(fetchUserSpy).toHaveBeenCalledWith(userIds);
@@ -275,11 +308,11 @@ describe('UserRepository', () => {
 
       it('deletes users that are not needed', async () => {
         const newUsers = [generateAPIUser(), generateAPIUser()];
-        const userIds = newUsers.map(user => user.qualified_id!);
-        const removeUserSpy = jest.spyOn(userRepository['userService'], 'removeUserFromDb').mockResolvedValue();
-        jest.spyOn(userRepository['userService'], 'getUsers').mockResolvedValue({found: newUsers});
+        const connections = createConnections(newUsers);
+        const removeUserSpy = jest.spyOn(userService, 'removeUserFromDb').mockResolvedValue();
+        jest.spyOn(userService, 'getUsers').mockResolvedValue({found: newUsers});
 
-        await userRepository.loadUsers(new User(), [], [], userIds);
+        await userRepository.loadUsers(new User(), connections, [], []);
 
         expect(userState.users()).toHaveLength(newUsers.length + 1);
         expect(removeUserSpy).toHaveBeenCalledTimes(localUsers.length);
@@ -290,12 +323,10 @@ describe('UserRepository', () => {
     });
 
     describe('assignAllClients', () => {
-      let userJaneRoe: User;
-      let userJohnDoe: User;
-
-      beforeEach(() => {
-        userJaneRoe = new User(entities.user.jane_roe.id);
-        userJohnDoe = new User(entities.user.john_doe.id);
+      it('assigns all available clients to the users', async () => {
+        const [userRepository, {clientRepository}] = await buildUserRepository();
+        const userJaneRoe = new User(entities.user.jane_roe.id);
+        const userJohnDoe = new User(entities.user.john_doe.id);
 
         userRepository['saveUsers']([userJaneRoe, userJohnDoe]);
         const permanent_client = ClientMapper.mapClient(entities.clients.john_doe.permanent, false);
@@ -306,12 +337,10 @@ describe('UserRepository', () => {
           [entities.user.jane_roe.id]: [plain_client],
         };
 
-        spyOn(testFactory.client_repository!, 'getAllClientsFromDb').and.returnValue(Promise.resolve(recipients));
-      });
+        jest.spyOn(clientRepository, 'getAllClientsFromDb').mockResolvedValue(recipients);
 
-      it('assigns all available clients to the users', () => {
         return userRepository.assignAllClients().then(() => {
-          expect(testFactory.client_repository!.getAllClientsFromDb).toHaveBeenCalled();
+          expect(clientRepository.getAllClientsFromDb).toHaveBeenCalled();
           expect(userJaneRoe.devices().length).toBe(1);
           expect(userJaneRoe.devices()[0].id).toBe(entities.clients.jane_roe.plain.id);
           expect(userJohnDoe.devices().length).toBe(2);
@@ -323,41 +352,22 @@ describe('UserRepository', () => {
 
     describe('verify_username', () => {
       it('resolves with username when username is not taken', async () => {
+        const [userRepository, {userService}] = await buildUserRepository();
         const expectedUsername = 'john_doe';
         const notFoundError = new Error('not found') as any;
         notFoundError.response = {status: HTTP_STATUS.NOT_FOUND};
-        const userRepo = new UserRepository(
-          {
-            checkUserHandle: jest.fn().mockImplementation(() => Promise.reject(notFoundError)),
-          } as any, // UserService
-          {} as any, // AssetRepository,
-          {} as any, // SelfService,
-          {} as any, // ClientRepository,
-          {} as any, // ServerTimeHandler,
-          {} as any, // PropertiesRepository,
-          {} as any, // UserState
-        );
+        jest.spyOn(userService, 'checkUserHandle').mockRejectedValue(notFoundError);
 
-        const actualUsername = await userRepo.verifyUserHandle(expectedUsername);
+        const actualUsername = await userRepository.verifyUserHandle(expectedUsername);
         expect(actualUsername).toBe(expectedUsername);
       });
 
       it('rejects when username is taken', async () => {
+        const [userRepository, {userService}] = await buildUserRepository();
         const username = 'john_doe';
+        jest.spyOn(userService, 'checkUserHandle').mockResolvedValue(undefined);
 
-        const userRepo = new UserRepository(
-          {
-            checkUserHandle: jest.fn().mockImplementation(() => Promise.resolve()),
-          } as any, // UserService
-          {} as any, // AssetRepository,
-          {} as any, // SelfService,
-          {} as any, // ClientRepository,
-          {} as any, // ServerTimeHandler,
-          {} as any, // PropertiesRepository,
-          {} as any, // UserState
-        );
-
-        await expect(userRepo.verifyUserHandle(username)).rejects.toMatchObject({
+        await expect(userRepository.verifyUserHandle(username)).rejects.toMatchObject({
           message: 'User related backend request failure',
           name: 'UserError',
           type: 'REQUEST_FAILURE',
@@ -365,10 +375,10 @@ describe('UserRepository', () => {
       });
     });
   });
-
   describe('updateUsers', () => {
     it('should update local users', async () => {
-      const userService = userRepository['userService'];
+      const [userRepository, {userService, userState}] = await buildUserRepository();
+      userState.self(new User());
       const user = new User(entities.user.jane_roe.id);
       user.name('initial name');
       user.isMe = true;
@@ -380,6 +390,126 @@ describe('UserRepository', () => {
       await userRepository.refreshUsers([user.qualifiedId]);
 
       expect(userRepository.findUserById(user.qualifiedId)?.name()).toBe(entities.user.jane_roe.name);
+    });
+  });
+
+  describe('supportedProtocols', () => {
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+
+    it("should update user's supportedProtocols", async () => {
+      const [userRepository, {userState}] = await buildUserRepository();
+      const user = new User(generateUUID());
+      userState.users.push(user);
+      userState.self(user);
+      const initialSupportedProtocols = [ConversationProtocol.PROTEUS];
+      const newSupportedProtocols = [ConversationProtocol.PROTEUS, ConversationProtocol.MLS];
+      user.supportedProtocols(initialSupportedProtocols);
+      const userUpdateEvent: UserUpdateEvent = {
+        type: USER_EVENT.UPDATE,
+        user: {
+          supported_protocols: newSupportedProtocols,
+          id: user.id,
+        },
+      };
+
+      const source = EventRepository.SOURCE.WEB_SOCKET;
+
+      await userRepository['onUserEvent'](userUpdateEvent, source);
+
+      expect(user.supportedProtocols()).toEqual(newSupportedProtocols);
+    });
+
+    it("should emit supportedProtocolsUpdate event after user's supported protocols were updated", async () => {
+      const [userRepository, {userState}] = await buildUserRepository();
+      const user = new User(generateUUID());
+      const selfUser = new User(generateUUID());
+
+      userState.users.push(user);
+      userState.self(selfUser);
+
+      const initialSupportedProtocols = [ConversationProtocol.PROTEUS];
+      const newSupportedProtocols = [ConversationProtocol.PROTEUS, ConversationProtocol.MLS];
+
+      user.supportedProtocols(initialSupportedProtocols);
+
+      const userUpdateEvent: UserUpdateEvent = {
+        type: USER_EVENT.UPDATE,
+        user: {
+          supported_protocols: newSupportedProtocols,
+          id: user.id,
+        },
+      };
+
+      jest.spyOn(userRepository, 'emit');
+      const source = EventRepository.SOURCE.WEB_SOCKET;
+
+      await userRepository['onUserEvent'](userUpdateEvent, source);
+
+      expect(userRepository.emit).toHaveBeenCalledWith('supportedProtocolsUpdated', {
+        user,
+        supportedProtocols: newSupportedProtocols,
+      });
+      expect(user.supportedProtocols()).toEqual(newSupportedProtocols);
+    });
+
+    it("should not emit supportedProtocolsUpdate event if user's supported protocols remain unchanged", async () => {
+      const [userRepository, {userState}] = await buildUserRepository();
+      const user = new User(generateUUID());
+      userState.users.push(user);
+
+      const selfUser = new User(generateUUID());
+      userState.self(selfUser);
+
+      const initialSupportedProtocols = [ConversationProtocol.PROTEUS, ConversationProtocol.MLS];
+      const newSupportedProtocols = [ConversationProtocol.PROTEUS, ConversationProtocol.MLS];
+
+      user.supportedProtocols(initialSupportedProtocols);
+
+      const userUpdateEvent: UserUpdateEvent = {
+        type: USER_EVENT.UPDATE,
+        user: {
+          supported_protocols: newSupportedProtocols,
+          id: user.id,
+        },
+      };
+
+      jest.spyOn(userRepository, 'emit');
+      const source = EventRepository.SOURCE.WEB_SOCKET;
+
+      await userRepository['onUserEvent'](userUpdateEvent, source);
+
+      expect(userRepository.emit).not.toHaveBeenCalled();
+      expect(user.supportedProtocols()).toEqual(newSupportedProtocols);
+    });
+
+    it('should not emit supportedProtocolsUpdate event if the event did not contain supported protocols', async () => {
+      const [userRepository, {userState}] = await buildUserRepository();
+      const user = new User(generateUUID());
+      userState.users.push(user);
+
+      const selfUser = new User(generateUUID());
+      userState.self(selfUser);
+
+      const initialSupportedProtocols = [ConversationProtocol.PROTEUS, ConversationProtocol.MLS];
+
+      user.supportedProtocols(initialSupportedProtocols);
+
+      const userUpdateEvent: UserUpdateEvent = {
+        type: USER_EVENT.UPDATE,
+        user: {
+          id: user.id,
+        },
+      };
+
+      jest.spyOn(userRepository, 'emit');
+      const source = EventRepository.SOURCE.WEB_SOCKET;
+
+      await userRepository['onUserEvent'](userUpdateEvent, source);
+
+      expect(userRepository.emit).not.toHaveBeenCalled();
+      expect(user.supportedProtocols()).toEqual(initialSupportedProtocols);
     });
   });
 });

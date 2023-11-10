@@ -101,6 +101,14 @@ export class ConversationService {
     return this.apiClient.api.conversation.getConversation({domain, id});
   }
 
+  public async blacklistConversation(conversationId: QualifiedId): Promise<void> {
+    await this.coreConversationService.blacklistConversation(conversationId);
+  }
+
+  public async removeConversationFromBlacklist(conversationId: QualifiedId): Promise<void> {
+    await this.coreConversationService.removeConversationFromBlacklist(conversationId);
+  }
+
   /**
    * Get conversations for a list of conversation IDs.
    * @see https://staging-nginz-https.zinfra.io/v4/api/swagger-ui/#/default/post_conversations_list
@@ -429,5 +437,18 @@ export class ConversationService {
    */
   async mlsGroupExistsLocally(groupId: string): Promise<boolean> {
     return this.coreConversationService.mlsGroupExistsLocally(groupId);
+  }
+
+  /**
+   * Will check if mls group is established locally.
+   * Group is established after the first commit was sent in the group and epoch number is at least 1.
+   * @param groupId groupId of the conversation
+   */
+  async isMLSGroupEstablishedLocally(groupId: string): Promise<boolean> {
+    return this.coreConversationService.isMLSGroupEstablishedLocally(groupId);
+  }
+
+  async getMLS1to1Conversation(userId: QualifiedId) {
+    return this.coreConversationService.getMLS1to1Conversation(userId);
   }
 }
