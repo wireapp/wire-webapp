@@ -24,7 +24,6 @@ import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
-import {Button} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {TeamState} from 'src/script/team/TeamState';
@@ -34,6 +33,7 @@ import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import type {MenuItem} from './PanelActions';
 import {PanelActions} from './PanelActions';
+import {SingleAction} from './SingleAction/SingleAction';
 
 import {ACCESS_STATE} from '../../conversation/AccessState';
 import type {ConversationRoleRepository} from '../../conversation/ConversationRoleRepository';
@@ -101,7 +101,7 @@ const UserActions: React.FC<UserActionsProps> = ({
   onAction,
   conversationRoleRepository,
   selfUser,
-  isModal,
+  isModal = false,
   teamState = container.resolve(TeamState),
 }) => {
   const {
@@ -313,7 +313,11 @@ const UserActions: React.FC<UserActionsProps> = ({
     removeUserFromConversation,
   ].filter((item): item is MenuItem => !!item);
 
-  return items.length > 1 && !isModal ? <PanelActions items={items} /> : <Button>{items[0].label}</Button>;
+  return items.length === 1 && isModal ? (
+    <SingleAction item={items[0]} onCancel={onAction} />
+  ) : (
+    <PanelActions items={items} />
+  );
 };
 
 export {UserActions};
