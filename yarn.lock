@@ -4784,12 +4784,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/redux-mock-store@npm:1.0.5":
-  version: 1.0.5
-  resolution: "@types/redux-mock-store@npm:1.0.5"
+"@types/redux-mock-store@npm:1.0.6":
+  version: 1.0.6
+  resolution: "@types/redux-mock-store@npm:1.0.6"
   dependencies:
     redux: ^4.0.5
-  checksum: 0ecae2d503f388c0e51e0b0eff10bedf3bfe331943c57b43efc66b84b1c1755079c736e8e099ab5be6336ff20d17a3377847c6d7abe39244cd78a69d0db3063d
+  checksum: 5c799d2fc5b3f0f84bfcd6243c56b1ac98be6707057f570b5e51e9d305f446978cc2958c7e0b629ebf73293f15a79765517e6d0a1df0371fd27551f7128325c7
   languageName: node
   linkType: hard
 
@@ -18485,7 +18485,7 @@ __metadata:
     "@types/react-dom": 18.2.14
     "@types/react-redux": 7.1.28
     "@types/react-transition-group": 4.4.8
-    "@types/redux-mock-store": 1.0.5
+    "@types/redux-mock-store": 1.0.6
     "@types/seedrandom": ^3
     "@types/sinon": 17.0.0
     "@types/speakingurl": 13.0.5
