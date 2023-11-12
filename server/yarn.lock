@@ -1006,12 +1006,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/hbs@npm:4.0.3":
-  version: 4.0.3
-  resolution: "@types/hbs@npm:4.0.3"
+"@types/hbs@npm:4.0.4":
+  version: 4.0.4
+  resolution: "@types/hbs@npm:4.0.4"
   dependencies:
     handlebars: ^4.1.0
-  checksum: a3e6e70894154d289da2d7af0b893ab677882a52b4322433d14c8af914eb845b75f16bae820c080e4143a68702e123a13877453f11fc08a63f079bce67ecdc1c
+  checksum: dbbab9d66d227084076bab3d1b16048b63079f8958017b3004c833665533b67d50d2b1d40f3aa7554241a7b84c705f7d2d84b8181cba06d7b33bcdbd2bcb863d
   languageName: node
   linkType: hard
 
@@ -5561,7 +5561,7 @@ __metadata:
     "@types/express-useragent": 1.0.4
     "@types/fs-extra": 11.0.4
     "@types/geolite2": 2.0.0
-    "@types/hbs": 4.0.3
+    "@types/hbs": 4.0.4
     "@types/jest": ^29.5.8
     "@types/node": 18.11.18
     "@wireapp/commons": 5.2.2
