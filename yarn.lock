@@ -4891,15 +4891,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-redux@npm:7.1.28":
-  version: 7.1.28
-  resolution: "@types/react-redux@npm:7.1.28"
+"@types/react-redux@npm:7.1.30":
+  version: 7.1.30
+  resolution: "@types/react-redux@npm:7.1.30"
   dependencies:
     "@types/hoist-non-react-statics": ^3.3.0
     "@types/react": "*"
     hoist-non-react-statics: ^3.3.0
     redux: ^4.0.0
-  checksum: 521729d7ba781a700e39bf8f8723632ea0abe3698f43a7e131f7613f64613b5724b33ecb5446623ee698182407036f19fc56918c427d7b1fd05ad2a2bd9b6643
+  checksum: df86069aae0b2dd79752a45265b36ad5583f4c87a05731607192a4df6dd4e1ed151e458957cced31df37cbb60c58c41211f7186a783305a8af62d8cd69ae6789
   languageName: node
   linkType: hard
 
@@ -18631,7 +18631,7 @@ __metadata:
     "@types/platform": 1.3.6
     "@types/react": 18.2.33
     "@types/react-dom": 18.2.15
-    "@types/react-redux": 7.1.28
+    "@types/react-redux": 7.1.30
     "@types/react-transition-group": 4.4.9
     "@types/redux-mock-store": 1.0.6
     "@types/seedrandom": ^3
