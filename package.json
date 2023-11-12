@@ -18,7 +18,7 @@
     "classnames": "2.3.2",
     "copy-webpack-plugin": "11.0.0",
     "core-js": "3.33.2",
-    "countly-sdk-web": "23.6.2",
+    "countly-sdk-web": "23.6.3",
     "date-fns": "2.30.0",
     "dexie-batch": "0.4.3",
     "emoji-picker-react": "4.5.14",
