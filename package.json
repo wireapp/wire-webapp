@@ -92,7 +92,7 @@
     "@types/redux-mock-store": "1.0.6",
     "@types/seedrandom": "^3",
     "@types/sinon": "17.0.1",
-    "@types/speakingurl": "13.0.5",
+    "@types/speakingurl": "13.0.6",
     "@types/underscore": "1.11.14",
     "@types/webpack-env": "1.18.4",
     "@wireapp/copy-config": "2.1.10",
