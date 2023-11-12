@@ -72,7 +72,7 @@
     "@types/dexie-batch": "0.4.7",
     "@types/eslint": "^8",
     "@types/fs-extra": "11.0.4",
-    "@types/generate-changelog": "1.8.2",
+    "@types/generate-changelog": "1.8.3",
     "@types/jest": "29.5.8",
     "@types/jquery": "^3",
     "@types/js-cookie": "3.0.6",

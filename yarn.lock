@@ -4570,10 +4570,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/generate-changelog@npm:1.8.2":
-  version: 1.8.2
-  resolution: "@types/generate-changelog@npm:1.8.2"
-  checksum: d2a063f45004c830b0b9395d9a0845e93f3408a7ec90e3e772eb750aa074b4482eba0f7b22eb68ce0d6bbf63457df818347196eb32d4f54588dc96d292c8b5e1
+"@types/generate-changelog@npm:1.8.3":
+  version: 1.8.3
+  resolution: "@types/generate-changelog@npm:1.8.3"
+  checksum: be2ba32c05331cb4a500ebdc214feb6f9ce6f4c4f09514eaf88f8d21ca3340071fe003bf985cb49cd8b5a410814f3ece02381b7d74c5695e12ca5b41f79b1a4c
   languageName: node
   linkType: hard
 
@@ -18616,7 +18616,7 @@ __metadata:
     "@types/dexie-batch": 0.4.7
     "@types/eslint": ^8
     "@types/fs-extra": 11.0.4
-    "@types/generate-changelog": 1.8.2
+    "@types/generate-changelog": 1.8.3
     "@types/jest": 29.5.8
     "@types/jquery": ^3
     "@types/js-cookie": 3.0.6
