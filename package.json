@@ -94,7 +94,7 @@
     "@types/sinon": "17.0.0",
     "@types/speakingurl": "13.0.5",
     "@types/underscore": "1.11.14",
-    "@types/webpack-env": "1.18.3",
+    "@types/webpack-env": "1.18.4",
     "@wireapp/copy-config": "2.1.10",
     "@wireapp/eslint-config": "3.0.4",
     "@wireapp/prettier-config": "0.6.3",
