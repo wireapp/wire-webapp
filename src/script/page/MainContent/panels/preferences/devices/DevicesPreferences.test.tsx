@@ -59,6 +59,6 @@ describe('DevicesPreferences', () => {
 
     await waitFor(() => getByText('preferencesDevicesCurrent'));
     expect(getByText('preferencesDevicesCurrent')).toBeDefined();
-    expect(getAllByText('preferencesDevicesId')).toHaveLength(selfUser.devices().length);
+    expect(getAllByText('preferencesDevicesId')).toHaveLength(selfUser.devices().length + 1);
   });
 });
