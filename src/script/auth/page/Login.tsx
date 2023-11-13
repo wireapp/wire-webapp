@@ -235,6 +235,7 @@ const LoginComponent = ({
         } catch (error) {
           if (isBackendError(error) && error.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD) {
             setConversationSubmitData(formLoginData);
+            setIsLinkPasswordModalOpen(true);
             return;
           }
           throw error;
