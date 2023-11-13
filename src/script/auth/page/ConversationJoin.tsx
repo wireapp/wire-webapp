@@ -128,7 +128,7 @@ const ConversationJoinComponent = ({
       return;
     }
     try {
-      if (!conversationCode || !conversationKey || !password) {
+      if (!conversationCode || !conversationKey) {
         throw Error('Conversation code or key missing');
       }
       const conversationEvent = await doJoinConversationByCode(conversationKey, conversationCode, undefined, password);
