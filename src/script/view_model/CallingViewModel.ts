@@ -48,7 +48,6 @@ import type {PermissionRepository} from '../permission/PermissionRepository';
 import {PermissionStatusState} from '../permission/PermissionStatusState';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
-import {Core} from '../service/CoreSingleton';
 import type {TeamRepository} from '../team/TeamRepository';
 import {TeamState} from '../team/TeamState';
 import {ROLE} from '../user/UserPermission';
@@ -101,7 +100,6 @@ export class CallingViewModel {
     private readonly conversationState = container.resolve(ConversationState),
     readonly callState = container.resolve(CallState),
     private readonly teamState = container.resolve(TeamState),
-    private readonly core = container.resolve(Core),
   ) {
     this.isSelfVerified = ko.pureComputed(() => selfUser().is_verified());
     this.activeCalls = ko.pureComputed(() =>
@@ -298,15 +296,6 @@ export class CallingViewModel {
         });
       },
     };
-  }
-
-  get subconversationService() {
-    const subconversationService = this.core.service?.subconversation;
-    if (!subconversationService) {
-      throw new Error('SubconversationService was not initialised');
-    }
-
-    return subconversationService;
   }
 
   /**
