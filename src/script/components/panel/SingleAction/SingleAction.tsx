@@ -38,7 +38,7 @@ export interface SingleActionProps {
 const SingleAction: React.FC<SingleActionProps> = ({item, onCancel}) => {
   return (
     <FlexBox justify="space-evenly">
-      <Button variant={ButtonVariant.SECONDARY} onClick={onCancel}>
+      <Button variant={ButtonVariant.SECONDARY} onClick={onCancel} data-uie-name="do-close">
         {t('modalConfirmSecondary')}
       </Button>
       <Button onClick={item.click} data-uie-name={item.identifier}>
