@@ -47,6 +47,7 @@ import {actionRoot as ROOT_ACTIONS} from '../module/action';
 import {ValidationError} from '../module/action/ValidationError';
 import {bindActionCreators, RootState} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
+import * as ClientSelector from '../module/selector/ClientSelector';
 import * as ConversationSelector from '../module/selector/ConversationSelector';
 import * as SelfSelector from '../module/selector/SelfSelector';
 import {QUERY_KEY} from '../route';
@@ -64,11 +65,13 @@ const ConversationJoinComponent = ({
   doGetConversationInfoByCode,
   selfName,
   conversationError,
+  hasLoadedClients,
   isFetchingAuth,
   isFetchingConversation,
   conversationInfo,
   conversationInfoFetching,
   generalError,
+  doGetAllClients,
 }: Props & ConnectedProps & DispatchProps) => {
   const nameInput = React.useRef<HTMLInputElement>(null);
   const {formatMessage: _} = useIntl();
@@ -87,6 +90,7 @@ const ConversationJoinComponent = ({
   const [isSubmitingName, setIsSubmitingName] = useState(false);
   const [showCookiePolicyBanner, setShowCookiePolicyBanner] = useState(true);
   const [showEntropyForm, setShowEntropyForm] = useState(false);
+  const [isTemporaryGuest, setIsTemporaryGuest] = useState<boolean>(false);
   const isEntropyRequired = Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY;
 
   const isFetching = isFetchingAuth || isFetchingConversation || conversationInfoFetching;
@@ -109,8 +113,12 @@ const ConversationJoinComponent = ({
           await doCheckConversationCode(localConversationKey, localConversationCode);
           await doGetConversationInfoByCode(localConversationKey, localConversationCode);
         }
+        await doGetAllClients();
       })
       .catch(error => {
+        if (error.label === BackendErrorLabel.INVALID_CREDENTIALS) {
+          return;
+        }
         setIsValidLink(false);
       });
   }, []);
@@ -245,11 +253,14 @@ const ConversationJoinComponent = ({
     <UnsupportedBrowser isTemporaryGuest>
       {isJoinGuestLinkPasswordModalOpen && (
         <JoinGuestLinkPasswordModal
-          onClose={() => setIsJoinGuestLinkPasswordModalOpen(false)}
+          onClose={() => {
+            setIsJoinGuestLinkPasswordModalOpen(false);
+            setIsTemporaryGuest(false);
+          }}
           error={conversationError || generalError}
           isLoading={isFetching}
           conversationName={conversationInfo?.name}
-          onSubmitPassword={selfName && !enteredName ? getConversationInfoAndJoin : submitJoinCodeWithPassword}
+          onSubmitPassword={!isTemporaryGuest ? getConversationInfoAndJoin : submitJoinCodeWithPassword}
         />
       )}
       <WirelessContainer
@@ -269,7 +280,7 @@ const ConversationJoinComponent = ({
         </div>
         <Columns style={{display: 'flex', gap: '2rem', alignSelf: 'center', maxWidth: '100%'}}>
           <Column>
-            {selfName ? (
+            {selfName && hasLoadedClients ? (
               <IsLoggedInColumn selfName={selfName} handleLogout={doLogout} handleSubmit={getConversationInfoAndJoin} />
             ) : (
               <Login embedded />
@@ -286,7 +297,10 @@ const ConversationJoinComponent = ({
                   nameInput={nameInput}
                   onNameChange={onNameChange}
                   checkNameValidity={checkNameValidity}
-                  handleSubmit={handleSubmit}
+                  handleSubmit={async () => {
+                    setIsTemporaryGuest(true);
+                    await handleSubmit();
+                  }}
                   isSubmitingName={isSubmitingName}
                   isValidName={isValidName}
                   conversationError={conversationError}
@@ -305,6 +319,7 @@ type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({
   isFetchingAuth: AuthSelector.isFetching(state),
   isAuthenticated: AuthSelector.isAuthenticated(state),
+  hasLoadedClients: ClientSelector.hasLoadedClients(state),
   isFetchingConversation: ConversationSelector.isFetching(state),
   isTemporaryGuest: SelfSelector.isTemporaryGuest(state),
   selfName: !SelfSelector.isTemporaryGuest(state) && SelfSelector.getSelfName(state),
@@ -318,6 +333,7 @@ type DispatchProps = ReturnType<typeof mapDispatchToProps>;
 const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
   bindActionCreators(
     {
+      doGetAllClients: ROOT_ACTIONS.clientAction.doGetAllClients,
       doCheckConversationCode: ROOT_ACTIONS.conversationAction.doCheckConversationCode,
       doGetConversationInfoByCode: ROOT_ACTIONS.conversationAction.doGetConversationInfoByCode,
       doInit: ROOT_ACTIONS.authAction.doInit,
