@@ -902,7 +902,7 @@ export class CallingRepository {
     callingSubscriptions.addCall(qualifiedId, unsubscribe);
   };
 
-  private readonly updateEpochInfo = async (conversationId: QualifiedId) => {
+  private readonly updateConferenceSubconversationEpoch = async (conversationId: QualifiedId) => {
     const conversation = this.getConversationById(conversationId);
     if (!conversation || !isMLSConversation(conversation)) {
       return;
@@ -1577,7 +1577,7 @@ export class CallingRepository {
 
   private readonly requestNewEpoch = async (_wUser: number, convId: SerializedConversationId) => {
     const qualifiedConversationId = this.parseQualifiedId(convId);
-    return this.updateEpochInfo(qualifiedConversationId);
+    return this.updateConferenceSubconversationEpoch(qualifiedConversationId);
   };
 
   private readonly getCallMediaStream = async (
