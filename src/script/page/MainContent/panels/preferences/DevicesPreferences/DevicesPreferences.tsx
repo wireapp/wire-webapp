@@ -63,7 +63,7 @@ export const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
   const [selectedDeviceIdentity, setSelectedDeviceIdentity] = useState<WireIdentity>();
   const [localFingerprint, setLocalFingerprint] = useState('');
 
-  const {clients} = useKoSubscribableChildren(clientState, ['clients']);
+  const {devices} = useKoSubscribableChildren(selfUser, ['devices']);
   const currentClient = clientState.currentClient;
   const isSelfClientVerified = React.useMemo(() => {
     if (!currentClient) {
@@ -137,10 +137,10 @@ export const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
 
       <hr className="preferences-devices-separator preferences-separator" />
 
-      {clients.length > 0 && (
+      {devices.length > 0 && (
         <fieldset className="preferences-section">
           <legend className="preferences-header">{t('preferencesDevicesActive')}</legend>
-          {clients.map((device, index) => (
+          {devices.map((device, index) => (
             <Device
               device={device}
               key={device.id}

@@ -19,7 +19,6 @@
 
 import {render, waitFor} from '@testing-library/react';
 import {CONVERSATION_TYPE, ConversationProtocol} from '@wireapp/api-client/lib/conversation';
-import ko from 'knockout';
 
 import {randomUUID} from 'crypto';
 
@@ -27,13 +26,13 @@ import {ClientEntity} from 'src/script/client/ClientEntity';
 import {ClientState} from 'src/script/client/ClientState';
 import {ConversationState} from 'src/script/conversation/ConversationState';
 import {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';
+import {User} from 'src/script/entity/User';
 import {createUuid} from 'Util/uuid';
 
 import {DevicesPreferences} from './DevicesPreferences';
 
 import {E2EIHandler} from '../../../../../E2EIdentity';
 import {Conversation} from '../../../../../entity/Conversation';
-import {User} from '../../../../../entity/User';
 
 function createDevice(): ClientEntity {
   const device = new ClientEntity(true, '', createUuid());
@@ -61,11 +60,13 @@ describe('DevicesPreferences', () => {
   const selfMLSConversation = createConversation(ConversationProtocol.MLS, CONVERSATION_TYPE.SELF);
   const regularConversation = createConversation();
 
+  const selfUser = new User(createUuid());
+  selfUser.devices([createDevice(), createDevice()]);
+
   const clientState = new ClientState();
-  clientState.clients = ko.pureComputed(() => [createDevice(), createDevice()]);
   clientState.currentClient = createDevice();
   const defaultParams = {
-    clientState: clientState,
+    clientState,
     conversationState: new ConversationState(),
     cryptographyRepository: {
       getLocalFingerprint: jest.fn().mockResolvedValue('0000000000000'),
@@ -73,8 +74,8 @@ describe('DevicesPreferences', () => {
     } as unknown as CryptographyRepository,
     removeDevice: jest.fn(),
     resetSession: jest.fn(),
-    selfUser: new User(createUuid()),
     verifyDevice: jest.fn(),
+    selfUser,
   };
 
   defaultParams.conversationState.conversations([selfProteusConversation, selfMLSConversation, regularConversation]);
@@ -87,6 +88,6 @@ describe('DevicesPreferences', () => {
 
     await waitFor(() => getByText('preferencesDevicesCurrent'));
     expect(getByText('preferencesDevicesCurrent')).toBeDefined();
-    expect(getAllByText('preferencesDevicesId')).toHaveLength(clientState.clients().length);
+    expect(getAllByText('preferencesDevicesId')).toHaveLength(selfUser.devices().length);
   });
 });
