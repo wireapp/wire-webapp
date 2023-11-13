@@ -141,7 +141,8 @@ const DevicesPreferences = ({
   selfUser,
 }: DevicesPreferencesProps) => {
   const [selectedDevice, setSelectedDevice] = useState<ClientEntity | undefined>();
-  const {clients} = useKoSubscribableChildren(clientState, ['clients']);
+
+  const {devices} = useKoSubscribableChildren(selfUser, ['devices']);
   const currentClient = clientState.currentClient;
   const isSSO = selfUser.isNoPasswordSSO;
   const getFingerprint = (device: ClientEntity) =>
@@ -179,10 +180,10 @@ const DevicesPreferences = ({
 
       <hr className="preferences-devices-separator preferences-separator" />
 
-      {clients.length > 0 && (
+      {devices.length > 0 && (
         <fieldset className="preferences-section">
           <legend className="preferences-header">{t('preferencesDevicesActive')}</legend>
-          {clients.map((device, index) => (
+          {devices.map((device, index) => (
             <Device
               device={device}
               key={device.id}

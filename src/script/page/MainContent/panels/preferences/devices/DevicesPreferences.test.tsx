@@ -18,7 +18,6 @@
  */
 
 import {render, waitFor} from '@testing-library/react';
-import ko from 'knockout';
 
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {ClientState} from 'src/script/client/ClientState';
@@ -38,11 +37,12 @@ function createDevice(): ClientEntity {
 }
 
 describe('DevicesPreferences', () => {
+  const selfUser = new User(createUuid());
+  selfUser.devices([createDevice(), createDevice()]);
   const clientState = new ClientState();
-  clientState.clients = ko.pureComputed(() => [createDevice(), createDevice()]);
   clientState.currentClient = createDevice();
   const defaultParams = {
-    clientState: clientState,
+    clientState,
     conversationState: new ConversationState(),
     cryptographyRepository: {
       getLocalFingerprint: jest.fn().mockResolvedValue('0000000000000'),
@@ -50,8 +50,8 @@ describe('DevicesPreferences', () => {
     } as unknown as CryptographyRepository,
     removeDevice: jest.fn(),
     resetSession: jest.fn(),
-    selfUser: new User(createUuid()),
     verifyDevice: jest.fn(),
+    selfUser,
   };
 
   it('displays all devices', async () => {
@@ -59,6 +59,6 @@ describe('DevicesPreferences', () => {
 
     await waitFor(() => getByText('preferencesDevicesCurrent'));
     expect(getByText('preferencesDevicesCurrent')).toBeDefined();
-    expect(getAllByText('preferencesDevicesId')).toHaveLength(clientState.clients().length + 1);
+    expect(getAllByText('preferencesDevicesId')).toHaveLength(selfUser.devices().length + 1);
   });
 });
