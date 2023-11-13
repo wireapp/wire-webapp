@@ -961,7 +961,7 @@ export class CallingRepository {
     }
   };
 
-  setEpochInfo(conversationId: QualifiedId, subconversationData: SubconversationData) {
+  private readonly setEpochInfo = (conversationId: QualifiedId, subconversationData: SubconversationData) => {
     const serializedConversationId = this.serializeQualifiedId(conversationId);
     const {epoch, secretKey, members} = subconversationData;
     const clients = {
@@ -970,7 +970,7 @@ export class CallingRepository {
     };
 
     return this.wCall?.setEpochInfo(this.wUser, serializedConversationId, epoch, JSON.stringify(clients), secretKey);
-  }
+  };
 
   rejectCall(conversationId: QualifiedId): void {
     this.wCall?.reject(this.wUser, this.serializeQualifiedId(conversationId));
