@@ -17,9 +17,11 @@
  *
  */
 
-import React, {CSSProperties} from 'react';
+import React, {CSSProperties, useEffect} from 'react';
 
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
+import {E2eiConversationState} from '@wireapp/core/lib/messagingProtocols/mls';
+import {container} from 'tsyringe';
 
 import {
   CertificateExpiredIcon,
@@ -29,7 +31,12 @@ import {
   ProteusVerified,
 } from '@wireapp/react-ui-kit';
 
+import {ConversationVerificationState} from 'src/script/conversation/ConversationVerificationState';
+import {Conversation} from 'src/script/entity/Conversation';
+import {Core} from 'src/script/service/CoreSingleton';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
+import {base64ToArray} from 'Util/util';
 
 export enum MLSStatuses {
   VALID = 'valid',
@@ -62,6 +69,39 @@ const title = (isMLSConversation = false): CSSProperties => ({
   lineHeight: '14px',
   marginRight: '4px',
 });
+
+const useVerificationState = (conversation: Conversation, core = container.resolve(Core)) => {
+  const [MLSVerificationState, setMLSVerificationState] = React.useState<MLSStatuses | undefined>();
+  const {verification_state: proteusVerificationState} = useKoSubscribableChildren(conversation, [
+    'verification_state',
+  ]);
+
+  useEffect(() => {
+    if (!conversation.groupId) {
+      return;
+    }
+
+    core.service?.e2eIdentity?.getConversationState(base64ToArray(conversation.groupId)).then(state => {
+      setMLSVerificationState(state === E2eiConversationState.Verified ? MLSStatuses.VALID : undefined);
+    });
+  });
+
+  return {MLS: MLSVerificationState, proteus: proteusVerificationState};
+};
+
+type ConversationVerificationBadgeProps = {
+  conversation: Conversation;
+};
+export const ConversationVerificationBadges = ({conversation}: ConversationVerificationBadgeProps) => {
+  const verificationState = useVerificationState(conversation);
+  return (
+    <VerificationBadges
+      conversationProtocol={conversation.protocol}
+      MLSStatus={verificationState.MLS}
+      isProteusVerified={verificationState.proteus === ConversationVerificationState.VERIFIED}
+    />
+  );
+};
 
 export const VerificationBadges: React.FC<VerificationBadgesProps> = ({
   conversationProtocol,
