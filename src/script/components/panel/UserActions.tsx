@@ -33,6 +33,7 @@ import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import type {MenuItem} from './PanelActions';
 import {PanelActions} from './PanelActions';
+import {SingleAction} from './SingleAction/SingleAction';
 
 import {ACCESS_STATE} from '../../conversation/AccessState';
 import type {ConversationRoleRepository} from '../../conversation/ConversationRoleRepository';
@@ -74,6 +75,7 @@ export interface UserActionsProps {
   onAction: (action: Actions) => void;
   selfUser: User;
   user: User;
+  isModal?: boolean;
   teamState?: TeamState;
 }
 
@@ -99,6 +101,7 @@ const UserActions: React.FC<UserActionsProps> = ({
   onAction,
   conversationRoleRepository,
   selfUser,
+  isModal = false,
   teamState = container.resolve(TeamState),
 }) => {
   const {
@@ -310,7 +313,11 @@ const UserActions: React.FC<UserActionsProps> = ({
     removeUserFromConversation,
   ].filter((item): item is MenuItem => !!item);
 
-  return <PanelActions items={items} />;
+  return items.length === 1 && isModal ? (
+    <SingleAction item={items[0]} onCancel={onAction} />
+  ) : (
+    <PanelActions items={items} />
+  );
 };
 
 export {UserActions};
