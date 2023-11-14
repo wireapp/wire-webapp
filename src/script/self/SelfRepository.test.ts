@@ -319,5 +319,30 @@ describe('SelfRepository', () => {
 
       expect(selfRepository.refreshSelfSupportedProtocols).not.toHaveBeenCalled();
     });
+
+    it('refreshes self supported protocols on mls migration feature config update', async () => {
+      const selfRepository = await testFactory.exposeSelfActors();
+
+      const mockedMLSMigrationFeatureUpdateEvent: TeamFeatureConfigurationUpdateEvent = {
+        name: FEATURE_KEY.MLS_MIGRATION,
+        team: '',
+        time: '',
+        data: {
+          status: FeatureStatus.ENABLED,
+          config: {finaliseRegardlessAfter: '', startTime: ''},
+        },
+
+        type: TEAM_EVENT.FEATURE_CONFIG_UPDATE,
+      };
+
+      jest.spyOn(selfRepository, 'refreshSelfSupportedProtocols').mockImplementationOnce(jest.fn());
+
+      selfRepository['teamRepository'].emit('featureUpdated', {
+        event: mockedMLSMigrationFeatureUpdateEvent,
+        prevFeatureList: {},
+      });
+
+      expect(selfRepository.refreshSelfSupportedProtocols).toHaveBeenCalled();
+    });
   });
 });

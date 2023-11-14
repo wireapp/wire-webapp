@@ -195,7 +195,7 @@ export const PeopleTab = ({
       onSearchResults(localSearchResults);
       if (canSearchUnconnectedUsers) {
         try {
-          const userEntities = await searchRepository.searchByName(searchQuery, selfUser.teamId);
+          const userEntities = await searchRepository.searchByName(searchQuery);
           const localUserIds = localSearchResults.contacts.map(({id}) => id);
           const onlyRemoteUsers = userEntities.filter(user => !localUserIds.includes(user.id));
           const results = inTeam

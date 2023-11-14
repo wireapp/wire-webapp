@@ -252,6 +252,8 @@ export class App {
       serverTimeHandler,
     );
 
+    repositories.self = new SelfRepository(selfService, repositories.user, repositories.team, repositories.client);
+
     repositories.conversation = new ConversationRepository(
       this.service.conversation,
       repositories.message,
@@ -259,12 +261,11 @@ export class App {
       repositories.event,
       repositories.team,
       repositories.user,
+      repositories.self,
       repositories.properties,
       repositories.calling,
       serverTimeHandler,
     );
-
-    repositories.self = new SelfRepository(selfService, repositories.user, repositories.team, repositories.client);
 
     repositories.eventTracker = new EventTrackingRepository(repositories.message);
 
@@ -415,26 +416,19 @@ export class App {
       onProgress(10);
       telemetry.timeStep(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
 
-      const connections = await connectionRepository.getConnections();
-
+      const teamMembers = await teamRepository.initTeam(selfUser.teamId);
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_USER_DATA);
 
+      const connections = await connectionRepository.getConnections();
       telemetry.addStatistic(AppInitStatisticsValue.CONNECTIONS, connections.length, 50);
 
       const conversations = await conversationRepository.loadConversations();
 
-      const contacts = await userRepository.loadUsers(selfUser, connections, conversations);
-      if (selfUser.teamId) {
-        await teamRepository.initTeam(selfUser.teamId, contacts);
-      }
+      await userRepository.loadUsers(selfUser, connections, conversations, teamMembers);
 
       if (supportsMLS()) {
         //if mls is supported, we need to initialize the callbacks (they are used when decrypting messages)
         conversationRepository.initMLSConversationRecoveredListener();
-      }
-
-      if (connections.length) {
-        await Promise.allSettled(conversationRepository.mapConnections(connections));
       }
 
       onProgress(25, t('initReceivedUserData'));
@@ -453,6 +447,8 @@ export class App {
         totalNotifications = total;
         onProgress(25 + 50 * (done / total), `${baseMessage}${extraInfo}`);
       });
+
+      await conversationRepository.init1To1Conversations(connections, conversations);
 
       if (supportsMLS()) {
         // Once all the messages have been processed and the message sending queue freed we can now:

@@ -21,7 +21,6 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import {CONV_TYPE} from '@wireapp/avs';
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
@@ -154,7 +153,7 @@ export class ListViewModel {
       return;
     }
 
-    if (call.conversationType === CONV_TYPE.CONFERENCE && !this.callingRepository.supportsConferenceCalling) {
+    if (call.isConference && !this.callingRepository.supportsConferenceCalling) {
       PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
         text: {
           message: `${t('modalConferenceCallNotSupportedMessage')} ${t('modalConferenceCallNotSupportedJoinMessage')}`,

@@ -117,11 +117,17 @@ const EmojiPickerContainer: FC<EmojiPickerContainerProps> = ({
             }
           }}
         >
+          {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions */}
           <div
             ref={emojiRef}
             style={{maxHeight: window.innerHeight, ...style}}
             role="dialog"
             data-uie-name="emoji-picker-dialog"
+            // stop propagation to prevent emoji picker search input from losing focus
+            // due to message element's handleFocus
+            onClick={event => {
+              event.stopPropagation();
+            }}
           >
             <EmojiPicker
               onEmojiClick={onEmojiClick}

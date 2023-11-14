@@ -17,6 +17,10 @@
  *
  */
 
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
+import {FeatureList, FeatureStatus} from '@wireapp/api-client/lib/team/feature/';
+import {Permissions} from '@wireapp/api-client/lib/team/member';
+
 import {randomUUID} from 'crypto';
 
 import {User} from 'src/script/entity/User';
@@ -67,6 +71,12 @@ describe('TeamRepository', () => {
     has_more: false,
   };
   const team_metadata = teams_data.teams[0];
+  const team_members = {
+    members: [
+      {user: randomUUID(), permissions: {copy: Permissions.DEFAULT, self: Permissions.DEFAULT}},
+      {user: randomUUID(), permissions: {copy: Permissions.DEFAULT, self: Permissions.DEFAULT}},
+    ],
+  };
 
   describe('getTeam()', () => {
     it('returns the team entity', async () => {
@@ -83,6 +93,17 @@ describe('TeamRepository', () => {
     });
   });
 
+  describe('getAllTeamMembers()', () => {
+    it('returns team member entities', async () => {
+      const [teamRepo, {teamService}] = buildConnectionRepository();
+      jest.spyOn(teamService, 'getAllTeamMembers').mockResolvedValue({hasMore: false, members: team_members.members});
+      const entities = await teamRepo['getAllTeamMembers'](team_metadata.id);
+      expect(entities.length).toEqual(team_members.members.length);
+      expect(entities[0].userId).toEqual(team_members.members[0].user);
+      expect(entities[0].permissions).toEqual(team_members.members[0].permissions);
+    });
+  });
+
   describe('sendAccountInfo', () => {
     it('does not crash when there is no team logo', async () => {
       const [teamRepo] = buildConnectionRepository();
@@ -92,6 +113,82 @@ describe('TeamRepository', () => {
       const accountInfo = await teamRepo.sendAccountInfo(true);
 
       expect(accountInfo.picture).toBeUndefined();
+    });
+  });
+
+  describe('getTeamSupportedProtocols', () => {
+    it('returns team supported protocols from mls feature config', async () => {
+      const [teamRepo, {teamState}] = buildConnectionRepository();
+
+      const mockedTeamProtocols = [ConversationProtocol.PROTEUS, ConversationProtocol.MLS];
+
+      const mockedFeatureList = {
+        mls: {config: {supportedProtocols: mockedTeamProtocols}, status: FeatureStatus.ENABLED},
+      } as FeatureList;
+
+      teamState.teamFeatures(mockedFeatureList);
+
+      const protocols = teamRepo.getTeamSupportedProtocols();
+
+      expect(protocols).toEqual(mockedTeamProtocols);
+    });
+
+    it('returns proteus if mls feature is disabled', async () => {
+      const [teamRepo, {teamState}] = buildConnectionRepository();
+
+      const mockedTeamProtocols = [ConversationProtocol.PROTEUS, ConversationProtocol.MLS];
+
+      const mockedFeatureList = {
+        mls: {config: {supportedProtocols: mockedTeamProtocols}, status: FeatureStatus.DISABLED},
+      } as FeatureList;
+
+      teamState.teamFeatures(mockedFeatureList);
+
+      const protocols = teamRepo.getTeamSupportedProtocols();
+
+      expect(protocols).toEqual([ConversationProtocol.PROTEUS]);
+    });
+
+    it('returns proteus if mls feature does not exist in team features', async () => {
+      const [teamRepo, {teamState}] = buildConnectionRepository();
+
+      const mockedFeatureList = {
+        mls: undefined,
+      } as FeatureList;
+
+      teamState.teamFeatures(mockedFeatureList);
+
+      const protocols = teamRepo.getTeamSupportedProtocols();
+
+      expect(protocols).toEqual([ConversationProtocol.PROTEUS]);
+    });
+
+    it('returns proteus if supported protocols field does not exist on mls feature', async () => {
+      const [teamRepo, {teamState}] = buildConnectionRepository();
+
+      const mockedFeatureList = {
+        mls: {config: {supportedProtocols: undefined}, status: FeatureStatus.ENABLED},
+      } as unknown as FeatureList;
+
+      teamState.teamFeatures(mockedFeatureList);
+
+      const protocols = teamRepo.getTeamSupportedProtocols();
+
+      expect(protocols).toEqual([ConversationProtocol.PROTEUS]);
+    });
+
+    it('returns proteus if supported protocols on mls feature config is an empty list', async () => {
+      const [teamRepo, {teamState}] = buildConnectionRepository();
+
+      const mockedFeatureList = {
+        mls: {config: {supportedProtocols: []}, status: FeatureStatus.ENABLED},
+      } as unknown as FeatureList;
+
+      teamState.teamFeatures(mockedFeatureList);
+
+      const protocols = teamRepo.getTeamSupportedProtocols();
+
+      expect(protocols).toEqual([ConversationProtocol.PROTEUS]);
     });
   });
 });

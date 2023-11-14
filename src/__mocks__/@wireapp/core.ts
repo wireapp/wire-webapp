@@ -56,11 +56,15 @@ export class Account extends EventEmitter {
       mlsGroupExistsLocally: jest.fn(),
       joinByExternalCommit: jest.fn(),
       addUsersToMLSConversation: jest.fn(),
+      isMLSGroupEstablishedLocally: jest.fn(),
+      establishMLS1to1Conversation: jest.fn(),
       messageTimer: {
         setConversationLevelTimer: jest.fn(),
       },
       removeUsersFromMLSConversation: jest.fn(),
       removeUserFromConversation: jest.fn(),
+      blacklistConversation: jest.fn(),
+      removeConversationFromBlacklist: jest.fn(),
     },
     subconversation: {
       joinConferenceSubconversation: jest.fn(),
