@@ -79,6 +79,9 @@ export const PrimaryModalComponent: FC = () => {
   const hasMultipleSecondary = currentType === PrimaryModalType.MULTI_ACTIONS;
   const isGuestLinkPassword = currentType === PrimaryModalType.GUEST_LINK_PASSWORD;
   const isJoinGuestLinkPassword = currentType === PrimaryModalType.JOIN_GUEST_LINK_PASSWORD;
+  const isConfirm = currentType === PrimaryModalType.CONFIRM;
+
+  const isPasswordRequired = hasPasswordWithRules || isGuestLinkPassword;
 
   const onModalHidden = () => {
     updateCurrentModalContent(defaultContent);
@@ -91,6 +94,7 @@ export const PrimaryModalComponent: FC = () => {
     setPasswordConfirmationValue('');
     setDidCopyPassword(false);
   };
+
   const isPasswordOptional = () => {
     const skipValidation = passwordOptional && !passwordInput.trim().length;
     if (skipValidation) {
@@ -98,24 +102,29 @@ export const PrimaryModalComponent: FC = () => {
     }
     return passwordRegex.test(passwordInput);
   };
+  const checkGuestLinkPassword = (password: string, passwordConfirm: string): boolean => {
+    if (password !== passwordConfirm) {
+      return false;
+    }
+    return isValidPassword(password);
+  };
 
   const passwordRegex = new RegExp(
     ValidationUtil.getNewPasswordPattern(Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH),
   );
-  const actionEnabled =
-    (!isInput || !!inputValue.trim().length) && (hasPasswordWithRules ? isPasswordOptional() : true);
+  const actionEnabled = isPasswordRequired ? isPasswordOptional() : true;
+  const inputActionEnabled = !isInput || !!inputValue.trim().length;
 
-  const checkPassword = (password: string, passwordConfirm: string): boolean => {
-    if (password !== passwordConfirm) {
+  const passwordGuestLinkActionEnabled =
+    (!isGuestLinkPassword || !!passwordValue.trim().length) &&
+    checkGuestLinkPassword(passwordValue, passwordConfirmationValue);
+
+  const isPrimaryActionDisabled = () => {
+    if (isConfirm) {
       return false;
     }
-
-    return isValidPassword(password);
+    return (!inputActionEnabled || !passwordGuestLinkActionEnabled) && !actionEnabled;
   };
-
-  const inputActionEnabled = !isInput || !!inputValue.trim().length;
-  const passwordActionEnabled =
-    (!isGuestLinkPassword || !!passwordValue.trim().length) && checkPassword(passwordValue, passwordConfirmationValue);
 
   const doAction =
     (action?: Function, closeAfter = true, skipValidation = false) =>
@@ -138,16 +147,13 @@ export const PrimaryModalComponent: FC = () => {
     if (!action) {
       return;
     }
-    if (isGuestLinkPassword) {
-      action(passwordValue, didCopyPassword);
-      return;
-    }
     const actions = {
       [PrimaryModalType.OPTION]: () => action(optionChecked),
       [PrimaryModalType.INPUT]: () => action(inputValue),
       [PrimaryModalType.PASSWORD]: () => action(passwordValue),
-      [PrimaryModalType.GUEST_LINK_PASSWORD]: () => action(passwordValue),
+      [PrimaryModalType.GUEST_LINK_PASSWORD]: () => action(passwordValue, didCopyPassword),
       [PrimaryModalType.JOIN_GUEST_LINK_PASSWORD]: () => action(passwordValue),
+      [PrimaryModalType.PASSWORD_ADVANCED_SECURITY]: () => action(passwordInput),
     };
 
     if (Object.keys(actions).includes(content?.currentType ?? '')) {
@@ -260,7 +266,7 @@ export const PrimaryModalComponent: FC = () => {
                     helperText={t('modalGuestLinkJoinHelperText', {
                       minPasswordLength: Config.getConfig().MINIMUM_PASSWORD_LENGTH.toString(),
                     })}
-                    id="modal_pswd_confirmation"
+                    id="modal_pswd"
                     className="modal__input"
                     type="password"
                     autoComplete="off"
@@ -285,7 +291,7 @@ export const PrimaryModalComponent: FC = () => {
 
               {copyPassword && (
                 <CopyToClipboardButton
-                  disabled={!passwordActionEnabled}
+                  disabled={!passwordGuestLinkActionEnabled}
                   textToCopy={passwordValue}
                   displayText={t('guestOptionsPasswordCopyToClipboard')}
                   copySuccessText={t('guestOptionsPasswordCopyToClipboardSuccess')}
@@ -444,7 +450,7 @@ export const PrimaryModalComponent: FC = () => {
                       ref={primaryActionButtonRef}
                       type="button"
                       onClick={doAction(confirm, !!closeOnConfirm)}
-                      disabled={!actionEnabled}
+                      disabled={isPrimaryActionDisabled()}
                       className={cx('modal__button modal__button--primary', {
                         'modal__button--full': hasMultipleSecondary,
                       })}
