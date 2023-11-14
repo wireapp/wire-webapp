@@ -17,10 +17,11 @@
  *
  */
 
-import React, {CSSProperties} from 'react';
+import React, {CSSProperties, useEffect} from 'react';
 
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {container} from 'tsyringe';
 
 import {
   CertificateExpiredIcon,
@@ -34,8 +35,10 @@ import {ClientEntity} from 'src/script/client';
 import {ConversationVerificationState} from 'src/script/conversation/ConversationVerificationState';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
+import {Core} from 'src/script/service/CoreSingleton';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
+import {base64ToArray} from 'Util/util';
 
 export enum MLSStatuses {
   VALID = 'valid',
@@ -77,7 +80,7 @@ const useConversationVerificationState = (conversation: Conversation) => {
   return {MLS: mlsState, proteus: proteusVerificationState};
 };
 
-export const UserVerificationBadges = ({user, conversation}: {user: User; conversation: Conversation}) => {
+export const UserVerificationBadges = ({user, groupId}: {user: User; groupId?: string}) => {
   const {is_verified: isProteusVerified} = useKoSubscribableChildren(user, ['is_verified']);
 
   return <VerificationBadges isProteusVerified={isProteusVerified} />;
@@ -87,12 +90,32 @@ export const DeviceVerificationBadges = ({
   device,
   userId,
   groupId,
+  core = container.resolve(Core),
 }: {
   device: ClientEntity;
   userId: QualifiedId;
   groupId?: string;
+  core?: Core;
 }) => {
-  return <VerificationBadges isProteusVerified={device.meta?.isVerified?.() ?? false} />;
+  const [isMLSVerified, setIsMLSVerified] = React.useState(false);
+  useEffect(() => {
+    if (groupId) {
+      void (async () => {
+        const identities = await core.service?.e2eIdentity?.getUserDeviceEntities(base64ToArray(groupId), {
+          [device.id]: userId,
+        });
+        // TODO, soon coreCrypto will return a `isValid` property. Use this one to check for validity
+        setIsMLSVerified(!!identities?.length);
+      })();
+    }
+  });
+
+  return (
+    <VerificationBadges
+      isProteusVerified={device.meta?.isVerified?.() ?? false}
+      MLSStatus={isMLSVerified ? MLSStatuses.VALID : undefined}
+    />
+  );
 };
 
 type ConversationVerificationBadgeProps = {

@@ -184,7 +184,7 @@ const Conversations: React.FC<ConversationsProps> = ({
             onClick={event => AvailabilityContextMenu.show(event.nativeEvent, 'left-list-availability-menu')}
           >
             <AvailabilityState user={selfUser} className="availability-state" dataUieName="status-availability">
-              <UserVerificationBadges user={selfUser} conversation={conversationState.getSelfMLSConversation()} />
+              <UserVerificationBadges user={selfUser} groupId={conversationState.selfMLSConversation()?.groupId} />
             </AvailabilityState>
           </button>
 

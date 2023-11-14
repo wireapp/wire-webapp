@@ -147,7 +147,7 @@ export const AccountPreferences = ({
             {name}
           </h3>
 
-          <UserVerificationBadges user={selfUser} conversation={conversationState.getSelfMLSConversation()} />
+          <UserVerificationBadges user={selfUser} groupId={conversationState.getSelfMLSConversation()?.groupId} />
         </div>
 
         <div className="preferences-account-image">

@@ -33,6 +33,7 @@ import {DetailedDevice} from '../DetailedDevice';
 
 interface DevicesPreferencesProps {
   device: ClientEntity;
+  renderDeviceBadges: (device: ClientEntity) => React.ReactNode;
   getFingerprint: (device: ClientEntity) => Promise<string | undefined>;
   onClose: () => void;
   onRemove: (device: ClientEntity) => void;
@@ -49,6 +50,7 @@ enum SessionResetState {
 
 export const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
   device,
+  renderDeviceBadges,
   getFingerprint,
   onVerify,
   onRemove,
@@ -93,12 +95,12 @@ export const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
           </legend>
 
           <DetailedDevice
+            renderDeviceBadges={renderDeviceBadges}
             device={device}
             fingerprint={fingerprint || ''}
             showVerificationStatus={false}
             certificate={deviceIdentity?.certificate}
             isOtherDevice
-            isProteusVerified={isVerified}
           />
 
           <div className="participant-devices__verify slider">

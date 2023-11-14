@@ -107,7 +107,7 @@ export const UserList = ({
   const selfInTeam = teamState.isInTeam(selfUser);
 
   // subscribe to roles changes in order to react to them
-  useKoSubscribableChildren(conversation ?? {}, ['roles']);
+  useKoSubscribableChildren(conversation, ['roles']);
 
   const isCompactMode = mode === UserlistMode.COMPACT;
   const cssClasses = isCompactMode ? 'search-list-sm' : 'search-list-lg';

@@ -23,6 +23,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {WireIdentity} from '@wireapp/core-crypto/platforms/web/corecrypto';
 import {container} from 'tsyringe';
 
+import {DeviceVerificationBadges} from 'Components/VerificationBadges';
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';
 import {Conversation} from 'src/script/entity/Conversation';
@@ -74,9 +75,20 @@ export const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
     void cryptographyRepository.getLocalFingerprint().then(setLocalFingerprint);
   }, [cryptographyRepository]);
 
+  const renderDeviceBadges = (device: ClientEntity) => {
+    return (
+      <DeviceVerificationBadges
+        device={device}
+        userId={selfUser.qualifiedId}
+        groupId={conversationState.selfMLSConversation()?.groupId}
+      />
+    );
+  };
+
   if (selectedDevice) {
     return (
       <DeviceDetailsPreferences
+        renderDeviceBadges={renderDeviceBadges}
         device={selectedDevice}
         deviceIdentity={selectedDeviceIdentity}
         getFingerprint={getFingerprint}

@@ -180,7 +180,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
   const containerRef = useCallback((element: HTMLDivElement | null) => element?.focus(), [currentState]);
 
   const renderParticipantsBadges = (participant: User) => {
-    return activeConversation && <UserVerificationBadges user={participant} conversation={activeConversation} />;
+    return <UserVerificationBadges user={participant} groupId={activeConversation?.groupId} />;
   };
 
   if (!activeConversation) {

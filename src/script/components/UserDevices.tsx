@@ -20,6 +20,7 @@
 import React, {useEffect, useMemo, useState} from 'react';
 
 import {ClientClassification} from '@wireapp/api-client/lib/client/';
+import {container} from 'tsyringe';
 
 import {partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -30,6 +31,7 @@ import {DeviceDetails} from './userDevices/DeviceDetails';
 import {DeviceList} from './userDevices/DeviceList';
 import {NoDevicesFound} from './userDevices/NoDevicesFound';
 import {SelfFingerprint} from './userDevices/SelfFingerprint';
+import {DeviceVerificationBadges} from './VerificationBadges';
 
 import {ClientRepository, ClientEntity} from '../client';
 import {ConversationState} from '../conversation/ConversationState';
@@ -97,6 +99,7 @@ const UserDevices: React.FC<UserDevicesProps> = ({
   goTo,
   messageRepository,
   cryptographyRepository,
+  conversationState = container.resolve(ConversationState),
 }) => {
   const [selectedClient, setSelectedClient] = useState<ClientEntity>();
   const [deviceMode, setDeviceMode] = useState(FIND_MODE.REQUESTING);
@@ -127,6 +130,16 @@ const UserDevices: React.FC<UserDevicesProps> = ({
     goTo(UserDevicesState.DEVICE_DETAILS, headline || '');
   };
 
+  const renderDeviceBadges = (device: ClientEntity) => {
+    return (
+      <DeviceVerificationBadges
+        device={device}
+        userId={user.qualifiedId}
+        groupId={conversationState.activeConversation()?.groupId}
+      />
+    );
+  };
+
   const clickToShowSelfFingerprint = () => {
     goTo(UserDevicesState.SELF_FINGERPRINT, t('participantDevicesSelfFingerprint'));
   };
@@ -136,7 +149,7 @@ const UserDevices: React.FC<UserDevicesProps> = ({
   return (
     <div>
       {showDeviceList && deviceMode === FIND_MODE.FOUND && (
-        <DeviceList {...{clickOnDevice, clients, noPadding, user}} />
+        <DeviceList {...{renderDeviceBadges, clickOnDevice, clients, noPadding, user}} />
       )}
 
       {showDeviceList && deviceMode === FIND_MODE.NOT_FOUND && <NoDevicesFound {...{noPadding, user}} />}
@@ -144,6 +157,7 @@ const UserDevices: React.FC<UserDevicesProps> = ({
       {current.state === UserDevicesState.DEVICE_DETAILS && (
         <DeviceDetails
           {...{
+            renderDeviceBadges,
             clickToShowSelfFingerprint,
             clientRepository,
             cryptographyRepository,

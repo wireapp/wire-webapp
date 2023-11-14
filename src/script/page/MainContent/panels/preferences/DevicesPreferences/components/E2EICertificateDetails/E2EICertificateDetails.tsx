@@ -34,15 +34,10 @@ const logger = getLogger('E2EICertificateDetails');
 
 interface E2EICertificateDetailsProps {
   certificate?: string;
-  isMLSVerified?: boolean;
   isOtherDevice?: boolean;
 }
 
-export const E2EICertificateDetails = ({
-  certificate,
-  isMLSVerified,
-  isOtherDevice = false,
-}: E2EICertificateDetailsProps) => {
+export const E2EICertificateDetails = ({certificate, isOtherDevice = false}: E2EICertificateDetailsProps) => {
   const [isCertificateDetailsModalOpen, setIsCertificateDetailsModalOpen] = useState(false);
 
   const {isNotDownloaded, isValid, isExpireSoon} = getCertificateDetails(certificate);
