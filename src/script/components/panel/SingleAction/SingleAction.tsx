@@ -17,8 +17,6 @@
  *
  */
 
-import React from 'react';
-
 import {Button, ButtonVariant, FlexBox} from '@wireapp/react-ui-kit';
 
 import {t} from 'Util/LocalizerUtil';
