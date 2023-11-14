@@ -21,7 +21,6 @@ import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConv
 
 import {ClientEntity} from 'src/script/client';
 import {Conversation} from 'src/script/entity/Conversation';
-import {User} from 'src/script/entity/User';
 import {Core} from 'src/script/service/CoreSingleton';
 import {createUuid} from 'Util/uuid';
 
@@ -42,7 +41,6 @@ describe('MLSConversationVerificationStateHandler', () => {
   const clientEntityId = 'clientIdXYZ';
   const selfClientEntityId = 'selfClientIdXYZ';
   const clientEntity: ClientEntity = new ClientEntity(false, '', clientEntityId);
-  const selfClientEntity: ClientEntity = new ClientEntity(false, '', selfClientEntityId);
   const conversation: Conversation = new Conversation(uuid, '', ConversationProtocol.MLS);
 
   beforeEach(() => {
@@ -166,43 +164,6 @@ describe('MLSConversationVerificationStateHandler', () => {
       await (handler as any).checkEpoch(mockData); // Calling the private method
 
       expect((handler as any).verifyConversation).toHaveBeenCalled();
-    });
-
-    it('should update ClientEntity isMLSVerified observable', async () => {
-      const mockData = {
-        groupId,
-        epoch: 12345,
-      };
-
-      jest.spyOn(handler as any, 'isCertificateActiveAndValid').mockReturnValue(true);
-      jest.spyOn(handler as any, 'verifyConversation').mockImplementation(() => null);
-
-      expect(clientEntity.meta.isMLSVerified?.()).toBe(false);
-
-      await (handler as any).checkEpoch(mockData); // Calling the private method
-
-      expect(clientEntity.meta.isMLSVerified?.()).toBe(true);
-    });
-
-    it('should update selfClient isMLSVerified observable', async () => {
-      const mockData = {
-        groupId,
-        epoch: 12345,
-      };
-
-      const user = new User();
-      user.isMe = true;
-      user.localClient = selfClientEntity;
-      conversation.getAllUserEntities = jest.fn().mockReturnValue([user]);
-
-      jest.spyOn(handler as any, 'isCertificateActiveAndValid').mockReturnValue(true);
-      jest.spyOn(handler as any, 'verifyConversation').mockImplementation(() => null);
-
-      expect(selfClientEntity.meta.isMLSVerified?.()).toBe(false);
-
-      await (handler as any).checkEpoch(mockData); // Calling the private method
-
-      expect(selfClientEntity.meta.isMLSVerified?.()).toBe(true);
     });
   });
 });

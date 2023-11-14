@@ -25,6 +25,7 @@ import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {UserVerificationBadges} from 'Components/VerificationBadges';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {AddParticipants} from './AddParticipants';
@@ -178,6 +179,10 @@ const RightSidebar: FC<RightSidebarProps> = ({
 
   const containerRef = useCallback((element: HTMLDivElement | null) => element?.focus(), [currentState]);
 
+  const renderParticipantsBadges = (participant: User) => {
+    return activeConversation && <UserVerificationBadges user={participant} conversation={activeConversation} />;
+  };
+
   if (!activeConversation) {
     return null;
   }
@@ -199,6 +204,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
           {currentState === PanelState.CONVERSATION_DETAILS && (
             <ConversationDetails
               ref={containerRef}
+              renderParticipantBadges={renderParticipantsBadges}
               onClose={closePanel}
               togglePanel={togglePanel}
               activeConversation={activeConversation}
@@ -215,6 +221,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
 
           {currentState === PanelState.GROUP_PARTICIPANT_USER && userEntity && (
             <GroupParticipantUser
+              renderParticipantBadges={renderParticipantsBadges}
               onBack={onBackClick}
               onClose={closePanel}
               goToRoot={goToRoot}
@@ -319,6 +326,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
 
           {currentState === PanelState.CONVERSATION_PARTICIPANTS && (
             <ConversationParticipants
+              renderParticipantBadges={renderParticipantsBadges}
               activeConversation={activeConversation}
               conversationRepository={conversationRepository}
               searchRepository={searchRepository}

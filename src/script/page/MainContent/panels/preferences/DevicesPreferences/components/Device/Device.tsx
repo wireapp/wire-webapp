@@ -90,11 +90,7 @@ export const Device = ({device, isSSO, onSelect, onRemove, deviceNumber, getDevi
         >
           {device.getName()}
 
-          <VerificationBadges
-            isProteusVerified={isVerified}
-            isMLSVerified={!!mlsFingerprint}
-            MLSStatus={certificateState}
-          />
+          <VerificationBadges isProteusVerified={isVerified} MLSStatus={certificateState} />
         </div>
 
         {mlsFingerprint && (

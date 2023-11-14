@@ -48,7 +48,6 @@ export class ClientEntity {
   };
   meta: {
     isVerified?: ko.Observable<boolean>;
-    isMLSVerified?: ko.Observable<boolean>;
     primaryKey?: string;
     userId?: string;
   };
@@ -77,7 +76,6 @@ export class ClientEntity {
     // Metadata maintained by us
     this.meta = {
       isVerified: ko.observable(false),
-      isMLSVerified: ko.observable(false),
       primaryKey: undefined,
     };
   }

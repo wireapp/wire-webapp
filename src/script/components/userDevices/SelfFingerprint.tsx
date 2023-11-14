@@ -40,7 +40,7 @@ interface SelfFingerprintProps {
   noPadding: boolean;
 }
 
-const SelfFingerprint: React.FC<SelfFingerprintProps> = ({
+export const SelfFingerprint: React.FC<SelfFingerprintProps> = ({
   cryptographyRepository,
   noPadding,
   clientState = container.resolve(ClientState),
@@ -71,5 +71,3 @@ const SelfFingerprint: React.FC<SelfFingerprintProps> = ({
     </div>
   );
 };
-
-export {SelfFingerprint};

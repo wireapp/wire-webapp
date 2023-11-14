@@ -20,14 +20,13 @@
 import {ChangeEvent, FC, KeyboardEvent, useEffect, useRef, useState} from 'react';
 
 import {Icon} from 'Components/Icon';
-import {VerificationBadges} from 'src/script/components/VerificationBadges';
+import {ConversationVerificationBadges} from 'src/script/components/VerificationBadges';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {removeLineBreaks} from 'Util/StringUtil';
 
 import {ConversationRepository} from '../../../../../conversation/ConversationRepository';
-import {ConversationVerificationState} from '../../../../../conversation/ConversationVerificationState';
 import {Conversation} from '../../../../../entity/Conversation';
 import {User} from '../../../../../entity/User';
 import {ServiceEntity} from '../../../../../integration/ServiceEntity';
@@ -54,17 +53,7 @@ const ConversationDetailsHeader: FC<ConversationDetailsHeaderProps> = ({
   isTeam = false,
   conversation,
 }) => {
-  const {
-    isGroup,
-    display_name: displayName,
-    verification_state: verificationState,
-    mlsVerificationState,
-  } = useKoSubscribableChildren(conversation, [
-    'isGroup',
-    'display_name',
-    'verification_state',
-    'mlsVerificationState',
-  ]);
+  const {isGroup, display_name: displayName} = useKoSubscribableChildren(conversation, ['isGroup', 'display_name']);
 
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
   const isEditGroupNameTouched = useRef(false);
@@ -161,12 +150,7 @@ const ConversationDetailsHeader: FC<ConversationDetailsHeaderProps> = ({
             />
           )}
 
-          <VerificationBadges
-            displayTitle
-            conversationProtocol={conversation.protocol}
-            isProteusVerified={verificationState === ConversationVerificationState.VERIFIED}
-            isMLSVerified={mlsVerificationState === ConversationVerificationState.VERIFIED}
-          />
+          <ConversationVerificationBadges displayTitle conversation={conversation} />
         </>
       ) : (
         <div className="conversation-details__name">

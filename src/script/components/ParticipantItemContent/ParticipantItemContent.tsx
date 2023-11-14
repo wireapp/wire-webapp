@@ -19,11 +19,11 @@
 
 import React from 'react';
 
-import {Availability} from '@wireapp/protocol-messaging';
-
 import {AvailabilityState} from 'Components/AvailabilityState';
 import {Icon} from 'Components/Icon';
-import {VerificationBadges} from 'src/script/components/VerificationBadges';
+import {User} from 'src/script/entity/User';
+import {ServiceEntity} from 'src/script/integration/ServiceEntity';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {
   contentInfoWrapper,
@@ -39,50 +39,48 @@ import {
 } from './ParticipantItem.styles';
 
 export interface ParticipantItemContentProps {
-  name: string;
+  renderParticipantBadges?: (user: User) => React.ReactNode;
+  participant: User | ServiceEntity;
   selfInTeam?: boolean;
-  availability?: Availability.Type;
   shortDescription?: string;
   selfString?: string;
   hasUsernameInfo?: boolean;
   showArrow?: boolean;
   onDropdownClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
   showAvailabilityState?: boolean;
-  isService?: boolean;
   isSelectable?: boolean;
   isProteusVerified?: boolean;
   isMLSVerified?: boolean;
 }
 
 export const ParticipantItemContent = ({
-  name,
+  renderParticipantBadges,
+  participant,
   selfInTeam = false,
-  availability = Availability.Type.NONE,
   shortDescription = '',
   selfString = '',
   hasUsernameInfo = false,
   showArrow = false,
   showAvailabilityState = false,
-  isService = false,
   isSelectable = false,
-  isProteusVerified = false,
-  isMLSVerified = false,
 }: ParticipantItemContentProps) => {
+  const {name} = useKoSubscribableChildren(participant, ['name']);
+
+  const isService = participant instanceof ServiceEntity;
+
   return (
     <div css={wrapper}>
       <div css={contentText}>
         <div css={nameWrapper}>
-          {showAvailabilityState && selfInTeam ? (
+          {!isService && showAvailabilityState && selfInTeam ? (
             <AvailabilityState
-              availability={availability}
+              user={participant}
               css={[userName, userAvailability, ellipsis]}
               dataUieName="status-name"
-              label={name}
               selfString={selfString}
-              showBadges={!isService && !isSelectable}
-              isProteusVerified={isProteusVerified}
-              isMLSVerified={isMLSVerified}
-            />
+            >
+              {!isSelectable && renderParticipantBadges?.(participant)}
+            </AvailabilityState>
           ) : (
             <>
               <div css={[userName, ellipsis]} data-uie-name="status-name">
@@ -91,9 +89,7 @@ export const ParticipantItemContent = ({
                 {selfString && <span css={selfIndicator}>{selfString}</span>}
               </div>
 
-              {!isService && !isSelectable && (
-                <VerificationBadges isProteusVerified={isProteusVerified} isMLSVerified={isMLSVerified} />
-              )}
+              {!isSelectable && !isService && renderParticipantBadges?.(participant)}
             </>
           )}
         </div>

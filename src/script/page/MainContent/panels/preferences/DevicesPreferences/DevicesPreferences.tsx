@@ -35,7 +35,6 @@ import {Device} from './components/Device';
 import {DeviceDetailsPreferences} from './components/DeviceDetailsPreferences';
 
 import {ClientState} from '../../../../../client/ClientState';
-import {isMLSConversation} from '../../../../../conversation/ConversationSelectors';
 import {ConversationState} from '../../../../../conversation/ConversationState';
 import {E2EIHandler} from '../../../../../E2EIdentity';
 import {PreferencesPage} from '../components/PreferencesPage';
@@ -65,12 +64,7 @@ export const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
 
   const {devices} = useKoSubscribableChildren(selfUser, ['devices']);
   const currentClient = clientState.currentClient;
-  const isSelfClientVerified = React.useMemo(() => {
-    if (!currentClient) {
-      return false;
-    }
-    return !!currentClient?.meta.isMLSVerified?.();
-  }, [currentClient]);
+  const isSelfClientVerified = false;
 
   const isSSO = selfUser.isNoPasswordSSO;
   const getFingerprint = (device: ClientEntity) =>
@@ -113,7 +107,7 @@ export const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
   const getDeviceIdentity = async (deviceId: string) => {
     const selfConversation = conversationState?.getSelfMLSConversation();
 
-    if (!isMLSConversation(selfConversation)) {
+    if (!selfConversation) {
       return null;
     }
 

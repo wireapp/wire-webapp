@@ -30,6 +30,7 @@ import {AvailabilityState} from 'Components/AvailabilityState';
 import {CallingCell} from 'Components/calling/CallingCell';
 import {Icon} from 'Components/Icon';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
+import {UserVerificationBadges} from 'Components/VerificationBadges';
 import {ListState} from 'src/script/page/useAppState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -87,19 +88,9 @@ const Conversations: React.FC<ConversationsProps> = ({
 }) => {
   const {
     name: userName,
-    availability: userAvailability,
     isOnLegalHold,
     hasPendingLegalHold,
-    isMLSVerified,
-    is_verified: isProteusVerified,
-  } = useKoSubscribableChildren(selfUser, [
-    'hasPendingLegalHold',
-    'isOnLegalHold',
-    'name',
-    'availability',
-    'isMLSVerified',
-    'is_verified',
-  ]);
+  } = useKoSubscribableChildren(selfUser, ['hasPendingLegalHold', 'isOnLegalHold', 'name']);
   const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
   const {connectRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
@@ -192,15 +183,9 @@ const Conversations: React.FC<ConversationsProps> = ({
             css={{...(showLegalHold && {gridColumn: '2/3'})}}
             onClick={event => AvailabilityContextMenu.show(event.nativeEvent, 'left-list-availability-menu')}
           >
-            <AvailabilityState
-              className="availability-state"
-              availability={userAvailability}
-              dataUieName="status-availability"
-              label={userName}
-              showBadges
-              isMLSVerified={isMLSVerified}
-              isProteusVerified={isProteusVerified}
-            />
+            <AvailabilityState user={selfUser} className="availability-state" dataUieName="status-availability">
+              <UserVerificationBadges user={selfUser} conversation={conversationState.getSelfMLSConversation()} />
+            </AvailabilityState>
           </button>
 
           {showLegalHold && (

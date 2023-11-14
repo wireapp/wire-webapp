@@ -56,7 +56,7 @@ export class ConversationState {
   public readonly filteredConversations: ko.PureComputed<Conversation[]>;
   public readonly archivedConversations: ko.PureComputed<Conversation[]>;
   private readonly selfProteusConversation: ko.PureComputed<Conversation | undefined>;
-  private readonly selfMLSConversation: ko.PureComputed<Conversation | undefined>;
+  private readonly selfMLSConversation: ko.PureComputed<MLSConversation | undefined>;
   public readonly unreadConversations: ko.PureComputed<Conversation[]>;
   /**
    * All the users that are connected to the selfUser through a conversation. Those users are not necessarily **directly** connected to the selfUser (through a connection request)
@@ -78,7 +78,10 @@ export class ConversationState {
       this.conversations().find(conversation => !isMLSConversation(conversation) && isSelfConversation(conversation)),
     );
     this.selfMLSConversation = ko.pureComputed(() =>
-      this.conversations().find(conversation => isMLSConversation(conversation) && isSelfConversation(conversation)),
+      this.conversations().find(
+        (conversation): conversation is MLSConversation =>
+          isMLSConversation(conversation) && isSelfConversation(conversation),
+      ),
     );
 
     this.visibleConversations = ko.pureComputed(() => {
@@ -160,7 +163,7 @@ export class ConversationState {
     return proteusConversation;
   }
 
-  getSelfMLSConversation(): Conversation {
+  getSelfMLSConversation(): MLSConversation {
     const mlsConversation = this.selfMLSConversation();
     if (!mlsConversation) {
       throw new Error('No MLS self conversation');

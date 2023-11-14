@@ -65,6 +65,7 @@ const CONFIG = {
 
 interface ConversationDetailsProps {
   onClose?: () => void;
+  renderParticipantBadges?: (user: User) => React.ReactNode;
   togglePanel?: (panel: PanelState, entity: PanelEntity, addMode?: boolean, direction?: 'left' | 'right') => void;
   actionsViewModel: ActionsViewModel;
   activeConversation: Conversation;
@@ -82,6 +83,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
     {
       onClose = () => {},
       togglePanel = () => {},
+      renderParticipantBadges,
       actionsViewModel,
       activeConversation,
       conversationRepository,
@@ -152,11 +154,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       'team',
     ]);
 
-    const {
-      is_verified: isSelfVerified,
-      teamRole,
-      isActivatedAccount,
-    } = useKoSubscribableChildren(selfUser, ['is_verified', 'teamRole', 'isActivatedAccount']);
+    const {teamRole, isActivatedAccount} = useKoSubscribableChildren(selfUser, ['teamRole', 'isActivatedAccount']);
 
     const isActiveGroupParticipant = isGroup && !removedFromConversation;
 
@@ -308,9 +306,9 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
           {isSingleUserMode && !isServiceMode && firstParticipant && (
             <>
               <UserDetails
+                renderParticipantBadges={renderParticipantBadges}
                 participant={firstParticipant}
                 isVerified={isVerified}
-                isSelfVerified={isSelfVerified}
                 badge={teamRepository.getRoleBadge(firstParticipant.id)}
                 classifiedDomains={classifiedDomains}
               />
@@ -359,6 +357,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
                 {isGroup && !!userParticipants.length && (
                   <>
                     <UserSearchableList
+                      renderParticipantBadges={renderParticipantBadges}
                       dataUieName="list-users"
                       users={userParticipants}
                       onClick={showUser}

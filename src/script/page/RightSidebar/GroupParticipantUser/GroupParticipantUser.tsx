@@ -51,6 +51,7 @@ interface GroupParticipantUserProps {
   onClose: () => void;
   showDevices: (entity: User) => void;
   goToRoot: () => void;
+  renderParticipantBadges?: (user: User) => React.ReactNode;
   currentUser: User;
   actionsViewModel: ActionsViewModel;
   activeConversation: Conversation;
@@ -66,6 +67,7 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
   onClose,
   goToRoot,
   showDevices,
+  renderParticipantBadges,
   currentUser,
   actionsViewModel,
   activeConversation,
@@ -82,10 +84,7 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
     'isTeam',
     'team',
   ]);
-  const {is_verified: isSelfVerified, isActivatedAccount} = useKoSubscribableChildren(selfUser, [
-    'is_verified',
-    'isActivatedAccount',
-  ]);
+  const {isActivatedAccount} = useKoSubscribableChildren(selfUser, ['isActivatedAccount']);
 
   const canChangeRole =
     conversationRoleRepository.canChangeParticipantRoles(activeConversation) && !currentUser.isMe && !isTemporaryGuest;
@@ -149,10 +148,10 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
 
       <FadingScrollbar className="panel__content">
         <UserDetails
+          renderParticipantBadges={renderParticipantBadges}
           participant={currentUser}
           badge={teamRepository.getRoleBadge(currentUser.id)}
           isGroupAdmin={isAdmin}
-          isSelfVerified={isSelfVerified}
           classifiedDomains={classifiedDomains}
         />
 

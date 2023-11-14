@@ -17,11 +17,10 @@
  *
  */
 
-import React, {CSSProperties, useEffect} from 'react';
+import React, {CSSProperties} from 'react';
 
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
-import {E2eiConversationState} from '@wireapp/core/lib/messagingProtocols/mls';
-import {container} from 'tsyringe';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {
   CertificateExpiredIcon,
@@ -31,12 +30,12 @@ import {
   ProteusVerified,
 } from '@wireapp/react-ui-kit';
 
+import {ClientEntity} from 'src/script/client';
 import {ConversationVerificationState} from 'src/script/conversation/ConversationVerificationState';
 import {Conversation} from 'src/script/entity/Conversation';
-import {Core} from 'src/script/service/CoreSingleton';
+import {User} from 'src/script/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
-import {base64ToArray} from 'Util/util';
 
 export enum MLSStatuses {
   VALID = 'valid',
@@ -47,7 +46,6 @@ export enum MLSStatuses {
 
 interface VerificationBadgesProps {
   conversationProtocol?: ConversationProtocol;
-  isMLSVerified?: boolean;
   isProteusVerified?: boolean;
   MLSStatus?: MLSStatuses;
   displayTitle?: boolean;
@@ -70,34 +68,45 @@ const title = (isMLSConversation = false): CSSProperties => ({
   marginRight: '4px',
 });
 
-const useVerificationState = (conversation: Conversation, core = container.resolve(Core)) => {
-  const [MLSVerificationState, setMLSVerificationState] = React.useState<MLSStatuses | undefined>();
-  const {verification_state: proteusVerificationState} = useKoSubscribableChildren(conversation, [
+const useConversationVerificationState = (conversation: Conversation) => {
+  const {verification_state: proteusVerificationState, mlsVerificationState} = useKoSubscribableChildren(conversation, [
     'verification_state',
+    'mlsVerificationState',
   ]);
+  const mlsState = mlsVerificationState === ConversationVerificationState.VERIFIED ? MLSStatuses.VALID : undefined;
+  return {MLS: mlsState, proteus: proteusVerificationState};
+};
 
-  useEffect(() => {
-    if (!conversation.groupId) {
-      return;
-    }
+export const UserVerificationBadges = ({user, conversation}: {user: User; conversation: Conversation}) => {
+  const {is_verified: isProteusVerified} = useKoSubscribableChildren(user, ['is_verified']);
 
-    core.service?.e2eIdentity?.getConversationState(base64ToArray(conversation.groupId)).then(state => {
-      setMLSVerificationState(state === E2eiConversationState.Verified ? MLSStatuses.VALID : undefined);
-    });
-  });
+  return <VerificationBadges isProteusVerified={isProteusVerified} />;
+};
 
-  return {MLS: MLSVerificationState, proteus: proteusVerificationState};
+export const DeviceVerificationBadges = ({
+  device,
+  userId,
+  groupId,
+}: {
+  device: ClientEntity;
+  userId: QualifiedId;
+  groupId?: string;
+}) => {
+  return <VerificationBadges isProteusVerified={device.meta?.isVerified?.() ?? false} />;
 };
 
 type ConversationVerificationBadgeProps = {
   conversation: Conversation;
+  displayTitle?: boolean;
 };
-export const ConversationVerificationBadges = ({conversation}: ConversationVerificationBadgeProps) => {
-  const verificationState = useVerificationState(conversation);
+export const ConversationVerificationBadges = ({conversation, displayTitle}: ConversationVerificationBadgeProps) => {
+  const verificationState = useConversationVerificationState(conversation);
+
   return (
     <VerificationBadges
       conversationProtocol={conversation.protocol}
       MLSStatus={verificationState.MLS}
+      displayTitle={displayTitle}
       isProteusVerified={verificationState.proteus === ConversationVerificationState.VERIFIED}
     />
   );
@@ -105,12 +114,11 @@ export const ConversationVerificationBadges = ({conversation}: ConversationVerif
 
 export const VerificationBadges: React.FC<VerificationBadgesProps> = ({
   conversationProtocol,
-  isMLSVerified = false,
   isProteusVerified = false,
   MLSStatus,
   displayTitle = false,
 }) => {
-  if (!isMLSVerified && !isProteusVerified) {
+  if (!MLSStatus && !isProteusVerified) {
     return null;
   }
 
@@ -121,8 +129,8 @@ export const VerificationBadges: React.FC<VerificationBadgesProps> = ({
   const conversationHasProtocol = !!conversationProtocol;
 
   const showMLSBadge = conversationHasProtocol
-    ? conversationProtocol === ConversationProtocol.MLS && isMLSVerified
-    : isMLSVerified;
+    ? conversationProtocol === ConversationProtocol.MLS && !!MLSStatus
+    : !!MLSStatus;
 
   const showProteusBadge = conversationHasProtocol
     ? conversationProtocol === ConversationProtocol.PROTEUS && isProteusVerified

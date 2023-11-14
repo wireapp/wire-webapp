@@ -53,11 +53,7 @@ export const DetailedDevice: React.FC<DeviceProps> = ({
         <span>{device.model}</span>
 
         {/* Badges to display: None, Proteus, MLS (Valid), MLS (Not Activated), MLS (Expires Soon), MLS (Expired), , MLS (Revoked) */}
-        <VerificationBadges
-          isProteusVerified={isProteusVerified}
-          isMLSVerified={!!mlsFingerprint}
-          MLSStatus={certificateState}
-        />
+        <VerificationBadges isProteusVerified={isProteusVerified} MLSStatus={certificateState} />
       </h3>
 
       {mlsFingerprint && (

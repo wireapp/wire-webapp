@@ -60,7 +60,6 @@ describe('ClientMapper', () => {
       expect(clientEntity.location?.lat).toBe(clientPayload.location.lat);
       expect(clientEntity.location?.lon).toBe(clientPayload.location.lon);
       expect(clientEntity.meta.isVerified?.()).toBe(false);
-      expect(clientEntity.meta.isMLSVerified?.()).toBe(false);
       expect(clientEntity.model).toBe(clientPayload.model);
       expect(clientEntity.time).toBe(clientPayload.time);
       expect(clientEntity.type).toBe(ClientType.TEMPORARY);
@@ -76,7 +75,6 @@ describe('ClientMapper', () => {
       expect(clientEntity.id).toBe(clientPayload.id);
       expect(clientEntity.class).toBe(clientPayload.class);
       expect(clientEntity.meta.isVerified?.()).toBe(false);
-      expect(clientEntity.meta.isMLSVerified?.()).toBe(false);
       expect(clientEntity.isPermanent()).toBe(false);
       expect(clientEntity.isTemporary()).toBe(false);
     });
@@ -147,7 +145,6 @@ describe('ClientMapper', () => {
       expect(clientEntity.location?.lat).toBe(clientPayload.location.lat);
       expect(clientEntity.location?.lon).toBe(clientPayload.location.lon);
       expect(clientEntity.meta.isVerified?.()).toBe(false);
-      expect(clientEntity.meta.isMLSVerified?.()).toBe(false);
       expect(clientEntity.model).toBe(clientPayload.model);
       expect(clientEntity.time).toBe(clientPayload.time);
       expect(clientEntity.type).toBe(ClientType.PERMANENT);
@@ -170,7 +167,6 @@ describe('ClientMapper', () => {
       expect(clientEntity.location?.lat).toBe(clientPayload.location.lat);
       expect(clientEntity.location?.lon).toBe(clientPayload.location.lon);
       expect(clientEntity.meta.isVerified?.()).toBe(false);
-      expect(clientEntity.meta.isMLSVerified?.()).toBe(false);
       expect(clientEntity.model).toBe(clientPayload.model);
       expect(clientEntity.time).toBe(clientPayload.time);
       expect(clientEntity.type).toBe(ClientType.PERMANENT);
