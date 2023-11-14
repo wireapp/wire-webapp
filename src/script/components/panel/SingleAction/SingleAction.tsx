@@ -35,7 +35,7 @@ export interface SingleActionProps {
   onCancel: (action: any) => void;
 }
 
-const SingleAction: React.FC<SingleActionProps> = ({item, onCancel}) => {
+const SingleAction = ({item, onCancel}: SingleActionProps) => {
   return (
     <FlexBox justify="space-evenly">
       <Button variant={ButtonVariant.SECONDARY} onClick={onCancel} data-uie-name="do-close">
