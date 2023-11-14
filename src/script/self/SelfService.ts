@@ -23,14 +23,24 @@ import type {Consent, Self} from '@wireapp/api-client/lib/self/';
 import type {UserUpdate} from '@wireapp/api-client/lib/user/';
 import {container} from 'tsyringe';
 
-import {getLogger} from 'Util/Logger';
-
 import {APIClient} from '../service/APIClientSingleton';
+import {Core} from '../service/CoreSingleton';
 
 export class SelfService {
-  private readonly logger = getLogger('ConversationService');
+  constructor(
+    private readonly apiClient = container.resolve(APIClient),
+    private readonly core = container.resolve(Core),
+  ) {}
 
-  constructor(private readonly apiClient = container.resolve(APIClient)) {}
+  private get coreSelfService() {
+    const selfService = this.core.service?.self;
+
+    if (!selfService) {
+      throw new Error('Self service not available');
+    }
+
+    return selfService;
+  }
 
   deleteSelf(password?: string): Promise<void> {
     return this.apiClient.api.self.deleteSelf({password});
@@ -74,11 +84,6 @@ export class SelfService {
   }
 
   public async putSupportedProtocols(supportedProtocols: ConversationProtocol[]): Promise<void> {
-    if (!this.apiClient.backendFeatures.supportsMLS) {
-      this.logger.warn('Self supported protocols were not updated, because MLS is not supported by the backend');
-      return;
-    }
-
-    return this.apiClient.api.self.putSupportedProtocols(supportedProtocols);
+    return this.coreSelfService.putSupportedProtocols(supportedProtocols);
   }
 }

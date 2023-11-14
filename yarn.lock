@@ -4957,16 +4957,27 @@ __metadata:
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 "@wireapp/api-client@npm:^26.7.2":
   version: 26.7.2
   resolution: "@wireapp/api-client@npm:26.7.2"
+=======
+"@wireapp/api-client@npm:^26.5.2":
+  version: 26.5.2
+  resolution: "@wireapp/api-client@npm:26.5.2"
+>>>>>>> 847d7643f (runfix: use core methods to prevent wrong supported protocols)
   dependencies:
     "@wireapp/commons": ^5.2.3
     "@wireapp/priority-queue": ^2.1.4
     "@wireapp/protocol-messaging": 1.44.0
+<<<<<<< HEAD
     axios: 1.6.2
     axios-retry: 3.9.1
     exponential-backoff: 3.1.1
+=======
+    axios: 1.6.1
+    axios-retry: 3.8.1
+>>>>>>> 847d7643f (runfix: use core methods to prevent wrong supported protocols)
     http-status-codes: 2.3.0
     logdown: 3.3.1
     pako: 2.1.0
@@ -4975,7 +4986,11 @@ __metadata:
     tough-cookie: 4.1.3
     ws: 8.15.1
     zod: 3.22.4
+<<<<<<< HEAD
   checksum: 41cdf2b889a8fa40cd813f453e389b7eca78a10b2afc84ac227371d71ed093bb839069b6cfd1af4c225d9d878e14d8a1f645b1eff6b72df5b30bcced72eecc59
+=======
+  checksum: f118cc9ab64dc4a7ea07a61c506829784d92ecad5c9473c0b40701d32c9ce6171273291060119ba9bba86c13ebe9611030e73e0a93f764dabadd3ed7697b8395
+>>>>>>> 847d7643f (runfix: use core methods to prevent wrong supported protocols)
   languageName: node
   linkType: hard
 
@@ -4993,7 +5008,30 @@ __metadata:
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 "@wireapp/commons@npm:5.2.3, @wireapp/commons@npm:^5.2.3":
+  version: 5.2.3
+  resolution: "@wireapp/commons@npm:5.2.3"
+=======
+"@wireapp/commons@npm:5.2.2":
+  version: 5.2.2
+  resolution: "@wireapp/commons@npm:5.2.2"
+>>>>>>> 847d7643f (runfix: use core methods to prevent wrong supported protocols)
+  dependencies:
+    ansi-regex: 5.0.1
+    fs-extra: 11.1.0
+    logdown: 3.3.1
+    platform: 1.3.6
+  checksum: 3cc801e52318db7cb474dcc22809652a91d39916124ed88de7cd413006d62893b84ecb5700ac3f74953a26aea311a3895ebb53b20ab4508f503ca1151c82be9f
+  languageName: node
+  linkType: hard
+
+<<<<<<< HEAD
+"@wireapp/copy-config@npm:2.1.12":
+  version: 2.1.12
+  resolution: "@wireapp/copy-config@npm:2.1.12"
+=======
+"@wireapp/commons@npm:^5.2.3":
   version: 5.2.3
   resolution: "@wireapp/commons@npm:5.2.3"
   dependencies:
@@ -5005,9 +5043,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/copy-config@npm:2.1.12":
-  version: 2.1.12
-  resolution: "@wireapp/copy-config@npm:2.1.12"
+"@wireapp/copy-config@npm:2.1.10":
+  version: 2.1.10
+  resolution: "@wireapp/copy-config@npm:2.1.10"
+>>>>>>> 847d7643f (runfix: use core methods to prevent wrong supported protocols)
   dependencies:
     axios: 1.6.2
     copy: 0.3.2
@@ -5028,6 +5067,7 @@ __metadata:
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 "@wireapp/core@npm:43.2.0":
   version: 43.2.0
   resolution: "@wireapp/core@npm:43.2.0"
@@ -5042,6 +5082,22 @@ __metadata:
     "@wireapp/store-engine-dexie": ^2.1.7
     axios: 1.6.2
     bazinga64: ^6.3.4
+=======
+"@wireapp/core@npm:42.20.0":
+  version: 42.20.0
+  resolution: "@wireapp/core@npm:42.20.0"
+  dependencies:
+    "@wireapp/api-client": ^26.5.2
+    "@wireapp/commons": ^5.2.3
+    "@wireapp/core-crypto": 1.0.0-rc.16
+    "@wireapp/cryptobox": 12.8.0
+    "@wireapp/promise-queue": ^2.2.8
+    "@wireapp/protocol-messaging": 1.44.0
+    "@wireapp/store-engine": 5.1.4
+    "@wireapp/store-engine-dexie": ^2.1.6
+    axios: 1.6.1
+    bazinga64: ^6.3.3
+>>>>>>> 847d7643f (runfix: use core methods to prevent wrong supported protocols)
     deepmerge-ts: 5.1.0
     hash.js: 1.1.7
     http-status-codes: 2.3.0
@@ -5050,7 +5106,11 @@ __metadata:
     long: ^5.2.0
     uuidjs: 4.2.13
     zod: 3.22.4
+<<<<<<< HEAD
   checksum: ea2a996c65111784be4b3befe21d5983d5d38969b9f58dea2d4a261b101a53f3dbf22504b5e0ab3842c65df2dc84188a08e848661a95bad3a605d80440533e8f
+=======
+  checksum: caeb5d03263b25c2de3013d22a6644dcc59ac079858808bc3094724d0bd1d23b47d076e9adeb4d24a1558ee7594c4ddbb78b505217d6709270a0c4c3fdf2f0ad
+>>>>>>> 847d7643f (runfix: use core methods to prevent wrong supported protocols)
   languageName: node
   linkType: hard
 
@@ -5882,6 +5942,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"axios@npm:1.6.1":
+  version: 1.6.1
+  resolution: "axios@npm:1.6.1"
+  dependencies:
+    follow-redirects: ^1.15.0
+    form-data: ^4.0.0
+    proxy-from-env: ^1.1.0
+  checksum: 573f03f59b7487d54551b16f5e155d1d130ad4864ed32d1da93d522b78a57123b34e3bde37f822a65ee297e79f1db840f9ad6514addff50d3cbf5caeed39e8dc
+  languageName: node
+  linkType: hard
+
 "axobject-query@npm:^3.1.1":
   version: 3.2.1
   resolution: "axobject-query@npm:3.2.1"
@@ -6126,9 +6197,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 "beautiful-react-hooks@npm:^5.0.1":
   version: 5.0.1
   resolution: "beautiful-react-hooks@npm:5.0.1"
+=======
+"bazinga64@npm:^6.3.3":
+  version: 6.3.3
+  resolution: "bazinga64@npm:6.3.3"
+  checksum: 0bc0ab0e9c5027958a086967ab85ff28e4061ee681546090789a5bd45294e380653f482bd7608dc9aa34d7d7a85c455b5f4bc6577ea5e47796220377c9c50d9c
+  languageName: node
+  linkType: hard
+
+"beautiful-react-hooks@npm:^5.0.0":
+  version: 5.0.0
+  resolution: "beautiful-react-hooks@npm:5.0.0"
+>>>>>>> 847d7643f (runfix: use core methods to prevent wrong supported protocols)
   dependencies:
     lodash.debounce: ^4.0.8
     lodash.throttle: ^4.1.1
@@ -17685,9 +17769,15 @@ __metadata:
     "@types/underscore": 1.11.15
     "@types/webpack-env": 1.18.4
     "@wireapp/avs": 9.5.2
+<<<<<<< HEAD
     "@wireapp/commons": 5.2.3
     "@wireapp/copy-config": 2.1.12
     "@wireapp/core": 43.2.0
+=======
+    "@wireapp/commons": 5.2.2
+    "@wireapp/copy-config": 2.1.10
+    "@wireapp/core": 42.20.0
+>>>>>>> 847d7643f (runfix: use core methods to prevent wrong supported protocols)
     "@wireapp/eslint-config": 3.0.4
     "@wireapp/prettier-config": 0.6.3
     "@wireapp/react-ui-kit": 9.12.3

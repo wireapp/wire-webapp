@@ -22,6 +22,7 @@ import type {User as APIClientUser, QualifiedHandle, QualifiedId} from '@wireapp
 import {container} from 'tsyringe';
 
 import {APIClient} from '../service/APIClientSingleton';
+import {Core} from '../service/CoreSingleton';
 import {UserRecord} from '../storage';
 import {StorageSchemata} from '../storage/StorageSchemata';
 import {StorageService} from '../storage/StorageService';
@@ -33,8 +34,19 @@ export class UserService {
   constructor(
     private readonly storageService = container.resolve(StorageService),
     private readonly apiClient = container.resolve(APIClient),
+    private readonly core = container.resolve(Core),
   ) {
     this.USER_STORE_NAME = StorageSchemata.OBJECT_STORE.USERS;
+  }
+
+  private get coreUserService() {
+    const userService = this.core.service?.user;
+
+    if (!userService) {
+      throw new Error('User service not available');
+    }
+
+    return userService;
   }
 
   //##############################################################################
@@ -154,10 +166,6 @@ export class UserService {
    * Get the list of user's supported protocols.
    */
   public async getUserSupportedProtocols(userId: QualifiedId): Promise<ConversationProtocol[]> {
-    // Clients that uses version below the one supporting MLS, are not aware of MLS, we default to Proteus in this case.
-    if (!this.apiClient.backendFeatures.supportsMLS) {
-      return [ConversationProtocol.PROTEUS];
-    }
-    return this.apiClient.api.user.getUserSupportedProtocols(userId);
+    return this.coreUserService.getUserSupportedProtocols(userId);
   }
 }
