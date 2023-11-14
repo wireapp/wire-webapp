@@ -17,15 +17,11 @@
  *
  */
 
-import ko from 'knockout';
 import {singleton} from 'tsyringe';
 
 import {ClientEntity} from './ClientEntity';
 
 @singleton()
 export class ClientState {
-  clients: ko.PureComputed<ClientEntity[]>;
   currentClient: ClientEntity | undefined;
-
-  constructor() {}
 }
