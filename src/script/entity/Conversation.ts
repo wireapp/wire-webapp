@@ -126,7 +126,6 @@ export class Conversation {
   public readonly is_loaded: ko.Observable<boolean>;
   public readonly is_pending: ko.Observable<boolean>;
   public readonly is_verified: ko.PureComputed<boolean | undefined>;
-  public readonly isMLSVerified: ko.PureComputed<boolean | undefined>;
   public readonly is1to1: ko.PureComputed<boolean>;
   public readonly isActiveParticipant: ko.PureComputed<boolean>;
   public readonly isClearable: ko.PureComputed<boolean>;
@@ -167,8 +166,8 @@ export class Conversation {
   public teamId: string;
   public readonly type: ko.Observable<CONVERSATION_TYPE>;
   public readonly unreadState: ko.PureComputed<UnreadState>;
-  public readonly verification_state: ko.Observable<ConversationVerificationState>;
-  public readonly mlsVerificationState: ko.Observable<ConversationVerificationState>;
+  public readonly verification_state = ko.observable(ConversationVerificationState.UNVERIFIED);
+  public readonly mlsVerificationState = ko.observable(ConversationVerificationState.UNVERIFIED);
   public readonly withAllTeamMembers: ko.Observable<boolean>;
   public readonly hasExternal: ko.PureComputed<boolean>;
   public readonly hasFederatedUsers: ko.PureComputed<boolean>;
@@ -279,8 +278,6 @@ export class Conversation {
     // E2EE conversation states
     this.archivedState = ko.observable(false).extend({notify: 'always'});
     this.mutedState = ko.observable(NOTIFICATION_STATE.EVERYTHING);
-    this.verification_state = ko.observable(ConversationVerificationState.UNVERIFIED);
-    this.mlsVerificationState = ko.observable(ConversationVerificationState.UNVERIFIED);
 
     this.archivedTimestamp = ko.observable(0);
     this.cleared_timestamp = ko.observable(0);
@@ -326,13 +323,6 @@ export class Conversation {
       }
 
       return this.allUserEntities().every(userEntity => userEntity.is_verified());
-    });
-    this.isMLSVerified = ko.pureComputed(() => {
-      if (!this.hasInitializedUsers()) {
-        return undefined;
-      }
-
-      return this.allUserEntities().every(userEntity => userEntity.isMLSVerified());
     });
 
     this.legalHoldStatus = ko.observable(LegalHoldStatus.DISABLED);
@@ -968,13 +958,6 @@ export class Conversation {
       ? this.participating_user_ets().concat(this.selfUser())
       : this.participating_user_ets();
     return userEntities.filter(userEntity => !userEntity.is_verified());
-  }
-
-  getUsersWithUnverifiedMLSClients(): User[] {
-    const userEntities = this.selfUser()
-      ? this.participating_user_ets().concat(this.selfUser())
-      : this.participating_user_ets();
-    return userEntities.filter(userEntity => !userEntity.isMLSVerified());
   }
 
   getAllUserEntities(): User[] {
