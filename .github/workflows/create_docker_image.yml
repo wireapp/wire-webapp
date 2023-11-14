@@ -1,0 +1,69 @@
+name: Create Release Artifact
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'tagname for the Artifact'
+        required: true
+        type: string
+
+      create_release:
+        description: 'Wether or not a release entry should be created on github'
+        required: false
+        default: true
+        type: boolean
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  create_image:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 16.x
+          cache: 'yarn'
+
+      - name: Install JS dependencies
+        run: yarn --immutable
+
+      - name: Test
+        run: |
+          set -o pipefail
+          yarn test --coverage --coverage-reporters=lcov --detectOpenHandles=false 2>&1 | tee ./unit-tests.log
+
+      - name: Build
+        run: yarn build:prod
+
+      - name: Set short sha
+        id: vars
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Push Docker image
+        env:
+          DOCKER_PASSWORD: ${{secrets.WEBTEAM_QUAY_PASSWORD}}
+          DOCKER_USERNAME: ${{secrets.WEBTEAM_QUAY_USERNAME}}
+        run: yarn docker "${{inputs.tag}}-${{ steps.vars.outputs.sha_short }}"
+
+      - name: Create GitHub release
+        if: ${{inputs.create_release}}
+        id: create_release_production
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{github.token}}
+        with:
+          tag_name: ${{inputs.tag}}
+          name: ${{inputs.tag}}
+          files: ./unit-tests.log
+          draft: false
+          prerelease: true
