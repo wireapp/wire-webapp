@@ -17,11 +17,15 @@
  *
  */
 
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {Self} from '@wireapp/api-client/lib/self/';
+import logdown from 'logdown';
 
 import {APIClient} from '@wireapp/api-client';
 
 export class SelfService {
+  private readonly logger = logdown('@wireapp/core/SelfService');
+
   constructor(private readonly apiClient: APIClient) {}
 
   public async checkUsername(username: string): Promise<boolean> {
@@ -56,5 +60,22 @@ export class SelfService {
 
   public setUsername(username: string): Promise<void> {
     return this.apiClient.api.self.putHandle({handle: username});
+  }
+
+  /**
+   * Update self user's list of supported-protocols
+   * @param supportedProtocols The list of supported protocols
+   */
+  public async putSupportedProtocols(supportedProtocols: ConversationProtocol[]) {
+    if (!this.apiClient.backendFeatures.supportsMLS) {
+      this.logger.warn('Self supported protocols were not updated, because endpoint is not supported by backend');
+      return;
+    }
+
+    if (!supportedProtocols || supportedProtocols.length === 0) {
+      throw new Error('Supported protocols must be a non-empty protocols list');
+    }
+
+    return this.apiClient.api.self.putSupportedProtocols(supportedProtocols);
   }
 }

@@ -17,6 +17,7 @@
  *
  */
 
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId, User} from '@wireapp/api-client/lib/user/';
 
 import {APIClient} from '@wireapp/api-client';
@@ -37,5 +38,18 @@ export class UserService {
       return [];
     }
     return this.apiClient.api.user.postListUsers({qualified_ids: userIds});
+  }
+
+  /**
+   * Get the list of other user's supported protocols.
+   */
+  public async getUserSupportedProtocols(userId: QualifiedId): Promise<ConversationProtocol[]> {
+    // Clients that uses version below the one supporting MLS, are not aware of user's supported protocols, we default to Proteus in this case.
+    if (!this.apiClient.backendFeatures.supportsMLS) {
+      return [ConversationProtocol.PROTEUS];
+    }
+
+    const supportedProtocols = await this.apiClient.api.user.getUserSupportedProtocols(userId);
+    return supportedProtocols.length > 0 ? supportedProtocols : [ConversationProtocol.PROTEUS];
   }
 }
