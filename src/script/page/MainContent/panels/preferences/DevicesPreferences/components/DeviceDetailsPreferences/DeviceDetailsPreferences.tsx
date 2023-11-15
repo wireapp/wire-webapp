@@ -33,6 +33,7 @@ interface DevicesPreferencesProps {
   device: ClientEntity;
   renderDeviceBadges?: (device: ClientEntity) => React.ReactNode;
   getFingerprint: (device: ClientEntity) => Promise<string | undefined>;
+  getCertificate: (deviceId: string) => Promise<string | undefined>;
   onClose: () => void;
   onRemove: (device: ClientEntity) => void;
   onResetSession: (device: ClientEntity) => Promise<void>;
@@ -49,6 +50,7 @@ export const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
   device,
   renderDeviceBadges,
   getFingerprint,
+  getCertificate,
   onVerify,
   onRemove,
   onClose,
@@ -92,10 +94,10 @@ export const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
 
           <DetailedDevice
             renderDeviceBadges={renderDeviceBadges}
+            getCertificate={getCertificate}
             device={device}
             fingerprint={fingerprint || ''}
             showVerificationStatus={false}
-            isOtherDevice
           />
 
           <div className="participant-devices__verify slider">

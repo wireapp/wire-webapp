@@ -83,9 +83,22 @@ export const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
     );
   };
 
+  const getDeviceCertificate = async (deviceId: string) => {
+    if (deviceId === currentClient?.id) {
+      return e2eIdentity.getCurrentDeviceCertificateData();
+    }
+    const selfConversation = conversationState.selfMLSConversation();
+    if (!selfConversation) {
+      return undefined;
+    }
+    const identity = await e2eIdentity.getDeviceIdentity(selfConversation.groupId, selfUser.qualifiedId, deviceId);
+    return identity?.certificate;
+  };
+
   if (selectedDevice) {
     return (
       <DeviceDetailsPreferences
+        getCertificate={getDeviceCertificate}
         renderDeviceBadges={renderDeviceBadges}
         device={selectedDevice}
         getFingerprint={getFingerprint}
@@ -102,8 +115,6 @@ export const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
     );
   }
 
-  const certificate = e2eIdentity.getCertificateData();
-
   return (
     <PreferencesPage title={t('preferencesDevices')}>
       <fieldset className="preferences-section" data-uie-name="preferences-device-current">
@@ -113,7 +124,7 @@ export const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
             isCurrentDevice
             device={currentClient}
             fingerprint={localFingerprint}
-            certificate={certificate}
+            getCertificate={getDeviceCertificate}
             isProteusVerified={isSelfClientVerified}
           />
         )}

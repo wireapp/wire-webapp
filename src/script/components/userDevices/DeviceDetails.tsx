@@ -109,7 +109,7 @@ export const DeviceDetails = ({
 
   return (
     <div className={cx('participant-devices__header', {'participant-devices__header--padding': !noPadding})}>
-      {mlsFingerprint && <MLSDeviceDetails fingerprint={mlsFingerprint} isOtherDevice />}
+      {mlsFingerprint && <MLSDeviceDetails fingerprint={mlsFingerprint} />}
 
       <div className="device-proteus-details">
         <h3 className="device-details-title paragraph-body-3">{t('participantDevicesProteusDeviceVerification')}</h3>
