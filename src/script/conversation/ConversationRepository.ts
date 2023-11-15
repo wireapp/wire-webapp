@@ -3625,7 +3625,7 @@ export class ConversationRepository {
   private async handleConversationProtocolUpdatedToMLS(conversation: Conversation): Promise<void> {
     // If protocol was changed to mls and there was an ongoing call we need to inform a user about it.
     const ongoingCall = this.callingRepository.findCall(conversation.qualifiedId);
-    if (!ongoingCall) {
+    if (!ongoingCall || !ongoingCall.isActive()) {
       return;
     }
 

@@ -2160,7 +2160,9 @@ describe('ConversationRepository', () => {
         const injectEventMock = jest
           .spyOn(conversationRepository['eventRepository'], 'injectEvent')
           .mockImplementation(jest.fn());
-        jest.spyOn(conversationRepository['callingRepository'], 'findCall').mockReturnValue({} as any);
+        jest
+          .spyOn(conversationRepository['callingRepository'], 'findCall')
+          .mockReturnValue({isActive: () => true} as any);
 
         await conversationRepository.updateConversationProtocol(conversation, newProtocol);
 
@@ -2168,6 +2170,54 @@ describe('ConversationRepository', () => {
           [mockedProtocolUpdateEventResponse, EventRepository.SOURCE.BACKEND_RESPONSE],
           [expect.objectContaining({type: ClientEvent.CONVERSATION.MLS_MIGRATION_FINALISATION_ONGOING_CALL})],
         ]);
+      });
+
+      it("should NOT inject a system message if conversation protocol changed to mls if we're not atively participating in a call", async () => {
+        jest.useFakeTimers();
+        const conversation = _generateConversation();
+        const selfUser = generateUser();
+        conversation.selfUser(selfUser);
+        const conversationRepository = await testFactory.exposeConversationActors();
+        const newProtocol = ConversationProtocol.MLS;
+
+        const mockedProtocolUpdateEventResponse = {
+          data: {
+            protocol: newProtocol,
+          },
+          qualified_conversation: conversation.qualifiedId,
+          time: '2020-10-13T14:00:00.000Z',
+          type: CONVERSATION_EVENT.PROTOCOL_UPDATE,
+        } as ConversationProtocolUpdateEvent;
+
+        jest
+          .spyOn(conversationRepository['conversationService'], 'updateConversationProtocol')
+          .mockResolvedValueOnce(mockedProtocolUpdateEventResponse);
+
+        const newCipherSuite = 1;
+        const newEpoch = 2;
+        const mockedConversationResponse = generateAPIConversation({
+          protocol: newProtocol,
+          overwites: {cipher_suite: newCipherSuite, epoch: newEpoch},
+        });
+        jest
+          .spyOn(conversationRepository['conversationService'], 'getConversationById')
+          .mockResolvedValueOnce(mockedConversationResponse);
+
+        const injectEventMock = jest
+          .spyOn(conversationRepository['eventRepository'], 'injectEvent')
+          .mockImplementation(jest.fn());
+        jest
+          .spyOn(conversationRepository['callingRepository'], 'findCall')
+          .mockReturnValue({isActive: () => false} as any);
+
+        await conversationRepository.updateConversationProtocol(conversation, newProtocol);
+
+        expect(injectEventMock).toHaveBeenCalledWith(
+          mockedProtocolUpdateEventResponse,
+          EventRepository.SOURCE.BACKEND_RESPONSE,
+        );
+
+        expect(injectEventMock).toHaveBeenCalledTimes(1);
       });
     });
 
