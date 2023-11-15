@@ -26,7 +26,7 @@ import {Core} from 'src/script/service/CoreSingleton';
 import {UserState} from 'src/script/user/UserState';
 import * as util from 'Util/util';
 
-import {E2EIHandler, E2EIHandlerStep} from './E2EIdentity';
+import {E2EIHandler, E2EIHandlerStep} from './E2EIdentityEnrolment';
 import {getModalOptions, ModalType} from './Modals';
 import {OIDCService} from './OIDCService/OIDCService';
 
@@ -140,7 +140,7 @@ describe('E2EIHandler', () => {
     jest.spyOn(container.resolve(Core), 'enrollE2EI').mockResolvedValueOnce(true);
 
     const instance = E2EIHandler.getInstance(params);
-    await instance['enrollE2EI']();
+    await instance['enroll']();
 
     expect(instance['currentStep']).toBe(E2EIHandlerStep.SUCCESS);
   });
@@ -151,7 +151,7 @@ describe('E2EIHandler', () => {
     jest.spyOn(container.resolve(UserState), 'self').mockImplementationOnce(() => user);
 
     const instance = E2EIHandler.getInstance(params);
-    await instance['enrollE2EI']();
+    await instance['enroll']();
     expect(instance['currentStep']).toBe(E2EIHandlerStep.ERROR);
   });
 
@@ -167,7 +167,7 @@ describe('E2EIHandler', () => {
 
   it('should display loading message when enrolled', async () => {
     const handler = E2EIHandler.getInstance(params);
-    await handler['enrollE2EI']();
+    await handler['enroll']();
     expect(getModalOptions).toHaveBeenCalledWith(
       expect.objectContaining({
         type: ModalType.LOADING,
@@ -180,7 +180,7 @@ describe('E2EIHandler', () => {
 
     const handler = E2EIHandler.getInstance(params);
     handler['showLoadingMessage'] = jest.fn();
-    await handler['enrollE2EI']();
+    await handler['enroll']();
     expect(getModalOptions).toHaveBeenCalledWith(
       expect.objectContaining({
         type: ModalType.SUCCESS,
@@ -193,7 +193,7 @@ describe('E2EIHandler', () => {
 
     const handler = E2EIHandler.getInstance(params);
     handler['showLoadingMessage'] = jest.fn();
-    await handler['enrollE2EI']();
+    await handler['enroll']();
     expect(getModalOptions).toHaveBeenCalledWith(
       expect.objectContaining({
         type: ModalType.ERROR,

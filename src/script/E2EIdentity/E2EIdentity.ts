@@ -18,301 +18,42 @@
  */
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {WireIdentity} from '@wireapp/core/lib/messagingProtocols/mls';
 import {container} from 'tsyringe';
 
-import {PrimaryModal, removeCurrentModal} from 'Components/Modals/PrimaryModal';
-import {Config} from 'src/script/Config';
 import {Core} from 'src/script/service/CoreSingleton';
-import {UserState} from 'src/script/user/UserState';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {removeUrlParameters} from 'Util/UrlUtil';
-import {supportsMLS} from 'Util/util';
+import {base64ToArray} from 'Util/util';
 
-import {DelayTimerService} from './DelayTimer/DelayTimer';
-import {getModalOptions, ModalType} from './Modals';
-import {getOIDCServiceInstance} from './OIDCService';
-import {OIDCServiceStore} from './OIDCService/OIDCServiceStorage';
+const core = container.resolve(Core);
 
-export enum E2EIHandlerStep {
-  UNINITIALIZED = 'uninitialized',
-  INITIALIZED = 'initialized',
-  ENROLL = 'enroll',
-  SUCCESS = 'success',
-  ERROR = 'error',
-  SNOOZE = 'snooze',
+/**
+ * @param groupId id of the group
+ * @param clientIdsWithUser client ids with user data
+ * Returns devices E2EI certificates
+ */
+export async function getUserDeviceEntities(
+  groupId: string | Uint8Array,
+  clientIdsWithUser: Record<string, QualifiedId>,
+) {
+  return core.service?.e2eIdentity?.getUserDeviceEntities(groupId, clientIdsWithUser);
 }
 
-interface E2EIHandlerParams {
-  discoveryUrl: string;
-  gracePeriodInSeconds: number;
+export async function getConversationState(groupId: string) {
+  return core.service?.e2eIdentity?.getConversationState(base64ToArray(groupId));
+}
+/**
+ * Checks if E2EI has active certificate.
+ */
+export function hasActiveCertificate() {
+  return core.service?.e2eIdentity?.hasActiveCertificate();
 }
 
-class E2EIHandler {
-  private static instance: E2EIHandler | null = null;
-  private readonly core = container.resolve(Core);
-  private readonly userState = container.resolve(UserState);
-  private timer: DelayTimerService;
-  private discoveryUrl: string;
-  private gracePeriodInMS: number;
-  private currentStep: E2EIHandlerStep | null = E2EIHandlerStep.UNINITIALIZED;
-
-  private constructor({discoveryUrl, gracePeriodInSeconds}: E2EIHandlerParams) {
-    // ToDo: Do these values need to te able to be updated? Should we use a singleton with update fn?
-    this.discoveryUrl = discoveryUrl;
-    this.gracePeriodInMS = gracePeriodInSeconds * TIME_IN_MILLIS.SECOND;
-    this.timer = DelayTimerService.getInstance({
-      gracePeriodInMS: this.gracePeriodInMS,
-      gracePeriodExpiredCallback: () => null,
-      delayPeriodExpiredCallback: () => null,
-    });
+/**
+ * returns E2EI certificate data.
+ */
+export function getCertificateData() {
+  if (!hasActiveCertificate()) {
+    return undefined;
   }
 
-  private get coreE2EIService() {
-    const e2eiService = this.core.service?.e2eIdentity;
-
-    if (!e2eiService) {
-      throw new Error('E2EI Service not available');
-    }
-
-    return e2eiService;
-  }
-
-  /**
-   * Get the singleton instance of GracePeriodTimer or create a new one
-   * For the first time, params are required to create the instance
-   * After that, params are optional and can be used to update the grace period timer
-   * @param params The params to create the grace period timer
-   * @returns The singleton instance of GracePeriodTimer
-   */
-  public static getInstance(params?: E2EIHandlerParams) {
-    if (!E2EIHandler.instance) {
-      if (!params) {
-        throw new Error('GracePeriodTimer is not initialized. Please call getInstance with params.');
-      }
-      E2EIHandler.instance = new E2EIHandler(params);
-    }
-    return E2EIHandler.instance;
-  }
-
-  /**
-   * Reset the instance
-   */
-  public static resetInstance() {
-    E2EIHandler.instance = null;
-  }
-
-  /**
-   * @param E2EIHandlerParams The params to create the grace period timer
-   */
-  public updateParams({gracePeriodInSeconds, discoveryUrl}: E2EIHandlerParams) {
-    this.gracePeriodInMS = gracePeriodInSeconds * TIME_IN_MILLIS.SECOND;
-    this.discoveryUrl = discoveryUrl;
-    this.timer.updateParams({
-      gracePeriodInMS: this.gracePeriodInMS,
-      gracePeriodExpiredCallback: () => null,
-      delayPeriodExpiredCallback: () => null,
-    });
-    this.initialize();
-  }
-
-  public initialize(): void {
-    if (this.isE2EIEnabled) {
-      if (!this.hasActiveCertificate()) {
-        this.showE2EINotificationMessage();
-      }
-    }
-  }
-
-  get isE2EIEnabled(): boolean {
-    return supportsMLS() && Config.getConfig().FEATURE.ENABLE_E2EI;
-  }
-
-  private async storeRedirectTargetAndRedirect(targetURL: string): Promise<void> {
-    // store the target url in the persistent oidc service store, since the oidc service will be destroyed after the redirect
-    OIDCServiceStore.store.targetURL(targetURL);
-    const oidcService = getOIDCServiceInstance();
-    await oidcService.authenticate();
-  }
-
-  public async enrollE2EI() {
-    try {
-      // Notify user about E2EI enrollment in progress
-      this.currentStep = E2EIHandlerStep.ENROLL;
-      this.showLoadingMessage();
-      let oAuthIdToken: string | undefined;
-
-      // If the enrollment is in progress, we need to get the id token from the oidc service, since oauth should have already been completed
-      if (this.coreE2EIService.isEnrollmentInProgress()) {
-        const oidcService = getOIDCServiceInstance();
-        const userData = await oidcService.handleAuthentication();
-        if (!userData) {
-          throw new Error('Received no user data from OIDC service');
-        }
-        oAuthIdToken = userData?.id_token;
-      }
-
-      const data = await this.core.enrollE2EI(
-        this.userState.self().name(),
-        this.userState.self().username(),
-        this.discoveryUrl,
-        oAuthIdToken,
-      );
-
-      // If the data is false or we dont get the ACMEChallenge, enrollment failed
-      if (!data) {
-        throw new Error('E2EI enrollment failed');
-      }
-
-      // Check if the data is a boolean, if not, we need to handle the oauth redirect
-      if (typeof data !== 'boolean') {
-        await this.storeRedirectTargetAndRedirect(data.target);
-      }
-
-      // Notify user about E2EI enrollment success
-      // This setTimeout is needed because there was a timing with the success modal and the loading modal
-      setTimeout(() => {
-        removeCurrentModal();
-      }, 0);
-
-      this.currentStep = E2EIHandlerStep.SUCCESS;
-      this.showSuccessMessage();
-      // Remove the url parameters after enrollment
-      removeUrlParameters();
-    } catch (error) {
-      this.currentStep = E2EIHandlerStep.ERROR;
-      setTimeout(() => {
-        removeCurrentModal();
-      }, 0);
-      this.showErrorMessage();
-    }
-  }
-
-  private showLoadingMessage(): void {
-    if (this.currentStep !== E2EIHandlerStep.ENROLL) {
-      return;
-    }
-
-    const {modalOptions, modalType} = getModalOptions({
-      type: ModalType.LOADING,
-      hideClose: true,
-    });
-    PrimaryModal.show(modalType, modalOptions);
-  }
-
-  private showSuccessMessage(): void {
-    if (this.currentStep !== E2EIHandlerStep.SUCCESS) {
-      return;
-    }
-
-    const {modalOptions, modalType} = getModalOptions({
-      type: ModalType.SUCCESS,
-      hideSecondary: true,
-      hideClose: false,
-    });
-    PrimaryModal.show(modalType, modalOptions);
-  }
-
-  private async showErrorMessage(): Promise<void> {
-    if (this.currentStep !== E2EIHandlerStep.ERROR) {
-      return;
-    }
-
-    // Remove the url parameters of the failed enrollment
-    removeUrlParameters();
-    // Clear the oidc service progress
-    const oidcService = getOIDCServiceInstance();
-    await oidcService.clearProgress();
-    // Clear the e2e identity progress
-    this.coreE2EIService.clearAllProgress();
-
-    const {modalOptions, modalType} = getModalOptions({
-      type: ModalType.ERROR,
-      hideClose: true,
-      primaryActionFn: () => {
-        this.currentStep = E2EIHandlerStep.INITIALIZED;
-        void this.enrollE2EI();
-      },
-      secondaryActionFn: () => {
-        this.showE2EINotificationMessage();
-      },
-    });
-
-    PrimaryModal.show(modalType, modalOptions);
-  }
-
-  private showE2EINotificationMessage(): void {
-    // If the user has already started enrollment, don't show the notification. Instead, show the loading modal
-    // This will occur after the redirect from the oauth provider
-    if (this.coreE2EIService.isEnrollmentInProgress()) {
-      void this.enrollE2EI();
-      return;
-    }
-
-    // If the user has already snoozed the notification, don't show it again until the snooze period has expired
-    if (this.currentStep !== E2EIHandlerStep.UNINITIALIZED && this.currentStep !== E2EIHandlerStep.SNOOZE) {
-      return;
-    }
-
-    // Only initialize the timer when the it is uninitialized
-    if (this.currentStep === E2EIHandlerStep.UNINITIALIZED) {
-      this.timer.updateParams({
-        gracePeriodInMS: this.gracePeriodInMS,
-        gracePeriodExpiredCallback: () => {
-          this.showE2EINotificationMessage();
-        },
-        delayPeriodExpiredCallback: () => {
-          this.showE2EINotificationMessage();
-        },
-      });
-      this.currentStep = E2EIHandlerStep.INITIALIZED;
-    }
-
-    // If the timer is not active, show the notification
-    if (!this.timer.isDelayTimerActive()) {
-      const {modalOptions, modalType} = getModalOptions({
-        hideSecondary: !this.timer.isSnoozeTimeAvailable(),
-        primaryActionFn: () => this.enrollE2EI(),
-        secondaryActionFn: () => {
-          this.currentStep = E2EIHandlerStep.SNOOZE;
-          this.timer.delayPrompt();
-        },
-        type: ModalType.ENROLL,
-        hideClose: true,
-      });
-      PrimaryModal.show(modalType, modalOptions);
-    }
-  }
-
-  /**
-   * Checks if E2EI has active certificate.
-   */
-  public hasActiveCertificate() {
-    return this.coreE2EIService.hasActiveCertificate();
-  }
-
-  /**
-   * returns E2EI certificate data.
-   */
-  public getCertificateData() {
-    if (!this.hasActiveCertificate()) {
-      return undefined;
-    }
-
-    return this.coreE2EIService.getCertificateData();
-  }
-
-  /**
-   * @param groupId id of the group
-   * @param clientIdsWithUser client ids with user data
-   * Returns devices E2EI certificates
-   */
-  public async getUserDeviceEntities(
-    groupId: string | Uint8Array,
-    clientIdsWithUser: Record<string, QualifiedId>,
-  ): Promise<WireIdentity[]> {
-    return this.coreE2EIService.getUserDeviceEntities(groupId, clientIdsWithUser);
-  }
+  return core.service?.e2eIdentity?.getCertificateData();
 }
-
-export {E2EIHandler};

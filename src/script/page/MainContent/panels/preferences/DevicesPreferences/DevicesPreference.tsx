@@ -37,7 +37,7 @@ import {DeviceDetailsPreferences} from './components/DeviceDetailsPreferences';
 
 import {ClientState} from '../../../../../client/ClientState';
 import {ConversationState} from '../../../../../conversation/ConversationState';
-import {E2EIHandler} from '../../../../../E2EIdentity';
+import * as e2eIdentity from '../../../../../E2EIdentity';
 import {PreferencesPage} from '../components/PreferencesPage';
 
 interface DevicesPreferencesProps {
@@ -105,8 +105,7 @@ export const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
     );
   }
 
-  const e2eiIdentity = E2EIHandler.getInstance();
-  const certificate = e2eiIdentity.getCertificateData();
+  const certificate = e2eIdentity.getCertificateData();
 
   const selectDevice = async (device: ClientEntity, deviceIdentity?: WireIdentity) => {
     setSelectedDevice(device);
@@ -124,7 +123,7 @@ export const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
     }
 
     const groupId = selfConversation.groupId;
-    return e2eiIdentity.getUserDeviceEntities(groupId, {[deviceId]: selfUser});
+    return e2eIdentity.getUserDeviceEntities(groupId, {[deviceId]: selfUser});
   };
 
   return (

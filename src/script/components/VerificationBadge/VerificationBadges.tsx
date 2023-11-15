@@ -17,11 +17,10 @@
  *
  */
 
-import React, {CSSProperties, useEffect} from 'react';
+import {CSSProperties, useEffect, useState} from 'react';
 
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {container} from 'tsyringe';
 
 import {
   CertificateExpiredIcon,
@@ -33,12 +32,11 @@ import {
 
 import {ClientEntity} from 'src/script/client';
 import {ConversationVerificationState} from 'src/script/conversation/ConversationVerificationState';
+import {getUserDeviceEntities} from 'src/script/E2EIdentity';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
-import {Core} from 'src/script/service/CoreSingleton';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
-import {base64ToArray} from 'Util/util';
 
 export enum MLSStatuses {
   VALID = 'valid',
@@ -90,20 +88,16 @@ export const DeviceVerificationBadges = ({
   device,
   userId,
   groupId,
-  core = container.resolve(Core),
 }: {
   device: ClientEntity;
   userId: QualifiedId;
   groupId?: string;
-  core?: Core;
 }) => {
-  const [isMLSVerified, setIsMLSVerified] = React.useState(false);
+  const [isMLSVerified, setIsMLSVerified] = useState(false);
   useEffect(() => {
     if (groupId) {
       void (async () => {
-        const identities = await core.service?.e2eIdentity?.getUserDeviceEntities(base64ToArray(groupId), {
-          [device.id]: userId,
-        });
+        const identities = await getUserDeviceEntities(groupId, {[device.id]: userId});
         // TODO, soon coreCrypto will return a `isValid` property. Use this one to check for validity
         setIsMLSVerified(!!identities?.length);
       })();

@@ -20,10 +20,10 @@
 import {E2eiConversationState} from '@wireapp/core/lib/messagingProtocols/mls';
 import {container} from 'tsyringe';
 
+import {getConversationState} from 'src/script/E2EIdentity';
 import {VerificationMessageType} from 'src/script/message/VerificationMessageType';
 import {Core} from 'src/script/service/CoreSingleton';
 import {Logger, getLogger} from 'Util/Logger';
-import {base64ToArray} from 'Util/util';
 
 import {MLSConversation} from '../../ConversationSelectors';
 import {ConversationState} from '../../ConversationState';
@@ -84,7 +84,7 @@ class MLSConversationVerificationStateHandler {
       return;
     }
 
-    const verificationState = await this.core.service!.e2eIdentity?.getConversationState(base64ToArray(groupId));
+    const verificationState = await getConversationState(groupId);
 
     if (
       verificationState === E2eiConversationState.Degraded &&
