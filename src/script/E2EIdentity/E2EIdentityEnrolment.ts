@@ -36,7 +36,7 @@ import {OIDCServiceStore} from './OIDCService/OIDCServiceStorage';
 export enum E2EIHandlerStep {
   UNINITIALIZED = 'uninitialized',
   INITIALIZED = 'initialized',
-  ENROLL = 'enroll',
+  ENROL = 'enrol',
   SUCCESS = 'success',
   ERROR = 'error',
   SNOOZE = 'snooze',
@@ -123,7 +123,7 @@ export class E2EIHandler {
     }
   }
 
-  private get isE2EIEnabled(): boolean {
+  get isE2EIEnabled(): boolean {
     return supportsMLS() && Config.getConfig().FEATURE.ENABLE_E2EI;
   }
 
@@ -136,12 +136,12 @@ export class E2EIHandler {
 
   public async enrol() {
     try {
-      // Notify user about E2EI enrollment in progress
-      this.currentStep = E2EIHandlerStep.ENROLL;
+      // Notify user about E2EI enrolment in progress
+      this.currentStep = E2EIHandlerStep.ENROL;
       this.showLoadingMessage();
       let oAuthIdToken: string | undefined;
 
-      // If the enrollment is in progress, we need to get the id token from the oidc service, since oauth should have already been completed
+      // If the enrolment is in progress, we need to get the id token from the oidc service, since oauth should have already been completed
       if (this.coreE2EIService.isEnrollmentInProgress()) {
         const oidcService = getOIDCServiceInstance();
         const userData = await oidcService.handleAuthentication();
@@ -158,9 +158,9 @@ export class E2EIHandler {
         oAuthIdToken,
       );
 
-      // If the data is false or we dont get the ACMEChallenge, enrollment failed
+      // If the data is false or we dont get the ACMEChallenge, enrolment failed
       if (!data) {
-        throw new Error('E2EI enrollment failed');
+        throw new Error('E2EI enrolment failed');
       }
 
       // Check if the data is a boolean, if not, we need to handle the oauth redirect
@@ -168,7 +168,7 @@ export class E2EIHandler {
         await this.storeRedirectTargetAndRedirect(data.target);
       }
 
-      // Notify user about E2EI enrollment success
+      // Notify user about E2EI enrolment success
       // This setTimeout is needed because there was a timing with the success modal and the loading modal
       setTimeout(() => {
         removeCurrentModal();
@@ -176,7 +176,7 @@ export class E2EIHandler {
 
       this.currentStep = E2EIHandlerStep.SUCCESS;
       this.showSuccessMessage();
-      // Remove the url parameters after enrollment
+      // Remove the url parameters after enrolment
       removeUrlParameters();
     } catch (error) {
       this.currentStep = E2EIHandlerStep.ERROR;
@@ -188,7 +188,7 @@ export class E2EIHandler {
   }
 
   private showLoadingMessage(): void {
-    if (this.currentStep !== E2EIHandlerStep.ENROLL) {
+    if (this.currentStep !== E2EIHandlerStep.ENROL) {
       return;
     }
 
@@ -217,7 +217,7 @@ export class E2EIHandler {
       return;
     }
 
-    // Remove the url parameters of the failed enrollment
+    // Remove the url parameters of the failed enrolment
     removeUrlParameters();
     // Clear the oidc service progress
     const oidcService = getOIDCServiceInstance();
@@ -241,7 +241,7 @@ export class E2EIHandler {
   }
 
   private showE2EINotificationMessage(): void {
-    // If the user has already started enrollment, don't show the notification. Instead, show the loading modal
+    // If the user has already started enrolment, don't show the notification. Instead, show the loading modal
     // This will occur after the redirect from the oauth provider
     if (this.coreE2EIService.isEnrollmentInProgress()) {
       void this.enrol();
@@ -276,7 +276,7 @@ export class E2EIHandler {
           this.currentStep = E2EIHandlerStep.SNOOZE;
           this.timer.delayPrompt();
         },
-        type: ModalType.ENROLL,
+        type: ModalType.ENROL,
         hideClose: true,
       });
       PrimaryModal.show(modalType, modalOptions);
