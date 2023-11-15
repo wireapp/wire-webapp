@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 
 import {ClientEntity, MLSPublicKeys} from 'src/script/client/ClientEntity';
 
@@ -43,11 +43,7 @@ export const DetailedDevice: React.FC<DeviceProps> = ({
   getCertificate,
   isProteusVerified = false,
 }) => {
-  const [certificate, setCertificate] = useState<string | undefined>();
   const mlsFingerprint = device.mlsPublicKeys?.[MLSPublicKeys.ED25519];
-  useEffect(() => {
-    getCertificate?.(device.id).then(setCertificate);
-  }, []);
 
   return (
     <>
@@ -57,7 +53,11 @@ export const DetailedDevice: React.FC<DeviceProps> = ({
       </h3>
 
       {mlsFingerprint && (
-        <MLSDeviceDetails fingerprint={mlsFingerprint} isCurrentDevice={isCurrentDevice} certificate={certificate} />
+        <MLSDeviceDetails
+          fingerprint={mlsFingerprint}
+          isCurrentDevice={isCurrentDevice}
+          getCertificate={() => getCertificate(device.id)}
+        />
       )}
 
       {/* Proteus */}

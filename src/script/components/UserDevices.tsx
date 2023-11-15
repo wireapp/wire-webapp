@@ -148,7 +148,7 @@ const UserDevices: React.FC<UserDevicesProps> = ({
 
       {showDeviceList && deviceMode === FIND_MODE.NOT_FOUND && <NoDevicesFound {...{noPadding, user}} />}
 
-      {current.state === UserDevicesState.DEVICE_DETAILS && (
+      {current.state === UserDevicesState.DEVICE_DETAILS && selectedClient && (
         <DeviceDetails
           {...{
             renderDeviceBadges: renderBadges,
@@ -158,7 +158,7 @@ const UserDevices: React.FC<UserDevicesProps> = ({
             logger,
             messageRepository,
             noPadding,
-            selectedClient,
+            device: selectedClient,
             user,
           }}
         />
