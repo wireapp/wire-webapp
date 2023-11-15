@@ -31,6 +31,7 @@ export enum SystemMessageType {
   CONVERSATION_RENAME = 'rename',
   CONVERSATION_PROTOCOL_UPDATE = 'protocol-update',
   JOINED_AFTER_MLS_MIGRATION_FINALISATION = 'joined-after-mls-migration-finalisation',
+  MLS_MIGRATION_FINALISATION_ONGOING_CALL = 'mls-migration-finalisation-ongoing-call',
   CONVERSATION_RESUME = 'resume',
   MEMBER_JOIN = 'join',
   MEMBER_LEAVE = 'leave',

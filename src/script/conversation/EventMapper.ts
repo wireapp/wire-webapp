@@ -64,6 +64,7 @@ import type {Message} from '../entity/message/Message';
 import {MessageTimerUpdateMessage} from '../entity/message/MessageTimerUpdateMessage';
 import {MissedMessage} from '../entity/message/MissedMessage';
 import {MLSConversationRecoveredMessage} from '../entity/message/MLSConversationRecoveredMessage';
+import {MLSMigrationFinalisationOngoingCallMessage} from '../entity/message/MLSMigrationFinalisationOngoingCallMessage';
 import {PingMessage} from '../entity/message/PingMessage';
 import {ProtocolUpdateMessage} from '../entity/message/ProtocolUpdateMessage';
 import {ReceiptModeUpdateMessage} from '../entity/message/ReceiptModeUpdateMessage';
@@ -334,7 +335,12 @@ export class EventMapper {
       }
 
       case ClientEvent.CONVERSATION.JOINED_AFTER_MLS_MIGRATION_FINALISATION: {
-        messageEntity = this._mapEventJoinedAfterMLSMigrationFinalisationMessages();
+        messageEntity = this._mapEventJoinedAfterMLSMigrationFinalisation();
+        break;
+      }
+
+      case ClientEvent.CONVERSATION.MLS_MIGRATION_FINALISATION_ONGOING_CALL: {
+        messageEntity = this._mapEventMLSMigrationFinalisationOngoingCall();
         break;
       }
 
@@ -651,8 +657,15 @@ export class EventMapper {
   /**
    * Maps JSON data of local missed message event to message entity.
    */
-  private _mapEventJoinedAfterMLSMigrationFinalisationMessages(): JoinedAfterMLSMigrationFinalisationMessage {
+  private _mapEventJoinedAfterMLSMigrationFinalisation(): JoinedAfterMLSMigrationFinalisationMessage {
     return new JoinedAfterMLSMigrationFinalisationMessage();
+  }
+
+  /**
+   * Maps JSON data of local missed message event to message entity.
+   */
+  private _mapEventMLSMigrationFinalisationOngoingCall(): MLSMigrationFinalisationOngoingCallMessage {
+    return new MLSMigrationFinalisationOngoingCallMessage();
   }
 
   /**

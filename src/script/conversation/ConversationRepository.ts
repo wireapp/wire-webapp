@@ -2330,6 +2330,10 @@ export class ConversationRepository {
 
     if (protocolUpdateEventResponse) {
       await this.eventRepository.injectEvent(protocolUpdateEventResponse, EventRepository.SOURCE.BACKEND_RESPONSE);
+
+      if (protocolUpdateEventResponse.data.protocol === ConversationProtocol.MLS) {
+        await this.handleConversationProtocolUpdatedToMLS(conversation);
+      }
     }
 
     //even if protocol was already updated (no response), we need to refetch the conversation
@@ -2996,6 +3000,7 @@ export class ConversationRepository {
       case ClientEvent.CONVERSATION.LOCATION:
       case ClientEvent.CONVERSATION.MISSED_MESSAGES:
       case ClientEvent.CONVERSATION.JOINED_AFTER_MLS_MIGRATION_FINALISATION:
+      case ClientEvent.CONVERSATION.MLS_MIGRATION_FINALISATION_ONGOING_CALL:
       case ClientEvent.CONVERSATION.MLS_CONVERSATION_RECOVERED:
       case ClientEvent.CONVERSATION.UNABLE_TO_DECRYPT:
       case ClientEvent.CONVERSATION.VERIFICATION:
@@ -3071,6 +3076,15 @@ export class ConversationRepository {
   public readonly injectJoinedAfterMigrationFinalisationMessage = (conversation: Conversation): void => {
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
     const joinedAfterMLSMigrationFinalisationEvent = EventBuilder.buildJoinedAfterMLSMigrationFinalisation(
+      conversation,
+      currentTimestamp,
+    );
+    return void this.eventRepository.injectEvent(joinedAfterMLSMigrationFinalisationEvent);
+  };
+
+  private readonly injectMLSMigrationFinalisationOngoingCallMessage = (conversation: Conversation): void => {
+    const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
+    const joinedAfterMLSMigrationFinalisationEvent = EventBuilder.buildMLSMigrationFinalisationOngoingCall(
       conversation,
       currentTimestamp,
     );
@@ -3595,9 +3609,26 @@ export class ConversationRepository {
    * @param eventJson JSON data of 'conversation.protocol-update' event
    * @returns Resolves when the event was handled
    */
-  private async onProtocolUpdate(conversation: Conversation, eventJson: ConversationProtocolUpdateEvent) {
+  private async onProtocolUpdate(
+    conversation: Conversation,
+    eventJson: ConversationProtocolUpdateEvent,
+  ): Promise<void> {
     const updatedConversation = await this.refreshConversationProtocolProperties(conversation);
-    return this.addEventToConversation(updatedConversation, eventJson);
+    await this.addEventToConversation(updatedConversation, eventJson);
+
+    if (eventJson.data.protocol === ConversationProtocol.MLS) {
+      await this.handleConversationProtocolUpdatedToMLS(updatedConversation);
+    }
+  }
+
+  private async handleConversationProtocolUpdatedToMLS(conversation: Conversation): Promise<void> {
+    // If protocol was changed to mls and there was an ongoing call we need to inform a user about it.
+    const ongoingCall = this.callingRepository.findCall(conversation.qualifiedId);
+    if (!ongoingCall) {
+      return;
+    }
+
+    return this.injectMLSMigrationFinalisationOngoingCallMessage(conversation);
   }
 
   /**

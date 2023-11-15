@@ -436,6 +436,7 @@
   "conversationMessageDelivered": "Delivered",
   "conversationMissedMessages": "You haven’t used this device for a while. Some messages may not appear here.",
   "conversationJoinedAfterMLSMigrationFinalisation": "You haven’t updated this device for a while. In the meantime, the standard messaging protocol changed from Proteus to Messaging Layer Security (MLS). Due to this change, some messages may not appear here. [link]Learn more about MLS[/link]",
+  "conversationMLSMigrationFinalisationOngoingCall": "Due to migration to MLS, you might have issues with your current call. If that's the case, hang up and call again.",
   "conversationModalRestrictedFileSharingDescription": "This file could not be shared due to your file sharing restrictions.",
   "conversationModalRestrictedFileSharingHeadline": "File sharing restrictions",
   "conversationMultipleMembersRemovedMissingLegalHoldConsent": "{{users}} were removed from this conversation because legal hold has been activated. [link]Learn more[/link]",
