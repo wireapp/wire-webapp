@@ -85,7 +85,6 @@ describe('ClientMapper', () => {
         id: '66d0515a23a0ef25',
         meta: {
           is_verified: true,
-          is_mls_verified: true,
         },
       };
 
@@ -105,7 +104,6 @@ describe('ClientMapper', () => {
         domain: '',
         meta: {
           is_verified: true,
-          is_mls_verified: true,
         },
       };
 
