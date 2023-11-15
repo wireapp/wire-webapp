@@ -23,7 +23,7 @@ import {container} from 'tsyringe';
 import {Core} from 'src/script/service/CoreSingleton';
 import {base64ToArray} from 'Util/util';
 
-function getE2EIdentityService() {
+export function getE2EIdentityService() {
   return container.resolve(Core).service?.e2eIdentity;
 }
 

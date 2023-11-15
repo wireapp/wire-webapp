@@ -20,6 +20,7 @@
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
 import {E2eiConversationState} from '@wireapp/core/lib/messagingProtocols/mls';
 
+import * as e2eIdentity from 'src/script/E2EIdentity/E2EIdentity';
 import {Conversation} from 'src/script/entity/Conversation';
 import {Core} from 'src/script/service/CoreSingleton';
 import {createUuid} from 'Util/uuid';
@@ -62,7 +63,7 @@ describe('MLSConversationVerificationStateHandler', () => {
     it('should degrade conversation', async () => {
       let triggerEpochChange: Function = () => {};
       conversation.mlsVerificationState(ConversationVerificationState.VERIFIED);
-      jest.spyOn(core.service!.e2eIdentity!, 'getConversationState').mockResolvedValue(E2eiConversationState.Degraded);
+      jest.spyOn(e2eIdentity, 'getConversationState').mockResolvedValue(E2eiConversationState.Degraded);
       jest
         .spyOn(core.service!.mls!, 'on')
         .mockImplementation((_event, listener) => (triggerEpochChange = listener) as any);
@@ -77,7 +78,7 @@ describe('MLSConversationVerificationStateHandler', () => {
     it('should verify conversation', async () => {
       let triggerEpochChange: Function = () => {};
       conversation.mlsVerificationState(ConversationVerificationState.DEGRADED);
-      jest.spyOn(core.service!.e2eIdentity!, 'getConversationState').mockResolvedValue(E2eiConversationState.Verified);
+      jest.spyOn(e2eIdentity, 'getConversationState').mockResolvedValue(E2eiConversationState.Verified);
       jest
         .spyOn(core.service!.mls!, 'on')
         .mockImplementation((_event, listener) => (triggerEpochChange = listener) as any);
