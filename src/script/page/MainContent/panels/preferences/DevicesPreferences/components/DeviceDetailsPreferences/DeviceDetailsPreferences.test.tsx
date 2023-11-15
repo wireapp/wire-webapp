@@ -35,7 +35,7 @@ describe('DeviceDetailsPreferences', () => {
     onClose: jest.fn(),
     onRemove: jest.fn(),
     onResetSession: jest.fn().mockResolvedValue(undefined),
-    onVerify: jest.fn((_, isVerified) => device.meta.isVerified(isVerified)),
+    onVerify: jest.fn((_, isVerified) => device.meta?.isVerified(isVerified)),
   };
   it('shows device details', async () => {
     const {getByText, getAllByText} = render(withTheme(<DeviceDetailsPreferences {...defaultParams} />));

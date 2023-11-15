@@ -33,7 +33,7 @@ import {DetailedDevice} from '../DetailedDevice';
 
 interface DevicesPreferencesProps {
   device: ClientEntity;
-  renderDeviceBadges: (device: ClientEntity) => React.ReactNode;
+  renderDeviceBadges?: (device: ClientEntity) => React.ReactNode;
   getFingerprint: (device: ClientEntity) => Promise<string | undefined>;
   onClose: () => void;
   onRemove: (device: ClientEntity) => void;

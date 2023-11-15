@@ -47,7 +47,7 @@ export class ClientEntity {
     lon?: number;
   };
   meta: {
-    isVerified?: ko.Observable<boolean>;
+    isVerified: ko.Observable<boolean>;
     primaryKey?: string;
     userId?: string;
   };
