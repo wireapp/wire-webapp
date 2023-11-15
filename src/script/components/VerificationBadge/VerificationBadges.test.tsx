@@ -24,10 +24,8 @@ import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {VerificationBadges, MLSStatuses} from './VerificationBadges';
 
 describe('VerificationBadges', () => {
-  const isMLSVerified = true;
-
   it('is mls verified', async () => {
-    const {getByTestId} = render(withTheme(<VerificationBadges isMLSVerified={isMLSVerified} />));
+    const {getByTestId} = render(withTheme(<VerificationBadges MLSStatus={MLSStatuses.VALID} />));
 
     const E2EIdentityStatus = getByTestId('mls-status');
     expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.VALID);
@@ -41,27 +39,21 @@ describe('VerificationBadges', () => {
   });
 
   it('is not downloaded', async () => {
-    const {getByTestId} = render(
-      withTheme(<VerificationBadges isMLSVerified={isMLSVerified} MLSStatus={MLSStatuses.NOT_DOWNLOADED} />),
-    );
+    const {getByTestId} = render(withTheme(<VerificationBadges MLSStatus={MLSStatuses.NOT_DOWNLOADED} />));
 
     const E2EIdentityStatus = getByTestId('mls-status');
     expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.NOT_DOWNLOADED);
   });
 
   it('is expired', async () => {
-    const {getByTestId} = render(
-      withTheme(<VerificationBadges isMLSVerified={isMLSVerified} MLSStatus={MLSStatuses.EXPIRED} />),
-    );
+    const {getByTestId} = render(withTheme(<VerificationBadges MLSStatus={MLSStatuses.EXPIRED} />));
 
     const E2EIdentityStatus = getByTestId('mls-status');
     expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.EXPIRED);
   });
 
   it('is expires soon', async () => {
-    const {getByTestId} = render(
-      withTheme(<VerificationBadges isMLSVerified={isMLSVerified} MLSStatus={MLSStatuses.EXPIRES_SOON} />),
-    );
+    const {getByTestId} = render(withTheme(<VerificationBadges MLSStatus={MLSStatuses.EXPIRES_SOON} />));
 
     const E2EIdentityStatus = getByTestId('mls-status');
     expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.EXPIRES_SOON);

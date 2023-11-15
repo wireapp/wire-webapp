@@ -26,7 +26,7 @@ import {Core} from 'src/script/service/CoreSingleton';
 import {UserState} from 'src/script/user/UserState';
 import * as util from 'Util/util';
 
-import {E2EIHandler, E2EIHandlerStep} from './E2EIdentity';
+import {E2EIHandler, E2EIHandlerStep} from './E2EIdentityEnrolment';
 import {getModalOptions, ModalType} from './Modals';
 import {OIDCService} from './OIDCService/OIDCService';
 
@@ -36,9 +36,6 @@ jest.mock('./OIDCService', () => ({
   } as unknown as OIDCService),
 }));
 
-jest.mock('Util/util');
-jest.mock('src/script/Config');
-jest.mock('Components/Modals/PrimaryModal');
 jest.mock('./Modals', () => ({
   getModalOptions: jest.fn().mockReturnValue({
     modalOptions: {},
@@ -48,7 +45,7 @@ jest.mock('./Modals', () => ({
     LOADING: 'loading',
     SUCCESS: 'success',
     ERROR: 'error',
-    ENROLL: 'enroll',
+    ENROL: 'enrol',
   },
 }));
 
@@ -58,7 +55,7 @@ describe('E2EIHandler', () => {
   const user = {name: () => 'John Doe', username: () => 'johndoe'};
 
   beforeEach(() => {
-    (util.supportsMLS as jest.Mock).mockReturnValue(true);
+    jest.spyOn(util, 'supportsMLS').mockReturnValue(true);
     // Reset the singleton instance before each test
     E2EIHandler.resetInstance();
     // Clear all mocks before each test
@@ -68,8 +65,7 @@ describe('E2EIHandler', () => {
     (util.supportsMLS as jest.Mock).mockReturnValue(true);
     Config.getConfig = jest.fn().mockReturnValue({FEATURE: {ENABLE_E2EI: true}});
 
-    // Mock the PrimaryModal service to return a mock modal
-    (PrimaryModal.show as jest.Mock).mockClear();
+    jest.spyOn(PrimaryModal, 'show');
     (getModalOptions as jest.Mock).mockClear();
 
     jest
@@ -132,7 +128,7 @@ describe('E2EIHandler', () => {
     expect(instance['currentStep']).toBe(E2EIHandlerStep.INITIALIZED);
   });
 
-  it('should set currentStep to SUCCESS when enrollE2EI is called and enrollment succeeds', async () => {
+  it('should set currentStep to SUCCESS when enrolE2EI is called and enrolment succeeds', async () => {
     jest
       .spyOn(container.resolve(UserState), 'self')
       .mockReturnValue({name: () => 'John Doe', username: () => 'johndoe'});
@@ -140,18 +136,18 @@ describe('E2EIHandler', () => {
     jest.spyOn(container.resolve(Core), 'enrollE2EI').mockResolvedValueOnce(true);
 
     const instance = E2EIHandler.getInstance(params);
-    await instance['enrollE2EI']();
+    await instance['enrol']();
 
     expect(instance['currentStep']).toBe(E2EIHandlerStep.SUCCESS);
   });
 
-  it('should set currentStep to ERROR when enrollE2EI is called and enrollment fails', async () => {
+  it('should set currentStep to ERROR when enrolE2EI is called and enrolment fails', async () => {
     // Mock the Core service to return an error
     jest.spyOn(container.resolve(Core), 'enrollE2EI').mockImplementationOnce(jest.fn(() => Promise.reject()));
     jest.spyOn(container.resolve(UserState), 'self').mockImplementationOnce(() => user);
 
     const instance = E2EIHandler.getInstance(params);
-    await instance['enrollE2EI']();
+    await instance['enrol']();
     expect(instance['currentStep']).toBe(E2EIHandlerStep.ERROR);
   });
 
@@ -160,14 +156,14 @@ describe('E2EIHandler', () => {
     await handler.initialize();
     expect(getModalOptions).toHaveBeenCalledWith(
       expect.objectContaining({
-        type: ModalType.ENROLL,
+        type: ModalType.ENROL,
       }),
     );
   });
 
-  it('should display loading message when enrolled', async () => {
+  it('should display loading message when enroled', async () => {
     const handler = E2EIHandler.getInstance(params);
-    await handler['enrollE2EI']();
+    await handler['enrol']();
     expect(getModalOptions).toHaveBeenCalledWith(
       expect.objectContaining({
         type: ModalType.LOADING,
@@ -175,12 +171,12 @@ describe('E2EIHandler', () => {
     );
   });
 
-  it('should display success message when enrollment is done', async () => {
+  it('should display success message when enrolment is done', async () => {
     jest.spyOn(container.resolve(Core), 'enrollE2EI').mockResolvedValueOnce(true);
 
     const handler = E2EIHandler.getInstance(params);
     handler['showLoadingMessage'] = jest.fn();
-    await handler['enrollE2EI']();
+    await handler['enrol']();
     expect(getModalOptions).toHaveBeenCalledWith(
       expect.objectContaining({
         type: ModalType.SUCCESS,
@@ -188,12 +184,12 @@ describe('E2EIHandler', () => {
     );
   });
 
-  it('should display error message when enrollment fails', async () => {
+  it('should display error message when enrolment fails', async () => {
     jest.spyOn(container.resolve(Core), 'enrollE2EI').mockRejectedValueOnce(false);
 
     const handler = E2EIHandler.getInstance(params);
     handler['showLoadingMessage'] = jest.fn();
-    await handler['enrollE2EI']();
+    await handler['enrol']();
     expect(getModalOptions).toHaveBeenCalledWith(
       expect.objectContaining({
         type: ModalType.ERROR,

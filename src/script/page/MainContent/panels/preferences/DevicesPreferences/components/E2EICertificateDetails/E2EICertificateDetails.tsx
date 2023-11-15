@@ -22,7 +22,7 @@ import {useState} from 'react';
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {CertificateDetailsModal} from 'Components/Modals/CertificateDetailsModal';
-import {VerificationBadges} from 'Components/VerificationBadges';
+import {VerificationBadges} from 'Components/VerificationBadge';
 import {E2EIHandler} from 'src/script/E2EIdentity';
 import {getCertificateDetails, getCertificateState} from 'Util/certificateDetails';
 import {t} from 'Util/LocalizerUtil';
@@ -34,15 +34,10 @@ const logger = getLogger('E2EICertificateDetails');
 
 interface E2EICertificateDetailsProps {
   certificate?: string;
-  isMLSVerified?: boolean;
   isOtherDevice?: boolean;
 }
 
-export const E2EICertificateDetails = ({
-  certificate,
-  isMLSVerified,
-  isOtherDevice = false,
-}: E2EICertificateDetailsProps) => {
+export const E2EICertificateDetails = ({certificate, isOtherDevice = false}: E2EICertificateDetailsProps) => {
   const [isCertificateDetailsModalOpen, setIsCertificateDetailsModalOpen] = useState(false);
 
   const {isNotDownloaded, isValid, isExpireSoon} = getCertificateDetails(certificate);
@@ -57,7 +52,7 @@ export const E2EICertificateDetails = ({
     try {
       const e2eHandler = E2EIHandler.getInstance();
 
-      await e2eHandler.enrollE2EI();
+      await e2eHandler.enrol();
     } catch (error) {
       logger.error('Cannot get E2EI instance: ', error);
     }
@@ -73,7 +68,7 @@ export const E2EICertificateDetails = ({
           <strong css={styles.e2eiStatus(certificateState)}>{t(`E2EI.${certificateState}`)}</strong>
         </p>
 
-        <VerificationBadges isMLSVerified={isMLSVerified} MLSStatus={certificateState} />
+        <VerificationBadges MLSStatus={certificateState} />
       </div>
 
       <div css={styles.buttonsGroup}>

@@ -25,7 +25,7 @@ const hideSecondaryBtn = {hideSecondary: true};
 const hideCloseBtn = {hideCloseBtn: true, preventClose: true};
 
 export enum ModalType {
-  ENROLL = 'enroll',
+  ENROL = 'enrol',
   ERROR = 'error',
   SUCCESS = 'success',
   LOADING = 'loading',
@@ -53,7 +53,7 @@ export const getModalOptions = ({
   let options: ModalOptions = {};
   let modalType: PrimaryModalType = PrimaryModal.type.CONFIRM;
   switch (type) {
-    case ModalType.ENROLL:
+    case ModalType.ENROL:
       options = {
         text: {
           closeBtnLabel: t('acme.settingsChanged.button.close'),

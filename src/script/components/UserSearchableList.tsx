@@ -42,6 +42,7 @@ export type UserListProps = React.ComponentProps<typeof UserList> & {
   users: User[];
   filter?: string;
   selected?: User[];
+  renderParticipantBadges?: (user: User) => React.ReactNode;
   onUpdateSelectedUsers?: (updatedUsers: User[]) => void;
   searchRepository: SearchRepository;
   selfFirst?: boolean;
@@ -56,7 +57,7 @@ export type UserListProps = React.ComponentProps<typeof UserList> & {
   allowRemoteSearch?: boolean;
 };
 
-const UserSearchableList: React.FC<UserListProps> = ({
+export const UserSearchableList: React.FC<UserListProps> = ({
   onUpdateSelectedUsers,
   dataUieName = '',
   filter = '',
@@ -169,5 +170,3 @@ const UserSearchableList: React.FC<UserListProps> = ({
     </div>
   );
 };
-
-export {UserSearchableList};

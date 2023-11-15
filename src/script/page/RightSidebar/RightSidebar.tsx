@@ -19,12 +19,15 @@
 
 import {cloneElement, FC, ReactNode, useCallback, useEffect, useState} from 'react';
 
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import {CSSTransition, TransitionGroup} from 'react-transition-group';
 import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {DeviceVerificationBadges, UserVerificationBadges} from 'Components/VerificationBadge';
+import {ClientEntity} from 'src/script/client';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {AddParticipants} from './AddParticipants';
@@ -178,6 +181,14 @@ const RightSidebar: FC<RightSidebarProps> = ({
 
   const containerRef = useCallback((element: HTMLDivElement | null) => element?.focus(), [currentState]);
 
+  const renderParticipantsBadges = (participant: User) => {
+    return <UserVerificationBadges user={participant} groupId={activeConversation?.groupId} />;
+  };
+
+  const renderDeviceBadges = (device: ClientEntity, userId: QualifiedId) => {
+    return <DeviceVerificationBadges device={device} groupId={activeConversation?.groupId} userId={userId} />;
+  };
+
   if (!activeConversation) {
     return null;
   }
@@ -199,6 +210,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
           {currentState === PanelState.CONVERSATION_DETAILS && (
             <ConversationDetails
               ref={containerRef}
+              renderParticipantBadges={renderParticipantsBadges}
               onClose={closePanel}
               togglePanel={togglePanel}
               activeConversation={activeConversation}
@@ -215,6 +227,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
 
           {currentState === PanelState.GROUP_PARTICIPANT_USER && userEntity && (
             <GroupParticipantUser
+              renderParticipantBadges={renderParticipantsBadges}
               onBack={onBackClick}
               onClose={closePanel}
               goToRoot={goToRoot}
@@ -241,6 +254,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
 
           {currentState === PanelState.PARTICIPANT_DEVICES && userEntity && (
             <ParticipantDevices
+              renderDeviceBadges={renderDeviceBadges}
               repositories={repositories}
               onClose={closePanel}
               onGoBack={onBackClick}
@@ -319,6 +333,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
 
           {currentState === PanelState.CONVERSATION_PARTICIPANTS && (
             <ConversationParticipants
+              renderParticipantBadges={renderParticipantsBadges}
               activeConversation={activeConversation}
               conversationRepository={conversationRepository}
               searchRepository={searchRepository}

@@ -20,7 +20,7 @@
 import * as x509 from '@peculiar/x509';
 import {render} from '@testing-library/react';
 
-import {MLSStatuses} from 'Components/VerificationBadges';
+import {MLSStatuses} from 'Components/VerificationBadge';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 
 import {E2EICertificateDetails} from './E2EICertificateDetails';
@@ -52,7 +52,6 @@ const certificateGenerator = async (notBefore: Date, notAfter: Date) => {
 };
 
 describe('E2EICertificateDetails', () => {
-  const isMLSVerified = true;
   const currentDate = new Date();
 
   it('is e2ei identity verified', async () => {
@@ -61,16 +60,14 @@ describe('E2EICertificateDetails', () => {
 
     const generatedCertificate = await certificateGenerator(yesterday, followingDay);
 
-    const {getByTestId} = render(
-      withTheme(<E2EICertificateDetails certificate={generatedCertificate} isMLSVerified={isMLSVerified} />),
-    );
+    const {getByTestId} = render(withTheme(<E2EICertificateDetails certificate={generatedCertificate} />));
 
     const E2EIdentityStatus = getByTestId('e2ei-identity-status');
     expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.VALID);
   });
 
   it('is e2ei identity not downloaded', async () => {
-    const {getByTestId} = render(withTheme(<E2EICertificateDetails isMLSVerified={isMLSVerified} />));
+    const {getByTestId} = render(withTheme(<E2EICertificateDetails />));
 
     const E2EIdentityStatus = getByTestId('e2ei-identity-status');
     expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.NOT_DOWNLOADED);
@@ -82,9 +79,7 @@ describe('E2EICertificateDetails', () => {
 
     const generatedCertificate = await certificateGenerator(yesterday, followingDay);
 
-    const {getByTestId} = render(
-      withTheme(<E2EICertificateDetails isMLSVerified={isMLSVerified} certificate={generatedCertificate} />),
-    );
+    const {getByTestId} = render(withTheme(<E2EICertificateDetails certificate={generatedCertificate} />));
 
     const E2EIdentityStatus = getByTestId('e2ei-identity-status');
     expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.EXPIRED);

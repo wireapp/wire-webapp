@@ -33,12 +33,13 @@ import {getPrivacyWhyUrl} from '../../externalRoute';
 
 interface DeviceListProps {
   clickOnDevice: (client: ClientEntity) => void;
+  renderDeviceBadges: (device: ClientEntity) => React.ReactNode;
   clients: ClientEntity[];
   noPadding: boolean;
   user: User;
 }
 
-const DeviceList: React.FC<DeviceListProps> = ({user, noPadding, clients, clickOnDevice}) => {
+const DeviceList: React.FC<DeviceListProps> = ({user, renderDeviceBadges, noPadding, clients, clickOnDevice}) => {
   const {name: userName} = useKoSubscribableChildren(user, ['name']);
 
   return (
@@ -67,7 +68,12 @@ const DeviceList: React.FC<DeviceListProps> = ({user, noPadding, clients, clickO
             })}
             data-uie-name="item-device"
           >
-            <DeviceCard device={client} click={() => clickOnDevice(client)} showVerified showIcon />
+            <DeviceCard
+              renderDeviceBadges={renderDeviceBadges}
+              device={client}
+              click={() => clickOnDevice(client)}
+              showIcon
+            />
           </li>
         ))}
       </ul>

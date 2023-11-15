@@ -27,7 +27,8 @@ import {Runtime} from '@wireapp/commons';
 import {ErrorFallback} from 'Components/ErrorFallback';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {useEnrichedFields} from 'Components/panel/EnrichedFields';
-import {VerificationBadges} from 'src/script/components/VerificationBadges';
+import {UserVerificationBadges} from 'Components/VerificationBadge';
+import {ConversationState} from 'src/script/conversation/ConversationState';
 import {ContentState} from 'src/script/page/useAppState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -74,6 +75,7 @@ interface AccountPreferencesProps {
   userRepository: UserRepository;
   selfUser: User;
   isActivatedAccount?: boolean;
+  conversationState?: ConversationState;
 }
 
 const logger = getLogger('AccountPreferences');
@@ -89,26 +91,16 @@ export const AccountPreferences = ({
   isActivatedAccount = false,
   showDomain = false,
   teamState = container.resolve(TeamState),
+  conversationState = container.resolve(ConversationState),
 }: AccountPreferencesProps) => {
   const {isTeam, teamName} = useKoSubscribableChildren(teamState, ['isTeam', 'teamName']);
-  const {
-    name,
-    email,
-    availability,
-    username,
-    managedBy,
-    phone,
-    is_verified: isVerified,
-    isMLSVerified,
-  } = useKoSubscribableChildren(selfUser, [
+  const {name, email, availability, username, managedBy, phone} = useKoSubscribableChildren(selfUser, [
     'name',
     'email',
     'availability',
     'username',
     'managedBy',
     'phone',
-    'is_verified',
-    'isMLSVerified',
   ]);
 
   const canEditProfile = managedBy === User.CONFIG.MANAGED_BY.WIRE;
@@ -155,7 +147,7 @@ export const AccountPreferences = ({
             {name}
           </h3>
 
-          <VerificationBadges isProteusVerified={isVerified} isMLSVerified={isMLSVerified} />
+          <UserVerificationBadges user={selfUser} groupId={conversationState.getSelfMLSConversation()?.groupId} />
         </div>
 
         <div className="preferences-account-image">

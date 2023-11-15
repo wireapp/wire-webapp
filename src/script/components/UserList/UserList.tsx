@@ -52,6 +52,7 @@ const USER_CHUNK_SIZE = 64;
 
 export interface UserListProps {
   conversation?: Conversation;
+  renderParticipantBadges?: (user: User) => React.ReactNode;
   conversationRepository?: ConversationRepository;
   conversationState?: ConversationState;
   highlightedUsers?: User[];
@@ -75,6 +76,7 @@ export interface UserListProps {
 
 export const UserList = ({
   onClick,
+  renderParticipantBadges,
   conversationRepository,
   users,
   infos,
@@ -130,6 +132,7 @@ export const UserList = ({
       return (
         <li key={user.id}>
           <UserListItem
+            renderParticipantBadges={renderParticipantBadges}
             noInteraction={noSelfInteraction && user.isMe}
             user={user}
             noUnderline={isLastItem || noUnderline}

@@ -21,8 +21,6 @@ import {ClientClassification} from '@wireapp/api-client/lib/client';
 import cx from 'classnames';
 
 import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
-import {VerificationBadges} from 'src/script/components/VerificationBadges';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {splitFingerprint} from 'Util/StringUtil';
@@ -34,17 +32,17 @@ import {LegalHoldDot} from '../LegalHoldDot';
 
 export interface DeviceCardProps {
   click?: (device: ClientEntity) => void;
+  renderDeviceBadges?: (device: ClientEntity) => React.ReactNode;
   device: ClientEntity;
   showIcon?: boolean;
   showVerified?: boolean;
 }
 
-const DeviceCard = ({click, device: clientEntity, showVerified = false, showIcon = false}: DeviceCardProps) => {
+const DeviceCard = ({click, renderDeviceBadges, device: clientEntity, showIcon = false}: DeviceCardProps) => {
   const messageFocusedTabIndex = useMessageFocusedTabIndex(!!click);
-  const {class: deviceClass = '?', id = '', label = '?', meta} = clientEntity;
+  const {class: deviceClass = '?', id = '', label = '?'} = clientEntity;
   const name = clientEntity.getName();
   const clickable = !!click;
-  const {isVerified, isMLSVerified} = useKoSubscribableChildren(meta, ['isVerified', 'isMLSVerified']);
 
   const mlsFingerprint = clientEntity.mlsPublicKeys?.[MLSPublicKeys.ED25519];
 
@@ -76,8 +74,7 @@ const DeviceCard = ({click, device: clientEntity, showVerified = false, showIcon
       <div className="device-card__info" data-uie-name="device-card-info" data-uie-value={label}>
         <div className="device-card__name">
           <span className="device-card__model">{name}</span>
-
-          {showVerified && <VerificationBadges isMLSVerified={isMLSVerified} isProteusVerified={isVerified} />}
+          {renderDeviceBadges?.(clientEntity)}
         </div>
 
         {mlsFingerprint && (

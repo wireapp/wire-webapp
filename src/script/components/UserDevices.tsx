@@ -20,6 +20,7 @@
 import React, {useEffect, useMemo, useState} from 'react';
 
 import {ClientClassification} from '@wireapp/api-client/lib/client/';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -84,6 +85,7 @@ interface UserDevicesProps {
   cryptographyRepository: CryptographyRepository;
   current: UserDevicesHistoryEntry;
   goTo: (state: UserDevicesState, headline: string) => void;
+  renderDeviceBadges?: (device: ClientEntity, userId: QualifiedId) => React.ReactNode;
   messageRepository: MessageRepository;
   noPadding?: boolean;
   user: User;
@@ -97,6 +99,7 @@ const UserDevices: React.FC<UserDevicesProps> = ({
   goTo,
   messageRepository,
   cryptographyRepository,
+  renderDeviceBadges,
 }) => {
   const [selectedClient, setSelectedClient] = useState<ClientEntity>();
   const [deviceMode, setDeviceMode] = useState(FIND_MODE.REQUESTING);
@@ -121,6 +124,10 @@ const UserDevices: React.FC<UserDevicesProps> = ({
     })();
   }, [user]);
 
+  const renderBadges = (device: ClientEntity) => {
+    return renderDeviceBadges?.(device, user.qualifiedId);
+  };
+
   const clickOnDevice = (clientEntity: ClientEntity) => {
     setSelectedClient(clientEntity);
     const headline = user.isMe ? clientEntity.label || clientEntity.model : capitalizeFirstChar(clientEntity.class);
@@ -136,7 +143,7 @@ const UserDevices: React.FC<UserDevicesProps> = ({
   return (
     <div>
       {showDeviceList && deviceMode === FIND_MODE.FOUND && (
-        <DeviceList {...{clickOnDevice, clients, noPadding, user}} />
+        <DeviceList {...{renderDeviceBadges: renderBadges, clickOnDevice, clients, noPadding, user}} />
       )}
 
       {showDeviceList && deviceMode === FIND_MODE.NOT_FOUND && <NoDevicesFound {...{noPadding, user}} />}
@@ -144,6 +151,7 @@ const UserDevices: React.FC<UserDevicesProps> = ({
       {current.state === UserDevicesState.DEVICE_DETAILS && (
         <DeviceDetails
           {...{
+            renderDeviceBadges: renderBadges,
             clickToShowSelfFingerprint,
             clientRepository,
             cryptographyRepository,

@@ -23,6 +23,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {WireIdentity} from '@wireapp/core-crypto/platforms/web/corecrypto';
 import {container} from 'tsyringe';
 
+import {DeviceVerificationBadges} from 'Components/VerificationBadge';
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';
 import {Conversation} from 'src/script/entity/Conversation';
@@ -35,9 +36,8 @@ import {Device} from './components/Device';
 import {DeviceDetailsPreferences} from './components/DeviceDetailsPreferences';
 
 import {ClientState} from '../../../../../client/ClientState';
-import {isMLSConversation} from '../../../../../conversation/ConversationSelectors';
 import {ConversationState} from '../../../../../conversation/ConversationState';
-import {E2EIHandler} from '../../../../../E2EIdentity';
+import * as e2eIdentity from '../../../../../E2EIdentity';
 import {PreferencesPage} from '../components/PreferencesPage';
 
 interface DevicesPreferencesProps {
@@ -65,12 +65,7 @@ export const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
 
   const {devices} = useKoSubscribableChildren(selfUser, ['devices']);
   const currentClient = clientState.currentClient;
-  const isSelfClientVerified = React.useMemo(() => {
-    if (!currentClient) {
-      return false;
-    }
-    return !!currentClient?.meta.isMLSVerified?.();
-  }, [currentClient]);
+  const isSelfClientVerified = false;
 
   const isSSO = selfUser.isNoPasswordSSO;
   const getFingerprint = (device: ClientEntity) =>
@@ -80,9 +75,20 @@ export const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
     void cryptographyRepository.getLocalFingerprint().then(setLocalFingerprint);
   }, [cryptographyRepository]);
 
+  const renderDeviceBadges = (device: ClientEntity) => {
+    return (
+      <DeviceVerificationBadges
+        device={device}
+        userId={selfUser.qualifiedId}
+        groupId={conversationState.selfMLSConversation()?.groupId}
+      />
+    );
+  };
+
   if (selectedDevice) {
     return (
       <DeviceDetailsPreferences
+        renderDeviceBadges={renderDeviceBadges}
         device={selectedDevice}
         deviceIdentity={selectedDeviceIdentity}
         getFingerprint={getFingerprint}
@@ -99,8 +105,7 @@ export const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
     );
   }
 
-  const e2eiIdentity = E2EIHandler.getInstance();
-  const certificate = e2eiIdentity.getCertificateData();
+  const certificate = e2eIdentity.getCertificateData();
 
   const selectDevice = async (device: ClientEntity, deviceIdentity?: WireIdentity) => {
     setSelectedDevice(device);
@@ -113,12 +118,12 @@ export const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
   const getDeviceIdentity = async (deviceId: string) => {
     const selfConversation = conversationState?.getSelfMLSConversation();
 
-    if (!isMLSConversation(selfConversation)) {
+    if (!selfConversation) {
       return null;
     }
 
     const groupId = selfConversation.groupId;
-    return e2eiIdentity.getUserDeviceEntities(groupId, {[deviceId]: selfUser});
+    return e2eIdentity.getUserDeviceEntities(groupId, {[deviceId]: selfUser});
   };
 
   return (

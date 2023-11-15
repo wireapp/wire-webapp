@@ -17,9 +17,10 @@
  *
  */
 
-import React, {CSSProperties} from 'react';
+import {CSSProperties, useEffect, useState} from 'react';
 
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {
   CertificateExpiredIcon,
@@ -29,6 +30,12 @@ import {
   ProteusVerified,
 } from '@wireapp/react-ui-kit';
 
+import {ClientEntity} from 'src/script/client';
+import {ConversationVerificationState} from 'src/script/conversation/ConversationVerificationState';
+import {getUserDeviceEntities} from 'src/script/E2EIdentity';
+import {Conversation} from 'src/script/entity/Conversation';
+import {User} from 'src/script/entity/User';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 export enum MLSStatuses {
@@ -40,7 +47,6 @@ export enum MLSStatuses {
 
 interface VerificationBadgesProps {
   conversationProtocol?: ConversationProtocol;
-  isMLSVerified?: boolean;
   isProteusVerified?: boolean;
   MLSStatus?: MLSStatuses;
   displayTitle?: boolean;
@@ -63,14 +69,73 @@ const title = (isMLSConversation = false): CSSProperties => ({
   marginRight: '4px',
 });
 
-export const VerificationBadges: React.FC<VerificationBadgesProps> = ({
+const useConversationVerificationState = (conversation: Conversation) => {
+  const {verification_state: proteusVerificationState, mlsVerificationState} = useKoSubscribableChildren(conversation, [
+    'verification_state',
+    'mlsVerificationState',
+  ]);
+  const mlsState = mlsVerificationState === ConversationVerificationState.VERIFIED ? MLSStatuses.VALID : undefined;
+  return {MLS: mlsState, proteus: proteusVerificationState};
+};
+
+export const UserVerificationBadges = ({user, groupId}: {user: User; groupId?: string}) => {
+  const {is_verified: isProteusVerified} = useKoSubscribableChildren(user, ['is_verified']);
+
+  return <VerificationBadges isProteusVerified={isProteusVerified} />;
+};
+
+export const DeviceVerificationBadges = ({
+  device,
+  userId,
+  groupId,
+}: {
+  device: ClientEntity;
+  userId: QualifiedId;
+  groupId?: string;
+}) => {
+  const [isMLSVerified, setIsMLSVerified] = useState(false);
+  useEffect(() => {
+    if (groupId) {
+      void (async () => {
+        const identities = await getUserDeviceEntities(groupId, {[device.id]: userId});
+        // TODO, soon coreCrypto will return a `isValid` property. Use this one to check for validity
+        setIsMLSVerified(!!identities?.length);
+      })();
+    }
+  });
+
+  return (
+    <VerificationBadges
+      isProteusVerified={device.meta?.isVerified?.() ?? false}
+      MLSStatus={isMLSVerified ? MLSStatuses.VALID : undefined}
+    />
+  );
+};
+
+type ConversationVerificationBadgeProps = {
+  conversation: Conversation;
+  displayTitle?: boolean;
+};
+export const ConversationVerificationBadges = ({conversation, displayTitle}: ConversationVerificationBadgeProps) => {
+  const verificationState = useConversationVerificationState(conversation);
+
+  return (
+    <VerificationBadges
+      conversationProtocol={conversation.protocol}
+      MLSStatus={verificationState.MLS}
+      displayTitle={displayTitle}
+      isProteusVerified={verificationState.proteus === ConversationVerificationState.VERIFIED}
+    />
+  );
+};
+
+export const VerificationBadges = ({
   conversationProtocol,
-  isMLSVerified = false,
   isProteusVerified = false,
   MLSStatus,
   displayTitle = false,
-}) => {
-  if (!isMLSVerified && !isProteusVerified) {
+}: VerificationBadgesProps) => {
+  if (!MLSStatus && !isProteusVerified) {
     return null;
   }
 
@@ -81,8 +146,8 @@ export const VerificationBadges: React.FC<VerificationBadgesProps> = ({
   const conversationHasProtocol = !!conversationProtocol;
 
   const showMLSBadge = conversationHasProtocol
-    ? conversationProtocol === ConversationProtocol.MLS && isMLSVerified
-    : isMLSVerified;
+    ? conversationProtocol === ConversationProtocol.MLS && !!MLSStatus
+    : !!MLSStatus;
 
   const showProteusBadge = conversationHasProtocol
     ? conversationProtocol === ConversationProtocol.PROTEUS && isProteusVerified

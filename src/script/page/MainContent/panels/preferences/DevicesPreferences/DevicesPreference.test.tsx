@@ -22,6 +22,7 @@ import {CONVERSATION_TYPE, ConversationProtocol} from '@wireapp/api-client/lib/c
 
 import {randomUUID} from 'crypto';
 
+import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {ClientState} from 'src/script/client/ClientState';
 import {ConversationState} from 'src/script/conversation/ConversationState';
@@ -29,9 +30,8 @@ import {CryptographyRepository} from 'src/script/cryptography/CryptographyReposi
 import {User} from 'src/script/entity/User';
 import {createUuid} from 'Util/uuid';
 
-import {DevicesPreferences} from './DevicesPreferences';
+import {DevicesPreferences} from './DevicesPreference';
 
-import {E2EIHandler} from '../../../../../E2EIdentity';
 import {Conversation} from '../../../../../entity/Conversation';
 
 function createDevice(): ClientEntity {
@@ -54,8 +54,6 @@ function createConversation(protocol?: ConversationProtocol, type?: CONVERSATION
 }
 
 describe('DevicesPreferences', () => {
-  const params = {discoveryUrl: 'http://example.com', gracePeriodInSeconds: 30};
-
   const selfProteusConversation = createConversation(ConversationProtocol.PROTEUS, CONVERSATION_TYPE.SELF);
   const selfMLSConversation = createConversation(ConversationProtocol.MLS, CONVERSATION_TYPE.SELF);
   const regularConversation = createConversation();
@@ -81,10 +79,7 @@ describe('DevicesPreferences', () => {
   defaultParams.conversationState.conversations([selfProteusConversation, selfMLSConversation, regularConversation]);
 
   it('displays all devices', async () => {
-    const instance = E2EIHandler.getInstance(params);
-    expect(instance).toBeInstanceOf(E2EIHandler);
-
-    const {getByText, getAllByText} = render(<DevicesPreferences {...defaultParams} />);
+    const {getByText, getAllByText} = render(withTheme(<DevicesPreferences {...defaultParams} />));
 
     await waitFor(() => getByText('preferencesDevicesCurrent'));
     expect(getByText('preferencesDevicesCurrent')).toBeDefined();

@@ -58,6 +58,7 @@ import {ConnectionRepository} from '../connection/ConnectionRepository';
 import {ConnectionService} from '../connection/ConnectionService';
 import {ConversationRepository} from '../conversation/ConversationRepository';
 import {ConversationService} from '../conversation/ConversationService';
+import {registerMLSConversationVerificationStateHandler} from '../conversation/ConversationVerificationStateHandler';
 import {MessageRepository} from '../conversation/MessageRepository';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {User} from '../entity/User';
@@ -369,6 +370,9 @@ export class App {
       const localClient = await this.core.initClient();
       if (!localClient) {
         throw new ClientError(CLIENT_ERROR_TYPE.NO_VALID_CLIENT, 'Client has been deleted on backend');
+      }
+      if (supportsMLS()) {
+        registerMLSConversationVerificationStateHandler();
       }
 
       this.core.on(CoreEvents.NEW_SESSION, ({userId, clientId}) => {
