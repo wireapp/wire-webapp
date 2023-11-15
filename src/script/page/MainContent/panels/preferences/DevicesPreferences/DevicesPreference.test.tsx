@@ -30,7 +30,7 @@ import {CryptographyRepository} from 'src/script/cryptography/CryptographyReposi
 import {User} from 'src/script/entity/User';
 import {createUuid} from 'Util/uuid';
 
-import {DevicesPreferences} from './DevicesPreferences';
+import {DevicesPreferences} from './DevicesPreference';
 
 import {E2EIHandler} from '../../../../../E2EIdentity';
 import {Conversation} from '../../../../../entity/Conversation';
