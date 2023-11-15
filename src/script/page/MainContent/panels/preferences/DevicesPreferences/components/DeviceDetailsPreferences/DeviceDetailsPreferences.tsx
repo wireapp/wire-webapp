@@ -19,8 +19,6 @@
 
 import React, {useEffect, useState} from 'react';
 
-import {WireIdentity} from '@wireapp/core-crypto/platforms/web/corecrypto';
-
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {ClientEntity} from 'src/script/client/ClientEntity';
@@ -35,11 +33,11 @@ interface DevicesPreferencesProps {
   device: ClientEntity;
   renderDeviceBadges?: (device: ClientEntity) => React.ReactNode;
   getFingerprint: (device: ClientEntity) => Promise<string | undefined>;
+  getCertificate: (deviceId: string) => Promise<string | undefined>;
   onClose: () => void;
   onRemove: (device: ClientEntity) => void;
   onResetSession: (device: ClientEntity) => Promise<void>;
   onVerify: (device: ClientEntity, verified: boolean) => void;
-  deviceIdentity?: WireIdentity;
 }
 
 enum SessionResetState {
@@ -52,11 +50,11 @@ export const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
   device,
   renderDeviceBadges,
   getFingerprint,
+  getCertificate,
   onVerify,
   onRemove,
   onClose,
   onResetSession,
-  deviceIdentity,
 }) => {
   const {isVerified} = useKoSubscribableChildren(device.meta, ['isVerified']);
   const [resetState, setResetState] = useState<SessionResetState>(SessionResetState.RESET);
@@ -96,11 +94,10 @@ export const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
 
           <DetailedDevice
             renderDeviceBadges={renderDeviceBadges}
+            getCertificate={getCertificate}
             device={device}
             fingerprint={fingerprint || ''}
             showVerificationStatus={false}
-            certificate={deviceIdentity?.certificate}
-            isOtherDevice
           />
 
           <div className="participant-devices__verify slider">

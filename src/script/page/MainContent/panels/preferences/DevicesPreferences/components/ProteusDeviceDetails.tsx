@@ -25,7 +25,7 @@ import {formatTimestamp} from 'Util/TimeUtil';
 import {type DeviceProps} from './DetailedDevice';
 import {FormattedId} from './FormattedId';
 
-interface ProteusDeviceDetailsProps extends DeviceProps {
+interface ProteusDeviceDetailsProps extends Omit<DeviceProps, 'getCertificate'> {
   isProteusVerified?: boolean;
   showVerificationStatus?: boolean;
 }

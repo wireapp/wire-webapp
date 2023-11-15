@@ -27,16 +27,19 @@ export function getE2EIdentityService() {
   return container.resolve(Core).service?.e2eIdentity;
 }
 
+export async function getDeviceIdentity(groupId: string, userId: QualifiedId, deviceId: string) {
+  const identities = await getE2EIdentityService()?.getUserDeviceEntities(groupId, {[deviceId]: userId});
+  return identities?.[0];
+}
 /**
  * @param groupId id of the group
  * @param clientIdsWithUser client ids with user data
  * Returns devices E2EI certificates
  */
-export async function getUserDeviceEntities(
-  groupId: string | Uint8Array,
-  clientIdsWithUser: Record<string, QualifiedId>,
-) {
-  return getE2EIdentityService()?.getUserDeviceEntities(groupId, clientIdsWithUser);
+export async function getDeviceVerificationState(groupId: string, userId: QualifiedId, deviceId: string) {
+  const identity = await getDeviceIdentity(groupId, userId, deviceId);
+  // @fixme: soon coreCrypto will return a `isValid` property. Use this one to check for validity
+  return identity ? 'verified' : 'unverified';
 }
 
 export async function getConversationState(groupId: string) {
@@ -52,7 +55,7 @@ export function hasActiveCertificate() {
 /**
  * returns E2EI certificate data.
  */
-export function getCertificateData() {
+export function getCurrentDeviceCertificateData() {
   if (!hasActiveCertificate()) {
     return undefined;
   }

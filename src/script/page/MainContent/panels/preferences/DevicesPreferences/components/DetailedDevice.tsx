@@ -29,8 +29,8 @@ export interface DeviceProps {
   device: ClientEntity;
   fingerprint: string;
   showVerificationStatus?: boolean;
-  isOtherDevice?: boolean;
-  certificate?: string;
+  isCurrentDevice?: boolean;
+  getCertificate: (deviceId: string) => Promise<string | undefined>;
   isProteusVerified?: boolean;
 }
 
@@ -39,8 +39,8 @@ export const DetailedDevice: React.FC<DeviceProps> = ({
   device,
   fingerprint,
   showVerificationStatus = true,
-  isOtherDevice = false,
-  certificate,
+  isCurrentDevice,
+  getCertificate,
   isProteusVerified = false,
 }) => {
   const mlsFingerprint = device.mlsPublicKeys?.[MLSPublicKeys.ED25519];
@@ -53,7 +53,11 @@ export const DetailedDevice: React.FC<DeviceProps> = ({
       </h3>
 
       {mlsFingerprint && (
-        <MLSDeviceDetails fingerprint={mlsFingerprint} isOtherDevice={isOtherDevice} certificate={certificate} />
+        <MLSDeviceDetails
+          fingerprint={mlsFingerprint}
+          isCurrentDevice={isCurrentDevice}
+          getCertificate={() => getCertificate(device.id)}
+        />
       )}
 
       {/* Proteus */}

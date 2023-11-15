@@ -32,6 +32,7 @@ describe('DeviceDetailsPreferences', () => {
   const defaultParams = {
     device,
     getFingerprint: jest.fn().mockResolvedValue('00000000'),
+    getCertificate: jest.fn().mockResolvedValue('00000000'),
     onClose: jest.fn(),
     onRemove: jest.fn(),
     onResetSession: jest.fn().mockResolvedValue(undefined),

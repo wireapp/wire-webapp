@@ -17,6 +17,8 @@
  *
  */
 
+import {useEffect, useState} from 'react';
+
 import {Config} from 'src/script/Config';
 import {t} from 'Util/LocalizerUtil';
 import {splitFingerprint} from 'Util/StringUtil';
@@ -30,12 +32,16 @@ import {FormattedId} from '../FormattedId';
 
 interface MLSDeviceDetailsProps {
   fingerprint: string;
-  isOtherDevice?: boolean;
-  certificate?: string;
+  isCurrentDevice?: boolean;
+  getCertificate: () => Promise<string | undefined>;
 }
 
-export const MLSDeviceDetails = ({fingerprint, isOtherDevice = false, certificate}: MLSDeviceDetailsProps) => {
+export const MLSDeviceDetails = ({fingerprint, isCurrentDevice, getCertificate}: MLSDeviceDetailsProps) => {
+  const [certificate, setCertificate] = useState<string | undefined>();
   const isE2EIEnabled = supportsMLS() && Config.getConfig().FEATURE.ENABLE_E2EI;
+  useEffect(() => {
+    getCertificate?.().then(setCertificate);
+  }, []);
 
   return (
     <div css={styles.wrapper}>
@@ -47,7 +53,7 @@ export const MLSDeviceDetails = ({fingerprint, isOtherDevice = false, certificat
         <FormattedId idSlices={splitFingerprint(fingerprint)} />
       </p>
 
-      {isE2EIEnabled && <E2EICertificateDetails certificate={certificate} isOtherDevice={isOtherDevice} />}
+      {isE2EIEnabled && <E2EICertificateDetails certificate={certificate} isCurrentDevice={isCurrentDevice} />}
     </div>
   );
 };

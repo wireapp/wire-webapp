@@ -32,7 +32,6 @@ import type {Logger} from 'Util/Logger';
 import {splitFingerprint} from 'Util/StringUtil';
 
 import type {ClientRepository, ClientEntity} from '../../client';
-import {MLSPublicKeys} from '../../client';
 import {Config} from '../../Config';
 import {ConversationState} from '../../conversation/ConversationState';
 import type {MessageRepository} from '../../conversation/MessageRepository';
@@ -40,7 +39,6 @@ import type {CryptographyRepository} from '../../cryptography/CryptographyReposi
 import type {User} from '../../entity/User';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {FormattedId} from '../../page/MainContent/panels/preferences/DevicesPreferences/components/FormattedId';
-import {MLSDeviceDetails} from '../../page/MainContent/panels/preferences/DevicesPreferences/components/MLSDeviceDetails';
 
 interface DeviceDetailsProps {
   clickToShowSelfFingerprint: () => void;
@@ -50,12 +48,12 @@ interface DeviceDetailsProps {
   logger: Logger;
   messageRepository: MessageRepository;
   noPadding: boolean;
-  selectedClient?: ClientEntity;
+  device: ClientEntity;
   user: User;
 }
 
 export const DeviceDetails = ({
-  selectedClient,
+  device,
   cryptographyRepository,
   user,
   clickToShowSelfFingerprint,
@@ -68,24 +66,24 @@ export const DeviceDetails = ({
   const [fingerprintRemote, setFingerprintRemote] = useState<string>();
   const [isResettingSession, setIsResettingSession] = useState(false);
 
-  const clientMeta = useMemo(() => selectedClient?.meta, [selectedClient]);
+  const clientMeta = useMemo(() => device?.meta, [device]);
 
   const {isVerified} = useKoSubscribableChildren(clientMeta, ['isVerified']);
   const {name: userName} = useKoSubscribableChildren(user, ['name']);
 
   useEffect(() => {
     setFingerprintRemote(undefined);
-    if (selectedClient) {
+    if (device) {
       void cryptographyRepository
-        .getRemoteFingerprint(user.qualifiedId, selectedClient.id)
+        .getRemoteFingerprint(user.qualifiedId, device.id)
         .then(remoteFingerprint => setFingerprintRemote(remoteFingerprint));
     }
-  }, [selectedClient]);
+  }, [device]);
 
   const clickToToggleDeviceVerification = () => {
     const toggleVerified = !isVerified;
     clientRepository
-      .verifyClient(user.qualifiedId, selectedClient, toggleVerified)
+      .verifyClient(user.qualifiedId, device, toggleVerified)
       .catch((error: DexieError) => logger.warn(`Failed to toggle client verification: ${error.message}`));
   };
 
@@ -97,7 +95,7 @@ export const DeviceDetails = ({
     setIsResettingSession(true);
     if (conversation) {
       messageRepository
-        .resetSession(user.qualifiedId, selectedClient.id, conversation)
+        .resetSession(user.qualifiedId, device.id, conversation)
         .then(_resetProgress)
         .catch(_resetProgress);
     }
@@ -105,11 +103,12 @@ export const DeviceDetails = ({
 
   const activeConversation = conversationState.activeConversation();
   const isConversationMLS = activeConversation && isMLSConversation(activeConversation);
-  const mlsFingerprint = selectedClient.mlsPublicKeys?.[MLSPublicKeys.ED25519];
 
   return (
     <div className={cx('participant-devices__header', {'participant-devices__header--padding': !noPadding})}>
-      {mlsFingerprint && <MLSDeviceDetails fingerprint={mlsFingerprint} isOtherDevice />}
+      {/*
+      TODO get the fingerprint from CoreCrypto (?)
+      mlsFingerprint && <MLSDeviceDetails fingerprint={mlsFingerprint} />*/}
 
       <div className="device-proteus-details">
         <h3 className="device-details-title paragraph-body-3">{t('participantDevicesProteusDeviceVerification')}</h3>

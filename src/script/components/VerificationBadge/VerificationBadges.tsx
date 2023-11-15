@@ -32,7 +32,7 @@ import {
 
 import {ClientEntity} from 'src/script/client';
 import {ConversationVerificationState} from 'src/script/conversation/ConversationVerificationState';
-import {getUserDeviceEntities} from 'src/script/E2EIdentity';
+import {getDeviceVerificationState} from 'src/script/E2EIdentity';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -97,9 +97,8 @@ export const DeviceVerificationBadges = ({
   useEffect(() => {
     if (groupId) {
       void (async () => {
-        const identities = await getUserDeviceEntities(groupId, {[device.id]: userId});
-        // TODO, soon coreCrypto will return a `isValid` property. Use this one to check for validity
-        setIsMLSVerified(!!identities?.length);
+        const verificationState = await getDeviceVerificationState(groupId, userId, device.id);
+        setIsMLSVerified(verificationState === 'verified');
       })();
     }
   });
