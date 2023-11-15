@@ -20,7 +20,7 @@
 import * as x509 from '@peculiar/x509';
 import {render} from '@testing-library/react';
 
-import {MLSStatuses} from 'Components/VerificationBadges';
+import {MLSStatuses} from 'Components/VerificationBadge';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 
 import {E2EICertificateDetails} from './E2EICertificateDetails';

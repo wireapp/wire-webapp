@@ -24,7 +24,7 @@ import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {WireIdentity} from '@wireapp/core-crypto';
 
 import {Icon} from 'Components/Icon';
-import {VerificationBadges} from 'Components/VerificationBadges';
+import {VerificationBadges} from 'Components/VerificationBadge';
 import {getCertificateDetails, getCertificateState} from 'Util/certificateDetails';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';

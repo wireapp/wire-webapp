@@ -30,7 +30,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {Icon} from 'Components/Icon';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
-import {ConversationVerificationBadges} from 'src/script/components/VerificationBadges';
+import {ConversationVerificationBadges} from 'Components/VerificationBadge';
 import {User} from 'src/script/entity/User';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {ContentState} from 'src/script/page/useAppState';

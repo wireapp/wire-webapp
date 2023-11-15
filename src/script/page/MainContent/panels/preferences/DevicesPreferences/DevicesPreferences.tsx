@@ -23,7 +23,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {WireIdentity} from '@wireapp/core-crypto/platforms/web/corecrypto';
 import {container} from 'tsyringe';
 
-import {DeviceVerificationBadges} from 'Components/VerificationBadges';
+import {DeviceVerificationBadges} from 'Components/VerificationBadge';
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';
 import {Conversation} from 'src/script/entity/Conversation';

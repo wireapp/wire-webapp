@@ -22,7 +22,7 @@ import {useState} from 'react';
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {CertificateDetailsModal} from 'Components/Modals/CertificateDetailsModal';
-import {VerificationBadges} from 'Components/VerificationBadges';
+import {VerificationBadges} from 'Components/VerificationBadge';
 import {E2EIHandler} from 'src/script/E2EIdentity';
 import {getCertificateDetails, getCertificateState} from 'Util/certificateDetails';
 import {t} from 'Util/LocalizerUtil';

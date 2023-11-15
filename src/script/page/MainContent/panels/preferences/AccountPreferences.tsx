@@ -27,7 +27,7 @@ import {Runtime} from '@wireapp/commons';
 import {ErrorFallback} from 'Components/ErrorFallback';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {useEnrichedFields} from 'Components/panel/EnrichedFields';
-import {UserVerificationBadges} from 'src/script/components/VerificationBadges';
+import {UserVerificationBadges} from 'Components/VerificationBadge';
 import {ConversationState} from 'src/script/conversation/ConversationState';
 import {ContentState} from 'src/script/page/useAppState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';

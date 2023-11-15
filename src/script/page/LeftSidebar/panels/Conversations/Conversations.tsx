@@ -30,7 +30,7 @@ import {AvailabilityState} from 'Components/AvailabilityState';
 import {CallingCell} from 'Components/calling/CallingCell';
 import {Icon} from 'Components/Icon';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
-import {UserVerificationBadges} from 'Components/VerificationBadges';
+import {UserVerificationBadges} from 'Components/VerificationBadge';
 import {ListState} from 'src/script/page/useAppState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';

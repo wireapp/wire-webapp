@@ -20,7 +20,7 @@
 import {ChangeEvent, FC, KeyboardEvent, useEffect, useRef, useState} from 'react';
 
 import {Icon} from 'Components/Icon';
-import {ConversationVerificationBadges} from 'src/script/components/VerificationBadges';
+import {ConversationVerificationBadges} from 'Components/VerificationBadge';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';

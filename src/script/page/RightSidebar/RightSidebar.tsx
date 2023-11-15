@@ -26,7 +26,7 @@ import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {DeviceVerificationBadges, UserVerificationBadges} from 'Components/VerificationBadges';
+import {DeviceVerificationBadges, UserVerificationBadges} from 'Components/VerificationBadge';
 import {ClientEntity} from 'src/script/client';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 

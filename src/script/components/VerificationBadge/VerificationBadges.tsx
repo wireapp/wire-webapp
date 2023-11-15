@@ -135,12 +135,12 @@ export const ConversationVerificationBadges = ({conversation, displayTitle}: Con
   );
 };
 
-export const VerificationBadges: React.FC<VerificationBadgesProps> = ({
+export const VerificationBadges = ({
   conversationProtocol,
   isProteusVerified = false,
   MLSStatus,
   displayTitle = false,
-}) => {
+}: VerificationBadgesProps) => {
   if (!MLSStatus && !isProteusVerified) {
     return null;
   }
