@@ -63,7 +63,9 @@ describe('MLSConversationVerificationStateHandler', () => {
       let triggerEpochChange: Function = () => {};
       conversation.mlsVerificationState(ConversationVerificationState.VERIFIED);
       jest.spyOn(core.service!.e2eIdentity!, 'getConversationState').mockResolvedValue(E2eiConversationState.Degraded);
-      jest.spyOn(core.service!.mls!, 'on').mockImplementation((_event, listener) => (triggerEpochChange = listener));
+      jest
+        .spyOn(core.service!.mls!, 'on')
+        .mockImplementation((_event, listener) => (triggerEpochChange = listener) as any);
 
       registerMLSConversationVerificationStateHandler(undefined, conversationState, core);
 
@@ -76,7 +78,9 @@ describe('MLSConversationVerificationStateHandler', () => {
       let triggerEpochChange: Function = () => {};
       conversation.mlsVerificationState(ConversationVerificationState.DEGRADED);
       jest.spyOn(core.service!.e2eIdentity!, 'getConversationState').mockResolvedValue(E2eiConversationState.Verified);
-      jest.spyOn(core.service!.mls!, 'on').mockImplementation((_event, listener) => (triggerEpochChange = listener));
+      jest
+        .spyOn(core.service!.mls!, 'on')
+        .mockImplementation((_event, listener) => (triggerEpochChange = listener) as any);
 
       registerMLSConversationVerificationStateHandler(undefined, conversationState, core);
 

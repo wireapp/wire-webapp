@@ -160,7 +160,7 @@ describe('E2EIHandler', () => {
     await handler.initialize();
     expect(getModalOptions).toHaveBeenCalledWith(
       expect.objectContaining({
-        type: ModalType.enrol,
+        type: ModalType.ENROL,
       }),
     );
   });
