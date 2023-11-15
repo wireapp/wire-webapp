@@ -20,7 +20,6 @@
 import React, {useEffect, useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {WireIdentity} from '@wireapp/core-crypto/platforms/web/corecrypto';
 import {container} from 'tsyringe';
 
 import {DeviceVerificationBadges} from 'Components/VerificationBadge';
@@ -60,7 +59,6 @@ export const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
   resetSession,
 }) => {
   const [selectedDevice, setSelectedDevice] = useState<ClientEntity | undefined>();
-  const [selectedDeviceIdentity, setSelectedDeviceIdentity] = useState<WireIdentity>();
   const [localFingerprint, setLocalFingerprint] = useState('');
 
   const {devices} = useKoSubscribableChildren(selfUser, ['devices']);
@@ -90,7 +88,6 @@ export const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
       <DeviceDetailsPreferences
         renderDeviceBadges={renderDeviceBadges}
         device={selectedDevice}
-        deviceIdentity={selectedDeviceIdentity}
         getFingerprint={getFingerprint}
         onRemove={async device => {
           await removeDevice(device);
@@ -106,25 +103,6 @@ export const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
   }
 
   const certificate = e2eIdentity.getCertificateData();
-
-  const selectDevice = async (device: ClientEntity, deviceIdentity?: WireIdentity) => {
-    setSelectedDevice(device);
-
-    if (deviceIdentity) {
-      setSelectedDeviceIdentity(deviceIdentity);
-    }
-  };
-
-  const getDeviceIdentity = async (deviceId: string) => {
-    const selfConversation = conversationState?.getSelfMLSConversation();
-
-    if (!selfConversation) {
-      return null;
-    }
-
-    const groupId = selfConversation.groupId;
-    return e2eIdentity.getUserDeviceEntities(groupId, {[deviceId]: selfUser});
-  };
 
   return (
     <PreferencesPage title={t('preferencesDevices')}>
@@ -150,10 +128,10 @@ export const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
               device={device}
               key={device.id}
               isSSO={isSSO}
-              onSelect={selectDevice}
+              onSelect={setSelectedDevice}
               onRemove={removeDevice}
               deviceNumber={++index}
-              getDeviceIdentity={getDeviceIdentity}
+              renderDeviceBadges={renderDeviceBadges}
             />
           ))}
           <p className="preferences-detail">{t('preferencesDevicesActiveDetail')}</p>

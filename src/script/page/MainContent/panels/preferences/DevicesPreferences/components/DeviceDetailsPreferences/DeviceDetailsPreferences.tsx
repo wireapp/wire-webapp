@@ -19,8 +19,6 @@
 
 import React, {useEffect, useState} from 'react';
 
-import {WireIdentity} from '@wireapp/core-crypto/platforms/web/corecrypto';
-
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {ClientEntity} from 'src/script/client/ClientEntity';
@@ -39,7 +37,6 @@ interface DevicesPreferencesProps {
   onRemove: (device: ClientEntity) => void;
   onResetSession: (device: ClientEntity) => Promise<void>;
   onVerify: (device: ClientEntity, verified: boolean) => void;
-  deviceIdentity?: WireIdentity;
 }
 
 enum SessionResetState {
@@ -56,7 +53,6 @@ export const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
   onRemove,
   onClose,
   onResetSession,
-  deviceIdentity,
 }) => {
   const {isVerified} = useKoSubscribableChildren(device.meta, ['isVerified']);
   const [resetState, setResetState] = useState<SessionResetState>(SessionResetState.RESET);
@@ -99,7 +95,6 @@ export const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
             device={device}
             fingerprint={fingerprint || ''}
             showVerificationStatus={false}
-            certificate={deviceIdentity?.certificate}
             isOtherDevice
           />
 

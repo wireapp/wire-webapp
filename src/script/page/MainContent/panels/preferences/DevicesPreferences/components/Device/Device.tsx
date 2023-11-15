@@ -17,15 +17,13 @@
  *
  */
 
-import {MouseEvent, KeyboardEvent, useEffect, useState, useCallback} from 'react';
+import {MouseEvent, KeyboardEvent} from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
 import {WireIdentity} from '@wireapp/core-crypto';
 
 import {Icon} from 'Components/Icon';
-import {VerificationBadges} from 'Components/VerificationBadge';
-import {getCertificateDetails, getCertificateState} from 'Util/certificateDetails';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -40,19 +38,15 @@ interface DeviceProps {
   onRemove: (device: ClientEntity) => void;
   onSelect: (device: ClientEntity, currentDeviceIdentity?: WireIdentity) => void;
   deviceNumber: number;
-  getDeviceIdentity: (deviceId: string) => Promise<WireIdentity[] | undefined | null>;
+  renderDeviceBadges: (device: ClientEntity) => React.ReactNode;
 }
 
-export const Device = ({device, isSSO, onSelect, onRemove, deviceNumber, getDeviceIdentity}: DeviceProps) => {
+export const Device = ({device, isSSO, onSelect, onRemove, deviceNumber, renderDeviceBadges}: DeviceProps) => {
   const {isVerified} = useKoSubscribableChildren(device.meta, ['isVerified']);
   const verifiedLabel = isVerified ? t('preferencesDevicesVerification') : t('preferencesDeviceNotVerified');
   const deviceAriaLabel = `${t('preferencesDevice')} ${deviceNumber}, ${device.getName()}, ${verifiedLabel}`;
 
-  const [currentDeviceIdentity, setCurrentDeviceIdentity] = useState<WireIdentity>();
   const mlsFingerprint = device.mlsPublicKeys?.[MLSPublicKeys.ED25519];
-
-  const {isNotDownloaded, isValid, isExpireSoon} = getCertificateDetails(currentDeviceIdentity?.certificate);
-  const certificateState = getCertificateState({isNotDownloaded, isValid, isExpireSoon});
 
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
@@ -63,16 +57,7 @@ export const Device = ({device, isSSO, onSelect, onRemove, deviceNumber, getDevi
     event.stopPropagation();
   };
 
-  const handleGetDeviceIdentity = useCallback(async () => {
-    const deviceIdentity = await getDeviceIdentity(device.id);
-    setCurrentDeviceIdentity(deviceIdentity?.[0]);
-  }, [device.id, getDeviceIdentity]);
-
-  useEffect(() => {
-    void handleGetDeviceIdentity();
-  }, [handleGetDeviceIdentity]);
-
-  const onDeviceSelect = () => onSelect(device, currentDeviceIdentity);
+  const onDeviceSelect = () => onSelect(device);
 
   return (
     <div
@@ -90,7 +75,7 @@ export const Device = ({device, isSSO, onSelect, onRemove, deviceNumber, getDevi
         >
           {device.getName()}
 
-          <VerificationBadges isProteusVerified={isVerified} MLSStatus={certificateState} />
+          {renderDeviceBadges(device)}
         </div>
 
         {mlsFingerprint && (

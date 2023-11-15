@@ -32,11 +32,10 @@ export function getE2EIdentityService() {
  * @param clientIdsWithUser client ids with user data
  * Returns devices E2EI certificates
  */
-export async function getUserDeviceEntities(
-  groupId: string | Uint8Array,
-  clientIdsWithUser: Record<string, QualifiedId>,
-) {
-  return getE2EIdentityService()?.getUserDeviceEntities(groupId, clientIdsWithUser);
+export async function getDeviceVerificationState(groupId: string, userId: QualifiedId, deviceId: string) {
+  const identities = await getE2EIdentityService()?.getUserDeviceEntities(groupId, {[deviceId]: userId});
+  // @fixme: soon coreCrypto will return a `isValid` property. Use this one to check for validity
+  return identities?.length ? 'verified' : 'unverified';
 }
 
 export async function getConversationState(groupId: string) {
