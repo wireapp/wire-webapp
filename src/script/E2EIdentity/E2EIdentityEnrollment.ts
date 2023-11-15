@@ -36,7 +36,7 @@ import {OIDCServiceStore} from './OIDCService/OIDCServiceStorage';
 export enum E2EIHandlerStep {
   UNINITIALIZED = 'uninitialized',
   INITIALIZED = 'initialized',
-  ENROL = 'enrol',
+  ENROLL = 'enroll',
   SUCCESS = 'success',
   ERROR = 'error',
   SNOOZE = 'snooze',
@@ -134,10 +134,10 @@ export class E2EIHandler {
     await oidcService.authenticate();
   }
 
-  public async enrol() {
+  public async enroll() {
     try {
       // Notify user about E2EI enrolment in progress
-      this.currentStep = E2EIHandlerStep.ENROL;
+      this.currentStep = E2EIHandlerStep.ENROLL;
       this.showLoadingMessage();
       let oAuthIdToken: string | undefined;
 
@@ -188,7 +188,7 @@ export class E2EIHandler {
   }
 
   private showLoadingMessage(): void {
-    if (this.currentStep !== E2EIHandlerStep.ENROL) {
+    if (this.currentStep !== E2EIHandlerStep.ENROLL) {
       return;
     }
 
@@ -230,7 +230,7 @@ export class E2EIHandler {
       hideClose: true,
       primaryActionFn: () => {
         this.currentStep = E2EIHandlerStep.INITIALIZED;
-        void this.enrol();
+        void this.enroll();
       },
       secondaryActionFn: () => {
         this.showE2EINotificationMessage();
@@ -244,7 +244,7 @@ export class E2EIHandler {
     // If the user has already started enrolment, don't show the notification. Instead, show the loading modal
     // This will occur after the redirect from the oauth provider
     if (this.coreE2EIService.isEnrollmentInProgress()) {
-      void this.enrol();
+      void this.enroll();
       return;
     }
 
@@ -271,12 +271,12 @@ export class E2EIHandler {
     if (!this.timer.isDelayTimerActive()) {
       const {modalOptions, modalType} = getModalOptions({
         hideSecondary: !this.timer.isSnoozeTimeAvailable(),
-        primaryActionFn: () => this.enrol(),
+        primaryActionFn: () => this.enroll(),
         secondaryActionFn: () => {
           this.currentStep = E2EIHandlerStep.SNOOZE;
           this.timer.delayPrompt();
         },
-        type: ModalType.ENROL,
+        type: ModalType.ENROLL,
         hideClose: true,
       });
       PrimaryModal.show(modalType, modalOptions);

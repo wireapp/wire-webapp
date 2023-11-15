@@ -52,7 +52,7 @@ export const E2EICertificateDetails = ({certificate, isOtherDevice = false}: E2E
     try {
       const e2eHandler = E2EIHandler.getInstance();
 
-      await e2eHandler.enrol();
+      await e2eHandler.enroll();
     } catch (error) {
       logger.error('Cannot get E2EI instance: ', error);
     }

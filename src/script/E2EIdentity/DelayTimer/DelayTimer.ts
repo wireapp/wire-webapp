@@ -124,7 +124,7 @@ class DelayTimerService {
   }
 
   /**
-   * Prompt the user to delay the enrolment
+   * Prompt the user to delay the enrollment
    */
   public delayPrompt() {
     if (this.isDelayTimerActive()) {

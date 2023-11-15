@@ -17,5 +17,5 @@
  *
  */
 
-export * from './E2EIdentityEnrolment';
+export * from './E2EIdentityEnrollment';
 export * from './E2EIdentity';

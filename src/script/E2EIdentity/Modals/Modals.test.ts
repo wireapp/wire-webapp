@@ -23,34 +23,34 @@ import {getModalOptions, ModalType} from './Modals';
 
 describe('getModalOptions', () => {
   it('should return modal options with hidden secondary action when hideSecondary is true', () => {
-    const options = getModalOptions({type: ModalType.ENROL, hideSecondary: true});
+    const options = getModalOptions({type: ModalType.ENROLL, hideSecondary: true});
 
     expect(options.modalOptions.secondaryAction).toBeUndefined();
     expect(options.modalType).toEqual(PrimaryModal.type.ACKNOWLEDGE);
   });
 
   it('should return modal options with hidden secondary action when secondaryActionFn is not provided', () => {
-    const options = getModalOptions({type: ModalType.ENROL, secondaryActionFn: undefined});
+    const options = getModalOptions({type: ModalType.ENROLL, secondaryActionFn: undefined});
 
     expect(options.modalOptions.secondaryAction).toBeUndefined();
     expect(options.modalType).toEqual(PrimaryModal.type.ACKNOWLEDGE);
   });
 
   it('should return modal options with hidden primary action when hidePrimary is true', () => {
-    const options = getModalOptions({type: ModalType.ENROL, hidePrimary: true});
+    const options = getModalOptions({type: ModalType.ENROLL, hidePrimary: true});
 
     expect(options.modalOptions.primaryAction).toBeUndefined();
   });
 
   it('should return modal options with hidden close button when hideClose is true', () => {
-    const options = getModalOptions({type: ModalType.ENROL, hideClose: true});
+    const options = getModalOptions({type: ModalType.ENROLL, hideClose: true});
 
     expect(options.modalOptions.hideCloseBtn).toBeTruthy();
     expect(options.modalOptions.preventClose).toBeTruthy();
   });
 
   it('should return modal options with hidden secondary and primary actions when both hideSecondary and hidePrimary are true', () => {
-    const options = getModalOptions({type: ModalType.ENROL, hideSecondary: true, hidePrimary: true});
+    const options = getModalOptions({type: ModalType.ENROLL, hideSecondary: true, hidePrimary: true});
 
     expect(options.modalOptions.secondaryAction).toBeUndefined();
     expect(options.modalOptions.primaryAction).toBeUndefined();
