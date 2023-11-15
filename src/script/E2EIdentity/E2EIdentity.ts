@@ -23,7 +23,9 @@ import {container} from 'tsyringe';
 import {Core} from 'src/script/service/CoreSingleton';
 import {base64ToArray} from 'Util/util';
 
-const core = container.resolve(Core);
+function getE2EIdentityService() {
+  return container.resolve(Core).service?.e2eIdentity;
+}
 
 /**
  * @param groupId id of the group
@@ -34,17 +36,17 @@ export async function getUserDeviceEntities(
   groupId: string | Uint8Array,
   clientIdsWithUser: Record<string, QualifiedId>,
 ) {
-  return core.service?.e2eIdentity?.getUserDeviceEntities(groupId, clientIdsWithUser);
+  return getE2EIdentityService()?.getUserDeviceEntities(groupId, clientIdsWithUser);
 }
 
 export async function getConversationState(groupId: string) {
-  return core.service?.e2eIdentity?.getConversationState(base64ToArray(groupId));
+  return getE2EIdentityService()?.getConversationState(base64ToArray(groupId));
 }
 /**
  * Checks if E2EI has active certificate.
  */
 export function hasActiveCertificate() {
-  return core.service?.e2eIdentity?.hasActiveCertificate();
+  return getE2EIdentityService()?.hasActiveCertificate();
 }
 
 /**
@@ -55,5 +57,5 @@ export function getCertificateData() {
     return undefined;
   }
 
-  return core.service?.e2eIdentity?.getCertificateData();
+  return getE2EIdentityService()?.getCertificateData();
 }

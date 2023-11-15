@@ -36,9 +36,6 @@ jest.mock('./OIDCService', () => ({
   } as unknown as OIDCService),
 }));
 
-jest.mock('Util/util');
-jest.mock('src/script/Config');
-jest.mock('Components/Modals/PrimaryModal');
 jest.mock('./Modals', () => ({
   getModalOptions: jest.fn().mockReturnValue({
     modalOptions: {},
@@ -48,7 +45,7 @@ jest.mock('./Modals', () => ({
     LOADING: 'loading',
     SUCCESS: 'success',
     ERROR: 'error',
-    enrol: 'enrol',
+    ENROL: 'enrol',
   },
 }));
 
@@ -58,7 +55,7 @@ describe('E2EIHandler', () => {
   const user = {name: () => 'John Doe', username: () => 'johndoe'};
 
   beforeEach(() => {
-    (util.supportsMLS as jest.Mock).mockReturnValue(true);
+    jest.spyOn(util, 'supportsMLS').mockReturnValue(true);
     // Reset the singleton instance before each test
     E2EIHandler.resetInstance();
     // Clear all mocks before each test
@@ -68,8 +65,7 @@ describe('E2EIHandler', () => {
     (util.supportsMLS as jest.Mock).mockReturnValue(true);
     Config.getConfig = jest.fn().mockReturnValue({FEATURE: {ENABLE_E2EI: true}});
 
-    // Mock the PrimaryModal service to return a mock modal
-    (PrimaryModal.show as jest.Mock).mockClear();
+    jest.spyOn(PrimaryModal, 'show');
     (getModalOptions as jest.Mock).mockClear();
 
     jest
