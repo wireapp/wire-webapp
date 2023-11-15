@@ -20,7 +20,7 @@
 import React, {useEffect, useMemo, useState} from 'react';
 
 import {ClientClassification} from '@wireapp/api-client/lib/client/';
-import {container} from 'tsyringe';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -31,7 +31,6 @@ import {DeviceDetails} from './userDevices/DeviceDetails';
 import {DeviceList} from './userDevices/DeviceList';
 import {NoDevicesFound} from './userDevices/NoDevicesFound';
 import {SelfFingerprint} from './userDevices/SelfFingerprint';
-import {DeviceVerificationBadges} from './VerificationBadges';
 
 import {ClientRepository, ClientEntity} from '../client';
 import {ConversationState} from '../conversation/ConversationState';
@@ -86,6 +85,7 @@ interface UserDevicesProps {
   cryptographyRepository: CryptographyRepository;
   current: UserDevicesHistoryEntry;
   goTo: (state: UserDevicesState, headline: string) => void;
+  renderDeviceBadges?: (device: ClientEntity, userId: QualifiedId) => React.ReactNode;
   messageRepository: MessageRepository;
   noPadding?: boolean;
   user: User;
@@ -99,7 +99,7 @@ const UserDevices: React.FC<UserDevicesProps> = ({
   goTo,
   messageRepository,
   cryptographyRepository,
-  conversationState = container.resolve(ConversationState),
+  renderDeviceBadges,
 }) => {
   const [selectedClient, setSelectedClient] = useState<ClientEntity>();
   const [deviceMode, setDeviceMode] = useState(FIND_MODE.REQUESTING);
@@ -124,20 +124,14 @@ const UserDevices: React.FC<UserDevicesProps> = ({
     })();
   }, [user]);
 
+  const renderBadges = (device: ClientEntity) => {
+    return renderDeviceBadges?.(device, user.qualifiedId);
+  };
+
   const clickOnDevice = (clientEntity: ClientEntity) => {
     setSelectedClient(clientEntity);
     const headline = user.isMe ? clientEntity.label || clientEntity.model : capitalizeFirstChar(clientEntity.class);
     goTo(UserDevicesState.DEVICE_DETAILS, headline || '');
-  };
-
-  const renderDeviceBadges = (device: ClientEntity) => {
-    return (
-      <DeviceVerificationBadges
-        device={device}
-        userId={user.qualifiedId}
-        groupId={conversationState.activeConversation()?.groupId}
-      />
-    );
   };
 
   const clickToShowSelfFingerprint = () => {
@@ -149,7 +143,7 @@ const UserDevices: React.FC<UserDevicesProps> = ({
   return (
     <div>
       {showDeviceList && deviceMode === FIND_MODE.FOUND && (
-        <DeviceList {...{renderDeviceBadges, clickOnDevice, clients, noPadding, user}} />
+        <DeviceList {...{renderDeviceBadges: renderBadges, clickOnDevice, clients, noPadding, user}} />
       )}
 
       {showDeviceList && deviceMode === FIND_MODE.NOT_FOUND && <NoDevicesFound {...{noPadding, user}} />}
@@ -157,7 +151,7 @@ const UserDevices: React.FC<UserDevicesProps> = ({
       {current.state === UserDevicesState.DEVICE_DETAILS && (
         <DeviceDetails
           {...{
-            renderDeviceBadges,
+            renderDeviceBadges: renderBadges,
             clickToShowSelfFingerprint,
             clientRepository,
             cryptographyRepository,

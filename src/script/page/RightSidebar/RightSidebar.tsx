@@ -19,13 +19,15 @@
 
 import {cloneElement, FC, ReactNode, useCallback, useEffect, useState} from 'react';
 
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import {CSSTransition, TransitionGroup} from 'react-transition-group';
 import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {UserVerificationBadges} from 'Components/VerificationBadges';
+import {DeviceVerificationBadges, UserVerificationBadges} from 'Components/VerificationBadges';
+import {ClientEntity} from 'src/script/client';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {AddParticipants} from './AddParticipants';
@@ -183,6 +185,10 @@ const RightSidebar: FC<RightSidebarProps> = ({
     return <UserVerificationBadges user={participant} groupId={activeConversation?.groupId} />;
   };
 
+  const renderDeviceBadges = (device: ClientEntity, userId: QualifiedId) => {
+    return <DeviceVerificationBadges device={device} groupId={activeConversation?.groupId} userId={userId} />;
+  };
+
   if (!activeConversation) {
     return null;
   }
@@ -248,6 +254,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
 
           {currentState === PanelState.PARTICIPANT_DEVICES && userEntity && (
             <ParticipantDevices
+              renderDeviceBadges={renderDeviceBadges}
               repositories={repositories}
               onClose={closePanel}
               onGoBack={onBackClick}

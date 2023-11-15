@@ -50,7 +50,7 @@ interface DeviceDetailsProps {
   logger: Logger;
   messageRepository: MessageRepository;
   noPadding: boolean;
-  selectedClient: ClientEntity;
+  selectedClient?: ClientEntity;
   user: User;
 }
 
