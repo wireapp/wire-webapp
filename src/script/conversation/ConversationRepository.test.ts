@@ -2073,6 +2073,10 @@ describe('ConversationRepository', () => {
     });
 
     describe('updateConversationProtocol', () => {
+      afterEach(() => {
+        jest.clearAllMocks();
+      });
+
       it('should update the protocol-related fields after protocol was updated to mixed and inject event', async () => {
         const conversation = _generateConversation();
         const conversationRepository = await testFactory.exposeConversationActors();
@@ -2100,6 +2104,7 @@ describe('ConversationRepository', () => {
           protocol: newProtocol,
           overwites: {cipher_suite: newCipherSuite, epoch: newEpoch},
         });
+
         jest
           .spyOn(conversationRepository['conversationService'], 'getConversationById')
           .mockResolvedValueOnce(mockedConversationResponse);
@@ -2119,6 +2124,50 @@ describe('ConversationRepository', () => {
         expect(updatedConversation.protocol).toEqual(ConversationProtocol.MIXED);
         expect(updatedConversation.cipherSuite).toEqual(newCipherSuite);
         expect(updatedConversation.epoch).toEqual(newEpoch);
+      });
+
+      it('should inject a system message if conversation protocol changed to mls during a call', async () => {
+        jest.useFakeTimers();
+        const conversation = _generateConversation();
+        const selfUser = generateUser();
+        conversation.selfUser(selfUser);
+        const conversationRepository = await testFactory.exposeConversationActors();
+        const newProtocol = ConversationProtocol.MLS;
+
+        const mockedProtocolUpdateEventResponse = {
+          data: {
+            protocol: newProtocol,
+          },
+          qualified_conversation: conversation.qualifiedId,
+          time: '2020-10-13T14:00:00.000Z',
+          type: CONVERSATION_EVENT.PROTOCOL_UPDATE,
+        } as ConversationProtocolUpdateEvent;
+
+        jest
+          .spyOn(conversationRepository['conversationService'], 'updateConversationProtocol')
+          .mockResolvedValueOnce(mockedProtocolUpdateEventResponse);
+
+        const newCipherSuite = 1;
+        const newEpoch = 2;
+        const mockedConversationResponse = generateAPIConversation({
+          protocol: newProtocol,
+          overwites: {cipher_suite: newCipherSuite, epoch: newEpoch},
+        });
+        jest
+          .spyOn(conversationRepository['conversationService'], 'getConversationById')
+          .mockResolvedValueOnce(mockedConversationResponse);
+
+        const injectEventMock = jest
+          .spyOn(conversationRepository['eventRepository'], 'injectEvent')
+          .mockImplementation(jest.fn());
+        jest.spyOn(conversationRepository['callingRepository'], 'findCall').mockReturnValue({} as any);
+
+        await conversationRepository.updateConversationProtocol(conversation, newProtocol);
+
+        expect(injectEventMock.mock.calls).toEqual([
+          [mockedProtocolUpdateEventResponse, EventRepository.SOURCE.BACKEND_RESPONSE],
+          [expect.objectContaining({type: ClientEvent.CONVERSATION.MLS_MIGRATION_FINALISATION_ONGOING_CALL})],
+        ]);
       });
     });
 

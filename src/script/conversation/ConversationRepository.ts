@@ -3084,11 +3084,12 @@ export class ConversationRepository {
 
   private readonly injectMLSMigrationFinalisationOngoingCallMessage = (conversation: Conversation): void => {
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-    const joinedAfterMLSMigrationFinalisationEvent = EventBuilder.buildMLSMigrationFinalisationOngoingCall(
+    const mlsMigrationFinalisationOngoingCallEvent = EventBuilder.buildMLSMigrationFinalisationOngoingCall(
       conversation,
       currentTimestamp,
     );
-    return void this.eventRepository.injectEvent(joinedAfterMLSMigrationFinalisationEvent);
+
+    return void this.eventRepository.injectEvent(mlsMigrationFinalisationOngoingCallEvent);
   };
 
   /**
