@@ -125,6 +125,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       this.currentStep = E2EIHandlerStep.ENROLL;
       this.showLoadingMessage();
       let oAuthIdToken: string | undefined;
+      let oAuthRefreshToken: string | undefined;
 
       // If the enrolment is in progress, we need to get the id token from the oidc service, since oauth should have already been completed
       if (this.coreE2EIService.isEnrollmentInProgress()) {
@@ -134,6 +135,11 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
           throw new Error('Received no user data from OIDC service');
         }
         oAuthIdToken = userData?.id_token;
+        oAuthRefreshToken = userData?.refresh_token;
+
+        if (oAuthRefreshToken) {
+          OIDCServiceStore.store.refreshToken(oAuthRefreshToken);
+        }
       }
 
       const displayName = this.userState.self()?.name();
