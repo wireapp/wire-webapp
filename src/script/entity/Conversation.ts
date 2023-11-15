@@ -31,7 +31,7 @@ import ko from 'knockout';
 import {container} from 'tsyringe';
 import {Cancelable, debounce} from 'underscore';
 
-import {Availability, LegalHoldStatus} from '@wireapp/protocol-messaging';
+import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
@@ -98,7 +98,6 @@ export class Conversation {
   public readonly accessCode: ko.Observable<string>;
   public readonly accessState: ko.Observable<ACCESS_STATE>;
   public readonly archivedTimestamp: ko.Observable<number>;
-  public readonly availabilityOfUser: ko.PureComputed<Availability.Type>;
   public readonly call: ko.Observable<Call | null>;
   public readonly cleared_timestamp: ko.Observable<number>;
   public readonly connection: ko.Observable<ConnectionEntity>;
@@ -215,7 +214,6 @@ export class Conversation {
     this.hasCreationMessage = false;
 
     this.firstUserEntity = ko.pureComputed(() => this.participating_user_ets()[0]);
-    this.availabilityOfUser = ko.pureComputed(() => this.firstUserEntity()?.availability());
 
     this.isGuest = ko.observable(false);
 
