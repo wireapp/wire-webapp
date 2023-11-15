@@ -32,7 +32,6 @@ import {createUuid} from 'Util/uuid';
 
 import {DevicesPreferences} from './DevicesPreference';
 
-import {E2EIHandler} from '../../../../../E2EIdentity';
 import {Conversation} from '../../../../../entity/Conversation';
 
 function createDevice(): ClientEntity {
@@ -55,8 +54,6 @@ function createConversation(protocol?: ConversationProtocol, type?: CONVERSATION
 }
 
 describe('DevicesPreferences', () => {
-  const params = {discoveryUrl: 'http://example.com', gracePeriodInSeconds: 30};
-
   const selfProteusConversation = createConversation(ConversationProtocol.PROTEUS, CONVERSATION_TYPE.SELF);
   const selfMLSConversation = createConversation(ConversationProtocol.MLS, CONVERSATION_TYPE.SELF);
   const regularConversation = createConversation();
@@ -82,9 +79,6 @@ describe('DevicesPreferences', () => {
   defaultParams.conversationState.conversations([selfProteusConversation, selfMLSConversation, regularConversation]);
 
   it('displays all devices', async () => {
-    const instance = E2EIHandler.getInstance(params);
-    expect(instance).toBeInstanceOf(E2EIHandler);
-
     const {getByText, getAllByText} = render(withTheme(<DevicesPreferences {...defaultParams} />));
 
     await waitFor(() => getByText('preferencesDevicesCurrent'));
