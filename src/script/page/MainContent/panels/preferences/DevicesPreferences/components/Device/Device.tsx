@@ -74,7 +74,6 @@ export const Device = ({device, isSSO, onSelect, onRemove, deviceNumber, renderD
           aria-label={deviceAriaLabel}
         >
           {device.getName()}
-
           {renderDeviceBadges(device)}
         </div>
 

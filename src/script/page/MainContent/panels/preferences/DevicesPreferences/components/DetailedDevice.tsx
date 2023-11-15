@@ -29,7 +29,7 @@ export interface DeviceProps {
   device: ClientEntity;
   fingerprint: string;
   showVerificationStatus?: boolean;
-  isOtherDevice?: boolean;
+  isCurrentDevice?: boolean;
   certificate?: string;
   isProteusVerified?: boolean;
 }
@@ -39,7 +39,7 @@ export const DetailedDevice: React.FC<DeviceProps> = ({
   device,
   fingerprint,
   showVerificationStatus = true,
-  isOtherDevice = false,
+  isCurrentDevice,
   certificate,
   isProteusVerified = false,
 }) => {
@@ -53,7 +53,7 @@ export const DetailedDevice: React.FC<DeviceProps> = ({
       </h3>
 
       {mlsFingerprint && (
-        <MLSDeviceDetails fingerprint={mlsFingerprint} isOtherDevice={isOtherDevice} certificate={certificate} />
+        <MLSDeviceDetails fingerprint={mlsFingerprint} isCurrentDevice={isCurrentDevice} certificate={certificate} />
       )}
 
       {/* Proteus */}

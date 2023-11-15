@@ -110,6 +110,7 @@ export const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
         <legend className="preferences-header">{t('preferencesDevicesCurrent')}</legend>
         {currentClient && (
           <DetailedDevice
+            isCurrentDevice
             device={currentClient}
             fingerprint={localFingerprint}
             certificate={certificate}

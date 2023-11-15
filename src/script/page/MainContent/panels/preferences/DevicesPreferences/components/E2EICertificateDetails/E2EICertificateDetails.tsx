@@ -34,10 +34,10 @@ const logger = getLogger('E2EICertificateDetails');
 
 interface E2EICertificateDetailsProps {
   certificate?: string;
-  isOtherDevice?: boolean;
+  isCurrentDevice?: boolean;
 }
 
-export const E2EICertificateDetails = ({certificate, isOtherDevice = false}: E2EICertificateDetailsProps) => {
+export const E2EICertificateDetails = ({certificate, isCurrentDevice}: E2EICertificateDetailsProps) => {
   const [isCertificateDetailsModalOpen, setIsCertificateDetailsModalOpen] = useState(false);
 
   const {isNotDownloaded, isValid, isExpireSoon} = getCertificateDetails(certificate);
@@ -50,9 +50,7 @@ export const E2EICertificateDetails = ({certificate, isOtherDevice = false}: E2E
 
   const getCertificate = async () => {
     try {
-      const e2eHandler = E2EIHandler.getInstance();
-
-      await e2eHandler.enroll();
+      await E2EIHandler.getInstance().enroll();
     } catch (error) {
       logger.error('Cannot get E2EI instance: ', error);
     }
@@ -86,16 +84,20 @@ export const E2EICertificateDetails = ({certificate, isOtherDevice = false}: E2E
           <CertificateDetailsModal certificate={certificate} onClose={() => setIsCertificateDetailsModalOpen(false)} />
         )}
 
-        {!isOtherDevice && isNotDownloaded && (
-          <Button variant={ButtonVariant.TERTIARY} onClick={getCertificate} data-uie-name="get-certificate">
-            {t('E2EI.getCertificate')}
-          </Button>
-        )}
+        {isCurrentDevice && (
+          <>
+            {isNotDownloaded && (
+              <Button variant={ButtonVariant.TERTIARY} onClick={getCertificate} data-uie-name="get-certificate">
+                {t('E2EI.getCertificate')}
+              </Button>
+            )}
 
-        {!isOtherDevice && certificate && !isValid && (
-          <Button variant={ButtonVariant.TERTIARY} onClick={updateCertificate} data-uie-name="update-certificate">
-            {t('E2EI.updateCertificate')}
-          </Button>
+            {certificate && !isValid && (
+              <Button variant={ButtonVariant.TERTIARY} onClick={updateCertificate} data-uie-name="update-certificate">
+                {t('E2EI.updateCertificate')}
+              </Button>
+            )}
+          </>
         )}
       </div>
     </div>

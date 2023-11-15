@@ -30,11 +30,11 @@ import {FormattedId} from '../FormattedId';
 
 interface MLSDeviceDetailsProps {
   fingerprint: string;
-  isOtherDevice?: boolean;
+  isCurrentDevice?: boolean;
   certificate?: string;
 }
 
-export const MLSDeviceDetails = ({fingerprint, isOtherDevice = false, certificate}: MLSDeviceDetailsProps) => {
+export const MLSDeviceDetails = ({fingerprint, isCurrentDevice, certificate}: MLSDeviceDetailsProps) => {
   const isE2EIEnabled = supportsMLS() && Config.getConfig().FEATURE.ENABLE_E2EI;
 
   return (
@@ -47,7 +47,7 @@ export const MLSDeviceDetails = ({fingerprint, isOtherDevice = false, certificat
         <FormattedId idSlices={splitFingerprint(fingerprint)} />
       </p>
 
-      {isE2EIEnabled && <E2EICertificateDetails certificate={certificate} isOtherDevice={isOtherDevice} />}
+      {isE2EIEnabled && <E2EICertificateDetails certificate={certificate} isCurrentDevice={isCurrentDevice} />}
     </div>
   );
 };
