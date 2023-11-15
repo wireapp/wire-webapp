@@ -40,6 +40,7 @@ export class Account extends EventEmitter {
       hasActiveCertificate: jest.fn(),
       getCertificateData: jest.fn(),
       getUserDeviceEntities: jest.fn(),
+      getConversationState: jest.fn(),
     },
     mls: {
       schedulePeriodicKeyMaterialRenewals: jest.fn(),
@@ -50,9 +51,9 @@ export class Account extends EventEmitter {
       getEpoch: jest.fn(),
       conversationExists: jest.fn(),
       exportSecretKey: jest.fn(),
-      on: this.on,
-      emit: this.emit,
-      off: this.off,
+      on: jest.fn(),
+      emit: jest.fn(),
+      off: jest.fn(),
       scheduleKeyMaterialRenewal: jest.fn(),
     },
     asset: {

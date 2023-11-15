@@ -30,7 +30,7 @@ import {ConversationState} from '../../ConversationState';
 import {ConversationVerificationState} from '../../ConversationVerificationState';
 import {getConversationByGroupId, OnConversationVerificationStateChange} from '../shared';
 
-export class MLSConversationVerificationStateHandler {
+class MLSConversationVerificationStateHandler {
   private readonly logger: Logger;
 
   public constructor(
@@ -77,13 +77,7 @@ export class MLSConversationVerificationStateHandler {
     });
   }
 
-  private checkConversationVerificationState = async ({
-    groupId,
-    epoch,
-  }: {
-    groupId: string;
-    epoch: number;
-  }): Promise<void> => {
+  private checkConversationVerificationState = async ({groupId}: {groupId: string}): Promise<void> => {
     const conversation = getConversationByGroupId({conversationState: this.conversationState, groupId});
     if (!conversation) {
       this.logger.error(`Epoch changed but conversationEntity can't be found`);
