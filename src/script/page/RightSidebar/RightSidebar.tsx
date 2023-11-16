@@ -28,6 +28,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {DeviceVerificationBadges, UserVerificationBadges} from 'Components/VerificationBadge';
 import {ClientEntity} from 'src/script/client';
+import * as e2eIdentity from 'src/script/E2EIdentity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {AddParticipants} from './AddParticipants';
@@ -186,7 +187,13 @@ const RightSidebar: FC<RightSidebarProps> = ({
   };
 
   const renderDeviceBadges = (device: ClientEntity, userId: QualifiedId) => {
-    return <DeviceVerificationBadges device={device} groupId={activeConversation?.groupId} userId={userId} />;
+    const selfConversation = conversationState.selfMLSConversation();
+    const getDeviceIdentity =
+      e2eIdentity.isE2EIEnabled() && selfConversation
+        ? () => e2eIdentity.getDeviceIdentity(selfConversation.groupId, userId, device.id)
+        : undefined;
+
+    return <DeviceVerificationBadges device={device} getDeviceIdentity={getDeviceIdentity} />;
   };
 
   if (!activeConversation) {

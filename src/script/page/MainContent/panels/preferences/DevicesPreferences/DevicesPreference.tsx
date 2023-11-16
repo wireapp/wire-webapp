@@ -73,32 +73,24 @@ export const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
     void cryptographyRepository.getLocalFingerprint().then(setLocalFingerprint);
   }, [cryptographyRepository]);
 
-  const renderDeviceBadges = (device: ClientEntity) => {
-    return (
-      <DeviceVerificationBadges
-        device={device}
-        userId={selfUser.qualifiedId}
-        groupId={conversationState.selfMLSConversation()?.groupId}
-      />
-    );
-  };
+  const getDeviceIdentity = e2eIdentity.isE2EIEnabled()
+    ? async (deviceId: string) => {
+        const selfConversation = conversationState.selfMLSConversation();
+        if (!selfConversation) {
+          return undefined;
+        }
+        return e2eIdentity.getDeviceIdentity(selfConversation.groupId, selfUser.qualifiedId, deviceId);
+      }
+    : undefined;
 
-  const getDeviceCertificate = async (deviceId: string) => {
-    if (deviceId === currentClient?.id) {
-      return e2eIdentity.getCurrentDeviceCertificateData();
-    }
-    const selfConversation = conversationState.selfMLSConversation();
-    if (!selfConversation) {
-      return undefined;
-    }
-    const identity = await e2eIdentity.getDeviceIdentity(selfConversation.groupId, selfUser.qualifiedId, deviceId);
-    return identity?.certificate;
+  const renderDeviceBadges = (device: ClientEntity) => {
+    return <DeviceVerificationBadges device={device} getDeviceIdentity={getDeviceIdentity} />;
   };
 
   if (selectedDevice) {
     return (
       <DeviceDetailsPreferences
-        getCertificate={getDeviceCertificate}
+        getDeviceIdentity={getDeviceIdentity}
         renderDeviceBadges={renderDeviceBadges}
         device={selectedDevice}
         getFingerprint={getFingerprint}
@@ -124,7 +116,7 @@ export const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
             isCurrentDevice
             device={currentClient}
             fingerprint={localFingerprint}
-            getCertificate={getDeviceCertificate}
+            getDeviceIdentity={getDeviceIdentity}
             isProteusVerified={isSelfClientVerified}
           />
         )}

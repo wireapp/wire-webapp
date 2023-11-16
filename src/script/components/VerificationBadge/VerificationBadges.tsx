@@ -20,7 +20,6 @@
 import {CSSProperties, useEffect, useState} from 'react';
 
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {
   CertificateExpiredIcon,
@@ -32,7 +31,7 @@ import {
 
 import {ClientEntity} from 'src/script/client';
 import {ConversationVerificationState} from 'src/script/conversation/ConversationVerificationState';
-import {getDeviceVerificationState} from 'src/script/E2EIdentity';
+import {TMP_DecoratedWireIdentity} from 'src/script/E2EIdentity';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -86,19 +85,22 @@ export const UserVerificationBadges = ({user, groupId}: {user: User; groupId?: s
 
 export const DeviceVerificationBadges = ({
   device,
-  userId,
-  groupId,
+  getDeviceIdentity,
 }: {
   device: ClientEntity;
-  userId: QualifiedId;
-  groupId?: string;
+  getDeviceIdentity?: (deviceId: string) => Promise<TMP_DecoratedWireIdentity | undefined>;
 }) => {
-  const [isMLSVerified, setIsMLSVerified] = useState(false);
+  const [isMLSVerified, setIsMLSVerified] = useState<MLSStatuses | undefined>(undefined);
   useEffect(() => {
-    if (groupId) {
+    if (getDeviceIdentity) {
+      const statusesMap = {
+        verified: MLSStatuses.VALID,
+        unverified: MLSStatuses.EXPIRED,
+      };
       void (async () => {
-        const verificationState = await getDeviceVerificationState(groupId, userId, device.id);
-        setIsMLSVerified(verificationState === 'verified');
+        const identity = await getDeviceIdentity(device.id);
+        const state = identity?.state && statusesMap[identity?.state];
+        setIsMLSVerified(state ?? MLSStatuses.NOT_DOWNLOADED);
       })();
     }
   });

@@ -19,10 +19,9 @@
 
 import {useEffect, useState} from 'react';
 
-import {Config} from 'src/script/Config';
+import {TMP_DecoratedWireIdentity} from 'src/script/E2EIdentity';
 import {t} from 'Util/LocalizerUtil';
 import {splitFingerprint} from 'Util/StringUtil';
-import {supportsMLS} from 'Util/util';
 
 import {styles} from './MLSDeviceDetails.styles';
 
@@ -31,17 +30,19 @@ import {E2EICertificateDetails} from '../E2EICertificateDetails';
 import {FormattedId} from '../FormattedId';
 
 interface MLSDeviceDetailsProps {
-  fingerprint: string;
   isCurrentDevice?: boolean;
-  getCertificate: () => Promise<string | undefined>;
+  getDeviceIdentity: () => Promise<TMP_DecoratedWireIdentity | undefined>;
 }
 
-export const MLSDeviceDetails = ({fingerprint, isCurrentDevice, getCertificate}: MLSDeviceDetailsProps) => {
-  const [certificate, setCertificate] = useState<string | undefined>();
-  const isE2EIEnabled = supportsMLS() && Config.getConfig().FEATURE.ENABLE_E2EI;
+export const MLSDeviceDetails = ({isCurrentDevice, getDeviceIdentity}: MLSDeviceDetailsProps) => {
+  const [identity, setIdentity] = useState<TMP_DecoratedWireIdentity | undefined>();
   useEffect(() => {
-    getCertificate?.().then(setCertificate);
+    getDeviceIdentity?.().then(setIdentity);
   }, []);
+
+  if (!identity) {
+    return null;
+  }
 
   return (
     <div css={styles.wrapper}>
@@ -50,10 +51,10 @@ export const MLSDeviceDetails = ({fingerprint, isCurrentDevice, getCertificate}:
       <p className="label-2 preferences-label preferences-devices-fingerprint-label">{t('mlsThumbprint')}</p>
 
       <p className="preferences-devices-fingerprint" css={{width: '230px'}}>
-        <FormattedId idSlices={splitFingerprint(fingerprint)} />
+        <FormattedId idSlices={splitFingerprint(identity.thumbprint)} />
       </p>
 
-      {isE2EIEnabled && <E2EICertificateDetails certificate={certificate} isCurrentDevice={isCurrentDevice} />}
+      <E2EICertificateDetails certificate={identity.certificate} isCurrentDevice={isCurrentDevice} />
     </div>
   );
 };
