@@ -20,15 +20,13 @@
 import {container} from 'tsyringe';
 
 import {PrimaryModal, removeCurrentModal} from 'Components/Modals/PrimaryModal';
-import {Config} from 'src/script/Config';
 import {Core} from 'src/script/service/CoreSingleton';
 import {UserState} from 'src/script/user/UserState';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {removeUrlParameters} from 'Util/UrlUtil';
-import {supportsMLS} from 'Util/util';
 
 import {DelayTimerService} from './DelayTimer/DelayTimer';
-import {hasActiveCertificate} from './E2EIdentity';
+import {hasActiveCertificate, isE2EIEnabled} from './E2EIdentity';
 import {getModalOptions, ModalType} from './Modals';
 import {getOIDCServiceInstance} from './OIDCService';
 import {OIDCServiceStore} from './OIDCService/OIDCServiceStorage';
@@ -116,15 +114,11 @@ export class E2EIHandler {
   }
 
   public initialize(): void {
-    if (this.isE2EIEnabled) {
+    if (isE2EIEnabled()) {
       if (!hasActiveCertificate()) {
         this.showE2EINotificationMessage();
       }
     }
-  }
-
-  get isE2EIEnabled(): boolean {
-    return supportsMLS() && Config.getConfig().FEATURE.ENABLE_E2EI;
   }
 
   private async storeRedirectTargetAndRedirect(targetURL: string): Promise<void> {

@@ -25,17 +25,12 @@ import {formatTimestamp} from 'Util/TimeUtil';
 import {type DeviceProps} from './DetailedDevice';
 import {FormattedId} from './FormattedId';
 
-interface ProteusDeviceDetailsProps extends Omit<DeviceProps, 'getCertificate'> {
+interface ProteusDeviceDetailsProps extends Omit<DeviceProps, 'getDeviceIdentity'> {
   isProteusVerified?: boolean;
   showVerificationStatus?: boolean;
 }
 
-export const ProteusDeviceDetails = ({
-  device,
-  fingerprint,
-  isProteusVerified = false,
-  showVerificationStatus = true,
-}: ProteusDeviceDetailsProps) => {
+export const ProteusDeviceDetails = ({device, fingerprint, isProteusVerified}: ProteusDeviceDetailsProps) => {
   return (
     <div className="preferences-proteus-details">
       <h4>{t('proteusDeviceDetails')}</h4>
@@ -66,21 +61,23 @@ export const ProteusDeviceDetails = ({
         <FormattedId idSlices={splitFingerprint(fingerprint)} />
       </p>
 
-      <h3 className="label preferences-label preferences-devices-fingerprint-label">
-        {t('preferencesDeviceDetailsVerificationStatus')}
-      </h3>
+      {isProteusVerified !== undefined && (
+        <>
+          <h3 className="label preferences-label preferences-devices-fingerprint-label">
+            {t('preferencesDeviceDetailsVerificationStatus')}
+          </h3>
 
-      {showVerificationStatus && (
-        <p className="preferences-devices-verification-details">
-          {isProteusVerified ? (
-            <>
-              <span>{t('proteusVerified')}</span>
-              <VerificationBadges isProteusVerified />
-            </>
-          ) : (
-            <span>{t('proteusNotVerified')}</span>
-          )}
-        </p>
+          <p className="preferences-devices-verification-details">
+            {isProteusVerified ? (
+              <>
+                <span>{t('proteusVerified')}</span>
+                <VerificationBadges isProteusVerified />
+              </>
+            ) : (
+              <span>{t('proteusNotVerified')}</span>
+            )}
+          </p>
+        </>
       )}
     </div>
   );

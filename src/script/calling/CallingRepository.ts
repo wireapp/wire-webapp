@@ -24,6 +24,8 @@ import type {WebappProperties} from '@wireapp/api-client/lib/user/data';
 import {MessageSendingState} from '@wireapp/core/lib/conversation';
 import {flattenUserMap} from '@wireapp/core/lib/conversation/message/UserClientsUtil';
 import {SubconversationEpochInfoMember} from '@wireapp/core/lib/conversation/SubconversationService/SubconversationService';
+import {TaskScheduler} from '@wireapp/core/lib/util';
+import {constructFullyQualifiedClientId} from '@wireapp/core/lib/util/fullyQualifiedClientIdUtils';
 import {amplify} from 'amplify';
 import axios from 'axios';
 import ko from 'knockout';
@@ -58,6 +60,7 @@ import {matchQualifiedIds} from 'Util/QualifiedId';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {Call, SerializedConversationId} from './Call';
+import {callingSubscriptions} from './callingSubscriptionsHandler';
 import {CallState, MuteState} from './CallState';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
@@ -65,7 +68,7 @@ import {ClientId, Participant, UserId} from './Participant';
 
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
-import {isMLSConversation} from '../conversation/ConversationSelectors';
+import {isMLSConversation, MLSConversation} from '../conversation/ConversationSelectors';
 import {ConversationState} from '../conversation/ConversationState';
 import {CallingEvent, EventBuilder} from '../conversation/EventBuilder';
 import {CONSENT_TYPE, MessageRepository, MessageSendingOptions} from '../conversation/MessageRepository';
@@ -127,9 +130,6 @@ export class CallingRepository {
   private readonly logger: Logger;
   private avsVersion: number = 0;
   private incomingCallCallback: (call: Call) => void;
-  private requestNewEpochCallback: (conversationId: QualifiedId) => void;
-  private callClosedCallback: (conversationId: QualifiedId, conversationType: CONV_TYPE) => void;
-  private callParticipantChangedCallback: (conversationId: QualifiedId, members: QualifiedWcallMember[]) => void;
   private isReady: boolean = false;
   /** will cache the query to media stream (in order to avoid asking the system for streams multiple times when we have multiple peers) */
   private mediaStreamQuery?: Promise<MediaStream>;
@@ -168,9 +168,6 @@ export class CallingRepository {
   ) {
     this.logger = getLogger('CallingRepository');
     this.incomingCallCallback = () => {};
-    this.requestNewEpochCallback = () => {};
-    this.callClosedCallback = () => {};
-    this.callParticipantChangedCallback = () => {};
     this.callLog = [];
 
     /** {<userId>: <isVerified>} */
@@ -217,6 +214,15 @@ export class CallingRepository {
         this.requestVideoStreams(call.conversationId, call.activeSpeakers());
       }
     });
+  }
+
+  get subconversationService() {
+    const subconversationService = this.core.service?.subconversation;
+    if (!subconversationService) {
+      throw new Error('SubconversationService was not initialised');
+    }
+
+    return subconversationService;
   }
 
   readonly toggleCbrEncoding = (vbrEnabled: boolean): void => {
@@ -328,7 +334,7 @@ export class CallingRepository {
     if (!call) {
       return false;
     }
-    const conversation = this.conversationState.findConversation(call.conversationId);
+    const conversation = this.getConversationById(call.conversationId);
     if (!conversation) {
       this.logger.warn(
         `Unable to find a conversation with id of ${call.conversationId.id}@${call.conversationId.domain}`,
@@ -419,20 +425,6 @@ export class CallingRepository {
     this.incomingCallCallback = callback;
   }
 
-  onCallClosed(callback: (conversationId: QualifiedId, conversationType: CONV_TYPE) => void): void {
-    this.callClosedCallback = callback;
-  }
-
-  onRequestNewEpochCallback(callback: (conversationId: QualifiedId) => void): void {
-    this.requestNewEpochCallback = callback;
-  }
-
-  onCallParticipantChangedCallback(
-    callback: (conversationId: QualifiedId, members: QualifiedWcallMember[]) => void,
-  ): void {
-    this.callParticipantChangedCallback = callback;
-  }
-
   findCall(conversationId: QualifiedId): Call | undefined {
     return this.callState
       .calls()
@@ -450,7 +442,7 @@ export class CallingRepository {
 
   private storeCall(call: Call): void {
     this.callState.calls.push(call);
-    const conversation = this.conversationState.findConversation(call.conversationId);
+    const conversation = this.getConversationById(call.conversationId);
     if (conversation) {
       conversation.call(call);
     }
@@ -464,7 +456,7 @@ export class CallingRepository {
     if (index !== -1) {
       this.callState.calls.splice(index, 1);
     }
-    const conversation = this.conversationState.findConversation(call.conversationId);
+    const conversation = this.getConversationById(call.conversationId);
     if (conversation) {
       conversation.call(null);
     }
@@ -621,7 +613,7 @@ export class CallingRepository {
     const toSecond = (timestamp: number) => Math.floor(timestamp / 1000);
     const contentStr = JSON.stringify(content);
     const conversationId = this.extractTargetedConversationId(event);
-    const conversation = this.conversationState.findConversation(conversationId);
+    const conversation = this.getConversationById(conversationId);
 
     if (!conversation) {
       this.logger.warn(`Unable to find a conversation with id of ${conversationId.id}@${conversationId.domain}`);
@@ -768,6 +760,11 @@ export class CallingRepository {
         this.showNoCameraModal();
         this.removeCall(call);
       }
+
+      if (isMLSConversation(conversation)) {
+        await this.joinMlsConferenceSubconversation(conversation);
+      }
+
       return call;
     } catch (error) {
       if (error) {
@@ -869,6 +866,14 @@ export class CallingRepository {
       this.sendCallingEvent(EventName.CALLING.JOINED_CALL, call, {
         [Segmentation.CALL.DIRECTION]: this.getCallDirection(call),
       });
+
+      const conversation = this.getConversationById(call.conversationId);
+
+      if (!conversation || !isMLSConversation(conversation)) {
+        return;
+      }
+
+      await this.joinMlsConferenceSubconversation(conversation);
     } catch (error) {
       if (error) {
         this.logger.error('Failed answering call', error);
@@ -877,7 +882,86 @@ export class CallingRepository {
     }
   }
 
-  setEpochInfo(conversationId: QualifiedId, subconversationData: SubconversationData) {
+  private getConversationById(conversationId: QualifiedId): Conversation | undefined {
+    return this.conversationState.findConversation(conversationId);
+  }
+
+  private readonly leaveMLSConference = async (conversationId: QualifiedId) => {
+    await this.subconversationService.leaveConferenceSubconversation(conversationId);
+    callingSubscriptions.removeCall(conversationId);
+  };
+
+  private readonly joinMlsConferenceSubconversation = async ({qualifiedId, groupId}: MLSConversation) => {
+    const unsubscribe = await this.subconversationService.subscribeToEpochUpdates(
+      qualifiedId,
+      groupId,
+      (groupId: string) => this.conversationState.findConversationByGroupId(groupId)?.qualifiedId,
+      data => this.setEpochInfo(qualifiedId, data),
+    );
+
+    callingSubscriptions.addCall(qualifiedId, unsubscribe);
+  };
+
+  private readonly updateConferenceSubconversationEpoch = async (conversationId: QualifiedId) => {
+    const conversation = this.getConversationById(conversationId);
+    if (!conversation || !isMLSConversation(conversation)) {
+      return;
+    }
+
+    const subconversationEpochInfo = await this.subconversationService.getSubconversationEpochInfo(
+      conversationId,
+      conversation.groupId,
+      true,
+    );
+
+    if (!subconversationEpochInfo) {
+      return;
+    }
+
+    this.setEpochInfo(conversationId, subconversationEpochInfo);
+  };
+
+  private readonly handleCallParticipantChange = (conversationId: QualifiedId, members: QualifiedWcallMember[]) => {
+    const conversation = this.getConversationById(conversationId);
+    if (!conversation || !isMLSConversation(conversation)) {
+      return;
+    }
+
+    for (const member of members) {
+      const isSelfClient = member.userId.id === this.core.userId && member.clientid === this.core.clientId;
+      //no need to set a timer for selfClient (it will most likely leave or get dropped from the call before the timer could expire)
+      if (isSelfClient) {
+        continue;
+      }
+
+      const {id: userId, domain} = member.userId;
+      const clientQualifiedId = constructFullyQualifiedClientId(userId, member.clientid, domain);
+
+      const key = `mls-call-client-${conversation.id}-${clientQualifiedId}`;
+
+      // audio state is established -> clear timer
+      if (member.aestab === AUDIO_STATE.ESTABLISHED) {
+        TaskScheduler.cancelTask(key);
+        continue;
+      }
+
+      // otherwise, remove the client from subconversation if it won't establish their audio state in 3 mins timeout
+      const firingDate = new Date().getTime() + TIME_IN_MILLIS.MINUTE * 3;
+
+      TaskScheduler.addTask({
+        firingDate,
+        key,
+        // if timer expires = client is stale -> remove client from the subconversation
+        task: () =>
+          this.subconversationService.removeClientFromConferenceSubconversation(conversationId, {
+            user: {id: member.userId.id, domain: member.userId.domain},
+            clientId: member.clientid,
+          }),
+      });
+    }
+  };
+
+  private readonly setEpochInfo = (conversationId: QualifiedId, subconversationData: SubconversationData) => {
     const serializedConversationId = this.serializeQualifiedId(conversationId);
     const {epoch, secretKey, members} = subconversationData;
     const clients = {
@@ -886,7 +970,7 @@ export class CallingRepository {
     };
 
     return this.wCall?.setEpochInfo(this.wUser, serializedConversationId, epoch, JSON.stringify(clients), secretKey);
-  }
+  };
 
   rejectCall(conversationId: QualifiedId): void {
     this.wCall?.reject(this.wUser, this.serializeQualifiedId(conversationId));
@@ -1133,7 +1217,7 @@ export class CallingRepository {
     options?: MessageSendingOptions,
     myClientsOnly: boolean = false,
   ): Promise<void> => {
-    const conversation = this.conversationState.findConversation(conversationId);
+    const conversation = this.getConversationById(conversationId);
     if (!conversation) {
       this.logger.warn(`Unable to send calling message, no conversation found with id ${conversationId}`);
       return;
@@ -1214,7 +1298,7 @@ export class CallingRepository {
     return 0;
   };
 
-  private readonly callClosed = (reason: REASON, convId: SerializedConversationId) => {
+  private readonly callClosed = async (reason: REASON, convId: SerializedConversationId) => {
     Warnings.hideWarning(Warnings.TYPE.CALL_QUALITY_POOR);
     const conversationId = this.parseQualifiedId(convId);
     const call = this.findCall(conversationId);
@@ -1222,7 +1306,10 @@ export class CallingRepository {
       return;
     }
 
-    this.callClosedCallback(conversationId, call.conversationType);
+    // There's nothing we need to do for non-mls calls
+    if (call.conversationType === CONV_TYPE.CONFERENCE_MLS) {
+      await this.leaveMLSConference(conversationId);
+    }
 
     if (reason === REASON.NORMAL) {
       this.callState.selectableScreens([]);
@@ -1230,7 +1317,7 @@ export class CallingRepository {
     }
 
     if (reason === REASON.NOONE_JOINED || reason === REASON.EVERYONE_LEFT) {
-      const conversationEntity = this.conversationState.findConversation(conversationId);
+      const conversationEntity = this.getConversationById(conversationId);
       if (!conversationEntity) {
         this.logger.warn(
           `Unable to find a conversation with id of ${call.conversationId.id}@${call.conversationId.domain}`,
@@ -1343,7 +1430,7 @@ export class CallingRepository {
   ) => {
     const qualifiedUserId = this.parseQualifiedId(userId);
     const conversationId = this.parseQualifiedId(convId);
-    const conversation = this.conversationState.findConversation(conversationId);
+    const conversation = this.getConversationById(conversationId);
     if (!conversation || !this.selfUser || !this.selfClientId) {
       this.logger.warn(
         'Unable to process incoming call',
@@ -1476,7 +1563,7 @@ export class CallingRepository {
     this.updateParticipantMutedState(call, members);
     this.updateParticipantVideoState(call, members);
     this.updateParticipantAudioState(call, members);
-    this.callParticipantChangedCallback(conversationId, members);
+    this.handleCallParticipantChange(conversationId, members);
   };
 
   private readonly requestClients = async (wUser: number, convId: SerializedConversationId, __: number) => {
@@ -1488,9 +1575,9 @@ export class CallingRepository {
     await this.pushClients(call);
   };
 
-  private readonly requestNewEpoch = async (wUser: number, convId: SerializedConversationId) => {
+  private readonly requestNewEpoch = async (_wUser: number, convId: SerializedConversationId) => {
     const qualifiedConversationId = this.parseQualifiedId(convId);
-    this.requestNewEpochCallback(qualifiedConversationId);
+    return this.updateConferenceSubconversationEpoch(qualifiedConversationId);
   };
 
   private readonly getCallMediaStream = async (
@@ -1702,7 +1789,7 @@ export class CallingRepository {
     call: Call,
     customSegmentations: Record<string, any> = {},
   ) => {
-    const conversationEntity = this.conversationState.findConversation(call.conversationId);
+    const conversationEntity = this.getConversationById(call.conversationId);
     const participants = conversationEntity?.participating_user_ets() || [];
     const selfUserTeamId = call.getSelfParticipant().user.id;
     const guests = participants.filter(user => user.isGuest()).length;

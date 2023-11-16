@@ -18,47 +18,57 @@
  */
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {WireIdentity} from '@wireapp/core/lib/messagingProtocols/mls';
 import {container} from 'tsyringe';
 
+import {MLSStatuses} from 'Components/VerificationBadge';
 import {Core} from 'src/script/service/CoreSingleton';
-import {base64ToArray} from 'Util/util';
+import {getCertificateState} from 'Util/certificateDetails';
+import {base64ToArray, supportsMLS} from 'Util/util';
+import {createUuid} from 'Util/uuid';
+
+import {Config} from '../Config';
+
+export type TMP_DecoratedWireIdentity = WireIdentity & {
+  state: MLSStatuses;
+  thumbprint: string;
+};
 
 export function getE2EIdentityService() {
-  return container.resolve(Core).service?.e2eIdentity;
+  const e2eIdentityService = container.resolve(Core).service?.e2eIdentity;
+  if (!e2eIdentityService) {
+    throw new Error('trying to query E2EIdentity data in an non-e2eidentity environment');
+  }
+  return e2eIdentityService;
 }
 
-export async function getDeviceIdentity(groupId: string, userId: QualifiedId, deviceId: string) {
-  const identities = await getE2EIdentityService()?.getUserDeviceEntities(groupId, {[deviceId]: userId});
-  return identities?.[0];
+export function isE2EIEnabled(): boolean {
+  return supportsMLS() && Config.getConfig().FEATURE.ENABLE_E2EI;
 }
-/**
- * @param groupId id of the group
- * @param clientIdsWithUser client ids with user data
- * Returns devices E2EI certificates
- */
-export async function getDeviceVerificationState(groupId: string, userId: QualifiedId, deviceId: string) {
-  const identity = await getDeviceIdentity(groupId, userId, deviceId);
-  // @fixme: soon coreCrypto will return a `isValid` property. Use this one to check for validity
-  return identity ? 'verified' : 'unverified';
+
+export async function getDeviceIdentity(
+  groupId: string,
+  userId: QualifiedId,
+  deviceId: string,
+): Promise<TMP_DecoratedWireIdentity | undefined> {
+  const identities = await getE2EIdentityService().getUserDeviceEntities(groupId, {[deviceId]: userId});
+  if (identities?.length) {
+    const extraData = {
+      state: getCertificateState(identities[0].certificate),
+      thumbprint: createUuid(),
+    };
+    return {...identities[0], ...extraData};
+  }
+  return undefined;
 }
 
 export async function getConversationState(groupId: string) {
-  return getE2EIdentityService()?.getConversationState(base64ToArray(groupId));
+  return getE2EIdentityService().getConversationState(base64ToArray(groupId));
 }
+
 /**
  * Checks if E2EI has active certificate.
  */
 export function hasActiveCertificate() {
-  return getE2EIdentityService()?.hasActiveCertificate();
-}
-
-/**
- * returns E2EI certificate data.
- */
-export function getCurrentDeviceCertificateData() {
-  if (!hasActiveCertificate()) {
-    return undefined;
-  }
-
-  return getE2EIdentityService()?.getCertificateData();
+  return getE2EIdentityService().hasActiveCertificate();
 }

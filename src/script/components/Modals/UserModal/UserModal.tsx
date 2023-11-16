@@ -97,6 +97,7 @@ const UserModalUserActionsSection: React.FC<UserModalUserActionsSectionProps> = 
       onAction={onAction}
       isSelfActivated={isSelfActivated}
       selfUser={selfUser}
+      isModal
     />
   );
 };

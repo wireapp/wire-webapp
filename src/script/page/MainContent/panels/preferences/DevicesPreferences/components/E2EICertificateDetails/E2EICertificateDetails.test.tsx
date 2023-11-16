@@ -17,50 +17,25 @@
  *
  */
 
-import * as x509 from '@peculiar/x509';
 import {render} from '@testing-library/react';
 
 import {MLSStatuses} from 'Components/VerificationBadge';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {TMP_DecoratedWireIdentity} from 'src/script/E2EIdentity';
 
 import {E2EICertificateDetails} from './E2EICertificateDetails';
 
-const certificateGenerator = async (notBefore: Date, notAfter: Date) => {
-  const alg = {
-    name: 'RSASSA-PKCS1-v1_5',
-    hash: 'SHA-256',
-    publicExponent: new Uint8Array([1, 0, 1]),
-    modulusLength: 2048,
-  };
-  const keys = await crypto.subtle.generateKey(alg, false, ['sign', 'verify']);
-  const cert = await x509.X509CertificateGenerator.createSelfSigned({
-    serialNumber: '01',
-    name: 'CN=Test',
-    notBefore,
-    notAfter,
-    signingAlgorithm: alg,
-    keys,
-    extensions: [
-      new x509.BasicConstraintsExtension(true, 2, true),
-      new x509.ExtendedKeyUsageExtension(['1.2.3.4.5.6.7', '2.3.4.5.6.7.8'], true),
-      new x509.KeyUsagesExtension(x509.KeyUsageFlags.keyCertSign | x509.KeyUsageFlags.cRLSign, true),
-      await x509.SubjectKeyIdentifierExtension.create(keys.publicKey),
-    ],
-  });
-
-  return cert.toString('pem');
-};
-
 describe('E2EICertificateDetails', () => {
-  const currentDate = new Date();
+  const generateIdentity = (state: MLSStatuses) =>
+    ({
+      state,
+      certificate: 'certificate',
+    }) as TMP_DecoratedWireIdentity;
 
   it('is e2ei identity verified', async () => {
-    const yesterday = new Date(currentDate.getTime() - 86400000);
-    const followingDay = new Date(currentDate.getTime() + 86400000 * 2);
+    const identity = generateIdentity(MLSStatuses.VALID);
 
-    const generatedCertificate = await certificateGenerator(yesterday, followingDay);
-
-    const {getByTestId} = render(withTheme(<E2EICertificateDetails certificate={generatedCertificate} />));
+    const {getByTestId} = render(withTheme(<E2EICertificateDetails identity={identity} />));
 
     const E2EIdentityStatus = getByTestId('e2ei-identity-status');
     expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.VALID);
@@ -74,12 +49,9 @@ describe('E2EICertificateDetails', () => {
   });
 
   it('is e2ei identity expired', async () => {
-    const yesterday = new Date(currentDate.getTime() - 86400000);
-    const followingDay = new Date(currentDate.getTime() - 86400000 / 2);
+    const identity = generateIdentity(MLSStatuses.EXPIRED);
 
-    const generatedCertificate = await certificateGenerator(yesterday, followingDay);
-
-    const {getByTestId} = render(withTheme(<E2EICertificateDetails certificate={generatedCertificate} />));
+    const {getByTestId} = render(withTheme(<E2EICertificateDetails identity={identity} />));
 
     const E2EIdentityStatus = getByTestId('e2ei-identity-status');
     expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.EXPIRED);

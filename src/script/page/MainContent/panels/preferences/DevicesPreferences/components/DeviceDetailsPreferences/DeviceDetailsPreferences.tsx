@@ -22,6 +22,7 @@ import React, {useEffect, useState} from 'react';
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {ClientEntity} from 'src/script/client/ClientEntity';
+import {TMP_DecoratedWireIdentity} from 'src/script/E2EIdentity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -31,9 +32,8 @@ import {DetailedDevice} from '../DetailedDevice';
 
 interface DevicesPreferencesProps {
   device: ClientEntity;
-  renderDeviceBadges?: (device: ClientEntity) => React.ReactNode;
   getFingerprint: (device: ClientEntity) => Promise<string | undefined>;
-  getCertificate: (deviceId: string) => Promise<string | undefined>;
+  getDeviceIdentity?: (deviceId: string) => Promise<TMP_DecoratedWireIdentity | undefined>;
   onClose: () => void;
   onRemove: (device: ClientEntity) => void;
   onResetSession: (device: ClientEntity) => Promise<void>;
@@ -48,9 +48,8 @@ enum SessionResetState {
 
 export const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
   device,
-  renderDeviceBadges,
   getFingerprint,
-  getCertificate,
+  getDeviceIdentity,
   onVerify,
   onRemove,
   onClose,
@@ -92,13 +91,11 @@ export const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
             />
           </legend>
 
-          <DetailedDevice
-            renderDeviceBadges={renderDeviceBadges}
-            getCertificate={getCertificate}
-            device={device}
-            fingerprint={fingerprint || ''}
-            showVerificationStatus={false}
-          />
+          <DetailedDevice getDeviceIdentity={getDeviceIdentity} device={device} fingerprint={fingerprint || ''} />
+
+          <h3 className="label preferences-label preferences-devices-fingerprint-label">
+            {t('preferencesDeviceDetailsVerificationStatus')}
+          </h3>
 
           <div className="participant-devices__verify slider">
             <input
