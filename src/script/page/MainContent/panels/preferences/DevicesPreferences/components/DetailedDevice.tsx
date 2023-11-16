@@ -19,6 +19,7 @@
 
 import React from 'react';
 
+import {DeviceVerificationBadges} from 'Components/VerificationBadge';
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {TMP_DecoratedWireIdentity} from 'src/script/E2EIdentity';
 
@@ -26,7 +27,6 @@ import {MLSDeviceDetails} from './MLSDeviceDetails';
 import {ProteusDeviceDetails} from './ProteusDeviceDetails';
 
 export interface DeviceProps {
-  renderDeviceBadges?: (device: ClientEntity) => React.ReactNode;
   device: ClientEntity;
   fingerprint: string;
   showVerificationStatus?: boolean;
@@ -36,7 +36,6 @@ export interface DeviceProps {
 }
 
 export const DetailedDevice: React.FC<DeviceProps> = ({
-  renderDeviceBadges,
   device,
   fingerprint,
   showVerificationStatus = true,
@@ -48,7 +47,7 @@ export const DetailedDevice: React.FC<DeviceProps> = ({
     <>
       <h3 className="preferences-devices-model preferences-devices-model-name" data-uie-name="device-model">
         <span>{device.model}</span>
-        {renderDeviceBadges?.(device)}
+        <DeviceVerificationBadges device={device} getDeviceIdentity={getDeviceIdentity} />
       </h3>
 
       {getDeviceIdentity && (

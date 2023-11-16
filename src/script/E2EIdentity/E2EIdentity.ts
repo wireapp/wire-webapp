@@ -50,7 +50,7 @@ export async function getDeviceIdentity(
   deviceId: string,
 ): Promise<TMP_DecoratedWireIdentity | undefined> {
   const identities = await getE2EIdentityService().getUserDeviceEntities(groupId, {[deviceId]: userId});
-  return identities ? {...identities[0], state: 'verified', thumbprint: createUuid()} : undefined;
+  return identities?.length ? {...identities[0], state: 'verified', thumbprint: createUuid()} : undefined;
 }
 
 export async function getConversationState(groupId: string) {

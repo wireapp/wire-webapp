@@ -22,7 +22,6 @@ import React, {useEffect, useState} from 'react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
-import {DeviceVerificationBadges} from 'Components/VerificationBadge';
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';
 import {Conversation} from 'src/script/entity/Conversation';
@@ -83,15 +82,10 @@ export const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
       }
     : undefined;
 
-  const renderDeviceBadges = (device: ClientEntity) => {
-    return <DeviceVerificationBadges device={device} getDeviceIdentity={getDeviceIdentity} />;
-  };
-
   if (selectedDevice) {
     return (
       <DeviceDetailsPreferences
         getDeviceIdentity={getDeviceIdentity}
-        renderDeviceBadges={renderDeviceBadges}
         device={selectedDevice}
         getFingerprint={getFingerprint}
         onRemove={async device => {
@@ -135,7 +129,7 @@ export const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
               onSelect={setSelectedDevice}
               onRemove={removeDevice}
               deviceNumber={++index}
-              renderDeviceBadges={renderDeviceBadges}
+              getDeviceIdentity={getDeviceIdentity}
             />
           ))}
           <p className="preferences-detail">{t('preferencesDevicesActiveDetail')}</p>

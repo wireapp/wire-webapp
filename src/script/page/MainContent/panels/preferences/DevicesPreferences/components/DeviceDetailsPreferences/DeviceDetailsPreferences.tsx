@@ -32,7 +32,6 @@ import {DetailedDevice} from '../DetailedDevice';
 
 interface DevicesPreferencesProps {
   device: ClientEntity;
-  renderDeviceBadges?: (device: ClientEntity) => React.ReactNode;
   getFingerprint: (device: ClientEntity) => Promise<string | undefined>;
   getDeviceIdentity?: (deviceId: string) => Promise<TMP_DecoratedWireIdentity | undefined>;
   onClose: () => void;
@@ -49,7 +48,6 @@ enum SessionResetState {
 
 export const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
   device,
-  renderDeviceBadges,
   getFingerprint,
   getDeviceIdentity,
   onVerify,
@@ -94,7 +92,6 @@ export const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
           </legend>
 
           <DetailedDevice
-            renderDeviceBadges={renderDeviceBadges}
             getDeviceIdentity={getDeviceIdentity}
             device={device}
             fingerprint={fingerprint || ''}

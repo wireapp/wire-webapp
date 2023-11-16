@@ -90,7 +90,7 @@ export const DeviceVerificationBadges = ({
   device: ClientEntity;
   getDeviceIdentity?: (deviceId: string) => Promise<TMP_DecoratedWireIdentity | undefined>;
 }) => {
-  const [isMLSVerified, setIsMLSVerified] = useState<MLSStatuses | undefined>(undefined);
+  const [MLSStatus, setMLSStatus] = useState<MLSStatuses | undefined>(undefined);
   useEffect(() => {
     if (getDeviceIdentity) {
       const statusesMap = {
@@ -100,17 +100,12 @@ export const DeviceVerificationBadges = ({
       void (async () => {
         const identity = await getDeviceIdentity(device.id);
         const state = identity?.state && statusesMap[identity?.state];
-        setIsMLSVerified(state ?? MLSStatuses.NOT_DOWNLOADED);
+        setMLSStatus(state ?? MLSStatuses.NOT_DOWNLOADED);
       })();
     }
   });
 
-  return (
-    <VerificationBadges
-      isProteusVerified={device.meta?.isVerified?.() ?? false}
-      MLSStatus={isMLSVerified ? MLSStatuses.VALID : undefined}
-    />
-  );
+  return <VerificationBadges isProteusVerified={device.meta?.isVerified?.() ?? false} MLSStatus={MLSStatus} />;
 };
 
 type ConversationVerificationBadgeProps = {
