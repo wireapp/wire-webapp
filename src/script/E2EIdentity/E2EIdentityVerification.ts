@@ -62,6 +62,7 @@ export async function getDeviceIdentity(
   return undefined;
 }
 
+// TODO: replace implementation with CoreCrypto once it has user verification method
 export async function getUsersVerificationState(groupId: string, userIds: QualifiedId[]) {
   return userIds.map(userId => ({
     userId,
