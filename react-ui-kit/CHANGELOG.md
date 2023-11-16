@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.10.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.9.13...@wireapp/react-ui-kit@9.10.0) (2023-11-16)
+
+### Features
+
+* **Select:** Group option for select menu ([#5686](https://github.com/wireapp/wire-web-packages/issues/5686)) ([978a7e1](https://github.com/wireapp/wire-web-packages/commit/978a7e1ac17967e66d56ce470a32cc7695177756))
+
 ## [9.9.13](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.9.12...@wireapp/react-ui-kit@9.9.13) (2023-11-14)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
