@@ -12,6 +12,26 @@ const selectOptions = [
   {value: '6', label: 'Option 6'},
 ];
 
+const groupOptions = [
+  {
+    label: 'Group 1',
+    options: [
+      {label: 'Group 1, option 1', value: 'value_1'},
+      {label: 'Group 1, option 2', value: 'value_2'},
+    ],
+  },
+  {
+    label: 'Group 2',
+    options: [
+      {label: 'Group 2, option 1', value: 'value_3'},
+      {label: 'Group 2, option 2', value: 'value_4'},
+      {label: 'Group 2, option 3', value: 'value_5'},
+      {label: 'Group 2, option 5', value: 'value_6'},
+    ],
+  },
+];
+const [isOpen, setIsOpen] = React.useState(false);
+
 <Container>
   <Columns>
     <Column>Select</Column>
@@ -62,6 +82,37 @@ const selectOptions = [
         options={selectOptions}
         dataUieName="required-select"
       />
+    </Column>
+  </Columns>
+
+  <Columns>
+    <Column>Select With Groups</Column>
+
+    <Column>
+      <button
+        className="device-toggle-button"
+        onClick={() => {
+          setIsOpen(prev => !prev);
+        }}
+        style={{width: '100px', height: '30px'}}
+      >
+        click me
+        {isOpen && (
+          <Select
+            id="groupSelect"
+            menuPlacement="top"
+            menuIsOpen
+            controlShouldRenderValue={false}
+            isClearable={false}
+            backspaceRemovesValue={false}
+            hideSelectedOptions={false}
+            options={groupOptions}
+            onChange={selectedOption => console.log('Selected option', selectedOption)}
+            dataUieName="group-select"
+            defaultValue={[groupOptions[0].options[0], groupOptions[1].options[3]]}
+          />
+        )}
+      </button>
     </Column>
   </Columns>
 

@@ -25,10 +25,13 @@ import {
   ValueContainerProps,
   IndicatorsContainerProps,
   MenuProps,
+  GroupBase,
+  OptionsOrGroups,
 } from 'react-select';
 
 import {Option} from './Select';
 
+import {CheckIcon} from '../Icon';
 import {ArrowDown} from '../Icon/ArrowDown';
 import {Theme} from '../Layout';
 import {TabIndex} from '../types/enums';
@@ -39,6 +42,10 @@ export const SelectContainer = (props: ContainerProps) => {
       <div tabIndex={TabIndex.FOCUSABLE}>{props.children}</div>
     </components.SelectContainer>
   );
+};
+
+export const isGroup = (options: OptionsOrGroups<Option, GroupBase<Option>>): options is GroupBase<Option>[] => {
+  return options.length > 0 && 'options' in options[0];
 };
 
 export const DropdownIndicator = (props: DropdownIndicatorProps) => {
@@ -60,12 +67,12 @@ export const CustomOption = (dataUieName: string) => (props: OptionProps<Option>
     <components.Option {...props}>
       <div
         css={{
-          ...(isMulti && {
+          ...((isMulti || isGroup) && {
             display: 'grid',
             gridTemplateAreas: `"checkbox label"
                                 ". description"`,
             gridTemplateColumns: '22px 1fr',
-            columnGap: '10px',
+            columnGap: isGroup ? '5px' : '10px',
           }),
         }}
         {...(dataUieName && {
@@ -81,6 +88,13 @@ export const CustomOption = (dataUieName: string) => (props: OptionProps<Option>
             onChange={() => null}
             css={{gridArea: 'checkbox', width: 22, height: 22, cursor: 'pointer', placeSelf: 'center'}}
           />
+        )}
+
+        {isGroup(options) && (
+          //includes a checkmark character if it is selected and a group
+          <div css={{width: 22, height: 22, cursor: 'pointer', placeSelf: 'center'}}>
+            {isSelected ? <CheckIcon /> : null}
+          </div>
         )}
 
         <div css={{gridArea: 'label', overflowWrap: 'break-word', overflow: 'hidden'}}>{children}</div>
