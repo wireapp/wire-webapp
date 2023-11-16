@@ -19,48 +19,41 @@
 
 import React from 'react';
 
-import {ClientEntity, MLSPublicKeys} from 'src/script/client/ClientEntity';
+import {DeviceVerificationBadges} from 'Components/VerificationBadge';
+import {ClientEntity} from 'src/script/client/ClientEntity';
+import {TMP_DecoratedWireIdentity} from 'src/script/E2EIdentity';
 
 import {MLSDeviceDetails} from './MLSDeviceDetails';
 import {ProteusDeviceDetails} from './ProteusDeviceDetails';
 
 export interface DeviceProps {
-  renderDeviceBadges?: (device: ClientEntity) => React.ReactNode;
   device: ClientEntity;
   fingerprint: string;
   showVerificationStatus?: boolean;
   isCurrentDevice?: boolean;
-  getCertificate: (deviceId: string) => Promise<string | undefined>;
+  getDeviceIdentity?: (deviceId: string) => Promise<TMP_DecoratedWireIdentity | undefined>;
   isProteusVerified?: boolean;
 }
 
 export const DetailedDevice: React.FC<DeviceProps> = ({
-  renderDeviceBadges,
   device,
   fingerprint,
   showVerificationStatus = true,
   isCurrentDevice,
-  getCertificate,
+  getDeviceIdentity,
   isProteusVerified = false,
 }) => {
-  const mlsFingerprint = device.mlsPublicKeys?.[MLSPublicKeys.ED25519];
-
   return (
     <>
       <h3 className="preferences-devices-model preferences-devices-model-name" data-uie-name="device-model">
         <span>{device.model}</span>
-        {renderDeviceBadges?.(device)}
+        <DeviceVerificationBadges device={device} getDeviceIdentity={getDeviceIdentity} />
       </h3>
 
-      {mlsFingerprint && (
-        <MLSDeviceDetails
-          fingerprint={mlsFingerprint}
-          isCurrentDevice={isCurrentDevice}
-          getCertificate={() => getCertificate(device.id)}
-        />
+      {getDeviceIdentity && (
+        <MLSDeviceDetails isCurrentDevice={isCurrentDevice} getDeviceIdentity={() => getDeviceIdentity(device.id)} />
       )}
 
-      {/* Proteus */}
       <ProteusDeviceDetails
         device={device}
         fingerprint={fingerprint}

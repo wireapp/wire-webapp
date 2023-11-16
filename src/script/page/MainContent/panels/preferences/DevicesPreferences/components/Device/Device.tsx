@@ -24,6 +24,8 @@ import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {WireIdentity} from '@wireapp/core-crypto';
 
 import {Icon} from 'Components/Icon';
+import {DeviceVerificationBadges} from 'Components/VerificationBadge';
+import {TMP_DecoratedWireIdentity} from 'src/script/E2EIdentity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -35,13 +37,13 @@ import {FormattedId} from '../FormattedId';
 interface DeviceProps {
   device: ClientEntity;
   isSSO: boolean;
+  getDeviceIdentity?: (deviceId: string) => Promise<TMP_DecoratedWireIdentity | undefined>;
   onRemove: (device: ClientEntity) => void;
   onSelect: (device: ClientEntity, currentDeviceIdentity?: WireIdentity) => void;
   deviceNumber: number;
-  renderDeviceBadges: (device: ClientEntity) => React.ReactNode;
 }
 
-export const Device = ({device, isSSO, onSelect, onRemove, deviceNumber, renderDeviceBadges}: DeviceProps) => {
+export const Device = ({device, isSSO, onSelect, onRemove, getDeviceIdentity, deviceNumber}: DeviceProps) => {
   const {isVerified} = useKoSubscribableChildren(device.meta, ['isVerified']);
   const verifiedLabel = isVerified ? t('preferencesDevicesVerification') : t('preferencesDeviceNotVerified');
   const deviceAriaLabel = `${t('preferencesDevice')} ${deviceNumber}, ${device.getName()}, ${verifiedLabel}`;
@@ -74,7 +76,7 @@ export const Device = ({device, isSSO, onSelect, onRemove, deviceNumber, renderD
           aria-label={deviceAriaLabel}
         >
           {device.getName()}
-          {renderDeviceBadges(device)}
+          <DeviceVerificationBadges device={device} getDeviceIdentity={getDeviceIdentity} />
         </div>
 
         {mlsFingerprint && (

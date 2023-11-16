@@ -103,25 +103,6 @@ describe('E2EIHandler', () => {
     expect(instance['gracePeriodInMS']).toEqual(newParams.gracePeriodInSeconds * TimeInMillis.SECOND);
   });
 
-  it('should return true when supportsMLS returns true and ENABLE_E2EI is true', () => {
-    const instance = E2EIHandler.getInstance(params);
-    expect(instance.isE2EIEnabled).toBe(true);
-  });
-
-  it('should return false when supportsMLS returns false', () => {
-    (util.supportsMLS as jest.Mock).mockReturnValue(false);
-
-    const instance = E2EIHandler.getInstance(params);
-    expect(instance.isE2EIEnabled).toBe(false);
-  });
-
-  it('should return false when ENABLE_E2EI is false', () => {
-    Config.getConfig = jest.fn().mockReturnValue({FEATURE: {ENABLE_E2EI: false}});
-
-    const instance = E2EIHandler.getInstance(params);
-    expect(instance.isE2EIEnabled).toBe(false);
-  });
-
   it('should set currentStep to INITIALIZE after initialize is called', () => {
     const instance = E2EIHandler.getInstance(params);
     instance.initialize();

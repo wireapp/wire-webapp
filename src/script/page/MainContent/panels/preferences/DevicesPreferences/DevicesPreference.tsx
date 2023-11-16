@@ -22,7 +22,6 @@ import React, {useEffect, useState} from 'react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
-import {DeviceVerificationBadges} from 'Components/VerificationBadge';
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';
 import {Conversation} from 'src/script/entity/Conversation';
@@ -73,33 +72,20 @@ export const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
     void cryptographyRepository.getLocalFingerprint().then(setLocalFingerprint);
   }, [cryptographyRepository]);
 
-  const renderDeviceBadges = (device: ClientEntity) => {
-    return (
-      <DeviceVerificationBadges
-        device={device}
-        userId={selfUser.qualifiedId}
-        groupId={conversationState.selfMLSConversation()?.groupId}
-      />
-    );
-  };
-
-  const getDeviceCertificate = async (deviceId: string) => {
-    if (deviceId === currentClient?.id) {
-      return e2eIdentity.getCurrentDeviceCertificateData();
-    }
-    const selfConversation = conversationState.selfMLSConversation();
-    if (!selfConversation) {
-      return undefined;
-    }
-    const identity = await e2eIdentity.getDeviceIdentity(selfConversation.groupId, selfUser.qualifiedId, deviceId);
-    return identity?.certificate;
-  };
+  const getDeviceIdentity = e2eIdentity.isE2EIEnabled()
+    ? async (deviceId: string) => {
+        const selfConversation = conversationState.selfMLSConversation();
+        if (!selfConversation) {
+          return undefined;
+        }
+        return e2eIdentity.getDeviceIdentity(selfConversation.groupId, selfUser.qualifiedId, deviceId);
+      }
+    : undefined;
 
   if (selectedDevice) {
     return (
       <DeviceDetailsPreferences
-        getCertificate={getDeviceCertificate}
-        renderDeviceBadges={renderDeviceBadges}
+        getDeviceIdentity={getDeviceIdentity}
         device={selectedDevice}
         getFingerprint={getFingerprint}
         onRemove={async device => {
@@ -124,7 +110,7 @@ export const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
             isCurrentDevice
             device={currentClient}
             fingerprint={localFingerprint}
-            getCertificate={getDeviceCertificate}
+            getDeviceIdentity={getDeviceIdentity}
             isProteusVerified={isSelfClientVerified}
           />
         )}
@@ -143,7 +129,7 @@ export const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
               onSelect={setSelectedDevice}
               onRemove={removeDevice}
               deviceNumber={++index}
-              renderDeviceBadges={renderDeviceBadges}
+              getDeviceIdentity={getDeviceIdentity}
             />
           ))}
           <p className="preferences-detail">{t('preferencesDevicesActiveDetail')}</p>

@@ -22,9 +22,8 @@ import {useState} from 'react';
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {CertificateDetailsModal} from 'Components/Modals/CertificateDetailsModal';
-import {VerificationBadges} from 'Components/VerificationBadge';
-import {E2EIHandler} from 'src/script/E2EIdentity';
-import {getCertificateDetails, getCertificateState} from 'Util/certificateDetails';
+import {MLSStatuses, VerificationBadges} from 'Components/VerificationBadge';
+import {E2EIHandler, TMP_DecoratedWireIdentity} from 'src/script/E2EIdentity';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 
@@ -33,15 +32,16 @@ import {styles} from './E2EICertificateDetails.styles';
 const logger = getLogger('E2EICertificateDetails');
 
 interface E2EICertificateDetailsProps {
-  certificate?: string;
+  identity?: TMP_DecoratedWireIdentity;
   isCurrentDevice?: boolean;
 }
 
-export const E2EICertificateDetails = ({certificate, isCurrentDevice}: E2EICertificateDetailsProps) => {
+export const E2EICertificateDetails = ({identity, isCurrentDevice}: E2EICertificateDetailsProps) => {
   const [isCertificateDetailsModalOpen, setIsCertificateDetailsModalOpen] = useState(false);
 
-  const {isNotDownloaded, isValid, isExpireSoon} = getCertificateDetails(certificate);
-  const certificateState = getCertificateState({isNotDownloaded, isValid, isExpireSoon});
+  const certificateState = identity?.state ?? MLSStatuses.NOT_DOWNLOADED;
+  const isNotDownloaded = certificateState === MLSStatuses.NOT_DOWNLOADED;
+  const isValid = certificateState === MLSStatuses.VALID;
 
   const updateCertificate = (): null => {
     // TODO: Waiting for update certificate implementation
@@ -80,8 +80,11 @@ export const E2EICertificateDetails = ({certificate, isCurrentDevice}: E2EICerti
           </Button>
         )}
 
-        {isCertificateDetailsModalOpen && certificate && (
-          <CertificateDetailsModal certificate={certificate} onClose={() => setIsCertificateDetailsModalOpen(false)} />
+        {isCertificateDetailsModalOpen && identity?.certificate && (
+          <CertificateDetailsModal
+            certificate={identity.certificate}
+            onClose={() => setIsCertificateDetailsModalOpen(false)}
+          />
         )}
 
         {isCurrentDevice && (
@@ -92,7 +95,7 @@ export const E2EICertificateDetails = ({certificate, isCurrentDevice}: E2EICerti
               </Button>
             )}
 
-            {certificate && !isValid && (
+            {identity?.certificate && !isValid && (
               <Button variant={ButtonVariant.TERTIARY} onClick={updateCertificate} data-uie-name="update-certificate">
                 {t('E2EI.updateCertificate')}
               </Button>
