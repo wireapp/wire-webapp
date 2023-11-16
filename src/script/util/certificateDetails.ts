@@ -38,9 +38,8 @@ export const getCertificateState = (certificate?: string) => {
     return MLSStatuses.NOT_DOWNLOADED;
   }
   const currentDate = new Date();
-  const parsedCertificate = certificate ? new x509.X509Certificate(certificate) : null;
-  const isValid =
-    !!parsedCertificate && currentDate > parsedCertificate.notBefore && currentDate < parsedCertificate.notAfter;
+  const parsedCertificate = new x509.X509Certificate(certificate);
+  const isValid = currentDate > parsedCertificate.notBefore && currentDate < parsedCertificate.notAfter;
   const isExpireSoon = isValid && !!parsedCertificate?.notAfter && checkExpirationDate(parsedCertificate.notAfter);
 
   if (isValid && !isExpireSoon) {
