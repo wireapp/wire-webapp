@@ -100,7 +100,7 @@ export const DeviceVerificationBadges = ({
     }
   });
 
-  return <VerificationBadges isProteusVerified={device.meta?.isVerified?.() ?? false} MLSStatus={MLSStatus} />;
+  return <VerificationBadges isProteusVerified={!!device.meta?.isVerified?.()} MLSStatus={MLSStatus} />;
 };
 
 type ConversationVerificationBadgeProps = {
