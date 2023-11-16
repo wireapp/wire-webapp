@@ -275,7 +275,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
           <IconButton
             variant={IconButtonVariant.SECONDARY}
             className=" icon-back"
-            css={{height: '25px', left: '5px', position: 'absolute', top: verticalBreakpoint ? '3px' : '10px'}}
+            css={{height: '25px', left: '5px', position: 'absolute', top: '10px'}}
             onClick={minimize}
           />
         )}
