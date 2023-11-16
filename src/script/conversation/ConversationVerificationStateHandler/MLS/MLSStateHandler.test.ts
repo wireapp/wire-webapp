@@ -20,7 +20,7 @@
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
 import {E2eiConversationState} from '@wireapp/core/lib/messagingProtocols/mls';
 
-import * as e2eIdentity from 'src/script/E2EIdentity/E2EIdentity';
+import * as e2eIdentity from 'src/script/E2EIdentity/E2EIdentityVerification';
 import {Conversation} from 'src/script/entity/Conversation';
 import {Core} from 'src/script/service/CoreSingleton';
 import {createUuid} from 'Util/uuid';

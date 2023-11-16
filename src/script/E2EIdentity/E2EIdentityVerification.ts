@@ -62,7 +62,9 @@ export async function getDeviceIdentity(
   return undefined;
 }
 
-export async function getConversationState(groupId: string) {
+export async function getUserVerificationState(groupId: string, userId: QualifiedId) {}
+
+export async function getConversationVerificationState(groupId: string) {
   return getE2EIdentityService().getConversationState(base64ToArray(groupId));
 }
 
