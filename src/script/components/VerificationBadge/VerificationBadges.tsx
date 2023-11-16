@@ -93,14 +93,9 @@ export const DeviceVerificationBadges = ({
   const [MLSStatus, setMLSStatus] = useState<MLSStatuses | undefined>(undefined);
   useEffect(() => {
     if (getDeviceIdentity) {
-      const statusesMap = {
-        verified: MLSStatuses.VALID,
-        unverified: MLSStatuses.EXPIRED,
-      };
       void (async () => {
         const identity = await getDeviceIdentity(device.id);
-        const state = identity?.state && statusesMap[identity?.state];
-        setMLSStatus(state ?? MLSStatuses.NOT_DOWNLOADED);
+        setMLSStatus(identity?.state ?? MLSStatuses.NOT_DOWNLOADED);
       })();
     }
   });

@@ -40,21 +40,21 @@ export const MLSDeviceDetails = ({isCurrentDevice, getDeviceIdentity}: MLSDevice
     getDeviceIdentity?.().then(setIdentity);
   }, []);
 
-  if (!identity) {
-    return null;
-  }
-
   return (
     <div css={styles.wrapper}>
       <h4 className="paragraph-body-3">{t('mlsSignature', MLSPublicKeys.ED25519.toUpperCase())}</h4>
 
-      <p className="label-2 preferences-label preferences-devices-fingerprint-label">{t('mlsThumbprint')}</p>
+      {identity?.thumbprint && (
+        <>
+          <p className="label-2 preferences-label preferences-devices-fingerprint-label">{t('mlsThumbprint')}</p>
 
-      <p className="preferences-devices-fingerprint" css={{width: '230px'}}>
-        <FormattedId idSlices={splitFingerprint(identity.thumbprint)} />
-      </p>
+          <p className="preferences-devices-fingerprint" css={{width: '230px'}}>
+            <FormattedId idSlices={splitFingerprint(identity.thumbprint)} />
+          </p>
+        </>
+      )}
 
-      <E2EICertificateDetails certificate={identity.certificate} isCurrentDevice={isCurrentDevice} />
+      <E2EICertificateDetails identity={identity} isCurrentDevice={isCurrentDevice} />
     </div>
   );
 };

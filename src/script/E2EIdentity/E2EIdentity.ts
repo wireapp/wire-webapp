@@ -21,14 +21,16 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {WireIdentity} from '@wireapp/core/lib/messagingProtocols/mls';
 import {container} from 'tsyringe';
 
+import {MLSStatuses} from 'Components/VerificationBadge';
 import {Core} from 'src/script/service/CoreSingleton';
+import {getCertificateState} from 'Util/certificateDetails';
 import {base64ToArray, supportsMLS} from 'Util/util';
 import {createUuid} from 'Util/uuid';
 
 import {Config} from '../Config';
 
 export type TMP_DecoratedWireIdentity = WireIdentity & {
-  state: 'verified' | 'unverified';
+  state: MLSStatuses;
   thumbprint: string;
 };
 
@@ -50,7 +52,14 @@ export async function getDeviceIdentity(
   deviceId: string,
 ): Promise<TMP_DecoratedWireIdentity | undefined> {
   const identities = await getE2EIdentityService().getUserDeviceEntities(groupId, {[deviceId]: userId});
-  return identities?.length ? {...identities[0], state: 'verified', thumbprint: createUuid()} : undefined;
+  if (identities?.length) {
+    const extraData = {
+      state: getCertificateState(identities[0].certificate),
+      thumbprint: createUuid(),
+    };
+    return {...identities[0], ...extraData};
+  }
+  return undefined;
 }
 
 export async function getConversationState(groupId: string) {
