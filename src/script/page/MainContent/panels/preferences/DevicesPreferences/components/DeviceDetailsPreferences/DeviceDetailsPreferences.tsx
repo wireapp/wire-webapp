@@ -91,12 +91,11 @@ export const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
             />
           </legend>
 
-          <DetailedDevice
-            getDeviceIdentity={getDeviceIdentity}
-            device={device}
-            fingerprint={fingerprint || ''}
-            showVerificationStatus={false}
-          />
+          <DetailedDevice getDeviceIdentity={getDeviceIdentity} device={device} fingerprint={fingerprint || ''} />
+
+          <h3 className="label preferences-label preferences-devices-fingerprint-label">
+            {t('preferencesDeviceDetailsVerificationStatus')}
+          </h3>
 
           <div className="participant-devices__verify slider">
             <input
