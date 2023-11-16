@@ -58,7 +58,10 @@ import {ConnectionRepository} from '../connection/ConnectionRepository';
 import {ConnectionService} from '../connection/ConnectionService';
 import {ConversationRepository} from '../conversation/ConversationRepository';
 import {ConversationService} from '../conversation/ConversationService';
+import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
 import {registerMLSConversationVerificationStateHandler} from '../conversation/ConversationVerificationStateHandler';
+import {OnConversationVerificationStateChange} from '../conversation/ConversationVerificationStateHandler/shared';
+import {EventBuilder} from '../conversation/EventBuilder';
 import {MessageRepository} from '../conversation/MessageRepository';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {User} from '../entity/User';
@@ -371,8 +374,9 @@ export class App {
       if (!localClient) {
         throw new ClientError(CLIENT_ERROR_TYPE.NO_VALID_CLIENT, 'Client has been deleted on backend');
       }
+
       if (supportsMLS()) {
-        registerMLSConversationVerificationStateHandler();
+        registerMLSConversationVerificationStateHandler(this.onConversationE2EIVerificationStateChange);
       }
 
       this.core.on(CoreEvents.NEW_SESSION, ({userId, clientId}) => {
@@ -802,4 +806,20 @@ export class App {
 
     doRedirect(signOutReason);
   }
+
+  private onConversationE2EIVerificationStateChange: OnConversationVerificationStateChange = async ({
+    conversationEntity,
+    conversationVerificationState,
+    // verificationMessageType,
+    // userIds = [],
+  }) => {
+    switch (conversationVerificationState) {
+      case ConversationVerificationState.VERIFIED:
+        const allVerifiedEvent = EventBuilder.buildAllE2EIVerified(conversationEntity);
+        await this.repository.event.injectEvent(allVerifiedEvent);
+        break;
+      default:
+        break;
+    }
+  };
 }

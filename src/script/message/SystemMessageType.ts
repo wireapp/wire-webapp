@@ -34,4 +34,5 @@ export enum SystemMessageType {
   MEMBER_LEAVE = 'leave',
   NORMAL = 'normal',
   MLS_CONVERSATION_RECOVERED = 'mls-conversation-recovered',
+  E2EI_VERIFIED = 'e2ei-verified',
 }

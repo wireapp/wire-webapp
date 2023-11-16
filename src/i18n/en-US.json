@@ -1332,6 +1332,7 @@
   "timedMessagesTitle": "Self-deleting messages",
   "tooltipConversationAddImage": "Add picture",
   "tooltipConversationAllVerified": "All fingerprints are verified",
+  "tooltipConversationAllE2EIVerified": "All devices are verified (end-to-end identity). [link]Learn more[/link]",
   "tooltipConversationCall": "Call",
   "tooltipConversationDetailsAddPeople": "Add participants to conversation ({{shortcut}})",
   "tooltipConversationDetailsRename": "Change conversation name",
