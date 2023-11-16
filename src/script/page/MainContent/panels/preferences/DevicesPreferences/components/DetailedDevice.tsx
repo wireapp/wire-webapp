@@ -29,7 +29,6 @@ import {ProteusDeviceDetails} from './ProteusDeviceDetails';
 export interface DeviceProps {
   device: ClientEntity;
   fingerprint: string;
-  showVerificationStatus?: boolean;
   isCurrentDevice?: boolean;
   getDeviceIdentity?: (deviceId: string) => Promise<TMP_DecoratedWireIdentity | undefined>;
   isProteusVerified?: boolean;
@@ -38,10 +37,9 @@ export interface DeviceProps {
 export const DetailedDevice: React.FC<DeviceProps> = ({
   device,
   fingerprint,
-  showVerificationStatus = true,
   isCurrentDevice,
   getDeviceIdentity,
-  isProteusVerified = false,
+  isProteusVerified,
 }) => {
   return (
     <>
@@ -54,12 +52,7 @@ export const DetailedDevice: React.FC<DeviceProps> = ({
         <MLSDeviceDetails isCurrentDevice={isCurrentDevice} getDeviceIdentity={() => getDeviceIdentity(device.id)} />
       )}
 
-      <ProteusDeviceDetails
-        device={device}
-        fingerprint={fingerprint}
-        isProteusVerified={isProteusVerified}
-        showVerificationStatus={showVerificationStatus}
-      />
+      <ProteusDeviceDetails device={device} fingerprint={fingerprint} isProteusVerified={isProteusVerified} />
     </>
   );
 };

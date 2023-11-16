@@ -62,7 +62,6 @@ export const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
 
   const {devices} = useKoSubscribableChildren(selfUser, ['devices']);
   const currentClient = clientState.currentClient;
-  const isSelfClientVerified = false;
 
   const isSSO = selfUser.isNoPasswordSSO;
   const getFingerprint = (device: ClientEntity) =>
@@ -111,7 +110,6 @@ export const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
             device={currentClient}
             fingerprint={localFingerprint}
             getDeviceIdentity={getDeviceIdentity}
-            isProteusVerified={isSelfClientVerified}
           />
         )}
       </fieldset>
