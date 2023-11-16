@@ -20,7 +20,7 @@
 import {ReactElement} from 'react';
 
 import {CSSObject, useTheme} from '@emotion/react';
-import ReactSelect, {StylesConfig} from 'react-select';
+import ReactSelect, {GroupBase, StylesConfig} from 'react-select';
 import type {StateManagerProps} from 'react-select/dist/declarations/src/stateManager';
 
 import {InputLabel} from './InputLabel';
@@ -44,11 +44,12 @@ export type Option = {
   isDisabled?: boolean;
 };
 
-interface SelectProps<IsMulti extends boolean> extends StateManagerProps<Option, IsMulti> {
+interface SelectProps<IsMulti extends boolean, Group extends GroupBase<Option>>
+  extends StateManagerProps<Option, IsMulti, Group> {
   id: string;
   disabled?: boolean;
   dataUieName: string;
-  options: Option[];
+  options: Option[] | Group[];
   wrapperCSS?: CSSObject;
   label?: string;
   helperText?: string;
@@ -58,7 +59,7 @@ interface SelectProps<IsMulti extends boolean> extends StateManagerProps<Option,
   isMulti?: IsMulti;
 }
 
-export const Select = <IsMulti extends boolean = false>({
+export const Select = <IsMulti extends boolean = false, Group extends GroupBase<Option> = GroupBase<Option>>({
   id,
   label,
   error,
@@ -71,7 +72,7 @@ export const Select = <IsMulti extends boolean = false>({
   markInvalid = false,
   required = false,
   ...props
-}: SelectProps<IsMulti>) => {
+}: SelectProps<IsMulti, Group>) => {
   const theme = useTheme();
   const hasError = !!error;
 

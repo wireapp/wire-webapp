@@ -18,6 +18,7 @@
  */
 
 import {inputStyle} from './Input';
+import {isGroup} from './SelectComponents';
 
 import {Theme} from '../Layout';
 
@@ -28,44 +29,50 @@ export const customStyles = (theme: Theme, markInvalid = false) => ({
   indicatorsContainer: provided => ({
     ...provided,
   }),
-  container: (_, {isDisabled, selectProps}) => {
+  container: (_, {isDisabled, selectProps, options}) => {
     const {menuIsOpen} = selectProps;
     const isSelectDisabled = selectProps.isDisabled;
 
     return {
-      '& > div': {
-        ...inputStyle(theme, {disabled: isSelectDisabled, markInvalid}),
-        padding: 0,
-        height: 'auto',
-        minHeight: '48px',
-        '&:-moz-focusring': {
-          color: 'transparent',
-          textShadow: '0 0 0 #000',
-        },
-        position: 'relative',
-        ...(isDisabled && {
-          backgroundColor: theme.Input.backgroundColorDisabled,
-          color: theme.Select.disabledColor,
-          cursor: 'default',
-        }),
-        ...(markInvalid && {
-          boxShadow: `0 0 0 1px ${theme.general.dangerColor}`,
-        }),
-        ...(menuIsOpen && {
-          boxShadow: `0 0 0 1px ${theme.general.primaryColor}`,
-          '&:hover': {
-            boxShadow: `0 0 0 1px ${theme.general.primaryColor}`,
+      '& > div': isGroup(options)
+        ? {
+            display: 'inline',
+            position: 'relative',
+            top: '-10px',
+          }
+        : {
+            ...inputStyle(theme, {disabled: isSelectDisabled, markInvalid}),
+            padding: 0,
+            height: 'auto',
+            minHeight: '48px',
+            '&:-moz-focusring': {
+              color: 'transparent',
+              textShadow: '0 0 0 #000',
+            },
+            position: 'relative',
+            ...(isDisabled && {
+              backgroundColor: theme.Input.backgroundColorDisabled,
+              color: theme.Select.disabledColor,
+              cursor: 'default',
+            }),
+            ...(markInvalid && {
+              boxShadow: `0 0 0 1px ${theme.general.dangerColor}`,
+            }),
+            ...(menuIsOpen && {
+              boxShadow: `0 0 0 1px ${theme.general.primaryColor}`,
+              '&:hover': {
+                boxShadow: `0 0 0 1px ${theme.general.primaryColor}`,
+              },
+            }),
+            cursor: !isSelectDisabled && 'pointer',
+            '&:focus:visible, active': {
+              boxShadow: !isSelectDisabled && `0 0 0 1px ${theme.general.primaryColor}`,
+            },
           },
-        }),
-        cursor: !isSelectDisabled && 'pointer',
-        '&:focus:visible, active': {
-          boxShadow: !isSelectDisabled && `0 0 0 1px ${theme.general.primaryColor}`,
-        },
-      },
     };
   },
-  control: () => ({
-    display: 'flex',
+  control: (_provided, {options}) => ({
+    display: isGroup(options) ? 'none' : 'flex',
     alignItems: 'center',
     appearance: 'none',
     padding: '0 8px 0 16px',
@@ -81,13 +88,29 @@ export const customStyles = (theme: Theme, markInvalid = false) => ({
       },
     };
   },
-  menu: provided => ({
+  group: provided => ({
+    ...provided,
+    paddingBottom: 0,
+  }),
+  groupHeading: provided => ({
+    ...provided,
+    display: 'flex',
+    color: theme.general.color,
+    fontSize: '14px',
+    marginBottom: '16px',
+    paddingLeft: '16px',
+    marginTop: '8px',
+  }),
+  menu: (provided, {options}) => ({
     ...provided,
     boxShadow: `0 0 0 1px ${theme.general.primaryColor}, 0 4px 11px hsl(0deg 0% 0% / 10%)`,
     borderRadius: 12,
     marginBottom: 0,
     marginTop: 4,
     overflowY: 'overlay',
+    ...(isGroup(options) && {
+      minWidth: '400px',
+    }),
   }),
   menuList: provided => ({
     ...provided,
@@ -95,7 +118,7 @@ export const customStyles = (theme: Theme, markInvalid = false) => ({
     paddingBottom: 0,
     paddingTop: 0,
   }),
-  option: (provided, {isMulti, isDisabled, isFocused, isSelected}) => ({
+  option: (provided, {isMulti, isDisabled, isFocused, isSelected, options, data}) => ({
     ...provided,
     backgroundColor: theme.Input.backgroundColor,
     color: theme.general.color,
@@ -155,14 +178,28 @@ export const customStyles = (theme: Theme, markInvalid = false) => ({
         color: theme.Select.disabledColor,
       }),
     }),
-    '&:not(:last-of-type)': {
-      borderBottom: `1px solid ${theme.Select.borderColor}`,
-    },
-    '&:first-of-type': {
-      borderRadius: '12px 12px 0 0',
-    },
+
+    ...(isGroup(options) && {
+      'div > svg': {
+        fill: theme.general.contrastColor,
+      },
+    }),
+    ...(!isGroup(options) && {
+      '&:not(:last-of-type)': {
+        borderBottom: `1px solid ${theme.Select.borderColor}`,
+      },
+    }),
+    ...(!isGroup(options) && {
+      '&:first-of-type': {
+        borderRadius: '12px 12px 0 0',
+      },
+    }),
     '&:last-of-type': {
-      borderRadius: '0 0 12px 12px',
+      ...(!isGroup(options) && {borderRadius: '0 0 12px 12px'}),
+      ...(isGroup(options) &&
+        !options[options.length - 1].options.includes(data) && {
+          borderBottom: `1px solid ${theme.Select.borderColor}`,
+        }),
     },
   }),
   valueContainer: provided => ({
