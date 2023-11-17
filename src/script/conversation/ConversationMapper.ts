@@ -258,7 +258,7 @@ export class ConversationMapper {
 
     conversationEntity.creator = creator;
     conversationEntity.groupId = group_id;
-    conversationEntity.initialProtocol = initial_protocol;
+    conversationEntity.initialProtocol = initial_protocol || protocol;
     conversationEntity.epoch = epoch ?? -1;
     conversationEntity.cipherSuite = cipher_suite;
     conversationEntity.type(type);
