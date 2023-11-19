@@ -4,7 +4,7 @@
     "@datadog/browser-rum": "^5.2.0",
     "@emotion/react": "11.11.1",
     "@lexical/history": "0.12.2",
-    "@lexical/react": "0.12.2",
+    "@lexical/react": "0.12.4",
     "@peculiar/x509": "1.9.5",
     "@wireapp/avs": "9.5.2",
     "@wireapp/commons": "5.2.2",
