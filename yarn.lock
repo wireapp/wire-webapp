@@ -4420,17 +4420,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@lexical/history@npm:0.12.2":
-  version: 0.12.2
-  resolution: "@lexical/history@npm:0.12.2"
-  dependencies:
-    "@lexical/utils": 0.12.2
-  peerDependencies:
-    lexical: 0.12.2
-  checksum: a813313e7d8d54f0c50a4a5114a5d04d095bb00aaaa8bf916d86cbe64434097fe3dcd10838fae50420987861b1cd9e52dc443077a8bd14e0073e92d60c944ed8
-  languageName: node
-  linkType: hard
-
 "@lexical/history@npm:0.12.4":
   version: 0.12.4
   resolution: "@lexical/history@npm:0.12.4"
@@ -4462,17 +4451,6 @@ __metadata:
   peerDependencies:
     lexical: 0.12.4
   checksum: 206214255505d68e8d14e53dfcdf5fa71813cde94fa30b489440278df9560aab262385a7334b4b094384a0d316de50469a33133db606d2da23f33fec049107b4
-  languageName: node
-  linkType: hard
-
-"@lexical/list@npm:0.12.2":
-  version: 0.12.2
-  resolution: "@lexical/list@npm:0.12.2"
-  dependencies:
-    "@lexical/utils": 0.12.2
-  peerDependencies:
-    lexical: 0.12.2
-  checksum: 196e40c79613f21bcbdd035ea6b970460b10dde86c22674d6c2e009f093d56a48565e631416ac1d60c9bb84b6225d85ba182c9d1362a197b7f84abef817eced0
   languageName: node
   linkType: hard
 
@@ -4586,32 +4564,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@lexical/selection@npm:0.12.2":
-  version: 0.12.2
-  resolution: "@lexical/selection@npm:0.12.2"
-  peerDependencies:
-    lexical: 0.12.2
-  checksum: 4c35dc644c401c3782ed8a10e404a92b1f18c763332035e1f8707a1ac6143754b463bbb122b7cc82c99766e0b5650927025e2d081538ffbbd76386cf9cf4c66c
-  languageName: node
-  linkType: hard
-
 "@lexical/selection@npm:0.12.4":
   version: 0.12.4
   resolution: "@lexical/selection@npm:0.12.4"
   peerDependencies:
     lexical: 0.12.4
   checksum: d3448e2510d4ab88ae6e99f0a4ae791f76b5a6a74664b48f0a1d29c0fdebdf9eed07c254a244cce87c912d87daffa444f351cb0600657422a07c3992991583cf
-  languageName: node
-  linkType: hard
-
-"@lexical/table@npm:0.12.2":
-  version: 0.12.2
-  resolution: "@lexical/table@npm:0.12.2"
-  dependencies:
-    "@lexical/utils": 0.12.2
-  peerDependencies:
-    lexical: 0.12.2
-  checksum: 051cd08a39b3ec86734db6ff2ff5c5fc1952890fa282696983c89a949ccea134131930d704eec98afa26c104ec05d1e26d705738b9f20aa90df1f341294a67b5
   languageName: node
   linkType: hard
 
@@ -4632,19 +4590,6 @@ __metadata:
   peerDependencies:
     lexical: 0.12.4
   checksum: 4de5404f6bbb7dc27dac31e893b1ff15a47712d32b5260d803bcdb43a850828e52ae2563ef69ba6b9213431e9ae27c030ee0748fc206e6a47707bfa167d65432
-  languageName: node
-  linkType: hard
-
-"@lexical/utils@npm:0.12.2":
-  version: 0.12.2
-  resolution: "@lexical/utils@npm:0.12.2"
-  dependencies:
-    "@lexical/list": 0.12.2
-    "@lexical/selection": 0.12.2
-    "@lexical/table": 0.12.2
-  peerDependencies:
-    lexical: 0.12.2
-  checksum: 579fd0b5a5b085f4842721d23076aa43eb295497952c81239f211c4c50ce8b33c10734f72acce3107af4b391dcd5d399461a6ab63eab1d6cd7b57db27f7a1066
   languageName: node
   linkType: hard
 
@@ -19405,7 +19350,7 @@ __metadata:
     "@faker-js/faker": 8.2.0
     "@formatjs/cli": 6.2.4
     "@koush/wrtc": 0.5.3
-    "@lexical/history": 0.12.2
+    "@lexical/history": 0.12.4
     "@lexical/react": 0.12.4
     "@peculiar/x509": 1.9.5
     "@testing-library/react": 14.1.2

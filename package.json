@@ -3,7 +3,7 @@
     "@datadog/browser-logs": "^5.3.0",
     "@datadog/browser-rum": "^5.3.0",
     "@emotion/react": "11.11.1",
-    "@lexical/history": "0.12.2",
+    "@lexical/history": "0.12.4",
     "@lexical/react": "0.12.4",
     "@peculiar/x509": "1.9.5",
     "@wireapp/avs": "9.5.2",
