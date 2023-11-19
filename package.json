@@ -8,7 +8,7 @@
     "@peculiar/x509": "1.9.5",
     "@wireapp/avs": "9.5.2",
     "@wireapp/commons": "5.2.2",
-    "@wireapp/core": "42.19.2",
+    "@wireapp/core": "42.20.0",
     "@wireapp/react-ui-kit": "9.9.12",
     "@wireapp/store-engine-dexie": "2.1.6",
     "@wireapp/store-engine-sqleet": "1.8.9",
