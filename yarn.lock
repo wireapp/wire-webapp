@@ -13267,10 +13267,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lexical@npm:0.12.2":
-  version: 0.12.2
-  resolution: "lexical@npm:0.12.2"
-  checksum: f02cd11aa015f1babb960d39a31ada30060c3af5446dcc4a6d26e300af8b889bc307633cf77604cf7538e776efdf6ca19d919b82ad24e29c451f58939e91621f
+"lexical@npm:0.12.4":
+  version: 0.12.4
+  resolution: "lexical@npm:0.12.4"
+  checksum: c2af8fa2a6bf55dde453240b583b433abd5b6dac860598d33be54fc191005ff5ee8ba8af03d21717cc08c6c87f8a3e45a0bd969f436c765aded57eb9387c8972
   languageName: node
   linkType: hard
 
@@ -19404,7 +19404,7 @@ __metadata:
     knockout: 3.5.1
     less: 4.2.0
     less-loader: ^11.1.3
-    lexical: 0.12.2
+    lexical: 0.12.4
     libsodium-wrappers: 0.7.13
     linkify-it: 4.0.1
     lint-staged: 15.1.0
