@@ -52,14 +52,12 @@ const defaultContent: ModalContent = {
   closeFn: noop,
   currentType: '',
   inputPlaceholder: '',
-  messageHtml: '',
-  messageText: '',
+  message: '',
   modalUie: '',
   onBgClick: noop,
   primaryAction: {} as Action,
   secondaryAction: [],
   titleText: '',
-  passwordGenerator: false,
   copyPassword: false,
 };
 
@@ -128,7 +126,6 @@ const updateCurrentModalContent = (type: PrimaryModalType, options: ModalOptions
     closeOnConfirm = true,
     copyPassword,
     data,
-    passwordGenerator,
     preventClose = false,
     primaryAction,
     secondaryAction,
@@ -146,11 +143,9 @@ const updateCurrentModalContent = (type: PrimaryModalType, options: ModalOptions
     copyPassword,
     currentType: type,
     inputPlaceholder: text.input ?? '',
-    messageHtml: text.htmlMessage ?? '',
-    messageText: text.message ?? '',
+    message: text.htmlMessage ?? '',
     modalUie: type,
     onBgClick: preventClose ? noop : removeCurrentModal,
-    passwordGenerator,
     primaryAction: primaryAction ?? null,
     secondaryAction: secondaryAction ?? null,
     hideCloseBtn,
@@ -163,17 +158,26 @@ const updateCurrentModalContent = (type: PrimaryModalType, options: ModalOptions
       content.titleText = t('modalAccountNewDevicesHeadline');
       content.primaryAction = {...primaryAction, text: t('modalAcknowledgeAction')};
       content.secondaryAction = {...secondaryAction, text: t('modalAccountNewDevicesSecondary')};
-      content.messageText = t('modalAccountNewDevicesMessage');
       const deviceList = (data as ClientNotificationData[])
         .map(device => {
           const deviceDate = new Date(device.time);
           const deviceTime = isValid(deviceDate) ? new Date(deviceDate) : new Date();
           const formattedDate = formatLocale(deviceTime, 'PP, p');
           const deviceModel = `${t('modalAccountNewDevicesFrom')} ${escape(device.model)}`;
-          return `<div>${formattedDate} - UTC</div><div>${deviceModel}</div>`;
+          return (
+            <>
+              <div>${formattedDate} - UTC</div>
+              <div>${deviceModel}</div>
+            </>
+          );
         })
         .join('');
-      content.messageHtml = `<div class="modal__content__device-list">${deviceList}</div>`;
+      content.message = (
+        <>
+          {t('modalAccountNewDevicesMessage')}
+          <div className="modal__content__device-list">${deviceList}</div>
+        </>
+      );
       break;
     }
     case PrimaryModalType.ACCOUNT_READ_RECEIPTS_CHANGED: {
@@ -181,18 +185,18 @@ const updateCurrentModalContent = (type: PrimaryModalType, options: ModalOptions
       content.titleText = data
         ? t('modalAccountReadReceiptsChangedOnHeadline')
         : t('modalAccountReadReceiptsChangedOffHeadline');
-      content.messageText = t('modalAccountReadReceiptsChangedMessage');
+      content.message = t('modalAccountReadReceiptsChangedMessage');
       break;
     }
     case PrimaryModalType.ACKNOWLEDGE: {
       content.primaryAction = {text: t('modalAcknowledgeAction'), ...primaryAction};
       content.titleText = text.title || t('modalAcknowledgeHeadline');
-      content.messageText = (!text.htmlMessage && text.message) || '';
+      content.message = (!text.htmlMessage && text.message) || '';
       break;
     }
     case PrimaryModalType.WITHOUT_TITLE: {
       content.primaryAction = {...primaryAction};
-      content.messageText = (!text.htmlMessage && text.message) || '';
+      content.message = (!text.htmlMessage && text.message) || '';
       break;
     }
     case PrimaryModalType.CONFIRM: {
@@ -210,7 +214,7 @@ const updateCurrentModalContent = (type: PrimaryModalType, options: ModalOptions
     case PrimaryModalType.SESSION_RESET: {
       content.titleText = t('modalSessionResetHeadline');
       content.primaryAction = {...primaryAction, text: t('modalAcknowledgeAction')};
-      content.messageHtml = t('modalSessionResetMessage', {}, replaceLink(Config.getConfig().URL.SUPPORT.BUG_REPORT));
+      content.message = t('modalSessionResetMessage', {}, replaceLink(Config.getConfig().URL.SUPPORT.BUG_REPORT));
       break;
     }
   }

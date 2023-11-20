@@ -57,15 +57,13 @@ export const PrimaryModalComponent: FC = () => {
     closeOnConfirm,
     currentType,
     inputPlaceholder,
-    messageHtml,
-    messageText,
+    message,
     modalUie,
     onBgClick,
     primaryAction,
     secondaryAction,
     titleText,
     closeBtnTitle,
-    passwordGenerator,
     copyPassword,
     hideCloseBtn = false,
     passwordOptional = false,
@@ -233,14 +231,13 @@ export const PrimaryModalComponent: FC = () => {
             </div>
 
             <FadingScrollbar className="modal__body">
-              {(messageHtml || messageText) && (
+              {message && (
                 <div className="modal__text" data-uie-name="status-modal-text">
-                  {messageHtml && <p id="modal-description-html" dangerouslySetInnerHTML={{__html: messageHtml}} />}
-                  {messageText && <p id="modal-description-text">{messageText}</p>}
+                  {message && <p id="modal-description-html">{message}</p>}
                 </div>
               )}
 
-              {passwordGenerator && (
+              {isGuestLinkPassword && (
                 <PasswordGeneratorButton
                   passwordLength={Config.getConfig().MINIMUM_PASSWORD_LENGTH}
                   onGeneratePassword={password => {

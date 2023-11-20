@@ -189,7 +189,6 @@ const GuestOptions: FC<GuestOptionsProps> = ({
     PrimaryModal.show(
       PrimaryModal.type.GUEST_LINK_PASSWORD,
       {
-        passwordGenerator: true,
         copyPassword: true,
         closeOnConfirm: true,
         preventClose: false,

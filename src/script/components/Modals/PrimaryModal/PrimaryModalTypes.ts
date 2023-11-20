@@ -26,7 +26,7 @@ export interface Action {
 }
 
 export interface Text {
-  htmlMessage?: string;
+  htmlMessage?: React.ReactNode;
   input?: string;
   message?: React.ReactNode;
   option?: string;
@@ -42,8 +42,6 @@ export interface ModalOptions {
   /** Content needed for visualization on modal */
   data?: ClientNotificationData[] | boolean;
   hideSecondary?: boolean;
-  /** Set to `true` to add a password generator button */
-  passwordGenerator?: boolean;
   /** Set to `true` to disable autoclose behavior */
   preventClose?: boolean;
   /** Called when action in modal is triggered */
@@ -78,13 +76,11 @@ export interface ModalContent {
   closeFn: () => void;
   closeOnConfirm?: boolean;
   copyPassword?: boolean;
-  currentType: string;
+  currentType: string | PrimaryModalType;
   inputPlaceholder: string;
-  messageHtml: string;
-  messageText: React.ReactNode;
+  message: React.ReactNode;
   modalUie: string;
   onBgClick: () => void;
-  passwordGenerator?: boolean;
   primaryAction: Action | null;
   secondaryAction: Action[] | Action | null;
   titleText: string;
