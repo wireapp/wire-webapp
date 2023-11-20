@@ -20,7 +20,8 @@
 import {E2eiConversationState} from '@wireapp/core/lib/messagingProtocols/mls';
 import {container} from 'tsyringe';
 
-import {getConversationState} from 'src/script/E2EIdentity';
+import {MLSStatuses} from 'Components/VerificationBadge';
+import {getConversationVerificationState, getUsersVerificationState} from 'src/script/E2EIdentity';
 import {VerificationMessageType} from 'src/script/message/VerificationMessageType';
 import {Core} from 'src/script/service/CoreSingleton';
 import {Logger, getLogger} from 'Util/Logger';
@@ -56,10 +57,15 @@ class MLSConversationVerificationStateHandler {
   private async degradeConversation(conversation: MLSConversation) {
     const state = ConversationVerificationState.DEGRADED;
     conversation.mlsVerificationState(state);
+    const degradedUsers = (await getUsersVerificationState(conversation.groupId, conversation.participating_user_ids()))
+      .filter(user => user.state !== MLSStatuses.VALID)
+      .map(user => user.userId);
+
     this.onConversationVerificationStateChange({
       conversationEntity: conversation,
       conversationVerificationState: state,
       verificationMessageType: VerificationMessageType.UNVERIFIED,
+      userIds: degradedUsers,
     });
   }
 
@@ -84,7 +90,7 @@ class MLSConversationVerificationStateHandler {
       return;
     }
 
-    const verificationState = await getConversationState(groupId);
+    const verificationState = await getConversationVerificationState(groupId);
 
     if (
       verificationState === E2eiConversationState.Degraded &&

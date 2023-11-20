@@ -144,7 +144,6 @@ export const DeviceDetails = ({
 
         <p className="label-2 preferences-label preferences-devices-fingerprint-label">
           {t('preferencesDeviceDetailsVerificationStatus')}
-          Verification Status
         </p>
 
         <div className="participant-devices__verify">
