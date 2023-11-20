@@ -50,6 +50,7 @@ import {CompositeMessage} from '../entity/message/CompositeMessage';
 import {ContentMessage} from '../entity/message/ContentMessage';
 import {DecryptErrorMessage} from '../entity/message/DecryptErrorMessage';
 import {DeleteMessage} from '../entity/message/DeleteMessage';
+import {E2EIVerificationMessage} from '../entity/message/E2EIVerificationMessage';
 import {FailedToAddUsersMessage} from '../entity/message/FailedToAddUsersMessage';
 import {FederationStopMessage} from '../entity/message/FederationStopMessage';
 import {FileAsset} from '../entity/message/FileAsset';
@@ -328,6 +329,11 @@ export class EventMapper {
 
       case ClientEvent.CONVERSATION.MLS_CONVERSATION_RECOVERED: {
         messageEntity = this._mapEventMLSConversationRecovered();
+        break;
+      }
+
+      case ClientEvent.CONVERSATION.E2EI_VERIFICATION: {
+        messageEntity = this._mapEventE2EIVerificationMessage();
         break;
       }
 
@@ -641,6 +647,13 @@ export class EventMapper {
    */
   private _mapEventMLSConversationRecovered(): MissedMessage {
     return new MLSConversationRecoveredMessage();
+  }
+
+  /**
+   * Maps JSON data of E2E Identity verification message event to message entity.
+   */
+  private _mapEventE2EIVerificationMessage(): MissedMessage {
+    return new E2EIVerificationMessage();
   }
 
   /**

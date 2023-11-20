@@ -156,7 +156,7 @@
   &--svg {
     line-height: 0;
 
-    svg path {
+    svg:not(.filled) path {
       fill: var(--foreground);
     }
   }
@@ -862,5 +862,13 @@
   &:focus > *,
   &:focus-visible > * {
     background-color: var(--message-actions-background-hover);
+  }
+}
+
+.system-message-caption {
+  & > a {
+    color: inherit;
+    font-weight: @font-weight-bold;
+    text-decoration: underline;
   }
 }

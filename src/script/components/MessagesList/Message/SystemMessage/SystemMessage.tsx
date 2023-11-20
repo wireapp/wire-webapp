@@ -58,7 +58,7 @@ export const SystemMessage: React.FC<SystemMessageProps> = ({message}) => {
   }
 
   if (message instanceof E2EIVerificationMessage) {
-    return <SystemMessageBase message={message} icon={<MLSVerified />} />;
+    return <SystemMessageBase message={message} icon={<MLSVerified className="filled" />} />;
   }
 
   return <SystemMessageBase message={message} />;

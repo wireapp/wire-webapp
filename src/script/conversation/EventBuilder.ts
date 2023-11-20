@@ -39,7 +39,6 @@ import type {Conversation} from '../entity/Conversation';
 import type {Message} from '../entity/message/Message';
 import type {User} from '../entity/User';
 import {CALL, ClientEvent, CONVERSATION} from '../event/Client';
-import {E2EIVerificationMessageType} from '../message/E2EIVerificationMessageType';
 import {StatusType} from '../message/StatusType';
 import {VerificationMessageType} from '../message/VerificationMessageType';
 import {ReactionMap, ReadReceipt, UserReactionMap} from '../storage';
@@ -240,8 +239,7 @@ export interface ErrorEvent
 }
 
 // E2EI Verified Events
-export type AllE2EIVerifiedEventData = {type: E2EIVerificationMessageType.VERIFIED};
-export type AllE2EIVerifiedEvent = ConversationEvent<CONVERSATION.E2EI_VERIFICATION, AllE2EIVerifiedEventData>;
+export type AllE2EIVerifiedEvent = ConversationEvent<CONVERSATION.E2EI_VERIFICATION>;
 
 export type ClientConversationEvent =
   | AllVerifiedEvent
@@ -318,9 +316,7 @@ export const EventBuilder = {
   buildAllE2EIVerified(conversationEntity: Conversation): AllE2EIVerifiedEvent {
     return {
       ...buildQualifiedId(conversationEntity),
-      data: {
-        type: E2EIVerificationMessageType.VERIFIED,
-      },
+      data: undefined,
       from: conversationEntity.selfUser().id,
       id: createUuid(),
       time: new Date(conversationEntity.getNextTimestamp()).toISOString(),
