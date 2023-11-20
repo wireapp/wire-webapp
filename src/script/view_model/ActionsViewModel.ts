@@ -149,7 +149,7 @@ export class ActionsViewModel {
       await this.conversationRepository.leaveConversation(conversation);
     }
     if (clear) {
-      await this.conversationRepository.clearConversationContent(conversation);
+      await this.conversationRepository.clearConversation(conversation);
     }
   };
 

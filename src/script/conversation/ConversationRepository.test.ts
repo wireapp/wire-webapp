@@ -895,7 +895,7 @@ describe('ConversationRepository', () => {
     });
   });
 
-  describe('clearConversationContent', () => {
+  describe('clearConversation', () => {
     it('clears all the messages from database and local state and re-applies creation message', async () => {
       const conversationRepository = testFactory.conversation_repository!;
       const messageRepository = testFactory.message_repository!;
@@ -911,7 +911,7 @@ describe('ConversationRepository', () => {
       jest.spyOn(conversationEntity, 'removeMessages').mockImplementationOnce(jest.fn());
       jest.spyOn(conversationRepository['eventService'], 'deleteEvents').mockImplementationOnce(jest.fn());
 
-      await conversationRepository.clearConversationContent(conversationEntity);
+      await conversationRepository.clearConversation(conversationEntity);
 
       expect(messageRepository.updateClearedTimestamp).toHaveBeenCalledWith(conversationEntity);
       expect(conversationEntity.removeMessages).toHaveBeenCalled();

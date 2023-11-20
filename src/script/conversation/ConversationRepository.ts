@@ -2134,25 +2134,25 @@ export class ConversationRepository {
   }
 
   /**
-   * Clear conversation content.
-   * It will clear all messages and events from the conversation and re-apply the conversation creation event.
+   * Clear conversation.
+   * It will update conversation's cleared timestamp on BE and clear all conversation content.
    *
    * @param conversation Conversation to clear content from
    * @param timestamp Timestamp of the event
    */
-  public async clearConversationContent(conversation: Conversation, timestamp?: number) {
+  public async clearConversation(conversation: Conversation, timestamp?: number) {
     await this.messageRepository.updateClearedTimestamp(conversation);
-    return this.onConversationContentCleared(conversation, timestamp);
+    return this.clearConversationContent(conversation, timestamp);
   }
 
   /**
-   * React to member update event that was triggered by conversation content being cleared.
+   * Clears conversation content.
    * It will clear all messages and events from the conversation and re-apply the conversation creation event.
    *
    * @param conversation Conversation to clear content from
    * @param timestamp Timestamp of the event
    */
-  private async onConversationContentCleared(conversation: Conversation, timestamp?: number) {
+  private async clearConversationContent(conversation: Conversation, timestamp?: number) {
     await this.deleteMessages(conversation, timestamp);
     return this.addCreationMessage(conversation, !!this.userState.self()?.isTemporaryGuest(), timestamp);
   }
@@ -3286,7 +3286,7 @@ export class ConversationRepository {
     }
 
     if (conversationEntity.is_cleared()) {
-      await this.onConversationContentCleared(conversationEntity, conversationEntity.cleared_timestamp());
+      await this.clearConversationContent(conversationEntity, conversationEntity.cleared_timestamp());
     }
 
     if (isActiveConversation && (conversationEntity.is_archived() || conversationEntity.is_cleared())) {
