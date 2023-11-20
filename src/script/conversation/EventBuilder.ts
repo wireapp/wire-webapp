@@ -317,9 +317,9 @@ export const EventBuilder = {
     return {
       ...buildQualifiedId(conversationEntity),
       data: undefined,
-      from: conversationEntity.selfUser().id,
+      from: '',
       id: createUuid(),
-      time: new Date(conversationEntity.getNextTimestamp()).toISOString(),
+      time: conversationEntity.getNextIsoDate(),
       type: ClientEvent.CONVERSATION.E2EI_VERIFICATION,
     };
   },

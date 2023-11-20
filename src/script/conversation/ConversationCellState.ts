@@ -24,7 +24,6 @@ import {getRenderedTextContent} from 'Util/messageRenderer';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import {ConversationStatusIcon} from './ConversationStatusIcon';
-import {ConversationVerificationState} from './ConversationVerificationState';
 
 import {AssetTransferState} from '../assets/AssetTransferState';
 import type {Conversation} from '../entity/Conversation';
@@ -33,6 +32,7 @@ import type {MemberMessage} from '../entity/message/MemberMessage';
 import type {SystemMessage} from '../entity/message/SystemMessage';
 import type {Text} from '../entity/message/Text';
 import {ConversationError} from '../error/ConversationError';
+import {ClientEvent} from '../event/Client';
 
 enum ACTIVITY_TYPE {
   CALL = 'ConversationCellState.ACTIVITY_TYPE.CALL',
@@ -388,12 +388,11 @@ const _getStateVerified = {
   },
   icon: () => ConversationStatusIcon.NONE,
   match: (conversationEntity: Conversation) => {
-    const isMLSProtocol = conversationEntity.protocol === ConversationProtocol.MLS;
-    const verificationState = isMLSProtocol
-      ? conversationEntity.mlsVerificationState()
-      : conversationEntity.verification_state();
+    const lastMessageEntity = conversationEntity.getNewestMessage();
+    const isE2EIVerificationMessage = lastMessageEntity?.type === ClientEvent.CONVERSATION.E2EI_VERIFICATION;
+    const {systemMessages: unreadSystemMessages} = conversationEntity.unreadState();
 
-    return verificationState === ConversationVerificationState.VERIFIED;
+    return isE2EIVerificationMessage && unreadSystemMessages.length > 0;
   },
 };
 

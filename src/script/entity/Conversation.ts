@@ -44,6 +44,7 @@ import {CallMessage} from './message/CallMessage';
 import type {ContentMessage} from './message/ContentMessage';
 import type {Message} from './message/Message';
 import {PingMessage} from './message/PingMessage';
+import {SystemMessage} from './message/SystemMessage';
 import type {User} from './User';
 
 import type {Call} from '../calling/Call';
@@ -70,6 +71,7 @@ interface UnreadState {
   pings: PingMessage[];
   selfMentions: ContentMessage[];
   selfReplies: ContentMessage[];
+  systemMessages: SystemMessage[];
 }
 
 enum TIMESTAMP_TYPE {
@@ -431,8 +433,10 @@ export class Conversation {
         pings: [],
         selfMentions: [],
         selfReplies: [],
+        systemMessages: [],
       };
       const messages = [...this.messages(), ...this.incomingMessages()];
+
       for (let index = messages.length - 1; index >= 0; index--) {
         const messageEntity = messages[index];
         if (messageEntity.visible()) {
@@ -451,6 +455,8 @@ export class Conversation {
           const isSelfQuoted =
             isMessage && this.selfUser() && (messageEntity as ContentMessage).isUserQuoted(this.selfUser().id);
 
+          const isSystem = messageEntity.isSystem();
+
           if (isMissedCall || isPing || isMessage) {
             unreadState.allMessages.push(messageEntity as ContentMessage);
           }
@@ -465,6 +471,8 @@ export class Conversation {
             unreadState.pings.push(messageEntity);
           } else if (isMessage) {
             unreadState.otherMessages.push(messageEntity as ContentMessage);
+          } else if (isSystem) {
+            unreadState.systemMessages.push(messageEntity);
           }
 
           unreadState.allEvents.push(messageEntity as ContentMessage);
