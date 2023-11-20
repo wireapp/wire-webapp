@@ -731,19 +731,19 @@ export class ConversationRepository {
       }
       const addCreationMessage = !conversationEntity.hasCreationMessage;
       if (addCreationMessage) {
-        this.addCreationMessage(conversationEntity, this.userState.self().isTemporaryGuest());
+        await this.addCreationMessage(conversationEntity, this.userState.self().isTemporaryGuest());
       }
     }
 
     return mappedMessageEntities;
   }
 
-  private addCreationMessage(
+  private async addCreationMessage(
     conversationEntity: Conversation,
     isTemporaryGuest: boolean,
     timestamp?: number,
     eventSource?: EventSource,
-  ): void {
+  ): Promise<void> {
     conversationEntity.hasCreationMessage = true;
 
     if (conversationEntity.inTeam()) {
@@ -763,7 +763,7 @@ export class ConversationRepository {
       ? EventBuilder.buildGroupCreation(conversationEntity, isTemporaryGuest, timestamp)
       : EventBuilder.build1to1Creation(conversationEntity);
 
-    this.eventRepository.injectEvent(creationEvent, eventSource);
+    await this.eventRepository.injectEvent(creationEvent, eventSource);
   }
 
   /**
@@ -2142,7 +2142,7 @@ export class ConversationRepository {
   public async clearConversationContent(conversation: Conversation) {
     await this.messageRepository.updateClearedTimestamp(conversation);
     await this.deleteMessages(conversation);
-    this.addCreationMessage(conversation, !!this.userState.self()?.isTemporaryGuest());
+    return this.addCreationMessage(conversation, !!this.userState.self()?.isTemporaryGuest());
   }
 
   async leaveGuestRoom(): Promise<void> {
@@ -3013,7 +3013,7 @@ export class ConversationRepository {
       const [conversationEntity] = this.mapConversations([conversationData], initialTimestamp);
       if (conversationEntity) {
         if (conversationEntity.participating_user_ids().length) {
-          this.addCreationMessage(conversationEntity, false, initialTimestamp, eventSource);
+          await this.addCreationMessage(conversationEntity, false, initialTimestamp, eventSource);
         }
         await this.updateParticipatingUserEntities(conversationEntity);
         this.proteusVerificationStateHandler.onConversationCreate(conversationEntity);
