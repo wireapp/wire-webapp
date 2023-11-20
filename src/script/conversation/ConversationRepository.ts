@@ -2134,24 +2134,15 @@ export class ConversationRepository {
   }
 
   /**
-   * Clear conversation content and archive the conversation.
-   *
-   * @note According to spec we archive a conversation when we clear it.
-   * It will be unarchived once it is opened through search. We use the archive flag to distinguish states.
+   * Clear conversation content.
+   * It will clear all messages and events from the conversation and re-apply the conversation creation event.
    *
    * @param conversation Conversation to clear
-   * @param leaveConversation Should we leave the conversation before clearing the content?
    */
-  public async clearConversation(conversation: Conversation) {
-    const isActiveConversation = this.conversationState.isActiveConversation(conversation);
-    const nextConversationEntity = this.getNextConversation(conversation);
-
+  public async clearConversationContent(conversation: Conversation) {
     await this.messageRepository.updateClearedTimestamp(conversation);
-    await this._clearConversation(conversation);
-
-    if (isActiveConversation) {
-      amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversationEntity, {});
-    }
+    await this.deleteMessages(conversation);
+    this.addCreationMessage(conversation, !!this.userState.self()?.isTemporaryGuest());
   }
 
   async leaveGuestRoom(): Promise<void> {
@@ -2207,7 +2198,6 @@ export class ConversationRepository {
    * Remove the current user from a conversation.
    *
    * @param conversation Conversation to remove user from
-   * @param clearContent Should we clear the conversation content from the database?
    * @returns Resolves when user was removed from the conversation
    */
   public async leaveConversation(conversation: Conversation) {
@@ -3710,6 +3700,7 @@ export class ConversationRepository {
     conversationEntity.hasCreationMessage = false;
 
     const iso_date = timestamp ? new Date(timestamp).toISOString() : undefined;
+    conversationEntity.removeMessages();
     return this.eventService.deleteEvents(conversationEntity.id, iso_date);
   }
 
