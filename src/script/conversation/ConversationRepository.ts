@@ -731,19 +731,19 @@ export class ConversationRepository {
       }
       const addCreationMessage = !conversationEntity.hasCreationMessage;
       if (addCreationMessage) {
-        this.addCreationMessage(conversationEntity, this.userState.self().isTemporaryGuest());
+        await this.addCreationMessage(conversationEntity, this.userState.self().isTemporaryGuest());
       }
     }
 
     return mappedMessageEntities;
   }
 
-  private addCreationMessage(
+  private async addCreationMessage(
     conversationEntity: Conversation,
     isTemporaryGuest: boolean,
     timestamp?: number,
     eventSource?: EventSource,
-  ): void {
+  ): Promise<void> {
     conversationEntity.hasCreationMessage = true;
 
     if (conversationEntity.inTeam()) {
@@ -763,7 +763,7 @@ export class ConversationRepository {
       ? EventBuilder.buildGroupCreation(conversationEntity, isTemporaryGuest, timestamp)
       : EventBuilder.build1to1Creation(conversationEntity);
 
-    this.eventRepository.injectEvent(creationEvent, eventSource);
+    await this.eventRepository.injectEvent(creationEvent, eventSource);
   }
 
   /**
@@ -2134,24 +2134,27 @@ export class ConversationRepository {
   }
 
   /**
-   * Clear conversation content and archive the conversation.
+   * Clear conversation.
+   * It will update conversation's cleared timestamp on BE and clear all conversation content.
    *
-   * @note According to spec we archive a conversation when we clear it.
-   * It will be unarchived once it is opened through search. We use the archive flag to distinguish states.
-   *
-   * @param conversation Conversation to clear
-   * @param leaveConversation Should we leave the conversation before clearing the content?
+   * @param conversation Conversation to clear content from
+   * @param timestamp Timestamp of the event
    */
-  public async clearConversation(conversation: Conversation) {
-    const isActiveConversation = this.conversationState.isActiveConversation(conversation);
-    const nextConversationEntity = this.getNextConversation(conversation);
-
+  public async clearConversation(conversation: Conversation, timestamp?: number) {
     await this.messageRepository.updateClearedTimestamp(conversation);
-    await this._clearConversation(conversation);
+    return this.clearConversationContent(conversation, timestamp);
+  }
 
-    if (isActiveConversation) {
-      amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversationEntity, {});
-    }
+  /**
+   * Clears conversation content.
+   * It will clear all messages and events from the conversation and re-apply the conversation creation event.
+   *
+   * @param conversation Conversation to clear content from
+   * @param timestamp Timestamp of the event
+   */
+  private async clearConversationContent(conversation: Conversation, timestamp?: number) {
+    await this.deleteMessages(conversation, timestamp);
+    return this.addCreationMessage(conversation, !!this.userState.self()?.isTemporaryGuest(), timestamp);
   }
 
   async leaveGuestRoom(): Promise<void> {
@@ -2206,9 +2209,8 @@ export class ConversationRepository {
   /**
    * Remove the current user from a conversation.
    *
-   * @param conversation Conversation to remove user from
-   * @param clearContent Should we clear the conversation content from the database?
-   * @returns Resolves when user was removed from the conversation
+   * @param conversation Conversation to remove the self user from
+   * @returns Resolves when the self user was removed from the conversation
    */
   public async leaveConversation(conversation: Conversation) {
     const userQualifiedId = this.userState.self().qualifiedId;
@@ -2458,21 +2460,6 @@ export class ConversationRepository {
       from: this.userState.self().id,
     };
     this.onMemberUpdate(conversationEntity, response);
-  }
-
-  /**
-   * Clears conversation content from view and the database.
-   *
-   * @param conversationEntity Conversation entity to delete
-   * @param timestamp Optional timestamps for which messages to remove
-   */
-  private async _clearConversation(conversationEntity: Conversation, timestamp?: number) {
-    await this.deleteMessages(conversationEntity, timestamp);
-
-    if (conversationEntity.removed_from_conversation()) {
-      await this.conversationService.deleteConversationFromDb(conversationEntity.id);
-      this.deleteConversationFromRepository(conversationEntity);
-    }
   }
 
   private handleTooManyMembersError(participants = ConversationRepository.CONFIG.GROUP.MAX_SIZE) {
@@ -3023,7 +3010,7 @@ export class ConversationRepository {
       const [conversationEntity] = this.mapConversations([conversationData], initialTimestamp);
       if (conversationEntity) {
         if (conversationEntity.participating_user_ids().length) {
-          this.addCreationMessage(conversationEntity, false, initialTimestamp, eventSource);
+          await this.addCreationMessage(conversationEntity, false, initialTimestamp, eventSource);
         }
         await this.updateParticipatingUserEntities(conversationEntity);
         this.proteusVerificationStateHandler.onConversationCreate(conversationEntity);
@@ -3299,7 +3286,7 @@ export class ConversationRepository {
     }
 
     if (conversationEntity.is_cleared()) {
-      await this._clearConversation(conversationEntity, conversationEntity.cleared_timestamp());
+      await this.clearConversationContent(conversationEntity, conversationEntity.cleared_timestamp());
     }
 
     if (isActiveConversation && (conversationEntity.is_archived() || conversationEntity.is_cleared())) {
@@ -3710,6 +3697,7 @@ export class ConversationRepository {
     conversationEntity.hasCreationMessage = false;
 
     const iso_date = timestamp ? new Date(timestamp).toISOString() : undefined;
+    conversationEntity.removeMessages();
     return this.eventService.deleteEvents(conversationEntity.id, iso_date);
   }
 
