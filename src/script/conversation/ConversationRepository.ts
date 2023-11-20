@@ -2138,11 +2138,23 @@ export class ConversationRepository {
    * It will clear all messages and events from the conversation and re-apply the conversation creation event.
    *
    * @param conversation Conversation to clear content from
+   * @param timestamp Timestamp of the event
    */
-  public async clearConversationContent(conversation: Conversation) {
+  public async clearConversationContent(conversation: Conversation, timestamp?: number) {
     await this.messageRepository.updateClearedTimestamp(conversation);
-    await this.deleteMessages(conversation);
-    return this.addCreationMessage(conversation, !!this.userState.self()?.isTemporaryGuest());
+    return this.onConversationContentCleared(conversation, timestamp);
+  }
+
+  /**
+   * React to member update event that was triggered by conversation content being cleared.
+   * It will clear all messages and events from the conversation and re-apply the conversation creation event.
+   *
+   * @param conversation Conversation to clear content from
+   * @param timestamp Timestamp of the event
+   */
+  private async onConversationContentCleared(conversation: Conversation, timestamp?: number) {
+    await this.deleteMessages(conversation, timestamp);
+    return this.addCreationMessage(conversation, !!this.userState.self()?.isTemporaryGuest(), timestamp);
   }
 
   async leaveGuestRoom(): Promise<void> {
@@ -2448,21 +2460,6 @@ export class ConversationRepository {
       from: this.userState.self().id,
     };
     this.onMemberUpdate(conversationEntity, response);
-  }
-
-  /**
-   * Clears conversation content from view and the database.
-   *
-   * @param conversationEntity Conversation entity to clear
-   * @param timestamp Optional timestamps for which messages to remove
-   */
-  private async _clearConversation(conversationEntity: Conversation, timestamp?: number) {
-    await this.deleteMessages(conversationEntity, timestamp);
-
-    if (conversationEntity.removed_from_conversation()) {
-      await this.conversationService.deleteConversationFromDb(conversationEntity.id);
-      this.deleteConversationFromRepository(conversationEntity);
-    }
   }
 
   private handleTooManyMembersError(participants = ConversationRepository.CONFIG.GROUP.MAX_SIZE) {
@@ -3289,7 +3286,7 @@ export class ConversationRepository {
     }
 
     if (conversationEntity.is_cleared()) {
-      await this._clearConversation(conversationEntity, conversationEntity.cleared_timestamp());
+      await this.onConversationContentCleared(conversationEntity, conversationEntity.cleared_timestamp());
     }
 
     if (isActiveConversation && (conversationEntity.is_archived() || conversationEntity.is_cleared())) {
