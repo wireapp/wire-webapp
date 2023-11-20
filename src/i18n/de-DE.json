@@ -139,7 +139,7 @@
   "acme.done.button": "Ok",
   "acme.done.button.close": "Close window 'Certificate Downloaded'",
   "acme.done.headline": "Certificate Downloaded",
-  "acme.done.paragraph": "The certificate is active now and your device is verified. You can find more details about this certificate in your Wire Settings under Devices.",
+  "acme.done.paragraph": "Das Zertifikat ist nun aktiv und Ihr Gerät ist verifiziert. Mehr Details zu diesem Zertifikat finden Sie in Ihren Wire-Einstellungen unter Geräte.",
   "acme.error.button.close": "Close window 'Something went wrong'",
   "acme.error.button.primary": "Wiederholen",
   "acme.error.button.secondary": "Abbrechen",
