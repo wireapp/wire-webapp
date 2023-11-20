@@ -87,7 +87,6 @@ export class ConversationState {
     this.visibleConversations = ko.pureComputed(() => {
       return this.sortedConversations().filter(
         conversation =>
-          !conversation.is_cleared() &&
           !conversation.is_archived() &&
           // We filter out 1 on 1 conversation with unavailable users that don't have messages
           (!conversation.is1to1() ||
