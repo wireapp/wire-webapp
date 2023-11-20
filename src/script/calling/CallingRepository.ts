@@ -124,7 +124,7 @@ enum CALL_DIRECTION {
 
 type SubconversationData = {epoch: number; secretKey: string; members: SubconversationEpochInfoMember[]};
 
-const MAX_USERS_TO_CALL_WITHOUT_CONFIRM = 1;
+const MAX_USERS_TO_CALL_WITHOUT_CONFIRM = 4;
 
 export class CallingRepository {
   private readonly acceptVersionWarning: (conversationId: QualifiedId) => void;
