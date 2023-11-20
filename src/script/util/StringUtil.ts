@@ -272,21 +272,6 @@ export const generateRandomPassword = (passwordLength: number = 8): string => {
  * @returns {boolean} True if the password meets all conditions, false otherwise.
  */
 export function isValidPassword(password: string): boolean {
-  // Regular expressions to check for the presence of different character types
-  const uppercaseRegex = /[A-Z]/; // Uppercase letter
-  const lowercaseRegex = /[a-z]/; // Lowercase letter
-  const numberRegex = /[0-9]/; // Number
-  const symbolRegex = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/; // Symbol
-
-  // Check if the password contains at least one of each character type
-  const hasUppercase = uppercaseRegex.test(password);
-  const hasLowercase = lowercaseRegex.test(password);
-  const hasNumber = numberRegex.test(password);
-  const hasSymbol = symbolRegex.test(password);
-
-  // Check if the password has a minimum length of 8 characters
-  const isMinimumLength = password.length >= 8;
-
-  // Return true if all conditions are met, otherwise return false
-  return hasUppercase && hasLowercase && hasNumber && hasSymbol && isMinimumLength;
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,}$/;
+  return passwordRegex.test(password);
 }
