@@ -31,7 +31,7 @@ import {
 
 import {ClientEntity} from 'src/script/client';
 import {ConversationVerificationState} from 'src/script/conversation/ConversationVerificationState';
-import {TMP_DecoratedWireIdentity} from 'src/script/E2EIdentity';
+import {getUserVerificationState, isE2EIEnabled, TMP_DecoratedWireIdentity} from 'src/script/E2EIdentity';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -78,9 +78,19 @@ const useConversationVerificationState = (conversation: Conversation) => {
 };
 
 export const UserVerificationBadges = ({user, groupId}: {user: User; groupId?: string}) => {
+  const [MLSStatus, setMLSStatus] = useState<MLSStatuses | undefined>(undefined);
   const {is_verified: isProteusVerified} = useKoSubscribableChildren(user, ['is_verified']);
 
-  return <VerificationBadges isProteusVerified={isProteusVerified} />;
+  useEffect(() => {
+    void (async () => {
+      if (groupId && isE2EIEnabled()) {
+        const status = await getUserVerificationState(groupId, user.qualifiedId);
+        setMLSStatus(status);
+      }
+    })();
+  }, []);
+
+  return <VerificationBadges isProteusVerified={isProteusVerified} MLSStatus={MLSStatus} />;
 };
 
 export const DeviceVerificationBadges = ({
@@ -98,7 +108,7 @@ export const DeviceVerificationBadges = ({
         setMLSStatus(identity?.state ?? MLSStatuses.NOT_DOWNLOADED);
       })();
     }
-  });
+  }, []);
 
   return <VerificationBadges isProteusVerified={!!device.meta?.isVerified?.()} MLSStatus={MLSStatus} />;
 };

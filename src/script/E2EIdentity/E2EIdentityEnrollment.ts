@@ -26,7 +26,7 @@ import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {removeUrlParameters} from 'Util/UrlUtil';
 
 import {DelayTimerService} from './DelayTimer/DelayTimer';
-import {hasActiveCertificate, isE2EIEnabled} from './E2EIdentity';
+import {hasActiveCertificate, isE2EIEnabled} from './E2EIdentityVerification';
 import {getModalOptions, ModalType} from './Modals';
 import {getOIDCServiceInstance} from './OIDCService';
 import {OIDCServiceStore} from './OIDCService/OIDCServiceStorage';

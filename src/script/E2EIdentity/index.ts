@@ -18,4 +18,4 @@
  */
 
 export * from './E2EIdentityEnrollment';
-export * from './E2EIdentity';
+export * from './E2EIdentityVerification';

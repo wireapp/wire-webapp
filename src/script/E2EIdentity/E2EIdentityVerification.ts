@@ -62,7 +62,20 @@ export async function getDeviceIdentity(
   return undefined;
 }
 
-export async function getConversationState(groupId: string) {
+// TODO: replace implementation with CoreCrypto once it has user verification method
+export async function getUsersVerificationState(groupId: string, userIds: QualifiedId[]) {
+  return userIds.map(userId => ({
+    userId,
+    state: Math.random() > 0.5 ? MLSStatuses.VALID : MLSStatuses.EXPIRED,
+  }));
+}
+
+export async function getUserVerificationState(groupId: string, userId: QualifiedId) {
+  const usersVerifications = await getUsersVerificationState(groupId, [userId]);
+  return usersVerifications[0].state;
+}
+
+export async function getConversationVerificationState(groupId: string) {
   return getE2EIdentityService().getConversationState(base64ToArray(groupId));
 }
 
