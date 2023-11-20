@@ -28,6 +28,7 @@ import {IconButton, IconButtonVariant, Select, useMatchMedia} from '@wireapp/rea
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {Icon} from 'Components/Icon';
 import {ConversationClassifiedBar} from 'Components/input/ClassifiedBar';
+import {isMediaDevice} from 'src/script/guards/MediaDevice';
 import {MediaDeviceType} from 'src/script/media/MediaDeviceType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {KEY} from 'Util/KeyboardUtil';
@@ -167,21 +168,39 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   const audioOptions = [
     {
       label: t('videoCallaudioInputMicrophone'),
-      options: availableMicrophones.map(device => ({
-        label: device.label,
-        value: `${device.deviceId}-input`,
-        dataUieName: `${device.deviceId}-input`,
-        id: device.deviceId,
-      })),
+      options: availableMicrophones.map((device: MediaDeviceInfo | ElectronDesktopCapturerSource) => {
+        return isMediaDevice(device)
+          ? {
+              label: device.label,
+              value: `${device.deviceId}-input`,
+              dataUieName: `${device.deviceId}-input`,
+              id: device.deviceId,
+            }
+          : {
+              label: device.name,
+              value: `${device.id}-input`,
+              dataUieName: `${device.id}-input`,
+              id: device.id,
+            };
+      }),
     },
     {
       label: t('videoCallaudioOutputSpeaker'),
-      options: availableSpeakers.map(device => ({
-        label: device.label,
-        value: `${device.deviceId}-output`,
-        dataUieName: `${device.deviceId}-output`,
-        id: device.deviceId,
-      })),
+      options: availableSpeakers.map((device: MediaDeviceInfo | ElectronDesktopCapturerSource) => {
+        return isMediaDevice(device)
+          ? {
+              label: device.label,
+              value: `${device.deviceId}-output`,
+              dataUieName: `${device.deviceId}-output`,
+              id: device.deviceId,
+            }
+          : {
+              label: device.name,
+              value: `${device.id}-output`,
+              dataUieName: `${device.id}-output`,
+              id: device.id,
+            };
+      }),
     },
   ];
   const [selectedAudioOptions, setSelectedAudioOptions] = React.useState(() =>
@@ -205,12 +224,21 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   const videoOptions = [
     {
       label: t('videoCallvideoInputCamera'),
-      options: availableCameras.map(device => ({
-        label: device.label,
-        value: device.deviceId,
-        dataUieName: device.deviceId,
-        id: device.deviceId,
-      })),
+      options: availableCameras.map((device: MediaDeviceInfo | ElectronDesktopCapturerSource) => {
+        return isMediaDevice(device)
+          ? {
+              label: device.label,
+              value: device.deviceId,
+              dataUieName: device.deviceId,
+              id: device.deviceId,
+            }
+          : {
+              label: device.name,
+              value: device.id,
+              dataUieName: device.id,
+              id: device.id,
+            };
+      }),
     },
   ];
 
