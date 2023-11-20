@@ -83,7 +83,8 @@ declare global {
     setSinkId?: (sinkId: string) => Promise<void>;
   }
 }
-const MAX_USERS_TO_CALL_WITHOUT_CONFIRM = 1;
+const MAX_USERS_TO_CALL_WITHOUT_CONFIRM = Config.getConfig().FEATURE.MAX_USERS_TO_PING_WITHOUT_ALERT;
+
 export class CallingViewModel {
   readonly activeCalls: ko.PureComputed<Call[]>;
   readonly callActions: CallActions;
