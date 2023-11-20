@@ -2137,7 +2137,7 @@ export class ConversationRepository {
    * Clear conversation content.
    * It will clear all messages and events from the conversation and re-apply the conversation creation event.
    *
-   * @param conversation Conversation to clear
+   * @param conversation Conversation to clear content from
    */
   public async clearConversationContent(conversation: Conversation) {
     await this.messageRepository.updateClearedTimestamp(conversation);
@@ -2197,8 +2197,8 @@ export class ConversationRepository {
   /**
    * Remove the current user from a conversation.
    *
-   * @param conversation Conversation to remove user from
-   * @returns Resolves when user was removed from the conversation
+   * @param conversation Conversation to remove the self user from
+   * @returns Resolves when the self user was removed from the conversation
    */
   public async leaveConversation(conversation: Conversation) {
     const userQualifiedId = this.userState.self().qualifiedId;
@@ -2453,7 +2453,7 @@ export class ConversationRepository {
   /**
    * Clears conversation content from view and the database.
    *
-   * @param conversationEntity Conversation entity to delete
+   * @param conversationEntity Conversation entity to clear
    * @param timestamp Optional timestamps for which messages to remove
    */
   private async _clearConversation(conversationEntity: Conversation, timestamp?: number) {
