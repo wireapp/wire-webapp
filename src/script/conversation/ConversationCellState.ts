@@ -17,11 +17,14 @@
  *
  */
 
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
+
 import {t} from 'Util/LocalizerUtil';
 import {getRenderedTextContent} from 'Util/messageRenderer';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import {ConversationStatusIcon} from './ConversationStatusIcon';
+import {ConversationVerificationState} from './ConversationVerificationState';
 
 import {AssetTransferState} from '../assets/AssetTransferState';
 import type {Conversation} from '../entity/Conversation';
@@ -377,6 +380,23 @@ const _getStateUserName = {
   },
 };
 
+const _getStateVerified = {
+  description: (conversationEntity: Conversation) => {
+    const isMLSProtocol = conversationEntity.protocol === ConversationProtocol.MLS;
+
+    return t(isMLSProtocol ? 'tooltipConversationAllE2EIVerifiedShort' : 'tooltipConversationAllDevicesVerified');
+  },
+  icon: () => ConversationStatusIcon.NONE,
+  match: (conversationEntity: Conversation) => {
+    const isMLSProtocol = conversationEntity.protocol === ConversationProtocol.MLS;
+    const verificationState = isMLSProtocol
+      ? conversationEntity.mlsVerificationState()
+      : conversationEntity.verification_state();
+
+    return verificationState === ConversationVerificationState.VERIFIED;
+  },
+};
+
 export const generateCellState = (
   conversationEntity: Conversation,
 ): {description: string; icon: ConversationStatusIcon | void} => {
@@ -387,7 +407,9 @@ export const generateCellState = (
     _getStateGroupActivity,
     _getStateUnreadMessage,
     _getStateUserName,
+    _getStateVerified,
   ];
+
   const matchingState = states.find(state => state.match(conversationEntity)) || _getStateDefault;
 
   return {
