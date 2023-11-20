@@ -124,6 +124,8 @@ enum CALL_DIRECTION {
 
 type SubconversationData = {epoch: number; secretKey: string; members: SubconversationEpochInfoMember[]};
 
+const MAX_USERS_TO_CALL_WITHOUT_CONFIRM = 1;
+
 export class CallingRepository {
   private readonly acceptVersionWarning: (conversationId: QualifiedId) => void;
   private readonly callLog: string[];
@@ -683,16 +685,39 @@ export class CallingRepository {
   // Call actions
   //##############################################################################
 
-  private readonly toggleState = (withVideo: boolean): void => {
+  private readonly toggleState = async (withVideo: boolean): Promise<void> => {
     const conversation = this.conversationState.activeConversation();
     if (conversation) {
       const isActiveCall = this.findCall(conversation.qualifiedId);
       const callType = withVideo ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL;
-      return (
-        (isActiveCall
-          ? this.leaveCall(conversation.qualifiedId, LEAVE_CALL_REASON.ELECTRON_TRAY_MENU_MESSAGE)
-          : this.startCall(conversation, callType)) && undefined
-      );
+
+      if (isActiveCall) {
+        this.leaveCall(conversation.qualifiedId, LEAVE_CALL_REASON.ELECTRON_TRAY_MENU_MESSAGE);
+        return;
+      }
+
+      const memberCount = conversation.participating_user_ets().length;
+
+      if (memberCount > MAX_USERS_TO_CALL_WITHOUT_CONFIRM) {
+        PrimaryModal.show(PrimaryModal.type.WITHOUT_TITLE, {
+          preventClose: true,
+          primaryAction: {
+            action: async () => await this.startCall(conversation, callType),
+            text: t('groupCallModalPrimaryBtnName'),
+          },
+          secondaryAction: {
+            text: t('modalConfirmSecondary'),
+          },
+          text: {
+            htmlMessage: `<div class="modal-description">
+            ${t('groupCallConfirmationModalTitle', memberCount)}
+          </div>`,
+            closeBtnLabel: t('groupCallModalCloseBtnLabel'),
+          },
+        });
+      } else {
+        await this.startCall(conversation, callType);
+      }
     }
   };
 
