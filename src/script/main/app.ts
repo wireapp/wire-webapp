@@ -810,8 +810,6 @@ export class App {
   private onConversationE2EIVerificationStateChange: OnConversationVerificationStateChange = async ({
     conversationEntity,
     conversationVerificationState,
-    // verificationMessageType,
-    // userIds = [],
   }) => {
     switch (conversationVerificationState) {
       case ConversationVerificationState.VERIFIED:
