@@ -376,7 +376,7 @@ export class App {
       }
 
       if (supportsMLS()) {
-        registerMLSConversationVerificationStateHandler(this.onConversationE2EIVerificationStateChange);
+        registerMLSConversationVerificationStateHandler(this.updateConversationVerificationState);
       }
 
       this.core.on(CoreEvents.NEW_SESSION, ({userId, clientId}) => {
@@ -807,7 +807,7 @@ export class App {
     doRedirect(signOutReason);
   }
 
-  private onConversationE2EIVerificationStateChange: OnConversationVerificationStateChange = async ({
+  private updateConversationVerificationState: OnConversationVerificationStateChange = async ({
     conversationEntity,
     conversationVerificationState,
   }) => {
