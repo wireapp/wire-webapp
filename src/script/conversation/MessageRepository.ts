@@ -1065,12 +1065,14 @@ export class MessageRepository {
   /**
    * Update cleared of conversation using timestamp.
    */
-  public async updateClearedTimestamp(conversation: Conversation): Promise<void> {
+  public async updateClearedTimestamp(conversation: Conversation): Promise<number> {
     const timestamp = conversation.getLastKnownTimestamp(this.serverTimeHandler.toServerTimestamp());
     if (timestamp && conversation.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.CLEARED)) {
       const payload = MessageBuilder.buildClearedMessage(conversation.qualifiedId);
       await this.sendToSelfConversations(payload);
     }
+
+    return timestamp;
   }
 
   sendButtonAction(conversation: Conversation, message: CompositeMessage, buttonId: string): void {

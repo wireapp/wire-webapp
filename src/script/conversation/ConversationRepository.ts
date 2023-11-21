@@ -2140,8 +2140,8 @@ export class ConversationRepository {
    * @param conversation Conversation to clear content from
    * @param timestamp Timestamp of the event
    */
-  public async clearConversation(conversation: Conversation, timestamp?: number) {
-    await this.messageRepository.updateClearedTimestamp(conversation);
+  public async clearConversation(conversation: Conversation) {
+    const timestamp = await this.messageRepository.updateClearedTimestamp(conversation);
     return this.clearConversationContent(conversation, timestamp);
   }
 
@@ -2152,9 +2152,10 @@ export class ConversationRepository {
    * @param conversation Conversation to clear content from
    * @param timestamp Timestamp of the event
    */
-  private async clearConversationContent(conversation: Conversation, timestamp?: number) {
+  private async clearConversationContent(conversation: Conversation, timestamp: number) {
     await this.deleteMessages(conversation, timestamp);
-    return this.addCreationMessage(conversation, !!this.userState.self()?.isTemporaryGuest(), timestamp);
+    await this.addCreationMessage(conversation, !!this.userState.self()?.isTemporaryGuest(), timestamp);
+    conversation.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.CLEARED);
   }
 
   async leaveGuestRoom(): Promise<void> {
