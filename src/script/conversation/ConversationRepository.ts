@@ -2669,11 +2669,9 @@ export class ConversationRepository {
         conversationEntity =>
           this.reactToConversationEvent(conversationEntity, eventJson, eventSource) as Promise<EntityObject>,
       )
-      .then((entityObject = {} as EntityObject) => {
-        if (type !== CONVERSATION_EVENT.MEMBER_JOIN && type !== CONVERSATION_EVENT.MEMBER_LEAVE) {
-          this.handleConversationNotification(entityObject as EntityObject, eventSource);
-        }
-      })
+      .then((entityObject = {} as EntityObject) =>
+        this.handleConversationNotification(entityObject as EntityObject, eventSource, type),
+      )
       .catch((error: BaseError) => {
         const ignoredErrorTypes: string[] = [
           ConversationError.TYPE.MESSAGE_NOT_FOUND,
@@ -2908,10 +2906,23 @@ export class ConversationRepository {
    * @param eventSource Source of event
    * @returns Resolves when the conversation was updated
    */
-  private async handleConversationNotification(entityObject: EntityObject, eventSource: EventSource) {
+  private async handleConversationNotification(
+    entityObject: EntityObject,
+    eventSource: EventSource,
+    eventType: CLIENT_CONVERSATION_EVENT | CONVERSATION_EVENT,
+  ) {
     const {conversationEntity, messageEntity} = entityObject;
 
-    if (conversationEntity) {
+    if (!conversationEntity) {
+      return;
+    }
+
+    const eventsToSkip: (CLIENT_CONVERSATION_EVENT | CONVERSATION_EVENT)[] = [
+      CONVERSATION_EVENT.MEMBER_JOIN,
+      CONVERSATION_EVENT.MEMBER_LEAVE,
+    ];
+
+    if (!eventsToSkip.includes(eventType)) {
       const eventFromWebSocket = eventSource === EventRepository.SOURCE.WEB_SOCKET;
       const eventFromStream = eventSource === EventRepository.SOURCE.STREAM;
 
@@ -2925,11 +2936,11 @@ export class ConversationRepository {
         if (!eventFromStream) {
           amplify.publish(WebAppEvents.NOTIFICATION.NOTIFY, messageEntity, undefined, conversationEntity);
         }
-
-        if (conversationEntity.is_cleared()) {
-          conversationEntity.cleared_timestamp(0);
-        }
       }
+    }
+
+    if (conversationEntity.is_cleared()) {
+      conversationEntity.cleared_timestamp(0);
     }
   }
 
@@ -3178,10 +3189,8 @@ export class ConversationRepository {
     conversationEntity: Conversation,
     eventJson: ConversationMemberLeaveEvent | TeamMemberLeaveEvent | MemberLeaveEvent,
   ): Promise<{conversationEntity: Conversation; messageEntity: Message} | undefined> {
-    const {data: eventData, from} = eventJson;
-    const isFromSelf = from === this.userState.self().id;
+    const {data: eventData} = eventJson;
     const removesSelfUser = eventData.user_ids.includes(this.userState.self().id);
-    const selfLeavingClearedConversation = isFromSelf && removesSelfUser && conversationEntity.is_cleared();
 
     if (removesSelfUser) {
       conversationEntity.status(ConversationStatus.PAST_MEMBER);
@@ -3208,27 +3217,23 @@ export class ConversationRepository {
       await this.conversationRoleRepository.updateConversationRoles(conversationEntity);
     }
 
-    if (!selfLeavingClearedConversation) {
-      const {messageEntity} = await this.addEventToConversation(conversationEntity, eventJson);
-      (messageEntity as MemberMessage)
-        .userEntities()
-        .filter(userEntity => !userEntity.isMe)
-        .forEach(userEntity => {
-          conversationEntity.participating_user_ids.remove(userId => matchQualifiedIds(userId, userEntity));
+    const {messageEntity} = await this.addEventToConversation(conversationEntity, eventJson);
+    (messageEntity as MemberMessage)
+      .userEntities()
+      .filter(userEntity => !userEntity.isMe)
+      .forEach(userEntity => {
+        conversationEntity.participating_user_ids.remove(userId => matchQualifiedIds(userId, userEntity));
 
-          if (userEntity.isTemporaryGuest()) {
-            userEntity.clearExpirationTimeout();
-          }
-        });
+        if (userEntity.isTemporaryGuest()) {
+          userEntity.clearExpirationTimeout();
+        }
+      });
 
-      await this.updateParticipatingUserEntities(conversationEntity);
+    await this.updateParticipatingUserEntities(conversationEntity);
 
-      this.proteusVerificationStateHandler.onMemberLeft(conversationEntity);
+    this.proteusVerificationStateHandler.onMemberLeft(conversationEntity);
 
-      return {conversationEntity, messageEntity};
-    }
-
-    return undefined;
+    return {conversationEntity, messageEntity};
   }
 
   /**
