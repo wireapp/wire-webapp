@@ -400,13 +400,13 @@ export const generateCellState = (
   conversationEntity: Conversation,
 ): {description: string; icon: ConversationStatusIcon | void} => {
   const states = [
+    _getStateVerified,
     _getStateRemoved,
     _getStateMuted,
     _getStateAlert,
     _getStateGroupActivity,
     _getStateUnreadMessage,
     _getStateUserName,
-    _getStateVerified,
   ];
 
   const matchingState = states.find(state => state.match(conversationEntity)) || _getStateDefault;
