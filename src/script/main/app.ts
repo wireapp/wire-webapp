@@ -489,7 +489,7 @@ export class App {
         startNewVersionPolling(Environment.version(false), this.update);
       }
       audioRepository.init(true);
-      conversationRepository.cleanupConversations();
+      await conversationRepository.cleanupEphemeralMessages();
       callingRepository.setReady();
       telemetry.timeStep(AppInitTimingsStep.APP_LOADED);
 

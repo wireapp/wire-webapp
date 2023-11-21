@@ -371,24 +371,6 @@ export class ConversationRepository {
     }
   };
 
-  /**
-   * Remove obsolete conversations locally.
-   */
-  cleanupConversations(): void {
-    this.conversationState.conversations().forEach(conversationEntity => {
-      if (
-        conversationEntity.isGroup() &&
-        conversationEntity.is_cleared() &&
-        conversationEntity.removed_from_conversation()
-      ) {
-        this.conversationService.deleteConversationFromDb(conversationEntity.id);
-        this.deleteConversationFromRepository(conversationEntity);
-      }
-    });
-
-    this.cleanupEphemeralMessages();
-  }
-
   //##############################################################################
   // Conversation service interactions
   //##############################################################################
