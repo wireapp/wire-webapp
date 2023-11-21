@@ -44,6 +44,7 @@ import {CallMessage} from './message/CallMessage';
 import type {ContentMessage} from './message/ContentMessage';
 import type {Message} from './message/Message';
 import {PingMessage} from './message/PingMessage';
+import {SystemMessage} from './message/SystemMessage';
 import type {User} from './User';
 
 import type {Call} from '../calling/Call';
@@ -57,6 +58,7 @@ import {ConversationStatus} from '../conversation/ConversationStatus';
 import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
 import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
 import {ConversationError} from '../error/ConversationError';
+import {ClientEvent} from '../event/Client';
 import {isContentMessage, isDeleteMessage} from '../guards/Message';
 import {StatusType} from '../message/StatusType';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
@@ -70,6 +72,7 @@ interface UnreadState {
   pings: PingMessage[];
   selfMentions: ContentMessage[];
   selfReplies: ContentMessage[];
+  systemMessages: SystemMessage[];
 }
 
 enum TIMESTAMP_TYPE {
@@ -431,8 +434,10 @@ export class Conversation {
         pings: [],
         selfMentions: [],
         selfReplies: [],
+        systemMessages: [],
       };
       const messages = [...this.messages(), ...this.incomingMessages()];
+
       for (let index = messages.length - 1; index >= 0; index--) {
         const messageEntity = messages[index];
         if (messageEntity.visible()) {
@@ -451,7 +456,11 @@ export class Conversation {
           const isSelfQuoted =
             isMessage && this.selfUser() && (messageEntity as ContentMessage).isUserQuoted(this.selfUser().id);
 
-          if (isMissedCall || isPing || isMessage) {
+          const isMLSProtocol = this.protocol === ConversationProtocol.MLS;
+          const isE2EIVerification =
+            isMLSProtocol && messageEntity?.type === ClientEvent.CONVERSATION.E2EI_VERIFICATION;
+
+          if (isMissedCall || isPing || isMessage || isE2EIVerification) {
             unreadState.allMessages.push(messageEntity as ContentMessage);
           }
 

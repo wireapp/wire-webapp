@@ -2881,6 +2881,7 @@ export class ConversationRepository {
       case ClientEvent.CONVERSATION.VERIFICATION:
       case ClientEvent.CONVERSATION.VOICE_CHANNEL_ACTIVATE:
       case ClientEvent.CONVERSATION.VOICE_CHANNEL_DEACTIVATE:
+      case ClientEvent.CONVERSATION.E2EI_VERIFICATION:
         return this.addEventToConversation(conversationEntity, eventJson);
     }
   }
