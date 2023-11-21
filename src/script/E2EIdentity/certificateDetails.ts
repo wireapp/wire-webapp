@@ -19,16 +19,17 @@
 
 import {WireIdentity} from '@wireapp/core/lib/messagingProtocols/mls';
 
-import {MLSStatuses} from 'Components/VerificationBadge';
+import {MLSStatuses} from './E2EIdentityVerification';
 
 type CoreStatus = WireIdentity['status'];
-const statusMap: Record<CoreStatus, MLSStatuses> = {
-  0: MLSStatuses.VALID,
-  1: MLSStatuses.EXPIRED,
-  2: MLSStatuses.EXPIRED,
-};
 
 export const mapMLSStatus = (status?: CoreStatus) => {
+  const statusMap: Record<CoreStatus, MLSStatuses> = {
+    0: MLSStatuses.VALID,
+    1: MLSStatuses.EXPIRED,
+    2: MLSStatuses.EXPIRED,
+  };
+
   if (!status) {
     return MLSStatuses.NOT_DOWNLOADED;
   }

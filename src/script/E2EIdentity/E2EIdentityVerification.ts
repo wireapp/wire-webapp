@@ -21,12 +21,19 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {WireIdentity as CoreWireIdentity} from '@wireapp/core/lib/messagingProtocols/mls';
 import {container} from 'tsyringe';
 
-import {MLSStatuses} from 'Components/VerificationBadge';
 import {Core} from 'src/script/service/CoreSingleton';
-import {mapMLSStatus} from 'Util/certificateDetails';
 import {base64ToArray, supportsMLS} from 'Util/util';
 
+import {mapMLSStatus} from './certificateDetails';
+
 import {Config} from '../Config';
+
+export enum MLSStatuses {
+  VALID = 'valid',
+  NOT_DOWNLOADED = 'not_downloaded',
+  EXPIRED = 'expired',
+  EXPIRES_SOON = 'expires_soon',
+}
 
 export type WireIdentity = Omit<CoreWireIdentity, 'status' | 'free'> & {
   status: MLSStatuses;
@@ -61,13 +68,25 @@ export async function getDeviceIdentity(
 
 // TODO: replace implementation with CoreCrypto once it has user verification method
 export async function getUsersVerificationState(groupId: string, userIds: QualifiedId[]) {
-  return getE2EIdentityService().getUsersIdentities(groupId, userIds);
+  const userVerifications = await getE2EIdentityService().getUsersIdentities(groupId, userIds);
+
+  const mappedUsers = new Map<string, WireIdentity[]>();
+
+  for (const [userId, identities] of userVerifications.entries()) {
+    mappedUsers.set(
+      userId,
+      identities.map(identity => ({...identity, status: mapMLSStatus(identity.status)})),
+    );
+  }
+
+  return mappedUsers;
 }
 
 export async function getUserVerificationState(groupId: string, userId: QualifiedId) {
   const usersVerifications = await getUsersVerificationState(groupId, [userId]);
-  const identity = usersVerifications.get(userId.id);
-  return mapMLSStatus(identity?.[0].status);
+  return usersVerifications.get(userId.id)?.some(identity => identity.status !== MLSStatuses.VALID)
+    ? MLSStatuses.NOT_DOWNLOADED
+    : MLSStatuses.VALID;
 }
 
 export async function getConversationVerificationState(groupId: string) {

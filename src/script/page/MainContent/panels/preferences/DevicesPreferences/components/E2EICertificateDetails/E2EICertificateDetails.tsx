@@ -22,8 +22,8 @@ import {useState} from 'react';
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {CertificateDetailsModal} from 'Components/Modals/CertificateDetailsModal';
-import {MLSStatuses, VerificationBadges} from 'Components/VerificationBadge';
-import {E2EIHandler, WireIdentity} from 'src/script/E2EIdentity';
+import {VerificationBadges} from 'Components/VerificationBadge';
+import {E2EIHandler, MLSStatuses, WireIdentity} from 'src/script/E2EIdentity';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 

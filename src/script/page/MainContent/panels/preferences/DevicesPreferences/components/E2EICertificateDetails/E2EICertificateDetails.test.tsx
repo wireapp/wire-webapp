@@ -19,26 +19,20 @@
 
 import {render} from '@testing-library/react';
 
-import {MLSStatuses} from 'Components/VerificationBadge';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {WireIdentity} from 'src/script/E2EIdentity';
+import {MLSStatuses, WireIdentity} from 'src/script/E2EIdentity';
 
 import {E2EICertificateDetails} from './E2EICertificateDetails';
 
 describe('E2EICertificateDetails', () => {
-  const generateIdentity = (state: MLSStatuses) =>
-    ({
-      state,
-      certificate: 'certificate',
-    }) as WireIdentity;
-
-  it('is e2ei identity verified', async () => {
-    const identity = generateIdentity(MLSStatuses.VALID);
-
-    const {getByTestId} = render(withTheme(<E2EICertificateDetails identity={identity} />));
-
-    const E2EIdentityStatus = getByTestId('e2ei-identity-status');
-    expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.VALID);
+  const generateIdentity = (status: MLSStatuses): WireIdentity => ({
+    status,
+    certificate: 'certificate',
+    clientId: '',
+    displayName: '',
+    domain: '',
+    handle: '',
+    thumbprint: '',
   });
 
   it('is e2ei identity not downloaded', async () => {
@@ -55,5 +49,14 @@ describe('E2EICertificateDetails', () => {
 
     const E2EIdentityStatus = getByTestId('e2ei-identity-status');
     expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.EXPIRED);
+  });
+
+  it('is e2ei identity verified', async () => {
+    const identity = generateIdentity(MLSStatuses.VALID);
+
+    const {getByTestId} = render(withTheme(<E2EICertificateDetails identity={identity} />));
+
+    const E2EIdentityStatus = getByTestId('e2ei-identity-status');
+    expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.VALID);
   });
 });
