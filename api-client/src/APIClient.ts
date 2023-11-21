@@ -415,13 +415,16 @@ export class APIClient extends EventEmitter {
    */
   public withLockedWebSocket<T extends (...args: any[]) => any>(
     callback: T,
-  ): (...args: Parameters<T>) => ReturnType<T> {
-    return (...args: Parameters<T>): ReturnType<T> => {
+  ): (...args: Parameters<T>) => Promise<ReturnType<T>> {
+    return async (...args: Parameters<T>): Promise<ReturnType<T>> => {
       this.transport.ws.lock();
       try {
-        return callback(...args);
-      } finally {
+        const result = await callback(...args);
         this.transport.ws.unlock();
+        return result;
+      } catch (error) {
+        this.transport.ws.unlock();
+        throw error;
       }
     };
   }
