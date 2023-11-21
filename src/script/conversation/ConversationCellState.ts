@@ -17,8 +17,6 @@
  *
  */
 
-import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
-
 import {t} from 'Util/LocalizerUtil';
 import {getRenderedTextContent} from 'Util/messageRenderer';
 import {matchQualifiedIds} from 'Util/QualifiedId';
@@ -337,6 +335,10 @@ const _getStateUnreadMessage = {
         string = t('notificationSharedLocation');
       } else if (messageEntity.hasAssetImage()) {
         string = t('notificationAssetAdd');
+      } else if (messageEntity?.type === ClientEvent.CONVERSATION.E2EI_VERIFICATION) {
+        string = t('tooltipConversationAllDevicesVerified');
+      } else if (messageEntity.isVerification()) {
+        string = t('tooltipConversationAllDevicesVerified');
       }
 
       if (!!string) {
@@ -380,27 +382,10 @@ const _getStateUserName = {
   },
 };
 
-const _getStateVerified = {
-  description: (conversationEntity: Conversation) => {
-    const isMLSProtocol = conversationEntity.protocol === ConversationProtocol.MLS;
-
-    return t(isMLSProtocol ? 'tooltipConversationAllE2EIVerifiedShort' : 'tooltipConversationAllDevicesVerified');
-  },
-  icon: () => ConversationStatusIcon.NONE,
-  match: (conversationEntity: Conversation) => {
-    const lastMessageEntity = conversationEntity.getNewestMessage();
-    const isE2EIVerificationMessage = lastMessageEntity?.type === ClientEvent.CONVERSATION.E2EI_VERIFICATION;
-    const {systemMessages: unreadSystemMessages} = conversationEntity.unreadState();
-
-    return isE2EIVerificationMessage && unreadSystemMessages.length > 0;
-  },
-};
-
 export const generateCellState = (
   conversationEntity: Conversation,
 ): {description: string; icon: ConversationStatusIcon | void} => {
   const states = [
-    _getStateVerified,
     _getStateRemoved,
     _getStateMuted,
     _getStateAlert,
