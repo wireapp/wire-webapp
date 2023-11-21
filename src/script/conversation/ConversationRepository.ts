@@ -3277,7 +3277,7 @@ export class ConversationRepository {
       await this.clearConversationContent(conversationEntity, conversationEntity.cleared_timestamp());
     }
 
-    if (isActiveConversation && (conversationEntity.is_archived() || conversationEntity.is_cleared())) {
+    if (isActiveConversation && conversationEntity.is_archived()) {
       amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversationEntity, {});
     }
   }
