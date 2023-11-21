@@ -90,16 +90,16 @@ export const customStyles = (theme: Theme, markInvalid = false) => ({
   },
   group: provided => ({
     ...provided,
-    paddingBottom: 0,
+    padding: 0,
+    backgroundColor: theme.Input.backgroundColor,
   }),
   groupHeading: provided => ({
     ...provided,
     display: 'flex',
-    color: theme.general.color,
-    fontSize: '14px',
-    marginBottom: '16px',
-    paddingLeft: '16px',
-    marginTop: '8px',
+    fontSize: theme.fontSizes.small,
+    lineHeight: '14px',
+    color: theme.Select.disabledColor,
+    padding: '8px 16px 6px 16px',
   }),
   menu: (provided, {options}) => ({
     ...provided,
@@ -122,10 +122,10 @@ export const customStyles = (theme: Theme, markInvalid = false) => ({
     ...provided,
     backgroundColor: theme.Input.backgroundColor,
     color: theme.general.color,
-    padding: '10px 18px',
+    padding: isGroup(options) ? '6px 16px' : '10px 18px',
     cursor: isDisabled ? 'not-allowed' : 'pointer',
     fontSize: theme.fontSizes.base,
-    fontWeight: 400,
+    fontWeight: isSelected && isGroup(options) ? 600 : 400,
     lineHeight: '1.5rem',
     ...(isSelected &&
       !isDisabled &&
@@ -193,6 +193,9 @@ export const customStyles = (theme: Theme, markInvalid = false) => ({
       '&:first-of-type': {
         borderRadius: '12px 12px 0 0',
       },
+    }),
+    ...(isGroup(options) && {
+      textAlign: 'left',
     }),
     '&:last-of-type': {
       ...(!isGroup(options) && {borderRadius: '0 0 12px 12px'}),

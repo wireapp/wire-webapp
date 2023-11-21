@@ -17,7 +17,7 @@ const groupOptions = [
     label: 'Group 1',
     options: [
       {label: 'Group 1, option 1', value: 'value_1'},
-      {label: 'Group 1, option 2', value: 'value_2'},
+      {label: 'Group 1, option 2 long name test test test boop a loop woop scoop schoop', value: 'value_2'},
     ],
   },
   {
