@@ -111,17 +111,9 @@ export class ConversationState {
           ConnectionStatus.PENDING,
         ];
 
-        const isCleared = conversationEntity.is_cleared();
-        const isRemoved = conversationEntity.removed_from_conversation();
-
-        if (
-          isSelfConversation(conversationEntity) ||
-          states_to_filter.includes(conversationEntity.connection().status())
-        ) {
-          return false;
-        }
-
-        return !(isCleared && isRemoved);
+        return !(
+          isSelfConversation(conversationEntity) || states_to_filter.includes(conversationEntity.connection().status())
+        );
       });
     });
 
