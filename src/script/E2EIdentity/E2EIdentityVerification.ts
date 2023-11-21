@@ -18,20 +18,18 @@
  */
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {WireIdentity} from '@wireapp/core/lib/messagingProtocols/mls';
+import {WireIdentity as CoreWireIdentity} from '@wireapp/core/lib/messagingProtocols/mls';
 import {container} from 'tsyringe';
 
 import {MLSStatuses} from 'Components/VerificationBadge';
 import {Core} from 'src/script/service/CoreSingleton';
-import {getCertificateState} from 'Util/certificateDetails';
+import {mapMLSStatus} from 'Util/certificateDetails';
 import {base64ToArray, supportsMLS} from 'Util/util';
-import {createUuid} from 'Util/uuid';
 
 import {Config} from '../Config';
 
-export type TMP_DecoratedWireIdentity = WireIdentity & {
-  state: MLSStatuses;
-  thumbprint: string;
+export type WireIdentity = Omit<CoreWireIdentity, 'status' | 'free'> & {
+  status: MLSStatuses;
 };
 
 export function getE2EIdentityService() {
@@ -50,29 +48,26 @@ export async function getDeviceIdentity(
   groupId: string,
   userId: QualifiedId,
   deviceId: string,
-): Promise<TMP_DecoratedWireIdentity | undefined> {
+): Promise<WireIdentity | undefined> {
   const identities = await getE2EIdentityService().getUserDeviceEntities(groupId, {[deviceId]: userId});
-  if (identities?.length) {
-    const extraData = {
-      state: getCertificateState(identities[0].certificate),
-      thumbprint: createUuid(),
+  if (identities?.length && identities[0]) {
+    return {
+      ...identities[0],
+      status: mapMLSStatus(identities[0].status),
     };
-    return {...identities[0], ...extraData};
   }
   return undefined;
 }
 
 // TODO: replace implementation with CoreCrypto once it has user verification method
 export async function getUsersVerificationState(groupId: string, userIds: QualifiedId[]) {
-  return userIds.map(userId => ({
-    userId,
-    state: Math.random() > 0.5 ? MLSStatuses.VALID : MLSStatuses.EXPIRED,
-  }));
+  return getE2EIdentityService().getUsersIdentities(groupId, userIds);
 }
 
 export async function getUserVerificationState(groupId: string, userId: QualifiedId) {
   const usersVerifications = await getUsersVerificationState(groupId, [userId]);
-  return usersVerifications[0].state;
+  const identity = usersVerifications.get(userId.id);
+  return mapMLSStatus(identity?.[0].status);
 }
 
 export async function getConversationVerificationState(groupId: string) {

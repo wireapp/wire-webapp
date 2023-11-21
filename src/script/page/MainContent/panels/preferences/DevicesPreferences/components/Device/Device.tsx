@@ -21,11 +21,9 @@ import {MouseEvent, KeyboardEvent} from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
-import {WireIdentity} from '@wireapp/core-crypto';
-
 import {Icon} from 'Components/Icon';
 import {DeviceVerificationBadges} from 'Components/VerificationBadge';
-import {TMP_DecoratedWireIdentity} from 'src/script/E2EIdentity';
+import {WireIdentity} from 'src/script/E2EIdentity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -37,7 +35,7 @@ import {FormattedId} from '../FormattedId';
 interface DeviceProps {
   device: ClientEntity;
   isSSO: boolean;
-  getDeviceIdentity?: (deviceId: string) => Promise<TMP_DecoratedWireIdentity | undefined>;
+  getDeviceIdentity?: (deviceId: string) => Promise<WireIdentity | undefined>;
   onRemove: (device: ClientEntity) => void;
   onSelect: (device: ClientEntity, currentDeviceIdentity?: WireIdentity) => void;
   deviceNumber: number;

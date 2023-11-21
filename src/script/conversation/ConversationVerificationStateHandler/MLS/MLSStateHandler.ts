@@ -17,6 +17,7 @@
  *
  */
 
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {E2eiConversationState} from '@wireapp/core/lib/messagingProtocols/mls';
 import {container} from 'tsyringe';
 
@@ -57,9 +58,13 @@ class MLSConversationVerificationStateHandler {
   private async degradeConversation(conversation: MLSConversation) {
     const state = ConversationVerificationState.DEGRADED;
     conversation.mlsVerificationState(state);
-    const degradedUsers = (await getUsersVerificationState(conversation.groupId, conversation.participating_user_ids()))
-      .filter(user => user.state !== MLSStatuses.VALID)
-      .map(user => user.userId);
+    const userIdentities = await getUsersVerificationState(conversation.groupId, conversation.participating_user_ids());
+    const degradedUsers: QualifiedId[] = [];
+    for (const [userId, identities] of userIdentities.entries()) {
+      if (identities.some(identity => identity.status !== MLSStatuses.VALID)) {
+        degradedUsers.push(userId);
+      }
+    }
 
     this.onConversationVerificationStateChange({
       conversationEntity: conversation,

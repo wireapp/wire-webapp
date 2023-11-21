@@ -21,7 +21,7 @@ import {render} from '@testing-library/react';
 
 import {MLSStatuses} from 'Components/VerificationBadge';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {TMP_DecoratedWireIdentity} from 'src/script/E2EIdentity';
+import {WireIdentity} from 'src/script/E2EIdentity';
 
 import {E2EICertificateDetails} from './E2EICertificateDetails';
 
@@ -30,7 +30,7 @@ describe('E2EICertificateDetails', () => {
     ({
       state,
       certificate: 'certificate',
-    }) as TMP_DecoratedWireIdentity;
+    }) as WireIdentity;
 
   it('is e2ei identity verified', async () => {
     const identity = generateIdentity(MLSStatuses.VALID);

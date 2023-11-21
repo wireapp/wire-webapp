@@ -21,7 +21,7 @@ import React from 'react';
 
 import {DeviceVerificationBadges} from 'Components/VerificationBadge';
 import {ClientEntity} from 'src/script/client/ClientEntity';
-import {TMP_DecoratedWireIdentity} from 'src/script/E2EIdentity';
+import {WireIdentity} from 'src/script/E2EIdentity';
 
 import {MLSDeviceDetails} from './MLSDeviceDetails';
 import {ProteusDeviceDetails} from './ProteusDeviceDetails';
@@ -30,7 +30,7 @@ export interface DeviceProps {
   device: ClientEntity;
   fingerprint: string;
   isCurrentDevice?: boolean;
-  getDeviceIdentity?: (deviceId: string) => Promise<TMP_DecoratedWireIdentity | undefined>;
+  getDeviceIdentity?: (deviceId: string) => Promise<WireIdentity | undefined>;
   isProteusVerified?: boolean;
 }
 

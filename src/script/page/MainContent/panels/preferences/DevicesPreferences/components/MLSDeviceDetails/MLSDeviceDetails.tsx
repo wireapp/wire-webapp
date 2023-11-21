@@ -19,7 +19,7 @@
 
 import {useEffect, useState} from 'react';
 
-import {TMP_DecoratedWireIdentity} from 'src/script/E2EIdentity';
+import {WireIdentity} from 'src/script/E2EIdentity';
 import {t} from 'Util/LocalizerUtil';
 import {splitFingerprint} from 'Util/StringUtil';
 
@@ -31,11 +31,11 @@ import {FormattedId} from '../FormattedId';
 
 interface MLSDeviceDetailsProps {
   isCurrentDevice?: boolean;
-  getDeviceIdentity: () => Promise<TMP_DecoratedWireIdentity | undefined>;
+  getDeviceIdentity: () => Promise<WireIdentity | undefined>;
 }
 
 export const MLSDeviceDetails = ({isCurrentDevice, getDeviceIdentity}: MLSDeviceDetailsProps) => {
-  const [identity, setIdentity] = useState<TMP_DecoratedWireIdentity | undefined>();
+  const [identity, setIdentity] = useState<WireIdentity | undefined>();
   useEffect(() => {
     getDeviceIdentity?.().then(setIdentity);
   }, []);

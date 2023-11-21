@@ -17,38 +17,20 @@
  *
  */
 
-import * as x509 from '@peculiar/x509';
+import {WireIdentity} from '@wireapp/core/lib/messagingProtocols/mls';
 
 import {MLSStatuses} from 'Components/VerificationBadge';
 
-// TODO: Will be changed when I get information how much hours before we need to display this status.
-const EXPIRATION_HOURS = 4;
-
-const checkExpirationDate = (notAfter: Date) => {
-  const endDate = new Date(notAfter);
-  const currentDate = new Date();
-  const dateBeforeEnd = new Date(notAfter);
-  dateBeforeEnd.setHours(endDate.getHours() - EXPIRATION_HOURS);
-
-  return currentDate > dateBeforeEnd;
+type CoreStatus = WireIdentity['status'];
+const statusMap: Record<CoreStatus, MLSStatuses> = {
+  0: MLSStatuses.VALID,
+  1: MLSStatuses.EXPIRED,
+  2: MLSStatuses.EXPIRED,
 };
 
-export const getCertificateState = (certificate?: string) => {
-  if (!certificate) {
+export const mapMLSStatus = (status?: CoreStatus) => {
+  if (!status) {
     return MLSStatuses.NOT_DOWNLOADED;
   }
-  const currentDate = new Date();
-  const parsedCertificate = new x509.X509Certificate(certificate);
-  const isValid = currentDate > parsedCertificate.notBefore && currentDate < parsedCertificate.notAfter;
-  const isExpireSoon = isValid && !!parsedCertificate?.notAfter && checkExpirationDate(parsedCertificate.notAfter);
-
-  if (isValid && !isExpireSoon) {
-    return MLSStatuses.VALID;
-  }
-
-  if (isValid && isExpireSoon) {
-    return MLSStatuses.EXPIRES_SOON;
-  }
-
-  return MLSStatuses.EXPIRED;
+  return statusMap[status];
 };

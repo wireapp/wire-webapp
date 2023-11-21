@@ -31,7 +31,7 @@ import {
 
 import {ClientEntity} from 'src/script/client';
 import {ConversationVerificationState} from 'src/script/conversation/ConversationVerificationState';
-import {getUserVerificationState, isE2EIEnabled, TMP_DecoratedWireIdentity} from 'src/script/E2EIdentity';
+import {getUserVerificationState, isE2EIEnabled, WireIdentity} from 'src/script/E2EIdentity';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -98,14 +98,14 @@ export const DeviceVerificationBadges = ({
   getDeviceIdentity,
 }: {
   device: ClientEntity;
-  getDeviceIdentity?: (deviceId: string) => Promise<TMP_DecoratedWireIdentity | undefined>;
+  getDeviceIdentity?: (deviceId: string) => Promise<WireIdentity | undefined>;
 }) => {
   const [MLSStatus, setMLSStatus] = useState<MLSStatuses | undefined>(undefined);
   useEffect(() => {
     if (getDeviceIdentity) {
       void (async () => {
         const identity = await getDeviceIdentity(device.id);
-        setMLSStatus(identity?.state ?? MLSStatuses.NOT_DOWNLOADED);
+        setMLSStatus(identity?.status ?? MLSStatuses.NOT_DOWNLOADED);
       })();
     }
   }, []);
