@@ -50,10 +50,6 @@
   // fade in animation
   animation: video-fade-in @animation-timing-slower @ease-out-quart forwards;
   opacity: 0;
-
-  @media (max-height: @screen-height-sm) {
-    height: calc(100% - 105px);
-  }
 }
 
 .video-element-remote-participant {
@@ -75,11 +71,6 @@
   align-items: baseline;
   justify-content: center;
   background-color: var(--sidebar-bg);
-
-  @media (max-height: @screen-height-sm) {
-    height: 30px;
-    line-height: 0.8rem;
-  }
 
   &__info-bar {
     .label-small-medium;
@@ -152,14 +143,6 @@
     @media (max-width: @call-ui-sm) {
       justify-content: center;
     }
-
-    @media (max-width: @call-ui-xs) {
-      padding: 15px 10px;
-    }
-
-    @media (max-height: @screen-height-sm) {
-      padding: 10px;
-    }
   }
 
   &__item__minimize {
@@ -180,7 +163,7 @@
     cursor: pointer;
     line-height: 0;
 
-    @media (max-height: @screen-height-sm) {
+    @media (max-width: @call-ui-xs) {
       margin: 0 5px;
     }
 
