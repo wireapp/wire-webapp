@@ -2141,8 +2141,8 @@ export class ConversationRepository {
    * @param timestamp Timestamp of the event
    */
   public async clearConversation(conversation: Conversation) {
-    const timestamp = await this.messageRepository.updateClearedTimestamp(conversation);
-    return this.clearConversationContent(conversation, timestamp);
+    await this.messageRepository.updateClearedTimestamp(conversation);
+    return this.clearConversationContent(conversation, new Date().getTime());
   }
 
   /**
