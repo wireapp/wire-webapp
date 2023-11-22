@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useMemo} from 'react';
+import React, {useEffect} from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {container} from 'tsyringe';
@@ -73,9 +73,9 @@ export interface FullscreenVideoCallProps {
   muteState: MuteState;
   setActiveCallViewTab: (tab: string) => void;
   setMaximizedParticipant: (call: Call, participant: Participant | null) => void;
-  switchCameraInput: (call: Call, deviceId: string) => void;
-  switchMicrophoneInput: (call: Call, deviceId: string) => void;
-  switchSpeakerOutput: (call: Call, deviceId: string) => void;
+  switchCameraInput: (deviceId: string) => void;
+  switchMicrophoneInput: (deviceId: string) => void;
+  switchSpeakerOutput: (deviceId: string) => void;
   teamState?: TeamState;
   toggleCamera: (call: Call) => void;
   toggleMute: (call: Call, muteState: boolean) => void;
@@ -148,27 +148,14 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   const showToggleVideo =
     isVideoCallingEnabled &&
     (call.initialType === CALL_TYPE.VIDEO || conversation.supportsVideoCall(call.isConference));
-  const availableCameras = useMemo(
-    () => videoinput.map(device => (device as MediaDeviceInfo) || (device as ElectronDesktopCapturerSource)),
-    [videoinput],
-  );
 
-  const availableMicrophones = useMemo(
-    () => audioinput.map(device => (device as MediaDeviceInfo) || (device as ElectronDesktopCapturerSource)),
-    [audioinput],
-  );
-
-  const availableSpeakers = useMemo(
-    () => audiooutput.map(device => (device as MediaDeviceInfo) || (device as ElectronDesktopCapturerSource)),
-    [audiooutput],
-  );
-  const showSwitchMicrophone = availableMicrophones.length > 1;
-  const showSwitchVideo = availableCameras.length > 1;
+  const showSwitchMicrophone = audioinput.length > 1;
+  const showSwitchVideo = videoinput.length > 1;
 
   const audioOptions = [
     {
       label: t('videoCallaudioInputMicrophone'),
-      options: availableMicrophones.map((device: MediaDeviceInfo | ElectronDesktopCapturerSource) => {
+      options: audioinput.map((device: MediaDeviceInfo | ElectronDesktopCapturerSource) => {
         return isMediaDevice(device)
           ? {
               label: device.label,
@@ -186,7 +173,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     },
     {
       label: t('videoCallaudioOutputSpeaker'),
-      options: availableSpeakers.map((device: MediaDeviceInfo | ElectronDesktopCapturerSource) => {
+      options: audiooutput.map((device: MediaDeviceInfo | ElectronDesktopCapturerSource) => {
         return isMediaDevice(device)
           ? {
               label: device.label,
@@ -217,14 +204,14 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
       : selectedAudioOptions[1];
 
     setSelectedAudioOptions([microphone, speaker]);
-    switchMicrophoneInput(call, microphone.id);
-    switchSpeakerOutput(call, speaker.id);
+    switchMicrophoneInput(microphone.id);
+    switchSpeakerOutput(speaker.id);
   };
 
   const videoOptions = [
     {
       label: t('videoCallvideoInputCamera'),
-      options: availableCameras.map((device: MediaDeviceInfo | ElectronDesktopCapturerSource) => {
+      options: videoinput.map((device: MediaDeviceInfo | ElectronDesktopCapturerSource) => {
         return isMediaDevice(device)
           ? {
               label: device.label,
@@ -250,7 +237,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   const updateVideoOptions = (selectedOption: string) => {
     const camera = videoOptions[0].options.find(item => item.value === selectedOption) ?? selectedVideoOptions[0];
     setSelectedVideoOptions([camera]);
-    switchCameraInput(call, camera.id);
+    switchCameraInput(camera.id);
   };
 
   const unreadMessagesCount = useAppState(state => state.unreadMessagesCount);

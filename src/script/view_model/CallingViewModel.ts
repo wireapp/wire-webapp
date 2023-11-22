@@ -61,8 +61,8 @@ export interface CallActions {
   reject: (call: Call) => void;
   startAudio: (conversationEntity: Conversation) => Promise<void>;
   startVideo: (conversationEntity: Conversation) => Promise<void>;
-  switchCameraInput: (call: Call, deviceId: string) => void;
-  switchScreenInput: (call: Call, deviceId: string) => void;
+  switchCameraInput: (deviceId: string) => void;
+  switchScreenInput: (deviceId: string) => void;
   toggleCamera: (call: Call) => void;
   toggleMute: (call: Call, muteState: boolean) => void;
   toggleScreenshare: (call: Call) => void;
@@ -271,11 +271,11 @@ export class CallingViewModel {
           await handleCallAction(conversationEntity, CALL_TYPE.VIDEO);
         }
       },
-      switchCameraInput: (call: Call, deviceId: string) => {
+      switchCameraInput: (deviceId: string) => {
         this.mediaDevicesHandler.currentDeviceId.videoinput(deviceId);
         this.callingRepository.refreshVideoInput();
       },
-      switchScreenInput: (call: Call, deviceId: string) => {
+      switchScreenInput: (deviceId: string) => {
         this.mediaDevicesHandler.currentDeviceId.screeninput(deviceId);
       },
       toggleCamera: (call: Call) => {
