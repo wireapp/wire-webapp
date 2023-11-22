@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [42.21.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.20.1...@wireapp/core@42.21.0) (2023-11-22)
+
+### Features
+
+* Verify E2EI of users ([#5733](https://github.com/wireapp/wire-web-packages/issues/5733)) ([e070220](https://github.com/wireapp/wire-web-packages/commit/e070220f4d9002330fab2f8d941d1afba8a68b3b))
+
 ## [42.20.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.20.0...@wireapp/core@42.20.1) (2023-11-21)
 
 **Note:** Version bump only for package @wireapp/core
