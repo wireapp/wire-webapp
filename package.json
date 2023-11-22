@@ -9,7 +9,7 @@
     "@wireapp/avs": "9.5.2",
     "@wireapp/commons": "5.2.3",
     "@wireapp/core": "42.20.0",
-    "@wireapp/react-ui-kit": "9.10.0",
+    "@wireapp/react-ui-kit": "9.11.0",
     "@wireapp/store-engine-dexie": "2.1.6",
     "@wireapp/store-engine-sqleet": "1.8.9",
     "@wireapp/webapp-events": "0.18.3",

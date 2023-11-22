@@ -462,6 +462,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                 {showSwitchMicrophone && (
                   <button
                     className="device-toggle-button"
+                    css={audioOptionsOpen ? videoControlActiveStyles : videoControlInActiveStyles}
                     onClick={() => {
                       setAudioOptionsOpen(prev => !prev);
                     }}
@@ -525,6 +526,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                   {showSwitchVideo && (
                     <button
                       className="device-toggle-button"
+                      css={videoOptionsOpen ? videoControlActiveStyles : videoControlInActiveStyles}
                       onClick={() => {
                         setVideoOptionsOpen(prev => !prev);
                       }}
