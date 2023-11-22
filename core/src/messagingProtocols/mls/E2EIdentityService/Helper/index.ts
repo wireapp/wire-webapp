@@ -19,6 +19,8 @@
 
 import {Converter, EncodedData, Encoder} from 'bazinga64';
 
+import {ClientIdStringType, constructFullyQualifiedClientId} from '../../../../util/fullyQualifiedClientIdUtils';
+
 export const jsonToByteArray = (data: any): Uint8Array => {
   const encoder = new TextEncoder();
   return encoder.encode(JSON.stringify(data, null, 0));
@@ -33,13 +35,12 @@ export const uuidTobase64url = (uuid: string): EncodedData => {
   return Encoder.toBase64Url(Converter.hexStringToArrayBufferView(noDashes));
 };
 
-type E2EIClientId = `${string}:${string}@${string}`;
 type GetE2EIClientIdReturnType = {
-  asString: E2EIClientId;
+  asString: ClientIdStringType;
   asBytes: Uint8Array;
 };
 export const getE2EIClientId = (clientId: string, userId: string, userDomain: string): GetE2EIClientIdReturnType => {
-  const asString: E2EIClientId = `${uuidTobase64url(userId).asString}:${clientId}@${userDomain}`;
+  const asString = constructFullyQualifiedClientId(uuidTobase64url(userId).asString, clientId, userDomain);
   const asBytes: Uint8Array = new TextEncoder().encode(asString);
   return {
     asString,
