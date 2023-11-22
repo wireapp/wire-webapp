@@ -1356,11 +1356,11 @@ export class MessageRepository {
   }
 
   /**
-   * Sends a call message only to self conversation (eg. REJECT message that warn the user's other clients that the call has been picked up)
+   * Sends a call message only to self MLS conversation (eg. REJECT message that warn the user's other clients that the call has been picked up)
    * @param payload
    * @returns
    */
-  public sendSelfCallingMessage(payload: string, targetConversation: QualifiedId) {
+  public sendCallingMessageToSelfMLSConversation(payload: string, targetConversation: QualifiedId) {
     return this.sendCallingMessage(this.conversationState.getSelfMLSConversation(), {
       content: payload,
       qualifiedConversationId: targetConversation,

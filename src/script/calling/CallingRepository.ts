@@ -1211,12 +1211,12 @@ export class CallingRepository {
     const content = typeof payload === 'string' ? payload : JSON.stringify(payload);
 
     /**
-     * @note If myClientsOnly option is true, the message should be sent via the self-conversation.
+     * @note If myClientsOnly option is true, the message should be sent via the mls self-conversation.
      * This message is used to tell your other clients you have answered or
      * rejected a call and to stop ringing.
      */
     if (typeof payload === 'string' && isMLSConversation(conversation) && myClientsOnly) {
-      return void this.messageRepository.sendSelfCallingMessage(payload, conversation.qualifiedId);
+      return void this.messageRepository.sendCallingMessageToSelfMLSConversation(payload, conversation.qualifiedId);
     }
 
     const message = await this.messageRepository.sendCallingMessage(conversation, content, options);
