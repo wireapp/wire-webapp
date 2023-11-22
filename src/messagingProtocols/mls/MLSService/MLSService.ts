@@ -50,7 +50,7 @@ import {MLSServiceConfig, UploadCommitOptions} from './MLSService.types';
 import {KeyPackageClaimUser} from '../../../conversation';
 import {sendMessage} from '../../../conversation/message/messageSender';
 import {CoreDatabase} from '../../../storage/CoreDB';
-import {constructFullyQualifiedClientId, parseFullQualifiedClientId} from '../../../util/fullyQualifiedClientIdUtils';
+import {parseFullQualifiedClientId} from '../../../util/fullyQualifiedClientIdUtils';
 import {numberToHex} from '../../../util/numberToHex';
 import {RecurringTaskScheduler} from '../../../util/RecurringTaskScheduler';
 import {TaskScheduler} from '../../../util/TaskScheduler';
@@ -58,6 +58,7 @@ import {AcmeChallenge, E2EIServiceExternal, User} from '../E2EIdentityService';
 import {E2EIServiceInternal} from '../E2EIdentityService/E2EIServiceInternal';
 import {handleMLSMessageAdd, handleMLSWelcomeMessage} from '../EventHandler/events';
 import {ClientId, CommitPendingProposalsParams, HandlePendingProposalsParams} from '../types';
+import {generateMLSDeviceId} from '../utils/MLSId';
 
 //@todo: this function is temporary, we wait for the update from core-crypto side
 //they are returning regular array instead of Uint8Array for commit and welcome messages
@@ -111,9 +112,8 @@ export class MLSService extends TypedEventEmitter<Events> {
   }
 
   public async initClient(userId: QualifiedId, client: RegisteredClient) {
-    const qualifiedClientId = constructFullyQualifiedClientId(userId.id, client.id, userId.domain);
     await this.coreCryptoClient.mlsInit(
-      this.textEncoder.encode(qualifiedClientId),
+      generateMLSDeviceId(userId, client.id),
       [this.config.defaultCiphersuite],
       this.config.nbKeyPackages,
     );
