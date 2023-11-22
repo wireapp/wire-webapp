@@ -271,9 +271,6 @@ export class ContentViewModel {
         this.conversationState.activeConversation(conversationEntity);
       }
 
-      if (conversationEntity.is_cleared()) {
-        conversationEntity.cleared_timestamp(0);
-      }
       const messageEntity = openFirstSelfMention ? conversationEntity.getFirstUnreadSelfMention() : exposeMessageEntity;
       this.changeConversation(conversationEntity, messageEntity);
       this.showAndNavigate(conversationEntity, openNotificationSettings);

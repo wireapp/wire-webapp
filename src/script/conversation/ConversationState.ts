@@ -84,7 +84,6 @@ export class ConversationState {
     this.visibleConversations = ko.pureComputed(() => {
       return this.sortedConversations().filter(
         conversation =>
-          !conversation.is_cleared() &&
           !conversation.is_archived() &&
           // We filter out 1 on 1 conversation with unavailable users that don't have messages
           (!conversation.is1to1() ||
@@ -109,17 +108,9 @@ export class ConversationState {
           ConnectionStatus.PENDING,
         ];
 
-        const isCleared = conversationEntity.is_cleared();
-        const isRemoved = conversationEntity.removed_from_conversation();
-
-        if (
-          isSelfConversation(conversationEntity) ||
-          states_to_filter.includes(conversationEntity.connection().status())
-        ) {
-          return false;
-        }
-
-        return !(isCleared && isRemoved);
+        return !(
+          isSelfConversation(conversationEntity) || states_to_filter.includes(conversationEntity.connection().status())
+        );
       });
     });
 

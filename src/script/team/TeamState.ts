@@ -49,9 +49,6 @@ export class TeamState {
   public readonly isSelfDeletingMessagesEnabled: ko.PureComputed<boolean>;
   public readonly isSelfDeletingMessagesEnforced: ko.PureComputed<boolean>;
   public readonly getEnforcedSelfDeletingMessagesTimeout: ko.PureComputed<SelfDeletingTimeout>;
-  public readonly isAppLockEnabled: ko.PureComputed<boolean>;
-  public readonly isAppLockEnforced: ko.PureComputed<boolean>;
-  public readonly appLockInactivityTimeoutSecs: ko.PureComputed<number>;
   /** all the members of the team */
   readonly teamMembers: ko.PureComputed<User[]>;
   /** all the members of the team + the users the selfUser is connected with */
@@ -122,11 +119,6 @@ export class TeamState {
 
     this.isConferenceCallingEnabled = ko.pureComputed(
       () => this.teamFeatures()?.conferenceCalling?.status === FeatureStatus.ENABLED,
-    );
-    this.isAppLockEnabled = ko.pureComputed(() => this.teamFeatures()?.appLock?.status === FeatureStatus.ENABLED);
-    this.isAppLockEnforced = ko.pureComputed(() => this.teamFeatures()?.appLock?.config?.enforceAppLock);
-    this.appLockInactivityTimeoutSecs = ko.pureComputed(
-      () => this.teamFeatures()?.appLock?.config?.inactivityTimeoutSecs,
     );
     this.isGuestLinkEnabled = ko.pureComputed(
       () => this.teamFeatures()?.conversationGuestLinks?.status === FeatureStatus.ENABLED,
