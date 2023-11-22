@@ -24,10 +24,10 @@ import {MLSStatuses} from './E2EIdentityVerification';
 type CoreStatus = WireIdentity['status'];
 
 export const mapMLSStatus = (status?: CoreStatus) => {
-  const statusMap: Record<CoreStatus, MLSStatuses> = {
-    0: MLSStatuses.VALID,
-    1: MLSStatuses.EXPIRED,
-    2: MLSStatuses.EXPIRED,
+  const statusMap: Record<any, MLSStatuses> = {
+    Valid: MLSStatuses.VALID,
+    Expired: MLSStatuses.EXPIRED,
+    Revoked: MLSStatuses.EXPIRED,
   };
 
   if (!status) {
