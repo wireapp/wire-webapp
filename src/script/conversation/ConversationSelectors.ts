@@ -45,6 +45,10 @@ export function isMLSCapableConversation(conversation: Conversation): conversati
   return isMixedConversation(conversation) || isMLSConversation(conversation);
 }
 
+export function isGroupMLSConversation(conversation: Conversation): conversation is MLSConversation {
+  return isMLSConversation(conversation) && conversation.isGroup();
+}
+
 export function isSelfConversation(conversation: Conversation): boolean {
   return conversation.type() === CONVERSATION_TYPE.SELF;
 }

@@ -18,11 +18,13 @@
  */
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
 import {CALL_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import {Availability} from '@wireapp/protocol-messaging';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ButtonGroupTab} from 'Components/calling/ButtonGroup';
 import 'Components/calling/ChooseScreen';
@@ -81,7 +83,8 @@ declare global {
     setSinkId?: (sinkId: string) => Promise<void>;
   }
 }
-const maxGroupSize = 4;
+const MAX_USERS_TO_CALL_WITHOUT_CONFIRM = Config.getConfig().FEATURE.MAX_USERS_TO_PING_WITHOUT_ALERT;
+
 export class CallingViewModel {
   readonly activeCalls: ko.PureComputed<Call[]>;
   readonly callActions: CallActions;
@@ -112,6 +115,23 @@ export class CallingViewModel {
         return call.reason() !== CALL_REASON.ANSWERED_ELSEWHERE;
       }),
     );
+
+    const toggleState = async (withVideo: boolean): Promise<void> => {
+      const conversation = this.conversationState.activeConversation();
+      if (conversation) {
+        const isActiveCall = this.callingRepository.findCall(conversation.qualifiedId);
+        const callType = withVideo ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL;
+
+        if (isActiveCall) {
+          this.callingRepository.leaveCall(conversation.qualifiedId, LEAVE_CALL_REASON.ELECTRON_TRAY_MENU_MESSAGE);
+          return;
+        }
+
+        await handleCallAction(conversation, callType);
+      }
+    };
+
+    amplify.subscribe(WebAppEvents.CALL.STATE.TOGGLE, toggleState); // This event needs to be kept, it is sent by the wrapper
 
     const ring = (call: Call): void => {
       const sounds: Partial<Record<CALL_STATE, AudioType>> = {
@@ -185,7 +205,7 @@ export class CallingViewModel {
 
     const handleCallAction = async (conversationEntity: Conversation, callType: CALL_TYPE): Promise<void> => {
       const memberCount = conversationEntity.participating_user_ets().length;
-      if (memberCount > maxGroupSize) {
+      if (memberCount > MAX_USERS_TO_CALL_WITHOUT_CONFIRM) {
         PrimaryModal.show(PrimaryModal.type.WITHOUT_TITLE, {
           preventClose: true,
           primaryAction: {

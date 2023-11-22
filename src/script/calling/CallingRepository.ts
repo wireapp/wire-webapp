@@ -68,7 +68,7 @@ import {ClientId, Participant, UserId} from './Participant';
 
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
-import {isMLSConversation, MLSConversation} from '../conversation/ConversationSelectors';
+import {isGroupMLSConversation, isMLSConversation, MLSConversation} from '../conversation/ConversationSelectors';
 import {ConversationState} from '../conversation/ConversationState';
 import {CallingEvent, EventBuilder} from '../conversation/EventBuilder';
 import {CONSENT_TYPE, MessageRepository, MessageSendingOptions} from '../conversation/MessageRepository';
@@ -343,7 +343,7 @@ export class CallingRepository {
     }
     const allClients = await this.core.service!.conversation.fetchAllParticipantsClients(call.conversationId);
 
-    if (!isMLSConversation(conversation)) {
+    if (!isGroupMLSConversation(conversation)) {
       const qualifiedClients = flattenUserMap(allClients);
 
       const clients: Clients = flatten(
@@ -512,7 +512,6 @@ export class CallingRepository {
    */
   subscribeToEvents(): void {
     amplify.subscribe(WebAppEvents.CALL.EVENT_FROM_BACKEND, this.onCallEvent);
-    amplify.subscribe(WebAppEvents.CALL.STATE.TOGGLE, this.toggleState); // This event needs to be kept, it is sent by the wrapper
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_VBR_ENCODING, this.toggleCbrEncoding);
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, ({settings}: WebappProperties) => {
       this.toggleCbrEncoding(settings.call.enable_vbr_encoding);
@@ -664,7 +663,7 @@ export class CallingRepository {
       this.serializeQualifiedId(conversationId),
       this.serializeQualifiedId(userId),
       conversation && isMLSConversation(conversation) ? senderClientId : clientId,
-      conversation && isMLSConversation(conversation) ? CONV_TYPE.CONFERENCE_MLS : CONV_TYPE.CONFERENCE,
+      conversation && isGroupMLSConversation(conversation) ? CONV_TYPE.CONFERENCE_MLS : CONV_TYPE.CONFERENCE,
     );
 
     if (res !== 0) {
@@ -683,25 +682,12 @@ export class CallingRepository {
   // Call actions
   //##############################################################################
 
-  private readonly toggleState = (withVideo: boolean): void => {
-    const conversation = this.conversationState.activeConversation();
-    if (conversation) {
-      const isActiveCall = this.findCall(conversation.qualifiedId);
-      const callType = withVideo ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL;
-      return (
-        (isActiveCall
-          ? this.leaveCall(conversation.qualifiedId, LEAVE_CALL_REASON.ELECTRON_TRAY_MENU_MESSAGE)
-          : this.startCall(conversation, callType)) && undefined
-      );
-    }
-  };
-
   private getConversationType(conversation: Conversation): CONV_TYPE {
     if (!conversation.isGroup()) {
       return CONV_TYPE.ONEONONE;
     }
 
-    if (isMLSConversation(conversation)) {
+    if (isGroupMLSConversation(conversation)) {
       return CONV_TYPE.CONFERENCE_MLS;
     }
     return this.supportsConferenceCalling ? CONV_TYPE.CONFERENCE : CONV_TYPE.GROUP;
@@ -761,7 +747,7 @@ export class CallingRepository {
         this.removeCall(call);
       }
 
-      if (isMLSConversation(conversation)) {
+      if (isGroupMLSConversation(conversation)) {
         await this.joinMlsConferenceSubconversation(conversation);
       }
 
@@ -869,7 +855,7 @@ export class CallingRepository {
 
       const conversation = this.getConversationById(call.conversationId);
 
-      if (!conversation || !isMLSConversation(conversation)) {
+      if (!conversation || !isGroupMLSConversation(conversation)) {
         return;
       }
 
@@ -904,7 +890,7 @@ export class CallingRepository {
 
   private readonly updateConferenceSubconversationEpoch = async (conversationId: QualifiedId) => {
     const conversation = this.getConversationById(conversationId);
-    if (!conversation || !isMLSConversation(conversation)) {
+    if (!conversation || !isGroupMLSConversation(conversation)) {
       return;
     }
 
@@ -923,7 +909,7 @@ export class CallingRepository {
 
   private readonly handleCallParticipantChange = (conversationId: QualifiedId, members: QualifiedWcallMember[]) => {
     const conversation = this.getConversationById(conversationId);
-    if (!conversation || !isMLSConversation(conversation)) {
+    if (!conversation || !isGroupMLSConversation(conversation)) {
       return;
     }
 
@@ -1225,12 +1211,12 @@ export class CallingRepository {
     const content = typeof payload === 'string' ? payload : JSON.stringify(payload);
 
     /**
-     * @note If myClientsOnly option is true, the message should be sent via the self-conversation.
+     * @note If myClientsOnly option is true, the message should be sent via the mls self-conversation.
      * This message is used to tell your other clients you have answered or
      * rejected a call and to stop ringing.
      */
     if (typeof payload === 'string' && isMLSConversation(conversation) && myClientsOnly) {
-      return void this.messageRepository.sendSelfCallingMessage(payload, conversation.qualifiedId);
+      return void this.messageRepository.sendCallingMessageToSelfMLSConversation(payload, conversation.qualifiedId);
     }
 
     const message = await this.messageRepository.sendCallingMessage(conversation, content, options);
