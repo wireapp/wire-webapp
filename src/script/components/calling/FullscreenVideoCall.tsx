@@ -83,6 +83,11 @@ export interface FullscreenVideoCallProps {
   videoGrid: Grid;
 }
 
+enum backgroundBlur {
+  isBlurred = 'isBlurred',
+  isNotBlurred = 'isNotBlurred',
+}
+
 const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   call,
   canShareScreen,
@@ -227,6 +232,23 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
             };
       }),
     },
+    {
+      label: t('videoCallbackgroundBlurHeadline'),
+      options: [
+        {
+          label: t('videoCallbackgroundBlur'),
+          value: backgroundBlur.isBlurred,
+          dataUieName: backgroundBlur.isBlurred,
+          id: backgroundBlur.isBlurred,
+        },
+        {
+          label: t('videoCallbackgroundNotBlurred'),
+          value: backgroundBlur.isNotBlurred,
+          dataUieName: backgroundBlur.isNotBlurred,
+          id: backgroundBlur.isNotBlurred,
+        },
+      ],
+    },
   ];
 
   const [selectedVideoOptions, setSelectedVideoOptions] = React.useState(() =>
@@ -236,7 +258,8 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   );
   const updateVideoOptions = (selectedOption: string) => {
     const camera = videoOptions[0].options.find(item => item.value === selectedOption) ?? selectedVideoOptions[0];
-    setSelectedVideoOptions([camera]);
+    const blur = videoOptions[1].options.find(item => item.value === selectedOption) ?? selectedVideoOptions[1];
+    setSelectedVideoOptions([camera, blur]);
     switchCameraInput(camera.id);
   };
 
