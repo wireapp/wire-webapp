@@ -748,7 +748,7 @@
   "messageFailedToSendWillNotReceiveSingular": "wird Ihre Nachricht nicht erhalten.",
   "messageFailedToSendWillReceivePlural": "werden Ihre Nachricht später erhalten.",
   "messageFailedToSendWillReceiveSingular": "wird Ihre Nachricht später erhalten.",
-  "mlsConversationRecovered": "You haven't used this device for a while, or an issue has occurred. Some older messages may not appear here.",
+  "mlsConversationRecovered": "Sie haben das Gerät eine Weile nicht benutzt oder es ist ein Problem aufgetreten. Einige ältere Nachrichten werden hier eventuell nicht angezeigt.",
   "mlsToggleInfo": "Wenn dies aktiviert ist, wird für die Unterhaltung das neue Messaging-Layer-Security-Protokoll (MLS) verwendet.",
   "mlsToggleName": "MLS",
   "modalAccountCreateAction": "Verstanden",
