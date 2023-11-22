@@ -80,8 +80,6 @@ export type Env = {
   /** will enable the MLS protocol */
   FEATURE_ENABLE_MLS?: string;
 
-  /** will enable the client to initialise the MLS migration flow of group conversations */
-  FEATURE_ENABLE_MLS_MIGRATION?: string;
   /** will enable the E2E-Identification protocol, needs active FEATURE_ENABLE_MLS to work */
   FEATURE_ENABLE_E2EI?: string;
 

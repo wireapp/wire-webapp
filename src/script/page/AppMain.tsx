@@ -34,7 +34,6 @@ import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {PrimaryModalComponent} from 'Components/Modals/PrimaryModal/PrimaryModal';
 import {showUserModal, UserModal} from 'Components/Modals/UserModal';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {supportsMLSMigration} from 'Util/util';
 
 import {AppLock} from './AppLock';
 import {FeatureConfigChangeHandler} from './components/FeatureConfigChange/FeatureConfigChangeHandler/FeatureConfigChangeHandler';
@@ -194,15 +193,13 @@ const AppMain: FC<AppMainProps> = ({
       window.setTimeout(() => repositories.notification.checkPermission(), App.CONFIG.NOTIFICATION_CHECK);
     });
 
-    if (supportsMLSMigration()) {
-      //after app is loaded, check mls migration configuration and start migration if needed
-      await initialiseMLSMigrationFlow({
-        selfUser,
-        conversationHandler: repositories.conversation,
-        getTeamMLSMigrationStatus: repositories.team.getTeamMLSMigrationStatus,
-        refreshAllKnownUsers: repositories.user.refreshAllKnownUsers,
-      });
-    }
+    //after app is loaded, check mls migration configuration and start migration if needed
+    await initialiseMLSMigrationFlow({
+      selfUser,
+      conversationHandler: repositories.conversation,
+      getTeamMLSMigrationStatus: repositories.team.getTeamMLSMigrationStatus,
+      refreshAllKnownUsers: repositories.user.refreshAllKnownUsers,
+    });
   };
 
   useEffect(() => {

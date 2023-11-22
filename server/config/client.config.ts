@@ -55,7 +55,6 @@ export function generateConfig(params: ConfigGeneratorParams, env: Env) {
       ENABLE_EXTRA_CLIENT_ENTROPY: env.FEATURE_ENABLE_EXTRA_CLIENT_ENTROPY == 'true',
       ENABLE_MEDIA_EMBEDS: env.FEATURE_ENABLE_MEDIA_EMBEDS != 'false',
       ENABLE_MLS: env.FEATURE_ENABLE_MLS == 'true',
-      ENABLE_MLS_MIGRATION: env.FEATURE_ENABLE_MLS_MIGRATION == 'true',
       ENABLE_E2EI: env.FEATURE_ENABLE_MLS == 'true' && env.FEATURE_ENABLE_E2EI == 'true',
       ENABLE_PHONE_LOGIN: env.FEATURE_ENABLE_PHONE_LOGIN != 'false',
       ENABLE_PROTEUS_CORE_CRYPTO: env.FEATURE_ENABLE_PROTEUS_CORE_CRYPTO == 'true',

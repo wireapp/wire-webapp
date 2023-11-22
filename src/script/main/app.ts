@@ -40,7 +40,7 @@ import {getLogger, Logger} from 'Util/Logger';
 import {includesString} from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {appendParameter} from 'Util/UrlUtil';
-import {checkIndexedDb, supportsMLS, supportsMLSMigration} from 'Util/util';
+import {checkIndexedDb, supportsMLS} from 'Util/util';
 
 import '../../style/default.less';
 import {AssetRepository} from '../assets/AssetRepository';
@@ -455,14 +455,12 @@ export class App {
         //add the potential `self` and `team` conversations
         await registerUninitializedSelfAndTeamConversations(conversations, selfUser, clientEntity.id, this.core);
 
-        if (supportsMLSMigration()) {
-          //join all the mls groups that are known by the user but were migrated to mls
-          await joinConversationsAfterMigrationFinalisation({
-            conversations,
-            core: this.core,
-            conversationRepository: conversationRepository,
-          });
-        }
+        //join all the mls groups that are known by the user but were migrated to mls
+        await joinConversationsAfterMigrationFinalisation({
+          conversations,
+          core: this.core,
+          conversationRepository: conversationRepository,
+        });
 
         //join all the mls groups we're member of and have not yet joined (eg. we were not send welcome message)
         await initMLSConversations(conversations, this.core);

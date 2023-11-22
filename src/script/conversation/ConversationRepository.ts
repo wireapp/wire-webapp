@@ -70,7 +70,7 @@ import {
 } from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {isBackendError} from 'Util/TypePredicateUtil';
-import {supportsMLSMigration, supportsMLS} from 'Util/util';
+import {supportsMLS} from 'Util/util';
 import {createUuid} from 'Util/uuid';
 
 import {ACCESS_STATE} from './AccessState';
@@ -2917,7 +2917,7 @@ export class ConversationRepository {
       case CONVERSATION_EVENT.TYPING:
         return this.onTyping(conversationEntity, eventJson);
 
-      case supportsMLSMigration() && CONVERSATION_EVENT.PROTOCOL_UPDATE:
+      case CONVERSATION_EVENT.PROTOCOL_UPDATE:
         return this.onProtocolUpdate(conversationEntity, eventJson);
 
       case CONVERSATION_EVENT.RENAME:
