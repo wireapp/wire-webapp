@@ -27,9 +27,7 @@ import {container} from 'tsyringe';
 
 import {ConversationDatabaseData, ConversationMapper} from 'src/script/conversation/ConversationMapper';
 import {User} from 'src/script/entity/User';
-import {CONVERSATION} from 'src/script/event/Client';
 import {Core} from 'src/script/service/CoreSingleton';
-import {TestFactory} from 'test/helper/TestFactory';
 import {createUuid} from 'Util/uuid';
 
 import {joinConversationsAfterMigrationFinalisation} from './';
@@ -120,19 +118,15 @@ const createConversation = (
   return conversation;
 };
 
-const testFactory = new TestFactory();
-
 describe('joinConversationsAfterMigrationFinalisation', () => {
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  it('Should join MLS groups of group conversations and insert a system message when joining after conversations were already migrated', async () => {
+  it('Should join MLS groups of group conversations and call onSuccess callback after successful join', async () => {
     const mockCore = container.resolve(Core);
-    const conversationRepository = await testFactory.exposeConversationActors();
 
     jest.spyOn(mockCore.service!.conversation, 'mlsGroupExistsLocally').mockResolvedValue(false);
-    jest.spyOn(conversationRepository['eventRepository'], 'injectEvent');
 
     const conversationId = 'conversation1';
     const mockDomain = 'anta.wire.link';
@@ -149,10 +143,12 @@ describe('joinConversationsAfterMigrationFinalisation', () => {
       conversationGroupId,
     );
 
+    const onSuccess = jest.fn();
+
     await joinConversationsAfterMigrationFinalisation({
       conversations: [mockedConversation],
       core: mockCore,
-      conversationRepository,
+      onSuccess,
     });
 
     expect(mockCore.service?.conversation.joinByExternalCommit).toHaveBeenCalledWith({
@@ -160,23 +156,13 @@ describe('joinConversationsAfterMigrationFinalisation', () => {
       id: conversationId,
     });
 
-    expect(conversationRepository['eventRepository'].injectEvent).toHaveBeenCalledWith({
-      conversation: conversationId,
-      qualified_conversation: {domain: mockDomain, id: conversationId},
-      from: selfUser.id,
-      id: expect.any(String),
-      data: null,
-      time: expect.any(String),
-      type: CONVERSATION.JOINED_AFTER_MLS_MIGRATION_FINALISATION,
-    });
+    expect(onSuccess).toHaveBeenCalledWith(mockedConversation);
   });
 
   it('Should ignore other type of conversations (e.g. 1:1)', async () => {
     const mockCore = container.resolve(Core);
-    const conversationRepository = await testFactory.exposeConversationActors();
 
     jest.spyOn(mockCore.service!.conversation, 'mlsGroupExistsLocally').mockResolvedValue(false);
-    jest.spyOn(conversationRepository['eventRepository'], 'injectEvent');
 
     const conversationId = 'conversation1';
     const mockDomain = 'anta.wire.link';
@@ -193,23 +179,23 @@ describe('joinConversationsAfterMigrationFinalisation', () => {
       conversationGroupId,
     );
 
+    const onSuccess = jest.fn();
+
     await joinConversationsAfterMigrationFinalisation({
       conversations: [mockedConversations],
       core: mockCore,
-      conversationRepository,
+      onSuccess,
     });
 
     expect(mockCore.service?.conversation.joinByExternalCommit).not.toHaveBeenCalled();
 
-    expect(conversationRepository['eventRepository'].injectEvent).not.toHaveBeenCalled();
+    expect(onSuccess).not.toHaveBeenCalled();
   });
 
   it('Should not join MLS conversation that was already MLS in the store', async () => {
     const mockCore = container.resolve(Core);
-    const conversationRepository = await testFactory.exposeConversationActors();
 
     jest.spyOn(mockCore.service!.conversation, 'mlsGroupExistsLocally').mockResolvedValue(false);
-    jest.spyOn(conversationRepository['eventRepository'], 'injectEvent');
 
     const conversationId = 'conversation1';
     const mockDomain = 'anta.wire.link';
@@ -226,23 +212,23 @@ describe('joinConversationsAfterMigrationFinalisation', () => {
       conversationGroupId,
     );
 
+    const onSuccess = jest.fn();
+
     await joinConversationsAfterMigrationFinalisation({
       conversations: [mockedConversation],
       core: mockCore,
-      conversationRepository,
+      onSuccess,
     });
 
     expect(mockCore.service?.conversation.joinByExternalCommit).not.toHaveBeenCalled();
 
-    expect(conversationRepository['eventRepository'].injectEvent).not.toHaveBeenCalled();
+    expect(onSuccess).not.toHaveBeenCalled();
   });
 
   it('Should not join MLS conversation if conversation was not migrated', async () => {
     const mockCore = container.resolve(Core);
-    const conversationRepository = await testFactory.exposeConversationActors();
 
     jest.spyOn(mockCore.service!.conversation, 'mlsGroupExistsLocally').mockResolvedValue(false);
-    jest.spyOn(conversationRepository['eventRepository'], 'injectEvent');
 
     const conversationId = 'conversation1';
     const mockDomain = 'anta.wire.link';
@@ -259,14 +245,15 @@ describe('joinConversationsAfterMigrationFinalisation', () => {
       conversationGroupId,
     );
 
+    const onSuccess = jest.fn();
+
     await joinConversationsAfterMigrationFinalisation({
       conversations: [mockedConversation],
       core: mockCore,
-      conversationRepository,
+      onSuccess,
     });
 
     expect(mockCore.service?.conversation.joinByExternalCommit).not.toHaveBeenCalled();
-
-    expect(conversationRepository['eventRepository'].injectEvent).not.toHaveBeenCalled();
+    expect(onSuccess).not.toHaveBeenCalled();
   });
 });

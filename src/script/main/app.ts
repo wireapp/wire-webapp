@@ -459,7 +459,7 @@ export class App {
         await joinConversationsAfterMigrationFinalisation({
           conversations,
           core: this.core,
-          conversationRepository: conversationRepository,
+          onSuccess: conversationRepository.injectJoinedAfterMigrationFinalisationMessage,
         });
 
         //join all the mls groups we're member of and have not yet joined (eg. we were not send welcome message)
