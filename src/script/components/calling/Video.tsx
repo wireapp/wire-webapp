@@ -18,14 +18,133 @@
  */
 
 // https://github.com/facebook/react/issues/11163#issuecomment-628379291
-import {VideoHTMLAttributes, useEffect, useRef} from 'react';
+import {VideoHTMLAttributes, useCallback, useEffect, useRef} from 'react';
+
+import '@mediapipe/selfie_segmentation';
+import '@tensorflow/tfjs-backend-webgl';
+import '@tensorflow/tfjs-core';
+//imports for blur effect
+import * as bodySegmentation from '@tensorflow-models/body-segmentation';
+// Register WebGL backend.
 
 type VideoProps = VideoHTMLAttributes<HTMLVideoElement> & {
   srcObject: MediaStream;
 };
 
+const STATE = {
+  camera: {targetFPS: 60, sizeOption: '640 X 480', cameraSelector: ''},
+  fpsDisplay: {mode: 'model'},
+  backend: '',
+  flags: {},
+  modelConfig: {},
+  visualization: {
+    foregroundThreshold: 0.5,
+    maskOpacity: 0.7,
+    maskBlur: 0,
+    pixelCellWidth: 10,
+    backgroundBlur: 3,
+    edgeBlur: 3,
+  },
+};
+const resetTime = {
+  startInferenceTime: 0,
+  numInferences: 0,
+  inferenceTimeSum: 0,
+  lastPanelUpdate: 0,
+};
+
 const Video = ({srcObject, ...props}: VideoProps) => {
   const refVideo = useRef<HTMLVideoElement>(null);
+  const canvas = useRef<HTMLCanvasElement>(null);
+  const ctx = useRef<CanvasRenderingContext2D | null | undefined>(null);
+  // let modelTime = {...resetTime};
+  let segmenter: bodySegmentation.BodySegmenter | null = null;
+
+  const draw = useCallback(
+    (ctx: CanvasRenderingContext2D | null | undefined) => {
+      ctx?.drawImage(
+        canvas!.current!,
+        0,
+        0,
+        srcObject.getVideoTracks()[0].getSettings().width ?? 400,
+        srcObject.getVideoTracks()[0].getSettings().height ?? 400,
+      );
+    },
+    [srcObject],
+  );
+
+  useEffect(() => {
+    ctx.current = canvas?.current?.getContext('2d');
+    draw(ctx.current);
+  }, [draw]);
+
+  const createSegmenter = async () => {
+    const model = bodySegmentation.SupportedModels.MediaPipeSelfieSegmentation;
+    const segmenterConfig: bodySegmentation.MediaPipeSelfieSegmentationMediaPipeModelConfig = {
+      runtime: 'mediapipe',
+      modelType: 'general',
+      solutionPath: '/selfie_segmentation',
+      // or 'base/node_modules/@mediapipe/selfie_segmentation' in npm.
+    };
+    segmenter = await bodySegmentation.createSegmenter(model, segmenterConfig);
+  };
+
+  const segmenterFunc = async () => {
+    let segmentation = null;
+    console.log('segmenterFunc');
+
+    await createSegmenter();
+    // Segmenter can be null if initialization failed (for example when loading
+    // from a URL that does not exist).
+    if (segmenter != null) {
+      // Change in what FPS should measure.
+      // Detectors can throw errors, for example when using custom URLs that
+      // contain a model that doesn't provide the expected output.
+      try {
+        if (segmenter.segmentPeople != null && refVideo.current != null) {
+          segmentation = await segmenter.segmentPeople(refVideo.current, {
+            flipHorizontal: false,
+            multiSegmentation: false,
+            segmentBodyParts: true,
+            segmentationThreshold: STATE.visualization.foregroundThreshold,
+          });
+        }
+      } catch (error) {
+        segmenter.dispose();
+        segmenter = null;
+        alert(error);
+      }
+
+      console.log('segmenter', segmenter, segmentation);
+      // const segmentationConfig = {flipHorizontal: false};
+      // // const people = await segmenter.segmentPeople(srcObject, segmentationConfig);
+      const options = STATE.visualization;
+      if (segmentation != null && canvas.current != null && refVideo.current != null) {
+        await bodySegmentation.drawBokehEffect(
+          canvas.current,
+          refVideo.current,
+          segmentation,
+          options.foregroundThreshold,
+          options.backgroundBlur,
+          options.edgeBlur,
+        );
+      }
+      draw(ctx.current);
+    }
+    console.log('NO SEGMENTER');
+  };
+
+  // const gl = window.exposedContext;
+  // if (gl)
+  //   gl.readPixels(
+  //     0,
+  //     0,
+  //     1,
+  //     1,
+  //     gl.RGBA,
+  //     gl.UNSIGNED_BYTE,
+  //     new Uint8Array(4)
+  //   );
 
   useEffect(() => {
     if (!refVideo.current) {
@@ -43,7 +162,13 @@ const Video = ({srcObject, ...props}: VideoProps) => {
     [],
   );
 
-  return <video ref={refVideo} {...props} />;
+  segmenterFunc().catch(console.warn);
+  return (
+    <>
+      <canvas ref={canvas}></canvas>
+      <video ref={refVideo} {...props} css={{visibility: 'hidden'}} />;
+    </>
+  );
 };
 
 export {Video};
