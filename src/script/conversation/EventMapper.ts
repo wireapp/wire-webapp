@@ -731,7 +731,6 @@ export class EventMapper {
    */
   private _mapEventE2EIVerificationMessage({data: eventData}: LegacyEventRecord): MissedMessage {
     const messageEntity = new E2EIVerificationMessage();
-    // Database can contain non-camelCased naming. For backwards compatibility reasons we handle both.
     messageEntity.messageType(eventData.type);
 
     return messageEntity;
