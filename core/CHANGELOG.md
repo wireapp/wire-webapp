@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [42.22.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.22.0...@wireapp/core@42.22.1) (2023-11-23)
+
+### Bug Fixes
+
+* upload of publicKeys in case of active E2EI ([#5737](https://github.com/wireapp/wire-web-packages/issues/5737)) ([e71bc6e](https://github.com/wireapp/wire-web-packages/commit/e71bc6eb8ac33120a66f57b33c748821b96ade13))
+
 # [42.22.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.21.0...@wireapp/core@42.22.0) (2023-11-23)
 
 ### Features
