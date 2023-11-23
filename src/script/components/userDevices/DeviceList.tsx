@@ -21,6 +21,7 @@ import React from 'react';
 
 import cx from 'classnames';
 
+import {WireIdentity} from 'src/script/E2EIdentity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -33,13 +34,13 @@ import {getPrivacyWhyUrl} from '../../externalRoute';
 
 interface DeviceListProps {
   clickOnDevice: (client: ClientEntity) => void;
-  renderDeviceBadges: (device: ClientEntity) => React.ReactNode;
+  getDeviceIdentity?: (deviceId: string) => WireIdentity | undefined;
   clients: ClientEntity[];
   noPadding: boolean;
   user: User;
 }
 
-const DeviceList: React.FC<DeviceListProps> = ({user, renderDeviceBadges, noPadding, clients, clickOnDevice}) => {
+const DeviceList: React.FC<DeviceListProps> = ({user, getDeviceIdentity, noPadding, clients, clickOnDevice}) => {
   const {name: userName} = useKoSubscribableChildren(user, ['name']);
 
   return (
@@ -69,7 +70,7 @@ const DeviceList: React.FC<DeviceListProps> = ({user, renderDeviceBadges, noPadd
             data-uie-name="item-device"
           >
             <DeviceCard
-              renderDeviceBadges={renderDeviceBadges}
+              getDeviceIdentity={getDeviceIdentity}
               device={client}
               click={() => clickOnDevice(client)}
               showIcon

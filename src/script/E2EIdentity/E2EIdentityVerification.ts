@@ -51,21 +51,6 @@ export function isE2EIEnabled(): boolean {
   return supportsMLS() && Config.getConfig().FEATURE.ENABLE_E2EI;
 }
 
-export async function getDeviceIdentity(
-  groupId: string,
-  userId: QualifiedId,
-  deviceId: string,
-): Promise<WireIdentity | undefined> {
-  const identities = await getE2EIdentityService().getDevicesIdentities(groupId, {[deviceId]: userId});
-  if (identities?.length && identities[0]) {
-    return {
-      ...identities[0],
-      status: mapMLSStatus(identities[0].status),
-    };
-  }
-  return undefined;
-}
-
 export async function getUsersIdentities(groupId: string, userIds: QualifiedId[]) {
   const userVerifications = await getE2EIdentityService().getUsersIdentities(groupId, userIds);
 

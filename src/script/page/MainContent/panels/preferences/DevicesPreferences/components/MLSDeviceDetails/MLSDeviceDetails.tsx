@@ -36,7 +36,6 @@ export const MLSDeviceDetails = ({isCurrentDevice, identity}: MLSDeviceDetailsPr
   return (
     <div css={styles.wrapper}>
       <h4 className="paragraph-body-3">{t('mlsSignature', MLSPublicKeys.ED25519.toUpperCase())}</h4>
-
       {identity?.thumbprint && (
         <>
           <p className="label-2 preferences-label preferences-devices-fingerprint-label">{t('mlsThumbprint')}</p>
@@ -46,7 +45,6 @@ export const MLSDeviceDetails = ({isCurrentDevice, identity}: MLSDeviceDetailsPr
           </p>
         </>
       )}
-
       <E2EICertificateDetails identity={identity} isCurrentDevice={isCurrentDevice} />
     </div>
   );

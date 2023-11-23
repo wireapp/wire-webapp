@@ -30,7 +30,6 @@ import {DeviceDetails} from './userDevices/DeviceDetails';
 import {DeviceList} from './userDevices/DeviceList';
 import {NoDevicesFound} from './userDevices/NoDevicesFound';
 import {SelfFingerprint} from './userDevices/SelfFingerprint';
-import {DeviceVerificationBadges} from './VerificationBadge';
 
 import {ClientRepository, ClientEntity} from '../client';
 import {MessageRepository} from '../conversation/MessageRepository';
@@ -106,10 +105,6 @@ const UserDevices: React.FC<UserDevicesProps> = ({
   const [clients, setClients] = useState<ClientEntity[]>([]);
   const logger = useMemo(() => getLogger('UserDevicesComponent'), []);
 
-  const renderDeviceBadges = (device: ClientEntity) => {
-    return <DeviceVerificationBadges device={device} getIdentity={getDeviceIdentity} />;
-  };
-
   useEffect(() => {
     (async () => {
       try {
@@ -128,10 +123,6 @@ const UserDevices: React.FC<UserDevicesProps> = ({
     })();
   }, [user]);
 
-  const renderBadges = (device: ClientEntity) => {
-    return renderDeviceBadges?.(device);
-  };
-
   const clickOnDevice = (clientEntity: ClientEntity) => {
     setSelectedClient(clientEntity);
     const headline = user.isMe ? clientEntity.label || clientEntity.model : capitalizeFirstChar(clientEntity.class);
@@ -147,7 +138,7 @@ const UserDevices: React.FC<UserDevicesProps> = ({
   return (
     <div>
       {showDeviceList && deviceMode === FIND_MODE.FOUND && (
-        <DeviceList {...{renderDeviceBadges: renderBadges, clickOnDevice, clients, noPadding, user}} />
+        <DeviceList {...{getDeviceIdentity, clickOnDevice, clients, noPadding, user}} />
       )}
 
       {showDeviceList && deviceMode === FIND_MODE.NOT_FOUND && <NoDevicesFound {...{noPadding, user}} />}
@@ -155,7 +146,7 @@ const UserDevices: React.FC<UserDevicesProps> = ({
       {current.state === UserDevicesState.DEVICE_DETAILS && selectedClient && (
         <DeviceDetails
           {...{
-            renderDeviceBadges: renderBadges,
+            getDeviceIdentity,
             clickToShowSelfFingerprint,
             clientRepository,
             cryptographyRepository,

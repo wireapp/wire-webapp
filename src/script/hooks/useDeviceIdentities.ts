@@ -33,7 +33,7 @@ export const useDeviceIdentities = (userId: QualifiedId, groupId?: string) => {
         setDeviceIdentities(userIdentities.get(userId.id) ?? []);
       })();
     }
-  });
+  }, [userId.id, groupId]);
 
   return {
     deviceIdentities,
