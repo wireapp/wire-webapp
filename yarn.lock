@@ -6167,10 +6167,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/avs@npm:9.5.2":
-  version: 9.5.2
-  resolution: "@wireapp/avs@npm:9.5.2"
-  checksum: e728dfed25af97c6dee587a7f9174466971866993e098a0017eba37ed40a70b4a4155f4f9ab25968020e048ee1a31ced8ae9a224ee77cb793a556b40a01950af
+"@wireapp/avs@npm:9.5.5":
+  version: 9.5.5
+  resolution: "@wireapp/avs@npm:9.5.5"
+  checksum: 6b20c639efa7045b76f3abaebd828fc1251e9cdcab40b8d0de1ddc180ea92b2bf7ad103d1d24c72807f67b96f8d46b97ec4427a8e4a31ca42b89c90695bd014c
   languageName: node
   linkType: hard
 
@@ -6216,9 +6216,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:42.21.0":
-  version: 42.21.0
-  resolution: "@wireapp/core@npm:42.21.0"
+"@wireapp/core@npm:42.22.0":
+  version: 42.22.0
+  resolution: "@wireapp/core@npm:42.22.0"
   dependencies:
     "@wireapp/api-client": ^26.5.3
     "@wireapp/commons": ^5.2.3
@@ -6238,7 +6238,7 @@ __metadata:
     long: ^5.2.0
     uuidjs: 4.2.13
     zod: 3.22.4
-  checksum: 0513c3e4387071cc4b432ce600572dbed139fe5ce96209c01b2b2e2ecc9d5670c8a81f0b2c23c9576cb537095ce2781cd0bb2856d41e8b9bcd4beb29c99ae708
+  checksum: 7097b7e9f22e2cb8f97f05ea58affc2dd6740d97b2a9f826e944ef0df3b27a256605d6ca0cbfcd7f3586edbbf87bae94394051c14c3c6b37ab1de373e76f20f8
   languageName: node
   linkType: hard
 
@@ -19350,10 +19350,10 @@ __metadata:
     "@types/speakingurl": 13.0.6
     "@types/underscore": 1.11.14
     "@types/webpack-env": 1.18.4
-    "@wireapp/avs": 9.5.2
+    "@wireapp/avs": 9.5.5
     "@wireapp/commons": 5.2.3
     "@wireapp/copy-config": 2.1.12
-    "@wireapp/core": 42.21.0
+    "@wireapp/core": 42.22.0
     "@wireapp/eslint-config": 3.0.4
     "@wireapp/prettier-config": 0.6.3
     "@wireapp/react-ui-kit": 9.11.0
