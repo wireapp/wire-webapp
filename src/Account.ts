@@ -234,6 +234,7 @@ export class Account extends TypedEventEmitter<Events> {
     displayName: string,
     handle: string,
     discoveryUrl: string,
+    client: RegisteredClient,
     oAuthIdToken?: string,
   ): Promise<AcmeChallenge | boolean> {
     const context = this.apiClient.context;
@@ -255,7 +256,7 @@ export class Account extends TypedEventEmitter<Events> {
       discoveryUrl,
       this.service.e2eIdentity,
       user,
-      this.clientId,
+      client,
       this.nbPrekeys,
       oAuthIdToken,
     );
