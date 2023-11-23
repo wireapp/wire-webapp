@@ -770,7 +770,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     discoveryUrl: string,
     e2eiServiceExternal: E2EIServiceExternal,
     user: User,
-    clientId: ClientId,
+    client: RegisteredClient,
     nbPrekeys: number,
     oAuthIdToken?: string,
   ): Promise<AcmeChallenge | boolean> {
@@ -780,7 +780,7 @@ export class MLSService extends TypedEventEmitter<Events> {
         coreCryptClient: this.coreCryptoClient,
         e2eiServiceExternal,
         user,
-        clientId,
+        clientId: client.id,
         discoveryUrl,
         keyPackagesAmount: nbPrekeys,
       });
@@ -792,12 +792,14 @@ export class MLSService extends TypedEventEmitter<Events> {
       } else {
         const rotateBundle = await instance.continueCertificateProcess(oAuthIdToken);
         if (rotateBundle !== undefined) {
+          // upload the clients public keys
+          await this.uploadMLSPublicKeys(client);
           // Remove old key packages
-          await this.deleteMLSKeyPackages(clientId, rotateBundle.keyPackageRefsToRemove);
+          await this.deleteMLSKeyPackages(client.id, rotateBundle.keyPackageRefsToRemove);
           // Upload new key packages with x509 certificate
-          await this.uploadMLSKeyPackages(clientId, rotateBundle.newKeyPackages);
+          await this.uploadMLSKeyPackages(client.id, rotateBundle.newKeyPackages);
           // Verify that we have enough key packages
-          await this.verifyRemoteMLSKeyPackagesAmount(clientId);
+          await this.verifyRemoteMLSKeyPackagesAmount(client.id);
           // Update keying material
           for (const [groupId, commitBundle] of rotateBundle.commits) {
             const groupIdAsBytes = Converter.hexStringToArrayBufferView(groupId);
