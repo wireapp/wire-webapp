@@ -111,7 +111,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     };
   }
 
-  public async initClient(userId: QualifiedId, client: RegisteredClient) {
+  public async initClient(userId: QualifiedId, client: RegisteredClient, blockKeypackageUpload = false) {
     await this.coreCryptoClient.mlsInit(
       generateMLSDeviceId(userId, client.id),
       [this.config.defaultCiphersuite],
@@ -125,9 +125,13 @@ export class MLSService extends TypedEventEmitter<Events> {
       userAuthorize: async () => true,
     });
 
-    // We need to make sure keypackages and public key are uploaded to the backend
-    await this.uploadMLSPublicKeys(client);
-    await this.verifyRemoteMLSKeyPackagesAmount(client.id);
+    if (!blockKeypackageUpload) {
+      // We need to make sure keypackages and public key are uploaded to the backend
+      await this.uploadMLSPublicKeys(client);
+      await this.verifyRemoteMLSKeyPackagesAmount(client.id);
+    } else {
+      this.logger.info(`Blocked initial key package upload for client ${client.id} as E2EI is enabled`);
+    }
   }
 
   // We need to lock the websocket while commit bundle is being processed by backend,
@@ -792,6 +796,8 @@ export class MLSService extends TypedEventEmitter<Events> {
           await this.deleteMLSKeyPackages(clientId, rotateBundle.keyPackageRefsToRemove);
           // Upload new key packages with x509 certificate
           await this.uploadMLSKeyPackages(clientId, rotateBundle.newKeyPackages);
+          // Verify that we have enough key packages
+          await this.verifyRemoteMLSKeyPackagesAmount(clientId);
           // Update keying material
           for (const [groupId, commitBundle] of rotateBundle.commits) {
             const groupIdAsBytes = Converter.hexStringToArrayBufferView(groupId);

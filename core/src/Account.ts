@@ -33,6 +33,7 @@ import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
 import {Notification} from '@wireapp/api-client/lib/notification/';
 import {AbortHandler, WebSocketClient} from '@wireapp/api-client/lib/tcp/';
 import {WEBSOCKET_STATE} from '@wireapp/api-client/lib/tcp/ReconnectingWebsocket';
+import {FEATURE_KEY, FeatureStatus} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import logdown from 'logdown';
 
@@ -221,6 +222,14 @@ export class Account extends TypedEventEmitter<Events> {
     return storeEngine.updateOrCreate(AUTH_TABLE_NAME, AUTH_COOKIE_KEY, entity);
   }
 
+  private async getE2EIStatus() {
+    const features = await this.apiClient.api.teams.feature.getAllFeatures();
+
+    return {
+      isFeatureEnabled: features[FEATURE_KEY.MLSE2EID]?.status === FeatureStatus.ENABLED,
+    };
+  }
+
   public async enrollE2EI(
     displayName: string,
     handle: string,
@@ -318,7 +327,7 @@ export class Account extends TypedEventEmitter<Events> {
 
     if (this.service.mls) {
       const {userId, domain = ''} = this.apiClient.context;
-      await this.service.mls.initClient({id: userId, domain}, client);
+      await this.initMLSClient({id: userId, domain}, client);
     }
     this.logger.info(`Created new client {mls: ${!!this.service.mls}, id: ${client.id}}`);
 
@@ -326,6 +335,19 @@ export class Account extends TypedEventEmitter<Events> {
     await this.service.client.synchronizeClients(client.id);
 
     return this.initClient(client);
+  }
+
+  /**
+   * Will create a new MLS Client for the current user
+   */
+  private async initMLSClient(userId: QualifiedId, client: RegisteredClient): Promise<void> {
+    if (!this.service?.mls) {
+      throw new Error('MLS Services is not ready.');
+    }
+    // we need to check if E2EI is enabled before creating the client
+    // in case it is enabled we are not supposed to upload new keypackages, that are not of type x509, to the backend
+    const {isFeatureEnabled} = await this.getE2EIStatus();
+    await this.service.mls.initClient(userId, client, isFeatureEnabled);
   }
 
   /**
@@ -352,8 +374,7 @@ export class Account extends TypedEventEmitter<Events> {
     if (this.service.mls) {
       const {userId, domain = ''} = this.apiClient.context;
       if (!client) {
-        // If the client has been passed to the method, it means it also has been initialized
-        await this.service.mls.initClient({id: userId, domain}, validClient);
+        await this.initMLSClient({id: userId, domain}, validClient);
       }
       // initialize schedulers for pending mls proposals once client is initialized
       await this.service.mls.initialisePendingProposalsTasks();
