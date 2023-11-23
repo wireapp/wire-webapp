@@ -19,9 +19,9 @@
 
 import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data';
 import {
-  ConversationOtrMessageAddEvent,
-  ConversationMLSMessageAddEvent,
   CONVERSATION_EVENT,
+  ConversationMLSMessageAddEvent,
+  ConversationOtrMessageAddEvent,
 } from '@wireapp/api-client/lib/event';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {AddUsersFailureReasons} from '@wireapp/core/lib/conversation';
@@ -29,7 +29,7 @@ import {ReactionType} from '@wireapp/core/lib/conversation/ReactionType';
 import {DecryptionError} from '@wireapp/core/lib/errors/DecryptionError';
 
 import type {REASON as AVS_REASON} from '@wireapp/avs';
-import type {LegalHoldStatus, Asset} from '@wireapp/protocol-messaging';
+import type {Asset, LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {createUuid} from 'Util/uuid';
 
@@ -39,6 +39,7 @@ import type {Conversation} from '../entity/Conversation';
 import type {Message} from '../entity/message/Message';
 import type {User} from '../entity/User';
 import {CALL, ClientEvent, CONVERSATION} from '../event/Client';
+import {E2EIVerificationMessageType} from '../message/E2EIVerificationMessageType';
 import {StatusType} from '../message/StatusType';
 import {VerificationMessageType} from '../message/VerificationMessageType';
 import {ReactionMap, ReadReceipt, UserReactionMap} from '../storage';
@@ -238,8 +239,12 @@ export interface ErrorEvent
   id: string;
 }
 
-// E2EI Verified Events
-export type AllE2EIVerifiedEvent = ConversationEvent<CONVERSATION.E2EI_VERIFICATION>;
+// E2EI Verification Events
+export type AllE2EIVerifiedEventData = {type: E2EIVerificationMessageType};
+export type AllE2EIVerifiedEvent = ConversationEvent<CONVERSATION.E2EI_VERIFICATION, AllE2EIVerifiedEventData>;
+
+export type E2EIDegradedMessageEventData = {type: E2EIVerificationMessageType};
+export type E2EIDegradedMessageEvent = ConversationEvent<CONVERSATION.E2EI_VERIFICATION, E2EIDegradedMessageEventData>;
 
 export type ClientConversationEvent =
   | AllVerifiedEvent
@@ -316,7 +321,22 @@ export const EventBuilder = {
   buildAllE2EIVerified(conversationEntity: Conversation): AllE2EIVerifiedEvent {
     return {
       ...buildQualifiedId(conversationEntity),
-      data: undefined,
+      data: {
+        type: E2EIVerificationMessageType.VERIFIED,
+      },
+      from: '',
+      id: createUuid(),
+      time: conversationEntity.getNextIsoDate(),
+      type: ClientEvent.CONVERSATION.E2EI_VERIFICATION,
+    };
+  },
+
+  buildE2EIDegraded(conversationEntity: Conversation, type: E2EIVerificationMessageType): E2EIDegradedMessageEvent {
+    return {
+      ...buildQualifiedId(conversationEntity),
+      data: {
+        type,
+      },
       from: '',
       id: createUuid(),
       time: conversationEntity.getNextIsoDate(),

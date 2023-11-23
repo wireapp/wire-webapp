@@ -332,11 +332,6 @@ export class EventMapper {
         break;
       }
 
-      case ClientEvent.CONVERSATION.E2EI_VERIFICATION: {
-        messageEntity = this._mapEventE2EIVerificationMessage();
-        break;
-      }
-
       case ClientEvent.CONVERSATION.ONE2ONE_CREATION: {
         messageEntity = this._mapEvent1to1Creation(event);
         break;
@@ -349,6 +344,11 @@ export class EventMapper {
 
       case ClientEvent.CONVERSATION.VERIFICATION: {
         messageEntity = this._mapEventVerification(event);
+        break;
+      }
+
+      case ClientEvent.CONVERSATION.E2EI_VERIFICATION: {
+        messageEntity = this._mapEventE2EIVerificationMessage(event);
         break;
       }
 
@@ -650,13 +650,6 @@ export class EventMapper {
   }
 
   /**
-   * Maps JSON data of E2E Identity verification message event to message entity.
-   */
-  private _mapEventE2EIVerificationMessage(): MissedMessage {
-    return new E2EIVerificationMessage();
-  }
-
-  /**
    * Maps JSON data of `conversation.knock` message into message entity.
    */
   private _mapEventPing(): PingMessage {
@@ -729,6 +722,17 @@ export class EventMapper {
     // Database can contain non-camelCased naming. For backwards compatibility reasons we handle both.
     messageEntity.userIds(eventData.userIds || eventData.user_ids);
     messageEntity.verificationMessageType(eventData.type);
+
+    return messageEntity;
+  }
+
+  /**
+   * Maps JSON data of E2E Identity verification message event to message entity.
+   */
+  private _mapEventE2EIVerificationMessage({data: eventData}: LegacyEventRecord): MissedMessage {
+    const messageEntity = new E2EIVerificationMessage();
+    // Database can contain non-camelCased naming. For backwards compatibility reasons we handle both.
+    messageEntity.messageType(eventData.type);
 
     return messageEntity;
   }

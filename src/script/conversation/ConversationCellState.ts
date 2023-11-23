@@ -30,7 +30,6 @@ import type {MemberMessage} from '../entity/message/MemberMessage';
 import type {SystemMessage} from '../entity/message/SystemMessage';
 import type {Text} from '../entity/message/Text';
 import {ConversationError} from '../error/ConversationError';
-import {ClientEvent} from '../event/Client';
 
 enum ACTIVITY_TYPE {
   CALL = 'ConversationCellState.ACTIVITY_TYPE.CALL',
@@ -335,7 +334,7 @@ const _getStateUnreadMessage = {
         string = t('notificationSharedLocation');
       } else if (messageEntity.hasAssetImage()) {
         string = t('notificationAssetAdd');
-      } else if (messageEntity?.type === ClientEvent.CONVERSATION.E2EI_VERIFICATION) {
+      } else if (messageEntity.isE2EIVerification()) {
         string = t('tooltipConversationAllDevicesVerified');
       } else if (messageEntity.isVerification()) {
         string = t('tooltipConversationAllDevicesVerified');

@@ -37,4 +37,5 @@ export enum SuperType {
   SYSTEM = 'system',
   UNABLE_TO_DECRYPT = 'unable-to-decrypt',
   VERIFICATION = 'verification',
+  E2EI_VERIFICATION = 'e2e-verification',
 }

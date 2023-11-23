@@ -17,20 +17,4 @@
  *
  */
 
-import ko from 'knockout';
-
-import {Message} from './Message';
-
-import {E2EIVerificationMessageType} from '../../message/E2EIVerificationMessageType';
-import {SuperType} from '../../message/SuperType';
-
-export class E2EIVerificationMessage extends Message {
-  public messageType: ko.Observable<E2EIVerificationMessageType>;
-
-  constructor() {
-    super();
-
-    this.super_type = SuperType.E2EI_VERIFICATION;
-    this.messageType = ko.observable();
-  }
-}
+export * from './E2EIVerificationMessage';

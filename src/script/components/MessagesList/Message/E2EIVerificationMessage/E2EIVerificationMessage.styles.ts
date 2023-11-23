@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2023 Wire Swiss GmbH
+ * Copyright (C) 2022 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,20 +17,17 @@
  *
  */
 
-import ko from 'knockout';
+import {CSSObject} from '@emotion/react';
 
-import {Message} from './Message';
+export const MessageIcon: CSSObject = {
+  alignItems: 'center',
+  display: 'flex',
+  justifyContent: 'center',
 
-import {E2EIVerificationMessageType} from '../../message/E2EIVerificationMessageType';
-import {SuperType} from '../../message/SuperType';
+  maxHeight: 'var(--avatar-diameter-s)',
+  width: 'var(--conversation-message-sender-width)',
+};
 
-export class E2EIVerificationMessage extends Message {
-  public messageType: ko.Observable<E2EIVerificationMessageType>;
-
-  constructor() {
-    super();
-
-    this.super_type = SuperType.E2EI_VERIFICATION;
-    this.messageType = ko.observable();
-  }
-}
+export const IconInfo: CSSObject = {
+  fill: 'var(--red-500)',
+};

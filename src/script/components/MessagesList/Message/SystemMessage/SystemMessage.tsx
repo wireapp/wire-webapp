@@ -19,10 +19,7 @@
 
 import React from 'react';
 
-import {MLSVerified} from '@wireapp/react-ui-kit';
-
 import {Icon} from 'Components/Icon';
-import {E2EIVerificationMessage} from 'src/script/entity/message/E2EIVerificationMessage';
 import {MessageTimerUpdateMessage} from 'src/script/entity/message/MessageTimerUpdateMessage';
 import {MLSConversationRecoveredMessage} from 'src/script/entity/message/MLSConversationRecoveredMessage';
 import {ReceiptModeUpdateMessage} from 'src/script/entity/message/ReceiptModeUpdateMessage';
@@ -55,10 +52,6 @@ export const SystemMessage: React.FC<SystemMessageProps> = ({message}) => {
 
   if (message instanceof MLSConversationRecoveredMessage) {
     return <SystemMessageBase message={message} icon={<Icon.Info />} />;
-  }
-
-  if (message instanceof E2EIVerificationMessage) {
-    return <SystemMessageBase message={message} icon={<MLSVerified className="filled" />} />;
   }
 
   return <SystemMessageBase message={message} />;
