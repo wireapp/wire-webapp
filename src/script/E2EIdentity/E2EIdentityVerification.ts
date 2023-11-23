@@ -66,7 +66,7 @@ export async function getDeviceIdentity(
   return undefined;
 }
 
-export async function getUsersVerificationState(groupId: string, userIds: QualifiedId[]) {
+export async function getUsersIdentities(groupId: string, userIds: QualifiedId[]) {
   const userVerifications = await getE2EIdentityService().getUsersIdentities(groupId, userIds);
 
   const mappedUsers = new Map<string, WireIdentity[]>();
@@ -82,7 +82,7 @@ export async function getUsersVerificationState(groupId: string, userIds: Qualif
 }
 
 export async function getUserVerificationState(groupId: string, userId: QualifiedId) {
-  const usersVerifications = await getUsersVerificationState(groupId, [userId]);
+  const usersVerifications = await getUsersIdentities(groupId, [userId]);
   const deviceIdentities = usersVerifications.get(userId.id);
   return deviceIdentities?.length && deviceIdentities.every(identity => identity.status === MLSStatuses.VALID)
     ? MLSStatuses.VALID
