@@ -360,24 +360,6 @@ export class ConversationRepository {
     }
   };
 
-  /**
-   * Remove obsolete conversations locally.
-   */
-  cleanupConversations(): void {
-    this.conversationState.conversations().forEach(conversationEntity => {
-      if (
-        conversationEntity.isGroup() &&
-        conversationEntity.is_cleared() &&
-        conversationEntity.removed_from_conversation()
-      ) {
-        this.conversationService.deleteConversationFromDb(conversationEntity.id);
-        this.deleteConversationFromRepository(conversationEntity);
-      }
-    });
-
-    this.cleanupEphemeralMessages();
-  }
-
   //##############################################################################
   // Conversation service interactions
   //##############################################################################
@@ -720,19 +702,19 @@ export class ConversationRepository {
       }
       const addCreationMessage = !conversationEntity.hasCreationMessage;
       if (addCreationMessage) {
-        this.addCreationMessage(conversationEntity, this.userState.self().isTemporaryGuest());
+        await this.addCreationMessage(conversationEntity, this.userState.self().isTemporaryGuest());
       }
     }
 
     return mappedMessageEntities;
   }
 
-  private addCreationMessage(
+  private async addCreationMessage(
     conversationEntity: Conversation,
     isTemporaryGuest: boolean,
     timestamp?: number,
     eventSource?: EventSource,
-  ): void {
+  ): Promise<void> {
     conversationEntity.hasCreationMessage = true;
 
     if (conversationEntity.inTeam()) {
@@ -752,7 +734,7 @@ export class ConversationRepository {
       ? EventBuilder.buildGroupCreation(conversationEntity, isTemporaryGuest, timestamp)
       : EventBuilder.build1to1Creation(conversationEntity);
 
-    this.eventRepository.injectEvent(creationEvent, eventSource);
+    await this.eventRepository.injectEvent(creationEvent, eventSource);
   }
 
   /**
@@ -2123,24 +2105,28 @@ export class ConversationRepository {
   }
 
   /**
-   * Clear conversation content and archive the conversation.
+   * Clear conversation.
+   * It will update conversation's cleared timestamp on BE and clear all conversation content.
    *
-   * @note According to spec we archive a conversation when we clear it.
-   * It will be unarchived once it is opened through search. We use the archive flag to distinguish states.
-   *
-   * @param conversation Conversation to clear
-   * @param leaveConversation Should we leave the conversation before clearing the content?
+   * @param conversation Conversation to clear content from
+   * @param timestamp Timestamp of the event
    */
   public async clearConversation(conversation: Conversation) {
-    const isActiveConversation = this.conversationState.isActiveConversation(conversation);
-    const nextConversationEntity = this.getNextConversation(conversation);
-
     await this.messageRepository.updateClearedTimestamp(conversation);
-    await this._clearConversation(conversation);
+    return this.clearConversationContent(conversation, new Date().getTime());
+  }
 
-    if (isActiveConversation) {
-      amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversationEntity, {});
-    }
+  /**
+   * Clears conversation content.
+   * It will clear all messages and events from the conversation and re-apply the conversation creation event.
+   *
+   * @param conversation Conversation to clear content from
+   * @param timestamp Timestamp of the event
+   */
+  private async clearConversationContent(conversation: Conversation, timestamp: number) {
+    await this.deleteMessages(conversation, timestamp);
+    await this.addCreationMessage(conversation, !!this.userState.self()?.isTemporaryGuest(), timestamp);
+    conversation.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.CLEARED);
   }
 
   async leaveGuestRoom(): Promise<void> {
@@ -2195,9 +2181,8 @@ export class ConversationRepository {
   /**
    * Remove the current user from a conversation.
    *
-   * @param conversation Conversation to remove user from
-   * @param clearContent Should we clear the conversation content from the database?
-   * @returns Resolves when user was removed from the conversation
+   * @param conversation Conversation to remove the self user from
+   * @returns Resolves when the self user was removed from the conversation
    */
   public async leaveConversation(conversation: Conversation) {
     const userQualifiedId = this.userState.self().qualifiedId;
@@ -2449,21 +2434,6 @@ export class ConversationRepository {
     this.onMemberUpdate(conversationEntity, response);
   }
 
-  /**
-   * Clears conversation content from view and the database.
-   *
-   * @param conversationEntity Conversation entity to delete
-   * @param timestamp Optional timestamps for which messages to remove
-   */
-  private async _clearConversation(conversationEntity: Conversation, timestamp?: number) {
-    await this.deleteMessages(conversationEntity, timestamp);
-
-    if (conversationEntity.removed_from_conversation()) {
-      await this.conversationService.deleteConversationFromDb(conversationEntity.id);
-      this.deleteConversationFromRepository(conversationEntity);
-    }
-  }
-
   private handleTooManyMembersError(participants = ConversationRepository.CONFIG.GROUP.MAX_SIZE) {
     const openSpots = ConversationRepository.CONFIG.GROUP.MAX_SIZE - participants;
     const substitutions = {
@@ -2670,11 +2640,9 @@ export class ConversationRepository {
         conversationEntity =>
           this.reactToConversationEvent(conversationEntity, eventJson, eventSource) as Promise<EntityObject>,
       )
-      .then((entityObject = {} as EntityObject) => {
-        if (type !== CONVERSATION_EVENT.MEMBER_JOIN && type !== CONVERSATION_EVENT.MEMBER_LEAVE) {
-          this.handleConversationNotification(entityObject as EntityObject, eventSource);
-        }
-      })
+      .then((entityObject = {} as EntityObject) =>
+        this.handleConversationNotification(entityObject as EntityObject, eventSource, type),
+      )
       .catch((error: BaseError) => {
         const ignoredErrorTypes: string[] = [
           ConversationError.TYPE.MESSAGE_NOT_FOUND,
@@ -2910,10 +2878,23 @@ export class ConversationRepository {
    * @param eventSource Source of event
    * @returns Resolves when the conversation was updated
    */
-  private async handleConversationNotification(entityObject: EntityObject, eventSource: EventSource) {
+  private async handleConversationNotification(
+    entityObject: EntityObject,
+    eventSource: EventSource,
+    eventType: CLIENT_CONVERSATION_EVENT | CONVERSATION_EVENT,
+  ) {
     const {conversationEntity, messageEntity} = entityObject;
 
-    if (conversationEntity) {
+    if (!conversationEntity) {
+      return;
+    }
+
+    const eventsToSkip: (CLIENT_CONVERSATION_EVENT | CONVERSATION_EVENT)[] = [
+      CONVERSATION_EVENT.MEMBER_JOIN,
+      CONVERSATION_EVENT.MEMBER_LEAVE,
+    ];
+
+    if (!eventsToSkip.includes(eventType)) {
       const eventFromWebSocket = eventSource === EventRepository.SOURCE.WEB_SOCKET;
       const eventFromStream = eventSource === EventRepository.SOURCE.STREAM;
 
@@ -2927,11 +2908,11 @@ export class ConversationRepository {
         if (!eventFromStream) {
           amplify.publish(WebAppEvents.NOTIFICATION.NOTIFY, messageEntity, undefined, conversationEntity);
         }
-
-        if (conversationEntity.is_cleared()) {
-          conversationEntity.cleared_timestamp(0);
-        }
       }
+    }
+
+    if (conversationEntity.is_cleared()) {
+      conversationEntity.cleared_timestamp(0);
     }
   }
 
@@ -3013,7 +2994,7 @@ export class ConversationRepository {
       const [conversationEntity] = this.mapConversations([conversationData], initialTimestamp);
       if (conversationEntity) {
         if (conversationEntity.participating_user_ids().length) {
-          this.addCreationMessage(conversationEntity, false, initialTimestamp, eventSource);
+          await this.addCreationMessage(conversationEntity, false, initialTimestamp, eventSource);
         }
         await this.updateParticipatingUserEntities(conversationEntity);
         this.proteusVerificationStateHandler.onConversationCreate(conversationEntity);
@@ -3180,10 +3161,8 @@ export class ConversationRepository {
     conversationEntity: Conversation,
     eventJson: ConversationMemberLeaveEvent | TeamMemberLeaveEvent | MemberLeaveEvent,
   ): Promise<{conversationEntity: Conversation; messageEntity: Message} | undefined> {
-    const {data: eventData, from} = eventJson;
-    const isFromSelf = from === this.userState.self().id;
+    const {data: eventData} = eventJson;
     const removesSelfUser = eventData.user_ids.includes(this.userState.self().id);
-    const selfLeavingClearedConversation = isFromSelf && removesSelfUser && conversationEntity.is_cleared();
 
     if (removesSelfUser) {
       conversationEntity.status(ConversationStatus.PAST_MEMBER);
@@ -3210,27 +3189,23 @@ export class ConversationRepository {
       await this.conversationRoleRepository.updateConversationRoles(conversationEntity);
     }
 
-    if (!selfLeavingClearedConversation) {
-      const {messageEntity} = await this.addEventToConversation(conversationEntity, eventJson);
-      (messageEntity as MemberMessage)
-        .userEntities()
-        .filter(userEntity => !userEntity.isMe)
-        .forEach(userEntity => {
-          conversationEntity.participating_user_ids.remove(userId => matchQualifiedIds(userId, userEntity));
+    const {messageEntity} = await this.addEventToConversation(conversationEntity, eventJson);
+    (messageEntity as MemberMessage)
+      .userEntities()
+      .filter(userEntity => !userEntity.isMe)
+      .forEach(userEntity => {
+        conversationEntity.participating_user_ids.remove(userId => matchQualifiedIds(userId, userEntity));
 
-          if (userEntity.isTemporaryGuest()) {
-            userEntity.clearExpirationTimeout();
-          }
-        });
+        if (userEntity.isTemporaryGuest()) {
+          userEntity.clearExpirationTimeout();
+        }
+      });
 
-      await this.updateParticipatingUserEntities(conversationEntity);
+    await this.updateParticipatingUserEntities(conversationEntity);
 
-      this.proteusVerificationStateHandler.onMemberLeft(conversationEntity);
+    this.proteusVerificationStateHandler.onMemberLeft(conversationEntity);
 
-      return {conversationEntity, messageEntity};
-    }
-
-    return undefined;
+    return {conversationEntity, messageEntity};
   }
 
   /**
@@ -3289,10 +3264,10 @@ export class ConversationRepository {
     }
 
     if (conversationEntity.is_cleared()) {
-      await this._clearConversation(conversationEntity, conversationEntity.cleared_timestamp());
+      await this.clearConversationContent(conversationEntity, conversationEntity.cleared_timestamp());
     }
 
-    if (isActiveConversation && (conversationEntity.is_archived() || conversationEntity.is_cleared())) {
+    if (isActiveConversation && conversationEntity.is_archived()) {
       amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversationEntity, {});
     }
   }
@@ -3700,6 +3675,7 @@ export class ConversationRepository {
     conversationEntity.hasCreationMessage = false;
 
     const iso_date = timestamp ? new Date(timestamp).toISOString() : undefined;
+    conversationEntity.removeMessages();
     return this.eventService.deleteEvents(conversationEntity.id, iso_date);
   }
 

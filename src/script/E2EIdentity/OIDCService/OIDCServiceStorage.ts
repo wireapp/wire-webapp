@@ -17,22 +17,36 @@
  *
  */
 
+import {OidcClientData} from './OIDCService.types';
+
 const TargetURLKey = 'E2EIdentity_OIDCService_TargetURL';
+const clientDataKey = 'E2EIdentity_OIDCService_ClientData';
 
 const OIDCServiceStore = {
   store: {
+    clientData: (data: OidcClientData) => localStorage.setItem(clientDataKey, JSON.stringify(data)),
     targetURL: (url: string) => localStorage.setItem(TargetURLKey, url),
   },
   get: {
+    clientData: (): OidcClientData => {
+      const clientData = localStorage.getItem(clientDataKey);
+      if (!clientData) {
+        throw new Error('No client data found in OIDCServiceStore');
+      }
+      return JSON.parse(clientData);
+    },
     targetURL: () => localStorage.getItem(TargetURLKey),
   },
   has: {
+    clientData: () => localStorage.getItem(clientDataKey) !== null,
     targetURL: () => localStorage.getItem(TargetURLKey) !== null,
   },
   clear: {
+    clientData: () => localStorage.removeItem(clientDataKey),
     targetURL: () => localStorage.removeItem(TargetURLKey),
     all: () => {
       OIDCServiceStore.clear.targetURL();
+      OIDCServiceStore.clear.clientData();
     },
   },
 };

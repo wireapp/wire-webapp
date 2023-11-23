@@ -56,7 +56,7 @@ import {Conversation} from 'src/script/entity/Conversation';
 import {Message} from 'src/script/entity/message/Message';
 import {User} from 'src/script/entity/User';
 import {ConversationError} from 'src/script/error/ConversationError';
-import {ClientEvent} from 'src/script/event/Client';
+import {ClientEvent, CONVERSATION} from 'src/script/event/Client';
 import {EventRepository} from 'src/script/event/EventRepository';
 import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';
 import {StorageSchemata} from 'src/script/storage/StorageSchemata';
@@ -892,6 +892,48 @@ describe('ConversationRepository', () => {
 
       expect(loadedEvents.length).toBe(1);
       expect(loadedEvents[0].id).toBe(messageWithTime.id);
+    });
+  });
+
+  describe('clearConversation', () => {
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    beforeEach(() => {
+      jest.useFakeTimers();
+    });
+
+    it('clears all the messages from database and local state and re-applies creation message', async () => {
+      const conversationRepository = testFactory.conversation_repository!;
+      const messageRepository = testFactory.message_repository!;
+      const eventRepository = testFactory.event_repository!;
+
+      const conversationEntity = _generateConversation({type: CONVERSATION_TYPE.REGULAR});
+      const selfUser = generateUser();
+
+      conversationEntity.selfUser(selfUser);
+
+      jest.spyOn(eventRepository, 'injectEvent').mockImplementationOnce(jest.fn());
+      jest.spyOn(messageRepository, 'updateClearedTimestamp').mockImplementationOnce(jest.fn());
+      jest.spyOn(conversationEntity, 'removeMessages').mockImplementationOnce(jest.fn());
+      jest.spyOn(conversationRepository['eventService'], 'deleteEvents').mockImplementationOnce(jest.fn());
+
+      const mockedCurrentDate = new Date(1000);
+      jest.setSystemTime(mockedCurrentDate);
+      await conversationRepository.clearConversation(conversationEntity);
+
+      expect(messageRepository.updateClearedTimestamp).toHaveBeenCalledWith(conversationEntity);
+      expect(conversationEntity.removeMessages).toHaveBeenCalled();
+      expect(conversationRepository['eventService'].deleteEvents).toHaveBeenCalledWith(
+        conversationEntity.id,
+        mockedCurrentDate.toISOString(),
+      );
+
+      expect(eventRepository.injectEvent).toHaveBeenCalledWith(
+        expect.objectContaining({type: CONVERSATION.GROUP_CREATION, conversation: conversationEntity.id}),
+        undefined,
+      );
     });
   });
 

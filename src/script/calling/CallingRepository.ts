@@ -512,7 +512,6 @@ export class CallingRepository {
    */
   subscribeToEvents(): void {
     amplify.subscribe(WebAppEvents.CALL.EVENT_FROM_BACKEND, this.onCallEvent);
-    amplify.subscribe(WebAppEvents.CALL.STATE.TOGGLE, this.toggleState); // This event needs to be kept, it is sent by the wrapper
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_VBR_ENCODING, this.toggleCbrEncoding);
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, ({settings}: WebappProperties) => {
       this.toggleCbrEncoding(settings.call.enable_vbr_encoding);
@@ -682,19 +681,6 @@ export class CallingRepository {
   //##############################################################################
   // Call actions
   //##############################################################################
-
-  private readonly toggleState = (withVideo: boolean): void => {
-    const conversation = this.conversationState.activeConversation();
-    if (conversation) {
-      const isActiveCall = this.findCall(conversation.qualifiedId);
-      const callType = withVideo ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL;
-      return (
-        (isActiveCall
-          ? this.leaveCall(conversation.qualifiedId, LEAVE_CALL_REASON.ELECTRON_TRAY_MENU_MESSAGE)
-          : this.startCall(conversation, callType)) && undefined
-      );
-    }
-  };
 
   private getConversationType(conversation: Conversation): CONV_TYPE {
     if (!conversation.isGroup()) {
