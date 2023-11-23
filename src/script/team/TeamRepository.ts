@@ -135,6 +135,18 @@ export class TeamRepository extends TypedEventEmitter<Events> {
       team,
       contacts.filter(user => user.teamId === teamId).map(({id}) => id),
     );
+
+    // Subscribe to team members change and update the user role and guest status
+    this.teamState.teamMembers.subscribe(members => {
+      this.userRepository.mapGuestStatus(members);
+      const roles = this.teamState.memberRoles();
+      members.forEach(user => {
+        if (roles[user.id]) {
+          user.teamRole(roles[user.id]);
+        }
+      });
+    });
+
     this.scheduleTeamRefresh();
     return team;
   }
