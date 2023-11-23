@@ -56,7 +56,7 @@ export async function getDeviceIdentity(
   userId: QualifiedId,
   deviceId: string,
 ): Promise<WireIdentity | undefined> {
-  const identities = await getE2EIdentityService().getUserDeviceEntities(groupId, {[deviceId]: userId});
+  const identities = await getE2EIdentityService().getDevicesIdentities(groupId, {[deviceId]: userId});
   if (identities?.length && identities[0]) {
     return {
       ...identities[0],
@@ -66,7 +66,6 @@ export async function getDeviceIdentity(
   return undefined;
 }
 
-// TODO: replace implementation with CoreCrypto once it has user verification method
 export async function getUsersVerificationState(groupId: string, userIds: QualifiedId[]) {
   const userVerifications = await getE2EIdentityService().getUsersIdentities(groupId, userIds);
 
@@ -84,9 +83,10 @@ export async function getUsersVerificationState(groupId: string, userIds: Qualif
 
 export async function getUserVerificationState(groupId: string, userId: QualifiedId) {
   const usersVerifications = await getUsersVerificationState(groupId, [userId]);
-  return usersVerifications.get(userId.id)?.some(identity => identity.status !== MLSStatuses.VALID)
-    ? MLSStatuses.NOT_DOWNLOADED
-    : MLSStatuses.VALID;
+  const deviceIdentities = usersVerifications.get(userId.id);
+  return deviceIdentities?.length && deviceIdentities.every(identity => identity.status === MLSStatuses.VALID)
+    ? MLSStatuses.VALID
+    : MLSStatuses.NOT_DOWNLOADED;
 }
 
 export async function getConversationVerificationState(groupId: string) {
