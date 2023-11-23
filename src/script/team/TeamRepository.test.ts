@@ -17,6 +17,9 @@
  *
  */
 
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
+import {FeatureList, FeatureStatus} from '@wireapp/api-client/lib/team/feature/';
+
 import {randomUUID} from 'crypto';
 
 import {User} from 'src/script/entity/User';
@@ -92,6 +95,82 @@ describe('TeamRepository', () => {
       const accountInfo = await teamRepo.sendAccountInfo(true);
 
       expect(accountInfo.picture).toBeUndefined();
+    });
+  });
+
+  describe('getTeamSupportedProtocols', () => {
+    it('returns team supported protocols from mls feature config', async () => {
+      const [teamRepo, {teamState}] = buildConnectionRepository();
+
+      const mockedTeamProtocols = [ConversationProtocol.PROTEUS, ConversationProtocol.MLS];
+
+      const mockedFeatureList = {
+        mls: {config: {supportedProtocols: mockedTeamProtocols}, status: FeatureStatus.ENABLED},
+      } as FeatureList;
+
+      teamState.teamFeatures(mockedFeatureList);
+
+      const protocols = teamRepo.getTeamSupportedProtocols();
+
+      expect(protocols).toEqual(mockedTeamProtocols);
+    });
+
+    it('returns proteus if mls feature is disabled', async () => {
+      const [teamRepo, {teamState}] = buildConnectionRepository();
+
+      const mockedTeamProtocols = [ConversationProtocol.PROTEUS, ConversationProtocol.MLS];
+
+      const mockedFeatureList = {
+        mls: {config: {supportedProtocols: mockedTeamProtocols}, status: FeatureStatus.DISABLED},
+      } as FeatureList;
+
+      teamState.teamFeatures(mockedFeatureList);
+
+      const protocols = teamRepo.getTeamSupportedProtocols();
+
+      expect(protocols).toEqual([ConversationProtocol.PROTEUS]);
+    });
+
+    it('returns proteus if mls feature does not exist in team features', async () => {
+      const [teamRepo, {teamState}] = buildConnectionRepository();
+
+      const mockedFeatureList = {
+        mls: undefined,
+      } as FeatureList;
+
+      teamState.teamFeatures(mockedFeatureList);
+
+      const protocols = teamRepo.getTeamSupportedProtocols();
+
+      expect(protocols).toEqual([ConversationProtocol.PROTEUS]);
+    });
+
+    it('returns proteus if supported protocols field does not exist on mls feature', async () => {
+      const [teamRepo, {teamState}] = buildConnectionRepository();
+
+      const mockedFeatureList = {
+        mls: {config: {supportedProtocols: undefined}, status: FeatureStatus.ENABLED},
+      } as unknown as FeatureList;
+
+      teamState.teamFeatures(mockedFeatureList);
+
+      const protocols = teamRepo.getTeamSupportedProtocols();
+
+      expect(protocols).toEqual([ConversationProtocol.PROTEUS]);
+    });
+
+    it('returns proteus if supported protocols on mls feature config is an empty list', async () => {
+      const [teamRepo, {teamState}] = buildConnectionRepository();
+
+      const mockedFeatureList = {
+        mls: {config: {supportedProtocols: []}, status: FeatureStatus.ENABLED},
+      } as unknown as FeatureList;
+
+      teamState.teamFeatures(mockedFeatureList);
+
+      const protocols = teamRepo.getTeamSupportedProtocols();
+
+      expect(protocols).toEqual([ConversationProtocol.PROTEUS]);
     });
   });
 });

@@ -23,9 +23,13 @@ import type {Consent, Self} from '@wireapp/api-client/lib/self/';
 import type {UserUpdate} from '@wireapp/api-client/lib/user/';
 import {container} from 'tsyringe';
 
+import {getLogger} from 'Util/Logger';
+
 import {APIClient} from '../service/APIClientSingleton';
 
 export class SelfService {
+  private readonly logger = getLogger('ConversationService');
+
   constructor(private readonly apiClient = container.resolve(APIClient)) {}
 
   deleteSelf(password?: string): Promise<void> {
@@ -69,7 +73,12 @@ export class SelfService {
     return this.apiClient.api.self.putPhone({phone});
   }
 
-  putSupportedProtocols(supportedProtocols: ConversationProtocol[]): Promise<void> {
+  public async putSupportedProtocols(supportedProtocols: ConversationProtocol[]): Promise<void> {
+    if (!this.apiClient.backendFeatures.supportsMLS) {
+      this.logger.warn('Self supported protocols were not updated, because MLS is not supported by the backend');
+      return;
+    }
+
     return this.apiClient.api.self.putSupportedProtocols(supportedProtocols);
   }
 }

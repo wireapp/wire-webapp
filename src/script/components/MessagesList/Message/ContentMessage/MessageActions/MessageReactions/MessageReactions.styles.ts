@@ -57,6 +57,7 @@ export const messageReactionButton: CSSObject = {
   margin: '0.5rem 0rem',
   padding: '3px',
   verticalAlign: 'top',
+  userSelect: 'none',
 };
 
 export const messageReactionButtonTooltip: CSSObject = {display: 'flex', maxWidth: 130, whiteSpace: 'break-spaces'};

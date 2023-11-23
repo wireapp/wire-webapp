@@ -18,31 +18,28 @@
  */
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {constructFullyQualifiedClientId} from '@wireapp/core/lib/util/fullyQualifiedClientIdUtils';
-import {TaskScheduler} from '@wireapp/core/lib/util/TaskScheduler';
+import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import {AUDIO_STATE, CALL_TYPE, CONV_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
+import {CALL_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import {Availability} from '@wireapp/protocol-messaging';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ButtonGroupTab} from 'Components/calling/ButtonGroup';
 import 'Components/calling/ChooseScreen';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import type {AudioRepository} from '../audio/AudioRepository';
 import {AudioType} from '../audio/AudioType';
 import type {Call} from '../calling/Call';
-import {CallingRepository, QualifiedWcallMember} from '../calling/CallingRepository';
-import {callingSubscriptions} from '../calling/callingSubscriptionsHandler';
+import {CallingRepository} from '../calling/CallingRepository';
 import {CallState} from '../calling/CallState';
 import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
-import {isMLSConversation} from '../conversation/ConversationSelectors';
 import {ConversationState} from '../conversation/ConversationState';
 import type {Conversation} from '../entity/Conversation';
 import type {User} from '../entity/User';
@@ -53,7 +50,6 @@ import type {PermissionRepository} from '../permission/PermissionRepository';
 import {PermissionStatusState} from '../permission/PermissionStatusState';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
-import {Core} from '../service/CoreSingleton';
 import type {TeamRepository} from '../team/TeamRepository';
 import {TeamState} from '../team/TeamState';
 import {ROLE} from '../user/UserPermission';
@@ -87,7 +83,8 @@ declare global {
     setSinkId?: (sinkId: string) => Promise<void>;
   }
 }
-const maxGroupSize = 4;
+const MAX_USERS_TO_CALL_WITHOUT_CONFIRM = Config.getConfig().FEATURE.MAX_USERS_TO_PING_WITHOUT_ALERT;
+
 export class CallingViewModel {
   readonly activeCalls: ko.PureComputed<Call[]>;
   readonly callActions: CallActions;
@@ -106,7 +103,6 @@ export class CallingViewModel {
     private readonly conversationState = container.resolve(ConversationState),
     readonly callState = container.resolve(CallState),
     private readonly teamState = container.resolve(TeamState),
-    private readonly core = container.resolve(Core),
   ) {
     this.isSelfVerified = ko.pureComputed(() => selfUser().is_verified());
     this.activeCalls = ko.pureComputed(() =>
@@ -119,6 +115,23 @@ export class CallingViewModel {
         return call.reason() !== CALL_REASON.ANSWERED_ELSEWHERE;
       }),
     );
+
+    const toggleState = async (withVideo: boolean): Promise<void> => {
+      const conversation = this.conversationState.activeConversation();
+      if (conversation) {
+        const isActiveCall = this.callingRepository.findCall(conversation.qualifiedId);
+        const callType = withVideo ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL;
+
+        if (isActiveCall) {
+          this.callingRepository.leaveCall(conversation.qualifiedId, LEAVE_CALL_REASON.ELECTRON_TRAY_MENU_MESSAGE);
+          return;
+        }
+
+        await handleCallAction(conversation, callType);
+      }
+    };
+
+    amplify.subscribe(WebAppEvents.CALL.STATE.TOGGLE, toggleState); // This event needs to be kept, it is sent by the wrapper
 
     const ring = (call: Call): void => {
       const sounds: Partial<Record<CALL_STATE, AudioType>> = {
@@ -159,34 +172,7 @@ export class CallingViewModel {
         return;
       }
 
-      if (isMLSConversation(conversation)) {
-        const unsubscribe = await this.subconversationService.subscribeToEpochUpdates(
-          conversation.qualifiedId,
-          conversation.groupId,
-          (groupId: string) => this.conversationState.findConversationByGroupId(groupId)?.qualifiedId,
-          data => this.callingRepository.setEpochInfo(conversation.qualifiedId, data),
-        );
-
-        callingSubscriptions.addCall(call.conversationId, unsubscribe);
-      }
       ring(call);
-    };
-
-    const joinOngoingMlsConference = async (call: Call) => {
-      const conversation = this.getConversationById(call.conversationId);
-
-      if (!conversation || !isMLSConversation(conversation)) {
-        return;
-      }
-
-      const unsubscribe = await this.subconversationService.subscribeToEpochUpdates(
-        call.conversationId,
-        conversation.groupId,
-        (groupId: string) => this.conversationState.findConversationByGroupId(groupId)?.qualifiedId,
-        data => this.callingRepository.setEpochInfo(call.conversationId, data),
-      );
-
-      callingSubscriptions.addCall(call.conversationId, unsubscribe);
     };
 
     const answerCall = async (call: Call) => {
@@ -200,10 +186,6 @@ export class CallingViewModel {
       }
 
       await this.callingRepository.answerCall(call);
-
-      if (call.conversationType === CONV_TYPE.CONFERENCE_MLS) {
-        await joinOngoingMlsConference(call);
-      }
     };
 
     const hasSoundlessCallsEnabled = (): boolean => {
@@ -214,35 +196,6 @@ export class CallingViewModel {
       return !!this.callState.joinedCall();
     };
 
-    const updateEpochInfo = async (conversationId: QualifiedId, shouldAdvanceEpoch = false) => {
-      const conversation = this.getConversationById(conversationId);
-      if (!conversation || !isMLSConversation(conversation)) {
-        return;
-      }
-
-      const subconversationEpochInfo = await this.subconversationService.getSubconversationEpochInfo(
-        conversationId,
-        conversation.groupId,
-        shouldAdvanceEpoch,
-      );
-
-      if (!subconversationEpochInfo) {
-        return;
-      }
-
-      this.callingRepository.setEpochInfo(conversationId, subconversationEpochInfo);
-    };
-
-    const closeCall = async (conversationId: QualifiedId, conversationType: CONV_TYPE) => {
-      // There's nothing we need to do for non-mls calls
-      if (conversationType !== CONV_TYPE.CONFERENCE_MLS) {
-        return;
-      }
-
-      await this.subconversationService.leaveConferenceSubconversation(conversationId);
-      callingSubscriptions.removeCall(conversationId);
-    };
-
     this.callingRepository.onIncomingCall(async (call: Call) => {
       const shouldRing = this.selfUser().availability() !== Availability.Type.AWAY;
       if (shouldRing && (!hasSoundlessCallsEnabled() || !hasJoinedCall())) {
@@ -250,49 +203,9 @@ export class CallingViewModel {
       }
     });
 
-    const handleCallParticipantChange = (conversationId: QualifiedId, members: QualifiedWcallMember[]) => {
-      const conversation = this.getConversationById(conversationId);
-      if (conversation && isMLSConversation(conversation)) {
-        return;
-      }
-
-      for (const member of members) {
-        const isSelfClient = member.userId.id === this.core.userId && member.clientid === this.core.clientId;
-        //no need to set a timer for selfClient (it will most likely leave or get dropped from the call before the timer could expire)
-        if (isSelfClient) {
-          continue;
-        }
-
-        const {id: userId, domain} = member.userId;
-        const clientQualifiedId = constructFullyQualifiedClientId(userId, member.clientid, domain);
-
-        const key = `mls-call-client-${conversation.id}-${clientQualifiedId}`;
-
-        // audio state is established -> clear timer
-        if (member.aestab === AUDIO_STATE.ESTABLISHED) {
-          TaskScheduler.cancelTask(key);
-          continue;
-        }
-
-        // otherwise, remove the client from subconversation if it won't establish their audio state in 3 mins timeout
-        const firingDate = new Date().getTime() + TIME_IN_MILLIS.MINUTE * 3;
-
-        TaskScheduler.addTask({
-          firingDate,
-          key,
-          // if timer expires = client is stale -> remove client from the subconversation
-          task: () =>
-            this.subconversationService.removeClientFromConferenceSubconversation(conversationId, {
-              user: {id: member.userId.id, domain: member.userId.domain},
-              clientId: member.clientid,
-            }),
-        });
-      }
-    };
-
     const handleCallAction = async (conversationEntity: Conversation, callType: CALL_TYPE): Promise<void> => {
       const memberCount = conversationEntity.participating_user_ets().length;
-      if (memberCount > maxGroupSize) {
+      if (memberCount > MAX_USERS_TO_CALL_WITHOUT_CONFIRM) {
         PrimaryModal.show(PrimaryModal.type.WITHOUT_TITLE, {
           preventClose: true,
           primaryAction: {
@@ -313,15 +226,6 @@ export class CallingViewModel {
         await startCall(conversationEntity, callType);
       }
     };
-
-    //update epoch info when AVS requests new epoch
-    this.callingRepository.onRequestNewEpochCallback(conversationId => updateEpochInfo(conversationId, true));
-
-    //once the call gets closed (eg. we leave a call or get dropped), we remove ourselfes from subconversation and unsubscribe from all the call events
-    this.callingRepository.onCallClosed(closeCall);
-
-    //handle participant change avs callback to detect stale clients in subconversations
-    this.callingRepository.onCallParticipantChangedCallback(handleCallParticipantChange);
 
     this.callActions = {
       answer: async (call: Call) => {
@@ -412,15 +316,6 @@ export class CallingViewModel {
         });
       },
     };
-  }
-
-  get subconversationService() {
-    const subconversationService = this.core.service?.subconversation;
-    if (!subconversationService) {
-      throw new Error('SubconversationService was not initialised');
-    }
-
-    return subconversationService;
   }
 
   /**

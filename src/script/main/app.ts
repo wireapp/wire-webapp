@@ -252,6 +252,8 @@ export class App {
       serverTimeHandler,
     );
 
+    repositories.self = new SelfRepository(selfService, repositories.user, repositories.team, repositories.client);
+
     repositories.conversation = new ConversationRepository(
       this.service.conversation,
       repositories.message,
@@ -259,12 +261,11 @@ export class App {
       repositories.event,
       repositories.team,
       repositories.user,
+      repositories.self,
       repositories.properties,
       repositories.calling,
       serverTimeHandler,
     );
-
-    repositories.self = new SelfRepository(selfService, repositories.user, repositories.team, repositories.client);
 
     repositories.eventTracker = new EventTrackingRepository(repositories.message);
 
@@ -433,10 +434,6 @@ export class App {
         conversationRepository.initMLSConversationRecoveredListener();
       }
 
-      if (connections.length) {
-        await Promise.allSettled(conversationRepository.mapConnections(connections));
-      }
-
       onProgress(25, t('initReceivedUserData'));
       telemetry.addStatistic(AppInitStatisticsValue.CONVERSATIONS, conversations.length, 50);
       this._subscribeToUnloadEvents(selfUser);
@@ -453,6 +450,8 @@ export class App {
         totalNotifications = total;
         onProgress(25 + 50 * (done / total), `${baseMessage}${extraInfo}`);
       });
+
+      await conversationRepository.init1To1Conversations(connections, conversations);
 
       if (supportsMLS()) {
         // Once all the messages have been processed and the message sending queue freed we can now:
@@ -493,7 +492,7 @@ export class App {
         startNewVersionPolling(Environment.version(false), this.update);
       }
       audioRepository.init(true);
-      conversationRepository.cleanupConversations();
+      await conversationRepository.cleanupEphemeralMessages();
       callingRepository.setReady();
       telemetry.timeStep(AppInitTimingsStep.APP_LOADED);
 

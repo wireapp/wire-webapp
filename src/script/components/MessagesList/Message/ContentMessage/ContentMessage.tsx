@@ -140,6 +140,8 @@ export const ContentMessageComponent: React.FC<ContentMessageProps> = ({
     setActionMenuVisibility(isMessageFocused || msgFocusState);
   }, [msgFocusState, isMessageFocused]);
 
+  const isConversationReadonly = conversation.readOnlyState() !== null;
+
   return (
     <div
       aria-label={messageAriaLabel}
@@ -225,7 +227,7 @@ export const ContentMessageComponent: React.FC<ContentMessageProps> = ({
             />
           )}
         </div>
-        {isActionMenuVisible && (
+        {!isConversationReadonly && isActionMenuVisible && (
           <MessageActionsMenu
             isMsgWithHeader={shouldShowAvatar()}
             message={message}

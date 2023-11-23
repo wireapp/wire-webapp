@@ -30,6 +30,7 @@ import type {
 } from '@wireapp/api-client/lib/event';
 import {TEAM_EVENT} from '@wireapp/api-client/lib/event/TeamEvent';
 import {FeatureStatus, FeatureList} from '@wireapp/api-client/lib/team/feature/';
+import type {PermissionsData} from '@wireapp/api-client/lib/team/member/PermissionsData';
 import type {TeamData} from '@wireapp/api-client/lib/team/team/TeamData';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
@@ -101,30 +102,22 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     this.userRepository = userRepository;
 
     this.userRepository.getTeamMembersFromUsers = this.getTeamMembersFromUsers;
-    this.teamState.teamMembers.subscribe(() => this.userRepository.mapGuestStatus());
-
-    this.isSelfConnectedTo = userId => {
-      return (
-        this.teamState.memberRoles()[userId] !== ROLE.PARTNER ||
-        this.teamState.memberInviters()[userId] === this.userState.self().id
-      );
-    };
 
     amplify.subscribe(WebAppEvents.TEAM.EVENT_FROM_BACKEND, this.onTeamEvent);
     amplify.subscribe(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, this.updateTeamConfig);
     amplify.subscribe(WebAppEvents.TEAM.UPDATE_INFO, this.sendAccountInfo.bind(this));
   }
 
-  readonly getRoleBadge = (userId: string): string => {
+  getRoleBadge(userId: string): string {
     return this.teamState.isExternal(userId) ? t('rolePartner') : '';
-  };
+  }
 
-  readonly isSelfConnectedTo = (userId: string): boolean => {
+  isSelfConnectedTo(userId: string): boolean {
     return (
       this.teamState.memberRoles()[userId] !== ROLE.PARTNER ||
       this.teamState.memberInviters()[userId] === this.userState.self().id
     );
-  };
+  }
 
   /**
    * Will init the team configuration and all the team members from the contact list.
@@ -190,7 +183,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
 
   async getSelfMember(teamId: string): Promise<TeamMemberEntity> {
     const memberEntity = await this.getTeamMember(teamId, this.userState.self().id);
-    this.teamMapper.mapRole(this.userState.self(), memberEntity.permissions);
+    this.updateUserRole(this.userState.self(), memberEntity.permissions);
     return memberEntity;
   }
 
@@ -198,7 +191,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     return this.teamService.conversationHasGuestLink(conversationId);
   }
 
-  getTeamMembersFromUsers = async (users: User[]): Promise<void> => {
+  private getTeamMembersFromUsers = async (users: User[]): Promise<void> => {
     const selfTeamId = this.userState.self().teamId;
     if (!selfTeamId) {
       return;
@@ -334,26 +327,8 @@ export class TeamRepository extends TypedEventEmitter<Events> {
       this.teamState.memberRoles({});
       this.teamState.memberInviters({});
     }
-    const userEntities = await this.userRepository.getUsersById(
-      memberIds.map(memberId => ({domain: this.teamState.teamDomain(), id: memberId})),
-    );
 
-    if (append) {
-      const knownUserIds = teamEntity.members().map(({id}) => id);
-      const newUserEntities = userEntities.filter(({id}) => !knownUserIds.includes(id));
-      teamEntity.members.push(...newUserEntities);
-    } else {
-      teamEntity.members(userEntities);
-    }
-    this.updateMemberRoles(teamEntity, mappedMembers);
-  }
-
-  private addUserToTeam(userEntity: User): void {
-    const members = this.teamState.team().members;
-
-    if (!members().find(member => member.id === userEntity.id)) {
-      members.push(userEntity);
-    }
+    this.updateMemberRoles(mappedMembers);
   }
 
   private getTeamById(teamId: string): Promise<TeamData> {
@@ -377,7 +352,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     amplify.publish(WebAppEvents.CONVERSATION.DELETE, {domain: '', id: conversationId});
   }
 
-  private _onMemberJoin(eventJson: TeamMemberJoinEvent): void {
+  private async _onMemberJoin(eventJson: TeamMemberJoinEvent) {
     const {
       data: {user: userId},
       team: teamId,
@@ -386,10 +361,9 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     const isOtherUser = this.userState.self().id !== userId;
 
     if (isLocalTeam && isOtherUser) {
-      this.userRepository
-        .getUserById({domain: this.userState.self().domain, id: userId})
-        .then(userEntity => this.addUserToTeam(userEntity));
-      this.getTeamMember(teamId, userId).then(member => this.updateMemberRoles(this.teamState.team(), [member]));
+      await this.userRepository.getUserById({domain: this.userState.self().domain, id: userId});
+      const member = await this.getTeamMember(teamId, userId);
+      this.updateMemberRoles([member]);
     }
   }
 
@@ -429,7 +403,6 @@ export class TeamRepository extends TypedEventEmitter<Events> {
         return this.onDelete(eventJson);
       }
 
-      this.teamState.team().members.remove(member => member.id === userId);
       amplify.publish(WebAppEvents.TEAM.MEMBER_LEAVE, teamId, {domain: '', id: userId}, new Date(time).toISOString());
     }
   }
@@ -440,34 +413,36 @@ export class TeamRepository extends TypedEventEmitter<Events> {
       team: teamId,
     } = eventJson;
     const isLocalTeam = this.teamState.team().id === teamId;
+    if (!isLocalTeam) {
+      return;
+    }
+
     const isSelfUser = this.userState.self().id === userId;
 
-    if (isLocalTeam && isSelfUser) {
+    if (isSelfUser) {
       const memberEntity = permissions ? {permissions} : await this.getTeamMember(teamId, userId);
-      this.teamMapper.mapRole(this.userState.self(), memberEntity.permissions);
+      this.updateUserRole(this.userState.self(), memberEntity.permissions);
       await this.sendAccountInfo();
-    }
-    if (isLocalTeam && !isSelfUser) {
+    } else {
       const member = await this.getTeamMember(teamId, userId);
-      this.updateMemberRoles(this.teamState.team(), [member]);
+      this.updateMemberRoles([member]);
     }
   }
 
-  private updateMemberRoles(team: TeamEntity, members: TeamMemberEntity[] = []): void {
-    members.forEach(member => {
-      const user = team.members().find(({id}) => member.userId === id);
-      if (user) {
-        this.teamMapper.mapRole(user, member.permissions);
-      }
-    });
+  private updateUserRole(user: User, permissions: PermissionsData): void {
+    user.teamRole(roleFromTeamPermissions(permissions));
+  }
 
+  private updateMemberRoles(members: TeamMemberEntity[] = []): void {
     const memberRoles = members.reduce((accumulator, member) => {
       accumulator[member.userId] = member.permissions ? roleFromTeamPermissions(member.permissions) : ROLE.INVALID;
       return accumulator;
     }, this.teamState.memberRoles());
 
     const memberInvites = members.reduce((accumulator, member) => {
-      accumulator[member.userId] = member.invitedBy;
+      if (member.invitedBy) {
+        accumulator[member.userId] = member.invitedBy;
+      }
       return accumulator;
     }, this.teamState.memberInviters());
 
@@ -498,7 +473,13 @@ export class TeamRepository extends TypedEventEmitter<Events> {
       return [ConversationProtocol.PROTEUS];
     }
 
-    return mlsFeature.config.supportedProtocols || [ConversationProtocol.PROTEUS];
+    const teamSupportedProtocols = mlsFeature.config.supportedProtocols;
+
+    // For old teams (created on some older backend versions) supportedProtocols field might not exist or be empty,
+    // we fallback to proteus in this case.
+    return teamSupportedProtocols && teamSupportedProtocols.length > 0
+      ? teamSupportedProtocols
+      : [ConversationProtocol.PROTEUS];
   }
 
   public getTeamMLSMigrationStatus(): MLSMigrationStatus {

@@ -20,18 +20,31 @@
 import {OIDCService} from './OIDCService';
 import {OIDCServiceStore} from './OIDCServiceStorage';
 
+// MOCK: store targetURL and clientData in OIDCServiceStore
+// TODO: remove this once we have a proper OIDC service
+OIDCServiceStore.store.clientData({
+  id: 'wireapp',
+  secret: 'dUpVSGx2dVdFdGQ0dmsxWGhDalQ0SldU',
+});
+
 // lots of hardcoded values here, but this is just for testing until we have a proper OIDC service
 export const getOIDCServiceInstance = (): OIDCService => {
-  // if there is no targetURL, we cannot create an OIDCService
   const targetURL = OIDCServiceStore.get.targetURL();
+  const clientData = OIDCServiceStore.get.clientData();
+
+  // if there is no targetURL, we cannot create an OIDCService
   if (!targetURL) {
-    throw new Error('No targetURL found in OIDCServiceStore');
+    throw new Error('No target URL found in OIDCServiceStore');
   }
+  // if there is no clientData ID, we cannot create an OIDCService
+  if (!clientData || !clientData.id) {
+    throw new Error('No client data found in OIDCServiceStore');
+  }
+
   const oidcService = new OIDCService({
-    audience: '338888153072-ktbh66pv3mr0ua0dn64sphgimeo0p7ss.apps.googleusercontent.com',
-    authorityUrl: 'https://accounts.google.com' || targetURL,
-    redirectUri: 'https://local.elna.wire.link:8081/oidc',
-    clientSecret: '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',
+    oidcClient: clientData,
+    authorityUrl: targetURL,
+    redirectUri: `${location.origin}/oidc`,
   });
   return oidcService;
 };
