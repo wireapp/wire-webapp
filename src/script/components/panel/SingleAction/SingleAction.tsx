@@ -21,6 +21,8 @@ import {Button, ButtonVariant, FlexBox} from '@wireapp/react-ui-kit';
 
 import {t} from 'Util/LocalizerUtil';
 
+import {singleActionButtonStyle, singleActionSpacerStyle} from './SingleAction.styles';
+
 export interface MenuItem {
   click: () => void;
   icon: string;
@@ -35,14 +37,22 @@ export interface SingleActionProps {
 
 const SingleAction = ({item, onCancel}: SingleActionProps) => {
   return (
-    <FlexBox justify="space-evenly">
-      <Button variant={ButtonVariant.SECONDARY} onClick={onCancel} data-uie-name="do-close">
-        {t('modalConfirmSecondary')}
-      </Button>
-      <Button onClick={item.click} data-uie-name={item.identifier}>
-        {item.label}
-      </Button>
-    </FlexBox>
+    <>
+      <div css={singleActionSpacerStyle} />
+      <FlexBox justify="space-evenly" className="modal__buttons">
+        <Button
+          variant={ButtonVariant.SECONDARY}
+          onClick={onCancel}
+          data-uie-name="do-close"
+          css={singleActionButtonStyle}
+        >
+          {t('modalConfirmSecondary')}
+        </Button>
+        <Button onClick={item.click} data-uie-name={item.identifier} css={singleActionButtonStyle}>
+          {item.label}
+        </Button>
+      </FlexBox>
+    </>
   );
 };
 

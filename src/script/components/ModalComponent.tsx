@@ -71,8 +71,6 @@ const ModalContentStyles: CSSObject = {
   margin: 'auto',
   maxHeight: 615,
   overflow: 'hidden',
-  overflowY: 'auto',
-  padding: 16,
   position: 'relative',
   transform: 'scale(0.8)',
   transition: 'transform 0.35s cubic-bezier(0.165, 0.84, 0.44, 1)',

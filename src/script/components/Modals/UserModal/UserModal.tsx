@@ -25,6 +25,7 @@ import {container} from 'tsyringe';
 
 import {Link, LinkVariant} from '@wireapp/react-ui-kit';
 
+import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Icon} from 'Components/Icon';
 import {ModalComponent} from 'Components/ModalComponent';
 import {EnrichedFields} from 'Components/panel/EnrichedFields';
@@ -200,17 +201,12 @@ const UserModal: React.FC<UserModalProps> = ({
           />
         </div>
 
-        <div className={cx('modal__body user-modal__wrapper', {'user-modal__wrapper--max': !user && !userNotFound})}>
+        <FadingScrollbar
+          className={cx('modal__body user-modal__wrapper', {'user-modal__wrapper--max': !user && !userNotFound})}
+        >
           {user && (
             <>
-              <UserDetails
-                avatarStyles={{
-                  marginTop: 60,
-                }}
-                participant={user}
-                isSelfVerified={isSelfVerified}
-                classifiedDomains={classifiedDomains}
-              />
+              <UserDetails participant={user} isSelfVerified={isSelfVerified} classifiedDomains={classifiedDomains} />
 
               <EnrichedFields user={user} showDomain={isFederated} />
 
@@ -243,7 +239,7 @@ const UserModal: React.FC<UserModalProps> = ({
               </div>
             </>
           )}
-        </div>
+        </FadingScrollbar>
       </ModalComponent>
     </div>
   );

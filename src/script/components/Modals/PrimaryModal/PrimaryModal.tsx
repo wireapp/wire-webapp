@@ -193,7 +193,9 @@ export const PrimaryModalComponent: FC = () => {
               )}
             </div>
 
-            <FadingScrollbar className="modal__body">
+            <FadingScrollbar
+              className={cx('modal__body', {'modal__body--actions': primaryAction && !hasMultipleSecondary})}
+            >
               {(messageHtml || messageText) && (
                 <div className="modal__text" data-uie-name="status-modal-text">
                   {messageHtml && <p id="modal-description-html" dangerouslySetInnerHTML={{__html: messageHtml}} />}
