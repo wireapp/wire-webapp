@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [42.22.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.21.0...@wireapp/core@42.22.0) (2023-11-23)
+
+### Features
+
+* block 'default mls key packages' - upload for new devices when E2EI is enabled ([#5735](https://github.com/wireapp/wire-web-packages/issues/5735)) ([2374963](https://github.com/wireapp/wire-web-packages/commit/237496386e1ad2ebbed34bea0fb5bd7001139b5e))
+
 # [42.21.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.20.1...@wireapp/core@42.21.0) (2023-11-22)
 
 ### Features
