@@ -33,6 +33,7 @@ describe('E2EICertificateDetails', () => {
     domain: '',
     handle: '',
     thumbprint: '',
+    deviceId: '',
   });
 
   it('is e2ei identity not downloaded', async () => {

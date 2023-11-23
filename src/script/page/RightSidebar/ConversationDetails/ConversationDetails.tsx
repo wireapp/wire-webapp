@@ -31,6 +31,7 @@ import {ServiceDetails} from 'Components/panel/ServiceDetails';
 import {UserDetails} from 'Components/panel/UserDetails';
 import {ServiceList} from 'Components/ServiceList/ServiceList';
 import {UserSearchableList} from 'Components/UserSearchableList';
+import {UserVerificationBadges} from 'Components/VerificationBadge';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
@@ -65,7 +66,6 @@ const CONFIG = {
 
 interface ConversationDetailsProps {
   onClose?: () => void;
-  renderParticipantBadges?: (user: User) => React.ReactNode;
   togglePanel?: (panel: PanelState, entity: PanelEntity, addMode?: boolean, direction?: 'left' | 'right') => void;
   actionsViewModel: ActionsViewModel;
   activeConversation: Conversation;
@@ -83,7 +83,6 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
     {
       onClose = () => {},
       togglePanel = () => {},
-      renderParticipantBadges,
       actionsViewModel,
       activeConversation,
       conversationRepository,
@@ -268,6 +267,10 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       isTeam,
     );
 
+    const renderParticipantsBadges = (participant: User) => {
+      return <UserVerificationBadges user={participant} groupId={activeConversation?.groupId} />;
+    };
+
     useEffect(() => {
       conversationRepository.refreshUnavailableParticipants(activeConversation);
     }, [activeConversation, conversationRepository]);
@@ -306,7 +309,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
           {isSingleUserMode && !isServiceMode && firstParticipant && (
             <>
               <UserDetails
-                renderParticipantBadges={renderParticipantBadges}
+                renderParticipantBadges={renderParticipantsBadges}
                 participant={firstParticipant}
                 isVerified={isVerified}
                 badge={teamRepository.getRoleBadge(firstParticipant.id)}
@@ -357,7 +360,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
                 {isGroup && !!userParticipants.length && (
                   <>
                     <UserSearchableList
-                      renderParticipantBadges={renderParticipantBadges}
+                      renderParticipantBadges={renderParticipantsBadges}
                       dataUieName="list-users"
                       users={userParticipants}
                       onClick={showUser}

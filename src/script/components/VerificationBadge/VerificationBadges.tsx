@@ -93,20 +93,12 @@ export const UserVerificationBadges = ({user, groupId}: {user: User; groupId?: s
 
 export const DeviceVerificationBadges = ({
   device,
-  getDeviceIdentity,
+  getIdentity,
 }: {
   device: ClientEntity;
-  getDeviceIdentity?: (deviceId: string) => Promise<WireIdentity | undefined>;
+  getIdentity?: (deviceId: string) => WireIdentity | undefined;
 }) => {
-  const [MLSStatus, setMLSStatus] = useState<MLSStatuses | undefined>(undefined);
-  useEffect(() => {
-    if (getDeviceIdentity) {
-      void (async () => {
-        const identity = await getDeviceIdentity(device.id);
-        setMLSStatus(identity?.status ?? MLSStatuses.NOT_DOWNLOADED);
-      })();
-    }
-  }, []);
+  const MLSStatus = getIdentity ? getIdentity(device.id)?.status ?? MLSStatuses.NOT_DOWNLOADED : undefined;
 
   return <VerificationBadges isProteusVerified={!!device.meta?.isVerified?.()} MLSStatus={MLSStatus} />;
 };

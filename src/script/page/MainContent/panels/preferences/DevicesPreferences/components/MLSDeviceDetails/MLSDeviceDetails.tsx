@@ -17,8 +17,6 @@
  *
  */
 
-import {useEffect, useState} from 'react';
-
 import {WireIdentity} from 'src/script/E2EIdentity';
 import {t} from 'Util/LocalizerUtil';
 import {splitFingerprint} from 'Util/StringUtil';
@@ -31,15 +29,10 @@ import {FormattedId} from '../FormattedId';
 
 interface MLSDeviceDetailsProps {
   isCurrentDevice?: boolean;
-  getDeviceIdentity: () => Promise<WireIdentity | undefined>;
+  identity: WireIdentity | undefined;
 }
 
-export const MLSDeviceDetails = ({isCurrentDevice, getDeviceIdentity}: MLSDeviceDetailsProps) => {
-  const [identity, setIdentity] = useState<WireIdentity | undefined>();
-  useEffect(() => {
-    getDeviceIdentity?.().then(setIdentity);
-  }, []);
-
+export const MLSDeviceDetails = ({isCurrentDevice, identity}: MLSDeviceDetailsProps) => {
   return (
     <div css={styles.wrapper}>
       <h4 className="paragraph-body-3">{t('mlsSignature', MLSPublicKeys.ED25519.toUpperCase())}</h4>

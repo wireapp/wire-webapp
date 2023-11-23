@@ -30,7 +30,7 @@ export interface DeviceProps {
   device: ClientEntity;
   fingerprint: string;
   isCurrentDevice?: boolean;
-  getDeviceIdentity?: (deviceId: string) => Promise<WireIdentity | undefined>;
+  getDeviceIdentity?: (deviceId: string) => WireIdentity | undefined;
   isProteusVerified?: boolean;
 }
 
@@ -45,11 +45,11 @@ export const DetailedDevice: React.FC<DeviceProps> = ({
     <>
       <h3 className="preferences-devices-model preferences-devices-model-name" data-uie-name="device-model">
         <span>{device.model}</span>
-        <DeviceVerificationBadges device={device} getDeviceIdentity={getDeviceIdentity} />
+        <DeviceVerificationBadges device={device} getIdentity={getDeviceIdentity} />
       </h3>
 
       {getDeviceIdentity && (
-        <MLSDeviceDetails isCurrentDevice={isCurrentDevice} getDeviceIdentity={() => getDeviceIdentity(device.id)} />
+        <MLSDeviceDetails isCurrentDevice={isCurrentDevice} identity={getDeviceIdentity(device.id)} />
       )}
 
       <ProteusDeviceDetails device={device} fingerprint={fingerprint} isProteusVerified={isProteusVerified} />

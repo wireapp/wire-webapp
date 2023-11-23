@@ -18,7 +18,7 @@
  */
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {WireIdentity as CoreWireIdentity} from '@wireapp/core/lib/messagingProtocols/mls';
+import {DeviceIdentity} from '@wireapp/core/lib/messagingProtocols/mls';
 import {container} from 'tsyringe';
 
 import {Core} from 'src/script/service/CoreSingleton';
@@ -35,7 +35,7 @@ export enum MLSStatuses {
   EXPIRES_SOON = 'expires_soon',
 }
 
-export type WireIdentity = Omit<CoreWireIdentity, 'status' | 'free'> & {
+export type WireIdentity = Omit<DeviceIdentity, 'status'> & {
   status: MLSStatuses;
 };
 

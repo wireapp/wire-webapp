@@ -33,7 +33,7 @@ import {DetailedDevice} from '../DetailedDevice';
 interface DevicesPreferencesProps {
   device: ClientEntity;
   getFingerprint: (device: ClientEntity) => Promise<string | undefined>;
-  getDeviceIdentity?: (deviceId: string) => Promise<WireIdentity | undefined>;
+  getDeviceIdentity?: (deviceId: string) => WireIdentity | undefined;
   onClose: () => void;
   onRemove: (device: ClientEntity) => void;
   onResetSession: (device: ClientEntity) => Promise<void>;

@@ -20,7 +20,6 @@
 import React, {useEffect, useMemo, useState} from 'react';
 
 import {ClientClassification} from '@wireapp/api-client/lib/client/';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -31,12 +30,13 @@ import {DeviceDetails} from './userDevices/DeviceDetails';
 import {DeviceList} from './userDevices/DeviceList';
 import {NoDevicesFound} from './userDevices/NoDevicesFound';
 import {SelfFingerprint} from './userDevices/SelfFingerprint';
+import {DeviceVerificationBadges} from './VerificationBadge';
 
 import {ClientRepository, ClientEntity} from '../client';
-import {ConversationState} from '../conversation/ConversationState';
 import {MessageRepository} from '../conversation/MessageRepository';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {User} from '../entity/User';
+import {useDeviceIdentities} from '../hooks/useDeviceIdentities';
 
 enum FIND_MODE {
   FOUND = 'UserDevices.MODE.FOUND',
@@ -81,14 +81,13 @@ const sortUserDevices = (devices: ClientEntity[]): ClientEntity[] => {
 
 interface UserDevicesProps {
   clientRepository: ClientRepository;
-  conversationState?: ConversationState;
   cryptographyRepository: CryptographyRepository;
   current: UserDevicesHistoryEntry;
   goTo: (state: UserDevicesState, headline: string) => void;
-  renderDeviceBadges?: (device: ClientEntity, userId: QualifiedId) => React.ReactNode;
   messageRepository: MessageRepository;
   noPadding?: boolean;
   user: User;
+  groupId?: string;
 }
 
 const UserDevices: React.FC<UserDevicesProps> = ({
@@ -99,12 +98,17 @@ const UserDevices: React.FC<UserDevicesProps> = ({
   goTo,
   messageRepository,
   cryptographyRepository,
-  renderDeviceBadges,
+  groupId,
 }) => {
   const [selectedClient, setSelectedClient] = useState<ClientEntity>();
+  const {getDeviceIdentity} = useDeviceIdentities(user.qualifiedId, groupId);
   const [deviceMode, setDeviceMode] = useState(FIND_MODE.REQUESTING);
   const [clients, setClients] = useState<ClientEntity[]>([]);
   const logger = useMemo(() => getLogger('UserDevicesComponent'), []);
+
+  const renderDeviceBadges = (device: ClientEntity) => {
+    return <DeviceVerificationBadges device={device} getIdentity={getDeviceIdentity} />;
+  };
 
   useEffect(() => {
     (async () => {
@@ -125,7 +129,7 @@ const UserDevices: React.FC<UserDevicesProps> = ({
   }, [user]);
 
   const renderBadges = (device: ClientEntity) => {
-    return renderDeviceBadges?.(device, user.qualifiedId);
+    return renderDeviceBadges?.(device);
   };
 
   const clickOnDevice = (clientEntity: ClientEntity) => {

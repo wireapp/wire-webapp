@@ -35,7 +35,7 @@ import {FormattedId} from '../FormattedId';
 interface DeviceProps {
   device: ClientEntity;
   isSSO: boolean;
-  getDeviceIdentity?: (deviceId: string) => Promise<WireIdentity | undefined>;
+  getDeviceIdentity?: (deviceId: string) => WireIdentity | undefined;
   onRemove: (device: ClientEntity) => void;
   onSelect: (device: ClientEntity, currentDeviceIdentity?: WireIdentity) => void;
   deviceNumber: number;
@@ -74,7 +74,7 @@ export const Device = ({device, isSSO, onSelect, onRemove, getDeviceIdentity, de
           aria-label={deviceAriaLabel}
         >
           {device.getName()}
-          <DeviceVerificationBadges device={device} getDeviceIdentity={getDeviceIdentity} />
+          <DeviceVerificationBadges device={device} getIdentity={getDeviceIdentity} />
         </div>
 
         {mlsFingerprint && (
