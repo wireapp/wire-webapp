@@ -9155,12 +9155,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"emoji-picker-react@npm:4.5.15":
-  version: 4.5.15
-  resolution: "emoji-picker-react@npm:4.5.15"
+"emoji-picker-react@npm:4.5.16":
+  version: 4.5.16
+  resolution: "emoji-picker-react@npm:4.5.16"
   peerDependencies:
     react: ">=16"
-  checksum: 7893a9e3755bd07e1f2a7b57233294bb09f95c001452403d8fe261a3439686cbeafbaafaff4add08a3a7c5febc622a3799524b33652ce7ee4cf191343c384405
+  checksum: 4c685b0984d88075e3ef9fcf9f7e29de5a294783b5714ba1b6deaa37c7dc80e75a5d921b0c2811336c4a80f3e35d73f0da88e7f5e100d1e7a361e1dda7819818
   languageName: node
   linkType: hard
 
@@ -19380,7 +19380,7 @@ __metadata:
     dexie-batch: 0.4.3
     dotenv: 16.3.1
     dpdm: 3.14.0
-    emoji-picker-react: 4.5.15
+    emoji-picker-react: 4.5.16
     eslint: ^8.54.0
     eslint-plugin-prettier: ^5.0.1
     fake-indexeddb: 4.0.2
