@@ -5689,12 +5689,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/sinon@npm:17.0.1":
-  version: 17.0.1
-  resolution: "@types/sinon@npm:17.0.1"
+"@types/sinon@npm:17.0.2":
+  version: 17.0.2
+  resolution: "@types/sinon@npm:17.0.2"
   dependencies:
     "@types/sinonjs__fake-timers": "*"
-  checksum: 5975ada3729c6153cd474ac519ee021e8213861851db837ed40e04a99d729f61f914a6782563b09a24ff80508c7b695fe66c95a325914da3c06b83104a7bb007
+  checksum: 3a56615f2dc7d0b67d3e4b8ae358df2ff2164d89fabb22e9b46e6afe7d4df844a354ea65d409af9baf29ac0103ea562ab44dd0176405a9cf82a4ff183939f22f
   languageName: node
   linkType: hard
 
@@ -19364,7 +19364,7 @@ __metadata:
     "@types/react-transition-group": 4.4.9
     "@types/redux-mock-store": 1.0.6
     "@types/seedrandom": ^3
-    "@types/sinon": 17.0.1
+    "@types/sinon": 17.0.2
     "@types/speakingurl": 13.0.6
     "@types/underscore": 1.11.14
     "@types/webpack-env": 1.18.4
