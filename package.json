@@ -11,7 +11,6 @@
     "@wireapp/core": "42.21.0",
     "@wireapp/react-ui-kit": "9.11.0",
     "@wireapp/store-engine-dexie": "2.1.6",
-    "@wireapp/store-engine-sqleet": "1.8.9",
     "@wireapp/webapp-events": "0.18.3",
     "amplify": "https://github.com/wireapp/amplify#head=master",
     "beautiful-react-hooks": "^5.0.1",
