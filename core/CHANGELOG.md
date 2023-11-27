@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [42.23.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.23.0...@wireapp/core@42.23.1) (2023-11-27)
+
+### Bug Fixes
+
+* Keep local instance of the registered client ([#5755](https://github.com/wireapp/wire-web-packages/issues/5755)) ([ac7c369](https://github.com/wireapp/wire-web-packages/commit/ac7c3694686e25b59f8fc84442c114c713f44e87))
+
 # [42.23.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.22.1...@wireapp/core@42.23.0) (2023-11-27)
 
 ### Features
