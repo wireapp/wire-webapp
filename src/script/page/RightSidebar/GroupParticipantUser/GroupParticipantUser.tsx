@@ -31,6 +31,7 @@ import {EnrichedFields} from 'Components/panel/EnrichedFields';
 import {UserActions, Actions} from 'Components/panel/UserActions';
 import {UserDetails} from 'Components/panel/UserDetails';
 import {BaseToggle} from 'Components/toggle/BaseToggle';
+import {UserVerificationBadges} from 'Components/VerificationBadge';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -51,7 +52,6 @@ interface GroupParticipantUserProps {
   onClose: () => void;
   showDevices: (entity: User) => void;
   goToRoot: () => void;
-  renderParticipantBadges?: (user: User) => React.ReactNode;
   currentUser: User;
   actionsViewModel: ActionsViewModel;
   activeConversation: Conversation;
@@ -67,7 +67,6 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
   onClose,
   goToRoot,
   showDevices,
-  renderParticipantBadges,
   currentUser,
   actionsViewModel,
   activeConversation,
@@ -136,6 +135,10 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
       currentUser.checkGuestExpiration();
     }
   }, [isTemporaryGuest, currentUser]);
+
+  const renderParticipantBadges = (participant: User) => {
+    return <UserVerificationBadges user={participant} groupId={activeConversation?.groupId} />;
+  };
 
   return (
     <div id="group-participant-user" className="panel__page group-participant">

@@ -20,8 +20,9 @@
 import {render} from '@testing-library/react';
 
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {MLSStatuses} from 'src/script/E2EIdentity';
 
-import {VerificationBadges, MLSStatuses} from './VerificationBadges';
+import {VerificationBadges} from './VerificationBadges';
 
 describe('VerificationBadges', () => {
   it('is mls verified', async () => {

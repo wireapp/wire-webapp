@@ -22,7 +22,7 @@ import React, {useEffect, useState} from 'react';
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {ClientEntity} from 'src/script/client/ClientEntity';
-import {TMP_DecoratedWireIdentity} from 'src/script/E2EIdentity';
+import {WireIdentity} from 'src/script/E2EIdentity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -33,7 +33,7 @@ import {DetailedDevice} from '../DetailedDevice';
 interface DevicesPreferencesProps {
   device: ClientEntity;
   getFingerprint: (device: ClientEntity) => Promise<string | undefined>;
-  getDeviceIdentity?: (deviceId: string) => Promise<TMP_DecoratedWireIdentity | undefined>;
+  getDeviceIdentity?: (deviceId: string) => WireIdentity | undefined;
   onClose: () => void;
   onRemove: (device: ClientEntity) => void;
   onResetSession: (device: ClientEntity) => Promise<void>;
