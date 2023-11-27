@@ -25,15 +25,19 @@ import {TypedEventEmitter} from '@wireapp/commons';
 import {PrimaryModal, removeCurrentModal} from 'Components/Modals/PrimaryModal';
 import {Core} from 'src/script/service/CoreSingleton';
 import {UserState} from 'src/script/user/UserState';
+import {getCertificateDetails} from 'Util/certificateDetails';
 import {getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {removeUrlParameters} from 'Util/UrlUtil';
+import {supportsMLS} from 'Util/util';
 
 import {DelayTimerService} from './DelayTimer/DelayTimer';
 import {hasActiveCertificate, isE2EIEnabled} from './E2EIdentityVerification';
 import {getModalOptions, ModalType} from './Modals';
 import {getOIDCServiceInstance} from './OIDCService';
 import {OIDCServiceStore} from './OIDCService/OIDCServiceStorage';
+
+import {Config} from '../Config';
 
 export enum E2EIHandlerStep {
   UNINITIALIZED = 'uninitialized',
@@ -182,6 +186,10 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     return renewalDate;
   }
 
+  get isE2EIEnabled(): boolean {
+    return supportsMLS() && Config.getConfig().FEATURE.ENABLE_E2EI;
+  }
+
   private async storeRedirectTargetAndRedirect(targetURL: string): Promise<void> {
     // store the target url in the persistent oidc service store, since the oidc service will be destroyed after the redirect
     OIDCServiceStore.store.targetURL(targetURL);
@@ -250,6 +258,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
         refreshActiveCertificate,
       });
 
+      //console.log('data-oAuthIdToken', data, oAuthIdToken);
       // If the data is false or we dont get the ACMEChallenge, enrolment failed
       if (!data) {
         throw new Error('E2EI enrolment failed');

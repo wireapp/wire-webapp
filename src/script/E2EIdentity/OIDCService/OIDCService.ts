@@ -20,6 +20,7 @@
 import {UserManager, User, UserManagerSettings, WebStorageStateStore} from 'oidc-client-ts';
 
 import {clearKeysStartingWith} from 'Util/localStorage';
+import {Logger, getLogger} from 'Util/Logger';
 
 import {OidcClientData} from './OIDCService.types';
 
@@ -30,7 +31,8 @@ interface OIDCServiceConfig {
 }
 
 export class OIDCService {
-  private userManager: UserManager;
+  private readonly userManager: UserManager;
+  private readonly logger: Logger;
 
   constructor(config: OIDCServiceConfig) {
     const {
@@ -54,6 +56,7 @@ export class OIDCService {
     };
 
     this.userManager = new UserManager(dexioConfig);
+    this.logger = getLogger('OIDC Service');
   }
 
   public async authenticate(): Promise<void> {
@@ -75,5 +78,16 @@ export class OIDCService {
     clearKeysStartingWith('oidc.', localStorage);
     clearKeysStartingWith('oidc.user:', localStorage);
     return this.userManager.clearStaleState();
+  }
+
+  public handleSilentAuthentication(): Promise<User | null> {
+    try {
+      return this.userManager.signinSilent().then(user => {
+        return user;
+      });
+    } catch (error) {
+      this.logger.log('Silent authentication with refresh token failed', error);
+      return Promise.resolve(null);
+    }
   }
 }
