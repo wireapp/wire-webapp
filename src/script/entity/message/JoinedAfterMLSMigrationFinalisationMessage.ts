@@ -26,7 +26,7 @@ import {SystemMessage} from './SystemMessage';
 export class JoinedAfterMLSMigrationFinalisationMessage extends SystemMessage {
   constructor() {
     super();
-    this.system_message_type = SystemMessageType.JOINED_AFTER_MLS_MIGRATION_FINALISATION;
+    this.system_message_type = SystemMessageType.JOINED_AFTER_MLS_MIGRATION;
     this.caption = t(
       'conversationJoinedAfterMLSMigrationFinalisation',
       {},

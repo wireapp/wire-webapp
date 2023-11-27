@@ -1011,7 +1011,7 @@ export class ConversationRepository {
   /**
    * Get all the group conversations owned by self user's team from the local state.
    */
-  public readonly getAllSelfTeamOwnedGroupConversations = (): Conversation[] => {
+  public readonly getAllTeamGroupConversations = (): Conversation[] => {
     const selfUser = this.userState.self();
     if (!selfUser) {
       this.logger.error('Failed to get self user');
@@ -1401,7 +1401,7 @@ export class ConversationRepository {
    * Proteus 1:1 conversation will be hidden in the UI and replaced with mls 1:1 conversation.
    *
    * @param proteusConversation - proteus 1:1 conversation
-   * @param mlsConversation - mls 1:1 conversation``
+   * @param mlsConversation - mls 1:1 conversation
    * @returns {shouldOpenMLS1to1Conversation} - whether proteus 1:1 was active conversation and mls 1:1 conversation should be opened in the UI
    */
   private readonly replaceProteus1to1WithMLS = async (
@@ -2967,8 +2967,8 @@ export class ConversationRepository {
       case ClientEvent.CONVERSATION.LEGAL_HOLD_UPDATE:
       case ClientEvent.CONVERSATION.LOCATION:
       case ClientEvent.CONVERSATION.MISSED_MESSAGES:
-      case ClientEvent.CONVERSATION.JOINED_AFTER_MLS_MIGRATION_FINALISATION:
-      case ClientEvent.CONVERSATION.MLS_MIGRATION_FINALISATION_ONGOING_CALL:
+      case ClientEvent.CONVERSATION.JOINED_AFTER_MLS_MIGRATION:
+      case ClientEvent.CONVERSATION.MLS_MIGRATION_ONGOING_CALL:
       case ClientEvent.CONVERSATION.MLS_CONVERSATION_RECOVERED:
       case ClientEvent.CONVERSATION.UNABLE_TO_DECRYPT:
       case ClientEvent.CONVERSATION.VERIFICATION:

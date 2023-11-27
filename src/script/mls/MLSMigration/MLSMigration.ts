@@ -40,7 +40,7 @@ const MIGRATION_TASK_KEY = 'mls-migration';
 
 interface MLSMigrationConversationHandler {
   getAllGroupConversations: () => Conversation[];
-  getAllSelfTeamOwnedGroupConversations: () => Conversation[];
+  getAllTeamGroupConversations: () => Conversation[];
   updateConversationProtocol: (
     conversation: Conversation,
     protocol: ConversationProtocol.MLS | ConversationProtocol.MIXED,
@@ -165,7 +165,7 @@ const migrateConversationsToMLS = async ({
   //refetch all known users so we have the latest lists of the protocols they support
   await refreshAllKnownUsers();
 
-  const selfTeamGroupConversations = conversationHandler.getAllSelfTeamOwnedGroupConversations();
+  const selfTeamGroupConversations = conversationHandler.getAllTeamGroupConversations();
 
   await initialiseMigrationOfProteusConversations(selfTeamGroupConversations, selfUserId, conversationHandler);
 

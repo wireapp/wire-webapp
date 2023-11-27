@@ -334,12 +334,12 @@ export class EventMapper {
         break;
       }
 
-      case ClientEvent.CONVERSATION.JOINED_AFTER_MLS_MIGRATION_FINALISATION: {
+      case ClientEvent.CONVERSATION.JOINED_AFTER_MLS_MIGRATION: {
         messageEntity = this._mapEventJoinedAfterMLSMigrationFinalisation();
         break;
       }
 
-      case ClientEvent.CONVERSATION.MLS_MIGRATION_FINALISATION_ONGOING_CALL: {
+      case ClientEvent.CONVERSATION.MLS_MIGRATION_ONGOING_CALL: {
         messageEntity = this._mapEventMLSMigrationFinalisationOngoingCall();
         break;
       }

@@ -2210,7 +2210,7 @@ describe('ConversationRepository', () => {
 
         expect(injectEventMock.mock.calls).toEqual([
           [mockedProtocolUpdateEventResponse, EventRepository.SOURCE.BACKEND_RESPONSE],
-          [expect.objectContaining({type: ClientEvent.CONVERSATION.MLS_MIGRATION_FINALISATION_ONGOING_CALL})],
+          [expect.objectContaining({type: ClientEvent.CONVERSATION.MLS_MIGRATION_ONGOING_CALL})],
         ]);
       });
 
