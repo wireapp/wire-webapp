@@ -26,25 +26,15 @@ import {Ciphersuite, CoreCrypto, E2eiConversationState, WireIdentity} from '@wir
 import {getE2EIClientId, uuidTobase64url} from './Helper';
 import {E2EIStorage} from './Storage/E2EIStorage';
 
+import {parseFullQualifiedClientId} from '../../../util/fullyQualifiedClientIdUtils';
+
+export type DeviceIdentity = Omit<WireIdentity, 'free'> & {deviceId: string};
+
 // This export is meant to be accessible from the outside (e.g the Webapp / UI)
 export class E2EIServiceExternal {
-  private static instance: E2EIServiceExternal;
   private readonly logger = logdown('@wireapp/core/E2EIdentityServiceExternal');
-  private readonly coreCryptoClient: CoreCrypto;
 
-  private constructor(coreCryptClient: CoreCrypto) {
-    this.coreCryptoClient = coreCryptClient;
-  }
-
-  public static async getInstance(coreCryptoClient: CoreCrypto): Promise<E2EIServiceExternal> {
-    if (!E2EIServiceExternal.instance) {
-      if (!coreCryptoClient) {
-        throw new Error('E2EIServiceExternal is not initialized. Please call getInstance with params.');
-      }
-      E2EIServiceExternal.instance = new E2EIServiceExternal(coreCryptoClient);
-    }
-    return E2EIServiceExternal.instance;
-  }
+  public constructor(private coreCryptoClient: CoreCrypto) {}
 
   // Checks if there is a certificate stored in the local storage
   public hasActiveCertificate(): boolean {
@@ -78,21 +68,49 @@ export class E2EIServiceExternal {
     return this.coreCryptoClient.e2eiIsEnabled(ciphersuite);
   }
 
-  public async getUsersIdentities(groupId: string, userIds: QualifiedId[]) {
-    return this.coreCryptoClient.getUserIdentities(
+  public async getUsersIdentities(groupId: string, userIds: QualifiedId[]): Promise<Map<string, DeviceIdentity[]>> {
+    // We keep track of the ID we give to CoreCrypto in order to map it back to regular userIds afterwards
+    const hashedIdMap = new Map(userIds.map(userId => [uuidTobase64url(userId.id).asString, userId]));
+
+    const userIdentities = await this.coreCryptoClient.getUserIdentities(
       Decoder.fromBase64(groupId).asBytes,
-      userIds.map(userId => uuidTobase64url(userId.id).asString),
+      Array.from(hashedIdMap.keys()),
     );
+
+    const mappedUserIdentities = new Map();
+    for (const [base64Id, identities] of userIdentities) {
+      // remapping coreCrypto user ids to regular userIds
+      const userId = hashedIdMap.get(base64Id);
+      if (userId) {
+        mappedUserIdentities.set(
+          userId.id,
+          identities.map(identity => ({
+            ...identity,
+            deviceId: parseFullQualifiedClientId((identity as any).client_id).client,
+          })),
+        );
+      }
+    }
+
+    return mappedUserIdentities;
   }
 
   // Returns devices e2ei certificates
-  public async getUserDeviceEntities(
+  public async getDevicesIdentities(
     groupId: string,
     userClientsMap: Record<string, QualifiedId>,
-  ): Promise<WireIdentity[]> {
+  ): Promise<DeviceIdentity[]> {
     const clientIds = Object.entries(userClientsMap).map(
       ([clientId, userId]) => getE2EIClientId(clientId, userId.id, userId.domain).asBytes,
     );
-    return this.coreCryptoClient.getDeviceIdentities(Decoder.fromBase64(groupId).asBytes, clientIds);
+    const deviceIdentities = await this.coreCryptoClient.getDeviceIdentities(
+      Decoder.fromBase64(groupId).asBytes,
+      clientIds,
+    );
+
+    return deviceIdentities.map(identity => ({
+      ...identity,
+      deviceId: parseFullQualifiedClientId((identity as any).client_id).client,
+    }));
   }
 }
