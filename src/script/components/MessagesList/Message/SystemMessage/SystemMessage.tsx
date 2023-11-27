@@ -20,13 +20,18 @@
 import React from 'react';
 
 import {Icon} from 'Components/Icon';
+import {JoinedAfterMLSMigrationFinalisationMessage} from 'src/script/entity/message/JoinedAfterMLSMigrationFinalisationMessage';
 import {MessageTimerUpdateMessage} from 'src/script/entity/message/MessageTimerUpdateMessage';
 import {MLSConversationRecoveredMessage} from 'src/script/entity/message/MLSConversationRecoveredMessage';
+import {MLSMigrationFinalisationOngoingCallMessage} from 'src/script/entity/message/MLSMigrationFinalisationOngoingCallMessage';
+import {ProtocolUpdateMessage} from 'src/script/entity/message/ProtocolUpdateMessage';
 import {ReceiptModeUpdateMessage} from 'src/script/entity/message/ReceiptModeUpdateMessage';
 import {RenameMessage} from 'src/script/entity/message/RenameMessage';
 import {SystemMessage as SystemMessageEntity} from 'src/script/entity/message/SystemMessage';
 
 import {SystemMessageBase} from './SystemMessageBase';
+
+import {ProtocolUpdateMessage as ProtocolUpdateMessageComponent} from '../ProtocolUpdateMessage';
 
 export interface SystemMessageProps {
   message: SystemMessageEntity;
@@ -51,6 +56,18 @@ export const SystemMessage: React.FC<SystemMessageProps> = ({message}) => {
   }
 
   if (message instanceof MLSConversationRecoveredMessage) {
+    return <SystemMessageBase message={message} icon={<Icon.Info />} />;
+  }
+
+  if (message instanceof ProtocolUpdateMessage) {
+    return <ProtocolUpdateMessageComponent message={message} />;
+  }
+
+  if (message instanceof JoinedAfterMLSMigrationFinalisationMessage) {
+    return <SystemMessageBase message={message} icon={<Icon.Info />} />;
+  }
+
+  if (message instanceof MLSMigrationFinalisationOngoingCallMessage) {
     return <SystemMessageBase message={message} icon={<Icon.Info />} />;
   }
 

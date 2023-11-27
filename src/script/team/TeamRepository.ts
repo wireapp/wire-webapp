@@ -504,9 +504,9 @@ export class TeamRepository extends TypedEventEmitter<Events> {
       : [ConversationProtocol.PROTEUS];
   }
 
-  public getTeamMLSMigrationStatus(): MLSMigrationStatus {
+  public readonly getTeamMLSMigrationStatus = (): MLSMigrationStatus => {
     const mlsMigrationFeature = this.teamState.teamFeatures()?.mlsMigration;
 
     return getMLSMigrationStatus(mlsMigrationFeature);
-  }
+  };
 }

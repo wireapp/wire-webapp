@@ -84,6 +84,7 @@ import {IntegrationService} from '../integration/IntegrationService';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import {MediaRepository} from '../media/MediaRepository';
 import {initMLSConversations, registerUninitializedSelfAndTeamConversations} from '../mls';
+import {joinConversationsAfterMigrationFinalisation} from '../mls/MLSMigration/migrationFinaliser';
 import {NotificationRepository} from '../notification/NotificationRepository';
 import {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
 import {PermissionRepository} from '../permission/PermissionRepository';
@@ -451,10 +452,15 @@ export class App {
       await conversationRepository.init1To1Conversations(connections, conversations);
 
       if (supportsMLS()) {
-        // Once all the messages have been processed and the message sending queue freed we can now:
-
         //add the potential `self` and `team` conversations
         await registerUninitializedSelfAndTeamConversations(conversations, selfUser, clientEntity.id, this.core);
+
+        //join all the mls groups that are known by the user but were migrated to mls
+        await joinConversationsAfterMigrationFinalisation({
+          conversations,
+          core: this.core,
+          onSuccess: conversationRepository.injectJoinedAfterMigrationFinalisationMessage,
+        });
 
         //join all the mls groups we're member of and have not yet joined (eg. we were not send welcome message)
         await initMLSConversations(conversations, this.core);

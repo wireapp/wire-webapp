@@ -62,6 +62,7 @@ import {createUuid} from 'Util/uuid';
 
 import {findDeletedClients} from './ClientMismatchUtil';
 import {ConversationRepository} from './ConversationRepository';
+import {isMLSConversation} from './ConversationSelectors';
 import {ConversationState} from './ConversationState';
 import {ConversationVerificationState} from './ConversationVerificationState';
 import {EventMapper} from './EventMapper';
@@ -745,8 +746,6 @@ export class MessageRepository {
       syncTimestamp: true,
     },
   ): Promise<SendAndInjectResult> {
-    const {groupId} = conversation;
-
     const messageTimer = conversation.messageTimer();
     const payload = enableEphemeral && messageTimer ? MessageBuilder.wrapInEphemeral(message, messageTimer) : message;
 
@@ -790,9 +789,9 @@ export class MessageRepository {
     // Configure ephemeral messages
     conversationService.messageTimer.setConversationLevelTimer(conversation.id, conversation.messageTimer());
 
-    const sendOptions: Parameters<typeof conversationService.send>[0] = groupId
+    const sendOptions: Parameters<typeof conversationService.send>[0] = isMLSConversation(conversation)
       ? {
-          groupId,
+          groupId: conversation.groupId,
           payload,
           protocol: ConversationProtocol.MLS,
           conversationId: conversation.qualifiedId,
