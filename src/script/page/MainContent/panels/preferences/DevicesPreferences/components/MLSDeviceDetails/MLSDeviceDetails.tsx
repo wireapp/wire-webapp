@@ -17,9 +17,7 @@
  *
  */
 
-import {useEffect, useState} from 'react';
-
-import {TMP_DecoratedWireIdentity} from 'src/script/E2EIdentity';
+import {WireIdentity} from 'src/script/E2EIdentity';
 import {t} from 'Util/LocalizerUtil';
 import {splitFingerprint} from 'Util/StringUtil';
 
@@ -31,19 +29,13 @@ import {FormattedId} from '../FormattedId';
 
 interface MLSDeviceDetailsProps {
   isCurrentDevice?: boolean;
-  getDeviceIdentity: () => Promise<TMP_DecoratedWireIdentity | undefined>;
+  identity: WireIdentity | undefined;
 }
 
-export const MLSDeviceDetails = ({isCurrentDevice, getDeviceIdentity}: MLSDeviceDetailsProps) => {
-  const [identity, setIdentity] = useState<TMP_DecoratedWireIdentity | undefined>();
-  useEffect(() => {
-    getDeviceIdentity?.().then(setIdentity);
-  }, []);
-
+export const MLSDeviceDetails = ({isCurrentDevice, identity}: MLSDeviceDetailsProps) => {
   return (
     <div css={styles.wrapper}>
       <h4 className="paragraph-body-3">{t('mlsSignature', MLSPublicKeys.ED25519.toUpperCase())}</h4>
-
       {identity?.thumbprint && (
         <>
           <p className="label-2 preferences-label preferences-devices-fingerprint-label">{t('mlsThumbprint')}</p>
@@ -53,7 +45,6 @@ export const MLSDeviceDetails = ({isCurrentDevice, getDeviceIdentity}: MLSDevice
           </p>
         </>
       )}
-
       <E2EICertificateDetails identity={identity} isCurrentDevice={isCurrentDevice} />
     </div>
   );

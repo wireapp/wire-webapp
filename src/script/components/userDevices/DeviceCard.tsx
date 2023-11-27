@@ -21,30 +21,32 @@ import {ClientClassification} from '@wireapp/api-client/lib/client';
 import cx from 'classnames';
 
 import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
+import {DeviceVerificationBadges} from 'Components/VerificationBadge';
+import {WireIdentity} from 'src/script/E2EIdentity';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {splitFingerprint} from 'Util/StringUtil';
 
-import {type ClientEntity, MLSPublicKeys} from '../../client/ClientEntity';
+import {type ClientEntity} from '../../client/ClientEntity';
 import {FormattedId} from '../../page/MainContent/panels/preferences/DevicesPreferences/components/FormattedId';
 import {Icon} from '../Icon';
 import {LegalHoldDot} from '../LegalHoldDot';
 
 export interface DeviceCardProps {
   click?: (device: ClientEntity) => void;
-  renderDeviceBadges?: (device: ClientEntity) => React.ReactNode;
+  getDeviceIdentity?: (deviceId: string) => WireIdentity | undefined;
   device: ClientEntity;
   showIcon?: boolean;
   showVerified?: boolean;
 }
 
-const DeviceCard = ({click, renderDeviceBadges, device: clientEntity, showIcon = false}: DeviceCardProps) => {
+const DeviceCard = ({click, getDeviceIdentity, device: clientEntity, showIcon = false}: DeviceCardProps) => {
   const messageFocusedTabIndex = useMessageFocusedTabIndex(!!click);
   const {class: deviceClass = '?', id = '', label = '?'} = clientEntity;
   const name = clientEntity.getName();
   const clickable = !!click;
 
-  const mlsFingerprint = clientEntity.mlsPublicKeys?.[MLSPublicKeys.ED25519];
+  const deviceIdentity = getDeviceIdentity?.(clientEntity.id);
 
   const showLegalHoldIcon = showIcon && deviceClass === ClientClassification.LEGAL_HOLD;
 
@@ -74,15 +76,15 @@ const DeviceCard = ({click, renderDeviceBadges, device: clientEntity, showIcon =
       <div className="device-card__info" data-uie-name="device-card-info" data-uie-value={label}>
         <div className="device-card__name">
           <span className="device-card__model">{name}</span>
-          {renderDeviceBadges?.(clientEntity)}
+          <DeviceVerificationBadges device={clientEntity} getIdentity={getDeviceIdentity} />
         </div>
 
-        {mlsFingerprint && (
+        {deviceIdentity?.thumbprint && (
           <p className="text-background device-card__id">
             <span>{t('preferencesMLSThumbprint')}</span>
 
             <span data-uie-name="device-id" className="formatted-id">
-              <FormattedId idSlices={splitFingerprint(mlsFingerprint)} smallPadding />
+              <FormattedId idSlices={splitFingerprint(deviceIdentity.thumbprint)} smallPadding />
             </span>
           </p>
         )}

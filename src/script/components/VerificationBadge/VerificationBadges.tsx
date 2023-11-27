@@ -31,18 +31,16 @@ import {
 
 import {ClientEntity} from 'src/script/client';
 import {ConversationVerificationState} from 'src/script/conversation/ConversationVerificationState';
-import {getUserVerificationState, isE2EIEnabled, TMP_DecoratedWireIdentity} from 'src/script/E2EIdentity';
+import {
+  getUserVerificationState,
+  isE2EIEnabled,
+  MLSStatuses,
+  WireIdentity,
+} from 'src/script/E2EIdentity/E2EIdentityVerification';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
-
-export enum MLSStatuses {
-  VALID = 'valid',
-  NOT_DOWNLOADED = 'not_downloaded',
-  EXPIRED = 'expired',
-  EXPIRES_SOON = 'expires_soon',
-}
 
 interface VerificationBadgesProps {
   conversationProtocol?: ConversationProtocol;
@@ -95,20 +93,12 @@ export const UserVerificationBadges = ({user, groupId}: {user: User; groupId?: s
 
 export const DeviceVerificationBadges = ({
   device,
-  getDeviceIdentity,
+  getIdentity,
 }: {
   device: ClientEntity;
-  getDeviceIdentity?: (deviceId: string) => Promise<TMP_DecoratedWireIdentity | undefined>;
+  getIdentity?: (deviceId: string) => WireIdentity | undefined;
 }) => {
-  const [MLSStatus, setMLSStatus] = useState<MLSStatuses | undefined>(undefined);
-  useEffect(() => {
-    if (getDeviceIdentity) {
-      void (async () => {
-        const identity = await getDeviceIdentity(device.id);
-        setMLSStatus(identity?.state ?? MLSStatuses.NOT_DOWNLOADED);
-      })();
-    }
-  }, []);
+  const MLSStatus = getIdentity ? getIdentity(device.id)?.status ?? MLSStatuses.NOT_DOWNLOADED : undefined;
 
   return <VerificationBadges isProteusVerified={!!device.meta?.isVerified?.()} MLSStatus={MLSStatus} />;
 };

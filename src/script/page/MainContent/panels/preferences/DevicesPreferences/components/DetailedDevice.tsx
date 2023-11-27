@@ -21,7 +21,7 @@ import React from 'react';
 
 import {DeviceVerificationBadges} from 'Components/VerificationBadge';
 import {ClientEntity} from 'src/script/client/ClientEntity';
-import {TMP_DecoratedWireIdentity} from 'src/script/E2EIdentity';
+import {WireIdentity} from 'src/script/E2EIdentity';
 
 import {MLSDeviceDetails} from './MLSDeviceDetails';
 import {ProteusDeviceDetails} from './ProteusDeviceDetails';
@@ -30,7 +30,7 @@ export interface DeviceProps {
   device: ClientEntity;
   fingerprint: string;
   isCurrentDevice?: boolean;
-  getDeviceIdentity?: (deviceId: string) => Promise<TMP_DecoratedWireIdentity | undefined>;
+  getDeviceIdentity?: (deviceId: string) => WireIdentity | undefined;
   isProteusVerified?: boolean;
 }
 
@@ -41,16 +41,15 @@ export const DetailedDevice: React.FC<DeviceProps> = ({
   getDeviceIdentity,
   isProteusVerified,
 }) => {
+  const identity = getDeviceIdentity?.(device.id);
   return (
     <>
       <h3 className="preferences-devices-model preferences-devices-model-name" data-uie-name="device-model">
         <span>{device.model}</span>
-        <DeviceVerificationBadges device={device} getDeviceIdentity={getDeviceIdentity} />
+        <DeviceVerificationBadges device={device} getIdentity={() => identity} />
       </h3>
 
-      {getDeviceIdentity && (
-        <MLSDeviceDetails isCurrentDevice={isCurrentDevice} getDeviceIdentity={() => getDeviceIdentity(device.id)} />
-      )}
+      {getDeviceIdentity && <MLSDeviceDetails isCurrentDevice={isCurrentDevice} identity={identity} />}
 
       <ProteusDeviceDetails device={device} fingerprint={fingerprint} isProteusVerified={isProteusVerified} />
     </>

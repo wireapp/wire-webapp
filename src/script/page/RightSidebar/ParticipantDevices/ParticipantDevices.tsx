@@ -19,11 +19,8 @@
 
 import {FC} from 'react';
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {UserDevices, UserDevicesState, useUserDevicesHistory} from 'Components/UserDevices';
-import {ClientEntity} from 'src/script/client';
 import {t} from 'Util/LocalizerUtil';
 
 import type {User} from '../../../entity/User';
@@ -33,18 +30,12 @@ import {PanelHeader} from '../PanelHeader';
 interface ParticipantDevicesProps {
   onClose: () => void;
   onGoBack: (userEntity: User) => void;
-  renderDeviceBadges: (device: ClientEntity, userId: QualifiedId) => React.ReactNode;
+  groupId?: string;
   repositories: ViewModelRepositories;
   user: User;
 }
 
-const ParticipantDevices: FC<ParticipantDevicesProps> = ({
-  repositories,
-  onClose,
-  onGoBack,
-  renderDeviceBadges,
-  user,
-}) => {
+const ParticipantDevices: FC<ParticipantDevicesProps> = ({repositories, onClose, onGoBack, groupId, user}) => {
   const history = useUserDevicesHistory();
 
   return (
@@ -67,7 +58,7 @@ const ParticipantDevices: FC<ParticipantDevicesProps> = ({
 
       <FadingScrollbar className="panel__content">
         <UserDevices
-          renderDeviceBadges={renderDeviceBadges}
+          groupId={groupId}
           clientRepository={repositories.client}
           cryptographyRepository={repositories.cryptography}
           messageRepository={repositories.message}
