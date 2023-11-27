@@ -440,7 +440,7 @@ export class Account extends TypedEventEmitter<Events> {
     let e2eIdentityService: E2EIServiceExternal | undefined;
 
     if (clientType === CryptoClientType.CORE_CRYPTO && (await this.isMlsEnabled())) {
-      e2eIdentityService = await E2EIServiceExternal.getInstance(cryptoClient.getNativeClient());
+      e2eIdentityService = new E2EIServiceExternal(cryptoClient.getNativeClient());
       mlsService = new MLSService(
         this.apiClient,
         cryptoClient.getNativeClient(),
