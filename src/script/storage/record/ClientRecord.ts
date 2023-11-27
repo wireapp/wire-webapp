@@ -26,10 +26,6 @@ export interface ClientRecord {
   domain?: string;
   id: string;
   label?: string;
-  location?: {
-    lat?: number;
-    lon?: number;
-  };
   meta: {
     is_verified?: boolean;
     is_mls_verified?: boolean;
