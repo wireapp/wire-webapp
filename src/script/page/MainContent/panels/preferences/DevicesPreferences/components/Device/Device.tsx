@@ -21,23 +21,21 @@ import {MouseEvent, KeyboardEvent} from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
-import {WireIdentity} from '@wireapp/core-crypto';
-
 import {Icon} from 'Components/Icon';
 import {DeviceVerificationBadges} from 'Components/VerificationBadge';
-import {TMP_DecoratedWireIdentity} from 'src/script/E2EIdentity';
+import {WireIdentity} from 'src/script/E2EIdentity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {splitFingerprint} from 'Util/StringUtil';
 
-import {ClientEntity, MLSPublicKeys} from '../../../../../../../client';
+import {ClientEntity} from '../../../../../../../client';
 import {FormattedId} from '../FormattedId';
 
 interface DeviceProps {
   device: ClientEntity;
   isSSO: boolean;
-  getDeviceIdentity?: (deviceId: string) => Promise<TMP_DecoratedWireIdentity | undefined>;
+  getDeviceIdentity?: (deviceId: string) => WireIdentity | undefined;
   onRemove: (device: ClientEntity) => void;
   onSelect: (device: ClientEntity, currentDeviceIdentity?: WireIdentity) => void;
   deviceNumber: number;
@@ -48,7 +46,7 @@ export const Device = ({device, isSSO, onSelect, onRemove, getDeviceIdentity, de
   const verifiedLabel = isVerified ? t('preferencesDevicesVerification') : t('preferencesDeviceNotVerified');
   const deviceAriaLabel = `${t('preferencesDevice')} ${deviceNumber}, ${device.getName()}, ${verifiedLabel}`;
 
-  const mlsFingerprint = device.mlsPublicKeys?.[MLSPublicKeys.ED25519];
+  const deviceIdentity = getDeviceIdentity?.(device.id);
 
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
@@ -76,15 +74,15 @@ export const Device = ({device, isSSO, onSelect, onRemove, getDeviceIdentity, de
           aria-label={deviceAriaLabel}
         >
           {device.getName()}
-          <DeviceVerificationBadges device={device} getDeviceIdentity={getDeviceIdentity} />
+          <DeviceVerificationBadges device={device} getIdentity={getDeviceIdentity} />
         </div>
 
-        {mlsFingerprint && (
+        {deviceIdentity && (
           <p className="preferences-devices-id">
             <span>{t('preferencesMLSThumbprint')}</span>
 
             <span className="preferences-formatted-id" data-uie-name="preferences-device-active-id">
-              <FormattedId idSlices={splitFingerprint(mlsFingerprint)} smallPadding />
+              <FormattedId idSlices={splitFingerprint(deviceIdentity.thumbprint)} smallPadding />
             </span>
           </p>
         )}

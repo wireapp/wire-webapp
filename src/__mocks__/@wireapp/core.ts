@@ -39,7 +39,8 @@ export class Account extends EventEmitter {
       clearAllProgress: jest.fn(),
       hasActiveCertificate: jest.fn(),
       getCertificateData: jest.fn(),
-      getUserDeviceEntities: jest.fn(),
+      getUsersIdentities: jest.fn(() => new Map()),
+      getDeviceIdentities: jest.fn(),
       getConversationState: jest.fn(),
     },
     mls: {

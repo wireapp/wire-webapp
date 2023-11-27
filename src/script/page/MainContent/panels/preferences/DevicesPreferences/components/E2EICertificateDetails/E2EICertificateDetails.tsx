@@ -22,8 +22,8 @@ import {useState} from 'react';
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {CertificateDetailsModal} from 'Components/Modals/CertificateDetailsModal';
-import {MLSStatuses, VerificationBadges} from 'Components/VerificationBadge';
-import {E2EIHandler, TMP_DecoratedWireIdentity} from 'src/script/E2EIdentity';
+import {VerificationBadges} from 'Components/VerificationBadge';
+import {E2EIHandler, MLSStatuses, WireIdentity} from 'src/script/E2EIdentity';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 
@@ -32,14 +32,14 @@ import {styles} from './E2EICertificateDetails.styles';
 const logger = getLogger('E2EICertificateDetails');
 
 interface E2EICertificateDetailsProps {
-  identity?: TMP_DecoratedWireIdentity;
+  identity?: WireIdentity;
   isCurrentDevice?: boolean;
 }
 
 export const E2EICertificateDetails = ({identity, isCurrentDevice}: E2EICertificateDetailsProps) => {
   const [isCertificateDetailsModalOpen, setIsCertificateDetailsModalOpen] = useState(false);
 
-  const certificateState = identity?.state ?? MLSStatuses.NOT_DOWNLOADED;
+  const certificateState = identity?.status ?? MLSStatuses.NOT_DOWNLOADED;
   const isNotDownloaded = certificateState === MLSStatuses.NOT_DOWNLOADED;
   const isValid = certificateState === MLSStatuses.VALID;
 

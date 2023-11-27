@@ -17,11 +17,11 @@
  *
  */
 
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {E2eiConversationState} from '@wireapp/core/lib/messagingProtocols/mls';
 import {container} from 'tsyringe';
 
-import {MLSStatuses} from 'Components/VerificationBadge';
-import {getConversationVerificationState, getUsersVerificationState} from 'src/script/E2EIdentity';
+import {getConversationVerificationState, getUsersIdentities, MLSStatuses} from 'src/script/E2EIdentity';
 import {E2EIVerificationMessageType} from 'src/script/message/E2EIVerificationMessageType';
 import {Core} from 'src/script/service/CoreSingleton';
 import {Logger, getLogger} from 'Util/Logger';
@@ -57,9 +57,13 @@ class MLSConversationVerificationStateHandler {
   private async degradeConversation(conversation: MLSConversation) {
     const state = ConversationVerificationState.DEGRADED;
     conversation.mlsVerificationState(state);
-    const degradedUsers = (await getUsersVerificationState(conversation.groupId, conversation.participating_user_ids()))
-      .filter(user => user.state !== MLSStatuses.VALID)
-      .map(user => user.userId);
+    const userIdentities = await getUsersIdentities(conversation.groupId, conversation.participating_user_ids());
+    const degradedUsers: QualifiedId[] = [];
+    for (const [userId, identities] of userIdentities.entries()) {
+      if (identities.some(identity => identity.status !== MLSStatuses.VALID)) {
+        degradedUsers.push({id: userId, domain: ''});
+      }
+    }
 
     this.onConversationVerificationStateChange({
       conversationEntity: conversation,

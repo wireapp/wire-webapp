@@ -26,6 +26,7 @@ import {ClientEntity} from 'src/script/client/ClientEntity';
 import {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
+import {useDeviceIdentities} from 'src/script/hooks/useDeviceIdentities';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -35,7 +36,6 @@ import {DeviceDetailsPreferences} from './components/DeviceDetailsPreferences';
 
 import {ClientState} from '../../../../../client/ClientState';
 import {ConversationState} from '../../../../../conversation/ConversationState';
-import * as e2eIdentity from '../../../../../E2EIdentity';
 import {PreferencesPage} from '../components/PreferencesPage';
 
 interface DevicesPreferencesProps {
@@ -61,6 +61,10 @@ export const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
   const [localFingerprint, setLocalFingerprint] = useState('');
 
   const {devices} = useKoSubscribableChildren(selfUser, ['devices']);
+  const {getDeviceIdentity} = useDeviceIdentities(
+    selfUser.qualifiedId,
+    conversationState.selfMLSConversation()?.groupId,
+  );
   const currentClient = clientState.currentClient;
 
   const isSSO = selfUser.isNoPasswordSSO;
@@ -70,16 +74,6 @@ export const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
   useEffect(() => {
     void cryptographyRepository.getLocalFingerprint().then(setLocalFingerprint);
   }, [cryptographyRepository]);
-
-  const getDeviceIdentity = e2eIdentity.isE2EIEnabled()
-    ? async (deviceId: string) => {
-        const selfConversation = conversationState.selfMLSConversation();
-        if (!selfConversation) {
-          return undefined;
-        }
-        return e2eIdentity.getDeviceIdentity(selfConversation.groupId, selfUser.qualifiedId, deviceId);
-      }
-    : undefined;
 
   if (selectedDevice) {
     return (

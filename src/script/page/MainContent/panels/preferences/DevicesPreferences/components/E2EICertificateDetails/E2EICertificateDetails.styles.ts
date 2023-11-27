@@ -19,7 +19,7 @@
 
 import {CSSObject} from '@emotion/serialize';
 
-import {MLSStatuses} from 'Components/VerificationBadge';
+import {MLSStatuses} from 'src/script/E2EIdentity';
 
 const MLSStatusColor = {
   [MLSStatuses.VALID]: 'var(--green-500)',

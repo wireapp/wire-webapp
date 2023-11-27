@@ -42,7 +42,6 @@ export type UserListProps = React.ComponentProps<typeof UserList> & {
   users: User[];
   filter?: string;
   selected?: User[];
-  renderParticipantBadges?: (user: User) => React.ReactNode;
   onUpdateSelectedUsers?: (updatedUsers: User[]) => void;
   searchRepository: SearchRepository;
   selfFirst?: boolean;
