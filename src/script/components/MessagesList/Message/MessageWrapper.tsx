@@ -222,7 +222,7 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
     return <VerificationMessage message={message} />;
   }
   if (message.isE2EIVerification()) {
-    return <E2EIVerificationMessage message={message} />;
+    return <E2EIVerificationMessage message={message} conversation={conversation} />;
   }
   if (message.isDelete()) {
     return <DeleteMessage message={message} onClickAvatar={onClickAvatar} />;

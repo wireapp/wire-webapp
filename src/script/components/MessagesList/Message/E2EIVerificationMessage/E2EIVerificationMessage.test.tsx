@@ -26,6 +26,7 @@ import {E2EIVerificationMessageType} from 'src/script/message/E2EIVerificationMe
 import {E2EIVerificationMessage} from './E2EIVerificationMessage';
 
 import {withTheme} from '../../../../auth/util/test/TestUtil';
+import {Conversation} from '../../../../entity/Conversation';
 
 const createVerificationMessage = (partialVerificationMessage: Partial<VerificationMessageEntity>) => {
   const verificationMessage: Partial<VerificationMessageEntity> = {
@@ -35,13 +36,17 @@ const createVerificationMessage = (partialVerificationMessage: Partial<Verificat
 };
 
 describe('E2EIVerificationMessage', () => {
+  const conversation = new Conversation();
+
   describe('with verified message', () => {
     it('shows verified icon when message is verified', async () => {
       const message = createVerificationMessage({
         messageType: ko.observable<E2EIVerificationMessageType>(E2EIVerificationMessageType.VERIFIED),
       });
 
-      const {getByTestId} = render(withTheme(<E2EIVerificationMessage message={message} />));
+      const {getByTestId} = render(
+        withTheme(<E2EIVerificationMessage message={message} conversation={conversation} />),
+      );
 
       const elementMessageVerification = getByTestId('element-message-verification');
       expect(elementMessageVerification.getAttribute('data-uie-value')).toEqual(E2EIVerificationMessageType.VERIFIED);

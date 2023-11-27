@@ -243,7 +243,7 @@ export interface ErrorEvent
 export type AllE2EIVerifiedEventData = {type: E2EIVerificationMessageType};
 export type AllE2EIVerifiedEvent = ConversationEvent<CONVERSATION.E2EI_VERIFICATION, AllE2EIVerifiedEventData>;
 
-export type E2EIDegradedMessageEventData = {type: E2EIVerificationMessageType};
+export type E2EIDegradedMessageEventData = {type: E2EIVerificationMessageType; userIds?: QualifiedId[]};
 export type E2EIDegradedMessageEvent = ConversationEvent<CONVERSATION.E2EI_VERIFICATION, E2EIDegradedMessageEventData>;
 
 export type ClientConversationEvent =
@@ -331,11 +331,16 @@ export const EventBuilder = {
     };
   },
 
-  buildE2EIDegraded(conversationEntity: Conversation, type: E2EIVerificationMessageType): E2EIDegradedMessageEvent {
+  buildE2EIDegraded(
+    conversationEntity: Conversation,
+    type: E2EIVerificationMessageType,
+    userIds?: QualifiedId[],
+  ): E2EIDegradedMessageEvent {
     return {
       ...buildQualifiedId(conversationEntity),
       data: {
         type,
+        userIds,
       },
       from: '',
       id: createUuid(),

@@ -17,7 +17,10 @@
  *
  */
 
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
+
+import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import {Message} from './Message';
 
@@ -26,11 +29,19 @@ import {SuperType} from '../../message/SuperType';
 
 export class E2EIVerificationMessage extends Message {
   public messageType: ko.Observable<E2EIVerificationMessageType>;
+  public userIds: ko.ObservableArray<QualifiedId>;
+  public readonly isSelfUser: ko.PureComputed<boolean>;
 
   constructor() {
     super();
 
     this.super_type = SuperType.E2EI_VERIFICATION;
     this.messageType = ko.observable();
+    this.userIds = ko.observableArray<QualifiedId>();
+
+    this.isSelfUser = ko.pureComputed(() => {
+      const messageUserId = this.userIds()?.length === 1 && this.userIds()[0];
+      return messageUserId && matchQualifiedIds(messageUserId, this.user().qualifiedId);
+    });
   }
 }

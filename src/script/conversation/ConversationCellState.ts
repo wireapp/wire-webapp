@@ -30,6 +30,7 @@ import type {MemberMessage} from '../entity/message/MemberMessage';
 import type {SystemMessage} from '../entity/message/SystemMessage';
 import type {Text} from '../entity/message/Text';
 import {ConversationError} from '../error/ConversationError';
+import {E2EIVerificationMessageType} from '../message/E2EIVerificationMessageType';
 
 enum ACTIVITY_TYPE {
   CALL = 'ConversationCellState.ACTIVITY_TYPE.CALL',
@@ -335,7 +336,10 @@ const _getStateUnreadMessage = {
       } else if (messageEntity.hasAssetImage()) {
         string = t('notificationAssetAdd');
       } else if (messageEntity.isE2EIVerification()) {
-        string = t('tooltipConversationAllDevicesVerified');
+        string =
+          messageEntity.messageType() === E2EIVerificationMessageType.VERIFIED
+            ? t('tooltipConversationAllDevicesVerified')
+            : t('tooltipConversationE2EIVerificationDegraded');
       } else if (messageEntity.isVerification()) {
         string = t('tooltipConversationAllDevicesVerified');
       }
@@ -351,7 +355,9 @@ const _getStateUnreadMessage = {
         const stateText: string = hasString
           ? (string as string)
           : getRenderedTextContent((messageEntity.getFirstAsset() as Text).text);
-        return conversationEntity.isGroup() ? `${messageEntity.unsafeSenderName()}: ${stateText}` : stateText;
+        return conversationEntity.isGroup() && !messageEntity.isE2EIVerification()
+          ? `${messageEntity.unsafeSenderName()}: ${stateText}`
+          : stateText;
       }
     }
     return '';

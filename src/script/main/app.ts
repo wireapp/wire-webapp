@@ -811,6 +811,7 @@ export class App {
     conversationEntity,
     conversationVerificationState,
     verificationMessageType,
+    userIds,
   }) => {
     switch (conversationVerificationState) {
       case ConversationVerificationState.VERIFIED:
@@ -819,7 +820,7 @@ export class App {
         break;
       case ConversationVerificationState.DEGRADED:
         if (verificationMessageType) {
-          const degradedEvent = EventBuilder.buildE2EIDegraded(conversationEntity, verificationMessageType);
+          const degradedEvent = EventBuilder.buildE2EIDegraded(conversationEntity, verificationMessageType, userIds);
           await this.repository.event.injectEvent(degradedEvent);
         } else {
           this.logger.error('updateConversationE2EIVerificationState: Missing verificationMessageType while degrading');

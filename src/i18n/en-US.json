@@ -1333,6 +1333,7 @@
   "tooltipConversationAddImage": "Add picture",
   "tooltipConversationAllVerified": "All fingerprints are verified (Proteus)",
   "tooltipConversationAllDevicesVerified": "All device fingerprints verified (Proteus)",
+  "tooltipConversationE2EIVerificationDegraded": "Conversation is no longer verified",
   "tooltipConversationAllE2EIVerified": "All devices are verified (end-to-end identity). [link]Learn more[/link]",
   "tooltipConversationAllE2EIVerifiedShort": "All devices verified (end-to-end identity)",
   "tooltipConversationAllE2EINewDeviceAdded": "This conversation is no longer verified, as [bold]{{user}}[/bold] uses at least one device without a valid end-to-end identity certificate.",

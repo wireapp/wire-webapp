@@ -22,24 +22,35 @@ import {MLSVerified} from '@wireapp/react-ui-kit';
 import {Icon} from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {replaceLink, t} from 'Util/LocalizerUtil';
+import {isUser} from 'Util/TypePredicateUtil';
 
 import {MessageIcon, IconInfo} from './E2EIVerificationMessage.styles';
 
 import {Config} from '../../../../Config';
+import {Conversation} from '../../../../entity/Conversation';
 import {E2EIVerificationMessage as E2EIVerificationMessageEntity} from '../../../../entity/message/E2EIVerificationMessage';
 import {E2EIVerificationMessageType} from '../../../../message/E2EIVerificationMessageType';
 
 export interface E2EIVerificationMessageProps {
   message: E2EIVerificationMessageEntity;
+  conversation: Conversation;
 }
 
-export const E2EIVerificationMessage = ({message}: E2EIVerificationMessageProps) => {
-  const {messageType} = useKoSubscribableChildren(message, ['messageType']);
+export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificationMessageProps) => {
+  const {messageType, userIds} = useKoSubscribableChildren(message, ['messageType', 'userIds']);
+  const {participating_user_ets: participatingUserEts} = useKoSubscribableChildren(conversation, [
+    'participating_user_ets',
+  ]);
 
-  const user = 'Deniz Agha';
+  const degradedUsers = userIds
+    ?.map(qualifiedId => participatingUserEts?.find(user => user.id === qualifiedId.id))
+    .filter(isUser);
+
+  const usersName = degradedUsers?.map(user => user.name()).join(', ');
 
   const isVerified = messageType === E2EIVerificationMessageType.VERIFIED;
   const isUnverified = messageType === E2EIVerificationMessageType.UNVERIFIED;
+  const isExpired = messageType === E2EIVerificationMessageType.EXPIRED;
   const isNewDevice = messageType === E2EIVerificationMessageType.NEW_DEVICE;
   const isNewMember = messageType === E2EIVerificationMessageType.NEW_MEMBER;
   const isDegraded = messageType === E2EIVerificationMessageType.DEGRADED;
@@ -69,10 +80,18 @@ export const E2EIVerificationMessage = ({message}: E2EIVerificationMessageProps)
           />
         )}
 
+        {isExpired && (
+          <span
+            dangerouslySetInnerHTML={{
+              __html: t('tooltipConversationAllE2EICertificateExpired', {user: usersName}),
+            }}
+          />
+        )}
+
         {isNewDevice && (
           <span
             dangerouslySetInnerHTML={{
-              __html: t('tooltipConversationAllE2EINewDeviceAdded', {user}),
+              __html: t('tooltipConversationAllE2EINewDeviceAdded', {user: usersName}),
             }}
           />
         )}
@@ -80,7 +99,7 @@ export const E2EIVerificationMessage = ({message}: E2EIVerificationMessageProps)
         {isNewMember && (
           <span
             dangerouslySetInnerHTML={{
-              __html: t('tooltipConversationAllE2EINewUserAdded', {user}),
+              __html: t('tooltipConversationAllE2EINewUserAdded', {user: usersName}),
             }}
           />
         )}
@@ -88,7 +107,7 @@ export const E2EIVerificationMessage = ({message}: E2EIVerificationMessageProps)
         {isUnverified && (
           <span
             dangerouslySetInnerHTML={{
-              __html: t('tooltipConversationAllE2EINewUserAdded', {user}),
+              __html: t('tooltipConversationAllE2EINewUserAdded', {user: usersName}),
             }}
           />
         )}
@@ -96,7 +115,7 @@ export const E2EIVerificationMessage = ({message}: E2EIVerificationMessageProps)
         {isDegraded && (
           <span
             dangerouslySetInnerHTML={{
-              __html: t('tooltipConversationAllE2EICertificateRevoked', {user}, learnMoreReplacement),
+              __html: t('tooltipConversationAllE2EICertificateRevoked', {user: usersName}, learnMoreReplacement),
             }}
           />
         )}
