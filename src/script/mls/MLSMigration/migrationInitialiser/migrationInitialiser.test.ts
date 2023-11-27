@@ -27,7 +27,7 @@ import {Core} from 'src/script/service/CoreSingleton';
 import {TestFactory} from 'test/helper/TestFactory';
 import {createUuid} from 'Util/uuid';
 
-import {initialiseMigrationOfProteusConversations} from './';
+import {initialiseMigrationOfProteusConversations} from '.';
 
 const selfUserId = {id: 'self-user-id', domain: 'local.wire.link'};
 

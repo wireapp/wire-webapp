@@ -17,4 +17,5 @@
  *
  */
 
-export * from './initialiseMigration';
+export * from './migrationInitialiser';
+export * from './joinUnestablishedMixedConversations';

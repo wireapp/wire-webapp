@@ -30,7 +30,7 @@ import {User} from 'src/script/entity/User';
 import {Core} from 'src/script/service/CoreSingleton';
 import {createUuid} from 'Util/uuid';
 
-import {joinConversationsAfterMigrationFinalisation} from './';
+import {joinConversationsAfterMigrationFinalisation} from '.';
 
 const createMockedDBConversationEntry = (
   id: string,

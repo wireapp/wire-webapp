@@ -28,9 +28,8 @@ import {User} from 'src/script/entity/User';
 import {Core as CoreSingleton} from 'src/script/service/CoreSingleton';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
-import {finaliseMigrationOfMixedConversations} from './finaliseMigration';
-import {initialiseMigrationOfProteusConversations} from './initialiseMigration';
-import {joinUnestablishedMixedConversations} from './initialiseMigration/joinUnestablishedMixedConversations';
+import {finaliseMigrationOfMixedConversations} from './migrationFinaliser';
+import {initialiseMigrationOfProteusConversations, joinUnestablishedMixedConversations} from './migrationInitialiser';
 import {MLSMigrationStatus} from './migrationStatus';
 import {mlsMigrationLogger} from './MLSMigrationLogger';
 
@@ -165,7 +164,7 @@ const migrateConversationsToMLS = async ({
   //refetch all known users so we have the latest lists of the protocols they support
   await refreshAllKnownUsers();
 
-  const selfTeamGroupConversations = conversationHandler.getAllTeamGroupConversations();
+  const selfTeamGroupConversations = conversationHandler.getAllGroupConversations();
 
   await initialiseMigrationOfProteusConversations(selfTeamGroupConversations, selfUserId, conversationHandler);
 

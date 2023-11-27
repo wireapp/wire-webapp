@@ -17,4 +17,5 @@
  *
  */
 
-export * from './finaliseMigration';
+export * from './migrationFinaliser';
+export * from './joinConversationsAfterMigrationFinalisation';

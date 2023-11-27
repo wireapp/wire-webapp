@@ -25,7 +25,7 @@ import {Conversation} from 'src/script/entity/Conversation';
 import {Core} from 'src/script/service/CoreSingleton';
 import {createUuid} from 'Util/uuid';
 
-import {joinUnestablishedMixedConversations} from './';
+import {joinUnestablishedMixedConversations} from '.';
 
 const createMixedConversation = (mockGroupId: string): MixedConversation => {
   const conversation = new Conversation(createUuid(), '', ConversationProtocol.MIXED);

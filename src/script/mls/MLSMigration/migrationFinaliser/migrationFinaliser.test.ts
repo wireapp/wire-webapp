@@ -26,7 +26,7 @@ import {TestFactory} from 'test/helper/TestFactory';
 import {generateUser} from 'test/helper/UserGenerator';
 import {createUuid} from 'Util/uuid';
 
-import {finaliseMigrationOfMixedConversations} from './finaliseMigration';
+import {finaliseMigrationOfMixedConversations} from './migrationFinaliser';
 
 const createMixedConversation = (): MixedConversation => {
   const conversation = new Conversation(createUuid(), '', ConversationProtocol.MIXED);

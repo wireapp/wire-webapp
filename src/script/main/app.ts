@@ -84,7 +84,7 @@ import {IntegrationService} from '../integration/IntegrationService';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import {MediaRepository} from '../media/MediaRepository';
 import {initMLSConversations, registerUninitializedSelfAndTeamConversations} from '../mls';
-import {joinConversationsAfterMigrationFinalisation} from '../mls/MLSMigration/finaliseMigration/joinConversationsAfterMigrationFinalisation';
+import {joinConversationsAfterMigrationFinalisation} from '../mls/MLSMigration/migrationFinaliser';
 import {NotificationRepository} from '../notification/NotificationRepository';
 import {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
 import {PermissionRepository} from '../permission/PermissionRepository';
