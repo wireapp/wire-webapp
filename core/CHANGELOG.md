@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [42.23.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.22.1...@wireapp/core@42.23.0) (2023-11-27)
+
+### Features
+
+* Map coreCrypto userIds to regular userIds ([#5736](https://github.com/wireapp/wire-web-packages/issues/5736)) ([1c16710](https://github.com/wireapp/wire-web-packages/commit/1c16710918d67203bec7459e8079ba9cb6a0000a))
+
 ## [42.22.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.22.0...@wireapp/core@42.22.1) (2023-11-23)
 
 ### Bug Fixes
