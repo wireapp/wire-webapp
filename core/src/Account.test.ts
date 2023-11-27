@@ -18,7 +18,7 @@
  */
 
 import {AuthAPI} from '@wireapp/api-client/lib/auth';
-import {ClientAPI, ClientType, RegisteredClient} from '@wireapp/api-client/lib/client';
+import {ClientAPI, ClientClassification, ClientType, RegisteredClient} from '@wireapp/api-client/lib/client';
 import {ConversationAPI} from '@wireapp/api-client/lib/conversation';
 import {BackendEvent, CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
 import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
@@ -161,6 +161,14 @@ describe('Account', () => {
     cleanAll();
   });
 
+  const currentClient: RegisteredClient = {
+    id: CLIENT_ID,
+    cookie: '',
+    time: '',
+    type: ClientType.TEMPORARY,
+    class: ClientClassification.DESKTOP,
+    mls_public_keys: {},
+  };
   describe('"init"', () => {
     it('initializes the Protocol buffers', async () => {
       const account = new Account();
@@ -227,6 +235,7 @@ describe('Account', () => {
         email: 'hello@example.com',
         password: 'my-secret',
       });
+      account['currentClient'] = currentClient;
 
       jest.spyOn(apiClient, 'connect').mockImplementation();
       jest.spyOn(account.service!.notification as any, 'handleEvent').mockReturnValue({
@@ -282,11 +291,13 @@ describe('Account', () => {
 
     beforeEach(async () => {
       dependencies = await createAccount();
-      await dependencies.account.login({
+      const {account} = dependencies;
+      await account.login({
         clientType: ClientType.TEMPORARY,
         email: 'hello@example.com',
         password: 'my-secret',
       });
+      account['currentClient'] = currentClient;
       jest
         .spyOn(dependencies.account.service!.notification, 'handleNotification')
         .mockImplementation(notif => notif.payload as any);

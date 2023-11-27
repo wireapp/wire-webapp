@@ -130,6 +130,8 @@ export class Account extends TypedEventEmitter<Events> {
   private readonly nbPrekeys: number;
   private readonly cryptoProtocolConfig?: CryptoProtocolConfig;
   private readonly isMlsEnabled: () => Promise<boolean>;
+  /** this is the client the consumer is currently using. Will be set as soon as `initClient` is called and will be rest upon logout */
+  private currentClient?: RegisteredClient;
   private storeEngine?: CRUDEngine;
   private db?: CoreDatabase;
   private coreCallbacks?: CoreCallbacks;
@@ -234,11 +236,14 @@ export class Account extends TypedEventEmitter<Events> {
     displayName: string,
     handle: string,
     discoveryUrl: string,
-    client: RegisteredClient,
     oAuthIdToken?: string,
   ): Promise<AcmeChallenge | boolean> {
     const context = this.apiClient.context;
     const domain = context?.domain ?? '';
+
+    if (!this.currentClient) {
+      throw new Error('Client has not been initialized - please login first');
+    }
 
     if (!this.service?.mls || !this.service?.e2eIdentity) {
       this.logger.info('MLS not initialized, unable to enroll E2EI');
@@ -256,7 +261,7 @@ export class Account extends TypedEventEmitter<Events> {
       discoveryUrl,
       this.service.e2eIdentity,
       user,
-      client,
+      this.currentClient,
       this.nbPrekeys,
       oAuthIdToken,
     );
@@ -387,6 +392,7 @@ export class Account extends TypedEventEmitter<Events> {
       await this.service.subconversation.leaveStaleConferenceSubconversations();
     }
 
+    this.currentClient = validClient;
     return validClient;
   }
 
@@ -498,6 +504,7 @@ export class Account extends TypedEventEmitter<Events> {
   }
 
   private resetContext(): void {
+    this.currentClient = undefined;
     delete this.apiClient.context;
     delete this.service;
   }
@@ -570,8 +577,8 @@ export class Account extends TypedEventEmitter<Events> {
      */
     dryRun?: boolean;
   } = {}): () => void {
-    if (!this.apiClient.context) {
-      throw new Error('Context is not set - please login first');
+    if (!this.currentClient) {
+      throw new Error('Client has not been initialized - please login first');
     }
 
     const handleEvent = async (payload: HandledEventPayload, source: NotificationSource) => {
