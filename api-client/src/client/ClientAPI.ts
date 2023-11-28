@@ -37,10 +37,13 @@ export type ClaimedKeyPackages = {
   }[];
 };
 
-type PublicKeys = {
-  removal: {
-    [algorithm: string]: string;
-  };
+export enum MLSPublicKeyAlgorithmKeys {
+  ED25519 = 'ed25519',
+}
+export type MLSPublicKeyRecord = Partial<Record<MLSPublicKeyAlgorithmKeys, string>>;
+
+type GetMLSPublicKeysResponseData = {
+  removal: MLSPublicKeyRecord;
 };
 
 export class ClientAPI {
@@ -234,13 +237,13 @@ export class ClientAPI {
    * In the future this may be used for other purposes as well.
    * @see https://staging-nginz-https.zinfra.io/api/swagger-ui/#/default/get_mls_public_keys
    */
-  public async getPublicKeys(): Promise<PublicKeys> {
+  public async getPublicKeys(): Promise<GetMLSPublicKeysResponseData> {
     const config: AxiosRequestConfig = {
       method: 'GET',
       url: `/${ClientAPI.URL.MLS_CLIENTS}/${ClientAPI.URL.PUBLIC_KEYS}`,
     };
 
-    const response = await this.client.sendJSON<PublicKeys>(config, true);
+    const response = await this.client.sendJSON<GetMLSPublicKeysResponseData>(config, true);
     return response.data;
   }
 

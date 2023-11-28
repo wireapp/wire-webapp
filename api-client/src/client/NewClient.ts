@@ -21,13 +21,11 @@ import {ClientCapabilityData} from './ClientCapabilityData';
 
 import {PreKey} from '../auth/';
 
-import {ClientClassification, ClientType, Location} from './';
+import {ClientClassification, ClientType, Location, MLSPublicKeyRecord} from './';
 
 type BaseUpdatePayload = ClientCapabilityData & {label?: string};
 type MLSUpdatePayload = {
-  mls_public_keys: {
-    ed25519: string;
-  };
+  mls_public_keys: MLSPublicKeyRecord;
 } & BaseUpdatePayload;
 
 type ProteusUpdatePayload = {

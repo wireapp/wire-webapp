@@ -85,7 +85,7 @@ describe('MLSService', () => {
       apiClient = mockApiClient;
       jest
         .spyOn(apiClient.api.client, 'getPublicKeys')
-        .mockResolvedValue({removal: {algo: 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm3OQFc='}});
+        .mockResolvedValue({removal: {ed25519: 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm3OQFc='}});
 
       jest.spyOn(apiClient.api.client, 'claimMLSKeyPackages').mockResolvedValue({key_packages: []});
       jest.spyOn(mlsService, 'scheduleKeyMaterialRenewal').mockImplementation();

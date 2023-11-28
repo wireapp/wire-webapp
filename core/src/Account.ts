@@ -445,19 +445,6 @@ export class Account extends TypedEventEmitter<Events> {
     let mlsService: MLSService | undefined;
     let e2eIdentityService: E2EIServiceExternal | undefined;
 
-    if (clientType === CryptoClientType.CORE_CRYPTO && (await this.isMlsEnabled())) {
-      e2eIdentityService = new E2EIServiceExternal(cryptoClient.getNativeClient());
-      mlsService = new MLSService(
-        this.apiClient,
-        cryptoClient.getNativeClient(),
-        this.db,
-        this.recurringTaskScheduler,
-        {
-          ...this.cryptoProtocolConfig?.mls,
-        },
-      );
-    }
-
     const proteusService = new ProteusService(this.apiClient, cryptoClient, {
       onNewClient: payload => this.emit(EVENTS.NEW_SESSION, payload),
       nbPrekeys: this.nbPrekeys,
@@ -482,6 +469,19 @@ export class Account extends TypedEventEmitter<Events> {
 
     const broadcastService = new BroadcastService(this.apiClient, proteusService);
     const userService = new UserService(this.apiClient);
+
+    if (clientType === CryptoClientType.CORE_CRYPTO && (await this.isMlsEnabled())) {
+      e2eIdentityService = new E2EIServiceExternal(cryptoClient.getNativeClient(), clientService);
+      mlsService = new MLSService(
+        this.apiClient,
+        cryptoClient.getNativeClient(),
+        this.db,
+        this.recurringTaskScheduler,
+        {
+          ...this.cryptoProtocolConfig?.mls,
+        },
+      );
+    }
 
     this.service = {
       e2eIdentity: e2eIdentityService,
