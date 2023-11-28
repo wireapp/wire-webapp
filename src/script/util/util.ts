@@ -267,7 +267,6 @@ const focusableElementsSelector =
 
 export const preventFocusOutside = (event: KeyboardEvent, parentId: string): void => {
   if (!isTabKey(event)) {
-    event.preventDefault();
     return;
   }
   event.preventDefault();

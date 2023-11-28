@@ -265,6 +265,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent): void => {
+      event.preventDefault();
       preventFocusOutside(event, 'video-calling');
     };
     document.addEventListener('keydown', onKeyDown);
