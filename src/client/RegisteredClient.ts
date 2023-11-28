@@ -17,7 +17,7 @@
  *
  */
 
-import {ClientType, Location, PublicClient} from './';
+import {ClientType, Location, MLSPublicKeyRecord, PublicClient} from './';
 
 export interface AddedClient extends PublicClient {
   /** The IP address from which the client was registered */
@@ -28,7 +28,7 @@ export interface AddedClient extends PublicClient {
   /** An ISO 8601 Date string */
   time: string;
   type: ClientType.PERMANENT | ClientType.TEMPORARY;
-  mls_public_keys: Record<string, string>;
+  mls_public_keys: MLSPublicKeyRecord;
   last_active?: string;
 }
 
