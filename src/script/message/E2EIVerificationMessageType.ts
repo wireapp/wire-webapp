@@ -18,12 +18,9 @@
  */
 
 export enum E2EIVerificationMessageType {
-  // DEGRADED States
-  DEGRADED = 'degraded',
   NEW_DEVICE = 'new-device',
   NEW_MEMBER = 'new-member',
   EXPIRED = 'expired',
   REVOKED = 'revoked',
   VERIFIED = 'verified',
-  UNVERIFIED = 'unverified',
 }

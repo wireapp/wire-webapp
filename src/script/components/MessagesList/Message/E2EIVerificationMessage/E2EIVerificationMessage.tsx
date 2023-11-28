@@ -17,19 +17,24 @@
  *
  */
 
-import {MLSVerified} from '@wireapp/react-ui-kit';
+import {Link, LinkVariant, MLSVerified} from '@wireapp/react-ui-kit';
 
 import {Icon} from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {replaceLink, t} from 'Util/LocalizerUtil';
+import {getLogger} from 'Util/Logger';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 import {isUser} from 'Util/TypePredicateUtil';
 
 import {MessageIcon, IconInfo} from './E2EIVerificationMessage.styles';
 
 import {Config} from '../../../../Config';
+import {E2EIHandler} from '../../../../E2EIdentity';
 import {Conversation} from '../../../../entity/Conversation';
 import {E2EIVerificationMessage as E2EIVerificationMessageEntity} from '../../../../entity/message/E2EIVerificationMessage';
 import {E2EIVerificationMessageType} from '../../../../message/E2EIVerificationMessageType';
+
+const logger = getLogger('E2EIVerificationMessage');
 
 export interface E2EIVerificationMessageProps {
   message: E2EIVerificationMessageEntity;
@@ -38,9 +43,13 @@ export interface E2EIVerificationMessageProps {
 
 export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificationMessageProps) => {
   const {messageType, userIds} = useKoSubscribableChildren(message, ['messageType', 'userIds']);
-  const {participating_user_ets: participatingUserEts} = useKoSubscribableChildren(conversation, [
+  const {participating_user_ets: participatingUserEts, selfUser} = useKoSubscribableChildren(conversation, [
     'participating_user_ets',
+    'selfUser',
   ]);
+
+  const messageUserId = userIds.length === 1 && userIds[0];
+  const isSelfUser = messageUserId && selfUser && matchQualifiedIds(messageUserId, selfUser.qualifiedId);
 
   const degradedUsers = userIds
     ?.map(qualifiedId => participatingUserEts?.find(user => user.id === qualifiedId.id))
@@ -49,13 +58,23 @@ export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificatio
   const usersName = degradedUsers?.map(user => user.name()).join(', ');
 
   const isVerified = messageType === E2EIVerificationMessageType.VERIFIED;
-  const isUnverified = messageType === E2EIVerificationMessageType.UNVERIFIED;
-  const isExpired = messageType === E2EIVerificationMessageType.EXPIRED;
   const isNewDevice = messageType === E2EIVerificationMessageType.NEW_DEVICE;
   const isNewMember = messageType === E2EIVerificationMessageType.NEW_MEMBER;
-  const isDegraded = messageType === E2EIVerificationMessageType.DEGRADED;
+  const isExpired = messageType === E2EIVerificationMessageType.EXPIRED;
+  const isRevoked = messageType === E2EIVerificationMessageType.REVOKED;
 
   const learnMoreReplacement = replaceLink(Config.getConfig().URL.SUPPORT.E2EI_VERIFICATION);
+
+  const getCertificate = async () => {
+    try {
+      await E2EIHandler.getInstance().enroll();
+    } catch (error) {
+      logger.error('Cannot get E2EI instance: ', error);
+    }
+  };
+
+  // TODO: Add update certificate method while this functionality will be finished
+  const updateCertificate = () => {};
 
   return (
     <div className="message-header">
@@ -75,50 +94,105 @@ export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificatio
         {isVerified && (
           <span
             dangerouslySetInnerHTML={{
-              __html: t('tooltipConversationAllE2EIVerified', {}, learnMoreReplacement),
+              __html: t('conversation.AllE2EIDevicesVerified', {}, learnMoreReplacement),
             }}
           />
         )}
 
-        {isExpired && (
-          <span
-            dangerouslySetInnerHTML={{
-              __html: t('tooltipConversationAllE2EICertificateExpired', {user: usersName}),
-            }}
-          />
-        )}
+        {isExpired &&
+          (!isSelfUser ? (
+            <span
+              dangerouslySetInnerHTML={{
+                __html: t('conversation.E2EICertificateExpired', {user: usersName}),
+              }}
+            />
+          ) : (
+            <>
+              <span
+                dangerouslySetInnerHTML={{
+                  __html: t('conversation.E2EISelfUserCertificateExpired'),
+                }}
+              />
 
-        {isNewDevice && (
-          <span
-            dangerouslySetInnerHTML={{
-              __html: t('tooltipConversationAllE2EINewDeviceAdded', {user: usersName}),
-            }}
-          />
-        )}
+              <Link
+                variant={LinkVariant.PRIMARY}
+                onClick={updateCertificate}
+                textTransform={'none'}
+                style={{fontSize: '.75rem', color: 'var(--accent-color)', textDecoration: 'none'}}
+                data-uie-name="update-certificate"
+              >
+                Update certificate now
+              </Link>
+            </>
+          ))}
 
-        {isNewMember && (
-          <span
-            dangerouslySetInnerHTML={{
-              __html: t('tooltipConversationAllE2EINewUserAdded', {user: usersName}),
-            }}
-          />
-        )}
+        {isNewDevice &&
+          (!isSelfUser ? (
+            <span
+              dangerouslySetInnerHTML={{
+                __html: t('conversation.E2EINewDeviceAdded', {user: usersName}),
+              }}
+            />
+          ) : (
+            <>
+              <span
+                dangerouslySetInnerHTML={{
+                  __html: t('conversation.E2EISelfUserUnverifiedDeviceAdded'),
+                }}
+              />
 
-        {isUnverified && (
-          <span
-            dangerouslySetInnerHTML={{
-              __html: t('tooltipConversationAllE2EINewUserAdded', {user: usersName}),
-            }}
-          />
-        )}
+              <Link
+                variant={LinkVariant.PRIMARY}
+                onClick={getCertificate}
+                textTransform={'none'}
+                style={{fontSize: '.75rem', color: 'var(--accent-color)', textDecoration: 'none'}}
+                data-uie-name="get-certificate"
+              >
+                Get the certificate now
+              </Link>
+            </>
+          ))}
 
-        {isDegraded && (
-          <span
-            dangerouslySetInnerHTML={{
-              __html: t('tooltipConversationAllE2EICertificateRevoked', {user: usersName}, learnMoreReplacement),
-            }}
-          />
-        )}
+        {isNewMember &&
+          (!isSelfUser ? (
+            <span
+              dangerouslySetInnerHTML={{
+                __html: t('conversation.E2EINewUserAdded', {user: usersName}),
+              }}
+            />
+          ) : (
+            <>
+              <span
+                dangerouslySetInnerHTML={{
+                  __html: t('conversation.E2EISelfUserUnverifiedUserAdded'),
+                }}
+              />
+              <Link
+                variant={LinkVariant.PRIMARY}
+                onClick={getCertificate}
+                textTransform={'none'}
+                style={{fontSize: '.75rem', color: 'var(--accent-color)', textDecoration: 'none'}}
+                data-uie-name="get-certificate"
+              >
+                Get the certificate now
+              </Link>
+            </>
+          ))}
+
+        {isRevoked &&
+          (!isSelfUser ? (
+            <span
+              dangerouslySetInnerHTML={{
+                __html: t('conversation.E2EICertificateRevoked', {user: usersName}, learnMoreReplacement),
+              }}
+            />
+          ) : (
+            <span
+              dangerouslySetInnerHTML={{
+                __html: t('conversation.E2EISelfUserCertificateRevoked', {}, learnMoreReplacement),
+              }}
+            />
+          ))}
       </div>
     </div>
   );

@@ -338,10 +338,10 @@ const _getStateUnreadMessage = {
       } else if (messageEntity.isE2EIVerification()) {
         string =
           messageEntity.messageType() === E2EIVerificationMessageType.VERIFIED
-            ? t('tooltipConversationAllDevicesVerified')
-            : t('tooltipConversationE2EIVerificationDegraded');
+            ? t('conversation.AllE2EIDevicesVerifiedShort')
+            : t('conversation.E2EIVerificationDegraded');
       } else if (messageEntity.isVerification()) {
-        string = t('tooltipConversationAllDevicesVerified');
+        string = t('conversation.AllDevicesVerified');
       }
 
       if (!!string) {
