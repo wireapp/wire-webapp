@@ -46,19 +46,13 @@ const STATE = {
     edgeBlur: 3,
   },
 };
-const resetTime = {
-  startInferenceTime: 0,
-  numInferences: 0,
-  inferenceTimeSum: 0,
-  lastPanelUpdate: 0,
-};
 
 const Video = ({srcObject, ...props}: VideoProps) => {
   const refVideo = useRef<HTMLVideoElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const ctx = useRef<CanvasRenderingContext2D | null | undefined>(null);
-  // let modelTime = {...resetTime};
   const segmenter = useRef<bodySegmentation.BodySegmenter | null>(null);
+  const rafId = useRef<number | null>(null);
 
   const draw = useCallback(
     (ctx: CanvasRenderingContext2D | null | undefined) => {
@@ -91,14 +85,10 @@ const Video = ({srcObject, ...props}: VideoProps) => {
 
   const segmenterFunc = useCallback(async () => {
     let segmentation = null;
-    console.log('segmenterFunc');
 
     // Segmenter can be null if initialization failed (for example when loading
     // from a URL that does not exist).
-    if (segmenter != null) {
-      // Change in what FPS should measure.
-      // Detectors can throw errors, for example when using custom URLs that
-      // contain a model that doesn't provide the expected output.
+    if (segmenter.current != null) {
       try {
         if (segmenter.current.segmentPeople != null && refVideo.current != null) {
           segmentation = await segmenter.current.segmentPeople(refVideo.current, {
@@ -111,12 +101,8 @@ const Video = ({srcObject, ...props}: VideoProps) => {
       } catch (error) {
         segmenter.current.dispose();
         segmenter.current = null;
-        alert(error);
       }
 
-      console.log('segmenter', segmenter.current, segmentation);
-      // const segmentationConfig = {flipHorizontal: false};
-      // // const people = await segmenter.segmentPeople(srcObject, segmentationConfig);
       const options = STATE.visualization;
       if (segmentation != null && canvas.current != null && refVideo.current != null) {
         await bodySegmentation.drawBokehEffect(
@@ -130,18 +116,20 @@ const Video = ({srcObject, ...props}: VideoProps) => {
       }
       draw(ctx.current);
     }
-    console.log('NO SEGMENTER');
   }, [draw, segmenter]);
+
+  const renderPrediction = useCallback(async () => {
+    await segmenterFunc().catch(console.warn);
+
+    rafId.current = requestAnimationFrame(async () => await renderPrediction());
+  }, [segmenterFunc]);
 
   useEffect(() => {
     if (refVideo.current) {
-      createSegmenter()
-        .then(() => {
-          segmenterFunc().catch(console.warn);
-        })
-        .catch(console.warn);
+      createSegmenter().catch(console.warn);
+      renderPrediction().catch(console.warn);
     }
-  }, [createSegmenter, segmenterFunc]);
+  }, [createSegmenter, renderPrediction, segmenterFunc]);
 
   // const gl = window.exposedContext;
   // if (gl)
@@ -171,10 +159,9 @@ const Video = ({srcObject, ...props}: VideoProps) => {
     [],
   );
 
-  // segmenterFunc().catch(console.warn);
   return (
     <>
-      <canvas ref={canvas}></canvas>
+      <canvas ref={canvas} />
       <video ref={refVideo} {...props} css={{visibility: 'hidden'}} />;
     </>
   );
