@@ -26,7 +26,7 @@ import {ClientEntity} from 'src/script/client/ClientEntity';
 import {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
-import {useDeviceIdentities} from 'src/script/hooks/useDeviceIdentities';
+import {useUserIdentity} from 'src/script/hooks/useDeviceIdentities';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -61,10 +61,7 @@ export const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
   const [localFingerprint, setLocalFingerprint] = useState('');
 
   const {devices} = useKoSubscribableChildren(selfUser, ['devices']);
-  const {getDeviceIdentity} = useDeviceIdentities(
-    selfUser.qualifiedId,
-    conversationState.selfMLSConversation()?.groupId,
-  );
+  const {getDeviceIdentity} = useUserIdentity(selfUser.qualifiedId, conversationState.selfMLSConversation()?.groupId);
   const currentClient = clientState.currentClient;
 
   const isSSO = selfUser.isNoPasswordSSO;
