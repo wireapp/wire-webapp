@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [26.6.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@26.5.4...@wireapp/api-client@26.6.0) (2023-11-28)
+
+### Features
+
+* enhance typing of mls publicKeys and add function for webapp to get selfClient status ([#5757](https://github.com/wireapp/wire-web-packages/issues/5757)) ([d266214](https://github.com/wireapp/wire-web-packages/commit/d2662148825b3c35974429036ddcc7f813a88c7c))
+
 ## [26.5.4](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@26.5.3...@wireapp/api-client@26.5.4) (2023-11-27)
 
 **Note:** Version bump only for package @wireapp/api-client
