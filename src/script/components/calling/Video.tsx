@@ -58,7 +58,7 @@ const Video = ({srcObject, ...props}: VideoProps) => {
   const canvas = useRef<HTMLCanvasElement>(null);
   const ctx = useRef<CanvasRenderingContext2D | null | undefined>(null);
   // let modelTime = {...resetTime};
-  let segmenter: bodySegmentation.BodySegmenter | null = null;
+  const segmenter = useRef<bodySegmentation.BodySegmenter | null>(null);
 
   const draw = useCallback(
     (ctx: CanvasRenderingContext2D | null | undefined) => {
@@ -78,7 +78,7 @@ const Video = ({srcObject, ...props}: VideoProps) => {
     draw(ctx.current);
   }, [draw]);
 
-  const createSegmenter = async () => {
+  const createSegmenter = useCallback(async () => {
     const model = bodySegmentation.SupportedModels.MediaPipeSelfieSegmentation;
     const segmenterConfig: bodySegmentation.MediaPipeSelfieSegmentationMediaPipeModelConfig = {
       runtime: 'mediapipe',
@@ -86,14 +86,13 @@ const Video = ({srcObject, ...props}: VideoProps) => {
       solutionPath: '/selfie_segmentation',
       // or 'base/node_modules/@mediapipe/selfie_segmentation' in npm.
     };
-    segmenter = await bodySegmentation.createSegmenter(model, segmenterConfig);
-  };
+    segmenter.current = await bodySegmentation.createSegmenter(model, segmenterConfig);
+  }, []);
 
-  const segmenterFunc = async () => {
+  const segmenterFunc = useCallback(async () => {
     let segmentation = null;
     console.log('segmenterFunc');
 
-    await createSegmenter();
     // Segmenter can be null if initialization failed (for example when loading
     // from a URL that does not exist).
     if (segmenter != null) {
@@ -101,8 +100,8 @@ const Video = ({srcObject, ...props}: VideoProps) => {
       // Detectors can throw errors, for example when using custom URLs that
       // contain a model that doesn't provide the expected output.
       try {
-        if (segmenter.segmentPeople != null && refVideo.current != null) {
-          segmentation = await segmenter.segmentPeople(refVideo.current, {
+        if (segmenter.current.segmentPeople != null && refVideo.current != null) {
+          segmentation = await segmenter.current.segmentPeople(refVideo.current, {
             flipHorizontal: false,
             multiSegmentation: false,
             segmentBodyParts: true,
@@ -110,12 +109,12 @@ const Video = ({srcObject, ...props}: VideoProps) => {
           });
         }
       } catch (error) {
-        segmenter.dispose();
-        segmenter = null;
+        segmenter.current.dispose();
+        segmenter.current = null;
         alert(error);
       }
 
-      console.log('segmenter', segmenter, segmentation);
+      console.log('segmenter', segmenter.current, segmentation);
       // const segmentationConfig = {flipHorizontal: false};
       // // const people = await segmenter.segmentPeople(srcObject, segmentationConfig);
       const options = STATE.visualization;
@@ -132,7 +131,17 @@ const Video = ({srcObject, ...props}: VideoProps) => {
       draw(ctx.current);
     }
     console.log('NO SEGMENTER');
-  };
+  }, [draw, segmenter]);
+
+  useEffect(() => {
+    if (refVideo.current) {
+      createSegmenter()
+        .then(() => {
+          segmenterFunc().catch(console.warn);
+        })
+        .catch(console.warn);
+    }
+  }, [createSegmenter, segmenterFunc]);
 
   // const gl = window.exposedContext;
   // if (gl)
@@ -162,7 +171,7 @@ const Video = ({srcObject, ...props}: VideoProps) => {
     [],
   );
 
-  segmenterFunc().catch(console.warn);
+  // segmenterFunc().catch(console.warn);
   return (
     <>
       <canvas ref={canvas}></canvas>
