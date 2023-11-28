@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [42.25.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.24.0...@wireapp/core@42.25.0) (2023-11-28)
+
+### Features
+
+* **E2EI:** add possibility to rotate a active certificate  ([#5758](https://github.com/wireapp/wire-web-packages/issues/5758)) ([e054cee](https://github.com/wireapp/wire-web-packages/commit/e054cee646eb285d8c37ef16b8ae4a45fc67d926))
+
 # [42.24.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.23.1...@wireapp/core@42.24.0) (2023-11-28)
 
 ### Features
