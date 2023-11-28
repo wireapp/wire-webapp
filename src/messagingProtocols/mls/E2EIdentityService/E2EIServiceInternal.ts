@@ -92,10 +92,12 @@ class E2EIServiceInternal {
     return E2EIServiceInternal.instance;
   }
 
-  public async startCertificateProcess() {
+  public async startCertificateProcess(refreshActiveCertificate: boolean) {
     // Step 0: Check if we have a handle in local storage
     // If we don't have a handle, we need to start a new OAuth flow
     try {
+      // Initialize the identity
+      await this.initIdentity(refreshActiveCertificate);
       return this.startNewOAuthFlow();
     } catch (error) {
       return this.exitWithError('Error while trying to start OAuth flow with error:', error);
@@ -117,6 +119,31 @@ class E2EIServiceInternal {
 
   // ############ Internal Functions ############
 
+  private async initIdentity(refreshActiveCertificate: boolean) {
+    const {clientId, user} = E2EIStorage.get.initialData();
+    const e2eiClientId = getE2EIClientId(clientId, user.id, user.domain).asString;
+    const expiryDays = 2;
+    const ciphersuite = Ciphersuite.MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519;
+
+    if (refreshActiveCertificate) {
+      this.identity = await this.coreCryptoClient.e2eiNewRotateEnrollment(
+        e2eiClientId,
+        expiryDays,
+        ciphersuite,
+        user.displayName,
+        user.handle,
+      );
+    } else {
+      this.identity = await this.coreCryptoClient.e2eiNewActivationEnrollment(
+        e2eiClientId,
+        user.displayName,
+        user.handle,
+        expiryDays,
+        ciphersuite,
+      );
+    }
+  }
+
   private exitWithError(message: string, error?: unknown) {
     this.logger.error(message, error);
     return undefined;
@@ -130,13 +157,6 @@ class E2EIServiceInternal {
         throw new Error();
       }
       this.acmeService = new AcmeService(discoveryUrl);
-      this.identity = await this.coreCryptoClient.e2eiNewActivationEnrollment(
-        getE2EIClientId(clientId, user.id, user.domain).asString,
-        user.displayName,
-        user.handle,
-        2,
-        Ciphersuite.MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519,
-      );
       this.isInitialized = true;
     } catch (error) {
       this.logger.error('Error while trying to initialize E2eIdentityService', error);
@@ -176,6 +196,7 @@ class E2EIServiceInternal {
     if (this.e2eServiceExternal.isEnrollmentInProgress()) {
       return this.exitWithError('Error while trying to start OAuth flow. There is already a flow in progress');
     }
+
     if (!this.isInitialized || !this.identity || !this.acmeService) {
       return this.exitWithError('Error while trying to start OAuth flow. E2eIdentityService is not fully initialized');
     }
