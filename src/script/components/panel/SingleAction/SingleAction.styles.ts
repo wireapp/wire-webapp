@@ -23,7 +23,3 @@ export const singleActionButtonStyle: CSSObject = {
   width: '100%',
   margin: '0 8px',
 };
-
-export const singleActionSpacerStyle: CSSObject = {
-  marginBottom: '90px',
-};
