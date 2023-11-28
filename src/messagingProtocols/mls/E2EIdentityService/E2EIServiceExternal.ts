@@ -26,6 +26,7 @@ import {Ciphersuite, CoreCrypto, E2eiConversationState, WireIdentity} from '@wir
 import {getE2EIClientId, uuidTobase64url} from './Helper';
 import {E2EIStorage} from './Storage/E2EIStorage';
 
+import {ClientService} from '../../../client';
 import {parseFullQualifiedClientId} from '../../../util/fullyQualifiedClientIdUtils';
 
 export type DeviceIdentity = Omit<WireIdentity, 'free'> & {deviceId: string};
@@ -34,7 +35,10 @@ export type DeviceIdentity = Omit<WireIdentity, 'free'> & {deviceId: string};
 export class E2EIServiceExternal {
   private readonly logger = logdown('@wireapp/core/E2EIdentityServiceExternal');
 
-  public constructor(private coreCryptoClient: CoreCrypto) {}
+  public constructor(
+    private readonly coreCryptoClient: CoreCrypto,
+    private readonly clientService: ClientService,
+  ) {}
 
   // Checks if there is a certificate stored in the local storage
   public hasActiveCertificate(): boolean {
@@ -112,5 +116,10 @@ export class E2EIServiceExternal {
       ...identity,
       deviceId: parseFullQualifiedClientId((identity as any).client_id).client,
     }));
+  }
+
+  public async isFreshMLSSelfClient(): Promise<boolean> {
+    const client = await this.clientService.loadClient();
+    return !!client && typeof client.mls_public_keys.ed25519 === 'string' && client.mls_public_keys.ed25519.length > 0;
   }
 }

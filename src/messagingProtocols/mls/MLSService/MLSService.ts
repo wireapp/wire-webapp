@@ -598,7 +598,7 @@ export class MLSService extends TypedEventEmitter<Events> {
    */
   private async uploadMLSPublicKeys(client: RegisteredClient) {
     // If we've already updated a client with its public key, there's no need to do it again.
-    if (client.mls_public_keys?.ed25519) {
+    if (typeof client.mls_public_keys.ed25519 === 'string' && client.mls_public_keys.ed25519.length > 0) {
       return;
     }
 

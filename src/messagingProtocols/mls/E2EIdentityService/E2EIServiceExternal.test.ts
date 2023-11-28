@@ -21,12 +21,16 @@ import {CoreCrypto, WireIdentity} from '@wireapp/core-crypto';
 
 import {E2EIServiceExternal} from './E2EIServiceExternal';
 
+import {ClientService} from '../../../client';
+
 function buildE2EIService() {
   const coreCrypto = {
     getUserIdentities: jest.fn(),
   } as unknown as jest.Mocked<CoreCrypto>;
 
-  return [new E2EIServiceExternal(coreCrypto), {coreCrypto}] as const;
+  const clientService = {} as jest.Mocked<ClientService>;
+
+  return [new E2EIServiceExternal(coreCrypto, clientService), {coreCrypto}] as const;
 }
 
 function generateCoreCryptoIdentity({status = 'Valid', deviceId = 'aaaaa'}: {status?: string; deviceId?: string} = {}) {
