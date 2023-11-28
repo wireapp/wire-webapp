@@ -123,7 +123,7 @@ class E2EIHandler {
     await oidcService.authenticate();
   }
 
-  private async enrollE2EI() {
+  private async enrollE2EI(refreshActiveCertificate: boolean = false) {
     try {
       // Notify user about E2EI enrollment in progress
       this.currentStep = E2EIHandlerStep.ENROLL;
@@ -140,12 +140,20 @@ class E2EIHandler {
         oAuthIdToken = userData?.id_token;
       }
 
-      const data = await this.core.enrollE2EI(
-        this.userState.self().name(),
-        this.userState.self().username(),
-        this.discoveryUrl,
+      const displayName = this.userState.self()?.name();
+      const handle = this.userState.self()?.username();
+      // If we don't have a display name or handle, we can't enroll
+      if (!displayName || !handle) {
+        throw new Error('No display name or handle found');
+      }
+
+      const data = await this.core.enrollE2EI({
+        discoveryUrl: this.discoveryUrl,
         oAuthIdToken,
-      );
+        displayName,
+        handle,
+        refreshActiveCertificate,
+      });
 
       // If the data is false or we dont get the ACMEChallenge, enrollment failed
       if (!data) {
