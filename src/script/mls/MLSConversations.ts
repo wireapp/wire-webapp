@@ -23,6 +23,7 @@ import {KeyPackageClaimUser} from '@wireapp/core/lib/conversation';
 import {Account} from '@wireapp/core';
 
 import {
+  isMLSCapableConversation,
   isMLSConversation,
   isSelfConversation,
   isTeamConversation,
@@ -37,13 +38,17 @@ import {User} from '../entity/User';
  * @param conversations - all the conversations that the user is part of
  * @param core - the instance of the core
  */
-export async function initMLSConversations(conversations: Conversation[], core: Account): Promise<void> {
+export async function initMLSConversations(
+  conversations: Conversation[],
+  core: Account,
+  onSuccessfulJoin?: (conversation: Conversation) => void,
+): Promise<void> {
   const {mls: mlsService, conversation: conversationService} = core.service || {};
   if (!mlsService || !conversationService) {
     throw new Error('MLS or Conversation service is not available!');
   }
 
-  const mlsConversations = conversations.filter(isMLSConversation);
+  const mlsConversations = conversations.filter(isMLSCapableConversation);
 
   await Promise.allSettled(
     mlsConversations.map(async mlsConversation => {
@@ -57,7 +62,11 @@ export async function initMLSConversations(conversations: Conversation[], core: 
       }
 
       //otherwise we should try joining via external commit
-      return conversationService.joinByExternalCommit(qualifiedId);
+      await conversationService.joinByExternalCommit(qualifiedId);
+
+      if (onSuccessfulJoin) {
+        return onSuccessfulJoin(mlsConversation);
+      }
     }),
   );
 }

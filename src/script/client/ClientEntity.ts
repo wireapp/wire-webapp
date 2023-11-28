@@ -38,14 +38,11 @@ export class ClientEntity {
   address?: string;
   class: ClientClassification | '?';
   cookie?: string;
-  domain?: string;
+  domain?: string | null;
   id: string;
   isSelfClient: boolean;
   label?: string;
-  location?: {
-    lat?: number;
-    lon?: number;
-  };
+
   meta: {
     isVerified: ko.Observable<boolean>;
     primaryKey?: string;
@@ -67,7 +64,6 @@ export class ClientEntity {
       this.address = '';
       this.cookie = '';
       this.label = ClientEntity.CONFIG.DEFAULT_VALUE;
-      this.location = {};
       this.model = ClientEntity.CONFIG.DEFAULT_VALUE;
       this.time = ClientEntity.CONFIG.DEFAULT_VALUE;
       this.type = ClientType.TEMPORARY;
@@ -100,7 +96,7 @@ export class ClientEntity {
     return this.type === ClientType.TEMPORARY;
   }
 
-  getName(): string {
+  getName(): string | undefined {
     const hasModel = this.model && this.model !== ClientEntity.CONFIG.DEFAULT_VALUE;
     return hasModel ? this.model : this.class.toUpperCase();
   }

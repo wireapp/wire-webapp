@@ -96,6 +96,7 @@ describe('CallingRepository', () => {
   afterEach(() => {
     callingRepository['callState'].calls([]);
     callingRepository['conversationState'].conversations([]);
+    callingRepository.destroy();
     jest.clearAllMocks();
   });
 
@@ -105,7 +106,7 @@ describe('CallingRepository', () => {
 
   describe('startCall', () => {
     it.each([ConversationProtocol.PROTEUS, ConversationProtocol.MLS])(
-      'starts a normal call in a 1:1 conversation for proteus or MLS conversation',
+      'starts a ONEONONE call for proteus or MLS 1:1 conversation',
       async protocol => {
         const conversation = createConversation(CONVERSATION_TYPE.ONE_TO_ONE, protocol);
         const callType = CALL_TYPE.NORMAL;
@@ -153,6 +154,22 @@ describe('CallingRepository', () => {
         expect.any(Function),
       );
     });
+
+    it('does not subscribe to epoch updates after initiating a call in 1:1 mls conversation', async () => {
+      const conversationId = {domain: 'example.com', id: 'conversation1'};
+
+      const groupId = 'groupId';
+      const mlsConversation = createConversation(
+        CONVERSATION_TYPE.ONE_TO_ONE,
+        ConversationProtocol.MLS,
+        conversationId,
+        groupId,
+      );
+
+      await callingRepository.startCall(mlsConversation, CALL_TYPE.NORMAL);
+
+      expect(container.resolve(Core).service?.subconversation.subscribeToEpochUpdates).not.toHaveBeenCalled();
+    });
   });
 
   describe('answerCall', () => {
@@ -191,6 +208,38 @@ describe('CallingRepository', () => {
         expect.any(Function),
         expect.any(Function),
       );
+    });
+
+    it('does not subscribe to epoch updates after answering a call in mls 1:1 conversation', async () => {
+      const conversationId = {domain: 'example.com', id: 'conversation2'};
+      const selfParticipant = createSelfParticipant();
+      const userId = {domain: '', id: ''};
+
+      const groupId = 'groupId';
+      const mlsConversation = createConversation(
+        CONVERSATION_TYPE.ONE_TO_ONE,
+        ConversationProtocol.MLS,
+        conversationId,
+        groupId,
+      );
+
+      const incomingCall = new Call(
+        userId,
+        mlsConversation.qualifiedId,
+        CONV_TYPE.ONEONONE,
+        selfParticipant,
+        CALL_TYPE.NORMAL,
+        {
+          currentAvailableDeviceId: mediaDevices,
+        } as unknown as MediaDevicesHandler,
+      );
+
+      jest.spyOn(callingRepository, 'pushClients').mockResolvedValueOnce(true);
+      callingRepository['conversationState'].conversations.push(mlsConversation);
+
+      await callingRepository.answerCall(incomingCall);
+
+      expect(container.resolve(Core).service?.subconversation.subscribeToEpochUpdates).not.toHaveBeenCalled();
     });
   });
 

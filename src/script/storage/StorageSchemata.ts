@@ -21,6 +21,8 @@ import type {Dexie, Transaction} from 'dexie';
 
 import {base64ToArray} from 'Util/util';
 
+import {ConversationRecord} from './record';
+
 import {categoryFromEvent} from '../message/MessageCategorization';
 
 interface DexieSchema {
@@ -413,6 +415,17 @@ export class StorageSchemata {
       {
         schema: {},
         version: 19,
+      },
+      {
+        schema: {},
+        upgrade: (transaction: Transaction) =>
+          transaction
+            .table(StorageSchemata.OBJECT_STORE.CONVERSATIONS)
+            .toCollection()
+            .modify((conversation: ConversationRecord) => {
+              conversation.initial_protocol = conversation.protocol;
+            }),
+        version: 20,
       },
     ];
   }

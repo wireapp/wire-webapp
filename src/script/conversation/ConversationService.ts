@@ -23,6 +23,7 @@ import type {
   ConversationCode,
   CONVERSATION_ACCESS,
   RemoteConversations,
+  ConversationProtocol,
 } from '@wireapp/api-client/lib/conversation';
 import type {
   ConversationJoinData,
@@ -30,6 +31,7 @@ import type {
   ConversationOtherMemberUpdateData,
   ConversationReceiptModeUpdateData,
 } from '@wireapp/api-client/lib/conversation/data';
+import {ConversationProtocolUpdateEvent} from '@wireapp/api-client/lib/event';
 import type {
   ConversationCodeDeleteEvent,
   ConversationCodeUpdateEvent,
@@ -45,7 +47,7 @@ import {container} from 'tsyringe';
 
 import {getLogger, Logger} from 'Util/Logger';
 
-import {MLSConversation} from './ConversationSelectors';
+import {MLSCapableConversation} from './ConversationSelectors';
 
 import type {Conversation as ConversationEntity} from '../entity/Conversation';
 import type {EventService} from '../event/EventService';
@@ -130,6 +132,22 @@ export class ConversationService {
     return this.apiClient.api.conversation.putConversation(conversationId, {
       name,
     });
+  }
+
+  /**
+   * Update the conversation protocol.
+   *
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/updateConversation
+   *
+   * @param conversationId ID of conversation to rename
+   * @param protocol new protocol of the conversation
+   * @returns Resolves with the server response
+   */
+  updateConversationProtocol(
+    conversationId: QualifiedId,
+    protocol: ConversationProtocol.MIXED | ConversationProtocol.MLS,
+  ): Promise<ConversationProtocolUpdateEvent | null> {
+    return this.apiClient.api.conversation.putConversationProtocol(conversationId, protocol);
   }
 
   /**
@@ -422,14 +440,32 @@ export class ConversationService {
    * Wipes MLS conversation in corecrypto and deletes the conversation state.
    * @param mlsConversation mls conversation
    */
-  async wipeMLSConversation(mlsConversation: MLSConversation) {
-    const {groupId} = mlsConversation;
-    return this.coreConversationService.wipeMLSConversation(groupId);
+  async wipeMLSCapableConversation(conversation: MLSCapableConversation) {
+    const {groupId} = conversation;
+    await this.coreConversationService.wipeMLSConversation(groupId);
   }
 
   public addMLSConversationRecoveredListener(onRecovered: (conversationId: QualifiedId) => void) {
     this.coreConversationService.on('MLSConversationRecovered', ({conversationId}) => onRecovered(conversationId));
   }
+
+  /**
+   * Will try to register mls group by sending an empty commit to establish it.
+   * After group was successfully established, it will try to add other users to the group.
+   *
+   * @param groupId - id of the MLS group
+   * @param conversationId - id of the conversation
+   * @param selfUserId - id of the self user
+   * @param qualifiedUsers - list of qualified users to add to the group (should not include the self user)
+   */
+  public readonly tryEstablishingMLSGroup = (params: {
+    groupId: string;
+    conversationId: QualifiedId;
+    selfUserId: QualifiedId;
+    qualifiedUsers: QualifiedId[];
+  }) => {
+    return this.coreConversationService.tryEstablishingMLSGroup(params);
+  };
 
   /**
    * Checks if MLS conversation exists locally.
