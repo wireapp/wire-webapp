@@ -22,17 +22,18 @@ import React, {useEffect, useState} from 'react';
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {ClientEntity} from 'src/script/client/ClientEntity';
+import {WireIdentity} from 'src/script/E2EIdentity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import {DetailedDevice} from './components/DetailedDevice';
-
-import {Config} from '../../../../../Config';
-import {MotionDuration} from '../../../../../motion/MotionDuration';
+import {Config} from '../../../../../../../Config';
+import {MotionDuration} from '../../../../../../../motion/MotionDuration';
+import {DetailedDevice} from '../DetailedDevice';
 
 interface DevicesPreferencesProps {
   device: ClientEntity;
   getFingerprint: (device: ClientEntity) => Promise<string | undefined>;
+  getDeviceIdentity?: (deviceId: string) => WireIdentity | undefined;
   onClose: () => void;
   onRemove: (device: ClientEntity) => void;
   onResetSession: (device: ClientEntity) => Promise<void>;
@@ -45,9 +46,10 @@ enum SessionResetState {
   RESET = 'reset',
 }
 
-const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
+export const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
   device,
   getFingerprint,
+  getDeviceIdentity,
   onVerify,
   onRemove,
   onClose,
@@ -66,7 +68,7 @@ const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
   };
 
   useEffect(() => {
-    getFingerprint(device).then(setFingerprint);
+    void getFingerprint(device).then(setFingerprint);
   }, [device, getFingerprint]);
 
   return (
@@ -76,6 +78,7 @@ const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
       data-uie-name="preferences-devices-details"
     >
       <h2 className="preferences-titlebar">{t('preferencesDeviceDetails')}</h2>
+
       <div className="preferences-content">
         <fieldset className="preferences-section">
           <legend className="preferences-devices-details">
@@ -87,9 +90,14 @@ const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
               aria-label={t('accessibility.preferencesDeviceDetails.goBack')}
             />
           </legend>
-          <DetailedDevice device={device} fingerprint={fingerprint || ''} />
 
-          <div className="preferences-devices-verification slider">
+          <DetailedDevice getDeviceIdentity={getDeviceIdentity} device={device} fingerprint={fingerprint || ''} />
+
+          <h3 className="label preferences-label preferences-devices-fingerprint-label">
+            {t('preferencesDeviceDetailsVerificationStatus')}
+          </h3>
+
+          <div className="participant-devices__verify slider">
             <input
               className="slider-input"
               type="checkbox"
@@ -101,22 +109,19 @@ const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
 
             <label className="button-label" htmlFor="preferences_device_verification" data-uie-name="do-verify">
               <span className="button-label__switch" />
-              <span className="button-label__text">{t('preferencesDevicesVerification')}</span>
+              <span className="button-label__text paragraph-body-3">{t('preferencesDevicesVerification')}</span>
             </label>
           </div>
 
-          <p className="preferences-detail">{t('preferencesDevicesFingerprintDetail', brandName)}</p>
+          <p className="paragraph-body-1">{t('preferencesDevicesFingerprintDetail', brandName)}</p>
         </fieldset>
 
         <section className="preferences-section">
-          <header className="preferences-header">
-            <hr className="preferences-separator" />
-          </header>
-        </section>
+          <p className="preferences-info preferences-reset-session paragraph-body-1">
+            {t('preferencesDevicesSessionDetail')}
+          </p>
 
-        <section className="preferences-section">
-          <p className="preferences-info">{t('preferencesDevicesSessionDetail')}</p>
-          <div className="preferences-devices-session" data-uie-name="preferences-device-details-session">
+          <div data-uie-name="preferences-device-details-session">
             {resetState === SessionResetState.RESET && (
               <Button
                 variant={ButtonVariant.TERTIARY}
@@ -128,9 +133,11 @@ const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
                 {t('preferencesDevicesSessionReset')}
               </Button>
             )}
+
             {resetState === SessionResetState.ONGOING && (
               <p className="preferences-devices-session-reset">{t('preferencesDevicesSessionOngoing')}</p>
             )}
+
             {resetState === SessionResetState.CONFIRMATION && (
               <p className="preferences-devices-session-confirmation accent-text">
                 {t('preferencesDevicesSessionConfirmation')}
@@ -139,9 +146,12 @@ const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
           </div>
         </section>
 
+        <hr className="preferences-separator" />
+
         {!device.isLegalHold() && (
           <section className="preferences-section">
-            <p className="preferences-info">{t('preferencesDevicesRemoveDetail')}</p>
+            <p className="preferences-info paragraph-body-1">{t('preferencesDevicesRemoveDetail')}</p>
+
             <Button
               variant={ButtonVariant.TERTIARY}
               type="button"
@@ -157,5 +167,3 @@ const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
     </div>
   );
 };
-
-export {DeviceDetailsPreferences};

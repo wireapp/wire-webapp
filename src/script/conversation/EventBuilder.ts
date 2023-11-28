@@ -244,8 +244,12 @@ export interface ErrorEvent
   id: string;
 }
 
+// E2EI Verified Events
+export type AllE2EIVerifiedEvent = ConversationEvent<CONVERSATION.E2EI_VERIFICATION>;
+
 export type ClientConversationEvent =
   | AllVerifiedEvent
+  | AllE2EIVerifiedEvent
   | AssetAddEvent
   | ErrorEvent
   | CompositeMessageAddEvent
@@ -314,6 +318,17 @@ export const EventBuilder = {
       id: createUuid(),
       time: new Date(conversationEntity.getNextTimestamp()).toISOString(),
       type: ClientEvent.CONVERSATION.VERIFICATION,
+    };
+  },
+
+  buildAllE2EIVerified(conversationEntity: Conversation): AllE2EIVerifiedEvent {
+    return {
+      ...buildQualifiedId(conversationEntity),
+      data: undefined,
+      from: '',
+      id: createUuid(),
+      time: conversationEntity.getNextIsoDate(),
+      type: ClientEvent.CONVERSATION.E2EI_VERIFICATION,
     };
   },
 

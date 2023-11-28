@@ -30,11 +30,12 @@ import {PanelHeader} from '../PanelHeader';
 interface ParticipantDevicesProps {
   onClose: () => void;
   onGoBack: (userEntity: User) => void;
+  groupId?: string;
   repositories: ViewModelRepositories;
   user: User;
 }
 
-const ParticipantDevices: FC<ParticipantDevicesProps> = ({repositories, onClose, onGoBack, user}) => {
+const ParticipantDevices: FC<ParticipantDevicesProps> = ({repositories, onClose, onGoBack, groupId, user}) => {
   const history = useUserDevicesHistory();
 
   return (
@@ -57,6 +58,7 @@ const ParticipantDevices: FC<ParticipantDevicesProps> = ({repositories, onClose,
 
       <FadingScrollbar className="panel__content">
         <UserDevices
+          groupId={groupId}
           clientRepository={repositories.client}
           cryptographyRepository={repositories.cryptography}
           messageRepository={repositories.message}

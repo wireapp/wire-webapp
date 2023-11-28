@@ -21,10 +21,10 @@ import React from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
-import {Availability} from '@wireapp/protocol-messaging';
-
 import {AvailabilityState} from 'Components/AvailabilityState';
 import {Icon} from 'Components/Icon';
+import {User} from 'src/script/entity/User';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 
@@ -40,24 +40,23 @@ import {
 } from './CallParticipantItemContent.styles';
 
 export interface CallParticipantItemContentProps {
-  name: string;
+  user: User;
   selfInTeam?: boolean;
   isAudioEstablished: boolean;
-  availability?: Availability.Type;
   isSelf?: boolean;
   showContextMenu: boolean;
   onDropdownClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
 export const CallParticipantItemContent = ({
-  name,
+  user,
   selfInTeam = false,
   isAudioEstablished,
-  availability = Availability.Type.NONE,
   isSelf = false,
   showContextMenu,
   onDropdownClick,
 }: CallParticipantItemContentProps) => {
+  const {name} = useKoSubscribableChildren(user, ['name']);
   const selfString = `(${capitalizeFirstChar(t('conversationYouNominative'))})`;
 
   return (
@@ -65,12 +64,7 @@ export const CallParticipantItemContent = ({
       <div css={contentText}>
         <div css={nameWrapper(isAudioEstablished)}>
           {selfInTeam ? (
-            <AvailabilityState
-              availability={availability}
-              css={[userAvailability, ellipsis]}
-              dataUieName="status-name"
-              label={name}
-            />
+            <AvailabilityState user={user} css={[userAvailability, ellipsis]} dataUieName="status-name" />
           ) : (
             <div css={[userName, ellipsis]} data-uie-name="status-name">
               {name}

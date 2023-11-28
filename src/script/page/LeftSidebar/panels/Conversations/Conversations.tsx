@@ -30,6 +30,7 @@ import {AvailabilityState} from 'Components/AvailabilityState';
 import {CallingCell} from 'Components/calling/CallingCell';
 import {Icon} from 'Components/Icon';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
+import {UserVerificationBadges} from 'Components/VerificationBadge';
 import {ListState} from 'src/script/page/useAppState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -87,10 +88,9 @@ const Conversations: React.FC<ConversationsProps> = ({
 }) => {
   const {
     name: userName,
-    availability: userAvailability,
     isOnLegalHold,
     hasPendingLegalHold,
-  } = useKoSubscribableChildren(selfUser, ['hasPendingLegalHold', 'isOnLegalHold', 'name', 'availability']);
+  } = useKoSubscribableChildren(selfUser, ['hasPendingLegalHold', 'isOnLegalHold', 'name']);
   const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
   const {connectRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
@@ -183,12 +183,9 @@ const Conversations: React.FC<ConversationsProps> = ({
             css={{...(showLegalHold && {gridColumn: '2/3'})}}
             onClick={event => AvailabilityContextMenu.show(event.nativeEvent, 'left-list-availability-menu')}
           >
-            <AvailabilityState
-              className="availability-state"
-              availability={userAvailability}
-              dataUieName="status-availability"
-              label={userName}
-            />
+            <AvailabilityState user={selfUser} className="availability-state" dataUieName="status-availability">
+              <UserVerificationBadges user={selfUser} groupId={conversationState.selfMLSConversation()?.groupId} />
+            </AvailabilityState>
           </button>
 
           {showLegalHold && (

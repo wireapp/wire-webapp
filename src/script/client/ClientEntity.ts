@@ -26,6 +26,10 @@ import {ClientMapper} from './ClientMapper';
 
 import {ClientRecord} from '../storage';
 
+export enum MLSPublicKeys {
+  ED25519 = 'ed25519',
+}
+
 export class ClientEntity {
   static CONFIG = {
     DEFAULT_VALUE: '?',
@@ -40,14 +44,14 @@ export class ClientEntity {
   label?: string;
 
   meta: {
-    isVerified?: ko.Observable<boolean>;
-    isMLSVerified?: ko.Observable<boolean>;
+    isVerified: ko.Observable<boolean>;
     primaryKey?: string;
     userId?: string;
   };
   model?: string;
   time?: string;
   type?: ClientType.PERMANENT | ClientType.TEMPORARY;
+  mlsPublicKeys?: Record<MLSPublicKeys, string>;
 
   constructor(isSelfClient: boolean, domain: string | null, id = '') {
     this.isSelfClient = isSelfClient;
@@ -68,7 +72,6 @@ export class ClientEntity {
     // Metadata maintained by us
     this.meta = {
       isVerified: ko.observable(false),
-      isMLSVerified: ko.observable(false),
       primaryKey: undefined,
     };
   }

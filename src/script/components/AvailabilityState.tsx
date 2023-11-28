@@ -24,20 +24,25 @@ import cx from 'classnames';
 
 import {Availability} from '@wireapp/protocol-messaging';
 
+import {selfIndicator} from 'Components/ParticipantItemContent/ParticipantItem.styles';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {CSS_SQUARE} from 'Util/CSSMixin';
 import {KEY} from 'Util/KeyboardUtil';
 
 import {Icon} from './Icon';
 
+import {User} from '../entity/User';
+
 interface AvailabilityStateProps {
-  availability: Availability.Type;
+  user: User;
   className?: string;
   dataUieName: string;
-  label: string;
+  selfString?: string;
   title?: string;
   onClick?: (event: React.MouseEvent | React.KeyboardEvent) => void;
   showArrow?: boolean;
   theme?: boolean;
+  children?: React.ReactNode;
 }
 
 const iconStyles: CSSObject = {
@@ -55,15 +60,18 @@ const buttonCommonStyles: CSSObject = {
 };
 
 export const AvailabilityState: React.FC<AvailabilityStateProps> = ({
-  availability,
+  user,
   className,
   dataUieName,
-  label,
+  selfString,
   title,
   showArrow = false,
   theme = false,
   onClick,
+  children,
 }) => {
+  const {availability, name: label} = useKoSubscribableChildren(user, ['availability', 'name']);
+
   const isAvailable = availability === Availability.Type.AVAILABLE;
   const isAway = availability === Availability.Type.AWAY;
   const isBusy = availability === Availability.Type.BUSY;
@@ -124,6 +132,10 @@ export const AvailabilityState: React.FC<AvailabilityStateProps> = ({
           {label}
         </span>
       )}
+
+      {selfString && <span css={selfIndicator}>{selfString}</span>}
+
+      {children}
 
       {showArrow && (
         <span

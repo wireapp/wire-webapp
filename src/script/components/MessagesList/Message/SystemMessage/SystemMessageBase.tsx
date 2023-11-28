@@ -39,9 +39,7 @@ export const SystemMessageBase: React.FC<SystemMessageProps> = ({message, isSend
       <p className="message-header-label">
         <span className="message-header-label__multiline">
           {isSenderNameVisible && <span className="message-header-sender-name">{unsafeSenderName}</span>}
-          {message.caption && (
-            <span className="system-message-caption ellipsis" dangerouslySetInnerHTML={{__html: message.caption}} />
-          )}
+          {message.caption && <span className="ellipsis" dangerouslySetInnerHTML={{__html: message.caption}} />}
         </span>
       </p>
       <div className="message-body-actions">

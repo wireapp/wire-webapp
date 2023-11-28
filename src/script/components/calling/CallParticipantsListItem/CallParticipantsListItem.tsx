@@ -63,10 +63,9 @@ export const CallParticipantsListItem = ({
   const {
     isDirectGuest,
     is_verified: isVerified,
-    availability,
     name: userName,
     isExternal,
-  } = useKoSubscribableChildren(user, ['isDirectGuest', 'is_verified', 'availability', 'name', 'isExternal']);
+  } = useKoSubscribableChildren(user, ['isDirectGuest', 'is_verified', 'name', 'isExternal']);
 
   const handleContextKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     handleKeyDown(event, () => {
@@ -103,9 +102,8 @@ export const CallParticipantsListItem = ({
 
         <CallParticipantItemContent
           isAudioEstablished={isAudioEstablished}
-          name={userName}
+          user={user}
           selfInTeam={selfInTeam}
-          availability={availability}
           isSelf={isSelf}
           showContextMenu={showContextMenu}
           onDropdownClick={event => onContextMenu?.(event as unknown as React.MouseEvent<HTMLDivElement>)}

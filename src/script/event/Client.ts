@@ -50,6 +50,7 @@ export enum CONVERSATION {
   FEDERATION_STOP = 'conversation.federation-stop',
   VOICE_CHANNEL_ACTIVATE = 'conversation.voice-channel-activate',
   VOICE_CHANNEL_DEACTIVATE = 'conversation.voice-channel-deactivate',
+  E2EI_VERIFICATION = 'conversation.e2ei-verification',
 }
 
 export enum USER {

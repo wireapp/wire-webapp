@@ -27,6 +27,7 @@ import {APIClient} from './APIClientSingleton';
 import {createStorageEngine, DatabaseTypes} from './StoreEngineProvider';
 
 import {Config} from '../Config';
+import {isE2EIEnabled} from '../E2EIdentity';
 
 declare global {
   interface Window {
@@ -57,7 +58,7 @@ export class Core extends Account {
           ? {
               keyingMaterialUpdateThreshold: Config.getConfig().FEATURE.MLS_CONFIG_KEYING_MATERIAL_UPDATE_THRESHOLD,
               defaultCiphersuite: Config.getConfig().FEATURE.MLS_CONFIG_DEFAULT_CIPHERSUITE,
-              useE2EI: Config.getConfig().FEATURE.ENABLE_E2EI,
+              useE2EI: isE2EIEnabled(),
             }
           : undefined,
 

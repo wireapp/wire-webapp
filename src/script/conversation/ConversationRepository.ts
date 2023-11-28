@@ -70,7 +70,6 @@ import {
 } from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {isBackendError} from 'Util/TypePredicateUtil';
-import {supportsMLS} from 'Util/util';
 import {createUuid} from 'Util/uuid';
 
 import {ACCESS_STATE} from './AccessState';
@@ -97,7 +96,6 @@ import {ConversationStateHandler} from './ConversationStateHandler';
 import {ConversationStatus} from './ConversationStatus';
 import {ConversationVerificationState} from './ConversationVerificationState';
 import {ProteusConversationVerificationStateHandler} from './ConversationVerificationStateHandler';
-import {registerMLSConversationVerificationStateHandler} from './ConversationVerificationStateHandler/MLS';
 import {OnConversationVerificationStateChange} from './ConversationVerificationStateHandler/shared';
 import {EventMapper} from './EventMapper';
 import {MessageRepository} from './MessageRepository';
@@ -288,15 +286,6 @@ export class ConversationRepository {
       this.userState,
       this.conversationState,
     );
-
-    if (supportsMLS()) {
-      // we register a handler that will handle MLS conversations on its own
-      registerMLSConversationVerificationStateHandler(
-        this.onConversationVerificationStateChange,
-        this.conversationState,
-        this.core,
-      );
-    }
 
     this.isBlockingNotificationHandling = true;
 
@@ -2169,14 +2158,6 @@ export class ConversationRepository {
     conversation.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.CLEARED);
   }
 
-  /**
-   * Wipes MLS conversation in corecrypto and deletes the conversation state.
-   * @param mlsConversation mls conversation
-   */
-  async wipeMLSCapableConversation(conversation: MLSCapableConversation) {
-    return this.conversationService.wipeMLSCapableConversation(conversation);
-  }
-
   async leaveGuestRoom(): Promise<void> {
     if (this.userState.self().isTemporaryGuest()) {
       const conversation = this.conversationState.getMostRecentConversation(true);
@@ -2974,6 +2955,7 @@ export class ConversationRepository {
       case ClientEvent.CONVERSATION.VERIFICATION:
       case ClientEvent.CONVERSATION.VOICE_CHANNEL_ACTIVATE:
       case ClientEvent.CONVERSATION.VOICE_CHANNEL_DEACTIVATE:
+      case ClientEvent.CONVERSATION.E2EI_VERIFICATION:
         return this.addEventToConversation(conversationEntity, eventJson);
     }
   }
