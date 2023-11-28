@@ -460,6 +460,20 @@ export class Account extends TypedEventEmitter<Events> {
     });
 
     const clientService = new ClientService(this.apiClient, proteusService, this.storeEngine);
+
+    if (clientType === CryptoClientType.CORE_CRYPTO && (await this.isMlsEnabled())) {
+      e2eIdentityService = new E2EIServiceExternal(cryptoClient.getNativeClient(), clientService);
+      mlsService = new MLSService(
+        this.apiClient,
+        cryptoClient.getNativeClient(),
+        this.db,
+        this.recurringTaskScheduler,
+        {
+          ...this.cryptoProtocolConfig?.mls,
+        },
+      );
+    }
+
     const connectionService = new ConnectionService(this.apiClient);
     const giphyService = new GiphyService(this.apiClient);
     const linkPreviewService = new LinkPreviewService(assetService);
@@ -478,19 +492,6 @@ export class Account extends TypedEventEmitter<Events> {
 
     const broadcastService = new BroadcastService(this.apiClient, proteusService);
     const userService = new UserService(this.apiClient);
-
-    if (clientType === CryptoClientType.CORE_CRYPTO && (await this.isMlsEnabled())) {
-      e2eIdentityService = new E2EIServiceExternal(cryptoClient.getNativeClient(), clientService);
-      mlsService = new MLSService(
-        this.apiClient,
-        cryptoClient.getNativeClient(),
-        this.db,
-        this.recurringTaskScheduler,
-        {
-          ...this.cryptoProtocolConfig?.mls,
-        },
-      );
-    }
 
     this.service = {
       e2eIdentity: e2eIdentityService,
