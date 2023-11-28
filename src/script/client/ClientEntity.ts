@@ -51,7 +51,7 @@ export class ClientEntity {
   model?: string;
   time?: string;
   type?: ClientType.PERMANENT | ClientType.TEMPORARY;
-  mlsPublicKeys?: Record<MLSPublicKeys, string>;
+  mlsPublicKeys?: Partial<Record<MLSPublicKeys, string>>;
 
   constructor(isSelfClient: boolean, domain: string | null, id = '') {
     this.isSelfClient = isSelfClient;
