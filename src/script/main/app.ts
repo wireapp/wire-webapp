@@ -25,7 +25,6 @@ import {Context} from '@wireapp/api-client/lib/auth';
 import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/';
 import {EVENTS as CoreEvents} from '@wireapp/core/lib/Account';
 import {amplify} from 'amplify';
-import Dexie from 'dexie';
 import platform from 'platform';
 import {container} from 'tsyringe';
 
@@ -120,7 +119,6 @@ export function doRedirect(signOutReason: SIGN_OUT_REASON) {
     url = appendParameter(url, `${URLParameter.REASON}=${signOutReason}`);
   }
 
-  Dexie.delete('/sqleet');
   window.location.replace(url);
 }
 
@@ -638,11 +636,7 @@ export class App {
       this.repository.calling.destroy();
 
       if (selfUser.isActivatedAccount()) {
-        if (this.service.storage.isTemporaryAndNonPersistent) {
-          this.logout(SIGN_OUT_REASON.CLIENT_REMOVED, true);
-        } else {
-          this.repository.storage.terminate('window.onunload');
-        }
+        this.repository.storage.terminate('window.onunload');
       } else {
         this.repository.conversation.leaveGuestRoom();
         this.repository.storage.deleteDatabase();

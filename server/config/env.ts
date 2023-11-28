@@ -148,9 +148,6 @@ export type Env = {
   /** Set a default federation domain in case no domain can be found */
   FEATURE_FEDERATION_DOMAIN: string;
 
-  /** Wether the temporary clients should use IndexedDB. If set to false, they will use an in-memory database */
-  FEATURE_PERSIST_TEMPORARY_CLIENTS: string;
-
   /** Feature toggle for the log in with a username. Can be set to true or false */
   FEATURE_ENABLE_USERNAME_LOGIN: string;
 
