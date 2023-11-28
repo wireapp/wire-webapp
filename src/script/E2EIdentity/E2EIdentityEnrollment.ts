@@ -146,6 +146,8 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
    * Renew the certificate without user action
    */
   private async renewCertificate(): Promise<void> {
+    // const refreshToken = OIDCServiceStore.get.refreshToken();
+
     const oidcService = getOIDCServiceInstance();
     try {
       // Use the oidc service to get the user data via silent authentication (refresh token)
@@ -258,7 +260,6 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
         refreshActiveCertificate,
       });
 
-      //console.log('data-oAuthIdToken', data, oAuthIdToken);
       // If the data is false or we dont get the ACMEChallenge, enrolment failed
       if (!data) {
         throw new Error('E2EI enrolment failed');
