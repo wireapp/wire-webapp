@@ -17,7 +17,7 @@
  *
  */
 
-import {CONVERSATION_EVENT, ConversationEvent} from '@wireapp/api-client/lib/event/';
+import {CONVERSATION_EVENT, ConversationEvent, ConversationProtocolUpdateEvent} from '@wireapp/api-client/lib/event/';
 import {container} from 'tsyringe';
 
 import {LinkPreview, Mention} from '@wireapp/protocol-messaging';
@@ -54,6 +54,7 @@ import {FailedToAddUsersMessage} from '../entity/message/FailedToAddUsersMessage
 import {FederationStopMessage} from '../entity/message/FederationStopMessage';
 import {FileAsset} from '../entity/message/FileAsset';
 import {FileTypeRestrictedMessage} from '../entity/message/FileTypeRestrictedMessage';
+import {JoinedAfterMLSMigrationFinalisationMessage} from '../entity/message/JoinedAfterMLSMigrationFinalisationMessage';
 import {LegalHoldMessage} from '../entity/message/LegalHoldMessage';
 import {LinkPreview as LinkPreviewEntity, LinkPreviewData} from '../entity/message/LinkPreview';
 import {Location} from '../entity/message/Location';
@@ -63,7 +64,9 @@ import type {Message} from '../entity/message/Message';
 import {MessageTimerUpdateMessage} from '../entity/message/MessageTimerUpdateMessage';
 import {MissedMessage} from '../entity/message/MissedMessage';
 import {MLSConversationRecoveredMessage} from '../entity/message/MLSConversationRecoveredMessage';
+import {MLSMigrationFinalisationOngoingCallMessage} from '../entity/message/MLSMigrationFinalisationOngoingCallMessage';
 import {PingMessage} from '../entity/message/PingMessage';
+import {ProtocolUpdateMessage} from '../entity/message/ProtocolUpdateMessage';
 import {ReceiptModeUpdateMessage} from '../entity/message/ReceiptModeUpdateMessage';
 import {RenameMessage} from '../entity/message/RenameMessage';
 import {Text} from '../entity/message/Text';
@@ -258,6 +261,11 @@ export class EventMapper {
         break;
       }
 
+      case CONVERSATION_EVENT.PROTOCOL_UPDATE: {
+        messageEntity = this._mapEventProtocolUpdate(event);
+        break;
+      }
+
       case ClientEvent.CONVERSATION.ASSET_ADD: {
         messageEntity = addMetadata(this._mapEventAssetAdd(event), event);
         break;
@@ -323,6 +331,16 @@ export class EventMapper {
 
       case ClientEvent.CONVERSATION.MISSED_MESSAGES: {
         messageEntity = this._mapEventMissedMessages();
+        break;
+      }
+
+      case ClientEvent.CONVERSATION.JOINED_AFTER_MLS_MIGRATION: {
+        messageEntity = this._mapEventJoinedAfterMLSMigrationFinalisation();
+        break;
+      }
+
+      case ClientEvent.CONVERSATION.MLS_MIGRATION_ONGOING_CALL: {
+        messageEntity = this._mapEventMLSMigrationFinalisationOngoingCall();
         break;
       }
 
@@ -637,6 +655,20 @@ export class EventMapper {
   }
 
   /**
+   * Maps JSON data of local missed message event to message entity.
+   */
+  private _mapEventJoinedAfterMLSMigrationFinalisation(): JoinedAfterMLSMigrationFinalisationMessage {
+    return new JoinedAfterMLSMigrationFinalisationMessage();
+  }
+
+  /**
+   * Maps JSON data of local missed message event to message entity.
+   */
+  private _mapEventMLSMigrationFinalisationOngoingCall(): MLSMigrationFinalisationOngoingCallMessage {
+    return new MLSMigrationFinalisationOngoingCallMessage();
+  }
+
+  /**
    * Maps JSON data of local MLS conversation recovered event to message entity.
    */
   private _mapEventMLSConversationRecovered(): MissedMessage {
@@ -648,6 +680,13 @@ export class EventMapper {
    */
   private _mapEventPing(): PingMessage {
     return new PingMessage();
+  }
+
+  /**
+   * Maps JSON data of `conversation.protocol-update` message into message entity.
+   */
+  private _mapEventProtocolUpdate(event: ConversationProtocolUpdateEvent): ProtocolUpdateMessage {
+    return new ProtocolUpdateMessage(event.data.protocol);
   }
 
   /**
