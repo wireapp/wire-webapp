@@ -70,10 +70,10 @@ export class OIDCService {
   }
 
   public clearProgress(): Promise<void> {
-    const {localStorage, sessionStorage} = window;
+    const {localStorage} = window;
     // remove all oidc keys from local and session storage to prevent errors and stale state
     clearKeysStartingWith('oidc.', localStorage);
-    clearKeysStartingWith('oidc.user:', sessionStorage);
+    clearKeysStartingWith('oidc.user:', localStorage);
     return this.userManager.clearStaleState();
   }
 }
