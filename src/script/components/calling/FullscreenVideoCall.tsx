@@ -31,7 +31,7 @@ import {ConversationClassifiedBar} from 'Components/input/ClassifiedBar';
 import {isMediaDevice} from 'src/script/guards/MediaDevice';
 import {MediaDeviceType} from 'src/script/media/MediaDeviceType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {KEY} from 'Util/KeyboardUtil';
+import {isEnterKey, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {preventFocusOutside} from 'Util/util';
 
@@ -265,7 +265,9 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent): void => {
-      event.preventDefault();
+      if (!isEnterKey(event)) {
+        event.preventDefault();
+      }
       preventFocusOutside(event, 'video-calling');
     };
     document.addEventListener('keydown', onKeyDown);
