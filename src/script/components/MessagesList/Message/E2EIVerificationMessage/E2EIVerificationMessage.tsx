@@ -24,7 +24,6 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';
-import {isUser} from 'Util/TypePredicateUtil';
 
 import {MessageIcon, IconInfo} from './E2EIVerificationMessage.styles';
 
@@ -51,9 +50,9 @@ export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificatio
   const messageUserId = userIds.length === 1 && userIds[0];
   const isSelfUser = messageUserId && selfUser && matchQualifiedIds(messageUserId, selfUser.qualifiedId);
 
-  const degradedUsers = userIds
-    ?.map(qualifiedId => participatingUserEts?.find(user => user.id === qualifiedId.id))
-    .filter(isUser);
+  const degradedUsers = participatingUserEts.filter(user =>
+    userIds.find(userId => matchQualifiedIds(userId, user.qualifiedId)),
+  );
 
   const usersName = degradedUsers?.map(user => user.name()).join(', ');
 
