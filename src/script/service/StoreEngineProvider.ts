@@ -17,6 +17,8 @@
  *
  */
 
+import {applyEncryptionMiddleware, NON_INDEXED_FIELDS} from 'dexie-encrypted';
+
 import type {CRUDEngine} from '@wireapp/store-engine';
 import {MemoryEngine} from '@wireapp/store-engine';
 import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
@@ -30,9 +32,23 @@ export enum DatabaseTypes {
   EFFEMERAL,
 }
 
-const providePermanentEngine = async (storeName: string, requestPersistentStorage: boolean): Promise<CRUDEngine> => {
+const providePermanentEngine = async (
+  storeName: string,
+  key?: Uint8Array,
+  requestPersistentStorage?: boolean,
+): Promise<CRUDEngine> => {
   const db = new DexieDatabase(storeName);
 
+  if (key) {
+    applyEncryptionMiddleware(
+      db,
+      key,
+      {
+        events: NON_INDEXED_FIELDS,
+      },
+      console.error,
+    );
+  }
   const engine = new IndexedDBEngine();
   try {
     await engine.initWithDb(db, requestPersistentStorage);
@@ -45,11 +61,11 @@ const providePermanentEngine = async (storeName: string, requestPersistentStorag
 export async function createStorageEngine(
   storeName: string,
   type: DatabaseTypes,
-  requestPersistentStorage: boolean = false,
+  {key, requestPersistentStorage}: {key?: Uint8Array; requestPersistentStorage?: boolean} = {},
 ): Promise<CRUDEngine> {
   switch (type) {
     case DatabaseTypes.PERMANENT:
-      return providePermanentEngine(storeName, requestPersistentStorage);
+      return providePermanentEngine(storeName, key, requestPersistentStorage);
 
     case DatabaseTypes.EFFEMERAL:
       return new MemoryEngine();

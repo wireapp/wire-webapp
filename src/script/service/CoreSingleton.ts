@@ -65,7 +65,14 @@ export class Core extends Account {
   constructor(apiClient = container.resolve(APIClient)) {
     const enableCoreCrypto = supportsMLS() || Config.getConfig().FEATURE.USE_CORE_CRYPTO;
     super(apiClient, {
-      createStore: storeName => createStorageEngine(storeName, DatabaseTypes.PERMANENT),
+      createStore: async storeName => {
+        const key = Config.getConfig().FEATURE.ENABLE_ENCRYTPION_AT_REST
+          ? await generateSecretKey(storeName, 'db-key', 32)
+          : undefined;
+        return createStorageEngine(storeName, DatabaseTypes.PERMANENT, {
+          key: key?.key,
+        });
+      },
 
       coreCryptoConfig: enableCoreCrypto
         ? {

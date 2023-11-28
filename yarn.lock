@@ -5048,6 +5048,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@stablelib/utf8@npm:1.0.0":
+  version: 1.0.0
+  resolution: "@stablelib/utf8@npm:1.0.0"
+  checksum: 87423b27c33616bf5bd78974361d5d5918f3a3057c3ac0e03358e3be5972e89ebea5f0188065559da718d2352fb6fbdb4afcee152eecdefdd76e4c88dfa269b8
+  languageName: node
+  linkType: hard
+
 "@surma/rollup-plugin-off-main-thread@npm:^2.2.3":
   version: 2.2.3
   resolution: "@surma/rollup-plugin-off-main-thread@npm:2.2.3"
@@ -7248,6 +7255,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"base64-arraybuffer-es6@npm:^0.6.0":
+  version: 0.6.0
+  resolution: "base64-arraybuffer-es6@npm:0.6.0"
+  peerDependencies:
+    core-js-bundle: ^3.6.5
+  checksum: 007c51d4445c6dda58db70c99a3465aef1a6812a2382ef47a7d65a3f514d4029afb43462a364e5c622fd7fe641bd7753acb5b1f77e92945e3f73143b67ad5a8c
+  languageName: node
+  linkType: hard
+
 "base64-arraybuffer-es6@npm:^0.7.0":
   version: 0.7.0
   resolution: "base64-arraybuffer-es6@npm:0.7.0"
@@ -8835,6 +8851,20 @@ __metadata:
   peerDependencies:
     dexie: ">1.3.6"
   checksum: 4884920011c859249209ebf1528f4cb10dd17ddaab47547107ecfaaf70037da842c3de986231bed1273423a9e58f29620c3e6fb7de390d0a28832e336b90b7f6
+  languageName: node
+  linkType: hard
+
+"dexie-encrypted@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "dexie-encrypted@npm:2.0.0"
+  dependencies:
+    "@stablelib/utf8": 1.0.0
+    tweetnacl: 1.0.3
+    typeson: 5.18.2
+    typeson-registry: 1.0.0-alpha.38
+  peerDependencies:
+    dexie: ^3.0.0
+  checksum: 17e934c15081142248022bf11cd6b43006a0cb72238582b8672d0bf616c2d295a82e5a140eaf2e7f43615c839e0d1a54b9b9f34c453c04f61d941b00937ff8ea
   languageName: node
   linkType: hard
 
@@ -18327,6 +18357,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"tweetnacl@npm:1.0.3":
+  version: 1.0.3
+  resolution: "tweetnacl@npm:1.0.3"
+  checksum: e4a57cac188f0c53f24c7a33279e223618a2bfb5fea426231991652a13247bea06b081fd745d71291fcae0f4428d29beba1b984b1f1ce6f66b06a6d1ab90645c
+  languageName: node
+  linkType: hard
+
 "type-check@npm:^0.4.0, type-check@npm:~0.4.0":
   version: 0.4.0
   resolution: "type-check@npm:0.4.0"
@@ -18476,6 +18513,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"typeson-registry@npm:1.0.0-alpha.38":
+  version: 1.0.0-alpha.38
+  resolution: "typeson-registry@npm:1.0.0-alpha.38"
+  dependencies:
+    base64-arraybuffer-es6: ^0.6.0
+    typeson: ^5.18.2
+    whatwg-url: ^8.1.0
+  checksum: 3aff6cf8444fad6a1be382a3204188a9c16c96a3ee71faabab0b60fc1450db3a2c4b8c29d2a85c12da4a0a1e47fd5c07ab2adacc2bb60450e3bac84c35215487
+  languageName: node
+  linkType: hard
+
 "typeson-registry@npm:^1.0.0-alpha.20":
   version: 1.0.0-alpha.39
   resolution: "typeson-registry@npm:1.0.0-alpha.39"
@@ -18484,6 +18532,16 @@ __metadata:
     typeson: ^6.0.0
     whatwg-url: ^8.4.0
   checksum: c6b629697acf4652aecfff7be760356d764600afc9beca253278bbfc44fae0fe635b7619201b83e497cdc30645cbce7614d12a04b5726d9b8b505f73e6a3fc2a
+  languageName: node
+  linkType: hard
+
+"typeson@npm:5.18.2, typeson@npm:^5.18.2":
+  version: 5.18.2
+  resolution: "typeson@npm:5.18.2"
+  peerDependencies:
+    core-js-bundle: ^3.6.4
+    regenerator-runtime: ^0.13.3
+  checksum: ce2cb4899a925d7a960de0c83ec0665859faa5bc0de246cb0f52b7ae05b6b6e2bff4fb7d191e7f51605b71ed394894164cdef3f2fafb1e9ba6ff647962fa0517
   languageName: node
   linkType: hard
 
@@ -19104,7 +19162,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"whatwg-url@npm:^8.4.0":
+"whatwg-url@npm:^8.1.0, whatwg-url@npm:^8.4.0":
   version: 8.7.0
   resolution: "whatwg-url@npm:8.7.0"
   dependencies:
@@ -19292,6 +19350,7 @@ __metadata:
     date-fns: 2.30.0
     dexie: 3.2.4
     dexie-batch: 0.4.3
+    dexie-encrypted: ^2.0.0
     dotenv: 16.3.1
     dpdm: 3.14.0
     emoji-picker-react: 4.5.16
