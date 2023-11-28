@@ -30,7 +30,6 @@ export const QUERY_KEY = {
   LANGUAGE: 'hl',
   LOCALE: 'hl',
   LOGOUT_REASON: 'reason',
-  PERSIST_TEMPORARY_CLIENTS: 'persist_temporary_clients',
   SSO_AUTO_LOGIN: 'sso_auto_login',
   SCOPE: 'scope',
   TRACKING: 'tracking',
@@ -57,7 +56,6 @@ export const FORWARDED_QUERY_KEYS = [
   QUERY_KEY.ACCOUNT_ID,
   QUERY_KEY.ENVIRONMENT,
   QUERY_KEY.LOCALE,
-  QUERY_KEY.PERSIST_TEMPORARY_CLIENTS,
   QUERY_KEY.TRACKING,
   ...Object.values(OAUTH_QUERY_KEYS),
 ];

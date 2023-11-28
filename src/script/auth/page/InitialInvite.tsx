@@ -64,7 +64,6 @@ const InitialInviteComponent = ({
   resetInviteErrors,
   invite,
   isTeamFlow,
-  doFlushDatabase,
   removeLocalStorage,
 }: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
@@ -73,7 +72,6 @@ const InitialInviteComponent = ({
   const [error, setError] = useState(null);
 
   const onInviteDone = async () => {
-    await doFlushDatabase();
     // Remove local storage item for 2FA logout if token expires.
     removeLocalStorage(QUERY_KEY.JOIN_EXPIRES);
     window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP));
@@ -215,7 +213,6 @@ type DispatchProps = ReturnType<typeof mapDispatchToProps>;
 const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
   bindActionCreators(
     {
-      doFlushDatabase: ROOT_ACTIONS.authAction.doFlushDatabase,
       invite: ROOT_ACTIONS.invitationAction.invite,
       removeLocalStorage: ROOT_ACTIONS.localStorageAction.deleteLocalStorage,
       resetInviteErrors: ROOT_ACTIONS.invitationAction.resetInviteErrors,

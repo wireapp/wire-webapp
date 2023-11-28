@@ -29,7 +29,7 @@ export class ClientMapper {
   static get CONFIG() {
     return {
       CLIENT_PAYLOAD: ['class', 'id', 'domain'],
-      SELF_CLIENT_PAYLOAD: ['address', 'cookie', 'label', 'location', 'model', 'time', 'type'],
+      SELF_CLIENT_PAYLOAD: ['address', 'cookie', 'label', 'model', 'time', 'type'],
     };
   }
 

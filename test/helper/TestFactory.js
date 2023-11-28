@@ -116,7 +116,6 @@ export class TestFactory {
     currentClient.cookie = 'webapp@2153234453@temporary@1470926647664';
     currentClient.id = '132b3653b33f851f';
     currentClient.label = 'Windows 10';
-    currentClient.location = {lat: 52.5233, lon: 13.4138};
     currentClient.meta = {isVerified: ko.observable(true), primaryKey: 'local_identity'};
     currentClient.model = 'Chrome (Temporary)';
     currentClient.time = '2016-10-07T16:01:42.133Z';

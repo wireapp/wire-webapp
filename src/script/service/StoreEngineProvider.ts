@@ -17,43 +17,28 @@
  *
  */
 
-import Dexie from 'dexie';
-
 import type {CRUDEngine} from '@wireapp/store-engine';
 import {MemoryEngine} from '@wireapp/store-engine';
 import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
-import {SQLeetEngine} from '@wireapp/store-engine-sqleet';
-
-import {saveRandomEncryptionKey} from 'Util/ephemeralValueStore';
 
 import {DexieDatabase} from '../storage/DexieDatabase';
-import {SQLeetSchemata} from '../storage/SQLeetSchemata';
 
 export enum DatabaseTypes {
   /** a permament storage that will still live after logout */
   PERMANENT,
-  /** a storage that is encrypted on disk */
-  ENCRYPTED,
   /** a storage that will be lost when the app is reloaded */
   EFFEMERAL,
 }
 
 const providePermanentEngine = async (storeName: string, requestPersistentStorage: boolean): Promise<CRUDEngine> => {
   const db = new DexieDatabase(storeName);
+
   const engine = new IndexedDBEngine();
   try {
     await engine.initWithDb(db, requestPersistentStorage);
   } catch (error) {
     await engine.initWithDb(db, false);
   }
-  return engine as CRUDEngine; // FIXME: the type of IndexedDBEngine needs fixing on the web packages side
-};
-
-const provideTemporaryAndNonPersistentEngine = async (storeName: string): Promise<CRUDEngine> => {
-  await Dexie.delete('/sqleet');
-  const encryptionKey = await saveRandomEncryptionKey();
-  const engine = new SQLeetEngine('/worker/sqleet-worker.js', SQLeetSchemata.getLatest(), encryptionKey);
-  await engine.init(storeName);
   return engine;
 };
 
@@ -65,9 +50,6 @@ export async function createStorageEngine(
   switch (type) {
     case DatabaseTypes.PERMANENT:
       return providePermanentEngine(storeName, requestPersistentStorage);
-
-    case DatabaseTypes.ENCRYPTED:
-      return provideTemporaryAndNonPersistentEngine(storeName);
 
     case DatabaseTypes.EFFEMERAL:
       return new MemoryEngine();

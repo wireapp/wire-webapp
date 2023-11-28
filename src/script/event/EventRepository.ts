@@ -437,7 +437,7 @@ export class EventRepository {
    * @param source Source of event
    * @returns The distributed event
    */
-  private handleEventDistribution(event: IncomingEvent, source: EventSource) {
+  private async handleEventDistribution(event: IncomingEvent, source: EventSource) {
     const eventDate = this.getIsoDateFromEvent(event);
     const isInjectedEvent = source === EventRepository.SOURCE.INJECTED;
     const canSetEventDate = !isInjectedEvent && eventDate;
@@ -449,7 +449,7 @@ export class EventRepository {
        * modify the last event timestamp which we use to query the backend's notification stream.
        */
       if (event.type !== ClientEvent.CONVERSATION.VOICE_CHANNEL_DEACTIVATE) {
-        this.updateLastEventDate(eventDate as string);
+        await this.updateLastEventDate(eventDate as string);
       }
     }
     return this.distributeEvent(event, source);
