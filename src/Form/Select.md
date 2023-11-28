@@ -27,6 +27,7 @@ const groupOptions = [
       {label: 'Group 2, option 2', value: 'value_4'},
       {label: 'Group 2, option 3', value: 'value_5'},
       {label: 'Group 2, option 5', value: 'value_6'},
+      {value: '7', label: 'Option 7'},
     ],
   },
 ];
