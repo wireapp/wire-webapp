@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [42.25.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.25.1...@wireapp/core@42.25.2) (2023-11-28)
+
+### Bug Fixes
+
+* Make sure MLSService is init before passing it to other services ([#5760](https://github.com/wireapp/wire-web-packages/issues/5760)) ([b6b648a](https://github.com/wireapp/wire-web-packages/commit/b6b648a57d07306cd2434772e5da6a7c2e238a15))
+
 ## [42.25.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.25.0...@wireapp/core@42.25.1) (2023-11-28)
 
 **Note:** Version bump only for package @wireapp/core
