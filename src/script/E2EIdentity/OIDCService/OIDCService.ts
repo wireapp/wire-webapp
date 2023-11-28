@@ -17,7 +17,7 @@
  *
  */
 
-import {UserManager, User, UserManagerSettings} from 'oidc-client-ts';
+import {UserManager, User, UserManagerSettings, WebStorageStateStore} from 'oidc-client-ts';
 
 import {clearKeysStartingWith} from 'Util/localStorage';
 
@@ -49,6 +49,8 @@ export class OIDCService {
         access_type: 'offline',
         prompt: 'consent',
       },
+      stateStore: new WebStorageStateStore({store: window.localStorage}),
+      userStore: new WebStorageStateStore({store: window.localStorage}),
     };
 
     this.userManager = new UserManager(dexioConfig);
