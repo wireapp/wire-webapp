@@ -772,6 +772,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     user: User,
     client: RegisteredClient,
     nbPrekeys: number,
+    refreshActiveCertificate: boolean,
     oAuthIdToken?: string,
   ): Promise<AcmeChallenge | boolean> {
     try {
@@ -785,7 +786,7 @@ export class MLSService extends TypedEventEmitter<Events> {
         keyPackagesAmount: nbPrekeys,
       });
       if (!oAuthIdToken) {
-        const challengeData = await instance.startCertificateProcess();
+        const challengeData = await instance.startCertificateProcess(refreshActiveCertificate);
         if (challengeData) {
           return challengeData;
         }
