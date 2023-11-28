@@ -50,6 +50,7 @@ const STATE = {
 const Video = ({srcObject, ...props}: VideoProps) => {
   const refVideo = useRef<HTMLVideoElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
+  const stream = useRef<MediaStream | null>(null);
   const ctx = useRef<CanvasRenderingContext2D | null | undefined>(null);
   const segmenter = useRef<bodySegmentation.BodySegmenter | null>(null);
   const rafId = useRef<number | null>(null);
@@ -70,6 +71,7 @@ const Video = ({srcObject, ...props}: VideoProps) => {
   useEffect(() => {
     ctx.current = canvas?.current?.getContext('2d');
     draw(ctx.current);
+    stream.current = canvas?.current?.captureStream() ?? null;
   }, [draw]);
 
   const createSegmenter = useCallback(async () => {
