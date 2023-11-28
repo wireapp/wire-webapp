@@ -69,7 +69,7 @@ const ModalContentStyles: CSSObject = {
   flexDirection: 'column',
   fontSize: '0.875rem',
   margin: 'auto',
-  maxHeight: 615,
+  maxHeight: '90vh',
   overflow: 'hidden',
   position: 'relative',
   transform: 'scale(0.8)',
