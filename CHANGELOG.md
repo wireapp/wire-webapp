@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [42.24.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.23.1...@wireapp/core@42.24.0) (2023-11-28)
+
+### Features
+
+* enhance typing of mls publicKeys and add function for webapp to get selfClient status ([#5757](https://github.com/wireapp/wire-web-packages/issues/5757)) ([d266214](https://github.com/wireapp/wire-web-packages/commit/d2662148825b3c35974429036ddcc7f813a88c7c))
+
 ## [42.23.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.23.0...@wireapp/core@42.23.1) (2023-11-27)
 
 ### Bug Fixes
