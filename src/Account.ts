@@ -338,15 +338,16 @@ export class Account extends TypedEventEmitter<Events> {
     const initialPreKeys = await this.service.proteus.createClient(entropyData);
 
     const client = await this.service.client.register(loginData, clientInfo, initialPreKeys);
+    const clientId = client.id;
 
     if (this.service.mls) {
       const {userId, domain = ''} = this.apiClient.context;
       await this.initMLSClient({id: userId, domain}, client);
     }
-    this.logger.info(`Created new client {mls: ${!!this.service.mls}, id: ${client.id}}`);
+    this.logger.info(`Created new client {mls: ${!!this.service.mls}, id: ${clientId}}`);
 
-    await this.service.notification.initializeNotificationStream();
-    await this.service.client.synchronizeClients(client.id);
+    await this.service.notification.initializeNotificationStream(clientId);
+    await this.service.client.synchronizeClients(clientId);
 
     return this.initClient(client);
   }
