@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [42.26.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.26.0...@wireapp/core@42.26.1) (2023-11-29)
+
+### Bug Fixes
+
+* **E2EI:** stop removing necessary data while clearing temporary data ([#5764](https://github.com/wireapp/wire-web-packages/issues/5764)) ([36a2aea](https://github.com/wireapp/wire-web-packages/commit/36a2aea81ca2e900e7f0d1373b716b3cdaf05b3a))
+
 # [42.26.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.25.2...@wireapp/core@42.26.0) (2023-11-29)
 
 ### Features
