@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [42.26.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.25.2...@wireapp/core@42.26.0) (2023-11-29)
+
+### Features
+
+* **E2EI:** add refresh flow to E2EIServiceInternal ([#5762](https://github.com/wireapp/wire-web-packages/issues/5762)) ([6a6f4d5](https://github.com/wireapp/wire-web-packages/commit/6a6f4d5d7c6995eb0e009a977c57aef67b3154e1))
+
 ## [42.25.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.25.1...@wireapp/core@42.25.2) (2023-11-28)
 
 ### Bug Fixes
