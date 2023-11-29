@@ -18,7 +18,6 @@
  */
 
 import {render} from '@testing-library/react';
-import ko from 'knockout';
 
 import {E2EIVerificationMessage as VerificationMessageEntity} from 'src/script/entity/message/E2EIVerificationMessage';
 import {E2EIVerificationMessageType} from 'src/script/message/E2EIVerificationMessageType';
@@ -42,7 +41,7 @@ describe('E2EIVerificationMessage', () => {
   describe('with verified message', () => {
     it('shows verified icon when message is verified', async () => {
       const message = createVerificationMessage({
-        messageType: ko.observable<E2EIVerificationMessageType>(E2EIVerificationMessageType.VERIFIED),
+        messageType: E2EIVerificationMessageType.VERIFIED,
       });
 
       const {getByTestId} = render(
@@ -59,8 +58,8 @@ describe('E2EIVerificationMessage', () => {
 
     it('show new unverified device added', async () => {
       const message = createVerificationMessage({
-        messageType: ko.observable<E2EIVerificationMessageType>(E2EIVerificationMessageType.NEW_DEVICE),
-        userIds: ko.observableArray([user.qualifiedId]),
+        messageType: E2EIVerificationMessageType.NEW_DEVICE,
+        userIds: [user.qualifiedId],
       });
 
       const {getByTestId} = render(
@@ -73,8 +72,8 @@ describe('E2EIVerificationMessage', () => {
 
     it('show new unverified user added', async () => {
       const message = createVerificationMessage({
-        messageType: ko.observable<E2EIVerificationMessageType>(E2EIVerificationMessageType.NEW_MEMBER),
-        userIds: ko.observableArray([user.qualifiedId]),
+        messageType: E2EIVerificationMessageType.NEW_MEMBER,
+        userIds: [user.qualifiedId],
       });
 
       const {getByTestId} = render(
@@ -87,8 +86,8 @@ describe('E2EIVerificationMessage', () => {
 
     it('show certificate expired', async () => {
       const message = createVerificationMessage({
-        messageType: ko.observable<E2EIVerificationMessageType>(E2EIVerificationMessageType.EXPIRED),
-        userIds: ko.observableArray([user.qualifiedId]),
+        messageType: E2EIVerificationMessageType.EXPIRED,
+        userIds: [user.qualifiedId],
       });
 
       const {getByTestId} = render(
@@ -101,8 +100,8 @@ describe('E2EIVerificationMessage', () => {
 
     it('show certificate revoked', async () => {
       const message = createVerificationMessage({
-        messageType: ko.observable<E2EIVerificationMessageType>(E2EIVerificationMessageType.REVOKED),
-        userIds: ko.observableArray([user.qualifiedId]),
+        messageType: E2EIVerificationMessageType.REVOKED,
+        userIds: [user.qualifiedId],
       });
 
       const {getByTestId} = render(

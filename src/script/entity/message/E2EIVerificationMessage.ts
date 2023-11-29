@@ -26,9 +26,9 @@ import {SuperType} from '../../message/SuperType';
 
 export class E2EIVerificationMessage extends Message {
   public messageType: E2EIVerificationMessageType;
-  public userIds: QualifiedId[];
+  public userIds?: QualifiedId[];
 
-  constructor(messageType: E2EIVerificationMessageType, userIds: QualifiedId[]) {
+  constructor(messageType: E2EIVerificationMessageType, userIds?: QualifiedId[]) {
     super();
 
     this.super_type = SuperType.E2EI_VERIFICATION;

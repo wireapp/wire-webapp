@@ -246,15 +246,12 @@ export interface ErrorEvent
 }
 
 // E2EI Verification Events
-export type AllE2EIVerifiedEventData = {type: E2EIVerificationMessageType};
-export type AllE2EIVerifiedEvent = ConversationEvent<CONVERSATION.E2EI_VERIFICATION, AllE2EIVerifiedEventData>;
-
-export type E2EIDegradedMessageEventData = {type: E2EIVerificationMessageType; userIds?: QualifiedId[]};
-export type E2EIDegradedMessageEvent = ConversationEvent<CONVERSATION.E2EI_VERIFICATION, E2EIDegradedMessageEventData>;
+export type E2EIVerificationEventData = {type: E2EIVerificationMessageType; userIds?: QualifiedId[]};
+export type E2EIVerificationEvent = ConversationEvent<CONVERSATION.E2EI_VERIFICATION, E2EIVerificationEventData>;
 
 export type ClientConversationEvent =
   | AllVerifiedEvent
-  | AllE2EIVerifiedEvent
+  | E2EIVerificationEvent
   | AssetAddEvent
   | ErrorEvent
   | CompositeMessageAddEvent
@@ -326,7 +323,7 @@ export const EventBuilder = {
     };
   },
 
-  buildAllE2EIVerified(conversationEntity: Conversation): AllE2EIVerifiedEvent {
+  buildAllE2EIVerified(conversationEntity: Conversation): E2EIVerificationEvent {
     return {
       ...buildQualifiedId(conversationEntity),
       data: {
@@ -343,7 +340,7 @@ export const EventBuilder = {
     conversationEntity: Conversation,
     type: E2EIVerificationMessageType,
     userIds?: QualifiedId[],
-  ): E2EIDegradedMessageEvent {
+  ): E2EIVerificationEvent {
     return {
       ...buildQualifiedId(conversationEntity),
       data: {
