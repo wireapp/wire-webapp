@@ -82,7 +82,7 @@ async function buildBackupRepository() {
 
   const backupService = new BackupService(storageService);
   const conversationRepository = {
-    init1To1Conversations: jest.fn(),
+    initAllLocal1To1Conversations: jest.fn(),
     getAllLocalConversations: jest.fn(),
     checkForDeletedConversations: jest.fn(),
     mapConnections: jest.fn().mockImplementation(() => []),

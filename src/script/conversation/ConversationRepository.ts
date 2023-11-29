@@ -108,6 +108,7 @@ import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
 import {ConnectionRepository} from '../connection/ConnectionRepository';
+import {ConnectionState} from '../connection/ConnectionState';
 import {
   AssetAddEvent,
   ButtonActionConfirmationEvent,
@@ -198,6 +199,7 @@ export class ConversationRepository {
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
     private readonly conversationState = container.resolve(ConversationState),
+    private readonly connectionState = container.resolve(ConnectionState),
     private readonly core = container.resolve(Core),
   ) {
     this.eventService = eventRepository.eventService;
@@ -331,7 +333,7 @@ export class ConversationRepository {
 
     window.addEventListener<any>(WebAppEvents.CONVERSATION.JOIN, this.onConversationJoin);
 
-    this.selfRepository.on('selfSupportedProtocolsUpdated', this.onSelfUserSupportedProtocolsUpdated);
+    this.selfRepository.on('selfSupportedProtocolsUpdated', this.initAllLocal1To1Conversations);
     this.userRepository.on('supportedProtocolsUpdated', this.onUserSupportedProtocolsUpdated);
   }
 
@@ -1829,11 +1831,6 @@ export class ConversationRepository {
     );
   }
 
-  private readonly onSelfUserSupportedProtocolsUpdated = async () => {
-    const one2oneConversations = this.conversationState.conversations().filter(conversation => conversation.is1to1());
-    await Promise.allSettled(one2oneConversations.map(conversation => this.init1to1Conversation(conversation)));
-  };
-
   private readonly onUserSupportedProtocolsUpdated = async ({user}: {user: User}) => {
     // After user's supported protocols are updated, we want to make sure that 1:1 conversation is initialised.
     const localMLSConversation = this.conversationState.findMLS1to1Conversation(user.qualifiedId);
@@ -1851,23 +1848,43 @@ export class ConversationRepository {
 
   /**
    * Maps user connections to the corresponding conversations.
-   * @param connectionEntities Connections entities
+   * @param connections Connections entities
    */
-  mapConnections(connectionEntities: ConnectionEntity[]): Promise<Conversation | undefined>[] {
-    this.logger.log(`Mapping '${connectionEntities.length}' user connection(s) to conversations`, connectionEntities);
-    return connectionEntities.map(connectionEntity => this.mapConnection(connectionEntity));
+  private async mapConnections(connections: ConnectionEntity[]): Promise<void> {
+    this.logger.log(`Mapping '${connections.length}' user connection(s) to conversations`, connections);
+    for (const connection of connections) {
+      try {
+        await this.mapConnection(connection);
+      } catch (error) {
+        this.logger.error(
+          `Failed when mapping a connection with user ${connection.userId} to a conversation, error: `,
+          error,
+        );
+      }
+    }
   }
 
   public readonly init1To1Conversations = async (connections: ConnectionEntity[], conversations: Conversation[]) => {
     if (connections.length) {
-      await Promise.allSettled(this.mapConnections(connections));
+      await this.mapConnections(connections);
     }
     await this.initTeam1To1Conversations(conversations);
   };
 
+  public readonly initAllLocal1To1Conversations = async () => {
+    return this.init1To1Conversations(this.connectionState.connections(), this.getAllLocalConversations());
+  };
+
   private readonly initTeam1To1Conversations = async (conversations: Conversation[]) => {
     const team1To1Conversations = conversations.filter(conversation => conversation.isTeam1to1());
-    await Promise.allSettled(team1To1Conversations.map(conversation => this.init1to1Conversation(conversation)));
+
+    for (const conversation of team1To1Conversations) {
+      try {
+        await this.init1to1Conversation(conversation);
+      } catch (error) {
+        this.logger.error(`Failed when initialising 1:1 conversation with id ${conversation.id}, error: `, error);
+      }
+    }
   };
 
   /**
