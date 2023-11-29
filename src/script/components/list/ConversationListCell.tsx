@@ -29,8 +29,8 @@ import React, {
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
 
-import {AvailabilityState} from 'Components/AvailabilityState';
 import {Avatar, AVATAR_SIZE, GroupAvatar} from 'Components/Avatar';
+import {UserInfo} from 'Components/UserInfo';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isKey, isOneOfKeys, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -190,18 +190,13 @@ const ConversationListCell = ({
           </div>
 
           <div className="conversation-list-cell-center">
-            {is1to1 && selfUser?.teamId ? (
-              <AvailabilityState
-                className="conversation-list-cell-availability"
-                user={conversation.firstUserEntity()!}
-                theme={isActive}
-                dataUieName="status-availability-item"
-              />
-            ) : (
-              <span className={cx('conversation-list-cell-name', {'conversation-list-cell-name--active': isActive})}>
-                {displayName}
-              </span>
-            )}
+            <UserInfo
+              className="conversation-list-cell-availability"
+              user={conversation.firstUserEntity()!}
+              theme={isActive}
+              dataUieName="status-availability-item"
+              showAvailability={is1to1 && !!selfUser?.teamId}
+            />
 
             <span
               className={cx('conversation-list-cell-description', {

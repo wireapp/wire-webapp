@@ -26,10 +26,10 @@ import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {AvailabilityState} from 'Components/AvailabilityState';
 import {CallingCell} from 'Components/calling/CallingCell';
 import {Icon} from 'Components/Icon';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
+import {UserInfo} from 'Components/UserInfo';
 import {UserVerificationBadges} from 'Components/VerificationBadge';
 import {ListState} from 'src/script/page/useAppState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -183,9 +183,9 @@ const Conversations: React.FC<ConversationsProps> = ({
             css={{...(showLegalHold && {gridColumn: '2/3'})}}
             onClick={event => AvailabilityContextMenu.show(event.nativeEvent, 'left-list-availability-menu')}
           >
-            <AvailabilityState user={selfUser} className="availability-state" dataUieName="status-availability">
+            <UserInfo user={selfUser} className="availability-state" dataUieName="status-availability" showAvailability>
               <UserVerificationBadges user={selfUser} groupId={conversationState.selfMLSConversation()?.groupId} />
-            </AvailabilityState>
+            </UserInfo>
           </button>
 
           {showLegalHold && (

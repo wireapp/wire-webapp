@@ -21,7 +21,7 @@ import {render} from '@testing-library/react';
 
 import {Availability} from '@wireapp/protocol-messaging';
 
-import {AvailabilityState} from './AvailabilityState';
+import {UserInfo} from './UserInfo';
 
 import {User} from '../entity/User';
 
@@ -31,14 +31,13 @@ const defaultProps = {
   dataUieName: 'example-data-uie',
   user,
   label: 'example',
-  showArrow: false,
   theme: false,
 };
 
 describe('AvailabilityState', () => {
   it('renders available icon', async () => {
     user.availability(Availability.Type.AVAILABLE);
-    const {getByTestId} = render(<AvailabilityState {...defaultProps} />);
+    const {getByTestId} = render(<UserInfo {...defaultProps} />);
 
     const statusAvailabilityIcon = getByTestId('status-availability-icon');
     expect(statusAvailabilityIcon.getAttribute('data-uie-value')).toEqual('available');
@@ -47,7 +46,7 @@ describe('AvailabilityState', () => {
   it('renders away icon', async () => {
     user.availability(Availability.Type.AWAY);
 
-    const {getByTestId} = render(<AvailabilityState {...defaultProps} />);
+    const {getByTestId} = render(<UserInfo {...defaultProps} />);
 
     const statusAvailabilityIcon = getByTestId('status-availability-icon');
     expect(statusAvailabilityIcon.getAttribute('data-uie-value')).toEqual('away');
@@ -56,24 +55,9 @@ describe('AvailabilityState', () => {
   it('renders busy icon', async () => {
     user.availability(Availability.Type.BUSY);
 
-    const {getByTestId} = render(<AvailabilityState {...defaultProps} />);
+    const {getByTestId} = render(<UserInfo {...defaultProps} />);
 
     const statusAvailabilityIcon = getByTestId('status-availability-icon');
     expect(statusAvailabilityIcon.getAttribute('data-uie-value')).toEqual('busy');
-  });
-
-  it('renders availability icon with arrow', async () => {
-    user.availability(Availability.Type.BUSY);
-    const props = {
-      ...defaultProps,
-      showArrow: true,
-    };
-
-    const {getByTestId} = render(<AvailabilityState {...props} />);
-
-    const statusAvailabilityIcon = getByTestId('status-availability-icon');
-    expect(statusAvailabilityIcon.getAttribute('data-uie-value')).toEqual('busy');
-
-    expect(getByTestId('availability-arrow')).not.toBeNull();
   });
 });

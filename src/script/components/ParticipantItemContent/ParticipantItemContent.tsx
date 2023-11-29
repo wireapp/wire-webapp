@@ -19,8 +19,8 @@
 
 import React from 'react';
 
-import {AvailabilityState} from 'Components/AvailabilityState';
 import {Icon} from 'Components/Icon';
+import {UserInfo} from 'Components/UserInfo';
 import {User} from 'src/script/entity/User';
 import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -72,15 +72,16 @@ export const ParticipantItemContent = ({
     <div css={wrapper}>
       <div css={contentText}>
         <div css={nameWrapper}>
-          {!isService && showAvailabilityState && selfInTeam ? (
-            <AvailabilityState
+          {!isService ? (
+            <UserInfo
               user={participant}
               css={[userName, userAvailability, ellipsis]}
               dataUieName="status-name"
               selfString={selfString}
+              showAvailability={showAvailabilityState && selfInTeam}
             >
               {!isSelectable && renderParticipantBadges?.(participant)}
-            </AvailabilityState>
+            </UserInfo>
           ) : (
             <>
               <div css={[userName, ellipsis]} data-uie-name="status-name">
@@ -88,8 +89,6 @@ export const ParticipantItemContent = ({
 
                 {selfString && <span css={selfIndicator}>{selfString}</span>}
               </div>
-
-              {!isSelectable && !isService && renderParticipantBadges?.(participant)}
             </>
           )}
         </div>
