@@ -41,15 +41,15 @@ export const DetailedDevice: React.FC<DeviceProps> = ({
   getDeviceIdentity,
   isProteusVerified,
 }) => {
-  const identity = getDeviceIdentity?.(device.id);
+  const getIdentity = getDeviceIdentity ? () => getDeviceIdentity(device.id) : undefined;
   return (
     <>
       <h3 className="preferences-devices-model preferences-devices-model-name" data-uie-name="device-model">
         <span>{device.model}</span>
-        <DeviceVerificationBadges device={device} getIdentity={() => identity} />
+        <DeviceVerificationBadges device={device} getIdentity={getIdentity} />
       </h3>
 
-      {getDeviceIdentity && <MLSDeviceDetails isCurrentDevice={isCurrentDevice} identity={identity} />}
+      {getDeviceIdentity && <MLSDeviceDetails isCurrentDevice={isCurrentDevice} identity={getIdentity?.()} />}
 
       <ProteusDeviceDetails device={device} fingerprint={fingerprint} isProteusVerified={isProteusVerified} />
     </>

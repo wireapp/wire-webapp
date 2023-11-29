@@ -17,8 +17,6 @@
  *
  */
 
-import {useRef} from 'react';
-
 import {ErrorBoundary} from 'react-error-boundary';
 import {container} from 'tsyringe';
 
@@ -33,8 +31,6 @@ import {ContentState} from 'src/script/page/useAppState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
-import {loadValue} from 'Util/StorageUtil';
-import {isTemporaryClientAndNonPersistent} from 'Util/util';
 
 import {AccountInput} from './accountPreferences/AccountInput';
 import {AccountLink} from './accountPreferences/AccountLink';
@@ -56,7 +52,6 @@ import {Config} from '../../../../Config';
 import {ConversationRepository} from '../../../../conversation/ConversationRepository';
 import {User} from '../../../../entity/User';
 import {PropertiesRepository} from '../../../../properties/PropertiesRepository';
-import {StorageKey} from '../../../../storage';
 import {TeamState} from '../../../../team/TeamState';
 import {RichProfileRepository} from '../../../../user/RichProfileRepository';
 import type {UserRepository} from '../../../../user/UserRepository';
@@ -105,8 +100,6 @@ export const AccountPreferences = ({
 
   const canEditProfile = managedBy === User.CONFIG.MANAGED_BY.WIRE;
   const isDesktop = Runtime.isDesktopApp();
-  const persistedAuth = loadValue(StorageKey.AUTH.PERSIST);
-  const isTemporaryAndNonPersistent = useRef(isTemporaryClientAndNonPersistent(!!persistedAuth));
   const config = Config.getConfig();
   const brandName = config.BRAND_NAME;
   const isConsentCheckEnabled = config.FEATURE.CHECK_CONSENT;
@@ -240,9 +233,7 @@ export const AccountPreferences = ({
 
       {isActivatedAccount && (
         <>
-          {!isTemporaryAndNonPersistent.current && (
-            <HistoryBackupSection brandName={brandName} importFile={importFile} switchContent={switchContent} />
-          )}
+          <HistoryBackupSection brandName={brandName} importFile={importFile} switchContent={switchContent} />
 
           <AccountSecuritySection selfUser={selfUser} userRepository={userRepository} />
 

@@ -22,7 +22,6 @@ import {singleton} from 'tsyringe';
 
 import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
 import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
-import {SQLeetEngine} from '@wireapp/store-engine-sqleet';
 
 import {Logger, getLogger} from 'Util/Logger';
 import {loadValue, storeValue} from 'Util/StorageUtil';
@@ -51,7 +50,6 @@ export class StorageService {
   private readonly dbListeners: DatabaseListener[] = [];
   private hasHookSupport: boolean;
   private engine: CRUDEngine;
-  public isTemporaryAndNonPersistent: boolean;
   private readonly logger: Logger;
   public dbName?: string;
 
@@ -74,7 +72,6 @@ export class StorageService {
     this.engine = engine;
     this.dbName = this.engine.storeName;
     this.hasHookSupport = this.engine instanceof IndexedDBEngine;
-    this.isTemporaryAndNonPersistent = this.engine instanceof SQLeetEngine;
 
     try {
       if (this.hasHookSupport) {
@@ -141,12 +138,10 @@ export class StorageService {
    * @returns Resolves when all stores have been cleared
    */
   async clearStores(): Promise<void[]> {
-    const deleteStorePromises = this.isTemporaryAndNonPersistent
-      ? [this.engine.purge()]
-      : Object.keys(this.db?._dbSchema ?? [])
-          // avoid clearing tables needed by third parties (dexie-observable for eg)
-          .filter(table => !table.startsWith('_'))
-          .map(storeName => this.deleteStore(storeName));
+    const deleteStorePromises = Object.keys(this.db?._dbSchema ?? [])
+      // avoid clearing tables needed by third parties (dexie-observable for eg)
+      .filter(table => !table.startsWith('_'))
+      .map(storeName => this.deleteStore(storeName));
     return Promise.all(deleteStorePromises);
   }
 
@@ -199,21 +194,6 @@ export class StorageService {
   }
 
   async deleteEventInConversation(storeName: string, conversationId: string, eventId: string): Promise<number> {
-    if (this.isTemporaryAndNonPersistent) {
-      let deletedRecords = 0;
-      const primaryKeys = await this.readAllPrimaryKeys(storeName);
-
-      for (const primaryKey of primaryKeys) {
-        const record = await this.load<{conversation: string; id: string; time: number}>(storeName, primaryKey);
-        if (record?.id === eventId && record.conversation === conversationId) {
-          await this.delete(storeName, primaryKey);
-          deletedRecords++;
-        }
-      }
-
-      return deletedRecords;
-    }
-
     if (!this.db) {
       return 0;
     }
@@ -227,21 +207,6 @@ export class StorageService {
   }
 
   async deleteEventsByDate(storeName: string, conversationId: string, isoDate?: string): Promise<number> {
-    if (this.isTemporaryAndNonPersistent) {
-      let deletedRecords = 0;
-      const primaryKeys = await this.readAllPrimaryKeys(storeName);
-
-      for (const primaryKey of primaryKeys) {
-        const record = await this.load<{conversation: string; time: string}>(storeName, primaryKey);
-        if (record?.conversation === conversationId && (!isoDate || isoDate >= record.time)) {
-          await this.delete(storeName, primaryKey);
-          deletedRecords++;
-        }
-      }
-
-      return deletedRecords;
-    }
-
     if (!this.db) {
       return 0;
     }
@@ -302,10 +267,6 @@ export class StorageService {
   }
 
   async loadFromSimpleStorage<T = Object>(primaryKey: string): Promise<T | undefined> {
-    if (this.isTemporaryAndNonPersistent) {
-      return this.load<T>(StorageSchemata.OBJECT_STORE.AMPLIFY, primaryKey);
-    }
-
     return loadValue(primaryKey);
   }
 
@@ -326,35 +287,17 @@ export class StorageService {
       throw new StorageError(StorageError.TYPE.NO_DATA, StorageError.MESSAGE.NO_DATA);
     }
 
-    if (this.isTemporaryAndNonPersistent) {
-      try {
-        const newKey = await this.engine.create(storeName, primaryKey, entity);
-        return newKey;
-      } catch (error) {
-        if (error instanceof StoreEngineError.RecordAlreadyExistsError) {
-          await this.update(storeName, primaryKey, entity);
-          return primaryKey;
-        }
-        this.logger.error(`Failed to create '${primaryKey}' in store '${storeName}'`, error);
-        throw error;
-      }
-    } else {
-      try {
-        const newKey = await this.engine.updateOrCreate(storeName, primaryKey, entity);
-        return newKey;
-      } catch (error) {
-        this.logger.error(`Failed to update or create '${primaryKey}' in store '${storeName}'`, error);
-        throw error;
-      }
+    try {
+      const newKey = await this.engine.updateOrCreate(storeName, primaryKey, entity);
+      return newKey;
+    } catch (error) {
+      this.logger.error(`Failed to update or create '${primaryKey}' in store '${storeName}'`, error);
+      throw error;
     }
   }
 
   async saveToSimpleStorage<T = Object>(primaryKey: string, entity: T): Promise<void> {
-    if (this.isTemporaryAndNonPersistent) {
-      await this.engine.updateOrCreate(StorageSchemata.OBJECT_STORE.AMPLIFY, primaryKey, entity);
-    } else {
-      storeValue(primaryKey, entity);
-    }
+    storeValue(primaryKey, entity);
   }
 
   /**

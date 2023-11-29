@@ -20,35 +20,15 @@
 import {Decoder, Encoder} from 'bazinga64';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
-import {UrlUtil, Runtime} from '@wireapp/commons';
+import {Runtime} from '@wireapp/commons';
 
 import {isTabKey} from './KeyboardUtil';
-import {loadValue} from './StorageUtil';
 
-import {QUERY_KEY} from '../auth/route';
 import {Config} from '../Config';
 import type {Conversation} from '../entity/Conversation';
 import {AuthError} from '../error/AuthError';
-import {StorageKey} from '../storage/StorageKey';
-
-export const isTemporaryClientAndNonPersistent = (persist: boolean): boolean => {
-  if (persist === undefined) {
-    throw new Error('Type of client is unspecified.');
-  }
-
-  const isNonPersistentByUrl = UrlUtil.getURLParameter(QUERY_KEY.PERSIST_TEMPORARY_CLIENTS) === 'false';
-  const isNonPersistentByServerConfig = Config.getConfig().FEATURE?.PERSIST_TEMPORARY_CLIENTS === false;
-  const isNonPersistent = isNonPersistentByUrl || isNonPersistentByServerConfig;
-
-  const isTemporary = persist === false;
-  return isTemporary && isNonPersistent;
-};
 
 export const checkIndexedDb = (): Promise<void> => {
-  if (isTemporaryClientAndNonPersistent(loadValue(StorageKey.AUTH.PERSIST))) {
-    return Promise.resolve();
-  }
-
   if (!Runtime.isSupportingIndexedDb()) {
     const errorType = Runtime.isEdge() ? AuthError.TYPE.PRIVATE_MODE : AuthError.TYPE.INDEXED_DB_UNSUPPORTED;
     const errorMessage = Runtime.isEdge() ? AuthError.MESSAGE.PRIVATE_MODE : AuthError.MESSAGE.INDEXED_DB_UNSUPPORTED;

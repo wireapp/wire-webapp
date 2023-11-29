@@ -266,8 +266,10 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
   if (message.isFileTypeRestricted()) {
     return <FileTypeRestrictedMessage message={message} />;
   }
+
   if (message.isMissed()) {
     return <MissedMessage />;
   }
+
   return null;
 };
