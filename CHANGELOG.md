@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [42.26.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.26.1...@wireapp/core@42.26.2) (2023-11-29)
+
+### Bug Fixes
+
+* **E2EI:** stop E2EIStorage getter methods from deleting data ([#5765](https://github.com/wireapp/wire-web-packages/issues/5765)) ([93ac8ee](https://github.com/wireapp/wire-web-packages/commit/93ac8ee880d1e84a733b6eab107fbaf2539b042a))
+
 ## [42.26.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.26.0...@wireapp/core@42.26.1) (2023-11-29)
 
 ### Bug Fixes
