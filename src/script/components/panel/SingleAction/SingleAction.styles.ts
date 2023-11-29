@@ -17,45 +17,9 @@
  *
  */
 
-import {CSSObject, css} from '@emotion/react';
+import {CSSObject} from '@emotion/react';
 
-export const userModalStyle = css`
-  .enriched-fields {
-    margin: 0 0 16px 0;
-  }
-
-  .loading-wrapper {
-    align-items: center;
-    display: flex;
-    height: 448px;
-    justify-content: center;
-  }
-
-  &__wrapper {
-    min-height: 0;
-    overflow-x: hidden;
-    transition: all 0.15s linear;
-
-    &--max {
-      min-height: 448px;
-    }
-  }
-
-  .panel-participant {
-    padding: 0;
-  }
-
-  .modal__body {
-    padding: 0 16px;
-
-    .classified-bar {
-      margin-top: 12px;
-      width: calc(100% + 32px);
-    }
-  }
-`;
-
-export const userModalWrapperStyle: CSSObject = {
-  maxHeight: '90vh',
-  padding: 0,
+export const singleActionButtonStyle: CSSObject = {
+  width: '100%',
+  margin: '0 8px',
 };
