@@ -18,7 +18,6 @@
  */
 
 import {render} from '@testing-library/react';
-import ko from 'knockout';
 
 import {E2EIVerificationMessage as VerificationMessageEntity} from 'src/script/entity/message/E2EIVerificationMessage';
 import {E2EIVerificationMessageType} from 'src/script/message/E2EIVerificationMessageType';
@@ -38,7 +37,7 @@ describe('E2EIVerificationMessage', () => {
   describe('with verified message', () => {
     it('shows verified icon when message is verified', async () => {
       const message = createVerificationMessage({
-        messageType: ko.observable<E2EIVerificationMessageType>(E2EIVerificationMessageType.VERIFIED),
+        messageType: E2EIVerificationMessageType.VERIFIED,
       });
 
       const {getByTestId} = render(withTheme(<E2EIVerificationMessage message={message} />));

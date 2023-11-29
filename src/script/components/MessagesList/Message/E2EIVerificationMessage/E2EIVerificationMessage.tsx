@@ -20,7 +20,6 @@
 import {MLSVerified} from '@wireapp/react-ui-kit';
 
 import {Icon} from 'Components/Icon';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 
 import {MessageIcon, IconInfo} from './E2EIVerificationMessage.styles';
@@ -34,7 +33,7 @@ export interface E2EIVerificationMessageProps {
 }
 
 export const E2EIVerificationMessage = ({message}: E2EIVerificationMessageProps) => {
-  const {messageType} = useKoSubscribableChildren(message, ['messageType']);
+  const {messageType} = message;
 
   const user = 'Deniz Agha';
 
