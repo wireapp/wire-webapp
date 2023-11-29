@@ -25,7 +25,7 @@ import {replaceLink, t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
-import {MessageIcon, IconInfo} from './E2EIVerificationMessage.styles';
+import {MessageIcon, IconInfo, Link as LinkStyles} from './E2EIVerificationMessage.styles';
 
 import {Config} from '../../../../Config';
 import {E2EIHandler} from '../../../../E2EIdentity';
@@ -34,6 +34,24 @@ import {E2EIVerificationMessage as E2EIVerificationMessageEntity} from '../../..
 import {E2EIVerificationMessageType} from '../../../../message/E2EIVerificationMessageType';
 
 const logger = getLogger('E2EIVerificationMessage');
+
+interface LinkTextProps {
+  dataUieName: string;
+  onClick: () => void;
+  label: string;
+}
+
+const LinkText = ({dataUieName, onClick, label}: LinkTextProps) => (
+  <Link
+    variant={LinkVariant.PRIMARY}
+    onClick={onClick}
+    textTransform={'none'}
+    css={LinkStyles}
+    data-uie-name={dataUieName}
+  >
+    {label}
+  </Link>
+);
 
 export interface E2EIVerificationMessageProps {
   message: E2EIVerificationMessageEntity;
@@ -106,23 +124,15 @@ export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificatio
               }}
             />
           ) : (
-            <>
-              <span
-                dangerouslySetInnerHTML={{
-                  __html: t('conversation.E2EISelfUserCertificateExpired'),
-                }}
-              />
+            <span>
+              {t('conversation.E2EISelfUserCertificateExpired')}
 
-              <Link
-                variant={LinkVariant.PRIMARY}
+              <LinkText
                 onClick={updateCertificate}
-                textTransform={'none'}
-                style={{fontSize: '.75rem', color: 'var(--accent-color)', textDecoration: 'none'}}
-                data-uie-name="update-certificate"
-              >
-                Update certificate now
-              </Link>
-            </>
+                dataUieName="update-certificate"
+                label={t('conversation.E2EIUpdateCertificate')}
+              />
+            </span>
           ))}
 
         {isNewDevice &&
@@ -133,23 +143,15 @@ export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificatio
               }}
             />
           ) : (
-            <>
-              <span
-                dangerouslySetInnerHTML={{
-                  __html: t('conversation.E2EISelfUserUnverifiedDeviceAdded'),
-                }}
-              />
+            <span>
+              {t('conversation.E2EISelfUserUnverifiedDeviceAdded')}
 
-              <Link
-                variant={LinkVariant.PRIMARY}
+              <LinkText
                 onClick={getCertificate}
-                textTransform={'none'}
-                style={{fontSize: '.75rem', color: 'var(--accent-color)', textDecoration: 'none'}}
-                data-uie-name="get-certificate"
-              >
-                Get the certificate now
-              </Link>
-            </>
+                dataUieName="get-certificate"
+                label={t('conversation.E2EIUGetCertificate')}
+              />
+            </span>
           ))}
 
         {isNewMember &&
@@ -160,22 +162,15 @@ export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificatio
               }}
             />
           ) : (
-            <>
-              <span
-                dangerouslySetInnerHTML={{
-                  __html: t('conversation.E2EISelfUserUnverifiedUserAdded'),
-                }}
-              />
-              <Link
-                variant={LinkVariant.PRIMARY}
+            <span>
+              {t('conversation.E2EISelfUserUnverifiedUserAdded')}
+
+              <LinkText
                 onClick={getCertificate}
-                textTransform={'none'}
-                style={{fontSize: '.75rem', color: 'var(--accent-color)', textDecoration: 'none'}}
-                data-uie-name="get-certificate"
-              >
-                Get the certificate now
-              </Link>
-            </>
+                dataUieName="get-certificate"
+                label={t('conversation.E2EIUGetCertificate')}
+              />
+            </span>
           ))}
 
         {isRevoked &&

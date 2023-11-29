@@ -27,6 +27,7 @@ import {E2EIVerificationMessage} from './E2EIVerificationMessage';
 
 import {withTheme} from '../../../../auth/util/test/TestUtil';
 import {Conversation} from '../../../../entity/Conversation';
+import {User} from '../../../../entity/User';
 
 const createVerificationMessage = (partialVerificationMessage: Partial<VerificationMessageEntity>) => {
   const verificationMessage: Partial<VerificationMessageEntity> = {
@@ -53,5 +54,63 @@ describe('E2EIVerificationMessage', () => {
     });
   });
 
-  // TODO: Add more test for another e2ei verification states
+  describe('with degraded message', () => {
+    const user = new User('user1');
+
+    it('show new unverified device added', async () => {
+      const message = createVerificationMessage({
+        messageType: ko.observable<E2EIVerificationMessageType>(E2EIVerificationMessageType.NEW_DEVICE),
+        userIds: ko.observableArray([user.qualifiedId]),
+      });
+
+      const {getByTestId} = render(
+        withTheme(<E2EIVerificationMessage message={message} conversation={conversation} />),
+      );
+
+      const elementMessageVerification = getByTestId('element-message-verification');
+      expect(elementMessageVerification.getAttribute('data-uie-value')).toEqual(E2EIVerificationMessageType.NEW_DEVICE);
+    });
+
+    it('show new unverified user added', async () => {
+      const message = createVerificationMessage({
+        messageType: ko.observable<E2EIVerificationMessageType>(E2EIVerificationMessageType.NEW_MEMBER),
+        userIds: ko.observableArray([user.qualifiedId]),
+      });
+
+      const {getByTestId} = render(
+        withTheme(<E2EIVerificationMessage message={message} conversation={conversation} />),
+      );
+
+      const elementMessageVerification = getByTestId('element-message-verification');
+      expect(elementMessageVerification.getAttribute('data-uie-value')).toEqual(E2EIVerificationMessageType.NEW_MEMBER);
+    });
+
+    it('show certificate expired', async () => {
+      const message = createVerificationMessage({
+        messageType: ko.observable<E2EIVerificationMessageType>(E2EIVerificationMessageType.EXPIRED),
+        userIds: ko.observableArray([user.qualifiedId]),
+      });
+
+      const {getByTestId} = render(
+        withTheme(<E2EIVerificationMessage message={message} conversation={conversation} />),
+      );
+
+      const elementMessageVerification = getByTestId('element-message-verification');
+      expect(elementMessageVerification.getAttribute('data-uie-value')).toEqual(E2EIVerificationMessageType.EXPIRED);
+    });
+
+    it('show certificate revoked', async () => {
+      const message = createVerificationMessage({
+        messageType: ko.observable<E2EIVerificationMessageType>(E2EIVerificationMessageType.REVOKED),
+        userIds: ko.observableArray([user.qualifiedId]),
+      });
+
+      const {getByTestId} = render(
+        withTheme(<E2EIVerificationMessage message={message} conversation={conversation} />),
+      );
+
+      const elementMessageVerification = getByTestId('element-message-verification');
+      expect(elementMessageVerification.getAttribute('data-uie-value')).toEqual(E2EIVerificationMessageType.REVOKED);
+    });
+  });
 });

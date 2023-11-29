@@ -31,3 +31,9 @@ export const MessageIcon: CSSObject = {
 export const IconInfo: CSSObject = {
   fill: 'var(--red-500)',
 };
+
+export const Link: CSSObject = {
+  color: 'var(--accent-color)',
+  fontSize: '.75rem',
+  textDecoration: 'none',
+};
