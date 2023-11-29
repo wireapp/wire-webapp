@@ -55,8 +55,8 @@ export class ConversationState {
   public readonly visibleConversations: ko.PureComputed<Conversation[]>;
   public readonly filteredConversations: ko.PureComputed<Conversation[]>;
   public readonly archivedConversations: ko.PureComputed<Conversation[]>;
-  private readonly selfProteusConversation: ko.PureComputed<Conversation | undefined>;
-  private readonly selfMLSConversation: ko.PureComputed<Conversation | undefined>;
+  public readonly selfProteusConversation: ko.PureComputed<Conversation | undefined>;
+  public readonly selfMLSConversation: ko.PureComputed<MLSConversation | undefined>;
   public readonly unreadConversations: ko.PureComputed<Conversation[]>;
   /**
    * All the users that are connected to the selfUser through a conversation. Those users are not necessarily **directly** connected to the selfUser (through a connection request)
@@ -78,13 +78,15 @@ export class ConversationState {
       this.conversations().find(conversation => !isMLSConversation(conversation) && isSelfConversation(conversation)),
     );
     this.selfMLSConversation = ko.pureComputed(() =>
-      this.conversations().find(conversation => isMLSConversation(conversation) && isSelfConversation(conversation)),
+      this.conversations().find(
+        (conversation): conversation is MLSConversation =>
+          isMLSConversation(conversation) && isSelfConversation(conversation),
+      ),
     );
 
     this.visibleConversations = ko.pureComputed(() => {
       return this.sortedConversations().filter(
         conversation =>
-          !conversation.is_cleared() &&
           !conversation.is_archived() &&
           // We filter out 1 on 1 conversation with unavailable users that don't have messages
           (!conversation.is1to1() ||
@@ -109,17 +111,9 @@ export class ConversationState {
           ConnectionStatus.PENDING,
         ];
 
-        const isCleared = conversationEntity.is_cleared();
-        const isRemoved = conversationEntity.removed_from_conversation();
-
-        if (
-          isSelfConversation(conversationEntity) ||
-          states_to_filter.includes(conversationEntity.connection().status())
-        ) {
-          return false;
-        }
-
-        return !(isCleared && isRemoved);
+        return !(
+          isSelfConversation(conversationEntity) || states_to_filter.includes(conversationEntity.connection().status())
+        );
       });
     });
 
@@ -160,7 +154,7 @@ export class ConversationState {
     return proteusConversation;
   }
 
-  getSelfMLSConversation(): Conversation {
+  getSelfMLSConversation(): MLSConversation {
     const mlsConversation = this.selfMLSConversation();
     if (!mlsConversation) {
       throw new Error('No MLS self conversation');

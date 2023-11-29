@@ -197,6 +197,14 @@ body.theme-dark {
   border: none;
   margin: 0;
   margin-bottom: 32px;
+
+  .preferences-device-details & {
+    margin: 0;
+  }
+}
+
+.preferences-reset-session {
+  margin-top: 12px;
 }
 
 .preferences-separator {
@@ -214,4 +222,12 @@ body.theme-dark {
 
 .preferences-history-restore-button {
   margin-top: 20px;
+}
+
+.preferences-wrapper {
+  width: var(--preferences-width);
+
+  .buttons-group {
+    justify-content: center;
+  }
 }

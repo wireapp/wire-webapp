@@ -31,6 +31,7 @@ import {EnrichedFields} from 'Components/panel/EnrichedFields';
 import {UserActions, Actions} from 'Components/panel/UserActions';
 import {UserDetails} from 'Components/panel/UserDetails';
 import {BaseToggle} from 'Components/toggle/BaseToggle';
+import {UserVerificationBadges} from 'Components/VerificationBadge';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -82,10 +83,7 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
     'isTeam',
     'team',
   ]);
-  const {is_verified: isSelfVerified, isActivatedAccount} = useKoSubscribableChildren(selfUser, [
-    'is_verified',
-    'isActivatedAccount',
-  ]);
+  const {isActivatedAccount} = useKoSubscribableChildren(selfUser, ['isActivatedAccount']);
 
   const canChangeRole =
     conversationRoleRepository.canChangeParticipantRoles(activeConversation) && !currentUser.isMe && !isTemporaryGuest;
@@ -138,6 +136,10 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
     }
   }, [isTemporaryGuest, currentUser]);
 
+  const renderParticipantBadges = (participant: User) => {
+    return <UserVerificationBadges user={participant} groupId={activeConversation?.groupId} />;
+  };
+
   return (
     <div id="group-participant-user" className="panel__page group-participant">
       <PanelHeader
@@ -149,10 +151,10 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
 
       <FadingScrollbar className="panel__content">
         <UserDetails
+          renderParticipantBadges={renderParticipantBadges}
           participant={currentUser}
           badge={teamRepository.getRoleBadge(currentUser.id)}
           isGroupAdmin={isAdmin}
-          isSelfVerified={isSelfVerified}
           classifiedDomains={classifiedDomains}
         />
 

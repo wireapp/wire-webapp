@@ -36,6 +36,7 @@ import {capitalizeFirstChar} from 'Util/StringUtil';
 import {User} from '../../../../entity/User';
 
 export interface UserListItemProps {
+  renderParticipantBadges?: (user: User) => React.ReactNode;
   canSelect: boolean;
   customInfo?: string;
   external: boolean;
@@ -53,14 +54,18 @@ export interface UserListItemProps {
   showArrow: boolean;
 }
 
-const UserListItem = ({
+interface RenderParticipantProps {
+  isSelectable?: boolean;
+}
+
+export const UserListItem = ({
+  renderParticipantBadges,
   canSelect,
   customInfo,
   external,
   hideInfo,
   isHighlighted,
   isSelected,
-  isSelfVerified = false,
   mode = UserlistMode.DEFAULT,
   noInteraction,
   noUnderline = false,
@@ -71,12 +76,7 @@ const UserListItem = ({
 }: UserListItemProps) => {
   const checkboxId = useId();
 
-  const {
-    is_verified: isVerified,
-    isDirectGuest,
-    availability,
-    expirationText,
-  } = useKoSubscribableChildren(user, ['isDirectGuest', 'is_verified', 'availability', 'expirationText', 'name']);
+  const {isDirectGuest, expirationText} = useKoSubscribableChildren(user, ['isDirectGuest', 'expirationText']);
 
   const {isMe: isSelf, isFederated} = user;
   const isTemporaryGuest = user.isTemporaryGuest();
@@ -110,19 +110,20 @@ const UserListItem = ({
 
   const contentInfoText = getContentInfoText();
 
-  const RenderParticipant = () => {
+  const RenderParticipant = ({isSelectable = false}: RenderParticipantProps) => {
     return (
       <div css={listItem(noInteraction)} data-uie-name="item-user" data-uie-value={userName}>
         <Avatar avatarSize={AVATAR_SIZE.SMALL} participant={user} aria-hidden="true" css={{margin: '0 16px'}} />
 
         <ParticipantItemContent
-          name={userName}
+          renderParticipantBadges={renderParticipantBadges}
+          participant={user}
           shortDescription={contentInfoText}
           selfInTeam={selfInTeam}
-          availability={availability}
           {...(isSelf && {selfString})}
           hasUsernameInfo={hasUsernameInfo}
           showAvailabilityState
+          isSelectable={isSelectable}
         />
 
         <UserStatusBadges
@@ -130,7 +131,6 @@ const UserListItem = ({
             guest: !isOthersMode && isDirectGuest && !isFederated,
             federated: isFederated,
             external,
-            verified: isSelfVerified && isVerified,
           }}
         />
       </div>
@@ -159,7 +159,7 @@ const UserListItem = ({
           >
             <CheckboxLabel htmlFor={checkboxId}>
               <div {...dataUieValues}>
-                <RenderParticipant />
+                <RenderParticipant isSelectable />
               </div>
             </CheckboxLabel>
           </Checkbox>
@@ -182,5 +182,3 @@ const UserListItem = ({
     </>
   );
 };
-
-export {UserListItem};

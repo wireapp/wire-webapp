@@ -41,3 +41,17 @@ export enum CredentialType {
   Basic = 1,
   X509 = 2,
 }
+export enum E2eiConversationState {
+  /**
+   * All clients have a valid E2EI certificate
+   */
+  Verified = 1,
+  /**
+   * Some clients are either still Basic or their certificate is expired
+   */
+  Degraded = 2,
+  /**
+   * All clients are still Basic. If all client have expired certificates, Degraded is returned.
+   */
+  NotEnabled = 3,
+}

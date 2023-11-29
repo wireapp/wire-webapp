@@ -25,7 +25,7 @@ import {
   NewConversation,
   MessageSendingStatus,
   RemoteConversations,
-} from '@wireapp/api-client/lib/conversation/';
+} from '@wireapp/api-client/lib/conversation';
 import {ConversationReceiptModeUpdateData} from '@wireapp/api-client/lib/conversation/data/';
 import {CONVERSATION_TYPING} from '@wireapp/api-client/lib/conversation/data/ConversationTypingData';
 import {
@@ -39,6 +39,7 @@ import {
   ConversationRenameEvent,
   ConversationTypingEvent,
   CONVERSATION_EVENT,
+  ConversationProtocolUpdateEvent,
   ConversationMLSWelcomeEvent,
 } from '@wireapp/api-client/lib/event';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
@@ -69,7 +70,6 @@ import {
 } from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {isBackendError} from 'Util/TypePredicateUtil';
-import {supportsMLS} from 'Util/util';
 import {createUuid} from 'Util/uuid';
 
 import {ACCESS_STATE} from './AccessState';
@@ -81,10 +81,13 @@ import {ConversationLabelRepository} from './ConversationLabelRepository';
 import {ConversationDatabaseData, ConversationMapper} from './ConversationMapper';
 import {ConversationRoleRepository} from './ConversationRoleRepository';
 import {
+  isMixedConversation,
+  isMLSCapableConversation,
   isMLSConversation,
-  isProteus1to1ConversationWithUser,
   isProteusConversation,
+  MLSCapableConversation,
   MLSConversation,
+  isProteus1to1ConversationWithUser,
   ProteusConversation,
 } from './ConversationSelectors';
 import {ConversationService} from './ConversationService';
@@ -93,7 +96,6 @@ import {ConversationStateHandler} from './ConversationStateHandler';
 import {ConversationStatus} from './ConversationStatus';
 import {ConversationVerificationState} from './ConversationVerificationState';
 import {ProteusConversationVerificationStateHandler} from './ConversationVerificationStateHandler';
-import {registerMLSConversationVerificationStateHandler} from './ConversationVerificationStateHandler/MLS';
 import {OnConversationVerificationStateChange} from './ConversationVerificationStateHandler/shared';
 import {EventMapper} from './EventMapper';
 import {MessageRepository} from './MessageRepository';
@@ -106,6 +108,7 @@ import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
 import {ConnectionRepository} from '../connection/ConnectionRepository';
+import {ConnectionState} from '../connection/ConnectionState';
 import {
   AssetAddEvent,
   ButtonActionConfirmationEvent,
@@ -196,6 +199,7 @@ export class ConversationRepository {
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
     private readonly conversationState = container.resolve(ConversationState),
+    private readonly connectionState = container.resolve(ConnectionState),
     private readonly core = container.resolve(Core),
   ) {
     this.eventService = eventRepository.eventService;
@@ -285,15 +289,6 @@ export class ConversationRepository {
       this.conversationState,
     );
 
-    if (supportsMLS()) {
-      // we register a handler that will handle MLS conversations on its own
-      registerMLSConversationVerificationStateHandler(
-        this.onConversationVerificationStateChange,
-        this.conversationState,
-        this.core,
-      );
-    }
-
     this.isBlockingNotificationHandling = true;
 
     this.teamState.isTeam.subscribe(() => this.mapGuestStatusSelf());
@@ -338,7 +333,7 @@ export class ConversationRepository {
 
     window.addEventListener<any>(WebAppEvents.CONVERSATION.JOIN, this.onConversationJoin);
 
-    this.selfRepository.on('selfSupportedProtocolsUpdated', this.onSelfUserSupportedProtocolsUpdated);
+    this.selfRepository.on('selfSupportedProtocolsUpdated', this.initAllLocal1To1Conversations);
     this.userRepository.on('supportedProtocolsUpdated', this.onUserSupportedProtocolsUpdated);
   }
 
@@ -370,24 +365,6 @@ export class ConversationRepository {
       conversationEntity.removeMessageById(deletedEvent.id);
     }
   };
-
-  /**
-   * Remove obsolete conversations locally.
-   */
-  cleanupConversations(): void {
-    this.conversationState.conversations().forEach(conversationEntity => {
-      if (
-        conversationEntity.isGroup() &&
-        conversationEntity.is_cleared() &&
-        conversationEntity.removed_from_conversation()
-      ) {
-        this.conversationService.deleteConversationFromDb(conversationEntity.id);
-        this.deleteConversationFromRepository(conversationEntity);
-      }
-    });
-
-    this.cleanupEphemeralMessages();
-  }
 
   //##############################################################################
   // Conversation service interactions
@@ -731,19 +708,19 @@ export class ConversationRepository {
       }
       const addCreationMessage = !conversationEntity.hasCreationMessage;
       if (addCreationMessage) {
-        this.addCreationMessage(conversationEntity, this.userState.self().isTemporaryGuest());
+        await this.addCreationMessage(conversationEntity, this.userState.self().isTemporaryGuest());
       }
     }
 
     return mappedMessageEntities;
   }
 
-  private addCreationMessage(
+  private async addCreationMessage(
     conversationEntity: Conversation,
     isTemporaryGuest: boolean,
     timestamp?: number,
     eventSource?: EventSource,
-  ): void {
+  ): Promise<void> {
     conversationEntity.hasCreationMessage = true;
 
     if (conversationEntity.inTeam()) {
@@ -763,7 +740,7 @@ export class ConversationRepository {
       ? EventBuilder.buildGroupCreation(conversationEntity, isTemporaryGuest, timestamp)
       : EventBuilder.build1to1Creation(conversationEntity);
 
-    this.eventRepository.injectEvent(creationEvent, eventSource);
+    await this.eventRepository.injectEvent(creationEvent, eventSource);
   }
 
   /**
@@ -974,8 +951,8 @@ export class ConversationRepository {
     }
     this.deleteConversationFromRepository(conversationId);
     await this.conversationService.deleteConversationFromDb(conversationId.id);
-    if (isMLSConversation(conversationEntity)) {
-      await this.conversationService.wipeMLSConversation(conversationEntity);
+    if (isMLSCapableConversation(conversationEntity)) {
+      await this.wipeMLSCapableConversation(conversationEntity);
     }
   };
 
@@ -1021,6 +998,28 @@ export class ConversationRepository {
       throw error;
     }
   }
+
+  /**
+   * Get all the group conversations owned by self user's team from the local state.
+   */
+  public readonly getAllTeamGroupConversations = (): Conversation[] => {
+    const selfUser = this.userState.self();
+    if (!selfUser) {
+      this.logger.error('Failed to get self user');
+      return [];
+    }
+    const {teamId: selfUserTeamId} = selfUser;
+    return this.conversationState.conversations().filter(conversation => {
+      return conversation.isGroup() && !!selfUserTeamId && conversation.teamId === selfUserTeamId;
+    });
+  };
+
+  /**
+   * Get all the group conversations owned by self user's team from the local state.
+   */
+  public readonly getAllGroupConversations = (): Conversation[] => {
+    return this.conversationState.conversations().filter(conversation => conversation.isGroup());
+  };
 
   /**
    * Get group conversations by name.
@@ -1553,6 +1552,7 @@ export class ConversationRepository {
 
     this.logger.info(`Initialising MLS 1:1 conversation with user ${otherUserId.id}...`);
     const mlsConversation = await this.getMLS1to1Conversation(otherUserId);
+
     const otherUser = await this.userRepository.getUserById(otherUserId);
     mlsConversation.connection(otherUser.connection());
 
@@ -1831,11 +1831,6 @@ export class ConversationRepository {
     );
   }
 
-  private readonly onSelfUserSupportedProtocolsUpdated = async () => {
-    const one2oneConversations = this.conversationState.conversations().filter(conversation => conversation.is1to1());
-    await Promise.allSettled(one2oneConversations.map(conversation => this.init1to1Conversation(conversation)));
-  };
-
   private readonly onUserSupportedProtocolsUpdated = async ({user}: {user: User}) => {
     // After user's supported protocols are updated, we want to make sure that 1:1 conversation is initialised.
     const localMLSConversation = this.conversationState.findMLS1to1Conversation(user.qualifiedId);
@@ -1853,23 +1848,43 @@ export class ConversationRepository {
 
   /**
    * Maps user connections to the corresponding conversations.
-   * @param connectionEntities Connections entities
+   * @param connections Connections entities
    */
-  mapConnections(connectionEntities: ConnectionEntity[]): Promise<Conversation | undefined>[] {
-    this.logger.log(`Mapping '${connectionEntities.length}' user connection(s) to conversations`, connectionEntities);
-    return connectionEntities.map(connectionEntity => this.mapConnection(connectionEntity));
+  private async mapConnections(connections: ConnectionEntity[]): Promise<void> {
+    this.logger.log(`Mapping '${connections.length}' user connection(s) to conversations`, connections);
+    for (const connection of connections) {
+      try {
+        await this.mapConnection(connection);
+      } catch (error) {
+        this.logger.error(
+          `Failed when mapping a connection with user ${connection.userId} to a conversation, error: `,
+          error,
+        );
+      }
+    }
   }
 
   public readonly init1To1Conversations = async (connections: ConnectionEntity[], conversations: Conversation[]) => {
     if (connections.length) {
-      await Promise.allSettled(this.mapConnections(connections));
+      await this.mapConnections(connections);
     }
     await this.initTeam1To1Conversations(conversations);
   };
 
+  public readonly initAllLocal1To1Conversations = async () => {
+    return this.init1To1Conversations(this.connectionState.connections(), this.getAllLocalConversations());
+  };
+
   private readonly initTeam1To1Conversations = async (conversations: Conversation[]) => {
     const team1To1Conversations = conversations.filter(conversation => conversation.isTeam1to1());
-    await Promise.allSettled(team1To1Conversations.map(conversation => this.init1to1Conversation(conversation)));
+
+    for (const conversation of team1To1Conversations) {
+      try {
+        await this.init1to1Conversation(conversation);
+      } catch (error) {
+        this.logger.error(`Failed when initialising 1:1 conversation with id ${conversation.id}, error: `, error);
+      }
+    }
   };
 
   /**
@@ -1880,7 +1895,7 @@ export class ConversationRepository {
    * @returns Mapped conversation/s
    */
   mapConversations(
-    payload: BackendConversation[],
+    payload: (BackendConversation | ConversationDatabaseData)[],
     initialTimestamp = this.getLatestEventTimestamp(true),
   ): Conversation[] {
     const entities = ConversationMapper.mapConversations(payload as ConversationDatabaseData[], initialTimestamp);
@@ -2038,16 +2053,7 @@ export class ConversationRepository {
     const {qualifiedId: conversationId} = conversation;
 
     try {
-      if (isMLSConversation(conversation)) {
-        const {events} = await this.core.service!.conversation.addUsersToMLSConversation({
-          conversationId,
-          groupId: conversation.groupId,
-          qualifiedUsers,
-        });
-        if (!!events.length) {
-          events.forEach(event => this.eventRepository.injectEvent(event));
-        }
-      } else {
+      if (isProteusConversation(conversation) || isMixedConversation(conversation)) {
         const {failedToAdd, event: memberJoinEvent} =
           await this.core.service!.conversation.addUsersToProteusConversation({
             conversationId,
@@ -2061,6 +2067,17 @@ export class ConversationRepository {
             EventBuilder.buildFailedToAddUsersEvent(failedToAdd, conversation, this.userState.self().id),
             EventRepository.SOURCE.INJECTED,
           );
+        }
+      }
+
+      if (isMLSCapableConversation(conversation)) {
+        const {events} = await this.core.service!.conversation.addUsersToMLSConversation({
+          conversationId: conversation.qualifiedId,
+          groupId: conversation.groupId,
+          qualifiedUsers,
+        });
+        if (!!events.length && isMLSConversation(conversation)) {
+          events.forEach(event => this.eventRepository.injectEvent(event));
         }
       }
     } catch (error) {
@@ -2134,24 +2151,36 @@ export class ConversationRepository {
   }
 
   /**
-   * Clear conversation content and archive the conversation.
+   * Clear conversation.
+   * It will update conversation's cleared timestamp on BE and clear all conversation content.
    *
-   * @note According to spec we archive a conversation when we clear it.
-   * It will be unarchived once it is opened through search. We use the archive flag to distinguish states.
-   *
-   * @param conversation Conversation to clear
-   * @param leaveConversation Should we leave the conversation before clearing the content?
+   * @param conversation Conversation to clear content from
+   * @param timestamp Timestamp of the event
    */
   public async clearConversation(conversation: Conversation) {
-    const isActiveConversation = this.conversationState.isActiveConversation(conversation);
-    const nextConversationEntity = this.getNextConversation(conversation);
-
     await this.messageRepository.updateClearedTimestamp(conversation);
-    await this._clearConversation(conversation);
+    return this.clearConversationContent(conversation, new Date().getTime());
+  }
 
-    if (isActiveConversation) {
-      amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversationEntity, {});
-    }
+  /**
+   * Clears conversation content.
+   * It will clear all messages and events from the conversation and re-apply the conversation creation event.
+   *
+   * @param conversation Conversation to clear content from
+   * @param timestamp Timestamp of the event
+   */
+  private async clearConversationContent(conversation: Conversation, timestamp: number) {
+    await this.deleteMessages(conversation, timestamp);
+    await this.addCreationMessage(conversation, !!this.userState.self()?.isTemporaryGuest(), timestamp);
+    conversation.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.CLEARED);
+  }
+
+  /**
+   * Wipes MLS conversation in corecrypto and deletes the conversation state.
+   * @param mlsConversation mls conversation
+   */
+  async wipeMLSCapableConversation(conversation: MLSCapableConversation) {
+    return this.conversationService.wipeMLSCapableConversation(conversation);
   }
 
   async leaveGuestRoom(): Promise<void> {
@@ -2206,9 +2235,8 @@ export class ConversationRepository {
   /**
    * Remove the current user from a conversation.
    *
-   * @param conversation Conversation to remove user from
-   * @param clearContent Should we clear the conversation content from the database?
-   * @returns Resolves when user was removed from the conversation
+   * @param conversation Conversation to remove the self user from
+   * @returns Resolves when the self user was removed from the conversation
    */
   public async leaveConversation(conversation: Conversation) {
     const userQualifiedId = this.userState.self().qualifiedId;
@@ -2271,6 +2299,78 @@ export class ConversationRepository {
       return response;
     }
     return undefined;
+  }
+
+  /**
+   * Update conversation protocol
+   * This will update the protocol of the conversation and refetch the conversation to get all new fields (groupId, ciphersuite, epoch and new protocol)
+   * If protocol was updated successfully, conversation protocol update system message will be injected
+   *
+   * @param conversationId id of the conversation
+   * @param protocol new conversation protocol
+   * @returns Resolves with updated conversation entity
+   */
+  public readonly updateConversationProtocol = async (
+    conversation: Conversation,
+    protocol: ConversationProtocol.MIXED | ConversationProtocol.MLS,
+  ): Promise<Conversation> => {
+    const protocolUpdateEventResponse = await this.conversationService.updateConversationProtocol(
+      conversation.qualifiedId,
+      protocol,
+    );
+
+    if (protocolUpdateEventResponse) {
+      await this.eventRepository.injectEvent(protocolUpdateEventResponse, EventRepository.SOURCE.BACKEND_RESPONSE);
+
+      if (protocolUpdateEventResponse.data.protocol === ConversationProtocol.MLS) {
+        await this.handleConversationProtocolUpdatedToMLS(conversation);
+      }
+    }
+
+    //even if protocol was already updated (no response), we need to refetch the conversation
+    return this.refreshConversationProtocolProperties(conversation);
+  };
+
+  /**
+   * Will try to register mls group by sending an empty commit to establish it.
+   * After group was successfully established, it will try to add other users to the group.
+   *
+   * @param groupId - id of the MLS group
+   * @param conversationId - id of the conversation
+   * @param selfUserId - id of the self user
+   * @param qualifiedUsers - list of qualified users to add to the group (should not include the self user)
+   */
+  public readonly tryEstablishingMLSGroup = (params: {
+    groupId: string;
+    conversationId: QualifiedId;
+    selfUserId: QualifiedId;
+    qualifiedUsers: QualifiedId[];
+  }) => {
+    return this.conversationService.tryEstablishingMLSGroup(params);
+  };
+
+  /**
+   * Refresh conversation protocol properties
+   * Will refetch the conversation to get all new protocol-related fields (groupId, ciphersuite, epoch and new protocol)
+   * Will update the conversation entity in memory and in the local database
+   *
+   * @param conversationId id of the conversation
+   * @returns Resolves with updated conversation entity
+   */
+  private async refreshConversationProtocolProperties(conversation: Conversation) {
+    //refetch the conversation to get all new fields (groupId, ciphersuite, epoch and new protocol)
+    const remoteConversationData = await this.conversationService.getConversationById(conversation.qualifiedId);
+    //update fields that came after protocol update
+    const {cipher_suite: cipherSuite, epoch, group_id: newGroupId, protocol: newProtocol} = remoteConversationData;
+    const updatedConversation = ConversationMapper.updateProperties(conversation, {
+      cipherSuite,
+      epoch,
+      groupId: newGroupId,
+      protocol: newProtocol,
+    });
+
+    await this.saveConversationStateInDb(updatedConversation);
+    return updatedConversation;
   }
 
   /**
@@ -2458,21 +2558,6 @@ export class ConversationRepository {
       from: this.userState.self().id,
     };
     this.onMemberUpdate(conversationEntity, response);
-  }
-
-  /**
-   * Clears conversation content from view and the database.
-   *
-   * @param conversationEntity Conversation entity to delete
-   * @param timestamp Optional timestamps for which messages to remove
-   */
-  private async _clearConversation(conversationEntity: Conversation, timestamp?: number) {
-    await this.deleteMessages(conversationEntity, timestamp);
-
-    if (conversationEntity.removed_from_conversation()) {
-      await this.conversationService.deleteConversationFromDb(conversationEntity.id);
-      this.deleteConversationFromRepository(conversationEntity);
-    }
   }
 
   private handleTooManyMembersError(participants = ConversationRepository.CONFIG.GROUP.MAX_SIZE) {
@@ -2681,11 +2766,9 @@ export class ConversationRepository {
         conversationEntity =>
           this.reactToConversationEvent(conversationEntity, eventJson, eventSource) as Promise<EntityObject>,
       )
-      .then((entityObject = {} as EntityObject) => {
-        if (type !== CONVERSATION_EVENT.MEMBER_JOIN && type !== CONVERSATION_EVENT.MEMBER_LEAVE) {
-          this.handleConversationNotification(entityObject as EntityObject, eventSource);
-        }
-      })
+      .then((entityObject = {} as EntityObject) =>
+        this.handleConversationNotification(entityObject as EntityObject, eventSource, type),
+      )
       .catch((error: BaseError) => {
         const ignoredErrorTypes: string[] = [
           ConversationError.TYPE.MESSAGE_NOT_FOUND,
@@ -2840,6 +2923,9 @@ export class ConversationRepository {
       case CONVERSATION_EVENT.TYPING:
         return this.onTyping(conversationEntity, eventJson);
 
+      case CONVERSATION_EVENT.PROTOCOL_UPDATE:
+        return this.onProtocolUpdate(conversationEntity, eventJson);
+
       case CONVERSATION_EVENT.RENAME:
         return this.onRename(conversationEntity, eventJson, eventSource === EventRepository.SOURCE.WEB_SOCKET);
 
@@ -2887,11 +2973,14 @@ export class ConversationRepository {
       case ClientEvent.CONVERSATION.LEGAL_HOLD_UPDATE:
       case ClientEvent.CONVERSATION.LOCATION:
       case ClientEvent.CONVERSATION.MISSED_MESSAGES:
+      case ClientEvent.CONVERSATION.JOINED_AFTER_MLS_MIGRATION:
+      case ClientEvent.CONVERSATION.MLS_MIGRATION_ONGOING_CALL:
       case ClientEvent.CONVERSATION.MLS_CONVERSATION_RECOVERED:
       case ClientEvent.CONVERSATION.UNABLE_TO_DECRYPT:
       case ClientEvent.CONVERSATION.VERIFICATION:
       case ClientEvent.CONVERSATION.VOICE_CHANNEL_ACTIVATE:
       case ClientEvent.CONVERSATION.VOICE_CHANNEL_DEACTIVATE:
+      case ClientEvent.CONVERSATION.E2EI_VERIFICATION:
         return this.addEventToConversation(conversationEntity, eventJson);
     }
   }
@@ -2920,10 +3009,23 @@ export class ConversationRepository {
    * @param eventSource Source of event
    * @returns Resolves when the conversation was updated
    */
-  private async handleConversationNotification(entityObject: EntityObject, eventSource: EventSource) {
+  private async handleConversationNotification(
+    entityObject: EntityObject,
+    eventSource: EventSource,
+    eventType: CLIENT_CONVERSATION_EVENT | CONVERSATION_EVENT,
+  ) {
     const {conversationEntity, messageEntity} = entityObject;
 
-    if (conversationEntity) {
+    if (!conversationEntity) {
+      return;
+    }
+
+    const eventsToSkip: (CLIENT_CONVERSATION_EVENT | CONVERSATION_EVENT)[] = [
+      CONVERSATION_EVENT.MEMBER_JOIN,
+      CONVERSATION_EVENT.MEMBER_LEAVE,
+    ];
+
+    if (!eventsToSkip.includes(eventType)) {
       const eventFromWebSocket = eventSource === EventRepository.SOURCE.WEB_SOCKET;
       const eventFromStream = eventSource === EventRepository.SOURCE.STREAM;
 
@@ -2937,11 +3039,11 @@ export class ConversationRepository {
         if (!eventFromStream) {
           amplify.publish(WebAppEvents.NOTIFICATION.NOTIFY, messageEntity, undefined, conversationEntity);
         }
-
-        if (conversationEntity.is_cleared()) {
-          conversationEntity.cleared_timestamp(0);
-        }
       }
+    }
+
+    if (conversationEntity.is_cleared()) {
+      conversationEntity.cleared_timestamp(0);
     }
   }
 
@@ -2957,6 +3059,25 @@ export class ConversationRepository {
         const missed_event = EventBuilder.buildMissed(conversationEntity, currentTimestamp);
         this.eventRepository.injectEvent(missed_event);
       });
+  };
+
+  public readonly injectJoinedAfterMigrationFinalisationMessage = (conversation: Conversation): void => {
+    const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
+    const joinedAfterMLSMigrationFinalisationEvent = EventBuilder.buildJoinedAfterMLSMigrationFinalisation(
+      conversation,
+      currentTimestamp,
+    );
+    return void this.eventRepository.injectEvent(joinedAfterMLSMigrationFinalisationEvent);
+  };
+
+  private readonly injectMLSMigrationFinalisationOngoingCallMessage = (conversation: Conversation): void => {
+    const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
+    const mlsMigrationFinalisationOngoingCallEvent = EventBuilder.buildMLSMigrationFinalisationOngoingCall(
+      conversation,
+      currentTimestamp,
+    );
+
+    return void this.eventRepository.injectEvent(mlsMigrationFinalisationOngoingCallEvent);
   };
 
   /**
@@ -3023,7 +3144,7 @@ export class ConversationRepository {
       const [conversationEntity] = this.mapConversations([conversationData], initialTimestamp);
       if (conversationEntity) {
         if (conversationEntity.participating_user_ids().length) {
-          this.addCreationMessage(conversationEntity, false, initialTimestamp, eventSource);
+          await this.addCreationMessage(conversationEntity, false, initialTimestamp, eventSource);
         }
         await this.updateParticipatingUserEntities(conversationEntity);
         this.proteusVerificationStateHandler.onConversationCreate(conversationEntity);
@@ -3131,7 +3252,7 @@ export class ConversationRepository {
     const qualifiedUserIds =
       eventData.users?.map(user => user.qualified_id) || eventData.user_ids.map(userId => ({domain: '', id: userId}));
 
-    if (isMLSConversation(conversationEntity)) {
+    if (isMLSCapableConversation(conversationEntity)) {
       const isSelfJoin = isFromSelf && selfUserJoins;
       await this.handleMLSConversationMemberJoin(conversationEntity, isSelfJoin);
     }
@@ -3151,7 +3272,7 @@ export class ConversationRepository {
    * @param conversation Conversation member joined to
    * @param isSelfJoin whether user has joined by itself, if so we need to add other self clients to mls group
    */
-  private async handleMLSConversationMemberJoin(conversation: Conversation, isSelfJoin: boolean) {
+  private async handleMLSConversationMemberJoin(conversation: MLSCapableConversation, isSelfJoin: boolean) {
     const {groupId} = conversation;
 
     if (!groupId) {
@@ -3190,10 +3311,8 @@ export class ConversationRepository {
     conversationEntity: Conversation,
     eventJson: ConversationMemberLeaveEvent | TeamMemberLeaveEvent | MemberLeaveEvent,
   ): Promise<{conversationEntity: Conversation; messageEntity: Message} | undefined> {
-    const {data: eventData, from} = eventJson;
-    const isFromSelf = from === this.userState.self().id;
+    const {data: eventData} = eventJson;
     const removesSelfUser = eventData.user_ids.includes(this.userState.self().id);
-    const selfLeavingClearedConversation = isFromSelf && removesSelfUser && conversationEntity.is_cleared();
 
     if (removesSelfUser) {
       conversationEntity.status(ConversationStatus.PAST_MEMBER);
@@ -3206,8 +3325,8 @@ export class ConversationRepository {
         eventJson.from = this.userState.self().id;
       }
 
-      if (isMLSConversation(conversationEntity)) {
-        await this.conversationService.wipeMLSConversation(conversationEntity);
+      if (isMLSCapableConversation(conversationEntity)) {
+        await this.wipeMLSCapableConversation(conversationEntity);
       }
     } else {
       /**
@@ -3220,27 +3339,23 @@ export class ConversationRepository {
       await this.conversationRoleRepository.updateConversationRoles(conversationEntity);
     }
 
-    if (!selfLeavingClearedConversation) {
-      const {messageEntity} = await this.addEventToConversation(conversationEntity, eventJson);
-      (messageEntity as MemberMessage)
-        .userEntities()
-        .filter(userEntity => !userEntity.isMe)
-        .forEach(userEntity => {
-          conversationEntity.participating_user_ids.remove(userId => matchQualifiedIds(userId, userEntity));
+    const {messageEntity} = await this.addEventToConversation(conversationEntity, eventJson);
+    (messageEntity as MemberMessage)
+      .userEntities()
+      .filter(userEntity => !userEntity.isMe)
+      .forEach(userEntity => {
+        conversationEntity.participating_user_ids.remove(userId => matchQualifiedIds(userId, userEntity));
 
-          if (userEntity.isTemporaryGuest()) {
-            userEntity.clearExpirationTimeout();
-          }
-        });
+        if (userEntity.isTemporaryGuest()) {
+          userEntity.clearExpirationTimeout();
+        }
+      });
 
-      await this.updateParticipatingUserEntities(conversationEntity);
+    await this.updateParticipatingUserEntities(conversationEntity);
 
-      this.proteusVerificationStateHandler.onMemberLeft(conversationEntity);
+    this.proteusVerificationStateHandler.onMemberLeft(conversationEntity);
 
-      return {conversationEntity, messageEntity};
-    }
-
-    return undefined;
+    return {conversationEntity, messageEntity};
   }
 
   /**
@@ -3299,10 +3414,10 @@ export class ConversationRepository {
     }
 
     if (conversationEntity.is_cleared()) {
-      await this._clearConversation(conversationEntity, conversationEntity.cleared_timestamp());
+      await this.clearConversationContent(conversationEntity, conversationEntity.cleared_timestamp());
     }
 
-    if (isActiveConversation && (conversationEntity.is_archived() || conversationEntity.is_cleared())) {
+    if (isActiveConversation && conversationEntity.is_archived()) {
       amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversationEntity, {});
     }
   }
@@ -3468,6 +3583,35 @@ export class ConversationRepository {
     const {messageEntity} = await this.addEventToConversation(conversationEntity, eventJson);
     ConversationMapper.updateProperties(conversationEntity, eventJson.data);
     return {conversationEntity, messageEntity};
+  }
+
+  /**
+   * Conversation protocol was updated.
+   *
+   * @param conversation Conversation that has updated protocol
+   * @param eventJson JSON data of 'conversation.protocol-update' event
+   * @returns Resolves when the event was handled
+   */
+  private async onProtocolUpdate(
+    conversation: Conversation,
+    eventJson: ConversationProtocolUpdateEvent,
+  ): Promise<void> {
+    const updatedConversation = await this.refreshConversationProtocolProperties(conversation);
+    await this.addEventToConversation(updatedConversation, eventJson);
+
+    if (eventJson.data.protocol === ConversationProtocol.MLS) {
+      await this.handleConversationProtocolUpdatedToMLS(updatedConversation);
+    }
+  }
+
+  private async handleConversationProtocolUpdatedToMLS(conversation: Conversation): Promise<void> {
+    // If protocol was changed to mls and there was an ongoing call we need to inform a user about it.
+    const ongoingCall = this.callingRepository.findCall(conversation.qualifiedId);
+    if (!ongoingCall || !ongoingCall.isActive()) {
+      return;
+    }
+
+    return this.injectMLSMigrationFinalisationOngoingCallMessage(conversation);
   }
 
   /**
@@ -3710,6 +3854,7 @@ export class ConversationRepository {
     conversationEntity.hasCreationMessage = false;
 
     const iso_date = timestamp ? new Date(timestamp).toISOString() : undefined;
+    conversationEntity.removeMessages();
     return this.eventService.deleteEvents(conversationEntity.id, iso_date);
   }
 

@@ -147,11 +147,10 @@ const UserModal: React.FC<UserModalProps> = ({
     resetState();
   };
   const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
-  const {
-    is_trusted: isTrusted,
-    is_verified: isSelfVerified,
-    isActivatedAccount,
-  } = useKoSubscribableChildren(selfUser, ['is_trusted', 'is_verified', 'isActivatedAccount']);
+  const {is_trusted: isTrusted, isActivatedAccount} = useKoSubscribableChildren(selfUser, [
+    'is_trusted',
+    'isActivatedAccount',
+  ]);
   const isFederated = core.backendFeatures?.isFederated;
 
   useEffect(() => {
@@ -206,7 +205,7 @@ const UserModal: React.FC<UserModalProps> = ({
         >
           {user && (
             <>
-              <UserDetails participant={user} isSelfVerified={isSelfVerified} classifiedDomains={classifiedDomains} />
+              <UserDetails participant={user} classifiedDomains={classifiedDomains} />
 
               <EnrichedFields user={user} showDomain={isFederated} />
 

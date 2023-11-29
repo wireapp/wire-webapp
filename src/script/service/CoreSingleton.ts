@@ -17,17 +17,17 @@
  *
  */
 
-import {ClientType} from '@wireapp/api-client/lib/client/';
 import {container, singleton} from 'tsyringe';
 
 import {Account} from '@wireapp/core';
 
-import {isTemporaryClientAndNonPersistent, supportsCoreCryptoProteus, supportsMLS} from 'Util/util';
+import {supportsCoreCryptoProteus, supportsMLS} from 'Util/util';
 
 import {APIClient} from './APIClientSingleton';
 import {createStorageEngine, DatabaseTypes} from './StoreEngineProvider';
 
 import {Config} from '../Config';
+import {isE2EIEnabled} from '../E2EIdentity';
 
 declare global {
   interface Window {
@@ -50,11 +50,7 @@ export class Core extends Account {
   constructor(apiClient = container.resolve(APIClient)) {
     super(apiClient, {
       createStore: (storeName, context) => {
-        const dbType = isTemporaryClientAndNonPersistent(context.clientType === ClientType.PERMANENT)
-          ? DatabaseTypes.ENCRYPTED
-          : DatabaseTypes.PERMANENT;
-
-        return createStorageEngine(storeName, dbType);
+        return createStorageEngine(storeName, DatabaseTypes.PERMANENT);
       },
       cryptoProtocolConfig: {
         coreCrypoWasmFilePath: '/min/core-crypto.wasm',
@@ -62,7 +58,7 @@ export class Core extends Account {
           ? {
               keyingMaterialUpdateThreshold: Config.getConfig().FEATURE.MLS_CONFIG_KEYING_MATERIAL_UPDATE_THRESHOLD,
               defaultCiphersuite: Config.getConfig().FEATURE.MLS_CONFIG_DEFAULT_CIPHERSUITE,
-              useE2EI: Config.getConfig().FEATURE.ENABLE_E2EI,
+              useE2EI: isE2EIEnabled(),
             }
           : undefined,
 

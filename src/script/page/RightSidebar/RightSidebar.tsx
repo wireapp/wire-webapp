@@ -241,6 +241,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
 
           {currentState === PanelState.PARTICIPANT_DEVICES && userEntity && (
             <ParticipantDevices
+              groupId={activeConversation.groupId}
               repositories={repositories}
               onClose={closePanel}
               onGoBack={onBackClick}
