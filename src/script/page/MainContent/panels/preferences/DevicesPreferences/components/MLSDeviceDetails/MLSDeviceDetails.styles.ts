@@ -27,7 +27,7 @@ export const styles: Styles = {
     width: '100%',
 
     '.preferences-devices &': {
-      paddingBottom: '32px',
+      marginTop: '32px',
     },
 
     '.preferences-device-details &': {
