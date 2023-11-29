@@ -37,6 +37,7 @@ import {PanelEntity, PanelState} from '../RightSidebar';
 
 interface ConversationParticipantsProps {
   activeConversation: Conversation;
+  renderParticipantBadges?: (user: User) => React.ReactNode;
   conversationRepository: ConversationRepository;
   searchRepository: SearchRepository;
   teamRepository: TeamRepository;
@@ -55,6 +56,7 @@ const ConversationParticipants: FC<ConversationParticipantsProps> = ({
   onClose,
   onBack,
   highlightedUsers,
+  renderParticipantBadges,
 }) => {
   const [searchInput, setSearchInput] = useState<string>('');
 
@@ -102,6 +104,7 @@ const ConversationParticipants: FC<ConversationParticipantsProps> = ({
 
         <FadingScrollbar className="conversation-participants__list panel__content">
           <UserSearchableList
+            renderParticipantBadges={renderParticipantBadges}
             dataUieName="list-conversation-participants"
             users={participants}
             filter={searchInput}

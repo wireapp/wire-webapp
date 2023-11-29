@@ -39,9 +39,9 @@ import {User} from '../../entity/User';
 
 interface UserDetailsProps {
   badge?: string;
+  renderParticipantBadges?: (user: User) => React.ReactNode;
   classifiedDomains?: string[];
   isGroupAdmin?: boolean;
-  isSelfVerified: boolean;
   isVerified?: boolean;
   participant: User;
   avatarStyles?: React.CSSProperties;
@@ -51,21 +51,13 @@ interface UserDetailsProps {
 const UserDetailsComponent: React.FC<UserDetailsProps> = ({
   badge,
   participant,
-  isSelfVerified,
+  renderParticipantBadges,
   isGroupAdmin,
   avatarStyles,
   classifiedDomains,
   teamState = container.resolve(TeamState),
 }) => {
-  const user = useKoSubscribableChildren(participant, [
-    'isGuest',
-    'isTemporaryGuest',
-    'expirationText',
-    'name',
-    'availability',
-    'is_verified',
-    'isAvailable',
-  ]);
+  const user = useKoSubscribableChildren(participant, ['isGuest', 'isTemporaryGuest', 'expirationText', 'isAvailable']);
 
   useEffect(() => {
     // This will trigger a user refresh
@@ -76,12 +68,9 @@ const UserDetailsComponent: React.FC<UserDetailsProps> = ({
     <div className="panel-participant">
       <div className="panel-participant__head">
         {teamState.isInTeam(participant) ? (
-          <AvailabilityState
-            className="panel-participant__head__name"
-            availability={user.availability}
-            label={user.name}
-            dataUieName="status-name"
-          />
+          <AvailabilityState className="panel-participant__head__name" user={participant} dataUieName="status-name">
+            {renderParticipantBadges?.(participant)}
+          </AvailabilityState>
         ) : (
           <h2
             className="panel-participant__head__name"
@@ -90,13 +79,6 @@ const UserDetailsComponent: React.FC<UserDetailsProps> = ({
           >
             <UserName user={participant} />
           </h2>
-        )}
-
-        {isSelfVerified && user.is_verified && (
-          <Icon.Verified
-            className="panel-participant__head__verified-icon"
-            data-uie-name="status-verified-participant"
-          />
         )}
       </div>
 

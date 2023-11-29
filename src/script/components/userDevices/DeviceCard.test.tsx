@@ -37,36 +37,6 @@ function createClientEntity(clientEntity: Partial<ClientEntity>): ClientEntity {
 }
 
 describe('DeviceCard', () => {
-  it('renders desktop icon for desktop clients', async () => {
-    const props = {
-      device: createClientEntity({
-        class: ClientClassification.DESKTOP,
-        meta: {
-          isVerified: ko.observable<boolean>(false),
-        },
-      }),
-      showIcon: true,
-    };
-
-    const {getByTestId} = render(<DeviceCard {...props} />);
-    expect(getByTestId('status-desktop-device')).not.toBeNull();
-  });
-
-  it('renders mobile devices icon for non-desktop clients', async () => {
-    const props = {
-      device: createClientEntity({
-        class: ClientClassification.PHONE,
-        meta: {
-          isVerified: ko.observable<boolean>(false),
-        },
-      }),
-      showIcon: true,
-    };
-
-    const {getByTestId} = render(<DeviceCard {...props} />);
-    expect(getByTestId('status-mobile-device')).not.toBeNull();
-  });
-
   it('shows disclose icon when component is clickable', async () => {
     const props = {
       click: jest.fn(),
@@ -81,37 +51,5 @@ describe('DeviceCard', () => {
 
     const {getByTestId} = render(<DeviceCard {...props} />);
     expect(getByTestId('disclose-icon')).not.toBeNull();
-  });
-
-  it('shows verified icon', async () => {
-    const props = {
-      device: createClientEntity({
-        class: ClientClassification.PHONE,
-        meta: {
-          isVerified: ko.observable<boolean>(true),
-        },
-      }),
-      showIcon: true,
-      showVerified: true,
-    };
-
-    const {getByTestId} = render(<DeviceCard {...props} />);
-    expect(getByTestId('user-device-verified')).not.toBeNull();
-  });
-
-  it('shows unverified icon', async () => {
-    const props = {
-      device: createClientEntity({
-        class: ClientClassification.PHONE,
-        meta: {
-          isVerified: ko.observable<boolean>(false),
-        },
-      }),
-      showIcon: true,
-      showVerified: true,
-    };
-
-    const {getByTestId} = render(<DeviceCard {...props} />);
-    expect(getByTestId('user-device-not-verified')).not.toBeNull();
   });
 });

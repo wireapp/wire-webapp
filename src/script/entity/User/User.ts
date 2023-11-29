@@ -66,7 +66,6 @@ export class User {
   // Manual Proteus verification
   public readonly is_verified: ko.PureComputed<boolean>;
   // MLS certificate verification
-  public readonly isMLSVerified: ko.PureComputed<boolean>;
   public readonly isBlocked: ko.PureComputed<boolean>;
   public readonly isCanceled: ko.PureComputed<boolean>;
   public readonly isConnected: ko.PureComputed<boolean>;
@@ -208,16 +207,6 @@ export class User {
         return false;
       }
       return this.devices().every(client_et => client_et.meta.isVerified?.());
-    });
-    this.isMLSVerified = ko.pureComputed(() => {
-      if (this.devices().length === 0) {
-        if (!this.isMe) {
-          return false;
-        }
-
-        return this.localClient?.meta.isMLSVerified?.() ?? false;
-      }
-      return this.devices().every(client_et => client_et.meta.isMLSVerified?.() ?? false);
     });
     this.isOnLegalHold = ko.pureComputed(() => {
       return this.devices().some(client_et => client_et.isLegalHold());

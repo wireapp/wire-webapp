@@ -56,7 +56,7 @@ export type UserListProps = React.ComponentProps<typeof UserList> & {
   allowRemoteSearch?: boolean;
 };
 
-const UserSearchableList: React.FC<UserListProps> = ({
+export const UserSearchableList: React.FC<UserListProps> = ({
   onUpdateSelectedUsers,
   dataUieName = '',
   filter = '',
@@ -169,5 +169,3 @@ const UserSearchableList: React.FC<UserListProps> = ({
     </div>
   );
 };
-
-export {UserSearchableList};

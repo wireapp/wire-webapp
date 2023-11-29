@@ -31,6 +31,7 @@ import {ServiceDetails} from 'Components/panel/ServiceDetails';
 import {UserDetails} from 'Components/panel/UserDetails';
 import {ServiceList} from 'Components/ServiceList/ServiceList';
 import {UserSearchableList} from 'Components/UserSearchableList';
+import {UserVerificationBadges} from 'Components/VerificationBadge';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
@@ -104,7 +105,6 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       verification_state: verificationState,
       isGroup,
       removed_from_conversation: removedFromConversation,
-      display_name: displayName,
       notificationState,
       hasGlobalMessageTimer,
       globalMessageTimer,
@@ -122,7 +122,6 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       'verification_state',
       'isGroup',
       'removed_from_conversation',
-      'display_name',
       'notificationState',
       'hasGlobalMessageTimer',
       'globalMessageTimer',
@@ -154,11 +153,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       'team',
     ]);
 
-    const {
-      is_verified: isSelfVerified,
-      teamRole,
-      isActivatedAccount,
-    } = useKoSubscribableChildren(selfUser, ['is_verified', 'teamRole', 'isActivatedAccount']);
+    const {teamRole, isActivatedAccount} = useKoSubscribableChildren(selfUser, ['teamRole', 'isActivatedAccount']);
 
     const isActiveGroupParticipant = isGroup && !removedFromConversation;
 
@@ -272,6 +267,10 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       isTeam,
     );
 
+    const renderParticipantsBadges = (participant: User) => {
+      return <UserVerificationBadges user={participant} groupId={activeConversation?.groupId} />;
+    };
+
     useEffect(() => {
       conversationRepository.refreshUnavailableParticipants(activeConversation);
     }, [activeConversation, conversationRepository]);
@@ -310,9 +309,9 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
           {isSingleUserMode && !isServiceMode && firstParticipant && (
             <>
               <UserDetails
+                renderParticipantBadges={renderParticipantsBadges}
                 participant={firstParticipant}
                 isVerified={isVerified}
-                isSelfVerified={isSelfVerified}
                 badge={teamRepository.getRoleBadge(firstParticipant.id)}
                 classifiedDomains={classifiedDomains}
               />
@@ -326,13 +325,12 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
               <ConversationDetailsHeader
                 isActiveGroupParticipant={isActiveGroupParticipant}
                 canRenameGroup={canRenameGroup}
-                displayName={displayName}
                 updateConversationName={updateConversationName}
-                isGroup={isGroup}
                 userParticipants={userParticipants}
                 serviceParticipants={serviceParticipants}
                 allUsersCount={allUsersCount}
                 isTeam={isTeam}
+                conversation={activeConversation}
               />
 
               {showTopActions && showActionAddParticipants && (
@@ -362,6 +360,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
                 {isGroup && !!userParticipants.length && (
                   <>
                     <UserSearchableList
+                      renderParticipantBadges={renderParticipantsBadges}
                       dataUieName="list-users"
                       users={userParticipants}
                       onClick={showUser}

@@ -4682,130 +4682,130 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@peculiar/asn1-cms@npm:^2.3.6":
-  version: 2.3.6
-  resolution: "@peculiar/asn1-cms@npm:2.3.6"
+"@peculiar/asn1-cms@npm:^2.3.6, @peculiar/asn1-cms@npm:^2.3.8":
+  version: 2.3.8
+  resolution: "@peculiar/asn1-cms@npm:2.3.8"
   dependencies:
-    "@peculiar/asn1-schema": ^2.3.6
-    "@peculiar/asn1-x509": ^2.3.6
-    "@peculiar/asn1-x509-attr": ^2.3.6
+    "@peculiar/asn1-schema": ^2.3.8
+    "@peculiar/asn1-x509": ^2.3.8
+    "@peculiar/asn1-x509-attr": ^2.3.8
     asn1js: ^3.0.5
-    tslib: ^2.4.0
-  checksum: caeb7fcb594b7158ecb31f2e0e3a85a79fb9a51b9204b3fbad398706f56f20dfb6478f37fc163b544ebe3fd6ade7606a71826684df040ae6870fe7a4d8286d8c
+    tslib: ^2.6.2
+  checksum: 5c5f833ad62bd5ba9391dc2f1fe80e49e5067688ee54c1a3ee37b659507049b652888c6e78f6e38ee8c73a1093dbe531dd47a8e4e2b09842bda737e8952001c1
   languageName: node
   linkType: hard
 
 "@peculiar/asn1-csr@npm:^2.3.6":
-  version: 2.3.6
-  resolution: "@peculiar/asn1-csr@npm:2.3.6"
+  version: 2.3.8
+  resolution: "@peculiar/asn1-csr@npm:2.3.8"
   dependencies:
-    "@peculiar/asn1-schema": ^2.3.6
-    "@peculiar/asn1-x509": ^2.3.6
+    "@peculiar/asn1-schema": ^2.3.8
+    "@peculiar/asn1-x509": ^2.3.8
     asn1js: ^3.0.5
-    tslib: ^2.4.0
-  checksum: 4989edc765476b02995fbee88ab3860cf657f0e62756fa0ec44cd95158e6276f58c2c8656e5f8bd2f6934650999b781f2ec7b65ec537fc41a1aeb387b2e32883
+    tslib: ^2.6.2
+  checksum: d2bc7641f5e71e55ebb0bcfbbdb63e5168ac676e5ee56ee549c61f63414d9699600d1267fca223d1d6dad4fdb0a50be2a125bee37828a91b9b4c138a2b8295b7
   languageName: node
   linkType: hard
 
 "@peculiar/asn1-ecc@npm:^2.3.6":
-  version: 2.3.6
-  resolution: "@peculiar/asn1-ecc@npm:2.3.6"
+  version: 2.3.8
+  resolution: "@peculiar/asn1-ecc@npm:2.3.8"
   dependencies:
-    "@peculiar/asn1-schema": ^2.3.6
-    "@peculiar/asn1-x509": ^2.3.6
+    "@peculiar/asn1-schema": ^2.3.8
+    "@peculiar/asn1-x509": ^2.3.8
     asn1js: ^3.0.5
-    tslib: ^2.4.0
-  checksum: 4b9a383dd443fbb9699d79550e03d1185781885768d8c7b780e26a959344286a53539824fa4a3103e9e8393a7d062fe6820bf79abafb340dc18ee5ce81b1d470
+    tslib: ^2.6.2
+  checksum: c7db2004a03f88c35fcd21957c8c15bfbf29c137a636bbc35d51dcebbc287ec253762e127d50197f0b5910600e3641a738c8ca756a15741fc09272272b0303f4
   languageName: node
   linkType: hard
 
-"@peculiar/asn1-pfx@npm:^2.3.6":
-  version: 2.3.6
-  resolution: "@peculiar/asn1-pfx@npm:2.3.6"
+"@peculiar/asn1-pfx@npm:^2.3.8":
+  version: 2.3.8
+  resolution: "@peculiar/asn1-pfx@npm:2.3.8"
   dependencies:
-    "@peculiar/asn1-cms": ^2.3.6
-    "@peculiar/asn1-pkcs8": ^2.3.6
-    "@peculiar/asn1-rsa": ^2.3.6
-    "@peculiar/asn1-schema": ^2.3.6
+    "@peculiar/asn1-cms": ^2.3.8
+    "@peculiar/asn1-pkcs8": ^2.3.8
+    "@peculiar/asn1-rsa": ^2.3.8
+    "@peculiar/asn1-schema": ^2.3.8
     asn1js: ^3.0.5
-    tslib: ^2.4.0
-  checksum: faa3abc62e4ba4e67f6377178df62c24146920475e4ddfee024b1e14b208947d9b136c1bb1b82d7a3a28b76a544687529338f6143f92bdf324db23bd6aa0c11a
+    tslib: ^2.6.2
+  checksum: a01dda82d077d52b343faafd14d58892813c4c43e37fb13e7531ab761d18fd453c50b5f0dbdffeb9310f0f502f97ab668d966bd899bae9604bd0aa43cd3874ea
   languageName: node
   linkType: hard
 
-"@peculiar/asn1-pkcs8@npm:^2.3.6":
-  version: 2.3.6
-  resolution: "@peculiar/asn1-pkcs8@npm:2.3.6"
+"@peculiar/asn1-pkcs8@npm:^2.3.8":
+  version: 2.3.8
+  resolution: "@peculiar/asn1-pkcs8@npm:2.3.8"
   dependencies:
-    "@peculiar/asn1-schema": ^2.3.6
-    "@peculiar/asn1-x509": ^2.3.6
+    "@peculiar/asn1-schema": ^2.3.8
+    "@peculiar/asn1-x509": ^2.3.8
     asn1js: ^3.0.5
-    tslib: ^2.4.0
-  checksum: 17b2ea5f2350ba74d58084f95f4d739d30413112e85268fd55b308307bd6a6f006e06accaf3e181103a61bfb7efd2c21be7f914b48954845bef109b1b0a4bc46
+    tslib: ^2.6.2
+  checksum: c1337df0097104b500f9428f839a699a9222125c9cdd34c288c95e52f5d0eec533d75ac45e41200ca8e328d135d3eda7638d2e7e91d1791419a04cd14b2d36a1
   languageName: node
   linkType: hard
 
 "@peculiar/asn1-pkcs9@npm:^2.3.6":
-  version: 2.3.6
-  resolution: "@peculiar/asn1-pkcs9@npm:2.3.6"
+  version: 2.3.8
+  resolution: "@peculiar/asn1-pkcs9@npm:2.3.8"
   dependencies:
-    "@peculiar/asn1-cms": ^2.3.6
-    "@peculiar/asn1-pfx": ^2.3.6
-    "@peculiar/asn1-pkcs8": ^2.3.6
-    "@peculiar/asn1-schema": ^2.3.6
-    "@peculiar/asn1-x509": ^2.3.6
-    "@peculiar/asn1-x509-attr": ^2.3.6
+    "@peculiar/asn1-cms": ^2.3.8
+    "@peculiar/asn1-pfx": ^2.3.8
+    "@peculiar/asn1-pkcs8": ^2.3.8
+    "@peculiar/asn1-schema": ^2.3.8
+    "@peculiar/asn1-x509": ^2.3.8
+    "@peculiar/asn1-x509-attr": ^2.3.8
     asn1js: ^3.0.5
-    tslib: ^2.4.0
-  checksum: 3b8ca25b46ce9afc51b8cc72afab6fd32bb1dbf501eef68f997b35591c16c321384224fe478fd03fa644f3d540d719568767c7bd8bd1f617a5d9f8d318be0d2c
+    tslib: ^2.6.2
+  checksum: 22ee32733a5abb14039c858093f4e79c989ed32c5ece746dd638afa23428f34a0a4c207126b75c2ae18198a20083fbc08dee9309771569eb8ef3734a37ff950f
   languageName: node
   linkType: hard
 
-"@peculiar/asn1-rsa@npm:^2.3.6":
-  version: 2.3.6
-  resolution: "@peculiar/asn1-rsa@npm:2.3.6"
+"@peculiar/asn1-rsa@npm:^2.3.6, @peculiar/asn1-rsa@npm:^2.3.8":
+  version: 2.3.8
+  resolution: "@peculiar/asn1-rsa@npm:2.3.8"
   dependencies:
-    "@peculiar/asn1-schema": ^2.3.6
-    "@peculiar/asn1-x509": ^2.3.6
+    "@peculiar/asn1-schema": ^2.3.8
+    "@peculiar/asn1-x509": ^2.3.8
     asn1js: ^3.0.5
-    tslib: ^2.4.0
-  checksum: 120dda00af6e1b1e5568826ac8211d60d36b3cbe91b086cae6b5ba132f1670ba129284068110305b237550e402c0beeda45fd713d640f97ad11d8cf6c925b31a
+    tslib: ^2.6.2
+  checksum: d9bf0f143686b475d3cc9f9b7d948826dc8c8764bc865697705351278541f0bf31a8f788ec8ff8bf6e4150b04aa65b20853bda45d77e4abbac717d7019e6fd56
   languageName: node
   linkType: hard
 
-"@peculiar/asn1-schema@npm:^2.3.6":
-  version: 2.3.6
-  resolution: "@peculiar/asn1-schema@npm:2.3.6"
+"@peculiar/asn1-schema@npm:^2.3.6, @peculiar/asn1-schema@npm:^2.3.8":
+  version: 2.3.8
+  resolution: "@peculiar/asn1-schema@npm:2.3.8"
   dependencies:
     asn1js: ^3.0.5
-    pvtsutils: ^1.3.2
-    tslib: ^2.4.0
-  checksum: fc09387c6e3dea07fca21b54ea8c71ce3ec0f8c92377237e51aef729f0c2df92781aa7a18a546a6fe809519faeaa222df576ec21a35c6095037a78677204a55b
+    pvtsutils: ^1.3.5
+    tslib: ^2.6.2
+  checksum: 1f4dd421f1411df8bc52bca12b1cef710434c13ff0a8b5746ede42b10d62b5ad06a3925c4a6db53102aaf1e589947539a6955fa8554a9b8ebb1ffa38b0155a24
   languageName: node
   linkType: hard
 
-"@peculiar/asn1-x509-attr@npm:^2.3.6":
-  version: 2.3.6
-  resolution: "@peculiar/asn1-x509-attr@npm:2.3.6"
+"@peculiar/asn1-x509-attr@npm:^2.3.8":
+  version: 2.3.8
+  resolution: "@peculiar/asn1-x509-attr@npm:2.3.8"
   dependencies:
-    "@peculiar/asn1-schema": ^2.3.6
-    "@peculiar/asn1-x509": ^2.3.6
+    "@peculiar/asn1-schema": ^2.3.8
+    "@peculiar/asn1-x509": ^2.3.8
     asn1js: ^3.0.5
-    tslib: ^2.4.0
-  checksum: 100a11aad2168a99b23d576869d27d569c34191d14311cf6fcbea126b737bcb42f23401ead45c2bc55074d164712c65e5541be23c0e5f92bf19005957a16a872
+    tslib: ^2.6.2
+  checksum: 07a64f1cf50af87f510aa857794e9f9334f36bd1682df3ece7bb4935575bca36111e0ba263e8559a738ae77116bc3ee576c2d4d713b2c720fa31a809452b2f4e
   languageName: node
   linkType: hard
 
-"@peculiar/asn1-x509@npm:^2.3.6":
-  version: 2.3.6
-  resolution: "@peculiar/asn1-x509@npm:2.3.6"
+"@peculiar/asn1-x509@npm:^2.3.6, @peculiar/asn1-x509@npm:^2.3.8":
+  version: 2.3.8
+  resolution: "@peculiar/asn1-x509@npm:2.3.8"
   dependencies:
-    "@peculiar/asn1-schema": ^2.3.6
+    "@peculiar/asn1-schema": ^2.3.8
     asn1js: ^3.0.5
-    ipaddr.js: ^2.0.1
-    pvtsutils: ^1.3.2
-    tslib: ^2.4.0
-  checksum: 6e946bd44091fb88f617c3bbf54ed1113ed2b249675dd36004513444f409160f6d446bdb82d3cb6041b4d15c68fa4cf40ad452891a5f85dda2af89ee5b0590d2
+    ipaddr.js: ^2.1.0
+    pvtsutils: ^1.3.5
+    tslib: ^2.6.2
+  checksum: 23856e5d024298447afca55bd68d19a7440c0ae076437aee5ced26a0fa2e4efa3e0e4a354fa6ee9968d62ac21ee1c2186fc427942bacfc824d3a3a4d2e80d14b
   languageName: node
   linkType: hard
 
@@ -6132,9 +6132,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^26.5.3":
-  version: 26.5.3
-  resolution: "@wireapp/api-client@npm:26.5.3"
+"@wireapp/api-client@npm:^26.6.0":
+  version: 26.6.0
+  resolution: "@wireapp/api-client@npm:26.6.0"
   dependencies:
     "@wireapp/commons": ^5.2.3
     "@wireapp/priority-queue": ^2.1.4
@@ -6149,7 +6149,7 @@ __metadata:
     tough-cookie: 4.1.3
     ws: 8.14.2
     zod: 3.22.4
-  checksum: 6520b95ebd8ccc59b576c890651bd20c782fa3054b303e857a428f09dbcc37ce6a661e3ee27cdc182b896481e1e7a610c796430fb9c40cffb3fb8fe4b74afe5d
+  checksum: 3bfe5c48c4f08b40fa254272be8be778b5a2909348876ba2690fb1dcda93ba89852d247a5895fcb534941960d0207c9eb7b0fc917f6f52fc3e1aaef65ab76fd3
   languageName: node
   linkType: hard
 
@@ -6202,11 +6202,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:42.21.0":
-  version: 42.21.0
-  resolution: "@wireapp/core@npm:42.21.0"
+"@wireapp/core@npm:42.25.2":
+  version: 42.25.2
+  resolution: "@wireapp/core@npm:42.25.2"
   dependencies:
-    "@wireapp/api-client": ^26.5.3
+    "@wireapp/api-client": ^26.6.0
     "@wireapp/commons": ^5.2.3
     "@wireapp/core-crypto": 1.0.0-rc.19
     "@wireapp/cryptobox": 12.8.0
@@ -6224,7 +6224,7 @@ __metadata:
     long: ^5.2.0
     uuidjs: 4.2.13
     zod: 3.22.4
-  checksum: 0513c3e4387071cc4b432ce600572dbed139fe5ce96209c01b2b2e2ecc9d5670c8a81f0b2c23c9576cb537095ce2781cd0bb2856d41e8b9bcd4beb29c99ae708
+  checksum: f44a5c1eeea7e9c13c1a5bc01e19411229f8a1e067243927d604982eb910e0f6cd0489d38568301620e7b9604e68e0cc72fea8d9d0a125376fb556a8c0de6c68
   languageName: node
   linkType: hard
 
@@ -11466,7 +11466,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ipaddr.js@npm:^2.0.1":
+"ipaddr.js@npm:^2.1.0":
   version: 2.1.0
   resolution: "ipaddr.js@npm:2.1.0"
   checksum: 807a054f2bd720c4d97ee479d6c9e865c233bea21f139fb8dabd5a35c4226d2621c42e07b4ad94ff3f82add926a607d8d9d37c625ad0319f0e08f9f2bd1968e2
@@ -19268,7 +19268,7 @@ __metadata:
     "@wireapp/avs": 9.5.2
     "@wireapp/commons": 5.2.3
     "@wireapp/copy-config": 2.1.12
-    "@wireapp/core": 42.21.0
+    "@wireapp/core": 42.25.2
     "@wireapp/eslint-config": 3.0.4
     "@wireapp/prettier-config": 0.6.3
     "@wireapp/react-ui-kit": 9.12.0

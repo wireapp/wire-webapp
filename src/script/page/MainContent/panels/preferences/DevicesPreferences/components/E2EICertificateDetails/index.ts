@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2022 Wire Swiss GmbH
+ * Copyright (C) 2023 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,20 +17,4 @@
  *
  */
 
-interface FormattedIdProps {
-  idSlices: string[];
-}
-
-export const FormattedId = ({idSlices}: FormattedIdProps) => (
-  <>
-    {idSlices.map((slice, index) => {
-      const Component = index % 2 === 0 ? 'strong' : 'span';
-
-      return (
-        <Component className="device-id-part" key={slice + index}>
-          {slice}
-        </Component>
-      );
-    })}
-  </>
-);
+export * from './E2EICertificateDetails';

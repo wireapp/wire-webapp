@@ -20,14 +20,13 @@
 import {container} from 'tsyringe';
 
 import {PrimaryModal, removeCurrentModal} from 'Components/Modals/PrimaryModal';
-import {Config} from 'src/script/Config';
 import {Core} from 'src/script/service/CoreSingleton';
 import {UserState} from 'src/script/user/UserState';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {removeUrlParameters} from 'Util/UrlUtil';
-import {supportsMLS} from 'Util/util';
 
 import {DelayTimerService} from './DelayTimer/DelayTimer';
+import {hasActiveCertificate, isE2EIEnabled} from './E2EIdentityVerification';
 import {getModalOptions, ModalType} from './Modals';
 import {getOIDCServiceInstance} from './OIDCService';
 import {OIDCServiceStore} from './OIDCService/OIDCServiceStorage';
@@ -46,7 +45,7 @@ interface E2EIHandlerParams {
   gracePeriodInSeconds: number;
 }
 
-class E2EIHandler {
+export class E2EIHandler {
   private static instance: E2EIHandler | null = null;
   private readonly core = container.resolve(Core);
   private readonly userState = container.resolve(UserState);
@@ -64,6 +63,16 @@ class E2EIHandler {
       gracePeriodExpiredCallback: () => null,
       delayPeriodExpiredCallback: () => null,
     });
+  }
+
+  private get coreE2EIService() {
+    const e2eiService = this.core.service?.e2eIdentity;
+
+    if (!e2eiService) {
+      throw new Error('E2EI Service not available');
+    }
+
+    return e2eiService;
   }
 
   /**
@@ -105,15 +114,11 @@ class E2EIHandler {
   }
 
   public initialize(): void {
-    if (this.isE2EIEnabled) {
-      if (!this.core.service?.e2eIdentity?.hasActiveCertificate()) {
+    if (isE2EIEnabled()) {
+      if (!hasActiveCertificate()) {
         this.showE2EINotificationMessage();
       }
     }
-  }
-
-  get isE2EIEnabled(): boolean {
-    return supportsMLS() && Config.getConfig().FEATURE.ENABLE_E2EI;
   }
 
   private async storeRedirectTargetAndRedirect(targetURL: string): Promise<void> {
@@ -123,15 +128,15 @@ class E2EIHandler {
     await oidcService.authenticate();
   }
 
-  private async enrollE2EI() {
+  public async enroll(refreshActiveCertificate: boolean = false) {
     try {
-      // Notify user about E2EI enrollment in progress
+      // Notify user about E2EI enrolment in progress
       this.currentStep = E2EIHandlerStep.ENROLL;
       this.showLoadingMessage();
       let oAuthIdToken: string | undefined;
 
-      // If the enrollment is in progress, we need to get the id token from the oidc service, since oauth should have already been completed
-      if (this.core.service?.e2eIdentity?.isEnrollmentInProgress()) {
+      // If the enrolment is in progress, we need to get the id token from the oidc service, since oauth should have already been completed
+      if (this.coreE2EIService.isEnrollmentInProgress()) {
         const oidcService = getOIDCServiceInstance();
         const userData = await oidcService.handleAuthentication();
         if (!userData) {
@@ -140,16 +145,23 @@ class E2EIHandler {
         oAuthIdToken = userData?.id_token;
       }
 
-      const data = await this.core.enrollE2EI(
-        this.userState.self().name(),
-        this.userState.self().username(),
-        this.discoveryUrl,
+      const displayName = this.userState.self()?.name();
+      const handle = this.userState.self()?.username();
+      // If the user has no username or handle, we cannot enroll
+      if (!displayName || !handle) {
+        throw new Error('Username or handle not found');
+      }
+      const data = await this.core.enrollE2EI({
+        discoveryUrl: this.discoveryUrl,
+        displayName,
+        handle,
         oAuthIdToken,
-      );
+        refreshActiveCertificate,
+      });
 
-      // If the data is false or we dont get the ACMEChallenge, enrollment failed
+      // If the data is false or we dont get the ACMEChallenge, enrolment failed
       if (!data) {
-        throw new Error('E2EI enrollment failed');
+        throw new Error('E2EI enrolment failed');
       }
 
       // Check if the data is a boolean, if not, we need to handle the oauth redirect
@@ -157,7 +169,7 @@ class E2EIHandler {
         await this.storeRedirectTargetAndRedirect(data.target);
       }
 
-      // Notify user about E2EI enrollment success
+      // Notify user about E2EI enrolment success
       // This setTimeout is needed because there was a timing with the success modal and the loading modal
       setTimeout(() => {
         removeCurrentModal();
@@ -165,7 +177,7 @@ class E2EIHandler {
 
       this.currentStep = E2EIHandlerStep.SUCCESS;
       this.showSuccessMessage();
-      // Remove the url parameters after enrollment
+      // Remove the url parameters after enrolment
       removeUrlParameters();
     } catch (error) {
       this.currentStep = E2EIHandlerStep.ERROR;
@@ -206,20 +218,20 @@ class E2EIHandler {
       return;
     }
 
-    // Remove the url parameters of the failed enrollment
+    // Remove the url parameters of the failed enrolment
     removeUrlParameters();
     // Clear the oidc service progress
     const oidcService = getOIDCServiceInstance();
     await oidcService.clearProgress();
     // Clear the e2e identity progress
-    this.core.service?.e2eIdentity?.clearAllProgress();
+    this.coreE2EIService.clearAllProgress();
 
     const {modalOptions, modalType} = getModalOptions({
       type: ModalType.ERROR,
       hideClose: true,
       primaryActionFn: () => {
         this.currentStep = E2EIHandlerStep.INITIALIZED;
-        void this.enrollE2EI();
+        void this.enroll();
       },
       secondaryActionFn: () => {
         this.showE2EINotificationMessage();
@@ -230,10 +242,10 @@ class E2EIHandler {
   }
 
   private showE2EINotificationMessage(): void {
-    // If the user has already started enrollment, don't show the notification. Instead, show the loading modal
+    // If the user has already started enrolment, don't show the notification. Instead, show the loading modal
     // This will occur after the redirect from the oauth provider
-    if (this.core.service?.e2eIdentity?.isEnrollmentInProgress()) {
-      void this.enrollE2EI();
+    if (this.coreE2EIService.isEnrollmentInProgress()) {
+      void this.enroll();
       return;
     }
 
@@ -260,7 +272,7 @@ class E2EIHandler {
     if (!this.timer.isDelayTimerActive()) {
       const {modalOptions, modalType} = getModalOptions({
         hideSecondary: !this.timer.isSnoozeTimeAvailable(),
-        primaryActionFn: () => this.enrollE2EI(),
+        primaryActionFn: () => this.enroll(),
         secondaryActionFn: () => {
           this.currentStep = E2EIHandlerStep.SNOOZE;
           this.timer.delayPrompt();
@@ -272,5 +284,3 @@ class E2EIHandler {
     }
   }
 }
-
-export {E2EIHandler};
