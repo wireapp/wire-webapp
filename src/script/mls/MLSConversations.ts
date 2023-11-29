@@ -50,25 +50,24 @@ export async function initMLSConversations(
 
   const mlsConversations = conversations.filter(isMLSCapableConversation);
 
-  await Promise.allSettled(
-    mlsConversations.map(async mlsConversation => {
-      const {groupId, qualifiedId} = mlsConversation;
+  for (const mlsConversation of mlsConversations) {
+    const {groupId, qualifiedId} = mlsConversation;
 
-      const doesMLSGroupExist = await conversationService.mlsGroupExistsLocally(groupId);
+    const doesMLSGroupExist = await conversationService.mlsGroupExistsLocally(groupId);
 
-      //if group is already established, we just schedule periodic key material updates
-      if (doesMLSGroupExist) {
-        return mlsService.scheduleKeyMaterialRenewal(groupId);
-      }
+    //if group is already established, we just schedule periodic key material updates
+    if (doesMLSGroupExist) {
+      await mlsService.scheduleKeyMaterialRenewal(groupId);
+      continue;
+    }
 
-      //otherwise we should try joining via external commit
-      await conversationService.joinByExternalCommit(qualifiedId);
+    //otherwise we should try joining via external commit
+    await conversationService.joinByExternalCommit(qualifiedId);
 
-      if (onSuccessfulJoin) {
-        return onSuccessfulJoin(mlsConversation);
-      }
-    }),
-  );
+    if (onSuccessfulJoin) {
+      return onSuccessfulJoin(mlsConversation);
+    }
+  }
 }
 
 /**

@@ -1851,23 +1851,28 @@ export class ConversationRepository {
 
   /**
    * Maps user connections to the corresponding conversations.
-   * @param connectionEntities Connections entities
+   * @param connections Connections entities
    */
-  mapConnections(connectionEntities: ConnectionEntity[]): Promise<Conversation | undefined>[] {
-    this.logger.log(`Mapping '${connectionEntities.length}' user connection(s) to conversations`, connectionEntities);
-    return connectionEntities.map(connectionEntity => this.mapConnection(connectionEntity));
+  private async mapConnections(connections: ConnectionEntity[]): Promise<void> {
+    this.logger.log(`Mapping '${connections.length}' user connection(s) to conversations`, connections);
+    for (const connection of connections) {
+      await this.mapConnection(connection);
+    }
   }
 
   public readonly init1To1Conversations = async (connections: ConnectionEntity[], conversations: Conversation[]) => {
     if (connections.length) {
-      await Promise.allSettled(this.mapConnections(connections));
+      await this.mapConnections(connections);
     }
     await this.initTeam1To1Conversations(conversations);
   };
 
   private readonly initTeam1To1Conversations = async (conversations: Conversation[]) => {
     const team1To1Conversations = conversations.filter(conversation => conversation.isTeam1to1());
-    await Promise.allSettled(team1To1Conversations.map(conversation => this.init1to1Conversation(conversation)));
+
+    for (const conversation of team1To1Conversations) {
+      await this.init1to1Conversation(conversation);
+    }
   };
 
   /**
