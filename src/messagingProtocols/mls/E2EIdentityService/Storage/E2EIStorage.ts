@@ -44,7 +44,6 @@ const getAndVerifyHandle = () => {
   if (!handle) {
     throw new Error('ACME: No handle found');
   }
-  storage.remove(HandleKey);
   const atob = window.atob(handle);
   return atob;
 };
@@ -54,7 +53,6 @@ const getAndVerifyAuthData = (): AuthData => {
   if (!data) {
     throw new Error('ACME: AuthData not found');
   }
-  storage.remove(AuthDataKey);
   const atob = window.atob(data);
   return AuthDataSchema.parse(JSON.parse(atob));
 };
@@ -64,7 +62,6 @@ const getInitialData = (): InitialData => {
   if (!data) {
     throw new Error('ACME: InitialData not found');
   }
-  storage.remove(InitialDataKey);
   const atob = window.atob(data);
   return InitialDataSchema.parse(JSON.parse(atob));
 };
@@ -74,7 +71,6 @@ const getAndVerifyOrderData = (): OrderData => {
   if (!data) {
     throw new Error('ACME: OrderData not found');
   }
-  storage.remove(OderDataKey);
   const atob = window.atob(data);
   return JSON.parse(atob);
 };
