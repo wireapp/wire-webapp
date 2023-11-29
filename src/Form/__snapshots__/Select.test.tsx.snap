@@ -203,6 +203,7 @@ exports[`"Select" renders 1`] = `
   className="emotion-0"
 >
   <div
+    autoFocus={false}
     className="emotion-1"
     data-uie-name="test"
   >
@@ -488,6 +489,7 @@ exports[`"Select" renders as disabled 1`] = `
   className="emotion-0"
 >
   <div
+    autoFocus={false}
     className="emotion-1"
     data-uie-name="test"
   >
@@ -774,6 +776,7 @@ exports[`"Select" renders as invalid 1`] = `
   className="emotion-0"
 >
   <div
+    autoFocus={false}
     className="emotion-1"
     data-uie-name="test"
   >

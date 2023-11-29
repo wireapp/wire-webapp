@@ -31,6 +31,7 @@ import {
   Menu,
   SelectContainer,
   ValueContainer,
+  isGroup,
 } from './SelectComponents';
 import {customStyles} from './SelectStyles';
 
@@ -78,6 +79,8 @@ export const Select = <IsMulti extends boolean = false, Group extends GroupBase<
 
   return (
     <div
+      // eslint-disable-next-line jsx-a11y/no-autofocus
+      autoFocus={isGroup(options)}
       css={(theme: Theme) => ({
         marginBottom: markInvalid ? '2px' : '20px',
         width: '100%',
