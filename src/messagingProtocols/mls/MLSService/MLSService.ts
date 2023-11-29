@@ -785,13 +785,24 @@ export class MLSService extends TypedEventEmitter<Events> {
         discoveryUrl,
         keyPackagesAmount: nbPrekeys,
       });
+      // If we don't have an OAuth id token, we need to start the certificate process with Oauth
       if (!oAuthIdToken) {
         const challengeData = await instance.startCertificateProcess(refreshActiveCertificate);
         if (challengeData) {
           return challengeData;
         }
+        // If we have an OAuth id token, we can continue the certificate process / start a refresh
       } else {
-        const rotateBundle = await instance.continueCertificateProcess(oAuthIdToken);
+        let rotateBundle;
+
+        // If we are not refreshing the active certificate, we need to continue the certificate process with Oauth
+        if (!refreshActiveCertificate) {
+          rotateBundle = await instance.continueCertificateProcess(oAuthIdToken);
+          // If we are refreshing the active certificate, can start the refresh process
+        } else {
+          rotateBundle = await instance.startRefreshCertficateFlow(oAuthIdToken);
+        }
+
         if (rotateBundle !== undefined) {
           // upload the clients public keys
           await this.uploadMLSPublicKeys(client);
