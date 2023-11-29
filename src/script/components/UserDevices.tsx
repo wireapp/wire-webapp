@@ -35,7 +35,7 @@ import {ClientRepository, ClientEntity} from '../client';
 import {MessageRepository} from '../conversation/MessageRepository';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {User} from '../entity/User';
-import {useDeviceIdentities} from '../hooks/useDeviceIdentities';
+import {useUserIdentity} from '../hooks/useDeviceIdentities';
 
 enum FIND_MODE {
   FOUND = 'UserDevices.MODE.FOUND',
@@ -100,7 +100,7 @@ const UserDevices: React.FC<UserDevicesProps> = ({
   groupId,
 }) => {
   const [selectedClient, setSelectedClient] = useState<ClientEntity>();
-  const {getDeviceIdentity} = useDeviceIdentities(user.qualifiedId, groupId);
+  const {getDeviceIdentity} = useUserIdentity(user.qualifiedId, groupId);
   const [deviceMode, setDeviceMode] = useState(FIND_MODE.REQUESTING);
   const [clients, setClients] = useState<ClientEntity[]>([]);
   const logger = useMemo(() => getLogger('UserDevicesComponent'), []);

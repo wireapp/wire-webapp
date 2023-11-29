@@ -21,9 +21,9 @@ import {useEffect, useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {getUsersIdentities, isE2EIEnabled, WireIdentity} from '../E2EIdentity';
+import {getUsersIdentities, isE2EIEnabled, MLSStatuses, WireIdentity} from '../E2EIdentity';
 
-export const useDeviceIdentities = (userId: QualifiedId, groupId?: string) => {
+export const useUserIdentity = (userId: QualifiedId, groupId?: string) => {
   const [deviceIdentities, setDeviceIdentities] = useState<WireIdentity[] | undefined>();
 
   useEffect(() => {
@@ -37,6 +37,13 @@ export const useDeviceIdentities = (userId: QualifiedId, groupId?: string) => {
 
   return {
     deviceIdentities,
+
+    status: !deviceIdentities
+      ? undefined
+      : deviceIdentities.length > 0 && deviceIdentities.every(identity => identity.status === MLSStatuses.VALID)
+      ? MLSStatuses.VALID
+      : MLSStatuses.NOT_DOWNLOADED,
+
     getDeviceIdentity:
       deviceIdentities !== undefined
         ? (deviceId: string) => {

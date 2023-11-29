@@ -17,7 +17,7 @@
  *
  */
 
-import {CSSProperties, useEffect, useState} from 'react';
+import {CSSProperties} from 'react';
 
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 
@@ -31,14 +31,10 @@ import {
 
 import {ClientEntity} from 'src/script/client';
 import {ConversationVerificationState} from 'src/script/conversation/ConversationVerificationState';
-import {
-  getUserVerificationState,
-  isE2EIEnabled,
-  MLSStatuses,
-  WireIdentity,
-} from 'src/script/E2EIdentity/E2EIdentityVerification';
+import {MLSStatuses, WireIdentity} from 'src/script/E2EIdentity/E2EIdentityVerification';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
+import {useUserIdentity} from 'src/script/hooks/useDeviceIdentities';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -76,17 +72,8 @@ const useConversationVerificationState = (conversation: Conversation) => {
 };
 
 export const UserVerificationBadges = ({user, groupId}: {user: User; groupId?: string}) => {
-  const [MLSStatus, setMLSStatus] = useState<MLSStatuses | undefined>(undefined);
+  const {status: MLSStatus} = useUserIdentity(user.qualifiedId, groupId);
   const {is_verified: isProteusVerified} = useKoSubscribableChildren(user, ['is_verified']);
-
-  useEffect(() => {
-    void (async () => {
-      if (groupId && isE2EIEnabled()) {
-        const status = await getUserVerificationState(groupId, user.qualifiedId);
-        setMLSStatus(status);
-      }
-    })();
-  }, []);
 
   return <VerificationBadges isProteusVerified={isProteusVerified} MLSStatus={MLSStatus} />;
 };

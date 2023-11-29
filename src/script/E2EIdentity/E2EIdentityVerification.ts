@@ -66,14 +66,6 @@ export async function getUsersIdentities(groupId: string, userIds: QualifiedId[]
   return mappedUsers;
 }
 
-export async function getUserVerificationState(groupId: string, userId: QualifiedId) {
-  const usersVerifications = await getUsersIdentities(groupId, [userId]);
-  const deviceIdentities = usersVerifications.get(userId.id);
-  return deviceIdentities?.length && deviceIdentities.every(identity => identity.status === MLSStatuses.VALID)
-    ? MLSStatuses.VALID
-    : MLSStatuses.NOT_DOWNLOADED;
-}
-
 export async function getConversationVerificationState(groupId: string) {
   return getE2EIdentityService().getConversationState(base64ToArray(groupId));
 }
