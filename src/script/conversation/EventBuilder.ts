@@ -171,6 +171,12 @@ export type MessageAddEvent = ConversationEvent<
   version?: number;
 };
 export type MissedEvent = BaseEvent & {id: string; type: CONVERSATION.MISSED_MESSAGES};
+export type JoinedAfterMLSMigrationFinalisationEvent = BaseEvent & {
+  type: CONVERSATION.JOINED_AFTER_MLS_MIGRATION;
+};
+export type MLSMigrationFinalisationOngoingCallEvent = BaseEvent & {
+  type: CONVERSATION.MLS_MIGRATION_ONGOING_CALL;
+};
 export type MLSConversationRecoveredEvent = BaseEvent & {id: string; type: CONVERSATION.MLS_CONVERSATION_RECOVERED};
 export type OneToOneCreationEvent = ConversationEvent<CONVERSATION.ONE2ONE_CREATION, {userIds: QualifiedId[]}>;
 export type TeamMemberLeaveEvent = Omit<MemberLeaveEvent, 'type'> & {
@@ -275,6 +281,8 @@ export type ClientConversationEvent =
   | FailedToAddUsersMessageEvent
   | UnableToDecryptEvent
   | MissedEvent
+  | JoinedAfterMLSMigrationFinalisationEvent
+  | MLSMigrationFinalisationOngoingCallEvent
   | MLSConversationRecoveredEvent
   | LocationEvent
   | VoiceChannelActivateEvent
@@ -604,6 +612,34 @@ export const EventBuilder = {
       id: createUuid(),
       time: conversationEntity.getNextIsoDate(currentTimestamp),
       type: ClientEvent.CONVERSATION.MLS_CONVERSATION_RECOVERED,
+    };
+  },
+
+  buildJoinedAfterMLSMigrationFinalisation(
+    conversationEntity: Conversation,
+    currentTimestamp: number,
+  ): JoinedAfterMLSMigrationFinalisationEvent {
+    return {
+      ...buildQualifiedId(conversationEntity),
+      from: conversationEntity.selfUser().id,
+      id: createUuid(),
+      data: null,
+      time: conversationEntity.getNextIsoDate(currentTimestamp),
+      type: ClientEvent.CONVERSATION.JOINED_AFTER_MLS_MIGRATION,
+    };
+  },
+
+  buildMLSMigrationFinalisationOngoingCall(
+    conversationEntity: Conversation,
+    currentTimestamp: number,
+  ): MLSMigrationFinalisationOngoingCallEvent {
+    return {
+      ...buildQualifiedId(conversationEntity),
+      from: conversationEntity.selfUser().id,
+      id: createUuid(),
+      data: null,
+      time: conversationEntity.getNextIsoDate(currentTimestamp),
+      type: ClientEvent.CONVERSATION.MLS_MIGRATION_ONGOING_CALL,
     };
   },
 

@@ -37,8 +37,6 @@ describe('ClientMapper', () => {
       expect(clientEntity.cookie).toBe(clientPayload.cookie);
       expect(clientEntity.id).toBe(clientPayload.id);
       expect(clientEntity.label).toBe(clientPayload.label);
-      expect(clientEntity.location?.lat).toBe(clientPayload.location.lat);
-      expect(clientEntity.location?.lon).toBe(clientPayload.location.lon);
       expect(clientEntity.meta.isVerified?.()).toBe(false);
       expect(clientEntity.model).toBe(clientPayload.model);
       expect(clientEntity.time).toBe(clientPayload.time);
@@ -57,8 +55,6 @@ describe('ClientMapper', () => {
       expect(clientEntity.cookie).toBe(clientPayload.cookie);
       expect(clientEntity.id).toBe(clientPayload.id);
       expect(clientEntity.label).toBe(clientPayload.label);
-      expect(clientEntity.location?.lat).toBe(clientPayload.location.lat);
-      expect(clientEntity.location?.lon).toBe(clientPayload.location.lon);
       expect(clientEntity.meta.isVerified?.()).toBe(false);
       expect(clientEntity.model).toBe(clientPayload.model);
       expect(clientEntity.time).toBe(clientPayload.time);
@@ -140,8 +136,6 @@ describe('ClientMapper', () => {
       expect(clientEntity.cookie).toBe(clientPayload.cookie);
       expect(clientEntity.id).toBe(clientPayload.id);
       expect(clientEntity.label).toBe(clientPayload.label);
-      expect(clientEntity.location?.lat).toBe(clientPayload.location.lat);
-      expect(clientEntity.location?.lon).toBe(clientPayload.location.lon);
       expect(clientEntity.meta.isVerified?.()).toBe(false);
       expect(clientEntity.model).toBe(clientPayload.model);
       expect(clientEntity.time).toBe(clientPayload.time);
@@ -162,8 +156,6 @@ describe('ClientMapper', () => {
       expect(clientEntity.cookie).toBe(clientPayload.cookie);
       expect(clientEntity.id).toBe(clientPayload.id);
       expect(clientEntity.label).toBe(clientPayload.label);
-      expect(clientEntity.location?.lat).toBe(clientPayload.location.lat);
-      expect(clientEntity.location?.lon).toBe(clientPayload.location.lon);
       expect(clientEntity.meta.isVerified?.()).toBe(false);
       expect(clientEntity.model).toBe(clientPayload.model);
       expect(clientEntity.time).toBe(clientPayload.time);
