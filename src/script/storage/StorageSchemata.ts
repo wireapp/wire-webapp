@@ -23,6 +23,7 @@ import {base64ToArray} from 'Util/util';
 
 import {ConversationRecord} from './record';
 
+import {Config} from '../Config';
 import {categoryFromEvent} from '../message/MessageCategorization';
 
 interface DexieSchema {
@@ -49,8 +50,8 @@ export class StorageSchemata {
     } as const;
   }
 
-  static get SCHEMATA(): DexieSchema[] {
-    return [
+  static get SCHEMATA() {
+    const versions: DexieSchema[] = [
       {
         schema: {
           [StorageSchemata.OBJECT_STORE.AMPLIFY]: '',
@@ -427,11 +428,17 @@ export class StorageSchemata {
             }),
         version: 20,
       },
-      {
+    ];
+
+    if (Config.getConfig().FEATURE.ENABLE_ENCRYPTION_AT_REST) {
+      // We need to dynamically add the encryption schema to the schema list only if (and when) the option is enabled
+      const highestVersion = versions[versions.length - 1].version;
+      versions.push({
         // This version enables DB encryption at rest
         schema: {},
-        version: 21,
-      },
-    ];
+        version: highestVersion + 1,
+      });
+    }
+    return versions;
   }
 }

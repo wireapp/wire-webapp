@@ -40,14 +40,7 @@ const providePermanentEngine = async (
   const db = new DexieDatabase(storeName);
 
   if (key) {
-    applyEncryptionMiddleware(
-      db,
-      key,
-      {
-        events: NON_INDEXED_FIELDS,
-      },
-      console.error,
-    );
+    applyEncryptionMiddleware(db, key, {events: NON_INDEXED_FIELDS}, console.error);
   }
   const engine = new IndexedDBEngine();
   try {
