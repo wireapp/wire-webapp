@@ -23,7 +23,11 @@ import type {CRUDEngine} from '@wireapp/store-engine';
 import {MemoryEngine} from '@wireapp/store-engine';
 import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
 
+import {getLogger} from 'Util/Logger';
+
 import {DexieDatabase} from '../storage/DexieDatabase';
+
+const logger = getLogger('StoreEngineProvider');
 
 export enum DatabaseTypes {
   /** a permament storage that will still live after logout */
@@ -40,7 +44,9 @@ const providePermanentEngine = async (
   const db = new DexieDatabase(storeName);
 
   if (key) {
-    applyEncryptionMiddleware(db, key, {events: NON_INDEXED_FIELDS}, console.error);
+    applyEncryptionMiddleware(db, key, {events: NON_INDEXED_FIELDS}, async () =>
+      logger.error('Database key is corrupted'),
+    );
   }
   const engine = new IndexedDBEngine();
   try {
