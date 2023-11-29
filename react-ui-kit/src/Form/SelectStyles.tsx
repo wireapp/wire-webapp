@@ -72,12 +72,16 @@ export const customStyles = (theme: Theme, markInvalid = false) => ({
     };
   },
   control: (_provided, {options}) => ({
-    display: isGroup(options) ? 'none' : 'flex',
+    display: 'flex',
     alignItems: 'center',
     appearance: 'none',
     padding: '0 8px 0 16px',
     height: 'auto',
     minHeight: '48px',
+    ...(isGroup(options) && {
+      position: 'absolute',
+      zIndex: -9999,
+    }),
   }),
   dropdownIndicator: (provided, selectProps) => {
     const isSelectDisabled = selectProps.isDisabled;
