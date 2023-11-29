@@ -146,7 +146,7 @@ export type Env = {
   FEATURE_ENFORCE_CONSTANT_BITRATE: string;
 
   /** will make sure the clear text content of messages are encrypted before being written in the DB (enabling this will also disable full text search on messages) */
-  FEATURE_ENABLE_ENCRYTPION_AT_REST: string;
+  FEATURE_ENABLE_ENCRYPTION_AT_REST: string;
 
   /** Set a default federation domain in case no domain can be found */
   FEATURE_FEDERATION_DOMAIN: string;
