@@ -337,7 +337,7 @@ const _getStateUnreadMessage = {
         string = t('notificationAssetAdd');
       } else if (messageEntity.isE2EIVerification()) {
         string =
-          messageEntity.messageType() === E2EIVerificationMessageType.VERIFIED
+          messageEntity.messageType === E2EIVerificationMessageType.VERIFIED
             ? t('conversation.AllE2EIDevicesVerifiedShort')
             : t('conversation.E2EIVerificationDegraded');
       } else if (messageEntity.isVerification()) {

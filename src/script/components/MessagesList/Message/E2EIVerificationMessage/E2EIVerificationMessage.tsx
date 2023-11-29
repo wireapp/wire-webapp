@@ -59,7 +59,8 @@ export interface E2EIVerificationMessageProps {
 }
 
 export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificationMessageProps) => {
-  const {messageType, userIds} = useKoSubscribableChildren(message, ['messageType', 'userIds']);
+  const {messageType, userIds = []} = message;
+
   const {participating_user_ets: participatingUserEts, selfUser} = useKoSubscribableChildren(conversation, [
     'participating_user_ets',
     'selfUser',
