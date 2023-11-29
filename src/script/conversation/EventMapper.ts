@@ -770,7 +770,7 @@ export class EventMapper {
    */
   private _mapEventE2EIVerificationMessage({data: eventData}: LegacyEventRecord): MissedMessage {
     const messageEntity = new E2EIVerificationMessage();
-    messageEntity.messageType(eventData.type);
+    messageEntity.messageType = eventData.type;
 
     return messageEntity;
   }
