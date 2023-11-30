@@ -374,10 +374,6 @@ export class App {
         throw new ClientError(CLIENT_ERROR_TYPE.NO_VALID_CLIENT, 'Client has been deleted on backend');
       }
 
-      if (supportsMLS()) {
-        registerMLSConversationVerificationStateHandler(this.updateConversationE2EIVerificationState);
-      }
-
       this.core.on(CoreEvents.NEW_SESSION, ({userId, clientId}) => {
         const newClient = {class: ClientClassification.UNKNOWN, id: clientId};
         userRepository.addClientToUser(userId, newClient, true);
@@ -436,6 +432,7 @@ export class App {
       if (supportsMLS()) {
         //if mls is supported, we need to initialize the callbacks (they are used when decrypting messages)
         conversationRepository.initMLSConversationRecoveredListener();
+        registerMLSConversationVerificationStateHandler(this.updateConversationE2EIVerificationState);
       }
 
       onProgress(25, t('initReceivedUserData'));
