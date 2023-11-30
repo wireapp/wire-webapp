@@ -71,7 +71,7 @@ export const RedirectRoutes = (config: ServerConfig, clientConfig: ClientConfig)
       .join('&');
     return res.redirect(
       HTTP_STATUS.MOVED_TEMPORARILY,
-      `/auth/?${queryString ? queryString : 'no_query=true'}#/e2ei-redirect`,
+      `/?${queryString ? queryString : 'no_query=true'}#/e2ei-redirect`,
     );
   }),
 ];
