@@ -30,7 +30,7 @@ import {PanelActions} from 'Components/panel/PanelActions';
 import {ServiceDetails} from 'Components/panel/ServiceDetails';
 import {UserDetails} from 'Components/panel/UserDetails';
 import {ServiceList} from 'Components/ServiceList/ServiceList';
-import {UserSearchableList} from 'Components/UserSearchableList';
+import {UserList} from 'Components/UserList';
 import {UserVerificationBadges} from 'Components/VerificationBadge';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -50,7 +50,6 @@ import {User} from '../../../entity/User';
 import {isServiceEntity} from '../../../guards/Service';
 import {IntegrationRepository} from '../../../integration/IntegrationRepository';
 import {ServiceEntity} from '../../../integration/ServiceEntity';
-import {SearchRepository} from '../../../search/SearchRepository';
 import {TeamRepository} from '../../../team/TeamRepository';
 import {TeamState} from '../../../team/TeamState';
 import {Shortcut} from '../../../ui/Shortcut';
@@ -71,7 +70,6 @@ interface ConversationDetailsProps {
   activeConversation: Conversation;
   conversationRepository: ConversationRepository;
   integrationRepository: IntegrationRepository;
-  searchRepository: SearchRepository;
   teamRepository: TeamRepository;
   teamState: TeamState;
   selfUser: User;
@@ -87,7 +85,6 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       activeConversation,
       conversationRepository,
       integrationRepository,
-      searchRepository,
       teamRepository,
       teamState,
       selfUser,
@@ -359,22 +356,20 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
               <div className="conversation-details__participants">
                 {isGroup && !!userParticipants.length && (
                   <>
-                    <UserSearchableList
-                      renderParticipantBadges={renderParticipantsBadges}
-                      dataUieName="list-users"
-                      users={userParticipants}
-                      onClick={showUser}
-                      noUnderline
-                      searchRepository={searchRepository}
-                      teamRepository={teamRepository}
-                      conversationRepository={conversationRepository}
-                      conversation={activeConversation}
-                      truncate
-                      showEmptyAdmin
-                      selfFirst={false}
-                      selfUser={selfUser}
-                      noSelfInteraction
-                    />
+                    <div className="user-list-wrapper" data-uie-name="list-users">
+                      <UserList
+                        renderParticipantBadges={renderParticipantsBadges}
+                        users={userParticipants}
+                        onClick={showUser}
+                        noUnderline
+                        conversationRepository={conversationRepository}
+                        conversation={activeConversation}
+                        truncate
+                        showEmptyAdmin
+                        selfUser={selfUser}
+                        noSelfInteraction
+                      />
+                    </div>
 
                     {allUsersCount > 0 && (
                       <button

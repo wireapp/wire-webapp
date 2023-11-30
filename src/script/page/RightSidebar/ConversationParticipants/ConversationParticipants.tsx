@@ -22,6 +22,7 @@ import {FC, useMemo, useState} from 'react';
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {SearchInput} from 'Components/SearchInput';
 import {UserSearchableList} from 'Components/UserSearchableList';
+import {UserVerificationBadges} from 'Components/VerificationBadge';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
@@ -37,7 +38,6 @@ import {PanelEntity, PanelState} from '../RightSidebar';
 
 interface ConversationParticipantsProps {
   activeConversation: Conversation;
-  renderParticipantBadges?: (user: User) => React.ReactNode;
   conversationRepository: ConversationRepository;
   searchRepository: SearchRepository;
   teamRepository: TeamRepository;
@@ -56,9 +56,11 @@ const ConversationParticipants: FC<ConversationParticipantsProps> = ({
   onClose,
   onBack,
   highlightedUsers,
-  renderParticipantBadges,
 }) => {
   const [searchInput, setSearchInput] = useState<string>('');
+  const renderParticipantBadges = (participant: User) => (
+    <UserVerificationBadges user={participant} groupId={activeConversation.groupId} />
+  );
 
   const {
     participating_user_ets: participatingUserEts,
