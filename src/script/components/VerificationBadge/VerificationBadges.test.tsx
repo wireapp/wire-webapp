@@ -30,7 +30,7 @@ describe('VerificationBadges', () => {
       withTheme(<VerificationBadges context="conversation" MLSStatus={MLSStatuses.VALID} />),
     );
 
-    const E2EIdentityStatus = getByTestId('mls-status');
+    const E2EIdentityStatus = getByTestId('mls-conversation-status');
     expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.VALID);
   });
 
@@ -46,7 +46,7 @@ describe('VerificationBadges', () => {
       withTheme(<VerificationBadges context="conversation" MLSStatus={MLSStatuses.NOT_DOWNLOADED} />),
     );
 
-    const E2EIdentityStatus = getByTestId('mls-status');
+    const E2EIdentityStatus = getByTestId('mls-conversation-status');
     expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.NOT_DOWNLOADED);
   });
 
@@ -55,7 +55,7 @@ describe('VerificationBadges', () => {
       withTheme(<VerificationBadges context="conversation" MLSStatus={MLSStatuses.EXPIRED} />),
     );
 
-    const E2EIdentityStatus = getByTestId('mls-status');
+    const E2EIdentityStatus = getByTestId('mls-conversation-status');
     expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.EXPIRED);
   });
 
@@ -64,7 +64,7 @@ describe('VerificationBadges', () => {
       withTheme(<VerificationBadges context="conversation" MLSStatus={MLSStatuses.EXPIRES_SOON} />),
     );
 
-    const E2EIdentityStatus = getByTestId('mls-status');
+    const E2EIdentityStatus = getByTestId('mls-conversation-status');
     expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.EXPIRES_SOON);
   });
 });
