@@ -71,7 +71,7 @@ export const ProteusDeviceDetails = ({device, fingerprint, isProteusVerified}: P
             {isProteusVerified ? (
               <>
                 <span>{t('proteusVerified')}</span>
-                <VerificationBadges isProteusVerified />
+                <VerificationBadges isProteusVerified context="device" />
               </>
             ) : (
               <span>{t('proteusNotVerified')}</span>

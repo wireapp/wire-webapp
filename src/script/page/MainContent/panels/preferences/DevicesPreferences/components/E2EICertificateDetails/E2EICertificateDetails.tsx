@@ -66,7 +66,7 @@ export const E2EICertificateDetails = ({identity, isCurrentDevice}: E2EICertific
           <strong css={styles.e2eiStatus(certificateState)}>{t(`E2EI.${certificateState}`)}</strong>
         </p>
 
-        <VerificationBadges MLSStatus={certificateState} />
+        <VerificationBadges MLSStatus={certificateState} context="device" />
       </div>
 
       <div css={styles.buttonsGroup}>
