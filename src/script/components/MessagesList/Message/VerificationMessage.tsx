@@ -67,7 +67,7 @@ const VerificationMessage: React.FC<VerificationMessageProps> = ({message}) => {
         data-uie-name="element-message-verification"
         data-uie-value={verificationMessageType}
       >
-        {isTypeVerified && <span>{t('tooltipConversationAllVerified')}</span>}
+        {isTypeVerified && <span>{t('conversation.AllVerified')}</span>}
         {isTypeUnverified && (
           <>
             <span className="message-header-sender-name">{unsafeSenderName}</span>

@@ -22,20 +22,20 @@ import {E2eiConversationState} from '@wireapp/core/lib/messagingProtocols/mls';
 import {container} from 'tsyringe';
 
 import {getConversationVerificationState, getUsersIdentities, MLSStatuses} from 'src/script/E2EIdentity';
-import {VerificationMessageType} from 'src/script/message/VerificationMessageType';
+import {E2EIVerificationMessageType} from 'src/script/message/E2EIVerificationMessageType';
 import {Core} from 'src/script/service/CoreSingleton';
 import {Logger, getLogger} from 'Util/Logger';
 
 import {MLSConversation} from '../../ConversationSelectors';
 import {ConversationState} from '../../ConversationState';
 import {ConversationVerificationState} from '../../ConversationVerificationState';
-import {getConversationByGroupId, OnConversationVerificationStateChange} from '../shared';
+import {getConversationByGroupId, OnConversationE2EIVerificationStateChange} from '../shared';
 
 class MLSConversationVerificationStateHandler {
   private readonly logger: Logger;
 
   public constructor(
-    private readonly onConversationVerificationStateChange: OnConversationVerificationStateChange,
+    private readonly onConversationVerificationStateChange: OnConversationE2EIVerificationStateChange,
     private readonly conversationState: ConversationState,
     private readonly core: Core,
   ) {
@@ -68,7 +68,7 @@ class MLSConversationVerificationStateHandler {
     this.onConversationVerificationStateChange({
       conversationEntity: conversation,
       conversationVerificationState: state,
-      verificationMessageType: VerificationMessageType.UNVERIFIED,
+      verificationMessageType: E2EIVerificationMessageType.REVOKED,
       userIds: degradedUsers,
     });
   }
@@ -111,7 +111,7 @@ class MLSConversationVerificationStateHandler {
 }
 
 export const registerMLSConversationVerificationStateHandler = (
-  onConversationVerificationStateChange: OnConversationVerificationStateChange = () => {},
+  onConversationVerificationStateChange: OnConversationE2EIVerificationStateChange = () => {},
   conversationState: ConversationState = container.resolve(ConversationState),
   core: Core = container.resolve(Core),
 ): void => {

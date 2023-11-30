@@ -59,7 +59,7 @@ import {ConversationRepository} from '../conversation/ConversationRepository';
 import {ConversationService} from '../conversation/ConversationService';
 import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
 import {registerMLSConversationVerificationStateHandler} from '../conversation/ConversationVerificationStateHandler';
-import {OnConversationVerificationStateChange} from '../conversation/ConversationVerificationStateHandler/shared';
+import {OnConversationE2EIVerificationStateChange} from '../conversation/ConversationVerificationStateHandler/shared';
 import {EventBuilder} from '../conversation/EventBuilder';
 import {MessageRepository} from '../conversation/MessageRepository';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
@@ -375,7 +375,7 @@ export class App {
       }
 
       if (supportsMLS()) {
-        registerMLSConversationVerificationStateHandler(this.updateConversationVerificationState);
+        registerMLSConversationVerificationStateHandler(this.updateConversationE2EIVerificationState);
       }
 
       this.core.on(CoreEvents.NEW_SESSION, ({userId, clientId}) => {
@@ -813,14 +813,24 @@ export class App {
     doRedirect(signOutReason);
   }
 
-  private updateConversationVerificationState: OnConversationVerificationStateChange = async ({
+  private updateConversationE2EIVerificationState: OnConversationE2EIVerificationStateChange = async ({
     conversationEntity,
     conversationVerificationState,
+    verificationMessageType,
+    userIds,
   }) => {
     switch (conversationVerificationState) {
       case ConversationVerificationState.VERIFIED:
         const allVerifiedEvent = EventBuilder.buildAllE2EIVerified(conversationEntity);
         await this.repository.event.injectEvent(allVerifiedEvent);
+        break;
+      case ConversationVerificationState.DEGRADED:
+        if (verificationMessageType) {
+          const degradedEvent = EventBuilder.buildE2EIDegraded(conversationEntity, verificationMessageType, userIds);
+          await this.repository.event.injectEvent(degradedEvent);
+        } else {
+          this.logger.error('updateConversationE2EIVerificationState: Missing verificationMessageType while degrading');
+        }
         break;
       default:
         break;

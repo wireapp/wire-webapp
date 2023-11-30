@@ -35,6 +35,7 @@ import {
   ClientConversationEvent,
   FederationStopEvent,
   FailedToAddUsersMessageEvent,
+  E2EIVerificationEvent,
 } from './EventBuilder';
 
 import {AssetRemoteData} from '../assets/AssetRemoteData';
@@ -350,11 +351,6 @@ export class EventMapper {
         break;
       }
 
-      case ClientEvent.CONVERSATION.E2EI_VERIFICATION: {
-        messageEntity = this._mapEventE2EIVerificationMessage();
-        break;
-      }
-
       case ClientEvent.CONVERSATION.ONE2ONE_CREATION: {
         messageEntity = this._mapEvent1to1Creation(event);
         break;
@@ -367,6 +363,11 @@ export class EventMapper {
 
       case ClientEvent.CONVERSATION.VERIFICATION: {
         messageEntity = this._mapEventVerification(event);
+        break;
+      }
+
+      case ClientEvent.CONVERSATION.E2EI_VERIFICATION: {
+        messageEntity = this._mapEventE2EIVerificationMessage(event);
         break;
       }
 
@@ -682,13 +683,6 @@ export class EventMapper {
   }
 
   /**
-   * Maps JSON data of E2E Identity verification message event to message entity.
-   */
-  private _mapEventE2EIVerificationMessage(): MissedMessage {
-    return new E2EIVerificationMessage();
-  }
-
-  /**
    * Maps JSON data of `conversation.knock` message into message entity.
    */
   private _mapEventPing(): PingMessage {
@@ -770,6 +764,13 @@ export class EventMapper {
     messageEntity.verificationMessageType(eventData.type);
 
     return messageEntity;
+  }
+
+  /**
+   * Maps JSON data of E2E Identity verification message event to message entity.
+   */
+  private _mapEventE2EIVerificationMessage({data: eventData}: E2EIVerificationEvent): MissedMessage {
+    return new E2EIVerificationMessage(eventData.type, eventData.userIds);
   }
 
   /**

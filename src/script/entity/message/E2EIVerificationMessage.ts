@@ -17,21 +17,22 @@
  *
  */
 
-import {replaceLink, t} from 'Util/LocalizerUtil';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {SystemMessage} from './SystemMessage';
+import {Message} from './Message';
 
-import {Config} from '../../Config';
-import {SystemMessageType} from '../../message/SystemMessageType';
+import {E2EIVerificationMessageType} from '../../message/E2EIVerificationMessageType';
+import {SuperType} from '../../message/SuperType';
 
-export class E2EIVerificationMessage extends SystemMessage {
-  constructor() {
+export class E2EIVerificationMessage extends Message {
+  public messageType: E2EIVerificationMessageType;
+  public userIds?: QualifiedId[];
+
+  constructor(messageType: E2EIVerificationMessageType, userIds?: QualifiedId[]) {
     super();
-    this.system_message_type = SystemMessageType.E2EI_VERIFIED;
-    this.caption = t(
-      'tooltipConversationAllE2EIVerified',
-      {},
-      replaceLink(Config.getConfig().URL.SUPPORT.E2EI_VERIFICATION),
-    );
+
+    this.super_type = SuperType.E2EI_VERIFICATION;
+    this.messageType = messageType;
+    this.userIds = userIds;
   }
 }

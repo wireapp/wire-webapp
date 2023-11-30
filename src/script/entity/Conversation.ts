@@ -58,7 +58,6 @@ import {ConversationStatus} from '../conversation/ConversationStatus';
 import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
 import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
 import {ConversationError} from '../error/ConversationError';
-import {ClientEvent} from '../event/Client';
 import {isContentMessage, isDeleteMessage} from '../guards/Message';
 import {StatusType} from '../message/StatusType';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
@@ -458,9 +457,7 @@ export class Conversation {
           const isSelfQuoted =
             isMessage && this.selfUser() && (messageEntity as ContentMessage).isUserQuoted(this.selfUser().id);
 
-          const isMLSProtocol = this.protocol === ConversationProtocol.MLS;
-          const isE2EIVerification =
-            isMLSProtocol && messageEntity?.type === ClientEvent.CONVERSATION.E2EI_VERIFICATION;
+          const isE2EIVerification = messageEntity.isE2EIVerification();
 
           if (isMissedCall || isPing || isMessage || isE2EIVerification) {
             unreadState.allMessages.push(messageEntity as ContentMessage);
