@@ -59,7 +59,7 @@ describe('VerificationBadges', () => {
     expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.EXPIRED);
   });
 
-  it('is expires soon', async () => {
+  it('is expiring soon', async () => {
     const {getByTestId} = render(
       withTheme(<VerificationBadges context="conversation" MLSStatus={MLSStatuses.EXPIRES_SOON} />),
     );
