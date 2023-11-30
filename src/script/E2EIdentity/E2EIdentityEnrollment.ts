@@ -17,6 +17,7 @@
  *
  */
 
+import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import {container} from 'tsyringe';
 
 import {TypedEventEmitter} from '@wireapp/commons';
@@ -24,6 +25,7 @@ import {TypedEventEmitter} from '@wireapp/commons';
 import {PrimaryModal, removeCurrentModal} from 'Components/Modals/PrimaryModal';
 import {Core} from 'src/script/service/CoreSingleton';
 import {UserState} from 'src/script/user/UserState';
+import {getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {removeUrlParameters} from 'Util/UrlUtil';
 
@@ -54,7 +56,11 @@ type EnrollmentConfig = {
   discoveryUrl: string;
   gracePeriodInMs: number;
 };
+
+const gracePeriodMS = 7 * TimeInMillis.DAY; //GP
+const historyTimeMS = 28 * TimeInMillis.DAY; //HT
 export class E2EIHandler extends TypedEventEmitter<Events> {
+  private logger = getLogger('E2EIHandler');
   private static instance: E2EIHandler | null = null;
   private readonly core = container.resolve(Core);
   private readonly userState = container.resolve(UserState);
@@ -91,22 +97,89 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   }
 
   public initialize({discoveryUrl, gracePeriodInSeconds}: E2EIHandlerParams) {
-    if (isE2EIEnabled()) {
-      if (!hasActiveCertificate()) {
-        const gracePeriodInMs = gracePeriodInSeconds * TIME_IN_MILLIS.SECOND;
-        this.config = {
-          discoveryUrl,
-          gracePeriodInMs,
-          timer: DelayTimerService.getInstance({
-            gracePeriodInMS: gracePeriodInMs,
-            gracePeriodExpiredCallback: () => null,
-            delayPeriodExpiredCallback: () => null,
-          }),
-        };
-        this.showE2EINotificationMessage();
+    if (!isE2EIEnabled()) {
+      return;
+    }
+
+    if (!hasActiveCertificate()) {
+      const gracePeriodInMs = gracePeriodInSeconds * TIME_IN_MILLIS.SECOND;
+      this.config = {
+        discoveryUrl,
+        gracePeriodInMs,
+        timer: DelayTimerService.getInstance({
+          gracePeriodInMS: gracePeriodInMs,
+          gracePeriodExpiredCallback: () => null,
+          delayPeriodExpiredCallback: () => null,
+        }),
+      };
+      this.showE2EINotificationMessage();
+    } else {
+      const certificate = this.getCurrentDeviceCertificateData();
+
+      if (!certificate) {
+        return;
+      }
+
+      const {isValid, timeRemainingMS, certificateCreationTime} = getCertificateDetails(certificate);
+
+      // CC will soon return valid/expired/revoked
+      if (!isValid) {
+        return;
+      }
+
+      const renewalTimeMS = this.calculateRenewalTime(timeRemainingMS, historyTimeMS, gracePeriodMS);
+      const renewalPromptTime = new Date(certificateCreationTime + renewalTimeMS).getTime();
+      const currentTime = new Date().getTime();
+
+      if (currentTime >= renewalPromptTime) {
+        void this.renewCertificate();
       }
     }
     return this;
+  }
+
+  /**
+   * Renew the certificate without user action
+   */
+  private async renewCertificate(): Promise<void> {
+    const oidcService = getOIDCServiceInstance();
+    try {
+      // Use the oidc service to get the user data via silent authentication (refresh token)
+      const userData = await oidcService.handleSilentAuthentication();
+
+      if (!userData) {
+        throw new Error('Received no user data from OIDC service');
+      }
+      // renew without user action
+      await this.enroll(true, userData);
+    } catch (error) {
+      this.logger.error('Silent authentication with refresh token failed', error);
+
+      // If the silent authentication fails, clear the oidc service progress/data and renew manually
+      await this.cleanUp();
+      this.showE2EINotificationMessage();
+    }
+  }
+
+  /**
+   * Calculates the date when the E2EI certificate renewal should be prompted.
+   *
+   * @param {number} timeRemainingMS - Certificate validity period in days (VP).
+   * @param {number} historyTime - Maximum time messages are stored in days (HT).
+   * @param {number} gracePeriod - Time to activate certificate in days (GP).
+   * @returns {Date} - The date to start prompting for certificate renewal.
+   */
+  private calculateRenewalTime(timeRemainingMS: number, historyTimeMS: number, gracePeriodMS: number) {
+    // Calculate a random time between 0 and 1 days
+    const randomTimeInMS = Math.random() * TimeInMillis.DAY; // Up to 24 hours in milliseconds
+
+    // Calculate the total days to subtract
+    const totalDaysToSubtract = historyTimeMS + gracePeriodMS + randomTimeInMS;
+
+    // Calculate the renewal date
+    const renewalDate = timeRemainingMS - totalDaysToSubtract;
+
+    return renewalDate;
   }
 
   private async storeRedirectTargetAndRedirect(targetURL: string): Promise<void> {
@@ -114,6 +187,33 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     OIDCServiceStore.store.targetURL(targetURL);
     const oidcService = getOIDCServiceInstance();
     await oidcService.authenticate();
+  }
+
+  /**
+   * Used to clean the state/storage after a failed run
+   */
+  private async cleanUp() {
+    // Remove the url parameters of the failed enrolment
+    removeUrlParameters();
+    // Clear the oidc service progress
+    const oidcService = getOIDCServiceInstance();
+    await oidcService.clearProgress();
+    // Clear the e2e identity progress
+    this.coreE2EIService.clearAllProgress();
+    // Clear the oidc service store refresh token
+    OIDCServiceStore.clear.refreshToken();
+  }
+
+  private getE2EIdentityService() {
+    return container.resolve(Core).service?.e2eIdentity;
+  }
+
+  private getCurrentDeviceCertificateData() {
+    if (!hasActiveCertificate()) {
+      return undefined;
+    }
+
+    return this.getE2EIdentityService()?.getCertificateData();
   }
 
   public async enroll(refreshActiveCertificate: boolean = false) {
@@ -125,7 +225,6 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       this.currentStep = E2EIHandlerStep.ENROLL;
       this.showLoadingMessage();
       let oAuthIdToken: string | undefined;
-      let oAuthRefreshToken: string | undefined;
 
       // If the enrolment is in progress, we need to get the id token from the oidc service, since oauth should have already been completed
       if (this.coreE2EIService.isEnrollmentInProgress()) {
@@ -135,11 +234,6 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
           throw new Error('Received no user data from OIDC service');
         }
         oAuthIdToken = userData?.id_token;
-        oAuthRefreshToken = userData?.refresh_token;
-
-        if (oAuthRefreshToken) {
-          OIDCServiceStore.store.refreshToken(oAuthRefreshToken);
-        }
       }
 
       const displayName = this.userState.self()?.name();
