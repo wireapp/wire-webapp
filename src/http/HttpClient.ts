@@ -19,6 +19,7 @@
 
 import axios, {AxiosError, AxiosHeaders, AxiosInstance, AxiosRequestConfig, AxiosResponse} from 'axios';
 import axiosRetry, {isNetworkOrIdempotentRequestError, exponentialDelay} from 'axios-retry';
+import {backOff} from 'exponential-backoff';
 import logdown from 'logdown';
 import {gzip} from 'pako';
 
@@ -153,6 +154,14 @@ export class HttpClient extends EventEmitter {
 
       return response;
     } catch (error) {
+      const isTooManyRequestsError = axios.isAxiosError(error) && error.response?.status === 420;
+      if (isTooManyRequestsError) {
+        return backOff(() => this._sendRequest<T>(config, tokenAsParam, false), {
+          jitter: 'full',
+          maxDelay: 2000,
+        });
+      }
+
       const retryWithTokenRefresh = async () => {
         this.logger.warn(`Access token refresh triggered for "${config.method}" request to "${config.url}".`);
         await this.refreshAccessToken();
