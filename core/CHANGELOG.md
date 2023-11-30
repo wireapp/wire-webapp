@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [43.0.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.26.2...@wireapp/core@43.0.0) (2023-11-30)
+
+### Features
+
+* Allow consumer to generate and store secret keys ([#5756](https://github.com/wireapp/wire-web-packages/issues/5756)) ([d3225ee](https://github.com/wireapp/wire-web-packages/commit/d3225eeaff54dcef414a2abad4d1db1ebf156e0b))
+
+### BREAKING CHANGES
+
+* the config object of coreCrypto has changed
+
 ## [42.26.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.26.1...@wireapp/core@42.26.2) (2023-11-29)
 
 ### Bug Fixes
