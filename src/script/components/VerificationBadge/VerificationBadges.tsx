@@ -19,6 +19,7 @@
 
 import {CSSProperties} from 'react';
 
+import {CSSObject} from '@emotion/react';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 
 import {
@@ -38,19 +39,21 @@ import {useUserIdentity} from 'src/script/hooks/useDeviceIdentities';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
+type VerificationBadgeContext = 'user' | 'conversation' | 'device';
 interface VerificationBadgesProps {
   conversationProtocol?: ConversationProtocol;
   isProteusVerified?: boolean;
   MLSStatus?: MLSStatuses;
   displayTitle?: boolean;
+  context: VerificationBadgeContext;
 }
 
-const badgeWrapper: CSSProperties = {
+const badgeWrapper: CSSObject = {
   display: 'flex',
   alignItems: 'center',
 };
 
-const iconStyles: CSSProperties = {
+const iconStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
 };
@@ -75,7 +78,7 @@ export const UserVerificationBadges = ({user, groupId}: {user: User; groupId?: s
   const {status: MLSStatus} = useUserIdentity(user.qualifiedId, groupId);
   const {is_verified: isProteusVerified} = useKoSubscribableChildren(user, ['is_verified']);
 
-  return <VerificationBadges isProteusVerified={isProteusVerified} MLSStatus={MLSStatus} />;
+  return <VerificationBadges context="user" isProteusVerified={isProteusVerified} MLSStatus={MLSStatus} />;
 };
 
 export const DeviceVerificationBadges = ({
@@ -87,7 +90,9 @@ export const DeviceVerificationBadges = ({
 }) => {
   const MLSStatus = getIdentity ? getIdentity(device.id)?.status ?? MLSStatuses.NOT_DOWNLOADED : undefined;
 
-  return <VerificationBadges isProteusVerified={!!device.meta?.isVerified?.()} MLSStatus={MLSStatus} />;
+  return (
+    <VerificationBadges context="device" isProteusVerified={!!device.meta?.isVerified?.()} MLSStatus={MLSStatus} />
+  );
 };
 
 type ConversationVerificationBadgeProps = {
@@ -95,16 +100,52 @@ type ConversationVerificationBadgeProps = {
   displayTitle?: boolean;
 };
 export const ConversationVerificationBadges = ({conversation, displayTitle}: ConversationVerificationBadgeProps) => {
-  const verificationState = useConversationVerificationState(conversation);
+  const {MLS, proteus} = useConversationVerificationState(conversation);
 
   return (
     <VerificationBadges
+      context="conversation"
       conversationProtocol={conversation.protocol}
-      MLSStatus={verificationState.MLS}
+      MLSStatus={MLS}
       displayTitle={displayTitle}
-      isProteusVerified={verificationState.proteus === ConversationVerificationState.VERIFIED}
+      isProteusVerified={proteus === ConversationVerificationState.VERIFIED}
     />
   );
+};
+
+const MLSVerificationBadge = ({context, MLSStatus}: {MLSStatus?: MLSStatuses; context: VerificationBadgeContext}) => {
+  const mlsVerificationProps = {
+    className: 'with-tooltip with-tooltip--external',
+    css: iconStyles,
+    'data-uie-name': `mls-${context}-status`,
+    'data-uie-value': MLSStatus,
+  };
+
+  switch (MLSStatus) {
+    case MLSStatuses.VALID:
+      return (
+        <span {...mlsVerificationProps} data-tooltip={t('E2EI.deviceVerified')}>
+          <MLSVerified />
+        </span>
+      );
+    case MLSStatuses.NOT_DOWNLOADED:
+      <span {...mlsVerificationProps} data-tooltip={t('E2EI.certificateRevoked')}>
+        <CertificateRevoked />
+      </span>;
+    case MLSStatuses.EXPIRED:
+      return (
+        <span {...mlsVerificationProps} data-tooltip={t('E2EI.certificateExpired')}>
+          <CertificateExpiredIcon />
+        </span>
+      );
+    case MLSStatuses.EXPIRES_SOON:
+      return (
+        <span {...mlsVerificationProps} data-tooltip={t('E2EI.certificateExpiresSoon')}>
+          <ExpiresSoon />
+        </span>
+      );
+  }
+  return null;
 };
 
 export const VerificationBadges = ({
@@ -112,14 +153,11 @@ export const VerificationBadges = ({
   isProteusVerified = false,
   MLSStatus,
   displayTitle = false,
+  context,
 }: VerificationBadgesProps) => {
   if (!MLSStatus && !isProteusVerified) {
     return null;
   }
-
-  const isExpired = MLSStatus === MLSStatuses.EXPIRED;
-  const isNotDownloaded = MLSStatus === MLSStatuses.NOT_DOWNLOADED;
-  const isExpiresSoon = MLSStatus === MLSStatuses.EXPIRES_SOON;
 
   const conversationHasProtocol = !!conversationProtocol;
 
@@ -132,72 +170,25 @@ export const VerificationBadges = ({
     : isProteusVerified;
 
   return (
-    <div className="conversation-badges" style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
+    <div className="conversation-badges" css={{display: 'flex', alignItems: 'center', gap: '6px'}}>
       {showMLSBadge && (
-        <div style={badgeWrapper}>
+        <div css={badgeWrapper}>
           {displayTitle && <span style={title(true)}>{t('E2EI.verified')}</span>}
-
-          {!isExpired && !isNotDownloaded && !isExpiresSoon && (
-            <span
-              className="with-tooltip with-tooltip--external"
-              data-tooltip={t('E2EI.deviceVerified')}
-              style={iconStyles}
-              data-uie-name="mls-status"
-              data-uie-value={MLSStatuses.VALID}
-            >
-              <MLSVerified data-uie-name="conversation-title-bar-verified-icon" />
-            </span>
-          )}
-
-          {isExpired && (
-            <span
-              className="with-tooltip with-tooltip--external"
-              data-tooltip={t('E2EI.certificateExpired')}
-              style={iconStyles}
-              data-uie-name="mls-status"
-              data-uie-value={MLSStatuses.EXPIRED}
-            >
-              <CertificateExpiredIcon data-uie-name="conversation-title-bar-verified-icon" />
-            </span>
-          )}
-
-          {isExpiresSoon && (
-            <span
-              className="with-tooltip with-tooltip--external"
-              data-tooltip={t('E2EI.certificateExpiresSoon')}
-              style={iconStyles}
-              data-uie-name="mls-status"
-              data-uie-value={MLSStatuses.EXPIRES_SOON}
-            >
-              <ExpiresSoon data-uie-name="conversation-title-bar-verified-icon" />
-            </span>
-          )}
-
-          {isNotDownloaded && (
-            <span
-              className="with-tooltip with-tooltip--external"
-              data-tooltip={t('E2EI.certificateRevoked')}
-              style={iconStyles}
-              data-uie-name="mls-status"
-              data-uie-value={MLSStatuses.NOT_DOWNLOADED}
-            >
-              <CertificateRevoked data-uie-name="conversation-title-bar-verified-icon" />
-            </span>
-          )}
+          <MLSVerificationBadge MLSStatus={MLSStatus} context={context} />
         </div>
       )}
 
       {showProteusBadge && (
-        <div style={badgeWrapper}>
+        <div css={badgeWrapper}>
           {displayTitle && <span style={title(false)}>{t('proteusVerifiedDetails')}</span>}
 
           <span
             className="with-tooltip with-tooltip--external"
             data-tooltip={t('proteusDeviceVerified')}
-            style={iconStyles}
+            css={iconStyles}
             data-uie-name="proteus-verified"
           >
-            <ProteusVerified data-uie-name="conversation-title-bar-verified-icon" />
+            <ProteusVerified data-uie-name={`proteus-${context}-verified`} />
           </span>
         </div>
       )}

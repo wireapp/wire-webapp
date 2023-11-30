@@ -202,11 +202,11 @@ describe('TitleBar', () => {
         verification_state: ko.observable<ConversationVerificationState>(state),
       });
 
-      const {container} = render(
+      const {queryByTestId} = render(
         withTheme(<TitleBar {...getDefaultProps(callingRepository, conversation)} selfUser={selfUser} />),
       );
 
-      const verifiedIcon = container.querySelector('[data-uie-name="conversation-title-bar-verified-icon"]');
+      const verifiedIcon = queryByTestId('proteus-conversations-verified');
       expect(verifiedIcon).toBeNull();
     },
   );
@@ -217,11 +217,11 @@ describe('TitleBar', () => {
       verification_state: ko.observable<ConversationVerificationState>(ConversationVerificationState.VERIFIED),
     });
 
-    const {container} = render(
+    const {getByTestId} = render(
       withTheme(<TitleBar {...getDefaultProps(callingRepository, conversation)} selfUser={selfUser} />),
     );
 
-    const verifiedIcon = container.querySelector('[data-uie-name="conversation-title-bar-verified-icon"]');
+    const verifiedIcon = getByTestId('proteus-conversation-verified');
     expect(verifiedIcon).not.toBeNull();
   });
 

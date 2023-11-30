@@ -26,37 +26,45 @@ import {VerificationBadges} from './VerificationBadges';
 
 describe('VerificationBadges', () => {
   it('is mls verified', async () => {
-    const {getByTestId} = render(withTheme(<VerificationBadges MLSStatus={MLSStatuses.VALID} />));
+    const {getByTestId} = render(
+      withTheme(<VerificationBadges context="conversation" MLSStatus={MLSStatuses.VALID} />),
+    );
 
-    const E2EIdentityStatus = getByTestId('mls-status');
+    const E2EIdentityStatus = getByTestId('mls-conversation-status');
     expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.VALID);
   });
 
   it('is proteus verified', async () => {
-    const {getByTestId} = render(withTheme(<VerificationBadges isProteusVerified />));
+    const {getByTestId} = render(withTheme(<VerificationBadges context="conversation" isProteusVerified />));
 
     const E2EIdentityStatus = getByTestId('proteus-verified');
     expect(E2EIdentityStatus).not.toBeNull();
   });
 
   it('is not downloaded', async () => {
-    const {getByTestId} = render(withTheme(<VerificationBadges MLSStatus={MLSStatuses.NOT_DOWNLOADED} />));
+    const {getByTestId} = render(
+      withTheme(<VerificationBadges context="conversation" MLSStatus={MLSStatuses.NOT_DOWNLOADED} />),
+    );
 
-    const E2EIdentityStatus = getByTestId('mls-status');
+    const E2EIdentityStatus = getByTestId('mls-conversation-status');
     expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.NOT_DOWNLOADED);
   });
 
   it('is expired', async () => {
-    const {getByTestId} = render(withTheme(<VerificationBadges MLSStatus={MLSStatuses.EXPIRED} />));
+    const {getByTestId} = render(
+      withTheme(<VerificationBadges context="conversation" MLSStatus={MLSStatuses.EXPIRED} />),
+    );
 
-    const E2EIdentityStatus = getByTestId('mls-status');
+    const E2EIdentityStatus = getByTestId('mls-conversation-status');
     expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.EXPIRED);
   });
 
-  it('is expires soon', async () => {
-    const {getByTestId} = render(withTheme(<VerificationBadges MLSStatus={MLSStatuses.EXPIRES_SOON} />));
+  it('is expiring soon', async () => {
+    const {getByTestId} = render(
+      withTheme(<VerificationBadges context="conversation" MLSStatus={MLSStatuses.EXPIRES_SOON} />),
+    );
 
-    const E2EIdentityStatus = getByTestId('mls-status');
+    const E2EIdentityStatus = getByTestId('mls-conversation-status');
     expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.EXPIRES_SOON);
   });
 });
