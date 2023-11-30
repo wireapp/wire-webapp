@@ -432,6 +432,7 @@ export class App {
       if (supportsMLS()) {
         //if mls is supported, we need to initialize the callbacks (they are used when decrypting messages)
         conversationRepository.initMLSConversationRecoveredListener();
+        registerMLSConversationVerificationStateHandler(this.updateConversationE2EIVerificationState);
       }
 
       onProgress(25, t('initReceivedUserData'));
@@ -472,8 +473,6 @@ export class App {
           onError: ({id}, error) =>
             this.logger.error(`Failed when initialising mls conversation with id ${id}, error: `, error),
         });
-
-        registerMLSConversationVerificationStateHandler(this.updateConversationE2EIVerificationState);
       }
 
       telemetry.timeStep(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
