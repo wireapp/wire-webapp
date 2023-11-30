@@ -25,43 +25,35 @@ import {Ciphersuite, CoreCrypto} from '@wireapp/core-crypto';
 import type {CRUDEngine} from '@wireapp/store-engine';
 
 import {PrekeyTracker} from './PrekeysTracker';
-import {generateSecretKey, CorruptedKeyError} from './secretKeyGenerator';
 
-import {SecretCrypto} from '../../../../mls/types';
+import {CorruptedKeyError, GeneratedKey} from '../../../../../secretStore/secretKeyGenerator';
 import {CryptoClient} from '../CryptoClient.types';
 
 type Config = {
-  systemCrypto?: SecretCrypto;
+  generateSecretKey: (keyId: string) => Promise<GeneratedKey>;
   nbPrekeys: number;
   onNewPrekeys: (prekeys: PreKey[]) => void;
+  wasmFilePath: string;
 };
 
-type ClientConfig = Config & {
+type ClientConfig = Omit<Config, 'generateSecretKey' | 'wasmFilePath'> & {
   onWipe: () => Promise<void>;
 };
 
 export async function buildClient(
   storeEngine: CRUDEngine,
-  coreCryptoWasmFilePath: string,
-  {systemCrypto, nbPrekeys, onNewPrekeys}: Config,
+  {wasmFilePath, generateSecretKey, nbPrekeys, onNewPrekeys}: Config,
 ): Promise<CoreCryptoWrapper> {
   let key;
   const coreCryptoDbName = `corecrypto-${storeEngine.storeName}`;
-  const secretKeysDbName = `secrets-${storeEngine.storeName}`;
+  const coreCryptoKeyId = 'corecrypto-key';
   try {
-    key = await generateSecretKey({
-      dbName: secretKeysDbName,
-      systemCrypto,
-    });
+    key = await generateSecretKey(coreCryptoKeyId);
   } catch (error) {
     if (error instanceof CorruptedKeyError) {
       // If we are dealing with a corrupted key, we wipe the key and the coreCrypto DB to start fresh
-      await deleteDB(secretKeysDbName);
       await deleteDB(coreCryptoDbName);
-      key = await generateSecretKey({
-        dbName: secretKeysDbName,
-        systemCrypto,
-      });
+      key = await generateSecretKey(coreCryptoKeyId);
     } else {
       throw error;
     }
@@ -69,7 +61,7 @@ export async function buildClient(
   const coreCrypto = await CoreCrypto.deferredInit({
     databaseName: coreCryptoDbName,
     key: Encoder.toBase64(key.key).asString,
-    wasmFilePath: coreCryptoWasmFilePath,
+    wasmFilePath,
     ciphersuites: [Ciphersuite.MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519],
   });
   return new CoreCryptoWrapper(coreCrypto, {nbPrekeys, onNewPrekeys, onWipe: key.deleteKey});

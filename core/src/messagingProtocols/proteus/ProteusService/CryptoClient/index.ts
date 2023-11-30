@@ -17,5 +17,4 @@
  *
  */
 
-export * from './CryptoClient';
 export * from './CryptoClient.types';

@@ -25,7 +25,7 @@ describe('encryptedStore', () => {
       const store = await createEncryptedStore('test');
       const value = Uint8Array.from([1, 2, 3]);
       await store.saveSecretValue('test', value);
-      const result = await store.getsecretValue('test');
+      const result = await store.getSecretValue('test');
       expect(result).toEqual(value);
     });
   });
@@ -38,7 +38,7 @@ describe('encryptedStore', () => {
       });
       const value = Uint8Array.from([1, 2, 3]);
       await store.saveSecretValue('test', value);
-      const result = await store.getsecretValue('test');
+      const result = await store.getSecretValue('test');
       expect(result).toEqual(value);
     });
   });

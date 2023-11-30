@@ -57,6 +57,7 @@ const systemCryptos = {
 } as const;
 
 const dbName = 'test';
+const keyId = 'test-key';
 
 describe('SecretKeyGenerator', () => {
   beforeEach(async () => {
@@ -71,10 +72,10 @@ describe('SecretKeyGenerator', () => {
   });
 
   it('generates and store a secret key stored in indexeddb', async () => {
-    const {key: secretKey} = await generateSecretKey({dbName});
+    const {key: secretKey} = await generateSecretKey({dbName, keyId});
     expect(secretKey).toBeDefined();
 
-    const {key: secretKey2} = await generateSecretKey({dbName});
+    const {key: secretKey2} = await generateSecretKey({dbName, keyId});
     expect(secretKey).toEqual(secretKey2);
   });
 
@@ -84,6 +85,7 @@ describe('SecretKeyGenerator', () => {
       const {key} = await generateSecretKey({
         dbName,
         systemCrypto,
+        keyId,
       });
 
       expect(key).toBeDefined();
@@ -91,7 +93,7 @@ describe('SecretKeyGenerator', () => {
       expect(systemCrypto.decrypt).not.toHaveBeenCalled();
 
       // fetch stored key
-      const {key: key2} = await generateSecretKey({dbName, systemCrypto: systemCrypto});
+      const {key: key2} = await generateSecretKey({dbName, systemCrypto: systemCrypto, keyId});
 
       expect(key2).toEqual(key);
       expect(systemCrypto.encrypt).toHaveBeenCalledTimes(1);
@@ -108,12 +110,13 @@ describe('SecretKeyGenerator', () => {
       const {key} = await generateSecretKey({
         dbName,
         systemCrypto: crypto1,
+        keyId,
       });
 
       expect(key).toBeDefined();
 
       try {
-        await generateSecretKey({dbName, systemCrypto: crypto2});
+        await generateSecretKey({dbName, systemCrypto: crypto2, keyId});
       } catch (e) {
         expect(e).toBeInstanceOf(CorruptedKeyError);
       }
@@ -121,10 +124,10 @@ describe('SecretKeyGenerator', () => {
   );
 
   it('deletes the key from DB', async () => {
-    const {key, deleteKey} = await generateSecretKey({dbName});
+    const {key, deleteKey} = await generateSecretKey({dbName, keyId});
 
     await deleteKey();
-    const {key: secondKey} = await generateSecretKey({dbName: 'test'});
+    const {key: secondKey} = await generateSecretKey({dbName: 'test', keyId});
 
     expect(key).not.toEqual(secondKey);
   });
@@ -135,11 +138,12 @@ describe('SecretKeyGenerator', () => {
       const {key} = await generateSecretKey({
         dbName: 'test',
         systemCrypto: crypto1,
+        keyId,
       });
 
       expect(key).toBeDefined();
 
-      const {key: key2} = await generateSecretKey({dbName: 'test', systemCrypto: crypto2});
+      const {key: key2} = await generateSecretKey({dbName: 'test', systemCrypto: crypto2, keyId});
 
       expect(key2).toEqual(key);
     },

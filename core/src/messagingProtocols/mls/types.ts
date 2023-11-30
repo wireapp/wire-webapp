@@ -21,6 +21,8 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {MLSServiceConfig} from './MLSService/MLSService.types';
 
+import {GeneratedKey} from '../../secretStore/secretKeyGenerator';
+
 export type ClientId = string;
 
 export type SecretCrypto =
@@ -58,25 +60,19 @@ export type CommitPendingProposalsParams = {
   skipDelete?: boolean;
 } & CommonMLS;
 
-export interface CryptoProtocolConfig {
+export interface CoreCryptoConfig {
   /**
-   * encrypt/decrypt function pair that will be called before storing/fetching secrets in the secrets database.
-   * If not provided will use the built in encryption mechanism
+   * function called to generate the secret key for CoreCrypto's database encryption
    */
-  systemCrypto?: SecretCrypto;
-
-  useCoreCrypto?: boolean;
+  generateSecretKey: (storeName: string, keyId: string, keySize: number) => Promise<GeneratedKey>;
 
   /**
    * path on the public server to the core crypto wasm file.
    * This file will be downloaded lazily when corecrypto is needed.
    * It, thus, needs to know where, on the server, the file can be found
    */
-  coreCrypoWasmFilePath: string;
+  wasmFilePath: string;
 
   /** If set will create an MLS capable device from the current device */
   mls?: Partial<MLSServiceConfig>;
-
-  /** if set to true, will use experimental proteus encryption/decryption library (core-crypto). If not set will fallback to the legacy proteus library (cryptobox) */
-  proteus?: boolean;
 }
