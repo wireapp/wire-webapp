@@ -60,15 +60,17 @@ const buttonCommonStyles: CSSObject = {
   textTransform: 'uppercase',
 };
 
-const iconBaseProps = {
+const availabilityIconBaseProps = {
   className: 'availability-state-icon',
   css: iconStyles,
   'data-uie-name': 'status-availability-icon',
 };
-const iconRenderer: Record<Availability.Type, () => ReactNode> = {
-  [Availability.Type.AVAILABLE]: () => <Icon.AvailabilityAvailable {...iconBaseProps} data-uie-value="available" />,
-  [Availability.Type.AWAY]: () => <Icon.AvailabilityAway {...iconBaseProps} data-uie-value="away" />,
-  [Availability.Type.BUSY]: () => <Icon.AvailabilityBusy {...iconBaseProps} data-uie-value="busy" />,
+const availabilityIconRenderer: Record<Availability.Type, () => ReactNode> = {
+  [Availability.Type.AVAILABLE]: () => (
+    <Icon.AvailabilityAvailable {...availabilityIconBaseProps} data-uie-value="available" />
+  ),
+  [Availability.Type.AWAY]: () => <Icon.AvailabilityAway {...availabilityIconBaseProps} data-uie-value="away" />,
+  [Availability.Type.BUSY]: () => <Icon.AvailabilityBusy {...availabilityIconBaseProps} data-uie-value="busy" />,
   [Availability.Type.NONE]: () => null,
 };
 
@@ -85,7 +87,7 @@ export const UserInfo: React.FC<AvailabilityStateProps> = ({
 }) => {
   const {availability, name} = useKoSubscribableChildren(user, ['availability', 'name']);
 
-  const renderAvailabilityIcon = (showAvailability && iconRenderer[availability]) || (() => null);
+  const renderAvailabilityIcon = showAvailability && availabilityIconRenderer[availability];
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
     const {key} = event;
