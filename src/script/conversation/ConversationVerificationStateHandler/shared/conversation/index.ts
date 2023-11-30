@@ -65,7 +65,7 @@ export const getConversationByGroupId = ({
   conversationState,
   groupId,
 }: GetConversationByGroupIdParams): MLSConversation | undefined => {
-  const conversation = conversationState.filteredConversations().find(conversation => conversation.groupId === groupId);
+  const conversation = conversationState.conversations().find(conversation => conversation.groupId === groupId);
   return conversation && isMLSConversation(conversation) ? conversation : undefined;
 };
 

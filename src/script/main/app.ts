@@ -374,10 +374,6 @@ export class App {
         throw new ClientError(CLIENT_ERROR_TYPE.NO_VALID_CLIENT, 'Client has been deleted on backend');
       }
 
-      if (supportsMLS()) {
-        registerMLSConversationVerificationStateHandler(this.updateConversationE2EIVerificationState);
-      }
-
       this.core.on(CoreEvents.NEW_SESSION, ({userId, clientId}) => {
         const newClient = {class: ClientClassification.UNKNOWN, id: clientId};
         userRepository.addClientToUser(userId, newClient, true);
@@ -476,6 +472,8 @@ export class App {
           onError: ({id}, error) =>
             this.logger.error(`Failed when initialising mls conversation with id ${id}, error: `, error),
         });
+
+        registerMLSConversationVerificationStateHandler(this.updateConversationE2EIVerificationState);
       }
 
       telemetry.timeStep(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
