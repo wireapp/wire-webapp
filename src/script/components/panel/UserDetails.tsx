@@ -25,12 +25,11 @@ import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {AvailabilityState} from 'Components/AvailabilityState';
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {ErrorFallback} from 'Components/ErrorFallback';
 import {Icon} from 'Components/Icon';
 import {UserClassifiedBar} from 'Components/input/ClassifiedBar';
-import {UserName} from 'Components/UserName';
+import {UserInfo} from 'Components/UserInfo';
 import {TeamState} from 'src/script/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -67,19 +66,14 @@ const UserDetailsComponent: React.FC<UserDetailsProps> = ({
   return (
     <div className="panel-participant">
       <div className="panel-participant__head">
-        {teamState.isInTeam(participant) ? (
-          <AvailabilityState className="panel-participant__head__name" user={participant} dataUieName="status-name">
-            {renderParticipantBadges?.(participant)}
-          </AvailabilityState>
-        ) : (
-          <h2
-            className="panel-participant__head__name"
-            data-uie-name="status-name"
-            css={user.isAvailable ? undefined : {color: 'var(--gray-70)'}}
-          >
-            <UserName user={participant} />
-          </h2>
-        )}
+        <UserInfo
+          className="panel-participant__head__name"
+          user={participant}
+          dataUieName="status-name"
+          showAvailability={teamState.isInTeam(participant)}
+        >
+          {renderParticipantBadges?.(participant)}
+        </UserInfo>
       </div>
 
       {participant.handle && (

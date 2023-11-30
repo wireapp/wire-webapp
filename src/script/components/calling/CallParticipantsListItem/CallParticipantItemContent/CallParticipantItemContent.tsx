@@ -21,16 +21,14 @@ import React from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
-import {AvailabilityState} from 'Components/AvailabilityState';
 import {Icon} from 'Components/Icon';
+import {UserInfo} from 'Components/UserInfo';
 import {User} from 'src/script/entity/User';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 
 import {
   selfIndicator,
-  userName,
   userAvailability,
   ellipsis,
   nameWrapper,
@@ -56,20 +54,18 @@ export const CallParticipantItemContent = ({
   showContextMenu,
   onDropdownClick,
 }: CallParticipantItemContentProps) => {
-  const {name} = useKoSubscribableChildren(user, ['name']);
   const selfString = `(${capitalizeFirstChar(t('conversationYouNominative'))})`;
 
   return (
     <div css={wrapper}>
       <div css={contentText}>
         <div css={nameWrapper(isAudioEstablished)}>
-          {selfInTeam ? (
-            <AvailabilityState user={user} css={[userAvailability, ellipsis]} dataUieName="status-name" />
-          ) : (
-            <div css={[userName, ellipsis]} data-uie-name="status-name">
-              {name}
-            </div>
-          )}
+          <UserInfo
+            user={user}
+            css={[userAvailability, ellipsis]}
+            dataUieName="status-name"
+            showAvailability={selfInTeam}
+          />
 
           {isSelf && <div css={selfIndicator}>{selfString}</div>}
         </div>
