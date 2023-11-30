@@ -113,18 +113,17 @@ export const ConversationVerificationBadges = ({conversation, displayTitle}: Con
 };
 
 const MLSVerificationBadge = ({context, MLSStatus}: {MLSStatus?: MLSStatuses; context: VerificationBadgeContext}) => {
-  const mlsVerificationUieName = `mls-${context}-verified`;
   const mlsVerificationProps = {
     className: 'with-tooltip with-tooltip--external',
     style: iconStyles,
-    'data-uie-name': 'mls-status',
+    'data-uie-name': 'mls-${context}-status',
   };
 
   switch (MLSStatus) {
     case MLSStatuses.VALID:
       return (
         <span {...mlsVerificationProps} data-tooltip={t('E2EI.deviceVerified')} data-uie-value={MLSStatuses.VALID}>
-          <MLSVerified data-uie-name={mlsVerificationUieName} />
+          <MLSVerified />
         </span>
       );
     case MLSStatuses.NOT_DOWNLOADED:
@@ -135,7 +134,7 @@ const MLSVerificationBadge = ({context, MLSStatus}: {MLSStatus?: MLSStatuses; co
         data-uie-name="mls-status"
         data-uie-value={MLSStatuses.NOT_DOWNLOADED}
       >
-        <CertificateRevoked data-uie-name={mlsVerificationUieName} />
+        <CertificateRevoked />
       </span>;
     case MLSStatuses.EXPIRED:
       return (
@@ -144,7 +143,7 @@ const MLSVerificationBadge = ({context, MLSStatus}: {MLSStatus?: MLSStatuses; co
           data-tooltip={t('E2EI.certificateExpired')}
           data-uie-value={MLSStatuses.EXPIRED}
         >
-          <CertificateExpiredIcon data-uie-name={mlsVerificationUieName} />
+          <CertificateExpiredIcon />
         </span>
       );
     case MLSStatuses.EXPIRES_SOON:
@@ -153,7 +152,7 @@ const MLSVerificationBadge = ({context, MLSStatus}: {MLSStatus?: MLSStatuses; co
         data-tooltip={t('E2EI.certificateExpiresSoon')}
         data-uie-value={MLSStatuses.EXPIRES_SOON}
       >
-        <ExpiresSoon data-uie-name={mlsVerificationUieName} />
+        <ExpiresSoon />
       </span>;
   }
   return null;
