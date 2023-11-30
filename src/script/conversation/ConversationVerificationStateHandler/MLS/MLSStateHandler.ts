@@ -26,7 +26,7 @@ import {E2EIVerificationMessageType} from 'src/script/message/E2EIVerificationMe
 import {Core} from 'src/script/service/CoreSingleton';
 import {Logger, getLogger} from 'Util/Logger';
 
-import {MLSConversation} from '../../ConversationSelectors';
+import {isMLSConversation, MLSConversation} from '../../ConversationSelectors';
 import {ConversationState} from '../../ConversationState';
 import {ConversationVerificationState} from '../../ConversationVerificationState';
 import {getConversationByGroupId, OnConversationE2EIVerificationStateChange} from '../shared';
@@ -91,6 +91,10 @@ class MLSConversationVerificationStateHandler {
     const conversation = getConversationByGroupId({conversationState: this.conversationState, groupId});
     if (!conversation) {
       this.logger.error(`Epoch changed but conversationEntity can't be found`);
+      return;
+    }
+
+    if (!isMLSConversation(conversation)) {
       return;
     }
 
