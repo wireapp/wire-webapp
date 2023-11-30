@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [43.1.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@43.0.0...@wireapp/core@43.1.0) (2023-11-30)
+
+### Features
+
+* exponential backoff ([#5766](https://github.com/wireapp/wire-web-packages/issues/5766)) ([d7426e7](https://github.com/wireapp/wire-web-packages/commit/d7426e79ef9c8b528487b7019722a4d780d90705))
+
 # [43.0.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@42.26.2...@wireapp/core@43.0.0) (2023-11-30)
 
 ### Features
