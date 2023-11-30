@@ -85,9 +85,10 @@ export const UserInfo: React.FC<AvailabilityStateProps> = ({
   onClick,
   children,
 }) => {
-  const {availability, name} = useKoSubscribableChildren(user, ['availability', 'name']);
+  const {availability: userAvailability, name} = useKoSubscribableChildren(user, ['availability', 'name']);
 
-  const renderAvailabilityIcon = showAvailability && availabilityIconRenderer[availability];
+  const availability = showAvailability ? userAvailability : Availability.Type.NONE;
+  const renderAvailabilityIcon = availabilityIconRenderer[availability];
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
     const {key} = event;
