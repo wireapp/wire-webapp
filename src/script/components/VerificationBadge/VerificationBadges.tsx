@@ -116,7 +116,7 @@ const MLSVerificationBadge = ({context, MLSStatus}: {MLSStatus?: MLSStatuses; co
   const mlsVerificationProps = {
     className: 'with-tooltip with-tooltip--external',
     style: iconStyles,
-    'data-uie-name': 'mls-${context}-status',
+    'data-uie-name': `mls-${context}-status`,
   };
 
   switch (MLSStatus) {
@@ -128,10 +128,8 @@ const MLSVerificationBadge = ({context, MLSStatus}: {MLSStatus?: MLSStatuses; co
       );
     case MLSStatuses.NOT_DOWNLOADED:
       <span
-        className="with-tooltip with-tooltip--external"
+        {...mlsVerificationProps}
         data-tooltip={t('E2EI.certificateRevoked')}
-        style={iconStyles}
-        data-uie-name="mls-status"
         data-uie-value={MLSStatuses.NOT_DOWNLOADED}
       >
         <CertificateRevoked />
