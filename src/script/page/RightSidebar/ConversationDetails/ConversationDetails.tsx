@@ -50,7 +50,6 @@ import {User} from '../../../entity/User';
 import {isServiceEntity} from '../../../guards/Service';
 import {IntegrationRepository} from '../../../integration/IntegrationRepository';
 import {ServiceEntity} from '../../../integration/ServiceEntity';
-import {SearchRepository} from '../../../search/SearchRepository';
 import {TeamRepository} from '../../../team/TeamRepository';
 import {TeamState} from '../../../team/TeamState';
 import {Shortcut} from '../../../ui/Shortcut';
@@ -71,7 +70,6 @@ interface ConversationDetailsProps {
   activeConversation: Conversation;
   conversationRepository: ConversationRepository;
   integrationRepository: IntegrationRepository;
-  searchRepository: SearchRepository;
   teamRepository: TeamRepository;
   teamState: TeamState;
   selfUser: User;
@@ -87,7 +85,6 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       activeConversation,
       conversationRepository,
       integrationRepository,
-      searchRepository,
       teamRepository,
       teamState,
       selfUser,
