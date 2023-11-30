@@ -68,7 +68,7 @@ class MLSConversationVerificationStateHandler {
     this.onConversationVerificationStateChange({
       conversationEntity: conversation,
       conversationVerificationState: state,
-      verificationMessageType: E2EIVerificationMessageType.UNVERIFIED,
+      verificationMessageType: E2EIVerificationMessageType.REVOKED,
       userIds: degradedUsers,
     });
   }

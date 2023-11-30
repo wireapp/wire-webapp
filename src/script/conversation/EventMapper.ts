@@ -35,8 +35,7 @@ import {
   ClientConversationEvent,
   FederationStopEvent,
   FailedToAddUsersMessageEvent,
-  E2EIDegradedMessageEvent,
-  AllE2EIVerifiedEvent,
+  E2EIVerificationEvent,
 } from './EventBuilder';
 
 import {AssetRemoteData} from '../assets/AssetRemoteData';
@@ -770,13 +769,8 @@ export class EventMapper {
   /**
    * Maps JSON data of E2E Identity verification message event to message entity.
    */
-  private _mapEventE2EIVerificationMessage({
-    data: eventData,
-  }: E2EIDegradedMessageEvent | AllE2EIVerifiedEvent): MissedMessage {
-    const messageEntity = new E2EIVerificationMessage();
-    messageEntity.messageType = eventData.type;
-
-    return messageEntity;
+  private _mapEventE2EIVerificationMessage({data: eventData}: E2EIVerificationEvent): MissedMessage {
+    return new E2EIVerificationMessage(eventData.type, eventData.userIds);
   }
 
   /**
