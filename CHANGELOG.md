@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [26.7.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@26.6.0...@wireapp/api-client@26.7.0) (2023-11-30)
+
+### Features
+
+* exponential backoff ([#5766](https://github.com/wireapp/wire-web-packages/issues/5766)) ([d7426e7](https://github.com/wireapp/wire-web-packages/commit/d7426e79ef9c8b528487b7019722a4d780d90705))
+
 # [26.6.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@26.5.4...@wireapp/api-client@26.6.0) (2023-11-28)
 
 ### Features
