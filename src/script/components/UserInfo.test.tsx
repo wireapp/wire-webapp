@@ -32,9 +32,10 @@ const defaultProps = {
   user,
   label: 'example',
   theme: false,
+  showAvailability: true,
 };
 
-describe('AvailabilityState', () => {
+describe('UserInfo', () => {
   it('renders available icon', async () => {
     user.availability(Availability.Type.AVAILABLE);
     const {getByTestId} = render(<UserInfo {...defaultProps} />);
@@ -59,5 +60,13 @@ describe('AvailabilityState', () => {
 
     const statusAvailabilityIcon = getByTestId('status-availability-icon');
     expect(statusAvailabilityIcon.getAttribute('data-uie-value')).toEqual('busy');
+  });
+
+  it('does not show availability icon if param is false', async () => {
+    user.availability(Availability.Type.AVAILABLE);
+    const {queryByTestId} = render(<UserInfo {...defaultProps} showAvailability={false} />);
+
+    const statusAvailabilityIcon = queryByTestId('status-availability-icon');
+    expect(statusAvailabilityIcon).toBeNull();
   });
 });
