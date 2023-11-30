@@ -190,13 +190,19 @@ const ConversationListCell = ({
           </div>
 
           <div className="conversation-list-cell-center">
-            <UserInfo
-              className="conversation-list-cell-availability"
-              user={conversation.firstUserEntity()!}
-              theme={isActive}
-              dataUieName="status-availability-item"
-              showAvailability={is1to1 && !!selfUser?.teamId}
-            />
+            {is1to1 ? (
+              <UserInfo
+                className="conversation-list-cell-availability"
+                user={conversation.firstUserEntity()!}
+                theme={isActive}
+                dataUieName="status-availability-item"
+                showAvailability={is1to1 && !!selfUser?.teamId}
+              />
+            ) : (
+              <span className={cx('conversation-list-cell-name', {'conversation-list-cell-name--active': isActive})}>
+                {displayName}
+              </span>
+            )}
 
             <span
               className={cx('conversation-list-cell-description', {
