@@ -21,6 +21,11 @@ import {PreKey} from '@wireapp/api-client/lib/auth';
 
 export type InitialPrekeys = {prekeys: PreKey[]; lastPrekey: PreKey};
 
+export enum CryptoClientType {
+  CORE_CRYPTO,
+  CRYPTOBOX,
+}
+
 export interface CryptoClient<T = unknown> {
   getNativeClient(): T;
   encrypt(sessions: string[], plainText: Uint8Array): Promise<Map<string, Uint8Array>>;
