@@ -100,15 +100,15 @@ type ConversationVerificationBadgeProps = {
   displayTitle?: boolean;
 };
 export const ConversationVerificationBadges = ({conversation, displayTitle}: ConversationVerificationBadgeProps) => {
-  const verificationState = useConversationVerificationState(conversation);
+  const {MLS, proteus} = useConversationVerificationState(conversation);
 
   return (
     <VerificationBadges
       context="conversation"
       conversationProtocol={conversation.protocol}
-      MLSStatus={verificationState.MLS}
+      MLSStatus={MLS}
       displayTitle={displayTitle}
-      isProteusVerified={verificationState.proteus === ConversationVerificationState.VERIFIED}
+      isProteusVerified={proteus === ConversationVerificationState.VERIFIED}
     />
   );
 };
