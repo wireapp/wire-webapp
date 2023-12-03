@@ -5527,12 +5527,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^20.10.0":
-  version: 20.10.0
-  resolution: "@types/node@npm:20.10.0"
+"@types/node@npm:^20.10.2":
+  version: 20.10.2
+  resolution: "@types/node@npm:20.10.2"
   dependencies:
     undici-types: ~5.26.4
-  checksum: face395140d6f2f1755b91fdd3b697cf56aeb9e2514529ce88d56e56f261ad65be7269d863520a9406d73c338699ea68b418e8677584de0c1efeed09539b6f97
+  checksum: c0c84e8270cdf7a47a18c0230c0321537cc59506adb0e3cba51949b6f1ad4879f2e2ec3a29161f2f5321ebb6415460712d9f0a25ac5c02be0f5435464fe77c23
   languageName: node
   linkType: hard
 
@@ -19291,7 +19291,7 @@ __metadata:
     "@types/linkify-it": 3.0.5
     "@types/loadable__component": ^5
     "@types/markdown-it": 13.0.7
-    "@types/node": ^20.10.0
+    "@types/node": ^20.10.2
     "@types/open-graph": 0.2.5
     "@types/platform": 1.3.6
     "@types/react": 18.2.33
