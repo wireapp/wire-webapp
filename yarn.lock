@@ -6139,15 +6139,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^26.6.0":
-  version: 26.6.0
-  resolution: "@wireapp/api-client@npm:26.6.0"
+"@wireapp/api-client@npm:^26.7.0":
+  version: 26.7.0
+  resolution: "@wireapp/api-client@npm:26.7.0"
   dependencies:
     "@wireapp/commons": ^5.2.3
     "@wireapp/priority-queue": ^2.1.4
     "@wireapp/protocol-messaging": 1.44.0
     axios: 1.6.2
     axios-retry: 3.9.1
+    exponential-backoff: 3.1.1
     http-status-codes: 2.3.0
     logdown: 3.3.1
     pako: 2.1.0
@@ -6156,7 +6157,7 @@ __metadata:
     tough-cookie: 4.1.3
     ws: 8.14.2
     zod: 3.22.4
-  checksum: 3bfe5c48c4f08b40fa254272be8be778b5a2909348876ba2690fb1dcda93ba89852d247a5895fcb534941960d0207c9eb7b0fc917f6f52fc3e1aaef65ab76fd3
+  checksum: 68ea9583de95fa5cd1eeb4def86de8f21fc5d251ff6bb8af6bf999792df37fa28177fce42ed8211754951243d2e28aa0dd639649bce8affa715eada8a2200c10
   languageName: node
   linkType: hard
 
@@ -6209,11 +6210,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:43.0.0":
-  version: 43.0.0
-  resolution: "@wireapp/core@npm:43.0.0"
+"@wireapp/core@npm:43.1.0":
+  version: 43.1.0
+  resolution: "@wireapp/core@npm:43.1.0"
   dependencies:
-    "@wireapp/api-client": ^26.6.0
+    "@wireapp/api-client": ^26.7.0
     "@wireapp/commons": ^5.2.3
     "@wireapp/core-crypto": 1.0.0-rc.19
     "@wireapp/cryptobox": 12.8.0
@@ -6231,7 +6232,7 @@ __metadata:
     long: ^5.2.0
     uuidjs: 4.2.13
     zod: 3.22.4
-  checksum: 59a7fe9592d979fcea7acec8c161bc5b48df1db5b1c86034feeb525e8ba30e89c407e7bcfa62404115da6ca0fdf309c8265ef042bf46be86b735ed1515801aa6
+  checksum: c542291cf409fd125f425a5c16c54bb99b07d81cbfc3b1bd9aa30e1c938ce55857bca5f6dd6d48e2bef8eb42594a9d61fcf6cb5a56f2e727c3450a83ae5c6013
   languageName: node
   linkType: hard
 
@@ -10049,7 +10050,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"exponential-backoff@npm:^3.1.1":
+"exponential-backoff@npm:3.1.1, exponential-backoff@npm:^3.1.1":
   version: 3.1.1
   resolution: "exponential-backoff@npm:3.1.1"
   checksum: 3d21519a4f8207c99f7457287291316306255a328770d320b401114ec8481986e4e467e854cb9914dd965e0a1ca810a23ccb559c642c88f4c7f55c55778a9b48
@@ -19306,7 +19307,7 @@ __metadata:
     "@wireapp/avs": 9.5.2
     "@wireapp/commons": 5.2.3
     "@wireapp/copy-config": 2.1.12
-    "@wireapp/core": 43.0.0
+    "@wireapp/core": 43.1.0
     "@wireapp/eslint-config": 3.0.4
     "@wireapp/prettier-config": 0.6.3
     "@wireapp/react-ui-kit": 9.12.1
