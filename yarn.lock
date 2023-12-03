@@ -193,6 +193,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babel/helper-create-class-features-plugin@npm:^7.23.5":
+  version: 7.23.5
+  resolution: "@babel/helper-create-class-features-plugin@npm:7.23.5"
+  dependencies:
+    "@babel/helper-annotate-as-pure": ^7.22.5
+    "@babel/helper-environment-visitor": ^7.22.20
+    "@babel/helper-function-name": ^7.23.0
+    "@babel/helper-member-expression-to-functions": ^7.23.0
+    "@babel/helper-optimise-call-expression": ^7.22.5
+    "@babel/helper-replace-supers": ^7.22.20
+    "@babel/helper-skip-transparent-expression-wrappers": ^7.22.5
+    "@babel/helper-split-export-declaration": ^7.22.6
+    semver: ^6.3.1
+  peerDependencies:
+    "@babel/core": ^7.0.0
+  checksum: fe7c6c0baca1838bba76ac1330df47b661d932354115ea9e2ea65b179f80b717987d3c3da7e1525fd648e5f2d86c620efc959cabda4d7562b125a27c3ac780d0
+  languageName: node
+  linkType: hard
+
 "@babel/helper-create-regexp-features-plugin@npm:^7.18.6, @babel/helper-create-regexp-features-plugin@npm:^7.22.15, @babel/helper-create-regexp-features-plugin@npm:^7.22.5":
   version: 7.22.15
   resolution: "@babel/helper-create-regexp-features-plugin@npm:7.22.15"
@@ -247,7 +266,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/helper-member-expression-to-functions@npm:^7.22.15":
+"@babel/helper-member-expression-to-functions@npm:^7.22.15, @babel/helper-member-expression-to-functions@npm:^7.23.0":
   version: 7.23.0
   resolution: "@babel/helper-member-expression-to-functions@npm:7.23.0"
   dependencies:
@@ -496,18 +515,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/plugin-proposal-decorators@npm:7.23.3":
-  version: 7.23.3
-  resolution: "@babel/plugin-proposal-decorators@npm:7.23.3"
+"@babel/plugin-proposal-decorators@npm:7.23.5":
+  version: 7.23.5
+  resolution: "@babel/plugin-proposal-decorators@npm:7.23.5"
   dependencies:
-    "@babel/helper-create-class-features-plugin": ^7.22.15
+    "@babel/helper-create-class-features-plugin": ^7.23.5
     "@babel/helper-plugin-utils": ^7.22.5
     "@babel/helper-replace-supers": ^7.22.20
     "@babel/helper-split-export-declaration": ^7.22.6
     "@babel/plugin-syntax-decorators": ^7.23.3
   peerDependencies:
     "@babel/core": ^7.0.0-0
-  checksum: 5c11da45eafe11105e87f83f48d9eb1c95a5f78c01041729e4a8d1726ee0068ee8d98743aaaa24e30bf8eac446aa3db4a44943cc53e5707b5fdfb50a2189d899
+  checksum: e925fe7a82c03aa372b92b312e69a05453d55aaaf2fd48336c88f4fe2b7e81bf9e8e52b93d4f785a02f2b8deedee6964054153566b40c92886dcf795843a243e
   languageName: node
   linkType: hard
 
@@ -19224,7 +19243,7 @@ __metadata:
   dependencies:
     "@babel/core": 7.23.3
     "@babel/eslint-parser": 7.23.3
-    "@babel/plugin-proposal-decorators": 7.23.3
+    "@babel/plugin-proposal-decorators": 7.23.5
     "@babel/preset-env": 7.23.3
     "@babel/preset-react": 7.23.3
     "@babel/preset-typescript": 7.23.3
