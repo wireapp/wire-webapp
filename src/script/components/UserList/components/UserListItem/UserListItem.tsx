@@ -54,10 +54,6 @@ export interface UserListItemProps {
   showArrow: boolean;
 }
 
-interface RenderParticipantProps {
-  isSelectable?: boolean;
-}
-
 export const UserListItem = ({
   groupId,
   canSelect,
@@ -110,7 +106,7 @@ export const UserListItem = ({
 
   const contentInfoText = getContentInfoText();
 
-  const RenderParticipant = ({isSelectable = false}: RenderParticipantProps) => {
+  const RenderParticipant = () => {
     return (
       <div css={listItem(noInteraction)} data-uie-name="item-user" data-uie-value={userName}>
         <Avatar avatarSize={AVATAR_SIZE.SMALL} participant={user} aria-hidden="true" css={{margin: '0 16px'}} />
@@ -123,7 +119,6 @@ export const UserListItem = ({
           {...(isSelf && {selfString})}
           hasUsernameInfo={hasUsernameInfo}
           showAvailabilityState
-          isSelectable={isSelectable}
         />
 
         <UserStatusBadges
@@ -159,7 +154,7 @@ export const UserListItem = ({
           >
             <CheckboxLabel htmlFor={checkboxId}>
               <div {...dataUieValues}>
-                <RenderParticipant isSelectable />
+                <RenderParticipant />
               </div>
             </CheckboxLabel>
           </Checkbox>
