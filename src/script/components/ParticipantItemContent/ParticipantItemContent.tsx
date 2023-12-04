@@ -21,6 +21,7 @@ import React from 'react';
 
 import {Icon} from 'Components/Icon';
 import {UserInfo} from 'Components/UserInfo';
+import {UserVerificationBadges} from 'Components/VerificationBadge';
 import {User} from 'src/script/entity/User';
 import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -39,7 +40,8 @@ import {
 } from './ParticipantItem.styles';
 
 export interface ParticipantItemContentProps {
-  renderParticipantBadges?: (user: User) => React.ReactNode;
+  /** the conversation context in which we are displaying the user (will enable e2ei verification badges) */
+  groupId?: string;
   participant: User | ServiceEntity;
   selfInTeam?: boolean;
   shortDescription?: string;
@@ -54,7 +56,7 @@ export interface ParticipantItemContentProps {
 }
 
 export const ParticipantItemContent = ({
-  renderParticipantBadges,
+  groupId,
   participant,
   selfInTeam = false,
   shortDescription = '',
@@ -80,7 +82,7 @@ export const ParticipantItemContent = ({
               selfString={selfString}
               showAvailability={showAvailabilityState && selfInTeam}
             >
-              {!isSelectable && renderParticipantBadges?.(participant)}
+              {!isSelectable && <UserVerificationBadges user={participant} groupId={groupId} />}
             </UserInfo>
           ) : (
             <>

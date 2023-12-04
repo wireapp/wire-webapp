@@ -31,7 +31,6 @@ import {EnrichedFields} from 'Components/panel/EnrichedFields';
 import {UserActions, Actions} from 'Components/panel/UserActions';
 import {UserDetails} from 'Components/panel/UserDetails';
 import {BaseToggle} from 'Components/toggle/BaseToggle';
-import {UserVerificationBadges} from 'Components/VerificationBadge';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -136,10 +135,6 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
     }
   }, [isTemporaryGuest, currentUser]);
 
-  const renderParticipantBadges = (participant: User) => {
-    return <UserVerificationBadges user={participant} groupId={activeConversation?.groupId} />;
-  };
-
   return (
     <div id="group-participant-user" className="panel__page group-participant">
       <PanelHeader
@@ -151,7 +146,7 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
 
       <FadingScrollbar className="panel__content">
         <UserDetails
-          renderParticipantBadges={renderParticipantBadges}
+          groupId={activeConversation?.groupId}
           participant={currentUser}
           badge={teamRepository.getRoleBadge(currentUser.id)}
           isGroupAdmin={isAdmin}

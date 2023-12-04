@@ -31,7 +31,6 @@ import {ServiceDetails} from 'Components/panel/ServiceDetails';
 import {UserDetails} from 'Components/panel/UserDetails';
 import {ServiceList} from 'Components/ServiceList/ServiceList';
 import {UserList} from 'Components/UserList';
-import {UserVerificationBadges} from 'Components/VerificationBadge';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
@@ -264,10 +263,6 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       isTeam,
     );
 
-    const renderParticipantsBadges = (participant: User) => {
-      return <UserVerificationBadges user={participant} groupId={activeConversation?.groupId} />;
-    };
-
     useEffect(() => {
       conversationRepository.refreshUnavailableParticipants(activeConversation);
     }, [activeConversation, conversationRepository]);
@@ -306,7 +301,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
           {isSingleUserMode && !isServiceMode && firstParticipant && (
             <>
               <UserDetails
-                renderParticipantBadges={renderParticipantsBadges}
+                groupId={activeConversation.groupId}
                 participant={firstParticipant}
                 isVerified={isVerified}
                 badge={teamRepository.getRoleBadge(firstParticipant.id)}
@@ -358,7 +353,6 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
                   <>
                     <div className="user-list-wrapper" data-uie-name="list-users">
                       <UserList
-                        renderParticipantBadges={renderParticipantsBadges}
                         users={userParticipants}
                         onClick={showUser}
                         noUnderline
