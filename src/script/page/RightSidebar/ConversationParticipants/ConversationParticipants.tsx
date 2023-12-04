@@ -101,6 +101,7 @@ const ConversationParticipants: FC<ConversationParticipantsProps> = ({
 
         <FadingScrollbar className="conversation-participants__list panel__content">
           <UserSearchableList
+            groupId={activeConversation?.groupId}
             dataUieName="list-conversation-participants"
             users={participants}
             filter={searchInput}
