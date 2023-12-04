@@ -43,11 +43,11 @@ const providePermanentEngine = async (
 ): Promise<CRUDEngine> => {
   const db = new DexieDatabase(storeName);
 
-  if (key) {
-    applyEncryptionMiddleware(db, key, {events: NON_INDEXED_FIELDS}, async () =>
-      logger.error('Database key is corrupted'),
-    );
-  }
+  const encryptionConfig = key ? {events: NON_INDEXED_FIELDS} : {};
+  const encryptionKey = key ? key : new Uint8Array(32).fill(0);
+  applyEncryptionMiddleware(db, encryptionKey, encryptionConfig, async () =>
+    logger.info('DB encyption config has changed'),
+  );
   const engine = new IndexedDBEngine();
   try {
     await engine.initWithDb(db, requestPersistentStorage);
