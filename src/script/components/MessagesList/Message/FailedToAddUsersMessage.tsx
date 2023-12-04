@@ -61,7 +61,11 @@ const MessageDetails = ({users, children, reason, domains}: MessageDetailsProps)
   const baseTranslationKey =
     users.length === 1 ? 'failedToAddParticipantsSingularDetails' : 'failedToAddParticipantsPluralDetails';
 
-  const domainStr = domains.join(', ');
+  const getUsername = (name: string) => (name.length > 0 ? name : t('unavailableUser'));
+
+  const uniqueDomains = Array.from(new Set(domains));
+
+  const domainStr = uniqueDomains.join(', ');
 
   return (
     <p
@@ -73,10 +77,10 @@ const MessageDetails = ({users, children, reason, domains}: MessageDetailsProps)
         css={warning}
         dangerouslySetInnerHTML={{
           __html: t(`${baseTranslationKey}${errorMessageType[reason]}`, {
-            name: users[0].name(),
+            name: getUsername(users[0].name()),
             names: users
               .slice(1)
-              .map(user => user.name())
+              .map(user => getUsername(user.name()))
               .join(', '),
             domain: domainStr,
           }),
@@ -174,7 +178,7 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
       </div>
       <div className="message-body" css={{flexDirection: 'column'}}>
         {isOpen && (
-          <MessageDetails users={users} reason={message.reason} domains={message.backends}>
+          <MessageDetails users={users} reason={message.reason} domains={users.map(user => user.domain)}>
             {learnMore}
           </MessageDetails>
         )}
