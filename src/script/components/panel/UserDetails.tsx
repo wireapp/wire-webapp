@@ -30,6 +30,7 @@ import {ErrorFallback} from 'Components/ErrorFallback';
 import {Icon} from 'Components/Icon';
 import {UserClassifiedBar} from 'Components/input/ClassifiedBar';
 import {UserInfo} from 'Components/UserInfo';
+import {UserVerificationBadges} from 'Components/VerificationBadge';
 import {TeamState} from 'src/script/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -38,7 +39,7 @@ import {User} from '../../entity/User';
 
 interface UserDetailsProps {
   badge?: string;
-  renderParticipantBadges?: (user: User) => React.ReactNode;
+  groupId?: string;
   classifiedDomains?: string[];
   isGroupAdmin?: boolean;
   isVerified?: boolean;
@@ -50,7 +51,7 @@ interface UserDetailsProps {
 const UserDetailsComponent: React.FC<UserDetailsProps> = ({
   badge,
   participant,
-  renderParticipantBadges,
+  groupId,
   isGroupAdmin,
   avatarStyles,
   classifiedDomains,
@@ -72,7 +73,7 @@ const UserDetailsComponent: React.FC<UserDetailsProps> = ({
           dataUieName="status-name"
           showAvailability={teamState.isInTeam(participant)}
         >
-          {renderParticipantBadges?.(participant)}
+          {<UserVerificationBadges user={participant} groupId={groupId} />}
         </UserInfo>
       </div>
 

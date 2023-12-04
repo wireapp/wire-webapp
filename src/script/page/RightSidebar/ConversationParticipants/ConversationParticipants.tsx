@@ -22,7 +22,6 @@ import {FC, useMemo, useState} from 'react';
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {SearchInput} from 'Components/SearchInput';
 import {UserSearchableList} from 'Components/UserSearchableList';
-import {UserVerificationBadges} from 'Components/VerificationBadge';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
@@ -58,10 +57,6 @@ const ConversationParticipants: FC<ConversationParticipantsProps> = ({
   highlightedUsers,
 }) => {
   const [searchInput, setSearchInput] = useState<string>('');
-  const renderParticipantBadges = (participant: User) => (
-    <UserVerificationBadges user={participant} groupId={activeConversation.groupId} />
-  );
-
   const {
     participating_user_ets: participatingUserEts,
     removed_from_conversation: removedFromConversation,
@@ -106,7 +101,6 @@ const ConversationParticipants: FC<ConversationParticipantsProps> = ({
 
         <FadingScrollbar className="conversation-participants__list panel__content">
           <UserSearchableList
-            renderParticipantBadges={renderParticipantBadges}
             dataUieName="list-conversation-participants"
             users={participants}
             filter={searchInput}

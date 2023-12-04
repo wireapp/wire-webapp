@@ -36,7 +36,7 @@ import {capitalizeFirstChar} from 'Util/StringUtil';
 import {User} from '../../../../entity/User';
 
 export interface UserListItemProps {
-  renderParticipantBadges?: (user: User) => React.ReactNode;
+  groupId?: string;
   canSelect: boolean;
   customInfo?: string;
   external: boolean;
@@ -59,7 +59,7 @@ interface RenderParticipantProps {
 }
 
 export const UserListItem = ({
-  renderParticipantBadges,
+  groupId,
   canSelect,
   customInfo,
   external,
@@ -116,7 +116,7 @@ export const UserListItem = ({
         <Avatar avatarSize={AVATAR_SIZE.SMALL} participant={user} aria-hidden="true" css={{margin: '0 16px'}} />
 
         <ParticipantItemContent
-          renderParticipantBadges={renderParticipantBadges}
+          groupId={groupId}
           participant={user}
           shortDescription={contentInfoText}
           selfInTeam={selfInTeam}

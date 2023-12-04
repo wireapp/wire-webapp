@@ -31,7 +31,6 @@ import {ModalComponent} from 'Components/ModalComponent';
 import {EnrichedFields} from 'Components/panel/EnrichedFields';
 import {UserActions} from 'Components/panel/UserActions';
 import {UserDetails} from 'Components/panel/UserDetails';
-import {UserVerificationBadges} from 'Components/VerificationBadge';
 import {getPrivacyUnverifiedUsersUrl} from 'src/script/externalRoute';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
@@ -206,11 +205,7 @@ const UserModal: React.FC<UserModalProps> = ({
         >
           {user && (
             <>
-              <UserDetails
-                participant={user}
-                classifiedDomains={classifiedDomains}
-                renderParticipantBadges={participant => <UserVerificationBadges user={participant} />}
-              />
+              <UserDetails participant={user} classifiedDomains={classifiedDomains} />
 
               <EnrichedFields user={user} showDomain={isFederated} />
 
