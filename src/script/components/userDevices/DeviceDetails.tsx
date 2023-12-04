@@ -153,7 +153,7 @@ export const DeviceDetails = ({
               type="checkbox"
               name="toggle"
               id="toggle"
-              defaultChecked={isVerified}
+              checked={isVerified}
               onChange={clickToToggleDeviceVerification}
             />
 

@@ -852,8 +852,23 @@ export class MessageRepository {
     this.logger.info(`Resetting session with client '${clientId}' of user '${userId.id}'.`);
 
     try {
+      const fingerprint = await this.cryptography_repository.getRemoteFingerprint(userId, clientId);
       // We delete the stored session so that it can be recreated later on
       await this.cryptography_repository.deleteSession(userId, clientId);
+      // Generating the fingerprint will regenerate the session
+      const newFingerPrint = await this.cryptography_repository.getRemoteFingerprint(userId, clientId);
+      if (fingerprint !== newFingerPrint) {
+        // unverify the client entity in case the fingerprint has changed during the session reset
+        this.logger.warn('identity of device has changed');
+        const device = this.userRepository
+          .findUserById(userId)
+          ?.devices()
+          .find(device => device.id === clientId);
+
+        device?.meta.isVerified(false);
+        // Will trigger the conversation verification handler
+        amplify.publish(WebAppEvents.USER.CLIENTS_UPDATED, userId);
+      }
       return await this.sendSessionReset(userId, clientId, conversation);
     } catch (error) {
       const message = error instanceof Error ? error.message : error;
