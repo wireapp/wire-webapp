@@ -73,7 +73,7 @@ const UserDetailsComponent: React.FC<UserDetailsProps> = ({
           dataUieName="status-name"
           showAvailability={teamState.isInTeam(participant)}
         >
-          {<UserVerificationBadges user={participant} groupId={groupId} />}
+          <UserVerificationBadges user={participant} groupId={groupId} />
         </UserInfo>
       </div>
 
