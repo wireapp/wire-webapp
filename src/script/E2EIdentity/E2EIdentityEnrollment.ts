@@ -18,6 +18,7 @@
  */
 
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
+import {User} from 'oidc-client-ts';
 import {container} from 'tsyringe';
 
 import {TypedEventEmitter} from '@wireapp/commons';
@@ -226,7 +227,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     return this.getE2EIdentityService()?.getCertificateData();
   }
 
-  public async enroll(refreshActiveCertificate: boolean = false) {
+  public async enroll(refreshActiveCertificate: boolean, userData?: User) {
     if (!this.config) {
       throw new Error('Trying to enroll for E2EI without initializing the E2EIHandler');
     }
@@ -235,14 +236,24 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       this.currentStep = E2EIHandlerStep.ENROLL;
       this.showLoadingMessage();
       let oAuthIdToken: string | undefined;
+      let oAuthRefreshToken: string | undefined;
 
-      // If the enrolment is in progress, we need to get the id token from the oidc service, since oauth should have already been completed
-      if (this.coreE2EIService.isEnrollmentInProgress()) {
-        const oidcService = getOIDCServiceInstance();
-        const userData = await oidcService.handleAuthentication();
-        if (!userData) {
-          throw new Error('Received no user data from OIDC service');
+      if (!userData) {
+        // If the enrolment is in progress, we need to get the id token from the oidc service, since oauth should have already been completed
+        if (this.coreE2EIService.isEnrollmentInProgress()) {
+          const oidcService = getOIDCServiceInstance();
+          const userData = await oidcService.handleAuthentication();
+          if (!userData) {
+            throw new Error('Received no user data from OIDC service');
+          }
+          oAuthIdToken = userData?.id_token;
+          oAuthRefreshToken = userData?.refresh_token;
+
+          if (oAuthRefreshToken) {
+            OIDCServiceStore.store.refreshToken(oAuthRefreshToken);
+          }
         }
+      } else {
         oAuthIdToken = userData?.id_token;
       }
 
@@ -253,7 +264,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
         throw new Error('Username or handle not found');
       }
       const data = await this.core.enrollE2EI({
-        discoveryUrl: this.config.discoveryUrl,
+        discoveryUrl: this.discoveryUrl,
         displayName,
         handle,
         oAuthIdToken,
@@ -280,13 +291,16 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       this.showSuccessMessage();
       // Remove the url parameters after enrolment
       removeUrlParameters();
-      this.emit('enrollmentSuccessful');
     } catch (error) {
+      this.logger.error('E2EI enrollment failed', error);
+
       this.currentStep = E2EIHandlerStep.ERROR;
+
       setTimeout(() => {
         removeCurrentModal();
       }, 0);
-      await this.showErrorMessage();
+      // Notify user about E2EI enrolment error
+      void this.showErrorMessage();
     }
   }
 
