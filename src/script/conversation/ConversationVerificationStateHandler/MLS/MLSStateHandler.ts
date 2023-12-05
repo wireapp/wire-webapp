@@ -102,7 +102,7 @@ class MLSConversationVerificationStateHandler {
 
     if (
       verificationState === E2eiConversationState.Degraded &&
-      conversation.mlsVerificationState() !== ConversationVerificationState.DEGRADED
+      conversation.mlsVerificationState() === ConversationVerificationState.VERIFIED
     ) {
       return this.degradeConversation(conversation);
     } else if (
