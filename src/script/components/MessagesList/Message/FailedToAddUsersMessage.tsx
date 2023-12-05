@@ -25,6 +25,7 @@ import {container} from 'tsyringe';
 import {Button, ButtonVariant, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
 import {Icon} from 'Components/Icon';
+import {UserName} from 'Components/UserName';
 import {Config} from 'src/script/Config';
 import {User} from 'src/script/entity/User';
 import {UserState} from 'src/script/user/UserState';
@@ -61,8 +62,6 @@ const MessageDetails = ({users, children, reason, domains}: MessageDetailsProps)
   const baseTranslationKey =
     users.length === 1 ? 'failedToAddParticipantsSingularDetails' : 'failedToAddParticipantsPluralDetails';
 
-  const getUsername = (name: string) => (name.length > 0 ? name : t('unavailableUser'));
-
   const uniqueDomains = Array.from(new Set(domains));
 
   const domainStr = uniqueDomains.join(', ');
@@ -77,10 +76,10 @@ const MessageDetails = ({users, children, reason, domains}: MessageDetailsProps)
         css={warning}
         dangerouslySetInnerHTML={{
           __html: t(`${baseTranslationKey}${errorMessageType[reason]}`, {
-            name: getUsername(users[0].name()),
+            name: UserName({user: users[0]}),
             names: users
               .slice(1)
-              .map(user => getUsername(user.name()))
+              .map(user => UserName({user}))
               .join(', '),
             domain: domainStr,
           }),
