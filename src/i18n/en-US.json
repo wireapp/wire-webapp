@@ -355,6 +355,7 @@
   "conversation.E2EICallAnyway": "Call anyway",
   "conversation.E2EISendAnyway": "Send anyway",
   "conversation.E2EICancel": "Cancel",
+  "conversation.E2EIOk": "OK",
   "conversationAssetDownloading": "Downloading…",
   "conversationAssetFailedDecryptDownloading": "DOWNLOAD FAILED (File could not be decrypted)",
   "conversationAssetFailedHashDownloading": "DOWNLOAD FAILED (HASH DOES NOT MATCH)",

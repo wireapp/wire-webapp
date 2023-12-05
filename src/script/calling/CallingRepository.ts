@@ -70,6 +70,7 @@ import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
 import {isGroupMLSConversation, isMLSConversation, MLSConversation} from '../conversation/ConversationSelectors';
 import {ConversationState} from '../conversation/ConversationState';
+import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
 import {CallingEvent, EventBuilder} from '../conversation/EventBuilder';
 import {CONSENT_TYPE, MessageRepository, MessageSendingOptions} from '../conversation/MessageRepository';
 import {Conversation} from '../entity/Conversation';
@@ -190,6 +191,40 @@ export class CallingRepository {
           return;
         }
       }
+    });
+
+    ko.computed(() => {
+      const call = this.callState.joinedCall();
+
+      if (!call) {
+        return;
+      }
+
+      const activeConversation = this.getConversationById(call.conversationId);
+
+      if (!activeConversation) {
+        return;
+      }
+
+      activeConversation.mlsVerificationState.subscribe(conversationVerificationState => {
+        const isDegraded = conversationVerificationState === ConversationVerificationState.DEGRADED;
+
+        if (isDegraded) {
+          this.abortCall(activeConversation.qualifiedId, LEAVE_CALL_REASON.CONVERSATION_DEGRADED);
+
+          const modalOptions = {
+            primaryAction: {
+              text: t('conversation.E2EIOk'),
+            },
+            text: {
+              message: t('conversation.E2EIGroupCallDisconnected'),
+              title: t('conversation.E2EIConversationNoLongerVerified'),
+            },
+          };
+
+          PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, modalOptions, `degraded-${call.conversationId}`);
+        }
+      });
     });
 
     this.acceptVersionWarning = (conversationId: QualifiedId) => {
