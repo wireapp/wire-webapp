@@ -29,11 +29,19 @@ const OIDCServiceStore = {
   },
   get: {
     clientData: (): OidcClientData => {
+      // MOCK: store targetURL and clientData in OIDCServiceStore
+      // TODO: remove this once we have a proper OIDC service
+      return {
+        id: 'wireapp',
+        secret: 'dUpVSGx2dVdFdGQ0dmsxWGhDalQ0SldU',
+      };
+      /*
       const clientData = localStorage.getItem(clientDataKey);
       if (!clientData) {
         throw new Error('No client data found in OIDCServiceStore');
       }
       return JSON.parse(clientData);
+      */
     },
     targetURL: () => localStorage.getItem(TargetURLKey),
   },

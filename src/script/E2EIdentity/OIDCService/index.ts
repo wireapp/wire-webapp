@@ -20,13 +20,6 @@
 import {OIDCService} from './OIDCService';
 import {OIDCServiceStore} from './OIDCServiceStorage';
 
-// MOCK: store targetURL and clientData in OIDCServiceStore
-// TODO: remove this once we have a proper OIDC service
-OIDCServiceStore.store.clientData({
-  id: 'wireapp',
-  secret: 'dUpVSGx2dVdFdGQ0dmsxWGhDalQ0SldU',
-});
-
 // lots of hardcoded values here, but this is just for testing until we have a proper OIDC service
 export const getOIDCServiceInstance = (): OIDCService => {
   const targetURL = OIDCServiceStore.get.targetURL();
