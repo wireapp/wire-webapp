@@ -352,13 +352,8 @@ export const InputBar = ({
 
   const handleSendMessage = () => {
     const isE2EIVerified = conversation.mlsVerificationState() === ConversationVerificationState.VERIFIED;
+
     if (isE2EIEnabled() && !isE2EIVerified) {
-      const isGroup = conversation.isGroup();
-
-      const textMessage = isGroup
-        ? t('conversation.E2EINewGroupMessage')
-        : t('conversation.E2EINew1to1Message', {user: conversation.display_name()});
-
       PrimaryModal.show(PrimaryModal.type.CONFIRM, {
         primaryAction: {
           action: () => sendMessage(),
@@ -369,7 +364,7 @@ export const InputBar = ({
           text: t('conversation.E2EICancel'),
         },
         text: {
-          message: textMessage,
+          message: t('conversation.E2EIDegradedNewMessage'),
           title: t('conversation.E2EIConversationNoLongerVerified'),
         },
       });

@@ -207,11 +207,6 @@ export class CallingViewModel {
 
     const showE2EICallModal = (conversationEntity: Conversation, callType: CALL_TYPE) => {
       const memberCount = conversationEntity.participating_user_ets().length;
-      const isGroup = conversationEntity.isGroup();
-
-      const textMessage = isGroup
-        ? t('conversation.E2EIInitiateGroupCall')
-        : t('conversation.E2EIInitiate1to1Call', {user: conversationEntity.display_name()});
 
       PrimaryModal.show(PrimaryModal.type.CONFIRM, {
         primaryAction: {
@@ -229,7 +224,7 @@ export class CallingViewModel {
           text: t('conversation.E2EICancel'),
         },
         text: {
-          message: textMessage,
+          message: t('conversation.E2EIDegradedInitiateCall'),
           title: t('conversation.E2EIConversationNoLongerVerified'),
         },
       });
