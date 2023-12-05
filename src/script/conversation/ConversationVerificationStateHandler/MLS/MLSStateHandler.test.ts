@@ -75,6 +75,21 @@ describe('MLSConversationVerificationStateHandler', () => {
       expect(conversation.mlsVerificationState()).toBe(ConversationVerificationState.DEGRADED);
     });
 
+    it('should not degrade conversation if it is not verified', async () => {
+      let triggerEpochChange: Function = () => {};
+      conversation.mlsVerificationState(ConversationVerificationState.UNVERIFIED);
+      jest.spyOn(e2eIdentity, 'getConversationVerificationState').mockResolvedValue(E2eiConversationState.Degraded);
+      jest
+        .spyOn(core.service!.mls!, 'on')
+        .mockImplementation((_event, listener) => (triggerEpochChange = listener) as any);
+
+      registerMLSConversationVerificationStateHandler(undefined, conversationState, core);
+
+      triggerEpochChange({groupId});
+      await new Promise(resolve => setTimeout(resolve, 0));
+      expect(conversation.mlsVerificationState()).toBe(ConversationVerificationState.UNVERIFIED);
+    });
+
     it('should verify conversation', async () => {
       let triggerEpochChange: Function = () => {};
       conversation.mlsVerificationState(ConversationVerificationState.DEGRADED);
