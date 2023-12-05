@@ -50,7 +50,6 @@ export interface ParticipantItemContentProps {
   showArrow?: boolean;
   onDropdownClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
   showAvailabilityState?: boolean;
-  isSelectable?: boolean;
   isProteusVerified?: boolean;
   isMLSVerified?: boolean;
 }
@@ -64,7 +63,6 @@ export const ParticipantItemContent = ({
   hasUsernameInfo = false,
   showArrow = false,
   showAvailabilityState = false,
-  isSelectable = false,
 }: ParticipantItemContentProps) => {
   const {name} = useKoSubscribableChildren(participant, ['name']);
 
@@ -82,7 +80,7 @@ export const ParticipantItemContent = ({
               selfString={selfString}
               showAvailability={showAvailabilityState && selfInTeam}
             >
-              {!isSelectable && <UserVerificationBadges user={participant} groupId={groupId} />}
+              <UserVerificationBadges user={participant} groupId={groupId} />
             </UserInfo>
           ) : (
             <>

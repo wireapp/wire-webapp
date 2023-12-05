@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useMemo, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 
 import cx from 'classnames';
 import type {DexieError} from 'dexie';
@@ -26,6 +26,8 @@ import {container} from 'tsyringe';
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {isMLSConversation} from 'src/script/conversation/ConversationSelectors';
+import {WireIdentity} from 'src/script/E2EIdentity';
+import {MLSDeviceDetails} from 'src/script/page/MainContent/panels/preferences/DevicesPreferences/components/MLSDeviceDetails';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import type {Logger} from 'Util/Logger';
@@ -37,13 +39,12 @@ import {ConversationState} from '../../conversation/ConversationState';
 import type {MessageRepository} from '../../conversation/MessageRepository';
 import type {CryptographyRepository} from '../../cryptography/CryptographyRepository';
 import type {User} from '../../entity/User';
-import {useUserIdentity} from '../../hooks/useDeviceIdentities';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {FormattedId} from '../../page/MainContent/panels/preferences/DevicesPreferences/components/FormattedId';
-import {MLSDeviceDetails} from '../../page/MainContent/panels/preferences/DevicesPreferences/components/MLSDeviceDetails';
 
 interface DeviceDetailsProps {
   clickToShowSelfFingerprint: () => void;
+  getDeviceIdentity?: (deviceId: string) => WireIdentity | undefined;
   clientRepository: ClientRepository;
   conversationState?: ConversationState;
   cryptographyRepository: CryptographyRepository;
@@ -58,6 +59,7 @@ export const DeviceDetails = ({
   device,
   cryptographyRepository,
   user,
+  getDeviceIdentity,
   clickToShowSelfFingerprint,
   clientRepository,
   messageRepository,
@@ -106,12 +108,9 @@ export const DeviceDetails = ({
   const activeConversation = conversationState.activeConversation();
   const isConversationMLS = activeConversation && isMLSConversation(activeConversation);
 
-  const {getDeviceIdentity} = useUserIdentity(user.qualifiedId, activeConversation?.groupId);
-  const getIdentity = getDeviceIdentity ? () => getDeviceIdentity(device.id) : undefined;
-
   return (
     <div className={cx('participant-devices__header', {'participant-devices__header--padding': !noPadding})}>
-      {getDeviceIdentity && <MLSDeviceDetails isCurrentDevice={false} identity={getIdentity?.()} />}
+      {getDeviceIdentity && <MLSDeviceDetails identity={getDeviceIdentity(device.id)} />}
 
       <div className="device-proteus-details">
         <h3 className="device-details-title paragraph-body-3">{t('participantDevicesProteusDeviceVerification')}</h3>
@@ -156,7 +155,7 @@ export const DeviceDetails = ({
               type="checkbox"
               name="toggle"
               id="toggle"
-              defaultChecked={isVerified}
+              checked={isVerified}
               onChange={clickToToggleDeviceVerification}
             />
 

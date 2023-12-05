@@ -94,6 +94,7 @@ async function buildMessageRepository(): Promise<[MessageRepository, MessageRepo
     propertiesRepository: new PropertiesRepository({} as any, {} as any),
     serverTimeHandler: serverTimeHandler,
     userRepository: {
+      findUserById: jest.fn(),
       assignAllClients: jest.fn().mockResolvedValue(true),
     } as unknown as UserRepository,
     assetRepository: {} as AssetRepository,
@@ -246,12 +247,41 @@ describe('MessageRepository', () => {
     it('resets the session with another device', async () => {
       const [messageRepository, {cryptographyRepository, core}] = await buildMessageRepository();
       jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
+      jest.spyOn(cryptographyRepository, 'getRemoteFingerprint').mockResolvedValue('first');
       spyOn(cryptographyRepository, 'deleteSession');
       const conversation = generateConversation();
 
       const userId = {domain: 'domain1', id: 'user1'};
       const clientId = 'client1';
       await messageRepository.resetSession(userId, clientId, conversation);
+      expect(cryptographyRepository.deleteSession).toHaveBeenCalledWith(userId, clientId);
+      expect(core.service!.conversation.send).toHaveBeenCalled();
+    });
+
+    it('unverifies device if fingerprint has changed', async () => {
+      const [messageRepository, {cryptographyRepository, userRepository, core}] = await buildMessageRepository();
+      const user = new User();
+      const clientId = 'client1';
+
+      const device = new ClientEntity(false, 'domain', clientId);
+      device.meta.isVerified(true);
+      user.devices([device]);
+
+      jest.spyOn(userRepository, 'findUserById').mockReturnValue(user);
+
+      jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
+      jest
+        .spyOn(cryptographyRepository, 'getRemoteFingerprint')
+        .mockResolvedValueOnce('first')
+        .mockResolvedValue('second');
+
+      spyOn(cryptographyRepository, 'deleteSession');
+      const conversation = generateConversation();
+
+      const userId = {domain: 'domain1', id: 'user1'};
+      expect(device.meta.isVerified()).toBe(true);
+      await messageRepository.resetSession(userId, clientId, conversation);
+      expect(device.meta.isVerified()).toBe(false);
       expect(cryptographyRepository.deleteSession).toHaveBeenCalledWith(userId, clientId);
       expect(core.service!.conversation.send).toHaveBeenCalled();
     });
