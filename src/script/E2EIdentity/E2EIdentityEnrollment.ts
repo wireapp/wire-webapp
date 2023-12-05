@@ -19,6 +19,8 @@
 
 import {container} from 'tsyringe';
 
+import {TypedEventEmitter} from '@wireapp/commons';
+
 import {PrimaryModal, removeCurrentModal} from 'Components/Modals/PrimaryModal';
 import {Core} from 'src/script/service/CoreSingleton';
 import {UserState} from 'src/script/user/UserState';
@@ -45,25 +47,19 @@ interface E2EIHandlerParams {
   gracePeriodInSeconds: number;
 }
 
-export class E2EIHandler {
+type Events = {enrollmentSuccessful: void};
+
+type EnrollmentConfig = {
+  timer: DelayTimerService;
+  discoveryUrl: string;
+  gracePeriodInMs: number;
+};
+export class E2EIHandler extends TypedEventEmitter<Events> {
   private static instance: E2EIHandler | null = null;
   private readonly core = container.resolve(Core);
   private readonly userState = container.resolve(UserState);
-  private timer: DelayTimerService;
-  private discoveryUrl: string;
-  private gracePeriodInMS: number;
+  private config?: EnrollmentConfig;
   private currentStep: E2EIHandlerStep | null = E2EIHandlerStep.UNINITIALIZED;
-
-  private constructor({discoveryUrl, gracePeriodInSeconds}: E2EIHandlerParams) {
-    // ToDo: Do these values need to te able to be updated? Should we use a singleton with update fn?
-    this.discoveryUrl = discoveryUrl;
-    this.gracePeriodInMS = gracePeriodInSeconds * TIME_IN_MILLIS.SECOND;
-    this.timer = DelayTimerService.getInstance({
-      gracePeriodInMS: this.gracePeriodInMS,
-      gracePeriodExpiredCallback: () => null,
-      delayPeriodExpiredCallback: () => null,
-    });
-  }
 
   private get coreE2EIService() {
     const e2eiService = this.core.service?.e2eIdentity;
@@ -82,13 +78,8 @@ export class E2EIHandler {
    * @param params The params to create the grace period timer
    * @returns The singleton instance of GracePeriodTimer
    */
-  public static getInstance(params?: E2EIHandlerParams) {
-    if (!E2EIHandler.instance) {
-      if (!params) {
-        throw new Error('GracePeriodTimer is not initialized. Please call getInstance with params.');
-      }
-      E2EIHandler.instance = new E2EIHandler(params);
-    }
+  public static getInstance() {
+    E2EIHandler.instance = E2EIHandler.instance ?? new E2EIHandler();
     return E2EIHandler.instance;
   }
 
@@ -99,26 +90,23 @@ export class E2EIHandler {
     E2EIHandler.instance = null;
   }
 
-  /**
-   * @param E2EIHandlerParams The params to create the grace period timer
-   */
-  public updateParams({gracePeriodInSeconds, discoveryUrl}: E2EIHandlerParams) {
-    this.gracePeriodInMS = gracePeriodInSeconds * TIME_IN_MILLIS.SECOND;
-    this.discoveryUrl = discoveryUrl;
-    this.timer.updateParams({
-      gracePeriodInMS: this.gracePeriodInMS,
-      gracePeriodExpiredCallback: () => null,
-      delayPeriodExpiredCallback: () => null,
-    });
-    this.initialize();
-  }
-
-  public initialize(): void {
+  public initialize({discoveryUrl, gracePeriodInSeconds}: E2EIHandlerParams) {
     if (isE2EIEnabled()) {
       if (!hasActiveCertificate()) {
+        const gracePeriodInMs = gracePeriodInSeconds * TIME_IN_MILLIS.SECOND;
+        this.config = {
+          discoveryUrl,
+          gracePeriodInMs,
+          timer: DelayTimerService.getInstance({
+            gracePeriodInMS: gracePeriodInMs,
+            gracePeriodExpiredCallback: () => null,
+            delayPeriodExpiredCallback: () => null,
+          }),
+        };
         this.showE2EINotificationMessage();
       }
     }
+    return this;
   }
 
   private async storeRedirectTargetAndRedirect(targetURL: string): Promise<void> {
@@ -129,6 +117,9 @@ export class E2EIHandler {
   }
 
   public async enroll(refreshActiveCertificate: boolean = false) {
+    if (!this.config) {
+      throw new Error('Trying to enroll for E2EI without initializing the E2EIHandler');
+    }
     try {
       // Notify user about E2EI enrolment in progress
       this.currentStep = E2EIHandlerStep.ENROLL;
@@ -152,7 +143,7 @@ export class E2EIHandler {
         throw new Error('Username or handle not found');
       }
       const data = await this.core.enrollE2EI({
-        discoveryUrl: this.discoveryUrl,
+        discoveryUrl: this.config.discoveryUrl,
         displayName,
         handle,
         oAuthIdToken,
@@ -179,12 +170,13 @@ export class E2EIHandler {
       this.showSuccessMessage();
       // Remove the url parameters after enrolment
       removeUrlParameters();
+      this.emit('enrollmentSuccessful');
     } catch (error) {
       this.currentStep = E2EIHandlerStep.ERROR;
       setTimeout(() => {
         removeCurrentModal();
       }, 0);
-      this.showErrorMessage();
+      await this.showErrorMessage();
     }
   }
 
@@ -256,8 +248,8 @@ export class E2EIHandler {
 
     // Only initialize the timer when the it is uninitialized
     if (this.currentStep === E2EIHandlerStep.UNINITIALIZED) {
-      this.timer.updateParams({
-        gracePeriodInMS: this.gracePeriodInMS,
+      this.config?.timer.updateParams({
+        gracePeriodInMS: this.config.gracePeriodInMs,
         gracePeriodExpiredCallback: () => {
           this.showE2EINotificationMessage();
         },
@@ -269,13 +261,13 @@ export class E2EIHandler {
     }
 
     // If the timer is not active, show the notification
-    if (!this.timer.isDelayTimerActive()) {
+    if (this.config && !this.config.timer.isDelayTimerActive()) {
       const {modalOptions, modalType} = getModalOptions({
-        hideSecondary: !this.timer.isSnoozeTimeAvailable(),
+        hideSecondary: !this.config.timer.isSnoozeTimeAvailable(),
         primaryActionFn: () => this.enroll(),
         secondaryActionFn: () => {
           this.currentStep = E2EIHandlerStep.SNOOZE;
-          this.timer.delayPrompt();
+          this.config?.timer.delayPrompt();
         },
         type: ModalType.ENROLL,
         hideClose: true,
