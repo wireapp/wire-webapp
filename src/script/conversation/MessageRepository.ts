@@ -323,6 +323,31 @@ export class MessageRepository {
       .build();
   }
 
+  public showE2EISendMessageModal = (conversationEntity: Conversation, callback: () => Promise<void>) => {
+    const isGroup = conversationEntity.isGroup();
+
+    const textMessage = isGroup
+      ? t('conversation.E2EINewGroupMessage')
+      : t('conversation.E2EINew1to1Message', {user: conversationEntity.display_name()});
+
+    PrimaryModal.show(PrimaryModal.type.CONFIRM, {
+      primaryAction: {
+        action: async () => {
+          await callback();
+        },
+        text: t('conversation.E2EISendAnyway'),
+      },
+      secondaryAction: {
+        action: () => {},
+        text: t('conversation.E2EICancel'),
+      },
+      text: {
+        message: textMessage,
+        title: t('conversation.E2EIConversationNoLongerVerified'),
+      },
+    });
+  };
+
   /**
    * Send text message with link preview in specified conversation.
    *

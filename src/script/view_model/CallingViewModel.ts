@@ -41,6 +41,8 @@ import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
 import {ConversationState} from '../conversation/ConversationState';
+import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
+import {isE2EIEnabled} from '../E2EIdentity';
 import type {Conversation} from '../entity/Conversation';
 import type {User} from '../entity/User';
 import type {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../media/MediaDevicesHandler';
@@ -203,25 +205,65 @@ export class CallingViewModel {
       }
     });
 
-    const handleCallAction = async (conversationEntity: Conversation, callType: CALL_TYPE): Promise<void> => {
+    const showE2EICallModal = (conversationEntity: Conversation, callType: CALL_TYPE) => {
       const memberCount = conversationEntity.participating_user_ets().length;
-      if (memberCount > MAX_USERS_TO_CALL_WITHOUT_CONFIRM) {
-        PrimaryModal.show(PrimaryModal.type.WITHOUT_TITLE, {
-          preventClose: true,
-          primaryAction: {
-            action: async () => await startCall(conversationEntity, callType),
-            text: t('groupCallModalPrimaryBtnName'),
+      const isGroup = conversationEntity.isGroup();
+
+      const textMessage = isGroup
+        ? t('conversation.E2EIInitiateGroupCall')
+        : t('conversation.E2EIInitiate1to1Call', {user: conversationEntity.display_name()});
+
+      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
+        primaryAction: {
+          action: async () => {
+            if (memberCount > MAX_USERS_TO_CALL_WITHOUT_CONFIRM) {
+              showMaxUsersToCallModalWithoutConfirm(conversationEntity, callType);
+            } else {
+              await startCall(conversationEntity, callType);
+            }
           },
-          secondaryAction: {
-            text: t('modalConfirmSecondary'),
-          },
-          text: {
-            htmlMessage: `<div class="modal-description">
+          text: t('conversation.E2EICallAnyway'),
+        },
+        secondaryAction: {
+          action: () => {},
+          text: t('conversation.E2EICancel'),
+        },
+        text: {
+          message: textMessage,
+          title: t('conversation.E2EIConversationNoLongerVerified'),
+        },
+      });
+    };
+
+    const showMaxUsersToCallModalWithoutConfirm = (conversationEntity: Conversation, callType: CALL_TYPE) => {
+      const memberCount = conversationEntity.participating_user_ets().length;
+
+      PrimaryModal.show(PrimaryModal.type.WITHOUT_TITLE, {
+        preventClose: true,
+        primaryAction: {
+          action: async () => await startCall(conversationEntity, callType),
+          text: t('groupCallModalPrimaryBtnName'),
+        },
+        secondaryAction: {
+          text: t('modalConfirmSecondary'),
+        },
+        text: {
+          htmlMessage: `<div class="modal-description">
             ${t('groupCallConfirmationModalTitle', memberCount)}
           </div>`,
-            closeBtnLabel: t('groupCallModalCloseBtnLabel'),
-          },
-        });
+          closeBtnLabel: t('groupCallModalCloseBtnLabel'),
+        },
+      });
+    };
+
+    const handleCallAction = async (conversationEntity: Conversation, callType: CALL_TYPE): Promise<void> => {
+      const memberCount = conversationEntity.participating_user_ets().length;
+      const isE2EIVerified = conversationEntity.mlsVerificationState() === ConversationVerificationState.VERIFIED;
+
+      if (isE2EIEnabled() && !isE2EIVerified) {
+        showE2EICallModal(conversationEntity, callType);
+      } else if (memberCount > MAX_USERS_TO_CALL_WITHOUT_CONFIRM) {
+        showMaxUsersToCallModalWithoutConfirm(conversationEntity, callType);
       } else {
         await startCall(conversationEntity, callType);
       }
