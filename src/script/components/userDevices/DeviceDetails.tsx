@@ -26,6 +26,8 @@ import {container} from 'tsyringe';
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {isMLSConversation} from 'src/script/conversation/ConversationSelectors';
+import {WireIdentity} from 'src/script/E2EIdentity';
+import {MLSDeviceDetails} from 'src/script/page/MainContent/panels/preferences/DevicesPreferences/components/MLSDeviceDetails';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import type {Logger} from 'Util/Logger';
@@ -42,6 +44,7 @@ import {FormattedId} from '../../page/MainContent/panels/preferences/DevicesPref
 
 interface DeviceDetailsProps {
   clickToShowSelfFingerprint: () => void;
+  getDeviceIdentity?: (deviceId: string) => WireIdentity | undefined;
   clientRepository: ClientRepository;
   conversationState?: ConversationState;
   cryptographyRepository: CryptographyRepository;
@@ -56,6 +59,7 @@ export const DeviceDetails = ({
   device,
   cryptographyRepository,
   user,
+  getDeviceIdentity,
   clickToShowSelfFingerprint,
   clientRepository,
   messageRepository,
@@ -106,9 +110,7 @@ export const DeviceDetails = ({
 
   return (
     <div className={cx('participant-devices__header', {'participant-devices__header--padding': !noPadding})}>
-      {/*
-      TODO get the fingerprint from CoreCrypto (?)
-      mlsFingerprint && <MLSDeviceDetails fingerprint={mlsFingerprint} />*/}
+      {getDeviceIdentity && <MLSDeviceDetails identity={getDeviceIdentity(device.id)} />}
 
       <div className="device-proteus-details">
         <h3 className="device-details-title paragraph-body-3">{t('participantDevicesProteusDeviceVerification')}</h3>
