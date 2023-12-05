@@ -17,7 +17,6 @@
  *
  */
 
-import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import {container} from 'tsyringe';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
@@ -51,7 +50,6 @@ jest.mock('./Modals', () => ({
 
 describe('E2EIHandler', () => {
   const params = {discoveryUrl: 'http://example.com', gracePeriodInSeconds: 30};
-  const newParams = {discoveryUrl: 'http://new-example.com', gracePeriodInSeconds: 60};
   const user = {name: () => 'John Doe', username: () => 'johndoe'};
 
   beforeEach(() => {
@@ -75,37 +73,19 @@ describe('E2EIHandler', () => {
   });
 
   it('should create instance with valid params', () => {
-    const instance = E2EIHandler.getInstance(params);
+    const instance = E2EIHandler.getInstance().initialize(params);
     expect(instance).toBeInstanceOf(E2EIHandler);
   });
 
-  it('should throw error if no params provided', () => {
-    expect(() => E2EIHandler.getInstance()).toThrow(
-      'GracePeriodTimer is not initialized. Please call getInstance with params.',
-    );
-  });
-
   it('should always return the same instance', () => {
-    const instance1 = E2EIHandler.getInstance(params);
-    const instance2 = E2EIHandler.getInstance(params);
+    const instance1 = E2EIHandler.getInstance().initialize(params);
+    const instance2 = E2EIHandler.getInstance().initialize(params);
     expect(instance1).toBe(instance2);
   });
 
-  it('should update parameters correctly', () => {
-    const instance = E2EIHandler.getInstance(params);
-
-    // Assuming that the instance exposes getters for discoveryUrl and gracePeriodInMS for testing purposes
-    expect(instance['discoveryUrl']).toEqual(params.discoveryUrl);
-    expect(instance['gracePeriodInMS']).toEqual(params.gracePeriodInSeconds * TimeInMillis.SECOND);
-
-    instance.updateParams(newParams);
-    expect(instance['discoveryUrl']).toEqual(newParams.discoveryUrl);
-    expect(instance['gracePeriodInMS']).toEqual(newParams.gracePeriodInSeconds * TimeInMillis.SECOND);
-  });
-
   it('should set currentStep to INITIALIZE after initialize is called', () => {
-    const instance = E2EIHandler.getInstance(params);
-    instance.initialize();
+    const instance = E2EIHandler.getInstance();
+    instance.initialize(params);
     expect(instance['currentStep']).toBe(E2EIHandlerStep.INITIALIZED);
   });
 
@@ -116,7 +96,7 @@ describe('E2EIHandler', () => {
 
     jest.spyOn(container.resolve(Core), 'enrollE2EI').mockResolvedValueOnce(true);
 
-    const instance = E2EIHandler.getInstance(params);
+    const instance = E2EIHandler.getInstance().initialize(params);
     await instance['enroll']();
 
     expect(instance['currentStep']).toBe(E2EIHandlerStep.SUCCESS);
@@ -127,14 +107,13 @@ describe('E2EIHandler', () => {
     jest.spyOn(container.resolve(Core), 'enrollE2EI').mockImplementationOnce(jest.fn(() => Promise.reject()));
     jest.spyOn(container.resolve(UserState), 'self').mockImplementationOnce(() => user);
 
-    const instance = E2EIHandler.getInstance(params);
+    const instance = E2EIHandler.getInstance().initialize(params);
     await instance['enroll']();
     expect(instance['currentStep']).toBe(E2EIHandlerStep.ERROR);
   });
 
   it('should display user info message when initialized', async () => {
-    const handler = E2EIHandler.getInstance(params);
-    await handler.initialize();
+    E2EIHandler.getInstance().initialize(params);
     expect(getModalOptions).toHaveBeenCalledWith(
       expect.objectContaining({
         type: ModalType.ENROLL,
@@ -142,8 +121,14 @@ describe('E2EIHandler', () => {
     );
   });
 
+  it('should throw error if trying to enroll with no config given', async () => {
+    await expect(E2EIHandler.getInstance().enroll()).rejects.toEqual(
+      new Error('Trying to enroll for E2EI without initializing the E2EIHandler'),
+    );
+  });
+
   it('should display loading message when enroled', async () => {
-    const handler = E2EIHandler.getInstance(params);
+    const handler = E2EIHandler.getInstance().initialize(params);
     await handler['enroll']();
     expect(getModalOptions).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -155,7 +140,7 @@ describe('E2EIHandler', () => {
   it('should display success message when enrollment is done', async () => {
     jest.spyOn(container.resolve(Core), 'enrollE2EI').mockResolvedValueOnce(true);
 
-    const handler = E2EIHandler.getInstance(params);
+    const handler = E2EIHandler.getInstance().initialize(params);
     handler['showLoadingMessage'] = jest.fn();
     await handler['enroll']();
     expect(getModalOptions).toHaveBeenCalledWith(
@@ -168,7 +153,7 @@ describe('E2EIHandler', () => {
   it('should display error message when enrollment fails', async () => {
     jest.spyOn(container.resolve(Core), 'enrollE2EI').mockRejectedValueOnce(false);
 
-    const handler = E2EIHandler.getInstance(params);
+    const handler = E2EIHandler.getInstance().initialize(params);
     handler['showLoadingMessage'] = jest.fn();
     await handler['enroll']();
     expect(getModalOptions).toHaveBeenCalledWith(

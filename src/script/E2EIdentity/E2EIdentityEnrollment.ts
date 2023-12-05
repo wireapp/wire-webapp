@@ -90,7 +90,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     E2EIHandler.instance = null;
   }
 
-  public initialize({discoveryUrl, gracePeriodInSeconds}: E2EIHandlerParams): void {
+  public initialize({discoveryUrl, gracePeriodInSeconds}: E2EIHandlerParams) {
     if (isE2EIEnabled()) {
       if (!hasActiveCertificate()) {
         const gracePeriodInMs = gracePeriodInSeconds * TIME_IN_MILLIS.SECOND;
@@ -106,6 +106,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
         this.showE2EINotificationMessage();
       }
     }
+    return this;
   }
 
   private async storeRedirectTargetAndRedirect(targetURL: string): Promise<void> {
@@ -175,7 +176,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       setTimeout(() => {
         removeCurrentModal();
       }, 0);
-      this.showErrorMessage();
+      await this.showErrorMessage();
     }
   }
 
