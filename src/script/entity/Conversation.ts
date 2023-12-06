@@ -584,6 +584,7 @@ export class Conversation {
       this.status,
       this.type,
       this.verification_state,
+      this.mlsVerificationState,
     ].forEach(property => (property as ko.Observable).subscribe(this.persistState));
   }
 
