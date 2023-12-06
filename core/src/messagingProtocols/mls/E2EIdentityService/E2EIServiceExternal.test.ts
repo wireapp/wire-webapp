@@ -58,8 +58,8 @@ describe('E2EIServiceExternal', () => {
 
       coreCrypto.getUserIdentities.mockResolvedValue(
         new Map([
-          ['SKHDsEsOS82TrWTHNEsVNA', [generateCoreCryptoIdentity(), generateCoreCryptoIdentity()]],
-          ['t9KH5Hu9QOClUGsY3K9fMQ', [generateCoreCryptoIdentity()]],
+          ['48a1c3b0-4b0e-4bcd-93ad-64c7344b1534', [generateCoreCryptoIdentity(), generateCoreCryptoIdentity()]],
+          ['b7d287e4-7bbd-40e0-a550-6b18dcaf5f31', [generateCoreCryptoIdentity()]],
         ]),
       );
 

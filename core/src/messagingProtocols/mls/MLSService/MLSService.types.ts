@@ -17,7 +17,7 @@
  *
  */
 
-import type {Ciphersuite, CommitBundle, CredentialType} from '@wireapp/core-crypto';
+import type {Ciphersuite, CommitBundle} from '@wireapp/core-crypto';
 
 export interface UploadCommitOptions {
   /**
@@ -43,11 +43,7 @@ export interface MLSServiceConfig {
   /**
    * default ciphersuite to use for MLS (MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519 = 1 by default)
    */
-  defaultCiphersuite: Ciphersuite;
-  /**
-   * default credential type to use for MLS (Basic = 1 by default)
-   */
-  defaultCredentialType: CredentialType;
+  cipherSuite: Ciphersuite;
   /**
    * signals if the E2E - Identity process should be used
    */

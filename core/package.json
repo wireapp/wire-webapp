@@ -13,7 +13,7 @@
   "dependencies": {
     "@wireapp/api-client": "workspace:^",
     "@wireapp/commons": "workspace:^",
-    "@wireapp/core-crypto": "1.0.0-rc.19",
+    "@wireapp/core-crypto": "1.0.0-rc.21",
     "@wireapp/cryptobox": "12.8.0",
     "@wireapp/promise-queue": "workspace:^",
     "@wireapp/protocol-messaging": "1.44.0",

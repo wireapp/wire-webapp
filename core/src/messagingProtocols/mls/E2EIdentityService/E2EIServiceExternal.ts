@@ -23,7 +23,7 @@ import logdown from 'logdown';
 
 import {Ciphersuite, CoreCrypto, E2eiConversationState, WireIdentity} from '@wireapp/core-crypto';
 
-import {getE2EIClientId, uuidTobase64url} from './Helper';
+import {getE2EIClientId} from './Helper';
 import {E2EIStorage} from './Storage/E2EIStorage';
 
 import {ClientService} from '../../../client';
@@ -73,27 +73,20 @@ export class E2EIServiceExternal {
   }
 
   public async getUsersIdentities(groupId: string, userIds: QualifiedId[]): Promise<Map<string, DeviceIdentity[]>> {
-    // We keep track of the ID we give to CoreCrypto in order to map it back to regular userIds afterwards
-    const hashedIdMap = new Map(userIds.map(userId => [uuidTobase64url(userId.id).asString, userId]));
-
     const userIdentities = await this.coreCryptoClient.getUserIdentities(
       Decoder.fromBase64(groupId).asBytes,
-      Array.from(hashedIdMap.keys()),
+      userIds.map(userId => userId.id),
     );
 
     const mappedUserIdentities = new Map();
-    for (const [base64Id, identities] of userIdentities) {
-      // remapping coreCrypto user ids to regular userIds
-      const userId = hashedIdMap.get(base64Id);
-      if (userId) {
-        mappedUserIdentities.set(
-          userId.id,
-          identities.map(identity => ({
-            ...identity,
-            deviceId: parseFullQualifiedClientId((identity as any).client_id).client,
-          })),
-        );
-      }
+    for (const [userId, identities] of userIdentities) {
+      mappedUserIdentities.set(
+        userId,
+        identities.map(identity => ({
+          ...identity,
+          deviceId: parseFullQualifiedClientId((identity as any).client_id).client,
+        })),
+      );
     }
 
     return mappedUserIdentities;
