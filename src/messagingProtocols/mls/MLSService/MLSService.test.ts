@@ -58,6 +58,7 @@ const createMLSService = async () => {
     conversationEpoch: jest.fn(),
     commitPendingProposals: jest.fn(),
     registerCallbacks: jest.fn(),
+    e2eiIsEnabled: jest.fn(() => false),
   } as unknown as CoreCrypto;
 
   const mockedDb = await openDB('core-test-db');
