@@ -128,6 +128,14 @@ jobs:
           containerImageTag="${TAG:-${packageVersion}}-${GITHUB_SHA::7}"
           echo "{\"imageTag\": \"${containerImageTag}\", \"releaseName\": \"${TAG:-v${packageVersion}}\"}" > ./release-info.json
 
+      - name: Patch helm chart
+        shell: bash
+        run: |
+          - name: Hello world
+            shell: bash
+            run: |
+              ls
+
       # - name: Storing release information
       #   if: contains(env.TAG, 'production')
       #   uses: actions/upload-artifact@v3
@@ -280,91 +288,73 @@ jobs:
       #     path: ./server/dist
 
 
-  update_helm_chart:
-    name: Update Helm chart
-    runs-on: ubuntu-latest
+  # update_helm_chart:
+  #   name: Update Helm chart
+  #   runs-on: ubuntu-latest
+  #
+  #   needs: test_build_deploy
+  #
+  #   steps:
+  #     # NOTE: on average, this step will throw an error, because the artifact is generated
+  #     #       conditionally; see the if-statement of 'Assembling release information'. The
+  #     #       flag continue-on-error facilitates this design. Overall, the approach is
+  #     #       basically the vehicle to allow putting the PR creation into a separate, more
+  #     #       loosely coupled job. The existence of the artifact is used to conditionally
+  #     #       run all subsequent steps.
+  #     - name: Obtaining release information artifact
+  #       id: release-info-artifact
+  #       uses: actions/download-artifact@v3
+  #       continue-on-error: true
+  #       with:
+  #         name: release-info.json
+  #     - name: Indicating whether release info exist
+  #       id: release-info-file
+  #       env:
+  #         ARTIFACT_LOCAL_PATH: '${{ steps.release-info-artifact.outputs.download-path }}/release-info.json'
+  #       shell: bash
+  #       run: |
+  #         test -s "${ARTIFACT_LOCAL_PATH}" && echo '::set-output name=exists::true'
+  #         echo "::set-output name=releaseInfo::$(cat ${ARTIFACT_LOCAL_PATH})"
+  #
+  #     - name: Checking out 'wire-server'
+  #       uses: actions/checkout@v4
+  #       if: ${{ steps.release-info-file.outputs.exists == 'true' }}
+  #       with:
+  #         repository: 'wireapp/wire-server'
+  #         fetch-depth: 1
+  #
+  #     - name: Changing Helm value of the webapp chart
+  #       id: change-helm-value
+  #       if: ${{ steps.release-info-file.outputs.exists == 'true' }}
+  #       shell: bash
+  #       run: |
+  #         sed --in-place --expression="s/  tag: .*/  tag: \"${{ fromJSON(steps.release-info-file.outputs.releaseInfo).imageTag }}\"/" ./charts/webapp/values.yaml
+  #         git add ./charts/webapp/values.yaml
+  #         echo "Upgrade webapp version to ${{ fromJSON(steps.release-info-file.outputs.releaseInfo).imageTag }}" > ./changelog.d/0-release-notes/webapp-upgrade
+  #         git add ./changelog.d/0-release-notes/webapp-upgrade
+  #         echo "::set-output name=releaseUrl::${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/releases/tag/${{ fromJSON(steps.release-info-file.outputs.releaseInfo).releaseName }}"
+  #
+  #     - name: Creating Pull Request
+  #       id: create-pr
+  #       if: ${{ steps.release-info-file.outputs.exists == 'true' }}
+  #       uses: peter-evans/create-pull-request@v5
+  #       with:
+  #         draft: false
+  #         token: ${{ secrets.ZEBOT_GH_TOKEN }}
+  #         author: 'Zebot <zebot@users.noreply.github.com>'
+  #         branch: charts-update-webapp-image-tag-${{ github.run_number }}
+  #         commit-message: 'chore: [charts] Update webapp version'
+  #         title: 'Update webapp version in Helm chart [skip ci]'
+  #         body: |
+  #           Image tag: `${{ fromJSON(steps.release-info-file.outputs.releaseInfo).imageTag }}`
+  #           Release: [`${{ fromJSON(steps.release-info-file.outputs.releaseInfo).releaseName }}`](${{ steps.change-helm-value.outputs.releaseUrl }})
+  #
+  #     - name: Printing Pull Request URL
+  #       if: ${{ steps.release-info-file.outputs.exists == 'true' }}
+  #       shell: bash
+  #       run: |
+  #         echo "PR: ${{ steps.create-pr.outputs.pull-request-url }}"
 
-    needs: test_build_deploy
-
-    steps:
-      # NOTE: on average, this step will throw an error, because the artifact is generated
-      #       conditionally; see the if-statement of 'Assembling release information'. The
-      #       flag continue-on-error facilitates this design. Overall, the approach is
-      #       basically the vehicle to allow putting the PR creation into a separate, more
-      #       loosely coupled job. The existence of the artifact is used to conditionally
-      #       run all subsequent steps.
-      - name: Obtaining release information artifact
-        id: release-info-artifact
-        uses: actions/download-artifact@v3
-        continue-on-error: true
-        with:
-          name: release-info.json
-      - name: Indicating whether release info exist
-        id: release-info-file
-        env:
-          ARTIFACT_LOCAL_PATH: '${{ steps.release-info-artifact.outputs.download-path }}/release-info.json'
-        shell: bash
-        run: |
-          test -s "${ARTIFACT_LOCAL_PATH}" && echo '::set-output name=exists::true'
-          echo "::set-output name=releaseInfo::$(cat ${ARTIFACT_LOCAL_PATH})"
-
-      - name: Checking out 'wire-server'
-        uses: actions/checkout@v4
-        if: ${{ steps.release-info-file.outputs.exists == 'true' }}
-        with:
-          repository: 'wireapp/wire-server'
-          fetch-depth: 1
-
-      - name: Changing Helm value of the webapp chart
-        id: change-helm-value
-        if: ${{ steps.release-info-file.outputs.exists == 'true' }}
-        shell: bash
-        run: |
-          sed --in-place --expression="s/  tag: .*/  tag: \"${{ fromJSON(steps.release-info-file.outputs.releaseInfo).imageTag }}\"/" ./charts/webapp/values.yaml
-          git add ./charts/webapp/values.yaml
-          echo "Upgrade webapp version to ${{ fromJSON(steps.release-info-file.outputs.releaseInfo).imageTag }}" > ./changelog.d/0-release-notes/webapp-upgrade
-          git add ./changelog.d/0-release-notes/webapp-upgrade
-          echo "::set-output name=releaseUrl::${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/releases/tag/${{ fromJSON(steps.release-info-file.outputs.releaseInfo).releaseName }}"
-
-      - name: Creating Pull Request
-        id: create-pr
-        if: ${{ steps.release-info-file.outputs.exists == 'true' }}
-        uses: peter-evans/create-pull-request@v5
-        with:
-          draft: false
-          token: ${{ secrets.ZEBOT_GH_TOKEN }}
-          author: 'Zebot <zebot@users.noreply.github.com>'
-          branch: charts-update-webapp-image-tag-${{ github.run_number }}
-          commit-message: 'chore: [charts] Update webapp version'
-          title: 'Update webapp version in Helm chart [skip ci]'
-          body: |
-            Image tag: `${{ fromJSON(steps.release-info-file.outputs.releaseInfo).imageTag }}`
-            Release: [`${{ fromJSON(steps.release-info-file.outputs.releaseInfo).releaseName }}`](${{ steps.change-helm-value.outputs.releaseUrl }})
-
-      - name: Printing Pull Request URL
-        if: ${{ steps.release-info-file.outputs.exists == 'true' }}
-        shell: bash
-        run: |
-          echo "PR: ${{ steps.create-pr.outputs.pull-request-url }}"
-
-  publish_helm_chart:
-    name: Patch Helm chart
-    runs-on: ubuntu-latest
-
-    needs: test_build_deploy
-
-    steps:
-      - name: Get release information artifact
-        id: release-info-artifact
-        uses: actions/download-artifact@v3
-        continue-on-error: true
-        with:
-          name: release-info.json
-
-      - name: Hello world
-        shell: bash
-        run: |
-          echo "Hello world!"
 
   cleanup_artifacts:
     permissions:
