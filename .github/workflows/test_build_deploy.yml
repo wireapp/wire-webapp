@@ -281,8 +281,6 @@ jobs:
 
 
   update_helm_chart:
-    if: contains(env.TAG, 'production')
-
     name: Update Helm chart
     runs-on: ubuntu-latest
 
