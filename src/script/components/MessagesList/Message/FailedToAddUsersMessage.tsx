@@ -25,7 +25,7 @@ import {container} from 'tsyringe';
 import {Button, ButtonVariant, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
 import {Icon} from 'Components/Icon';
-import {UserName} from 'Components/UserName';
+import {getUserName} from 'Components/UserName';
 import {Config} from 'src/script/Config';
 import {User} from 'src/script/entity/User';
 import {UserState} from 'src/script/user/UserState';
@@ -76,10 +76,10 @@ const MessageDetails = ({users, children, reason, domains}: MessageDetailsProps)
         css={warning}
         dangerouslySetInnerHTML={{
           __html: t(`${baseTranslationKey}${errorMessageType[reason]}`, {
-            name: UserName({user: users[0]}),
+            name: getUserName(users[0]),
             names: users
               .slice(1)
-              .map(user => UserName({user}))
+              .map(user => getUserName(user))
               .join(', '),
             domain: domainStr,
           }),
