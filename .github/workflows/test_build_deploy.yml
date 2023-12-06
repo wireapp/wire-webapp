@@ -131,7 +131,13 @@ jobs:
       - name: Patch helm chart
         shell: bash
         run: |
-          yq --version
+          base_version=$(yq -Mr '.version' ./charts/webapp/Chart.yaml)
+          suffix=$(date +%Y%m%d%H%M%S)
+          chart_version="$base_version+$suffix"
+          chart_patched=$(yq -Mr ".version = \"$chart_version}\"" ./charts/webapp/Chart.yaml)
+          echo "$chart_patched" > ./charts/webapp/Chart.yaml
+          cat ./charts/webapp/Chart.yaml
+
 
       # - name: Storing release information
       #   if: contains(env.TAG, 'production')
