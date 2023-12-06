@@ -21,28 +21,19 @@ import {FC} from 'react';
 
 import {CSSObject} from '@emotion/react';
 
-import {messageReactionEmoji, reactionImgSize} from './EmojiImg.styles';
+type EmojiSize = 'small' | 'medium';
 
 export interface EmojiImgProps {
-  emojiUrl: string;
-  emojiName: string;
-  emojiImgSize?: CSSObject;
+  emoji: string;
+  size?: EmojiSize;
   styles?: CSSObject;
 }
 
-const EmojiImg: FC<EmojiImgProps> = ({emojiUrl, styles, emojiName, emojiImgSize = reactionImgSize}) => {
+export const EmojiChar: FC<EmojiImgProps> = ({emoji: unicode, size = 'small', styles}) => {
+  const fontSize = size === 'small' ? '.68rem' : '.81rem';
   return (
-    <>
-      <img
-        alt={emojiName}
-        aria-hidden={true}
-        css={{...emojiImgSize, ...messageReactionEmoji, ...styles}}
-        draggable="false"
-        loading="eager"
-        src={emojiUrl}
-      />
-    </>
+    <span aria-hidden={true} css={{fontSize, ...styles}}>
+      {unicode}
+    </span>
   );
 };
-
-export {EmojiImg};

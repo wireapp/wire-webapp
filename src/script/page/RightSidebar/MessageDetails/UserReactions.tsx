@@ -21,7 +21,7 @@ import {Fragment} from 'react';
 
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {EmojiImg} from 'Components/MessagesList/Message/ContentMessage/MessageActions/MessageReactions/EmojiImg';
+import {EmojiChar} from 'Components/MessagesList/Message/ContentMessage/MessageActions/MessageReactions/EmojiChar';
 import {
   messageReactionDetailsMargin,
   reactionsCountAlignment,
@@ -30,7 +30,6 @@ import {UserList} from 'Components/UserList';
 import {User} from 'src/script/entity/User';
 import {ReactionMap} from 'src/script/storage';
 import {getEmojiTitleFromEmojiUnicode, getEmojiUnicode} from 'Util/EmojiUtil';
-import {getEmojiUrl} from 'Util/ReactionUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 
 import {panelContentTitleStyles} from './MessageDetails.styles';
@@ -46,7 +45,6 @@ export function UsersReactions({reactions, selfUser, findUsers, onParticipantCli
   return reactions.map(reaction => {
     const [reactionKey, userIds] = reaction;
     const emojiUnicode = getEmojiUnicode(reactionKey);
-    const emojiUrl = getEmojiUrl(emojiUnicode);
     const emojiName = getEmojiTitleFromEmojiUnicode(emojiUnicode);
     const capitalizedEmojiName = capitalizeFirstChar(emojiName);
     const users = findUsers(userIds);
@@ -55,7 +53,7 @@ export function UsersReactions({reactions, selfUser, findUsers, onParticipantCli
     return (
       <Fragment key={reactionKey}>
         <div css={panelContentTitleStyles} className="font-weight-bold">
-          <EmojiImg emojiUrl={emojiUrl} emojiName={emojiName} styles={messageReactionDetailsMargin} />
+          <EmojiChar emoji={reactionKey} styles={messageReactionDetailsMargin} />
           <span css={messageReactionDetailsMargin}>{capitalizedEmojiName}</span>
           <span css={reactionsCountAlignment}>({emojiCount})</span>
         </div>
