@@ -19,9 +19,9 @@
 
 import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data';
 import {
-  ConversationOtrMessageAddEvent,
-  ConversationMLSMessageAddEvent,
   CONVERSATION_EVENT,
+  ConversationMLSMessageAddEvent,
+  ConversationOtrMessageAddEvent,
 } from '@wireapp/api-client/lib/event';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {AddUsersFailureReasons} from '@wireapp/core/lib/conversation';
@@ -29,7 +29,7 @@ import {ReactionType} from '@wireapp/core/lib/conversation/ReactionType';
 import {DecryptionError} from '@wireapp/core/lib/errors/DecryptionError';
 
 import type {REASON as AVS_REASON} from '@wireapp/avs';
-import type {LegalHoldStatus, Asset} from '@wireapp/protocol-messaging';
+import type {Asset, LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {createUuid} from 'Util/uuid';
 
@@ -39,6 +39,7 @@ import type {Conversation} from '../entity/Conversation';
 import type {Message} from '../entity/message/Message';
 import type {User} from '../entity/User';
 import {CALL, ClientEvent, CONVERSATION} from '../event/Client';
+import {E2EIVerificationMessageType} from '../message/E2EIVerificationMessageType';
 import {StatusType} from '../message/StatusType';
 import {VerificationMessageType} from '../message/VerificationMessageType';
 import {ReactionMap, ReadReceipt, UserReactionMap} from '../storage';
@@ -244,8 +245,13 @@ export interface ErrorEvent
   id: string;
 }
 
+// E2EI Verification Events
+export type E2EIVerificationEventData = {type: E2EIVerificationMessageType; userIds?: QualifiedId[]};
+export type E2EIVerificationEvent = ConversationEvent<CONVERSATION.E2EI_VERIFICATION, E2EIVerificationEventData>;
+
 export type ClientConversationEvent =
   | AllVerifiedEvent
+  | E2EIVerificationEvent
   | AssetAddEvent
   | ErrorEvent
   | CompositeMessageAddEvent
@@ -314,6 +320,37 @@ export const EventBuilder = {
       id: createUuid(),
       time: new Date(conversationEntity.getNextTimestamp()).toISOString(),
       type: ClientEvent.CONVERSATION.VERIFICATION,
+    };
+  },
+
+  buildAllE2EIVerified(conversationEntity: Conversation): E2EIVerificationEvent {
+    return {
+      ...buildQualifiedId(conversationEntity),
+      data: {
+        type: E2EIVerificationMessageType.VERIFIED,
+      },
+      from: '',
+      id: createUuid(),
+      time: conversationEntity.getNextIsoDate(),
+      type: ClientEvent.CONVERSATION.E2EI_VERIFICATION,
+    };
+  },
+
+  buildE2EIDegraded(
+    conversationEntity: Conversation,
+    type: E2EIVerificationMessageType,
+    userIds?: QualifiedId[],
+  ): E2EIVerificationEvent {
+    return {
+      ...buildQualifiedId(conversationEntity),
+      data: {
+        type,
+        userIds,
+      },
+      from: '',
+      id: createUuid(),
+      time: conversationEntity.getNextIsoDate(),
+      type: ClientEvent.CONVERSATION.E2EI_VERIFICATION,
     };
   },
 

@@ -40,8 +40,15 @@ import {User} from '../entity/User';
  */
 export async function initMLSConversations(
   conversations: Conversation[],
-  core: Account,
-  onSuccessfulJoin?: (conversation: Conversation) => void,
+  {
+    core,
+    onSuccessfulJoin,
+    onError,
+  }: {
+    core: Account;
+    onSuccessfulJoin?: (conversation: Conversation) => void;
+    onError?: (conversation: Conversation, error: unknown) => void;
+  },
 ): Promise<void> {
   const {mls: mlsService, conversation: conversationService} = core.service || {};
   if (!mlsService || !conversationService) {
@@ -50,15 +57,16 @@ export async function initMLSConversations(
 
   const mlsConversations = conversations.filter(isMLSCapableConversation);
 
-  await Promise.allSettled(
-    mlsConversations.map(async mlsConversation => {
+  for (const mlsConversation of mlsConversations) {
+    try {
       const {groupId, qualifiedId} = mlsConversation;
 
       const doesMLSGroupExist = await conversationService.mlsGroupExistsLocally(groupId);
 
       //if group is already established, we just schedule periodic key material updates
       if (doesMLSGroupExist) {
-        return mlsService.scheduleKeyMaterialRenewal(groupId);
+        await mlsService.scheduleKeyMaterialRenewal(groupId);
+        continue;
       }
 
       //otherwise we should try joining via external commit
@@ -67,8 +75,10 @@ export async function initMLSConversations(
       if (onSuccessfulJoin) {
         return onSuccessfulJoin(mlsConversation);
       }
-    }),
-  );
+    } catch (error) {
+      return onError?.(mlsConversation, error);
+    }
+  }
 }
 
 /**

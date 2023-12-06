@@ -208,7 +208,7 @@ export const downloadBlob = (blob: Blob, filename: string, mimeType?: string): n
   throw new Error('Failed to download blob: Resource not provided');
 };
 
-const downloadFile = (url: string, fileName: string, mimeType?: string): number => {
+export const downloadFile = (url: string, fileName: string, mimeType?: string): number => {
   const anchor = document.createElement('a');
   anchor.download = fileName;
   anchor.href = url;

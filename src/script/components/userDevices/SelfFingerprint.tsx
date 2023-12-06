@@ -26,12 +26,13 @@ import {container} from 'tsyringe';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {t} from 'Util/LocalizerUtil';
+import {splitFingerprint} from 'Util/StringUtil';
 
 import {DeviceCard} from './DeviceCard';
 
 import {ClientState} from '../../client/ClientState';
 import type {CryptographyRepository} from '../../cryptography/CryptographyRepository';
-import {DeviceId} from '../DeviceId';
+import {FormattedId} from '../../page/MainContent/panels/preferences/DevicesPreferences/components/FormattedId';
 
 interface SelfFingerprintProps {
   clientState?: ClientState;
@@ -39,7 +40,7 @@ interface SelfFingerprintProps {
   noPadding: boolean;
 }
 
-const SelfFingerprint: React.FC<SelfFingerprintProps> = ({
+export const SelfFingerprint: React.FC<SelfFingerprintProps> = ({
   cryptographyRepository,
   noPadding,
   clientState = container.resolve(ClientState),
@@ -55,8 +56,9 @@ const SelfFingerprint: React.FC<SelfFingerprintProps> = ({
     <div className={cx('participant-devices__header', {'participant-devices__header--padding': !noPadding})}>
       {currentClient && <DeviceCard device={currentClient} />}
       <div className="participant-devices__fingerprint">
-        <DeviceId deviceId={localFingerprint} />
+        <FormattedId idSlices={splitFingerprint(localFingerprint)} smallPadding />
       </div>
+
       <div>
         <button
           type="button"
@@ -69,5 +71,3 @@ const SelfFingerprint: React.FC<SelfFingerprintProps> = ({
     </div>
   );
 };
-
-export {SelfFingerprint};

@@ -205,7 +205,6 @@ const RightSidebar: FC<RightSidebarProps> = ({
               actionsViewModel={actionsViewModel}
               conversationRepository={conversationRepository}
               integrationRepository={integrationRepository}
-              searchRepository={searchRepository}
               teamRepository={teamRepository}
               teamState={teamState}
               selfUser={selfUser}
@@ -241,6 +240,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
 
           {currentState === PanelState.PARTICIPANT_DEVICES && userEntity && (
             <ParticipantDevices
+              groupId={activeConversation.groupId}
               repositories={repositories}
               onClose={closePanel}
               onGoBack={onBackClick}
@@ -308,8 +308,6 @@ const RightSidebar: FC<RightSidebarProps> = ({
               selfUser={selfUser}
               conversationRepository={conversationRepository}
               messageEntity={messageEntity}
-              teamRepository={teamRepository}
-              searchRepository={searchRepository}
               showReactions={rightSidebar.showReactions}
               userRepository={userRepository}
               onClose={closePanel}

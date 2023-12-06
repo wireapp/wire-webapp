@@ -17,27 +17,33 @@
  *
  */
 
-import React from 'react';
+import React, {ReactNode} from 'react';
 
 import {CSSObject} from '@emotion/react';
 import cx from 'classnames';
 
 import {Availability} from '@wireapp/protocol-messaging';
 
+import {selfIndicator} from 'Components/ParticipantItemContent/ParticipantItem.styles';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {CSS_SQUARE} from 'Util/CSSMixin';
 import {KEY} from 'Util/KeyboardUtil';
 
 import {Icon} from './Icon';
+import {UserName} from './UserName';
+
+import {User} from '../entity/User';
 
 interface AvailabilityStateProps {
-  availability: Availability.Type;
+  user: User;
   className?: string;
   dataUieName: string;
-  label: string;
+  selfString?: string;
   title?: string;
   onClick?: (event: React.MouseEvent | React.KeyboardEvent) => void;
-  showArrow?: boolean;
   theme?: boolean;
+  showAvailability?: boolean;
+  children?: React.ReactNode;
 }
 
 const iconStyles: CSSObject = {
@@ -54,19 +60,35 @@ const buttonCommonStyles: CSSObject = {
   textTransform: 'uppercase',
 };
 
-export const AvailabilityState: React.FC<AvailabilityStateProps> = ({
-  availability,
+const availabilityIconBaseProps = {
+  className: 'availability-state-icon',
+  css: iconStyles,
+  'data-uie-name': 'status-availability-icon',
+};
+const availabilityIconRenderer: Record<Availability.Type, () => ReactNode> = {
+  [Availability.Type.AVAILABLE]: () => (
+    <Icon.AvailabilityAvailable {...availabilityIconBaseProps} data-uie-value="available" />
+  ),
+  [Availability.Type.AWAY]: () => <Icon.AvailabilityAway {...availabilityIconBaseProps} data-uie-value="away" />,
+  [Availability.Type.BUSY]: () => <Icon.AvailabilityBusy {...availabilityIconBaseProps} data-uie-value="busy" />,
+  [Availability.Type.NONE]: () => null,
+};
+
+export const UserInfo: React.FC<AvailabilityStateProps> = ({
+  user,
   className,
   dataUieName,
-  label,
+  selfString,
   title,
-  showArrow = false,
   theme = false,
+  showAvailability,
   onClick,
+  children,
 }) => {
-  const isAvailable = availability === Availability.Type.AVAILABLE;
-  const isAway = availability === Availability.Type.AWAY;
-  const isBusy = availability === Availability.Type.BUSY;
+  const {availability: userAvailability, name} = useKoSubscribableChildren(user, ['availability', 'name']);
+
+  const availability = showAvailability ? userAvailability : Availability.Type.NONE;
+  const renderAvailabilityIcon = availabilityIconRenderer[availability];
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
     const {key} = event;
@@ -87,65 +109,20 @@ export const AvailabilityState: React.FC<AvailabilityStateProps> = ({
 
   const content = (
     <span data-uie-name={dataUieName} css={{alignItems: 'center', display: 'flex', overflow: 'hidden'}}>
-      {isAvailable && (
-        <Icon.AvailabilityAvailable
-          className="availability-state-icon"
-          css={iconStyles}
-          data-uie-name="status-availability-icon"
-          data-uie-value="available"
-        />
-      )}
+      {renderAvailabilityIcon()}
 
-      {isAway && (
-        <Icon.AvailabilityAway
-          className="availability-state-icon"
-          css={iconStyles}
-          data-uie-name="status-availability-icon"
-          data-uie-value="away"
-        />
-      )}
+      <span
+        className={cx('availability-state-label', {'availability-state-label--active': theme})}
+        css={{userSelect: 'none'}}
+        data-uie-name="status-label"
+        title={title || name}
+      >
+        <UserName user={user} />
+      </span>
 
-      {isBusy && (
-        <Icon.AvailabilityBusy
-          className="availability-state-icon"
-          css={iconStyles}
-          data-uie-name="status-availability-icon"
-          data-uie-value="busy"
-        />
-      )}
+      {selfString && <span css={selfIndicator}>{selfString}</span>}
 
-      {label && (
-        <span
-          className={cx('availability-state-label', {'availability-state-label--active': theme})}
-          css={{userSelect: 'none'}}
-          data-uie-name="status-label"
-          title={title || label}
-        >
-          {label}
-        </span>
-      )}
-
-      {showArrow && (
-        <span
-          data-uie-name="availability-arrow"
-          css={{
-            '&::before': {
-              borderLeft: '4px solid transparent',
-              borderRight: '4px solid transparent',
-              borderTop: '4px solid currentColor',
-              content: "''",
-              height: 0,
-              width: 0,
-            },
-            alignItems: 'center',
-            display: 'inline-flex',
-            marginLeft: 4,
-            marginTop: 4,
-            paddingBottom: 4,
-            ...CSS_SQUARE(16),
-          }}
-        />
-      )}
+      {children}
     </span>
   );
 

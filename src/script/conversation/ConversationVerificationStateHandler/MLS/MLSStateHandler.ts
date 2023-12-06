@@ -17,32 +17,27 @@
  *
  */
 
-import {X509Certificate} from '@peculiar/x509';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {WireIdentity} from '@wireapp/core/lib/messagingProtocols/mls';
+import {E2eiConversationState} from '@wireapp/core/lib/messagingProtocols/mls';
 import {container} from 'tsyringe';
 
-import {ClientEntity} from 'src/script/client';
-import {VerificationMessageType} from 'src/script/message/VerificationMessageType';
+import {getConversationVerificationState, getUsersIdentities, MLSStatuses} from 'src/script/E2EIdentity';
+import {E2EIVerificationMessageType} from 'src/script/message/E2EIVerificationMessageType';
 import {Core} from 'src/script/service/CoreSingleton';
 import {Logger, getLogger} from 'Util/Logger';
 
-import {MLSConversation, isMLSConversation} from '../../ConversationSelectors';
+import {isMLSConversation, MLSConversation} from '../../ConversationSelectors';
 import {ConversationState} from '../../ConversationState';
-import {
-  getConversationByGroupId,
-  attemptChangeToDegraded,
-  attemptChangeToVerified,
-  OnConversationVerificationStateChange,
-} from '../shared';
+import {ConversationVerificationState} from '../../ConversationVerificationState';
+import {getConversationByGroupId, OnConversationE2EIVerificationStateChange} from '../shared';
 
-export class MLSConversationVerificationStateHandler {
+class MLSConversationVerificationStateHandler {
   private readonly logger: Logger;
 
   public constructor(
-    private readonly onConversationVerificationStateChange: OnConversationVerificationStateChange,
-    private readonly conversationState = container.resolve(ConversationState),
-    private readonly core = container.resolve(Core),
+    private readonly onConversationVerificationStateChange: OnConversationE2EIVerificationStateChange,
+    private readonly conversationState: ConversationState,
+    private readonly core: Core,
   ) {
     this.logger = getLogger('MLSConversationVerificationStateHandler');
     // We need to check if the core service is available and if the e2eIdentity is available
@@ -51,129 +46,78 @@ export class MLSConversationVerificationStateHandler {
     }
 
     // We hook into the newEpoch event of the MLS service to check if the conversation needs to be verified or degraded
-    this.core.service.mls.on('newEpoch', this.checkEpoch);
+    this.core.service.mls.on('newEpoch', this.checkConversationVerificationState);
   }
 
   /**
    * This function checks if the conversation is verified and if it is, it will degrade it
-   * @param conversationEntity
+   * @param conversation
    * @param userIds
    */
-  private degradeConversation = async (conversationEntity: MLSConversation, userIds: QualifiedId[]) => {
-    this.logger.log(`Conversation ${conversationEntity.name} will be degraded`);
-    const conversationVerificationState = attemptChangeToDegraded({
-      conversationEntity,
-      logger: this.logger,
-    });
-    if (conversationVerificationState) {
-      this.onConversationVerificationStateChange({
-        conversationEntity,
-        conversationVerificationState,
-        verificationMessageType: VerificationMessageType.UNVERIFIED,
-        userIds,
-      });
+  private async degradeConversation(conversation: MLSConversation) {
+    const state = ConversationVerificationState.DEGRADED;
+    conversation.mlsVerificationState(state);
+    const userIdentities = await getUsersIdentities(conversation.groupId, conversation.participating_user_ids());
+    const degradedUsers: QualifiedId[] = [];
+    for (const [userId, identities] of userIdentities.entries()) {
+      if (identities.some(identity => identity.status !== MLSStatuses.VALID)) {
+        degradedUsers.push({id: userId, domain: ''});
+      }
     }
-  };
+
+    this.onConversationVerificationStateChange({
+      conversationEntity: conversation,
+      conversationVerificationState: state,
+      verificationMessageType: E2EIVerificationMessageType.REVOKED,
+      userIds: degradedUsers,
+    });
+  }
 
   /**
    * This function checks if the conversation is degraded and if it is, it will verify it
-   * @param conversationEntity
+   * @param conversation
    * @param userIds
    */
-  private verifyConversation = async (conversationEntity: MLSConversation) => {
-    this.logger.log(`Conversation ${conversationEntity.name} will be verified`);
-
-    const conversationVerificationState = attemptChangeToVerified({conversationEntity, logger: this.logger});
-
-    if (conversationVerificationState) {
-      this.onConversationVerificationStateChange({
-        conversationEntity,
-        conversationVerificationState,
-      });
-    }
-  };
-
-  /**
-   * This function returns the WireIdentity of all userDeviceEntities in a conversation, as long as they have a certificate.
-   * If the conversation has userDeviceEntities without a certificate, it will not be included in the returned array
-   *
-   * It also updates the isMLSVerified observable of all the devices in the conversation
-   */
-  private updateUserDevices = async (conversation: MLSConversation) => {
-    const userEntities = conversation.getAllUserEntities();
-    const allClients: ClientEntity[] = [];
-    const allIdentities: WireIdentity[] = [];
-    userEntities.forEach(async userEntity => {
-      let devices = userEntity.devices();
-      // Add the localClient to the devices array if it is the current user
-      if (userEntity.isMe && userEntity.localClient) {
-        devices = [...devices, userEntity.localClient];
-      }
-      const deviceUserPairs = devices
-        .map(device => ({
-          [device.id]: userEntity.qualifiedId,
-        }))
-        .reduce((acc, current) => {
-          return {...acc, ...current};
-        }, {});
-      const identities = await this.core.service!.e2eIdentity!.getUserDeviceEntities(
-        conversation.groupId,
-        deviceUserPairs,
-      );
-      identities.forEach(async identity => {
-        const verified = await this.isCertificateActiveAndValid(identity.certificate);
-        if (verified) {
-          const device = devices.find(device => device.id === identity.clientId);
-          /**
-           * ToDo: Change the current implementation of isMLSVerified to be stored in Zustand instead of ko.observable
-           */
-          device?.meta.isMLSVerified?.(true);
-          allIdentities.push(identity);
-        }
-      });
-      allClients.push(...devices);
+  private async verifyConversation(conversation: MLSConversation) {
+    const state = ConversationVerificationState.VERIFIED;
+    conversation.mlsVerificationState(state);
+    this.onConversationVerificationStateChange({
+      conversationEntity: conversation,
+      conversationVerificationState: state,
     });
-
-    return {
-      isResultComplete: allClients.length === allIdentities.length,
-      qualifiedIds: userEntities.map(userEntity => userEntity.qualifiedId),
-    };
-  };
-
-  private async isCertificateActiveAndValid(certificateString: string): Promise<boolean> {
-    const cert = new X509Certificate(certificateString);
-    const isValid = await cert.verify();
-    const isActive = cert.notAfter.getTime() > Date.now();
-
-    return isValid && isActive;
   }
 
-  private async checkEpoch({groupId, epoch}: {groupId: string; epoch: number}): Promise<void> {
-    this.logger.log(`Epoch changed to ${epoch} for groupId ${groupId}`);
-    const conversationEntity = getConversationByGroupId({conversationState: this.conversationState, groupId});
-    if (!conversationEntity) {
+  private checkConversationVerificationState = async ({groupId}: {groupId: string}): Promise<void> => {
+    const conversation = getConversationByGroupId({conversationState: this.conversationState, groupId});
+    if (!conversation) {
       this.logger.error(`Epoch changed but conversationEntity can't be found`);
       return;
     }
 
-    if (isMLSConversation(conversationEntity)) {
-      const {isResultComplete, qualifiedIds} = await this.updateUserDevices(conversationEntity);
-
-      // If the number of userDevicePairs is not equal to the number of identities, our Conversation is not secure
-      if (!isResultComplete) {
-        return this.degradeConversation(conversationEntity, qualifiedIds);
-      }
-
-      // If we reach this point, all checks have passed and we can set the conversation to verified
-      return this.verifyConversation(conversationEntity);
+    if (!isMLSConversation(conversation)) {
+      return;
     }
-  }
+
+    const verificationState = await getConversationVerificationState(groupId);
+
+    if (
+      verificationState === E2eiConversationState.Degraded &&
+      conversation.mlsVerificationState() === ConversationVerificationState.VERIFIED
+    ) {
+      return this.degradeConversation(conversation);
+    } else if (
+      verificationState === E2eiConversationState.Verified &&
+      conversation.mlsVerificationState() !== ConversationVerificationState.VERIFIED
+    ) {
+      return this.verifyConversation(conversation);
+    }
+  };
 }
 
 export const registerMLSConversationVerificationStateHandler = (
-  onConversationVerificationStateChange: OnConversationVerificationStateChange,
-  conversationState?: ConversationState,
-  core?: Core,
+  onConversationVerificationStateChange: OnConversationE2EIVerificationStateChange = () => {},
+  conversationState: ConversationState = container.resolve(ConversationState),
+  core: Core = container.resolve(Core),
 ): void => {
   new MLSConversationVerificationStateHandler(onConversationVerificationStateChange, conversationState, core);
 };

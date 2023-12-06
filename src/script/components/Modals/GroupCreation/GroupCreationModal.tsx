@@ -392,129 +392,131 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
             </>
           )}
         </div>
-        {stateIsParticipants && (
-          <SearchInput
-            input={participantsInput}
-            setInput={setParticipantsInput}
-            selectedUsers={selectedContacts}
-            setSelectedUsers={setSelectedContacts}
-            placeholder={t('groupCreationParticipantsPlaceholder')}
-            onEnter={clickOnCreate}
-          />
-        )}
+        <FadingScrollbar className="modal__body">
+          {stateIsParticipants && (
+            <SearchInput
+              input={participantsInput}
+              setInput={setParticipantsInput}
+              selectedUsers={selectedContacts}
+              setSelectedUsers={setSelectedContacts}
+              placeholder={t('groupCreationParticipantsPlaceholder')}
+              onEnter={clickOnCreate}
+            />
+          )}
 
-        {stateIsParticipants && selfUser && (
-          <FadingScrollbar className="group-creation__list">
-            {filteredContacts.length > 0 && (
-              <UserSearchableList
-                selfUser={selfUser}
-                users={filteredContacts}
-                filter={participantsInput}
-                selected={selectedContacts}
-                isSelectable
-                onUpdateSelectedUsers={setSelectedContacts}
-                searchRepository={searchRepository}
-                teamRepository={teamRepository}
-                conversationRepository={conversationRepository}
-                noUnderline
-                allowRemoteSearch
-              />
-            )}
-          </FadingScrollbar>
-        )}
+          {stateIsParticipants && selfUser && (
+            <FadingScrollbar className="group-creation__list">
+              {filteredContacts.length > 0 && (
+                <UserSearchableList
+                  selfUser={selfUser}
+                  users={filteredContacts}
+                  filter={participantsInput}
+                  selected={selectedContacts}
+                  isSelectable
+                  onUpdateSelectedUsers={setSelectedContacts}
+                  searchRepository={searchRepository}
+                  teamRepository={teamRepository}
+                  conversationRepository={conversationRepository}
+                  noUnderline
+                  allowRemoteSearch
+                />
+              )}
+            </FadingScrollbar>
+          )}
 
-        {/* eslint jsx-a11y/no-autofocus : "off" */}
-        {stateIsPreferences && (
-          <>
-            <div className="modal-input-wrapper">
-              <TextInput
-                autoFocus
-                label={t('groupCreationPreferencesPlaceholder')}
-                placeholder={t('groupCreationPreferencesPlaceholder')}
-                uieName="enter-group-name"
-                name="enter-group-name"
-                errorUieName="error-group-name"
-                onCancel={() => setGroupName('')}
-                onChange={onGroupNameChange}
-                onBlur={event => {
-                  const {value} = event.target as HTMLInputElement;
-                  const trimmedName = value.trim();
-                  setGroupName(trimmedName);
-                }}
-                onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
-                  handleEnterDown(event, clickOnNext);
-                }}
-                value={groupName}
-                isError={hasNameError}
-                errorMessage={nameError}
-              />
-            </div>
+          {/* eslint jsx-a11y/no-autofocus : "off" */}
+          {stateIsPreferences && (
+            <>
+              <div className="modal-input-wrapper">
+                <TextInput
+                  autoFocus
+                  label={t('groupCreationPreferencesPlaceholder')}
+                  placeholder={t('groupCreationPreferencesPlaceholder')}
+                  uieName="enter-group-name"
+                  name="enter-group-name"
+                  errorUieName="error-group-name"
+                  onCancel={() => setGroupName('')}
+                  onChange={onGroupNameChange}
+                  onBlur={event => {
+                    const {value} = event.target as HTMLInputElement;
+                    const trimmedName = value.trim();
+                    setGroupName(trimmedName);
+                  }}
+                  onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
+                    handleEnterDown(event, clickOnNext);
+                  }}
+                  value={groupName}
+                  isError={hasNameError}
+                  errorMessage={nameError}
+                />
+              </div>
 
-            {isTeam && (
-              <>
-                <p
-                  className="modal__info"
-                  style={{visibility: hasNameError ? 'hidden' : 'visible'}}
-                  data-uie-name="status-group-size-info"
-                >
-                  {t('groupSizeInfo', maxSize)}
-                </p>
-                <hr className="group-creation__modal__separator" />
-                <BaseToggle
-                  className="modal-style"
-                  isChecked={isGuestEnabled}
-                  setIsChecked={clickOnToggleGuestMode}
-                  extendedInfo
-                  extendedInfoText={t('guestRoomToggleInfoExtended')}
-                  infoText={t('guestRoomToggleInfo')}
-                  toggleName={t('guestOptionsTitle')}
-                  toggleId="guests"
-                />
-                <BaseToggle
-                  className="modal-style"
-                  isChecked={isServicesEnabled}
-                  setIsChecked={clickOnToggleServicesMode}
-                  extendedInfo
-                  extendedInfoText={t('servicesRoomToggleInfoExtended')}
-                  infoText={t('servicesRoomToggleInfo')}
-                  toggleName={t('servicesOptionsTitle')}
-                  toggleId="services"
-                />
-                <InfoToggle
-                  className="modal-style"
-                  dataUieName="read-receipts"
-                  info={t('readReceiptsToggleInfo')}
-                  isChecked={enableReadReceipts}
-                  setIsChecked={setEnableReadReceipts}
-                  isDisabled={false}
-                  name={t('readReceiptsToggleName')}
-                />
-                {enableMLSToggle && (
-                  <>
-                    <Select
-                      id="select-protocol"
-                      onChange={option => {
-                        if (isProtocolOption(option)) {
-                          setSelectedProtocol(option);
-                        }
-                      }}
-                      dataUieName="select-protocol"
-                      options={protocolOptions}
-                      value={selectedProtocol}
-                      label={t('modalCreateGroupProtocolHeading')}
-                      menuPosition="absolute"
-                      wrapperCSS={{marginBottom: 0}}
-                    />
-                    <p className="modal__info" data-uie-name="status-group-protocol-info">
-                      {t('modalCreateGroupProtocolInfo')}
-                    </p>
-                  </>
-                )}
-                <br />
-              </>
-            )}
-          </>
-        )}
+              {isTeam && (
+                <>
+                  <p
+                    className="modal__info"
+                    style={{visibility: hasNameError ? 'hidden' : 'visible'}}
+                    data-uie-name="status-group-size-info"
+                  >
+                    {t('groupSizeInfo', maxSize)}
+                  </p>
+                  <hr className="group-creation__modal__separator" />
+                  <BaseToggle
+                    className="modal-style"
+                    isChecked={isGuestEnabled}
+                    setIsChecked={clickOnToggleGuestMode}
+                    extendedInfo
+                    extendedInfoText={t('guestRoomToggleInfoExtended')}
+                    infoText={t('guestRoomToggleInfo')}
+                    toggleName={t('guestOptionsTitle')}
+                    toggleId="guests"
+                  />
+                  <BaseToggle
+                    className="modal-style"
+                    isChecked={isServicesEnabled}
+                    setIsChecked={clickOnToggleServicesMode}
+                    extendedInfo
+                    extendedInfoText={t('servicesRoomToggleInfoExtended')}
+                    infoText={t('servicesRoomToggleInfo')}
+                    toggleName={t('servicesOptionsTitle')}
+                    toggleId="services"
+                  />
+                  <InfoToggle
+                    className="modal-style"
+                    dataUieName="read-receipts"
+                    info={t('readReceiptsToggleInfo')}
+                    isChecked={enableReadReceipts}
+                    setIsChecked={setEnableReadReceipts}
+                    isDisabled={false}
+                    name={t('readReceiptsToggleName')}
+                  />
+                  {enableMLSToggle && (
+                    <>
+                      <Select
+                        id="select-protocol"
+                        onChange={option => {
+                          if (isProtocolOption(option)) {
+                            setSelectedProtocol(option);
+                          }
+                        }}
+                        dataUieName="select-protocol"
+                        options={protocolOptions}
+                        value={selectedProtocol}
+                        label={t('modalCreateGroupProtocolHeading')}
+                        menuPosition="absolute"
+                        wrapperCSS={{marginBottom: 0}}
+                      />
+                      <p className="modal__info" data-uie-name="status-group-protocol-info">
+                        {t('modalCreateGroupProtocolInfo')}
+                      </p>
+                    </>
+                  )}
+                  <br />
+                </>
+              )}
+            </>
+          )}
+        </FadingScrollbar>
       </ModalComponent>
     </div>
   );

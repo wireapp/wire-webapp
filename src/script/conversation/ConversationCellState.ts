@@ -30,6 +30,7 @@ import type {MemberMessage} from '../entity/message/MemberMessage';
 import type {SystemMessage} from '../entity/message/SystemMessage';
 import type {Text} from '../entity/message/Text';
 import {ConversationError} from '../error/ConversationError';
+import {E2EIVerificationMessageType} from '../message/E2EIVerificationMessageType';
 
 enum ACTIVITY_TYPE {
   CALL = 'ConversationCellState.ACTIVITY_TYPE.CALL',
@@ -334,6 +335,13 @@ const _getStateUnreadMessage = {
         string = t('notificationSharedLocation');
       } else if (messageEntity.hasAssetImage()) {
         string = t('notificationAssetAdd');
+      } else if (messageEntity.isE2EIVerification()) {
+        string =
+          messageEntity.messageType === E2EIVerificationMessageType.VERIFIED
+            ? t('conversation.AllE2EIDevicesVerifiedShort')
+            : t('conversation.E2EIVerificationDegraded');
+      } else if (messageEntity.isVerification()) {
+        string = t('conversation.AllDevicesVerified');
       }
 
       if (!!string) {
@@ -347,7 +355,9 @@ const _getStateUnreadMessage = {
         const stateText: string = hasString
           ? (string as string)
           : getRenderedTextContent((messageEntity.getFirstAsset() as Text).text);
-        return conversationEntity.isGroup() ? `${messageEntity.unsafeSenderName()}: ${stateText}` : stateText;
+        return conversationEntity.isGroup() && !messageEntity.isE2EIVerification()
+          ? `${messageEntity.unsafeSenderName()}: ${stateText}`
+          : stateText;
       }
     }
     return '';
@@ -388,6 +398,7 @@ export const generateCellState = (
     _getStateUnreadMessage,
     _getStateUserName,
   ];
+
   const matchingState = states.find(state => state.match(conversationEntity)) || _getStateDefault;
 
   return {

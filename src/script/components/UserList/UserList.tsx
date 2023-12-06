@@ -130,6 +130,7 @@ export const UserList = ({
       return (
         <li key={user.id}>
           <UserListItem
+            groupId={conversation?.groupId}
             noInteraction={noSelfInteraction && user.isMe}
             user={user}
             noUnderline={isLastItem || noUnderline}

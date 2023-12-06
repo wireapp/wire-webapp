@@ -17,19 +17,21 @@
  *
  */
 
-import React, {useEffect, useMemo, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 
 import cx from 'classnames';
 import type {DexieError} from 'dexie';
 import {container} from 'tsyringe';
 
-import {Icon} from 'Components/Icon';
+import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
+
 import {isMLSConversation} from 'src/script/conversation/ConversationSelectors';
+import {WireIdentity} from 'src/script/E2EIdentity';
+import {MLSDeviceDetails} from 'src/script/page/MainContent/panels/preferences/DevicesPreferences/components/MLSDeviceDetails';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import type {Logger} from 'Util/Logger';
-
-import {DeviceCard} from './DeviceCard';
+import {splitFingerprint} from 'Util/StringUtil';
 
 import type {ClientRepository, ClientEntity} from '../../client';
 import {Config} from '../../Config';
@@ -38,52 +40,54 @@ import type {MessageRepository} from '../../conversation/MessageRepository';
 import type {CryptographyRepository} from '../../cryptography/CryptographyRepository';
 import type {User} from '../../entity/User';
 import {MotionDuration} from '../../motion/MotionDuration';
-import {DeviceId} from '../DeviceId';
+import {FormattedId} from '../../page/MainContent/panels/preferences/DevicesPreferences/components/FormattedId';
 
 interface DeviceDetailsProps {
   clickToShowSelfFingerprint: () => void;
+  getDeviceIdentity?: (deviceId: string) => WireIdentity | undefined;
   clientRepository: ClientRepository;
   conversationState?: ConversationState;
   cryptographyRepository: CryptographyRepository;
   logger: Logger;
   messageRepository: MessageRepository;
   noPadding: boolean;
-  selectedClient: ClientEntity;
+  device: ClientEntity;
   user: User;
 }
 
-const DeviceDetails: React.FC<DeviceDetailsProps> = ({
-  selectedClient,
+export const DeviceDetails = ({
+  device,
   cryptographyRepository,
   user,
+  getDeviceIdentity,
   clickToShowSelfFingerprint,
   clientRepository,
   messageRepository,
   noPadding,
   logger,
   conversationState = container.resolve(ConversationState),
-}) => {
+}: DeviceDetailsProps) => {
   const [fingerprintRemote, setFingerprintRemote] = useState<string>();
   const [isResettingSession, setIsResettingSession] = useState(false);
 
-  const clientMeta = useMemo(() => selectedClient?.meta, [selectedClient]);
+  const clientMeta = useMemo(() => device?.meta, [device]);
 
   const {isVerified} = useKoSubscribableChildren(clientMeta, ['isVerified']);
   const {name: userName} = useKoSubscribableChildren(user, ['name']);
 
   useEffect(() => {
     setFingerprintRemote(undefined);
-    if (selectedClient) {
-      cryptographyRepository
-        .getRemoteFingerprint(user.qualifiedId, selectedClient.id)
+    if (device) {
+      void cryptographyRepository
+        .getRemoteFingerprint(user.qualifiedId, device.id)
         .then(remoteFingerprint => setFingerprintRemote(remoteFingerprint));
     }
-  }, [selectedClient]);
+  }, [device]);
 
   const clickToToggleDeviceVerification = () => {
     const toggleVerified = !isVerified;
     clientRepository
-      .verifyClient(user.qualifiedId, selectedClient, toggleVerified)
+      .verifyClient(user.qualifiedId, device, toggleVerified)
       .catch((error: DexieError) => logger.warn(`Failed to toggle client verification: ${error.message}`));
   };
 
@@ -95,7 +99,7 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
     setIsResettingSession(true);
     if (conversation) {
       messageRepository
-        .resetSession(user.qualifiedId, selectedClient.id, conversation)
+        .resetSession(user.qualifiedId, device.id, conversation)
         .then(_resetProgress)
         .catch(_resetProgress);
     }
@@ -106,74 +110,82 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
 
   return (
     <div className={cx('participant-devices__header', {'participant-devices__header--padding': !noPadding})}>
-      <button
-        type="button"
-        className="button-reset-default participant-devices__link participant-devices__show-self-fingerprint accent-text"
-        onClick={clickToShowSelfFingerprint}
-      >
-        {t('participantDevicesDetailShowMyDevice')}
-      </button>
-      <p
-        className="panel__info-text"
-        dangerouslySetInnerHTML={{
-          __html: user ? t('participantDevicesDetailHeadline', {user: userName}) : '',
-        }}
-      />
-      <a
-        className="participant-devices__link accent-text"
-        href={Config.getConfig().URL.SUPPORT.PRIVACY_VERIFY_FINGERPRINT}
-        rel="nofollow noopener noreferrer"
-        target="_blank"
-      >
-        {t('participantDevicesDetailHowTo')}
-      </a>
-      <div className="participant-devices__single-client">
-        <DeviceCard device={selectedClient} />
-      </div>
-      {fingerprintRemote && (
-        <div className="participant-devices__fingerprint" data-uie-name="status-fingerprint">
-          <DeviceId deviceId={fingerprintRemote} />
-        </div>
-      )}
+      {getDeviceIdentity && <MLSDeviceDetails identity={getDeviceIdentity(device.id)} />}
 
-      <div className="participant-devices__verify">
-        <div className="slider" data-uie-name="do-toggle-verified">
-          <input
-            className="slider-input"
-            type="checkbox"
-            name="toggle"
-            id="toggle"
-            defaultChecked={isVerified}
-            onChange={clickToToggleDeviceVerification}
+      <div className="device-proteus-details">
+        <h3 className="device-details-title paragraph-body-3">{t('participantDevicesProteusDeviceVerification')}</h3>
+
+        <p className="panel__info-text">
+          <span
+            dangerouslySetInnerHTML={{
+              __html: user ? t('participantDevicesDetailHeadline', {user: userName}) : '',
+            }}
           />
 
-          <label className="button-label" htmlFor="toggle">
-            <span className="button-label__switch" />
-            <span className="button-label__text">{t('participantDevicesDetailVerify')}</span>
-          </label>
+          <a
+            className="participant-devices__link accent-text"
+            href={Config.getConfig().URL.SUPPORT.PRIVACY_VERIFY_FINGERPRINT}
+            rel="nofollow noopener noreferrer"
+            target="_blank"
+          >
+            {t('participantDevicesDetailHowTo')}
+          </a>
+        </p>
+
+        {fingerprintRemote && (
+          <>
+            <p className="label-2 preferences-label preferences-devices-fingerprint-label">
+              {t('participantDevicesProteusKeyFingerprint')}
+            </p>
+
+            <div className="participant-devices__fingerprint" data-uie-name="status-fingerprint">
+              <FormattedId idSlices={splitFingerprint(fingerprintRemote)} smallPadding />
+            </div>
+          </>
+        )}
+
+        <p className="label-2 preferences-label preferences-devices-fingerprint-label">
+          {t('preferencesDeviceDetailsVerificationStatus')}
+        </p>
+
+        <div className="participant-devices__verify">
+          <div className="slider" data-uie-name="do-toggle-verified">
+            <input
+              className="slider-input"
+              type="checkbox"
+              name="toggle"
+              id="toggle"
+              checked={isVerified}
+              onChange={clickToToggleDeviceVerification}
+            />
+
+            <label className="button-label" htmlFor="toggle">
+              <span className="button-label__switch" />
+              <span className="button-label__text paragraph-body-3">{t('participantDevicesDetailVerify')}</span>
+            </label>
+          </div>
         </div>
 
-        <div className="participant-devices__actions">
-          <Icon.Loading
-            className="accent-fill"
-            style={{display: isResettingSession ? 'initial' : 'none'}}
-            data-uie-name="status-loading"
-          />
-          {!isConversationMLS && (
-            <button
-              type="button"
-              className="button-reset-default button-label participant-devices__reset-session accent-text ellipsis"
-              onClick={clickToResetSession}
-              style={{display: isResettingSession ? 'none' : 'initial'}}
-              data-uie-name="do-reset-session"
-            >
-              {t('participantDevicesDetailResetSession')}
-            </button>
-          )}
-        </div>
+        <p className="device-details__reset-fingerprint paragraph-body-1">
+          {t('preferencesDeviceDetailsFingerprintNotMatch')}
+        </p>
+
+        {!isConversationMLS && (
+          <Button
+            variant={ButtonVariant.TERTIARY}
+            showLoading={isResettingSession}
+            onClick={clickToResetSession}
+            style={{display: isResettingSession ? 'none' : 'initial'}}
+            data-uie-name={isResettingSession ? 'status-loading' : 'do-reset-session'}
+          >
+            {t('participantDevicesDetailResetSession')}
+          </Button>
+        )}
+
+        <Button variant={ButtonVariant.TERTIARY} onClick={clickToShowSelfFingerprint}>
+          {t('participantDevicesDetailShowMyDevice')}
+        </Button>
       </div>
     </div>
   );
 };
-
-export {DeviceDetails};

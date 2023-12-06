@@ -99,6 +99,7 @@ export function generateConfig(params: ConfigGeneratorParams, env: Env) {
         OAUTH_LEARN_MORE: env.URL_SUPPORT_OAUTH_LEARN_MORE,
         OFFLINE_BACKEND: env.URL_SUPPORT_OFFLINE_BACKEND,
         FEDERATION_STOP: env.URL_SUPPORT_FEDERATION_STOP,
+        E2EI_VERIFICATION: env.URL_SUPPORT_E2EI_VERIFICATION,
       },
       TEAMS_BASE: env.URL_TEAMS_BASE,
       TEAMS_CREATE: env.URL_TEAMS_CREATE,

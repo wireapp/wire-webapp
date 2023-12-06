@@ -50,7 +50,7 @@ export class User {
   public providerId?: string;
   public readonly accent_color: ko.PureComputed<string>;
   public readonly accent_id: ko.Observable<number>;
-  public readonly availability: ko.Observable<Availability.Type>;
+  public readonly availability = ko.observable(Availability.Type.NONE);
   public readonly connection: ko.Observable<ConnectionEntity>;
   /** does not include current client/device */
   public readonly devices: ko.ObservableArray<ClientEntity>;
@@ -66,7 +66,6 @@ export class User {
   // Manual Proteus verification
   public readonly is_verified: ko.PureComputed<boolean>;
   // MLS certificate verification
-  public readonly isMLSVerified: ko.PureComputed<boolean>;
   public readonly isBlocked: ko.PureComputed<boolean>;
   public readonly isCanceled: ko.PureComputed<boolean>;
   public readonly isConnected: ko.PureComputed<boolean>;
@@ -209,16 +208,6 @@ export class User {
       }
       return this.devices().every(client_et => client_et.meta.isVerified?.());
     });
-    this.isMLSVerified = ko.pureComputed(() => {
-      if (this.devices().length === 0) {
-        if (!this.isMe) {
-          return false;
-        }
-
-        return this.localClient?.meta.isMLSVerified?.() ?? false;
-      }
-      return this.devices().every(client_et => client_et.meta.isMLSVerified?.() ?? false);
-    });
     this.isOnLegalHold = ko.pureComputed(() => {
       return this.devices().some(client_et => client_et.isLegalHold());
     });
@@ -229,8 +218,6 @@ export class User {
       read: () => this.isMe && !this.isOnLegalHold() && _hasPendingLegalHold(),
       write: value => _hasPendingLegalHold(value),
     });
-
-    this.availability = ko.observable(Availability.Type.NONE);
 
     this.expirationRemaining = ko.observable(0);
     this.expirationText = ko.observable('');

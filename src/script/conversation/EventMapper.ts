@@ -35,6 +35,7 @@ import {
   ClientConversationEvent,
   FederationStopEvent,
   FailedToAddUsersMessageEvent,
+  E2EIVerificationEvent,
 } from './EventBuilder';
 
 import {AssetRemoteData} from '../assets/AssetRemoteData';
@@ -50,6 +51,7 @@ import {CompositeMessage} from '../entity/message/CompositeMessage';
 import {ContentMessage} from '../entity/message/ContentMessage';
 import {DecryptErrorMessage} from '../entity/message/DecryptErrorMessage';
 import {DeleteMessage} from '../entity/message/DeleteMessage';
+import {E2EIVerificationMessage} from '../entity/message/E2EIVerificationMessage';
 import {FailedToAddUsersMessage} from '../entity/message/FailedToAddUsersMessage';
 import {FederationStopMessage} from '../entity/message/FederationStopMessage';
 import {FileAsset} from '../entity/message/FileAsset';
@@ -361,6 +363,11 @@ export class EventMapper {
 
       case ClientEvent.CONVERSATION.VERIFICATION: {
         messageEntity = this._mapEventVerification(event);
+        break;
+      }
+
+      case ClientEvent.CONVERSATION.E2EI_VERIFICATION: {
+        messageEntity = this._mapEventE2EIVerificationMessage(event);
         break;
       }
 
@@ -757,6 +764,13 @@ export class EventMapper {
     messageEntity.verificationMessageType(eventData.type);
 
     return messageEntity;
+  }
+
+  /**
+   * Maps JSON data of E2E Identity verification message event to message entity.
+   */
+  private _mapEventE2EIVerificationMessage({data: eventData}: E2EIVerificationEvent): MissedMessage {
+    return new E2EIVerificationMessage(eventData.type, eventData.userIds);
   }
 
   /**

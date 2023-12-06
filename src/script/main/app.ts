@@ -57,6 +57,10 @@ import {ConnectionRepository} from '../connection/ConnectionRepository';
 import {ConnectionService} from '../connection/ConnectionService';
 import {ConversationRepository} from '../conversation/ConversationRepository';
 import {ConversationService} from '../conversation/ConversationService';
+import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
+import {registerMLSConversationVerificationStateHandler} from '../conversation/ConversationVerificationStateHandler';
+import {OnConversationE2EIVerificationStateChange} from '../conversation/ConversationVerificationStateHandler/shared';
+import {EventBuilder} from '../conversation/EventBuilder';
 import {MessageRepository} from '../conversation/MessageRepository';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {User} from '../entity/User';
@@ -428,6 +432,7 @@ export class App {
       if (supportsMLS()) {
         //if mls is supported, we need to initialize the callbacks (they are used when decrypting messages)
         conversationRepository.initMLSConversationRecoveredListener();
+        registerMLSConversationVerificationStateHandler(this.updateConversationE2EIVerificationState);
       }
 
       onProgress(25, t('initReceivedUserData'));
@@ -458,10 +463,16 @@ export class App {
           conversations,
           core: this.core,
           onSuccess: conversationRepository.injectJoinedAfterMigrationFinalisationMessage,
+          onError: ({id}, error) =>
+            this.logger.error(`Failed when joining a migrated mls conversation with id ${id}, error: `, error),
         });
 
         //join all the mls groups we're member of and have not yet joined (eg. we were not send welcome message)
-        await initMLSConversations(conversations, this.core);
+        await initMLSConversations(conversations, {
+          core: this.core,
+          onError: ({id}, error) =>
+            this.logger.error(`Failed when initialising mls conversation with id ${id}, error: `, error),
+        });
       }
 
       telemetry.timeStep(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
@@ -798,4 +809,28 @@ export class App {
 
     doRedirect(signOutReason);
   }
+
+  private updateConversationE2EIVerificationState: OnConversationE2EIVerificationStateChange = async ({
+    conversationEntity,
+    conversationVerificationState,
+    verificationMessageType,
+    userIds,
+  }) => {
+    switch (conversationVerificationState) {
+      case ConversationVerificationState.VERIFIED:
+        const allVerifiedEvent = EventBuilder.buildAllE2EIVerified(conversationEntity);
+        await this.repository.event.injectEvent(allVerifiedEvent);
+        break;
+      case ConversationVerificationState.DEGRADED:
+        if (verificationMessageType) {
+          const degradedEvent = EventBuilder.buildE2EIDegraded(conversationEntity, verificationMessageType, userIds);
+          await this.repository.event.injectEvent(degradedEvent);
+        } else {
+          this.logger.error('updateConversationE2EIVerificationState: Missing verificationMessageType while degrading');
+        }
+        break;
+      default:
+        break;
+    }
+  };
 }

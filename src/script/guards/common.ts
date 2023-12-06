@@ -17,32 +17,4 @@
  *
  */
 
-import {FC} from 'react';
-
-import {CSSObject} from '@emotion/react';
-
-import {messageReactionEmoji, reactionImgSize} from './EmojiImg.styles';
-
-export interface EmojiImgProps {
-  emojiUrl: string;
-  emojiName: string;
-  emojiImgSize?: CSSObject;
-  styles?: CSSObject;
-}
-
-const EmojiImg: FC<EmojiImgProps> = ({emojiUrl, styles, emojiName, emojiImgSize = reactionImgSize}) => {
-  return (
-    <>
-      <img
-        alt={emojiName}
-        aria-hidden={true}
-        css={{...emojiImgSize, ...messageReactionEmoji, ...styles}}
-        draggable="false"
-        loading="eager"
-        src={emojiUrl}
-      />
-    </>
-  );
-};
-
-export {EmojiImg};
+export const isObject = (value: unknown): value is {} => typeof value === 'object' && value !== null;
