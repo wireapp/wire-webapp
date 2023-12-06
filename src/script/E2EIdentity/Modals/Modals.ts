@@ -29,6 +29,7 @@ export enum ModalType {
   ERROR = 'error',
   SUCCESS = 'success',
   LOADING = 'loading',
+  CERTIFICATE_RENEWAL = 'certificate_renewal',
 }
 
 interface GetModalOptions {
@@ -67,6 +68,27 @@ export const getModalOptions = ({
         secondaryAction: {
           action: secondaryActionFn,
           text: t('acme.settingsChanged.button.secondary'),
+        },
+        ...hideCloseBtn,
+      };
+      modalType =
+        hideSecondary || secondaryActionFn === undefined ? PrimaryModal.type.ACKNOWLEDGE : PrimaryModal.type.CONFIRM;
+      break;
+
+    case ModalType.CERTIFICATE_RENEWAL:
+      options = {
+        text: {
+          closeBtnLabel: t('acme.renewCertificate.button.close'),
+          htmlMessage: t('acme.renewCertificate.paragraph'),
+          title: t('acme.renewCertificate.headline.alt'),
+        },
+        primaryAction: {
+          action: primaryActionFn,
+          text: t('acme.renewCertificate.button.primary'),
+        },
+        secondaryAction: {
+          action: secondaryActionFn,
+          text: t('acme.renewCertificate.button.secondary'),
         },
         ...hideCloseBtn,
       };
