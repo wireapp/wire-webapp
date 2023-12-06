@@ -27,10 +27,10 @@ jobs:
       COMMITTER: ${{github.event.head_commit.committer.name}}
 
     steps:
-      # - name: Checkout
-      #   uses: actions/checkout@v4
-      #   with:
-      #     fetch-depth: 0
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       #
       # - name: Setup Node.js
       #   uses: actions/setup-node@v4
@@ -38,11 +38,11 @@ jobs:
       #     node-version: 16.x
       #     cache: 'yarn'
       #
-      # - name: Set environment variables
-      #   run: |
-      #     echo "BRANCH_NAME=$(git branch --show-current)" >> $GITHUB_ENV
-      #     echo "TAG=$(git tag --points-at ${{github.sha}})" >> $GITHUB_ENV
-      #     echo "PR_LAST_COMMIT_MESSAGE=$(git log --format=%B -n 1 ${{github.event.after}} | head -n 1)" >> $GITHUB_ENV
+      - name: Set environment variables
+        run: |
+          echo "BRANCH_NAME=$(git branch --show-current)" >> $GITHUB_ENV
+          echo "TAG=$(git tag --points-at ${{github.sha}})" >> $GITHUB_ENV
+          echo "PR_LAST_COMMIT_MESSAGE=$(git log --format=%B -n 1 ${{github.event.after}} | head -n 1)" >> $GITHUB_ENV
       #
       # - name: Set TITLE and BUILD_DESKTOP
       #   env:
