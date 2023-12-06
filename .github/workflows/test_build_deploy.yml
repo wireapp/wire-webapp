@@ -356,18 +356,18 @@ jobs:
   #         echo "PR: ${{ steps.create-pr.outputs.pull-request-url }}"
 
 
-  cleanup_artifacts:
-    permissions:
-      contents: none
-    name: Cleanup artifacts
-    needs: update_helm_chart
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Delete WebApp artifacts
-        uses: geekyeggo/delete-artifact@v2
-        with:
-          failOnError: false
-          name: |
-            webapp-dist
-            release-info.json
+  # cleanup_artifacts:
+  #   permissions:
+  #     contents: none
+  #   name: Cleanup artifacts
+  #   needs: update_helm_chart
+  #   runs-on: ubuntu-latest
+  #
+  #   steps:
+  #     - name: Delete WebApp artifacts
+  #       uses: geekyeggo/delete-artifact@v2
+  #       with:
+  #         failOnError: false
+  #         name: |
+  #           webapp-dist
+  #           release-info.json
