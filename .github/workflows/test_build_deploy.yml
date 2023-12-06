@@ -121,7 +121,7 @@ jobs:
       #   run: yarn build:prod
 
       - name: Assembling release information
-        if: contains(fromJSON( '["stefan"]' ) , env.BRANCH_NAME)
+        if: contains(env.TAG, 'production') || contains(fromJSON( '["master", "dev", "edge", "avs", "mobile", "acc", "stefan"]' ) , env.BRANCH_NAME)
         shell: bash
         run: |
           packageVersion=$(cat ./package.json | jq -r '.version')
