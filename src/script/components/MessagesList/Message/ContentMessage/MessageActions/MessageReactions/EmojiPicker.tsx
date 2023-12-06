@@ -19,13 +19,12 @@
 
 import {useState, useEffect, useRef, FC, RefObject} from 'react';
 
-import EmojiPicker, {EmojiClickData, SkinTones} from 'emoji-picker-react';
+import EmojiPicker, {EmojiClickData, EmojiStyle, SkinTones} from 'emoji-picker-react';
 import {createPortal} from 'react-dom';
 
 import {useClickOutside} from 'src/script/hooks/useClickOutside';
 import {isEnterKey, isEscapeKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
-import {getEmojiUrl} from 'Util/ReactionUtil';
 
 interface EmojiPickerContainerProps {
   posX: number;
@@ -124,9 +123,8 @@ const EmojiPickerContainer: FC<EmojiPickerContainerProps> = ({
             data-uie-name="emoji-picker-dialog"
           >
             <EmojiPicker
+              emojiStyle={EmojiStyle.NATIVE}
               onEmojiClick={onEmojiClick}
-              getEmojiUrl={getEmojiUrl}
-              lazyLoadEmojis={true}
               searchPlaceHolder={t('accessibility.emojiPickerSearchPlaceholder')}
               defaultSkinTone={getSkinTone()}
             />

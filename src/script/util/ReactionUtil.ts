@@ -38,12 +38,6 @@ export function groupByReactionUsers(reactions: Reactions): ReactionsGroupedByUs
 
   return reactionsGroupedByUser;
 }
-
-// Maps to the static server emojis url
-export function getEmojiUrl(unicode: string) {
-  return `/image/emojis/img-apple-64/${unicode}.png`;
-}
-
 /**
  *
  * @param reactionsList This is an array of tuples, each tuple consists of two elements a

@@ -117,7 +117,3 @@ export const getReactionsButtonCSS = (isActive?: boolean, isDisabled?: boolean):
     },
   };
 };
-
-export const actionMenuEmojiSize = {
-  width: '16px',
-};
