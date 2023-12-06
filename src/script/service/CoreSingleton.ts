@@ -73,7 +73,7 @@ export class Core extends Account {
             mls: supportsMLS()
               ? {
                   keyingMaterialUpdateThreshold: Config.getConfig().FEATURE.MLS_CONFIG_KEYING_MATERIAL_UPDATE_THRESHOLD,
-                  defaultCiphersuite: Config.getConfig().FEATURE.MLS_CONFIG_DEFAULT_CIPHERSUITE,
+                  cipherSuite: Config.getConfig().FEATURE.MLS_CONFIG_DEFAULT_CIPHERSUITE,
                   useE2EI: isE2EIEnabled(),
                 }
               : undefined,
