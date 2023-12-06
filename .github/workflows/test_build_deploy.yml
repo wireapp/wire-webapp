@@ -131,10 +131,7 @@ jobs:
       - name: Patch helm chart
         shell: bash
         run: |
-          - name: Hello world
-            shell: bash
-            run: |
-              ls
+          ls
 
       # - name: Storing release information
       #   if: contains(env.TAG, 'production')
