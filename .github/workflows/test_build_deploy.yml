@@ -27,6 +27,11 @@ jobs:
       COMMITTER: ${{github.event.head_commit.committer.name}}
 
     steps:
+      - uses: azure/setup-helm@v3
+        with:
+           version: '3.12.2'
+        id: install
+
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -139,6 +144,8 @@ jobs:
           chart_patched="$(yq -Mr ".version = \"$chart_version\" | .appVersion = \"$image_tag\"" ./charts/webapp/Chart.yaml)"
           echo "$chart_patched" > ./charts/webapp/Chart.yaml
           cat ./charts/webapp/Chart.yaml
+
+          helm version
 
 
       # - name: Storing release information
