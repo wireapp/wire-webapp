@@ -62,6 +62,7 @@ export interface SelfStatusUpdateDatabaseData {
   receipt_mode: number;
   status: number;
   verification_state: ConversationVerificationState;
+  mlsVerificationState: ConversationVerificationState;
 }
 
 type Roles = {[userId: string]: DefaultConversationRoleName | string};
@@ -131,6 +132,7 @@ export class ConversationMapper {
       receipt_mode,
       status,
       verification_state,
+      mlsVerificationState,
     } = selfState;
 
     if (archived_timestamp) {
@@ -177,6 +179,10 @@ export class ConversationMapper {
 
     if (verification_state !== undefined) {
       conversationEntity.verification_state(verification_state);
+    }
+
+    if (mlsVerificationState !== undefined) {
+      conversationEntity.mlsVerificationState(mlsVerificationState);
     }
 
     if (legal_hold_status) {
