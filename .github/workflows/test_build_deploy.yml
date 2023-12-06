@@ -131,7 +131,7 @@ jobs:
       - name: Patch helm chart
         shell: bash
         run: |
-          ls
+          yq --version
 
       # - name: Storing release information
       #   if: contains(env.TAG, 'production')
