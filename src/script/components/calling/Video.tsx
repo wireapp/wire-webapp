@@ -23,12 +23,16 @@ import {VideoHTMLAttributes, useCallback, useEffect, useRef} from 'react';
 import '@mediapipe/selfie_segmentation';
 import '@tensorflow/tfjs-backend-webgl';
 import '@tensorflow/tfjs-core';
-//imports for blur effect
 import * as bodySegmentation from '@tensorflow-models/body-segmentation';
+
+// //imports for blur effect
+// import * as bodySegmentation from '@tensorflow-models/body-segmentation';
+import {useBlur} from './useBlur';
 // Register WebGL backend.
 
-type VideoProps = VideoHTMLAttributes<HTMLVideoElement> & {
+type VideoProps = VideoHTMLAttributes<HTMLVideoElement | HTMLCanvasElement> & {
   srcObject: MediaStream;
+  isBlurred: boolean;
 };
 
 const STATE = {
@@ -47,13 +51,20 @@ const STATE = {
   },
 };
 
-const Video = ({srcObject, ...props}: VideoProps) => {
+const Video = ({srcObject, isBlurred, ...props}: VideoProps) => {
   const refVideo = useRef<HTMLVideoElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const stream = useRef<MediaStream | null>(null);
   const ctx = useRef<CanvasRenderingContext2D | null | undefined>(null);
-  const segmenter = useRef<bodySegmentation.BodySegmenter | null>(null);
+  // const segmenter = useRef<bodySegmentation.BodySegmenter | null>(null);
   const rafId = useRef<number | null>(null);
+  // const model = useRef(bodySegmentation.SupportedModels.MediaPipeSelfieSegmentation);
+  const {init, segmenter, cleanup} = useBlur();
+
+  // const cleanup = () => {
+  //   segmenter.current?.dispose();
+  //   segmenter.current = null;
+  // };
 
   const draw = useCallback(
     (ctx: CanvasRenderingContext2D | null | undefined) => {
@@ -61,36 +72,56 @@ const Video = ({srcObject, ...props}: VideoProps) => {
         canvas!.current!,
         0,
         0,
-        srcObject.getVideoTracks()[0].getSettings().width ?? 400,
-        srcObject.getVideoTracks()[0].getSettings().height ?? 400,
+        srcObject.getVideoTracks()[0]?.getSettings().width ?? 400,
+        srcObject.getVideoTracks()[0]?.getSettings().height ?? 400,
       );
     },
     [srcObject],
   );
 
   useEffect(() => {
+    if (!isBlurred && !canvas.current) {
+      return;
+    }
     ctx.current = canvas?.current?.getContext('2d');
     draw(ctx.current);
     stream.current = canvas?.current?.captureStream() ?? null;
-  }, [draw]);
+  }, [draw, isBlurred]);
 
-  const createSegmenter = useCallback(async () => {
-    const model = bodySegmentation.SupportedModels.MediaPipeSelfieSegmentation;
-    const segmenterConfig: bodySegmentation.MediaPipeSelfieSegmentationMediaPipeModelConfig = {
-      runtime: 'mediapipe',
-      modelType: 'general',
-      solutionPath: '/selfie_segmentation',
-      // or 'base/node_modules/@mediapipe/selfie_segmentation' in npm.
+  // const init = async () => {
+  //   const segmenterConfig: bodySegmentation.MediaPipeSelfieSegmentationMediaPipeModelConfig = {
+  //     runtime: 'mediapipe',
+  //     modelType: 'general',
+  //     solutionPath: '/selfie_segmentation',
+  //     // or 'base/node_modules/@mediapipe/selfie_segmentation' in npm.
+  //   };
+  //   segmenter.current = await bodySegmentation.createSegmenter(model.current, segmenterConfig);
+  // };
+
+  useEffect(() => {
+    // if (segmenter.current === null) {
+    if (refVideo.current) {
+      init().catch(err => {
+        segmenter.current = null;
+        console.error(err);
+      });
+    }
+    // }
+    return () => {
+      //   if (segmenter.current !== null) {
+      //     // segmenter.current?.dispose();
+      //     // segmenter.current = null;
+      cleanup();
     };
-    segmenter.current = await bodySegmentation.createSegmenter(model, segmenterConfig);
-  }, []);
+    // };
+  }, [refVideo.current]);
 
   const segmenterFunc = useCallback(async () => {
     let segmentation = null;
 
     // Segmenter can be null if initialization failed (for example when loading
     // from a URL that does not exist).
-    if (segmenter.current != null) {
+    if (segmenter.current != null && canvas.current != null) {
       try {
         if (segmenter.current.segmentPeople != null && refVideo.current != null) {
           segmentation = await segmenter.current.segmentPeople(refVideo.current, {
@@ -101,8 +132,7 @@ const Video = ({srcObject, ...props}: VideoProps) => {
           });
         }
       } catch (error) {
-        segmenter.current.dispose();
-        segmenter.current = null;
+        cleanup();
       }
 
       const options = STATE.visualization;
@@ -117,8 +147,9 @@ const Video = ({srcObject, ...props}: VideoProps) => {
         );
       }
       draw(ctx.current);
+      stream.current = canvas?.current?.captureStream() ?? null;
     }
-  }, [draw, segmenter]);
+  }, [cleanup, draw, segmenter]);
 
   const renderPrediction = useCallback(async () => {
     await segmenterFunc().catch(console.warn);
@@ -127,23 +158,28 @@ const Video = ({srcObject, ...props}: VideoProps) => {
   }, [segmenterFunc]);
 
   useEffect(() => {
-    if (refVideo.current) {
-      createSegmenter().catch(console.warn);
+    if (refVideo.current && !!isBlurred) {
+      console.log('inside useEffect, refVideo.current, isBlurred', refVideo.current, isBlurred);
+      window.cancelAnimationFrame(rafId?.current ?? 0);
+      cleanup();
+      init().catch(err => {
+        segmenter.current = null;
+        console.warn(err);
+      });
+
       renderPrediction().catch(console.warn);
     }
-  }, [createSegmenter, renderPrediction, segmenterFunc]);
+    return () => {
+      // if (segmenter.current !== null) {
+      // segmenter.current?.dispose();
+      // segmenter.current = null;
+      cleanup();
+      // }
+    };
+  }, [isBlurred, renderPrediction, segmenterFunc, segmenter, init, cleanup]);
 
   // const gl = window.exposedContext;
-  // if (gl)
-  //   gl.readPixels(
-  //     0,
-  //     0,
-  //     1,
-  //     1,
-  //     gl.RGBA,
-  //     gl.UNSIGNED_BYTE,
-  //     new Uint8Array(4)
-  //   );
+  // if (gl) gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(4));
 
   useEffect(() => {
     if (!refVideo.current) {
@@ -163,8 +199,8 @@ const Video = ({srcObject, ...props}: VideoProps) => {
 
   return (
     <>
-      <canvas ref={canvas} />
-      <video ref={refVideo} {...props} css={{visibility: 'hidden'}} />;
+      {!!isBlurred && <canvas ref={canvas} {...props} />}
+      <video ref={refVideo} {...props} css={{visibility: !!isBlurred ? 'hidden' : 'visible'}} />
     </>
   );
 };

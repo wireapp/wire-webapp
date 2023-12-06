@@ -27,10 +27,12 @@ import {matchQualifiedIds} from 'Util/QualifiedId';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
 import {MuteState} from './CallState';
-import type {ClientId, Participant} from './Participant';
+import {ClientId, Participant} from './Participant';
 
 import {Config} from '../Config';
 import type {MediaDevicesHandler} from '../media/MediaDevicesHandler';
+
+import {backgroundBlur} from 'Components/calling/FullscreenVideoCall';
 
 export type SerializedConversationId = string;
 
@@ -47,6 +49,9 @@ export class Call {
   public readonly startedAt: ko.Observable<number | undefined> = ko.observable();
   public readonly state: ko.Observable<CALL_STATE> = ko.observable(CALL_STATE.UNKNOWN);
   public readonly muteState: ko.Observable<MuteState> = ko.observable(MuteState.NOT_MUTED);
+  public readonly blurState: ko.Observable<backgroundBlur> = ko.observable(
+    localStorage.getItem('blurState') === 'true' ? backgroundBlur.isBlurred : backgroundBlur.isNotBlurred,
+  );
   public readonly participants: ko.ObservableArray<Participant>;
   public readonly selfClientId: ClientId;
   public readonly initialType: CALL_TYPE;
@@ -55,7 +60,7 @@ export class Call {
   );
   public readonly isConference: boolean;
   public readonly isGroupOrConference: boolean;
-  public readonly activeSpeakers: ko.ObservableArray<Participant> = ko.observableArray([]);
+  public readonly activeSpeakers: ko.ObservableArray<Participant> = ko.observableArray<Participant>([]);
   public blockMessages: boolean = false;
   public currentPage: ko.Observable<number> = ko.observable(0);
   public pages: ko.ObservableArray<Participant[]> = ko.observableArray();

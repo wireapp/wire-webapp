@@ -1107,10 +1107,17 @@ export class CallingRepository {
     // Don't update video input (coming from A/V preferences) when screensharing is activated
     if (mediaType === MediaType.VIDEO && selfParticipant.sharesCamera() && !selfParticipant.sharesScreen()) {
       const videoTracks = mediaStream.getVideoTracks().map(track => track.clone());
+      const canvasTracks = mediaStream.getTracks().map(track => track.clone());
+      console.log(videoTracks, canvasTracks);
       if (videoTracks.length > 0) {
         const clonedMediaStream = new MediaStream(videoTracks);
-        selfParticipant.setVideoStream(clonedMediaStream, true);
-        this.wCall?.replaceTrack(this.serializeQualifiedId(call.conversationId), videoTracks[0]);
+        const clonedCanvasStream = new MediaStream(canvasTracks);
+        console.log('changeMediaSource', videoTracks, clonedMediaStream, selfParticipant.isBlurred());
+        selfParticipant.setVideoStream(!!selfParticipant.isBlurred() ? clonedCanvasStream : clonedMediaStream, true);
+        this.wCall?.replaceTrack(
+          this.serializeQualifiedId(call.conversationId),
+          !!selfParticipant.isBlurred() ? canvasTracks[0] : videoTracks[0],
+        );
         // Remove the previous video stream
         this.mediaStreamHandler.releaseTracksFromStream(mediaStream);
         return clonedMediaStream;

@@ -22,6 +22,7 @@ import ko from 'knockout';
 
 import {VIDEO_STATE} from '@wireapp/avs';
 
+import {backgroundBlur} from 'Components/calling/FullscreenVideoCall';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import {User} from '../entity/User';
@@ -41,7 +42,7 @@ export class Participant {
   public isActivelySpeaking: ko.Observable<boolean>;
   public isSendingVideo: ko.PureComputed<boolean>;
   public isAudioEstablished: ko.Observable<boolean>;
-
+  public isBlurred: ko.Observable<backgroundBlur>;
   // Audio
   public audioStream: ko.Observable<MediaStream | undefined>;
   public isMuted: ko.Observable<boolean>;
@@ -63,6 +64,9 @@ export class Participant {
     this.hasPausedVideo = ko.pureComputed(() => {
       return this.videoState() === VIDEO_STATE.PAUSED;
     });
+    this.isBlurred = ko.observable(
+      localStorage.getItem('blurState') === 'true' ? backgroundBlur.isBlurred : backgroundBlur.isNotBlurred,
+    );
     this.videoStream = ko.observable();
     this.audioStream = ko.observable();
     this.isActivelySpeaking = ko.observable(false);
@@ -80,6 +84,11 @@ export class Participant {
   setAudioStream(audioStream: MediaStream, stopTracks: boolean): void {
     this.releaseStream(this.audioStream(), stopTracks);
     this.audioStream(audioStream);
+  }
+
+  setBlur(blurState: backgroundBlur): void {
+    this.isBlurred(blurState);
+    localStorage.setItem('blurState', blurState === backgroundBlur.isBlurred ? 'true' : 'false');
   }
 
   setVideoStream(videoStream: MediaStream, stopTracks: boolean): void {

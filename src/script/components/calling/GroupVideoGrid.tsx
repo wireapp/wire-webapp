@@ -161,6 +161,7 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
       {thumbnail.videoStream && !maximizedParticipant && (
         <GroupVideoThumbnailWrapper minimized={minimized}>
           <Video
+            isBlurred={!!selfParticipant.isBlurred()}
             className="group-video__thumbnail-video"
             autoPlay
             playsInline
