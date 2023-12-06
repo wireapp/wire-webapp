@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [43.1.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@43.1.0...@wireapp/core@43.1.1) (2023-12-06)
+
+### Bug Fixes
+
+* Use correct credential type according to e2ei enrollment status ([087336d](https://github.com/wireapp/wire-web-packages/commit/087336dde78551de6c9900810d8fcdfde04386f0))
+
 # [43.1.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@43.0.0...@wireapp/core@43.1.0) (2023-11-30)
 
 ### Features
