@@ -151,6 +151,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
     }
   };
 
+  const emojiSize = 13;
   return (
     <>
       <button
@@ -167,7 +168,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
         onClick={handleMsgActionClick}
         onKeyDown={handleMsgActionKeyDown}
       >
-        <EmojiChar emoji={thumbsUpEmoji} size="medium" />
+        <EmojiChar emoji={thumbsUpEmoji} size={emojiSize} />
       </button>
       <button
         css={{
@@ -183,7 +184,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
         onClick={handleMsgActionClick}
         onKeyDown={handleMsgActionKeyDown}
       >
-        <EmojiChar emoji={likeEmoji} size="medium" />
+        <EmojiChar emoji={likeEmoji} size={emojiSize} />
       </button>
       <button
         css={{

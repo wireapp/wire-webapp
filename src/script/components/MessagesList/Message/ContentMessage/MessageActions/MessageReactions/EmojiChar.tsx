@@ -21,16 +21,14 @@ import {FC} from 'react';
 
 import {CSSObject} from '@emotion/react';
 
-type EmojiSize = 'small' | 'medium';
-
 export interface EmojiImgProps {
   emoji: string;
-  size?: EmojiSize;
+  size?: number;
   styles?: CSSObject;
 }
 
-export const EmojiChar: FC<EmojiImgProps> = ({emoji: unicode, size = 'small', styles}) => {
-  const fontSize = size === 'small' ? '.68rem' : '.81rem';
+export const EmojiChar: FC<EmojiImgProps> = ({emoji: unicode, size, styles}) => {
+  const fontSize = size ? `${size}px` : 'var(--font-size-xsmall)';
   return (
     <span aria-hidden={true} css={{fontSize, ...styles}}>
       {unicode}
