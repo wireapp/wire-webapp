@@ -348,8 +348,6 @@ jobs:
           echo "PR: ${{ steps.create-pr.outputs.pull-request-url }}"
 
   publish_helm_chart:
-    if: contains(env.TAG, 'production') || contains(fromJson( '["master", "dev", "edge", "avs", "mobile", "acc", "stefan"]' ) , env.BRANCH_NAME)
-
     name: Patch Helm chart
     runs-on: ubuntu-latest
 
