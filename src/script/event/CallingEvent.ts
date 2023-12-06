@@ -17,14 +17,15 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
+import type {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
+import type {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {CALL} from './Client';
 
 import {CALL_MESSAGE_TYPE} from '../calling/enum/CallMessageType';
 
 interface CallingRemoteMuteEventContentData {
-  recipients: string[];
+  targets: QualifiedUserClients;
 }
 
 interface CallingEventContentData {
