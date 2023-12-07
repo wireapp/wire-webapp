@@ -135,7 +135,12 @@ jobs:
 
       - name: Patch helm chart
         shell: bash
+        env:
+           AWS_ACCESS_KEY_ID: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_ACCESS_KEY_ID }}
+           AWS_SECRET_ACCESS_KEY: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_SECRET_ACCESS_KEY }}
         run: |
+          set -eo pipefail
+
           image_tag="$(jq -Mr ".imageTag" ./release-info.json)"
 
           base_version=$(yq -Mr '.version' ./charts/webapp/Chart.yaml)
@@ -143,9 +148,16 @@ jobs:
           chart_version="$base_version+$suffix"
           chart_patched="$(yq -Mr ".version = \"$chart_version\" | .appVersion = \"$image_tag\"" ./charts/webapp/Chart.yaml)"
           echo "$chart_patched" > ./charts/webapp/Chart.yaml
-          cat ./charts/webapp/Chart.yaml
+          # cat ./charts/webapp/Chart.yaml
+
+          # package to a a webapp-*.tgz file
+          helm package ./charts/webapp
 
           helm plugin install https://github.com/hypnoglow/helm-s3.git --version 0.15.1
+
+          helm repo add charts-webapp s3://public.wire.com/charts-webapp
+
+          helm s3 push webapp-*.tgz charts-webapp
 
 
       # - name: Storing release information
