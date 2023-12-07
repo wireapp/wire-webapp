@@ -150,7 +150,7 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
                 css={warning}
                 dangerouslySetInnerHTML={{
                   __html: t(`failedToAddParticipantSingular${errorMessageType[message.reason]}`, {
-                    name: users[0].name(),
+                    name: getUserName(users[0]),
                     domain: users[0].domain,
                   }),
                 }}

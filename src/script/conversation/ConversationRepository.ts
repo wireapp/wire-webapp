@@ -2073,13 +2073,19 @@ export class ConversationRepository {
       }
 
       if (isMLSCapableConversation(conversation)) {
-        const {events} = await this.core.service!.conversation.addUsersToMLSConversation({
+        const {failedToAdd, events} = await this.core.service!.conversation.addUsersToMLSConversation({
           conversationId: conversation.qualifiedId,
           groupId: conversation.groupId,
           qualifiedUsers,
         });
         if (!!events.length && isMLSConversation(conversation)) {
           events.forEach(event => this.eventRepository.injectEvent(event));
+        }
+        if (failedToAdd) {
+          await this.eventRepository.injectEvent(
+            EventBuilder.buildFailedToAddUsersEvent(failedToAdd, conversation, this.userState.self().id),
+            EventRepository.SOURCE.INJECTED,
+          );
         }
       }
     } catch (error) {
