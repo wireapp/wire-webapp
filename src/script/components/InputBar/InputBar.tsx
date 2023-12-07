@@ -351,12 +351,15 @@ export const InputBar = ({
   };
 
   const handleSendMessage = () => {
-    const isE2EIVerified = conversation.mlsVerificationState() === ConversationVerificationState.VERIFIED;
+    const isE2EIDegraded = conversation.mlsVerificationState() === ConversationVerificationState.DEGRADED;
 
-    if (isE2EIEnabled() && !isE2EIVerified) {
+    if (isE2EIEnabled() && isE2EIDegraded) {
       PrimaryModal.show(PrimaryModal.type.CONFIRM, {
         primaryAction: {
-          action: () => sendMessage(),
+          action: () => {
+            conversation.mlsVerificationState(ConversationVerificationState.UNVERIFIED);
+            sendMessage();
+          },
           text: t('conversation.E2EISendAnyway'),
         },
         secondaryAction: {

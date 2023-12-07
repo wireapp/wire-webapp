@@ -211,6 +211,8 @@ export class CallingViewModel {
       PrimaryModal.show(PrimaryModal.type.CONFIRM, {
         primaryAction: {
           action: async () => {
+            conversationEntity.mlsVerificationState(ConversationVerificationState.UNVERIFIED);
+
             if (memberCount > MAX_USERS_TO_CALL_WITHOUT_CONFIRM) {
               showMaxUsersToCallModalWithoutConfirm(conversationEntity, callType);
             } else {
@@ -253,9 +255,9 @@ export class CallingViewModel {
 
     const handleCallAction = async (conversationEntity: Conversation, callType: CALL_TYPE): Promise<void> => {
       const memberCount = conversationEntity.participating_user_ets().length;
-      const isE2EIVerified = conversationEntity.mlsVerificationState() === ConversationVerificationState.VERIFIED;
+      const isE2EIDegraded = conversationEntity.mlsVerificationState() === ConversationVerificationState.DEGRADED;
 
-      if (isE2EIEnabled() && !isE2EIVerified) {
+      if (isE2EIEnabled() && isE2EIDegraded) {
         showE2EICallModal(conversationEntity, callType);
       } else if (memberCount > MAX_USERS_TO_CALL_WITHOUT_CONFIRM) {
         showMaxUsersToCallModalWithoutConfirm(conversationEntity, callType);
