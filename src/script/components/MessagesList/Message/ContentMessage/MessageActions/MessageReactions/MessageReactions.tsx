@@ -151,7 +151,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
     }
   };
 
-  const emojiSize = 13;
+  const emojiSize = 15;
   return (
     <>
       <button
