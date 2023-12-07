@@ -792,6 +792,36 @@ describe('ConversationRepository', () => {
     });
   });
 
+  describe('mapConnections', () => {
+    it("maps a connection to connection request placeholder for 1:1 conversation when there's an outgoing connection request", async () => {
+      const conversationRepository = testFactory.conversation_repository!;
+      const userRepository = testFactory.user_repository!;
+
+      const otherUserId = {id: 'f718410c-3833-479d-bd80-a5df03f38414', domain: 'test-domain'};
+      const otherUser = new User(otherUserId.id, otherUserId.domain);
+      otherUser.supportedProtocols([ConversationProtocol.PROTEUS]);
+      userRepository['userState'].users.push(otherUser);
+
+      const selfUserId = {id: '109da9ca-a495-47a8-ac70-9ffbe924b2d0', domain: 'test-domain'};
+      const selfUser = new User(selfUserId.id, selfUserId.domain);
+      selfUser.supportedProtocols([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]);
+      jest.spyOn(conversationRepository['userState'], 'self').mockReturnValue(selfUser);
+
+      const conversation = _generateConversation({type: CONVERSATION_TYPE.ONE_TO_ONE});
+      conversationRepository['conversationState'].conversations.push(conversation);
+
+      const connection = new ConnectionEntity();
+      connection.status(ConnectionStatus.SENT);
+      connection.conversationId = conversation.qualifiedId;
+      otherUser.connection(connection);
+
+      jest.spyOn(conversationRepository['conversationService'], 'removeConversationFromBlacklist');
+
+      await conversationRepository.init1To1Conversations([connection], [conversation]);
+      expect(conversation.type()).toEqual(CONVERSATION_TYPE.CONNECT);
+    });
+  });
+
   describe('getGroupsByName', () => {
     beforeEach(() => {
       const group_a = _generateConversation();
