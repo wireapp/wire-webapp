@@ -322,6 +322,41 @@ jobs:
       #     name: webapp-dist
       #     path: ./server/dist
 
+  # TODO: loop here over all target branches
+  upade_wire_build:
+    name: Update Helm chart
+    runs-on: ubuntu-latest
+
+     # needs: test_build_deploy
+    steps:
+      - name: Check out wire-builds
+        uses: actions/checkout@v4
+        with:
+          repository: 'wireapp/wire-builds'
+          fetch-depth: 1
+
+      - name: Bump version in ./build.json
+        # TODO: loop over all target branches (depending on own branch) using "matrix"
+        shell: bash
+        run: |
+          git fetch --depth 1 origin main
+          git checkout -b tmp origin/main
+          build_json=$(jq -Mr '.helmCharts.webapp.version = "1.1.1"' ./build.json)
+          echo "$build_json" > ./build.json
+
+      - name: Create pull-request to wire-builds
+        id: create-pr
+        uses: peter-evans/create-pull-request@v5
+        with:
+          draft: false
+          token: ${{ secrets.ZEBOT_GH_TOKEN }}
+          author: 'Zebot <zebot@users.noreply.github.com>'
+          branch: webapp-bump-${{ github.run_number }}
+          commit-message: 'Bump webapp chart to 1.1.1'
+          title: 'Bump webapp chart to 1.1.1'
+          body: |
+            Bump webapp chart to 1.1.1
+
 
   # update_helm_chart:
   #   name: Update Helm chart
