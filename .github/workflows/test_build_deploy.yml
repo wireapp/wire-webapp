@@ -333,6 +333,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: wireapp/wire-builds
+          token: ${{secrets.OTTO_THE_BOT_GH_TOKEN}}
           ref: main
           fetch-depth: 1
 
