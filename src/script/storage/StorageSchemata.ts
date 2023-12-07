@@ -427,6 +427,11 @@ export class StorageSchemata {
             }),
         version: 20,
       },
+      {
+        // This version enables DB encryption at rest
+        schema: {},
+        version: 21,
+      },
     ];
   }
 }
