@@ -28,7 +28,7 @@ export interface EmojiImgProps {
 }
 
 export const EmojiChar: FC<EmojiImgProps> = ({emoji: unicode, size, styles}) => {
-  const fontSize = size ? `${size}px` : 'var(--font-size-xsmall)';
+  const fontSize = size ? `${size}px` : 'var(--font-size-medium)';
   return (
     <span aria-hidden={true} css={{fontSize, ...styles}}>
       {unicode}
