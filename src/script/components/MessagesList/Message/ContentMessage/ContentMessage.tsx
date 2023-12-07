@@ -203,18 +203,20 @@ export const ContentMessageComponent: React.FC<ContentMessageProps> = ({
             />
           )}
         </div>
-        <div className={cx('message-actions-wrapper', {visible: isActionMenuVisible})}>
-          <MessageActionsMenu
-            isMsgWithHeader={shouldShowAvatar()}
-            message={message}
-            handleActionMenuVisibility={setActionMenuVisibility}
-            contextMenu={contextMenu}
-            isMessageFocused={msgFocusState}
-            handleReactionClick={onClickReaction}
-            reactionsTotalCount={reactions.length}
-            isRemovedFromConversation={conversation.removed_from_conversation()}
-          />
-        </div>
+        {!isConversationReadonly && (
+          <div className={cx('message-actions-wrapper', {visible: isActionMenuVisible})}>
+            <MessageActionsMenu
+              isMsgWithHeader={shouldShowAvatar()}
+              message={message}
+              handleActionMenuVisibility={setActionMenuVisibility}
+              contextMenu={contextMenu}
+              isMessageFocused={msgFocusState}
+              handleReactionClick={onClickReaction}
+              reactionsTotalCount={reactions.length}
+              isRemovedFromConversation={conversation.removed_from_conversation()}
+            />
+          </div>
+        )}
 
         <div className="message-body-actions">
           <ReadReceiptStatus

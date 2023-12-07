@@ -127,7 +127,7 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
       } else if (selectedMsgActionName) {
         setCurrentMsgAction(selectedMsgActionName);
         openMenu(message.id);
-        showContextMenu(event, menuEntries, 'message-options-menu', resetActionMenuStates);
+        showContextMenu(event, menuEntries, 'message-options-menu');
       }
     },
     [currentMsgActionName, closeMenu, openMenu, menuEntries],
