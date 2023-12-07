@@ -375,7 +375,11 @@ export class ConversationService extends TypedEventEmitter<Events> {
     const {coreCryptoKeyPackagesPayload, failedToFetchKeyPackages} =
       await this.mlsService.getKeyPackagesPayload(qualifiedUsers);
 
-    const response = await this.mlsService.addUsersToExistingConversation(groupId, coreCryptoKeyPackagesPayload);
+    const response =
+      coreCryptoKeyPackagesPayload.length > 0
+        ? await this.mlsService.addUsersToExistingConversation(groupId, coreCryptoKeyPackagesPayload)
+        : {events: []};
+
     const conversation = await this.getConversation(conversationId);
 
     //We store the info when user was added (and key material was created), so we will know when to renew it
