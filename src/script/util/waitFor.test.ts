@@ -20,6 +20,10 @@
 import {waitFor} from './waitFor';
 
 describe('waitFor', () => {
+  beforeAll(() => {
+    jest.useFakeTimers();
+  });
+
   it('should resolve if condition is true', async () => {
     const condition = jest.fn().mockReturnValue(true);
 
@@ -32,16 +36,20 @@ describe('waitFor', () => {
     const condition = jest.fn().mockReturnValue(false);
     setTimeout(() => condition.mockReturnValue('hello'), 100);
 
-    const result = await waitFor(condition);
+    const promise = waitFor(condition, 200, 50);
+    jest.advanceTimersByTime(101);
 
+    const result = await promise;
     expect(result).toBe('hello');
   });
 
   it('should resolve with undefined if condition is never true', async () => {
     const condition = jest.fn().mockReturnValue(false);
 
-    const result = await waitFor(condition, 50, 50);
+    const promise = waitFor(condition, 50, 50);
+    jest.runAllTimers();
 
+    const result = await promise;
     expect(result).toBe(undefined);
   });
 });
