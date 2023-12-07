@@ -25,6 +25,7 @@ import {container} from 'tsyringe';
 import {Button, ButtonVariant, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
 import {Icon} from 'Components/Icon';
+import {getUserName} from 'Components/UserName';
 import {Config} from 'src/script/Config';
 import {User} from 'src/script/entity/User';
 import {UserState} from 'src/script/user/UserState';
@@ -61,7 +62,9 @@ const MessageDetails = ({users, children, reason, domains}: MessageDetailsProps)
   const baseTranslationKey =
     users.length === 1 ? 'failedToAddParticipantsSingularDetails' : 'failedToAddParticipantsPluralDetails';
 
-  const domainStr = domains.join(', ');
+  const uniqueDomains = Array.from(new Set(domains));
+
+  const domainStr = uniqueDomains.join(', ');
 
   return (
     <p
@@ -73,10 +76,10 @@ const MessageDetails = ({users, children, reason, domains}: MessageDetailsProps)
         css={warning}
         dangerouslySetInnerHTML={{
           __html: t(`${baseTranslationKey}${errorMessageType[reason]}`, {
-            name: users[0].name(),
+            name: getUserName(users[0]),
             names: users
               .slice(1)
-              .map(user => user.name())
+              .map(user => getUserName(user))
               .join(', '),
             domain: domainStr,
           }),
@@ -174,7 +177,7 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
       </div>
       <div className="message-body" css={{flexDirection: 'column'}}>
         {isOpen && (
-          <MessageDetails users={users} reason={message.reason} domains={message.backends}>
+          <MessageDetails users={users} reason={message.reason} domains={users.map(user => user.domain)}>
             {learnMore}
           </MessageDetails>
         )}
