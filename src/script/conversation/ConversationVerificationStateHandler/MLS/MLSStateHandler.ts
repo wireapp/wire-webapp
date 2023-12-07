@@ -90,7 +90,7 @@ class MLSConversationVerificationStateHandler {
   private checkConversationVerificationState = async ({groupId}: {groupId: string}): Promise<void> => {
     const conversation = getConversationByGroupId({conversationState: this.conversationState, groupId});
     if (!conversation) {
-      this.logger.error(`Epoch changed but conversationEntity can't be found`);
+      this.logger.warn(`Epoch changed but conversationEntity can't be found`);
       return;
     }
 
