@@ -206,25 +206,23 @@ export class CallingRepository {
         return;
       }
 
-      activeConversation.mlsVerificationState.subscribe(conversationVerificationState => {
-        const isDegraded = conversationVerificationState === ConversationVerificationState.DEGRADED;
+      const isDegraded = activeConversation.mlsVerificationState() === ConversationVerificationState.DEGRADED;
 
-        if (isDegraded) {
-          this.abortCall(activeConversation.qualifiedId, LEAVE_CALL_REASON.CONVERSATION_DEGRADED);
+      if (isDegraded) {
+        this.abortCall(activeConversation.qualifiedId, LEAVE_CALL_REASON.CONVERSATION_DEGRADED);
 
-          const modalOptions = {
-            primaryAction: {
-              text: t('conversation.E2EIOk'),
-            },
-            text: {
-              message: t('conversation.E2EIGroupCallDisconnected'),
-              title: t('conversation.E2EIConversationNoLongerVerified'),
-            },
-          };
+        const modalOptions = {
+          primaryAction: {
+            text: t('conversation.E2EIOk'),
+          },
+          text: {
+            message: t('conversation.E2EIGroupCallDisconnected'),
+            title: t('conversation.E2EIConversationNoLongerVerified'),
+          },
+        };
 
-          PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, modalOptions, `degraded-${call.conversationId}`);
-        }
-      });
+        PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, modalOptions, `degraded-${call.conversationId}`);
+      }
     });
 
     this.acceptVersionWarning = (conversationId: QualifiedId) => {
