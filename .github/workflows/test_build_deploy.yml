@@ -141,8 +141,11 @@ jobs:
         run: |
           set -eo pipefail
 
-          echo "AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID"
           echo "AWS_ACCESS_KEY_ID length: ${#AWS_ACCESS_KEY_ID}"
+          echo "AWS_SECRET_ACCESS_KEY length: ${#AWS_SECRET_ACCESS_KEY}"
+
+          sha256sum <<<$AWS_ACCESS_KEY_ID
+          sha256sum <<<$AWS_SECRET_ACCESS_KEY
 
           echo "listing charts-webapp"
           aws s3 ls s3://public.wire.com/charts-webapp/
