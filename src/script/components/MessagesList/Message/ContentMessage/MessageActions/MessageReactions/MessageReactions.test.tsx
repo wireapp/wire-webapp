@@ -22,6 +22,7 @@ import React from 'react';
 import {render, act, fireEvent, waitFor} from '@testing-library/react';
 
 import {t} from 'Util/LocalizerUtil';
+import {createUuid} from 'Util/uuid';
 
 import {MessageReactions, MessageReactionsProps} from './MessageReactions';
 
@@ -31,6 +32,7 @@ const thumbsUpEmoji = '👍';
 const likeEmoji = '❤️';
 const wrapperRef = React.createRef<HTMLDivElement>();
 const defaultProps: MessageReactionsProps = {
+  messageId: createUuid(),
   handleReactionClick: jest.fn(),
   messageFocusedTabIndex: 0,
   currentMsgActionName: '',

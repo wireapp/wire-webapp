@@ -35,6 +35,7 @@ const likeEmoji = '❤️';
 const INITIAL_CLIENT_X_POS = 0;
 const INITIAL_CLIENT_Y_POS = 0;
 export interface MessageReactionsProps {
+  messageId: string;
   messageFocusedTabIndex: number;
   currentMsgActionName: string;
   toggleActiveMenu: (event: React.MouseEvent<HTMLButtonElement> | React.KeyboardEvent<HTMLButtonElement>) => void;
@@ -46,6 +47,7 @@ export interface MessageReactionsProps {
 }
 
 const MessageReactions: FC<MessageReactionsProps> = ({
+  messageId,
   messageFocusedTabIndex,
   currentMsgActionName,
   handleCurrentMsgAction,
@@ -82,7 +84,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
     const isActive = !!actionName;
     handleCurrentMsgAction(actionName);
     if (isActive) {
-      openMenu(message.id);
+      openMenu(messageId);
     } else {
       closeMenu();
     }

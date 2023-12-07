@@ -173,6 +173,7 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
         {isMsgReactable && (
           <>
             <MessageReactions
+              messageId={message.id}
               messageFocusedTabIndex={messageFocusedTabIndex}
               currentMsgActionName={currentMsgActionName}
               handleCurrentMsgAction={setCurrentMsgAction}

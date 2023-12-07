@@ -119,6 +119,7 @@ const DetailViewModalFooter: FC<DetailViewModalFooterProps> = ({
       {isMsgReactable && !isRemovedFromConversation && (
         <div ref={wrapperRef} style={{display: 'flex'}}>
           <MessageReactions
+            messageId={messageEntity.id}
             messageFocusedTabIndex={TabIndex.FOCUSABLE}
             currentMsgActionName={currentMsgActionName}
             handleCurrentMsgAction={setCurrentMsgAction}
