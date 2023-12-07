@@ -169,7 +169,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
     [handleEmojiKeyDown, handleKeyDown],
   );
 
-  const emojiSize = 13;
+  const emojiSize = 15;
   return (
     <>
       <button
