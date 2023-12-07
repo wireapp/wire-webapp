@@ -23,7 +23,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {E2EIHandler, getUsersIdentities, isE2EIEnabled, MLSStatuses, WireIdentity} from '../E2EIdentity';
 
-export const useUserIdentity = (userId: QualifiedId, groupId?: string) => {
+export const useUserIdentity = (userId: QualifiedId, groupId?: string, updateAfterEnrollment?: boolean) => {
   const [deviceIdentities, setDeviceIdentities] = useState<WireIdentity[] | undefined>();
 
   const refreshDeviceIdentities = useCallback(async () => {
@@ -39,11 +39,14 @@ export const useUserIdentity = (userId: QualifiedId, groupId?: string) => {
   }, [refreshDeviceIdentities]);
 
   useEffect(() => {
+    if (!updateAfterEnrollment) {
+      return () => {};
+    }
     E2EIHandler.getInstance().on('enrollmentSuccessful', refreshDeviceIdentities);
     return () => {
       E2EIHandler.getInstance().off('enrollmentSuccessful', refreshDeviceIdentities);
     };
-  });
+  }, [refreshDeviceIdentities, updateAfterEnrollment]);
 
   return {
     deviceIdentities,

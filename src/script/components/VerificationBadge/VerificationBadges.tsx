@@ -74,8 +74,16 @@ const useConversationVerificationState = (conversation: Conversation) => {
   return {MLS: mlsState, proteus: proteusVerificationState};
 };
 
-export const UserVerificationBadges = ({user, groupId}: {user: User; groupId?: string}) => {
-  const {status: MLSStatus} = useUserIdentity(user.qualifiedId, groupId);
+export const UserVerificationBadges = ({
+  user,
+  groupId,
+  isSelfUser,
+}: {
+  user: User;
+  groupId?: string;
+  isSelfUser?: boolean;
+}) => {
+  const {status: MLSStatus} = useUserIdentity(user.qualifiedId, groupId, isSelfUser);
   const {is_verified: isProteusVerified} = useKoSubscribableChildren(user, ['is_verified']);
 
   return <VerificationBadges context="user" isProteusVerified={isProteusVerified} MLSStatus={MLSStatus} />;
