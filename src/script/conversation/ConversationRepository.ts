@@ -1732,7 +1732,9 @@ export class ConversationRepository {
 
     // For connection request, we simply display proteus conversation of type 3 (connect) it will be displayed as a connection request
     if (connectionEntity.isOutgoingRequest()) {
-      return localProteusConversation || this.fetchConversationById(proteusConversationId);
+      const proteusConversation = localProteusConversation || (await this.fetchConversationById(proteusConversationId));
+      proteusConversation.type(CONVERSATION_TYPE.CONNECT);
+      return proteusConversation;
     }
 
     const isConnectionAccepted = connectionEntity.isConnected();
