@@ -23,10 +23,9 @@ import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import {EmojiImg} from './EmojiImg';
-import {reactionImgSize} from './EmojiImg.styles';
+import {EmojiChar} from './EmojiChar';
+import {reactionImgSize} from './EmojiChar.styles';
 import {EmojiPickerContainer} from './EmojiPicker';
-import {actionMenuEmojiSize} from './MessageReactions.styles';
 
 import {MessageActionsId} from '../MessageActions';
 import {useMessageActionsState} from '../MessageActions.state';
@@ -34,8 +33,6 @@ import {messageActionsMenuButton, getActionsMenuCSS, getIconCSS} from '../Messag
 
 const thumbsUpEmoji = '👍';
 const likeEmoji = '❤️';
-const thumbsUpEmojiUrl = '/image/emojis/img-apple-64/1f44d.png';
-const likeEmojiUrl = '/image/emojis/img-apple-64/2764-fe0f.png';
 const INITIAL_CLIENT_X_POS = 0;
 const INITIAL_CLIENT_Y_POS = 0;
 export interface MessageReactionsProps {
@@ -172,6 +169,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
     [handleEmojiKeyDown, handleKeyDown],
   );
 
+  const emojiSize = 15;
   return (
     <>
       <button
@@ -188,11 +186,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
         onClick={handleMsgActionClick}
         onKeyDown={handleMsgActionKeyDown}
       >
-        <EmojiImg
-          emojiUrl={thumbsUpEmojiUrl}
-          emojiName={t('accessibility.messageActionsMenuThumbsUp')}
-          emojiImgSize={actionMenuEmojiSize}
-        />
+        <EmojiChar emoji={thumbsUpEmoji} size={emojiSize} />
       </button>
       <button
         css={{
@@ -208,11 +202,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
         onClick={handleMsgActionClick}
         onKeyDown={handleMsgActionKeyDown}
       >
-        <EmojiImg
-          emojiUrl={likeEmojiUrl}
-          emojiName={t('accessibility.messageActionsMenuLike')}
-          emojiImgSize={actionMenuEmojiSize}
-        />
+        <EmojiChar emoji={likeEmoji} size={emojiSize} />
       </button>
       <button
         css={{

@@ -27,7 +27,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Icon} from 'Components/Icon';
-import {EmojiImg} from 'Components/MessagesList/Message/ContentMessage/MessageActions/MessageReactions/EmojiImg';
+import {EmojiChar} from 'Components/MessagesList/Message/ContentMessage/MessageActions/MessageReactions/EmojiChar';
 import {
   messageReactionDetailsMargin,
   reactionsCountAlignment,
@@ -36,7 +36,7 @@ import {UserSearchableList} from 'Components/UserSearchableList';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getEmojiTitleFromEmojiUnicode, getEmojiUnicode} from 'Util/EmojiUtil';
 import {t} from 'Util/LocalizerUtil';
-import {getEmojiUrl, groupByReactionUsers} from 'Util/ReactionUtil';
+import {groupByReactionUsers} from 'Util/ReactionUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 import {formatLocale} from 'Util/TimeUtil';
 
@@ -279,14 +279,13 @@ const MessageDetails: FC<MessageDetailsProps> = ({
           Array.from(reactionUsers).map(reactions => {
             const [reactionKey, users] = reactions;
             const emojiUnicode = getEmojiUnicode(reactionKey);
-            const emojiUrl = getEmojiUrl(emojiUnicode);
             const emojiName = getEmojiTitleFromEmojiUnicode(emojiUnicode);
             const capitalizedEmojiName = capitalizeFirstChar(emojiName);
             const emojiCount = users.length;
             return (
               <Fragment key={reactionKey}>
                 <div css={panelContentTitleStyles} className="font-weight-bold">
-                  <EmojiImg emojiUrl={emojiUrl} emojiName={emojiName} styles={messageReactionDetailsMargin} />
+                  <EmojiChar emoji={reactionKey} styles={messageReactionDetailsMargin} />
                   <span css={messageReactionDetailsMargin}>{capitalizedEmojiName}</span>
                   <span css={reactionsCountAlignment}>({emojiCount})</span>
                 </div>
