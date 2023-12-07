@@ -324,7 +324,7 @@ jobs:
 
   # TODO: loop here over all target branches
   upade_wire_build:
-    name: Update Helm chart
+    name: Create PR to wire-builds
     runs-on: ubuntu-latest
 
      # needs: test_build_deploy
@@ -332,7 +332,8 @@ jobs:
       - name: Check out wire-builds
         uses: actions/checkout@v4
         with:
-          repository: 'wireapp/wire-builds'
+          repository: wireapp/wire-builds
+          ref: main
           fetch-depth: 1
 
       - name: Bump version in ./build.json
