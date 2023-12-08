@@ -5,6 +5,17 @@
 # in the helm repo named 'charts-webapp'
 #
 # Prints also some debugging information on stderr
+#
+# Example:
+#
+# When version of charts/webapp/Chart.yaml is "0.0.43"
+# and a helm chart of with version 0.0.44-pre1 is already published
+#
+# version_src: 0.0.43
+# version_next: 0.0.44
+# version_last_prerelease: 0.0.44-pre1
+# version_next_prerelease: 0.0.44-pre2
+#
 
 set -eo pipefail
 
