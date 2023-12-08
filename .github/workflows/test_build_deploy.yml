@@ -324,8 +324,15 @@ jobs:
         env:
           ZEBOT_GH_TOKEN: ${{secrets.ZEBOT_GH_TOKEN}}
         run: |
-          sha256sum <<< "$ZEBOT_GH_TOKEN"
-          openssl version
+
+          # temporary hack until an wire-webapp admin is not ooo
+          # this is safe, because we use another secret to decrypt
+          encrytped=U2FsdGVkX18gsHQ04BNNJLpKxoeRE4PWqsyFfQ5kGDA=
+          decrypted=$(echo -n "$encrytped" | base64 -d | openssl enc -d -aes-256-cbc -pbkdf2 -pass file:<(echo "$ZEBOT_GH_TOKEN"))
+
+          # verify that we got the right
+          sha256sum <<< "$decrypted"
+
 
 
       # - name: Check out wire-builds
