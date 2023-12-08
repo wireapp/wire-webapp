@@ -103,33 +103,32 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
   public initialize({discoveryUrl, gracePeriodInSeconds}: E2EIHandlerParams) {
     if (!isE2EIEnabled()) {
-      return;
+      return this;
     }
-
+    const gracePeriodInMs = gracePeriodInSeconds * TIME_IN_MILLIS.SECOND;
+    this.config = {
+      discoveryUrl,
+      gracePeriodInMs,
+      timer: DelayTimerService.getInstance({
+        gracePeriodInMS: gracePeriodInMs,
+        gracePeriodExpiredCallback: () => null,
+        delayPeriodExpiredCallback: () => null,
+      }),
+    };
     if (!hasActiveCertificate()) {
-      const gracePeriodInMs = gracePeriodInSeconds * TIME_IN_MILLIS.SECOND;
-      this.config = {
-        discoveryUrl,
-        gracePeriodInMs,
-        timer: DelayTimerService.getInstance({
-          gracePeriodInMS: gracePeriodInMs,
-          gracePeriodExpiredCallback: () => null,
-          delayPeriodExpiredCallback: () => null,
-        }),
-      };
       this.showE2EINotificationMessage();
     } else {
       const certificate = this.getCurrentDeviceCertificateData();
 
       if (!certificate) {
-        return;
+        return this;
       }
 
       const {isValid, timeRemainingMS, certificateCreationTime} = getCertificateDetails(certificate);
 
       // CC will soon return valid/expired/revoked
       if (!isValid) {
-        return;
+        return this;
       }
 
       const renewalTimeMS = this.calculateRenewalTime(timeRemainingMS, historyTimeMS, gracePeriodMS);
@@ -147,8 +146,6 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
    * Renew the certificate without user action
    */
   private async renewCertificate(): Promise<void> {
-    // const refreshToken = OIDCServiceStore.get.refreshToken();
-
     const oidcService = getOIDCServiceInstance();
     try {
       // Use the oidc service to get the user data via silent authentication (refresh token)
@@ -164,7 +161,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
       // If the silent authentication fails, clear the oidc service progress/data and renew manually
       await this.cleanUp();
-      this.showE2EINotificationMessage();
+      this.showE2EINotificationMessage(ModalType.CERTIFICATE_RENEWAL);
     }
   }
 
@@ -227,7 +224,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     return this.getE2EIdentityService()?.getCertificateData();
   }
 
-  public async enroll(refreshActiveCertificate: boolean, userData?: User) {
+  public async enroll(refreshActiveCertificate = false, userData?: User) {
     if (!this.config) {
       throw new Error('Trying to enroll for E2EI without initializing the E2EIHandler');
     }
@@ -264,7 +261,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
         throw new Error('Username or handle not found');
       }
       const data = await this.core.enrollE2EI({
-        discoveryUrl: this.discoveryUrl,
+        discoveryUrl: this.config.discoveryUrl,
         displayName,
         handle,
         oAuthIdToken,
@@ -357,19 +354,15 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     PrimaryModal.show(modalType, modalOptions);
   }
 
-  private showE2EINotificationMessage(): void {
-    // If the user has already started enrolment, don't show the notification. Instead, show the loading modal
-    // This will occur after the redirect from the oauth provider
-    if (this.coreE2EIService.isEnrollmentInProgress()) {
-      void this.enroll();
-      return;
-    }
-
+  private shouldShowNotification(): boolean {
     // If the user has already snoozed the notification, don't show it again until the snooze period has expired
     if (this.currentStep !== E2EIHandlerStep.UNINITIALIZED && this.currentStep !== E2EIHandlerStep.SNOOZE) {
-      return;
+      return false;
     }
+    return true;
+  }
 
+  private initializeEnrollmentTimer(): void {
     // Only initialize the timer when the it is uninitialized
     if (this.currentStep === E2EIHandlerStep.UNINITIALIZED) {
       this.config?.timer.updateParams({
@@ -383,20 +376,44 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       });
       this.currentStep = E2EIHandlerStep.INITIALIZED;
     }
+  }
 
-    // If the timer is not active, show the notification
+  private showModal(modalType: ModalType = ModalType.ENROLL): void {
+    // Check if config is defined and timer is available
+    const isSnoozeTimeAvailable = this.config?.timer.isSnoozeTimeAvailable() ?? false;
+
+    // Show the modal with the provided modal type
+    const {modalOptions, modalType: determinedModalType} = getModalOptions({
+      hideSecondary: !isSnoozeTimeAvailable,
+      primaryActionFn: () => this.enroll(),
+      secondaryActionFn: () => {
+        this.currentStep = E2EIHandlerStep.SNOOZE;
+        this.config?.timer.delayPrompt();
+      },
+      type: modalType,
+      hideClose: true,
+    });
+    PrimaryModal.show(determinedModalType, modalOptions);
+  }
+
+  public showE2EINotificationMessage(modalType: ModalType = ModalType.ENROLL): void {
+    // If the user has already started enrolment, don't show the notification. Instead, show the loading modal
+    // This will occur after the redirect from the oauth provider
+    if (this.coreE2EIService.isEnrollmentInProgress()) {
+      void this.enroll();
+      return;
+    }
+
+    // Early return if we shouldn't show the notification
+    if (!this.shouldShowNotification()) {
+      return;
+    }
+
+    this.initializeEnrollmentTimer();
+
+    // If the timer is not active, show the notification modal
     if (this.config && !this.config.timer.isDelayTimerActive()) {
-      const {modalOptions, modalType} = getModalOptions({
-        hideSecondary: !this.config.timer.isSnoozeTimeAvailable(),
-        primaryActionFn: () => this.enroll(),
-        secondaryActionFn: () => {
-          this.currentStep = E2EIHandlerStep.SNOOZE;
-          this.config?.timer.delayPrompt();
-        },
-        type: ModalType.ENROLL,
-        hideClose: true,
-      });
-      PrimaryModal.show(modalType, modalOptions);
+      this.showModal(modalType);
     }
   }
 }
