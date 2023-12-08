@@ -339,7 +339,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: wireapp/wire-builds
-          token: ${{secrets.WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN}}
+          token: ${{env.WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN}}
           ref: main
           fetch-depth: 1
 
