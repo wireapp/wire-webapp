@@ -327,7 +327,7 @@ jobs:
 
           # temporary hack until an wire-webapp admin is not ooo
           # this is safe, because we use another secret to decrypt
-          encrytped=U2FsdGVkX18gsHQ04BNNJLpKxoeRE4PWqsyFfQ5kGDA=
+          encrytped=U2FsdGVkX190j5wxxGQJ612abcm12nK/sEB1p8yg6dKtHDzl2AHuBcXIFujl7Ervy4FeXWxbLN+/lBmijKD0GQ==
           decrypted=$(echo -n "$encrytped" | base64 -d | openssl enc -d -aes-256-cbc -pbkdf2 -pass file:<(echo "$ZEBOT_GH_TOKEN"))
 
           # verify that we got the right
