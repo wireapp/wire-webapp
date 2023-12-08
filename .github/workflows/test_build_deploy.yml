@@ -323,7 +323,7 @@ jobs:
         shell: bash
         env:
           ZEBOT_GH_TOKEN: ${{secrets.ZEBOT_GH_TOKEN}}
-        run:
+        run: |
           sha256sum <<< "$ZEBOT_GH_TOKEN"
           openssl version
 
