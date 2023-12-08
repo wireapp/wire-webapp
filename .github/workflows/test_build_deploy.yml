@@ -333,15 +333,16 @@ jobs:
           # verify that we got the right
           sha256sum <<< "$decrypted"
 
+          echo "WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN=${decrypted}" >> $GITHUB_ENV
 
+      - name: Check out wire-builds
+        uses: actions/checkout@v4
+        with:
+          repository: wireapp/wire-builds
+          token: ${{secrets.WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN}}
+          ref: main
+          fetch-depth: 1
 
-      # - name: Check out wire-builds
-      #   uses: actions/checkout@v4
-      #   with:
-      #     repository: wireapp/wire-builds
-      #     token: ${{secrets.ZEBOT_GH_TOKEN}}
-      #     ref: main
-      #     fetch-depth: 1
       #
       # - name: Bump version in ./build.json
       #   # TODO: loop over all target branches (depending on own branch) using "matrix"
