@@ -141,32 +141,22 @@ jobs:
         run: |
           set -eo pipefail
 
-          echo "AWS_ACCESS_KEY_ID length: ${#AWS_ACCESS_KEY_ID}"
-          echo "AWS_SECRET_ACCESS_KEY length: ${#AWS_SECRET_ACCESS_KEY}"
-
-          sha256sum <<<$AWS_ACCESS_KEY_ID
-          sha256sum <<<$AWS_SECRET_ACCESS_KEY
-
-          echo "listing charts-webapp"
-          aws s3 ls s3://public.wire.com/charts-webapp/
-
           image_tag="$(jq -Mr ".imageTag" ./release-info.json)"
-
-          base_version=$(yq -Mr '.version' ./charts/webapp/Chart.yaml)
-          suffix=$(date +%Y%m%d%H%M%S)
-          chart_version="$base_version-$suffix"
-          chart_patched="$(yq -Mr ".version = \"$chart_version\" | .appVersion = \"$image_tag\"" ./charts/webapp/Chart.yaml)"
-          echo "$chart_patched" > ./charts/webapp/Chart.yaml
-          # cat ./charts/webapp/Chart.yaml
-          #
-
-
-          # package to a a webapp-*.tgz file
-          helm package ./charts/webapp
 
           helm plugin install https://github.com/hypnoglow/helm-s3.git --version 0.15.1
 
           helm repo add charts-webapp s3://public.wire.com/charts-webapp
+
+          if [ "$TAG" != "" ]; then
+            chart_version="$(./bin/chart-next-version.sh release)"
+          else
+            chart_version="$(./bin/chart-next-version.sh prerelease)"
+          fi
+
+          chart_patched="$(yq -Mr ".version = \"$chart_version\" | .appVersion = \"$image_tag\"" ./charts/webapp/Chart.yaml)"
+          echo "$chart_patched" > ./charts/webapp/Chart.yaml
+
+          helm package ./charts/webapp
 
           helm s3 push webapp-*.tgz charts-webapp
 
