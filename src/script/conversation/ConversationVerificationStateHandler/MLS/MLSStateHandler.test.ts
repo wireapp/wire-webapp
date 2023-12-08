@@ -24,6 +24,7 @@ import * as e2eIdentity from 'src/script/E2EIdentity/E2EIdentityVerification';
 import {Conversation} from 'src/script/entity/Conversation';
 import {Core} from 'src/script/service/CoreSingleton';
 import {createUuid} from 'Util/uuid';
+import {waitFor} from 'Util/waitFor';
 
 import {registerMLSConversationVerificationStateHandler} from './MLSStateHandler';
 
@@ -103,6 +104,27 @@ describe('MLSConversationVerificationStateHandler', () => {
       triggerEpochChange({groupId});
       await new Promise(resolve => setTimeout(resolve, 0));
       expect(conversation.mlsVerificationState()).toBe(ConversationVerificationState.VERIFIED);
+    });
+
+    it('should wait for conversation to be known', async () => {
+      let triggerEpochChange: Function = () => {};
+      const newConversation = new Conversation(createUuid(), '', ConversationProtocol.MLS);
+      newConversation.groupId = 'AAEAAAOygT3TL0wljoaNabgK4yIAZWxuYS53aXJlLmxpbms=';
+
+      jest.spyOn(e2eIdentity, 'getConversationVerificationState').mockResolvedValue(E2eiConversationState.Verified);
+      jest
+        .spyOn(core.service!.mls!, 'on')
+        .mockImplementation((_event, listener) => (triggerEpochChange = listener) as any);
+
+      registerMLSConversationVerificationStateHandler(undefined, conversationState, core);
+
+      triggerEpochChange({groupId: newConversation.groupId});
+      setTimeout(() => {
+        // adding the conversation after the epoch change event was triggered
+        conversationState.conversations.push(newConversation);
+      }, 100);
+      await waitFor(() => newConversation.mlsVerificationState() === ConversationVerificationState.VERIFIED);
+      expect(newConversation.mlsVerificationState()).toBe(ConversationVerificationState.VERIFIED);
     });
   });
 });

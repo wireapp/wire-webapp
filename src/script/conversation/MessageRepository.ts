@@ -1224,7 +1224,11 @@ export class MessageRepository {
     try {
       const messageEntity = await this.getMessageInConversationById(conversationEntity, eventId);
       const errorStatus =
-        isBackendError(error) && error.label === BackendErrorLabel.FEDERATION_REMOTE_ERROR
+        isBackendError(error) &&
+        error.label ===
+          (BackendErrorLabel.FEDERATION_REMOTE_ERROR ||
+            BackendErrorLabel.FEDERATION_NOT_AVAILABLE ||
+            BackendErrorLabel.SERVER_ERROR)
           ? StatusType.FEDERATION_ERROR
           : StatusType.FAILED;
       messageEntity.status(errorStatus);

@@ -56,7 +56,9 @@ import {handleClickOutsideOfInputBar, IgnoreOutsideClickWrapper} from './util/cl
 import {loadDraftState, saveDraftState} from './util/DraftStateUtil';
 
 import {Config} from '../../Config';
+import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
 import {MessageRepository, OutgoingQuote} from '../../conversation/MessageRepository';
+import {isE2EIEnabled} from '../../E2EIdentity';
 import {Conversation} from '../../entity/Conversation';
 import {ContentMessage} from '../../entity/message/ContentMessage';
 import {User} from '../../entity/User';
@@ -348,6 +350,32 @@ export const InputBar = ({
     resetDraftState();
   };
 
+  const handleSendMessage = () => {
+    const isE2EIDegraded = conversation.mlsVerificationState() === ConversationVerificationState.DEGRADED;
+
+    if (isE2EIEnabled() && isE2EIDegraded) {
+      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
+        primaryAction: {
+          action: () => {
+            conversation.mlsVerificationState(ConversationVerificationState.UNVERIFIED);
+            sendMessage();
+          },
+          text: t('conversation.E2EISendAnyway'),
+        },
+        secondaryAction: {
+          action: () => {},
+          text: t('conversation.E2EICancel'),
+        },
+        text: {
+          message: t('conversation.E2EIDegradedNewMessage'),
+          title: t('conversation.E2EIConversationNoLongerVerified'),
+        },
+      });
+    } else {
+      sendMessage();
+    }
+  };
+
   const onGifClick = () => openGiphy(textValue);
 
   const pingConversation = () => {
@@ -569,14 +597,14 @@ export const InputBar = ({
                 saveDraftState={saveDraft}
                 loadDraftState={loadDraft}
                 onShiftTab={onShiftTab}
-                onSend={sendMessage}
+                onSend={handleSendMessage}
                 onBlur={() => isTypingRef.current && conversationRepository.sendTypingStop(conversation)}
               >
                 {isScaledDown ? (
                   <>
                     <ul className="controls-right buttons-group" css={{minWidth: '95px'}}>
                       {showGiphyButton && <GiphyButton onGifClick={onGifClick} />}
-                      <SendMessageButton disabled={!enableSending} onSend={sendMessage} />
+                      <SendMessageButton disabled={!enableSending} onSend={handleSendMessage} />
                     </ul>
                     <ul className="controls-right buttons-group" css={{justifyContent: 'center', width: '100%'}}>
                       <ControlButtons {...controlButtonsProps} isScaledDown={isScaledDown} />
@@ -586,7 +614,7 @@ export const InputBar = ({
                   <>
                     <ul className="controls-right buttons-group">
                       <ControlButtons {...controlButtonsProps} showGiphyButton={showGiphyButton} />
-                      <SendMessageButton disabled={!enableSending} onSend={sendMessage} />
+                      <SendMessageButton disabled={!enableSending} onSend={handleSendMessage} />
                     </ul>
                   </>
                 )}

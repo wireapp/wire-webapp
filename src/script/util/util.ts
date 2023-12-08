@@ -305,9 +305,6 @@ const supportsSecretStorage = () => !Runtime.isDesktopApp() || !!window.systemCr
 // disables mls for old 'broken' desktop clients, see https://github.com/wireapp/wire-desktop/pull/6094
 export const supportsMLS = () => Config.getConfig().FEATURE.ENABLE_MLS && supportsSecretStorage();
 
-export const supportsCoreCryptoProteus = () =>
-  Config.getConfig().FEATURE.ENABLE_PROTEUS_CORE_CRYPTO && supportsSecretStorage();
-
 export const incomingCssClass = 'content-animation-incoming-horizontal-left';
 
 export const removeAnimationsClass = (element: HTMLElement | null) => {

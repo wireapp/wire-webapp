@@ -17,22 +17,24 @@
  *
  */
 
-import {FC} from 'react';
+export function waitFor<T>(condition: () => T, timeout: number = 5000, interval: number = 100): Promise<T | undefined> {
+  return new Promise(resolve => {
+    if (condition()) {
+      return resolve(condition());
+    }
 
-import {CSSObject} from '@emotion/react';
+    const timeoutId = setTimeout(() => {
+      clearInterval(intervalId);
+      resolve(undefined);
+    }, timeout);
 
-export interface EmojiImgProps {
-  emoji: string;
-  size?: number;
-  styles?: CSSObject;
+    const intervalId = setInterval(() => {
+      const result = condition();
+      if (result) {
+        clearTimeout(timeoutId);
+        clearInterval(intervalId);
+        resolve(result);
+      }
+    }, interval);
+  });
 }
-
-export const EmojiChar: FC<EmojiImgProps> = ({emoji: unicode, size, styles}) => {
-  const fontSize = size ? `${size}px` : 'var(--font-size-medium)';
-  const style = {
-    ':after': {
-      content: `'${unicode}'`,
-    },
-  };
-  return <span aria-hidden={true} css={{fontSize, ...style, ...styles}}></span>;
-};

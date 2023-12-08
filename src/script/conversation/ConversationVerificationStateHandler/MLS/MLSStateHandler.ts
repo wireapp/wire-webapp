@@ -25,6 +25,7 @@ import {getConversationVerificationState, getUsersIdentities, MLSStatuses} from 
 import {E2EIVerificationMessageType} from 'src/script/message/E2EIVerificationMessageType';
 import {Core} from 'src/script/service/CoreSingleton';
 import {Logger, getLogger} from 'Util/Logger';
+import {waitFor} from 'Util/waitFor';
 
 import {isMLSConversation, MLSConversation} from '../../ConversationSelectors';
 import {ConversationState} from '../../ConversationState';
@@ -88,10 +89,14 @@ class MLSConversationVerificationStateHandler {
   }
 
   private checkConversationVerificationState = async ({groupId}: {groupId: string}): Promise<void> => {
-    const conversation = getConversationByGroupId({conversationState: this.conversationState, groupId});
+    // There could be a race condition where we would receive an epoch update for a conversation that is not yet known by the webapp.
+    // We just wait for it to be available and then check the verification state
+    const conversation = await waitFor(() =>
+      getConversationByGroupId({conversationState: this.conversationState, groupId}),
+    );
+
     if (!conversation) {
-      this.logger.error(`Epoch changed but conversationEntity can't be found`);
-      return;
+      return this.logger.warn(`Epoch changed but conversation could not be found after waiting for 5 seconds`);
     }
 
     if (!isMLSConversation(conversation)) {

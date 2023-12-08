@@ -1732,7 +1732,9 @@ export class ConversationRepository {
 
     // For connection request, we simply display proteus conversation of type 3 (connect) it will be displayed as a connection request
     if (connectionEntity.isOutgoingRequest()) {
-      return localProteusConversation || this.fetchConversationById(proteusConversationId);
+      const proteusConversation = localProteusConversation || (await this.fetchConversationById(proteusConversationId));
+      proteusConversation.type(CONVERSATION_TYPE.CONNECT);
+      return proteusConversation;
     }
 
     const isConnectionAccepted = connectionEntity.isConnected();
@@ -2071,13 +2073,19 @@ export class ConversationRepository {
       }
 
       if (isMLSCapableConversation(conversation)) {
-        const {events} = await this.core.service!.conversation.addUsersToMLSConversation({
+        const {failedToAdd, events} = await this.core.service!.conversation.addUsersToMLSConversation({
           conversationId: conversation.qualifiedId,
           groupId: conversation.groupId,
           qualifiedUsers,
         });
         if (!!events.length && isMLSConversation(conversation)) {
           events.forEach(event => this.eventRepository.injectEvent(event));
+        }
+        if (failedToAdd) {
+          await this.eventRepository.injectEvent(
+            EventBuilder.buildFailedToAddUsersEvent(failedToAdd, conversation, this.userState.self().id),
+            EventRepository.SOURCE.INJECTED,
+          );
         }
       }
     } catch (error) {
