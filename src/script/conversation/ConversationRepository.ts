@@ -3061,7 +3061,7 @@ export class ConversationRepository {
   private readonly onMissedEvents = (): void => {
     this.conversationState
       .filteredConversations()
-      .filter(conversationEntity => !conversationEntity.removed_from_conversation())
+      .filter(conversationEntity => !conversationEntity.removed_from_conversation() && !conversationEntity.isRequest())
       .forEach(conversationEntity => {
         const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
         const missed_event = EventBuilder.buildMissed(conversationEntity, currentTimestamp);
