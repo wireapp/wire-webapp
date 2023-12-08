@@ -343,15 +343,16 @@ jobs:
           ref: main
           fetch-depth: 1
 
-      #
-      # - name: Bump version in ./build.json
-      #   # TODO: loop over all target branches (depending on own branch) using "matrix"
-      #   shell: bash
-      #   run: |
-      #     git fetch --depth 1 origin main
-      #     git checkout -b tmp origin/main
-      #     build_json=$(jq -Mr '.helmCharts.webapp.version = "1.1.1"' ./build.json)
-      #     echo "$build_json" > ./build.json
+      - name: Bump version in ./build.json
+        # TODO: loop over all target branches (depending on own branch) using "matrix"
+        # TODO: add retry
+        shell: bash
+        run: |
+          git fetch --depth 1 origin main
+          git checkout -b tmp origin/main
+          build_json=$(cat ./build.json | ./bin/bump-chart webapp 1.2.3 | ./bin/bump-prerelease )
+          echo "$build_json" > ./build.json
+          git push
 
       # - name: Create pull-request to wire-builds
       #   id: create-pr
