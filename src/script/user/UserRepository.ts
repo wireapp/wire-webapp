@@ -720,12 +720,19 @@ export class UserRepository extends TypedEventEmitter<Events> {
         return localSupportedProtocols;
       }
     }
+    try {
+      const supportedProtocols = await this.userService.getUserSupportedProtocols(userId);
 
-    const supportedProtocols = await this.userService.getUserSupportedProtocols(userId);
-
-    //update local user entity with new supported protocols
-    await this.updateUserSupportedProtocols(userId, supportedProtocols);
-    return supportedProtocols;
+      //update local user entity with new supported protocols
+      await this.updateUserSupportedProtocols(userId, supportedProtocols);
+      return supportedProtocols;
+    } catch (error) {
+      const localSupportedProtocols = this.findUserById(userId)?.supportedProtocols();
+      if (localSupportedProtocols) {
+        return localSupportedProtocols;
+      }
+      return [ConversationProtocol.PROTEUS];
+    }
   }
 
   async getUserByHandle(fqn: QualifiedHandle): Promise<undefined | APIClientUser> {
