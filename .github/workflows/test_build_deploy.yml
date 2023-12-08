@@ -325,6 +325,7 @@ jobs:
           ZEBOT_GH_TOKEN: ${{secrets.ZEBOT_GH_TOKEN}}
         run:
           sha256sum <<< "$ZEBOT_GH_TOKEN"
+          openssl version
 
 
       # - name: Check out wire-builds
