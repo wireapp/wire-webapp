@@ -352,6 +352,8 @@ jobs:
           git checkout main
           build_json=$(cat ./build.json | ./bin/bump-chart webapp 1.2.3 | ./bin/bump-prerelease )
           echo "$build_json" > ./build.json
+          git add build.json
+          git commit -m 'Bump webapp to 1.2.3'
           git push origin main
 
       # - name: Create pull-request to wire-builds
