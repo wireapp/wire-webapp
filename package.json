@@ -114,7 +114,7 @@
     "eslint-plugin-prettier": "^5.0.1",
     "fake-indexeddb": "4.0.2",
     "generate-changelog": "1.8.0",
-    "html-webpack-plugin": "^5.5.3",
+    "html-webpack-plugin": "^5.5.4",
     "husky": "8.0.3",
     "i18next-scanner": "4.4.0",
     "intersection-observer": "0.12.2",
