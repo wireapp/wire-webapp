@@ -14,6 +14,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  wire_builds_targets:
+
+
   test_build_deploy:
     runs-on: buildjet-8vcpu-ubuntu-2204
 
@@ -370,7 +373,7 @@ jobs:
           if [[ "$imageTag" == *"production"* ]]; then
              echo '::set-output name=exists::true'
              echo "::set-output name=releaseInfo::$(cat ${ARTIFACT_LOCAL_PATH})"
-          else
+          fi
 
       - name: Checking out 'wire-server'
         uses: actions/checkout@v4
