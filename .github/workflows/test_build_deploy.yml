@@ -211,8 +211,6 @@ jobs:
             chart_version="$(./bin/chart-next-version.sh prerelease)"
           fi
 
-          echo "chart_version: $chart_version"
-
           chart_patched="$(yq -Mr ".version = \"$chart_version\" | .appVersion = \"$image_tag\"" ./charts/webapp/Chart.yaml)"
           echo "$chart_patched" > ./charts/webapp/Chart.yaml
 
@@ -220,7 +218,7 @@ jobs:
 
           helm s3 push webapp-*.tgz charts-webapp
 
-          ri="$(jq "chartVersion = \"$chart_version\"" ./release-info.json)"
+          ri="$(jq ".chartVersion = \"$chart_version\"" ./release-info.json)"
           echo "$ri" > ./release-info.json
 
           echo "release-info.json :"
