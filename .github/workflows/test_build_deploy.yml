@@ -17,6 +17,9 @@ jobs:
   test_build_deploy:
     runs-on: buildjet-8vcpu-ubuntu-2204
 
+    outputs:
+      wire_builds_target_branches: ${{ steps.output_target_branches.outputs.wire_builds_target_branches }}
+
     env:
       TEST_COVERAGE_FAIL_THRESHOLD: 45
       TEST_COVERAGE_WARNING_THRESHOLD: 60
@@ -61,6 +64,7 @@ jobs:
             }
 
       - name: Make target branches available as output to other jobs
+        id: output_target_branches
         shell: bash
         run: |
           echo "wire_builds_target_branches: $wire_builds_target_branches"
