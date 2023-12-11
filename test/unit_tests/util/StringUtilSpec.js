@@ -86,6 +86,16 @@ describe('StringUtil', () => {
   });
 
   describe('obfuscate', () => {
+    it('obfuscates a text returning a text with greater length', () => {
+      expect(obfuscate('a').length).toBeGreaterThan(1);
+      expect(obfuscate('ab').length).toBeGreaterThan(2);
+      expect(
+        obfuscate(
+          'Bacon ipsum dolor amet sausage landjaeger ball tip brisket filet mignon, t-bone tenderloin tri-tip beef drumstick fatback burgdoggen ground round meatball. Tri-tip spare ribs ground round bresaola ball tip tail, sirloin chicken doner boudin turkey leberkas bacon alcatra. ',
+        ).length,
+      ).toBeGreaterThan(272);
+    });
+
     it('obfuscates a text keeping its length', () => {
       const text =
         'Bacon ipsum dolor amet sausage landjaeger ball tip brisket filet mignon, t-bone tenderloin tri-tip beef drumstick fatback burgdoggen ground round meatball. Tri-tip spare ribs ground round bresaola ball tip tail, sirloin chicken doner boudin turkey leberkas bacon alcatra. ';

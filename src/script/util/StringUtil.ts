@@ -50,24 +50,13 @@ export const getRandomChar = (): string => {
 };
 
 export const obfuscate = (text: string): string => {
-  /* cspell:disable-next-line */
-  const alphabet = Array.from('abcdefghijklmnopqrstuvwxyz');
+  const alphabet = Array.from('abcdefghijklmnopqrstuvwxyz ');
 
-  const obfuscatedText = text
-    .split('')
-    .map(char => (/\s/.test(char) && Math.random() < 0.5 ? '' : char))
-    .join('');
+  const obfuscatedText = Array.from({length: text.length + Math.floor((1 + Math.random()) * 10)}, () =>
+    randomElement(alphabet),
+  ).join('');
 
-  return obfuscatedText
-    .split(/\s+/)
-    .map(word => obfuscateWord(word.length, alphabet))
-    .join(' ');
-};
-
-const obfuscateWord = (originalLength: number, alphabet: string[]): string => {
-  const obfuscatedLength = Math.max(1, Math.floor(Math.random() * (originalLength + 1))); // Randomize the length
-
-  return Array.from({length: obfuscatedLength}, () => randomElement(alphabet)).join('');
+  return obfuscatedText;
 };
 
 /**
