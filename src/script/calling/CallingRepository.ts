@@ -681,6 +681,8 @@ export class CallingRepository {
           break;
         }
 
+        //TODO: check if a self client was targeted
+
         this.muteCall(call, true, MuteState.REMOTE_MUTED);
         break;
       }
