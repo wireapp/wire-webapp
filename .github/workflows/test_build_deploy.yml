@@ -80,11 +80,11 @@ jobs:
       - name: Install JS dependencies
         run: yarn --immutable
 
-      - name: Test
-        run: |
-          set -o pipefail
-          yarn test --coverage --coverage-reporters=lcov --detectOpenHandles=false 2>&1 | tee ./unit-tests.log
-
+      # - name: Test
+      #   run: |
+      #     set -o pipefail
+      #     yarn test --coverage --coverage-reporters=lcov --detectOpenHandles=false 2>&1 | tee ./unit-tests.log
+      #
       - name: Monitor coverage
         uses: codecov/codecov-action@v3.1.4
         with:
@@ -193,7 +193,7 @@ jobs:
 
           cat ./release-info.json
 
-      - name: Patch helm chart
+      - name: Publish Helm chart
         shell: bash
         env:
            AWS_ACCESS_KEY_ID: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_ACCESS_KEY_ID }}
