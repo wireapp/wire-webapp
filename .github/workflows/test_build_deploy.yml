@@ -66,256 +66,256 @@ jobs:
           echo "wire_builds_target_branches: $wire_builds_target_branches"
           echo "wire_builds_target_branches=$wire_builds_target_branches" >> $GITHUB_OUTPUT
 
-      - name: Set TITLE and BUILD_DESKTOP
-        env:
-          PR_TITLE: ${{github.event.pull_request.title || env.PR_LAST_COMMIT_MESSAGE}}
-        run: |
-          echo "TITLE=${PR_TITLE}" >> $GITHUB_ENV
-          echo "BUILD_DESKTOP=${{contains(env.TAG, 'staging') || contains(env.TAG, 'production') || contains(env.PR_LAST_COMMIT_MESSAGE, '+Desktop')}}" >> $GITHUB_ENV
-
-      - name: Print environment variables
-        run: |
-          echo -e "BRANCH_NAME = ${BRANCH_NAME}"
-          echo -e "TAG = ${TAG}"
-          echo -e "TITLE = ${TITLE}"
-          echo -e "PR_LAST_COMMIT_MESSAGE = ${PR_LAST_COMMIT_MESSAGE}"
-          echo -e "COMMIT_URL = ${COMMIT_URL}"
-          echo -e "COMMITTER = ${COMMITTER}"
-          echo -e "BUILD_DESKTOP = ${BUILD_DESKTOP}"
-
-      - name: Skip CI
-        if: |
-          contains(env.TITLE || env.PR_LAST_COMMIT_MESSAGE, 'skip ci') ||
-          contains(env.TITLE || env.PR_LAST_COMMIT_MESSAGE, '[ci skip]')
-        uses: andymckay/cancel-action@0.3
-
-      - name: Authenticate git clone
-        env:
-          GH_TOKEN: ${{secrets.OTTO_THE_BOT_GH_TOKEN}}
-        run: echo "machine github.com login ${GH_TOKEN}" > ~/.netrc
-
-      - name: Install JS dependencies
-        run: yarn --immutable
-
-      # - name: Test
+      # - name: Set TITLE and BUILD_DESKTOP
+      #   env:
+      #     PR_TITLE: ${{github.event.pull_request.title || env.PR_LAST_COMMIT_MESSAGE}}
       #   run: |
-      #     set -o pipefail
-      #     yarn test --coverage --coverage-reporters=lcov --detectOpenHandles=false 2>&1 | tee ./unit-tests.log
+      #     echo "TITLE=${PR_TITLE}" >> $GITHUB_ENV
+      #     echo "BUILD_DESKTOP=${{contains(env.TAG, 'staging') || contains(env.TAG, 'production') || contains(env.PR_LAST_COMMIT_MESSAGE, '+Desktop')}}" >> $GITHUB_ENV
       #
-      - name: Monitor coverage
-        uses: codecov/codecov-action@v3.1.4
-        with:
-          fail_ci_if_error: false
-          files: ./coverage/lcov.info
-          flags: unittests
-
-      - uses: kanga333/variable-mapper@master
-        with:
-          # We try to map a branch to a dev environment
-          key: '${{github.ref}}'
-          map: |
-            {
-              "dev": { "dev_env": "wire-webapp-dev-al2" },
-              "master": { "dev_env": "wire-webapp-master-al2" }
-            }
-
-      - uses: kanga333/variable-mapper@master
-        with:
-          # We try to map a branch to a dev environment
-          key: '${{github.ref}}'
-          map: |
-            {
-              "dev": { "preprod_env": "wire-webapp-edge-al2" }
-            }
-
-      - uses: kanga333/variable-mapper@master
-        with:
-          # We try to map a tag to a dev environment
-          key: '${{env.TAG}}'
-          map: |
-            {
-              "production": { "prod_env": "wire-webapp-prod-al2" },
-              "staging": { "prod_env": "wire-webapp-staging-al2" }
-            }
-
-      - name: Build
-        run: yarn build:prod
-
-      # Stage 1: https://wire-webapp-edge.zinfra.io/
-      - name: Deploy to dev env
-        if: env.dev_env
-        uses: einaregilsson/beanstalk-deploy@v21
-        with:
-          application_name: ${{env.AWS_APPLICATION_NAME}}
-          aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
-          aws_secret_key: ${{secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY}}
-          deployment_package: ${{env.AWS_BUILD_ZIP_PATH}}
-          environment_name: ${{env.dev_env}}
-          region: eu-central-1
-          use_existing_version_if_available: true
-          version_description: ${{github.sha}}
-          version_label: ${{github.run_id}}
-          wait_for_deployment: false
-          wait_for_environment_recovery: ${{env.DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS}}
-
-      - name: Deploy to pre-prod env
-        if: env.preprod_env
-        uses: einaregilsson/beanstalk-deploy@v21
-        with:
-          application_name: ${{env.AWS_APPLICATION_NAME}}
-          aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
-          aws_secret_key: ${{secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY}}
-          deployment_package: ${{env.AWS_BUILD_ZIP_PATH}}
-          environment_name: ${{env.preprod_env}}
-          region: eu-central-1
-          use_existing_version_if_available: true
-          version_description: ${{github.sha}}
-          version_label: ${{github.run_id}}
-          wait_for_deployment: false
-          wait_for_environment_recovery: ${{env.DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS}}
-
-      - name: Deploy to prod env
-        if: env.prod_env
-        uses: einaregilsson/beanstalk-deploy@v21
-        with:
-          application_name: ${{env.AWS_APPLICATION_NAME}}
-          aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
-          aws_secret_key: ${{secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY}}
-          deployment_package: ${{env.AWS_BUILD_ZIP_PATH}}
-          environment_name: ${{env.prod_env}}
-          region: eu-central-1
-          use_existing_version_if_available: true
-          version_description: ${{github.sha}}
-          version_label: ${{env.TAG}}-${{github.run_id}}
-          wait_for_deployment: false
-          wait_for_environment_recovery: ${{env.DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS}}
-
-      - name: Push Docker image
-        env:
-          DOCKER_PASSWORD: ${{secrets.WEBTEAM_QUAY_PASSWORD}}
-          DOCKER_USERNAME: ${{secrets.WEBTEAM_QUAY_USERNAME}}
-          aws_secret_key: ${{secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY}}
-        run: |
-          version_tag="${TAG:-$BRANCH_NAME}"
-          if [[ "$version_tag" == *"production"* ]]; then
-            config_entry="wire-web-config-default-master"
-          else
-            config_entry="wire-web-config-default-staging"
-          fi
-          yarn docker "$config_entry" "$version_tag" ./image_tag.txt
-
-          packageVersion=$(cat ./package.json | jq -r '.version')
-          imageTag="$(cat ./image_tag.txt)"
-          echo "{\"imageTag\": \"${imageTag}\", \"releaseName\": \"${TAG:-v${packageVersion}}\"}" > ./release-info.json
-
-      - name: Publish Helm chart
-        shell: bash
-        env:
-           AWS_ACCESS_KEY_ID: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_ACCESS_KEY_ID }}
-           AWS_SECRET_ACCESS_KEY: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_SECRET_ACCESS_KEY }}
-        run: |
-          set -eo pipefail
-
-          image_tag="$(jq -Mr ".imageTag" ./release-info.json)"
-
-          helm plugin install https://github.com/hypnoglow/helm-s3.git --version 0.15.1
-
-          helm repo add charts-webapp s3://public.wire.com/charts-webapp
-
-          if [ "$TAG" != "" ]; then
-            chart_version="$(./bin/chart-next-version.sh release)"
-          else
-            chart_version="$(./bin/chart-next-version.sh prerelease)"
-          fi
-
-          chart_patched="$(yq -Mr ".version = \"$chart_version\" | .appVersion = \"$image_tag\"" ./charts/webapp/Chart.yaml)"
-          echo "$chart_patched" > ./charts/webapp/Chart.yaml
-
-          helm package ./charts/webapp
-
-          helm s3 push webapp-*.tgz charts-webapp
-
-          ri="$(jq ".chartVersion = \"$chart_version\"" ./release-info.json)"
-          echo "$ri" > ./release-info.json
-
-          echo "release-info.json :"
-          cat ./release-info.json
-
-      - name: Store release information
-        uses: actions/upload-artifact@v3
-        with:
-          name: release-info.json
-          path: ./release-info.json
-
-      - name: Generate changelog for production release
-        if: contains(env.TAG, 'production')
-        run: yarn changelog:production
-
-      - name: Create GitHub production release
-        id: create_release_production
-        if: contains(env.TAG, 'production')
-        uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{github.token}}
-        with:
-          tag_name: ${{env.TAG}}
-          name: ${{env.TAG}}
-          body_path: ./CHANGELOG.md
-          files: ./unit-tests.log
-          draft: false
-          prerelease: false
-
-      - name: Announce production release
-        if: contains(env.TAG, 'production')
-        uses: wireapp/github-action-wire-messenger@v2.0.0
-        with:
-          email: ${{secrets.WIRE_BOT_EMAIL}}
-          password: ${{secrets.WIRE_BOT_PASSWORD}}
-          conversation: 1784ed44-7c32-4984-b5e2-0b4d55b034ed
-          send_text: 'The web team just rolled out a new version of [Wire for Web](https://app.wire.com/). You can find what has changed in our [GitHub release notes](https://github.com/wireapp/wire-webapp/releases/latest).\n\nPlease note that the rollout can take up to 30 minutes to be fully deployed on all nodes. You can check here if you get already served our latest version from today: https://app.wire.com/version'
-
-      - name: Generate changelog for staging release
-        if: contains(env.TAG, 'staging')
-        run: yarn changelog:staging
-
-      - name: Create GitHub staging release
-        id: create_release_staging
-        if: contains(env.TAG, 'staging')
-        uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{github.token}}
-        with:
-          tag_name: ${{env.TAG}}
-          name: ${{env.TAG}}
-          body_path: ./CHANGELOG.md
-          files: ./unit-tests.log
-          draft: false
-          prerelease: true
-
-      - name: Announce staging release
-        if: contains(env.TAG, 'staging')
-        uses: wireapp/github-action-wire-messenger@v2.0.0
-        with:
-          email: ${{secrets.WIRE_BOT_EMAIL}}
-          password: ${{secrets.WIRE_BOT_PASSWORD}}
-          conversation: '697c93e8-0b13-4204-a35e-59270462366a'
-          send_text: 'Staging bump for commit **${{github.sha}}** ("${{env.TITLE}}") done! 🏁'
-
-      - name: Notify CI error
-        if: failure() && github.event_name != 'pull_request'
-        uses: wireapp/github-action-wire-messenger@v2.0.0
-        with:
-          email: ${{secrets.WIRE_BOT_EMAIL}}
-          password: ${{secrets.WIRE_BOT_PASSWORD}}
-          conversation: 'b2cc7120-4154-4be4-b0c0-45a8c361c4d1'
-          send_text: '${{env.COMMITTER}} broke the "${{env.BRANCH_NAME}}" branch on "${{github.repository}}" with [${{env.TITLE}}](${{env.COMMIT_URL}}) 🌵'
-
-      - name: Upload WebApp artifacts
-        if: env.BUILD_DESKTOP == 'true'
-        uses: actions/upload-artifact@v3
-        with:
-          name: webapp-dist
-          path: ./server/dist
+      # - name: Print environment variables
+      #   run: |
+      #     echo -e "BRANCH_NAME = ${BRANCH_NAME}"
+      #     echo -e "TAG = ${TAG}"
+      #     echo -e "TITLE = ${TITLE}"
+      #     echo -e "PR_LAST_COMMIT_MESSAGE = ${PR_LAST_COMMIT_MESSAGE}"
+      #     echo -e "COMMIT_URL = ${COMMIT_URL}"
+      #     echo -e "COMMITTER = ${COMMITTER}"
+      #     echo -e "BUILD_DESKTOP = ${BUILD_DESKTOP}"
+      #
+      # - name: Skip CI
+      #   if: |
+      #     contains(env.TITLE || env.PR_LAST_COMMIT_MESSAGE, 'skip ci') ||
+      #     contains(env.TITLE || env.PR_LAST_COMMIT_MESSAGE, '[ci skip]')
+      #   uses: andymckay/cancel-action@0.3
+      #
+      # - name: Authenticate git clone
+      #   env:
+      #     GH_TOKEN: ${{secrets.OTTO_THE_BOT_GH_TOKEN}}
+      #   run: echo "machine github.com login ${GH_TOKEN}" > ~/.netrc
+      #
+      # - name: Install JS dependencies
+      #   run: yarn --immutable
+      #
+      # # - name: Test
+      # #   run: |
+      # #     set -o pipefail
+      # #     yarn test --coverage --coverage-reporters=lcov --detectOpenHandles=false 2>&1 | tee ./unit-tests.log
+      # #
+      # - name: Monitor coverage
+      #   uses: codecov/codecov-action@v3.1.4
+      #   with:
+      #     fail_ci_if_error: false
+      #     files: ./coverage/lcov.info
+      #     flags: unittests
+      #
+      # - uses: kanga333/variable-mapper@master
+      #   with:
+      #     # We try to map a branch to a dev environment
+      #     key: '${{github.ref}}'
+      #     map: |
+      #       {
+      #         "dev": { "dev_env": "wire-webapp-dev-al2" },
+      #         "master": { "dev_env": "wire-webapp-master-al2" }
+      #       }
+      #
+      # - uses: kanga333/variable-mapper@master
+      #   with:
+      #     # We try to map a branch to a dev environment
+      #     key: '${{github.ref}}'
+      #     map: |
+      #       {
+      #         "dev": { "preprod_env": "wire-webapp-edge-al2" }
+      #       }
+      #
+      # - uses: kanga333/variable-mapper@master
+      #   with:
+      #     # We try to map a tag to a dev environment
+      #     key: '${{env.TAG}}'
+      #     map: |
+      #       {
+      #         "production": { "prod_env": "wire-webapp-prod-al2" },
+      #         "staging": { "prod_env": "wire-webapp-staging-al2" }
+      #       }
+      #
+      # - name: Build
+      #   run: yarn build:prod
+      #
+      # # Stage 1: https://wire-webapp-edge.zinfra.io/
+      # - name: Deploy to dev env
+      #   if: env.dev_env
+      #   uses: einaregilsson/beanstalk-deploy@v21
+      #   with:
+      #     application_name: ${{env.AWS_APPLICATION_NAME}}
+      #     aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
+      #     aws_secret_key: ${{secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY}}
+      #     deployment_package: ${{env.AWS_BUILD_ZIP_PATH}}
+      #     environment_name: ${{env.dev_env}}
+      #     region: eu-central-1
+      #     use_existing_version_if_available: true
+      #     version_description: ${{github.sha}}
+      #     version_label: ${{github.run_id}}
+      #     wait_for_deployment: false
+      #     wait_for_environment_recovery: ${{env.DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS}}
+      #
+      # - name: Deploy to pre-prod env
+      #   if: env.preprod_env
+      #   uses: einaregilsson/beanstalk-deploy@v21
+      #   with:
+      #     application_name: ${{env.AWS_APPLICATION_NAME}}
+      #     aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
+      #     aws_secret_key: ${{secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY}}
+      #     deployment_package: ${{env.AWS_BUILD_ZIP_PATH}}
+      #     environment_name: ${{env.preprod_env}}
+      #     region: eu-central-1
+      #     use_existing_version_if_available: true
+      #     version_description: ${{github.sha}}
+      #     version_label: ${{github.run_id}}
+      #     wait_for_deployment: false
+      #     wait_for_environment_recovery: ${{env.DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS}}
+      #
+      # - name: Deploy to prod env
+      #   if: env.prod_env
+      #   uses: einaregilsson/beanstalk-deploy@v21
+      #   with:
+      #     application_name: ${{env.AWS_APPLICATION_NAME}}
+      #     aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
+      #     aws_secret_key: ${{secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY}}
+      #     deployment_package: ${{env.AWS_BUILD_ZIP_PATH}}
+      #     environment_name: ${{env.prod_env}}
+      #     region: eu-central-1
+      #     use_existing_version_if_available: true
+      #     version_description: ${{github.sha}}
+      #     version_label: ${{env.TAG}}-${{github.run_id}}
+      #     wait_for_deployment: false
+      #     wait_for_environment_recovery: ${{env.DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS}}
+      #
+      # - name: Push Docker image
+      #   env:
+      #     DOCKER_PASSWORD: ${{secrets.WEBTEAM_QUAY_PASSWORD}}
+      #     DOCKER_USERNAME: ${{secrets.WEBTEAM_QUAY_USERNAME}}
+      #     aws_secret_key: ${{secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY}}
+      #   run: |
+      #     version_tag="${TAG:-$BRANCH_NAME}"
+      #     if [[ "$version_tag" == *"production"* ]]; then
+      #       config_entry="wire-web-config-default-master"
+      #     else
+      #       config_entry="wire-web-config-default-staging"
+      #     fi
+      #     yarn docker "$config_entry" "$version_tag" ./image_tag.txt
+      #
+      #     packageVersion=$(cat ./package.json | jq -r '.version')
+      #     imageTag="$(cat ./image_tag.txt)"
+      #     echo "{\"imageTag\": \"${imageTag}\", \"releaseName\": \"${TAG:-v${packageVersion}}\"}" > ./release-info.json
+      #
+      # - name: Publish Helm chart
+      #   shell: bash
+      #   env:
+      #      AWS_ACCESS_KEY_ID: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_ACCESS_KEY_ID }}
+      #      AWS_SECRET_ACCESS_KEY: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_SECRET_ACCESS_KEY }}
+      #   run: |
+      #     set -eo pipefail
+      #
+      #     image_tag="$(jq -Mr ".imageTag" ./release-info.json)"
+      #
+      #     helm plugin install https://github.com/hypnoglow/helm-s3.git --version 0.15.1
+      #
+      #     helm repo add charts-webapp s3://public.wire.com/charts-webapp
+      #
+      #     if [ "$TAG" != "" ]; then
+      #       chart_version="$(./bin/chart-next-version.sh release)"
+      #     else
+      #       chart_version="$(./bin/chart-next-version.sh prerelease)"
+      #     fi
+      #
+      #     chart_patched="$(yq -Mr ".version = \"$chart_version\" | .appVersion = \"$image_tag\"" ./charts/webapp/Chart.yaml)"
+      #     echo "$chart_patched" > ./charts/webapp/Chart.yaml
+      #
+      #     helm package ./charts/webapp
+      #
+      #     helm s3 push webapp-*.tgz charts-webapp
+      #
+      #     ri="$(jq ".chartVersion = \"$chart_version\"" ./release-info.json)"
+      #     echo "$ri" > ./release-info.json
+      #
+      #     echo "release-info.json :"
+      #     cat ./release-info.json
+      #
+      # - name: Store release information
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: release-info.json
+      #     path: ./release-info.json
+      #
+      # - name: Generate changelog for production release
+      #   if: contains(env.TAG, 'production')
+      #   run: yarn changelog:production
+      #
+      # - name: Create GitHub production release
+      #   id: create_release_production
+      #   if: contains(env.TAG, 'production')
+      #   uses: softprops/action-gh-release@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{github.token}}
+      #   with:
+      #     tag_name: ${{env.TAG}}
+      #     name: ${{env.TAG}}
+      #     body_path: ./CHANGELOG.md
+      #     files: ./unit-tests.log
+      #     draft: false
+      #     prerelease: false
+      #
+      # - name: Announce production release
+      #   if: contains(env.TAG, 'production')
+      #   uses: wireapp/github-action-wire-messenger@v2.0.0
+      #   with:
+      #     email: ${{secrets.WIRE_BOT_EMAIL}}
+      #     password: ${{secrets.WIRE_BOT_PASSWORD}}
+      #     conversation: 1784ed44-7c32-4984-b5e2-0b4d55b034ed
+      #     send_text: 'The web team just rolled out a new version of [Wire for Web](https://app.wire.com/). You can find what has changed in our [GitHub release notes](https://github.com/wireapp/wire-webapp/releases/latest).\n\nPlease note that the rollout can take up to 30 minutes to be fully deployed on all nodes. You can check here if you get already served our latest version from today: https://app.wire.com/version'
+      #
+      # - name: Generate changelog for staging release
+      #   if: contains(env.TAG, 'staging')
+      #   run: yarn changelog:staging
+      #
+      # - name: Create GitHub staging release
+      #   id: create_release_staging
+      #   if: contains(env.TAG, 'staging')
+      #   uses: softprops/action-gh-release@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{github.token}}
+      #   with:
+      #     tag_name: ${{env.TAG}}
+      #     name: ${{env.TAG}}
+      #     body_path: ./CHANGELOG.md
+      #     files: ./unit-tests.log
+      #     draft: false
+      #     prerelease: true
+      #
+      # - name: Announce staging release
+      #   if: contains(env.TAG, 'staging')
+      #   uses: wireapp/github-action-wire-messenger@v2.0.0
+      #   with:
+      #     email: ${{secrets.WIRE_BOT_EMAIL}}
+      #     password: ${{secrets.WIRE_BOT_PASSWORD}}
+      #     conversation: '697c93e8-0b13-4204-a35e-59270462366a'
+      #     send_text: 'Staging bump for commit **${{github.sha}}** ("${{env.TITLE}}") done! 🏁'
+      #
+      # - name: Notify CI error
+      #   if: failure() && github.event_name != 'pull_request'
+      #   uses: wireapp/github-action-wire-messenger@v2.0.0
+      #   with:
+      #     email: ${{secrets.WIRE_BOT_EMAIL}}
+      #     password: ${{secrets.WIRE_BOT_PASSWORD}}
+      #     conversation: 'b2cc7120-4154-4be4-b0c0-45a8c361c4d1'
+      #     send_text: '${{env.COMMITTER}} broke the "${{env.BRANCH_NAME}}" branch on "${{github.repository}}" with [${{env.TITLE}}](${{env.COMMIT_URL}}) 🌵'
+      #
+      # - name: Upload WebApp artifacts
+      #   if: env.BUILD_DESKTOP == 'true'
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: webapp-dist
+      #     path: ./server/dist
 
   publish_wire_builds:
     name: Publish helm version to wire-builds
