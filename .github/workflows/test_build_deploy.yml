@@ -49,6 +49,22 @@ jobs:
           echo "TAG=$(git tag --points-at ${{github.sha}})" >> $GITHUB_ENV
           echo "PR_LAST_COMMIT_MESSAGE=$(git log --format=%B -n 1 ${{github.event.after}} | head -n 1)" >> $GITHUB_ENV
 
+
+      - uses: kanga333/variable-mapper@master
+        name: Determine target branches in wireapp/wire-builds
+        with:
+          key: env.BRANCH_NAME
+          map: |
+            {
+              "stefan": { "wire_builds_target_branches" : "[\"main\"]" },
+              "dev": { "wire_builds_target_branches" : "[\"main\"]" },
+            }
+
+      - name: Make target branches available as output to other jobs
+        shell: bash
+        run: |
+          echo '::set-output name=wire_builds_target_branches::$wire_builds_target_branches'
+
       - name: Set TITLE and BUILD_DESKTOP
         env:
           PR_TITLE: ${{github.event.pull_request.title || env.PR_LAST_COMMIT_MESSAGE}}
@@ -299,54 +315,72 @@ jobs:
         with:
           name: webapp-dist
           path: ./server/dist
-  #
-  # # TODO: loop here over all target branches
-  # # upade_wire_build:
-  # #   name: Create PR to wire-builds
-  # #   runs-on: ubuntu-latest
-  # #
-  # #    # needs: test_build_deploy
-  # #   steps:
-  # #     - name: debug
-  # #       shell: bash
-  # #       env:
-  # #         ZEBOT_GH_TOKEN: ${{secrets.ZEBOT_GH_TOKEN}}
-  # #       run: |
-  # #
-  # #         # temporary hack until an wire-webapp admin is not ooo
-  # #         # this is safe, because we use another secret to decrypt
-  # #         encrytped=U2FsdGVkX190j5wxxGQJ612abcm12nK/sEB1p8yg6dKtHDzl2AHuBcXIFujl7Ervy4FeXWxbLN+/lBmijKD0GQ==
-  # #         decrypted=$(echo -n "$encrytped" | base64 -d | openssl enc -d -aes-256-cbc -pbkdf2 -pass file:<(echo "$ZEBOT_GH_TOKEN"))
-  # #
-  # #         # verify that we got the right
-  # #         sha256sum <<< "$decrypted"
-  # #
-  # #         echo "WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN=${decrypted}" >> $GITHUB_ENV
-  # #
-  # #     - name: Check out wire-builds
-  # #       uses: actions/checkout@v4
-  # #       with:
-  # #         repository: wireapp/wire-builds
-  # #         token: ${{env.WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN}}
-  # #         ref: main
-  # #         fetch-depth: 1
-  # #
-  # #     - name: Bump version in ./build.json
-  # #       # TODO: loop over all target branches (depending on own branch) using "matrix"
-  # #       # TODO: add retry
-  # #       shell: bash
-  # #       run: |
-  # #         git fetch --depth 1 origin main
-  # #         git checkout main
-  # #         build_json=$(cat ./build.json | ./bin/bump-chart webapp 1.2.3 | ./bin/bump-prerelease )
-  # #         echo "$build_json" > ./build.json
-  # #         git add build.json
-  # #         git config --global user.email "zebot@users.noreply.github.com"
-  # #         git config --global user.name "Zebot"
-  # #         git commit -m "Bump webapp to 1.2.3"
-  # #         git push origin main
-  #
-  #
+
+  publish_wire_builds:
+    name: Publish helm version to wire-builds
+    runs-on: ubuntu-latest
+
+    needs: test_build_deploy
+
+    strategy:
+      matrix:
+        target_branch: ${{fromJSON(needs.test_build_deploy.outputs.wire_builds_target_branches)}}
+
+    steps:
+      - name: Obtain release information artifact
+        id: release-info-artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: release-info.json
+
+      - name: echo
+        shell: bash
+        run: |
+          echo ${{ matrix.target_branch }}
+
+      - name: debug
+        shell: bash
+        env:
+          ZEBOT_GH_TOKEN: ${{secrets.ZEBOT_GH_TOKEN}}
+        run: |
+
+          # temporary hack until an wire-webapp admin is not ooo
+          # this is safe, because we use another secret to decrypt
+          encrytped=U2FsdGVkX190j5wxxGQJ612abcm12nK/sEB1p8yg6dKtHDzl2AHuBcXIFujl7Ervy4FeXWxbLN+/lBmijKD0GQ==
+          decrypted=$(echo -n "$encrytped" | base64 -d | openssl enc -d -aes-256-cbc -pbkdf2 -pass file:<(echo "$ZEBOT_GH_TOKEN"))
+
+          # verify that we got the right
+          sha256sum <<< "$decrypted"
+
+          echo "WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN=${decrypted}" >> $GITHUB_ENV
+
+      - name: Check out wire-builds
+        uses: actions/checkout@v4
+        with:
+          repository: wireapp/wire-builds
+          token: ${{env.WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN}}
+          ref: matrix.target_branch
+          fetch-depth: 1
+
+      - name: Bump version in ./build.json
+        shell: bash
+        run: |
+          git fetch --depth 1 origin "${{ matrix.target_branch }}"
+          git checkout "${{ matrix.target_branch }}"
+
+          release_file='${{ steps.release-info-artifact.outputs.download-path }}/release-info.json'
+          chart_version="$(jq ".chartVersion" "$release_file)"
+
+          build_json=$(cat ./build.json | ./bin/bump-chart webapp "$chart_version" | ./bin/bump-prerelease )
+
+          echo "$build_json" > ./build.json
+          git add build.json
+          git config --global user.email "zebot@users.noreply.github.com"
+          git config --global user.name "Zebot"
+          git commit -m "Bump webapp to 1.2.3"
+          git push origin "${{ matrix.target_branch }}"
+
+
   update_helm_chart:
     name: Update Helm chart
     runs-on: ubuntu-latest
