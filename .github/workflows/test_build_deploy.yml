@@ -206,7 +206,7 @@ jobs:
           git checkout "${{ matrix.target_branch }}"
 
           release_file='${{ steps.release-info-artifact.outputs.download-path }}/release-info.json'
-          chart_version="$(jq ".chartVersion" "$release_file)"
+          chart_version="$(jq ".chartVersion" "$release_file")"
 
           build_json=$(cat ./build.json | ./bin/bump-chart webapp "$chart_version" | ./bin/bump-prerelease )
           echo "$build_json" > ./build.json
