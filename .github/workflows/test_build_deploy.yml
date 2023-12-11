@@ -38,11 +38,11 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 16.x
-          cache: 'yarn'
+      # - name: Setup Node.js
+      #   uses: actions/setup-node@v4
+      #   with:
+      #     node-version: 16.x
+      #     cache: 'yarn'
 
       - name: Set environment variables
         run: |
