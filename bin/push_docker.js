@@ -59,8 +59,8 @@ tags.push(`${repository}:${versionTag}`);
 
 /** Defines which config version (listed in "app-config/package.json") is going to be used */
 const configVersion = appConfigPkg.dependencies[configurationEntry].split('#')[1];
-const uniqueTag=`${repository}:${versionTag}-${configVersion}-${commitShortSha}`
-tags.push(uniqueTag);
+const uniqueTag=`${versionTag}-${configVersion}-${commitShortSha}`;
+tags.push(`${repository}:${uniqueTag}`);
 
 const dockerCommands = [
   `echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin ${dockerRegistryDomain}`,
