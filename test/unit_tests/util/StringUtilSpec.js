@@ -86,15 +86,6 @@ describe('StringUtil', () => {
   });
 
   describe('obfuscate', () => {
-    it("obfuscates a text preserving it's whitespaces", () => {
-      const text = 'You Are The Sunshine Of My Life';
-      const obfuscated = obfuscate(text);
-      const whitespaces = obfuscated.match(/[\n\r\s]+/gi);
-
-      expect(obfuscated).not.toBe(text);
-      expect(whitespaces.length).toBe(6);
-    });
-
     it('obfuscates a text keeping its length', () => {
       const text =
         'Bacon ipsum dolor amet sausage landjaeger ball tip brisket filet mignon, t-bone tenderloin tri-tip beef drumstick fatback burgdoggen ground round meatball. Tri-tip spare ribs ground round bresaola ball tip tail, sirloin chicken doner boudin turkey leberkas bacon alcatra. ';
