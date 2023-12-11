@@ -95,8 +95,8 @@ jobs:
           GH_TOKEN: ${{secrets.OTTO_THE_BOT_GH_TOKEN}}
         run: echo "machine github.com login ${GH_TOKEN}" > ~/.netrc
 
-      - name: Install JS dependencies
-        run: yarn --immutable
+      # - name: Install JS dependencies
+      #   run: yarn --immutable
 
       # - name: Test
       #   run: |
@@ -117,7 +117,6 @@ jobs:
         run: |
           touch ./server
           touch ./.env.defaults
-
       - name: Push Docker image
         id: push_docker_image
         env:
@@ -195,9 +194,7 @@ jobs:
           git fetch --depth 1 origin "${{ matrix.target_branch }}"
           git checkout "${{ matrix.target_branch }}"
 
-          imageTag="${{steps.push_docker_image.outputs.imageTag}}"
-
-          chart_version="${{steps.publish_helm_chart.outputs.chart_version}}"
+          chart_version="${{needs.build.outputs.chart_version}}"
 
           build_json=$(cat ./build.json | ./bin/bump-chart webapp "$chart_version" | ./bin/bump-prerelease )
           echo "$build_json" > ./build.json
