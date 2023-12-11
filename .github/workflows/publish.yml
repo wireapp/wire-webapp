@@ -31,7 +31,7 @@ jobs:
     steps:
       - uses: azure/setup-helm@v3
         with:
-           version: '3.12.2'
+          version: '3.12.2'
         id: install
 
       - name: Checkout
@@ -54,7 +54,7 @@ jobs:
       - uses: kanga333/variable-mapper@master
         name: Determine target branches in wireapp/wire-builds
         with:
-          key: "${{env.BRANCH_NAME}}"
+          key: '${{env.BRANCH_NAME}}'
           map: |
             {
               "stefan": { "wire_builds_target_branches" : "[\"main\"]" },
@@ -99,10 +99,10 @@ jobs:
       - name: Install JS dependencies
         run: yarn --immutable
 
-      # - name: Test
-      #   run: |
-      #     set -o pipefail
-      #     yarn test --coverage --coverage-reporters=lcov --detectOpenHandles=false 2>&1 | tee ./unit-tests.log
+      - name: Test
+        run: |
+          set -o pipefail
+          yarn test --coverage --coverage-reporters=lcov --detectOpenHandles=false 2>&1 | tee ./unit-tests.log
 
       - name: Monitor coverage
         uses: codecov/codecov-action@v3.1.4
@@ -111,8 +111,8 @@ jobs:
           files: ./coverage/lcov.info
           flags: unittests
 
-      # - name: Build
-      #   run: yarn build:prod
+      - name: Build
+        run: yarn build:prod
 
       - name: Fake build
         run: |
@@ -144,8 +144,8 @@ jobs:
         shell: bash
         id: publish_helm_chart
         env:
-           AWS_ACCESS_KEY_ID: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_ACCESS_KEY_ID }}
-           AWS_SECRET_ACCESS_KEY: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_SECRET_ACCESS_KEY }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_SECRET_ACCESS_KEY }}
         run: |
           set -eo pipefail
 
@@ -168,7 +168,6 @@ jobs:
           helm package ./charts/webapp
 
           helm s3 push webapp-*.tgz charts-webapp
-
 
   publish_wire_builds:
     name: Bump webapp chart in wire-builds
@@ -207,10 +206,9 @@ jobs:
 
           git push origin "${{ matrix.target_branch }}"
 
-
   # FUTUREWORK: Remove this job once production builds are based on wireapp/wire-builds
   update_helm_chart:
-    name: "Create PR in wire-server: Bump Helm chart"
+    name: 'Create PR in wire-server: Bump Helm chart'
     runs-on: ubuntu-latest
 
     needs: build
