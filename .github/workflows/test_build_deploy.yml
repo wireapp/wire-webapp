@@ -6,8 +6,6 @@ on:
     tags:
       - '*staging*'
       - '*production*'
-  # pull_request:
-  #   branches: [master, dev, edge, avs, mobile, acc, stefan]
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -23,9 +21,6 @@ jobs:
     env:
       TEST_COVERAGE_FAIL_THRESHOLD: 45
       TEST_COVERAGE_WARNING_THRESHOLD: 60
-      DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS: 150
-      AWS_APPLICATION_NAME: Webapp
-      AWS_BUILD_ZIP_PATH: server/dist/s3/ebs.zip
       COMMIT_URL: ${{github.event.head_commit.url}}
       COMMITTER: ${{github.event.head_commit.committer.name}}
 
@@ -51,7 +46,6 @@ jobs:
           echo "BRANCH_NAME=$(git branch --show-current)" >> $GITHUB_ENV
           echo "TAG=$(git tag --points-at ${{github.sha}})" >> $GITHUB_ENV
           echo "PR_LAST_COMMIT_MESSAGE=$(git log --format=%B -n 1 ${{github.event.after}} | head -n 1)" >> $GITHUB_ENV
-
 
       - uses: kanga333/variable-mapper@master
         name: Determine target branches in wireapp/wire-builds
@@ -101,11 +95,11 @@ jobs:
       - name: Install JS dependencies
         run: yarn --immutable
 
-      # - name: Test
-      #   run: |
-      #     set -o pipefail
-      #     yarn test --coverage --coverage-reporters=lcov --detectOpenHandles=false 2>&1 | tee ./unit-tests.log
-      #
+      - name: Test
+        run: |
+          set -o pipefail
+          yarn test --coverage --coverage-reporters=lcov --detectOpenHandles=false 2>&1 | tee ./unit-tests.log
+
       - name: Monitor coverage
         uses: codecov/codecov-action@v3.1.4
         with:
@@ -113,86 +107,8 @@ jobs:
           files: ./coverage/lcov.info
           flags: unittests
 
-      - uses: kanga333/variable-mapper@master
-        with:
-          # We try to map a branch to a dev environment
-          key: '${{github.ref}}'
-          map: |
-            {
-              "dev": { "dev_env": "wire-webapp-dev-al2" },
-              "master": { "dev_env": "wire-webapp-master-al2" }
-            }
-
-      - uses: kanga333/variable-mapper@master
-        with:
-          # We try to map a branch to a dev environment
-          key: '${{github.ref}}'
-          map: |
-            {
-              "dev": { "preprod_env": "wire-webapp-edge-al2" }
-            }
-
-      - uses: kanga333/variable-mapper@master
-        with:
-          # We try to map a tag to a dev environment
-          key: '${{env.TAG}}'
-          map: |
-            {
-              "production": { "prod_env": "wire-webapp-prod-al2" },
-              "staging": { "prod_env": "wire-webapp-staging-al2" }
-            }
-
       - name: Build
         run: yarn build:prod
-
-      # Stage 1: https://wire-webapp-edge.zinfra.io/
-      - name: Deploy to dev env
-        if: env.dev_env
-        uses: einaregilsson/beanstalk-deploy@v21
-        with:
-          application_name: ${{env.AWS_APPLICATION_NAME}}
-          aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
-          aws_secret_key: ${{secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY}}
-          deployment_package: ${{env.AWS_BUILD_ZIP_PATH}}
-          environment_name: ${{env.dev_env}}
-          region: eu-central-1
-          use_existing_version_if_available: true
-          version_description: ${{github.sha}}
-          version_label: ${{github.run_id}}
-          wait_for_deployment: false
-          wait_for_environment_recovery: ${{env.DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS}}
-
-      - name: Deploy to pre-prod env
-        if: env.preprod_env
-        uses: einaregilsson/beanstalk-deploy@v21
-        with:
-          application_name: ${{env.AWS_APPLICATION_NAME}}
-          aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
-          aws_secret_key: ${{secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY}}
-          deployment_package: ${{env.AWS_BUILD_ZIP_PATH}}
-          environment_name: ${{env.preprod_env}}
-          region: eu-central-1
-          use_existing_version_if_available: true
-          version_description: ${{github.sha}}
-          version_label: ${{github.run_id}}
-          wait_for_deployment: false
-          wait_for_environment_recovery: ${{env.DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS}}
-
-      - name: Deploy to prod env
-        if: env.prod_env
-        uses: einaregilsson/beanstalk-deploy@v21
-        with:
-          application_name: ${{env.AWS_APPLICATION_NAME}}
-          aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
-          aws_secret_key: ${{secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY}}
-          deployment_package: ${{env.AWS_BUILD_ZIP_PATH}}
-          environment_name: ${{env.prod_env}}
-          region: eu-central-1
-          use_existing_version_if_available: true
-          version_description: ${{github.sha}}
-          version_label: ${{env.TAG}}-${{github.run_id}}
-          wait_for_deployment: false
-          wait_for_environment_recovery: ${{env.DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS}}
 
       - name: Push Docker image
         env:
@@ -251,76 +167,6 @@ jobs:
           name: release-info.json
           path: ./release-info.json
 
-      - name: Generate changelog for production release
-        if: contains(env.TAG, 'production')
-        run: yarn changelog:production
-
-      - name: Create GitHub production release
-        id: create_release_production
-        if: contains(env.TAG, 'production')
-        uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{github.token}}
-        with:
-          tag_name: ${{env.TAG}}
-          name: ${{env.TAG}}
-          body_path: ./CHANGELOG.md
-          files: ./unit-tests.log
-          draft: false
-          prerelease: false
-
-      - name: Announce production release
-        if: contains(env.TAG, 'production')
-        uses: wireapp/github-action-wire-messenger@v2.0.0
-        with:
-          email: ${{secrets.WIRE_BOT_EMAIL}}
-          password: ${{secrets.WIRE_BOT_PASSWORD}}
-          conversation: 1784ed44-7c32-4984-b5e2-0b4d55b034ed
-          send_text: 'The web team just rolled out a new version of [Wire for Web](https://app.wire.com/). You can find what has changed in our [GitHub release notes](https://github.com/wireapp/wire-webapp/releases/latest).\n\nPlease note that the rollout can take up to 30 minutes to be fully deployed on all nodes. You can check here if you get already served our latest version from today: https://app.wire.com/version'
-
-      - name: Generate changelog for staging release
-        if: contains(env.TAG, 'staging')
-        run: yarn changelog:staging
-
-      - name: Create GitHub staging release
-        id: create_release_staging
-        if: contains(env.TAG, 'staging')
-        uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{github.token}}
-        with:
-          tag_name: ${{env.TAG}}
-          name: ${{env.TAG}}
-          body_path: ./CHANGELOG.md
-          files: ./unit-tests.log
-          draft: false
-          prerelease: true
-
-      - name: Announce staging release
-        if: contains(env.TAG, 'staging')
-        uses: wireapp/github-action-wire-messenger@v2.0.0
-        with:
-          email: ${{secrets.WIRE_BOT_EMAIL}}
-          password: ${{secrets.WIRE_BOT_PASSWORD}}
-          conversation: '697c93e8-0b13-4204-a35e-59270462366a'
-          send_text: 'Staging bump for commit **${{github.sha}}** ("${{env.TITLE}}") done! 🏁'
-
-      - name: Notify CI error
-        if: failure() && github.event_name != 'pull_request'
-        uses: wireapp/github-action-wire-messenger@v2.0.0
-        with:
-          email: ${{secrets.WIRE_BOT_EMAIL}}
-          password: ${{secrets.WIRE_BOT_PASSWORD}}
-          conversation: 'b2cc7120-4154-4be4-b0c0-45a8c361c4d1'
-          send_text: '${{env.COMMITTER}} broke the "${{env.BRANCH_NAME}}" branch on "${{github.repository}}" with [${{env.TITLE}}](${{env.COMMIT_URL}}) 🌵'
-
-      - name: Upload WebApp artifacts
-        if: env.BUILD_DESKTOP == 'true'
-        uses: actions/upload-artifact@v3
-        with:
-          name: webapp-dist
-          path: ./server/dist
-
   publish_wire_builds:
     name: Publish helm version to wire-builds
     runs-on: ubuntu-latest
@@ -367,7 +213,7 @@ jobs:
           ref: matrix.target_branch
           fetch-depth: 1
 
-      - name: Bump version in ./build.json
+      - name: Create new build in wire-build
         shell: bash
         run: |
           git fetch --depth 1 origin "${{ matrix.target_branch }}"
@@ -377,15 +223,17 @@ jobs:
           chart_version="$(jq ".chartVersion" "$release_file)"
 
           build_json=$(cat ./build.json | ./bin/bump-chart webapp "$chart_version" | ./bin/bump-prerelease )
-
           echo "$build_json" > ./build.json
+
           git add build.json
           git config --global user.email "zebot@users.noreply.github.com"
           git config --global user.name "Zebot"
-          git commit -m "Bump webapp to 1.2.3"
+          git commit -m "Bump webapp to $chart_version"
+
           git push origin "${{ matrix.target_branch }}"
 
 
+  # FUTUREWORK: Remove this job once production builds are based on wireapp/wire-builds
   update_helm_chart:
     name: Update Helm chart
     runs-on: ubuntu-latest
