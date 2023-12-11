@@ -1,4 +1,4 @@
-name: Publish Docker, Helm and an wire-builds
+name: Publish Docker image, Helm chart and Wire build
 
 on:
   push:
