@@ -124,44 +124,6 @@ jobs:
       - name: Build
         run: yarn build:prod
 
-      - name: Assembling release information
-        if: contains(env.TAG, 'production')
-        # NOTE: always using 'master' config, since release version is only consumed at
-        #       'production' stage for now
-        shell: bash
-        run: |
-          configVersion=$(cat ./app-config/package.json | jq -r '.dependencies["wire-web-config-default-master"]' | awk -F '#' '{ print $2 }')
-          packageVersion=$(cat ./package.json | jq -r '.version')
-          containerImageTag="${TAG:-${packageVersion}}-${configVersion}-${GITHUB_SHA::7}"
-          echo "{\"imageTag\": \"${containerImageTag}\", \"releaseName\": \"${TAG:-v${packageVersion}}\"}" > ./release-info.json
-
-      - name: Patch helm chart
-        shell: bash
-        env:
-           AWS_ACCESS_KEY_ID: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_ACCESS_KEY_ID }}
-           AWS_SECRET_ACCESS_KEY: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_SECRET_ACCESS_KEY }}
-        run: |
-          set -eo pipefail
-
-          image_tag="$(jq -Mr ".imageTag" ./release-info.json)"
-
-          helm plugin install https://github.com/hypnoglow/helm-s3.git --version 0.15.1
-
-          helm repo add charts-webapp s3://public.wire.com/charts-webapp
-
-          if [ "$TAG" != "" ]; then
-            chart_version="$(./bin/chart-next-version.sh release)"
-          else
-            chart_version="$(./bin/chart-next-version.sh prerelease)"
-          fi
-
-          chart_patched="$(yq -Mr ".version = \"$chart_version\" | .appVersion = \"$image_tag\"" ./charts/webapp/Chart.yaml)"
-          echo "$chart_patched" > ./charts/webapp/Chart.yaml
-
-          helm package ./charts/webapp
-
-          helm s3 push webapp-*.tgz charts-webapp
-
       # Stage 1: https://wire-webapp-edge.zinfra.io/
       - name: Deploy to dev env
         if: env.dev_env
@@ -230,6 +192,33 @@ jobs:
           echo "{\"imageTag\": \"${imageTag}\", \"releaseName\": \"${TAG:-v${packageVersion}}\"}" > ./release-info.json
 
           cat ./release-info.json
+
+      - name: Patch helm chart
+        shell: bash
+        env:
+           AWS_ACCESS_KEY_ID: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_ACCESS_KEY_ID }}
+           AWS_SECRET_ACCESS_KEY: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_SECRET_ACCESS_KEY }}
+        run: |
+          set -eo pipefail
+
+          image_tag="$(jq -Mr ".imageTag" ./release-info.json)"
+
+          helm plugin install https://github.com/hypnoglow/helm-s3.git --version 0.15.1
+
+          helm repo add charts-webapp s3://public.wire.com/charts-webapp
+
+          if [ "$TAG" != "" ]; then
+            chart_version="$(./bin/chart-next-version.sh release)"
+          else
+            chart_version="$(./bin/chart-next-version.sh prerelease)"
+          fi
+
+          chart_patched="$(yq -Mr ".version = \"$chart_version\" | .appVersion = \"$image_tag\"" ./charts/webapp/Chart.yaml)"
+          echo "$chart_patched" > ./charts/webapp/Chart.yaml
+
+          helm package ./charts/webapp
+
+          helm s3 push webapp-*.tgz charts-webapp
 
       - name: Storing release information
         if: contains(env.TAG, 'production')
