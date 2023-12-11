@@ -50,9 +50,13 @@ export const getRandomChar = (): string => {
 };
 
 export const obfuscate = (text: string): string => {
-  /* cspell:disable-next-line */
-  const alphabet = Array.from('abcdefghijklmnopqrstuvwxyz');
-  return Array.from(text, char => (/\s/.test(char) ? char : randomElement(alphabet))).join('');
+  const alphabet = Array.from('abcdefghijklmnopqrstuvwxyz ');
+
+  const obfuscatedText = Array.from({length: text.length + Math.floor((1 + Math.random()) * 10)}, () =>
+    randomElement(alphabet),
+  ).join('');
+
+  return obfuscatedText;
 };
 
 /**
