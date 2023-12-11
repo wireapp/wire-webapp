@@ -45,9 +45,9 @@ require('dotenv').config();
 const configurationEntry = process.argv[2];
 /** Version tag of webapp (e.g. "2023-11-09-staging.0", "dev") */
 const versionTag = process.argv[3];
-const uniqueTagOut = process.argv[4] | '';
+const uniqueTagOut = process.argv[4] || '';
 /** Commit ID of https://github.com/wireapp/wire-webapp (i.e. "1240cfda9e609470cf1154e18f5bc582ca8907ff") */
-const commitSha = process.env.GITHUB_SHA || process.argv[4];
+const commitSha = process.env.GITHUB_SHA || process.argv[5];
 const commitShortSha = commitSha.substring(0, 7);
 const dockerRegistryDomain = 'quay.io';
 const repository = `${dockerRegistryDomain}/wire/webapp`;
