@@ -191,32 +191,11 @@ jobs:
         with:
           name: release-info.json
 
-      - name: echo
-        shell: bash
-        run: |
-          echo ${{ matrix.target_branch }}
-
-      - name: debug
-        shell: bash
-        env:
-          ZEBOT_GH_TOKEN: ${{secrets.ZEBOT_GH_TOKEN}}
-        run: |
-
-          # temporary hack until an wire-webapp admin is not ooo
-          # this is safe, because we use another secret to decrypt
-          encrytped=U2FsdGVkX190j5wxxGQJ612abcm12nK/sEB1p8yg6dKtHDzl2AHuBcXIFujl7Ervy4FeXWxbLN+/lBmijKD0GQ==
-          decrypted=$(echo -n "$encrytped" | base64 -d | openssl enc -d -aes-256-cbc -pbkdf2 -pass file:<(echo "$ZEBOT_GH_TOKEN"))
-
-          # verify that we got the right
-          sha256sum <<< "$decrypted"
-
-          echo "WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN=${decrypted}" >> $GITHUB_ENV
-
       - name: Check out wire-builds
         uses: actions/checkout@v4
         with:
           repository: wireapp/wire-builds
-          token: ${{env.WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN}}
+          token: ${{secrets.WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN}}
           ref: ${{matrix.target_branch}}
           fetch-depth: 1
 
