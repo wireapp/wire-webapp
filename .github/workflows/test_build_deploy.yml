@@ -19,6 +19,7 @@ jobs:
     outputs:
       wire_builds_target_branches: ${{ steps.output_target_branches.outputs.wire_builds_target_branches }}
       imageTag: ${{ steps.push_docker_image.outputs.imageTag }}
+      chart_version: ${{ steps.publish_helm_chart.outputs.imageTag }}
 
     env:
       TEST_COVERAGE_FAIL_THRESHOLD: 45
