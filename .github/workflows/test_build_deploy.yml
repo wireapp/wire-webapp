@@ -18,7 +18,8 @@ jobs:
 
     outputs:
       wire_builds_target_branches: ${{ steps.output_target_branches.outputs.wire_builds_target_branches }}
-      imageTag: ${{ steps.push_docker_image.outputs.imageTag }}
+      image_tag: ${{ steps.push_docker_image.outputs.image_tag }}
+      release_name: ${{ steps.push_docker_image.outputs.release_name }}
       chart_version: ${{ steps.publish_helm_chart.outputs.chart_version }}
 
     env:
@@ -133,11 +134,11 @@ jobs:
           yarn docker "$config_entry" "$version_tag" ./image_tag.txt
 
           packageVersion=$(cat ./package.json | jq -r '.version')
-          imageTag="$(cat ./image_tag.txt)"
-          releaseName="${TAG:-v${packageVersion}}"
+          image_tag="$(cat ./image_tag.txt)"
+          release_name="${TAG:-v${packageVersion}}"
 
-          echo "imageTag=$imageTag" >> $GITHUB_OUTPUT
-          echo "releaseName=$releaseName" >> $GITHUB_OUTPUT
+          echo "image_tag=$image_tag" >> $GITHUB_OUTPUT
+          echo "release_name=$release_name" >> $GITHUB_OUTPUT
 
       - name: Publish Helm chart
         shell: bash
@@ -148,7 +149,7 @@ jobs:
         run: |
           set -eo pipefail
 
-          imageTag="${{steps.push_docker_image.outputs.imageTag}}"
+          image_tag="${{steps.push_docker_image.outputs.image_tag}}"
 
           helm plugin install https://github.com/hypnoglow/helm-s3.git --version 0.15.1
 
@@ -161,7 +162,7 @@ jobs:
           fi
           echo "chart_version=$chart_version" >> $GITHUB_OUTPUT
 
-          chart_patched="$(yq -Mr ".version = \"$chart_version\" | .appVersion = \"$imageTag\"" ./charts/webapp/Chart.yaml)"
+          chart_patched="$(yq -Mr ".version = \"$chart_version\" | .appVersion = \"$image_tag\"" ./charts/webapp/Chart.yaml)"
           echo "$chart_patched" > ./charts/webapp/Chart.yaml
 
           helm package ./charts/webapp
@@ -219,9 +220,9 @@ jobs:
         id: release-info-file
         shell: bash
         run: |
-          imageTag="${{needs.build.outputs.imageTag}}"
-          echo "imageTag: $imageTag"
-          if [[ "$imageTag" == *"production"* ]]; then
+          image_tag="${{needs.build.outputs.image_tag}}"
+          echo "image_tag: $image_tag"
+          if [[ "$image_tag" == *"production"* ]]; then
              echo '::set-output name=exists::true'
              echo "::set-output name=releaseInfo::$(cat ${ARTIFACT_LOCAL_PATH})"
           fi
@@ -238,11 +239,11 @@ jobs:
         if: ${{ steps.release-info-file.outputs.exists == 'true' }}
         shell: bash
         run: |
-          sed --in-place --expression="s/  tag: .*/  tag: \"${{ fromJSON(steps.release-info-file.outputs.releaseInfo).imageTag }}\"/" ./charts/webapp/values.yaml
+          sed --in-place --expression="s/  tag: .*/  tag: \"${{needs.build.outputs.image_tag}}\"/" ./charts/webapp/values.yaml
           git add ./charts/webapp/values.yaml
-          echo "Upgrade webapp version to ${{ fromJSON(steps.release-info-file.outputs.releaseInfo).imageTag }}" > ./changelog.d/0-release-notes/webapp-upgrade
+          echo "Upgrade webapp version to ${{needs.build.outputs.image_tag}}" > ./changelog.d/0-release-notes/webapp-upgrade
           git add ./changelog.d/0-release-notes/webapp-upgrade
-          echo "::set-output name=releaseUrl::${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/releases/tag/${{ fromJSON(steps.release-info-file.outputs.releaseInfo).releaseName }}"
+          echo "::set-output name=releaseUrl::${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/releases/tag/${{needs.build.outputs.release_name}}"
 
       - name: Creating Pull Request
         id: create-pr
@@ -256,8 +257,8 @@ jobs:
           commit-message: 'chore: [charts] Update webapp version'
           title: 'Update webapp version in Helm chart [skip ci]'
           body: |
-            Image tag: `${{ fromJSON(steps.release-info-file.outputs.releaseInfo).imageTag }}`
-            Release: [`${{ fromJSON(steps.release-info-file.outputs.releaseInfo).releaseName }}`](${{ steps.change-helm-value.outputs.releaseUrl }})
+            Image tag: `${{needs.build.outputs.image_tag}}`
+            Release: [`${{needs.build.outputs.release_name}}`](${{ steps.change-helm-value.outputs.releaseUrl }})
 
       - name: Printing Pull Request URL
         if: ${{ steps.release-info-file.outputs.exists == 'true' }}
