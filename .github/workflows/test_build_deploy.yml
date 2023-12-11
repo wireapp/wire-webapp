@@ -53,7 +53,7 @@ jobs:
       - uses: kanga333/variable-mapper@master
         name: Determine target branches in wireapp/wire-builds
         with:
-          key: env.BRANCH_NAME
+          key: "${{env.BRANCH_NAME}}"
           map: |
             {
               "stefan": { "wire_builds_target_branches" : "[\"main\"]" },
