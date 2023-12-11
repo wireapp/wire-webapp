@@ -6,8 +6,8 @@ on:
     tags:
       - '*staging*'
       - '*production*'
-  pull_request:
-    branches: [master, dev, edge, avs, mobile, acc, stefan]
+  # pull_request:
+  #   branches: [master, dev, edge, avs, mobile, acc, stefan]
 
 concurrency:
   group: ci-${{ github.ref }}
