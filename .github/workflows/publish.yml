@@ -114,10 +114,6 @@ jobs:
       - name: Build
         run: yarn build:prod
 
-      - name: Fake build
-        run: |
-          touch ./server
-          touch ./.env.defaults
       - name: Push Docker image
         id: push_docker_image
         env:
