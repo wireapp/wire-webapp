@@ -14,9 +14,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  wire_builds_targets:
-
-
   test_build_deploy:
     runs-on: buildjet-8vcpu-ubuntu-2204
 
