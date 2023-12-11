@@ -18,6 +18,7 @@ jobs:
 
     outputs:
       wire_builds_target_branches: ${{ steps.output_target_branches.outputs.wire_builds_target_branches }}
+      imageTag: ${{ steps.push_docker_image.outputs.imageTag }}
 
     env:
       TEST_COVERAGE_FAIL_THRESHOLD: 45
@@ -128,22 +129,21 @@ jobs:
 
           packageVersion=$(cat ./package.json | jq -r '.version')
           imageTag="$(cat ./image_tag.txt)"
-
-          echo "{\"imageTag\": \"${imageTag}\", \"releaseName\": \"${TAG:-v${packageVersion}}\"}" > ./release-info.json
+          releaseName="${TAG:-v${packageVersion}}"
 
           echo "imageTag=$imageTag" >> $GITHUB_OUTPUT
+          echo "releaseName=$releaseName" >> $GITHUB_OUTPUT
 
       - name: Publish Helm chart
         shell: bash
+        id: publish_helm_chart
         env:
            AWS_ACCESS_KEY_ID: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_ACCESS_KEY_ID }}
            AWS_SECRET_ACCESS_KEY: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_SECRET_ACCESS_KEY }}
         run: |
           set -eo pipefail
 
-          echo "imageTag from previous step: ${{ steps.push_docker_image.outputs.imageTag }}"
-
-          image_tag="$(jq -Mr ".imageTag" ./release-info.json)"
+          imageTag="${{steps.push_docker_image.outputs.imageTag}}"
 
           helm plugin install https://github.com/hypnoglow/helm-s3.git --version 0.15.1
 
@@ -154,25 +154,15 @@ jobs:
           else
             chart_version="$(./bin/chart-next-version.sh prerelease)"
           fi
+          echo "chart_version=$chart_version" >> $GITHUB_OUTPUT
 
-          chart_patched="$(yq -Mr ".version = \"$chart_version\" | .appVersion = \"$image_tag\"" ./charts/webapp/Chart.yaml)"
+          chart_patched="$(yq -Mr ".version = \"$chart_version\" | .appVersion = \"$imageTag\"" ./charts/webapp/Chart.yaml)"
           echo "$chart_patched" > ./charts/webapp/Chart.yaml
 
           helm package ./charts/webapp
 
           helm s3 push webapp-*.tgz charts-webapp
 
-          ri="$(jq ".chartVersion = \"$chart_version\"" ./release-info.json)"
-          echo "$ri" > ./release-info.json
-
-          echo "release-info.json :"
-          cat ./release-info.json
-
-      - name: Store release information
-        uses: actions/upload-artifact@v3
-        with:
-          name: release-info.json
-          path: ./release-info.json
 
   publish_wire_builds:
     name: Bump webapp chart in wire-builds
@@ -185,12 +175,6 @@ jobs:
         target_branch: ${{fromJSON(needs.build.outputs.wire_builds_target_branches)}}
 
     steps:
-      - name: Obtain release information artifact
-        id: release-info-artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: release-info.json
-
       - name: Check out wire-builds
         uses: actions/checkout@v4
         with:
@@ -205,8 +189,9 @@ jobs:
           git fetch --depth 1 origin "${{ matrix.target_branch }}"
           git checkout "${{ matrix.target_branch }}"
 
-          release_file='${{ steps.release-info-artifact.outputs.download-path }}/release-info.json'
-          chart_version="$(jq ".chartVersion" "$release_file")"
+          imageTag="${{steps.push_docker_image.outputs.imageTag}}"
+
+          chart_version="${{steps.publish_helm_chart.outputs.chart_version}}"
 
           build_json=$(cat ./build.json | ./bin/bump-chart webapp "$chart_version" | ./bin/bump-prerelease )
           echo "$build_json" > ./build.json
@@ -227,19 +212,12 @@ jobs:
     needs: build
 
     steps:
-      - name: Obtaining release information artifact
-        id: release-info-artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: release-info.json
-
       - name: Check whether this is a production release
         id: release-info-file
-        env:
-          ARTIFACT_LOCAL_PATH: '${{ steps.release-info-artifact.outputs.download-path }}/release-info.json'
         shell: bash
         run: |
-          imageTag="$(jq -Mr ".imageTag" "$ARTIFACT_LOCAL_PATH")"
+          imageTag="${{needs.build.outputs.imageTag}}"
+          echo "imageTag: $imageTag"
           if [[ "$imageTag" == *"production"* ]]; then
              echo '::set-output name=exists::true'
              echo "::set-output name=releaseInfo::$(cat ${ARTIFACT_LOCAL_PATH})"
@@ -283,20 +261,3 @@ jobs:
         shell: bash
         run: |
           echo "PR: ${{ steps.create-pr.outputs.pull-request-url }}"
-
-
-  cleanup_artifacts:
-    permissions:
-      contents: none
-    name: Cleanup artifacts
-    needs: update_helm_chart
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Delete WebApp artifacts
-        uses: geekyeggo/delete-artifact@v2
-        with:
-          failOnError: false
-          name: |
-            webapp-dist
-            release-info.json
