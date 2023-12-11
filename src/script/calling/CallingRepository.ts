@@ -672,9 +672,16 @@ export class CallingRepository {
       }
       case CALL_MESSAGE_TYPE.REMOTE_MUTE: {
         const call = this.findCall(conversationId);
-        if (call) {
-          this.muteCall(call, true, MuteState.REMOTE_MUTED);
+        if (!call) {
+          break;
         }
+
+        const isSenderAdmin = conversation.isAdmin(userId);
+        if (!isSenderAdmin) {
+          break;
+        }
+
+        this.muteCall(call, true, MuteState.REMOTE_MUTED);
         break;
       }
       case CALL_MESSAGE_TYPE.REMOTE_KICK: {

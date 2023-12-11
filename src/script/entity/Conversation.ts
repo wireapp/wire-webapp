@@ -22,6 +22,7 @@ import {
   CONVERSATION_ACCESS,
   CONVERSATION_LEGACY_ACCESS_ROLE,
   CONVERSATION_TYPE,
+  DefaultConversationRoleName,
 } from '@wireapp/api-client/lib/conversation/';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
@@ -607,6 +608,10 @@ export class Conversation {
       this.is_loaded(false);
       this.hasAdditionalMessages(true);
     }
+  }
+
+  public isAdmin(userId: QualifiedId) {
+    return this.roles()[userId.id] === DefaultConversationRoleName.WIRE_ADMIN;
   }
 
   /**
