@@ -57,7 +57,7 @@ jobs:
           map: |
             {
               "stefan": { "wire_builds_target_branches" : "[\"main\"]" },
-              "dev": { "wire_builds_target_branches" : "[\"main\"]" },
+              "dev": { "wire_builds_target_branches" : "[\"main\"]" }
             }
 
       - name: Make target branches available as output to other jobs
