@@ -211,7 +211,7 @@ jobs:
         with:
           repository: wireapp/wire-builds
           token: ${{env.WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN}}
-          ref: matrix.target_branch
+          ref: ${{matrix.target_branch}}
           fetch-depth: 1
 
       - name: Create new build in wire-build
