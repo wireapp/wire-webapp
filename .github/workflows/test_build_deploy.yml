@@ -38,11 +38,11 @@ jobs:
         with:
           fetch-depth: 0
 
-      # - name: Setup Node.js
-      #   uses: actions/setup-node@v4
-      #   with:
-      #     node-version: 16.x
-      #     cache: 'yarn'
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 16.x
+          cache: 'yarn'
 
       - name: Set environment variables
         run: |
@@ -95,8 +95,8 @@ jobs:
           GH_TOKEN: ${{secrets.OTTO_THE_BOT_GH_TOKEN}}
         run: echo "machine github.com login ${GH_TOKEN}" > ~/.netrc
 
-      # - name: Install JS dependencies
-      #   run: yarn --immutable
+      - name: Install JS dependencies
+        run: yarn --immutable
 
       # - name: Test
       #   run: |
