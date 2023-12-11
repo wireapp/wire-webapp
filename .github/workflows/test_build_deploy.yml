@@ -191,8 +191,6 @@ jobs:
           imageTag="$(cat ./image_tag.txt)"
           echo "{\"imageTag\": \"${imageTag}\", \"releaseName\": \"${TAG:-v${packageVersion}}\"}" > ./release-info.json
 
-          cat ./release-info.json
-
       - name: Publish Helm chart
         shell: bash
         env:
@@ -224,8 +222,13 @@ jobs:
 
           helm s3 push webapp-*.tgz charts-webapp
 
-      - name: Storing release information
-        if: contains(env.TAG, 'production')
+          ri="$(jq "chartVersion = \"$chart_version\"" ./release-info.json)"
+          echo "$ri" > ./release-info.json
+
+          echo "release-info.json :"
+          cat ./release-info.json
+
+      - name: Store release information
         uses: actions/upload-artifact@v3
         with:
           name: release-info.json
