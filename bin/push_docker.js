@@ -36,10 +36,16 @@ require('dotenv').config();
  * yarn docker staging '2021-08-25' '1240cfda9e609470cf1154e18f5bc582ca8907ff'
  */
 
-/** Either "staging" (for internal releases / staging bumps) or "production" (for cloud releases) */
-const stageParam = process.argv[2];
-/** Version tag of webapp (i.e. "2021-08-25") */
-const versionParam = process.argv[3];
+/** Key to  ./app-config/package.json, either
+ *
+ *  "wire-web-config-default-master"
+ *   or
+ *  "wire-web-config-default-staging"
+ * */
+const configurationEntry = process.argv[2];
+/** Version tag of webapp (e.g. "2023-11-09-staging.0", "dev") */
+const versionTag = process.argv[3];
+const uniqueTagOut = process.argv[4] | '';
 /** Commit ID of https://github.com/wireapp/wire-webapp (i.e. "1240cfda9e609470cf1154e18f5bc582ca8907ff") */
 const commitSha = process.env.GITHUB_SHA || process.argv[4];
 const commitShortSha = commitSha.substring(0, 7);
@@ -49,16 +55,17 @@ const repository = `${dockerRegistryDomain}/wire/webapp`;
 const tags = [];
 
 /** One Docker image can have multiple tags, e.g. "production" (links always to the latest production build) & "2021-08-30-production.0-v0.28.25-0-1240cfd" (links to a fixed production build) */
-tags.push(`${repository}:${stageParam}`);
+tags.push(`${repository}:${versionTag}`);
 
 /** Defines which config version (listed in "app-config/package.json") is going to be used */
-const configurationEntry = `wire-web-config-default-${stageParam === 'production' ? 'master' : 'staging'}`;
 const configVersion = appConfigPkg.dependencies[configurationEntry].split('#')[1];
-tags.push(`${repository}:${versionParam}-${configVersion}-${commitShortSha}`);
+const uniqueTag=`${repository}:${versionTag}-${configVersion}-${commitShortSha}`
+tags.push(uniqueTag);
 
 const dockerCommands = [
   `echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin ${dockerRegistryDomain}`,
   `docker build . --tag ${commitShortSha}`,
+  `if [ "${uniqueTagOut}" != "" ]; then echo -n "${uniqueTag}" > "${uniqueTagOut}"; fi`
 ];
 
 tags.forEach(containerImageTagValue => {
