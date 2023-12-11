@@ -216,8 +216,6 @@ jobs:
           chart_patched="$(yq -Mr ".version = \"$chart_version\" | .appVersion = \"$image_tag\"" ./charts/webapp/Chart.yaml)"
           echo "$chart_patched" > ./charts/webapp/Chart.yaml
 
-          rm -f webapp-*.tgz
-
           helm package ./charts/webapp
 
           helm s3 push webapp-*.tgz charts-webapp
