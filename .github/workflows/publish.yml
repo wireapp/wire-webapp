@@ -68,12 +68,11 @@ jobs:
           echo "wire_builds_target_branches: $wire_builds_target_branches"
           echo "wire_builds_target_branches=$wire_builds_target_branches" >> $GITHUB_OUTPUT
 
-      - name: Set TITLE and BUILD_DESKTOP
+      - name: Set TITLE
         env:
           PR_TITLE: ${{github.event.pull_request.title || env.PR_LAST_COMMIT_MESSAGE}}
         run: |
           echo "TITLE=${PR_TITLE}" >> $GITHUB_ENV
-          echo "BUILD_DESKTOP=${{contains(env.TAG, 'staging') || contains(env.TAG, 'production') || contains(env.PR_LAST_COMMIT_MESSAGE, '+Desktop')}}" >> $GITHUB_ENV
 
       - name: Print environment variables
         run: |
@@ -83,7 +82,6 @@ jobs:
           echo -e "PR_LAST_COMMIT_MESSAGE = ${PR_LAST_COMMIT_MESSAGE}"
           echo -e "COMMIT_URL = ${COMMIT_URL}"
           echo -e "COMMITTER = ${COMMITTER}"
-          echo -e "BUILD_DESKTOP = ${BUILD_DESKTOP}"
 
       - name: Skip CI
         if: |
