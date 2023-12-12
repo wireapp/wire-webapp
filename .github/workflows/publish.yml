@@ -122,18 +122,13 @@ jobs:
           aws_secret_key: ${{secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY}}
         run: |
           version_tag="${TAG:-$BRANCH_NAME}"
-          if [[ "$version_tag" == *"production"* ]]; then
-            config_entry="wire-web-config-default-master"
-          else
-            config_entry="wire-web-config-default-staging"
-          fi
-          yarn docker "$config_entry" "$version_tag" ./image_tag.txt
+          yarn docker "$version_tag" ./image_tag.txt
+
+          image_tag="$(cat ./image_tag.txt)"
+          echo "image_tag=$image_tag" >> $GITHUB_OUTPUT
 
           packageVersion=$(cat ./package.json | jq -r '.version')
-          image_tag="$(cat ./image_tag.txt)"
           release_name="${TAG:-v${packageVersion}}"
-
-          echo "image_tag=$image_tag" >> $GITHUB_OUTPUT
           echo "release_name=$release_name" >> $GITHUB_OUTPUT
 
       - name: Publish Helm chart

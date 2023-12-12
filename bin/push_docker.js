@@ -36,18 +36,11 @@ require('dotenv').config();
  * yarn docker staging '2021-08-25' '1240cfda9e609470cf1154e18f5bc582ca8907ff'
  */
 
-/** Key to  ./app-config/package.json, either
- *
- *  "wire-web-config-default-master"
- *   or
- *  "wire-web-config-default-staging"
- * */
-const configurationEntry = process.argv[2];
 /** Version tag of webapp (e.g. "2023-11-09-staging.0", "dev") */
-const versionTag = process.argv[3];
-const uniqueTagOut = process.argv[4] || '';
+const versionTag = process.argv[2];
+const uniqueTagOut = process.argv[3] || '';
 /** Commit ID of https://github.com/wireapp/wire-webapp (i.e. "1240cfda9e609470cf1154e18f5bc582ca8907ff") */
-const commitSha = process.env.GITHUB_SHA || process.argv[5];
+const commitSha = process.env.GITHUB_SHA || process.argv[4];
 const commitShortSha = commitSha.substring(0, 7);
 const dockerRegistryDomain = 'quay.io';
 const repository = `${dockerRegistryDomain}/wire/webapp`;
@@ -58,6 +51,13 @@ const tags = [];
 tags.push(`${repository}:${versionTag}`);
 
 /** Defines which config version (listed in "app-config/package.json") is going to be used */
+
+var configurationEntry;
+if (versionTag.includes('production')) {
+  configurationEntry = "wire-web-config-default-master";
+} else {
+  configurationEntry = "wire-web-config-default-staging";
+}
 const configVersion = appConfigPkg.dependencies[configurationEntry].split('#')[1];
 const uniqueTag=`${versionTag}-${configVersion}-${commitShortSha}`;
 tags.push(`${repository}:${uniqueTag}`);
