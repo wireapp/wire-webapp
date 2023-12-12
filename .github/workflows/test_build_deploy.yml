@@ -226,25 +226,3 @@ jobs:
           password: ${{secrets.WIRE_BOT_PASSWORD}}
           conversation: 'b2cc7120-4154-4be4-b0c0-45a8c361c4d1'
           send_text: '${{env.COMMITTER}} broke the "${{env.BRANCH_NAME}}" branch on "${{github.repository}}" with [${{env.TITLE}}](${{env.COMMIT_URL}}) 🌵'
-
-      - name: Upload WebApp artifacts
-        if: env.BUILD_DESKTOP == 'true'
-        uses: actions/upload-artifact@v3
-        with:
-          name: webapp-dist
-          path: ./server/dist
-
-  cleanup_artifacts:
-    permissions:
-      contents: none
-    name: Cleanup artifacts
-    needs: update_helm_chart
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Delete WebApp artifacts
-        uses: geekyeggo/delete-artifact@v2
-        with:
-          failOnError: false
-          name: |
-            webapp-dist
