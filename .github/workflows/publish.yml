@@ -51,23 +51,6 @@ jobs:
           echo "TAG=$(git tag --points-at ${{github.sha}})" >> $GITHUB_ENV
           echo "PR_LAST_COMMIT_MESSAGE=$(git log --format=%B -n 1 ${{github.event.after}} | head -n 1)" >> $GITHUB_ENV
 
-      - uses: kanga333/variable-mapper@master
-        name: Determine target branches in wireapp/wire-builds
-        with:
-          key: '${{env.BRANCH_NAME}}'
-          map: |
-            {
-              "stefan": { "wire_builds_target_branches" : "[\"main\"]" },
-              "dev": { "wire_builds_target_branches" : "[\"main\"]" }
-            }
-
-      - name: Make target branches available as output to other jobs
-        id: output_target_branches
-        shell: bash
-        run: |
-          echo "wire_builds_target_branches: $wire_builds_target_branches"
-          echo "wire_builds_target_branches=$wire_builds_target_branches" >> $GITHUB_OUTPUT
-
       - name: Set TITLE
         env:
           PR_TITLE: ${{github.event.pull_request.title || env.PR_LAST_COMMIT_MESSAGE}}
@@ -88,6 +71,29 @@ jobs:
           contains(env.TITLE || env.PR_LAST_COMMIT_MESSAGE, 'skip ci') ||
           contains(env.TITLE || env.PR_LAST_COMMIT_MESSAGE, '[ci skip]')
         uses: andymckay/cancel-action@0.3
+
+      - name: Define target branches in wireapp/wire-builds to bump
+        id: output_target_branches
+        shell: bash
+        run: |
+          wire_builds_target_branches='[]'
+
+          version_tag="${TAG:-$BRANCH_NAME}"
+
+          if [[ "$image_tag" == *"production"* ]]; then
+            echo "FUTUREWORK: bump some production branch on wire-builds once it exists"
+          fi
+
+          if [[ "$image_tag" == *"staging"* ]]; then
+            echo "FUTUREWORK: bump some cloud staging branch on wire-builds once it exists"
+          fi
+
+          if [ "$image_tag" == "dev" ] || [ "$image_tag" == "stefan" ] ; then
+            wire_builds_target_branches='["main"]'
+          fi
+
+          echo "wire_builds_target_branches: $wire_builds_target_branches"
+          echo "wire_builds_target_branches=$wire_builds_target_branches" >> $GITHUB_OUTPUT
 
       - name: Install JS dependencies
         run: yarn --immutable
