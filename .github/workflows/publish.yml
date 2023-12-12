@@ -75,7 +75,7 @@ jobs:
             echo "FUTUREWORK: bump some cloud staging branch on wire-builds once it exists"
           fi
 
-          if [ "$version_tag" == "dev" ] || [ "$image_tag" == "stefan" ] ; then
+          if [ "$version_tag" == "dev" ] || [ "$version_tag" == "stefan" ] ; then
             wire_builds_target_branches='["main"]'
           fi
 
