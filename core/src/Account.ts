@@ -226,9 +226,11 @@ export class Account extends TypedEventEmitter<Events> {
 
   private async getE2EIStatus() {
     const features = await this.apiClient.api.teams.feature.getAllFeatures();
+    const clientCanUseE2EI = this.coreCryptoConfig?.mls?.useE2EI;
+    const teamCanUseE2EI = features[FEATURE_KEY.MLSE2EID]?.status === FeatureStatus.ENABLED;
 
     return {
-      isFeatureEnabled: features[FEATURE_KEY.MLSE2EID]?.status === FeatureStatus.ENABLED,
+      isFeatureEnabled: clientCanUseE2EI && teamCanUseE2EI,
     };
   }
 
