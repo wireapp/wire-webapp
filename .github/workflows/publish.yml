@@ -80,20 +80,21 @@ jobs:
 
           version_tag="${TAG:-$BRANCH_NAME}"
 
-          if [[ "$image_tag" == *"production"* ]]; then
+          if [[ "$version_tag" == *"production"* ]]; then
             echo "FUTUREWORK: bump some production branch on wire-builds once it exists"
           fi
 
-          if [[ "$image_tag" == *"staging"* ]]; then
+          if [[ "$version_tag" == *"staging"* ]]; then
             echo "FUTUREWORK: bump some cloud staging branch on wire-builds once it exists"
           fi
 
-          if [ "$image_tag" == "dev" ] || [ "$image_tag" == "stefan" ] ; then
+          if [ "$version_tag" == "dev" ] || [ "$image_tag" == "stefan" ] ; then
             wire_builds_target_branches='["main"]'
           fi
 
           echo "wire_builds_target_branches: $wire_builds_target_branches"
           echo "wire_builds_target_branches=$wire_builds_target_branches" >> $GITHUB_OUTPUT
+
 
       - name: Install JS dependencies
         run: yarn --immutable
