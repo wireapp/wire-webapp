@@ -216,7 +216,7 @@ export class SubconversationService extends TypedEventEmitter<Events> {
     const {epoch: initialEpoch, groupId: subconversationGroupId} =
       await this.joinConferenceSubconversation(parentConversationId);
 
-    const forwardNewEpoch = async ({groupId, epoch}: {groupId: string; epoch: number}) => {
+    const forwardNewEpoch = async ({groupId}: {groupId: string; epoch: number}) => {
       if (groupId !== subconversationGroupId) {
         // if the epoch update did not happen in the subconversation directly, check if it happened in the parent conversation
         const parentConversationId = findConversationByGroupId(groupId);
@@ -244,7 +244,12 @@ export class SubconversationService extends TypedEventEmitter<Events> {
         return;
       }
 
-      return onEpochUpdate({...subconversationEpochInfo, epoch: Number(epoch)});
+      const newSubconversationEpoch = Number(await this.mlsService.getEpoch(subconversationGroupId));
+
+      return onEpochUpdate({
+        ...subconversationEpochInfo,
+        epoch: newSubconversationEpoch,
+      });
     };
 
     this.mlsService.on('newEpoch', forwardNewEpoch);
