@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [43.1.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@43.1.2...@wireapp/core@43.1.3) (2023-12-12)
+
+### Bug Fixes
+
+* use local settings and team settings for e2ei ([#5799](https://github.com/wireapp/wire-web-packages/issues/5799)) ([8676e7d](https://github.com/wireapp/wire-web-packages/commit/8676e7d3925c17aaf6a10ac2718450dcc8ee088a))
+
 ## [43.1.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@43.1.1...@wireapp/core@43.1.2) (2023-12-07)
 
 **Note:** Version bump only for package @wireapp/core
