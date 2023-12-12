@@ -52,5 +52,9 @@ function storageMock() {
 global.localStorage = storageMock();
 // @ts-ignore
 global.crypto = nodeCrypto.webcrypto;
-global.btoa = (text: string) => Buffer.from(text).toString('base64');
-global.atob = (base64: string) => Buffer.from(base64, 'base64').toString();
+if (!global.btoa) {
+  global.btoa = (text: string) => Buffer.from(text).toString('base64');
+}
+if (!global.atob) {
+  global.atob = (base64: string) => Buffer.from(base64, 'base64').toString();
+}
