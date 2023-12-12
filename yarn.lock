@@ -5133,10 +5133,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@stablelib/utf8@npm:1.0.0":
-  version: 1.0.0
-  resolution: "@stablelib/utf8@npm:1.0.0"
-  checksum: 87423b27c33616bf5bd78974361d5d5918f3a3057c3ac0e03358e3be5972e89ebea5f0188065559da718d2352fb6fbdb4afcee152eecdefdd76e4c88dfa269b8
+"@stablelib/utf8@npm:1.0.2":
+  version: 1.0.2
+  resolution: "@stablelib/utf8@npm:1.0.2"
+  checksum: 3ab01baa4eb36eece44a310bf6b2e4313e8d585fc04dbcf8a5dc2d239f06071f34038b85aad6fbd98e9969f0b3b0584fcb541fe5e512c8f0cc0982b9fe1290a3
   languageName: node
   linkType: hard
 
