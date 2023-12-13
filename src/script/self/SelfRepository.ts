@@ -70,6 +70,10 @@ export class SelfRepository extends TypedEventEmitter<Events> {
       if (event.name === FEATURE_KEY.MLS_MIGRATION) {
         void this.refreshSelfSupportedProtocols();
       }
+
+      if (event.name === FEATURE_KEY.DOWNLOAD_LOCATION) {
+        amplify.publish(WebAppEvents.TEAM.DOWNLOAD_LOCATION_UPDATED, event.data);
+      }
     });
   }
 
