@@ -1,0 +1,218 @@
+name: Publish Docker image, Helm chart and Wire build
+on:
+  push:
+    branches: [master, dev, edge]
+    tags:
+      - '*staging*'
+      - '*production*'
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  build:
+    name: Build Docker image and Helm Chart
+    runs-on: buildjet-8vcpu-ubuntu-2204
+    outputs:
+      wire_builds_target_branches: ${{ steps.output_target_branches.outputs.wire_builds_target_branches }}
+      image_tag: ${{ steps.push_docker_image.outputs.image_tag }}
+      release_name: ${{ steps.push_docker_image.outputs.release_name }}
+      chart_version: ${{ steps.publish_helm_chart.outputs.chart_version }}
+    env:
+      TEST_COVERAGE_FAIL_THRESHOLD: 45
+      TEST_COVERAGE_WARNING_THRESHOLD: 60
+      COMMIT_URL: ${{github.event.head_commit.url}}
+      COMMITTER: ${{github.event.head_commit.committer.name}}
+    steps:
+      - uses: azure/setup-helm@v3
+        with:
+          version: '3.12.2'
+        id: install
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 16.x
+          cache: 'yarn'
+      - name: Set environment variables
+        run: |
+          echo "BRANCH_NAME=$(git branch --show-current)" >> $GITHUB_ENV
+          echo "TAG=$(git tag --points-at ${{github.sha}})" >> $GITHUB_ENV
+          echo "PR_LAST_COMMIT_MESSAGE=$(git log --format=%B -n 1 ${{github.event.after}} | head -n 1)" >> $GITHUB_ENV
+      - name: Set TITLE
+        env:
+          PR_TITLE: ${{github.event.pull_request.title || env.PR_LAST_COMMIT_MESSAGE}}
+        run: |
+          echo "TITLE=${PR_TITLE}" >> $GITHUB_ENV
+      - name: Print environment variables
+        run: |
+          echo -e "BRANCH_NAME = ${BRANCH_NAME}"
+          echo -e "TAG = ${TAG}"
+          echo -e "TITLE = ${TITLE}"
+          echo -e "PR_LAST_COMMIT_MESSAGE = ${PR_LAST_COMMIT_MESSAGE}"
+          echo -e "COMMIT_URL = ${COMMIT_URL}"
+          echo -e "COMMITTER = ${COMMITTER}"
+      - name: Skip CI
+        if: |
+          contains(env.TITLE || env.PR_LAST_COMMIT_MESSAGE, 'skip ci') ||
+          contains(env.TITLE || env.PR_LAST_COMMIT_MESSAGE, '[ci skip]')
+        uses: andymckay/cancel-action@0.3
+      - name: Define target branches in wireapp/wire-builds to bump
+        id: output_target_branches
+        shell: bash
+        run: |
+          wire_builds_target_branches='[]'
+
+          version_tag="${TAG:-$BRANCH_NAME}"
+
+          if [[ "$version_tag" == *"production"* ]]; then
+            echo "FUTUREWORK: bump some production branch on wire-builds once it exists"
+          fi
+
+          if [[ "$version_tag" == *"staging"* ]]; then
+            echo "FUTUREWORK: bump some cloud staging branch on wire-builds once it exists"
+          fi
+
+          if [ "$version_tag" == "dev" ]; then
+            wire_builds_target_branches='["dev"]'
+          fi
+
+          echo "wire_builds_target_branches: $wire_builds_target_branches"
+          echo "wire_builds_target_branches=$wire_builds_target_branches" >> $GITHUB_OUTPUT
+      - name: Install JS dependencies
+        run: yarn --immutable
+      - name: Test
+        run: |
+          set -o pipefail
+          yarn test --coverage --coverage-reporters=lcov --detectOpenHandles=false 2>&1 | tee ./unit-tests.log
+      - name: Build
+        run: yarn build:prod
+      - name: Push Docker image
+        id: push_docker_image
+        env:
+          DOCKER_PASSWORD: ${{secrets.WEBTEAM_QUAY_PASSWORD}}
+          DOCKER_USERNAME: ${{secrets.WEBTEAM_QUAY_USERNAME}}
+          aws_secret_key: ${{secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY}}
+        run: |
+          version_tag="${TAG:-$BRANCH_NAME}"
+          yarn docker "$version_tag" ./image_tag.txt
+
+          image_tag="$(cat ./image_tag.txt)"
+          echo "image_tag=$image_tag" >> $GITHUB_OUTPUT
+
+          packageVersion=$(cat ./package.json | jq -r '.version')
+          release_name="${TAG:-v${packageVersion}}"
+          echo "release_name=$release_name" >> $GITHUB_OUTPUT
+      - name: Publish Helm chart
+        shell: bash
+        id: publish_helm_chart
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_SECRET_ACCESS_KEY }}
+        run: |
+          set -eo pipefail
+
+          image_tag="${{steps.push_docker_image.outputs.image_tag}}"
+
+          helm plugin install https://github.com/hypnoglow/helm-s3.git --version 0.15.1
+
+          helm repo add charts-webapp s3://public.wire.com/charts-webapp
+
+          if [ "$TAG" != "" ]; then
+            chart_version="$(./bin/chart-next-version.sh release)"
+          else
+            chart_version="$(./bin/chart-next-version.sh prerelease)"
+          fi
+          echo "chart_version=$chart_version" >> $GITHUB_OUTPUT
+
+          chart_patched="$(yq -Mr ".version = \"$chart_version\" | .appVersion = \"$image_tag\"" ./charts/webapp/Chart.yaml)"
+          echo "$chart_patched" > ./charts/webapp/Chart.yaml
+
+          helm package ./charts/webapp
+
+          helm s3 push webapp-*.tgz charts-webapp
+  publish_wire_builds:
+    name: Bump webapp chart in wire-builds
+    runs-on: ubuntu-latest
+    needs: build
+    strategy:
+      matrix:
+        target_branch: ${{fromJSON(needs.build.outputs.wire_builds_target_branches)}}
+    steps:
+      - name: Check out wire-builds
+        uses: actions/checkout@v4
+        with:
+          repository: wireapp/wire-builds
+          token: ${{secrets.WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN}}
+          ref: ${{matrix.target_branch}}
+          fetch-depth: 1
+      - name: Create new build in wire-build
+        shell: bash
+        run: |
+          git fetch --depth 1 origin "${{ matrix.target_branch }}"
+          git checkout "${{ matrix.target_branch }}"
+
+          chart_version="${{needs.build.outputs.chart_version}}"
+
+          build_json=$(cat ./build.json | ./bin/bump-chart webapp "$chart_version" | ./bin/bump-prerelease )
+          echo "$build_json" > ./build.json
+
+          git add build.json
+          git config --global user.email "zebot@users.noreply.github.com"
+          git config --global user.name "Zebot"
+          git commit -m "Bump webapp to $chart_version"
+
+          git push origin "${{ matrix.target_branch }}"
+  # FUTUREWORK: Remove this job once production builds are based on wireapp/wire-builds
+  update_helm_chart:
+    name: 'Create PR in wire-server: Bump Helm chart'
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Check whether this is a production release
+        id: release-info-file
+        shell: bash
+        run: |
+          image_tag="${{needs.build.outputs.image_tag}}"
+          echo "image_tag: $image_tag"
+          if [[ "$image_tag" == *"production"* ]]; then
+             echo '::set-output name=exists::true'
+             echo "::set-output name=releaseInfo::$(cat ${ARTIFACT_LOCAL_PATH})"
+          fi
+      - name: Checking out 'wire-server'
+        uses: actions/checkout@v4
+        if: ${{ steps.release-info-file.outputs.exists == 'true' }}
+        with:
+          repository: 'wireapp/wire-server'
+          fetch-depth: 1
+      - name: Changing Helm value of the webapp chart
+        id: change-helm-value
+        if: ${{ steps.release-info-file.outputs.exists == 'true' }}
+        shell: bash
+        run: |
+          sed --in-place --expression="s/  tag: .*/  tag: \"${{needs.build.outputs.image_tag}}\"/" ./charts/webapp/values.yaml
+          git add ./charts/webapp/values.yaml
+          echo "Upgrade webapp version to ${{needs.build.outputs.image_tag}}" > ./changelog.d/0-release-notes/webapp-upgrade
+          git add ./changelog.d/0-release-notes/webapp-upgrade
+          echo "::set-output name=releaseUrl::${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/releases/tag/${{needs.build.outputs.release_name}}"
+      - name: Creating Pull Request
+        id: create-pr
+        if: ${{ steps.release-info-file.outputs.exists == 'true' }}
+        uses: peter-evans/create-pull-request@v5
+        with:
+          draft: false
+          token: ${{ secrets.ZEBOT_GH_TOKEN }}
+          author: 'Zebot <zebot@users.noreply.github.com>'
+          branch: charts-update-webapp-image-tag-${{ github.run_number }}
+          commit-message: 'chore: [charts] Update webapp version'
+          title: 'Update webapp version in Helm chart [skip ci]'
+          body: |
+            Image tag: `${{needs.build.outputs.image_tag}}`
+            Release: [`${{needs.build.outputs.release_name}}`](${{ steps.change-helm-value.outputs.releaseUrl }})
+      - name: Printing Pull Request URL
+        if: ${{ steps.release-info-file.outputs.exists == 'true' }}
+        shell: bash
+        run: |
+          echo "PR: ${{ steps.create-pr.outputs.pull-request-url }}"
