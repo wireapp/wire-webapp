@@ -33,9 +33,9 @@ import type {ClientConfig, ServerConfig} from './config';
 import {HealthCheckRoute} from './routes/_health/HealthRoute';
 import {AppleAssociationRoute} from './routes/appleassociation/AppleAssociationRoute';
 import {ConfigRoute} from './routes/config/ConfigRoute';
+import {OIDCProxyRoute, OIDCProxyRoutePath} from './routes/E2EIProxy/OIDCProxyRoute';
 import {InternalErrorRoute, NotFoundRoute} from './routes/error/ErrorRoutes';
 import {GoogleWebmasterRoute} from './routes/googlewebmaster/GoogleWebmasterRoute';
-import {ProxyRoute} from './routes/proxy/ProxyRoute';
 import {RedirectRoutes} from './routes/RedirectRoutes';
 import {Root} from './routes/Root';
 import * as BrowserUtil from './util/BrowserUtil';
@@ -74,7 +74,7 @@ class Server {
     this.app.use(ConfigRoute(this.config, this.clientConfig));
     this.app.use(GoogleWebmasterRoute(this.config));
     this.app.use(AppleAssociationRoute());
-    this.app.use(ProxyRoute());
+    this.app.use(OIDCProxyRoute());
     this.app.use(NotFoundRoute());
     this.app.use(InternalErrorRoute());
   }
@@ -191,7 +191,7 @@ class Server {
         req.path.startsWith('/auth') ||
         req.path.startsWith('/google') ||
         req.path.startsWith('/apple-app-site-association') ||
-        req.path.startsWith('/proxy');
+        req.path.startsWith(OIDCProxyRoutePath);
 
       if (ignoredPath) {
         return next();

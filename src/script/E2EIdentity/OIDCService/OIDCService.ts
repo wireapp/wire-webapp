@@ -39,7 +39,7 @@ export class OIDCService {
       oidcClient: {id, secret},
     } = config;
     const dexioConfig: UserManagerSettings = {
-      authority: `/proxy?oidcProxyUrl=${authorityUrl}`,
+      authority: `/oidcProxy?targetUrl=${authorityUrl}`,
       client_id: id,
       redirect_uri: redirectUri,
       response_type: 'code',

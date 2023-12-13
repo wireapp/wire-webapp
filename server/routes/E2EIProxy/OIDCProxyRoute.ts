@@ -20,9 +20,11 @@
 import {Router} from 'express';
 import {createProxyMiddleware} from 'http-proxy-middleware';
 
-const targetURLParam = 'oidcProxyUrl';
+const targetURLParam = 'targetUrl';
 
-export const ProxyRoute = () => {
+export const OIDCProxyRoutePath = '/oidcProxy';
+
+export const OIDCProxyRoute = () => {
   // Function to validate the URL
   const isValidUrl = (urlString: string) => {
     try {
@@ -34,7 +36,7 @@ export const ProxyRoute = () => {
   };
 
   // @ts-ignore
-  return Router().use('/proxy', (req, res, next) => {
+  return Router().use(OIDCProxyRoutePath, (req, res, next) => {
     const targetUrl = req.query[targetURLParam];
 
     if (typeof targetUrl !== 'string' || !isValidUrl(targetUrl)) {
@@ -82,7 +84,9 @@ export const ProxyRoute = () => {
                   const originalUrl = new URL(json[key]);
                   const refererUrl = new URL(req.headers.referer);
 
-                  json[key] = `${refererUrl.origin}/proxy?${targetURLParam}=${encodeURIComponent(originalUrl.href)}`;
+                  json[key] = `${refererUrl.origin}${OIDCProxyRoutePath}?${targetURLParam}=${encodeURIComponent(
+                    originalUrl.href,
+                  )}`;
                 }
               });
               // Send the modified response back to the client
