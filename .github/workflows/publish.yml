@@ -1,7 +1,7 @@
 name: Publish Docker image, Helm chart and Wire build
 on:
   push:
-    branches: [master, dev, edge, stefan]
+    branches: [master, dev, edge]
     tags:
       - '*staging*'
       - '*production*'
@@ -75,8 +75,8 @@ jobs:
             echo "FUTUREWORK: bump some cloud staging branch on wire-builds once it exists"
           fi
 
-          if [ "$version_tag" == "dev" ] || [ "$version_tag" == "stefan" ] ; then
-            wire_builds_target_branches='["main"]'
+          if [ "$version_tag" == "dev" ]; then
+            wire_builds_target_branches='["dev"]'
           fi
 
           echo "wire_builds_target_branches: $wire_builds_target_branches"
