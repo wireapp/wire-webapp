@@ -35,6 +35,7 @@ import {AppleAssociationRoute} from './routes/appleassociation/AppleAssociationR
 import {ConfigRoute} from './routes/config/ConfigRoute';
 import {InternalErrorRoute, NotFoundRoute} from './routes/error/ErrorRoutes';
 import {GoogleWebmasterRoute} from './routes/googlewebmaster/GoogleWebmasterRoute';
+import {ProxyRoute} from './routes/proxy/ProxyRoute';
 import {RedirectRoutes} from './routes/RedirectRoutes';
 import {Root} from './routes/Root';
 import * as BrowserUtil from './util/BrowserUtil';
@@ -73,6 +74,7 @@ class Server {
     this.app.use(ConfigRoute(this.config, this.clientConfig));
     this.app.use(GoogleWebmasterRoute(this.config));
     this.app.use(AppleAssociationRoute());
+    this.app.use(ProxyRoute());
     this.app.use(NotFoundRoute());
     this.app.use(InternalErrorRoute());
   }
@@ -188,7 +190,8 @@ class Server {
         req.path.startsWith('/join') ||
         req.path.startsWith('/auth') ||
         req.path.startsWith('/google') ||
-        req.path.startsWith('/apple-app-site-association');
+        req.path.startsWith('/apple-app-site-association') ||
+        req.path.startsWith('/proxy');
 
       if (ignoredPath) {
         return next();
