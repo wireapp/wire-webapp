@@ -54,13 +54,17 @@ export class OIDCService {
     await this.userManager.signinRedirect();
   }
 
-  public handleAuthentication(): Promise<User | null> {
+  public async handleAuthentication(): Promise<User | undefined> {
     // Remove the hash (hash router) from the url before processing
     const url = window.location.href.replace('/#', '');
 
-    return this.userManager.signinCallback(url).then(user => {
-      return user ?? null;
-    });
+    const user = await this.userManager.signinCallback(url);
+
+    if (!user) {
+      return undefined;
+    }
+
+    return user;
   }
 
   public clearProgress(): Promise<void> {
