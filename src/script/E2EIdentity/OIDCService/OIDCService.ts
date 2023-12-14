@@ -21,12 +21,13 @@ import {UserManager, User, UserManagerSettings} from 'oidc-client-ts';
 
 import {clearKeysStartingWith} from 'Util/localStorage';
 
-import {OidcClientData} from './OIDCService.types';
-
 interface OIDCServiceConfig {
   authorityUrl: string;
   redirectUri: string;
-  oidcClient: OidcClientData;
+  oidcClient: {
+    id: string;
+    secret: string;
+  };
 }
 
 export class OIDCService {
