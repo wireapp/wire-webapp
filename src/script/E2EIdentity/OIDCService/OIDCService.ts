@@ -41,7 +41,7 @@ export class OIDCService {
       oidcClient: {id, secret},
     } = config;
     const dexioConfig: UserManagerSettings = {
-      authority: authorityUrl,
+      authority: `/oidcProxy?targetUrl=${authorityUrl}`,
       client_id: id,
       redirect_uri: redirectUri,
       response_type: 'code',
@@ -63,13 +63,17 @@ export class OIDCService {
     await this.userManager.signinRedirect();
   }
 
-  public handleAuthentication(): Promise<User> {
+  public async handleAuthentication(): Promise<User | undefined> {
     // Remove the hash (hash router) from the url before processing
     const url = window.location.href.replace('/#', '');
 
-    return this.userManager.signinRedirectCallback(url).then(user => {
-      return user;
-    });
+    const user = await this.userManager.signinCallback(url);
+
+    if (!user) {
+      return undefined;
+    }
+
+    return user;
   }
 
   public clearProgress(): Promise<void> {
