@@ -67,11 +67,8 @@ if [ "$bump_type" = "prerelease" ]; then
     # this is a first prelease
     # so let's create a new release (bump minor)
     # and create a first prerelease for it
-    # we initialize prerelease counter to 100000 instead of 0
-    # so that prereleases are lexicographically ordered.
-    # That way helm search always shows the latest version by default.
     version_next=$(./bin/semver bump minor "$version_latest")
-    version_new=$(./bin/semver bump prerelease pre100000 "$version_next")
+    version_new=$(./bin/semver bump prerelease pre.1 "$version_next")
   else
     version_new=$(./bin/semver bump prerelease "$version_latest")
   fi

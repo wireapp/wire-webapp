@@ -17,49 +17,26 @@
  *
  */
 
-import {OidcClientData} from './OIDCService.types';
-
 const TargetURLKey = 'E2EIdentity_OIDCService_TargetURL';
-const clientDataKey = 'E2EIdentity_OIDCService_ClientData';
 const RefreshTokenKey = 'E2EIdentity_OIDCService_RefreshToken';
-
 const OIDCServiceStore = {
   store: {
-    clientData: (data: OidcClientData) => localStorage.setItem(clientDataKey, JSON.stringify(data)),
     targetURL: (url: string) => localStorage.setItem(TargetURLKey, url),
     refreshToken: (refreshToken: string) => localStorage.setItem(RefreshTokenKey, refreshToken),
   },
   get: {
-    clientData: (): OidcClientData => {
-      // MOCK: store targetURL and clientData in OIDCServiceStore
-      // TODO: remove this once we have a proper OIDC service
-      return {
-        id: 'wireapp',
-        secret: 'dUpVSGx2dVdFdGQ0dmsxWGhDalQ0SldU',
-      };
-      /*
-      const clientData = localStorage.getItem(clientDataKey);
-      if (!clientData) {
-        throw new Error('No client data found in OIDCServiceStore');
-      }
-      return JSON.parse(clientData);
-      */
-    },
     targetURL: () => localStorage.getItem(TargetURLKey),
     refreshToken: () => localStorage.getItem(RefreshTokenKey),
   },
   has: {
-    clientData: () => localStorage.getItem(clientDataKey) !== null,
     targetURL: () => localStorage.getItem(TargetURLKey) !== null,
     refreshToken: localStorage.getItem(RefreshTokenKey) !== null,
   },
   clear: {
-    clientData: () => localStorage.removeItem(clientDataKey),
     targetURL: () => localStorage.removeItem(TargetURLKey),
     refreshToken: () => localStorage.removeItem(RefreshTokenKey),
     all: () => {
       OIDCServiceStore.clear.targetURL();
-      OIDCServiceStore.clear.clientData();
       OIDCServiceStore.clear.refreshToken();
     },
   },

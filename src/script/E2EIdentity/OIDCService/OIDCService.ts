@@ -22,12 +22,13 @@ import {UserManager, User, UserManagerSettings, WebStorageStateStore} from 'oidc
 import {clearKeysStartingWith} from 'Util/localStorage';
 import {Logger, getLogger} from 'Util/Logger';
 
-import {OidcClientData} from './OIDCService.types';
-
 interface OIDCServiceConfig {
   authorityUrl: string;
   redirectUri: string;
-  oidcClient: OidcClientData;
+  oidcClient: {
+    id: string;
+    secret?: string;
+  };
 }
 
 export class OIDCService {
