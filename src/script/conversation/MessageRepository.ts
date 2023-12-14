@@ -1008,6 +1008,11 @@ export class MessageRepository {
     const conversationId = conversation.id;
     const messageId = message.id;
 
+    // directly delete message from local database when status is sending
+    if (message.status() === StatusType.SENDING) {
+      await this.deleteMessageById(conversation, message.id);
+    }
+
     try {
       if (!message.user().isMe && !message.ephemeral_expires()) {
         throw new ConversationError(ConversationError.TYPE.WRONG_USER, ConversationError.MESSAGE.WRONG_USER);
