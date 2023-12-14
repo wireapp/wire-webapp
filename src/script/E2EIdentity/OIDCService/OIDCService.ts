@@ -26,7 +26,7 @@ interface OIDCServiceConfig {
   redirectUri: string;
   oidcClient: {
     id: string;
-    secret: string;
+    secret?: string;
   };
 }
 
