@@ -156,96 +156,96 @@ jobs:
 
           helm s3 push webapp-*.tgz charts-webapp
 
-  publish_wire_builds:
-    name: Bump webapp chart in wire-builds
-    runs-on: ubuntu-latest
-    needs: build
-    strategy:
-      matrix:
-        target_branch: ${{fromJSON(needs.build.outputs.wire_builds_target_branches)}}
-    steps:
-      - name: Check out wire-builds
-        uses: actions/checkout@v4
-        with:
-          repository: wireapp/wire-builds
-          token: ${{secrets.WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN}}
-          ref: ${{matrix.target_branch}}
-          fetch-depth: 1
-
-      - name: Create new build in wire-build
-        shell: bash
-        run: |
-          git fetch --depth 1 origin "${{ matrix.target_branch }}"
-          git checkout "${{ matrix.target_branch }}"
-
-          chart_version="${{needs.build.outputs.chart_version}}"
-
-          build_json=$(cat ./build.json | ./bin/bump-chart webapp "$chart_version" | ./bin/bump-prerelease )
-          echo "$build_json" > ./build.json
-
-          git add build.json
-          git config --global user.email "zebot@users.noreply.github.com"
-          git config --global user.name "Zebot"
-          git commit -m "Bump webapp to $chart_version"
-
-          git push origin "${{ matrix.target_branch }}"
-
+  #  publish_wire_builds:
+  #    name: Bump webapp chart in wire-builds
+  #    runs-on: ubuntu-latest
+  #    needs: build
+  #    strategy:
+  #      matrix:
+  #        target_branch: ${{fromJSON(needs.build.outputs.wire_builds_target_branches)}}
+  #    steps:
+  #      - name: Check out wire-builds
+  #        uses: actions/checkout@v4
+  #        with:
+  #          repository: wireapp/wire-builds
+  #          token: ${{secrets.WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN}}
+  #          ref: ${{matrix.target_branch}}
+  #          fetch-depth: 1
+  #
+  #      - name: Create new build in wire-build
+  #        shell: bash
+  #        run: |
+  #          git fetch --depth 1 origin "${{ matrix.target_branch }}"
+  #          git checkout "${{ matrix.target_branch }}"
+  #
+  #          chart_version="${{needs.build.outputs.chart_version}}"
+  #
+  #          build_json=$(cat ./build.json | ./bin/bump-chart webapp "$chart_version" | ./bin/bump-prerelease )
+  #          echo "$build_json" > ./build.json
+  #
+  #          git add build.json
+  #          git config --global user.email "zebot@users.noreply.github.com"
+  #          git config --global user.name "Zebot"
+  #          git commit -m "Bump webapp to $chart_version"
+  #
+  #          git push origin "${{ matrix.target_branch }}"
+  #
   # FUTUREWORK: Remove this job once production builds are based on wireapp/wire-builds
-  update_helm_chart:
-    name: 'Create PR in wire-server: Bump Helm chart'
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Check whether this is a production release
-        id: release-info-file
-        shell: bash
-        run: |
-          image_tag="${{needs.build.outputs.image_tag}}"
-          echo "image_tag: $image_tag"
-          if [[ "$image_tag" == *"production"* ]]; then
-             echo '::set-output name=exists::true'
-             echo "::set-output name=releaseInfo::$(cat ${ARTIFACT_LOCAL_PATH})"
-          fi
-
-      - name: Checking out 'wire-server'
-        uses: actions/checkout@v4
-        if: ${{ steps.release-info-file.outputs.exists == 'true' }}
-        with:
-          repository: 'wireapp/wire-server'
-          fetch-depth: 1
-
-      - name: Changing Helm value of the webapp chart
-        id: change-helm-value
-        if: ${{ steps.release-info-file.outputs.exists == 'true' }}
-        shell: bash
-        run: |
-          sed --in-place --expression="s/  tag: .*/  tag: \"${{needs.build.outputs.image_tag}}\"/" ./charts/webapp/values.yaml
-          git add ./charts/webapp/values.yaml
-          echo "Upgrade webapp version to ${{needs.build.outputs.image_tag}}" > ./changelog.d/0-release-notes/webapp-upgrade
-          git add ./changelog.d/0-release-notes/webapp-upgrade
-          echo "::set-output name=releaseUrl::${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/releases/tag/${{needs.build.outputs.release_name}}"
-
-      - name: Creating Pull Request
-        id: create-pr
-        if: ${{ steps.release-info-file.outputs.exists == 'true' }}
-        uses: peter-evans/create-pull-request@v5
-        with:
-          draft: false
-          token: ${{ secrets.ZEBOT_GH_TOKEN }}
-          author: 'Zebot <zebot@users.noreply.github.com>'
-          branch: charts-update-webapp-image-tag-${{ github.run_number }}
-          commit-message: 'chore: [charts] Update webapp version'
-          title: 'Update webapp version in Helm chart [skip ci]'
-          body: |
-            Image tag: `${{needs.build.outputs.image_tag}}`
-            Release: [`${{needs.build.outputs.release_name}}`](${{ steps.change-helm-value.outputs.releaseUrl }})
-
-      - name: Printing Pull Request URL
-        if: ${{ steps.release-info-file.outputs.exists == 'true' }}
-        shell: bash
-        run: |
-          echo "PR: ${{ steps.create-pr.outputs.pull-request-url }}"
-
+  #  update_helm_chart:
+  #    name: 'Create PR in wire-server: Bump Helm chart'
+  #    runs-on: ubuntu-latest
+  #    needs: build
+  #    steps:
+  #      - name: Check whether this is a production release
+  #        id: release-info-file
+  #        shell: bash
+  #        run: |
+  #          image_tag="${{needs.build.outputs.image_tag}}"
+  #          echo "image_tag: $image_tag"
+  #          if [[ "$image_tag" == *"production"* ]]; then
+  #             echo '::set-output name=exists::true'
+  #             echo "::set-output name=releaseInfo::$(cat ${ARTIFACT_LOCAL_PATH})"
+  #          fi
+  #
+  #      - name: Checking out 'wire-server'
+  #        uses: actions/checkout@v4
+  #        if: ${{ steps.release-info-file.outputs.exists == 'true' }}
+  #        with:
+  #          repository: 'wireapp/wire-server'
+  #          fetch-depth: 1
+  #
+  #      - name: Changing Helm value of the webapp chart
+  #        id: change-helm-value
+  #        if: ${{ steps.release-info-file.outputs.exists == 'true' }}
+  #        shell: bash
+  #        run: |
+  #          sed --in-place --expression="s/  tag: .*/  tag: \"${{needs.build.outputs.image_tag}}\"/" ./charts/webapp/values.yaml
+  #          git add ./charts/webapp/values.yaml
+  #          echo "Upgrade webapp version to ${{needs.build.outputs.image_tag}}" > ./changelog.d/0-release-notes/webapp-upgrade
+  #          git add ./changelog.d/0-release-notes/webapp-upgrade
+  #          echo "::set-output name=releaseUrl::${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/releases/tag/${{needs.build.outputs.release_name}}"
+  #
+  #      - name: Creating Pull Request
+  #        id: create-pr
+  #        if: ${{ steps.release-info-file.outputs.exists == 'true' }}
+  #        uses: peter-evans/create-pull-request@v5
+  #        with:
+  #          draft: false
+  #          token: ${{ secrets.ZEBOT_GH_TOKEN }}
+  #          author: 'Zebot <zebot@users.noreply.github.com>'
+  #          branch: charts-update-webapp-image-tag-${{ github.run_number }}
+  #          commit-message: 'chore: [charts] Update webapp version'
+  #          title: 'Update webapp version in Helm chart [skip ci]'
+  #          body: |
+  #            Image tag: `${{needs.build.outputs.image_tag}}`
+  #            Release: [`${{needs.build.outputs.release_name}}`](${{ steps.change-helm-value.outputs.releaseUrl }})
+  #
+  #      - name: Printing Pull Request URL
+  #        if: ${{ steps.release-info-file.outputs.exists == 'true' }}
+  #        shell: bash
+  #        run: |
+  #          echo "PR: ${{ steps.create-pr.outputs.pull-request-url }}"
+  #
   set_deployment_targets:
     name: 'Set the aws deployment targets'
     runs-on: ubuntu-latest
