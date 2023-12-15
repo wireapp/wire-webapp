@@ -260,10 +260,18 @@ jobs:
           key: '${{github.ref}}'
           map: |
             {
-              "dev": ["wire-webapp-dev-al2", "wire-webapp-edge-al2" ],
-              "master": ["wire-webapp-master-al2"],
-              "production": ["wire-webapp-prod-al2"],
-              "staging": ["wire-webapp-staging-al2"]
+              "dev": {
+                "targets": ["wire-webapp-dev-al2", "wire-webapp-edge-al2" ]
+              },
+              "master": {
+                "targets": ["wire-webapp-master-al2"]
+              },
+              "production": {
+                "targets": ["wire-webapp-prod-al2"]
+              },
+              "staging": {
+                "targets": ["wire-webapp-staging-al2"]
+              }
             }
           export_to: targets
 
