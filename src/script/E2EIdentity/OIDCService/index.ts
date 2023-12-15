@@ -23,27 +23,20 @@ import {OIDCServiceStore} from './OIDCServiceStorage';
 // lots of hardcoded values here, but this is just for testing until we have a proper OIDC service
 export const getOIDCServiceInstance = (): OIDCService => {
   const targetURL = OIDCServiceStore.get.targetURL();
+  const clientData = OIDCServiceStore.get.clientData();
 
   // if there is no targetURL, we cannot create an OIDCService
   if (!targetURL) {
     throw new Error('No target URL found in OIDCServiceStore');
   }
-
-  const idpUrl = new URL(targetURL);
-  const idpClientId = idpUrl.searchParams.get('clientId');
-
   // if there is no clientData ID, we cannot create an OIDCService
-  if (!idpClientId) {
-    throw new Error('No clientId provided by the targetUrl');
+  if (!clientData || !clientData.id) {
+    throw new Error('No client data found in OIDCServiceStore');
   }
 
   const oidcService = new OIDCService({
-    oidcClient: {
-      id: idpClientId,
-      // this is a secret that is only used for testing and needs to be removed by backend
-      secret: 'dUpVSGx2dVdFdGQ0dmsxWGhDalQ0SldU',
-    },
-    authorityUrl: idpUrl.origin + idpUrl.pathname,
+    oidcClient: clientData,
+    authorityUrl: targetURL,
     redirectUri: `${location.origin}/oidc`,
   });
   return oidcService;
