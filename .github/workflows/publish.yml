@@ -92,7 +92,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: 'build-artifact'
-          path: env.BUILD_ARTIFACT
+          path: ${{env.BUILD_ARTIFACT}}
 
       - name: Generate changelog
         if: contains(env.TAG, 'production')
