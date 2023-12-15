@@ -2,7 +2,12 @@ name: CI
 
 on:
   pull_request:
+    # we want to run the CI on every PR targetting those branches
     branches: [master, dev]
+
+  push:
+    # We also run CI on dev in order to update the coverage monitoring
+    branches: [dev]
 
 concurrency:
   group: ci-${{ github.ref }}

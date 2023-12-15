@@ -180,7 +180,7 @@
     "url": "https://github.com/wireapp/wire-webapp.git"
   },
   "scripts": {
-    "build:prod": "yarn build:server && yarn bundle:dev && yarn zip",
+    "build:prod": "yarn build:server && yarn bundle:prod && yarn zip",
     "build:server": "cd server && yarn build",
     "bundle:dev": "webpack --config webpack.config.dev.js --progress",
     "bundle:prod": "webpack --config webpack.config.js",
