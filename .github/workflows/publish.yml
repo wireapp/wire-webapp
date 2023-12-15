@@ -2,13 +2,10 @@ name: Publish
 
 on:
   push:
-    branches: [master, dev, edge]
+    branches: [master, dev, edge, chore/deployment-pipeline]
     tags:
       - '*staging*'
       - '*production*'
-
-  pull_request:
-    branches: [dev]
 
 jobs:
   build:
@@ -260,6 +257,9 @@ jobs:
           key: '${{github.ref}}'
           map: |
             {
+              "chore/deployment-pipeline": {
+                targets: "[\"felix\"]"
+              },
               "dev": {
                 "targets": "[\"wire-webapp-dev-al2\", \"wire-webapp-edge-al2\" ]"
               },
