@@ -41,15 +41,13 @@ export class OIDCService {
     // Extract the clientId from the targetURL
     const idpUrl = new URL(targetURL);
     // This clientId will be used to create the OIDCService, it is mocked for now
-    // const idpClientId = idpUrl.searchParams.get('clientId');
     const idpClientId = 'wireapp';
-    // This secret is only used for testing and needs to be removed in the future
-    const idpClientSecret = 'dUpVSGx2dVdFdGQ0dmsxWGhDalQ0SldU';
-
-    // if there is no clientData ID, we cannot create an OIDCService
+    //const idpClientId = idpUrl.searchParams.get('clientId');
     if (!idpClientId) {
       throw new Error('No clientId provided by the targetUrl');
     }
+    // This secret is only used for testing and needs to be removed in the future
+    const idpClientSecret = 'dUpVSGx2dVdFdGQ0dmsxWGhDalQ0SldU';
 
     // Build the proxy url and redirect uri
     const currentOrigin = location.origin;
@@ -77,7 +75,7 @@ export class OIDCService {
   }
 
   public async authenticate(): Promise<void> {
-    await this.userManager.signinRedirect();
+    await this.userManager.signinRedirect({extraQueryParams: {shouldBeRedirectedByProxy: true}});
   }
 
   public async handleAuthentication(): Promise<User | undefined> {

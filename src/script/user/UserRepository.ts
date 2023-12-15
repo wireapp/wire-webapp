@@ -713,19 +713,30 @@ export class UserRepository extends TypedEventEmitter<Events> {
    */
 
   public async getUserSupportedProtocols(userId: QualifiedId, forceRefetch = false): Promise<ConversationProtocol[]> {
-    if (!forceRefetch) {
-      const localSupportedProtocols = this.findUserById(userId)?.supportedProtocols();
+    const localSupportedProtocols = this.findUserById(userId)?.supportedProtocols();
 
-      if (localSupportedProtocols) {
-        return localSupportedProtocols;
-      }
+    if (!forceRefetch && localSupportedProtocols) {
+      return localSupportedProtocols;
     }
 
-    const supportedProtocols = await this.userService.getUserSupportedProtocols(userId);
+    try {
+      const supportedProtocols = await this.userService.getUserSupportedProtocols(userId);
 
-    //update local user entity with new supported protocols
-    await this.updateUserSupportedProtocols(userId, supportedProtocols);
-    return supportedProtocols;
+      //update local user entity with new supported protocols
+      await this.updateUserSupportedProtocols(userId, supportedProtocols);
+      return supportedProtocols;
+    } catch (error) {
+      if (localSupportedProtocols) {
+        this.logger.warn(
+          `Failed when fetching supported protocols of user ${userId.id}, using local supported protocols as fallback: `,
+          localSupportedProtocols,
+        );
+        return localSupportedProtocols;
+      }
+
+      this.logger.error(`Couldn't specify supported protocols of user ${userId.id}.`, error);
+      throw error;
+    }
   }
 
   async getUserByHandle(fqn: QualifiedHandle): Promise<undefined | APIClientUser> {

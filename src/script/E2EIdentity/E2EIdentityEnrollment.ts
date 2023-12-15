@@ -296,8 +296,8 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       setTimeout(() => {
         removeCurrentModal();
       }, 0);
-      // Notify user about E2EI enrolment error
-      void this.showErrorMessage();
+      console.error('E2EI enrolment failed', error);
+      await this.showErrorMessage();
     }
   }
 
