@@ -22,6 +22,7 @@ jobs:
       release_name: ${{ steps.push_docker_image.outputs.release_name }}
       chart_version: ${{ steps.publish_helm_chart.outputs.chart_version }}
       changelog: ${{ steps.generate_changelog.outputs.changelog }}
+      unit_tests_report: ${{ env.UNIT_TEST_REPORT_FILE }}
 
     env:
       BUILD_ARTIFACT: server/dist/s3/ebs.zip
@@ -81,10 +82,14 @@ jobs:
         run: yarn --immutable
 
       - name: Test
-        if: ${{false}}
         run: |
           set -o pipefail
           yarn test --detectOpenHandles=false 2>&1 | tee ${{ env.UNIT_TEST_REPORT_FILE }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: 'unit-tests-report'
+          path: ${{env.UNIT_TEST_REPORT_FILE}}
 
       - name: Build
         if: ${{ false }}
@@ -353,6 +358,10 @@ jobs:
         with:
           name: 'changelog'
 
+      - uses: actions/download-artifact@v4
+        with:
+          name: 'unit-tests-report'
+
       - name: Create GitHub release
         #if: ${{env.TAG}}
         uses: softprops/action-gh-release@v1
@@ -361,7 +370,7 @@ jobs:
         with:
           tag_name: 'test' #${{env.TAG}}
           body_path: ${{ needs.build.outputs.changelog }}
-          #files: ./unit-tests.log
+          files: ${{ needs.build.outputs.unit_tests_report }}
           draft: true
           prerelease: ${{contains(env.TAG, 'staging')}}
 
