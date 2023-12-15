@@ -670,6 +670,7 @@ export class CallingRepository {
         }
         break;
       }
+
       case CALL_MESSAGE_TYPE.REMOTE_MUTE: {
         const call = this.findCall(conversationId);
         if (!call) {
@@ -678,10 +679,22 @@ export class CallingRepository {
 
         const isSenderAdmin = conversation.isAdmin(userId);
         if (!isSenderAdmin) {
-          break;
+          return;
         }
 
-        //TODO: check if a self client was targeted
+        const selfUserId = this.selfUser?.qualifiedId;
+        const selfClientId = this.selfClientId;
+
+        if (!selfUserId || !selfClientId) {
+          return;
+        }
+
+        const isSelfClientTargetted =
+          !!content.data.targets[selfUserId.domain]?.[selfUserId.id]?.includes(selfClientId);
+
+        if (!isSelfClientTargetted) {
+          return;
+        }
 
         this.muteCall(call, true, MuteState.REMOTE_MUTED);
         break;
@@ -1282,7 +1295,11 @@ export class CallingRepository {
 
   readonly sendModeratorMute = (conversationId: QualifiedId, participants: Participant[]) => {
     const recipients = this.convertParticipantsToCallingMessageRecepients(participants);
-    this.sendCallingMessage(conversationId, {type: CALL_MESSAGE_TYPE.REMOTE_MUTE}, {nativePush: true, recipients});
+    this.sendCallingMessage(
+      conversationId,
+      {type: CALL_MESSAGE_TYPE.REMOTE_MUTE, data: {targets: recipients}},
+      {nativePush: true, recipients},
+    );
   };
 
   readonly sendModeratorKick = (conversationId: QualifiedId, participants: Participant[]) => {
