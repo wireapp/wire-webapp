@@ -265,7 +265,6 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
         displayName,
         handle,
         oAuthIdToken,
-        refreshActiveCertificate,
       });
 
       // If the data is false or we dont get the ACMEChallenge, enrolment failed
