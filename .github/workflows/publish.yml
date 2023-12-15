@@ -28,11 +28,6 @@ jobs:
       COMMITTER: ${{github.event.head_commit.committer.name}}
 
     steps:
-      - uses: azure/setup-helm@v3
-        with:
-          version: '3.12.2'
-        id: install
-
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -126,6 +121,11 @@ jobs:
           packageVersion=$(cat ./package.json | jq -r '.version')
           release_name="${TAG:-v${packageVersion}}"
           echo "release_name=$release_name" >> $GITHUB_OUTPUT
+
+      - uses: azure/setup-helm@v3
+        with:
+          version: '3.12.2'
+        id: install
 
       - name: Publish Helm chart
         shell: bash
@@ -246,7 +246,7 @@ jobs:
   #        shell: bash
   #        run: |
   #          echo "PR: ${{ steps.create-pr.outputs.pull-request-url }}"
-  #
+
   set_deployment_targets:
     name: 'Set aws deployment targets'
     runs-on: ubuntu-latest
@@ -255,6 +255,7 @@ jobs:
       deployment_targets: ${{env.targets}}
 
     steps:
+      # generates a mapping between branches/tag to aws envs to deploy to
       - uses: kanga333/variable-mapper@master
         id: targets
         with:
@@ -288,10 +289,6 @@ jobs:
       matrix:
         target: ${{fromJson(needs.set_deployment_targets.outputs.deployment_targets)}}
 
-    env:
-      DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS: 150
-      AWS_APPLICATION_NAME: Webapp
-
     steps:
       - name: Set tag
         run: |
@@ -302,14 +299,10 @@ jobs:
           name: 'build-artifact'
 
       - name: Deploy to ${{matrix.target}}
-        run: |
-          echo "deploying to ${{matrix.target}}"
-
-      - name: Deploy to dev env
         if: ${{false}}
         uses: einaregilsson/beanstalk-deploy@v21
         with:
-          application_name: ${{env.AWS_APPLICATION_NAME}}
+          application_name: Webapp
           aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
           aws_secret_key: ${{secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY}}
           deployment_package: ${{env.AWS_BUILD_ZIP_PATH}}
@@ -319,7 +312,7 @@ jobs:
           version_description: ${{github.sha}}
           version_label: ${{github.run_id}}
           wait_for_deployment: false
-          wait_for_environment_recovery: ${{env.DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS}}
+          wait_for_environment_recovery: 150
 
   create_gh_release:
     name: 'Create release on Github'
