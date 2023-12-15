@@ -726,16 +726,16 @@ export class UserRepository extends TypedEventEmitter<Events> {
       await this.updateUserSupportedProtocols(userId, supportedProtocols);
       return supportedProtocols;
     } catch (error) {
-      this.logger.warn(
-        `Failed when fetching supported protocols of user ${userId.id}, using local supported protocols as fallback: `,
-        localSupportedProtocols,
-      );
-
-      if (!localSupportedProtocols) {
-        throw error;
+      if (localSupportedProtocols) {
+        this.logger.warn(
+          `Failed when fetching supported protocols of user ${userId.id}, using local supported protocols as fallback: `,
+          localSupportedProtocols,
+        );
+        return localSupportedProtocols;
       }
 
-      return localSupportedProtocols;
+      this.logger.error(`Couldn't specify supported protocols of user ${userId.id}.`, error);
+      throw error;
     }
   }
 
