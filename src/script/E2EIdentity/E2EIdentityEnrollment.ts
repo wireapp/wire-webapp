@@ -132,6 +132,12 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
         return this;
       }
 
+      // if an enrollment is already in progress ex: manual certificate renewal then call enroll directly
+      if (this.coreE2EIService.isEnrollmentInProgress()) {
+        void this.enroll();
+        return this;
+      }
+
       const renewalTimeMS = this.calculateRenewalTime(timeRemainingMS, historyTimeMS, gracePeriodMS);
       const renewalPromptTime = new Date(certificateCreationTime + renewalTimeMS).getTime();
       const currentTime = new Date().getTime();
@@ -256,15 +262,12 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       if (!displayName || !handle) {
         throw new Error('Username or handle not found');
       }
-      // console.log('enrollE2EI call');
       const data = await this.core.enrollE2EI({
         discoveryUrl: this.config.discoveryUrl,
         displayName,
         handle,
         oAuthIdToken,
       });
-
-      // console.log('enrollE2EI data', data);
       // If the data is false or we dont get the ACMEChallenge, enrolment failed
       if (!data) {
         throw new Error('E2EI enrolment failed');
@@ -272,22 +275,20 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
       // Check if the data is a boolean, if not, we need to handle the oauth redirect
       if (typeof data !== 'boolean') {
-        // console.log('storeRedirectTargetAndRedirect');
         await this.storeRedirectTargetAndRedirect(data.target);
       }
 
-      // console.log('before setTimeout');
       // Notify user about E2EI enrolment success
       // This setTimeout is needed because there was a timing with the success modal and the loading modal
       setTimeout(() => {
         removeCurrentModal();
       }, 0);
 
-      // console.log('after setTimeout');
       this.currentStep = E2EIHandlerStep.SUCCESS;
       this.showSuccessMessage();
-      // Remove the url parameters after enrolment
-      removeUrlParameters();
+
+      // clear the oidc service progress/data and successful enrolment
+      await this.cleanUp();
     } catch (error) {
       this.logger.error('E2EI enrollment failed', error);
 
@@ -317,8 +318,6 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     if (this.currentStep !== E2EIHandlerStep.SUCCESS) {
       return;
     }
-
-    // console.log('showSuccessMessage');
     const {modalOptions, modalType} = getModalOptions({
       type: ModalType.SUCCESS,
       hideSecondary: true,
