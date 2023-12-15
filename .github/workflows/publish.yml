@@ -2,7 +2,7 @@ name: Publish
 
 on:
   push:
-    branches: [master, dev, edge, chore/deployment-pipeline]
+    branches: [master, dev, edge]
     tags:
       - '*staging*'
       - '*production*'
@@ -14,7 +14,7 @@ concurrency:
 jobs:
   build:
     name: Build Docker image and Helm Chart
-    runs-on: buildjet-16vcpu-ubuntu-2204
+    runs-on: buildjet-8vcpu-ubuntu-2204
 
     outputs:
       wire_builds_target_branches: ${{ steps.output_target_branches.outputs.wire_builds_target_branches }}
@@ -23,6 +23,7 @@ jobs:
       chart_version: ${{ steps.publish_helm_chart.outputs.chart_version }}
       changelog: ${{ steps.generate_changelog.outputs.changelog }}
       unit_tests_report: ${{ env.UNIT_TEST_REPORT_FILE }}
+      build_artifact: ${{ env.BUILD_ARTIFACT }}
 
     env:
       BUILD_ARTIFACT: server/dist/s3/ebs.zip
@@ -105,9 +106,6 @@ jobs:
           key: '${{github.ref}}'
           map: |
             {
-              "chore/deployment-pipeline": {
-                "changelog_type": "staging"
-              },
               "production": {
                 "changelog_type": "production"
               },
@@ -131,7 +129,6 @@ jobs:
           path: ${{ env.CHANGELOG_FILE }}
 
       - name: Push Docker image
-        if: ${{false}}
         id: push_docker_image
         env:
           DOCKER_PASSWORD: ${{secrets.WEBTEAM_QUAY_PASSWORD}}
@@ -155,7 +152,6 @@ jobs:
 
       - name: Publish Helm chart
         shell: bash
-        if: ${{false}}
         id: publish_helm_chart
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_ACCESS_KEY_ID }}
@@ -184,13 +180,13 @@ jobs:
           helm s3 push webapp-*.tgz charts-webapp
 
   publish_wire_builds:
-    if: ${{ false }}
     name: Bump webapp chart in wire-builds
     runs-on: ubuntu-latest
     needs: build
     strategy:
       matrix:
         target_branch: ${{fromJSON(needs.build.outputs.wire_builds_target_branches)}}
+
     steps:
       - name: Check out wire-builds
         uses: actions/checkout@v4
@@ -220,7 +216,6 @@ jobs:
 
   #FUTUREWORK: Remove this job once production builds are based on wireapp/wire-builds
   update_helm_chart:
-    if: ${{false}}
     name: 'Create PR in wire-server: Bump Helm chart'
     runs-on: ubuntu-latest
     needs: build
@@ -276,7 +271,7 @@ jobs:
           echo "PR: ${{ steps.create-pr.outputs.pull-request-url }}"
 
   set_deployment_targets:
-    name: 'Set aws deployment targets'
+    name: 'Set deployment targets'
     runs-on: ubuntu-latest
     needs: build
     outputs:
@@ -290,9 +285,6 @@ jobs:
           key: '${{github.ref}}'
           map: |
             {
-              "chore/deployment-pipeline": {
-                "targets": "[\"felix\"]"
-              },
               "dev": {
                 "targets": "[\"wire-webapp-dev-al2\", \"wire-webapp-edge-al2\" ]"
               },
@@ -309,9 +301,9 @@ jobs:
           export_to: env
 
   deploy_to_aws:
-    name: 'Deploy build to live environments'
+    name: 'Deploy to live environments'
     runs-on: ubuntu-latest
-    needs: set_deployment_targets
+    needs: [build, set_deployment_targets]
 
     strategy:
       matrix:
@@ -333,7 +325,7 @@ jobs:
           application_name: Webapp
           aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
           aws_secret_key: ${{secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY}}
-          deployment_package: ${{env.AWS_BUILD_ZIP_PATH}}
+          deployment_package: ${{needs.build.outputs.build_artifact}}
           environment_name: ${{matrix.target}}
           region: eu-central-1
           use_existing_version_if_available: true
@@ -343,7 +335,7 @@ jobs:
           wait_for_environment_recovery: 150
 
   create_gh_release:
-    name: 'Create release on Github'
+    name: 'Create Github release'
     runs-on: ubuntu-latest
     needs: [deploy_to_aws, build]
 
@@ -364,13 +356,13 @@ jobs:
           name: 'unit-tests-report'
 
       - name: Create GitHub release
-        #if: ${{env.TAG}}
+        if: ${{env.TAG}}
         id: 'release'
         uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{github.token}}
         with:
-          tag_name: 'test' #${{env.TAG}}
+          tag_name: ${{env.TAG}}
           body_path: ${{ needs.build.outputs.changelog }}
           files: ${{ needs.build.outputs.unit_tests_report }}
           draft: true
@@ -382,12 +374,8 @@ jobs:
     needs: create_gh_release
 
     steps:
-      - name: print
-        run: echo "New release done ([full changelog](${{ needs.create_gh_release.outputs.release_url }})) 🚀"
-
       - name: Announce staging release
-        if: false
-        #if: ${{ needs.create_gh_release.outputs.release_url }}
+        if: ${{ needs.create_gh_release.outputs.release_url }}
         uses: wireapp/github-action-wire-messenger@v2.0.0
         with:
           email: ${{secrets.WIRE_BOT_EMAIL}}
