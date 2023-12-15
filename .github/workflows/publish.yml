@@ -7,6 +7,10 @@ on:
       - '*staging*'
       - '*production*'
 
+concurrency:
+  group: publish-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     name: Build Docker image and Helm Chart
@@ -258,7 +262,7 @@ jobs:
           map: |
             {
               "chore/deployment-pipeline": {
-                targets: "[\"felix\"]"
+                "targets": "[\"felix\"]"
               },
               "dev": {
                 "targets": "[\"wire-webapp-dev-al2\", \"wire-webapp-edge-al2\" ]"
