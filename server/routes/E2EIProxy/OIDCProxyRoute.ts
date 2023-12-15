@@ -47,11 +47,21 @@ export const OIDCProxyRoute = () => {
     const queryParams = req.query;
     delete queryParams[targetURLParam];
 
+    // Check if the target URL has the shouldBeRedirectedByProxy query parameter
+    const redirectParamName = 'shouldBeRedirectedByProxy';
+    const shouldBeRedirected = req.query[redirectParamName];
+    delete queryParams[redirectParamName];
+
     // Append the query parameters to the target URL
     const targetUrlWithQueryParams = new URL(targetUrl);
     Object.keys(queryParams).forEach(key => {
       targetUrlWithQueryParams.searchParams.append(key, queryParams[key] as string);
     });
+
+    // Redirect to the target URL if the shouldBeRedirected query parameter is set
+    if (shouldBeRedirected && shouldBeRedirected === 'true') {
+      res.redirect(targetUrlWithQueryParams.href);
+    }
 
     // Configure the dynamic proxy middleware
     const proxy = createProxyMiddleware({
@@ -62,11 +72,8 @@ export const OIDCProxyRoute = () => {
       selfHandleResponse: true, // Handle response manually
       followRedirects: true,
       onProxyRes: (proxyRes, req, res) => {
-        if (targetUrlWithQueryParams.href.includes('/dex/auth')) {
-          // Exception 1: Redirect to the target URL if the response is a redirect to the OIDC auth endpoint
-          res.redirect(targetUrlWithQueryParams.href);
-          // Exception 2: Modify the response if the target URL is the OIDC discovery URL
-        } else if (req.originalUrl.includes('.well-known/openid-configuration')) {
+        // Exception: Modify the response if the target URL is the OIDC discovery URL
+        if (req.originalUrl.includes('.well-known/openid-configuration')) {
           let body = '';
 
           proxyRes.on('data', chunk => {
