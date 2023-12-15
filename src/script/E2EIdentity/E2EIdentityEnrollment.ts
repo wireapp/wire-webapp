@@ -147,10 +147,10 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
    * Renew the certificate without user action
    */
   private async renewCertificate(): Promise<void> {
-    const oidcService = getOIDCServiceInstance();
+    this.oidcService = new OIDCService();
     try {
       // Use the oidc service to get the user data via silent authentication (refresh token)
-      const userData = await oidcService.handleSilentAuthentication();
+      const userData = await this.oidcService.handleSilentAuthentication();
 
       if (!userData) {
         throw new Error('Received no user data from OIDC service');
@@ -205,8 +205,8 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     // Remove the url parameters of the failed enrolment
     removeUrlParameters();
     // Clear the oidc service progress
-    const oidcService = getOIDCServiceInstance();
-    await oidcService.clearProgress();
+    this.oidcService = new OIDCService();
+    await this.oidcService.clearProgress();
     // Clear the e2e identity progress
     this.coreE2EIService.clearAllProgress();
     // Clear the oidc service store refresh token
@@ -256,6 +256,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       if (!displayName || !handle) {
         throw new Error('Username or handle not found');
       }
+      // console.log('enrollE2EI call');
       const data = await this.core.enrollE2EI({
         discoveryUrl: this.config.discoveryUrl,
         displayName,
@@ -263,6 +264,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
         oAuthIdToken,
       });
 
+      // console.log('enrollE2EI data', data);
       // If the data is false or we dont get the ACMEChallenge, enrolment failed
       if (!data) {
         throw new Error('E2EI enrolment failed');
@@ -270,15 +272,18 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
       // Check if the data is a boolean, if not, we need to handle the oauth redirect
       if (typeof data !== 'boolean') {
+        // console.log('storeRedirectTargetAndRedirect');
         await this.storeRedirectTargetAndRedirect(data.target);
       }
 
+      // console.log('before setTimeout');
       // Notify user about E2EI enrolment success
       // This setTimeout is needed because there was a timing with the success modal and the loading modal
       setTimeout(() => {
         removeCurrentModal();
       }, 0);
 
+      // console.log('after setTimeout');
       this.currentStep = E2EIHandlerStep.SUCCESS;
       this.showSuccessMessage();
       // Remove the url parameters after enrolment
@@ -313,6 +318,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       return;
     }
 
+    // console.log('showSuccessMessage');
     const {modalOptions, modalType} = getModalOptions({
       type: ModalType.SUCCESS,
       hideSecondary: true,
