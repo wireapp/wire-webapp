@@ -12,6 +12,10 @@ jobs:
   test:
     runs-on: buildjet-8vcpu-ubuntu-2204
 
+    env:
+      BRANCH_NAME: $(git branch --show-current)"
+      TAG: $(git tag --points-at ${{github.sha}})"
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
