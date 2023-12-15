@@ -230,6 +230,46 @@ describe('ConversationRepository', () => {
     });
   });
 
+  describe('init1to1Conversation', () => {
+    it('just returns a conversation if id of the other user cannot be found', async () => {
+      const conversationRepository = testFactory.conversation_repository!;
+
+      const conversation = _generateConversation({
+        type: CONVERSATION_TYPE.ONE_TO_ONE,
+        protocol: ConversationProtocol.MLS,
+      });
+
+      const conversationEntity = await conversationRepository.init1to1Conversation(conversation, true);
+      expect(conversationEntity).toEqual(conversation);
+    });
+
+    it('returns a conversation if we fail when fetching other users supported protocols', async () => {
+      const conversationRepository = testFactory.conversation_repository!;
+      const userRepository = testFactory.user_repository!;
+
+      const otherUserId = {id: 'f718410c-3833-479d-bd80-a5df03f38414', domain: 'test-domain'};
+      const otherUser = new User(otherUserId.id, otherUserId.domain);
+
+      userRepository['userState'].users.push(otherUser);
+
+      const conversation = _generateConversation({
+        type: CONVERSATION_TYPE.ONE_TO_ONE,
+        protocol: ConversationProtocol.MLS,
+      });
+
+      const connection = new ConnectionEntity();
+      conversation.connection(connection);
+      connection.conversationId = conversation.qualifiedId;
+      connection.userId = otherUserId;
+      otherUser.connection(connection);
+
+      jest.spyOn(userRepository['userService'], 'getUserSupportedProtocols').mockRejectedValueOnce(new Error('error'));
+
+      const conversationEntity = await conversationRepository.init1to1Conversation(conversation, true);
+      expect(conversationEntity).toEqual(conversation);
+    });
+  });
+
   describe('getInitialised1To1Conversation', () => {
     beforeEach(() => {
       testFactory.conversation_repository['conversationState'].conversations([]);
