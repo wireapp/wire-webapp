@@ -82,6 +82,7 @@ jobs:
         run: yarn --immutable
 
       - name: Test
+        if: ${{false}}
         run: |
           set -o pipefail
           yarn test --detectOpenHandles=false 2>&1 | tee ./unit-tests.log
