@@ -30,7 +30,7 @@ import {removeUrlParameters} from 'Util/UrlUtil';
 import {DelayTimerService} from './DelayTimer/DelayTimer';
 import {hasActiveCertificate, isE2EIEnabled} from './E2EIdentityVerification';
 import {getModalOptions, ModalType} from './Modals';
-import {getOIDCServiceInstance} from './OIDCService';
+import {OIDCService} from './OIDCService';
 import {OIDCServiceStore} from './OIDCService/OIDCServiceStorage';
 
 export enum E2EIHandlerStep {
@@ -60,6 +60,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   private readonly userState = container.resolve(UserState);
   private config?: EnrollmentConfig;
   private currentStep: E2EIHandlerStep | null = E2EIHandlerStep.UNINITIALIZED;
+  private oidcService: OIDCService | null = null;
 
   private get coreE2EIService() {
     const e2eiService = this.core.service?.e2eIdentity;
@@ -112,8 +113,8 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   private async storeRedirectTargetAndRedirect(targetURL: string): Promise<void> {
     // store the target url in the persistent oidc service store, since the oidc service will be destroyed after the redirect
     OIDCServiceStore.store.targetURL(targetURL);
-    const oidcService = getOIDCServiceInstance();
-    await oidcService.authenticate();
+    this.oidcService = new OIDCService();
+    await this.oidcService.authenticate();
   }
 
   public async enroll(refreshActiveCertificate: boolean = false) {
@@ -128,8 +129,9 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
       // If the enrolment is in progress, we need to get the id token from the oidc service, since oauth should have already been completed
       if (this.coreE2EIService.isEnrollmentInProgress()) {
-        const oidcService = getOIDCServiceInstance();
-        const userData = await oidcService.handleAuthentication();
+        // The redirect-url which is needed inside the OIDCService is stored in the OIDCServiceStore previously
+        this.oidcService = new OIDCService();
+        const userData = await this.oidcService.handleAuthentication();
         if (!userData) {
           throw new Error('Received no user data from OIDC service');
         }
@@ -213,8 +215,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     // Remove the url parameters of the failed enrolment
     removeUrlParameters();
     // Clear the oidc service progress
-    const oidcService = getOIDCServiceInstance();
-    await oidcService.clearProgress();
+    await this.oidcService?.clearProgress();
     // Clear the e2e identity progress
     this.coreE2EIService.clearAllProgress();
 
