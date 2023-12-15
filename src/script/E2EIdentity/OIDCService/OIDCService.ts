@@ -22,32 +22,48 @@ import {UserManager, User, UserManagerSettings, WebStorageStateStore} from 'oidc
 import {clearKeysStartingWith} from 'Util/localStorage';
 import {Logger, getLogger} from 'Util/Logger';
 
-interface OIDCServiceConfig {
-  authorityUrl: string;
-  redirectUri: string;
-  oidcClient: {
-    id: string;
-    secret?: string;
-  };
-}
+import {OIDCServiceStore} from './OIDCServiceStorage';
 
 export class OIDCService {
   private readonly userManager: UserManager;
   private readonly logger: Logger;
 
-  constructor(config: OIDCServiceConfig) {
-    const {
-      authorityUrl,
-      redirectUri,
-      oidcClient: {id, secret},
-    } = config;
+  constructor() {
+    // Get the targetURL from the OIDCServiceStore
+    // It has been set by the E2EIdentityEnrollment
+    const targetURL = OIDCServiceStore.get.targetURL();
+
+    // if there is no targetURL, we cannot create an OIDCService
+    if (!targetURL) {
+      throw new Error('No target URL found in OIDCServiceStore');
+    }
+
+    // Extract the clientId from the targetURL
+    const idpUrl = new URL(targetURL);
+    // This clientId will be used to create the OIDCService, it is mocked for now
+    // const idpClientId = idpUrl.searchParams.get('clientId');
+    const idpClientId = 'wireapp';
+    // This secret is only used for testing and needs to be removed in the future
+    const idpClientSecret = 'dUpVSGx2dVdFdGQ0dmsxWGhDalQ0SldU';
+
+    // if there is no clientData ID, we cannot create an OIDCService
+    if (!idpClientId) {
+      throw new Error('No clientId provided by the targetUrl');
+    }
+
+    // Build the proxy url and redirect uri
+    const currentOrigin = location.origin;
+    const authorityUrl = idpUrl.origin + idpUrl.pathname;
+    const proxyUrl = `${currentOrigin}/oidcProxy?targetUrl=${authorityUrl}`;
+    const redirectUri = `${currentOrigin}/oidc`;
+
     const dexioConfig: UserManagerSettings = {
-      authority: `/oidcProxy?targetUrl=${authorityUrl}`,
-      client_id: id,
+      authority: proxyUrl,
+      client_id: idpClientId,
       redirect_uri: redirectUri,
       response_type: 'code',
       scope: 'openid profile email offline_access',
-      client_secret: secret,
+      client_secret: idpClientSecret,
       extraQueryParams: {
         access_type: 'offline',
         prompt: 'consent',
