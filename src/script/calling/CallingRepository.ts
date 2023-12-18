@@ -631,20 +631,9 @@ export class CallingRepository {
    * Handle incoming calling events from backend.
    */
   onCallEvent = async (event: CallingEvent, source: string): Promise<void> => {
-    const {
-      content,
-      qualified_conversation,
-      from,
-      qualified_from,
-      sender: clientId,
-      time = new Date().toISOString(),
-      senderClientId: senderFullyQualifiedClientId = '',
-    } = event;
+    const {content, qualified_conversation, from, qualified_from} = event;
     const isFederated = this.core.backendFeatures.isFederated && qualified_conversation && qualified_from;
     const userId = isFederated ? qualified_from : {domain: '', id: from};
-    const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-    const toSecond = (timestamp: number) => Math.floor(timestamp / 1000);
-    const contentStr = JSON.stringify(content);
     const conversationId = this.extractTargetedConversationId(event);
     const conversation = this.getConversationById(conversationId);
 
@@ -705,6 +694,26 @@ export class CallingRepository {
       }
     }
 
+    this.processCallEvent(event, conversation);
+  };
+
+  private processCallEvent = (callingEvent: CallingEvent, conversation: Conversation): void => {
+    const {
+      content,
+      time = new Date().toISOString(),
+      senderClientId: qualified_conversation,
+      from,
+      qualified_from,
+      sender: clientId,
+      senderClientId: senderFullyQualifiedClientId = '',
+    } = callingEvent;
+    const contentStr = JSON.stringify(content);
+    const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
+    const toSecond = (timestamp: number) => Math.floor(timestamp / 1000);
+
+    const isFederated = this.core.backendFeatures.isFederated && qualified_conversation && qualified_from;
+    const userId = isFederated ? qualified_from : {domain: '', id: from};
+
     let senderClientId = '';
     if (senderFullyQualifiedClientId) {
       senderClientId = this.parseQualifiedId(senderFullyQualifiedClientId).id.split(':')[1];
@@ -716,7 +725,7 @@ export class CallingRepository {
       contentStr.length,
       toSecond(currentTimestamp),
       toSecond(new Date(time).getTime()),
-      this.serializeQualifiedId(conversationId),
+      this.serializeQualifiedId(conversation.qualifiedId),
       this.serializeQualifiedId(userId),
       conversation && isMLSConversation(conversation) ? senderClientId : clientId,
       conversation && isGroupMLSConversation(conversation) ? CONV_TYPE.CONFERENCE_MLS : CONV_TYPE.CONFERENCE,
@@ -725,11 +734,13 @@ export class CallingRepository {
     if (res !== 0) {
       this.logger.warn(`recv_msg failed with code: ${res}`);
       if (
-        this.callState.acceptedVersionWarnings().every(acceptedId => !matchQualifiedIds(acceptedId, conversationId)) &&
+        this.callState
+          .acceptedVersionWarnings()
+          .every(acceptedId => !matchQualifiedIds(acceptedId, conversation.qualifiedId)) &&
         res === ERROR.UNKNOWN_PROTOCOL &&
-        event.content.type === 'CONFSTART'
+        callingEvent.content.type === 'CONFSTART'
       ) {
-        this.warnOutdatedClient(conversationId);
+        this.warnOutdatedClient(conversation.qualifiedId);
       }
     }
   };
