@@ -657,13 +657,13 @@ export class CallingRepository {
             this.abortCall(conversationId, LEAVE_CALL_REASON.ABORTED_BECAUSE_FAILED_TO_UPDATE_MISSING_CLIENTS);
           }
         }
-        break;
+        return this.processCallingMessage(event, conversation);
       }
 
       case CALL_MESSAGE_TYPE.REMOTE_MUTE: {
         const call = this.findCall(conversationId);
         if (!call) {
-          break;
+          return;
         }
 
         const isSenderAdmin = conversation.isAdmin(userId);
@@ -686,18 +686,16 @@ export class CallingRepository {
         }
 
         this.muteCall(call, true, MuteState.REMOTE_MUTED);
-        break;
+        return this.processCallingMessage(event, conversation);
       }
       case CALL_MESSAGE_TYPE.REMOTE_KICK: {
         this.leaveCall(conversationId, LEAVE_CALL_REASON.REMOTE_KICK);
-        break;
+        return this.processCallingMessage(event, conversation);
       }
     }
-
-    this.processCallEvent(event, conversation);
   };
 
-  private processCallEvent = (callingEvent: CallingEvent, conversation: Conversation): void => {
+  private readonly processCallingMessage = (callingEvent: CallingEvent, conversation: Conversation): void => {
     const {
       content,
       time = new Date().toISOString(),
