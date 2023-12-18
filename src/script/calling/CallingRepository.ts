@@ -688,8 +688,13 @@ export class CallingRepository {
         this.muteCall(call, true, MuteState.REMOTE_MUTED);
         return this.processCallingMessage(event, conversation);
       }
+
       case CALL_MESSAGE_TYPE.REMOTE_KICK: {
         this.leaveCall(conversationId, LEAVE_CALL_REASON.REMOTE_KICK);
+        return this.processCallingMessage(event, conversation);
+      }
+
+      default: {
         return this.processCallingMessage(event, conversation);
       }
     }
