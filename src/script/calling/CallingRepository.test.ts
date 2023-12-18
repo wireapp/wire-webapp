@@ -17,7 +17,11 @@
  *
  */
 
-import {ConversationProtocol, CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {
+  ConversationProtocol,
+  CONVERSATION_TYPE,
+  DefaultConversationRoleName,
+} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import 'jsdom-worker';
 import ko, {Subscription} from 'knockout';
@@ -28,7 +32,7 @@ import {Runtime} from '@wireapp/commons';
 
 import {Call} from 'src/script/calling/Call';
 import {CallingRepository} from 'src/script/calling/CallingRepository';
-import {CallState} from 'src/script/calling/CallState';
+import {CallState, MuteState} from 'src/script/calling/CallState';
 import {Participant} from 'src/script/calling/Participant';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
@@ -41,6 +45,7 @@ import {createUuid} from 'Util/uuid';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
 
+import {CallingEvent} from '../event/CallingEvent';
 import {CALL} from '../event/Client';
 import {MediaDevicesHandler} from '../media/MediaDevicesHandler';
 import {Core} from '../service/CoreSingleton';
@@ -102,6 +107,142 @@ describe('CallingRepository', () => {
 
   afterAll(() => {
     return wCall && wCall.destroy(wUser);
+  });
+
+  describe('onCallEvent', () => {
+    it('does mute itself when remote muted message arrives', async () => {
+      const conversation = createConversation();
+      const selfParticipant = createSelfParticipant();
+      const senderUserId = {domain: 'senderdomain', id: 'senderid'};
+      const selfUserId = callingRepository['selfUser']?.qualifiedId!;
+      const selfClientId = callingRepository['selfClientId']!;
+      const call = new Call(
+        selfUserId,
+        conversation.qualifiedId,
+        CONV_TYPE.CONFERENCE,
+        selfParticipant,
+        CALL_TYPE.NORMAL,
+        {
+          currentAvailableDeviceId: mediaDevices,
+        } as unknown as MediaDevicesHandler,
+      );
+
+      conversation.roles({[senderUserId.id]: DefaultConversationRoleName.WIRE_ADMIN});
+
+      callingRepository['conversationState'].conversations.push(conversation);
+      spyOn(callingRepository, 'findCall').and.returnValue(call);
+      spyOn(callingRepository, 'muteCall').and.callThrough();
+      spyOn(wCall, 'recvMsg').and.callThrough();
+
+      const event: CallingEvent = {
+        content: {
+          type: CALL_MESSAGE_TYPE.REMOTE_MUTE,
+          version: '',
+          data: {targets: {[selfUserId.domain]: {[selfUserId.id]: [selfClientId]}}},
+        },
+        conversation: conversation.id,
+        from: senderUserId.id,
+        qualified_from: senderUserId,
+        sender: 'test',
+        time: new Date().toISOString(),
+        type: CALL.E_CALL,
+        qualified_conversation: conversation.qualifiedId,
+      };
+
+      await callingRepository.onCallEvent(event, EventRepository.SOURCE.WEB_SOCKET);
+      expect(callingRepository.muteCall).toHaveBeenCalledWith(call, true, MuteState.REMOTE_MUTED);
+      expect(wCall.recvMsg).toHaveBeenCalled();
+    });
+
+    it('should not mute itself when remote muted message arrives but the event sender is not an admin', async () => {
+      const conversation = createConversation();
+      const selfParticipant = createSelfParticipant();
+      const senderUserId = {domain: 'senderdomain', id: 'senderid'};
+      const selfUserId = callingRepository['selfUser']?.qualifiedId!;
+      const selfClientId = callingRepository['selfClientId']!;
+      const call = new Call(
+        selfUserId,
+        conversation.qualifiedId,
+        CONV_TYPE.CONFERENCE,
+        selfParticipant,
+        CALL_TYPE.NORMAL,
+        {
+          currentAvailableDeviceId: mediaDevices,
+        } as unknown as MediaDevicesHandler,
+      );
+
+      conversation.roles({[senderUserId.id]: DefaultConversationRoleName.WIRE_MEMBER});
+
+      callingRepository['conversationState'].conversations.push(conversation);
+      spyOn(callingRepository, 'findCall').and.returnValue(call);
+      spyOn(callingRepository, 'muteCall').and.callThrough();
+      spyOn(wCall, 'recvMsg').and.callThrough();
+
+      const event: CallingEvent = {
+        content: {
+          type: CALL_MESSAGE_TYPE.REMOTE_MUTE,
+          version: '',
+          data: {targets: {[selfUserId.domain]: {[selfUserId.id]: [selfClientId]}}},
+        },
+        conversation: conversation.id,
+        from: senderUserId.id,
+        qualified_from: senderUserId,
+        sender: 'test',
+        time: new Date().toISOString(),
+        type: CALL.E_CALL,
+        qualified_conversation: conversation.qualifiedId,
+      };
+
+      await callingRepository.onCallEvent(event, EventRepository.SOURCE.WEB_SOCKET);
+      expect(callingRepository.muteCall).not.toHaveBeenCalled();
+      expect(wCall.recvMsg).not.toHaveBeenCalled();
+    });
+
+    it('should not mute itself when remote muted message arrives but client was not included in targets list', async () => {
+      const conversation = createConversation();
+      const selfParticipant = createSelfParticipant();
+      const senderUserId = {domain: 'senderdomain', id: 'senderid'};
+      const selfUserId = callingRepository['selfUser']?.qualifiedId!;
+
+      const call = new Call(
+        selfUserId,
+        conversation.qualifiedId,
+        CONV_TYPE.CONFERENCE,
+        selfParticipant,
+        CALL_TYPE.NORMAL,
+        {
+          currentAvailableDeviceId: mediaDevices,
+        } as unknown as MediaDevicesHandler,
+      );
+
+      conversation.roles({[senderUserId.id]: DefaultConversationRoleName.WIRE_ADMIN});
+
+      callingRepository['conversationState'].conversations.push(conversation);
+      spyOn(callingRepository, 'findCall').and.returnValue(call);
+      spyOn(callingRepository, 'muteCall').and.callThrough();
+      spyOn(wCall, 'recvMsg').and.callThrough();
+
+      const someOtherClientId = 'some-other-client';
+
+      const event: CallingEvent = {
+        content: {
+          type: CALL_MESSAGE_TYPE.REMOTE_MUTE,
+          version: '',
+          data: {targets: {[selfUserId.domain]: {[selfUserId.id]: [someOtherClientId]}}},
+        },
+        conversation: conversation.id,
+        from: senderUserId.id,
+        qualified_from: senderUserId,
+        sender: 'test',
+        time: new Date().toISOString(),
+        type: CALL.E_CALL,
+        qualified_conversation: conversation.qualifiedId,
+      };
+
+      await callingRepository.onCallEvent(event, EventRepository.SOURCE.WEB_SOCKET);
+      expect(callingRepository.muteCall).not.toHaveBeenCalled();
+      expect(wCall.recvMsg).not.toHaveBeenCalled();
+    });
   });
 
   describe('startCall', () => {
