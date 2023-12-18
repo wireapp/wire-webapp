@@ -657,7 +657,7 @@ export class CallingRepository {
             this.abortCall(conversationId, LEAVE_CALL_REASON.ABORTED_BECAUSE_FAILED_TO_UPDATE_MISSING_CLIENTS);
           }
         }
-        return this.processCallingMessage(event, conversation);
+        return this.processCallingMessage(conversation, event);
       }
 
       case CALL_MESSAGE_TYPE.REMOTE_MUTE: {
@@ -686,21 +686,21 @@ export class CallingRepository {
         }
 
         this.muteCall(call, true, MuteState.REMOTE_MUTED);
-        return this.processCallingMessage(event, conversation);
+        return this.processCallingMessage(conversation, event);
       }
 
       case CALL_MESSAGE_TYPE.REMOTE_KICK: {
         this.leaveCall(conversationId, LEAVE_CALL_REASON.REMOTE_KICK);
-        return this.processCallingMessage(event, conversation);
+        return this.processCallingMessage(conversation, event);
       }
 
       default: {
-        return this.processCallingMessage(event, conversation);
+        return this.processCallingMessage(conversation, event);
       }
     }
   };
 
-  private readonly processCallingMessage = (callingEvent: CallingEvent, conversation: Conversation): void => {
+  private readonly processCallingMessage = (conversation: Conversation, event: CallingEvent): void => {
     const {
       content,
       time = new Date().toISOString(),
@@ -709,7 +709,7 @@ export class CallingRepository {
       qualified_from,
       sender: clientId,
       senderClientId: senderFullyQualifiedClientId = '',
-    } = callingEvent;
+    } = event;
     const contentStr = JSON.stringify(content);
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
     const toSecond = (timestamp: number) => Math.floor(timestamp / 1000);
@@ -741,7 +741,7 @@ export class CallingRepository {
           .acceptedVersionWarnings()
           .every(acceptedId => !matchQualifiedIds(acceptedId, conversation.qualifiedId)) &&
         res === ERROR.UNKNOWN_PROTOCOL &&
-        callingEvent.content.type === 'CONFSTART'
+        event.content.type === 'CONFSTART'
       ) {
         this.warnOutdatedClient(conversation.qualifiedId);
       }
