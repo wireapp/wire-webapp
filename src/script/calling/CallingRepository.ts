@@ -704,7 +704,7 @@ export class CallingRepository {
     const {
       content,
       time = new Date().toISOString(),
-      senderClientId: qualified_conversation,
+      qualified_conversation,
       from,
       qualified_from,
       sender: clientId,
