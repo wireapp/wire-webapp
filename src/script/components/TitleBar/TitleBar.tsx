@@ -30,6 +30,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {Icon} from 'Components/Icon';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
+import {ConversationVerificationBadges} from 'Components/VerificationBadge';
 import {User} from 'src/script/entity/User';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {ContentState} from 'src/script/page/useAppState';
@@ -41,7 +42,6 @@ import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {CallState} from '../../calling/CallState';
 import {ConversationFilter} from '../../conversation/ConversationFilter';
-import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
 import {Conversation} from '../../entity/Conversation';
 import {RightSidebarParams} from '../../page/AppMain';
 import {PanelState} from '../../page/RightSidebar/RightSidebar';
@@ -60,6 +60,7 @@ export interface TitleBarProps {
   teamState: TeamState;
   isRightSidebarOpen?: boolean;
   callState?: CallState;
+  isReadOnlyConversation?: boolean;
 }
 
 export const TitleBar: React.FC<TitleBarProps> = ({
@@ -71,6 +72,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
   isRightSidebarOpen = false,
   callState = container.resolve(CallState),
   teamState = container.resolve(TeamState),
+  isReadOnlyConversation = false,
 }) => {
   const {calling: callingRepository} = repositories;
   const {
@@ -85,7 +87,6 @@ export const TitleBar: React.FC<TitleBarProps> = ({
     firstUserEntity,
     hasLegalHold,
     display_name: displayName,
-    verification_state: verificationState,
   } = useKoSubscribableChildren(conversation, [
     'is1to1',
     'isRequest',
@@ -98,7 +99,6 @@ export const TitleBar: React.FC<TitleBarProps> = ({
     'firstUserEntity',
     'hasLegalHold',
     'display_name',
-    'verification_state',
   ]);
 
   const {isActivatedAccount} = useKoSubscribableChildren(selfUser, ['isActivatedAccount']);
@@ -266,16 +266,11 @@ export const TitleBar: React.FC<TitleBarProps> = ({
               />
             )}
 
-            {verificationState === ConversationVerificationState.VERIFIED && (
-              <Icon.Verified
-                data-uie-name="conversation-title-bar-verified-icon"
-                className="conversation-title-bar-name--verified"
-              />
-            )}
-
             <span className="conversation-title-bar-name-label" data-uie-name="status-conversation-title-bar-label">
               {displayName}
             </span>
+
+            <ConversationVerificationBadges conversation={conversation} />
           </div>
 
           {conversationSubtitle && <div className="conversation-title-bar-name--subtitle">{conversationSubtitle}</div>}
@@ -297,6 +292,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
                   showStartedCallAlert(isGroup, true);
                 }}
                 data-uie-name="do-video-call"
+                disabled={isReadOnlyConversation}
               >
                 <Icon.Camera />
               </button>
@@ -313,6 +309,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
                 showStartedCallAlert(isGroup);
               }}
               data-uie-name="do-call"
+              disabled={isReadOnlyConversation}
             >
               <Icon.Pickup />
             </button>
@@ -338,6 +335,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
                 css={{marginBottom: 0}}
                 onClick={onClickStartAudio}
                 data-uie-name="do-call"
+                disabled={isReadOnlyConversation}
               >
                 <Icon.Pickup />
               </IconButton>

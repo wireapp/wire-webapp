@@ -26,6 +26,9 @@ updates:
       eslint:
         patterns:
           - '*eslint*'
+      lexial:
+        patterns:
+          - '*lexical*'
       datadog:
         patterns:
           - '*@datadog*'

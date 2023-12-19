@@ -62,6 +62,7 @@ export interface SelfStatusUpdateDatabaseData {
   receipt_mode: number;
   status: number;
   verification_state: ConversationVerificationState;
+  mlsVerificationState: ConversationVerificationState;
 }
 
 type Roles = {[userId: string]: DefaultConversationRoleName | string};
@@ -131,6 +132,7 @@ export class ConversationMapper {
       receipt_mode,
       status,
       verification_state,
+      mlsVerificationState,
     } = selfState;
 
     if (archived_timestamp) {
@@ -177,6 +179,10 @@ export class ConversationMapper {
 
     if (verification_state !== undefined) {
       conversationEntity.verification_state(verification_state);
+    }
+
+    if (mlsVerificationState !== undefined) {
+      conversationEntity.mlsVerificationState(mlsVerificationState);
     }
 
     if (legal_hold_status) {
@@ -234,8 +240,20 @@ export class ConversationMapper {
       throw new ConversationError(BASE_ERROR_TYPE.INVALID_PARAMETER, BaseError.MESSAGE.INVALID_PARAMETER);
     }
 
-    const {creator, id, members, name, others, qualified_others, type, group_id, epoch, protocol, cipher_suite} =
-      conversationData;
+    const {
+      creator,
+      id,
+      members,
+      name,
+      others,
+      qualified_others,
+      type,
+      group_id,
+      epoch,
+      protocol,
+      cipher_suite,
+      initial_protocol,
+    } = conversationData;
 
     let conversationEntity = new Conversation(
       id,
@@ -246,6 +264,7 @@ export class ConversationMapper {
 
     conversationEntity.creator = creator;
     conversationEntity.groupId = group_id;
+    conversationEntity.initialProtocol = initial_protocol || protocol;
     conversationEntity.epoch = epoch ?? -1;
     conversationEntity.cipherSuite = cipher_suite;
     conversationEntity.type(type);

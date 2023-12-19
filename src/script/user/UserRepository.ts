@@ -24,6 +24,7 @@ import {
   UserLegalHoldDisableEvent,
   UserLegalHoldRequestEvent,
   USER_EVENT,
+  UserUpdateEvent,
 } from '@wireapp/api-client/lib/event';
 import type {BackendError, TraceState} from '@wireapp/api-client/lib/http';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
@@ -39,7 +40,7 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {container} from 'tsyringe';
 import {flatten, uniq} from 'underscore';
 
-import type {AccentColor} from '@wireapp/commons';
+import {TypedEventEmitter, type AccentColor} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
@@ -103,7 +104,9 @@ interface UserAvailabilityEvent {
   fromDomain: string | null;
   type: USER.AVAILABILITY;
 }
-export class UserRepository {
+
+type Events = {supportedProtocolsUpdated: {user: User; supportedProtocols: ConversationProtocol[]}};
+export class UserRepository extends TypedEventEmitter<Events> {
   private readonly logger: Logger;
   public readonly userMapper: UserMapper;
   public getTeamMembersFromUsers: (users: User[]) => Promise<void>;
@@ -129,6 +132,7 @@ export class UserRepository {
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
   ) {
+    super();
     this.logger = getLogger('UserRepository');
 
     this.userMapper = new UserMapper(serverTimeHandler);
@@ -154,9 +158,7 @@ export class UserRepository {
         this.userDelete(eventJson);
         break;
       case USER_EVENT.UPDATE:
-        const user = eventJson.user;
-        const userId = generateQualifiedId(user);
-        await this.updateUser(userId, user, source === EventRepository.SOURCE.WEB_SOCKET);
+        await this.onUserUpdate(eventJson, source);
         break;
       case USER.AVAILABILITY:
         const {from, data, fromDomain} = eventJson;
@@ -295,6 +297,39 @@ export class UserRepository {
       window.setTimeout(() => {
         amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.ACCOUNT_DELETED, true);
       }, 100);
+    }
+  }
+
+  private async onUserUpdate(eventJson: UserUpdateEvent, source: EventSource): Promise<void> {
+    const user = eventJson.user;
+    const userId = generateQualifiedId(user);
+
+    // Check if user's supported protocols were updated, if they were, we need to re-evaluate a 1:1 conversation to use with that user
+    const newSupportedProtocols = user.supported_protocols;
+    if (newSupportedProtocols) {
+      await this.onUserSupportedProtocolsUpdate(userId, newSupportedProtocols);
+    }
+
+    await this.updateUser(userId, user, source === EventRepository.SOURCE.WEB_SOCKET);
+  }
+
+  private async onUserSupportedProtocolsUpdate(
+    userId: QualifiedId,
+    newSupportedProtocols: ConversationProtocol[],
+  ): Promise<void> {
+    const localSupportedProtocols = this.findUserById(userId)?.supportedProtocols();
+
+    const hasSupportedProtocolsChanged =
+      !localSupportedProtocols ||
+      !(
+        localSupportedProtocols.length === newSupportedProtocols.length &&
+        [...localSupportedProtocols].every(protocol => newSupportedProtocols.includes(protocol))
+      );
+
+    if (hasSupportedProtocolsChanged) {
+      const user = await this.getUserById(userId);
+      await this.updateUserSupportedProtocols(user, newSupportedProtocols);
+      this.emit('supportedProtocolsUpdated', {user, supportedProtocols: newSupportedProtocols});
     }
   }
 
@@ -671,6 +706,39 @@ export class UserRepository {
     }
   }
 
+  /**
+   * Check for supported protocols on user entity locally, otherwise fetch them from the backend.
+   * @param userId - the user to fetch the supported protocols for
+   * @param forceRefetch - if true, the supported protocols will be fetched from the backend even if they are already stored locally
+   */
+
+  public async getUserSupportedProtocols(userId: QualifiedId, forceRefetch = false): Promise<ConversationProtocol[]> {
+    const localSupportedProtocols = this.findUserById(userId)?.supportedProtocols();
+
+    if (!forceRefetch && localSupportedProtocols) {
+      return localSupportedProtocols;
+    }
+
+    try {
+      const supportedProtocols = await this.userService.getUserSupportedProtocols(userId);
+
+      //update local user entity with new supported protocols
+      await this.updateUserSupportedProtocols(userId, supportedProtocols);
+      return supportedProtocols;
+    } catch (error) {
+      if (localSupportedProtocols) {
+        this.logger.warn(
+          `Failed when fetching supported protocols of user ${userId.id}, using local supported protocols as fallback: `,
+          localSupportedProtocols,
+        );
+        return localSupportedProtocols;
+      }
+
+      this.logger.error(`Couldn't specify supported protocols of user ${userId.id}.`, error);
+      throw error;
+    }
+  }
+
   async getUserByHandle(fqn: QualifiedHandle): Promise<undefined | APIClientUser> {
     try {
       return await this.userService.getUserByFQN(fqn);
@@ -754,10 +822,10 @@ export class UserRepository {
   /**
    * Refresh all known users (in local state) from the backend.
    */
-  async refreshAllKnownUsers() {
+  public readonly refreshAllKnownUsers = async (): Promise<void> => {
     const userIds = this.userState.users().map(user => user.qualifiedId);
-    return this.refreshUsers(userIds);
-  }
+    await this.refreshUsers(userIds);
+  };
 
   /**
    * Will update user entity with provided list of supportedProtocols.
@@ -766,10 +834,6 @@ export class UserRepository {
    */
   async updateUserSupportedProtocols(userId: QualifiedId, supportedProtocols: ConversationProtocol[]): Promise<User> {
     return this.updateUser(userId, {supported_protocols: supportedProtocols});
-  }
-
-  getSelfSupportedProtocols(): ConversationProtocol[] | null {
-    return this.userState.self()?.supportedProtocols() || null;
   }
 
   public async getAllSelfClients() {

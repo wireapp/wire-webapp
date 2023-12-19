@@ -62,6 +62,7 @@ import {createUuid} from 'Util/uuid';
 
 import {findDeletedClients} from './ClientMismatchUtil';
 import {ConversationRepository} from './ConversationRepository';
+import {isMLSConversation} from './ConversationSelectors';
 import {ConversationState} from './ConversationState';
 import {ConversationVerificationState} from './ConversationVerificationState';
 import {EventMapper} from './EventMapper';
@@ -745,8 +746,6 @@ export class MessageRepository {
       syncTimestamp: true,
     },
   ): Promise<SendAndInjectResult> {
-    const {groupId} = conversation;
-
     const messageTimer = conversation.messageTimer();
     const payload = enableEphemeral && messageTimer ? MessageBuilder.wrapInEphemeral(message, messageTimer) : message;
 
@@ -790,9 +789,9 @@ export class MessageRepository {
     // Configure ephemeral messages
     conversationService.messageTimer.setConversationLevelTimer(conversation.id, conversation.messageTimer());
 
-    const sendOptions: Parameters<typeof conversationService.send>[0] = groupId
+    const sendOptions: Parameters<typeof conversationService.send>[0] = isMLSConversation(conversation)
       ? {
-          groupId,
+          groupId: conversation.groupId,
           payload,
           protocol: ConversationProtocol.MLS,
           conversationId: conversation.qualifiedId,
@@ -853,8 +852,23 @@ export class MessageRepository {
     this.logger.info(`Resetting session with client '${clientId}' of user '${userId.id}'.`);
 
     try {
+      const fingerprint = await this.cryptography_repository.getRemoteFingerprint(userId, clientId);
       // We delete the stored session so that it can be recreated later on
       await this.cryptography_repository.deleteSession(userId, clientId);
+      // Generating the fingerprint will regenerate the session
+      const newFingerPrint = await this.cryptography_repository.getRemoteFingerprint(userId, clientId);
+      if (fingerprint !== newFingerPrint) {
+        // unverify the client entity in case the fingerprint has changed during the session reset
+        this.logger.warn('identity of device has changed');
+        const device = this.userRepository
+          .findUserById(userId)
+          ?.devices()
+          .find(device => device.id === clientId);
+
+        device?.meta.isVerified(false);
+        // Will trigger the conversation verification handler
+        amplify.publish(WebAppEvents.USER.CLIENTS_UPDATED, userId);
+      }
       return await this.sendSessionReset(userId, clientId, conversation);
     } catch (error) {
       const message = error instanceof Error ? error.message : error;
@@ -993,6 +1007,11 @@ export class MessageRepository {
   ): Promise<void> {
     const conversationId = conversation.id;
     const messageId = message.id;
+
+    // directly delete message from local database when status is sending
+    if (message.status() === StatusType.SENDING) {
+      await this.deleteMessageById(conversation, message.id);
+    }
 
     try {
       if (!message.user().isMe && !message.ephemeral_expires()) {
@@ -1210,7 +1229,11 @@ export class MessageRepository {
     try {
       const messageEntity = await this.getMessageInConversationById(conversationEntity, eventId);
       const errorStatus =
-        isBackendError(error) && error.label === BackendErrorLabel.FEDERATION_REMOTE_ERROR
+        isBackendError(error) &&
+        error.label ===
+          (BackendErrorLabel.FEDERATION_REMOTE_ERROR ||
+            BackendErrorLabel.FEDERATION_NOT_AVAILABLE ||
+            BackendErrorLabel.SERVER_ERROR)
           ? StatusType.FEDERATION_ERROR
           : StatusType.FAILED;
       messageEntity.status(errorStatus);
@@ -1356,11 +1379,11 @@ export class MessageRepository {
   }
 
   /**
-   * Sends a call message only to self conversation (eg. REJECT message that warn the user's other clients that the call has been picked up)
+   * Sends a call message only to self MLS conversation (eg. REJECT message that warn the user's other clients that the call has been picked up)
    * @param payload
    * @returns
    */
-  public sendSelfCallingMessage(payload: string, targetConversation: QualifiedId) {
+  public sendCallingMessageToSelfMLSConversation(payload: string, targetConversation: QualifiedId) {
     return this.sendCallingMessage(this.conversationState.getSelfMLSConversation(), {
       content: payload,
       qualifiedConversationId: targetConversation,

@@ -28,11 +28,7 @@ import type {TeamData} from '@wireapp/api-client/lib/team/';
 import {LowDiskSpaceError} from '@wireapp/store-engine/lib/engine/error';
 import {StatusCodes as HTTP_STATUS, StatusCodes} from 'http-status-codes';
 
-import type {CRUDEngine} from '@wireapp/store-engine';
-import {SQLeetEngine} from '@wireapp/store-engine-sqleet';
-
 import {isAxiosError, isBackendError} from 'Util/TypePredicateUtil';
-import {isTemporaryClientAndNonPersistent} from 'Util/util';
 
 import {AuthActionCreator} from './creator/';
 import {LabeledError} from './LabeledError';
@@ -45,15 +41,6 @@ import type {LoginDataState, RegistrationDataState} from '../reducer/authReducer
 type LoginLifecycleFunction = (dispatch: ThunkDispatch, getState: () => RootState, global: Api) => Promise<void>;
 
 export class AuthAction {
-  doFlushDatabase = (): ThunkAction => {
-    return async (dispatch, getState, {core}) => {
-      const storeEngine: CRUDEngine = (core as any).storeEngine;
-      if (storeEngine instanceof SQLeetEngine) {
-        await (core as any).storeEngine.save();
-      }
-    };
-  };
-
   doLogin = (loginData: LoginData, getEntropy?: () => Promise<Uint8Array>): ThunkAction => {
     const onBeforeLogin: LoginLifecycleFunction = async (dispatch, getState, {actions: {authAction}}) =>
       dispatch(authAction.doSilentLogout());
@@ -365,7 +352,6 @@ export class AuthAction {
         await dispatch(selfAction.fetchSelf());
         await (clientType !== ClientType.NONE &&
           dispatch(clientAction.doInitializeClient(clientType, undefined, undefined, entropyData)));
-        await dispatch(authAction.doFlushDatabase());
         dispatch(AuthActionCreator.successfulRegisterWireless(registrationData));
       } catch (error) {
         dispatch(AuthActionCreator.failedRegisterWireless(error));
@@ -426,13 +412,6 @@ export class AuthAction {
     return async (dispatch, getState, {getConfig, core, actions: {localStorageAction}}) => {
       try {
         await core.logout();
-        if (isTemporaryClientAndNonPersistent(false)) {
-          /**
-           * WEBAPP-6804: Our current implementation of "websql" has the drawback that a mounted database can only get unmounted by refreshing the page.
-           * @see https://github.com/wireapp/websql/blob/v0.0.15/packages/worker/src/Database.ts#L142-L145
-           */
-          window.location.reload();
-        }
         dispatch(AuthActionCreator.successfulLogout());
       } catch (error) {
         dispatch(AuthActionCreator.failedLogout(error));

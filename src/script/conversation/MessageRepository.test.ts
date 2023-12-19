@@ -45,6 +45,7 @@ import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {ContentMessage} from '../entity/message/ContentMessage';
 import {EventRepository} from '../event/EventRepository';
 import {EventService} from '../event/EventService';
+import {StatusType} from '../message/StatusType';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {ReactionMap} from '../storage';
 import {TeamState} from '../team/TeamState';
@@ -94,6 +95,7 @@ async function buildMessageRepository(): Promise<[MessageRepository, MessageRepo
     propertiesRepository: new PropertiesRepository({} as any, {} as any),
     serverTimeHandler: serverTimeHandler,
     userRepository: {
+      findUserById: jest.fn(),
       assignAllClients: jest.fn().mockResolvedValue(true),
     } as unknown as UserRepository,
     assetRepository: {} as AssetRepository,
@@ -240,18 +242,66 @@ describe('MessageRepository', () => {
         }),
       );
     });
+
+    it('should send delete and deletes message for own pending/gray messages', async () => {
+      const conversation = generateConversation(CONVERSATION_TYPE.REGULAR);
+      conversation.participating_user_ets.push(new User('user1'));
+
+      const messageToDelete = new Message(createUuid());
+      messageToDelete.user(selfUser);
+      messageToDelete.status(StatusType.SENDING);
+      conversation.addMessage(messageToDelete);
+
+      const [messageRepository, {core, eventRepository}] = await buildMessageRepository();
+      jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
+      spyOn(eventRepository.eventService, 'deleteEvent').and.returnValue(Promise.resolve());
+      spyOn(messageRepository, 'deleteMessageById');
+
+      await messageRepository.deleteMessageForEveryone(conversation, messageToDelete);
+
+      expect(messageRepository.deleteMessageById).toHaveBeenCalledWith(conversation, messageToDelete.id);
+    });
   });
 
   describe('resetSession', () => {
     it('resets the session with another device', async () => {
       const [messageRepository, {cryptographyRepository, core}] = await buildMessageRepository();
       jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
+      jest.spyOn(cryptographyRepository, 'getRemoteFingerprint').mockResolvedValue('first');
       spyOn(cryptographyRepository, 'deleteSession');
       const conversation = generateConversation();
 
       const userId = {domain: 'domain1', id: 'user1'};
       const clientId = 'client1';
       await messageRepository.resetSession(userId, clientId, conversation);
+      expect(cryptographyRepository.deleteSession).toHaveBeenCalledWith(userId, clientId);
+      expect(core.service!.conversation.send).toHaveBeenCalled();
+    });
+
+    it('unverifies device if fingerprint has changed', async () => {
+      const [messageRepository, {cryptographyRepository, userRepository, core}] = await buildMessageRepository();
+      const user = new User();
+      const clientId = 'client1';
+
+      const device = new ClientEntity(false, 'domain', clientId);
+      device.meta.isVerified(true);
+      user.devices([device]);
+
+      jest.spyOn(userRepository, 'findUserById').mockReturnValue(user);
+
+      jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
+      jest
+        .spyOn(cryptographyRepository, 'getRemoteFingerprint')
+        .mockResolvedValueOnce('first')
+        .mockResolvedValue('second');
+
+      spyOn(cryptographyRepository, 'deleteSession');
+      const conversation = generateConversation();
+
+      const userId = {domain: 'domain1', id: 'user1'};
+      expect(device.meta.isVerified()).toBe(true);
+      await messageRepository.resetSession(userId, clientId, conversation);
+      expect(device.meta.isVerified()).toBe(false);
       expect(cryptographyRepository.deleteSession).toHaveBeenCalledWith(userId, clientId);
       expect(core.service!.conversation.send).toHaveBeenCalled();
     });

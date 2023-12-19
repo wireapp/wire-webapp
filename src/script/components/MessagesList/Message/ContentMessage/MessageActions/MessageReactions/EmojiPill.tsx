@@ -25,9 +25,8 @@ import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
 import {getEmojiTitleFromEmojiUnicode} from 'Util/EmojiUtil';
 import {isTabKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
-import {getEmojiUrl} from 'Util/ReactionUtil';
 
-import {EmojiImg} from './EmojiImg';
+import {EmojiChar} from './EmojiChar';
 import {
   getReactionsButtonCSS,
   messageReactionButton,
@@ -52,7 +51,7 @@ export interface EmojiPillProps {
   hasUserReacted: boolean;
 }
 
-const EmojiPill: FC<EmojiPillProps> = ({
+export const EmojiPill: FC<EmojiPillProps> = ({
   emoji,
   emojiUnicode,
   emojiCount,
@@ -67,7 +66,6 @@ const EmojiPill: FC<EmojiPillProps> = ({
 }) => {
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
   const [isOpen, setTooltipVisibility] = useState(false);
-  const emojiUrl = getEmojiUrl(emojiUnicode);
   const emojiName = getEmojiTitleFromEmojiUnicode(emojiUnicode);
   const isActive = hasUserReacted && !isRemovedFromConversation;
 
@@ -83,14 +81,7 @@ const EmojiPill: FC<EmojiPillProps> = ({
       <Tooltip
         body={
           <div css={messageReactionButtonTooltip}>
-            <EmojiImg
-              emojiImgSize={{
-                width: '1.2rem',
-              }}
-              styles={messageReactionButtonTooltipImage}
-              emojiUrl={emojiUrl}
-              emojiName={emojiName}
-            />
+            <EmojiChar styles={messageReactionButtonTooltipImage} emoji={emoji} />
             <p css={messageReactionButtonTooltipText}>
               {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */}
               <span onClick={onTooltipReactionCountClick} css={messageReactionButtonTooltipTextLink}>
@@ -131,18 +122,10 @@ const EmojiPill: FC<EmojiPillProps> = ({
             }
           }}
         >
-          <EmojiImg
-            emojiUrl={emojiUrl}
-            emojiName={emojiName}
-            emojiImgSize={{
-              width: 'var(--font-size-medium)',
-            }}
-          />
+          <EmojiChar emoji={emoji} />
           <span css={messageReactionCount(isActive)}>{emojiCount}</span>
         </button>
       </Tooltip>
     </div>
   );
 };
-
-export {EmojiPill};

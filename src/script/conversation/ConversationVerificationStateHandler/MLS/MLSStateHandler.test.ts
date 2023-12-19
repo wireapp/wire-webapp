@@ -18,191 +18,113 @@
  */
 
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
+import {E2eiConversationState} from '@wireapp/core/lib/messagingProtocols/mls';
 
-import {ClientEntity} from 'src/script/client';
+import * as e2eIdentity from 'src/script/E2EIdentity/E2EIdentityVerification';
 import {Conversation} from 'src/script/entity/Conversation';
-import {User} from 'src/script/entity/User';
 import {Core} from 'src/script/service/CoreSingleton';
 import {createUuid} from 'Util/uuid';
+import {waitFor} from 'Util/waitFor';
 
-import {
-  MLSConversationVerificationStateHandler,
-  registerMLSConversationVerificationStateHandler,
-} from './MLSStateHandler';
+import {registerMLSConversationVerificationStateHandler} from './MLSStateHandler';
 
 import {ConversationState} from '../../ConversationState';
+import {ConversationVerificationState} from '../../ConversationVerificationState';
 
 describe('MLSConversationVerificationStateHandler', () => {
-  const uuid = createUuid();
-  let handler: MLSConversationVerificationStateHandler;
-  let mockOnConversationVerificationStateChange: jest.Mock;
-  let mockConversationState: jest.Mocked<ConversationState>;
-  let mockCore: jest.Mocked<Core>;
-  const groupId = 'groupIdXYZ';
-  const clientEntityId = 'clientIdXYZ';
-  const selfClientEntityId = 'selfClientIdXYZ';
-  const clientEntity: ClientEntity = new ClientEntity(false, '', clientEntityId);
-  const selfClientEntity: ClientEntity = new ClientEntity(false, '', selfClientEntityId);
-  const conversation: Conversation = new Conversation(uuid, '', ConversationProtocol.MLS);
+  const conversationState = new ConversationState();
+  let core = new Core();
+  const groupId = 'AAEAAKA0LuGtiU7NjqqlZIE2dQUAZWxuYS53aXJlLmxpbms=';
+  const conversation = new Conversation(createUuid(), '', ConversationProtocol.MLS);
+  conversationState.conversations.push(conversation);
+  conversation.groupId = groupId;
 
   beforeEach(() => {
-    conversation.groupId = groupId;
-    conversation.getAllUserEntities = jest.fn().mockReturnValue([
-      {
-        devices: () => [clientEntity],
-      },
-    ]);
-    mockOnConversationVerificationStateChange = jest.fn();
-    // Mock the conversation state
-    mockConversationState = {
-      filteredConversations: () => [conversation],
-    } as unknown as jest.Mocked<ConversationState>;
-    mockCore = {
-      service: {
-        mls: {
-          on: jest.fn(),
-        },
-        e2eIdentity: {
-          getUserDeviceEntities: jest.fn().mockResolvedValue([
-            {
-              certificate: 'mockCertificate',
-              clientId: clientEntityId,
-            },
-            {
-              certificate: 'mockCertificate',
-              clientId: selfClientEntityId,
-            },
-          ]),
-        },
-      },
-    } as unknown as jest.Mocked<Core>;
-
-    handler = new MLSConversationVerificationStateHandler(
-      mockOnConversationVerificationStateChange,
-      mockConversationState,
-      mockCore,
-    );
-
+    core = new Core();
     jest.clearAllMocks();
   });
 
   it('should do nothing if MLS service is not available', () => {
-    mockCore.service.mls = undefined;
+    core.service!.mls = undefined;
 
-    const t = () =>
-      registerMLSConversationVerificationStateHandler(
-        mockOnConversationVerificationStateChange,
-        mockConversationState,
-        mockCore,
-      );
+    const t = () => registerMLSConversationVerificationStateHandler(undefined, conversationState, core);
 
     expect(t).not.toThrow();
   });
 
   it('should do nothing if e2eIdentity service is not available', () => {
-    mockCore.service.e2eIdentity = undefined;
+    core.service!.e2eIdentity = undefined;
 
-    registerMLSConversationVerificationStateHandler(
-      mockOnConversationVerificationStateChange,
-      mockConversationState,
-      mockCore,
-    );
+    registerMLSConversationVerificationStateHandler(undefined, conversationState, core);
 
-    // Assert
-    expect(mockCore.service?.mls?.on).not.toHaveBeenCalled();
+    expect(core.service?.mls?.on).not.toHaveBeenCalled();
   });
 
-  it('should hook into the newEpoch event of the MLS service', () => {
-    registerMLSConversationVerificationStateHandler(
-      mockOnConversationVerificationStateChange,
-      mockConversationState,
-      mockCore,
-    );
+  describe('checkConversationVerificationState', () => {
+    it('should degrade conversation', async () => {
+      let triggerEpochChange: Function = () => {};
+      conversation.mlsVerificationState(ConversationVerificationState.VERIFIED);
+      jest.spyOn(e2eIdentity, 'getConversationVerificationState').mockResolvedValue(E2eiConversationState.Degraded);
+      jest
+        .spyOn(core.service!.mls!, 'on')
+        .mockImplementation((_event, listener) => (triggerEpochChange = listener) as any);
 
-    // Assert
-    expect(mockCore.service.mls.on).toHaveBeenCalledWith('newEpoch', expect.any(Function));
-  });
+      registerMLSConversationVerificationStateHandler(undefined, conversationState, core);
 
-  describe('checkEpoch', () => {
-    it('should degrade conversation if not all user entities have certificates', async () => {
-      jest.spyOn(handler as any, 'degradeConversation');
-
-      const mockData = {
-        groupId,
-        epoch: 12345,
-      };
-
-      jest.spyOn(handler as any, 'updateUserDevices').mockResolvedValue({
-        isResultComplete: false,
-        identities: [],
-        qualifiedIds: [],
-      });
-
-      await (handler as any).checkEpoch(mockData);
-
-      expect((handler as any).degradeConversation).toHaveBeenCalled();
+      triggerEpochChange({groupId});
+      await new Promise(resolve => setTimeout(resolve, 0));
+      expect(conversation.mlsVerificationState()).toBe(ConversationVerificationState.DEGRADED);
     });
 
-    it('should verify conversation if all checks pass', async () => {
-      jest.spyOn(handler as any, 'verifyConversation');
+    it('should not degrade conversation if it is not verified', async () => {
+      let triggerEpochChange: Function = () => {};
+      conversation.mlsVerificationState(ConversationVerificationState.UNVERIFIED);
+      jest.spyOn(e2eIdentity, 'getConversationVerificationState').mockResolvedValue(E2eiConversationState.Degraded);
+      jest
+        .spyOn(core.service!.mls!, 'on')
+        .mockImplementation((_event, listener) => (triggerEpochChange = listener) as any);
 
-      const mockData = {
-        groupId,
-        epoch: 12345,
-      };
+      registerMLSConversationVerificationStateHandler(undefined, conversationState, core);
 
-      jest.spyOn(handler as any, 'updateUserDevices').mockResolvedValue({
-        isResultComplete: true,
-        identities: [
-          {
-            certificate: 'mockCertificate',
-          },
-        ],
-        qualifiedIds: [],
-      });
-
-      jest.spyOn(handler as any, 'isCertificateActiveAndValid').mockResolvedValue(true);
-
-      await (handler as any).checkEpoch(mockData); // Calling the private method
-
-      expect((handler as any).verifyConversation).toHaveBeenCalled();
+      triggerEpochChange({groupId});
+      await new Promise(resolve => setTimeout(resolve, 0));
+      expect(conversation.mlsVerificationState()).toBe(ConversationVerificationState.UNVERIFIED);
     });
 
-    it('should update ClientEntity isMLSVerified observable', async () => {
-      const mockData = {
-        groupId,
-        epoch: 12345,
-      };
+    it('should verify conversation', async () => {
+      let triggerEpochChange: Function = () => {};
+      conversation.mlsVerificationState(ConversationVerificationState.DEGRADED);
+      jest.spyOn(e2eIdentity, 'getConversationVerificationState').mockResolvedValue(E2eiConversationState.Verified);
+      jest
+        .spyOn(core.service!.mls!, 'on')
+        .mockImplementation((_event, listener) => (triggerEpochChange = listener) as any);
 
-      jest.spyOn(handler as any, 'isCertificateActiveAndValid').mockReturnValue(true);
-      jest.spyOn(handler as any, 'verifyConversation').mockImplementation(() => null);
+      registerMLSConversationVerificationStateHandler(undefined, conversationState, core);
 
-      expect(clientEntity.meta.isMLSVerified?.()).toBe(false);
-
-      await (handler as any).checkEpoch(mockData); // Calling the private method
-
-      expect(clientEntity.meta.isMLSVerified?.()).toBe(true);
+      triggerEpochChange({groupId});
+      await new Promise(resolve => setTimeout(resolve, 0));
+      expect(conversation.mlsVerificationState()).toBe(ConversationVerificationState.VERIFIED);
     });
 
-    it('should update selfClient isMLSVerified observable', async () => {
-      const mockData = {
-        groupId,
-        epoch: 12345,
-      };
+    it('should wait for conversation to be known', async () => {
+      let triggerEpochChange: Function = () => {};
+      const newConversation = new Conversation(createUuid(), '', ConversationProtocol.MLS);
+      newConversation.groupId = 'AAEAAAOygT3TL0wljoaNabgK4yIAZWxuYS53aXJlLmxpbms=';
 
-      const user = new User();
-      user.isMe = true;
-      user.localClient = selfClientEntity;
-      conversation.getAllUserEntities = jest.fn().mockReturnValue([user]);
+      jest.spyOn(e2eIdentity, 'getConversationVerificationState').mockResolvedValue(E2eiConversationState.Verified);
+      jest
+        .spyOn(core.service!.mls!, 'on')
+        .mockImplementation((_event, listener) => (triggerEpochChange = listener) as any);
 
-      jest.spyOn(handler as any, 'isCertificateActiveAndValid').mockReturnValue(true);
-      jest.spyOn(handler as any, 'verifyConversation').mockImplementation(() => null);
+      registerMLSConversationVerificationStateHandler(undefined, conversationState, core);
 
-      expect(selfClientEntity.meta.isMLSVerified?.()).toBe(false);
-
-      await (handler as any).checkEpoch(mockData); // Calling the private method
-
-      expect(selfClientEntity.meta.isMLSVerified?.()).toBe(true);
+      triggerEpochChange({groupId: newConversation.groupId});
+      setTimeout(() => {
+        // adding the conversation after the epoch change event was triggered
+        conversationState.conversations.push(newConversation);
+      }, 100);
+      await waitFor(() => newConversation.mlsVerificationState() === ConversationVerificationState.VERIFIED);
+      expect(newConversation.mlsVerificationState()).toBe(ConversationVerificationState.VERIFIED);
     });
   });
 });

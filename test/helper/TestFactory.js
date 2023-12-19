@@ -116,7 +116,6 @@ export class TestFactory {
     currentClient.cookie = 'webapp@2153234453@temporary@1470926647664';
     currentClient.id = '132b3653b33f851f';
     currentClient.label = 'Windows 10';
-    currentClient.location = {lat: 52.5233, lon: 13.4138};
     currentClient.meta = {isVerified: ko.observable(true), primaryKey: 'local_identity'};
     currentClient.model = 'Chrome (Temporary)';
     currentClient.time = '2016-10-07T16:01:42.133Z';
@@ -243,6 +242,7 @@ export class TestFactory {
     await this.exposeConnectionActors();
     await this.exposeTeamActors();
     await this.exposeEventActors();
+    await this.exposeSelfActors();
 
     this.conversation_service = new ConversationService(this.event_service);
 
@@ -280,12 +280,14 @@ export class TestFactory {
       this.event_repository,
       this.team_repository,
       this.user_repository,
+      this.self_repository,
       this.propertyRepository,
       this.calling_repository,
       serverTimeHandler,
       this.user_repository['userState'],
       this.team_repository['teamState'],
       conversationState,
+      this.connection_repository['connectionState'],
       core,
     );
 

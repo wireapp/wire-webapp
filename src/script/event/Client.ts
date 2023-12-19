@@ -39,6 +39,8 @@ export enum CONVERSATION {
   MESSAGE_DELETE = 'conversation.message-delete',
   MESSAGE_HIDDEN = 'conversation.message-hidden',
   MISSED_MESSAGES = 'conversation.missed-messages',
+  JOINED_AFTER_MLS_MIGRATION = 'conversation.joined-after-mls-migration',
+  MLS_MIGRATION_ONGOING_CALL = 'conversation.mls-migration-ongoing-call',
   MLS_CONVERSATION_RECOVERED = 'conversation.mls-conversation-recovered',
   ONE2ONE_CREATION = 'conversation.one2one-creation',
   REACTION = 'conversation.reaction',
@@ -48,6 +50,7 @@ export enum CONVERSATION {
   FEDERATION_STOP = 'conversation.federation-stop',
   VOICE_CHANNEL_ACTIVATE = 'conversation.voice-channel-activate',
   VOICE_CHANNEL_DEACTIVATE = 'conversation.voice-channel-deactivate',
+  E2EI_VERIFICATION = 'conversation.e2ei-verification',
 }
 
 export enum USER {

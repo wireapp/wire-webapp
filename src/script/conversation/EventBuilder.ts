@@ -19,9 +19,9 @@
 
 import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data';
 import {
-  ConversationOtrMessageAddEvent,
-  ConversationMLSMessageAddEvent,
   CONVERSATION_EVENT,
+  ConversationMLSMessageAddEvent,
+  ConversationOtrMessageAddEvent,
 } from '@wireapp/api-client/lib/event';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {AddUsersFailureReasons} from '@wireapp/core/lib/conversation';
@@ -29,16 +29,16 @@ import {ReactionType} from '@wireapp/core/lib/conversation/ReactionType';
 import {DecryptionError} from '@wireapp/core/lib/errors/DecryptionError';
 
 import type {REASON as AVS_REASON} from '@wireapp/avs';
-import type {LegalHoldStatus, Asset} from '@wireapp/protocol-messaging';
+import type {Asset, LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {createUuid} from 'Util/uuid';
 
 import {AssetTransferState} from '../assets/AssetTransferState';
-import {CALL_MESSAGE_TYPE} from '../calling/enum/CallMessageType';
 import type {Conversation} from '../entity/Conversation';
 import type {Message} from '../entity/message/Message';
 import type {User} from '../entity/User';
-import {CALL, ClientEvent, CONVERSATION} from '../event/Client';
+import {ClientEvent, CONVERSATION} from '../event/Client';
+import {E2EIVerificationMessageType} from '../message/E2EIVerificationMessageType';
 import {StatusType} from '../message/StatusType';
 import {VerificationMessageType} from '../message/VerificationMessageType';
 import {ReactionMap, ReadReceipt, UserReactionMap} from '../storage';
@@ -58,25 +58,6 @@ export interface BaseEvent {
 export interface ConversationEvent<Type extends CONVERSATION | CONVERSATION_EVENT, Data = undefined> extends BaseEvent {
   data: Data;
   type: Type;
-}
-
-export interface CallingEvent {
-  /**
-   * content is an object that comes from avs
-   */
-  content: {
-    type: CALL_MESSAGE_TYPE;
-    version: string;
-  };
-  targetConversation?: QualifiedId;
-  conversation: string;
-  from: string;
-  qualified_conversation?: QualifiedId;
-  qualified_from?: QualifiedId;
-  sender: string;
-  time?: string;
-  type: CALL;
-  senderClientId?: string;
 }
 
 export interface BackendEventMessage<Type, Data> extends Omit<BaseEvent, 'id'> {
@@ -170,6 +151,12 @@ export type MessageAddEvent = ConversationEvent<
   version?: number;
 };
 export type MissedEvent = BaseEvent & {id: string; type: CONVERSATION.MISSED_MESSAGES};
+export type JoinedAfterMLSMigrationFinalisationEvent = BaseEvent & {
+  type: CONVERSATION.JOINED_AFTER_MLS_MIGRATION;
+};
+export type MLSMigrationFinalisationOngoingCallEvent = BaseEvent & {
+  type: CONVERSATION.MLS_MIGRATION_ONGOING_CALL;
+};
 export type MLSConversationRecoveredEvent = BaseEvent & {id: string; type: CONVERSATION.MLS_CONVERSATION_RECOVERED};
 export type OneToOneCreationEvent = ConversationEvent<CONVERSATION.ONE2ONE_CREATION, {userIds: QualifiedId[]}>;
 export type TeamMemberLeaveEvent = Omit<MemberLeaveEvent, 'type'> & {
@@ -238,8 +225,13 @@ export interface ErrorEvent
   id: string;
 }
 
+// E2EI Verification Events
+export type E2EIVerificationEventData = {type: E2EIVerificationMessageType; userIds?: QualifiedId[]};
+export type E2EIVerificationEvent = ConversationEvent<CONVERSATION.E2EI_VERIFICATION, E2EIVerificationEventData>;
+
 export type ClientConversationEvent =
   | AllVerifiedEvent
+  | E2EIVerificationEvent
   | AssetAddEvent
   | ErrorEvent
   | CompositeMessageAddEvent
@@ -266,6 +258,8 @@ export type ClientConversationEvent =
   | FailedToAddUsersMessageEvent
   | UnableToDecryptEvent
   | MissedEvent
+  | JoinedAfterMLSMigrationFinalisationEvent
+  | MLSMigrationFinalisationOngoingCallEvent
   | MLSConversationRecoveredEvent
   | LocationEvent
   | VoiceChannelActivateEvent
@@ -306,6 +300,37 @@ export const EventBuilder = {
       id: createUuid(),
       time: new Date(conversationEntity.getNextTimestamp()).toISOString(),
       type: ClientEvent.CONVERSATION.VERIFICATION,
+    };
+  },
+
+  buildAllE2EIVerified(conversationEntity: Conversation): E2EIVerificationEvent {
+    return {
+      ...buildQualifiedId(conversationEntity),
+      data: {
+        type: E2EIVerificationMessageType.VERIFIED,
+      },
+      from: '',
+      id: createUuid(),
+      time: conversationEntity.getNextIsoDate(),
+      type: ClientEvent.CONVERSATION.E2EI_VERIFICATION,
+    };
+  },
+
+  buildE2EIDegraded(
+    conversationEntity: Conversation,
+    type: E2EIVerificationMessageType,
+    userIds?: QualifiedId[],
+  ): E2EIVerificationEvent {
+    return {
+      ...buildQualifiedId(conversationEntity),
+      data: {
+        type,
+        userIds,
+      },
+      from: '',
+      id: createUuid(),
+      time: conversationEntity.getNextIsoDate(),
+      type: ClientEvent.CONVERSATION.E2EI_VERIFICATION,
     };
   },
 
@@ -569,6 +594,34 @@ export const EventBuilder = {
       id: createUuid(),
       time: conversationEntity.getNextIsoDate(currentTimestamp),
       type: ClientEvent.CONVERSATION.MLS_CONVERSATION_RECOVERED,
+    };
+  },
+
+  buildJoinedAfterMLSMigrationFinalisation(
+    conversationEntity: Conversation,
+    currentTimestamp: number,
+  ): JoinedAfterMLSMigrationFinalisationEvent {
+    return {
+      ...buildQualifiedId(conversationEntity),
+      from: conversationEntity.selfUser().id,
+      id: createUuid(),
+      data: null,
+      time: conversationEntity.getNextIsoDate(currentTimestamp),
+      type: ClientEvent.CONVERSATION.JOINED_AFTER_MLS_MIGRATION,
+    };
+  },
+
+  buildMLSMigrationFinalisationOngoingCall(
+    conversationEntity: Conversation,
+    currentTimestamp: number,
+  ): MLSMigrationFinalisationOngoingCallEvent {
+    return {
+      ...buildQualifiedId(conversationEntity),
+      from: conversationEntity.selfUser().id,
+      id: createUuid(),
+      data: null,
+      time: conversationEntity.getNextIsoDate(currentTimestamp),
+      type: ClientEvent.CONVERSATION.MLS_MIGRATION_ONGOING_CALL,
     };
   },
 

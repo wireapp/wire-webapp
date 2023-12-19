@@ -77,8 +77,6 @@ export class ClientRepository {
     this.selfUser = ko.observable(undefined);
     this.logger = getLogger('ClientRepository');
 
-    this.clientState.clients = ko.pureComputed(() => (this.selfUser() ? this.selfUser().devices() : []));
-
     amplify.subscribe(WebAppEvents.LIFECYCLE.ASK_TO_CLEAR_DATA, this.logoutClient);
     amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent);
   }
@@ -298,7 +296,7 @@ export class ClientRepository {
     await this.core.service!.client.deleteClient(clientId, password);
     selfUser.removeClient(clientId);
     amplify.publish(WebAppEvents.USER.CLIENT_REMOVED, selfUser.qualifiedId, clientId);
-    return this.clientState.clients();
+    return selfUser.devices();
   }
 
   logoutClient = async (): Promise<void> => {

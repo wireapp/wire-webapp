@@ -24,7 +24,6 @@ import {createUuid} from 'Util/uuid';
 
 import {UserDetails} from './UserDetails';
 
-import {ClientEntity} from '../../client/ClientEntity';
 import {User} from '../../entity/User';
 
 describe('UserDetails', () => {
@@ -52,20 +51,6 @@ describe('UserDetails', () => {
     expect(queryByTestId('status-guest')).toBeNull();
     expect(queryByTestId('status-expiration-text')).toBeNull();
     expect(queryByTestId('status-admin')).toBeNull();
-  });
-
-  it('shows a verified icon when all clients from the self user are verified and all clients of the other participant are verified', () => {
-    const otherParticipant = new User(createUuid());
-    const verifiedClient = new ClientEntity(false, null);
-    verifiedClient.meta.isVerified?.(true);
-    otherParticipant.devices.push(verifiedClient);
-
-    const props = {isGroupAdmin: true, isSelfVerified: true, participant: otherParticipant};
-
-    const {queryByTestId} = render(<UserDetails {...props} />);
-
-    expect(queryByTestId('status-verified-participant')).not.toBeNull();
-    expect(queryByTestId('status-admin')).not.toBeNull();
   });
 
   it('renders the badge for a user', () => {

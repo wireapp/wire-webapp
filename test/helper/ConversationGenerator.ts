@@ -18,7 +18,12 @@
  */
 
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
-import {CONVERSATION_TYPE, CONVERSATION_ACCESS_ROLE} from '@wireapp/api-client/lib/conversation/';
+import {
+  CONVERSATION_TYPE,
+  CONVERSATION_ACCESS_ROLE,
+  Conversation as BackendConversation,
+  Member,
+} from '@wireapp/api-client/lib/conversation/';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
@@ -38,15 +43,16 @@ interface GenerateAPIConversationParams {
   protocol?: ConversationProtocol;
   overwites?: Partial<ConversationDatabaseData>;
   name?: string;
+  groupId?: string;
 }
 
-function generateAPIConversation({
+export function generateAPIConversation({
   id = {id: createUuid(), domain: 'test.wire.link'},
   type = CONVERSATION_TYPE.REGULAR,
   protocol = ConversationProtocol.PROTEUS,
   overwites = {},
   name,
-}: GenerateAPIConversationParams): ConversationDatabaseData {
+}: GenerateAPIConversationParams): BackendConversation {
   return {
     id: id.id,
     name,
@@ -61,6 +67,7 @@ function generateAPIConversation({
     status: ConversationStatus.CURRENT_MEMBER,
     is_guest: false,
     archived_state: false,
+    readonly_state: null,
     archived_timestamp: 0,
     last_event_timestamp: 0,
     last_read_timestamp: 0,
@@ -80,6 +87,7 @@ function generateAPIConversation({
     domain: id.domain,
     creator: '',
     access_role: [CONVERSATION_ACCESS_ROLE.TEAM_MEMBER],
+    members: {others: [], self: {} as Member},
     ...overwites,
   };
 }
@@ -95,20 +103,21 @@ export function generateConversation({
   protocol = ConversationProtocol.PROTEUS,
   id,
   name,
+  groupId = 'groupId',
   users = [],
   overwites = {},
 }: GenerateConversationParams = {}): Conversation {
   const apiConversation = generateAPIConversation({id, type, protocol, name, overwites});
 
-  const conversation = ConversationMapper.mapConversations([apiConversation])[0];
+  const conversation = ConversationMapper.mapConversations([apiConversation as ConversationDatabaseData])[0];
   const connectionEntity = new ConnectionEntity();
   connectionEntity.conversationId = conversation.qualifiedId;
   connectionEntity.status(status);
   conversation.connection(connectionEntity);
   conversation.type(type);
 
-  if (protocol === ConversationProtocol.MLS) {
-    conversation.groupId = 'groupId';
+  if ([ConversationProtocol.MLS, ConversationProtocol.MIXED].includes(protocol)) {
+    conversation.groupId = groupId;
   }
 
   if (users) {

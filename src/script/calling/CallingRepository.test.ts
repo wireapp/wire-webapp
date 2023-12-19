@@ -17,16 +17,22 @@
  *
  */
 
-import {ConversationProtocol, CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {
+  ConversationProtocol,
+  CONVERSATION_TYPE,
+  DefaultConversationRoleName,
+} from '@wireapp/api-client/lib/conversation';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import 'jsdom-worker';
 import ko, {Subscription} from 'knockout';
+import {container} from 'tsyringe';
 
 import {CONV_TYPE, CALL_TYPE, STATE as CALL_STATE, REASON, Wcall} from '@wireapp/avs';
 import {Runtime} from '@wireapp/commons';
 
 import {Call} from 'src/script/calling/Call';
 import {CallingRepository} from 'src/script/calling/CallingRepository';
-import {CallState} from 'src/script/calling/CallState';
+import {CallState, MuteState} from 'src/script/calling/CallState';
 import {Participant} from 'src/script/calling/Participant';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
@@ -39,8 +45,10 @@ import {createUuid} from 'Util/uuid';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
 
+import {CallingEvent} from '../event/CallingEvent';
 import {CALL} from '../event/Client';
 import {MediaDevicesHandler} from '../media/MediaDevicesHandler';
+import {Core} from '../service/CoreSingleton';
 import {UserRepository} from '../user/UserRepository';
 
 const createSelfParticipant = () => {
@@ -52,12 +60,14 @@ const createSelfParticipant = () => {
 const createConversation = (
   type: CONVERSATION_TYPE = CONVERSATION_TYPE.ONE_TO_ONE,
   protocol: ConversationProtocol = ConversationProtocol.PROTEUS,
+  conversationId: QualifiedId = {id: createUuid(), domain: ''},
+  groupId = 'group-id',
 ) => {
-  const conversation = new Conversation(createUuid(), '', protocol);
+  const conversation = new Conversation(conversationId.id, conversationId.domain, protocol);
   conversation.participating_user_ets.push(new User(createUuid()));
   conversation.type(type);
   if (protocol === ConversationProtocol.MLS) {
-    conversation.groupId = 'group-id';
+    conversation.groupId = groupId;
   }
   return conversation;
 };
@@ -90,15 +100,154 @@ describe('CallingRepository', () => {
 
   afterEach(() => {
     callingRepository['callState'].calls([]);
+    callingRepository['conversationState'].conversations([]);
+    callingRepository.destroy();
+    jest.clearAllMocks();
   });
 
   afterAll(() => {
     return wCall && wCall.destroy(wUser);
   });
 
+  describe('onCallEvent', () => {
+    it('does mute itself when remote muted message arrives', async () => {
+      const conversation = createConversation();
+      const selfParticipant = createSelfParticipant();
+      const senderUserId = {domain: 'senderdomain', id: 'senderid'};
+      const selfUserId = callingRepository['selfUser']?.qualifiedId!;
+      const selfClientId = callingRepository['selfClientId']!;
+      const call = new Call(
+        selfUserId,
+        conversation.qualifiedId,
+        CONV_TYPE.CONFERENCE,
+        selfParticipant,
+        CALL_TYPE.NORMAL,
+        {
+          currentAvailableDeviceId: mediaDevices,
+        } as unknown as MediaDevicesHandler,
+      );
+
+      conversation.roles({[senderUserId.id]: DefaultConversationRoleName.WIRE_ADMIN});
+
+      callingRepository['conversationState'].conversations.push(conversation);
+      spyOn(callingRepository, 'findCall').and.returnValue(call);
+      spyOn(callingRepository, 'muteCall').and.callThrough();
+      spyOn(wCall, 'recvMsg').and.callThrough();
+
+      const event: CallingEvent = {
+        content: {
+          type: CALL_MESSAGE_TYPE.REMOTE_MUTE,
+          version: '',
+          data: {targets: {[selfUserId.domain]: {[selfUserId.id]: [selfClientId]}}},
+        },
+        conversation: conversation.id,
+        from: senderUserId.id,
+        qualified_from: senderUserId,
+        sender: 'test',
+        time: new Date().toISOString(),
+        type: CALL.E_CALL,
+        qualified_conversation: conversation.qualifiedId,
+      };
+
+      await callingRepository.onCallEvent(event, EventRepository.SOURCE.WEB_SOCKET);
+      expect(callingRepository.muteCall).toHaveBeenCalledWith(call, true, MuteState.REMOTE_MUTED);
+      expect(wCall.recvMsg).toHaveBeenCalled();
+    });
+
+    it('should not mute itself when remote muted message arrives but the event sender is not an admin', async () => {
+      const conversation = createConversation();
+      const selfParticipant = createSelfParticipant();
+      const senderUserId = {domain: 'senderdomain', id: 'senderid'};
+      const selfUserId = callingRepository['selfUser']?.qualifiedId!;
+      const selfClientId = callingRepository['selfClientId']!;
+      const call = new Call(
+        selfUserId,
+        conversation.qualifiedId,
+        CONV_TYPE.CONFERENCE,
+        selfParticipant,
+        CALL_TYPE.NORMAL,
+        {
+          currentAvailableDeviceId: mediaDevices,
+        } as unknown as MediaDevicesHandler,
+      );
+
+      conversation.roles({[senderUserId.id]: DefaultConversationRoleName.WIRE_MEMBER});
+
+      callingRepository['conversationState'].conversations.push(conversation);
+      spyOn(callingRepository, 'findCall').and.returnValue(call);
+      spyOn(callingRepository, 'muteCall').and.callThrough();
+      spyOn(wCall, 'recvMsg').and.callThrough();
+
+      const event: CallingEvent = {
+        content: {
+          type: CALL_MESSAGE_TYPE.REMOTE_MUTE,
+          version: '',
+          data: {targets: {[selfUserId.domain]: {[selfUserId.id]: [selfClientId]}}},
+        },
+        conversation: conversation.id,
+        from: senderUserId.id,
+        qualified_from: senderUserId,
+        sender: 'test',
+        time: new Date().toISOString(),
+        type: CALL.E_CALL,
+        qualified_conversation: conversation.qualifiedId,
+      };
+
+      await callingRepository.onCallEvent(event, EventRepository.SOURCE.WEB_SOCKET);
+      expect(callingRepository.muteCall).not.toHaveBeenCalled();
+      expect(wCall.recvMsg).not.toHaveBeenCalled();
+    });
+
+    it('should not mute itself when remote muted message arrives but client was not included in targets list', async () => {
+      const conversation = createConversation();
+      const selfParticipant = createSelfParticipant();
+      const senderUserId = {domain: 'senderdomain', id: 'senderid'};
+      const selfUserId = callingRepository['selfUser']?.qualifiedId!;
+
+      const call = new Call(
+        selfUserId,
+        conversation.qualifiedId,
+        CONV_TYPE.CONFERENCE,
+        selfParticipant,
+        CALL_TYPE.NORMAL,
+        {
+          currentAvailableDeviceId: mediaDevices,
+        } as unknown as MediaDevicesHandler,
+      );
+
+      conversation.roles({[senderUserId.id]: DefaultConversationRoleName.WIRE_ADMIN});
+
+      callingRepository['conversationState'].conversations.push(conversation);
+      spyOn(callingRepository, 'findCall').and.returnValue(call);
+      spyOn(callingRepository, 'muteCall').and.callThrough();
+      spyOn(wCall, 'recvMsg').and.callThrough();
+
+      const someOtherClientId = 'some-other-client';
+
+      const event: CallingEvent = {
+        content: {
+          type: CALL_MESSAGE_TYPE.REMOTE_MUTE,
+          version: '',
+          data: {targets: {[selfUserId.domain]: {[selfUserId.id]: [someOtherClientId]}}},
+        },
+        conversation: conversation.id,
+        from: senderUserId.id,
+        qualified_from: senderUserId,
+        sender: 'test',
+        time: new Date().toISOString(),
+        type: CALL.E_CALL,
+        qualified_conversation: conversation.qualifiedId,
+      };
+
+      await callingRepository.onCallEvent(event, EventRepository.SOURCE.WEB_SOCKET);
+      expect(callingRepository.muteCall).not.toHaveBeenCalled();
+      expect(wCall.recvMsg).not.toHaveBeenCalled();
+    });
+  });
+
   describe('startCall', () => {
     it.each([ConversationProtocol.PROTEUS, ConversationProtocol.MLS])(
-      'starts a normal call in a 1:1 conversation for proteus or MLS conversation',
+      'starts a ONEONONE call for proteus or MLS 1:1 conversation',
       async protocol => {
         const conversation = createConversation(CONVERSATION_TYPE.ONE_TO_ONE, protocol);
         const callType = CALL_TYPE.NORMAL;
@@ -124,6 +273,114 @@ describe('CallingRepository', () => {
       spyOn(wCall, 'start');
       await callingRepository.startCall(conversation, callType);
       expect(wCall.start).toHaveBeenCalledWith(wUser, conversation.id, callType, CONV_TYPE.CONFERENCE_MLS, 0);
+    });
+
+    it('subscribes to epoch updates after initiating a mls conference call', async () => {
+      const conversationId = {domain: 'example.com', id: 'conversation1'};
+
+      const groupId = 'groupId';
+      const mlsConversation = createConversation(
+        CONVERSATION_TYPE.REGULAR,
+        ConversationProtocol.MLS,
+        conversationId,
+        groupId,
+      );
+
+      await callingRepository.startCall(mlsConversation, CALL_TYPE.NORMAL);
+
+      expect(container.resolve(Core).service?.subconversation.subscribeToEpochUpdates).toHaveBeenCalledWith(
+        conversationId,
+        groupId,
+        expect.any(Function),
+        expect.any(Function),
+      );
+    });
+
+    it('does not subscribe to epoch updates after initiating a call in 1:1 mls conversation', async () => {
+      const conversationId = {domain: 'example.com', id: 'conversation1'};
+
+      const groupId = 'groupId';
+      const mlsConversation = createConversation(
+        CONVERSATION_TYPE.ONE_TO_ONE,
+        ConversationProtocol.MLS,
+        conversationId,
+        groupId,
+      );
+
+      await callingRepository.startCall(mlsConversation, CALL_TYPE.NORMAL);
+
+      expect(container.resolve(Core).service?.subconversation.subscribeToEpochUpdates).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('answerCall', () => {
+    it('subscribes to epoch updates after answering a mls conference call', async () => {
+      const conversationId = {domain: 'example.com', id: 'conversation2'};
+      const selfParticipant = createSelfParticipant();
+      const userId = {domain: '', id: ''};
+
+      const groupId = 'groupId';
+      const mlsConversation = createConversation(
+        CONVERSATION_TYPE.REGULAR,
+        ConversationProtocol.MLS,
+        conversationId,
+        groupId,
+      );
+
+      const incomingCall = new Call(
+        userId,
+        mlsConversation.qualifiedId,
+        CONV_TYPE.CONFERENCE_MLS,
+        selfParticipant,
+        CALL_TYPE.NORMAL,
+        {
+          currentAvailableDeviceId: mediaDevices,
+        } as unknown as MediaDevicesHandler,
+      );
+
+      jest.spyOn(callingRepository, 'pushClients').mockResolvedValueOnce(true);
+      callingRepository['conversationState'].conversations.push(mlsConversation);
+
+      await callingRepository.answerCall(incomingCall);
+
+      expect(container.resolve(Core).service?.subconversation.subscribeToEpochUpdates).toHaveBeenCalledWith(
+        conversationId,
+        groupId,
+        expect.any(Function),
+        expect.any(Function),
+      );
+    });
+
+    it('does not subscribe to epoch updates after answering a call in mls 1:1 conversation', async () => {
+      const conversationId = {domain: 'example.com', id: 'conversation2'};
+      const selfParticipant = createSelfParticipant();
+      const userId = {domain: '', id: ''};
+
+      const groupId = 'groupId';
+      const mlsConversation = createConversation(
+        CONVERSATION_TYPE.ONE_TO_ONE,
+        ConversationProtocol.MLS,
+        conversationId,
+        groupId,
+      );
+
+      const incomingCall = new Call(
+        userId,
+        mlsConversation.qualifiedId,
+        CONV_TYPE.ONEONONE,
+        selfParticipant,
+        CALL_TYPE.NORMAL,
+        {
+          currentAvailableDeviceId: mediaDevices,
+        } as unknown as MediaDevicesHandler,
+      );
+
+      jest.spyOn(callingRepository, 'pushClients').mockResolvedValueOnce(true);
+      callingRepository['conversationState'].conversations.push(mlsConversation);
+
+      await callingRepository.answerCall(incomingCall);
+
+      expect(container.resolve(Core).service?.subconversation.subscribeToEpochUpdates).not.toHaveBeenCalled();
     });
   });
 

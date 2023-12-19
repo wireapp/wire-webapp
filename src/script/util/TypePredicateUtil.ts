@@ -17,11 +17,13 @@
  *
  */
 
+import {RegisteredClient} from '@wireapp/api-client/lib/client';
 import type {BackendError} from '@wireapp/api-client/lib/http';
 import {AxiosError} from 'axios';
 
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
+import {isObject} from '../guards/common';
 import {ClientRecord} from '../storage/record/ClientRecord';
 
 export function isAxiosError<T>(errorCandidate: any): errorCandidate is AxiosError<T> {
@@ -42,4 +44,8 @@ export function isConversationEntity(conversation: any): conversation is Convers
 
 export function isClientRecord(record: any): record is ClientRecord {
   return !!record.meta;
+}
+
+export function isClientWithMLSPublicKeys(record: unknown): record is RegisteredClient {
+  return isObject(record) && 'mls_public_keys' in record;
 }

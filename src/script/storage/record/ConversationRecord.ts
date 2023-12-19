@@ -30,6 +30,8 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
+import {CONVERSATION_READONLY_STATE} from 'src/script/conversation/ConversationRepository';
+
 import {ConversationStatus} from '../../conversation/ConversationStatus';
 import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
 
@@ -37,6 +39,7 @@ export interface ConversationRecord {
   access_role: CONVERSATION_LEGACY_ACCESS_ROLE | CONVERSATION_ACCESS_ROLE[];
   access: CONVERSATION_ACCESS[];
   archived_state: boolean;
+  readonly_state: CONVERSATION_READONLY_STATE | null;
   archived_timestamp: number;
   cipher_suite: number;
   cleared_timestamp: number;
@@ -47,6 +50,7 @@ export interface ConversationRecord {
   group_id: string;
   epoch: number;
   id: string;
+  initial_protocol?: ConversationProtocol;
   is_guest: boolean;
   last_event_timestamp: number;
   last_read_timestamp: number;

@@ -61,7 +61,7 @@ export const messageReactionButton: CSSObject = {
 };
 
 export const messageReactionButtonTooltip: CSSObject = {display: 'flex', maxWidth: 130, whiteSpace: 'break-spaces'};
-export const messageReactionButtonTooltipImage: CSSObject = {marginRight: 8};
+export const messageReactionButtonTooltipImage: CSSObject = {marginRight: 8, lineHeight: '2.5em'};
 export const messageReactionDetailsMargin: CSSObject = {marginRight: '0.4rem'};
 export const reactionsCountAlignment: CSSObject = {display: 'flex', alignItems: 'center'};
 export const messageReactionButtonTooltipText: CSSObject = {fontSize: '0.7rem'};
@@ -117,8 +117,4 @@ export const getReactionsButtonCSS = (isActive?: boolean, isDisabled?: boolean):
       outline: 'none',
     },
   };
-};
-
-export const actionMenuEmojiSize = {
-  width: '16px',
 };

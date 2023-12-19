@@ -68,7 +68,6 @@ export function buildCallingViewModel() {
     undefined,
     callState,
     undefined,
-    mockCore,
   );
 
   return [callingViewModel, {core: mockCore}] as const;

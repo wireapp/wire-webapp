@@ -82,6 +82,8 @@ async function buildBackupRepository() {
 
   const backupService = new BackupService(storageService);
   const conversationRepository = {
+    initAllLocal1To1Conversations: jest.fn(),
+    getAllLocalConversations: jest.fn(),
     checkForDeletedConversations: jest.fn(),
     mapConnections: jest.fn().mockImplementation(() => []),
     updateConversationStates: jest.fn().mockImplementation(conversations => conversations),
@@ -198,11 +200,12 @@ describe('BackupRepository', () => {
     it('successfully imports a backup', async () => {
       const [backupRepository, {backupService, conversationRepository}] = await buildBackupRepository();
       const user = new User('user1');
-      jest.spyOn(backupService, 'getDatabaseVersion').mockReturnValue(15);
+      const mockedDBVersion = 20;
+      jest.spyOn(backupService, 'getDatabaseVersion').mockReturnValue(mockedDBVersion);
       const importSpy = jest.spyOn(backupService, 'importEntities').mockResolvedValue(1);
       const users = [generateAPIUser(), generateAPIUser()];
 
-      const metadata = {...backupRepository.createMetaData(user, 'client1'), version: 15};
+      const metadata = {...backupRepository.createMetaData(user, 'client1'), version: mockedDBVersion};
 
       const files = {
         [Filename.METADATA]: JSON.stringify(metadata),

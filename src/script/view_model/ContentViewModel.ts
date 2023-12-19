@@ -138,15 +138,20 @@ export class ContentViewModel {
     this.conversationState.activeConversation(conversationEntity);
   }
 
-  private async getConversationEntity(
+  private readonly getConversationEntity = async (
     conversation: Conversation | string,
     domain: string | null = null,
-  ): Promise<Conversation> {
-    if (isConversationEntity(conversation)) {
-      return conversation;
+  ): Promise<Conversation> => {
+    const conversationEntity = isConversationEntity(conversation)
+      ? conversation
+      : await this.conversationRepository.getConversationById({domain: domain || '', id: conversation});
+
+    if (!conversationEntity.is1to1()) {
+      return conversationEntity;
     }
-    return await this.conversationRepository.getConversationById({domain: domain || '', id: conversation});
-  }
+
+    return this.conversationRepository.init1to1Conversation(conversationEntity, true);
+  };
 
   private closeRightSidebar(): void {
     const {rightSidebar} = useAppMainState.getState();
@@ -266,9 +271,6 @@ export class ContentViewModel {
         this.conversationState.activeConversation(conversationEntity);
       }
 
-      if (conversationEntity.is_cleared()) {
-        conversationEntity.cleared_timestamp(0);
-      }
       const messageEntity = openFirstSelfMention ? conversationEntity.getFirstUnreadSelfMention() : exposeMessageEntity;
       this.changeConversation(conversationEntity, messageEntity);
       this.showAndNavigate(conversationEntity, openNotificationSettings);

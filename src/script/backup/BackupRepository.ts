@@ -18,7 +18,6 @@
  */
 
 import type Dexie from 'dexie';
-import {container} from 'tsyringe';
 import {omit} from 'underscore';
 
 import {chunk} from 'Util/ArrayUtil';
@@ -41,7 +40,6 @@ import {
 } from './Error';
 import {preprocessConversations, preprocessEvents, preprocessUsers} from './recordPreprocessors';
 
-import {ConnectionState} from '../connection/ConnectionState';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
 import type {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
@@ -91,11 +89,7 @@ export class BackupRepository {
   private canceled: boolean = false;
   private worker: WebWorker;
 
-  constructor(
-    backupService: BackupService,
-    conversationRepository: ConversationRepository,
-    private readonly connectionState = container.resolve(ConnectionState),
-  ) {
+  constructor(backupService: BackupService, conversationRepository: ConversationRepository) {
     this.logger = getLogger('BackupRepository');
 
     this.backupService = backupService;
@@ -384,7 +378,7 @@ export class BackupRepository {
     }
 
     await this.conversationRepository.updateConversations(importedConversations);
-    await Promise.all(this.conversationRepository.mapConnections(this.connectionState.connections()));
+    await this.conversationRepository.initAllLocal1To1Conversations();
     // doesn't need to be awaited
     void this.conversationRepository.checkForDeletedConversations();
   }

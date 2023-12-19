@@ -23,13 +23,13 @@ import {ClientEntity} from './ClientEntity';
 import {parseClientId} from './ClientIdUtil';
 
 import {ClientRecord} from '../storage';
-import {isClientRecord} from '../util/TypePredicateUtil';
+import {isClientRecord, isClientWithMLSPublicKeys} from '../util/TypePredicateUtil';
 
 export class ClientMapper {
   static get CONFIG() {
     return {
       CLIENT_PAYLOAD: ['class', 'id', 'domain'],
-      SELF_CLIENT_PAYLOAD: ['address', 'cookie', 'label', 'location', 'model', 'time', 'type'],
+      SELF_CLIENT_PAYLOAD: ['address', 'cookie', 'label', 'model', 'time', 'type'],
     };
   }
 
@@ -58,9 +58,12 @@ export class ClientMapper {
       const {userId} = parseClientId(clientPayload.meta.primary_key);
 
       clientEntity.meta.isVerified?.(!!clientPayload.meta.is_verified);
-      clientEntity.meta.isMLSVerified?.(!!clientPayload.meta.is_mls_verified);
       clientEntity.meta.primaryKey = clientPayload.meta.primary_key;
       clientEntity.meta.userId = userId;
+    }
+
+    if (isClientWithMLSPublicKeys(clientPayload)) {
+      clientEntity.mlsPublicKeys = clientPayload.mls_public_keys;
     }
 
     return clientEntity;

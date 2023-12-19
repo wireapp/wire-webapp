@@ -20,11 +20,14 @@
 import {ChangeEvent, FC, KeyboardEvent, useEffect, useRef, useState} from 'react';
 
 import {Icon} from 'Components/Icon';
+import {ConversationVerificationBadges} from 'Components/VerificationBadge';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {removeLineBreaks} from 'Util/StringUtil';
 
 import {ConversationRepository} from '../../../../../conversation/ConversationRepository';
+import {Conversation} from '../../../../../entity/Conversation';
 import {User} from '../../../../../entity/User';
 import {ServiceEntity} from '../../../../../integration/ServiceEntity';
 import {GroupDetails} from '../GroupDetails/GroupDetails';
@@ -32,26 +35,26 @@ import {GroupDetails} from '../GroupDetails/GroupDetails';
 interface ConversationDetailsHeaderProps {
   isActiveGroupParticipant: boolean;
   canRenameGroup: boolean;
-  displayName: string;
   updateConversationName: (conversationName: string) => void;
-  isGroup: boolean;
   userParticipants: User[];
   serviceParticipants: ServiceEntity[];
   allUsersCount: number;
   isTeam?: boolean;
+  conversation: Conversation;
 }
 
 const ConversationDetailsHeader: FC<ConversationDetailsHeaderProps> = ({
   isActiveGroupParticipant,
   canRenameGroup,
-  displayName,
   updateConversationName,
-  isGroup,
   userParticipants,
   serviceParticipants,
   allUsersCount,
   isTeam = false,
+  conversation,
 }) => {
+  const {isGroup, display_name: displayName} = useKoSubscribableChildren(conversation, ['isGroup', 'display_name']);
+
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
   const isEditGroupNameTouched = useRef(false);
 
@@ -146,6 +149,8 @@ const ConversationDetailsHeader: FC<ConversationDetailsHeaderProps> = ({
               data-uie-name="enter-name"
             />
           )}
+
+          <ConversationVerificationBadges displayTitle conversation={conversation} />
         </>
       ) : (
         <div className="conversation-details__name">

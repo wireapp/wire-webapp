@@ -25,7 +25,6 @@ import {Context} from '@wireapp/api-client/lib/auth';
 import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/';
 import {EVENTS as CoreEvents} from '@wireapp/core/lib/Account';
 import {amplify} from 'amplify';
-import Dexie from 'dexie';
 import platform from 'platform';
 import {container} from 'tsyringe';
 
@@ -58,6 +57,10 @@ import {ConnectionRepository} from '../connection/ConnectionRepository';
 import {ConnectionService} from '../connection/ConnectionService';
 import {ConversationRepository} from '../conversation/ConversationRepository';
 import {ConversationService} from '../conversation/ConversationService';
+import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
+import {registerMLSConversationVerificationStateHandler} from '../conversation/ConversationVerificationStateHandler';
+import {OnConversationE2EIVerificationStateChange} from '../conversation/ConversationVerificationStateHandler/shared';
+import {EventBuilder} from '../conversation/EventBuilder';
 import {MessageRepository} from '../conversation/MessageRepository';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {User} from '../entity/User';
@@ -84,6 +87,7 @@ import {IntegrationService} from '../integration/IntegrationService';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import {MediaRepository} from '../media/MediaRepository';
 import {initMLSConversations, registerUninitializedSelfAndTeamConversations} from '../mls';
+import {joinConversationsAfterMigrationFinalisation} from '../mls/MLSMigration/migrationFinaliser';
 import {NotificationRepository} from '../notification/NotificationRepository';
 import {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
 import {PermissionRepository} from '../permission/PermissionRepository';
@@ -119,7 +123,6 @@ export function doRedirect(signOutReason: SIGN_OUT_REASON) {
     url = appendParameter(url, `${URLParameter.REASON}=${signOutReason}`);
   }
 
-  Dexie.delete('/sqleet');
   window.location.replace(url);
 }
 
@@ -252,6 +255,8 @@ export class App {
       serverTimeHandler,
     );
 
+    repositories.self = new SelfRepository(selfService, repositories.user, repositories.team, repositories.client);
+
     repositories.conversation = new ConversationRepository(
       this.service.conversation,
       repositories.message,
@@ -259,12 +264,11 @@ export class App {
       repositories.event,
       repositories.team,
       repositories.user,
+      repositories.self,
       repositories.properties,
       repositories.calling,
       serverTimeHandler,
     );
-
-    repositories.self = new SelfRepository(selfService, repositories.user, repositories.team, repositories.client);
 
     repositories.eventTracker = new EventTrackingRepository(repositories.message);
 
@@ -428,10 +432,7 @@ export class App {
       if (supportsMLS()) {
         //if mls is supported, we need to initialize the callbacks (they are used when decrypting messages)
         conversationRepository.initMLSConversationRecoveredListener();
-      }
-
-      if (connections.length) {
-        await Promise.allSettled(conversationRepository.mapConnections(connections));
+        registerMLSConversationVerificationStateHandler(this.updateConversationE2EIVerificationState);
       }
 
       onProgress(25, t('initReceivedUserData'));
@@ -451,14 +452,27 @@ export class App {
         onProgress(25 + 50 * (done / total), `${baseMessage}${extraInfo}`);
       });
 
-      if (supportsMLS()) {
-        // Once all the messages have been processed and the message sending queue freed we can now:
+      await conversationRepository.init1To1Conversations(connections, conversations);
 
+      if (supportsMLS()) {
         //add the potential `self` and `team` conversations
         await registerUninitializedSelfAndTeamConversations(conversations, selfUser, clientEntity.id, this.core);
 
+        //join all the mls groups that are known by the user but were migrated to mls
+        await joinConversationsAfterMigrationFinalisation({
+          conversations,
+          core: this.core,
+          onSuccess: conversationRepository.injectJoinedAfterMigrationFinalisationMessage,
+          onError: ({id}, error) =>
+            this.logger.error(`Failed when joining a migrated mls conversation with id ${id}, error: `, error),
+        });
+
         //join all the mls groups we're member of and have not yet joined (eg. we were not send welcome message)
-        await initMLSConversations(conversations, this.core);
+        await initMLSConversations(conversations, {
+          core: this.core,
+          onError: ({id}, error) =>
+            this.logger.error(`Failed when initialising mls conversation with id ${id}, error: `, error),
+        });
       }
 
       telemetry.timeStep(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
@@ -490,7 +504,7 @@ export class App {
         startNewVersionPolling(Environment.version(false), this.update);
       }
       audioRepository.init(true);
-      conversationRepository.cleanupConversations();
+      await conversationRepository.cleanupEphemeralMessages();
       callingRepository.setReady();
       telemetry.timeStep(AppInitTimingsStep.APP_LOADED);
 
@@ -633,11 +647,7 @@ export class App {
       this.repository.calling.destroy();
 
       if (selfUser.isActivatedAccount()) {
-        if (this.service.storage.isTemporaryAndNonPersistent) {
-          this.logout(SIGN_OUT_REASON.CLIENT_REMOVED, true);
-        } else {
-          this.repository.storage.terminate('window.onunload');
-        }
+        this.repository.storage.terminate('window.onunload');
       } else {
         this.repository.conversation.leaveGuestRoom();
         this.repository.storage.deleteDatabase();
@@ -799,4 +809,28 @@ export class App {
 
     doRedirect(signOutReason);
   }
+
+  private updateConversationE2EIVerificationState: OnConversationE2EIVerificationStateChange = async ({
+    conversationEntity,
+    conversationVerificationState,
+    verificationMessageType,
+    userIds,
+  }) => {
+    switch (conversationVerificationState) {
+      case ConversationVerificationState.VERIFIED:
+        const allVerifiedEvent = EventBuilder.buildAllE2EIVerified(conversationEntity);
+        await this.repository.event.injectEvent(allVerifiedEvent);
+        break;
+      case ConversationVerificationState.DEGRADED:
+        if (verificationMessageType) {
+          const degradedEvent = EventBuilder.buildE2EIDegraded(conversationEntity, verificationMessageType, userIds);
+          await this.repository.event.injectEvent(degradedEvent);
+        } else {
+          this.logger.error('updateConversationE2EIVerificationState: Missing verificationMessageType while degrading');
+        }
+        break;
+      default:
+        break;
+    }
+  };
 }

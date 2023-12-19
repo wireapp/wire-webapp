@@ -17,7 +17,10 @@
  *
  */
 
+import {generateUUID} from '@datadog/browser-core';
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
+import {USER_EVENT, UserUpdateEvent} from '@wireapp/api-client/lib/event';
 import type {User as APIClientUser} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
@@ -372,7 +375,6 @@ describe('UserRepository', () => {
       });
     });
   });
-
   describe('updateUsers', () => {
     it('should update local users', async () => {
       const [userRepository, {userService, userState}] = await buildUserRepository();
@@ -388,6 +390,126 @@ describe('UserRepository', () => {
       await userRepository.refreshUsers([user.qualifiedId]);
 
       expect(userRepository.findUserById(user.qualifiedId)?.name()).toBe(entities.user.jane_roe.name);
+    });
+  });
+
+  describe('supportedProtocols', () => {
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+
+    it("should update user's supportedProtocols", async () => {
+      const [userRepository, {userState}] = await buildUserRepository();
+      const user = new User(generateUUID());
+      userState.users.push(user);
+      userState.self(user);
+      const initialSupportedProtocols = [ConversationProtocol.PROTEUS];
+      const newSupportedProtocols = [ConversationProtocol.PROTEUS, ConversationProtocol.MLS];
+      user.supportedProtocols(initialSupportedProtocols);
+      const userUpdateEvent: UserUpdateEvent = {
+        type: USER_EVENT.UPDATE,
+        user: {
+          supported_protocols: newSupportedProtocols,
+          id: user.id,
+        },
+      };
+
+      const source = EventRepository.SOURCE.WEB_SOCKET;
+
+      await userRepository['onUserEvent'](userUpdateEvent, source);
+
+      expect(user.supportedProtocols()).toEqual(newSupportedProtocols);
+    });
+
+    it("should emit supportedProtocolsUpdate event after user's supported protocols were updated", async () => {
+      const [userRepository, {userState}] = await buildUserRepository();
+      const user = new User(generateUUID());
+      const selfUser = new User(generateUUID());
+
+      userState.users.push(user);
+      userState.self(selfUser);
+
+      const initialSupportedProtocols = [ConversationProtocol.PROTEUS];
+      const newSupportedProtocols = [ConversationProtocol.PROTEUS, ConversationProtocol.MLS];
+
+      user.supportedProtocols(initialSupportedProtocols);
+
+      const userUpdateEvent: UserUpdateEvent = {
+        type: USER_EVENT.UPDATE,
+        user: {
+          supported_protocols: newSupportedProtocols,
+          id: user.id,
+        },
+      };
+
+      jest.spyOn(userRepository, 'emit');
+      const source = EventRepository.SOURCE.WEB_SOCKET;
+
+      await userRepository['onUserEvent'](userUpdateEvent, source);
+
+      expect(userRepository.emit).toHaveBeenCalledWith('supportedProtocolsUpdated', {
+        user,
+        supportedProtocols: newSupportedProtocols,
+      });
+      expect(user.supportedProtocols()).toEqual(newSupportedProtocols);
+    });
+
+    it("should not emit supportedProtocolsUpdate event if user's supported protocols remain unchanged", async () => {
+      const [userRepository, {userState}] = await buildUserRepository();
+      const user = new User(generateUUID());
+      userState.users.push(user);
+
+      const selfUser = new User(generateUUID());
+      userState.self(selfUser);
+
+      const initialSupportedProtocols = [ConversationProtocol.PROTEUS, ConversationProtocol.MLS];
+      const newSupportedProtocols = [ConversationProtocol.PROTEUS, ConversationProtocol.MLS];
+
+      user.supportedProtocols(initialSupportedProtocols);
+
+      const userUpdateEvent: UserUpdateEvent = {
+        type: USER_EVENT.UPDATE,
+        user: {
+          supported_protocols: newSupportedProtocols,
+          id: user.id,
+        },
+      };
+
+      jest.spyOn(userRepository, 'emit');
+      const source = EventRepository.SOURCE.WEB_SOCKET;
+
+      await userRepository['onUserEvent'](userUpdateEvent, source);
+
+      expect(userRepository.emit).not.toHaveBeenCalled();
+      expect(user.supportedProtocols()).toEqual(newSupportedProtocols);
+    });
+
+    it('should not emit supportedProtocolsUpdate event if the event did not contain supported protocols', async () => {
+      const [userRepository, {userState}] = await buildUserRepository();
+      const user = new User(generateUUID());
+      userState.users.push(user);
+
+      const selfUser = new User(generateUUID());
+      userState.self(selfUser);
+
+      const initialSupportedProtocols = [ConversationProtocol.PROTEUS, ConversationProtocol.MLS];
+
+      user.supportedProtocols(initialSupportedProtocols);
+
+      const userUpdateEvent: UserUpdateEvent = {
+        type: USER_EVENT.UPDATE,
+        user: {
+          id: user.id,
+        },
+      };
+
+      jest.spyOn(userRepository, 'emit');
+      const source = EventRepository.SOURCE.WEB_SOCKET;
+
+      await userRepository['onUserEvent'](userUpdateEvent, source);
+
+      expect(userRepository.emit).not.toHaveBeenCalled();
+      expect(user.supportedProtocols()).toEqual(initialSupportedProtocols);
     });
   });
 });

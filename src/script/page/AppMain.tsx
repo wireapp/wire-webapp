@@ -50,6 +50,7 @@ import {ConversationState} from '../conversation/ConversationState';
 import {User} from '../entity/User';
 import {useInitializeRootFontSize} from '../hooks/useRootFontSize';
 import {App} from '../main/app';
+import {initialiseMLSMigrationFlow} from '../mls/MLSMigration';
 import {generateConversationUrl} from '../router/routeGenerator';
 import {configureRoutes, navigate} from '../router/Router';
 import {TeamState} from '../team/TeamState';
@@ -124,7 +125,7 @@ const AppMain: FC<AppMainProps> = ({
   const {currentView} = useAppMainState(state => state.responsiveView);
   const isLeftSidebarVisible = currentView == ViewType.LEFT_SIDEBAR;
 
-  const initializeApp = () => {
+  const initializeApp = async () => {
     repositories.notification.setContentViewModelStates(contentState, mainView.multitasking);
 
     const showMostRecentConversation = () => {
@@ -191,6 +192,14 @@ const AppMain: FC<AppMainProps> = ({
     repositories.properties.checkPrivacyPermission().then(() => {
       window.setTimeout(() => repositories.notification.checkPermission(), App.CONFIG.NOTIFICATION_CHECK);
     });
+
+    //after app is loaded, check mls migration configuration and start migration if needed
+    await initialiseMLSMigrationFlow({
+      selfUser,
+      conversationHandler: repositories.conversation,
+      getTeamMLSMigrationStatus: repositories.team.getTeamMLSMigrationStatus,
+      refreshAllKnownUsers: repositories.user.refreshAllKnownUsers,
+    });
   };
 
   useEffect(() => {
@@ -226,6 +235,7 @@ const AppMain: FC<AppMainProps> = ({
                 selfUser={selfUser}
                 isRightSidebarOpen={!!currentState}
                 openRightSidebar={toggleRightSidebar}
+                reloadApp={app.refresh}
               />
             )}
 

@@ -495,12 +495,18 @@ export class TeamRepository extends TypedEventEmitter<Events> {
       return [ConversationProtocol.PROTEUS];
     }
 
-    return mlsFeature.config.supportedProtocols || [ConversationProtocol.PROTEUS];
+    const teamSupportedProtocols = mlsFeature.config.supportedProtocols;
+
+    // For old teams (created on some older backend versions) supportedProtocols field might not exist or be empty,
+    // we fallback to proteus in this case.
+    return teamSupportedProtocols && teamSupportedProtocols.length > 0
+      ? teamSupportedProtocols
+      : [ConversationProtocol.PROTEUS];
   }
 
-  public getTeamMLSMigrationStatus(): MLSMigrationStatus {
+  public readonly getTeamMLSMigrationStatus = (): MLSMigrationStatus => {
     const mlsMigrationFeature = this.teamState.teamFeatures()?.mlsMigration;
 
     return getMLSMigrationStatus(mlsMigrationFeature);
-  }
+  };
 }
