@@ -119,7 +119,7 @@ jobs:
         id: generate_changelog
         if: ${{ env.changelog_type }}
         run: |
-          yarn changelog:${{ env.changelog_type }} >> ${{ env.CHANGELOG_FILE }}
+          yarn changelog:${{ env.changelog_type }} > ${{ env.CHANGELOG_FILE }}
           echo "changelog=${{ env.CHANGELOG_FILE }}" >> $GITHUB_OUTPUT
 
       - uses: actions/upload-artifact@v4
