@@ -330,7 +330,7 @@ jobs:
           region: eu-central-1
           use_existing_version_if_available: true
           version_description: ${{github.sha}}
-          version_label: '${{github.run_id}}-${{github.job}}'
+          version_label: '${{github.run_id}}-${{matrix.target}}'
           wait_for_deployment: false
           wait_for_environment_recovery: 150
 
