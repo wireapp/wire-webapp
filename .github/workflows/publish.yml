@@ -319,7 +319,6 @@ jobs:
           name: 'build-artifact'
 
       - name: Deploy to ${{matrix.target}}
-        if: false
         uses: einaregilsson/beanstalk-deploy@v21
         with:
           application_name: Webapp
@@ -338,6 +337,7 @@ jobs:
     name: 'Create Github release'
     runs-on: ubuntu-latest
     needs: [deploy_to_aws, build]
+    if: ${{ needs.build.outputs.changelog }}
 
     outputs:
       release_url: ${{ steps.release.outputs.url }}
