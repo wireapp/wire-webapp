@@ -67,6 +67,15 @@ export class BackupService {
     ] as const;
   }
 
+  async runDbSchemaUpdates(archiveVersion: number): Promise<void> {
+    const {db} = this.storageService;
+    if (!db) {
+      this.logger.warn('Database schema will not run because the database is not initialized');
+      return;
+    }
+    return db.runDbSchemaUpdates(archiveVersion);
+  }
+
   /**
    * Will import all entities in the Database.
    * If a primaryKey generator is given, it will only import the entities that are not already in the DB
