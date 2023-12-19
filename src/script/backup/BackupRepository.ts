@@ -311,7 +311,7 @@ export class BackupRepository {
       throw new InvalidMetaDataError();
     }
 
-    await this.verifyMetadata(user, files);
+    const archiveVersion = await this.verifyMetadata(user, files);
     const fileDescriptors = Object.entries(files)
       .filter(([filename]) => filename !== Filename.METADATA)
       .map(([filename, content]) => {
@@ -326,7 +326,7 @@ export class BackupRepository {
     const nbEntities = fileDescriptors.reduce((acc, {entities}) => acc + entities.length, 0);
     initCallback(nbEntities);
 
-    await this.importHistoryData(fileDescriptors, progressCallback);
+    await this.importHistoryData(archiveVersion, fileDescriptors, progressCallback);
   }
 
   private async createDecryptedBackup(
@@ -357,6 +357,7 @@ export class BackupRepository {
   }
 
   private async importHistoryData(
+    archiveVersion: number,
     fileDescriptors: FileDescriptor[],
     progressCallback: ProgressCallback,
   ): Promise<void> {
@@ -378,7 +379,7 @@ export class BackupRepository {
     }
 
     // Run all the database migrations on the imported data
-    await this.backupService.runDbSchemaUpdates();
+    await this.backupService.runDbSchemaUpdates(archiveVersion);
 
     await this.conversationRepository.updateConversations(importedConversations);
     await this.conversationRepository.initAllLocal1To1Conversations();
@@ -477,15 +478,16 @@ export class BackupRepository {
     return omit(entity, 'primary_key');
   }
 
-  private async verifyMetadata(user: User, files: Record<string, Uint8Array>): Promise<void> {
+  private async verifyMetadata(user: User, files: Record<string, Uint8Array>): Promise<number> {
     const rawData = files[Filename.METADATA];
     const metaData = new TextDecoder().decode(rawData);
     const parsedMetaData = JSON.parse(metaData);
-    this._verifyMetadata(user, parsedMetaData);
+    const archiveVersion = this._verifyMetadata(user, parsedMetaData);
     this.logger.log('Validated metadata during history import', files);
+    return archiveVersion;
   }
 
-  private _verifyMetadata(user: User, archiveMetadata: Metadata): void {
+  private _verifyMetadata(user: User, archiveMetadata: Metadata): number {
     const localMetadata = this.createMetaData(user, '');
     const isExpectedUserId = archiveMetadata.user_id === localMetadata.user_id;
     if (!isExpectedUserId) {
@@ -500,6 +502,8 @@ export class BackupRepository {
       const message = `History created from "${archiveMetadata.platform}" device cannot be imported`;
       throw new IncompatiblePlatformError(message);
     }
+
+    return archiveMetadata.version;
   }
 
   private mapDecodingError(decodingError: string) {

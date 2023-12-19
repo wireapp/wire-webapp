@@ -67,13 +67,13 @@ export class BackupService {
     ] as const;
   }
 
-  async runDbSchemaUpdates(): Promise<void> {
+  async runDbSchemaUpdates(archiveVersion: number): Promise<void> {
     const {db} = this.storageService;
     if (!db) {
       this.logger.warn('Database schema will not run because the database is not initialized');
       return;
     }
-    return db.runDbSchemaUpdates();
+    return db.runDbSchemaUpdates(archiveVersion);
   }
 
   /**

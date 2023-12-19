@@ -75,9 +75,10 @@ export class DexieDatabase extends Dexie {
     });
   };
 
-  public readonly runDbSchemaUpdates = async (): Promise<void> => {
+  public readonly runDbSchemaUpdates = async (archiveVersion: number): Promise<void> => {
     for (const {upgrade, version} of StorageSchemata.SCHEMATA) {
-      if (upgrade) {
+      // If the archive version is greater than the current version, run the upgrade
+      if (upgrade && version > archiveVersion) {
         await this.transaction('rw', this.tables, transaction => {
           this.logger.info(`Running DB schema update for version '${version}'`);
           upgrade(transaction, this);
