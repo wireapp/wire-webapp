@@ -26,7 +26,8 @@ jobs:
       build_artifact: ${{ env.BUILD_ARTIFACT }}
 
     env:
-      BUILD_ARTIFACT: server/dist/s3/ebs.zip
+      BUILD_DIR: server/dist/s3/
+      BUILD_ARTIFACT: ebs.zip
       COMMIT_URL: ${{github.event.head_commit.url}}
       COMMITTER: ${{github.event.head_commit.committer.name}}
       CHANGELOG_FILE: './changelog.md'
@@ -98,7 +99,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: 'build-artifact'
-          path: ${{env.BUILD_ARTIFACT}}
+          path: '${{env.BUILD_DIR}}${{env.BUILD_ARTIFACT}}'
 
       - uses: kanga333/variable-mapper@master
         id: changelog
