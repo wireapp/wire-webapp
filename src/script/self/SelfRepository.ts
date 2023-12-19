@@ -71,8 +71,8 @@ export class SelfRepository extends TypedEventEmitter<Events> {
         void this.refreshSelfSupportedProtocols();
       }
 
-      if (event.name === FEATURE_KEY.DOWNLOAD_LOCATION) {
-        amplify.publish(WebAppEvents.TEAM.DOWNLOAD_LOCATION_UPDATED, event.data);
+      if (event.name === FEATURE_KEY.ENFORCE_DOWNLOAD_PATH) {
+        amplify.publish(WebAppEvents.TEAM.DOWNLOAD_PATH_UPDATE, event.data);
       }
     });
   }
