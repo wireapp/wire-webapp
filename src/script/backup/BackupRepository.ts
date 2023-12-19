@@ -377,6 +377,9 @@ export class BackupRepository {
       }
     }
 
+    // Run all the database migrations on the imported data
+    await this.backupService.runDbSchemaUpdates();
+
     await this.conversationRepository.updateConversations(importedConversations);
     await this.conversationRepository.initAllLocal1To1Conversations();
     // doesn't need to be awaited
@@ -496,19 +499,6 @@ export class BackupRepository {
     if (!isExpectedPlatform) {
       const message = `History created from "${archiveMetadata.platform}" device cannot be imported`;
       throw new IncompatiblePlatformError(message);
-    }
-
-    const lowestDbVersion = Math.min(archiveMetadata.version, localMetadata.version);
-    const involvesDatabaseMigration = StorageSchemata.SCHEMATA.reduce((involvesMigration, schemaData) => {
-      if (schemaData.version > lowestDbVersion) {
-        return involvesMigration || !!schemaData.upgrade;
-      }
-      return involvesMigration;
-    }, false);
-
-    if (involvesDatabaseMigration) {
-      const message = 'History cannot be restored: Database version mismatch';
-      throw new IncompatibleBackupError(message);
     }
   }
 
