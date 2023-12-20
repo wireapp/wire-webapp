@@ -508,7 +508,7 @@ export class App {
         // start regularly polling the server to check if there is a new version of Wire
         startNewVersionPolling(Environment.version(false), this.update);
       }
-      audioRepository.init(true);
+      audioRepository.init();
       await conversationRepository.cleanupEphemeralMessages();
       callingRepository.setReady();
       telemetry.timeStep(AppInitTimingsStep.APP_LOADED);

@@ -44,7 +44,7 @@ export class AudioRepository {
   private readonly audioPreference = ko.observable(AudioPreference.ALL);
   private muted: boolean;
 
-  constructor(private readonly devicesHandler: MediaDevicesHandler) {
+  constructor(private readonly devicesHandler?: MediaDevicesHandler) {
     this.logger = getLogger('AudioRepository');
     this.audioPreference.subscribe(audioPreference => {
       if (audioPreference === AudioPreference.NONE) {
@@ -74,12 +74,11 @@ export class AudioRepository {
     return AUDIO_PLAY_PERMISSION.ALLOWED;
   }
 
-  private createAudioElement(sourcePath: string, preload: boolean): HTMLAudioElement {
+  private createAudioElement(sourcePath: string): HTMLAudioElement {
     const audioElement = new Audio();
-    audioElement.preload = preload ? 'auto' : 'none';
-    if (preload) {
-      audioElement.load();
-    }
+    audioElement.preload = 'auto';
+    // preload element
+    audioElement.load();
     audioElement.src = sourcePath;
     return audioElement;
   }
@@ -100,9 +99,9 @@ export class AudioRepository {
     return this.audioElements[audioId];
   }
 
-  private initSounds(preload: boolean): void {
+  private initSounds(): void {
     Object.values(AudioType).forEach(audioId => {
-      this.audioElements[audioId] = this.createAudioElement(`./audio/${audioId}.mp3`, preload);
+      this.audioElements[audioId] = this.createAudioElement(`./audio/${audioId}.mp3`);
     });
   }
 
@@ -122,8 +121,8 @@ export class AudioRepository {
     }
   }
 
-  init(preload: boolean = false): void {
-    this.initSounds(preload);
+  init(): void {
+    this.initSounds();
     this.updateSinkIds();
   }
 

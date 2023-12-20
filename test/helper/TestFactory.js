@@ -270,7 +270,7 @@ export class TestFactory {
       serverTimeHandler,
       this.user_repository,
       this.assetRepository,
-      new AudioRepository({}),
+      new AudioRepository(),
       this.user_repository['userState'],
       clientState,
     );
