@@ -244,6 +244,7 @@ export class App {
       serverTimeHandler,
       repositories.user,
       repositories.asset,
+      repositories.audio,
     );
 
     repositories.calling = new CallingRepository(
@@ -280,7 +281,11 @@ export class App {
       repositories.team,
     );
     repositories.permission = new PermissionRepository();
-    repositories.notification = new NotificationRepository(repositories.conversation, repositories.permission);
+    repositories.notification = new NotificationRepository(
+      repositories.conversation,
+      repositories.permission,
+      repositories.audio,
+    );
     repositories.preferenceNotification = new PreferenceNotificationRepository(repositories.user['userState'].self);
 
     return repositories;

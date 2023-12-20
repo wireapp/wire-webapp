@@ -19,14 +19,13 @@
 
 import {AudioPreference, WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
-import {container} from 'tsyringe';
+import ko from 'knockout';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Logger, getLogger} from 'Util/Logger';
 
 import {AudioPlayingType} from './AudioPlayingType';
-import {AudioState} from './AudioState';
 import {AudioType} from './AudioType';
 
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
@@ -42,14 +41,12 @@ enum AUDIO_PLAY_PERMISSION {
 export class AudioRepository {
   private readonly logger: Logger;
   private readonly audioElements: Record<string, HTMLAudioElement>;
+  private readonly audioPreference = ko.observable(AudioPreference.ALL);
   private muted: boolean;
 
-  constructor(
-    private readonly devicesHandler: MediaDevicesHandler,
-    private readonly audioState = container.resolve(AudioState),
-  ) {
+  constructor(private readonly devicesHandler: MediaDevicesHandler) {
     this.logger = getLogger('AudioRepository');
-    this.audioState.audioPreference.subscribe(audioPreference => {
+    this.audioPreference.subscribe(audioPreference => {
       if (audioPreference === AudioPreference.NONE) {
         this.stopAll();
       }
@@ -64,12 +61,12 @@ export class AudioRepository {
       return AUDIO_PLAY_PERMISSION.DISALLOWED_BY_MUTE_STATE;
     }
 
-    const preferenceIsNone = this.audioState.audioPreference() === AudioPreference.NONE;
+    const preferenceIsNone = this.audioPreference() === AudioPreference.NONE;
     if (preferenceIsNone && !AudioPlayingType.NONE.includes(audioId)) {
       return AUDIO_PLAY_PERMISSION.DISALLOWED_BY_PREFERENCES;
     }
 
-    const preferenceIsSome = this.audioState.audioPreference() === AudioPreference.SOME;
+    const preferenceIsSome = this.audioPreference() === AudioPreference.SOME;
     if (preferenceIsSome && !AudioPlayingType.SOME.includes(audioId)) {
       return AUDIO_PLAY_PERMISSION.DISALLOWED_BY_PREFERENCES;
     }
@@ -113,11 +110,6 @@ export class AudioRepository {
     Object.keys(this.audioElements).forEach((audioId: AudioType) => this.stop(audioId));
   }
 
-  private subscribeToAudioEvents(): void {
-    amplify.subscribe(WebAppEvents.AUDIO.PLAY, this.play);
-    amplify.subscribe(WebAppEvents.AUDIO.STOP, this.stop);
-  }
-
   private subscribeToEvents(): void {
     amplify.subscribe(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, this.setMutedState);
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, this.updatedProperties);
@@ -133,7 +125,6 @@ export class AudioRepository {
   init(preload: boolean = false): void {
     this.initSounds(preload);
     this.updateSinkIds();
-    this.subscribeToAudioEvents();
   }
 
   loop(audioId: AudioType): Promise<void> {
@@ -184,7 +175,7 @@ export class AudioRepository {
   };
 
   readonly setAudioPreference = (audioPreference: AudioPreference): void => {
-    this.audioState.audioPreference(audioPreference);
+    this.audioPreference(audioPreference);
   };
 
   readonly setMutedState = (handlingNotifications: NOTIFICATION_HANDLING_STATE): void => {
