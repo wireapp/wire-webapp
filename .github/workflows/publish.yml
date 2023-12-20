@@ -15,7 +15,6 @@ jobs:
   build:
     name: Build Docker image and Helm Chart
     runs-on: buildjet-8vcpu-ubuntu-2204
-
     outputs:
       wire_builds_target_branches: ${{ steps.output_target_branches.outputs.wire_builds_target_branches }}
       image_tag: ${{ steps.push_docker_image.outputs.image_tag }}
@@ -38,18 +37,15 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 16.x
           cache: 'yarn'
-
       - name: Set environment variables
         run: |
           echo "BRANCH_NAME=$(git branch --show-current)" >> $GITHUB_ENV
           echo "TAG=$(git tag --points-at ${{github.sha}})" >> $GITHUB_ENV
-
       - name: Print environment variables
         run: |
           echo -e "BRANCH_NAME = ${BRANCH_NAME}"
@@ -179,7 +175,6 @@ jobs:
           helm package ./charts/webapp
 
           helm s3 push webapp-*.tgz charts-webapp
-
   publish_wire_builds:
     name: Bump webapp chart in wire-builds
     runs-on: ubuntu-latest
@@ -187,7 +182,6 @@ jobs:
     strategy:
       matrix:
         target_branch: ${{fromJSON(needs.build.outputs.wire_builds_target_branches)}}
-
     steps:
       - name: Check out wire-builds
         uses: actions/checkout@v4
@@ -196,7 +190,6 @@ jobs:
           token: ${{secrets.WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN}}
           ref: ${{matrix.target_branch}}
           fetch-depth: 1
-
       - name: Create new build in wire-build
         shell: bash
         run: |
@@ -231,14 +224,12 @@ jobs:
              echo '::set-output name=exists::true'
              echo "::set-output name=releaseInfo::$(cat ${ARTIFACT_LOCAL_PATH})"
           fi
-
       - name: Checking out 'wire-server'
         uses: actions/checkout@v4
         if: ${{ steps.release-info-file.outputs.exists == 'true' }}
         with:
           repository: 'wireapp/wire-server'
           fetch-depth: 1
-
       - name: Changing Helm value of the webapp chart
         id: change-helm-value
         if: ${{ steps.release-info-file.outputs.exists == 'true' }}
@@ -249,7 +240,6 @@ jobs:
           echo "Upgrade webapp version to ${{needs.build.outputs.image_tag}}" > ./changelog.d/0-release-notes/webapp-upgrade
           git add ./changelog.d/0-release-notes/webapp-upgrade
           echo "::set-output name=releaseUrl::${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/releases/tag/${{needs.build.outputs.release_name}}"
-
       - name: Creating Pull Request
         id: create-pr
         if: ${{ steps.release-info-file.outputs.exists == 'true' }}
@@ -264,7 +254,6 @@ jobs:
           body: |
             Image tag: `${{needs.build.outputs.image_tag}}`
             Release: [`${{needs.build.outputs.release_name}}`](${{ steps.change-helm-value.outputs.releaseUrl }})
-
       - name: Printing Pull Request URL
         if: ${{ steps.release-info-file.outputs.exists == 'true' }}
         shell: bash

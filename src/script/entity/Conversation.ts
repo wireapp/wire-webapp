@@ -99,6 +99,7 @@ export class Conversation {
   public blockLegalHoldMessage: boolean;
   public hasCreationMessage: boolean;
   public readonly accessCode: ko.Observable<string>;
+  public readonly accessCodeHasPassword: ko.Observable<boolean | undefined>;
   public readonly accessState: ko.Observable<ACCESS_STATE>;
   public readonly archivedTimestamp: ko.Observable<number>;
   public readonly call: ko.Observable<Call | null>;
@@ -198,6 +199,7 @@ export class Conversation {
 
     this.accessState = ko.observable();
     this.accessCode = ko.observable();
+    this.accessCodeHasPassword = ko.observable();
     this.creator = undefined;
     this.name = ko.observable();
     this.teamId = undefined;

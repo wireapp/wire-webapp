@@ -228,8 +228,8 @@ export class ConversationService {
    * @param conversationId ID of conversation to request access code for
    * @returns Resolves with the server response
    */
-  postConversationCode(conversationId: string): Promise<ConversationCodeUpdateEvent> {
-    return this.apiClient.api.conversation.postConversationCodeRequest(conversationId);
+  postConversationCode(conversationId: string, password?: string): Promise<ConversationCodeUpdateEvent> {
+    return this.apiClient.api.conversation.postConversationCodeRequest(conversationId, password);
   }
 
   /**
@@ -240,8 +240,8 @@ export class ConversationService {
    * @param code Conversation access code
    * @returns Resolves with the server response
    */
-  postConversationJoin(key: string, code: string): Promise<ConversationMemberJoinEvent> {
-    return this.apiClient.api.conversation.postJoinByCode({code, key});
+  postConversationJoin(key: string, code: string, password?: string): Promise<ConversationMemberJoinEvent> {
+    return this.apiClient.api.conversation.postJoinByCode({code, key, password});
   }
 
   /**

@@ -64,6 +64,7 @@ import {Page} from './Page';
 import {Config} from '../../Config';
 import {loginStrings, verifyStrings} from '../../strings';
 import {AppAlreadyOpen} from '../component/AppAlreadyOpen';
+import {JoinGuestLinkPasswordModal} from '../component/JoinGuestLinkPasswordModal';
 import {LoginForm} from '../component/LoginForm';
 import {RouterLink} from '../component/RouterLink';
 import {EXTERNAL_ROUTE} from '../externalRoute';
@@ -72,6 +73,7 @@ import {LabeledError} from '../module/action/LabeledError';
 import {ValidationError} from '../module/action/ValidationError';
 import {bindActionCreators, RootState} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
+import * as ConversationSelector from '../module/selector/ConversationSelector';
 import {QUERY_KEY, ROUTE} from '../route';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import {getOAuthQueryString} from '../util/oauthUtil';
@@ -84,11 +86,13 @@ const LoginComponent = ({
   authError,
   resetAuthError,
   doCheckConversationCode,
+  doGetConversationInfoByCode,
   doInit,
   doSetLocalStorage,
   doInitializeClient,
   doLoginAndJoin,
   doLogin,
+  conversationError,
   pushEntropyData,
   doSendTwoFactorCode,
   isFetching,
@@ -96,6 +100,8 @@ const LoginComponent = ({
   loginData,
   defaultSSOCode,
   isSendingTwoFactorCode,
+  conversationInfo,
+  conversationInfoFetching,
   embedded,
 }: Props & ConnectedProps & DispatchProps) => {
   const logger = getLogger('Login');
@@ -103,7 +109,8 @@ const LoginComponent = ({
   const navigate = useNavigate();
   const [conversationCode, setConversationCode] = useState<string | null>(null);
   const [conversationKey, setConversationKey] = useState<string | null>(null);
-
+  const [conversationSubmitData, setConversationSubmitData] = useState<Partial<LoginData> | null>(null);
+  const [isLinkPasswordModalOpen, setIsLinkPasswordModalOpen] = useState<boolean>(false);
   const [isValidLink, setIsValidLink] = useState(true);
   const [validationErrors, setValidationErrors] = useState<Error[]>([]);
 
@@ -118,6 +125,7 @@ const LoginComponent = ({
   const isEntropyRequired = Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY;
   const onEntropyGenerated = useRef<((entropy: Uint8Array) => void) | undefined>();
   const entropy = useRef<Uint8Array | undefined>();
+
   const getEntropy = isEntropyRequired
     ? () => {
         // This is somewhat hacky. When the login action detects a new device and that entropy is required, then we give back a promise to the login action.
@@ -160,6 +168,10 @@ const LoginComponent = ({
         logger.warn('Invalid conversation code', error);
         setIsValidLink(false);
       });
+      doGetConversationInfoByCode(queryConversationKey, queryConversationCode).catch(error => {
+        logger.warn('Failed to fetch conversation info', error);
+        setIsValidLink(false);
+      });
     }
   }, []);
 
@@ -193,8 +205,23 @@ const LoginComponent = ({
     }
   };
 
-  const handleSubmit = async (formLoginData: Partial<LoginData>, validationErrors: Error[] = []) => {
+  const handleSubmit = async (
+    formLoginData: Partial<LoginData>,
+    validationErrors: Error[] = [],
+    conversationPassword?: string,
+  ) => {
     setValidationErrors(validationErrors);
+
+    if (
+      !isLinkPasswordModalOpen &&
+      (!!conversationInfo?.has_password ||
+        (!!conversationError && conversationError.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD))
+    ) {
+      setConversationSubmitData(formLoginData);
+      setIsLinkPasswordModalOpen(true);
+      return;
+    }
+
     try {
       const login: LoginData = {...formLoginData, clientType: loginData.clientType};
       if (validationErrors.length) {
@@ -203,9 +230,19 @@ const LoginComponent = ({
 
       const hasKeyAndCode = conversationKey && conversationCode;
       if (hasKeyAndCode) {
-        await doLoginAndJoin(login, conversationKey, conversationCode, undefined, getEntropy);
+        try {
+          await doLoginAndJoin(login, conversationKey, conversationCode, undefined, getEntropy, conversationPassword);
+        } catch (error) {
+          if (isBackendError(error) && error.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD) {
+            setConversationSubmitData(formLoginData);
+            setIsLinkPasswordModalOpen(true);
+            return;
+          }
+          throw error;
+        }
+      } else {
+        await doLogin(login, getEntropy);
       }
-      await doLogin(login, getEntropy);
 
       if (isOauth) {
         const queryString = getOAuthQueryString(window.location);
@@ -216,6 +253,11 @@ const LoginComponent = ({
     } catch (error) {
       if (isBackendError(error)) {
         switch (error.label) {
+          case BackendErrorLabel.INVALID_CONVERSATION_PASSWORD: {
+            setConversationSubmitData(formLoginData);
+            setIsLinkPasswordModalOpen(true);
+            break;
+          }
           case BackendErrorLabel.TOO_MANY_CLIENTS: {
             await resetAuthError();
             if (formLoginData?.verificationCode) {
@@ -283,7 +325,7 @@ const LoginComponent = ({
     setTwoFactorSubmitError('');
     // Do not auto submit if already failed once
     if (!twoFactorSubmitFailedOnce) {
-      handleSubmit({...twoFactorLoginData, verificationCode: code}, []);
+      void handleSubmit({...twoFactorLoginData, verificationCode: code}, []);
     }
   };
 
@@ -296,6 +338,14 @@ const LoginComponent = ({
       <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
     </RouterLink>
   );
+
+  const submitJoinCodeWithPassword = async (password: string) => {
+    if (!conversationSubmitData) {
+      setIsLinkPasswordModalOpen(false);
+      return;
+    }
+    await handleSubmit(conversationSubmitData, [], password);
+  };
 
   return (
     <Page>
@@ -313,6 +363,19 @@ const LoginComponent = ({
         <Container centerText verticalCenter style={{width: '100%'}}>
           {!isValidLink && <Navigate to={ROUTE.CONVERSATION_JOIN_INVALID} replace />}
           {!embedded && <AppAlreadyOpen />}
+          {isLinkPasswordModalOpen && (
+            <JoinGuestLinkPasswordModal
+              onClose={() => {
+                setIsLinkPasswordModalOpen(false);
+                void resetAuthError();
+                setValidationErrors([]);
+              }}
+              error={conversationError}
+              conversationName={conversationInfo?.name}
+              isLoading={isFetching || conversationInfoFetching}
+              onSubmitPassword={submitJoinCodeWithPassword}
+            />
+          )}
           <Columns>
             {!embedded && (
               <IsMobile not>
@@ -386,7 +449,7 @@ const LoginComponent = ({
                         {!Runtime.isDesktopApp() && (
                           <Checkbox
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                              pushLoginData({
+                              void pushLoginData({
                                 clientType: event.target.checked ? ClientType.TEMPORARY : ClientType.PERMANENT,
                               });
                             }}
@@ -440,9 +503,12 @@ type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({
   defaultSSOCode: AuthSelector.getDefaultSSOCode(state),
   isFetching: AuthSelector.isFetching(state),
+  conversationError: ConversationSelector.getError(state),
   isSendingTwoFactorCode: AuthSelector.isSendingTwoFactorCode(state),
   loginData: AuthSelector.getLoginData(state),
   authError: AuthSelector.getError(state),
+  conversationInfo: ConversationSelector.conversationInfo(state),
+  conversationInfoFetching: ConversationSelector.conversationInfoFetching(state),
 });
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
@@ -459,6 +525,7 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
       pushEntropyData: actionRoot.authAction.pushEntropyData,
       pushLoginData: actionRoot.authAction.pushLoginData,
       resetAuthError: actionRoot.authAction.resetAuthError,
+      doGetConversationInfoByCode: actionRoot.conversationAction.doGetConversationInfoByCode,
     },
     dispatch,
   );

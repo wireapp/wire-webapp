@@ -21,3 +21,6 @@ import type {RootState} from '../reducer';
 
 export const isFetching = (state: RootState) => state.conversationState.fetching;
 export const getError = (state: RootState) => state.conversationState.error;
+export const conversationInfo = (state: RootState) => state.conversationState.conversationInfo;
+export const conversationInfoError = (state: RootState) => state.conversationState.conversationInfoError;
+export const conversationInfoFetching = (state: RootState) => state.conversationState.conversationInfoFetching;
