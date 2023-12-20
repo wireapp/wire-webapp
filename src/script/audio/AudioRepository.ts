@@ -145,7 +145,7 @@ export class AudioRepository {
     return audioElement.play();
   }
 
-  play = async (audioId: AudioType, playInLoop: boolean = false): Promise<void> => {
+  async play(audioId: AudioType, playInLoop: boolean = false): Promise<void> {
     this.updateSinkIds();
     const audioElement = this.getSoundById(audioId);
     if (!audioElement) {
@@ -171,7 +171,7 @@ export class AudioRepository {
         this.logger.debug(`Playing '${audioId}' was disallowed because of user's preferences`);
         break;
     }
-  };
+  }
 
   readonly setAudioPreference = (audioPreference: AudioPreference): void => {
     this.audioPreference(audioPreference);
@@ -187,7 +187,7 @@ export class AudioRepository {
     }
   };
 
-  readonly stop = (audioId: AudioType): void => {
+  stop(audioId: AudioType): void {
     const audioElement = this.getSoundById(audioId);
     if (!audioElement?.paused) {
       // This log is used by QA
@@ -195,7 +195,7 @@ export class AudioRepository {
       audioElement.pause();
       audioElement.load();
     }
-  };
+  }
 
   readonly updatedProperties = (properties: WebappProperties): void => {
     this.setAudioPreference(properties.settings.sound.alerts);
