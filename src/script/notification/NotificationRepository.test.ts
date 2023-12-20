@@ -59,6 +59,7 @@ import {createUuid} from 'Util/uuid';
 
 import {NotificationRepository} from './NotificationRepository';
 
+import {AudioRepository} from '../audio/AudioRepository';
 import {CallState} from '../calling/CallState';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
 import {ConversationState} from '../conversation/ConversationState';
@@ -72,6 +73,7 @@ function buildNotificationRepository() {
   const notificationRepository = new NotificationRepository(
     {} as any,
     new PermissionRepository(),
+    new AudioRepository(),
     userState,
     container.resolve(ConversationState),
     container.resolve(CallState),
