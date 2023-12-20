@@ -23,6 +23,7 @@ type UserId = string;
 type ClientId = string;
 type Domain = string;
 export type ClientIdStringType = `${UserId}:${ClientId}@${Domain}`;
+export type ParsedFullyQualifiedId = {user: UserId; client: ClientId; domain: Domain};
 
 export const constructFullyQualifiedClientId = (
   userId: UserId,
@@ -30,7 +31,7 @@ export const constructFullyQualifiedClientId = (
   domain: Domain,
 ): ClientIdStringType => `${userId}:${clientId}@${domain}`;
 
-export const parseFullQualifiedClientId = (qualifiedId: string): {user: UserId; client: ClientId; domain: Domain} => {
+export const parseFullQualifiedClientId = (qualifiedId: string): ParsedFullyQualifiedId => {
   const regexp = /([a-zA-Z0-9\-]+):([a-zA-Z0-9\-]+)@([a-zA-Z0-9\-.]+)/;
   const [, user, client, domain] = qualifiedId.match(regexp) ?? [];
   if (!user || !client || !domain) {
