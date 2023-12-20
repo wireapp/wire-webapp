@@ -119,34 +119,39 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     if (!hasActiveCertificate()) {
       this.showE2EINotificationMessage();
     } else {
-      const certificate = this.getCurrentDeviceCertificateData();
-
-      if (!certificate) {
-        return this;
-      }
-
-      const {isValid, timeRemainingMS, certificateCreationTime} = getCertificateDetails(certificate);
-
-      // CC will soon return valid/expired/revoked
-      if (!isValid) {
-        return this;
-      }
-
-      // if an enrollment is already in progress ex: manual certificate renewal then call enroll directly
-      if (this.coreE2EIService.isEnrollmentInProgress()) {
-        void this.enroll();
-        return this;
-      }
-
-      const renewalTimeMS = this.calculateRenewalTime(timeRemainingMS, historyTimeMS, gracePeriodMS);
-      const renewalPromptTime = new Date(certificateCreationTime + renewalTimeMS).getTime();
-      const currentTime = new Date().getTime();
-
-      if (currentTime >= renewalPromptTime) {
-        void this.renewCertificate();
-      }
+      void this.handleCertificateRenewal();
     }
     return this;
+  }
+
+  public async handleCertificateRenewal(): Promise<void> {
+    const certificate = this.getCurrentDeviceCertificateData();
+
+    if (!certificate) {
+      return;
+    }
+
+    const {isValid, timeRemainingMS, certificateCreationTime} = getCertificateDetails(certificate);
+
+    // Check if the certificate is still valid
+    if (!isValid) {
+      return;
+    }
+
+    // Check if an enrollment is already in progress
+    if (this.coreE2EIService.isEnrollmentInProgress()) {
+      await this.enroll();
+      return;
+    }
+
+    const renewalTimeMS = this.calculateRenewalTime(timeRemainingMS, historyTimeMS, gracePeriodMS);
+    const renewalPromptTime = new Date(certificateCreationTime + renewalTimeMS).getTime();
+    const currentTime = new Date().getTime();
+
+    // Check if it's time to renew the certificate
+    if (currentTime >= renewalPromptTime) {
+      await this.renewCertificate();
+    }
   }
 
   /**
