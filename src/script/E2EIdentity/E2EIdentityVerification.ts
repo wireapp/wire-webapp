@@ -76,3 +76,7 @@ export async function getConversationVerificationState(groupId: string) {
 export function hasActiveCertificate() {
   return getE2EIdentityService().hasActiveCertificate();
 }
+
+export async function isFreshMLSSelfClient() {
+  return getE2EIdentityService().isFreshMLSSelfClient();
+}

@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, useEffect, useLayoutEffect} from 'react';
+import {FC, useEffect, useLayoutEffect, useState} from 'react';
 
 import {amplify} from 'amplify';
 import {ErrorBoundary} from 'react-error-boundary';
@@ -47,6 +47,7 @@ import {useAppMainState, ViewType} from './state';
 import {useAppState, ContentState} from './useAppState';
 
 import {ConversationState} from '../conversation/ConversationState';
+import {isFreshMLSSelfClient} from '../E2EIdentity';
 import {User} from '../entity/User';
 import {useInitializeRootFontSize} from '../hooks/useRootFontSize';
 import {App} from '../main/app';
@@ -79,6 +80,8 @@ const AppMain: FC<AppMainProps> = ({
   conversationState = container.resolve(ConversationState),
 }) => {
   const apiContext = app.getAPIContext();
+
+  const [freshMLSSelfClient, setFreshMLSSelfClient] = useState(false);
 
   useInitializeRootFontSize();
 
@@ -126,6 +129,17 @@ const AppMain: FC<AppMainProps> = ({
   const isLeftSidebarVisible = currentView == ViewType.LEFT_SIDEBAR;
 
   const initializeApp = async () => {
+    const initializedIsFreshMLSSelfClient = await isFreshMLSSelfClient();
+
+    if (!initializedIsFreshMLSSelfClient) {
+      repositories.calling.setSoftLock(true);
+      repositories.notification.setSoftLock(true);
+
+      setFreshMLSSelfClient(!initializedIsFreshMLSSelfClient);
+
+      return;
+    }
+
     repositories.notification.setContentViewModelStates(contentState, mainView.multitasking);
 
     const showMostRecentConversation = () => {
@@ -222,57 +236,67 @@ const AppMain: FC<AppMainProps> = ({
       data-uie-name="status-webapp"
       data-uie-value="is-loaded"
     >
-      <WindowTitleUpdater />
+      {!freshMLSSelfClient && <WindowTitleUpdater />}
       <RootProvider value={mainView}>
         <ErrorBoundary FallbackComponent={ErrorFallback}>
-          <div id="app" className="app">
-            {(!smBreakpoint || isLeftSidebarVisible) && (
-              <LeftSidebar listViewModel={mainView.list} selfUser={selfUser} isActivatedAccount={isActivatedAccount} />
-            )}
+          {!freshMLSSelfClient && (
+            <div id="app" className="app">
+              {(!smBreakpoint || isLeftSidebarVisible) && (
+                <LeftSidebar
+                  listViewModel={mainView.list}
+                  selfUser={selfUser}
+                  isActivatedAccount={isActivatedAccount}
+                />
+              )}
 
-            {(!smBreakpoint || !isLeftSidebarVisible) && (
-              <MainContent
-                selfUser={selfUser}
-                isRightSidebarOpen={!!currentState}
-                openRightSidebar={toggleRightSidebar}
-                reloadApp={app.refresh}
-              />
-            )}
+              {(!smBreakpoint || !isLeftSidebarVisible) && (
+                <MainContent
+                  selfUser={selfUser}
+                  isRightSidebarOpen={!!currentState}
+                  openRightSidebar={toggleRightSidebar}
+                  reloadApp={app.refresh}
+                />
+              )}
 
-            {currentState && (
-              <RightSidebar
-                lastViewedMessageDetailsEntity={lastViewedMessageDetailsEntity}
-                currentEntity={currentEntity}
-                repositories={repositories}
-                actionsViewModel={mainView.actions}
-                isFederated={mainView.isFederated}
-                teamState={teamState}
-                selfUser={selfUser}
-                userState={userState}
-              />
-            )}
-          </div>
+              {currentState && (
+                <RightSidebar
+                  lastViewedMessageDetailsEntity={lastViewedMessageDetailsEntity}
+                  currentEntity={currentEntity}
+                  repositories={repositories}
+                  actionsViewModel={mainView.actions}
+                  isFederated={mainView.isFederated}
+                  teamState={teamState}
+                  selfUser={selfUser}
+                  userState={userState}
+                />
+              )}
+            </div>
+          )}
 
           <AppLock clientRepository={repositories.client} />
           <WarningsContainer onRefresh={app.refresh} />
           <FeatureConfigChangeNotifier selfUserId={selfUser.id} teamState={teamState} />
           <FeatureConfigChangeHandler teamState={teamState} />
 
-          <CallingContainer
-            multitasking={mainView.multitasking}
-            callingRepository={repositories.calling}
-            mediaRepository={repositories.media}
-          />
+          {!freshMLSSelfClient && (
+            <>
+              <CallingContainer
+                multitasking={mainView.multitasking}
+                callingRepository={repositories.calling}
+                mediaRepository={repositories.media}
+              />
 
-          <LegalHoldModal
-            selfUser={selfUser}
-            conversationRepository={repositories.conversation}
-            searchRepository={repositories.search}
-            teamRepository={repositories.team}
-            clientRepository={repositories.client}
-            messageRepository={repositories.message}
-            cryptographyRepository={repositories.cryptography}
-          />
+              <LegalHoldModal
+                selfUser={selfUser}
+                conversationRepository={repositories.conversation}
+                searchRepository={repositories.search}
+                teamRepository={repositories.team}
+                clientRepository={repositories.client}
+                messageRepository={repositories.message}
+                cryptographyRepository={repositories.cryptography}
+              />
+            </>
+          )}
 
           {/*The order of these elements matter to show proper modals stack upon each other*/}
           <UserModal selfUser={selfUser} userRepository={repositories.user} />

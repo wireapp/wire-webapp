@@ -262,10 +262,12 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       this.currentStep = E2EIHandlerStep.INITIALIZED;
     }
 
+    const isFreshMLSSelfClient = void this.coreE2EIService.isFreshMLSSelfClient();
+
     // If the timer is not active, show the notification
     if (this.config && !this.config.timer.isDelayTimerActive()) {
       const {modalOptions, modalType} = getModalOptions({
-        hideSecondary: !this.config.timer.isSnoozeTimeAvailable(),
+        hideSecondary: !this.config.timer.isSnoozeTimeAvailable() || !isFreshMLSSelfClient,
         primaryActionFn: () => this.enroll(),
         secondaryActionFn: () => {
           this.currentStep = E2EIHandlerStep.SNOOZE;
