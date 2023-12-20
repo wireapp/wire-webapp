@@ -22,10 +22,12 @@ import {CoreCrypto, WireIdentity} from '@wireapp/core-crypto';
 import {E2EIServiceExternal} from './E2EIServiceExternal';
 
 import {ClientService} from '../../../client';
+import {getUUID} from '../../../test/PayloadHelper';
 
 function buildE2EIService() {
   const coreCrypto = {
     getUserIdentities: jest.fn(),
+    getClientIds: jest.fn().mockResolvedValue([]),
   } as unknown as jest.Mocked<CoreCrypto>;
 
   const clientService = {} as jest.Mocked<ClientService>;
@@ -33,9 +35,17 @@ function buildE2EIService() {
   return [new E2EIServiceExternal(coreCrypto, clientService), {coreCrypto}] as const;
 }
 
-function generateCoreCryptoIdentity({status = 'Valid', deviceId = 'aaaaa'}: {status?: string; deviceId?: string} = {}) {
+function generateCoreCryptoIdentity({
+  userId,
+  status = 'Valid',
+  deviceId = getUUID(),
+}: {
+  userId: string;
+  status?: string;
+  deviceId?: string;
+}) {
   return {
-    client_id: `SKHDsEsOS82TrWTHNEsVNA:${deviceId}@elna.wire.link`,
+    client_id: `${userId}:${deviceId}@elna.wire.link`,
     handle: 'adrian_wire2@elna.wire.link',
     display_name: 'Adrian Weiss 2',
     domain: 'elna.wire.link',
@@ -58,15 +68,41 @@ describe('E2EIServiceExternal', () => {
 
       coreCrypto.getUserIdentities.mockResolvedValue(
         new Map([
-          ['48a1c3b0-4b0e-4bcd-93ad-64c7344b1534', [generateCoreCryptoIdentity(), generateCoreCryptoIdentity()]],
-          ['b7d287e4-7bbd-40e0-a550-6b18dcaf5f31', [generateCoreCryptoIdentity()]],
+          [user1.id, [generateCoreCryptoIdentity({userId: user1.id}), generateCoreCryptoIdentity({userId: user1.id})]],
+          [user2.id, [generateCoreCryptoIdentity({userId: user2.id})]],
         ]),
       );
 
       const userIdentities = await service.getUsersIdentities(groupId, userIds);
 
-      expect(userIdentities.get(user1.id)).toBeDefined();
-      expect(userIdentities.get(user2.id)).toBeDefined();
+      expect(userIdentities.get(user1.id)).toHaveLength(2);
+      expect(userIdentities.get(user2.id)).toHaveLength(1);
+    });
+
+    it('returns MLS basic devices with empty identity', async () => {
+      const [service, {coreCrypto}] = buildE2EIService();
+      const user1 = {domain: 'elna.wire.link', id: '48a1c3b0-4b0e-4bcd-93ad-64c7344b1534'};
+      const user2 = {domain: 'elna.wire.link', id: 'b7d287e4-7bbd-40e0-a550-6b18dcaf5f31'};
+      const userIds = [user1, user2];
+
+      const user1Identities = [
+        generateCoreCryptoIdentity({userId: user1.id}),
+        generateCoreCryptoIdentity({userId: user1.id}),
+      ];
+      const encoder = new TextEncoder();
+      coreCrypto.getUserIdentities.mockResolvedValue(new Map([[user1.id, user1Identities]]));
+
+      const allClients = [
+        ...user1Identities.map(identity => (identity as any).client_id),
+        `${user1.id}:74a50c1f4352b41f@elna.wire.link`,
+        `${user2.id}:452cb4c65f0369a8@elna.wire.link`,
+      ];
+      coreCrypto.getClientIds.mockResolvedValue(allClients.map(clientId => encoder.encode(clientId)));
+
+      const userIdentities = await service.getUsersIdentities(groupId, userIds);
+
+      expect(userIdentities.get(user1.id)).toHaveLength(3);
+      expect(userIdentities.get(user2.id)).toHaveLength(1);
     });
   });
 });

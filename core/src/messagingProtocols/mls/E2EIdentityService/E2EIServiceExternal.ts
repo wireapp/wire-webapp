@@ -21,7 +21,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Decoder} from 'bazinga64';
 import logdown from 'logdown';
 
-import {Ciphersuite, CoreCrypto, E2eiConversationState, WireIdentity} from '@wireapp/core-crypto';
+import {Ciphersuite, CoreCrypto, E2eiConversationState, WireIdentity, DeviceStatus} from '@wireapp/core-crypto';
 
 import {getE2EIClientId} from './Helper';
 import {E2EIStorage} from './Storage/E2EIStorage';
@@ -29,7 +29,7 @@ import {E2EIStorage} from './Storage/E2EIStorage';
 import {ClientService} from '../../../client';
 import {parseFullQualifiedClientId} from '../../../util/fullyQualifiedClientIdUtils';
 
-export type DeviceIdentity = Omit<WireIdentity, 'free'> & {deviceId: string};
+export type DeviceIdentity = Omit<WireIdentity, 'free' | 'status'> & {status?: DeviceStatus; deviceId: string};
 
 // This export is meant to be accessible from the outside (e.g the Webapp / UI)
 export class E2EIServiceExternal {
@@ -73,20 +73,44 @@ export class E2EIServiceExternal {
   }
 
   public async getUsersIdentities(groupId: string, userIds: QualifiedId[]): Promise<Map<string, DeviceIdentity[]>> {
+    const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
+    const textDecoder = new TextDecoder();
+
+    // we get all the devices that have an identity (either valid, expired or revoked)
     const userIdentities = await this.coreCryptoClient.getUserIdentities(
-      Decoder.fromBase64(groupId).asBytes,
+      groupIdBytes,
       userIds.map(userId => userId.id),
     );
 
-    const mappedUserIdentities = new Map();
-    for (const [userId, identities] of userIdentities) {
-      mappedUserIdentities.set(
-        userId,
-        identities.map(identity => ({
-          ...identity,
-          deviceId: parseFullQualifiedClientId((identity as any).client_id).client,
-        })),
-      );
+    // We get all the devices in the conversation (in order to get devices that have no identity)
+    const allUsersMLSDevices = (await this.coreCryptoClient.getClientIds(groupIdBytes))
+      .map(id => textDecoder.decode(id))
+      .map(fullyQualifiedId => parseFullQualifiedClientId(fullyQualifiedId));
+
+    const mappedUserIdentities = new Map<string, DeviceIdentity[]>();
+    for (const userId of userIds) {
+      const identities = (userIdentities.get(userId.id) || []).map(identity => ({
+        ...identity,
+        deviceId: parseFullQualifiedClientId((identity as any).client_id).client,
+      }));
+
+      const basicMLSDevices = allUsersMLSDevices
+        .filter(({user}) => user === userId.id)
+        // filtering devices that have a valid identity
+        .filter(({client}) => !identities.map(identity => identity.deviceId).includes(client))
+        // map basic MLS devices to "fake" identity object
+        .map<DeviceIdentity>(id => ({
+          ...id,
+          deviceId: id.client,
+          thumbprint: '',
+          user: '',
+          certificate: '',
+          displayName: '',
+          handle: '',
+          clientId: id.client,
+        }));
+
+      mappedUserIdentities.set(userId.id, [...identities, ...basicMLSDevices]);
     }
 
     return mappedUserIdentities;
