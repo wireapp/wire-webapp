@@ -233,7 +233,7 @@ export const PrimaryModalComponent: FC = () => {
             <FadingScrollbar className="modal__body">
               {message && (
                 <div className="modal__text" data-uie-name="status-modal-text">
-                  {message && <p id="modal-description-html">{message}</p>}
+                  <div id="modal-description-html">{message}</div>
                 </div>
               )}
 

@@ -158,24 +158,22 @@ const updateCurrentModalContent = (type: PrimaryModalType, options: ModalOptions
       content.titleText = t('modalAccountNewDevicesHeadline');
       content.primaryAction = {...primaryAction, text: t('modalAcknowledgeAction')};
       content.secondaryAction = {...secondaryAction, text: t('modalAccountNewDevicesSecondary')};
-      const deviceList = (data as ClientNotificationData[])
-        .map(device => {
-          const deviceDate = new Date(device.time);
-          const deviceTime = isValid(deviceDate) ? new Date(deviceDate) : new Date();
-          const formattedDate = formatLocale(deviceTime, 'PP, p');
-          const deviceModel = `${t('modalAccountNewDevicesFrom')} ${escape(device.model)}`;
-          return (
-            <>
-              <div>${formattedDate} - UTC</div>
-              <div>${deviceModel}</div>
-            </>
-          );
-        })
-        .join('');
+      const deviceList = (data as ClientNotificationData[]).map(device => {
+        const deviceDate = new Date(device.time);
+        const deviceTime = isValid(deviceDate) ? new Date(deviceDate) : new Date();
+        const formattedDate = formatLocale(deviceTime, 'PP, p');
+        const deviceModel = `${t('modalAccountNewDevicesFrom')} ${escape(device.model)}`;
+        return (
+          <>
+            <div>{formattedDate} - UTC</div>
+            <div>{deviceModel}</div>
+          </>
+        );
+      });
       content.message = (
         <>
+          <div className="modal__content__device-list">{deviceList}</div>
           {t('modalAccountNewDevicesMessage')}
-          <div className="modal__content__device-list">${deviceList}</div>
         </>
       );
       break;
