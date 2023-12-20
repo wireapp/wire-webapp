@@ -28,7 +28,6 @@ export const OIDCProxyRoute = () => {
     try {
       const {shouldBeRedirected, targetUrlWithQueryParams} = getTargetUrlWithQueryParams(req);
 
-      //console.log(shouldBeRedirected, targetUrlWithQueryParams);
       if (shouldBeRedirected) {
         return res.redirect(targetUrlWithQueryParams.href);
       }
