@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [43.1.4](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@43.1.3...@wireapp/core@43.1.4) (2023-12-20)
+
+### Bug Fixes
+
+* Add MLS basic devices to the return value of user identities ([#5814](https://github.com/wireapp/wire-web-packages/issues/5814)) ([38bce7a](https://github.com/wireapp/wire-web-packages/commit/38bce7a30016887d7665c8e4443c82a43b9fd77f))
+
 ## [43.1.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@43.1.2...@wireapp/core@43.1.3) (2023-12-12)
 
 ### Bug Fixes
