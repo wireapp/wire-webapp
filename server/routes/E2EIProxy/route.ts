@@ -25,14 +25,18 @@ import {OIDCProxy} from './proxy';
 export const OIDCProxyRoute = () => {
   return Router().use(OIDCProxyRoutePath, (req, res, next) => {
     // Redirect to the target URL if the shouldBeRedirected query parameter is set
-    const {shouldBeRedirected, targetUrlWithQueryParams} = getTargetUrlWithQueryParams(req);
+    try {
+      const {shouldBeRedirected, targetUrlWithQueryParams} = getTargetUrlWithQueryParams(req);
 
-    //console.log(shouldBeRedirected, targetUrlWithQueryParams);
-    if (shouldBeRedirected) {
-      return res.redirect(targetUrlWithQueryParams.href);
+      //console.log(shouldBeRedirected, targetUrlWithQueryParams);
+      if (shouldBeRedirected) {
+        return res.redirect(targetUrlWithQueryParams.href);
+      }
+
+      // Apply the proxy middleware
+      OIDCProxy(req, res, next);
+    } catch (e) {
+      res.status(500).send(e.message);
     }
-
-    // Apply the proxy middleware
-    OIDCProxy(req, res, next);
   });
 };
