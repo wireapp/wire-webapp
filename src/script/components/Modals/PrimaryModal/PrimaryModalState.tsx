@@ -143,7 +143,7 @@ const updateCurrentModalContent = (type: PrimaryModalType, options: ModalOptions
     copyPassword,
     currentType: type,
     inputPlaceholder: text.input ?? '',
-    message: text.htmlMessage ?? '',
+    message: text.htmlMessage ?? text.message ?? '',
     modalUie: type,
     onBgClick: preventClose ? noop : removeCurrentModal,
     primaryAction: primaryAction ?? null,
