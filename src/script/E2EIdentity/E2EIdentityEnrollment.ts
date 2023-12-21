@@ -45,7 +45,7 @@ export enum E2EIHandlerStep {
 interface E2EIHandlerParams {
   discoveryUrl: string;
   gracePeriodInSeconds: number;
-  isFreshMLSSelfClient?: boolean;
+  isFreshMLSSelfClient: boolean;
 }
 
 type Events = {enrollmentSuccessful: void};
@@ -54,7 +54,9 @@ type EnrollmentConfig = {
   timer: DelayTimerService;
   discoveryUrl: string;
   gracePeriodInMs: number;
+  isFreshMLSSelfClient: boolean;
 };
+
 export class E2EIHandler extends TypedEventEmitter<Events> {
   private static instance: E2EIHandler | null = null;
   private readonly core = container.resolve(Core);
@@ -104,8 +106,9 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
             gracePeriodExpiredCallback: () => null,
             delayPeriodExpiredCallback: () => null,
           }),
+          isFreshMLSSelfClient,
         };
-        this.showE2EINotificationMessage(isFreshMLSSelfClient);
+        this.showE2EINotificationMessage();
       }
     }
     return this;
@@ -228,17 +231,15 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
         this.currentStep = E2EIHandlerStep.INITIALIZED;
         void this.enroll();
       },
-      secondaryActionFn: async () => {
-        const isFreshMLSSelfClient = await this.coreE2EIService.isFreshMLSSelfClient();
-
-        this.showE2EINotificationMessage(isFreshMLSSelfClient);
+      secondaryActionFn: () => {
+        this.showE2EINotificationMessage();
       },
     });
 
     PrimaryModal.show(modalType, modalOptions);
   }
 
-  private showE2EINotificationMessage(freshMLSSelfClient = false): void {
+  private showE2EINotificationMessage(): void {
     // If the user has already started enrolment, don't show the notification. Instead, show the loading modal
     // This will occur after the redirect from the oauth provider
     if (this.coreE2EIService.isEnrollmentInProgress()) {
@@ -255,15 +256,11 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     if (this.currentStep === E2EIHandlerStep.UNINITIALIZED) {
       this.config?.timer.updateParams({
         gracePeriodInMS: this.config.gracePeriodInMs,
-        gracePeriodExpiredCallback: async () => {
-          const isFreshMLSSelfClient = await this.coreE2EIService.isFreshMLSSelfClient();
-
-          this.showE2EINotificationMessage(isFreshMLSSelfClient);
+        gracePeriodExpiredCallback: () => {
+          this.showE2EINotificationMessage();
         },
-        delayPeriodExpiredCallback: async () => {
-          const isFreshMLSSelfClient = await this.coreE2EIService.isFreshMLSSelfClient();
-
-          this.showE2EINotificationMessage(isFreshMLSSelfClient);
+        delayPeriodExpiredCallback: () => {
+          this.showE2EINotificationMessage();
         },
       });
       this.currentStep = E2EIHandlerStep.INITIALIZED;
@@ -272,7 +269,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     // If the timer is not active, show the notification
     if (this.config && !this.config.timer.isDelayTimerActive()) {
       const {modalOptions, modalType} = getModalOptions({
-        hideSecondary: !this.config.timer.isSnoozeTimeAvailable() || !freshMLSSelfClient,
+        hideSecondary: !this.config.timer.isSnoozeTimeAvailable() || this.config.isFreshMLSSelfClient,
         primaryActionFn: () => this.enroll(),
         secondaryActionFn: () => {
           this.currentStep = E2EIHandlerStep.SNOOZE;

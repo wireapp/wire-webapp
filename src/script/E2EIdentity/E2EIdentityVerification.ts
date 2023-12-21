@@ -78,5 +78,7 @@ export function hasActiveCertificate() {
 }
 
 export async function isFreshMLSSelfClient() {
-  return getE2EIdentityService().isFreshMLSSelfClient();
+  const isFreshMLSSelfClient = await getE2EIdentityService().isFreshMLSSelfClient();
+  // negation because we get reversed value
+  return !isFreshMLSSelfClient;
 }

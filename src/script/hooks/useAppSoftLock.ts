@@ -32,7 +32,7 @@ export function useAppSoftLock(callingRepository: CallingRepository, notificatio
   const checkIfIsFreshMLSSelfClient = async () => {
     const initializedIsFreshMLSSelfClient = await isFreshMLSSelfClient();
 
-    setFreshMLSSelfClient(!initializedIsFreshMLSSelfClient);
+    setFreshMLSSelfClient(initializedIsFreshMLSSelfClient);
 
     callingRepository.setSoftLock(true);
     notificationRepository.setSoftLock(true);
