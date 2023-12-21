@@ -489,6 +489,7 @@ export class ConversationMapper {
       const baseUrl = `${window.wire.env.URL.ACCOUNT_BASE}/conversation-join/?key=${accessCode.key}&code=${accessCode.code}`;
       const accessCodeUrl = conversation.domain ? `${baseUrl}&domain=${conversation.domain}` : baseUrl;
       conversation.accessCode(accessCodeUrl);
+      conversation.accessCodeHasPassword(accessCode.has_password);
     }
   }
 

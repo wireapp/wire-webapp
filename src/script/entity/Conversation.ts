@@ -22,6 +22,7 @@ import {
   CONVERSATION_ACCESS,
   CONVERSATION_LEGACY_ACCESS_ROLE,
   CONVERSATION_TYPE,
+  DefaultConversationRoleName,
 } from '@wireapp/api-client/lib/conversation/';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
@@ -98,6 +99,7 @@ export class Conversation {
   public blockLegalHoldMessage: boolean;
   public hasCreationMessage: boolean;
   public readonly accessCode: ko.Observable<string>;
+  public readonly accessCodeHasPassword: ko.Observable<boolean | undefined>;
   public readonly accessState: ko.Observable<ACCESS_STATE>;
   public readonly archivedTimestamp: ko.Observable<number>;
   public readonly call: ko.Observable<Call | null>;
@@ -197,6 +199,7 @@ export class Conversation {
 
     this.accessState = ko.observable();
     this.accessCode = ko.observable();
+    this.accessCodeHasPassword = ko.observable();
     this.creator = undefined;
     this.name = ko.observable();
     this.teamId = undefined;
@@ -607,6 +610,10 @@ export class Conversation {
       this.is_loaded(false);
       this.hasAdditionalMessages(true);
     }
+  }
+
+  public isAdmin(userId: QualifiedId) {
+    return this.roles()[userId.id] === DefaultConversationRoleName.WIRE_ADMIN;
   }
 
   /**

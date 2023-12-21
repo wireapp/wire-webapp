@@ -105,9 +105,9 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
     }
   }
 
-  async requestAccessCode(conversationEntity: Conversation): Promise<void> {
+  async requestAccessCode(conversationEntity: Conversation, password?: string): Promise<void> {
     try {
-      const response = await this.conversationService.postConversationCode(conversationEntity.id);
+      const response = await this.conversationService.postConversationCode(conversationEntity.id, password);
       const accessCode = response && response.data;
       if (accessCode) {
         ConversationMapper.mapAccessCode(conversationEntity, accessCode);

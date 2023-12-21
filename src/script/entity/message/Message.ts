@@ -220,7 +220,7 @@ export class Message {
    * @returns `true`, if message is deletable, `false` otherwise.
    */
   isDeletable(): boolean {
-    return !this.hasUnavailableAsset(false) && !this.isComposite() && this.status() !== StatusType.SENDING;
+    return !this.hasUnavailableAsset(false) && !this.isComposite();
   }
 
   /**

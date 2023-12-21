@@ -49,15 +49,7 @@ export class DexieDatabase extends Dexie {
     super(dbName);
     this.logger = getLogger(`Dexie (${dbName})`);
 
-    StorageSchemata.SCHEMATA.forEach(({schema, upgrade, version}) => {
-      const versionInstance = this.version(version).stores(schema);
-      if (upgrade) {
-        versionInstance.upgrade((transaction: Transaction) => {
-          this.logger.warn(`Database upgrade to version '${version}'`);
-          upgrade(transaction, this);
-        });
-      }
-    });
+    void this.initDbSchema();
 
     this.amplify = this.table(StorageSchemata.OBJECT_STORE.AMPLIFY);
     this.clients = this.table(StorageSchemata.OBJECT_STORE.CLIENTS);
@@ -70,4 +62,28 @@ export class DexieDatabase extends Dexie {
     this.users = this.table(StorageSchemata.OBJECT_STORE.USERS);
     this.groupIds = this.table(StorageSchemata.OBJECT_STORE.GROUP_IDS);
   }
+
+  private readonly initDbSchema = async (): Promise<void> => {
+    StorageSchemata.SCHEMATA.forEach(({schema, upgrade, version}) => {
+      const versionInstance = this.version(version).stores(schema);
+      if (upgrade) {
+        versionInstance.upgrade((transaction: Transaction) => {
+          this.logger.warn(`Database upgrade to version '${version}'`);
+          upgrade(transaction, this);
+        });
+      }
+    });
+  };
+
+  public readonly runDbSchemaUpdates = async (archiveVersion: number): Promise<void> => {
+    for (const {upgrade, version} of StorageSchemata.SCHEMATA) {
+      // If the archive version is greater than the current version, run the upgrade
+      if (upgrade && version > archiveVersion) {
+        await this.transaction('rw', this.tables, transaction => {
+          this.logger.info(`Running DB schema update for version '${version}'`);
+          upgrade(transaction, this);
+        });
+      }
+    }
+  };
 }

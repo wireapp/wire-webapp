@@ -17,18 +17,27 @@
  *
  */
 
+import type {ConversationJoinData} from '@wireapp/api-client/lib/conversation/data/ConversationJoinData';
+import type {BackendError} from '@wireapp/api-client/lib/http/';
+
 import {AppActions, CONVERSATION_ACTION} from '../action/creator/';
 
 export interface ConversationState {
-  error: Error & {label?: string};
+  error: (Error & {label?: string; code?: number; message?: string}) | null;
   fetched: boolean;
   fetching: boolean;
+  conversationInfoFetching: boolean;
+  conversationInfoError: BackendError | null;
+  conversationInfo: ConversationJoinData | null;
 }
 
 export const initialConversationState: ConversationState = {
   error: null,
   fetched: false,
   fetching: false,
+  conversationInfoFetching: false,
+  conversationInfoError: null,
+  conversationInfo: null,
 };
 
 export function conversationReducer(
@@ -57,6 +66,29 @@ export function conversationReducer(
       return {
         ...state,
         fetching: false,
+      };
+    }
+    case CONVERSATION_ACTION.CONVERSATION_CODE_GET_INFO_START: {
+      return {
+        ...state,
+        conversationInfoFetching: true,
+        conversationInfoError: null,
+      };
+    }
+    case CONVERSATION_ACTION.CONVERSATION_CODE_GET_INFO_FAILED: {
+      return {
+        ...state,
+        conversationInfoFetching: false,
+        conversationInfoError: null,
+      };
+    }
+    case CONVERSATION_ACTION.CONVERSATION_CODE_GET_INFO_SUCCESS: {
+      return {
+        ...state,
+        fetching: false,
+        conversationInfoFetching: false,
+        conversationInfoError: null,
+        conversationInfo: {...state.conversationInfo, ...action.payload},
       };
     }
     default: {

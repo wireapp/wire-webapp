@@ -24,13 +24,13 @@ import cx from 'classnames';
 
 import {handleKeyDown} from 'Util/KeyboardUtil';
 
-export interface CopyToClipboardProps {
+export interface SelectTextProps {
   text: string;
   className?: string;
   dataUieName?: string;
 }
 
-const CopyToClipboard: React.FC<CopyToClipboardProps> = ({text, className = '', dataUieName = 'copy-to-clipboard'}) => {
+const SelectText: React.FC<SelectTextProps> = ({text, className = '', dataUieName = 'select-text'}) => {
   const onClick = ({currentTarget}: React.UIEvent) => {
     if (window.getSelection) {
       const selectionRange = document.createRange();
@@ -49,7 +49,8 @@ const CopyToClipboard: React.FC<CopyToClipboardProps> = ({text, className = '', 
       role="button"
       tabIndex={TabIndex.FOCUSABLE}
       data-uie-name={dataUieName}
-      className={cx('copy-to-clipboard', className)}
+      css={{wordBreak: 'break-all'}}
+      className={cx('select-text', className)}
       onClick={onClick}
       onKeyDown={event => handleKeyDown(event, () => onClick(event))}
     >
@@ -58,4 +59,4 @@ const CopyToClipboard: React.FC<CopyToClipboardProps> = ({text, className = '', 
   );
 };
 
-export {CopyToClipboard};
+export {SelectText};

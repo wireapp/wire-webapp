@@ -70,7 +70,7 @@ const PhoneLoginComponent = ({
   const {formatMessage: _} = useIntl();
   const navigate = useNavigate();
 
-  const [error, setError] = useState();
+  const [error, setError] = useState<Error>();
 
   const handleSubmit = async (formLoginData: Partial<LoginData>, validationErrors: Error[]) => {
     try {
@@ -88,11 +88,11 @@ const PhoneLoginComponent = ({
         case error instanceof ValidationError:
         case error instanceof InvalidPhoneNumberError:
         case error instanceof ForbiddenPhoneNumberError: {
-          setError(error);
+          setError(error as Error);
           break;
         }
         default: {
-          setError(error);
+          setError(error as Error);
           throw error;
         }
       }
