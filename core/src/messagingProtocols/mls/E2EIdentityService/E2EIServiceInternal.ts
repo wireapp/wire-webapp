@@ -92,12 +92,12 @@ class E2EIServiceInternal {
     return E2EIServiceInternal.instance;
   }
 
-  public async startCertificateProcess(refreshActiveCertificate: boolean) {
+  public async startCertificateProcess() {
     // Step 0: Check if we have a handle in local storage
     // If we don't have a handle, we need to start a new OAuth flow
     try {
       // Initialize the identity
-      await this.initIdentity(refreshActiveCertificate);
+      await this.initIdentity();
       return this.startNewOAuthFlow();
     } catch (error) {
       return this.exitWithError('Error while trying to start OAuth flow with error:', error);
@@ -119,20 +119,25 @@ class E2EIServiceInternal {
 
   // ############ Internal Functions ############
 
-  private async initIdentity(refreshActiveCertificate: boolean) {
+  private async initIdentity() {
     const {clientId, user} = E2EIStorage.get.initialData();
     const e2eiClientId = getE2EIClientId(clientId, user.id, user.domain).asString;
     const expiryDays = 2;
     const ciphersuite = Ciphersuite.MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519;
 
-    if (refreshActiveCertificate) {
-      this.identity = await this.coreCryptoClient.e2eiNewRotateEnrollment(
-        e2eiClientId,
-        expiryDays,
-        ciphersuite,
-        user.displayName,
-        user.handle,
-      );
+    if (this.e2eServiceExternal.hasActiveCertificate()) {
+      try {
+        this.identity = await this.coreCryptoClient.e2eiNewRotateEnrollment(
+          e2eiClientId,
+          expiryDays,
+          ciphersuite,
+          user.displayName,
+          user.handle,
+        );
+      } catch (error) {
+        this.logger.error('Error while trying to initIdentity e2eiNewRotateEnrollment', error);
+        throw error;
+      }
     } else {
       this.identity = await this.coreCryptoClient.e2eiNewActivationEnrollment(
         e2eiClientId,
@@ -321,7 +326,12 @@ class E2EIServiceInternal {
     E2EIStorage.store.certificate(certificate);
 
     // Step 10: Initialize MLS with the certificate
-    return await this.coreCryptoClient.e2eiRotateAll(this.identity, certificate, this.keyPackagesAmount);
+    try {
+      return await this.coreCryptoClient.e2eiRotateAll(this.identity, certificate, this.keyPackagesAmount);
+    } catch (error) {
+      this.logger.error('Error while e2eiRotateAll', error);
+      throw error;
+    }
   }
 
   /**
@@ -394,7 +404,7 @@ class E2EIServiceInternal {
       }
 
       // We need to initialize the identity
-      await this.initIdentity(true);
+      await this.initIdentity();
 
       await this.getAndStoreInitialEnrollmentData();
 
