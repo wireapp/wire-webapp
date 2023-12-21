@@ -54,8 +54,8 @@ export const useUserIdentity = (userId: QualifiedId, groupId?: string, updateAft
     status: !deviceIdentities
       ? undefined
       : deviceIdentities.length > 0 && deviceIdentities.every(identity => identity.status === MLSStatuses.VALID)
-      ? MLSStatuses.VALID
-      : MLSStatuses.NOT_DOWNLOADED,
+        ? MLSStatuses.VALID
+        : MLSStatuses.NOT_DOWNLOADED,
 
     getDeviceIdentity:
       deviceIdentities !== undefined
