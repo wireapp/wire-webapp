@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [43.2.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@43.1.4...@wireapp/core@43.2.0) (2023-12-21)
+
+### Features
+
+* replace refreshActiveCertificate with hasActiveCertificate and initialise MLSService with e2eServiceExternal ([#5815](https://github.com/wireapp/wire-web-packages/issues/5815)) ([dc24b45](https://github.com/wireapp/wire-web-packages/commit/dc24b457dd065624f5a8f2cf010272115c9bd0fc))
+
 ## [43.1.4](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@43.1.3...@wireapp/core@43.1.4) (2023-12-20)
 
 ### Bug Fixes
