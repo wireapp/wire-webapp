@@ -601,15 +601,15 @@ export class UserRepository extends TypedEventEmitter<Events> {
 
     const selfDomain = selfUser.qualifiedId.domain;
 
-    // When a federated backend is unreachable, try to load a user from the local database.
-    // Otherwise, we generate placeholder users locally with some default values
     const failedToLoad = failed.map(userId => {
+      // When a federated backend is unreachable, we try to load a user from the local database.
       const dbUserRecord = dbUsers?.find(user => matchQualifiedIds(user.qualified_id, userId));
 
       if (dbUserRecord && selfUser) {
         return this.userMapper.mapUserFromJson(dbUserRecord, selfDomain);
       }
 
+      // Otherwise, we generate placeholder users locally with some default values.
       return new User(userId.id, userId.domain);
     });
 
