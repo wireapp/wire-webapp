@@ -245,7 +245,7 @@ export class CallingViewModel {
           text: t('modalConfirmSecondary'),
         },
         text: {
-          htmlMessage: `<div class="modal-description">
+          message: `<div class="modal-description">
             ${t('groupCallConfirmationModalTitle', memberCount)}
           </div>`,
           closeBtnLabel: t('groupCallModalCloseBtnLabel'),
@@ -427,7 +427,7 @@ export class CallingViewModel {
             text: t('callingRestrictedConferenceCallOwnerModalUpgradeButton'),
           },
           text: {
-            htmlMessage: t(
+            message: t(
               'callingRestrictedConferenceCallOwnerModalDescription',
               {brandName: Config.getConfig().BRAND_NAME},
               replaceEnterprise,
@@ -446,7 +446,7 @@ export class CallingViewModel {
     } else {
       PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
         text: {
-          htmlMessage: t('callingRestrictedConferenceCallPersonalModalDescription', {
+          message: t('callingRestrictedConferenceCallPersonalModalDescription', {
             brandName: Config.getConfig().BRAND_NAME,
           }),
           title: t('callingRestrictedConferenceCallPersonalModalTitle'),

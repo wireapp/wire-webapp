@@ -19,38 +19,69 @@
 
 import React from 'react';
 
-interface Replacement {
-  start: string;
-  end: string;
-  render: (text: string) => React.ReactNode;
-}
+type Replacement =
+  | {
+      start: string;
+      end: string;
+      render: (text: string) => React.ReactNode;
+    }
+  | {
+      start: string;
+      render: () => React.ReactNode;
+    };
 
 function sanitizeRegexp(text: string) {
   return text.replaceAll('[', '\\[').replaceAll(']', '\\]');
 }
 
+export const generateLinkReplacement = (href: string, className: string = '', uieName: string = ''): Replacement => {
+  return {
+    start: '[link]',
+    end: '[/link]',
+    render: content => (
+      <a href={href} data-uie-name={uieName} className={className} rel="nofollow noopener noreferrer" target="_blank">
+        {content}
+      </a>
+    ),
+  };
+};
+
+const defaultReplacements: Replacement[] = [
+  {
+    start: '[br]',
+    render: () => <br />,
+  },
+];
+
 /**
  * Will replace all occurences of `replacements` by a React component returned by `render`.
  */
+
 export function replaceReactComponents(html: string, replacements: Replacement[]): React.ReactNode[] {
-  if (!replacements.length) {
-    return [html];
-  }
+  const allReplacements = replacements.concat(defaultReplacements);
+
   const splitRegexp = new RegExp(
-    `(${replacements
-      .map(replacement => `${sanitizeRegexp(replacement.start)}.+?${sanitizeRegexp(replacement.end)}`)
+    `(${allReplacements
+      .map(replacement =>
+        'end' in replacement
+          ? `${sanitizeRegexp(replacement.start)}.+?${sanitizeRegexp(replacement.end)}`
+          : sanitizeRegexp(replacement.start),
+      )
       .join('|')})`,
     'g',
   );
+
   return html
     .split(splitRegexp)
     .map(node => {
-      const match = replacements.find(
-        replacement => node.startsWith(replacement.start) && node.endsWith(replacement.end),
+      const match = allReplacements.find(
+        replacement =>
+          node.startsWith(replacement.start) && (!('end' in replacement) || node.endsWith(replacement.end)),
       );
 
       if (match) {
-        const text = node.substring(match.start.length, node.length - match.end.length);
+        const length = 'end' in match ? node.length - match.end.length : node.length;
+        const text = node.substring(match.start.length, length);
         return match.render(text);
       }
       return node;

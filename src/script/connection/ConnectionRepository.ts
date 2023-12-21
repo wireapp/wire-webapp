@@ -28,7 +28,7 @@ import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {replaceLink, t} from 'Util/LocalizerUtil';
+import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {isBackendError} from 'Util/TypePredicateUtil';
@@ -47,6 +47,7 @@ import {EventRepository} from '../event/EventRepository';
 import type {EventSource} from '../event/EventSource';
 import {SystemMessageType} from '../message/SystemMessageType';
 import type {UserRepository} from '../user/UserRepository';
+import {generateLinkReplacement, replaceReactComponents} from '../util/LocalizerUtil/ReactLocalizerUtil';
 
 export class ConnectionRepository {
   private readonly connectionService: ConnectionService;
@@ -202,14 +203,11 @@ export class ConnectionRepository {
       if (isBackendError(error)) {
         switch (error.label) {
           case BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT: {
-            const replaceLinkLegalHold = replaceLink(
-              Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK,
-              '',
-              'read-more-legal-hold',
-            );
             PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
               text: {
-                htmlMessage: t('modalUserCannotSendConnectionLegalHoldMessage', {}, replaceLinkLegalHold),
+                message: replaceReactComponents(t('modalUserCannotSendConnectionLegalHoldMessage'), [
+                  generateLinkReplacement(Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK, '', 'read-more-legal-hold'),
+                ]),
                 title: t('modalUserCannotConnectHeadline'),
               },
             });
@@ -219,7 +217,7 @@ export class ConnectionRepository {
           case BackendErrorLabel.FEDERATION_NOT_ALLOWED: {
             PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
               text: {
-                htmlMessage: t('modalUserCannotSendConnectionNotFederatingMessage', userEntity.name()),
+                message: t('modalUserCannotSendConnectionNotFederatingMessage', userEntity.name()),
                 title: t('modalUserCannotConnectHeadline'),
               },
             });
@@ -230,7 +228,7 @@ export class ConnectionRepository {
             this.logger.error(`Failed to send connection request to user '${userEntity.id}': ${error.message}`, error);
             PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
               text: {
-                htmlMessage: t('modalUserCannotSendConnectionMessage'),
+                message: t('modalUserCannotSendConnectionMessage'),
                 title: t('modalUserCannotConnectHeadline'),
               },
             });
@@ -330,7 +328,7 @@ export class ConnectionRepository {
         case ConnectionStatus.ACCEPTED: {
           PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
             text: {
-              htmlMessage: t('modalUserCannotAcceptConnectionMessage'),
+              message: t('modalUserCannotAcceptConnectionMessage'),
               title: t('modalUserCannotConnectHeadline'),
             },
           });
@@ -339,7 +337,7 @@ export class ConnectionRepository {
         case ConnectionStatus.CANCELLED: {
           PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
             text: {
-              htmlMessage: t('modalUserCannotCancelConnectionMessage'),
+              message: t('modalUserCannotCancelConnectionMessage'),
               title: t('modalUserCannotConnectHeadline'),
             },
           });
@@ -348,7 +346,7 @@ export class ConnectionRepository {
         case ConnectionStatus.IGNORED: {
           PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
             text: {
-              htmlMessage: t('modalUserCannotIgnoreConnectionMessage'),
+              message: t('modalUserCannotIgnoreConnectionMessage'),
               title: t('modalUserCannotConnectHeadline'),
             },
           });

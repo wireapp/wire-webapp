@@ -26,9 +26,10 @@ export interface Action {
 }
 
 export interface Text {
-  htmlMessage?: string;
   input?: string;
   message?: React.ReactNode;
+  /** @deprecated please use 'message' instead */
+  htmlMessage?: string;
   option?: string;
   title?: string;
   closeBtnLabel?: string;

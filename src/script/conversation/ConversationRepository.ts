@@ -2621,7 +2621,7 @@ export class ConversationRepository {
 
     PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
       text: {
-        htmlMessage: messageText,
+        message: messageText,
         title: titleText,
       },
     });

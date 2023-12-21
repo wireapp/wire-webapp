@@ -53,7 +53,6 @@ const defaultContent: ModalContent = {
   currentType: '',
   inputPlaceholder: '',
   message: '',
-  messageHtml: '',
   modalUie: '',
   onBgClick: noop,
   primaryAction: {} as Action,
@@ -144,8 +143,7 @@ const updateCurrentModalContent = (type: PrimaryModalType, options: ModalOptions
     copyPassword,
     currentType: type,
     inputPlaceholder: text.input ?? '',
-    messageHtml: text.htmlMessage,
-    message: text.message,
+    message: text.message ?? '',
     modalUie: type,
     onBgClick: preventClose ? noop : removeCurrentModal,
     primaryAction: primaryAction ?? null,
@@ -191,12 +189,12 @@ const updateCurrentModalContent = (type: PrimaryModalType, options: ModalOptions
     case PrimaryModalType.ACKNOWLEDGE: {
       content.primaryAction = {text: t('modalAcknowledgeAction'), ...primaryAction};
       content.titleText = text.title || t('modalAcknowledgeHeadline');
-      content.message = (!text.htmlMessage && text.message) || '';
+      content.message = text.message ?? '';
       break;
     }
     case PrimaryModalType.WITHOUT_TITLE: {
       content.primaryAction = {...primaryAction};
-      content.message = (!text.htmlMessage && text.message) || '';
+      content.message = text.message ?? '';
       break;
     }
     case PrimaryModalType.CONFIRM: {
@@ -214,7 +212,7 @@ const updateCurrentModalContent = (type: PrimaryModalType, options: ModalOptions
     case PrimaryModalType.SESSION_RESET: {
       content.titleText = t('modalSessionResetHeadline');
       content.primaryAction = {...primaryAction, text: t('modalAcknowledgeAction')};
-      content.messageHtml = t('modalSessionResetMessage', {}, replaceLink(Config.getConfig().URL.SUPPORT.BUG_REPORT));
+      content.message = t('modalSessionResetMessage', {}, replaceLink(Config.getConfig().URL.SUPPORT.BUG_REPORT));
       break;
     }
   }

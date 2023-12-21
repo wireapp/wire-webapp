@@ -65,4 +65,15 @@ describe('replaceReactComponents', () => {
 
     expect(result).toHaveLength(4);
   });
+
+  it('replaces self closing tags', () => {
+    const result = replaceReactComponents('Hello World <br> Bonjour Monde', [
+      {
+        start: '<br>',
+        render: () => <br />,
+      },
+    ]);
+
+    expect(result).toHaveLength(3);
+  });
 });
