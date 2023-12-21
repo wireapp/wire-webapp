@@ -16756,18 +16756,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"stylelint-config-prettier@npm:9.0.5":
-  version: 9.0.5
-  resolution: "stylelint-config-prettier@npm:9.0.5"
-  peerDependencies:
-    stylelint: ">= 11.x < 15"
-  bin:
-    stylelint-config-prettier: bin/check.js
-    stylelint-config-prettier-check: bin/check.js
-  checksum: 3d04e463e0bb7e42a5ddec49eea6ef4ea07705d887e8a3ff1fcb82278a5e2bec1a36b8498ea7ed2d24878de29d7c94ac75b1d3ac4f8b19c3a84970595b29261f
-  languageName: node
-  linkType: hard
-
 "stylelint-order@npm:^6.0.2":
   version: 6.0.4
   resolution: "stylelint-order@npm:6.0.4"
@@ -18438,7 +18426,6 @@ __metadata:
     style-loader: ^3.3.3
     stylelint: ^16
     stylelint-config-idiomatic-order: 10.0.0
-    stylelint-config-prettier: 9.0.5
     svg-inline-loader: 0.8.2
     switch-path: 1.2.0
     terser-webpack-plugin: 5.3.9
