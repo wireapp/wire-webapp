@@ -20,6 +20,7 @@
 import {FC, useCallback, useRef, useState} from 'react';
 
 import {amplify} from 'amplify';
+import ko from 'knockout';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 

@@ -20,6 +20,7 @@
 import React, {useMemo, useState, useEffect} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import ko from 'knockout';
 
 import {Conversation} from 'src/script/entity/Conversation';
 import {CompositeMessage} from 'src/script/entity/message/CompositeMessage';
