@@ -29,29 +29,19 @@ describe('AudioRepository', () => {
   const audioRepository = new AudioRepository();
 
   describe('init', () => {
-    it('inits all the sounds without preload', () => {
-      spyOn(window, 'Audio').and.callFake(function () {
-        this.load = () => {};
-        spyOn(this, 'load');
-      });
+    it('inits all the sounds with preload', () => {
+      jest.spyOn(window, 'Audio').mockImplementation(
+        () =>
+          ({
+            load: jest.fn(),
+          }) as unknown as HTMLAudioElement,
+      );
+
       audioRepository.init();
 
       expect(window.Audio).toHaveBeenCalledTimes(Object.keys(AudioType).length);
-      Object.values(audioRepository.audioElements).forEach(audioElement => {
-        expect(audioElement.load).not.toHaveBeenCalled();
-      });
-    });
 
-    it('inits all the sounds with preload', () => {
-      spyOn(window, 'Audio').and.callFake(function () {
-        this.load = () => {};
-        spyOn(this, 'load');
-      });
-      audioRepository.init(true);
-
-      expect(window.Audio).toHaveBeenCalledTimes(Object.keys(AudioType).length);
-
-      Object.values(audioRepository.audioElements).forEach(audioElement => {
+      Object.values(audioRepository['audioElements']).forEach(audioElement => {
         expect(audioElement.load).toHaveBeenCalledTimes(1);
       });
     });
@@ -59,24 +49,26 @@ describe('AudioRepository', () => {
 
   describe('play', () => {
     beforeEach(() => {
-      spyOn(window, 'Audio').and.callFake(function () {
-        this.load = () => {};
-        this.play = () => {};
-        this.paused = true;
-        spyOn(this, 'play');
-      });
+      jest.spyOn(window, 'Audio').mockImplementation(
+        () =>
+          ({
+            load: jest.fn(),
+            play: jest.fn(),
+            paused: true,
+          }) as unknown as HTMLAudioElement,
+      );
       audioRepository.init();
       audioRepository.setMutedState(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
     });
 
     it('only plays muted allowed sounds when in muted state', () => {
       audioRepository.setAudioPreference(AudioPreference.NONE);
-      audioRepository.setMutedState('whatever');
+      audioRepository.setMutedState(NOTIFICATION_HANDLING_STATE.RECOVERY);
       const forcedSounds = AudioPlayingType.MUTED;
 
       const forcedPromises = forcedSounds.map(audioId => {
         return audioRepository.play(audioId).then(() => {
-          expect(audioRepository.audioElements[audioId].play).toHaveBeenCalledTimes(1);
+          expect(audioRepository['audioElements'][audioId].play).toHaveBeenCalledTimes(1);
         });
       });
 
@@ -84,7 +76,7 @@ describe('AudioRepository', () => {
 
       const ignoredPromises = ignoredSounds.map(audioId => {
         return audioRepository.play(audioId).then(() => {
-          expect(audioRepository.audioElements[audioId].play).not.toHaveBeenCalledTimes(1);
+          expect(audioRepository['audioElements'][audioId].play).not.toHaveBeenCalledTimes(1);
         });
       });
 
@@ -97,7 +89,7 @@ describe('AudioRepository', () => {
 
       const allowedPromises = allowedSounds.map(audioId => {
         return audioRepository.play(audioId).then(() => {
-          expect(audioRepository.audioElements[audioId].play).toHaveBeenCalledTimes(1);
+          expect(audioRepository['audioElements'][audioId].play).toHaveBeenCalledTimes(1);
         });
       });
 
@@ -105,7 +97,7 @@ describe('AudioRepository', () => {
 
       const ignoredPromises = ignoredSounds.map(audioId => {
         return audioRepository.play(audioId).then(() => {
-          expect(audioRepository.audioElements[audioId].play).not.toHaveBeenCalledTimes(1);
+          expect(audioRepository['audioElements'][audioId].play).not.toHaveBeenCalledTimes(1);
         });
       });
 
@@ -118,7 +110,7 @@ describe('AudioRepository', () => {
 
       const testPromises = sounds.map(audioId => {
         return audioRepository.play(audioId).then(() => {
-          expect(audioRepository.audioElements[audioId].play).not.toHaveBeenCalled();
+          expect(audioRepository['audioElements'][audioId].play).not.toHaveBeenCalled();
         });
       });
 
