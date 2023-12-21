@@ -6399,13 +6399,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"base64-arraybuffer-es6@npm:^0.7.0":
-  version: 0.7.0
-  resolution: "base64-arraybuffer-es6@npm:0.7.0"
-  checksum: 6d2fd114df49201b476cea5d470504e5d4e8c4cd42544152b312c9bdcb824313086fe83f1ffc34262e9e276b82d46aefc6e63bb85553f016932061137b355cdf
-  languageName: node
-  linkType: hard
-
 "base64-js@npm:^1.3.1":
   version: 1.5.1
   resolution: "base64-js@npm:1.5.1"
@@ -9180,12 +9173,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fake-indexeddb@npm:4.0.2":
-  version: 4.0.2
-  resolution: "fake-indexeddb@npm:4.0.2"
-  dependencies:
-    realistic-structured-clone: ^3.0.0
-  checksum: ad257e5cc6273d9ea667b4129d8b0798830d56a68c7c77ddba752b3fd0088cb33e34b9569b218d16dfc8a78733d360d325f89c2ce352b70a0587c1f46f6f881d
+"fake-indexeddb@npm:5.0.1":
+  version: 5.0.1
+  resolution: "fake-indexeddb@npm:5.0.1"
+  checksum: b9bf94003e40923513863dde1f0f852fb00faa9d31db5203e4142e7937371e9061801b68cfdd37b321df1a314b2a30788b904be909685302d8f9c37a54580cb9
   languageName: node
   linkType: hard
 
@@ -15564,17 +15555,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"realistic-structured-clone@npm:^3.0.0":
-  version: 3.0.0
-  resolution: "realistic-structured-clone@npm:3.0.0"
-  dependencies:
-    domexception: ^1.0.1
-    typeson: ^6.1.0
-    typeson-registry: ^1.0.0-alpha.20
-  checksum: b4521b299c8dc320a5e3ef44678f80a92b0f1837901a5fbd1c7be06808110fb0b591b417114306ec55b44ef47fd17968aacca079afc9665afbe1c528026295ec
-  languageName: node
-  linkType: hard
-
 "rechoir@npm:^0.8.0":
   version: 0.8.0
   resolution: "rechoir@npm:0.8.0"
@@ -17679,17 +17659,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typeson-registry@npm:^1.0.0-alpha.20":
-  version: 1.0.0-alpha.39
-  resolution: "typeson-registry@npm:1.0.0-alpha.39"
-  dependencies:
-    base64-arraybuffer-es6: ^0.7.0
-    typeson: ^6.0.0
-    whatwg-url: ^8.4.0
-  checksum: c6b629697acf4652aecfff7be760356d764600afc9beca253278bbfc44fae0fe635b7619201b83e497cdc30645cbce7614d12a04b5726d9b8b505f73e6a3fc2a
-  languageName: node
-  linkType: hard
-
 "typeson@npm:5.18.2, typeson@npm:^5.18.2":
   version: 5.18.2
   resolution: "typeson@npm:5.18.2"
@@ -17697,13 +17666,6 @@ __metadata:
     core-js-bundle: ^3.6.4
     regenerator-runtime: ^0.13.3
   checksum: ce2cb4899a925d7a960de0c83ec0665859faa5bc0de246cb0f52b7ae05b6b6e2bff4fb7d191e7f51605b71ed394894164cdef3f2fafb1e9ba6ff647962fa0517
-  languageName: node
-  linkType: hard
-
-"typeson@npm:^6.0.0, typeson@npm:^6.1.0":
-  version: 6.1.0
-  resolution: "typeson@npm:6.1.0"
-  checksum: 00a77b03ac8f704acb103307bad9295fe47d6b304c386297f078ec3be63875c0b81e022a4815edb9dc2c7da0a72a431345411d35c755a8510af4a420e9e46cdc
   languageName: node
   linkType: hard
 
@@ -18324,7 +18286,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"whatwg-url@npm:^8.1.0, whatwg-url@npm:^8.4.0":
+"whatwg-url@npm:^8.1.0":
   version: 8.7.0
   resolution: "whatwg-url@npm:8.7.0"
   dependencies:
@@ -18518,7 +18480,7 @@ __metadata:
     emoji-picker-react: 4.5.16
     eslint: ^8.56.0
     eslint-plugin-prettier: ^5.0.1
-    fake-indexeddb: 4.0.2
+    fake-indexeddb: 5.0.1
     generate-changelog: 1.8.0
     highlight.js: 11.9.0
     html-webpack-plugin: ^5.5.4
