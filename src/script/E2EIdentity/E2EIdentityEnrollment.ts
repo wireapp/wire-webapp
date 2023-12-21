@@ -62,7 +62,6 @@ type EnrollmentConfig = {
   gracePeriodInMs: number;
 };
 
-const gracePeriodMS = 7 * TimeInMillis.DAY; //GP
 const historyTimeMS = 28 * TimeInMillis.DAY; //HT
 export class E2EIHandler extends TypedEventEmitter<Events> {
   private logger = getLogger('E2EIHandler');
@@ -144,7 +143,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       return;
     }
 
-    const renewalTimeMS = this.calculateRenewalTime(timeRemainingMS, historyTimeMS, gracePeriodMS);
+    const renewalTimeMS = this.calculateRenewalTime(timeRemainingMS, historyTimeMS, this.config!.gracePeriodInMs);
     const renewalPromptTime = new Date(certificateCreationTime + renewalTimeMS).getTime();
     const currentTime = new Date().getTime();
 
@@ -291,6 +290,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
       this.currentStep = E2EIHandlerStep.SUCCESS;
       this.showSuccessMessage();
+      this.emit('enrollmentSuccessful');
 
       // clear the oidc service progress/data and successful enrolment
       await this.cleanUp();
