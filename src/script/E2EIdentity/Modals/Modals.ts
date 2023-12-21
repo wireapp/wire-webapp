@@ -19,7 +19,7 @@
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {ModalOptions, PrimaryModalType} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
-import {t} from 'Util/LocalizerUtil';
+import {replaceLink, t} from 'Util/LocalizerUtil';
 
 const hideSecondaryBtn = {hideSecondary: true};
 const hideCloseBtn = {hideCloseBtn: true, preventClose: true};
@@ -52,12 +52,13 @@ export const getModalOptions = ({
   }
   let options: ModalOptions = {};
   let modalType: PrimaryModalType = PrimaryModal.type.CONFIRM;
+  const replaceLearnMore = replaceLink('learnMore');
   switch (type) {
     case ModalType.ENROLL:
       options = {
         text: {
           closeBtnLabel: t('acme.settingsChanged.button.close'),
-          htmlMessage: t('acme.settingsChanged.paragraph'),
+          htmlMessage: t('acme.settingsChanged.paragraph', {}, {br: '<br>', ...replaceLearnMore}),
           title: t('acme.settingsChanged.headline.alt'),
         },
         primaryAction: {
@@ -78,7 +79,7 @@ export const getModalOptions = ({
       options = {
         text: {
           closeBtnLabel: t('acme.error.button.close'),
-          htmlMessage: t('acme.error.paragraph'),
+          htmlMessage: t('acme.error.paragraph', {}, {br: '<br>'}),
           title: t('acme.error.headline'),
         },
         primaryAction: {

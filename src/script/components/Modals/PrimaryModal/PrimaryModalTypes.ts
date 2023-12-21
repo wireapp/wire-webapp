@@ -26,7 +26,7 @@ export interface Action {
 }
 
 export interface Text {
-  htmlMessage?: React.ReactNode;
+  htmlMessage?: string;
   input?: string;
   message?: React.ReactNode;
   option?: string;
@@ -79,6 +79,7 @@ export interface ModalContent {
   currentType: string | PrimaryModalType;
   inputPlaceholder: string;
   message: React.ReactNode;
+  messageHtml?: string;
   modalUie: string;
   onBgClick: () => void;
   primaryAction: Action | null;
