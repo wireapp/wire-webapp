@@ -68,6 +68,7 @@ import {UserState} from 'src/script/user/UserState';
 
 import {entities} from '../api/payloads';
 import {SelfRepository} from 'src/script/self/SelfRepository';
+import {AudioRepository} from 'src/script/audio/AudioRepository';
 
 export class TestFactory {
   constructor() {
@@ -269,6 +270,7 @@ export class TestFactory {
       serverTimeHandler,
       this.user_repository,
       this.assetRepository,
+      new AudioRepository(),
       this.user_repository['userState'],
       clientState,
     );
