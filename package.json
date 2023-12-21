@@ -32,7 +32,7 @@
     "knockout": "3.5.1",
     "lexical": "0.12.5",
     "libsodium-wrappers": "0.7.13",
-    "linkify-it": "4.0.1",
+    "linkify-it": "5.0.0",
     "long": "5.2.3",
     "markdown-it": "13.0.2",
     "murmurhash": "2.0.1",
