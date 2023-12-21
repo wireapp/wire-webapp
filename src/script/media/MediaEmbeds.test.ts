@@ -17,11 +17,15 @@
  *
  */
 
+import $ from 'jquery';
+
 import type {TypeUtil} from '@wireapp/commons';
 
 import {Configuration, Config} from 'src/script/Config';
 import {MediaEmbeds} from 'src/script/media/MediaEmbeds';
 import {MediaParser} from 'src/script/media/MediaParser';
+
+window.$ = $;
 
 describe('MediaEmbeds', () => {
   // Will test all common link variations

@@ -54,19 +54,6 @@ jest.mock('axios', () => {
 window.TextEncoder = encoding.TextEncoder;
 window.TextDecoder = encoding.TextDecoder;
 
-const sinon = require('sinon');
-window.sinon = sinon;
-
-const ko = require('knockout');
-window.ko = ko;
-
-const {amplify} = require('amplify');
-window.amplify = amplify;
-
-const jQuery = require('jquery');
-window.jQuery = jQuery;
-window.$ = jQuery;
-
 window.wire = {
   env: {
     BACKEND_REST: 'https://test.wire.link',

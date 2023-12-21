@@ -17,6 +17,7 @@
  *
  */
 
+import $ from 'jquery';
 import {URLParameter} from 'src/script/auth/URLParameter';
 import {
   forwardParameter,
@@ -27,6 +28,8 @@ import {
   getLinksFromHtml,
   prependProtocol,
 } from 'Util/UrlUtil';
+
+window.$ = $;
 
 describe('UrlUtil', () => {
   describe('appendParameter', () => {
