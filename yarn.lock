@@ -361,12 +361,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/parser@npm:^7.1.0, @babel/parser@npm:^7.14.7, @babel/parser@npm:^7.20.7, @babel/parser@npm:^7.22.15, @babel/parser@npm:^7.23.6, @babel/parser@npm:^7.9.4":
+"@babel/parser@npm:^7.1.0, @babel/parser@npm:^7.14.7, @babel/parser@npm:^7.20.7, @babel/parser@npm:^7.22.15, @babel/parser@npm:^7.23.6":
   version: 7.23.6
   resolution: "@babel/parser@npm:7.23.6"
   bin:
     parser: ./bin/babel-parser.js
   checksum: 140801c43731a6c41fd193f5c02bc71fd647a0360ca616b23d2db8be4b9739b9f951a03fc7c2db4f9b9214f4b27c1074db0f18bc3fa653783082d5af7c8860d5
+  languageName: node
+  linkType: hard
+
+"@babel/parser@npm:^7.9.4":
+  version: 7.23.5
+  resolution: "@babel/parser@npm:7.23.5"
+  bin:
+    parser: ./bin/babel-parser.js
+  checksum: ea763629310f71580c4a3ea9d3705195b7ba994ada2cc98f9a584ebfdacf54e92b2735d351672824c2c2b03c7f19206899f4d95650d85ce514a822b19a8734c7
   languageName: node
   linkType: hard
 
@@ -1459,12 +1468,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:^7.11.2, @babel/runtime@npm:^7.12.0, @babel/runtime@npm:^7.12.1, @babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.15.4, @babel/runtime@npm:^7.16.3, @babel/runtime@npm:^7.18.3, @babel/runtime@npm:^7.20.7, @babel/runtime@npm:^7.22.5, @babel/runtime@npm:^7.5.5, @babel/runtime@npm:^7.8.4, @babel/runtime@npm:^7.8.7, @babel/runtime@npm:^7.9.2":
+"@babel/runtime@npm:^7.11.2, @babel/runtime@npm:^7.12.0, @babel/runtime@npm:^7.12.1, @babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.16.3, @babel/runtime@npm:^7.18.3, @babel/runtime@npm:^7.20.7, @babel/runtime@npm:^7.22.5, @babel/runtime@npm:^7.5.5, @babel/runtime@npm:^7.8.4, @babel/runtime@npm:^7.8.7, @babel/runtime@npm:^7.9.2":
   version: 7.23.2
   resolution: "@babel/runtime@npm:7.23.2"
   dependencies:
     regenerator-runtime: ^0.14.0
   checksum: 6c4df4839ec75ca10175f636d6362f91df8a3137f86b38f6cd3a4c90668a0fe8e9281d320958f4fbd43b394988958585a17c3aab2a4ea6bf7316b22916a371fb
+  languageName: node
+  linkType: hard
+
+"@babel/runtime@npm:^7.15.4":
+  version: 7.23.5
+  resolution: "@babel/runtime@npm:7.23.5"
+  dependencies:
+    regenerator-runtime: ^0.14.0
+  checksum: 164d9802424f06908e62d29b8fd3a87db55accf82f46f964ac481dcead11ff7df8391e3696e5fa91a8ca10ea8845bf650acd730fa88cf13f8026cd8d5eec6936
   languageName: node
   linkType: hard
 
@@ -4592,7 +4610,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/libsodium-wrappers@npm:*, @types/libsodium-wrappers@npm:^0":
+"@types/libsodium-wrappers@npm:*":
+  version: 0.7.13
+  resolution: "@types/libsodium-wrappers@npm:0.7.13"
+  checksum: 94d608bed8ccd364754c3a7bf5d4c770b229efa33f0c475061b1b82bb8d5da8d57a72df0b8876b887077edbb6ff9594b7a1183029de4d1ad679821d1013f3db9
+  languageName: node
+  linkType: hard
+
+"@types/libsodium-wrappers@npm:^0":
   version: 0.7.12
   resolution: "@types/libsodium-wrappers@npm:0.7.12"
   checksum: 8f25b4ffe6b60c36f3c59b3dea2e952b8790c9b8375ee5235e6d294c1519a578b7882d773f168005eb0f3fdb4f11e06ba27b30b89d2c3b8be3f985c7eedd0491
@@ -4642,7 +4667,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:>=13.7.0, @types/node@npm:^20.10.5":
+"@types/node@npm:*, @types/node@npm:^20.10.5":
   version: 20.10.5
   resolution: "@types/node@npm:20.10.5"
   dependencies:
@@ -4655,6 +4680,15 @@ __metadata:
   version: 16.9.1
   resolution: "@types/node@npm:16.9.1"
   checksum: 41afcf183a22d59323a0199dd7e0f46591247f45fc08a4434edb26d56dc279ae4fdb80f37989ddd7a0f45e3857c4933e6e82057ede09c5a829f77e373e680375
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:>=13.7.0":
+  version: 20.10.1
+  resolution: "@types/node@npm:20.10.1"
+  dependencies:
+    undici-types: ~5.26.4
+  checksum: 9dfdcd2496ce535dba0ae496985d6e991a8a5d70a180db3a94c947a2123d99318a95dce4aa2a192f7e57c3afa3fdb44d6fd63e18efd49568950d6c239dadcc39
   languageName: node
   linkType: hard
 
@@ -5319,9 +5353,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:43.1.4":
-  version: 43.1.4
-  resolution: "@wireapp/core@npm:43.1.4"
+"@wireapp/core@npm:43.2.0":
+  version: 43.2.0
+  resolution: "@wireapp/core@npm:43.2.0"
   dependencies:
     "@wireapp/api-client": ^26.7.2
     "@wireapp/commons": ^5.2.3
@@ -5341,7 +5375,7 @@ __metadata:
     long: ^5.2.0
     uuidjs: 4.2.13
     zod: 3.22.4
-  checksum: fbac47e1d1847ad5a36c96a8bae5ba1db4f0026686daa5eacd524d941007e1fe3819e3afbd5b28182ed94e668c3497db8ea70cb16cdc98b47a0817ce736cff86
+  checksum: ea2a996c65111784be4b3befe21d5983d5d38969b9f58dea2d4a261b101a53f3dbf22504b5e0ab3842c65df2dc84188a08e848661a95bad3a605d80440533e8f
   languageName: node
   linkType: hard
 
@@ -18335,7 +18369,7 @@ __metadata:
     "@wireapp/avs": 9.5.2
     "@wireapp/commons": 5.2.3
     "@wireapp/copy-config": 2.1.12
-    "@wireapp/core": 43.1.4
+    "@wireapp/core": 43.2.0
     "@wireapp/eslint-config": 3.0.4
     "@wireapp/prettier-config": 0.6.3
     "@wireapp/react-ui-kit": 9.12.2

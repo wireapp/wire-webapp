@@ -54,18 +54,18 @@ tags.push(`${repository}:${versionTag}`);
 
 var configurationEntry;
 if (versionTag.includes('production')) {
-  configurationEntry = "wire-web-config-default-master";
+  configurationEntry = 'wire-web-config-default-master';
 } else {
-  configurationEntry = "wire-web-config-default-staging";
+  configurationEntry = 'wire-web-config-default-staging';
 }
 const configVersion = appConfigPkg.dependencies[configurationEntry].split('#')[1];
-const uniqueTag=`${versionTag}-${configVersion}-${commitShortSha}`;
+const uniqueTag = `${versionTag}-${configVersion}-${commitShortSha}`;
 tags.push(`${repository}:${uniqueTag}`);
 
 const dockerCommands = [
   `echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin ${dockerRegistryDomain}`,
   `docker build . --tag ${commitShortSha}`,
-  `if [ "${uniqueTagOut}" != "" ]; then echo -n "${uniqueTag}" > "${uniqueTagOut}"; fi`
+  `if [ "${uniqueTagOut}" != "" ]; then echo -n "${uniqueTag}" > "${uniqueTagOut}"; fi`,
 ];
 
 tags.forEach(containerImageTagValue => {
