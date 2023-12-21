@@ -58,6 +58,7 @@ export const PrimaryModalComponent: FC = () => {
     currentType,
     inputPlaceholder,
     message,
+    messageHtml,
     modalUie,
     onBgClick,
     primaryAction,
@@ -231,9 +232,10 @@ export const PrimaryModalComponent: FC = () => {
             </div>
 
             <FadingScrollbar className="modal__body">
-              {message && (
+              {(messageHtml || message) && (
                 <div className="modal__text" data-uie-name="status-modal-text">
-                  <div id="modal-description-html">{message}</div>
+                  {messageHtml && <p id="modal-description-html" dangerouslySetInnerHTML={{__html: messageHtml}} />}
+                  {message && <p id="modal-description-text">{message}</p>}
                 </div>
               )}
 

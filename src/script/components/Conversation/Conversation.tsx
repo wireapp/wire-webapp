@@ -297,7 +297,7 @@ export const Conversation = ({
         text: t('modalOpenLinkAction'),
       },
       text: {
-        message: t('modalOpenLinkMessage', href, {}, true),
+        htmlMessage: t('modalOpenLinkMessage', href, {}, true),
         title: t('modalOpenLinkTitle'),
       },
     });
