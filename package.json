@@ -135,7 +135,7 @@
     "postcss-loader": "^7.3.3",
     "postcss-preset-env": "^9.3.0",
     "postcss-scss": "4.0.9",
-    "prettier": "^3.0.3",
+    "prettier": "^3.1.1",
     "raf": "3.4.1",
     "redux-devtools-extension": "2.13.9",
     "redux-mock-store": "1.5.4",

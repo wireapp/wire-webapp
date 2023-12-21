@@ -182,8 +182,8 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
     const timedMessagesText = isSelfDeletingMessagesEnforced
       ? formatDuration(getEnforcedSelfDeletingMessagesTimeout).text
       : hasTimer && globalMessageTimer
-      ? formatDuration(globalMessageTimer).text
-      : t('ephemeralUnitsNone');
+        ? formatDuration(globalMessageTimer).text
+        : t('ephemeralUnitsNone');
 
     const showActionMute = isMutable && !isTeam;
     const isVerified = verificationState === ConversationVerificationState.VERIFIED;
