@@ -39,6 +39,7 @@ import {ConversationRepository} from './ConversationRepository';
 import {ConversationState} from './ConversationState';
 
 import {AssetRepository} from '../assets/AssetRepository';
+import {AudioRepository} from '../audio/AudioRepository';
 import {ClientEntity} from '../client/ClientEntity';
 import {ClientState} from '../client/ClientState';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
@@ -99,6 +100,7 @@ async function buildMessageRepository(): Promise<[MessageRepository, MessageRepo
       assignAllClients: jest.fn().mockResolvedValue(true),
     } as unknown as UserRepository,
     assetRepository: {} as AssetRepository,
+    audioRepository: new AudioRepository(),
     userState,
     clientState,
     conversationState,
