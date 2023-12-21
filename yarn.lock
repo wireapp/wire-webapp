@@ -7697,13 +7697,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"entities@npm:~3.0.1":
-  version: 3.0.1
-  resolution: "entities@npm:3.0.1"
-  checksum: aaf7f12033f0939be91f5161593f853f2da55866db55ccbf72f45430b8977e2b79dbd58c53d0fdd2d00bd7d313b75b0968d09f038df88e308aa97e39f9456572
-  languageName: node
-  linkType: hard
-
 "env-paths@npm:^2.2.0, env-paths@npm:^2.2.1":
   version: 2.2.1
   resolution: "env-paths@npm:2.2.1"
@@ -11674,7 +11667,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"linkify-it@npm:5.0.0":
+"linkify-it@npm:5.0.0, linkify-it@npm:^5.0.0":
   version: 5.0.0
   resolution: "linkify-it@npm:5.0.0"
   dependencies:
@@ -11689,15 +11682,6 @@ __metadata:
   dependencies:
     uc.micro: ^1.0.1
   checksum: 31367a4bb70c5bbc9703246236b504b0a8e049bcd4e0de4291fa50f0ebdebf235b5eb54db6493cb0b1319357c6eeafc4324c9f4aa34b0b943d9f2e11a1268fbc
-  languageName: node
-  linkType: hard
-
-"linkify-it@npm:^4.0.1":
-  version: 4.0.1
-  resolution: "linkify-it@npm:4.0.1"
-  dependencies:
-    uc.micro: ^1.0.1
-  checksum: 3e0a29921269c14eb7ac6f5db2da68d4854ea9acca6e9014a323f75f2dd39b197ffab57c1fbd6a906ceb021aad3ee6d7ba7d0181236dd9630ffc452b392f7f71
   languageName: node
   linkType: hard
 
@@ -12098,18 +12082,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"markdown-it@npm:13.0.2":
-  version: 13.0.2
-  resolution: "markdown-it@npm:13.0.2"
+"markdown-it@npm:14.0.0":
+  version: 14.0.0
+  resolution: "markdown-it@npm:14.0.0"
   dependencies:
     argparse: ^2.0.1
-    entities: ~3.0.1
-    linkify-it: ^4.0.1
-    mdurl: ^1.0.1
-    uc.micro: ^1.0.5
+    entities: ^4.4.0
+    linkify-it: ^5.0.0
+    mdurl: ^2.0.0
+    punycode.js: ^2.3.1
+    uc.micro: ^2.0.0
   bin:
-    markdown-it: bin/markdown-it.js
-  checksum: bb4bf2cb3e5d77a7f3dc9cf48e17d050fbcd26d37992204eaa5812220752858fe9debe439b2ae1de06e749a3bba537c0baf6ce7510307cf7163a70f04fafe672
+    markdown-it: bin/markdown-it.mjs
+  checksum: f63bd8b39b2232ad686ec49f046bbf51c34253e38295f5d44a8e5dc6ec5401e9a9fbed0bb88cbc1635608e2bb21c5a3c2336a2a9f52548c24be5abd06001bc01
   languageName: node
   linkType: hard
 
@@ -12179,6 +12164,13 @@ __metadata:
   version: 1.0.1
   resolution: "mdurl@npm:1.0.1"
   checksum: 71731ecba943926bfbf9f9b51e28b5945f9411c4eda80894221b47cc105afa43ba2da820732b436f0798fd3edbbffcd1fc1415843c41a87fea08a41cc1e3d02b
+  languageName: node
+  linkType: hard
+
+"mdurl@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "mdurl@npm:2.0.0"
+  checksum: 880bc289ef668df0bb34c5b2b5aaa7b6ea755052108cdaf4a5e5968ad01cf27e74927334acc9ebcc50a8628b65272ae6b1fd51fae1330c130e261c0466e1a3b2
   languageName: node
   linkType: hard
 
@@ -14414,6 +14406,13 @@ __metadata:
   version: 1.9.0
   resolution: "psl@npm:1.9.0"
   checksum: 20c4277f640c93d393130673f392618e9a8044c6c7bf61c53917a0fddb4952790f5f362c6c730a9c32b124813e173733f9895add8d26f566ed0ea0654b2e711d
+  languageName: node
+  linkType: hard
+
+"punycode.js@npm:^2.3.1":
+  version: 2.3.1
+  resolution: "punycode.js@npm:2.3.1"
+  checksum: 13466d7ed5e8dacdab8c4cc03837e7dd14218a59a40eb14a837f1f53ca396e18ef2c4ee6d7766b8ed2fc391d6a3ac489eebf2de83b3596f5a54e86df4a251b72
   languageName: node
   linkType: hard
 
@@ -17632,7 +17631,7 @@ __metadata:
     linkify-it: 5.0.0
     lint-staged: 15.2.0
     long: 5.2.3
-    markdown-it: 13.0.2
+    markdown-it: 14.0.0
     murmurhash: 2.0.1
     node-fetch: 2.7.0
     oidc-client-ts: ^2.4.0
