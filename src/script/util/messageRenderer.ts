@@ -20,7 +20,6 @@
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import hljs from 'highlight.js';
 import MarkdownIt from 'markdown-it';
-import {escapeHtml} from 'markdown-it/lib/common/utils';
 import {escape} from 'underscore';
 
 import {replaceInRange} from './StringUtil';
@@ -137,7 +136,7 @@ export const renderMessage = (message: string, selfId?: QualifiedId, mentionEnti
   };
 
   markdownit.renderer.rules.text = (tokens, idx) => {
-    const escapedText = escapeHtml(tokens[idx].content);
+    const escapedText = markdownit.utils.escapeHtml(tokens[idx].content);
 
     return renderMentions(escapedText);
   };
