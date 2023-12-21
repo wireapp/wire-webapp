@@ -35,6 +35,8 @@ import 'src/script/util/test/mock/SVGProviderMock';
 import 'src/script/util/test/mock/WebRTCMock';
 import 'src/script/util/test/mock/resizeObserver.mock';
 
+import encoding from 'text-encoding';
+
 jest.mock('axios', () => {
   return {
     create: () => {
@@ -49,9 +51,6 @@ jest.mock('axios', () => {
   };
 });
 
-require('test/api/payloads');
-
-const encoding = require('text-encoding');
 window.TextEncoder = encoding.TextEncoder;
 window.TextDecoder = encoding.TextDecoder;
 
