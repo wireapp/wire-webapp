@@ -220,13 +220,13 @@ export class UserRepository extends TypedEventEmitter<Events> {
     /* prior to April 2023, we were only storing the availability in the DB, we need to refetch those users */
     const [localUsers, incompleteUsers] = partition(dbUsers, user => !!user.qualified_id);
 
-    /** users we have in the DB that are not matching any loaded users */
+    // We can remove users that are not linked to any "known users" from the local database.
+    // Known users are the users that are part of the conversations or the connections (or some extra users)
     const orphanUsers = localUsers.filter(
       localUser => !users.find(user => matchQualifiedIds(user, localUser.qualified_id)),
     );
 
     for (const orphanUser of orphanUsers) {
-      // Remove users that are not linked to any loaded users
       await this.userService.removeUserFromDb(orphanUser.qualified_id);
     }
 
@@ -249,7 +249,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
     // Save all new users to the database
     await Promise.all(userWithAvailability.map(user => this.saveUserInDb(user)));
 
-    const mappedUsers = this.mapUserResponse(userWithAvailability, failed);
+    const mappedUsers = this.mapUserResponse(userWithAvailability, failed, dbUsers);
 
     // Assign connections to users
     mappedUsers.forEach(user => {
@@ -592,12 +592,28 @@ export class UserRepository extends TypedEventEmitter<Events> {
     );
   }
 
-  private mapUserResponse(found: APIClientUser[], failed: QualifiedId[]): User[] {
-    const failedToLoad = failed.map(
-      /* When a federated backend is unreachable, we generate placeholder users locally with some default values */
-      userId => new User(userId.id, userId.domain),
-    );
-    const mappedUsers = this.userMapper.mapUsersFromJson(found, this.userState.self().domain).concat(failedToLoad);
+  private mapUserResponse(found: APIClientUser[], failed: QualifiedId[], dbUsers?: UserRecord[]): User[] {
+    const selfUser = this.userState.self();
+
+    if (!selfUser) {
+      throw new Error('Self user is not defined');
+    }
+
+    const selfDomain = selfUser.qualifiedId.domain;
+
+    // When a federated backend is unreachable, try to load a user from the local database.
+    // Otherwise, we generate placeholder users locally with some default values
+    const failedToLoad = failed.map(userId => {
+      const dbUserRecord = dbUsers?.find(user => matchQualifiedIds(user.qualified_id, userId));
+
+      if (dbUserRecord && selfUser) {
+        return this.userMapper.mapUserFromJson(dbUserRecord, selfDomain);
+      }
+
+      return new User(userId.id, userId.domain);
+    });
+
+    const mappedUsers = this.userMapper.mapUsersFromJson(found, selfDomain).concat(failedToLoad);
     if (this.teamState.isTeam()) {
       this.mapGuestStatus(mappedUsers);
     }
