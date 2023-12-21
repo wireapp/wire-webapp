@@ -14851,12 +14851,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss-sorting@npm:^7.0.1":
-  version: 7.0.1
-  resolution: "postcss-sorting@npm:7.0.1"
+"postcss-sorting@npm:^8.0.2":
+  version: 8.0.2
+  resolution: "postcss-sorting@npm:8.0.2"
   peerDependencies:
-    postcss: ^8.3.9
-  checksum: 79cca6703ef7c60ea913c3bfb91f85bd7adce35e60b834a40cadd1c7e18f37961d63f0e641387651ee3bf1df1996e952d8fe443f93a271aa2d23f239ea3145bc
+    postcss: ^8.4.20
+  checksum: ebb5cc6a2982a1f0bb8332669e425793ebc01c30fa83ea981c765d64d212e289bef5fdb1e627904c471cb75f1ad0727ed9e85c0d879e263590c8fc64eecf31c2
   languageName: node
   linkType: hard
 
@@ -14911,7 +14911,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss@npm:^8.3.11, postcss@npm:^8.4.21":
+"postcss@npm:^8.4.21":
   version: 8.4.31
   resolution: "postcss@npm:8.4.31"
   dependencies:
@@ -16745,14 +16745,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"stylelint-config-idiomatic-order@npm:9.0.0":
-  version: 9.0.0
-  resolution: "stylelint-config-idiomatic-order@npm:9.0.0"
+"stylelint-config-idiomatic-order@npm:10.0.0":
+  version: 10.0.0
+  resolution: "stylelint-config-idiomatic-order@npm:10.0.0"
   dependencies:
-    stylelint-order: ^5.0.0
+    stylelint-order: ^6.0.2
   peerDependencies:
     stylelint: ">=11"
-  checksum: ff942702442cb60116ef35442f8ab15279fbaeb6ce6ca2e56f3b0fd11c1f5355a8aa4a8cdca5f64d5cfd3b4879f662e1a092333965a16342fc25d9ff230616c6
+  checksum: c8760d77dc8523bbeb5ca919ad00f3bd2593fc31af72637c2380c903d61022d39b5e8d971e03ab02705b1e70a8364c4f6fe5b1473ad8f9fd830067a537a32682
   languageName: node
   linkType: hard
 
@@ -16768,15 +16768,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"stylelint-order@npm:^5.0.0":
-  version: 5.0.0
-  resolution: "stylelint-order@npm:5.0.0"
+"stylelint-order@npm:^6.0.2":
+  version: 6.0.4
+  resolution: "stylelint-order@npm:6.0.4"
   dependencies:
-    postcss: ^8.3.11
-    postcss-sorting: ^7.0.1
+    postcss: ^8.4.32
+    postcss-sorting: ^8.0.2
   peerDependencies:
-    stylelint: ^14.0.0
-  checksum: fa3ace3cc65486b9f94165603bd04983636fda5ac959cd29bf87847a95b32f366b16faf612bd49e3b9f96073f8fe28a22a5c5727cc08c8f9d7327c89084b3f30
+    stylelint: ^14.0.0 || ^15.0.0 || ^16.0.1
+  checksum: 66ed8a80b34b98994e38d75671766f102d47c73362495b77861f0648efcc75cf3ad6f30f988c3cf16c9747ac139087ef1ff71b3bea40f9c5e081a25ebeb34feb
   languageName: node
   linkType: hard
 
@@ -18437,7 +18437,7 @@ __metadata:
     speakingurl: 14.0.1
     style-loader: ^3.3.3
     stylelint: ^16
-    stylelint-config-idiomatic-order: 9.0.0
+    stylelint-config-idiomatic-order: 10.0.0
     stylelint-config-prettier: 9.0.5
     svg-inline-loader: 0.8.2
     switch-path: 1.2.0
