@@ -235,7 +235,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     PrimaryModal.show(modalType, modalOptions);
   }
 
-  private showE2EINotificationMessage(): void {
+  private async showE2EINotificationMessage(): Promise<void> {
     // If the user has already started enrolment, don't show the notification. Instead, show the loading modal
     // This will occur after the redirect from the oauth provider
     if (this.coreE2EIService.isEnrollmentInProgress()) {
@@ -262,7 +262,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       this.currentStep = E2EIHandlerStep.INITIALIZED;
     }
 
-    const isFreshMLSSelfClient = void this.coreE2EIService.isFreshMLSSelfClient();
+    const isFreshMLSSelfClient = await this.coreE2EIService.isFreshMLSSelfClient();
 
     // If the timer is not active, show the notification
     if (this.config && !this.config.timer.isDelayTimerActive()) {
