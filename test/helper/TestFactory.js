@@ -45,7 +45,6 @@ import {CryptographyRepository} from 'src/script/cryptography/CryptographyReposi
 import {User} from 'src/script/entity/User';
 import {EventRepository} from 'src/script/event/EventRepository';
 import {EventService} from 'src/script/event/EventService';
-import {EventServiceNoCompound} from 'src/script/event/EventServiceNoCompound';
 import {NotificationService} from 'src/script/event/NotificationService';
 import {MediaRepository} from 'src/script/media/MediaRepository';
 import {PermissionRepository} from 'src/script/permission/PermissionRepository';
@@ -134,7 +133,6 @@ export class TestFactory {
     await this.exposeUserActors();
 
     this.event_service = new EventService(this.storage_service);
-    this.event_service_no_compound = new EventServiceNoCompound(this.storage_service);
     this.notification_service = new NotificationService(this.storage_service);
     this.conversation_service = new ConversationService(this.event_service);
 
