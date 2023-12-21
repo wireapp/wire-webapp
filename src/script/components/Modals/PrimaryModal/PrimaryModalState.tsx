@@ -53,6 +53,7 @@ const defaultContent: ModalContent = {
   currentType: '',
   inputPlaceholder: '',
   message: '',
+  htmlMessage: '',
   modalUie: '',
   onBgClick: noop,
   primaryAction: {} as Action,
@@ -144,6 +145,7 @@ const updateCurrentModalContent = (type: PrimaryModalType, options: ModalOptions
     currentType: type,
     inputPlaceholder: text.input ?? '',
     message: text.message ?? '',
+    htmlMessage: text.htmlMessage ?? '',
     modalUie: type,
     onBgClick: preventClose ? noop : removeCurrentModal,
     primaryAction: primaryAction ?? null,
@@ -212,7 +214,7 @@ const updateCurrentModalContent = (type: PrimaryModalType, options: ModalOptions
     case PrimaryModalType.SESSION_RESET: {
       content.titleText = t('modalSessionResetHeadline');
       content.primaryAction = {...primaryAction, text: t('modalAcknowledgeAction')};
-      content.message = t('modalSessionResetMessage', {}, replaceLink(Config.getConfig().URL.SUPPORT.BUG_REPORT));
+      content.htmlMessage = t('modalSessionResetMessage', {}, replaceLink(Config.getConfig().URL.SUPPORT.BUG_REPORT));
       break;
     }
   }
