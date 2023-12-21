@@ -71,7 +71,7 @@ export const showLegalHoldWarningModal = (
       },
       secondaryAction,
       text: {
-        message: t('legalHoldWarningMessage', {}, {br: '<br>'}),
+        htmlMessage: t('legalHoldWarningMessage', {}, {br: '<br>'}),
         title: t('legalHoldWarningTitle'),
       },
     });

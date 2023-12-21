@@ -191,12 +191,10 @@ const updateCurrentModalContent = (type: PrimaryModalType, options: ModalOptions
     case PrimaryModalType.ACKNOWLEDGE: {
       content.primaryAction = {text: t('modalAcknowledgeAction'), ...primaryAction};
       content.titleText = text.title || t('modalAcknowledgeHeadline');
-      content.message = text.message ?? '';
       break;
     }
     case PrimaryModalType.WITHOUT_TITLE: {
       content.primaryAction = {...primaryAction};
-      content.message = text.message ?? '';
       break;
     }
     case PrimaryModalType.CONFIRM: {
