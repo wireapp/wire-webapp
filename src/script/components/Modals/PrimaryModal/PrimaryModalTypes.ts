@@ -79,6 +79,7 @@ export interface ModalContent {
   currentType: string | PrimaryModalType;
   inputPlaceholder: string;
   message: React.ReactNode;
+  /** @deprecated please use `message` instead */
   messageHtml?: string;
   modalUie: string;
   onBgClick: () => void;
