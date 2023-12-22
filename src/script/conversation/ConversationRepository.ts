@@ -1243,20 +1243,22 @@ export class ConversationRepository {
     };
 
     try {
-      const {id: conversationId, name: conversationName} = await this.conversationService.getConversationJoin(
-        key,
-        code,
-      );
+      const {
+        id: conversationId,
+        name: conversationName,
+        has_password: hasPassword,
+      } = await this.conversationService.getConversationJoin(key, code);
       const knownConversation = this.conversationState.findConversation({domain: null, id: conversationId});
       if (knownConversation?.status() === ConversationStatus.CURRENT_MEMBER) {
         amplify.publish(WebAppEvents.CONVERSATION.SHOW, knownConversation, {});
         return;
       }
-      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
+      PrimaryModal.show(hasPassword ? PrimaryModal.type.JOIN_GUEST_LINK_PASSWORD : PrimaryModal.type.CONFIRM, {
+        preventClose: false,
         primaryAction: {
-          action: async () => {
+          action: async (password?: string) => {
             try {
-              const response = await this.conversationService.postConversationJoin(key, code);
+              const response = await this.conversationService.postConversationJoin(key, code, password);
               const conversationEntity = await this.getConversationById({
                 domain: domain ?? this.userState.self().domain,
                 id: conversationId,
@@ -1284,11 +1286,15 @@ export class ConversationRepository {
               }
             }
           },
-          text: t('modalConversationJoinConfirm'),
+          text: t('guestLinkPasswordModal.joinConversation'),
         },
         text: {
-          message: t('modalConversationJoinMessage', {conversationName}),
-          title: t('modalConversationJoinHeadline'),
+          message: hasPassword
+            ? t('guestLinkPasswordModal.conversationPasswordProtected')
+            : t('modalConversationJoinMessage', {conversationName}),
+          title: hasPassword
+            ? t('guestLinkPasswordModal.headline', {conversationName})
+            : t('modalConversationJoinHeadline'),
         },
       });
     } catch (error) {

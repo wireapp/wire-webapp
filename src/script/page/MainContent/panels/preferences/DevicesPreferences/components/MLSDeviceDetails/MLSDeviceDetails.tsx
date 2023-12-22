@@ -29,10 +29,13 @@ import {FormattedId} from '../FormattedId';
 
 interface MLSDeviceDetailsProps {
   isCurrentDevice?: boolean;
-  identity: WireIdentity | undefined;
+  identity?: WireIdentity;
 }
 
 export const MLSDeviceDetails = ({isCurrentDevice, identity}: MLSDeviceDetailsProps) => {
+  if (!isCurrentDevice && !identity) {
+    return null;
+  }
   return (
     <div css={styles.wrapper}>
       <h4 className="paragraph-body-3">{t('mlsSignature', MLSPublicKeys.ED25519.toUpperCase())}</h4>

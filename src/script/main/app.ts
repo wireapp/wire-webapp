@@ -71,7 +71,6 @@ import {ClientError, CLIENT_ERROR_TYPE} from '../error/ClientError';
 import {TeamError} from '../error/TeamError';
 import {EventRepository} from '../event/EventRepository';
 import {EventService} from '../event/EventService';
-import {EventServiceNoCompound} from '../event/EventServiceNoCompound';
 import {NotificationService} from '../event/NotificationService';
 import {EventStorageMiddleware} from '../event/preprocessor/EventStorageMiddleware';
 import {QuotedMessageMiddleware} from '../event/preprocessor/QuoteDecoderMiddleware';
@@ -134,7 +133,7 @@ export class App {
   service: {
     asset: AssetService;
     conversation: ConversationService;
-    event: EventService | EventServiceNoCompound;
+    event: EventService;
     integration: IntegrationService;
     notification: NotificationService;
     storage: StorageService;
@@ -244,6 +243,7 @@ export class App {
       serverTimeHandler,
       repositories.user,
       repositories.asset,
+      repositories.audio,
     );
 
     repositories.calling = new CallingRepository(
@@ -280,7 +280,11 @@ export class App {
       repositories.team,
     );
     repositories.permission = new PermissionRepository();
-    repositories.notification = new NotificationRepository(repositories.conversation, repositories.permission);
+    repositories.notification = new NotificationRepository(
+      repositories.conversation,
+      repositories.permission,
+      repositories.audio,
+    );
     repositories.preferenceNotification = new PreferenceNotificationRepository(repositories.user['userState'].self);
 
     return repositories;
@@ -294,7 +298,7 @@ export class App {
   private _setupServices() {
     container.registerInstance(StorageService, new StorageService());
     const storageService = container.resolve(StorageService);
-    const eventService = Runtime.isEdge() ? new EventServiceNoCompound() : new EventService();
+    const eventService = new EventService();
 
     return {
       asset: container.resolve(AssetService),
@@ -503,7 +507,7 @@ export class App {
         // start regularly polling the server to check if there is a new version of Wire
         startNewVersionPolling(Environment.version(false), this.update);
       }
-      audioRepository.init(true);
+      audioRepository.init();
       await conversationRepository.cleanupEphemeralMessages();
       callingRepository.setReady();
       telemetry.timeStep(AppInitTimingsStep.APP_LOADED);

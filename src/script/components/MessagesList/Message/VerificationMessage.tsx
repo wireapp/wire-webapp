@@ -91,8 +91,8 @@ const VerificationMessage: React.FC<VerificationMessageProps> = ({message}) => {
               {hasMultipleUsers
                 ? t('conversationDeviceStartedUsingMany')
                 : isSelfClient
-                ? t('conversationDeviceStartedUsingYou')
-                : t('conversationDeviceStartedUsingOne')}
+                  ? t('conversationDeviceStartedUsingYou')
+                  : t('conversationDeviceStartedUsingOne')}
             </span>
             <button
               type="button"

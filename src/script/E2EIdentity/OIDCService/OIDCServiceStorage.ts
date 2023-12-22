@@ -18,21 +18,26 @@
  */
 
 const TargetURLKey = 'E2EIdentity_OIDCService_TargetURL';
-
+const RefreshTokenKey = 'E2EIdentity_OIDCService_RefreshToken';
 const OIDCServiceStore = {
   store: {
     targetURL: (url: string) => localStorage.setItem(TargetURLKey, url),
+    refreshToken: (refreshToken: string) => localStorage.setItem(RefreshTokenKey, refreshToken),
   },
   get: {
     targetURL: () => localStorage.getItem(TargetURLKey),
+    refreshToken: () => localStorage.getItem(RefreshTokenKey),
   },
   has: {
     targetURL: () => localStorage.getItem(TargetURLKey) !== null,
+    refreshToken: localStorage.getItem(RefreshTokenKey) !== null,
   },
   clear: {
     targetURL: () => localStorage.removeItem(TargetURLKey),
+    refreshToken: () => localStorage.removeItem(RefreshTokenKey),
     all: () => {
       OIDCServiceStore.clear.targetURL();
+      OIDCServiceStore.clear.refreshToken();
     },
   },
 };

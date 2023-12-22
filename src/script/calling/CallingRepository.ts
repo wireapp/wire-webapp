@@ -323,7 +323,6 @@ export class CallingRepository {
   };
 
   private createWUser(wCall: Wcall, selfUserId: string, selfClientId: string): number {
-    /* cspell:disable */
     const wUser = wCall.create(
       selfUserId,
       selfClientId,
@@ -340,7 +339,6 @@ export class CallingRepository {
       this.audioCbrChanged, // `acbrh`,
       this.videoStateChanged, // `vstateh`,
     );
-    /* cspell:enable */
     const tenSeconds = 10;
     wCall.setNetworkQualityHandler(wUser, this.updateCallQuality, tenSeconds);
     wCall.setMuteHandler(wUser, this.updateMuteState);

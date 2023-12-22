@@ -49,7 +49,7 @@ export const DetailedDevice: React.FC<DeviceProps> = ({
         <DeviceVerificationBadges device={device} getIdentity={getIdentity} />
       </h3>
 
-      {getDeviceIdentity && <MLSDeviceDetails isCurrentDevice={isCurrentDevice} identity={getIdentity?.()} />}
+      <MLSDeviceDetails isCurrentDevice={isCurrentDevice} identity={getIdentity?.()} />
 
       <ProteusDeviceDetails device={device} fingerprint={fingerprint} isProteusVerified={isProteusVerified} />
     </>

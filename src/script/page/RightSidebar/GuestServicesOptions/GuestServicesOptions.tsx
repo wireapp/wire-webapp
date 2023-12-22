@@ -42,6 +42,7 @@ interface GuestServicesOptionsProps {
   onClose: () => void;
   teamState: TeamState;
   isGuest?: boolean;
+  isPasswordSupported?: boolean;
 }
 
 const GuestServicesOptions: FC<GuestServicesOptionsProps> = ({
@@ -52,6 +53,7 @@ const GuestServicesOptions: FC<GuestServicesOptionsProps> = ({
   onClose,
   teamState,
   isGuest = false,
+  isPasswordSupported = false,
 }) => {
   const [isRequestOngoing, setIsRequestOngoing] = useState<boolean>(false);
 
@@ -117,6 +119,7 @@ const GuestServicesOptions: FC<GuestServicesOptionsProps> = ({
             isRequestOngoing={isRequestOngoing}
             setIsRequestOngoing={setIsRequestOngoing}
             isToggleDisabled={isToggleDisabled}
+            isPasswordSupported={isPasswordSupported}
           />
         ) : (
           <ServicesOptions

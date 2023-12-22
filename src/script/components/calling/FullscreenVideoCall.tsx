@@ -556,8 +556,8 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                     !canShareScreen
                       ? videoControlDisabledStyles
                       : selfSharesScreen
-                      ? videoControlActiveStyles
-                      : videoControlInActiveStyles
+                        ? videoControlActiveStyles
+                        : videoControlInActiveStyles
                   }
                   onClick={() => toggleScreenshare(call)}
                   type="button"

@@ -108,9 +108,11 @@ export const DeviceDetails = ({
   const activeConversation = conversationState.activeConversation();
   const isConversationMLS = activeConversation && isMLSConversation(activeConversation);
 
+  const deviceIdentity = getDeviceIdentity?.(device.id);
+
   return (
     <div className={cx('participant-devices__header', {'participant-devices__header--padding': !noPadding})}>
-      {getDeviceIdentity && <MLSDeviceDetails identity={getDeviceIdentity(device.id)} />}
+      {deviceIdentity && <MLSDeviceDetails identity={deviceIdentity} />}
 
       <div className="device-proteus-details">
         <h3 className="device-details-title paragraph-body-3">{t('participantDevicesProteusDeviceVerification')}</h3>

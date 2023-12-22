@@ -71,6 +71,7 @@ import {getLinkPreviewFromString} from './linkPreviews';
 import {buildMetadata, ImageMetadata, isAudio, isImage, isVideo} from '../assets/AssetMetaDataBuilder';
 import {AssetRepository} from '../assets/AssetRepository';
 import {AssetTransferState} from '../assets/AssetTransferState';
+import {AudioRepository} from '../audio/AudioRepository';
 import {AudioType} from '../audio/AudioType';
 import {ClientState} from '../client/ClientState';
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
@@ -165,6 +166,7 @@ export class MessageRepository {
     private readonly serverTimeHandler: ServerTimeHandler,
     private readonly userRepository: UserRepository,
     private readonly assetRepository: AssetRepository,
+    private readonly audioRepository: AudioRepository,
     private readonly userState = container.resolve(UserState),
     private readonly clientState = container.resolve(ClientState),
     private readonly conversationState = container.resolve(ConversationState),
@@ -240,7 +242,7 @@ export class MessageRepository {
       legalHoldStatus: conversation.legalHoldStatus(),
     });
 
-    amplify.publish(WebAppEvents.AUDIO.PLAY, AudioType.OUTGOING_PING);
+    void this.audioRepository.play(AudioType.OUTGOING_PING);
     return this.sendAndInjectMessage(ping, conversation, {enableEphemeral: true});
   }
 
