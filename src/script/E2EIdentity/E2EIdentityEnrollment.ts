@@ -390,7 +390,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       hideSecondary: !isSnoozeTimeAvailable || hideSecondary,
       primaryActionFn: () => {
         if (modalType === ModalType.SNOOZE_REMINDER) {
-          return;
+          return undefined;
         }
         return this.enroll();
       },
