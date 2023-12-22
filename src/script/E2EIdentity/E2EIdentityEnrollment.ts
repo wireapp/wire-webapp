@@ -219,8 +219,6 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     await this.oidcService.clearProgress();
     // Clear the e2e identity progress
     this.coreE2EIService.clearAllProgress();
-    // Clear the oidc service store refresh token
-    OIDCServiceStore.clear.refreshToken();
   }
 
   private getE2EIdentityService() {
