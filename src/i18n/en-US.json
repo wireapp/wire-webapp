@@ -182,6 +182,8 @@
   "acme.settingsChanged.headline.alt": "End-to-end identity certificate",
   "acme.settingsChanged.headline.main": "Team settings changed",
   "acme.settingsChanged.paragraph": "As of today, your team uses end-to-end identity to make Wire’s usage more secure and practicable. The device verification takes place automatically using a certificate and replaces the previous manual process. This way, you communicate with the highest security standard. <br/> <br/> Enter your identity provider’s credentials in the next step to automatically get a verification certificate for this device. <br/> <br/> <a href=\"{{url}}\" target=\"_blank\">Learn more about end-to-end identity</a>",
+  "acme.remindLater.paragraph": "You can get the certificate in your [bold]Wire settings[/bold] during the next {{delayTime}}. Open [bold]Devices[/bold] and select [bold]Get Certificate[/bold] for your current device. <br/> <br/> To continue using Wire without interruption, retrieve it in time – it doesn’t take long. <br/> <br/> <a href=\"{{url}}\" target=\"_blank\"> Learn more about end-to-end identity </a>",
+  "acme.remindLater.button.primary": "Ok",
   "addParticipantsConfirmLabel": "Add",
   "addParticipantsHeader": "Add participants",
   "addParticipantsHeaderWithCounter": "Add participants ({{number}})",

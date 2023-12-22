@@ -28,10 +28,11 @@ import {Core} from 'src/script/service/CoreSingleton';
 import {UserState} from 'src/script/user/UserState';
 import {getCertificateDetails} from 'Util/certificateDetails';
 import {getLogger} from 'Util/Logger';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {formatDelayTime, TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {removeUrlParameters} from 'Util/UrlUtil';
 import {supportsMLS} from 'Util/util';
 
+import {getDelayTime} from './DelayTimer/delay';
 import {DelayTimerService} from './DelayTimer/DelayTimer';
 import {hasActiveCertificate, isE2EIEnabled} from './E2EIdentityVerification';
 import {getModalOptions, ModalType} from './Modals';
@@ -380,22 +381,35 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     }
   }
 
-  private showModal(modalType: ModalType = ModalType.ENROLL): void {
+  private showModal(modalType: ModalType = ModalType.ENROLL, hideSecondary = false): void {
     // Check if config is defined and timer is available
     const isSnoozeTimeAvailable = this.config?.timer.isSnoozeTimeAvailable() ?? false;
 
     // Show the modal with the provided modal type
     const {modalOptions, modalType: determinedModalType} = getModalOptions({
-      hideSecondary: !isSnoozeTimeAvailable,
-      primaryActionFn: () => this.enroll(),
+      hideSecondary: !isSnoozeTimeAvailable || hideSecondary,
+      primaryActionFn: () => {
+        if (modalType === ModalType.SNOOZE_REMINDER) {
+          return;
+        }
+        return this.enroll();
+      },
       secondaryActionFn: () => {
         this.currentStep = E2EIHandlerStep.SNOOZE;
         this.config?.timer.delayPrompt();
+        this.handleE2EIReminderSnooze();
       },
       type: modalType,
       hideClose: true,
+      extraParams: {
+        delayTime: formatDelayTime(getDelayTime(this.config!.gracePeriodInMs)),
+      },
     });
     PrimaryModal.show(determinedModalType, modalOptions);
+  }
+
+  private handleE2EIReminderSnooze(): void {
+    this.showModal(ModalType.SNOOZE_REMINDER, true);
   }
 
   public showE2EINotificationMessage(modalType: ModalType = ModalType.ENROLL): void {

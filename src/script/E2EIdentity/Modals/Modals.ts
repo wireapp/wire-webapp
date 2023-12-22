@@ -30,6 +30,7 @@ export enum ModalType {
   SUCCESS = 'success',
   LOADING = 'loading',
   CERTIFICATE_RENEWAL = 'certificate_renewal',
+  SNOOZE_REMINDER = 'snooze_reminder',
 }
 
 interface GetModalOptions {
@@ -39,6 +40,7 @@ interface GetModalOptions {
   hideSecondary?: boolean;
   hidePrimary?: boolean;
   hideClose?: boolean;
+  extraParams?: {delayTime?: string};
 }
 export const getModalOptions = ({
   type,
@@ -47,6 +49,7 @@ export const getModalOptions = ({
   hidePrimary = false,
   hideSecondary = false,
   hideClose = true,
+  extraParams,
 }: GetModalOptions) => {
   if (!secondaryActionFn) {
     hideSecondary = true;
@@ -90,6 +93,23 @@ export const getModalOptions = ({
         secondaryAction: {
           action: secondaryActionFn,
           text: t('acme.renewCertificate.button.secondary'),
+        },
+        ...hideCloseBtn,
+      };
+      modalType =
+        hideSecondary || secondaryActionFn === undefined ? PrimaryModal.type.ACKNOWLEDGE : PrimaryModal.type.CONFIRM;
+      break;
+
+    case ModalType.SNOOZE_REMINDER:
+      options = {
+        text: {
+          closeBtnLabel: t('acme.settingsChanged.button.close'),
+          htmlMessage: t('acme.remindLater.paragraph', extraParams?.delayTime),
+          title: t('acme.settingsChanged.headline.alt'),
+        },
+        primaryAction: {
+          action: primaryActionFn,
+          text: t('acme.remindLater.button.primary'),
         },
         ...hideCloseBtn,
       };
