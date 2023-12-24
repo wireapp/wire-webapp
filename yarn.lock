@@ -3391,7 +3391,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@peculiar/asn1-cms@npm:^2.3.6, @peculiar/asn1-cms@npm:^2.3.8":
+"@peculiar/asn1-cms@npm:^2.3.8":
   version: 2.3.8
   resolution: "@peculiar/asn1-cms@npm:2.3.8"
   dependencies:
@@ -3404,7 +3404,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@peculiar/asn1-csr@npm:^2.3.6":
+"@peculiar/asn1-csr@npm:^2.3.8":
   version: 2.3.8
   resolution: "@peculiar/asn1-csr@npm:2.3.8"
   dependencies:
@@ -3416,7 +3416,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@peculiar/asn1-ecc@npm:^2.3.6":
+"@peculiar/asn1-ecc@npm:^2.3.8":
   version: 2.3.8
   resolution: "@peculiar/asn1-ecc@npm:2.3.8"
   dependencies:
@@ -3454,7 +3454,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@peculiar/asn1-pkcs9@npm:^2.3.6":
+"@peculiar/asn1-pkcs9@npm:^2.3.8":
   version: 2.3.8
   resolution: "@peculiar/asn1-pkcs9@npm:2.3.8"
   dependencies:
@@ -3470,7 +3470,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@peculiar/asn1-rsa@npm:^2.3.6, @peculiar/asn1-rsa@npm:^2.3.8":
+"@peculiar/asn1-rsa@npm:^2.3.8":
   version: 2.3.8
   resolution: "@peculiar/asn1-rsa@npm:2.3.8"
   dependencies:
@@ -3482,7 +3482,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@peculiar/asn1-schema@npm:^2.3.6, @peculiar/asn1-schema@npm:^2.3.8":
+"@peculiar/asn1-schema@npm:^2.3.8":
   version: 2.3.8
   resolution: "@peculiar/asn1-schema@npm:2.3.8"
   dependencies:
@@ -3505,7 +3505,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@peculiar/asn1-x509@npm:^2.3.6, @peculiar/asn1-x509@npm:^2.3.8":
+"@peculiar/asn1-x509@npm:^2.3.8":
   version: 2.3.8
   resolution: "@peculiar/asn1-x509@npm:2.3.8"
   dependencies:
@@ -3518,22 +3518,22 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@peculiar/x509@npm:1.9.5":
-  version: 1.9.5
-  resolution: "@peculiar/x509@npm:1.9.5"
+"@peculiar/x509@npm:1.9.6":
+  version: 1.9.6
+  resolution: "@peculiar/x509@npm:1.9.6"
   dependencies:
-    "@peculiar/asn1-cms": ^2.3.6
-    "@peculiar/asn1-csr": ^2.3.6
-    "@peculiar/asn1-ecc": ^2.3.6
-    "@peculiar/asn1-pkcs9": ^2.3.6
-    "@peculiar/asn1-rsa": ^2.3.6
-    "@peculiar/asn1-schema": ^2.3.6
-    "@peculiar/asn1-x509": ^2.3.6
+    "@peculiar/asn1-cms": ^2.3.8
+    "@peculiar/asn1-csr": ^2.3.8
+    "@peculiar/asn1-ecc": ^2.3.8
+    "@peculiar/asn1-pkcs9": ^2.3.8
+    "@peculiar/asn1-rsa": ^2.3.8
+    "@peculiar/asn1-schema": ^2.3.8
+    "@peculiar/asn1-x509": ^2.3.8
     pvtsutils: ^1.3.5
-    reflect-metadata: ^0.1.13
-    tslib: ^2.6.1
+    reflect-metadata: ^0.2.1
+    tslib: ^2.6.2
     tsyringe: ^4.8.0
-  checksum: 855342d71bb9cf4c19f5232106bd5f79f2ae7b5607568940d9bdb5bd528ccf4454a19bd47a7cb820397216a1bb7cf613e940c1778b8cf940ec082055bc373c56
+  checksum: c5a0a7856db2c8ab64eb127638d79c57a1c4553422f9eac5dd268966cb6b81d927d45faa6c06c9424ec95e4011faa89835920e978a3943e0d7ab15dbd46b44b8
   languageName: node
   linkType: hard
 
@@ -14756,10 +14756,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"reflect-metadata@npm:^0.1.13":
-  version: 0.1.13
-  resolution: "reflect-metadata@npm:0.1.13"
-  checksum: 798d379a7b6f6455501145419505c97dd11cbc23857a386add2b9ef15963ccf15a48d9d15507afe01d4cd74116df8a213247200bac00320bd7c11ddeaa5e8fb4
+"reflect-metadata@npm:^0.2.1":
+  version: 0.2.1
+  resolution: "reflect-metadata@npm:0.2.1"
+  checksum: 772f552a544e04b999c1bf2c868225fef10032274e9d9e315bc3e7a687a504b8b115fa71966665b9619acfd323123a941f892b593250140da809330d41564181
   languageName: node
   linkType: hard
 
@@ -17476,7 +17476,7 @@ __metadata:
     "@koush/wrtc": 0.5.3
     "@lexical/history": 0.12.5
     "@lexical/react": 0.12.5
-    "@peculiar/x509": 1.9.5
+    "@peculiar/x509": 1.9.6
     "@testing-library/react": 14.1.2
     "@types/dexie-batch": 0.4.7
     "@types/eslint": ^8
