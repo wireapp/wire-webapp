@@ -1611,14 +1611,21 @@ export class ConversationRepository {
     // If mls is supported by the other user, we can establish the group and remove readonly state from the conversation.
     await this.updateConversationReadOnlyState(mlsConversation, null);
 
-    const establishedMLSConversation = await this.establishMLS1to1Conversation(mlsConversation, otherUserId);
+    // If its a 1:1 conversation between two users from the same team we should not establish it automatically,
+    // it will be established once first mls message is sent in a conversation
+    const selfUser = this.userState.self();
+    const isTeamMember = !!selfUser && !!selfUser.teamId && !!otherUser.teamId && selfUser.teamId === otherUser.teamId;
+
+    const initialisedMLSConversation = isTeamMember
+      ? mlsConversation
+      : await this.establishMLS1to1Conversation(mlsConversation, otherUserId);
 
     if (shouldOpenMLS1to1Conversation) {
       // If proteus conversation was previously active conversaiton, we want to make mls 1:1 conversation active.
-      amplify.publish(WebAppEvents.CONVERSATION.SHOW, mlsConversation, {});
+      amplify.publish(WebAppEvents.CONVERSATION.SHOW, initialisedMLSConversation, {});
     }
 
-    return establishedMLSConversation;
+    return initialisedMLSConversation;
   };
 
   /**
