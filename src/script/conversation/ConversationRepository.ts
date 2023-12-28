@@ -1137,7 +1137,7 @@ export class ConversationRepository {
    * Get or create a proteus 1:1 conversation with a user.
    * If a conversation does not exist, but user is in the current team, or there's a connection with this user, proteus 1:1 conversation will be created and saved.
    * @param userEntity User entity for whom to get the conversation
-   * @returns Resolves with the conversation with requested user (if in the current team or there's a connection with this user), otherwise `null`
+   * @returns Resolves with the conversation with requested user (if in the current team or there's an existing connection with this user), otherwise `null`
    */
   private async getOrCreateProteus1To1Conversation(userEntity: User): Promise<Conversation | null> {
     const selfUser = this.userState.self();
@@ -1147,10 +1147,16 @@ export class ConversationRepository {
       return this.getOrCreateProteusTeam1to1Conversation(userEntity);
     }
 
-    const conversationId = userEntity.connection().conversationId;
+    const userConnection = userEntity.connection();
+
+    if (!userConnection) {
+      return null;
+    }
+
+    const conversationId = userConnection.conversationId;
     try {
       const conversationEntity = await this.getConversationById(conversationId);
-      conversationEntity.connection(userEntity.connection());
+      conversationEntity.connection(userConnection);
       await this.updateParticipatingUserEntities(conversationEntity);
       return conversationEntity;
     } catch (error) {
@@ -1560,7 +1566,12 @@ export class ConversationRepository {
     const mlsConversation = await this.getMLS1to1Conversation(otherUserId);
 
     const otherUser = await this.userRepository.getUserById(otherUserId);
-    mlsConversation.connection(otherUser.connection());
+
+    const userConnection = otherUser.connection();
+
+    if (userConnection) {
+      mlsConversation.connection(userConnection);
+    }
 
     // If proteus 1:1 conversation with the same user is known, we have to make sure it is replaced with mls 1:1 conversation.
     const {shouldOpenMLS1to1Conversation} = await this.replaceProteus1to1WithMLS(otherUserId, mlsConversation);
