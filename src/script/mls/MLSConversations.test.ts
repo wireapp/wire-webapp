@@ -23,7 +23,7 @@ import {randomUUID} from 'crypto';
 
 import {Account} from '@wireapp/core';
 
-import {initMLSConversations, registerUninitializedSelfAndTeamConversations} from './MLSConversations';
+import {initMLSGroupConversations, registerUninitializedSelfAndTeamConversations} from './MLSConversations';
 
 import {MLSConversation} from '../conversation/ConversationSelectors';
 import {Conversation} from '../entity/Conversation';
@@ -54,7 +54,7 @@ describe('MLSConversations', () => {
       jest.spyOn(core.service!.conversation, 'mlsGroupExistsLocally').mockResolvedValue(false);
       jest.spyOn(core.service!.conversation, 'joinByExternalCommit');
 
-      await initMLSConversations(mlsConversations, {core});
+      await initMLSGroupConversations(mlsConversations, {core});
 
       for (const conversation of mlsConversations) {
         expect(core.service?.conversation.joinByExternalCommit).toHaveBeenCalledWith(conversation.qualifiedId);
@@ -71,7 +71,7 @@ describe('MLSConversations', () => {
     jest.spyOn(core.service!.conversation!, 'mlsGroupExistsLocally').mockResolvedValue(true);
     jest.spyOn(core.service!.mls!, 'scheduleKeyMaterialRenewal');
 
-    await initMLSConversations(mlsConversations, {core});
+    await initMLSGroupConversations(mlsConversations, {core});
 
     for (const conversation of mlsConversations) {
       expect(core.service!.mls!.scheduleKeyMaterialRenewal).toHaveBeenCalledWith(conversation.groupId);

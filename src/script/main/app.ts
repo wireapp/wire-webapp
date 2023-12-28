@@ -85,7 +85,7 @@ import {IntegrationRepository} from '../integration/IntegrationRepository';
 import {IntegrationService} from '../integration/IntegrationService';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import {MediaRepository} from '../media/MediaRepository';
-import {initMLSConversations, registerUninitializedSelfAndTeamConversations} from '../mls';
+import {initMLSGroupConversations, registerUninitializedSelfAndTeamConversations} from '../mls';
 import {joinConversationsAfterMigrationFinalisation} from '../mls/MLSMigration/migrationFinaliser';
 import {NotificationRepository} from '../notification/NotificationRepository';
 import {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
@@ -472,7 +472,7 @@ export class App {
         });
 
         //join all the mls groups we're member of and have not yet joined (eg. we were not send welcome message)
-        await initMLSConversations(conversations, {
+        await initMLSGroupConversations(conversations, {
           core: this.core,
           onError: ({id}, error) =>
             this.logger.error(`Failed when initialising mls conversation with id ${id}, error: `, error),

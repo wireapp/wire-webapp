@@ -27,6 +27,7 @@ import {
   isMLSConversation,
   isSelfConversation,
   isTeamConversation,
+  MLSCapableConversation,
   MLSConversation,
 } from '../conversation/ConversationSelectors';
 import {Conversation} from '../entity/Conversation';
@@ -38,7 +39,7 @@ import {User} from '../entity/User';
  * @param conversations - all the conversations that the user is part of
  * @param core - the instance of the core
  */
-export async function initMLSConversations(
+export async function initMLSGroupConversations(
   conversations: Conversation[],
   {
     core,
@@ -55,9 +56,12 @@ export async function initMLSConversations(
     throw new Error('MLS or Conversation service is not available!');
   }
 
-  const mlsConversations = conversations.filter(isMLSCapableConversation);
+  const mlsGroupConversations = conversations.filter(
+    (conversation): conversation is MLSCapableConversation =>
+      conversation.isGroup() && isMLSCapableConversation(conversation),
+  );
 
-  for (const mlsConversation of mlsConversations) {
+  for (const mlsConversation of mlsGroupConversations) {
     try {
       const {groupId, qualifiedId} = mlsConversation;
 
@@ -76,7 +80,7 @@ export async function initMLSConversations(
         return onSuccessfulJoin(mlsConversation);
       }
     } catch (error) {
-      return onError?.(mlsConversation, error);
+      onError?.(mlsConversation, error);
     }
   }
 }

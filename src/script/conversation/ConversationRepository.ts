@@ -1904,7 +1904,7 @@ export class ConversationRepository {
   };
 
   private readonly initTeam1To1Conversations = async (conversations: Conversation[]) => {
-    const team1To1Conversations = conversations.filter(conversation => conversation.isTeam1to1());
+    const team1To1Conversations = conversations.filter(conversation => conversation.isProteusTeam1to1());
 
     for (const conversation of team1To1Conversations) {
       try {
