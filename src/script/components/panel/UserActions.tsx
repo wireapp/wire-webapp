@@ -80,7 +80,13 @@ export interface UserActionsProps {
 }
 
 function createPlaceholder1to1Conversation(user: User, selfUser: User) {
-  const {id, domain} = user.connection().conversationId;
+  const userConnection = user.connection();
+
+  if (!userConnection) {
+    throw new Error(`There's no connection with user ${user.qualifiedId.id}.`);
+  }
+
+  const {id, domain} = userConnection.conversationId;
   const conversation = new Conversation(id, domain);
   conversation.name(user.name());
   conversation.selfUser(selfUser);
@@ -89,7 +95,7 @@ function createPlaceholder1to1Conversation(user: User, selfUser: User) {
   conversation.participating_user_ets([user]);
   conversation.accessState(ACCESS_STATE.PERSONAL.ONE2ONE);
   conversation.last_event_timestamp(Date.now());
-  conversation.connection(user.connection());
+  conversation.connection(userConnection);
   return conversation;
 }
 

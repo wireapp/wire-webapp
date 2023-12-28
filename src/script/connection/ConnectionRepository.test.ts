@@ -58,7 +58,7 @@ describe('ConnectionRepository', () => {
 
     it('sets the connection status to cancelled', () => {
       const user = createConnection();
-      connectionRepository.addConnectionEntity(user.connection());
+      connectionRepository.addConnectionEntity(user.connection()!);
       jest.spyOn(connectionService, 'putConnections').mockResolvedValue({} as any);
       return connectionRepository.cancelRequest(user).then(() => {
         expect(connectionService.putConnections).toHaveBeenCalled();
@@ -67,7 +67,7 @@ describe('ConnectionRepository', () => {
 
     it('switches the conversation if requested', () => {
       const user = createConnection();
-      connectionRepository.addConnectionEntity(user.connection());
+      connectionRepository.addConnectionEntity(user.connection()!);
       const amplifySpy = jasmine.createSpy('conversation_show');
       amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, amplifySpy);
 
@@ -83,8 +83,8 @@ describe('ConnectionRepository', () => {
 
     it('should return the expected connection for the given conversation id', () => {
       const userA = createConnection();
-      connectionRepository.addConnectionEntity(userA.connection());
-      const connectionEntity = connectionRepository.getConnectionByConversationId(userA.connection().conversationId);
+      connectionRepository.addConnectionEntity(userA.connection()!);
+      const connectionEntity = connectionRepository.getConnectionByConversationId(userA.connection()!.conversationId);
 
       expect(connectionEntity).toBe(userA.connection());
 

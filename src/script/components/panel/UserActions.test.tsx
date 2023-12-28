@@ -96,7 +96,7 @@ describe('UserActions', () => {
     const conversation = new Conversation();
     jest.spyOn(conversation, 'isGroup').mockImplementation(ko.pureComputed(() => true));
     jest.spyOn(conversation, 'participating_user_ids').mockImplementation(ko.observableArray([new User()]));
-    user.connection().status(ConnectionStatus.ACCEPTED);
+    user.connection()?.status(ConnectionStatus.ACCEPTED);
     const conversationRoleRepository: Partial<ConversationRoleRepository> = {canRemoveParticipants: () => true};
 
     const props = {
@@ -125,7 +125,7 @@ describe('UserActions', () => {
     const conversation = new Conversation();
     jest.spyOn(conversation, 'isGroup').mockImplementation(ko.pureComputed(() => true));
     jest.spyOn(conversation, 'participating_user_ids').mockImplementation(ko.observableArray([new User()]));
-    user.connection().status(ConnectionStatus.ACCEPTED);
+    user.connection()?.status(ConnectionStatus.ACCEPTED);
     const conversationRoleRepository: Partial<ConversationRoleRepository> = {canRemoveParticipants: () => true};
 
     const props = {
@@ -147,7 +147,7 @@ describe('UserActions', () => {
   it('displays buttons instead of a list when a single action is available in user modal', () => {
     const user = new User('');
     const conversation = new Conversation();
-    user.connection().status(ConnectionStatus.UNKNOWN);
+    user.connection()?.status(ConnectionStatus.UNKNOWN);
     jest.spyOn(user, 'isAvailable').mockImplementation(ko.pureComputed(() => true));
     const conversationRoleRepository: Partial<ConversationRoleRepository> = {canRemoveParticipants: () => false};
 
@@ -174,7 +174,7 @@ describe('UserActions', () => {
   it('displays a list when a single action is available in sidebar', () => {
     const user = new User('');
     const conversation = new Conversation();
-    user.connection().status(ConnectionStatus.UNKNOWN);
+    user.connection()?.status(ConnectionStatus.UNKNOWN);
     jest.spyOn(user, 'isAvailable').mockImplementation(ko.pureComputed(() => true));
     const conversationRoleRepository: Partial<ConversationRoleRepository> = {canRemoveParticipants: () => false};
 
@@ -200,7 +200,7 @@ describe('UserActions', () => {
   it('displays a list when multiple actions are available in user modal', () => {
     const user = new User('');
     const conversation = new Conversation();
-    user.connection().status(ConnectionStatus.SENT);
+    user.connection()?.status(ConnectionStatus.SENT);
     jest.spyOn(user, 'isAvailable').mockImplementation(ko.pureComputed(() => true));
     const conversationRoleRepository: Partial<ConversationRoleRepository> = {canRemoveParticipants: () => false};
 
