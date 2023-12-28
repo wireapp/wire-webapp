@@ -1632,10 +1632,14 @@ export class ConversationRepository {
     // If mls is supported by the other user, we can establish the group and remove readonly state from the conversation.
     await this.updateConversationReadOnlyState(mlsConversation, null);
 
+    const selfUser = this.userState.self();
+    if (!selfUser) {
+      throw new Error('Self user is not available!');
+    }
+
     // If its a 1:1 conversation between two users from the same team we should not establish it automatically,
     // it will be established once first mls message is sent in a conversation
-    const selfUser = this.userState.self();
-    const isTeamMember = !!selfUser && !!selfUser.teamId && !!otherUser.teamId && selfUser.teamId === otherUser.teamId;
+    const isTeamMember = !!selfUser.teamId && !!otherUser.teamId && selfUser.teamId === otherUser.teamId;
 
     const initialisedMLSConversation = isTeamMember
       ? mlsConversation
