@@ -104,7 +104,7 @@ export class Conversation {
   public readonly archivedTimestamp: ko.Observable<number>;
   public readonly call: ko.Observable<Call | null>;
   public readonly cleared_timestamp: ko.Observable<number>;
-  public readonly connection: ko.Observable<ConnectionEntity>;
+  public readonly connection: ko.Observable<ConnectionEntity | null>;
   // TODO(Federation): Currently the 'creator' just refers to a user id but it has to become a qualified id
   public creator: string;
   public groupId?: string;
@@ -272,7 +272,7 @@ export class Conversation {
     );
 
     // in case this is a one2one conversation this is the connection to that user
-    this.connection = ko.observable(new ConnectionEntity());
+    this.connection = ko.observable(null);
     this.connection.subscribe(connectionEntity => {
       const connectedUserId = connectionEntity?.userId;
       if (connectedUserId && this.participating_user_ids().every(user => !matchQualifiedIds(user, connectedUserId))) {
