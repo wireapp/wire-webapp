@@ -111,8 +111,11 @@ export class ConversationState {
           ConnectionStatus.PENDING,
         ];
 
+        const connection = conversationEntity.connection();
+
         return !(
-          isSelfConversation(conversationEntity) || states_to_filter.includes(conversationEntity.connection().status())
+          isSelfConversation(conversationEntity) ||
+          (connection && states_to_filter.includes(connection.status()))
         );
       });
     });
