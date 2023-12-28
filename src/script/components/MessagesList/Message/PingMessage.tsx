@@ -55,10 +55,8 @@ const PingMessage: React.FC<PingMessageProps> = ({message, is1to1Conversation, i
           <span className="message-header-sender-name">{unsafeSenderName}</span>
           <span className="ellipsis">{caption}</span>
         </p>
-      </div>
-      <div className="message-body-actions">
+
         <ReadReceiptStatus
-          showOnHover
           message={message}
           is1to1Conversation={is1to1Conversation}
           isLastDeliveredMessage={isLastDeliveredMessage}

@@ -28,6 +28,8 @@ import {matchQualifiedIds} from 'Util/QualifiedId';
 import {EmojiPill} from './EmojiPill';
 import {messageReactionWrapper} from './MessageReactions.styles';
 
+import {User} from '../../../../../../entity/User';
+
 export interface MessageReactionsListProps {
   reactions: ReactionMap;
   handleReactionClick: (emoji: string) => void;
@@ -36,10 +38,11 @@ export interface MessageReactionsListProps {
   onTooltipReactionCountClick: () => void;
   onLastReactionKeyEvent: () => void;
   isRemovedFromConversation: boolean;
+  users: User[];
 }
 
 const MessageReactionsList: FC<MessageReactionsListProps> = ({reactions, ...props}) => {
-  const {selfUserId, ...emojiPillProps} = props;
+  const {selfUserId, users: conversationUsers, ...emojiPillProps} = props;
 
   return (
     <div css={messageReactionWrapper} data-uie-name="message-reactions">
@@ -50,7 +53,8 @@ const MessageReactionsList: FC<MessageReactionsListProps> = ({reactions, ...prop
 
         return (
           <EmojiPill
-            emojiCount={users.length}
+            qualifiedIds={users}
+            conversationUsers={conversationUsers}
             hasUserReacted={hasUserReacted}
             emojiUnicode={emojiUnicode}
             emoji={emoji}

@@ -31,15 +31,9 @@ export interface ReadReceiptStatusProps {
   is1to1Conversation: boolean;
   isLastDeliveredMessage: boolean;
   message: Message;
-  showOnHover?: boolean;
 }
 
-const ReadReceiptStatus: React.FC<ReadReceiptStatusProps> = ({
-  message,
-  is1to1Conversation,
-  isLastDeliveredMessage,
-  showOnHover = false,
-}) => {
+const ReadReceiptStatus: React.FC<ReadReceiptStatusProps> = ({message, is1to1Conversation, isLastDeliveredMessage}) => {
   const [readReceiptText, setReadReceiptText] = useState('');
   const {readReceipts} = useKoSubscribableChildren(message, ['readReceipts']);
 
@@ -62,11 +56,7 @@ const ReadReceiptStatus: React.FC<ReadReceiptStatusProps> = ({
       )}
       {showEyeIndicator && (
         <div
-          className={cx(
-            'message-status-read',
-            is1to1Conversation && 'message-status-read__one-on-one',
-            showOnHover && 'message-status-read__show-on-hover',
-          )}
+          className={cx('message-status-read', is1to1Conversation && 'message-status-read__one-on-one')}
           data-uie-name="status-message-read-receipts"
           aria-label={t('accessibility.messageDetailsReadReceipts', readReceiptText)}
         >

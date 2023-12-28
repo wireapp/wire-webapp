@@ -45,7 +45,14 @@ export const messageReactionWrapper: CSSObject = {
   flexWrap: 'wrap',
   maxWidth: '100%',
   marginRight: 'var(--conversation-message-timestamp-width)',
-  '.tooltip-content': {marginBottom: '0 !important'},
+  '.tooltip-content': {
+    backgroundColor: 'var(--gray-95) !important',
+    marginBottom: '0 !important',
+    padding: '6px 8px !important',
+    '.tooltip-arrow': {
+      borderTopColor: 'var(--gray-95) !important',
+    },
+  },
 };
 
 export const messageReactionButton: CSSObject = {
@@ -60,14 +67,22 @@ export const messageReactionButton: CSSObject = {
   userSelect: 'none',
 };
 
-export const messageReactionButtonTooltip: CSSObject = {display: 'flex', maxWidth: 130, whiteSpace: 'break-spaces'};
-export const messageReactionButtonTooltipImage: CSSObject = {marginRight: 8, lineHeight: '2.5em'};
+export const messageReactionButtonTooltip: CSSObject = {
+  display: 'flex',
+  flexDirection: 'column',
+  maxWidth: 165,
+  whiteSpace: 'break-spaces',
+};
+export const messageReactionButtonTooltipImage: CSSObject = {
+  fontSize: 'var(--font-size-large)',
+  lineHeight: 'var(--line-height-md)',
+};
 export const messageReactionDetailsMargin: CSSObject = {marginRight: '0.4rem'};
 export const reactionsCountAlignment: CSSObject = {display: 'flex', alignItems: 'center'};
-export const messageReactionButtonTooltipText: CSSObject = {fontSize: '0.7rem'};
+export const messageReactionButtonTooltipText: CSSObject = {fontSize: '0.7rem', marginTop: '8px'};
 export const messageReactionButtonTooltipTextLink: CSSObject = {
-  color: 'var(--blue-500)',
   cursor: 'pointer',
+  fontWeight: 600,
   textDecoration: 'underline',
 };
 
