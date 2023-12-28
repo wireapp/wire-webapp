@@ -33,7 +33,7 @@ function createMLSConversation(type?: CONVERSATION_TYPE): MLSConversation {
   const conversation = new Conversation(randomUUID(), '', ConversationProtocol.MLS);
   conversation.groupId = `groupid-${randomUUID()}`;
   conversation.epoch = 0;
-  if (type) {
+  if (type !== undefined) {
     conversation.type(type);
   }
   return conversation as MLSConversation;
@@ -44,12 +44,12 @@ function createMLSConversations(nbConversations: number, type?: CONVERSATION_TYP
 }
 
 describe('MLSConversations', () => {
-  describe('initMLSConversations', () => {
+  describe('initMLSGroupConversations', () => {
     it('joins all the unestablished MLS groups', async () => {
       const core = new Account();
       const nbMLSConversations = 5 + Math.ceil(Math.random() * 10);
 
-      const mlsConversations = createMLSConversations(nbMLSConversations);
+      const mlsConversations = createMLSConversations(nbMLSConversations, CONVERSATION_TYPE.REGULAR);
 
       jest.spyOn(core.service!.conversation, 'mlsGroupExistsLocally').mockResolvedValue(false);
       jest.spyOn(core.service!.conversation, 'joinByExternalCommit');
@@ -66,7 +66,7 @@ describe('MLSConversations', () => {
     const core = new Account();
     const nbMLSConversations = 5 + Math.ceil(Math.random() * 10);
 
-    const mlsConversations = createMLSConversations(nbMLSConversations);
+    const mlsConversations = createMLSConversations(nbMLSConversations, CONVERSATION_TYPE.REGULAR);
 
     jest.spyOn(core.service!.conversation!, 'mlsGroupExistsLocally').mockResolvedValue(true);
     jest.spyOn(core.service!.mls!, 'scheduleKeyMaterialRenewal');
