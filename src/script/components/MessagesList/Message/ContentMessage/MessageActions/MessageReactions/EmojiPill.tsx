@@ -19,8 +19,6 @@
 
 import {FC, useState} from 'react';
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-
 import {Tooltip} from '@wireapp/react-ui-kit';
 
 import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
@@ -53,8 +51,7 @@ export interface EmojiPillProps {
   index: number;
   emojiListCount: number;
   hasUserReacted: boolean;
-  qualifiedIds: QualifiedId[];
-  conversationUsers: User[];
+  reactedUsers: User[];
 }
 
 const MAX_USER_NAMES_TO_SHOW = 2;
@@ -70,19 +67,14 @@ export const EmojiPill: FC<EmojiPillProps> = ({
   index,
   emojiListCount,
   hasUserReacted,
-  qualifiedIds,
-  conversationUsers,
+  reactedUsers,
 }) => {
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
   const [isOpen, setTooltipVisibility] = useState(false);
   const emojiName = getEmojiTitleFromEmojiUnicode(emojiUnicode);
   const isActive = hasUserReacted && !isRemovedFromConversation;
 
-  const emojiCount = qualifiedIds.length;
-  const reactedUsers = conversationUsers
-    .filter(user => qualifiedIds.some(qualifiedId => qualifiedId.id === user.id))
-    .slice(0, MAX_USER_NAMES_TO_SHOW)
-    .map(user => user.name());
+  const emojiCount = reactedUsers.length;
 
   const showTooltip = () => {
     setTooltipVisibility(true);
@@ -92,22 +84,24 @@ export const EmojiPill: FC<EmojiPillProps> = ({
     setTooltipVisibility(false);
   };
 
+  const reactedUserNames = reactedUsers.slice(0, MAX_USER_NAMES_TO_SHOW).map(user => user.name());
+
   const conversationReactionCaption = () => {
     if (emojiCount > MAX_USER_NAMES_TO_SHOW) {
       return t('conversationLikesCaptionPluralMoreThan2', {
         number: (emojiCount - MAX_USER_NAMES_TO_SHOW).toString(),
-        userNames: reactedUsers.join(', '),
+        userNames: reactedUserNames.join(', '),
       });
     }
 
     if (emojiCount === MAX_USER_NAMES_TO_SHOW) {
       return t('conversationLikesCaptionPlural', {
-        firstUser: reactedUsers[0],
-        secondUser: reactedUsers[1],
+        firstUser: reactedUserNames[0],
+        secondUser: reactedUserNames[1],
       });
     }
 
-    return reactedUsers[0];
+    return reactedUserNames?.[0] || '';
   };
 
   const caption = conversationReactionCaption();

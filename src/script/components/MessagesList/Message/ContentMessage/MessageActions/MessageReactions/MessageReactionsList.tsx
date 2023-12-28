@@ -17,8 +17,6 @@
  *
  */
 
-import {FC} from 'react';
-
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import {ReactionMap} from 'src/script/storage';
@@ -41,7 +39,7 @@ export interface MessageReactionsListProps {
   users: User[];
 }
 
-const MessageReactionsList: FC<MessageReactionsListProps> = ({reactions, ...props}) => {
+const MessageReactionsList = ({reactions, ...props}: MessageReactionsListProps) => {
   const {selfUserId, users: conversationUsers, ...emojiPillProps} = props;
 
   return (
@@ -51,10 +49,13 @@ const MessageReactionsList: FC<MessageReactionsListProps> = ({reactions, ...prop
         const emojiListCount = users.length;
         const hasUserReacted = users.some(user => matchQualifiedIds(selfUserId, user));
 
+        const reactedUsers = users
+          .map(qualifiedId => conversationUsers.find(user => matchQualifiedIds(qualifiedId, user.qualifiedId)))
+          .filter((user): user is User => typeof user !== 'undefined');
+
         return (
           <EmojiPill
-            qualifiedIds={users}
-            conversationUsers={conversationUsers}
+            reactedUsers={reactedUsers}
             hasUserReacted={hasUserReacted}
             emojiUnicode={emojiUnicode}
             emoji={emoji}
