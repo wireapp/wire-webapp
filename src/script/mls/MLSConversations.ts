@@ -122,7 +122,7 @@ export async function initialiseSelfAndTeamConversations(
       // If the conversation is already established, we don't need to do anything.
       const isGroupAlreadyEstablished = await mlsService.isConversationEstablished(conversation.groupId);
       if (isGroupAlreadyEstablished) {
-        return;
+        return Promise.resolve();
       }
 
       // Otherwise, we need to join the conversation via external commit.
