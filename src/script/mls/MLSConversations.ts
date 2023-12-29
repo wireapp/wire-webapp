@@ -90,34 +90,37 @@ export async function initMLSGroupConversations(
  * The self conversation and the team conversation are special conversations created by noone and, thus, need to be manually created by the first device that detects them
  *
  * @param conversations all the conversations the user is part of
+ * @param selfUser entity of the self user
+ * @param selfClientId id of the current client
  * @param core instance of the core
  */
-export async function registerUninitializedSelfAndTeamConversations(
+export async function initialiseSelfAndTeamConversations(
   conversations: Conversation[],
   selfUser: User,
   selfClientId: string,
   core: Account,
 ): Promise<void> {
-  const mlsService = core.service?.mls;
-
-  if (!mlsService) {
-    throw new Error('MLS service not available');
+  const {mls: mlsService, conversation: conversationService} = core.service || {};
+  if (!mlsService || !conversationService) {
+    throw new Error('MLS or Conversation service is not available!');
   }
 
-  const uninitializedConversations = conversations.filter(
+  const conversationsToEstablish = conversations.filter(
     (conversation): conversation is MLSConversation =>
-      isMLSConversation(conversation) &&
-      conversation.epoch === 0 &&
-      (isSelfConversation(conversation) || isTeamConversation(conversation)),
+      isMLSConversation(conversation) && (isSelfConversation(conversation) || isTeamConversation(conversation)),
   );
 
   await Promise.all(
-    uninitializedConversations.map(conversation =>
-      mlsService.registerConversation(conversation.groupId, [selfUser.qualifiedId], {
-        user: selfUser,
-        client: selfClientId,
-      }),
-    ),
+    conversationsToEstablish.map(conversation => {
+      if (conversation.epoch === 0) {
+        return mlsService.registerConversation(conversation.groupId, [selfUser.qualifiedId], {
+          user: selfUser,
+          client: selfClientId,
+        });
+      }
+
+      return conversationService.joinByExternalCommit(conversation.qualifiedId);
+    }),
   );
 }
 

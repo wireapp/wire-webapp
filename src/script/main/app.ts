@@ -85,7 +85,7 @@ import {IntegrationRepository} from '../integration/IntegrationRepository';
 import {IntegrationService} from '../integration/IntegrationService';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import {MediaRepository} from '../media/MediaRepository';
-import {initMLSGroupConversations, registerUninitializedSelfAndTeamConversations} from '../mls';
+import {initMLSGroupConversations, initialiseSelfAndTeamConversations} from '../mls';
 import {joinConversationsAfterMigrationFinalisation} from '../mls/MLSMigration/migrationFinaliser';
 import {NotificationRepository} from '../notification/NotificationRepository';
 import {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
@@ -460,7 +460,7 @@ export class App {
 
       if (supportsMLS()) {
         //add the potential `self` and `team` conversations
-        await registerUninitializedSelfAndTeamConversations(conversations, selfUser, clientEntity.id, this.core);
+        await initialiseSelfAndTeamConversations(conversations, selfUser, clientEntity.id, this.core);
 
         //join all the mls groups that are known by the user but were migrated to mls
         await joinConversationsAfterMigrationFinalisation({
