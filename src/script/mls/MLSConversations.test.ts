@@ -29,10 +29,10 @@ import {MLSConversation} from '../conversation/ConversationSelectors';
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 
-function createMLSConversation(type?: CONVERSATION_TYPE): MLSConversation {
+function createMLSConversation(type?: CONVERSATION_TYPE, epoch = 0): MLSConversation {
   const conversation = new Conversation(randomUUID(), '', ConversationProtocol.MLS);
   conversation.groupId = `groupid-${randomUUID()}`;
-  conversation.epoch = 0;
+  conversation.epoch = epoch;
   if (type !== undefined) {
     conversation.type(type);
   }
@@ -78,8 +78,8 @@ describe('MLSConversations', () => {
     }
   });
 
-  describe('registerUninitializedSelfAndTeamConversations', () => {
-    it('register uninitiated team and self mls conversations', async () => {
+  describe('initialiseSelfAndTeamConversations', () => {
+    it('register unestablished team and self mls conversations', async () => {
       const core = new Account();
       const nbMLSConversations = 5 + Math.ceil(Math.random() * 10);
 
@@ -115,6 +115,53 @@ describe('MLSConversations', () => {
       await initialiseSelfAndTeamConversations(conversations, new User(), 'clientId', core);
 
       expect(core.service!.mls!.registerConversation).toHaveBeenCalledTimes(0);
+    });
+
+    it('joins self and team conversation with external commit that have epoch > 0', async () => {
+      const core = new Account();
+      const nbMLSConversations = 5 + Math.ceil(Math.random() * 10);
+
+      const selfConversation = createMLSConversation();
+      selfConversation.epoch = 1;
+      selfConversation.type(CONVERSATION_TYPE.SELF);
+
+      const teamConversation = createMLSConversation();
+      teamConversation.epoch = 2;
+      teamConversation.type(CONVERSATION_TYPE.GLOBAL_TEAM);
+
+      const mlsConversations = createMLSConversations(nbMLSConversations);
+      const conversations = [teamConversation, ...mlsConversations, selfConversation];
+
+      // MLS group is not yet established locally
+      jest.spyOn(core.service!.mls!, 'isConversationEstablished').mockResolvedValue(false);
+
+      await initialiseSelfAndTeamConversations(conversations, new User(), 'clientId', core);
+
+      expect(core.service!.mls!.registerConversation).toHaveBeenCalledTimes(0);
+      expect(core.service!.conversation!.joinByExternalCommit).toHaveBeenCalledTimes(2);
+    });
+
+    it('DOES NOT join self and team conversation with external commit that have epoch > 0, but is already established locally', async () => {
+      const core = new Account();
+      const nbMLSConversations = 5 + Math.ceil(Math.random() * 10);
+
+      const selfConversation = createMLSConversation();
+      selfConversation.epoch = 1;
+      selfConversation.type(CONVERSATION_TYPE.SELF);
+
+      const teamConversation = createMLSConversation();
+      teamConversation.epoch = 2;
+      teamConversation.type(CONVERSATION_TYPE.GLOBAL_TEAM);
+
+      const mlsConversations = createMLSConversations(nbMLSConversations);
+      const conversations = [teamConversation, ...mlsConversations, selfConversation];
+
+      jest.spyOn(core.service!.mls!, 'isConversationEstablished').mockResolvedValue(true);
+
+      await initialiseSelfAndTeamConversations(conversations, new User(), 'clientId', core);
+
+      expect(core.service!.mls!.registerConversation).not.toHaveBeenCalled();
+      expect(core.service!.conversation!.joinByExternalCommit).not.toHaveBeenCalled();
     });
   });
 });

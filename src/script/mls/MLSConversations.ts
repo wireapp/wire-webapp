@@ -111,14 +111,21 @@ export async function initialiseSelfAndTeamConversations(
   );
 
   await Promise.all(
-    conversationsToEstablish.map(conversation => {
-      if (conversation.epoch === 0) {
+    conversationsToEstablish.map(async conversation => {
+      if (conversation.epoch < 1) {
         return mlsService.registerConversation(conversation.groupId, [selfUser.qualifiedId], {
           user: selfUser,
           client: selfClientId,
         });
       }
 
+      // If the conversation is already established, we don't need to do anything.
+      const isGroupAlreadyEstablished = await mlsService.isConversationEstablished(conversation.groupId);
+      if (isGroupAlreadyEstablished) {
+        return;
+      }
+
+      // Otherwise, we need to join the conversation via external commit.
       return conversationService.joinByExternalCommit(conversation.qualifiedId);
     }),
   );
