@@ -1918,6 +1918,7 @@ export class ConversationRepository {
   }
 
   public readonly init1To1Conversations = async (connections: ConnectionEntity[], conversations: Conversation[]) => {
+    // It's important to map connections first, so connection entities get attached to the conversation entities.
     if (connections.length) {
       await this.mapConnections(connections);
     }
@@ -1929,7 +1930,10 @@ export class ConversationRepository {
   };
 
   private readonly initTeam1To1Conversations = async (conversations: Conversation[]) => {
-    const team1To1Conversations = conversations.filter(conversation => conversation.isProteusTeam1to1());
+    // Team owned 1:1 conversations are: legacy group conversations with only 1 other user and mls 1:1 conversations between two users without connection.
+    const team1To1Conversations = conversations.filter(
+      conversation => conversation.is1to1() && !conversation.connection(),
+    );
 
     for (const conversation of team1To1Conversations) {
       try {
