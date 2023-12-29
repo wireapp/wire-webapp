@@ -1410,11 +1410,11 @@ export class ConversationRepository {
   private readonly replaceProteus1to1WithMLS = async (
     otherUserId: QualifiedId,
     mlsConversation: MLSConversation,
-  ): Promise<{shouldOpenMLS1to1Conversation: boolean}> => {
+  ): Promise<{shouldOpenMLS1to1Conversation: boolean; wasProteus1to1Replaced: boolean}> => {
     const proteusConversations = this.conversationState.findProteus1to1Conversations(otherUserId);
 
     if (!proteusConversations || proteusConversations.length < 1) {
-      return {shouldOpenMLS1to1Conversation: false};
+      return {shouldOpenMLS1to1Conversation: false, wasProteus1to1Replaced: false};
     }
 
     this.logger.info(`Replacing proteus 1:1 conversation(s) with mls 1:1 conversation ${mlsConversation.id}`);
@@ -1480,7 +1480,7 @@ export class ConversationRepository {
 
     const shouldOpenMLS1to1Conversation = wasProteus1to1ActiveConversation && !isMLS1to1ActiveConversation;
 
-    return {shouldOpenMLS1to1Conversation};
+    return {shouldOpenMLS1to1Conversation, wasProteus1to1Replaced: true};
   };
 
   private async blacklistConversation(conversationId: QualifiedId) {
@@ -1595,7 +1595,10 @@ export class ConversationRepository {
     }
 
     // If proteus 1:1 conversation with the same user is known, we have to make sure it is replaced with mls 1:1 conversation.
-    const {shouldOpenMLS1to1Conversation} = await this.replaceProteus1to1WithMLS(otherUserId, mlsConversation);
+    const {shouldOpenMLS1to1Conversation, wasProteus1to1Replaced} = await this.replaceProteus1to1WithMLS(
+      otherUserId,
+      mlsConversation,
+    );
 
     if (mlsConversation.participating_user_ids.length === 0) {
       ConversationMapper.updateProperties(mlsConversation, {participating_user_ids: [otherUser.qualifiedId]});
@@ -1637,13 +1640,15 @@ export class ConversationRepository {
       throw new Error('Self user is not available!');
     }
 
-    // If its a 1:1 conversation between two users from the same team we should not establish it automatically,
+    // If its a 1:1 conversation between two users from the same team we should not establish it automatically (unless there was already a proteus 1:1 conversation),
     // it will be established once first mls message is sent in a conversation
     const isTeamMember = !!selfUser.teamId && !!otherUser.teamId && selfUser.teamId === otherUser.teamId;
 
-    const initialisedMLSConversation = isTeamMember
-      ? mlsConversation
-      : await this.establishMLS1to1Conversation(mlsConversation, otherUserId);
+    const shouldEstablishMLS1to1 = !isTeamMember || wasProteus1to1Replaced;
+
+    const initialisedMLSConversation = shouldEstablishMLS1to1
+      ? await this.establishMLS1to1Conversation(mlsConversation, otherUserId)
+      : mlsConversation;
 
     if (shouldOpenMLS1to1Conversation) {
       // If proteus conversation was previously active conversaiton, we want to make mls 1:1 conversation active.
