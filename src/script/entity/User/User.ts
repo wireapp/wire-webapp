@@ -180,7 +180,10 @@ export class User {
     this.isIgnored = ko.pureComputed(() => !!this.connection()?.isIgnored());
     this.isIncomingRequest = ko.pureComputed(() => !!this.connection()?.isIncomingRequest());
     this.isOutgoingRequest = ko.pureComputed(() => !!this.connection()?.isOutgoingRequest());
-    this.isUnknown = ko.pureComputed(() => !!this.connection()?.isUnknown());
+    this.isUnknown = ko.pureComputed(() => {
+      const connection = this.connection();
+      return !connection || connection.isUnknown();
+    });
     this.isExternal = ko.pureComputed(() => this.teamRole() === TEAM_ROLE.PARTNER);
     this.isRequest = ko.pureComputed(() => !!this.connection()?.isRequest());
 
