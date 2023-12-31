@@ -6849,10 +6849,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"countly-sdk-web@npm:23.12.2":
-  version: 23.12.2
-  resolution: "countly-sdk-web@npm:23.12.2"
-  checksum: 1c0131669386b17775b31627fb1e462d8fd17ed3376b88f15aa5b8ae26f9d0e1cd69087dddf3164487a49fe4c5a1e6169002cf9c50bb0e8c64e55c23d5282991
+"countly-sdk-web@npm:23.12.3":
+  version: 23.12.3
+  resolution: "countly-sdk-web@npm:23.12.3"
+  checksum: 2066e268903e8f7e88db48d79a0db26b63507fd94123181d5ecb522901afedae0a2d42f2ca62b9fa38b6eca5cc541926a3c0a3cbf760181e9fb85c2bee26833e
   languageName: node
   linkType: hard
 
@@ -17651,7 +17651,7 @@ __metadata:
     classnames: 2.5.1
     copy-webpack-plugin: 11.0.0
     core-js: 3.35.0
-    countly-sdk-web: 23.12.2
+    countly-sdk-web: 23.12.3
     cross-env: 7.0.3
     css-loader: ^6.8.1
     cssnano: 6.0.2
