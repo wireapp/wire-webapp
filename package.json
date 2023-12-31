@@ -153,7 +153,7 @@
     "webpack": "5.89.0",
     "webpack-cli": "5.1.4",
     "webpack-dev-middleware": "6.1.1",
-    "webpack-hot-middleware": "2.25.4",
+    "webpack-hot-middleware": "2.26.0",
     "workbox-webpack-plugin": "7.0.0"
   },
   "engines": {
