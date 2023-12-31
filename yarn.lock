@@ -8607,10 +8607,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fake-indexeddb@npm:5.0.1":
-  version: 5.0.1
-  resolution: "fake-indexeddb@npm:5.0.1"
-  checksum: b9bf94003e40923513863dde1f0f852fb00faa9d31db5203e4142e7937371e9061801b68cfdd37b321df1a314b2a30788b904be909685302d8f9c37a54580cb9
+"fake-indexeddb@npm:5.0.2":
+  version: 5.0.2
+  resolution: "fake-indexeddb@npm:5.0.2"
+  checksum: df4dc15c2f2b1a04429461fdc4da02bf25e9b84e2bbfa2ffcf4bb87764f75eef772bb36b245547538796f372c5190eb06cdaa391c7c5f5662b19667f949106cb
   languageName: node
   linkType: hard
 
@@ -17664,7 +17664,7 @@ __metadata:
     emoji-picker-react: 4.6.0
     eslint: ^8.56.0
     eslint-plugin-prettier: ^5.1.2
-    fake-indexeddb: 5.0.1
+    fake-indexeddb: 5.0.2
     generate-changelog: 1.8.0
     highlight.js: 11.9.0
     html-webpack-plugin: ^5.6.0
