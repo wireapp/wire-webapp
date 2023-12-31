@@ -11595,13 +11595,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"less-loader@npm:^11.1.3":
-  version: 11.1.3
-  resolution: "less-loader@npm:11.1.3"
+"less-loader@npm:^11.1.4":
+  version: 11.1.4
+  resolution: "less-loader@npm:11.1.4"
   peerDependencies:
     less: ^3.5.0 || ^4.0.0
     webpack: ^5.0.0
-  checksum: fe0de6b5ab930a4521d04555d9bd77723164bfa0f71eb5724d91c45090af544000e2d7f598cd83ec4e1445e6b943cc0c0dd1445fb2e83fd7c12f4ad3a0db05c5
+  checksum: 29b2055a05283e16e99d0333802c185b6e1a5408212336e25b07f53d56acd8683dcd643b3e3c0c32abba0d9d5fda5ccf73cb8da00ae634ec6b929307861955c8
   languageName: node
   linkType: hard
 
@@ -17684,7 +17684,7 @@ __metadata:
     keyboardjs: 2.7.0
     knockout: 3.5.1
     less: 4.2.0
-    less-loader: ^11.1.3
+    less-loader: ^11.1.4
     lexical: 0.12.5
     libsodium-wrappers: 0.7.13
     linkify-it: 5.0.0
