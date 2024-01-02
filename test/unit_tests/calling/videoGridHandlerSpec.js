@@ -18,6 +18,7 @@
  */
 
 import {CONV_TYPE, CALL_TYPE, VIDEO_STATE} from '@wireapp/avs';
+import ko from 'knockout';
 
 import {Call} from 'src/script/calling/Call';
 import {Participant} from 'src/script/calling/Participant';

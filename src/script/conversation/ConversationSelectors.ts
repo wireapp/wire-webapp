@@ -73,7 +73,7 @@ const is1to1ConversationWithUser =
     }
 
     const connection = conversation.connection();
-    if (connection.userId) {
+    if (connection?.userId) {
       return matchQualifiedIds(connection.userId, userId);
     }
 

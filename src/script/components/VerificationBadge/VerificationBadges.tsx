@@ -96,7 +96,7 @@ export const DeviceVerificationBadges = ({
   device: ClientEntity;
   getIdentity?: (deviceId: string) => WireIdentity | undefined;
 }) => {
-  const MLSStatus = getIdentity ? getIdentity(device.id)?.status ?? MLSStatuses.NOT_DOWNLOADED : undefined;
+  const MLSStatus = getIdentity?.(device.id)?.status;
 
   return (
     <VerificationBadges context="device" isProteusVerified={!!device.meta?.isVerified?.()} MLSStatus={MLSStatus} />

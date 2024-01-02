@@ -33,7 +33,7 @@ import type {ClientConfig, ServerConfig} from './config';
 import {HealthCheckRoute} from './routes/_health/HealthRoute';
 import {AppleAssociationRoute} from './routes/appleassociation/AppleAssociationRoute';
 import {ConfigRoute} from './routes/config/ConfigRoute';
-import {OIDCProxyRoute, OIDCProxyRoutePath} from './routes/E2EIProxy/OIDCProxyRoute';
+import {OIDCProxyRoute, OIDCProxyRoutePath} from './routes/E2EIProxy';
 import {InternalErrorRoute, NotFoundRoute} from './routes/error/ErrorRoutes';
 import {GoogleWebmasterRoute} from './routes/googlewebmaster/GoogleWebmasterRoute';
 import {RedirectRoutes} from './routes/RedirectRoutes';

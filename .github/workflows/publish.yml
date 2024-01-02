@@ -184,6 +184,7 @@ jobs:
     name: Bump webapp chart in wire-builds
     runs-on: ubuntu-latest
     needs: build
+
     strategy:
       matrix:
         target_branch: ${{fromJSON(needs.build.outputs.wire_builds_target_branches)}}
@@ -220,6 +221,7 @@ jobs:
     name: 'Create PR in wire-server: Bump Helm chart'
     runs-on: ubuntu-latest
     needs: build
+
     steps:
       - name: Check whether this is a production release
         id: release-info-file

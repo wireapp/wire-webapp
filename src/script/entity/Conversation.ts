@@ -89,7 +89,7 @@ export class Conversation {
   public readonly archivedState: ko.Observable<boolean>;
   public readonly readOnlyState: ko.Observable<CONVERSATION_READONLY_STATE | null>;
   private readonly incomingMessages: ko.ObservableArray<Message>;
-  public readonly isTeam1to1: ko.PureComputed<boolean>;
+  public readonly isProteusTeam1to1: ko.PureComputed<boolean>;
   public readonly last_server_timestamp: ko.Observable<number>;
   private readonly logger: Logger;
   public readonly mutedState: ko.Observable<number>;
@@ -99,11 +99,12 @@ export class Conversation {
   public blockLegalHoldMessage: boolean;
   public hasCreationMessage: boolean;
   public readonly accessCode: ko.Observable<string>;
+  public readonly accessCodeHasPassword: ko.Observable<boolean | undefined>;
   public readonly accessState: ko.Observable<ACCESS_STATE>;
   public readonly archivedTimestamp: ko.Observable<number>;
   public readonly call: ko.Observable<Call | null>;
   public readonly cleared_timestamp: ko.Observable<number>;
-  public readonly connection: ko.Observable<ConnectionEntity>;
+  public readonly connection: ko.Observable<ConnectionEntity | null>;
   // TODO(Federation): Currently the 'creator' just refers to a user id but it has to become a qualified id
   public creator: string;
   public groupId?: string;
@@ -198,6 +199,7 @@ export class Conversation {
 
     this.accessState = ko.observable();
     this.accessCode = ko.observable();
+    this.accessCodeHasPassword = ko.observable();
     this.creator = undefined;
     this.name = ko.observable();
     this.teamId = undefined;
@@ -233,18 +235,18 @@ export class Conversation {
     this.isTeamOnly = ko.pureComputed(() => this.accessState() === ACCESS_STATE.TEAM.TEAM_ONLY);
     this.withAllTeamMembers = ko.observable(false);
 
-    this.isTeam1to1 = ko.pureComputed(() => {
+    this.isProteusTeam1to1 = ko.pureComputed(() => {
       const isGroupConversation = this.type() === CONVERSATION_TYPE.REGULAR;
       const hasOneParticipant = this.participating_user_ids().length === 1;
       return isGroupConversation && hasOneParticipant && this.teamId && !this.name();
     });
     this.isGroup = ko.pureComputed(() => {
       const isGroupConversation = this.type() === CONVERSATION_TYPE.REGULAR;
-      return isGroupConversation && !this.isTeam1to1();
+      return isGroupConversation && !this.isProteusTeam1to1();
     });
     this.is1to1 = ko.pureComputed(() => {
       const is1to1Conversation = this.type() === CONVERSATION_TYPE.ONE_TO_ONE;
-      return is1to1Conversation || this.isTeam1to1();
+      return is1to1Conversation || this.isProteusTeam1to1();
     });
     this.isRequest = ko.pureComputed(
       () =>
@@ -270,7 +272,7 @@ export class Conversation {
     );
 
     // in case this is a one2one conversation this is the connection to that user
-    this.connection = ko.observable(new ConnectionEntity());
+    this.connection = ko.observable(null);
     this.connection.subscribe(connectionEntity => {
       const connectedUserId = connectionEntity?.userId;
       if (connectedUserId && this.participating_user_ids().every(user => !matchQualifiedIds(user, connectedUserId))) {

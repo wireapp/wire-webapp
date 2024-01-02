@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2021 Wire Swiss GmbH
+ * Copyright (C) 2023 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,15 +17,19 @@
  *
  */
 
-import {AudioPreference} from '@wireapp/api-client/lib/user/data/';
-import ko from 'knockout';
-import {singleton} from 'tsyringe';
+import * as x509 from '@peculiar/x509';
 
-@singleton()
-export class AudioState {
-  public readonly audioPreference: ko.Observable<AudioPreference>;
+export const getCertificateDetails = (certificate: string) => {
+  const currentDate = new Date();
+  const parsedCertificate = new x509.X509Certificate(certificate);
+  const isValid = currentDate > parsedCertificate.notBefore && currentDate < parsedCertificate.notAfter;
 
-  constructor() {
-    this.audioPreference = ko.observable(AudioPreference.ALL);
-  }
-}
+  const timeRemainingMS = new Date(parsedCertificate.notAfter).getTime() - currentDate.getTime();
+  const certificateCreationTime = parsedCertificate?.notBefore.getTime();
+
+  return {
+    isValid,
+    timeRemainingMS,
+    certificateCreationTime,
+  };
+};

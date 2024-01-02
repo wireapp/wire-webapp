@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2023 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,10 +17,15 @@
  *
  */
 
-copy-to-clipboard {
-  display: block;
+import {CSSObject} from '@emotion/react';
 
-  .copy-to-clipboard {
-    word-break: break-all;
-  }
-}
+export const guestLinkPasswordInputStyles: CSSObject = {
+  flexDirection: 'column',
+  input: {
+    borderRadius: 12,
+    border: '1px solid var(--button-tertiary-border)',
+    boxShadow: 'none !important',
+    '&:hover': {boxShadow: 'none'},
+    '&:focus': {border: '1px solid var(--accent-color)'},
+  },
+};

@@ -37,6 +37,7 @@ import {ValidationUtilError} from 'Util/ValidationUtil';
 import {PermissionState} from './PermissionState';
 
 import {AssetRepository} from '../assets/AssetRepository';
+import {AudioRepository} from '../audio/AudioRepository';
 import {AudioType} from '../audio/AudioType';
 import {CallState} from '../calling/CallState';
 import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
@@ -126,6 +127,7 @@ export class NotificationRepository {
   constructor(
     conversationRepository: ConversationRepository,
     permissionRepository: PermissionRepository,
+    private readonly audioRepository: AudioRepository,
     private readonly userState = container.resolve(UserState),
     private readonly conversationState = container.resolve(ConversationState),
     private readonly callState = container.resolve(CallState),
@@ -766,12 +768,12 @@ export class NotificationRepository {
     if (shouldPlaySound) {
       switch (messageEntity.super_type) {
         case SuperType.CONTENT: {
-          amplify.publish(WebAppEvents.AUDIO.PLAY, AudioType.NEW_MESSAGE);
+          void this.audioRepository.play(AudioType.NEW_MESSAGE);
           break;
         }
 
         case SuperType.PING: {
-          amplify.publish(WebAppEvents.AUDIO.PLAY, AudioType.INCOMING_PING);
+          void this.audioRepository.play(AudioType.INCOMING_PING);
           break;
         }
       }

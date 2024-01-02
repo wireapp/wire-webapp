@@ -17,7 +17,12 @@
  *
  */
 
-import {ConversationProtocol, MessageSendingStatus, QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
+import {
+  CONVERSATION_TYPE,
+  ConversationProtocol,
+  MessageSendingStatus,
+  QualifiedUserClients,
+} from '@wireapp/api-client/lib/conversation';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import {QualifiedId, RequestCancellationError} from '@wireapp/api-client/lib/user';
 import {
@@ -71,6 +76,7 @@ import {getLinkPreviewFromString} from './linkPreviews';
 import {buildMetadata, ImageMetadata, isAudio, isImage, isVideo} from '../assets/AssetMetaDataBuilder';
 import {AssetRepository} from '../assets/AssetRepository';
 import {AssetTransferState} from '../assets/AssetTransferState';
+import {AudioRepository} from '../audio/AudioRepository';
 import {AudioType} from '../audio/AudioType';
 import {ClientState} from '../client/ClientState';
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
@@ -165,6 +171,7 @@ export class MessageRepository {
     private readonly serverTimeHandler: ServerTimeHandler,
     private readonly userRepository: UserRepository,
     private readonly assetRepository: AssetRepository,
+    private readonly audioRepository: AudioRepository,
     private readonly userState = container.resolve(UserState),
     private readonly clientState = container.resolve(ClientState),
     private readonly conversationState = container.resolve(ConversationState),
@@ -240,7 +247,7 @@ export class MessageRepository {
       legalHoldStatus: conversation.legalHoldStatus(),
     });
 
-    amplify.publish(WebAppEvents.AUDIO.PLAY, AudioType.OUTGOING_PING);
+    void this.audioRepository.play(AudioType.OUTGOING_PING);
     return this.sendAndInjectMessage(ping, conversation, {enableEphemeral: true});
   }
 
@@ -789,7 +796,15 @@ export class MessageRepository {
     // Configure ephemeral messages
     conversationService.messageTimer.setConversationLevelTimer(conversation.id, conversation.messageTimer());
 
-    const sendOptions: Parameters<typeof conversationService.send>[0] = isMLSConversation(conversation)
+    const isMLS = isMLSConversation(conversation);
+    const is1to1 = conversation.type() === CONVERSATION_TYPE.ONE_TO_ONE;
+
+    //Before sending a message in MLS 1:1 conversation we need to make sure that the group is established
+    if (isMLS && is1to1) {
+      await this.conversationRepositoryProvider().makeSureMLS1to1ConversationIsEstablished(conversation);
+    }
+
+    const sendOptions: Parameters<typeof conversationService.send>[0] = isMLS
       ? {
           groupId: conversation.groupId,
           payload,

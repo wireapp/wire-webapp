@@ -30,6 +30,7 @@ import {
   utf8ToUtf16BE,
   obfuscate,
   replaceAccents,
+  generateRandomPassword,
 } from 'Util/StringUtil';
 
 import {lorem_ipsum} from '../../api/payloads';
@@ -255,6 +256,32 @@ describe('StringUtil', () => {
       expect(replaceAccents('tÇst')).toEqual('tcst');
       expect(replaceAccents('tñst')).toEqual('tnst');
       expect(replaceAccents('tÑst')).toEqual('tnst');
+    });
+  });
+
+  describe('generateRandomPassword', () => {
+    test('returns a string', () => {
+      expect(typeof generateRandomPassword(10)).toBe('string');
+    });
+
+    test('returns a password with at least 8 characters', () => {
+      expect(generateRandomPassword(10).length).toBeGreaterThanOrEqual(8);
+    });
+
+    test('returns a password containing at least one lowercase letter', () => {
+      expect(generateRandomPassword(10)).toMatch(/[a-z]/);
+    });
+
+    test('returns a password containing at least one uppercase letter', () => {
+      expect(generateRandomPassword(10)).toMatch(/[A-Z]/);
+    });
+
+    test('returns a password containing at least one number', () => {
+      expect(generateRandomPassword(10)).toMatch(/[0-9]/);
+    });
+
+    test('returns a password containing at least one special character', () => {
+      expect(generateRandomPassword(10)).toMatch(/[!@#$%^&*()_+\-={}\[\];',.?/~`|:"<>]/);
     });
   });
 });
