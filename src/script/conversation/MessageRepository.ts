@@ -17,7 +17,12 @@
  *
  */
 
-import {ConversationProtocol, MessageSendingStatus, QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
+import {
+  CONVERSATION_TYPE,
+  ConversationProtocol,
+  MessageSendingStatus,
+  QualifiedUserClients,
+} from '@wireapp/api-client/lib/conversation';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import {QualifiedId, RequestCancellationError} from '@wireapp/api-client/lib/user';
 import {
@@ -791,7 +796,15 @@ export class MessageRepository {
     // Configure ephemeral messages
     conversationService.messageTimer.setConversationLevelTimer(conversation.id, conversation.messageTimer());
 
-    const sendOptions: Parameters<typeof conversationService.send>[0] = isMLSConversation(conversation)
+    const isMLS = isMLSConversation(conversation);
+    const is1to1 = conversation.type() === CONVERSATION_TYPE.ONE_TO_ONE;
+
+    //Before sending a message in MLS 1:1 conversation we need to make sure that the group is established
+    if (isMLS && is1to1) {
+      await this.conversationRepositoryProvider().makeSureMLS1to1ConversationIsEstablished(conversation);
+    }
+
+    const sendOptions: Parameters<typeof conversationService.send>[0] = isMLS
       ? {
           groupId: conversation.groupId,
           payload,

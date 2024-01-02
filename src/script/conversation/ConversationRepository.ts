@@ -1405,16 +1405,16 @@ export class ConversationRepository {
    *
    * @param proteusConversation - proteus 1:1 conversation
    * @param mlsConversation - mls 1:1 conversation
-   * @returns {shouldOpenMLS1to1Conversation} - whether proteus 1:1 was active conversation and mls 1:1 conversation should be opened in the UI
+   * @returns {shouldOpenMLS1to1Conversation, wasProteus1to1Replaced} - whether proteus 1:1 was replaced with mls and whether it was an active conversation and mls 1:1 conversation should be opened in the UI
    */
   private readonly replaceProteus1to1WithMLS = async (
     otherUserId: QualifiedId,
     mlsConversation: MLSConversation,
-  ): Promise<{shouldOpenMLS1to1Conversation: boolean}> => {
+  ): Promise<{shouldOpenMLS1to1Conversation: boolean; wasProteus1to1Replaced: boolean}> => {
     const proteusConversations = this.conversationState.findProteus1to1Conversations(otherUserId);
 
     if (!proteusConversations || proteusConversations.length < 1) {
-      return {shouldOpenMLS1to1Conversation: false};
+      return {shouldOpenMLS1to1Conversation: false, wasProteus1to1Replaced: false};
     }
 
     this.logger.info(`Replacing proteus 1:1 conversation(s) with mls 1:1 conversation ${mlsConversation.id}`);
@@ -1480,7 +1480,7 @@ export class ConversationRepository {
 
     const shouldOpenMLS1to1Conversation = wasProteus1to1ActiveConversation && !isMLS1to1ActiveConversation;
 
-    return {shouldOpenMLS1to1Conversation};
+    return {shouldOpenMLS1to1Conversation, wasProteus1to1Replaced: true};
   };
 
   private async blacklistConversation(conversationId: QualifiedId) {
@@ -1490,6 +1490,27 @@ export class ConversationRepository {
   private async removeConversationFromBlacklist(conversationId: QualifiedId) {
     return this.conversationService.removeConversationFromBlacklist(conversationId);
   }
+
+  public readonly makeSureMLS1to1ConversationIsEstablished = async (mlsConversation: MLSConversation) => {
+    const isMLSGroupEstablished = await this.conversationService.isMLSGroupEstablishedLocally(mlsConversation.groupId);
+    if (isMLSGroupEstablished) {
+      return;
+    }
+
+    const selfUser = this.userState.self();
+
+    if (!selfUser) {
+      throw new Error('Self user not found');
+    }
+
+    const otherUserId = this.getUserIdOf1to1Conversation(mlsConversation);
+
+    if (!otherUserId) {
+      throw new Error('Other user not found');
+    }
+
+    await this.establishMLS1to1Conversation(mlsConversation, otherUserId);
+  };
 
   /**
    * Will establish mls 1:1 conversation.
@@ -1574,7 +1595,10 @@ export class ConversationRepository {
     }
 
     // If proteus 1:1 conversation with the same user is known, we have to make sure it is replaced with mls 1:1 conversation.
-    const {shouldOpenMLS1to1Conversation} = await this.replaceProteus1to1WithMLS(otherUserId, mlsConversation);
+    const {shouldOpenMLS1to1Conversation, wasProteus1to1Replaced} = await this.replaceProteus1to1WithMLS(
+      otherUserId,
+      mlsConversation,
+    );
 
     if (mlsConversation.participating_user_ids.length === 0) {
       ConversationMapper.updateProperties(mlsConversation, {participating_user_ids: [otherUser.qualifiedId]});
@@ -1611,14 +1635,27 @@ export class ConversationRepository {
     // If mls is supported by the other user, we can establish the group and remove readonly state from the conversation.
     await this.updateConversationReadOnlyState(mlsConversation, null);
 
-    const establishedMLSConversation = await this.establishMLS1to1Conversation(mlsConversation, otherUserId);
+    const selfUser = this.userState.self();
+    if (!selfUser) {
+      throw new Error('Self user is not available!');
+    }
+
+    // If its a 1:1 conversation between two users from the same team we should not establish it automatically (unless there was already a proteus 1:1 conversation),
+    // it will be established once first mls message is sent in a conversation
+    const isTeamMember = !!selfUser.teamId && !!otherUser.teamId && selfUser.teamId === otherUser.teamId;
+
+    const shouldEstablishMLS1to1 = !isTeamMember || wasProteus1to1Replaced;
+
+    const initialisedMLSConversation = shouldEstablishMLS1to1
+      ? await this.establishMLS1to1Conversation(mlsConversation, otherUserId)
+      : mlsConversation;
 
     if (shouldOpenMLS1to1Conversation) {
       // If proteus conversation was previously active conversaiton, we want to make mls 1:1 conversation active.
-      amplify.publish(WebAppEvents.CONVERSATION.SHOW, mlsConversation, {});
+      amplify.publish(WebAppEvents.CONVERSATION.SHOW, initialisedMLSConversation, {});
     }
 
-    return establishedMLSConversation;
+    return initialisedMLSConversation;
   };
 
   /**
@@ -1886,6 +1923,7 @@ export class ConversationRepository {
   }
 
   public readonly init1To1Conversations = async (connections: ConnectionEntity[], conversations: Conversation[]) => {
+    // It's important to map connections first, so connection entities get attached to the conversation entities.
     if (connections.length) {
       await this.mapConnections(connections);
     }
@@ -1897,7 +1935,10 @@ export class ConversationRepository {
   };
 
   private readonly initTeam1To1Conversations = async (conversations: Conversation[]) => {
-    const team1To1Conversations = conversations.filter(conversation => conversation.isTeam1to1());
+    // Team owned 1:1 conversations are: legacy group conversations with only 1 other user and mls 1:1 conversations between two users without connection.
+    const team1To1Conversations = conversations.filter(
+      conversation => conversation.is1to1() && !conversation.connection(),
+    );
 
     for (const conversation of team1To1Conversations) {
       try {
