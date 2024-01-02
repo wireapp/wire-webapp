@@ -17,11 +17,14 @@
  *
  */
 
+import {amplify} from 'amplify';
+
 import {WireModule} from './Wire.types';
 
 declare global {
   interface Window {
     wire: WireModule;
+    amplify: amplify.Static;
     z: any;
   }
 }
