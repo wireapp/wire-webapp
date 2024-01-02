@@ -52,6 +52,7 @@ export enum E2EIHandlerStep {
 interface E2EIHandlerParams {
   discoveryUrl: string;
   gracePeriodInSeconds: number;
+  isFreshMLSSelfClient?: boolean;
 }
 
 type Events = {enrollmentSuccessful: void};
@@ -60,6 +61,7 @@ type EnrollmentConfig = {
   timer: DelayTimerService;
   discoveryUrl: string;
   gracePeriodInMs: number;
+  isFreshMLSSelfClient?: boolean;
 };
 
 const historyTimeMS = 28 * TimeInMillis.DAY; //HT
@@ -101,7 +103,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     E2EIHandler.instance = null;
   }
 
-  public initialize({discoveryUrl, gracePeriodInSeconds}: E2EIHandlerParams) {
+  public initialize({discoveryUrl, gracePeriodInSeconds, isFreshMLSSelfClient = false}: E2EIHandlerParams) {
     if (!isE2EIEnabled()) {
       return this;
     }
@@ -114,6 +116,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
         gracePeriodExpiredCallback: () => null,
         delayPeriodExpiredCallback: () => null,
       }),
+      isFreshMLSSelfClient,
     };
     if (!hasActiveCertificate()) {
       this.showE2EINotificationMessage();
@@ -386,7 +389,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
     // Show the modal with the provided modal type
     const {modalOptions, modalType: determinedModalType} = getModalOptions({
-      hideSecondary: !isSnoozeTimeAvailable,
+      hideSecondary: !isSnoozeTimeAvailable || !!this.config?.isFreshMLSSelfClient,
       primaryActionFn: () => this.enroll(),
       secondaryActionFn: () => {
         this.currentStep = E2EIHandlerStep.SNOOZE;
