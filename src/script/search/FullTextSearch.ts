@@ -21,7 +21,6 @@ import {escapeRegex} from 'Util/SanitizationUtil';
 
 export const getSearchRegex = (query: string): RegExp => {
   const delimiter = ' ';
-  /* cspell:disable-next-line */
   const flags = 'gumi';
   const regex = query
     .trim()

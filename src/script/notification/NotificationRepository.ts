@@ -103,6 +103,7 @@ export class NotificationRepository {
   private readonly permissionRepository: PermissionRepository;
   private readonly permissionState: ko.Observable<PermissionState | PermissionStatusState | NotificationPermission>;
   private readonly assetRepository: AssetRepository;
+  private isSoftLock = false;
 
   static get CONFIG() {
     return {
@@ -168,6 +169,10 @@ export class NotificationRepository {
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.NOTIFICATIONS, this.updatedNotificationsProperty);
   }
 
+  setSoftLock(value: boolean) {
+    this.isSoftLock = value;
+  }
+
   /**
    * Check for browser permission if we have not yet asked.
    * @returns Promise that resolves with the permission state
@@ -216,6 +221,10 @@ export class NotificationRepository {
     connectionEntity?: ConnectionEntity,
     conversationEntity?: Conversation,
   ): Promise<void> => {
+    if (this.isSoftLock) {
+      return Promise.resolve();
+    }
+
     const isUserAway = this.userState.self().availability() === Availability.Type.AWAY;
     const isComposite = messageEntity.isComposite();
 

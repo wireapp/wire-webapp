@@ -106,7 +106,7 @@ export class ContentViewModel {
 
     ko.computed(() => {
       if (
-        this.conversationState.activeConversation()?.connection().status() ===
+        this.conversationState.activeConversation()?.connection()?.status() ===
         ConnectionStatus.MISSING_LEGAL_HOLD_CONSENT
       ) {
         showMostRecentConversation();

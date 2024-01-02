@@ -438,7 +438,7 @@ export class CallingViewModel {
       } else {
         PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
           text: {
-            htmlMessage: t('callingRestrictedConferenceCallTeamMemberModalDescription'),
+            message: t('callingRestrictedConferenceCallTeamMemberModalDescription'),
             title: t('callingRestrictedConferenceCallTeamMemberModalTitle'),
           },
         });

@@ -17,14 +17,16 @@
  *
  */
 
-import {UserManager, User, UserManagerSettings} from 'oidc-client-ts';
+import {UserManager, User, UserManagerSettings, WebStorageStateStore} from 'oidc-client-ts';
 
 import {clearKeysStartingWith} from 'Util/localStorage';
+import {Logger, getLogger} from 'Util/Logger';
 
 import {OIDCServiceStore} from './OIDCServiceStorage';
 
 export class OIDCService {
-  private userManager: UserManager;
+  private readonly userManager: UserManager;
+  private readonly logger: Logger;
 
   constructor() {
     // Get the targetURL from the OIDCServiceStore
@@ -60,9 +62,16 @@ export class OIDCService {
       response_type: 'code',
       scope: 'openid profile email offline_access',
       client_secret: idpClientSecret,
+      extraQueryParams: {
+        access_type: 'offline',
+        prompt: 'consent',
+      },
+      stateStore: new WebStorageStateStore({store: window.localStorage}),
+      userStore: new WebStorageStateStore({store: window.localStorage}),
     };
 
     this.userManager = new UserManager(dexioConfig);
+    this.logger = getLogger('OIDC Service');
   }
 
   public async authenticate(): Promise<void> {
@@ -83,10 +92,21 @@ export class OIDCService {
   }
 
   public clearProgress(): Promise<void> {
-    const {localStorage, sessionStorage} = window;
+    const {localStorage} = window;
     // remove all oidc keys from local and session storage to prevent errors and stale state
     clearKeysStartingWith('oidc.', localStorage);
-    clearKeysStartingWith('oidc.user:', sessionStorage);
+    clearKeysStartingWith('oidc.user:', localStorage);
     return this.userManager.clearStaleState();
+  }
+
+  public handleSilentAuthentication(): Promise<User | null> {
+    try {
+      return this.userManager.signinSilent().then(user => {
+        return user;
+      });
+    } catch (error) {
+      this.logger.log('Silent authentication with refresh token failed', error);
+      return Promise.resolve(null);
+    }
   }
 }

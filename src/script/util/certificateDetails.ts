@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2023 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,33 +17,19 @@
  *
  */
 
-const soundCloudStatic = [
-  'about',
-  'channels',
-  'charts',
-  'discover',
-  'discussion',
-  'featured',
-  'home',
-  'messages',
-  'mobile',
-  'pages',
-  'playlists',
-  'sets',
-  'settings',
-  'stream',
-  'terms-of-use',
-  'upload',
-  'videos',
-  'you',
-];
+import * as x509 from '@peculiar/x509';
 
-const BLACKLIST = [
-  `soundcloud.com/(?!${soundCloudStatic.join('|')})`,
-  'spotify.com/(?!\\w\\w/)',
-  'youtu.be',
-  'youtube(-nocookie)?.com/(watch|embed)',
-  'vimeo.com/(channels/[^/]+/|video/)?[0-9]+',
-];
+export const getCertificateDetails = (certificate: string) => {
+  const currentDate = new Date();
+  const parsedCertificate = new x509.X509Certificate(certificate);
+  const isValid = currentDate > parsedCertificate.notBefore && currentDate < parsedCertificate.notAfter;
 
-export const isBlacklisted = (url: string) => new RegExp(BLACKLIST.join('|')).test(url);
+  const timeRemainingMS = new Date(parsedCertificate.notAfter).getTime() - currentDate.getTime();
+  const certificateCreationTime = parsedCertificate?.notBefore.getTime();
+
+  return {
+    isValid,
+    timeRemainingMS,
+    certificateCreationTime,
+  };
+};

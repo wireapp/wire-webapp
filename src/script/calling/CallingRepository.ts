@@ -146,6 +146,8 @@ export class CallingRepository {
    * Keeps track of the size of the avs log once the webapp is initiated. This allows detecting meaningless avs logs (logs that have a length equal to the length when the webapp was initiated)
    */
   private avsInitLogLength: number = 0;
+  private isSoftLock = false;
+
   onChooseScreen: (deviceId: string) => void;
 
   static get CONFIG() {
@@ -194,6 +196,7 @@ export class CallingRepository {
       }
     });
 
+    // abort call while conversation is degraded
     ko.computed(() => {
       const call = this.callState.joinedCall();
 
@@ -269,6 +272,10 @@ export class CallingRepository {
     return this.wCall?.getStats(this.serializeQualifiedId(conversationId));
   }
 
+  setSoftLock(value: boolean) {
+    this.isSoftLock = value;
+  }
+
   async initAvs(selfUser: User, clientId: ClientId): Promise<{wCall: Wcall; wUser: number}> {
     this.selfUser = selfUser;
     this.selfClientId = clientId;
@@ -316,7 +323,6 @@ export class CallingRepository {
   };
 
   private createWUser(wCall: Wcall, selfUserId: string, selfClientId: string): number {
-    /* cspell:disable */
     const wUser = wCall.create(
       selfUserId,
       selfClientId,
@@ -333,7 +339,6 @@ export class CallingRepository {
       this.audioCbrChanged, // `acbrh`,
       this.videoStateChanged, // `vstateh`,
     );
-    /* cspell:enable */
     const tenSeconds = 10;
     wCall.setNetworkQualityHandler(wUser, this.updateCallQuality, tenSeconds);
     wCall.setMuteHandler(wUser, this.updateMuteState);
@@ -631,6 +636,10 @@ export class CallingRepository {
    * Handle incoming calling events from backend.
    */
   onCallEvent = async (event: CallingEvent, source: string): Promise<void> => {
+    if (this.isSoftLock) {
+      return;
+    }
+
     const {content, qualified_conversation, from, qualified_from} = event;
     const isFederated = this.core.backendFeatures.isFederated && qualified_conversation && qualified_from;
     const userId = isFederated ? qualified_from : {domain: '', id: from};
