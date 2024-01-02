@@ -32,21 +32,10 @@ export function useAppSoftLock(callingRepository: CallingRepository, notificatio
   const checkIfIsFreshMLSSelfClient = async () => {
     const initializedIsFreshMLSSelfClient = await isFreshMLSSelfClient();
 
-    if (initializedIsFreshMLSSelfClient) {
-      setFreshMLSSelfClient(true);
-
-      callingRepository.setSoftLock(true);
-      notificationRepository.setSoftLock(true);
-
-      setSoftLockLoaded(true);
-    } else {
-      setFreshMLSSelfClient(false);
-
-      callingRepository.setSoftLock(false);
-      notificationRepository.setSoftLock(false);
-
-      setSoftLockLoaded(true);
-    }
+    setFreshMLSSelfClient(initializedIsFreshMLSSelfClient);
+    callingRepository.setSoftLock(initializedIsFreshMLSSelfClient);
+    notificationRepository.setSoftLock(initializedIsFreshMLSSelfClient);
+    setSoftLockLoaded(true);
   };
 
   useEffect(() => {
