@@ -36,6 +36,7 @@ import {
   messageReactionButtonTooltipText,
   messageReactionButtonTooltipTextLink,
   messageReactionCount,
+  userBoldStyle,
 } from './MessageReactions.styles';
 
 import {User} from '../../../../../../entity/User';
@@ -107,15 +108,22 @@ export const EmojiPill: FC<EmojiPillProps> = ({
   const caption = conversationReactionCaption();
 
   const content = replaceReactComponents(caption, [
-    {start: '<strong>', end: '</strong>', render: text => <strong key={text}>{text}</strong>},
+    {
+      start: '<strong>',
+      end: '</strong>',
+      render: text => (
+        <strong key={text} css={userBoldStyle}>
+          {text}
+        </strong>
+      ),
+    },
     {
       start: '[showmore]',
       end: '[/showmore]',
       render: text => (
-        // eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events
-        <span key={text} onClick={onTooltipReactionCountClick} css={messageReactionButtonTooltipTextLink}>
+        <button key={text} onClick={onTooltipReactionCountClick} css={messageReactionButtonTooltipTextLink}>
           {text}
-        </span>
+        </button>
       ),
     },
   ]);

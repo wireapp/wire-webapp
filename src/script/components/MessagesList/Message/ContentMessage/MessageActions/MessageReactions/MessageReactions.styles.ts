@@ -81,10 +81,15 @@ export const messageReactionDetailsMargin: CSSObject = {marginRight: '0.4rem'};
 export const reactionsCountAlignment: CSSObject = {display: 'flex', alignItems: 'center'};
 export const messageReactionButtonTooltipText: CSSObject = {fontSize: '0.7rem', marginTop: '8px'};
 export const messageReactionButtonTooltipTextLink: CSSObject = {
+  background: 'transparent',
   cursor: 'pointer',
   fontWeight: 600,
+  padding: 0,
+  border: 'none',
   textDecoration: 'underline',
 };
+
+export const userBoldStyle: CSSObject = {fontWeight: 700};
 
 export const messageReactionCount = (isActive?: boolean): CSSObject => {
   return {
