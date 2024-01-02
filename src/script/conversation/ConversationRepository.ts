@@ -1405,7 +1405,7 @@ export class ConversationRepository {
    *
    * @param proteusConversation - proteus 1:1 conversation
    * @param mlsConversation - mls 1:1 conversation
-   * @returns {shouldOpenMLS1to1Conversation} - whether proteus 1:1 was active conversation and mls 1:1 conversation should be opened in the UI
+   * @returns {shouldOpenMLS1to1Conversation, wasProteus1to1Replaced} - whether proteus 1:1 was replaced with mls and whether it was an active conversation and mls 1:1 conversation should be opened in the UI
    */
   private readonly replaceProteus1to1WithMLS = async (
     otherUserId: QualifiedId,
