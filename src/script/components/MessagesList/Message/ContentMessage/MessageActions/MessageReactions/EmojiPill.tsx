@@ -51,7 +51,7 @@ export interface EmojiPillProps {
   index: number;
   emojiListCount: number;
   hasUserReacted: boolean;
-  reactedUsers: User[];
+  reactingUsers: User[];
 }
 
 const MAX_USER_NAMES_TO_SHOW = 2;
@@ -67,14 +67,14 @@ export const EmojiPill: FC<EmojiPillProps> = ({
   index,
   emojiListCount,
   hasUserReacted,
-  reactedUsers,
+  reactingUsers,
 }) => {
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
   const [isOpen, setTooltipVisibility] = useState(false);
   const emojiName = getEmojiTitleFromEmojiUnicode(emojiUnicode);
   const isActive = hasUserReacted && !isRemovedFromConversation;
 
-  const emojiCount = reactedUsers.length;
+  const emojiCount = reactingUsers.length;
 
   const showTooltip = () => {
     setTooltipVisibility(true);
@@ -84,24 +84,24 @@ export const EmojiPill: FC<EmojiPillProps> = ({
     setTooltipVisibility(false);
   };
 
-  const reactedUserNames = reactedUsers.slice(0, MAX_USER_NAMES_TO_SHOW).map(user => user.name());
+  const reactingUserNames = reactingUsers.slice(0, MAX_USER_NAMES_TO_SHOW).map(user => user.name());
 
   const conversationReactionCaption = () => {
     if (emojiCount > MAX_USER_NAMES_TO_SHOW) {
       return t('conversationLikesCaptionPluralMoreThan2', {
         number: (emojiCount - MAX_USER_NAMES_TO_SHOW).toString(),
-        userNames: reactedUserNames.join(', '),
+        userNames: reactingUserNames.join(', '),
       });
     }
 
     if (emojiCount === MAX_USER_NAMES_TO_SHOW) {
       return t('conversationLikesCaptionPlural', {
-        firstUser: reactedUserNames[0],
-        secondUser: reactedUserNames[1],
+        firstUser: reactingUserNames[0],
+        secondUser: reactingUserNames[1],
       });
     }
 
-    return t('conversationLikesCaptionSingular', {userName: reactedUserNames?.[0] || ''});
+    return t('conversationLikesCaptionSingular', {userName: reactingUserNames?.[0] || ''});
   };
 
   const caption = conversationReactionCaption();

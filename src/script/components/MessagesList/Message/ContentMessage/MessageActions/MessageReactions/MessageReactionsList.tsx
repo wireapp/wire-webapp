@@ -49,13 +49,13 @@ const MessageReactionsList = ({reactions, ...props}: MessageReactionsListProps) 
         const emojiListCount = users.length;
         const hasUserReacted = users.some(user => matchQualifiedIds(selfUserId, user));
 
-        const reactedUsers = users
+        const reactingUsers = users
           .map(qualifiedId => conversationUsers.find(user => matchQualifiedIds(qualifiedId, user.qualifiedId)))
           .filter((user): user is User => typeof user !== 'undefined');
 
         return (
           <EmojiPill
-            reactedUsers={reactedUsers}
+            reactingUsers={reactingUsers}
             hasUserReacted={hasUserReacted}
             emojiUnicode={emojiUnicode}
             emoji={emoji}
