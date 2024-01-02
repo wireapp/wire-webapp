@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [26.8.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@26.7.2...@wireapp/api-client@26.8.0) (2024-01-02)
+
+### Features
+
+* add a queue for incoming mls messages ([#5822](https://github.com/wireapp/wire-web-packages/issues/5822)) ([3c857b4](https://github.com/wireapp/wire-web-packages/commit/3c857b470894ca9006220344bd42c76b8caa57e7))
+
 ## [26.7.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@26.7.1...@wireapp/api-client@26.7.2) (2023-12-20)
 
 **Note:** Version bump only for package @wireapp/api-client
