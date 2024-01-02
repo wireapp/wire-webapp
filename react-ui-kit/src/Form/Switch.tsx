@@ -97,8 +97,8 @@ export const Switch = ({
                 disabled || showLoading
                   ? COLOR.tint(checked ? activatedColor : deactivatedColor, 0.4)
                   : checked
-                  ? activatedColor
-                  : deactivatedColor,
+                    ? activatedColor
+                    : deactivatedColor,
               boxSizing: 'border-box',
               display: 'block',
               float: 'left',
