@@ -51,10 +51,16 @@ export const ConnectRequests = ({
   const mainViewModel = useContext(RootContext);
   const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
   const {connectRequests: unsortedConnectionRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
-  const connectionRequests = unsortedConnectionRequests.sort(
-    (user1, user2) =>
-      new Date(user1.connection().lastUpdate).getTime() - new Date(user2.connection().lastUpdate).getTime(),
-  );
+  const connectionRequests = unsortedConnectionRequests.sort((user1, user2) => {
+    const user1Connection = user1.connection();
+    const user2Connection = user2.connection();
+
+    if (!user1Connection || !user2Connection) {
+      return 0;
+    }
+
+    return new Date(user1Connection.lastUpdate).getTime() - new Date(user2Connection.lastUpdate).getTime();
+  });
 
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
   const smBreakpoint = useMatchMedia('max-width: 640px');

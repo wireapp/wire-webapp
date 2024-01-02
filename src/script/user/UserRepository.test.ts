@@ -282,7 +282,7 @@ describe('UserRepository', () => {
         expect(userState.users()).toHaveLength(users.length + 1);
         users.forEach(user => {
           const localUser = userState.users().find(u => matchQualifiedIds(u.qualifiedId, user.qualified_id));
-          expect(localUser?.connection().userId).toEqual(user.qualified_id);
+          expect(localUser?.connection()?.userId).toEqual(user.qualified_id);
         });
       });
 

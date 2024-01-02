@@ -76,3 +76,9 @@ export async function getConversationVerificationState(groupId: string) {
 export function hasActiveCertificate() {
   return getE2EIdentityService().hasActiveCertificate();
 }
+
+export async function isFreshMLSSelfClient() {
+  const isFreshMLSSelfClient = await getE2EIdentityService().isFreshMLSSelfClient();
+  // negation because we get reversed value
+  return !isFreshMLSSelfClient;
+}

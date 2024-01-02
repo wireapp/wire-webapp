@@ -365,7 +365,9 @@ export class UserRepository extends TypedEventEmitter<Events> {
 
     userEntities.forEach(userEntity => {
       const connectionEntity = connectionEntities.find(({userId}) => matchQualifiedIds(userId, userEntity));
-      userEntity.connection(connectionEntity);
+      if (connectionEntity) {
+        userEntity.connection(connectionEntity);
+      }
     });
     return this.assignAllClients();
   }
