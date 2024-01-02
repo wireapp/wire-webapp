@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [43.3.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@43.2.0...@wireapp/core@43.3.0) (2024-01-02)
+
+### Bug Fixes
+
+* **e2ei:** return value of isFreshMLSSelfClient ([#5837](https://github.com/wireapp/wire-web-packages/issues/5837)) ([e3ad1bf](https://github.com/wireapp/wire-web-packages/commit/e3ad1bfc09d460da8bb23e3f3f702df0fefe63bf))
+
+### Features
+
+* add a queue for incoming mls messages ([#5822](https://github.com/wireapp/wire-web-packages/issues/5822)) ([3c857b4](https://github.com/wireapp/wire-web-packages/commit/3c857b470894ca9006220344bd42c76b8caa57e7))
+
 # [43.2.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@43.1.4...@wireapp/core@43.2.0) (2023-12-21)
 
 ### Features
