@@ -17,7 +17,7 @@
  *
  */
 
-import '@testing-library/jest-dom/extend-expect';
+import '@testing-library/jest-dom/jest-globals';
 import {fireEvent, render} from '@testing-library/react';
 
 import {Checkbox, CheckboxLabel} from './Checkbox';
