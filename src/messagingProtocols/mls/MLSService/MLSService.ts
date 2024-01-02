@@ -56,6 +56,11 @@ import {TaskScheduler} from '../../../util/TaskScheduler';
 import {AcmeChallenge, E2EIServiceExternal, User} from '../E2EIdentityService';
 import {E2EIServiceInternal} from '../E2EIdentityService/E2EIServiceInternal';
 import {handleMLSMessageAdd, handleMLSWelcomeMessage} from '../EventHandler/events';
+import {
+  deleteMLSMessagesQueue,
+  queueIncomingMLSMessage,
+  withLockedMLSMessagesQueue,
+} from '../EventHandler/events/messageAdd';
 import {ClientId, CommitPendingProposalsParams, HandlePendingProposalsParams} from '../types';
 import {generateMLSDeviceId} from '../utils/MLSId';
 
@@ -137,14 +142,16 @@ export class MLSService extends TypedEventEmitter<Events> {
       : CredentialType.Basic;
   }
 
-  // We need to lock the websocket while commit bundle is being processed by backend,
-  // it's possible that we will be sent some mls messages before we receive the response from backend and accept a commit locally.
-  private readonly uploadCommitBundle = this.apiClient.withLockedWebSocket(
-    async (
-      groupId: Uint8Array,
-      commitBundle: CommitBundle,
-      {regenerateCommitBundle, isExternalCommit}: UploadCommitOptions = {},
-    ): Promise<PostMlsMessageResponse> => {
+  private readonly uploadCommitBundle = async (
+    groupId: Uint8Array,
+    commitBundle: CommitBundle,
+    {regenerateCommitBundle, isExternalCommit}: UploadCommitOptions = {},
+  ): Promise<PostMlsMessageResponse> => {
+    const groupIdStr = Encoder.toBase64(groupId).asString;
+
+    // We need to lock the incoming mls messages queue while we are uploading the commit bundle
+    // it's possible that we will be sent some mls messages before we receive the response from backend and accept a commit locally.
+    return withLockedMLSMessagesQueue(groupIdStr, async () => {
       const {commit, groupInfo, welcome} = commitBundle;
       const bundlePayload = new Uint8Array([...commit, ...groupInfo.payload, ...(welcome || [])]);
       try {
@@ -155,7 +162,6 @@ export class MLSService extends TypedEventEmitter<Events> {
           await this.coreCryptoClient.commitAccepted(groupId);
         }
         const newEpoch = await this.getEpoch(groupId);
-        const groupIdStr = Encoder.toBase64(groupId).asString;
 
         this.emit('newEpoch', {epoch: newEpoch, groupId: groupIdStr});
         return response;
@@ -177,8 +183,8 @@ export class MLSService extends TypedEventEmitter<Events> {
         }
         throw error;
       }
-    },
-  );
+    });
+  };
 
   /**
    * Will add users to an existing MLS group and send a commit bundle to backend.
@@ -613,6 +619,7 @@ export class MLSService extends TypedEventEmitter<Events> {
   }
 
   public async wipeConversation(groupId: string): Promise<void> {
+    deleteMLSMessagesQueue(groupId);
     await this.cancelKeyMaterialRenewal(groupId);
     await this.cancelPendingProposalsTask(groupId);
 
@@ -728,7 +735,18 @@ export class MLSService extends TypedEventEmitter<Events> {
       subconversationId?: SUBCONVERSATION_ID,
     ) => Promise<string | undefined>,
   ) {
-    return handleMLSMessageAdd({event, mlsService: this, groupIdFromConversationId});
+    const qualifiedConversationId = event.qualified_conversation ?? {id: event.conversation, domain: ''};
+
+    const groupId = await groupIdFromConversationId(qualifiedConversationId, event.subconv);
+
+    // We should not receive a message for a group the client is not aware of
+    if (!groupId) {
+      throw new Error(
+        `Could not find a group_id for conversation ${qualifiedConversationId.id}@${qualifiedConversationId.domain}`,
+      );
+    }
+
+    return queueIncomingMLSMessage(groupId, () => handleMLSMessageAdd({event, mlsService: this, groupId}));
   }
 
   public async handleMLSWelcomeMessageEvent(event: ConversationMLSWelcomeEvent, clientId: string) {

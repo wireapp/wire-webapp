@@ -17,9 +17,7 @@
  *
  */
 
-import {SUBCONVERSATION_ID} from '@wireapp/api-client/lib/conversation';
 import {ConversationMLSMessageAddEvent} from '@wireapp/api-client/lib/event';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Decoder} from 'bazinga64';
 
 import {GenericMessage} from '@wireapp/protocol-messaging';
@@ -29,30 +27,16 @@ import {MLSService, optionalToUint8Array} from '../../../MLSService/MLSService';
 
 interface HandleMLSMessageAddParams {
   event: ConversationMLSMessageAddEvent;
+  groupId: string;
   mlsService: MLSService;
-  groupIdFromConversationId: (
-    conversationId: QualifiedId,
-    subconversationId?: SUBCONVERSATION_ID,
-  ) => Promise<string | undefined>;
 }
 
 export const handleMLSMessageAdd = async ({
   event,
+  groupId,
   mlsService,
-  groupIdFromConversationId,
 }: HandleMLSMessageAddParams): Promise<HandledEventPayload | null> => {
   const encryptedData = Decoder.fromBase64(event.data).asBytes;
-
-  const qualifiedConversationId = event.qualified_conversation ?? {id: event.conversation, domain: ''};
-
-  const groupId = await groupIdFromConversationId(qualifiedConversationId, event.subconv);
-
-  // We should not receive a message for a group the client is not aware of
-  if (!groupId) {
-    throw new Error(
-      `Could not find a group_id for conversation ${qualifiedConversationId.id}@${qualifiedConversationId.domain}`,
-    );
-  }
 
   const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
 

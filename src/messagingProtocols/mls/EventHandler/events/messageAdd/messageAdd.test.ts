@@ -54,21 +54,9 @@ const createMockedMessage = () => {
 };
 
 describe('handleMLSMessageAdd', () => {
-  it('throws when received a message for a group that is not known by a client', async () => {
-    const event = createMLSMessageAddEventMock({id: 'conversationId', domain: 'staging.zinfra.io'});
-
-    const groupIdFromConversationId = () => Promise.resolve(undefined);
-
-    await expect(
-      handleMLSMessageAdd({event, mlsService: mockedMLSService, groupIdFromConversationId}),
-    ).rejects.toThrow();
-  });
-
   it('does not handle pending proposals if message does not contain proposals', async () => {
     const event = createMLSMessageAddEventMock({id: 'conversationId', domain: 'staging.zinfra.io'});
     const mockGroupId = 'AAEAAH87aajaQ011i+rNLmwpy0sAZGl5YS53aXJlLmxpbms=';
-
-    const groupIdFromConversationId = () => Promise.resolve(mockGroupId);
 
     const message = createMockedMessage();
 
@@ -80,7 +68,7 @@ describe('handleMLSMessageAdd', () => {
       isActive: true,
     });
 
-    await handleMLSMessageAdd({event, mlsService: mockedMLSService, groupIdFromConversationId});
+    await handleMLSMessageAdd({event, mlsService: mockedMLSService, groupId: mockGroupId});
 
     expect(mockedMLSService.handlePendingProposals).not.toHaveBeenCalled();
   });
@@ -88,8 +76,6 @@ describe('handleMLSMessageAdd', () => {
   it('handles pending proposals if message includes proposals', async () => {
     const event = createMLSMessageAddEventMock({id: 'conversationId', domain: 'staging.zinfra.io'});
     const mockGroupId = 'AAEAAH87aajaQ011i+rNLmwpy0sAZGl5YS53aXJlLmxpbms=';
-
-    const groupIdFromConversationId = () => Promise.resolve(mockGroupId);
 
     const message = createMockedMessage();
 
@@ -101,7 +87,7 @@ describe('handleMLSMessageAdd', () => {
       isActive: true,
     });
 
-    await handleMLSMessageAdd({event, mlsService: mockedMLSService, groupIdFromConversationId});
+    await handleMLSMessageAdd({event, mlsService: mockedMLSService, groupId: mockGroupId});
 
     expect(mockedMLSService.handlePendingProposals).toHaveBeenCalledWith({
       groupId: mockGroupId,
@@ -113,8 +99,6 @@ describe('handleMLSMessageAdd', () => {
   it('emits "newEpoch" event if incoming message has advanced epoch number', async () => {
     const event = createMLSMessageAddEventMock({id: 'conversationId', domain: 'staging.zinfra.io'});
     const mockGroupId = 'AAEAAH87aajaQ011i+rNLmwpy0sAZGl5YS53aXJlLmxpbms=';
-
-    const groupIdFromConversationId = () => Promise.resolve(mockGroupId);
 
     const message = createMockedMessage();
 
@@ -128,7 +112,7 @@ describe('handleMLSMessageAdd', () => {
     const mockedNewEpoch = 5;
     jest.spyOn(mockedMLSService, 'getEpoch').mockResolvedValueOnce(mockedNewEpoch);
 
-    await handleMLSMessageAdd({event, mlsService: mockedMLSService, groupIdFromConversationId});
+    await handleMLSMessageAdd({event, mlsService: mockedMLSService, groupId: mockGroupId});
 
     expect(mockedMLSService.emit).toHaveBeenCalledWith('newEpoch', {
       groupId: mockGroupId,
