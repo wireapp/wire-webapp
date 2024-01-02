@@ -101,7 +101,7 @@ export const EmojiPill: FC<EmojiPillProps> = ({
       });
     }
 
-    return reactedUserNames?.[0] || '';
+    return t('conversationLikesCaptionSingular', {userName: reactedUserNames?.[0] || ''});
   };
 
   const caption = conversationReactionCaption();
