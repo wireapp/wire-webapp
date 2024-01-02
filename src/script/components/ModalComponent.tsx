@@ -148,7 +148,7 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
       onClick={onBgClick}
       id={id}
       css={hasVisibleClass ? ModalOverlayVisibleStyles : ModalOverlayStyles}
-      style={{display: displayNone ? 'none' : 'flex'}}
+      style={{display: 'flex'}}
       tabIndex={TabIndex.FOCUSABLE}
       className={className}
       {...rest}

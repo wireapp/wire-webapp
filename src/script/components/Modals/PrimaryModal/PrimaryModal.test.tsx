@@ -30,7 +30,7 @@ describe('PrimaryModal', () => {
   it('does not render when no item is in the queue', async () => {
     const {getByTestId} = render(<PrimaryModalComponent />);
     const PrimaryModalWrapper = getByTestId('primary-modals-container');
-    expect(PrimaryModalWrapper.children[0].getAttribute('style')).toBe('display: none;');
+    expect(PrimaryModalWrapper.children).toHaveLength(0);
   });
 
   it('correctly calls action callback', async () => {

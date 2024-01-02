@@ -92,10 +92,10 @@ describe('AppLock', () => {
         clientRepository,
       };
 
-      const {getByTestId} = render(<AppLock {...props} />);
+      const {queryByTestId} = render(<AppLock {...props} />);
 
-      const appLockModal = getByTestId('applock-modal');
-      expect(window.getComputedStyle(appLockModal).getPropertyValue('display')).toBe('none');
+      const appLockModal = queryByTestId('applock-modal');
+      expect(appLockModal).toBe(null);
     });
   });
 
