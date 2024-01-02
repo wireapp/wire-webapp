@@ -132,7 +132,7 @@ const AppMain: FC<AppMainProps> = ({
   const isLeftSidebarVisible = currentView == ViewType.LEFT_SIDEBAR;
 
   const initializeApp = async () => {
-    if (!isFreshMLSSelfClient) {
+    if (isFreshMLSSelfClient) {
       return;
     }
 

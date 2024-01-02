@@ -33,10 +33,8 @@ export function useAppSoftLock(callingRepository: CallingRepository, notificatio
     const initializedIsFreshMLSSelfClient = await isFreshMLSSelfClient();
 
     setFreshMLSSelfClient(initializedIsFreshMLSSelfClient);
-
-    callingRepository.setSoftLock(true);
-    notificationRepository.setSoftLock(true);
-
+    callingRepository.setSoftLock(initializedIsFreshMLSSelfClient);
+    notificationRepository.setSoftLock(initializedIsFreshMLSSelfClient);
     setSoftLockLoaded(true);
   };
 
