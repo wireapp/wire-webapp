@@ -410,26 +410,6 @@ export class APIClient extends EventEmitter {
   }
 
   /**
-   * Will lock the websocket before executing the callback and unlock it after
-   * @param callback The callback to execute
-   */
-  public withLockedWebSocket<T extends (...args: any[]) => any>(
-    callback: T,
-  ): (...args: Parameters<T>) => Promise<ReturnType<T>> {
-    return async (...args: Parameters<T>): Promise<ReturnType<T>> => {
-      this.transport.ws.lock();
-      try {
-        const result = await callback(...args);
-        this.transport.ws.unlock();
-        return result;
-      } catch (error) {
-        this.transport.ws.unlock();
-        throw error;
-      }
-    };
-  }
-
-  /**
    * Will check if MLS is supported by backend (whether the api version used supports MLS, and whether a backend removal key is present).
    */
   public async supportsMLS(): Promise<boolean> {
