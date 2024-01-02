@@ -307,16 +307,8 @@
 .message-body {
   position: relative;
   display: flex;
-  max-width: @conversation-max-width;
   justify-content: space-between;
-  padding-left: @conversation-message-sender-width;
-
-  &-content {
-    width: calc(100% - var(--conversation-message-timestamp-width));
-    max-width: calc(
-      @conversation-max-width - @conversation-message-sender-width - var(--conversation-message-timestamp-width)
-    );
-  }
+  padding-inline: @conversation-message-sender-width 40px;
 
   .text {
     .text-selection;
