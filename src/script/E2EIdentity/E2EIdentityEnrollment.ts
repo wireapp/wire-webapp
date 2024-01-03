@@ -58,7 +58,7 @@ interface E2EIHandlerParams {
   isFreshMLSSelfClient?: boolean;
 }
 
-type Events = {enrollmentSuccessful: {certificateRenewal: boolean}};
+type Events = {enrollmentSuccessful: void};
 
 type EnrollmentConfig = {
   timer: DelayTimerService;
@@ -294,9 +294,9 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       }, 0);
 
       this.currentStep = E2EIHandlerStep.SUCCESS;
-      this.showSuccessMessage();
+      this.showSuccessMessage(isCertificateRenewal);
 
-      this.emit('enrollmentSuccessful', {certificateRenewal: isCertificateRenewal});
+      this.emit('enrollmentSuccessful');
 
       // clear the oidc service progress/data and successful enrolment
       await this.cleanUp();
@@ -325,25 +325,23 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     PrimaryModal.show(modalType, modalOptions);
   }
 
-  private showSuccessMessage(): void {
+  private showSuccessMessage(isCertificateRenewal = false): void {
     if (this.currentStep !== E2EIHandlerStep.SUCCESS) {
       return;
     }
 
-    E2EIHandler.getInstance().on('enrollmentSuccessful', data => {
-      const {modalOptions, modalType} = getModalOptions({
-        type: ModalType.SUCCESS,
-        hideSecondary: false,
-        hideClose: false,
-        extraParams: {
-          isRenewal: data.certificateRenewal,
-        },
-        secondaryActionFn: () => {
-          amplify.publish(WebAppEvents.PREFERENCES.MANAGE_DEVICES);
-        },
-      });
-      PrimaryModal.show(modalType, modalOptions);
+    const {modalOptions, modalType} = getModalOptions({
+      type: ModalType.SUCCESS,
+      hideSecondary: false,
+      hideClose: false,
+      extraParams: {
+        isRenewal: isCertificateRenewal,
+      },
+      secondaryActionFn: () => {
+        amplify.publish(WebAppEvents.PREFERENCES.MANAGE_DEVICES);
+      },
     });
+    PrimaryModal.show(modalType, modalOptions);
   }
 
   private async showErrorMessage(): Promise<void> {
