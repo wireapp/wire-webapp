@@ -29,9 +29,15 @@ import {AssetTransferState} from '../../../../../assets/AssetTransferState';
 import {ContentMessage} from '../../../../../entity/message/ContentMessage';
 import {FileAsset} from '../../../../../entity/message/FileAsset';
 
+export type AssetUrl = {
+  url: string;
+  dispose: () => void;
+};
+
 export const useAssetTransfer = (message: ContentMessage, assetRepository = container.resolve(AssetRepository)) => {
   const asset = message?.getFirstAsset() as FileAsset;
   const [uploadProgress, setUploadProgress] = useState<number>(0);
+
   useEffect(() => {
     const progressSubscribable = assetRepository.getUploadProgress(message?.id);
     setUploadProgress(progressSubscribable());
@@ -40,8 +46,10 @@ export const useAssetTransfer = (message: ContentMessage, assetRepository = cont
       subscription.dispose();
     };
   }, [message]);
+
   const {status} = useKoSubscribableChildren(asset, ['status']);
   const transferState = uploadProgress > -1 ? AssetTransferState.UPLOADING : status;
+
   return {
     cancelUpload: () => assetRepository.cancelUpload(message.id),
     downloadAsset: (asset: FileAsset) => assetRepository.downloadFile(asset),
@@ -49,7 +57,20 @@ export const useAssetTransfer = (message: ContentMessage, assetRepository = cont
     isPendingUpload: transferState === AssetTransferState.UPLOAD_PENDING,
     isUploaded: transferState === AssetTransferState.UPLOADED,
     isUploading: transferState === AssetTransferState.UPLOADING,
-    loadAsset: (resource: AssetRemoteData) => assetRepository.load(resource),
+    getAssetUrl: async (resource: AssetRemoteData, acceptedMimeTypes?: string[]): Promise<AssetUrl> => {
+      const blob = await assetRepository.load(resource);
+      if (!blob) {
+        throw new Error(`Asset could not be loaded`);
+      }
+      if (acceptedMimeTypes && !acceptedMimeTypes?.includes(blob.type)) {
+        throw new Error(`Mime type not accepted "${blob.type}"`);
+      }
+      const url = URL.createObjectURL(blob);
+      return {
+        dispose: () => URL.revokeObjectURL(url),
+        url,
+      };
+    },
     transferState,
     uploadProgress,
   };
