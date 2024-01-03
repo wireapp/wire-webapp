@@ -62,6 +62,7 @@ export const ImageAsset: React.FC<ImageAssetProps> = ({
   const {isUploading, uploadProgress, cancelUpload, getAssetUrl} = useAssetTransfer(message);
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isFocusable);
 
+  /** keeps track of whether the component is mounted or not to avoid setting the image url in case it's not */
   const isUnmouted = useRef(false);
 
   useEffect(() => {
