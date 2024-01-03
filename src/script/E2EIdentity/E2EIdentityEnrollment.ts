@@ -128,7 +128,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   }
 
   public async handleCertificateRenewal(): Promise<void> {
-    const certificate = await this.getCurrentDeviceCertificateData();
+    const certificate = await getActiveCertificate();
 
     if (!certificate) {
       return;
@@ -223,16 +223,6 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     await this.oidcService.clearProgress();
     // Clear the e2e identity progress
     this.coreE2EIService.clearAllProgress();
-  }
-
-  private async getCurrentDeviceCertificateData() {
-    const activeCertificate = await getActiveCertificate();
-
-    if (!activeCertificate.length) {
-      return undefined;
-    }
-
-    return activeCertificate;
   }
 
   public async enroll(refreshActiveCertificate = false, userData?: User) {

@@ -92,14 +92,15 @@ const fetchSelfDeviceIdentity = async (): Promise<WireIdentity | undefined> => {
 };
 
 export async function hasActiveCertificate(): Promise<boolean> {
-  return Boolean((await getActiveCertificate()).length);
+  const activeCertificate = await getActiveCertificate();
+  return typeof activeCertificate === 'string' && Boolean(activeCertificate.length);
 }
 
-export async function getActiveCertificate(): Promise<string> {
+export async function getActiveCertificate(): Promise<string | undefined> {
   const selfDeviceIdentity = await fetchSelfDeviceIdentity();
 
   if (!selfDeviceIdentity) {
-    return '';
+    return undefined;
   }
 
   return selfDeviceIdentity.certificate;
