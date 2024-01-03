@@ -22,7 +22,7 @@ import {useEffect, useState} from 'react';
 import cx from 'classnames';
 
 import {Icon} from 'Components/Icon';
-import {Message} from 'src/script/entity/message/Message';
+import {Message as BaseMessage, Message} from 'src/script/entity/message/Message';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatTimeShort} from 'Util/TimeUtil';
@@ -31,7 +31,7 @@ export interface ReadReceiptStatusProps {
   is1to1Conversation: boolean;
   isLastDeliveredMessage: boolean;
   message: Message;
-  onClickDetails?: any;
+  onClickDetails?: (message: BaseMessage) => void;
 }
 
 const ReadReceiptStatus = ({
