@@ -18,10 +18,12 @@
  */
 
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
+import {amplify} from 'amplify';
 import {User} from 'oidc-client-ts';
 import {container} from 'tsyringe';
 
 import {TypedEventEmitter} from '@wireapp/commons';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal, removeCurrentModal} from 'Components/Modals/PrimaryModal';
 import {Core} from 'src/script/service/CoreSingleton';
@@ -56,7 +58,7 @@ interface E2EIHandlerParams {
   isFreshMLSSelfClient?: boolean;
 }
 
-type Events = {enrollmentSuccessful: void};
+type Events = {enrollmentSuccessful: {certificateRenewal: boolean}};
 
 type EnrollmentConfig = {
   timer: DelayTimerService;
@@ -170,7 +172,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
         throw new Error('Received no user data from OIDC service');
       }
       // renew without user action
-      await this.enroll(true, userData);
+      await this.enroll(userData);
     } catch (error) {
       this.logger.error('Silent authentication with refresh token failed', error);
 
@@ -237,7 +239,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     return this.getE2EIdentityService()?.getCertificateData();
   }
 
-  public async enroll(refreshActiveCertificate = false, userData?: User) {
+  public async enroll(userData?: User) {
     if (!this.config) {
       throw new Error('Trying to enroll for E2EI without initializing the E2EIHandler');
     }
@@ -246,6 +248,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       this.currentStep = E2EIHandlerStep.ENROLL;
       this.showLoadingMessage();
       let oAuthIdToken: string | undefined;
+      const isCertificateRenewal = hasActiveCertificate();
 
       if (!userData) {
         // If the enrolment is in progress, we need to get the id token from the oidc service, since oauth should have already been completed
@@ -292,7 +295,8 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
       this.currentStep = E2EIHandlerStep.SUCCESS;
       this.showSuccessMessage();
-      this.emit('enrollmentSuccessful');
+
+      this.emit('enrollmentSuccessful', {certificateRenewal: isCertificateRenewal});
 
       // clear the oidc service progress/data and successful enrolment
       await this.cleanUp();
@@ -325,12 +329,21 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     if (this.currentStep !== E2EIHandlerStep.SUCCESS) {
       return;
     }
-    const {modalOptions, modalType} = getModalOptions({
-      type: ModalType.SUCCESS,
-      hideSecondary: true,
-      hideClose: false,
+
+    E2EIHandler.getInstance().on('enrollmentSuccessful', data => {
+      const {modalOptions, modalType} = getModalOptions({
+        type: ModalType.SUCCESS,
+        hideSecondary: false,
+        hideClose: false,
+        extraParams: {
+          isRenewal: data.certificateRenewal,
+        },
+        secondaryActionFn: () => {
+          amplify.publish(WebAppEvents.PREFERENCES.MANAGE_DEVICES);
+        },
+      });
+      PrimaryModal.show(modalType, modalOptions);
     });
-    PrimaryModal.show(modalType, modalOptions);
   }
 
   private async showErrorMessage(): Promise<void> {

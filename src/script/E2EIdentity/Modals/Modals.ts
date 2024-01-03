@@ -40,7 +40,7 @@ interface GetModalOptions {
   hideSecondary?: boolean;
   hidePrimary?: boolean;
   hideClose?: boolean;
-  extraParams?: {delayTime?: string};
+  extraParams?: {delayTime?: string; isRenewal?: boolean};
 }
 export const getModalOptions = ({
   type,
@@ -57,6 +57,13 @@ export const getModalOptions = ({
   let options: ModalOptions = {};
   let modalType: PrimaryModalType = PrimaryModal.type.CONFIRM;
   const replaceLearnMore = replaceLink('learnMore');
+  const svgHtml = `
+  <div style="margin-bottom: 24px;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" fill="none">
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M60 32V7.48786L32 0L4 8V32C4 48 16.0287 60.3908 32 64C48.1374 60.3908 60 48 60 32ZM52 21.3829L27.4086 48L12 31.3842L16.9238 26.0013L27.4086 37.2342L47.0762 16L52 21.3829Z" fill="#1D7833"/>
+      </svg>
+  </div>
+  `;
   switch (type) {
     case ModalType.ENROLL:
       options = {
@@ -152,12 +159,18 @@ export const getModalOptions = ({
       options = {
         text: {
           closeBtnLabel: t('acme.done.button.close'),
-          htmlMessage: t('acme.done.paragraph'),
-          title: t('acme.done.headline'),
+          htmlMessage: `<div style="text-align: center">${svgHtml}${
+            extraParams?.isRenewal ? t('acme.renewal.done.paragraph') : t('acme.done.paragraph')
+          }</div>`,
+          title: extraParams?.isRenewal ? t('acme.renewal.done.headline') : t('acme.done.headline'),
         },
         primaryAction: {
           action: primaryActionFn,
           text: t('acme.done.button'),
+        },
+        secondaryAction: {
+          action: secondaryActionFn,
+          text: t('acme.done.button.secondary'),
         },
       };
       modalType = PrimaryModal.type.ACKNOWLEDGE;
