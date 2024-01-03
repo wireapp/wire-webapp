@@ -64,6 +64,7 @@ jest.mock('./Modals', () => ({
 
 jest.mock('./E2EIdentityVerification', () => ({
   hasActiveCertificate: jest.fn().mockResolvedValue(false),
+  getActiveCertificate: jest.fn().mockResolvedValue('certificate data'),
   isE2EIEnabled: jest.fn().mockReturnValue(true),
 }));
 
@@ -195,9 +196,6 @@ describe('E2EIHandler', () => {
   it('should call renewCertificate when conditions are met', async () => {
     const handler = E2EIHandler.getInstance();
 
-    // Mock getCurrentDeviceCertificateData to return a specific string
-    handler['getCurrentDeviceCertificateData'] = jest.fn().mockReturnValue('certificate data');
-
     // set active certificate to be truthy
     (hasActiveCertificate as jest.Mock).mockResolvedValue(true);
 
@@ -216,9 +214,6 @@ describe('E2EIHandler', () => {
 
   it('should handle enrollment in progress', async () => {
     const handler = E2EIHandler.getInstance();
-
-    // Mock getCurrentDeviceCertificateData to return a specific string
-    handler['getCurrentDeviceCertificateData'] = jest.fn().mockReturnValue('certificate data');
 
     // Set active certificate to be truthy and enrollment in progress
     (hasActiveCertificate as jest.Mock).mockResolvedValue(true);
@@ -240,9 +235,6 @@ describe('E2EIHandler', () => {
 
   it('should not call renewCertificate when the renewal time is in the future', async () => {
     const handler = E2EIHandler.getInstance();
-
-    // Mock getCurrentDeviceCertificateData to return a specific string
-    handler['getCurrentDeviceCertificateData'] = jest.fn().mockReturnValue('certificate data');
 
     // Set active certificate to be truthy and enrollment not in progress
     (hasActiveCertificate as jest.Mock).mockResolvedValue(true);
@@ -284,9 +276,6 @@ describe('E2EIHandler', () => {
 
   it('for invalid certificate user can not get another certificate until deleting a client', async () => {
     const handler = E2EIHandler.getInstance();
-
-    // Mock getCurrentDeviceCertificateData to return a specific string
-    handler['getCurrentDeviceCertificateData'] = jest.fn().mockReturnValue('certificate data');
 
     // Set active certificate to be true
     (hasActiveCertificate as jest.Mock).mockResolvedValue(true);
