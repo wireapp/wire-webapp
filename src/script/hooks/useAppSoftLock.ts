@@ -20,7 +20,7 @@
 import {useEffect, useState} from 'react';
 
 import {CallingRepository} from '../calling/CallingRepository';
-import {isE2EIEnabled, isFreshMLSSelfClient} from '../E2EIdentity';
+import {E2EIHandler, isE2EIEnabled, isFreshMLSSelfClient} from '../E2EIdentity';
 import {NotificationRepository} from '../notification/NotificationRepository';
 
 export function useAppSoftLock(callingRepository: CallingRepository, notificationRepository: NotificationRepository) {
@@ -43,6 +43,17 @@ export function useAppSoftLock(callingRepository: CallingRepository, notificatio
       void checkIfIsFreshMLSSelfClient();
     }
   }, [e2eiEnabled]);
+
+  useEffect(() => {
+    if (!freshMLSSelfClient) {
+      return () => {};
+    }
+
+    E2EIHandler.getInstance().on('enrollmentSuccessful', checkIfIsFreshMLSSelfClient);
+    return () => {
+      E2EIHandler.getInstance().off('enrollmentSuccessful', checkIfIsFreshMLSSelfClient);
+    };
+  }, [freshMLSSelfClient]);
 
   return {isFreshMLSSelfClient: freshMLSSelfClient, softLockLoaded: e2eiEnabled ? softLockLoaded : true};
 }
