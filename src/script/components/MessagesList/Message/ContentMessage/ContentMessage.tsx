@@ -83,6 +83,7 @@ export const ContentMessageComponent: React.FC<ContentMessageProps> = ({
   onRetry,
   isMsgElementsFocusable,
   onClickReaction,
+  onClickDetails,
 }) => {
   // check if current message is focused and its elements focusable
   const msgFocusState = useMemo(
@@ -182,6 +183,7 @@ export const ContentMessageComponent: React.FC<ContentMessageProps> = ({
             message={message}
             is1to1Conversation={conversation.is1to1()}
             isLastDeliveredMessage={isLastDeliveredMessage}
+            onClickDetails={onClickDetails}
           />
         </MessageHeader>
       )}

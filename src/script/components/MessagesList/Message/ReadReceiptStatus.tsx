@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 
 import cx from 'classnames';
 
@@ -31,9 +31,15 @@ export interface ReadReceiptStatusProps {
   is1to1Conversation: boolean;
   isLastDeliveredMessage: boolean;
   message: Message;
+  onClickDetails?: any;
 }
 
-const ReadReceiptStatus: React.FC<ReadReceiptStatusProps> = ({message, is1to1Conversation, isLastDeliveredMessage}) => {
+const ReadReceiptStatus = ({
+  message,
+  is1to1Conversation,
+  isLastDeliveredMessage,
+  onClickDetails,
+}: ReadReceiptStatusProps) => {
   const [readReceiptText, setReadReceiptText] = useState('');
   const {readReceipts} = useKoSubscribableChildren(message, ['readReceipts']);
 
@@ -55,16 +61,21 @@ const ReadReceiptStatus: React.FC<ReadReceiptStatusProps> = ({message, is1to1Con
         </span>
       )}
       {showEyeIndicator && (
-        <div
-          className={cx('message-status-read', is1to1Conversation && 'message-status-read__one-on-one')}
+        <button
+          className={cx(
+            'message-status-read',
+            is1to1Conversation && 'message-status-read__one-on-one',
+            !!onClickDetails && 'message-status-read__clickable',
+          )}
           data-uie-name="status-message-read-receipts"
           aria-label={t('accessibility.messageDetailsReadReceipts', readReceiptText)}
+          onClick={() => onClickDetails?.(message)}
         >
           <Icon.Read />
           <span className="message-status-read__count" data-uie-name="status-message-read-receipt-count">
             {readReceiptText}
           </span>
-        </div>
+        </button>
       )}
     </>
   );
