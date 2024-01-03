@@ -57,10 +57,10 @@ export const useAssetTransfer = (message: ContentMessage, assetRepository = cont
     isPendingUpload: transferState === AssetTransferState.UPLOAD_PENDING,
     isUploaded: transferState === AssetTransferState.UPLOADED,
     isUploading: transferState === AssetTransferState.UPLOADING,
-    getAssetUrl: async (resource: AssetRemoteData, acceptedMimeTypes?: string[]): Promise<AssetUrl | undefined> => {
+    getAssetUrl: async (resource: AssetRemoteData, acceptedMimeTypes?: string[]): Promise<AssetUrl> => {
       const blob = await assetRepository.load(resource);
       if (!blob) {
-        return undefined;
+        throw new Error(`Asset could not be loaded`);
       }
       if (acceptedMimeTypes && !acceptedMimeTypes?.includes(blob.type)) {
         throw new Error(`Mime type not accepted "${blob.type}"`);

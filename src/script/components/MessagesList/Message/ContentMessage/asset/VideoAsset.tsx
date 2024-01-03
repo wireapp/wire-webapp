@@ -75,7 +75,7 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
 
   useEffect(() => {
     if (assetPreviewResource && isFileSharingReceivingEnabled) {
-      getAssetUrl(assetPreviewResource).then(url => url && setVideoPreview(url));
+      getAssetUrl(assetPreviewResource).then(setVideoPreview);
     }
     return () => {
       videoPreview?.dispose();
@@ -94,9 +94,6 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
 
         try {
           const url = await getAssetUrl(asset.original_resource());
-          if (!url) {
-            throw new Error('blob could not be loaded from asset');
-          }
           setVideoSrc(url);
           setIsVideoLoaded(true);
         } catch (error) {
