@@ -33,7 +33,7 @@ import {removeUrlParameters} from 'Util/UrlUtil';
 import {supportsMLS} from 'Util/util';
 
 import {DelayTimerService} from './DelayTimer/DelayTimer';
-import {hasActiveCertificate, isE2EIEnabled} from './E2EIdentityVerification';
+import {hasActiveCertificate, isE2EIEnabled, getActiveCertificate} from './E2EIdentityVerification';
 import {getModalOptions, ModalType} from './Modals';
 import {OIDCService} from './OIDCService';
 import {OIDCServiceStore} from './OIDCService/OIDCServiceStorage';
@@ -103,7 +103,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     E2EIHandler.instance = null;
   }
 
-  public initialize({discoveryUrl, gracePeriodInSeconds, isFreshMLSSelfClient = false}: E2EIHandlerParams) {
+  public async initialize({discoveryUrl, gracePeriodInSeconds, isFreshMLSSelfClient = false}: E2EIHandlerParams) {
     if (!isE2EIEnabled()) {
       return this;
     }
@@ -118,7 +118,8 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       }),
       isFreshMLSSelfClient,
     };
-    if (!hasActiveCertificate()) {
+    const hasCertificate = await hasActiveCertificate();
+    if (!hasCertificate) {
       this.showE2EINotificationMessage();
     } else {
       void this.handleCertificateRenewal();
@@ -127,7 +128,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   }
 
   public async handleCertificateRenewal(): Promise<void> {
-    const certificate = this.getCurrentDeviceCertificateData();
+    const certificate = await getActiveCertificate();
 
     if (!certificate) {
       return;
@@ -222,18 +223,6 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     await this.oidcService.clearProgress();
     // Clear the e2e identity progress
     this.coreE2EIService.clearAllProgress();
-  }
-
-  private getE2EIdentityService() {
-    return container.resolve(Core).service?.e2eIdentity;
-  }
-
-  private getCurrentDeviceCertificateData() {
-    if (!hasActiveCertificate()) {
-      return undefined;
-    }
-
-    return this.getE2EIdentityService()?.getCertificateData();
   }
 
   public async enroll(refreshActiveCertificate = false, userData?: User) {
