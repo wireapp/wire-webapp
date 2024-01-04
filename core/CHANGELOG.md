@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [43.4.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@43.3.1...@wireapp/core@43.4.0) (2024-01-04)
+
+### Features
+
+* **e2ei:** remove device storage for e2ei cert ([#5840](https://github.com/wireapp/wire-web-packages/issues/5840)) ([40869fd](https://github.com/wireapp/wire-web-packages/commit/40869fd35fba4a295e7ba637d359cf14aade7e92))
+
 ## [43.3.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@43.3.0...@wireapp/core@43.3.1) (2024-01-04)
 
 ### Bug Fixes
