@@ -46,7 +46,6 @@ import logdown from 'logdown';
 
 import {APIClient} from '@wireapp/api-client';
 import {TypedEventEmitter} from '@wireapp/commons';
-import {Ciphersuite, CredentialType, ExternalProposalType} from '@wireapp/core-crypto';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {
@@ -60,7 +59,7 @@ import {
 
 import {MessageTimer, MessageSendingState, RemoveUsersParams} from '../../conversation/';
 import {decryptAsset} from '../../cryptography/AssetCryptography';
-import {MLSService, optionalToUint8Array} from '../../messagingProtocols/mls';
+import {MLSService} from '../../messagingProtocols/mls';
 import {isCoreCryptoMLSWrongEpochError} from '../../messagingProtocols/mls/MLSService/CoreCryptoMLSError';
 import {getConversationQualifiedMembers, ProteusService} from '../../messagingProtocols/proteus';
 import {
@@ -420,31 +419,6 @@ export class ConversationService extends TypedEventEmitter<Events> {
 
   public async joinByExternalCommit(conversationId: QualifiedId) {
     return this.mlsService.joinByExternalCommit(() => this.apiClient.api.conversation.getGroupInfo(conversationId));
-  }
-
-  /**
-   * Will send an external proposal for the current device to join a specific conversation.
-   * In order for the external proposal to be sent correctly, the underlying mls conversation needs to be in a non-established state
-   * @param groupId The conversation to join
-   * @param epoch The current epoch of the local conversation
-   */
-  public async sendExternalJoinProposal(groupId: string, epoch: number) {
-    return sendMessage(async () => {
-      const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
-      const externalProposal = await this.mlsService.newExternalProposal(ExternalProposalType.Add, {
-        epoch,
-        conversationId: groupIdBytes,
-        ciphersuite: Ciphersuite.MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519,
-        credentialType: CredentialType.Basic,
-      });
-      await this.apiClient.api.conversation.postMlsMessage(
-        //@todo: it's temporary - we wait for core-crypto fix to return the actual Uint8Array instead of regular array
-        optionalToUint8Array(externalProposal),
-      );
-
-      //We store the info when user was added (and key material was created), so we will know when to renew it
-      await this.mlsService.resetKeyMaterialRenewal(groupId);
-    });
   }
 
   /**
