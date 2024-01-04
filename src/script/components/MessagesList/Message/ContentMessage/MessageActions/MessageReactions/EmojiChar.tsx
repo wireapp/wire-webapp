@@ -33,7 +33,7 @@ export const EmojiChar: FC<EmojiImgProps> = ({emoji, size, styles}) => {
   const fontSize = size ? `${size}px` : 'var(--font-size-medium)';
   const style = {
     ':after': {
-      content: `'${`${emoji}`}'`,
+      content: `'${emoji}'`,
     },
   };
 
