@@ -175,7 +175,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       this.logger.error('Silent authentication with refresh token failed', error);
 
       // If the silent authentication fails, clear the oidc service progress/data and renew manually
-      await this.cleanUp();
+      await this.cleanUp(true);
       this.showE2EINotificationMessage(ModalType.CERTIFICATE_RENEWAL);
     }
   }
@@ -215,12 +215,12 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   /**
    * Used to clean the state/storage after a failed run
    */
-  private async cleanUp() {
+  private async cleanUp(includeOidcServiceUserData: boolean) {
     // Remove the url parameters of the failed enrolment
     removeUrlParameters();
     // Clear the oidc service progress
     this.oidcService = new OIDCService();
-    await this.oidcService.clearProgress();
+    await this.oidcService.clearProgress(includeOidcServiceUserData);
     // Clear the e2e identity progress
     this.coreE2EIService.clearAllProgress();
   }
@@ -283,7 +283,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       this.emit('enrollmentSuccessful');
 
       // clear the oidc service progress/data and successful enrolment
-      await this.cleanUp();
+      await this.cleanUp(false);
     } catch (error) {
       this.logger.error('E2EI enrollment failed', error);
 
