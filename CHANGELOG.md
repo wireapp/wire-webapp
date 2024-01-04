@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [43.3.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@43.3.0...@wireapp/core@43.3.1) (2024-01-04)
+
+### Bug Fixes
+
+* Remove outdated sendExternalJoinProposal method ([#5841](https://github.com/wireapp/wire-web-packages/issues/5841)) ([1a64fe7](https://github.com/wireapp/wire-web-packages/commit/1a64fe71876e3d9f52bb3da19332cbeee3a678b9))
+
 # [43.3.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@43.2.0...@wireapp/core@43.3.0) (2024-01-02)
 
 ### Bug Fixes
