@@ -46,6 +46,7 @@ import {
 import {getModalOptions, ModalType} from './Modals';
 import {OIDCService} from './OIDCService';
 import {OIDCServiceStore} from './OIDCService/OIDCServiceStorage';
+import {getProxiedUrl} from './utils/proxyUrlGenerator';
 
 import {Config} from '../Config';
 
@@ -137,6 +138,16 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       };
     }
     return this;
+  }
+
+  public async downloadRevocationList(): Promise<void> {
+    const baseDomain = new URL(this.config?.discoveryUrl ?? '').hostname;
+    // TODO change this to http (instead of https) when backend has the http endpoint
+    const crlUrl = getProxiedUrl(`https://${baseDomain}/crl`);
+    const response = await fetch(crlUrl);
+    const revocationList = await response.arrayBuffer();
+    // TODO pass the revocation list to CoreCrypto when it has the method implemented
+    console.log(revocationList);
   }
 
   public async attemptEnrollment(): Promise<void> {

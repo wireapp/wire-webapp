@@ -24,6 +24,7 @@ import {Logger, getLogger} from 'Util/Logger';
 
 import {EncryptedStorage} from './OauthEncryptedStore';
 import {OIDCServiceStore} from './OIDCServiceStorage';
+import {getProxiedUrl} from '../utils/proxyUrlGenerator';
 
 export class OIDCService {
   private readonly userManager: UserManager;
@@ -51,9 +52,9 @@ export class OIDCService {
     const idpClientSecret = 'dUpVSGx2dVdFdGQ0dmsxWGhDalQ0SldU';
 
     // Build the proxy url and redirect uri
-    const currentOrigin = location.origin;
     const authorityUrl = idpUrl.origin + idpUrl.pathname;
-    const proxyUrl = `${currentOrigin}/oidcProxy?targetUrl=${authorityUrl}`;
+    const currentOrigin = location.origin;
+    const proxyUrl = getProxiedUrl(authorityUrl);
     const redirectUri = `${currentOrigin}/oidc`;
 
     const dexioConfig: UserManagerSettings = {
