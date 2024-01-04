@@ -19,7 +19,9 @@
 
 import {FC} from 'react';
 
-import {CSSObject} from '@emotion/react';
+import {CSSObject, css} from '@emotion/react';
+
+import {getEmojiUnicode} from 'Util/EmojiUtil';
 
 export interface EmojiImgProps {
   emoji: string;
@@ -27,12 +29,20 @@ export interface EmojiImgProps {
   styles?: CSSObject;
 }
 
-export const EmojiChar: FC<EmojiImgProps> = ({emoji: unicode, size, styles}) => {
+export const EmojiChar: FC<EmojiImgProps> = ({emoji, size, styles}) => {
   const fontSize = size ? `${size}px` : 'var(--font-size-medium)';
   const style = {
     ':after': {
-      content: `'${unicode}'`,
+      content: `'${`${emoji}`}'`,
     },
   };
-  return <span aria-hidden={true} css={{fontSize, ...style, ...styles}}></span>;
+
+  const unicode = getEmojiUnicode(emoji);
+  const cssStyles = css({
+    fontSize,
+    ...style,
+    ...styles,
+    label: unicode,
+  });
+  return <span aria-hidden={true} css={cssStyles}></span>;
 };
