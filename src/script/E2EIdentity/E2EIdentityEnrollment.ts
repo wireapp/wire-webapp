@@ -29,7 +29,6 @@ import {UserState} from 'src/script/user/UserState';
 import {getCertificateDetails} from 'Util/certificateDetails';
 import {getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {removeUrlParameters} from 'Util/UrlUtil';
 import {supportsMLS} from 'Util/util';
 
 import {DelayTimerService} from './DelayTimer/DelayTimer';
@@ -73,6 +72,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   private config?: EnrollmentConfig;
   private currentStep: E2EIHandlerStep | null = E2EIHandlerStep.UNINITIALIZED;
   private oidcService: OIDCService | null = null;
+  private isModalActive = false;
 
   private get coreE2EIService() {
     const e2eiService = this.core.service?.e2eIdentity;
@@ -141,12 +141,6 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       return;
     }
 
-    // Check if an enrollment is already in progress
-    if (this.coreE2EIService.isEnrollmentInProgress()) {
-      await this.enroll();
-      return;
-    }
-
     const renewalTimeMS = this.calculateRenewalTime(timeRemainingMS, historyTimeMS, this.config!.gracePeriodInMs);
     const renewalPromptTime = new Date(certificateCreationTime + renewalTimeMS).getTime();
     const currentTime = new Date().getTime();
@@ -170,7 +164,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
         throw new Error('Received no user data from OIDC service');
       }
       // renew without user action
-      await this.enroll(true, userData);
+      await this.enroll(userData);
     } catch (error) {
       this.logger.error('Silent authentication with refresh token failed', error);
 
@@ -205,19 +199,10 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     return supportsMLS() && Config.getConfig().FEATURE.ENABLE_E2EI;
   }
 
-  private async storeRedirectTargetAndRedirect(targetURL: string): Promise<void> {
-    // store the target url in the persistent oidc service store, since the oidc service will be destroyed after the redirect
-    OIDCServiceStore.store.targetURL(targetURL);
-    this.oidcService = new OIDCService();
-    await this.oidcService.authenticate();
-  }
-
   /**
    * Used to clean the state/storage after a failed run
    */
   private async cleanUp(includeOidcServiceUserData: boolean) {
-    // Remove the url parameters of the failed enrolment
-    removeUrlParameters();
     // Clear the oidc service progress
     this.oidcService = new OIDCService();
     await this.oidcService.clearProgress(includeOidcServiceUserData);
@@ -225,31 +210,26 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     this.coreE2EIService.clearAllProgress();
   }
 
-  public async enroll(refreshActiveCertificate = false, userData?: User) {
+  private closeModal() {
+    if (this.isModalActive) {
+      removeCurrentModal();
+      this.isModalActive = false;
+    }
+  }
+
+  public async enroll(userData?: User) {
     if (!this.config) {
       throw new Error('Trying to enroll for E2EI without initializing the E2EIHandler');
     }
     try {
       // Notify user about E2EI enrolment in progress
-      this.currentStep = E2EIHandlerStep.ENROLL;
-      this.showLoadingMessage();
-      let oAuthIdToken: string | undefined;
 
+      this.currentStep = E2EIHandlerStep.ENROLL;
       if (!userData) {
-        // If the enrolment is in progress, we need to get the id token from the oidc service, since oauth should have already been completed
-        if (this.coreE2EIService.isEnrollmentInProgress()) {
-          // The redirect-url which is needed inside the OIDCService is stored in the OIDCServiceStore previously
-          this.oidcService = new OIDCService();
-          const userData = await this.oidcService.handleAuthentication();
-          if (!userData) {
-            throw new Error('Received no user data from OIDC service');
-          }
-          oAuthIdToken = userData?.id_token;
-        }
-      } else {
-        oAuthIdToken = userData?.id_token;
+        this.showLoadingMessage();
       }
 
+      const oAuthIdToken = userData?.id_token ?? undefined;
       const displayName = this.userState.self()?.name();
       const handle = this.userState.self()?.username();
       // If the user has no username or handle, we cannot enroll
@@ -269,17 +249,21 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
       // Check if the data is a boolean, if not, we need to handle the oauth redirect
       if (typeof data !== 'boolean') {
-        await this.storeRedirectTargetAndRedirect(data.target);
+        OIDCServiceStore.store.targetURL(data.target);
+        this.oidcService = new OIDCService();
+        const userData = await this.oidcService.authenticate();
+        if (!userData) {
+          throw new Error('Received no user data from OIDC service');
+        }
+        void this.enroll(userData);
+        return;
       }
-
       // Notify user about E2EI enrolment success
       // This setTimeout is needed because there was a timing with the success modal and the loading modal
-      setTimeout(() => {
-        removeCurrentModal();
-      }, 0);
 
       this.currentStep = E2EIHandlerStep.SUCCESS;
       this.showSuccessMessage();
+
       this.emit('enrollmentSuccessful');
 
       // clear the oidc service progress/data and successful enrolment
@@ -288,13 +272,14 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       this.logger.error('E2EI enrollment failed', error);
 
       this.currentStep = E2EIHandlerStep.ERROR;
-
-      setTimeout(() => {
-        removeCurrentModal();
-      }, 0);
-      console.error('E2EI enrolment failed', error);
       await this.showErrorMessage();
     }
+  }
+
+  private replaceModal(callback: () => void) {
+    this.closeModal();
+    callback();
+    this.isModalActive = true;
   }
 
   private showLoadingMessage(): void {
@@ -306,19 +291,22 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       type: ModalType.LOADING,
       hideClose: true,
     });
-    PrimaryModal.show(modalType, modalOptions);
+
+    this.replaceModal(() => PrimaryModal.show(modalType, modalOptions));
   }
 
   private showSuccessMessage(): void {
     if (this.currentStep !== E2EIHandlerStep.SUCCESS) {
       return;
     }
+
     const {modalOptions, modalType} = getModalOptions({
       type: ModalType.SUCCESS,
       hideSecondary: true,
       hideClose: false,
     });
-    PrimaryModal.show(modalType, modalOptions);
+
+    this.replaceModal(() => PrimaryModal.show(modalType, modalOptions));
   }
 
   private async showErrorMessage(): Promise<void> {
@@ -326,12 +314,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       return;
     }
 
-    // Remove the url parameters of the failed enrolment
-    removeUrlParameters();
-    // Clear the oidc service progress
-    await this.oidcService?.clearProgress();
-    // Clear the e2e identity progress
-    this.coreE2EIService.clearAllProgress();
+    await this.cleanUp(true);
 
     const {modalOptions, modalType} = getModalOptions({
       type: ModalType.ERROR,
@@ -345,7 +328,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       },
     });
 
-    PrimaryModal.show(modalType, modalOptions);
+    this.replaceModal(() => PrimaryModal.show(modalType, modalOptions));
   }
 
   private shouldShowNotification(): boolean {

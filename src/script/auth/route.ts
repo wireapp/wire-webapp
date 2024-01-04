@@ -91,5 +91,4 @@ export const ROUTE = {
   VERIFY_EMAIL_CODE: '/verifyemailcode',
   VERIFY_EMAIL_LINK: '/verifyemaillink',
   VERIFY_PHONE_CODE: '/verifyphonecode',
-  E2EI_OAUTH_REDIRECT: '/e2ei-redirect',
 };

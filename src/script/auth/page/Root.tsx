@@ -27,6 +27,7 @@ import {AnyAction, Dispatch} from 'redux';
 
 import {ContainerXS, Loading, StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
+import {OIDCService} from 'src/script/E2EIdentity/OIDCService';
 import {t} from 'Util/LocalizerUtil';
 
 import {CheckPassword} from './CheckPassword';
@@ -131,11 +132,11 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
   const ProtectedSetPassword = () => isAuthenticatedCheck(<SetPassword />);
   const ProtectedOAuthPermissions = () => isOAuthCheck(<OAuthPermissions />);
 
-  // Send user back to index page after e2ei oauth redirect
-  // This is needed because the oauth redirect is only done by logged in users
-  // and the user would otherwise be stuck on login page without getting logged in
-  if (window.location.hash.includes(ROUTE.E2EI_OAUTH_REDIRECT)) {
-    navigate(ROUTE.INDEX);
+  // This code is only used for e2e oidc with a popup.
+  // The oidc service will handle the authentication, close the second window / popup and continue in the first window.
+  if (window.location.href.includes('e2eiRedirect=true')) {
+    const oidcService = new OIDCService();
+    void oidcService.handleAuthenticationCallback();
   }
 
   const brandName = Config.getConfig().BRAND_NAME;

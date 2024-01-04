@@ -74,21 +74,31 @@ export class OIDCService {
     this.logger = getLogger('OIDC Service');
   }
 
-  public async authenticate(): Promise<void> {
-    await this.userManager.signinRedirect({extraQueryParams: {shouldBeRedirectedByProxy: true}});
-  }
-
-  public async handleAuthentication(): Promise<User | undefined> {
-    // Remove the hash (hash router) from the url before processing
-    const url = window.location.href.replace('/#', '');
-
-    const user = await this.userManager.signinCallback(url);
-
+  public async authenticate(): Promise<User | undefined> {
+    const user = await this.userManager.signinPopup({
+      popupWindowFeatures: {
+        width: 400,
+        height: 600,
+        resizable: true,
+        scrollbars: true,
+        toolbar: true,
+        menubar: true,
+        location: true,
+        status: true,
+        closePopupWindowAfterInSeconds: 30,
+      },
+      extraQueryParams: {shouldBeRedirectedByProxy: true},
+      popupWindowTarget: 'popup',
+    });
     if (!user) {
       return undefined;
     }
 
     return user;
+  }
+
+  public async handleAuthenticationCallback(): Promise<void> {
+    await this.userManager.signinPopupCallback();
   }
 
   public clearProgress(includeUserData: boolean = false): Promise<void> {
