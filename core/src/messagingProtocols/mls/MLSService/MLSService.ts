@@ -36,8 +36,6 @@ import {
   CoreCrypto,
   CredentialType,
   DecryptedMessage,
-  ExternalAddProposalArgs,
-  ExternalProposalType,
   ProposalArgs,
   ProposalType,
   RemoveProposalArgs,
@@ -285,10 +283,6 @@ export class MLSService extends TypedEventEmitter<Events> {
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
     const key = await this.coreCryptoClient.exportSecretKey(groupIdBytes, keyLength);
     return Encoder.toBase64(key).asString;
-  }
-
-  public async newExternalProposal(externalProposalType: ExternalProposalType, args: ExternalAddProposalArgs) {
-    return this.coreCryptoClient.newExternalProposal(externalProposalType, args);
   }
 
   public async processWelcomeMessage(welcomeMessage: Uint8Array): Promise<ConversationId> {
