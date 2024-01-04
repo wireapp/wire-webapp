@@ -91,11 +91,13 @@ export class OIDCService {
     return user;
   }
 
-  public clearProgress(): Promise<void> {
-    const {localStorage} = window;
-    // remove all oidc keys from local and session storage to prevent errors and stale state
-    clearKeysStartingWith('oidc.', localStorage);
-    clearKeysStartingWith('oidc.user:', localStorage);
+  public clearProgress(includeUserData: boolean = false): Promise<void> {
+    if (includeUserData) {
+      const {localStorage} = window;
+      // remove all oidc keys from local and session storage to prevent errors and stale state
+      clearKeysStartingWith('oidc.', localStorage);
+      clearKeysStartingWith('oidc.user:', localStorage);
+    }
     return this.userManager.clearStaleState();
   }
 

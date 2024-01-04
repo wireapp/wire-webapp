@@ -1606,7 +1606,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:^7.11.2, @babel/runtime@npm:^7.12.0, @babel/runtime@npm:^7.12.1, @babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.15.4, @babel/runtime@npm:^7.16.3, @babel/runtime@npm:^7.18.3, @babel/runtime@npm:^7.20.7, @babel/runtime@npm:^7.22.5, @babel/runtime@npm:^7.5.5, @babel/runtime@npm:^7.8.4, @babel/runtime@npm:^7.8.7, @babel/runtime@npm:^7.9.2":
+"@babel/runtime@npm:^7.11.2, @babel/runtime@npm:^7.12.0, @babel/runtime@npm:^7.12.1, @babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.16.3, @babel/runtime@npm:^7.18.3, @babel/runtime@npm:^7.20.7, @babel/runtime@npm:^7.22.5, @babel/runtime@npm:^7.5.5, @babel/runtime@npm:^7.8.4, @babel/runtime@npm:^7.8.7, @babel/runtime@npm:^7.9.2":
   version: 7.23.5
   resolution: "@babel/runtime@npm:7.23.5"
   dependencies:
@@ -4957,15 +4957,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^26.8.0":
-  version: 26.8.0
-  resolution: "@wireapp/api-client@npm:26.8.0"
+"@wireapp/api-client@npm:^26.8.1":
+  version: 26.8.1
+  resolution: "@wireapp/api-client@npm:26.8.1"
   dependencies:
-    "@wireapp/commons": ^5.2.3
+    "@wireapp/commons": ^5.2.4
     "@wireapp/priority-queue": ^2.1.4
     "@wireapp/protocol-messaging": 1.44.0
     axios: 1.6.3
-    axios-retry: 3.9.1
+    axios-retry: 4.0.0
     exponential-backoff: 3.1.1
     http-status-codes: 2.3.0
     logdown: 3.3.1
@@ -4975,7 +4975,7 @@ __metadata:
     tough-cookie: 4.1.3
     ws: 8.16.0
     zod: 3.22.4
-  checksum: 9b6ceadd324e4219f1d54215f276ad892d641af0c216494597fd38d962ebe0fa6374bf45b638443dd844ce3bc1891c12e7e5be784c899d1aa2ff25ca9ee15fa1
+  checksum: dc2b560c9cdb229b0a7ed8fad1126cb5949c5e100aa217d0e25f75c3bea745f81fc774e89fa5138bc46a5464b8cf80d14509829ca10e938b6421b33549500487
   languageName: node
   linkType: hard
 
@@ -4993,7 +4993,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/commons@npm:5.2.3, @wireapp/commons@npm:^5.2.3":
+"@wireapp/commons@npm:5.2.3":
   version: 5.2.3
   resolution: "@wireapp/commons@npm:5.2.3"
   dependencies:
@@ -5002,6 +5002,18 @@ __metadata:
     logdown: 3.3.1
     platform: 1.3.6
   checksum: 3cc801e52318db7cb474dcc22809652a91d39916124ed88de7cd413006d62893b84ecb5700ac3f74953a26aea311a3895ebb53b20ab4508f503ca1151c82be9f
+  languageName: node
+  linkType: hard
+
+"@wireapp/commons@npm:^5.2.4":
+  version: 5.2.4
+  resolution: "@wireapp/commons@npm:5.2.4"
+  dependencies:
+    ansi-regex: 5.0.1
+    fs-extra: 11.1.0
+    logdown: 3.3.1
+    platform: 1.3.6
+  checksum: 0fdff8e6283e5f9d6108f438b356661632aeeb0bbe63e0651aeab98c514f614ee69eeb51bd6ce19ddcd5366898ffe65dc2aa334cd09e01277998022fa868c580
   languageName: node
   linkType: hard
 
@@ -5028,15 +5040,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:43.3.0":
-  version: 43.3.0
-  resolution: "@wireapp/core@npm:43.3.0"
+"@wireapp/core@npm:43.4.0":
+  version: 43.4.0
+  resolution: "@wireapp/core@npm:43.4.0"
   dependencies:
-    "@wireapp/api-client": ^26.8.0
-    "@wireapp/commons": ^5.2.3
+    "@wireapp/api-client": ^26.8.1
+    "@wireapp/commons": ^5.2.4
     "@wireapp/core-crypto": 1.0.0-rc.21
     "@wireapp/cryptobox": 12.8.0
-    "@wireapp/promise-queue": ^2.2.8
+    "@wireapp/promise-queue": ^2.2.9
     "@wireapp/protocol-messaging": 1.44.0
     "@wireapp/store-engine": 5.1.5
     "@wireapp/store-engine-dexie": ^2.1.7
@@ -5045,12 +5057,12 @@ __metadata:
     deepmerge-ts: 5.1.0
     hash.js: 1.1.7
     http-status-codes: 2.3.0
-    idb: 7.1.1
+    idb: 8.0.0
     logdown: 3.3.1
     long: ^5.2.0
     uuidjs: 4.2.13
     zod: 3.22.4
-  checksum: c7121199bf2563fe98a4526e71256581582cae4eea15353e5a95edefaf28b212fda462bd1b6a8f2b3dacaccaafe0de8c93d019d9d2595f5437c643f000861a97
+  checksum: f3c891f65f9a400f5e951e5746ad92c694244a916361b2d1ca8ff98504571b7e1d7f1614fbdda0ae69d22e170d9224b1218bac8ff1389bd7594dcea3abfb28d0
   languageName: node
   linkType: hard
 
@@ -5133,10 +5145,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/promise-queue@npm:^2.2.8":
-  version: 2.2.8
-  resolution: "@wireapp/promise-queue@npm:2.2.8"
-  checksum: d9497e1db2a12a4a0fcf2807242158c7e540bf172bbd8e9fb9f41ae87f94a26e10a9ac8398a5dc897f66b0a2251e8cb3f99912a98532ecd24c8cb3b29f35c9b9
+"@wireapp/promise-queue@npm:^2.2.9":
+  version: 2.2.9
+  resolution: "@wireapp/promise-queue@npm:2.2.9"
+  checksum: 1e9d93c18e5efab42b5865678883e8a5eef9c35203a3a4c4de438fd2fb429b2a38ddcb653d88e348a77a15e8d792044d05f82fbaa1959ca2834677b80319a554
   languageName: node
   linkType: hard
 
@@ -5861,13 +5873,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios-retry@npm:3.9.1":
-  version: 3.9.1
-  resolution: "axios-retry@npm:3.9.1"
+"axios-retry@npm:4.0.0":
+  version: 4.0.0
+  resolution: "axios-retry@npm:4.0.0"
   dependencies:
-    "@babel/runtime": ^7.15.4
     is-retry-allowed: ^2.2.0
-  checksum: 44e574ad559e4ee638e735662e9b9fcb69a1da6652adc3a75ca4b060e0fd40bdd7ac718e7743f51c0dad54149a6f3c09109275bf90298042542e80a17740a4e5
+  peerDependencies:
+    axios: 0.x || 1.x
+  checksum: 132b63132e8087242b8888fdebf3786cfd687e1021970319336a63533b4b584ab23a39d5b5a05e84b96055a640129a25e60b6a6cdb422c4cf10517398238000f
   languageName: node
   linkType: hard
 
@@ -9868,7 +9881,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"idb@npm:7.1.1, idb@npm:^7.0.1":
+"idb@npm:8.0.0":
+  version: 8.0.0
+  resolution: "idb@npm:8.0.0"
+  checksum: a9c6176c176dc1a73520ae906d33fcda8a6f6068cf64027e196763d4ad70b088b7141650ed68f3604e0f0ccd1a123f6b8a435ba5e4514f42ada3460c23b6747a
+  languageName: node
+  linkType: hard
+
+"idb@npm:^7.0.1":
   version: 7.1.1
   resolution: "idb@npm:7.1.1"
   checksum: 1973c28d53c784b177bdef9f527ec89ec239ec7cf5fcbd987dae75a16c03f5b7dfcc8c6d3285716fd0309dd57739805390bd9f98ce23b1b7d8849a3b52de8d56
@@ -17712,7 +17732,7 @@ __metadata:
     "@wireapp/avs": 9.5.2
     "@wireapp/commons": 5.2.3
     "@wireapp/copy-config": 2.1.12
-    "@wireapp/core": 43.3.0
+    "@wireapp/core": 43.4.0
     "@wireapp/eslint-config": 3.0.4
     "@wireapp/prettier-config": 0.6.3
     "@wireapp/react-ui-kit": 9.12.3
