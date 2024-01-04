@@ -25,7 +25,6 @@ const HandleKey = 'Handle';
 const AuthDataKey = 'AuthData';
 const OderDataKey = 'OrderData';
 const InitialDataKey = 'InitialData';
-const CertificateDataKey = 'CertificateData';
 
 const storage = LocalStorageStore<string>('E2EIStorage');
 
@@ -33,11 +32,9 @@ const storeHandle = (handle: string) => storage.add(HandleKey, window.btoa(handl
 const storeOrderData = (data: OrderData) => storage.add(OderDataKey, window.btoa(JSON.stringify(data)));
 const storeAuthData = (data: AuthData) => storage.add(AuthDataKey, window.btoa(JSON.stringify(data)));
 const storeInitialData = (data: InitialData) => storage.add(InitialDataKey, window.btoa(JSON.stringify(data)));
-const storeCertificate = (data: string) => storage.add(CertificateDataKey, window.btoa(data));
 
 const hasHandle = () => storage.has(HandleKey);
 const hasInitialData = () => storage.has(InitialDataKey);
-const hasCertificateData = () => storage.has(CertificateDataKey);
 
 const getAndVerifyHandle = () => {
   const handle = storage.get(HandleKey);
@@ -75,15 +72,6 @@ const getAndVerifyOrderData = (): OrderData => {
   return JSON.parse(atob);
 };
 
-const getCertificateData = (): string => {
-  const data = storage.get(CertificateDataKey);
-  if (!data) {
-    throw new Error('ACME: CertificateData not found');
-  }
-  const atob = window.atob(data);
-  return atob;
-};
-
 const removeInitialData = () => {
   storage.remove(InitialDataKey);
 };
@@ -94,13 +82,8 @@ const removeTemporaryData = () => {
   storage.remove(OderDataKey);
 };
 
-const removeCertificateData = () => {
-  storage.remove(CertificateDataKey);
-};
-
 const removeAll = () => {
   removeTemporaryData();
-  removeCertificateData();
   removeInitialData();
 };
 
@@ -110,11 +93,9 @@ export const E2EIStorage = {
     authData: storeAuthData,
     orderData: storeOrderData,
     initialData: storeInitialData,
-    certificate: storeCertificate,
   },
   get: {
     initialData: getInitialData,
-    certificateData: getCertificateData,
     handle: getAndVerifyHandle,
     authData: getAndVerifyAuthData,
     orderData: getAndVerifyOrderData,
@@ -122,12 +103,10 @@ export const E2EIStorage = {
   has: {
     handle: hasHandle,
     initialData: hasInitialData,
-    certificateData: hasCertificateData,
   },
   remove: {
     initialData: removeInitialData,
     temporaryData: removeTemporaryData,
-    certificateData: removeCertificateData,
     all: removeAll,
   },
 };

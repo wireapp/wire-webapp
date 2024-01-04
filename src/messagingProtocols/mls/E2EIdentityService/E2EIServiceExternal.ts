@@ -19,7 +19,6 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Decoder} from 'bazinga64';
-import logdown from 'logdown';
 
 import {Ciphersuite, CoreCrypto, E2eiConversationState, WireIdentity, DeviceStatus} from '@wireapp/core-crypto';
 
@@ -33,27 +32,10 @@ export type DeviceIdentity = Omit<WireIdentity, 'free' | 'status'> & {status?: D
 
 // This export is meant to be accessible from the outside (e.g the Webapp / UI)
 export class E2EIServiceExternal {
-  private readonly logger = logdown('@wireapp/core/E2EIdentityServiceExternal');
-
   public constructor(
     private readonly coreCryptoClient: CoreCrypto,
     private readonly clientService: ClientService,
   ) {}
-
-  // Checks if there is a certificate stored in the local storage
-  public hasActiveCertificate(): boolean {
-    return E2EIStorage.has.certificateData();
-  }
-
-  // Returns the certificate data stored in the local storage
-  public getCertificateData(): string | undefined {
-    try {
-      return E2EIStorage.get.certificateData();
-    } catch (error) {
-      this.logger.error('ACME: Failed to get stored certificate', error);
-      return undefined;
-    }
-  }
 
   // If we have a handle in the local storage, we are in the enrollment process (this handle is saved before oauth redirect)
   public isEnrollmentInProgress(): boolean {

@@ -95,7 +95,6 @@ export class MLSService extends TypedEventEmitter<Events> {
     private readonly coreCryptoClient: CoreCrypto,
     private readonly coreDatabase: CoreDatabase,
     private readonly recurringTaskScheduler: RecurringTaskScheduler,
-    private readonly e2eServiceExternal: E2EIServiceExternal,
     {
       keyingMaterialUpdateThreshold = defaultConfig.keyingMaterialUpdateThreshold,
       nbKeyPackages = defaultConfig.nbKeyPackages,
@@ -784,6 +783,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     oAuthIdToken?: string,
   ): Promise<AcmeChallenge | boolean> {
     try {
+      const hasActiveCertificate = await this.coreCryptoClient.e2eiIsEnabled(this.config.cipherSuite);
       const instance = await E2EIServiceInternal.getInstance({
         apiClient: this.apiClient,
         coreCryptClient: this.coreCryptoClient,
@@ -793,9 +793,10 @@ export class MLSService extends TypedEventEmitter<Events> {
         discoveryUrl,
         keyPackagesAmount: nbPrekeys,
       });
+
       // If we don't have an OAuth id token, we need to start the certificate process with Oauth
       if (!oAuthIdToken) {
-        const challengeData = await instance.startCertificateProcess();
+        const challengeData = await instance.startCertificateProcess(hasActiveCertificate);
         if (challengeData) {
           return challengeData;
         }
@@ -804,11 +805,11 @@ export class MLSService extends TypedEventEmitter<Events> {
         let rotateBundle;
 
         // If we are not refreshing the active certificate, we need to continue the certificate process with Oauth
-        if (!this.e2eServiceExternal.hasActiveCertificate()) {
+        if (!hasActiveCertificate) {
           rotateBundle = await instance.continueCertificateProcess(oAuthIdToken);
           // If we are refreshing the active certificate, can start the refresh process
         } else {
-          rotateBundle = await instance.startRefreshCertficateFlow(oAuthIdToken);
+          rotateBundle = await instance.startRefreshCertficateFlow(oAuthIdToken, hasActiveCertificate);
         }
 
         if (rotateBundle !== undefined) {
