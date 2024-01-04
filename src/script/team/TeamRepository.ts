@@ -23,10 +23,7 @@ import type {
   TeamDeleteEvent,
   TeamEvent,
   TeamFeatureConfigurationUpdateEvent,
-  TeamMemberJoinEvent,
   TeamMemberLeaveEvent,
-  TeamMemberUpdateEvent,
-  TeamUpdateEvent,
 } from '@wireapp/api-client/lib/event';
 import {TEAM_EVENT} from '@wireapp/api-client/lib/event/TeamEvent';
 import {FeatureStatus, FeatureList} from '@wireapp/api-client/lib/team/feature/';
@@ -254,20 +251,8 @@ export class TeamRepository extends TypedEventEmitter<Events> {
         this.onDelete(eventJson);
         break;
       }
-      case TEAM_EVENT.MEMBER_JOIN: {
-        this._onMemberJoin(eventJson);
-        break;
-      }
       case TEAM_EVENT.MEMBER_LEAVE: {
         this.onMemberLeave(eventJson);
-        break;
-      }
-      case TEAM_EVENT.MEMBER_UPDATE: {
-        await this.onMemberUpdate(eventJson);
-        break;
-      }
-      case TEAM_EVENT.UPDATE: {
-        this.onUpdate(eventJson);
         break;
       }
       case TEAM_EVENT.FEATURE_CONFIG_UPDATE: {
@@ -374,21 +359,6 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     amplify.publish(WebAppEvents.CONVERSATION.DELETE, {domain: '', id: conversationId});
   }
 
-  private async _onMemberJoin(eventJson: TeamMemberJoinEvent) {
-    const {
-      data: {user: userId},
-      team: teamId,
-    } = eventJson;
-    const isLocalTeam = this.teamState.team().id === teamId;
-    const isOtherUser = this.userState.self().id !== userId;
-
-    if (isLocalTeam && isOtherUser) {
-      await this.userRepository.getUserById({domain: this.userState.self().domain, id: userId});
-      const member = await this.getTeamMember(teamId, userId);
-      this.updateMemberRoles([member]);
-    }
-  }
-
   private readonly updateTeamConfig = async (handlingNotifications: NOTIFICATION_HANDLING_STATE): Promise<void> => {
     const shouldFetchConfig = handlingNotifications === NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
 
@@ -429,28 +399,6 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     }
   }
 
-  private async onMemberUpdate(eventJson: TeamMemberUpdateEvent): Promise<void> {
-    const {
-      data: {permissions, user: userId},
-      team: teamId,
-    } = eventJson;
-    const isLocalTeam = this.teamState.team().id === teamId;
-    if (!isLocalTeam) {
-      return;
-    }
-
-    const isSelfUser = this.userState.self().id === userId;
-
-    if (isSelfUser) {
-      const memberEntity = permissions ? {permissions} : await this.getTeamMember(teamId, userId);
-      this.updateUserRole(this.userState.self(), memberEntity.permissions);
-      await this.sendAccountInfo();
-    } else {
-      const member = await this.getTeamMember(teamId, userId);
-      this.updateMemberRoles([member]);
-    }
-  }
-
   private updateUserRole(user: User, permissions: PermissionsData): void {
     user.teamRole(roleFromTeamPermissions(permissions));
   }
@@ -477,15 +425,6 @@ export class TeamRepository extends TypedEventEmitter<Events> {
 
   private onUnhandled(eventJson: TeamEvent): void {
     this.logger.log(`Received '${eventJson.type}' event from backend which is not yet handled`, eventJson);
-  }
-
-  private onUpdate(eventJson: TeamUpdateEvent): void {
-    const {data: teamData, team: teamId} = eventJson;
-
-    if (this.teamState.team().id === teamId) {
-      this.teamMapper.updateTeamFromObject(teamData, this.teamState.team());
-      this.sendAccountInfo();
-    }
   }
 
   public getTeamSupportedProtocols(): ConversationProtocol[] {
