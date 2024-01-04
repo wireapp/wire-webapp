@@ -467,7 +467,6 @@ export class Account extends TypedEventEmitter<Events> {
         cryptoClient.getNativeClient(),
         this.db,
         this.recurringTaskScheduler,
-        e2eServiceExternal,
         {
           ...this.coreCryptoConfig?.mls,
         },

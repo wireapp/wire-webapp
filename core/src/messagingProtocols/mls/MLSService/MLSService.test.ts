@@ -33,11 +33,9 @@ import {CoreCrypto, DecryptedMessage} from '@wireapp/core-crypto';
 import {CoreCryptoMLSError} from './CoreCryptoMLSError';
 import {MLSService} from './MLSService';
 
-import {ClientService} from '../../../client';
 import {openDB} from '../../../storage/CoreDB';
 import {RecurringTaskScheduler} from '../../../util/RecurringTaskScheduler';
 import {TaskScheduler} from '../../../util/TaskScheduler';
-import {E2EIServiceExternal} from '../E2EIdentityService';
 
 jest.createMockFromModule('@wireapp/api-client');
 
@@ -45,14 +43,8 @@ function createUserId() {
   return {id: randomUUID(), domain: ''};
 }
 
-const coreCrypto = {
-  getUserIdentities: jest.fn(),
-} as unknown as jest.Mocked<CoreCrypto>;
-
-const clientService = {} as jest.Mocked<ClientService>;
 const createMLSService = async () => {
   const apiClient = new APIClient();
-  const e2eServiceExternal = new E2EIServiceExternal(coreCrypto, clientService);
   const mockCoreCrypto = {
     createConversation: jest.fn(),
     conversationExists: jest.fn(),
@@ -78,14 +70,7 @@ const createMLSService = async () => {
     },
   });
 
-  const mlsService = new MLSService(
-    apiClient,
-    mockCoreCrypto,
-    mockedDb,
-    recurringTaskScheduler,
-    e2eServiceExternal,
-    {},
-  );
+  const mlsService = new MLSService(apiClient, mockCoreCrypto, mockedDb, recurringTaskScheduler, {});
 
   return [mlsService, {apiClient, coreCrypto: mockCoreCrypto, recurringTaskScheduler}] as const;
 };
