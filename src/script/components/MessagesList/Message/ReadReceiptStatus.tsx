@@ -34,7 +34,7 @@ export interface ReadReceiptStatusProps {
   onClickDetails?: (message: Message) => void;
 }
 
-const ReadReceiptStatus = ({
+export const ReadReceiptStatus = ({
   message,
   is1to1Conversation,
   isLastDeliveredMessage,
@@ -60,6 +60,7 @@ const ReadReceiptStatus = ({
           {t('conversationMessageDelivered')}
         </span>
       )}
+
       {showEyeIndicator && (
         <button
           className={cx(
@@ -69,7 +70,11 @@ const ReadReceiptStatus = ({
           )}
           data-uie-name="status-message-read-receipts"
           aria-label={t('accessibility.messageDetailsReadReceipts', readReceiptText)}
-          onClick={() => onClickDetails?.(message)}
+          onClick={() => {
+            if (!is1to1Conversation) {
+              onClickDetails?.(message);
+            }
+          }}
         >
           <Icon.Read />
           <span className="message-status-read__count" data-uie-name="status-message-read-receipt-count">
@@ -80,5 +85,3 @@ const ReadReceiptStatus = ({
     </>
   );
 };
-
-export {ReadReceiptStatus};
