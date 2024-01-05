@@ -33,7 +33,7 @@ import {removeUrlParameters} from 'Util/UrlUtil';
 import {supportsMLS} from 'Util/util';
 
 import {DelayTimerService} from './DelayTimer/DelayTimer';
-import {hasActiveCertificate, isE2EIEnabled, getActiveCertificate} from './E2EIdentityVerification';
+import {hasActiveCertificate, isE2EIEnabled, getActiveWireIdentity} from './E2EIdentityVerification';
 import {getModalOptions, ModalType} from './Modals';
 import {OIDCService} from './OIDCService';
 import {OIDCServiceStore} from './OIDCService/OIDCServiceStorage';
@@ -128,13 +128,13 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   }
 
   public async handleCertificateRenewal(): Promise<void> {
-    const certificate = await getActiveCertificate();
+    const identity = await getActiveWireIdentity();
 
-    if (!certificate) {
+    if (!identity?.certificate) {
       return;
     }
 
-    const {isValid, timeRemainingMS, certificateCreationTime} = getCertificateDetails(certificate);
+    const {isValid, timeRemainingMS, certificateCreationTime} = getCertificateDetails(identity.certificate);
 
     // Check if the certificate is still valid
     if (!isValid) {
