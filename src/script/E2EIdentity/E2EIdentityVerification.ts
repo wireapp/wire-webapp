@@ -92,18 +92,21 @@ const fetchSelfDeviceIdentity = async (): Promise<WireIdentity | undefined> => {
 };
 
 export async function hasActiveCertificate(): Promise<boolean> {
-  const activeCertificate = await getActiveCertificate();
-  return typeof activeCertificate === 'string' && Boolean(activeCertificate.length);
+  const identity = await getActiveWireIdentity();
+  if (!identity?.certificate) {
+    return false;
+  }
+  return typeof identity.certificate === 'string' && Boolean(identity.certificate.length);
 }
 
-export async function getActiveCertificate(): Promise<string | undefined> {
+export async function getActiveWireIdentity(): Promise<WireIdentity | undefined> {
   const selfDeviceIdentity = await fetchSelfDeviceIdentity();
 
   if (!selfDeviceIdentity) {
     return undefined;
   }
 
-  return selfDeviceIdentity.certificate;
+  return selfDeviceIdentity;
 }
 
 export async function isFreshMLSSelfClient() {
