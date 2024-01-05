@@ -64,7 +64,7 @@ jest.mock('./Modals', () => ({
 
 jest.mock('./E2EIdentityVerification', () => ({
   hasActiveCertificate: jest.fn().mockResolvedValue(false),
-  getActiveCertificate: jest.fn().mockResolvedValue('certificate data'),
+  getActiveWireIdentity: jest.fn().mockResolvedValue({certificate: 'certificate data'}),
   isE2EIEnabled: jest.fn().mockReturnValue(true),
 }));
 
