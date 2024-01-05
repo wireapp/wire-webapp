@@ -29,11 +29,11 @@ import {getLogger} from 'Util/Logger';
 import {formatSeconds} from 'Util/TimeUtil';
 import {useEffectRef} from 'Util/useEffectRef';
 
-import {useAssetTransfer} from './AbstractAssetTransferStateTracker';
 import {AssetHeader} from './AssetHeader';
 import {AudioSeekBar} from './controls/AudioSeekBar';
 import {MediaButton} from './controls/MediaButton';
 import {SeekBar} from './controls/SeekBar';
+import {AssetUrl, useAssetTransfer} from './useAssetTransfer';
 
 import {AssetTransferState} from '../../../../../assets/AssetTransferState';
 import type {ContentMessage} from '../../../../../entity/message/ContentMessage';
@@ -51,7 +51,7 @@ export interface AudioAssetProps {
   isFocusable?: boolean;
 }
 
-const AudioAsset: React.FC<AudioAssetProps> = ({
+export const AudioAsset: React.FC<AudioAssetProps> = ({
   message,
   className,
   hasHeader = false,
@@ -62,9 +62,9 @@ const AudioAsset: React.FC<AudioAssetProps> = ({
   const [audioElement, setAudioElement] = useEffectRef<HTMLAudioElement>();
   const {isFileSharingReceivingEnabled} = useKoSubscribableChildren(teamState, ['isFileSharingReceivingEnabled']);
   const {isObfuscated} = useKoSubscribableChildren(message, ['isObfuscated']);
-  const {transferState, uploadProgress, cancelUpload, loadAsset} = useAssetTransfer(message);
+  const {transferState, uploadProgress, cancelUpload, getAssetUrl} = useAssetTransfer(message);
   const [audioTime, setAudioTime] = useState<number>(asset?.meta?.duration || 0);
-  const [audioSrc, setAudioSrc] = useState<string>();
+  const [audioSrc, setAudioSrc] = useState<AssetUrl>();
   const onTimeupdate = () => audioElement && setAudioTime(audioElement.currentTime);
   const showLoudnessPreview = !!(asset.meta?.loudness?.length ?? 0 > 0);
   const onPauseButtonClicked = () => audioElement?.pause();
@@ -75,11 +75,8 @@ const AudioAsset: React.FC<AudioAssetProps> = ({
     } else {
       asset.status(AssetTransferState.DOWNLOADING);
       try {
-        const blob = await loadAsset(asset.original_resource());
-        if (!blob) {
-          throw new Error('blob could not be loaded from asset');
-        }
-        setAudioSrc(window.URL.createObjectURL(blob));
+        const url = await getAssetUrl(asset.original_resource());
+        setAudioSrc(url);
       } catch (error) {
         logger.error('Failed to load audio asset ', error);
       }
@@ -97,17 +94,11 @@ const AudioAsset: React.FC<AudioAssetProps> = ({
     }
   }, [audioElement, audioSrc]);
 
-  useEffect(() => {
-    return () => {
-      if (audioSrc) {
-        window.URL.revokeObjectURL(audioSrc);
-      }
-    };
-  }, []);
+  useEffect(() => () => audioSrc?.dispose(), []);
 
   return (
     <div className={cx('audio-asset', className)} data-uie-name="audio-asset" data-uie-value={asset.file_name}>
-      <audio ref={setAudioElement} src={audioSrc} onTimeUpdate={onTimeupdate} />
+      <audio ref={setAudioElement} src={audioSrc?.url} onTimeUpdate={onTimeupdate} />
 
       {!isObfuscated ? (
         <>
@@ -164,5 +155,3 @@ const AudioAsset: React.FC<AudioAssetProps> = ({
     </div>
   );
 };
-
-export {AudioAsset};

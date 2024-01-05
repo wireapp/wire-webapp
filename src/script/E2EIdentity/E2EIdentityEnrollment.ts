@@ -36,7 +36,7 @@ import {supportsMLS} from 'Util/util';
 
 import {getDelayTime} from './DelayTimer/delay';
 import {DelayTimerService} from './DelayTimer/DelayTimer';
-import {hasActiveCertificate, isE2EIEnabled} from './E2EIdentityVerification';
+import {hasActiveCertificate, isE2EIEnabled, getActiveCertificate} from './E2EIdentityVerification';
 import {getModalOptions, ModalType} from './Modals';
 import {OIDCService} from './OIDCService';
 import {OIDCServiceStore} from './OIDCService/OIDCServiceStorage';
@@ -106,7 +106,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     E2EIHandler.instance = null;
   }
 
-  public initialize({discoveryUrl, gracePeriodInSeconds, isFreshMLSSelfClient = false}: E2EIHandlerParams) {
+  public async initialize({discoveryUrl, gracePeriodInSeconds, isFreshMLSSelfClient = false}: E2EIHandlerParams) {
     if (!isE2EIEnabled()) {
       return this;
     }
@@ -121,7 +121,8 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       }),
       isFreshMLSSelfClient,
     };
-    if (!hasActiveCertificate()) {
+    const hasCertificate = await hasActiveCertificate();
+    if (!hasCertificate) {
       this.showE2EINotificationMessage();
     } else {
       void this.handleCertificateRenewal();
@@ -130,7 +131,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   }
 
   public async handleCertificateRenewal(): Promise<void> {
-    const certificate = this.getCurrentDeviceCertificateData();
+    const certificate = await getActiveCertificate();
 
     if (!certificate) {
       return;
@@ -177,7 +178,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       this.logger.error('Silent authentication with refresh token failed', error);
 
       // If the silent authentication fails, clear the oidc service progress/data and renew manually
-      await this.cleanUp();
+      await this.cleanUp(true);
       this.showE2EINotificationMessage(ModalType.CERTIFICATE_RENEWAL);
     }
   }
@@ -217,29 +218,17 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   /**
    * Used to clean the state/storage after a failed run
    */
-  private async cleanUp() {
+  private async cleanUp(includeOidcServiceUserData: boolean) {
     // Remove the url parameters of the failed enrolment
     removeUrlParameters();
     // Clear the oidc service progress
     this.oidcService = new OIDCService();
-    await this.oidcService.clearProgress();
+    await this.oidcService.clearProgress(includeOidcServiceUserData);
     // Clear the e2e identity progress
     this.coreE2EIService.clearAllProgress();
   }
 
-  private getE2EIdentityService() {
-    return container.resolve(Core).service?.e2eIdentity;
-  }
-
-  private getCurrentDeviceCertificateData() {
-    if (!hasActiveCertificate()) {
-      return undefined;
-    }
-
-    return this.getE2EIdentityService()?.getCertificateData();
-  }
-
-  public async enroll(userData?: User) {
+  public async enroll(refreshActiveCertificate = false, userData?: User) {
     if (!this.config) {
       throw new Error('Trying to enroll for E2EI without initializing the E2EIHandler');
     }
@@ -299,7 +288,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       this.emit('enrollmentSuccessful');
 
       // clear the oidc service progress/data and successful enrolment
-      await this.cleanUp();
+      await this.cleanUp(false);
     } catch (error) {
       this.logger.error('E2EI enrollment failed', error);
 

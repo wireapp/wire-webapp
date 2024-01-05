@@ -37,8 +37,6 @@ export class Account extends EventEmitter {
     e2eIdentity: {
       isEnrollmentInProgress: jest.fn(),
       clearAllProgress: jest.fn(),
-      hasActiveCertificate: jest.fn(),
-      getCertificateData: jest.fn(),
       getUsersIdentities: jest.fn(() => new Map()),
       getDeviceIdentities: jest.fn(),
       getConversationState: jest.fn(),

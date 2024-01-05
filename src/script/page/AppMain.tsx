@@ -132,10 +132,6 @@ const AppMain: FC<AppMainProps> = ({
   const isLeftSidebarVisible = currentView == ViewType.LEFT_SIDEBAR;
 
   const initializeApp = async () => {
-    if (isFreshMLSSelfClient) {
-      return;
-    }
-
     repositories.notification.setContentViewModelStates(contentState, mainView.multitasking);
 
     const showMostRecentConversation = () => {
@@ -220,8 +216,10 @@ const AppMain: FC<AppMainProps> = ({
   }, []);
 
   useLayoutEffect(() => {
-    initializeApp();
-  }, []);
+    if (!isFreshMLSSelfClient) {
+      initializeApp();
+    }
+  }, [isFreshMLSSelfClient]);
 
   return (
     <StyledApp
