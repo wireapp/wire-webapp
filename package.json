@@ -17,7 +17,7 @@
     "classnames": "2.5.1",
     "copy-webpack-plugin": "11.0.0",
     "core-js": "3.35.0",
-    "countly-sdk-web": "23.12.3",
+    "countly-sdk-web": "23.12.4",
     "date-fns": "3.0.6",
     "dexie-batch": "0.4.3",
     "dexie-encrypted": "2.0.0",
