@@ -7287,10 +7287,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"date-fns@npm:3.0.6":
-  version: 3.0.6
-  resolution: "date-fns@npm:3.0.6"
-  checksum: ee62b8e764e4c11c418d342f401d3e85adb4a631b196746e49ac89099c8d34cb141f10ae953c4a72bd3c76fe4d8740ec89564c8599a31256c82adbbed56c0014
+"date-fns@npm:3.1.0":
+  version: 3.1.0
+  resolution: "date-fns@npm:3.1.0"
+  checksum: 8de5474a0e5a4b9901547f0eb572b0ae8b3027d6d8117053d9b258000a4350b673f03c847211f6dfee316c39a1df30e1ea0f85efd475ef90764c0c3d18aabed3
   languageName: node
   linkType: hard
 
@@ -17768,7 +17768,7 @@ __metadata:
     cross-env: 7.0.3
     css-loader: ^6.8.1
     cssnano: 6.0.3
-    date-fns: 3.0.6
+    date-fns: 3.1.0
     dexie: 3.2.4
     dexie-batch: 0.4.3
     dexie-encrypted: 2.0.0
