@@ -17,13 +17,7 @@
  *
  */
 
-import {Decoder, Encoder} from 'bazinga64';
-
-import {createCustomEncryptedStore, createEncryptedStore} from './encryptedStore';
-
-import {SecretCrypto} from '../messagingProtocols/mls/types';
-
-const isBase64 = /^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)?$/;
+import {EncryptedStore} from './encryptedStore';
 
 export class CorruptedKeyError extends Error {}
 
@@ -38,50 +32,15 @@ export type GeneratedKey = {
 export async function generateSecretKey({
   keyId,
   keySize = 16,
-  dbName,
-  systemCrypto: baseCrypto,
+  secretsDb,
 }: {
   /** the ID of the key to generate (if the ID already exists, then the generated key will be returned) */
   keyId: string;
   /** size of the key to generate */
   keySize?: number;
   /** name of the database that will hold the secrets */
-  dbName: string;
-  /** custom crypto primitives to use to encrypt the secret keys */
-  systemCrypto?: SecretCrypto;
+  secretsDb: EncryptedStore<any>;
 }): Promise<GeneratedKey> {
-  const systemCrypto = baseCrypto
-    ? {
-        encrypt: (value: Uint8Array) => {
-          if (baseCrypto.version === 1) {
-            const strValue = Encoder.toBase64(value).asString;
-            return baseCrypto.encrypt(strValue);
-          }
-          // In previous versions of the systemCrypto (prior to February 2023), encrypt took a uint8Array
-          return baseCrypto.encrypt(value);
-        },
-
-        decrypt: async (value: Uint8Array) => {
-          if (typeof baseCrypto.version === 'undefined') {
-            // In previous versions of the systemCrypto (prior to February 2023), the decrypt function returned a Uint8Array
-            return baseCrypto.decrypt(value);
-          }
-          const decrypted = await baseCrypto.decrypt(value);
-          if (isBase64.test(decrypted)) {
-            return Decoder.fromBase64(decrypted).asBytes;
-          }
-          // Between June 2022 and October 2022, the systemCrypto returned a string encoded in UTF-8
-          const encoder = new TextEncoder();
-
-          return encoder.encode(decrypted);
-        },
-      }
-    : undefined;
-
-  const secretsDb = systemCrypto
-    ? await createCustomEncryptedStore(dbName, systemCrypto)
-    : await createEncryptedStore(dbName);
-
   try {
     let key;
     try {
@@ -99,10 +58,8 @@ export async function generateSecretKey({
       key = crypto.getRandomValues(new Uint8Array(keySize));
       await secretsDb.saveSecretValue(keyId, key);
     }
-    await secretsDb?.close();
     return {key, deleteKey: () => secretsDb.deleteSecretValue(keyId)};
   } catch (error) {
-    await secretsDb?.close();
     throw error;
   }
 }

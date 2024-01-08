@@ -21,21 +21,12 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {MLSServiceConfig} from './MLSService/MLSService.types';
 
-import {GeneratedKey} from '../../secretStore/secretKeyGenerator';
-
 export type ClientId = string;
 
-export type SecretCrypto =
-  | {
-      encrypt: (value: Uint8Array) => Promise<Uint8Array>;
-      decrypt: (payload: Uint8Array) => Promise<Uint8Array>;
-      version: undefined;
-    }
-  | {
-      encrypt: (value: string) => Promise<Uint8Array>;
-      decrypt: (payload: Uint8Array) => Promise<string>;
-      version: 1;
-    };
+export type SecretCrypto = {
+  encrypt: (value: Uint8Array) => Promise<Uint8Array>;
+  decrypt: (payload: Uint8Array) => Promise<Uint8Array>;
+};
 
 export interface CoreCallbacks {
   /**
@@ -61,11 +52,6 @@ export type CommitPendingProposalsParams = {
 } & CommonMLS;
 
 export interface CoreCryptoConfig {
-  /**
-   * function called to generate the secret key for CoreCrypto's database encryption
-   */
-  generateSecretKey: (storeName: string, keyId: string, keySize: number) => Promise<GeneratedKey>;
-
   /**
    * path on the public server to the core crypto wasm file.
    * This file will be downloaded lazily when corecrypto is needed.
