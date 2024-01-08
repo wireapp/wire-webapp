@@ -39,6 +39,10 @@ export const OIDCProxy = createProxyMiddleware({
 
     return undefined; // or handle this case appropriately
   },
+  onError: (err, req, res) => {
+    console.error('Error processing proxy response:', err);
+    res.status(500).send('Error while connecting to the target URL');
+  },
   onProxyRes: (proxyRes, req, res) => {
     // Exception: Modify the response if the target URL is the OIDC discovery URL
     if (req.originalUrl.includes('.well-known/openid-configuration')) {
@@ -72,7 +76,7 @@ export const OIDCProxy = createProxyMiddleware({
           res.end(JSON.stringify(json));
         } catch (error) {
           console.error('Error processing proxy response:', error);
-          res.status(500).send('Internal Server Error');
+          res.status(500).send('Error while processing the response');
         }
       });
     } else {
