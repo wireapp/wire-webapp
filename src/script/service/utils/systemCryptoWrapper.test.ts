@@ -19,7 +19,7 @@
 
 import {Encoder, Decoder} from 'bazinga64';
 
-import {wrapSystemCrypto} from './systemCryptoWrapper';
+import {SystemCrypto, wrapSystemCrypto} from './systemCryptoWrapper';
 
 const systemCryptos = {
   v0: {
@@ -30,7 +30,7 @@ const systemCryptos = {
       return value;
     },
     version: undefined,
-  },
+  } as SystemCrypto,
 
   v01: {
     encrypt: async (value: Uint8Array) => {
@@ -40,7 +40,7 @@ const systemCryptos = {
       return Decoder.fromBase64(Array.from(value.values())).asBytes;
     },
     version: undefined,
-  },
+  } as SystemCrypto,
 
   v1: {
     encrypt: async (value: string) => {
@@ -52,7 +52,7 @@ const systemCryptos = {
       return decoder.decode(value);
     },
     version: 1,
-  },
+  } as SystemCrypto,
 } as const;
 
 describe('systemCryptoWrapper', () => {

@@ -19,17 +19,18 @@
 
 import {Encoder, Decoder} from 'bazinga64';
 
-export type SystemCrypto =
-  | {
-      encrypt: (value: Uint8Array) => Promise<Uint8Array>;
-      decrypt: (payload: Uint8Array) => Promise<Uint8Array>;
-      version: undefined;
-    }
-  | {
-      encrypt: (value: string) => Promise<Uint8Array>;
-      decrypt: (payload: Uint8Array) => Promise<string>;
-      version: 1;
-    };
+type SystemCryptoV0 = {
+  encrypt: (value: Uint8Array) => Promise<Uint8Array>;
+  decrypt: (payload: Uint8Array) => Promise<Uint8Array>;
+  version: undefined;
+};
+type SystemCryptoV1 = {
+  encrypt: (value: string) => Promise<Uint8Array>;
+  decrypt: (payload: Uint8Array) => Promise<string>;
+  version: 1;
+};
+
+export type SystemCrypto = SystemCryptoV0 | SystemCryptoV1;
 
 export function wrapSystemCrypto(baseCrypto: SystemCrypto) {
   const isBase64 = /^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)?$/;
@@ -37,18 +38,18 @@ export function wrapSystemCrypto(baseCrypto: SystemCrypto) {
     encrypt: (value: Uint8Array) => {
       if (baseCrypto.version === 1) {
         const strValue = Encoder.toBase64(value).asString;
-        return baseCrypto.encrypt(strValue);
+        return (baseCrypto as SystemCryptoV1).encrypt(strValue);
       }
       // In previous versions of the systemCrypto (prior to February 2023), encrypt took a uint8Array
-      return baseCrypto.encrypt(value);
+      return (baseCrypto as SystemCryptoV0).encrypt(value);
     },
 
     decrypt: async (value: Uint8Array) => {
       if (typeof baseCrypto.version === 'undefined') {
         // In previous versions of the systemCrypto (prior to February 2023), the decrypt function returned a Uint8Array
-        return baseCrypto.decrypt(value);
+        return (baseCrypto as SystemCryptoV0).decrypt(value);
       }
-      const decrypted = await baseCrypto.decrypt(value);
+      const decrypted = await (baseCrypto as SystemCryptoV1).decrypt(value);
       if (isBase64.test(decrypted)) {
         return Decoder.fromBase64(decrypted).asBytes;
       }
