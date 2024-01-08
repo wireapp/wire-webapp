@@ -401,6 +401,8 @@ export class MessageRepository {
       originalMessageId,
     };
 
+    // We cancel the sending of the link preview if the user has edited the message
+    // It prevents from sending a link preview for a message that has been replaced by another one
     cancelSendingLinkPreview(originalMessageId);
     try {
       const {state} = await this.sendEdit(messagePayload);
