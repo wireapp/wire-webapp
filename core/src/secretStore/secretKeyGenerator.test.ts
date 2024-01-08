@@ -17,135 +17,50 @@
  *
  */
 
-import {Decoder, Encoder} from 'bazinga64';
+import {EncryptedStore, createCustomEncryptedStore, createEncryptedStore} from './encryptedStore';
+import {generateSecretKey} from './secretKeyGenerator';
 
-import {generateSecretKey, CorruptedKeyError} from './secretKeyGenerator';
-
-const systemCryptos = {
-  v0: {
-    encrypt: async (value: Uint8Array) => {
-      return value;
-    },
-    decrypt: async (value: Uint8Array) => {
-      return value;
-    },
-    version: undefined,
-  },
-
-  v01: {
-    encrypt: async (value: Uint8Array) => {
-      return Encoder.toBase64(value).asBytes;
-    },
-    decrypt: async (value: Uint8Array) => {
-      const str = new TextDecoder().decode(value);
-      return Decoder.fromBase64(str).asBytes;
-    },
-    version: undefined,
-  },
-
-  v1: {
-    encrypt: async (value: string) => {
-      const encoder = new TextEncoder();
-      return encoder.encode(value);
-    },
-    decrypt: async (value: Uint8Array) => {
-      const decoder = new TextDecoder();
-      return decoder.decode(value);
-    },
-    version: 1,
-  },
+const customCrypto = {
+  encrypt: async (value: Uint8Array) => value,
+  decrypt: async (value: Uint8Array) => value,
+  version: 1,
 } as const;
 
 const dbName = 'test';
 const keyId = 'test-key';
 
 describe('SecretKeyGenerator', () => {
-  beforeEach(async () => {
-    return new Promise(resolve => {
-      Object.values(systemCryptos).forEach(version => {
-        jest.spyOn(version, 'encrypt');
-        jest.spyOn(version, 'decrypt');
-      });
-      const deleteReq = indexedDB.deleteDatabase(dbName);
-      deleteReq.onsuccess = resolve;
-    });
+  let secretsDb: EncryptedStore<any>;
+  afterEach(async () => {
+    await secretsDb?.wipe();
   });
 
-  it('generates and store a secret key stored in indexeddb', async () => {
-    const {key: secretKey} = await generateSecretKey({dbName, keyId});
+  it('generates store and deletes a secret key stored in indexeddb', async () => {
+    secretsDb = await createEncryptedStore(dbName);
+    const {key: secretKey} = await generateSecretKey({secretsDb, keyId});
     expect(secretKey).toBeDefined();
 
-    const {key: secretKey2} = await generateSecretKey({dbName, keyId});
+    const {key: secretKey2} = await generateSecretKey({secretsDb, keyId});
     expect(secretKey).toEqual(secretKey2);
   });
 
-  it.each(Object.entries(systemCryptos))(
-    'generates and store a secret key encrypted using system crypto (%s)',
-    async (_name, systemCrypto) => {
-      const {key} = await generateSecretKey({
-        dbName,
-        systemCrypto,
-        keyId,
-      });
-
-      expect(key).toBeDefined();
-      expect(systemCrypto.encrypt).toHaveBeenCalled();
-      expect(systemCrypto.decrypt).not.toHaveBeenCalled();
-
-      // fetch stored key
-      const {key: key2} = await generateSecretKey({dbName, systemCrypto: systemCrypto, keyId});
-
-      expect(key2).toEqual(key);
-      expect(systemCrypto.encrypt).toHaveBeenCalledTimes(1);
-      expect(systemCrypto.decrypt).toHaveBeenCalledTimes(1);
-    },
-  );
-
-  it.each([
-    ['v0 > v01', systemCryptos.v0, systemCryptos.v01],
-    ['v0 > v1', systemCryptos.v0, systemCryptos.v1],
-  ])(
-    'throws an error if previous systemCrypto is not compatible with the current one (%s)',
-    async (_name, crypto1, crypto2) => {
-      const {key} = await generateSecretKey({
-        dbName,
-        systemCrypto: crypto1,
-        keyId,
-      });
-
-      expect(key).toBeDefined();
-
-      try {
-        await generateSecretKey({dbName, systemCrypto: crypto2, keyId});
-      } catch (e) {
-        expect(e).toBeInstanceOf(CorruptedKeyError);
-      }
-    },
-  );
-
   it('deletes the key from DB', async () => {
-    const {key, deleteKey} = await generateSecretKey({dbName, keyId});
+    secretsDb = await createEncryptedStore(dbName);
+    const {key, deleteKey} = await generateSecretKey({secretsDb, keyId});
 
     await deleteKey();
-    const {key: secondKey} = await generateSecretKey({dbName: 'test', keyId});
+    const {key: secondKey} = await generateSecretKey({secretsDb, keyId});
 
     expect(key).not.toEqual(secondKey);
   });
 
-  it.each([['v01 > v1', systemCryptos.v01, systemCryptos.v1]])(
-    'is able to read a key that was generated with a previous system crypto (%s)',
-    async (_name, crypto1, crypto2) => {
-      const {key} = await generateSecretKey({
-        dbName: 'test',
-        systemCrypto: crypto1,
-        keyId,
-      });
+  it('creates a new key from a custom encryption store', async () => {
+    secretsDb = await createCustomEncryptedStore(dbName, customCrypto);
+    const {key} = await generateSecretKey({secretsDb, keyId});
 
-      expect(key).toBeDefined();
+    expect(key).toBeDefined();
 
-      const {key: key2} = await generateSecretKey({dbName: 'test', systemCrypto: crypto2, keyId});
-
-      expect(key2).toEqual(key);
-    },
-  );
+    const {key: key2} = await generateSecretKey({secretsDb, keyId});
+    expect(key2).toEqual(key);
+  });
 });

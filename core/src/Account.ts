@@ -54,10 +54,12 @@ import {GiphyService} from './giphy/';
 import {LinkPreviewService} from './linkPreview';
 import {MLSService} from './messagingProtocols/mls';
 import {AcmeChallenge, E2EIServiceExternal, User} from './messagingProtocols/mls/E2EIdentityService';
-import {CoreCallbacks, CoreCryptoConfig} from './messagingProtocols/mls/types';
+import {CoreCallbacks, CoreCryptoConfig, SecretCrypto} from './messagingProtocols/mls/types';
 import {NewClient, ProteusService} from './messagingProtocols/proteus';
 import {CryptoClientType} from './messagingProtocols/proteus/ProteusService/CryptoClient';
 import {HandledEventPayload, NotificationService, NotificationSource} from './notification/';
+import {createCustomEncryptedStore, createEncryptedStore, EncryptedStore} from './secretStore/encryptedStore';
+import {generateSecretKey} from './secretStore/secretKeyGenerator';
 import {SelfService} from './self/';
 import {CoreDatabase, deleteDB, openDB} from './storage/CoreDB';
 import {TeamService} from './team/';
@@ -85,11 +87,12 @@ export enum ConnectionState {
   LIVE = 'live',
 }
 
-export type CreateStoreFn = (storeName: string, context: Context) => undefined | Promise<CRUDEngine | undefined>;
+export type CreateStoreFn = (storeName: string, key: Uint8Array) => undefined | Promise<CRUDEngine | undefined>;
 
 interface AccountOptions {
   /** Used to store info in the database (will create a inMemory engine if returns undefined) */
   createStore?: CreateStoreFn;
+  systemCrypto?: SecretCrypto;
 
   /** Number of prekeys to generate when creating a new device (defaults to 2)
    * Prekeys are Diffie-Hellmann public keys which allow offline initiation of a secure Proteus session between two devices.
@@ -100,7 +103,7 @@ interface AccountOptions {
    *    - make creating a new device fast
    *    - make it likely that all prekeys get consumed while the device is offline and the last resort prekey will be used to create new session
    */
-  nbPrekeys?: number;
+  nbPrekeys: number;
 
   /**
    * Config for MLS and proteus devices. Will fallback to the old cryptobox logic if not provided
@@ -126,14 +129,13 @@ type Events = {
 export class Account extends TypedEventEmitter<Events> {
   private readonly apiClient: APIClient;
   private readonly logger: logdown.Logger;
-  private readonly createStore: CreateStoreFn;
-  private readonly nbPrekeys: number;
   private readonly coreCryptoConfig?: CoreCryptoConfig;
   private readonly isMlsEnabled: () => Promise<boolean>;
   /** this is the client the consumer is currently using. Will be set as soon as `initClient` is called and will be rest upon logout */
   private currentClient?: RegisteredClient;
   private storeEngine?: CRUDEngine;
   private db?: CoreDatabase;
+  private encryptedDb?: EncryptedStore<any>;
   private coreCallbacks?: CoreCallbacks;
 
   public service?: {
@@ -163,15 +165,13 @@ export class Account extends TypedEventEmitter<Events> {
    */
   constructor(
     apiClient: APIClient = new APIClient(),
-    {createStore = () => undefined, nbPrekeys = 100, coreCryptoConfig}: AccountOptions = {},
+    private options: AccountOptions = {nbPrekeys: 100},
   ) {
     super();
     this.apiClient = apiClient;
     this.backendFeatures = this.apiClient.backendFeatures;
-    this.coreCryptoConfig = coreCryptoConfig;
-    this.nbPrekeys = nbPrekeys;
+    this.coreCryptoConfig = options.coreCryptoConfig;
     this.isMlsEnabled = async () => !!this.coreCryptoConfig?.mls && (await this.apiClient.supportsMLS());
-    this.createStore = createStore;
     this.recurringTaskScheduler = new RecurringTaskScheduler({
       get: async key => {
         const task = await this.db?.get('recurringTasks', key);
@@ -269,7 +269,7 @@ export class Account extends TypedEventEmitter<Events> {
       this.service.e2eIdentity,
       user,
       this.currentClient,
-      this.nbPrekeys,
+      this.options.nbPrekeys,
       oAuthIdToken,
     );
   }
@@ -404,9 +404,9 @@ export class Account extends TypedEventEmitter<Events> {
     return validClient;
   }
 
-  private async buildCryptoClient(context: Context, storeEngine: CRUDEngine) {
+  private async buildCryptoClient(context: Context, storeEngine: CRUDEngine, encryptedStore: EncryptedStore) {
     const baseConfig = {
-      nbPrekeys: this.nbPrekeys,
+      nbPrekeys: this.options.nbPrekeys,
       onNewPrekeys: async (prekeys: PreKey[]) => {
         this.logger.debug(`Received '${prekeys.length}' new PreKeys.`);
 
@@ -421,13 +421,13 @@ export class Account extends TypedEventEmitter<Events> {
       const client = await buildClient(storeEngine, {
         ...baseConfig,
         ...coreCryptoConfig,
-        generateSecretKey: keyId => coreCryptoConfig.generateSecretKey(storeEngine.storeName, keyId, 16),
+        generateSecretKey: keyId => generateSecretKey({keyId, keySize: 16, secretsDb: encryptedStore}),
       });
       return [CryptoClientType.CORE_CRYPTO, client] as const;
     }
 
     const {buildClient} = await import('./messagingProtocols/proteus/ProteusService/CryptoClient/CryptoboxWrapper');
-    const client = await buildClient(storeEngine, baseConfig);
+    const client = buildClient(storeEngine, baseConfig);
     return [CryptoClientType.CRYPTOBOX, client] as const;
   }
 
@@ -443,19 +443,24 @@ export class Account extends TypedEventEmitter<Events> {
   }
 
   public async initServices(context: Context): Promise<void> {
-    this.storeEngine = await this.initEngine(context);
+    const encryptedStoreName = this.generateEncryptedDbName(context);
+    this.encryptedDb = this.options.systemCrypto
+      ? await createCustomEncryptedStore(encryptedStoreName, this.options.systemCrypto)
+      : await createEncryptedStore(encryptedStoreName);
     this.db = await openDB(this.generateCoreDbName(context));
+    this.storeEngine = await this.initEngine(context, this.encryptedDb);
+
     const accountService = new AccountService(this.apiClient);
     const assetService = new AssetService(this.apiClient);
 
-    const [clientType, cryptoClient] = await this.buildCryptoClient(context, this.storeEngine);
+    const [clientType, cryptoClient] = await this.buildCryptoClient(context, this.storeEngine, this.encryptedDb);
 
     let mlsService: MLSService | undefined;
     let e2eServiceExternal: E2EIServiceExternal | undefined;
 
     const proteusService = new ProteusService(this.apiClient, cryptoClient, {
       onNewClient: payload => this.emit(EVENTS.NEW_SESSION, payload),
-      nbPrekeys: this.nbPrekeys,
+      nbPrekeys: this.options.nbPrekeys,
     });
 
     const clientService = new ClientService(this.apiClient, proteusService, this.storeEngine);
@@ -524,6 +529,7 @@ export class Account extends TypedEventEmitter<Events> {
    */
   public async logout(clearData: boolean = false): Promise<void> {
     this.db?.close();
+    this.encryptedDb?.close();
     if (clearData) {
       await this.wipe();
     }
@@ -539,6 +545,7 @@ export class Account extends TypedEventEmitter<Events> {
     if (this.db) {
       await deleteDB(this.db);
     }
+    await this.encryptedDb?.wipe();
   }
 
   /**
@@ -685,11 +692,16 @@ export class Account extends TypedEventEmitter<Events> {
     return `core-${this.generateDbName(context)}`;
   }
 
-  private async initEngine(context: Context): Promise<CRUDEngine> {
+  private generateEncryptedDbName(context: Context) {
+    return `secrets-${this.generateDbName(context)}`;
+  }
+
+  private async initEngine(context: Context, encryptedStore: EncryptedStore): Promise<CRUDEngine> {
     const dbName = this.generateDbName(context);
     this.logger.log(`Initialising store with name "${dbName}"...`);
     const openDb = async () => {
-      const initializedDb = await this.createStore(dbName, context);
+      const dbKey = await generateSecretKey({keyId: 'db-key', keySize: 32, secretsDb: encryptedStore});
+      const initializedDb = await this.options.createStore?.(dbName, dbKey.key);
       if (initializedDb) {
         this.logger.info(`Initialized store with existing engine "${dbName}".`);
         return initializedDb;
