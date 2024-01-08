@@ -392,18 +392,23 @@ export class MessageRepository {
       );
     }
 
+    const originalMessageId = originalMessage.id;
     const messagePayload = {
       conversation,
       mentions,
       message: textMessage,
       messageId: createUuid(), // We set the id explicitely in order to be able to override the message if we generate a link preview
-      originalMessageId: originalMessage.id,
+      originalMessageId,
     };
 
-    cancelSendingLinkPreview(originalMessage.id);
-    const {state} = await this.sendEdit(messagePayload);
-    if (state !== MessageSendingState.CANCELED) {
-      await this.handleLinkPreview(messagePayload);
+    cancelSendingLinkPreview(originalMessageId);
+    try {
+      const {state} = await this.sendEdit(messagePayload);
+      if (state !== MessageSendingState.CANCELED) {
+        await this.handleLinkPreview(messagePayload);
+      }
+    } finally {
+      clearLinkPreviewSendingState(originalMessageId);
     }
   }
 
@@ -419,22 +424,18 @@ export class MessageRepository {
       return;
     }
 
-    try {
-      const linkPreview = await getLinkPreviewFromString(textPayload.message);
-      if (linkPreview) {
-        // If we detect a link preview, then we go on and send a new message (that will override the initial message) containing the link preview
-        await this.sendText(
-          {
-            ...textPayload,
-            linkPreview: linkPreview.image
-              ? await this.core.service!.linkPreview.uploadLinkPreviewImage(linkPreview as LinkPreviewContent)
-              : linkPreview,
-          },
-          {syncTimestamp: false},
-        );
-      }
-    } finally {
-      clearLinkPreviewSendingState(textPayload.messageId);
+    const linkPreview = await getLinkPreviewFromString(textPayload.message);
+    if (linkPreview) {
+      // If we detect a link preview, then we go on and send a new message (that will override the initial message) containing the link preview
+      await this.sendText(
+        {
+          ...textPayload,
+          linkPreview: linkPreview.image
+            ? await this.core.service!.linkPreview.uploadLinkPreviewImage(linkPreview as LinkPreviewContent)
+            : linkPreview,
+        },
+        {syncTimestamp: false},
+      );
     }
   }
 
