@@ -54,6 +54,11 @@ import {partition} from 'underscore';
 import {Asset, Availability, Confirmation, GenericMessage} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {
+  cancelSendingLinkPreview,
+  clearLinkPreviewSendingState,
+  shouldSendLinkPreviewForMessage,
+} from 'Util/LinkPreviewSender';
 import {Declension, joinNames, t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
@@ -394,6 +399,8 @@ export class MessageRepository {
       messageId: createUuid(), // We set the id explicitely in order to be able to override the message if we generate a link preview
       originalMessageId: originalMessage.id,
     };
+
+    cancelSendingLinkPreview(originalMessage.id);
     const {state} = await this.sendEdit(messagePayload);
     if (state !== MessageSendingState.CANCELED) {
       await this.handleLinkPreview(messagePayload);
@@ -406,18 +413,28 @@ export class MessageRepository {
       return;
     }
 
-    const linkPreview = await getLinkPreviewFromString(textPayload.message);
-    if (linkPreview) {
-      // If we detect a link preview, then we go on and send a new message (that will override the initial message) containing the link preview
-      await this.sendText(
-        {
-          ...textPayload,
-          linkPreview: linkPreview.image
-            ? await this.core.service!.linkPreview.uploadLinkPreviewImage(linkPreview as LinkPreviewContent)
-            : linkPreview,
-        },
-        {syncTimestamp: false},
-      );
+    const shouldSendLinkPreview = shouldSendLinkPreviewForMessage(textPayload.messageId);
+
+    if (!shouldSendLinkPreview) {
+      return;
+    }
+
+    try {
+      const linkPreview = await getLinkPreviewFromString(textPayload.message);
+      if (linkPreview) {
+        // If we detect a link preview, then we go on and send a new message (that will override the initial message) containing the link preview
+        await this.sendText(
+          {
+            ...textPayload,
+            linkPreview: linkPreview.image
+              ? await this.core.service!.linkPreview.uploadLinkPreviewImage(linkPreview as LinkPreviewContent)
+              : linkPreview,
+          },
+          {syncTimestamp: false},
+        );
+      }
+    } finally {
+      clearLinkPreviewSendingState(textPayload.messageId);
     }
   }
 
