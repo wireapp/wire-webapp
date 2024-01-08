@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [43.5.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@43.5.0...@wireapp/core@43.5.1) (2024-01-08)
+
+### Bug Fixes
+
+* Delete secrets store when account is wiped ([#5857](https://github.com/wireapp/wire-web-packages/issues/5857)) ([1a5df9b](https://github.com/wireapp/wire-web-packages/commit/1a5df9b5a922ffeba98206fa3c85e61a90b2bc7e))
+
 # [43.5.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@43.4.0...@wireapp/core@43.5.0) (2024-01-05)
 
 ### Features
