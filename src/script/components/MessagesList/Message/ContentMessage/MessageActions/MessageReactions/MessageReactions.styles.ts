@@ -78,7 +78,7 @@ export const messageReactionButton: CSSObject = {
 export const messageReactionButtonTooltip: CSSObject = {
   display: 'flex',
   flexDirection: 'column',
-  maxWidth: 165,
+  maxWidth: 145,
   whiteSpace: 'break-spaces',
 };
 export const messageReactionButtonTooltipImage: CSSObject = {
