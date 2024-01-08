@@ -47,6 +47,11 @@ export class Core extends Account {
         });
       },
 
+      /*
+       * When in an electron context, the window.systemCrypto will be populated by the renderer process.
+       * We then give those crypto primitives to the key generator that will use them to encrypt secrets.
+       * When in a browser context, then this systemCrypto will be undefined and the key generator will then use it's internal encryption system
+       */
       systemCrypto: window.systemCrypto ? wrapSystemCrypto(window.systemCrypto) : undefined,
       coreCryptoConfig: enableCoreCrypto
         ? {
