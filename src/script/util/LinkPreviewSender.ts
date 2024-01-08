@@ -17,16 +17,16 @@
  *
  */
 
-const shouldSendLinkPreview = new Map<string, boolean>();
+const pendingLinkPreviewMessages = new Map<string, boolean>();
 
 export const cancelSendingLinkPreview = (messageId: string) => {
-  shouldSendLinkPreview.set(messageId, false);
+  pendingLinkPreviewMessages.set(messageId, false);
 };
 
 export const shouldSendLinkPreviewForMessage = (messageId: string) => {
-  return shouldSendLinkPreview.get(messageId) ?? true;
+  return pendingLinkPreviewMessages.get(messageId) ?? true;
 };
 
 export const clearLinkPreviewSendingState = (messageId: string) => {
-  shouldSendLinkPreview.delete(messageId);
+  pendingLinkPreviewMessages.delete(messageId);
 };
