@@ -36,7 +36,7 @@ import {supportsMLS} from 'Util/util';
 
 import {getDelayTime} from './DelayTimer/delay';
 import {DelayTimerService} from './DelayTimer/DelayTimer';
-import {getActiveCertificate, hasActiveCertificate, isE2EIEnabled, MLSStatuses} from './E2EIdentityVerification';
+import {hasActiveCertificate, isE2EIEnabled, getActiveWireIdentity, MLSStatuses} from './E2EIdentityVerification';
 import {getModalOptions, ModalType} from './Modals';
 import {OIDCService} from './OIDCService';
 import {OIDCServiceStore} from './OIDCService/OIDCServiceStorage';
@@ -131,23 +131,16 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   }
 
   public async handleCertificateRenewal(): Promise<void> {
-    const certificate = await getActiveCertificate();
+    const identity = await getActiveWireIdentity();
 
-    if (!certificate) {
+    if (!identity?.certificate) {
       return;
     }
 
-    const {activeCertificate, activeCertificateStatus} = certificate;
-
-    //console.log('activeCertificateStatus', activeCertificateStatus);
-    if (!activeCertificate) {
-      return;
-    }
-
-    const {timeRemainingMS, certificateCreationTime} = getCertificateDetails(activeCertificate);
+    const {timeRemainingMS, certificateCreationTime} = getCertificateDetails(identity.certificate);
 
     // Check if the certificate is still valid
-    if (activeCertificateStatus !== MLSStatuses.VALID) {
+    if (identity.status !== MLSStatuses.VALID) {
       return;
     }
 

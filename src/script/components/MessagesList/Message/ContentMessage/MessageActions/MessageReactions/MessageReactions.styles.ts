@@ -46,11 +46,19 @@ export const messageReactionWrapper: CSSObject = {
   maxWidth: '100%',
   marginRight: 'var(--conversation-message-timestamp-width)',
   '.tooltip-content': {
-    backgroundColor: 'var(--gray-95) !important',
+    backgroundColor: 'var(--white) !important',
     marginBottom: '0 !important',
     padding: '6px 8px !important',
     '.tooltip-arrow': {
-      borderTopColor: 'var(--gray-95) !important',
+      borderTopColor: 'var(--white) !important',
+
+      'body.theme-dark &': {
+        borderTopColor: 'var(--gray-95) !important',
+      },
+    },
+
+    'body.theme-dark &': {
+      backgroundColor: 'var(--gray-95) !important',
     },
   },
 };
@@ -70,7 +78,7 @@ export const messageReactionButton: CSSObject = {
 export const messageReactionButtonTooltip: CSSObject = {
   display: 'flex',
   flexDirection: 'column',
-  maxWidth: 165,
+  maxWidth: 145,
   whiteSpace: 'break-spaces',
 };
 export const messageReactionButtonTooltipImage: CSSObject = {

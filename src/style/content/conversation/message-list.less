@@ -507,8 +507,7 @@
     .action-pill-style;
   }
 
-  .time,
-  .message-status {
+  .time {
     .subline;
     color: var(--gray-70);
     font-size: 12px !important;
@@ -523,18 +522,33 @@
 
 .message-status {
   margin-left: 12px;
+
+  .subline;
+  color: var(--gray-70);
+  font-size: 11px !important;
+  pointer-events: none;
+  user-select: none;
+
+  body.theme-dark & {
+    color: var(--gray-60);
+  }
 }
 
 .message-status-read {
   display: flex;
   align-items: center;
   margin-left: 12px;
-
-  .subline;
   color: var(--gray-70);
-  font-size: 12px !important;
+  font-size: 11px !important;
   pointer-events: none;
   user-select: none;
+
+  .button-reset-default;
+  .subline;
+
+  &__clickable {
+    pointer-events: all;
+  }
 
   body.theme-dark & {
     color: var(--gray-60);

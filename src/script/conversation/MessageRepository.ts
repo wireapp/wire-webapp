@@ -54,6 +54,11 @@ import {partition} from 'underscore';
 import {Asset, Availability, Confirmation, GenericMessage} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {
+  cancelSendingLinkPreview,
+  clearLinkPreviewSendingState,
+  shouldSendLinkPreviewForMessage,
+} from 'Util/LinkPreviewSender';
 import {Declension, joinNames, t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
@@ -387,22 +392,37 @@ export class MessageRepository {
       );
     }
 
+    const originalMessageId = originalMessage.id;
     const messagePayload = {
       conversation,
       mentions,
       message: textMessage,
       messageId: createUuid(), // We set the id explicitely in order to be able to override the message if we generate a link preview
-      originalMessageId: originalMessage.id,
+      originalMessageId,
     };
-    const {state} = await this.sendEdit(messagePayload);
-    if (state !== MessageSendingState.CANCELED) {
-      await this.handleLinkPreview(messagePayload);
+
+    // We cancel the sending of the link preview if the user has edited the message
+    // It prevents from sending a link preview for a message that has been replaced by another one
+    cancelSendingLinkPreview(originalMessageId);
+    try {
+      const {state} = await this.sendEdit(messagePayload);
+      if (state !== MessageSendingState.CANCELED) {
+        await this.handleLinkPreview(messagePayload);
+      }
+    } finally {
+      clearLinkPreviewSendingState(originalMessageId);
     }
   }
 
   private async handleLinkPreview(textPayload: TextMessagePayload & {messageId: string}) {
     // check if the user actually wants to send link previews
     if (!this.propertyRepository.getPreference(PROPERTIES_TYPE.PREVIEWS.SEND)) {
+      return;
+    }
+
+    const shouldSendLinkPreview = shouldSendLinkPreviewForMessage(textPayload.messageId);
+
+    if (!shouldSendLinkPreview) {
       return;
     }
 

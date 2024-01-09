@@ -29,12 +29,6 @@ import {mapMLSStatus} from './certificateDetails';
 import {Config} from '../Config';
 import {ConversationState} from '../conversation/ConversationState';
 
-// Define an interface for the device identity
-interface SelfDeviceIdentity {
-  activeCertificate?: string;
-  activeCertificateStatus?: string;
-}
-
 export enum MLSStatuses {
   VALID = 'valid',
   NOT_DOWNLOADED = 'not_downloaded',
@@ -98,24 +92,21 @@ const fetchSelfDeviceIdentity = async (): Promise<WireIdentity | undefined> => {
 };
 
 export async function hasActiveCertificate(): Promise<boolean> {
-  const certificate = await getActiveCertificate();
-
-  if (!certificate) {
+  const identity = await getActiveWireIdentity();
+  if (!identity?.certificate) {
     return false;
   }
-
-  const {activeCertificate} = certificate;
-  return typeof activeCertificate === 'string' && Boolean(activeCertificate.length);
+  return typeof identity.certificate === 'string' && Boolean(identity.certificate.length);
 }
 
-export async function getActiveCertificate(): Promise<SelfDeviceIdentity | undefined> {
+export async function getActiveWireIdentity(): Promise<WireIdentity | undefined> {
   const selfDeviceIdentity = await fetchSelfDeviceIdentity();
 
   if (!selfDeviceIdentity) {
     return undefined;
   }
 
-  return {activeCertificate: selfDeviceIdentity.certificate, activeCertificateStatus: selfDeviceIdentity.status};
+  return selfDeviceIdentity;
 }
 
 export async function isFreshMLSSelfClient() {
