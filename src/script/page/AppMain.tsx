@@ -31,7 +31,6 @@ import {ErrorFallback} from 'Components/ErrorFallback';
 import {GroupCreationModal} from 'Components/Modals/GroupCreation/GroupCreationModal';
 import {LegalHoldModal} from 'Components/Modals/LegalHoldModal/LegalHoldModal';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {PrimaryModalComponent} from 'Components/Modals/PrimaryModal/PrimaryModal';
 import {showUserModal, UserModal} from 'Components/Modals/UserModal';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
@@ -271,11 +270,11 @@ const AppMain: FC<AppMainProps> = ({
 
               <AppLock clientRepository={repositories.client} />
               <WarningsContainer onRefresh={app.refresh} />
-              <FeatureConfigChangeNotifier selfUserId={selfUser.id} teamState={teamState} />
-              <FeatureConfigChangeHandler teamState={teamState} />
 
               {!isFreshMLSSelfClient && (
                 <>
+                  <FeatureConfigChangeNotifier selfUserId={selfUser.id} teamState={teamState} />
+                  <FeatureConfigChangeHandler teamState={teamState} />
                   <CallingContainer
                     multitasking={mainView.multitasking}
                     callingRepository={repositories.calling}
@@ -296,7 +295,6 @@ const AppMain: FC<AppMainProps> = ({
 
               {/*The order of these elements matter to show proper modals stack upon each other*/}
               <UserModal selfUser={selfUser} userRepository={repositories.user} />
-              <PrimaryModalComponent />
               <GroupCreationModal userState={userState} teamState={teamState} />
             </ErrorBoundary>
           </RootProvider>

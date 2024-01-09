@@ -424,10 +424,8 @@ export class App {
       onProgress(10);
       telemetry.timeStep(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
 
-      const teamMembers = await teamRepository.initTeam(selfUser.teamId);
-      if (await handleE2EIdentityFeatureChange(this.logger, teamRepository['teamState'].teamFeatures())) {
-        return selfUser;
-      }
+      const {members: teamMembers, features: teamFeatures} = await teamRepository.initTeam(selfUser.teamId);
+      await handleE2EIdentityFeatureChange(this.logger, teamFeatures);
 
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_USER_DATA);
 

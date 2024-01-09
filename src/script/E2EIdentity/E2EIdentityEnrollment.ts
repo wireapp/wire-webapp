@@ -105,7 +105,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
   public async initialize({discoveryUrl, gracePeriodInSeconds, isFreshMLSSelfClient = false}: E2EIHandlerParams) {
     if (!isE2EIEnabled()) {
-      return this;
+      return;
     }
     const gracePeriodInMs = gracePeriodInSeconds * TIME_IN_MILLIS.SECOND;
     this.config = {
@@ -120,11 +120,17 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     };
     const hasCertificate = await hasActiveCertificate();
     if (!hasCertificate) {
-      this.showE2EINotificationMessage();
+      await this.showE2EINotificationMessage();
     } else {
-      void this.handleCertificateRenewal();
+      await this.handleCertificateRenewal();
     }
-    return this;
+    return new Promise<void>(resolve => {
+      const handleSuccess = () => {
+        this.off('enrollmentSuccessful', handleSuccess);
+        resolve();
+      };
+      this.on('enrollmentSuccessful', handleSuccess);
+    });
   }
 
   public async handleCertificateRenewal(): Promise<void> {
@@ -278,7 +284,6 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
       this.currentStep = E2EIHandlerStep.SUCCESS;
       this.showSuccessMessage();
-      this.emit('enrollmentSuccessful');
 
       // clear the oidc service progress/data and successful enrolment
       await this.cleanUp(false);
@@ -309,6 +314,9 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     }
     const {modalOptions, modalType} = getModalOptions({
       type: ModalType.SUCCESS,
+      primaryActionFn: () => {
+        this.emit('enrollmentSuccessful');
+      },
       hideSecondary: true,
       hideClose: false,
     });
@@ -366,7 +374,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     }
   }
 
-  private showModal(modalType: ModalType = ModalType.ENROLL): void {
+  private showModal(modalType: ModalType = ModalType.ENROLL): Promise<void> {
     // Check if config is defined and timer is available
     const isSnoozeTimeAvailable = this.config?.timer.isSnoozeTimeAvailable() ?? false;
 
