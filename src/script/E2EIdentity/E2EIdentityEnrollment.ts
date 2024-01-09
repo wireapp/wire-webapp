@@ -126,7 +126,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       // If the client already has a certificate, we don't need to start the enrollment
       return;
     }
-    await this.showE2EINotificationMessage();
+    this.showE2EINotificationMessage();
     return new Promise<void>(resolve => {
       const handleSuccess = () => {
         this.off('enrollmentSuccessful', handleSuccess);
@@ -295,7 +295,6 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
       setTimeout(removeCurrentModal, 0);
       await this.showErrorMessage();
-      throw error;
     }
   }
 
