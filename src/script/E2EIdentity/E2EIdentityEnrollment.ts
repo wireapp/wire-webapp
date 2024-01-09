@@ -317,9 +317,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     }
     const {modalOptions, modalType} = getModalOptions({
       type: ModalType.SUCCESS,
-      primaryActionFn: () => {
-        this.emit('enrollmentSuccessful');
-      },
+      primaryActionFn: () => this.emit('enrollmentSuccessful'),
       hideSecondary: true,
       hideClose: false,
     });
@@ -377,7 +375,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     }
   }
 
-  private showModal(modalType: ModalType = ModalType.ENROLL): Promise<void> {
+  private showModal(modalType: ModalType = ModalType.ENROLL) {
     // Check if config is defined and timer is available
     const isSnoozeTimeAvailable = this.config?.timer.isSnoozeTimeAvailable() ?? false;
 
