@@ -32,6 +32,7 @@ import {
   FeatureMLS,
   FeatureMLSE2EId,
   FeatureMLSMigration,
+  FeatureDownloadPath,
 } from './Feature';
 import {InvalidAppLockTimeoutError} from './FeatureError';
 import {FeatureList} from './FeatureList';
@@ -49,6 +50,7 @@ export class FeatureAPI {
     CALLING_VIDEO: 'videoCalling',
     SELF_DELETING_MESSAGES: 'selfDeletingMessages',
     DIGITAL_SIGNATURES: 'digitalSignatures',
+    DL_PATH: 'enforceFileDownloadLocation',
     CONVERSATION_GUEST_LINKS: 'conversationGuestLinks',
     FEATURE_CONFIGS: '/feature-configs',
     FEATURES: 'features',
@@ -379,5 +381,18 @@ export class FeatureAPI {
       }
       throw error;
     }
+  }
+  public async putDownloadPathFeature(
+    teamId: string,
+    dlPathFeature: Omit<FeatureDownloadPath, 'lockStatus'>,
+  ): Promise<FeatureDownloadPath> {
+    const config: AxiosRequestConfig = {
+      data: dlPathFeature,
+      method: 'put',
+      url: `${FeatureAPI.URL.TEAMS}/${teamId}/${FeatureAPI.URL.FEATURES}/${FeatureAPI.URL.DL_PATH}`,
+    };
+
+    const response = await this.client.sendJSON<FeatureDownloadPath>(config);
+    return response.data;
   }
 }
