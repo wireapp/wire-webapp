@@ -235,6 +235,7 @@ export const WebAppEvents = {
     INFO: 'wire.webapp.team.info',
     MEMBER_LEAVE: 'wire.webapp.team.member_leave',
     UPDATE_INFO: 'wire.webapp.team.update_info',
+    DOWNLOAD_PATH_UPDATE: 'wire.webapp.team.download_path_update',
   },
   TELEMETRY: {
     BACKEND_REQUESTS: 'wire.webapp.telemetry.backend_requests',
