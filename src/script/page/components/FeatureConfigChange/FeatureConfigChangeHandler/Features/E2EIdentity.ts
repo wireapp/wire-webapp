@@ -24,12 +24,12 @@ import {Logger} from 'Util/Logger';
 
 import {hasE2EIVerificationExpiration, hasMLSDefaultProtocol} from '../../../../../guards/Protocol';
 
-export const handleE2EIdentityFeatureChange = async (logger: Logger, config: FeatureList) => {
+export const handleE2EIdentityFeatureChange = async (logger: Logger, config: FeatureList): Promise<boolean> => {
   const e2eiConfig = config[FEATURE_KEY.MLSE2EID];
   const mlsConfig = config[FEATURE_KEY.MLS];
   // Check if MLS or MLS E2EIdentity feature is existent
   if (!hasE2EIVerificationExpiration(e2eiConfig) || !hasMLSDefaultProtocol(mlsConfig)) {
-    return;
+    return false;
   }
 
   // Check if E2EIdentity feature is enabled
@@ -37,12 +37,12 @@ export const handleE2EIdentityFeatureChange = async (logger: Logger, config: Fea
     // Check if MLS feature is enabled
     if (mlsConfig?.status !== FeatureStatus.ENABLED) {
       logger.info('Warning: E2EIdentity feature enabled but MLS feature is not active');
-      return;
+      return false;
     }
     // Check if E2EIdentity feature has a server discoveryUrl
     if (!e2eiConfig.config || !e2eiConfig.config.acmeDiscoveryUrl || e2eiConfig.config.acmeDiscoveryUrl.length <= 0) {
       logger.info('Warning: E2EIdentity feature enabled but no discoveryUrl provided');
-      return;
+      return false;
     }
 
     const freshMLSSelfClient = await isFreshMLSSelfClient();
@@ -53,5 +53,7 @@ export const handleE2EIdentityFeatureChange = async (logger: Logger, config: Fea
       gracePeriodInSeconds: e2eiConfig.config.verificationExpiration,
       isFreshMLSSelfClient: freshMLSSelfClient,
     });
+    return true;
   }
+  return false;
 };

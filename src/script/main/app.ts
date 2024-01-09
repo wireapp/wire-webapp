@@ -89,6 +89,7 @@ import {initMLSGroupConversations, initialiseSelfAndTeamConversations} from '../
 import {joinConversationsAfterMigrationFinalisation} from '../mls/MLSMigration/migrationFinaliser';
 import {NotificationRepository} from '../notification/NotificationRepository';
 import {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
+import {handleE2EIdentityFeatureChange} from '../page/components/FeatureConfigChange/FeatureConfigChangeHandler/Features/E2EIdentity';
 import {PermissionRepository} from '../permission/PermissionRepository';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {PropertiesService} from '../properties/PropertiesService';
@@ -424,6 +425,10 @@ export class App {
       telemetry.timeStep(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
 
       const teamMembers = await teamRepository.initTeam(selfUser.teamId);
+      if (await handleE2EIdentityFeatureChange(this.logger, teamRepository['teamState'].teamFeatures())) {
+        return selfUser;
+      }
+
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_USER_DATA);
 
       const connections = await connectionRepository.getConnections();

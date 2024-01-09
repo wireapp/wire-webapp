@@ -53,6 +53,9 @@ export function isE2EIEnabled(): boolean {
 }
 
 export async function getUsersIdentities(groupId: string, userIds: QualifiedId[]) {
+  if (await isFreshMLSSelfClient()) {
+    return new Map<string, WireIdentity[]>();
+  }
   const userVerifications = await getE2EIdentityService().getUsersIdentities(groupId, userIds);
 
   const mappedUsers = new Map<string, WireIdentity[]>();
@@ -100,6 +103,9 @@ export async function hasActiveCertificate(): Promise<boolean> {
 }
 
 export async function getActiveWireIdentity(): Promise<WireIdentity | undefined> {
+  if (await isFreshMLSSelfClient()) {
+    return undefined;
+  }
   const selfDeviceIdentity = await fetchSelfDeviceIdentity();
 
   if (!selfDeviceIdentity) {

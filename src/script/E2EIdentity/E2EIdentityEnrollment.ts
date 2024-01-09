@@ -274,9 +274,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
       // Notify user about E2EI enrolment success
       // This setTimeout is needed because there was a timing with the success modal and the loading modal
-      setTimeout(() => {
-        removeCurrentModal();
-      }, 0);
+      setTimeout(removeCurrentModal, 0);
 
       this.currentStep = E2EIHandlerStep.SUCCESS;
       this.showSuccessMessage();
@@ -285,15 +283,11 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       // clear the oidc service progress/data and successful enrolment
       await this.cleanUp(false);
     } catch (error) {
-      this.logger.error('E2EI enrollment failed', error);
-
       this.currentStep = E2EIHandlerStep.ERROR;
 
-      setTimeout(() => {
-        removeCurrentModal();
-      }, 0);
-      console.error('E2EI enrolment failed', error);
+      setTimeout(removeCurrentModal, 0);
       await this.showErrorMessage();
+      throw error;
     }
   }
 
