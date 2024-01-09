@@ -17,7 +17,7 @@
  *
  */
 
-import {CoreCrypto, WireIdentity} from '@wireapp/core-crypto';
+import {Ciphersuite, CoreCrypto, WireIdentity} from '@wireapp/core-crypto';
 
 import {E2EIServiceExternal} from './E2EIServiceExternal';
 
@@ -32,7 +32,10 @@ function buildE2EIService() {
 
   const clientService = {} as jest.Mocked<ClientService>;
 
-  return [new E2EIServiceExternal(coreCrypto, clientService), {coreCrypto}] as const;
+  return [
+    new E2EIServiceExternal(coreCrypto, clientService, Ciphersuite.MLS_128_DHKEMP256_AES128GCM_SHA256_P256),
+    {coreCrypto},
+  ] as const;
 }
 
 function generateCoreCryptoIdentity({
