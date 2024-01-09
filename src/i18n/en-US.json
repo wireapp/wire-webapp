@@ -68,7 +68,7 @@
   "E2EI.not_downloaded": "Not downloaded",
   "E2EI.serialNumber": "Serial number: ",
   "E2EI.showCertificateDetails": "Show Certificate Details",
-  "E2EI.status": "Status: ",
+  "E2EI.status": "Status:",
   "E2EI.updateCertificate": "Update Certificate",
   "E2EI.valid": "Valid",
   "E2EI.verified": "Verified (End-to-end Identity)",
