@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.19.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.18.3...@wireapp/webapp-events@0.19.0) (2024-01-09)
+
+### Features
+
+* update types for download path ([#5813](https://github.com/wireapp/wire-web-packages/issues/5813)) ([f4e5472](https://github.com/wireapp/wire-web-packages/commit/f4e547237b178e16631b98dae2e24fbf33a6e598))
+
 ## [0.18.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.18.2...@wireapp/webapp-events@0.18.3) (2023-09-06)
 
 **Note:** Version bump only for package @wireapp/webapp-events
