@@ -466,7 +466,6 @@ export class Account extends TypedEventEmitter<Events> {
     const clientService = new ClientService(this.apiClient, proteusService, this.storeEngine);
 
     if (clientType === CryptoClientType.CORE_CRYPTO && (await this.isMlsEnabled())) {
-      e2eServiceExternal = new E2EIServiceExternal(cryptoClient.getNativeClient(), clientService);
       mlsService = new MLSService(
         this.apiClient,
         cryptoClient.getNativeClient(),
@@ -475,6 +474,11 @@ export class Account extends TypedEventEmitter<Events> {
         {
           ...this.coreCryptoConfig?.mls,
         },
+      );
+      e2eServiceExternal = new E2EIServiceExternal(
+        cryptoClient.getNativeClient(),
+        clientService,
+        mlsService.config.cipherSuite,
       );
     }
 

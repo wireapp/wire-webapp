@@ -35,6 +35,7 @@ export class E2EIServiceExternal {
   public constructor(
     private readonly coreCryptoClient: CoreCrypto,
     private readonly clientService: ClientService,
+    private readonly cipherSuite: Ciphersuite,
   ) {}
 
   // If we have a handle in the local storage, we are in the enrollment process (this handle is saved before oauth redirect)
@@ -50,8 +51,8 @@ export class E2EIServiceExternal {
     return this.coreCryptoClient.e2eiConversationState(conversationId);
   }
 
-  public isE2EIEnabled(ciphersuite: Ciphersuite): Promise<boolean> {
-    return this.coreCryptoClient.e2eiIsEnabled(ciphersuite);
+  public isE2EIEnabled(): Promise<boolean> {
+    return this.coreCryptoClient.e2eiIsEnabled(this.cipherSuite);
   }
 
   public async getUsersIdentities(groupId: string, userIds: QualifiedId[]): Promise<Map<string, DeviceIdentity[]>> {
