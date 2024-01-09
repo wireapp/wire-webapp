@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [43.5.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@43.5.1...@wireapp/core@43.5.2) (2024-01-09)
+
+### Bug Fixes
+
+* Use config ciphersuite when querying e2ei ([#5858](https://github.com/wireapp/wire-web-packages/issues/5858)) ([cc31a37](https://github.com/wireapp/wire-web-packages/commit/cc31a37ab1bd4134c63262e509404d7c347e8502))
+
 ## [43.5.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@43.5.0...@wireapp/core@43.5.1) (2024-01-08)
 
 ### Bug Fixes
