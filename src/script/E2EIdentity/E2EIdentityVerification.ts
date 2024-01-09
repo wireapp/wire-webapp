@@ -95,11 +95,7 @@ const fetchSelfDeviceIdentity = async (): Promise<WireIdentity | undefined> => {
 };
 
 export async function hasActiveCertificate(): Promise<boolean> {
-  const identity = await getActiveWireIdentity();
-  if (!identity?.certificate) {
-    return false;
-  }
-  return typeof identity.certificate === 'string' && Boolean(identity.certificate.length);
+  return getE2EIdentityService().isE2EIEnabled();
 }
 
 export async function getActiveWireIdentity(): Promise<WireIdentity | undefined> {

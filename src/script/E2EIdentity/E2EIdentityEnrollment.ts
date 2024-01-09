@@ -104,26 +104,29 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   }
 
   public async initialize({discoveryUrl, gracePeriodInSeconds, isFreshMLSSelfClient = false}: E2EIHandlerParams) {
-    if (!isE2EIEnabled()) {
+    if (isE2EIEnabled()) {
+      const gracePeriodInMs = gracePeriodInSeconds * TIME_IN_MILLIS.SECOND;
+      this.config = {
+        discoveryUrl,
+        gracePeriodInMs,
+        timer: DelayTimerService.getInstance({
+          gracePeriodInMS: gracePeriodInMs,
+          gracePeriodExpiredCallback: () => null,
+          delayPeriodExpiredCallback: () => null,
+        }),
+        isFreshMLSSelfClient,
+      };
+    }
+    return this;
+  }
+
+  public async attemptEnrollment(): Promise<void> {
+    const hasCertificate = await hasActiveCertificate();
+    if (hasCertificate) {
+      // If the client already has a certificate, we don't need to start the enrollment
       return;
     }
-    const gracePeriodInMs = gracePeriodInSeconds * TIME_IN_MILLIS.SECOND;
-    this.config = {
-      discoveryUrl,
-      gracePeriodInMs,
-      timer: DelayTimerService.getInstance({
-        gracePeriodInMS: gracePeriodInMs,
-        gracePeriodExpiredCallback: () => null,
-        delayPeriodExpiredCallback: () => null,
-      }),
-      isFreshMLSSelfClient,
-    };
-    const hasCertificate = await hasActiveCertificate();
-    if (!hasCertificate) {
-      await this.showE2EINotificationMessage();
-    } else {
-      await this.handleCertificateRenewal();
-    }
+    await this.showE2EINotificationMessage();
     return new Promise<void>(resolve => {
       const handleSuccess = () => {
         this.off('enrollmentSuccessful', handleSuccess);
@@ -133,7 +136,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     });
   }
 
-  public async handleCertificateRenewal(): Promise<void> {
+  public async attemptRenewal(): Promise<void> {
     const identity = await getActiveWireIdentity();
 
     if (!identity?.certificate) {

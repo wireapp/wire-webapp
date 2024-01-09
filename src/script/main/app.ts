@@ -89,7 +89,7 @@ import {initMLSGroupConversations, initialiseSelfAndTeamConversations} from '../
 import {joinConversationsAfterMigrationFinalisation} from '../mls/MLSMigration/migrationFinaliser';
 import {NotificationRepository} from '../notification/NotificationRepository';
 import {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
-import {handleE2EIdentityFeatureChange} from '../page/components/FeatureConfigChange/FeatureConfigChangeHandler/Features/E2EIdentity';
+import {configureE2EI} from '../page/components/FeatureConfigChange/FeatureConfigChangeHandler/Features/E2EIdentity';
 import {PermissionRepository} from '../permission/PermissionRepository';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {PropertiesService} from '../properties/PropertiesService';
@@ -425,7 +425,14 @@ export class App {
       telemetry.timeStep(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
 
       const {members: teamMembers, features: teamFeatures} = await teamRepository.initTeam(selfUser.teamId);
-      await handleE2EIdentityFeatureChange(this.logger, teamFeatures);
+      const e2eiHandler = await configureE2EI(this.logger, teamFeatures);
+      if (e2eiHandler) {
+        /* We first try to do the initial enrollment (if the user has not yet enrolled)
+         * We need to enroll before anything else (in particular joining MLS conversations)
+         * Until the user is enrolled, we need to pause loading the app
+         */
+        await e2eiHandler.attemptEnrollment();
+      }
 
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_USER_DATA);
 
@@ -517,6 +524,10 @@ export class App {
 
       this.logger.info(`App loaded in ${Date.now() - startTime}ms`);
 
+      if (e2eiHandler) {
+        // At the end of the process (once conversations are loaded and joined), we can check if we need to renew the user's certificate
+        await e2eiHandler.attemptRenewal();
+      }
       return selfUser;
     } catch (error) {
       if (error instanceof BaseError) {
