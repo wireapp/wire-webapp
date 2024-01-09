@@ -36,7 +36,7 @@ import {supportsMLS} from 'Util/util';
 
 import {getDelayTime} from './DelayTimer/delay';
 import {DelayTimerService} from './DelayTimer/DelayTimer';
-import {hasActiveCertificate, isE2EIEnabled, getActiveCertificate} from './E2EIdentityVerification';
+import {getActiveCertificate, hasActiveCertificate, isE2EIEnabled, MLSStatuses} from './E2EIdentityVerification';
 import {getModalOptions, ModalType} from './Modals';
 import {OIDCService} from './OIDCService';
 import {OIDCServiceStore} from './OIDCService/OIDCServiceStorage';
@@ -137,10 +137,17 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       return;
     }
 
-    const {isValid, timeRemainingMS, certificateCreationTime} = getCertificateDetails(certificate);
+    const {activeCertificate, activeCertificateStatus} = certificate;
+
+    //console.log('activeCertificateStatus', activeCertificateStatus);
+    if (!activeCertificate) {
+      return;
+    }
+
+    const {timeRemainingMS, certificateCreationTime} = getCertificateDetails(activeCertificate);
 
     // Check if the certificate is still valid
-    if (!isValid) {
+    if (activeCertificateStatus !== MLSStatuses.VALID) {
       return;
     }
 
@@ -228,7 +235,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     this.coreE2EIService.clearAllProgress();
   }
 
-  public async enroll(refreshActiveCertificate = false, userData?: User) {
+  public async enroll(userData?: User) {
     if (!this.config) {
       throw new Error('Trying to enroll for E2EI without initializing the E2EIHandler');
     }
