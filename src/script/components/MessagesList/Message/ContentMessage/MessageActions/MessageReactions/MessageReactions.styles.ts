@@ -51,6 +51,7 @@ export const messageReactionWrapper: CSSObject = {
     padding: '6px 8px !important',
     '.tooltip-arrow': {
       borderTopColor: 'var(--white) !important',
+      filter: 'none !important',
 
       'body.theme-dark &': {
         borderTopColor: 'var(--gray-95) !important',
