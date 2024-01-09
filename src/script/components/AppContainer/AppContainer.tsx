@@ -27,6 +27,7 @@ import {SIGN_OUT_REASON} from 'src/script/auth/SignOutReason';
 import {useSingleInstance} from 'src/script/hooks/useSingleInstance';
 import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
 
+import {useAccentColor} from './hooks/useAccentColor';
 import {useTheme} from './hooks/useTheme';
 
 import {Configuration} from '../../Config';
@@ -50,6 +51,7 @@ export const AppContainer: FC<AppProps> = ({config, clientType}) => {
   window.wire.app = app;
   const mainView = new MainViewModel(app.repository);
   useTheme(() => app.repository.properties.getPreference(PROPERTIES_TYPE.INTERFACE.THEME));
+  useAccentColor();
 
   const {hasOtherInstance, registerInstance} = useSingleInstance();
 

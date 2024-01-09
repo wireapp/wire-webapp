@@ -72,7 +72,7 @@ interface AppMainProps {
   conversationState?: ConversationState;
 }
 
-const AppMain: FC<AppMainProps> = ({
+export const AppMain: FC<AppMainProps> = ({
   app,
   mainView,
   selfUser,
@@ -95,11 +95,10 @@ const AppMain: FC<AppMainProps> = ({
     repositories.notification,
   );
 
-  const {
-    accent_id,
-    availability: userAvailability,
-    isActivatedAccount,
-  } = useKoSubscribableChildren(selfUser, ['accent_id', 'availability', 'isActivatedAccount']);
+  const {availability: userAvailability, isActivatedAccount} = useKoSubscribableChildren(selfUser, [
+    'availability',
+    'isActivatedAccount',
+  ]);
 
   const teamState = container.resolve(TeamState);
   const userState = container.resolve(UserState);
@@ -224,7 +223,6 @@ const AppMain: FC<AppMainProps> = ({
     <StyledApp
       themeId={THEME_ID.DEFAULT}
       css={{backgroundColor: 'unset', height: '100%'}}
-      className={`main-accent-color-${accent_id} show`}
       id="wire-main"
       data-uie-name="status-webapp"
       data-uie-value="is-loaded"
@@ -303,5 +301,3 @@ const AppMain: FC<AppMainProps> = ({
     </StyledApp>
   );
 };
-
-export {AppMain};
