@@ -27,6 +27,13 @@ import {base64ToArray, supportsMLS} from 'Util/util';
 import {mapMLSStatus} from './certificateDetails';
 
 import {Config} from '../Config';
+import {ConversationState} from '../conversation/ConversationState';
+
+// Define an interface for the device identity
+interface SelfDeviceIdentity {
+  activeCertificate?: string;
+  activeCertificateStatus?: string;
+}
 
 export enum MLSStatuses {
   VALID = 'valid',
@@ -73,6 +80,44 @@ export async function getConversationVerificationState(groupId: string) {
 /**
  * Checks if E2EI has active certificate.
  */
-export function hasActiveCertificate() {
-  return getE2EIdentityService().hasActiveCertificate();
+const fetchSelfDeviceIdentity = async (): Promise<WireIdentity | undefined> => {
+  const conversationState = container.resolve(ConversationState);
+  const selfMLSConversation = conversationState.getSelfMLSConversation();
+  const userIdentities = await getUsersIdentities(
+    selfMLSConversation.groupId,
+    selfMLSConversation.allUserEntities().map(user => user.qualifiedId),
+  );
+  const currentClientId = selfMLSConversation.selfUser()?.localClient?.id;
+  const userId = selfMLSConversation.selfUser()?.id;
+
+  if (userId && currentClientId) {
+    const identity = userIdentities.get(userId)?.find(identity => identity.deviceId === currentClientId);
+    return identity;
+  }
+  return undefined;
+};
+
+export async function hasActiveCertificate(): Promise<boolean> {
+  const certificate = await getActiveCertificate();
+
+  if (!certificate) {
+    return false;
+  }
+
+  const {activeCertificate} = certificate;
+  return typeof activeCertificate === 'string' && Boolean(activeCertificate.length);
+}
+
+export async function getActiveCertificate(): Promise<SelfDeviceIdentity | undefined> {
+  const selfDeviceIdentity = await fetchSelfDeviceIdentity();
+
+  if (!selfDeviceIdentity) {
+    return undefined;
+  }
+
+  return {activeCertificate: selfDeviceIdentity.certificate, activeCertificateStatus: selfDeviceIdentity.status};
+}
+
+export async function isFreshMLSSelfClient() {
+  return getE2EIdentityService().isFreshMLSSelfClient();
 }

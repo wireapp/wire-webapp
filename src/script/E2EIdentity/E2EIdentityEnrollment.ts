@@ -33,7 +33,7 @@ import {removeUrlParameters} from 'Util/UrlUtil';
 import {supportsMLS} from 'Util/util';
 
 import {DelayTimerService} from './DelayTimer/DelayTimer';
-import {hasActiveCertificate, isE2EIEnabled} from './E2EIdentityVerification';
+import {hasActiveCertificate, isE2EIEnabled, MLSStatuses} from './E2EIdentityVerification';
 import {getModalOptions, ModalType} from './Modals';
 import {OIDCService} from './OIDCService';
 import {OIDCServiceStore} from './OIDCService/OIDCServiceStorage';
@@ -130,10 +130,17 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       return;
     }
 
-    const {isValid, timeRemainingMS, certificateCreationTime} = getCertificateDetails(certificate);
+    const {activeCertificate, activeCertificateStatus} = certificate;
+
+    //console.log('activeCertificateStatus', activeCertificateStatus);
+    if (!activeCertificate) {
+      return;
+    }
+
+    const {timeRemainingMS, certificateCreationTime} = getCertificateDetails(activeCertificate);
 
     // Check if the certificate is still valid
-    if (!isValid) {
+    if (activeCertificateStatus !== MLSStatuses.VALID) {
       return;
     }
 
@@ -166,7 +173,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
         throw new Error('Received no user data from OIDC service');
       }
       // renew without user action
-      await this.enroll(true, userData);
+      await this.enroll(userData);
     } catch (error) {
       this.logger.error('Silent authentication with refresh token failed', error);
 
@@ -235,7 +242,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     return this.getE2EIdentityService()?.getCertificateData();
   }
 
-  public async enroll(refreshActiveCertificate = false, userData?: User) {
+  public async enroll(userData?: User) {
     if (!this.config) {
       throw new Error('Trying to enroll for E2EI without initializing the E2EIHandler');
     }
