@@ -84,12 +84,12 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     return e2eiService;
   }
 
-  private get encryptionKey() {
+  private createOIDCService() {
     const key = this.core.key;
     if (!key) {
       throw new Error('encryption key not set');
     }
-    return key;
+    return new OIDCService(key);
   }
 
   /**
@@ -178,7 +178,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
    * Renew the certificate without user action
    */
   private async renewCertificate(): Promise<void> {
-    this.oidcService = new OIDCService(this.encryptionKey);
+    this.oidcService = this.createOIDCService();
     try {
       // Use the oidc service to get the user data via silent authentication (refresh token)
       const userData = await this.oidcService.handleSilentAuthentication();
@@ -225,7 +225,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   private async storeRedirectTargetAndRedirect(targetURL: string): Promise<void> {
     // store the target url in the persistent oidc service store, since the oidc service will be destroyed after the redirect
     OIDCServiceStore.store.targetURL(targetURL);
-    this.oidcService = new OIDCService(this.encryptionKey);
+    this.oidcService = this.createOIDCService();
     await this.oidcService.authenticate();
   }
 
@@ -236,7 +236,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     // Remove the url parameters of the failed enrolment
     removeUrlParameters();
     // Clear the oidc service progress
-    this.oidcService = new OIDCService(this.encryptionKey);
+    this.oidcService = this.createOIDCService();
     await this.oidcService.clearProgress(includeOidcServiceUserData);
     // Clear the e2e identity progress
     this.coreE2EIService.clearAllProgress();
@@ -255,7 +255,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
         // If the enrolment is in progress, we need to get the id token from the oidc service, since oauth should have already been completed
         if (this.coreE2EIService.isEnrollmentInProgress()) {
           // The redirect-url which is needed inside the OIDCService is stored in the OIDCServiceStore previously
-          this.oidcService = new OIDCService(this.encryptionKey);
+          this.oidcService = this.createOIDCService();
           userData = await this.oidcService.handleAuthentication();
           if (!userData) {
             throw new Error('Received no user data from OIDC service');
