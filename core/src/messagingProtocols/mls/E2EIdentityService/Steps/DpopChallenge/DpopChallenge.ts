@@ -17,6 +17,8 @@
  *
  */
 
+import {Converter} from 'bazinga64';
+
 import {DoWireDpopChallengeParams, GetClientAccessTokenParams, GetClientNonceParams} from './DpopChallenge.types';
 
 const getClientNonce = async ({apiClient, clientId}: GetClientNonceParams) => {
@@ -38,12 +40,12 @@ const getClientAccessToken = async ({
   clientId,
   expirySecs,
 }: GetClientAccessTokenParams) => {
-  const dpopToken = identity.createDpopToken(expirySecs, clientNonce);
+  const dpopToken = await identity.createDpopToken(expirySecs, clientNonce);
 
   // Remove this when the server is ready to accept the token
   await new Promise(resolve => setTimeout(resolve, 2000));
 
-  return await apiClient.api.client.getAccessToken(clientId, dpopToken);
+  return apiClient.api.client.getAccessToken(clientId, dpopToken);
 };
 
 export const doWireDpopChallenge = async ({
@@ -75,12 +77,15 @@ export const doWireDpopChallenge = async ({
     userDomain,
   });
 
-  const reqBody = identity.newDpopChallengeRequest(clientAccessTokenData.token, nonce);
+  const reqBody = await identity.newDpopChallengeRequest(clientAccessTokenData.token, nonce);
 
   const dpopChallengeResponse = await connection.validateDpopChallenge(wireDpopChallenge.url, reqBody);
   if (!dpopChallengeResponse) {
     throw new Error('No response received while validating DPOP challenge');
   }
+  await identity.newDpopChallengeResponse(
+    Converter.stringToArrayBufferViewUTF8(JSON.stringify(dpopChallengeResponse.data)),
+  );
 
   return dpopChallengeResponse;
 };

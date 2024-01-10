@@ -27,7 +27,7 @@ interface GetCertificateParams {
   certificateUrl: string;
 }
 export const getCertificate = async ({certificateUrl, connection, identity, nonce}: GetCertificateParams) => {
-  const reqBody = identity.certificateRequest(nonce);
+  const reqBody = await identity.certificateRequest(nonce);
 
   const certificateResponse = await connection.getCertificate(certificateUrl, reqBody);
 

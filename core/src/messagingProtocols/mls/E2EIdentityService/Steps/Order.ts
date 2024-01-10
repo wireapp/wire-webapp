@@ -42,11 +42,11 @@ export const createNewOrder = async ({
   directory,
   connection,
 }: CreateNewOrderParams): CreateNewOrderReturnValue => {
-  const reqBody = identity.newOrderRequest(nonce);
+  const reqBody = await identity.newOrderRequest(nonce);
   const response = await connection.createNewOrder(directory.newOrder, reqBody);
   if (response?.data && !!response.data.status.length && !!response.nonce.length && !!response.location?.length) {
     return {
-      order: identity.newOrderResponse(jsonToByteArray(response.data)),
+      order: await identity.newOrderResponse(jsonToByteArray(response.data)),
       authzUrl: response.data.authorizations[0],
       nonce: response.nonce,
       orderUrl: response.location,
@@ -63,16 +63,16 @@ export interface FinalizeOrderParams {
   orderUrl: OrderUrl;
 }
 export const finalizeOrder = async ({identity, nonce, orderUrl, connection}: FinalizeOrderParams) => {
-  const statusReqBody = identity.checkOrderRequest(orderUrl, nonce);
+  const statusReqBody = await identity.checkOrderRequest(orderUrl, nonce);
   const statusResponse = await connection.checkStatusOfOrder(orderUrl, statusReqBody);
 
   if (statusResponse?.data && !!statusResponse.data.status.length && !!statusResponse.nonce.length) {
-    const finalizeUrl = identity.checkOrderResponse(jsonToByteArray(statusResponse.data));
-    const finalizeReqBody = identity.finalizeRequest(statusResponse.nonce);
+    const finalizeUrl = await identity.checkOrderResponse(jsonToByteArray(statusResponse.data));
+    const finalizeReqBody = await identity.finalizeRequest(statusResponse.nonce);
     const finalizeResponse = await connection.finalizeOrder(finalizeUrl, finalizeReqBody);
 
     if (finalizeResponse?.data && !!finalizeResponse.data.status.length && !!finalizeResponse.nonce.length) {
-      const certificateUrl = identity.finalizeResponse(jsonToByteArray(finalizeResponse.data));
+      const certificateUrl = await identity.finalizeResponse(jsonToByteArray(finalizeResponse.data));
 
       return {
         certificateUrl,
