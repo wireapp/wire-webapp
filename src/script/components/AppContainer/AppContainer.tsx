@@ -22,6 +22,8 @@ import {FC, useEffect} from 'react';
 import {ClientType} from '@wireapp/api-client/lib/client/';
 import {container} from 'tsyringe';
 
+import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
+
 import {PrimaryModalComponent} from 'Components/Modals/PrimaryModal/PrimaryModal';
 import {SIGN_OUT_REASON} from 'src/script/auth/SignOutReason';
 import {useSingleInstance} from 'src/script/hooks/useSingleInstance';
@@ -82,7 +84,9 @@ export const AppContainer: FC<AppProps> = ({config, clientType}) => {
       <AppLoader init={onProgress => app.initApp(clientType, onProgress)}>
         {selfUser => <AppMain app={app} selfUser={selfUser} mainView={mainView} />}
       </AppLoader>
-      <PrimaryModalComponent />
+      <StyledApp themeId={THEME_ID.DEFAULT} css={{backgroundColor: 'unset', height: '100%'}}>
+        <PrimaryModalComponent />
+      </StyledApp>
     </>
   );
 };
