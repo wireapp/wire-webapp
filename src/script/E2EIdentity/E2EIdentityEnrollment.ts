@@ -242,22 +242,19 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       // Notify user about E2EI enrolment in progress
       this.currentStep = E2EIHandlerStep.ENROLL;
       this.showLoadingMessage();
-      let oAuthIdToken: string | undefined;
 
       if (!userData) {
         // If the enrolment is in progress, we need to get the id token from the oidc service, since oauth should have already been completed
         if (this.coreE2EIService.isEnrollmentInProgress()) {
           // The redirect-url which is needed inside the OIDCService is stored in the OIDCServiceStore previously
           this.oidcService = new OIDCService();
-          const userData = await this.oidcService.handleAuthentication();
+          userData = await this.oidcService.handleAuthentication();
           if (!userData) {
             throw new Error('Received no user data from OIDC service');
           }
-          oAuthIdToken = userData?.id_token;
         }
-      } else {
-        oAuthIdToken = userData?.id_token;
       }
+      const oAuthIdToken = userData?.id_token;
 
       const displayName = this.userState.self()?.name();
       const handle = this.userState.self()?.username();
