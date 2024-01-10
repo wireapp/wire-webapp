@@ -29,12 +29,16 @@ export function useAppSoftLock(callingRepository: CallingRepository, notificatio
 
   const e2eiEnabled = isE2EIEnabled();
 
+  const setAppSoftLock = (isLocked: boolean) => {
+    setFreshMLSSelfClient(isLocked);
+    callingRepository.setSoftLock(isLocked);
+    notificationRepository.setSoftLock(isLocked);
+  };
+
   const checkIfIsFreshMLSSelfClient = async () => {
     const initializedIsFreshMLSSelfClient = await isFreshMLSSelfClient();
 
-    setFreshMLSSelfClient(initializedIsFreshMLSSelfClient);
-    callingRepository.setSoftLock(initializedIsFreshMLSSelfClient);
-    notificationRepository.setSoftLock(initializedIsFreshMLSSelfClient);
+    setAppSoftLock(initializedIsFreshMLSSelfClient);
     setSoftLockLoaded(true);
   };
 
@@ -54,6 +58,18 @@ export function useAppSoftLock(callingRepository: CallingRepository, notificatio
       E2EIHandler.getInstance().off('enrollmentSuccessful', checkIfIsFreshMLSSelfClient);
     };
   }, [freshMLSSelfClient]);
+
+  useEffect(() => {
+    if (!e2eiEnabled) {
+      return () => {};
+    }
+
+    E2EIHandler.getInstance().on('enableSoftLock', setAppSoftLock);
+
+    return () => {
+      E2EIHandler.getInstance().off('enableSoftLock', setAppSoftLock);
+    };
+  }, [e2eiEnabled]);
 
   return {isFreshMLSSelfClient: freshMLSSelfClient, softLockLoaded: e2eiEnabled ? softLockLoaded : true};
 }

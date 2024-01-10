@@ -34,6 +34,7 @@ export enum MLSStatuses {
   NOT_DOWNLOADED = 'not_downloaded',
   EXPIRED = 'expired',
   EXPIRES_SOON = 'expires_soon',
+  REVOKED = 'revoked',
 }
 
 export type WireIdentity = Omit<DeviceIdentity, 'status'> & {

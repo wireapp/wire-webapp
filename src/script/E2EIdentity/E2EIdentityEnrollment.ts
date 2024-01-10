@@ -36,7 +36,13 @@ import {supportsMLS} from 'Util/util';
 
 import {getDelayTime} from './DelayTimer/delay';
 import {DelayTimerService} from './DelayTimer/DelayTimer';
-import {hasActiveCertificate, isE2EIEnabled, getActiveWireIdentity, MLSStatuses} from './E2EIdentityVerification';
+import {
+  hasActiveCertificate,
+  isE2EIEnabled,
+  getActiveWireIdentity,
+  MLSStatuses,
+  WireIdentity,
+} from './E2EIdentityVerification';
 import {getModalOptions, ModalType} from './Modals';
 import {OIDCService} from './OIDCService';
 import {OIDCServiceStore} from './OIDCService/OIDCServiceStorage';
@@ -58,7 +64,7 @@ interface E2EIHandlerParams {
   isFreshMLSSelfClient?: boolean;
 }
 
-type Events = {enrollmentSuccessful: void};
+type Events = {enrollmentSuccessful: void; enableSoftLock: boolean};
 
 type EnrollmentConfig = {
   timer: DelayTimerService;
@@ -139,8 +145,9 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
     const {timeRemainingMS, certificateCreationTime} = getCertificateDetails(identity.certificate);
 
-    // Check if the certificate is still valid
-    if (identity.status !== MLSStatuses.VALID) {
+    this.handleSoftLock(identity);
+
+    if (!this.shouldRefresh(identity)) {
       return;
     }
 
@@ -157,6 +164,29 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     // Check if it's time to renew the certificate
     if (currentTime >= renewalPromptTime) {
       await this.renewCertificate();
+    }
+  }
+
+  private handleSoftLock(identity: WireIdentity) {
+    const isSnoozeTimeAvailable = this.config?.timer.isSnoozeTimeAvailable() ?? false;
+    if (
+      (identity.status === MLSStatuses.VALID && !isSnoozeTimeAvailable) ||
+      identity.status === MLSStatuses.EXPIRED ||
+      identity.status === MLSStatuses.REVOKED
+    ) {
+      this.emit('enableSoftLock', true);
+    } else {
+      this.emit('enableSoftLock', false);
+    }
+  }
+
+  private shouldRefresh(identity: WireIdentity) {
+    const deviceIdentityStatus = identity.status;
+    switch (deviceIdentityStatus) {
+      case MLSStatuses.REVOKED:
+        return false;
+      default:
+        return true;
     }
   }
 
@@ -237,7 +267,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       this.currentStep = E2EIHandlerStep.ENROLL;
       this.showLoadingMessage();
       let oAuthIdToken: string | undefined;
-      const isCertificateRenewal = hasActiveCertificate();
+      const isCertificateRenewal = await hasActiveCertificate();
 
       if (!userData) {
         // If the enrolment is in progress, we need to get the id token from the oidc service, since oauth should have already been completed
