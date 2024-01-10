@@ -66,7 +66,7 @@ export class EncryptedStorage {
   async clear() {
     localStorage.clear();
   }
-  async key() {
+  async key(): Promise<null> {
     return null;
   }
 }
