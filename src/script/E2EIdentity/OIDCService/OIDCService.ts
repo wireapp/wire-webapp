@@ -17,12 +17,55 @@
  *
  */
 
+import {Encoder, Decoder} from 'bazinga64';
 import {UserManager, User, UserManagerSettings, WebStorageStateStore} from 'oidc-client-ts';
 
 import {clearKeysStartingWith} from 'Util/localStorage';
 import {Logger, getLogger} from 'Util/Logger';
 
 import {OIDCServiceStore} from './OIDCServiceStorage';
+
+const secretKey = await crypto.subtle.importKey('raw', new Uint8Array(32), 'AES-GCM', false, ['encrypt', 'decrypt']);
+export class EncryptedStorage {
+  static async setItem(key: string, value: string) {
+    try {
+      const iv = window.crypto.getRandomValues(new Uint8Array(12));
+      const encryptedValue = await window.crypto.subtle.encrypt(
+        {name: 'AES-GCM', iv},
+        secretKey,
+        Encoder.toBase64(value).asBytes,
+      );
+      const base64Value = Encoder.toBase64(encryptedValue).asString;
+      window.localStorage.setItem(key, JSON.stringify({value: base64Value, iv: Array.from(iv)}));
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+
+  static async getItem(key: string) {
+    const entry = localStorage.getItem(key);
+    if (entry) {
+      const {value, iv} = JSON.parse(entry);
+      const decrypted = await crypto.subtle.decrypt(
+        {name: 'AES-GCM', iv: new Uint8Array(iv)},
+        secretKey,
+        Decoder.fromBase64(value).asBytes,
+      );
+      return Decoder.fromBase64(Array.from(new Uint8Array(decrypted))).asString;
+    }
+    return null;
+  }
+
+  static removeItem(key: string) {
+    localStorage.removeItem(key);
+  }
+
+  static clear() {
+    localStorage.clear();
+  }
+  static key() {}
+}
 
 export class OIDCService {
   private readonly userManager: UserManager;
@@ -66,8 +109,10 @@ export class OIDCService {
         access_type: 'offline',
         prompt: 'consent',
       },
-      stateStore: new WebStorageStateStore({store: window.localStorage}),
-      userStore: new WebStorageStateStore({store: window.localStorage}),
+      stateStore: new WebStorageStateStore({store: window.sessionStorage}),
+      userStore: new WebStorageStateStore({
+        store: EncryptedStorage,
+      }),
     };
 
     this.userManager = new UserManager(dexioConfig);
