@@ -120,12 +120,12 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     );
   }
 
-  async initTeam(teamId?: string): Promise<QualifiedId[]> {
+  async initTeam(teamId?: string): Promise<{members: QualifiedId[]; features: FeatureList}> {
     const team = await this.getTeam();
     // get the fresh feature config from backend
-    await this.updateFeatureConfig();
+    const {newFeatureList} = await this.updateFeatureConfig();
     if (!teamId) {
-      return [];
+      return {members: [], features: {}};
     }
     this.teamState.teamMembers.subscribe(members => {
       // Subscribe to team members change and update the user role and guest status
@@ -139,7 +139,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     });
     const members = await this.loadTeamMembers(team);
     this.scheduleTeamRefresh();
-    return members;
+    return {members, features: newFeatureList};
   }
 
   private async updateFeatureConfig(): Promise<{newFeatureList: FeatureList; prevFeatureList?: FeatureList}> {

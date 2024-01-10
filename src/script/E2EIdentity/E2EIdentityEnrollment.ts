@@ -104,30 +104,39 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   }
 
   public async initialize({discoveryUrl, gracePeriodInSeconds, isFreshMLSSelfClient = false}: E2EIHandlerParams) {
-    if (!isE2EIEnabled()) {
-      return this;
-    }
-    const gracePeriodInMs = gracePeriodInSeconds * TIME_IN_MILLIS.SECOND;
-    this.config = {
-      discoveryUrl,
-      gracePeriodInMs,
-      timer: DelayTimerService.getInstance({
-        gracePeriodInMS: gracePeriodInMs,
-        gracePeriodExpiredCallback: () => null,
-        delayPeriodExpiredCallback: () => null,
-      }),
-      isFreshMLSSelfClient,
-    };
-    const hasCertificate = await hasActiveCertificate();
-    if (!hasCertificate) {
-      this.showE2EINotificationMessage();
-    } else {
-      void this.handleCertificateRenewal();
+    if (isE2EIEnabled()) {
+      const gracePeriodInMs = gracePeriodInSeconds * TIME_IN_MILLIS.SECOND;
+      this.config = {
+        discoveryUrl,
+        gracePeriodInMs,
+        timer: DelayTimerService.getInstance({
+          gracePeriodInMS: gracePeriodInMs,
+          gracePeriodExpiredCallback: () => null,
+          delayPeriodExpiredCallback: () => null,
+        }),
+        isFreshMLSSelfClient,
+      };
     }
     return this;
   }
 
-  public async handleCertificateRenewal(): Promise<void> {
+  public async attemptEnrollment(): Promise<void> {
+    const hasCertificate = await hasActiveCertificate();
+    if (hasCertificate) {
+      // If the client already has a certificate, we don't need to start the enrollment
+      return;
+    }
+    this.showE2EINotificationMessage();
+    return new Promise<void>(resolve => {
+      const handleSuccess = () => {
+        this.off('enrollmentSuccessful', handleSuccess);
+        resolve();
+      };
+      this.on('enrollmentSuccessful', handleSuccess);
+    });
+  }
+
+  public async attemptRenewal(): Promise<void> {
     const identity = await getActiveWireIdentity();
 
     if (!identity?.certificate) {
@@ -274,25 +283,17 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
       // Notify user about E2EI enrolment success
       // This setTimeout is needed because there was a timing with the success modal and the loading modal
-      setTimeout(() => {
-        removeCurrentModal();
-      }, 0);
+      setTimeout(removeCurrentModal, 0);
 
       this.currentStep = E2EIHandlerStep.SUCCESS;
       this.showSuccessMessage();
-      this.emit('enrollmentSuccessful');
 
       // clear the oidc service progress/data and successful enrolment
       await this.cleanUp(false);
     } catch (error) {
-      this.logger.error('E2EI enrollment failed', error);
-
       this.currentStep = E2EIHandlerStep.ERROR;
 
-      setTimeout(() => {
-        removeCurrentModal();
-      }, 0);
-      console.error('E2EI enrolment failed', error);
+      setTimeout(removeCurrentModal, 0);
       await this.showErrorMessage();
     }
   }
@@ -315,6 +316,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     }
     const {modalOptions, modalType} = getModalOptions({
       type: ModalType.SUCCESS,
+      primaryActionFn: () => this.emit('enrollmentSuccessful'),
       hideSecondary: true,
       hideClose: false,
     });
@@ -372,7 +374,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     }
   }
 
-  private showModal(modalType: ModalType = ModalType.ENROLL): void {
+  private showModal(modalType: ModalType = ModalType.ENROLL) {
     // Check if config is defined and timer is available
     const isSnoozeTimeAvailable = this.config?.timer.isSnoozeTimeAvailable() ?? false;
 
