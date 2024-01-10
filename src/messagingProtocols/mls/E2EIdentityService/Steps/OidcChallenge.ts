@@ -17,12 +17,15 @@
  *
  */
 
+import {Converter} from 'bazinga64';
+
 import {GetAuthorizationReturnValue} from './Authorization';
 
 import {AcmeService} from '../Connection/AcmeServer';
-import {E2eiEnrollment, Nonce} from '../E2EIService.types';
+import {CoreCrypto, E2eiEnrollment, Nonce} from '../E2EIService.types';
 
 interface DoWireOidcChallengeParams {
+  coreCryptoClient: CoreCrypto;
   authData: GetAuthorizationReturnValue;
   identity: E2eiEnrollment;
   connection: AcmeService;
@@ -31,6 +34,7 @@ interface DoWireOidcChallengeParams {
 }
 
 export const doWireOidcChallenge = async ({
+  coreCryptoClient,
   connection,
   authData,
   identity,
@@ -42,12 +46,17 @@ export const doWireOidcChallenge = async ({
     throw new Error('No wireOIDCChallenge defined');
   }
 
-  const reqBody = identity.newOidcChallengeRequest(oAuthIdToken, nonce);
+  const refreshToken = 'empty'; // CC just stores the refresh token (which we don't need for web, as our oidc library does that for us)
+  const reqBody = await identity.newOidcChallengeRequest(oAuthIdToken, refreshToken, nonce);
 
   const oidcChallengeResponse = await connection.validateOidcChallenge(wireOidcChallenge.url, reqBody);
   if (!oidcChallengeResponse) {
     throw new Error('No response received while validating OIDC challenge');
   }
+  await identity.newOidcChallengeResponse(
+    coreCryptoClient,
+    Converter.stringToArrayBufferViewUTF8(JSON.stringify(oidcChallengeResponse.data)),
+  );
 
   return oidcChallengeResponse;
 };

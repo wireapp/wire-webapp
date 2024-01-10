@@ -35,11 +35,11 @@ export const getAuthorization = async ({
   identity,
   connection,
 }: GetAuthorizationParams): Promise<GetAuthorizationReturnValue> => {
-  const reqBody = identity.newAuthzRequest(authzUrl, nonce);
+  const reqBody = await identity.newAuthzRequest(authzUrl, nonce);
   const response = await connection.getAuthorization(authzUrl, reqBody);
 
   if (response?.data && !!response.data.status.length && !!response.nonce.length) {
-    const wasmData = identity.newAuthzResponse(jsonToByteArray(response.data));
+    const wasmData = await identity.newAuthzResponse(jsonToByteArray(response.data));
     // manual copy of the wasm data because of a problem while cloning it
     const authorization: NewAcmeAuthz = {
       identifier: wasmData.identifier,

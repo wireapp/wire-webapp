@@ -35,11 +35,11 @@ export const createNewAccount = async ({
   directory,
   identity,
 }: CreateNewAccountParams): CreateNewAccountReturnValue => {
-  const reqBody = identity.newAccountRequest(nonce);
+  const reqBody = await identity.newAccountRequest(nonce);
   const response = await connection.createNewAccount(directory.newAccount, reqBody);
 
   if (response?.data && !!response.data.status.length && !!response.nonce.length) {
-    identity.newAccountResponse(jsonToByteArray(response.data));
+    await identity.newAccountResponse(jsonToByteArray(response.data));
     return response.nonce;
   }
 
