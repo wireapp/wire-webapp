@@ -18,7 +18,7 @@
  */
 
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
-import {FEATURE_KEY, FeatureMLS} from '@wireapp/api-client/lib/team/feature/';
+import {FEATURE_KEY, FeatureMLS, FeatureStatus} from '@wireapp/api-client/lib/team/feature/';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
@@ -72,7 +72,10 @@ export class SelfRepository extends TypedEventEmitter<Events> {
       }
 
       if (event.name === FEATURE_KEY.ENFORCE_DOWNLOAD_PATH) {
-        amplify.publish(WebAppEvents.TEAM.DOWNLOAD_PATH_UPDATE, event.data);
+        amplify.publish(
+          WebAppEvents.TEAM.DOWNLOAD_PATH_UPDATE,
+          event.data.status === FeatureStatus.ENABLED ? event.data.config.enforcedDownloadLocation : undefined,
+        );
       }
     });
   }
