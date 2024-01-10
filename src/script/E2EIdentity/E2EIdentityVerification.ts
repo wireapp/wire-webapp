@@ -27,6 +27,7 @@ import {base64ToArray, supportsMLS} from 'Util/util';
 import {mapMLSStatus} from './certificateDetails';
 
 import {Config} from '../Config';
+import {ConversationState} from '../conversation/ConversationState';
 
 export enum MLSStatuses {
   VALID = 'valid',
@@ -73,6 +74,38 @@ export async function getConversationVerificationState(groupId: string) {
 /**
  * Checks if E2EI has active certificate.
  */
-export function hasActiveCertificate() {
-  return getE2EIdentityService().hasActiveCertificate();
+const fetchSelfDeviceIdentity = async (): Promise<WireIdentity | undefined> => {
+  const conversationState = container.resolve(ConversationState);
+  const selfMLSConversation = conversationState.getSelfMLSConversation();
+  const userIdentities = await getUsersIdentities(
+    selfMLSConversation.groupId,
+    selfMLSConversation.allUserEntities().map(user => user.qualifiedId),
+  );
+  const currentClientId = selfMLSConversation.selfUser()?.localClient?.id;
+  const userId = selfMLSConversation.selfUser()?.id;
+
+  if (userId && currentClientId) {
+    const identity = userIdentities.get(userId)?.find(identity => identity.deviceId === currentClientId);
+    return identity;
+  }
+  return undefined;
+};
+
+export async function hasActiveCertificate(): Promise<boolean> {
+  // isE2EIEnabled() is the name of the CC method that tells us if a user has a valid certificate (and is enrolled to E2EI)
+  return getE2EIdentityService().isE2EIEnabled();
+}
+
+export async function getActiveWireIdentity(): Promise<WireIdentity | undefined> {
+  const selfDeviceIdentity = await fetchSelfDeviceIdentity();
+
+  if (!selfDeviceIdentity) {
+    return undefined;
+  }
+
+  return selfDeviceIdentity;
+}
+
+export async function isFreshMLSSelfClient() {
+  return getE2EIdentityService().isFreshMLSSelfClient();
 }

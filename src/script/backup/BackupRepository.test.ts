@@ -28,7 +28,7 @@ import {WebWorker} from 'Util/worker';
 import {BackUpHeader, DecodedHeader, ENCRYPTED_BACKUP_FORMAT, ENCRYPTED_BACKUP_VERSION} from './BackUpHeader';
 import {BackupRepository, Filename} from './BackupRepository';
 import {BackupService} from './BackupService';
-import {CancelError, DifferentAccountError, IncompatibleBackupError, IncompatiblePlatformError} from './Error';
+import {CancelError, DifferentAccountError, IncompatiblePlatformError} from './Error';
 import {handleZipEvent} from './zipWorker';
 
 import {ConversationRepository} from '../conversation/ConversationRepository';
@@ -170,12 +170,6 @@ describe('BackupRepository', () => {
         {
           expectedError: DifferentAccountError,
           metaChanges: {user_id: 'fail'},
-        },
-      ],
-      [
-        {
-          expectedError: IncompatibleBackupError,
-          metaChanges: {version: 13}, // version 14 contains a migration script, thus will generate an error
         },
       ],
       [

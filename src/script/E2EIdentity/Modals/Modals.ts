@@ -19,7 +19,7 @@
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {ModalOptions, PrimaryModalType} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
-import {t} from 'Util/LocalizerUtil';
+import {replaceLink, t} from 'Util/LocalizerUtil';
 
 const hideSecondaryBtn = {hideSecondary: true};
 const hideCloseBtn = {hideCloseBtn: true, preventClose: true};
@@ -29,6 +29,7 @@ export enum ModalType {
   ERROR = 'error',
   SUCCESS = 'success',
   LOADING = 'loading',
+  CERTIFICATE_RENEWAL = 'certificate_renewal',
 }
 
 interface GetModalOptions {
@@ -52,12 +53,13 @@ export const getModalOptions = ({
   }
   let options: ModalOptions = {};
   let modalType: PrimaryModalType = PrimaryModal.type.CONFIRM;
+  const replaceLearnMore = replaceLink('learnMore');
   switch (type) {
     case ModalType.ENROLL:
       options = {
         text: {
           closeBtnLabel: t('acme.settingsChanged.button.close'),
-          htmlMessage: t('acme.settingsChanged.paragraph'),
+          htmlMessage: t('acme.settingsChanged.paragraph', {}, {br: '<br>', ...replaceLearnMore}),
           title: t('acme.settingsChanged.headline.alt'),
         },
         primaryAction: {
@@ -74,11 +76,32 @@ export const getModalOptions = ({
         hideSecondary || secondaryActionFn === undefined ? PrimaryModal.type.ACKNOWLEDGE : PrimaryModal.type.CONFIRM;
       break;
 
+    case ModalType.CERTIFICATE_RENEWAL:
+      options = {
+        text: {
+          closeBtnLabel: t('acme.renewCertificate.button.close'),
+          htmlMessage: t('acme.renewCertificate.paragraph'),
+          title: t('acme.renewCertificate.headline.alt'),
+        },
+        primaryAction: {
+          action: primaryActionFn,
+          text: t('acme.renewCertificate.button.primary'),
+        },
+        secondaryAction: {
+          action: secondaryActionFn,
+          text: t('acme.renewCertificate.button.secondary'),
+        },
+        ...hideCloseBtn,
+      };
+      modalType =
+        hideSecondary || secondaryActionFn === undefined ? PrimaryModal.type.ACKNOWLEDGE : PrimaryModal.type.CONFIRM;
+      break;
+
     case ModalType.ERROR:
       options = {
         text: {
           closeBtnLabel: t('acme.error.button.close'),
-          htmlMessage: t('acme.error.paragraph'),
+          htmlMessage: t('acme.error.paragraph', {}, {br: '<br>'}),
           title: t('acme.error.headline'),
         },
         primaryAction: {

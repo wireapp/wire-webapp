@@ -17,7 +17,6 @@
  *
  */
 
-import {generateSecretKey as generateKey} from '@wireapp/core/lib/secretStore/secretKeyGenerator';
 import {container, singleton} from 'tsyringe';
 
 import {Account} from '@wireapp/core';
@@ -26,54 +25,34 @@ import {supportsMLS} from 'Util/util';
 
 import {APIClient} from './APIClientSingleton';
 import {createStorageEngine, DatabaseTypes} from './StoreEngineProvider';
+import {SystemCrypto, wrapSystemCrypto} from './utils/systemCryptoWrapper';
 
 import {Config} from '../Config';
 import {isE2EIEnabled} from '../E2EIdentity';
 
 declare global {
   interface Window {
-    systemCrypto?:
-      | {
-          encrypt: (value: Uint8Array) => Promise<Uint8Array>;
-          decrypt: (payload: Uint8Array) => Promise<Uint8Array>;
-          version: undefined;
-        }
-      | {
-          encrypt: (value: string) => Promise<Uint8Array>;
-          decrypt: (payload: Uint8Array) => Promise<string>;
-          version: 1;
-        };
+    systemCrypto?: SystemCrypto;
   }
 }
-
-const generateSecretKey = async (storeName: string, keyId: string, keySize: number) => {
-  return generateKey({
-    keyId,
-    keySize,
-    dbName: `secrets-${storeName}`,
-    /*
-     * When in an electron context, the window.systemCrypto will be populated by the renderer process.
-     * We then give those crypto primitives to the key generator that will use them to encrypt secrets.
-     * When in a browser context, then this systemCrypto will be undefined and the key generator will then use it's internal encryption system
-     */
-    systemCrypto: window.systemCrypto,
-  });
-};
 
 @singleton()
 export class Core extends Account {
   constructor(apiClient = container.resolve(APIClient)) {
     const enableCoreCrypto = supportsMLS() || Config.getConfig().FEATURE.USE_CORE_CRYPTO;
     super(apiClient, {
-      createStore: async storeName => {
-        const key = Config.getConfig().FEATURE.ENABLE_ENCRYPTION_AT_REST
-          ? await generateSecretKey(storeName, 'db-key', 32)
-          : undefined;
+      createStore: async (storeName, key) => {
         return createStorageEngine(storeName, DatabaseTypes.PERMANENT, {
-          key: key?.key,
+          key: Config.getConfig().FEATURE.ENABLE_ENCRYPTION_AT_REST ? key : undefined,
         });
       },
 
+      /*
+       * When in an electron context, the window.systemCrypto will be populated by the renderer process.
+       * We then give those crypto primitives to the key generator that will use them to encrypt secrets.
+       * When in a browser context, then this systemCrypto will be undefined and the key generator will then use it's internal encryption system
+       */
+      systemCrypto: window.systemCrypto ? wrapSystemCrypto(window.systemCrypto) : undefined,
       coreCryptoConfig: enableCoreCrypto
         ? {
             wasmFilePath: '/min/core-crypto.wasm',
@@ -84,8 +63,6 @@ export class Core extends Account {
                   useE2EI: isE2EIEnabled(),
                 }
               : undefined,
-
-            generateSecretKey,
           }
         : undefined,
 

@@ -54,13 +54,6 @@
     pointer-events: auto;
   }
 
-  &:hover .message-status-read {
-    opacity: 0;
-    &__show-on-hover {
-      opacity: 1;
-    }
-  }
-
   &.hover .time,
   &:hover .time,
   .show-timestamp.time {
@@ -491,20 +484,6 @@
   font-size: @font-size-xs;
 }
 
-// hover
-.message-show-on-hover {
-  opacity: 0;
-  transition-duration: @animation-timing-fast;
-  transition-property: opacity;
-  transition-timing-function: @ease-out-quart;
-
-  .message:hover &,
-  .message:focus-visible & {
-    opacity: 1;
-    transition-delay: @animation-timing-faster + 0.05;
-  }
-}
-
 // MESSAGE - ACTIONS
 .message-body-actions {
   display: flex;
@@ -524,42 +503,11 @@
     transition: opacity, 0.3s;
   }
 
-  .message-status-read {
-    display: flex;
-    align-items: center;
-    svg {
-      width: 12px;
-      min-height: 12px;
-      fill: currentColor;
-    }
-
-    &__count {
-      margin-left: 4px;
-    }
-
-    &:focus,
-    &:focus-visible {
-      opacity: 1;
-    }
-
-    @media (max-width: @screen-md-min) {
-      &__one-on-one {
-        height: 24px;
-        flex-direction: column;
-        .message-status-read__count {
-          margin-left: 0;
-        }
-      }
-    }
-  }
-
   .time {
     .action-pill-style;
   }
 
-  .time,
-  .message-status,
-  .message-status-read {
+  .time {
     .subline;
     color: var(--gray-70);
     font-size: 12px !important;
@@ -568,6 +516,70 @@
 
     body.theme-dark & {
       color: var(--gray-60);
+    }
+  }
+}
+
+.message-status {
+  margin-left: 12px;
+
+  .subline;
+  color: var(--gray-70);
+  font-size: 11px !important;
+  pointer-events: none;
+  user-select: none;
+
+  body.theme-dark & {
+    color: var(--gray-60);
+  }
+}
+
+.message-status-read {
+  display: flex;
+  align-items: center;
+  margin-left: 12px;
+  color: var(--gray-70);
+  font-size: 11px !important;
+  pointer-events: none;
+  user-select: none;
+
+  .button-reset-default;
+  .subline;
+
+  &__clickable {
+    pointer-events: all;
+  }
+
+  body.theme-dark & {
+    color: var(--gray-60);
+  }
+
+  svg {
+    width: 12px;
+    min-height: 12px;
+    fill: currentColor;
+  }
+
+  &__count {
+    margin-left: 4px;
+  }
+
+  &:focus,
+  &:focus-visible {
+    opacity: 1;
+  }
+
+  &__one-on-one {
+    pointer-events: none;
+  }
+
+  @media (max-width: @screen-md-min) {
+    &__one-on-one {
+      height: 24px;
+      flex-direction: column;
+      .message-status-read__count {
+        margin-left: 0;
+      }
     }
   }
 }

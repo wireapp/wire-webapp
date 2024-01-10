@@ -51,7 +51,7 @@ export class User {
   public readonly accent_color: ko.PureComputed<string>;
   public readonly accent_id: ko.Observable<number>;
   public readonly availability = ko.observable(Availability.Type.NONE);
-  public readonly connection: ko.Observable<ConnectionEntity>;
+  public readonly connection: ko.Observable<ConnectionEntity | null>;
   /** does not include current client/device */
   public readonly devices: ko.ObservableArray<ClientEntity>;
   public localClient: ClientEntity | undefined;
@@ -171,17 +171,21 @@ export class User {
     this.previewPictureResource = ko.observable().extend({rateLimit: {method: 'notifyWhenChangesStop', timeout: 100}});
     this.mediumPictureResource = ko.observable().extend({rateLimit: {method: 'notifyWhenChangesStop', timeout: 100}});
 
-    this.connection = ko.observable(new ConnectionEntity());
+    this.connection = ko.observable<ConnectionEntity | null>(null);
 
-    this.isBlocked = ko.pureComputed(() => this.connection().isBlocked() || this.isBlockedLegalHold());
-    this.isBlockedLegalHold = ko.pureComputed(() => this.connection().isMissingLegalHoldConsent());
-    this.isCanceled = ko.pureComputed(() => this.connection().isCanceled());
-    this.isConnected = ko.pureComputed(() => this.connection().isConnected());
-    this.isIgnored = ko.pureComputed(() => this.connection().isIgnored());
-    this.isIncomingRequest = ko.pureComputed(() => this.connection().isIncomingRequest());
-    this.isOutgoingRequest = ko.pureComputed(() => this.connection().isOutgoingRequest());
-    this.isUnknown = ko.pureComputed(() => this.connection().isUnknown());
+    this.isBlocked = ko.pureComputed(() => !!this.connection()?.isBlocked() || this.isBlockedLegalHold());
+    this.isBlockedLegalHold = ko.pureComputed(() => !!this.connection()?.isMissingLegalHoldConsent());
+    this.isCanceled = ko.pureComputed(() => !!this.connection()?.isCanceled());
+    this.isConnected = ko.pureComputed(() => !!this.connection()?.isConnected());
+    this.isIgnored = ko.pureComputed(() => !!this.connection()?.isIgnored());
+    this.isIncomingRequest = ko.pureComputed(() => !!this.connection()?.isIncomingRequest());
+    this.isOutgoingRequest = ko.pureComputed(() => !!this.connection()?.isOutgoingRequest());
+    this.isUnknown = ko.pureComputed(() => {
+      const connection = this.connection();
+      return !connection || connection.isUnknown();
+    });
     this.isExternal = ko.pureComputed(() => this.teamRole() === TEAM_ROLE.PARTNER);
+    this.isRequest = ko.pureComputed(() => !!this.connection()?.isRequest());
 
     this.isGuest = ko.observable(false);
     this.isDirectGuest = ko.pureComputed(() => {
@@ -191,8 +195,6 @@ export class User {
     this.isActivatedAccount = ko.pureComputed(() => !this.isTemporaryGuest());
     this.teamRole = ko.observable(TEAM_ROLE.NONE);
     this.teamId = undefined;
-
-    this.isRequest = ko.pureComputed(() => this.connection().isRequest());
 
     /* Placeholder for a future feature allowing 3rd party user verification
       As it is not implemented yet, it always returns false for now */
@@ -248,7 +250,7 @@ export class User {
   }
 
   markConnectionAsUnknown() {
-    this.connection().status(ConnectionStatus.UNKNOWN);
+    this.connection()?.status(ConnectionStatus.UNKNOWN);
   }
 
   addClient(new_client_et: ClientEntity): boolean {

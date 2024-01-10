@@ -17,6 +17,8 @@
  *
  */
 
+import jquery from 'jquery';
+
 import {includesString} from 'Util/StringUtil';
 
 export const appendParameter = (url: string, parameter: string) => {
@@ -99,7 +101,7 @@ export const getLinksFromHtml = <T extends HTMLElement>(html: string): T[] => {
   const links = html.match(anchorTags);
 
   const hasLinks = links?.length;
-  return hasLinks ? links.map(element => $<T>(element)[0]) : [];
+  return hasLinks ? links.map(element => jquery<T>(element)[0]) : [];
 };
 
 /**

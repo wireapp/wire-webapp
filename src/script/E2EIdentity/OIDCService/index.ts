@@ -17,27 +17,4 @@
  *
  */
 
-import {OIDCService} from './OIDCService';
-import {OIDCServiceStore} from './OIDCServiceStorage';
-
-// lots of hardcoded values here, but this is just for testing until we have a proper OIDC service
-export const getOIDCServiceInstance = (): OIDCService => {
-  const targetURL = OIDCServiceStore.get.targetURL();
-  const clientData = OIDCServiceStore.get.clientData();
-
-  // if there is no targetURL, we cannot create an OIDCService
-  if (!targetURL) {
-    throw new Error('No target URL found in OIDCServiceStore');
-  }
-  // if there is no clientData ID, we cannot create an OIDCService
-  if (!clientData || !clientData.id) {
-    throw new Error('No client data found in OIDCServiceStore');
-  }
-
-  const oidcService = new OIDCService({
-    oidcClient: clientData,
-    authorityUrl: targetURL,
-    redirectUri: `${location.origin}/oidc`,
-  });
-  return oidcService;
-};
+export * from './OIDCService';

@@ -456,7 +456,11 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                     onClick={() => {
                       setAudioOptionsOpen(prev => !prev);
                     }}
-                    onBlur={() => setAudioOptionsOpen(false)}
+                    onBlur={event => {
+                      if (!event.currentTarget.contains(event.relatedTarget)) {
+                        setAudioOptionsOpen(false);
+                      }
+                    }}
                   >
                     {audioOptionsOpen ? (
                       <>
@@ -520,7 +524,11 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                       onClick={() => {
                         setVideoOptionsOpen(prev => !prev);
                       }}
-                      onBlur={() => setVideoOptionsOpen(false)}
+                      onBlur={event => {
+                        if (!event.currentTarget.contains(event.relatedTarget)) {
+                          setVideoOptionsOpen(false);
+                        }
+                      }}
                     >
                       {videoOptionsOpen ? (
                         <>
@@ -556,8 +564,8 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                     !canShareScreen
                       ? videoControlDisabledStyles
                       : selfSharesScreen
-                      ? videoControlActiveStyles
-                      : videoControlInActiveStyles
+                        ? videoControlActiveStyles
+                        : videoControlInActiveStyles
                   }
                   onClick={() => toggleScreenshare(call)}
                   type="button"

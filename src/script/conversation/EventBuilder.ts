@@ -34,11 +34,10 @@ import type {Asset, LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {createUuid} from 'Util/uuid';
 
 import {AssetTransferState} from '../assets/AssetTransferState';
-import {CALL_MESSAGE_TYPE} from '../calling/enum/CallMessageType';
 import type {Conversation} from '../entity/Conversation';
 import type {Message} from '../entity/message/Message';
 import type {User} from '../entity/User';
-import {CALL, ClientEvent, CONVERSATION} from '../event/Client';
+import {ClientEvent, CONVERSATION} from '../event/Client';
 import {E2EIVerificationMessageType} from '../message/E2EIVerificationMessageType';
 import {StatusType} from '../message/StatusType';
 import {VerificationMessageType} from '../message/VerificationMessageType';
@@ -59,25 +58,6 @@ export interface BaseEvent {
 export interface ConversationEvent<Type extends CONVERSATION | CONVERSATION_EVENT, Data = undefined> extends BaseEvent {
   data: Data;
   type: Type;
-}
-
-export interface CallingEvent {
-  /**
-   * content is an object that comes from avs
-   */
-  content: {
-    type: CALL_MESSAGE_TYPE;
-    version: string;
-  };
-  targetConversation?: QualifiedId;
-  conversation: string;
-  from: string;
-  qualified_conversation?: QualifiedId;
-  qualified_from?: QualifiedId;
-  sender: string;
-  time?: string;
-  type: CALL;
-  senderClientId?: string;
 }
 
 export interface BackendEventMessage<Type, Data> extends Omit<BaseEvent, 'id'> {

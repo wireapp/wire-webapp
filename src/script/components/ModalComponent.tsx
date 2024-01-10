@@ -82,6 +82,8 @@ const ModalContentVisibleStyles: CSSObject = {
   transform: 'scale(1)',
 };
 
+const CLOSE_DELAY = 350;
+
 const ModalComponent: React.FC<ModalComponentProps> = ({
   id,
   className = '',
@@ -98,12 +100,7 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
   const isMounting = useRef<boolean>(true);
   const trapId = useId();
 
-  const trapFocus = useCallback(
-    (event: KeyboardEvent): void => {
-      preventFocusOutside(event, trapId);
-    },
-    [trapId],
-  );
+  const trapFocus = useCallback((event: KeyboardEvent) => preventFocusOutside(event, trapId), [trapId]);
 
   useEffect(() => {
     if (isShown) {
@@ -132,22 +129,27 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
     timeoutId = window.setTimeout(() => {
       setDisplayNone(true);
       onClosed();
-    }, 150);
+    }, CLOSE_DELAY);
 
     return () => {
       window.clearTimeout(timeoutId);
     };
   }, [isShown]);
 
+  if (displayNone) {
+    return null;
+  }
+
   return (
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-noninteractive-element-interactions
     <div
+      role="dialog"
+      aria-modal="true"
       onClick={onBgClick}
-      css={hasVisibleClass ? ModalOverlayVisibleStyles : ModalOverlayStyles}
-      style={{display: displayNone ? 'none' : 'flex'}}
-      tabIndex={TabIndex.FOCUSABLE}
-      role="button"
-      onKeyDown={noop}
       id={id}
+      css={hasVisibleClass ? ModalOverlayVisibleStyles : ModalOverlayStyles}
+      style={{display: 'flex'}}
+      tabIndex={TabIndex.FOCUSABLE}
       className={className}
       {...rest}
     >

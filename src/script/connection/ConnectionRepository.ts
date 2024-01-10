@@ -318,7 +318,7 @@ export class ConnectionRepository {
    * @returns Promise that resolves when the connection status was updated
    */
   private async updateStatus(userEntity: User, newStatus: ConnectionStatus): Promise<void> {
-    const currentStatus = userEntity.connection().status();
+    const currentStatus = userEntity.connection()?.status();
     try {
       const response = await this.connectionService.putConnections(userEntity.qualifiedId, newStatus);
       const connectionEvent = {connection: response, user: {name: userEntity.name()}};

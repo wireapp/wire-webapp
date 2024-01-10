@@ -83,6 +83,7 @@ export const ContentMessageComponent: React.FC<ContentMessageProps> = ({
   onRetry,
   isMsgElementsFocusable,
   onClickReaction,
+  onClickDetails,
 }) => {
   // check if current message is focused and its elements focusable
   const msgFocusState = useMemo(
@@ -177,6 +178,13 @@ export const ContentMessageComponent: React.FC<ContentMessageProps> = ({
               {timeAgo}
             </MessageTime>
           </span>
+
+          <ReadReceiptStatus
+            message={message}
+            is1to1Conversation={conversation.is1to1()}
+            isLastDeliveredMessage={isLastDeliveredMessage}
+            onClickDetails={onClickDetails}
+          />
         </MessageHeader>
       )}
       <div className="message-body">
@@ -239,14 +247,6 @@ export const ContentMessageComponent: React.FC<ContentMessageProps> = ({
             isRemovedFromConversation={conversation.removed_from_conversation()}
           />
         )}
-
-        <div className="message-body-actions">
-          <ReadReceiptStatus
-            message={message}
-            is1to1Conversation={conversation.is1to1()}
-            isLastDeliveredMessage={isLastDeliveredMessage}
-          />
-        </div>
       </div>
 
       <MessageReactionsList
@@ -257,6 +257,7 @@ export const ContentMessageComponent: React.FC<ContentMessageProps> = ({
         onTooltipReactionCountClick={() => onClickReactionDetails(message)}
         onLastReactionKeyEvent={() => setActionMenuVisibility(false)}
         isRemovedFromConversation={conversation.removed_from_conversation()}
+        users={conversation.allUserEntities()}
       />
     </div>
   );

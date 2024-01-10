@@ -37,8 +37,6 @@ export class Account extends EventEmitter {
     e2eIdentity: {
       isEnrollmentInProgress: jest.fn(),
       clearAllProgress: jest.fn(),
-      hasActiveCertificate: jest.fn(),
-      getCertificateData: jest.fn(),
       getUsersIdentities: jest.fn(() => new Map()),
       getDeviceIdentities: jest.fn(),
       getConversationState: jest.fn(),
@@ -58,6 +56,7 @@ export class Account extends EventEmitter {
       emit: jest.fn(),
       off: jest.fn(),
       scheduleKeyMaterialRenewal: jest.fn(),
+      isConversationEstablished: jest.fn(),
     },
     asset: {
       uploadAsset: jest.fn(),
@@ -87,6 +86,12 @@ export class Account extends EventEmitter {
     },
     client: {
       deleteClient: jest.fn(),
+    },
+    self: {
+      putSupportedProtocols: jest.fn(),
+    },
+    user: {
+      getUserSupportedProtocols: jest.fn(),
     },
   };
 }

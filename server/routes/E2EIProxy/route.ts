@@ -17,7 +17,25 @@
  *
  */
 
-export type OidcClientData = {
-  id: string;
-  secret?: string;
+import {Router} from 'express';
+
+import {OIDCProxyRoutePath, getTargetUrlWithQueryParams} from './common';
+import {OIDCProxy} from './proxy';
+
+export const OIDCProxyRoute = () => {
+  return Router().use(OIDCProxyRoutePath, (req, res, next) => {
+    // Redirect to the target URL if the shouldBeRedirected query parameter is set
+    try {
+      const {shouldBeRedirected, targetUrlWithQueryParams} = getTargetUrlWithQueryParams(req);
+
+      if (shouldBeRedirected) {
+        return res.redirect(targetUrlWithQueryParams.href);
+      }
+
+      // Apply the proxy middleware
+      OIDCProxy(req, res, next);
+    } catch (e) {
+      res.status(500).send(e.message);
+    }
+  });
 };

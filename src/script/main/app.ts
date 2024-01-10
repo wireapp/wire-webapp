@@ -71,7 +71,6 @@ import {ClientError, CLIENT_ERROR_TYPE} from '../error/ClientError';
 import {TeamError} from '../error/TeamError';
 import {EventRepository} from '../event/EventRepository';
 import {EventService} from '../event/EventService';
-import {EventServiceNoCompound} from '../event/EventServiceNoCompound';
 import {NotificationService} from '../event/NotificationService';
 import {EventStorageMiddleware} from '../event/preprocessor/EventStorageMiddleware';
 import {QuotedMessageMiddleware} from '../event/preprocessor/QuoteDecoderMiddleware';
@@ -86,10 +85,11 @@ import {IntegrationRepository} from '../integration/IntegrationRepository';
 import {IntegrationService} from '../integration/IntegrationService';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import {MediaRepository} from '../media/MediaRepository';
-import {initMLSConversations, registerUninitializedSelfAndTeamConversations} from '../mls';
+import {initMLSGroupConversations, initialiseSelfAndTeamConversations} from '../mls';
 import {joinConversationsAfterMigrationFinalisation} from '../mls/MLSMigration/migrationFinaliser';
 import {NotificationRepository} from '../notification/NotificationRepository';
 import {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
+import {configureE2EI} from '../page/components/FeatureConfigChange/FeatureConfigChangeHandler/Features/E2EIdentity';
 import {PermissionRepository} from '../permission/PermissionRepository';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {PropertiesService} from '../properties/PropertiesService';
@@ -134,7 +134,7 @@ export class App {
   service: {
     asset: AssetService;
     conversation: ConversationService;
-    event: EventService | EventServiceNoCompound;
+    event: EventService;
     integration: IntegrationService;
     notification: NotificationService;
     storage: StorageService;
@@ -244,6 +244,7 @@ export class App {
       serverTimeHandler,
       repositories.user,
       repositories.asset,
+      repositories.audio,
     );
 
     repositories.calling = new CallingRepository(
@@ -280,7 +281,11 @@ export class App {
       repositories.team,
     );
     repositories.permission = new PermissionRepository();
-    repositories.notification = new NotificationRepository(repositories.conversation, repositories.permission);
+    repositories.notification = new NotificationRepository(
+      repositories.conversation,
+      repositories.permission,
+      repositories.audio,
+    );
     repositories.preferenceNotification = new PreferenceNotificationRepository(repositories.user['userState'].self);
 
     return repositories;
@@ -294,7 +299,7 @@ export class App {
   private _setupServices() {
     container.registerInstance(StorageService, new StorageService());
     const storageService = container.resolve(StorageService);
-    const eventService = Runtime.isEdge() ? new EventServiceNoCompound() : new EventService();
+    const eventService = new EventService();
 
     return {
       asset: container.resolve(AssetService),
@@ -419,7 +424,16 @@ export class App {
       onProgress(10);
       telemetry.timeStep(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
 
-      const teamMembers = await teamRepository.initTeam(selfUser.teamId);
+      const {members: teamMembers, features: teamFeatures} = await teamRepository.initTeam(selfUser.teamId);
+      const e2eiHandler = await configureE2EI(this.logger, teamFeatures);
+      if (e2eiHandler) {
+        /* We first try to do the initial enrollment (if the user has not yet enrolled)
+         * We need to enroll before anything else (in particular joining MLS conversations)
+         * Until the user is enrolled, we need to pause loading the app
+         */
+        await e2eiHandler.attemptEnrollment();
+      }
+
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_USER_DATA);
 
       const connections = await connectionRepository.getConnections();
@@ -456,7 +470,7 @@ export class App {
 
       if (supportsMLS()) {
         //add the potential `self` and `team` conversations
-        await registerUninitializedSelfAndTeamConversations(conversations, selfUser, clientEntity.id, this.core);
+        await initialiseSelfAndTeamConversations(conversations, selfUser, clientEntity.id, this.core);
 
         //join all the mls groups that are known by the user but were migrated to mls
         await joinConversationsAfterMigrationFinalisation({
@@ -468,7 +482,7 @@ export class App {
         });
 
         //join all the mls groups we're member of and have not yet joined (eg. we were not send welcome message)
-        await initMLSConversations(conversations, {
+        await initMLSGroupConversations(conversations, {
           core: this.core,
           onError: ({id}, error) =>
             this.logger.error(`Failed when initialising mls conversation with id ${id}, error: `, error),
@@ -503,13 +517,17 @@ export class App {
         // start regularly polling the server to check if there is a new version of Wire
         startNewVersionPolling(Environment.version(false), this.update);
       }
-      audioRepository.init(true);
+      audioRepository.init();
       await conversationRepository.cleanupEphemeralMessages();
       callingRepository.setReady();
       telemetry.timeStep(AppInitTimingsStep.APP_LOADED);
 
       this.logger.info(`App loaded in ${Date.now() - startTime}ms`);
 
+      if (e2eiHandler) {
+        // At the end of the process (once conversations are loaded and joined), we can check if we need to renew the user's certificate
+        await e2eiHandler.attemptRenewal();
+      }
       return selfUser;
     } catch (error) {
       if (error instanceof BaseError) {

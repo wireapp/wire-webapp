@@ -39,12 +39,14 @@ import {ConversationRepository} from './ConversationRepository';
 import {ConversationState} from './ConversationState';
 
 import {AssetRepository} from '../assets/AssetRepository';
+import {AudioRepository} from '../audio/AudioRepository';
 import {ClientEntity} from '../client/ClientEntity';
 import {ClientState} from '../client/ClientState';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {ContentMessage} from '../entity/message/ContentMessage';
 import {EventRepository} from '../event/EventRepository';
 import {EventService} from '../event/EventService';
+import {StatusType} from '../message/StatusType';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {ReactionMap} from '../storage';
 import {TeamState} from '../team/TeamState';
@@ -98,6 +100,7 @@ async function buildMessageRepository(): Promise<[MessageRepository, MessageRepo
       assignAllClients: jest.fn().mockResolvedValue(true),
     } as unknown as UserRepository,
     assetRepository: {} as AssetRepository,
+    audioRepository: new AudioRepository(),
     userState,
     clientState,
     conversationState,
@@ -240,6 +243,25 @@ describe('MessageRepository', () => {
           userIds: {'': {selfid: [], user1: []}},
         }),
       );
+    });
+
+    it('should send delete and deletes message for own pending/gray messages', async () => {
+      const conversation = generateConversation(CONVERSATION_TYPE.REGULAR);
+      conversation.participating_user_ets.push(new User('user1'));
+
+      const messageToDelete = new Message(createUuid());
+      messageToDelete.user(selfUser);
+      messageToDelete.status(StatusType.SENDING);
+      conversation.addMessage(messageToDelete);
+
+      const [messageRepository, {core, eventRepository}] = await buildMessageRepository();
+      jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
+      spyOn(eventRepository.eventService, 'deleteEvent').and.returnValue(Promise.resolve());
+      spyOn(messageRepository, 'deleteMessageById');
+
+      await messageRepository.deleteMessageForEveryone(conversation, messageToDelete);
+
+      expect(messageRepository.deleteMessageById).toHaveBeenCalledWith(conversation, messageToDelete.id);
     });
   });
 
