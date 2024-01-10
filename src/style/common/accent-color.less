@@ -312,7 +312,7 @@ each(.colors(), .(@color-key, @color-name) {
     @icon-secondary-active-border-dark: '@{name}-dark-800' ;
     @indicator-range-input-thumb-dark: '@{name}-dark-300';
     @toggle-button-unselected-bg-dark: '@{name}-dark-800';
-    .main-accent-color-@{color-key} {
+    &.main-accent-color-@{color-key} {
       --button-primary-hover: @@button-primary-hover-dark;
       --button-primary-focus-border: @@button-primary-focus-border-dark;
       --button-primary-active: @@button-primary-active-dark;
