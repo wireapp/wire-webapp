@@ -21,6 +21,7 @@ import {Encoder, Decoder} from 'bazinga64';
 
 export class EncryptedStorage {
   private encryptionKey: Promise<CryptoKey>;
+  length = Promise.resolve(0);
 
   constructor(secretKey: Uint8Array) {
     this.encryptionKey = crypto.subtle.importKey('raw', secretKey, 'AES-GCM', false, ['encrypt', 'decrypt']);
@@ -58,12 +59,14 @@ export class EncryptedStorage {
     return null;
   }
 
-  removeItem(key: string) {
+  async removeItem(key: string) {
     localStorage.removeItem(key);
   }
 
-  clear() {
+  async clear() {
     localStorage.clear();
   }
-  key() {}
+  async key() {
+    return null;
+  }
 }
