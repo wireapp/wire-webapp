@@ -320,8 +320,9 @@ const _getStateUnreadMessage = {
 
       if (messageEntity.isPing()) {
         string = t('notificationPing');
-      } else if (messageEntity.hasAssetText()) {
-        string = true;
+      } else if (messageEntity.isContent() && messageEntity.hasAssetText()) {
+        const assetText = messageEntity.getFirstAsset().text;
+        string = getRenderedTextContent(assetText);
       } else if (messageEntity.isContent() && messageEntity.hasAsset()) {
         const assetEntity = messageEntity.getFirstAsset();
         const isUploaded = (assetEntity as FileAsset).status() === AssetTransferState.UPLOADED;
@@ -355,13 +356,9 @@ const _getStateUnreadMessage = {
             : t('conversationsSecondaryLineEphemeralMessage');
         }
 
-        const hasString = string && string !== true;
-        const stateText: string = hasString
-          ? (string as string)
-          : getRenderedTextContent((messageEntity.getFirstAsset() as Text).text);
         return conversationEntity.isGroup() && !messageEntity.isE2EIVerification()
-          ? `${messageEntity.unsafeSenderName()}: ${stateText}`
-          : stateText;
+          ? `${messageEntity.unsafeSenderName()}: ${string}`
+          : string;
       }
     }
     return '';
