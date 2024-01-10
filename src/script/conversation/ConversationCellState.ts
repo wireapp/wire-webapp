@@ -309,16 +309,20 @@ const _getStateRemoved = {
 
 const _getStateUnreadMessage = {
   description: (conversationEntity: Conversation): string => {
-    const unreadMessages = conversationEntity.unreadState().allMessages;
+    const unreadState = conversationEntity.unreadState();
 
-    for (const messageEntity of unreadMessages) {
+    const {allMessages, systemMessages} = unreadState;
+
+    const allUnread = [...allMessages, ...systemMessages];
+
+    for (const messageEntity of allUnread) {
       let string;
 
       if (messageEntity.isPing()) {
         string = t('notificationPing');
       } else if (messageEntity.hasAssetText()) {
         string = true;
-      } else if (messageEntity.hasAsset()) {
+      } else if (messageEntity.isContent() && messageEntity.hasAsset()) {
         const assetEntity = messageEntity.getFirstAsset();
         const isUploaded = (assetEntity as FileAsset).status() === AssetTransferState.UPLOADED;
 
@@ -363,7 +367,11 @@ const _getStateUnreadMessage = {
     return '';
   },
   icon: () => ConversationStatusIcon.UNREAD_MESSAGES,
-  match: (conversationEntity: Conversation) => conversationEntity.unreadState().allMessages.length > 0,
+  match: (conversationEntity: Conversation) => {
+    const {allMessages, systemMessages} = conversationEntity.unreadState();
+    const hasUnreadMessages = [...allMessages, ...systemMessages].length > 0;
+    return hasUnreadMessages;
+  },
 };
 
 const _getStateUserName = {
