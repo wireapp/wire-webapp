@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.20.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.19.0...@wireapp/webapp-events@0.20.0) (2024-01-11)
+
+### Features
+
+* add a redirected event to the apps lifecycle (for oauth) ([#5861](https://github.com/wireapp/wire-web-packages/issues/5861)) ([2756f41](https://github.com/wireapp/wire-web-packages/commit/2756f41d56f3a4514ec8ba70ef005d52cabab25f))
+
 # [0.19.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.18.3...@wireapp/webapp-events@0.19.0) (2024-01-09)
 
 ### Features
