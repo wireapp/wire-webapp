@@ -106,7 +106,7 @@ class MLSConversationVerificationStateHandler {
     const verificationState = await getConversationVerificationState(groupId);
 
     if (
-      verificationState === E2eiConversationState.Degraded &&
+      verificationState === E2eiConversationState.NotVerified &&
       conversation.mlsVerificationState() === ConversationVerificationState.VERIFIED
     ) {
       return this.degradeConversation(conversation);
