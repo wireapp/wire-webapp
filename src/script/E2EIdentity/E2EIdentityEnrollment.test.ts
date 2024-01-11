@@ -105,6 +105,7 @@ describe('E2EIHandler', () => {
       .spyOn(container.resolve(UserState), 'self')
       .mockReturnValue({name: () => 'John Doe', username: () => 'johndoe'});
     jest.spyOn(container.resolve(Core), 'enrollE2EI').mockResolvedValue(true);
+    container.resolve(Core).key = new Uint8Array();
   });
 
   it('should create instance with valid params', async () => {
