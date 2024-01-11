@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [43.5.4](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@43.5.3...@wireapp/core@43.5.4) (2024-01-11)
+
+### Bug Fixes
+
+* Do not upload public keys when renewing certificate ([#5860](https://github.com/wireapp/wire-web-packages/issues/5860)) ([f5c2e7f](https://github.com/wireapp/wire-web-packages/commit/f5c2e7f7ed79524d253e65f015247662234d8fa5))
+
 ## [43.5.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@43.5.2...@wireapp/core@43.5.3) (2024-01-09)
 
 **Note:** Version bump only for package @wireapp/core
