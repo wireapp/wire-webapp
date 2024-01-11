@@ -126,7 +126,9 @@ export class MLSService extends TypedEventEmitter<Events> {
 
     if (!blockKeypackageUpload) {
       // We need to make sure keypackages and public key are uploaded to the backend
-      await this.uploadMLSPublicKeys(client);
+      if (typeof client.mls_public_keys.ed25519 !== 'string' || client.mls_public_keys.ed25519.length === 0) {
+        await this.uploadMLSPublicKeys(client);
+      }
       await this.verifyRemoteMLSKeyPackagesAmount(client.id);
     } else {
       this.logger.info(`Blocked initial key package upload for client ${client.id} as E2EI is enabled`);
@@ -594,10 +596,6 @@ export class MLSService extends TypedEventEmitter<Events> {
    */
   private async uploadMLSPublicKeys(client: RegisteredClient) {
     // If we've already updated a client with its public key, there's no need to do it again.
-    if (typeof client.mls_public_keys.ed25519 === 'string' && client.mls_public_keys.ed25519.length > 0) {
-      return;
-    }
-
     const publicKey = await this.coreCryptoClient.clientPublicKey(this.config.cipherSuite);
     return this.apiClient.api.client.putClient(client.id, {
       mls_public_keys: {ed25519: btoa(Converter.arrayBufferViewToBaselineString(publicKey))},
@@ -814,7 +812,10 @@ export class MLSService extends TypedEventEmitter<Events> {
 
         if (rotateBundle !== undefined) {
           // upload the clients public keys
-          await this.uploadMLSPublicKeys(client);
+          if (!hasActiveCertificate) {
+            // we only upload public keys for the initial certification process. Renewals do not need to upload new public keys
+            await this.uploadMLSPublicKeys(client);
+          }
           // Remove old key packages
           await this.deleteMLSKeyPackages(client.id, rotateBundle.keyPackageRefsToRemove);
           // Upload new key packages with x509 certificate
