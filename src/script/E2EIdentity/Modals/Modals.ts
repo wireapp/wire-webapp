@@ -114,7 +114,7 @@ export const getModalOptions = ({
         },
       };
       modalType =
-        hideSecondary || secondaryActionFn === undefined ? PrimaryModal.type.CONFIRM : PrimaryModal.type.ACKNOWLEDGE;
+        hideSecondary || secondaryActionFn === undefined ? PrimaryModal.type.ACKNOWLEDGE : PrimaryModal.type.CONFIRM;
       break;
 
     case ModalType.LOADING:

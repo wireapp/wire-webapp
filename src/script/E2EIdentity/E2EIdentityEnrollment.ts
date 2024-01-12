@@ -345,6 +345,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       secondaryActionFn: () => {
         this.showE2EINotificationMessage();
       },
+      hideSecondary: !!this.config?.isFreshMLSSelfClient,
     });
 
     PrimaryModal.show(modalType, modalOptions);
