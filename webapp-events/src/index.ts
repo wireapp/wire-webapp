@@ -153,7 +153,6 @@ export const WebAppEvents = {
     SSO_WINDOW_FOCUS: 'wire.webapp.lifecycle.sso_window_focus',
     UNREAD_COUNT: 'wire.webapp.lifecycle.unread_count',
     UPDATE: 'wire.webapp.lifecycle.update',
-    REDIRECTED: 'wire.webapp.lifecycle.redirected',
   },
   NOTIFICATION: {
     CLICK: 'wire.webapp.notification.click',
