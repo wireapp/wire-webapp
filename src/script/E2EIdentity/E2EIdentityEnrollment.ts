@@ -34,7 +34,7 @@ import {formatDelayTime, TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {removeUrlParameters} from 'Util/UrlUtil';
 import {supportsMLS} from 'Util/util';
 
-import {getDelayTime} from './DelayTimer/delay';
+import {getDelayTime, shouldHideSecondary} from './DelayTimer/delay';
 import {DelayTimerService} from './DelayTimer/DelayTimer';
 import {
   hasActiveCertificate,
@@ -66,7 +66,7 @@ interface E2EIHandlerParams {
 
 type Events = {enrollmentSuccessful: void; enableSoftLock: boolean};
 
-type EnrollmentConfig = {
+export type EnrollmentConfig = {
   timer: DelayTimerService;
   discoveryUrl: string;
   gracePeriodInMs: number;
@@ -177,7 +177,8 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   }
 
   private handleSoftLock(identity: WireIdentity) {
-    const isSnoozeTimeAvailable = this.config?.timer.isSnoozeTimeAvailable() ?? false;
+    const isSnoozeTimeAvailable = false;
+
     if (
       (identity.status === MLSStatuses.VALID && !isSnoozeTimeAvailable) ||
       identity.status === MLSStatuses.EXPIRED ||
@@ -274,9 +275,9 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     try {
       // Notify user about E2EI enrolment in progress
       this.currentStep = E2EIHandlerStep.ENROLL;
-      this.showLoadingMessage();
-      let oAuthIdToken: string | undefined;
       const isCertificateRenewal = await hasActiveCertificate();
+      this.showLoadingMessage(isCertificateRenewal);
+      let oAuthIdToken: string | undefined;
 
       if (!userData) {
         // If the enrolment is in progress, we need to get the id token from the oidc service, since oauth should have already been completed
@@ -334,7 +335,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     }
   }
 
-  private showLoadingMessage(): void {
+  private showLoadingMessage(isCertificateRenewal = false): void {
     if (this.currentStep !== E2EIHandlerStep.ENROLL) {
       return;
     }
@@ -342,6 +343,9 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     const {modalOptions, modalType} = getModalOptions({
       type: ModalType.LOADING,
       hideClose: true,
+      extraParams: {
+        isRenewal: isCertificateRenewal,
+      },
     });
     PrimaryModal.show(modalType, modalOptions);
   }
@@ -370,6 +374,11 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       return;
     }
 
+    const identity = await getActiveWireIdentity();
+    if (!identity?.certificate) {
+      return;
+    }
+
     // Remove the url parameters of the failed enrolment
     removeUrlParameters();
     // Clear the oidc service progress
@@ -380,6 +389,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     const {modalOptions, modalType} = getModalOptions({
       type: ModalType.ERROR,
       hideClose: true,
+      hideSecondary: shouldHideSecondary(this.config!, identity),
       primaryActionFn: () => {
         this.currentStep = E2EIHandlerStep.INITIALIZED;
         void this.enroll();

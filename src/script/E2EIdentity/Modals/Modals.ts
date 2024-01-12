@@ -141,13 +141,13 @@ export const getModalOptions = ({
         },
       };
       modalType =
-        hideSecondary || secondaryActionFn === undefined ? PrimaryModal.type.CONFIRM : PrimaryModal.type.ACKNOWLEDGE;
+        hideSecondary || secondaryActionFn === undefined ? PrimaryModal.type.ACKNOWLEDGE : PrimaryModal.type.CONFIRM;
       break;
 
     case ModalType.LOADING:
       options = {
         text: {
-          title: t('acme.inProgress.headline'),
+          title: extraParams?.isRenewal ? t('acme.renewal.inProgress.headline') : t('acme.inProgress.headline'),
         },
         ...hideCloseBtn,
       };

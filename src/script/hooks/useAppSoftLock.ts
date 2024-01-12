@@ -35,6 +35,12 @@ export function useAppSoftLock(callingRepository: CallingRepository, notificatio
     notificationRepository.setSoftLock(isLocked);
   };
 
+  const setAppSoftLockRefresh = (isLocked: boolean) => {
+    setFreshMLSSelfClient(isLocked);
+    callingRepository.setSoftLock(isLocked);
+    notificationRepository.setSoftLock(isLocked);
+  };
+
   const checkIfIsFreshMLSSelfClient = async () => {
     const initializedIsFreshMLSSelfClient = await isFreshMLSSelfClient();
 
@@ -64,10 +70,12 @@ export function useAppSoftLock(callingRepository: CallingRepository, notificatio
       return () => {};
     }
 
-    E2EIHandler.getInstance().on('enableSoftLock', setAppSoftLock);
+    E2EIHandler.getInstance().on('enableSoftLock', locked => {
+      setAppSoftLockRefresh(locked);
+    });
 
     return () => {
-      E2EIHandler.getInstance().off('enableSoftLock', setAppSoftLock);
+      E2EIHandler.getInstance().off('enableSoftLock', setAppSoftLockRefresh);
     };
   }, [e2eiEnabled]);
 

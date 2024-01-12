@@ -17,6 +17,9 @@
  *
  */
 
+import {EnrollmentConfig} from '../E2EIdentityEnrollment';
+import {MLSStatuses, WireIdentity} from '../E2EIdentityVerification';
+
 /* eslint-disable no-magic-numbers */
 
 enum TIME_IN_MILLIS {
@@ -49,4 +52,13 @@ export function getDelayTime(gracePeriodInMs: number): number {
     return Math.min(ONE_DAY, gracePeriodInMs);
   }
   return 0;
+}
+
+export function shouldHideSecondary(enrollmentConfig: EnrollmentConfig, identity: WireIdentity): boolean {
+  const isSnoozeTimeAvailable = !!enrollmentConfig?.timer.isSnoozeTimeAvailable();
+  const isFreshMLSSelfClient = !!enrollmentConfig?.isFreshMLSSelfClient;
+  const certificateExpired = identity.status === MLSStatuses.EXPIRED;
+  const certificateRevoked = identity.status === MLSStatuses.REVOKED;
+
+  return isFreshMLSSelfClient || !isSnoozeTimeAvailable || certificateExpired || certificateRevoked;
 }
