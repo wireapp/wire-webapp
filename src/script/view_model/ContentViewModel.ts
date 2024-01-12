@@ -249,8 +249,9 @@ export class ContentViewModel {
 
     try {
       const conversationEntity = await this.getConversationEntity(conversation, domain);
+      const isConnectionBlocked = conversationEntity?.connection()?.isBlocked();
 
-      if (!conversationEntity) {
+      if (!conversationEntity || isConnectionBlocked) {
         this.closeRightSidebar();
         throw new ConversationError(
           ConversationError.TYPE.CONVERSATION_NOT_FOUND,
