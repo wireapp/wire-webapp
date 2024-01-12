@@ -1940,7 +1940,23 @@ export class ConversationRepository {
       conversation => conversation.is1to1() && !conversation.connection(),
     );
 
-    for (const conversation of team1To1Conversations) {
+    // Sort conversations so mls 1:1 conversations are initialised first
+    const sortedConverstions = team1To1Conversations.toSorted((a, b) => {
+      const aIsMLSConversation = isMLSConversation(a);
+      const bIsMLSConversation = isMLSConversation(b);
+
+      if (aIsMLSConversation && !bIsMLSConversation) {
+        return -1;
+      }
+
+      if (!aIsMLSConversation && bIsMLSConversation) {
+        return 1;
+      }
+
+      return 0;
+    });
+
+    for (const conversation of sortedConverstions) {
       try {
         await this.init1to1Conversation(conversation);
       } catch (error) {
