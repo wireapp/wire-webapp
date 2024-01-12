@@ -1941,7 +1941,7 @@ export class ConversationRepository {
     );
 
     // Sort conversations so mls 1:1 conversations are initialised first
-    const sortedConverstions = team1To1Conversations.toSorted((a, b) => {
+    const sortedConverstions = [...team1To1Conversations].sort((a, b) => {
       const aIsMLSConversation = isMLSConversation(a);
       const bIsMLSConversation = isMLSConversation(b);
 
