@@ -5221,10 +5221,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/webapp-events@npm:0.18.3":
-  version: 0.18.3
-  resolution: "@wireapp/webapp-events@npm:0.18.3"
-  checksum: 03e16464df7599ca4877a0b5242c7557933b6ae93fdf5c475864db2235f5903e6ccddbb8798051de81cb2e0e9b20b7e6f9e4444dad5510d1fe183dc04347df12
+"@wireapp/webapp-events@npm:0.20.1":
+  version: 0.20.1
+  resolution: "@wireapp/webapp-events@npm:0.20.1"
+  checksum: 8aa3dd428c25790a6c47346ee11031bd91cd81ec8403db17923dabf2fb5f3c500d70a35c4d5e8e9faab494ad8be9e7df07c6e82b3cdcfaaa5447913cb980fccc
   languageName: node
   linkType: hard
 
@@ -17775,7 +17775,7 @@ __metadata:
     "@wireapp/react-ui-kit": 9.12.5
     "@wireapp/store-engine": ^5.1.4
     "@wireapp/store-engine-dexie": 2.1.7
-    "@wireapp/webapp-events": 0.18.3
+    "@wireapp/webapp-events": 0.20.1
     amplify: "https://github.com/wireapp/amplify#head=master"
     archiver: ^6.0.1
     autoprefixer: ^10.4.16
