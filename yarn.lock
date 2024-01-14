@@ -5039,11 +5039,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/copy-config@npm:2.1.13":
-  version: 2.1.13
-  resolution: "@wireapp/copy-config@npm:2.1.13"
+"@wireapp/copy-config@npm:2.1.14":
+  version: 2.1.14
+  resolution: "@wireapp/copy-config@npm:2.1.14"
   dependencies:
-    axios: 1.6.3
+    axios: 1.6.5
     copy: 0.3.2
     cosmiconfig: 8.3.6
     fs-extra: 11.1.0
@@ -5051,7 +5051,7 @@ __metadata:
     logdown: 3.3.1
   bin:
     copy-config: lib/cli.js
-  checksum: 41b6392a53e4823c146d200926b1a62cca67adbf7b2996794ba6b7f4f27d9cc58159a279ba9377d96d480d6aee05e7f316331a2cfa4fcad948a4d6093620c85e
+  checksum: 0c0f472167ba40313f53a2a0966f62840bf404c495d26ff0ee578ea78ce2dc684138ae72288100ae0057a8dc9291f2fcf6c47d4986da332191cd87569ee6abdd
   languageName: node
   linkType: hard
 
@@ -5903,17 +5903,6 @@ __metadata:
   peerDependencies:
     axios: 0.x || 1.x
   checksum: 132b63132e8087242b8888fdebf3786cfd687e1021970319336a63533b4b584ab23a39d5b5a05e84b96055a640129a25e60b6a6cdb422c4cf10517398238000f
-  languageName: node
-  linkType: hard
-
-"axios@npm:1.6.3":
-  version: 1.6.3
-  resolution: "axios@npm:1.6.3"
-  dependencies:
-    follow-redirects: ^1.15.0
-    form-data: ^4.0.0
-    proxy-from-env: ^1.1.0
-  checksum: 07ef3bb83fc2dacc1ae2c97f2bbd04ef7701f5655f9037789d79ee78b698ffa50eaa8465c2017d4d3e9ce7d94cb779f730acaab32ce9036d0a4933c1e89df4da
   languageName: node
   linkType: hard
 
@@ -9024,16 +9013,6 @@ __metadata:
   version: 3.2.9
   resolution: "flatted@npm:3.2.9"
   checksum: f14167fbe26a9d20f6fca8d998e8f1f41df72c8e81f9f2c9d61ed2bea058248f5e1cbd05e7f88c0e5087a6a0b822a1e5e2b446e879f3cfbe0b07ba2d7f80b026
-  languageName: node
-  linkType: hard
-
-"follow-redirects@npm:^1.15.0":
-  version: 1.15.3
-  resolution: "follow-redirects@npm:1.15.3"
-  peerDependenciesMeta:
-    debug:
-      optional: true
-  checksum: 584da22ec5420c837bd096559ebfb8fe69d82512d5585004e36a3b4a6ef6d5905780e0c74508c7b72f907d1fa2b7bd339e613859e9c304d0dc96af2027fd0231
   languageName: node
   linkType: hard
 
@@ -17834,7 +17813,7 @@ __metadata:
     "@types/webpack-env": 1.18.4
     "@wireapp/avs": 9.5.13
     "@wireapp/commons": 5.2.4
-    "@wireapp/copy-config": 2.1.13
+    "@wireapp/copy-config": 2.1.14
     "@wireapp/core": 43.5.4
     "@wireapp/eslint-config": 3.0.5
     "@wireapp/prettier-config": 0.6.3
