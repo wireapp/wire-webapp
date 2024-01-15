@@ -70,6 +70,7 @@ interface AppMainProps {
   selfUser: User;
   mainView: MainViewModel;
   conversationState?: ConversationState;
+  softLockEnabled: boolean;
 }
 
 export const AppMain: FC<AppMainProps> = ({
@@ -77,6 +78,7 @@ export const AppMain: FC<AppMainProps> = ({
   mainView,
   selfUser,
   conversationState = container.resolve(ConversationState),
+  softLockEnabled = false,
 }) => {
   const apiContext = app.getAPIContext();
 
@@ -93,6 +95,7 @@ export const AppMain: FC<AppMainProps> = ({
   const {isFreshMLSSelfClient, softLockLoaded = false} = useAppSoftLock(
     repositories.calling,
     repositories.notification,
+    softLockEnabled,
   );
 
   const {availability: userAvailability, isActivatedAccount} = useKoSubscribableChildren(selfUser, [

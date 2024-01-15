@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, useEffect} from 'react';
+import {FC, useEffect, useState} from 'react';
 
 import {ClientType} from '@wireapp/api-client/lib/client/';
 import {container} from 'tsyringe';
@@ -26,6 +26,7 @@ import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
 import {PrimaryModalComponent} from 'Components/Modals/PrimaryModal/PrimaryModal';
 import {SIGN_OUT_REASON} from 'src/script/auth/SignOutReason';
+import {E2EIHandler, isE2EIEnabled} from 'src/script/E2EIdentity';
 import {useSingleInstance} from 'src/script/hooks/useSingleInstance';
 import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
 
@@ -56,6 +57,7 @@ export const AppContainer: FC<AppProps> = ({config, clientType}) => {
   useAccentColor();
 
   const {hasOtherInstance, registerInstance} = useSingleInstance();
+  const [softLockEnabled, setAppSoftLock] = useState(false);
 
   useEffect(() => {
     if (hasOtherInstance) {
@@ -74,6 +76,20 @@ export const AppContainer: FC<AppProps> = ({config, clientType}) => {
     return () => document.removeEventListener('scroll', resetWindowScroll);
   }, []);
 
+  const e2eiEnabled = isE2EIEnabled();
+
+  useEffect(() => {
+    if (!e2eiEnabled) {
+      return () => {};
+    }
+
+    E2EIHandler.getInstance().on('identityUpdate', setAppSoftLock);
+
+    return () => {
+      E2EIHandler.getInstance().off('identityUpdate', setAppSoftLock);
+    };
+  }, [e2eiEnabled]);
+
   if (hasOtherInstance) {
     app.redirectToLogin(SIGN_OUT_REASON.MULTIPLE_TABS);
     return null;
@@ -82,7 +98,7 @@ export const AppContainer: FC<AppProps> = ({config, clientType}) => {
   return (
     <>
       <AppLoader init={onProgress => app.initApp(clientType, onProgress)}>
-        {selfUser => <AppMain app={app} selfUser={selfUser} mainView={mainView} />}
+        {selfUser => <AppMain app={app} selfUser={selfUser} mainView={mainView} softLockEnabled={softLockEnabled} />}
       </AppLoader>
       <StyledApp themeId={THEME_ID.DEFAULT} css={{backgroundColor: 'unset', height: '100%'}}>
         <PrimaryModalComponent />

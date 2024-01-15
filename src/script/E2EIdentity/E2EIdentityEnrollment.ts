@@ -34,7 +34,7 @@ import {formatDelayTime, TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {removeUrlParameters} from 'Util/UrlUtil';
 import {supportsMLS} from 'Util/util';
 
-import {getDelayTime, shouldHideSecondary} from './DelayTimer/delay';
+import {getDelayTime, shouldEnableSoftLock} from './DelayTimer/delay';
 import {DelayTimerService} from './DelayTimer/DelayTimer';
 import {
   hasActiveCertificate,
@@ -64,7 +64,7 @@ interface E2EIHandlerParams {
   isFreshMLSSelfClient?: boolean;
 }
 
-type Events = {enrollmentSuccessful: void; enableSoftLock: boolean};
+type Events = {enrollmentSuccessful: void; identityUpdate: boolean};
 
 export type EnrollmentConfig = {
   timer: DelayTimerService;
@@ -154,8 +154,6 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
     const {timeRemainingMS, certificateCreationTime} = getCertificateDetails(identity.certificate);
 
-    this.handleSoftLock(identity);
-
     if (!this.shouldRefresh(identity)) {
       return;
     }
@@ -173,20 +171,10 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     // Check if it's time to renew the certificate
     if (currentTime >= renewalPromptTime) {
       await this.renewCertificate();
-    }
-  }
-
-  private handleSoftLock(identity: WireIdentity) {
-    const isSnoozeTimeAvailable = false;
-
-    if (
-      (identity.status === MLSStatuses.VALID && !isSnoozeTimeAvailable) ||
-      identity.status === MLSStatuses.EXPIRED ||
-      identity.status === MLSStatuses.REVOKED
-    ) {
-      this.emit('enableSoftLock', true);
-    } else {
-      this.emit('enableSoftLock', false);
+      const isSoftLockEnabled = await shouldEnableSoftLock(this.config!);
+      if (isSoftLockEnabled) {
+        E2EIHandler.instance!.emit('identityUpdate', true);
+      }
     }
   }
 
@@ -374,11 +362,6 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       return;
     }
 
-    const identity = await getActiveWireIdentity();
-    if (!identity?.certificate) {
-      return;
-    }
-
     // Remove the url parameters of the failed enrolment
     removeUrlParameters();
     // Clear the oidc service progress
@@ -386,10 +369,12 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     // Clear the e2e identity progress
     this.coreE2EIService.clearAllProgress();
 
+    const isSoftLockEnabled = await shouldEnableSoftLock(this.config!);
+
     const {modalOptions, modalType} = getModalOptions({
       type: ModalType.ERROR,
       hideClose: true,
-      hideSecondary: shouldHideSecondary(this.config!, identity),
+      hideSecondary: isSoftLockEnabled,
       primaryActionFn: () => {
         this.currentStep = E2EIHandlerStep.INITIALIZED;
         void this.enroll();
@@ -426,13 +411,13 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     }
   }
 
-  private showModal(modalType: ModalType = ModalType.ENROLL, hideSecondary = false): void {
+  private async showModal(modalType: ModalType = ModalType.ENROLL, hideSecondary = false): Promise<void> {
     // Check if config is defined and timer is available
-    const isSnoozeTimeAvailable = this.config?.timer.isSnoozeTimeAvailable() ?? false;
+    const isSoftLockEnabled = await shouldEnableSoftLock(this.config!);
 
     // Show the modal with the provided modal type
     const {modalOptions, modalType: determinedModalType} = getModalOptions({
-      hideSecondary: !isSnoozeTimeAvailable || hideSecondary || !!this.config?.isFreshMLSSelfClient,
+      hideSecondary: !isSoftLockEnabled || hideSecondary,
       primaryActionFn: () => {
         if (modalType === ModalType.SNOOZE_REMINDER) {
           return undefined;
@@ -454,7 +439,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   }
 
   private handleE2EIReminderSnooze(): void {
-    this.showModal(ModalType.SNOOZE_REMINDER, true);
+    void this.showModal(ModalType.SNOOZE_REMINDER, true);
   }
 
   public showE2EINotificationMessage(modalType: ModalType = ModalType.ENROLL): void {
@@ -474,7 +459,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
     // If the timer is not active, show the notification modal
     if (this.config && !this.config.timer.isDelayTimerActive()) {
-      this.showModal(modalType);
+      void this.showModal(modalType);
     }
   }
 }

@@ -23,19 +23,17 @@ import {CallingRepository} from '../calling/CallingRepository';
 import {E2EIHandler, isE2EIEnabled, isFreshMLSSelfClient} from '../E2EIdentity';
 import {NotificationRepository} from '../notification/NotificationRepository';
 
-export function useAppSoftLock(callingRepository: CallingRepository, notificationRepository: NotificationRepository) {
+export function useAppSoftLock(
+  callingRepository: CallingRepository,
+  notificationRepository: NotificationRepository,
+  softLockEnabled = false,
+) {
   const [freshMLSSelfClient, setFreshMLSSelfClient] = useState(false);
   const [softLockLoaded, setSoftLockLoaded] = useState(false);
 
   const e2eiEnabled = isE2EIEnabled();
 
   const setAppSoftLock = (isLocked: boolean) => {
-    setFreshMLSSelfClient(isLocked);
-    callingRepository.setSoftLock(isLocked);
-    notificationRepository.setSoftLock(isLocked);
-  };
-
-  const setAppSoftLockRefresh = (isLocked: boolean) => {
     setFreshMLSSelfClient(isLocked);
     callingRepository.setSoftLock(isLocked);
     notificationRepository.setSoftLock(isLocked);
@@ -50,34 +48,26 @@ export function useAppSoftLock(callingRepository: CallingRepository, notificatio
 
   useEffect(() => {
     if (e2eiEnabled) {
+      setAppSoftLock(softLockEnabled);
+      setSoftLockLoaded(softLockEnabled);
+    }
+  }, [e2eiEnabled, softLockEnabled]);
+
+  useEffect(() => {
+    if (e2eiEnabled && !softLockEnabled) {
       void checkIfIsFreshMLSSelfClient();
     }
-  }, [e2eiEnabled]);
+  }, [e2eiEnabled, softLockEnabled]);
 
   useEffect(() => {
     if (!freshMLSSelfClient) {
       return () => {};
     }
-
     E2EIHandler.getInstance().on('enrollmentSuccessful', checkIfIsFreshMLSSelfClient);
     return () => {
       E2EIHandler.getInstance().off('enrollmentSuccessful', checkIfIsFreshMLSSelfClient);
     };
   }, [freshMLSSelfClient]);
-
-  useEffect(() => {
-    if (!e2eiEnabled) {
-      return () => {};
-    }
-
-    E2EIHandler.getInstance().on('enableSoftLock', locked => {
-      setAppSoftLockRefresh(locked);
-    });
-
-    return () => {
-      E2EIHandler.getInstance().off('enableSoftLock', setAppSoftLockRefresh);
-    };
-  }, [e2eiEnabled]);
 
   return {isFreshMLSSelfClient: freshMLSSelfClient, softLockLoaded: e2eiEnabled ? softLockLoaded : true};
 }

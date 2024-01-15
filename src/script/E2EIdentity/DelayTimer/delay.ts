@@ -18,7 +18,7 @@
  */
 
 import {EnrollmentConfig} from '../E2EIdentityEnrollment';
-import {MLSStatuses, WireIdentity} from '../E2EIdentityVerification';
+import {MLSStatuses, getActiveWireIdentity} from '../E2EIdentityVerification';
 
 /* eslint-disable no-magic-numbers */
 
@@ -54,11 +54,22 @@ export function getDelayTime(gracePeriodInMs: number): number {
   return 0;
 }
 
-export function shouldHideSecondary(enrollmentConfig: EnrollmentConfig, identity: WireIdentity): boolean {
+export async function shouldEnableSoftLock(enrollmentConfig: EnrollmentConfig): Promise<boolean> {
+  const identity = await getActiveWireIdentity();
+  if (!identity?.certificate) {
+    return false;
+  }
   const isSnoozeTimeAvailable = !!enrollmentConfig?.timer.isSnoozeTimeAvailable();
   const isFreshMLSSelfClient = !!enrollmentConfig?.isFreshMLSSelfClient;
   const certificateExpired = identity.status === MLSStatuses.EXPIRED;
   const certificateRevoked = identity.status === MLSStatuses.REVOKED;
+  const certificateValidWithNoGracePeriod = identity.status === MLSStatuses.VALID && !isSnoozeTimeAvailable;
 
-  return isFreshMLSSelfClient || !isSnoozeTimeAvailable || certificateExpired || certificateRevoked;
+  return (
+    isFreshMLSSelfClient ||
+    !isSnoozeTimeAvailable ||
+    certificateValidWithNoGracePeriod ||
+    certificateExpired ||
+    certificateRevoked
+  );
 }
