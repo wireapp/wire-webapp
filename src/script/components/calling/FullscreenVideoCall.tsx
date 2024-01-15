@@ -206,6 +206,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     setSelectedAudioOptions([microphone, speaker]);
     switchMicrophoneInput(microphone.id);
     switchSpeakerOutput(speaker.id);
+    setAudioOptionsOpen(false);
   };
 
   const videoOptions = [
@@ -238,6 +239,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     const camera = videoOptions[0].options.find(item => item.value === selectedOption) ?? selectedVideoOptions[0];
     setSelectedVideoOptions([camera]);
     switchCameraInput(camera.id);
+    setVideoOptionsOpen(false);
   };
 
   const unreadMessagesCount = useAppState(state => state.unreadMessagesCount);
@@ -453,8 +455,11 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                   <button
                     className="device-toggle-button"
                     css={audioOptionsOpen ? videoControlActiveStyles : videoControlInActiveStyles}
-                    onClick={() => {
-                      setAudioOptionsOpen(prev => !prev);
+                    onClick={event => {
+                      const target = event.target as Element;
+                      if (!target.closest('#select-microphone')) {
+                        setAudioOptionsOpen(prev => !prev);
+                      }
                     }}
                     onBlur={event => {
                       if (!event.currentTarget.contains(event.relatedTarget)) {
@@ -467,7 +472,6 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                         <Select
                           // eslint-disable-next-line jsx-a11y/no-autofocus
                           autoFocus
-                          onBlur={() => setAudioOptionsOpen(false)}
                           value={selectedAudioOptions}
                           id="select-microphone"
                           dataUieName="select-microphone"
@@ -481,7 +485,6 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                               String(selectedOption?.value),
                               String(selectedOption?.value).includes('input'),
                             );
-                            setAudioOptionsOpen(false);
                           }}
                           menuPlacement="top"
                           menuIsOpen
@@ -525,8 +528,11 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                     <button
                       className="device-toggle-button"
                       css={videoOptionsOpen ? videoControlActiveStyles : videoControlInActiveStyles}
-                      onClick={() => {
-                        setVideoOptionsOpen(prev => !prev);
+                      onClick={event => {
+                        const target = event.target as Element;
+                        if (!target.closest('#select-camera')) {
+                          setVideoOptionsOpen(prev => !prev);
+                        }
                       }}
                       onBlur={event => {
                         if (!event.currentTarget.contains(event.relatedTarget)) {
@@ -539,11 +545,9 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                           <Select
                             // eslint-disable-next-line jsx-a11y/no-autofocus
                             autoFocus
-                            onBlur={() => setVideoOptionsOpen(false)}
                             value={selectedVideoOptions}
                             onChange={selectedOption => {
                               updateVideoOptions(String(selectedOption?.value));
-                              setVideoOptionsOpen(false);
                             }}
                             id="select-camera"
                             dataUieName="select-camera"
@@ -574,8 +578,8 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                     !canShareScreen
                       ? videoControlDisabledStyles
                       : selfSharesScreen
-                      ? videoControlActiveStyles
-                      : videoControlInActiveStyles
+                        ? videoControlActiveStyles
+                        : videoControlInActiveStyles
                   }
                   onClick={() => toggleScreenshare(call)}
                   type="button"
