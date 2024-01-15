@@ -64,7 +64,7 @@ interface E2EIHandlerParams {
   isFreshMLSSelfClient?: boolean;
 }
 
-type Events = {enrollmentSuccessful: void; identityUpdate: boolean};
+type Events = {enrollmentSuccessful: void; identityUpdate: {enrollmentConfig: EnrollmentConfig}};
 
 export type EnrollmentConfig = {
   timer: DelayTimerService;
@@ -171,10 +171,8 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     // Check if it's time to renew the certificate
     if (currentTime >= renewalPromptTime) {
       await this.renewCertificate();
-      const isSoftLockEnabled = await shouldEnableSoftLock(this.config!);
-      if (isSoftLockEnabled) {
-        E2EIHandler.instance!.emit('identityUpdate', true);
-      }
+
+      E2EIHandler.instance!.emit('identityUpdate', {enrollmentConfig: this.config!});
     }
   }
 

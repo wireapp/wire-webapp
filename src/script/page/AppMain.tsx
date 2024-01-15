@@ -47,7 +47,6 @@ import {useAppState, ContentState} from './useAppState';
 
 import {ConversationState} from '../conversation/ConversationState';
 import {User} from '../entity/User';
-import {useAppSoftLock} from '../hooks/useAppSoftLock';
 import {useInitializeRootFontSize} from '../hooks/useRootFontSize';
 import {App} from '../main/app';
 import {initialiseMLSMigrationFlow} from '../mls/MLSMigration';
@@ -70,7 +69,8 @@ interface AppMainProps {
   selfUser: User;
   mainView: MainViewModel;
   conversationState?: ConversationState;
-  softLockEnabled: boolean;
+  isFreshMLSSelfClient: boolean;
+  softLockLoaded: boolean;
 }
 
 export const AppMain: FC<AppMainProps> = ({
@@ -78,7 +78,8 @@ export const AppMain: FC<AppMainProps> = ({
   mainView,
   selfUser,
   conversationState = container.resolve(ConversationState),
-  softLockEnabled = false,
+  isFreshMLSSelfClient,
+  softLockLoaded = false,
 }) => {
   const apiContext = app.getAPIContext();
 
@@ -91,12 +92,6 @@ export const AppMain: FC<AppMainProps> = ({
   const contentState = useAppState(state => state.contentState);
 
   const {repository: repositories} = app;
-
-  const {isFreshMLSSelfClient, softLockLoaded = false} = useAppSoftLock(
-    repositories.calling,
-    repositories.notification,
-    softLockEnabled,
-  );
 
   const {availability: userAvailability, isActivatedAccount} = useKoSubscribableChildren(selfUser, [
     'availability',

@@ -20,14 +20,11 @@
 import {useEffect, useState} from 'react';
 
 import {CallingRepository} from '../calling/CallingRepository';
-import {E2EIHandler, isE2EIEnabled, isFreshMLSSelfClient} from '../E2EIdentity';
+import {E2EIHandler, EnrollmentConfig, isE2EIEnabled, isFreshMLSSelfClient} from '../E2EIdentity';
+import {shouldEnableSoftLock} from '../E2EIdentity/DelayTimer/delay';
 import {NotificationRepository} from '../notification/NotificationRepository';
 
-export function useAppSoftLock(
-  callingRepository: CallingRepository,
-  notificationRepository: NotificationRepository,
-  softLockEnabled = false,
-) {
+export function useAppSoftLock(callingRepository: CallingRepository, notificationRepository: NotificationRepository) {
   const [freshMLSSelfClient, setFreshMLSSelfClient] = useState(false);
   const [softLockLoaded, setSoftLockLoaded] = useState(false);
 
@@ -35,6 +32,7 @@ export function useAppSoftLock(
 
   const setAppSoftLock = (isLocked: boolean) => {
     setFreshMLSSelfClient(isLocked);
+    setSoftLockLoaded(true);
     callingRepository.setSoftLock(isLocked);
     notificationRepository.setSoftLock(isLocked);
   };
@@ -43,21 +41,29 @@ export function useAppSoftLock(
     const initializedIsFreshMLSSelfClient = await isFreshMLSSelfClient();
 
     setAppSoftLock(initializedIsFreshMLSSelfClient);
-    setSoftLockLoaded(true);
+  };
+
+  const handleSoftLockActivation = async ({enrollmentConfig}: {enrollmentConfig: EnrollmentConfig}) => {
+    const isSoftLockEnabled = await shouldEnableSoftLock(enrollmentConfig);
+    setAppSoftLock(isSoftLockEnabled);
   };
 
   useEffect(() => {
-    if (e2eiEnabled) {
-      setAppSoftLock(softLockEnabled);
-      setSoftLockLoaded(softLockEnabled);
+    if (!e2eiEnabled) {
+      return () => {};
     }
-  }, [e2eiEnabled, softLockEnabled]);
+
+    E2EIHandler.getInstance().on('identityUpdate', handleSoftLockActivation);
+    return () => {
+      E2EIHandler.getInstance().off('identityUpdate', handleSoftLockActivation);
+    };
+  }, [e2eiEnabled]);
 
   useEffect(() => {
-    if (e2eiEnabled && !softLockEnabled) {
+    if (e2eiEnabled) {
       void checkIfIsFreshMLSSelfClient();
     }
-  }, [e2eiEnabled, softLockEnabled]);
+  }, [e2eiEnabled]);
 
   useEffect(() => {
     if (!freshMLSSelfClient) {
