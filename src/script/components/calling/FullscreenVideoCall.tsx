@@ -546,9 +546,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                             // eslint-disable-next-line jsx-a11y/no-autofocus
                             autoFocus
                             value={selectedVideoOptions}
-                            onChange={selectedOption => {
-                              updateVideoOptions(String(selectedOption?.value));
-                            }}
+                            onChange={selectedOption => updateVideoOptions(String(selectedOption?.value))}
                             id="select-camera"
                             dataUieName="select-camera"
                             controlShouldRenderValue={false}
