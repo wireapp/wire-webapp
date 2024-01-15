@@ -1735,7 +1735,7 @@ export class ConversationRepository {
     const otherUserId = this.getUserIdOf1to1Conversation(conversation);
 
     if (!otherUserId) {
-      this.logger.error(`Could not find other user id in 1:1 conversation ${conversation.id}`);
+      this.logger.warn(`Could not find other user id in 1:1 conversation ${conversation.id}`);
       return conversation;
     }
 
