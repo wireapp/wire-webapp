@@ -24,7 +24,7 @@ import {Logger} from 'Util/Logger';
 
 import {hasE2EIVerificationExpiration, hasMLSDefaultProtocol} from '../../../../../guards/Protocol';
 
-export const handleE2EIdentityFeatureChange = async (logger: Logger, config: FeatureList) => {
+export const configureE2EI = async (logger: Logger, config: FeatureList): Promise<void | E2EIHandler> => {
   const e2eiConfig = config[FEATURE_KEY.MLSE2EID];
   const mlsConfig = config[FEATURE_KEY.MLS];
   // Check if MLS or MLS E2EIdentity feature is existent
@@ -48,7 +48,7 @@ export const handleE2EIdentityFeatureChange = async (logger: Logger, config: Fea
     const freshMLSSelfClient = await isFreshMLSSelfClient();
 
     // Either get the current E2EIdentity handler instance or create a new one
-    await E2EIHandler.getInstance().initialize({
+    return E2EIHandler.getInstance().initialize({
       discoveryUrl: e2eiConfig.config.acmeDiscoveryUrl!,
       gracePeriodInSeconds: e2eiConfig.config.verificationExpiration,
       isFreshMLSSelfClient: freshMLSSelfClient,

@@ -43,6 +43,7 @@ jest.mock('./OIDCService', () => {
         profile: 'sub',
       }),
       clearProgress: jest.fn(),
+      handleAuthentication: jest.fn().mockResolvedValue({}),
       // ... other methods of OIDCService
     })),
     getOIDCServiceInstance: jest.fn(), // if needed
@@ -77,6 +78,10 @@ jest.mock('Util/certificateDetails', () => ({
   }),
 }));
 
+function wait(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 describe('E2EIHandler', () => {
   const params = {discoveryUrl: 'http://example.com', gracePeriodInSeconds: 30};
   const user = {name: () => 'John Doe', username: () => 'johndoe'};
@@ -100,6 +105,7 @@ describe('E2EIHandler', () => {
       .spyOn(container.resolve(UserState), 'self')
       .mockReturnValue({name: () => 'John Doe', username: () => 'johndoe'});
     jest.spyOn(container.resolve(Core), 'enrollE2EI').mockResolvedValue(true);
+    container.resolve(Core).key = new Uint8Array();
   });
 
   it('should create instance with valid params', async () => {
@@ -116,6 +122,8 @@ describe('E2EIHandler', () => {
   it('should set currentStep to INITIALIZE after initialize is called', async () => {
     const instance = E2EIHandler.getInstance();
     await instance.initialize(params);
+    void instance.attemptEnrollment();
+    await wait(1);
     expect(instance['currentStep']).toBe(E2EIHandlerStep.INITIALIZED);
   });
 
@@ -143,7 +151,9 @@ describe('E2EIHandler', () => {
   });
 
   it('should display user info message when initialized', async () => {
-    await E2EIHandler.getInstance().initialize(params);
+    const instance = await E2EIHandler.getInstance().initialize(params);
+    void instance.attemptEnrollment();
+    await wait(1);
     expect(getModalOptions).toHaveBeenCalledWith(
       expect.objectContaining({
         type: ModalType.ENROLL,
@@ -206,6 +216,8 @@ describe('E2EIHandler', () => {
 
     // Initialize E2EI
     await handler.initialize(params);
+    void handler.attemptRenewal();
+    await wait(1);
 
     // Assert that renewCertificate was called
     expect(getCertificateDetails as jest.Mock).toHaveBeenCalled();
@@ -224,6 +236,8 @@ describe('E2EIHandler', () => {
 
     // Initialize E2EI
     await handler.initialize(params);
+    void handler.attemptRenewal();
+    await wait(1);
 
     // Assert that enroll was called to continue the current enrollment
     expect(enrollSpy).toHaveBeenCalled();
@@ -253,6 +267,8 @@ describe('E2EIHandler', () => {
 
     // Initialize E2EI
     await handler.initialize(params);
+    void handler.attemptRenewal();
+    await wait(1);
 
     expect(getCertificateDetails as jest.Mock).toHaveBeenCalled();
     expect(renewCertificateSpy).not.toHaveBeenCalled();
@@ -269,6 +285,8 @@ describe('E2EIHandler', () => {
 
     // Initialize E2EI
     await handler.initialize(params);
+    void handler.attemptEnrollment();
+    await wait(1);
 
     expect(renewCertificateSpy).not.toHaveBeenCalled();
     expect(showE2EINotificationMessageSpy).toHaveBeenCalled();
@@ -294,6 +312,8 @@ describe('E2EIHandler', () => {
 
     // Initialize E2EI
     await handler.initialize(params);
+    void handler.attemptRenewal();
+    await wait(1);
 
     expect(renewCertificateSpy).not.toHaveBeenCalled();
     expect(showE2EINotificationMessageSpy).not.toHaveBeenCalled();

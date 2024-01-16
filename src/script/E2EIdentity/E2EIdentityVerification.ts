@@ -92,11 +92,8 @@ const fetchSelfDeviceIdentity = async (): Promise<WireIdentity | undefined> => {
 };
 
 export async function hasActiveCertificate(): Promise<boolean> {
-  const identity = await getActiveWireIdentity();
-  if (!identity?.certificate) {
-    return false;
-  }
-  return typeof identity.certificate === 'string' && Boolean(identity.certificate.length);
+  // isE2EIEnabled() is the name of the CC method that tells us if a user has a valid certificate (and is enrolled to E2EI)
+  return getE2EIdentityService().isE2EIEnabled();
 }
 
 export async function getActiveWireIdentity(): Promise<WireIdentity | undefined> {

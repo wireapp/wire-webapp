@@ -38,10 +38,13 @@ declare global {
 
 @singleton()
 export class Core extends Account {
+  public key?: Uint8Array;
+
   constructor(apiClient = container.resolve(APIClient)) {
     const enableCoreCrypto = supportsMLS() || Config.getConfig().FEATURE.USE_CORE_CRYPTO;
     super(apiClient, {
       createStore: async (storeName, key) => {
+        this.key = key;
         return createStorageEngine(storeName, DatabaseTypes.PERMANENT, {
           key: Config.getConfig().FEATURE.ENABLE_ENCRYPTION_AT_REST ? key : undefined,
         });

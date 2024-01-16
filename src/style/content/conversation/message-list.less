@@ -569,6 +569,10 @@
     opacity: 1;
   }
 
+  &__one-on-one {
+    pointer-events: none;
+  }
+
   @media (max-width: @screen-md-min) {
     &__one-on-one {
       height: 24px;
@@ -866,7 +870,7 @@
   border-top: 1px solid var(--message-actions-border-hover);
 }
 
-.EmojiPickerReact .epr-search-container input.epr-search {
+.EmojiPickerReact .epr-search-container input {
   body.theme-dark & {
     border: 1px solid var(--gray-70);
     border-radius: 12px;

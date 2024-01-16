@@ -70,11 +70,11 @@ export const ReadReceiptStatus = ({
           )}
           data-uie-name="status-message-read-receipts"
           aria-label={t('accessibility.messageDetailsReadReceipts', readReceiptText)}
-          onClick={() => {
-            if (!is1to1Conversation) {
+          {...(!is1to1Conversation && {
+            onClick: () => {
               onClickDetails?.(message);
-            }
-          }}
+            },
+          })}
         >
           <Icon.Read />
           <span className="message-status-read__count" data-uie-name="status-message-read-receipt-count">

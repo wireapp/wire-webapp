@@ -22,13 +22,14 @@ import {UserManager, User, UserManagerSettings, WebStorageStateStore} from 'oidc
 import {clearKeysStartingWith} from 'Util/localStorage';
 import {Logger, getLogger} from 'Util/Logger';
 
+import {EncryptedStorage} from './OauthEncryptedStore';
 import {OIDCServiceStore} from './OIDCServiceStorage';
 
 export class OIDCService {
   private readonly userManager: UserManager;
   private readonly logger: Logger;
 
-  constructor() {
+  constructor(secretKey: Uint8Array) {
     // Get the targetURL from the OIDCServiceStore
     // It has been set by the E2EIdentityEnrollment
     const targetURL = OIDCServiceStore.get.targetURL();
@@ -66,8 +67,10 @@ export class OIDCService {
         access_type: 'offline',
         prompt: 'consent',
       },
-      stateStore: new WebStorageStateStore({store: window.localStorage}),
-      userStore: new WebStorageStateStore({store: window.localStorage}),
+      stateStore: new WebStorageStateStore({store: window.sessionStorage}),
+      userStore: new WebStorageStateStore({
+        store: new EncryptedStorage(secretKey),
+      }),
     };
 
     this.userManager = new UserManager(dexioConfig);
@@ -101,14 +104,12 @@ export class OIDCService {
     return this.userManager.clearStaleState();
   }
 
-  public handleSilentAuthentication(): Promise<User | null> {
+  public async handleSilentAuthentication(): Promise<User | null> {
     try {
-      return this.userManager.signinSilent().then(user => {
-        return user;
-      });
+      return this.userManager.signinSilent();
     } catch (error) {
       this.logger.log('Silent authentication with refresh token failed', error);
-      return Promise.resolve(null);
     }
+    return null;
   }
 }

@@ -57,7 +57,13 @@ const UserDetailsComponent: React.FC<UserDetailsProps> = ({
   classifiedDomains,
   teamState = container.resolve(TeamState),
 }) => {
-  const user = useKoSubscribableChildren(participant, ['isGuest', 'isTemporaryGuest', 'expirationText', 'isAvailable']);
+  const user = useKoSubscribableChildren(participant, [
+    'isGuest',
+    'isDirectGuest',
+    'isTemporaryGuest',
+    'expirationText',
+    'isAvailable',
+  ]);
 
   useEffect(() => {
     // This will trigger a user refresh
@@ -107,7 +113,7 @@ const UserDetailsComponent: React.FC<UserDetailsProps> = ({
         </div>
       )}
 
-      {user.isGuest && user.isAvailable && (
+      {user.isDirectGuest && user.isAvailable && (
         <div className="panel-participant__label" data-uie-name="status-guest">
           <Icon.Guest />
           <span>{t('conversationGuestIndicator')}</span>

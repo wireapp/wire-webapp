@@ -31,7 +31,6 @@ import {ErrorFallback} from 'Components/ErrorFallback';
 import {GroupCreationModal} from 'Components/Modals/GroupCreation/GroupCreationModal';
 import {LegalHoldModal} from 'Components/Modals/LegalHoldModal/LegalHoldModal';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {PrimaryModalComponent} from 'Components/Modals/PrimaryModal/PrimaryModal';
 import {showUserModal, UserModal} from 'Components/Modals/UserModal';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
@@ -73,7 +72,7 @@ interface AppMainProps {
   conversationState?: ConversationState;
 }
 
-const AppMain: FC<AppMainProps> = ({
+export const AppMain: FC<AppMainProps> = ({
   app,
   mainView,
   selfUser,
@@ -96,11 +95,10 @@ const AppMain: FC<AppMainProps> = ({
     repositories.notification,
   );
 
-  const {
-    accent_id,
-    availability: userAvailability,
-    isActivatedAccount,
-  } = useKoSubscribableChildren(selfUser, ['accent_id', 'availability', 'isActivatedAccount']);
+  const {availability: userAvailability, isActivatedAccount} = useKoSubscribableChildren(selfUser, [
+    'availability',
+    'isActivatedAccount',
+  ]);
 
   const teamState = container.resolve(TeamState);
   const userState = container.resolve(UserState);
@@ -225,7 +223,6 @@ const AppMain: FC<AppMainProps> = ({
     <StyledApp
       themeId={THEME_ID.DEFAULT}
       css={{backgroundColor: 'unset', height: '100%'}}
-      className={`main-accent-color-${accent_id} show`}
       id="wire-main"
       data-uie-name="status-webapp"
       data-uie-value="is-loaded"
@@ -271,11 +268,11 @@ const AppMain: FC<AppMainProps> = ({
 
               <AppLock clientRepository={repositories.client} />
               <WarningsContainer onRefresh={app.refresh} />
-              <FeatureConfigChangeNotifier selfUserId={selfUser.id} teamState={teamState} />
-              <FeatureConfigChangeHandler teamState={teamState} />
 
               {!isFreshMLSSelfClient && (
                 <>
+                  <FeatureConfigChangeNotifier selfUserId={selfUser.id} teamState={teamState} />
+                  <FeatureConfigChangeHandler teamState={teamState} />
                   <CallingContainer
                     multitasking={mainView.multitasking}
                     callingRepository={repositories.calling}
@@ -296,7 +293,6 @@ const AppMain: FC<AppMainProps> = ({
 
               {/*The order of these elements matter to show proper modals stack upon each other*/}
               <UserModal selfUser={selfUser} userRepository={repositories.user} />
-              <PrimaryModalComponent />
               <GroupCreationModal userState={userState} teamState={teamState} />
             </ErrorBoundary>
           </RootProvider>
@@ -305,5 +301,3 @@ const AppMain: FC<AppMainProps> = ({
     </StyledApp>
   );
 };
-
-export {AppMain};

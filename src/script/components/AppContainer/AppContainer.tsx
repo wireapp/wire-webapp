@@ -22,10 +22,14 @@ import {FC, useEffect} from 'react';
 import {ClientType} from '@wireapp/api-client/lib/client/';
 import {container} from 'tsyringe';
 
+import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
+
+import {PrimaryModalComponent} from 'Components/Modals/PrimaryModal/PrimaryModal';
 import {SIGN_OUT_REASON} from 'src/script/auth/SignOutReason';
 import {useSingleInstance} from 'src/script/hooks/useSingleInstance';
 import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
 
+import {useAccentColor} from './hooks/useAccentColor';
 import {useTheme} from './hooks/useTheme';
 
 import {Configuration} from '../../Config';
@@ -49,6 +53,7 @@ export const AppContainer: FC<AppProps> = ({config, clientType}) => {
   window.wire.app = app;
   const mainView = new MainViewModel(app.repository);
   useTheme(() => app.repository.properties.getPreference(PROPERTIES_TYPE.INTERFACE.THEME));
+  useAccentColor();
 
   const {hasOtherInstance, registerInstance} = useSingleInstance();
 
@@ -75,8 +80,13 @@ export const AppContainer: FC<AppProps> = ({config, clientType}) => {
   }
 
   return (
-    <AppLoader init={onProgress => app.initApp(clientType, onProgress)}>
-      {selfUser => <AppMain app={app} selfUser={selfUser} mainView={mainView} />}
-    </AppLoader>
+    <>
+      <AppLoader init={onProgress => app.initApp(clientType, onProgress)}>
+        {selfUser => <AppMain app={app} selfUser={selfUser} mainView={mainView} />}
+      </AppLoader>
+      <StyledApp themeId={THEME_ID.DEFAULT} css={{backgroundColor: 'unset', height: '100%'}}>
+        <PrimaryModalComponent />
+      </StyledApp>
+    </>
   );
 };
