@@ -309,8 +309,6 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       this.currentStep = E2EIHandlerStep.SUCCESS;
       this.showSuccessMessage(isCertificateRenewal);
 
-      this.emit('enrollmentSuccessful');
-
       // clear the oidc service progress/data and successful enrolment
       await this.cleanUp(false);
     } catch (error) {
@@ -348,6 +346,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       extraParams: {
         isRenewal: isCertificateRenewal,
       },
+      primaryActionFn: () => this.emit('enrollmentSuccessful'),
       secondaryActionFn: () => {
         amplify.publish(WebAppEvents.PREFERENCES.MANAGE_DEVICES);
       },
