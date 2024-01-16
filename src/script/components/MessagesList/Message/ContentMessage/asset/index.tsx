@@ -114,12 +114,14 @@ const ContentAsset = ({
       }
     case AssetType.IMAGE:
       return (
-        <ImageAsset
-          asset={asset as MediumImage}
-          message={message}
-          onClick={onClickImage}
-          isFocusable={isMessageFocused}
-        />
+        <div key={asset.id} className="message-asset">
+          <ImageAsset
+            asset={asset as MediumImage}
+            message={message}
+            onClick={onClickImage}
+            isFocusable={isMessageFocused}
+          />
+        </div>
       );
     case AssetType.LOCATION:
       return <LocationAsset asset={asset as Location} />;
