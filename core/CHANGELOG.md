@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [43.5.6](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@43.5.5...@wireapp/core@43.5.6) (2024-01-16)
+
+### Bug Fixes
+
+* Upgrade CoreCrypto to 1.0.0-rc.29 ([#5878](https://github.com/wireapp/wire-web-packages/issues/5878)) ([ed4c0d8](https://github.com/wireapp/wire-web-packages/commit/ed4c0d855e1d6e68da33223473350838da1aee81))
+
 ## [43.5.5](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@43.5.4...@wireapp/core@43.5.5) (2024-01-16)
 
 **Note:** Version bump only for package @wireapp/core
