@@ -457,6 +457,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                     css={audioOptionsOpen ? videoControlActiveStyles : videoControlInActiveStyles}
                     onClick={event => {
                       const target = event.target as Element;
+                      // We want to ensure to only toggling the menu open or closed when clicking the icon, not the select menu
                       if (!target.closest('#select-microphone')) {
                         setAudioOptionsOpen(prev => !prev);
                       }
@@ -530,6 +531,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                       css={videoOptionsOpen ? videoControlActiveStyles : videoControlInActiveStyles}
                       onClick={event => {
                         const target = event.target as Element;
+                        // We want to ensure to only toggling the menu open or closed when clicking the icon, not the select menu
                         if (!target.closest('#select-camera')) {
                           setVideoOptionsOpen(prev => !prev);
                         }
