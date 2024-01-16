@@ -206,6 +206,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     setSelectedAudioOptions([microphone, speaker]);
     switchMicrophoneInput(microphone.id);
     switchSpeakerOutput(speaker.id);
+    setAudioOptionsOpen(false);
   };
 
   const videoOptions = [
@@ -238,6 +239,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     const camera = videoOptions[0].options.find(item => item.value === selectedOption) ?? selectedVideoOptions[0];
     setSelectedVideoOptions([camera]);
     switchCameraInput(camera.id);
+    setVideoOptionsOpen(false);
   };
 
   const unreadMessagesCount = useAppState(state => state.unreadMessagesCount);
@@ -453,8 +455,12 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                   <button
                     className="device-toggle-button"
                     css={audioOptionsOpen ? videoControlActiveStyles : videoControlInActiveStyles}
-                    onClick={() => {
-                      setAudioOptionsOpen(prev => !prev);
+                    onClick={event => {
+                      const target = event.target as Element;
+                      // We want to ensure to only toggling the menu open or closed when clicking the icon, not the select menu
+                      if (!target.closest('#select-microphone')) {
+                        setAudioOptionsOpen(prev => !prev);
+                      }
                     }}
                     onBlur={event => {
                       if (!event.currentTarget.contains(event.relatedTarget)) {
@@ -465,6 +471,8 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                     {audioOptionsOpen ? (
                       <>
                         <Select
+                          // eslint-disable-next-line jsx-a11y/no-autofocus
+                          autoFocus
                           value={selectedAudioOptions}
                           id="select-microphone"
                           dataUieName="select-microphone"
@@ -521,8 +529,12 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                     <button
                       className="device-toggle-button"
                       css={videoOptionsOpen ? videoControlActiveStyles : videoControlInActiveStyles}
-                      onClick={() => {
-                        setVideoOptionsOpen(prev => !prev);
+                      onClick={event => {
+                        const target = event.target as Element;
+                        // We want to ensure to only toggling the menu open or closed when clicking the icon, not the select menu
+                        if (!target.closest('#select-camera')) {
+                          setVideoOptionsOpen(prev => !prev);
+                        }
                       }}
                       onBlur={event => {
                         if (!event.currentTarget.contains(event.relatedTarget)) {
@@ -533,6 +545,8 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                       {videoOptionsOpen ? (
                         <>
                           <Select
+                            // eslint-disable-next-line jsx-a11y/no-autofocus
+                            autoFocus
                             value={selectedVideoOptions}
                             onChange={selectedOption => updateVideoOptions(String(selectedOption?.value))}
                             id="select-camera"
