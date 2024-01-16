@@ -21,6 +21,7 @@ import {QualifiedId} from '../../user';
 
 export enum MemberLeaveReason {
   LEGAL_HOLD_POLICY_CONFLICT = 'legalhold-policy-conflict',
+  USER_DELETED = 'user-deleted',
 }
 
 /**
