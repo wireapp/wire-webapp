@@ -61,6 +61,7 @@
   "E2EI.deviceVerified": "Device verified (End-to-end identity)",
   "E2EI.downloadCertificate": "Download",
   "E2EI.expired": "Expired",
+  "E2EI.revoked": "Revoked",
   "E2EI.expires_soon": "Valid (expires soon)",
   "E2EI.getCertificate": "Get Certificate",
   "E2EI.notAvailable": "Not available",
