@@ -20,7 +20,8 @@
 import {useEffect, useState} from 'react';
 
 import {CallingRepository} from '../calling/CallingRepository';
-import {E2EIHandler, isE2EIEnabled, isFreshMLSSelfClient} from '../E2EIdentity';
+import {E2EIHandler, EnrollmentConfig, isE2EIEnabled, isFreshMLSSelfClient} from '../E2EIdentity';
+import {shouldEnableSoftLock} from '../E2EIdentity/DelayTimer/delay';
 import {NotificationRepository} from '../notification/NotificationRepository';
 
 export function useAppSoftLock(callingRepository: CallingRepository, notificationRepository: NotificationRepository) {
@@ -29,14 +30,34 @@ export function useAppSoftLock(callingRepository: CallingRepository, notificatio
 
   const e2eiEnabled = isE2EIEnabled();
 
+  const setAppSoftLock = (isLocked: boolean) => {
+    setFreshMLSSelfClient(isLocked);
+    setSoftLockLoaded(true);
+    callingRepository.setSoftLock(isLocked);
+    notificationRepository.setSoftLock(isLocked);
+  };
+
   const checkIfIsFreshMLSSelfClient = async () => {
     const initializedIsFreshMLSSelfClient = await isFreshMLSSelfClient();
 
-    setFreshMLSSelfClient(initializedIsFreshMLSSelfClient);
-    callingRepository.setSoftLock(initializedIsFreshMLSSelfClient);
-    notificationRepository.setSoftLock(initializedIsFreshMLSSelfClient);
-    setSoftLockLoaded(true);
+    setAppSoftLock(initializedIsFreshMLSSelfClient);
   };
+
+  const handleSoftLockActivation = async ({enrollmentConfig}: {enrollmentConfig: EnrollmentConfig}) => {
+    const isSoftLockEnabled = await shouldEnableSoftLock(enrollmentConfig);
+    setAppSoftLock(isSoftLockEnabled);
+  };
+
+  useEffect(() => {
+    if (!e2eiEnabled) {
+      return () => {};
+    }
+
+    E2EIHandler.getInstance().on('identityUpdate', handleSoftLockActivation);
+    return () => {
+      E2EIHandler.getInstance().off('identityUpdate', handleSoftLockActivation);
+    };
+  }, [e2eiEnabled]);
 
   useEffect(() => {
     if (e2eiEnabled) {
@@ -48,7 +69,6 @@ export function useAppSoftLock(callingRepository: CallingRepository, notificatio
     if (!freshMLSSelfClient) {
       return () => {};
     }
-
     E2EIHandler.getInstance().on('enrollmentSuccessful', checkIfIsFreshMLSSelfClient);
     return () => {
       E2EIHandler.getInstance().off('enrollmentSuccessful', checkIfIsFreshMLSSelfClient);

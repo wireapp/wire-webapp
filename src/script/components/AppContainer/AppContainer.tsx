@@ -26,6 +26,7 @@ import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
 import {PrimaryModalComponent} from 'Components/Modals/PrimaryModal/PrimaryModal';
 import {SIGN_OUT_REASON} from 'src/script/auth/SignOutReason';
+import {useAppSoftLock} from 'src/script/hooks/useAppSoftLock';
 import {useSingleInstance} from 'src/script/hooks/useSingleInstance';
 import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
 
@@ -74,6 +75,13 @@ export const AppContainer: FC<AppProps> = ({config, clientType}) => {
     return () => document.removeEventListener('scroll', resetWindowScroll);
   }, []);
 
+  const {repository: repositories} = app;
+
+  const {isFreshMLSSelfClient, softLockLoaded = false} = useAppSoftLock(
+    repositories.calling,
+    repositories.notification,
+  );
+
   if (hasOtherInstance) {
     app.redirectToLogin(SIGN_OUT_REASON.MULTIPLE_TABS);
     return null;
@@ -82,7 +90,15 @@ export const AppContainer: FC<AppProps> = ({config, clientType}) => {
   return (
     <>
       <AppLoader init={onProgress => app.initApp(clientType, onProgress)}>
-        {selfUser => <AppMain app={app} selfUser={selfUser} mainView={mainView} />}
+        {selfUser => (
+          <AppMain
+            app={app}
+            selfUser={selfUser}
+            mainView={mainView}
+            softLockLoaded={softLockLoaded}
+            isFreshMLSSelfClient={isFreshMLSSelfClient}
+          />
+        )}
       </AppLoader>
       <StyledApp themeId={THEME_ID.DEFAULT} css={{backgroundColor: 'unset', height: '100%'}}>
         <PrimaryModalComponent />
