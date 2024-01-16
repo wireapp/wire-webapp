@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [26.10.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@26.9.0...@wireapp/api-client@26.10.0) (2024-01-16)
+
+### Features
+
+* add new conversation member leave reason (WPB-4545) ([#5856](https://github.com/wireapp/wire-web-packages/issues/5856)) ([d9eb895](https://github.com/wireapp/wire-web-packages/commit/d9eb895427ad227869e3394868ee4a1fe9780c69))
+
 # [26.9.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@26.8.2...@wireapp/api-client@26.9.0) (2024-01-09)
 
 ### Features
