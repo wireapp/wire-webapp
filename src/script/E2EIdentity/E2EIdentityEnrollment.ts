@@ -42,7 +42,6 @@ import {
   getActiveWireIdentity,
   MLSStatuses,
   WireIdentity,
-  isFreshMLSSelfClient,
 } from './E2EIdentityVerification';
 import {getModalOptions, ModalType} from './Modals';
 import {OIDCService} from './OIDCService';
@@ -307,7 +306,8 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       // clear the oidc service progress/data and successful enrolment
       await this.cleanUp(false);
 
-      return this.showSuccessMessage(isCertificateRenewal);
+      await this.showSuccessMessage(isCertificateRenewal);
+      this.emit('identityUpdated', {enrollmentConfig: this.config!});
     } catch (error) {
       this.currentStep = E2EIHandlerStep.ERROR;
 
@@ -365,7 +365,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     // Clear the e2e identity progress
     this.coreE2EIService.clearAllProgress();
 
-    const isSoftLockEnabled = shouldEnableSoftLock(this.config!);
+    const isSoftLockEnabled = await shouldEnableSoftLock(this.config!);
 
     return new Promise<void>(resolve => {
       const {modalOptions, modalType} = getModalOptions({
@@ -411,11 +411,9 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     }
   }
 
-  private async showEnrollmentModal(
-    modalType: ModalType.ENROLL | ModalType.CERTIFICATE_RENEWAL,
-    disableSnooze: boolean,
-  ): Promise<void> {
+  private async showEnrollmentModal(modalType: ModalType.ENROLL | ModalType.CERTIFICATE_RENEWAL): Promise<void> {
     // Show the modal with the provided modal type
+    const disableSnooze = await shouldEnableSoftLock(this.config!);
     return new Promise<void>(resolve => {
       const {modalOptions, modalType: determinedModalType} = getModalOptions({
         hideSecondary: disableSnooze,
@@ -467,8 +465,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
     // If the timer is not active, show the notification modal
     if (this.config && !this.config.timer.isDelayTimerActive()) {
-      const isFreshDevice = await isFreshMLSSelfClient();
-      return this.showEnrollmentModal(modalType, isFreshDevice);
+      return this.showEnrollmentModal(modalType);
     }
   }
 }

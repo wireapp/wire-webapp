@@ -30,8 +30,8 @@ export function useAppSoftLock(callingRepository: CallingRepository, notificatio
   const [softLockEnabled, setSoftLockEnabled] = useState(false);
 
   const handleSoftLockActivation = useCallback(
-    ({enrollmentConfig, identity}: {enrollmentConfig: EnrollmentConfig; identity?: WireIdentity}) => {
-      const isSoftLockEnabled = shouldEnableSoftLock(enrollmentConfig, identity);
+    async ({enrollmentConfig, identity}: {enrollmentConfig: EnrollmentConfig; identity?: WireIdentity}) => {
+      const isSoftLockEnabled = await shouldEnableSoftLock(enrollmentConfig, identity);
 
       setSoftLockEnabled(isSoftLockEnabled);
       callingRepository.setSoftLock(isSoftLockEnabled);

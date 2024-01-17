@@ -18,7 +18,7 @@
  */
 
 import {EnrollmentConfig} from '../E2EIdentityEnrollment';
-import {MLSStatuses, WireIdentity} from '../E2EIdentityVerification';
+import {MLSStatuses, WireIdentity, isFreshMLSSelfClient} from '../E2EIdentityVerification';
 
 /* eslint-disable no-magic-numbers */
 
@@ -54,7 +54,13 @@ export function getDelayTime(gracePeriodInMs: number): number {
   return 0;
 }
 
-export function shouldEnableSoftLock(enrollmentConfig: EnrollmentConfig, identity?: WireIdentity): boolean {
+export async function shouldEnableSoftLock(
+  enrollmentConfig: EnrollmentConfig,
+  identity?: WireIdentity,
+): Promise<boolean> {
+  if (await isFreshMLSSelfClient()) {
+    return true;
+  }
   if (!enrollmentConfig.timer.isSnoozeTimeAvailable()) {
     // The user has used up the entire grace period or has a fresh new client, he now needs to enroll
     return true;
