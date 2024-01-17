@@ -55,7 +55,7 @@ export function getDelayTime(gracePeriodInMs: number): number {
 }
 
 export function shouldEnableSoftLock(enrollmentConfig: EnrollmentConfig, identity?: WireIdentity): boolean {
-  if (!enrollmentConfig.timer.isSnoozeTimeAvailable() || enrollmentConfig.isFreshMLSSelfClient) {
+  if (!enrollmentConfig.timer.isSnoozeTimeAvailable()) {
     // The user has used up the entire grace period or has a fresh new client, he now needs to enroll
     return true;
   }

@@ -47,6 +47,7 @@ import {useAppState, ContentState} from './useAppState';
 
 import {ConversationState} from '../conversation/ConversationState';
 import {User} from '../entity/User';
+import {useAppSoftLock} from '../hooks/useAppSoftLock';
 import {useInitializeRootFontSize} from '../hooks/useRootFontSize';
 import {App} from '../main/app';
 import {initialiseMLSMigrationFlow} from '../mls/MLSMigration';
@@ -69,8 +70,6 @@ interface AppMainProps {
   selfUser: User;
   mainView: MainViewModel;
   conversationState?: ConversationState;
-  /** will block the user from being able to interact with the application (no notifications and no messages will be shown) */
-  locked: boolean;
 }
 
 export const AppMain: FC<AppMainProps> = ({
@@ -78,7 +77,6 @@ export const AppMain: FC<AppMainProps> = ({
   mainView,
   selfUser,
   conversationState = container.resolve(ConversationState),
-  locked,
 }) => {
   const apiContext = app.getAPIContext();
 
@@ -91,6 +89,8 @@ export const AppMain: FC<AppMainProps> = ({
   const contentState = useAppState(state => state.contentState);
 
   const {repository: repositories} = app;
+
+  const {softLockEnabled: locked} = useAppSoftLock(repositories.calling, repositories.notification);
 
   const {availability: userAvailability, isActivatedAccount} = useKoSubscribableChildren(selfUser, [
     'availability',
