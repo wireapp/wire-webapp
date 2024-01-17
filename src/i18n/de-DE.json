@@ -1354,7 +1354,7 @@
   "searchTrySearchFederation": "Finden Sie Personen in Wire anhand ihrer Namen oder\n@Benutzernamen\n\nFinden Sie Personen einer anderen Domain\nmit @Benutzername@Domainname",
   "searchTrySearchLearnMore": "Mehr erfahren",
   "selfNotSupportMLSMsgPart1": "Sie können nicht mehr mit [bold]{{selfUserName}}[/bold] kommunizieren, da Ihr Gerät das entsprechende Protokoll nicht unterstützt.",
-  "selfNotSupportMLSMsgPart2": "to call, and send messages and files again.",
+  "selfNotSupportMLSMsgPart2": ", um wieder zu telefonieren und Nachrichten und Dateien zu senden.",
   "selfProfileImageAlt": "Ihr Profilbild",
   "servicesOptionsTitle": "Dienste",
   "servicesRoomToggleInfo": "Öffnen Sie diese Unterhaltung für Dienste.",
