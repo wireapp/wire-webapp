@@ -367,20 +367,24 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
     const isSoftLockEnabled = shouldEnableSoftLock(this.config!);
 
-    const {modalOptions, modalType} = getModalOptions({
-      type: ModalType.ERROR,
-      hideClose: true,
-      hideSecondary: isSoftLockEnabled,
-      primaryActionFn: () => {
-        this.currentStep = E2EIHandlerStep.INITIALIZED;
-        void this.enroll();
-      },
-      secondaryActionFn: () => {
-        this.showE2EINotificationMessage(ModalType.ENROLL);
-      },
-    });
+    return new Promise<void>(resolve => {
+      const {modalOptions, modalType} = getModalOptions({
+        type: ModalType.ERROR,
+        hideClose: true,
+        hideSecondary: isSoftLockEnabled,
+        primaryActionFn: async () => {
+          this.currentStep = E2EIHandlerStep.INITIALIZED;
+          await this.enroll();
+          resolve();
+        },
+        secondaryActionFn: async () => {
+          await this.showE2EINotificationMessage(ModalType.ENROLL);
+          resolve();
+        },
+      });
 
-    PrimaryModal.show(modalType, modalOptions);
+      PrimaryModal.show(modalType, modalOptions);
+    });
   }
 
   private shouldShowNotification(): boolean {
