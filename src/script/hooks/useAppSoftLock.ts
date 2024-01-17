@@ -30,8 +30,8 @@ export function useAppSoftLock(callingRepository: CallingRepository, notificatio
   const [softLockEnabled, setSoftLockEnabled] = useState(false);
 
   const handleSoftLockActivation = useCallback(
-    ({enrollmentConfig, identity}: {enrollmentConfig: EnrollmentConfig; identity?: WireIdentity}) => {
-      const isSoftLockEnabled = shouldEnableSoftLock(enrollmentConfig, identity);
+    async ({enrollmentConfig, identity}: {enrollmentConfig: EnrollmentConfig; identity?: WireIdentity}) => {
+      const isSoftLockEnabled = await shouldEnableSoftLock(enrollmentConfig, identity);
 
       setSoftLockEnabled(isSoftLockEnabled);
       callingRepository.setSoftLock(isSoftLockEnabled);
@@ -44,10 +44,11 @@ export function useAppSoftLock(callingRepository: CallingRepository, notificatio
     if (!e2eiEnabled) {
       return () => {};
     }
+    const e2eiHandler = E2EIHandler.getInstance();
 
-    E2EIHandler.getInstance().on('identityUpdated', handleSoftLockActivation);
+    e2eiHandler.on('identityUpdated', handleSoftLockActivation);
     return () => {
-      E2EIHandler.getInstance().off('identityUpdated', handleSoftLockActivation);
+      e2eiHandler.off('identityUpdated', handleSoftLockActivation);
     };
   }, [e2eiEnabled, handleSoftLockActivation]);
 
