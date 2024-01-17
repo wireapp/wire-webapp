@@ -31,7 +31,7 @@ import {ConversationClassifiedBar} from 'Components/input/ClassifiedBar';
 import {isMediaDevice} from 'src/script/guards/MediaDevice';
 import {MediaDeviceType} from 'src/script/media/MediaDeviceType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {isEnterKey, KEY} from 'Util/KeyboardUtil';
+import {handleKeyDown, isEscapeKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {preventFocusOutside} from 'Util/util';
 
@@ -206,7 +206,6 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     setSelectedAudioOptions([microphone, speaker]);
     switchMicrophoneInput(microphone.id);
     switchSpeakerOutput(speaker.id);
-    setAudioOptionsOpen(false);
   };
 
   const videoOptions = [
@@ -239,7 +238,6 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     const camera = videoOptions[0].options.find(item => item.value === selectedOption) ?? selectedVideoOptions[0];
     setSelectedVideoOptions([camera]);
     switchCameraInput(camera.id);
-    setVideoOptionsOpen(false);
   };
 
   const unreadMessagesCount = useAppState(state => state.unreadMessagesCount);
@@ -249,17 +247,6 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
 
   const totalPages = callPages.length;
 
-  const isSpaceOrEnterKey = (event: React.KeyboardEvent<HTMLButtonElement>) =>
-    [KEY.ENTER, KEY.SPACE].includes(event.key);
-
-  const handleToggleCameraKeydown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
-    if (isSpaceOrEnterKey(event)) {
-      toggleCamera(call);
-    }
-
-    return true;
-  };
-
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
   const horizontalSmBreakpoint = useMatchMedia('max-width: 680px');
   const horizontalXsBreakpoint = useMatchMedia('max-width: 500px');
@@ -267,9 +254,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent): void => {
-      if (!isEnterKey(event)) {
-        event.preventDefault();
-      }
+      event.preventDefault();
       preventFocusOutside(event, 'video-calling');
     };
     document.addEventListener('keydown', onKeyDown);
@@ -361,6 +346,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
               <button
                 data-uie-name="pagination-next"
                 onClick={() => changePage(currentPage + 1, call)}
+                onKeyDown={event => handleKeyDown(event, () => changePage(currentPage + 1, call))}
                 type="button"
                 className="button-reset-default"
                 css={{
@@ -378,6 +364,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                 data-uie-name="pagination-previous"
                 type="button"
                 onClick={() => changePage(currentPage - 1, call)}
+                onKeyDown={event => handleKeyDown(event, () => changePage(currentPage - 1, call))}
                 className="button-reset-default"
                 css={{
                   ...paginationButtonStyles,
@@ -411,6 +398,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                   className="video-controls__button"
                   css={videoControlInActiveStyles}
                   onClick={minimize}
+                  onKeyDown={event => handleKeyDown(event, () => minimize())}
                   type="button"
                   aria-labelledby="minimize-label"
                   data-uie-name="do-call-controls-video-minimize"
@@ -437,6 +425,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                   className="video-controls__button"
                   data-uie-value={!isMuted ? 'inactive' : 'active'}
                   onClick={() => toggleMute(call, !isMuted)}
+                  onKeyDown={event => handleKeyDown(event, () => toggleMute(call, !isMuted))}
                   css={!isMuted ? videoControlActiveStyles : videoControlInActiveStyles}
                   type="button"
                   aria-labelledby="mute-label"
@@ -455,13 +444,8 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                   <button
                     className="device-toggle-button"
                     css={audioOptionsOpen ? videoControlActiveStyles : videoControlInActiveStyles}
-                    onClick={event => {
-                      const target = event.target as Element;
-                      // We want to ensure to only toggling the menu open or closed when clicking the icon, not the select menu
-                      if (!target.closest('#select-microphone')) {
-                        setAudioOptionsOpen(prev => !prev);
-                      }
-                    }}
+                    onClick={() => setAudioOptionsOpen(prev => !prev)}
+                    onKeyDown={event => handleKeyDown(event, () => setAudioOptionsOpen(prev => !prev))}
                     onBlur={event => {
                       if (!event.currentTarget.contains(event.relatedTarget)) {
                         setAudioOptionsOpen(false);
@@ -487,6 +471,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                               String(selectedOption?.value).includes('input'),
                             );
                           }}
+                          onKeyDown={event => isEscapeKey(event) && setAudioOptionsOpen(false)}
                           menuPlacement="top"
                           menuIsOpen
                           wrapperCSS={{marginBottom: 0}}
@@ -506,7 +491,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                     className="video-controls__button"
                     data-uie-value={selfSharesCamera ? 'active' : 'inactive'}
                     onClick={() => toggleCamera(call)}
-                    onKeyDown={handleToggleCameraKeydown}
+                    onKeyDown={event => handleKeyDown(event, () => toggleCamera(call))}
                     role="switch"
                     aria-checked={selfSharesCamera}
                     tabIndex={TabIndex.FOCUSABLE}
@@ -529,13 +514,8 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                     <button
                       className="device-toggle-button"
                       css={videoOptionsOpen ? videoControlActiveStyles : videoControlInActiveStyles}
-                      onClick={event => {
-                        const target = event.target as Element;
-                        // We want to ensure to only toggling the menu open or closed when clicking the icon, not the select menu
-                        if (!target.closest('#select-camera')) {
-                          setVideoOptionsOpen(prev => !prev);
-                        }
-                      }}
+                      onClick={() => setVideoOptionsOpen(prev => !prev)}
+                      onKeyDown={event => handleKeyDown(event, () => setVideoOptionsOpen(prev => !prev))}
                       onBlur={event => {
                         if (!event.currentTarget.contains(event.relatedTarget)) {
                           setVideoOptionsOpen(false);
@@ -549,6 +529,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                             autoFocus
                             value={selectedVideoOptions}
                             onChange={selectedOption => updateVideoOptions(String(selectedOption?.value))}
+                            onKeyDown={event => isEscapeKey(event) && setVideoOptionsOpen(false)}
                             id="select-camera"
                             dataUieName="select-camera"
                             controlShouldRenderValue={false}
@@ -582,6 +563,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                         : videoControlInActiveStyles
                   }
                   onClick={() => toggleScreenshare(call)}
+                  onKeyDown={event => handleKeyDown(event, () => toggleScreenshare(call))}
                   type="button"
                   aria-labelledby="screen-share-label"
                   data-uie-value={selfSharesScreen ? 'active' : 'inactive'}
@@ -603,6 +585,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                 <button
                   className="video-controls__button video-controls__button--red"
                   onClick={() => leave(call)}
+                  onKeyDown={event => handleKeyDown(event, () => leave(call))}
                   type="button"
                   aria-labelledby="leave-label"
                   data-uie-name="do-call-controls-video-call-cancel"
