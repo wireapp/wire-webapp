@@ -18,7 +18,7 @@
  */
 
 import {EnrollmentConfig} from '../E2EIdentityEnrollment';
-import {MLSStatuses, getActiveWireIdentity} from '../E2EIdentityVerification';
+import {MLSStatuses, WireIdentity} from '../E2EIdentityVerification';
 
 /* eslint-disable no-magic-numbers */
 
@@ -54,22 +54,13 @@ export function getDelayTime(gracePeriodInMs: number): number {
   return 0;
 }
 
-export async function shouldEnableSoftLock(enrollmentConfig: EnrollmentConfig): Promise<boolean> {
-  const identity = await getActiveWireIdentity();
+export function shouldEnableSoftLock(enrollmentConfig: EnrollmentConfig, identity?: WireIdentity): boolean {
+  if (!enrollmentConfig.timer.isSnoozeTimeAvailable() || enrollmentConfig.isFreshMLSSelfClient) {
+    // The user has used up the entire grace period or has a fresh new client, he now needs to enroll
+    return true;
+  }
   if (!identity?.certificate) {
     return false;
   }
-  const isSnoozeTimeAvailable = !!enrollmentConfig?.timer.isSnoozeTimeAvailable();
-  const isFreshMLSSelfClient = !!enrollmentConfig?.isFreshMLSSelfClient;
-  const certificateExpired = identity.status === MLSStatuses.EXPIRED;
-  const certificateRevoked = identity.status === MLSStatuses.REVOKED;
-  const certificateValidWithNoGracePeriod = identity.status === MLSStatuses.VALID && !isSnoozeTimeAvailable;
-
-  return (
-    isFreshMLSSelfClient ||
-    !isSnoozeTimeAvailable ||
-    certificateValidWithNoGracePeriod ||
-    certificateExpired ||
-    certificateRevoked
-  );
+  return [MLSStatuses.EXPIRED, MLSStatuses.REVOKED].includes(identity.status);
 }
