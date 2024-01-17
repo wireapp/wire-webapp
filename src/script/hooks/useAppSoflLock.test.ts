@@ -45,7 +45,7 @@ describe('useAppSoftLock', () => {
 
   it('should not do anything if e2ei is not enabled', () => {
     const {result} = renderHook(() => useAppSoftLock(callingRepository, notificationRepository));
-    expect(result.current).toEqual({softLockEnabled: false, softLockLoaded: true});
+    expect(result.current).toEqual({softLockEnabled: false});
     expect(callingRepository.setSoftLock).not.toHaveBeenCalledWith(true);
     expect(notificationRepository.setSoftLock).not.toHaveBeenCalledWith(true);
   });
@@ -60,7 +60,6 @@ describe('useAppSoftLock', () => {
     const {result} = renderHook(() => useAppSoftLock(callingRepository, notificationRepository));
 
     expect(result.current.softLockEnabled).toBe(true);
-    expect(result.current.softLockLoaded).toBe(true);
     expect(callingRepository.setSoftLock).toHaveBeenCalledWith(true);
     expect(notificationRepository.setSoftLock).toHaveBeenCalledWith(true);
   });
@@ -77,7 +76,6 @@ describe('useAppSoftLock', () => {
     const {result} = renderHook(() => useAppSoftLock(callingRepository, notificationRepository));
 
     expect(result.current.softLockEnabled).toBe(true);
-    expect(result.current.softLockLoaded).toBe(true);
     expect(callingRepository.setSoftLock).toHaveBeenCalledWith(true);
     expect(notificationRepository.setSoftLock).toHaveBeenCalledWith(true);
   });
@@ -94,7 +92,6 @@ describe('useAppSoftLock', () => {
     const {result} = renderHook(() => useAppSoftLock(callingRepository, notificationRepository));
 
     expect(result.current.softLockEnabled).toBe(false);
-    expect(result.current.softLockLoaded).toBe(true);
     expect(callingRepository.setSoftLock).not.toHaveBeenCalledWith(true);
     expect(notificationRepository.setSoftLock).not.toHaveBeenCalledWith(true);
   });

@@ -28,14 +28,12 @@ export function useAppSoftLock(callingRepository: CallingRepository, notificatio
   const e2eiEnabled = isE2EIEnabled();
 
   const [softLockEnabled, setSoftLockEnabled] = useState(false);
-  const [softLockLoaded, setSoftLockLoaded] = useState(!e2eiEnabled);
 
   const handleSoftLockActivation = useCallback(
     ({enrollmentConfig, identity}: {enrollmentConfig: EnrollmentConfig; identity?: WireIdentity}) => {
       const isSoftLockEnabled = shouldEnableSoftLock(enrollmentConfig, identity);
 
       setSoftLockEnabled(isSoftLockEnabled);
-      setSoftLockLoaded(true);
       callingRepository.setSoftLock(isSoftLockEnabled);
       notificationRepository.setSoftLock(isSoftLockEnabled);
     },
@@ -53,5 +51,5 @@ export function useAppSoftLock(callingRepository: CallingRepository, notificatio
     };
   }, [e2eiEnabled, handleSoftLockActivation]);
 
-  return {softLockEnabled, softLockLoaded};
+  return {softLockEnabled};
 }
