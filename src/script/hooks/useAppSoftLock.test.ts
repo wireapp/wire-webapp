@@ -17,16 +17,22 @@
  *
  */
 
-import {renderHook} from '@testing-library/react';
+import {renderHook, waitFor} from '@testing-library/react';
 
 import {useAppSoftLock} from './useAppSoftLock';
 
 import {CallingRepository} from '../calling/CallingRepository';
-import {isE2EIEnabled, E2EIHandler} from '../E2EIdentity';
+import {E2EIHandler, isE2EIEnabled} from '../E2EIdentity';
+import {isFreshMLSSelfClient} from '../E2EIdentity/E2EIdentityVerification';
 import {NotificationRepository} from '../notification/NotificationRepository';
 
+const isFreshMLSSelfClientMock = isFreshMLSSelfClient as jest.MockedFn<typeof isFreshMLSSelfClient>;
 const isE2EIEnabledMock = isE2EIEnabled as jest.MockedFn<typeof isE2EIEnabled>;
 const E2EIHandlerMock = E2EIHandler as jest.Mocked<typeof E2EIHandler>;
+
+jest.mock('../E2EIdentity/E2EIdentityVerification', () => ({
+  isFreshMLSSelfClient: jest.fn(),
+}));
 
 jest.mock('../E2EIdentity', () => ({
   isE2EIEnabled: jest.fn(),
@@ -59,25 +65,28 @@ describe('useAppSoftLock', () => {
 
     const {result} = renderHook(() => useAppSoftLock(callingRepository, notificationRepository));
 
-    expect(result.current.softLockEnabled).toBe(true);
-    expect(callingRepository.setSoftLock).toHaveBeenCalledWith(true);
-    expect(notificationRepository.setSoftLock).toHaveBeenCalledWith(true);
+    await waitFor(() => {
+      expect(result.current.softLockEnabled).toBe(true);
+      expect(callingRepository.setSoftLock).toHaveBeenCalledWith(true);
+      expect(notificationRepository.setSoftLock).toHaveBeenCalledWith(true);
+    });
   });
 
   it('should set softLock if the device is a fresh new device', async () => {
     isE2EIEnabledMock.mockReturnValue(true);
+    isFreshMLSSelfClientMock.mockResolvedValue(true);
     E2EIHandlerMock.getInstance.mockReturnValue({
-      on: jest.fn((eventName, callback) =>
-        callback({enrollmentConfig: {timer: {isSnoozeTimeAvailable: () => true}, isFreshMLSSelfClient: true}}),
-      ),
+      on: jest.fn((eventName, callback) => callback({enrollmentConfig: {timer: {isSnoozeTimeAvailable: () => true}}})),
       off: jest.fn(),
     } as any);
 
     const {result} = renderHook(() => useAppSoftLock(callingRepository, notificationRepository));
 
-    expect(result.current.softLockEnabled).toBe(true);
-    expect(callingRepository.setSoftLock).toHaveBeenCalledWith(true);
-    expect(notificationRepository.setSoftLock).toHaveBeenCalledWith(true);
+    await waitFor(() => {
+      expect(result.current.softLockEnabled).toBe(true);
+      expect(callingRepository.setSoftLock).toHaveBeenCalledWith(true);
+      expect(notificationRepository.setSoftLock).toHaveBeenCalledWith(true);
+    });
   });
 
   it('should not set softLock if the device is an old device and the grace period is not expireds', async () => {
