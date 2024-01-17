@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 
 import {CallingRepository} from '../calling/CallingRepository';
 import {E2EIHandler, EnrollmentConfig, isE2EIEnabled, WireIdentity} from '../E2EIdentity';
@@ -25,28 +25,22 @@ import {shouldEnableSoftLock} from '../E2EIdentity/DelayTimer/delay';
 import {NotificationRepository} from '../notification/NotificationRepository';
 
 export function useAppSoftLock(callingRepository: CallingRepository, notificationRepository: NotificationRepository) {
-  const [freshMLSSelfClient, setFreshMLSSelfClient] = useState(false);
-  const [softLockLoaded, setSoftLockLoaded] = useState(false);
-
   const e2eiEnabled = isE2EIEnabled();
 
-  const setAppSoftLock = (isLocked: boolean) => {
-    setFreshMLSSelfClient(isLocked);
-    setSoftLockLoaded(true);
-    callingRepository.setSoftLock(isLocked);
-    notificationRepository.setSoftLock(isLocked);
-  };
+  const [softLockEnabled, setSoftLockEnabled] = useState(false);
+  const [softLockLoaded, setSoftLockLoaded] = useState(!e2eiEnabled);
 
-  const handleSoftLockActivation = ({
-    enrollmentConfig,
-    identity,
-  }: {
-    enrollmentConfig: EnrollmentConfig;
-    identity: WireIdentity;
-  }) => {
-    const isSoftLockEnabled = shouldEnableSoftLock(enrollmentConfig, identity);
-    setAppSoftLock(isSoftLockEnabled);
-  };
+  const handleSoftLockActivation = useCallback(
+    ({enrollmentConfig, identity}: {enrollmentConfig: EnrollmentConfig; identity?: WireIdentity}) => {
+      const isSoftLockEnabled = shouldEnableSoftLock(enrollmentConfig, identity);
+
+      setSoftLockEnabled(isSoftLockEnabled);
+      setSoftLockLoaded(true);
+      callingRepository.setSoftLock(isSoftLockEnabled);
+      notificationRepository.setSoftLock(isSoftLockEnabled);
+    },
+    [callingRepository, notificationRepository],
+  );
 
   useEffect(() => {
     if (!e2eiEnabled) {
@@ -57,7 +51,7 @@ export function useAppSoftLock(callingRepository: CallingRepository, notificatio
     return () => {
       E2EIHandler.getInstance().off('identityUpdated', handleSoftLockActivation);
     };
-  }, [e2eiEnabled]);
+  }, [e2eiEnabled, handleSoftLockActivation]);
 
-  return {isFreshMLSSelfClient: freshMLSSelfClient, softLockLoaded: e2eiEnabled ? softLockLoaded : true};
+  return {softLockEnabled, softLockLoaded};
 }

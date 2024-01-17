@@ -69,8 +69,8 @@ interface AppMainProps {
   selfUser: User;
   mainView: MainViewModel;
   conversationState?: ConversationState;
-  isFreshMLSSelfClient: boolean;
-  softLockLoaded: boolean;
+  /** will block the user from being able to interact with the application (no notifications and no messages will be shown) */
+  locked: boolean;
 }
 
 export const AppMain: FC<AppMainProps> = ({
@@ -78,8 +78,7 @@ export const AppMain: FC<AppMainProps> = ({
   mainView,
   selfUser,
   conversationState = container.resolve(ConversationState),
-  isFreshMLSSelfClient,
-  softLockLoaded = false,
+  locked,
 }) => {
   const apiContext = app.getAPIContext();
 
@@ -212,10 +211,10 @@ export const AppMain: FC<AppMainProps> = ({
   }, []);
 
   useLayoutEffect(() => {
-    if (!isFreshMLSSelfClient) {
+    if (!locked) {
       initializeApp();
     }
-  }, [isFreshMLSSelfClient]);
+  }, [locked]);
 
   return (
     <StyledApp
@@ -225,77 +224,73 @@ export const AppMain: FC<AppMainProps> = ({
       data-uie-name="status-webapp"
       data-uie-value="is-loaded"
     >
-      {softLockLoaded && (
-        <>
-          {!isFreshMLSSelfClient && <WindowTitleUpdater />}
-          <RootProvider value={mainView}>
-            <ErrorBoundary FallbackComponent={ErrorFallback}>
-              {!isFreshMLSSelfClient && (
-                <div id="app" className="app">
-                  {(!smBreakpoint || isLeftSidebarVisible) && (
-                    <LeftSidebar
-                      listViewModel={mainView.list}
-                      selfUser={selfUser}
-                      isActivatedAccount={isActivatedAccount}
-                    />
-                  )}
-
-                  {(!smBreakpoint || !isLeftSidebarVisible) && (
-                    <MainContent
-                      selfUser={selfUser}
-                      isRightSidebarOpen={!!currentState}
-                      openRightSidebar={toggleRightSidebar}
-                      reloadApp={app.refresh}
-                    />
-                  )}
-
-                  {currentState && (
-                    <RightSidebar
-                      lastViewedMessageDetailsEntity={lastViewedMessageDetailsEntity}
-                      currentEntity={currentEntity}
-                      repositories={repositories}
-                      actionsViewModel={mainView.actions}
-                      isFederated={mainView.isFederated}
-                      teamState={teamState}
-                      selfUser={selfUser}
-                      userState={userState}
-                    />
-                  )}
-                </div>
+      {!locked && <WindowTitleUpdater />}
+      <RootProvider value={mainView}>
+        <ErrorBoundary FallbackComponent={ErrorFallback}>
+          {!locked && (
+            <div id="app" className="app">
+              {(!smBreakpoint || isLeftSidebarVisible) && (
+                <LeftSidebar
+                  listViewModel={mainView.list}
+                  selfUser={selfUser}
+                  isActivatedAccount={isActivatedAccount}
+                />
               )}
 
-              <AppLock clientRepository={repositories.client} />
-              <WarningsContainer onRefresh={app.refresh} />
-
-              {!isFreshMLSSelfClient && (
-                <>
-                  <FeatureConfigChangeNotifier selfUserId={selfUser.id} teamState={teamState} />
-                  <FeatureConfigChangeHandler teamState={teamState} />
-                  <CallingContainer
-                    multitasking={mainView.multitasking}
-                    callingRepository={repositories.calling}
-                    mediaRepository={repositories.media}
-                  />
-
-                  <LegalHoldModal
-                    selfUser={selfUser}
-                    conversationRepository={repositories.conversation}
-                    searchRepository={repositories.search}
-                    teamRepository={repositories.team}
-                    clientRepository={repositories.client}
-                    messageRepository={repositories.message}
-                    cryptographyRepository={repositories.cryptography}
-                  />
-                </>
+              {(!smBreakpoint || !isLeftSidebarVisible) && (
+                <MainContent
+                  selfUser={selfUser}
+                  isRightSidebarOpen={!!currentState}
+                  openRightSidebar={toggleRightSidebar}
+                  reloadApp={app.refresh}
+                />
               )}
 
-              {/*The order of these elements matter to show proper modals stack upon each other*/}
-              <UserModal selfUser={selfUser} userRepository={repositories.user} />
-              <GroupCreationModal userState={userState} teamState={teamState} />
-            </ErrorBoundary>
-          </RootProvider>
-        </>
-      )}
+              {currentState && (
+                <RightSidebar
+                  lastViewedMessageDetailsEntity={lastViewedMessageDetailsEntity}
+                  currentEntity={currentEntity}
+                  repositories={repositories}
+                  actionsViewModel={mainView.actions}
+                  isFederated={mainView.isFederated}
+                  teamState={teamState}
+                  selfUser={selfUser}
+                  userState={userState}
+                />
+              )}
+            </div>
+          )}
+
+          <AppLock clientRepository={repositories.client} />
+          <WarningsContainer onRefresh={app.refresh} />
+
+          {!locked && (
+            <>
+              <FeatureConfigChangeNotifier selfUserId={selfUser.id} teamState={teamState} />
+              <FeatureConfigChangeHandler teamState={teamState} />
+              <CallingContainer
+                multitasking={mainView.multitasking}
+                callingRepository={repositories.calling}
+                mediaRepository={repositories.media}
+              />
+
+              <LegalHoldModal
+                selfUser={selfUser}
+                conversationRepository={repositories.conversation}
+                searchRepository={repositories.search}
+                teamRepository={repositories.team}
+                clientRepository={repositories.client}
+                messageRepository={repositories.message}
+                cryptographyRepository={repositories.cryptography}
+              />
+            </>
+          )}
+
+          {/*The order of these elements matter to show proper modals stack upon each other*/}
+          <UserModal selfUser={selfUser} userRepository={repositories.user} />
+          <GroupCreationModal userState={userState} teamState={teamState} />
+        </ErrorBoundary>
+      </RootProvider>
     </StyledApp>
   );
 };

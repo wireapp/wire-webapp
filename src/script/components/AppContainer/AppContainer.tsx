@@ -77,10 +77,7 @@ export const AppContainer: FC<AppProps> = ({config, clientType}) => {
 
   const {repository: repositories} = app;
 
-  const {isFreshMLSSelfClient, softLockLoaded = false} = useAppSoftLock(
-    repositories.calling,
-    repositories.notification,
-  );
+  const {softLockEnabled, softLockLoaded} = useAppSoftLock(repositories.calling, repositories.notification);
 
   if (hasOtherInstance) {
     app.redirectToLogin(SIGN_OUT_REASON.MULTIPLE_TABS);
@@ -90,15 +87,11 @@ export const AppContainer: FC<AppProps> = ({config, clientType}) => {
   return (
     <>
       <AppLoader init={onProgress => app.initApp(clientType, onProgress)}>
-        {selfUser => (
-          <AppMain
-            app={app}
-            selfUser={selfUser}
-            mainView={mainView}
-            softLockLoaded={softLockLoaded}
-            isFreshMLSSelfClient={isFreshMLSSelfClient}
-          />
-        )}
+        {selfUser => {
+          return softLockLoaded ? (
+            <AppMain app={app} selfUser={selfUser} mainView={mainView} locked={softLockEnabled} />
+          ) : null;
+        }}
       </AppLoader>
       <StyledApp themeId={THEME_ID.DEFAULT} css={{backgroundColor: 'unset', height: '100%'}}>
         <PrimaryModalComponent />
