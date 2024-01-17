@@ -20,7 +20,7 @@
 import {useEffect, useState} from 'react';
 
 import {CallingRepository} from '../calling/CallingRepository';
-import {E2EIHandler, EnrollmentConfig, isE2EIEnabled, isFreshMLSSelfClient} from '../E2EIdentity';
+import {E2EIHandler, EnrollmentConfig, isE2EIEnabled, WireIdentity} from '../E2EIdentity';
 import {shouldEnableSoftLock} from '../E2EIdentity/DelayTimer/delay';
 import {NotificationRepository} from '../notification/NotificationRepository';
 
@@ -37,14 +37,14 @@ export function useAppSoftLock(callingRepository: CallingRepository, notificatio
     notificationRepository.setSoftLock(isLocked);
   };
 
-  const checkIfIsFreshMLSSelfClient = async () => {
-    const initializedIsFreshMLSSelfClient = await isFreshMLSSelfClient();
-
-    setAppSoftLock(initializedIsFreshMLSSelfClient);
-  };
-
-  const handleSoftLockActivation = async ({enrollmentConfig}: {enrollmentConfig: EnrollmentConfig}) => {
-    const isSoftLockEnabled = await shouldEnableSoftLock(enrollmentConfig);
+  const handleSoftLockActivation = ({
+    enrollmentConfig,
+    identity,
+  }: {
+    enrollmentConfig: EnrollmentConfig;
+    identity: WireIdentity;
+  }) => {
+    const isSoftLockEnabled = shouldEnableSoftLock(enrollmentConfig, identity);
     setAppSoftLock(isSoftLockEnabled);
   };
 
@@ -58,22 +58,6 @@ export function useAppSoftLock(callingRepository: CallingRepository, notificatio
       E2EIHandler.getInstance().off('identityUpdate', handleSoftLockActivation);
     };
   }, [e2eiEnabled]);
-
-  useEffect(() => {
-    if (e2eiEnabled) {
-      void checkIfIsFreshMLSSelfClient();
-    }
-  }, [e2eiEnabled]);
-
-  useEffect(() => {
-    if (!freshMLSSelfClient) {
-      return () => {};
-    }
-    E2EIHandler.getInstance().on('enrollmentSuccessful', checkIfIsFreshMLSSelfClient);
-    return () => {
-      E2EIHandler.getInstance().off('enrollmentSuccessful', checkIfIsFreshMLSSelfClient);
-    };
-  }, [freshMLSSelfClient]);
 
   return {isFreshMLSSelfClient: freshMLSSelfClient, softLockLoaded: e2eiEnabled ? softLockLoaded : true};
 }

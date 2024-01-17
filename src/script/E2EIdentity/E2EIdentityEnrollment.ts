@@ -64,7 +64,9 @@ interface E2EIHandlerParams {
   isFreshMLSSelfClient?: boolean;
 }
 
-type Events = {enrollmentSuccessful: void; identityUpdate: {enrollmentConfig: EnrollmentConfig}};
+type Events = {
+  identityUpdate: {enrollmentConfig: EnrollmentConfig; identity: WireIdentity};
+};
 
 export type EnrollmentConfig = {
   timer: DelayTimerService;
@@ -146,10 +148,10 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     this.showE2EINotificationMessage();
     return new Promise<void>(resolve => {
       const handleSuccess = () => {
-        this.off('enrollmentSuccessful', handleSuccess);
+        this.off('identityUpdate', handleSuccess);
         resolve();
       };
-      this.on('enrollmentSuccessful', handleSuccess);
+      this.on('identityUpdate', handleSuccess);
     });
   }
 
@@ -168,8 +170,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
     // Check if an enrollment is already in progress
     if (this.coreE2EIService.isEnrollmentInProgress()) {
-      await this.enroll();
-      return;
+      return this.enroll();
     }
 
     const renewalTimeMS = this.calculateRenewalTime(timeRemainingMS, historyTimeMS, this.config!.gracePeriodInMs);
@@ -179,8 +180,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     // Check if it's time to renew the certificate
     if (currentTime >= renewalPromptTime) {
       await this.renewCertificate();
-
-      E2EIHandler.instance!.emit('identityUpdate', {enrollmentConfig: this.config!});
+      this.emit('identityUpdate', {enrollmentConfig: this.config!, identity});
     }
   }
 
@@ -339,8 +339,12 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     PrimaryModal.show(modalType, modalOptions);
   }
 
-  private showSuccessMessage(isCertificateRenewal = false): void {
+  private async showSuccessMessage(isCertificateRenewal = false) {
     if (this.currentStep !== E2EIHandlerStep.SUCCESS) {
+      return;
+    }
+    const identity = await getActiveWireIdentity();
+    if (!identity) {
       return;
     }
 
@@ -351,7 +355,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       extraParams: {
         isRenewal: isCertificateRenewal,
       },
-      primaryActionFn: () => this.emit('enrollmentSuccessful'),
+      primaryActionFn: () => this.emit('identityUpdate', {enrollmentConfig: this.config!, identity}),
       secondaryActionFn: () => {
         amplify.publish(WebAppEvents.PREFERENCES.MANAGE_DEVICES);
       },
@@ -371,7 +375,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     // Clear the e2e identity progress
     this.coreE2EIService.clearAllProgress();
 
-    const isSoftLockEnabled = await shouldEnableSoftLock(this.config!);
+    const isSoftLockEnabled = shouldEnableSoftLock(this.config!);
 
     const {modalOptions, modalType} = getModalOptions({
       type: ModalType.ERROR,
@@ -415,11 +419,11 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
   private async showModal(modalType: ModalType = ModalType.ENROLL, hideSecondary = false): Promise<void> {
     // Check if config is defined and timer is available
-    const isSoftLockEnabled = await shouldEnableSoftLock(this.config!);
+    const isSoftLockEnabled = shouldEnableSoftLock(this.config!);
 
     // Show the modal with the provided modal type
     const {modalOptions, modalType: determinedModalType} = getModalOptions({
-      hideSecondary: !isSoftLockEnabled || hideSecondary,
+      hideSecondary: isSoftLockEnabled || hideSecondary,
       primaryActionFn: () => {
         if (modalType === ModalType.SNOOZE_REMINDER) {
           return undefined;
