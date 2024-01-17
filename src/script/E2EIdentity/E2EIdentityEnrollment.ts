@@ -126,7 +126,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       this.config = {
         discoveryUrl,
         gracePeriodInMs,
-        timer: DelayTimerService.getInstance({
+        timer: new DelayTimerService({
           gracePeriodInMS: gracePeriodInMs,
           gracePeriodExpiredCallback: () => null,
           delayPeriodExpiredCallback: () => null,
