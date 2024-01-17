@@ -51,4 +51,5 @@ export const configureE2EI = (logger: Logger, config: FeatureList): undefined | 
       gracePeriodInSeconds: e2eiConfig.config.verificationExpiration,
     });
   }
+  return undefined;
 };
