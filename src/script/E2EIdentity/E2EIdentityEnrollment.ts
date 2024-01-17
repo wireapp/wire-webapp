@@ -144,8 +144,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       // If the client already has a certificate, we don't need to start the enrollment
       return;
     }
-    const isFreshDevice = await isFreshMLSSelfClient();
-    return this.showE2EINotificationMessage(ModalType.ENROLL, isFreshDevice);
+    return this.showE2EINotificationMessage(ModalType.ENROLL);
   }
 
   public async attemptRenewal(): Promise<void> {
@@ -340,7 +339,6 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     return new Promise<void>(resolve => {
       const {modalOptions, modalType} = getModalOptions({
         type: ModalType.SUCCESS,
-        hideSecondary: false,
         hideClose: false,
         extraParams: {
           isRenewal: isCertificateRenewal,
@@ -465,7 +463,8 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
     // If the timer is not active, show the notification modal
     if (this.config && !this.config.timer.isDelayTimerActive()) {
-      return this.showEnrollmentModal(modalType, disableSnooze);
+      const isFreshDevice = await isFreshMLSSelfClient();
+      return this.showEnrollmentModal(modalType, isFreshDevice);
     }
   }
 }
