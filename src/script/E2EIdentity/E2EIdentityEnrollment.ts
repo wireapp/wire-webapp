@@ -65,7 +65,7 @@ interface E2EIHandlerParams {
 }
 
 type Events = {
-  identityUpdate: {enrollmentConfig: EnrollmentConfig; identity: WireIdentity};
+  identityUpdated: {enrollmentConfig: EnrollmentConfig; identity: WireIdentity};
 };
 
 export type EnrollmentConfig = {
@@ -148,10 +148,10 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     this.showE2EINotificationMessage();
     return new Promise<void>(resolve => {
       const handleSuccess = () => {
-        this.off('identityUpdate', handleSuccess);
+        this.off('identityUpdated', handleSuccess);
         resolve();
       };
-      this.on('identityUpdate', handleSuccess);
+      this.on('identityUpdated', handleSuccess);
     });
   }
 
@@ -180,7 +180,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     // Check if it's time to renew the certificate
     if (currentTime >= renewalPromptTime) {
       await this.renewCertificate();
-      this.emit('identityUpdate', {enrollmentConfig: this.config!, identity});
+      this.emit('identityUpdated', {enrollmentConfig: this.config!, identity});
     }
   }
 
@@ -355,7 +355,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       extraParams: {
         isRenewal: isCertificateRenewal,
       },
-      primaryActionFn: () => this.emit('identityUpdate', {enrollmentConfig: this.config!, identity}),
+      primaryActionFn: () => this.emit('identityUpdated', {enrollmentConfig: this.config!, identity}),
       secondaryActionFn: () => {
         amplify.publish(WebAppEvents.PREFERENCES.MANAGE_DEVICES);
       },

@@ -53,9 +53,9 @@ export function useAppSoftLock(callingRepository: CallingRepository, notificatio
       return () => {};
     }
 
-    E2EIHandler.getInstance().on('identityUpdate', handleSoftLockActivation);
+    E2EIHandler.getInstance().on('identityUpdated', handleSoftLockActivation);
     return () => {
-      E2EIHandler.getInstance().off('identityUpdate', handleSoftLockActivation);
+      E2EIHandler.getInstance().off('identityUpdated', handleSoftLockActivation);
     };
   }, [e2eiEnabled]);
 
