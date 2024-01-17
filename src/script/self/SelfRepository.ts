@@ -72,8 +72,7 @@ export class SelfRepository extends TypedEventEmitter<Events> {
       }
 
       if (event.name === FEATURE_KEY.ENFORCE_DOWNLOAD_PATH) {
-        amplify.publish(
-          WebAppEvents.TEAM.DOWNLOAD_PATH_UPDATE,
+        this.handleDownloadPathUpdate(
           event.data.status === FeatureStatus.ENABLED ? event.data.config.enforcedDownloadLocation : undefined,
         );
       }
@@ -102,6 +101,10 @@ export class SelfRepository extends TypedEventEmitter<Events> {
     if (hasFeatureStatusChanged || hasTeamSupportedProtocolsChanged) {
       await this.refreshSelfSupportedProtocols();
     }
+  };
+
+  public handleDownloadPathUpdate = (dlPath?: string) => {
+    amplify.publish(WebAppEvents.TEAM.DOWNLOAD_PATH_UPDATE, dlPath);
   };
 
   /**
