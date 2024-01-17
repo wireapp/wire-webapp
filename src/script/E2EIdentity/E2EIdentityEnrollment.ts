@@ -137,7 +137,6 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
         isFreshMLSSelfClient,
       };
     }
-    await this.refreshRevocationList();
     return this;
   }
 
@@ -147,11 +146,11 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   public async refreshRevocationList(): Promise<void> {
     const baseDomain = new URL(this.config?.discoveryUrl ?? '').hostname;
     // TODO change this to http (instead of https) when backend has the http endpoint
-    const crlUrl = getProxiedUrl(`https://${baseDomain}/crl`);
+    const url = `https://${baseDomain}/crl`;
+    const crlUrl = getProxiedUrl(url);
     const response = await fetch(crlUrl);
     const revocationList = await response.arrayBuffer();
-    // TODO pass the revocation list to CoreCrypto when it has the method implemented
-    this.logger.log(revocationList);
+    await this.coreE2EIService.setClientRevocationList(url, new Uint8Array(revocationList));
 
     // we refresh the revocation list every 24h
     setTimeout(() => this.refreshRevocationList(), TimeInMillis.DAY);
@@ -159,8 +158,11 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
   public async attemptEnrollment(): Promise<void> {
     const hasCertificate = await hasActiveCertificate();
+    // We refresh the client revocation list
     if (hasCertificate) {
       // If the client already has a certificate, we don't need to start the enrollment
+      // we just trigger the refresh of the revocation list
+      await this.refreshRevocationList();
       return;
     }
     this.showE2EINotificationMessage();
