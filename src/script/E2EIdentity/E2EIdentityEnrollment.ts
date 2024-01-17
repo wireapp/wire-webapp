@@ -65,7 +65,7 @@ interface E2EIHandlerParams {
 }
 
 type Events = {
-  identityUpdated: {enrollmentConfig: EnrollmentConfig; identity: WireIdentity};
+  identityUpdated: {enrollmentConfig: EnrollmentConfig; identity?: WireIdentity};
 };
 
 export type EnrollmentConfig = {
@@ -343,10 +343,6 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     if (this.currentStep !== E2EIHandlerStep.SUCCESS) {
       return;
     }
-    const identity = await getActiveWireIdentity();
-    if (!identity) {
-      return;
-    }
 
     const {modalOptions, modalType} = getModalOptions({
       type: ModalType.SUCCESS,
@@ -355,7 +351,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       extraParams: {
         isRenewal: isCertificateRenewal,
       },
-      primaryActionFn: () => this.emit('identityUpdated', {enrollmentConfig: this.config!, identity}),
+      primaryActionFn: () => this.emit('identityUpdated', {enrollmentConfig: this.config!}),
       secondaryActionFn: () => {
         amplify.publish(WebAppEvents.PREFERENCES.MANAGE_DEVICES);
       },
