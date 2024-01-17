@@ -319,6 +319,6 @@ export const formatDelayTime = (delayTimeInMS: number): string => {
     const hours = Math.floor(delayTimeInMS / TIME_IN_MILLIS.HOUR);
     return `${hours} hour${hours > 1 ? 's' : ''}`;
   }
-  const minutes = Math.floor(delayTimeInMS / (TIME_IN_MILLIS.SECOND * TIME_IN_MILLIS.MINUTE));
+  const minutes = Math.floor(delayTimeInMS / TIME_IN_MILLIS.MINUTE);
   return `${minutes} minute${minutes > 1 ? 's' : ''}`;
 };

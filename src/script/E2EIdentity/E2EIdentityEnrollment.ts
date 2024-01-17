@@ -61,7 +61,6 @@ export enum E2EIHandlerStep {
 interface E2EIHandlerParams {
   discoveryUrl: string;
   gracePeriodInSeconds: number;
-  isFreshMLSSelfClient?: boolean;
 }
 
 type Events = {
@@ -121,7 +120,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     E2EIHandler.instance = null;
   }
 
-  public async initialize({discoveryUrl, gracePeriodInSeconds}: E2EIHandlerParams) {
+  public initialize({discoveryUrl, gracePeriodInSeconds}: E2EIHandlerParams) {
     if (isE2EIEnabled()) {
       const gracePeriodInMs = gracePeriodInSeconds * TIME_IN_MILLIS.SECOND;
       this.config = {
