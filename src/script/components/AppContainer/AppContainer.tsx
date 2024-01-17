@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, useEffect} from 'react';
+import {FC, useEffect, useMemo} from 'react';
 
 import {ClientType} from '@wireapp/api-client/lib/client/';
 import {container} from 'tsyringe';
@@ -49,7 +49,8 @@ interface AppProps {
 
 export const AppContainer: FC<AppProps> = ({config, clientType}) => {
   setAppLocale();
-  const app = new App(container.resolve(Core), container.resolve(APIClient), config);
+  const app = useMemo(() => new App(container.resolve(Core), container.resolve(APIClient), config), []);
+
   // Publishing application on the global scope for debug and testing purposes.
   window.wire.app = app;
   const mainView = new MainViewModel(app.repository);
