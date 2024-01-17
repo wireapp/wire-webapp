@@ -64,6 +64,7 @@ jest.mock('./Modals', () => ({
 }));
 
 jest.mock('./E2EIdentityVerification', () => ({
+  ...jest.requireActual('./E2EIdentityVerification'),
   hasActiveCertificate: jest.fn().mockResolvedValue(false),
   getActiveWireIdentity: jest.fn().mockResolvedValue({certificate: 'certificate data'}),
   isE2EIEnabled: jest.fn().mockReturnValue(true),
@@ -72,7 +73,6 @@ jest.mock('./E2EIdentityVerification', () => ({
 // These values should lead to renewalPromptTime being less than the mocked current time
 jest.mock('Util/certificateDetails', () => ({
   getCertificateDetails: jest.fn().mockReturnValue({
-    isValid: true,
     timeRemainingMS: 5 * 24 * 60 * 60 * 1000,
     certificateCreationTime: new Date().getTime() - 10 * 24 * 60 * 60 * 1000,
   }),
@@ -258,10 +258,11 @@ describe('E2EIHandler', () => {
 
     // Mock getCertificateDetails to return a certificate with enough time remaining
     (getCertificateDetails as jest.Mock).mockReturnValue({
-      isValid: true,
       timeRemainingMS,
       certificateCreationTime: new Date().getTime() - 10 * TimeInMillis.DAY,
     });
+
+    jest.spyOn(handler as any, 'shouldRefresh').mockReturnValue(true);
 
     const renewCertificateSpy = jest.spyOn(handler as any, 'renewCertificate');
 
@@ -305,10 +306,11 @@ describe('E2EIHandler', () => {
 
     // Mock getCertificateDetails to return a certificate with enough time remaining
     (getCertificateDetails as jest.Mock).mockReturnValue({
-      isValid: false,
       timeRemainingMS,
       certificateCreationTime: new Date().getTime() - 10 * TimeInMillis.DAY,
     });
+
+    jest.spyOn(handler as any, 'shouldRefresh').mockReturnValue(false);
 
     // Initialize E2EI
     await handler.initialize(params);

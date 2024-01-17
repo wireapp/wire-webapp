@@ -22,13 +22,10 @@ import * as x509 from '@peculiar/x509';
 export const getCertificateDetails = (certificate: string) => {
   const currentDate = new Date();
   const parsedCertificate = new x509.X509Certificate(certificate);
-  const isValid = currentDate > parsedCertificate.notBefore && currentDate < parsedCertificate.notAfter;
-
   const timeRemainingMS = new Date(parsedCertificate.notAfter).getTime() - currentDate.getTime();
   const certificateCreationTime = parsedCertificate?.notBefore.getTime();
 
   return {
-    isValid,
     timeRemainingMS,
     certificateCreationTime,
   };

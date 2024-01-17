@@ -18,22 +18,31 @@
  */
 
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
+import {amplify} from 'amplify';
 import {User} from 'oidc-client-ts';
 import {container} from 'tsyringe';
 
 import {TypedEventEmitter} from '@wireapp/commons';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal, removeCurrentModal} from 'Components/Modals/PrimaryModal';
 import {Core} from 'src/script/service/CoreSingleton';
 import {UserState} from 'src/script/user/UserState';
 import {getCertificateDetails} from 'Util/certificateDetails';
 import {getLogger} from 'Util/Logger';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {formatDelayTime, TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {removeUrlParameters} from 'Util/UrlUtil';
 import {supportsMLS} from 'Util/util';
 
+import {getDelayTime, shouldEnableSoftLock} from './DelayTimer/delay';
 import {DelayTimerService} from './DelayTimer/DelayTimer';
-import {hasActiveCertificate, isE2EIEnabled, getActiveWireIdentity} from './E2EIdentityVerification';
+import {
+  hasActiveCertificate,
+  isE2EIEnabled,
+  getActiveWireIdentity,
+  MLSStatuses,
+  WireIdentity,
+} from './E2EIdentityVerification';
 import {getModalOptions, ModalType} from './Modals';
 import {OIDCService} from './OIDCService';
 import {OIDCServiceStore} from './OIDCService/OIDCServiceStorage';
@@ -55,9 +64,11 @@ interface E2EIHandlerParams {
   isFreshMLSSelfClient?: boolean;
 }
 
-type Events = {enrollmentSuccessful: void};
+type Events = {
+  identityUpdated: {enrollmentConfig: EnrollmentConfig; identity: WireIdentity};
+};
 
-type EnrollmentConfig = {
+export type EnrollmentConfig = {
   timer: DelayTimerService;
   discoveryUrl: string;
   gracePeriodInMs: number;
@@ -137,10 +148,10 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     this.showE2EINotificationMessage();
     return new Promise<void>(resolve => {
       const handleSuccess = () => {
-        this.off('enrollmentSuccessful', handleSuccess);
+        this.off('identityUpdated', handleSuccess);
         resolve();
       };
-      this.on('enrollmentSuccessful', handleSuccess);
+      this.on('identityUpdated', handleSuccess);
     });
   }
 
@@ -151,17 +162,15 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       return;
     }
 
-    const {isValid, timeRemainingMS, certificateCreationTime} = getCertificateDetails(identity.certificate);
+    const {timeRemainingMS, certificateCreationTime} = getCertificateDetails(identity.certificate);
 
-    // Check if the certificate is still valid
-    if (!isValid) {
+    if (!this.shouldRefresh(identity)) {
       return;
     }
 
     // Check if an enrollment is already in progress
     if (this.coreE2EIService.isEnrollmentInProgress()) {
-      await this.enroll();
-      return;
+      return this.enroll();
     }
 
     const renewalTimeMS = this.calculateRenewalTime(timeRemainingMS, historyTimeMS, this.config!.gracePeriodInMs);
@@ -171,6 +180,17 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     // Check if it's time to renew the certificate
     if (currentTime >= renewalPromptTime) {
       await this.renewCertificate();
+      this.emit('identityUpdated', {enrollmentConfig: this.config!, identity});
+    }
+  }
+
+  private shouldRefresh(identity: WireIdentity) {
+    const deviceIdentityStatus = identity.status;
+    switch (deviceIdentityStatus) {
+      case MLSStatuses.REVOKED:
+        return false;
+      default:
+        return true;
     }
   }
 
@@ -187,7 +207,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
         throw new Error('Received no user data from OIDC service');
       }
       // renew without user action
-      await this.enroll(true, userData);
+      await this.enroll(userData);
     } catch (error) {
       this.logger.error('Silent authentication with refresh token failed', error);
 
@@ -242,13 +262,14 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     this.coreE2EIService.clearAllProgress();
   }
 
-  public async enroll(refreshActiveCertificate = false, userData?: User) {
+  public async enroll(userData?: User) {
     if (!this.config) {
       throw new Error('Trying to enroll for E2EI without initializing the E2EIHandler');
     }
     try {
       // Notify user about E2EI enrolment in progress
       this.currentStep = E2EIHandlerStep.ENROLL;
+      const isCertificateRenewal = await hasActiveCertificate();
       this.showLoadingMessage();
 
       if (!userData) {
@@ -291,7 +312,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       setTimeout(removeCurrentModal, 0);
 
       this.currentStep = E2EIHandlerStep.SUCCESS;
-      this.showSuccessMessage();
+      this.showSuccessMessage(isCertificateRenewal);
 
       // clear the oidc service progress/data and successful enrolment
       await this.cleanUp(false);
@@ -303,7 +324,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     }
   }
 
-  private showLoadingMessage(): void {
+  private showLoadingMessage(isCertificateRenewal = false): void {
     if (this.currentStep !== E2EIHandlerStep.ENROLL) {
       return;
     }
@@ -311,19 +332,33 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     const {modalOptions, modalType} = getModalOptions({
       type: ModalType.LOADING,
       hideClose: true,
+      extraParams: {
+        isRenewal: isCertificateRenewal,
+      },
     });
     PrimaryModal.show(modalType, modalOptions);
   }
 
-  private showSuccessMessage(): void {
+  private async showSuccessMessage(isCertificateRenewal = false) {
     if (this.currentStep !== E2EIHandlerStep.SUCCESS) {
       return;
     }
+    const identity = await getActiveWireIdentity();
+    if (!identity) {
+      return;
+    }
+
     const {modalOptions, modalType} = getModalOptions({
       type: ModalType.SUCCESS,
-      primaryActionFn: () => this.emit('enrollmentSuccessful'),
-      hideSecondary: true,
+      hideSecondary: false,
       hideClose: false,
+      extraParams: {
+        isRenewal: isCertificateRenewal,
+      },
+      primaryActionFn: () => this.emit('identityUpdated', {enrollmentConfig: this.config!, identity}),
+      secondaryActionFn: () => {
+        amplify.publish(WebAppEvents.PREFERENCES.MANAGE_DEVICES);
+      },
     });
     PrimaryModal.show(modalType, modalOptions);
   }
@@ -340,9 +375,12 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     // Clear the e2e identity progress
     this.coreE2EIService.clearAllProgress();
 
+    const isSoftLockEnabled = shouldEnableSoftLock(this.config!);
+
     const {modalOptions, modalType} = getModalOptions({
       type: ModalType.ERROR,
       hideClose: true,
+      hideSecondary: isSoftLockEnabled,
       primaryActionFn: () => {
         this.currentStep = E2EIHandlerStep.INITIALIZED;
         void this.enroll();
@@ -379,22 +417,35 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     }
   }
 
-  private showModal(modalType: ModalType = ModalType.ENROLL) {
+  private async showModal(modalType: ModalType = ModalType.ENROLL, hideSecondary = false): Promise<void> {
     // Check if config is defined and timer is available
-    const isSnoozeTimeAvailable = this.config?.timer.isSnoozeTimeAvailable() ?? false;
+    const isSoftLockEnabled = shouldEnableSoftLock(this.config!);
 
     // Show the modal with the provided modal type
     const {modalOptions, modalType: determinedModalType} = getModalOptions({
-      hideSecondary: !isSnoozeTimeAvailable || !!this.config?.isFreshMLSSelfClient,
-      primaryActionFn: () => this.enroll(),
+      hideSecondary: isSoftLockEnabled || hideSecondary,
+      primaryActionFn: () => {
+        if (modalType === ModalType.SNOOZE_REMINDER) {
+          return undefined;
+        }
+        return this.enroll();
+      },
       secondaryActionFn: () => {
         this.currentStep = E2EIHandlerStep.SNOOZE;
         this.config?.timer.delayPrompt();
+        this.handleE2EIReminderSnooze();
       },
       type: modalType,
       hideClose: true,
+      extraParams: {
+        delayTime: formatDelayTime(getDelayTime(this.config!.gracePeriodInMs)),
+      },
     });
     PrimaryModal.show(determinedModalType, modalOptions);
+  }
+
+  private handleE2EIReminderSnooze(): void {
+    void this.showModal(ModalType.SNOOZE_REMINDER, true);
   }
 
   public showE2EINotificationMessage(modalType: ModalType = ModalType.ENROLL): void {
@@ -414,7 +465,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
     // If the timer is not active, show the notification modal
     if (this.config && !this.config.timer.isDelayTimerActive()) {
-      this.showModal(modalType);
+      void this.showModal(modalType);
     }
   }
 }

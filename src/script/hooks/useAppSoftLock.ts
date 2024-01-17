@@ -20,7 +20,8 @@
 import {useEffect, useState} from 'react';
 
 import {CallingRepository} from '../calling/CallingRepository';
-import {E2EIHandler, isE2EIEnabled, isFreshMLSSelfClient} from '../E2EIdentity';
+import {E2EIHandler, EnrollmentConfig, isE2EIEnabled, WireIdentity} from '../E2EIdentity';
+import {shouldEnableSoftLock} from '../E2EIdentity/DelayTimer/delay';
 import {NotificationRepository} from '../notification/NotificationRepository';
 
 export function useAppSoftLock(callingRepository: CallingRepository, notificationRepository: NotificationRepository) {
@@ -29,31 +30,34 @@ export function useAppSoftLock(callingRepository: CallingRepository, notificatio
 
   const e2eiEnabled = isE2EIEnabled();
 
-  const checkIfIsFreshMLSSelfClient = async () => {
-    const initializedIsFreshMLSSelfClient = await isFreshMLSSelfClient();
-
-    setFreshMLSSelfClient(initializedIsFreshMLSSelfClient);
-    callingRepository.setSoftLock(initializedIsFreshMLSSelfClient);
-    notificationRepository.setSoftLock(initializedIsFreshMLSSelfClient);
+  const setAppSoftLock = (isLocked: boolean) => {
+    setFreshMLSSelfClient(isLocked);
     setSoftLockLoaded(true);
+    callingRepository.setSoftLock(isLocked);
+    notificationRepository.setSoftLock(isLocked);
+  };
+
+  const handleSoftLockActivation = ({
+    enrollmentConfig,
+    identity,
+  }: {
+    enrollmentConfig: EnrollmentConfig;
+    identity: WireIdentity;
+  }) => {
+    const isSoftLockEnabled = shouldEnableSoftLock(enrollmentConfig, identity);
+    setAppSoftLock(isSoftLockEnabled);
   };
 
   useEffect(() => {
-    if (e2eiEnabled) {
-      void checkIfIsFreshMLSSelfClient();
-    }
-  }, [e2eiEnabled]);
-
-  useEffect(() => {
-    if (!freshMLSSelfClient) {
+    if (!e2eiEnabled) {
       return () => {};
     }
 
-    E2EIHandler.getInstance().on('enrollmentSuccessful', checkIfIsFreshMLSSelfClient);
+    E2EIHandler.getInstance().on('identityUpdated', handleSoftLockActivation);
     return () => {
-      E2EIHandler.getInstance().off('enrollmentSuccessful', checkIfIsFreshMLSSelfClient);
+      E2EIHandler.getInstance().off('identityUpdated', handleSoftLockActivation);
     };
-  }, [freshMLSSelfClient]);
+  }, [e2eiEnabled]);
 
   return {isFreshMLSSelfClient: freshMLSSelfClient, softLockLoaded: e2eiEnabled ? softLockLoaded : true};
 }

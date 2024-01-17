@@ -17,6 +17,9 @@
  *
  */
 
+import {EnrollmentConfig} from '../E2EIdentityEnrollment';
+import {MLSStatuses, WireIdentity} from '../E2EIdentityVerification';
+
 /* eslint-disable no-magic-numbers */
 
 enum TIME_IN_MILLIS {
@@ -49,4 +52,15 @@ export function getDelayTime(gracePeriodInMs: number): number {
     return Math.min(ONE_DAY, gracePeriodInMs);
   }
   return 0;
+}
+
+export function shouldEnableSoftLock(enrollmentConfig: EnrollmentConfig, identity?: WireIdentity): boolean {
+  if (!enrollmentConfig.timer.isSnoozeTimeAvailable() || enrollmentConfig.isFreshMLSSelfClient) {
+    // The user has used up the entire grace period or has a fresh new client, he now needs to enroll
+    return true;
+  }
+  if (!identity?.certificate) {
+    return false;
+  }
+  return [MLSStatuses.EXPIRED, MLSStatuses.REVOKED].includes(identity.status);
 }
