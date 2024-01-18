@@ -2,7 +2,7 @@ name: Cherry pick to dev
 on:
   push:
     branches:
-      - xp/*
+      - release/*
 jobs:
   cherry_pick:
     runs-on: ubuntu-latest
