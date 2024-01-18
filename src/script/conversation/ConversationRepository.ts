@@ -26,7 +26,7 @@ import {
   MessageSendingStatus,
   RemoteConversations,
 } from '@wireapp/api-client/lib/conversation';
-import {ConversationReceiptModeUpdateData} from '@wireapp/api-client/lib/conversation/data/';
+import {MemberLeaveReason, ConversationReceiptModeUpdateData} from '@wireapp/api-client/lib/conversation/data';
 import {CONVERSATION_TYPING} from '@wireapp/api-client/lib/conversation/data/ConversationTypingData';
 import {
   ConversationCreateEvent,
@@ -3020,6 +3020,19 @@ export class ConversationRepository {
         return this.onMemberJoin(conversationEntity, eventJson);
 
       case CONVERSATION_EVENT.MEMBER_LEAVE:
+        if (eventJson.data.reason === MemberLeaveReason.USER_DELETED) {
+          eventJson.data.qualified_user_ids?.forEach(qualifiedUserId => {
+            const user = this.userState.users().find(user => matchQualifiedIds(user.qualifiedId, qualifiedUserId));
+            if (!user?.teamId) {
+              return;
+            }
+
+            void this.teamMemberLeave(user?.teamId, user?.qualifiedId, new Date(eventJson.time).getTime());
+          });
+          return;
+        }
+        return this.onMemberLeave(conversationEntity, eventJson);
+
       case ClientEvent.CONVERSATION.TEAM_MEMBER_LEAVE:
         return this.onMemberLeave(conversationEntity, eventJson);
 
