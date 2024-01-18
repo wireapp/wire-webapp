@@ -17,6 +17,7 @@
  *
  */
 
+import {KeyAuth} from '@wireapp/core/lib/messagingProtocols/mls';
 import {UserManager, User, UserManagerSettings, WebStorageStateStore} from 'oidc-client-ts';
 
 import {clearKeysStartingWith} from 'Util/localStorage';
@@ -77,8 +78,18 @@ export class OIDCService {
     this.logger = getLogger('OIDC Service');
   }
 
-  public async authenticate(): Promise<void> {
-    await this.userManager.signinRedirect({extraQueryParams: {shouldBeRedirectedByProxy: true}});
+  public async authenticate(keyAuth: KeyAuth, challengeUrl: string): Promise<void> {
+    // New claims value for keycloak
+    const claims = {
+      id_token: {
+        keyauth: {essential: true, value: keyAuth},
+        acme_aud: {essential: true, value: challengeUrl},
+      },
+    };
+
+    await this.userManager.signinRedirect({
+      extraQueryParams: {shouldBeRedirectedByProxy: true, claims: JSON.stringify(claims)},
+    });
   }
 
   public async handleAuthentication(): Promise<User | undefined> {
