@@ -33,6 +33,20 @@ export enum ModalType {
   SNOOZE_REMINDER = 'snooze_reminder',
 }
 
+/**
+ * Options for configuring a modal.
+ * @typedef {Object} GetModalOptions
+ * @property {ModalType} type - The type of modal to display.
+ * @property {Function} [primaryActionFn] - Function to execute for the primary action.
+ * @property {Function} [secondaryActionFn] - Function to execute for the secondary action.
+ * @property {boolean} [hideSecondary=false] - Flag to hide the secondary action button.
+ * @property {boolean} [hidePrimary=false] - Flag to hide the primary action button.
+ * @property {boolean} [hideClose=false] - Flag to hide the close button.
+ * @property {Object} [extraParams] - Additional parameters for the modal.
+ * @property {string} [extraParams.delayTime] - time left to remind the user again for enroll/renewal.
+ * @property {boolean} [extraParams.isRenewal] - Flag indicating if this is a renewal action.
+ * @property {boolean} [extraParams.isGracePeriodOver] - Flag indicating if the grace period is over.
+ */
 interface GetModalOptions {
   type: ModalType;
   primaryActionFn?: () => void;
