@@ -389,7 +389,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
   private shouldShowNotification(): boolean {
     // If the user has already snoozed the notification, don't show it again until the snooze period has expired
-    if (this.currentStep !== E2EIHandlerStep.UNINITIALIZED && this.currentStep !== E2EIHandlerStep.SNOOZE) {
+    if (this.currentStep === E2EIHandlerStep.SNOOZE) {
       return false;
     }
     return true;
