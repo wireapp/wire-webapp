@@ -21,13 +21,13 @@ import {useCallback, useEffect, useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {E2EIHandler, getUsersIdentities, isE2EIEnabled, MLSStatuses, WireIdentity} from '../E2EIdentity';
+import {E2EIHandler, getUsersIdentities, MLSStatuses, WireIdentity} from '../E2EIdentity';
 
 export const useUserIdentity = (userId: QualifiedId, groupId?: string, updateAfterEnrollment?: boolean) => {
   const [deviceIdentities, setDeviceIdentities] = useState<WireIdentity[] | undefined>();
 
   const refreshDeviceIdentities = useCallback(async () => {
-    if (!isE2EIEnabled() || !groupId) {
+    if (!E2EIHandler.getInstance().isE2EIEnabled() || !groupId) {
       return;
     }
     const userIdentities = await getUsersIdentities(groupId, [userId]);

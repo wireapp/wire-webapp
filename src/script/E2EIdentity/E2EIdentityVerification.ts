@@ -22,11 +22,10 @@ import {DeviceIdentity} from '@wireapp/core/lib/messagingProtocols/mls';
 import {container} from 'tsyringe';
 
 import {Core} from 'src/script/service/CoreSingleton';
-import {base64ToArray, supportsMLS} from 'Util/util';
+import {base64ToArray} from 'Util/util';
 
 import {mapMLSStatus} from './certificateDetails';
 
-import {Config} from '../Config';
 import {ConversationState} from '../conversation/ConversationState';
 
 export enum MLSStatuses {
@@ -47,10 +46,6 @@ export function getE2EIdentityService() {
     throw new Error('trying to query E2EIdentity data in an non-e2eidentity environment');
   }
   return e2eIdentityService;
-}
-
-export function isE2EIEnabled(): boolean {
-  return supportsMLS() && Config.getConfig().FEATURE.ENABLE_E2EI;
 }
 
 export async function getUsersIdentities(groupId: string, userIds: QualifiedId[]) {
