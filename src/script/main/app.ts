@@ -492,10 +492,10 @@ export class App {
       telemetry.timeStep(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
       telemetry.addStatistic(AppInitStatisticsValue.NOTIFICATIONS, totalNotifications, 100);
 
-      eventTrackerRepository.init(propertiesRepository.properties.settings.privacy.telemetry_sharing);
       onProgress(97.5, t('initUpdatedFromNotifications', this.config.BRAND_NAME));
 
       const clientEntities = await clientRepository.updateClientsForSelf();
+      await eventTrackerRepository.init(propertiesRepository.properties.settings.privacy.telemetry_sharing);
 
       onProgress(99);
 

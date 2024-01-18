@@ -75,10 +75,7 @@ export async function initMLSGroupConversations(
 
       //otherwise we should try joining via external commit
       await conversationService.joinByExternalCommit(qualifiedId);
-
-      if (onSuccessfulJoin) {
-        return onSuccessfulJoin(mlsConversation);
-      }
+      onSuccessfulJoin?.(mlsConversation);
     } catch (error) {
       onError?.(mlsConversation, error);
     }
