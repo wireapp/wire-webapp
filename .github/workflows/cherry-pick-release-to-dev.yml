@@ -2,13 +2,15 @@ name: Cherry pick to dev
 on:
   push:
     branches:
-      - xp/*
+      - release/*
 jobs:
   cherry_pick:
     runs-on: ubuntu-latest
     steps:
       - name: checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Create PR to branch
         uses: gorillio/github-action-cherry-pick@master
