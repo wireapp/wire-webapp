@@ -54,7 +54,15 @@ interface GetModalOptions {
   hideSecondary?: boolean;
   hidePrimary?: boolean;
   hideClose?: boolean;
-  extraParams?: {delayTime?: string; isRenewal?: boolean; isGracePeriodOver?: boolean};
+  extraParams?: {
+    /** time left to remind the user again (only for enroll and renewal modal types). */
+    delayTime?: string; 
+    
+    /** Flag indicating if this is a renewal action */
+    isRenewal?: boolean; 
+    
+    /** Flag indicating if the grace period is over (only for enroll, renew or error modals) */
+    isGracePeriodOver?: boolean};
 }
 export const getModalOptions = ({
   type,
