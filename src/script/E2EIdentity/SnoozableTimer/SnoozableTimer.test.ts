@@ -18,19 +18,19 @@
  */
 
 import {FIFTEEN_MINUTES, FOUR_HOURS, ONE_HOUR, ONE_MINUTE} from './delay';
-import {DelayTimerService} from './DelayTimer';
+import {SnoozableTimer} from './SnoozableTimer';
 
 describe('createGracePeriodTimer', () => {
-  let timer: DelayTimerService | undefined;
+  let timer: SnoozableTimer | undefined;
 
   beforeEach(() => {
     jest.clearAllMocks();
     jest.useFakeTimers();
     global.localStorage.clear();
-    timer = new DelayTimerService({
+    timer = new SnoozableTimer({
       gracePeriodInMS: 0,
-      gracePeriodExpiredCallback: jest.fn(),
-      delayPeriodExpiredCallback: jest.fn(),
+      onGracePeriodExpired: jest.fn(),
+      onSnoozeExpired: jest.fn(),
     });
   });
 
@@ -42,8 +42,8 @@ describe('createGracePeriodTimer', () => {
     const gracePeriodExpiredCallback = jest.fn();
     timer?.updateParams({
       gracePeriodInMS: 1000,
-      gracePeriodExpiredCallback,
-      delayPeriodExpiredCallback: jest.fn(),
+      onGracePeriodExpired: gracePeriodExpiredCallback,
+      onSnoozeExpired: jest.fn(),
     });
 
     jest.advanceTimersByTime(1000);
@@ -55,11 +55,11 @@ describe('createGracePeriodTimer', () => {
 
     timer?.updateParams({
       gracePeriodInMS: ONE_HOUR,
-      gracePeriodExpiredCallback,
-      delayPeriodExpiredCallback: jest.fn(),
+      onGracePeriodExpired: gracePeriodExpiredCallback,
+      onSnoozeExpired: jest.fn(),
     });
 
-    timer?.delayPrompt();
+    timer?.snooze();
 
     jest.advanceTimersByTime(FIFTEEN_MINUTES);
     expect(gracePeriodExpiredCallback).not.toHaveBeenCalled();
@@ -72,10 +72,10 @@ describe('createGracePeriodTimer', () => {
     const gracePeriodExpiredCallback = jest.fn();
     timer?.updateParams({
       gracePeriodInMS: 0,
-      gracePeriodExpiredCallback,
-      delayPeriodExpiredCallback: jest.fn(),
+      onGracePeriodExpired: gracePeriodExpiredCallback,
+      onSnoozeExpired: jest.fn(),
     });
-    timer?.delayPrompt();
+    timer?.snooze();
 
     jest.advanceTimersByTime(500);
     expect(gracePeriodExpiredCallback).toHaveBeenCalled();
@@ -85,12 +85,12 @@ describe('createGracePeriodTimer', () => {
     const gracePeriodExpiredCallback = jest.fn();
     timer?.updateParams({
       gracePeriodInMS: 7200000,
-      gracePeriodExpiredCallback,
-      delayPeriodExpiredCallback: jest.fn(),
+      onGracePeriodExpired: gracePeriodExpiredCallback,
+      onSnoozeExpired: jest.fn(),
     });
-    timer?.delayPrompt();
+    timer?.snooze();
     jest.advanceTimersByTime(3600000);
-    timer?.delayPrompt();
+    timer?.snooze();
     jest.advanceTimersByTime(3600000);
 
     expect(gracePeriodExpiredCallback).toHaveBeenCalled();
@@ -100,11 +100,11 @@ describe('createGracePeriodTimer', () => {
     const delayPeriodExpiredCallback = jest.fn();
     timer?.updateParams({
       gracePeriodInMS: ONE_HOUR,
-      gracePeriodExpiredCallback: jest.fn(),
-      delayPeriodExpiredCallback,
+      onGracePeriodExpired: jest.fn(),
+      onSnoozeExpired: delayPeriodExpiredCallback,
     });
 
-    timer?.delayPrompt();
+    timer?.snooze();
 
     // getDelayTime(ONE_HOUR) will return FIFTEEN_MINUTES according to the function provided.
     jest.advanceTimersByTime(FIFTEEN_MINUTES);
@@ -116,18 +116,18 @@ describe('createGracePeriodTimer', () => {
     const gracePeriodExpiredCallback = jest.fn();
     timer?.updateParams({
       gracePeriodInMS: ONE_HOUR,
-      delayPeriodExpiredCallback,
-      gracePeriodExpiredCallback,
+      onSnoozeExpired: delayPeriodExpiredCallback,
+      onGracePeriodExpired: gracePeriodExpiredCallback,
     });
 
-    timer?.delayPrompt();
+    timer?.snooze();
 
     // Here, instead of advancing time by "ONE_HOUR + FIFTEEN_MINUTES", we advance by "ONE_HOUR", which is the end of the grace period.
     jest.advanceTimersByTime(ONE_HOUR + FIFTEEN_MINUTES);
     expect(delayPeriodExpiredCallback).toHaveBeenCalled(); // The delayPeriodExpiredCallback should be called after ONE_HOUR.
     expect(gracePeriodExpiredCallback).toHaveBeenCalled(); // The gracePeriodExpiredCallback should be called when the grace period ends, which is after ONE_HOUR.
 
-    timer?.delayPrompt(); // We try to delay after the grace period has ended.
+    timer?.snooze(); // We try to delay after the grace period has ended.
     jest.advanceTimersByTime(FIFTEEN_MINUTES);
     expect(delayPeriodExpiredCallback).toHaveBeenCalledTimes(1); // The delayPeriodExpiredCallback should not be called again since we're now past the grace period.
   });
@@ -136,17 +136,17 @@ describe('createGracePeriodTimer', () => {
     const delayPeriodExpiredCallback = jest.fn();
     timer?.updateParams({
       gracePeriodInMS: FOUR_HOURS,
-      gracePeriodExpiredCallback: jest.fn(),
-      delayPeriodExpiredCallback,
+      onGracePeriodExpired: jest.fn(),
+      onSnoozeExpired: delayPeriodExpiredCallback,
     });
 
-    timer?.delayPrompt();
+    timer?.snooze();
     jest.advanceTimersByTime(ONE_HOUR); // gracePeriod > delay, so delay = ONE_HOUR
 
-    timer?.delayPrompt();
+    timer?.snooze();
     jest.advanceTimersByTime(ONE_HOUR);
 
-    timer?.delayPrompt();
+    timer?.snooze();
     jest.advanceTimersByTime(ONE_HOUR);
 
     expect(delayPeriodExpiredCallback).toHaveBeenCalledTimes(3);
@@ -157,11 +157,11 @@ describe('createGracePeriodTimer', () => {
     const gracePeriodExpiredCallback = jest.fn();
     timer?.updateParams({
       gracePeriodInMS: ONE_MINUTE,
-      gracePeriodExpiredCallback,
-      delayPeriodExpiredCallback,
+      onGracePeriodExpired: gracePeriodExpiredCallback,
+      onSnoozeExpired: delayPeriodExpiredCallback,
     });
 
-    timer?.delayPrompt();
+    timer?.snooze();
     jest.advanceTimersByTime(ONE_MINUTE);
 
     expect(delayPeriodExpiredCallback).not.toHaveBeenCalled();
