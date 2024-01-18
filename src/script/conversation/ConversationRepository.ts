@@ -2255,7 +2255,7 @@ export class ConversationRepository {
    */
   private async clearConversationContent(conversation: Conversation, timestamp: number) {
     await this.deleteMessages(conversation, timestamp);
-    await this.addCreationMessage(conversation, !!this.userState.self()?.isTemporaryGuest(), timestamp);
+    await this.addCreationMessage(conversation, !!this.userState.self()?.isTemporaryGuest());
     conversation.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.CLEARED);
   }
 

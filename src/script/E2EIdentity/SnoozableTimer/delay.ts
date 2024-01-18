@@ -38,7 +38,11 @@ export const ONE_HOUR = TIME_IN_MILLIS.HOUR;
 export const FOUR_HOURS = TIME_IN_MILLIS.HOUR * 4;
 export const ONE_DAY = TIME_IN_MILLIS.DAY;
 
-export function getDelayTime(gracePeriodInMs: number): number {
+/**
+ * Will return a suitable snooze time based on the grace period
+ * @param gracePeriodInMs - the full grace period length in milliseconds
+ */
+export function getSnoozeTime(gracePeriodInMs: number): number {
   if (gracePeriodInMs > 0) {
     if (gracePeriodInMs <= FIFTEEN_MINUTES) {
       return Math.min(FIVE_MINUTES, gracePeriodInMs);
