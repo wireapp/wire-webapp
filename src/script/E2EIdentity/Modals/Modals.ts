@@ -69,7 +69,7 @@ export const getModalOptions = ({
       options = {
         text: {
           closeBtnLabel: t('acme.settingsChanged.button.close'),
-          htmlMessage: hideSecondary
+          htmlMessage: extraParams?.isGracePeriodOver
             ? t('acme.settingsChanged.gracePeriodOver.paragraph', {}, {br: '<br>', ...replaceLearnMore})
             : t('acme.settingsChanged.paragraph', {}, {br: '<br>', ...replaceLearnMore}),
           title: t('acme.settingsChanged.headline.alt'),
