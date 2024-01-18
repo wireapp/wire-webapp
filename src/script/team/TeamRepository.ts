@@ -29,7 +29,7 @@ import type {
   TeamUpdateEvent,
 } from '@wireapp/api-client/lib/event';
 import {TEAM_EVENT} from '@wireapp/api-client/lib/event/TeamEvent';
-import {FeatureStatus, FeatureList, FEATURE_KEY} from '@wireapp/api-client/lib/team/feature/';
+import {FeatureStatus, FeatureList} from '@wireapp/api-client/lib/team/feature/';
 import type {PermissionsData} from '@wireapp/api-client/lib/team/member/PermissionsData';
 import type {TeamData} from '@wireapp/api-client/lib/team/team/TeamData';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
@@ -401,7 +401,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     event: TeamFeatureConfigurationUpdateEvent,
     source: EventSource,
   ): Promise<void> => {
-    if (source !== EventSource.WEBSOCKET && event.name !== FEATURE_KEY.ENFORCE_DOWNLOAD_PATH) {
+    if (source !== EventSource.WEBSOCKET) {
       // Ignore notification stream events
       return;
     }

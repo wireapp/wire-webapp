@@ -27,8 +27,13 @@ import {
   FeatureStatus,
   SelfDeletingTimeout,
 } from '@wireapp/api-client/lib/team/feature/';
+import {amplify} from 'amplify';
+
+import {Runtime} from '@wireapp/commons';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {Action} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {StringIdentifer, replaceLink, t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
@@ -44,8 +49,8 @@ const featureNotifications: Partial<
     FEATURE_KEY,
     (
       oldConfig?: Feature<any> | FeatureWithoutConfig,
-      newConfig?: Feature<any> | FeatureWithoutConfig,
-    ) => undefined | {htmlMessage: string; title: StringIdentifer}
+      newConfig?: FeatureWithoutConfig | Feature<any> | undefined,
+    ) => undefined | {htmlMessage: string; title: StringIdentifer; primaryAction?: Action}
   >
 > = {
   [FEATURE_KEY.FILE_SHARING]: (oldConfig, newConfig) => {
@@ -72,6 +77,33 @@ const featureNotifications: Partial<
           ? t('featureConfigChangeModalAudioVideoDescriptionItemCameraEnabled')
           : t('featureConfigChangeModalAudioVideoDescriptionItemCameraDisabled'),
       title: 'featureConfigChangeModalAudioVideoHeadline',
+    };
+  },
+  [FEATURE_KEY.ENFORCE_DOWNLOAD_PATH]: (oldConfig, newConfig) => {
+    const status = wasTurnedOnOrOff(oldConfig, newConfig);
+    if (!status) {
+      return undefined;
+    }
+    if (newConfig && 'config' in newConfig) {
+      amplify.publish(
+        WebAppEvents.TEAM.DOWNLOAD_PATH_UPDATE,
+        newConfig.status === FeatureStatus.ENABLED ? newConfig.config.enforcedDownloadLocation : undefined,
+      );
+    }
+    return {
+      htmlMessage:
+        status === FeatureStatus.ENABLED
+          ? t('featureConfigChangeModalDownloadPathEnabled')
+          : t('featureConfigChangeModalDownloadPathDisabled'),
+      title: 'featureConfigChangeModalDownloadPathHeadline',
+      primaryAction: {
+        action: () => {
+          if (Runtime.isDesktopApp() && status === FeatureStatus.ENABLED) {
+            // if we are in a desktop env, we just warn the wrapper that we need to reload. It then decide what should be done
+            amplify.publish(WebAppEvents.LIFECYCLE.RESTART);
+          }
+        },
+      },
     };
   },
   [FEATURE_KEY.SELF_DELETING_MESSAGES]: (oldConfig, newConfig) => {
@@ -181,6 +213,8 @@ export function FeatureConfigChangeNotifier({teamState, selfUserId}: Props): nul
               brandName: Config.getConfig().BRAND_NAME,
             }),
           },
+          primaryAction: message.primaryAction,
+          hideCloseBtn: featureKey === FEATURE_KEY.ENFORCE_DOWNLOAD_PATH,
         });
       });
     }
