@@ -34,8 +34,6 @@ import {formatDelayTime, TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {removeUrlParameters} from 'Util/UrlUtil';
 import {supportsMLS} from 'Util/util';
 
-import {getDelayTime, shouldEnableSoftLock} from './DelayTimer/delay';
-import {DelayTimerService} from './DelayTimer/DelayTimer';
 import {
   hasActiveCertificate,
   isE2EIEnabled,
@@ -46,6 +44,8 @@ import {
 import {getModalOptions, ModalType} from './Modals';
 import {OIDCService} from './OIDCService';
 import {OIDCServiceStore} from './OIDCService/OIDCServiceStorage';
+import {getSnoozeTime, shouldEnableSoftLock} from './SnoozableTimer/delay';
+import {SnoozableTimer} from './SnoozableTimer/SnoozableTimer';
 
 import {Config} from '../Config';
 
@@ -68,7 +68,7 @@ type Events = {
 };
 
 export type EnrollmentConfig = {
-  timer: DelayTimerService;
+  timer: SnoozableTimer;
   discoveryUrl: string;
   gracePeriodInMs: number;
 };
@@ -80,7 +80,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   private readonly core = container.resolve(Core);
   private readonly userState = container.resolve(UserState);
   private config?: EnrollmentConfig;
-  private currentStep: E2EIHandlerStep | null = E2EIHandlerStep.UNINITIALIZED;
+  private currentStep: E2EIHandlerStep = E2EIHandlerStep.UNINITIALIZED;
   private oidcService?: OIDCService;
 
   private get coreE2EIService() {
@@ -126,12 +126,13 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       this.config = {
         discoveryUrl,
         gracePeriodInMs,
-        timer: new DelayTimerService({
+        timer: new SnoozableTimer({
           gracePeriodInMS: gracePeriodInMs,
-          gracePeriodExpiredCallback: () => null,
-          delayPeriodExpiredCallback: () => null,
+          onGracePeriodExpired: () => this.startEnrollment(ModalType.ENROLL),
+          onSnoozeExpired: () => this.startEnrollment(ModalType.ENROLL),
         }),
       };
+      this.currentStep = E2EIHandlerStep.INITIALIZED;
     }
     return this;
   }
@@ -142,7 +143,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       // If the client already has a certificate, we don't need to start the enrollment
       return;
     }
-    return this.showE2EINotificationMessage(ModalType.ENROLL);
+    return this.startEnrollment(ModalType.ENROLL);
   }
 
   public async attemptRenewal(): Promise<void> {
@@ -203,7 +204,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
       // If the silent authentication fails, clear the oidc service progress/data and renew manually
       await this.cleanUp(true);
-      this.showE2EINotificationMessage(ModalType.CERTIFICATE_RENEWAL);
+      this.startEnrollment(ModalType.CERTIFICATE_RENEWAL);
     }
   }
 
@@ -377,7 +378,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
           resolve();
         },
         secondaryActionFn: async () => {
-          await this.showE2EINotificationMessage(ModalType.ENROLL);
+          await this.startEnrollment(ModalType.ENROLL);
           resolve();
         },
       });
@@ -394,22 +395,6 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     return true;
   }
 
-  private initializeEnrollmentTimer(): void {
-    // Only initialize the timer when the it is uninitialized
-    if (this.currentStep === E2EIHandlerStep.UNINITIALIZED) {
-      this.config?.timer.updateParams({
-        gracePeriodInMS: this.config.gracePeriodInMs,
-        gracePeriodExpiredCallback: () => {
-          this.showE2EINotificationMessage(ModalType.ENROLL);
-        },
-        delayPeriodExpiredCallback: () => {
-          this.showE2EINotificationMessage(ModalType.ENROLL);
-        },
-      });
-      this.currentStep = E2EIHandlerStep.INITIALIZED;
-    }
-  }
-
   private async showEnrollmentModal(modalType: ModalType.ENROLL | ModalType.CERTIFICATE_RENEWAL): Promise<void> {
     // Show the modal with the provided modal type
     const disableSnooze = await shouldEnableSoftLock(this.config!);
@@ -422,8 +407,8 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
         },
         secondaryActionFn: () => {
           this.currentStep = E2EIHandlerStep.SNOOZE;
-          this.config?.timer.delayPrompt();
-          this.showSnoozeModal();
+          this.config?.timer.snooze();
+          this.showSnoozeConfirmationModal();
           resolve();
         },
         type: modalType,
@@ -433,22 +418,19 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     });
   }
 
-  private showSnoozeModal() {
+  private showSnoozeConfirmationModal() {
     // Show the modal with the provided modal type
     const {modalOptions, modalType: determinedModalType} = getModalOptions({
       type: ModalType.SNOOZE_REMINDER,
       hideClose: true,
       extraParams: {
-        delayTime: formatDelayTime(getDelayTime(this.config!.gracePeriodInMs)),
+        delayTime: formatDelayTime(getSnoozeTime(this.config!.gracePeriodInMs)),
       },
     });
     PrimaryModal.show(determinedModalType, modalOptions);
   }
 
-  public async showE2EINotificationMessage(
-    modalType: ModalType.CERTIFICATE_RENEWAL | ModalType.ENROLL,
-    disableSnooze: boolean = false,
-  ): Promise<void> {
+  private async startEnrollment(enrollmentType: ModalType.CERTIFICATE_RENEWAL | ModalType.ENROLL): Promise<void> {
     // If the user has already started enrolment, don't show the notification. Instead, show the loading modal
     // This will occur after the redirect from the oauth provider
     if (this.coreE2EIService.isEnrollmentInProgress()) {
@@ -460,11 +442,9 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       return;
     }
 
-    this.initializeEnrollmentTimer();
-
     // If the timer is not active, show the notification modal
-    if (this.config && !this.config.timer.isDelayTimerActive()) {
-      return this.showEnrollmentModal(modalType);
+    if (this.config && !this.config.timer.isSnoozableTimerActive()) {
+      return this.showEnrollmentModal(enrollmentType);
     }
   }
 }
