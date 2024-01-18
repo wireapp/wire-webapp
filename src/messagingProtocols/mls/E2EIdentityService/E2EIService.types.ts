@@ -38,7 +38,7 @@ type NewAcmeAuthzOriginal = OmitFree<Awaited<ReturnType<E2eiEnrollment['newAuthz
 export type AcmeDirectory = OmitFree<Awaited<ReturnType<E2eiEnrollment['directoryResponse']>>>;
 export type AcmeChallenge = OmitFree<NonNullable<NewAcmeAuthzOriginal['wireDpopChallenge']>>;
 export type NewAcmeOrder = OmitFree<Awaited<ReturnType<E2eiEnrollment['newOrderResponse']>>>;
-export type NewAcmeAuthz = Pick<Awaited<ReturnType<E2eiEnrollment['newAuthzResponse']>>, 'identifier'> & {
+export type NewAcmeAuthz = Pick<Awaited<ReturnType<E2eiEnrollment['newAuthzResponse']>>, 'identifier' | 'keyauth'> & {
   wireDpopChallenge?: AcmeChallenge;
   wireOidcChallenge?: AcmeChallenge;
 };
@@ -52,6 +52,7 @@ export type User = {
 };
 export type Account = Uint8Array;
 export type Nonce = string;
+export type KeyAuth = NewAcmeAuthzOriginal['keyauth'];
 
 export interface FinishOidcChallengeParams {
   oidcChallenge: AcmeChallenge;
@@ -73,4 +74,9 @@ export interface InitParams {
   skipInit?: boolean;
   discoveryUrl?: string;
   keyPackagesAmount: number;
+}
+
+export interface StartNewOAuthFlowReturnValue {
+  challenge: AcmeChallenge;
+  keyAuth: KeyAuth;
 }

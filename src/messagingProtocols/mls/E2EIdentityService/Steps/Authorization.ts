@@ -43,6 +43,7 @@ export const getAuthorization = async ({
     // manual copy of the wasm data because of a problem while cloning it
     const authorization: NewAcmeAuthz = {
       identifier: wasmData.identifier,
+      keyauth: wasmData.keyauth,
       wireDpopChallenge: {
         delegate: wasmData.wireDpopChallenge!.delegate,
         target: wasmData.wireDpopChallenge!.target,

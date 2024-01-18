@@ -53,7 +53,7 @@ import {SubconversationService} from './conversation/SubconversationService/Subc
 import {GiphyService} from './giphy/';
 import {LinkPreviewService} from './linkPreview';
 import {MLSService} from './messagingProtocols/mls';
-import {AcmeChallenge, E2EIServiceExternal, User} from './messagingProtocols/mls/E2EIdentityService';
+import {E2EIServiceExternal, StartNewOAuthFlowReturnValue, User} from './messagingProtocols/mls/E2EIdentityService';
 import {CoreCallbacks, CoreCryptoConfig, SecretCrypto} from './messagingProtocols/mls/types';
 import {NewClient, ProteusService} from './messagingProtocols/proteus';
 import {CryptoClientType} from './messagingProtocols/proteus/ProteusService/CryptoClient';
@@ -244,7 +244,7 @@ export class Account extends TypedEventEmitter<Events> {
     handle: string;
     discoveryUrl: string;
     oAuthIdToken?: string;
-  }): Promise<AcmeChallenge | boolean> {
+  }): Promise<StartNewOAuthFlowReturnValue | boolean> {
     const context = this.apiClient.context;
     const domain = context?.domain ?? '';
 
