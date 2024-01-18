@@ -18,6 +18,7 @@
  */
 
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
+import {KeyAuth} from '@wireapp/core/lib/messagingProtocols/mls';
 import {amplify} from 'amplify';
 import {User} from 'oidc-client-ts';
 import {container} from 'tsyringe';
@@ -232,11 +233,15 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     return supportsMLS() && Config.getConfig().FEATURE.ENABLE_E2EI;
   }
 
-  private async storeRedirectTargetAndRedirect(targetURL: string): Promise<void> {
+  private async storeRedirectTargetAndRedirect(
+    targetURL: string,
+    keyAuth: KeyAuth,
+    challengeURL: string,
+  ): Promise<void> {
     // store the target url in the persistent oidc service store, since the oidc service will be destroyed after the redirect
     OIDCServiceStore.store.targetURL(targetURL);
     this.oidcService = this.createOIDCService();
-    await this.oidcService.authenticate();
+    await this.oidcService.authenticate(keyAuth, challengeURL);
   }
 
   /**
@@ -294,7 +299,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
       // Check if the data is a boolean, if not, we need to handle the oauth redirect
       if (typeof data !== 'boolean') {
-        await this.storeRedirectTargetAndRedirect(data.target);
+        await this.storeRedirectTargetAndRedirect(data.challenge.target, data.keyAuth, data.challenge.url);
       }
 
       // Notify user about E2EI enrolment success
