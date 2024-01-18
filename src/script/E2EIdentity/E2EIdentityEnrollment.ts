@@ -363,13 +363,13 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     // Clear the e2e identity progress
     this.coreE2EIService.clearAllProgress();
 
-    const isSoftLockEnabled = await shouldEnableSoftLock(this.config!);
+    const disableSnooze = await shouldEnableSoftLock(this.config!);
 
     return new Promise<void>(resolve => {
       const {modalOptions, modalType} = getModalOptions({
         type: ModalType.ERROR,
         hideClose: true,
-        hideSecondary: isSoftLockEnabled,
+        hideSecondary: disableSnooze,
         primaryActionFn: async () => {
           this.currentStep = E2EIHandlerStep.INITIALIZED;
           await this.enroll();
@@ -378,6 +378,9 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
         secondaryActionFn: async () => {
           await this.startEnrollment(ModalType.ENROLL);
           resolve();
+        },
+        extraParams: {
+          isGracePeriodOver: disableSnooze,
         },
       });
 
@@ -403,6 +406,9 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
           this.config?.timer.snooze();
           this.showSnoozeConfirmationModal();
           resolve();
+        },
+        extraParams: {
+          isGracePeriodOver: disableSnooze,
         },
         type: modalType,
         hideClose: true,
