@@ -17,6 +17,7 @@
  *
  */
 
+import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {E2eiConversationState} from '@wireapp/core/lib/messagingProtocols/mls';
 import {container} from 'tsyringe';
@@ -99,7 +100,8 @@ class MLSConversationVerificationStateHandler {
       return this.logger.warn(`Epoch changed but conversation could not be found after waiting for 5 seconds`);
     }
 
-    if (!isMLSConversation(conversation)) {
+    const isSelfMLSConversation = isMLSConversation(conversation) && conversation.type() === CONVERSATION_TYPE.SELF;
+    if (!isMLSConversation(conversation) || isSelfMLSConversation) {
       return;
     }
 
