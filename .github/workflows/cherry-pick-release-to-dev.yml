@@ -1,0 +1,18 @@
+name: Cherry pick to dev
+on:
+  push:
+    branches:
+      - release/*
+jobs:
+  cherry_pick:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v1
+
+      - name: Create PR to branch
+        uses: gorillio/github-action-cherry-pick@master
+        with:
+          pr_branch: 'dev'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
