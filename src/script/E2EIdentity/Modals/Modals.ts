@@ -40,7 +40,7 @@ interface GetModalOptions {
   hideSecondary?: boolean;
   hidePrimary?: boolean;
   hideClose?: boolean;
-  extraParams?: {delayTime?: string; isRenewal?: boolean};
+  extraParams?: {delayTime?: string; isRenewal?: boolean; isGracePeriodOver?: boolean};
 }
 export const getModalOptions = ({
   type,
@@ -69,7 +69,9 @@ export const getModalOptions = ({
       options = {
         text: {
           closeBtnLabel: t('acme.settingsChanged.button.close'),
-          htmlMessage: t('acme.settingsChanged.paragraph', {}, {br: '<br>', ...replaceLearnMore}),
+          htmlMessage: hideSecondary
+            ? t('acme.settingsChanged.gracePeriodOver.paragraph', {}, {br: '<br>', ...replaceLearnMore})
+            : t('acme.settingsChanged.paragraph', {}, {br: '<br>', ...replaceLearnMore}),
           title: t('acme.settingsChanged.headline.alt'),
         },
         primaryAction: {
@@ -90,7 +92,9 @@ export const getModalOptions = ({
       options = {
         text: {
           closeBtnLabel: t('acme.renewCertificate.button.close'),
-          htmlMessage: t('acme.renewCertificate.paragraph'),
+          htmlMessage: extraParams?.isGracePeriodOver
+            ? t('acme.renewCertificate.gracePeriodOver.paragraph')
+            : t('acme.renewCertificate.paragraph'),
           title: t('acme.renewCertificate.headline.alt'),
         },
         primaryAction: {
@@ -128,7 +132,9 @@ export const getModalOptions = ({
       options = {
         text: {
           closeBtnLabel: t('acme.error.button.close'),
-          htmlMessage: t('acme.error.paragraph', {}, {br: '<br>'}),
+          htmlMessage: extraParams?.isGracePeriodOver
+            ? t('acme.error.gracePeriod.paragraph', {}, {br: '<br>'})
+            : t('acme.error.paragraph', {}, {br: '<br>'}),
           title: t('acme.error.headline'),
         },
         primaryAction: {
