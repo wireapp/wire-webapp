@@ -32,8 +32,7 @@ interface CreateGracePeriodTimerParams {
   delayPeriodExpiredCallback: () => void;
 }
 
-class DelayTimerService {
-  private static instance: DelayTimerService | null = null;
+export class DelayTimerService {
   private gracePeriodInMS: number;
   private gracePeriodExpiredCallback: () => void;
   private delayPeriodExpiredCallback: () => void;
@@ -41,31 +40,11 @@ class DelayTimerService {
   private delayPeriodTimerKey: string = 'E2EIdentity_DelayTimer';
   private gracePeriodTimerKey: string = 'E2EIdentity_GracePeriodTimer';
 
-  private constructor({
-    gracePeriodInMS,
-    gracePeriodExpiredCallback,
-    delayPeriodExpiredCallback,
-  }: CreateGracePeriodTimerParams) {
+  constructor({gracePeriodInMS, gracePeriodExpiredCallback, delayPeriodExpiredCallback}: CreateGracePeriodTimerParams) {
     this.gracePeriodInMS = gracePeriodInMS;
     this.gracePeriodExpiredCallback = gracePeriodExpiredCallback;
     this.delayPeriodExpiredCallback = delayPeriodExpiredCallback;
     this.initialize();
-  }
-
-  /**
-   * Get the singleton instance of GracePeriodTimer or create a new one
-   * For the first time, params are required to create the instance
-   * @param params The params to create the grace period timer
-   * @returns The singleton instance of GracePeriodTimer
-   */
-  public static getInstance(params?: CreateGracePeriodTimerParams) {
-    if (!DelayTimerService.instance) {
-      if (!params) {
-        throw new Error('DelayTimerService is not initialized. Please call getInstance with params.');
-      }
-      DelayTimerService.instance = new DelayTimerService(params);
-    }
-    return DelayTimerService.instance;
   }
 
   /**
@@ -263,16 +242,6 @@ class DelayTimerService {
       : 0;
   }
 
-  /**
-   * Reset the instance
-   */
-  public resetInstance() {
-    DelayTimerStore.clear.all();
-    this.clearGracePeriodTimer();
-    this.clearDelayPeriodTimer();
-    DelayTimerService.instance = null;
-  }
-
   public isDelayTimerActive() {
     return TaskScheduler.hasActiveTask(this.delayPeriodTimerKey);
   }
@@ -283,5 +252,3 @@ class DelayTimerService {
     return remainingTime - delayTime > 0;
   }
 }
-
-export {DelayTimerService};

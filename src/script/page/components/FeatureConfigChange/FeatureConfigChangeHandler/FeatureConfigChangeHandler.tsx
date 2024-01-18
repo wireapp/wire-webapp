@@ -38,7 +38,7 @@ export function FeatureConfigChangeHandler({teamState}: Props): null {
   useEffect(() => {
     if (config) {
       // initialize feature handlers
-      configureE2EI(logger, config);
+      configureE2EI(logger, config)?.attemptEnrollment();
     }
   }, [config]);
 

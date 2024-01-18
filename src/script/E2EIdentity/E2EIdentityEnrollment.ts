@@ -61,7 +61,6 @@ export enum E2EIHandlerStep {
 interface E2EIHandlerParams {
   discoveryUrl: string;
   gracePeriodInSeconds: number;
-  isFreshMLSSelfClient?: boolean;
 }
 
 type Events = {
@@ -121,13 +120,13 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     E2EIHandler.instance = null;
   }
 
-  public async initialize({discoveryUrl, gracePeriodInSeconds}: E2EIHandlerParams) {
+  public initialize({discoveryUrl, gracePeriodInSeconds}: E2EIHandlerParams) {
     if (isE2EIEnabled()) {
       const gracePeriodInMs = gracePeriodInSeconds * TIME_IN_MILLIS.SECOND;
       this.config = {
         discoveryUrl,
         gracePeriodInMs,
-        timer: DelayTimerService.getInstance({
+        timer: new DelayTimerService({
           gracePeriodInMS: gracePeriodInMs,
           gracePeriodExpiredCallback: () => null,
           delayPeriodExpiredCallback: () => null,
@@ -211,10 +210,10 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   /**
    * Calculates the date when the E2EI certificate renewal should be prompted.
    *
-   * @param {number} timeRemainingMS - Certificate validity period in days (VP).
-   * @param {number} historyTime - Maximum time messages are stored in days (HT).
-   * @param {number} gracePeriod - Time to activate certificate in days (GP).
-   * @returns {Date} - The date to start prompting for certificate renewal.
+   * @param timeRemainingMS - Certificate validity period in days (VP).
+   * @param historyTime - Maximum time messages are stored in days (HT).
+   * @param gracePeriod - Time to activate certificate in days (GP).
+   * @returns The date to start prompting for certificate renewal.
    */
   private calculateRenewalTime(timeRemainingMS: number, historyTimeMS: number, gracePeriodMS: number) {
     // Calculate a random time between 0 and 1 days
