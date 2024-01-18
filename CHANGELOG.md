@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [43.6.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@43.5.6...@wireapp/core@43.6.0) (2024-01-18)
+
+### Features
+
+* **e2ei:** update @wireapp/core-crypto to rc30 ([#5879](https://github.com/wireapp/wire-web-packages/issues/5879)) ([8d1befc](https://github.com/wireapp/wire-web-packages/commit/8d1befc4992f0031973d31e795769897e2161b44))
+
 ## [43.5.6](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@43.5.5...@wireapp/core@43.5.6) (2024-01-16)
 
 ### Bug Fixes
