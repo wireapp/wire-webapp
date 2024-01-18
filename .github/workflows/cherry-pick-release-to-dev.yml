@@ -1,3 +1,5 @@
+# This job will automatically create a cherry pick PR from any release/* branch to the dev branch
+# It allows the dev branch to stay up-to-date with fixes made to specific release branches
 name: Cherry pick to dev
 on:
   push:
