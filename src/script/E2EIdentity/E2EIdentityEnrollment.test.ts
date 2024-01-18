@@ -68,6 +68,7 @@ jest.mock('./E2EIdentityVerification', () => ({
   hasActiveCertificate: jest.fn().mockResolvedValue(false),
   getActiveWireIdentity: jest.fn().mockResolvedValue({certificate: 'certificate data'}),
   isE2EIEnabled: jest.fn().mockReturnValue(true),
+  isFreshMLSSelfClient: jest.fn().mockResolvedValue(false),
 }));
 
 // These values should lead to renewalPromptTime being less than the mocked current time
@@ -135,8 +136,8 @@ describe('E2EIHandler', () => {
     jest.spyOn(container.resolve(Core), 'enrollE2EI').mockResolvedValueOnce(true);
 
     const instance = await E2EIHandler.getInstance().initialize(params);
-    await instance['enroll']();
-
+    void instance['enroll']();
+    await wait(1);
     expect(instance['currentStep']).toBe(E2EIHandlerStep.SUCCESS);
   });
 
@@ -146,7 +147,8 @@ describe('E2EIHandler', () => {
     jest.spyOn(container.resolve(UserState), 'self').mockImplementationOnce(() => user);
 
     const instance = await E2EIHandler.getInstance().initialize(params);
-    await instance['enroll']();
+    void instance['enroll']();
+    await wait(1);
     expect(instance['currentStep']).toBe(E2EIHandlerStep.ERROR);
   });
 
@@ -169,7 +171,8 @@ describe('E2EIHandler', () => {
 
   it('should display loading message when enroled', async () => {
     const handler = await E2EIHandler.getInstance().initialize(params);
-    await handler['enroll']();
+    void handler['enroll']();
+    await wait(1);
     expect(getModalOptions).toHaveBeenCalledWith(
       expect.objectContaining({
         type: ModalType.LOADING,
@@ -182,7 +185,8 @@ describe('E2EIHandler', () => {
 
     const handler = await E2EIHandler.getInstance().initialize(params);
     handler['showLoadingMessage'] = jest.fn();
-    await handler['enroll']();
+    void handler['enroll']();
+    await wait(1);
     expect(getModalOptions).toHaveBeenCalledWith(
       expect.objectContaining({
         type: ModalType.SUCCESS,
@@ -195,7 +199,8 @@ describe('E2EIHandler', () => {
 
     const handler = await E2EIHandler.getInstance().initialize(params);
     handler['showLoadingMessage'] = jest.fn();
-    await handler['enroll']();
+    void handler['enroll']();
+    await wait(1);
     expect(getModalOptions).toHaveBeenCalledWith(
       expect.objectContaining({
         type: ModalType.ERROR,

@@ -18,7 +18,7 @@
  */
 
 import {FIFTEEN_MINUTES, FOUR_HOURS, ONE_HOUR, ONE_MINUTE} from './delay';
-import {DelayTimerService} from './DelayTimer'; // Update this with your module's actual path
+import {DelayTimerService} from './DelayTimer';
 
 describe('createGracePeriodTimer', () => {
   let timer: DelayTimerService | undefined;
@@ -27,7 +27,7 @@ describe('createGracePeriodTimer', () => {
     jest.clearAllMocks();
     jest.useFakeTimers();
     global.localStorage.clear();
-    timer = DelayTimerService?.getInstance({
+    timer = new DelayTimerService({
       gracePeriodInMS: 0,
       gracePeriodExpiredCallback: jest.fn(),
       delayPeriodExpiredCallback: jest.fn(),
@@ -35,8 +35,6 @@ describe('createGracePeriodTimer', () => {
   });
 
   afterEach(() => {
-    timer?.resetInstance();
-    timer = undefined;
     jest.useRealTimers();
   });
 
