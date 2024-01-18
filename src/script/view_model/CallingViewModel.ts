@@ -42,7 +42,6 @@ import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
 import {ConversationState} from '../conversation/ConversationState';
 import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
-import {isE2EIEnabled} from '../E2EIdentity';
 import type {Conversation} from '../entity/Conversation';
 import type {User} from '../entity/User';
 import type {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../media/MediaDevicesHandler';
@@ -257,7 +256,7 @@ export class CallingViewModel {
       const memberCount = conversationEntity.participating_user_ets().length;
       const isE2EIDegraded = conversationEntity.mlsVerificationState() === ConversationVerificationState.DEGRADED;
 
-      if (isE2EIEnabled() && isE2EIDegraded) {
+      if (isE2EIDegraded) {
         showE2EICallModal(conversationEntity, callType);
       } else if (memberCount > MAX_USERS_TO_CALL_WITHOUT_CONFIRM) {
         showMaxUsersToCallModalWithoutConfirm(conversationEntity, callType);

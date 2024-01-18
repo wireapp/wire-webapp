@@ -19,8 +19,10 @@
 
 import {FeatureStatus, FEATURE_KEY, FeatureList} from '@wireapp/api-client/lib/team';
 
+import {Config} from 'src/script/Config';
 import {E2EIHandler} from 'src/script/E2EIdentity';
 import {Logger} from 'Util/Logger';
+import {supportsMLS} from 'Util/util';
 
 import {hasE2EIVerificationExpiration, hasMLSDefaultProtocol} from '../../../../../guards/Protocol';
 
@@ -29,6 +31,10 @@ export const configureE2EI = (logger: Logger, config: FeatureList): undefined | 
   const mlsConfig = config[FEATURE_KEY.MLS];
   // Check if MLS or MLS E2EIdentity feature is existent
   if (!hasE2EIVerificationExpiration(e2eiConfig) || !hasMLSDefaultProtocol(mlsConfig)) {
+    return undefined;
+  }
+
+  if (!supportsMLS() && Config.getConfig().FEATURE.ENABLE_E2EI) {
     return undefined;
   }
 
