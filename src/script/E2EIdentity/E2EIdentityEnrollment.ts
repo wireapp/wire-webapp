@@ -204,7 +204,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
       // If the silent authentication fails, clear the oidc service progress/data and renew manually
       await this.cleanUp(true);
-      this.startEnrollment(ModalType.CERTIFICATE_RENEWAL);
+      await this.startEnrollment(ModalType.CERTIFICATE_RENEWAL);
     }
   }
 
@@ -387,17 +387,12 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     });
   }
 
-  private shouldShowNotification(): boolean {
-    // If the user has already snoozed the notification, don't show it again until the snooze period has expired
-    if (this.currentStep === E2EIHandlerStep.SNOOZE) {
-      return false;
-    }
-    return true;
-  }
-
-  private async showEnrollmentModal(modalType: ModalType.ENROLL | ModalType.CERTIFICATE_RENEWAL): Promise<void> {
+  private async showEnrollmentModal(
+    modalType: ModalType.ENROLL | ModalType.CERTIFICATE_RENEWAL,
+    config: EnrollmentConfig,
+  ): Promise<void> {
     // Show the modal with the provided modal type
-    const disableSnooze = await shouldEnableSoftLock(this.config!);
+    const disableSnooze = await shouldEnableSoftLock(config);
     return new Promise<void>(resolve => {
       const {modalOptions, modalType: determinedModalType} = getModalOptions({
         hideSecondary: disableSnooze,
@@ -437,14 +432,14 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       return this.enroll();
     }
 
-    // Early return if we shouldn't show the notification
-    if (!this.shouldShowNotification()) {
+    if (this.config?.timer.isSnoozableTimerActive()) {
+      // If the user has snoozed, no need to show the notification modal
       return;
     }
 
     // If the timer is not active, show the notification modal
-    if (this.config && !this.config.timer.isSnoozableTimerActive()) {
-      return this.showEnrollmentModal(enrollmentType);
+    if (this.config) {
+      return this.showEnrollmentModal(enrollmentType, this.config);
     }
   }
 }
