@@ -51,7 +51,7 @@ import {parseFullQualifiedClientId} from '../../../util/fullyQualifiedClientIdUt
 import {numberToHex} from '../../../util/numberToHex';
 import {RecurringTaskScheduler} from '../../../util/RecurringTaskScheduler';
 import {TaskScheduler} from '../../../util/TaskScheduler';
-import {AcmeChallenge, E2EIServiceExternal, User} from '../E2EIdentityService';
+import {E2EIServiceExternal, StartNewOAuthFlowReturnValue, User} from '../E2EIdentityService';
 import {E2EIServiceInternal} from '../E2EIdentityService/E2EIServiceInternal';
 import {handleMLSMessageAdd, handleMLSWelcomeMessage} from '../EventHandler/events';
 import {
@@ -779,7 +779,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     client: RegisteredClient,
     nbPrekeys: number,
     oAuthIdToken?: string,
-  ): Promise<AcmeChallenge | boolean> {
+  ): Promise<StartNewOAuthFlowReturnValue | boolean> {
     try {
       const hasActiveCertificate = await this.coreCryptoClient.e2eiIsEnabled(this.config.cipherSuite);
       const instance = await E2EIServiceInternal.getInstance({
@@ -794,9 +794,9 @@ export class MLSService extends TypedEventEmitter<Events> {
 
       // If we don't have an OAuth id token, we need to start the certificate process with Oauth
       if (!oAuthIdToken) {
-        const challengeData = await instance.startCertificateProcess(hasActiveCertificate);
-        if (challengeData) {
-          return challengeData;
+        const data = await instance.startCertificateProcess(hasActiveCertificate);
+        if (data) {
+          return data;
         }
         // If we have an OAuth id token, we can continue the certificate process / start a refresh
       } else {

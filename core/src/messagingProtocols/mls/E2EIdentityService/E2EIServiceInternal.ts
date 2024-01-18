@@ -24,13 +24,13 @@ import {APIClient} from '@wireapp/api-client';
 
 import {AcmeService} from './Connection/AcmeServer';
 import {
-  AcmeChallenge,
   AcmeDirectory,
   Ciphersuite,
   CoreCrypto,
   E2eiEnrollment,
   InitParams,
   RotateBundle,
+  StartNewOAuthFlowReturnValue,
 } from './E2EIService.types';
 import {E2EIServiceExternal} from './E2EIServiceExternal';
 import {isResponseStatusValid} from './Helper';
@@ -337,7 +337,7 @@ class E2EIServiceInternal {
    *  This function starts a new ACME enrollment flow for either a new client
    *  or a client that wants to refresh its certificate but has no valid refresh token
    */
-  private async startNewOAuthFlow(): Promise<AcmeChallenge | undefined> {
+  private async startNewOAuthFlow(): Promise<StartNewOAuthFlowReturnValue | undefined> {
     if (this.e2eServiceExternal.isEnrollmentInProgress()) {
       return this.exitWithError('Error while trying to start OAuth flow. There is already a flow in progress');
     }
@@ -350,15 +350,15 @@ class E2EIServiceInternal {
 
     // Step 6: Start E2E OAuth flow
     const {
-      authorization: {wireOidcChallenge},
+      authorization: {wireOidcChallenge, keyauth},
     } = authData;
-    if (wireOidcChallenge) {
+    if (wireOidcChallenge && keyauth) {
       // stash the identity for later use
       const handle = await this.coreCryptoClient.e2eiEnrollmentStash(this.identity);
       // stash the handle in local storage
       E2EIStorage.store.handle(Encoder.toBase64(handle).asString);
       // we need to pass back the aquired wireOidcChallenge to the UI
-      return wireOidcChallenge;
+      return {challenge: wireOidcChallenge, keyAuth: keyauth};
     }
     return undefined;
   }
