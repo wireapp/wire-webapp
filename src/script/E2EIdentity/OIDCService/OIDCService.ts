@@ -42,7 +42,7 @@ export class OIDCService {
 
     // Extract the clientId from the targetURL
     const idpUrl = new URL(targetURL);
-    // This clientId will be used to create the OIDCService, it is mocked for now
+    // This clientId will be used to create the OIDCService. It needs to be attached to the targetURL
     const idpClientId = idpUrl.searchParams.get('client_id');
     if (!idpClientId) {
       throw new Error('No clientId provided by the targetUrl');
