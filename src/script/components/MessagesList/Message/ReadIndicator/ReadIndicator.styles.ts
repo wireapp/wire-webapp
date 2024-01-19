@@ -50,7 +50,7 @@ export const ReadIndicatorStyles = (showIconOnly = false): CSSObject => ({
   },
 
   ...(!showIconOnly && {
-    opacity: 1,
+    opacity: 0,
     '.message:hover &': {
       opacity: '1',
     },
