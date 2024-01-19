@@ -67,7 +67,7 @@ import {MessageTimerUpdateMessage} from '../entity/message/MessageTimerUpdateMes
 import {MissedMessage} from '../entity/message/MissedMessage';
 import {MLSConversationRecoveredMessage} from '../entity/message/MLSConversationRecoveredMessage';
 import {MLSMigrationFinalisationOngoingCallMessage} from '../entity/message/MLSMigrationFinalisationOngoingCallMessage';
-import {One2OneMigratedToMlsMessage} from '../entity/message/One2OneMigratedToMlsMessage';
+import {OneToOneMigratedToMlsMessage} from '../entity/message/OneToOneMigratedToMlsMessage';
 import {PingMessage} from '../entity/message/PingMessage';
 import {ProtocolUpdateMessage} from '../entity/message/ProtocolUpdateMessage';
 import {ReceiptModeUpdateMessage} from '../entity/message/ReceiptModeUpdateMessage';
@@ -358,7 +358,7 @@ export class EventMapper {
       }
 
       case ClientEvent.CONVERSATION.ONE2ONE_MIGRATED_TO_MLS: {
-        messageEntity = this._mapEventOne2OneMigratedToMls();
+        messageEntity = this._mapEventOneToOneMigratedToMls();
         break;
       }
 
@@ -691,8 +691,8 @@ export class EventMapper {
   /**
    * Maps 1:1 conversation migrated to mls event to message entity.
    */
-  private _mapEventOne2OneMigratedToMls(): One2OneMigratedToMlsMessage {
-    return new One2OneMigratedToMlsMessage();
+  private _mapEventOneToOneMigratedToMls(): OneToOneMigratedToMlsMessage {
+    return new OneToOneMigratedToMlsMessage();
   }
 
   /**

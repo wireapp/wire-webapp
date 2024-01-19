@@ -78,7 +78,7 @@ export type VoiceChannelDeactivateEvent = ConversationEvent<
 
 export type AllVerifiedEventData = {type: VerificationMessageType.VERIFIED};
 export type AllVerifiedEvent = ConversationEvent<CONVERSATION.VERIFICATION, AllVerifiedEventData>;
-export type One2OneMigratedToMlsEvent = ConversationEvent<CONVERSATION.ONE2ONE_MIGRATED_TO_MLS>;
+export type OneToOneMigratedToMlsEvent = ConversationEvent<CONVERSATION.ONE2ONE_MIGRATED_TO_MLS>;
 export type AssetAddEvent = ConversationEvent<
   CONVERSATION.ASSET_ADD,
   {
@@ -253,7 +253,7 @@ export type ClientConversationEvent =
   | MemberLeaveEvent
   | MemberJoinEvent
   | OneToOneCreationEvent
-  | One2OneMigratedToMlsEvent
+  | OneToOneMigratedToMlsEvent
   | VoiceChannelDeactivateEvent
   | FileTypeRestrictedEvent
   | CallingTimeoutEvent
@@ -292,7 +292,7 @@ export const EventBuilder = {
     };
   },
 
-  build1to1MigratedToMLS(conversationEntity: Conversation): One2OneMigratedToMlsEvent {
+  build1to1MigratedToMLS(conversationEntity: Conversation): OneToOneMigratedToMlsEvent {
     return {
       ...buildQualifiedId(conversationEntity),
       time: new Date(conversationEntity.getNextTimestamp()).toISOString(),

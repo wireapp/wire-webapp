@@ -23,7 +23,7 @@ import {replaceLink, t} from 'Util/LocalizerUtil';
 
 import {SystemMessage} from './SystemMessage';
 
-export class One2OneMigratedToMlsMessage extends SystemMessage {
+export class OneToOneMigratedToMlsMessage extends SystemMessage {
   constructor() {
     super();
     this.system_message_type = SystemMessageType.ONE2ONE_MIGRATED_TO_MLS;
