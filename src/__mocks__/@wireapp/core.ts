@@ -40,6 +40,7 @@ export class Account extends EventEmitter {
       getUsersIdentities: jest.fn(() => new Map()),
       getDeviceIdentities: jest.fn(),
       getConversationState: jest.fn(),
+      registerServerCertificates: jest.fn(),
     },
     mls: {
       schedulePeriodicKeyMaterialRenewals: jest.fn(),
