@@ -123,6 +123,7 @@ describe('E2EIHandler', () => {
     await instance.initialize(params);
     void instance.attemptEnrollment();
     await wait(1);
+    expect(container.resolve(Core).service?.e2eIdentity?.registerServerCertificates).toHaveBeenCalled();
     expect(instance['currentStep']).toBe(E2EIHandlerStep.INITIALIZED);
   });
 
