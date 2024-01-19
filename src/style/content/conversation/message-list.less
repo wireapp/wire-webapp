@@ -322,9 +322,10 @@
     .text-selection;
     .accent-selection;
 
-    display: inline-block;
+    display: inline;
     width: 100%;
     min-width: 0;
+    margin-right: 12px;
     line-height: @line-height-lg;
     white-space: pre-wrap;
     word-wrap: break-word;
@@ -790,6 +791,7 @@
 
 // MESSAGE SPACING
 .message-asset {
+  display: flex;
   flex: 1;
   margin-top: 8px;
 }

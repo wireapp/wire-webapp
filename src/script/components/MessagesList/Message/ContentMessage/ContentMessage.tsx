@@ -21,6 +21,7 @@ import React, {useMemo, useState, useEffect} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
+import {ReadIndicator} from 'Components/MessagesList/Message/ReadIndicator';
 import {Conversation} from 'src/script/entity/Conversation';
 import {CompositeMessage} from 'src/script/entity/message/CompositeMessage';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
@@ -44,7 +45,6 @@ import {EphemeralStatusType} from '../../../../message/EphemeralStatusType';
 import {ContextMenuEntry} from '../../../../ui/ContextMenu';
 import {EphemeralTimer} from '../EphemeralTimer';
 import {MessageTime} from '../MessageTime';
-import {ReadReceiptStatus} from '../ReadReceiptStatus';
 import {useMessageFocusedTabIndex} from '../util';
 
 export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetSession'> {
@@ -192,12 +192,20 @@ export const ContentMessageComponent: React.FC<ContentMessageProps> = ({
             </MessageTime>
           </span>
 
-          <ReadReceiptStatus
+          <ReadIndicator
             message={message}
             is1to1Conversation={conversation.is1to1()}
             isLastDeliveredMessage={isLastDeliveredMessage}
-            onClickDetails={onClickDetails}
+            onClick={onClickDetails}
+            showIconOnly
           />
+
+          {/*<ReadReceiptStatus*/}
+          {/*  message={message}*/}
+          {/*  is1to1Conversation={conversation.is1to1()}*/}
+          {/*  isLastDeliveredMessage={isLastDeliveredMessage}*/}
+          {/*  onClickDetails={onClickDetails}*/}
+          {/*/>*/}
         </MessageHeader>
       )}
       <div className="message-body">
@@ -220,6 +228,7 @@ export const ContentMessageComponent: React.FC<ContentMessageProps> = ({
               isMessageFocused={msgFocusState}
             />
           )}
+
           {assets.map(asset => (
             <ContentAsset
               key={asset.type}
@@ -230,8 +239,12 @@ export const ContentMessageComponent: React.FC<ContentMessageProps> = ({
               onClickImage={onClickImage}
               onClickMessage={onClickMessage}
               isMessageFocused={msgFocusState}
+              is1to1Conversation={conversation.is1to1()}
+              isLastDeliveredMessage={isLastDeliveredMessage}
+              onClickDetails={() => onClickDetails(message)}
             />
           ))}
+
           {failedToSend && (
             <PartialFailureToSendWarning
               isMessageFocused={msgFocusState}
@@ -247,7 +260,15 @@ export const ContentMessageComponent: React.FC<ContentMessageProps> = ({
               onRetry={() => onRetry(message)}
             />
           )}
+
+          <ReadIndicator
+            message={message}
+            is1to1Conversation={conversation.is1to1()}
+            isLastDeliveredMessage={isLastDeliveredMessage}
+            onClick={onClickDetails}
+          />
         </div>
+
         {!isConversationReadonly && isActionMenuVisible && (
           <MessageActionsMenu
             isMsgWithHeader={shouldShowMessageHeader()}
