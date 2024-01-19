@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [43.7.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@43.6.0...@wireapp/core@43.7.0) (2024-01-19)
+
+### Features
+
+* fetch local certificate root [WPB-3338] ([#5863](https://github.com/wireapp/wire-web-packages/issues/5863)) ([47d45de](https://github.com/wireapp/wire-web-packages/commit/47d45de232d0e26ba863f8bde595b348269b3fdf))
+
 # [43.6.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@43.5.6...@wireapp/core@43.6.0) (2024-01-18)
 
 ### Features
