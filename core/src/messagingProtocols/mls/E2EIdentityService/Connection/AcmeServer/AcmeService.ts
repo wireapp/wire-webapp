@@ -57,7 +57,6 @@ export class AcmeService {
   private logger = logdown('@wireapp/core/AcmeService');
   private readonly axiosInstance: AxiosInstance = axios.create();
   private readonly url = {
-    DIRECTORY: '/directory',
     ROOTS: '/roots.pem',
   };
 
@@ -112,7 +111,7 @@ export class AcmeService {
 
   public async getDirectory(): GetDirectoryReturnValue {
     try {
-      const {data} = await this.axiosInstance.get(`${this.discoveryUrl}${this.url.DIRECTORY}`);
+      const {data} = await this.axiosInstance.get(this.discoveryUrl);
       const directory = DirectoryResponseSchema.parse(data);
       return new TextEncoder().encode(JSON.stringify(directory));
     } catch (e) {
