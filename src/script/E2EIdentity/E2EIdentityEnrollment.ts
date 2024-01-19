@@ -317,13 +317,13 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
       await this.showSuccessMessage(isCertificateRenewal);
       this.emit('identityUpdated', {enrollmentConfig: this.config!});
-      this.isEnrollmentInProgress = false;
     } catch (error) {
       this.currentStep = E2EIHandlerStep.ERROR;
-      this.isEnrollmentInProgress = false;
 
       setTimeout(removeCurrentModal, 0);
       await this.showErrorMessage();
+    } finally {
+      this.isEnrollmentInProgress = false;
     }
   }
 
