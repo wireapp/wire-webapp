@@ -31,7 +31,6 @@ interface ReadIndicatorProps {
   is1to1Conversation?: boolean;
   isLastDeliveredMessage?: boolean;
   showIconOnly?: boolean;
-  isInAsset?: boolean;
   onClick: (message: Message) => void;
 }
 
@@ -40,7 +39,6 @@ export const ReadIndicator = ({
   is1to1Conversation = false,
   isLastDeliveredMessage = false,
   showIconOnly = false,
-  isInAsset = false,
   onClick,
 }: ReadIndicatorProps) => {
   const {readReceipts} = useKoSubscribableChildren(message, ['readReceipts']);
@@ -54,7 +52,7 @@ export const ReadIndicator = ({
     const showDeliveredMessage = isLastDeliveredMessage && readReceiptText === '';
 
     return (
-      <span css={ReadIndicatorStyles(showIconOnly, isInAsset)} data-uie-name="status-message-read-receipts">
+      <span css={ReadIndicatorStyles(showIconOnly)} data-uie-name="status-message-read-receipts">
         {showDeliveredMessage && (
           <span data-uie-name="status-message-read-receipt-delivered">{t('conversationMessageDelivered')}</span>
         )}
@@ -75,7 +73,7 @@ export const ReadIndicator = ({
 
   return (
     <button
-      css={ReadIndicatorStyles(showIconOnly, isInAsset)}
+      css={ReadIndicatorStyles(showIconOnly)}
       onClick={() => onClick(message)}
       className="button-reset-default"
       data-uie-name="status-message-read-receipts"

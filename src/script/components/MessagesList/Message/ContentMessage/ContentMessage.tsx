@@ -199,13 +199,6 @@ export const ContentMessageComponent: React.FC<ContentMessageProps> = ({
             onClick={onClickDetails}
             showIconOnly
           />
-
-          {/*<ReadReceiptStatus*/}
-          {/*  message={message}*/}
-          {/*  is1to1Conversation={conversation.is1to1()}*/}
-          {/*  isLastDeliveredMessage={isLastDeliveredMessage}*/}
-          {/*  onClickDetails={onClickDetails}*/}
-          {/*/>*/}
         </MessageHeader>
       )}
       <div className="message-body">
@@ -260,13 +253,6 @@ export const ContentMessageComponent: React.FC<ContentMessageProps> = ({
               onRetry={() => onRetry(message)}
             />
           )}
-
-          <ReadIndicator
-            message={message}
-            is1to1Conversation={conversation.is1to1()}
-            isLastDeliveredMessage={isLastDeliveredMessage}
-            onClick={onClickDetails}
-          />
         </div>
 
         {!isConversationReadonly && isActionMenuVisible && (

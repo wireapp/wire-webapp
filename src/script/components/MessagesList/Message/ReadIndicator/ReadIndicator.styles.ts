@@ -25,15 +25,11 @@ export const ReadReceiptText: CSSObject = {
   verticalAlign: 'bottom',
 };
 
-export const ReadIndicatorStyles = (showIconOnly = false, isInAsset = false): CSSObject => ({
+export const ReadIndicatorStyles = (showIconOnly = false): CSSObject => ({
   color: 'var(--gray-70)',
   fontSize: 'var(--font-size-small)',
   fontWeight: 'var(--font-weight-medium)',
   lineHeight: 'var(--line-height-sm)',
-
-  ...(isInAsset && {
-    marginTop: '8px',
-  }),
 
   svg: {
     width: '10px',
@@ -48,8 +44,13 @@ export const ReadIndicatorStyles = (showIconOnly = false, isInAsset = false): CS
     marginLeft: '8px',
   }),
 
+  '.message-asset &': {
+    marginTop: '8px',
+    marginLeft: '12px',
+  },
+
   ...(!showIconOnly && {
-    opacity: 0,
+    opacity: 1,
     '.message:hover &': {
       opacity: '1',
     },

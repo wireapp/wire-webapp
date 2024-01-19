@@ -43,6 +43,7 @@ import {AssetType} from '../../../../../assets/AssetType';
 import {Button} from '../../../../../entity/message/Button';
 import {CompositeMessage} from '../../../../../entity/message/CompositeMessage';
 import {ContentMessage} from '../../../../../entity/message/ContentMessage';
+import {ReadIndicator} from '../../ReadIndicator';
 
 interface ContentAssetProps {
   asset: Asset;
@@ -95,12 +96,12 @@ const ContentAsset = ({
             </div>
           ))}
 
-          {/*<ReadIndicator*/}
-          {/*  message={message}*/}
-          {/*  is1to1Conversation={is1to1Conversation}*/}
-          {/*  isLastDeliveredMessage={isLastDeliveredMessage}*/}
-          {/*  onClick={onClickDetails}*/}
-          {/*/>*/}
+          <ReadIndicator
+            message={message}
+            is1to1Conversation={is1to1Conversation}
+            isLastDeliveredMessage={isLastDeliveredMessage}
+            onClick={onClickDetails}
+          />
         </>
       );
     case AssetType.FILE:
@@ -109,13 +110,12 @@ const ContentAsset = ({
           <div className={`message-asset ${isObfuscated ? 'ephemeral-asset-expired icon-file' : ''}`}>
             <FileAsset message={message} isFocusable={isMessageFocused} />
 
-            {/*<ReadIndicator*/}
-            {/*  message={message}*/}
-            {/*  is1to1Conversation={is1to1Conversation}*/}
-            {/*  isLastDeliveredMessage={isLastDeliveredMessage}*/}
-            {/*  onClick={onClickDetails}*/}
-            {/*  isInAsset*/}
-            {/*/>*/}
+            <ReadIndicator
+              message={message}
+              is1to1Conversation={is1to1Conversation}
+              isLastDeliveredMessage={isLastDeliveredMessage}
+              onClick={onClickDetails}
+            />
           </div>
         );
       }
@@ -125,13 +125,12 @@ const ContentAsset = ({
           <div className={`message-asset ${isObfuscated ? 'ephemeral-asset-expired' : ''}`}>
             <AudioAsset message={message} isFocusable={isMessageFocused} />
 
-            {/*<ReadIndicator*/}
-            {/*  message={message}*/}
-            {/*  is1to1Conversation={is1to1Conversation}*/}
-            {/*  isLastDeliveredMessage={isLastDeliveredMessage}*/}
-            {/*  onClick={onClickDetails}*/}
-            {/*  isInAsset*/}
-            {/*/>*/}
+            <ReadIndicator
+              message={message}
+              is1to1Conversation={is1to1Conversation}
+              isLastDeliveredMessage={isLastDeliveredMessage}
+              onClick={onClickDetails}
+            />
           </div>
         );
       }
@@ -141,13 +140,12 @@ const ContentAsset = ({
           <div className={`message-asset ${isObfuscated ? 'ephemeral-asset-expired icon-movie' : ''}`}>
             <VideoAsset message={message} isFocusable={isMessageFocused} />
 
-            {/*<ReadIndicator*/}
-            {/*  message={message}*/}
-            {/*  is1to1Conversation={is1to1Conversation}*/}
-            {/*  isLastDeliveredMessage={isLastDeliveredMessage}*/}
-            {/*  onClick={onClickDetails}*/}
-            {/*  isInAsset*/}
-            {/*/>*/}
+            <ReadIndicator
+              message={message}
+              is1to1Conversation={is1to1Conversation}
+              isLastDeliveredMessage={isLastDeliveredMessage}
+              onClick={onClickDetails}
+            />
           </div>
         );
       }
@@ -161,13 +159,12 @@ const ContentAsset = ({
             isFocusable={isMessageFocused}
           />
 
-          {/*<ReadIndicator*/}
-          {/*  message={message}*/}
-          {/*  is1to1Conversation={is1to1Conversation}*/}
-          {/*  isLastDeliveredMessage={isLastDeliveredMessage}*/}
-          {/*  onClick={onClickDetails}*/}
-          {/*  isInAsset*/}
-          {/*/>*/}
+          <ReadIndicator
+            message={message}
+            is1to1Conversation={is1to1Conversation}
+            isLastDeliveredMessage={isLastDeliveredMessage}
+            onClick={onClickDetails}
+          />
         </div>
       );
     case AssetType.LOCATION:
