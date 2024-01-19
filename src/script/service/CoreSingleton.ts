@@ -28,7 +28,6 @@ import {createStorageEngine, DatabaseTypes} from './StoreEngineProvider';
 import {SystemCrypto, wrapSystemCrypto} from './utils/systemCryptoWrapper';
 
 import {Config} from '../Config';
-import {isE2EIEnabled} from '../E2EIdentity';
 
 declare global {
   interface Window {
@@ -38,10 +37,13 @@ declare global {
 
 @singleton()
 export class Core extends Account {
+  public key?: Uint8Array;
+
   constructor(apiClient = container.resolve(APIClient)) {
     const enableCoreCrypto = supportsMLS() || Config.getConfig().FEATURE.USE_CORE_CRYPTO;
     super(apiClient, {
       createStore: async (storeName, key) => {
+        this.key = key;
         return createStorageEngine(storeName, DatabaseTypes.PERMANENT, {
           key: Config.getConfig().FEATURE.ENABLE_ENCRYPTION_AT_REST ? key : undefined,
         });
@@ -60,7 +62,7 @@ export class Core extends Account {
               ? {
                   keyingMaterialUpdateThreshold: Config.getConfig().FEATURE.MLS_CONFIG_KEYING_MATERIAL_UPDATE_THRESHOLD,
                   cipherSuite: Config.getConfig().FEATURE.MLS_CONFIG_DEFAULT_CIPHERSUITE,
-                  useE2EI: isE2EIEnabled(),
+                  useE2EI: Config.getConfig().FEATURE.ENABLE_E2EI,
                 }
               : undefined,
           }

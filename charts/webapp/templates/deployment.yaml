@@ -25,7 +25,7 @@ spec:
     spec:
       containers:
       - name: webapp
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.appVersion }}"
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
         {{- if eq (include "includeSecurityContext" .) "true" }}
         securityContext:
           {{- toYaml .Values.podSecurityContext | nindent 10 }}

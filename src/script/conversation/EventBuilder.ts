@@ -430,11 +430,11 @@ export const EventBuilder = {
   buildGroupCreation(
     conversationEntity: Conversation,
     isTemporaryGuest: boolean = false,
-    timestamp: number,
+    timestamp: number = 0,
   ): GroupCreationEvent {
     const {creator: creatorId} = conversationEntity;
     const selfUserId = conversationEntity.selfUser().id;
-    const isoDate = new Date(timestamp || 0).toISOString();
+    const isoDate = new Date(timestamp).toISOString();
 
     const userIds = conversationEntity.participating_user_ids().slice();
     const createdBySelf = creatorId === selfUserId || isTemporaryGuest;

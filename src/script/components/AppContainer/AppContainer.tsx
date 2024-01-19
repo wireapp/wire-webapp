@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, useEffect} from 'react';
+import {FC, useEffect, useMemo} from 'react';
 
 import {ClientType} from '@wireapp/api-client/lib/client/';
 import {container} from 'tsyringe';
@@ -26,6 +26,7 @@ import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
 import {PrimaryModalComponent} from 'Components/Modals/PrimaryModal/PrimaryModal';
 import {SIGN_OUT_REASON} from 'src/script/auth/SignOutReason';
+import {useAppSoftLock} from 'src/script/hooks/useAppSoftLock';
 import {useSingleInstance} from 'src/script/hooks/useSingleInstance';
 import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
 
@@ -48,7 +49,8 @@ interface AppProps {
 
 export const AppContainer: FC<AppProps> = ({config, clientType}) => {
   setAppLocale();
-  const app = new App(container.resolve(Core), container.resolve(APIClient), config);
+  const app = useMemo(() => new App(container.resolve(Core), container.resolve(APIClient), config), []);
+
   // Publishing application on the global scope for debug and testing purposes.
   window.wire.app = app;
   const mainView = new MainViewModel(app.repository);
@@ -74,6 +76,10 @@ export const AppContainer: FC<AppProps> = ({config, clientType}) => {
     return () => document.removeEventListener('scroll', resetWindowScroll);
   }, []);
 
+  const {repository: repositories} = app;
+
+  const {softLockEnabled} = useAppSoftLock(repositories.calling, repositories.notification);
+
   if (hasOtherInstance) {
     app.redirectToLogin(SIGN_OUT_REASON.MULTIPLE_TABS);
     return null;
@@ -82,7 +88,9 @@ export const AppContainer: FC<AppProps> = ({config, clientType}) => {
   return (
     <>
       <AppLoader init={onProgress => app.initApp(clientType, onProgress)}>
-        {selfUser => <AppMain app={app} selfUser={selfUser} mainView={mainView} />}
+        {selfUser => {
+          return <AppMain app={app} selfUser={selfUser} mainView={mainView} locked={softLockEnabled} />;
+        }}
       </AppLoader>
       <StyledApp themeId={THEME_ID.DEFAULT} css={{backgroundColor: 'unset', height: '100%'}}>
         <PrimaryModalComponent />

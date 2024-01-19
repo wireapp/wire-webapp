@@ -45,7 +45,6 @@ import {CallMessage} from './message/CallMessage';
 import type {ContentMessage} from './message/ContentMessage';
 import type {Message} from './message/Message';
 import {PingMessage} from './message/PingMessage';
-import {SystemMessage} from './message/SystemMessage';
 import type {User} from './User';
 
 import type {Call} from '../calling/Call';
@@ -72,7 +71,7 @@ interface UnreadState {
   pings: PingMessage[];
   selfMentions: ContentMessage[];
   selfReplies: ContentMessage[];
-  systemMessages: SystemMessage[];
+  systemMessages: Message[];
 }
 
 enum TIMESTAMP_TYPE {
@@ -462,7 +461,7 @@ export class Conversation {
 
           const isE2EIVerification = messageEntity.isE2EIVerification();
 
-          if (isMissedCall || isPing || isMessage || isE2EIVerification) {
+          if (isMissedCall || isPing || isMessage) {
             unreadState.allMessages.push(messageEntity as ContentMessage);
           }
 
@@ -476,6 +475,8 @@ export class Conversation {
             unreadState.pings.push(messageEntity);
           } else if (isMessage) {
             unreadState.otherMessages.push(messageEntity as ContentMessage);
+          } else if (isE2EIVerification) {
+            unreadState.systemMessages.push(messageEntity);
           }
 
           unreadState.allEvents.push(messageEntity as ContentMessage);

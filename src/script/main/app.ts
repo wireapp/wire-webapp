@@ -425,7 +425,7 @@ export class App {
       telemetry.timeStep(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
 
       const {members: teamMembers, features: teamFeatures} = await teamRepository.initTeam(selfUser.teamId);
-      const e2eiHandler = await configureE2EI(this.logger, teamFeatures);
+      const e2eiHandler = configureE2EI(this.logger, teamFeatures);
       if (e2eiHandler) {
         /* We first try to do the initial enrollment (if the user has not yet enrolled)
          * We need to enroll before anything else (in particular joining MLS conversations)
@@ -492,10 +492,10 @@ export class App {
       telemetry.timeStep(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
       telemetry.addStatistic(AppInitStatisticsValue.NOTIFICATIONS, totalNotifications, 100);
 
-      eventTrackerRepository.init(propertiesRepository.properties.settings.privacy.telemetry_sharing);
       onProgress(97.5, t('initUpdatedFromNotifications', this.config.BRAND_NAME));
 
       const clientEntities = await clientRepository.updateClientsForSelf();
+      await eventTrackerRepository.init(propertiesRepository.properties.settings.privacy.telemetry_sharing);
 
       onProgress(99);
 

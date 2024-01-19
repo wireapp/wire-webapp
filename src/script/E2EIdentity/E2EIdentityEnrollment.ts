@@ -18,27 +18,28 @@
  */
 
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
+import {KeyAuth} from '@wireapp/core/lib/messagingProtocols/mls';
+import {amplify} from 'amplify';
 import {User} from 'oidc-client-ts';
 import {container} from 'tsyringe';
 
 import {TypedEventEmitter} from '@wireapp/commons';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal, removeCurrentModal} from 'Components/Modals/PrimaryModal';
 import {Core} from 'src/script/service/CoreSingleton';
 import {UserState} from 'src/script/user/UserState';
 import {getCertificateDetails} from 'Util/certificateDetails';
 import {getLogger} from 'Util/Logger';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {formatDelayTime, TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {removeUrlParameters} from 'Util/UrlUtil';
-import {supportsMLS} from 'Util/util';
 
-import {DelayTimerService} from './DelayTimer/DelayTimer';
-import {hasActiveCertificate, isE2EIEnabled, getActiveWireIdentity} from './E2EIdentityVerification';
+import {hasActiveCertificate, getActiveWireIdentity, MLSStatuses, WireIdentity} from './E2EIdentityVerification';
 import {getModalOptions, ModalType} from './Modals';
 import {OIDCService} from './OIDCService';
 import {OIDCServiceStore} from './OIDCService/OIDCServiceStorage';
-
-import {Config} from '../Config';
+import {getSnoozeTime, shouldEnableSoftLock} from './SnoozableTimer/delay';
+import {SnoozableTimer} from './SnoozableTimer/SnoozableTimer';
 
 export enum E2EIHandlerStep {
   UNINITIALIZED = 'uninitialized',
@@ -52,16 +53,16 @@ export enum E2EIHandlerStep {
 interface E2EIHandlerParams {
   discoveryUrl: string;
   gracePeriodInSeconds: number;
-  isFreshMLSSelfClient?: boolean;
 }
 
-type Events = {enrollmentSuccessful: void};
+type Events = {
+  identityUpdated: {enrollmentConfig: EnrollmentConfig; identity?: WireIdentity};
+};
 
-type EnrollmentConfig = {
-  timer: DelayTimerService;
+export type EnrollmentConfig = {
+  timer: SnoozableTimer;
   discoveryUrl: string;
   gracePeriodInMs: number;
-  isFreshMLSSelfClient?: boolean;
 };
 
 const historyTimeMS = 28 * TimeInMillis.DAY; //HT
@@ -71,8 +72,8 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   private readonly core = container.resolve(Core);
   private readonly userState = container.resolve(UserState);
   private config?: EnrollmentConfig;
-  private currentStep: E2EIHandlerStep | null = E2EIHandlerStep.UNINITIALIZED;
-  private oidcService: OIDCService | null = null;
+  private currentStep: E2EIHandlerStep = E2EIHandlerStep.UNINITIALIZED;
+  private oidcService?: OIDCService;
 
   private get coreE2EIService() {
     const e2eiService = this.core.service?.e2eIdentity;
@@ -82,6 +83,14 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     }
 
     return e2eiService;
+  }
+
+  private createOIDCService() {
+    const key = this.core.key;
+    if (!key) {
+      throw new Error('encryption key not set');
+    }
+    return new OIDCService(key);
   }
 
   /**
@@ -103,20 +112,26 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     E2EIHandler.instance = null;
   }
 
-  public async initialize({discoveryUrl, gracePeriodInSeconds, isFreshMLSSelfClient = false}: E2EIHandlerParams) {
-    if (isE2EIEnabled()) {
-      const gracePeriodInMs = gracePeriodInSeconds * TIME_IN_MILLIS.SECOND;
-      this.config = {
-        discoveryUrl,
-        gracePeriodInMs,
-        timer: DelayTimerService.getInstance({
-          gracePeriodInMS: gracePeriodInMs,
-          gracePeriodExpiredCallback: () => null,
-          delayPeriodExpiredCallback: () => null,
-        }),
-        isFreshMLSSelfClient,
-      };
-    }
+  /**
+   * Returns true if the current instance has been configured with team settings params
+   * @returns
+   */
+  public isE2EIEnabled() {
+    return this.currentStep !== E2EIHandlerStep.UNINITIALIZED;
+  }
+
+  public initialize({discoveryUrl, gracePeriodInSeconds}: E2EIHandlerParams) {
+    const gracePeriodInMs = gracePeriodInSeconds * TIME_IN_MILLIS.SECOND;
+    this.config = {
+      discoveryUrl,
+      gracePeriodInMs,
+      timer: new SnoozableTimer({
+        gracePeriodInMS: gracePeriodInMs,
+        onGracePeriodExpired: () => this.startEnrollment(ModalType.ENROLL),
+        onSnoozeExpired: () => this.startEnrollment(ModalType.ENROLL),
+      }),
+    };
+    this.currentStep = E2EIHandlerStep.INITIALIZED;
     return this;
   }
 
@@ -126,14 +141,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       // If the client already has a certificate, we don't need to start the enrollment
       return;
     }
-    this.showE2EINotificationMessage();
-    return new Promise<void>(resolve => {
-      const handleSuccess = () => {
-        this.off('enrollmentSuccessful', handleSuccess);
-        resolve();
-      };
-      this.on('enrollmentSuccessful', handleSuccess);
-    });
+    return this.startEnrollment(ModalType.ENROLL);
   }
 
   public async attemptRenewal(): Promise<void> {
@@ -143,17 +151,15 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       return;
     }
 
-    const {isValid, timeRemainingMS, certificateCreationTime} = getCertificateDetails(identity.certificate);
+    const {timeRemainingMS, certificateCreationTime} = getCertificateDetails(identity.certificate);
 
-    // Check if the certificate is still valid
-    if (!isValid) {
+    if (!this.shouldRefresh(identity)) {
       return;
     }
 
     // Check if an enrollment is already in progress
     if (this.coreE2EIService.isEnrollmentInProgress()) {
-      await this.enroll();
-      return;
+      return this.enroll();
     }
 
     const renewalTimeMS = this.calculateRenewalTime(timeRemainingMS, historyTimeMS, this.config!.gracePeriodInMs);
@@ -163,6 +169,17 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     // Check if it's time to renew the certificate
     if (currentTime >= renewalPromptTime) {
       await this.renewCertificate();
+      this.emit('identityUpdated', {enrollmentConfig: this.config!, identity});
+    }
+  }
+
+  private shouldRefresh(identity: WireIdentity) {
+    const deviceIdentityStatus = identity.status;
+    switch (deviceIdentityStatus) {
+      case MLSStatuses.REVOKED:
+        return false;
+      default:
+        return true;
     }
   }
 
@@ -170,7 +187,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
    * Renew the certificate without user action
    */
   private async renewCertificate(): Promise<void> {
-    this.oidcService = new OIDCService();
+    this.oidcService = this.createOIDCService();
     try {
       // Use the oidc service to get the user data via silent authentication (refresh token)
       const userData = await this.oidcService.handleSilentAuthentication();
@@ -179,23 +196,23 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
         throw new Error('Received no user data from OIDC service');
       }
       // renew without user action
-      await this.enroll(true, userData);
+      await this.enroll(userData);
     } catch (error) {
       this.logger.error('Silent authentication with refresh token failed', error);
 
       // If the silent authentication fails, clear the oidc service progress/data and renew manually
       await this.cleanUp(true);
-      this.showE2EINotificationMessage(ModalType.CERTIFICATE_RENEWAL);
+      await this.startEnrollment(ModalType.CERTIFICATE_RENEWAL);
     }
   }
 
   /**
    * Calculates the date when the E2EI certificate renewal should be prompted.
    *
-   * @param {number} timeRemainingMS - Certificate validity period in days (VP).
-   * @param {number} historyTime - Maximum time messages are stored in days (HT).
-   * @param {number} gracePeriod - Time to activate certificate in days (GP).
-   * @returns {Date} - The date to start prompting for certificate renewal.
+   * @param timeRemainingMS - Certificate validity period in days (VP).
+   * @param historyTime - Maximum time messages are stored in days (HT).
+   * @param gracePeriod - Time to activate certificate in days (GP).
+   * @returns The date to start prompting for certificate renewal.
    */
   private calculateRenewalTime(timeRemainingMS: number, historyTimeMS: number, gracePeriodMS: number) {
     // Calculate a random time between 0 and 1 days
@@ -210,15 +227,15 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     return renewalDate;
   }
 
-  get isE2EIEnabled(): boolean {
-    return supportsMLS() && Config.getConfig().FEATURE.ENABLE_E2EI;
-  }
-
-  private async storeRedirectTargetAndRedirect(targetURL: string): Promise<void> {
+  private async storeRedirectTargetAndRedirect(
+    targetURL: string,
+    keyAuth: KeyAuth,
+    challengeURL: string,
+  ): Promise<void> {
     // store the target url in the persistent oidc service store, since the oidc service will be destroyed after the redirect
     OIDCServiceStore.store.targetURL(targetURL);
-    this.oidcService = new OIDCService();
-    await this.oidcService.authenticate();
+    this.oidcService = this.createOIDCService();
+    await this.oidcService.authenticate(keyAuth, challengeURL);
   }
 
   /**
@@ -228,36 +245,34 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     // Remove the url parameters of the failed enrolment
     removeUrlParameters();
     // Clear the oidc service progress
-    this.oidcService = new OIDCService();
+    this.oidcService = this.createOIDCService();
     await this.oidcService.clearProgress(includeOidcServiceUserData);
     // Clear the e2e identity progress
     this.coreE2EIService.clearAllProgress();
   }
 
-  public async enroll(refreshActiveCertificate = false, userData?: User) {
+  public async enroll(userData?: User) {
     if (!this.config) {
       throw new Error('Trying to enroll for E2EI without initializing the E2EIHandler');
     }
     try {
       // Notify user about E2EI enrolment in progress
       this.currentStep = E2EIHandlerStep.ENROLL;
+      const isCertificateRenewal = await hasActiveCertificate();
       this.showLoadingMessage();
-      let oAuthIdToken: string | undefined;
 
       if (!userData) {
         // If the enrolment is in progress, we need to get the id token from the oidc service, since oauth should have already been completed
         if (this.coreE2EIService.isEnrollmentInProgress()) {
           // The redirect-url which is needed inside the OIDCService is stored in the OIDCServiceStore previously
-          this.oidcService = new OIDCService();
-          const userData = await this.oidcService.handleAuthentication();
+          this.oidcService = this.createOIDCService();
+          userData = await this.oidcService.handleAuthentication();
           if (!userData) {
             throw new Error('Received no user data from OIDC service');
           }
-          oAuthIdToken = userData?.id_token;
         }
-      } else {
-        oAuthIdToken = userData?.id_token;
       }
+      const oAuthIdToken = userData?.id_token;
 
       const displayName = this.userState.self()?.name();
       const handle = this.userState.self()?.username();
@@ -278,7 +293,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
       // Check if the data is a boolean, if not, we need to handle the oauth redirect
       if (typeof data !== 'boolean') {
-        await this.storeRedirectTargetAndRedirect(data.target);
+        await this.storeRedirectTargetAndRedirect(data.challenge.target, data.keyAuth, data.challenge.url);
       }
 
       // Notify user about E2EI enrolment success
@@ -286,10 +301,11 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       setTimeout(removeCurrentModal, 0);
 
       this.currentStep = E2EIHandlerStep.SUCCESS;
-      this.showSuccessMessage();
-
       // clear the oidc service progress/data and successful enrolment
       await this.cleanUp(false);
+
+      await this.showSuccessMessage(isCertificateRenewal);
+      this.emit('identityUpdated', {enrollmentConfig: this.config!});
     } catch (error) {
       this.currentStep = E2EIHandlerStep.ERROR;
 
@@ -298,7 +314,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     }
   }
 
-  private showLoadingMessage(): void {
+  private showLoadingMessage(isCertificateRenewal = false): void {
     if (this.currentStep !== E2EIHandlerStep.ENROLL) {
       return;
     }
@@ -306,21 +322,33 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     const {modalOptions, modalType} = getModalOptions({
       type: ModalType.LOADING,
       hideClose: true,
+      extraParams: {
+        isRenewal: isCertificateRenewal,
+      },
     });
     PrimaryModal.show(modalType, modalOptions);
   }
 
-  private showSuccessMessage(): void {
+  private async showSuccessMessage(isCertificateRenewal = false) {
     if (this.currentStep !== E2EIHandlerStep.SUCCESS) {
       return;
     }
-    const {modalOptions, modalType} = getModalOptions({
-      type: ModalType.SUCCESS,
-      primaryActionFn: () => this.emit('enrollmentSuccessful'),
-      hideSecondary: true,
-      hideClose: false,
+
+    return new Promise<void>(resolve => {
+      const {modalOptions, modalType} = getModalOptions({
+        type: ModalType.SUCCESS,
+        hideClose: false,
+        extraParams: {
+          isRenewal: isCertificateRenewal,
+        },
+        primaryActionFn: resolve,
+        secondaryActionFn: () => {
+          amplify.publish(WebAppEvents.PREFERENCES.MANAGE_DEVICES);
+          resolve();
+        },
+      });
+      PrimaryModal.show(modalType, modalOptions);
     });
-    PrimaryModal.show(modalType, modalOptions);
   }
 
   private async showErrorMessage(): Promise<void> {
@@ -335,81 +363,87 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     // Clear the e2e identity progress
     this.coreE2EIService.clearAllProgress();
 
-    const {modalOptions, modalType} = getModalOptions({
-      type: ModalType.ERROR,
-      hideClose: true,
-      primaryActionFn: () => {
-        this.currentStep = E2EIHandlerStep.INITIALIZED;
-        void this.enroll();
-      },
-      secondaryActionFn: () => {
-        this.showE2EINotificationMessage();
-      },
-    });
+    const disableSnooze = await shouldEnableSoftLock(this.config!);
 
-    PrimaryModal.show(modalType, modalOptions);
-  }
-
-  private shouldShowNotification(): boolean {
-    // If the user has already snoozed the notification, don't show it again until the snooze period has expired
-    if (this.currentStep !== E2EIHandlerStep.UNINITIALIZED && this.currentStep !== E2EIHandlerStep.SNOOZE) {
-      return false;
-    }
-    return true;
-  }
-
-  private initializeEnrollmentTimer(): void {
-    // Only initialize the timer when the it is uninitialized
-    if (this.currentStep === E2EIHandlerStep.UNINITIALIZED) {
-      this.config?.timer.updateParams({
-        gracePeriodInMS: this.config.gracePeriodInMs,
-        gracePeriodExpiredCallback: () => {
-          this.showE2EINotificationMessage();
+    return new Promise<void>(resolve => {
+      const {modalOptions, modalType} = getModalOptions({
+        type: ModalType.ERROR,
+        hideClose: true,
+        hideSecondary: disableSnooze,
+        primaryActionFn: async () => {
+          this.currentStep = E2EIHandlerStep.INITIALIZED;
+          await this.enroll();
+          resolve();
         },
-        delayPeriodExpiredCallback: () => {
-          this.showE2EINotificationMessage();
+        secondaryActionFn: async () => {
+          await this.startEnrollment(ModalType.ENROLL);
+          resolve();
+        },
+        extraParams: {
+          isGracePeriodOver: disableSnooze,
         },
       });
-      this.currentStep = E2EIHandlerStep.INITIALIZED;
-    }
+
+      PrimaryModal.show(modalType, modalOptions);
+    });
   }
 
-  private showModal(modalType: ModalType = ModalType.ENROLL) {
-    // Check if config is defined and timer is available
-    const isSnoozeTimeAvailable = this.config?.timer.isSnoozeTimeAvailable() ?? false;
+  private async showEnrollmentModal(
+    modalType: ModalType.ENROLL | ModalType.CERTIFICATE_RENEWAL,
+    config: EnrollmentConfig,
+  ): Promise<void> {
+    // Show the modal with the provided modal type
+    const disableSnooze = await shouldEnableSoftLock(config);
+    return new Promise<void>(resolve => {
+      const {modalOptions, modalType: determinedModalType} = getModalOptions({
+        hideSecondary: disableSnooze,
+        primaryActionFn: async () => {
+          await this.enroll();
+          resolve();
+        },
+        secondaryActionFn: () => {
+          this.currentStep = E2EIHandlerStep.SNOOZE;
+          this.config?.timer.snooze();
+          this.showSnoozeConfirmationModal();
+          resolve();
+        },
+        extraParams: {
+          isGracePeriodOver: disableSnooze,
+        },
+        type: modalType,
+        hideClose: true,
+      });
+      PrimaryModal.show(determinedModalType, modalOptions);
+    });
+  }
 
+  private showSnoozeConfirmationModal() {
     // Show the modal with the provided modal type
     const {modalOptions, modalType: determinedModalType} = getModalOptions({
-      hideSecondary: !isSnoozeTimeAvailable || !!this.config?.isFreshMLSSelfClient,
-      primaryActionFn: () => this.enroll(),
-      secondaryActionFn: () => {
-        this.currentStep = E2EIHandlerStep.SNOOZE;
-        this.config?.timer.delayPrompt();
-      },
-      type: modalType,
+      type: ModalType.SNOOZE_REMINDER,
       hideClose: true,
+      extraParams: {
+        delayTime: formatDelayTime(getSnoozeTime(this.config!.gracePeriodInMs)),
+      },
     });
     PrimaryModal.show(determinedModalType, modalOptions);
   }
 
-  public showE2EINotificationMessage(modalType: ModalType = ModalType.ENROLL): void {
+  private async startEnrollment(enrollmentType: ModalType.CERTIFICATE_RENEWAL | ModalType.ENROLL): Promise<void> {
     // If the user has already started enrolment, don't show the notification. Instead, show the loading modal
     // This will occur after the redirect from the oauth provider
     if (this.coreE2EIService.isEnrollmentInProgress()) {
-      void this.enroll();
-      return;
+      return this.enroll();
     }
 
-    // Early return if we shouldn't show the notification
-    if (!this.shouldShowNotification()) {
+    if (this.config?.timer.isSnoozableTimerActive()) {
+      // If the user has snoozed, no need to show the notification modal
       return;
     }
-
-    this.initializeEnrollmentTimer();
 
     // If the timer is not active, show the notification modal
-    if (this.config && !this.config.timer.isDelayTimerActive()) {
-      this.showModal(modalType);
+    if (this.config) {
+      return this.showEnrollmentModal(enrollmentType, this.config);
     }
   }
 }

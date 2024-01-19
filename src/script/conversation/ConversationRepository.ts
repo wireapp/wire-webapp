@@ -1735,7 +1735,7 @@ export class ConversationRepository {
     const otherUserId = this.getUserIdOf1to1Conversation(conversation);
 
     if (!otherUserId) {
-      this.logger.error(`Could not find other user id in 1:1 conversation ${conversation.id}`);
+      this.logger.warn(`Could not find other user id in 1:1 conversation ${conversation.id}`);
       return conversation;
     }
 
@@ -1940,7 +1940,23 @@ export class ConversationRepository {
       conversation => conversation.is1to1() && !conversation.connection(),
     );
 
-    for (const conversation of team1To1Conversations) {
+    // Sort conversations so mls 1:1 conversations are initialised first
+    const sortedConverstions = [...team1To1Conversations].sort((a, b) => {
+      const aIsMLSConversation = isMLSConversation(a);
+      const bIsMLSConversation = isMLSConversation(b);
+
+      if (aIsMLSConversation && !bIsMLSConversation) {
+        return -1;
+      }
+
+      if (!aIsMLSConversation && bIsMLSConversation) {
+        return 1;
+      }
+
+      return 0;
+    });
+
+    for (const conversation of sortedConverstions) {
       try {
         await this.init1to1Conversation(conversation);
       } catch (error) {
@@ -2239,7 +2255,7 @@ export class ConversationRepository {
    */
   private async clearConversationContent(conversation: Conversation, timestamp: number) {
     await this.deleteMessages(conversation, timestamp);
-    await this.addCreationMessage(conversation, !!this.userState.self()?.isTemporaryGuest(), timestamp);
+    await this.addCreationMessage(conversation, !!this.userState.self()?.isTemporaryGuest());
     conversation.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.CLEARED);
   }
 
