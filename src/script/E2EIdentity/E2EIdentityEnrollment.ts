@@ -120,7 +120,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     return this.currentStep !== E2EIHandlerStep.UNINITIALIZED;
   }
 
-  public initialize({discoveryUrl, gracePeriodInSeconds}: E2EIHandlerParams) {
+  public async initialize({discoveryUrl, gracePeriodInSeconds}: E2EIHandlerParams) {
     const gracePeriodInMs = gracePeriodInSeconds * TIME_IN_MILLIS.SECOND;
     this.config = {
       discoveryUrl,
@@ -131,6 +131,8 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
         onSnoozeExpired: () => this.startEnrollment(ModalType.ENROLL),
       }),
     };
+
+    await this.coreE2EIService.registerServerCertificates(discoveryUrl);
     this.currentStep = E2EIHandlerStep.INITIALIZED;
     return this;
   }

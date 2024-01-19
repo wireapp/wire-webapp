@@ -4874,9 +4874,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:43.6.0":
-  version: 43.6.0
-  resolution: "@wireapp/core@npm:43.6.0"
+"@wireapp/core@npm:43.7.0":
+  version: 43.7.0
+  resolution: "@wireapp/core@npm:43.7.0"
   dependencies:
     "@wireapp/api-client": ^26.10.0
     "@wireapp/commons": ^5.2.4
@@ -4896,7 +4896,7 @@ __metadata:
     long: ^5.2.0
     uuidjs: 4.2.13
     zod: 3.22.4
-  checksum: 3e2333344241b46253faed7f86be71e8bffc38fd5dd3cb1f02f08aeef0c170d8e12f3c49ec8b64194cff30b0f74c78ca993d391cfd4ad41b80d0490c485751a4
+  checksum: 2f670208c0dd7a1c17b04e91522da9ec1764857b118adbfbc77031eb613ee1e64440e634d8ef54bc5f91d6fb046e78ef88b765b8281bad270266156903a153a6
   languageName: node
   linkType: hard
 
@@ -17568,7 +17568,7 @@ __metadata:
     "@wireapp/avs": 9.6.9
     "@wireapp/commons": 5.2.4
     "@wireapp/copy-config": 2.1.14
-    "@wireapp/core": 43.6.0
+    "@wireapp/core": 43.7.0
     "@wireapp/eslint-config": 3.0.5
     "@wireapp/prettier-config": 0.6.3
     "@wireapp/react-ui-kit": 9.12.6

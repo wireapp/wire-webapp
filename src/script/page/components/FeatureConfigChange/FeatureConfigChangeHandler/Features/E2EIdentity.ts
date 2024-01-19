@@ -26,7 +26,7 @@ import {supportsMLS} from 'Util/util';
 
 import {hasE2EIVerificationExpiration, hasMLSDefaultProtocol} from '../../../../../guards/Protocol';
 
-export const configureE2EI = (logger: Logger, config: FeatureList): undefined | E2EIHandler => {
+export const configureE2EI = (logger: Logger, config: FeatureList): undefined | Promise<E2EIHandler> => {
   const e2eiConfig = config[FEATURE_KEY.MLSE2EID];
   const mlsConfig = config[FEATURE_KEY.MLS];
   // Check if MLS or MLS E2EIdentity feature is existent

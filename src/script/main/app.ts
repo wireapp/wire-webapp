@@ -425,7 +425,7 @@ export class App {
       telemetry.timeStep(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
 
       const {members: teamMembers, features: teamFeatures} = await teamRepository.initTeam(selfUser.teamId);
-      const e2eiHandler = configureE2EI(this.logger, teamFeatures);
+      const e2eiHandler = await configureE2EI(this.logger, teamFeatures);
       if (e2eiHandler) {
         /* We first try to do the initial enrollment (if the user has not yet enrolled)
          * We need to enroll before anything else (in particular joining MLS conversations)
