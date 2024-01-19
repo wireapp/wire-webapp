@@ -64,15 +64,16 @@ jest.mock('./Modals', () => ({
 }));
 
 jest.mock('./E2EIdentityVerification', () => ({
+  ...jest.requireActual('./E2EIdentityVerification'),
   hasActiveCertificate: jest.fn().mockResolvedValue(false),
   getActiveWireIdentity: jest.fn().mockResolvedValue({certificate: 'certificate data'}),
   isE2EIEnabled: jest.fn().mockReturnValue(true),
+  isFreshMLSSelfClient: jest.fn().mockResolvedValue(false),
 }));
 
 // These values should lead to renewalPromptTime being less than the mocked current time
 jest.mock('Util/certificateDetails', () => ({
   getCertificateDetails: jest.fn().mockReturnValue({
-    isValid: true,
     timeRemainingMS: 5 * 24 * 60 * 60 * 1000,
     certificateCreationTime: new Date().getTime() - 10 * 24 * 60 * 60 * 1000,
   }),
@@ -98,8 +99,6 @@ describe('E2EIHandler', () => {
     Config.getConfig = jest.fn().mockReturnValue({FEATURE: {ENABLE_E2EI: true}});
 
     jest.spyOn(PrimaryModal, 'show');
-    (getModalOptions as jest.Mock).mockClear();
-    (getCertificateDetails as jest.Mock).mockClear();
 
     jest
       .spyOn(container.resolve(UserState), 'self')
@@ -109,19 +108,19 @@ describe('E2EIHandler', () => {
   });
 
   it('should create instance with valid params', async () => {
-    const instance = await E2EIHandler.getInstance().initialize(params);
+    const instance = E2EIHandler.getInstance().initialize(params);
     expect(instance).toBeInstanceOf(E2EIHandler);
   });
 
   it('should always return the same instance', async () => {
-    const instance1 = await E2EIHandler.getInstance().initialize(params);
-    const instance2 = await E2EIHandler.getInstance().initialize(params);
+    const instance1 = E2EIHandler.getInstance().initialize(params);
+    const instance2 = E2EIHandler.getInstance().initialize(params);
     expect(instance1).toBe(instance2);
   });
 
   it('should set currentStep to INITIALIZE after initialize is called', async () => {
     const instance = E2EIHandler.getInstance();
-    await instance.initialize(params);
+    instance.initialize(params);
     void instance.attemptEnrollment();
     await wait(1);
     expect(instance['currentStep']).toBe(E2EIHandlerStep.INITIALIZED);
@@ -134,9 +133,9 @@ describe('E2EIHandler', () => {
 
     jest.spyOn(container.resolve(Core), 'enrollE2EI').mockResolvedValueOnce(true);
 
-    const instance = await E2EIHandler.getInstance().initialize(params);
-    await instance['enroll']();
-
+    const instance = E2EIHandler.getInstance().initialize(params);
+    void instance['enroll']();
+    await wait(1);
     expect(instance['currentStep']).toBe(E2EIHandlerStep.SUCCESS);
   });
 
@@ -145,13 +144,14 @@ describe('E2EIHandler', () => {
     jest.spyOn(container.resolve(Core), 'enrollE2EI').mockImplementationOnce(jest.fn(() => Promise.reject()));
     jest.spyOn(container.resolve(UserState), 'self').mockImplementationOnce(() => user);
 
-    const instance = await E2EIHandler.getInstance().initialize(params);
-    await instance['enroll']();
+    const instance = E2EIHandler.getInstance().initialize(params);
+    void instance['enroll']();
+    await wait(1);
     expect(instance['currentStep']).toBe(E2EIHandlerStep.ERROR);
   });
 
   it('should display user info message when initialized', async () => {
-    const instance = await E2EIHandler.getInstance().initialize(params);
+    const instance = E2EIHandler.getInstance().initialize(params);
     void instance.attemptEnrollment();
     await wait(1);
     expect(getModalOptions).toHaveBeenCalledWith(
@@ -168,8 +168,9 @@ describe('E2EIHandler', () => {
   });
 
   it('should display loading message when enroled', async () => {
-    const handler = await E2EIHandler.getInstance().initialize(params);
-    await handler['enroll']();
+    const handler = E2EIHandler.getInstance().initialize(params);
+    void handler['enroll']();
+    await wait(1);
     expect(getModalOptions).toHaveBeenCalledWith(
       expect.objectContaining({
         type: ModalType.LOADING,
@@ -180,9 +181,10 @@ describe('E2EIHandler', () => {
   it('should display success message when enrollment is done', async () => {
     jest.spyOn(container.resolve(Core), 'enrollE2EI').mockResolvedValueOnce(true);
 
-    const handler = await E2EIHandler.getInstance().initialize(params);
+    const handler = E2EIHandler.getInstance().initialize(params);
     handler['showLoadingMessage'] = jest.fn();
-    await handler['enroll']();
+    void handler['enroll']();
+    await wait(1);
     expect(getModalOptions).toHaveBeenCalledWith(
       expect.objectContaining({
         type: ModalType.SUCCESS,
@@ -193,9 +195,10 @@ describe('E2EIHandler', () => {
   it('should display error message when enrollment fails', async () => {
     jest.spyOn(container.resolve(Core), 'enrollE2EI').mockRejectedValueOnce(false);
 
-    const handler = await E2EIHandler.getInstance().initialize(params);
+    const handler = E2EIHandler.getInstance().initialize(params);
     handler['showLoadingMessage'] = jest.fn();
-    await handler['enroll']();
+    void handler['enroll']();
+    await wait(1);
     expect(getModalOptions).toHaveBeenCalledWith(
       expect.objectContaining({
         type: ModalType.ERROR,
@@ -215,7 +218,7 @@ describe('E2EIHandler', () => {
     const renewCertificateSpy = jest.spyOn(handler as any, 'renewCertificate');
 
     // Initialize E2EI
-    await handler.initialize(params);
+    handler.initialize(params);
     void handler.attemptRenewal();
     await wait(1);
 
@@ -235,7 +238,7 @@ describe('E2EIHandler', () => {
     const enrollSpy = jest.spyOn(handler, 'enroll');
 
     // Initialize E2EI
-    await handler.initialize(params);
+    handler.initialize(params);
     void handler.attemptRenewal();
     await wait(1);
 
@@ -258,15 +261,16 @@ describe('E2EIHandler', () => {
 
     // Mock getCertificateDetails to return a certificate with enough time remaining
     (getCertificateDetails as jest.Mock).mockReturnValue({
-      isValid: true,
       timeRemainingMS,
       certificateCreationTime: new Date().getTime() - 10 * TimeInMillis.DAY,
     });
 
+    jest.spyOn(handler as any, 'shouldRefresh').mockReturnValue(true);
+
     const renewCertificateSpy = jest.spyOn(handler as any, 'renewCertificate');
 
     // Initialize E2EI
-    await handler.initialize(params);
+    handler.initialize(params);
     void handler.attemptRenewal();
     await wait(1);
 
@@ -274,22 +278,22 @@ describe('E2EIHandler', () => {
     expect(renewCertificateSpy).not.toHaveBeenCalled();
   });
 
-  it('call showE2EINotificationMessage when no active certificate is found', async () => {
+  it('call startEnrollment when no active certificate is found', async () => {
     const handler = E2EIHandler.getInstance();
 
     // Set active certificate to be false
     (hasActiveCertificate as jest.Mock).mockResolvedValue(false);
 
     const renewCertificateSpy = jest.spyOn(handler as any, 'renewCertificate');
-    const showE2EINotificationMessageSpy = jest.spyOn(handler as any, 'showE2EINotificationMessage');
+    const startEnrollmentSpy = jest.spyOn(handler as any, 'startEnrollment');
 
     // Initialize E2EI
-    await handler.initialize(params);
+    handler.initialize(params);
     void handler.attemptEnrollment();
     await wait(1);
 
     expect(renewCertificateSpy).not.toHaveBeenCalled();
-    expect(showE2EINotificationMessageSpy).toHaveBeenCalled();
+    expect(startEnrollmentSpy).toHaveBeenCalled();
   });
 
   it('for invalid certificate user can not get another certificate until deleting a client', async () => {
@@ -299,23 +303,24 @@ describe('E2EIHandler', () => {
     (hasActiveCertificate as jest.Mock).mockResolvedValue(true);
 
     const renewCertificateSpy = jest.spyOn(handler as any, 'renewCertificate');
-    const showE2EINotificationMessageSpy = jest.spyOn(handler as any, 'showE2EINotificationMessage');
+    const startEnrollmentSpy = jest.spyOn(handler as any, 'startEnrollment');
 
     const timeRemainingMS = 5 * TimeInMillis.DAY; // 5 days remaining
 
     // Mock getCertificateDetails to return a certificate with enough time remaining
     (getCertificateDetails as jest.Mock).mockReturnValue({
-      isValid: false,
       timeRemainingMS,
       certificateCreationTime: new Date().getTime() - 10 * TimeInMillis.DAY,
     });
 
+    jest.spyOn(handler as any, 'shouldRefresh').mockReturnValue(false);
+
     // Initialize E2EI
-    await handler.initialize(params);
+    handler.initialize(params);
     void handler.attemptRenewal();
     await wait(1);
 
     expect(renewCertificateSpy).not.toHaveBeenCalled();
-    expect(showE2EINotificationMessageSpy).not.toHaveBeenCalled();
+    expect(startEnrollmentSpy).not.toHaveBeenCalled();
   });
 });

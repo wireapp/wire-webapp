@@ -2255,7 +2255,7 @@ export class ConversationRepository {
    */
   private async clearConversationContent(conversation: Conversation, timestamp: number) {
     await this.deleteMessages(conversation, timestamp);
-    await this.addCreationMessage(conversation, !!this.userState.self()?.isTemporaryGuest(), timestamp);
+    await this.addCreationMessage(conversation, !!this.userState.self()?.isTemporaryGuest());
     conversation.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.CLEARED);
   }
 
@@ -2810,11 +2810,9 @@ export class ConversationRepository {
 
       const isExpectedType = typesInSelfConversation.includes(type);
       if (!isExpectedType) {
-        return Promise.reject(
-          new ConversationError(
-            ConversationError.TYPE.WRONG_CONVERSATION,
-            ConversationError.MESSAGE.WRONG_CONVERSATION,
-          ),
+        throw new ConversationError(
+          ConversationError.TYPE.WRONG_CONVERSATION,
+          ConversationError.MESSAGE.WRONG_CONVERSATION,
         );
       }
     }

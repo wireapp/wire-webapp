@@ -28,7 +28,6 @@ import {createStorageEngine, DatabaseTypes} from './StoreEngineProvider';
 import {SystemCrypto, wrapSystemCrypto} from './utils/systemCryptoWrapper';
 
 import {Config} from '../Config';
-import {isE2EIEnabled} from '../E2EIdentity';
 
 declare global {
   interface Window {
@@ -63,7 +62,7 @@ export class Core extends Account {
               ? {
                   keyingMaterialUpdateThreshold: Config.getConfig().FEATURE.MLS_CONFIG_KEYING_MATERIAL_UPDATE_THRESHOLD,
                   cipherSuite: Config.getConfig().FEATURE.MLS_CONFIG_DEFAULT_CIPHERSUITE,
-                  useE2EI: isE2EIEnabled(),
+                  useE2EI: Config.getConfig().FEATURE.ENABLE_E2EI,
                 }
               : undefined,
           }

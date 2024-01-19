@@ -21,67 +21,53 @@ import logdown from 'logdown';
 
 import {util} from '@wireapp/core';
 
-import {getDelayTime} from './delay';
-import {DelayTimerStore} from './DelayTimerStorage';
+import {getSnoozeTime} from './delay';
+import {SnoozableTimerStore} from './SnoozableTimerStorage';
 
 const {TaskScheduler} = util;
 
 interface CreateGracePeriodTimerParams {
   gracePeriodInMS: number;
-  gracePeriodExpiredCallback: () => void;
-  delayPeriodExpiredCallback: () => void;
+  /**
+   * called when the grace period is over. The grace period is the time during which the user can keep snoozing the enrollment.
+   * Once the grace period is over, the user will be forced to enroll.
+   */
+  onGracePeriodExpired: () => void;
+  /**
+   * as long as the grace period is not over, the user can snooze the enrollment. This callback is called when the user snoozes the enrollment.
+   */
+  onSnoozeExpired: () => void;
 }
 
-class DelayTimerService {
-  private static instance: DelayTimerService | null = null;
+export class SnoozableTimer {
   private gracePeriodInMS: number;
-  private gracePeriodExpiredCallback: () => void;
-  private delayPeriodExpiredCallback: () => void;
+  private onGracePeriodExpired: () => void;
+  private onSnoozeExpired: () => void;
   private readonly logger = logdown('@wireapp/core/DelayTimer');
   private delayPeriodTimerKey: string = 'E2EIdentity_DelayTimer';
   private gracePeriodTimerKey: string = 'E2EIdentity_GracePeriodTimer';
 
-  private constructor({
+  constructor({
     gracePeriodInMS,
-    gracePeriodExpiredCallback,
-    delayPeriodExpiredCallback,
+    onGracePeriodExpired: onGracePeriodExpired,
+    onSnoozeExpired,
   }: CreateGracePeriodTimerParams) {
     this.gracePeriodInMS = gracePeriodInMS;
-    this.gracePeriodExpiredCallback = gracePeriodExpiredCallback;
-    this.delayPeriodExpiredCallback = delayPeriodExpiredCallback;
+    this.onGracePeriodExpired = onGracePeriodExpired;
+    this.onSnoozeExpired = onSnoozeExpired;
     this.initialize();
-  }
-
-  /**
-   * Get the singleton instance of GracePeriodTimer or create a new one
-   * For the first time, params are required to create the instance
-   * @param params The params to create the grace period timer
-   * @returns The singleton instance of GracePeriodTimer
-   */
-  public static getInstance(params?: CreateGracePeriodTimerParams) {
-    if (!DelayTimerService.instance) {
-      if (!params) {
-        throw new Error('DelayTimerService is not initialized. Please call getInstance with params.');
-      }
-      DelayTimerService.instance = new DelayTimerService(params);
-    }
-    return DelayTimerService.instance;
   }
 
   /**
    * @param CreateGracePeriodTimerParams The params to create the grace period timer
    */
-  public updateParams({
-    gracePeriodInMS,
-    gracePeriodExpiredCallback,
-    delayPeriodExpiredCallback,
-  }: CreateGracePeriodTimerParams) {
-    DelayTimerStore.clear.all();
+  public updateParams({gracePeriodInMS, onGracePeriodExpired, onSnoozeExpired}: CreateGracePeriodTimerParams) {
+    SnoozableTimerStore.clear.all();
     this.clearGracePeriodTimer();
-    this.clearDelayPeriodTimer();
+    this.clearSnoozePeriodTimer();
     this.gracePeriodInMS = gracePeriodInMS;
-    this.gracePeriodExpiredCallback = gracePeriodExpiredCallback;
-    this.delayPeriodExpiredCallback = delayPeriodExpiredCallback;
+    this.onGracePeriodExpired = onGracePeriodExpired;
+    this.onSnoozeExpired = onSnoozeExpired;
     this.initialize();
   }
 
@@ -94,7 +80,7 @@ class DelayTimerService {
     }
 
     // Check if grace period has changed
-    if (DelayTimerStore.get.gracePeriod() !== this.gracePeriodInMS) {
+    if (SnoozableTimerStore.get.gracePeriod() !== this.gracePeriodInMS) {
       // Check if grace period is less than the time elapsed since the last prompt
       if (this.gracePeriodInMS < this.getElapsedGracePeriod()) {
         return this.exit(
@@ -105,44 +91,44 @@ class DelayTimerService {
     }
 
     // Load saved data from local storage
-    if (DelayTimerStore.get.firingDate()) {
+    if (SnoozableTimerStore.get.firingDate()) {
       const currentTime = Date.now();
-      if (DelayTimerStore.get.firingDate() <= currentTime) {
+      if (SnoozableTimerStore.get.firingDate() <= currentTime) {
         return this.exit('Grace period is already over. No more delays are allowed.');
       }
     } else {
       const firingDate = Date.now() + this.gracePeriodInMS;
-      DelayTimerStore.store.firingDate(firingDate);
-      DelayTimerStore.store.gracePeriod(this.gracePeriodInMS);
+      SnoozableTimerStore.store.firingDate(firingDate);
+      SnoozableTimerStore.store.gracePeriod(this.gracePeriodInMS);
     }
 
     // Start / restart the grace period timer
-    this.startGracePeriod(DelayTimerStore.get.firingDate());
+    this.startGracePeriod(SnoozableTimerStore.get.firingDate());
 
     // this will start the delay period timer if it was active before
-    this.continueDelayPeriodTimer();
+    this.continueSnoozePeriodTimer();
   }
 
   /**
-   * Prompt the user to delay the enrollment
+   * Will start a snooze period if the conditions are met
    */
-  public delayPrompt() {
-    if (this.isDelayTimerActive()) {
+  public snooze() {
+    if (this.isSnoozableTimerActive()) {
       return;
     }
     if (!this.isSnoozeTimeAvailable()) {
       return this.exit('No more delays are allowed.');
     }
-    const delayTimeInMS = getDelayTime(this.gracePeriodInMS);
+    const delayTimeInMS = getSnoozeTime(this.gracePeriodInMS);
     if (delayTimeInMS <= 0) {
       return this.exit('Delay period is 0. No more delays are allowed.');
     }
 
-    if (DelayTimerStore.get.firingDate() <= Date.now()) {
+    if (SnoozableTimerStore.get.firingDate() <= Date.now()) {
       return this.exit('Grace period is already over. No more delays are allowed.');
     }
 
-    this.startDelayPeriod(Date.now() + delayTimeInMS);
+    this.startSnoozePeriod(Date.now() + delayTimeInMS);
   }
 
   /**
@@ -150,7 +136,7 @@ class DelayTimerService {
    */
   private updateGracePeriod() {
     // Store the new grace period
-    DelayTimerStore.store.gracePeriod(this.gracePeriodInMS);
+    SnoozableTimerStore.store.gracePeriod(this.gracePeriodInMS);
     const elapsedGracePeriod = this.getElapsedGracePeriod();
 
     // Check if grace period is already over
@@ -164,7 +150,7 @@ class DelayTimerService {
     // Calculate the new end time
     const firingDate = startTime + this.gracePeriodInMS;
     // Store the new end time
-    DelayTimerStore.store.firingDate(firingDate);
+    SnoozableTimerStore.store.firingDate(firingDate);
 
     this.startGracePeriod(firingDate);
   }
@@ -176,10 +162,10 @@ class DelayTimerService {
    */
   private exit(exitMessage: string) {
     this.logger.info(exitMessage);
-    this.clearDelayPeriodTimer();
+    this.clearSnoozePeriodTimer();
     this.clearGracePeriodTimer();
-    DelayTimerStore.clear.all();
-    return this.gracePeriodExpiredCallback();
+    SnoozableTimerStore.clear.all();
+    return this.onGracePeriodExpired();
   }
 
   /**
@@ -212,12 +198,12 @@ class DelayTimerService {
    * Start the delay period timer and store the delay time
    * @param delayTimeInMS The delay time in ms
    */
-  private startDelayPeriod(firingDate?: number) {
-    this.clearDelayPeriodTimer();
+  private startSnoozePeriod(firingDate?: number) {
+    this.clearSnoozePeriodTimer();
 
     const task = () => {
-      this.logger.info('Delay time is over.');
-      return this.delayPeriodExpiredCallback();
+      this.logger.info('Snooze time is over.');
+      return this.onSnoozeExpired();
     };
 
     if (TaskScheduler.hasActiveTask(this.delayPeriodTimerKey)) {
@@ -245,12 +231,12 @@ class DelayTimerService {
   /**
    * Clear the current delay period timer
    */
-  private clearDelayPeriodTimer() {
+  private clearSnoozePeriodTimer() {
     TaskScheduler.cancelTask(this.delayPeriodTimerKey);
   }
 
-  private continueDelayPeriodTimer() {
-    this.startDelayPeriod();
+  private continueSnoozePeriodTimer() {
+    this.startSnoozePeriod();
   }
 
   /**
@@ -258,30 +244,18 @@ class DelayTimerService {
    * @returns The time elapsed since the last prompt in ms
    */
   private getElapsedGracePeriod() {
-    return DelayTimerStore.get.firingDate()
-      ? Date.now() - (DelayTimerStore.get.firingDate() - this.gracePeriodInMS)
+    return SnoozableTimerStore.get.firingDate()
+      ? Date.now() - (SnoozableTimerStore.get.firingDate() - this.gracePeriodInMS)
       : 0;
   }
 
-  /**
-   * Reset the instance
-   */
-  public resetInstance() {
-    DelayTimerStore.clear.all();
-    this.clearGracePeriodTimer();
-    this.clearDelayPeriodTimer();
-    DelayTimerService.instance = null;
-  }
-
-  public isDelayTimerActive() {
+  public isSnoozableTimerActive() {
     return TaskScheduler.hasActiveTask(this.delayPeriodTimerKey);
   }
 
   public isSnoozeTimeAvailable() {
-    const remainingTime = DelayTimerStore.get.firingDate() - Date.now();
-    const delayTime = getDelayTime(remainingTime);
+    const remainingTime = SnoozableTimerStore.get.firingDate() - Date.now();
+    const delayTime = getSnoozeTime(remainingTime);
     return remainingTime - delayTime > 0;
   }
 }
-
-export {DelayTimerService};

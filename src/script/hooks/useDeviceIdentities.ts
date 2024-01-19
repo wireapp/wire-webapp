@@ -21,13 +21,13 @@ import {useCallback, useEffect, useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {E2EIHandler, getUsersIdentities, isE2EIEnabled, MLSStatuses, WireIdentity} from '../E2EIdentity';
+import {E2EIHandler, getUsersIdentities, MLSStatuses, WireIdentity} from '../E2EIdentity';
 
 export const useUserIdentity = (userId: QualifiedId, groupId?: string, updateAfterEnrollment?: boolean) => {
   const [deviceIdentities, setDeviceIdentities] = useState<WireIdentity[] | undefined>();
 
   const refreshDeviceIdentities = useCallback(async () => {
-    if (!isE2EIEnabled() || !groupId) {
+    if (!E2EIHandler.getInstance().isE2EIEnabled() || !groupId) {
       return;
     }
     const userIdentities = await getUsersIdentities(groupId, [userId]);
@@ -42,9 +42,9 @@ export const useUserIdentity = (userId: QualifiedId, groupId?: string, updateAft
     if (!updateAfterEnrollment) {
       return () => {};
     }
-    E2EIHandler.getInstance().on('enrollmentSuccessful', refreshDeviceIdentities);
+    E2EIHandler.getInstance().on('identityUpdated', refreshDeviceIdentities);
     return () => {
-      E2EIHandler.getInstance().off('enrollmentSuccessful', refreshDeviceIdentities);
+      E2EIHandler.getInstance().off('identityUpdated', refreshDeviceIdentities);
     };
   }, [refreshDeviceIdentities, updateAfterEnrollment]);
 

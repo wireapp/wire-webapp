@@ -307,3 +307,18 @@ export const weeksPassedSinceDate = (date: Date): number => {
 
   return Math.max(1, Math.ceil(diffInWeeks));
 };
+
+export const formatDelayTime = (delayTimeInMS: number): string => {
+  if (delayTimeInMS >= TIME_IN_MILLIS.WEEK) {
+    const weeks = Math.floor(delayTimeInMS / TIME_IN_MILLIS.WEEK);
+    return `${weeks} week${weeks > 1 ? 's' : ''}`;
+  } else if (delayTimeInMS >= TIME_IN_MILLIS.DAY) {
+    const days = Math.floor(delayTimeInMS / TIME_IN_MILLIS.DAY);
+    return `${days} day${days > 1 ? 's' : ''}`;
+  } else if (delayTimeInMS >= TIME_IN_MILLIS.HOUR) {
+    const hours = Math.floor(delayTimeInMS / TIME_IN_MILLIS.HOUR);
+    return `${hours} hour${hours > 1 ? 's' : ''}`;
+  }
+  const minutes = Math.floor(delayTimeInMS / TIME_IN_MILLIS.MINUTE);
+  return `${minutes} minute${minutes > 1 ? 's' : ''}`;
+};

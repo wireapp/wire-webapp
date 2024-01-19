@@ -17,6 +17,9 @@
  *
  */
 
+import {EnrollmentConfig} from '../E2EIdentityEnrollment';
+import {MLSStatuses, WireIdentity, isFreshMLSSelfClient} from '../E2EIdentityVerification';
+
 /* eslint-disable no-magic-numbers */
 
 enum TIME_IN_MILLIS {
@@ -35,7 +38,11 @@ export const ONE_HOUR = TIME_IN_MILLIS.HOUR;
 export const FOUR_HOURS = TIME_IN_MILLIS.HOUR * 4;
 export const ONE_DAY = TIME_IN_MILLIS.DAY;
 
-export function getDelayTime(gracePeriodInMs: number): number {
+/**
+ * Will return a suitable snooze time based on the grace period
+ * @param gracePeriodInMs - the full grace period length in milliseconds
+ */
+export function getSnoozeTime(gracePeriodInMs: number): number {
   if (gracePeriodInMs > 0) {
     if (gracePeriodInMs <= FIFTEEN_MINUTES) {
       return Math.min(FIVE_MINUTES, gracePeriodInMs);
@@ -49,4 +56,21 @@ export function getDelayTime(gracePeriodInMs: number): number {
     return Math.min(ONE_DAY, gracePeriodInMs);
   }
   return 0;
+}
+
+export async function shouldEnableSoftLock(
+  enrollmentConfig: EnrollmentConfig,
+  identity?: WireIdentity,
+): Promise<boolean> {
+  if (await isFreshMLSSelfClient()) {
+    return true;
+  }
+  if (!enrollmentConfig.timer.isSnoozeTimeAvailable()) {
+    // The user has used up the entire grace period or has a fresh new client, he now needs to enroll
+    return true;
+  }
+  if (!identity?.certificate) {
+    return false;
+  }
+  return [MLSStatuses.EXPIRED, MLSStatuses.REVOKED].includes(identity.status);
 }
