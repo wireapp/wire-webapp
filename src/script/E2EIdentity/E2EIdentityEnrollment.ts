@@ -74,6 +74,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   private config?: EnrollmentConfig;
   private currentStep: E2EIHandlerStep = E2EIHandlerStep.UNINITIALIZED;
   private oidcService?: OIDCService;
+  private isEnrollmentInProgress = false;
 
   private get coreE2EIService() {
     const e2eiService = this.core.service?.e2eIdentity;
@@ -189,8 +190,8 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
    * Renew the certificate without user action
    */
   private async renewCertificate(): Promise<void> {
-    this.oidcService = this.createOIDCService();
     try {
+      this.oidcService = this.createOIDCService();
       // Use the oidc service to get the user data via silent authentication (refresh token)
       const userData = await this.oidcService.handleSilentAuthentication();
 
@@ -234,10 +235,14 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     keyAuth: KeyAuth,
     challengeURL: string,
   ): Promise<void> {
-    // store the target url in the persistent oidc service store, since the oidc service will be destroyed after the redirect
-    OIDCServiceStore.store.targetURL(targetURL);
-    this.oidcService = this.createOIDCService();
-    await this.oidcService.authenticate(keyAuth, challengeURL);
+    try {
+      // store the target url in the persistent oidc service store, since the oidc service will be destroyed after the redirect
+      OIDCServiceStore.store.targetURL(targetURL);
+      this.oidcService = this.createOIDCService();
+      await this.oidcService.authenticate(keyAuth, challengeURL);
+    } catch (error) {
+      this.logger.error('Failed to store redirect target and redirect', error);
+    }
   }
 
   /**
@@ -257,6 +262,10 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     if (!this.config) {
       throw new Error('Trying to enroll for E2EI without initializing the E2EIHandler');
     }
+    if (this.isEnrollmentInProgress) {
+      return;
+    }
+    this.isEnrollmentInProgress = true;
     try {
       // Notify user about E2EI enrolment in progress
       this.currentStep = E2EIHandlerStep.ENROLL;
@@ -313,6 +322,8 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
       setTimeout(removeCurrentModal, 0);
       await this.showErrorMessage();
+    } finally {
+      this.isEnrollmentInProgress = false;
     }
   }
 

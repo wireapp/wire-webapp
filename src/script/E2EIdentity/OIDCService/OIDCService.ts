@@ -42,14 +42,11 @@ export class OIDCService {
 
     // Extract the clientId from the targetURL
     const idpUrl = new URL(targetURL);
-    // This clientId will be used to create the OIDCService, it is mocked for now
-    const idpClientId = 'wireapp';
-    //const idpClientId = idpUrl.searchParams.get('clientId');
+    // This clientId will be used to create the OIDCService. It needs to be attached to the targetURL
+    const idpClientId = idpUrl.searchParams.get('client_id');
     if (!idpClientId) {
       throw new Error('No clientId provided by the targetUrl');
     }
-    // This secret is only used for testing and needs to be removed in the future
-    const idpClientSecret = 'dUpVSGx2dVdFdGQ0dmsxWGhDalQ0SldU';
 
     // Build the proxy url and redirect uri
     const currentOrigin = location.origin;
@@ -63,11 +60,11 @@ export class OIDCService {
       redirect_uri: redirectUri,
       response_type: 'code',
       scope: 'openid profile email offline_access',
-      client_secret: idpClientSecret,
       extraQueryParams: {
         access_type: 'offline',
         prompt: 'consent',
       },
+      automaticSilentRenew: false,
       stateStore: new WebStorageStateStore({store: window.sessionStorage}),
       userStore: new WebStorageStateStore({
         store: new EncryptedStorage(secretKey),
