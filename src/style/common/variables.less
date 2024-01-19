@@ -233,13 +233,14 @@ body {
 // ----------------------------------------------------------------------------
 // Conversation
 // ----------------------------------------------------------------------------
-@conversation-max-width: 800px;
+@conversation-max-width: 100%;
 
 @conversation-message-max-width: 640px;
 @conversation-message-sender-width: 64px;
 
 body {
   --conversation-message-sender-width: @conversation-message-sender-width;
+  --conversation-message-asset-width: 800px;
 
   --conversation-message-timestamp-width: 140px;
   @media (max-width: @screen-md-min) {
