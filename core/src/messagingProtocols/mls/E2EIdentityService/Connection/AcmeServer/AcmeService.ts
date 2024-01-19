@@ -48,6 +48,7 @@ import {
   OidcChallengeResponseSchema,
   GetCertificateResponseData,
   GetCertificateResponseSchema,
+  LocalCertificateRootResponseSchema,
 } from './schema';
 
 import {AcmeChallenge, AcmeDirectory} from '../../E2EIService.types';
@@ -57,9 +58,15 @@ export class AcmeService {
   private readonly axiosInstance: AxiosInstance = axios.create();
   private readonly url = {
     DIRECTORY: '/directory',
+    ROOTS: '/roots.pem',
   };
 
   constructor(private discoveryUrl: string) {}
+
+  private get acmeBaseUrl() {
+    const {origin} = new URL(this.discoveryUrl);
+    return origin;
+  }
 
   // ############ Internal Functions ############
 
@@ -112,6 +119,12 @@ export class AcmeService {
       this.logger.error('Error while receiving Directory', e);
       return undefined;
     }
+  }
+
+  public async getLocalCertificateRoot(): Promise<string> {
+    const {data} = await this.axiosInstance.get(`${this.acmeBaseUrl}${this.url.ROOTS}`);
+    const localCertificateRoot = LocalCertificateRootResponseSchema.parse(data);
+    return localCertificateRoot;
   }
 
   public async getInitialNonce(url: AcmeDirectory['newNonce']): GetInitialNonceReturnValue {

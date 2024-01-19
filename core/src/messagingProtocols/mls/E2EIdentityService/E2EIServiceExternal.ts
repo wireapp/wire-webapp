@@ -22,11 +22,13 @@ import {Decoder} from 'bazinga64';
 
 import {Ciphersuite, CoreCrypto, E2eiConversationState, WireIdentity, DeviceStatus} from '@wireapp/core-crypto';
 
+import {AcmeService} from './Connection';
 import {getE2EIClientId} from './Helper';
 import {E2EIStorage} from './Storage/E2EIStorage';
 
 import {ClientService} from '../../../client';
 import {parseFullQualifiedClientId} from '../../../util/fullyQualifiedClientIdUtils';
+import {LocalStorageStore} from '../../../util/LocalStorageStore';
 
 export type DeviceIdentity = Omit<WireIdentity, 'free' | 'status'> & {status?: DeviceStatus; deviceId: string};
 
@@ -124,5 +126,45 @@ export class E2EIServiceExternal {
       return true;
     }
     return typeof client.mls_public_keys.ed25519 !== 'string' || client.mls_public_keys.ed25519.length === 0;
+  }
+
+  private async registerLocalCertificateRoot(connection: AcmeService): Promise<string> {
+    const localCertificateRoot = await connection.getLocalCertificateRoot();
+    await this.coreCryptoClient.e2eiRegisterAcmeCA(localCertificateRoot);
+
+    return localCertificateRoot;
+  }
+
+  /**
+   * This function is used to register different server certificates in CoreCrypto.
+   *
+   * 1. Root Certificate: This is the root certificate of the server.
+   * - It must only be registered once.
+   * - It must be the first certificate to be registered. Nothing else will work
+   *
+   * 2. Intermediate Certificate: This is the intermediate certificate of the server. It must be updated every 24 hours.
+   * - It must be registered after the root certificate.
+   * - It must be updated every 24 hours.
+   *
+   * Both must be registered before the first enrollment.
+   *
+   * @param discoveryUrl
+   */
+  public async registerServerCertificates(discoveryUrl: string): Promise<void> {
+    const ROOT_CA_KEY = 'e2ei_root-registered';
+    const store = LocalStorageStore(ROOT_CA_KEY);
+    const acmeService = new AcmeService(discoveryUrl);
+
+    // Register root certificate if not already registered
+    if (!store.has(ROOT_CA_KEY)) {
+      try {
+        await this.registerLocalCertificateRoot(acmeService);
+        store.add(ROOT_CA_KEY, 'true');
+      } catch (error) {
+        console.error('Failed to register root certificate', error);
+      }
+    }
+
+    // Register intermediate certificate and update it every 24 hours
   }
 }

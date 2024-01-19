@@ -41,6 +41,9 @@ export const DirectoryResponseSchema = z.object({
 });
 export type DirectoryResponseData = z.infer<typeof DirectoryResponseSchema>;
 
+export const LocalCertificateRootResponseSchema = nonOptionalString;
+export type LocalCertificateRootResonseData = z.infer<typeof LocalCertificateRootResponseSchema>;
+
 export const NewAccountResponseSchema = z.object({
   status: nonOptionalString,
   orders: nonOptionalUrl,
