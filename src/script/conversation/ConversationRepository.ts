@@ -1464,6 +1464,14 @@ export class ConversationRepository {
 
     ConversationMapper.updateProperties(mlsConversation, updates);
 
+    const wasProteus1to1ActiveConversation = proteusConversations.some(conversation =>
+      this.conversationState.isActiveConversation(conversation),
+    );
+
+    const wasProteusConnectionIncomingRequest = proteusConversations.some(
+      conversation => conversation.type() === CONVERSATION_TYPE.CONNECT,
+    );
+
     await Promise.allSettled(
       proteusConversations.map(async proteusConversation => {
         this.logger.info(`Deleting proteus 1:1 conversation ${proteusConversation.id}`);
@@ -1472,9 +1480,11 @@ export class ConversationRepository {
       }),
     );
 
-    const wasProteus1to1ActiveConversation =
-      !!proteusConversations &&
-      proteusConversations.some(conversation => this.conversationState.isActiveConversation(conversation));
+    // Because of the current architecture and the fact that we present a connection request as a conversation of connect type,
+    // we don't want to inject conversation migrated event if the only proteus 1:1 conversation we had was a connection request.
+    if (!wasProteusConnectionIncomingRequest) {
+      await this.inject1to1MigratedToMLS(mlsConversation);
+    }
 
     const isMLS1to1ActiveConversation = this.conversationState.isActiveConversation(mlsConversation);
 
@@ -2385,6 +2395,11 @@ export class ConversationRepository {
     return undefined;
   }
 
+  private readonly inject1to1MigratedToMLS = async (conversation: Conversation) => {
+    const protocolUpdateEvent = EventBuilder.build1to1MigratedToMLS(conversation);
+    await this.eventRepository.injectEvent(protocolUpdateEvent);
+  };
+
   /**
    * Update conversation protocol
    * This will update the protocol of the conversation and refetch the conversation to get all new fields (groupId, ciphersuite, epoch and new protocol)
@@ -3058,6 +3073,7 @@ export class ConversationRepository {
       case ClientEvent.CONVERSATION.JOINED_AFTER_MLS_MIGRATION:
       case ClientEvent.CONVERSATION.MLS_MIGRATION_ONGOING_CALL:
       case ClientEvent.CONVERSATION.MLS_CONVERSATION_RECOVERED:
+      case ClientEvent.CONVERSATION.ONE2ONE_MIGRATED_TO_MLS:
       case ClientEvent.CONVERSATION.UNABLE_TO_DECRYPT:
       case ClientEvent.CONVERSATION.VERIFICATION:
       case ClientEvent.CONVERSATION.E2EI_VERIFICATION:
