@@ -22,12 +22,11 @@ import {renderHook, waitFor} from '@testing-library/react';
 import {useAppSoftLock} from './useAppSoftLock';
 
 import {CallingRepository} from '../calling/CallingRepository';
-import {E2EIHandler, isE2EIEnabled} from '../E2EIdentity';
+import {E2EIHandler} from '../E2EIdentity';
 import {isFreshMLSSelfClient} from '../E2EIdentity/E2EIdentityVerification';
 import {NotificationRepository} from '../notification/NotificationRepository';
 
 const isFreshMLSSelfClientMock = isFreshMLSSelfClient as jest.MockedFn<typeof isFreshMLSSelfClient>;
-const isE2EIEnabledMock = isE2EIEnabled as jest.MockedFn<typeof isE2EIEnabled>;
 const E2EIHandlerMock = E2EIHandler as jest.Mocked<typeof E2EIHandler>;
 
 jest.mock('../E2EIdentity/E2EIdentityVerification', () => ({
@@ -35,7 +34,6 @@ jest.mock('../E2EIdentity/E2EIdentityVerification', () => ({
 }));
 
 jest.mock('../E2EIdentity', () => ({
-  isE2EIEnabled: jest.fn(),
   E2EIHandler: {
     getInstance: jest.fn(),
   },
@@ -50,6 +48,9 @@ describe('useAppSoftLock', () => {
   });
 
   it('should not do anything if e2ei is not enabled', () => {
+    E2EIHandlerMock.getInstance.mockReturnValue({
+      isE2EIEnabled: jest.fn(() => false),
+    } as any);
     const {result} = renderHook(() => useAppSoftLock(callingRepository, notificationRepository));
     expect(result.current).toEqual({softLockEnabled: false});
     expect(callingRepository.setSoftLock).not.toHaveBeenCalledWith(true);
@@ -57,8 +58,8 @@ describe('useAppSoftLock', () => {
   });
 
   it('should set soft lock to true if the user has used up the entire grace period', async () => {
-    isE2EIEnabledMock.mockReturnValue(true);
     E2EIHandlerMock.getInstance.mockReturnValue({
+      isE2EIEnabled: jest.fn(() => true),
       on: jest.fn((eventName, callback) => callback({enrollmentConfig: {timer: {isSnoozeTimeAvailable: () => false}}})),
       off: jest.fn(),
     } as any);
@@ -73,9 +74,9 @@ describe('useAppSoftLock', () => {
   });
 
   it('should set softLock if the device is a fresh new device', async () => {
-    isE2EIEnabledMock.mockReturnValue(true);
     isFreshMLSSelfClientMock.mockResolvedValue(true);
     E2EIHandlerMock.getInstance.mockReturnValue({
+      isE2EIEnabled: jest.fn(() => true),
       on: jest.fn((eventName, callback) => callback({enrollmentConfig: {timer: {isSnoozeTimeAvailable: () => true}}})),
       off: jest.fn(),
     } as any);
@@ -90,8 +91,8 @@ describe('useAppSoftLock', () => {
   });
 
   it('should not set softLock if the device is an old device and the grace period is not expireds', async () => {
-    isE2EIEnabledMock.mockReturnValue(true);
     E2EIHandlerMock.getInstance.mockReturnValue({
+      isE2EIEnabled: jest.fn(() => true),
       on: jest.fn((eventName, callback) =>
         callback({enrollmentConfig: {timer: {isSnoozeTimeAvailable: () => true}, isFreshMLSSelfClient: false}}),
       ),

@@ -20,13 +20,11 @@
 import {useCallback, useEffect, useState} from 'react';
 
 import {CallingRepository} from '../calling/CallingRepository';
-import {E2EIHandler, EnrollmentConfig, isE2EIEnabled, WireIdentity} from '../E2EIdentity';
+import {E2EIHandler, EnrollmentConfig, WireIdentity} from '../E2EIdentity';
 import {shouldEnableSoftLock} from '../E2EIdentity/SnoozableTimer/delay';
 import {NotificationRepository} from '../notification/NotificationRepository';
 
 export function useAppSoftLock(callingRepository: CallingRepository, notificationRepository: NotificationRepository) {
-  const e2eiEnabled = isE2EIEnabled();
-
   const [softLockEnabled, setSoftLockEnabled] = useState(false);
 
   const handleSoftLockActivation = useCallback(
@@ -41,16 +39,16 @@ export function useAppSoftLock(callingRepository: CallingRepository, notificatio
   );
 
   useEffect(() => {
-    if (!e2eiEnabled) {
+    const e2eiHandler = E2EIHandler.getInstance();
+    if (!e2eiHandler.isE2EIEnabled()) {
       return () => {};
     }
-    const e2eiHandler = E2EIHandler.getInstance();
 
     e2eiHandler.on('identityUpdated', handleSoftLockActivation);
     return () => {
       e2eiHandler.off('identityUpdated', handleSoftLockActivation);
     };
-  }, [e2eiEnabled, handleSoftLockActivation]);
+  }, [handleSoftLockActivation]);
 
   return {softLockEnabled};
 }

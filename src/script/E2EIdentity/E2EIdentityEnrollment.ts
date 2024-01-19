@@ -33,22 +33,13 @@ import {getCertificateDetails} from 'Util/certificateDetails';
 import {getLogger} from 'Util/Logger';
 import {formatDelayTime, TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {removeUrlParameters} from 'Util/UrlUtil';
-import {supportsMLS} from 'Util/util';
 
-import {
-  hasActiveCertificate,
-  isE2EIEnabled,
-  getActiveWireIdentity,
-  MLSStatuses,
-  WireIdentity,
-} from './E2EIdentityVerification';
+import {hasActiveCertificate, getActiveWireIdentity, MLSStatuses, WireIdentity} from './E2EIdentityVerification';
 import {getModalOptions, ModalType} from './Modals';
 import {OIDCService} from './OIDCService';
 import {OIDCServiceStore} from './OIDCService/OIDCServiceStorage';
 import {getSnoozeTime, shouldEnableSoftLock} from './SnoozableTimer/delay';
 import {SnoozableTimer} from './SnoozableTimer/SnoozableTimer';
-
-import {Config} from '../Config';
 
 export enum E2EIHandlerStep {
   UNINITIALIZED = 'uninitialized',
@@ -121,20 +112,26 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     E2EIHandler.instance = null;
   }
 
+  /**
+   * Returns true if the current instance has been configured with team settings params
+   * @returns
+   */
+  public isE2EIEnabled() {
+    return this.currentStep !== E2EIHandlerStep.UNINITIALIZED;
+  }
+
   public initialize({discoveryUrl, gracePeriodInSeconds}: E2EIHandlerParams) {
-    if (isE2EIEnabled()) {
-      const gracePeriodInMs = gracePeriodInSeconds * TIME_IN_MILLIS.SECOND;
-      this.config = {
-        discoveryUrl,
-        gracePeriodInMs,
-        timer: new SnoozableTimer({
-          gracePeriodInMS: gracePeriodInMs,
-          onGracePeriodExpired: () => this.startEnrollment(ModalType.ENROLL),
-          onSnoozeExpired: () => this.startEnrollment(ModalType.ENROLL),
-        }),
-      };
-      this.currentStep = E2EIHandlerStep.INITIALIZED;
-    }
+    const gracePeriodInMs = gracePeriodInSeconds * TIME_IN_MILLIS.SECOND;
+    this.config = {
+      discoveryUrl,
+      gracePeriodInMs,
+      timer: new SnoozableTimer({
+        gracePeriodInMS: gracePeriodInMs,
+        onGracePeriodExpired: () => this.startEnrollment(ModalType.ENROLL),
+        onSnoozeExpired: () => this.startEnrollment(ModalType.ENROLL),
+      }),
+    };
+    this.currentStep = E2EIHandlerStep.INITIALIZED;
     return this;
   }
 
@@ -228,10 +225,6 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     const renewalDate = timeRemainingMS - totalDaysToSubtract;
 
     return renewalDate;
-  }
-
-  get isE2EIEnabled(): boolean {
-    return supportsMLS() && Config.getConfig().FEATURE.ENABLE_E2EI;
   }
 
   private async storeRedirectTargetAndRedirect(
@@ -370,13 +363,13 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     // Clear the e2e identity progress
     this.coreE2EIService.clearAllProgress();
 
-    const isSoftLockEnabled = await shouldEnableSoftLock(this.config!);
+    const disableSnooze = await shouldEnableSoftLock(this.config!);
 
     return new Promise<void>(resolve => {
       const {modalOptions, modalType} = getModalOptions({
         type: ModalType.ERROR,
         hideClose: true,
-        hideSecondary: isSoftLockEnabled,
+        hideSecondary: disableSnooze,
         primaryActionFn: async () => {
           this.currentStep = E2EIHandlerStep.INITIALIZED;
           await this.enroll();
@@ -385,6 +378,9 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
         secondaryActionFn: async () => {
           await this.startEnrollment(ModalType.ENROLL);
           resolve();
+        },
+        extraParams: {
+          isGracePeriodOver: disableSnooze,
         },
       });
 
@@ -410,6 +406,9 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
           this.config?.timer.snooze();
           this.showSnoozeConfirmationModal();
           resolve();
+        },
+        extraParams: {
+          isGracePeriodOver: disableSnooze,
         },
         type: modalType,
         hideClose: true,
