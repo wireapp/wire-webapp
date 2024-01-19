@@ -89,6 +89,7 @@ import {
   MLSConversation,
   isProteus1to1ConversationWithUser,
   ProteusConversation,
+  isConnectionRequestConversation,
 } from './ConversationSelectors';
 import {ConversationService} from './ConversationService';
 import {ConversationState} from './ConversationState';
@@ -1468,9 +1469,7 @@ export class ConversationRepository {
       this.conversationState.isActiveConversation(conversation),
     );
 
-    const wasProteusConnectionIncomingRequest = proteusConversations.some(
-      conversation => conversation.type() === CONVERSATION_TYPE.CONNECT,
-    );
+    const wasProteusConnectionIncomingRequest = proteusConversations.some(isConnectionRequestConversation);
 
     await Promise.allSettled(
       proteusConversations.map(async proteusConversation => {
