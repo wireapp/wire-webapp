@@ -20,7 +20,7 @@
     "@types/node": "^20.1.0",
     "@types/rimraf": "^3.0.2",
     "@wireapp/store-engine": "workspace:^",
-    "fake-indexeddb": "^4.0.0",
+    "fake-indexeddb": "^5.0.2",
     "jest": "^29.2.1",
     "logdown": "3.3.1",
     "rimraf": "^3.0.2",
