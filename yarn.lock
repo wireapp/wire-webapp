@@ -7576,14 +7576,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"emoji-picker-react@npm:4.6.10":
-  version: 4.6.10
-  resolution: "emoji-picker-react@npm:4.6.10"
+"emoji-picker-react@npm:4.6.14":
+  version: 4.6.14
+  resolution: "emoji-picker-react@npm:4.6.14"
   dependencies:
-    flairup: 0.0.31
+    flairup: 0.0.32
   peerDependencies:
     react: ">=16"
-  checksum: bbbae2379b94f56315eb635e28d409beca515c4c696749e4d3313317a1f440202c69db36f1021e733030201364c430c1159b11a8128eba12df66f0e0e4216b07
+  checksum: 7a16b280ddc7eb327e935fffd968f4fa0b0243e8105010737a349a74aa9f19c00f671b598d7f2a126c6691639a869161e696e26d6637f5bda5094db78448bd17
   languageName: node
   linkType: hard
 
@@ -8736,10 +8736,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"flairup@npm:0.0.31":
-  version: 0.0.31
-  resolution: "flairup@npm:0.0.31"
-  checksum: e25c35626f24cc7bef3fdefa611827af779ee907ea3f66c95b867dbd2780678d27954abf6574096be12aa3e83e5df08515217647897bb99fdb604c2d68035333
+"flairup@npm:0.0.32":
+  version: 0.0.32
+  resolution: "flairup@npm:0.0.32"
+  checksum: 5f08a8f9c7dd624d1c5215b0ff16f790022679ad031a49774cd4427002a4ae9339d11ffe4693849eafb8845f51e8a1687871707109a1a68c9824a6800b295426
   languageName: node
   linkType: hard
 
@@ -17605,7 +17605,7 @@ __metadata:
     dexie-encrypted: 2.0.0
     dotenv: 16.3.1
     dpdm: 3.14.0
-    emoji-picker-react: 4.6.10
+    emoji-picker-react: 4.6.14
     eslint: ^8.56.0
     eslint-plugin-prettier: ^5.1.3
     fake-indexeddb: 5.0.2
