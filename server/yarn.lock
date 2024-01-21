@@ -805,16 +805,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@pm2/js-api@npm:~0.6.7":
-  version: 0.6.7
-  resolution: "@pm2/js-api@npm:0.6.7"
+"@pm2/js-api@npm:~0.8.0":
+  version: 0.8.0
+  resolution: "@pm2/js-api@npm:0.8.0"
   dependencies:
     async: ^2.6.3
-    axios: ^0.21.0
     debug: ~4.3.1
     eventemitter2: ^6.3.1
+    extrareqp2: ^1.0.0
     ws: ^7.0.0
-  checksum: 43d1e4d06328ad18d8929225a0732fa20701694dea0e3af0ea692239e0adc45ef2f48a794599a8df88bc705d2e428b5b8018deb3709983c91ed0b74a834b2f21
+  checksum: c17b01d2a5efe8db370b21a7a0452e144d14066632d35a423cc025b812630563f195440dea842281cce614ae5dc3509fce33e27f68318aa024d815332d28edbd
   languageName: node
   linkType: hard
 
@@ -1391,15 +1391,6 @@ __metadata:
   dependencies:
     typpy: 2.3.11
   checksum: 05c6562edd290b04bd73e8aace2a627b755e66a3320be7306b594296aa73490a5591595ac50f00f9a2325c8eeddab7a35fdb4a370ad823c9e2656c35db91a244
-  languageName: node
-  linkType: hard
-
-"axios@npm:^0.21.0":
-  version: 0.21.4
-  resolution: "axios@npm:0.21.4"
-  dependencies:
-    follow-redirects: ^1.14.0
-  checksum: 44245f24ac971e7458f3120c92f9d66d1fc695e8b97019139de5b0cc65d9b8104647db01e5f46917728edfc0cfd88eb30fc4c55e6053eef4ace76768ce95ff3c
   languageName: node
   linkType: hard
 
@@ -2388,6 +2379,15 @@ __metadata:
     utils-merge: 1.0.1
     vary: ~1.1.2
   checksum: 3c4b9b076879442f6b968fe53d85d9f1eeacbb4f4c41e5f16cc36d77ce39a2b0d81b3f250514982110d815b2f7173f5561367f9110fcc541f9371948e8c8b037
+  languageName: node
+  linkType: hard
+
+"extrareqp2@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "extrareqp2@npm:1.0.0"
+  dependencies:
+    follow-redirects: ^1.14.0
+  checksum: 1c64c2669715a8dbb07c88ba81a3aa1dd1fe29a794b27db5bece17994de32d3f21ca686af265f56174a748203b57eebdf8ae22afda05f361fc29420059ed14ae
   languageName: node
   linkType: hard
 
@@ -4619,13 +4619,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pm2@npm:5.3.0":
-  version: 5.3.0
-  resolution: "pm2@npm:5.3.0"
+"pm2@npm:5.3.1":
+  version: 5.3.1
+  resolution: "pm2@npm:5.3.1"
   dependencies:
     "@pm2/agent": ~2.0.0
     "@pm2/io": ~5.0.0
-    "@pm2/js-api": ~0.6.7
+    "@pm2/js-api": ~0.8.0
     "@pm2/pm2-version-check": latest
     async: ~3.2.0
     blessed: 0.1.81
@@ -4661,7 +4661,7 @@ __metadata:
     pm2-dev: bin/pm2-dev
     pm2-docker: bin/pm2-docker
     pm2-runtime: bin/pm2-runtime
-  checksum: ca1a655ab11b8aa8f7c10098578e7f0ed508fb19fae02694c5478f4167a75cb150eb2c305d734b7420696b70193bb765ffbbca498d2ce427f85ae9d25ef19842
+  checksum: 7d82fd70393432abb34218fb82a2ae31e499db13259da6746a371fbf242758c3859a309fd93c836a4cb318721315a95e69126cc16a1843a2f5df931581c47d0e
   languageName: node
   linkType: hard
 
@@ -5640,7 +5640,7 @@ __metadata:
     maxmind: 4.3.10
     nocache: 4.0.0
     opn: 6.0.0
-    pm2: 5.3.0
+    pm2: 5.3.1
     rimraf: 4.4.1
     typescript: 5.3.3
   languageName: unknown
