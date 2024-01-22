@@ -1488,7 +1488,7 @@ export class ConversationRepository {
     );
 
     // Because of the current architecture and the fact that we present a connection request as a conversation of connect type,
-    // we don't want to inject conversation migrated even if the only proteus 1:1 conversation we had was a connection request.
+    // we don't want to inject conversation migrated event if the only proteus 1:1 conversation we had was a connection request.
     if (!wasProteusConnectionIncomingRequest) {
       await this.inject1to1MigratedToMLS(mlsConversation);
     }
