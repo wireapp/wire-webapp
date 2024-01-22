@@ -18,7 +18,7 @@
  */
 
 import {act, render, waitFor} from '@testing-library/react';
-import {FeatureStatus, FEATURE_KEY} from '@wireapp/api-client/lib/team/feature';
+import {FeatureStatus, FEATURE_KEY, FeatureList} from '@wireapp/api-client/lib/team/feature';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import en from 'I18n/en-US.json';
@@ -38,7 +38,7 @@ describe('FeatureConfigChangeNotifier', () => {
     localStorage.clear();
   });
 
-  const baseConfig = {
+  const baseConfig: FeatureList = {
     [FEATURE_KEY.FILE_SHARING]: {
       status: FeatureStatus.DISABLED,
     },
@@ -54,6 +54,10 @@ describe('FeatureConfigChangeNotifier', () => {
     },
     [FEATURE_KEY.CONVERSATION_GUEST_LINKS]: {
       status: FeatureStatus.DISABLED,
+    },
+    [FEATURE_KEY.ENFORCE_DOWNLOAD_PATH]: {
+      status: FeatureStatus.DISABLED,
+      config: {enforcedDownloadLocation: ''},
     },
   };
 
@@ -74,6 +78,11 @@ describe('FeatureConfigChangeNotifier', () => {
       'Generating guest links is now enabled for all group admins.',
       'Generating guest links is now disabled for all group admins.',
     ],
+    [
+      FEATURE_KEY.ENFORCE_DOWNLOAD_PATH,
+      'Enforced Download Path is enabled. The App will restart for the new settings to take effect.',
+      'Enforced Download Path is disabled. You will need to restart the app if you want to save downloads in a new location.',
+    ],
   ] as const)('shows a modal when feature %s is turned on and off', async (feature, enabledString, disabledString) => {
     const teamState = new TeamState();
     render(<FeatureConfigChangeNotifier selfUserId={'self'} teamState={teamState} />);
@@ -92,11 +101,14 @@ describe('FeatureConfigChangeNotifier', () => {
 
     await waitFor(() => {
       expect(showModalSpy).toHaveBeenCalledTimes(1);
-      expect(showModalSpy).toHaveBeenCalledWith(PrimaryModal.type.ACKNOWLEDGE, {
-        text: expect.objectContaining({
-          htmlMessage: enabledString,
+      expect(showModalSpy).toHaveBeenCalledWith(
+        PrimaryModal.type.ACKNOWLEDGE,
+        expect.objectContaining({
+          text: expect.objectContaining({
+            htmlMessage: enabledString,
+          }),
         }),
-      });
+      );
     });
 
     act(() => {
@@ -113,11 +125,14 @@ describe('FeatureConfigChangeNotifier', () => {
     } else {
       await waitFor(() => {
         expect(showModalSpy).toHaveBeenCalledTimes(2);
-        expect(showModalSpy).toHaveBeenCalledWith(PrimaryModal.type.ACKNOWLEDGE, {
-          text: expect.objectContaining({
-            htmlMessage: disabledString,
+        expect(showModalSpy).toHaveBeenCalledWith(
+          PrimaryModal.type.ACKNOWLEDGE,
+          expect.objectContaining({
+            text: expect.objectContaining({
+              htmlMessage: disabledString,
+            }),
           }),
-        });
+        );
       });
     }
   });
@@ -179,6 +194,8 @@ describe('FeatureConfigChangeNotifier', () => {
       await waitFor(() => {
         expect(showModalSpy).toHaveBeenCalledTimes(1);
         expect(showModalSpy).toHaveBeenCalledWith(PrimaryModal.type.ACKNOWLEDGE, {
+          hideCloseBtn: false,
+          primaryAction: undefined,
           text: expect.objectContaining({
             htmlMessage: expectedText,
           }),
