@@ -90,8 +90,8 @@ export class TeamState {
     });
 
     this.classifiedDomains = ko.pureComputed(() => {
-      return this.teamFeatures()?.classifiedDomains.status === FeatureStatus.ENABLED
-        ? this.teamFeatures().classifiedDomains.config.domains
+      return this.teamFeatures()?.classifiedDomains?.status === FeatureStatus.ENABLED
+        ? this.teamFeatures()?.classifiedDomains?.config.domains
         : undefined;
     });
 
