@@ -215,7 +215,7 @@ jobs:
 
           chart_version="${{needs.build.outputs.chart_version}}"
 
-          image_tag="${{steps.push_docker_image.outputs.image_tag}}"
+          image_tag="${{needs.build.outputs.image_tag}}"
 
           git config --global user.email "zebot@users.noreply.github.com"
           git config --global user.name "Zebot"
