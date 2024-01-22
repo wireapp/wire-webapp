@@ -41,7 +41,7 @@ import {CSSObject} from '@emotion/react';
 export const messageReactionWrapper: CSSObject = {
   display: 'flex',
   gap: '0.5rem',
-  paddingLeft: 'var(--conversation-message-sender-width)',
+  paddingInline: 'var(--conversation-message-sender-width)',
   flexWrap: 'wrap',
   maxWidth: '100%',
   '.tooltip-content': {
