@@ -1686,6 +1686,12 @@ export class ConversationRepository {
       throw new Error('initProteus1to1Conversation provided with conversation id of conversation that is not proteus');
     }
 
+    const connection = proteusConversation.connection();
+
+    if (connection && connection.isConnected()) {
+      proteusConversation.type(CONVERSATION_TYPE.ONE_TO_ONE);
+    }
+
     // If proteus is not supported by the other user we have to mark conversation as readonly
     if (!doesOtherUserSupportProteus) {
       await this.blacklistConversation(proteusConversationId);
@@ -1860,10 +1866,6 @@ export class ConversationRepository {
       }
 
       conversation.connection(connectionEntity);
-
-      if (connectionEntity.isConnected()) {
-        conversation.type(CONVERSATION_TYPE.ONE_TO_ONE);
-      }
 
       const updatedConversation = await this.updateParticipatingUserEntities(conversation);
 
