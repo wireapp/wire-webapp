@@ -31,7 +31,7 @@ interface ReadIndicatorProps {
   is1to1Conversation?: boolean;
   isLastDeliveredMessage?: boolean;
   showIconOnly?: boolean;
-  onClick: (message: Message) => void;
+  onClick?: (message: Message) => void;
 }
 
 export const ReadIndicator = ({
@@ -74,8 +74,8 @@ export const ReadIndicator = ({
   return (
     <button
       css={ReadIndicatorStyles(showIconOnly)}
-      onClick={() => onClick(message)}
-      className="button-reset-default"
+      onClick={() => onClick?.(message)}
+      className="button-reset-default read-indicator"
       data-uie-name="status-message-read-receipts"
     >
       {showEyeIndicatorOnly ? (

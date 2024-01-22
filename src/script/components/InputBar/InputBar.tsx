@@ -611,7 +611,11 @@ export const InputBar = ({
                   </>
                 ) : (
                   <>
-                    <ul className="controls-right buttons-group">
+                    <ul
+                      className={cx('controls-right buttons-group', {
+                        'controls-right-shrinked': textValue.length !== 0,
+                      })}
+                    >
                       <ControlButtons {...controlButtonsProps} showGiphyButton={showGiphyButton} />
                       <SendMessageButton disabled={!enableSending} onSend={handleSendMessage} />
                     </ul>
