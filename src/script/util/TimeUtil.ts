@@ -285,7 +285,7 @@ export const formatTimestamp = (timestamp: number | string, longFormat: boolean 
 export const getCurrentDate = () => new Date().toISOString().substring(0, 10);
 export const getUnixTimestamp = () => Math.floor(Date.now() / TIME_IN_MILLIS.SECOND);
 export const isBeforeToday = (date: FnDate): boolean => isBefore(date, startOfToday());
-export const isYoungerThan2Minutes = (date: FnDate): boolean => differenceInMinutes(new Date(), date) < 2;
+export const isYoungerThanMinute = (date: FnDate): boolean => differenceInMinutes(new Date(), date) < 1;
 export const isYoungerThan1Hour = (date: FnDate) => differenceInHours(new Date(), date) < 1;
 export const isYoungerThan7Days = (date: FnDate) => differenceInDays(new Date(), date) < 7;
 

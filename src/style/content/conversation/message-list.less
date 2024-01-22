@@ -320,9 +320,9 @@
     .text-selection;
     .accent-selection;
 
-    display: inline-block;
-    width: 100%;
+    display: inline;
     min-width: 0;
+    margin-right: 12px;
     line-height: @line-height-lg;
     white-space: pre-wrap;
     word-wrap: break-word;
@@ -788,8 +788,9 @@
 
 // MESSAGE SPACING
 .message-asset {
+  display: flex;
   max-width: var(--conversation-message-asset-width);
-  flex: 1;
+  align-items: flex-start;
   margin-top: 8px;
 }
 
