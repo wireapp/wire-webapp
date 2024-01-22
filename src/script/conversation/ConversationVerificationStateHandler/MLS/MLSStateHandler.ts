@@ -100,8 +100,8 @@ class MLSConversationVerificationStateHandler {
       return this.logger.warn(`Epoch changed but conversation could not be found after waiting for 5 seconds`);
     }
 
-    const isSelfMLSConversation = isMLSConversation(conversation) && conversation.type() === CONVERSATION_TYPE.SELF;
-    if (!isMLSConversation(conversation) || isSelfMLSConversation) {
+    const isSelfConversation = conversation.type() === CONVERSATION_TYPE.SELF;
+    if (!isMLSConversation(conversation) || isSelfConversation) {
       return;
     }
 
