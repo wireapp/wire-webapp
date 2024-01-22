@@ -77,6 +77,10 @@ jobs:
             wire_builds_target_branches='["dev"]'
           fi
 
+          if [ "$version_tag" == "release/q1-2024" ]; then
+            wire_builds_target_branches='["q1-2024"]'
+          fi
+
           echo "wire_builds_target_branches: $wire_builds_target_branches"
           echo "wire_builds_target_branches=$wire_builds_target_branches" >> $GITHUB_OUTPUT
 
