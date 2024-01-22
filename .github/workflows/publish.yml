@@ -2,6 +2,7 @@ name: Publish
 
 on:
   push:
+    # TODO remove me before mergin PR
     branches: [master, dev, WPB-6146]
     tags:
       - '*staging*'
@@ -74,6 +75,11 @@ jobs:
           fi
 
           if [ "$version_tag" == "dev" ]; then
+            wire_builds_target_branches='["dev"]'
+          fi
+
+          # TODO remove me before mergin PR
+          if [ "$version_tag" == "WPB-6146" ]; then
             wire_builds_target_branches='["dev"]'
           fi
 
