@@ -51,6 +51,7 @@ export enum CONVERSATION {
   VOICE_CHANNEL_ACTIVATE = 'conversation.voice-channel-activate',
   VOICE_CHANNEL_DEACTIVATE = 'conversation.voice-channel-deactivate',
   E2EI_VERIFICATION = 'conversation.e2ei-verification',
+  ONE2ONE_MIGRATED_TO_MLS = 'conversation.one2one-migrated-to-mls',
 }
 
 export enum USER {
