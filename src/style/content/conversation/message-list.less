@@ -312,19 +312,17 @@
   padding-left: @conversation-message-sender-width;
 
   &-content {
-    width: calc(100% - var(--conversation-message-timestamp-width));
-    max-width: calc(
-      @conversation-max-width - @conversation-message-sender-width - var(--conversation-message-timestamp-width)
-    );
+    width: 100%;
+    max-width: calc(@conversation-max-width - var(--conversation-message-sender-width));
   }
 
   .text {
     .text-selection;
     .accent-selection;
 
-    display: inline-block;
-    width: 100%;
+    display: inline;
     min-width: 0;
+    margin-right: 12px;
     line-height: @line-height-lg;
     white-space: pre-wrap;
     word-wrap: break-word;
@@ -790,7 +788,9 @@
 
 // MESSAGE SPACING
 .message-asset {
-  flex: 1;
+  display: flex;
+  max-width: var(--conversation-message-asset-width);
+  align-items: flex-start;
   margin-top: 8px;
 }
 

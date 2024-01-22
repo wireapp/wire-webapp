@@ -43,6 +43,20 @@ import {AssetType} from '../../../../../assets/AssetType';
 import {Button} from '../../../../../entity/message/Button';
 import {CompositeMessage} from '../../../../../entity/message/CompositeMessage';
 import {ContentMessage} from '../../../../../entity/message/ContentMessage';
+import {ReadIndicator} from '../../ReadIndicator';
+
+interface ContentAssetProps {
+  asset: Asset;
+  message: ContentMessage;
+  onClickButton: (message: CompositeMessage, buttonId: string) => void;
+  onClickImage: MessageActions['onClickImage'];
+  onClickMessage: MessageActions['onClickMessage'];
+  selfId: QualifiedId;
+  isMessageFocused: boolean;
+  is1to1Conversation: boolean;
+  isLastDeliveredMessage: boolean;
+  onClickDetails: () => void;
+}
 
 const ContentAsset = ({
   asset,
@@ -52,15 +66,10 @@ const ContentAsset = ({
   onClickMessage,
   onClickButton,
   isMessageFocused,
-}: {
-  asset: Asset;
-  message: ContentMessage;
-  onClickButton: (message: CompositeMessage, buttonId: string) => void;
-  onClickImage: MessageActions['onClickImage'];
-  onClickMessage: MessageActions['onClickMessage'];
-  selfId: QualifiedId;
-  isMessageFocused: boolean;
-}) => {
+  is1to1Conversation,
+  isLastDeliveredMessage,
+  onClickDetails,
+}: ContentAssetProps) => {
   const {isObfuscated, status} = useKoSubscribableChildren(message, ['isObfuscated', 'status']);
 
   switch (asset.type) {
@@ -86,6 +95,13 @@ const ContentAsset = ({
               <LinkPreviewAsset message={message} isFocusable={isMessageFocused} />
             </div>
           ))}
+
+          <ReadIndicator
+            message={message}
+            is1to1Conversation={is1to1Conversation}
+            isLastDeliveredMessage={isLastDeliveredMessage}
+            onClick={onClickDetails}
+          />
         </>
       );
     case AssetType.FILE:
@@ -93,6 +109,13 @@ const ContentAsset = ({
         return (
           <div className={`message-asset ${isObfuscated ? 'ephemeral-asset-expired icon-file' : ''}`}>
             <FileAsset message={message} isFocusable={isMessageFocused} />
+
+            <ReadIndicator
+              message={message}
+              is1to1Conversation={is1to1Conversation}
+              isLastDeliveredMessage={isLastDeliveredMessage}
+              onClick={onClickDetails}
+            />
           </div>
         );
       }
@@ -101,6 +124,13 @@ const ContentAsset = ({
         return (
           <div className={`message-asset ${isObfuscated ? 'ephemeral-asset-expired' : ''}`}>
             <AudioAsset message={message} isFocusable={isMessageFocused} />
+
+            <ReadIndicator
+              message={message}
+              is1to1Conversation={is1to1Conversation}
+              isLastDeliveredMessage={isLastDeliveredMessage}
+              onClick={onClickDetails}
+            />
           </div>
         );
       }
@@ -109,17 +139,33 @@ const ContentAsset = ({
         return (
           <div className={`message-asset ${isObfuscated ? 'ephemeral-asset-expired icon-movie' : ''}`}>
             <VideoAsset message={message} isFocusable={isMessageFocused} />
+
+            <ReadIndicator
+              message={message}
+              is1to1Conversation={is1to1Conversation}
+              isLastDeliveredMessage={isLastDeliveredMessage}
+              onClick={onClickDetails}
+            />
           </div>
         );
       }
     case AssetType.IMAGE:
       return (
-        <ImageAsset
-          asset={asset as MediumImage}
-          message={message}
-          onClick={onClickImage}
-          isFocusable={isMessageFocused}
-        />
+        <div className={`message-asset ${isObfuscated ? 'ephemeral-asset-expired' : ''}`}>
+          <ImageAsset
+            asset={asset as MediumImage}
+            message={message}
+            onClick={onClickImage}
+            isFocusable={isMessageFocused}
+          />
+
+          <ReadIndicator
+            message={message}
+            is1to1Conversation={is1to1Conversation}
+            isLastDeliveredMessage={isLastDeliveredMessage}
+            onClick={onClickDetails}
+          />
+        </div>
       );
     case AssetType.LOCATION:
       return <LocationAsset asset={asset as Location} />;

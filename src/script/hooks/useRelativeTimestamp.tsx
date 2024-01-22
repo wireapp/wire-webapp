@@ -23,7 +23,6 @@ import {t} from 'Util/LocalizerUtil';
 import {
   TIME_IN_MILLIS,
   fromUnixTime,
-  isYoungerThan2Minutes,
   isYoungerThan1Hour,
   isToday,
   isYesterday,
@@ -33,12 +32,13 @@ import {
   formatLocale,
   formatDayMonth,
   isThisYear,
+  isYoungerThanMinute,
 } from 'Util/TimeUtil';
 
 export function useRelativeTimestamp(timestamp: number, asDay = false) {
   const calculateTimestamp = (ts: number, isDay: boolean) => {
     const date = fromUnixTime(ts / TIME_IN_MILLIS.SECOND);
-    if (isYoungerThan2Minutes(date)) {
+    if (isYoungerThanMinute(date)) {
       return t('conversationJustNow');
     }
 

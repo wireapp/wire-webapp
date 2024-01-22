@@ -21,6 +21,7 @@ import React, {useMemo, useState, useEffect} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
+import {ReadIndicator} from 'Components/MessagesList/Message/ReadIndicator';
 import {Conversation} from 'src/script/entity/Conversation';
 import {CompositeMessage} from 'src/script/entity/message/CompositeMessage';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
@@ -29,6 +30,7 @@ import {useRelativeTimestamp} from 'src/script/hooks/useRelativeTimestamp';
 import {StatusType} from 'src/script/message/StatusType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getMessageAriaLabel} from 'Util/conversationMessages';
+import {fromUnixTime, TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {ContentAsset} from './asset';
 import {MessageActionsMenu} from './MessageActions/MessageActions';
@@ -43,7 +45,6 @@ import {EphemeralStatusType} from '../../../../message/EphemeralStatusType';
 import {ContextMenuEntry} from '../../../../ui/ContextMenu';
 import {EphemeralTimer} from '../EphemeralTimer';
 import {MessageTime} from '../MessageTime';
-import {ReadReceiptStatus} from '../ReadReceiptStatus';
 import {useMessageFocusedTabIndex} from '../util';
 
 export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetSession'> {
@@ -117,7 +118,7 @@ export const ContentMessageComponent: React.FC<ContentMessageProps> = ({
     'quote',
   ]);
 
-  const shouldShowAvatar = (): boolean => {
+  const shouldShowMessageHeader = (): boolean => {
     if (!previousMessage || hasMarker) {
       return true;
     }
@@ -126,9 +127,21 @@ export const ContentMessageComponent: React.FC<ContentMessageProps> = ({
       return true;
     }
 
+    const currentMessageDate = fromUnixTime(message.timestamp() / TIME_IN_MILLIS.SECOND);
+    const previousMessageDate = fromUnixTime(previousMessage.timestamp() / TIME_IN_MILLIS.SECOND);
+
+    const currentMinute = currentMessageDate.getMinutes();
+    const previousMinute = previousMessageDate.getMinutes();
+
+    if (currentMinute !== previousMinute) {
+      return true;
+    }
+
     return !previousMessage.isContent() || previousMessage.user().id !== user.id;
   };
+
   const timeAgo = useRelativeTimestamp(message.timestamp());
+
   const [messageAriaLabel] = getMessageAriaLabel({
     assets,
     displayTimestampShort: message.displayTimestampShort(),
@@ -168,7 +181,7 @@ export const ContentMessageComponent: React.FC<ContentMessageProps> = ({
         }
       }}
     >
-      {shouldShowAvatar() && (
+      {shouldShowMessageHeader() && (
         <MessageHeader onClickAvatar={onClickAvatar} message={message} focusTabIndex={messageFocusedTabIndex}>
           {was_edited && (
             <span className="message-header-label-icon icon-edit" title={message.displayEditedTimestamp()}></span>
@@ -179,11 +192,12 @@ export const ContentMessageComponent: React.FC<ContentMessageProps> = ({
             </MessageTime>
           </span>
 
-          <ReadReceiptStatus
+          <ReadIndicator
             message={message}
             is1to1Conversation={conversation.is1to1()}
             isLastDeliveredMessage={isLastDeliveredMessage}
-            onClickDetails={onClickDetails}
+            onClick={onClickDetails}
+            showIconOnly
           />
         </MessageHeader>
       )}
@@ -207,6 +221,7 @@ export const ContentMessageComponent: React.FC<ContentMessageProps> = ({
               isMessageFocused={msgFocusState}
             />
           )}
+
           {assets.map(asset => (
             <ContentAsset
               key={asset.type}
@@ -217,8 +232,12 @@ export const ContentMessageComponent: React.FC<ContentMessageProps> = ({
               onClickImage={onClickImage}
               onClickMessage={onClickMessage}
               isMessageFocused={msgFocusState}
+              is1to1Conversation={conversation.is1to1()}
+              isLastDeliveredMessage={isLastDeliveredMessage}
+              onClickDetails={() => onClickDetails(message)}
             />
           ))}
+
           {failedToSend && (
             <PartialFailureToSendWarning
               isMessageFocused={msgFocusState}
@@ -235,9 +254,10 @@ export const ContentMessageComponent: React.FC<ContentMessageProps> = ({
             />
           )}
         </div>
+
         {!isConversationReadonly && isActionMenuVisible && (
           <MessageActionsMenu
-            isMsgWithHeader={shouldShowAvatar()}
+            isMsgWithHeader={shouldShowMessageHeader()}
             message={message}
             handleActionMenuVisibility={setActionMenuVisibility}
             contextMenu={contextMenu}
