@@ -1415,6 +1415,14 @@ export class ConversationRepository {
     const proteusConversations = this.conversationState.findProteus1to1Conversations(otherUserId);
 
     if (!proteusConversations || proteusConversations.length < 1) {
+      // Even if we don't have proteus 1:1 conversation, we still want to blacklist the proteus 1:1 conversation
+      // which is by default assigned to connection entity by backend (so it's not being fetched anymore).
+      const otherUser = this.userRepository.findUserById(otherUserId);
+      const conversationId = otherUser?.connection()?.conversationId;
+
+      if (conversationId) {
+        await this.blacklistConversation(conversationId);
+      }
       return {shouldOpenMLS1to1Conversation: false, wasProteus1to1Replaced: false};
     }
 
@@ -1480,7 +1488,7 @@ export class ConversationRepository {
     );
 
     // Because of the current architecture and the fact that we present a connection request as a conversation of connect type,
-    // we don't want to inject conversation migrated event if the only proteus 1:1 conversation we had was a connection request.
+    // we don't want to inject conversation migrated even if the only proteus 1:1 conversation we had was a connection request.
     if (!wasProteusConnectionIncomingRequest) {
       await this.inject1to1MigratedToMLS(mlsConversation);
     }
