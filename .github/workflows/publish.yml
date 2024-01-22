@@ -2,7 +2,7 @@ name: Publish
 
 on:
   push:
-    branches: [master, dev]
+    branches: [master, dev, WPB-6146]
     tags:
       - '*staging*'
       - '*production*'
@@ -205,20 +205,48 @@ jobs:
       - name: Create new build in wire-build
         shell: bash
         run: |
-          git fetch --depth 1 origin "${{ matrix.target_branch }}"
-          git checkout "${{ matrix.target_branch }}"
+          set -eo pipefail
 
           chart_version="${{needs.build.outputs.chart_version}}"
 
-          build_json=$(cat ./build.json | ./bin/bump-chart webapp "$chart_version" | ./bin/bump-prerelease )
-          echo "$build_json" > ./build.json
+          image_tag="${{steps.push_docker_image.outputs.image_tag}}"
 
-          git add build.json
           git config --global user.email "zebot@users.noreply.github.com"
           git config --global user.name "Zebot"
-          git commit -m "Bump webapp to $chart_version"
 
-          git push origin "${{ matrix.target_branch }}"
+          for retry in $(seq 3); do
+            (
+            set -e
+
+            if (( retry > 1 )); then
+             echo "Retrying..."
+            fi
+
+            git fetch --depth 1 origin "${{ matrix.target_branch }}"
+            git checkout "${{ matrix.target_branch }}"
+            git reset --hard @{upstream}
+
+            build_json=$(cat ./build.json | \
+              ./bin/set-chart-fields webapp \
+              "version=$chart_version" \
+              "repo=https://s3-eu-west-1.amazonaws.com/public.wire.com/charts-webapp" \
+              "meta.appVersion=$image_tag" \
+              "meta.commitURL=${{github.event.head_commit.url}}" \
+              "meta.commit=${{github.event.head_commit.id}}" \
+              | ./bin/bump-prerelease )
+            echo "$build_json" > ./build.json
+
+            git add build.json
+            git commit -m "Bump webapp to $chart_version"
+
+            git push origin "${{ matrix.target_branch }}"
+
+            ) && break
+          done
+          if (( $? != 0 )); then
+              echo "Retrying didn't help. Failing the step."
+              exit 1
+          fi
 
   #FUTUREWORK: Remove this job once production builds are based on wireapp/wire-builds
   update_helm_chart:
