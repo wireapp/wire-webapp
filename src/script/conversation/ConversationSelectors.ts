@@ -57,6 +57,10 @@ export function isTeamConversation(conversation: Conversation): boolean {
   return conversation.type() === CONVERSATION_TYPE.GLOBAL_TEAM;
 }
 
+export function isConnectionRequestConversation(conversation: Conversation): boolean {
+  return conversation.type() === CONVERSATION_TYPE.CONNECT;
+}
+
 interface ProtocolToConversationType {
   [ConversationProtocol.PROTEUS]: ProteusConversation;
   [ConversationProtocol.MLS]: MLSConversation;
@@ -78,7 +82,7 @@ const is1to1ConversationWithUser =
     }
 
     const isProteusConnectType =
-      protocol === ConversationProtocol.PROTEUS && conversation.type() === CONVERSATION_TYPE.CONNECT;
+      protocol === ConversationProtocol.PROTEUS && isConnectionRequestConversation(conversation);
 
     if (!conversation.is1to1() && !isProteusConnectType) {
       return false;

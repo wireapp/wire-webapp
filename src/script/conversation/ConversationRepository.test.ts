@@ -538,6 +538,7 @@ describe('ConversationRepository', () => {
         .mockReturnValueOnce(proteus1to1Conversation);
       jest.spyOn(conversationRepository['conversationService'], 'deleteConversationFromDb');
       jest.spyOn(conversationRepository['conversationService'], 'blacklistConversation');
+      jest.spyOn(conversationRepository['eventRepository'], 'injectEvent').mockResolvedValueOnce(undefined);
 
       const conversationEntity = await conversationRepository.getInitialised1To1Conversation(otherUser);
 
@@ -560,6 +561,7 @@ describe('ConversationRepository', () => {
         proteus1to1Conversation.qualifiedId,
       );
       expect(container.resolve(Core).service!.conversation.establishMLS1to1Conversation).toHaveBeenCalled();
+      expect(conversationRepository['eventRepository'].injectEvent).toHaveBeenCalled();
       expect(conversationRepository['conversationState'].conversations()).not.toEqual(
         expect.arrayContaining([proteus1to1Conversation]),
       );

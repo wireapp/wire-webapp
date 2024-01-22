@@ -89,6 +89,7 @@ import {
   MLSConversation,
   isProteus1to1ConversationWithUser,
   ProteusConversation,
+  isConnectionRequestConversation,
 } from './ConversationSelectors';
 import {ConversationService} from './ConversationService';
 import {ConversationState} from './ConversationState';
@@ -1407,13 +1408,21 @@ export class ConversationRepository {
    * @param mlsConversation - mls 1:1 conversation
    * @returns {shouldOpenMLS1to1Conversation, wasProteus1to1Replaced} - whether proteus 1:1 was replaced with mls and whether it was an active conversation and mls 1:1 conversation should be opened in the UI
    */
-  private readonly replaceProteus1to1WithMLS = async (
+  private readonly migrateProteus1to1MLS = async (
     otherUserId: QualifiedId,
     mlsConversation: MLSConversation,
   ): Promise<{shouldOpenMLS1to1Conversation: boolean; wasProteus1to1Replaced: boolean}> => {
     const proteusConversations = this.conversationState.findProteus1to1Conversations(otherUserId);
 
     if (!proteusConversations || proteusConversations.length < 1) {
+      // Even if we don't have proteus 1:1 conversation, we still want to blacklist the proteus 1:1 conversation
+      // which is by default assigned to connection entity by backend (so it's not being fetched anymore).
+      const otherUser = this.userRepository.findUserById(otherUserId);
+      const conversationId = otherUser?.connection()?.conversationId;
+
+      if (conversationId) {
+        await this.blacklistConversation(conversationId);
+      }
       return {shouldOpenMLS1to1Conversation: false, wasProteus1to1Replaced: false};
     }
 
@@ -1464,6 +1473,12 @@ export class ConversationRepository {
 
     ConversationMapper.updateProperties(mlsConversation, updates);
 
+    const wasProteus1to1ActiveConversation = proteusConversations.some(conversation =>
+      this.conversationState.isActiveConversation(conversation),
+    );
+
+    const wasProteusConnectionIncomingRequest = proteusConversations.some(isConnectionRequestConversation);
+
     await Promise.allSettled(
       proteusConversations.map(async proteusConversation => {
         this.logger.info(`Deleting proteus 1:1 conversation ${proteusConversation.id}`);
@@ -1472,9 +1487,11 @@ export class ConversationRepository {
       }),
     );
 
-    const wasProteus1to1ActiveConversation =
-      !!proteusConversations &&
-      proteusConversations.some(conversation => this.conversationState.isActiveConversation(conversation));
+    // Because of the current architecture and the fact that we present a connection request as a conversation of connect type,
+    // we don't want to inject conversation migrated event if the only proteus 1:1 conversation we had was a connection request.
+    if (!wasProteusConnectionIncomingRequest) {
+      await this.inject1to1MigratedToMLS(mlsConversation);
+    }
 
     const isMLS1to1ActiveConversation = this.conversationState.isActiveConversation(mlsConversation);
 
@@ -1595,7 +1612,7 @@ export class ConversationRepository {
     }
 
     // If proteus 1:1 conversation with the same user is known, we have to make sure it is replaced with mls 1:1 conversation.
-    const {shouldOpenMLS1to1Conversation, wasProteus1to1Replaced} = await this.replaceProteus1to1WithMLS(
+    const {shouldOpenMLS1to1Conversation, wasProteus1to1Replaced} = await this.migrateProteus1to1MLS(
       otherUserId,
       mlsConversation,
     );
@@ -1675,6 +1692,12 @@ export class ConversationRepository {
 
     if (!isProteusConversation(proteusConversation)) {
       throw new Error('initProteus1to1Conversation provided with conversation id of conversation that is not proteus');
+    }
+
+    const connection = proteusConversation.connection();
+
+    if (connection && connection.isConnected()) {
+      proteusConversation.type(CONVERSATION_TYPE.ONE_TO_ONE);
     }
 
     // If proteus is not supported by the other user we have to mark conversation as readonly
@@ -1851,10 +1874,6 @@ export class ConversationRepository {
       }
 
       conversation.connection(connectionEntity);
-
-      if (connectionEntity.isConnected()) {
-        conversation.type(CONVERSATION_TYPE.ONE_TO_ONE);
-      }
 
       const updatedConversation = await this.updateParticipatingUserEntities(conversation);
 
@@ -2384,6 +2403,11 @@ export class ConversationRepository {
     }
     return undefined;
   }
+
+  private readonly inject1to1MigratedToMLS = async (conversation: Conversation) => {
+    const protocolUpdateEvent = EventBuilder.build1to1MigratedToMLS(conversation);
+    await this.eventRepository.injectEvent(protocolUpdateEvent);
+  };
 
   /**
    * Update conversation protocol
@@ -3058,6 +3082,7 @@ export class ConversationRepository {
       case ClientEvent.CONVERSATION.JOINED_AFTER_MLS_MIGRATION:
       case ClientEvent.CONVERSATION.MLS_MIGRATION_ONGOING_CALL:
       case ClientEvent.CONVERSATION.MLS_CONVERSATION_RECOVERED:
+      case ClientEvent.CONVERSATION.ONE2ONE_MIGRATED_TO_MLS:
       case ClientEvent.CONVERSATION.UNABLE_TO_DECRYPT:
       case ClientEvent.CONVERSATION.VERIFICATION:
       case ClientEvent.CONVERSATION.E2EI_VERIFICATION:
