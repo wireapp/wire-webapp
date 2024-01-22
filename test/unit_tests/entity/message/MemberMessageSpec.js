@@ -93,11 +93,11 @@ describe('Member Message', () => {
       expect(message_et.isDeletable()).toBe(true);
     });
 
-    it('should not be deletable while message is sending', () => {
+    it('should be deletable while message is sending', () => {
       message_et.assets.push(new Text());
       message_et.status(StatusType.SENDING);
 
-      expect(message_et.isDeletable()).toBe(false);
+      expect(message_et.isDeletable()).toBe(true);
     });
 
     it('should not be deletable when message is a file and uploading or downloading', () => {
