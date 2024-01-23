@@ -58,8 +58,8 @@ export const doWireDpopChallenge = async ({
   expirySecs,
   userDomain,
 }: DoWireDpopChallengeParams) => {
-  const {wireDpopChallenge} = authData.authorization;
-  if (!wireDpopChallenge) {
+  const {dpopChallenge} = authData.authorization;
+  if (!dpopChallenge) {
     throw new Error('No wireDpopChallenge defined');
   }
 
@@ -79,7 +79,7 @@ export const doWireDpopChallenge = async ({
 
   const reqBody = await identity.newDpopChallengeRequest(clientAccessTokenData.token, nonce);
 
-  const dpopChallengeResponse = await connection.validateDpopChallenge(wireDpopChallenge.url, reqBody);
+  const dpopChallengeResponse = await connection.validateDpopChallenge(dpopChallenge.url, reqBody);
   if (!dpopChallengeResponse) {
     throw new Error('No response received while validating DPOP challenge');
   }

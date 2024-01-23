@@ -91,6 +91,7 @@ export const DpopChallengeResponseSchema = z.object({
   url: nonOptionalUrl,
   status: nonOptionalString,
   token: nonOptionalString,
+  target: nonOptionalUrl,
 });
 export type DpopChallengeResponseData = z.infer<typeof DpopChallengeResponseSchema>;
 

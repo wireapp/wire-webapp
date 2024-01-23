@@ -22,13 +22,13 @@ import {APIClient} from '@wireapp/api-client';
 import {ClientId} from '../../../types';
 import {AcmeService} from '../../Connection/AcmeServer';
 import {E2eiEnrollment, Nonce, User} from '../../E2EIService.types';
-import {AuthorizationChallenge} from '../Authorization';
+import {AuthData} from '../../Storage/E2EIStorage.schema';
 
 export interface DoWireDpopChallengeParams {
   apiClient: APIClient;
   clientId: ClientId;
   userDomain: User['domain'];
-  authData: AuthorizationChallenge;
+  authData: AuthData;
   identity: E2eiEnrollment;
   connection: AcmeService;
   nonce: Nonce;
