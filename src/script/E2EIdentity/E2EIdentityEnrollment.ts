@@ -18,7 +18,6 @@
  */
 
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
-import {KeyAuth} from '@wireapp/core/lib/messagingProtocols/mls';
 import {amplify} from 'amplify';
 import {User} from 'oidc-client-ts';
 import {container} from 'tsyringe';
@@ -74,7 +73,6 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   private config?: EnrollmentConfig;
   private currentStep: E2EIHandlerStep = E2EIHandlerStep.UNINITIALIZED;
   private oidcService?: OIDCService;
-  private isEnrollmentInProgress = false;
 
   private get coreE2EIService() {
     const e2eiService = this.core.service?.e2eIdentity;
@@ -230,21 +228,6 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     return renewalDate;
   }
 
-  private async storeRedirectTargetAndRedirect(
-    targetURL: string,
-    keyAuth: KeyAuth,
-    challengeURL: string,
-  ): Promise<void> {
-    try {
-      // store the target url in the persistent oidc service store, since the oidc service will be destroyed after the redirect
-      OIDCServiceStore.store.targetURL(targetURL);
-      this.oidcService = this.createOIDCService();
-      await this.oidcService.authenticate(keyAuth, challengeURL);
-    } catch (error) {
-      this.logger.error('Failed to store redirect target and redirect', error);
-    }
-  }
-
   /**
    * Used to clean the state/storage after a failed run
    */
@@ -262,10 +245,6 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     if (!this.config) {
       throw new Error('Trying to enroll for E2EI without initializing the E2EIHandler');
     }
-    if (this.isEnrollmentInProgress) {
-      return;
-    }
-    this.isEnrollmentInProgress = true;
     try {
       // Notify user about E2EI enrolment in progress
       this.currentStep = E2EIHandlerStep.ENROLL;
@@ -287,24 +266,26 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
       const displayName = this.userState.self()?.name();
       const handle = this.userState.self()?.username();
+      const teamId = this.userState.self()?.teamId;
       // If the user has no username or handle, we cannot enroll
-      if (!displayName || !handle) {
-        throw new Error('Username or handle not found');
+      if (!displayName || !handle || !teamId) {
+        throw new Error('Username, handle or teamId not found');
       }
-      const data = await this.core.enrollE2EI({
+      const enrollmentState = await this.core.enrollE2EI({
         discoveryUrl: this.config.discoveryUrl,
         displayName,
         handle,
+        teamId,
         oAuthIdToken,
       });
       // If the data is false or we dont get the ACMEChallenge, enrolment failed
-      if (!data) {
-        throw new Error('E2EI enrolment failed');
-      }
 
-      // Check if the data is a boolean, if not, we need to handle the oauth redirect
-      if (typeof data !== 'boolean') {
-        await this.storeRedirectTargetAndRedirect(data.challenge.target, data.keyAuth, data.challenge.url);
+      if (enrollmentState.status === 'authentication') {
+        // If the data is authentication flow data, we need to kick off the oauth flow to get an oauth token
+        const {challenge, keyAuth} = enrollmentState.authenticationChallenge;
+        OIDCServiceStore.store.targetURL(challenge.target);
+        this.oidcService = this.createOIDCService();
+        await this.oidcService.authenticate(keyAuth, challenge.url);
       }
 
       // Notify user about E2EI enrolment success
@@ -322,8 +303,6 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
       setTimeout(removeCurrentModal, 0);
       await this.showErrorMessage();
-    } finally {
-      this.isEnrollmentInProgress = false;
     }
   }
 
