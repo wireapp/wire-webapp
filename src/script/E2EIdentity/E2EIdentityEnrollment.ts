@@ -128,14 +128,20 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       gracePeriodInMs,
       timer: new SnoozableTimer({
         gracePeriodInMS: gracePeriodInMs,
-        onGracePeriodExpired: () => this.startEnrollment(ModalType.ENROLL),
-        onSnoozeExpired: () => this.startEnrollment(ModalType.ENROLL),
+        onGracePeriodExpired: () => this.processEnrollmentUponExpiry(),
+        onSnoozeExpired: () => this.processEnrollmentUponExpiry(),
       }),
     };
 
     await this.coreE2EIService.registerServerCertificates(discoveryUrl);
     this.currentStep = E2EIHandlerStep.INITIALIZED;
     return this;
+  }
+
+  private async processEnrollmentUponExpiry() {
+    const hasCertificate = await hasActiveCertificate();
+    const enrollmentType = hasCertificate ? ModalType.CERTIFICATE_RENEWAL : ModalType.ENROLL;
+    await this.startEnrollment(enrollmentType);
   }
 
   public async attemptEnrollment(): Promise<void> {
