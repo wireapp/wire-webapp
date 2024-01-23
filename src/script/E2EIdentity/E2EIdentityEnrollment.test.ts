@@ -85,7 +85,7 @@ function wait(ms: number) {
 
 describe('E2EIHandler', () => {
   const params = {discoveryUrl: 'http://example.com', gracePeriodInSeconds: 30};
-  const user = {name: () => 'John Doe', username: () => 'johndoe'};
+  const user = {name: () => 'John Doe', username: () => 'johndoe', teamId: 'team'};
 
   beforeEach(() => {
     jest.spyOn(util, 'supportsMLS').mockReturnValue(true);
@@ -100,9 +100,7 @@ describe('E2EIHandler', () => {
 
     jest.spyOn(PrimaryModal, 'show');
 
-    jest
-      .spyOn(container.resolve(UserState), 'self')
-      .mockReturnValue({name: () => 'John Doe', username: () => 'johndoe'});
+    jest.spyOn(container.resolve(UserState), 'self').mockReturnValue(user);
     jest.spyOn(container.resolve(Core), 'enrollE2EI').mockResolvedValue({status: 'successful'});
     container.resolve(Core).key = new Uint8Array();
   });
@@ -128,10 +126,6 @@ describe('E2EIHandler', () => {
   });
 
   it('should set currentStep to SUCCESS when enrollE2EI is called and enrollment succeeds', async () => {
-    jest
-      .spyOn(container.resolve(UserState), 'self')
-      .mockReturnValue({name: () => 'John Doe', username: () => 'johndoe'});
-
     jest.spyOn(container.resolve(Core), 'enrollE2EI').mockResolvedValueOnce({status: 'successful'});
 
     const instance = await E2EIHandler.getInstance().initialize(params);
@@ -143,7 +137,6 @@ describe('E2EIHandler', () => {
   it('should set currentStep to ERROR when enrolE2EI is called and enrolment fails', async () => {
     // Mock the Core service to return an error
     jest.spyOn(container.resolve(Core), 'enrollE2EI').mockImplementationOnce(jest.fn(() => Promise.reject()));
-    jest.spyOn(container.resolve(UserState), 'self').mockImplementationOnce(() => user);
 
     const instance = await E2EIHandler.getInstance().initialize(params);
     void instance['enroll']();
