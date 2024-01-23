@@ -22,7 +22,7 @@ import {CSSObject} from '@emotion/react';
 export const ReadReceiptText: CSSObject = {
   display: 'inline-flex',
   alignItems: 'center',
-  verticalAlign: 'bottom',
+  verticalAlign: 'text-bottom',
 };
 
 export const ReadIndicatorStyles = (showIconOnly = false): CSSObject => ({
@@ -45,7 +45,6 @@ export const ReadIndicatorStyles = (showIconOnly = false): CSSObject => ({
   }),
 
   '.message-asset &': {
-    marginTop: '8px',
     marginLeft: '12px',
   },
 
