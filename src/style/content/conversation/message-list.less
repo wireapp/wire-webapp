@@ -315,6 +315,10 @@
     width: 100%;
     max-width: calc(@conversation-max-width - var(--conversation-message-sender-width));
     height: fit-content;
+
+    .text:has(> .iframe-container) {
+      margin-right: 0;
+    }
   }
 
   .text {
