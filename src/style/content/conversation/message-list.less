@@ -37,7 +37,6 @@
 // MESSAGE
 .message {
   position: relative;
-  margin-bottom: 16px;
 
   & * {
     .accent-selection;
@@ -315,6 +314,7 @@
   &-content {
     width: 100%;
     max-width: calc(@conversation-max-width - var(--conversation-message-sender-width));
+    height: fit-content;
   }
 
   .text {
@@ -342,23 +342,14 @@
     line-height: 2.5rem;
   }
 
-  .iframe-container {
+  embed,
+  iframe,
+  object {
+    max-width: var(--conversation-message-asset-width);
     margin-top: 16px;
-    margin-bottom: 24px;
+    aspect-ratio: 16 / 9;
   }
 
-  .iframe-container-video {
-    position: relative;
-    padding-bottom: 75%;
-
-    embed,
-    iframe,
-    object {
-      position: absolute;
-      left: 0;
-      max-width: 100%;
-    }
-  }
   .message-ephemeral-timer {
     position: absolute;
     top: 2px;
@@ -388,7 +379,8 @@
 .image-asset {
   position: relative;
   display: flex;
-  margin: 8px 0 24px;
+  max-width: var(--conversation-message-asset-width);
+  margin: 0 0 24px;
   cursor: pointer;
 
   &--no-image {
@@ -727,7 +719,6 @@
 // MESSAGE SPACING
 .message-asset {
   display: flex;
-  max-width: var(--conversation-message-asset-width);
   align-items: flex-start;
   margin-top: 8px;
 }

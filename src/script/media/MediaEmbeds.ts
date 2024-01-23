@@ -49,7 +49,7 @@ const _createIFrameContainer = (options?: Partial<IFrameOptions>): string => {
   };
 
   options = {...defaults, ...options};
-  const iFrameContainer = `<div class="{0}"><iframe class="${options.type}" width="{1}" height="{2}" src="{3}" frameborder="{4}"{5}></iframe></div>`;
+  const iFrameContainer = `<iframe class="${options.type}" width="{1}" height="{2}" src="{3}" frameborder="{4}"{5}></iframe>`;
 
   if (!options.video) {
     options.allowfullscreen = '';
