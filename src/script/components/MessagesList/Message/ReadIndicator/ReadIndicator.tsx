@@ -31,7 +31,7 @@ interface ReadIndicatorProps {
   is1to1Conversation?: boolean;
   isLastDeliveredMessage?: boolean;
   showIconOnly?: boolean;
-  onClick: (message: Message) => void;
+  onClick?: (message: Message) => void;
 }
 
 export const ReadIndicator = ({
@@ -69,24 +69,29 @@ export const ReadIndicator = ({
   }
 
   const readReceiptCount = readReceipts.length;
-  const showEyeIndicatorOnly = showIconOnly && readReceiptCount > 0;
+
+  if (readReceiptCount === 0) {
+    return null;
+  }
+
+  if (showIconOnly) {
+    return (
+      <span css={ReadIndicatorStyles(true)} data-uie-name="status-message-read-receipts-header">
+        <Icon.Read />
+      </span>
+    );
+  }
 
   return (
     <button
-      css={ReadIndicatorStyles(showIconOnly)}
-      onClick={() => onClick(message)}
-      className="button-reset-default"
+      css={ReadIndicatorStyles(false)}
+      onClick={() => onClick?.(message)}
+      className="button-reset-default read-indicator"
       data-uie-name="status-message-read-receipts"
     >
-      {showEyeIndicatorOnly ? (
-        <Icon.Read />
-      ) : (
-        !!readReceiptCount && (
-          <div css={ReadReceiptText} data-uie-name="status-message-read-receipt-count">
-            <Icon.Read /> {readReceiptCount}
-          </div>
-        )
-      )}
+      <div css={ReadReceiptText} data-uie-name="status-message-read-receipt-count">
+        <Icon.Read /> {readReceiptCount}
+      </div>
     </button>
   );
 };
