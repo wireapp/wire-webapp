@@ -51,11 +51,10 @@ export class OIDCService {
     // Build the proxy url and redirect uri
     const currentOrigin = location.origin;
     const authorityUrl = idpUrl.origin + idpUrl.pathname;
-    const proxyUrl = `${currentOrigin}/oidcProxy?targetUrl=${authorityUrl}`;
     const redirectUri = `${currentOrigin}/oidc`;
 
     const dexioConfig: UserManagerSettings = {
-      authority: proxyUrl,
+      authority: authorityUrl,
       client_id: idpClientId,
       redirect_uri: redirectUri,
       response_type: 'code',
