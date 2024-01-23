@@ -31,7 +31,7 @@ import {
   isMLSConversation,
   isProteus1to1ConversationWithUser,
   isSelfConversation,
-  isUsableConversation,
+  isReadableConversation,
 } from './ConversationSelectors';
 
 import {Conversation} from '../entity/Conversation';
@@ -103,7 +103,7 @@ export class ConversationState {
     });
 
     this.filteredConversations = ko.pureComputed(() => {
-      return this.conversations().filter(isUsableConversation);
+      return this.conversations().filter(isReadableConversation);
     });
 
     this.connectedUsers = ko.pureComputed(() => {

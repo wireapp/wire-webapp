@@ -98,7 +98,7 @@ export const isProteus1to1ConversationWithUser = (userId: QualifiedId) =>
 export const isMLS1to1ConversationWithUser = (userId: QualifiedId) =>
   is1to1ConversationWithUser(userId, ConversationProtocol.MLS);
 
-export const isUsableConversation = (conversation: Conversation): boolean => {
+export const isReadableConversation = (conversation: Conversation): boolean => {
   const states_to_filter = [
     ConnectionStatus.MISSING_LEGAL_HOLD_CONSENT,
     ConnectionStatus.BLOCKED,

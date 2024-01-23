@@ -41,7 +41,7 @@ import {
 import {preprocessConversations, preprocessEvents, preprocessUsers} from './recordPreprocessors';
 
 import type {ConversationRepository} from '../conversation/ConversationRepository';
-import {isUsableConversation} from '../conversation/ConversationSelectors';
+import {isReadableConversation} from '../conversation/ConversationSelectors';
 import type {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 import {EventRecord, UserRecord} from '../storage';
@@ -382,9 +382,9 @@ export class BackupRepository {
     // Run all the database migrations on the imported data
     await this.backupService.runDbSchemaUpdates(archiveVersion);
 
-    const usableConversations = importedConversations.filter(isUsableConversation);
+    const readableConversations = importedConversations.filter(isReadableConversation);
 
-    await this.conversationRepository.updateConversations(usableConversations);
+    await this.conversationRepository.updateConversations(readableConversations);
     await this.conversationRepository.initAllLocal1To1Conversations();
     // doesn't need to be awaited
     void this.conversationRepository.checkForDeletedConversations();
