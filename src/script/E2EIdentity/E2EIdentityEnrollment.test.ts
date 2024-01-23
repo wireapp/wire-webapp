@@ -103,7 +103,7 @@ describe('E2EIHandler', () => {
     jest
       .spyOn(container.resolve(UserState), 'self')
       .mockReturnValue({name: () => 'John Doe', username: () => 'johndoe'});
-    jest.spyOn(container.resolve(Core), 'enrollE2EI').mockResolvedValue(true);
+    jest.spyOn(container.resolve(Core), 'enrollE2EI').mockResolvedValue({status: 'successful'});
     container.resolve(Core).key = new Uint8Array();
   });
 
@@ -132,7 +132,7 @@ describe('E2EIHandler', () => {
       .spyOn(container.resolve(UserState), 'self')
       .mockReturnValue({name: () => 'John Doe', username: () => 'johndoe'});
 
-    jest.spyOn(container.resolve(Core), 'enrollE2EI').mockResolvedValueOnce(true);
+    jest.spyOn(container.resolve(Core), 'enrollE2EI').mockResolvedValueOnce({status: 'successful'});
 
     const instance = await E2EIHandler.getInstance().initialize(params);
     void instance['enroll']();
@@ -180,7 +180,7 @@ describe('E2EIHandler', () => {
   });
 
   it('should display success message when enrollment is done', async () => {
-    jest.spyOn(container.resolve(Core), 'enrollE2EI').mockResolvedValueOnce(true);
+    jest.spyOn(container.resolve(Core), 'enrollE2EI').mockResolvedValueOnce({status: 'successful'});
 
     const handler = await E2EIHandler.getInstance().initialize(params);
     handler['showLoadingMessage'] = jest.fn();
