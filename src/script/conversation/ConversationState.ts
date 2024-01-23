@@ -17,7 +17,6 @@
  *
  */
 
-import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
 import {container, singleton} from 'tsyringe';
@@ -32,6 +31,7 @@ import {
   isMLSConversation,
   isProteus1to1ConversationWithUser,
   isSelfConversation,
+  isReadableConversation,
 } from './ConversationSelectors';
 
 import {Conversation} from '../entity/Conversation';
@@ -103,21 +103,7 @@ export class ConversationState {
     });
 
     this.filteredConversations = ko.pureComputed(() => {
-      return this.conversations().filter(conversationEntity => {
-        const states_to_filter = [
-          ConnectionStatus.MISSING_LEGAL_HOLD_CONSENT,
-          ConnectionStatus.BLOCKED,
-          ConnectionStatus.CANCELLED,
-          ConnectionStatus.PENDING,
-        ];
-
-        const connection = conversationEntity.connection();
-
-        return !(
-          isSelfConversation(conversationEntity) ||
-          (connection && states_to_filter.includes(connection.status()))
-        );
-      });
+      return this.conversations().filter(isReadableConversation);
     });
 
     this.connectedUsers = ko.pureComputed(() => {
