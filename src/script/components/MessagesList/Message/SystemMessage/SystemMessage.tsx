@@ -27,6 +27,7 @@ import {JoinedAfterMLSMigrationFinalisationMessage} from 'src/script/entity/mess
 import {MessageTimerUpdateMessage} from 'src/script/entity/message/MessageTimerUpdateMessage';
 import {MLSConversationRecoveredMessage} from 'src/script/entity/message/MLSConversationRecoveredMessage';
 import {MLSMigrationFinalisationOngoingCallMessage} from 'src/script/entity/message/MLSMigrationFinalisationOngoingCallMessage';
+import {OneToOneMigratedToMlsMessage} from 'src/script/entity/message/OneToOneMigratedToMlsMessage';
 import {ProtocolUpdateMessage} from 'src/script/entity/message/ProtocolUpdateMessage';
 import {ReceiptModeUpdateMessage} from 'src/script/entity/message/ReceiptModeUpdateMessage';
 import {RenameMessage} from 'src/script/entity/message/RenameMessage';
@@ -71,6 +72,10 @@ export const SystemMessage: React.FC<SystemMessageProps> = ({message}) => {
   }
 
   if (message instanceof JoinedAfterMLSMigrationFinalisationMessage) {
+    return <SystemMessageBase message={message} icon={<Icon.Info />} />;
+  }
+
+  if (message instanceof OneToOneMigratedToMlsMessage) {
     return <SystemMessageBase message={message} icon={<Icon.Info />} />;
   }
 
