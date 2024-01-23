@@ -199,13 +199,11 @@ describe('BackupRepository', () => {
       const conversation = generateConversation({
         id: {id: 'conversation1', domain: 'staging2'},
         type: CONVERSATION_TYPE.ONE_TO_ONE,
-        overwites: {type: CONVERSATION_TYPE.ONE_TO_ONE},
       }).serialize();
 
       const selfConversation = generateConversation({
         id: {id: 'conversation2', domain: 'staging2'},
         type: CONVERSATION_TYPE.SELF,
-        overwites: {type: CONVERSATION_TYPE.SELF},
       }).serialize();
 
       const files = {
