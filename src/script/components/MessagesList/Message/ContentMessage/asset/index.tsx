@@ -74,12 +74,15 @@ const ContentAsset = ({
 
   switch (asset.type) {
     case AssetType.TEXT:
+      const shouldRenderText = (asset as Text).should_render_text();
+      const renderText = (asset as Text).render(selfId, message.accent_color());
+
       return (
         <>
-          {(asset as Text).should_render_text() && (
+          {shouldRenderText && (
             <TextMessageRenderer
               onMessageClick={onClickMessage}
-              text={(asset as Text).render(selfId, message.accent_color())}
+              text={renderText}
               className={cx('text', {
                 'text-foreground': [StatusType.FAILED, StatusType.FEDERATION_ERROR, StatusType.SENDING].includes(
                   status,
@@ -90,18 +93,30 @@ const ContentAsset = ({
               isFocusable={isMessageFocused}
             />
           )}
+
+          {shouldRenderText && (
+            <ReadIndicator
+              message={message}
+              is1to1Conversation={is1to1Conversation}
+              isLastDeliveredMessage={isLastDeliveredMessage}
+              onClick={onClickDetails}
+            />
+          )}
+
           {(asset as Text).previews().map(preview => (
             <div key={asset.id} className="message-asset">
               <LinkPreviewAsset message={message} isFocusable={isMessageFocused} />
+
+              {!shouldRenderText && (
+                <ReadIndicator
+                  message={message}
+                  is1to1Conversation={is1to1Conversation}
+                  isLastDeliveredMessage={isLastDeliveredMessage}
+                  onClick={onClickDetails}
+                />
+              )}
             </div>
           ))}
-
-          <ReadIndicator
-            message={message}
-            is1to1Conversation={is1to1Conversation}
-            isLastDeliveredMessage={isLastDeliveredMessage}
-            onClick={onClickDetails}
-          />
         </>
       );
     case AssetType.FILE:
