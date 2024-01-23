@@ -17,6 +17,7 @@
  *
  */
 
+import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {container} from 'tsyringe';
 import {omit} from 'underscore';
 
@@ -44,15 +45,6 @@ const conversationId = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a';
 const conversation = generateConversation({
   id: {id: conversationId, domain: 'test.wire.link'},
   overwites: {
-    archived_state: false,
-    archived_timestamp: 0,
-    creator: '1ccd93e0-0f4b-4a73-b33f-05c464b88439',
-    id: conversationId,
-    last_event_timestamp: 2,
-    last_server_timestamp: 2,
-    muted_timestamp: 0,
-    name: 'Tom @ Staging',
-    others: ['a7122859-3f16-4870-b7f2-5cbca5572ab2'],
     status: 0,
     type: 2,
   },
@@ -89,18 +81,9 @@ async function buildBackupRepository() {
 
   jest
     .spyOn(conversationRepository, 'mapConversations')
-    .mockImplementation(conversations => conversations.map(c => generateConversation({overwites: c})));
-  jest
-    .spyOn(conversationRepository, 'updateConversationStates')
-    .mockImplementation(conversations => conversations.map(c => generateConversation({overwites: c as any})) as any);
-  // const conversationRepository = {
-  //   initAllLocal1To1Conversations: jest.fn(),
-  //   getAllLocalConversations: jest.fn(),
-  //   checkForDeletedConversations: jest.fn(),
-  //   mapConnections: jest.fn().mockImplementation(() => []),
-  //   updateConversationStates: jest.fn().mockImplementation(conversations => conversations),
-  //   updateConversations: jest.fn().mockImplementation(async () => {}),
-  // } as unknown as ConversationRepository;
+    .mockImplementation(conversations => conversations.map(c => generateConversation({type: c.type, overwites: c})));
+  jest.spyOn(conversationRepository, 'updateConversationStates');
+  jest.spyOn(conversationRepository, 'updateConversations');
   return [
     new BackupRepository(backupService, conversationRepository),
     {backupService, conversationRepository, storageService},
@@ -213,9 +196,21 @@ describe('BackupRepository', () => {
 
       const metadata = {...backupRepository.createMetaData(user, 'client1'), version: mockedDBVersion};
 
+      const conversation = generateConversation({
+        id: {id: 'conversation1', domain: 'staging2'},
+        type: CONVERSATION_TYPE.ONE_TO_ONE,
+        overwites: {type: CONVERSATION_TYPE.ONE_TO_ONE},
+      }).serialize();
+
+      const selfConversation = generateConversation({
+        id: {id: 'conversation2', domain: 'staging2'},
+        type: CONVERSATION_TYPE.SELF,
+        overwites: {type: CONVERSATION_TYPE.SELF},
+      }).serialize();
+
       const files = {
         [Filename.METADATA]: JSON.stringify(metadata),
-        [Filename.CONVERSATIONS]: JSON.stringify([conversation]),
+        [Filename.CONVERSATIONS]: JSON.stringify([conversation, selfConversation]),
         [Filename.EVENTS]: JSON.stringify(messages),
         [Filename.USERS]: JSON.stringify(users),
       };
@@ -224,7 +219,17 @@ describe('BackupRepository', () => {
 
       await backupRepository.importHistory(user, zip, noop, noop);
 
-      expect(conversationRepository.updateConversationStates).toHaveBeenCalledWith([conversation]);
+      expect(conversationRepository.updateConversationStates).toHaveBeenCalledWith(
+        expect.arrayContaining([expect.objectContaining({id: conversation.id})]),
+      );
+
+      expect(conversationRepository.updateConversations).toHaveBeenCalledWith(
+        expect.arrayContaining([expect.objectContaining({id: conversation.id})]),
+      );
+      expect(conversationRepository.updateConversations).not.toHaveBeenCalledWith(
+        expect.arrayContaining([expect.objectContaining({id: conversation.id})]),
+      );
+
       expect(importSpy).toHaveBeenCalledWith(
         StorageSchemata.OBJECT_STORE.EVENTS,
         messages.map(message => omit(message, 'primary_key')),
