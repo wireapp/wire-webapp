@@ -48,7 +48,7 @@ const conversation = generateConversation({
     status: 0,
     type: 2,
   },
-});
+}).serialize();
 
 const messages = [
   {
@@ -132,8 +132,8 @@ describe('BackupRepository', () => {
       };
       const importSpy = jest.spyOn(backupService, 'importEntities');
 
-      await storageService.save(StorageSchemata.OBJECT_STORE.EVENTS, undefined, verificationEvent);
-      await storageService.save(StorageSchemata.OBJECT_STORE.EVENTS, undefined, textEvent);
+      await storageService.save(StorageSchemata.OBJECT_STORE.EVENTS, '', verificationEvent);
+      await storageService.save(StorageSchemata.OBJECT_STORE.EVENTS, '', textEvent);
       const blob = await backupRepository.generateHistory(user, 'client1', noop, password);
 
       await backupRepository.importHistory(new User('user1'), blob, noop, noop);
@@ -148,7 +148,7 @@ describe('BackupRepository', () => {
       const [backupRepository, {storageService}] = await buildBackupRepository();
       const password = '';
       await Promise.all([
-        ...messages.map(message => storageService.save(eventStoreName, undefined, message)),
+        ...messages.map(message => storageService.save(eventStoreName, '', message)),
         storageService.save('conversations', conversationId, conversation),
       ]);
 
@@ -227,7 +227,7 @@ describe('BackupRepository', () => {
         expect.arrayContaining([expect.objectContaining({id: conversation.id})]),
       );
       expect(conversationRepository.updateConversations).not.toHaveBeenCalledWith(
-        expect.arrayContaining([expect.objectContaining({id: conversation.id})]),
+        expect.arrayContaining([expect.objectContaining({id: selfConversation.id})]),
       );
 
       expect(importSpy).toHaveBeenCalledWith(
