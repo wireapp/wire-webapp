@@ -186,8 +186,9 @@ export const ContentMessageComponent: React.FC<ContentMessageProps> = ({
           {was_edited && (
             <span className="message-header-label-icon icon-edit" title={message.displayEditedTimestamp()}></span>
           )}
+
           <span className="content-message-timestamp">
-            <MessageTime timestamp={timestamp} className="label-xs" data-timestamp-type="normal">
+            <MessageTime timestamp={timestamp} data-timestamp-type="normal">
               {timeAgo}
             </MessageTime>
           </span>
@@ -196,11 +197,11 @@ export const ContentMessageComponent: React.FC<ContentMessageProps> = ({
             message={message}
             is1to1Conversation={conversation.is1to1()}
             isLastDeliveredMessage={isLastDeliveredMessage}
-            onClick={onClickDetails}
             showIconOnly
           />
         </MessageHeader>
       )}
+
       <div className="message-body">
         <div className="message-body-content" title={ephemeral_caption}>
           {ephemeral_status === EphemeralStatusType.ACTIVE && (
@@ -208,6 +209,7 @@ export const ContentMessageComponent: React.FC<ContentMessageProps> = ({
               <EphemeralTimer message={message} />
             </div>
           )}
+
           {quote && (
             <Quote
               conversation={conversation}

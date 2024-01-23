@@ -310,6 +310,7 @@
   max-width: @conversation-max-width;
   justify-content: space-between;
   padding-left: @conversation-message-sender-width;
+  padding-block: 4px 8px;
 
   &-content {
     width: 100%;
@@ -420,72 +421,9 @@
   }
 }
 
-// MESSAGE FOOTER
-.message-footer {
-  display: flex;
-  flex-wrap: wrap;
-  line-height: @avatar-diameter-xs;
-}
-
-.message-footer-text {
-  color: var(--gray-70);
-  font-size: @font-size-xsmall;
-
-  body.theme-dark & {
-    color: var(--gray-60);
-  }
-}
-
-.message-footer-icon {
-  .flex-center;
-
-  width: @conversation-message-sender-width;
-}
-
-.message-footer-label {
-  display: flex;
-  overflow: hidden;
-  flex: 1;
-  align-items: center;
-  font-size: @font-size-xs;
-
-  & > span {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: pre;
-  }
-
-  > * + * {
-    margin-left: 8px;
-  }
-}
-
-.message-footer-bottom {
-  display: flex;
-  width: 100%;
-  flex-wrap: wrap;
-  margin-top: 4px;
-  margin-right: var(--conversation-message-timestamp-width);
-  margin-left: @conversation-message-sender-width;
-
-  > *:not(:last-child) {
-    margin-right: 8px;
-    margin-bottom: 8px;
-  }
-}
-
-.message-footer-close-button {
-  .square(@avatar-diameter-xs);
-  .flex-center;
-
-  cursor: pointer;
-  font-size: @font-size-xs;
-}
-
 // MESSAGE - ACTIONS
 .message-body-actions {
   display: flex;
-  min-width: var(--conversation-message-timestamp-width);
   align-items: flex-start;
   justify-content: flex-start;
   padding: 5px;

@@ -26,9 +26,9 @@ export const ReadReceiptText: CSSObject = {
 };
 
 export const ReadIndicatorStyles = (showIconOnly = false): CSSObject => ({
-  color: 'var(--gray-70)',
+  color: 'var(--content-message-timestamp)',
   fontSize: 'var(--font-size-small)',
-  fontWeight: 'var(--font-weight-medium)',
+  fontWeight: 'var(--font-weight-regular)',
   lineHeight: 'var(--line-height-sm)',
 
   svg: {
