@@ -20,46 +20,56 @@
 import {AcmeService} from '../Connection';
 import {E2eiEnrollment, NewAcmeAuthz, Nonce} from '../E2EIService.types';
 import {jsonToByteArray} from '../Helper';
+import {AuthData} from '../Storage/E2EIStorage.schema';
 
 interface GetAuthorizationParams {
   nonce: Nonce;
-  authzUrl: string;
+  authzUrls: string[];
   identity: E2eiEnrollment;
   connection: AcmeService;
 }
-export type AuthorizationChallenge = {authorization: NewAcmeAuthz; nonce: Nonce};
 
 export const getAuthorizationChallenges = async ({
-  authzUrl,
+  authzUrls,
   nonce,
   identity,
   connection,
-}: GetAuthorizationParams): Promise<AuthorizationChallenge> => {
-  const reqBody = await identity.newAuthzRequest(authzUrl, nonce);
-  const response = await connection.getAuthorization(authzUrl, reqBody);
+}: GetAuthorizationParams): Promise<AuthData> => {
+  const challenges: {type: string; challenge: NewAcmeAuthz}[] = [];
 
-  if (response?.data && !!response.data.status.length && !!response.nonce.length) {
-    const wasmData = await identity.newAuthzResponse(jsonToByteArray(response.data));
-    // manual copy of the wasm data because of a problem while cloning it
-    const authorization: NewAcmeAuthz = {
-      identifier: wasmData.identifier,
-      keyauth: wasmData.keyauth,
-      wireDpopChallenge: {
-        delegate: wasmData.wireDpopChallenge!.delegate,
-        target: wasmData.wireDpopChallenge!.target,
-        url: wasmData.wireDpopChallenge!.url,
-      },
-      wireOidcChallenge: {
-        delegate: wasmData.wireOidcChallenge!.delegate,
-        target: wasmData.wireOidcChallenge!.target,
-        url: wasmData.wireOidcChallenge!.url,
-      },
-    };
-    return {
-      authorization,
-      nonce: response.nonce,
-    };
+  for (const authzUrl of authzUrls) {
+    const reqBody = await identity.newAuthzRequest(authzUrl, nonce);
+    const response = await connection.getAuthorization(authzUrl, reqBody);
+    // The backend returns a list of challenges (to be inline with the protocol), but in our case we are only ever going to have a single element in the list
+    const backendChallenge = response.data.challenges[0];
+    const challenge = await identity.newAuthzResponse(jsonToByteArray(response.data));
+    challenges.push({type: backendChallenge.type, challenge});
+    nonce = response.nonce;
   }
 
-  throw new Error('No authorization-data received');
+  const {challenge: oidcChallenge} = challenges.find(challenge => challenge.type.includes('oidc')) ?? {};
+  const {challenge: dpopChallenge} = challenges.find(challenge => challenge.type.includes('dpop')) ?? {};
+
+  if (!dpopChallenge || !oidcChallenge) {
+    throw new Error('missing dpop or oidc challenge');
+  }
+  // manual copy of the wasm data because of a problem while cloning it
+  const authorization = {
+    keyauth: oidcChallenge.keyauth!,
+    dpopChallenge: {
+      delegate: dpopChallenge.challenge.delegate,
+      target: dpopChallenge.challenge.target,
+      url: dpopChallenge.challenge.url,
+    },
+    oidcChallenge: {
+      delegate: oidcChallenge.challenge.delegate,
+      target: oidcChallenge.challenge.target,
+      url: oidcChallenge.challenge.url,
+    },
+  };
+
+  return {
+    authorization,
+    nonce,
+  };
 };

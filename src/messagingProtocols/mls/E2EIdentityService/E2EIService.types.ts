@@ -36,12 +36,12 @@ import {E2EIServiceExternal} from './E2EIServiceExternal';
 type OmitFree<T> = Omit<T, 'free'>;
 type NewAcmeAuthzOriginal = OmitFree<Awaited<ReturnType<E2eiEnrollment['newAuthzResponse']>>>;
 export type AcmeDirectory = OmitFree<Awaited<ReturnType<E2eiEnrollment['directoryResponse']>>>;
-export type AcmeChallenge = OmitFree<NonNullable<NewAcmeAuthzOriginal['wireOidcChallenge']>>;
+export type AcmeChallenge = OmitFree<NonNullable<NewAcmeAuthzOriginal['challenge']>>;
 export type NewAcmeOrder = OmitFree<Awaited<ReturnType<E2eiEnrollment['newOrderResponse']>>>;
-export type NewAcmeAuthz = Pick<Awaited<ReturnType<E2eiEnrollment['newAuthzResponse']>>, 'identifier' | 'keyauth'> & {
-  wireDpopChallenge?: AcmeChallenge;
-  wireOidcChallenge?: AcmeChallenge;
-};
+export type NewAcmeAuthz = Pick<
+  Awaited<ReturnType<E2eiEnrollment['newAuthzResponse']>>,
+  'identifier' | 'keyauth' | 'challenge'
+>;
 export {E2eiEnrollment, Ciphersuite, CoreCrypto, RotateBundle, WireIdentity, E2eiConversationState, CredentialType};
 
 export type User = {

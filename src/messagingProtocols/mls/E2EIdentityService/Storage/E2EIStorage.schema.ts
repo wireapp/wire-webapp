@@ -42,10 +42,9 @@ const AcmeChallengeSchema = z.object({
 });
 export const AuthDataSchema = z.object({
   authorization: z.object({
-    identifier: z.string(),
     keyauth: z.string(),
-    wireDpopChallenge: AcmeChallengeSchema.optional(),
-    wireOidcChallenge: AcmeChallengeSchema.optional(),
+    dpopChallenge: AcmeChallengeSchema,
+    oidcChallenge: AcmeChallengeSchema,
   }),
   nonce: z.string(),
 });

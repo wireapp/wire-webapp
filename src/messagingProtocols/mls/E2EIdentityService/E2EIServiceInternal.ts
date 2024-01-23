@@ -200,7 +200,7 @@ export class E2EIServiceInternal {
     const authChallenges = await getAuthorizationChallenges({
       connection: acmeService,
       identity: identity,
-      authzUrl: orderData.authzUrls[0],
+      authzUrls: orderData.authzUrls,
       nonce: orderData.nonce,
     });
 
@@ -297,7 +297,7 @@ export class E2EIServiceInternal {
     }
 
     const {
-      authorization: {wireOidcChallenge, keyauth},
+      authorization: {oidcChallenge: wireOidcChallenge, keyauth},
     } = await this.getEnrollmentChallenges();
 
     if (!wireOidcChallenge || !keyauth) {
