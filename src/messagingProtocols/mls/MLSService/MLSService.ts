@@ -51,7 +51,7 @@ import {parseFullQualifiedClientId} from '../../../util/fullyQualifiedClientIdUt
 import {numberToHex} from '../../../util/numberToHex';
 import {RecurringTaskScheduler} from '../../../util/RecurringTaskScheduler';
 import {TaskScheduler} from '../../../util/TaskScheduler';
-import {E2EIServiceExternal, StartNewOAuthFlowReturnValue, User} from '../E2EIdentityService';
+import {AcmeChallenge, E2EIServiceExternal, User} from '../E2EIdentityService';
 import {E2EIServiceInternal} from '../E2EIdentityService/E2EIServiceInternal';
 import {handleMLSMessageAdd, handleMLSWelcomeMessage} from '../EventHandler/events';
 import {
@@ -67,6 +67,13 @@ import {generateMLSDeviceId} from '../utils/MLSId';
 export const optionalToUint8Array = (array: Uint8Array | []): Uint8Array => {
   return Array.isArray(array) ? Uint8Array.from(array) : array;
 };
+
+type EnrollmentProcessState =
+  | {
+      status: 'authentication';
+      authenticationChallenge: {keyAuth: string; challenge: AcmeChallenge};
+    }
+  | {status: 'successful'};
 
 interface LocalMLSServiceConfig extends MLSServiceConfig {
   /**
@@ -779,7 +786,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     client: RegisteredClient,
     nbPrekeys: number,
     oAuthIdToken?: string,
-  ): Promise<StartNewOAuthFlowReturnValue | boolean> {
+  ): Promise<EnrollmentProcessState> {
     try {
       const hasActiveCertificate = await this.coreCryptoClient.e2eiIsEnabled(this.config.cipherSuite);
       const instance = await E2EIServiceInternal.getInstance({
@@ -795,50 +802,48 @@ export class MLSService extends TypedEventEmitter<Events> {
       // If we don't have an OAuth id token, we need to start the certificate process with Oauth
       if (!oAuthIdToken) {
         const data = await instance.startCertificateProcess(hasActiveCertificate);
-        if (data) {
-          return data;
+        const oidcChallenge = data.challenge;
+        if (!oidcChallenge) {
+          throw new Error('Not oidc challenge found');
         }
-        // If we have an OAuth id token, we can continue the certificate process / start a refresh
-      } else {
-        let rotateBundle;
-
-        // If we are not refreshing the active certificate, we need to continue the certificate process with Oauth
-        if (!hasActiveCertificate) {
-          rotateBundle = await instance.continueCertificateProcess(oAuthIdToken);
-          // If we are refreshing the active certificate, can start the refresh process
-        } else {
-          rotateBundle = await instance.startRefreshCertficateFlow(oAuthIdToken, hasActiveCertificate);
-        }
-
-        if (rotateBundle !== undefined) {
-          // upload the clients public keys
-          if (!hasActiveCertificate) {
-            // we only upload public keys for the initial certification process. Renewals do not need to upload new public keys
-            await this.uploadMLSPublicKeys(client);
-          }
-          // Remove old key packages
-          await this.deleteMLSKeyPackages(client.id, rotateBundle.keyPackageRefsToRemove);
-          // Upload new key packages with x509 certificate
-          await this.uploadMLSKeyPackages(client.id, rotateBundle.newKeyPackages);
-          // Verify that we have enough key packages
-          await this.verifyRemoteMLSKeyPackagesAmount(client.id);
-          // Update keying material
-          for (const [groupId, commitBundle] of rotateBundle.commits) {
-            const groupIdAsBytes = Converter.hexStringToArrayBufferView(groupId);
-            // manual copy of the commit bundle data because of a problem while cloning it
-            const newCommitBundle = {
-              commit: commitBundle.commit,
-              // @ts-ignore
-              groupInfo: commitBundle?.group_info || commitBundle.groupInfo,
-              welcome: commitBundle?.welcome,
-            };
-
-            await this.uploadCommitBundle(groupIdAsBytes, newCommitBundle);
-          }
-          return true;
-        }
+        return {status: 'authentication', authenticationChallenge: data};
       }
-      return false;
+
+      // If we have an OAuth id token, we can continue the certificate process / start a refresh
+      const rotateBundle = !hasActiveCertificate
+        ? // If we are not refreshing the active certificate, we need to continue the certificate process with Oauth
+          await instance.continueCertificateProcess(oAuthIdToken)
+        : // If we are refreshing the active certificate, can start the refresh process
+          await instance.startRefreshCertficateFlow(oAuthIdToken, hasActiveCertificate);
+
+      if (rotateBundle === undefined) {
+        throw new Error('Could not get the rotate bundle');
+      }
+      // upload the clients public keys
+      if (!hasActiveCertificate) {
+        // we only upload public keys for the initial certification process. Renewals do not need to upload new public keys
+        await this.uploadMLSPublicKeys(client);
+      }
+      // Remove old key packages
+      await this.deleteMLSKeyPackages(client.id, rotateBundle.keyPackageRefsToRemove);
+      // Upload new key packages with x509 certificate
+      await this.uploadMLSKeyPackages(client.id, rotateBundle.newKeyPackages);
+      // Verify that we have enough key packages
+      await this.verifyRemoteMLSKeyPackagesAmount(client.id);
+      // Update keying material
+      for (const [groupId, commitBundle] of rotateBundle.commits) {
+        const groupIdAsBytes = Converter.hexStringToArrayBufferView(groupId);
+        // manual copy of the commit bundle data because of a problem while cloning it
+        const newCommitBundle = {
+          commit: commitBundle.commit,
+          // @ts-ignore
+          groupInfo: commitBundle?.group_info || commitBundle.groupInfo,
+          welcome: commitBundle?.welcome,
+        };
+
+        await this.uploadCommitBundle(groupIdAsBytes, newCommitBundle);
+      }
+      return {status: 'successful'};
     } catch (error) {
       this.logger.error('E2EI - Failed to enroll', error);
       throw error;

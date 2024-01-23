@@ -27,14 +27,14 @@ interface GetAuthorizationParams {
   identity: E2eiEnrollment;
   connection: AcmeService;
 }
-export type GetAuthorizationReturnValue = {authorization: NewAcmeAuthz; nonce: Nonce};
+export type AuthorizationChallenge = {authorization: NewAcmeAuthz; nonce: Nonce};
 
-export const getAuthorization = async ({
+export const getAuthorizationChallenges = async ({
   authzUrl,
   nonce,
   identity,
   connection,
-}: GetAuthorizationParams): Promise<GetAuthorizationReturnValue> => {
+}: GetAuthorizationParams): Promise<AuthorizationChallenge> => {
   const reqBody = await identity.newAuthzRequest(authzUrl, nonce);
   const response = await connection.getAuthorization(authzUrl, reqBody);
 

@@ -27,6 +27,7 @@ export const InitialDataSchema = z.object({
     displayName: z.string(),
     handle: z.string(),
     domain: z.string(),
+    teamId: z.string(),
   }),
 });
 export type InitialData = z.infer<typeof InitialDataSchema>;

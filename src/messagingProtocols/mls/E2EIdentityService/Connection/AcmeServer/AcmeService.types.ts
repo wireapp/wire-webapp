@@ -29,14 +29,10 @@ export interface PostJoseRequestParams<T> {
   url: string;
   payload: Uint8Array;
   schema: ZodSchema<T>;
-  errorMessage: string;
   shouldGetLocation?: boolean;
 }
-export type PostJoseRequestReturnValue<T> = Promise<
-  | {
-      data: T;
-      nonce: Nonce;
-      location?: string;
-    }
-  | undefined
->;
+export type PostJoseRequestReturnValue<T> = {
+  data: T;
+  nonce: Nonce;
+  location?: string;
+};

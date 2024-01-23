@@ -29,31 +29,30 @@ export interface CreateNewOrderParams {
   directory: AcmeDirectory;
   connection: AcmeService;
 }
-export type CreateNewOrderReturnValue = Promise<{
+export type CreateNewOrderReturnValue = {
   order: NewAcmeOrder;
   nonce: string;
-  authzUrl: string;
+  authzUrls: string[];
   orderUrl: OrderUrl;
-}>;
+};
 
 export const createNewOrder = async ({
   identity,
   nonce,
   directory,
   connection,
-}: CreateNewOrderParams): CreateNewOrderReturnValue => {
+}: CreateNewOrderParams): Promise<CreateNewOrderReturnValue> => {
   const reqBody = await identity.newOrderRequest(nonce);
-  const response = await connection.createNewOrder(directory.newOrder, reqBody);
-  if (response?.data && !!response.data.status.length && !!response.nonce.length && !!response.location?.length) {
-    return {
-      order: await identity.newOrderResponse(jsonToByteArray(response.data)),
-      authzUrl: response.data.authorizations[0],
-      nonce: response.nonce,
-      orderUrl: response.location,
-    };
+  const {data, nonce: responseNonce, location} = await connection.createNewOrder(directory.newOrder, reqBody);
+  if (!location) {
+    throw new Error('No location header from API received for order creation');
   }
-
-  throw new Error('No createNewOrder-data received');
+  return {
+    order: await identity.newOrderResponse(jsonToByteArray(data)),
+    authzUrls: data.authorizations,
+    nonce: responseNonce,
+    orderUrl: location,
+  };
 };
 
 export interface FinalizeOrderParams {

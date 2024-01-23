@@ -19,14 +19,14 @@
 
 import {Converter} from 'bazinga64';
 
-import {GetAuthorizationReturnValue} from './Authorization';
+import {AuthorizationChallenge} from './Authorization';
 
 import {AcmeService} from '../Connection/AcmeServer';
 import {CoreCrypto, E2eiEnrollment, Nonce} from '../E2EIService.types';
 
 interface DoWireOidcChallengeParams {
   coreCryptoClient: CoreCrypto;
-  authData: GetAuthorizationReturnValue;
+  authData: AuthorizationChallenge;
   identity: E2eiEnrollment;
   connection: AcmeService;
   nonce: Nonce;

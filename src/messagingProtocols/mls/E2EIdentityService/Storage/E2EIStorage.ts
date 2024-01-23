@@ -50,8 +50,8 @@ const getAndVerifyAuthData = (): AuthData => {
   if (!data) {
     throw new Error('ACME: AuthData not found');
   }
-  const atob = window.atob(data);
-  return AuthDataSchema.parse(JSON.parse(atob));
+  const decodedData = window.atob(data);
+  return AuthDataSchema.parse(JSON.parse(decodedData));
 };
 
 const getInitialData = (): InitialData => {
