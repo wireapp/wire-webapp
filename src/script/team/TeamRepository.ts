@@ -162,7 +162,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
       } catch (error) {
         this.logger.error(error);
       }
-    }, TIME_IN_MILLIS.DAY);
+    }, TIME_IN_MILLIS.SECOND * 30);
   };
 
   async getTeam(): Promise<TeamEntity> {
