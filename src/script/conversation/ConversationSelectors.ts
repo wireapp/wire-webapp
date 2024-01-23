@@ -17,6 +17,7 @@
  *
  */
 
+import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {CONVERSATION_TYPE, ConversationProtocol} from '@wireapp/api-client/lib/conversation/';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
@@ -96,3 +97,16 @@ export const isProteus1to1ConversationWithUser = (userId: QualifiedId) =>
 
 export const isMLS1to1ConversationWithUser = (userId: QualifiedId) =>
   is1to1ConversationWithUser(userId, ConversationProtocol.MLS);
+
+export const isReadableConversation = (conversation: Conversation): boolean => {
+  const states_to_filter = [
+    ConnectionStatus.MISSING_LEGAL_HOLD_CONSENT,
+    ConnectionStatus.BLOCKED,
+    ConnectionStatus.CANCELLED,
+    ConnectionStatus.PENDING,
+  ];
+
+  const connection = conversation.connection();
+
+  return !(isSelfConversation(conversation) || (connection && states_to_filter.includes(connection.status())));
+};
