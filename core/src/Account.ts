@@ -53,7 +53,7 @@ import {SubconversationService} from './conversation/SubconversationService/Subc
 import {GiphyService} from './giphy/';
 import {LinkPreviewService} from './linkPreview';
 import {MLSService} from './messagingProtocols/mls';
-import {E2EIServiceExternal, StartNewOAuthFlowReturnValue, User} from './messagingProtocols/mls/E2EIdentityService';
+import {E2EIServiceExternal, User} from './messagingProtocols/mls/E2EIdentityService';
 import {CoreCallbacks, CoreCryptoConfig, SecretCrypto} from './messagingProtocols/mls/types';
 import {NewClient, ProteusService} from './messagingProtocols/proteus';
 import {CryptoClientType} from './messagingProtocols/proteus/ProteusService/CryptoClient';
@@ -237,14 +237,16 @@ export class Account extends TypedEventEmitter<Events> {
   public async enrollE2EI({
     displayName,
     handle,
+    teamId,
     discoveryUrl,
     oAuthIdToken,
   }: {
     displayName: string;
     handle: string;
+    teamId: string;
     discoveryUrl: string;
     oAuthIdToken?: string;
-  }): Promise<StartNewOAuthFlowReturnValue | boolean> {
+  }) {
     const context = this.apiClient.context;
     const domain = context?.domain ?? '';
 
@@ -253,14 +255,14 @@ export class Account extends TypedEventEmitter<Events> {
     }
 
     if (!this.service?.mls || !this.service?.e2eIdentity) {
-      this.logger.info('MLS not initialized, unable to enroll E2EI');
-      return false;
+      throw new Error('MLS not initialized, unable to enroll E2EI');
     }
 
     const user: User = {
       displayName,
       handle,
       domain,
+      teamId,
       id: this.userId,
     };
 

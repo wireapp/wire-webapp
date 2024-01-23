@@ -27,26 +27,18 @@ import {
   PostJoseRequestReturnValue,
 } from './AcmeService.types';
 import {
-  AuthorizationResponseData,
   AuthorizationResponseSchema,
   DirectoryResponseSchema,
-  NewAccountResponseData,
   NewAccountResponseSchema,
-  NewOrderResponseData,
   NewOrderResponseSchema,
   ResponseHeaderLocation,
   ResponseHeaderLocationSchema,
   ResponseHeaderNonce,
   ResponseHeaderNonceSchema,
-  CheckStatusOfOrderResponseData,
   CheckStatusOfOrderResponseSchema,
-  DpopChallengeResponseData,
   DpopChallengeResponseSchema,
-  FinalizeOrderResponseData,
   FinalizeOrderResponseSchema,
-  OidcChallengeResponseData,
   OidcChallengeResponseSchema,
-  GetCertificateResponseData,
   GetCertificateResponseSchema,
   LocalCertificateRootResponseSchema,
 } from './schema';
@@ -81,30 +73,20 @@ export class AcmeService {
     payload,
     schema,
     url,
-    errorMessage,
     shouldGetLocation = false,
-  }: PostJoseRequestParams<T>): PostJoseRequestReturnValue<T> {
-    try {
-      const {data, headers} = await this.axiosInstance.post(url, payload, {
-        headers: {
-          'Content-Type': 'application/jose+json',
-        },
-      });
-      let location = undefined;
-      const nonce = this.extractNonce(headers);
-      if (shouldGetLocation) {
-        location = this.extractLocation(headers);
-      }
-      const accountData = schema.parse(data);
-      return {
-        data: accountData,
-        nonce,
-        location,
-      };
-    } catch (e) {
-      this.logger.error(errorMessage, e);
-      return undefined;
-    }
+  }: PostJoseRequestParams<T>): Promise<PostJoseRequestReturnValue<T>> {
+    const {data, headers} = await this.axiosInstance.post(url, payload, {
+      headers: {
+        'Content-Type': 'application/jose+json',
+      },
+    });
+    const nonce = this.extractNonce(headers);
+    const accountData = schema.parse(data);
+    return {
+      data: accountData,
+      nonce,
+      location: shouldGetLocation ? this.extractLocation(headers) : undefined,
+    };
   }
 
   // ############ Public Functions ############
@@ -138,8 +120,7 @@ export class AcmeService {
   }
 
   public async createNewAccount(url: AcmeDirectory['newAccount'], payload: Uint8Array) {
-    return this.postJoseRequest<NewAccountResponseData>({
-      errorMessage: 'Error while creating new Account',
+    return this.postJoseRequest({
       payload,
       schema: NewAccountResponseSchema,
       url,
@@ -147,8 +128,7 @@ export class AcmeService {
   }
 
   public async createNewOrder(url: AcmeDirectory['newOrder'], payload: Uint8Array) {
-    return this.postJoseRequest<NewOrderResponseData>({
-      errorMessage: 'Error while creating new Order',
+    return this.postJoseRequest({
       payload,
       schema: NewOrderResponseSchema,
       url,
@@ -157,8 +137,7 @@ export class AcmeService {
   }
 
   public async getAuthorization(url: string, payload: Uint8Array) {
-    return this.postJoseRequest<AuthorizationResponseData>({
-      errorMessage: 'Error while receiving Authorization',
+    return this.postJoseRequest({
       payload,
       schema: AuthorizationResponseSchema,
       url,
@@ -166,8 +145,7 @@ export class AcmeService {
   }
 
   public async validateDpopChallenge(url: AcmeChallenge['url'], payload: Uint8Array) {
-    return this.postJoseRequest<DpopChallengeResponseData>({
-      errorMessage: 'Error while validating DPOP challenge',
+    return this.postJoseRequest({
       payload,
       schema: DpopChallengeResponseSchema,
       url,
@@ -175,8 +153,7 @@ export class AcmeService {
   }
 
   public async validateOidcChallenge(url: AcmeChallenge['url'], payload: Uint8Array) {
-    return this.postJoseRequest<OidcChallengeResponseData>({
-      errorMessage: 'Error while validating OIDC challenge',
+    return this.postJoseRequest({
       payload,
       schema: OidcChallengeResponseSchema,
       url,
@@ -184,8 +161,7 @@ export class AcmeService {
   }
 
   public async checkStatusOfOrder(url: string, payload: Uint8Array) {
-    return this.postJoseRequest<CheckStatusOfOrderResponseData>({
-      errorMessage: 'Error while checking status of Order',
+    return this.postJoseRequest({
       payload,
       schema: CheckStatusOfOrderResponseSchema,
       url,
@@ -193,8 +169,7 @@ export class AcmeService {
   }
 
   public async finalizeOrder(url: string, payload: Uint8Array) {
-    return this.postJoseRequest<FinalizeOrderResponseData>({
-      errorMessage: 'Error while finalizing Order',
+    return this.postJoseRequest({
       payload,
       schema: FinalizeOrderResponseSchema,
       url,
@@ -202,8 +177,7 @@ export class AcmeService {
   }
 
   public async getCertificate(url: string, payload: Uint8Array) {
-    return this.postJoseRequest<GetCertificateResponseData>({
-      errorMessage: 'Error while receiving Certificate',
+    return this.postJoseRequest({
       payload,
       schema: GetCertificateResponseSchema,
       url,

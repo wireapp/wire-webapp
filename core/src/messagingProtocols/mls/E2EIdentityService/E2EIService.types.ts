@@ -36,7 +36,7 @@ import {E2EIServiceExternal} from './E2EIServiceExternal';
 type OmitFree<T> = Omit<T, 'free'>;
 type NewAcmeAuthzOriginal = OmitFree<Awaited<ReturnType<E2eiEnrollment['newAuthzResponse']>>>;
 export type AcmeDirectory = OmitFree<Awaited<ReturnType<E2eiEnrollment['directoryResponse']>>>;
-export type AcmeChallenge = OmitFree<NonNullable<NewAcmeAuthzOriginal['wireDpopChallenge']>>;
+export type AcmeChallenge = OmitFree<NonNullable<NewAcmeAuthzOriginal['wireOidcChallenge']>>;
 export type NewAcmeOrder = OmitFree<Awaited<ReturnType<E2eiEnrollment['newOrderResponse']>>>;
 export type NewAcmeAuthz = Pick<Awaited<ReturnType<E2eiEnrollment['newAuthzResponse']>>, 'identifier' | 'keyauth'> & {
   wireDpopChallenge?: AcmeChallenge;
@@ -48,6 +48,7 @@ export type User = {
   id: string;
   domain: string;
   displayName: string;
+  teamId: string;
   handle: string;
 };
 export type Account = Uint8Array;
@@ -74,9 +75,4 @@ export interface InitParams {
   skipInit?: boolean;
   discoveryUrl?: string;
   keyPackagesAmount: number;
-}
-
-export interface StartNewOAuthFlowReturnValue {
-  challenge: AcmeChallenge;
-  keyAuth: KeyAuth;
 }
