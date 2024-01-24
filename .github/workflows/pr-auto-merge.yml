@@ -1,26 +1,22 @@
-name: auto-merge flagged PR
-on:
-  pull_request:
-    types: ['labeled']
+name: auto-merge PR
+on: pull_request
 
 permissions:
   pull-requests: write
   contents: write
 
-## This job will auto merge PR that has been labeled with 'auto-merge'
+# This job will enable auto merge on dependabots and otto-the-bot's PRs
 jobs:
   activate-auto-merge:
     runs-on: ubuntu-latest
-    if: ${{ github.event.label.name == 'auto-merge' }}
+    if: ${{github.actor == 'dependabot[bot]' || github.actor == 'otto-the-bot'}}
     steps:
       - name: Approve PR
-        run: gh pr review --approve "$PR_URL"
+        run: gh pr review --approve ${{github.event.pull_request.html_url}}
         env:
-          PR_URL: ${{github.event.pull_request.html_url}}
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
       - name: Enable auto-merge
-        run: gh pr merge --auto --squash "$PR_URL"
+        run: gh pr merge --auto --squash ${{github.event.pull_request.html_url}}
         env:
-          PR_URL: ${{github.event.pull_request.html_url}}
-          GITHUB_TOKEN: ${{secrets.WEBTEAM_AUTOMERGE_TOKEN}}
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
