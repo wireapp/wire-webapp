@@ -1,4 +1,4 @@
-name: Dependabot auto-merge
+name: auto-merge flagged PR
 on:
   pull_request_target:
     types: ['labeled']
