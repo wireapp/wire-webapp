@@ -65,13 +65,13 @@ export const getWebsiteUrl = (path: string = '', pkCampaign?: string): string | 
   return undefined;
 };
 
-const getHelpCenterUrl = (path: (typeof URL_PATH)[keyof typeof URL_PATH]) => {
-  if (URL.SUPPORT) {
-    const helpcenterUrl = `${URL.SUPPORT}${path}`;
-    return addLocaleToHelpCenterUrl(URL.SUPPORT ? helpcenterUrl : undefined);
-  }
-  return undefined;
-};
+// const getHelpCenterUrl = (path: (typeof URL_PATH)[keyof typeof URL_PATH]) => {
+//   if (URL.SUPPORT) {
+//     const helpcenterUrl = `${URL.SUPPORT}${path}`;
+//     return addLocaleToHelpCenterUrl(URL.SUPPORT ? helpcenterUrl : undefined);
+//   }
+//   return undefined;
+// };
 
 export const getAccountPagesUrl = (path: string = ''): string | undefined => {
   const accountPagesUrl = `${URL.ACCOUNT}${path}`;
@@ -88,11 +88,11 @@ export const getManageTeamUrl = (utmSource?: string): string => getTeamSettingsU
 
 export const getCreateTeamUrl = (): string =>
   Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && `${Config.getConfig().URL.TEAMS_BASE}/register/email`;
-export const getDecryptErrorUrl = (): string => getHelpCenterUrl(URL_PATH.DECRYPT_ERROR_1);
+// export const getDecryptErrorUrl = (): string => getHelpCenterUrl(URL_PATH.DECRYPT_ERROR_1);
 export const getPrivacyUnverifiedUsersUrl = (): string => getHelpCenterUrl(URL_PATH.PRIVACY_UNVERIFIED_USERS);
 export const getPrivacyWhyUrl = (): string => getHelpCenterUrl(URL_PATH.PRIVACY_WHY);
 
-export const addLocaleToUrl = (url?: string): string => {
+export const addLocaleToUrl = (url?: string): string | undefined => {
   if (!url) {
     return undefined;
   }
@@ -101,14 +101,14 @@ export const addLocaleToUrl = (url?: string): string => {
   return url.replace(Config.getConfig().URL.WEBSITE_BASE, `${Config.getConfig().URL.WEBSITE_BASE}/${websiteLanguage}`);
 };
 
-const addLocaleToHelpCenterUrl = (url?: string): string => {
-  if (!url) {
-    return undefined;
-  }
-  const language = currentLanguage().slice(0, 2);
-  const websiteLanguage = language == 'de' ? language : 'en-us';
-  return url.replace(
-    `${Config.getConfig().URL.SUPPORT.INDEX}`,
-    `${Config.getConfig().URL.SUPPORT.INDEX}/hc/${websiteLanguage}`,
-  );
-};
+// const addLocaleToHelpCenterUrl = (url?: string): string => {
+//   if (!url) {
+//     return undefined;
+//   }
+//   const language = currentLanguage().slice(0, 2);
+//   const websiteLanguage = language == 'de' ? language : 'en-us';
+//   return url.replace(
+//     `${Config.getConfig().URL.SUPPORT.INDEX}`,
+//     `${Config.getConfig().URL.SUPPORT.INDEX}/hc/${websiteLanguage}`,
+//   );
+// };
