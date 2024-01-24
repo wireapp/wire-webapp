@@ -1,5 +1,5 @@
 name: auto-merge PR
-on: pull_request_target
+on: pull_request
 
 permissions:
   pull-requests: write
@@ -12,11 +12,11 @@ jobs:
     if: ${{github.actor == 'dependabot[bot]' || github.actor == 'otto-the-bot' || github.actor == 'atomrc'}}
     steps:
       - name: Approve PR
-        run: gh pr review --approve ${{github.event.pull_request.id}}
+        run: gh pr review --approve ${{github.event.pull_request.html_url}}
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
       - name: Enable auto-merge
-        run: gh pr merge --auto --squash ${{github.event.pull_request.id}}
+        run: gh pr merge --auto --squash ${{github.event.pull_request.html_url}}
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
