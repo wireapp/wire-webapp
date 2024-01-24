@@ -90,6 +90,10 @@ const featureNotifications: Partial<
       Runtime.isWindows()
     ) {
       const status = wasTurnedOnOrOff(oldConfig, newConfig);
+      const configStatus = newConfig?.config?.enforcedDownloadLocation !== oldConfig?.config?.enforcedDownloadLocation;
+      if (!status && !configStatus) {
+        return undefined;
+      }
       amplify.publish(
         WebAppEvents.TEAM.DOWNLOAD_PATH_UPDATE,
         newConfig.status === FeatureStatus.ENABLED ? newConfig.config.enforcedDownloadLocation : undefined,

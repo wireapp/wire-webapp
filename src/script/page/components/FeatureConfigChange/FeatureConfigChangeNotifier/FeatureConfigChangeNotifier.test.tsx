@@ -19,6 +19,7 @@
 
 import {act, render, waitFor} from '@testing-library/react';
 import {FeatureStatus, FEATURE_KEY, FeatureList} from '@wireapp/api-client/lib/team/feature';
+import {Runtime} from '@wireapp/commons/lib/util/Runtime';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import en from 'I18n/en-US.json';
@@ -36,6 +37,8 @@ describe('FeatureConfigChangeNotifier', () => {
   beforeEach(() => {
     showModalSpy.mockClear();
     localStorage.clear();
+    jest.spyOn(Runtime, 'isDesktopApp').mockReturnValue(true);
+    jest.spyOn(Runtime, 'isWindows').mockReturnValue(true);
   });
 
   const baseConfig: FeatureList = {
@@ -95,6 +98,7 @@ describe('FeatureConfigChangeNotifier', () => {
         ...baseConfig,
         [feature]: {
           status: FeatureStatus.ENABLED,
+          ...(feature === FEATURE_KEY.ENFORCE_DOWNLOAD_PATH && {config: {enforcedDownloadLocation: 'dlpath'}}),
         },
       });
     });
@@ -116,6 +120,7 @@ describe('FeatureConfigChangeNotifier', () => {
         ...baseConfig,
         [feature]: {
           status: FeatureStatus.DISABLED,
+          ...(feature === FEATURE_KEY.ENFORCE_DOWNLOAD_PATH && {config: {enforcedDownloadLocation: ''}}),
         },
       });
     });
