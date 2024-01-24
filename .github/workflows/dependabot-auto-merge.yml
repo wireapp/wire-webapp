@@ -22,4 +22,4 @@ jobs:
         run: gh pr edit ${{ github.event.pull_request.id }} --add-label auto-merge
         env:
           PR_URL: ${{github.event.pull_request.html_url}}
-          GITHUB_TOKEN: ${{secrets.WEBTEAM_AUTOMERGE_TOKEN}}
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
