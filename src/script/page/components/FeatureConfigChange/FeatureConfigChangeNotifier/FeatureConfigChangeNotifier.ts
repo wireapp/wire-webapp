@@ -80,31 +80,38 @@ const featureNotifications: Partial<
     };
   },
   [FEATURE_KEY.ENFORCE_DOWNLOAD_PATH]: (oldConfig, newConfig) => {
-    const status = wasTurnedOnOrOff(oldConfig, newConfig);
-    if (!status) {
-      return undefined;
-    }
-    if (newConfig && 'config' in newConfig) {
+    if (
+      newConfig &&
+      'config' in newConfig &&
+      oldConfig &&
+      'config' in oldConfig &&
+      newConfig?.config?.enforcedDownloadLocation !== oldConfig?.config?.enforcedDownloadLocation &&
+      Runtime.isDesktopApp() &&
+      Runtime.isWindows()
+    ) {
+      const status = wasTurnedOnOrOff(oldConfig, newConfig);
       amplify.publish(
         WebAppEvents.TEAM.DOWNLOAD_PATH_UPDATE,
         newConfig.status === FeatureStatus.ENABLED ? newConfig.config.enforcedDownloadLocation : undefined,
       );
-    }
-    return {
-      htmlMessage:
-        status === FeatureStatus.ENABLED
-          ? t('featureConfigChangeModalDownloadPathEnabled')
-          : t('featureConfigChangeModalDownloadPathDisabled'),
-      title: 'featureConfigChangeModalDownloadPathHeadline',
-      primaryAction: {
-        action: () => {
-          if (Runtime.isDesktopApp() && status === FeatureStatus.ENABLED) {
-            // if we are in a desktop env, we just warn the wrapper that we need to reload. It then decide what should be done
-            amplify.publish(WebAppEvents.LIFECYCLE.RESTART);
-          }
+      return {
+        htmlMessage:
+          status === FeatureStatus.ENABLED
+            ? t('featureConfigChangeModalDownloadPathEnabled')
+            : status === FeatureStatus.DISABLED
+              ? t('featureConfigChangeModalDownloadPathDisabled')
+              : t('featureConfigChangeModalDownloadPathChanged'),
+        title: 'featureConfigChangeModalDownloadPathHeadline',
+        primaryAction: {
+          action: () => {
+            if (Runtime.isDesktopApp() && status !== FeatureStatus.DISABLED) {
+              amplify.publish(WebAppEvents.LIFECYCLE.RESTART);
+            }
+          },
         },
-      },
-    };
+      };
+    }
+    return undefined;
   },
   [FEATURE_KEY.SELF_DELETING_MESSAGES]: (oldConfig, newConfig) => {
     if (!oldConfig || !('config' in oldConfig) || !newConfig || !('config' in newConfig)) {
