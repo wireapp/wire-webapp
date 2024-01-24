@@ -20,3 +20,10 @@ jobs:
           pr_branch: 'dev'
         env:
           GITHUB_TOKEN: ${{ secrets.OTTO_THE_BOT_GH_TOKEN }}
+
+      # Add the auto-merge flag
+      - name: Enable auto-merge
+        run: gh pr edit ${{ github.event.pull_request.id }} --add-label auto-merge
+        env:
+          PR_URL: ${{github.event.pull_request.html_url}}
+          GITHUB_TOKEN: ${{secrets.WEBTEAM_AUTOMERGE_TOKEN}}
