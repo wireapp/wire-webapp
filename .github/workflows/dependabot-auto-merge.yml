@@ -16,15 +16,10 @@ jobs:
         with:
           github-token: '${{secrets.WEBTEAM_AUTOMERGE_TOKEN}}'
 
-      - name: Approve a PR
-        run: gh pr review --approve "$PR_URL"
-        env:
-          PR_URL: ${{github.event.pull_request.html_url}}
-          GITHUB_TOKEN: ${{secrets.WEBTEAM_AUTOMERGE_TOKEN}}
-
-      - name: Enable auto-merge for Dependabot PRs
+      # Add the auto-merge flag if the PR is a minor or patch version update
+      - name: Enable auto-merge for minor and patch updates
         if: ${{steps.metadata.outputs.update-type == 'version-update:semver-minor' || steps.metadata.outputs.update-type == 'version-update:semver-patch'}}
-        run: gh pr merge --auto --squash "$PR_URL"
+        run: gh pr edit ${{ github.event.pull_request.id }} --add-label auto-merge
         env:
           PR_URL: ${{github.event.pull_request.html_url}}
           GITHUB_TOKEN: ${{secrets.WEBTEAM_AUTOMERGE_TOKEN}}
