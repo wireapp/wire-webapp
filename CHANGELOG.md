@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [43.9.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@43.9.0...@wireapp/core@43.9.1) (2024-01-24)
+
+### Bug Fixes
+
+* **core:** replace btoa with bazinga in e2ei storage ([#5899](https://github.com/wireapp/wire-web-packages/issues/5899)) ([e8ec491](https://github.com/wireapp/wire-web-packages/commit/e8ec491842298fd6dd87b22b96f1ec1cbef289d5))
+
 # [43.9.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@43.8.0...@wireapp/core@43.9.0) (2024-01-23)
 
 ### Features
