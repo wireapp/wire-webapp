@@ -19,4 +19,4 @@ jobs:
         with:
           pr_branch: 'dev'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.OTTO_THE_BOT_GH_TOKEN }}
