@@ -5,6 +5,10 @@ on:
   push:
     branches:
       - release/*
+
+permissions:
+  pull-requests: write
+
 jobs:
   cherry_pick:
     runs-on: ubuntu-latest
