@@ -9,7 +9,7 @@ permissions:
 jobs:
   activate-auto-merge:
     runs-on: ubuntu-latest
-    if: ${{github.actor == 'dependabot[bot]' || github.actor == 'otto-the-bot' || github.actor == 'atomrc'}}
+    if: ${{github.actor == 'dependabot[bot]' || github.actor == 'otto-the-bot'}}
     steps:
       - name: Approve PR
         run: gh pr review --approve ${{github.event.pull_request.html_url}}
