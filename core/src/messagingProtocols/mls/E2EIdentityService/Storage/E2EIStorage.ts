@@ -17,6 +17,8 @@
  *
  */
 
+import {Encoder, Decoder} from 'bazinga64';
+
 import {AuthData, AuthDataSchema, InitialData, InitialDataSchema, OrderData} from './E2EIStorage.schema';
 
 import {LocalStorageStore} from '../../../../util/LocalStorageStore';
@@ -28,10 +30,11 @@ const InitialDataKey = 'InitialData';
 
 const storage = LocalStorageStore<string>('E2EIStorage');
 
-const storeHandle = (handle: string) => storage.add(HandleKey, window.btoa(handle));
-const storeOrderData = (data: OrderData) => storage.add(OderDataKey, window.btoa(JSON.stringify(data)));
-const storeAuthData = (data: AuthData) => storage.add(AuthDataKey, window.btoa(JSON.stringify(data)));
-const storeInitialData = (data: InitialData) => storage.add(InitialDataKey, window.btoa(JSON.stringify(data)));
+const storeHandle = (handle: string) => storage.add(HandleKey, Encoder.toBase64(handle).asString);
+const storeOrderData = (data: OrderData) => storage.add(OderDataKey, Encoder.toBase64(JSON.stringify(data)).asString);
+const storeAuthData = (data: AuthData) => storage.add(AuthDataKey, Encoder.toBase64(JSON.stringify(data)).asString);
+const storeInitialData = (data: InitialData) =>
+  storage.add(InitialDataKey, Encoder.toBase64(JSON.stringify(data)).asString);
 
 const hasHandle = () => storage.has(HandleKey);
 const hasInitialData = () => storage.has(InitialDataKey);
@@ -41,8 +44,8 @@ const getAndVerifyHandle = () => {
   if (!handle) {
     throw new Error('ACME: No handle found');
   }
-  const atob = window.atob(handle);
-  return atob;
+
+  return Decoder.fromBase64(handle).asString;
 };
 
 const getAndVerifyAuthData = (): AuthData => {
@@ -50,7 +53,7 @@ const getAndVerifyAuthData = (): AuthData => {
   if (!data) {
     throw new Error('ACME: AuthData not found');
   }
-  const decodedData = window.atob(data);
+  const decodedData = Decoder.fromBase64(data).asString;
   return AuthDataSchema.parse(JSON.parse(decodedData));
 };
 
@@ -59,8 +62,8 @@ const getInitialData = (): InitialData => {
   if (!data) {
     throw new Error('ACME: InitialData not found');
   }
-  const atob = window.atob(data);
-  return InitialDataSchema.parse(JSON.parse(atob));
+  const decodedData = Decoder.fromBase64(data).asString;
+  return InitialDataSchema.parse(JSON.parse(decodedData));
 };
 
 const getAndVerifyOrderData = (): OrderData => {
@@ -68,8 +71,8 @@ const getAndVerifyOrderData = (): OrderData => {
   if (!data) {
     throw new Error('ACME: OrderData not found');
   }
-  const atob = window.atob(data);
-  return JSON.parse(atob);
+  const decodedData = Decoder.fromBase64(data).asString;
+  return JSON.parse(decodedData);
 };
 
 const removeInitialData = () => {
