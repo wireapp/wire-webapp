@@ -3,7 +3,6 @@ on: pull_request
 
 permissions:
   pull-requests: write
-  contents: write
 
 # This job will remove the AUTO: prefix from the PR title
 jobs:
@@ -16,6 +15,6 @@ jobs:
           TITLE="${{github.event.pull_request.title}}"
           SEMANTIC_TITLE="${TITLE/AUTO: /}"
           echo "renaming pr to: $SEMANTIC_TITLE"
-          gh pr edit ${{github.event.pull_request.id}} --title "$SEMANTIC_TITLE"
+          gh pr edit ${{github.event.pull_request.html_url}} --title "$SEMANTIC_TITLE"
         env:
           GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
