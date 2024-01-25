@@ -481,6 +481,7 @@ export class Account extends TypedEventEmitter<Events> {
         cryptoClient.getNativeClient(),
         clientService,
         mlsService.config.cipherSuite,
+        this.recurringTaskScheduler,
       );
     }
 

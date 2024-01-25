@@ -18,6 +18,7 @@
  */
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import {Decoder} from 'bazinga64';
 
 import {Ciphersuite, CoreCrypto, E2eiConversationState, WireIdentity, DeviceStatus} from '@wireapp/core-crypto';
@@ -29,6 +30,7 @@ import {E2EIStorage} from './Storage/E2EIStorage';
 import {ClientService} from '../../../client';
 import {parseFullQualifiedClientId} from '../../../util/fullyQualifiedClientIdUtils';
 import {LocalStorageStore} from '../../../util/LocalStorageStore';
+import {RecurringTaskScheduler} from '../../../util/RecurringTaskScheduler';
 
 export type DeviceIdentity = Omit<WireIdentity, 'free' | 'status'> & {status?: DeviceStatus; deviceId: string};
 
@@ -38,6 +40,7 @@ export class E2EIServiceExternal {
     private readonly coreCryptoClient: CoreCrypto,
     private readonly clientService: ClientService,
     private readonly cipherSuite: Ciphersuite,
+    private readonly recurringTaskScheduler: RecurringTaskScheduler,
   ) {}
 
   // If we have a handle in the local storage, we are in the enrollment process (this handle is saved before oauth redirect)
@@ -128,11 +131,16 @@ export class E2EIServiceExternal {
     return typeof client.mls_public_keys.ed25519 !== 'string' || client.mls_public_keys.ed25519.length === 0;
   }
 
-  private async registerLocalCertificateRoot(connection: AcmeService): Promise<string> {
-    const localCertificateRoot = await connection.getLocalCertificateRoot();
+  private async registerLocalCertificateRoot(acmeService: AcmeService): Promise<string> {
+    const localCertificateRoot = await acmeService.getLocalCertificateRoot();
     await this.coreCryptoClient.e2eiRegisterAcmeCA(localCertificateRoot);
 
     return localCertificateRoot;
+  }
+
+  private async registerCrossSignedCertificates(acmeService: AcmeService): Promise<void> {
+    const certificates = await acmeService.getFederationCrossSignedCertificates();
+    await Promise.all(certificates.map(cert => this.coreCryptoClient.e2eiRegisterIntermediateCA(cert)));
   }
 
   /**
@@ -157,14 +165,26 @@ export class E2EIServiceExternal {
 
     // Register root certificate if not already registered
     if (!store.has(ROOT_CA_KEY)) {
-      try {
-        await this.registerLocalCertificateRoot(acmeService);
-        store.add(ROOT_CA_KEY, 'true');
-      } catch (error) {
-        console.error('Failed to register root certificate', error);
-      }
+      await this.registerLocalCertificateRoot(acmeService);
+      store.add(ROOT_CA_KEY, 'true');
     }
 
     // Register intermediate certificate and update it every 24 hours
+
+    const INTERMEDIATE_CA_KEY = 'update-intermediate-certificates';
+    const hasPendingTask = await this.recurringTaskScheduler.hasTask(INTERMEDIATE_CA_KEY);
+
+    const task = () => this.registerCrossSignedCertificates(acmeService);
+
+    // If the task was never registered, we run it once, and then register it to run every 24 hours
+    if (!hasPendingTask) {
+      await task();
+    }
+
+    await this.recurringTaskScheduler.registerTask({
+      every: TimeInMillis.DAY,
+      key: INTERMEDIATE_CA_KEY,
+      task,
+    });
   }
 }

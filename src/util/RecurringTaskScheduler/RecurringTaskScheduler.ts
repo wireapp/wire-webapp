@@ -68,4 +68,8 @@ export class RecurringTaskScheduler {
     TaskScheduler.cancelTask(taskKey);
     LowPrecisionTaskScheduler.cancelTask({intervalDelay: TimeUtil.TimeInMillis.MINUTE, key: taskKey});
   };
+
+  public readonly hasTask = async (taskKey: string): Promise<boolean> => {
+    return !!(await this.storage.get(taskKey));
+  };
 }

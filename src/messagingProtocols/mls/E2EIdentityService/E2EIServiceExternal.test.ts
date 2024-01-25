@@ -22,9 +22,11 @@ import {Ciphersuite, CoreCrypto, WireIdentity} from '@wireapp/core-crypto';
 import {E2EIServiceExternal} from './E2EIServiceExternal';
 
 import {ClientService} from '../../../client';
+import {openDB} from '../../../storage/CoreDB';
 import {getUUID} from '../../../test/PayloadHelper';
+import {RecurringTaskScheduler} from '../../../util/RecurringTaskScheduler';
 
-function buildE2EIService() {
+async function buildE2EIService() {
   const coreCrypto = {
     getUserIdentities: jest.fn(),
     getClientIds: jest.fn().mockResolvedValue([]),
@@ -32,8 +34,23 @@ function buildE2EIService() {
 
   const clientService = {} as jest.Mocked<ClientService>;
 
+  const mockedDb = await openDB('core-test-db');
+
+  const recurringTaskScheduler = new RecurringTaskScheduler({
+    delete: key => mockedDb.delete('recurringTasks', key),
+    get: async key => (await mockedDb.get('recurringTasks', key))?.firingDate,
+    set: async (key, timestamp) => {
+      await mockedDb.put('recurringTasks', {key, firingDate: timestamp});
+    },
+  });
+
   return [
-    new E2EIServiceExternal(coreCrypto, clientService, Ciphersuite.MLS_128_DHKEMP256_AES128GCM_SHA256_P256),
+    new E2EIServiceExternal(
+      coreCrypto,
+      clientService,
+      Ciphersuite.MLS_128_DHKEMP256_AES128GCM_SHA256_P256,
+      recurringTaskScheduler,
+    ),
     {coreCrypto},
   ] as const;
 }
@@ -64,7 +81,7 @@ const groupId = 'AAEAAhJrE+8TbFFUqiagedTYDUMAZWxuYS53aXJlLmxpbms=';
 describe('E2EIServiceExternal', () => {
   describe('getUsersIdentities', () => {
     it('returns the user identities', async () => {
-      const [service, {coreCrypto}] = buildE2EIService();
+      const [service, {coreCrypto}] = await buildE2EIService();
       const user1 = {domain: 'elna.wire.link', id: '48a1c3b0-4b0e-4bcd-93ad-64c7344b1534'};
       const user2 = {domain: 'elna.wire.link', id: 'b7d287e4-7bbd-40e0-a550-6b18dcaf5f31'};
       const userIds = [user1, user2];
@@ -83,7 +100,7 @@ describe('E2EIServiceExternal', () => {
     });
 
     it('returns MLS basic devices with empty identity', async () => {
-      const [service, {coreCrypto}] = buildE2EIService();
+      const [service, {coreCrypto}] = await buildE2EIService();
       const user1 = {domain: 'elna.wire.link', id: '48a1c3b0-4b0e-4bcd-93ad-64c7344b1534'};
       const user2 = {domain: 'elna.wire.link', id: 'b7d287e4-7bbd-40e0-a550-6b18dcaf5f31'};
       const userIds = [user1, user2];
