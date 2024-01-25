@@ -2,7 +2,7 @@ name: Publish
 
 on:
   push:
-    branches: [master, dev]
+    branches: [master, dev, release/*]
     tags:
       - '*staging*'
       - '*production*'
