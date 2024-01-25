@@ -17,4 +17,4 @@ jobs:
           echo "new semantic title: $SEMANTIC_TITLE"
           gh pr edit ${{github.event.pull_request.id}} --title "$SEMANTIC_TITLE"
         env:
-          GH_TOKEN: ${{github.token}}
+          GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
