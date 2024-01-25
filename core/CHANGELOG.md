@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [43.10.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@43.9.1...@wireapp/core@43.10.0) (2024-01-25)
+
+### Features
+
+* federation cross signed certs [WPB-5391] ([#5882](https://github.com/wireapp/wire-web-packages/issues/5882)) ([ffb7348](https://github.com/wireapp/wire-web-packages/commit/ffb734886006d2ff69ca8ce15ddf33ddc59e73db))
+
 ## [43.9.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@43.9.0...@wireapp/core@43.9.1) (2024-01-24)
 
 ### Bug Fixes
