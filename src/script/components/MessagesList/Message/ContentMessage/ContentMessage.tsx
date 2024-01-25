@@ -29,7 +29,6 @@ import {useRelativeTimestamp} from 'src/script/hooks/useRelativeTimestamp';
 import {StatusType} from 'src/script/message/StatusType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getMessageAriaLabel} from 'Util/conversationMessages';
-import {fromUnixTime, TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {ContentAsset} from './asset';
 import {MessageActionsMenu} from './MessageActions/MessageActions';
@@ -126,13 +125,13 @@ export const ContentMessageComponent: React.FC<ContentMessageProps> = ({
       return true;
     }
 
-    const currentMessageDate = fromUnixTime(message.timestamp() / TIME_IN_MILLIS.SECOND);
-    const previousMessageDate = fromUnixTime(previousMessage.timestamp() / TIME_IN_MILLIS.SECOND);
+    // Interval in milliseconds, within which messages are grouped together
+    const GROUPED_MESSAGE_INTERVAL = 30000;
 
-    const currentMinute = currentMessageDate.getMinutes();
-    const previousMinute = previousMessageDate.getMinutes();
+    const currentMessageDate = message.timestamp();
+    const previousMessageDate = previousMessage.timestamp();
 
-    if (currentMinute !== previousMinute) {
+    if (currentMessageDate - previousMessageDate >= GROUPED_MESSAGE_INTERVAL) {
       return true;
     }
 
