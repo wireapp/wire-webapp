@@ -23,6 +23,7 @@ import {E2eiConversationState} from '@wireapp/core/lib/messagingProtocols/mls';
 import {container} from 'tsyringe';
 
 import {getConversationVerificationState, getUsersIdentities, MLSStatuses} from 'src/script/E2EIdentity';
+import {Conversation} from 'src/script/entity/Conversation';
 import {E2EIVerificationMessageType} from 'src/script/message/E2EIVerificationMessageType';
 import {Core} from 'src/script/service/CoreSingleton';
 import {Logger, getLogger} from 'Util/Logger';
@@ -48,7 +49,8 @@ class MLSConversationVerificationStateHandler {
     }
 
     // We hook into the newEpoch event of the MLS service to check if the conversation needs to be verified or degraded
-    this.core.service.mls.on('newEpoch', this.checkConversationVerificationState);
+    this.core.service.mls.on('newEpoch', this.onEpochChanged);
+    this.core.service.e2eIdentity.on('crlChanged', this.checkAllConversationsVerificationState);
   }
 
   /**
@@ -89,7 +91,15 @@ class MLSConversationVerificationStateHandler {
     });
   }
 
-  private checkConversationVerificationState = async ({groupId}: {groupId: string}): Promise<void> => {
+  /**
+   * This function checks all conversations if they are verified or degraded and updates them accordingly
+   */
+  private checkAllConversationsVerificationState = async (): Promise<void> => {
+    const conversations = this.conversationState.conversations();
+    await Promise.all(conversations.map(conversation => this.checkConversationVerificationState(conversation)));
+  };
+
+  private onEpochChanged = async ({groupId}: {groupId: string}): Promise<void> => {
     // There could be a race condition where we would receive an epoch update for a conversation that is not yet known by the webapp.
     // We just wait for it to be available and then check the verification state
     const conversation = await waitFor(() =>
@@ -100,12 +110,16 @@ class MLSConversationVerificationStateHandler {
       return this.logger.warn(`Epoch changed but conversation could not be found after waiting for 5 seconds`);
     }
 
+    return this.checkConversationVerificationState(conversation);
+  };
+
+  private checkConversationVerificationState = async (conversation: Conversation): Promise<void> => {
     const isSelfConversation = conversation.type() === CONVERSATION_TYPE.SELF;
     if (!isMLSConversation(conversation) || isSelfConversation) {
       return;
     }
 
-    const verificationState = await getConversationVerificationState(groupId);
+    const verificationState = await getConversationVerificationState(conversation.groupId);
 
     if (
       verificationState === E2eiConversationState.NotVerified &&
