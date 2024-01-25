@@ -85,7 +85,6 @@ const featureNotifications: Partial<
       'config' in newConfig &&
       oldConfig &&
       'config' in oldConfig &&
-      newConfig?.config?.enforcedDownloadLocation !== oldConfig?.config?.enforcedDownloadLocation &&
       Runtime.isDesktopApp() &&
       Runtime.isWindows()
     ) {
@@ -226,6 +225,7 @@ export function FeatureConfigChangeNotifier({teamState, selfUserId}: Props): nul
           },
           primaryAction: message.primaryAction,
           hideCloseBtn: featureKey === FEATURE_KEY.ENFORCE_DOWNLOAD_PATH,
+          preventClose: featureKey === FEATURE_KEY.ENFORCE_DOWNLOAD_PATH,
         });
       });
     }
