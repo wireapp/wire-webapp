@@ -11,6 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     if: startsWith(github.event.pull_request.title, 'AUTO:')
     steps:
+      - name: checkout
+        uses: actions/checkout@v4
       - name: Make title semantic
         run: |
           TITLE="${{github.event.pull_request.title}}"
