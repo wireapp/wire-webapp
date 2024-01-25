@@ -226,7 +226,6 @@ export class E2EIServiceInternal {
 
     // Step 7: Do OIDC client challenge
     const oidcData = await doWireOidcChallenge({
-      coreCryptoClient: this.coreCryptoClient,
       oAuthIdToken,
       authData,
       connection: this.acmeService,
