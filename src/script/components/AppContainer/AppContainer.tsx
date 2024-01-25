@@ -64,7 +64,10 @@ export const AppContainer: FC<AppProps> = ({config, clientType}) => {
       return;
     }
     const killInstance = registerInstance();
-    window.addEventListener('beforeunload', killInstance);
+    /* We need to wait the very last moment to de-register the instance.
+     * If we do it too early (like beforeunload event) then the app could detect it's no longer the single instance running and redirect to the login page
+     */
+    window.addEventListener('pagehide', killInstance);
   }, []);
 
   useEffect(() => {
