@@ -21,7 +21,6 @@ import React, {useMemo, useState, useEffect} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {ReadIndicator} from 'Components/MessagesList/Message/ReadIndicator';
 import {Conversation} from 'src/script/entity/Conversation';
 import {CompositeMessage} from 'src/script/entity/message/CompositeMessage';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
@@ -192,13 +191,6 @@ export const ContentMessageComponent: React.FC<ContentMessageProps> = ({
               {timeAgo}
             </MessageTime>
           </span>
-
-          <ReadIndicator
-            message={message}
-            is1to1Conversation={conversation.is1to1()}
-            isLastDeliveredMessage={isLastDeliveredMessage}
-            showIconOnly
-          />
         </MessageHeader>
       )}
 
