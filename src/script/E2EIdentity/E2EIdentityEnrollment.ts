@@ -131,7 +131,8 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       }),
     };
 
-    await this.coreE2EIService.registerServerCertificates(discoveryUrl);
+    await this.coreE2EIService.initialize(discoveryUrl);
+    await this.coreE2EIService.registerServerCertificates();
     this.currentStep = E2EIHandlerStep.INITIALIZED;
     return this;
   }
