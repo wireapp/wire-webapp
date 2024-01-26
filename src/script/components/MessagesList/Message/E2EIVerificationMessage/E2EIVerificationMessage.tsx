@@ -91,7 +91,6 @@ export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificatio
     }
   };
 
-  // TODO: Add update certificate method while this functionality will be finished
   const updateCertificate = async () => {
     try {
       await E2EIHandler.getInstance().attemptRenewal();
