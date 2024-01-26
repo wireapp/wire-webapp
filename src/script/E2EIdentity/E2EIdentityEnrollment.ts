@@ -161,7 +161,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     const {timeRemainingMS, certificateCreationTime} = getCertificateDetails(identity.certificate);
 
     if (!this.shouldRefresh(identity)) {
-      return;
+      throw new Error('Cannot renew certificate, identity is revoked');
     }
 
     // Check if an enrollment is already in progress
