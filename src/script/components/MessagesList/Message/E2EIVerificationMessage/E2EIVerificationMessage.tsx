@@ -87,12 +87,17 @@ export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificatio
     try {
       await E2EIHandler.getInstance().enroll();
     } catch (error) {
-      logger.error('Cannot get E2EI instance: ', error);
+      logger.error('Failed to enroll user certificate: ', error);
     }
   };
 
-  // TODO: Add update certificate method while this functionality will be finished
-  const updateCertificate = () => {};
+  const updateCertificate = async () => {
+    try {
+      await E2EIHandler.getInstance().attemptRenewal();
+    } catch (error) {
+      logger.error('Failed to renew user certificate: ', error);
+    }
+  };
 
   return (
     <div className="message-header">

@@ -526,7 +526,11 @@ export class App {
 
       if (e2eiHandler) {
         // At the end of the process (once conversations are loaded and joined), we can check if we need to renew the user's certificate
-        await e2eiHandler.attemptRenewal();
+        try {
+          await e2eiHandler.attemptRenewal();
+        } catch (error) {
+          this.logger.error('Failed to renew user certificate: ', error);
+        }
       }
       return selfUser;
     } catch (error) {
