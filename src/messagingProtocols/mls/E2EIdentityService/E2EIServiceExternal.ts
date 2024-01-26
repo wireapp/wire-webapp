@@ -21,6 +21,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import {Decoder} from 'bazinga64';
 
+import {TypedEventEmitter} from '@wireapp/commons';
 import {Ciphersuite, CoreCrypto, E2eiConversationState, WireIdentity, DeviceStatus} from '@wireapp/core-crypto';
 
 import {AcmeService} from './Connection';
@@ -28,20 +29,33 @@ import {getE2EIClientId} from './Helper';
 import {E2EIStorage} from './Storage/E2EIStorage';
 
 import {ClientService} from '../../../client';
+import {CoreDatabase} from '../../../storage/CoreDB';
 import {parseFullQualifiedClientId} from '../../../util/fullyQualifiedClientIdUtils';
 import {LocalStorageStore} from '../../../util/LocalStorageStore';
+import {LowPrecisionTaskScheduler} from '../../../util/LowPrecisionTaskScheduler';
 import {RecurringTaskScheduler} from '../../../util/RecurringTaskScheduler';
 
 export type DeviceIdentity = Omit<WireIdentity, 'free' | 'status'> & {status?: DeviceStatus; deviceId: string};
 
+type Events = {
+  remoteCrlChanged: undefined;
+  selfCrlChanged: undefined;
+};
+
 // This export is meant to be accessible from the outside (e.g the Webapp / UI)
-export class E2EIServiceExternal {
+export class E2EIServiceExternal extends TypedEventEmitter<Events> {
+  private _acmeService?: AcmeService;
+
   public constructor(
     private readonly coreCryptoClient: CoreCrypto,
+    private readonly coreDatabase: CoreDatabase,
+    private readonly recurringTaskScheduler: RecurringTaskScheduler,
     private readonly clientService: ClientService,
     private readonly cipherSuite: Ciphersuite,
-    private readonly recurringTaskScheduler: RecurringTaskScheduler,
-  ) {}
+  ) {
+    super();
+    void this.initialiseCrlDistributionTimers();
+  }
 
   // If we have a handle in the local storage, we are in the enrollment process (this handle is saved before oauth redirect)
   public isEnrollmentInProgress(): boolean {
@@ -138,6 +152,17 @@ export class E2EIServiceExternal {
     return localCertificateRoot;
   }
 
+  public async initialize(discoveryUrl: string): Promise<void> {
+    this._acmeService = new AcmeService(discoveryUrl);
+  }
+
+  private get acmeService(): AcmeService {
+    if (!this._acmeService) {
+      throw new Error('AcmeService not initialized');
+    }
+    return this._acmeService;
+  }
+
   private async registerCrossSignedCertificates(acmeService: AcmeService): Promise<void> {
     const certificates = await acmeService.getFederationCrossSignedCertificates();
     await Promise.all(certificates.map(cert => this.coreCryptoClient.e2eiRegisterIntermediateCA(cert)));
@@ -158,14 +183,13 @@ export class E2EIServiceExternal {
    *
    * @param discoveryUrl
    */
-  public async registerServerCertificates(discoveryUrl: string): Promise<void> {
+  public async registerServerCertificates(): Promise<void> {
     const ROOT_CA_KEY = 'e2ei_root-registered';
     const store = LocalStorageStore(ROOT_CA_KEY);
-    const acmeService = new AcmeService(discoveryUrl);
 
     // Register root certificate if not already registered
     if (!store.has(ROOT_CA_KEY)) {
-      await this.registerLocalCertificateRoot(acmeService);
+      await this.registerLocalCertificateRoot(this.acmeService);
       store.add(ROOT_CA_KEY, 'true');
     }
 
@@ -174,7 +198,7 @@ export class E2EIServiceExternal {
     const INTERMEDIATE_CA_KEY = 'update-intermediate-certificates';
     const hasPendingTask = await this.recurringTaskScheduler.hasTask(INTERMEDIATE_CA_KEY);
 
-    const task = () => this.registerCrossSignedCertificates(acmeService);
+    const task = () => this.registerCrossSignedCertificates(this.acmeService);
 
     // If the task was never registered, we run it once, and then register it to run every 24 hours
     if (!hasPendingTask) {
@@ -186,5 +210,74 @@ export class E2EIServiceExternal {
       key: INTERMEDIATE_CA_KEY,
       task,
     });
+  }
+
+  public async getCRLFromDistributionPoint(distributionPointUrl: string): Promise<Uint8Array> {
+    return this.acmeService.getCRLFromDistributionPoint(distributionPointUrl);
+  }
+
+  private scheduleCrlDistributionTimer({expiresAt, url}: {expiresAt: number; url: string}): void {
+    LowPrecisionTaskScheduler.addTask({
+      intervalDelay: TimeInMillis.SECOND,
+      firingDate: expiresAt,
+      key: url,
+      task: () => this.validateRemoteCrlDistributionPoint(url),
+    });
+  }
+
+  private async initialiseCrlDistributionTimers(): Promise<void> {
+    const crls = await this.coreDatabase.getAll('crls');
+
+    for (const crl of crls) {
+      this.scheduleCrlDistributionTimer(crl);
+    }
+  }
+
+  private async addCrlDistributionTimer({expiresAt, url}: {expiresAt: number; url: string}): Promise<void> {
+    await this.coreDatabase.add('crls', {expiresAt, url}, url);
+    this.scheduleCrlDistributionTimer({expiresAt, url});
+  }
+
+  private async cancelCrlDistributionTimer(url: string): Promise<void> {
+    await this.coreDatabase.delete('crls', url);
+  }
+
+  public async validateSelfCrl(): Promise<void> {
+    const {crl, url} = await this.acmeService.getSelfCRL();
+
+    await this.validateCrl(url, crl, async () => {
+      this.emit('selfCrlChanged');
+    });
+  }
+
+  private async validateRemoteCrlDistributionPoint(distributionPointUrl: string): Promise<void> {
+    const domain = new URL(distributionPointUrl).hostname;
+    const crl = await this.getCRLFromDistributionPoint(domain);
+
+    await this.validateCrl(distributionPointUrl, crl, async () => {
+      this.emit('remoteCrlChanged');
+    });
+  }
+
+  private async validateCrl(url: string, crl: Uint8Array, onDirty: () => Promise<void>): Promise<void> {
+    const {expiration, dirty} = await this.coreCryptoClient.e2eiRegisterCRL(url, crl);
+
+    await this.cancelCrlDistributionTimer(url);
+
+    //set a new timer that will execute a task once the CRL is expired
+    if (expiration) {
+      await this.addCrlDistributionTimer({expiresAt: expiration, url});
+    }
+
+    //if it was dirty, trigger e2eiconversationstate for every conversation
+    if (dirty) {
+      await onDirty();
+    }
+  }
+
+  public async handleNewRemoteCrlDistributionPoints(distributionPoints: string[]): Promise<void> {
+    for (const distributionPointUrl of distributionPoints) {
+      await this.validateRemoteCrlDistributionPoint(distributionPointUrl);
+    }
   }
 }

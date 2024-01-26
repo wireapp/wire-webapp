@@ -39,6 +39,7 @@ import {
   ProposalArgs,
   ProposalType,
   RemoveProposalArgs,
+  WelcomeBundle,
 } from '@wireapp/core-crypto';
 
 import {isCoreCryptoMLSConversationAlreadyExistsError, shouldMLSDecryptionErrorBeIgnored} from './CoreCryptoMLSError';
@@ -90,6 +91,7 @@ const defaultConfig: MLSServiceConfig = {
 
 type Events = {
   newEpoch: {epoch: number; groupId: string};
+  newCrlDistributionPoints: string[];
 };
 export class MLSService extends TypedEventEmitter<Events> {
   logger = logdown('@wireapp/core/MLSService');
@@ -205,9 +207,18 @@ export class MLSService extends TypedEventEmitter<Events> {
     if (keyPackages.length < 1) {
       throw new Error('Empty list of keys provided to addUsersToExistingConversation');
     }
-    return this.processCommitAction(groupIdBytes, () =>
-      this.coreCryptoClient.addClientsToConversation(groupIdBytes, keyPackages),
-    );
+    return this.processCommitAction(groupIdBytes, async () => {
+      const {crlNewDistributionPoints, ...commitBundle} = await this.coreCryptoClient.addClientsToConversation(
+        groupIdBytes,
+        keyPackages,
+      );
+
+      if (crlNewDistributionPoints && crlNewDistributionPoints.length > 0) {
+        this.emit('newCrlDistributionPoints', crlNewDistributionPoints);
+      }
+
+      return commitBundle;
+    });
   }
 
   public async getKeyPackagesPayload(qualifiedUsers: KeyPackageClaimUser[]) {
@@ -266,10 +277,12 @@ export class MLSService extends TypedEventEmitter<Events> {
     const credentialType = await this.getCredentialType();
     const generateCommit = async () => {
       const groupInfo = await getGroupInfo();
-      const {conversationId, ...commitBundle} = await this.coreCryptoClient.joinByExternalCommit(
-        groupInfo,
-        credentialType,
-      );
+      const {conversationId, crlNewDistributionPoints, ...commitBundle} =
+        await this.coreCryptoClient.joinByExternalCommit(groupInfo, credentialType);
+
+      if (crlNewDistributionPoints && crlNewDistributionPoints.length > 0) {
+        this.emit('newCrlDistributionPoints', crlNewDistributionPoints);
+      }
       return {groupId: conversationId, commitBundle};
     };
     const {commitBundle, groupId} = await generateCommit();
@@ -294,12 +307,30 @@ export class MLSService extends TypedEventEmitter<Events> {
   }
 
   public async processWelcomeMessage(welcomeMessage: Uint8Array): Promise<ConversationId> {
-    return this.coreCryptoClient.processWelcomeMessage(welcomeMessage);
+    const response = await this.coreCryptoClient.processWelcomeMessage(welcomeMessage);
+
+    //FIXME: this is temporary (it should be camel case), we wait for the update from core-crypto side
+    const {id, crl_new_distribution_points: crlNewDistributionPoints} = response as unknown as {
+      id: WelcomeBundle['id'];
+      crl_new_distribution_points: WelcomeBundle['crlNewDistributionPoints'];
+    };
+
+    if (crlNewDistributionPoints && crlNewDistributionPoints.length > 0) {
+      this.emit('newCrlDistributionPoints', crlNewDistributionPoints);
+    }
+    return id;
   }
 
   public async decryptMessage(conversationId: ConversationId, payload: Uint8Array): Promise<DecryptedMessage> {
     try {
       const decryptedMessage = await this.coreCryptoClient.decryptMessage(conversationId, payload);
+
+      const {crlNewDistributionPoints} = decryptedMessage;
+
+      if (crlNewDistributionPoints && crlNewDistributionPoints.length > 0) {
+        this.emit('newCrlDistributionPoints', crlNewDistributionPoints);
+      }
+
       return decryptedMessage;
     } catch (error) {
       // According to CoreCrypto JS doc on .decryptMessage method, we should ignore some errors (corecrypto handle them internally)
@@ -797,6 +828,10 @@ export class MLSService extends TypedEventEmitter<Events> {
         clientId: client.id,
         discoveryUrl,
         keyPackagesAmount: nbPrekeys,
+      });
+
+      instance.on('newCrlDistributionPoints', crlDistributionPoints => {
+        this.emit('newCrlDistributionPoints', crlDistributionPoints);
       });
 
       // If we don't have an OAuth id token, we need to start the certificate process with Oauth

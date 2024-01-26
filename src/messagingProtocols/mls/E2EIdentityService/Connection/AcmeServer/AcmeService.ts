@@ -42,6 +42,7 @@ import {
   GetCertificateResponseSchema,
   LocalCertificateRootResponseSchema,
   FederationCrossSignedCertificatesResponseSchema,
+  CrlResponseSchema,
 } from './schema';
 
 import {AcmeChallenge, AcmeDirectory} from '../../E2EIService.types';
@@ -51,8 +52,10 @@ export class AcmeService {
   private readonly axiosInstance: AxiosInstance = axios.create();
   private readonly url = {
     ROOTS: '/roots.pem',
+    CRL: '/crl',
+    PROXY_CRL: '/proxyCrl',
     FEDERATION: '/federation',
-  };
+  } as const;
 
   constructor(private discoveryUrl: string) {}
 
@@ -104,10 +107,34 @@ export class AcmeService {
     }
   }
 
+  public async getSelfCRL(): Promise<{crl: Uint8Array; url: string}> {
+    const url = `${this.acmeBaseUrl}${this.url.CRL}`;
+
+    const {data} = await this.axiosInstance.get(url, {
+      responseType: 'arraybuffer',
+    });
+
+    const crl = CrlResponseSchema.parse(data);
+    const crlUint8Array = new Uint8Array(crl);
+
+    return {url, crl: crlUint8Array};
+  }
+
   public async getLocalCertificateRoot(): Promise<string> {
     const {data} = await this.axiosInstance.get(`${this.acmeBaseUrl}${this.url.ROOTS}`);
     const localCertificateRoot = LocalCertificateRootResponseSchema.parse(data);
     return localCertificateRoot;
+  }
+
+  public async getCRLFromDistributionPoint(distributionPointUrl: string): Promise<Uint8Array> {
+    const {data} = await this.axiosInstance.get(`${this.acmeBaseUrl}${this.url.PROXY_CRL}/${distributionPointUrl}`, {
+      responseType: 'arraybuffer',
+    });
+
+    const crl = CrlResponseSchema.parse(data);
+    const crlUint8Array = new Uint8Array(crl);
+
+    return crlUint8Array;
   }
 
   public async getFederationCrossSignedCertificates(): Promise<string[]> {
