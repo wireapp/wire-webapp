@@ -31,6 +31,7 @@ import {container} from 'tsyringe';
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {E2EIHandler} from 'src/script/E2EIdentity';
 import {initializeDataDog} from 'Util/DataDog';
 import {DebugUtil} from 'Util/DebugUtil';
 import {Environment} from 'Util/Environment';
@@ -433,9 +434,10 @@ export class App {
       const conversations = await conversationRepository.loadConversations();
 
       const contacts = await userRepository.loadUsers(selfUser, connections, conversations);
+      let e2eiHandler: E2EIHandler | undefined;
       if (selfUser.teamId) {
         const {features: teamFeatures} = await teamRepository.initTeam(selfUser.teamId, contacts);
-        const e2eiHandler = await configureE2EI(this.logger, teamFeatures);
+        e2eiHandler = await configureE2EI(this.logger, teamFeatures);
         if (e2eiHandler) {
           /* We first try to do the initial enrollment (if the user has not yet enrolled)
            * We need to enroll before anything else (in particular joining MLS conversations)
