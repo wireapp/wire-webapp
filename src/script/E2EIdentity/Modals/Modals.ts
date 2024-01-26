@@ -30,6 +30,7 @@ export enum ModalType {
   SUCCESS = 'success',
   LOADING = 'loading',
   CERTIFICATE_RENEWAL = 'certificate_renewal',
+  SELF_CERTIFICATE_REVOKED = 'self_certificate_revoked',
   SNOOZE_REMINDER = 'snooze_reminder',
 }
 
@@ -118,6 +119,21 @@ export const getModalOptions = ({
       };
       modalType =
         hideSecondary || secondaryActionFn === undefined ? PrimaryModal.type.ACKNOWLEDGE : PrimaryModal.type.CONFIRM;
+      break;
+
+    case ModalType.SELF_CERTIFICATE_REVOKED:
+      options = {
+        text: {
+          closeBtnLabel: t('acme.selfCertificateRevoked.button.cancel'),
+          htmlMessage: t('acme.selfCertificateRevoked.text'),
+          title: t('acme.selfCertificateRevoked.title'),
+        },
+        primaryAction: {
+          action: primaryActionFn,
+          text: t('acme.selfCertificateRevoked.button.primary'),
+        },
+      };
+      modalType = PrimaryModal.type.CONFIRM;
       break;
 
     case ModalType.SNOOZE_REMINDER:
