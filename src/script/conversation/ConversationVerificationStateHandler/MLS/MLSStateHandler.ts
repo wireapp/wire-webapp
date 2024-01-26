@@ -22,7 +22,12 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {E2eiConversationState} from '@wireapp/core/lib/messagingProtocols/mls';
 import {container} from 'tsyringe';
 
-import {getConversationVerificationState, getUsersIdentities, MLSStatuses} from 'src/script/E2EIdentity';
+import {
+  getActiveWireIdentity,
+  getConversationVerificationState,
+  getUsersIdentities,
+  MLSStatuses,
+} from 'src/script/E2EIdentity';
 import {Conversation} from 'src/script/entity/Conversation';
 import {E2EIVerificationMessageType} from 'src/script/message/E2EIVerificationMessageType';
 import {Core} from 'src/script/service/CoreSingleton';
@@ -39,6 +44,7 @@ class MLSConversationVerificationStateHandler {
 
   public constructor(
     private readonly onConversationVerificationStateChange: OnConversationE2EIVerificationStateChange,
+    private readonly onSelfClientCertificateRevoked: () => Promise<void>,
     private readonly conversationState: ConversationState,
     private readonly core: Core,
   ) {
@@ -50,7 +56,8 @@ class MLSConversationVerificationStateHandler {
 
     // We hook into the newEpoch event of the MLS service to check if the conversation needs to be verified or degraded
     this.core.service.mls.on('newEpoch', this.onEpochChanged);
-    this.core.service.e2eIdentity.on('crlChanged', this.checkAllConversationsVerificationState);
+    this.core.service.e2eIdentity.on('remoteCrlChanged', this.checkAllConversationsVerificationState);
+    this.core.service.e2eIdentity.on('selfCrlChanged', this.checkSelfCertificateRevocation);
   }
 
   /**
@@ -90,6 +97,25 @@ class MLSConversationVerificationStateHandler {
       conversationVerificationState: state,
     });
   }
+
+  /**
+   * This function checks if self client certificate is revoked
+   */
+  private checkSelfCertificateRevocation = async (): Promise<void> => {
+    const activeIdentity = await getActiveWireIdentity();
+
+    if (!activeIdentity) {
+      return;
+    }
+
+    const isRevoked = activeIdentity.status === MLSStatuses.REVOKED;
+
+    if (isRevoked) {
+      await this.onSelfClientCertificateRevoked();
+    }
+
+    await this.checkAllConversationsVerificationState();
+  };
 
   /**
    * This function checks all conversations if they are verified or degraded and updates them accordingly
@@ -137,8 +163,14 @@ class MLSConversationVerificationStateHandler {
 
 export const registerMLSConversationVerificationStateHandler = (
   onConversationVerificationStateChange: OnConversationE2EIVerificationStateChange = () => {},
+  onSelfClientCertificateRevoked: () => Promise<void> = async () => {},
   conversationState: ConversationState = container.resolve(ConversationState),
   core: Core = container.resolve(Core),
 ): void => {
-  new MLSConversationVerificationStateHandler(onConversationVerificationStateChange, conversationState, core);
+  new MLSConversationVerificationStateHandler(
+    onConversationVerificationStateChange,
+    onSelfClientCertificateRevoked,
+    conversationState,
+    core,
+  );
 };
