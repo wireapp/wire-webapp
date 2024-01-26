@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [43.11.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@43.10.0...@wireapp/core@43.11.0) (2024-01-26)
+
+### Features
+
+* maintain revocation list timers ([#5900](https://github.com/wireapp/wire-web-packages/issues/5900)) ([ec4ac8f](https://github.com/wireapp/wire-web-packages/commit/ec4ac8fdb6a3564068b054da0ab649c9bfca9415))
+
 # [43.10.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@43.9.1...@wireapp/core@43.10.0) (2024-01-25)
 
 ### Features
