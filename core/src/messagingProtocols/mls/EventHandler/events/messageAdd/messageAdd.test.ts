@@ -80,9 +80,7 @@ describe('handleMLSMessageAdd', () => {
     const message = createMockedMessage();
 
     jest.spyOn(mockedMLSService, 'decryptMessage').mockResolvedValueOnce({
-      proposals: [
-        {proposal: new Uint8Array(), proposalRef: new Uint8Array(), free: () => {}, crlNewDistributionPoints: []},
-      ],
+      proposals: [{proposal: new Uint8Array(), proposalRef: new Uint8Array()}],
       commitDelay: 2000,
       message,
       hasEpochChanged: false,
