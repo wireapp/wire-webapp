@@ -32,7 +32,6 @@ import {TEAM_EVENT} from '@wireapp/api-client/lib/event/TeamEvent';
 import {FeatureStatus, FeatureList} from '@wireapp/api-client/lib/team/feature/';
 import type {PermissionsData} from '@wireapp/api-client/lib/team/member/PermissionsData';
 import type {TeamData} from '@wireapp/api-client/lib/team/team/TeamData';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
@@ -120,15 +119,29 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     );
   }
 
-  async initTeam(teamId?: string): Promise<{members: QualifiedId[]; features: FeatureList}> {
+  /**
+   * Will init the team configuration and all the team members from the contact list.
+   * @param teamId the Id of the team to init
+   * @param contacts all the contacts the self user has, team members will be deduced from it.
+   */
+  async initTeam(
+    teamId: string,
+    contacts: User[] = [],
+  ): Promise<{team: TeamEntity | undefined; features: FeatureList}> {
+    // async initTeam(teamId?: string): Promise<{members: QualifiedId[]; features: FeatureList}> {
     const team = await this.getTeam();
     // get the fresh feature config from backend
     const {newFeatureList} = await this.updateFeatureConfig();
     if (!teamId) {
-      return {members: [], features: {}};
+      return {team: undefined, features: {}};
     }
+    await this.updateTeamMembersByIds(
+      team,
+      contacts.filter(user => user.teamId === teamId).map(({id}) => id),
+    );
+
+    // Subscribe to team members change and update the user role and guest status
     this.teamState.teamMembers.subscribe(members => {
-      // Subscribe to team members change and update the user role and guest status
       this.userRepository.mapGuestStatus(members);
       const roles = this.teamState.memberRoles();
       members.forEach(user => {
@@ -137,9 +150,9 @@ export class TeamRepository extends TypedEventEmitter<Events> {
         }
       });
     });
-    const members = await this.loadTeamMembers(team);
+
     this.scheduleTeamRefresh();
-    return {members, features: newFeatureList};
+    return {team, features: newFeatureList};
   }
 
   private async updateFeatureConfig(): Promise<{newFeatureList: FeatureList; prevFeatureList?: FeatureList}> {
@@ -188,14 +201,6 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     const memberEntity = await this.getTeamMember(teamId, this.userState.self().id);
     this.updateUserRole(this.userState.self(), memberEntity.permissions);
     return memberEntity;
-  }
-
-  private async getAllTeamMembers(teamId: string): Promise<TeamMemberEntity[]> {
-    const {members, hasMore} = await this.teamService.getAllTeamMembers(teamId);
-    if (!hasMore && members.length) {
-      return this.teamMapper.mapMembers(members);
-    }
-    return [];
   }
 
   async conversationHasGuestLinkEnabled(conversationId: string): Promise<boolean> {
@@ -340,17 +345,6 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     }
 
     this.updateMemberRoles(mappedMembers);
-  }
-
-  private async loadTeamMembers(teamEntity: TeamEntity): Promise<QualifiedId[]> {
-    const teamMembers = await this.getAllTeamMembers(teamEntity.id);
-    this.teamState.memberRoles({});
-    this.teamState.memberInviters({});
-
-    this.updateMemberRoles(teamMembers);
-    return teamMembers
-      .filter(({userId}) => userId !== this.userState.self().id)
-      .map(memberEntity => ({domain: this.teamState.teamDomain() ?? '', id: memberEntity.userId}));
   }
 
   private getTeamById(teamId: string): Promise<TeamData> {
