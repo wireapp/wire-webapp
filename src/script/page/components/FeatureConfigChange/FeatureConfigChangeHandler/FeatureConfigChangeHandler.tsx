@@ -22,7 +22,7 @@ import {useEffect} from 'react';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getLogger} from 'Util/Logger';
 
-import {handleE2EIdentityFeatureChange} from './Features/E2EIdentity';
+import {configureE2EI} from './Features/E2EIdentity';
 
 import {TeamState} from '../../../../team/TeamState';
 
@@ -38,7 +38,7 @@ export function FeatureConfigChangeHandler({teamState}: Props): null {
   useEffect(() => {
     if (config) {
       // initialize feature handlers
-      handleE2EIdentityFeatureChange(logger, config);
+      void configureE2EI(logger, config)?.then(client => client.attemptEnrollment());
     }
   }, [config]);
 

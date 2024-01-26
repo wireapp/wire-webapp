@@ -70,11 +70,13 @@ import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
 import {isGroupMLSConversation, isMLSConversation, MLSConversation} from '../conversation/ConversationSelectors';
 import {ConversationState} from '../conversation/ConversationState';
-import {CallingEvent, EventBuilder} from '../conversation/EventBuilder';
+import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
+import {EventBuilder} from '../conversation/EventBuilder';
 import {CONSENT_TYPE, MessageRepository, MessageSendingOptions} from '../conversation/MessageRepository';
 import {Conversation} from '../entity/Conversation';
 import type {User} from '../entity/User';
 import {NoAudioInputError} from '../error/NoAudioInputError';
+import {CallingEvent} from '../event/CallingEvent';
 import {EventRepository} from '../event/EventRepository';
 import {EventSource} from '../event/EventSource';
 import type {MediaDevicesHandler} from '../media/MediaDevicesHandler';
@@ -144,6 +146,8 @@ export class CallingRepository {
    * Keeps track of the size of the avs log once the webapp is initiated. This allows detecting meaningless avs logs (logs that have a length equal to the length when the webapp was initiated)
    */
   private avsInitLogLength: number = 0;
+  private isSoftLock = false;
+
   onChooseScreen: (deviceId: string) => void;
 
   static get CONFIG() {
@@ -192,6 +196,39 @@ export class CallingRepository {
       }
     });
 
+    // abort call while conversation is degraded
+    ko.computed(() => {
+      const call = this.callState.joinedCall();
+
+      if (!call) {
+        return;
+      }
+
+      const activeConversation = this.getConversationById(call.conversationId);
+
+      if (!activeConversation) {
+        return;
+      }
+
+      const isDegraded = activeConversation.mlsVerificationState() === ConversationVerificationState.DEGRADED;
+
+      if (isDegraded) {
+        this.abortCall(activeConversation.qualifiedId, LEAVE_CALL_REASON.CONVERSATION_DEGRADED);
+
+        const modalOptions = {
+          primaryAction: {
+            text: t('conversation.E2EIOk'),
+          },
+          text: {
+            message: t('conversation.E2EIGroupCallDisconnected'),
+            title: t('conversation.E2EIConversationNoLongerVerified'),
+          },
+        };
+
+        PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, modalOptions, `degraded-${call.conversationId}`);
+      }
+    });
+
     this.acceptVersionWarning = (conversationId: QualifiedId) => {
       this.callState.acceptedVersionWarnings.push(conversationId);
       window.setTimeout(
@@ -233,6 +270,10 @@ export class CallingRepository {
 
   getStats(conversationId: QualifiedId) {
     return this.wCall?.getStats(this.serializeQualifiedId(conversationId));
+  }
+
+  setSoftLock(value: boolean) {
+    this.isSoftLock = value;
   }
 
   async initAvs(selfUser: User, clientId: ClientId): Promise<{wCall: Wcall; wUser: number}> {
@@ -282,7 +323,6 @@ export class CallingRepository {
   };
 
   private createWUser(wCall: Wcall, selfUserId: string, selfClientId: string): number {
-    /* cspell:disable */
     const wUser = wCall.create(
       selfUserId,
       selfClientId,
@@ -299,7 +339,6 @@ export class CallingRepository {
       this.audioCbrChanged, // `acbrh`,
       this.videoStateChanged, // `vstateh`,
     );
-    /* cspell:enable */
     const tenSeconds = 10;
     wCall.setNetworkQualityHandler(wUser, this.updateCallQuality, tenSeconds);
     wCall.setMuteHandler(wUser, this.updateMuteState);
@@ -597,20 +636,13 @@ export class CallingRepository {
    * Handle incoming calling events from backend.
    */
   onCallEvent = async (event: CallingEvent, source: string): Promise<void> => {
-    const {
-      content,
-      qualified_conversation,
-      from,
-      qualified_from,
-      sender: clientId,
-      time = new Date().toISOString(),
-      senderClientId: senderFullyQualifiedClientId = '',
-    } = event;
+    if (this.isSoftLock) {
+      return;
+    }
+
+    const {content, qualified_conversation, from, qualified_from} = event;
     const isFederated = this.core.backendFeatures.isFederated && qualified_conversation && qualified_from;
     const userId = isFederated ? qualified_from : {domain: '', id: from};
-    const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-    const toSecond = (timestamp: number) => Math.floor(timestamp / 1000);
-    const contentStr = JSON.stringify(content);
     const conversationId = this.extractTargetedConversationId(event);
     const conversation = this.getConversationById(conversationId);
 
@@ -634,20 +666,65 @@ export class CallingRepository {
             this.abortCall(conversationId, LEAVE_CALL_REASON.ABORTED_BECAUSE_FAILED_TO_UPDATE_MISSING_CLIENTS);
           }
         }
-        break;
+        return this.processCallingMessage(conversation, event);
       }
+
       case CALL_MESSAGE_TYPE.REMOTE_MUTE: {
         const call = this.findCall(conversationId);
-        if (call) {
-          this.muteCall(call, true, MuteState.REMOTE_MUTED);
+        if (!call) {
+          return;
         }
-        break;
+
+        const isSenderAdmin = conversation.isAdmin(userId);
+        if (!isSenderAdmin) {
+          return;
+        }
+
+        const selfUserId = this.selfUser?.qualifiedId;
+        const selfClientId = this.selfClientId;
+
+        if (!selfUserId || !selfClientId) {
+          return;
+        }
+
+        const isSelfClientTargetted =
+          !!content.data.targets[selfUserId.domain]?.[selfUserId.id]?.includes(selfClientId);
+
+        if (!isSelfClientTargetted) {
+          return;
+        }
+
+        this.muteCall(call, true, MuteState.REMOTE_MUTED);
+        return this.processCallingMessage(conversation, event);
       }
+
       case CALL_MESSAGE_TYPE.REMOTE_KICK: {
         this.leaveCall(conversationId, LEAVE_CALL_REASON.REMOTE_KICK);
-        break;
+        return this.processCallingMessage(conversation, event);
+      }
+
+      default: {
+        return this.processCallingMessage(conversation, event);
       }
     }
+  };
+
+  private readonly processCallingMessage = (conversation: Conversation, event: CallingEvent): void => {
+    const {
+      content,
+      time = new Date().toISOString(),
+      qualified_conversation,
+      from,
+      qualified_from,
+      sender: clientId,
+      senderClientId: senderFullyQualifiedClientId = '',
+    } = event;
+    const contentStr = JSON.stringify(content);
+    const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
+    const toSecond = (timestamp: number) => Math.floor(timestamp / 1000);
+
+    const isFederated = this.core.backendFeatures.isFederated && qualified_conversation && qualified_from;
+    const userId = isFederated ? qualified_from : {domain: '', id: from};
 
     let senderClientId = '';
     if (senderFullyQualifiedClientId) {
@@ -660,7 +737,7 @@ export class CallingRepository {
       contentStr.length,
       toSecond(currentTimestamp),
       toSecond(new Date(time).getTime()),
-      this.serializeQualifiedId(conversationId),
+      this.serializeQualifiedId(conversation.qualifiedId),
       this.serializeQualifiedId(userId),
       conversation && isMLSConversation(conversation) ? senderClientId : clientId,
       conversation && isGroupMLSConversation(conversation) ? CONV_TYPE.CONFERENCE_MLS : CONV_TYPE.CONFERENCE,
@@ -669,11 +746,13 @@ export class CallingRepository {
     if (res !== 0) {
       this.logger.warn(`recv_msg failed with code: ${res}`);
       if (
-        this.callState.acceptedVersionWarnings().every(acceptedId => !matchQualifiedIds(acceptedId, conversationId)) &&
+        this.callState
+          .acceptedVersionWarnings()
+          .every(acceptedId => !matchQualifiedIds(acceptedId, conversation.qualifiedId)) &&
         res === ERROR.UNKNOWN_PROTOCOL &&
         event.content.type === 'CONFSTART'
       ) {
-        this.warnOutdatedClient(conversationId);
+        this.warnOutdatedClient(conversation.qualifiedId);
       }
     }
   };
@@ -1239,7 +1318,11 @@ export class CallingRepository {
 
   readonly sendModeratorMute = (conversationId: QualifiedId, participants: Participant[]) => {
     const recipients = this.convertParticipantsToCallingMessageRecepients(participants);
-    this.sendCallingMessage(conversationId, {type: CALL_MESSAGE_TYPE.REMOTE_MUTE}, {nativePush: true, recipients});
+    this.sendCallingMessage(
+      conversationId,
+      {type: CALL_MESSAGE_TYPE.REMOTE_MUTE, data: {targets: recipients}},
+      {nativePush: true, recipients},
+    );
   };
 
   readonly sendModeratorKick = (conversationId: QualifiedId, participants: Participant[]) => {
@@ -1496,11 +1579,10 @@ export class CallingRepository {
   }
 
   private updateParticipantAudioState(call: Call, members: QualifiedWcallMember[]): void {
-    members.forEach(
-      member =>
-        call
-          .getParticipant(member.userId, member.clientid)
-          ?.isAudioEstablished(member.aestab === AUDIO_STATE.ESTABLISHED),
+    members.forEach(member =>
+      call
+        .getParticipant(member.userId, member.clientid)
+        ?.isAudioEstablished(member.aestab === AUDIO_STATE.ESTABLISHED),
     );
   }
 

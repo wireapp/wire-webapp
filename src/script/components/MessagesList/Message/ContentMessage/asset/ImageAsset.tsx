@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 
 import {CSSObject} from '@emotion/react';
 import cx from 'classnames';
@@ -30,8 +30,8 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import {useAssetTransfer} from './AbstractAssetTransferStateTracker';
 import {AssetLoader} from './AssetLoader';
+import {AssetUrl, useAssetTransfer} from './useAssetTransfer';
 
 import {Config} from '../../../../../Config';
 import {ContentMessage} from '../../../../../entity/message/ContentMessage';
@@ -47,48 +47,51 @@ export interface ImageAssetProps {
   isFocusable?: boolean;
 }
 
-const ImageAsset: React.FC<ImageAssetProps> = ({
+export const ImageAsset: React.FC<ImageAssetProps> = ({
   asset,
   message,
   onClick,
   teamState = container.resolve(TeamState),
   isFocusable = true,
 }) => {
-  const [imageUrl, setImageUrl] = useState<string>();
+  const [imageUrl, setImageUrl] = useState<AssetUrl>();
   const {resource} = useKoSubscribableChildren(asset, ['resource']);
   const {isObfuscated, visible} = useKoSubscribableChildren(message, ['isObfuscated', 'visible']);
   const {isFileSharingReceivingEnabled} = useKoSubscribableChildren(teamState, ['isFileSharingReceivingEnabled']);
   const [isInViewport, setIsInViewport] = useState(false);
-  const {isUploading, uploadProgress, cancelUpload, loadAsset} = useAssetTransfer(message);
+  const {isUploading, uploadProgress, cancelUpload, getAssetUrl} = useAssetTransfer(message);
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isFocusable);
+
+  /** keeps track of whether the component is mounted or not to avoid setting the image url in case it's not */
+  const isUnmouted = useRef(false);
 
   useEffect(() => {
     if (!imageUrl && isInViewport && resource && isFileSharingReceivingEnabled) {
-      let isWaiting = true;
       (async () => {
         try {
-          const blob = (await loadAsset(resource)) as Blob;
           const allowedImageTypes = [
             'application/octet-stream', // Octet-stream is required to paste images from clipboard
             ...Config.getConfig().ALLOWED_IMAGE_TYPES,
           ];
-          if (allowedImageTypes.includes(blob.type)) {
-            if (isWaiting) {
-              setImageUrl(window.URL.createObjectURL(blob));
-            }
-          } else {
-            throw new Error(`Unsupported image type "${blob.type}".`);
+          const url = await getAssetUrl(resource, allowedImageTypes);
+          if (isUnmouted.current) {
+            // Avoid re-rendering a component that is umounted
+            return;
           }
+          setImageUrl(url);
         } catch (error) {
           console.error(error);
         }
       })();
-      return () => {
-        isWaiting = false;
-      };
     }
-    return undefined;
-  }, [isInViewport, resource, isFileSharingReceivingEnabled]);
+  }, [imageUrl, isInViewport, resource, isFileSharingReceivingEnabled, getAssetUrl]);
+
+  useEffect(() => {
+    return () => {
+      isUnmouted.current = true;
+      imageUrl?.dispose();
+    };
+  }, []);
 
   const dummyImageUrl = `data:image/svg+xml;utf8,<svg aria-hidden="true" xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1' width='${asset.width}' height='${asset.height}'></svg>`;
 
@@ -99,7 +102,7 @@ const ImageAsset: React.FC<ImageAssetProps> = ({
 
   const imageContainerStyle: CSSObject = {
     aspectRatio: isFileSharingReceivingEnabled ? `${asset.ratio}` : undefined,
-    maxWidth: '100%',
+    maxWidth: 'var(--conversation-message-asset-width)',
     width: asset.width,
     maxHeight: '80vh',
   };
@@ -137,7 +140,7 @@ const ImageAsset: React.FC<ImageAssetProps> = ({
           <img
             data-uie-name="image-asset-img"
             className={cx('image-element', {'image-ephemeral': isObfuscated})}
-            src={imageUrl || dummyImageUrl}
+            src={imageUrl?.url || dummyImageUrl}
             alt={imageAltText}
           />
         </InViewport>
@@ -147,5 +150,3 @@ const ImageAsset: React.FC<ImageAssetProps> = ({
     </div>
   );
 };
-
-export {ImageAsset};

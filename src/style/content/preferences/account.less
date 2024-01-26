@@ -212,7 +212,14 @@
 }
 
 .preferences-account-name {
-  font-weight: @font-weight-bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+
+  .conversation-badges {
+    margin-left: 4px;
+  }
 }
 
 .preferences-account-username-atsign {
@@ -231,4 +238,12 @@
   .label-bold-xs;
 
   cursor: pointer;
+}
+
+.preferences-account-image {
+  text-align: center;
+}
+
+.preferences-accent-color-picker {
+  text-align: center;
 }

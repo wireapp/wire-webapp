@@ -21,6 +21,7 @@ import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 
 import {Message as MessageEntity} from 'src/script/entity/message/Message';
 
+import {ProtocolUpdateMessage} from '../entity/message/ProtocolUpdateMessage';
 import {SystemMessage} from '../entity/message/SystemMessage';
 import {ClientEvent} from '../event/Client';
 import {isMemberMessage} from '../guards/Message';
@@ -60,7 +61,7 @@ const filterDuplicatedSystemMessages = (messages: MessageEntity[]) => {
     }
 
     if (currentMessage.isSystem()) {
-      const systemMessagesToFilter = [CONVERSATION_EVENT.RENAME] as string[];
+      const systemMessagesToFilter = [CONVERSATION_EVENT.RENAME, CONVERSATION_EVENT.PROTOCOL_UPDATE] as string[];
       if (systemMessagesToFilter.includes(currentMessage.type)) {
         const uniqUpdateMessages = uniqMessages.filter(
           (message): message is SystemMessage => message.isSystem() && systemMessagesToFilter.includes(message.type),
@@ -79,6 +80,15 @@ const filterDuplicatedSystemMessages = (messages: MessageEntity[]) => {
             }
             return [...uniqMessages, currentMessage];
           }
+
+          if (prevMessage instanceof ProtocolUpdateMessage && currentMessage instanceof ProtocolUpdateMessage) {
+            // for protocol update messages, only protocol changes are relevant
+            if (prevMessage.protocol === currentMessage.protocol) {
+              return uniqMessages;
+            }
+            return [...uniqMessages, currentMessage];
+          }
+
           // Dont show duplicated system messages that follow each other
           if (prevMessage.caption === currentMessage.caption) {
             return uniqMessages;

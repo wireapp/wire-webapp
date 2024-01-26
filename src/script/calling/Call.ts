@@ -60,6 +60,7 @@ export class Call {
   public currentPage: ko.Observable<number> = ko.observable(0);
   public pages: ko.ObservableArray<Participant[]> = ko.observableArray();
   readonly maximizedParticipant: ko.Observable<Participant | null>;
+  public readonly isActive: ko.PureComputed<boolean>;
 
   private readonly audios: Record<string, {audioElement: HTMLAudioElement; stream: MediaStream}> = {};
   /**
@@ -97,6 +98,9 @@ export class Call {
     this.muteState(isMuted ? MuteState.SELF_MUTED : MuteState.NOT_MUTED);
     this.isConference = [CONV_TYPE.CONFERENCE, CONV_TYPE.CONFERENCE_MLS].includes(this.conversationType);
     this.isGroupOrConference = this.isConference || this.conversationType === CONV_TYPE.GROUP;
+    this.isActive = ko.pureComputed(() =>
+      [CALL_STATE.OUTGOING, CALL_STATE.ANSWERED, CALL_STATE.MEDIA_ESTAB].includes(this.state()),
+    );
   }
 
   get hasWorkingAudioInput(): boolean {

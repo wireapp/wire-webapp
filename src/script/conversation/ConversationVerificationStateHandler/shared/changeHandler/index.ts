@@ -23,10 +23,24 @@ import {ConversationVerificationState} from 'src/script/conversation/Conversatio
 import {Conversation} from 'src/script/entity/Conversation';
 import {VerificationMessageType} from 'src/script/message/VerificationMessageType';
 
-interface OnConversationVerificationStateChangeParams {
+import {E2EIVerificationMessageType} from '../../../../message/E2EIVerificationMessageType';
+
+interface CommonOnConversationVerificationStateChangeParams {
   conversationEntity: Conversation;
   conversationVerificationState: ConversationVerificationState;
-  verificationMessageType?: VerificationMessageType;
   userIds?: QualifiedId[];
 }
+
+interface OnConversationVerificationStateChangeParams extends CommonOnConversationVerificationStateChangeParams {
+  verificationMessageType?: VerificationMessageType;
+}
+
+interface OnConversationE2EIVerificationStateChangeParams extends CommonOnConversationVerificationStateChangeParams {
+  verificationMessageType?: E2EIVerificationMessageType;
+}
+
 export type OnConversationVerificationStateChange = (params: OnConversationVerificationStateChangeParams) => void;
+
+export type OnConversationE2EIVerificationStateChange = (
+  params: OnConversationE2EIVerificationStateChangeParams,
+) => void;

@@ -124,12 +124,16 @@ export class TeamRepository extends TypedEventEmitter<Events> {
    * @param teamId the Id of the team to init
    * @param contacts all the contacts the self user has, team members will be deduced from it.
    */
-  async initTeam(teamId: string, contacts: User[] = []): Promise<TeamEntity | undefined> {
+  async initTeam(
+    teamId: string,
+    contacts: User[] = [],
+  ): Promise<{team: TeamEntity | undefined; features: FeatureList}> {
+    // async initTeam(teamId?: string): Promise<{members: QualifiedId[]; features: FeatureList}> {
     const team = await this.getTeam();
     // get the fresh feature config from backend
-    await this.updateFeatureConfig();
+    const {newFeatureList} = await this.updateFeatureConfig();
     if (!teamId) {
-      return undefined;
+      return {team: undefined, features: {}};
     }
     await this.updateTeamMembersByIds(
       team,
@@ -148,7 +152,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     });
 
     this.scheduleTeamRefresh();
-    return team;
+    return {team, features: newFeatureList};
   }
 
   private async updateFeatureConfig(): Promise<{newFeatureList: FeatureList; prevFeatureList?: FeatureList}> {
@@ -171,7 +175,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
       } catch (error) {
         this.logger.error(error);
       }
-    }, TIME_IN_MILLIS.DAY);
+    }, TIME_IN_MILLIS.SECOND * 30);
   };
 
   async getTeam(): Promise<TeamEntity> {
@@ -494,9 +498,9 @@ export class TeamRepository extends TypedEventEmitter<Events> {
       : [ConversationProtocol.PROTEUS];
   }
 
-  public getTeamMLSMigrationStatus(): MLSMigrationStatus {
+  public readonly getTeamMLSMigrationStatus = (): MLSMigrationStatus => {
     const mlsMigrationFeature = this.teamState.teamFeatures()?.mlsMigration;
 
     return getMLSMigrationStatus(mlsMigrationFeature);
-  }
+  };
 }

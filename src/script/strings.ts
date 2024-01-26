@@ -344,6 +344,37 @@ export const acceptNewsModalStrings = defineMessages({
   },
 });
 
+export const joinGuestLinkPasswordModalStrings = defineMessages({
+  headline: {
+    defaultMessage: '{conversationName} \n Enter password',
+    id: 'guestLinkPasswordModal.headline',
+  },
+  headlineDefault: {
+    defaultMessage: '[Group Conversation] \n Enter password',
+    id: 'guestLinkPasswordModal.headlineDefault',
+  },
+  description: {
+    defaultMessage: 'Please enter the password you have received with the access link for this conversation.',
+    id: 'guestLinkPasswordModal.description',
+  },
+  passwordInputLabel: {
+    defaultMessage: 'Conversation password',
+    id: 'guestLinkPasswordModal.passwordInputLabel',
+  },
+  learnMoreLink: {
+    defaultMessage: 'Learn more about guest links',
+    id: 'guestLinkPasswordModal.learnMoreLink',
+  },
+  joinConversation: {
+    defaultMessage: 'Join Conversation',
+    id: 'guestLinkPasswordModal.joinConversation',
+  },
+  passwordIncorrect: {
+    defaultMessage: 'Password is incorrect, please try again.',
+    id: 'guestLinkPasswordModal.passwordIncorrect',
+  },
+});
+
 export const unsupportedStrings = defineMessages({
   desktopOnlyMessage: {
     defaultMessage: 'Please use {brandName} on your desktop app instead.',
@@ -653,6 +684,10 @@ export const errorHandlerStrings = defineMessages({
   [BackendErrorLabel.CUSTOM_BACKEND_NOT_FOUND]: {
     defaultMessage: 'This email cannot be used for enterprise login. Please enter the SSO code to proceed.',
     id: 'BackendErrorLabel.CUSTOM_BACKEND_NOT_FOUND',
+  },
+  [BackendErrorLabel.INVALID_CONVERSATION_PASSWORD]: {
+    defaultMessage: 'Password is incorrect, please try again.',
+    id: 'BackendErrorLabel.INVALID_CONVERSATION_PASSWORD',
   },
   learnMore: {
     defaultMessage: 'Learn more',

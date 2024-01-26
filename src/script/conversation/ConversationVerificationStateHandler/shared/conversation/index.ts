@@ -19,7 +19,7 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {isMLSConversation, MLSConversation} from 'src/script/conversation/ConversationSelectors';
+import {isMLSCapableConversation, MLSCapableConversation} from 'src/script/conversation/ConversationSelectors';
 import {ConversationState} from 'src/script/conversation/ConversationState';
 import {ConversationVerificationState} from 'src/script/conversation/ConversationVerificationState';
 import {Conversation} from 'src/script/entity/Conversation';
@@ -64,12 +64,9 @@ interface GetConversationByGroupIdParams {
 export const getConversationByGroupId = ({
   conversationState,
   groupId,
-}: GetConversationByGroupIdParams): MLSConversation | undefined => {
-  const conversation = conversationState.filteredConversations().find(conversation => conversation.groupId === groupId);
-  if (conversation && isMLSConversation(conversation)) {
-    return conversation;
-  }
-  return undefined;
+}: GetConversationByGroupIdParams): MLSCapableConversation | undefined => {
+  const conversation = conversationState.conversations().find(conversation => conversation.groupId === groupId);
+  return conversation && isMLSCapableConversation(conversation) ? conversation : undefined;
 };
 
 /**

@@ -22,6 +22,7 @@ import {
   CONVERSATION_ACCESS,
   CONVERSATION_LEGACY_ACCESS_ROLE,
   CONVERSATION_TYPE,
+  DefaultConversationRoleName,
 } from '@wireapp/api-client/lib/conversation/';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
@@ -31,7 +32,7 @@ import ko from 'knockout';
 import {container} from 'tsyringe';
 import {Cancelable, debounce} from 'underscore';
 
-import {Availability, LegalHoldStatus} from '@wireapp/protocol-messaging';
+import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
@@ -70,6 +71,7 @@ interface UnreadState {
   pings: PingMessage[];
   selfMentions: ContentMessage[];
   selfReplies: ContentMessage[];
+  systemMessages: Message[];
 }
 
 enum TIMESTAMP_TYPE {
@@ -86,7 +88,7 @@ export class Conversation {
   public readonly archivedState: ko.Observable<boolean>;
   public readonly readOnlyState: ko.Observable<CONVERSATION_READONLY_STATE | null>;
   private readonly incomingMessages: ko.ObservableArray<Message>;
-  public readonly isTeam1to1: ko.PureComputed<boolean>;
+  public readonly isProteusTeam1to1: ko.PureComputed<boolean>;
   public readonly last_server_timestamp: ko.Observable<number>;
   private readonly logger: Logger;
   public readonly mutedState: ko.Observable<number>;
@@ -96,17 +98,19 @@ export class Conversation {
   public blockLegalHoldMessage: boolean;
   public hasCreationMessage: boolean;
   public readonly accessCode: ko.Observable<string>;
+  public readonly accessCodeHasPassword: ko.Observable<boolean | undefined>;
   public readonly accessState: ko.Observable<ACCESS_STATE>;
   public readonly archivedTimestamp: ko.Observable<number>;
-  public readonly availabilityOfUser: ko.PureComputed<Availability.Type>;
   public readonly call: ko.Observable<Call | null>;
   public readonly cleared_timestamp: ko.Observable<number>;
-  public readonly connection: ko.Observable<ConnectionEntity>;
+  public readonly connection: ko.Observable<ConnectionEntity | null>;
   // TODO(Federation): Currently the 'creator' just refers to a user id but it has to become a qualified id
   public creator: string;
   public groupId?: string;
   public epoch: number = -1;
   public cipherSuite: number = 1;
+  // Initial protocol is a protocol that was known by a webapp before any protocol update happened. For newly created conversations it is the same as protocol.
+  public initialProtocol: ConversationProtocol = this.protocol;
   public readonly display_name: ko.PureComputed<string>;
   public readonly firstUserEntity: ko.PureComputed<User | undefined>;
   public readonly globalMessageTimer: ko.Observable<number | null>;
@@ -126,7 +130,6 @@ export class Conversation {
   public readonly is_loaded: ko.Observable<boolean>;
   public readonly is_pending: ko.Observable<boolean>;
   public readonly is_verified: ko.PureComputed<boolean | undefined>;
-  public readonly isMLSVerified: ko.PureComputed<boolean | undefined>;
   public readonly is1to1: ko.PureComputed<boolean>;
   public readonly isActiveParticipant: ko.PureComputed<boolean>;
   public readonly isClearable: ko.PureComputed<boolean>;
@@ -167,8 +170,8 @@ export class Conversation {
   public teamId: string;
   public readonly type: ko.Observable<CONVERSATION_TYPE>;
   public readonly unreadState: ko.PureComputed<UnreadState>;
-  public readonly verification_state: ko.Observable<ConversationVerificationState>;
-  public readonly mlsVerificationState: ko.Observable<ConversationVerificationState>;
+  public readonly verification_state = ko.observable(ConversationVerificationState.UNVERIFIED);
+  public readonly mlsVerificationState = ko.observable(ConversationVerificationState.UNVERIFIED);
   public readonly withAllTeamMembers: ko.Observable<boolean>;
   public readonly hasExternal: ko.PureComputed<boolean>;
   public readonly hasFederatedUsers: ko.PureComputed<boolean>;
@@ -195,6 +198,7 @@ export class Conversation {
 
     this.accessState = ko.observable();
     this.accessCode = ko.observable();
+    this.accessCodeHasPassword = ko.observable();
     this.creator = undefined;
     this.name = ko.observable();
     this.teamId = undefined;
@@ -216,7 +220,6 @@ export class Conversation {
     this.hasCreationMessage = false;
 
     this.firstUserEntity = ko.pureComputed(() => this.participating_user_ets()[0]);
-    this.availabilityOfUser = ko.pureComputed(() => this.firstUserEntity()?.availability());
 
     this.isGuest = ko.observable(false);
 
@@ -231,18 +234,18 @@ export class Conversation {
     this.isTeamOnly = ko.pureComputed(() => this.accessState() === ACCESS_STATE.TEAM.TEAM_ONLY);
     this.withAllTeamMembers = ko.observable(false);
 
-    this.isTeam1to1 = ko.pureComputed(() => {
+    this.isProteusTeam1to1 = ko.pureComputed(() => {
       const isGroupConversation = this.type() === CONVERSATION_TYPE.REGULAR;
       const hasOneParticipant = this.participating_user_ids().length === 1;
       return isGroupConversation && hasOneParticipant && this.teamId && !this.name();
     });
     this.isGroup = ko.pureComputed(() => {
       const isGroupConversation = this.type() === CONVERSATION_TYPE.REGULAR;
-      return isGroupConversation && !this.isTeam1to1();
+      return isGroupConversation && !this.isProteusTeam1to1();
     });
     this.is1to1 = ko.pureComputed(() => {
       const is1to1Conversation = this.type() === CONVERSATION_TYPE.ONE_TO_ONE;
-      return is1to1Conversation || this.isTeam1to1();
+      return is1to1Conversation || this.isProteusTeam1to1();
     });
     this.isRequest = ko.pureComputed(
       () =>
@@ -268,7 +271,7 @@ export class Conversation {
     );
 
     // in case this is a one2one conversation this is the connection to that user
-    this.connection = ko.observable(new ConnectionEntity());
+    this.connection = ko.observable(null);
     this.connection.subscribe(connectionEntity => {
       const connectedUserId = connectionEntity?.userId;
       if (connectedUserId && this.participating_user_ids().every(user => !matchQualifiedIds(user, connectedUserId))) {
@@ -279,8 +282,6 @@ export class Conversation {
     // E2EE conversation states
     this.archivedState = ko.observable(false).extend({notify: 'always'});
     this.mutedState = ko.observable(NOTIFICATION_STATE.EVERYTHING);
-    this.verification_state = ko.observable(ConversationVerificationState.UNVERIFIED);
-    this.mlsVerificationState = ko.observable(ConversationVerificationState.UNVERIFIED);
 
     this.archivedTimestamp = ko.observable(0);
     this.cleared_timestamp = ko.observable(0);
@@ -326,13 +327,6 @@ export class Conversation {
       }
 
       return this.allUserEntities().every(userEntity => userEntity.is_verified());
-    });
-    this.isMLSVerified = ko.pureComputed(() => {
-      if (!this.hasInitializedUsers()) {
-        return undefined;
-      }
-
-      return this.allUserEntities().every(userEntity => userEntity.isMLSVerified());
     });
 
     this.legalHoldStatus = ko.observable(LegalHoldStatus.DISABLED);
@@ -443,8 +437,10 @@ export class Conversation {
         pings: [],
         selfMentions: [],
         selfReplies: [],
+        systemMessages: [],
       };
       const messages = [...this.messages(), ...this.incomingMessages()];
+
       for (let index = messages.length - 1; index >= 0; index--) {
         const messageEntity = messages[index];
         if (messageEntity.visible()) {
@@ -463,6 +459,8 @@ export class Conversation {
           const isSelfQuoted =
             isMessage && this.selfUser() && (messageEntity as ContentMessage).isUserQuoted(this.selfUser().id);
 
+          const isE2EIVerification = messageEntity.isE2EIVerification();
+
           if (isMissedCall || isPing || isMessage) {
             unreadState.allMessages.push(messageEntity as ContentMessage);
           }
@@ -477,6 +475,8 @@ export class Conversation {
             unreadState.pings.push(messageEntity);
           } else if (isMessage) {
             unreadState.otherMessages.push(messageEntity as ContentMessage);
+          } else if (isE2EIVerification) {
+            unreadState.systemMessages.push(messageEntity);
           }
 
           unreadState.allEvents.push(messageEntity as ContentMessage);
@@ -588,6 +588,7 @@ export class Conversation {
       this.status,
       this.type,
       this.verification_state,
+      this.mlsVerificationState,
     ].forEach(property => (property as ko.Observable).subscribe(this.persistState));
   }
 
@@ -610,6 +611,10 @@ export class Conversation {
       this.is_loaded(false);
       this.hasAdditionalMessages(true);
     }
+  }
+
+  public isAdmin(userId: QualifiedId) {
+    return this.roles()[userId.id] === DefaultConversationRoleName.WIRE_ADMIN;
   }
 
   /**
@@ -970,13 +975,6 @@ export class Conversation {
     return userEntities.filter(userEntity => !userEntity.is_verified());
   }
 
-  getUsersWithUnverifiedMLSClients(): User[] {
-    const userEntities = this.selfUser()
-      ? this.participating_user_ets().concat(this.selfUser())
-      : this.participating_user_ets();
-    return userEntities.filter(userEntity => !userEntity.isMLSVerified());
-  }
-
   getAllUserEntities(): User[] {
     return this.participating_user_ets();
   }
@@ -1010,6 +1008,7 @@ export class Conversation {
       epoch: this.epoch,
       global_message_timer: this.globalMessageTimer(),
       group_id: this.groupId,
+      initial_protocol: this.initialProtocol,
       id: this.id,
       is_guest: this.isGuest(),
       last_event_timestamp: this.last_event_timestamp(),

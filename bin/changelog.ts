@@ -1,6 +1,4 @@
-import fs from 'fs-extra';
 import Changelog from 'generate-changelog';
-import path from 'path';
 import simpleGit from 'simple-git';
 import * as pkg from '../package.json';
 
@@ -22,7 +20,6 @@ const until = args[1];
  */
 void (async () => {
   const tags = await simpleGit().tags({'--list': null});
-  const outputPath = path.join(__dirname, '../CHANGELOG.md');
   const productionTags = tags.all.filter(tag => tag.includes(`-${releaseType}.`));
 
   const newProductionTag = productionTags.sort().reverse()[0];
@@ -31,16 +28,13 @@ void (async () => {
   const from = until ? newProductionTag : lastProductionTag;
   const to = until ? until : newProductionTag;
 
-  console.info(`Generating changelog with commits from "${from}" to "${to}".`);
-
   try {
     const changelog = await Changelog.generate({
       exclude: ['chore', 'docs', 'refactor', 'style', 'test', 'runfix'],
       repoUrl: pkg.repository.url.replace('.git', ''),
       tag: `${from}...${to}`,
     });
-    fs.outputFileSync(outputPath, changelog, 'utf8');
-    console.info(`Wrote file to: ${outputPath}`);
+    console.log(changelog);
   } catch (error: any) {
     console.warn(`Could not generate changelog from "${from}" to "${to}": ${error.message}`, error);
   }

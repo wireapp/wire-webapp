@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, ReactElement, useEffect, useRef, useState} from 'react';
+import {FC, ReactNode, useEffect, useRef, useState} from 'react';
 
 import {LoadingBar} from 'Components/LoadingBar/LoadingBar';
 
@@ -27,7 +27,7 @@ import {User} from '../../entity/User';
 
 interface AppLoaderProps {
   init: (onProgress: (progress: number, message?: string) => void) => Promise<User | undefined>;
-  children: (selfUser: User) => ReactElement;
+  children: (selfUser: User) => ReactNode;
 }
 
 interface LoadingProgress {

@@ -98,6 +98,7 @@ export function authReducer(state: AuthState = initialAuthState, action: AppActi
   switch (action.type) {
     case AUTH_ACTION.LOGIN_START:
     case AUTH_ACTION.REGISTER_JOIN_START:
+    case AUTH_ACTION.REGISTER_WIRELESS_START:
     case AUTH_ACTION.REGISTER_PERSONAL_START:
     case AUTH_ACTION.REGISTER_TEAM_START:
     case USER_ACTION.USER_SEND_ACTIVATION_CODE_START: {
@@ -146,6 +147,7 @@ export function authReducer(state: AuthState = initialAuthState, action: AppActi
     case AUTH_ACTION.LOGIN_FAILED:
     case AUTH_ACTION.REGISTER_JOIN_FAILED:
     case AUTH_ACTION.REGISTER_PERSONAL_FAILED:
+    case AUTH_ACTION.REGISTER_WIRELESS_FAILED:
     case AUTH_ACTION.REGISTER_TEAM_FAILED:
     case USER_ACTION.USER_SEND_ACTIVATION_CODE_FAILED: {
       return {
@@ -166,6 +168,7 @@ export function authReducer(state: AuthState = initialAuthState, action: AppActi
     case AUTH_ACTION.LOGIN_SUCCESS:
     case AUTH_ACTION.REFRESH_SUCCESS:
     case AUTH_ACTION.REGISTER_JOIN_SUCCESS:
+    case AUTH_ACTION.REGISTER_WIRELESS_SUCCESS:
     case AUTH_ACTION.REGISTER_PERSONAL_SUCCESS:
     case AUTH_ACTION.REGISTER_TEAM_SUCCESS: {
       return {

@@ -21,6 +21,8 @@ import React from 'react';
 
 import {CSSObject} from '@emotion/react';
 
+import {handleKeyDown} from 'Util/KeyboardUtil';
+
 export interface PaginationProps {
   currentPage: number;
   onChangePage: (newPage: number) => void;
@@ -64,6 +66,7 @@ const Pagination: React.FC<PaginationProps> = ({totalPages, currentPage, onChang
             data-uie-status={isCurrentPage ? 'active' : 'inactive'}
             key={page}
             onClick={() => onChangePage(page)}
+            onKeyDown={event => handleKeyDown(event, () => onChangePage(page))}
             type="button"
             className="button-reset-default"
             css={{

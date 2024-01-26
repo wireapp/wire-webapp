@@ -152,8 +152,6 @@ module.exports = {
         },
         // copying all static resources (audio, images, fonts...)
         {from: 'resource', to: dist},
-        // copying worker files
-        {context: `${SRC_PATH}`, from: 'worker', to: `${dist}/worker`},
       ],
     }),
     new webpack.IgnorePlugin({resourceRegExp: /.*\.wasm/}),

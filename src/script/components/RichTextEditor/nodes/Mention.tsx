@@ -32,17 +32,15 @@ import {
   $setSelection,
   CLICK_COMMAND,
   COMMAND_PRIORITY_LOW,
-  GridSelection,
   KEY_ARROW_LEFT_COMMAND,
   KEY_ARROW_RIGHT_COMMAND,
   KEY_BACKSPACE_COMMAND,
   KEY_DELETE_COMMAND,
   BLUR_COMMAND,
   NodeKey,
-  NodeSelection,
-  RangeSelection,
   $isRangeSelection,
   $createRangeSelection,
+  BaseSelection,
 } from 'lexical';
 
 import {KEY} from 'Util/KeyboardUtil';
@@ -62,7 +60,7 @@ export const Mention = (props: MentionComponentProps) => {
   const {mention, className = '', classNameFocused = '', nodeKey} = props;
   const [editor] = useLexicalComposerContext();
   const [isSelected, setSelected, clearSelection] = useLexicalNodeSelection(nodeKey);
-  const [selection, setSelection] = useState<RangeSelection | NodeSelection | GridSelection | null>(null);
+  const [selection, setSelection] = useState<BaseSelection | null>(null);
   const isFocused = $isNodeSelection(selection) && isSelected;
   const ref = useRef<HTMLSpanElement>(null);
 

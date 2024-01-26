@@ -23,7 +23,7 @@ import {Icon} from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 
 import {getActionsMenuCSS, getIconCSS, messageActionsMenuButton} from './MessageActions.styles';
-import {reactionImgSize} from './MessageReactions/EmojiImg.styles';
+import {reactionImgSize} from './MessageReactions/EmojiChar.styles';
 
 export interface ReplyButtonProps {
   actionId: string;

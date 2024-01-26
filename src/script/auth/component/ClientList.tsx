@@ -106,7 +106,7 @@ const ClientListComponent = ({
       {permanentClients.map(client => (
         <ClientItem
           client={client}
-          clientError={isSelectedClient(client.id) ? clientError : undefined}
+          clientError={isSelectedClient(client.id) ? clientError ?? undefined : undefined}
           key={client.id}
           onClick={() => setSelectedClient(client.id)}
           onClientRemoval={(password?: string) => removeClient(client.id, password)}

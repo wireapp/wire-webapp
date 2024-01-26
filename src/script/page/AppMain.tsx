@@ -31,7 +31,6 @@ import {ErrorFallback} from 'Components/ErrorFallback';
 import {GroupCreationModal} from 'Components/Modals/GroupCreation/GroupCreationModal';
 import {LegalHoldModal} from 'Components/Modals/LegalHoldModal/LegalHoldModal';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {PrimaryModalComponent} from 'Components/Modals/PrimaryModal/PrimaryModal';
 import {showUserModal, UserModal} from 'Components/Modals/UserModal';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
@@ -50,6 +49,7 @@ import {ConversationState} from '../conversation/ConversationState';
 import {User} from '../entity/User';
 import {useInitializeRootFontSize} from '../hooks/useRootFontSize';
 import {App} from '../main/app';
+import {initialiseMLSMigrationFlow} from '../mls/MLSMigration';
 import {generateConversationUrl} from '../router/routeGenerator';
 import {configureRoutes, navigate} from '../router/Router';
 import {TeamState} from '../team/TeamState';
@@ -69,13 +69,16 @@ interface AppMainProps {
   selfUser: User;
   mainView: MainViewModel;
   conversationState?: ConversationState;
+  /** will block the user from being able to interact with the application (no notifications and no messages will be shown) */
+  locked: boolean;
 }
 
-const AppMain: FC<AppMainProps> = ({
+export const AppMain: FC<AppMainProps> = ({
   app,
   mainView,
   selfUser,
   conversationState = container.resolve(ConversationState),
+  locked,
 }) => {
   const apiContext = app.getAPIContext();
 
@@ -89,11 +92,10 @@ const AppMain: FC<AppMainProps> = ({
 
   const {repository: repositories} = app;
 
-  const {
-    accent_id,
-    availability: userAvailability,
-    isActivatedAccount,
-  } = useKoSubscribableChildren(selfUser, ['accent_id', 'availability', 'isActivatedAccount']);
+  const {availability: userAvailability, isActivatedAccount} = useKoSubscribableChildren(selfUser, [
+    'availability',
+    'isActivatedAccount',
+  ]);
 
   const teamState = container.resolve(TeamState);
   const userState = container.resolve(UserState);
@@ -124,7 +126,7 @@ const AppMain: FC<AppMainProps> = ({
   const {currentView} = useAppMainState(state => state.responsiveView);
   const isLeftSidebarVisible = currentView == ViewType.LEFT_SIDEBAR;
 
-  const initializeApp = () => {
+  const initializeApp = async () => {
     repositories.notification.setContentViewModelStates(contentState, mainView.multitasking);
 
     const showMostRecentConversation = () => {
@@ -191,6 +193,14 @@ const AppMain: FC<AppMainProps> = ({
     repositories.properties.checkPrivacyPermission().then(() => {
       window.setTimeout(() => repositories.notification.checkPermission(), App.CONFIG.NOTIFICATION_CHECK);
     });
+
+    //after app is loaded, check mls migration configuration and start migration if needed
+    await initialiseMLSMigrationFlow({
+      selfUser,
+      conversationHandler: repositories.conversation,
+      getTeamMLSMigrationStatus: repositories.team.getTeamMLSMigrationStatus,
+      refreshAllKnownUsers: repositories.user.refreshAllKnownUsers,
+    });
   };
 
   useEffect(() => {
@@ -201,78 +211,86 @@ const AppMain: FC<AppMainProps> = ({
   }, []);
 
   useLayoutEffect(() => {
-    initializeApp();
-  }, []);
+    if (!locked) {
+      initializeApp();
+    }
+  }, [locked]);
 
   return (
     <StyledApp
       themeId={THEME_ID.DEFAULT}
       css={{backgroundColor: 'unset', height: '100%'}}
-      className={`main-accent-color-${accent_id} show`}
       id="wire-main"
       data-uie-name="status-webapp"
       data-uie-value="is-loaded"
     >
-      <WindowTitleUpdater />
+      {!locked && <WindowTitleUpdater />}
       <RootProvider value={mainView}>
         <ErrorBoundary FallbackComponent={ErrorFallback}>
-          <div id="app" className="app">
-            {(!smBreakpoint || isLeftSidebarVisible) && (
-              <LeftSidebar listViewModel={mainView.list} selfUser={selfUser} isActivatedAccount={isActivatedAccount} />
-            )}
+          {!locked && (
+            <div id="app" className="app">
+              {(!smBreakpoint || isLeftSidebarVisible) && (
+                <LeftSidebar
+                  listViewModel={mainView.list}
+                  selfUser={selfUser}
+                  isActivatedAccount={isActivatedAccount}
+                />
+              )}
 
-            {(!smBreakpoint || !isLeftSidebarVisible) && (
-              <MainContent
-                selfUser={selfUser}
-                isRightSidebarOpen={!!currentState}
-                openRightSidebar={toggleRightSidebar}
-                reloadApp={app.refresh}
-              />
-            )}
+              {(!smBreakpoint || !isLeftSidebarVisible) && (
+                <MainContent
+                  selfUser={selfUser}
+                  isRightSidebarOpen={!!currentState}
+                  openRightSidebar={toggleRightSidebar}
+                  reloadApp={app.refresh}
+                />
+              )}
 
-            {currentState && (
-              <RightSidebar
-                lastViewedMessageDetailsEntity={lastViewedMessageDetailsEntity}
-                currentEntity={currentEntity}
-                repositories={repositories}
-                actionsViewModel={mainView.actions}
-                isFederated={mainView.isFederated}
-                teamState={teamState}
-                selfUser={selfUser}
-                userState={userState}
-              />
-            )}
-          </div>
+              {currentState && (
+                <RightSidebar
+                  lastViewedMessageDetailsEntity={lastViewedMessageDetailsEntity}
+                  currentEntity={currentEntity}
+                  repositories={repositories}
+                  actionsViewModel={mainView.actions}
+                  isFederated={mainView.isFederated}
+                  teamState={teamState}
+                  selfUser={selfUser}
+                  userState={userState}
+                />
+              )}
+            </div>
+          )}
 
           <AppLock clientRepository={repositories.client} />
           <WarningsContainer onRefresh={app.refresh} />
-          <FeatureConfigChangeNotifier selfUserId={selfUser.id} teamState={teamState} />
-          <FeatureConfigChangeHandler teamState={teamState} />
 
-          <CallingContainer
-            multitasking={mainView.multitasking}
-            callingRepository={repositories.calling}
-            mediaRepository={repositories.media}
-          />
+          {!locked && (
+            <>
+              <FeatureConfigChangeNotifier selfUserId={selfUser.id} teamState={teamState} />
+              <FeatureConfigChangeHandler teamState={teamState} />
+              <CallingContainer
+                multitasking={mainView.multitasking}
+                callingRepository={repositories.calling}
+                mediaRepository={repositories.media}
+              />
 
-          <LegalHoldModal
-            selfUser={selfUser}
-            conversationRepository={repositories.conversation}
-            searchRepository={repositories.search}
-            teamRepository={repositories.team}
-            clientRepository={repositories.client}
-            messageRepository={repositories.message}
-            cryptographyRepository={repositories.cryptography}
-          />
+              <LegalHoldModal
+                selfUser={selfUser}
+                conversationRepository={repositories.conversation}
+                searchRepository={repositories.search}
+                teamRepository={repositories.team}
+                clientRepository={repositories.client}
+                messageRepository={repositories.message}
+                cryptographyRepository={repositories.cryptography}
+              />
+            </>
+          )}
 
           {/*The order of these elements matter to show proper modals stack upon each other*/}
           <UserModal selfUser={selfUser} userRepository={repositories.user} />
-          <PrimaryModalComponent />
           <GroupCreationModal userState={userState} teamState={teamState} />
         </ErrorBoundary>
       </RootProvider>
     </StyledApp>
   );
 };
-
-export {AppMain};

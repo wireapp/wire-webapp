@@ -31,6 +31,7 @@ import type {CompositeMessage} from './CompositeMessage';
 import type {ContentMessage} from './ContentMessage';
 import type {DecryptErrorMessage} from './DecryptErrorMessage';
 import type {DeleteMessage} from './DeleteMessage';
+import {E2EIVerificationMessage} from './E2EIVerificationMessage';
 import type {FailedToAddUsersMessage} from './FailedToAddUsersMessage';
 import type {FederationStopMessage} from './FederationStopMessage';
 import type {FileAsset} from './FileAsset';
@@ -219,7 +220,7 @@ export class Message {
    * @returns `true`, if message is deletable, `false` otherwise.
    */
   isDeletable(): boolean {
-    return !this.hasUnavailableAsset(false) && !this.isComposite() && this.status() !== StatusType.SENDING;
+    return !this.hasUnavailableAsset(false) && !this.isComposite();
   }
 
   /**
@@ -318,6 +319,14 @@ export class Message {
    */
   isVerification(): this is VerificationMessage {
     return this.super_type === SuperType.VERIFICATION;
+  }
+
+  /**
+   * Check if message is a E2E Identity Verification message.
+   * @returns Is message of type E2E Identity Verification
+   */
+  isE2EIVerification(): this is E2EIVerificationMessage {
+    return this.super_type === SuperType.E2EI_VERIFICATION;
   }
 
   isFederationStop(): this is FederationStopMessage {

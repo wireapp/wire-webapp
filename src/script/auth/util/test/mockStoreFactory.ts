@@ -48,7 +48,6 @@ const defaultGetConfig = () => ({
     ENABLE_DEBUG: true,
     ENABLE_PHONE_LOGIN: true,
     ENABLE_SSO: true,
-    PERSIST_TEMPORARY_CLIENTS: true,
   },
 });
 

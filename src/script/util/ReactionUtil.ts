@@ -69,8 +69,3 @@ export function addReaction(reactions: ReactionMap, reactionsStr: string, userId
     });
   return filteredReactions.filter(([, users]) => users.length > 0);
 }
-
-// Maps to the static server emojis url
-export function getEmojiUrl(unicode: string) {
-  return `/image/emojis/img-apple-64/${unicode}.png`;
-}

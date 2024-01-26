@@ -26,6 +26,10 @@ import {ClientMapper} from './ClientMapper';
 
 import {ClientRecord} from '../storage';
 
+export enum MLSPublicKeys {
+  ED25519 = 'ed25519',
+}
+
 export class ClientEntity {
   static CONFIG = {
     DEFAULT_VALUE: '?',
@@ -34,23 +38,20 @@ export class ClientEntity {
   address?: string;
   class: ClientClassification | '?';
   cookie?: string;
-  domain?: string;
+  domain?: string | null;
   id: string;
   isSelfClient: boolean;
   label?: string;
-  location?: {
-    lat?: number;
-    lon?: number;
-  };
+
   meta: {
-    isVerified?: ko.Observable<boolean>;
-    isMLSVerified?: ko.Observable<boolean>;
+    isVerified: ko.Observable<boolean>;
     primaryKey?: string;
     userId?: string;
   };
   model?: string;
   time?: string;
   type?: ClientType.PERMANENT | ClientType.TEMPORARY;
+  mlsPublicKeys?: Partial<Record<MLSPublicKeys, string>>;
 
   constructor(isSelfClient: boolean, domain: string | null, id = '') {
     this.isSelfClient = isSelfClient;
@@ -63,7 +64,6 @@ export class ClientEntity {
       this.address = '';
       this.cookie = '';
       this.label = ClientEntity.CONFIG.DEFAULT_VALUE;
-      this.location = {};
       this.model = ClientEntity.CONFIG.DEFAULT_VALUE;
       this.time = ClientEntity.CONFIG.DEFAULT_VALUE;
       this.type = ClientType.TEMPORARY;
@@ -72,7 +72,6 @@ export class ClientEntity {
     // Metadata maintained by us
     this.meta = {
       isVerified: ko.observable(false),
-      isMLSVerified: ko.observable(false),
       primaryKey: undefined,
     };
   }
@@ -97,7 +96,7 @@ export class ClientEntity {
     return this.type === ClientType.TEMPORARY;
   }
 
-  getName(): string {
+  getName(): string | undefined {
     const hasModel = this.model && this.model !== ClientEntity.CONFIG.DEFAULT_VALUE;
     return hasModel ? this.model : this.class.toUpperCase();
   }

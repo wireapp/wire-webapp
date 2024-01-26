@@ -25,14 +25,16 @@ import {generateQualifiedId} from 'test/helper/UserGenerator';
 
 import {MessageReactionsList, MessageReactionsListProps} from './MessageReactionsList';
 
-const user1 = generateQualifiedId();
-const user2 = generateQualifiedId();
-const user3 = generateQualifiedId();
+import {User} from '../../../../../../entity/User';
+
+const user1 = new User();
+const user2 = new User();
+const user3 = new User();
 const reactions: ReactionMap = [
-  ['😇', [user1, user2, user3]],
-  ['😊', [user1, user2]],
-  ['👍', [user2]],
-  ['😉', [user2]],
+  ['😇', [user1.qualifiedId, user2.qualifiedId, user3.qualifiedId]],
+  ['😊', [user1.qualifiedId, user2.qualifiedId]],
+  ['👍', [user2.qualifiedId]],
+  ['😉', [user2.qualifiedId]],
 ];
 
 const defaultProps: MessageReactionsListProps = {
@@ -43,6 +45,7 @@ const defaultProps: MessageReactionsListProps = {
   onLastReactionKeyEvent: jest.fn(),
   isRemovedFromConversation: false,
   selfUserId: generateQualifiedId(),
+  users: [user1, user2, user3],
 };
 
 describe('MessageReactionsList', () => {

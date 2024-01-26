@@ -23,7 +23,7 @@ import cx from 'classnames';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Icon} from 'Components/Icon';
-import {UserSearchableList} from 'Components/UserSearchableList';
+import {UserList} from 'Components/UserList';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatLocale} from 'Util/TimeUtil';
@@ -35,8 +35,6 @@ import {Conversation} from '../../../entity/Conversation';
 import {ContentMessage} from '../../../entity/message/ContentMessage';
 import {User} from '../../../entity/User';
 import {SuperType} from '../../../message/SuperType';
-import {SearchRepository} from '../../../search/SearchRepository';
-import {TeamRepository} from '../../../team/TeamRepository';
 import {UserRepository} from '../../../user/UserRepository';
 import {PanelHeader} from '../PanelHeader';
 import {PanelEntity, PanelState} from '../RightSidebar';
@@ -61,8 +59,6 @@ interface MessageDetailsProps {
   onClose: () => void;
   conversationRepository: ConversationRepository;
   messageEntity: ContentMessage;
-  teamRepository: TeamRepository;
-  searchRepository: SearchRepository;
   userRepository: UserRepository;
   showReactions?: boolean;
   selfUser: User;
@@ -73,8 +69,6 @@ const MessageDetails: FC<MessageDetailsProps> = ({
   activeConversation,
   conversationRepository,
   messageEntity,
-  teamRepository,
-  searchRepository,
   showReactions = false,
   userRepository,
   selfUser,
@@ -185,17 +179,16 @@ const MessageDetails: FC<MessageDetailsProps> = ({
 
       <FadingScrollbar className="panel__content" style={{flexGrow: 1}}>
         {messageState === MESSAGE_STATES.RECEIPTS && (
-          <UserSearchableList
-            dataUieName="read-list"
-            selfUser={selfUser}
-            users={receiptUsers}
-            infos={receiptTimes}
-            noUnderline
-            conversationRepository={conversationRepository}
-            searchRepository={searchRepository}
-            teamRepository={teamRepository}
-            onClick={onParticipantClick}
-          />
+          <div data-uie-name="read-list">
+            <UserList
+              selfUser={selfUser}
+              users={receiptUsers}
+              infos={receiptTimes}
+              noUnderline
+              conversationRepository={conversationRepository}
+              onClick={onParticipantClick}
+            />
+          </div>
         )}
 
         {messageState === MESSAGE_STATES.REACTIONS && (

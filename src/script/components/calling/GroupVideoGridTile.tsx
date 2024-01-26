@@ -145,16 +145,18 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
       tabIndex={isMaximized ? TabIndex.FOCUSABLE : TabIndex.UNFOCUSABLE}
     >
       {hasActiveVideo ? (
-        <Video
-          autoPlay
-          playsInline
-          srcObject={videoStream}
-          className="group-video-grid__element-video"
-          css={{
-            objectFit: isMaximized || sharesScreen ? 'contain' : 'cover',
-            transform: participant === selfParticipant && sharesCamera ? 'rotateY(180deg)' : 'initial',
-          }}
-        />
+        <div className="tile-wrapper">
+          <Video
+            autoPlay
+            playsInline
+            srcObject={videoStream}
+            className="group-video-grid__element-video"
+            css={{
+              objectFit: isMaximized || sharesScreen ? 'contain' : 'cover',
+              transform: participant === selfParticipant && sharesCamera ? 'rotateY(180deg)' : 'initial',
+            }}
+          />
+        </div>
       ) : (
         <div
           css={{

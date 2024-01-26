@@ -19,10 +19,12 @@
 
 import React from 'react';
 
-import {Availability} from '@wireapp/protocol-messaging';
-
-import {AvailabilityState} from 'Components/AvailabilityState';
 import {Icon} from 'Components/Icon';
+import {UserInfo} from 'Components/UserInfo';
+import {UserVerificationBadges} from 'Components/VerificationBadge';
+import {User} from 'src/script/entity/User';
+import {ServiceEntity} from 'src/script/integration/ServiceEntity';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {
   contentInfoWrapper,
@@ -38,45 +40,57 @@ import {
 } from './ParticipantItem.styles';
 
 export interface ParticipantItemContentProps {
-  name: string;
+  /** the conversation context in which we are displaying the user (will enable e2ei verification badges) */
+  groupId?: string;
+  participant: User | ServiceEntity;
   selfInTeam?: boolean;
-  availability?: Availability.Type;
   shortDescription?: string;
   selfString?: string;
   hasUsernameInfo?: boolean;
   showArrow?: boolean;
   onDropdownClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
   showAvailabilityState?: boolean;
+  isProteusVerified?: boolean;
+  isMLSVerified?: boolean;
 }
 
 export const ParticipantItemContent = ({
-  name,
+  groupId,
+  participant,
   selfInTeam = false,
-  availability = Availability.Type.NONE,
   shortDescription = '',
   selfString = '',
   hasUsernameInfo = false,
   showArrow = false,
   showAvailabilityState = false,
 }: ParticipantItemContentProps) => {
+  const {name} = useKoSubscribableChildren(participant, ['name']);
+
+  const isService = participant instanceof ServiceEntity;
+
   return (
     <div css={wrapper}>
       <div css={contentText}>
         <div css={nameWrapper}>
-          {showAvailabilityState && selfInTeam ? (
-            <AvailabilityState
-              availability={availability}
+          {!isService ? (
+            <UserInfo
+              user={participant}
               css={[userName, userAvailability, ellipsis]}
               dataUieName="status-name"
-              label={name}
-            />
+              selfString={selfString}
+              showAvailability={showAvailabilityState && selfInTeam}
+            >
+              <UserVerificationBadges user={participant} groupId={groupId} />
+            </UserInfo>
           ) : (
-            <div css={[userName, ellipsis]} data-uie-name="status-name">
-              {name}
-            </div>
-          )}
+            <>
+              <div css={[userName, ellipsis]} data-uie-name="status-name">
+                {name}
 
-          {selfString && <div css={selfIndicator}>{selfString}</div>}
+                {selfString && <span css={selfIndicator}>{selfString}</span>}
+              </div>
+            </>
+          )}
         </div>
 
         {shortDescription && (

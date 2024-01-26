@@ -45,7 +45,6 @@ import {CryptographyRepository} from 'src/script/cryptography/CryptographyReposi
 import {User} from 'src/script/entity/User';
 import {EventRepository} from 'src/script/event/EventRepository';
 import {EventService} from 'src/script/event/EventService';
-import {EventServiceNoCompound} from 'src/script/event/EventServiceNoCompound';
 import {NotificationService} from 'src/script/event/NotificationService';
 import {MediaRepository} from 'src/script/media/MediaRepository';
 import {PermissionRepository} from 'src/script/permission/PermissionRepository';
@@ -68,6 +67,7 @@ import {UserState} from 'src/script/user/UserState';
 
 import {entities} from '../api/payloads';
 import {SelfRepository} from 'src/script/self/SelfRepository';
+import {AudioRepository} from 'src/script/audio/AudioRepository';
 
 export class TestFactory {
   constructor() {
@@ -116,7 +116,6 @@ export class TestFactory {
     currentClient.cookie = 'webapp@2153234453@temporary@1470926647664';
     currentClient.id = '132b3653b33f851f';
     currentClient.label = 'Windows 10';
-    currentClient.location = {lat: 52.5233, lon: 13.4138};
     currentClient.meta = {isVerified: ko.observable(true), primaryKey: 'local_identity'};
     currentClient.model = 'Chrome (Temporary)';
     currentClient.time = '2016-10-07T16:01:42.133Z';
@@ -134,7 +133,6 @@ export class TestFactory {
     await this.exposeUserActors();
 
     this.event_service = new EventService(this.storage_service);
-    this.event_service_no_compound = new EventServiceNoCompound(this.storage_service);
     this.notification_service = new NotificationService(this.storage_service);
     this.conversation_service = new ConversationService(this.event_service);
 
@@ -270,6 +268,7 @@ export class TestFactory {
       serverTimeHandler,
       this.user_repository,
       this.assetRepository,
+      new AudioRepository(),
       this.user_repository['userState'],
       clientState,
     );
@@ -288,6 +287,7 @@ export class TestFactory {
       this.user_repository['userState'],
       this.team_repository['teamState'],
       conversationState,
+      this.connection_repository['connectionState'],
       core,
     );
 

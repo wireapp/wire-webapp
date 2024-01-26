@@ -41,6 +41,7 @@ import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
 import {ConversationState} from '../conversation/ConversationState';
+import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
 import type {Conversation} from '../entity/Conversation';
 import type {User} from '../entity/User';
 import type {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../media/MediaDevicesHandler';
@@ -61,8 +62,8 @@ export interface CallActions {
   reject: (call: Call) => void;
   startAudio: (conversationEntity: Conversation) => Promise<void>;
   startVideo: (conversationEntity: Conversation) => Promise<void>;
-  switchCameraInput: (call: Call, deviceId: string) => void;
-  switchScreenInput: (call: Call, deviceId: string) => void;
+  switchCameraInput: (deviceId: string) => void;
+  switchScreenInput: (deviceId: string) => void;
   toggleCamera: (call: Call) => void;
   toggleMute: (call: Call, muteState: boolean) => void;
   toggleScreenshare: (call: Call) => void;
@@ -203,25 +204,62 @@ export class CallingViewModel {
       }
     });
 
-    const handleCallAction = async (conversationEntity: Conversation, callType: CALL_TYPE): Promise<void> => {
+    const showE2EICallModal = (conversationEntity: Conversation, callType: CALL_TYPE) => {
       const memberCount = conversationEntity.participating_user_ets().length;
-      if (memberCount > MAX_USERS_TO_CALL_WITHOUT_CONFIRM) {
-        PrimaryModal.show(PrimaryModal.type.WITHOUT_TITLE, {
-          preventClose: true,
-          primaryAction: {
-            action: async () => await startCall(conversationEntity, callType),
-            text: t('groupCallModalPrimaryBtnName'),
+
+      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
+        primaryAction: {
+          action: async () => {
+            conversationEntity.mlsVerificationState(ConversationVerificationState.UNVERIFIED);
+
+            if (memberCount > MAX_USERS_TO_CALL_WITHOUT_CONFIRM) {
+              showMaxUsersToCallModalWithoutConfirm(conversationEntity, callType);
+            } else {
+              await startCall(conversationEntity, callType);
+            }
           },
-          secondaryAction: {
-            text: t('modalConfirmSecondary'),
-          },
-          text: {
-            htmlMessage: `<div class="modal-description">
+          text: t('conversation.E2EICallAnyway'),
+        },
+        secondaryAction: {
+          action: () => {},
+          text: t('conversation.E2EICancel'),
+        },
+        text: {
+          message: t('conversation.E2EIDegradedInitiateCall'),
+          title: t('conversation.E2EIConversationNoLongerVerified'),
+        },
+      });
+    };
+
+    const showMaxUsersToCallModalWithoutConfirm = (conversationEntity: Conversation, callType: CALL_TYPE) => {
+      const memberCount = conversationEntity.participating_user_ets().length;
+
+      PrimaryModal.show(PrimaryModal.type.WITHOUT_TITLE, {
+        preventClose: true,
+        primaryAction: {
+          action: async () => await startCall(conversationEntity, callType),
+          text: t('groupCallModalPrimaryBtnName'),
+        },
+        secondaryAction: {
+          text: t('modalConfirmSecondary'),
+        },
+        text: {
+          htmlMessage: `<div class="modal-description">
             ${t('groupCallConfirmationModalTitle', memberCount)}
           </div>`,
-            closeBtnLabel: t('groupCallModalCloseBtnLabel'),
-          },
-        });
+          closeBtnLabel: t('groupCallModalCloseBtnLabel'),
+        },
+      });
+    };
+
+    const handleCallAction = async (conversationEntity: Conversation, callType: CALL_TYPE): Promise<void> => {
+      const memberCount = conversationEntity.participating_user_ets().length;
+      const isE2EIDegraded = conversationEntity.mlsVerificationState() === ConversationVerificationState.DEGRADED;
+
+      if (isE2EIDegraded) {
+        showE2EICallModal(conversationEntity, callType);
+      } else if (memberCount > MAX_USERS_TO_CALL_WITHOUT_CONFIRM) {
+        showMaxUsersToCallModalWithoutConfirm(conversationEntity, callType);
       } else {
         await startCall(conversationEntity, callType);
       }
@@ -271,11 +309,11 @@ export class CallingViewModel {
           await handleCallAction(conversationEntity, CALL_TYPE.VIDEO);
         }
       },
-      switchCameraInput: (call: Call, deviceId: string) => {
+      switchCameraInput: (deviceId: string) => {
         this.mediaDevicesHandler.currentDeviceId.videoinput(deviceId);
         this.callingRepository.refreshVideoInput();
       },
-      switchScreenInput: (call: Call, deviceId: string) => {
+      switchScreenInput: (deviceId: string) => {
         this.mediaDevicesHandler.currentDeviceId.screeninput(deviceId);
       },
       toggleCamera: (call: Call) => {
@@ -399,7 +437,7 @@ export class CallingViewModel {
       } else {
         PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
           text: {
-            htmlMessage: t('callingRestrictedConferenceCallTeamMemberModalDescription'),
+            message: t('callingRestrictedConferenceCallTeamMemberModalDescription'),
             title: t('callingRestrictedConferenceCallTeamMemberModalTitle'),
           },
         });

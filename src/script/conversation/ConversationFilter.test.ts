@@ -66,6 +66,7 @@ describe('ConversationFilter', () => {
         name: 'Florian@Staging11',
         others: ['71e25be1-5433-4647-964d-03a5d9e7c970'],
         protocol: ConversationProtocol.PROTEUS,
+        initial_protocol: ConversationProtocol.PROTEUS,
         qualified_others: undefined,
         receipt_mode: null,
         roles: {},
@@ -77,7 +78,7 @@ describe('ConversationFilter', () => {
       };
       const [conversationEntity] = ConversationMapper.mapConversations([conversationData]);
       expect(conversationEntity.is1to1()).toBeFalsy();
-      expect(conversationEntity['isTeam1to1']()).toBeFalsy();
+      expect(conversationEntity['isProteusTeam1to1']()).toBeFalsy();
       expect(conversationEntity.isGroup()).toBeFalsy();
       expect(conversationEntity.participating_user_ids().length).toBe(1);
       expect(conversationEntity.removed_from_conversation()).toBeFalsy();
@@ -116,6 +117,7 @@ describe('ConversationFilter', () => {
         muted_timestamp: 0,
         name: 'Florian@Staging11',
         others: ['71e25be1-5433-4647-964d-03a5d9e7c970'],
+        initial_protocol: ConversationProtocol.PROTEUS,
         protocol: ConversationProtocol.PROTEUS,
         qualified_others: undefined,
         receipt_mode: null,
@@ -131,7 +133,7 @@ describe('ConversationFilter', () => {
       };
       const [conversationEntity] = ConversationMapper.mapConversations([conversationData]);
       expect(conversationEntity.is1to1()).toBeTruthy();
-      expect(conversationEntity['isTeam1to1']()).toBeFalsy();
+      expect(conversationEntity['isProteusTeam1to1']()).toBeFalsy();
       expect(conversationEntity.isGroup()).toBeFalsy();
       expect(conversationEntity.participating_user_ids().length).toBe(1);
       expect(conversationEntity.removed_from_conversation()).toBeFalsy();

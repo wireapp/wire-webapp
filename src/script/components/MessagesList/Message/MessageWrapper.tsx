@@ -26,6 +26,7 @@ import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {E2EIVerificationMessage} from 'Components/MessagesList/Message/E2EIVerificationMessage';
 import {OutgoingQuote} from 'src/script/conversation/MessageRepository';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {Text} from 'src/script/entity/message/Text';
@@ -220,6 +221,9 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
   if (message.isVerification()) {
     return <VerificationMessage message={message} />;
   }
+  if (message.isE2EIVerification()) {
+    return <E2EIVerificationMessage message={message} conversation={conversation} />;
+  }
   if (message.isDelete()) {
     return <DeleteMessage message={message} onClickAvatar={onClickAvatar} />;
   }
@@ -262,8 +266,10 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
   if (message.isFileTypeRestricted()) {
     return <FileTypeRestrictedMessage message={message} />;
   }
+
   if (message.isMissed()) {
     return <MissedMessage />;
   }
+
   return null;
 };

@@ -31,9 +31,9 @@ import {t} from 'Util/LocalizerUtil';
 import {formatSeconds} from 'Util/TimeUtil';
 import {useEffectRef} from 'Util/useEffectRef';
 
-import {useAssetTransfer} from './AbstractAssetTransferStateTracker';
 import {MediaButton} from './controls/MediaButton';
 import {SeekBar} from './controls/SeekBar';
+import {AssetUrl, useAssetTransfer} from './useAssetTransfer';
 
 import {AssetRepository} from '../../../../../assets/AssetRepository';
 import {AssetTransferState} from '../../../../../assets/AssetTransferState';
@@ -53,7 +53,6 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
   message,
   isQuote,
   teamState = container.resolve(TeamState),
-  assetRepository = container.resolve(AssetRepository),
   isFocusable = true,
 }) => {
   const asset = message.getFirstAsset() as FileAsset;
@@ -61,13 +60,13 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
   const {preview_resource: assetPreviewResource} = useKoSubscribableChildren(asset, ['preview_resource']);
   const [videoPlaybackError, setVideoPlaybackError] = useState(false);
   const [videoTimeRest, setVideoTimeRest] = useState<number>(0);
-  const [videoPreview, setVideoPreview] = useState<string>();
-  const [videoSrc, setVideoSrc] = useState<string>();
+  const [videoPreview, setVideoPreview] = useState<AssetUrl>();
+  const [videoSrc, setVideoSrc] = useState<AssetUrl>();
   const [videoElement, setVideoElement] = useEffectRef<HTMLVideoElement>();
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const {isFileSharingReceivingEnabled} = useKoSubscribableChildren(teamState, ['isFileSharingReceivingEnabled']);
   const [displaySmall, setDisplaySmall] = useState(!!isQuote);
-  const {transferState, isUploading, isPendingUpload, uploadProgress, cancelUpload, loadAsset} =
+  const {transferState, isUploading, isPendingUpload, uploadProgress, cancelUpload, getAssetUrl} =
     useAssetTransfer(message);
 
   const [hideControls, setHideControls] = useState(false);
@@ -76,17 +75,11 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
 
   useEffect(() => {
     if (assetPreviewResource && isFileSharingReceivingEnabled) {
-      assetRepository
-        .load(assetPreviewResource)
-        .then(blob => blob && setVideoPreview(window.URL.createObjectURL(blob)));
+      getAssetUrl(assetPreviewResource).then(setVideoPreview);
     }
     return () => {
-      if (videoPreview) {
-        window.URL.revokeObjectURL(videoPreview);
-      }
-      if (videoSrc) {
-        window.URL.revokeObjectURL(videoSrc);
-      }
+      videoPreview?.dispose();
+      videoSrc?.dispose();
     };
   }, []);
 
@@ -100,11 +93,8 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
         asset.status(AssetTransferState.DOWNLOADING);
 
         try {
-          const blob = await loadAsset(asset.original_resource());
-          if (!blob) {
-            throw new Error('blob could not be loaded from asset');
-          }
-          setVideoSrc(window.URL.createObjectURL(blob));
+          const url = await getAssetUrl(asset.original_resource());
+          setVideoSrc(url);
           setIsVideoLoaded(true);
         } catch (error) {
           console.error('Failed to load video asset ', error);
@@ -159,8 +149,8 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
             <video
               ref={setVideoElement}
               playsInline
-              src={videoSrc}
-              poster={videoPreview}
+              src={videoSrc?.url}
+              poster={videoPreview?.url}
               onError={event => {
                 setVideoPlaybackError(true);
                 console.error('Video cannot be played', event);

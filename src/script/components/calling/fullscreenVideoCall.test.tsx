@@ -60,6 +60,7 @@ describe('fullscreenVideoCall', () => {
         availableDevices: {
           audioinput: ko.observableArray(),
           videoinput: ko.observableArray(),
+          audiooutput: ko.observableArray(),
         },
         currentDeviceId: {
           audioinput: ko.observable(''),
