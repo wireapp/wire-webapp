@@ -47,9 +47,10 @@ async function buildE2EIService() {
   return [
     new E2EIServiceExternal(
       coreCrypto,
+      mockedDb,
+      recurringTaskScheduler,
       clientService,
       Ciphersuite.MLS_128_DHKEMP256_AES128GCM_SHA256_P256,
-      recurringTaskScheduler,
     ),
     {coreCrypto},
   ] as const;

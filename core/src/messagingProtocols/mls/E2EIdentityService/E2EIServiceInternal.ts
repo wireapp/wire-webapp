@@ -21,6 +21,7 @@ import {Decoder, Encoder} from 'bazinga64';
 import logdown from 'logdown';
 
 import {APIClient} from '@wireapp/api-client';
+import {TypedEventEmitter} from '@wireapp/commons';
 
 import {AcmeService} from './Connection/AcmeServer';
 import {AcmeDirectory, Ciphersuite, CoreCrypto, E2eiEnrollment, InitParams, RotateBundle} from './E2EIService.types';
@@ -35,7 +36,11 @@ import {createNewOrder, finalizeOrder} from './Steps/Order';
 import {E2EIStorage} from './Storage/E2EIStorage';
 import {AuthData} from './Storage/E2EIStorage.schema';
 
-export class E2EIServiceInternal {
+type Events = {
+  newCrlDistributionPoints: string[];
+};
+
+export class E2EIServiceInternal extends TypedEventEmitter<Events> {
   private static instance: E2EIServiceInternal;
   private readonly logger = logdown('@wireapp/core/E2EIdentityServiceInternal');
   private readonly coreCryptoClient: CoreCrypto;
@@ -52,6 +57,7 @@ export class E2EIServiceInternal {
     e2eiServiceExternal: E2EIServiceExternal,
     keyPackagesAmount: number = 100,
   ) {
+    super();
     this.coreCryptoClient = coreCryptClient;
     this.apiClient = apiClient;
     this.e2eServiceExternal = e2eiServiceExternal;
@@ -279,7 +285,17 @@ export class E2EIServiceInternal {
     }
 
     // Step 10: Initialize MLS with the certificate
-    return this.coreCryptoClient.e2eiRotateAll(this.identity, certificate, this.keyPackagesAmount);
+    const {crlNewDistributionPoints, ...rotateBundle} = await this.coreCryptoClient.e2eiRotateAll(
+      this.identity,
+      certificate,
+      this.keyPackagesAmount,
+    );
+
+    if (crlNewDistributionPoints && crlNewDistributionPoints.length > 0) {
+      this.emit('newCrlDistributionPoints', crlNewDistributionPoints);
+    }
+
+    return rotateBundle;
   }
 
   /**

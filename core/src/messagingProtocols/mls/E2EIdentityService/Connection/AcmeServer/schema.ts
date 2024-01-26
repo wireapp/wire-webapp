@@ -44,6 +44,11 @@ export type DirectoryResponseData = z.infer<typeof DirectoryResponseSchema>;
 export const LocalCertificateRootResponseSchema = nonOptionalString;
 export type LocalCertificateRootResonseData = z.infer<typeof LocalCertificateRootResponseSchema>;
 
+export const CrlResponseSchema = z.instanceof(ArrayBuffer).refine(arr => arr.byteLength > 0, {
+  message: 'CRL is empty',
+});
+export type CrlResponseData = z.infer<typeof CrlResponseSchema>;
+
 export const FederationCrossSignedCertificatesResponseSchema = z.object({crts: z.array(nonOptionalString)});
 export type FederationCrossSignedCertificatesResponseData = z.infer<
   typeof FederationCrossSignedCertificatesResponseSchema

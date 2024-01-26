@@ -43,6 +43,10 @@ interface CoreDBSchema extends DBSchema {
     key: string;
     value: {parentConversationId: QualifiedId; subconversationId: SUBCONVERSATION_ID; groupId: string};
   };
+  crls: {
+    key: string;
+    value: {expiresAt: number; url: string};
+  };
 }
 
 export type CoreDatabase = IDBPDatabase<CoreDBSchema>;
@@ -62,6 +66,8 @@ export async function openDB(dbName: string): Promise<CoreDatabase> {
           db.createObjectStore('conversationBlacklist');
         case 4:
           db.createObjectStore('subconversations');
+        case 5:
+          db.createObjectStore('crls');
       }
     },
   });
