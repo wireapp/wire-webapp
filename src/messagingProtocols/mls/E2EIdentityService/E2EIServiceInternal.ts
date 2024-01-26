@@ -17,6 +17,7 @@
  *
  */
 
+import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import {Decoder, Encoder} from 'bazinga64';
 import logdown from 'logdown';
 
@@ -112,12 +113,12 @@ export class E2EIServiceInternal extends TypedEventEmitter<Events> {
     const {user} = E2EIStorage.get.initialData();
 
     // How long the issued certificate should be maximal valid
-    const expiryDays = 90;
+    const expirySec = 90 * TimeInMillis.DAY;
     const ciphersuite = Ciphersuite.MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519;
 
     if (hasActiveCertificate) {
       this.identity = await this.coreCryptoClient.e2eiNewRotateEnrollment(
-        expiryDays,
+        expirySec,
         ciphersuite,
         user.displayName,
         user.handle,
@@ -127,7 +128,7 @@ export class E2EIServiceInternal extends TypedEventEmitter<Events> {
       this.identity = await this.coreCryptoClient.e2eiNewActivationEnrollment(
         user.displayName,
         user.handle,
-        expiryDays,
+        expirySec,
         ciphersuite,
         user.teamId,
       );
