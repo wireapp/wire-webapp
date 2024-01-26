@@ -39,7 +39,6 @@ import {
   ProposalArgs,
   ProposalType,
   RemoveProposalArgs,
-  WelcomeBundle,
 } from '@wireapp/core-crypto';
 
 import {isCoreCryptoMLSConversationAlreadyExistsError, shouldMLSDecryptionErrorBeIgnored} from './CoreCryptoMLSError';
@@ -208,15 +207,7 @@ export class MLSService extends TypedEventEmitter<Events> {
       throw new Error('Empty list of keys provided to addUsersToExistingConversation');
     }
     return this.processCommitAction(groupIdBytes, async () => {
-      const {crlNewDistributionPoints, ...commitBundle} = await this.coreCryptoClient.addClientsToConversation(
-        groupIdBytes,
-        keyPackages,
-      );
-
-      if (crlNewDistributionPoints && crlNewDistributionPoints.length > 0) {
-        this.emit('newCrlDistributionPoints', crlNewDistributionPoints);
-      }
-
+      const commitBundle = await this.coreCryptoClient.addClientsToConversation(groupIdBytes, keyPackages);
       return commitBundle;
     });
   }
@@ -277,12 +268,11 @@ export class MLSService extends TypedEventEmitter<Events> {
     const credentialType = await this.getCredentialType();
     const generateCommit = async () => {
       const groupInfo = await getGroupInfo();
-      const {conversationId, crlNewDistributionPoints, ...commitBundle} =
-        await this.coreCryptoClient.joinByExternalCommit(groupInfo, credentialType);
+      const {conversationId, ...commitBundle} = await this.coreCryptoClient.joinByExternalCommit(
+        groupInfo,
+        credentialType,
+      );
 
-      if (crlNewDistributionPoints && crlNewDistributionPoints.length > 0) {
-        this.emit('newCrlDistributionPoints', crlNewDistributionPoints);
-      }
       return {groupId: conversationId, commitBundle};
     };
     const {commitBundle, groupId} = await generateCommit();
@@ -307,18 +297,7 @@ export class MLSService extends TypedEventEmitter<Events> {
   }
 
   public async processWelcomeMessage(welcomeMessage: Uint8Array): Promise<ConversationId> {
-    const response = await this.coreCryptoClient.processWelcomeMessage(welcomeMessage);
-
-    //FIXME: this is temporary (it should be camel case), we wait for the update from core-crypto side
-    const {id, crl_new_distribution_points: crlNewDistributionPoints} = response as unknown as {
-      id: WelcomeBundle['id'];
-      crl_new_distribution_points: WelcomeBundle['crlNewDistributionPoints'];
-    };
-
-    if (crlNewDistributionPoints && crlNewDistributionPoints.length > 0) {
-      this.emit('newCrlDistributionPoints', crlNewDistributionPoints);
-    }
-    return id;
+    return this.coreCryptoClient.processWelcomeMessage(welcomeMessage);
   }
 
   public async decryptMessage(conversationId: ConversationId, payload: Uint8Array): Promise<DecryptedMessage> {
