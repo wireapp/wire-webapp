@@ -31,6 +31,7 @@ import {container} from 'tsyringe';
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {E2EIHandler} from 'src/script/E2EIdentity';
 import {initializeDataDog} from 'Util/DataDog';
 import {DebugUtil} from 'Util/DebugUtil';
@@ -64,6 +65,7 @@ import {OnConversationE2EIVerificationStateChange} from '../conversation/Convers
 import {EventBuilder} from '../conversation/EventBuilder';
 import {MessageRepository} from '../conversation/MessageRepository';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
+import {getModalOptions, ModalType} from '../E2EIdentity/Modals';
 import {User} from '../entity/User';
 import {AccessTokenError} from '../error/AccessTokenError';
 import {AuthError} from '../error/AuthError';
@@ -450,7 +452,10 @@ export class App {
       if (supportsMLS()) {
         //if mls is supported, we need to initialize the callbacks (they are used when decrypting messages)
         conversationRepository.initMLSConversationRecoveredListener();
-        registerMLSConversationVerificationStateHandler(this.updateConversationE2EIVerificationState);
+        registerMLSConversationVerificationStateHandler(
+          this.updateConversationE2EIVerificationState,
+          this.showClientCertificateRevokedWarning,
+        );
       }
 
       onProgress(25, t('initReceivedUserData'));
@@ -858,5 +863,14 @@ export class App {
       default:
         break;
     }
+  };
+
+  private showClientCertificateRevokedWarning = async () => {
+    const {modalOptions, modalType} = getModalOptions({
+      type: ModalType.SELF_CERTIFICATE_REVOKED,
+      primaryActionFn: () => this.logout(SIGN_OUT_REASON.APP_INIT, false),
+    });
+
+    PrimaryModal.show(modalType, modalOptions);
   };
 }

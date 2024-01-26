@@ -27,7 +27,7 @@ export const mapMLSStatus = (status?: CoreStatus) => {
   const statusMap: Record<any, MLSStatuses> = {
     Valid: MLSStatuses.VALID,
     Expired: MLSStatuses.EXPIRED,
-    Revoked: MLSStatuses.EXPIRED,
+    Revoked: MLSStatuses.REVOKED,
   };
 
   if (!status) {
