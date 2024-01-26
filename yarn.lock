@@ -4876,20 +4876,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core-crypto@npm:1.0.0-rc.32":
-  version: 1.0.0-rc.32
-  resolution: "@wireapp/core-crypto@npm:1.0.0-rc.32"
-  checksum: b8d5c8b28308e276419fd8528cee1ca2eb55f74e47d1ea7ca24054e6a13dd76a4f8fb761bf0697848942a06f412a6ee22491bb14eae30954bf09e2433f9181b6
+"@wireapp/core-crypto@npm:1.0.0-rc.33":
+  version: 1.0.0-rc.33
+  resolution: "@wireapp/core-crypto@npm:1.0.0-rc.33"
+  checksum: 44b88f4b7a1ec2ce9c13ce48329c53193c91833f13345abf28e3bfcf51f41ab510187d1192dcf76293c23b9fa4167e67ee1bd084a9739f2dc598ca7987258d27
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:43.9.1":
-  version: 43.9.1
-  resolution: "@wireapp/core@npm:43.9.1"
+"@wireapp/core@npm:43.11.2":
+  version: 43.11.2
+  resolution: "@wireapp/core@npm:43.11.2"
   dependencies:
     "@wireapp/api-client": ^26.10.1
     "@wireapp/commons": ^5.2.4
-    "@wireapp/core-crypto": 1.0.0-rc.32
+    "@wireapp/core-crypto": 1.0.0-rc.33
     "@wireapp/cryptobox": 12.8.0
     "@wireapp/promise-queue": ^2.2.9
     "@wireapp/protocol-messaging": 1.44.0
@@ -4905,7 +4905,7 @@ __metadata:
     long: ^5.2.0
     uuidjs: 4.2.13
     zod: 3.22.4
-  checksum: ad69c04e17c82c01f96fda511c47a335c7972c475ac755042097f2c4e95f97846f8416795666be3eff4f4b4e5caa33022890472a1e99cdfbf89b5f7df928acde
+  checksum: 685d047c9dd296e528ae8500e6b82c1ad6aa07762fd6ae549672028e8f9741cc88c3dbab15959b68d3b0fc47870daab7ba30d3b2127c15d256409551165df002
   languageName: node
   linkType: hard
 
@@ -5019,9 +5019,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/react-ui-kit@npm:9.12.7":
-  version: 9.12.7
-  resolution: "@wireapp/react-ui-kit@npm:9.12.7"
+"@wireapp/react-ui-kit@npm:9.12.8":
+  version: 9.12.8
+  resolution: "@wireapp/react-ui-kit@npm:9.12.8"
   dependencies:
     "@types/color": 3.0.6
     color: 4.2.3
@@ -5036,7 +5036,7 @@ __metadata:
   peerDependenciesMeta:
     "@types/react":
       optional: true
-  checksum: e31a97b6380decd1705dd2b3603a9e59b6e9a7f0e193c718ace0f58dde634aedc6ede11d7574ca37e4e9c6440c80c81fc7a6321bd7d03e751fa788a89b7b4eae
+  checksum: eaab4ee5abbc36b1b5a50511b7b7824c9f7f717b2b852a35fac148ecb505f1f2a3ad910ecfd3b54c16de04b0fd7284ef60442a957e78da7a25f20a466c6b7fa5
   languageName: node
   linkType: hard
 
@@ -17602,10 +17602,10 @@ __metadata:
     "@wireapp/avs": 9.6.9
     "@wireapp/commons": 5.2.4
     "@wireapp/copy-config": 2.1.14
-    "@wireapp/core": 43.9.1
+    "@wireapp/core": 43.11.2
     "@wireapp/eslint-config": 3.0.5
     "@wireapp/prettier-config": 0.6.3
-    "@wireapp/react-ui-kit": 9.12.7
+    "@wireapp/react-ui-kit": 9.12.8
     "@wireapp/store-engine": ^5.1.4
     "@wireapp/store-engine-dexie": 2.1.7
     "@wireapp/webapp-events": 0.20.1

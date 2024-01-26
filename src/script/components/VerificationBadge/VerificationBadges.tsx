@@ -146,6 +146,12 @@ const MLSVerificationBadge = ({context, MLSStatus}: {MLSStatus?: MLSStatuses; co
           <CertificateExpiredIcon />
         </span>
       );
+    case MLSStatuses.REVOKED:
+      return (
+        <span {...mlsVerificationProps} data-tooltip={t('E2EI.certificateRevoked')}>
+          <CertificateExpiredIcon />
+        </span>
+      );
     case MLSStatuses.EXPIRES_SOON:
       return (
         <span {...mlsVerificationProps} data-tooltip={t('E2EI.certificateExpiresSoon')}>
