@@ -41,6 +41,10 @@ export class Account extends EventEmitter {
       getDeviceIdentities: jest.fn(),
       getConversationState: jest.fn(),
       registerServerCertificates: jest.fn(),
+      on: jest.fn(),
+      emit: jest.fn(),
+      off: jest.fn(),
+      initialize: jest.fn(),
     },
     mls: {
       schedulePeriodicKeyMaterialRenewals: jest.fn(),
