@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [43.11.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@43.11.0...@wireapp/core@43.11.1) (2024-01-26)
+
+### Bug Fixes
+
+* **e2ei:** certificate duration ([#5903](https://github.com/wireapp/wire-web-packages/issues/5903)) ([b7a59f8](https://github.com/wireapp/wire-web-packages/commit/b7a59f833c7974dcf1105c08aea356c1e1964b9c))
+
 # [43.11.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@43.10.0...@wireapp/core@43.11.0) (2024-01-26)
 
 ### Features
