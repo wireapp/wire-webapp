@@ -2158,10 +2158,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@faker-js/faker@npm:8.3.1":
-  version: 8.3.1
-  resolution: "@faker-js/faker@npm:8.3.1"
-  checksum: 33efe912411fe61f43b313784a9ce041dfbfb54bc3b2f7b923a547f97beb6b3763534f9c37af25ab330982e6b36e6f7b040dfb35c115deb8c789d8ada413bd94
+"@faker-js/faker@npm:8.4.0":
+  version: 8.4.0
+  resolution: "@faker-js/faker@npm:8.4.0"
+  checksum: 682581f0b009b7e8b81bc0736a3f1df2fb5179706786b87ef5bed5e2e28e22dfeba10e5122942371f12d68e833be3b3726850f96940baf080500cef35a77403b
   languageName: node
   linkType: hard
 
@@ -17530,7 +17530,7 @@ __metadata:
     "@datadog/browser-rum": ^5.8.0
     "@emotion/eslint-plugin": ^11.11.0
     "@emotion/react": 11.11.3
-    "@faker-js/faker": 8.3.1
+    "@faker-js/faker": 8.4.0
     "@formatjs/cli": 6.2.6
     "@koush/wrtc": 0.5.3
     "@lexical/history": 0.12.5
