@@ -75,9 +75,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/eslint-parser@npm:7.23.3":
-  version: 7.23.3
-  resolution: "@babel/eslint-parser@npm:7.23.3"
+"@babel/eslint-parser@npm:7.23.9":
+  version: 7.23.9
+  resolution: "@babel/eslint-parser@npm:7.23.9"
   dependencies:
     "@nicolo-ribaudo/eslint-scope-5-internals": 5.1.1-v1
     eslint-visitor-keys: ^2.1.0
@@ -85,7 +85,7 @@ __metadata:
   peerDependencies:
     "@babel/core": ^7.11.0
     eslint: ^7.5.0 || ^8.0.0
-  checksum: 9573daebe21af5123c302c307be80cacf1c2bf236a9497068a14726d3944ef55e1282519d0ccf51882dfc369359a3442299c98cb22a419e209924db39d4030fd
+  checksum: cfb87bc48d005f181807ae8f8357ba9eeb3ece38480084fb5d997bac03ebb4cf709ee197d697f506de8faa7f665fa07579b9b9c2045d86d6c17174b6c1b0c5c9
   languageName: node
   linkType: hard
 
@@ -17521,7 +17521,7 @@ __metadata:
   resolution: "wire-webapp@workspace:."
   dependencies:
     "@babel/core": 7.23.7
-    "@babel/eslint-parser": 7.23.3
+    "@babel/eslint-parser": 7.23.9
     "@babel/plugin-proposal-decorators": 7.23.7
     "@babel/preset-env": 7.23.8
     "@babel/preset-react": 7.23.3
