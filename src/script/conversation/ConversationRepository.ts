@@ -1892,20 +1892,12 @@ export class ConversationRepository {
   };
 
   /**
-   * @returns resolves when deleted conversations are locally deleted, too.
+   * will locally delete conversations that no longer exist on backend side
    */
-  checkForDeletedConversations() {
-    return Promise.all(
-      this.conversationState.conversations().map(async conversation => {
-        try {
-          await this.conversationService.getConversationById(conversation);
-        } catch ({code}) {
-          if (code === HTTP_STATUS.NOT_FOUND) {
-            this.deleteConversationLocally(conversation, true);
-          }
-        }
-      }),
-    );
+  async syncDeletedConversations() {
+    const conversationIds = this.conversationState.conversations().map(conversation => conversation.qualifiedId);
+    const {not_found = []} = await this.conversationService.getConversationByIds(conversationIds);
+    not_found.forEach(deletedConversationId => this.deleteConversationLocally(deletedConversationId, true));
   }
 
   private readonly onUserSupportedProtocolsUpdated = async ({user}: {user: User}) => {
