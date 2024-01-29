@@ -35,6 +35,7 @@ import {showUserModal, UserModal} from 'Components/Modals/UserModal';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {AppLock} from './AppLock';
+import {useE2EIFeatureConfigUpdate} from './components/FeatureConfigChange/FeatureConfigChangeHandler/Features/useE2EIFeatureConfigUpdate';
 import {FeatureConfigChangeNotifier} from './components/FeatureConfigChange/FeatureConfigChangeNotifier';
 import {WindowTitleUpdater} from './components/WindowTitleUpdater';
 import {LeftSidebar} from './LeftSidebar';
@@ -214,6 +215,8 @@ export const AppMain: FC<AppMainProps> = ({
       initializeApp();
     }
   }, [locked]);
+
+  useE2EIFeatureConfigUpdate(repositories.team);
 
   return (
     <StyledApp
