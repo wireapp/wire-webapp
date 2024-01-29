@@ -85,7 +85,6 @@ const featureNotifications: Partial<
       'config' in newConfig &&
       oldConfig &&
       'config' in oldConfig &&
-      newConfig?.config?.enforcedDownloadLocation !== oldConfig?.config?.enforcedDownloadLocation &&
       Runtime.isDesktopApp() &&
       Runtime.isWindows()
     ) {
@@ -209,6 +208,8 @@ export function FeatureConfigChangeNotifier({teamState, selfUserId}: Props): nul
       Object.entries(featureNotifications).forEach(([feature, getMessage]) => {
         const featureKey = feature as FEATURE_KEY;
         const message = getMessage(previous?.[featureKey], config[featureKey]);
+        const isEnforceDownloadPath = featureKey === FEATURE_KEY.ENFORCE_DOWNLOAD_PATH;
+
         if (!message) {
           return;
         }
@@ -225,7 +226,8 @@ export function FeatureConfigChangeNotifier({teamState, selfUserId}: Props): nul
             }),
           },
           primaryAction: message.primaryAction,
-          hideCloseBtn: featureKey === FEATURE_KEY.ENFORCE_DOWNLOAD_PATH,
+          hideCloseBtn: isEnforceDownloadPath,
+          preventClose: isEnforceDownloadPath,
         });
       });
     }

@@ -201,6 +201,7 @@ describe('FeatureConfigChangeNotifier', () => {
         expect(showModalSpy).toHaveBeenCalledWith(PrimaryModal.type.ACKNOWLEDGE, {
           hideCloseBtn: false,
           primaryAction: undefined,
+          preventClose: false,
           text: expect.objectContaining({
             htmlMessage: expectedText,
           }),
