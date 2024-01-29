@@ -131,7 +131,16 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       }),
     };
 
-    await this.coreE2EIService.registerServerCertificates(discoveryUrl);
+    await this.coreE2EIService.initialize(discoveryUrl);
+    await this.coreE2EIService.registerServerCertificates();
+
+    try {
+      //FIXME: this doesn't work on curernt core-crypto version
+      await this.coreE2EIService.validateSelfCrl();
+    } catch (error) {
+      console.error('Error validating self CRL', error);
+    }
+
     this.currentStep = E2EIHandlerStep.INITIALIZED;
     return this;
   }
