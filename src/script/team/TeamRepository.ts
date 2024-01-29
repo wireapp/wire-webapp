@@ -74,9 +74,9 @@ export interface AccountInfo {
 }
 
 type Events = {
-  featureUpdated: {
+  featureConfigUpdated: {
     prevFeatureList?: FeatureList;
-    event: TeamFeatureConfigurationUpdateEvent;
+    newFeatureList: FeatureList;
   };
   teamRefreshed: void;
 };
@@ -393,8 +393,8 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     }
 
     // When we receive a `feature-config.update` event, we will refetch the entire feature config
-    const {prevFeatureList} = await this.updateFeatureConfig();
-    this.emit('featureUpdated', {event, prevFeatureList});
+    const {prevFeatureList, newFeatureList} = await this.updateFeatureConfig();
+    this.emit('featureConfigUpdated', {prevFeatureList, newFeatureList});
   };
 
   private onMemberLeave(eventJson: TeamMemberLeaveEvent): void {

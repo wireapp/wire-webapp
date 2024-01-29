@@ -17,45 +17,110 @@
  *
  */
 
-import {FeatureList, FEATURE_KEY} from '@wireapp/api-client/lib/team';
+import {FeatureList, FEATURE_KEY, FeatureStatus} from '@wireapp/api-client/lib/team';
 
-export const hasTeamFeatureChanged = (
-  {prevFeatureList, newFeatureList}: {prevFeatureList: FeatureList | undefined; newFeatureList: FeatureList},
-  key: FEATURE_KEY,
-): boolean => {
-  const newFeature = newFeatureList[key];
+export enum FeatureUpdateType {
+  ENABLED = 'ENABLED', // Feature was enabled or didn't exist before and now it was added and is enabled
+  DISABLED = 'DISABLED', // Feature was previously enabled and now it was removed or disabled
+  CONFIG_CHANGED = 'CONFIG_CHANGED', // Feature was enabled and now it's config has changed
+  UNCHANGED = 'UNCHANGED', // Feature is enabled or disabled or doesn't exist and it's config hasn't changed
+}
+
+type FeatureUpdateEnabled<Key extends FEATURE_KEY> = {
+  type: FeatureUpdateType.ENABLED;
+  prev?: FeatureList[Key];
+  next: FeatureList[Key];
+};
+
+type FeatureUpdateDisabled<Key extends FEATURE_KEY> = {
+  type: FeatureUpdateType.DISABLED;
+  prev: FeatureList[Key];
+  next?: FeatureList[Key];
+};
+
+type FeatureUpdateConfigChanged<Key extends FEATURE_KEY> = {
+  type: FeatureUpdateType.CONFIG_CHANGED;
+  prev: FeatureList[Key];
+  next: NonNullable<FeatureList[Key]>;
+};
+
+type FeatureUpdateUnchanged<Key extends FEATURE_KEY> = {
+  type: FeatureUpdateType.UNCHANGED;
+  prev?: FeatureList[Key];
+  next?: FeatureList[Key];
+};
+
+type FeatureUpdate<Key extends FEATURE_KEY> =
+  | FeatureUpdateEnabled<Key>
+  | FeatureUpdateDisabled<Key>
+  | FeatureUpdateConfigChanged<Key>
+  | FeatureUpdateUnchanged<Key>;
+
+export const getTeamFeatureUpdate = <Key extends FEATURE_KEY>(
+  {prevFeatureList, newFeatureList}: {prevFeatureList?: FeatureList; newFeatureList?: FeatureList},
+  key: Key,
+): FeatureUpdate<Key> => {
+  const newFeature = newFeatureList?.[key];
 
   if (!prevFeatureList) {
-    return !!newFeature;
+    // Feature was added and is enabled
+    if (newFeature && newFeature.status === FeatureStatus.ENABLED) {
+      return {type: FeatureUpdateType.ENABLED, next: newFeature};
+    }
+
+    // Feature was not added or it was added but disabled
+    return {type: FeatureUpdateType.UNCHANGED, next: newFeature};
   }
 
   const prevFeature = prevFeatureList[key];
 
   const wasFeatureAdded = !prevFeature && newFeature;
+
+  if (wasFeatureAdded) {
+    // Feature was added and is enabled
+    if (newFeature.status === FeatureStatus.ENABLED) {
+      return {type: FeatureUpdateType.ENABLED, next: newFeature};
+    }
+
+    // Feature config was added but it is disabled
+    return {type: FeatureUpdateType.UNCHANGED, next: newFeature};
+  }
+
   const wasFeatureRemoved = prevFeature && !newFeature;
 
-  if (wasFeatureAdded || wasFeatureRemoved) {
-    return true;
+  if (wasFeatureRemoved) {
+    // Feature was removed
+    return {type: FeatureUpdateType.DISABLED, prev: prevFeature};
   }
 
   // This feature was never there;
   if (!prevFeature && !newFeature) {
-    return false;
+    return {type: FeatureUpdateType.UNCHANGED};
   }
 
   if (!prevFeature || !newFeature) {
-    return true;
+    throw new Error('This should never happen');
   }
 
   const hasFeatureStatusChanged = prevFeature.status !== newFeature.status;
+
   if (hasFeatureStatusChanged) {
-    return true;
+    if (newFeature.status === FeatureStatus.ENABLED) {
+      return {type: FeatureUpdateType.ENABLED, prev: prevFeature, next: newFeature};
+    }
+
+    return {type: FeatureUpdateType.DISABLED, prev: prevFeature, next: newFeature};
   }
 
   const hasFeatureConfigChanged =
+    newFeature.status === FeatureStatus.ENABLED &&
     'config' in prevFeature &&
     'config' in newFeature &&
     JSON.stringify(prevFeature.config) !== JSON.stringify(newFeature.config);
 
-  return hasFeatureConfigChanged;
+  if (hasFeatureConfigChanged) {
+    return {type: FeatureUpdateType.CONFIG_CHANGED, prev: prevFeature, next: newFeature};
+  }
+
+  return {type: FeatureUpdateType.UNCHANGED, prev: prevFeature, next: newFeature};
 };
