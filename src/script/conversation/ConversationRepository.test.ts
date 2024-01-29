@@ -1962,7 +1962,7 @@ describe('ConversationRepository', () => {
         await conversationRepository['saveConversation'](deletedGroup);
 
         const currentNbConversations = conversationRepository['conversationState'].conversations().length;
-        await testFactory.conversation_repository.checkForDeletedConversations();
+        await testFactory.conversation_repository.syncDeletedConversations();
 
         expect(conversationRepository['conversationState'].conversations()).toHaveLength(currentNbConversations - 1);
       });
