@@ -18,14 +18,14 @@
  */
 
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
-import {FEATURE_KEY, FeatureStatus, FeatureMLS, FeatureMLSE2EId} from '@wireapp/api-client/lib/team';
+import {FEATURE_KEY, FeatureStatus, FeatureMLS, FeatureMLSE2EId, FeatureList} from '@wireapp/api-client/lib/team';
 
 import {FeatureUpdateType, getTeamFeatureUpdate} from './TeamFeatureUpdater';
 
 describe('TeamFeatureUtil', () => {
   describe('hasTeamFeatureChanged', () => {
     it(`returns "unchanged" if feature list didn't exist before and it was added with feature disabled`, () => {
-      const prevFeatureList = undefined;
+      const prevFeatureList: FeatureList | undefined = undefined;
       const newFeatureList = {
         [FEATURE_KEY.MLS]: {status: FeatureStatus.DISABLED} as unknown as FeatureMLS,
       };
@@ -37,7 +37,7 @@ describe('TeamFeatureUtil', () => {
     });
 
     it(`returns "unchanged" if feature list didn't exist before and it was added without the feature`, () => {
-      const prevFeatureList = undefined;
+      const prevFeatureList: FeatureList | undefined = undefined;
       const newFeatureList = {
         [FEATURE_KEY.MLSE2EID]: {status: FeatureStatus.DISABLED} as unknown as FeatureMLSE2EId,
       };
@@ -48,7 +48,7 @@ describe('TeamFeatureUtil', () => {
     });
 
     it(`returns "unchanged" if feature list didn't exist before and it was added without a feature`, () => {
-      const prevFeatureList = undefined;
+      const prevFeatureList: FeatureList | undefined = undefined;
       const newFeatureList = {
         [FEATURE_KEY.MLS]: {status: FeatureStatus.DISABLED} as unknown as FeatureMLS,
         [FEATURE_KEY.MLSE2EID]: {status: FeatureStatus.DISABLED} as unknown as FeatureMLSE2EId,
@@ -76,7 +76,7 @@ describe('TeamFeatureUtil', () => {
     });
 
     it('should return "unchanged" if the feature list was not defined previously but feature is not included in the new list', () => {
-      const prevFeatureList = undefined;
+      const prevFeatureList: FeatureList | undefined = undefined;
       const newFeatureList = {};
 
       expect(getTeamFeatureUpdate({prevFeatureList, newFeatureList}, FEATURE_KEY.MLS)).toEqual({
@@ -106,7 +106,7 @@ describe('TeamFeatureUtil', () => {
     });
 
     it(`returns "enabled" if the feature list didn't exist before and it was added with feature enabled`, () => {
-      const prevFeatureList = undefined;
+      const prevFeatureList: FeatureList | undefined = undefined;
       const newFeatureList = {
         [FEATURE_KEY.MLS]: {status: FeatureStatus.ENABLED} as unknown as FeatureMLS,
       };
