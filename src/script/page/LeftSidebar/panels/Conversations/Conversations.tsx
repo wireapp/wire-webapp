@@ -24,6 +24,7 @@ import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
+import {CloseIcon, Input, SearchIcon} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {CallingCell} from 'Components/calling/CallingCell';
@@ -31,6 +32,7 @@ import {Icon} from 'Components/Icon';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
 import {UserInfo} from 'Components/UserInfo';
 import {UserVerificationBadges} from 'Components/VerificationBadge';
+import {Config} from 'src/script/Config';
 import {ListState} from 'src/script/page/useAppState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -86,6 +88,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   selfUser,
   switchList,
 }) => {
+  const [conversationsFilter, setConversationsFilter] = useState<string>('');
   const {
     name: userName,
     isOnLegalHold,
@@ -100,6 +103,10 @@ const Conversations: React.FC<ConversationsProps> = ({
   ]);
   const {notifications} = useKoSubscribableChildren(preferenceNotificationRepository, ['notifications']);
   const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
+
+  const filteredConversations = conversations.filter(conversation =>
+    conversation.name().toLowerCase().includes(conversationsFilter.toLowerCase()),
+  );
 
   const initialViewStyle = propertiesRepository.getPreference(PROPERTIES_TYPE.INTERFACE.VIEW_FOLDERS)
     ? ConversationViewStyle.FOLDER
@@ -315,27 +322,83 @@ const Conversations: React.FC<ConversationsProps> = ({
       {hasNoConversations ? (
         <>
           {archivedConversations.length === 0 ? (
-            <div className="conversations-hint" data-uie-name="status-start-conversation-hint">
-              <div className="conversations-hint-text">{t('conversationsNoConversations')}</div>
-              <Icon.ArrowDownLong className="conversations-hint-arrow" />
+            <div className="conversations-centered">
+              <div>
+                {t('conversationsWelcome', {
+                  brandName: Config.getConfig().BRAND_NAME,
+                })}
+              </div>
+              <button className="button-reset-default text-underline" onClick={() => switchList(ListState.START_UI)}>
+                {t('conversationsNoConversations')}
+              </button>
             </div>
           ) : (
             <div className="conversations-all-archived">{t('conversationsAllArchived')}</div>
           )}
         </>
       ) : (
-        <ConversationsList
-          connectRequests={connectRequests}
-          callState={callState}
-          conversations={conversations}
-          viewStyle={viewStyle}
-          listViewModel={listViewModel}
-          conversationState={conversationState}
-          conversationRepository={conversationRepository}
-          currentFocus={currentFocus}
-          resetConversationFocus={resetConversationFocus}
-          handleArrowKeyDown={handleKeyDown}
-        />
+        <>
+          <Input
+            value={conversationsFilter}
+            onChange={event => {
+              setConversationsFilter(event.currentTarget.value);
+            }}
+            startContent={
+              <SearchIcon
+                css={{
+                  top: '50%',
+                  left: 10,
+                  position: 'absolute',
+                  transform: 'translateY(-50%)',
+                }}
+              />
+            }
+            endContent={
+              conversationsFilter && (
+                <CloseIcon
+                  className="cursor-pointer"
+                  onClick={() => setConversationsFilter('')}
+                  css={{
+                    top: '50%',
+                    right: 10,
+                    position: 'absolute',
+                    transform: 'translateY(-50%)',
+                  }}
+                />
+              )
+            }
+            inputCSS={{height: '32px', borderRadius: 8, paddingLeft: 36}}
+            wrapperCSS={{
+              marginBottom: 12,
+              marginTop: 12,
+              paddingLeft: 16,
+              paddingRight: 16,
+              zIndex: 1,
+              position: 'relative',
+            }}
+            placeholder={t('searchConversations')}
+          />
+          {filteredConversations.length === 0 && (
+            <div className="conversations-centered">
+              <div>{t('searchConversationsNoResult')}</div>
+              <button className="button-reset-default text-underline" onClick={() => switchList(ListState.START_UI)}>
+                {t('searchConversationsNoResultConnectSuggestion')}
+              </button>
+            </div>
+          )}
+          <ConversationsList
+            connectRequests={connectRequests}
+            callState={callState}
+            conversations={filteredConversations}
+            viewStyle={viewStyle}
+            listViewModel={listViewModel}
+            conversationState={conversationState}
+            conversationRepository={conversationRepository}
+            currentFocus={currentFocus}
+            resetConversationFocus={resetConversationFocus}
+            handleArrowKeyDown={handleKeyDown}
+          />
+        </>
       )}
     </ListWrapper>
   );
