@@ -18,7 +18,6 @@
  */
 
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
-import {TeamFeatureConfigurationUpdateEvent, TEAM_EVENT} from '@wireapp/api-client/lib/event';
 import {FeatureList, FeatureStatus} from '@wireapp/api-client/lib/team';
 import {FEATURE_KEY} from '@wireapp/api-client/lib/team/feature';
 import {act} from 'react-dom/test-utils';
@@ -206,23 +205,18 @@ describe('SelfRepository', () => {
         },
       };
 
-      const mockedMLSFeatureUpdateEvent: TeamFeatureConfigurationUpdateEvent = {
-        name: FEATURE_KEY.MLS,
-        team: '',
-        time: '',
-        data: {
-          status: FeatureStatus.ENABLED,
+      const mockedNewFeatureList: FeatureList = {
+        [FEATURE_KEY.MLS]: {
           config: generateMLSFeatureConfig(newSupportedProtocols),
+          status: FeatureStatus.ENABLED,
         },
-
-        type: TEAM_EVENT.FEATURE_CONFIG_UPDATE,
       };
 
       jest.spyOn(selfRepository, 'refreshSelfSupportedProtocols').mockImplementationOnce(jest.fn());
 
-      selfRepository['teamRepository'].emit('featureUpdated', {
-        event: mockedMLSFeatureUpdateEvent,
+      selfRepository['teamRepository'].emit('featureConfigUpdated', {
         prevFeatureList: mockedFeatureList,
+        newFeatureList: mockedNewFeatureList,
       });
 
       expect(selfRepository.refreshSelfSupportedProtocols).toHaveBeenCalled();
@@ -263,25 +257,22 @@ describe('SelfRepository', () => {
         },
       };
 
-      const mockedMLSFeatureUpdateEvent: TeamFeatureConfigurationUpdateEvent = {
-        name: FEATURE_KEY.MLS,
-        team: '',
-        time: '',
-        data: {
-          status: newFeatureStatus,
+      const mockedNewFeatureList: FeatureList = {
+        [FEATURE_KEY.MLS]: {
           config: generateMLSFeatureConfig(newSupportedProtocols),
+          status: newFeatureStatus,
         },
-
-        type: TEAM_EVENT.FEATURE_CONFIG_UPDATE,
       };
 
       jest.spyOn(selfRepository, 'refreshSelfSupportedProtocols').mockImplementationOnce(jest.fn());
 
-      selfRepository['teamRepository'].emit('featureUpdated', {
-        event: mockedMLSFeatureUpdateEvent,
+      selfRepository['teamRepository'].emit('featureConfigUpdated', {
         prevFeatureList: mockedFeatureList,
+        newFeatureList: mockedNewFeatureList,
       });
 
+      // Await for async work caused by event emitter to finish
+      await Promise.resolve();
       expect(selfRepository.refreshSelfSupportedProtocols).toHaveBeenCalled();
     });
 
@@ -298,50 +289,49 @@ describe('SelfRepository', () => {
         },
       };
 
-      const mockedMLSFeatureUpdateEvent: TeamFeatureConfigurationUpdateEvent = {
-        name: FEATURE_KEY.MLS,
-        team: '',
-        time: '',
-        data: {
-          status: FeatureStatus.ENABLED,
+      const mockedNewFeatureList: FeatureList = {
+        [FEATURE_KEY.MLS]: {
           config: generateMLSFeatureConfig(newSupportedProtocols),
+          status: FeatureStatus.ENABLED,
         },
-
-        type: TEAM_EVENT.FEATURE_CONFIG_UPDATE,
       };
 
       jest.spyOn(selfRepository, 'refreshSelfSupportedProtocols').mockImplementationOnce(jest.fn());
 
-      selfRepository['teamRepository'].emit('featureUpdated', {
-        event: mockedMLSFeatureUpdateEvent,
+      selfRepository['teamRepository'].emit('featureConfigUpdated', {
         prevFeatureList: mockedFeatureList,
+        newFeatureList: mockedNewFeatureList,
       });
 
+      await Promise.resolve();
       expect(selfRepository.refreshSelfSupportedProtocols).not.toHaveBeenCalled();
     });
 
     it('refreshes self supported protocols on mls migration feature config update', async () => {
       const selfRepository = await testFactory.exposeSelfActors();
 
-      const mockedMLSMigrationFeatureUpdateEvent: TeamFeatureConfigurationUpdateEvent = {
-        name: FEATURE_KEY.MLS_MIGRATION,
-        team: '',
-        time: '',
-        data: {
-          status: FeatureStatus.ENABLED,
-          config: {finaliseRegardlessAfter: '', startTime: ''},
+      const mockedFeatureList: FeatureList = {
+        [FEATURE_KEY.MLS_MIGRATION]: {
+          config: {},
+          status: FeatureStatus.DISABLED,
         },
+      };
 
-        type: TEAM_EVENT.FEATURE_CONFIG_UPDATE,
+      const mockedNewFeatureList: FeatureList = {
+        [FEATURE_KEY.MLS_MIGRATION]: {
+          config: {},
+          status: FeatureStatus.ENABLED,
+        },
       };
 
       jest.spyOn(selfRepository, 'refreshSelfSupportedProtocols').mockImplementationOnce(jest.fn());
 
-      selfRepository['teamRepository'].emit('featureUpdated', {
-        event: mockedMLSMigrationFeatureUpdateEvent,
-        prevFeatureList: {},
+      selfRepository['teamRepository'].emit('featureConfigUpdated', {
+        prevFeatureList: mockedFeatureList,
+        newFeatureList: mockedNewFeatureList,
       });
 
+      await Promise.resolve();
       expect(selfRepository.refreshSelfSupportedProtocols).toHaveBeenCalled();
     });
   });

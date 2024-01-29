@@ -20,7 +20,7 @@
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {FEATURE_KEY, FeatureStatus, FeatureMLS, FeatureMLSE2EId} from '@wireapp/api-client/lib/team';
 
-import {FeatureUpdateType, getTeamFeatureUpdate} from './TeamFeatureUtil';
+import {FeatureUpdateType, getTeamFeatureUpdate} from './TeamFeatureUpdater';
 
 describe('TeamFeatureUtil', () => {
   describe('hasTeamFeatureChanged', () => {

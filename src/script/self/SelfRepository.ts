@@ -33,7 +33,7 @@ import {evaluateSelfSupportedProtocols} from './SelfSupportedProtocols/SelfSuppo
 
 import {ClientEntity, ClientRepository} from '../client';
 import {Core} from '../service/CoreSingleton';
-import {FeatureUpdateType, getTeamFeatureUpdate} from '../team/TeamFeatureUtil/TeamFeatureUtil';
+import {FeatureUpdateType, getTeamFeatureUpdate} from '../team/TeamFeatureUpdater/TeamFeatureUpdater';
 import {TeamRepository} from '../team/TeamRepository';
 import {UserRepository} from '../user/UserRepository';
 import {UserState} from '../user/UserState';
