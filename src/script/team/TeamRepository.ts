@@ -77,7 +77,6 @@ type Events = {
     prevFeatureList?: FeatureList;
     newFeatureList: FeatureList;
   };
-  teamRefreshed: void;
 };
 
 export class TeamRepository extends TypedEventEmitter<Events> {
@@ -165,7 +164,6 @@ export class TeamRepository extends TypedEventEmitter<Events> {
       try {
         await this.getTeam();
         await this.updateFeatureConfig();
-        this.emit('teamRefreshed');
       } catch (error) {
         this.logger.error(error);
       }
