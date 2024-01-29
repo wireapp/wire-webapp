@@ -18,7 +18,7 @@
  */
 
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
-import {FEATURE_KEY, FeatureMLS, FeatureStatus} from '@wireapp/api-client/lib/team/feature/';
+import {FEATURE_KEY, FeatureStatus, FeatureList} from '@wireapp/api-client/lib/team/feature/';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
@@ -33,6 +33,10 @@ import {evaluateSelfSupportedProtocols} from './SelfSupportedProtocols/SelfSuppo
 
 import {ClientEntity, ClientRepository} from '../client';
 import {Core} from '../service/CoreSingleton';
+import {
+  FeatureUpdateType,
+  detectTeamFeatureUpdate,
+} from '../team/TeamFeatureConfigChangeDetector/TeamFeatureConfigChangeDetector';
 import {TeamRepository} from '../team/TeamRepository';
 import {UserRepository} from '../user/UserRepository';
 import {UserState} from '../user/UserState';
@@ -58,24 +62,10 @@ export class SelfRepository extends TypedEventEmitter<Events> {
     // It's possible that they have removed proteus client, and now all their clients are mls-capable.
     amplify.subscribe(WebAppEvents.CLIENT.REMOVE, this.refreshSelfSupportedProtocols);
 
-    teamRepository.on('teamRefreshed', this.refreshSelfSupportedProtocols);
-    teamRepository.on('featureUpdated', ({event, prevFeatureList}) => {
-      if (event.name === FEATURE_KEY.MLS) {
-        void this.handleMLSFeatureUpdate(event.data, prevFeatureList?.[FEATURE_KEY.MLS]);
-      }
-
-      // MLS Migration feature config is also considered when evaluating self supported protocols
-      // We still allow proteus to be used if migration is enabled (but startTime has not been reached yet),
-      // or when migration is enabled, started and not finalised yet (finaliseRegardlessAfter has not arrived yet)
-      if (event.name === FEATURE_KEY.MLS_MIGRATION) {
-        void this.refreshSelfSupportedProtocols();
-      }
-
-      if (event.name === FEATURE_KEY.ENFORCE_DOWNLOAD_PATH) {
-        this.handleDownloadPathUpdate(
-          event.data.status === FeatureStatus.ENABLED ? event.data.config.enforcedDownloadLocation : undefined,
-        );
-      }
+    teamRepository.on('featureConfigUpdated', async configUpdate => {
+      await this.handleMLSFeatureUpdate(configUpdate);
+      await this.handleMLSMigrationFeatureUpdate(configUpdate);
+      await this.handleDownloadPathFeatureUpdate(configUpdate);
     });
   }
 
@@ -87,23 +77,73 @@ export class SelfRepository extends TypedEventEmitter<Events> {
     return selfUser;
   }
 
-  private handleMLSFeatureUpdate = async (newMLSFeature: FeatureMLS, prevMLSFeature?: FeatureMLS) => {
-    const prevSupportedProtocols = prevMLSFeature?.config.supportedProtocols ?? [];
-    const newSupportedProtocols = newMLSFeature.config.supportedProtocols ?? [];
+  private handleMLSFeatureUpdate = async ({
+    prevFeatureList,
+    newFeatureList,
+  }: {
+    prevFeatureList?: FeatureList;
+    newFeatureList?: FeatureList;
+  }) => {
+    const mlsFeatureUpdate = detectTeamFeatureUpdate({prevFeatureList, newFeatureList}, FEATURE_KEY.MLS);
 
-    const hasFeatureStatusChanged = prevMLSFeature?.status !== newMLSFeature.status;
+    // Nothing to do if MLS feature was not changed
+    if (mlsFeatureUpdate.type === FeatureUpdateType.UNCHANGED) {
+      return;
+    }
 
-    const hasTeamSupportedProtocolsChanged = !(
-      prevSupportedProtocols.length === newSupportedProtocols.length &&
-      [...prevSupportedProtocols].every(protocol => newSupportedProtocols.includes(protocol))
-    );
+    // If MLS feature was enabled or disabled, we need to re-evaluate self supported protocols
+    if (mlsFeatureUpdate.type === FeatureUpdateType.DISABLED || mlsFeatureUpdate.type === FeatureUpdateType.ENABLED) {
+      await this.refreshSelfSupportedProtocols();
+      return;
+    }
 
-    if (hasFeatureStatusChanged || hasTeamSupportedProtocolsChanged) {
+    if (mlsFeatureUpdate.type === FeatureUpdateType.CONFIG_CHANGED) {
+      const {prev, next} = mlsFeatureUpdate;
+
+      const prevSupportedProtocols = prev?.config.supportedProtocols ?? [];
+      const newSupportedProtocols = next.config.supportedProtocols ?? [];
+
+      const hasTeamSupportedProtocolsChanged = !(
+        prevSupportedProtocols.length === newSupportedProtocols.length &&
+        [...prevSupportedProtocols].every(protocol => newSupportedProtocols.includes(protocol))
+      );
+
+      if (hasTeamSupportedProtocolsChanged) {
+        await this.refreshSelfSupportedProtocols();
+      }
+    }
+  };
+
+  private handleMLSMigrationFeatureUpdate = async (featureUpdate: {
+    prevFeatureList?: FeatureList;
+    newFeatureList?: FeatureList;
+  }) => {
+    // MLS Migration feature config is also considered when evaluating self supported protocols
+    // We still allow proteus to be used if migration is enabled (but startTime has not been reached yet),
+    // or when migration is enabled, started and not finalised yet (finaliseRegardlessAfter has not arrived yet)
+    const {type} = detectTeamFeatureUpdate(featureUpdate, FEATURE_KEY.MLS_MIGRATION);
+
+    if (type !== FeatureUpdateType.UNCHANGED) {
       await this.refreshSelfSupportedProtocols();
     }
   };
 
-  public handleDownloadPathUpdate = (dlPath?: string) => {
+  private handleDownloadPathFeatureUpdate = async (featureUpdate: {
+    prevFeatureList?: FeatureList;
+    newFeatureList?: FeatureList;
+  }) => {
+    const {type, next} = detectTeamFeatureUpdate(featureUpdate, FEATURE_KEY.ENFORCE_DOWNLOAD_PATH);
+
+    if (type === FeatureUpdateType.UNCHANGED) {
+      return;
+    }
+
+    this.handleDownloadPathUpdate(
+      next?.status === FeatureStatus.ENABLED ? next.config.enforcedDownloadLocation : undefined,
+    );
+  };
+
+  private handleDownloadPathUpdate = (dlPath?: string) => {
     amplify.publish(WebAppEvents.TEAM.DOWNLOAD_PATH_UPDATE, dlPath);
   };
 
