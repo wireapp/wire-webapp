@@ -20,7 +20,7 @@
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {FEATURE_KEY, FeatureStatus, FeatureMLS, FeatureMLSE2EId, FeatureList} from '@wireapp/api-client/lib/team';
 
-import {FeatureUpdateType, getTeamFeatureUpdate} from './TeamFeatureUpdater';
+import {FeatureUpdateType, detectTeamFeatureUpdate} from './TeamFeatureConfigChangeDetector';
 
 describe('TeamFeatureUtil', () => {
   describe('hasTeamFeatureChanged', () => {
@@ -30,7 +30,7 @@ describe('TeamFeatureUtil', () => {
         [FEATURE_KEY.MLS]: {status: FeatureStatus.DISABLED} as unknown as FeatureMLS,
       };
 
-      expect(getTeamFeatureUpdate({prevFeatureList, newFeatureList}, FEATURE_KEY.MLS)).toEqual({
+      expect(detectTeamFeatureUpdate({prevFeatureList, newFeatureList}, FEATURE_KEY.MLS)).toEqual({
         type: FeatureUpdateType.UNCHANGED,
         next: newFeatureList[FEATURE_KEY.MLS],
       });
@@ -42,7 +42,7 @@ describe('TeamFeatureUtil', () => {
         [FEATURE_KEY.MLSE2EID]: {status: FeatureStatus.DISABLED} as unknown as FeatureMLSE2EId,
       };
 
-      expect(getTeamFeatureUpdate({prevFeatureList, newFeatureList}, FEATURE_KEY.MLS)).toEqual({
+      expect(detectTeamFeatureUpdate({prevFeatureList, newFeatureList}, FEATURE_KEY.MLS)).toEqual({
         type: FeatureUpdateType.UNCHANGED,
       });
     });
@@ -54,7 +54,7 @@ describe('TeamFeatureUtil', () => {
         [FEATURE_KEY.MLSE2EID]: {status: FeatureStatus.DISABLED} as unknown as FeatureMLSE2EId,
       };
 
-      expect(getTeamFeatureUpdate({prevFeatureList, newFeatureList}, FEATURE_KEY.MLS)).toEqual({
+      expect(detectTeamFeatureUpdate({prevFeatureList, newFeatureList}, FEATURE_KEY.MLS)).toEqual({
         type: FeatureUpdateType.UNCHANGED,
         next: newFeatureList[FEATURE_KEY.MLS],
       });
@@ -69,7 +69,7 @@ describe('TeamFeatureUtil', () => {
         [FEATURE_KEY.MLS]: {status: FeatureStatus.DISABLED} as unknown as FeatureMLS,
       };
 
-      expect(getTeamFeatureUpdate({prevFeatureList, newFeatureList}, FEATURE_KEY.MLS)).toEqual({
+      expect(detectTeamFeatureUpdate({prevFeatureList, newFeatureList}, FEATURE_KEY.MLS)).toEqual({
         type: FeatureUpdateType.UNCHANGED,
         next: newFeatureList[FEATURE_KEY.MLS],
       });
@@ -79,7 +79,7 @@ describe('TeamFeatureUtil', () => {
       const prevFeatureList: FeatureList | undefined = undefined;
       const newFeatureList = {};
 
-      expect(getTeamFeatureUpdate({prevFeatureList, newFeatureList}, FEATURE_KEY.MLS)).toEqual({
+      expect(detectTeamFeatureUpdate({prevFeatureList, newFeatureList}, FEATURE_KEY.MLS)).toEqual({
         type: FeatureUpdateType.UNCHANGED,
       });
     });
@@ -98,7 +98,7 @@ describe('TeamFeatureUtil', () => {
         } as unknown as FeatureMLS,
       };
 
-      expect(getTeamFeatureUpdate({prevFeatureList, newFeatureList}, FEATURE_KEY.MLS)).toEqual({
+      expect(detectTeamFeatureUpdate({prevFeatureList, newFeatureList}, FEATURE_KEY.MLS)).toEqual({
         type: FeatureUpdateType.UNCHANGED,
         prev: prevFeatureList[FEATURE_KEY.MLS],
         next: newFeatureList[FEATURE_KEY.MLS],
@@ -111,7 +111,7 @@ describe('TeamFeatureUtil', () => {
         [FEATURE_KEY.MLS]: {status: FeatureStatus.ENABLED} as unknown as FeatureMLS,
       };
 
-      expect(getTeamFeatureUpdate({prevFeatureList, newFeatureList}, FEATURE_KEY.MLS)).toEqual({
+      expect(detectTeamFeatureUpdate({prevFeatureList, newFeatureList}, FEATURE_KEY.MLS)).toEqual({
         type: FeatureUpdateType.ENABLED,
         next: newFeatureList[FEATURE_KEY.MLS],
       });
@@ -123,7 +123,7 @@ describe('TeamFeatureUtil', () => {
         [FEATURE_KEY.MLS]: {status: FeatureStatus.ENABLED} as unknown as FeatureMLS,
       };
 
-      expect(getTeamFeatureUpdate({prevFeatureList, newFeatureList}, FEATURE_KEY.MLS)).toEqual({
+      expect(detectTeamFeatureUpdate({prevFeatureList, newFeatureList}, FEATURE_KEY.MLS)).toEqual({
         type: FeatureUpdateType.ENABLED,
         next: newFeatureList[FEATURE_KEY.MLS],
       });
@@ -137,7 +137,7 @@ describe('TeamFeatureUtil', () => {
         [FEATURE_KEY.MLS]: {status: FeatureStatus.ENABLED} as unknown as FeatureMLS,
       };
 
-      expect(getTeamFeatureUpdate({prevFeatureList, newFeatureList}, FEATURE_KEY.MLS)).toEqual({
+      expect(detectTeamFeatureUpdate({prevFeatureList, newFeatureList}, FEATURE_KEY.MLS)).toEqual({
         type: FeatureUpdateType.ENABLED,
         prev: prevFeatureList[FEATURE_KEY.MLS],
         next: newFeatureList[FEATURE_KEY.MLS],
@@ -150,7 +150,7 @@ describe('TeamFeatureUtil', () => {
       };
       const newFeatureList = {};
 
-      expect(getTeamFeatureUpdate({prevFeatureList, newFeatureList}, FEATURE_KEY.MLS)).toEqual({
+      expect(detectTeamFeatureUpdate({prevFeatureList, newFeatureList}, FEATURE_KEY.MLS)).toEqual({
         type: FeatureUpdateType.DISABLED,
         prev: prevFeatureList[FEATURE_KEY.MLS],
       });
@@ -164,7 +164,7 @@ describe('TeamFeatureUtil', () => {
         [FEATURE_KEY.MLS]: {status: FeatureStatus.DISABLED} as unknown as FeatureMLS,
       };
 
-      expect(getTeamFeatureUpdate({prevFeatureList, newFeatureList}, FEATURE_KEY.MLS)).toEqual({
+      expect(detectTeamFeatureUpdate({prevFeatureList, newFeatureList}, FEATURE_KEY.MLS)).toEqual({
         type: FeatureUpdateType.DISABLED,
         prev: prevFeatureList[FEATURE_KEY.MLS],
         next: newFeatureList[FEATURE_KEY.MLS],
@@ -191,7 +191,7 @@ describe('TeamFeatureUtil', () => {
         [FEATURE_KEY.MLSE2EID]: {} as unknown as FeatureMLSE2EId,
       };
 
-      expect(getTeamFeatureUpdate({prevFeatureList, newFeatureList}, FEATURE_KEY.MLS)).toEqual({
+      expect(detectTeamFeatureUpdate({prevFeatureList, newFeatureList}, FEATURE_KEY.MLS)).toEqual({
         type: FeatureUpdateType.CONFIG_CHANGED,
         prev: prevFeatureList[FEATURE_KEY.MLS],
         next: newFeatureList[FEATURE_KEY.MLS],

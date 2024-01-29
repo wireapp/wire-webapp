@@ -56,7 +56,7 @@ type FeatureUpdate<Key extends FEATURE_KEY> =
   | FeatureUpdateConfigChanged<Key>
   | FeatureUpdateUnchanged<Key>;
 
-export const getTeamFeatureUpdate = <Key extends FEATURE_KEY>(
+export const detectTeamFeatureUpdate = <Key extends FEATURE_KEY>(
   {prevFeatureList, newFeatureList}: {prevFeatureList?: FeatureList; newFeatureList?: FeatureList},
   key: Key,
 ): FeatureUpdate<Key> => {

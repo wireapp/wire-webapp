@@ -33,7 +33,10 @@ import {evaluateSelfSupportedProtocols} from './SelfSupportedProtocols/SelfSuppo
 
 import {ClientEntity, ClientRepository} from '../client';
 import {Core} from '../service/CoreSingleton';
-import {FeatureUpdateType, getTeamFeatureUpdate} from '../team/TeamFeatureUpdater/TeamFeatureUpdater';
+import {
+  FeatureUpdateType,
+  detectTeamFeatureUpdate,
+} from '../team/TeamFeatureConfigChangeDetector/TeamFeatureConfigChangeDetector';
 import {TeamRepository} from '../team/TeamRepository';
 import {UserRepository} from '../user/UserRepository';
 import {UserState} from '../user/UserState';
@@ -81,7 +84,7 @@ export class SelfRepository extends TypedEventEmitter<Events> {
     prevFeatureList?: FeatureList;
     newFeatureList?: FeatureList;
   }) => {
-    const mlsFeatureUpdate = getTeamFeatureUpdate({prevFeatureList, newFeatureList}, FEATURE_KEY.MLS);
+    const mlsFeatureUpdate = detectTeamFeatureUpdate({prevFeatureList, newFeatureList}, FEATURE_KEY.MLS);
 
     // Nothing to do if MLS feature was not changed
     if (mlsFeatureUpdate.type === FeatureUpdateType.UNCHANGED) {
@@ -118,7 +121,7 @@ export class SelfRepository extends TypedEventEmitter<Events> {
     // MLS Migration feature config is also considered when evaluating self supported protocols
     // We still allow proteus to be used if migration is enabled (but startTime has not been reached yet),
     // or when migration is enabled, started and not finalised yet (finaliseRegardlessAfter has not arrived yet)
-    const {type} = getTeamFeatureUpdate(featureUpdate, FEATURE_KEY.MLS_MIGRATION);
+    const {type} = detectTeamFeatureUpdate(featureUpdate, FEATURE_KEY.MLS_MIGRATION);
 
     if (type !== FeatureUpdateType.UNCHANGED) {
       await this.refreshSelfSupportedProtocols();
@@ -129,7 +132,7 @@ export class SelfRepository extends TypedEventEmitter<Events> {
     prevFeatureList?: FeatureList;
     newFeatureList?: FeatureList;
   }) => {
-    const {type, next} = getTeamFeatureUpdate(featureUpdate, FEATURE_KEY.ENFORCE_DOWNLOAD_PATH);
+    const {type, next} = detectTeamFeatureUpdate(featureUpdate, FEATURE_KEY.ENFORCE_DOWNLOAD_PATH);
 
     if (type === FeatureUpdateType.UNCHANGED) {
       return;

@@ -21,7 +21,10 @@ import {useEffect} from 'react';
 
 import {FEATURE_KEY, FeatureList} from '@wireapp/api-client/lib/team';
 
-import {FeatureUpdateType, getTeamFeatureUpdate} from 'src/script/team/TeamFeatureUpdater/TeamFeatureUpdater';
+import {
+  FeatureUpdateType,
+  detectTeamFeatureUpdate,
+} from 'src/script/team/TeamFeatureConfigChangeDetector/TeamFeatureConfigChangeDetector';
 import {TeamRepository} from 'src/script/team/TeamRepository';
 import {getLogger} from 'Util/Logger';
 
@@ -33,7 +36,7 @@ const onConfigUpdate = async (configUpdate: {
   prevFeatureList?: FeatureList | undefined;
   newFeatureList: FeatureList;
 }) => {
-  const {type} = getTeamFeatureUpdate(configUpdate, FEATURE_KEY.MLSE2EID);
+  const {type} = detectTeamFeatureUpdate(configUpdate, FEATURE_KEY.MLSE2EID);
 
   if (type !== FeatureUpdateType.UNCHANGED) {
     const client = await configureE2EI(logger, configUpdate.newFeatureList);
