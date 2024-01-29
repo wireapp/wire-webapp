@@ -31,6 +31,7 @@ import {container} from 'tsyringe';
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {E2EIHandler} from 'src/script/E2EIdentity';
 import {initializeDataDog} from 'Util/DataDog';
 import {DebugUtil} from 'Util/DebugUtil';
 import {Environment} from 'Util/Environment';
@@ -424,24 +425,27 @@ export class App {
       onProgress(10);
       telemetry.timeStep(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
 
-      const {members: teamMembers, features: teamFeatures} = await teamRepository.initTeam(selfUser.teamId);
-      const e2eiHandler = await configureE2EI(this.logger, teamFeatures);
-      if (e2eiHandler) {
-        /* We first try to do the initial enrollment (if the user has not yet enrolled)
-         * We need to enroll before anything else (in particular joining MLS conversations)
-         * Until the user is enrolled, we need to pause loading the app
-         */
-        await e2eiHandler.attemptEnrollment();
-      }
+      const connections = await connectionRepository.getConnections();
 
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_USER_DATA);
 
-      const connections = await connectionRepository.getConnections();
       telemetry.addStatistic(AppInitStatisticsValue.CONNECTIONS, connections.length, 50);
 
       const conversations = await conversationRepository.loadConversations();
 
-      await userRepository.loadUsers(selfUser, connections, conversations, teamMembers);
+      const contacts = await userRepository.loadUsers(selfUser, connections, conversations);
+      let e2eiHandler: E2EIHandler | undefined;
+      if (selfUser.teamId) {
+        const {features: teamFeatures} = await teamRepository.initTeam(selfUser.teamId, contacts);
+        e2eiHandler = await configureE2EI(this.logger, teamFeatures);
+        if (e2eiHandler) {
+          /* We first try to do the initial enrollment (if the user has not yet enrolled)
+           * We need to enroll before anything else (in particular joining MLS conversations)
+           * Until the user is enrolled, we need to pause loading the app
+           */
+          await e2eiHandler.attemptEnrollment();
+        }
+      }
 
       if (supportsMLS()) {
         //if mls is supported, we need to initialize the callbacks (they are used when decrypting messages)
