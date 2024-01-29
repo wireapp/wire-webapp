@@ -720,28 +720,32 @@ export class UserRepository extends TypedEventEmitter<Events> {
    * @param userId - the user to fetch the supported protocols for
    */
   private async refreshUserSupportedProtocols(userId: QualifiedId): Promise<void> {
-    const localUser = this.findUserById(userId);
+    try {
+      const localUser = this.findUserById(userId);
 
-    if (!localUser) {
-      return;
+      if (!localUser) {
+        return;
+      }
+
+      const localSupportedProtocols = localUser.supportedProtocols();
+      const supportedProtocols = await this.userService.getUserSupportedProtocols(userId);
+
+      const haveSupportedProtocolsChanged =
+        !localSupportedProtocols ||
+        !(
+          localSupportedProtocols.length === supportedProtocols.length &&
+          [...localSupportedProtocols].every(protocol => supportedProtocols.includes(protocol))
+        );
+
+      if (!haveSupportedProtocolsChanged) {
+        return;
+      }
+
+      await this.updateUserSupportedProtocols(userId, supportedProtocols);
+      this.emit('supportedProtocolsUpdated', {user: localUser, supportedProtocols});
+    } catch (error) {
+      this.logger.warn(`Failed to refresh supported protocols for user ${userId.id}`, error);
     }
-
-    const localSupportedProtocols = localUser.supportedProtocols();
-    const supportedProtocols = await this.userService.getUserSupportedProtocols(userId);
-
-    const haveSupportedProtocolsChanged =
-      !localSupportedProtocols ||
-      !(
-        localSupportedProtocols.length === supportedProtocols.length &&
-        [...localSupportedProtocols].every(protocol => supportedProtocols.includes(protocol))
-      );
-
-    if (!haveSupportedProtocolsChanged) {
-      return;
-    }
-
-    await this.updateUserSupportedProtocols(userId, supportedProtocols);
-    this.emit('supportedProtocolsUpdated', {user: localUser, supportedProtocols});
   }
 
   /**
