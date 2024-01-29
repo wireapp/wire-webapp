@@ -38,7 +38,6 @@ export interface InputProps<T = HTMLInputElement> extends TextProps<T> {
   placeholderTextTransform?: Property.TextTransform;
   wrapperCSS?: CSSObject;
   inputCSS?: CSSObject;
-  size?: number;
   startContent?: React.ReactNode;
   endContent?: React.ReactNode;
 }
