@@ -1947,22 +1947,16 @@ describe('ConversationRepository', () => {
 
     describe('checkForDeletedConversations', () => {
       it('removes conversations that have been deleted on the backend', async () => {
-        const existingGroup = _generateConversation();
         const deletedGroup = _generateConversation();
         const conversationRepository = testFactory.conversation_repository!;
 
-        spyOn(testFactory.conversation_service, 'getConversationById').and.callFake(({id}) => {
-          if (id === deletedGroup.id) {
-            // eslint-disable-next-line prefer-promise-reject-errors
-            return Promise.reject({code: HTTP_STATUS.NOT_FOUND});
-          }
-          return Promise.resolve();
+        jest.spyOn(testFactory.conversation_service!, 'getConversationByIds').mockResolvedValue({
+          not_found: [deletedGroup],
         });
-        await conversationRepository['saveConversation'](existingGroup);
         await conversationRepository['saveConversation'](deletedGroup);
 
         const currentNbConversations = conversationRepository['conversationState'].conversations().length;
-        await testFactory.conversation_repository.syncDeletedConversations();
+        await testFactory.conversation_repository!.syncDeletedConversations();
 
         expect(conversationRepository['conversationState'].conversations()).toHaveLength(currentNbConversations - 1);
       });
