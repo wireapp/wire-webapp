@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.14.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.13.0...@wireapp/react-ui-kit@9.14.0) (2024-01-29)
+
+### Features
+
+* **react-ui-kit:** Add new CircleCloseIcon ([#5922](https://github.com/wireapp/wire-web-packages/issues/5922)) ([9a4cefe](https://github.com/wireapp/wire-web-packages/commit/9a4cefed02def84cf602666a2c8c24a59c30650d))
+
 # [9.13.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.12.8...@wireapp/react-ui-kit@9.13.0) (2024-01-29)
 
 ### Features
