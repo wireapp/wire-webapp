@@ -23,6 +23,7 @@ import 'core-js/full/reflect';
 
 import {Context} from '@wireapp/api-client/lib/auth';
 import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/';
+import {FEATURE_KEY} from '@wireapp/api-client/lib/team';
 import {EVENTS as CoreEvents} from '@wireapp/core/lib/Account';
 import {amplify} from 'amplify';
 import platform from 'platform';
@@ -101,6 +102,7 @@ import {SelfService} from '../self/SelfService';
 import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
 import {StorageKey, StorageRepository, StorageService} from '../storage';
+import {FeatureUpdateType, getTeamFeatureUpdate} from '../team/TeamFeatureUpdater/TeamFeatureUpdater';
 import {TeamRepository} from '../team/TeamRepository';
 import {AppInitStatisticsValue} from '../telemetry/app_init/AppInitStatisticsValue';
 import {AppInitTelemetry} from '../telemetry/app_init/AppInitTelemetry';
@@ -397,6 +399,15 @@ export class App {
          */
         await e2eiHandler.attemptEnrollment();
       }
+
+      teamRepository.on('featureConfigUpdated', async configUpdate => {
+        const {type} = getTeamFeatureUpdate(configUpdate, FEATURE_KEY.MLSE2EID);
+
+        if (type !== FeatureUpdateType.UNCHANGED) {
+          const client = await configureE2EI(this.logger, configUpdate.newFeatureList);
+          return client?.attemptEnrollment();
+        }
+      });
 
       this.core.configureCoreCallbacks({
         groupIdFromConversationId: async conversationId => {
