@@ -50,6 +50,7 @@ import {ConversationRepository} from '../conversation/ConversationRepository';
 import {isMLSCapableConversation} from '../conversation/ConversationSelectors';
 import {ConversationState} from '../conversation/ConversationState';
 import type {MessageRepository} from '../conversation/MessageRepository';
+import {E2EIHandler} from '../E2EIdentity';
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 import {EventRepository} from '../event/EventRepository';
@@ -277,6 +278,10 @@ export class DebugUtil {
       const textNode = $createTextNode(text);
       root.append(textNode);
     });
+  }
+
+  setE2EICertificateTtl(ttl: number) {
+    E2EIHandler.getInstance().certificateTtl = ttl;
   }
 
   /**
