@@ -32,7 +32,6 @@ import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {E2EIHandler} from 'src/script/E2EIdentity';
 import {initializeDataDog} from 'Util/DataDog';
 import {DebugUtil} from 'Util/DebugUtil';
 import {Environment} from 'Util/Environment';
@@ -389,6 +388,16 @@ export class App {
 
       const selfUser = await this.initiateSelfUser();
 
+      const {features: teamFeatures, team} = await teamRepository.initTeam(selfUser.teamId);
+      const e2eiHandler = await configureE2EI(this.logger, teamFeatures);
+      if (e2eiHandler) {
+        /* We first try to do the initial enrollment (if the user has not yet enrolled)
+         * We need to enroll before anything else (in particular joining MLS conversations)
+         * Until the user is enrolled, we need to pause loading the app
+         */
+        await e2eiHandler.attemptEnrollment();
+      }
+
       this.core.configureCoreCallbacks({
         groupIdFromConversationId: async conversationId => {
           const conversation = await conversationRepository.getConversationById(conversationId);
@@ -436,18 +445,10 @@ export class App {
       const conversations = await conversationRepository.loadConversations();
 
       const contacts = await userRepository.loadUsers(selfUser, connections, conversations);
-      let e2eiHandler: E2EIHandler | undefined;
-      if (selfUser.teamId) {
-        const {features: teamFeatures} = await teamRepository.initTeam(selfUser.teamId, contacts);
-        e2eiHandler = await configureE2EI(this.logger, teamFeatures);
-        if (e2eiHandler) {
-          /* We first try to do the initial enrollment (if the user has not yet enrolled)
-           * We need to enroll before anything else (in particular joining MLS conversations)
-           * Until the user is enrolled, we need to pause loading the app
-           */
-          await e2eiHandler.attemptEnrollment();
-        }
-      }
+      await teamRepository.updateTeamMembersByIds(
+        team,
+        contacts.filter(user => user.teamId === team.id).map(({id}) => id),
+      );
 
       if (supportsMLS()) {
         //if mls is supported, we need to initialize the callbacks (they are used when decrypting messages)
