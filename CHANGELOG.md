@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.13.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.12.8...@wireapp/react-ui-kit@9.13.0) (2024-01-29)
+
+### Features
+
+* **react-ui-kit:** Add start & end content to input (WPB-5949) ([#5921](https://github.com/wireapp/wire-web-packages/issues/5921)) ([ad15ed5](https://github.com/wireapp/wire-web-packages/commit/ad15ed5cbd76c1794668583a213aaaeb74bbc523))
+
 ## [9.12.8](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.12.7...@wireapp/react-ui-kit@9.12.8) (2024-01-23)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
