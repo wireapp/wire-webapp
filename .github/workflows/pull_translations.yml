@@ -1,4 +1,4 @@
-name: Push translations from crowdin
+name: Pull translations from crowdin
 
 on:
   workflow_dispatch:
@@ -40,9 +40,9 @@ jobs:
           download_translations: true
           push_translations: true
           create_pull_request: true
-          localization_branch_name: 'push_translations'
-          pull_request_title: 'chore: Push translations'
-          commit_message: 'chore: Push translations'
+          localization_branch_name: 'pull_translations'
+          pull_request_title: 'chore: Pull translations'
+          commit_message: 'chore: Pull translations'
           token: ${{secrets.WEBTEAM_CROWDIN_TOKEN}}
           source: '/src/i18n/en-US.json'
           translation: '/src/i18n/%locale%.json'
