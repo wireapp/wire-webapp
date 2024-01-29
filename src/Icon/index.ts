@@ -30,6 +30,7 @@ export * from './CamIcon';
 export * from './CheckIcon';
 export * from './CheckRoundIcon';
 export * from './ChevronIcon';
+export * from './CircleCloseIcon';
 export * from './CloseIcon';
 export * from './DeviceIcon';
 export * from './DownloadIcon';
