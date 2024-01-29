@@ -716,15 +716,51 @@ export class UserRepository extends TypedEventEmitter<Events> {
   }
 
   /**
+   * Will refetch supported protocols for the given user and (if they changed) update the local user entity.
+   * @param userId - the user to fetch the supported protocols for
+   */
+  private async refreshUserSupportedProtocols(userId: QualifiedId): Promise<void> {
+    const localUser = this.findUserById(userId);
+
+    if (!localUser) {
+      return;
+    }
+
+    const localSupportedProtocols = localUser.supportedProtocols();
+    const supportedProtocols = await this.userService.getUserSupportedProtocols(userId);
+
+    const haveSupportedProtocolsChanged =
+      !localSupportedProtocols ||
+      !(
+        localSupportedProtocols.length === supportedProtocols.length &&
+        [...localSupportedProtocols].every(protocol => supportedProtocols.includes(protocol))
+      );
+
+    if (!haveSupportedProtocolsChanged) {
+      return;
+    }
+
+    await this.updateUserSupportedProtocols(userId, supportedProtocols);
+    this.emit('supportedProtocolsUpdated', {user: localUser, supportedProtocols});
+  }
+
+  /**
    * Check for supported protocols on user entity locally, otherwise fetch them from the backend.
    * @param userId - the user to fetch the supported protocols for
    * @param forceRefetch - if true, the supported protocols will be fetched from the backend even if they are already stored locally
    */
-
-  public async getUserSupportedProtocols(userId: QualifiedId, forceRefetch = false): Promise<ConversationProtocol[]> {
+  public async getUserSupportedProtocols(
+    userId: QualifiedId,
+    shouldRefreshUser = false,
+  ): Promise<ConversationProtocol[]> {
     const localSupportedProtocols = this.findUserById(userId)?.supportedProtocols();
 
-    if (!forceRefetch && localSupportedProtocols) {
+    // Refresh user supported protocols in the background
+    if (shouldRefreshUser) {
+      void this.refreshUserSupportedProtocols(userId);
+    }
+
+    if (localSupportedProtocols) {
       return localSupportedProtocols;
     }
 
