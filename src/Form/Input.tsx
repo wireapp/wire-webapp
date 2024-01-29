@@ -37,6 +37,10 @@ export interface InputProps<T = HTMLInputElement> extends TextProps<T> {
   helperText?: string;
   placeholderTextTransform?: Property.TextTransform;
   wrapperCSS?: CSSObject;
+  inputCSS?: CSSObject;
+  size?: number;
+  startContent?: React.ReactNode;
+  endContent?: React.ReactNode;
 }
 
 export const inputStyle: <T>(theme: Theme, props: InputProps<T>, hasError?: boolean) => CSSObject = (
@@ -101,77 +105,100 @@ const centerInputAction: CSSObject = {
 export const Input: React.FC<InputProps<HTMLInputElement>> = React.forwardRef<
   HTMLInputElement,
   InputProps<HTMLInputElement>
->(({type, label, error, helperText, wrapperCSS = {}, className = '', ...props}, ref) => {
-  const [togglePassword, setTogglePassword] = useState<boolean>(false);
+>(
+  (
+    {
+      type,
+      label,
+      error,
+      helperText,
+      startContent = null,
+      endContent = null,
+      inputCSS = {},
+      wrapperCSS = {},
+      className = '',
+      ...props
+    },
+    ref,
+  ) => {
+    const [togglePassword, setTogglePassword] = useState<boolean>(false);
 
-  const hasError = !!error;
-  const isPasswordInput = type === 'password';
-  const toggledPasswordType = togglePassword ? 'text' : 'password';
+    const hasError = !!error;
+    const isPasswordInput = type === 'password';
+    const toggledPasswordType = togglePassword ? 'text' : 'password';
 
-  const toggleSetPassword = () => setTogglePassword(prevState => !prevState);
+    const toggleSetPassword = () => setTogglePassword(prevState => !prevState);
 
-  return (
-    <div
-      className={INPUT_GROUP}
-      css={(theme: Theme) => ({
-        marginBottom: hasError ? '2px' : '20px',
-        width: '100%',
-        '&:focus-within label': {
-          color: theme.general.primaryColor,
-        },
-        ...wrapperCSS,
-      })}
-    >
-      {label && (
-        <InputLabel htmlFor={props.id} isRequired={props.required} markInvalid={props.markInvalid}>
-          {label}
-        </InputLabel>
-      )}
-
-      <div css={{marginBottom: hasError && '8px', position: 'relative'}}>
-        <input
-          className={INPUT_CLASSNAME}
-          css={(theme: Theme) => inputStyle(theme, props, hasError)}
-          ref={ref}
-          type={isPasswordInput ? toggledPasswordType : type}
-          aria-required={props.required}
-          {...filterInputProps(props)}
-        />
-
-        {hasError && !isPasswordInput && (
-          <ErrorIcon css={centerInputAction} width={16} height={16} aria-hidden="true" />
+    return (
+      <div
+        className={INPUT_GROUP}
+        css={(theme: Theme) => ({
+          marginBottom: hasError ? '2px' : '20px',
+          width: '100%',
+          '&:focus-within label': {
+            color: theme.general.primaryColor,
+          },
+          ...wrapperCSS,
+        })}
+      >
+        {label && (
+          <InputLabel htmlFor={props.id} isRequired={props.required} markInvalid={props.markInvalid}>
+            {label}
+          </InputLabel>
         )}
 
-        {isPasswordInput && (
-          <button
-            type="button"
-            data-uie-name={!togglePassword ? 'do-show-password' : 'do-hide-password'}
-            css={{...centerInputAction, background: 'transparent', border: 'none', cursor: 'pointer', padding: 0}}
-            onClick={toggleSetPassword}
-            title="Toggle password visibility"
-            aria-controls={props.id}
-            aria-expanded={togglePassword}
+        <div css={{marginBottom: hasError && '8px', position: 'relative'}}>
+          {startContent}
+
+          <input
+            className={INPUT_CLASSNAME}
+            css={(theme: Theme) => ({
+              ...inputStyle(theme, props, hasError),
+              ...inputCSS,
+            })}
+            ref={ref}
+            type={isPasswordInput ? toggledPasswordType : type}
+            aria-required={props.required}
+            {...filterInputProps(props)}
+          />
+
+          {endContent}
+
+          {hasError && !isPasswordInput && (
+            <ErrorIcon css={centerInputAction} width={16} height={16} aria-hidden="true" />
+          )}
+
+          {isPasswordInput && (
+            <button
+              type="button"
+              data-uie-name={!togglePassword ? 'do-show-password' : 'do-hide-password'}
+              css={{...centerInputAction, background: 'transparent', border: 'none', cursor: 'pointer', padding: 0}}
+              onClick={toggleSetPassword}
+              title="Toggle password visibility"
+              aria-controls={props.id}
+              aria-expanded={togglePassword}
+            >
+              {togglePassword ? <HideIcon /> : <ShowIcon />}
+            </button>
+          )}
+        </div>
+
+        {!hasError && helperText && (
+          <p
+            css={(theme: Theme) => ({
+              fontSize: theme.fontSizes.small,
+              fontWeight: 400,
+              color: theme.Input.placeholderColor,
+              marginTop: 8,
+            })}
           >
-            {togglePassword ? <HideIcon /> : <ShowIcon />}
-          </button>
+            {helperText}
+          </p>
         )}
+
+        {error}
       </div>
-
-      {!hasError && helperText && (
-        <p
-          css={(theme: Theme) => ({
-            fontSize: theme.fontSizes.small,
-            fontWeight: 400,
-            color: theme.Input.placeholderColor,
-            marginTop: 8,
-          })}
-        >
-          {helperText}
-        </p>
-      )}
-
-      {error}
-    </div>
-  );
-});
+    );
+  },
+);
 Input.displayName = 'Input';
