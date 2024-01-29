@@ -444,11 +444,16 @@ export class App {
 
       const conversations = await conversationRepository.loadConversations();
 
+      // We load all the users the self user is connected with
       const contacts = await userRepository.loadUsers(selfUser, connections, conversations);
-      await teamRepository.updateTeamMembersByIds(
-        team,
-        contacts.filter(user => user.teamId === team.id).map(({id}) => id),
-      );
+
+      if (team) {
+        // If we are in the context of team, we load the team members metadata (user roles)
+        await teamRepository.updateTeamMembersByIds(
+          team,
+          contacts.filter(user => user.teamId === team.id).map(({id}) => id),
+        );
+      }
 
       if (supportsMLS()) {
         //if mls is supported, we need to initialize the callbacks (they are used when decrypting messages)
