@@ -22,7 +22,6 @@ import type {
   TeamConversationDeleteEvent,
   TeamDeleteEvent,
   TeamEvent,
-  TeamFeatureConfigurationUpdateEvent,
   TeamMemberJoinEvent,
   TeamMemberLeaveEvent,
   TeamMemberUpdateEvent,
@@ -150,6 +149,9 @@ export class TeamRepository extends TypedEventEmitter<Events> {
   private async updateFeatureConfig(): Promise<{newFeatureList: FeatureList; prevFeatureList?: FeatureList}> {
     const prevFeatureList = this.teamState.teamFeatures();
     const newFeatureList = await this.teamService.getAllTeamFeatures();
+
+    this.emit('featureConfigUpdated', {prevFeatureList, newFeatureList});
+
     this.teamState.teamFeatures(newFeatureList);
 
     return {
@@ -268,7 +270,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
         break;
       }
       case TEAM_EVENT.FEATURE_CONFIG_UPDATE: {
-        await this.onFeatureConfigUpdate(eventJson, source);
+        await this.onFeatureConfigUpdate(source);
         break;
       }
       case TEAM_EVENT.CONVERSATION_CREATE:
@@ -383,18 +385,14 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     }
   };
 
-  private readonly onFeatureConfigUpdate = async (
-    event: TeamFeatureConfigurationUpdateEvent,
-    source: EventSource,
-  ): Promise<void> => {
+  private readonly onFeatureConfigUpdate = async (source: EventSource): Promise<void> => {
     if (source !== EventSource.WEBSOCKET) {
       // Ignore notification stream events
       return;
     }
 
     // When we receive a `feature-config.update` event, we will refetch the entire feature config
-    const {prevFeatureList, newFeatureList} = await this.updateFeatureConfig();
-    this.emit('featureConfigUpdated', {prevFeatureList, newFeatureList});
+    await this.updateFeatureConfig();
   };
 
   private onMemberLeave(eventJson: TeamMemberLeaveEvent): void {
