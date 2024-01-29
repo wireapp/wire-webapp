@@ -124,10 +124,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
    * @param teamId the Id of the team to init
    * @param contacts all the contacts the self user has, team members will be deduced from it.
    */
-  async initTeam(
-    teamId: string,
-    contacts: User[] = [],
-  ): Promise<{team: TeamEntity | undefined; features: FeatureList}> {
+  async initTeam(teamId?: string): Promise<{team: TeamEntity | undefined; features: FeatureList}> {
     // async initTeam(teamId?: string): Promise<{members: QualifiedId[]; features: FeatureList}> {
     const team = await this.getTeam();
     // get the fresh feature config from backend
@@ -135,11 +132,6 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     if (!teamId) {
       return {team: undefined, features: {}};
     }
-    await this.updateTeamMembersByIds(
-      team,
-      contacts.filter(user => user.teamId === teamId).map(({id}) => id),
-    );
-
     // Subscribe to team members change and update the user role and guest status
     this.teamState.teamMembers.subscribe(members => {
       this.userRepository.mapGuestStatus(members);
