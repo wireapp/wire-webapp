@@ -35,7 +35,6 @@ import {showUserModal, UserModal} from 'Components/Modals/UserModal';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {AppLock} from './AppLock';
-import {FeatureConfigChangeHandler} from './components/FeatureConfigChange/FeatureConfigChangeHandler/FeatureConfigChangeHandler';
 import {FeatureConfigChangeNotifier} from './components/FeatureConfigChange/FeatureConfigChangeNotifier';
 import {WindowTitleUpdater} from './components/WindowTitleUpdater';
 import {LeftSidebar} from './LeftSidebar';
@@ -267,7 +266,6 @@ export const AppMain: FC<AppMainProps> = ({
           {!locked && (
             <>
               <FeatureConfigChangeNotifier selfUserId={selfUser.id} teamState={teamState} />
-              <FeatureConfigChangeHandler teamState={teamState} />
               <CallingContainer
                 multitasking={mainView.multitasking}
                 callingRepository={repositories.calling}
