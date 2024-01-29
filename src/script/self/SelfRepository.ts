@@ -95,20 +95,20 @@ export class SelfRepository extends TypedEventEmitter<Events> {
       return;
     }
 
-    // Otherwise it means that MLS feature config was changed
-    // We need to check if the list of supported protocols has changed
-    const {prev, next} = mlsFeatureUpdate;
+    if (mlsFeatureUpdate.type === FeatureUpdateType.CONFIG_CHANGED) {
+      const {prev, next} = mlsFeatureUpdate;
 
-    const prevSupportedProtocols = prev?.config.supportedProtocols ?? [];
-    const newSupportedProtocols = next.config.supportedProtocols ?? [];
+      const prevSupportedProtocols = prev?.config.supportedProtocols ?? [];
+      const newSupportedProtocols = next.config.supportedProtocols ?? [];
 
-    const hasTeamSupportedProtocolsChanged = !(
-      prevSupportedProtocols.length === newSupportedProtocols.length &&
-      [...prevSupportedProtocols].every(protocol => newSupportedProtocols.includes(protocol))
-    );
+      const hasTeamSupportedProtocolsChanged = !(
+        prevSupportedProtocols.length === newSupportedProtocols.length &&
+        [...prevSupportedProtocols].every(protocol => newSupportedProtocols.includes(protocol))
+      );
 
-    if (hasTeamSupportedProtocolsChanged) {
-      await this.refreshSelfSupportedProtocols();
+      if (hasTeamSupportedProtocolsChanged) {
+        await this.refreshSelfSupportedProtocols();
+      }
     }
   };
 
