@@ -267,10 +267,6 @@ export class TeamRepository extends TypedEventEmitter<Events> {
         this.onUpdate(eventJson);
         break;
       }
-      case TEAM_EVENT.FEATURE_CONFIG_UPDATE: {
-        await this.onFeatureConfigUpdate(source);
-        break;
-      }
       case TEAM_EVENT.CONVERSATION_CREATE:
       default: {
         this.onUnhandled(eventJson);
@@ -381,16 +377,6 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     if (shouldFetchConfig) {
       await this.updateFeatureConfig();
     }
-  };
-
-  private readonly onFeatureConfigUpdate = async (source: EventSource): Promise<void> => {
-    if (source !== EventSource.WEBSOCKET) {
-      // Ignore notification stream events
-      return;
-    }
-
-    // When we receive a `feature-config.update` event, we will refetch the entire feature config
-    await this.updateFeatureConfig();
   };
 
   private onMemberLeave(eventJson: TeamMemberLeaveEvent): void {
