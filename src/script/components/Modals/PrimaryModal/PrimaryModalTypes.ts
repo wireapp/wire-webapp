@@ -51,6 +51,7 @@ export interface ModalOptions {
   hideCloseBtn?: boolean;
   text?: Text;
   passwordOptional?: boolean;
+  confirmCancelBtnLabel?: string;
 }
 
 export enum PrimaryModalType {

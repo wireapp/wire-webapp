@@ -124,7 +124,6 @@ export const getModalOptions = ({
     case ModalType.SELF_CERTIFICATE_REVOKED:
       options = {
         text: {
-          closeBtnLabel: t('acme.selfCertificateRevoked.button.cancel'),
           htmlMessage: t('acme.selfCertificateRevoked.text'),
           title: t('acme.selfCertificateRevoked.title'),
         },
@@ -132,6 +131,7 @@ export const getModalOptions = ({
           action: primaryActionFn,
           text: t('acme.selfCertificateRevoked.button.primary'),
         },
+        confirmCancelBtnLabel: t('acme.selfCertificateRevoked.button.cancel'),
       };
       modalType = PrimaryModal.type.CONFIRM;
       break;
