@@ -717,18 +717,12 @@ export class UserRepository extends TypedEventEmitter<Events> {
 
   /**
    * Will refetch supported protocols for the given user and (if they changed) update the local user entity.
-   * @param userId - the user to fetch the supported protocols for
+   * @param user - the user to fetch the supported protocols for
    */
-  private async refreshUserSupportedProtocols(userId: QualifiedId): Promise<void> {
+  private async refreshUserSupportedProtocols(user: User): Promise<void> {
     try {
-      const localUser = this.findUserById(userId);
-
-      if (!localUser) {
-        return;
-      }
-
-      const localSupportedProtocols = localUser.supportedProtocols();
-      const supportedProtocols = await this.userService.getUserSupportedProtocols(userId);
+      const localSupportedProtocols = user.supportedProtocols();
+      const supportedProtocols = await this.userService.getUserSupportedProtocols(user.qualifiedId);
 
       const haveSupportedProtocolsChanged =
         !localSupportedProtocols ||
@@ -741,10 +735,10 @@ export class UserRepository extends TypedEventEmitter<Events> {
         return;
       }
 
-      await this.updateUserSupportedProtocols(userId, supportedProtocols);
-      this.emit('supportedProtocolsUpdated', {user: localUser, supportedProtocols});
+      await this.updateUserSupportedProtocols(user.qualifiedId, supportedProtocols);
+      this.emit('supportedProtocolsUpdated', {user, supportedProtocols});
     } catch (error) {
-      this.logger.warn(`Failed to refresh supported protocols for user ${userId.id}`, error);
+      this.logger.warn(`Failed to refresh supported protocols for user ${user.qualifiedId.id}`, error);
     }
   }
 
@@ -757,11 +751,12 @@ export class UserRepository extends TypedEventEmitter<Events> {
     userId: QualifiedId,
     shouldRefreshUser = false,
   ): Promise<ConversationProtocol[]> {
-    const localSupportedProtocols = this.findUserById(userId)?.supportedProtocols();
+    const localUser = this.findUserById(userId);
+    const localSupportedProtocols = localUser?.supportedProtocols();
 
-    // Refresh user supported protocols in the background
-    if (shouldRefreshUser) {
-      void this.refreshUserSupportedProtocols(userId);
+    if (shouldRefreshUser && localUser) {
+      // Trigger a refresh of the supported protocols in the background. No need to await for this one.
+      void this.refreshUserSupportedProtocols(localUser);
     }
 
     if (localSupportedProtocols) {
