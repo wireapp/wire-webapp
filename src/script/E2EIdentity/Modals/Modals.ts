@@ -132,6 +132,8 @@ export const getModalOptions = ({
           text: t('acme.selfCertificateRevoked.button.primary'),
         },
         confirmCancelBtnLabel: t('acme.selfCertificateRevoked.button.cancel'),
+        allButtonsFullWidth: true,
+        primaryBtnFirst: true,
       };
       modalType = PrimaryModal.type.CONFIRM;
       break;

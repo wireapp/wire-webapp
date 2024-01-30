@@ -68,6 +68,8 @@ export const PrimaryModalComponent: FC = () => {
     copyPassword,
     hideCloseBtn = false,
     passwordOptional = false,
+    allButtonsFullWidth = false,
+    primaryBtnFirst,
   } = content;
 
   const isPassword = currentType === PrimaryModalType.PASSWORD;
@@ -195,6 +197,40 @@ export const PrimaryModalComponent: FC = () => {
       closeAction?.action?.();
     }
   };
+
+  const secondaryButtons = secondaryActions
+    .filter((action): action is Action => action !== null && !!action.text)
+    .map(action => (
+      <button
+        key={`${action.text}-${action.uieName}`}
+        type="button"
+        onClick={doAction(action.action, true, true)}
+        data-uie-name={action.uieName}
+        className={cx('modal__button modal__button--secondary', {
+          'modal__button--full': hasMultipleSecondary || allButtonsFullWidth,
+        })}
+      >
+        {action.text}
+      </button>
+    ));
+
+  const primaryButton = !!primaryAction?.text && (
+    <button
+      ref={primaryActionButtonRef}
+      type="button"
+      onClick={doAction(confirm, !!closeOnConfirm)}
+      disabled={isPrimaryActionDisabled()}
+      className={cx('modal__button modal__button--primary', {
+        'modal__button--full': hasMultipleSecondary || allButtonsFullWidth,
+      })}
+      data-uie-name="do-action"
+      key={`modal-primary-button`}
+    >
+      {primaryAction.text}
+    </button>
+  );
+
+  const buttons = primaryBtnFirst ? [primaryButton, ...secondaryButtons] : [...secondaryButtons, primaryButton];
 
   return (
     <div
@@ -428,36 +464,12 @@ export const PrimaryModalComponent: FC = () => {
                   <Loading />
                 </div>
               ) : (
-                <div className={cx('modal__buttons', {'modal__buttons--column': hasMultipleSecondary})}>
-                  {secondaryActions
-                    .filter((action): action is Action => action !== null && !!action.text)
-                    .map(action => (
-                      <button
-                        key={`${action.text}-${action.uieName}`}
-                        type="button"
-                        onClick={doAction(action.action, true, true)}
-                        data-uie-name={action.uieName}
-                        className={cx('modal__button modal__button--secondary', {
-                          'modal__button--full': hasMultipleSecondary,
-                        })}
-                      >
-                        {action.text}
-                      </button>
-                    ))}
-                  {primaryAction?.text && (
-                    <button
-                      ref={primaryActionButtonRef}
-                      type="button"
-                      onClick={doAction(confirm, !!closeOnConfirm)}
-                      disabled={isPrimaryActionDisabled()}
-                      className={cx('modal__button modal__button--primary', {
-                        'modal__button--full': hasMultipleSecondary,
-                      })}
-                      data-uie-name="do-action"
-                    >
-                      {primaryAction.text}
-                    </button>
-                  )}
+                <div
+                  className={cx('modal__buttons', {
+                    'modal__buttons--column': hasMultipleSecondary || allButtonsFullWidth,
+                  })}
+                >
+                  {buttons}
                 </div>
               )}
             </FadingScrollbar>

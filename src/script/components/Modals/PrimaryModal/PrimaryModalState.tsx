@@ -135,6 +135,8 @@ const updateCurrentModalContent = (type: PrimaryModalType, options: ModalOptions
     passwordOptional = false,
     text = {} as Text,
     confirmCancelBtnLabel,
+    allButtonsFullWidth = false,
+    primaryBtnFirst = false,
   } = options;
 
   const content = {
@@ -155,6 +157,8 @@ const updateCurrentModalContent = (type: PrimaryModalType, options: ModalOptions
     titleText: text.title ?? '',
     passwordOptional,
     confirmCancelBtnLabel,
+    allButtonsFullWidth,
+    primaryBtnFirst,
   };
 
   switch (type) {
