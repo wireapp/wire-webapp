@@ -29,7 +29,7 @@ import {useRelativeTimestamp} from 'src/script/hooks/useRelativeTimestamp';
 import {StatusType} from 'src/script/message/StatusType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getMessageAriaLabel} from 'Util/conversationMessages';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {fromUnixTime, TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {ContentAsset} from './asset';
 import {MessageActionsMenu} from './MessageActions/MessageActions';
@@ -129,10 +129,19 @@ export const ContentMessageComponent: React.FC<ContentMessageProps> = ({
     // Interval in seconds, within which messages are grouped together
     const GROUPED_MESSAGE_INTERVAL = 30 * TIME_IN_MILLIS.SECOND;
 
-    const currentMessageDate = message.timestamp();
-    const previousMessageDate = previousMessage.timestamp();
+    const currentMessageDate = fromUnixTime(message.timestamp() / TIME_IN_MILLIS.SECOND);
+    const previousMessageDate = fromUnixTime(previousMessage.timestamp() / TIME_IN_MILLIS.SECOND);
 
-    if (currentMessageDate - previousMessageDate >= GROUPED_MESSAGE_INTERVAL) {
+    const currentMessageTime = message.timestamp();
+    const previousMessageTime = previousMessage.timestamp();
+
+    const currentMinute = currentMessageDate.getMinutes();
+    const previousMinute = previousMessageDate.getMinutes();
+
+    const isSentWithinTheSameMinute = currentMinute == previousMinute;
+    const isSentWithinTimeInterval = currentMessageTime - previousMessageTime <= GROUPED_MESSAGE_INTERVAL;
+
+    if (!isSentWithinTheSameMinute && !isSentWithinTimeInterval) {
       return true;
     }
 
