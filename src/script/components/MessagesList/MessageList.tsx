@@ -35,13 +35,14 @@ import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {onHitTopOrBottom} from 'Util/DOM/onHitTopOrBottom';
 import {useResizeObserver} from 'Util/DOM/resizeObserver';
-import {filterMessages} from 'Util/messagesFilterUtil';
+import {filterMessages} from 'Components/MessagesList/utils/messagesFilter';
 
 import {Message, MessageActions} from './Message';
 
 import {Conversation as ConversationEntity, Conversation} from '../../entity/Conversation';
 import {isContentMessage} from '../../guards/Message';
 import {StatusType} from '../../message/StatusType';
+import {groupMessagesBySenderAndTime} from './utils/messagesGroup';
 
 type FocusedElement = {center?: boolean; element: Element};
 
@@ -119,6 +120,9 @@ const MessagesList: FC<MessagesListParams> = ({
 
   const filteredMessages = filterMessages(allMessages);
   const filteredMessagesLength = filteredMessages.length;
+
+  const groupedMessages = groupMessagesBySenderAndTime(filteredMessages);
+  console.log(groupedMessages);
 
   const [messagesContainer, setMessageContainer] = useState<HTMLDivElement | null>(null);
 
