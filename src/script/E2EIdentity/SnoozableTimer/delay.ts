@@ -72,5 +72,5 @@ export async function shouldEnableSoftLock(
   if (!identity?.certificate) {
     return false;
   }
-  return [MLSStatuses.EXPIRED, MLSStatuses.REVOKED].includes(identity.status);
+  return identity.status === MLSStatuses.EXPIRED;
 }
