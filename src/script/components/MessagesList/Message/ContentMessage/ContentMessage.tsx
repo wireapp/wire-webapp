@@ -129,6 +129,7 @@ export const ContentMessageComponent: React.FC<ContentMessageProps> = ({
     const currentMessageTime = message.timestamp();
     const previousMessageTime = previousMessage.timestamp();
 
+    // We intend to change the first parameter to the timestamp of the first message in a group when structure allows it
     if (!shouldGroupMessagesByTimestamp(previousMessageTime, previousMessageTime, currentMessageTime)) {
       return true;
     }

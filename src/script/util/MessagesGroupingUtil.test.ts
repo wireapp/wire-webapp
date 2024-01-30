@@ -37,7 +37,7 @@ describe('shouldGroupMessagesByTimestamp', () => {
 
   it('should return false for messages sent in different minutes and more than 30 seconds apart', () => {
     const firstMessageTimestamp = 1 * TIME_IN_MILLIS.SECOND; // clock shows 0 min 1 sec
-    const previousMessageTimestamp = 25 * TIME_IN_MILLIS.SECOND; // clock shows 0 min 26 sec
+    const previousMessageTimestamp = 25 * TIME_IN_MILLIS.SECOND; // clock shows 0 min 25 sec
     const currentMessageTimestamp = firstMessageTimestamp + 59 * TIME_IN_MILLIS.SECOND; // clock shows 1 min 00 sec
 
     const result = shouldGroupMessagesByTimestamp(

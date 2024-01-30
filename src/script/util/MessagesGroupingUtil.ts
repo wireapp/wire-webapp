@@ -19,6 +19,14 @@
 
 import {fromUnixTime, TIME_IN_MILLIS} from 'Util/TimeUtil';
 
+/**
+ * Determines whether a message should be grouped with a previous one based on timestamp,
+ * a message should be grouped if it's sent within the same minute on the clock than the first message in the group
+ * or if it's sent within a timeframe (30 seconds) of the previous one
+ * @param firstMessageTimestamp unix timestamp of the first message in the group
+ * @param previousMessageTimestamp timestamp of the previous message
+ * @param currentMessageTimestamp timestamp of the current message
+ */
 export function shouldGroupMessagesByTimestamp(
   firstMessageTimestamp: number,
   previousMessageTimestamp: number,
