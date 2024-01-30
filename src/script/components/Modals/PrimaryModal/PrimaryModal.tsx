@@ -69,7 +69,7 @@ export const PrimaryModalComponent: FC = () => {
     hideCloseBtn = false,
     passwordOptional = false,
     allButtonsFullWidth = false,
-    primaryBtnFirst,
+    primaryBtnFirst = false,
   } = content;
 
   const isPassword = currentType === PrimaryModalType.PASSWORD;
