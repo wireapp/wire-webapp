@@ -716,15 +716,50 @@ export class UserRepository extends TypedEventEmitter<Events> {
   }
 
   /**
+   * Will refetch supported protocols for the given user and (if they changed) update the local user entity.
+   * @param user - the user to fetch the supported protocols for
+   */
+  private async refreshUserSupportedProtocols(user: User): Promise<void> {
+    try {
+      const localSupportedProtocols = user.supportedProtocols();
+      const supportedProtocols = await this.userService.getUserSupportedProtocols(user.qualifiedId);
+
+      const haveSupportedProtocolsChanged =
+        !localSupportedProtocols ||
+        !(
+          localSupportedProtocols.length === supportedProtocols.length &&
+          [...localSupportedProtocols].every(protocol => supportedProtocols.includes(protocol))
+        );
+
+      if (!haveSupportedProtocolsChanged) {
+        return;
+      }
+
+      await this.updateUserSupportedProtocols(user.qualifiedId, supportedProtocols);
+      this.emit('supportedProtocolsUpdated', {user, supportedProtocols});
+    } catch (error) {
+      this.logger.warn(`Failed to refresh supported protocols for user ${user.qualifiedId.id}`, error);
+    }
+  }
+
+  /**
    * Check for supported protocols on user entity locally, otherwise fetch them from the backend.
    * @param userId - the user to fetch the supported protocols for
    * @param forceRefetch - if true, the supported protocols will be fetched from the backend even if they are already stored locally
    */
+  public async getUserSupportedProtocols(
+    userId: QualifiedId,
+    shouldRefreshUser = false,
+  ): Promise<ConversationProtocol[]> {
+    const localUser = this.findUserById(userId);
+    const localSupportedProtocols = localUser?.supportedProtocols();
 
-  public async getUserSupportedProtocols(userId: QualifiedId, forceRefetch = false): Promise<ConversationProtocol[]> {
-    const localSupportedProtocols = this.findUserById(userId)?.supportedProtocols();
+    if (shouldRefreshUser && localUser) {
+      // Trigger a refresh of the supported protocols in the background. No need to await for this one.
+      void this.refreshUserSupportedProtocols(localUser);
+    }
 
-    if (!forceRefetch && localSupportedProtocols) {
+    if (localSupportedProtocols) {
       return localSupportedProtocols;
     }
 
