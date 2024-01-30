@@ -55,6 +55,7 @@
   "E2EI.certificateDetails": "Данные сертификата (формат PEM)",
   "E2EI.certificateExpired": "Срок действия сертификата сквозной идентификации истек",
   "E2EI.certificateExpiresSoon": "Срок действия сертификата сквозной идентификации скоро истечет",
+  "E2EI.certificateNotDownloaded": "End-to-end identity certificate not downloaded",
   "E2EI.certificateRevoked": "Сертификат сквозной идентификации отозван",
   "E2EI.certificateTitle": "Сертификат сквозной идентификации",
   "E2EI.copyCertificate": "Скопировать в буфер обмена",

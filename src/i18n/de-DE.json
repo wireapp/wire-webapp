@@ -55,6 +55,7 @@
   "E2EI.certificateDetails": "Zertifikatsdetails (PEM-Format)",
   "E2EI.certificateExpired": "Ende-zu-Ende-Identitätszertifikat abgelaufen",
   "E2EI.certificateExpiresSoon": "Ende-zu-Ende-Identitätszertifikat läuft bald ab",
+  "E2EI.certificateNotDownloaded": "End-to-end identity certificate not downloaded",
   "E2EI.certificateRevoked": "Ende-zu-Ende-Identitätszertifikat widerrufen",
   "E2EI.certificateTitle": "Ende-zu-Ende-Identitätszertifikat",
   "E2EI.copyCertificate": "In Zwischenablage kopieren",
