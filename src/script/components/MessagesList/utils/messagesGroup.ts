@@ -18,37 +18,94 @@
  */
 
 import {Message} from 'src/script/entity/message/Message';
+import {differenceInMinutes, isSameDay} from 'Util/TimeUtil';
 
-type GroupInfo = {
+import {shouldGroupMessagesByTimestamp} from './MessagesGroupingUtil';
+
+export type MessagesGroup = {
   sender: string;
-  firstMessageTime: number;
-  lastMessageTime: number;
+  firstMessageTimestamp: number;
+  lastMessageTimestamp: number;
   messages: Message[];
 };
 
-function shouldGroupMessagesByTimestamp(firstMessageTime: number, lastMessageTime: number, messageTime: number) {
-  return true;
+export type Marker = {
+  type: 'unread' | 'day' | 'hour';
+  timestamp: number;
+};
+
+/**
+ * Return a marker that should be displayed right before the given message.
+ * A marker would indicated a new day, hour or unread section
+ *
+ * @param message The message we want to render
+ * @param lastReadTimestamp If given will check new messages from this timestamp instead of live value of conversation.last_read_timestamp()
+ * @param previousMessage The right before in the conversation
+ */
+export function getMessageMarkerType(
+  message: Message,
+  lastReadTimestamp: number,
+  previousMessage?: Message,
+): Marker['type'] | undefined {
+  if (!previousMessage || message.isCall()) {
+    return undefined;
+  }
+
+  const previousMessageTimestamp = previousMessage.timestamp();
+  const currentMessageTimestamp = message.timestamp();
+
+  const isFirstUnread = previousMessageTimestamp <= lastReadTimestamp && currentMessageTimestamp > lastReadTimestamp;
+
+  if (isFirstUnread) {
+    return 'unread';
+  }
+
+  if (!isSameDay(previousMessageTimestamp, currentMessageTimestamp)) {
+    return 'day';
+  }
+
+  if (differenceInMinutes(currentMessageTimestamp, previousMessageTimestamp) > 60) {
+    return 'hour';
+  }
+
+  return undefined;
 }
 
-export function groupMessagesBySenderAndTime(messages: Message[]) {
-  const groupedMessages: GroupInfo[] = [];
-  for (const message of messages) {
-    const lastGroupInfo = groupedMessages[groupedMessages.length - 1];
+export function isMarker(object: any): object is Marker {
+  return object && object.type && object.timestamp;
+}
+
+export function groupMessagesBySenderAndTime(messages: Message[], lastReadTimestamp: number) {
+  return messages.reduce<Array<MessagesGroup | Marker>>((acc, message, index) => {
+    const lastItem = acc[acc.length - 1];
+    const lastGroupInfo = isMarker(lastItem) ? undefined : lastItem;
+
+    const marker = getMessageMarkerType(message, lastReadTimestamp, messages[index - 1]);
+
+    if (marker) {
+      // if there is a marker to insert, we insert it before the current message
+      acc.push({type: marker, timestamp: message.timestamp()});
+    }
+
     if (
       lastGroupInfo &&
       lastGroupInfo.sender === message.from &&
-      shouldGroupMessagesByTimestamp(lastGroupInfo.firstMessageTime, lastGroupInfo.lastMessageTime, message.timestamp())
+      shouldGroupMessagesByTimestamp(
+        lastGroupInfo.firstMessageTimestamp,
+        lastGroupInfo.lastMessageTimestamp,
+        message.timestamp(),
+      )
     ) {
       lastGroupInfo.messages.push(message);
-      lastGroupInfo.lastMessageTime = message.timestamp();
+      lastGroupInfo.lastMessageTimestamp = message.timestamp();
     } else {
-      groupedMessages.push({
+      acc.push({
         sender: message.from,
-        firstMessageTime: message.timestamp(),
-        lastMessageTime: message.timestamp(),
+        firstMessageTimestamp: message.timestamp(),
+        lastMessageTimestamp: message.timestamp(),
         messages: [message],
       });
     }
-  }
-  return groupedMessages;
+    return acc;
+  }, []);
 }

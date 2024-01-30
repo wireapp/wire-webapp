@@ -23,6 +23,7 @@ import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
+import {filterMessages} from 'Components/MessagesList/utils/messagesFilter';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {MessageRepository} from 'src/script/conversation/MessageRepository';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
@@ -35,14 +36,14 @@ import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {onHitTopOrBottom} from 'Util/DOM/onHitTopOrBottom';
 import {useResizeObserver} from 'Util/DOM/resizeObserver';
-import {filterMessages} from 'Components/MessagesList/utils/messagesFilter';
 
 import {Message, MessageActions} from './Message';
+import {MarkerComponent} from './Message/Marker';
+import {groupMessagesBySenderAndTime, isMarker} from './utils/messagesGroup';
 
 import {Conversation as ConversationEntity, Conversation} from '../../entity/Conversation';
 import {isContentMessage} from '../../guards/Message';
 import {StatusType} from '../../message/StatusType';
-import {groupMessagesBySenderAndTime} from './utils/messagesGroup';
 
 type FocusedElement = {center?: boolean; element: Element};
 
@@ -117,12 +118,12 @@ const MessagesList: FC<MessagesListParams> = ({
   const messageListRef = useRef<HTMLDivElement | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [focusedMessage, setFocusedMessage] = useState<string | undefined>(initialMessage?.id);
+  const conversationLastReadTimestamp = useRef(conversation.last_read_timestamp());
 
   const filteredMessages = filterMessages(allMessages);
   const filteredMessagesLength = filteredMessages.length;
 
-  const groupedMessages = groupMessagesBySenderAndTime(filteredMessages);
-  console.log(groupedMessages);
+  const groupedMessages = groupMessagesBySenderAndTime(filteredMessages, conversationLastReadTimestamp.current);
 
   const [messagesContainer, setMessageContainer] = useState<HTMLDivElement | null>(null);
 
@@ -147,7 +148,6 @@ const MessagesList: FC<MessagesListParams> = ({
   const scrollHeight = useRef(0);
   const nbMessages = useRef(0);
   const focusedElement = useRef<FocusedElement | null>(null);
-  const conversationLastReadTimestamp = useRef(conversation.last_read_timestamp());
 
   const updateScroll = (container: Element | null) => {
     const scrollingContainer = container?.parentElement;
@@ -256,67 +256,72 @@ const MessagesList: FC<MessagesListParams> = ({
   return (
     <FadingScrollbar ref={messageListRef} id="message-list" className="message-list" tabIndex={TabIndex.UNFOCUSABLE}>
       <div ref={setMessageContainer} className={cx('messages', {'flex-center': verticallyCenterMessage()})}>
-        {filteredMessages.map((message, index) => {
-          const previousMessage = filteredMessages[index - 1];
-          const isLastDeliveredMessage = lastDeliveredMessage?.id === message.id;
+        {groupedMessages.map(group => {
+          if (isMarker(group)) {
+            return <MarkerComponent key={`${group.type}-${group.timestamp}`} marker={group} />;
+          }
+          const {messages, firstMessageTimestamp} = group;
 
-          const visibleCallback = getVisibleCallback(conversation, message);
+          return messages.map((message, index) => {
+            const isLastDeliveredMessage = lastDeliveredMessage?.id === message.id;
 
-          const key = `${message.id || 'message'}-${message.timestamp()}`;
+            const visibleCallback = getVisibleCallback(conversation, message);
 
-          return (
-            <Message
-              key={key}
-              onVisible={visibleCallback}
-              message={message}
-              previousMessage={previousMessage}
-              messageActions={messageActions}
-              conversation={conversation}
-              hasReadReceiptsTurnedOn={conversationRepository.expectReadReceipt(conversation)}
-              isLastDeliveredMessage={isLastDeliveredMessage}
-              isMarked={!!focusedMessage && focusedMessage === message.id}
-              scrollTo={({element, center}, isUnread) => {
-                if (isUnread && messagesContainer) {
-                  // if it's a new unread message, but we are not on the first render of the list,
-                  // we do not need to scroll to the unread message
-                  return;
-                }
-                focusedElement.current = {center, element};
-                setTimeout(() => (focusedElement.current = null), 1000);
-                updateScroll(messagesContainer);
-              }}
-              isSelfTemporaryGuest={selfUser.isTemporaryGuest()}
-              messageRepository={messageRepository}
-              lastReadTimestamp={conversationLastReadTimestamp.current}
-              onClickAvatar={showUserDetails}
-              onClickCancelRequest={cancelConnectionRequest}
-              onClickImage={showImageDetails}
-              onClickInvitePeople={() => invitePeople(conversation)}
-              onClickReactionDetails={message => showMessageReactions(message, true)}
-              onClickMessage={onClickMessage}
-              onClickParticipants={showParticipants}
-              onClickDetails={message => showMessageDetails(message)}
-              onClickResetSession={resetSession}
-              onClickTimestamp={async function (messageId: string) {
-                setFocusedMessage(messageId);
-                setTimeout(() => setFocusedMessage(undefined), 5000);
-                const messageIsLoaded = conversation.getMessage(messageId);
+            const key = `${message.id || 'message'}-${message.timestamp()}`;
 
-                if (!messageIsLoaded) {
-                  const messageEntity = await messageRepository.getMessageInConversationById(conversation, messageId);
-                  conversation.removeMessages();
-                  conversationRepository.getMessagesWithOffset(conversation, messageEntity);
-                }
-              }}
-              selfId={selfUser.qualifiedId}
-              shouldShowInvitePeople={shouldShowInvitePeople}
-              isMessageFocused={focusedId === message.id}
-              handleFocus={setFocusedId}
-              handleArrowKeyDown={handleKeyDown}
-              isMsgElementsFocusable={isMsgElementsFocusable}
-              setMsgElementsFocusable={setMsgElementsFocusable}
-            />
-          );
+            return (
+              <Message
+                key={key}
+                onVisible={visibleCallback}
+                message={message}
+                hideHeader={message.timestamp() !== firstMessageTimestamp}
+                messageActions={messageActions}
+                conversation={conversation}
+                hasReadReceiptsTurnedOn={conversationRepository.expectReadReceipt(conversation)}
+                isLastDeliveredMessage={isLastDeliveredMessage}
+                isMarked={!!focusedMessage && focusedMessage === message.id}
+                scrollTo={({element, center}, isUnread) => {
+                  if (isUnread && messagesContainer) {
+                    // if it's a new unread message, but we are not on the first render of the list,
+                    // we do not need to scroll to the unread message
+                    return;
+                  }
+                  focusedElement.current = {center, element};
+                  setTimeout(() => (focusedElement.current = null), 1000);
+                  updateScroll(messagesContainer);
+                }}
+                isSelfTemporaryGuest={selfUser.isTemporaryGuest()}
+                messageRepository={messageRepository}
+                onClickAvatar={showUserDetails}
+                onClickCancelRequest={cancelConnectionRequest}
+                onClickImage={showImageDetails}
+                onClickInvitePeople={() => invitePeople(conversation)}
+                onClickReactionDetails={message => showMessageReactions(message, true)}
+                onClickMessage={onClickMessage}
+                onClickParticipants={showParticipants}
+                onClickDetails={message => showMessageDetails(message)}
+                onClickResetSession={resetSession}
+                onClickTimestamp={async function (messageId: string) {
+                  setFocusedMessage(messageId);
+                  setTimeout(() => setFocusedMessage(undefined), 5000);
+                  const messageIsLoaded = conversation.getMessage(messageId);
+
+                  if (!messageIsLoaded) {
+                    const messageEntity = await messageRepository.getMessageInConversationById(conversation, messageId);
+                    conversation.removeMessages();
+                    conversationRepository.getMessagesWithOffset(conversation, messageEntity);
+                  }
+                }}
+                selfId={selfUser.qualifiedId}
+                shouldShowInvitePeople={shouldShowInvitePeople}
+                isMessageFocused={focusedId === message.id}
+                handleFocus={setFocusedId}
+                handleArrowKeyDown={handleKeyDown}
+                isMsgElementsFocusable={isMsgElementsFocusable}
+                setMsgElementsFocusable={setMsgElementsFocusable}
+              />
+            );
+          });
         })}
       </div>
     </FadingScrollbar>

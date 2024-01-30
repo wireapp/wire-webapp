@@ -24,12 +24,10 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Conversation} from 'src/script/entity/Conversation';
 import {CompositeMessage} from 'src/script/entity/message/CompositeMessage';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {Message} from 'src/script/entity/message/Message';
 import {useRelativeTimestamp} from 'src/script/hooks/useRelativeTimestamp';
 import {StatusType} from 'src/script/message/StatusType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getMessageAriaLabel} from 'Util/conversationMessages';
-import {shouldGroupMessagesByTimestamp} from 'Util/MessagesGroupingUtil';
 
 import {ContentAsset} from './asset';
 import {MessageActionsMenu} from './MessageActions/MessageActions';
@@ -51,13 +49,14 @@ export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetS
   conversation: Conversation;
   findMessage: (conversation: Conversation, messageId: string) => Promise<ContentMessage | undefined>;
   focusMessage?: () => void;
+  /** whether the message should display the user avatar and user name before the actual content */
+  hideHeader: boolean;
   hasMarker?: boolean;
   isMessageFocused: boolean;
   isLastDeliveredMessage: boolean;
   message: ContentMessage;
   onClickButton: (message: CompositeMessage, buttonId: string) => void;
   onRetry: (message: ContentMessage) => void;
-  previousMessage?: Message;
   quotedMessage?: ContentMessage;
   selfId: QualifiedId;
   isMsgElementsFocusable: boolean;
@@ -69,11 +68,10 @@ export const ContentMessageComponent = ({
   message,
   findMessage,
   selfId,
-  hasMarker = false,
+  hideHeader,
   isMessageFocused,
   isLastDeliveredMessage,
   contextMenu,
-  previousMessage,
   onClickAvatar,
   onClickImage,
   onClickTimestamp,
@@ -101,7 +99,6 @@ export const ContentMessageComponent = ({
     failedToSend,
     reactions,
     status,
-    user,
     quote,
   } = useKoSubscribableChildren(message, [
     'senderName',
@@ -113,29 +110,8 @@ export const ContentMessageComponent = ({
     'failedToSend',
     'reactions',
     'status',
-    'user',
     'quote',
   ]);
-
-  const shouldShowMessageHeader = (): boolean => {
-    if (!previousMessage || hasMarker) {
-      return true;
-    }
-
-    if (message.isContent() && was_edited) {
-      return true;
-    }
-
-    const currentMessageTime = message.timestamp();
-    const previousMessageTime = previousMessage.timestamp();
-
-    // We intend to change the first parameter to the timestamp of the first message in a group when structure allows it
-    if (!shouldGroupMessagesByTimestamp(previousMessageTime, previousMessageTime, currentMessageTime)) {
-      return true;
-    }
-
-    return !previousMessage.isContent() || previousMessage.user().id !== user.id;
-  };
 
   const timeAgo = useRelativeTimestamp(message.timestamp());
 
@@ -178,7 +154,7 @@ export const ContentMessageComponent = ({
         }
       }}
     >
-      {shouldShowMessageHeader() && (
+      {!hideHeader && (
         <MessageHeader onClickAvatar={onClickAvatar} message={message} focusTabIndex={messageFocusedTabIndex}>
           {was_edited && (
             <span className="message-header-label-icon icon-edit" title={message.displayEditedTimestamp()}></span>
@@ -249,7 +225,7 @@ export const ContentMessageComponent = ({
 
         {!isConversationReadonly && isActionMenuVisible && (
           <MessageActionsMenu
-            isMsgWithHeader={shouldShowMessageHeader()}
+            isMsgWithHeader={!hideHeader}
             message={message}
             handleActionMenuVisibility={setActionMenuVisibility}
             contextMenu={contextMenu}
