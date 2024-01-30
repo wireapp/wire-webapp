@@ -55,6 +55,7 @@
   "E2EI.certificateDetails": "Certificate details (PEM format)",
   "E2EI.certificateExpired": "End-to-end identity certificate expired",
   "E2EI.certificateExpiresSoon": "End-to-end identity certificate expires soon",
+  "E2EI.certificateNotDownloaded": "End-to-end identity certificate not downloaded",
   "E2EI.certificateRevoked": "End-to-end identity certificate revoked",
   "E2EI.certificateTitle": "End-to-end identity certificate",
   "E2EI.copyCertificate": "Copy to Clipboard",
