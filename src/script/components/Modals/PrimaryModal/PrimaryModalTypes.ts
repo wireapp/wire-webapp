@@ -51,6 +51,9 @@ export interface ModalOptions {
   hideCloseBtn?: boolean;
   text?: Text;
   passwordOptional?: boolean;
+  confirmCancelBtnLabel?: string;
+  allButtonsFullWidth?: boolean;
+  primaryBtnFirst?: boolean;
 }
 
 export enum PrimaryModalType {
@@ -88,6 +91,8 @@ export interface ModalContent {
   titleText: string;
   hideCloseBtn?: boolean;
   passwordOptional?: boolean;
+  allButtonsFullWidth?: boolean;
+  primaryBtnFirst?: boolean;
 }
 
 export type ModalItem = {id: string; options: ModalOptions; type: PrimaryModalType};
