@@ -81,8 +81,13 @@ export class EventStorageMiddleware implements EventMiddleware {
 
   private validateEvent(event: HandledEvents, duplicateEvent?: EventRecord) {
     if (event.type === CONVERSATION_EVENT.MEMBER_LEAVE) {
-    /* When we receive a `member-leave` event, we should check that the user is actually still part of the conversation before forwarding the event. If the user is already not part of the conversation, then we can throw a validation error (that means the user was already removed by another member-leave event) */
-    
+      /*
+        When we receive a `member-leave` event,
+        we should check that the user is actually still part of the
+        conversation before forwarding the event. If the user is already not part
+        of the conversation, then we can throw a validation error
+        (that means the user was already removed by another member-leave event)
+      */
       if (!event.qualified_conversation) {
         return;
       }
