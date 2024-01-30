@@ -24,7 +24,7 @@ import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {CloseIcon, Input, SearchIcon} from '@wireapp/react-ui-kit';
+import {CircleCloseIcon, Input, SearchIcon} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {CallingCell} from 'Components/calling/CallingCell';
@@ -355,7 +355,7 @@ const Conversations: React.FC<ConversationsProps> = ({
             }
             endContent={
               conversationsFilter && (
-                <CloseIcon
+                <CircleCloseIcon
                   className="cursor-pointer"
                   onClick={() => setConversationsFilter('')}
                   css={{
