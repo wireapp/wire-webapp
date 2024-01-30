@@ -41,7 +41,7 @@ export function shouldGroupMessagesByTimestamp(
   const currentMinute = currentMessageDate.getMinutes();
   const previousMinute = firstMessageDate.getMinutes();
 
-  const isSentWithinTheSameMinute = currentMinute == previousMinute;
+  const isSentWithinTheSameMinute = currentMinute === previousMinute;
   const isSentWithinTimeInterval = currentMessageTimestamp - previousMessageTimestamp <= GROUPED_MESSAGE_INTERVAL;
 
   if (isSentWithinTheSameMinute || isSentWithinTimeInterval) {
