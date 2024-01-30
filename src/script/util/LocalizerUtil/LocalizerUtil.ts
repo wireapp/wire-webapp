@@ -54,7 +54,7 @@ const replaceSubstituteEscaped = (string: string, regex: RegExp | string, substi
     return string.replace(regex, escape(substitutes.toString()));
   }
   return string.replace(regex, (found: string, content: string): string =>
-    substitutes.hasOwnProperty(content) ? escape(substitutes[content]) : found,
+    substitutes.hasOwnProperty(content) ? escape(String(substitutes[content])) : found,
   );
 };
 
@@ -63,7 +63,7 @@ const replaceSubstitute = (string: string, regex: RegExp | string, substitutes: 
     return string.replace(regex, substitutes.toString());
   }
   return string.replace(regex, (found: string, content: string): string =>
-    substitutes.hasOwnProperty(content) ? substitutes[content] : found,
+    substitutes.hasOwnProperty(content) ? String(substitutes[content]) : found,
   );
 };
 
