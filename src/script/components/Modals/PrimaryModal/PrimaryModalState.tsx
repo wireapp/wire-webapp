@@ -134,6 +134,9 @@ const updateCurrentModalContent = (type: PrimaryModalType, options: ModalOptions
     hideCloseBtn = false,
     passwordOptional = false,
     text = {} as Text,
+    confirmCancelBtnLabel,
+    allButtonsFullWidth = false,
+    primaryBtnFirst = false,
   } = options;
 
   const content = {
@@ -153,6 +156,9 @@ const updateCurrentModalContent = (type: PrimaryModalType, options: ModalOptions
     hideCloseBtn,
     titleText: text.title ?? '',
     passwordOptional,
+    confirmCancelBtnLabel,
+    allButtonsFullWidth,
+    primaryBtnFirst,
   };
 
   switch (type) {
@@ -200,7 +206,10 @@ const updateCurrentModalContent = (type: PrimaryModalType, options: ModalOptions
       break;
     }
     case PrimaryModalType.CONFIRM: {
-      content.secondaryAction = {text: t('modalConfirmSecondary'), ...content.secondaryAction};
+      content.secondaryAction = {
+        text: content.confirmCancelBtnLabel || t('modalConfirmSecondary'),
+        ...content.secondaryAction,
+      };
       break;
     }
     case PrimaryModalType.INPUT:
