@@ -374,7 +374,7 @@
   "conversation.E2EISelfUserUnverifiedDeviceAdded": "Diese Unterhaltung ist nicht mehr überprüft, da Sie mindestens ein Gerät ohne gültiges Ende-zu-Ende-Identitätszertifikat hinzugefügt haben. ",
   "conversation.E2EISelfUserUnverifiedUserAdded": "Diese Unterhaltung ist nicht mehr überprüft, da Sie mindestens ein Gerät ohne gültiges Ende-zu-Ende-Identitätszertifikat verwenden. ",
   "conversation.E2EISendAnyway": "Trotzdem senden",
-  "conversation.E2EIUGetCertificate": "Get the certificate now",
+  "conversation.E2EIUGetCertificate": "Zertifikat jetzt herunterladen",
   "conversation.E2EIUpdateCertificate": "Zertifikat jetzt aktualisieren",
   "conversation.E2EIVerificationDegraded": "Unterhaltung nicht mehr überprüft",
   "conversationAssetDownloading": "Herunterladen…",
