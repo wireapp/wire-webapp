@@ -27,4 +27,4 @@ export const Declension = {
 
 export type StringIdentifer = keyof typeof en | '';
 
-export type Substitutes = Record<string, string | number> | string | number;
+export type Substitutes = Record<string, string> | string | number;
