@@ -311,14 +311,14 @@ export const weeksPassedSinceDate = (date: Date): number => {
 export const formatDelayTime = (delayTimeInMS: number): string => {
   if (delayTimeInMS >= TIME_IN_MILLIS.WEEK) {
     const weeks = Math.floor(delayTimeInMS / TIME_IN_MILLIS.WEEK);
-    return t('TimeUnit.WEEKS', {duration: weeks});
+    return `${weeks} ${t(`ephemeralUnitsWeek${weeks === 1 ? '' : 's'}`)}`;
   } else if (delayTimeInMS >= TIME_IN_MILLIS.DAY) {
     const days = Math.floor(delayTimeInMS / TIME_IN_MILLIS.DAY);
-    return t('TimeUnit.DAYS', {duration: days});
+    return `${days} ${t(`ephemeralUnitsDay${days === 1 ? '' : 's'}`)}`;
   } else if (delayTimeInMS >= TIME_IN_MILLIS.HOUR) {
     const hours = Math.floor(delayTimeInMS / TIME_IN_MILLIS.HOUR);
-    return t('TimeUnit.HOURS', {duration: hours});
+    return `${hours} ${t(`ephemeralUnitsHour${hours === 1 ? '' : 's'}`)}`;
   }
   const minutes = Math.floor(delayTimeInMS / TIME_IN_MILLIS.MINUTE);
-  return t('TimeUnit.MINUTES', {duration: minutes});
+  return `${minutes} ${t(`ephemeralUnitsMinute${minutes === 1 ? '' : 's'}`)}`;
 };
