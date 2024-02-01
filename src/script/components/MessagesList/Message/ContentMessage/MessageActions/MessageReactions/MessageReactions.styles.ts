@@ -40,13 +40,14 @@ import {CSSObject} from '@emotion/react';
 
 export const messageReactionWrapper: CSSObject = {
   display: 'flex',
+  paddingBlock: '0.5rem',
   gap: '0.5rem',
   paddingInline: 'var(--conversation-message-sender-width)',
   flexWrap: 'wrap',
   maxWidth: '100%',
   '.tooltip-content': {
     backgroundColor: 'var(--white) !important',
-    marginBottom: '0 !important',
+    marginBottom: '0.5rem !important',
     padding: '6px 8px !important',
     '.tooltip-arrow': {
       borderTopColor: 'var(--white) !important',
@@ -69,7 +70,6 @@ export const messageReactionButton: CSSObject = {
   color: 'var(--white)',
   display: 'inline-flex',
   gap: '4px',
-  margin: '0.5rem 0rem',
   padding: '3px',
   verticalAlign: 'top',
   userSelect: 'none',

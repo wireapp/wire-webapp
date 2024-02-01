@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useMemo, useState, useEffect} from 'react';
+import {useMemo, useState, useEffect} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
@@ -64,7 +64,7 @@ export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetS
   onClickReaction: (emoji: string) => void;
 }
 
-export const ContentMessageComponent: React.FC<ContentMessageProps> = ({
+export const ContentMessageComponent = ({
   conversation,
   message,
   findMessage,
@@ -84,7 +84,7 @@ export const ContentMessageComponent: React.FC<ContentMessageProps> = ({
   isMsgElementsFocusable,
   onClickReaction,
   onClickDetails,
-}) => {
+}: ContentMessageProps) => {
   // check if current message is focused and its elements focusable
   const msgFocusState = useMemo(
     () => isMsgElementsFocusable && isMessageFocused,
@@ -261,16 +261,18 @@ export const ContentMessageComponent: React.FC<ContentMessageProps> = ({
         )}
       </div>
 
-      <MessageReactionsList
-        reactions={reactions}
-        selfUserId={selfId}
-        handleReactionClick={onClickReaction}
-        isMessageFocused={msgFocusState}
-        onTooltipReactionCountClick={() => onClickReactionDetails(message)}
-        onLastReactionKeyEvent={() => setActionMenuVisibility(false)}
-        isRemovedFromConversation={conversation.removed_from_conversation()}
-        users={conversation.allUserEntities()}
-      />
+      {!!reactions.length && (
+        <MessageReactionsList
+          reactions={reactions}
+          selfUserId={selfId}
+          handleReactionClick={onClickReaction}
+          isMessageFocused={msgFocusState}
+          onTooltipReactionCountClick={() => onClickReactionDetails(message)}
+          onLastReactionKeyEvent={() => setActionMenuVisibility(false)}
+          isRemovedFromConversation={conversation.removed_from_conversation()}
+          users={conversation.allUserEntities()}
+        />
+      )}
     </div>
   );
 };
