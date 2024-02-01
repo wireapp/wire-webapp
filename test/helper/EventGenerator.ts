@@ -17,11 +17,15 @@
  *
  */
 
+import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data/';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
+
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';
 import {
   AssetAddEvent,
   DeleteEvent,
   EventBuilder,
+  MemberLeaveEvent,
   MessageAddEvent,
   ReactionEvent,
 } from 'src/script/conversation/EventBuilder';
@@ -65,6 +69,24 @@ export function createReactionEvent(targetMessageId: string, reaction: string = 
     id: createUuid(),
     time: new Date().toISOString(),
     type: CONVERSATION.REACTION,
+  };
+}
+
+export function createMemberLeaveEvent(conversationId: string, userIds: string[]): MemberLeaveEvent {
+  const conversationQualifiedId = {id: conversationId, domain: ''};
+
+  return {
+    conversation: conversationId,
+    qualified_conversation: conversationQualifiedId,
+    data: {
+      qualified_user_ids: userIds.map(userId => ({id: userId, domain: ''})),
+      reason: MemberLeaveReason.USER_DELETED,
+      user_ids: userIds,
+    },
+    from: createUuid(),
+    id: createUuid(),
+    time: new Date().toISOString(),
+    type: CONVERSATION_EVENT.MEMBER_LEAVE,
   };
 }
 
