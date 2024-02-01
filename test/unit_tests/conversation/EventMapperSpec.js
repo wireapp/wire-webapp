@@ -65,13 +65,12 @@ describe('Event Mapper', () => {
         type: ClientEvent.CONVERSATION.MESSAGE_ADD,
       };
 
-      return event_mapper.mapJsonEvent(event, conversation_et).then(messageEntity => {
-        expect(messageEntity.getFirstAsset().text).toBe(event.data.content);
-        expect(messageEntity).toBeDefined();
-      });
+      const messageEntity = event_mapper.mapJsonEvent(event, conversation_et);
+      expect(messageEntity.getFirstAsset().text).toBe(event.data.content);
+      expect(messageEntity).toBeDefined();
     });
 
-    it('maps text messages with deprecated link preview format', async () => {
+    it('maps text messages with deprecated link preview format', () => {
       const event_id = createUuid();
 
       const article = new Article({
@@ -100,7 +99,7 @@ describe('Event Mapper', () => {
         type: ClientEvent.CONVERSATION.MESSAGE_ADD,
       };
 
-      const messageEntity = await event_mapper.mapJsonEvent(event, conversation_et);
+      const messageEntity = event_mapper.mapJsonEvent(event, conversation_et);
 
       expect(messageEntity.getFirstAsset().text).toBe(event.data.content);
       expect(messageEntity.getFirstAsset().previews().length).toBe(1);
@@ -108,7 +107,7 @@ describe('Event Mapper', () => {
       expect(messageEntity).toBeDefined();
     });
 
-    it('maps text messages with link preview', async () => {
+    it('maps text messages with link preview', () => {
       const event_id = createUuid();
 
       const link_preview = new LinkPreview({
@@ -135,7 +134,7 @@ describe('Event Mapper', () => {
         type: ClientEvent.CONVERSATION.MESSAGE_ADD,
       };
 
-      const messageEntity = await event_mapper.mapJsonEvent(event, conversation_et);
+      const messageEntity = event_mapper.mapJsonEvent(event, conversation_et);
 
       expect(messageEntity.getFirstAsset().text).toBe(event.data.content);
       expect(messageEntity.getFirstAsset().previews().length).toBe(1);
@@ -230,16 +229,15 @@ describe('Event Mapper', () => {
         type: 'conversation.asset-add',
       };
 
-      return event_mapper.mapJsonEvent(event, conversation_et).then(messageEntity => {
-        expect(messageEntity.getFirstAsset().width).toBe(`${event.data.info.width}px`);
-        expect(messageEntity.getFirstAsset().height).toBe(`${event.data.info.height}px`);
-        expect(messageEntity.getFirstAsset().file_size).toBe(event.data.content_length);
-        expect(messageEntity.getFirstAsset().file_type).toBe(event.data.content_type);
-        expect(messageEntity.getFirstAsset().type).toBe(AssetType.IMAGE);
-        expect(messageEntity.getFirstAsset().resource().otrKey).toBe(event.data.otr_key);
-        expect(messageEntity.getFirstAsset().resource().sha256).toBe(event.data.sha256);
-        expect(messageEntity).toBeDefined();
-      });
+      const messageEntity = event_mapper.mapJsonEvent(event, conversation_et);
+      expect(messageEntity.getFirstAsset().width).toBe(`${event.data.info.width}px`);
+      expect(messageEntity.getFirstAsset().height).toBe(`${event.data.info.height}px`);
+      expect(messageEntity.getFirstAsset().file_size).toBe(event.data.content_length);
+      expect(messageEntity.getFirstAsset().file_type).toBe(event.data.content_type);
+      expect(messageEntity.getFirstAsset().type).toBe(AssetType.IMAGE);
+      expect(messageEntity.getFirstAsset().resource().otrKey).toBe(event.data.otr_key);
+      expect(messageEntity.getFirstAsset().resource().sha256).toBe(event.data.sha256);
+      expect(messageEntity).toBeDefined();
     });
 
     it('skips messages which cannot be mapped', () => {
@@ -259,12 +257,11 @@ describe('Event Mapper', () => {
         type: 'conversation.message-add',
       };
 
-      return event_mapper.mapJsonEvents([good_message, bad_message], conversation_et).then(messageEntities => {
-        expect(messageEntities.length).toBe(1);
-      });
+      const messageEntities = event_mapper.mapJsonEvents([good_message, bad_message], conversation_et);
+      expect(messageEntities.length).toBe(1);
     });
 
-    it('filters mentions that are out of range', async () => {
+    it('filters mentions that are out of range', () => {
       const mandy = '@Mandy';
       const randy = '@Randy';
       const text = `Hi ${mandy} and ${randy}.`;
@@ -294,13 +291,13 @@ describe('Event Mapper', () => {
         type: 'conversation.message-add',
       };
 
-      const messageEntity = await event_mapper.mapJsonEvent(event, conversationEntity);
+      const messageEntity = event_mapper.mapJsonEvent(event, conversationEntity);
       const mentions = messageEntity.getFirstAsset().mentions();
 
       expect(mentions.length).toBe(1);
     });
 
-    it('filters mentions that are overlapping', async () => {
+    it('filters mentions that are overlapping', () => {
       const mandy = '@Mandy';
       const randy = '@Randy';
       const sandy = '@Sandy';
@@ -337,7 +334,7 @@ describe('Event Mapper', () => {
         type: 'conversation.message-add',
       };
 
-      const messageEntity = await event_mapper.mapJsonEvent(event, conversationEntity);
+      const messageEntity = event_mapper.mapJsonEvent(event, conversationEntity);
       const mentions = messageEntity.getFirstAsset().mentions();
 
       expect(mentions.length).toBe(2);

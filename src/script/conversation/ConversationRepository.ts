@@ -802,7 +802,7 @@ export class ConversationRepository {
    */
   async getEventsForCategory(conversationEntity: Conversation, category = MessageCategory.NONE): Promise<Message[]> {
     const events = (await this.eventService.loadEventsWithCategory(conversationEntity.id, category)) as EventRecord[];
-    const messageEntities = (await this.event_mapper.mapJsonEvents(events, conversationEntity)) as Message[];
+    const messageEntities = this.event_mapper.mapJsonEvents(events, conversationEntity) as Message[];
     return this.updateMessagesUserEntities(messageEntities);
   }
 
@@ -818,7 +818,7 @@ export class ConversationRepository {
     }
 
     const events = await this.conversationService.searchInConversation(conversationEntity.id, query);
-    const mappedMessages = await this.event_mapper.mapJsonEvents(events, conversationEntity);
+    const mappedMessages = this.event_mapper.mapJsonEvents(events, conversationEntity);
     const messageEntities = await this.updateMessagesUserEntities(mappedMessages);
     return {messageEntities, query};
   }
@@ -3196,19 +3196,17 @@ export class ConversationRepository {
   };
 
   private on1to1Creation(conversationEntity: Conversation, eventJson: OneToOneCreationEvent) {
-    return this.event_mapper
-      .mapJsonEvent(eventJson, conversationEntity)
-      .then(messageEntity => this.updateMessageUserEntities(messageEntity))
-      .then((messageEntity: MemberMessage) => {
-        const userEntity = messageEntity.otherUser();
-        const isOutgoingRequest = userEntity?.isOutgoingRequest();
-        if (isOutgoingRequest) {
-          messageEntity.memberMessageType = SystemMessageType.CONNECTION_REQUEST;
-        }
+    const message = this.event_mapper.mapJsonEvent(eventJson, conversationEntity);
+    return this.updateMessageUserEntities(message).then((messageEntity: MemberMessage) => {
+      const userEntity = messageEntity.otherUser();
+      const isOutgoingRequest = userEntity?.isOutgoingRequest();
+      if (isOutgoingRequest) {
+        messageEntity.memberMessageType = SystemMessageType.CONNECTION_REQUEST;
+      }
 
-        conversationEntity.addMessage(messageEntity);
-        return {conversationEntity};
-      });
+      conversationEntity.addMessage(messageEntity);
+      return {conversationEntity};
+    });
   }
 
   /**
@@ -3260,7 +3258,7 @@ export class ConversationRepository {
   }
 
   private async onGroupCreation(conversationEntity: Conversation, eventJson: GroupCreationEvent) {
-    const messageEntity = await this.event_mapper.mapJsonEvent(eventJson, conversationEntity);
+    const messageEntity = this.event_mapper.mapJsonEvent(eventJson, conversationEntity);
     const creatorId = conversationEntity.creator;
     const creatorDomain = conversationEntity.domain;
     const createdByParticipant = !!conversationEntity
@@ -3816,7 +3814,7 @@ export class ConversationRepository {
   };
 
   private async initMessageEntity(conversationEntity: Conversation, eventJson: IncomingEvent): Promise<Message> {
-    const messageEntity = await this.event_mapper.mapJsonEvent(eventJson, conversationEntity);
+    const messageEntity = this.event_mapper.mapJsonEvent(eventJson, conversationEntity);
     return this.updateMessageUserEntities(messageEntity);
   }
 

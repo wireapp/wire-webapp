@@ -107,18 +107,16 @@ export class EventMapper {
    * @param conversationEntity Conversation entity the events belong to
    * @returns Resolves with the mapped message entities
    */
-  async mapJsonEvents(events: EventRecord[], conversationEntity: Conversation): Promise<Message[]> {
+  mapJsonEvents(events: EventRecord[], conversationEntity: Conversation): Message[] {
     const reversedEvents = events.filter(event => !!event).reverse();
-    const mappedEvents = await Promise.all(
-      reversedEvents.map(async (event): Promise<Message | void> => {
-        try {
-          return await this._mapJsonEvent(event, conversationEntity);
-        } catch (error) {
-          const errorMessage = `Failure while mapping events. Affected '${event.type}' event: ${error.message}`;
-          this.logger.error(errorMessage, error);
-        }
-      }),
-    );
+    const mappedEvents = reversedEvents.map((event): Message | void => {
+      try {
+        return this._mapJsonEvent(event, conversationEntity);
+      } catch (error) {
+        const errorMessage = `Failure while mapping events. Affected '${event.type}' event: ${error.message}`;
+        this.logger.error(errorMessage, error);
+      }
+    });
     return mappedEvents.filter(messageEntity => !!messageEntity) as Message[];
   }
 
@@ -130,7 +128,9 @@ export class EventMapper {
    * @returns Resolves with the mapped message entity
    */
   mapJsonEvent(event: ConversationEvent | ClientConversationEvent, conversationEntity: Conversation) {
-    return this._mapJsonEvent(event, conversationEntity).catch(error => {
+    try {
+      return this._mapJsonEvent(event, conversationEntity);
+    } catch (error) {
       const isMessageNotFound = error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;
       if (isMessageNotFound) {
         throw error;
@@ -142,7 +142,7 @@ export class EventMapper {
         ConversationError.TYPE.MESSAGE_NOT_FOUND,
         ConversationError.MESSAGE.MESSAGE_NOT_FOUND,
       );
-    });
+    }
   }
 
   /**
@@ -153,7 +153,7 @@ export class EventMapper {
    * @param event new json data to feed into the entity
    * @returns the updated message entity
    */
-  async updateMessageEvent(originalEntity: ContentMessage, event: LegacyEventRecord): Promise<ContentMessage> {
+  updateMessageEvent(originalEntity: ContentMessage, event: LegacyEventRecord): ContentMessage {
     const {id, data: eventData, edited_time: editedTime, conversation, qualified_conversation} = event;
 
     if (eventData.quote) {
@@ -163,7 +163,7 @@ export class EventMapper {
 
     if (id !== originalEntity.id && originalEntity.hasAssetText()) {
       originalEntity.assets.removeAll();
-      const textAsset = await this._mapAssetText(eventData);
+      const textAsset = this._mapAssetText(eventData);
       originalEntity.assets.push(textAsset);
     } else if (originalEntity.getFirstAsset) {
       const asset = originalEntity.getFirstAsset();
@@ -173,7 +173,7 @@ export class EventMapper {
       }
       if (eventData.previews) {
         if ((asset as TextAsset).previews().length !== eventData.previews.length) {
-          const previews = await this._mapAssetLinkPreviews(eventData.previews);
+          const previews = this._mapAssetLinkPreviews(eventData.previews);
           (asset as TextAsset).previews(previews as LinkPreviewEntity[]);
         }
       }
@@ -232,7 +232,7 @@ export class EventMapper {
    * @param conversationEntity Conversation entity the event belong to
    * @returns Mapped message entity
    */
-  async _mapJsonEvent(event: ConversationEvent | ClientConversationEvent, conversationEntity: Conversation) {
+  _mapJsonEvent(event: ConversationEvent | ClientConversationEvent, conversationEntity: Conversation) {
     let messageEntity;
 
     switch (event.type) {
@@ -275,7 +275,7 @@ export class EventMapper {
       }
 
       case ClientEvent.CONVERSATION.COMPOSITE_MESSAGE_ADD: {
-        const addMessage = await this._mapEventCompositeMessageAdd(event);
+        const addMessage = this._mapEventCompositeMessageAdd(event);
         messageEntity = addMetadata(addMessage, event);
         break;
       }
@@ -327,7 +327,7 @@ export class EventMapper {
       }
 
       case ClientEvent.CONVERSATION.MESSAGE_ADD: {
-        const addMessage = await this._mapEventMessageAdd(event);
+        const addMessage = this._mapEventMessageAdd(event);
         messageEntity = addMetadata(addMessage, event);
         break;
       }
@@ -624,11 +624,11 @@ export class EventMapper {
    * @param event Message data
    * @returns Content message entity
    */
-  private async _mapEventMessageAdd(event: LegacyEventRecord) {
+  private _mapEventMessageAdd(event: LegacyEventRecord) {
     const {data: eventData, edited_time: editedTime} = event;
     const messageEntity = new ContentMessage();
 
-    const assets = await this._mapAssetText(eventData);
+    const assets = this._mapAssetText(eventData);
     messageEntity.assets.push(assets);
     messageEntity.replacing_message_id = eventData.replacing_message_id;
     messageEntity.edited_timestamp(new Date(editedTime || eventData.edited_time).getTime());
@@ -641,20 +641,18 @@ export class EventMapper {
     return messageEntity;
   }
 
-  private async _mapEventCompositeMessageAdd(event: LegacyEventRecord) {
+  private _mapEventCompositeMessageAdd(event: LegacyEventRecord) {
     const {data: eventData} = event;
     const messageEntity = new CompositeMessage();
-    const assets: (Asset | FileAsset | Text | MediumImage)[] = await Promise.all(
-      eventData.items.map(
-        async (item: {button: {id: string; text: string}; text: LegacyEventRecord}): Promise<void | Button | Text> => {
-          if (item.button) {
-            return new Button(item.button.id, item.button.text);
-          }
-          if (item.text) {
-            return this._mapAssetText(item.text);
-          }
-        },
-      ),
+    const assets: (Asset | FileAsset | Text | MediumImage)[] = eventData.items.map(
+      (item: {button: {id: string; text: string}; text: LegacyEventRecord}): void | Button | Text => {
+        if (item.button) {
+          return new Button(item.button.id, item.button.text);
+        }
+        if (item.text) {
+          return this._mapAssetText(item.text);
+        }
+      },
     );
     messageEntity.assets.push(...assets);
     return messageEntity;
@@ -961,8 +959,8 @@ export class EventMapper {
    * @param linkPreviews Link previews as base64 encoded proto messages
    * @returns Array of mapped link previews
    */
-  private async _mapAssetLinkPreviews(linkPreviews: string[]) {
-    const encodedLinkPreviews = await Promise.all(linkPreviews.map(base64 => base64ToArray(base64)));
+  private _mapAssetLinkPreviews(linkPreviews: string[]) {
+    const encodedLinkPreviews = linkPreviews.map(base64 => base64ToArray(base64));
     return encodedLinkPreviews
       .map(encodedLinkPreview => LinkPreview.decode(encodedLinkPreview))
       .map(linkPreview => this._mapAssetLinkPreview(linkPreview))
@@ -976,8 +974,8 @@ export class EventMapper {
    * @param messageText Text of message
    * @returns Array of mapped mentions
    */
-  private async _mapAssetMentions(mentions: string[], messageText: string) {
-    const encodedMentions = await Promise.all(mentions.map(base64 => base64ToArray(base64)));
+  private _mapAssetMentions(mentions: string[], messageText: string) {
+    const encodedMentions = mentions.map(base64 => base64ToArray(base64));
     return encodedMentions
       .map(encodedMention => {
         const protoMention = Mention.decode(encodedMention);
@@ -1006,17 +1004,17 @@ export class EventMapper {
    * @param eventData Asset data received as JSON
    * @returns Text asset entity
    */
-  private async _mapAssetText(eventData: LegacyEventRecord) {
+  private _mapAssetText(eventData: LegacyEventRecord) {
     const {id, content, mentions, message, previews} = eventData;
     const messageText = content || message;
     const assetEntity = new Text(id, messageText);
 
     if (mentions && mentions.length) {
-      const mappedMentions = await this._mapAssetMentions(mentions, messageText);
+      const mappedMentions = this._mapAssetMentions(mentions, messageText);
       assetEntity.mentions(mappedMentions);
     }
     if (previews && previews.length) {
-      const mappedLinkPreviews = (await this._mapAssetLinkPreviews(previews)) as unknown as LinkPreviewEntity[];
+      const mappedLinkPreviews = this._mapAssetLinkPreviews(previews) as unknown as LinkPreviewEntity[];
       assetEntity.previews(mappedLinkPreviews);
     }
 
