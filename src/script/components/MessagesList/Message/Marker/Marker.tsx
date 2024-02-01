@@ -17,36 +17,39 @@
  *
  */
 
-import cx from 'classnames';
+import {SerializedStyles, css} from '@emotion/react';
 
 import {useRelativeTimestamp} from 'src/script/hooks/useRelativeTimestamp';
+
+import {dayMarkerStyle, baseMarkerStyle} from './Marker.styles';
 
 import {Marker} from '../../utils/messagesGroup';
 import {MessageTime} from '../MessageTime';
 
-const classes: Record<Marker['type'], string> = {
-  day: 'message-timestamp-visible message-timestamp-day',
-  hour: 'message-timestamp-visible',
-  unread: 'message-timestamp-visible message-timestamp-unread',
+const markerStyles: Partial<Record<Marker['type'], SerializedStyles>> = {
+  day: dayMarkerStyle,
 };
 
 export function MarkerComponent({marker}: {marker: Marker}) {
-  const timeAgo = useRelativeTimestamp(marker.timestamp);
-  const timeAgoDay = useRelativeTimestamp(marker.timestamp, true);
+  const timeAgo = useRelativeTimestamp(marker.timestamp, marker.type === 'day');
+
+  const style = css`
+    ${baseMarkerStyle} ${markerStyles[marker.type]}
+  `;
 
   return (
-    <div className={cx('message-header message-timestamp', classes[marker.type])}>
+    <div className="message-header" css={style}>
       <div className="message-header-icon">
-        <span className="message-unread-dot" />
+        {marker.type === 'unread' && <span className="message-unread-dot dot-md" />}
       </div>
 
       <h3 className="message-header-label">
-        <MessageTime timestamp={marker.timestamp} className="label-xs" data-timestamp-type="normal">
+        <MessageTime
+          timestamp={marker.timestamp}
+          data-timestamp-type={marker.type === 'day' ? 'day' : 'normal'}
+          className={marker.type === 'day' ? 'label-bold-xs' : 'label-xs'}
+        >
           {timeAgo}
-        </MessageTime>
-
-        <MessageTime timestamp={marker.timestamp} data-timestamp-type="day" className="label-bold-xs">
-          {timeAgoDay}
         </MessageTime>
       </h3>
     </div>
