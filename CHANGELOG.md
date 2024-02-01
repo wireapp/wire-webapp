@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [43.12.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@43.11.5...@wireapp/core@43.12.0) (2024-02-01)
+
+### Features
+
+* Upgrade to coreCrypto rc36 to support crl distribution points ([#5923](https://github.com/wireapp/wire-web-packages/issues/5923)) ([fc08184](https://github.com/wireapp/wire-web-packages/commit/fc08184db38420e86764cdfc1b420e60c7a28df7))
+
 ## [43.11.5](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@43.11.4...@wireapp/core@43.11.5) (2024-02-01)
 
 **Note:** Version bump only for package @wireapp/core
