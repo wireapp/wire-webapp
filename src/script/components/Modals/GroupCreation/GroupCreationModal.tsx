@@ -407,21 +407,19 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
 
         {stateIsParticipants && selfUser && (
           <FadingScrollbar className="group-creation__list">
-            {filteredContacts.length > 0 && (
-              <UserSearchableList
-                selfUser={selfUser}
-                users={filteredContacts}
-                filter={participantsInput}
-                selected={selectedContacts}
-                isSelectable
-                onUpdateSelectedUsers={setSelectedContacts}
-                searchRepository={searchRepository}
-                teamRepository={teamRepository}
-                conversationRepository={conversationRepository}
-                noUnderline
-                allowRemoteSearch
-              />
-            )}
+            <UserSearchableList
+              selfUser={selfUser}
+              users={filteredContacts}
+              filter={participantsInput}
+              selected={selectedContacts}
+              isSelectable
+              onUpdateSelectedUsers={setSelectedContacts}
+              searchRepository={searchRepository}
+              teamRepository={teamRepository}
+              conversationRepository={conversationRepository}
+              noUnderline
+              allowRemoteSearch
+            />
           </FadingScrollbar>
         )}
 
