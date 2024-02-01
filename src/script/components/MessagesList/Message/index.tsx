@@ -109,7 +109,7 @@ export const Message: React.FC<
       // for reply message, focus on the original message when original message link is clicked for keyboard users
       handleFocus(message.id);
     }
-  }, [isMarked, messageElementRef]);
+  }, [isMarked]);
 
   const handleDivKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     // when a message is focused set its elements focusable

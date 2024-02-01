@@ -154,7 +154,7 @@ export const ContentMessageComponent = ({
         }
       }}
     >
-      {!hideHeader && (
+      {(was_edited || !hideHeader) && (
         <MessageHeader onClickAvatar={onClickAvatar} message={message} focusTabIndex={messageFocusedTabIndex}>
           {was_edited && (
             <span className="message-header-label-icon icon-edit" title={message.displayEditedTimestamp()}></span>
