@@ -28,7 +28,7 @@ export function useRoveFocus(elements: string[]) {
   const [focusedIndex, setFocusedIndex] = useState<number>(-1);
 
   const lastIndex = elements.length - 1;
-  const setCurrentFocus = useCallback(
+  const setFocusedId = useCallback(
     (id: string) => {
       const index = elements.findIndex(element => element === id);
       setFocusedIndex(index);
@@ -59,5 +59,5 @@ export function useRoveFocus(elements: string[]) {
   );
 
   const focusedId = focusedIndex !== -1 ? elements[focusedIndex] : undefined;
-  return {currentFocus: focusedId, handleKeyDown, setCurrentFocus};
+  return {focusedId, handleKeyDown, setFocusedId};
 }

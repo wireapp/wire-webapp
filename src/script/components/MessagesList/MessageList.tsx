@@ -231,13 +231,13 @@ const MessagesList: FC<MessagesListParams> = ({
     }
   }, [loaded]);
 
-  const {currentFocus, handleKeyDown, setCurrentFocus} = useRoveFocus(filteredMessages.map(message => message.id));
+  const {focusedId, handleKeyDown, setFocusedId} = useRoveFocus(filteredMessages.map(message => message.id));
 
   // when a new conversation is opened using keyboard(enter), focus on the last message
   useEffect(() => {
     if (loaded && history.state?.eventKey === 'Enter') {
       const lastMessage = filteredMessages[filteredMessages.length - 1];
-      setCurrentFocus(lastMessage?.id);
+      setFocusedId(lastMessage?.id);
 
       // reset the eventKey to stop focusing on every new message user send/receive afterwards
       // last message should be focused only when user enters a new conversation using keyboard(press enter)
@@ -306,8 +306,8 @@ const MessagesList: FC<MessagesListParams> = ({
               }}
               selfId={selfUser.qualifiedId}
               shouldShowInvitePeople={shouldShowInvitePeople}
-              isMessageFocused={currentFocus === message.id}
-              handleFocus={setCurrentFocus}
+              isMessageFocused={focusedId === message.id}
+              handleFocus={setFocusedId}
               handleArrowKeyDown={handleKeyDown}
               isMsgElementsFocusable={isMsgElementsFocusable}
               setMsgElementsFocusable={setMsgElementsFocusable}
