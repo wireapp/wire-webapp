@@ -49,3 +49,5 @@ export interface MLSServiceConfig {
    */
   useE2EI?: boolean;
 }
+
+export type NewCrlDistributionPointsPayload = {crlNewDistributionPoints?: string[] | undefined};

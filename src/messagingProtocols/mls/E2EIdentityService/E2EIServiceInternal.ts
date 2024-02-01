@@ -21,7 +21,6 @@ import {Decoder, Encoder} from 'bazinga64';
 import logdown from 'logdown';
 
 import {APIClient} from '@wireapp/api-client';
-import {TypedEventEmitter} from '@wireapp/commons';
 
 import {AcmeService} from './Connection/AcmeServer';
 import {AcmeDirectory, Ciphersuite, CoreCrypto, E2eiEnrollment, InitParams, RotateBundle} from './E2EIService.types';
@@ -36,11 +35,9 @@ import {createNewOrder, finalizeOrder} from './Steps/Order';
 import {E2EIStorage} from './Storage/E2EIStorage';
 import {AuthData} from './Storage/E2EIStorage.schema';
 
-type Events = {
-  newCrlDistributionPoints: string[];
-};
+import {NewCrlDistributionPointsPayload} from '../MLSService/MLSService.types';
 
-export class E2EIServiceInternal extends TypedEventEmitter<Events> {
+export class E2EIServiceInternal {
   private static instance: E2EIServiceInternal;
   private readonly logger = logdown('@wireapp/core/E2EIdentityServiceInternal');
   private readonly coreCryptoClient: CoreCrypto;
@@ -50,18 +47,20 @@ export class E2EIServiceInternal extends TypedEventEmitter<Events> {
   private identity?: E2eiEnrollment;
   private acmeService?: AcmeService;
   private isInitialized = false;
+  private readonly dispatchNewCrlDistributionPoints: (payload: NewCrlDistributionPointsPayload) => void;
 
   private constructor(
     coreCryptClient: CoreCrypto,
     apiClient: APIClient,
     e2eiServiceExternal: E2EIServiceExternal,
     keyPackagesAmount: number = 100,
+    dispatchNewCrlDistributionPoints: (payload: NewCrlDistributionPointsPayload) => void,
   ) {
-    super();
     this.coreCryptoClient = coreCryptClient;
     this.apiClient = apiClient;
     this.e2eServiceExternal = e2eiServiceExternal;
     this.keyPackagesAmount = keyPackagesAmount;
+    this.dispatchNewCrlDistributionPoints = dispatchNewCrlDistributionPoints;
     this.logger.log('Instance of E2EIServiceInternal created');
   }
 
@@ -72,12 +71,20 @@ export class E2EIServiceInternal extends TypedEventEmitter<Events> {
       if (!params) {
         throw new Error('E2EIServiceInternal is not initialized. Please call getInstance with params.');
       }
-      const {skipInit = false, coreCryptClient, apiClient, e2eiServiceExternal, keyPackagesAmount} = params;
+      const {
+        skipInit = false,
+        coreCryptClient,
+        apiClient,
+        e2eiServiceExternal,
+        keyPackagesAmount,
+        dispatchNewCrlDistributionPoints,
+      } = params;
       E2EIServiceInternal.instance = new E2EIServiceInternal(
         coreCryptClient,
         apiClient,
         e2eiServiceExternal,
         keyPackagesAmount,
+        dispatchNewCrlDistributionPoints,
       );
       if (!skipInit) {
         const {discoveryUrl, user, clientId} = params;
@@ -113,11 +120,12 @@ export class E2EIServiceInternal extends TypedEventEmitter<Events> {
 
     // How long the issued certificate should be maximal valid
     const expiryDays = 90;
+    const expirySecs = expiryDays * 24 * 60 * 60;
     const ciphersuite = Ciphersuite.MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519;
 
     if (hasActiveCertificate) {
       this.identity = await this.coreCryptoClient.e2eiNewRotateEnrollment(
-        expiryDays,
+        expirySecs,
         ciphersuite,
         user.displayName,
         user.handle,
@@ -127,7 +135,7 @@ export class E2EIServiceInternal extends TypedEventEmitter<Events> {
       this.identity = await this.coreCryptoClient.e2eiNewActivationEnrollment(
         user.displayName,
         user.handle,
-        expiryDays,
+        expirySecs,
         ciphersuite,
         user.teamId,
       );
@@ -286,6 +294,7 @@ export class E2EIServiceInternal extends TypedEventEmitter<Events> {
 
     // Step 10: Initialize MLS with the certificate
     const rotateBundle = await this.coreCryptoClient.e2eiRotateAll(this.identity, certificate, this.keyPackagesAmount);
+    this.dispatchNewCrlDistributionPoints(rotateBundle);
     return rotateBundle;
   }
 
