@@ -74,7 +74,7 @@ interface MessagesListParams {
   setMsgElementsFocusable: (isMsgElementsFocusable: boolean) => void;
 }
 
-const MessagesList: FC<MessagesListParams> = ({
+export const MessagesList: FC<MessagesListParams> = ({
   conversation,
   initialMessage,
   selfUser,
@@ -176,10 +176,10 @@ const MessagesList: FC<MessagesListParams> = ({
       // We only want to animate the scroll if there are new messages in the list
       const behavior = nbMessages.current !== filteredMessagesLength ? 'smooth' : 'auto';
       // Simple content update, we just scroll to bottom if we are in the stick to bottom threshold
-      scrollingContainer.scrollTo?.({behavior, top: scrollingContainer.scrollHeight});
+      scrollingContainer.scrollTo({behavior, top: scrollingContainer.scrollHeight});
     } else if (lastMessage && lastMessage.status() === StatusType.SENDING && lastMessage.user().id === selfUser.id) {
       // The self user just sent a message, we scroll straight to the bottom
-      scrollingContainer.scrollTo?.({behavior: 'smooth', top: scrollingContainer.scrollHeight});
+      scrollingContainer.scrollTo({behavior: 'smooth', top: scrollingContainer.scrollHeight});
     }
     scrollHeight.current = scrollingContainer.scrollHeight;
     nbMessages.current = filteredMessagesLength;
@@ -254,22 +254,26 @@ const MessagesList: FC<MessagesListParams> = ({
   if (!loaded) {
     return null;
   }
+
+  const scrollToElement: ScrollToElement = ({element, center}, isUnread) => {
+    if (isUnread && messagesContainer) {
+      // if it's a new unread message, but we are not on the first render of the list,
+      // we do not need to scroll to the unread message
+      return;
+    }
+    focusedElement.current = {center, element};
+    setTimeout(() => (focusedElement.current = null), 1000);
+    updateScroll(messagesContainer);
+  };
+
   return (
     <FadingScrollbar ref={messageListRef} id="message-list" className="message-list" tabIndex={TabIndex.UNFOCUSABLE}>
       <div ref={setMessageContainer} className={cx('messages', {'flex-center': verticallyCenterMessage()})}>
         {groupedMessages.map(group => {
-          const scrollTo: ScrollToElement = ({element, center}, isUnread) => {
-            if (isUnread && messagesContainer) {
-              // if it's a new unread message, but we are not on the first render of the list,
-              // we do not need to scroll to the unread message
-              return;
-            }
-            focusedElement.current = {center, element};
-            setTimeout(() => (focusedElement.current = null), 1000);
-            updateScroll(messagesContainer);
-          };
           if (isMarker(group)) {
-            return <MarkerComponent key={`${group.type}-${group.timestamp}`} scrollTo={scrollTo} marker={group} />;
+            return (
+              <MarkerComponent key={`${group.type}-${group.timestamp}`} scrollTo={scrollToElement} marker={group} />
+            );
           }
           const {messages, firstMessageTimestamp} = group;
 
@@ -291,7 +295,7 @@ const MessagesList: FC<MessagesListParams> = ({
                 hasReadReceiptsTurnedOn={conversationRepository.expectReadReceipt(conversation)}
                 isLastDeliveredMessage={isLastDeliveredMessage}
                 isMarked={!!focusedMessage && focusedMessage === message.id}
-                scrollTo={scrollTo}
+                scrollTo={scrollToElement}
                 isSelfTemporaryGuest={selfUser.isTemporaryGuest()}
                 messageRepository={messageRepository}
                 onClickAvatar={showUserDetails}
@@ -329,5 +333,3 @@ const MessagesList: FC<MessagesListParams> = ({
     </FadingScrollbar>
   );
 };
-
-export {MessagesList};

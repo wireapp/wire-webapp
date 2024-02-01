@@ -42,7 +42,7 @@ export function MarkerComponent({marker, scrollTo}: {marker: Marker; scrollTo: S
   `;
 
   useLayoutEffect(() => {
-    if (marker.type === 'unread') {
+    if (marker.type === 'unread' && elementRef.current) {
       scrollTo({element: elementRef.current}, true);
     }
   }, []);
