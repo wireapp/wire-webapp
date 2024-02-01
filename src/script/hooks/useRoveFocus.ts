@@ -24,35 +24,40 @@ import type {KeyboardEvent as ReactKeyboardEvent} from 'react';
 
 import {isKey, isTabKey, KEY} from 'Util/KeyboardUtil';
 
-function useRoveFocus(size: number, defaultFocus = 0, infinite = true) {
-  const [currentFocus, setCurrentFocus] = useState(defaultFocus);
-  const firstItem = 0;
-  const interval = 1;
-  const lastItem = size - 1;
+export function useRoveFocus(elements: string[]) {
+  const [focusedIndex, setFocusedIndex] = useState<number>(-1);
+
+  const lastIndex = elements.length - 1;
+  const setCurrentFocus = useCallback(
+    (id: string) => {
+      const index = elements.findIndex(element => element === id);
+      setFocusedIndex(index);
+    },
+    [elements],
+  );
 
   const handleKeyDown = useCallback(
     (event: ReactKeyboardEvent | KeyboardEvent) => {
       if (isKey(event, KEY.ARROW_DOWN)) {
         event.preventDefault();
-        if (infinite) {
-          setCurrentFocus(currentFocus === lastItem ? firstItem : currentFocus + interval);
-        } else if (currentFocus !== lastItem) {
-          setCurrentFocus(currentFocus + interval);
+        if (focusedIndex < elements.length - 1) {
+          setFocusedIndex(focusedIndex + 1);
         }
       } else if (isKey(event, KEY.ARROW_UP)) {
         event.preventDefault();
-        if (infinite) {
-          setCurrentFocus(currentFocus === firstItem ? lastItem : currentFocus - interval);
-        } else if (currentFocus !== firstItem) {
-          setCurrentFocus(currentFocus - interval);
+        if (focusedIndex === -1) {
+          setFocusedIndex(lastIndex);
+        }
+        if (focusedIndex > 0) {
+          setFocusedIndex(focusedIndex - 1);
         }
       } else if (isTabKey(event)) {
-        setCurrentFocus(firstItem);
+        setFocusedIndex(lastIndex);
       }
     },
-    [currentFocus, setCurrentFocus, infinite, lastItem],
+    [focusedIndex, setFocusedIndex, lastIndex, elements],
   );
-  return {currentFocus, handleKeyDown, setCurrentFocus};
-}
 
-export {useRoveFocus};
+  const focusedId = focusedIndex !== -1 ? elements[focusedIndex] : undefined;
+  return {currentFocus: focusedId, handleKeyDown, setCurrentFocus};
+}

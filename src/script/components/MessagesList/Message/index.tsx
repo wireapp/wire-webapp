@@ -76,10 +76,8 @@ export interface MessageParams extends MessageActions {
   selfId: QualifiedId;
   shouldShowInvitePeople: boolean;
   teamState?: TeamState;
-  totalMessage: number;
-  index: number;
   isMessageFocused: boolean;
-  handleFocus: (index: number) => void;
+  handleFocus: (id: string) => void;
   handleArrowKeyDown: (e: React.KeyboardEvent) => void;
   isMsgElementsFocusable: boolean;
   setMsgElementsFocusable: (isMsgElementsFocusable: boolean) => void;
@@ -95,11 +93,9 @@ const Message: React.FC<
     lastReadTimestamp,
     onVisible,
     scrollTo,
-    totalMessage,
     isMessageFocused,
     handleFocus,
     handleArrowKeyDown,
-    index,
     isMsgElementsFocusable,
     setMsgElementsFocusable,
   } = props;
@@ -123,7 +119,7 @@ const Message: React.FC<
       scrollTo?.({center: true, element: messageElementRef.current});
 
       // for reply message, focus on the original message when original message link is clicked for keyboard users
-      handleFocus(index);
+      handleFocus(message.id);
     } else if (markerType === MessageMarkerType.UNREAD) {
       scrollTo?.({element: messageElementRef.current}, true);
     }
@@ -144,21 +140,6 @@ const Message: React.FC<
     }
     handleArrowKeyDown(event);
   };
-
-  // when a new conversation is opened using keyboard(enter), focus on the last message
-  useEffect(() => {
-    if (!messageRef.current) {
-      return;
-    }
-    if (history.state?.eventKey === 'Enter') {
-      handleFocus(totalMessage - 1);
-
-      // reset the eventKey to stop focusing on every new message user send/receive afterwards
-      // last message should be focused only when user enters a new conversation using keyboard(press enter)
-      history.state.eventKey = '';
-      window.history.replaceState(history.state, '', window.location.hash);
-    }
-  }, [totalMessage]);
 
   useEffect(() => {
     // Move element into view when it is focused
@@ -240,7 +221,7 @@ const Message: React.FC<
         role="listitem"
         onKeyDown={handleDivKeyDown}
         onClick={event => {
-          handleFocus(index);
+          handleFocus(message.id);
         }}
         className="message-wrapper"
       >
