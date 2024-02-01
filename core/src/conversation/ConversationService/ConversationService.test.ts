@@ -23,6 +23,8 @@ import {
   ConversationProtocol,
   MLSConversation,
   PostMlsMessageResponse,
+  Subconversation,
+  SUBCONVERSATION_ID,
 } from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_EVENT, ConversationMLSMessageAddEvent} from '@wireapp/api-client/lib/event';
 import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
@@ -40,8 +42,12 @@ import * as MessagingProtocols from '../../messagingProtocols/proteus';
 import {openDB} from '../../storage/CoreDB';
 import * as PayloadHelper from '../../test/PayloadHelper';
 import * as MessageBuilder from '../message/MessageBuilder';
+import {SubconversationService} from '../SubconversationService/SubconversationService';
 
-const createMLSMessageAddEventMock = (conversationId: QualifiedId): ConversationMLSMessageAddEvent => ({
+const createMLSMessageAddEventMock = (
+  conversationId: QualifiedId,
+  subconversationId?: SUBCONVERSATION_ID,
+): ConversationMLSMessageAddEvent => ({
   data: '',
   conversation: conversationId.id,
   qualified_conversation: conversationId,
@@ -49,6 +55,7 @@ const createMLSMessageAddEventMock = (conversationId: QualifiedId): Conversation
   senderClientId: '',
   type: CONVERSATION_EVENT.MLS_MESSAGE_ADD,
   time: '2023-08-21T06:47:43.387Z',
+  subconv: subconversationId,
 });
 
 jest.mock('../../messagingProtocols/proteus', () => ({
@@ -124,18 +131,26 @@ describe('ConversationService', () => {
 
     const groupIdFromConversationId = jest.fn();
 
+    const mockedSubconversationService = {
+      joinConferenceSubconversation: jest.fn(),
+    } as unknown as SubconversationService;
+
     const conversationService = new ConversationService(
       client,
       mockedProteusService,
       mockedDb,
       groupIdFromConversationId,
+      mockedSubconversationService,
       mockedMLSService,
     );
 
     jest.spyOn(conversationService, 'joinByExternalCommit');
     jest.spyOn(conversationService, 'emit');
 
-    return [conversationService, {apiClient: client, mlsService: mockedMLSService}] as const;
+    return [
+      conversationService,
+      {apiClient: client, mlsService: mockedMLSService, subconversationService: mockedSubconversationService},
+    ] as const;
   }
 
   describe('"send PROTEUS"', () => {
@@ -488,6 +503,38 @@ describe('ConversationService', () => {
 
       expect(conversationService.joinByExternalCommit).toHaveBeenCalledWith(conversationId);
       expect(conversationService.emit).toHaveBeenCalledWith('MLSConversationRecovered', {conversationId});
+    });
+
+    it('rejoins a conference subconversation if epoch mismatch detected when decrypting mls message', async () => {
+      const [conversationService, {apiClient, mlsService, subconversationService}] = await buildConversationService();
+      const conversationId = {id: 'conversationId', domain: 'staging.zinfra.io'};
+      const mockGroupId = 'mock-group-id';
+
+      const mockMLSMessageAddEvent = createMLSMessageAddEventMock(conversationId, SUBCONVERSATION_ID.CONFERENCE);
+
+      jest
+        .spyOn(mlsService, 'handleMLSMessageAddEvent')
+        .mockRejectedValueOnce(new Error(CoreCryptoMLSError.DECRYPTION.WRONG_EPOCH));
+
+      const remoteEpoch = 5;
+      const localEpoch = 4;
+
+      jest.spyOn(mlsService, 'conversationExists').mockResolvedValueOnce(true);
+      jest.spyOn(mlsService, 'getEpoch').mockResolvedValueOnce(localEpoch);
+
+      const mockedSubconversationResponse = {
+        epoch: remoteEpoch,
+        group_id: mockGroupId,
+        parent_qualified_id: conversationId,
+        subconv_id: SUBCONVERSATION_ID.CONFERENCE,
+      } as unknown as Subconversation;
+
+      jest.spyOn(apiClient.api.conversation, 'getSubconversation').mockResolvedValueOnce(mockedSubconversationResponse);
+
+      await conversationService.handleEvent(mockMLSMessageAddEvent);
+
+      expect(conversationService.joinByExternalCommit).not.toHaveBeenCalled();
+      expect(subconversationService.joinConferenceSubconversation).toHaveBeenCalledWith(conversationId);
     });
   });
 
