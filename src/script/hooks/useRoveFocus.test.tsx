@@ -32,6 +32,21 @@ describe('useRoveFocus', () => {
     expect(result.current.currentFocus).toBe(undefined);
   });
 
+  it('should allow manually setting the focused index and navigate using the down/up arrow keys', () => {
+    const {result} = renderHook(() => useRoveFocus(['0', '1', '2']));
+    act(() => result.current.setCurrentFocus('1'));
+    expect(result.current.currentFocus).toBe('1');
+
+    act(() => result.current.handleKeyDown(createEvent('ArrowDown')));
+    expect(result.current.currentFocus).toBe('2');
+
+    act(() => result.current.handleKeyDown(createEvent('ArrowUp')));
+    expect(result.current.currentFocus).toBe('1');
+
+    act(() => result.current.handleKeyDown(createEvent('ArrowUp')));
+    expect(result.current.currentFocus).toBe('0');
+  });
+
   it('should set the focus to the next item when the arrow down key is pressed', () => {
     const {result} = renderHook(() => useRoveFocus(['0', '1', '2']));
     act(() => result.current.handleKeyDown(createEvent('ArrowDown')));
