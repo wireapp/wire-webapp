@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, useState} from 'react';
+import {useState} from 'react';
 
 import {Tooltip} from '@wireapp/react-ui-kit';
 
@@ -57,7 +57,7 @@ export interface EmojiPillProps {
 
 const MAX_USER_NAMES_TO_SHOW = 2;
 
-export const EmojiPill: FC<EmojiPillProps> = ({
+export const EmojiPill = ({
   emoji,
   emojiUnicode,
   handleReactionClick,
@@ -69,7 +69,7 @@ export const EmojiPill: FC<EmojiPillProps> = ({
   emojiListCount,
   hasUserReacted,
   reactingUsers,
-}) => {
+}: EmojiPillProps) => {
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
   const [isOpen, setTooltipVisibility] = useState(false);
   const emojiName = getEmojiTitleFromEmojiUnicode(emojiUnicode);

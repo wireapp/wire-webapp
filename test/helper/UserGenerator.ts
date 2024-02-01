@@ -19,7 +19,7 @@
 
 import {faker} from '@faker-js/faker';
 import {QualifiedId, UserAssetType} from '@wireapp/api-client/lib/user';
-import type {User as APIClientUser} from '@wireapp/api-client/lib/user/';
+import type {User as APIClientUser} from '@wireapp/api-client/lib/user';
 
 import {createUuid} from 'Util/uuid';
 
@@ -61,7 +61,7 @@ export function generateAPIUser(
   };
 }
 
-export function generateUser(id?: QualifiedId): User {
-  const apiUser = generateAPIUser(id);
+export function generateUser(id?: QualifiedId, overwites?: Partial<APIClientUser>): User {
+  const apiUser = generateAPIUser(id, overwites);
   return new UserMapper(serverTimeHandler).mapUserFromJson(apiUser, '');
 }

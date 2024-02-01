@@ -137,13 +137,19 @@ const MLSVerificationBadge = ({context, MLSStatus}: {MLSStatus?: MLSStatuses; co
         </span>
       );
     case MLSStatuses.NOT_DOWNLOADED:
-      <span {...mlsVerificationProps} data-tooltip={t('E2EI.certificateRevoked')}>
-        <CertificateRevoked />
+      <span {...mlsVerificationProps} data-tooltip={t('E2EI.certificateNotDownloaded')}>
+        <CertificateExpiredIcon />
       </span>;
     case MLSStatuses.EXPIRED:
       return (
         <span {...mlsVerificationProps} data-tooltip={t('E2EI.certificateExpired')}>
           <CertificateExpiredIcon />
+        </span>
+      );
+    case MLSStatuses.REVOKED:
+      return (
+        <span {...mlsVerificationProps} data-tooltip={t('E2EI.certificateRevoked')}>
+          <CertificateRevoked />
         </span>
       );
     case MLSStatuses.EXPIRES_SOON:

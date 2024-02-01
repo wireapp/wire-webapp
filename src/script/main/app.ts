@@ -31,6 +31,7 @@ import {container} from 'tsyringe';
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {initializeDataDog} from 'Util/DataDog';
 import {DebugUtil} from 'Util/DebugUtil';
 import {Environment} from 'Util/Environment';
@@ -63,6 +64,7 @@ import {OnConversationE2EIVerificationStateChange} from '../conversation/Convers
 import {EventBuilder} from '../conversation/EventBuilder';
 import {MessageRepository} from '../conversation/MessageRepository';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
+import {getModalOptions, ModalType} from '../E2EIdentity/Modals';
 import {User} from '../entity/User';
 import {AccessTokenError} from '../error/AccessTokenError';
 import {AuthError} from '../error/AuthError';
@@ -386,6 +388,16 @@ export class App {
 
       const selfUser = await this.initiateSelfUser();
 
+      const {features: teamFeatures, team} = await teamRepository.initTeam(selfUser.teamId);
+      const e2eiHandler = await configureE2EI(this.logger, teamFeatures);
+      if (e2eiHandler) {
+        /* We first try to do the initial enrollment (if the user has not yet enrolled)
+         * We need to enroll before anything else (in particular joining MLS conversations)
+         * Until the user is enrolled, we need to pause loading the app
+         */
+        await e2eiHandler.attemptEnrollment();
+      }
+
       this.core.configureCoreCallbacks({
         groupIdFromConversationId: async conversationId => {
           const conversation = await conversationRepository.getConversationById(conversationId);
@@ -424,29 +436,32 @@ export class App {
       onProgress(10);
       telemetry.timeStep(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
 
-      const {members: teamMembers, features: teamFeatures} = await teamRepository.initTeam(selfUser.teamId);
-      const e2eiHandler = await configureE2EI(this.logger, teamFeatures);
-      if (e2eiHandler) {
-        /* We first try to do the initial enrollment (if the user has not yet enrolled)
-         * We need to enroll before anything else (in particular joining MLS conversations)
-         * Until the user is enrolled, we need to pause loading the app
-         */
-        await e2eiHandler.attemptEnrollment();
-      }
+      const connections = await connectionRepository.getConnections();
 
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_USER_DATA);
 
-      const connections = await connectionRepository.getConnections();
       telemetry.addStatistic(AppInitStatisticsValue.CONNECTIONS, connections.length, 50);
 
       const conversations = await conversationRepository.loadConversations();
 
-      await userRepository.loadUsers(selfUser, connections, conversations, teamMembers);
+      // We load all the users the self user is connected with
+      const contacts = await userRepository.loadUsers(selfUser, connections, conversations);
+
+      if (team) {
+        // If we are in the context of team, we load the team members metadata (user roles)
+        await teamRepository.updateTeamMembersByIds(
+          team,
+          contacts.filter(user => user.teamId === team.id).map(({id}) => id),
+        );
+      }
 
       if (supportsMLS()) {
         //if mls is supported, we need to initialize the callbacks (they are used when decrypting messages)
         conversationRepository.initMLSConversationRecoveredListener();
-        registerMLSConversationVerificationStateHandler(this.updateConversationE2EIVerificationState);
+        registerMLSConversationVerificationStateHandler(
+          this.updateConversationE2EIVerificationState,
+          this.showClientCertificateRevokedWarning,
+        );
       }
 
       onProgress(25, t('initReceivedUserData'));
@@ -526,7 +541,11 @@ export class App {
 
       if (e2eiHandler) {
         // At the end of the process (once conversations are loaded and joined), we can check if we need to renew the user's certificate
-        await e2eiHandler.attemptRenewal();
+        try {
+          await e2eiHandler.attemptRenewal();
+        } catch (error) {
+          this.logger.error('Failed to renew user certificate: ', error);
+        }
       }
       return selfUser;
     } catch (error) {
@@ -850,5 +869,14 @@ export class App {
       default:
         break;
     }
+  };
+
+  private showClientCertificateRevokedWarning = async () => {
+    const {modalOptions, modalType} = getModalOptions({
+      type: ModalType.SELF_CERTIFICATE_REVOKED,
+      primaryActionFn: () => this.logout(SIGN_OUT_REASON.APP_INIT, false),
+    });
+
+    PrimaryModal.show(modalType, modalOptions);
   };
 }

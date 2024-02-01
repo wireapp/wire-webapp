@@ -329,6 +329,9 @@ jobs:
               "production": {
                 "targets": "[\"wire-webapp-prod-al2\"]"
               },
+              "release/q1-2024": {
+                "targets": "[\"wire-webapp-mls-al2\"]"
+              }
               "staging": {
                 "targets": "[\"wire-webapp-staging-al2\"]"
               }

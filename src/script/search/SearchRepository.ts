@@ -178,11 +178,11 @@ export class SearchRepository {
    * @note We skip a few results as connection changes need a while to reflect on the backend.
    *
    * @param query Search query
-   * @param isHandle Is query a user handle
+   * @param teamId Current team ID the selfUser is in (will help prioritize results)
    * @param maxResults Maximum number of results
    * @returns Resolves with the search results
    */
-  async searchByName(term: string, maxResults = CONFIG.MAX_SEARCH_RESULTS): Promise<User[]> {
+  async searchByName(term: string, teamId = '', maxResults = CONFIG.MAX_SEARCH_RESULTS): Promise<User[]> {
     const {query, isHandleQuery} = this.normalizeQuery(term);
     const [rawName, rawDomain] = this.core.backendFeatures.isFederated ? query.split('@') : [query];
     const [name, domain] = validateHandle(rawName, rawDomain) ? [rawName, rawDomain] : [query];
@@ -199,6 +199,10 @@ export class SearchRepository {
         .filter(user => !user.isMe)
         .filter(user => !isHandleQuery || startsWith(user.username(), query))
         .sort((userA, userB) => {
+          if (userA.teamId === teamId && userB.teamId !== teamId) {
+            // put team members first
+            return -1;
+          }
           return isHandleQuery
             ? sortByPriority(userA.username(), userB.username(), query)
             : sortByPriority(userA.name(), userB.name(), query);
