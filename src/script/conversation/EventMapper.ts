@@ -36,6 +36,8 @@ import {
   FederationStopEvent,
   FailedToAddUsersMessageEvent,
   E2EIVerificationEvent,
+  MessageAddEvent,
+  CompositeMessageAddEvent,
 } from './EventBuilder';
 
 import {AssetRemoteData} from '../assets/AssetRemoteData';
@@ -43,7 +45,6 @@ import {AssetTransferState} from '../assets/AssetTransferState';
 import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
 import {AssetData} from '../cryptography/CryptographyMapper';
 import type {Conversation} from '../entity/Conversation';
-import type {Asset} from '../entity/message/Asset';
 import {Button} from '../entity/message/Button';
 import {CallingTimeoutMessage} from '../entity/message/CallingTimeoutMessage';
 import {CallMessage} from '../entity/message/CallMessage';
@@ -624,36 +625,37 @@ export class EventMapper {
    * @param event Message data
    * @returns Content message entity
    */
-  private _mapEventMessageAdd(event: LegacyEventRecord) {
+  private _mapEventMessageAdd(event: MessageAddEvent) {
     const {data: eventData, edited_time: editedTime} = event;
     const messageEntity = new ContentMessage();
 
     const assets = this._mapAssetText(eventData);
     messageEntity.assets.push(assets);
     messageEntity.replacing_message_id = eventData.replacing_message_id;
-    messageEntity.edited_timestamp(new Date(editedTime || eventData.edited_time).getTime());
+    if (editedTime) {
+      messageEntity.edited_timestamp(new Date(editedTime).getTime());
+    }
 
     if (eventData.quote) {
-      const {message_id: messageId, user_id: userId, error} = eventData.quote;
+      const {message_id: messageId, user_id: userId, error} = eventData.quote as any;
       messageEntity.quote(new QuoteEntity({error, messageId, userId}));
     }
 
     return messageEntity;
   }
 
-  private _mapEventCompositeMessageAdd(event: LegacyEventRecord) {
+  private _mapEventCompositeMessageAdd(event: CompositeMessageAddEvent) {
     const {data: eventData} = event;
     const messageEntity = new CompositeMessage();
-    const assets: (Asset | FileAsset | Text | MediumImage)[] = eventData.items.map(
-      (item: {button: {id: string; text: string}; text: LegacyEventRecord}): void | Button | Text => {
-        if (item.button) {
-          return new Button(item.button.id, item.button.text);
-        }
-        if (item.text) {
-          return this._mapAssetText(item.text);
-        }
-      },
-    );
+    const assets = eventData.items.flatMap(item => {
+      if (item.button) {
+        return [new Button(item.button.id, item.button.text)];
+      }
+      if (item.text) {
+        return [this._mapAssetText(item.text)];
+      }
+      return [];
+    });
     messageEntity.assets.push(...assets);
     return messageEntity;
   }
@@ -1004,7 +1006,7 @@ export class EventMapper {
    * @param eventData Asset data received as JSON
    * @returns Text asset entity
    */
-  private _mapAssetText(eventData: LegacyEventRecord) {
+  private _mapAssetText(eventData: MessageAddEvent['data']) {
     const {id, content, mentions, message, previews} = eventData;
     const messageText = content || message;
     const assetEntity = new Text(id, messageText);
