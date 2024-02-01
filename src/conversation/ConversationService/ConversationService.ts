@@ -28,6 +28,7 @@ import {
   PostMlsMessageResponse,
   MLSConversation,
   SUBCONVERSATION_ID,
+  Subconversation,
 } from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_TYPING, ConversationMemberUpdateData} from '@wireapp/api-client/lib/conversation/data';
 import {
@@ -72,6 +73,7 @@ import {isMLSConversation} from '../../util';
 import {mapQualifiedUserClientIdsToFullyQualifiedClientIds} from '../../util/fullyQualifiedClientIdUtils';
 import {RemoteData} from '../content';
 import {isSendingMessage, sendMessage} from '../message/messageSender';
+import {SubconversationService} from '../SubconversationService/SubconversationService';
 
 type Events = {
   MLSConversationRecovered: {conversationId: QualifiedId};
@@ -89,6 +91,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
       conversationId: QualifiedId,
       subconversationId?: SUBCONVERSATION_ID,
     ) => Promise<string | undefined>,
+    private readonly subconversationService: SubconversationService,
     private readonly _mlsService?: MLSService,
   ) {
     super();
@@ -334,7 +337,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
       const isMLSStaleMessageError =
         error instanceof BackendError && error.label === BackendErrorLabel.MLS_STALE_MESSAGE;
       if (isMLSStaleMessageError) {
-        await this.recoverMLSConversationFromEpochMismatch(conversationId);
+        await this.recoverMLSGroupFromEpochMismatch(conversationId);
         if (shouldRetry) {
           return this.sendMLSMessage(params, false);
         }
@@ -470,9 +473,44 @@ export class ConversationService extends TypedEventEmitter<Events> {
   }
 
   /**
-   * Handles epoch mismatch in a single MLS conversation.
-   * Compares the epoch of the local conversation with the epoch of the remote conversation.
-   * If the epochs do not match, it will try to rejoin the conversation via external commit.
+   * Handles epoch mismatch in a subconversation.
+   * @param subconversation - subconversation
+   */
+  private async handleSubconversationEpochMismatch(subconversation: Subconversation) {
+    const {
+      parent_qualified_id: parentConversationId,
+      group_id: groupId,
+      epoch,
+      subconv_id: subconversationId,
+    } = subconversation;
+
+    try {
+      await this.handleEpochMismatch({
+        groupId,
+        epoch,
+        onEpochMismatch: async () => {
+          this.logger.log(
+            `Subconversation "${subconversationId}" (parent id: ${parentConversationId.id}) was not established or it's epoch number was out of date, joining via external commit`,
+          );
+
+          // We only support conference subconversations for now
+          if (subconversationId !== SUBCONVERSATION_ID.CONFERENCE) {
+            throw new Error('Unexpected subconversation id');
+          }
+
+          await this.subconversationService.joinConferenceSubconversation(parentConversationId);
+        },
+      });
+    } catch (error) {
+      this.logger.error(
+        `There was an error while handling epoch mismatch in MLS subconversation (id: ${parentConversationId.id}, subconv: ${subconversationId}):`,
+        error,
+      );
+    }
+  }
+
+  /**
+   * Handles epoch mismatch in a MLS conversation.
    * @param mlsConversation - mls conversation
    */
   private async handleConversationEpochMismatch(
@@ -482,25 +520,49 @@ export class ConversationService extends TypedEventEmitter<Events> {
     const {qualified_id: qualifiedId, group_id: groupId, epoch} = remoteMlsConversation;
 
     try {
-      const isEstablished = await this.mlsGroupExistsLocally(groupId);
-      const doesEpochMatch = isEstablished && (await this.matchesEpoch(groupId, epoch));
+      return this.handleEpochMismatch({
+        groupId,
+        epoch,
+        onEpochMismatch: async () => {
+          this.logger.log(
+            `Conversation (id ${qualifiedId.id}) was not established or it's epoch number was out of date, joining via external commit`,
+          );
+          await this.joinByExternalCommit(qualifiedId);
 
-      //if conversation is not established or epoch does not match -> try to rejoin
-      if (!isEstablished || !doesEpochMatch) {
-        this.logger.log(
-          `Conversation (id ${qualifiedId.id}) was not established or it's epoch number was out of date, joining via external commit`,
-        );
-        await this.joinByExternalCommit(qualifiedId);
-
-        if (onSuccessfulRejoin) {
-          onSuccessfulRejoin();
-        }
-      }
+          onSuccessfulRejoin?.();
+        },
+      });
     } catch (error) {
       this.logger.error(
         `There was an error while handling epoch mismatch in MLS conversation (id: ${qualifiedId.id}):`,
         error,
       );
+    }
+  }
+
+  /**
+   * Handles epoch mismatch in a MLS group.
+   * Compares the epoch of the local group with the epoch of the remote conversation.
+   * If the epochs do not match, it will call onEpochMismatch callback.
+   * @param groupId - id of the MLS group
+   * @param epoch - epoch of the remote conversation
+   * @param onEpochMismatch - callback to be called when epochs do not match
+   */
+  private async handleEpochMismatch({
+    groupId,
+    epoch,
+    onEpochMismatch,
+  }: {
+    groupId: string;
+    epoch: number;
+    onEpochMismatch: () => Promise<any>;
+  }) {
+    const isEstablished = await this.mlsGroupExistsLocally(groupId);
+    const doesEpochMatch = isEstablished && (await this.matchesEpoch(groupId, epoch));
+
+    //if conversation is not established or epoch does not match -> try to rejoin
+    if (!isEstablished || !doesEpochMatch) {
+      await onEpochMismatch();
     }
   }
 
@@ -634,19 +696,28 @@ export class ConversationService extends TypedEventEmitter<Events> {
         this.logger.info(
           `Received message for the wrong epoch in conversation ${event.conversation}, handling epoch mismatch...`,
         );
-        const conversationId = event.qualified_conversation;
+        const {qualified_conversation: conversationId, subconv} = event;
         if (!conversationId) {
           throw new Error('Qualified conversation id is missing in the event');
         }
 
-        await this.recoverMLSConversationFromEpochMismatch(conversationId);
+        await this.recoverMLSGroupFromEpochMismatch(conversationId, subconv);
         return null;
       }
       throw error;
     }
   }
 
-  private async recoverMLSConversationFromEpochMismatch(conversationId: QualifiedId) {
+  private async recoverMLSGroupFromEpochMismatch(conversationId: QualifiedId, subconversationId?: SUBCONVERSATION_ID) {
+    if (subconversationId) {
+      const subconversation = await this.apiClient.api.conversation.getSubconversation(
+        conversationId,
+        subconversationId,
+      );
+
+      return this.handleSubconversationEpochMismatch(subconversation);
+    }
+
     const mlsConversation = await this.apiClient.api.conversation.getConversation(conversationId);
 
     if (!isMLSConversation(mlsConversation)) {
