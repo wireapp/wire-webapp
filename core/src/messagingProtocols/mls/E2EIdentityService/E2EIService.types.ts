@@ -30,6 +30,8 @@ import {
 
 import {E2EIServiceExternal} from './E2EIServiceExternal';
 
+import {NewCrlDistributionPointsPayload} from '../MLSService/MLSService.types';
+
 /**
  * Proxy types relevant to the E2EIService from CoreCrypto
  */
@@ -75,4 +77,5 @@ export interface InitParams {
   skipInit?: boolean;
   discoveryUrl?: string;
   keyPackagesAmount: number;
+  dispatchNewCrlDistributionPoints: (payload: NewCrlDistributionPointsPayload) => void;
 }

@@ -260,13 +260,15 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
   }
 
   private async validateCrl(url: string, crl: Uint8Array, onDirty: () => Promise<void>): Promise<void> {
-    const {expiration, dirty} = await this.coreCryptoClient.e2eiRegisterCRL(url, crl);
+    const {expiration: expirationTimestampSeconds, dirty} = await this.coreCryptoClient.e2eiRegisterCRL(url, crl);
+
+    const expirationTimestamp = expirationTimestampSeconds && expirationTimestampSeconds * TimeInMillis.SECOND;
 
     await this.cancelCrlDistributionTimer(url);
 
     //set a new timer that will execute a task once the CRL is expired
-    if (expiration) {
-      await this.addCrlDistributionTimer({expiresAt: expiration, url});
+    if (expirationTimestamp !== undefined) {
+      await this.addCrlDistributionTimer({expiresAt: expirationTimestamp, url});
     }
 
     //if it was dirty, trigger e2eiconversationstate for every conversation
