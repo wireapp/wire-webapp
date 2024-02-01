@@ -20,9 +20,16 @@
 import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';
+import {ConversationState} from 'src/script/conversation/ConversationState';
+import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import {EventError} from 'src/script/error/EventError';
-import {createAssetAddEvent, createMessageAddEvent, toSavedEvent} from 'test/helper/EventGenerator';
+import {
+  createAssetAddEvent,
+  createMemberLeaveEvent,
+  createMessageAddEvent,
+  toSavedEvent,
+} from 'test/helper/EventGenerator';
 import {createUuid} from 'Util/uuid';
 
 import {EventStorageMiddleware} from './EventStorageMiddleware';
@@ -37,9 +44,15 @@ function buildEventStorageMiddleware() {
     replaceEvent: jest.fn(event => event),
     deleteEvent: jest.fn(),
   } as unknown as jest.Mocked<EventService>;
-
+  const conversationState = {
+    findConversation: jest.fn(),
+  } as unknown as jest.Mocked<ConversationState>;
   const selfUser = new User(createUuid());
-  return [new EventStorageMiddleware(eventService, selfUser), {eventService, selfUser}] as const;
+
+  return [
+    new EventStorageMiddleware(eventService, selfUser, conversationState),
+    {eventService, conversationState, selfUser},
+  ] as const;
 }
 
 describe('EventStorageMiddleware', () => {
@@ -72,6 +85,66 @@ describe('EventStorageMiddleware', () => {
           'Event validation failed: ID previously used by another user',
         ),
       );
+    });
+
+    it('fails for a member leave event when users are not part of the conversation', async () => {
+      const [eventStorageMiddleware, {conversationState}] = buildEventStorageMiddleware();
+      const conversationId = createUuid();
+      const userIds = [createUuid(), createUuid(), createUuid(), createUuid()];
+      const conversation = new Conversation(conversationId, '');
+
+      conversationState.findConversation.mockImplementation(() => conversation);
+
+      const event = createMemberLeaveEvent(conversationId, userIds);
+
+      await expect(eventStorageMiddleware.processEvent(event)).rejects.toEqual(
+        new EventError(
+          EventError.TYPE.VALIDATION_FAILED,
+          'Event validation failed: User is not part of the conversation',
+        ),
+      );
+    });
+
+    it('fails for a member leave event when users are part of the conversation but are deleted already', async () => {
+      const [eventStorageMiddleware, {conversationState}] = buildEventStorageMiddleware();
+      const conversationId = createUuid();
+      const userIds = [createUuid(), createUuid(), createUuid()];
+      const user1 = new User(userIds[0]);
+      const user2 = new User(userIds[1]);
+      const user3 = new User(userIds[2]);
+      user1.isDeleted = true;
+      user2.isDeleted = true;
+      user3.isDeleted = true;
+      const conversation = new Conversation(conversationId, '');
+      conversation.participating_user_ets([user1, user2, user3]);
+
+      conversationState.findConversation.mockImplementation(() => conversation);
+
+      const event = createMemberLeaveEvent(conversationId, userIds);
+
+      await expect(eventStorageMiddleware.processEvent(event)).rejects.toEqual(
+        new EventError(
+          EventError.TYPE.VALIDATION_FAILED,
+          'Event validation failed: User is not part of the conversation',
+        ),
+      );
+    });
+
+    it('does not return an error for a member leave event when users are part of the conversation', async () => {
+      const [eventStorageMiddleware, {conversationState}] = buildEventStorageMiddleware();
+      const conversationId = createUuid();
+      const userIds = [createUuid(), createUuid(), createUuid()];
+      const user1 = new User(userIds[0]);
+      const user2 = new User(userIds[1]);
+      const user3 = new User(userIds[2]);
+      const conversation = new Conversation(conversationId, '');
+      conversation.participating_user_ets([user1, user2, user3]);
+
+      conversationState.findConversation.mockImplementation(() => conversation);
+
+      const event = createMemberLeaveEvent(conversationId, userIds);
+
+      await expect(eventStorageMiddleware.processEvent(event)).resolves.toEqual(event);
     });
 
     it('fails for a non-"text message" with an ID previously used by the same user', async () => {
