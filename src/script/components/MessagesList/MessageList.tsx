@@ -39,6 +39,7 @@ import {useResizeObserver} from 'Util/DOM/resizeObserver';
 
 import {Message, MessageActions} from './Message';
 import {MarkerComponent} from './Message/Marker';
+import {ScrollToElement} from './Message/types';
 import {groupMessagesBySenderAndTime, isMarker} from './utils/messagesGroup';
 
 import {Conversation as ConversationEntity, Conversation} from '../../entity/Conversation';
@@ -257,8 +258,18 @@ const MessagesList: FC<MessagesListParams> = ({
     <FadingScrollbar ref={messageListRef} id="message-list" className="message-list" tabIndex={TabIndex.UNFOCUSABLE}>
       <div ref={setMessageContainer} className={cx('messages', {'flex-center': verticallyCenterMessage()})}>
         {groupedMessages.map(group => {
+          const scrollTo: ScrollToElement = ({element, center}, isUnread) => {
+            if (isUnread && messagesContainer) {
+              // if it's a new unread message, but we are not on the first render of the list,
+              // we do not need to scroll to the unread message
+              return;
+            }
+            focusedElement.current = {center, element};
+            setTimeout(() => (focusedElement.current = null), 1000);
+            updateScroll(messagesContainer);
+          };
           if (isMarker(group)) {
-            return <MarkerComponent key={`${group.type}-${group.timestamp}`} marker={group} />;
+            return <MarkerComponent key={`${group.type}-${group.timestamp}`} scrollTo={scrollTo} marker={group} />;
           }
           const {messages, firstMessageTimestamp} = group;
 
@@ -280,16 +291,7 @@ const MessagesList: FC<MessagesListParams> = ({
                 hasReadReceiptsTurnedOn={conversationRepository.expectReadReceipt(conversation)}
                 isLastDeliveredMessage={isLastDeliveredMessage}
                 isMarked={!!focusedMessage && focusedMessage === message.id}
-                scrollTo={({element, center}, isUnread) => {
-                  if (isUnread && messagesContainer) {
-                    // if it's a new unread message, but we are not on the first render of the list,
-                    // we do not need to scroll to the unread message
-                    return;
-                  }
-                  focusedElement.current = {center, element};
-                  setTimeout(() => (focusedElement.current = null), 1000);
-                  updateScroll(messagesContainer);
-                }}
+                scrollTo={scrollTo}
                 isSelfTemporaryGuest={selfUser.isTemporaryGuest()}
                 messageRepository={messageRepository}
                 onClickAvatar={showUserDetails}

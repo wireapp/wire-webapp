@@ -17,6 +17,8 @@
  *
  */
 
+import {useLayoutEffect, useRef} from 'react';
+
 import {SerializedStyles, css} from '@emotion/react';
 
 import {useRelativeTimestamp} from 'src/script/hooks/useRelativeTimestamp';
@@ -25,20 +27,28 @@ import {dayMarkerStyle, baseMarkerStyle} from './Marker.styles';
 
 import {Marker} from '../../utils/messagesGroup';
 import {MessageTime} from '../MessageTime';
+import {ScrollToElement} from '../types';
 
 const markerStyles: Partial<Record<Marker['type'], SerializedStyles>> = {
   day: dayMarkerStyle,
 };
 
-export function MarkerComponent({marker}: {marker: Marker}) {
+export function MarkerComponent({marker, scrollTo}: {marker: Marker; scrollTo: ScrollToElement}) {
   const timeAgo = useRelativeTimestamp(marker.timestamp, marker.type === 'day');
+  const elementRef = useRef<HTMLDivElement>(null);
 
   const style = css`
     ${baseMarkerStyle} ${markerStyles[marker.type]}
   `;
 
+  useLayoutEffect(() => {
+    if (marker.type === 'unread') {
+      scrollTo({element: elementRef.current}, true);
+    }
+  }, []);
+
   return (
-    <div className="message-header" css={style}>
+    <div className="message-header" css={style} ref={elementRef}>
       <div className="message-header-icon">
         {marker.type === 'unread' && <span className="message-unread-dot dot-md" />}
       </div>

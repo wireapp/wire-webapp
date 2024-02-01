@@ -30,6 +30,7 @@ import {isTabKey} from 'Util/KeyboardUtil';
 
 import {ElementType, MessageDetails} from './ContentMessage/asset/TextMessageRenderer';
 import {MessageWrapper} from './MessageWrapper';
+import {ScrollToElement} from './types';
 import {useMessageFocusedTabIndex} from './util';
 
 import type {MessageRepository} from '../../../conversation/MessageRepository';
@@ -79,9 +80,7 @@ export interface MessageParams extends MessageActions {
   setMsgElementsFocusable: (isMsgElementsFocusable: boolean) => void;
 }
 
-export const Message: React.FC<
-  MessageParams & {scrollTo?: (elm: {center?: boolean; element: HTMLElement}, isUnread?: boolean) => void}
-> = props => {
+export const Message: React.FC<MessageParams & {scrollTo?: ScrollToElement}> = props => {
   const {
     message,
     isMarked,
@@ -105,7 +104,6 @@ export const Message: React.FC<
     }
     if (isMarked) {
       scrollTo?.({center: true, element: messageElementRef.current});
-
       // for reply message, focus on the original message when original message link is clicked for keyboard users
       handleFocus(message.id);
     }
