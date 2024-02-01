@@ -70,4 +70,15 @@ describe('useRoveFocus', () => {
     act(() => result.current.handleKeyDown(createEvent('Enter')));
     expect(result.current.focusedId).toBe(undefined);
   });
+
+  it('should keep focused element stable as the array changes', () => {
+    const {result, rerender} = renderHook(useRoveFocus, {initialProps: ['0', '1', '2']});
+
+    act(() => result.current.setFocusedId('1'));
+    expect(result.current.focusedId).toBe('1');
+
+    // Adding one element at the end
+    rerender(['0', '2', '3', '1']);
+    expect(result.current.focusedId).toBe('1');
+  });
 });
