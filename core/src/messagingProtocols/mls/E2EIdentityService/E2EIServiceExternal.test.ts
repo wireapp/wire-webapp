@@ -17,7 +17,7 @@
  *
  */
 
-import {Ciphersuite, CoreCrypto, WireIdentity} from '@wireapp/core-crypto';
+import {CoreCrypto, WireIdentity} from '@wireapp/core-crypto';
 
 import {E2EIServiceExternal} from './E2EIServiceExternal';
 
@@ -25,6 +25,7 @@ import {ClientService} from '../../../client';
 import {openDB} from '../../../storage/CoreDB';
 import {getUUID} from '../../../test/PayloadHelper';
 import {RecurringTaskScheduler} from '../../../util/RecurringTaskScheduler';
+import {MLSService} from '../MLSService';
 
 async function buildE2EIService() {
   const coreCrypto = {
@@ -36,6 +37,11 @@ async function buildE2EIService() {
 
   const mockedDb = await openDB('core-test-db');
 
+  const mockedMLSService = {
+    on: jest.fn(),
+    getClientIds: jest.fn(),
+  } as unknown as MLSService;
+
   const recurringTaskScheduler = new RecurringTaskScheduler({
     delete: key => mockedDb.delete('recurringTasks', key),
     get: async key => (await mockedDb.get('recurringTasks', key))?.firingDate,
@@ -45,14 +51,8 @@ async function buildE2EIService() {
   });
 
   return [
-    new E2EIServiceExternal(
-      coreCrypto,
-      mockedDb,
-      recurringTaskScheduler,
-      clientService,
-      Ciphersuite.MLS_128_DHKEMP256_AES128GCM_SHA256_P256,
-    ),
-    {coreCrypto},
+    new E2EIServiceExternal(coreCrypto, mockedDb, recurringTaskScheduler, clientService, mockedMLSService),
+    {coreCrypto, mlsService: mockedMLSService},
   ] as const;
 }
 
@@ -124,6 +124,40 @@ describe('E2EIServiceExternal', () => {
 
       expect(userIdentities.get(user1.id)).toHaveLength(3);
       expect(userIdentities.get(user2.id)).toHaveLength(1);
+    });
+  });
+
+  describe('getAllGroupUsersIdentities', () => {
+    it('returns all the user identities of a mls group', async () => {
+      const [service, {coreCrypto, mlsService}] = await buildE2EIService();
+      const user1 = {
+        domain: 'elna.wire.link',
+        userId: '48a1c3b0-4b0e-4bcd-93ad-64c7344b1534',
+        clientId: '74a50c1f4352b41f',
+      };
+      const user2 = {
+        domain: 'elna.wire.link',
+        userId: 'b7d287e4-7bbd-40e0-a550-6b18dcaf5f31',
+        clientId: '452cb4c65f0369a8',
+      };
+      const clientIds = [user1, user2];
+
+      jest.spyOn(mlsService, 'getClientIds').mockResolvedValue(clientIds);
+
+      coreCrypto.getUserIdentities.mockResolvedValue(
+        new Map([
+          [
+            user1.userId,
+            [generateCoreCryptoIdentity({userId: user1.userId}), generateCoreCryptoIdentity({userId: user1.userId})],
+          ],
+          [user2.userId, [generateCoreCryptoIdentity({userId: user2.userId})]],
+        ]),
+      );
+
+      const userIdentities = await service.getAllGroupUsersIdentities(groupId);
+
+      expect(userIdentities.get(user1.userId)).toHaveLength(2);
+      expect(userIdentities.get(user2.userId)).toHaveLength(1);
     });
   });
 });
