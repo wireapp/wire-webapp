@@ -23,4 +23,5 @@ export enum E2EIVerificationMessageType {
   EXPIRED = 'expired',
   REVOKED = 'revoked',
   VERIFIED = 'verified',
+  NO_LONGER_VERIFIED = 'no-longer-verified',
 }

@@ -111,5 +111,21 @@ describe('E2EIVerificationMessage', () => {
       const elementMessageVerification = getByTestId('element-message-verification');
       expect(elementMessageVerification.getAttribute('data-uie-value')).toEqual(E2EIVerificationMessageType.REVOKED);
     });
+
+    it('show certificate no longer verified', async () => {
+      const message = createVerificationMessage({
+        messageType: E2EIVerificationMessageType.NO_LONGER_VERIFIED,
+        userIds: [user.qualifiedId],
+      });
+
+      const {getByTestId} = render(
+        withTheme(<E2EIVerificationMessage message={message} conversation={conversation} />),
+      );
+
+      const elementMessageVerification = getByTestId('element-message-verification');
+      expect(elementMessageVerification.getAttribute('data-uie-value')).toEqual(
+        E2EIVerificationMessageType.NO_LONGER_VERIFIED,
+      );
+    });
   });
 });
