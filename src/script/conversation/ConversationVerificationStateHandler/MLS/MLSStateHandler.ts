@@ -24,8 +24,8 @@ import {container} from 'tsyringe';
 
 import {
   getActiveWireIdentity,
+  getAllGroupUsersIdentities,
   getConversationVerificationState,
-  getUsersIdentities,
   MLSStatuses,
 } from 'src/script/E2EIdentity';
 import {Conversation} from 'src/script/entity/Conversation';
@@ -68,7 +68,7 @@ class MLSConversationVerificationStateHandler {
   private async degradeConversation(conversation: MLSConversation) {
     const state = ConversationVerificationState.DEGRADED;
     conversation.mlsVerificationState(state);
-    const userIdentities = await getUsersIdentities(conversation.groupId, conversation.participating_user_ids());
+    const userIdentities = await getAllGroupUsersIdentities(conversation.groupId);
     const degradedUsers: QualifiedId[] = [];
     for (const [userId, identities] of userIdentities.entries()) {
       if (identities.some(identity => identity.status !== MLSStatuses.VALID)) {
