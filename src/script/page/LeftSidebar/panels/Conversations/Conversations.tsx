@@ -338,46 +338,48 @@ const Conversations: React.FC<ConversationsProps> = ({
         </>
       ) : (
         <>
-          <Input
-            value={conversationsFilter}
-            onChange={event => {
-              setConversationsFilter(event.currentTarget.value);
-            }}
-            startContent={
-              <SearchIcon
-                css={{
-                  top: '50%',
-                  left: 10,
-                  position: 'absolute',
-                  transform: 'translateY(-50%)',
-                }}
-              />
-            }
-            endContent={
-              conversationsFilter && (
-                <CircleCloseIcon
-                  className="cursor-pointer"
-                  onClick={() => setConversationsFilter('')}
+          {isRecentViewStyle && (
+            <Input
+              value={conversationsFilter}
+              onChange={event => {
+                setConversationsFilter(event.currentTarget.value);
+              }}
+              startContent={
+                <SearchIcon
                   css={{
                     top: '50%',
-                    right: 10,
+                    left: 10,
                     position: 'absolute',
                     transform: 'translateY(-50%)',
                   }}
                 />
-              )
-            }
-            inputCSS={{height: '32px', borderRadius: 8, paddingLeft: 36}}
-            wrapperCSS={{
-              marginBottom: 12,
-              marginTop: 12,
-              paddingLeft: 16,
-              paddingRight: 16,
-              zIndex: 1,
-              position: 'relative',
-            }}
-            placeholder={t('searchConversations')}
-          />
+              }
+              endContent={
+                conversationsFilter && (
+                  <CircleCloseIcon
+                    className="cursor-pointer"
+                    onClick={() => setConversationsFilter('')}
+                    css={{
+                      top: '50%',
+                      right: 10,
+                      position: 'absolute',
+                      transform: 'translateY(-50%)',
+                    }}
+                  />
+                )
+              }
+              inputCSS={{height: '32px', fontWeight: 400, fontSize: 14, borderRadius: 8, paddingLeft: 36}}
+              wrapperCSS={{
+                marginBottom: 12,
+                marginTop: 12,
+                paddingLeft: 16,
+                paddingRight: 16,
+                zIndex: 1,
+                position: 'relative',
+              }}
+              placeholder={t('searchConversations')}
+            />
+          )}
           {filteredConversations.length === 0 && (
             <div className="conversations-centered">
               <div>{t('searchConversationsNoResult')}</div>
