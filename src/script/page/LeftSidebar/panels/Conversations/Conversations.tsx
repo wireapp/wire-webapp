@@ -105,7 +105,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
 
   const filteredConversations = conversations.filter(conversation =>
-    conversation.name().toLowerCase().includes(conversationsFilter.toLowerCase()),
+    conversation.display_name().toLowerCase().includes(conversationsFilter.toLowerCase()),
   );
 
   const initialViewStyle = propertiesRepository.getPreference(PROPERTIES_TYPE.INTERFACE.VIEW_FOLDERS)
