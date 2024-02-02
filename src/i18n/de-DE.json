@@ -361,6 +361,7 @@
   "conversation.E2EICallDisconnected": "Der Anruf wurde unterbrochen, da {{user}} ein neues Gerät verwendet oder ein ungültiges Zertifikat hat.",
   "conversation.E2EICancel": "Abbrechen",
   "conversation.E2EICertificateExpired": "Diese Unterhaltung ist nicht mehr überprüft, da [bold]{{user}}[/bold] mindestens ein Gerät mit einem abgelaufenen Ende-zu-Ende-Identitätszertifikat verwendet. ",
+  "conversation.E2EICertificateNoLongerVerifiedGeneric": "This conversation is no longer verified, as at least one participant started using a new device or has an invalid certificate. [link]Learn more[/link]",
   "conversation.E2EICertificateRevoked": "Diese Unterhaltung ist nicht mehr überprüft, da ein Team-Admin das Ende-zu-Ende-Identitätszertifikat für mindestens ein Gerät von [bold]{{user}}[/bold] widerrufen hat. [link]Mehr erfahren[/link]",
   "conversation.E2EIConversationNoLongerVerified": "Unterhaltung nicht mehr überprüft",
   "conversation.E2EIDegradedInitiateCall": "Mindestens ein Teilnehmer hat begonnen, ein neues Gerät zu verwenden oder hat ein ungültiges Zertifikat.\nMöchten Sie trotzdem anrufen?",
