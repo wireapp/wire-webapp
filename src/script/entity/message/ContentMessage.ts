@@ -45,7 +45,7 @@ export class ContentMessage extends Message {
   public readonly fileData: ko.Observable<Blob | undefined> = ko.observable();
   public readonly quote = ko.observable<QuoteEntity | undefined>();
   public readonly was_edited: ko.PureComputed<boolean>;
-  public replacing_message_id: null | string = null;
+  public replacing_message_id?: string;
   readonly edited_timestamp: ko.Observable<number | null> = ko.observable(null);
   readonly reactions = ko.observable<ReactionMap>([]);
   public super_type = SuperType.CONTENT;

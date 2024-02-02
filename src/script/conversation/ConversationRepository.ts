@@ -26,7 +26,7 @@ import {
   MessageSendingStatus,
   RemoteConversations,
 } from '@wireapp/api-client/lib/conversation';
-import {ConversationReceiptModeUpdateData} from '@wireapp/api-client/lib/conversation/data/';
+import {MemberLeaveReason, ConversationReceiptModeUpdateData} from '@wireapp/api-client/lib/conversation/data';
 import {CONVERSATION_TYPING} from '@wireapp/api-client/lib/conversation/data/ConversationTypingData';
 import {
   ConversationCreateEvent,
@@ -802,7 +802,7 @@ export class ConversationRepository {
    */
   async getEventsForCategory(conversationEntity: Conversation, category = MessageCategory.NONE): Promise<Message[]> {
     const events = (await this.eventService.loadEventsWithCategory(conversationEntity.id, category)) as EventRecord[];
-    const messageEntities = (await this.event_mapper.mapJsonEvents(events, conversationEntity)) as Message[];
+    const messageEntities = this.event_mapper.mapJsonEvents(events, conversationEntity) as Message[];
     return this.updateMessagesUserEntities(messageEntities);
   }
 
@@ -818,7 +818,7 @@ export class ConversationRepository {
     }
 
     const events = await this.conversationService.searchInConversation(conversationEntity.id, query);
-    const mappedMessages = await this.event_mapper.mapJsonEvents(events, conversationEntity);
+    const mappedMessages = this.event_mapper.mapJsonEvents(events, conversationEntity);
     const messageEntities = await this.updateMessagesUserEntities(mappedMessages);
     return {messageEntities, query};
   }
@@ -1892,20 +1892,12 @@ export class ConversationRepository {
   };
 
   /**
-   * @returns resolves when deleted conversations are locally deleted, too.
+   * will locally delete conversations that no longer exist on backend side
    */
-  checkForDeletedConversations() {
-    return Promise.all(
-      this.conversationState.conversations().map(async conversation => {
-        try {
-          await this.conversationService.getConversationById(conversation);
-        } catch ({code}) {
-          if (code === HTTP_STATUS.NOT_FOUND) {
-            this.deleteConversationLocally(conversation, true);
-          }
-        }
-      }),
-    );
+  async syncDeletedConversations() {
+    const conversationIds = this.conversationState.conversations().map(conversation => conversation.qualifiedId);
+    const {not_found = []} = await this.conversationService.getConversationByIds(conversationIds);
+    not_found.forEach(deletedConversationId => this.deleteConversationLocally(deletedConversationId, true));
   }
 
   private readonly onUserSupportedProtocolsUpdated = async ({user}: {user: User}) => {
@@ -3020,6 +3012,19 @@ export class ConversationRepository {
         return this.onMemberJoin(conversationEntity, eventJson);
 
       case CONVERSATION_EVENT.MEMBER_LEAVE:
+        if (eventJson.data.reason === MemberLeaveReason.USER_DELETED) {
+          eventJson.data.qualified_user_ids?.forEach(qualifiedUserId => {
+            const user = this.userState.users().find(user => matchQualifiedIds(user.qualifiedId, qualifiedUserId));
+            if (!user?.teamId) {
+              return;
+            }
+
+            void this.teamMemberLeave(user?.teamId, user?.qualifiedId, new Date(eventJson.time).getTime());
+          });
+          return;
+        }
+        return this.onMemberLeave(conversationEntity, eventJson);
+
       case ClientEvent.CONVERSATION.TEAM_MEMBER_LEAVE:
         return this.onMemberLeave(conversationEntity, eventJson);
 
@@ -3204,19 +3209,17 @@ export class ConversationRepository {
   };
 
   private on1to1Creation(conversationEntity: Conversation, eventJson: OneToOneCreationEvent) {
-    return this.event_mapper
-      .mapJsonEvent(eventJson, conversationEntity)
-      .then(messageEntity => this.updateMessageUserEntities(messageEntity))
-      .then((messageEntity: MemberMessage) => {
-        const userEntity = messageEntity.otherUser();
-        const isOutgoingRequest = userEntity?.isOutgoingRequest();
-        if (isOutgoingRequest) {
-          messageEntity.memberMessageType = SystemMessageType.CONNECTION_REQUEST;
-        }
+    const message = this.event_mapper.mapJsonEvent(eventJson, conversationEntity);
+    return this.updateMessageUserEntities(message).then((messageEntity: MemberMessage) => {
+      const userEntity = messageEntity.otherUser();
+      const isOutgoingRequest = userEntity?.isOutgoingRequest();
+      if (isOutgoingRequest) {
+        messageEntity.memberMessageType = SystemMessageType.CONNECTION_REQUEST;
+      }
 
-        conversationEntity.addMessage(messageEntity);
-        return {conversationEntity};
-      });
+      conversationEntity.addMessage(messageEntity);
+      return {conversationEntity};
+    });
   }
 
   /**
@@ -3268,7 +3271,7 @@ export class ConversationRepository {
   }
 
   private async onGroupCreation(conversationEntity: Conversation, eventJson: GroupCreationEvent) {
-    const messageEntity = await this.event_mapper.mapJsonEvent(eventJson, conversationEntity);
+    const messageEntity = this.event_mapper.mapJsonEvent(eventJson, conversationEntity);
     const creatorId = conversationEntity.creator;
     const creatorDomain = conversationEntity.domain;
     const createdByParticipant = !!conversationEntity
@@ -3824,7 +3827,7 @@ export class ConversationRepository {
   };
 
   private async initMessageEntity(conversationEntity: Conversation, eventJson: IncomingEvent): Promise<Message> {
-    const messageEntity = await this.event_mapper.mapJsonEvent(eventJson, conversationEntity);
+    const messageEntity = this.event_mapper.mapJsonEvent(eventJson, conversationEntity);
     return this.updateMessageUserEntities(messageEntity);
   }
 

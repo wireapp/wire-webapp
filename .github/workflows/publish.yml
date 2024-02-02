@@ -287,7 +287,7 @@ jobs:
       - name: Creating Pull Request
         id: create-pr
         if: ${{ steps.release-info-file.outputs.exists == 'true' }}
-        uses: peter-evans/create-pull-request@v5
+        uses: peter-evans/create-pull-request@v6
         with:
           draft: false
           token: ${{ secrets.ZEBOT_GH_TOKEN }}
@@ -328,6 +328,9 @@ jobs:
               },
               "production": {
                 "targets": "[\"wire-webapp-prod-al2\"]"
+              },
+              "release/q1-2024": {
+                "targets": "[\"wire-webapp-mls-al2\"]"
               },
               "staging": {
                 "targets": "[\"wire-webapp-staging-al2\"]"

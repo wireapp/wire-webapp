@@ -59,6 +59,15 @@ describe('VerificationBadges', () => {
     expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.EXPIRED);
   });
 
+  it('is revoked', async () => {
+    const {getByTestId} = render(
+      withTheme(<VerificationBadges context="conversation" MLSStatus={MLSStatuses.REVOKED} />),
+    );
+
+    const E2EIdentityStatus = getByTestId('mls-conversation-status');
+    expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.REVOKED);
+  });
+
   it('is expiring soon', async () => {
     const {getByTestId} = render(
       withTheme(<VerificationBadges context="conversation" MLSStatus={MLSStatuses.EXPIRES_SOON} />),

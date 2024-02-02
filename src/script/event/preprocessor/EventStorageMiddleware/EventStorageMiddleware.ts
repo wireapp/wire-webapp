@@ -17,7 +17,13 @@
  *
  */
 
+import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
+import {container} from 'tsyringe';
+
+import {ConversationState} from 'src/script/conversation/ConversationState';
 import {User} from 'src/script/entity/User';
+import {UserFilter} from 'src/script/user/UserFilter';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import {handleLinkPreviewEvent, handleEditEvent, handleAssetEvent, handleReactionEvent} from './eventHandlers';
 import {EventValidationError} from './eventHandlers/EventValidationError';
@@ -34,6 +40,7 @@ export class EventStorageMiddleware implements EventMiddleware {
   constructor(
     private readonly eventService: EventService,
     private readonly selfUser: User,
+    private readonly conversationState: ConversationState = container.resolve(ConversationState),
   ) {}
 
   async processEvent(event: IncomingEvent) {
@@ -73,9 +80,44 @@ export class EventStorageMiddleware implements EventMiddleware {
   }
 
   private validateEvent(event: HandledEvents, duplicateEvent?: EventRecord) {
+    if (event.type === CONVERSATION_EVENT.MEMBER_LEAVE) {
+      /*
+        When we receive a `member-leave` event,
+        we should check that the user is actually still part of the
+        conversation before forwarding the event. If the user is already not part
+        of the conversation, then we can throw a validation error
+        (that means the user was already removed by another member-leave event)
+      */
+      if (!event.qualified_conversation) {
+        return;
+      }
+      const conversation = this.conversationState.findConversation(event.qualified_conversation);
+
+      const qualifiedUserIds = event.data.qualified_user_ids;
+
+      if (!conversation || !qualifiedUserIds) {
+        return;
+      }
+
+      const usersNotPartofConversation = qualifiedUserIds.reduce((acc, qualifiedUserId) => {
+        const isDeleted = conversation
+          .getAllUserEntities()
+          .find(user => matchQualifiedIds(user.qualifiedId, qualifiedUserId))?.isDeleted;
+
+        const isParticipant = UserFilter.isParticipant(conversation, qualifiedUserId);
+
+        return acc || isDeleted || !isParticipant;
+      }, false);
+
+      if (usersNotPartofConversation) {
+        throw new EventValidationError('User is not part of the conversation');
+      }
+    }
+
     if (!duplicateEvent) {
       return;
     }
+
     if (duplicateEvent.from !== event.from) {
       throw new EventValidationError('ID previously used by another user');
     }

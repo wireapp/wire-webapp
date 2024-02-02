@@ -52,6 +52,15 @@ describe('E2EICertificateDetails', () => {
     expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.EXPIRED);
   });
 
+  it('is e2ei identity revoked', async () => {
+    const identity = generateIdentity(MLSStatuses.REVOKED);
+
+    const {getByTestId} = render(withTheme(<E2EICertificateDetails identity={identity} />));
+
+    const E2EIdentityStatus = getByTestId('e2ei-identity-status');
+    expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.REVOKED);
+  });
+
   it('is e2ei identity verified', async () => {
     const identity = generateIdentity(MLSStatuses.VALID);
 

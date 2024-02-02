@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useMemo, useState, useEffect} from 'react';
+import {useMemo, useState, useEffect} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
@@ -29,7 +29,7 @@ import {useRelativeTimestamp} from 'src/script/hooks/useRelativeTimestamp';
 import {StatusType} from 'src/script/message/StatusType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getMessageAriaLabel} from 'Util/conversationMessages';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {shouldGroupMessagesByTimestamp} from 'Util/MessagesGroupingUtil';
 
 import {ContentAsset} from './asset';
 import {MessageActionsMenu} from './MessageActions/MessageActions';
@@ -64,7 +64,7 @@ export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetS
   onClickReaction: (emoji: string) => void;
 }
 
-export const ContentMessageComponent: React.FC<ContentMessageProps> = ({
+export const ContentMessageComponent = ({
   conversation,
   message,
   findMessage,
@@ -84,7 +84,7 @@ export const ContentMessageComponent: React.FC<ContentMessageProps> = ({
   isMsgElementsFocusable,
   onClickReaction,
   onClickDetails,
-}) => {
+}: ContentMessageProps) => {
   // check if current message is focused and its elements focusable
   const msgFocusState = useMemo(
     () => isMsgElementsFocusable && isMessageFocused,
@@ -126,13 +126,11 @@ export const ContentMessageComponent: React.FC<ContentMessageProps> = ({
       return true;
     }
 
-    // Interval in seconds, within which messages are grouped together
-    const GROUPED_MESSAGE_INTERVAL = 30 * TIME_IN_MILLIS.SECOND;
+    const currentMessageTime = message.timestamp();
+    const previousMessageTime = previousMessage.timestamp();
 
-    const currentMessageDate = message.timestamp();
-    const previousMessageDate = previousMessage.timestamp();
-
-    if (currentMessageDate - previousMessageDate >= GROUPED_MESSAGE_INTERVAL) {
+    // We intend to change the first parameter to the timestamp of the first message in a group when structure allows it
+    if (!shouldGroupMessagesByTimestamp(previousMessageTime, previousMessageTime, currentMessageTime)) {
       return true;
     }
 
@@ -263,16 +261,18 @@ export const ContentMessageComponent: React.FC<ContentMessageProps> = ({
         )}
       </div>
 
-      <MessageReactionsList
-        reactions={reactions}
-        selfUserId={selfId}
-        handleReactionClick={onClickReaction}
-        isMessageFocused={msgFocusState}
-        onTooltipReactionCountClick={() => onClickReactionDetails(message)}
-        onLastReactionKeyEvent={() => setActionMenuVisibility(false)}
-        isRemovedFromConversation={conversation.removed_from_conversation()}
-        users={conversation.allUserEntities()}
-      />
+      {!!reactions.length && (
+        <MessageReactionsList
+          reactions={reactions}
+          selfUserId={selfId}
+          handleReactionClick={onClickReaction}
+          isMessageFocused={msgFocusState}
+          onTooltipReactionCountClick={() => onClickReactionDetails(message)}
+          onLastReactionKeyEvent={() => setActionMenuVisibility(false)}
+          isRemovedFromConversation={conversation.removed_from_conversation()}
+          users={conversation.allUserEntities()}
+        />
+      )}
     </div>
   );
 };

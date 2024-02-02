@@ -133,6 +133,7 @@ export type MessageAddEvent = ConversationEvent<
     replacing_message_id?: string;
     previews?: string[];
     expects_read_confirmation?: boolean;
+    mentions?: string[];
     quote?:
       | string
       | {
@@ -141,6 +142,10 @@ export type MessageAddEvent = ConversationEvent<
           hash: Uint8Array;
         }
       | {error: {type: string}};
+    /** @deprecated this was legacy field for the text content */
+    message?: string;
+    /** @deprecated this was legacy field for the conversationId */
+    id?: string;
   }
 > & {
   /** who have received/read the event */
@@ -186,7 +191,10 @@ export type DeleteEverywhereEvent = ConversationEvent<
     deleted_time: string;
   }
 >;
-export type CompositeMessageAddEvent = ConversationEvent<CONVERSATION.COMPOSITE_MESSAGE_ADD>;
+export type CompositeMessageAddEvent = ConversationEvent<
+  CONVERSATION.COMPOSITE_MESSAGE_ADD,
+  {items: {button: {id: string; text: string}; text: MessageAddEvent['data']}[]}
+>;
 export type IncomingMessageTooBigEvent = ConversationEvent<CONVERSATION.INCOMING_MESSAGE_TOO_BIG>;
 export type KnockEvent = ConversationEvent<
   CONVERSATION.KNOCK,

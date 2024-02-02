@@ -80,6 +80,7 @@ export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificatio
   const isNewMember = messageType === E2EIVerificationMessageType.NEW_MEMBER;
   const isExpired = messageType === E2EIVerificationMessageType.EXPIRED;
   const isRevoked = messageType === E2EIVerificationMessageType.REVOKED;
+  const isNoLongerVerified = messageType === E2EIVerificationMessageType.NO_LONGER_VERIFIED;
 
   const learnMoreReplacement = replaceLink(Config.getConfig().URL.SUPPORT.E2EI_VERIFICATION);
 
@@ -193,6 +194,14 @@ export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificatio
               }}
             />
           ))}
+
+        {isNoLongerVerified && (
+          <span
+            dangerouslySetInnerHTML={{
+              __html: t('conversation.E2EICertificateNoLongerVerifiedGeneric', {}, learnMoreReplacement),
+            }}
+          />
+        )}
       </div>
     </div>
   );

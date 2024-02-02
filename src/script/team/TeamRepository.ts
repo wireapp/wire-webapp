@@ -22,11 +22,7 @@ import type {
   TeamConversationDeleteEvent,
   TeamDeleteEvent,
   TeamEvent,
-  TeamFeatureConfigurationUpdateEvent,
-  TeamMemberJoinEvent,
   TeamMemberLeaveEvent,
-  TeamMemberUpdateEvent,
-  TeamUpdateEvent,
 } from '@wireapp/api-client/lib/event';
 import {TEAM_EVENT} from '@wireapp/api-client/lib/event/TeamEvent';
 import {FeatureStatus, FeatureList} from '@wireapp/api-client/lib/team/feature/';
@@ -74,11 +70,10 @@ export interface AccountInfo {
 }
 
 type Events = {
-  featureUpdated: {
+  featureConfigUpdated: {
     prevFeatureList?: FeatureList;
-    event: TeamFeatureConfigurationUpdateEvent;
+    newFeatureList: FeatureList;
   };
-  teamRefreshed: void;
 };
 
 export class TeamRepository extends TypedEventEmitter<Events> {
@@ -124,10 +119,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
    * @param teamId the Id of the team to init
    * @param contacts all the contacts the self user has, team members will be deduced from it.
    */
-  async initTeam(
-    teamId: string,
-    contacts: User[] = [],
-  ): Promise<{team: TeamEntity | undefined; features: FeatureList}> {
+  async initTeam(teamId?: string): Promise<{team: TeamEntity | undefined; features: FeatureList}> {
     // async initTeam(teamId?: string): Promise<{members: QualifiedId[]; features: FeatureList}> {
     const team = await this.getTeam();
     // get the fresh feature config from backend
@@ -135,11 +127,6 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     if (!teamId) {
       return {team: undefined, features: {}};
     }
-    await this.updateTeamMembersByIds(
-      team,
-      contacts.filter(user => user.teamId === teamId).map(({id}) => id),
-    );
-
     // Subscribe to team members change and update the user role and guest status
     this.teamState.teamMembers.subscribe(members => {
       this.userRepository.mapGuestStatus(members);
@@ -158,6 +145,9 @@ export class TeamRepository extends TypedEventEmitter<Events> {
   private async updateFeatureConfig(): Promise<{newFeatureList: FeatureList; prevFeatureList?: FeatureList}> {
     const prevFeatureList = this.teamState.teamFeatures();
     const newFeatureList = await this.teamService.getAllTeamFeatures();
+
+    this.emit('featureConfigUpdated', {prevFeatureList, newFeatureList});
+
     this.teamState.teamFeatures(newFeatureList);
 
     return {
@@ -171,7 +161,6 @@ export class TeamRepository extends TypedEventEmitter<Events> {
       try {
         await this.getTeam();
         await this.updateFeatureConfig();
-        this.emit('teamRefreshed');
       } catch (error) {
         this.logger.error(error);
       }
@@ -259,24 +248,8 @@ export class TeamRepository extends TypedEventEmitter<Events> {
         this.onDelete(eventJson);
         break;
       }
-      case TEAM_EVENT.MEMBER_JOIN: {
-        this._onMemberJoin(eventJson);
-        break;
-      }
       case TEAM_EVENT.MEMBER_LEAVE: {
         this.onMemberLeave(eventJson);
-        break;
-      }
-      case TEAM_EVENT.MEMBER_UPDATE: {
-        await this.onMemberUpdate(eventJson);
-        break;
-      }
-      case TEAM_EVENT.UPDATE: {
-        this.onUpdate(eventJson);
-        break;
-      }
-      case TEAM_EVENT.FEATURE_CONFIG_UPDATE: {
-        await this.onFeatureConfigUpdate(eventJson, source);
         break;
       }
       case TEAM_EVENT.CONVERSATION_CREATE:
@@ -368,41 +341,12 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     amplify.publish(WebAppEvents.CONVERSATION.DELETE, {domain: '', id: conversationId});
   }
 
-  private async _onMemberJoin(eventJson: TeamMemberJoinEvent) {
-    const {
-      data: {user: userId},
-      team: teamId,
-    } = eventJson;
-    const isLocalTeam = this.teamState.team().id === teamId;
-    const isOtherUser = this.userState.self().id !== userId;
-
-    if (isLocalTeam && isOtherUser) {
-      await this.userRepository.getUserById({domain: this.userState.self().domain, id: userId});
-      const member = await this.getTeamMember(teamId, userId);
-      this.updateMemberRoles([member]);
-    }
-  }
-
   private readonly updateTeamConfig = async (handlingNotifications: NOTIFICATION_HANDLING_STATE): Promise<void> => {
     const shouldFetchConfig = handlingNotifications === NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
 
     if (shouldFetchConfig) {
       await this.updateFeatureConfig();
     }
-  };
-
-  private readonly onFeatureConfigUpdate = async (
-    event: TeamFeatureConfigurationUpdateEvent,
-    source: EventSource,
-  ): Promise<void> => {
-    if (source !== EventSource.WEBSOCKET) {
-      // Ignore notification stream events
-      return;
-    }
-
-    // When we receive a `feature-config.update` event, we will refetch the entire feature config
-    const {prevFeatureList} = await this.updateFeatureConfig();
-    this.emit('featureUpdated', {event, prevFeatureList});
   };
 
   private onMemberLeave(eventJson: TeamMemberLeaveEvent): void {
@@ -420,28 +364,6 @@ export class TeamRepository extends TypedEventEmitter<Events> {
       }
 
       amplify.publish(WebAppEvents.TEAM.MEMBER_LEAVE, teamId, {domain: '', id: userId}, new Date(time).toISOString());
-    }
-  }
-
-  private async onMemberUpdate(eventJson: TeamMemberUpdateEvent): Promise<void> {
-    const {
-      data: {permissions, user: userId},
-      team: teamId,
-    } = eventJson;
-    const isLocalTeam = this.teamState.team().id === teamId;
-    if (!isLocalTeam) {
-      return;
-    }
-
-    const isSelfUser = this.userState.self().id === userId;
-
-    if (isSelfUser) {
-      const memberEntity = permissions ? {permissions} : await this.getTeamMember(teamId, userId);
-      this.updateUserRole(this.userState.self(), memberEntity.permissions);
-      await this.sendAccountInfo();
-    } else {
-      const member = await this.getTeamMember(teamId, userId);
-      this.updateMemberRoles([member]);
     }
   }
 
@@ -471,15 +393,6 @@ export class TeamRepository extends TypedEventEmitter<Events> {
 
   private onUnhandled(eventJson: TeamEvent): void {
     this.logger.log(`Received '${eventJson.type}' event from backend which is not yet handled`, eventJson);
-  }
-
-  private onUpdate(eventJson: TeamUpdateEvent): void {
-    const {data: teamData, team: teamId} = eventJson;
-
-    if (this.teamState.team().id === teamId) {
-      this.teamMapper.updateTeamFromObject(teamData, this.teamState.team());
-      this.sendAccountInfo();
-    }
   }
 
   public getTeamSupportedProtocols(): ConversationProtocol[] {

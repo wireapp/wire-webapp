@@ -84,6 +84,7 @@ async function buildBackupRepository() {
     .mockImplementation(conversations => conversations.map(c => generateConversation({type: c.type, overwites: c})));
   jest.spyOn(conversationRepository, 'updateConversationStates');
   jest.spyOn(conversationRepository, 'updateConversations');
+  jest.spyOn(conversationRepository, 'syncDeletedConversations').mockResolvedValue(undefined);
   return [
     new BackupRepository(backupService, conversationRepository),
     {backupService, conversationRepository, storageService},
@@ -279,7 +280,7 @@ describe('BackupRepository', () => {
       expect(mockGenerateChaCha20Key).toHaveBeenCalledWith(decodedHeader);
     });
 
-    test('compressHistoryFiles does not call the encryption function if no password is provided', async () => {
+    it('compressHistoryFiles does not call the encryption function if no password is provided', async () => {
       // Mocked values
       const password = '';
       const clientId = 'ClientId';
@@ -298,7 +299,8 @@ describe('BackupRepository', () => {
       expect(mockEncodeHeader).not.toHaveBeenCalled();
       expect(mockGenerateChaCha20Key).not.toHaveBeenCalled();
     });
-    test('compressHistoryFiles returns a Blob object with the correct type', async () => {
+
+    it('compressHistoryFiles returns a Blob object with the correct type', async () => {
       // Mocked values...
       const password = 'Password';
       const clientId = 'ClientId';

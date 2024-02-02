@@ -1,15 +1,7 @@
-name: Sync translations
+name: Pull translations from crowdin
 
 on:
-  push:
-    branches: [dev]
-  schedule:
-    - cron: '0 8 * * *'
   workflow_dispatch:
-
-concurrency:
-  group: translations-${{ github.ref }}
-  cancel-in-progress: true
 
 jobs:
   sync_translations:
@@ -19,11 +11,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.12.1
         with:
-          node-version: 16.x
-          cache: 'yarn'
+          access_token: ${{github.token}}
+
+      - name: Yarn cache
+        uses: c-hive/gha-yarn-cache@v2
 
       - name: Authenticate git clone
         env:
@@ -33,26 +27,22 @@ jobs:
       - name: Install JS dependencies
         run: yarn --immutable
 
-      - name: Merge translations
-        run: yarn translate:merge
-
-      - name: Download translations
+      - name: Sync translations
         uses: crowdin/github-action@v1.17.0
         env:
           GITHUB_TOKEN: ${{secrets.OTTO_THE_BOT_GH_TOKEN}}
+          GITHUB_ACTOR: otto-the-bot
           CROWDIN_PROJECT_ID: 342359
-          INPUT_DEBUG_MODE: false
+          INPUT_DEBUG_MODE: true
         with:
-          upload_sources: true
+          upload_sources: false
           upload_translations: false
-          github_user_name: otto-the-bot
-          github_user_email: webapp+otto@wire.com
           download_translations: true
           push_translations: true
           create_pull_request: true
-          localization_branch_name: 'translations'
-          pull_request_title: 'chore: Update translations'
-          commit_message: 'chore: Update translations'
+          localization_branch_name: 'pull_translations'
+          pull_request_title: 'chore: Pull translations'
+          commit_message: 'chore: Pull translations'
           token: ${{secrets.WEBTEAM_CROWDIN_TOKEN}}
           source: '/src/i18n/en-US.json'
           translation: '/src/i18n/%locale%.json'
