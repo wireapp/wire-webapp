@@ -340,12 +340,15 @@ const Conversations: React.FC<ConversationsProps> = ({
         <>
           {isRecentViewStyle && (
             <Input
+              className="label-1"
               value={conversationsFilter}
               onChange={event => {
                 setConversationsFilter(event.currentTarget.value);
               }}
               startContent={
                 <SearchIcon
+                  width={14}
+                  height={14}
                   css={{
                     top: '50%',
                     left: 10,
@@ -368,7 +371,7 @@ const Conversations: React.FC<ConversationsProps> = ({
                   />
                 )
               }
-              inputCSS={{height: '32px', fontWeight: 400, fontSize: 14, borderRadius: 8, paddingLeft: 36}}
+              inputCSS={{height: '32px', borderRadius: 8, paddingLeft: 36}}
               wrapperCSS={{
                 marginBottom: 12,
                 marginTop: 12,
