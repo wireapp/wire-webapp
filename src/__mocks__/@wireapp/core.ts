@@ -38,6 +38,7 @@ export class Account extends EventEmitter {
       isEnrollmentInProgress: jest.fn(),
       clearAllProgress: jest.fn(),
       getUsersIdentities: jest.fn(() => new Map()),
+      getAllGroupUsersIdentities: jest.fn(() => new Map()),
       getDeviceIdentities: jest.fn(),
       getConversationState: jest.fn(),
       registerServerCertificates: jest.fn(),
