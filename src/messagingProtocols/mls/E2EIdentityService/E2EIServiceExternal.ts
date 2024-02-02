@@ -22,7 +22,7 @@ import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import {Decoder} from 'bazinga64';
 
 import {TypedEventEmitter} from '@wireapp/commons';
-import {Ciphersuite, CoreCrypto, E2eiConversationState, WireIdentity, DeviceStatus} from '@wireapp/core-crypto';
+import {CoreCrypto, E2eiConversationState, WireIdentity, DeviceStatus} from '@wireapp/core-crypto';
 
 import {AcmeService} from './Connection';
 import {getE2EIClientId} from './Helper';
@@ -33,7 +33,9 @@ import {CoreDatabase} from '../../../storage/CoreDB';
 import {parseFullQualifiedClientId} from '../../../util/fullyQualifiedClientIdUtils';
 import {LocalStorageStore} from '../../../util/LocalStorageStore';
 import {LowPrecisionTaskScheduler} from '../../../util/LowPrecisionTaskScheduler';
+import {stringifyQualifiedId} from '../../../util/qualifiedIdUtil';
 import {RecurringTaskScheduler} from '../../../util/RecurringTaskScheduler';
+import {MLSService} from '../MLSService';
 
 export type DeviceIdentity = Omit<WireIdentity, 'free' | 'status'> & {status?: DeviceStatus; deviceId: string};
 
@@ -51,10 +53,11 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
     private readonly coreDatabase: CoreDatabase,
     private readonly recurringTaskScheduler: RecurringTaskScheduler,
     private readonly clientService: ClientService,
-    private readonly cipherSuite: Ciphersuite,
+    private readonly mlsService: MLSService,
   ) {
     super();
     void this.initialiseCrlDistributionTimers();
+    mlsService.on('newCrlDistributionPoints', this.handleNewRemoteCrlDistributionPoints);
   }
 
   // If we have a handle in the local storage, we are in the enrollment process (this handle is saved before oauth redirect)
@@ -71,7 +74,23 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
   }
 
   public isE2EIEnabled(): Promise<boolean> {
-    return this.coreCryptoClient.e2eiIsEnabled(this.cipherSuite);
+    return this.coreCryptoClient.e2eiIsEnabled(this.mlsService.config.cipherSuite);
+  }
+
+  public async getAllGroupUsersIdentities(groupId: string): Promise<Map<string, DeviceIdentity[]>> {
+    const allGroupClients = await this.mlsService.getClientIds(groupId);
+
+    const userIdsMap = allGroupClients.reduce(
+      (acc, {userId, domain}) => {
+        const qualifiedId = {id: userId, domain};
+        acc[stringifyQualifiedId(qualifiedId)] = qualifiedId;
+        return acc;
+      },
+      {} as Record<string, QualifiedId>,
+    );
+
+    const userIds = Object.values(userIdsMap);
+    return this.getUsersIdentities(groupId, userIds);
   }
 
   public async getUsersIdentities(groupId: string, userIds: QualifiedId[]): Promise<Map<string, DeviceIdentity[]>> {
@@ -277,7 +296,7 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
     }
   }
 
-  public async handleNewRemoteCrlDistributionPoints(distributionPoints: string[]): Promise<void> {
+  private async handleNewRemoteCrlDistributionPoints(distributionPoints: string[]): Promise<void> {
     for (const distributionPointUrl of distributionPoints) {
       await this.validateRemoteCrlDistributionPoint(distributionPointUrl);
     }

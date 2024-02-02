@@ -483,10 +483,8 @@ export class Account extends TypedEventEmitter<Events> {
         this.db,
         this.recurringTaskScheduler,
         clientService,
-        mlsService.config.cipherSuite,
+        mlsService,
       );
-
-      mlsService.on('newCrlDistributionPoints', e2eServiceExternal.handleNewRemoteCrlDistributionPoints);
     }
 
     const connectionService = new ConnectionService(this.apiClient);
