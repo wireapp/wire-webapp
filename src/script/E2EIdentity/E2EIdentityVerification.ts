@@ -81,10 +81,7 @@ export async function getConversationVerificationState(groupId: string) {
 const fetchSelfDeviceIdentity = async (): Promise<WireIdentity | undefined> => {
   const conversationState = container.resolve(ConversationState);
   const selfMLSConversation = conversationState.getSelfMLSConversation();
-  const userIdentities = await getUsersIdentities(
-    selfMLSConversation.groupId,
-    selfMLSConversation.allUserEntities().map(user => user.qualifiedId),
-  );
+  const userIdentities = await getAllGroupUsersIdentities(selfMLSConversation.groupId);
   const currentClientId = selfMLSConversation.selfUser()?.localClient?.id;
   const userId = selfMLSConversation.selfUser()?.id;
 
