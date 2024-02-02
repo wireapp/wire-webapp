@@ -361,6 +361,7 @@
   "conversation.E2EICallDisconnected": "Вызов был прерван, поскольку {{user}} начал использовать новое устройство или имеет недействительный сертификат.",
   "conversation.E2EICancel": "Отмена",
   "conversation.E2EICertificateExpired": "Эта беседа больше не является верифицированной, поскольку [bold]{{user}}[/bold] использует по крайней мере одно устройство с просроченным сертификатом сквозной идентификации.",
+  "conversation.E2EICertificateNoLongerVerifiedGeneric": "This conversation is no longer verified, as at least one participant started using a new device or has an invalid certificate. [link]Learn more[/link]",
   "conversation.E2EICertificateRevoked": "Эта беседа больше не является верифицированной, поскольку администратор команды отозвал сертификат сквозной идентификации по крайней мере для одного из устройств [bold]{{user}}[/bold]. [link]Подробнее[/link]",
   "conversation.E2EIConversationNoLongerVerified": "Беседа больше не является верифицированной",
   "conversation.E2EIDegradedInitiateCall": "По крайней мере, один из участников начал использовать новое устройство или имеет недействительный сертификат.\nВы все еще хотите позвонить?",

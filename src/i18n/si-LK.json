@@ -361,6 +361,7 @@
   "conversation.E2EICallDisconnected": "{{user}} නව උපාංගයක් භාවිතා කරන නිසා හෝ වලංගු නොවන සහතිකයක් තිබෙන බැවින් ඇමතුම විසන්ධි විය.",
   "conversation.E2EICancel": "අවලංගු",
   "conversation.E2EICertificateExpired": "[bold]{{user}}[/bold] කල් ඉකුත් වූ අන්ත අනන්‍යතා සහතිකයක් සමඟ අවම වශයෙන් එක් උපාංගයක් භාවිතා කරන බැවින් මෙම සංවාදය තවදුරටත් සත්‍යාපිත නොවේ.",
+  "conversation.E2EICertificateNoLongerVerifiedGeneric": "This conversation is no longer verified, as at least one participant started using a new device or has an invalid certificate. [link]Learn more[/link]",
   "conversation.E2EICertificateRevoked": "කණ්ඩායමේ පරිපාලකයෙක් අවම වශයෙන් [bold]{{user}}[/bold]ගේ එක් උපාංගයක අන්ත අනන්‍යතා සහතිකය අහෝසි කළ බැවින් මෙම සංවාදය තවදුරටත් සත්‍යාපිත නොවේ. [link]තව දැනගන්න[/link]",
   "conversation.E2EIConversationNoLongerVerified": "සංවාදය තවදුරටත් සත්‍යාපිත නොවේ",
   "conversation.E2EIDegradedInitiateCall": "අවම වශයෙන් එක් සහභාගියෙක් නව උපාංගයක් භාවිතා කරයි හෝ වලංගු නොවන සහතිකයක් ඇත. ඔබට තවමත් ඇමතීමට වුවමනා ද?",
