@@ -13971,17 +13971,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss-loader@npm:^8.0.0":
-  version: 8.0.0
-  resolution: "postcss-loader@npm:8.0.0"
+"postcss-loader@npm:^8.1.0":
+  version: 8.1.0
+  resolution: "postcss-loader@npm:8.1.0"
   dependencies:
     cosmiconfig: ^9.0.0
     jiti: ^1.20.0
     semver: ^7.5.4
   peerDependencies:
+    "@rspack/core": 0.x || 1.x
     postcss: ^7.0.0 || ^8.0.1
     webpack: ^5.0.0
-  checksum: 10a79c1ceabf32f323a068c1369fe0e5b7fcf694af47e1e59b4c5a679bcc80969e77a1d21f1f156d49aa2979d0929a59cf2774c6ea4ee728d11b7e6c636c5e20
+  peerDependenciesMeta:
+    "@rspack/core":
+      optional: true
+    webpack:
+      optional: true
+  checksum: 72fd4975f7342efedaa62eb944cf309736ffde2e92ad4298d93b357f5131bc98dc219ee33d8157964868d30336e5e46a9def40873385a8b69ec9c8f1c53dcb36
   languageName: node
   linkType: hard
 
@@ -17922,7 +17928,7 @@ __metadata:
     postcss: 8.4.33
     postcss-import: ^16.0.0
     postcss-less: 6.0.0
-    postcss-loader: ^8.0.0
+    postcss-loader: ^8.1.0
     postcss-preset-env: ^9.3.0
     postcss-scss: 4.0.9
     prettier: ^3.2.2
