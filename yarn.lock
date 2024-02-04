@@ -17554,14 +17554,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack-hot-middleware@npm:2.26.0":
-  version: 2.26.0
-  resolution: "webpack-hot-middleware@npm:2.26.0"
+"webpack-hot-middleware@npm:2.26.1":
+  version: 2.26.1
+  resolution: "webpack-hot-middleware@npm:2.26.1"
   dependencies:
     ansi-html-community: 0.0.8
     html-entities: ^2.1.0
     strip-ansi: ^6.0.0
-  checksum: c20877a287b2af46e27f03f279fce23eedb5f81f80e299bc814bf2b7744e3b1e2ce43ff404b1d9e16d3dcf53be5c0b416c475f430c24b113f2d1858d8499627b
+  checksum: 78513d8d5770c59c3039ce094c49b2e2772b3f1d4ec5c124a7aabe6124a0e08429993b81129649087dc300f496822257e39135bf8b891b51aea197c1b554072a
   languageName: node
   linkType: hard
 
@@ -17960,7 +17960,7 @@ __metadata:
     webpack: 5.90.0
     webpack-cli: 5.1.4
     webpack-dev-middleware: 7.0.0
-    webpack-hot-middleware: 2.26.0
+    webpack-hot-middleware: 2.26.1
     webrtc-adapter: 8.2.3
     workbox-webpack-plugin: 7.0.0
     zustand: 4.5.0
