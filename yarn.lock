@@ -3749,9 +3749,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@peculiar/x509@npm:1.9.6":
-  version: 1.9.6
-  resolution: "@peculiar/x509@npm:1.9.6"
+"@peculiar/x509@npm:1.9.7":
+  version: 1.9.7
+  resolution: "@peculiar/x509@npm:1.9.7"
   dependencies:
     "@peculiar/asn1-cms": ^2.3.8
     "@peculiar/asn1-csr": ^2.3.8
@@ -3764,7 +3764,7 @@ __metadata:
     reflect-metadata: ^0.2.1
     tslib: ^2.6.2
     tsyringe: ^4.8.0
-  checksum: c5a0a7856db2c8ab64eb127638d79c57a1c4553422f9eac5dd268966cb6b81d927d45faa6c06c9424ec95e4011faa89835920e978a3943e0d7ab15dbd46b44b8
+  checksum: 7fe1de9a0dd4be7277c35345a119c9851223cbd9535f45dc733702d1a7ad135e21ad6e98626c6c6c2931e4ab0e836e5a5102c6d280032acd1795fe89c980c97a
   languageName: node
   linkType: hard
 
@@ -17826,7 +17826,7 @@ __metadata:
     "@koush/wrtc": 0.5.3
     "@lexical/history": 0.12.5
     "@lexical/react": 0.12.5
-    "@peculiar/x509": 1.9.6
+    "@peculiar/x509": 1.9.7
     "@testing-library/react": 14.1.2
     "@types/dexie-batch": 0.4.7
     "@types/eslint": ^8
