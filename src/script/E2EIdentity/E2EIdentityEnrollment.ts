@@ -73,6 +73,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   private config?: EnrollmentConfig;
   private currentStep: E2EIHandlerStep = E2EIHandlerStep.UNINITIALIZED;
   private oidcService?: OIDCService;
+  public certificateTtl?: number;
 
   private get coreE2EIService() {
     const e2eiService = this.core.service?.e2eIdentity;
@@ -292,6 +293,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
         handle,
         teamId,
         oAuthIdToken,
+        certificateTtl: this.certificateTtl,
       });
       // If the data is false or we dont get the ACMEChallenge, enrolment failed
 
