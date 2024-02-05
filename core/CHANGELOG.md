@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [43.13.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@43.12.1...@wireapp/core@43.13.0) (2024-02-05)
+
+### Features
+
+* **e2ei:** Allow configuring the certificate time to live ([#5901](https://github.com/wireapp/wire-web-packages/issues/5901)) ([54b500b](https://github.com/wireapp/wire-web-packages/commit/54b500b16ce2f58042fdc49d5cd923f4ca037c53))
+
 ## [43.12.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@43.12.0...@wireapp/core@43.12.1) (2024-02-02)
 
 **Note:** Version bump only for package @wireapp/core
