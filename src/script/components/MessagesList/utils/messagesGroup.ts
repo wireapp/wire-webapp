@@ -18,9 +18,7 @@
  */
 
 import {Message} from 'src/script/entity/message/Message';
-import {differenceInMinutes, isSameDay} from 'Util/TimeUtil';
-
-import {shouldGroupMessagesByTimestamp} from './MessagesGroupingUtil';
+import {differenceInMinutes, isSameDay, fromUnixTime, TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 export type MessagesGroup = {
   sender: string;
@@ -73,6 +71,37 @@ function getMessageMarkerType(
 
 export function isMarker(object: any): object is Marker {
   return object && object.type && object.timestamp;
+}
+
+/**
+ * Determines whether a message should be grouped with a previous one based on timestamp,
+ * a message should be grouped if it's sent within the same minute on the clock than the first message in the group
+ * or if it's sent within a timeframe (30 seconds) of the previous one
+ * @param firstMessageTimestamp unix timestamp of the first message in the group
+ * @param previousMessageTimestamp timestamp of the previous message
+ * @param currentMessageTimestamp timestamp of the current message
+ */
+function shouldGroupMessagesByTimestamp(
+  firstMessageTimestamp: number,
+  previousMessageTimestamp: number,
+  currentMessageTimestamp: number,
+) {
+  // Interval in seconds, within which messages are grouped together
+  const GROUPED_MESSAGE_INTERVAL = 30 * TIME_IN_MILLIS.SECOND;
+
+  const currentMessageDate = fromUnixTime(currentMessageTimestamp / TIME_IN_MILLIS.SECOND);
+  const firstMessageDate = fromUnixTime(firstMessageTimestamp / TIME_IN_MILLIS.SECOND);
+
+  const currentMinute = currentMessageDate.getMinutes();
+  const previousMinute = firstMessageDate.getMinutes();
+
+  const isSentWithinTheSameMinute = currentMinute === previousMinute;
+  const isSentWithinTimeInterval = currentMessageTimestamp - previousMessageTimestamp <= GROUPED_MESSAGE_INTERVAL;
+
+  if (isSentWithinTheSameMinute || isSentWithinTimeInterval) {
+    return true;
+  }
+  return false;
 }
 
 /**
