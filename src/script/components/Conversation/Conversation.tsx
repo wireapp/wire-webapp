@@ -404,71 +404,69 @@ export const Conversation = ({
     }
   };
 
-  const getInViewportCallback = (
-    conversationEntity: ConversationEntity,
-    messageEntity: Message,
-  ): (() => void) | undefined => {
-    const messageTimestamp = messageEntity.timestamp();
-    const callbacks: Function[] = [];
+  const getInViewportCallback = useCallback(
+    (conversationEntity: ConversationEntity, messageEntity: Message) => {
+      const messageTimestamp = messageEntity.timestamp();
+      const callbacks: Function[] = [];
 
-    if (!messageEntity.isEphemeral()) {
-      const isCreationMessage = messageEntity.isMember() && messageEntity.isCreation();
-      if (conversationEntity.is1to1() && isCreationMessage) {
-        repositories.integration.addProviderNameToParticipant((messageEntity as MemberMessage).otherUser());
+      if (!messageEntity.isEphemeral()) {
+        const isCreationMessage = messageEntity.isMember() && messageEntity.isCreation();
+        if (conversationEntity.is1to1() && isCreationMessage) {
+          repositories.integration.addProviderNameToParticipant((messageEntity as MemberMessage).otherUser());
+        }
       }
-    }
 
-    const updateLastRead = () => {
-      conversationEntity.setTimestamp(messageEntity.timestamp(), ConversationEntity.TIMESTAMP_TYPE.LAST_READ);
-    };
+      const updateLastRead = () => {
+        conversationEntity.setTimestamp(messageEntity.timestamp(), ConversationEntity.TIMESTAMP_TYPE.LAST_READ);
+      };
 
-    const startTimer = async () => {
-      if (messageEntity.conversation_id === conversationEntity.id) {
-        repositories.conversation.checkMessageTimer(messageEntity as ContentMessage);
+      const startTimer = async () => {
+        if (messageEntity.conversation_id === conversationEntity.id) {
+          repositories.conversation.checkMessageTimer(messageEntity as ContentMessage);
+        }
+      };
+
+      if (messageEntity.isEphemeral()) {
+        callbacks.push(startTimer);
       }
-    };
 
-    if (messageEntity.isEphemeral()) {
-      callbacks.push(startTimer);
-    }
+      const isUnreadMessage = messageTimestamp > conversationEntity.last_read_timestamp();
+      const isNotOwnMessage = !messageEntity.user().isMe;
 
-    const isUnreadMessage = messageTimestamp > conversationEntity.last_read_timestamp();
-    const isNotOwnMessage = !messageEntity.user().isMe;
+      let shouldSendReadReceipt = false;
 
-    let shouldSendReadReceipt = false;
-
-    if (messageEntity.expectsReadConfirmation) {
-      if (conversationEntity.is1to1()) {
-        shouldSendReadReceipt = repositories.conversation.expectReadReceipt(conversationEntity);
-      } else if (
-        conversationEntity.isGroup() &&
-        (conversationEntity.inTeam() || conversationEntity.isGuestRoom() || conversationEntity.isGuestAndServicesRoom())
-      ) {
-        shouldSendReadReceipt = true;
+      if (messageEntity.expectsReadConfirmation) {
+        if (conversationEntity.is1to1()) {
+          shouldSendReadReceipt = repositories.conversation.expectReadReceipt(conversationEntity);
+        } else if (
+          conversationEntity.isGroup() &&
+          (conversationEntity.inTeam() ||
+            conversationEntity.isGuestRoom() ||
+            conversationEntity.isGuestAndServicesRoom())
+        ) {
+          shouldSendReadReceipt = true;
+        }
       }
-    }
 
-    if (isLastReceivedMessage(messageEntity, conversationEntity)) {
-      callbacks.push(() => updateConversationLastRead(conversationEntity, messageEntity));
-    }
-
-    if (isUnreadMessage && isNotOwnMessage) {
-      callbacks.push(updateLastRead);
-      if (shouldSendReadReceipt) {
-        callbacks.push(() => addReadReceiptToBatch(conversationEntity, messageEntity));
+      if (isLastReceivedMessage(messageEntity, conversationEntity)) {
+        callbacks.push(() => updateConversationLastRead(conversationEntity, messageEntity));
       }
-    }
 
-    if (!callbacks.length) {
-      return undefined;
-    }
+      if (isUnreadMessage && isNotOwnMessage) {
+        callbacks.push(updateLastRead);
+        if (shouldSendReadReceipt) {
+          callbacks.push(() => addReadReceiptToBatch(conversationEntity, messageEntity));
+        }
+      }
 
-    return () => {
-      const trigger = () => callbacks.forEach(callback => callback());
+      return () => {
+        const trigger = () => callbacks.forEach(callback => callback());
 
-      return document.hasFocus() ? trigger() : window.addEventListener('focus', () => trigger(), {once: true});
-    };
-  };
+        return document.hasFocus() ? trigger() : window.addEventListener('focus', () => trigger(), {once: true});
+      };
+    },
+    [addReadReceiptToBatch, repositories.conversation, repositories.integration, updateConversationLastRead],
+  );
 
   return (
     <DropFileArea
