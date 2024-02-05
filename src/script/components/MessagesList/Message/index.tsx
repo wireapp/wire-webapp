@@ -25,13 +25,12 @@ import cx from 'classnames';
 import {InViewport} from 'Components/utils/InViewport';
 import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {getMessageMarkerType, MessageMarkerType} from 'Util/conversationMessages';
 import {getAllFocusableElements, setElementsTabIndex} from 'Util/focusUtil';
 import {isTabKey} from 'Util/KeyboardUtil';
 
 import {ElementType, MessageDetails} from './ContentMessage/asset/TextMessageRenderer';
-import {MessageTime} from './MessageTime';
 import {MessageWrapper} from './MessageWrapper';
+import {ScrollToElement} from './types';
 import {useMessageFocusedTabIndex} from './util';
 
 import type {MessageRepository} from '../../../conversation/MessageRepository';
@@ -41,7 +40,6 @@ import type {DecryptErrorMessage} from '../../../entity/message/DecryptErrorMess
 import type {MemberMessage as MemberMessageEntity} from '../../../entity/message/MemberMessage';
 import {Message as BaseMessage} from '../../../entity/message/Message';
 import type {User} from '../../../entity/User';
-import {useRelativeTimestamp} from '../../../hooks/useRelativeTimestamp';
 import {TeamState} from '../../../team/TeamState';
 
 export interface MessageActions {
@@ -63,16 +61,15 @@ export interface MessageParams extends MessageActions {
   isLastDeliveredMessage: boolean;
   isMarked: boolean;
   isSelfTemporaryGuest: boolean;
-  /** The last read timestamp at the moment the conversation was rendered */
-  lastReadTimestamp: number;
   message: BaseMessage;
+  /** whether the message should display the user avatar and user name before the actual content */
+  hideHeader: boolean;
   messageActions: {
     deleteMessage: (conversation: Conversation, message: BaseMessage) => void;
     deleteMessageEveryone: (conversation: Conversation, message: BaseMessage) => void;
   };
   messageRepository: MessageRepository;
   onVisible?: () => void;
-  previousMessage?: BaseMessage;
   selfId: QualifiedId;
   shouldShowInvitePeople: boolean;
   teamState?: TeamState;
@@ -83,14 +80,11 @@ export interface MessageParams extends MessageActions {
   setMsgElementsFocusable: (isMsgElementsFocusable: boolean) => void;
 }
 
-const Message: React.FC<
-  MessageParams & {scrollTo?: (elm: {center?: boolean; element: HTMLElement}, isUnread?: boolean) => void}
-> = props => {
+export const Message: React.FC<MessageParams & {scrollTo?: ScrollToElement}> = props => {
   const {
     message,
-    previousMessage,
     isMarked,
-    lastReadTimestamp,
+    hideHeader,
     onVisible,
     scrollTo,
     isMessageFocused,
@@ -101,15 +95,8 @@ const Message: React.FC<
   } = props;
   const messageElementRef = useRef<HTMLDivElement>(null);
   const messageRef = useRef<HTMLDivElement>(null);
-  const {status, ephemeral_expires, timestamp} = useKoSubscribableChildren(message, [
-    'status',
-    'ephemeral_expires',
-    'timestamp',
-  ]);
-  const timeAgo = useRelativeTimestamp(message.timestamp());
-  const timeAgoDay = useRelativeTimestamp(message.timestamp(), true);
+  const {status, ephemeral_expires} = useKoSubscribableChildren(message, ['status', 'ephemeral_expires']);
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
-  const markerType = getMessageMarkerType(message, lastReadTimestamp, previousMessage);
 
   useLayoutEffect(() => {
     if (!messageElementRef.current) {
@@ -117,13 +104,10 @@ const Message: React.FC<
     }
     if (isMarked) {
       scrollTo?.({center: true, element: messageElementRef.current});
-
       // for reply message, focus on the original message when original message link is clicked for keyboard users
       handleFocus(message.id);
-    } else if (markerType === MessageMarkerType.UNREAD) {
-      scrollTo?.({element: messageElementRef.current}, true);
     }
-  }, [isMarked, messageElementRef]);
+  }, [isMarked]);
 
   const handleDivKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     // when a message is focused set its elements focusable
@@ -158,20 +142,10 @@ const Message: React.FC<
     setElementsTabIndex(interactiveMsgElements, isMsgElementsFocusable && isMessageFocused);
   }, [isMessageFocused, isMsgElementsFocusable, message]);
 
-  const getTimestampClass = (): string => {
-    const classes = {
-      [MessageMarkerType.NONE]: '',
-      [MessageMarkerType.DAY]: 'message-timestamp-visible message-timestamp-day',
-      [MessageMarkerType.HOUR]: 'message-timestamp-visible',
-      [MessageMarkerType.UNREAD]: 'message-timestamp-visible message-timestamp-unread',
-    };
-    return classes[markerType];
-  };
-
   const content = (
     <MessageWrapper
       {...props}
-      hasMarker={markerType !== MessageMarkerType.NONE}
+      hideHeader={hideHeader}
       isMessageFocused={isMessageFocused}
       isMsgElementsFocusable={isMsgElementsFocusable}
     />
@@ -196,24 +170,6 @@ const Message: React.FC<
       data-uie-name="item-message"
       role="list"
     >
-      {markerType !== MessageMarkerType.NONE ? (
-        <div className={cx('message-header message-timestamp', getTimestampClass())}>
-          <div className="message-header-icon">
-            <span className="message-unread-dot" />
-          </div>
-
-          <h3 className="message-header-label">
-            <MessageTime timestamp={timestamp} className="label-xs" data-timestamp-type="normal">
-              {timeAgo}
-            </MessageTime>
-
-            <MessageTime timestamp={timestamp} data-timestamp-type="day" className="label-bold-xs">
-              {timeAgoDay}
-            </MessageTime>
-          </h3>
-        </div>
-      ) : null}
-
       {/*eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions*/}
       <div
         tabIndex={messageFocusedTabIndex}
@@ -230,5 +186,3 @@ const Message: React.FC<
     </div>
   );
 };
-
-export {Message};
