@@ -17,103 +17,68 @@
  *
  */
 
-import {render, fireEvent} from '@testing-library/react';
+import {renderHook} from '@testing-library/react';
+import {act} from 'react-dom/test-utils';
 
 import {useRoveFocus} from './useRoveFocus';
 
-const renderHTML = (currentFocus: number, handleKeyDown: (e: React.KeyboardEvent) => void) => {
-  return (
-    <div role="button" tabIndex={currentFocus} onKeyDown={handleKeyDown}>
-      <div data-uie-name="current-focus">{currentFocus}</div>
-    </div>
-  );
-};
+function createEvent(key: string) {
+  return {key, preventDefault: () => {}} as KeyboardEvent;
+}
+
 describe('useRoveFocus', () => {
   it('should set the initial focus to the default value', () => {
-    const TestComponent = () => {
-      const {currentFocus} = useRoveFocus(3);
-      return <div data-uie-name="current-focus">{currentFocus}</div>;
-    };
-    const {getByTestId} = render(<TestComponent />);
-    expect(getByTestId('current-focus').textContent).toBe('0');
+    const {result} = renderHook(() => useRoveFocus(['0', '1', '2']));
+    expect(result.current.focusedId).toBe(undefined);
   });
 
-  it('should set the initial focus to the specified value', () => {
-    const TestComponent = () => {
-      const {currentFocus} = useRoveFocus(3, 2);
-      return <div data-uie-name="current-focus">{currentFocus}</div>;
-    };
-    const {getByTestId} = render(<TestComponent />);
-    expect(getByTestId('current-focus').textContent).toBe('2');
+  it('should allow manually setting the focused index and navigate using the down/up arrow keys', () => {
+    const {result} = renderHook(() => useRoveFocus(['0', '1', '2']));
+    act(() => result.current.setFocusedId('1'));
+    expect(result.current.focusedId).toBe('1');
+
+    act(() => result.current.handleKeyDown(createEvent('ArrowDown')));
+    expect(result.current.focusedId).toBe('2');
+
+    act(() => result.current.handleKeyDown(createEvent('ArrowUp')));
+    expect(result.current.focusedId).toBe('1');
+
+    act(() => result.current.handleKeyDown(createEvent('ArrowUp')));
+    expect(result.current.focusedId).toBe('0');
   });
 
   it('should set the focus to the next item when the arrow down key is pressed', () => {
-    const TestComponent = () => {
-      const {currentFocus, handleKeyDown} = useRoveFocus(3);
-      return renderHTML(currentFocus, handleKeyDown);
-    };
-    const {getByTestId} = render(<TestComponent />);
-    fireEvent.keyDown(getByTestId('current-focus'), {key: 'ArrowDown'});
-    expect(getByTestId('current-focus').textContent).toBe('1');
+    const {result} = renderHook(() => useRoveFocus(['0', '1', '2']));
+    act(() => result.current.handleKeyDown(createEvent('ArrowDown')));
+    expect(result.current.focusedId).toBe('0');
   });
 
   it('should set the focus to the previous item when the arrow up key is pressed', () => {
-    const TestComponent = () => {
-      const {currentFocus, handleKeyDown} = useRoveFocus(3, 1);
-      return renderHTML(currentFocus, handleKeyDown);
-    };
-    const {getByTestId} = render(<TestComponent />);
-    fireEvent.keyDown(getByTestId('current-focus'), {key: 'ArrowUp'});
-    expect(getByTestId('current-focus').textContent).toBe('0');
+    const {result} = renderHook(() => useRoveFocus(['0', '1', '2']));
+    act(() => result.current.handleKeyDown(createEvent('ArrowUp')));
+    expect(result.current.focusedId).toBe('2');
   });
 
   it('should set the focus to the first item when the tab key is pressed', () => {
-    const TestComponent = () => {
-      const {currentFocus, handleKeyDown} = useRoveFocus(3, 1);
-      return renderHTML(currentFocus, handleKeyDown);
-    };
-    const {getByTestId} = render(<TestComponent />);
-    fireEvent.keyDown(getByTestId('current-focus'), {key: 'Tab'});
-    expect(getByTestId('current-focus').textContent).toBe('0');
+    const {result} = renderHook(() => useRoveFocus(['0', '1', '2']));
+    act(() => result.current.handleKeyDown(createEvent('Tab')));
+    expect(result.current.focusedId).toBe('2');
   });
 
   it('should not change the focus when an unsupported key is pressed', () => {
-    const TestComponent = () => {
-      const {currentFocus, handleKeyDown} = useRoveFocus(3);
-      return renderHTML(currentFocus, handleKeyDown);
-    };
-    const {getByTestId} = render(<TestComponent />);
-    fireEvent.keyDown(getByTestId('current-focus'), {key: 'UnsupportedKey'});
-    expect(getByTestId('current-focus').textContent).toBe('0');
+    const {result} = renderHook(() => useRoveFocus(['0', '1', '2']));
+    act(() => result.current.handleKeyDown(createEvent('Enter')));
+    expect(result.current.focusedId).toBe(undefined);
   });
 
-  it('should wrap around to the first item when the last item is focused and the arrow down key is pressed (if infinite is set to true)', () => {
-    const TestComponent = () => {
-      const {currentFocus, handleKeyDown} = useRoveFocus(3, 2, true);
-      return renderHTML(currentFocus, handleKeyDown);
-    };
-    const {getByTestId} = render(<TestComponent />);
-    fireEvent.keyDown(getByTestId('current-focus'), {key: 'ArrowDown'});
-    expect(getByTestId('current-focus').textContent).toBe('0');
-  });
+  it('should keep focused element stable as the array changes', () => {
+    const {result, rerender} = renderHook(useRoveFocus, {initialProps: ['0', '1', '2']});
 
-  it('should wrap around to the last item when the first item is focused and the arrow up key is pressed (if infinite is set to true)', () => {
-    const TestComponent = () => {
-      const {currentFocus, handleKeyDown} = useRoveFocus(3, 0, true);
-      return renderHTML(currentFocus, handleKeyDown);
-    };
-    const {getByTestId} = render(<TestComponent />);
-    fireEvent.keyDown(getByTestId('current-focus'), {key: 'ArrowUp'});
-    expect(getByTestId('current-focus').textContent).toBe('2');
-  });
+    act(() => result.current.setFocusedId('1'));
+    expect(result.current.focusedId).toBe('1');
 
-  it('should not wrap around when the last item is focused and the arrow down key is pressed (if infinite is set to false)', () => {
-    const TestComponent = () => {
-      const {currentFocus, handleKeyDown} = useRoveFocus(3, 2, false);
-      return renderHTML(currentFocus, handleKeyDown);
-    };
-    const {getByTestId} = render(<TestComponent />);
-    fireEvent.keyDown(getByTestId('current-focus'), {key: 'ArrowDown'});
-    expect(getByTestId('current-focus').textContent).not.toBe('0');
+    // Adding one element at the end
+    rerender(['0', '2', '3', '1']);
+    expect(result.current.focusedId).toBe('1');
   });
 });
