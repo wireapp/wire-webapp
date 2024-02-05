@@ -83,8 +83,8 @@ describe('FeatureConfigChangeNotifier', () => {
     ],
     [
       FEATURE_KEY.ENFORCE_DOWNLOAD_PATH,
-      'Enforced Download Path is enabled. The App will restart for the new settings to take effect.',
-      'Enforced Download Path is disabled. You will need to restart the app if you want to save downloads in a new location.',
+      'You’ll find your downloaded files now in a specific standard location on your Windows computer. The app needs a restart for the new setting to take effect.',
+      'Standard file location on Windows computers is disabled. Restart the app to save downloaded files in a new location.',
     ],
   ] as const)('shows a modal when feature %s is turned on and off', async (feature, enabledString, disabledString) => {
     const teamState = new TeamState();
