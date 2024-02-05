@@ -21,7 +21,7 @@ import React, {useEffect, useLayoutEffect, useRef} from 'react';
 
 import cx from 'classnames';
 
-import {isRemovalAction, isEnterKey} from 'Util/KeyboardUtil';
+import {isEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {Icon} from './Icon';
@@ -37,14 +37,12 @@ interface SearchInputProps {
   placeholder: string;
   selectedUsers?: User[];
   setInput: (input: string) => void;
-  setSelectedUsers?: (users: User[]) => void;
 }
 
 export const SearchInput: React.FC<SearchInputProps> = ({
   onEnter,
   input,
   selectedUsers = [],
-  setSelectedUsers = () => {},
   placeholder,
   setInput,
   forceDark,
@@ -84,11 +82,9 @@ export const SearchInput: React.FC<SearchInputProps> = ({
             maxLength={MAX_HANDLE_LENGTH}
             onChange={event => setInput(event.target.value)}
             onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
-              if (isRemovalAction(event.key) && emptyInput) {
-                setSelectedUsers(selectedUsers.slice(0, -1));
-              } else if (isEnterKey(event.nativeEvent)) {
+              if (isEnterKey(event.nativeEvent)) {
                 event.preventDefault();
-                onEnter?.(event);
+                void onEnter?.(event);
               }
               return true;
             }}

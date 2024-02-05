@@ -399,7 +399,6 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
             input={participantsInput}
             setInput={setParticipantsInput}
             selectedUsers={selectedContacts}
-            setSelectedUsers={setSelectedContacts}
             placeholder={t('groupCreationParticipantsPlaceholder')}
             onEnter={clickOnCreate}
           />
