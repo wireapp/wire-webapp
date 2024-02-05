@@ -1962,18 +1962,24 @@ describe('ConversationRepository', () => {
       });
     });
 
-    function generateConversation(id: QualifiedId, name: string) {
+    function generateConversation(
+      id: QualifiedId,
+      name: string,
+      otherMembers: QualifiedId[] = [],
+      protocol = ConversationProtocol.PROTEUS,
+      type = CONVERSATION_TYPE.REGULAR,
+    ) {
       return {
         members: {
-          others: [] as QualifiedId[],
+          others: otherMembers.map(uid => ({qualified_id: uid})) || ([] as any),
           self: {},
         },
         name,
-        protocol: 'proteus',
+        protocol,
         qualified_id: id,
         receipt_mode: 1,
         team: 'b0dcee1f-c64e-4d40-8b50-5baf932906b8',
-        type: 0,
+        type,
       };
     }
 
@@ -2005,6 +2011,96 @@ describe('ConversationRepository', () => {
           ],
         };
         const localConversations: any = [];
+
+        jest
+          .spyOn(conversationService, 'getAllConversations')
+          .mockResolvedValue(remoteConversations as unknown as RemoteConversations);
+        jest
+          .spyOn(conversationService, 'loadConversationStatesFromDb')
+          .mockResolvedValue(localConversations as unknown as ConversationDatabaseData[]);
+        jest.spyOn(conversationService, 'saveConversationsInDb').mockImplementation(data => Promise.resolve(data));
+
+        const conversations = await conversationRepository.loadConversations();
+
+        expect(conversations).toHaveLength(remoteConversations.found.length);
+      });
+
+      it("does not load proteus 1:1 conversation if there's mls 1:1 conversation with the same user", async () => {
+        const conversationRepository = testFactory.conversation_repository!;
+        const conversationService = conversationRepository['conversationService'];
+        const userId = {id: '05d0f240-bfe9-40d7-b6cb-602dac89fa1b', domain: 'staging.zinfra.io'};
+
+        const remoteConversations = {
+          found: [
+            generateConversation(
+              {
+                domain: 'staging.zinfra.io',
+                id: '05d0f240-bfe9-40d7-b6cb-602dac89fa1b',
+              },
+              'conv1',
+              [userId],
+              ConversationProtocol.PROTEUS,
+              CONVERSATION_TYPE.ONE_TO_ONE,
+            ),
+
+            generateConversation(
+              {
+                domain: 'staging.zinfra.io',
+                id: '05d0f240-bfe9-1234-b6cb-602dac89fa1b',
+              },
+              'conv2',
+              [userId],
+              ConversationProtocol.MLS,
+              CONVERSATION_TYPE.ONE_TO_ONE,
+            ),
+          ],
+        };
+        const localConversations: any = [];
+
+        jest
+          .spyOn(conversationService, 'getAllConversations')
+          .mockResolvedValue(remoteConversations as unknown as RemoteConversations);
+        jest
+          .spyOn(conversationService, 'loadConversationStatesFromDb')
+          .mockResolvedValue(localConversations as unknown as ConversationDatabaseData[]);
+        jest.spyOn(conversationService, 'saveConversationsInDb').mockImplementation(data => Promise.resolve(data));
+
+        const conversations = await conversationRepository.loadConversations();
+
+        expect(conversations).toHaveLength(1);
+      });
+
+      it("still loads proteus 1:1 conversation if there's mls 1:1 conversation with the same user but conversation exists locally", async () => {
+        const conversationRepository = testFactory.conversation_repository!;
+        const conversationService = conversationRepository['conversationService'];
+        const userId = {id: '05d0f240-bfe9-40d7-b6cb-602dac89fa1b', domain: 'staging.zinfra.io'};
+
+        const mls1to1 = generateConversation(
+          {
+            domain: 'staging.zinfra.io',
+            id: '05d0f240-bfe9-1234-b6cb-602dac89fa1b',
+          },
+          'conv2',
+          [userId],
+          ConversationProtocol.MLS,
+          CONVERSATION_TYPE.ONE_TO_ONE,
+        );
+
+        const proteus1to1 = generateConversation(
+          {
+            domain: 'staging.zinfra.io',
+            id: '05d0f240-bfe9-40d7-b6cb-602dac89fa1b',
+          },
+          'conv1',
+          [userId],
+          ConversationProtocol.PROTEUS,
+          CONVERSATION_TYPE.ONE_TO_ONE,
+        );
+
+        const remoteConversations = {
+          found: [proteus1to1, mls1to1],
+        };
+        const localConversations: any = [proteus1to1];
 
         jest
           .spyOn(conversationService, 'getAllConversations')

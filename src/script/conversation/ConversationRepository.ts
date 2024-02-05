@@ -90,6 +90,7 @@ import {
   isProteus1to1ConversationWithUser,
   ProteusConversation,
   isConnectionRequestConversation,
+  isBackendProteus1to1Conversation,
 } from './ConversationSelectors';
 import {ConversationService} from './ConversationService';
 import {ConversationState} from './ConversationState';
@@ -596,18 +597,98 @@ export class ConversationRepository {
   }
 
   /**
+   * Will filter out abandoned proteus 1:1 conversations (old proteus 1:1 conversations that should be replaced by mls 1:1 conversations)
+   * @param remoteConversations new conversations fetched from backend
+   * @returns filtered remote conversations
+   */
+  private async filterAbandonedProteus1to1Conversations(
+    remoteConversations: RemoteConversations,
+    localConverstions: ConversationDatabaseData[],
+  ): Promise<RemoteConversations> {
+    if (!remoteConversations.found?.length) {
+      return remoteConversations;
+    }
+    // We loop through all the remote conversations
+    // and find all proteus 1:1 conversations (also team-owned 1:1 conversations).
+    // If we can find a mls 1:1 conversation with the same user (it means mls 1:1 conversation was established),
+    // we will blacklist proteus 1:1 (so it's never refetched) conversation and remove it from the list of remote conversations
+
+    const mls1to1Conversations = remoteConversations.found.filter(
+      ({protocol, type}) => protocol === ConversationProtocol.MLS && type === CONVERSATION_TYPE.ONE_TO_ONE,
+    );
+
+    const {abandonedProteus1to1Conversations, allConversations} = remoteConversations.found.reduce(
+      (acc, conversation) => {
+        const {abandonedProteus1to1Conversations, allConversations} = acc;
+
+        // We don't want to filter out non proteus 1:1 conversations
+        if (!isBackendProteus1to1Conversation(conversation)) {
+          allConversations.push(conversation);
+          return acc;
+        }
+
+        // We want to filter out proteus 1:1 conversations that are already in the local storage
+        // Their content will be migrated to mls 1:1 conversations at a later stage
+
+        const isKnownLocalConversation = localConverstions.find(({qualified_id}) => {
+          return qualified_id && matchQualifiedIds(qualified_id, conversation.qualified_id);
+        });
+        if (isKnownLocalConversation) {
+          allConversations.push(conversation);
+          return acc;
+        }
+
+        const userQualifiedId = conversation.members.others?.[0]?.qualified_id;
+        if (!userQualifiedId) {
+          allConversations.push(conversation);
+          return acc;
+        }
+
+        const mls1to1Conversation = mls1to1Conversations.find(mlsConversation =>
+          mlsConversation.members.others.find(
+            ({qualified_id}) => qualified_id && matchQualifiedIds(qualified_id, userQualifiedId),
+          ),
+        );
+
+        if (mls1to1Conversation) {
+          abandonedProteus1to1Conversations.push(conversation);
+          return acc;
+        }
+
+        allConversations.push(conversation);
+        return acc;
+      },
+      {abandonedProteus1to1Conversations: [] as BackendConversation[], allConversations: [] as BackendConversation[]},
+    );
+
+    // We blacklist all the abandoned proteus 1:1 conversations so they are never refetched from the backend
+    await Promise.all(
+      abandonedProteus1to1Conversations.map(
+        ({qualified_id}) => qualified_id && this.blacklistConversation(qualified_id),
+      ),
+    );
+
+    return {...remoteConversations, found: allConversations};
+  }
+
+  /**
    * Will append the new conversations from backend to the locally stored conversations in memory
    * @param remoteConversations new conversations fetched from backend
    * @returns the new conversations from backend merged with the locally stored conversations
    */
   private async loadRemoteConversations(remoteConversations: RemoteConversations): Promise<Conversation[]> {
     const localConversations = await this.conversationService.loadConversationStatesFromDb<ConversationDatabaseData>();
+
     let conversationsData: any[];
 
     if (!remoteConversations.found?.length) {
       conversationsData = localConversations;
     } else {
-      const data = ConversationMapper.mergeConversations(localConversations, remoteConversations);
+      const filteredRemoteConversations = await this.filterAbandonedProteus1to1Conversations(
+        remoteConversations,
+        localConversations,
+      );
+      const data = ConversationMapper.mergeConversations(localConversations, filteredRemoteConversations);
       conversationsData = (await this.conversationService.saveConversationsInDb(data)) as any[];
     }
 
