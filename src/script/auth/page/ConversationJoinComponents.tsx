@@ -49,7 +49,6 @@ interface IsLoggedInColumnProps {
 }
 
 interface GuestLoginColumnProps {
-  handleSubmit: () => void;
   enteredName: string;
   onNameChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   checkNameValidity: (event: React.FormEvent) => Promise<void>;

@@ -92,7 +92,6 @@ const ConversationJoinComponent = ({
   const [showEntropyForm, setShowEntropyForm] = useState(false);
   const [isTemporaryGuest, setIsTemporaryGuest] = useState<boolean>(false);
   const isEntropyRequired = Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY;
-
   const isFetching = isFetchingAuth || isFetchingConversation || conversationInfoFetching;
 
   const isWirePublicInstance = Config.getConfig().BRAND_NAME === 'Wire';
@@ -209,6 +208,7 @@ const ConversationJoinComponent = ({
   };
 
   const checkNameValidity = async (event: React.FormEvent) => {
+    setIsTemporaryGuest(true);
     event.preventDefault();
     if (!nameInput.current) {
       return;
@@ -297,10 +297,6 @@ const ConversationJoinComponent = ({
                   nameInput={nameInput}
                   onNameChange={onNameChange}
                   checkNameValidity={checkNameValidity}
-                  handleSubmit={async () => {
-                    setIsTemporaryGuest(true);
-                    await handleSubmit();
-                  }}
                   isSubmitingName={isSubmitingName}
                   isValidName={isValidName}
                   conversationError={conversationError}
