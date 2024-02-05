@@ -194,8 +194,8 @@ export const formatDuration = (duration: number): DurationUnit => {
     const seconds = durationUnits().pop();
 
     return {
-      symbol: seconds.symbol,
-      text: `0 ${seconds.plural}`,
+      symbol: seconds?.symbol ?? 's',
+      text: `0 ${seconds?.plural}`,
       value: 0,
     };
   }
@@ -216,12 +216,12 @@ export const formatDurationCaption = (duration: number): string => {
   const mappedUnits = mapUnits(duration, false);
   const hours = mappedUnits.find(unit => unit.symbol === 'h');
   const minutes = mappedUnits.find(unit => unit.symbol === 'm');
-  const hasHours = hours.value > 0;
+  const hasHours = hours?.value ?? 0 > 0;
   const validUnitStrings = [];
   for (let index = 0; index < mappedUnits.length; index++) {
     const unit = mappedUnits[index];
     if (unit === hours && hasHours) {
-      validUnitStrings.push(`${zeroPadding(hours.value)}:${zeroPadding(minutes.value)}`);
+      validUnitStrings.push(`${zeroPadding(hours.value)}:${zeroPadding(minutes?.value ?? 0)}`);
       break;
     }
     if (unit.value > 0) {
@@ -311,14 +311,14 @@ export const weeksPassedSinceDate = (date: Date): number => {
 export const formatDelayTime = (delayTimeInMS: number): string => {
   if (delayTimeInMS >= TIME_IN_MILLIS.WEEK) {
     const weeks = Math.floor(delayTimeInMS / TIME_IN_MILLIS.WEEK);
-    return `${weeks} week${weeks > 1 ? 's' : ''}`;
+    return `${weeks} ${t(`ephemeralUnitsWeek${weeks === 1 ? '' : 's'}`)}`;
   } else if (delayTimeInMS >= TIME_IN_MILLIS.DAY) {
     const days = Math.floor(delayTimeInMS / TIME_IN_MILLIS.DAY);
-    return `${days} day${days > 1 ? 's' : ''}`;
+    return `${days} ${t(`ephemeralUnitsDay${days === 1 ? '' : 's'}`)}`;
   } else if (delayTimeInMS >= TIME_IN_MILLIS.HOUR) {
     const hours = Math.floor(delayTimeInMS / TIME_IN_MILLIS.HOUR);
-    return `${hours} hour${hours > 1 ? 's' : ''}`;
+    return `${hours} ${t(`ephemeralUnitsHour${hours === 1 ? '' : 's'}`)}`;
   }
   const minutes = Math.floor(delayTimeInMS / TIME_IN_MILLIS.MINUTE);
-  return `${minutes} minute${minutes > 1 ? 's' : ''}`;
+  return `${minutes} ${t(`ephemeralUnitsMinute${minutes === 1 ? '' : 's'}`)}`;
 };
