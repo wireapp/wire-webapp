@@ -53,7 +53,7 @@ import {Config} from '../Config';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
 import {ACCESS_STATE} from '../conversation/AccessState';
 import {ConversationRepository, CONVERSATION_READONLY_STATE} from '../conversation/ConversationRepository';
-import {isSelfConversation} from '../conversation/ConversationSelectors';
+import {isProteusTeam1to1Conversation, isSelfConversation} from '../conversation/ConversationSelectors';
 import {ConversationStatus} from '../conversation/ConversationStatus';
 import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
 import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
@@ -234,11 +234,14 @@ export class Conversation {
     this.isTeamOnly = ko.pureComputed(() => this.accessState() === ACCESS_STATE.TEAM.TEAM_ONLY);
     this.withAllTeamMembers = ko.observable(false);
 
-    this.isProteusTeam1to1 = ko.pureComputed(() => {
-      const isGroupConversation = this.type() === CONVERSATION_TYPE.REGULAR;
-      const hasOneParticipant = this.participating_user_ids().length === 1;
-      return isGroupConversation && hasOneParticipant && this.teamId && !this.name();
-    });
+    this.isProteusTeam1to1 = ko.pureComputed(() =>
+      isProteusTeam1to1Conversation({
+        name: this.name(),
+        type: this.type(),
+        inTeam: !!this.teamId,
+        otherMembersLength: this.participating_user_ids().length,
+      }),
+    );
     this.isGroup = ko.pureComputed(() => {
       const isGroupConversation = this.type() === CONVERSATION_TYPE.REGULAR;
       return isGroupConversation && !this.isProteusTeam1to1();
