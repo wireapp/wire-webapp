@@ -40,29 +40,19 @@ import {NewCrlDistributionPointsPayload} from '../MLSService/MLSService.types';
 export class E2EIServiceInternal {
   private static instance: E2EIServiceInternal;
   private readonly logger = logdown('@wireapp/core/E2EIdentityServiceInternal');
-  private readonly coreCryptoClient: CoreCrypto;
-  private readonly apiClient: APIClient;
-  private readonly e2eServiceExternal: E2EIServiceExternal;
-  private readonly keyPackagesAmount;
   private identity?: E2eiEnrollment;
   private acmeService?: AcmeService;
   private isInitialized = false;
-  private readonly dispatchNewCrlDistributionPoints: (payload: NewCrlDistributionPointsPayload) => void;
 
   private constructor(
-    coreCryptClient: CoreCrypto,
-    apiClient: APIClient,
-    e2eiServiceExternal: E2EIServiceExternal,
-    keyPackagesAmount: number = 100,
-    dispatchNewCrlDistributionPoints: (payload: NewCrlDistributionPointsPayload) => void,
-  ) {
-    this.coreCryptoClient = coreCryptClient;
-    this.apiClient = apiClient;
-    this.e2eServiceExternal = e2eiServiceExternal;
-    this.keyPackagesAmount = keyPackagesAmount;
-    this.dispatchNewCrlDistributionPoints = dispatchNewCrlDistributionPoints;
-    this.logger.log('Instance of E2EIServiceInternal created');
-  }
+    private readonly coreCryptoClient: CoreCrypto,
+    private readonly apiClient: APIClient,
+    private readonly e2eiServiceExternal: E2EIServiceExternal,
+    /** number of seconds the certificate should be valid */
+    private readonly certificateTtl: number,
+    private readonly keyPackagesAmount: number,
+    private readonly dispatchNewCrlDistributionPoints: (payload: NewCrlDistributionPointsPayload) => void,
+  ) {}
 
   // ############ Public Functions ############
 
@@ -78,11 +68,13 @@ export class E2EIServiceInternal {
         e2eiServiceExternal,
         keyPackagesAmount,
         dispatchNewCrlDistributionPoints,
+        certificateTtl,
       } = params;
       E2EIServiceInternal.instance = new E2EIServiceInternal(
         coreCryptClient,
         apiClient,
         e2eiServiceExternal,
+        certificateTtl,
         keyPackagesAmount,
         dispatchNewCrlDistributionPoints,
       );
@@ -107,7 +99,7 @@ export class E2EIServiceInternal {
 
   public async continueCertificateProcess(oAuthIdToken: string): Promise<RotateBundle | undefined> {
     // If we don't have a handle, we need to start a new OAuth flow
-    if (this.e2eServiceExternal.isEnrollmentInProgress()) {
+    if (this.e2eiServiceExternal.isEnrollmentInProgress()) {
       return this.continueOAuthFlow(oAuthIdToken);
     }
     throw new Error('Error while trying to continue OAuth flow. No enrollment in progress found');
@@ -119,13 +111,11 @@ export class E2EIServiceInternal {
     const {user} = E2EIStorage.get.initialData();
 
     // How long the issued certificate should be maximal valid
-    const expiryDays = 90;
-    const expirySecs = expiryDays * 24 * 60 * 60;
     const ciphersuite = Ciphersuite.MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519;
 
     if (hasActiveCertificate) {
       this.identity = await this.coreCryptoClient.e2eiNewRotateEnrollment(
-        expirySecs,
+        this.certificateTtl,
         ciphersuite,
         user.displayName,
         user.handle,
@@ -135,7 +125,7 @@ export class E2EIServiceInternal {
       this.identity = await this.coreCryptoClient.e2eiNewActivationEnrollment(
         user.displayName,
         user.handle,
-        expirySecs,
+        this.certificateTtl,
         ciphersuite,
         user.teamId,
       );
@@ -303,7 +293,7 @@ export class E2EIServiceInternal {
    *  or a client that wants to refresh its certificate but has no valid refresh token
    */
   private async startNewOAuthFlow() {
-    if (this.e2eServiceExternal.isEnrollmentInProgress()) {
+    if (this.e2eiServiceExternal.isEnrollmentInProgress()) {
       throw new Error('Error while trying to start OAuth flow. There is already a flow in progress');
     }
 

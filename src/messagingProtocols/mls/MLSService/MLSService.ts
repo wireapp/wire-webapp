@@ -797,6 +797,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     user: User,
     client: RegisteredClient,
     nbPrekeys: number,
+    certificateTtl: number,
     oAuthIdToken?: string,
   ): Promise<EnrollmentProcessState> {
     try {
@@ -810,6 +811,7 @@ export class MLSService extends TypedEventEmitter<Events> {
         discoveryUrl,
         keyPackagesAmount: nbPrekeys,
         dispatchNewCrlDistributionPoints: payload => this.dispatchNewCrlDistributionPoints(payload),
+        certificateTtl,
       });
 
       // If we don't have an OAuth id token, we need to start the certificate process with Oauth

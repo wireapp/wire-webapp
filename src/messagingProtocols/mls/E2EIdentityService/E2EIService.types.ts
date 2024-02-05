@@ -75,6 +75,8 @@ export interface InitParams {
   clientId?: string;
   // If a entrollment is in progress, the init function will not start a new enrollment
   skipInit?: boolean;
+  /** number of seconds the certificate should be valid */
+  certificateTtl: number;
   discoveryUrl?: string;
   keyPackagesAmount: number;
   dispatchNewCrlDistributionPoints: (payload: NewCrlDistributionPointsPayload) => void;

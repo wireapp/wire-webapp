@@ -36,6 +36,7 @@ import {AbortHandler, WebSocketClient} from '@wireapp/api-client/lib/tcp/';
 import {WEBSOCKET_STATE} from '@wireapp/api-client/lib/tcp/ReconnectingWebsocket';
 import {FEATURE_KEY, FeatureStatus} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import logdown from 'logdown';
 
 import {APIClient, BackendFeatures} from '@wireapp/api-client';
@@ -240,12 +241,15 @@ export class Account extends TypedEventEmitter<Events> {
     teamId,
     discoveryUrl,
     oAuthIdToken,
+    certificateTtl = 90 * (TimeInMillis.DAY / 1000),
   }: {
     displayName: string;
     handle: string;
     teamId: string;
     discoveryUrl: string;
     oAuthIdToken?: string;
+    /** number of seconds the certificate should be valid (default 90 days) */
+    certificateTtl?: number;
   }) {
     const context = this.apiClient.context;
     const domain = context?.domain ?? '';
@@ -272,6 +276,7 @@ export class Account extends TypedEventEmitter<Events> {
       user,
       this.currentClient,
       this.options.nbPrekeys,
+      certificateTtl,
       oAuthIdToken,
     );
   }
