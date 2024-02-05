@@ -168,7 +168,7 @@ export const MessagesList: FC<MessagesListParams> = ({
       const elementPosition = element.getBoundingClientRect();
       const containerPosition = scrollingContainer.getBoundingClientRect();
       const scrollBy = scrollingContainer.scrollTop + elementPosition.top - containerPosition.top;
-      scrollingContainer.scrollTo({top: scrollBy - (center ? scrollingContainer.offsetHeight / 2 : 0)});
+      scrollingContainer.scrollTo?.({top: scrollBy - (center ? scrollingContainer.offsetHeight / 2 : 0)});
     } else if (scrollingContainer.scrollTop === 0 && scrollingContainer.scrollHeight > previousScrollHeight) {
       // If we hit the top and new messages were loaded, we keep the scroll position stable
       scrollingContainer.scrollTop = scrollingContainer.scrollHeight - previousScrollHeight;
@@ -176,10 +176,10 @@ export const MessagesList: FC<MessagesListParams> = ({
       // We only want to animate the scroll if there are new messages in the list
       const behavior = nbMessages.current !== filteredMessagesLength ? 'smooth' : 'auto';
       // Simple content update, we just scroll to bottom if we are in the stick to bottom threshold
-      scrollingContainer.scrollTo({behavior, top: scrollingContainer.scrollHeight});
+      scrollingContainer.scrollTo?.({behavior, top: scrollingContainer.scrollHeight});
     } else if (lastMessage && lastMessage.status() === StatusType.SENDING && lastMessage.user().id === selfUser.id) {
       // The self user just sent a message, we scroll straight to the bottom
-      scrollingContainer.scrollTo({behavior: 'smooth', top: scrollingContainer.scrollHeight});
+      scrollingContainer.scrollTo?.({behavior: 'smooth', top: scrollingContainer.scrollHeight});
     }
     scrollHeight.current = scrollingContainer.scrollHeight;
     nbMessages.current = filteredMessagesLength;
