@@ -42,7 +42,7 @@ export type Marker = {
  * @param lastReadTimestamp If given will check new messages from this timestamp instead of live value of conversation.last_read_timestamp()
  * @param previousMessage The right before in the conversation
  */
-export function getMessageMarkerType(
+function getMessageMarkerType(
   message: Message,
   lastReadTimestamp: number,
   previousMessage?: Message,
@@ -75,6 +75,11 @@ export function isMarker(object: any): object is Marker {
   return object && object.type && object.timestamp;
 }
 
+/**
+ * Will group a list of ordered messages in groups of messages from the same sender and close in time
+ * @param messages - the sorted list of messages
+ * @param lastReadTimestamp - the timestamp of the last read message (used to mark unread messages)
+ */
 export function groupMessagesBySenderAndTime(messages: Message[], lastReadTimestamp: number) {
   return messages.reduce<Array<MessagesGroup | Marker>>((acc, message, index) => {
     const lastItem = acc[acc.length - 1];
