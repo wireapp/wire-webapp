@@ -103,7 +103,7 @@ export class DebugUtil {
 
     this.logger = getLogger('DebugUtil');
 
-    keyboardjs.bind('command+shift+1', this.toggleDebugUi);
+    keyboardjs.bind(['command+shift+1', 'ctrl+shift+1'], this.toggleDebugUi);
   }
 
   /** will print all the ids of entities that show on screen (userIds, conversationIds, messageIds) */
