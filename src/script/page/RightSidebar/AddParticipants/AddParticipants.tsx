@@ -196,7 +196,6 @@ const AddParticipants: FC<AddParticipantsProps> = ({
           input={searchInput}
           setInput={onSearchInput}
           selectedUsers={selectedContacts}
-          setSelectedUsers={setSelectedContacts}
           placeholder={t('addParticipantsSearchPlaceholder')}
         />
 
