@@ -18,7 +18,7 @@
  */
 
 import {LoginData} from '@wireapp/api-client/lib/auth/';
-import {ClientType, CreateClientPayload, RegisteredClient} from '@wireapp/api-client/lib/client/';
+import {ClientCapability, ClientType, CreateClientPayload, RegisteredClient} from '@wireapp/api-client/lib/client/';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import axios from 'axios';
 import {StatusCodes} from 'http-status-codes';
@@ -164,6 +164,7 @@ export class ClientService {
 
     const newClient: CreateClientPayload = {
       class: clientInfo.classification,
+      capabilities: [ClientCapability.LEGAL_HOLD_IMPLICIT_CONSENT],
       cookie: clientInfo.cookieLabel,
       label: clientInfo.label,
       lastkey: lastPrekey,
