@@ -26,9 +26,7 @@ import {User} from '../entity/User';
 
 export class UserFilter {
   static isParticipant(conversationEntity: Conversation, userId: QualifiedId) {
-    const index = conversationEntity
-      .participating_user_ets()
-      .findIndex((user: User) => matchQualifiedIds(userId, user));
+    const index = conversationEntity.allUserEntities().findIndex((user: User) => matchQualifiedIds(userId, user));
     return index !== -1;
   }
 }
