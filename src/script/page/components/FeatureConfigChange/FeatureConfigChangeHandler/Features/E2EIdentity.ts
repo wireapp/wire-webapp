@@ -34,7 +34,7 @@ export const configureE2EI = (logger: Logger, config: FeatureList): undefined | 
     return undefined;
   }
 
-  if (!supportsMLS() && Config.getConfig().FEATURE.ENABLE_E2EI) {
+  if (!supportsMLS() || !Config.getConfig().FEATURE.ENABLE_E2EI) {
     return undefined;
   }
 
