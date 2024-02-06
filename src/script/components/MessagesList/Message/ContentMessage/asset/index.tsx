@@ -71,6 +71,7 @@ const ContentAsset = ({
   onClickDetails,
 }: ContentAssetProps) => {
   const {isObfuscated, status} = useKoSubscribableChildren(message, ['isObfuscated', 'status']);
+  const {previews} = useKoSubscribableChildren(asset as Text, ['previews']);
 
   switch (asset.type) {
     case AssetType.TEXT:
@@ -103,7 +104,7 @@ const ContentAsset = ({
             />
           )}
 
-          {(asset as Text).previews().map(preview => (
+          {previews.map(() => (
             <div key={asset.id} className="message-asset">
               <LinkPreviewAsset message={message} isFocusable={isMessageFocused} />
 
