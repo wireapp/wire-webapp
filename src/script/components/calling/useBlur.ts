@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useEffect, useRef} from 'react';
+import {useCallback, useRef} from 'react';
 
 import '@mediapipe/selfie_segmentation';
 import '@tensorflow/tfjs-backend-webgl';

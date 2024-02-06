@@ -36,6 +36,14 @@ export function useUserName(user: User) {
 }
 
 /**
+ * same as above, but using the current value of isAvailable and name instead of the knockout subscribable
+ * @param user the user to get the name for
+ */
+export function getUserName(user: User) {
+  return user.isAvailable() ? user.name() : t('unavailableUser');
+}
+
+/**
  * component that will display the username, if available, otherwise a string indicating that the user is unavailable
  */
 export function UserName({user}: UserNameProps) {

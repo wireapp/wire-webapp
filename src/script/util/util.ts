@@ -208,7 +208,7 @@ export const downloadBlob = (blob: Blob, filename: string, mimeType?: string): n
   throw new Error('Failed to download blob: Resource not provided');
 };
 
-const downloadFile = (url: string, fileName: string, mimeType?: string): number => {
+export const downloadFile = (url: string, fileName: string, mimeType?: string): number => {
   const anchor = document.createElement('a');
   anchor.download = fileName;
   anchor.href = url;
@@ -304,9 +304,6 @@ const supportsSecretStorage = () => !Runtime.isDesktopApp() || !!window.systemCr
 
 // disables mls for old 'broken' desktop clients, see https://github.com/wireapp/wire-desktop/pull/6094
 export const supportsMLS = () => Config.getConfig().FEATURE.ENABLE_MLS && supportsSecretStorage();
-
-export const supportsCoreCryptoProteus = () =>
-  Config.getConfig().FEATURE.ENABLE_PROTEUS_CORE_CRYPTO && supportsSecretStorage();
 
 export const incomingCssClass = 'content-animation-incoming-horizontal-left';
 

@@ -25,6 +25,7 @@ import {container} from 'tsyringe';
 
 import {Link, LinkVariant} from '@wireapp/react-ui-kit';
 
+import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Icon} from 'Components/Icon';
 import {ModalComponent} from 'Components/ModalComponent';
 import {EnrichedFields} from 'Components/panel/EnrichedFields';
@@ -146,11 +147,10 @@ const UserModal: React.FC<UserModalProps> = ({
     resetState();
   };
   const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
-  const {
-    is_trusted: isTrusted,
-    is_verified: isSelfVerified,
-    isActivatedAccount,
-  } = useKoSubscribableChildren(selfUser, ['is_trusted', 'is_verified', 'isActivatedAccount']);
+  const {is_trusted: isTrusted, isActivatedAccount} = useKoSubscribableChildren(selfUser, [
+    'is_trusted',
+    'isActivatedAccount',
+  ]);
   const isFederated = core.backendFeatures?.isFederated;
 
   useEffect(() => {
@@ -176,76 +176,71 @@ const UserModal: React.FC<UserModalProps> = ({
   }, [userId?.id, userId?.domain]);
 
   return (
-    <div className="user-modal" css={userModalStyle}>
-      <ModalComponent
-        isShown={isShown}
-        onBgClick={hide}
-        onClosed={onModalClosed}
-        data-uie-name={user ? 'modal-user-profile' : userNotFound ? 'modal-cannot-open-profile' : ''}
-        wrapperCSS={userModalWrapperStyle}
+    <ModalComponent
+      isShown={isShown}
+      onBgClick={hide}
+      onClosed={onModalClosed}
+      className="user-modal"
+      css={userModalStyle}
+      data-uie-name={user ? 'modal-user-profile' : userNotFound ? 'modal-cannot-open-profile' : ''}
+      wrapperCSS={userModalWrapperStyle}
+    >
+      <div className="modal__header">
+        {userNotFound && (
+          <h2 className="modal__header__title" data-uie-name="status-modal-title">
+            {t('userNotFoundTitle', brandName)}
+          </h2>
+        )}
+
+        <Icon.Close
+          className="modal__header__button"
+          onClick={hide}
+          onKeyDown={event => handleKeyDown(event, hide)}
+          data-uie-name="do-close"
+          tabIndex={TabIndex.FOCUSABLE}
+        />
+      </div>
+
+      <FadingScrollbar
+        className={cx('modal__body user-modal__wrapper', {'user-modal__wrapper--max': !user && !userNotFound})}
       >
-        <div className="modal__header">
-          {userNotFound && (
-            <h2 className="modal__header__title" data-uie-name="status-modal-title">
-              {t('userNotFoundTitle', brandName)}
-            </h2>
-          )}
+        {user && (
+          <>
+            <UserDetails participant={user} classifiedDomains={classifiedDomains} />
 
-          <Icon.Close
-            className="modal__header__button"
-            onClick={hide}
-            onKeyDown={event => handleKeyDown(event, hide)}
-            data-uie-name="do-close"
-            tabIndex={TabIndex.FOCUSABLE}
-          />
-        </div>
+            <EnrichedFields user={user} showDomain={isFederated} />
 
-        <div className={cx('modal__body user-modal__wrapper', {'user-modal__wrapper--max': !user && !userNotFound})}>
-          {user && (
-            <>
-              <UserDetails
-                avatarStyles={{
-                  marginTop: 60,
-                }}
-                participant={user}
-                isSelfVerified={isSelfVerified}
-                classifiedDomains={classifiedDomains}
-              />
+            {!isTrusted && <UnverifiedUserWarning user={user} />}
 
-              <EnrichedFields user={user} showDomain={isFederated} />
+            <UserModalUserActionsSection
+              user={user}
+              onAction={hide}
+              isSelfActivated={isActivatedAccount}
+              selfUser={selfUser}
+            />
+          </>
+        )}
+        {isShown && !user && !userNotFound && (
+          <div className="loading-wrapper">
+            <Icon.Loading aria-hidden="true" />
+          </div>
+        )}
 
-              {!isTrusted && <UnverifiedUserWarning user={user} />}
-
-              <UserModalUserActionsSection
-                user={user}
-                onAction={hide}
-                isSelfActivated={isActivatedAccount}
-                selfUser={selfUser}
-              />
-            </>
-          )}
-          {isShown && !user && !userNotFound && (
-            <div className="loading-wrapper">
-              <Icon.Loading aria-hidden="true" />
+        {userNotFound && (
+          <>
+            <div className="modal__message" data-uie-name="status-modal-text">
+              {t('userNotFoundMessage', brandName)}
             </div>
-          )}
 
-          {userNotFound && (
-            <>
-              <div className="modal__message" data-uie-name="status-modal-text">
-                {t('userNotFoundMessage', brandName)}
-              </div>
-
-              <div className="modal__buttons">
-                <button className="modal__button modal__button--confirm" data-uie-name="do-ok" onClick={hide}>
-                  {t('modalAcknowledgeAction')}
-                </button>
-              </div>
-            </>
-          )}
-        </div>
-      </ModalComponent>
-    </div>
+            <div className="modal__buttons">
+              <button className="modal__button modal__button--confirm" data-uie-name="do-ok" onClick={hide}>
+                {t('modalAcknowledgeAction')}
+              </button>
+            </div>
+          </>
+        )}
+      </FadingScrollbar>
+    </ModalComponent>
   );
 };
 

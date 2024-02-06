@@ -32,7 +32,7 @@ export const messageBodyActions: CSSObject = {
   minWidth: '40px',
   position: 'absolute',
   right: '16px',
-  top: '-20px',
+  top: '-30px',
   userSelect: 'none',
   '@media (max-width: @screen-md-min)': {
     height: '45px',
@@ -103,5 +103,5 @@ export const getActionsMenuCSS = (isActive?: boolean): CSSObject => {
 };
 
 export const messageWithHeaderTop: CSSObject = {
-  top: '-53px',
+  top: '-63px',
 };

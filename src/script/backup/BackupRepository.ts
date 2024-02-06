@@ -18,7 +18,6 @@
  */
 
 import type Dexie from 'dexie';
-import {container} from 'tsyringe';
 import {omit} from 'underscore';
 
 import {chunk} from 'Util/ArrayUtil';
@@ -41,8 +40,8 @@ import {
 } from './Error';
 import {preprocessConversations, preprocessEvents, preprocessUsers} from './recordPreprocessors';
 
-import {ConnectionState} from '../connection/ConnectionState';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
+import {isReadableConversation} from '../conversation/ConversationSelectors';
 import type {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 import {EventRecord, UserRecord} from '../storage';
@@ -91,11 +90,7 @@ export class BackupRepository {
   private canceled: boolean = false;
   private worker: WebWorker;
 
-  constructor(
-    backupService: BackupService,
-    conversationRepository: ConversationRepository,
-    private readonly connectionState = container.resolve(ConnectionState),
-  ) {
+  constructor(backupService: BackupService, conversationRepository: ConversationRepository) {
     this.logger = getLogger('BackupRepository');
 
     this.backupService = backupService;
@@ -317,7 +312,7 @@ export class BackupRepository {
       throw new InvalidMetaDataError();
     }
 
-    await this.verifyMetadata(user, files);
+    const archiveVersion = await this.verifyMetadata(user, files);
     const fileDescriptors = Object.entries(files)
       .filter(([filename]) => filename !== Filename.METADATA)
       .map(([filename, content]) => {
@@ -332,7 +327,7 @@ export class BackupRepository {
     const nbEntities = fileDescriptors.reduce((acc, {entities}) => acc + entities.length, 0);
     initCallback(nbEntities);
 
-    await this.importHistoryData(fileDescriptors, progressCallback);
+    await this.importHistoryData(archiveVersion, fileDescriptors, progressCallback);
   }
 
   private async createDecryptedBackup(
@@ -363,6 +358,7 @@ export class BackupRepository {
   }
 
   private async importHistoryData(
+    archiveVersion: number,
     fileDescriptors: FileDescriptor[],
     progressCallback: ProgressCallback,
   ): Promise<void> {
@@ -383,13 +379,15 @@ export class BackupRepository {
       }
     }
 
-    await this.conversationRepository.updateConversations(importedConversations);
-    await this.conversationRepository.init1To1Conversations(
-      this.connectionState.connections(),
-      this.conversationRepository.getAllLocalConversations(),
-    );
+    // Run all the database migrations on the imported data
+    await this.backupService.runDbSchemaUpdates(archiveVersion);
+
+    const readableConversations = importedConversations.filter(isReadableConversation);
+
+    await this.conversationRepository.updateConversations(readableConversations);
+    await this.conversationRepository.initAllLocal1To1Conversations();
     // doesn't need to be awaited
-    void this.conversationRepository.checkForDeletedConversations();
+    void this.conversationRepository.syncDeletedConversations();
   }
 
   private async importConversations(
@@ -483,15 +481,16 @@ export class BackupRepository {
     return omit(entity, 'primary_key');
   }
 
-  private async verifyMetadata(user: User, files: Record<string, Uint8Array>): Promise<void> {
+  private async verifyMetadata(user: User, files: Record<string, Uint8Array>): Promise<number> {
     const rawData = files[Filename.METADATA];
     const metaData = new TextDecoder().decode(rawData);
     const parsedMetaData = JSON.parse(metaData);
-    this._verifyMetadata(user, parsedMetaData);
+    const archiveVersion = this._verifyMetadata(user, parsedMetaData);
     this.logger.log('Validated metadata during history import', files);
+    return archiveVersion;
   }
 
-  private _verifyMetadata(user: User, archiveMetadata: Metadata): void {
+  private _verifyMetadata(user: User, archiveMetadata: Metadata): number {
     const localMetadata = this.createMetaData(user, '');
     const isExpectedUserId = archiveMetadata.user_id === localMetadata.user_id;
     if (!isExpectedUserId) {
@@ -507,18 +506,7 @@ export class BackupRepository {
       throw new IncompatiblePlatformError(message);
     }
 
-    const lowestDbVersion = Math.min(archiveMetadata.version, localMetadata.version);
-    const involvesDatabaseMigration = StorageSchemata.SCHEMATA.reduce((involvesMigration, schemaData) => {
-      if (schemaData.version > lowestDbVersion) {
-        return involvesMigration || !!schemaData.upgrade;
-      }
-      return involvesMigration;
-    }, false);
-
-    if (involvesDatabaseMigration) {
-      const message = 'History cannot be restored: Database version mismatch';
-      throw new IncompatibleBackupError(message);
-    }
+    return archiveMetadata.version;
   }
 
   private mapDecodingError(decodingError: string) {

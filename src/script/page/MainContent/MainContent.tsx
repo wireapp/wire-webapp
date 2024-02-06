@@ -38,7 +38,7 @@ import {Collection} from './panels/Collection';
 import {AboutPreferences} from './panels/preferences/AboutPreferences';
 import {AccountPreferences} from './panels/preferences/AccountPreferences';
 import {AVPreferences} from './panels/preferences/AVPreferences';
-import {DevicesPreferences} from './panels/preferences/devices/DevicesPreferences';
+import {DevicesPreferences} from './panels/preferences/DevicesPreferences';
 import {OptionPreferences} from './panels/preferences/OptionPreferences';
 
 import {ClientState} from '../../client/ClientState';

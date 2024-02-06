@@ -19,7 +19,7 @@
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {ModalOptions, PrimaryModalType} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
-import {t} from 'Util/LocalizerUtil';
+import {replaceLink, t} from 'Util/LocalizerUtil';
 
 const hideSecondaryBtn = {hideSecondary: true};
 const hideCloseBtn = {hideCloseBtn: true, preventClose: true};
@@ -29,6 +29,9 @@ export enum ModalType {
   ERROR = 'error',
   SUCCESS = 'success',
   LOADING = 'loading',
+  CERTIFICATE_RENEWAL = 'certificate_renewal',
+  SELF_CERTIFICATE_REVOKED = 'self_certificate_revoked',
+  SNOOZE_REMINDER = 'snooze_reminder',
 }
 
 interface GetModalOptions {
@@ -38,6 +41,16 @@ interface GetModalOptions {
   hideSecondary?: boolean;
   hidePrimary?: boolean;
   hideClose?: boolean;
+  extraParams?: {
+    /** time left to remind the user again (only for enroll and renewal modal types). */
+    delayTime?: string;
+
+    /** Flag indicating if this is a renewal action */
+    isRenewal?: boolean;
+
+    /** Flag indicating if the grace period is over (only for enroll, renew or error modals) */
+    isGracePeriodOver?: boolean;
+  };
 }
 export const getModalOptions = ({
   type,
@@ -46,18 +59,29 @@ export const getModalOptions = ({
   hidePrimary = false,
   hideSecondary = false,
   hideClose = true,
+  extraParams,
 }: GetModalOptions) => {
   if (!secondaryActionFn) {
     hideSecondary = true;
   }
   let options: ModalOptions = {};
   let modalType: PrimaryModalType = PrimaryModal.type.CONFIRM;
+  const replaceLearnMore = replaceLink('learnMore');
+  const svgHtml = `
+  <div style="margin-bottom: 24px;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" fill="none">
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M60 32V7.48786L32 0L4 8V32C4 48 16.0287 60.3908 32 64C48.1374 60.3908 60 48 60 32ZM52 21.3829L27.4086 48L12 31.3842L16.9238 26.0013L27.4086 37.2342L47.0762 16L52 21.3829Z" fill="#1D7833"/>
+      </svg>
+  </div>
+  `;
   switch (type) {
     case ModalType.ENROLL:
       options = {
         text: {
           closeBtnLabel: t('acme.settingsChanged.button.close'),
-          htmlMessage: t('acme.settingsChanged.paragraph'),
+          htmlMessage: extraParams?.isGracePeriodOver
+            ? t('acme.settingsChanged.gracePeriodOver.paragraph', {}, {br: '<br>', ...replaceLearnMore})
+            : t('acme.settingsChanged.paragraph', {}, {br: '<br>', ...replaceLearnMore}),
           title: t('acme.settingsChanged.headline.alt'),
         },
         primaryAction: {
@@ -74,11 +98,70 @@ export const getModalOptions = ({
         hideSecondary || secondaryActionFn === undefined ? PrimaryModal.type.ACKNOWLEDGE : PrimaryModal.type.CONFIRM;
       break;
 
+    case ModalType.CERTIFICATE_RENEWAL:
+      options = {
+        text: {
+          closeBtnLabel: t('acme.renewCertificate.button.close'),
+          htmlMessage: extraParams?.isGracePeriodOver
+            ? t('acme.renewCertificate.gracePeriodOver.paragraph')
+            : t('acme.renewCertificate.paragraph'),
+          title: t('acme.renewCertificate.headline.alt'),
+        },
+        primaryAction: {
+          action: primaryActionFn,
+          text: t('acme.renewCertificate.button.primary'),
+        },
+        secondaryAction: {
+          action: secondaryActionFn,
+          text: t('acme.renewCertificate.button.secondary'),
+        },
+        ...hideCloseBtn,
+      };
+      modalType =
+        hideSecondary || secondaryActionFn === undefined ? PrimaryModal.type.ACKNOWLEDGE : PrimaryModal.type.CONFIRM;
+      break;
+
+    case ModalType.SELF_CERTIFICATE_REVOKED:
+      options = {
+        text: {
+          htmlMessage: t('acme.selfCertificateRevoked.text'),
+          title: t('acme.selfCertificateRevoked.title'),
+        },
+        primaryAction: {
+          action: primaryActionFn,
+          text: t('acme.selfCertificateRevoked.button.primary'),
+        },
+        confirmCancelBtnLabel: t('acme.selfCertificateRevoked.button.cancel'),
+        allButtonsFullWidth: true,
+        primaryBtnFirst: true,
+      };
+      modalType = PrimaryModal.type.CONFIRM;
+      break;
+
+    case ModalType.SNOOZE_REMINDER:
+      options = {
+        text: {
+          closeBtnLabel: t('acme.settingsChanged.button.close'),
+          htmlMessage: t('acme.remindLater.paragraph', extraParams?.delayTime),
+          title: t('acme.settingsChanged.headline.alt'),
+        },
+        primaryAction: {
+          action: primaryActionFn,
+          text: t('acme.remindLater.button.primary'),
+        },
+        ...hideCloseBtn,
+      };
+      modalType =
+        hideSecondary || secondaryActionFn === undefined ? PrimaryModal.type.ACKNOWLEDGE : PrimaryModal.type.CONFIRM;
+      break;
+
     case ModalType.ERROR:
       options = {
         text: {
           closeBtnLabel: t('acme.error.button.close'),
-          htmlMessage: t('acme.error.paragraph'),
+          htmlMessage: extraParams?.isGracePeriodOver
+            ? t('acme.error.gracePeriod.paragraph', {}, {br: '<br>'})
+            : t('acme.error.paragraph', {}, {br: '<br>'}),
           title: t('acme.error.headline'),
         },
         primaryAction: {
@@ -91,13 +174,13 @@ export const getModalOptions = ({
         },
       };
       modalType =
-        hideSecondary || secondaryActionFn === undefined ? PrimaryModal.type.CONFIRM : PrimaryModal.type.ACKNOWLEDGE;
+        hideSecondary || secondaryActionFn === undefined ? PrimaryModal.type.ACKNOWLEDGE : PrimaryModal.type.CONFIRM;
       break;
 
     case ModalType.LOADING:
       options = {
         text: {
-          title: t('acme.inProgress.headline'),
+          title: extraParams?.isRenewal ? t('acme.renewal.inProgress.headline') : t('acme.inProgress.headline'),
         },
         ...hideCloseBtn,
       };
@@ -109,12 +192,18 @@ export const getModalOptions = ({
       options = {
         text: {
           closeBtnLabel: t('acme.done.button.close'),
-          htmlMessage: t('acme.done.paragraph'),
-          title: t('acme.done.headline'),
+          htmlMessage: `<div style="text-align: center">${svgHtml}${
+            extraParams?.isRenewal ? t('acme.renewal.done.paragraph') : t('acme.done.paragraph')
+          }</div>`,
+          title: extraParams?.isRenewal ? t('acme.renewal.done.headline') : t('acme.done.headline'),
         },
         primaryAction: {
           action: primaryActionFn,
           text: t('acme.done.button'),
+        },
+        secondaryAction: {
+          action: secondaryActionFn,
+          text: t('acme.done.button.secondary'),
         },
       };
       modalType = PrimaryModal.type.ACKNOWLEDGE;

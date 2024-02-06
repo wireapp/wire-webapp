@@ -57,7 +57,6 @@ const ConversationParticipants: FC<ConversationParticipantsProps> = ({
   highlightedUsers,
 }) => {
   const [searchInput, setSearchInput] = useState<string>('');
-
   const {
     participating_user_ets: participatingUserEts,
     removed_from_conversation: removedFromConversation,

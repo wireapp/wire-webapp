@@ -17,15 +17,20 @@
  *
  */
 
-import {FC, useEffect} from 'react';
+import {FC, useEffect, useMemo} from 'react';
 
 import {ClientType} from '@wireapp/api-client/lib/client/';
 import {container} from 'tsyringe';
 
+import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
+
+import {PrimaryModalComponent} from 'Components/Modals/PrimaryModal/PrimaryModal';
 import {SIGN_OUT_REASON} from 'src/script/auth/SignOutReason';
+import {useAppSoftLock} from 'src/script/hooks/useAppSoftLock';
 import {useSingleInstance} from 'src/script/hooks/useSingleInstance';
 import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
 
+import {useAccentColor} from './hooks/useAccentColor';
 import {useTheme} from './hooks/useTheme';
 
 import {Configuration} from '../../Config';
@@ -44,11 +49,13 @@ interface AppProps {
 
 export const AppContainer: FC<AppProps> = ({config, clientType}) => {
   setAppLocale();
-  const app = new App(container.resolve(Core), container.resolve(APIClient), config);
+  const app = useMemo(() => new App(container.resolve(Core), container.resolve(APIClient), config), []);
+
   // Publishing application on the global scope for debug and testing purposes.
   window.wire.app = app;
   const mainView = new MainViewModel(app.repository);
   useTheme(() => app.repository.properties.getPreference(PROPERTIES_TYPE.INTERFACE.THEME));
+  useAccentColor();
 
   const {hasOtherInstance, registerInstance} = useSingleInstance();
 
@@ -57,7 +64,10 @@ export const AppContainer: FC<AppProps> = ({config, clientType}) => {
       return;
     }
     const killInstance = registerInstance();
-    window.addEventListener('beforeunload', killInstance);
+    /* We need to wait the very last moment to de-register the instance.
+     * If we do it too early (like beforeunload event) then the app could detect it's no longer the single instance running and redirect to the login page
+     */
+    window.addEventListener('pagehide', killInstance);
   }, []);
 
   useEffect(() => {
@@ -69,14 +79,25 @@ export const AppContainer: FC<AppProps> = ({config, clientType}) => {
     return () => document.removeEventListener('scroll', resetWindowScroll);
   }, []);
 
+  const {repository: repositories} = app;
+
+  const {softLockEnabled} = useAppSoftLock(repositories.calling, repositories.notification);
+
   if (hasOtherInstance) {
     app.redirectToLogin(SIGN_OUT_REASON.MULTIPLE_TABS);
     return null;
   }
 
   return (
-    <AppLoader init={onProgress => app.initApp(clientType, onProgress)}>
-      {selfUser => <AppMain app={app} selfUser={selfUser} mainView={mainView} />}
-    </AppLoader>
+    <>
+      <AppLoader init={onProgress => app.initApp(clientType, onProgress)}>
+        {selfUser => {
+          return <AppMain app={app} selfUser={selfUser} mainView={mainView} locked={softLockEnabled} />;
+        }}
+      </AppLoader>
+      <StyledApp themeId={THEME_ID.DEFAULT} css={{backgroundColor: 'unset', height: '100%'}}>
+        <PrimaryModalComponent />
+      </StyledApp>
+    </>
   );
 };

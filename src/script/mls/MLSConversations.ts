@@ -27,6 +27,7 @@ import {
   isMLSConversation,
   isSelfConversation,
   isTeamConversation,
+  MLSCapableConversation,
   MLSConversation,
 } from '../conversation/ConversationSelectors';
 import {Conversation} from '../entity/Conversation';
@@ -38,37 +39,47 @@ import {User} from '../entity/User';
  * @param conversations - all the conversations that the user is part of
  * @param core - the instance of the core
  */
-export async function initMLSConversations(
+export async function initMLSGroupConversations(
   conversations: Conversation[],
-  core: Account,
-  onSuccessfulJoin?: (conversation: Conversation) => void,
+  {
+    core,
+    onSuccessfulJoin,
+    onError,
+  }: {
+    core: Account;
+    onSuccessfulJoin?: (conversation: Conversation) => void;
+    onError?: (conversation: Conversation, error: unknown) => void;
+  },
 ): Promise<void> {
   const {mls: mlsService, conversation: conversationService} = core.service || {};
   if (!mlsService || !conversationService) {
     throw new Error('MLS or Conversation service is not available!');
   }
 
-  const mlsConversations = conversations.filter(isMLSCapableConversation);
+  const mlsGroupConversations = conversations.filter(
+    (conversation): conversation is MLSCapableConversation =>
+      conversation.isGroup() && isMLSCapableConversation(conversation),
+  );
 
-  await Promise.allSettled(
-    mlsConversations.map(async mlsConversation => {
+  for (const mlsConversation of mlsGroupConversations) {
+    try {
       const {groupId, qualifiedId} = mlsConversation;
 
       const doesMLSGroupExist = await conversationService.mlsGroupExistsLocally(groupId);
 
       //if group is already established, we just schedule periodic key material updates
       if (doesMLSGroupExist) {
-        return mlsService.scheduleKeyMaterialRenewal(groupId);
+        await mlsService.scheduleKeyMaterialRenewal(groupId);
+        continue;
       }
 
       //otherwise we should try joining via external commit
       await conversationService.joinByExternalCommit(qualifiedId);
-
-      if (onSuccessfulJoin) {
-        return onSuccessfulJoin(mlsConversation);
-      }
-    }),
-  );
+      onSuccessfulJoin?.(mlsConversation);
+    } catch (error) {
+      onError?.(mlsConversation, error);
+    }
+  }
 }
 
 /**
@@ -76,34 +87,44 @@ export async function initMLSConversations(
  * The self conversation and the team conversation are special conversations created by noone and, thus, need to be manually created by the first device that detects them
  *
  * @param conversations all the conversations the user is part of
+ * @param selfUser entity of the self user
+ * @param selfClientId id of the current client
  * @param core instance of the core
  */
-export async function registerUninitializedSelfAndTeamConversations(
+export async function initialiseSelfAndTeamConversations(
   conversations: Conversation[],
   selfUser: User,
   selfClientId: string,
   core: Account,
 ): Promise<void> {
-  const mlsService = core.service?.mls;
-
-  if (!mlsService) {
-    throw new Error('MLS service not available');
+  const {mls: mlsService, conversation: conversationService} = core.service || {};
+  if (!mlsService || !conversationService) {
+    throw new Error('MLS or Conversation service is not available!');
   }
 
-  const uninitializedConversations = conversations.filter(
+  const conversationsToEstablish = conversations.filter(
     (conversation): conversation is MLSConversation =>
-      isMLSConversation(conversation) &&
-      conversation.epoch === 0 &&
-      (isSelfConversation(conversation) || isTeamConversation(conversation)),
+      isMLSConversation(conversation) && (isSelfConversation(conversation) || isTeamConversation(conversation)),
   );
 
   await Promise.all(
-    uninitializedConversations.map(conversation =>
-      mlsService.registerConversation(conversation.groupId, [selfUser.qualifiedId], {
-        user: selfUser,
-        client: selfClientId,
-      }),
-    ),
+    conversationsToEstablish.map(async conversation => {
+      if (conversation.epoch < 1) {
+        return mlsService.registerConversation(conversation.groupId, [selfUser.qualifiedId], {
+          user: selfUser,
+          client: selfClientId,
+        });
+      }
+
+      // If the conversation is already established, we don't need to do anything.
+      const isGroupAlreadyEstablished = await mlsService.isConversationEstablished(conversation.groupId);
+      if (isGroupAlreadyEstablished) {
+        return Promise.resolve();
+      }
+
+      // Otherwise, we need to join the conversation via external commit.
+      return conversationService.joinByExternalCommit(conversation.qualifiedId);
+    }),
   );
 }
 

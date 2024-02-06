@@ -19,9 +19,9 @@
 
 import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data';
 import {
-  ConversationOtrMessageAddEvent,
-  ConversationMLSMessageAddEvent,
   CONVERSATION_EVENT,
+  ConversationMLSMessageAddEvent,
+  ConversationOtrMessageAddEvent,
 } from '@wireapp/api-client/lib/event';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {AddUsersFailureReasons} from '@wireapp/core/lib/conversation';
@@ -29,16 +29,16 @@ import {ReactionType} from '@wireapp/core/lib/conversation/ReactionType';
 import {DecryptionError} from '@wireapp/core/lib/errors/DecryptionError';
 
 import type {REASON as AVS_REASON} from '@wireapp/avs';
-import type {LegalHoldStatus, Asset} from '@wireapp/protocol-messaging';
+import type {Asset, LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {createUuid} from 'Util/uuid';
 
 import {AssetTransferState} from '../assets/AssetTransferState';
-import {CALL_MESSAGE_TYPE} from '../calling/enum/CallMessageType';
 import type {Conversation} from '../entity/Conversation';
 import type {Message} from '../entity/message/Message';
 import type {User} from '../entity/User';
-import {CALL, ClientEvent, CONVERSATION} from '../event/Client';
+import {ClientEvent, CONVERSATION} from '../event/Client';
+import {E2EIVerificationMessageType} from '../message/E2EIVerificationMessageType';
 import {StatusType} from '../message/StatusType';
 import {VerificationMessageType} from '../message/VerificationMessageType';
 import {ReactionMap, ReadReceipt, UserReactionMap} from '../storage';
@@ -60,25 +60,6 @@ export interface ConversationEvent<Type extends CONVERSATION | CONVERSATION_EVEN
   type: Type;
 }
 
-export interface CallingEvent {
-  /**
-   * content is an object that comes from avs
-   */
-  content: {
-    type: CALL_MESSAGE_TYPE;
-    version: string;
-  };
-  targetConversation?: QualifiedId;
-  conversation: string;
-  from: string;
-  qualified_conversation?: QualifiedId;
-  qualified_from?: QualifiedId;
-  sender: string;
-  time?: string;
-  type: CALL;
-  senderClientId?: string;
-}
-
 export interface BackendEventMessage<Type, Data> extends Omit<BaseEvent, 'id'> {
   data: Data;
   id?: string;
@@ -97,6 +78,7 @@ export type VoiceChannelDeactivateEvent = ConversationEvent<
 
 export type AllVerifiedEventData = {type: VerificationMessageType.VERIFIED};
 export type AllVerifiedEvent = ConversationEvent<CONVERSATION.VERIFICATION, AllVerifiedEventData>;
+export type OneToOneMigratedToMlsEvent = ConversationEvent<CONVERSATION.ONE2ONE_MIGRATED_TO_MLS>;
 export type AssetAddEvent = ConversationEvent<
   CONVERSATION.ASSET_ADD,
   {
@@ -151,6 +133,7 @@ export type MessageAddEvent = ConversationEvent<
     replacing_message_id?: string;
     previews?: string[];
     expects_read_confirmation?: boolean;
+    mentions?: string[];
     quote?:
       | string
       | {
@@ -159,6 +142,10 @@ export type MessageAddEvent = ConversationEvent<
           hash: Uint8Array;
         }
       | {error: {type: string}};
+    /** @deprecated this was legacy field for the text content */
+    message?: string;
+    /** @deprecated this was legacy field for the conversationId */
+    id?: string;
   }
 > & {
   /** who have received/read the event */
@@ -204,7 +191,10 @@ export type DeleteEverywhereEvent = ConversationEvent<
     deleted_time: string;
   }
 >;
-export type CompositeMessageAddEvent = ConversationEvent<CONVERSATION.COMPOSITE_MESSAGE_ADD>;
+export type CompositeMessageAddEvent = ConversationEvent<
+  CONVERSATION.COMPOSITE_MESSAGE_ADD,
+  {items: {button: {id: string; text: string}; text: MessageAddEvent['data']}[]}
+>;
 export type IncomingMessageTooBigEvent = ConversationEvent<CONVERSATION.INCOMING_MESSAGE_TOO_BIG>;
 export type KnockEvent = ConversationEvent<
   CONVERSATION.KNOCK,
@@ -244,8 +234,13 @@ export interface ErrorEvent
   id: string;
 }
 
+// E2EI Verification Events
+export type E2EIVerificationEventData = {type: E2EIVerificationMessageType; userIds?: QualifiedId[]};
+export type E2EIVerificationEvent = ConversationEvent<CONVERSATION.E2EI_VERIFICATION, E2EIVerificationEventData>;
+
 export type ClientConversationEvent =
   | AllVerifiedEvent
+  | E2EIVerificationEvent
   | AssetAddEvent
   | ErrorEvent
   | CompositeMessageAddEvent
@@ -266,6 +261,7 @@ export type ClientConversationEvent =
   | MemberLeaveEvent
   | MemberJoinEvent
   | OneToOneCreationEvent
+  | OneToOneMigratedToMlsEvent
   | VoiceChannelDeactivateEvent
   | FileTypeRestrictedEvent
   | CallingTimeoutEvent
@@ -304,6 +300,17 @@ export const EventBuilder = {
     };
   },
 
+  build1to1MigratedToMLS(conversationEntity: Conversation): OneToOneMigratedToMlsEvent {
+    return {
+      ...buildQualifiedId(conversationEntity),
+      time: new Date(conversationEntity.getNextTimestamp()).toISOString(),
+      type: ClientEvent.CONVERSATION.ONE2ONE_MIGRATED_TO_MLS,
+      from: conversationEntity.selfUser().id,
+      data: undefined,
+      id: createUuid(),
+    };
+  },
+
   buildAllVerified(conversationEntity: Conversation): AllVerifiedEvent {
     return {
       ...buildQualifiedId(conversationEntity),
@@ -314,6 +321,37 @@ export const EventBuilder = {
       id: createUuid(),
       time: new Date(conversationEntity.getNextTimestamp()).toISOString(),
       type: ClientEvent.CONVERSATION.VERIFICATION,
+    };
+  },
+
+  buildAllE2EIVerified(conversationEntity: Conversation): E2EIVerificationEvent {
+    return {
+      ...buildQualifiedId(conversationEntity),
+      data: {
+        type: E2EIVerificationMessageType.VERIFIED,
+      },
+      from: '',
+      id: createUuid(),
+      time: conversationEntity.getNextIsoDate(),
+      type: ClientEvent.CONVERSATION.E2EI_VERIFICATION,
+    };
+  },
+
+  buildE2EIDegraded(
+    conversationEntity: Conversation,
+    type: E2EIVerificationMessageType,
+    userIds?: QualifiedId[],
+  ): E2EIVerificationEvent {
+    return {
+      ...buildQualifiedId(conversationEntity),
+      data: {
+        type,
+        userIds,
+      },
+      from: '',
+      id: createUuid(),
+      time: conversationEntity.getNextIsoDate(),
+      type: ClientEvent.CONVERSATION.E2EI_VERIFICATION,
     };
   },
 
@@ -413,11 +451,11 @@ export const EventBuilder = {
   buildGroupCreation(
     conversationEntity: Conversation,
     isTemporaryGuest: boolean = false,
-    timestamp: number,
+    timestamp: number = 0,
   ): GroupCreationEvent {
     const {creator: creatorId} = conversationEntity;
     const selfUserId = conversationEntity.selfUser().id;
-    const isoDate = new Date(timestamp || 0).toISOString();
+    const isoDate = new Date(timestamp).toISOString();
 
     const userIds = conversationEntity.participating_user_ids().slice();
     const createdBySelf = creatorId === selfUserId || isTemporaryGuest;

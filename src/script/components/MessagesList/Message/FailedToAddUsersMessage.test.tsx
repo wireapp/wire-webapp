@@ -150,7 +150,7 @@ describe('FailedToAddUsersMessage', () => {
     const message = createFailedToAddUsersMessage({
       users: [qualifiedId1, qualifiedId2],
       reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS,
-      backends: ['test-2.domain'],
+      backends: ['test.domain', 'test-2.domain'],
     });
 
     const {getByText, getAllByText} = render(
@@ -171,7 +171,7 @@ describe('FailedToAddUsersMessage', () => {
     const details = getAllByText(
       (_, element) =>
         element?.textContent ===
-        'Arjita and Tom could not be added to the group as the backend of test-2.domain could not be reached.',
+        'Arjita and Tom could not be added to the group as the backend of test.domain, test-2.domain could not be reached.',
     );
 
     expect(details.length).toBeGreaterThanOrEqual(1);

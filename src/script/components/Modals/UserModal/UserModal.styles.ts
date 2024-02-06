@@ -45,10 +45,6 @@ export const userModalStyle = css`
     padding: 0;
   }
 
-  .modal__header {
-    margin: 16px;
-  }
-
   .modal__body {
     padding: 0 16px;
 

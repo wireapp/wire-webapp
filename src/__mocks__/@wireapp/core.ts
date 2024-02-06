@@ -32,8 +32,21 @@ export class Account extends EventEmitter {
   };
 
   configureMLSCallbacks = jest.fn();
-
+  enrollE2EI = jest.fn();
   service = {
+    e2eIdentity: {
+      isEnrollmentInProgress: jest.fn(),
+      clearAllProgress: jest.fn(),
+      getUsersIdentities: jest.fn(() => new Map()),
+      getAllGroupUsersIdentities: jest.fn(() => new Map()),
+      getDeviceIdentities: jest.fn(),
+      getConversationState: jest.fn(),
+      registerServerCertificates: jest.fn(),
+      on: jest.fn(),
+      emit: jest.fn(),
+      off: jest.fn(),
+      initialize: jest.fn(),
+    },
     mls: {
       schedulePeriodicKeyMaterialRenewals: jest.fn(),
       addUsersToExistingConversation: jest.fn(),
@@ -45,10 +58,11 @@ export class Account extends EventEmitter {
       getClientIds: jest.fn(),
       getEpoch: jest.fn(),
       exportSecretKey: jest.fn(),
-      on: this.on,
-      emit: this.emit,
-      off: this.off,
+      on: jest.fn(),
+      emit: jest.fn(),
+      off: jest.fn(),
       scheduleKeyMaterialRenewal: jest.fn(),
+      isConversationEstablished: jest.fn(),
     },
     asset: {
       uploadAsset: jest.fn(),
@@ -78,6 +92,12 @@ export class Account extends EventEmitter {
     },
     client: {
       deleteClient: jest.fn(),
+    },
+    self: {
+      putSupportedProtocols: jest.fn(),
+    },
+    user: {
+      getUserSupportedProtocols: jest.fn(),
     },
   };
 }

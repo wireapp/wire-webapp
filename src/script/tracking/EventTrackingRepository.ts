@@ -18,6 +18,7 @@
  */
 
 import {amplify} from 'amplify';
+import Countly from 'countly-sdk-web';
 import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -42,8 +43,6 @@ import {ClientEvent} from '../event/Client';
 import {TeamState} from '../team/TeamState';
 import {ROLE as TEAM_ROLE} from '../user/UserPermission';
 import {UserState} from '../user/UserState';
-
-const Countly = require('countly-sdk-web');
 
 export class EventTrackingRepository {
   private isProductReportingActivated: boolean;

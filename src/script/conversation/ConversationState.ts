@@ -17,7 +17,6 @@
  *
  */
 
-import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
 import {container, singleton} from 'tsyringe';
@@ -32,6 +31,7 @@ import {
   isMLSConversation,
   isProteus1to1ConversationWithUser,
   isSelfConversation,
+  isReadableConversation,
 } from './ConversationSelectors';
 
 import {Conversation} from '../entity/Conversation';
@@ -55,8 +55,8 @@ export class ConversationState {
   public readonly visibleConversations: ko.PureComputed<Conversation[]>;
   public readonly filteredConversations: ko.PureComputed<Conversation[]>;
   public readonly archivedConversations: ko.PureComputed<Conversation[]>;
-  private readonly selfProteusConversation: ko.PureComputed<Conversation | undefined>;
-  private readonly selfMLSConversation: ko.PureComputed<Conversation | undefined>;
+  public readonly selfProteusConversation: ko.PureComputed<Conversation | undefined>;
+  public readonly selfMLSConversation: ko.PureComputed<MLSConversation | undefined>;
   public readonly unreadConversations: ko.PureComputed<Conversation[]>;
   /**
    * All the users that are connected to the selfUser through a conversation. Those users are not necessarily **directly** connected to the selfUser (through a connection request)
@@ -78,7 +78,10 @@ export class ConversationState {
       this.conversations().find(conversation => !isMLSConversation(conversation) && isSelfConversation(conversation)),
     );
     this.selfMLSConversation = ko.pureComputed(() =>
-      this.conversations().find(conversation => isMLSConversation(conversation) && isSelfConversation(conversation)),
+      this.conversations().find(
+        (conversation): conversation is MLSConversation =>
+          isMLSConversation(conversation) && isSelfConversation(conversation),
+      ),
     );
 
     this.visibleConversations = ko.pureComputed(() => {
@@ -100,18 +103,7 @@ export class ConversationState {
     });
 
     this.filteredConversations = ko.pureComputed(() => {
-      return this.conversations().filter(conversationEntity => {
-        const states_to_filter = [
-          ConnectionStatus.MISSING_LEGAL_HOLD_CONSENT,
-          ConnectionStatus.BLOCKED,
-          ConnectionStatus.CANCELLED,
-          ConnectionStatus.PENDING,
-        ];
-
-        return !(
-          isSelfConversation(conversationEntity) || states_to_filter.includes(conversationEntity.connection().status())
-        );
-      });
+      return this.conversations().filter(isReadableConversation);
     });
 
     this.connectedUsers = ko.pureComputed(() => {
@@ -151,7 +143,7 @@ export class ConversationState {
     return proteusConversation;
   }
 
-  getSelfMLSConversation(): Conversation {
+  getSelfMLSConversation(): MLSConversation {
     const mlsConversation = this.selfMLSConversation();
     if (!mlsConversation) {
       throw new Error('No MLS self conversation');

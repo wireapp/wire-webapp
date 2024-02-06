@@ -31,7 +31,7 @@ import {ConversationClassifiedBar} from 'Components/input/ClassifiedBar';
 import {isMediaDevice} from 'src/script/guards/MediaDevice';
 import {MediaDeviceType} from 'src/script/media/MediaDeviceType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {KEY} from 'Util/KeyboardUtil';
+import {handleKeyDown, isEscapeKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {preventFocusOutside} from 'Util/util';
 
@@ -156,6 +156,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     (call.initialType === CALL_TYPE.VIDEO || conversation.supportsVideoCall(call.isConference));
 
   const showSwitchMicrophone = audioinput.length > 1;
+  const showSwitchVideo = videoinput.length > 1;
 
   const audioOptions = [
     {
@@ -276,17 +277,6 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
 
   const totalPages = callPages.length;
 
-  const isSpaceOrEnterKey = (event: React.KeyboardEvent<HTMLButtonElement>) =>
-    [KEY.ENTER, KEY.SPACE].includes(event.key);
-
-  const handleToggleCameraKeydown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
-    if (isSpaceOrEnterKey(event)) {
-      toggleCamera(call);
-    }
-
-    return true;
-  };
-
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
   const horizontalSmBreakpoint = useMatchMedia('max-width: 680px');
   const horizontalXsBreakpoint = useMatchMedia('max-width: 500px');
@@ -294,6 +284,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent): void => {
+      event.preventDefault();
       preventFocusOutside(event, 'video-calling');
     };
     document.addEventListener('keydown', onKeyDown);
@@ -385,6 +376,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
               <button
                 data-uie-name="pagination-next"
                 onClick={() => changePage(currentPage + 1, call)}
+                onKeyDown={event => handleKeyDown(event, () => changePage(currentPage + 1, call))}
                 type="button"
                 className="button-reset-default"
                 css={{
@@ -402,6 +394,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                 data-uie-name="pagination-previous"
                 type="button"
                 onClick={() => changePage(currentPage - 1, call)}
+                onKeyDown={event => handleKeyDown(event, () => changePage(currentPage - 1, call))}
                 className="button-reset-default"
                 css={{
                   ...paginationButtonStyles,
@@ -435,6 +428,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                   className="video-controls__button"
                   css={videoControlInActiveStyles}
                   onClick={minimize}
+                  onKeyDown={event => handleKeyDown(event, () => minimize())}
                   type="button"
                   aria-labelledby="minimize-label"
                   data-uie-name="do-call-controls-video-minimize"
@@ -461,6 +455,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                   className="video-controls__button"
                   data-uie-value={!isMuted ? 'inactive' : 'active'}
                   onClick={() => toggleMute(call, !isMuted)}
+                  onKeyDown={event => handleKeyDown(event, () => toggleMute(call, !isMuted))}
                   css={!isMuted ? videoControlActiveStyles : videoControlInActiveStyles}
                   type="button"
                   aria-labelledby="mute-label"
@@ -479,14 +474,19 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                   <button
                     className="device-toggle-button"
                     css={audioOptionsOpen ? videoControlActiveStyles : videoControlInActiveStyles}
-                    onClick={() => {
-                      setAudioOptionsOpen(prev => !prev);
+                    onClick={() => setAudioOptionsOpen(prev => !prev)}
+                    onKeyDown={event => handleKeyDown(event, () => setAudioOptionsOpen(prev => !prev))}
+                    onBlur={event => {
+                      if (!event.currentTarget.contains(event.relatedTarget)) {
+                        setAudioOptionsOpen(false);
+                      }
                     }}
-                    onBlur={() => setAudioOptionsOpen(false)}
                   >
                     {audioOptionsOpen ? (
                       <>
                         <Select
+                          // eslint-disable-next-line jsx-a11y/no-autofocus
+                          autoFocus
                           value={selectedAudioOptions}
                           id="select-microphone"
                           dataUieName="select-microphone"
@@ -501,6 +501,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                               String(selectedOption?.value).includes('input'),
                             );
                           }}
+                          onKeyDown={event => isEscapeKey(event) && setAudioOptionsOpen(false)}
                           menuPlacement="top"
                           menuIsOpen
                           wrapperCSS={{marginBottom: 0}}
@@ -520,7 +521,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                     className="video-controls__button"
                     data-uie-value={selfSharesCamera ? 'active' : 'inactive'}
                     onClick={() => toggleCamera(call)}
-                    onKeyDown={handleToggleCameraKeydown}
+                    onKeyDown={event => handleKeyDown(event, () => toggleCamera(call))}
                     role="switch"
                     aria-checked={selfSharesCamera}
                     tabIndex={TabIndex.FOCUSABLE}
@@ -539,36 +540,38 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                     </span>
                   </button>
 
-                  <button
-                    className="device-toggle-button"
-                    css={videoOptionsOpen ? videoControlActiveStyles : videoControlInActiveStyles}
-                    onClick={() => {
-                      setVideoOptionsOpen(prev => !prev);
-                    }}
-                    onBlur={() => setVideoOptionsOpen(false)}
-                  >
-                    {videoOptionsOpen ? (
-                      <>
-                        <Select
-                          value={selectedVideoOptions}
-                          onChange={selectedOption => updateVideoOptions(String(selectedOption?.value))}
-                          id="select-camera"
-                          dataUieName="select-camera"
-                          controlShouldRenderValue={false}
-                          isClearable={false}
-                          backspaceRemovesValue={false}
-                          hideSelectedOptions={false}
-                          options={videoOptions}
-                          menuPlacement="top"
-                          menuIsOpen
-                          wrapperCSS={{marginBottom: 0}}
-                        />
-                        <Icon.Chevron css={{height: '16px'}} />
-                      </>
-                    ) : (
-                      <Icon.Chevron css={{rotate: '180deg', height: '16px'}} />
-                    )}
-                  </button>
+                  {showSwitchVideo && (
+                    <button
+                      className="device-toggle-button"
+                      css={videoOptionsOpen ? videoControlActiveStyles : videoControlInActiveStyles}
+                      onClick={() => {
+                        setVideoOptionsOpen(prev => !prev);
+                      }}
+                      onBlur={() => setVideoOptionsOpen(false)}
+                    >
+                      {videoOptionsOpen ? (
+                        <>
+                          <Select
+                            value={selectedVideoOptions}
+                            onChange={selectedOption => updateVideoOptions(String(selectedOption?.value))}
+                            id="select-camera"
+                            dataUieName="select-camera"
+                            controlShouldRenderValue={false}
+                            isClearable={false}
+                            backspaceRemovesValue={false}
+                            hideSelectedOptions={false}
+                            options={videoOptions}
+                            menuPlacement="top"
+                            menuIsOpen
+                            wrapperCSS={{marginBottom: 0}}
+                          />
+                          <Icon.Chevron css={{height: '16px'}} />
+                        </>
+                      ) : (
+                        <Icon.Chevron css={{rotate: '180deg', height: '16px'}} />
+                      )}
+                    </button>
+                  )}
                 </li>
               )}
 
@@ -580,10 +583,11 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                     !canShareScreen
                       ? videoControlDisabledStyles
                       : selfSharesScreen
-                      ? videoControlActiveStyles
-                      : videoControlInActiveStyles
+                        ? videoControlActiveStyles
+                        : videoControlInActiveStyles
                   }
                   onClick={() => toggleScreenshare(call)}
+                  onKeyDown={event => handleKeyDown(event, () => toggleScreenshare(call))}
                   type="button"
                   aria-labelledby="screen-share-label"
                   data-uie-value={selfSharesScreen ? 'active' : 'inactive'}
@@ -605,6 +609,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                 <button
                   className="video-controls__button video-controls__button--red"
                   onClick={() => leave(call)}
+                  onKeyDown={event => handleKeyDown(event, () => leave(call))}
                   type="button"
                   aria-labelledby="leave-label"
                   data-uie-name="do-call-controls-video-call-cancel"

@@ -17,7 +17,12 @@
  *
  */
 
-import {CONVERSATION_TYPE, ConversationProtocol} from '@wireapp/api-client/lib/conversation/';
+import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
+import {
+  CONVERSATION_TYPE,
+  ConversationProtocol,
+  Conversation as BackendConversation,
+} from '@wireapp/api-client/lib/conversation/';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import {matchQualifiedIds} from 'Util/QualifiedId';
@@ -57,6 +62,42 @@ export function isTeamConversation(conversation: Conversation): boolean {
   return conversation.type() === CONVERSATION_TYPE.GLOBAL_TEAM;
 }
 
+export function isProteusTeam1to1Conversation({
+  name,
+  type,
+  inTeam,
+  otherMembersLength,
+}: {
+  name: string | undefined;
+  type: CONVERSATION_TYPE;
+  inTeam: boolean;
+  otherMembersLength: number;
+}): boolean {
+  const isGroupConversation = type === CONVERSATION_TYPE.REGULAR;
+  const hasOneParticipant = otherMembersLength === 1;
+  return isGroupConversation && hasOneParticipant && inTeam && !name;
+}
+
+export function isBackendProteus1to1Conversation(conversation: BackendConversation): boolean {
+  const isProteus1to1 =
+    conversation.protocol === ConversationProtocol.PROTEUS && conversation.type === CONVERSATION_TYPE.ONE_TO_ONE;
+
+  const {name, type, team, members} = conversation;
+
+  return (
+    isProteusTeam1to1Conversation({
+      name,
+      type,
+      inTeam: !!team,
+      otherMembersLength: members.others.length,
+    }) || isProteus1to1
+  );
+}
+
+export function isConnectionRequestConversation(conversation: Conversation): boolean {
+  return conversation.type() === CONVERSATION_TYPE.CONNECT;
+}
+
 interface ProtocolToConversationType {
   [ConversationProtocol.PROTEUS]: ProteusConversation;
   [ConversationProtocol.MLS]: MLSConversation;
@@ -73,12 +114,12 @@ const is1to1ConversationWithUser =
     }
 
     const connection = conversation.connection();
-    if (connection.userId) {
+    if (connection?.userId) {
       return matchQualifiedIds(connection.userId, userId);
     }
 
     const isProteusConnectType =
-      protocol === ConversationProtocol.PROTEUS && conversation.type() === CONVERSATION_TYPE.CONNECT;
+      protocol === ConversationProtocol.PROTEUS && isConnectionRequestConversation(conversation);
 
     if (!conversation.is1to1() && !isProteusConnectType) {
       return false;
@@ -96,3 +137,16 @@ export const isProteus1to1ConversationWithUser = (userId: QualifiedId) =>
 
 export const isMLS1to1ConversationWithUser = (userId: QualifiedId) =>
   is1to1ConversationWithUser(userId, ConversationProtocol.MLS);
+
+export const isReadableConversation = (conversation: Conversation): boolean => {
+  const states_to_filter = [
+    ConnectionStatus.MISSING_LEGAL_HOLD_CONSENT,
+    ConnectionStatus.BLOCKED,
+    ConnectionStatus.CANCELLED,
+    ConnectionStatus.PENDING,
+  ];
+
+  const connection = conversation.connection();
+
+  return !(isSelfConversation(conversation) || (connection && states_to_filter.includes(connection.status())));
+};

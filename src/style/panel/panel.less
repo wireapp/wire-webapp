@@ -136,14 +136,15 @@
   }
 
   &__info-text {
-    .subline;
+    > .participant-devices__link {
+      display: block;
+    }
+
     &:focus-visible {
       .focus-outline;
       .focus-offset;
       .focus-border-radius;
     }
-
-    color: var(--gray-90);
 
     body.theme-dark & {
       color: var(--gray-50);

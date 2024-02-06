@@ -318,86 +318,87 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   const isInputValid = groupNameLength && !nameError.length;
 
   return (
-    <div id="group-creation-modal" className="group-creation__modal">
-      <ModalComponent
-        wrapperCSS={{overflow: 'unset', overflowY: 'unset'}}
-        isShown={isShown}
-        onClosed={onClose}
-        data-uie-name="group-creation-label"
-      >
-        <div className="modal__header modal__header--list">
-          {stateIsParticipants && (
-            <>
-              <button
-                className="button-reset-default"
-                type="button"
-                onClick={clickOnBack}
-                aria-label={t('accessibility.groupCreationParticipantsActionBack')}
-                data-uie-name="go-back"
-              >
-                <Icon.ArrowLeft aria-hidden="true" className="modal__header__button" />
-              </button>
+    <ModalComponent
+      id="group-creation-modal"
+      className="group-creation__modal"
+      wrapperCSS={{overflow: 'unset', overflowY: 'unset'}}
+      isShown={isShown}
+      onClosed={onClose}
+      data-uie-name="group-creation-label"
+    >
+      <div className="modal__header modal__header--list">
+        {stateIsParticipants && (
+          <>
+            <button
+              className="button-reset-default"
+              type="button"
+              onClick={clickOnBack}
+              aria-label={t('accessibility.groupCreationParticipantsActionBack')}
+              data-uie-name="go-back"
+            >
+              <Icon.ArrowLeft aria-hidden="true" className="modal__header__button" />
+            </button>
 
-              <h2 id="group-creation-label" className="modal__header__title" data-uie-name="status-people-selected">
-                {selectedContacts.length
-                  ? t('groupCreationParticipantsHeaderWithCounter', selectedContacts.length)
-                  : t('groupCreationParticipantsHeader')}
-              </h2>
+            <h2 id="group-creation-label" className="modal__header__title" data-uie-name="status-people-selected">
+              {selectedContacts.length
+                ? t('groupCreationParticipantsHeaderWithCounter', selectedContacts.length)
+                : t('groupCreationParticipantsHeader')}
+            </h2>
 
-              <Button
-                className="group-creation__action enabled accent-text"
-                css={{marginBottom: 0}}
-                type="button"
-                onClick={clickOnCreate}
-                aria-label={participantsActionText}
-                data-uie-name="do-create-group"
-                variant={ButtonVariant.TERTIARY}
-              >
-                {participantsActionText}
-              </Button>
-            </>
-          )}
-          {stateIsPreferences && (
-            <>
-              <button
-                className="button-reset-default"
-                type="button"
-                onClick={() => setIsShown(false)}
-                aria-label={t('accessibility.groupCreationActionCloseModal')}
-                data-uie-name="do-close"
-              >
-                <Icon.Close aria-hidden="true" className="modal__header__button" />
-              </button>
+            <Button
+              className="group-creation__action enabled accent-text"
+              css={{marginBottom: 0}}
+              type="button"
+              onClick={clickOnCreate}
+              aria-label={participantsActionText}
+              data-uie-name="do-create-group"
+              variant={ButtonVariant.TERTIARY}
+            >
+              {participantsActionText}
+            </Button>
+          </>
+        )}
+        {stateIsPreferences && (
+          <>
+            <button
+              className="button-reset-default"
+              type="button"
+              onClick={() => setIsShown(false)}
+              aria-label={t('accessibility.groupCreationActionCloseModal')}
+              data-uie-name="do-close"
+            >
+              <Icon.Close aria-hidden="true" className="modal__header__button" />
+            </button>
 
-              <h2 id="group-creation-label" className="modal__header__title">
-                {t('groupCreationPreferencesHeader')}
-              </h2>
+            <h2 id="group-creation-label" className="modal__header__title">
+              {t('groupCreationPreferencesHeader')}
+            </h2>
 
-              <Button
-                id="group-go-next"
-                className={cx('group-creation__action', {
-                  'accent-text': groupNameLength,
-                  enabled: isInputValid,
-                })}
-                css={{marginBottom: 0}}
-                disabled={!isInputValid}
-                type="button"
-                onClick={clickOnNext}
-                aria-label={t('groupCreationPreferencesAction')}
-                data-uie-name="go-next"
-                variant={ButtonVariant.TERTIARY}
-              >
-                {t('groupCreationPreferencesAction')}
-              </Button>
-            </>
-          )}
-        </div>
+            <Button
+              id="group-go-next"
+              className={cx('group-creation__action', {
+                'accent-text': groupNameLength,
+                enabled: isInputValid,
+              })}
+              css={{marginBottom: 0}}
+              disabled={!isInputValid}
+              type="button"
+              onClick={clickOnNext}
+              aria-label={t('groupCreationPreferencesAction')}
+              data-uie-name="go-next"
+              variant={ButtonVariant.TERTIARY}
+            >
+              {t('groupCreationPreferencesAction')}
+            </Button>
+          </>
+        )}
+      </div>
+      <FadingScrollbar className="modal__body">
         {stateIsParticipants && (
           <SearchInput
             input={participantsInput}
             setInput={setParticipantsInput}
             selectedUsers={selectedContacts}
-            setSelectedUsers={setSelectedContacts}
             placeholder={t('groupCreationParticipantsPlaceholder')}
             onEnter={clickOnCreate}
           />
@@ -405,21 +406,19 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
 
         {stateIsParticipants && selfUser && (
           <FadingScrollbar className="group-creation__list">
-            {filteredContacts.length > 0 && (
-              <UserSearchableList
-                selfUser={selfUser}
-                users={filteredContacts}
-                filter={participantsInput}
-                selected={selectedContacts}
-                isSelectable
-                onUpdateSelectedUsers={setSelectedContacts}
-                searchRepository={searchRepository}
-                teamRepository={teamRepository}
-                conversationRepository={conversationRepository}
-                noUnderline
-                allowRemoteSearch
-              />
-            )}
+            <UserSearchableList
+              selfUser={selfUser}
+              users={filteredContacts}
+              filter={participantsInput}
+              selected={selectedContacts}
+              isSelectable
+              onUpdateSelectedUsers={setSelectedContacts}
+              searchRepository={searchRepository}
+              teamRepository={teamRepository}
+              conversationRepository={conversationRepository}
+              noUnderline
+              allowRemoteSearch
+            />
           </FadingScrollbar>
         )}
 
@@ -515,8 +514,8 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
             )}
           </>
         )}
-      </ModalComponent>
-    </div>
+      </FadingScrollbar>
+    </ModalComponent>
   );
 };
 

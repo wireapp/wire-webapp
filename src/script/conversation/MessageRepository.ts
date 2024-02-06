@@ -17,7 +17,12 @@
  *
  */
 
-import {ConversationProtocol, MessageSendingStatus, QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
+import {
+  CONVERSATION_TYPE,
+  ConversationProtocol,
+  MessageSendingStatus,
+  QualifiedUserClients,
+} from '@wireapp/api-client/lib/conversation';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import {QualifiedId, RequestCancellationError} from '@wireapp/api-client/lib/user';
 import {
@@ -49,6 +54,11 @@ import {partition} from 'underscore';
 import {Asset, Availability, Confirmation, GenericMessage} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {
+  cancelSendingLinkPreview,
+  clearLinkPreviewSendingState,
+  shouldSendLinkPreviewForMessage,
+} from 'Util/LinkPreviewSender';
 import {Declension, joinNames, t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
@@ -71,6 +81,7 @@ import {getLinkPreviewFromString} from './linkPreviews';
 import {buildMetadata, ImageMetadata, isAudio, isImage, isVideo} from '../assets/AssetMetaDataBuilder';
 import {AssetRepository} from '../assets/AssetRepository';
 import {AssetTransferState} from '../assets/AssetTransferState';
+import {AudioRepository} from '../audio/AudioRepository';
 import {AudioType} from '../audio/AudioType';
 import {ClientState} from '../client/ClientState';
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
@@ -165,6 +176,7 @@ export class MessageRepository {
     private readonly serverTimeHandler: ServerTimeHandler,
     private readonly userRepository: UserRepository,
     private readonly assetRepository: AssetRepository,
+    private readonly audioRepository: AudioRepository,
     private readonly userState = container.resolve(UserState),
     private readonly clientState = container.resolve(ClientState),
     private readonly conversationState = container.resolve(ConversationState),
@@ -240,7 +252,7 @@ export class MessageRepository {
       legalHoldStatus: conversation.legalHoldStatus(),
     });
 
-    amplify.publish(WebAppEvents.AUDIO.PLAY, AudioType.OUTGOING_PING);
+    void this.audioRepository.play(AudioType.OUTGOING_PING);
     return this.sendAndInjectMessage(ping, conversation, {enableEphemeral: true});
   }
 
@@ -380,22 +392,37 @@ export class MessageRepository {
       );
     }
 
+    const originalMessageId = originalMessage.id;
     const messagePayload = {
       conversation,
       mentions,
       message: textMessage,
       messageId: createUuid(), // We set the id explicitely in order to be able to override the message if we generate a link preview
-      originalMessageId: originalMessage.id,
+      originalMessageId,
     };
-    const {state} = await this.sendEdit(messagePayload);
-    if (state !== MessageSendingState.CANCELED) {
-      await this.handleLinkPreview(messagePayload);
+
+    // We cancel the sending of the link preview if the user has edited the message
+    // It prevents from sending a link preview for a message that has been replaced by another one
+    cancelSendingLinkPreview(originalMessageId);
+    try {
+      const {state} = await this.sendEdit(messagePayload);
+      if (state !== MessageSendingState.CANCELED) {
+        await this.handleLinkPreview(messagePayload);
+      }
+    } finally {
+      clearLinkPreviewSendingState(originalMessageId);
     }
   }
 
   private async handleLinkPreview(textPayload: TextMessagePayload & {messageId: string}) {
     // check if the user actually wants to send link previews
     if (!this.propertyRepository.getPreference(PROPERTIES_TYPE.PREVIEWS.SEND)) {
+      return;
+    }
+
+    const shouldSendLinkPreview = shouldSendLinkPreviewForMessage(textPayload.messageId);
+
+    if (!shouldSendLinkPreview) {
       return;
     }
 
@@ -789,7 +816,15 @@ export class MessageRepository {
     // Configure ephemeral messages
     conversationService.messageTimer.setConversationLevelTimer(conversation.id, conversation.messageTimer());
 
-    const sendOptions: Parameters<typeof conversationService.send>[0] = isMLSConversation(conversation)
+    const isMLS = isMLSConversation(conversation);
+    const is1to1 = conversation.type() === CONVERSATION_TYPE.ONE_TO_ONE;
+
+    //Before sending a message in MLS 1:1 conversation we need to make sure that the group is established
+    if (isMLS && is1to1) {
+      await this.conversationRepositoryProvider().makeSureMLS1to1ConversationIsEstablished(conversation);
+    }
+
+    const sendOptions: Parameters<typeof conversationService.send>[0] = isMLS
       ? {
           groupId: conversation.groupId,
           payload,
@@ -852,8 +887,23 @@ export class MessageRepository {
     this.logger.info(`Resetting session with client '${clientId}' of user '${userId.id}'.`);
 
     try {
+      const fingerprint = await this.cryptography_repository.getRemoteFingerprint(userId, clientId);
       // We delete the stored session so that it can be recreated later on
       await this.cryptography_repository.deleteSession(userId, clientId);
+      // Generating the fingerprint will regenerate the session
+      const newFingerPrint = await this.cryptography_repository.getRemoteFingerprint(userId, clientId);
+      if (fingerprint !== newFingerPrint) {
+        // unverify the client entity in case the fingerprint has changed during the session reset
+        this.logger.warn('identity of device has changed');
+        const device = this.userRepository
+          .findUserById(userId)
+          ?.devices()
+          .find(device => device.id === clientId);
+
+        device?.meta.isVerified(false);
+        // Will trigger the conversation verification handler
+        amplify.publish(WebAppEvents.USER.CLIENTS_UPDATED, userId);
+      }
       return await this.sendSessionReset(userId, clientId, conversation);
     } catch (error) {
       const message = error instanceof Error ? error.message : error;
@@ -992,6 +1042,11 @@ export class MessageRepository {
   ): Promise<void> {
     const conversationId = conversation.id;
     const messageId = message.id;
+
+    // directly delete message from local database when status is sending
+    if (message.status() === StatusType.SENDING) {
+      await this.deleteMessageById(conversation, message.id);
+    }
 
     try {
       if (!message.user().isMe && !message.ephemeral_expires()) {
@@ -1209,7 +1264,11 @@ export class MessageRepository {
     try {
       const messageEntity = await this.getMessageInConversationById(conversationEntity, eventId);
       const errorStatus =
-        isBackendError(error) && error.label === BackendErrorLabel.FEDERATION_REMOTE_ERROR
+        isBackendError(error) &&
+        error.label ===
+          (BackendErrorLabel.FEDERATION_REMOTE_ERROR ||
+            BackendErrorLabel.FEDERATION_NOT_AVAILABLE ||
+            BackendErrorLabel.SERVER_ERROR)
           ? StatusType.FEDERATION_ERROR
           : StatusType.FAILED;
       messageEntity.status(errorStatus);

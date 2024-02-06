@@ -22,6 +22,7 @@ import ko from 'knockout';
 
 import {CALL_TYPE, CONV_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 
+import {backgroundBlur} from 'Components/calling/FullscreenVideoCall';
 import {chunk, getDifference, partition} from 'Util/ArrayUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {sortUsersByPriority} from 'Util/StringUtil';
@@ -31,8 +32,6 @@ import {ClientId, Participant} from './Participant';
 
 import {Config} from '../Config';
 import type {MediaDevicesHandler} from '../media/MediaDevicesHandler';
-
-import {backgroundBlur} from 'Components/calling/FullscreenVideoCall';
 
 export type SerializedConversationId = string;
 

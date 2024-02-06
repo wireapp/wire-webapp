@@ -36,9 +36,9 @@ export interface ServiceData {
 export class ServiceEntity {
   description: string;
   id: string;
-  mediumPictureResource: ko.Observable<AssetRemoteData>;
+  mediumPictureResource = ko.observable<AssetRemoteData>();
   name: ko.Observable<string>;
-  previewPictureResource: ko.Observable<AssetRemoteData>;
+  previewPictureResource = ko.observable<AssetRemoteData>();
   providerId: string;
   providerName: ko.Observable<string>;
   summary: string;
@@ -56,8 +56,6 @@ export class ServiceEntity {
     this.summary = summary;
     this.tags = tags;
 
-    this.mediumPictureResource = ko.observable();
-    this.previewPictureResource = ko.observable();
     this.isService = true;
   }
 }

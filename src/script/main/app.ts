@@ -31,6 +31,7 @@ import {container} from 'tsyringe';
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {initializeDataDog} from 'Util/DataDog';
 import {DebugUtil} from 'Util/DebugUtil';
 import {Environment} from 'Util/Environment';
@@ -57,8 +58,13 @@ import {ConnectionRepository} from '../connection/ConnectionRepository';
 import {ConnectionService} from '../connection/ConnectionService';
 import {ConversationRepository} from '../conversation/ConversationRepository';
 import {ConversationService} from '../conversation/ConversationService';
+import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
+import {registerMLSConversationVerificationStateHandler} from '../conversation/ConversationVerificationStateHandler';
+import {OnConversationE2EIVerificationStateChange} from '../conversation/ConversationVerificationStateHandler/shared';
+import {EventBuilder} from '../conversation/EventBuilder';
 import {MessageRepository} from '../conversation/MessageRepository';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
+import {getModalOptions, ModalType} from '../E2EIdentity/Modals';
 import {User} from '../entity/User';
 import {AccessTokenError} from '../error/AccessTokenError';
 import {AuthError} from '../error/AuthError';
@@ -67,7 +73,6 @@ import {ClientError, CLIENT_ERROR_TYPE} from '../error/ClientError';
 import {TeamError} from '../error/TeamError';
 import {EventRepository} from '../event/EventRepository';
 import {EventService} from '../event/EventService';
-import {EventServiceNoCompound} from '../event/EventServiceNoCompound';
 import {NotificationService} from '../event/NotificationService';
 import {EventStorageMiddleware} from '../event/preprocessor/EventStorageMiddleware';
 import {QuotedMessageMiddleware} from '../event/preprocessor/QuoteDecoderMiddleware';
@@ -82,10 +87,11 @@ import {IntegrationRepository} from '../integration/IntegrationRepository';
 import {IntegrationService} from '../integration/IntegrationService';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import {MediaRepository} from '../media/MediaRepository';
-import {initMLSConversations, registerUninitializedSelfAndTeamConversations} from '../mls';
+import {initMLSGroupConversations, initialiseSelfAndTeamConversations} from '../mls';
 import {joinConversationsAfterMigrationFinalisation} from '../mls/MLSMigration/migrationFinaliser';
 import {NotificationRepository} from '../notification/NotificationRepository';
 import {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
+import {configureE2EI} from '../page/components/FeatureConfigChange/FeatureConfigChangeHandler/Features/E2EIdentity';
 import {PermissionRepository} from '../permission/PermissionRepository';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {PropertiesService} from '../properties/PropertiesService';
@@ -130,7 +136,7 @@ export class App {
   service: {
     asset: AssetService;
     conversation: ConversationService;
-    event: EventService | EventServiceNoCompound;
+    event: EventService;
     integration: IntegrationService;
     notification: NotificationService;
     storage: StorageService;
@@ -240,6 +246,7 @@ export class App {
       serverTimeHandler,
       repositories.user,
       repositories.asset,
+      repositories.audio,
     );
 
     repositories.calling = new CallingRepository(
@@ -276,7 +283,11 @@ export class App {
       repositories.team,
     );
     repositories.permission = new PermissionRepository();
-    repositories.notification = new NotificationRepository(repositories.conversation, repositories.permission);
+    repositories.notification = new NotificationRepository(
+      repositories.conversation,
+      repositories.permission,
+      repositories.audio,
+    );
     repositories.preferenceNotification = new PreferenceNotificationRepository(repositories.user['userState'].self);
 
     return repositories;
@@ -290,7 +301,7 @@ export class App {
   private _setupServices() {
     container.registerInstance(StorageService, new StorageService());
     const storageService = container.resolve(StorageService);
-    const eventService = Runtime.isEdge() ? new EventServiceNoCompound() : new EventService();
+    const eventService = new EventService();
 
     return {
       asset: container.resolve(AssetService),
@@ -377,6 +388,16 @@ export class App {
 
       const selfUser = await this.initiateSelfUser();
 
+      const {features: teamFeatures, team} = await teamRepository.initTeam(selfUser.teamId);
+      const e2eiHandler = await configureE2EI(this.logger, teamFeatures);
+      if (e2eiHandler) {
+        /* We first try to do the initial enrollment (if the user has not yet enrolled)
+         * We need to enroll before anything else (in particular joining MLS conversations)
+         * Until the user is enrolled, we need to pause loading the app
+         */
+        await e2eiHandler.attemptEnrollment();
+      }
+
       this.core.configureCoreCallbacks({
         groupIdFromConversationId: async conversationId => {
           const conversation = await conversationRepository.getConversationById(conversationId);
@@ -415,19 +436,32 @@ export class App {
       onProgress(10);
       telemetry.timeStep(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
 
-      const teamMembers = await teamRepository.initTeam(selfUser.teamId);
+      const connections = await connectionRepository.getConnections();
+
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_USER_DATA);
 
-      const connections = await connectionRepository.getConnections();
       telemetry.addStatistic(AppInitStatisticsValue.CONNECTIONS, connections.length, 50);
 
       const conversations = await conversationRepository.loadConversations();
 
-      await userRepository.loadUsers(selfUser, connections, conversations, teamMembers);
+      // We load all the users the self user is connected with
+      const contacts = await userRepository.loadUsers(selfUser, connections, conversations);
+
+      if (team) {
+        // If we are in the context of team, we load the team members metadata (user roles)
+        await teamRepository.updateTeamMembersByIds(
+          team,
+          contacts.filter(user => user.teamId === team.id).map(({id}) => id),
+        );
+      }
 
       if (supportsMLS()) {
         //if mls is supported, we need to initialize the callbacks (they are used when decrypting messages)
         conversationRepository.initMLSConversationRecoveredListener();
+        registerMLSConversationVerificationStateHandler(
+          this.updateConversationE2EIVerificationState,
+          this.showClientCertificateRevokedWarning,
+        );
       }
 
       onProgress(25, t('initReceivedUserData'));
@@ -451,26 +485,32 @@ export class App {
 
       if (supportsMLS()) {
         //add the potential `self` and `team` conversations
-        await registerUninitializedSelfAndTeamConversations(conversations, selfUser, clientEntity.id, this.core);
+        await initialiseSelfAndTeamConversations(conversations, selfUser, clientEntity.id, this.core);
 
         //join all the mls groups that are known by the user but were migrated to mls
         await joinConversationsAfterMigrationFinalisation({
           conversations,
           core: this.core,
           onSuccess: conversationRepository.injectJoinedAfterMigrationFinalisationMessage,
+          onError: ({id}, error) =>
+            this.logger.error(`Failed when joining a migrated mls conversation with id ${id}, error: `, error),
         });
 
         //join all the mls groups we're member of and have not yet joined (eg. we were not send welcome message)
-        await initMLSConversations(conversations, this.core);
+        await initMLSGroupConversations(conversations, {
+          core: this.core,
+          onError: ({id}, error) =>
+            this.logger.error(`Failed when initialising mls conversation with id ${id}, error: `, error),
+        });
       }
 
       telemetry.timeStep(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
       telemetry.addStatistic(AppInitStatisticsValue.NOTIFICATIONS, totalNotifications, 100);
 
-      eventTrackerRepository.init(propertiesRepository.properties.settings.privacy.telemetry_sharing);
       onProgress(97.5, t('initUpdatedFromNotifications', this.config.BRAND_NAME));
 
       const clientEntities = await clientRepository.updateClientsForSelf();
+      await eventTrackerRepository.init(propertiesRepository.properties.settings.privacy.telemetry_sharing);
 
       onProgress(99);
 
@@ -492,13 +532,21 @@ export class App {
         // start regularly polling the server to check if there is a new version of Wire
         startNewVersionPolling(Environment.version(false), this.update);
       }
-      audioRepository.init(true);
+      audioRepository.init();
       await conversationRepository.cleanupEphemeralMessages();
       callingRepository.setReady();
       telemetry.timeStep(AppInitTimingsStep.APP_LOADED);
 
       this.logger.info(`App loaded in ${Date.now() - startTime}ms`);
 
+      if (e2eiHandler) {
+        // At the end of the process (once conversations are loaded and joined), we can check if we need to renew the user's certificate
+        try {
+          await e2eiHandler.attemptRenewal();
+        } catch (error) {
+          this.logger.error('Failed to renew user certificate: ', error);
+        }
+      }
       return selfUser;
     } catch (error) {
       if (error instanceof BaseError) {
@@ -798,4 +846,37 @@ export class App {
 
     doRedirect(signOutReason);
   }
+
+  private updateConversationE2EIVerificationState: OnConversationE2EIVerificationStateChange = async ({
+    conversationEntity,
+    conversationVerificationState,
+    verificationMessageType,
+    userIds,
+  }) => {
+    switch (conversationVerificationState) {
+      case ConversationVerificationState.VERIFIED:
+        const allVerifiedEvent = EventBuilder.buildAllE2EIVerified(conversationEntity);
+        await this.repository.event.injectEvent(allVerifiedEvent);
+        break;
+      case ConversationVerificationState.DEGRADED:
+        if (verificationMessageType) {
+          const degradedEvent = EventBuilder.buildE2EIDegraded(conversationEntity, verificationMessageType, userIds);
+          await this.repository.event.injectEvent(degradedEvent);
+        } else {
+          this.logger.error('updateConversationE2EIVerificationState: Missing verificationMessageType while degrading');
+        }
+        break;
+      default:
+        break;
+    }
+  };
+
+  private showClientCertificateRevokedWarning = async () => {
+    const {modalOptions, modalType} = getModalOptions({
+      type: ModalType.SELF_CERTIFICATE_REVOKED,
+      primaryActionFn: () => this.logout(SIGN_OUT_REASON.APP_INIT, false),
+    });
+
+    PrimaryModal.show(modalType, modalOptions);
+  };
 }

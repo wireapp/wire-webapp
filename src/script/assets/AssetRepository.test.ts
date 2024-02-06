@@ -99,7 +99,6 @@ describe('AssetRepository', () => {
   });
 
   it('detects a malformed asset key', async () => {
-    /* cspell:disable */
     const event: any = {
       category: 128,
       conversation: '61350a90-e522-4ee5-90b7-f55b648e34da',

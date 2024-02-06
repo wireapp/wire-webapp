@@ -17,11 +17,17 @@
  *
  */
 
+import {applyEncryptionMiddleware, NON_INDEXED_FIELDS} from 'dexie-encrypted';
+
 import type {CRUDEngine} from '@wireapp/store-engine';
 import {MemoryEngine} from '@wireapp/store-engine';
 import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
 
+import {getLogger} from 'Util/Logger';
+
 import {DexieDatabase} from '../storage/DexieDatabase';
+
+const logger = getLogger('StoreEngineProvider');
 
 export enum DatabaseTypes {
   /** a permament storage that will still live after logout */
@@ -30,9 +36,20 @@ export enum DatabaseTypes {
   EFFEMERAL,
 }
 
-const providePermanentEngine = async (storeName: string, requestPersistentStorage: boolean): Promise<CRUDEngine> => {
+const providePermanentEngine = async (
+  storeName: string,
+  key?: Uint8Array,
+  requestPersistentStorage?: boolean,
+): Promise<CRUDEngine> => {
   const db = new DexieDatabase(storeName);
 
+  // In case the encryption key is empty, we just give an empty config to the encryption middleware.
+  // We still need to set it up, even if encryption at rest is disabled, as we need to upgrade the DB version for the middleware to install its config table
+  const encryptionConfig = key ? {events: NON_INDEXED_FIELDS} : {};
+  const encryptionKey = key ? key : new Uint8Array(32).fill(0);
+  applyEncryptionMiddleware(db, encryptionKey, encryptionConfig, async () =>
+    logger.info('DB encyption config has changed'),
+  );
   const engine = new IndexedDBEngine();
   try {
     await engine.initWithDb(db, requestPersistentStorage);
@@ -45,11 +62,11 @@ const providePermanentEngine = async (storeName: string, requestPersistentStorag
 export async function createStorageEngine(
   storeName: string,
   type: DatabaseTypes,
-  requestPersistentStorage: boolean = false,
+  {key, requestPersistentStorage}: {key?: Uint8Array; requestPersistentStorage?: boolean} = {},
 ): Promise<CRUDEngine> {
   switch (type) {
     case DatabaseTypes.PERMANENT:
-      return providePermanentEngine(storeName, requestPersistentStorage);
+      return providePermanentEngine(storeName, key, requestPersistentStorage);
 
     case DatabaseTypes.EFFEMERAL:
       return new MemoryEngine();

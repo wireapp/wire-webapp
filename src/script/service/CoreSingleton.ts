@@ -21,56 +21,53 @@ import {container, singleton} from 'tsyringe';
 
 import {Account} from '@wireapp/core';
 
-import {supportsCoreCryptoProteus, supportsMLS} from 'Util/util';
+import {supportsMLS} from 'Util/util';
 
 import {APIClient} from './APIClientSingleton';
 import {createStorageEngine, DatabaseTypes} from './StoreEngineProvider';
+import {SystemCrypto, wrapSystemCrypto} from './utils/systemCryptoWrapper';
 
 import {Config} from '../Config';
 
 declare global {
   interface Window {
-    systemCrypto?:
-      | {
-          encrypt: (value: Uint8Array) => Promise<Uint8Array>;
-          decrypt: (payload: Uint8Array) => Promise<Uint8Array>;
-          version: undefined;
-        }
-      | {
-          encrypt: (value: string) => Promise<Uint8Array>;
-          decrypt: (payload: Uint8Array) => Promise<string>;
-          version: 1;
-        };
+    systemCrypto?: SystemCrypto;
   }
 }
 
 @singleton()
 export class Core extends Account {
+  public key?: Uint8Array;
+
   constructor(apiClient = container.resolve(APIClient)) {
+    const enableCoreCrypto = supportsMLS() || Config.getConfig().FEATURE.USE_CORE_CRYPTO;
     super(apiClient, {
-      createStore: (storeName, context) => {
-        return createStorageEngine(storeName, DatabaseTypes.PERMANENT);
+      createStore: async (storeName, key) => {
+        this.key = key;
+        return createStorageEngine(storeName, DatabaseTypes.PERMANENT, {
+          key: Config.getConfig().FEATURE.ENABLE_ENCRYPTION_AT_REST ? key : undefined,
+        });
       },
-      cryptoProtocolConfig: {
-        coreCrypoWasmFilePath: '/min/core-crypto.wasm',
-        mls: supportsMLS()
-          ? {
-              keyingMaterialUpdateThreshold: Config.getConfig().FEATURE.MLS_CONFIG_KEYING_MATERIAL_UPDATE_THRESHOLD,
-              defaultCiphersuite: Config.getConfig().FEATURE.MLS_CONFIG_DEFAULT_CIPHERSUITE,
-              useE2EI: Config.getConfig().FEATURE.ENABLE_E2EI,
-            }
-          : undefined,
 
-        proteus: supportsCoreCryptoProteus(),
-        /*
-         * When in an electron context, the window.systemCrypto will be populated by the renderer process.
-         * We then give those crypto primitives to the core that will use them when encrypting MLS secrets.
-         * When in a browser context, then this systemCrypto will be undefined and the core will then use it's internal encryption system
-         */
-        systemCrypto: window.systemCrypto,
+      /*
+       * When in an electron context, the window.systemCrypto will be populated by the renderer process.
+       * We then give those crypto primitives to the key generator that will use them to encrypt secrets.
+       * When in a browser context, then this systemCrypto will be undefined and the key generator will then use it's internal encryption system
+       */
+      systemCrypto: window.systemCrypto ? wrapSystemCrypto(window.systemCrypto) : undefined,
+      coreCryptoConfig: enableCoreCrypto
+        ? {
+            wasmFilePath: '/min/core-crypto.wasm',
+            mls: supportsMLS()
+              ? {
+                  keyingMaterialUpdateThreshold: Config.getConfig().FEATURE.MLS_CONFIG_KEYING_MATERIAL_UPDATE_THRESHOLD,
+                  cipherSuite: Config.getConfig().FEATURE.MLS_CONFIG_DEFAULT_CIPHERSUITE,
+                  useE2EI: Config.getConfig().FEATURE.ENABLE_E2EI,
+                }
+              : undefined,
+          }
+        : undefined,
 
-        useCoreCrypto: Config.getConfig().FEATURE.USE_CORE_CRYPTO,
-      },
       nbPrekeys: 100,
     });
   }

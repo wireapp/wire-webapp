@@ -145,6 +145,9 @@ export type Env = {
   /** Feature toggle to enforce constant bitrate encoding for calls. Can be set to true or false */
   FEATURE_ENFORCE_CONSTANT_BITRATE: string;
 
+  /** will make sure the clear text content of messages are encrypted before being written in the DB (enabling this will also disable full text search on messages) */
+  FEATURE_ENABLE_ENCRYPTION_AT_REST: string;
+
   /** Set a default federation domain in case no domain can be found */
   FEATURE_FEDERATION_DOMAIN: string;
 
@@ -245,6 +248,8 @@ export type Env = {
 
   URL_SUPPORT_SCREEN_ACCESS_DENIED: string;
 
+  URL_LEARN_MORE_ABOUT_GUEST_LINKS: string;
+
   URL_SUPPORT_NON_FEDERATING_INFO: string;
 
   URL_SUPPORT_OAUTH_LEARN_MORE: string;
@@ -252,6 +257,7 @@ export type Env = {
   URL_SUPPORT_OFFLINE_BACKEND: string;
 
   URL_SUPPORT_FEDERATION_STOP: string;
+  URL_SUPPORT_E2EI_VERIFICATION: string;
 
   URL_WHATS_NEW: string;
 

@@ -233,16 +233,14 @@ body {
 // ----------------------------------------------------------------------------
 // Conversation
 // ----------------------------------------------------------------------------
-@conversation-max-width: 800px;
+@conversation-max-width: 100%;
 
 @conversation-message-max-width: 640px;
-@conversation-message-sender-width: 56px;
+@conversation-message-sender-width: 64px;
 
 body {
-  --conversation-message-timestamp-width: 140px;
-  @media (max-width: @screen-md-min) {
-    --conversation-message-timestamp-width: 60px;
-  }
+  --conversation-message-sender-width: @conversation-message-sender-width;
+  --conversation-message-asset-width: 800px;
 }
 
 // ----------------------------------------------------------------------------
@@ -287,6 +285,7 @@ body {
 // Avatar
 // ---------------------------------------------------------------------------
 body {
+  --avatar-diameter-s: 28px;
   --avatar-diameter-m: 40px;
   --font-weight-semibold: 600;
   --font-weight-medium: 500;

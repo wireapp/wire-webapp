@@ -27,8 +27,13 @@ import {
   FeatureStatus,
   SelfDeletingTimeout,
 } from '@wireapp/api-client/lib/team/feature/';
+import {amplify} from 'amplify';
+
+import {Runtime} from '@wireapp/commons';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {Action} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {StringIdentifer, replaceLink, t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
@@ -44,8 +49,8 @@ const featureNotifications: Partial<
     FEATURE_KEY,
     (
       oldConfig?: Feature<any> | FeatureWithoutConfig,
-      newConfig?: Feature<any> | FeatureWithoutConfig,
-    ) => undefined | {htmlMessage: string; title: StringIdentifer}
+      newConfig?: FeatureWithoutConfig | Feature<any> | undefined,
+    ) => undefined | {htmlMessage: string; title: StringIdentifer; primaryAction?: Action}
   >
 > = {
   [FEATURE_KEY.FILE_SHARING]: (oldConfig, newConfig) => {
@@ -73,6 +78,43 @@ const featureNotifications: Partial<
           : t('featureConfigChangeModalAudioVideoDescriptionItemCameraDisabled'),
       title: 'featureConfigChangeModalAudioVideoHeadline',
     };
+  },
+  [FEATURE_KEY.ENFORCE_DOWNLOAD_PATH]: (oldConfig, newConfig) => {
+    if (
+      newConfig &&
+      'config' in newConfig &&
+      oldConfig &&
+      'config' in oldConfig &&
+      Runtime.isDesktopApp() &&
+      Runtime.isWindows()
+    ) {
+      const status = wasTurnedOnOrOff(oldConfig, newConfig);
+      const configStatus = newConfig?.config?.enforcedDownloadLocation !== oldConfig?.config?.enforcedDownloadLocation;
+      if (!status && !configStatus) {
+        return undefined;
+      }
+      amplify.publish(
+        WebAppEvents.TEAM.DOWNLOAD_PATH_UPDATE,
+        newConfig.status === FeatureStatus.ENABLED ? newConfig.config.enforcedDownloadLocation : undefined,
+      );
+      return {
+        htmlMessage:
+          status === FeatureStatus.ENABLED
+            ? t('featureConfigChangeModalDownloadPathEnabled')
+            : status === FeatureStatus.DISABLED
+              ? t('featureConfigChangeModalDownloadPathDisabled')
+              : t('featureConfigChangeModalDownloadPathChanged'),
+        title: 'featureConfigChangeModalDownloadPathHeadline',
+        primaryAction: {
+          action: () => {
+            if (Runtime.isDesktopApp() && status !== FeatureStatus.DISABLED) {
+              amplify.publish(WebAppEvents.LIFECYCLE.RESTART);
+            }
+          },
+        },
+      };
+    }
+    return undefined;
   },
   [FEATURE_KEY.SELF_DELETING_MESSAGES]: (oldConfig, newConfig) => {
     if (!oldConfig || !('config' in oldConfig) || !newConfig || !('config' in newConfig)) {
@@ -166,6 +208,8 @@ export function FeatureConfigChangeNotifier({teamState, selfUserId}: Props): nul
       Object.entries(featureNotifications).forEach(([feature, getMessage]) => {
         const featureKey = feature as FEATURE_KEY;
         const message = getMessage(previous?.[featureKey], config[featureKey]);
+        const isEnforceDownloadPath = featureKey === FEATURE_KEY.ENFORCE_DOWNLOAD_PATH;
+
         if (!message) {
           return;
         }
@@ -181,6 +225,9 @@ export function FeatureConfigChangeNotifier({teamState, selfUserId}: Props): nul
               brandName: Config.getConfig().BRAND_NAME,
             }),
           },
+          primaryAction: message.primaryAction,
+          hideCloseBtn: isEnforceDownloadPath,
+          preventClose: isEnforceDownloadPath,
         });
       });
     }

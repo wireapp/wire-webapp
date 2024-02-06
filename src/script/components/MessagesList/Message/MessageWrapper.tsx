@@ -26,6 +26,7 @@ import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {E2EIVerificationMessage} from 'Components/MessagesList/Message/E2EIVerificationMessage';
 import {OutgoingQuote} from 'src/script/conversation/MessageRepository';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {Text} from 'src/script/entity/message/Text';
@@ -60,16 +61,15 @@ const isOutgoingQuote = (quoteEntity: QuoteEntity): quoteEntity is OutgoingQuote
   return quoteEntity.hash !== undefined;
 };
 
-export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMessageFocused: boolean}> = ({
+export const MessageWrapper: React.FC<MessageParams & {isMessageFocused: boolean}> = ({
   message,
   conversation,
   selfId,
-  hasMarker,
   isMessageFocused,
   isSelfTemporaryGuest,
   isLastDeliveredMessage,
   shouldShowInvitePeople,
-  previousMessage,
+  hideHeader,
   hasReadReceiptsTurnedOn,
   onClickAvatar,
   onClickImage,
@@ -186,8 +186,7 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
         message={message}
         findMessage={findMessage}
         conversation={conversation}
-        previousMessage={previousMessage}
-        hasMarker={hasMarker}
+        hideHeader={hideHeader}
         selfId={selfId}
         isLastDeliveredMessage={isLastDeliveredMessage}
         onClickMessage={onClickMessage}
@@ -219,6 +218,9 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
   }
   if (message.isVerification()) {
     return <VerificationMessage message={message} />;
+  }
+  if (message.isE2EIVerification()) {
+    return <E2EIVerificationMessage message={message} conversation={conversation} />;
   }
   if (message.isDelete()) {
     return <DeleteMessage message={message} onClickAvatar={onClickAvatar} />;

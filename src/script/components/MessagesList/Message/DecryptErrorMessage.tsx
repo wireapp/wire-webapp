@@ -19,13 +19,14 @@
 
 import React, {useState} from 'react';
 
-import {DeviceId} from 'Components/DeviceId';
 import {Icon} from 'Components/Icon';
 import {getDecryptErrorUrl} from 'src/script/externalRoute';
 import {MotionDuration} from 'src/script/motion/MotionDuration';
 import {t} from 'Util/LocalizerUtil';
+import {splitFingerprint} from 'Util/StringUtil';
 
 import {DecryptErrorMessage as DecryptErrorMessageEntity} from '../../../entity/message/DecryptErrorMessage';
+import {FormattedId} from '../../../page/MainContent/panels/preferences/DevicesPreferences/components/FormattedId';
 
 export interface DecryptErrorMessageProps {
   message: DecryptErrorMessageEntity;
@@ -81,7 +82,7 @@ const DecryptErrorMessage: React.FC<DecryptErrorMessageProps> = ({message, onCli
           {message.clientId && (
             <>
               {'ID: '}
-              <DeviceId deviceId={message.clientId} />
+              <FormattedId idSlices={splitFingerprint(message.clientId)} smallPadding />
             </>
           )}
         </p>

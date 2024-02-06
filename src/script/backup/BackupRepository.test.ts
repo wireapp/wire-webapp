@@ -17,9 +17,12 @@
  *
  */
 
+import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {container} from 'tsyringe';
 import {omit} from 'underscore';
 
+import {generateConversation} from 'test/helper/ConversationGenerator';
+import {TestFactory} from 'test/helper/TestFactory';
 import {generateAPIUser} from 'test/helper/UserGenerator';
 import {noop} from 'Util/util';
 import {createUuid} from 'Util/uuid';
@@ -28,10 +31,9 @@ import {WebWorker} from 'Util/worker';
 import {BackUpHeader, DecodedHeader, ENCRYPTED_BACKUP_FORMAT, ENCRYPTED_BACKUP_VERSION} from './BackUpHeader';
 import {BackupRepository, Filename} from './BackupRepository';
 import {BackupService} from './BackupService';
-import {CancelError, DifferentAccountError, IncompatibleBackupError, IncompatiblePlatformError} from './Error';
+import {CancelError, DifferentAccountError, IncompatiblePlatformError} from './Error';
 import {handleZipEvent} from './zipWorker';
 
-import {ConversationRepository} from '../conversation/ConversationRepository';
 import {User} from '../entity/User';
 import {ClientEvent} from '../event/Client';
 import {DatabaseTypes, createStorageEngine} from '../service/StoreEngineProvider';
@@ -39,22 +41,14 @@ import {StorageService} from '../storage';
 import {StorageSchemata} from '../storage/StorageSchemata';
 
 const conversationId = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a';
-const conversation = {
-  accessModes: ['private'],
-  accessRole: 'private',
-  archived_state: false,
-  archived_timestamp: 0,
-  creator: '1ccd93e0-0f4b-4a73-b33f-05c464b88439',
-  id: conversationId,
-  last_event_timestamp: 2,
-  last_server_timestamp: 2,
-  muted_state: false,
-  muted_timestamp: 0,
-  name: 'Tom @ Staging',
-  others: ['a7122859-3f16-4870-b7f2-5cbca5572ab2'],
-  status: 0,
-  type: 2,
-};
+
+const conversation = generateConversation({
+  id: {id: conversationId, domain: 'test.wire.link'},
+  overwites: {
+    status: 0,
+    type: 2,
+  },
+}).serialize();
 
 const messages = [
   {
@@ -81,14 +75,16 @@ async function buildBackupRepository() {
   storageService.init(engine);
 
   const backupService = new BackupService(storageService);
-  const conversationRepository = {
-    init1To1Conversations: jest.fn(),
-    getAllLocalConversations: jest.fn(),
-    checkForDeletedConversations: jest.fn(),
-    mapConnections: jest.fn().mockImplementation(() => []),
-    updateConversationStates: jest.fn().mockImplementation(conversations => conversations),
-    updateConversations: jest.fn().mockImplementation(async () => {}),
-  } as unknown as ConversationRepository;
+
+  const testFactory = new TestFactory();
+  const conversationRepository = await testFactory.exposeConversationActors();
+
+  jest
+    .spyOn(conversationRepository, 'mapConversations')
+    .mockImplementation(conversations => conversations.map(c => generateConversation({type: c.type, overwites: c})));
+  jest.spyOn(conversationRepository, 'updateConversationStates');
+  jest.spyOn(conversationRepository, 'updateConversations');
+  jest.spyOn(conversationRepository, 'syncDeletedConversations').mockResolvedValue(undefined);
   return [
     new BackupRepository(backupService, conversationRepository),
     {backupService, conversationRepository, storageService},
@@ -137,8 +133,8 @@ describe('BackupRepository', () => {
       };
       const importSpy = jest.spyOn(backupService, 'importEntities');
 
-      await storageService.save(StorageSchemata.OBJECT_STORE.EVENTS, undefined, verificationEvent);
-      await storageService.save(StorageSchemata.OBJECT_STORE.EVENTS, undefined, textEvent);
+      await storageService.save(StorageSchemata.OBJECT_STORE.EVENTS, '', verificationEvent);
+      await storageService.save(StorageSchemata.OBJECT_STORE.EVENTS, '', textEvent);
       const blob = await backupRepository.generateHistory(user, 'client1', noop, password);
 
       await backupRepository.importHistory(new User('user1'), blob, noop, noop);
@@ -153,7 +149,7 @@ describe('BackupRepository', () => {
       const [backupRepository, {storageService}] = await buildBackupRepository();
       const password = '';
       await Promise.all([
-        ...messages.map(message => storageService.save(eventStoreName, undefined, message)),
+        ...messages.map(message => storageService.save(eventStoreName, '', message)),
         storageService.save('conversations', conversationId, conversation),
       ]);
 
@@ -170,12 +166,6 @@ describe('BackupRepository', () => {
         {
           expectedError: DifferentAccountError,
           metaChanges: {user_id: 'fail'},
-        },
-      ],
-      [
-        {
-          expectedError: IncompatibleBackupError,
-          metaChanges: {version: 13}, // version 14 contains a migration script, thus will generate an error
         },
       ],
       [
@@ -207,9 +197,19 @@ describe('BackupRepository', () => {
 
       const metadata = {...backupRepository.createMetaData(user, 'client1'), version: mockedDBVersion};
 
+      const conversation = generateConversation({
+        id: {id: 'conversation1', domain: 'staging2'},
+        type: CONVERSATION_TYPE.ONE_TO_ONE,
+      }).serialize();
+
+      const selfConversation = generateConversation({
+        id: {id: 'conversation2', domain: 'staging2'},
+        type: CONVERSATION_TYPE.SELF,
+      }).serialize();
+
       const files = {
         [Filename.METADATA]: JSON.stringify(metadata),
-        [Filename.CONVERSATIONS]: JSON.stringify([conversation]),
+        [Filename.CONVERSATIONS]: JSON.stringify([conversation, selfConversation]),
         [Filename.EVENTS]: JSON.stringify(messages),
         [Filename.USERS]: JSON.stringify(users),
       };
@@ -218,7 +218,17 @@ describe('BackupRepository', () => {
 
       await backupRepository.importHistory(user, zip, noop, noop);
 
-      expect(conversationRepository.updateConversationStates).toHaveBeenCalledWith([conversation]);
+      expect(conversationRepository.updateConversationStates).toHaveBeenCalledWith(
+        expect.arrayContaining([expect.objectContaining({id: conversation.id})]),
+      );
+
+      expect(conversationRepository.updateConversations).toHaveBeenCalledWith(
+        expect.arrayContaining([expect.objectContaining({id: conversation.id})]),
+      );
+      expect(conversationRepository.updateConversations).not.toHaveBeenCalledWith(
+        expect.arrayContaining([expect.objectContaining({id: selfConversation.id})]),
+      );
+
       expect(importSpy).toHaveBeenCalledWith(
         StorageSchemata.OBJECT_STORE.EVENTS,
         messages.map(message => omit(message, 'primary_key')),
@@ -270,7 +280,7 @@ describe('BackupRepository', () => {
       expect(mockGenerateChaCha20Key).toHaveBeenCalledWith(decodedHeader);
     });
 
-    test('compressHistoryFiles does not call the encryption function if no password is provided', async () => {
+    it('compressHistoryFiles does not call the encryption function if no password is provided', async () => {
       // Mocked values
       const password = '';
       const clientId = 'ClientId';
@@ -289,7 +299,8 @@ describe('BackupRepository', () => {
       expect(mockEncodeHeader).not.toHaveBeenCalled();
       expect(mockGenerateChaCha20Key).not.toHaveBeenCalled();
     });
-    test('compressHistoryFiles returns a Blob object with the correct type', async () => {
+
+    it('compressHistoryFiles returns a Blob object with the correct type', async () => {
       // Mocked values...
       const password = 'Password';
       const clientId = 'ClientId';

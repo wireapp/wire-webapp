@@ -1,0 +1,22 @@
+name: auto-merge PR
+on: pull_request
+
+permissions:
+  pull-requests: write
+  contents: write
+
+# This job will enable auto merge on dependabots and otto-the-bot's PRs
+jobs:
+  activate-auto-merge:
+    runs-on: ubuntu-latest
+    if: ${{github.actor == 'dependabot[bot]' || github.actor == 'otto-the-bot'}}
+    steps:
+      - name: Approve PR
+        run: gh pr review --approve ${{github.event.pull_request.html_url}}
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+      - name: Enable auto-merge
+        run: gh pr merge --auto --squash ${{github.event.pull_request.html_url}}
+        env:
+          GITHUB_TOKEN: ${{secrets.OTTO_THE_BOT_GH_TOKEN}}

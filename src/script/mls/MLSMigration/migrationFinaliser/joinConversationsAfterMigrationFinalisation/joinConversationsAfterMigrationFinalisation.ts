@@ -23,7 +23,7 @@ import {Account} from '@wireapp/core';
 
 import {MLSConversation, isMLSConversation} from 'src/script/conversation/ConversationSelectors';
 import {Conversation} from 'src/script/entity/Conversation';
-import {initMLSConversations} from 'src/script/mls/MLSConversations';
+import {initMLSGroupConversations} from 'src/script/mls/MLSConversations';
 
 /**
  * Will compare the list of initial conversations stored in the local database with conversations fetched from the backend.
@@ -34,12 +34,14 @@ import {initMLSConversations} from 'src/script/mls/MLSConversations';
  */
 export const joinConversationsAfterMigrationFinalisation = async ({
   conversations,
-  onSuccess,
   core,
+  onSuccess,
+  onError,
 }: {
   conversations: Conversation[];
-  onSuccess: (conversation: Conversation) => void;
   core: Account;
+  onSuccess: (conversation: Conversation) => void;
+  onError?: (conversation: Conversation, error: unknown) => void;
 }) => {
   //we filter out the conversations that are known by the clients (saved in the db) before being refetch from the backend
   //if such conversations were previously using proteus, and now are using MLS,
@@ -47,7 +49,7 @@ export const joinConversationsAfterMigrationFinalisation = async ({
   //we have to join the conversation with external commit and let user know that they might have missed some messages
   const alreadyMigratedConversations = filterGroupConversationsAlreadyMigratedToMLS(conversations);
 
-  await initMLSConversations(alreadyMigratedConversations, core, onSuccess);
+  await initMLSGroupConversations(alreadyMigratedConversations, {core, onSuccessfulJoin: onSuccess, onError});
 };
 
 const filterGroupConversationsAlreadyMigratedToMLS = (conversations: Conversation[]) => {

@@ -25,12 +25,12 @@ import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {AvailabilityState} from 'Components/AvailabilityState';
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {ErrorFallback} from 'Components/ErrorFallback';
 import {Icon} from 'Components/Icon';
 import {UserClassifiedBar} from 'Components/input/ClassifiedBar';
-import {UserName} from 'Components/UserName';
+import {UserInfo} from 'Components/UserInfo';
+import {UserVerificationBadges} from 'Components/VerificationBadge';
 import {TeamState} from 'src/script/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -39,9 +39,9 @@ import {User} from '../../entity/User';
 
 interface UserDetailsProps {
   badge?: string;
+  groupId?: string;
   classifiedDomains?: string[];
   isGroupAdmin?: boolean;
-  isSelfVerified: boolean;
   isVerified?: boolean;
   participant: User;
   avatarStyles?: React.CSSProperties;
@@ -51,7 +51,7 @@ interface UserDetailsProps {
 const UserDetailsComponent: React.FC<UserDetailsProps> = ({
   badge,
   participant,
-  isSelfVerified,
+  groupId,
   isGroupAdmin,
   avatarStyles,
   classifiedDomains,
@@ -59,11 +59,9 @@ const UserDetailsComponent: React.FC<UserDetailsProps> = ({
 }) => {
   const user = useKoSubscribableChildren(participant, [
     'isGuest',
+    'isDirectGuest',
     'isTemporaryGuest',
     'expirationText',
-    'name',
-    'availability',
-    'is_verified',
     'isAvailable',
   ]);
 
@@ -75,29 +73,14 @@ const UserDetailsComponent: React.FC<UserDetailsProps> = ({
   return (
     <div className="panel-participant">
       <div className="panel-participant__head">
-        {teamState.isInTeam(participant) ? (
-          <AvailabilityState
-            className="panel-participant__head__name"
-            availability={user.availability}
-            label={user.name}
-            dataUieName="status-name"
-          />
-        ) : (
-          <h2
-            className="panel-participant__head__name"
-            data-uie-name="status-name"
-            css={user.isAvailable ? undefined : {color: 'var(--gray-70)'}}
-          >
-            <UserName user={participant} />
-          </h2>
-        )}
-
-        {isSelfVerified && user.is_verified && (
-          <Icon.Verified
-            className="panel-participant__head__verified-icon"
-            data-uie-name="status-verified-participant"
-          />
-        )}
+        <UserInfo
+          className="panel-participant__head__name"
+          user={participant}
+          dataUieName="status-name"
+          showAvailability={teamState.isInTeam(participant)}
+        >
+          <UserVerificationBadges user={participant} groupId={groupId} />
+        </UserInfo>
       </div>
 
       {participant.handle && (
@@ -130,7 +113,7 @@ const UserDetailsComponent: React.FC<UserDetailsProps> = ({
         </div>
       )}
 
-      {user.isGuest && user.isAvailable && (
+      {user.isDirectGuest && user.isAvailable && (
         <div className="panel-participant__label" data-uie-name="status-guest">
           <Icon.Guest />
           <span>{t('conversationGuestIndicator')}</span>

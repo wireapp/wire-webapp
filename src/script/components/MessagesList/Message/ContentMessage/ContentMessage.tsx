@@ -17,14 +17,13 @@
  *
  */
 
-import React, {useMemo, useState, useEffect} from 'react';
+import {useMemo, useState, useEffect} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {Conversation} from 'src/script/entity/Conversation';
 import {CompositeMessage} from 'src/script/entity/message/CompositeMessage';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {Message} from 'src/script/entity/message/Message';
 import {useRelativeTimestamp} from 'src/script/hooks/useRelativeTimestamp';
 import {StatusType} from 'src/script/message/StatusType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -43,7 +42,6 @@ import {EphemeralStatusType} from '../../../../message/EphemeralStatusType';
 import {ContextMenuEntry} from '../../../../ui/ContextMenu';
 import {EphemeralTimer} from '../EphemeralTimer';
 import {MessageTime} from '../MessageTime';
-import {ReadReceiptStatus} from '../ReadReceiptStatus';
 import {useMessageFocusedTabIndex} from '../util';
 
 export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetSession'> {
@@ -51,29 +49,29 @@ export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetS
   conversation: Conversation;
   findMessage: (conversation: Conversation, messageId: string) => Promise<ContentMessage | undefined>;
   focusMessage?: () => void;
+  /** whether the message should display the user avatar and user name before the actual content */
+  hideHeader: boolean;
   hasMarker?: boolean;
   isMessageFocused: boolean;
   isLastDeliveredMessage: boolean;
   message: ContentMessage;
   onClickButton: (message: CompositeMessage, buttonId: string) => void;
   onRetry: (message: ContentMessage) => void;
-  previousMessage?: Message;
   quotedMessage?: ContentMessage;
   selfId: QualifiedId;
   isMsgElementsFocusable: boolean;
   onClickReaction: (emoji: string) => void;
 }
 
-export const ContentMessageComponent: React.FC<ContentMessageProps> = ({
+export const ContentMessageComponent = ({
   conversation,
   message,
   findMessage,
   selfId,
-  hasMarker = false,
+  hideHeader,
   isMessageFocused,
   isLastDeliveredMessage,
   contextMenu,
-  previousMessage,
   onClickAvatar,
   onClickImage,
   onClickTimestamp,
@@ -83,7 +81,8 @@ export const ContentMessageComponent: React.FC<ContentMessageProps> = ({
   onRetry,
   isMsgElementsFocusable,
   onClickReaction,
-}) => {
+  onClickDetails,
+}: ContentMessageProps) => {
   // check if current message is focused and its elements focusable
   const msgFocusState = useMemo(
     () => isMsgElementsFocusable && isMessageFocused,
@@ -100,7 +99,6 @@ export const ContentMessageComponent: React.FC<ContentMessageProps> = ({
     failedToSend,
     reactions,
     status,
-    user,
     quote,
   } = useKoSubscribableChildren(message, [
     'senderName',
@@ -112,22 +110,11 @@ export const ContentMessageComponent: React.FC<ContentMessageProps> = ({
     'failedToSend',
     'reactions',
     'status',
-    'user',
     'quote',
   ]);
 
-  const shouldShowAvatar = (): boolean => {
-    if (!previousMessage || hasMarker) {
-      return true;
-    }
-
-    if (message.isContent() && was_edited) {
-      return true;
-    }
-
-    return !previousMessage.isContent() || previousMessage.user().id !== user.id;
-  };
   const timeAgo = useRelativeTimestamp(message.timestamp());
+
   const [messageAriaLabel] = getMessageAriaLabel({
     assets,
     displayTimestampShort: message.displayTimestampShort(),
@@ -167,18 +154,20 @@ export const ContentMessageComponent: React.FC<ContentMessageProps> = ({
         }
       }}
     >
-      {shouldShowAvatar() && (
+      {(was_edited || !hideHeader) && (
         <MessageHeader onClickAvatar={onClickAvatar} message={message} focusTabIndex={messageFocusedTabIndex}>
           {was_edited && (
             <span className="message-header-label-icon icon-edit" title={message.displayEditedTimestamp()}></span>
           )}
+
           <span className="content-message-timestamp">
-            <MessageTime timestamp={timestamp} className="label-xs" data-timestamp-type="normal">
+            <MessageTime timestamp={timestamp} data-timestamp-type="normal">
               {timeAgo}
             </MessageTime>
           </span>
         </MessageHeader>
       )}
+
       <div className="message-body">
         <div className="message-body-content" title={ephemeral_caption}>
           {ephemeral_status === EphemeralStatusType.ACTIVE && (
@@ -186,6 +175,7 @@ export const ContentMessageComponent: React.FC<ContentMessageProps> = ({
               <EphemeralTimer message={message} />
             </div>
           )}
+
           {quote && (
             <Quote
               conversation={conversation}
@@ -199,6 +189,7 @@ export const ContentMessageComponent: React.FC<ContentMessageProps> = ({
               isMessageFocused={msgFocusState}
             />
           )}
+
           {assets.map(asset => (
             <ContentAsset
               key={asset.type}
@@ -209,8 +200,12 @@ export const ContentMessageComponent: React.FC<ContentMessageProps> = ({
               onClickImage={onClickImage}
               onClickMessage={onClickMessage}
               isMessageFocused={msgFocusState}
+              is1to1Conversation={conversation.is1to1()}
+              isLastDeliveredMessage={isLastDeliveredMessage}
+              onClickDetails={() => onClickDetails(message)}
             />
           ))}
+
           {failedToSend && (
             <PartialFailureToSendWarning
               isMessageFocused={msgFocusState}
@@ -227,9 +222,10 @@ export const ContentMessageComponent: React.FC<ContentMessageProps> = ({
             />
           )}
         </div>
+
         {!isConversationReadonly && isActionMenuVisible && (
           <MessageActionsMenu
-            isMsgWithHeader={shouldShowAvatar()}
+            isMsgWithHeader={!hideHeader}
             message={message}
             handleActionMenuVisibility={setActionMenuVisibility}
             contextMenu={contextMenu}
@@ -239,25 +235,20 @@ export const ContentMessageComponent: React.FC<ContentMessageProps> = ({
             isRemovedFromConversation={conversation.removed_from_conversation()}
           />
         )}
-
-        <div className="message-body-actions">
-          <ReadReceiptStatus
-            message={message}
-            is1to1Conversation={conversation.is1to1()}
-            isLastDeliveredMessage={isLastDeliveredMessage}
-          />
-        </div>
       </div>
 
-      <MessageReactionsList
-        reactions={reactions}
-        selfUserId={selfId}
-        handleReactionClick={onClickReaction}
-        isMessageFocused={msgFocusState}
-        onTooltipReactionCountClick={() => onClickReactionDetails(message)}
-        onLastReactionKeyEvent={() => setActionMenuVisibility(false)}
-        isRemovedFromConversation={conversation.removed_from_conversation()}
-      />
+      {!!reactions.length && (
+        <MessageReactionsList
+          reactions={reactions}
+          selfUserId={selfId}
+          handleReactionClick={onClickReaction}
+          isMessageFocused={msgFocusState}
+          onTooltipReactionCountClick={() => onClickReactionDetails(message)}
+          onLastReactionKeyEvent={() => setActionMenuVisibility(false)}
+          isRemovedFromConversation={conversation.removed_from_conversation()}
+          users={conversation.allUserEntities()}
+        />
+      )}
     </div>
   );
 };

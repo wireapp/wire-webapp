@@ -17,8 +17,6 @@
  *
  */
 
-import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
-
 import {ConfirmationEvent} from 'src/script/conversation/EventBuilder';
 import {User} from 'src/script/entity/User';
 import {getLogger, Logger} from 'Util/Logger';
@@ -52,10 +50,7 @@ export class ReceiptsMiddleware implements EventMiddleware {
       case ClientEvent.CONVERSATION.MESSAGE_ADD: {
         const qualifiedConversation = event.qualified_conversation || {domain: '', id: event.conversation};
         return this.conversationRepository.getConversationById(qualifiedConversation).then(conversation => {
-          if (conversation && conversation.isGroup()) {
-            const expectsReadConfirmation = conversation.receiptMode() === RECEIPT_MODE.ON;
-            event.data.expects_read_confirmation = !!expectsReadConfirmation;
-          }
+          event.data.expects_read_confirmation = this.conversationRepository.expectReadReceipt(conversation);
           return event;
         });
       }
