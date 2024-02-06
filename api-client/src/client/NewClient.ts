@@ -21,7 +21,7 @@ import {ClientCapabilityData} from './ClientCapabilityData';
 
 import {PreKey} from '../auth/';
 
-import {ClientClassification, ClientType, Location, MLSPublicKeyRecord} from './';
+import {ClientCapability, ClientClassification, ClientType, Location, MLSPublicKeyRecord} from './';
 
 type BaseUpdatePayload = ClientCapabilityData & {label?: string};
 type MLSUpdatePayload = {
@@ -38,6 +38,7 @@ export type UpdateClientPayload = Partial<ProteusUpdatePayload | MLSUpdatePayloa
 
 export type CreateClientPayload = {
   class: ClientClassification.DESKTOP | ClientClassification.PHONE | ClientClassification.TABLET;
+  capabilities?: ClientCapability[];
   cookie: string;
   label?: string;
   lastkey: PreKey;
