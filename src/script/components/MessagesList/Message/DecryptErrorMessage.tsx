@@ -36,7 +36,7 @@ export interface DecryptErrorMessageProps {
 const DecryptErrorMessage: React.FC<DecryptErrorMessageProps> = ({message, onClickResetSession}) => {
   const [isResettingSession, setIsResettingSession] = useState(false);
 
-  const link = Config.getConfig().URL_SUPPORT_DECRYPT_ERROR_1;
+  const link = Config.getConfig().URL.SUPPORT.DECRYPT_ERROR;
   const caption = message.isIdentityChanged
     ? t('conversationUnableToDecrypt2', message.user().name(), {
         '/highlight': '</span>',

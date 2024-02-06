@@ -30,7 +30,6 @@ import {DeviceCard} from './DeviceCard';
 import type {ClientEntity} from '../../client/ClientEntity';
 import {Config} from '../../Config';
 import type {User} from '../../entity/User';
-import {getPrivacyWhyUrl} from '../../externalRoute';
 
 interface DeviceListProps {
   clickOnDevice: (client: ClientEntity) => void;
@@ -52,7 +51,7 @@ const DeviceList: React.FC<DeviceListProps> = ({user, getDeviceIdentity, noPaddi
 
         <a
           className="participant-devices__link accent-text"
-          href={getPrivacyWhyUrl()}
+          href={Config.getConfig().URL.SUPPORT.PRIVACY_WHY}
           rel="nofollow noopener noreferrer"
           target="_blank"
         >
