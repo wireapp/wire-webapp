@@ -978,8 +978,11 @@ export class Conversation {
     return userEntities.filter(userEntity => !userEntity.is_verified());
   }
 
+  /**
+   * Get all conversation participants including the self user.
+   */
   getAllUserEntities(): User[] {
-    return this.participating_user_ets();
+    return this.participating_user_ets().concat(this.selfUser());
   }
 
   supportsVideoCall(sftEnabled: boolean): boolean {
