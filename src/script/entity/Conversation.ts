@@ -978,10 +978,6 @@ export class Conversation {
     return userEntities.filter(userEntity => !userEntity.is_verified());
   }
 
-  getAllUserEntities(): User[] {
-    return this.participating_user_ets();
-  }
-
   supportsVideoCall(sftEnabled: boolean): boolean {
     if (sftEnabled) {
       return true;
