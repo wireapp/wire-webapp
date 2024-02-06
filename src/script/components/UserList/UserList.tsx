@@ -219,9 +219,7 @@ export const UserList = ({
     const isSelected = (userEntity: User): boolean =>
       isSelectable && !!selectedUsers?.some(user => user.id === userEntity.id);
 
-    const currentUsers = truncatedUsers.filter(user => isSelected(user));
-
-    const selectedUsersCount = currentUsers.length;
+    const selectedUsersCount = selectedUsers.length;
     const hasSelectedUsers = selectedUsersCount > 0;
 
     const toggleFolder = (folderName: UserListSections) => {
@@ -255,7 +253,7 @@ export const UserList = ({
               className={cx('search-list', cssClasses)}
             >
               {isSelectedContactsOpen &&
-                currentUsers.map((user, index) => {
+                selectedUsers.map((user, index) => {
                   const isLastItem = index === selectedUsersCount - 1;
 
                   return renderListItem(user, isLastItem);
