@@ -20,79 +20,42 @@
 import {currentLanguage} from './auth/localeConfig';
 import {Config} from './Config';
 
-const env = window.wire.env;
-
-export const URL = {
-  ACCOUNT: env.URL?.ACCOUNT_BASE,
-  PRIVACY_POLICY: env.URL?.PRIVACY_POLICY,
-  SUPPORT: env.URL?.SUPPORT.INDEX,
-  TEAM_SETTINGS: env.URL?.TEAMS_BASE,
-  TERMS_OF_USE_PERSONAL: env.URL?.TERMS_OF_USE_PERSONAL,
-  TERMS_OF_USE_TEAMS: env.URL?.TERMS_OF_USE_TEAMS,
-  WEBAPP: {
-    INTERNAL: 'https://wire-webapp-staging.wire.com',
-    PRODUCTION: env.APP_BASE || 'https://app.wire.com',
-    STAGING: 'https://wire-webapp-staging.zinfra.io',
-  },
-  WEBSITE: env.URL?.WEBSITE_BASE,
-};
-
-export const URL_PATH = {
-  CREATE_TEAM: '/create-team/',
-  DECRYPT_ERROR_1: '/articles/207948115',
-  DECRYPT_ERROR_2: '/privacy/error-2/',
-  MANAGE_SERVICES: '/services/',
-  MANAGE_TEAM: '/login/',
-  PASSWORD_RESET: '/forgot/',
-  PRIVACY_HOW: '/privacy/how/',
-  PRIVACY_UNVERIFIED_USERS: '/articles/202857164',
-  PRIVACY_WHY: '/articles/207859815',
-  SUPPORT_USERNAME: '/support/username/',
-} as const;
+export const URL = Config.getConfig().URL;
 
 const getTeamSettingsUrl = (path: string = '', utmSource?: string): string | undefined => {
   const query = utmSource ? `?utm_source=${utmSource}&utm_term=desktop` : '';
-  const teamSettingsUrl = `${URL.TEAM_SETTINGS}${path}${query}`;
-  return URL.TEAM_SETTINGS ? teamSettingsUrl : undefined;
+  const teamSettingsUrl = `${URL.TEAMS_BASE}${path}${query}`;
+  return URL.TEAMS_BASE ? teamSettingsUrl : undefined;
 };
 
 export const getWebsiteUrl = (path: string = '', pkCampaign?: string): string | undefined => {
-  if (URL.WEBSITE) {
+  if (URL.WEBSITE_BASE) {
     const query = pkCampaign ? `?pk_campaign=${pkCampaign}&pk_kwd=desktop` : '';
-    const websiteUrl = `${URL.WEBSITE}${path}${query}`;
-    return addLocaleToUrl(URL.WEBSITE ? websiteUrl : undefined);
+    const websiteUrl = `${URL.WEBSITE_BASE}${path}${query}`;
+    return addLocaleToUrl(URL.WEBSITE_BASE ? websiteUrl : undefined);
   }
   return undefined;
 };
 
-// const getHelpCenterUrl = (path: (typeof URL_PATH)[keyof typeof URL_PATH]) => {
-//   if (URL.SUPPORT) {
-//     const helpcenterUrl = `${URL.SUPPORT}${path}`;
-//     return addLocaleToHelpCenterUrl(URL.SUPPORT ? helpcenterUrl : undefined);
-//   }
-//   return undefined;
-// };
-
 export const getAccountPagesUrl = (path: string = ''): string | undefined => {
-  const accountPagesUrl = `${URL.ACCOUNT}${path}`;
-  return URL.ACCOUNT ? accountPagesUrl : undefined;
+  const accountPagesUrl = `${URL.ACCOUNT_BASE}${path}`;
+  return URL.ACCOUNT_BASE ? accountPagesUrl : undefined;
 };
 
-export const getPrivacyPolicyUrl = (): string => addLocaleToUrl(URL.PRIVACY_POLICY || undefined);
-export const getTermsOfUsePersonalUrl = (): string => addLocaleToUrl(URL.TERMS_OF_USE_PERSONAL || undefined);
-export const getTermsOfUseTeamUrl = (): string => addLocaleToUrl(URL.TERMS_OF_USE_TEAMS || undefined);
+export const getPrivacyPolicyUrl = (): string | undefined => addLocaleToUrl(URL.PRIVACY_POLICY || undefined);
+export const getTermsOfUsePersonalUrl = (): string | undefined =>
+  addLocaleToUrl(URL.TERMS_OF_USE_PERSONAL || undefined);
+export const getTermsOfUseTeamUrl = (): string | undefined => addLocaleToUrl(URL.TERMS_OF_USE_TEAMS || undefined);
 
-export const getManageServicesUrl = (utmSource?: string): string =>
-  getTeamSettingsUrl(URL_PATH.MANAGE_SERVICES, utmSource);
-export const getManageTeamUrl = (utmSource?: string): string => getTeamSettingsUrl(URL_PATH.MANAGE_TEAM, utmSource);
+export const getManageServicesUrl = (utmSource?: string): string | undefined =>
+  getTeamSettingsUrl(URL.SUBPATH.MANAGE_SERVICES, utmSource);
+export const getManageTeamUrl = (utmSource?: string): string | undefined =>
+  getTeamSettingsUrl(URL.SUBPATH.MANAGE_TEAM, utmSource);
 
-export const getCreateTeamUrl = (): string =>
-  Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && `${Config.getConfig().URL.TEAMS_BASE}/register/email`;
-// export const getDecryptErrorUrl = (): string => getHelpCenterUrl(URL_PATH.DECRYPT_ERROR_1);
-export const getPrivacyUnverifiedUsersUrl = (): string => getHelpCenterUrl(URL_PATH.PRIVACY_UNVERIFIED_USERS);
-export const getPrivacyWhyUrl = (): string => getHelpCenterUrl(URL_PATH.PRIVACY_WHY);
+export const getCreateTeamUrl = (): string | undefined =>
+  Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION ? `${URL.TEAMS_BASE}${URL.SUBPATH.CREATE_TEAM}` : undefined;
 
-export const addLocaleToUrl = (url?: string): string | undefined => {
+export const addLocaleToUrl = (url?: string | undefined): string | undefined => {
   if (!url) {
     return undefined;
   }
@@ -100,15 +63,3 @@ export const addLocaleToUrl = (url?: string): string | undefined => {
   const websiteLanguage = language == 'de' ? language : 'en';
   return url.replace(Config.getConfig().URL.WEBSITE_BASE, `${Config.getConfig().URL.WEBSITE_BASE}/${websiteLanguage}`);
 };
-
-// const addLocaleToHelpCenterUrl = (url?: string): string => {
-//   if (!url) {
-//     return undefined;
-//   }
-//   const language = currentLanguage().slice(0, 2);
-//   const websiteLanguage = language == 'de' ? language : 'en-us';
-//   return url.replace(
-//     `${Config.getConfig().URL.SUPPORT.INDEX}`,
-//     `${Config.getConfig().URL.SUPPORT.INDEX}/hc/${websiteLanguage}`,
-//   );
-// };
