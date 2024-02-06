@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [26.10.5](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@26.10.4...@wireapp/api-client@26.10.5) (2024-02-06)
+
+### Bug Fixes
+
+* Allow new created client to be legal hold ready ([#5945](https://github.com/wireapp/wire-web-packages/issues/5945)) ([74f9ee7](https://github.com/wireapp/wire-web-packages/commit/74f9ee7d936c431a1304d7d6f264a8fb820f2d72))
+
 ## [26.10.4](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@26.10.3...@wireapp/api-client@26.10.4) (2024-02-05)
 
 **Note:** Version bump only for package @wireapp/api-client
