@@ -22,7 +22,7 @@ import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import {EventMapper} from 'src/script/conversation/EventMapper';
 import {Conversation} from 'src/script/entity/Conversation';
 import {Message} from 'src/script/entity/message/Message';
-import {createMessageAddEvent} from 'test/helper/EventGenerator';
+import {createGroupCreationEvent, createMessageAddEvent} from 'test/helper/EventGenerator';
 import {getRandomNumber} from 'Util/NumberUtil';
 import {createUuid} from 'Util/uuid';
 
@@ -54,6 +54,19 @@ describe('MessagesGroup', () => {
     const lastGroup: any = groupedMessages[groupedMessages.length - 1];
     expect(lastGroup.messages.length).toBe(sizeGroup);
     expect(lastGroup.sender).toBe(sender);
+  });
+
+  it('does not group together system messages and content messages', () => {
+    const sender = createUuid();
+    const groupCreationMessage = createGroupCreationEvent({from: sender});
+    const contentMessage = createMessageAddEvent({overrides: {from: sender}});
+
+    const allMessages = [groupCreationMessage, contentMessage].map(
+      event => eventMapper.mapJsonEvent(event, conversation) as Message,
+    );
+
+    const groupedMessages = groupMessagesBySenderAndTime(allMessages, 0);
+    expect(groupedMessages).toHaveLength(2);
   });
 
   it('adds markers for unread messages', () => {
