@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2022 Wire Swiss GmbH
+ * Copyright (C) 2024 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,16 +17,4 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-
-import {matchQualifiedIds} from 'Util/QualifiedId';
-
-import {Conversation} from '../entity/Conversation';
-import {User} from '../entity/User';
-
-export class UserFilter {
-  static isParticipant(conversationEntity: Conversation, userId: QualifiedId) {
-    const index = conversationEntity.allUserEntities().findIndex((user: User) => matchQualifiedIds(userId, user));
-    return index !== -1;
-  }
-}
+export type ScrollToElement = (elm: {center?: boolean; element: HTMLElement}, isUnread?: boolean) => void;

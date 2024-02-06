@@ -101,7 +101,7 @@ export class EventStorageMiddleware implements EventMiddleware {
 
       const usersNotPartofConversation = qualifiedUserIds.reduce((acc, qualifiedUserId) => {
         const isDeleted = conversation
-          .getAllUserEntities()
+          .allUserEntities()
           .find(user => matchQualifiedIds(user.qualifiedId, qualifiedUserId))?.isDeleted;
 
         const isParticipant = UserFilter.isParticipant(conversation, qualifiedUserId);

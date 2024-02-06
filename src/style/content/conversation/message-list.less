@@ -244,55 +244,6 @@
   height: 16px;
 }
 
-// MESSAGE - TIMESTAMP
-.message-timestamp {
-  height: 48px;
-  padding-top: 8px; // TODO margin top is not working because of collapsing margins
-  border-bottom: 1px solid @separator-color;
-  margin-bottom: 16px;
-  line-height: 2.5rem;
-  user-select: none;
-
-  .message-header-icon {
-    max-height: 40px;
-  }
-
-  .message-unread-dot {
-    .dot-md;
-    background-color: var(--accent-color);
-  }
-
-  &:not(.message-timestamp-unread) {
-    .message-unread-dot {
-      display: none;
-    }
-  }
-
-  &:not(.message-timestamp-day) {
-    border: 0;
-
-    .message-header-label {
-      border-bottom: 1px dotted @separator-color;
-    }
-  }
-
-  time[data-timestamp-type='normal'] {
-    display: block;
-  }
-  time[data-timestamp-type='day'] {
-    display: none;
-  }
-}
-
-.message-timestamp-day {
-  time[data-timestamp-type='normal'] {
-    display: none;
-  }
-  time[data-timestamp-type='day'] {
-    display: block;
-  }
-}
-
 .message-wrapper {
   outline-offset: -0.1rem;
 }

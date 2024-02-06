@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2022 Wire Swiss GmbH
+ * Copyright (C) 2024 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,16 +17,32 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {css} from '@emotion/react';
 
-import {matchQualifiedIds} from 'Util/QualifiedId';
+export const baseMarkerStyle = css`
+  height: 48px;
+  padding-top: 8px; // TODO margin top is not working because of collapsing margins
+  margin-bottom: 16px;
+  line-height: 2.5rem;
+  user-select: none;
 
-import {Conversation} from '../entity/Conversation';
-import {User} from '../entity/User';
-
-export class UserFilter {
-  static isParticipant(conversationEntity: Conversation, userId: QualifiedId) {
-    const index = conversationEntity.allUserEntities().findIndex((user: User) => matchQualifiedIds(userId, user));
-    return index !== -1;
+  .message-header-icon {
+    max-height: 40px;
   }
-}
+
+  .message-header-label {
+    border-bottom: 1px dotted var(--foreground-fade-24);
+  }
+
+  .message-unread-dot {
+    background-color: var(--accent-color);
+  }
+`;
+
+export const dayMarkerStyle = css`
+  border-bottom: 1px solid var(--foreground-fade-24);
+
+  .message-header-label {
+    border: 0;
+  }
+`;
