@@ -72,7 +72,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
     <form
       autoComplete="off"
       className={`search-outer ${forceDark ? '' : 'user-list-light'}`}
-      css={noSelectedUsers && {minHeight: '48px'}}
+      css={noSelectedUsers && {minHeight: '32px'}}
     >
       <div className="search-inner-wrap">
         <div className="search-inner" ref={innerElement}>
