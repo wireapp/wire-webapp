@@ -41,7 +41,7 @@ interface AboutPreferencesProps {
 const AboutPreferences: React.FC<AboutPreferencesProps> = ({selfUser, teamState = container.resolve(TeamState)}) => {
   const inTeam = teamState.isInTeam(selfUser);
   const config = Config.getConfig();
-  const websiteUrl = URL.WEBSITE;
+  const websiteUrl = URL.WEBSITE_BASE;
   const privacyPolicyUrl = getPrivacyPolicyUrl();
 
   const termsOfUseUrl = useMemo(() => {
