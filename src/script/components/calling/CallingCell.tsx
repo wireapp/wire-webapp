@@ -123,7 +123,6 @@ const CallingCell: React.FC<CallingCellProps> = ({
   const {activeCallViewTab} = useKoSubscribableChildren(callState, ['activeCallViewTab']);
   const isMuted = muteState !== MuteState.NOT_MUTED;
 
-  const isStillOngoing = reason === CALL_REASON.STILL_ONGOING;
   const isDeclined = !!reason && [CALL_REASON.STILL_ONGOING, CALL_REASON.ANSWERED_ELSEWHERE].includes(reason);
 
   const isOutgoing = state === CALL_STATE.OUTGOING;
@@ -173,7 +172,6 @@ const CallingCell: React.FC<CallingCellProps> = ({
   const disableVideoButton = isOutgoingVideoCall || isVideoUnsupported;
   const disableScreenButton = !callingRepository.supportsScreenSharing;
 
-  const showJoinButton = conversation && isStillOngoing && temporaryUserStyle;
   const [showParticipants, setShowParticipants] = useState(false);
   const isModerator = selfUser && roles[selfUser.id] === DefaultConversationRoleName.WIRE_ADMIN;
 
@@ -304,19 +302,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
         </p>
       )}
 
-      {showJoinButton && isFullUi && (
-        <button
-          className="call-ui__button call-ui__button--green call-ui__button--join"
-          style={{margin: '40px 16px 0px'}}
-          onClick={() => callActions.answer(call)}
-          type="button"
-          data-uie-name="do-call-controls-call-join"
-        >
-          {t('callJoin')}
-        </button>
-      )}
-
-      {conversation && !isDeclined && (
+      {conversation && (!isDeclined || temporaryUserStyle) && (
         <div
           className="conversation-list-calling-cell-background"
           data-uie-name="item-call"
@@ -448,7 +434,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
             <ConversationClassifiedBar conversation={conversation} classifiedDomains={classifiedDomains} />
           )}
 
-          {!isDeclined && (
+          {(!isDeclined || temporaryUserStyle) && (
             <>
               <div className="conversation-list-calling-cell-controls">
                 <ul className="conversation-list-calling-cell-controls-left">
@@ -538,7 +524,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
                     </li>
                   )}
 
-                  {(isIncoming || isOutgoing) && (
+                  {(isIncoming || isOutgoing) && !isDeclined && (
                     <li className="conversation-list-calling-cell-controls-item">
                       <button
                         ref={element => {
