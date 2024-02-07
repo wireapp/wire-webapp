@@ -130,7 +130,6 @@ export const EmojiPill = ({
           </p>
         </div>
       }
-      // isOpen={isOpen}
     >
       <button
         css={{...messageReactionButton, ...getReactionsButtonCSS(isActive, isRemovedFromConversation)}}
