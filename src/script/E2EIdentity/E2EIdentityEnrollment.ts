@@ -56,6 +56,7 @@ interface E2EIHandlerParams {
 
 type Events = {
   identityUpdated: {enrollmentConfig: EnrollmentConfig; identity?: WireIdentity};
+  initialized: {enrollmentConfig: EnrollmentConfig};
 };
 
 export type EnrollmentConfig = {
@@ -143,6 +144,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     }
 
     this.currentStep = E2EIHandlerStep.INITIALIZED;
+    this.emit('initialized', {enrollmentConfig: this.config});
     return this;
   }
 
