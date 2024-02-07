@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.15.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.15.0...@wireapp/react-ui-kit@9.15.1) (2024-02-07)
+
+### Bug Fixes
+
+* **react-ui-kit:** Check if tooltip parent element exist ([#5948](https://github.com/wireapp/wire-web-packages/issues/5948)) ([617bbcf](https://github.com/wireapp/wire-web-packages/commit/617bbcf430830d676a66b577d0b1d54a40594a12))
+
 # [9.15.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.14.1...@wireapp/react-ui-kit@9.15.0) (2024-02-07)
 
 ### Features
