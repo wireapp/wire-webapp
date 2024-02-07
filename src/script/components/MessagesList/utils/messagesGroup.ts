@@ -111,8 +111,6 @@ function shouldGroupMessagesByTimestamp(
  */
 export function groupMessagesBySenderAndTime(messages: Message[], lastReadTimestamp: number) {
   return messages.reduce<Array<MessagesGroup | Marker>>((acc, message, index) => {
-    const lastItem = acc[acc.length - 1];
-    const lastGroupInfo = isMarker(lastItem) ? undefined : lastItem;
     const previousMessage = messages[index - 1];
 
     const marker = getMessageMarkerType(message, lastReadTimestamp, previousMessage);
@@ -121,6 +119,9 @@ export function groupMessagesBySenderAndTime(messages: Message[], lastReadTimest
       // if there is a marker to insert, we insert it before the current message
       acc.push({type: marker, timestamp: message.timestamp()});
     }
+
+    const lastItem = acc[acc.length - 1];
+    const lastGroupInfo = isMarker(lastItem) ? undefined : lastItem;
 
     const areContentMessages = message.isContent() && previousMessage?.isContent();
 
