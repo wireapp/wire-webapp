@@ -136,4 +136,35 @@ describe('MessagesGroup', () => {
     expect(firstMarkerIndex).toBe(nbPrevHourMessages);
     expect(marker.type).toBe('day');
   });
+
+  it('splits current group when new unread messages are detected', () => {
+    const nbReadMessages = getRandomNumber(1, 10);
+    const nbUnreadMessages = getRandomNumber(1, 10);
+    const lastReadTimestamp = 10;
+    const senderId = 'same-sender';
+
+    const readMessages = [...Array(nbReadMessages)].map((_, index) =>
+      createMessageAddEvent({overrides: {from: senderId, time: new Date(index).toISOString()}}),
+    );
+    const unreadMessages = [...Array(nbUnreadMessages)].map((_, index) =>
+      createMessageAddEvent({
+        overrides: {from: senderId, time: new Date(lastReadTimestamp + 1 + index).toISOString()},
+      }),
+    );
+
+    const allMessages = [...readMessages, ...unreadMessages].map(
+      event => eventMapper.mapJsonEvent(event, conversation) as Message,
+    );
+
+    const groupedMessages = groupMessagesBySenderAndTime(allMessages, lastReadTimestamp);
+    /* There should be :
+      - one group for read messages from the sender
+      - one marker for unread messages
+      - one group for unread messages from the sender
+    */
+    expect(groupedMessages).toHaveLength(3);
+    expect((groupedMessages[0] as any).messages).toHaveLength(nbReadMessages);
+    expect(isMarker(groupedMessages[1])).toBeTruthy();
+    expect((groupedMessages[2] as any).messages).toHaveLength(nbUnreadMessages);
+  });
 });
