@@ -17,8 +17,6 @@
  *
  */
 
-import {useState} from 'react';
-
 import {Tooltip} from '@wireapp/react-ui-kit';
 
 import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
@@ -71,19 +69,10 @@ export const EmojiPill = ({
   reactingUsers,
 }: EmojiPillProps) => {
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
-  const [isOpen, setTooltipVisibility] = useState(false);
   const emojiName = getEmojiTitleFromEmojiUnicode(emojiUnicode);
   const isActive = hasUserReacted && !isRemovedFromConversation;
 
   const emojiCount = reactingUsers.length;
-
-  const showTooltip = () => {
-    setTooltipVisibility(true);
-  };
-
-  const hideTooltip = () => {
-    setTooltipVisibility(false);
-  };
 
   const reactingUserNames = reactingUsers.slice(0, MAX_USER_NAMES_TO_SHOW).map(user => user.name());
 
@@ -129,50 +118,48 @@ export const EmojiPill = ({
   ]);
 
   return (
-    <div onMouseEnter={showTooltip} onMouseLeave={hideTooltip} onFocus={showTooltip} onBlur={hideTooltip}>
-      <Tooltip
-        body={
-          <div css={messageReactionButtonTooltip}>
-            <EmojiChar styles={messageReactionButtonTooltipImage} emoji={emoji} />
-            <p css={messageReactionButtonTooltipText}>
-              {content}{' '}
-              {emojiCount > 1
-                ? t('conversationLikesCaptionReactedPlural', {emojiName})
-                : t('conversationLikesCaptionReactedSingular', {emojiName})}
-            </p>
-          </div>
+    <Tooltip
+      body={
+        <div css={messageReactionButtonTooltip}>
+          <EmojiChar styles={messageReactionButtonTooltipImage} emoji={emoji} />
+          <p css={messageReactionButtonTooltipText}>
+            {content}{' '}
+            {emojiCount > 1
+              ? t('conversationLikesCaptionReactedPlural', {emojiName})
+              : t('conversationLikesCaptionReactedSingular', {emojiName})}
+          </p>
+        </div>
+      }
+      // isOpen={isOpen}
+    >
+      <button
+        css={{...messageReactionButton, ...getReactionsButtonCSS(isActive, isRemovedFromConversation)}}
+        aria-label={
+          emojiCount > 1
+            ? t('accessibility.messageReactionDetailsPlural', {emojiCount: emojiCount.toString(), emojiName})
+            : t('accessibility.messageReactionDetailsSingular', {emojiCount: emojiCount.toString(), emojiName})
         }
-        isOpen={isOpen}
-      >
-        <button
-          css={{...messageReactionButton, ...getReactionsButtonCSS(isActive, isRemovedFromConversation)}}
-          aria-label={
-            emojiCount > 1
-              ? t('accessibility.messageReactionDetailsPlural', {emojiCount: emojiCount.toString(), emojiName})
-              : t('accessibility.messageReactionDetailsSingular', {emojiCount: emojiCount.toString(), emojiName})
-          }
-          title={emojiName}
-          aria-pressed={isActive}
-          type="button"
-          tabIndex={messageFocusedTabIndex}
-          className="button-reset-default"
-          data-uie-name="emoji-pill"
-          onClick={() => {
-            handleReactionClick(emoji);
-          }}
-          onKeyDown={event => {
-            // is last reaction then on tab key press it should hide the reaction menu
-            if (index === emojiListCount - 1) {
-              if (!event.shiftKey && isTabKey(event)) {
-                onLastReactionKeyEvent();
-              }
+        title={emojiName}
+        aria-pressed={isActive}
+        type="button"
+        tabIndex={messageFocusedTabIndex}
+        className="button-reset-default"
+        data-uie-name="emoji-pill"
+        onClick={() => {
+          handleReactionClick(emoji);
+        }}
+        onKeyDown={event => {
+          // is last reaction then on tab key press it should hide the reaction menu
+          if (index === emojiListCount - 1) {
+            if (!event.shiftKey && isTabKey(event)) {
+              onLastReactionKeyEvent();
             }
-          }}
-        >
-          <EmojiChar emoji={emoji} />
-          <span css={messageReactionCount(isActive)}>{emojiCount}</span>
-        </button>
-      </Tooltip>
-    </div>
+          }
+        }}
+      >
+        <EmojiChar emoji={emoji} />
+        <span css={messageReactionCount(isActive)}>{emojiCount}</span>
+      </button>
+    </Tooltip>
   );
 };
