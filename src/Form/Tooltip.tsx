@@ -17,135 +17,135 @@
  *
  */
 
-import * as React from 'react';
+import {HTMLProps, MouseEvent, FocusEvent, ReactNode, useRef, useState} from 'react';
 
 import {CSSObject} from '@emotion/react';
+import {createPortal} from 'react-dom';
 
 import {Theme} from '../Layout';
 import {filterProps} from '../util';
 
-interface ToolTipProps<T = HTMLDivElement> extends React.HTMLProps<T> {
-  position?: 'top' | 'right' | 'left' | 'bottom';
-  body: React.ReactNode;
-  isOpen?: boolean;
-}
+const paddingTop = 6;
 
 const tooltipStyle: (theme: Theme) => CSSObject = theme => ({
-  position: 'relative',
-  width: 'fit-content',
-  '&:hover .tooltip-content, &:focus-within .tooltip-content,': {
-    visibility: 'visible',
-    opacity: 1,
-  },
+  position: 'absolute',
+  zIndex: '99999',
+  maxWidth: '300px',
+  filter: 'drop-shadow(1px 2px 6px rgba(0, 0, 0, 0.3))',
+  borderRadius: '4px',
   '.tooltip-content': {
-    textAlign: 'center',
-    visibility: 'hidden',
-    opacity: 0,
-    width: 'max-content',
-    height: 'max-content',
-    position: 'absolute',
-    boxSizing: 'border-box',
-    display: 'block',
-    margin: '0 auto',
-    padding: '4px 8px',
-    backgroundColor: theme.Tooltip.backgroundColor,
     color: theme.Tooltip.color,
-    borderRadius: 4,
-    fontSize: theme.fontSizes.small,
-    fontWeight: 500,
-    whiteSpace: 'nowrap',
-    transition: 'opacity ease-out 150ms, bottom ease-out 150ms',
-    boxShadow: '1px 2px 6px rgba(0, 0, 0, 0.3)',
+    backgroundColor: theme.Tooltip.backgroundColor,
+    fontSize: '12px',
+    lineHeight: '14px',
+    fontWeight: 400,
+    padding: `${paddingTop}px 8px`,
+    textAlign: 'center',
   },
-  '& .tooltip-content .tooltip-arrow': {
-    position: 'absolute',
+  '.tooltip-arrow': {
     width: 0,
     height: 0,
-  },
-  "&[data-position='top'] .tooltip-content": {
-    bottom: '100%',
-    marginBottom: 10,
-    left: '50%',
-    transform: 'translateX(-50%)',
-    '& .tooltip-arrow': {
-      filter: 'drop-shadow(0px 2px 1px rgba(0, 0, 0, 0.1))',
-      borderLeft: '12px solid transparent',
-      borderRight: '12px solid transparent',
-      borderTop: `12px solid ${theme.Tooltip.backgroundColor}`,
-      top: '90%',
-      left: '50%',
-      transform: 'translateX(-50%)',
+    borderLeft: '6px solid transparent',
+    borderRight: '6px solid transparent',
+    position: 'absolute',
+
+    "&[data-position='top']": {
+      borderTop: `10px solid ${theme.Tooltip.backgroundColor}`,
+      bottom: '-6px',
     },
-  },
-  "&[data-position='right'] .tooltip-content": {
-    left: '100%',
-    marginLeft: '8px !important',
-    top: 0,
-    bottom: 0,
-    margin: 'auto 0',
-    '& .tooltip-arrow': {
-      filter: 'drop-shadow(-2px 0px 1px rgba(0, 0, 0, 0.1))',
-      borderTop: '8px solid transparent',
-      borderBottom: '8px solid transparent',
-      borderRight: `8px solid ${theme.Tooltip.backgroundColor}`,
-      top: '50%',
-      transform: 'translateY(-50%)',
-      left: -7,
-    },
-  },
-  "&[data-position='bottom'] .tooltip-content": {
-    top: '100%',
-    marginTop: 10,
-    left: '50%',
-    transform: 'translateX(-50%)',
-    '& .tooltip-arrow': {
-      filter: 'drop-shadow(0px -2px 1px rgba(0, 0, 0, 0.1))',
-      borderLeft: '12px solid transparent',
-      borderRight: '12px solid transparent',
-      borderBottom: `12px solid ${theme.Tooltip.backgroundColor}`,
-      bottom: '90%',
-      left: '50%',
-      transform: 'translateX(-50%)',
-    },
-  },
-  "&[data-position='left'] .tooltip-content": {
-    right: '100%',
-    marginRight: '8px !important',
-    top: 0,
-    bottom: 0,
-    margin: 'auto 0',
-    '& .tooltip-arrow': {
-      filter: 'drop-shadow(2px 0px 1px rgba(0, 0, 0, 0.1))',
-      borderTop: '8px solid transparent',
-      borderBottom: '8px solid transparent',
-      borderLeft: `8px solid ${theme.Tooltip.backgroundColor}`,
-      top: '50%',
-      transform: 'translateY(-50%)',
-      right: -7,
+    "&[data-position='bottom']": {
+      borderBottom: `10px solid ${theme.Tooltip.backgroundColor}`,
+      top: '-6px',
     },
   },
 });
 
-const filterTooltipProps = (props: ToolTipProps) => filterProps(props, ['position', 'body', 'isOpen']);
+interface PortalProps {
+  children: ReactNode;
+  bounding?: DOMRect;
+}
 
-export const Tooltip = ({children, ...props}: ToolTipProps) => {
+const PortalComponent = ({children, bounding}: PortalProps) => {
+  const bodyElement = document.querySelector('#wire-app');
+
+  const [isTouchingTop, setIsTouchingTop] = useState(false);
+
+  if (!bodyElement) {
+    return null;
+  }
+
+  return createPortal(
+    <div
+      ref={element => {
+        if (!bounding) {
+          return;
+        }
+
+        const isTouchingTopEdge = bounding.y <= element.clientHeight + paddingTop * 2;
+        setIsTouchingTop(isTouchingTopEdge);
+
+        const elementWidth = (element.scrollWidth - bounding.width) / 2;
+        element.style.left = `${bounding.x - elementWidth}px`;
+
+        if (isTouchingTopEdge) {
+          element.style.top = `${bounding.y + bounding.height + paddingTop}px`;
+        } else {
+          element.style.top = `${bounding.y - element.clientHeight - paddingTop}px`;
+        }
+      }}
+      className="tooltip"
+      css={(theme: Theme) => tooltipStyle(theme)}
+    >
+      <div
+        ref={element => {
+          const {parentElement} = element;
+          const parentElementRect = parentElement.getBoundingClientRect();
+          element.style.left = `${parentElementRect.width / 2 - paddingTop}px`;
+        }}
+        className="tooltip-arrow"
+        data-position={isTouchingTop ? 'bottom' : 'top'}
+      />
+      <div className="tooltip-content" data-testid="tooltip-content">
+        {children}
+      </div>
+    </div>,
+    bodyElement,
+  );
+};
+
+interface TooltipProps<T = HTMLDivElement> extends HTMLProps<T> {
+  body: ReactNode;
+}
+
+const filterTooltipProps = (props: TooltipProps) => filterProps(props, ['body']);
+
+export const Tooltip = ({children, ...props}: TooltipProps) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const boundingRectRef = useRef<DOMRect>();
   const filteredProps = filterTooltipProps(props);
-  const {body, position = 'top', isOpen = true} = props;
+  const {body} = props;
+
+  const onElementEnter = (event: MouseEvent | FocusEvent) => {
+    const boundingRect = (event.target as Element).getBoundingClientRect();
+    setIsHovered(true);
+    boundingRectRef.current = boundingRect;
+  };
+
+  const onElementLeave = () => setIsHovered(false);
 
   return (
     <div
-      css={(theme: Theme) => tooltipStyle(theme)}
-      data-position={position}
+      role="presentation"
       {...filteredProps}
       data-testid="tooltip-wrapper"
+      onMouseEnter={onElementEnter}
+      onMouseLeave={onElementLeave}
+      onFocus={onElementEnter}
+      onBlur={onElementLeave}
+      {...props}
     >
-      {isOpen && (
-        <div className="tooltip-content" data-testid="tooltip-content">
-          {body}
-          <div className="tooltip-arrow"></div>
-        </div>
-      )}
       {children}
+      {isHovered && <PortalComponent bounding={boundingRectRef.current}>{body}</PortalComponent>}
     </div>
   );
 };
