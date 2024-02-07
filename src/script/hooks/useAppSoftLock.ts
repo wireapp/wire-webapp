@@ -40,12 +40,11 @@ export function useAppSoftLock(callingRepository: CallingRepository, notificatio
 
   useEffect(() => {
     const e2eiHandler = E2EIHandler.getInstance();
-    if (!e2eiHandler.isE2EIEnabled()) {
-      return () => {};
-    }
 
+    e2eiHandler.on('initialized', handleSoftLockActivation);
     e2eiHandler.on('identityUpdated', handleSoftLockActivation);
     return () => {
+      e2eiHandler.off('initialized', handleSoftLockActivation);
       e2eiHandler.off('identityUpdated', handleSoftLockActivation);
     };
   }, [handleSoftLockActivation]);

@@ -50,6 +50,8 @@ describe('useAppSoftLock', () => {
   it('should not do anything if e2ei is not enabled', () => {
     E2EIHandlerMock.getInstance.mockReturnValue({
       isE2EIEnabled: jest.fn(() => false),
+      on: jest.fn(),
+      off: jest.fn(),
     } as any);
     const {result} = renderHook(() => useAppSoftLock(callingRepository, notificationRepository));
     expect(result.current).toEqual({softLockEnabled: false});
