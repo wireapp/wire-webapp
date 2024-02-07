@@ -229,8 +229,6 @@ export type Env = {
 
   URL_SUBPATH_PASSWORD_RESET: string;
 
-  URL_SUBPATH_SUPPORT_USERNAME: string;
-
   /** Sets Support URLs to specific pages */
   URL_SUPPORT_INDEX: string;
 
@@ -273,8 +271,6 @@ export type Env = {
   URL_SUPPORT_E2EI_VERIFICATION: string;
 
   URL_SUPPORT_DECRYPT_ERROR: string;
-
-  URL_SUPPORT_PRIVACY_HOW: string;
 
   URL_SUPPORT_PRIVACY_UNVERIFIED_USERS: string;
 
