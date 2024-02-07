@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [43.14.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@43.13.1...@wireapp/core@43.14.0) (2024-02-07)
+
+### Features
+
+* Queue recovering MLS conversations on notification stream processing ([#5947](https://github.com/wireapp/wire-web-packages/issues/5947)) ([9f68222](https://github.com/wireapp/wire-web-packages/commit/9f68222029ea5855e8e10c9fdecff9c6ef3c45e3))
+
 ## [43.13.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@43.13.0...@wireapp/core@43.13.1) (2024-02-06)
 
 ### Bug Fixes
