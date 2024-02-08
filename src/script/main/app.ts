@@ -388,7 +388,7 @@ export class App {
 
       const selfUser = await this.initiateSelfUser();
 
-      const {features: teamFeatures, team} = await teamRepository.initTeam(selfUser.teamId);
+      const {features: teamFeatures, members: teamMembers} = await teamRepository.initTeam(selfUser.teamId);
       const e2eiHandler = await configureE2EI(this.logger, teamFeatures);
       if (e2eiHandler) {
         /* We first try to do the initial enrollment (if the user has not yet enrolled)
@@ -445,15 +445,7 @@ export class App {
       const conversations = await conversationRepository.loadConversations();
 
       // We load all the users the self user is connected with
-      const contacts = await userRepository.loadUsers(selfUser, connections, conversations);
-
-      if (team) {
-        // If we are in the context of team, we load the team members metadata (user roles)
-        await teamRepository.updateTeamMembersByIds(
-          team,
-          contacts.filter(user => user.teamId === team.id).map(({id}) => id),
-        );
-      }
+      await userRepository.loadUsers(selfUser, connections, conversations, teamMembers);
 
       if (supportsMLS()) {
         //if mls is supported, we need to initialize the callbacks (they are used when decrypting messages)
