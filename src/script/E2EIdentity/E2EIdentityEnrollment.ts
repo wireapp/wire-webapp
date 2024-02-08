@@ -320,6 +320,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       this.emit('identityUpdated', {enrollmentConfig: this.config!});
     } catch (error) {
       this.currentStep = E2EIHandlerStep.ERROR;
+      this.logger.error('E2EI enrollment failed', error);
 
       setTimeout(removeCurrentModal, 0);
       await this.showErrorMessage();
