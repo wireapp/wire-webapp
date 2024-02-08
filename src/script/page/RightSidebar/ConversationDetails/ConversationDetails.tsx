@@ -268,10 +268,10 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
     }, [activeConversation, conversationRepository]);
 
     useEffect(() => {
-      if (isTeam && isSingleUserMode) {
-        teamRepository.updateTeamMembersByIds(team, [firstParticipant.id], true);
+      if (team.id && isSingleUserMode) {
+        teamRepository.updateTeamMembersByIds(team.id, [firstParticipant.id], true);
       }
-    }, [firstParticipant, isSingleUserMode, isTeam, team, teamRepository]);
+    }, [firstParticipant, isSingleUserMode, team, teamRepository]);
 
     useEffect(() => {
       getService();
