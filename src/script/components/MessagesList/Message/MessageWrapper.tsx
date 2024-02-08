@@ -61,11 +61,11 @@ const isOutgoingQuote = (quoteEntity: QuoteEntity): quoteEntity is OutgoingQuote
   return quoteEntity.hash !== undefined;
 };
 
-export const MessageWrapper: React.FC<MessageParams & {isMessageFocused: boolean}> = ({
+export const MessageWrapper: React.FC<MessageParams> = ({
   message,
   conversation,
   selfId,
-  isMessageFocused,
+  isFocused,
   isSelfTemporaryGuest,
   isLastDeliveredMessage,
   shouldShowInvitePeople,
@@ -201,7 +201,7 @@ export const MessageWrapper: React.FC<MessageParams & {isMessageFocused: boolean
         onClickParticipants={onClickParticipants}
         onClickDetails={onClickDetails}
         onRetry={onRetry}
-        isMessageFocused={isMessageFocused}
+        isFocused={isFocused}
         isMsgElementsFocusable={isMsgElementsFocusable}
         onClickReaction={handleReactionClick}
       />
@@ -214,7 +214,7 @@ export const MessageWrapper: React.FC<MessageParams & {isMessageFocused: boolean
     return <LegalHoldMessage message={message} />;
   }
   if (message.isFederationStop()) {
-    return <FederationStopMessage isMessageFocused={isMessageFocused} message={message} />;
+    return <FederationStopMessage isMessageFocused={isFocused} message={message} />;
   }
   if (message.isVerification()) {
     return <VerificationMessage message={message} />;
@@ -232,7 +232,7 @@ export const MessageWrapper: React.FC<MessageParams & {isMessageFocused: boolean
     return <CallTimeoutMessage message={message} />;
   }
   if (message.isFailedToAddUsersMessage()) {
-    return <FailedToAddUsersMessage isMessageFocused={isMessageFocused} message={message} />;
+    return <FailedToAddUsersMessage isMessageFocused={isFocused} message={message} />;
   }
   if (message.isSystem()) {
     return <SystemMessage message={message} />;
