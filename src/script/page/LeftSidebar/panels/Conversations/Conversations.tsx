@@ -214,66 +214,67 @@ const Conversations: React.FC<ConversationsProps> = ({
     </>
   );
 
-  const footer = (
-    <nav className="conversations-footer">
+  const sidebar = (
+    <nav className="conversations-sidebar">
       <div
         role="tablist"
         aria-label={t('accessibility.headings.sidebar')}
         aria-owns="tab-1 tab-2 tab-3"
-        className="conversations-footer-list"
+        className="conversations-sidebar-list"
       >
+        <div className="conversations-sidebar-title">{t('conversationViewTooltip')}</div>
         <button
           id="tab-1"
           type="button"
-          className="conversations-footer-btn"
+          className="conversations-sidebar-btn"
           onClick={() => switchList(ListState.START_UI)}
           title={t('tooltipConversationsStart', Shortcut.getShortcutTooltip(ShortcutType.START))}
           data-uie-name="go-people"
         >
-          <Icon.PeopleOutline className="people-outline" />
-          <span className="conversations-footer-btn--text">{t('conversationFooterContacts')}</span>
+          <Icon.People className="people-outline" />
+          <span className="conversations-sidebar-btn--text">{t('conversationFooterContacts')}</span>
         </button>
 
         <button
           id="tab-2"
           type="button"
           role="tab"
-          className={cx(`conversations-footer-btn`, {active: isRecentViewStyle})}
+          className={cx(`conversations-sidebar-btn`, {active: isRecentViewStyle})}
           onClick={() => setViewStyle(ConversationViewStyle.RECENT)}
           title={t('conversationViewTooltip')}
           data-uie-name="go-recent-view"
           data-uie-status={isRecentViewStyle ? 'active' : 'inactive'}
           aria-selected={isRecentViewStyle}
         >
-          <Icon.ConversationsOutline className={cx('conversations-outline', {active: isRecentViewStyle})} />
-          <span className="conversations-footer-btn--text">{t('conversationViewTooltip')}</span>
+          <Icon.ConversationsOutline />
+          <span className="conversations-sidebar-btn--text">{t('conversationViewTooltip')}</span>
         </button>
 
         <button
           id="tab-3"
           type="button"
           role="tab"
-          className={cx(`conversations-footer-btn`, {active: isFolderViewStyle})}
+          className={cx(`conversations-sidebar-btn`, {active: isFolderViewStyle})}
           onClick={() => setViewStyle(ConversationViewStyle.FOLDER)}
           title={t('folderViewTooltip')}
           data-uie-name="go-folder-view"
           data-uie-status={isFolderViewStyle ? 'active' : 'inactive'}
           aria-selected={isFolderViewStyle}
         >
-          <Icon.FoldersOutline className={cx('folders-outline', {active: isFolderViewStyle})} />
-          <span className="conversations-footer-btn--text">{t('folderViewTooltip')}</span>
+          <Icon.ConversationsFolder />
+          <span className="conversations-sidebar-btn--text">{t('folderViewTooltip')}</span>
         </button>
 
         {archivedConversations.length > 0 && (
           <button
             type="button"
-            className="conversations-footer-btn"
+            className="conversations-sidebar-btn"
             data-uie-name="go-archive"
             onClick={() => switchList(ListState.ARCHIVE)}
             title={t('tooltipConversationsArchived', archivedConversations.length)}
           >
-            <Icon.ArchiveOutline className="archive-outline" />
-            <span className="conversations-footer-btn--text">{t('conversationFooterArchive')}</span>
+            <Icon.Archive />
+            <span className="conversations-sidebar-btn--text">{t('conversationFooterArchive')}</span>
           </button>
         )}
       </div>
@@ -311,33 +312,35 @@ const Conversations: React.FC<ConversationsProps> = ({
   const {currentFocus, handleKeyDown, resetConversationFocus} = useConversationFocus(conversations);
 
   return (
-    <ListWrapper id="conversations" headerElement={header} footer={footer} before={callingView}>
-      {hasNoConversations ? (
-        <>
-          {archivedConversations.length === 0 ? (
-            <div className="conversations-hint" data-uie-name="status-start-conversation-hint">
-              <div className="conversations-hint-text">{t('conversationsNoConversations')}</div>
-              <Icon.ArrowDownLong className="conversations-hint-arrow" />
-            </div>
-          ) : (
-            <div className="conversations-all-archived">{t('conversationsAllArchived')}</div>
-          )}
-        </>
-      ) : (
-        <ConversationsList
-          connectRequests={connectRequests}
-          callState={callState}
-          conversations={conversations}
-          viewStyle={viewStyle}
-          listViewModel={listViewModel}
-          conversationState={conversationState}
-          conversationRepository={conversationRepository}
-          currentFocus={currentFocus}
-          resetConversationFocus={resetConversationFocus}
-          handleArrowKeyDown={handleKeyDown}
-        />
-      )}
-    </ListWrapper>
+    <div className="conversations-wrapper">
+      <ListWrapper id="conversations" headerElement={header} sidebar={sidebar} before={callingView}>
+        {hasNoConversations ? (
+          <>
+            {archivedConversations.length === 0 ? (
+              <div className="conversations-hint" data-uie-name="status-start-conversation-hint">
+                <div className="conversations-hint-text">{t('conversationsNoConversations')}</div>
+                <Icon.ArrowDownLong className="conversations-hint-arrow" />
+              </div>
+            ) : (
+              <div className="conversations-all-archived">{t('conversationsAllArchived')}</div>
+            )}
+          </>
+        ) : (
+          <ConversationsList
+            connectRequests={connectRequests}
+            callState={callState}
+            conversations={conversations}
+            viewStyle={viewStyle}
+            listViewModel={listViewModel}
+            conversationState={conversationState}
+            conversationRepository={conversationRepository}
+            currentFocus={currentFocus}
+            resetConversationFocus={resetConversationFocus}
+            handleArrowKeyDown={handleKeyDown}
+          />
+        )}
+      </ListWrapper>
+    </div>
   );
 };
 
