@@ -56,6 +56,7 @@ interface E2EIHandlerParams {
 
 type Events = {
   identityUpdated: {enrollmentConfig: EnrollmentConfig; identity?: WireIdentity};
+  initialized: {enrollmentConfig: EnrollmentConfig};
 };
 
 export type EnrollmentConfig = {
@@ -87,10 +88,11 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
   private createOIDCService() {
     const key = this.core.key;
-    if (!key) {
-      throw new Error('encryption key not set');
+    const targetURL = OIDCServiceStore.get.targetURL();
+    if (!key || !targetURL) {
+      throw new Error('encryption key or targetURL not set');
     }
-    return new OIDCService(key);
+    return new OIDCService(key, targetURL);
   }
 
   /**
@@ -143,6 +145,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     }
 
     this.currentStep = E2EIHandlerStep.INITIALIZED;
+    this.emit('initialized', {enrollmentConfig: this.config});
     return this;
   }
 

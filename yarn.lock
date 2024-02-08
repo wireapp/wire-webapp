@@ -5132,9 +5132,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:43.13.1":
-  version: 43.13.1
-  resolution: "@wireapp/core@npm:43.13.1"
+"@wireapp/core@npm:43.14.2":
+  version: 43.14.2
+  resolution: "@wireapp/core@npm:43.14.2"
   dependencies:
     "@wireapp/api-client": ^26.10.5
     "@wireapp/commons": ^5.2.4
@@ -5154,7 +5154,7 @@ __metadata:
     long: ^5.2.0
     uuidjs: 4.2.13
     zod: 3.22.4
-  checksum: 4205541d82b8bb728b35ab52743a354a2ac2aeb388d1c102d035a077592e21706a2aa5aef0ff2cdf0282b2a9b96bdbe6c2f14ac26ba2ed4638a2fd806d75220f
+  checksum: e9061b61dda837aa5255dd95c7d069c14e53b296e91fcfdd30004e4aefa526b25a578011f6cc45705e22a36f288331edc2bd6b438fa4ca7d62c9d0cf307b4b4e
   languageName: node
   linkType: hard
 
@@ -5268,9 +5268,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/react-ui-kit@npm:9.14.0":
-  version: 9.14.0
-  resolution: "@wireapp/react-ui-kit@npm:9.14.0"
+"@wireapp/react-ui-kit@npm:9.15.1":
+  version: 9.15.1
+  resolution: "@wireapp/react-ui-kit@npm:9.15.1"
   dependencies:
     "@types/color": 3.0.6
     color: 4.2.3
@@ -5285,7 +5285,7 @@ __metadata:
   peerDependenciesMeta:
     "@types/react":
       optional: true
-  checksum: e2915d4bbd2cc9a85aad46a761ef5fed529aebe9de0d1ac2d97936b84a00951ef47bbbd79d8838e0860e7a570080cf046c1f8f4b2fede4b1a30ed3699542ea25
+  checksum: 3b29a23a83c7e056b87bd492177005584475735c1542ab9b9dc7a005e9053fabf7f73e06d17603f3d4ea3b7103427877060a2ddb18560921e5963326bfc6e5e4
   languageName: node
   linkType: hard
 
@@ -17857,10 +17857,10 @@ __metadata:
     "@wireapp/avs": 9.6.9
     "@wireapp/commons": 5.2.4
     "@wireapp/copy-config": 2.1.16
-    "@wireapp/core": 43.13.1
+    "@wireapp/core": 43.14.2
     "@wireapp/eslint-config": 3.0.5
     "@wireapp/prettier-config": 0.6.3
-    "@wireapp/react-ui-kit": 9.14.0
+    "@wireapp/react-ui-kit": 9.15.1
     "@wireapp/store-engine": ^5.1.4
     "@wireapp/store-engine-dexie": 2.1.7
     "@wireapp/webapp-events": 0.20.1

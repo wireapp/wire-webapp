@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2023 Wire Swiss GmbH
+ * Copyright (C) 2024 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,21 +17,33 @@
  *
  */
 
-const TargetURLKey = 'E2EIdentity_OIDCService_TargetURL';
+import {CSSObject} from '@emotion/react';
 
-const OIDCServiceStore = {
-  store: {
-    targetURL: (url: string) => localStorage.setItem(TargetURLKey, url),
-  },
-  get: {
-    targetURL: () => localStorage.getItem(TargetURLKey),
-  },
-  clear: {
-    targetURL: () => localStorage.removeItem(TargetURLKey),
-    all: () => {
-      OIDCServiceStore.clear.targetURL();
-    },
-  },
+const commonIconStyles: CSSObject = {
+  top: '50%',
+  position: 'absolute',
+  transform: 'translateY(-50%)',
 };
 
-export {OIDCServiceStore};
+export const searchIconStyles: CSSObject = {
+  ...commonIconStyles,
+  left: 10,
+};
+
+export const closeIconStyles: CSSObject = {
+  ...commonIconStyles,
+  right: 10,
+};
+
+export const searchInputStyles: CSSObject = {
+  height: '32px',
+  borderRadius: 8,
+  paddingLeft: 36,
+};
+
+export const searchInputWrapperStyles: CSSObject = {
+  marginBlock: 12,
+  paddingInline: 16,
+  zIndex: 1,
+  position: 'relative',
+};
