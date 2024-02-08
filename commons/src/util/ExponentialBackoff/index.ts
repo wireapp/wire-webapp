@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2023 Wire Swiss GmbH
+ * Copyright (C) 2024 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,18 +17,4 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-
-import {randomUUID} from 'crypto';
-
-export function generateQualifiedId(domain: string) {
-  return {id: randomUUID(), domain};
-}
-
-export function generateQualifiedIds(nbUsers: number, domain: string) {
-  const users: QualifiedId[] = [];
-  for (let i = 0; i < nbUsers; i++) {
-    users.push(generateQualifiedId(domain));
-  }
-  return users;
-}
+export * from './ExponentialBackoff';
