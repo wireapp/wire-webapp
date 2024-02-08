@@ -22,6 +22,8 @@ import {PostMlsMessageResponse, SUBCONVERSATION_ID} from '@wireapp/api-client/li
 import {ConversationMLSMessageAddEvent, ConversationMLSWelcomeEvent} from '@wireapp/api-client/lib/event';
 import {BackendError, StatusCode} from '@wireapp/api-client/lib/http';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {exponentialBackoff} from '@wireapp/commons/lib/util/ExponentialBackoff';
+import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import {Converter, Decoder, Encoder} from 'bazinga64';
 import logdown from 'logdown';
 
@@ -156,6 +158,12 @@ export class MLSService extends TypedEventEmitter<Events> {
   ): Promise<PostMlsMessageResponse> => {
     const groupIdStr = Encoder.toBase64(groupId).asString;
 
+    const backoffKey = `upload-commit-bundle-409-${groupIdStr}`;
+    const {backOff, resetBackOff} = exponentialBackoff(backoffKey, {
+      maxDelay: TimeInMillis.SECOND * 32,
+      minDelay: TimeInMillis.SECOND / 2,
+    });
+
     // We need to lock the incoming mls messages queue while we are uploading the commit bundle
     // it's possible that we will be sent some mls messages before we receive the response from backend and accept a commit locally.
     return withLockedMLSMessagesQueue(groupIdStr, async () => {
@@ -163,6 +171,7 @@ export class MLSService extends TypedEventEmitter<Events> {
       const bundlePayload = new Uint8Array([...commit, ...groupInfo.payload, ...(welcome || [])]);
       try {
         const response = await this.apiClient.api.conversation.postMlsCommitBundle(bundlePayload);
+
         if (isExternalCommit) {
           await this.coreCryptoClient.mergePendingGroupFromExternalCommit(groupId);
         } else {
@@ -171,6 +180,9 @@ export class MLSService extends TypedEventEmitter<Events> {
         const newEpoch = await this.getEpoch(groupId);
 
         this.emit('newEpoch', {epoch: newEpoch, groupId: groupIdStr});
+
+        // We need to reset the backoff after a successful request
+        resetBackOff();
         return response;
       } catch (error) {
         if (isExternalCommit) {
@@ -180,13 +192,23 @@ export class MLSService extends TypedEventEmitter<Events> {
         }
 
         const shouldRetry = error instanceof BackendError && error.code === StatusCode.CONFLICT;
+
         if (shouldRetry && regenerateCommitBundle) {
           // in case of a 409, we want to retry to generate the commit and resend it
           // could be that we are trying to upload a commit to a conversation that has a different epoch on backend
           // in this case we will most likely receive a commit from backend that will increase our local epoch
           this.logger.warn(`Uploading commitBundle failed. Will retry generating a new bundle`);
-          const updatedCommitBundle = await regenerateCommitBundle();
-          return this.uploadCommitBundle(groupId, updatedCommitBundle, {isExternalCommit});
+
+          return backOff(
+            async () => {
+              const updatedCommitBundle = await regenerateCommitBundle();
+              return this.uploadCommitBundle(groupId, updatedCommitBundle, {regenerateCommitBundle, isExternalCommit});
+            },
+            () => {
+              this.logger.error('Uploading commit bundle retry limit reached', error);
+              throw error;
+            },
+          );
         }
         throw error;
       }

@@ -17,9 +17,9 @@
  *
  */
 
-import {LowPrecisionTaskScheduler} from './LowPrecisionTaskScheduler';
+import {advanceJestTimersWithPromise} from '@wireapp/commons/lib/util/testUtils';
 
-import {advanceJestTimersWithPromise} from '../../testUtils';
+import {LowPrecisionTaskScheduler} from './LowPrecisionTaskScheduler';
 
 describe('LowPrecisionTaskScheduler', () => {
   beforeEach(() => {

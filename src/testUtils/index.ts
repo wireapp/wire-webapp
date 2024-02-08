@@ -32,11 +32,3 @@ export function generateQualifiedIds(nbUsers: number, domain: string) {
   }
   return users;
 }
-
-/*
- * Jest fake timers do not play well with promises, so we need to advance the timers and wait for all the promises to resolve.
- */
-export const advanceJestTimersWithPromise = async (time: number) => {
-  jest.advanceTimersByTime(time);
-  return new Promise(jest.requireActual('timers').setImmediate);
-};
