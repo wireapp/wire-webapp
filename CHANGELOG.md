@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [43.14.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@43.14.1...@wireapp/core@43.14.2) (2024-02-08)
+
+### Bug Fixes
+
+* Avoid storing unecessary enrollement data ([#5951](https://github.com/wireapp/wire-web-packages/issues/5951)) ([aa9f13c](https://github.com/wireapp/wire-web-packages/commit/aa9f13c67ed062d2a6e003e416ee223ec52b513f))
+
 ## [43.14.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@43.14.0...@wireapp/core@43.14.1) (2024-02-08)
 
 **Note:** Version bump only for package @wireapp/core
