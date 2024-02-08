@@ -88,10 +88,11 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
   private createOIDCService() {
     const key = this.core.key;
-    if (!key) {
+    const targetURL = OIDCServiceStore.get.targetURL();
+    if (!key || !targetURL) {
       throw new Error('encryption key not set');
     }
-    return new OIDCService(key);
+    return new OIDCService(key, targetURL);
   }
 
   /**
