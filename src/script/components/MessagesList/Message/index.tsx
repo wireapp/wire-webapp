@@ -59,7 +59,6 @@ export interface MessageParams extends MessageActions {
   conversation: Conversation;
   hasReadReceiptsTurnedOn: boolean;
   isLastDeliveredMessage: boolean;
-  isMarked: boolean;
   isSelfTemporaryGuest: boolean;
   message: BaseMessage;
   /** whether the message should display the user avatar and user name before the actual content */
@@ -73,7 +72,10 @@ export interface MessageParams extends MessageActions {
   selfId: QualifiedId;
   shouldShowInvitePeople: boolean;
   teamState?: TeamState;
-  isMessageFocused: boolean;
+  /** whether the message is being accessed using the keyboard (will then show the focus state of the elements) */
+  isFocused: boolean;
+  /** will visually highlight the message when it's being loaded */
+  isHighlighted: boolean;
   handleFocus: (id: string) => void;
   handleArrowKeyDown: (e: React.KeyboardEvent) => void;
   isMsgElementsFocusable: boolean;
@@ -83,11 +85,11 @@ export interface MessageParams extends MessageActions {
 export const Message: React.FC<MessageParams & {scrollTo?: ScrollToElement}> = props => {
   const {
     message,
-    isMarked,
+    isHighlighted,
     hideHeader,
     onVisible,
     scrollTo,
-    isMessageFocused,
+    isFocused,
     handleFocus,
     handleArrowKeyDown,
     isMsgElementsFocusable,
@@ -96,18 +98,18 @@ export const Message: React.FC<MessageParams & {scrollTo?: ScrollToElement}> = p
   const messageElementRef = useRef<HTMLDivElement>(null);
   const messageRef = useRef<HTMLDivElement>(null);
   const {status, ephemeral_expires} = useKoSubscribableChildren(message, ['status', 'ephemeral_expires']);
-  const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
+  const messageFocusedTabIndex = useMessageFocusedTabIndex(isFocused);
 
   useLayoutEffect(() => {
     if (!messageElementRef.current) {
       return;
     }
-    if (isMarked) {
+    if (isHighlighted) {
       scrollTo?.({center: true, element: messageElementRef.current});
       // for reply message, focus on the original message when original message link is clicked for keyboard users
       handleFocus(message.id);
     }
-  }, [isMarked]);
+  }, [isHighlighted]);
 
   const handleDivKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     // when a message is focused set its elements focusable
@@ -127,10 +129,10 @@ export const Message: React.FC<MessageParams & {scrollTo?: ScrollToElement}> = p
 
   useEffect(() => {
     // Move element into view when it is focused
-    if (isMessageFocused) {
+    if (isFocused) {
       messageRef.current?.focus();
     }
-  }, [isMessageFocused]);
+  }, [isFocused]);
 
   // set message elements focus for non content type mesages
   // some non content type message has interactive element like invite people for member message
@@ -139,14 +141,14 @@ export const Message: React.FC<MessageParams & {scrollTo?: ScrollToElement}> = p
       return;
     }
     const interactiveMsgElements = getAllFocusableElements(messageRef.current);
-    setElementsTabIndex(interactiveMsgElements, isMsgElementsFocusable && isMessageFocused);
-  }, [isMessageFocused, isMsgElementsFocusable, message]);
+    setElementsTabIndex(interactiveMsgElements, isMsgElementsFocusable && isFocused);
+  }, [isFocused, isMsgElementsFocusable, message]);
 
   const content = (
     <MessageWrapper
       {...props}
       hideHeader={hideHeader}
-      isMessageFocused={isMessageFocused}
+      isFocused={isFocused}
       isMsgElementsFocusable={isMsgElementsFocusable}
     />
   );
@@ -161,7 +163,7 @@ export const Message: React.FC<MessageParams & {scrollTo?: ScrollToElement}> = p
 
   return (
     <div
-      className={cx('message', {'message-marked': isMarked})}
+      className={cx('message', {'message-marked': isHighlighted})}
       ref={messageElementRef}
       data-uie-uid={message.id}
       data-uie-value={message.super_type}

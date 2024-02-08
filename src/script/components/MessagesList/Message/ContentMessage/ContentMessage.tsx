@@ -52,7 +52,7 @@ export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetS
   /** whether the message should display the user avatar and user name before the actual content */
   hideHeader: boolean;
   hasMarker?: boolean;
-  isMessageFocused: boolean;
+  isFocused: boolean;
   isLastDeliveredMessage: boolean;
   message: ContentMessage;
   onClickButton: (message: CompositeMessage, buttonId: string) => void;
@@ -69,7 +69,7 @@ export const ContentMessageComponent = ({
   findMessage,
   selfId,
   hideHeader,
-  isMessageFocused,
+  isFocused,
   isLastDeliveredMessage,
   contextMenu,
   onClickAvatar,
@@ -84,10 +84,7 @@ export const ContentMessageComponent = ({
   onClickDetails,
 }: ContentMessageProps) => {
   // check if current message is focused and its elements focusable
-  const msgFocusState = useMemo(
-    () => isMsgElementsFocusable && isMessageFocused,
-    [isMsgElementsFocusable, isMessageFocused],
-  );
+  const msgFocusState = useMemo(() => isMsgElementsFocusable && isFocused, [isMsgElementsFocusable, isFocused]);
   const messageFocusedTabIndex = useMessageFocusedTabIndex(msgFocusState);
   const {
     senderName,
@@ -124,8 +121,8 @@ export const ContentMessageComponent = ({
   const [isActionMenuVisible, setActionMenuVisibility] = useState(false);
   const isMenuOpen = useMessageActionsState(state => state.isMenuOpen);
   useEffect(() => {
-    setActionMenuVisibility(isMessageFocused || msgFocusState);
-  }, [msgFocusState, isMessageFocused]);
+    setActionMenuVisibility(isFocused || msgFocusState);
+  }, [msgFocusState, isFocused]);
 
   const isConversationReadonly = conversation.readOnlyState() !== null;
 

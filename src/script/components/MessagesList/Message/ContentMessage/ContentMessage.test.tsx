@@ -46,7 +46,7 @@ describe('message', () => {
       contextMenu: {entries: ko.observable([])},
       conversation: new Conversation(),
       findMessage: jest.fn(),
-      isMessageFocused: true,
+      isFocused: true,
       isLastDeliveredMessage: false,
       hideHeader: false,
       message,
