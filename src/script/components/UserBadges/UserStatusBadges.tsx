@@ -19,6 +19,8 @@
 
 import React from 'react';
 
+import {Tooltip} from '@wireapp/react-ui-kit';
+
 import {Icon} from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 
@@ -26,23 +28,19 @@ import {badgesWrapper, icon} from './UserStatusBadges.styles';
 
 const badgeToComponentMap = {
   guest: () => (
-    <span css={icon} className="with-tooltip with-tooltip--external" data-tooltip={t('conversationGuestIndicator')}>
+    <Tooltip css={icon} body={t('conversationGuestIndicator')}>
       <Icon.Guest data-uie-name="status-guest" />
-    </span>
+    </Tooltip>
   ),
   federated: () => (
-    <span
-      css={icon}
-      className="with-tooltip with-tooltip--external"
-      data-tooltip={t('conversationFederationIndicator')}
-    >
+    <Tooltip css={icon} body={t('conversationFederationIndicator')}>
       <Icon.Federation data-uie-name="status-federated-user" />
-    </span>
+    </Tooltip>
   ),
   external: () => (
-    <span css={icon} className="with-tooltip with-tooltip--external" data-tooltip={t('rolePartner')}>
+    <Tooltip css={icon} body={t('rolePartner')}>
       <Icon.External data-uie-name="status-external" />
-    </span>
+    </Tooltip>
   ),
   verified: () => (
     <span css={icon}>

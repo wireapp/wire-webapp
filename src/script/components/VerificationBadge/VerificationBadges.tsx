@@ -24,10 +24,11 @@ import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 
 import {
   CertificateExpiredIcon,
-  ExpiresSoon,
   CertificateRevoked,
+  ExpiresSoon,
   MLSVerified,
   ProteusVerified,
+  Tooltip,
 } from '@wireapp/react-ui-kit';
 
 import {ClientEntity} from 'src/script/client';
@@ -123,7 +124,6 @@ export const ConversationVerificationBadges = ({conversation, displayTitle}: Con
 
 const MLSVerificationBadge = ({context, MLSStatus}: {MLSStatus?: MLSStatuses; context: VerificationBadgeContext}) => {
   const mlsVerificationProps = {
-    className: 'with-tooltip with-tooltip--external',
     css: iconStyles,
     'data-uie-name': `mls-${context}-status`,
     'data-uie-value': MLSStatus,
@@ -132,31 +132,33 @@ const MLSVerificationBadge = ({context, MLSStatus}: {MLSStatus?: MLSStatuses; co
   switch (MLSStatus) {
     case MLSStatuses.VALID:
       return (
-        <span {...mlsVerificationProps} data-tooltip={t('E2EI.deviceVerified')}>
+        <Tooltip body={t('E2EI.deviceVerified')} {...mlsVerificationProps}>
           <MLSVerified />
-        </span>
+        </Tooltip>
       );
     case MLSStatuses.NOT_DOWNLOADED:
-      <span {...mlsVerificationProps} data-tooltip={t('E2EI.certificateNotDownloaded')}>
-        <CertificateExpiredIcon />
-      </span>;
+      return (
+        <Tooltip {...mlsVerificationProps} body={t('E2EI.certificateNotDownloaded')}>
+          <CertificateExpiredIcon />
+        </Tooltip>
+      );
     case MLSStatuses.EXPIRED:
       return (
-        <span {...mlsVerificationProps} data-tooltip={t('E2EI.certificateExpired')}>
+        <Tooltip {...mlsVerificationProps} body={t('E2EI.certificateExpired')}>
           <CertificateExpiredIcon />
-        </span>
+        </Tooltip>
       );
     case MLSStatuses.REVOKED:
       return (
-        <span {...mlsVerificationProps} data-tooltip={t('E2EI.certificateRevoked')}>
+        <Tooltip {...mlsVerificationProps} body={t('E2EI.certificateRevoked')}>
           <CertificateRevoked />
-        </span>
+        </Tooltip>
       );
     case MLSStatuses.EXPIRES_SOON:
       return (
-        <span {...mlsVerificationProps} data-tooltip={t('E2EI.certificateExpiresSoon')}>
+        <Tooltip {...mlsVerificationProps} body={t('E2EI.certificateExpiresSoon')}>
           <ExpiresSoon />
-        </span>
+        </Tooltip>
       );
   }
   return null;
@@ -196,14 +198,9 @@ export const VerificationBadges = ({
         <div css={badgeWrapper}>
           {displayTitle && <span style={title(false)}>{t('proteusVerifiedDetails')}</span>}
 
-          <span
-            className="with-tooltip with-tooltip--external"
-            data-tooltip={t('proteusDeviceVerified')}
-            css={iconStyles}
-            data-uie-name="proteus-verified"
-          >
+          <Tooltip body={t('proteusDeviceVerified')} css={iconStyles} data-uie-name="proteus-verified">
             <ProteusVerified data-uie-name={`proteus-${context}-verified`} />
-          </span>
+          </Tooltip>
         </div>
       )}
     </div>
