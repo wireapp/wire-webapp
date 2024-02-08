@@ -19,25 +19,21 @@
 
 import {Encoder, Decoder} from 'bazinga64';
 
-import {AuthData, AuthDataSchema, InitialData, InitialDataSchema, OrderData} from './E2EIStorage.schema';
+import {AuthData, AuthDataSchema, OrderData} from './E2EIStorage.schema';
 
 import {LocalStorageStore} from '../../../../util/LocalStorageStore';
 
 const HandleKey = 'Handle';
 const AuthDataKey = 'AuthData';
 const OderDataKey = 'OrderData';
-const InitialDataKey = 'InitialData';
 
 const storage = LocalStorageStore<string>('E2EIStorage');
 
 const storeHandle = (handle: string) => storage.add(HandleKey, Encoder.toBase64(handle).asString);
 const storeOrderData = (data: OrderData) => storage.add(OderDataKey, Encoder.toBase64(JSON.stringify(data)).asString);
 const storeAuthData = (data: AuthData) => storage.add(AuthDataKey, Encoder.toBase64(JSON.stringify(data)).asString);
-const storeInitialData = (data: InitialData) =>
-  storage.add(InitialDataKey, Encoder.toBase64(JSON.stringify(data)).asString);
 
 const hasHandle = () => storage.has(HandleKey);
-const hasInitialData = () => storage.has(InitialDataKey);
 
 const getAndVerifyHandle = () => {
   const handle = storage.get(HandleKey);
@@ -57,15 +53,6 @@ const getAndVerifyAuthData = (): AuthData => {
   return AuthDataSchema.parse(JSON.parse(decodedData));
 };
 
-const getInitialData = (): InitialData => {
-  const data = storage.get(InitialDataKey);
-  if (!data) {
-    throw new Error('ACME: InitialData not found');
-  }
-  const decodedData = Decoder.fromBase64(data).asString;
-  return InitialDataSchema.parse(JSON.parse(decodedData));
-};
-
 const getAndVerifyOrderData = (): OrderData => {
   const data = storage.get(OderDataKey);
   if (!data) {
@@ -73,10 +60,6 @@ const getAndVerifyOrderData = (): OrderData => {
   }
   const decodedData = Decoder.fromBase64(data).asString;
   return JSON.parse(decodedData);
-};
-
-const removeInitialData = () => {
-  storage.remove(InitialDataKey);
 };
 
 const removeTemporaryData = () => {
@@ -87,7 +70,6 @@ const removeTemporaryData = () => {
 
 const removeAll = () => {
   removeTemporaryData();
-  removeInitialData();
 };
 
 export const E2EIStorage = {
@@ -95,20 +77,16 @@ export const E2EIStorage = {
     handle: storeHandle,
     authData: storeAuthData,
     orderData: storeOrderData,
-    initialData: storeInitialData,
   },
   get: {
-    initialData: getInitialData,
     handle: getAndVerifyHandle,
     authData: getAndVerifyAuthData,
     orderData: getAndVerifyOrderData,
   },
   has: {
     handle: hasHandle,
-    initialData: hasInitialData,
   },
   remove: {
-    initialData: removeInitialData,
     temporaryData: removeTemporaryData,
     all: removeAll,
   },

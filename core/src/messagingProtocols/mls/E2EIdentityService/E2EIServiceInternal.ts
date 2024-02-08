@@ -33,7 +33,7 @@ import {doWireDpopChallenge} from './Steps/DpopChallenge';
 import {doWireOidcChallenge} from './Steps/OidcChallenge';
 import {createNewOrder, finalizeOrder} from './Steps/Order';
 import {E2EIStorage} from './Storage/E2EIStorage';
-import {AuthData} from './Storage/E2EIStorage.schema';
+import {AuthData, InitialData} from './Storage/E2EIStorage.schema';
 
 import {NewCrlDistributionPointsPayload} from '../MLSService/MLSService.types';
 
@@ -41,6 +41,7 @@ export class E2EIServiceInternal {
   private static instance: E2EIServiceInternal;
   private readonly logger = logdown('@wireapp/core/E2EIdentityServiceInternal');
   private _acmeService?: AcmeService;
+  private _initialData?: InitialData;
 
   private constructor(
     private readonly coreCryptoClient: CoreCrypto,
@@ -81,7 +82,6 @@ export class E2EIServiceInternal {
         if (!discoveryUrl || !user || !clientId) {
           throw new Error('discoveryUrl, user and clientId are required to initialize E2EIServiceInternal');
         }
-        E2EIStorage.store.initialData({discoveryUrl, user, clientId});
         await E2EIServiceInternal.instance.init({clientId, discoveryUrl, user});
       }
     }
@@ -93,6 +93,13 @@ export class E2EIServiceInternal {
       throw new Error('Error while trying to get AcmeService. E2EIServiceInternal has not been initialized');
     }
     return this._acmeService;
+  }
+
+  get initialData(): InitialData {
+    if (!this._initialData) {
+      throw new Error('Error while trying to get InitialData. E2EIServiceInternal has not been initialized');
+    }
+    return this._initialData;
   }
 
   public async startCertificateProcess(hasActiveCertificate: boolean) {
@@ -110,10 +117,23 @@ export class E2EIServiceInternal {
     throw new Error('Error while trying to continue OAuth flow. No enrollment in progress found');
   }
 
+  /**
+   * This function starts a ACME refresh flow for an existing client with a valid refresh token
+   *
+   * @param oAuthIdToken
+   * @returns
+   */
+  public async renewCertificate(oAuthIdToken: string, hasActiveCertificate: boolean) {
+    const identity = await this.initIdentity(hasActiveCertificate);
+    const authData = await this.getEnrollmentChallenges(identity);
+
+    return this.getRotateBundleAndStoreCertificateData(identity, oAuthIdToken, authData.authChallenges);
+  }
+
   // ############ Internal Functions ############
 
   private async initIdentity(hasActiveCertificate: boolean) {
-    const {user} = E2EIStorage.get.initialData();
+    const {user} = this.initialData;
 
     // How long the issued certificate should be maximal valid
     const ciphersuite = Ciphersuite.MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519;
@@ -138,9 +158,9 @@ export class E2EIServiceInternal {
   private async init(params: Required<Pick<InitParams, 'user' | 'clientId' | 'discoveryUrl'>>): Promise<void> {
     const {user, clientId, discoveryUrl} = params;
     if (!user || !clientId) {
-      this.logger.error('user and clientId are required to initialize E2eIdentityService');
-      throw new Error();
+      throw new Error('user and clientId are required to initialize E2eIdentityService');
     }
+    this._initialData = {user, clientId, discoveryUrl};
     this._acmeService = new AcmeService(discoveryUrl);
   }
 
@@ -206,11 +226,7 @@ export class E2EIServiceInternal {
       nonce: orderData.nonce,
     });
 
-    // Store the values in local storage for later use (e.g. in the continue flow)
-    E2EIStorage.store.authData(authChallenges);
-    E2EIStorage.store.orderData({orderUrl: orderData.orderUrl});
-
-    return authChallenges;
+    return {authChallenges, orderUrl: orderData.orderUrl};
   }
 
   /**
@@ -240,7 +256,7 @@ export class E2EIServiceInternal {
       throw new Error('Error while trying to continue OAuth flow. OIDC challenge not validated');
     }
 
-    const {user: wireUser, clientId} = E2EIStorage.get.initialData();
+    const {user: wireUser, clientId} = this.initialData;
     //Step 8: Do DPOP Challenge
     const dpopData = await doWireDpopChallenge({
       authData,
@@ -295,17 +311,22 @@ export class E2EIServiceInternal {
       throw new Error('Error while trying to start OAuth flow. There is already a flow in progress');
     }
 
+    const {authChallenges, orderUrl} = await this.getEnrollmentChallenges(identity);
     const {
       authorization: {oidcChallenge: wireOidcChallenge, keyauth},
-    } = await this.getEnrollmentChallenges(identity);
+    } = authChallenges;
 
     if (!wireOidcChallenge || !keyauth) {
       throw new Error('missing wireOidcChallenge or keyauth');
     }
     // stash the identity for later use
     const handle = await this.coreCryptoClient.e2eiEnrollmentStash(identity);
-    // stash the handle in local storage
+
+    // Store the values in local storage for later use (e.g. in the continue flow)
     E2EIStorage.store.handle(Encoder.toBase64(handle).asString);
+    E2EIStorage.store.authData(authChallenges);
+    E2EIStorage.store.orderData({orderUrl});
+
     // we need to pass back the aquired wireOidcChallenge to the UI
     return {challenge: wireOidcChallenge, keyAuth: keyauth};
   }
@@ -323,21 +344,6 @@ export class E2EIServiceInternal {
 
     const identity = await this.coreCryptoClient.e2eiEnrollmentStashPop(Decoder.fromBase64(handle).asBytes);
     this.logger.log('retrieved identity from stash');
-
-    return this.getRotateBundleAndStoreCertificateData(identity, oAuthIdToken, authData);
-  }
-
-  /**
-   * This function starts a ACME refresh flow for an existing client with a valid refresh token
-   *
-   * @param oAuthIdToken
-   * @returns
-   */
-  public async startRefreshCertficateFlow(oAuthIdToken: string, hasActiveCertificate: boolean) {
-    // We need to initialize the identity
-    const identity = await this.initIdentity(hasActiveCertificate);
-
-    const authData = await this.getEnrollmentChallenges(identity);
 
     return this.getRotateBundleAndStoreCertificateData(identity, oAuthIdToken, authData);
   }

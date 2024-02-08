@@ -828,7 +828,7 @@ export class MLSService extends TypedEventEmitter<Events> {
       ? // If we are not refreshing the active certificate, we need to continue the certificate process with Oauth
         await instance.continueCertificateProcess(oAuthIdToken)
       : // If we are refreshing the active certificate, can start the refresh process
-        await instance.startRefreshCertficateFlow(oAuthIdToken, hasActiveCertificate);
+        await instance.renewCertificate(oAuthIdToken, hasActiveCertificate);
 
     if (rotateBundle === undefined) {
       throw new Error('Could not get the rotate bundle');
