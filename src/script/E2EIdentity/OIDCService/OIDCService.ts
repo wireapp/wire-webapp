@@ -101,12 +101,7 @@ export class OIDCService {
     return this.userManager.clearStaleState();
   }
 
-  public async handleSilentAuthentication(): Promise<User | null> {
-    try {
-      return this.userManager.signinSilent();
-    } catch (error) {
-      this.logger.log('Silent authentication with refresh token failed', error);
-    }
-    return null;
+  public async handleSilentAuthentication() {
+    return this.userManager.signinSilent();
   }
 }
