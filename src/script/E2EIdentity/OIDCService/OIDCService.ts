@@ -24,22 +24,12 @@ import {clearKeysStartingWith} from 'Util/localStorage';
 import {Logger, getLogger} from 'Util/Logger';
 
 import {EncryptedStorage} from './OauthEncryptedStore';
-import {OIDCServiceStore} from './OIDCServiceStorage';
 
 export class OIDCService {
   private readonly userManager: UserManager;
   private readonly logger: Logger;
 
-  constructor(secretKey: Uint8Array) {
-    // Get the targetURL from the OIDCServiceStore
-    // It has been set by the E2EIdentityEnrollment
-    const targetURL = OIDCServiceStore.get.targetURL();
-
-    // if there is no targetURL, we cannot create an OIDCService
-    if (!targetURL) {
-      throw new Error('No target URL found in OIDCServiceStore');
-    }
-
+  constructor(secretKey: Uint8Array, targetURL: string) {
     // Extract the clientId from the targetURL
     const idpUrl = new URL(targetURL);
     // This clientId will be used to create the OIDCService. It needs to be attached to the targetURL
