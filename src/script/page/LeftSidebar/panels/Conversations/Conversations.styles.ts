@@ -42,10 +42,8 @@ export const searchInputStyles: CSSObject = {
 };
 
 export const searchInputWrapperStyles: CSSObject = {
-  marginBottom: 12,
-  marginTop: 12,
-  paddingLeft: 16,
-  paddingRight: 16,
+  marginBlock: 12,
+  paddingInline: 16,
   zIndex: 1,
   position: 'relative',
 };
