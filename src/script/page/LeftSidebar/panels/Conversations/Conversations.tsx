@@ -33,6 +33,12 @@ import {LegalHoldDot} from 'Components/LegalHoldDot';
 import {UserInfo} from 'Components/UserInfo';
 import {UserVerificationBadges} from 'Components/VerificationBadge';
 import {Config} from 'src/script/Config';
+import {
+  closeIconStyles,
+  searchIconStyles,
+  searchInputStyles,
+  searchInputWrapperStyles,
+} from 'src/script/page/LeftSidebar/panels/Conversations/Conversations.styles';
 import {ListState} from 'src/script/page/useAppState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -345,41 +351,18 @@ const Conversations: React.FC<ConversationsProps> = ({
               onChange={event => {
                 setConversationsFilter(event.currentTarget.value);
               }}
-              startContent={
-                <SearchIcon
-                  width={14}
-                  height={14}
-                  css={{
-                    top: '50%',
-                    left: 10,
-                    position: 'absolute',
-                    transform: 'translateY(-50%)',
-                  }}
-                />
-              }
+              startContent={<SearchIcon width={14} height={14} css={searchIconStyles} />}
               endContent={
                 conversationsFilter && (
                   <CircleCloseIcon
                     className="cursor-pointer"
                     onClick={() => setConversationsFilter('')}
-                    css={{
-                      top: '50%',
-                      right: 10,
-                      position: 'absolute',
-                      transform: 'translateY(-50%)',
-                    }}
+                    css={closeIconStyles}
                   />
                 )
               }
-              inputCSS={{height: '32px', borderRadius: 8, paddingLeft: 36}}
-              wrapperCSS={{
-                marginBottom: 12,
-                marginTop: 12,
-                paddingLeft: 16,
-                paddingRight: 16,
-                zIndex: 1,
-                position: 'relative',
-              }}
+              inputCSS={searchInputStyles}
+              wrapperCSS={searchInputWrapperStyles}
               placeholder={t('searchConversations')}
             />
           )}
