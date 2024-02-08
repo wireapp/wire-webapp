@@ -30,6 +30,7 @@ import * as util from 'Util/util';
 import {E2EIHandler, E2EIHandlerStep} from './E2EIdentityEnrollment';
 import {hasActiveCertificate} from './E2EIdentityVerification';
 import {getModalOptions, ModalType} from './Modals';
+import {OIDCServiceStore} from './OIDCService/OIDCServiceStorage';
 
 jest.mock('./OIDCService', () => {
   return {
@@ -102,6 +103,7 @@ describe('E2EIHandler', () => {
 
     jest.spyOn(container.resolve(UserState), 'self').mockReturnValue(user);
     jest.spyOn(container.resolve(Core), 'enrollE2EI').mockResolvedValue({status: 'successful'});
+    OIDCServiceStore.store.targetURL('http://example.com');
     container.resolve(Core).key = new Uint8Array();
   });
 
