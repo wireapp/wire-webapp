@@ -23,6 +23,7 @@ import 'core-js/full/reflect';
 
 import {Context} from '@wireapp/api-client/lib/auth';
 import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/';
+import {FEATURE_KEY} from '@wireapp/api-client/lib/team';
 import {EVENTS as CoreEvents} from '@wireapp/core/lib/Account';
 import {amplify} from 'amplify';
 import platform from 'platform';
@@ -390,12 +391,28 @@ export class App {
 
       const {features: teamFeatures, members: teamMembers} = await teamRepository.initTeam(selfUser.teamId);
       const e2eiHandler = await configureE2EI(this.logger, teamFeatures);
+      const dlPathNotifier =
+        teamFeatures[FEATURE_KEY.ENFORCE_DOWNLOAD_PATH]?.status === 'enabled' &&
+        localStorage.getItem('enforcedDownloadLocation') !==
+          teamFeatures[FEATURE_KEY.ENFORCE_DOWNLOAD_PATH]?.config.enforcedDownloadLocation &&
+        Runtime.isDesktopApp() &&
+        Runtime.isWindows();
+
       if (e2eiHandler) {
         /* We first try to do the initial enrollment (if the user has not yet enrolled)
          * We need to enroll before anything else (in particular joining MLS conversations)
          * Until the user is enrolled, we need to pause loading the app
          */
         await e2eiHandler.attemptEnrollment();
+      }
+
+      if (dlPathNotifier) {
+        localStorage.setItem(
+          'enforcedDownloadLocation',
+          teamFeatures[FEATURE_KEY.ENFORCE_DOWNLOAD_PATH]?.config.enforcedDownloadLocation ?? '',
+        );
+        const {modalOptions, modalType} = getModalOptions({type: ModalType.DOWNLOAD_PATH_CHANGED});
+        PrimaryModal.show(modalType, modalOptions);
       }
 
       this.core.configureCoreCallbacks({

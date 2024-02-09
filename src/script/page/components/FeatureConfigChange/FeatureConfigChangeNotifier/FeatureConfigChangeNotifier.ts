@@ -80,6 +80,29 @@ const featureNotifications: Partial<
     };
   },
   [FEATURE_KEY.ENFORCE_DOWNLOAD_PATH]: (oldConfig, newConfig) => {
+    const modal: (
+      status: FeatureStatus | boolean,
+    ) => undefined | {htmlMessage: string; title: StringIdentifer; primaryAction?: Action} = status => ({
+      htmlMessage:
+        status === FeatureStatus.ENABLED
+          ? t('featureConfigChangeModalDownloadPathEnabled')
+          : status === FeatureStatus.DISABLED
+            ? t('featureConfigChangeModalDownloadPathDisabled')
+            : t('featureConfigChangeModalDownloadPathChanged'),
+      title: 'featureConfigChangeModalDownloadPathHeadline',
+      primaryAction: {
+        action: () => {
+          if (Runtime.isDesktopApp() && status !== FeatureStatus.DISABLED) {
+            amplify.publish(WebAppEvents.LIFECYCLE.RESTART);
+          }
+        },
+      },
+    });
+    if (!oldConfig && newConfig?.status === FeatureStatus.ENABLED && 'config' in newConfig) {
+      localStorage.setItem('enforcedDownloadLocation', newConfig.config.enforcedDownloadLocation);
+      amplify.publish(WebAppEvents.TEAM.DOWNLOAD_PATH_UPDATE, newConfig?.config?.enforcedDownloadLocation);
+      return modal(FeatureStatus.ENABLED);
+    }
     if (
       newConfig &&
       'config' in newConfig &&
@@ -93,26 +116,12 @@ const featureNotifications: Partial<
       if (!status && !configStatus) {
         return undefined;
       }
+      localStorage.setItem('enforcedDownloadLocation', newConfig.config.enforcedDownloadLocation);
       amplify.publish(
         WebAppEvents.TEAM.DOWNLOAD_PATH_UPDATE,
         newConfig.status === FeatureStatus.ENABLED ? newConfig.config.enforcedDownloadLocation : undefined,
       );
-      return {
-        htmlMessage:
-          status === FeatureStatus.ENABLED
-            ? t('featureConfigChangeModalDownloadPathEnabled')
-            : status === FeatureStatus.DISABLED
-              ? t('featureConfigChangeModalDownloadPathDisabled')
-              : t('featureConfigChangeModalDownloadPathChanged'),
-        title: 'featureConfigChangeModalDownloadPathHeadline',
-        primaryAction: {
-          action: () => {
-            if (Runtime.isDesktopApp() && status !== FeatureStatus.DISABLED) {
-              amplify.publish(WebAppEvents.LIFECYCLE.RESTART);
-            }
-          },
-        },
-      };
+      return modal(status);
     }
     return undefined;
   },
