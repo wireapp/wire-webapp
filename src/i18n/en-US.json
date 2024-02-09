@@ -713,7 +713,7 @@
   "guestLinkPasswordModal.conversationPasswordProtected": "This conversation is password protected.",
   "guestLinkPasswordModal.description": "Please enter the password you have received with the access link for this conversation.",
   "guestLinkPasswordModal.headline": "{conversationName} Enter password",
-  "guestLinkPasswordModal.headlineDefault": "[Group Conversation] Enter password",
+  "guestLinkPasswordModal.headlineDefault": "Enter password",
   "guestLinkPasswordModal.joinConversation": "Join Conversation",
   "guestLinkPasswordModal.learnMoreLink": "Learn more about guest links",
   "guestLinkPasswordModal.passwordIncorrect": "Password is incorrect, please try again.",
