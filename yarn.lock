@@ -13105,12 +13105,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"oidc-client-ts@npm:^3.0.0":
-  version: 3.0.0
-  resolution: "oidc-client-ts@npm:3.0.0"
+"oidc-client-ts@npm:^3.0.1":
+  version: 3.0.1
+  resolution: "oidc-client-ts@npm:3.0.1"
   dependencies:
     jwt-decode: ^4.0.0
-  checksum: 995851e8842ec2465c95d1f91936bca018ab1332d6ef2d3d1fbe000a7e42a589d37b7b03dd53eb9d72198d659028e8f85742387e634231a425c51b1c391b66ec
+  checksum: 08a21a40304131642ffc6a4e9ecc3a51bf476967dfbf4b60dbdb84f79b42489fda2ba447d9276ecb575a4ca75d94f652deac38065553688bff614c9d763f6c03
   languageName: node
   linkType: hard
 
@@ -17915,7 +17915,7 @@ __metadata:
     markdown-it: 14.0.0
     murmurhash: 2.0.1
     node-fetch: 2.7.0
-    oidc-client-ts: ^3.0.0
+    oidc-client-ts: ^3.0.1
     os-browserify: 0.3.0
     path-browserify: 1.0.1
     platform: 1.3.6
