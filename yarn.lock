@@ -2162,48 +2162,48 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@datadog/browser-core@npm:5.8.0":
-  version: 5.8.0
-  resolution: "@datadog/browser-core@npm:5.8.0"
-  checksum: 3282c104976b7e151a3db5d67100b2b98714d092f3c8395cf8dbafd6db470a83ef54a61ffb1e2a171e147145a95a0a0af50918baa5a14251996b8c68788a5c0b
+"@datadog/browser-core@npm:5.9.0":
+  version: 5.9.0
+  resolution: "@datadog/browser-core@npm:5.9.0"
+  checksum: 3dab065d26fc1803a169587835696bd44c781b60be359f25bcf0a517a9ea41c4b314861e65068e7a5ca50354554504441f1c8b22453727a4092da49bba2ba776
   languageName: node
   linkType: hard
 
-"@datadog/browser-logs@npm:^5.8.0":
-  version: 5.8.0
-  resolution: "@datadog/browser-logs@npm:5.8.0"
+"@datadog/browser-logs@npm:^5.9.0":
+  version: 5.9.0
+  resolution: "@datadog/browser-logs@npm:5.9.0"
   dependencies:
-    "@datadog/browser-core": 5.8.0
+    "@datadog/browser-core": 5.9.0
   peerDependencies:
-    "@datadog/browser-rum": 5.8.0
+    "@datadog/browser-rum": 5.9.0
   peerDependenciesMeta:
     "@datadog/browser-rum":
       optional: true
-  checksum: ceb4daae67bc9fc720284881d2ce27b417bf004f123989be8c747771587373083ce2f370311eb42823bef80dd4ee0b8023a492a87a14e0ff8ca2127f36d455e7
+  checksum: ea09a83b870a65c52c0801b1c7bd5957923c09e59bc7abeed22bccbe273fbf837a73d8428b0aa6f10a863320dd0db53bbe92af269b260dd7f22e5a4b7b2cf370
   languageName: node
   linkType: hard
 
-"@datadog/browser-rum-core@npm:5.8.0":
-  version: 5.8.0
-  resolution: "@datadog/browser-rum-core@npm:5.8.0"
+"@datadog/browser-rum-core@npm:5.9.0":
+  version: 5.9.0
+  resolution: "@datadog/browser-rum-core@npm:5.9.0"
   dependencies:
-    "@datadog/browser-core": 5.8.0
-  checksum: b99d5dbe5dc2b9976362a5028cf97cd8f274b65729e92f3d8086e24c540ad987ae558e8f246a6b10ff41bf27c3679b8d43736b462411a3ad06cd9b9d9d72de80
+    "@datadog/browser-core": 5.9.0
+  checksum: 79f2dac3145dc3be254567640fa1071be83e0230f87a68003fc1a9fb8e18e186267d49cf9d2845739ad2f3a89baca05ac2f0d20b8a652b4a09a80470a2203e7a
   languageName: node
   linkType: hard
 
-"@datadog/browser-rum@npm:^5.8.0":
-  version: 5.8.0
-  resolution: "@datadog/browser-rum@npm:5.8.0"
+"@datadog/browser-rum@npm:^5.9.0":
+  version: 5.9.0
+  resolution: "@datadog/browser-rum@npm:5.9.0"
   dependencies:
-    "@datadog/browser-core": 5.8.0
-    "@datadog/browser-rum-core": 5.8.0
+    "@datadog/browser-core": 5.9.0
+    "@datadog/browser-rum-core": 5.9.0
   peerDependencies:
-    "@datadog/browser-logs": 5.8.0
+    "@datadog/browser-logs": 5.9.0
   peerDependenciesMeta:
     "@datadog/browser-logs":
       optional: true
-  checksum: ca564c4a23c3b2d2343c048c74ca03774a90c32bac8aea29050ed286a3698d4a071fa00ea7a629543df6bcbc88595f9b78dd8fa032be623819100110dfbd996b
+  checksum: d846c21d91c2bb7d32879352fc33bf5e234b90c0050c0712e028a2e90381c8ea6c70889e62503fbbe07fc01e41836d3f92589a838307205f8ff257be19268bc9
   languageName: node
   linkType: hard
 
@@ -17817,8 +17817,8 @@ __metadata:
     "@babel/preset-env": 7.23.9
     "@babel/preset-react": 7.23.3
     "@babel/preset-typescript": 7.23.3
-    "@datadog/browser-logs": ^5.8.0
-    "@datadog/browser-rum": ^5.8.0
+    "@datadog/browser-logs": ^5.9.0
+    "@datadog/browser-rum": ^5.9.0
     "@emotion/eslint-plugin": ^11.11.0
     "@emotion/react": 11.11.3
     "@faker-js/faker": 8.4.0
