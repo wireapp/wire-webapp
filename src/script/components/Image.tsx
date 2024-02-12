@@ -100,9 +100,9 @@ export const Image: React.FC<ImageProps> = ({
   return (
     <InViewport onVisible={() => setIsInViewport(true)} className={cx('image-wrapper', className)} {...props}>
       {imageUrl ? (
-        <img onClick={onClick} src={imageUrl.url} role="presentation" alt={alt} />
+        <img onClick={onClick} src={imageUrl.url} role="presentation" alt={alt} data-uie-name="image-asset-img" />
       ) : (
-        <div style={placeholderStyle} className={cx('loading-dots')}></div>
+        <div style={placeholderStyle} className={cx('loading-dots')} data-uie-name="image-loader"></div>
       )}
     </InViewport>
   );
