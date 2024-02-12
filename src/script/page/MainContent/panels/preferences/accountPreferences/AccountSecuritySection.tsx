@@ -32,7 +32,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {User} from '../../../../../entity/User';
-import {getAccountPagesUrl, getCreateTeamUrl, getManageTeamUrl, URL} from '../../../../../externalRoute';
+import {externalUrl, getManageTeamUrl} from '../../../../../externalRoute';
 import {TeamState} from '../../../../../team/TeamState';
 import {AppLockState} from '../../../../../user/AppLockState';
 import {FEATURES, hasAccessToFeature} from '../../../../../user/UserPermission';
@@ -52,7 +52,7 @@ const AccountSecuritySection: React.FC<AccountSecuritySectionProps> = ({
   appLockState = container.resolve(AppLockState),
   teamState = container.resolve(TeamState),
 }) => {
-  const createTeamUrl = getCreateTeamUrl();
+  const createTeamUrl = externalUrl.createTeam;
   const manageTeamUrl = getManageTeamUrl('client_settings');
   const {teamRole} = useKoSubscribableChildren(selfUser, ['teamRole']);
   const {isAppLockActivated} = useKoSubscribableChildren(appLockState, ['isAppLockActivated']);
@@ -110,7 +110,7 @@ const AccountSecuritySection: React.FC<AccountSecuritySectionProps> = ({
         <Link
           tabIndex={TabIndex.FOCUSABLE}
           variant={LinkVariant.PRIMARY}
-          href={getAccountPagesUrl(URL.URL_PATH.PASSWORD_RESET)}
+          href={externalUrl.passwordReset}
           targetBlank
           title={t('tooltipPreferencesPassword')}
           data-uie-name="do-reset-password"

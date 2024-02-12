@@ -20,7 +20,7 @@
 import {currentLanguage} from './auth/localeConfig';
 import {Config} from './Config';
 
-export const URL = Config.getConfig().URL;
+const URL = Config.getConfig().URL;
 
 const getTeamSettingsUrl = (path: string = '', utmSource?: string): string | undefined => {
   const query = utmSource ? `?utm_source=${utmSource}&utm_term=desktop` : '';
@@ -28,7 +28,7 @@ const getTeamSettingsUrl = (path: string = '', utmSource?: string): string | und
   return URL.TEAMS_BASE ? teamSettingsUrl : undefined;
 };
 
-export const getWebsiteUrl = (path: string = '', pkCampaign?: string): string | undefined => {
+const getWebsiteUrl = (path: string = '', pkCampaign?: string): string | undefined => {
   if (URL.WEBSITE_BASE) {
     const query = pkCampaign ? `?pk_campaign=${pkCampaign}&pk_kwd=desktop` : '';
     const websiteUrl = `${URL.WEBSITE_BASE}${path}${query}`;
@@ -37,22 +37,21 @@ export const getWebsiteUrl = (path: string = '', pkCampaign?: string): string | 
   return undefined;
 };
 
-export const getAccountPagesUrl = (path: string = ''): string | undefined => {
+const getAccountPagesUrl = (path: string = ''): string | undefined => {
   const accountPagesUrl = `${URL.ACCOUNT_BASE}${path}`;
   return URL.ACCOUNT_BASE ? accountPagesUrl : undefined;
 };
 
-export const getPrivacyPolicyUrl = (): string | undefined => addLocaleToUrl(URL.PRIVACY_POLICY || undefined);
-export const getTermsOfUsePersonalUrl = (): string | undefined =>
-  addLocaleToUrl(URL.TERMS_OF_USE_PERSONAL || undefined);
-export const getTermsOfUseTeamUrl = (): string | undefined => addLocaleToUrl(URL.TERMS_OF_USE_TEAMS || undefined);
+const getPrivacyPolicyUrl = (): string | undefined => addLocaleToUrl(URL.PRIVACY_POLICY || undefined);
+const getTermsOfUsePersonalUrl = (): string | undefined => addLocaleToUrl(URL.TERMS_OF_USE_PERSONAL || undefined);
+const getTermsOfUseTeamUrl = (): string | undefined => addLocaleToUrl(URL.TERMS_OF_USE_TEAMS || undefined);
 
 export const getManageServicesUrl = (utmSource?: string): string | undefined =>
   getTeamSettingsUrl(URL.URL_PATH.MANAGE_SERVICES, utmSource);
 export const getManageTeamUrl = (utmSource?: string): string | undefined =>
   getTeamSettingsUrl(URL.URL_PATH.MANAGE_TEAM, utmSource);
 
-export const getCreateTeamUrl = (): string | undefined =>
+const getCreateTeamUrl = (): string | undefined =>
   Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION ? `${URL.TEAMS_BASE}${URL.URL_PATH.CREATE_TEAM}` : undefined;
 
 export const addLocaleToUrl = (url?: string | undefined): string | undefined => {
@@ -62,4 +61,13 @@ export const addLocaleToUrl = (url?: string | undefined): string | undefined => 
   const language = currentLanguage().slice(0, 2);
   const websiteLanguage = language == 'de' ? language : 'en';
   return url.replace(Config.getConfig().URL.WEBSITE_BASE, `${Config.getConfig().URL.WEBSITE_BASE}/${websiteLanguage}`);
+};
+
+export const externalUrl = {
+  createTeam: getCreateTeamUrl(),
+  passwordReset: getAccountPagesUrl(URL.URL_PATH.PASSWORD_RESET),
+  privacyPolicy: getPrivacyPolicyUrl(),
+  termsOfUsePersonnal: getTermsOfUsePersonalUrl(),
+  termsOfUseTeam: getTermsOfUseTeamUrl(),
+  website: getWebsiteUrl(),
 };

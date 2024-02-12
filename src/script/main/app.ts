@@ -82,7 +82,7 @@ import {ServiceMiddleware} from '../event/preprocessor/ServiceMiddleware';
 import {FederationEventProcessor} from '../event/processor/FederationEventProcessor';
 import {GiphyRepository} from '../extension/GiphyRepository';
 import {GiphyService} from '../extension/GiphyService';
-import {getWebsiteUrl} from '../externalRoute';
+import {externalUrl} from '../externalRoute';
 import {IntegrationRepository} from '../integration/IntegrationRepository';
 import {IntegrationService} from '../integration/IntegrationService';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
@@ -829,7 +829,7 @@ export class App {
     const isLeavingGuestRoom = isTemporaryGuestReason && this.repository.user['userState'].self()?.isTemporaryGuest();
 
     if (isLeavingGuestRoom) {
-      const websiteUrl = getWebsiteUrl();
+      const websiteUrl = externalUrl.website;
 
       if (websiteUrl) {
         return window.location.replace(websiteUrl);
