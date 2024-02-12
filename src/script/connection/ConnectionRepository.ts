@@ -115,6 +115,12 @@ export class ConnectionRepository {
       connectionEntity = ConnectionMapper.mapConnectionFromJson(connectionData);
     }
 
+    const user = await this.userRepository.getUserById(connectionEntity.userId);
+    // If this is the connection request, but the user does not exist anymore, no need to attach a connection to a user or a conversation
+    if (user?.isDeleted && connectionEntity.status() === ConnectionStatus.SENT) {
+      return;
+    }
+
     // Attach connection to user
     await this.attachConnectionToUser(connectionEntity);
 

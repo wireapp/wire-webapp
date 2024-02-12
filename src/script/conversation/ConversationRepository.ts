@@ -570,12 +570,12 @@ export class ConversationRepository {
    * Will load all the conversations in memory
    * @returns all the conversations from backend merged with the locally stored conversations and loaded into memory
    */
-  public async loadConversations(): Promise<Conversation[]> {
+  public async loadConversations(connections: ConnectionEntity[]): Promise<Conversation[]> {
     const remoteConversations = await this.conversationService.getAllConversations().catch(error => {
       this.logger.error(`Failed to get all conversations from backend: ${error.message}`);
       return {found: []} as RemoteConversations;
     });
-    return this.loadRemoteConversations(remoteConversations);
+    return this.loadRemoteConversations(remoteConversations, connections);
   }
 
   /**
@@ -593,7 +593,9 @@ export class ConversationRepository {
         this.logger.error(`Failed to get all conversations from backend: ${error.message}`);
         return {found: [], failed: missingConversations} as RemoteConversations;
       });
-    return this.loadRemoteConversations(remoteConversations);
+
+    const connections = this.connectionState.connections();
+    return this.loadRemoteConversations(remoteConversations, connections);
   }
 
   /**
@@ -671,24 +673,85 @@ export class ConversationRepository {
     return {...remoteConversations, found: allConversations};
   }
 
+  private async filterDeletedConnectionRequests(
+    localConversations: ConversationDatabaseData[],
+    remoteConversations: RemoteConversations,
+    connections: ConnectionEntity[],
+  ): Promise<{localConversations: ConversationDatabaseData[]; remoteConversations: RemoteConversations}> {
+    //If there's any local conversation of type 3 (CONNECT), but the connection doesn't exist anymore (user was deleted),
+    // we delete the conversation and blacklist it so it's never refetched from the backend
+
+    const deletedConnectionRequests = [] as ConversationDatabaseData[];
+    const filteredLocalConversations = [] as ConversationDatabaseData[];
+
+    for (const conversation of localConversations) {
+      const {type, qualified_id, id, domain} = conversation;
+
+      const isDeletedConnectionRequest =
+        type === CONVERSATION_TYPE.CONNECT &&
+        !connections.find(connection => matchQualifiedIds(connection.conversationId, qualified_id || {id, domain}));
+
+      if (isDeletedConnectionRequest) {
+        deletedConnectionRequests.push(conversation);
+      } else {
+        filteredLocalConversations.push(conversation);
+      }
+    }
+
+    const filteredRemoteConversations = remoteConversations.found?.filter(
+      remoteConversation =>
+        !deletedConnectionRequests.find(({qualified_id, id, domain}) =>
+          matchQualifiedIds(qualified_id || {id, domain}, remoteConversation.qualified_id),
+        ),
+    );
+
+    await Promise.all(
+      deletedConnectionRequests.map(async ({id, domain, qualified_id}) => {
+        const qualifiedId = qualified_id || {id, domain};
+        await this.conversationService.deleteConversationFromDb(qualifiedId.id);
+        await this.blacklistConversation(qualifiedId);
+      }),
+    );
+
+    return {
+      localConversations: filteredLocalConversations,
+      remoteConversations: {...remoteConversations, found: filteredRemoteConversations},
+    };
+  }
+
+  private async filterLoadedConversations(
+    localConversations: ConversationDatabaseData[],
+    remoteConversations: RemoteConversations,
+    connections: ConnectionEntity[],
+  ): Promise<{localConversations: ConversationDatabaseData[]; remoteConversations: RemoteConversations}> {
+    const filteredAbandonedRemoteConversations = await this.filterAbandonedProteus1to1Conversations(
+      remoteConversations,
+      localConversations,
+    );
+
+    return this.filterDeletedConnectionRequests(localConversations, filteredAbandonedRemoteConversations, connections);
+  }
+
   /**
    * Will append the new conversations from backend to the locally stored conversations in memory
    * @param remoteConversations new conversations fetched from backend
    * @returns the new conversations from backend merged with the locally stored conversations
    */
-  private async loadRemoteConversations(remoteConversations: RemoteConversations): Promise<Conversation[]> {
+  private async loadRemoteConversations(
+    remoteConversations: RemoteConversations,
+    connections: ConnectionEntity[],
+  ): Promise<Conversation[]> {
     const localConversations = await this.conversationService.loadConversationStatesFromDb<ConversationDatabaseData>();
 
     let conversationsData: any[];
 
+    const {localConversations: filteredLocalConversations, remoteConversations: filteredRemoteConversations} =
+      await this.filterLoadedConversations(localConversations, remoteConversations, connections);
+
     if (!remoteConversations.found?.length) {
-      conversationsData = localConversations;
+      conversationsData = filteredLocalConversations;
     } else {
-      const filteredRemoteConversations = await this.filterAbandonedProteus1to1Conversations(
-        remoteConversations,
-        localConversations,
-      );
-      const data = ConversationMapper.mergeConversations(localConversations, filteredRemoteConversations);
+      const data = ConversationMapper.mergeConversations(filteredLocalConversations, filteredRemoteConversations);
       conversationsData = (await this.conversationService.saveConversationsInDb(data)) as any[];
     }
 
