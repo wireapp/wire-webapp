@@ -91,7 +91,7 @@ export const Image: React.FC<ImageProps> = ({
       isUnmouted.current = true;
       imageUrl?.dispose();
     };
-  }, []);
+  }, [imageUrl]);
 
   const style = {aspectRatio: `${image.ratio}`, maxWidth: '100%', width: image.width};
 

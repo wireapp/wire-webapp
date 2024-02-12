@@ -92,17 +92,19 @@ export const ImageAsset = ({asset, message, onClick, teamState = container.resol
         </div>
       )}
 
-      <Image
-        image={asset}
-        alt={imageAltText}
-        data-uie-visible={visible && !isObfuscated}
-        onClick={event => onClick(message, event)}
-        onKeyDown={event => handleKeyDown(event, onClick.bind(null, message, event))}
-        tabIndex={0}
-        role="button"
-        data-uie-name="go-image-detail"
-        aria-label={imageAltText}
-      />
+      {!isUploading && (
+        <Image
+          image={asset}
+          alt={imageAltText}
+          data-uie-visible={visible && !isObfuscated}
+          onClick={event => onClick(message, event)}
+          onKeyDown={event => handleKeyDown(event, onClick.bind(null, message, event))}
+          tabIndex={0}
+          role="button"
+          data-uie-name="go-image-detail"
+          aria-label={imageAltText}
+        />
+      )}
     </div>
   );
 };
