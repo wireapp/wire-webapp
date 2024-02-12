@@ -91,6 +91,7 @@ import {initMLSGroupConversations, initialiseSelfAndTeamConversations} from '../
 import {joinConversationsAfterMigrationFinalisation} from '../mls/MLSMigration/migrationFinaliser';
 import {NotificationRepository} from '../notification/NotificationRepository';
 import {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
+import {configureDownloadPath} from '../page/components/FeatureConfigChange/FeatureConfigChangeHandler/Features/downloadPath';
 import {configureE2EI} from '../page/components/FeatureConfigChange/FeatureConfigChangeHandler/Features/E2EIdentity';
 import {PermissionRepository} from '../permission/PermissionRepository';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
@@ -390,6 +391,8 @@ export class App {
 
       const {features: teamFeatures, members: teamMembers} = await teamRepository.initTeam(selfUser.teamId);
       const e2eiHandler = await configureE2EI(this.logger, teamFeatures);
+      configureDownloadPath(teamFeatures);
+
       if (e2eiHandler) {
         /* We first try to do the initial enrollment (if the user has not yet enrolled)
          * We need to enroll before anything else (in particular joining MLS conversations)
