@@ -28,14 +28,12 @@ import {RestrictedImage} from './asset/RestrictedImage';
 import {AssetUrl, useAssetTransfer} from './MessagesList/Message/ContentMessage/asset/useAssetTransfer';
 import {InViewport} from './utils/InViewport';
 
-import {AssetRemoteData} from '../assets/AssetRemoteData';
 import {Config} from '../Config';
 import {MediumImage} from '../entity/message/MediumImage';
 import {TeamState} from '../team/TeamState';
 
-export interface ImageProps extends Omit<React.HTMLProps<HTMLDivElement>, 'onClick'> {
+export interface ImageProps extends React.HTMLProps<HTMLDivElement> {
   image: MediumImage;
-  onClick?: (asset: AssetRemoteData, event: React.MouseEvent) => void;
   alt?: string;
   isQuote?: boolean;
   teamState?: TeamState;
@@ -60,10 +58,6 @@ export const Image: React.FC<ImageProps> = ({
   const {getAssetUrl} = useAssetTransfer();
 
   const {isFileSharingReceivingEnabled} = useKoSubscribableChildren(teamState, ['isFileSharingReceivingEnabled']);
-
-  const handleClick = (event: React.MouseEvent) => {
-    onClick?.(resource, event);
-  };
 
   useEffect(() => {
     if (!imageUrl && isInViewport && resource && isFileSharingReceivingEnabled) {
@@ -102,7 +96,7 @@ export const Image: React.FC<ImageProps> = ({
   return (
     <InViewport onVisible={() => setIsInViewport(true)} className={cx('image-wrapper', className)} {...props}>
       {imageUrl ? (
-        <img style={style} onClick={handleClick} src={imageUrl.url} role="presentation" alt={alt} />
+        <img style={style} onClick={onClick} src={imageUrl.url} role="presentation" alt={alt} />
       ) : (
         <div style={style} className={cx('loading-dots')}></div>
       )}

@@ -188,7 +188,7 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
               <Image
                 className="message-quote__image"
                 image={asset}
-                onClick={(asset, event) => showDetail(quotedMessage, event)}
+                onClick={event => showDetail(quotedMessage, event)}
               />
             </div>
           )}

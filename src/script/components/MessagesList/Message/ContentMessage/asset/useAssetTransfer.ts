@@ -40,7 +40,7 @@ export const useAssetTransfer = (message?: ContentMessage, assetRepository = con
 
   useEffect(() => {
     if (!message) {
-      return;
+      return () => {};
     }
     const progressSubscribable = assetRepository.getUploadProgress(message?.id);
     setUploadProgress(progressSubscribable());

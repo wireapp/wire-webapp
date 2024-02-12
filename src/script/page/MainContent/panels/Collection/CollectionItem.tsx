@@ -46,7 +46,7 @@ const CollectionItem: FC<CollectionItemProps> = ({message, onImageClick}) => {
         className="collection-image"
         image={firstAsset}
         data-uie-name="image-asset"
-        click={() => onImageClick?.(message)}
+        onClick={() => onImageClick?.(message)}
       />
     );
   }
