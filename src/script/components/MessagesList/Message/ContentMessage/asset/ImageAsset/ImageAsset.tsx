@@ -79,7 +79,7 @@ export const ImageAsset = ({asset, message, onClick, teamState = container.resol
   };
 
   return (
-    <div data-uie-name="image-asset" css={imageContainerStyle}>
+    <div data-uie-name="image-asset" className="image-asset" css={imageContainerStyle}>
       {isUploading && (
         <div className="asset-loader">
           <AssetLoader loadProgress={uploadProgress} onCancel={cancelUpload} />
@@ -87,21 +87,21 @@ export const ImageAsset = ({asset, message, onClick, teamState = container.resol
       )}
 
       {isObfuscated && (
-        <div className="image-icon flex-center full-screen">
+        <div className="image-icon flex-center full-screen bg-color-ephemeral">
           <Icon.Image />
         </div>
       )}
 
-      {!isUploading && (
+      {!isUploading && !isObfuscated && (
         <Image
           image={asset}
           alt={imageAltText}
+          data-uie-name="go-image-detail"
           data-uie-visible={visible && !isObfuscated}
           onClick={event => onClick(message, event)}
           onKeyDown={event => handleKeyDown(event, onClick.bind(null, message, event))}
           tabIndex={0}
           role="button"
-          data-uie-name="go-image-detail"
           aria-label={imageAltText}
         />
       )}
