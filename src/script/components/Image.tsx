@@ -20,6 +20,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 
 import cx from 'classnames';
+import ko from 'knockout';
 import {container} from 'tsyringe';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -28,12 +29,13 @@ import {RestrictedImage} from './asset/RestrictedImage';
 import {AssetUrl, useAssetTransfer} from './MessagesList/Message/ContentMessage/asset/useAssetTransfer';
 import {InViewport} from './utils/InViewport';
 
+import {AssetRemoteData} from '../assets/AssetRemoteData';
 import {Config} from '../Config';
 import {MediumImage} from '../entity/message/MediumImage';
 import {TeamState} from '../team/TeamState';
 
 export interface ImageProps extends React.HTMLProps<HTMLDivElement> {
-  image: MediumImage;
+  image: MediumImage | AssetRemoteData;
   alt?: string;
   isQuote?: boolean;
   teamState?: TeamState;
@@ -53,7 +55,9 @@ export const Image: React.FC<ImageProps> = ({
   const isUnmouted = useRef(false);
 
   const [imageUrl, setImageUrl] = useState<AssetUrl>();
-  const {resource} = useKoSubscribableChildren(image, ['resource']);
+  const imageData =
+    image instanceof AssetRemoteData ? {resource: ko.observable(image), ratio: undefined as undefined} : image;
+  const {resource} = useKoSubscribableChildren(imageData, ['resource']);
 
   const {getAssetUrl} = useAssetTransfer();
 
@@ -91,7 +95,7 @@ export const Image: React.FC<ImageProps> = ({
     return <RestrictedImage className={className} showMessage={!isQuote} isSmall={isQuote} />;
   }
 
-  const placeholderStyle = {aspectRatio: `${image.ratio}`, maxWidth: '100%'};
+  const placeholderStyle = {aspectRatio: `${imageData.ratio}`, maxWidth: '100%'};
 
   return (
     <InViewport onVisible={() => setIsInViewport(true)} className={cx('image-wrapper', className)} {...props}>
