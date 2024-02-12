@@ -236,17 +236,6 @@ const Conversations: React.FC<ConversationsProps> = ({
         className="conversations-sidebar-list"
       >
         <div className="conversations-sidebar-title">{t('conversationViewTooltip')}</div>
-        <button
-          id="tab-1"
-          type="button"
-          className="conversations-sidebar-btn"
-          onClick={() => switchList(ListState.START_UI)}
-          title={t('tooltipConversationsStart', Shortcut.getShortcutTooltip(ShortcutType.START))}
-          data-uie-name="go-people"
-        >
-          <Icon.People className="people-outline" />
-          <span className="conversations-sidebar-btn--text">{t('conversationFooterContacts')}</span>
-        </button>
 
         <button
           id="tab-2"
@@ -290,6 +279,18 @@ const Conversations: React.FC<ConversationsProps> = ({
             <span className="conversations-sidebar-btn--text">{t('conversationFooterArchive')}</span>
           </button>
         )}
+        <div className="conversations-sidebar-title">{t('conversationFooterContacts')}</div>
+        <button
+          id="tab-1"
+          type="button"
+          className="conversations-sidebar-btn"
+          onClick={() => switchList(ListState.START_UI)}
+          title={t('searchConnect', Shortcut.getShortcutTooltip(ShortcutType.START))}
+          data-uie-name="go-people"
+        >
+          <Icon.Plus className="people-outline" />
+          <span className="conversations-sidebar-btn--text">{t('searchConnect')}</span>
+        </button>
       </div>
     </nav>
   );
