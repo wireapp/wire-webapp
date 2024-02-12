@@ -93,11 +93,7 @@ const ReplyBar: FC<ReplyBarProps> = ({replyMessageEntity, onCancel}) => {
               tabIndex={TabIndex.FOCUSABLE}
               aria-label={replyAsset.file_name}
             >
-              <Image
-                className="bar__reply__message input-bar__reply__message__image"
-                asset={replyAsset.resource()}
-                isQuote
-              />
+              <Image className="bar__reply__message input-bar__reply__message__image" image={replyAsset} isQuote />
             </div>
           )}
 

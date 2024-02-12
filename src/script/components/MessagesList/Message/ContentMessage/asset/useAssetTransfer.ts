@@ -34,7 +34,7 @@ export type AssetUrl = {
   dispose: () => void;
 };
 
-export const useAssetTransfer = (message: ContentMessage, assetRepository = container.resolve(AssetRepository)) => {
+export const useAssetTransfer = (message?: ContentMessage, assetRepository = container.resolve(AssetRepository)) => {
   const asset = message?.getFirstAsset() as FileAsset;
   const [uploadProgress, setUploadProgress] = useState<number>(0);
 

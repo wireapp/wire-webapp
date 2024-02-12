@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -25,7 +25,7 @@ import {container} from 'tsyringe';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {RestrictedImage} from './asset/RestrictedImage';
-import {useAssetTransfer} from './MessagesList/Message/ContentMessage/asset/AbstractAssetTransferStateTracker';
+import {AssetUrl, useAssetTransfer} from './MessagesList/Message/ContentMessage/asset/useAssetTransfer';
 import {InViewport} from './utils/InViewport';
 
 import {AssetRemoteData} from '../assets/AssetRemoteData';
@@ -51,11 +51,13 @@ export const Image: React.FC<ImageProps> = ({
   ...props
 }) => {
   const [isInViewport, setIsInViewport] = useState(false);
+  /** keeps track of whether the component is mounted or not to avoid setting the image url in case it's not */
+  const isUnmouted = useRef(false);
 
-  const [assetSrc, setAssetSrc] = useState<string>();
+  const [imageUrl, setImageUrl] = useState<AssetUrl>();
   const {resource} = useKoSubscribableChildren(image, ['resource']);
 
-  const {loadAsset} = useAssetTransfer();
+  const {getAssetUrl} = useAssetTransfer();
 
   const {isFileSharingReceivingEnabled} = useKoSubscribableChildren(teamState, ['isFileSharingReceivingEnabled']);
 
@@ -64,36 +66,32 @@ export const Image: React.FC<ImageProps> = ({
   };
 
   useEffect(() => {
-    if (!assetSrc && isInViewport && isFileSharingReceivingEnabled) {
-      let isWaiting = true;
-      (async () => {
+    if (!imageUrl && isInViewport && resource && isFileSharingReceivingEnabled) {
+      void (async () => {
         try {
-          const blob = (await loadAsset(resource)) as Blob;
           const allowedImageTypes = [
             'application/octet-stream', // Octet-stream is required to paste images from clipboard
             ...Config.getConfig().ALLOWED_IMAGE_TYPES,
           ];
-          if (allowedImageTypes.includes(blob.type)) {
-            if (isWaiting) {
-              setAssetSrc(window.URL.createObjectURL(blob));
-            }
-          } else {
-            throw new Error(`Unsupported image type "${blob.type}".`);
+          const url = await getAssetUrl(resource, allowedImageTypes);
+          if (isUnmouted.current) {
+            // Avoid re-rendering a component that is umounted
+            return;
           }
+          setImageUrl(url);
         } catch (error) {
           console.error(error);
         }
       })();
-
-      return () => {
-        if (assetSrc) {
-          window.URL.revokeObjectURL(assetSrc);
-        }
-        isWaiting = false;
-      };
-      return undefined;
     }
-  }, [isInViewport, resource, isFileSharingReceivingEnabled, assetSrc, loadAsset]);
+  }, [imageUrl, isInViewport, resource, isFileSharingReceivingEnabled, getAssetUrl]);
+
+  useEffect(() => {
+    return () => {
+      isUnmouted.current = true;
+      imageUrl?.dispose();
+    };
+  }, []);
 
   const style = {aspectRatio: `${image.ratio}`, maxWidth: '100%', width: image.width};
 
@@ -103,8 +101,8 @@ export const Image: React.FC<ImageProps> = ({
 
   return (
     <InViewport onVisible={() => setIsInViewport(true)} className={cx('image-wrapper', className)} {...props}>
-      {assetSrc ? (
-        <img style={style} onClick={handleClick} src={assetSrc} role="presentation" alt={alt} />
+      {imageUrl ? (
+        <img style={style} onClick={handleClick} src={imageUrl.url} role="presentation" alt={alt} />
       ) : (
         <div style={style} className={cx('loading-dots')}></div>
       )}
