@@ -22,6 +22,8 @@ import {forwardRef, useCallback, useEffect, useMemo, useState} from 'react';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/';
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
+import {HideIcon} from '@wireapp/react-ui-kit';
+
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Icon} from 'Components/Icon';
 import {ConversationProtocolDetails} from 'Components/panel/ConversationProtocolDetails/ConversationProtocolDetails';
@@ -437,9 +439,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
 
               {isSingleUserMode && (
                 <div className="panel__info-item" data-uie-name="label-1to1-read-receipts">
-                  <span className="panel__info-item__icon">
-                    <Icon.Read />
-                  </span>
+                  <span className="panel__info-item__icon">{hasReceiptsEnabled ? <Icon.Read /> : <HideIcon />}</span>
 
                   <span>
                     <span>
