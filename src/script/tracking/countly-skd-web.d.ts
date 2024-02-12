@@ -35,7 +35,7 @@ declare module 'countly-sdk-web' {
     begin_session(): void;
     change_id(newId: string, merge: boolean): void;
     userData: UserData;
-    add_event: (eventData: EventData) => void;
+    add_event: (eventData: any) => void;
   }
 
   const Countly: Countly;
