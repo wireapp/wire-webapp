@@ -46,8 +46,23 @@ const getPrivacyPolicyUrl = (): string | undefined => addLocaleToUrl(URL.PRIVACY
 const getTermsOfUsePersonalUrl = (): string | undefined => addLocaleToUrl(URL.TERMS_OF_USE_PERSONAL || undefined);
 const getTermsOfUseTeamUrl = (): string | undefined => addLocaleToUrl(URL.TERMS_OF_USE_TEAMS || undefined);
 
+/**
+ * Retrieves the URL for managing services with optional UTM parameters.
+ * UTM parameters are used in online marketing to track the effectiveness of campaigns.
+ *
+ * @param  utmSource - Optional. The source of the UTM parameters.
+ * @returns  The URL for managing services with optional UTM parameters.
+ */
 export const getManageServicesUrl = (utmSource?: string): string | undefined =>
   getTeamSettingsUrl(URL.URL_PATH.MANAGE_SERVICES, utmSource);
+
+/**
+ * Retrieves the URL for managing team settings with optional UTM parameters.
+ * UTM parameters are used in online marketing to track the effectiveness of campaigns.
+ *
+ * @param utmSource - Optional. The source of the UTM parameters.
+ * @returns The URL for managing team settings with optional UTM parameters.
+ */
 export const getManageTeamUrl = (utmSource?: string): string | undefined =>
   getTeamSettingsUrl(URL.URL_PATH.MANAGE_TEAM, utmSource);
 
