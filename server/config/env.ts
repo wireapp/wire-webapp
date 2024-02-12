@@ -221,13 +221,13 @@ export type Env = {
   URL_WEBSITE_BASE: string;
 
   /** Sets paths to append to a base URL */
-  URL_SUBPATH_CREATE_TEAM: string;
+  URL_PATH_CREATE_TEAM: string;
 
-  URL_SUBPATH_MANAGE_SERVICES: string;
+  URL_PATH_MANAGE_SERVICES: string;
 
-  URL_SUBPATH_MANAGE_TEAM: string;
+  URL_PATH_MANAGE_TEAM: string;
 
-  URL_SUBPATH_PASSWORD_RESET: string;
+  URL_PATH_PASSWORD_RESET: string;
 
   /** Sets Support URLs to specific pages */
   URL_SUPPORT_INDEX: string;

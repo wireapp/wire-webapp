@@ -48,12 +48,12 @@ export const getTermsOfUsePersonalUrl = (): string | undefined =>
 export const getTermsOfUseTeamUrl = (): string | undefined => addLocaleToUrl(URL.TERMS_OF_USE_TEAMS || undefined);
 
 export const getManageServicesUrl = (utmSource?: string): string | undefined =>
-  getTeamSettingsUrl(URL.SUBPATH.MANAGE_SERVICES, utmSource);
+  getTeamSettingsUrl(URL.URL_PATH.MANAGE_SERVICES, utmSource);
 export const getManageTeamUrl = (utmSource?: string): string | undefined =>
-  getTeamSettingsUrl(URL.SUBPATH.MANAGE_TEAM, utmSource);
+  getTeamSettingsUrl(URL.URL_PATH.MANAGE_TEAM, utmSource);
 
 export const getCreateTeamUrl = (): string | undefined =>
-  Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION ? `${URL.TEAMS_BASE}${URL.SUBPATH.CREATE_TEAM}` : undefined;
+  Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION ? `${URL.TEAMS_BASE}${URL.URL_PATH.CREATE_TEAM}` : undefined;
 
 export const addLocaleToUrl = (url?: string | undefined): string | undefined => {
   if (!url) {
