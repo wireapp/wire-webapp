@@ -436,20 +436,22 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
               />
 
               {isSingleUserMode && (
-                <div className="conversation-details__read-receipts" data-uie-name="label-1to1-read-receipts">
-                  <strong className="panel__info-text panel__info-text--head panel__info-text--margin-bottom">
-                    {hasReceiptsEnabled
-                      ? t('conversationDetails1to1ReceiptsHeadEnabled')
-                      : t('conversationDetails1to1ReceiptsHeadDisabled')}
-                  </strong>
+                <div className="panel__info-item" data-uie-name="label-1to1-read-receipts">
+                  <span className="panel__info-item__icon">
+                    <Icon.Read />
+                  </span>
 
-                  <p className="panel__info-text panel__info-text--margin-bottom">
-                    {t('conversationDetails1to1ReceiptsFirst')}
-                  </p>
-
-                  <p className="panel__info-text panel__info-text--margin">
-                    {t('conversationDetails1to1ReceiptsSecond')}
-                  </p>
+                  <span>
+                    <span>
+                      <p>
+                        {hasReceiptsEnabled
+                          ? t('conversationDetails1to1ReceiptsHeadEnabled')
+                          : t('conversationDetails1to1ReceiptsHeadDisabled')}
+                      </p>
+                    </span>
+                    <p className="panel__action-item__status">{t('conversationDetails1to1ReceiptsFirst')}</p>
+                    <p className="panel__action-item__status">{t('conversationDetails1to1ReceiptsSecond')}</p>
+                  </span>
                 </div>
               )}
 
