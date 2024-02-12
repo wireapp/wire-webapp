@@ -87,18 +87,18 @@ export const Image: React.FC<ImageProps> = ({
     };
   }, [imageUrl]);
 
-  const style = {aspectRatio: `${image.ratio}`, maxWidth: '100%', width: image.width};
-
   if (!isFileSharingReceivingEnabled) {
     return <RestrictedImage className={className} showMessage={!isQuote} isSmall={isQuote} />;
   }
 
+  const placeholderStyle = {aspectRatio: `${image.ratio}`, maxWidth: '100%'};
+
   return (
     <InViewport onVisible={() => setIsInViewport(true)} className={cx('image-wrapper', className)} {...props}>
       {imageUrl ? (
-        <img style={style} onClick={onClick} src={imageUrl.url} role="presentation" alt={alt} />
+        <img onClick={onClick} src={imageUrl.url} role="presentation" alt={alt} />
       ) : (
-        <div style={style} className={cx('loading-dots')}></div>
+        <div style={placeholderStyle} className={cx('loading-dots')}></div>
       )}
     </InViewport>
   );
