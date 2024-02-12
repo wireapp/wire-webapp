@@ -52,6 +52,7 @@ export class ConnectionRepository {
   private readonly connectionService: ConnectionService;
   private readonly userRepository: UserRepository;
   private readonly logger: Logger;
+  private deleteConnectionRequestConversation?: (userId: QualifiedId) => Promise<void>;
 
   static get CONFIG(): Record<string, BackendEventType[]> {
     return {
@@ -369,7 +370,19 @@ export class ConnectionRepository {
           break;
         }
       }
+
+      const user = await this.userRepository.fetchUser(userEntity.qualifiedId);
+
+      const isNotConnectedError = isBackendError(error) && error.label === BackendErrorLabel.NOT_CONNECTED;
+
+      if (isNotConnectedError && user.isDeleted) {
+        await this.deleteConnectionRequestConversation?.(user.qualifiedId);
+      }
     }
+  }
+
+  onDeleteConnectionRequestConversation(callback: (userId: QualifiedId) => Promise<void>): void {
+    this.deleteConnectionRequestConversation = callback;
   }
 
   /**

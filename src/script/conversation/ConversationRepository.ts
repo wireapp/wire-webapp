@@ -280,6 +280,8 @@ export class ConversationRepository {
         : this.messageRepository.requestUserSendingPermission(conversation, shouldWarnLegalHold, consentType);
     });
 
+    this.connectionRepository.onDeleteConnectionRequestConversation(this.deleteConnectionRequestConversation);
+
     this.logger = getLogger('ConversationRepository');
 
     this.event_mapper = new EventMapper();
@@ -2355,6 +2357,18 @@ export class ConversationRepository {
       })
       .catch(error => this.handleAddToConversationError(error, conversationEntity, [{domain: '', id: serviceId}]));
   }
+
+  private deleteConnectionRequestConversation = async (userId: QualifiedId) => {
+    const connection = this.connectionState
+      .connections()
+      .find(connection => matchQualifiedIds(connection.userId, userId));
+
+    if (!connection) {
+      return;
+    }
+
+    return this.deleteConversationLocally(connection.conversationId, true);
+  };
 
   private handleAddToConversationError(error: BackendError, conversationEntity: Conversation, userIds: QualifiedId[]) {
     switch (error.label) {
