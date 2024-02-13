@@ -7622,7 +7622,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dexie@npm:3.2.4, dexie@npm:^3.2.0, dexie@npm:latest":
+"dexie@npm:3.2.5":
+  version: 3.2.5
+  resolution: "dexie@npm:3.2.5"
+  dependencies:
+    karma-safari-launcher: ^1.0.0
+  checksum: 648497ae25ca5c25bb7027d2db8335d7d890e424c7dc400c79d52c75beab1ae073962b83717dccec5d0281249476baf580ecb62bdcbeef9b7f97aa4dfe5ddb45
+  languageName: node
+  linkType: hard
+
+"dexie@npm:^3.2.0, dexie@npm:latest":
   version: 3.2.4
   resolution: "dexie@npm:3.2.4"
   checksum: 4e5294a954118b6862c864b8c3970904a1733daebcd919488624520696411e2e81ed1bceeac3634c5c15a21e37ce4b8502ed41c4edfbc5ba3f5925c34d56497b
@@ -11685,6 +11694,15 @@ __metadata:
   version: 4.0.0
   resolution: "jwt-decode@npm:4.0.0"
   checksum: 390e2edcb31a92e86c8cbdd1edeea4c0d62acd371f8a8f0a8878e499390c0ecf4c658b365c4e941e4ef37d0170e4ca650aaa49f99a45c0b9695a235b210154b0
+  languageName: node
+  linkType: hard
+
+"karma-safari-launcher@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "karma-safari-launcher@npm:1.0.0"
+  peerDependencies:
+    karma: ">=0.9"
+  checksum: 09de8a231035c147c22c4106137594e5285e21e5d9f56d12a25563975b410363997947a7e8b5fdbfa0b8ba6f4f120b08a8f2777a28212c410d99b2e30c2eecb8
   languageName: node
   linkType: hard
 
@@ -17898,7 +17916,7 @@ __metadata:
     css-loader: ^6.10.0
     cssnano: 6.0.3
     date-fns: 3.3.1
-    dexie: 3.2.4
+    dexie: 3.2.5
     dexie-batch: 0.4.3
     dexie-encrypted: 2.0.0
     dotenv: 16.4.2
