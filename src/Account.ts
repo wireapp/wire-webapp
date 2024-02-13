@@ -34,7 +34,6 @@ import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
 import {Notification} from '@wireapp/api-client/lib/notification/';
 import {AbortHandler, WebSocketClient} from '@wireapp/api-client/lib/tcp/';
 import {WEBSOCKET_STATE} from '@wireapp/api-client/lib/tcp/ReconnectingWebsocket';
-import {FEATURE_KEY, FeatureStatus} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import logdown from 'logdown';
@@ -230,16 +229,6 @@ export class Account extends TypedEventEmitter<Events> {
     return storeEngine.updateOrCreate(AUTH_TABLE_NAME, AUTH_COOKIE_KEY, entity);
   }
 
-  private async getE2EIStatus() {
-    const features = await this.apiClient.api.teams.feature.getAllFeatures();
-    const clientCanUseE2EI = this.coreCryptoConfig?.mls?.useE2EI;
-    const teamCanUseE2EI = features[FEATURE_KEY.MLSE2EID]?.status === FeatureStatus.ENABLED;
-
-    return {
-      isFeatureEnabled: clientCanUseE2EI && teamCanUseE2EI,
-    };
-  }
-
   public async enrollE2EI({
     displayName,
     handle,
@@ -339,6 +328,7 @@ export class Account extends TypedEventEmitter<Events> {
   public async registerClient(
     loginData: LoginData,
     clientInfo: ClientInfo = coreDefaultClient,
+    /** will add extra manual entropy to the client's identity being created */
     entropyData?: Uint8Array,
   ): Promise<RegisteredClient> {
     if (!this.service || !this.apiClient.context || !this.storeEngine) {
@@ -351,69 +341,45 @@ export class Account extends TypedEventEmitter<Events> {
     const client = await this.service.client.register(loginData, clientInfo, initialPreKeys);
     const clientId = client.id;
 
-    if (this.service.mls) {
-      const {userId, domain = ''} = this.apiClient.context;
-      await this.initMLSClient({id: userId, domain}, client);
-    }
-    this.logger.info(`Created new client {mls: ${!!this.service.mls}, id: ${clientId}}`);
-
     await this.service.notification.initializeNotificationStream(clientId);
     await this.service.client.synchronizeClients(clientId);
+    return client;
+  }
 
-    return this.initClient(client);
+  public getLocalClient() {
+    return this.service?.client.loadClient();
   }
 
   /**
-   * Will create a new MLS Client for the current user
-   */
-  private async initMLSClient(userId: QualifiedId, client: RegisteredClient): Promise<void> {
-    if (!this.service?.mls) {
-      throw new Error('MLS Services is not ready.');
-    }
-    // we need to check if E2EI is enabled before creating the client
-    // in case it is enabled we are not supposed to upload new keypackages, that are not of type x509, to the backend
-    const {isFeatureEnabled} = await this.getE2EIStatus();
-    await this.service.mls.initClient(userId, client, isFeatureEnabled);
-  }
-
-  /**
-   * Will initiate all the cryptographic material of the device and setup all the background tasks.
+   * Will initiate all the cryptographic material of the given registered device and setup all the background tasks.
    *
    * @returns The local existing client or undefined if the client does not exist or is not valid (non existing on backend)
    */
-  public async initClient(client: RegisteredClient): Promise<RegisteredClient>;
-  public async initClient(): Promise<RegisteredClient | undefined>;
-  public async initClient(client?: RegisteredClient): Promise<RegisteredClient | undefined> {
+  public async initClient(client: RegisteredClient, willEnrollE2ei: boolean = false) {
     if (!this.service || !this.apiClient.context || !this.storeEngine) {
       throw new Error('Services are not set.');
     }
-    const validClient = client ?? (await this.service!.client.loadClient());
-    if (!validClient) {
-      return undefined;
-    }
-    this.apiClient.context.clientId = validClient.id;
+    this.apiClient.context.clientId = client.id;
 
     // Call /access endpoint with client_id after client initialisation
-    await this.apiClient.transport.http.associateClientWithSession(validClient.id);
+    await this.apiClient.transport.http.associateClientWithSession(client.id);
 
     await this.service.proteus.initClient(this.storeEngine, this.apiClient.context);
     if (this.service.mls) {
       const {userId, domain = ''} = this.apiClient.context;
-      if (!client) {
-        await this.initMLSClient({id: userId, domain}, validClient);
-      }
+      await this.service.mls.initClient({id: userId, domain}, client, willEnrollE2ei);
       // initialize schedulers for pending mls proposals once client is initialized
       await this.service.mls.initialisePendingProposalsTasks();
 
       // initialize scheduler for syncing key packages with backend
-      await this.service.mls.schedulePeriodicKeyPackagesBackendSync(validClient.id);
+      await this.service.mls.schedulePeriodicKeyPackagesBackendSync(client.id);
 
       // leave stale conference subconversations (e.g after a crash)
       await this.service.subconversation.leaveStaleConferenceSubconversations();
     }
 
-    this.currentClient = validClient;
-    return validClient;
+    this.currentClient = client;
+    return client;
   }
 
   private async buildCryptoClient(context: Context, storeEngine: CRUDEngine, encryptedStore: EncryptedStore) {

@@ -120,7 +120,13 @@ export class MLSService extends TypedEventEmitter<Events> {
     };
   }
 
-  public async initClient(userId: QualifiedId, client: RegisteredClient, blockKeypackageUpload = false) {
+  /**
+   * Will initialize an MLS client
+   * @param userId the user owning the client
+   * @param client id of the client to initialize
+   * @param skipInitIdentity avoid registering the client's identity to the backend (needed for e2eidentity as the identity will be uploaded and signed only when enrollment is successful)
+   */
+  public async initClient(userId: QualifiedId, client: RegisteredClient, skipInitIdentity = false) {
     await this.coreCryptoClient.mlsInit(
       generateMLSDeviceId(userId, client.id),
       [this.config.cipherSuite],
@@ -134,9 +140,13 @@ export class MLSService extends TypedEventEmitter<Events> {
       userAuthorize: async () => true,
     });
 
-    if (!blockKeypackageUpload) {
+    const isFreshMLSSelfClient =
+      typeof client.mls_public_keys.ed25519 !== 'string' || client.mls_public_keys.ed25519.length === 0;
+    const shouldinitIdentity = !(isFreshMLSSelfClient && skipInitIdentity);
+
+    if (shouldinitIdentity) {
       // We need to make sure keypackages and public key are uploaded to the backend
-      if (typeof client.mls_public_keys.ed25519 !== 'string' || client.mls_public_keys.ed25519.length === 0) {
+      if (isFreshMLSSelfClient) {
         await this.uploadMLSPublicKeys(client);
       }
       await this.verifyRemoteMLSKeyPackagesAmount(client.id);

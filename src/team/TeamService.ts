@@ -59,4 +59,8 @@ export class TeamService {
   public updateTeam(teamId: string, teamData: UpdateTeamData): Promise<void> {
     return this.apiClient.api.teams.team.putTeam(teamId, teamData);
   }
+
+  public getTeamFeatureConfig() {
+    return this.apiClient.api.teams.feature.getAllFeatures();
+  }
 }
