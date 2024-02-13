@@ -30,5 +30,5 @@ export interface EventProcessor {
 }
 
 export interface EventMiddleware {
-  processEvent(event: IncomingEvent): Promise<IncomingEvent>;
+  processEvent(event: IncomingEvent, source: EventSource): Promise<IncomingEvent>;
 }
