@@ -42,11 +42,11 @@ const STATE = {
   flags: {},
   modelConfig: {},
   visualization: {
-    foregroundThreshold: 0.5,
+    foregroundThreshold: 0.4,
     maskOpacity: 0.7,
     maskBlur: 0,
     pixelCellWidth: 10,
-    backgroundBlur: 3,
+    backgroundBlur: 4,
     edgeBlur: 3,
   },
 };
@@ -56,15 +56,8 @@ const Video = ({srcObject, isBlurred, ...props}: VideoProps) => {
   const canvas = useRef<HTMLCanvasElement>(null);
   const stream = useRef<MediaStream | null>(null);
   const ctx = useRef<CanvasRenderingContext2D | null | undefined>(null);
-  // const segmenter = useRef<bodySegmentation.BodySegmenter | null>(null);
   const rafId = useRef<number | null>(null);
-  // const model = useRef(bodySegmentation.SupportedModels.MediaPipeSelfieSegmentation);
   const {init, segmenter, cleanup} = useBlur();
-
-  // const cleanup = () => {
-  //   segmenter.current?.dispose();
-  //   segmenter.current = null;
-  // };
 
   const draw = useCallback(
     (ctx: CanvasRenderingContext2D | null | undefined) => {
@@ -72,8 +65,8 @@ const Video = ({srcObject, isBlurred, ...props}: VideoProps) => {
         canvas!.current!,
         0,
         0,
-        srcObject.getVideoTracks()[0]?.getSettings().width ?? 400,
-        srcObject.getVideoTracks()[0]?.getSettings().height ?? 400,
+        srcObject.getVideoTracks()[0]?.getSettings().width,
+        srcObject.getVideoTracks()[0]?.getSettings().height,
       );
     },
     [srcObject],
@@ -87,34 +80,6 @@ const Video = ({srcObject, isBlurred, ...props}: VideoProps) => {
     draw(ctx.current);
     stream.current = canvas?.current?.captureStream() ?? null;
   }, [draw, isBlurred]);
-
-  // const init = async () => {
-  //   const segmenterConfig: bodySegmentation.MediaPipeSelfieSegmentationMediaPipeModelConfig = {
-  //     runtime: 'mediapipe',
-  //     modelType: 'general',
-  //     solutionPath: '/selfie_segmentation',
-  //     // or 'base/node_modules/@mediapipe/selfie_segmentation' in npm.
-  //   };
-  //   segmenter.current = await bodySegmentation.createSegmenter(model.current, segmenterConfig);
-  // };
-
-  useEffect(() => {
-    // if (segmenter.current === null) {
-    if (refVideo.current) {
-      init().catch(err => {
-        segmenter.current = null;
-        console.error(err);
-      });
-    }
-    // }
-    return () => {
-      //   if (segmenter.current !== null) {
-      //     // segmenter.current?.dispose();
-      //     // segmenter.current = null;
-      cleanup();
-    };
-    // };
-  }, [refVideo.current]);
 
   const segmenterFunc = useCallback(async () => {
     let segmentation = null;
@@ -158,8 +123,7 @@ const Video = ({srcObject, isBlurred, ...props}: VideoProps) => {
   }, [segmenterFunc]);
 
   useEffect(() => {
-    if (refVideo.current && !!isBlurred) {
-      console.log('inside useEffect, refVideo.current, isBlurred', refVideo.current, isBlurred);
+    if (refVideo.current?.srcObject && !!isBlurred) {
       window.cancelAnimationFrame(rafId?.current ?? 0);
       cleanup();
       init().catch(err => {
@@ -170,13 +134,10 @@ const Video = ({srcObject, isBlurred, ...props}: VideoProps) => {
       renderPrediction().catch(console.warn);
     }
     return () => {
-      // if (segmenter.current !== null) {
-      // segmenter.current?.dispose();
-      // segmenter.current = null;
       cleanup();
-      // }
     };
-  }, [isBlurred, renderPrediction, segmenterFunc, segmenter, init, cleanup]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isBlurred, refVideo.current?.srcObject]);
 
   // const gl = window.exposedContext;
   // if (gl) gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(4));

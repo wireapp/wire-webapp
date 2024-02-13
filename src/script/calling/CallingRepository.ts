@@ -91,6 +91,7 @@ import * as trackingHelpers from '../tracking/Helpers';
 import {Segmentation} from '../tracking/Segmentation';
 import type {UserRepository} from '../user/UserRepository';
 import {Warnings} from '../view_model/WarningsContainer';
+import {backgroundBlur} from 'Components/calling/FullscreenVideoCall';
 
 const avsLogger = getLogger('avs');
 
@@ -1191,15 +1192,24 @@ export class CallingRepository {
       if (videoTracks.length > 0) {
         const clonedMediaStream = new MediaStream(videoTracks);
         const clonedCanvasStream = new MediaStream(canvasTracks);
-        console.log('changeMediaSource', videoTracks, clonedMediaStream, selfParticipant.isBlurred());
-        selfParticipant.setVideoStream(!!selfParticipant.isBlurred() ? clonedCanvasStream : clonedMediaStream, true);
+        console.log(
+          'changeMediaSource',
+          videoTracks,
+          clonedMediaStream,
+          clonedCanvasStream,
+          selfParticipant.isBlurred(),
+        );
+        selfParticipant.setVideoStream(
+          selfParticipant.isBlurred() === backgroundBlur.isBlurred ? clonedCanvasStream : clonedMediaStream,
+          true,
+        );
         this.wCall?.replaceTrack(
           this.serializeQualifiedId(call.conversationId),
-          !!selfParticipant.isBlurred() ? canvasTracks[0] : videoTracks[0],
+          selfParticipant.isBlurred() === backgroundBlur.isBlurred ? canvasTracks[0] : videoTracks[0],
         );
         // Remove the previous video stream
         this.mediaStreamHandler.releaseTracksFromStream(mediaStream);
-        return clonedMediaStream;
+        return selfParticipant.isBlurred() === backgroundBlur.isBlurred ? clonedCanvasStream : clonedMediaStream;
       }
     }
   }

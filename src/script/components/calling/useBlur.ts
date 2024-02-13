@@ -43,13 +43,5 @@ export const useBlur = () => {
     segmenter.current = null;
   };
 
-  // useEffect(() => {
-  //   init().catch(err => {
-  //     segmenter.current = null;
-  //     console.error(err);
-  //   });
-  //   return () => cleanup();
-  // }, []);
-
   return {segmenter, cleanup, init};
 };
