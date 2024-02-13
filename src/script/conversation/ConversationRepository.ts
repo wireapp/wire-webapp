@@ -3102,7 +3102,7 @@ export class ConversationRepository {
                 ? // If we are in the team, we display the team member removed from the team message
                   this.onMemberLeave(conversationEntity, eventJson)
                 : // in case we are not in a team, we just display the message that says a user left the conversation
-                  this.teamMemberLeave(user?.teamId, user?.qualifiedId, new Date(eventJson.time).getTime());
+                  this.teamMemberLeave(user.teamId, user.qualifiedId, new Date(eventJson.time).getTime());
             }),
           );
         }
