@@ -44,10 +44,6 @@ export interface MLSServiceConfig {
    * default ciphersuite to use for MLS (MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519 = 1 by default)
    */
   cipherSuite: Ciphersuite;
-  /**
-   * signals if the E2E - Identity process should be used
-   */
-  useE2EI?: boolean;
 }
 
 export type NewCrlDistributionPointsPayload = {crlNewDistributionPoints?: string[] | undefined};
