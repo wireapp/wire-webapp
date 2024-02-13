@@ -68,7 +68,7 @@ export const getManageTeamUrl = (utmSource?: string): string | undefined =>
 const getCreateTeamUrl = (): string | undefined =>
   Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION ? `${URL.TEAMS_BASE}${URL.URL_PATH.CREATE_TEAM}` : undefined;
 
-export const addLocaleToUrl = (url?: string | undefined): string | undefined => {
+export const addLocaleToUrl = (url?: string): string | undefined => {
   if (!url) {
     return undefined;
   }
