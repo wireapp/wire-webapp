@@ -3094,15 +3094,15 @@ export class ConversationRepository {
 
       case CONVERSATION_EVENT.MEMBER_LEAVE:
         if (eventJson.data.reason === MemberLeaveReason.USER_DELETED) {
-          eventJson.data.qualified_user_ids?.forEach(qualifiedUserId => {
-            const user = this.userState.users().find(user => matchQualifiedIds(user.qualifiedId, qualifiedUserId));
-            if (!user?.teamId) {
-              return;
-            }
-
-            void this.teamMemberLeave(user?.teamId, user?.qualifiedId, new Date(eventJson.time).getTime());
-          });
-          return;
+          const deletedUsers = eventJson.data.qualified_user_ids ?? [];
+          return Promise.all(
+            deletedUsers.map(async qualifiedUserId => {
+              const user = this.userState.users().find(user => matchQualifiedIds(user.qualifiedId, qualifiedUserId));
+              return !user?.teamId
+                ? this.onMemberLeave(conversationEntity, eventJson)
+                : this.teamMemberLeave(user?.teamId, user?.qualifiedId, new Date(eventJson.time).getTime());
+            }),
+          );
         }
         return this.onMemberLeave(conversationEntity, eventJson);
 
