@@ -757,7 +757,7 @@ export class ConversationRepository {
       conversationsData = (await this.conversationService.saveConversationsInDb(data)) as any[];
     }
 
-    const allConversationEntities = this.mapConversations(conversationsData);
+    const allConversationEntities = conversationsData.length ? this.mapConversations(conversationsData) : [];
     const newConversationEntities = allConversationEntities.filter(
       allConversations =>
         !this.conversationState
