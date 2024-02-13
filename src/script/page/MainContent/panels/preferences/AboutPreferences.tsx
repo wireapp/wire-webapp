@@ -31,7 +31,7 @@ import {PreferencesSection} from './components/PreferencesSection';
 
 import {Config} from '../../../../Config';
 import {User} from '../../../../entity/User';
-import {getPrivacyPolicyUrl, getTermsOfUsePersonalUrl, getTermsOfUseTeamUrl, URL} from '../../../../externalRoute';
+import {externalUrl} from '../../../../externalRoute';
 
 interface AboutPreferencesProps {
   selfUser: User;
@@ -42,12 +42,12 @@ const AboutPreferences: React.FC<AboutPreferencesProps> = ({selfUser, teamState 
   const inTeam = teamState.isInTeam(selfUser);
   const config = Config.getConfig();
   const desktopConfig = Config.getDesktopConfig();
-  const websiteUrl = URL.WEBSITE;
-  const privacyPolicyUrl = getPrivacyPolicyUrl();
+  const websiteUrl = externalUrl.website;
+  const privacyPolicyUrl = externalUrl.privacyPolicy;
 
   const termsOfUseUrl = useMemo(() => {
     if (selfUser) {
-      return inTeam ? getTermsOfUseTeamUrl() : getTermsOfUsePersonalUrl();
+      return inTeam ? externalUrl.termsOfUseTeam : externalUrl.termsOfUsePersonnal;
     }
     return '';
   }, [selfUser, inTeam]);
