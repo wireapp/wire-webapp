@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [44.0.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@43.14.3...@wireapp/core@44.0.0) (2024-02-13)
+
+### Code Refactoring
+
+* Improve and streamline client initialization ([#5972](https://github.com/wireapp/wire-web-packages/issues/5972)) ([eab8411](https://github.com/wireapp/wire-web-packages/commit/eab8411434a52abf8aefe6117877a1e3da834c45))
+
+### BREAKING CHANGES
+
+* now the registerClient does not automatically initialize the client. It needs to be done in 2 steps:
+
+```js
+const localClient = await account.registerClient(...)
+await account.initClient(localClient);
+```
+
 ## [43.14.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@43.14.2...@wireapp/core@43.14.3) (2024-02-08)
 
 **Note:** Version bump only for package @wireapp/core
