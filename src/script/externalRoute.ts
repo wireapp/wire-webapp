@@ -80,7 +80,7 @@ export const addLocaleToUrl = (url?: string | undefined): string | undefined => 
 
 export const externalUrl = {
   createTeam: getCreateTeamUrl(),
-  passwordReset: getAccountPagesUrl(URL.URL_PATH.PASSWORD_RESET),
+  passwordReset: getAccountPagesUrl(URL.URL_PATH?.PASSWORD_RESET),
   privacyPolicy: getPrivacyPolicyUrl(),
   termsOfUsePersonnal: getTermsOfUsePersonalUrl(),
   termsOfUseTeam: getTermsOfUseTeamUrl(),
