@@ -1865,10 +1865,24 @@ export class ConversationRepository {
       // If there's local mls conversation, we want to use it
       const localMLSConversation = this.conversationState.findMLS1to1Conversation(otherUserId);
 
-      // If both users support mls or mls conversation is already known, we use it
+      // If mls conversation is already known, we use it
       // we never go back to proteus conversation, even if one of the users do not support mls anymore
       // (e.g. due to the change of supported protocols in team configuration)
-      if (protocol === ConversationProtocol.MLS || localMLSConversation) {
+      if (localMLSConversation) {
+        return this.initMLS1to1Conversation(otherUserId, isMLSSupportedByTheOtherUser);
+      }
+
+      // If both users support mls, we will initialise mls 1:1 conversation (unless it's a proteus 1:1 conversation with a user that has been deleted)
+      if (protocol === ConversationProtocol.MLS) {
+        // If the other user is deleted on backend, just open a proteus conversation and do not try to migrate it to mls.
+        if (isProteusConversation(conversation)) {
+          const otherUser = await this.userRepository.getUserById(otherUserId);
+          if (otherUser.isDeleted) {
+            this.logger.warn(`User ${otherUserId.id} is deleted, opening proteus conversation`);
+            return conversation;
+          }
+        }
+
         return this.initMLS1to1Conversation(otherUserId, isMLSSupportedByTheOtherUser);
       }
 
