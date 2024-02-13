@@ -52,7 +52,7 @@ export class ConnectionRepository {
   private readonly connectionService: ConnectionService;
   private readonly userRepository: UserRepository;
   private readonly logger: Logger;
-  private deleteConnectionRequestConversation?: (userId: QualifiedId) => Promise<void>;
+  private onDeleteConnectionRequestConversation?: (userId: QualifiedId) => Promise<void>;
 
   static get CONFIG(): Record<string, BackendEventType[]> {
     return {
@@ -392,15 +392,15 @@ export class ConnectionRepository {
       user.connection(null);
     }
 
-    await this.deleteConnectionRequestConversation?.(user.qualifiedId);
+    await this.onDeleteConnectionRequestConversation?.(user.qualifiedId);
   }
 
   /**
    * Set callback for deleting a connection request conversation.
    * @param callback Callback function
    */
-  public onDeleteConnectionRequestConversation(callback: (userId: QualifiedId) => Promise<void>): void {
-    this.deleteConnectionRequestConversation = callback;
+  public setDeleteConnectionRequestConversationHandler(callback: (userId: QualifiedId) => Promise<void>): void {
+    this.onDeleteConnectionRequestConversation = callback;
   }
 
   /**

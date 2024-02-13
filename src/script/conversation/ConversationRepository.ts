@@ -280,7 +280,7 @@ export class ConversationRepository {
         : this.messageRepository.requestUserSendingPermission(conversation, shouldWarnLegalHold, consentType);
     });
 
-    this.connectionRepository.onDeleteConnectionRequestConversation(this.deleteConnectionRequestConversation);
+    this.connectionRepository.setDeleteConnectionRequestConversationHandler(this.deleteConnectionRequestConversation);
 
     this.logger = getLogger('ConversationRepository');
 
