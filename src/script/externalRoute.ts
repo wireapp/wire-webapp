@@ -32,14 +32,13 @@ const getWebsiteUrl = (path: string = '', pkCampaign?: string): string | undefin
   if (URL.WEBSITE_BASE) {
     const query = pkCampaign ? `?pk_campaign=${pkCampaign}&pk_kwd=desktop` : '';
     const websiteUrl = `${URL.WEBSITE_BASE}${path}${query}`;
-    return addLocaleToUrl(URL.WEBSITE_BASE ? websiteUrl : undefined);
+    return addLocaleToUrl(websiteUrl);
   }
   return undefined;
 };
 
 const getAccountPagesUrl = (path: string = ''): string | undefined => {
-  const accountPagesUrl = `${URL.ACCOUNT_BASE}${path}`;
-  return URL.ACCOUNT_BASE ? accountPagesUrl : undefined;
+  return URL.ACCOUNT_BASE ? `${URL.ACCOUNT_BASE}${path}` : undefined;
 };
 
 const getPrivacyPolicyUrl = (): string | undefined => addLocaleToUrl(URL.PRIVACY_POLICY || undefined);
