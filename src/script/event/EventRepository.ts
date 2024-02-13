@@ -417,7 +417,7 @@ export class EventRepository {
   private async processEvent(event: IncomingEvent | ClientConversationEvent, source: EventSource) {
     try {
       for (const eventProcessMiddleware of this.eventProcessMiddlewares) {
-        event = await eventProcessMiddleware.processEvent(event);
+        event = await eventProcessMiddleware.processEvent(event, source);
       }
     } catch (error) {
       if (error instanceof EventValidationError) {
