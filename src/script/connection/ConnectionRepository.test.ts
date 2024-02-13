@@ -18,7 +18,10 @@
  */
 
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
+import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
+import {StatusCodes} from 'http-status-codes';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
@@ -54,7 +57,7 @@ function createConnection() {
 
 describe('ConnectionRepository', () => {
   describe('cancelRequest', () => {
-    const [connectionRepository, {connectionService}] = buildConnectionRepository();
+    const [connectionRepository, {connectionService, userRepository}] = buildConnectionRepository();
 
     it('sets the connection status to cancelled', () => {
       const user = createConnection();
@@ -75,6 +78,25 @@ describe('ConnectionRepository', () => {
         expect(connectionService.putConnections).toHaveBeenCalled();
         expect(amplifySpy).toHaveBeenCalled();
       });
+    });
+
+    it('deletes connection request if the other user does not exist on backend anymore', async () => {
+      const user = createConnection();
+
+      connectionRepository.addConnectionEntity(user.connection()!);
+
+      jest.spyOn(userRepository, 'refreshUser').mockImplementationOnce(async (uid: QualifiedId) => {
+        user.isDeleted = true;
+        return user;
+      });
+      jest
+        .spyOn(connectionService, 'putConnections')
+        .mockRejectedValueOnce(new BackendError('', BackendErrorLabel.NOT_CONNECTED, StatusCodes.FORBIDDEN));
+      await connectionRepository.cancelRequest(user);
+
+      expect(connectionService.putConnections).toHaveBeenCalled();
+      expect(connectionRepository['connectionState'].connections()).not.toContain(user.connection());
+      expect(user.connection()).toEqual(null);
     });
   });
 
