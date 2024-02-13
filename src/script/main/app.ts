@@ -450,7 +450,7 @@ export class App {
 
       telemetry.addStatistic(AppInitStatisticsValue.CONNECTIONS, connections.length, 50);
 
-      const conversations = await conversationRepository.loadConversations();
+      const conversations = await conversationRepository.loadConversations(connections);
 
       // We load all the users the self user is connected with
       await userRepository.loadUsers(selfUser, connections, conversations, teamMembers);

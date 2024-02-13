@@ -2055,7 +2055,7 @@ describe('ConversationRepository', () => {
           .mockResolvedValue(localConversations as unknown as ConversationDatabaseData[]);
         jest.spyOn(conversationService, 'saveConversationsInDb').mockImplementation(data => Promise.resolve(data));
 
-        const conversations = await conversationRepository.loadConversations();
+        const conversations = await conversationRepository.loadConversations([]);
 
         expect(conversations).toHaveLength(remoteConversations.found.length);
       });
@@ -2100,7 +2100,7 @@ describe('ConversationRepository', () => {
           .mockResolvedValue(localConversations as unknown as ConversationDatabaseData[]);
         jest.spyOn(conversationService, 'saveConversationsInDb').mockImplementation(data => Promise.resolve(data));
 
-        const conversations = await conversationRepository.loadConversations();
+        const conversations = await conversationRepository.loadConversations([]);
 
         expect(conversations).toHaveLength(1);
       });
@@ -2145,9 +2145,47 @@ describe('ConversationRepository', () => {
           .mockResolvedValue(localConversations as unknown as ConversationDatabaseData[]);
         jest.spyOn(conversationService, 'saveConversationsInDb').mockImplementation(data => Promise.resolve(data));
 
-        const conversations = await conversationRepository.loadConversations();
+        const conversations = await conversationRepository.loadConversations([]);
 
         expect(conversations).toHaveLength(remoteConversations.found.length);
+      });
+
+      it('does not load connection request (type 3) conversations if their users were deleted on backend', async () => {
+        const conversationRepository = testFactory.conversation_repository!;
+        const conversationService = conversationRepository['conversationService'];
+        const userId = {id: '05d0f240-bfe9-40d7-b6cb-602dac89fa1b', domain: 'staging.zinfra.io'};
+
+        const connectionReq = generateConversation(
+          {
+            domain: 'staging.zinfra.io',
+            id: '05d0f240-bfe9-1234-b6cb-602dac89fa1b',
+          },
+          'conv2',
+          [userId],
+          ConversationProtocol.PROTEUS,
+          CONVERSATION_TYPE.CONNECT,
+        );
+
+        const remoteConversations = {
+          found: [connectionReq],
+        };
+        const localConversations: any = [connectionReq];
+
+        jest.spyOn(conversationService, 'deleteConversationFromDb');
+        jest.spyOn(conversationService, 'blacklistConversation');
+        jest
+          .spyOn(conversationService, 'getAllConversations')
+          .mockResolvedValue(remoteConversations as unknown as RemoteConversations);
+        jest
+          .spyOn(conversationService, 'loadConversationStatesFromDb')
+          .mockResolvedValue(localConversations as unknown as ConversationDatabaseData[]);
+        jest.spyOn(conversationService, 'saveConversationsInDb').mockImplementation(data => Promise.resolve(data));
+
+        const conversations = await conversationRepository.loadConversations([]);
+
+        expect(conversations).toHaveLength(0);
+        expect(conversationService.deleteConversationFromDb).toHaveBeenCalledWith(connectionReq.qualified_id.id);
+        expect(conversationService.blacklistConversation).toHaveBeenCalledWith(connectionReq.qualified_id);
       });
 
       it('keeps track of missing conversations', async () => {
@@ -2187,7 +2225,7 @@ describe('ConversationRepository', () => {
           .spyOn(conversationService, 'getAllConversations')
           .mockResolvedValue(remoteConversations as unknown as RemoteConversations);
 
-        await conversationRepository.loadConversations();
+        await conversationRepository.loadConversations([]);
 
         expect(conversationState.missingConversations).toHaveLength(remoteConversations.failed.length);
       });
