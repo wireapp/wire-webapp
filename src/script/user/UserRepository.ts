@@ -691,7 +691,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
     return userData;
   }
 
-  public async fetchUser(userId: QualifiedId): Promise<User> {
+  private async fetchUser(userId: QualifiedId): Promise<User> {
     const [userEntity] = await this.fetchUsers([userId]);
     return userEntity;
   }

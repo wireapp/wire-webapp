@@ -371,17 +371,35 @@ export class ConnectionRepository {
         }
       }
 
-      const user = await this.userRepository.fetchUser(userEntity.qualifiedId);
+      const user = await this.userRepository.refreshUser(userEntity.qualifiedId);
 
       const isNotConnectedError = isBackendError(error) && error.label === BackendErrorLabel.NOT_CONNECTED;
 
+      // If connection failed because the user is deleted, delete the conversation representing the connection request (type 3 - CONNECT)
       if (isNotConnectedError && user.isDeleted) {
-        await this.deleteConnectionRequestConversation?.(user.qualifiedId);
+        await this.deleteConnectionWithUser(user);
       }
     }
   }
 
-  onDeleteConnectionRequestConversation(callback: (userId: QualifiedId) => Promise<void>): void {
+  private async deleteConnectionWithUser(user: User) {
+    const connection = this.connectionState
+      .connections()
+      .find(connection => matchQualifiedIds(connection.userId, user.qualifiedId));
+
+    if (connection) {
+      this.connectionState.connections.remove(connection);
+      user.connection(null);
+    }
+
+    await this.deleteConnectionRequestConversation?.(user.qualifiedId);
+  }
+
+  /**
+   * Set callback for deleting a connection request conversation.
+   * @param callback Callback function
+   */
+  public onDeleteConnectionRequestConversation(callback: (userId: QualifiedId) => Promise<void>): void {
     this.deleteConnectionRequestConversation = callback;
   }
 
