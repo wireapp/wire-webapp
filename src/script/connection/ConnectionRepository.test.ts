@@ -36,7 +36,7 @@ import {UserRepository} from '../user/UserRepository';
 function buildConnectionRepository() {
   const connectionState = new ConnectionState();
   const connectionService = new ConnectionService();
-  const userRepository = {} as UserRepository;
+  const userRepository = {fetchUser: jest.fn()} as unknown as UserRepository;
   return [
     new ConnectionRepository(connectionService, userRepository, connectionState),
     {connectionState, userRepository, connectionService},
