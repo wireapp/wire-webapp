@@ -1441,12 +1441,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:^7.11.2, @babel/runtime@npm:^7.12.0, @babel/runtime@npm:^7.12.1, @babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.16.3, @babel/runtime@npm:^7.18.3, @babel/runtime@npm:^7.20.7, @babel/runtime@npm:^7.22.5, @babel/runtime@npm:^7.5.5, @babel/runtime@npm:^7.8.4, @babel/runtime@npm:^7.8.7, @babel/runtime@npm:^7.9.2":
+"@babel/runtime@npm:^7.11.2, @babel/runtime@npm:^7.12.0, @babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.16.3, @babel/runtime@npm:^7.18.3, @babel/runtime@npm:^7.20.7, @babel/runtime@npm:^7.22.5, @babel/runtime@npm:^7.5.5, @babel/runtime@npm:^7.8.4, @babel/runtime@npm:^7.8.7, @babel/runtime@npm:^7.9.2":
   version: 7.23.5
   resolution: "@babel/runtime@npm:7.23.5"
   dependencies:
     regenerator-runtime: ^0.14.0
   checksum: 164d9802424f06908e62d29b8fd3a87db55accf82f46f964ac481dcead11ff7df8391e3696e5fa91a8ca10ea8845bf650acd730fa88cf13f8026cd8d5eec6936
+  languageName: node
+  linkType: hard
+
+"@babel/runtime@npm:^7.12.1":
+  version: 7.23.9
+  resolution: "@babel/runtime@npm:7.23.9"
+  dependencies:
+    regenerator-runtime: ^0.14.0
+  checksum: 6bbebe8d27c0c2dd275d1ac197fc1a6c00e18dab68cc7aaff0adc3195b45862bae9c4cc58975629004b0213955b2ed91e99eccb3d9b39cabea246c657323d667
   languageName: node
   linkType: hard
 
@@ -3995,7 +4004,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/hoist-non-react-statics@npm:^3.3.0, @types/hoist-non-react-statics@npm:^3.3.1":
+"@types/hoist-non-react-statics@npm:^3.3.0":
+  version: 3.3.5
+  resolution: "@types/hoist-non-react-statics@npm:3.3.5"
+  dependencies:
+    "@types/react": "*"
+    hoist-non-react-statics: ^3.3.0
+  checksum: b645b062a20cce6ab1245ada8274051d8e2e0b2ee5c6bd58215281d0ec6dae2f26631af4e2e7c8abe238cdcee73fcaededc429eef569e70908f82d0cc0ea31d7
+  languageName: node
+  linkType: hard
+
+"@types/hoist-non-react-statics@npm:^3.3.1":
   version: 3.3.3
   resolution: "@types/hoist-non-react-statics@npm:3.3.3"
   dependencies:
@@ -4995,9 +5014,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/react-ui-kit@npm:9.15.2":
-  version: 9.15.2
-  resolution: "@wireapp/react-ui-kit@npm:9.15.2"
+"@wireapp/react-ui-kit@npm:9.15.3":
+  version: 9.15.3
+  resolution: "@wireapp/react-ui-kit@npm:9.15.3"
   dependencies:
     "@types/color": 3.0.6
     color: 4.2.3
@@ -5005,14 +5024,14 @@ __metadata:
     react-select: 5.7.5
     react-transition-group: 4.4.5
   peerDependencies:
-    "@emotion/react": 11.10.4
-    "@types/react": ^18.0.9
-    react: ^18.1.0
-    react-dom: ^18.1.0
+    "@emotion/react": ^11
+    "@types/react": ^18
+    react: ^18
+    react-dom: ^18
   peerDependenciesMeta:
     "@types/react":
       optional: true
-  checksum: ea2ea780c9d78db6d61454b7fd05af7d04881974f86368ae6ef014a6fa28a31878bbd9b5d6f832c9efc2d90d2edfd112727632c4b076f31758f910774bab26c9
+  checksum: a39658ee797f9d61af24c457a2d68918c1d08c5565c2f630de20906000253a5333905c0ae4010159b7421ac4585b9ca9036a4151360a6da5d48a99633562aca2
   languageName: node
   linkType: hard
 
@@ -17547,7 +17566,7 @@ __metadata:
     "@wireapp/core": 44.0.1
     "@wireapp/eslint-config": 3.0.6
     "@wireapp/prettier-config": 0.6.3
-    "@wireapp/react-ui-kit": 9.15.2
+    "@wireapp/react-ui-kit": 9.15.3
     "@wireapp/store-engine": ^5.1.4
     "@wireapp/store-engine-dexie": 2.1.7
     "@wireapp/webapp-events": 0.20.1
