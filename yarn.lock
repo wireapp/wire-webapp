@@ -12528,7 +12528,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"node-fetch@npm:2.7.0, node-fetch@npm:^2.6.1, node-fetch@npm:^2.6.7":
+"node-fetch@npm:^2.6.1, node-fetch@npm:^2.6.7":
   version: 2.7.0
   resolution: "node-fetch@npm:2.7.0"
   dependencies:
@@ -17576,7 +17576,6 @@ __metadata:
     long: 5.2.3
     markdown-it: 14.0.0
     murmurhash: 2.0.1
-    node-fetch: 2.7.0
     oidc-client-ts: ^3.0.1
     os-browserify: 0.3.0
     path-browserify: 1.0.1
