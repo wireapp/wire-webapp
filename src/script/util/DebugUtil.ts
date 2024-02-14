@@ -276,7 +276,8 @@ export class DebugUtil {
     lexicalEditor.update(() => {
       const root = $getRoot().getLastChild()!;
       const textNode = $createTextNode(text);
-      root.append(textNode);
+      // the "as any" can be removed when this issue is fixed https://github.com/facebook/lexical/issues/5502
+      (root as any).append(textNode);
     });
   }
 
