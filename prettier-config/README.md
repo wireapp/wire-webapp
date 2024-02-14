@@ -23,6 +23,6 @@ yarn add --dev @wireapp/prettier-config
 ```jsonc
 {
   // ...
-  "prettier": "@wireapp/prettier-config"
+  "prettier": "@wireapp/prettier-config",
 }
 ```

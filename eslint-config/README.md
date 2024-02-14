@@ -75,6 +75,6 @@ typescript
 ```jsonc
 {
   // ...
-  "extends": "@wireapp/eslint-config"
+  "extends": "@wireapp/eslint-config",
 }
 ```
