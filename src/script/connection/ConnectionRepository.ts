@@ -52,6 +52,7 @@ export class ConnectionRepository {
   private readonly connectionService: ConnectionService;
   private readonly userRepository: UserRepository;
   private readonly logger: Logger;
+  private onDeleteConnectionRequestConversation?: (userId: QualifiedId) => Promise<void>;
 
   static get CONFIG(): Record<string, BackendEventType[]> {
     return {
@@ -113,6 +114,12 @@ export class ConnectionRepository {
     } else {
       // Create new connection if there was no connection before
       connectionEntity = ConnectionMapper.mapConnectionFromJson(connectionData);
+    }
+
+    const user = await this.userRepository.getUserById(connectionEntity.userId);
+    // If this is the connection request, but the user does not exist anymore, no need to attach a connection to a user or a conversation
+    if (user?.isDeleted && connectionEntity.status() === ConnectionStatus.SENT) {
+      return;
     }
 
     // Attach connection to user
@@ -363,7 +370,37 @@ export class ConnectionRepository {
           break;
         }
       }
+
+      const user = await this.userRepository.refreshUser(userEntity.qualifiedId);
+
+      const isNotConnectedError = isBackendError(error) && error.label === BackendErrorLabel.NOT_CONNECTED;
+
+      // If connection failed because the user is deleted, delete the conversation representing the connection request (type 3 - CONNECT)
+      if (isNotConnectedError && user.isDeleted) {
+        await this.deleteConnectionWithUser(user);
+      }
     }
+  }
+
+  private async deleteConnectionWithUser(user: User) {
+    const connection = this.connectionState
+      .connections()
+      .find(connection => matchQualifiedIds(connection.userId, user.qualifiedId));
+
+    if (connection) {
+      this.connectionState.connections.remove(connection);
+      user.connection(null);
+    }
+
+    await this.onDeleteConnectionRequestConversation?.(user.qualifiedId);
+  }
+
+  /**
+   * Set callback for deleting a connection request conversation.
+   * @param callback Callback function
+   */
+  public setDeleteConnectionRequestConversationHandler(callback: (userId: QualifiedId) => Promise<void>): void {
+    this.onDeleteConnectionRequestConversation = callback;
   }
 
   /**
