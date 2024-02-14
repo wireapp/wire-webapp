@@ -97,8 +97,15 @@ export const Image: React.FC<ImageProps> = ({
 
   const placeholderStyle = {aspectRatio: `${imageData.ratio}`, maxWidth: '100%'};
 
+  const status = imageUrl ? 'loaded' : 'loading';
+
   return (
-    <InViewport onVisible={() => setIsInViewport(true)} className={cx('image-wrapper', className)} {...props}>
+    <InViewport
+      onVisible={() => setIsInViewport(true)}
+      className={cx('image-wrapper', className)}
+      data-uie-status={status}
+      {...props}
+    >
       {imageUrl ? (
         <img onClick={onClick} src={imageUrl.url} role="presentation" alt={alt} data-uie-name="image-asset-img" />
       ) : (
