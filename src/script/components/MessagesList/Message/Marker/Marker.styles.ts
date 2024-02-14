@@ -32,7 +32,6 @@ export const baseMarkerStyle = css`
 
   .message-header-label {
     border-bottom: 1px dotted var(--foreground-fade-24);
-    flex: unset;
   }
 
   .message-unread-dot {
