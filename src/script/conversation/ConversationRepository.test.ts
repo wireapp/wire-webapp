@@ -66,6 +66,7 @@ import {
   generateAPIConversation,
 } from 'test/helper/ConversationGenerator';
 import {createDeleteEvent} from 'test/helper/EventGenerator';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 import {escapeRegex} from 'Util/SanitizationUtil';
 import {createUuid} from 'Util/uuid';
 
@@ -1983,12 +1984,22 @@ describe('ConversationRepository', () => {
     describe('checkForDeletedConversations', () => {
       it('removes conversations that have been deleted on the backend', async () => {
         const deletedGroup = _generateConversation();
+        const oldGroup = _generateConversation();
         const conversationRepository = testFactory.conversation_repository!;
 
         jest.spyOn(testFactory.conversation_service!, 'getConversationByIds').mockResolvedValue({
-          not_found: [deletedGroup],
+          not_found: [deletedGroup, oldGroup],
         });
+        jest
+          .spyOn(conversationRepository['conversationService'], 'getConversationById')
+          .mockImplementation(async conversationId => {
+            if (matchQualifiedIds(conversationId, deletedGroup.qualifiedId)) {
+              throw new ConversationError(ConversationError.TYPE.CONVERSATION_NOT_FOUND, 'Conversation not found');
+            }
+            return {} as any;
+          });
         await conversationRepository['saveConversation'](deletedGroup);
+        await conversationRepository['saveConversation'](oldGroup);
 
         const currentNbConversations = conversationRepository['conversationState'].conversations().length;
         await testFactory.conversation_repository!.syncDeletedConversations();
