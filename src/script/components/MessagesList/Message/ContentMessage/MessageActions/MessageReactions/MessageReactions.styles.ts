@@ -40,7 +40,7 @@ import {CSSObject} from '@emotion/react';
 
 export const messageReactionWrapper: CSSObject = {
   display: 'flex',
-  paddingBlock: '0.5rem',
+  paddingTop: '6px',
   gap: '0.5rem',
   paddingInline: 'var(--conversation-message-sender-width)',
   flexWrap: 'wrap',

@@ -85,6 +85,20 @@
   }
 }
 
+.content-message {
+  &:has(.message-header) {
+    padding-top: 6px;
+  }
+}
+
+.system-message {
+  padding-block: 8px;
+
+  &:has(.message-timestamp) + .system-message {
+    padding-top: 0;
+  }
+}
+
 @keyframes marked-animation {
   to {
     background-color: inherit;
@@ -92,6 +106,8 @@
 }
 
 .content-message-wrapper {
+  padding-block: 6px;
+
   &:hover,
   &:focus-visible {
     background-color: #fff;
@@ -124,8 +140,6 @@
   position: relative;
   display: flex;
   width: 100%;
-  padding-top: 6px;
-  margin-bottom: 2px;
   line-height: @avatar-diameter-xs;
 
   & > .message-body-actions {
@@ -135,11 +149,15 @@
   + .message-services-warning {
     margin-left: 72px;
   }
+
+  + .message-body .message-asset {
+    padding-top: 6px;
+  }
 }
 
 .message-header-icon {
   .flex-center;
-  width: @conversation-message-sender-width;
+  width: var(--conversation-message-sender-width);
   max-height: @avatar-diameter-xs;
 
   align-self: center;
@@ -157,6 +175,7 @@
 .message-header-label {
   display: flex;
   min-width: 0; // fixes ellipsis not working with flexbox (FF)
+  flex: 1;
   align-items: center;
   font-size: @font-size-small;
   font-weight: @font-weight-regular;
@@ -259,7 +278,6 @@
   max-width: @conversation-max-width;
   justify-content: space-between;
   padding-left: @conversation-message-sender-width;
-  padding-block: 4px;
 
   &-content {
     width: 100%;
@@ -513,7 +531,7 @@
 .message-group-creation-header,
 .message-member-footer {
   padding-top: 16px;
-  margin-left: 54px;
+  margin-left: var(--conversation-message-sender-width);
   font-size: @font-size-small;
   font-weight: @font-weight-regular;
 }
@@ -673,7 +691,7 @@
 .message-asset {
   display: flex;
   align-items: flex-start;
-  margin-bottom: 4px;
+  padding-block: 6px;
 }
 
 .message-call,

@@ -72,6 +72,7 @@ interface MessagesListParams {
   isLastReceivedMessage: (messageEntity: MessageEntity, conversationEntity: ConversationEntity) => boolean;
   isMsgElementsFocusable: boolean;
   setMsgElementsFocusable: (isMsgElementsFocusable: boolean) => void;
+  isRightSidebarOpen?: boolean;
 }
 
 export const MessagesList: FC<MessagesListParams> = ({
@@ -95,6 +96,7 @@ export const MessagesList: FC<MessagesListParams> = ({
   isLastReceivedMessage,
   isMsgElementsFocusable,
   setMsgElementsFocusable,
+  isRightSidebarOpen = false,
 }) => {
   const {
     messages: allMessages,
@@ -267,7 +269,12 @@ export const MessagesList: FC<MessagesListParams> = ({
   };
 
   return (
-    <FadingScrollbar ref={messageListRef} id="message-list" className="message-list" tabIndex={TabIndex.UNFOCUSABLE}>
+    <FadingScrollbar
+      ref={messageListRef}
+      id="message-list"
+      className={cx('message-list', {'is-right-panel-open': isRightSidebarOpen})}
+      tabIndex={TabIndex.UNFOCUSABLE}
+    >
       <div ref={setMessageContainer} className={cx('messages', {'flex-center': verticallyCenterMessage()})}>
         {groupedMessages.map(group => {
           if (isMarker(group)) {
