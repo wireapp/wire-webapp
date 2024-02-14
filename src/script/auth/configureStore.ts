@@ -18,7 +18,7 @@
  */
 
 import {applyMiddleware, combineReducers, legacy_createStore as createStore} from 'redux';
-import thunk from 'redux-thunk';
+import {withExtraArgument} from 'redux-thunk';
 
 import {LOGGER_NAMESPACE} from 'Util/Logger';
 
@@ -28,7 +28,7 @@ import {ThunkDispatch, reducers} from './module/reducer';
 const reduxLogdown = require('redux-logdown');
 
 const configureStore = (thunkArguments: object = {}) => {
-  const store = createStore(combineReducers(reducers), createMiddleware(thunkArguments));
+  const store = createStore(combineReducers(reducers), undefined, createMiddleware(thunkArguments));
 
   if (process.env.NODE_ENV !== 'production') {
     if (module.hot) {
@@ -49,7 +49,7 @@ const configureStore = (thunkArguments: object = {}) => {
 const createLoggerMiddleware = () => reduxLogdown(LOGGER_NAMESPACE, {diff: true});
 
 const createMiddleware = (thunkArguments: object) => {
-  const middlewares = [thunk.withExtraArgument(thunkArguments), createLoggerMiddleware()];
+  const middlewares = [withExtraArgument(thunkArguments), createLoggerMiddleware()];
   return applyMiddleware(...middlewares);
 };
 
