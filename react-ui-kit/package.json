@@ -49,10 +49,10 @@
     "webpack": "^5.74.0"
   },
   "peerDependencies": {
-    "@emotion/react": "11.10.4",
-    "@types/react": "^18.0.9",
-    "react": "^18.1.0",
-    "react-dom": "^18.1.0"
+    "@emotion/react": "^11",
+    "@types/react": "^18",
+    "react": "^18",
+    "react-dom": "^18"
   },
   "peerDependenciesMeta": {
     "@types/react": {
