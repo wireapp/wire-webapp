@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.15.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.15.2...@wireapp/react-ui-kit@9.15.3) (2024-02-14)
+
+### Bug Fixes
+
+* **react-ui-kit:** loosen peer dependencies contraints ([65d33e4](https://github.com/wireapp/wire-web-packages/commit/65d33e4978336902d564054dd90c8a05c0495707))
+
 ## [9.15.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.15.1...@wireapp/react-ui-kit@9.15.2) (2024-02-13)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
