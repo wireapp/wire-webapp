@@ -48,7 +48,7 @@ const TemporaryGuestConversations: React.FC<TemporaryGuestConversations> = ({
     'expirationRemainingText',
   ]);
 
-  const {calls} = useKoSubscribableChildren(callingViewModel, ['calls']);
+  const {activeCalls} = useKoSubscribableChildren(callingViewModel, ['activeCalls']);
   const isAccountCreationEnabled = Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION;
   const getConversationById = (conversationId: QualifiedId) => callingViewModel.getConversationById(conversationId);
   const openPreferences = () => {
@@ -71,7 +71,7 @@ const TemporaryGuestConversations: React.FC<TemporaryGuestConversations> = ({
 
   return (
     <div id="temporary-guest" className={`temporary-guest`}>
-      {calls.map(call => {
+      {activeCalls.map(call => {
         const conversation = getConversationById(call.conversationId);
         return (
           <div key={call.conversationId.id} className="calling-cell">
@@ -81,7 +81,7 @@ const TemporaryGuestConversations: React.FC<TemporaryGuestConversations> = ({
               data-uie-value={conversation.display_name()}
               call={call}
               conversation={conversation}
-              temporaryUserStyle
+              isTemporaryUser
               isFullUi
               isSelfVerified={false}
               callActions={callingViewModel.callActions}
