@@ -206,7 +206,11 @@ const Message: React.FC<
 
   return (
     <div
-      className={cx('message', {'message-marked': isMarked})}
+      className={cx('message', {
+        'message-marked': isMarked,
+        'content-message': message.isContent(),
+        'system-message': !message.isContent(),
+      })}
       ref={messageElementRef}
       data-uie-uid={message.id}
       data-uie-value={message.super_type}

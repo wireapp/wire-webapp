@@ -535,6 +535,7 @@ export const Conversation = ({
             isLastReceivedMessage={isLastReceivedMessage}
             isMsgElementsFocusable={isMsgElementsFocusable}
             setMsgElementsFocusable={setMsgElementsFocusable}
+            isRightSidebarOpen={isRightSidebarOpen}
           />
 
           {isConversationLoaded &&
