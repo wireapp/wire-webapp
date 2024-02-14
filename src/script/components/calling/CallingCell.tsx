@@ -69,7 +69,7 @@ interface AnsweringControlsProps {
   isFullUi?: boolean;
   callState?: CallState;
   classifiedDomains?: string[];
-  temporaryUserStyle?: boolean;
+  isTemporaryUser?: boolean;
 }
 
 export type CallingCellProps = VideoCallProps & AnsweringControlsProps;
@@ -79,7 +79,7 @@ type labels = {dataUieName: string; text: string};
 const CallingCell: React.FC<CallingCellProps> = ({
   conversation,
   classifiedDomains,
-  temporaryUserStyle,
+  isTemporaryUser,
   call,
   callActions,
   isFullUi = false,
@@ -302,7 +302,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
         </p>
       )}
 
-      {conversation && (!isDeclined || temporaryUserStyle) && (
+      {conversation && (!isDeclined || isTemporaryUser) && (
         <div
           className="conversation-list-calling-cell-background"
           data-uie-name="item-call"
@@ -336,7 +336,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
                   : `${isOngoing ? `${ongoingCallAlert} ` : ''}${t('accessibility.openConversation', conversationName)}`
               }
             >
-              {!temporaryUserStyle && (
+              {!isTemporaryUser && (
                 <div className="conversation-list-cell-left">
                   {isGroup && <GroupAvatar users={conversationParticipants} />}
                   {!isGroup && !!conversationParticipants.length && (
@@ -346,7 +346,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
               )}
               <h2
                 className={cx('conversation-list-cell-center ', {
-                  'conversation-list-cell-center-no-left': temporaryUserStyle,
+                  'conversation-list-cell-center-no-left': isTemporaryUser,
                 })}
               >
                 <span className="conversation-list-cell-name">{conversationName}</span>
@@ -434,7 +434,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
             <ConversationClassifiedBar conversation={conversation} classifiedDomains={classifiedDomains} />
           )}
 
-          {(!isDeclined || temporaryUserStyle) && (
+          {(!isDeclined || isTemporaryUser) && (
             <>
               <div className="conversation-list-calling-cell-controls">
                 <ul className="conversation-list-calling-cell-controls-left">
@@ -547,16 +547,27 @@ const CallingCell: React.FC<CallingCellProps> = ({
 
                   {isIncoming && (
                     <li className="conversation-list-calling-cell-controls-item">
-                      <button
-                        className="call-ui__button call-ui__button--green call-ui__button--large"
-                        onClick={answerCall}
-                        type="button"
-                        title={t('callAccept')}
-                        aria-label={t('callAccept')}
-                        data-uie-name="do-call-controls-call-accept"
-                      >
-                        <Icon.Pickup className="small-icon" />
-                      </button>
+                      {isDeclined ? (
+                        <button
+                          className="call-ui__button call-ui__button--green call-ui__button--join call-ui__button--join--large "
+                          onClick={answerCall}
+                          type="button"
+                          data-uie-name="do-call-controls-call-join"
+                        >
+                          {t('callJoin')}
+                        </button>
+                      ) : (
+                        <button
+                          className="call-ui__button call-ui__button--green call-ui__button--large"
+                          onClick={answerCall}
+                          type="button"
+                          title={t('callAccept')}
+                          aria-label={t('callAccept')}
+                          data-uie-name="do-call-controls-call-accept"
+                        >
+                          <Icon.Pickup className="small-icon" />
+                        </button>
+                      )}
                     </li>
                   )}
                 </ul>
