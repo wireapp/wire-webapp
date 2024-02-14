@@ -7510,10 +7510,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dotenv@npm:16.4.2":
-  version: 16.4.2
-  resolution: "dotenv@npm:16.4.2"
-  checksum: c53d064435d835b07b2cd90a692f6859b8ba016b7ca57eeb487e430da74fb2335ac2bdb53f16774011d7b9b6b44c093637b39cbe76d9e01f9b8856a6dfd32f4a
+"dotenv@npm:16.4.4":
+  version: 16.4.4
+  resolution: "dotenv@npm:16.4.4"
+  checksum: fbe0355972634d8843e1804115885e94d70618cfc975eadca67e26b2d71eb46f0ed45c12c2b88fd88cd6b1476a151471227b13311127a3504d10060cc74ce2f7
   languageName: node
   linkType: hard
 
@@ -17602,7 +17602,7 @@ __metadata:
     dexie: 3.2.5
     dexie-batch: 0.4.3
     dexie-encrypted: 2.0.0
-    dotenv: 16.4.2
+    dotenv: 16.4.4
     dpdm: 3.14.0
     emoji-picker-react: 4.7.17
     eslint: ^8.56.0
