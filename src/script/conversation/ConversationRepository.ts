@@ -2057,7 +2057,18 @@ export class ConversationRepository {
   async syncDeletedConversations() {
     const conversationIds = this.conversationState.conversations().map(conversation => conversation.qualifiedId);
     const {not_found = []} = await this.conversationService.getConversationByIds(conversationIds);
-    not_found.forEach(deletedConversationId => this.deleteConversationLocally(deletedConversationId, true));
+    for (const inccessibleConversation of not_found) {
+      try {
+        // a conversation marked `not_found` could be either non existing on backend or it could mean the self user is not part of it
+        // We need to check if the conversation exists on backend
+        await this.conversationService.getConversationById(inccessibleConversation);
+      } catch (error) {
+        if (error instanceof ConversationError && error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND) {
+          // Only if the conversation triggers a not found error, we delete it locally
+          await this.deleteConversationLocally(inccessibleConversation, true);
+        }
+      }
+    }
   }
 
   private readonly onUserSupportedProtocolsUpdated = async ({user}: {user: User}) => {
