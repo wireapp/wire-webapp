@@ -14718,12 +14718,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"redux-thunk@npm:3.0.1":
-  version: 3.0.1
-  resolution: "redux-thunk@npm:3.0.1"
+"redux-thunk@npm:3.1.0":
+  version: 3.1.0
+  resolution: "redux-thunk@npm:3.1.0"
   peerDependencies:
     redux: ^5.0.0
-  checksum: 17c918470a91c6401739e58590ae7c4d1e3590ac51d0d5f2275215a78eb47f64021de98ae7425398c6d2041e0f5bd9b6ce4727ae0d5c53b70df69a836f80cb57
+  checksum: bea96f8233975aad4c9f24ca1ffd08ac7ec91eaefc26e7ba9935544dc55d7f09ba2aa726676dab53dc79d0c91e8071f9729cddfea927f4c41839757d2ade0f50
   languageName: node
   linkType: hard
 
@@ -17599,7 +17599,7 @@ __metadata:
     redux: 5.0.1
     redux-logdown: 1.0.4
     redux-mock-store: 1.5.4
-    redux-thunk: 3.0.1
+    redux-thunk: 3.1.0
     seedrandom: ^3.0.5
     simple-git: 3.22.0
     sinon: 17.0.1
