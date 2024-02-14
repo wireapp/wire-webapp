@@ -4920,9 +4920,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/eslint-config@npm:3.0.5":
-  version: 3.0.5
-  resolution: "@wireapp/eslint-config@npm:3.0.5"
+"@wireapp/eslint-config@npm:3.0.6":
+  version: 3.0.6
+  resolution: "@wireapp/eslint-config@npm:3.0.6"
   dependencies:
     "@types/eslint": ^8
     "@types/prettier": ^3
@@ -4943,7 +4943,7 @@ __metadata:
     eslint-plugin-prettier: ^5
     eslint-plugin-react: ^7.31.10
     eslint-plugin-react-hooks: ^4.6.0
-    eslint-plugin-simple-import-sort: ^10.0.0
+    eslint-plugin-simple-import-sort: ^12.0.0
     eslint-plugin-testing-library: ^6.0.0
     eslint-plugin-unused-imports: ^3
     prettier: ^3
@@ -4951,7 +4951,7 @@ __metadata:
   peerDependencies:
     eslint: ^8
     prettier: ^3
-  checksum: 5d6aff9939c0088e73a25d43130189446e66cf068600d8040392c88092edd04560b19d83b9aa357306bfd456957f62512addc56d5380a6e3854673661597b52e
+  checksum: 1db416ac6ad1bd0d3b3afe606a17572ecc5380d268c195ff48f96a89d9760f58833a46e7fd166e4993d46f09ace7933b615df5a1068ba94810f0474fa62e2b83
   languageName: node
   linkType: hard
 
@@ -8158,12 +8158,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-simple-import-sort@npm:^10.0.0":
-  version: 10.0.0
-  resolution: "eslint-plugin-simple-import-sort@npm:10.0.0"
+"eslint-plugin-simple-import-sort@npm:^12.0.0":
+  version: 12.0.0
+  resolution: "eslint-plugin-simple-import-sort@npm:12.0.0"
   peerDependencies:
     eslint: ">=5.0.0"
-  checksum: 23221ff63f80f9c52da807d388ee8a51bc36a3b73345f60ec886e7973c28d75eb1d1e47f7f2916a7c1f94a1b5037b1450356a64a8fbd58096fd6bee57c6e3e48
+  checksum: 1b97055a9e8782099a788d030d3ceb03729bd7c9fe145eb617e5857c8c429d3124f1926621f4a363e1f2fad23037285b5b43ee01c6597eedb5f19b1d2f50604b
   languageName: node
   linkType: hard
 
@@ -17579,7 +17579,7 @@ __metadata:
     "@wireapp/commons": 5.2.5
     "@wireapp/copy-config": 2.1.16
     "@wireapp/core": 44.0.1
-    "@wireapp/eslint-config": 3.0.5
+    "@wireapp/eslint-config": 3.0.6
     "@wireapp/prettier-config": 0.6.3
     "@wireapp/react-ui-kit": 9.15.1
     "@wireapp/store-engine": ^5.1.4
