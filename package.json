@@ -149,6 +149,7 @@
     "tsc-watch": "6.0.4",
     "typescript": "5.3.3",
     "webpack": "5.90.1",
+    "webpack-cli": "5.1.4",
     "webpack-dev-middleware": "7.0.0",
     "webpack-hot-middleware": "2.26.1",
     "workbox-webpack-plugin": "7.0.0"
