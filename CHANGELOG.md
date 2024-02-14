@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [44.0.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@44.0.0...@wireapp/core@44.0.1) (2024-02-14)
+
+### Bug Fixes
+
+* **core:** Remove unneeded dexie-store-engine dependency ([#5974](https://github.com/wireapp/wire-web-packages/issues/5974)) ([0297505](https://github.com/wireapp/wire-web-packages/commit/0297505e54deab5980a2236aa522d4af2fbb48c8))
+
 # [44.0.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@43.14.3...@wireapp/core@44.0.0) (2024-02-13)
 
 ### Code Refactoring
