@@ -17,54 +17,69 @@
  *
  */
 
+.conversations {
+  width: 320px;
+  background-color: var(--app-bg-secondary);
+}
+
 .conversations .left-list-header-text {
   max-width: 208px;
   flex: 1;
   text-align: center;
 }
 
-.conversations-footer-list {
+.conversations-sidebar {
+  padding: 24px 8px;
+  border-right: 1px solid var(--border-color);
+}
+
+.conversations-sidebar-list {
   .list-unstyled;
 
   display: flex;
+  width: 200px - 16px;
   height: @conversation-input-min-height;
-  align-items: center;
+  flex-direction: column;
   justify-content: space-between;
   padding: 2px 0;
-  border-top: 1px solid var(--sidebar-border-color);
   margin: 0;
-  color: #fff;
+  gap: 8px;
 
-  .conversations-footer-contacts-label {
+  .conversations-sidebar-contacts-label {
     .label-xs;
 
     margin-left: 16px;
     color: #fff;
   }
+
+  .conversations-sidebar-title {
+    .text-bold-small;
+    .text-uppercase;
+    .label-2;
+  }
 }
 
-.conversations-footer-list-item {
+.conversations-sidebar-list-item {
   height: 100%;
   flex: 1;
   padding: 2px 0;
 }
 
-.conversations-footer-btn {
+.conversations-sidebar-btn {
   .button-reset-default;
   display: flex;
   width: 100%;
   height: 100%;
   flex: 1;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  justify-content: center;
+  padding: 8px;
   border-radius: 6px;
+  gap: 12px;
 
   &--text {
-    .label-small-medium;
+    .text-bold-small;
     color: var(--gray-90);
-    font-size: 11px;
-    text-transform: capitalize;
   }
 
   .button-states();
@@ -78,22 +93,26 @@
     &.active {
       background-color: var(--gray-95);
     }
-    .conversations-footer-btn--text {
+    .conversations-sidebar-btn--text {
       color: var(--gray-50);
     }
   }
 
   &.active {
-    background-color: var(--gray-10);
+    background-color: var(--accent-color-500);
     color: var(--accent-color-500);
 
-    .conversations-footer-btn--text {
-      color: var(--accent-color-500) !important;
+    svg {
+      fill: var(--white) !important;
+    }
+
+    .conversations-sidebar-btn--text {
+      color: var(--white) !important;
     }
   }
 }
 
-.conversations-footer-btn {
+.conversations-sidebar-btn {
   svg {
     margin-bottom: 4px;
   }
@@ -123,15 +142,6 @@
     }
     body.theme-dark & path:last-child {
       stroke: var(--gray-95) !important;
-    }
-  }
-
-  .archive-outline {
-    fill: transparent;
-
-    body.theme-dark & path,
-    body.theme-dark & rect {
-      stroke: var(--gray-50);
     }
   }
 }
@@ -185,12 +195,8 @@
   flex-direction: column;
 }
 
-.conversations-centered {
-  .full-screen;
-  .flex-center;
-  .text-center;
-
-  flex-direction: column;
+.conversations-wrapper {
+  display: flex;
 }
 
 .conversation-folder-list {
