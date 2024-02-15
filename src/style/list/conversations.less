@@ -29,7 +29,8 @@
 }
 
 .conversations-sidebar {
-  padding: 24px 8px;
+  width: 220px;
+  padding: 8px 8px;
   border-right: 1px solid var(--border-color);
 }
 
@@ -37,7 +38,7 @@
   .list-unstyled;
 
   display: flex;
-  width: 200px - 16px;
+  width: 100%;
   height: @conversation-input-min-height;
   flex-direction: column;
   justify-content: space-between;
@@ -73,9 +74,15 @@
   flex: 1;
   flex-direction: row;
   align-items: center;
+  justify-content: space-between;
   padding: 8px;
   border-radius: 6px;
   gap: 12px;
+
+  &--text-wrapper {
+    display: flex;
+    gap: 12px;
+  }
 
   &--text {
     .text-bold-small;
@@ -89,13 +96,20 @@
     outline-offset: -2px;
   }
 
-  body.theme-dark & {
-    &.active {
-      background-color: var(--gray-95);
-    }
-    .conversations-sidebar-btn--text {
-      color: var(--gray-50);
-    }
+  .conversations-sidebar-btn--badge {
+    padding: 1px 4px;
+    border: 1px solid #fff;
+    border-radius: 10px;
+    background: var(--red-500);
+    color: var(--button-tertiary-bg);
+    .label-sm;
+  }
+
+  &.active {
+    background-color: var(--gray-95);
+  }
+  .conversations-sidebar-btn--text {
+    color: var(--gray-100);
   }
 
   &.active {
@@ -119,7 +133,7 @@
 
   .people-outline path {
     body.theme-dark & {
-      fill: var(--gray-50);
+      fill: var(--gray-100);
     }
   }
 
@@ -127,7 +141,7 @@
   .folders-outline {
     fill: transparent;
     body.theme-dark & path {
-      stroke: var(--gray-50);
+      stroke: var(--gray-100);
     }
 
     &.active path {
