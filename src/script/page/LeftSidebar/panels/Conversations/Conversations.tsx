@@ -246,7 +246,7 @@ const Conversations: React.FC<ConversationsProps> = ({
         aria-owns="tab-1 tab-2 tab-3"
         className="conversations-sidebar-list"
       >
-        <div className="conversations-sidebar-title">{t('conversationViewTooltip')}</div>
+        <div className="conversations-sidebar-title">{t('videoCallOverlayConversations')}</div>
 
         <button
           id="tab-2"
