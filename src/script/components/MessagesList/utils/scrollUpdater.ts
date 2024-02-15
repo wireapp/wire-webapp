@@ -34,16 +34,6 @@ export function updateScroll(
   container: HTMLElement,
   {focusedElement, prevScrollHeight, prevNbMessages, messages, selfUserId}: MessageListContext,
 ) {
-  /*
-  console.log('felix', {
-    container,
-    focusedElement,
-    prevScrollHeight,
-    prevNbMessages,
-    messages,
-    selfUserId,
-  });
-  */
   const newNbMessages = messages.length;
   const lastMessage = messages[newNbMessages - 1];
   const scrollBottomPosition = container.scrollTop + container.clientHeight;
