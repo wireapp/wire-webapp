@@ -178,7 +178,6 @@ export const MessagesList: FC<MessagesListParams> = ({
   const loadPrecedingMessages = async (): Promise<void> => {
     const shouldPullMessages = !isPending && hasAdditionalMessages;
 
-
     if (shouldPullMessages) {
       await conversationRepository.getPrecedingMessages(conversation);
     }
