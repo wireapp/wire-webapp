@@ -548,7 +548,7 @@
   "conversationUpdatedTimer": " set the message timer to {{time}}",
   "conversationUpdatedTimerYou": " set the message timer to {{time}}",
   "conversationVideoAssetRestricted": "Receiving videos is prohibited",
-  "conversationViewTooltip": "Conversations",
+  "conversationViewTooltip": "All",
   "conversationVoiceChannelDeactivate": " called",
   "conversationVoiceChannelDeactivateYou": " called",
   "conversationWithBlockedUserMessage": "The link to this group conversation is no longer valid or leads to a conversation with someone you blocked.",
