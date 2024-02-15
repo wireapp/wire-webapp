@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect} from 'react';
+import {useLayoutEffect} from 'react';
 
 const observedElements = new Map<Element, (element: Element) => void>();
 
@@ -46,7 +46,8 @@ export const useResizeObserver = (
   callback: (element: Element | HTMLDivElement) => void,
   element?: Element | HTMLDivElement | null,
 ) => {
-  useEffect(() => {
+  // We need to use a layout effect here as we want to make sure the observer is set up (and removed!) before the component is rendered
+  useLayoutEffect(() => {
     if (!element) {
       return () => {};
     }
