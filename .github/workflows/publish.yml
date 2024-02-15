@@ -348,10 +348,6 @@ jobs:
         target: ${{fromJson(needs.set_deployment_targets.outputs.deployment_targets)}}
 
     steps:
-      - name: Set tag
-        run: |
-          echo "TAG=$(git tag --points-at ${{github.sha}})" >> $GITHUB_ENV
-
       - uses: actions/download-artifact@v4
         with:
           name: 'build-artifact'
@@ -381,10 +377,6 @@ jobs:
       release_url: ${{ steps.release.outputs.url }}
 
     steps:
-      - name: Set tag
-        run: |
-          echo "TAG=$(git tag --points-at ${{github.sha}})" >> $GITHUB_ENV
-
       - uses: actions/download-artifact@v4
         with:
           name: 'changelog'
@@ -394,17 +386,16 @@ jobs:
           name: 'unit-tests-report'
 
       - name: Create GitHub release
-        if: ${{env.TAG}}
         id: 'release'
         uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{github.token}}
         with:
-          tag_name: ${{env.TAG}}
+          tag_name: ${{needs.build.outputs.release_name}}
           body_path: ${{ needs.build.outputs.changelog }}
           files: ${{ needs.build.outputs.unit_tests_report }}
           draft: true
-          prerelease: ${{contains(env.TAG, 'staging')}}
+          prerelease: ${{contains(needs.build.outputs.release_name, 'staging')}}
 
   announce_deployment:
     name: 'Announce deployment to wire chats'
