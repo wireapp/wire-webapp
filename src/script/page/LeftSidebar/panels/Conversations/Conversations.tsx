@@ -102,11 +102,22 @@ const Conversations: React.FC<ConversationsProps> = ({
   } = useKoSubscribableChildren(selfUser, ['hasPendingLegalHold', 'isOnLegalHold', 'name']);
   const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
   const {connectRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
-  const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
+  const {activeConversation, unreadConversations} = useKoSubscribableChildren(conversationState, [
+    'activeConversation',
+    'archivedConversations',
+    'unreadConversations',
+  ]);
+
   const {archivedConversations, visibleConversations: conversations} = useKoSubscribableChildren(conversationState, [
     'archivedConversations',
     'visibleConversations',
   ]);
+
+  const totalUnreadConversations = unreadConversations.length;
+  const totalUnreadArchivedConversations = archivedConversations.filter(conversation =>
+    conversation.hasUnread(),
+  ).length;
+
   const {notifications} = useKoSubscribableChildren(preferenceNotificationRepository, ['notifications']);
   const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
 
@@ -235,7 +246,7 @@ const Conversations: React.FC<ConversationsProps> = ({
         aria-owns="tab-1 tab-2 tab-3"
         className="conversations-sidebar-list"
       >
-        <div className="conversations-sidebar-title">{t('conversationViewTooltip')}</div>
+        <div className="conversations-sidebar-title">{t('videoCallOverlayConversations')}</div>
 
         <button
           id="tab-2"
@@ -248,8 +259,13 @@ const Conversations: React.FC<ConversationsProps> = ({
           data-uie-status={isRecentViewStyle ? 'active' : 'inactive'}
           aria-selected={isRecentViewStyle}
         >
-          <Icon.ConversationsOutline />
-          <span className="conversations-sidebar-btn--text">{t('conversationViewTooltip')}</span>
+          <span className="conversations-sidebar-btn--text-wrapper">
+            <Icon.ConversationsOutline />
+            <span className="conversations-sidebar-btn--text">{t('conversationViewTooltip')}</span>
+          </span>
+          {totalUnreadConversations > 0 && (
+            <span className="conversations-sidebar-btn--badge">{unreadConversations.length}</span>
+          )}
         </button>
 
         <button
@@ -263,8 +279,13 @@ const Conversations: React.FC<ConversationsProps> = ({
           data-uie-status={isFolderViewStyle ? 'active' : 'inactive'}
           aria-selected={isFolderViewStyle}
         >
-          <Icon.ConversationsFolder />
-          <span className="conversations-sidebar-btn--text">{t('folderViewTooltip')}</span>
+          <span className="conversations-sidebar-btn--text-wrapper">
+            <Icon.ConversationsFolder />
+            <span className="conversations-sidebar-btn--text">{t('folderViewTooltip')}</span>
+          </span>
+          {totalUnreadConversations > 0 && (
+            <span className="conversations-sidebar-btn--badge">{totalUnreadConversations}</span>
+          )}
         </button>
 
         {archivedConversations.length > 0 && (
@@ -275,8 +296,13 @@ const Conversations: React.FC<ConversationsProps> = ({
             onClick={() => switchList(ListState.ARCHIVE)}
             title={t('tooltipConversationsArchived', archivedConversations.length)}
           >
-            <Icon.Archive />
-            <span className="conversations-sidebar-btn--text">{t('conversationFooterArchive')}</span>
+            <span className="conversations-sidebar-btn--text-wrapper">
+              <Icon.Archive />
+              <span className="conversations-sidebar-btn--text">{t('conversationFooterArchive')}</span>
+            </span>
+            {totalUnreadArchivedConversations > 0 && (
+              <span className="conversations-sidebar-btn--badge">{totalUnreadArchivedConversations}</span>
+            )}
           </button>
         )}
         <div className="conversations-sidebar-title">{t('conversationFooterContacts')}</div>
@@ -288,8 +314,10 @@ const Conversations: React.FC<ConversationsProps> = ({
           title={t('searchConnect', Shortcut.getShortcutTooltip(ShortcutType.START))}
           data-uie-name="go-people"
         >
-          <Icon.Plus className="people-outline" />
-          <span className="conversations-sidebar-btn--text">{t('searchConnect')}</span>
+          <span className="conversations-sidebar-btn--text-wrapper">
+            <Icon.Plus className="people-outline" />
+            <span className="conversations-sidebar-btn--text">{t('searchConnect')}</span>
+          </span>
         </button>
       </div>
     </nav>
