@@ -23,6 +23,7 @@ import type {RegisterData} from '@wireapp/api-client/lib/auth';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
+import {Navigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
 
 import {UrlUtil} from '@wireapp/commons';
@@ -31,7 +32,7 @@ import {Column, Columns, H1, Muted} from '@wireapp/react-ui-kit';
 import {noop} from 'Util/util';
 
 import {GuestLoginColumn, IsLoggedInColumn, Separator} from './ConversationJoinComponents';
-import {ConversationJoinFull, ConversationJoinInvalid} from './ConversationJoinInvalid';
+import {ConversationJoinFull} from './ConversationJoinInvalid';
 import {EntropyContainer} from './EntropyContainer';
 import {Login} from './Login';
 import {Page} from './Page';
@@ -50,7 +51,7 @@ import * as AuthSelector from '../module/selector/AuthSelector';
 import * as ClientSelector from '../module/selector/ClientSelector';
 import * as ConversationSelector from '../module/selector/ConversationSelector';
 import * as SelfSelector from '../module/selector/SelfSelector';
-import {QUERY_KEY} from '../route';
+import {QUERY_KEY, ROUTE} from '../route';
 import * as AccentColor from '../util/AccentColor';
 
 type Props = React.HTMLProps<HTMLDivElement>;
@@ -92,7 +93,6 @@ const ConversationJoinComponent = ({
   const [showEntropyForm, setShowEntropyForm] = useState(false);
   const [isTemporaryGuest, setIsTemporaryGuest] = useState<boolean>(false);
   const isEntropyRequired = Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY;
-
   const isFetching = isFetchingAuth || isFetchingConversation || conversationInfoFetching;
 
   const isWirePublicInstance = Config.getConfig().BRAND_NAME === 'Wire';
@@ -209,6 +209,7 @@ const ConversationJoinComponent = ({
   };
 
   const checkNameValidity = async (event: React.FormEvent) => {
+    setIsTemporaryGuest(true);
     event.preventDefault();
     if (!nameInput.current) {
       return;
@@ -235,7 +236,7 @@ const ConversationJoinComponent = ({
   };
 
   if (!isValidLink) {
-    return <ConversationJoinInvalid />;
+    return <Navigate to={ROUTE.CONVERSATION_JOIN_INVALID} replace />;
   }
 
   const isFullConversation =
@@ -297,10 +298,6 @@ const ConversationJoinComponent = ({
                   nameInput={nameInput}
                   onNameChange={onNameChange}
                   checkNameValidity={checkNameValidity}
-                  handleSubmit={async () => {
-                    setIsTemporaryGuest(true);
-                    await handleSubmit();
-                  }}
                   isSubmitingName={isSubmitingName}
                   isValidName={isValidName}
                   conversationError={conversationError}

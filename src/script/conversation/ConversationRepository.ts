@@ -280,6 +280,8 @@ export class ConversationRepository {
         : this.messageRepository.requestUserSendingPermission(conversation, shouldWarnLegalHold, consentType);
     });
 
+    this.connectionRepository.setDeleteConnectionRequestConversationHandler(this.deleteConnectionRequestConversation);
+
     this.logger = getLogger('ConversationRepository');
 
     this.event_mapper = new EventMapper();
@@ -570,12 +572,12 @@ export class ConversationRepository {
    * Will load all the conversations in memory
    * @returns all the conversations from backend merged with the locally stored conversations and loaded into memory
    */
-  public async loadConversations(): Promise<Conversation[]> {
+  public async loadConversations(connections: ConnectionEntity[]): Promise<Conversation[]> {
     const remoteConversations = await this.conversationService.getAllConversations().catch(error => {
       this.logger.error(`Failed to get all conversations from backend: ${error.message}`);
       return {found: []} as RemoteConversations;
     });
-    return this.loadRemoteConversations(remoteConversations);
+    return this.loadRemoteConversations(remoteConversations, connections);
   }
 
   /**
@@ -593,7 +595,9 @@ export class ConversationRepository {
         this.logger.error(`Failed to get all conversations from backend: ${error.message}`);
         return {found: [], failed: missingConversations} as RemoteConversations;
       });
-    return this.loadRemoteConversations(remoteConversations);
+
+    const connections = this.connectionState.connections();
+    return this.loadRemoteConversations(remoteConversations, connections);
   }
 
   /**
@@ -671,28 +675,89 @@ export class ConversationRepository {
     return {...remoteConversations, found: allConversations};
   }
 
+  private async filterDeletedConnectionRequests(
+    localConversations: ConversationDatabaseData[],
+    remoteConversations: RemoteConversations,
+    connections: ConnectionEntity[],
+  ): Promise<{localConversations: ConversationDatabaseData[]; remoteConversations: RemoteConversations}> {
+    //If there's any local conversation of type 3 (CONNECT), but the connection doesn't exist anymore (user was deleted),
+    // we delete the conversation and blacklist it so it's never refetched from the backend
+
+    const deletedConnectionRequests = [] as ConversationDatabaseData[];
+    const filteredLocalConversations = [] as ConversationDatabaseData[];
+
+    for (const conversation of localConversations) {
+      const {type, qualified_id, id, domain} = conversation;
+
+      const isDeletedConnectionRequest =
+        type === CONVERSATION_TYPE.CONNECT &&
+        !connections.find(connection => matchQualifiedIds(connection.conversationId, qualified_id || {id, domain}));
+
+      if (isDeletedConnectionRequest) {
+        deletedConnectionRequests.push(conversation);
+      } else {
+        filteredLocalConversations.push(conversation);
+      }
+    }
+
+    const filteredRemoteConversations = remoteConversations.found?.filter(
+      remoteConversation =>
+        !deletedConnectionRequests.find(({qualified_id, id, domain}) =>
+          matchQualifiedIds(qualified_id || {id, domain}, remoteConversation.qualified_id),
+        ),
+    );
+
+    await Promise.all(
+      deletedConnectionRequests.map(async ({id, domain, qualified_id}) => {
+        const qualifiedId = qualified_id || {id, domain};
+        await this.conversationService.deleteConversationFromDb(qualifiedId.id);
+        await this.blacklistConversation(qualifiedId);
+      }),
+    );
+
+    return {
+      localConversations: filteredLocalConversations,
+      remoteConversations: {...remoteConversations, found: filteredRemoteConversations},
+    };
+  }
+
+  private async filterLoadedConversations(
+    localConversations: ConversationDatabaseData[],
+    remoteConversations: RemoteConversations,
+    connections: ConnectionEntity[],
+  ): Promise<{localConversations: ConversationDatabaseData[]; remoteConversations: RemoteConversations}> {
+    const filteredAbandonedRemoteConversations = await this.filterAbandonedProteus1to1Conversations(
+      remoteConversations,
+      localConversations,
+    );
+
+    return this.filterDeletedConnectionRequests(localConversations, filteredAbandonedRemoteConversations, connections);
+  }
+
   /**
    * Will append the new conversations from backend to the locally stored conversations in memory
    * @param remoteConversations new conversations fetched from backend
    * @returns the new conversations from backend merged with the locally stored conversations
    */
-  private async loadRemoteConversations(remoteConversations: RemoteConversations): Promise<Conversation[]> {
+  private async loadRemoteConversations(
+    remoteConversations: RemoteConversations,
+    connections: ConnectionEntity[],
+  ): Promise<Conversation[]> {
     const localConversations = await this.conversationService.loadConversationStatesFromDb<ConversationDatabaseData>();
 
     let conversationsData: any[];
 
+    const {localConversations: filteredLocalConversations, remoteConversations: filteredRemoteConversations} =
+      await this.filterLoadedConversations(localConversations, remoteConversations, connections);
+
     if (!remoteConversations.found?.length) {
-      conversationsData = localConversations;
+      conversationsData = filteredLocalConversations;
     } else {
-      const filteredRemoteConversations = await this.filterAbandonedProteus1to1Conversations(
-        remoteConversations,
-        localConversations,
-      );
-      const data = ConversationMapper.mergeConversations(localConversations, filteredRemoteConversations);
+      const data = ConversationMapper.mergeConversations(filteredLocalConversations, filteredRemoteConversations);
       conversationsData = (await this.conversationService.saveConversationsInDb(data)) as any[];
     }
 
-    const allConversationEntities = this.mapConversations(conversationsData);
+    const allConversationEntities = conversationsData.length ? this.mapConversations(conversationsData) : [];
     const newConversationEntities = allConversationEntities.filter(
       allConversations =>
         !this.conversationState
@@ -1865,10 +1930,24 @@ export class ConversationRepository {
       // If there's local mls conversation, we want to use it
       const localMLSConversation = this.conversationState.findMLS1to1Conversation(otherUserId);
 
-      // If both users support mls or mls conversation is already known, we use it
+      // If mls conversation is already known, we use it
       // we never go back to proteus conversation, even if one of the users do not support mls anymore
       // (e.g. due to the change of supported protocols in team configuration)
-      if (protocol === ConversationProtocol.MLS || localMLSConversation) {
+      if (localMLSConversation) {
+        return this.initMLS1to1Conversation(otherUserId, isMLSSupportedByTheOtherUser);
+      }
+
+      // If both users support mls, we will initialise mls 1:1 conversation (unless it's a proteus 1:1 conversation with a user that has been deleted)
+      if (protocol === ConversationProtocol.MLS) {
+        // If the other user is deleted on backend, just open a proteus conversation and do not try to migrate it to mls.
+        if (isProteusConversation(conversation)) {
+          const otherUser = await this.userRepository.getUserById(otherUserId);
+          if (otherUser.isDeleted) {
+            this.logger.warn(`User ${otherUserId.id} is deleted, opening proteus conversation`);
+            return conversation;
+          }
+        }
+
         return this.initMLS1to1Conversation(otherUserId, isMLSSupportedByTheOtherUser);
       }
 
@@ -1978,7 +2057,18 @@ export class ConversationRepository {
   async syncDeletedConversations() {
     const conversationIds = this.conversationState.conversations().map(conversation => conversation.qualifiedId);
     const {not_found = []} = await this.conversationService.getConversationByIds(conversationIds);
-    not_found.forEach(deletedConversationId => this.deleteConversationLocally(deletedConversationId, true));
+    for (const inccessibleConversation of not_found) {
+      try {
+        // a conversation marked `not_found` could be either non existing on backend or it could mean the self user is not part of it
+        // We need to check if the conversation exists on backend
+        await this.conversationService.getConversationById(inccessibleConversation);
+      } catch (error) {
+        if (error instanceof ConversationError && error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND) {
+          // Only if the conversation triggers a not found error, we delete it locally
+          await this.deleteConversationLocally(inccessibleConversation, true);
+        }
+      }
+    }
   }
 
   private readonly onUserSupportedProtocolsUpdated = async ({user}: {user: User}) => {
@@ -2292,6 +2382,18 @@ export class ConversationRepository {
       })
       .catch(error => this.handleAddToConversationError(error, conversationEntity, [{domain: '', id: serviceId}]));
   }
+
+  private deleteConnectionRequestConversation = async (userId: QualifiedId) => {
+    const connection = this.connectionState
+      .connections()
+      .find(connection => matchQualifiedIds(connection.userId, userId));
+
+    if (!connection) {
+      return;
+    }
+
+    return this.deleteConversationLocally(connection.conversationId, true);
+  };
 
   private handleAddToConversationError(error: BackendError, conversationEntity: Conversation, userIds: QualifiedId[]) {
     switch (error.label) {
@@ -3094,15 +3196,17 @@ export class ConversationRepository {
 
       case CONVERSATION_EVENT.MEMBER_LEAVE:
         if (eventJson.data.reason === MemberLeaveReason.USER_DELETED) {
-          eventJson.data.qualified_user_ids?.forEach(qualifiedUserId => {
-            const user = this.userState.users().find(user => matchQualifiedIds(user.qualifiedId, qualifiedUserId));
-            if (!user?.teamId) {
-              return;
-            }
-
-            void this.teamMemberLeave(user?.teamId, user?.qualifiedId, new Date(eventJson.time).getTime());
-          });
-          return;
+          const deletedUsers = eventJson.data.qualified_user_ids ?? [];
+          return Promise.all(
+            deletedUsers.map(async qualifiedUserId => {
+              const user = this.userState.users().find(user => matchQualifiedIds(user.qualifiedId, qualifiedUserId));
+              return !user?.teamId
+                ? // If we are in the team, we display the team member removed from the team message
+                  this.onMemberLeave(conversationEntity, eventJson)
+                : // in case we are not in a team, we just display the message that says a user left the conversation
+                  this.teamMemberLeave(user.teamId, user.qualifiedId, new Date(eventJson.time).getTime());
+            }),
+          );
         }
         return this.onMemberLeave(conversationEntity, eventJson);
 

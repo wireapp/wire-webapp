@@ -17,8 +17,13 @@
  *
  */
 
+import {amplify} from 'amplify';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {ModalOptions, PrimaryModalType} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
+import {Config} from 'src/script/Config';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 
 const hideSecondaryBtn = {hideSecondary: true};
@@ -32,6 +37,7 @@ export enum ModalType {
   CERTIFICATE_RENEWAL = 'certificate_renewal',
   SELF_CERTIFICATE_REVOKED = 'self_certificate_revoked',
   SNOOZE_REMINDER = 'snooze_reminder',
+  DOWNLOAD_PATH_CHANGED = 'download_path_changed',
 }
 
 interface GetModalOptions {
@@ -204,6 +210,26 @@ export const getModalOptions = ({
         secondaryAction: {
           action: secondaryActionFn,
           text: t('acme.done.button.secondary'),
+        },
+      };
+      modalType = PrimaryModal.type.ACKNOWLEDGE;
+      break;
+
+    case ModalType.DOWNLOAD_PATH_CHANGED:
+      options = {
+        hideCloseBtn: true,
+        preventClose: true,
+        text: {
+          htmlMessage: t('featureConfigChangeModalDownloadPathEnabled'),
+
+          title: t('featureConfigChangeModalDownloadPathHeadline', {
+            brandName: Config.getConfig().BRAND_NAME,
+          }),
+        },
+        primaryAction: {
+          action: () => {
+            amplify.publish(WebAppEvents.LIFECYCLE.RESTART);
+          },
         },
       };
       modalType = PrimaryModal.type.ACKNOWLEDGE;

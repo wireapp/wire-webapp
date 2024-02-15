@@ -22,6 +22,8 @@ import {forwardRef, useCallback, useEffect, useMemo, useState} from 'react';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/';
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
+import {HideIcon} from '@wireapp/react-ui-kit';
+
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Icon} from 'Components/Icon';
 import {ConversationProtocolDetails} from 'Components/panel/ConversationProtocolDetails/ConversationProtocolDetails';
@@ -268,10 +270,10 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
     }, [activeConversation, conversationRepository]);
 
     useEffect(() => {
-      if (isTeam && isSingleUserMode) {
-        teamRepository.updateTeamMembersByIds(team, [firstParticipant.id], true);
+      if (team.id && isSingleUserMode) {
+        teamRepository.updateTeamMembersByIds(team.id, [firstParticipant.id], true);
       }
-    }, [firstParticipant, isSingleUserMode, isTeam, team, teamRepository]);
+    }, [firstParticipant, isSingleUserMode, team, teamRepository]);
 
     useEffect(() => {
       getService();
@@ -436,20 +438,20 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
               />
 
               {isSingleUserMode && (
-                <div className="conversation-details__read-receipts" data-uie-name="label-1to1-read-receipts">
-                  <strong className="panel__info-text panel__info-text--head panel__info-text--margin-bottom">
-                    {hasReceiptsEnabled
-                      ? t('conversationDetails1to1ReceiptsHeadEnabled')
-                      : t('conversationDetails1to1ReceiptsHeadDisabled')}
-                  </strong>
+                <div className="panel__info-item" data-uie-name="label-1to1-read-receipts">
+                  <span className="panel__info-item__icon">{hasReceiptsEnabled ? <Icon.Read /> : <HideIcon />}</span>
 
-                  <p className="panel__info-text panel__info-text--margin-bottom">
-                    {t('conversationDetails1to1ReceiptsFirst')}
-                  </p>
-
-                  <p className="panel__info-text panel__info-text--margin">
-                    {t('conversationDetails1to1ReceiptsSecond')}
-                  </p>
+                  <span>
+                    <span>
+                      <p>
+                        {hasReceiptsEnabled
+                          ? t('conversationDetails1to1ReceiptsHeadEnabled')
+                          : t('conversationDetails1to1ReceiptsHeadDisabled')}
+                      </p>
+                    </span>
+                    <p className="panel__action-item__status">{t('conversationDetails1to1ReceiptsFirst')}</p>
+                    <p className="panel__action-item__status">{t('conversationDetails1to1ReceiptsSecond')}</p>
+                  </span>
                 </div>
               )}
 

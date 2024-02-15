@@ -21,6 +21,7 @@ import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {ConsentType} from '@wireapp/api-client/lib/self/';
 import {AudioPreference, NotificationPreference, WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
+import jquery from 'jquery';
 import ko from 'knockout';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -185,7 +186,7 @@ export class PropertiesRepository {
     return this.propertiesService
       .getPropertiesByKey(PropertiesRepository.CONFIG.WEBAPP_ACCOUNT_SETTINGS)
       .then(properties => {
-        $.extend(true, this.properties, properties);
+        jquery.extend(true, this.properties, properties);
       })
       .catch(() => {
         this.logger.warn(

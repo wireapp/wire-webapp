@@ -4,12 +4,9 @@
     "jasmine": true
   },
   "globals": {
-    "amplify": true,
-    "ko": true,
-    "sinon": true,
-    "wire": true,
-    "z": true,
-    "RTCAudioSource": true
+    "React": "readonly",
+    "JSX": "readonly",
+    "amplify": "readonly"
   },
   "ignorePatterns": [
     ".git/",
@@ -42,7 +39,6 @@
     "@typescript-eslint/no-floating-promises": "warn",
     "@typescript-eslint/typedef": "off",
     "no-dupe-class-members": "off",
-    "no-undef": "off",
     "no-unsanitized/property": "off",
     "prefer-promise-reject-errors": "off",
     "valid-jsdoc": "off",

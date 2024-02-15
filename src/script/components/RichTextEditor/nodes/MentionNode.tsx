@@ -87,7 +87,7 @@ export class MentionNode extends DecoratorNode<JSX.Element> {
         }
         return {
           conversion: convertElement,
-          priority: 0,
+          priority: 0 as const,
         };
       },
     };

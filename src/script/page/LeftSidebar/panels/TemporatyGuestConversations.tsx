@@ -81,7 +81,7 @@ const TemporaryGuestConversations: React.FC<TemporaryGuestConversations> = ({
               data-uie-value={conversation.display_name()}
               call={call}
               conversation={conversation}
-              temporaryUserStyle
+              isTemporaryUser
               isFullUi
               isSelfVerified={false}
               callActions={callingViewModel.callActions}

@@ -25,7 +25,6 @@ import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api
 import {StatusCodes} from 'http-status-codes';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
-import {Navigate} from 'react-router';
 import {useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
 
@@ -111,7 +110,6 @@ const LoginComponent = ({
   const [conversationKey, setConversationKey] = useState<string | null>(null);
   const [conversationSubmitData, setConversationSubmitData] = useState<Partial<LoginData> | null>(null);
   const [isLinkPasswordModalOpen, setIsLinkPasswordModalOpen] = useState<boolean>(false);
-  const [isValidLink, setIsValidLink] = useState(true);
   const [validationErrors, setValidationErrors] = useState<Error[]>([]);
 
   const [twoFactorSubmitError, setTwoFactorSubmitError] = useState<string | Error>('');
@@ -163,14 +161,11 @@ const LoginComponent = ({
     if (keyAndCodeExistent) {
       setConversationCode(queryConversationCode);
       setConversationKey(queryConversationKey);
-      setIsValidLink(true);
       doCheckConversationCode(queryConversationKey, queryConversationCode).catch(error => {
         logger.warn('Invalid conversation code', error);
-        setIsValidLink(false);
       });
       doGetConversationInfoByCode(queryConversationKey, queryConversationCode).catch(error => {
         logger.warn('Failed to fetch conversation info', error);
-        setIsValidLink(false);
       });
     }
   }, []);
@@ -361,7 +356,6 @@ const LoginComponent = ({
         <EntropyContainer onSetEntropy={storeEntropy} />
       ) : (
         <Container centerText verticalCenter style={{width: '100%'}}>
-          {!isValidLink && <Navigate to={ROUTE.CONVERSATION_JOIN_INVALID} replace />}
           {!embedded && <AppAlreadyOpen />}
           {isLinkPasswordModalOpen && (
             <JoinGuestLinkPasswordModal

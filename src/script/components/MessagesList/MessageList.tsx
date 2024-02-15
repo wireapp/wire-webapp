@@ -72,6 +72,7 @@ interface MessagesListParams {
   isLastReceivedMessage: (messageEntity: MessageEntity, conversationEntity: ConversationEntity) => boolean;
   isMsgElementsFocusable: boolean;
   setMsgElementsFocusable: (isMsgElementsFocusable: boolean) => void;
+  isRightSidebarOpen?: boolean;
 }
 
 export const MessagesList: FC<MessagesListParams> = ({
@@ -95,6 +96,7 @@ export const MessagesList: FC<MessagesListParams> = ({
   isLastReceivedMessage,
   isMsgElementsFocusable,
   setMsgElementsFocusable,
+  isRightSidebarOpen = false,
 }) => {
   const {
     messages: allMessages,
@@ -118,7 +120,7 @@ export const MessagesList: FC<MessagesListParams> = ({
 
   const messageListRef = useRef<HTMLDivElement | null>(null);
   const [loaded, setLoaded] = useState(false);
-  const [focusedMessage, setFocusedMessage] = useState<string | undefined>(initialMessage?.id);
+  const [highlightedMessage, setHighlightedMessage] = useState<string | undefined>(initialMessage?.id);
   const conversationLastReadTimestamp = useRef(conversation.last_read_timestamp());
 
   const filteredMessages = filterMessages(allMessages);
@@ -267,7 +269,12 @@ export const MessagesList: FC<MessagesListParams> = ({
   };
 
   return (
-    <FadingScrollbar ref={messageListRef} id="message-list" className="message-list" tabIndex={TabIndex.UNFOCUSABLE}>
+    <FadingScrollbar
+      ref={messageListRef}
+      id="message-list"
+      className={cx('message-list', {'is-right-panel-open': isRightSidebarOpen})}
+      tabIndex={TabIndex.UNFOCUSABLE}
+    >
       <div ref={setMessageContainer} className={cx('messages', {'flex-center': verticallyCenterMessage()})}>
         {groupedMessages.map(group => {
           if (isMarker(group)) {
@@ -277,12 +284,15 @@ export const MessagesList: FC<MessagesListParams> = ({
           }
           const {messages, firstMessageTimestamp} = group;
 
-          return messages.map((message, index) => {
+          return messages.map(message => {
             const isLastDeliveredMessage = lastDeliveredMessage?.id === message.id;
 
             const visibleCallback = getVisibleCallback(conversation, message);
 
             const key = `${message.id || 'message'}-${message.timestamp()}`;
+
+            const isHighlighted = !!highlightedMessage && highlightedMessage === message.id;
+            const isFocused = !!focusedId && focusedId === message.id;
 
             return (
               <Message
@@ -294,7 +304,7 @@ export const MessagesList: FC<MessagesListParams> = ({
                 conversation={conversation}
                 hasReadReceiptsTurnedOn={conversationRepository.expectReadReceipt(conversation)}
                 isLastDeliveredMessage={isLastDeliveredMessage}
-                isMarked={!!focusedMessage && focusedMessage === message.id}
+                isHighlighted={isHighlighted}
                 scrollTo={scrollToElement}
                 isSelfTemporaryGuest={selfUser.isTemporaryGuest()}
                 messageRepository={messageRepository}
@@ -308,8 +318,8 @@ export const MessagesList: FC<MessagesListParams> = ({
                 onClickDetails={message => showMessageDetails(message)}
                 onClickResetSession={resetSession}
                 onClickTimestamp={async function (messageId: string) {
-                  setFocusedMessage(messageId);
-                  setTimeout(() => setFocusedMessage(undefined), 5000);
+                  setHighlightedMessage(messageId);
+                  setTimeout(() => setHighlightedMessage(undefined), 5000);
                   const messageIsLoaded = conversation.getMessage(messageId);
 
                   if (!messageIsLoaded) {
@@ -320,7 +330,7 @@ export const MessagesList: FC<MessagesListParams> = ({
                 }}
                 selfId={selfUser.qualifiedId}
                 shouldShowInvitePeople={shouldShowInvitePeople}
-                isMessageFocused={focusedId === message.id}
+                isFocused={isFocused}
                 handleFocus={setFocusedId}
                 handleArrowKeyDown={handleKeyDown}
                 isMsgElementsFocusable={isMsgElementsFocusable}

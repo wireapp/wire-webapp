@@ -21,7 +21,6 @@ import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import {container} from 'tsyringe';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {Config} from 'src/script/Config';
 import {Core} from 'src/script/service/CoreSingleton';
 import {UserState} from 'src/script/user/UserState';
 import {getCertificateDetails} from 'Util/certificateDetails';
@@ -95,9 +94,8 @@ describe('E2EIHandler', () => {
     // Clear all mocks before each test
     jest.clearAllMocks();
 
-    // Mock the Config service to return true for ENABLE_E2EI
+    // Mock the Config to enable e2eIdentity
     (util.supportsMLS as jest.Mock).mockReturnValue(true);
-    Config.getConfig = jest.fn().mockReturnValue({FEATURE: {ENABLE_E2EI: true}});
 
     jest.spyOn(PrimaryModal, 'show');
 

@@ -21,13 +21,11 @@ import {KeyAuth} from '@wireapp/core/lib/messagingProtocols/mls';
 import {UserManager, User, UserManagerSettings, WebStorageStateStore} from 'oidc-client-ts';
 
 import {clearKeysStartingWith} from 'Util/localStorage';
-import {Logger, getLogger} from 'Util/Logger';
 
 import {EncryptedStorage} from './OauthEncryptedStore';
 
 export class OIDCService {
   private readonly userManager: UserManager;
-  private readonly logger: Logger;
 
   constructor(secretKey: Uint8Array, targetURL: string) {
     // Extract the clientId from the targetURL
@@ -61,7 +59,6 @@ export class OIDCService {
     };
 
     this.userManager = new UserManager(dexioConfig);
-    this.logger = getLogger('OIDC Service');
   }
 
   public async authenticate(keyAuth: KeyAuth, challengeUrl: string): Promise<void> {
@@ -101,12 +98,7 @@ export class OIDCService {
     return this.userManager.clearStaleState();
   }
 
-  public async handleSilentAuthentication(): Promise<User | null> {
-    try {
-      return this.userManager.signinSilent();
-    } catch (error) {
-      this.logger.log('Silent authentication with refresh token failed', error);
-    }
-    return null;
+  public async handleSilentAuthentication() {
+    return this.userManager.signinSilent();
   }
 }
