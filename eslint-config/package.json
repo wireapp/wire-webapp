@@ -12,7 +12,7 @@
   "dependencies": {
     "@types/eslint": "^8",
     "@types/prettier": "^3",
-    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.1",
     "@typescript-eslint/parser": "^7.0.1",
     "eslint": "^8",
     "eslint-config-prettier": "^9",
