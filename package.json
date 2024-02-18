@@ -126,7 +126,7 @@
     "os-browserify": "0.3.0",
     "path-browserify": "1.0.1",
     "postcss": "8.4.35",
-    "postcss-import": "^16.0.0",
+    "postcss-import": "^16.0.1",
     "postcss-less": "6.0.0",
     "postcss-loader": "^8.1.0",
     "postcss-preset-env": "^9.3.0",
