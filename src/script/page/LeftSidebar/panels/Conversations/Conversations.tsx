@@ -80,6 +80,7 @@ type ConversationsProps = {
 export enum ConversationViewStyle {
   RECENT,
   FOLDER,
+  FAVORITES,
 }
 
 const Conversations: React.FC<ConversationsProps> = ({
@@ -113,7 +114,16 @@ const Conversations: React.FC<ConversationsProps> = ({
     'visibleConversations',
   ]);
 
+  const {conversationLabelRepository} = conversationRepository;
+
+  const favoriteConversations = conversationLabelRepository.getFavorites(conversations);
+
   const totalUnreadConversations = unreadConversations.length;
+
+  const totalUnreadFavoriteConversations = favoriteConversations.filter(favoriteConversation =>
+    favoriteConversation.hasUnread(),
+  ).length;
+
   const totalUnreadArchivedConversations = archivedConversations.filter(conversation =>
     conversation.hasUnread(),
   ).length;
@@ -134,11 +144,10 @@ const Conversations: React.FC<ConversationsProps> = ({
 
   const isRecentViewStyle = viewStyle === ConversationViewStyle.RECENT;
   const isFolderViewStyle = viewStyle === ConversationViewStyle.FOLDER;
+  const isFavoritesViewStyle = viewStyle === ConversationViewStyle.FAVORITES;
 
   const hasNoConversations = conversations.length + connectRequests.length === 0;
   const {isOpen: isFolderOpen, openFolder} = useFolderState();
-
-  const {conversationLabelRepository} = conversationRepository;
 
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
   const {close: closeRightSidebar} = useAppMainState(state => state.rightSidebar);
@@ -243,13 +252,13 @@ const Conversations: React.FC<ConversationsProps> = ({
       <div
         role="tablist"
         aria-label={t('accessibility.headings.sidebar')}
-        aria-owns="tab-1 tab-2 tab-3"
+        aria-owns="tab-1 tab-2 tab-3 tab-4 tab-5"
         className="conversations-sidebar-list"
       >
         <div className="conversations-sidebar-title">{t('videoCallOverlayConversations')}</div>
 
         <button
-          id="tab-2"
+          id="tab-1"
           type="button"
           role="tab"
           className={cx(`conversations-sidebar-btn`, {active: isRecentViewStyle})}
@@ -265,6 +274,26 @@ const Conversations: React.FC<ConversationsProps> = ({
           </span>
           {totalUnreadConversations > 0 && (
             <span className="conversations-sidebar-btn--badge">{unreadConversations.length}</span>
+          )}
+        </button>
+
+        <button
+          id="tab-2"
+          type="button"
+          role="tab"
+          className={cx(`conversations-sidebar-btn`, {active: isFavoritesViewStyle})}
+          onClick={() => setViewStyle(ConversationViewStyle.FAVORITES)}
+          title={t('conversationLabelFavorites')}
+          data-uie-name="go-favorites-view"
+          data-uie-status={isFavoritesViewStyle ? 'active' : 'inactive'}
+          aria-selected={isFavoritesViewStyle}
+        >
+          <span className="conversations-sidebar-btn--text-wrapper">
+            <Icon.ConversationsOutline />
+            <span className="conversations-sidebar-btn--text">{t('conversationLabelFavorites')}</span>
+          </span>
+          {totalUnreadFavoriteConversations > 0 && (
+            <span className="conversations-sidebar-btn--badge">{totalUnreadFavoriteConversations}</span>
           )}
         </button>
 
@@ -290,6 +319,7 @@ const Conversations: React.FC<ConversationsProps> = ({
 
         {archivedConversations.length > 0 && (
           <button
+            id="tab-4"
             type="button"
             className="conversations-sidebar-btn"
             data-uie-name="go-archive"
@@ -307,7 +337,7 @@ const Conversations: React.FC<ConversationsProps> = ({
         )}
         <div className="conversations-sidebar-title">{t('conversationFooterContacts')}</div>
         <button
-          id="tab-1"
+          id="tab-5"
           type="button"
           className="conversations-sidebar-btn"
           onClick={() => switchList(ListState.START_UI)}
@@ -352,6 +382,18 @@ const Conversations: React.FC<ConversationsProps> = ({
   );
 
   const {currentFocus, handleKeyDown, resetConversationFocus} = useConversationFocus(conversations);
+
+  function getViewStyleConversations() {
+    if (viewStyle === ConversationViewStyle.FOLDER || viewStyle === ConversationViewStyle.RECENT) {
+      return filteredConversations;
+    }
+
+    if (viewStyle === ConversationViewStyle.FAVORITES) {
+      return favoriteConversations;
+    }
+
+    return [];
+  }
 
   return (
     <div className="conversations-wrapper">
@@ -408,7 +450,7 @@ const Conversations: React.FC<ConversationsProps> = ({
             <ConversationsList
               connectRequests={connectRequests}
               callState={callState}
-              conversations={filteredConversations}
+              conversations={getViewStyleConversations()}
               viewStyle={viewStyle}
               listViewModel={listViewModel}
               conversationState={conversationState}

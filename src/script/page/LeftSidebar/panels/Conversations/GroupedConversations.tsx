@@ -33,7 +33,6 @@ import {
   ConversationLabel,
   ConversationLabelRepository,
   createLabel,
-  createLabelFavorites,
   createLabelGroups,
   createLabelPeople,
 } from '../../../../conversation/ConversationLabelRepository';
@@ -85,7 +84,6 @@ const GroupedConversations: React.FC<GroupedConversationsProps> = ({
 
   useLabels(conversationLabelRepository);
 
-  const favorites = conversationLabelRepository.getFavorites(conversations);
   const groups = conversationLabelRepository.getGroupsWithoutLabel(conversations);
   const contacts = conversationLabelRepository.getContactsWithoutLabel(conversations);
   const custom = conversationLabelRepository
@@ -94,7 +92,6 @@ const GroupedConversations: React.FC<GroupedConversationsProps> = ({
     .filter(({conversations}) => !!conversations().length);
 
   const folders = [
-    ...(favorites.length > 0 ? [createLabelFavorites(favorites)] : []),
     ...(groups.length > 0 ? [createLabelGroups(groups)] : []),
     ...(contacts.length > 0 ? [createLabelPeople(contacts)] : []),
     ...custom,
