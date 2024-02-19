@@ -28,7 +28,7 @@ import {BackendError, BackendErrorLabel, StatusCode} from '@wireapp/api-client/l
 import {randomUUID} from 'crypto';
 
 import {APIClient} from '@wireapp/api-client';
-import {CoreCrypto, DecryptedMessage} from '@wireapp/core-crypto';
+import {CommitBundle, CoreCrypto, DecryptedMessage} from '@wireapp/core-crypto';
 
 import {CoreCryptoMLSError} from './CoreCryptoMLSError';
 import {MLSService} from './MLSService';
@@ -59,6 +59,9 @@ const createMLSService = async () => {
     commitPendingProposals: jest.fn(),
     registerCallbacks: jest.fn(),
     e2eiIsEnabled: jest.fn(() => false),
+    clearPendingGroupFromExternalCommit: async () => {},
+    clearPendingCommit: async () => {},
+    commitAccepted: jest.fn(),
   } as unknown as CoreCrypto;
 
   const mockedDb = await openDB('core-test-db');
@@ -262,6 +265,51 @@ describe('MLSService', () => {
       expect(recurringTaskScheduler.cancelTask).toHaveBeenCalledWith(expect.stringContaining(groupId));
       expect(TaskScheduler.cancelTask).toHaveBeenCalledWith(expect.stringContaining(groupId));
       expect(coreCrypto.wipeConversation).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('commitPendingProposals', () => {
+    it('commits pending proposals and uploads received commit bundle to backend', async () => {
+      const [mlsService, {coreCrypto: mockCoreCrypto, apiClient}] = await createMLSService();
+
+      const mockGroupId = 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm3OQFc=';
+
+      jest.spyOn(mockCoreCrypto, 'commitPendingProposals').mockResolvedValueOnce({
+        commit: new Uint8Array(),
+        groupInfo: {payload: new Uint8Array()},
+      } as unknown as CommitBundle);
+
+      jest.spyOn(apiClient.api.conversation, 'postMlsCommitBundle').mockResolvedValueOnce({events: [], time: ''});
+
+      await mlsService.commitPendingProposals(mockGroupId);
+
+      expect(mockCoreCrypto.commitPendingProposals).toHaveBeenCalled();
+      expect(apiClient.api.conversation.postMlsCommitBundle).toHaveBeenCalled();
+    });
+
+    it('clears pending commit and retries when failed committing pending proposals', async () => {
+      const [mlsService, {coreCrypto: mockCoreCrypto, apiClient}] = await createMLSService();
+
+      const mockGroupId = 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm3OQFc=';
+
+      jest.spyOn(mockCoreCrypto, 'commitPendingProposals').mockRejectedValueOnce(new Error('mocked error'));
+
+      jest.spyOn(mockCoreCrypto, 'commitPendingProposals').mockResolvedValueOnce({
+        commit: new Uint8Array(),
+        groupInfo: {payload: new Uint8Array()},
+      } as unknown as CommitBundle);
+
+      jest.spyOn(apiClient.api.conversation, 'postMlsCommitBundle').mockResolvedValueOnce({events: [], time: ''});
+
+      jest.spyOn(mockCoreCrypto, 'clearPendingCommit');
+      jest.spyOn(mockCoreCrypto, 'clearPendingGroupFromExternalCommit');
+
+      await mlsService.commitPendingProposals(mockGroupId);
+
+      expect(mockCoreCrypto.clearPendingCommit).toHaveBeenCalledTimes(1);
+      expect(mockCoreCrypto.clearPendingGroupFromExternalCommit).toHaveBeenCalledTimes(1);
+      expect(mockCoreCrypto.commitPendingProposals).toHaveBeenCalledTimes(2);
+      expect(apiClient.api.conversation.postMlsCommitBundle).toHaveBeenCalledTimes(1);
     });
   });
 
