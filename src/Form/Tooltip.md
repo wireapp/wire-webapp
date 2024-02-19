@@ -11,9 +11,13 @@ import {Form, Tooltip, Input, Button} from '@wireapp/react-ui-kit';
       event.preventDefault();
     }}
   >
-    <Tooltip body="This is a tooltip">
-      <Button>Tooltip on top</Button>
-    </Tooltip>
+    <Button>
+      <Tooltip body="This is a tooltip" selector="#rsg-root">
+        Tooltip on top
+      </Tooltip>
+    </Button>
+
+    <p>If You want to test tooltip bottom scroll this button to top of the page :)</p>
   </Form>
 </Fragment>;
 ```
