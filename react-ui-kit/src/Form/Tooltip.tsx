@@ -25,38 +25,49 @@ import {createPortal} from 'react-dom';
 import {Theme} from '../Layout';
 import {filterProps} from '../util';
 
-const paddingTop = 6;
+const paddingDistance = 8;
 
 const tooltipStyle: (theme: Theme) => CSSObject = theme => ({
-  position: 'absolute',
+  position: 'fixed',
   zIndex: '99999',
   maxWidth: '300px',
   filter: 'drop-shadow(1px 2px 6px rgba(0, 0, 0, 0.3))',
   borderRadius: '4px',
+
+  "&[data-position='top']": {
+    paddingBottom: `${paddingDistance}px`,
+
+    '.tooltip-arrow': {
+      borderTop: `10px solid ${theme.Tooltip.backgroundColor}`,
+      bottom: 0,
+    },
+  },
+  "&[data-position='bottom']": {
+    paddingTop: `${paddingDistance}px`,
+
+    '.tooltip-arrow': {
+      borderBottom: `10px solid ${theme.Tooltip.backgroundColor}`,
+      top: 0,
+    },
+  },
+
   '.tooltip-content': {
     color: theme.Tooltip.color,
     backgroundColor: theme.Tooltip.backgroundColor,
+    borderRadius: '4px',
     fontSize: '12px',
     lineHeight: '14px',
     fontWeight: 400,
-    padding: `${paddingTop}px 8px`,
+    padding: `${paddingDistance}px 8px`,
     textAlign: 'center',
   },
+
   '.tooltip-arrow': {
     width: 0,
     height: 0,
-    borderLeft: '6px solid transparent',
-    borderRight: '6px solid transparent',
+    borderLeft: '8px solid transparent',
+    borderRight: '8px solid transparent',
     position: 'absolute',
-
-    "&[data-position='top']": {
-      borderTop: `10px solid ${theme.Tooltip.backgroundColor}`,
-      bottom: '-6px',
-    },
-    "&[data-position='bottom']": {
-      borderBottom: `10px solid ${theme.Tooltip.backgroundColor}`,
-      top: '-6px',
-    },
   },
 });
 
@@ -79,16 +90,16 @@ const PortalComponent = ({children, bounding, selector = '#wire-app'}: PortalPro
       return;
     }
 
-    const isTouchingTopEdge = bounding.y <= element.clientHeight + paddingTop * 2;
+    const isTouchingTopEdge = bounding.y <= element.clientHeight + paddingDistance * 2;
     setIsTouchingTop(isTouchingTopEdge);
 
     const elementWidth = (element.scrollWidth - bounding.width) / 2;
     element.style.left = `${bounding.x - elementWidth}px`;
 
     if (isTouchingTopEdge) {
-      element.style.top = `${bounding.y + bounding.height + paddingTop}px`;
+      element.style.top = `${bounding.y + bounding.height}px`;
     } else {
-      element.style.top = `${bounding.y - element.clientHeight - paddingTop}px`;
+      element.style.top = `${bounding.y - element.clientHeight}px`;
     }
   };
 
@@ -104,12 +115,17 @@ const PortalComponent = ({children, bounding, selector = '#wire-app'}: PortalPro
     }
 
     const parentElementRect = parentElement.getBoundingClientRect();
-    element.style.left = `${parentElementRect.width / 2 - paddingTop}px`;
+    element.style.left = `${parentElementRect.width / 2 - paddingDistance}px`;
   };
 
   return createPortal(
-    <div ref={tooltipRef} className="tooltip" css={(theme: Theme) => tooltipStyle(theme)}>
-      <div ref={tooltipArrowRef} className="tooltip-arrow" data-position={isTouchingTop ? 'bottom' : 'top'} />
+    <div
+      ref={tooltipRef}
+      className="tooltip"
+      css={(theme: Theme) => tooltipStyle(theme)}
+      data-position={isTouchingTop ? 'bottom' : 'top'}
+    >
+      <div ref={tooltipArrowRef} className="tooltip-arrow" />
 
       <div className="tooltip-content" data-testid="tooltip-content">
         {children}
@@ -133,7 +149,7 @@ export const Tooltip = ({children, ...props}: TooltipProps) => {
   const {body, selector = '#wire-app'} = props;
 
   const onElementEnter = (event: MouseEvent | FocusEvent) => {
-    const boundingRect = (event.target as Element).getBoundingClientRect();
+    const boundingRect = event.currentTarget.getBoundingClientRect();
     setIsHovered(true);
     boundingRectRef.current = boundingRect;
   };
