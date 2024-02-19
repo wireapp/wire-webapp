@@ -47,10 +47,6 @@ export type HandlePendingProposalsParams = {
   eventTime: string;
 } & CommonMLS;
 
-export type CommitPendingProposalsParams = {
-  skipDelete?: boolean;
-} & CommonMLS;
-
 export interface CoreCryptoConfig {
   /**
    * path on the public server to the core crypto wasm file.

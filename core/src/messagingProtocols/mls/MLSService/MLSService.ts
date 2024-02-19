@@ -61,7 +61,7 @@ import {
   queueIncomingMLSMessage,
   withLockedMLSMessagesQueue,
 } from '../EventHandler/events/messageAdd';
-import {ClientId, CommitPendingProposalsParams, HandlePendingProposalsParams} from '../types';
+import {ClientId, HandlePendingProposalsParams} from '../types';
 import {generateMLSDeviceId} from '../utils/MLSId';
 
 //@todo: this function is temporary, we wait for the update from core-crypto side
@@ -373,8 +373,10 @@ export class MLSService extends TypedEventEmitter<Events> {
    * @param generateCommit The function that will generate a coreCrypto CommitBundle
    */
   private async processCommitAction(groupId: ConversationId, generateCommit: () => Promise<CommitBundle>) {
+    const groupIdStr = Encoder.toBase64(groupId).asString;
+
     return sendMessage<PostMlsMessageResponse>(async () => {
-      await this.commitProposals(groupId);
+      await this.commitPendingProposals(groupIdStr);
       const commitBundle = await generateCommit();
       return this.uploadCommitBundle(groupId, commitBundle, {regenerateCommitBundle: generateCommit});
     });
@@ -495,11 +497,6 @@ export class MLSService extends TypedEventEmitter<Events> {
         clientIds.map(id => this.textEncoder.encode(id)),
       ),
     );
-  }
-
-  private async commitProposals(groupId: ConversationId): Promise<void> {
-    const commitBundle = await this.coreCryptoClient.commitPendingProposals(groupId);
-    return commitBundle ? void (await this.uploadCommitBundle(groupId, commitBundle)) : undefined;
   }
 
   /**
@@ -690,7 +687,7 @@ export class MLSService extends TypedEventEmitter<Events> {
 
       await this.schedulePendingProposalsTask(groupId, firingDate);
     } else {
-      await this.commitPendingProposals({groupId, skipDelete: true});
+      await this.commitPendingProposals(groupId);
     }
   }
 
@@ -698,7 +695,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     await this.coreDatabase.put('pendingProposals', {groupId, firingDate}, groupId);
 
     TaskScheduler.addTask({
-      task: () => this.commitPendingProposals({groupId}),
+      task: () => this.commitPendingProposals(groupId),
       firingDate,
       key: this.createPendingProposalsTaskKey(groupId),
     });
@@ -717,17 +714,32 @@ export class MLSService extends TypedEventEmitter<Events> {
    * Commit all pending proposals for a given groupId
    *
    * @param groupId groupId of the conversation
-   * @param skipDelete if true, do not delete the pending proposals from the database
    */
-  public async commitPendingProposals({groupId, skipDelete = false}: CommitPendingProposalsParams) {
-    try {
-      await this.commitProposals(Decoder.fromBase64(groupId).asBytes);
+  public async commitPendingProposals(groupId: string, shouldRetry = true): Promise<void> {
+    const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
 
-      if (!skipDelete) {
-        await this.cancelPendingProposalsTask(groupId);
+    try {
+      const commitBundle = await this.coreCryptoClient.commitPendingProposals(groupIdBytes);
+
+      if (commitBundle) {
+        await this.uploadCommitBundle(groupIdBytes, commitBundle);
       }
+
+      await this.cancelPendingProposalsTask(groupId);
     } catch (error) {
-      this.logger.error(`Error while committing pending proposals for groupId ${groupId}`, error);
+      if (!shouldRetry) {
+        throw error;
+      }
+
+      this.logger.warn('Failed to commit proposals, clearing the pending commit and retrying', error);
+
+      // If we failed to commit the proposals, we need to clear the pending commit and retry
+      // this is to avoid a situation where we are stuck with pending proposals that we can't commit.
+      // If there's nothing to clear the methods might throw an error, which we can ignore.
+      await this.coreCryptoClient.clearPendingCommit(groupIdBytes).catch(() => undefined);
+      await this.coreCryptoClient.clearPendingGroupFromExternalCommit(groupIdBytes).catch(() => undefined);
+
+      return this.commitPendingProposals(groupId, false);
     }
   }
 
@@ -742,7 +754,7 @@ export class MLSService extends TypedEventEmitter<Events> {
       if (pendingProposals.length > 0) {
         pendingProposals.forEach(({groupId, firingDate}) =>
           TaskScheduler.addTask({
-            task: () => this.commitPendingProposals({groupId}),
+            task: () => this.commitPendingProposals(groupId),
             firingDate,
             key: this.createPendingProposalsTaskKey(groupId),
           }),
