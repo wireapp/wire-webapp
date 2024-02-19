@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.16.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.15.4...@wireapp/react-ui-kit@9.16.0) (2024-02-19)
+
+### Features
+
+* **react-ui-kit:** Add new star icon ([#5992](https://github.com/wireapp/wire-web-packages/issues/5992)) ([449c7c1](https://github.com/wireapp/wire-web-packages/commit/449c7c1316b8b5baa7f7d4f7795a36cfdb166135))
+
 ## [9.15.4](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.15.3...@wireapp/react-ui-kit@9.15.4) (2024-02-19)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
