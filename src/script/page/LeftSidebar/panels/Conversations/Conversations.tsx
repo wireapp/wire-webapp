@@ -24,7 +24,7 @@ import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {CircleCloseIcon, Input, SearchIcon} from '@wireapp/react-ui-kit';
+import {CircleCloseIcon, Input, SearchIcon, StarIcon} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {CallingCell} from 'Components/calling/CallingCell';
@@ -289,7 +289,7 @@ const Conversations: React.FC<ConversationsProps> = ({
           aria-selected={isFavoritesViewStyle}
         >
           <span className="conversations-sidebar-btn--text-wrapper">
-            <Icon.ConversationsOutline />
+            <StarIcon />
             <span className="conversations-sidebar-btn--text">{t('conversationLabelFavorites')}</span>
           </span>
           {totalUnreadFavoriteConversations > 0 && (
