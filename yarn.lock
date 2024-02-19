@@ -3613,10 +3613,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@remix-run/router@npm:1.15.0":
-  version: 1.15.0
-  resolution: "@remix-run/router@npm:1.15.0"
-  checksum: 0b5ea6b2e7bb7f3266005e033337a6fed29c458aa5ddc9a97a90ff19813ae6dfb4392871722d66d7e8db93a29760a8257830a9af58824b3a3363ed58e1e471d8
+"@remix-run/router@npm:1.15.1":
+  version: 1.15.1
+  resolution: "@remix-run/router@npm:1.15.1"
+  checksum: 5c404e64a95da7d2a06811c15e8b213cd1079bca546d8a78a1626264ac0b71361b9ce93269bda7209a938e5a22c25993902841f81240c58eb7ed0934e1781197
   languageName: node
   linkType: hard
 
@@ -4183,7 +4183,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:>=13.7.0, @types/node@npm:^20.11.17":
+"@types/node@npm:*, @types/node@npm:>=13.7.0":
   version: 20.11.17
   resolution: "@types/node@npm:20.11.17"
   dependencies:
@@ -4196,6 +4196,15 @@ __metadata:
   version: 16.9.1
   resolution: "@types/node@npm:16.9.1"
   checksum: 41afcf183a22d59323a0199dd7e0f46591247f45fc08a4434edb26d56dc279ae4fdb80f37989ddd7a0f45e3857c4933e6e82057ede09c5a829f77e373e680375
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:^20.11.19":
+  version: 20.11.19
+  resolution: "@types/node@npm:20.11.19"
+  dependencies:
+    undici-types: ~5.26.4
+  checksum: 259d16643ba611ade617a8212e594a3ac014727457507389bbf7213971346ab052d870f1e6e2df0afd0876ecd7874f578bccb130be01e069263cfc7136ddc0c1
   languageName: node
   linkType: hard
 
@@ -7540,14 +7549,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"emoji-picker-react@npm:4.7.17":
-  version: 4.7.17
-  resolution: "emoji-picker-react@npm:4.7.17"
+"emoji-picker-react@npm:4.7.18":
+  version: 4.7.18
+  resolution: "emoji-picker-react@npm:4.7.18"
   dependencies:
     flairup: 0.0.38
   peerDependencies:
     react: ">=16"
-  checksum: e282692b99fca956a4daa6478a317bde7bfd87c9d89871f7b6f9db989935f47f9f44a9e0445e980971984eca263120c7e8f2730b41e5072c35a5f6495f5898b1
+  checksum: 6f1050db601deaa13bff5dcb93a1437526ec6bfee206ceb0ef93a7f32ed59d0556ab6b473c1314c59ff55c64910fe42ab31f4239ad29bb7929180edf6ab2765a
   languageName: node
   linkType: hard
 
@@ -13603,16 +13612,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss-import@npm:^16.0.0":
-  version: 16.0.0
-  resolution: "postcss-import@npm:16.0.0"
+"postcss-import@npm:^16.0.1":
+  version: 16.0.1
+  resolution: "postcss-import@npm:16.0.1"
   dependencies:
     postcss-value-parser: ^4.0.0
     read-cache: ^1.0.0
     resolve: ^1.1.7
   peerDependencies:
     postcss: ^8.0.0
-  checksum: dd25ec2c8da949ec8c271581491888938b4fb1e9777bf248a089e64446f34e62366a266cf33777f9184184afbdf22a95e39ec53a1e090fd2539be04f23eeee83
+  checksum: fe5a12afaf01961f5bb6f0333cb79fa2acd81095b8388dd4c30b2d15033ac5f7b09b7dbb6fd77b208216304e1e8c51c9f623b2a85dca33a13b22129847c0cc52
   languageName: node
   linkType: hard
 
@@ -14542,27 +14551,27 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-router-dom@npm:6.22.0":
-  version: 6.22.0
-  resolution: "react-router-dom@npm:6.22.0"
+"react-router-dom@npm:6.22.1":
+  version: 6.22.1
+  resolution: "react-router-dom@npm:6.22.1"
   dependencies:
-    "@remix-run/router": 1.15.0
-    react-router: 6.22.0
+    "@remix-run/router": 1.15.1
+    react-router: 6.22.1
   peerDependencies:
     react: ">=16.8"
     react-dom: ">=16.8"
-  checksum: 21cbdda0070dffb50845a97e2688648a9925c7ebabd1f9335523a1f8ae66048c1d9d06442f1b0ec35a266d1c63ed3b56b437db70807f73440a185f3e2d3c632f
+  checksum: 01a074518663db1b64d9ee7fa22eb628544b74316057aab0c39ef58ad665f012df081e8523eb62c4e060272a67c8d90cccedb6a6dac4e8f71290f9be8aaab1f6
   languageName: node
   linkType: hard
 
-"react-router@npm:6.22.0":
-  version: 6.22.0
-  resolution: "react-router@npm:6.22.0"
+"react-router@npm:6.22.1":
+  version: 6.22.1
+  resolution: "react-router@npm:6.22.1"
   dependencies:
-    "@remix-run/router": 1.15.0
+    "@remix-run/router": 1.15.1
   peerDependencies:
     react: ">=16.8"
-  checksum: 94f382f3fa6fcb8525c143d83d4c3a3b010979f417cac0bbe7a63f906b3809e2bb56e8c329b9b3fd3212a498670ab278aea72893e921b827dcf00024c3d115dd
+  checksum: b53fab4c507eca8af03581387e37d9a1616f5cda0639abd84ba223c502528324171c4fee0ad8b86a92ba00eb3de4bd77c25c107e1754eb62988c874a059f3060
   languageName: node
   linkType: hard
 
@@ -17257,9 +17266,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack@npm:5.90.1":
-  version: 5.90.1
-  resolution: "webpack@npm:5.90.1"
+"webpack@npm:5.90.2":
+  version: 5.90.2
+  resolution: "webpack@npm:5.90.2"
   dependencies:
     "@types/eslint-scope": ^3.7.3
     "@types/estree": ^1.0.5
@@ -17290,7 +17299,7 @@ __metadata:
       optional: true
   bin:
     webpack: bin/webpack.js
-  checksum: a7be844d5720a0c6282fec012e6fa34b1137dff953c5d48bf2ef066a6c27c1dbc92a9b9effc05ee61c9fe269499266db9782073f2d82a589d3c5c966ffc56584
+  checksum: 4af55f314c3610e0b17afd01960c4cf9d8d90c87a58ef7d7dc7a0a019f48e2bba4eff63b02d9da56fc61df5b04af0d66b3fa4ec82937a780d37a64db84c643fe
   languageName: node
   linkType: hard
 
@@ -17504,7 +17513,7 @@ __metadata:
     "@types/linkify-it": 3.0.5
     "@types/loadable__component": 5.13.8
     "@types/markdown-it": 13.0.7
-    "@types/node": ^20.11.17
+    "@types/node": ^20.11.19
     "@types/open-graph": 0.2.5
     "@types/platform": 1.3.6
     "@types/react": 18.2.55
@@ -17545,7 +17554,7 @@ __metadata:
     dexie-encrypted: 2.0.0
     dotenv: 16.4.4
     dpdm: 3.14.0
-    emoji-picker-react: 4.7.17
+    emoji-picker-react: 4.7.18
     eslint: ^8.56.0
     eslint-plugin-prettier: ^5.1.3
     fake-indexeddb: 5.0.2
@@ -17581,7 +17590,7 @@ __metadata:
     path-browserify: 1.0.1
     platform: 1.3.6
     postcss: 8.4.35
-    postcss-import: ^16.0.0
+    postcss-import: ^16.0.1
     postcss-less: 6.0.0
     postcss-loader: ^8.1.0
     postcss-preset-env: ^9.3.0
@@ -17592,8 +17601,8 @@ __metadata:
     react-error-boundary: 4.0.12
     react-intl: 6.6.2
     react-redux: 9.1.0
-    react-router: 6.22.0
-    react-router-dom: 6.22.0
+    react-router: 6.22.1
+    react-router-dom: 6.22.1
     react-transition-group: 4.4.5
     redux: 5.0.1
     redux-logdown: 1.0.4
@@ -17616,13 +17625,13 @@ __metadata:
     typescript: 5.3.3
     underscore: 1.13.6
     uuidjs: 4.2.13
-    webpack: 5.90.1
+    webpack: 5.90.2
     webpack-cli: 5.1.4
     webpack-dev-middleware: 7.0.0
     webpack-hot-middleware: 2.26.1
     webrtc-adapter: 8.2.3
     workbox-webpack-plugin: 7.0.0
-    zustand: 4.5.0
+    zustand: 4.5.1
   languageName: unknown
   linkType: soft
 
@@ -18121,9 +18130,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zustand@npm:4.5.0":
-  version: 4.5.0
-  resolution: "zustand@npm:4.5.0"
+"zustand@npm:4.5.1":
+  version: 4.5.1
+  resolution: "zustand@npm:4.5.1"
   dependencies:
     use-sync-external-store: 1.2.0
   peerDependencies:
@@ -18137,6 +18146,6 @@ __metadata:
       optional: true
     react:
       optional: true
-  checksum: 91685492ab33bb656b98e07d8fff2be1794d8e68ac5dc546ec457f4ae3d709f0c19de9e93045b9ee5d6b704f64503d9e085ffe1f600f6ade0459e572d1cf5c0d
+  checksum: 420af9fda3e70536bccf65cf964dd6668cc88baa5e6e0208254f69c2c068963710f49bf580ad05ba3c5c5ae0470a17d2677165b199b749c4fc7228800e7fa705
   languageName: node
   linkType: hard
