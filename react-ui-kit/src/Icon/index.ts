@@ -75,6 +75,7 @@ export * from './SettingsIcon';
 export * from './ShowIcon';
 export * from './SignIcon';
 export * from './SpeakerIcon';
+export * from './StarIcon';
 export * from './TeamIcon';
 export * from './TimedIcon';
 export * from './TrashIcon';
