@@ -4812,9 +4812,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^26.10.6":
-  version: 26.10.6
-  resolution: "@wireapp/api-client@npm:26.10.6"
+"@wireapp/api-client@npm:^26.10.8":
+  version: 26.10.8
+  resolution: "@wireapp/api-client@npm:26.10.8"
   dependencies:
     "@wireapp/commons": ^5.2.5
     "@wireapp/priority-queue": ^2.1.4
@@ -4830,7 +4830,7 @@ __metadata:
     tough-cookie: 4.1.3
     ws: 8.16.0
     zod: 3.22.4
-  checksum: 48cb41e99f99b5d048b964f53b024d17b70a2c9efd8137b43d4bd26be857c1cc741d513da3ea3ed0bdd09c83c8c0e5c95fca71aa95dbdbbaa7d85d23acb02e94
+  checksum: ef9195e81a695c270f599236a640a50487e25e1a98fc8fbf3b5a335cdf80254becb314ba78d8ff67a778f634b43d6b70c76d2dfef77101040d87c3b187897923
   languageName: node
   linkType: hard
 
@@ -4895,18 +4895,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:44.0.0":
-  version: 44.0.0
-  resolution: "@wireapp/core@npm:44.0.0"
+"@wireapp/core@npm:44.0.3":
+  version: 44.0.3
+  resolution: "@wireapp/core@npm:44.0.3"
   dependencies:
-    "@wireapp/api-client": ^26.10.6
+    "@wireapp/api-client": ^26.10.8
     "@wireapp/commons": ^5.2.5
     "@wireapp/core-crypto": 1.0.0-rc.36
     "@wireapp/cryptobox": 12.8.0
     "@wireapp/promise-queue": ^2.2.10
     "@wireapp/protocol-messaging": 1.44.0
     "@wireapp/store-engine": 5.1.5
-    "@wireapp/store-engine-dexie": ^2.1.7
     axios: 1.6.7
     bazinga64: ^6.3.4
     deepmerge-ts: 5.1.0
@@ -4917,7 +4916,7 @@ __metadata:
     long: ^5.2.0
     uuidjs: 4.2.13
     zod: 3.22.4
-  checksum: 297c6896ebabdd838abac0c51eff5dffa602fa4c05e8fbccd2f3c497f2b56ece596c8f1218c789446961efa795905e76fb7c556de41938d588f65e5fdf33ff6d
+  checksum: cc635655f7ef425e074a72dce1f8f1594b5a68598d8b5fc030b8ef6f18fb6f7e5f376dcd2f66c0ad54859e48f5cc6d9474d9f25bfab901162856a611de7f4b2f
   languageName: node
   linkType: hard
 
@@ -5052,7 +5051,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/store-engine-dexie@npm:2.1.7, @wireapp/store-engine-dexie@npm:^2.1.7":
+"@wireapp/store-engine-dexie@npm:2.1.7":
   version: 2.1.7
   resolution: "@wireapp/store-engine-dexie@npm:2.1.7"
   dependencies:
@@ -17625,7 +17624,7 @@ __metadata:
     "@wireapp/avs": 9.6.9
     "@wireapp/commons": 5.2.4
     "@wireapp/copy-config": 2.1.14
-    "@wireapp/core": 44.0.0
+    "@wireapp/core": 44.0.3
     "@wireapp/eslint-config": 3.0.5
     "@wireapp/prettier-config": 0.6.3
     "@wireapp/react-ui-kit": 9.15.4
