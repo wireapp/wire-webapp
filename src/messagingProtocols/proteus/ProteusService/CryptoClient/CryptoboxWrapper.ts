@@ -35,6 +35,7 @@ export function buildClient(storeEngine: CRUDEngine, config: Config & {nbPrekeys
 }
 
 export class CryptoboxWrapper implements CryptoClient {
+  public readonly version: string = '1.0.0';
   constructor(
     private readonly cryptobox: Cryptobox,
     config: Config,

@@ -69,11 +69,13 @@ export async function buildClient(
 
 export class CoreCryptoWrapper implements CryptoClient {
   private readonly prekeyTracker: PrekeyTracker;
+  public readonly version: string;
 
   constructor(
     private readonly coreCrypto: CoreCrypto,
     private readonly config: ClientConfig,
   ) {
+    this.version = CoreCrypto.version();
     this.prekeyTracker = new PrekeyTracker(this, config);
   }
 

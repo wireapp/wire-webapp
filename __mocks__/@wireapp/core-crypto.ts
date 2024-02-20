@@ -55,4 +55,8 @@ export class CoreCrypto {
   static deferredInit() {
     return new CoreCrypto();
   }
+
+  static version() {
+    return '1.0.0';
+  }
 }

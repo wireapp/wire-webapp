@@ -644,7 +644,8 @@ export class MLSService extends TypedEventEmitter<Events> {
    */
   private async uploadMLSPublicKeys(client: RegisteredClient) {
     // If we've already updated a client with its public key, there's no need to do it again.
-    const publicKey = await this.coreCryptoClient.clientPublicKey(this.config.cipherSuite);
+    const credentialType = await this.getCredentialType();
+    const publicKey = await this.coreCryptoClient.clientPublicKey(this.config.cipherSuite, credentialType);
     return this.apiClient.api.client.putClient(client.id, {
       mls_public_keys: {ed25519: btoa(Converter.arrayBufferViewToBaselineString(publicKey))},
     });

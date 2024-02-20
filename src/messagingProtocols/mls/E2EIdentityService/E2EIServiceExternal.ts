@@ -57,7 +57,9 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
   ) {
     super();
     void this.initialiseCrlDistributionTimers();
-    mlsService.on('newCrlDistributionPoints', this.handleNewRemoteCrlDistributionPoints);
+    mlsService.on('newCrlDistributionPoints', distributionPoints =>
+      this.handleNewCrlDistributionPoints(distributionPoints),
+    );
   }
 
   // If we have a handle in the local storage, we are in the enrollment process (this handle is saved before oauth redirect)
@@ -128,6 +130,9 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
           certificate: '',
           displayName: '',
           handle: '',
+          notAfter: BigInt(0),
+          notBefore: BigInt(0),
+          serialNumber: '',
           clientId: id.client,
         }));
 
@@ -231,16 +236,12 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
     });
   }
 
-  public async getCRLFromDistributionPoint(distributionPointUrl: string): Promise<Uint8Array> {
-    return this.acmeService.getCRLFromDistributionPoint(distributionPointUrl);
-  }
-
   private scheduleCrlDistributionTimer({expiresAt, url}: {expiresAt: number; url: string}): void {
     LowPrecisionTaskScheduler.addTask({
       intervalDelay: TimeInMillis.SECOND,
       firingDate: expiresAt,
       key: url,
-      task: () => this.validateRemoteCrlDistributionPoint(url),
+      task: () => this.validateCrlDistributionPoint(url),
     });
   }
 
@@ -269,9 +270,9 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
     });
   }
 
-  private async validateRemoteCrlDistributionPoint(distributionPointUrl: string): Promise<void> {
+  private async validateCrlDistributionPoint(distributionPointUrl: string): Promise<void> {
     const domain = new URL(distributionPointUrl).hostname;
-    const crl = await this.getCRLFromDistributionPoint(domain);
+    const crl = await this.acmeService.getCRLFromDistributionPoint(domain);
 
     await this.validateCrl(distributionPointUrl, crl, async () => {
       this.emit('remoteCrlChanged');
@@ -296,9 +297,9 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
     }
   }
 
-  private async handleNewRemoteCrlDistributionPoints(distributionPoints: string[]): Promise<void> {
+  private async handleNewCrlDistributionPoints(distributionPoints: string[]): Promise<void> {
     for (const distributionPointUrl of distributionPoints) {
-      await this.validateRemoteCrlDistributionPoint(distributionPointUrl);
+      await this.validateCrlDistributionPoint(distributionPointUrl);
     }
   }
 }
