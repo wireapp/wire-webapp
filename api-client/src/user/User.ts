@@ -30,7 +30,6 @@ export interface User {
   assets?: UserAsset[];
   deleted?: boolean;
   email?: string;
-  email_unvalidated?: string;
   expires_at?: string;
   handle?: string;
   id: string;
