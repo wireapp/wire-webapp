@@ -406,7 +406,7 @@ describe('MLSService', () => {
       jest.spyOn(apiClient.api.client, 'uploadMLSKeyPackages').mockResolvedValueOnce(undefined);
       jest
         .spyOn(coreCrypto, 'processWelcomeMessage')
-        .mockResolvedValueOnce({id: new Uint8Array(), crlNewDistributionPoints: [], free: () => {}});
+        .mockResolvedValueOnce({id: new Uint8Array(), crlNewDistributionPoints: []});
 
       jest.spyOn(mlsService, 'scheduleKeyMaterialRenewal').mockImplementation(jest.fn());
 
@@ -442,7 +442,7 @@ describe('MLSService', () => {
       jest.spyOn(apiClient.api.client, 'uploadMLSKeyPackages').mockResolvedValueOnce(undefined);
       jest
         .spyOn(coreCrypto, 'processWelcomeMessage')
-        .mockResolvedValueOnce({id: new Uint8Array(), crlNewDistributionPoints: [], free: () => {}});
+        .mockResolvedValueOnce({id: new Uint8Array(), crlNewDistributionPoints: []});
 
       jest.spyOn(mlsService, 'scheduleKeyMaterialRenewal').mockImplementation(jest.fn());
 
@@ -480,7 +480,7 @@ describe('MLSService', () => {
       jest.spyOn(apiClient.api.client, 'uploadMLSKeyPackages').mockResolvedValueOnce(undefined);
       jest
         .spyOn(coreCrypto, 'processWelcomeMessage')
-        .mockResolvedValueOnce({id: new Uint8Array(), crlNewDistributionPoints: [], free: () => {}});
+        .mockResolvedValueOnce({id: new Uint8Array(), crlNewDistributionPoints: []});
 
       jest.spyOn(mlsService, 'scheduleKeyMaterialRenewal').mockImplementation(jest.fn());
 

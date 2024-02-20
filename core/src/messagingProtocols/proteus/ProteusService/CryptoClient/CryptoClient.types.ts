@@ -27,6 +27,7 @@ export enum CryptoClientType {
 }
 
 export interface CryptoClient<T = unknown> {
+  readonly version: string;
   getNativeClient(): T;
   encrypt(sessions: string[], plainText: Uint8Array): Promise<Map<string, Uint8Array>>;
   decrypt(sessionId: string, message: Uint8Array): Promise<Uint8Array>;

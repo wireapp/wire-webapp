@@ -431,6 +431,7 @@ export class Account extends TypedEventEmitter<Events> {
     const assetService = new AssetService(this.apiClient);
 
     const [clientType, cryptoClient] = await this.buildCryptoClient(context, this.storeEngine, this.encryptedDb);
+    this.logger.info(`CryptoClient of type ${clientType} created (version ${cryptoClient.version})`);
 
     let mlsService: MLSService | undefined;
     let e2eServiceExternal: E2EIServiceExternal | undefined;
