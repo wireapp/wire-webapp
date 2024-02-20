@@ -23,8 +23,7 @@ import logdown from 'logdown';
 import {APIClient} from '@wireapp/api-client';
 
 import {AcmeService} from './Connection/AcmeServer';
-import {AcmeDirectory, Ciphersuite, CoreCrypto, E2eiEnrollment, InitParams, RotateBundle} from './E2EIService.types';
-import {E2EIServiceExternal} from './E2EIServiceExternal';
+import {AcmeDirectory, Ciphersuite, CoreCrypto, E2eiEnrollment, RotateBundle} from './E2EIService.types';
 import {isResponseStatusValid} from './Helper';
 import {createNewAccount} from './Steps/Account';
 import {getAuthorizationChallenges} from './Steps/Authorization';
@@ -35,86 +34,50 @@ import {createNewOrder, finalizeOrder} from './Steps/Order';
 import {E2EIStorage} from './Storage/E2EIStorage';
 import {AuthData, InitialData} from './Storage/E2EIStorage.schema';
 
-import {NewCrlDistributionPointsPayload} from '../MLSService/MLSService.types';
-
 export class E2EIServiceInternal {
-  private static instance: E2EIServiceInternal;
   private readonly logger = logdown('@wireapp/core/E2EIdentityServiceInternal');
-  private _acmeService?: AcmeService;
-  private _initialData?: InitialData;
+  private acmeService: AcmeService;
 
-  private constructor(
+  public constructor(
     private readonly coreCryptoClient: CoreCrypto,
     private readonly apiClient: APIClient,
-    private readonly e2eiServiceExternal: E2EIServiceExternal,
     /** number of seconds the certificate should be valid */
     private readonly certificateTtl: number,
     private readonly keyPackagesAmount: number,
-    private readonly dispatchNewCrlDistributionPoints: (payload: NewCrlDistributionPointsPayload) => void,
-  ) {}
-
-  // ############ Public Functions ############
-
-  public static async getInstance(params?: InitParams): Promise<E2EIServiceInternal> {
-    if (!E2EIServiceInternal.instance) {
-      if (!params) {
-        throw new Error('E2EIServiceInternal is not initialized. Please call getInstance with params.');
-      }
-      const {
-        skipInit = false,
-        coreCryptClient,
-        apiClient,
-        e2eiServiceExternal,
-        keyPackagesAmount,
-        dispatchNewCrlDistributionPoints,
-        certificateTtl,
-      } = params;
-      E2EIServiceInternal.instance = new E2EIServiceInternal(
-        coreCryptClient,
-        apiClient,
-        e2eiServiceExternal,
-        certificateTtl,
-        keyPackagesAmount,
-        dispatchNewCrlDistributionPoints,
-      );
-      if (!skipInit) {
-        const {discoveryUrl, user, clientId} = params;
-        if (!discoveryUrl || !user || !clientId) {
-          throw new Error('discoveryUrl, user and clientId are required to initialize E2EIServiceInternal');
-        }
-        await E2EIServiceInternal.instance.init({clientId, discoveryUrl, user});
-      }
-    }
-    return E2EIServiceInternal.instance;
-  }
-
-  get acmeService(): AcmeService {
-    if (!this._acmeService) {
-      throw new Error('Error while trying to get AcmeService. E2EIServiceInternal has not been initialized');
-    }
-    return this._acmeService;
-  }
-
-  get initialData(): InitialData {
-    if (!this._initialData) {
-      throw new Error('Error while trying to get InitialData. E2EIServiceInternal has not been initialized');
-    }
-    return this._initialData;
+    private readonly initialData: InitialData,
+  ) {
+    const {discoveryUrl} = initialData;
+    this.acmeService = new AcmeService(discoveryUrl);
   }
 
   public async startCertificateProcess(hasActiveCertificate: boolean) {
-    // Step 0: Check if we have a handle in local storage
-    // If we don't have a handle, we need to start a new OAuth flow
     const identity = await this.initIdentity(hasActiveCertificate);
-    return this.startNewOAuthFlow(identity);
+
+    // Store the values in local storage for later use (e.g. in the continue flow)
+    const {orderUrl, authChallenges} = await this.getEnrollmentChallenges(identity);
+    const {
+      authorization: {keyauth, oidcChallenge},
+    } = authChallenges;
+
+    // store auth data for continuing the flow later on
+    const handle = await this.coreCryptoClient.e2eiEnrollmentStash(identity);
+    E2EIStorage.store.handle(Encoder.toBase64(handle).asString);
+    E2EIStorage.store.authData(authChallenges);
+    E2EIStorage.store.orderData({orderUrl});
+
+    return {challenge: oidcChallenge, keyAuth: keyauth};
   }
 
   public async continueCertificateProcess(oAuthIdToken: string): Promise<RotateBundle | undefined> {
-    // If we don't have a handle, we need to start a new OAuth flow
-    if (this.e2eiServiceExternal.isEnrollmentInProgress()) {
-      return this.continueOAuthFlow(oAuthIdToken);
+    const handle = E2EIStorage.get.handle();
+
+    const identity = await this.coreCryptoClient.e2eiEnrollmentStashPop(Decoder.fromBase64(handle).asBytes);
+    if (!identity) {
+      throw new Error('Error while trying to continue OAuth flow. No enrollment in progress found');
     }
-    throw new Error('Error while trying to continue OAuth flow. No enrollment in progress found');
+
+    const authData = E2EIStorage.get.authData();
+    return this.getRotateBundle(identity, oAuthIdToken, authData);
   }
 
   /**
@@ -127,7 +90,7 @@ export class E2EIServiceInternal {
     const identity = await this.initIdentity(hasActiveCertificate);
     const authData = await this.getEnrollmentChallenges(identity);
 
-    return this.getRotateBundleAndStoreCertificateData(identity, oAuthIdToken, authData.authChallenges);
+    return this.getRotateBundle(identity, oAuthIdToken, authData.authChallenges);
   }
 
   // ############ Internal Functions ############
@@ -153,15 +116,6 @@ export class E2EIServiceInternal {
           ciphersuite,
           user.teamId,
         );
-  }
-
-  private async init(params: Required<Pick<InitParams, 'user' | 'clientId' | 'discoveryUrl'>>): Promise<void> {
-    const {user, clientId, discoveryUrl} = params;
-    if (!user || !clientId) {
-      throw new Error('user and clientId are required to initialize E2eIdentityService');
-    }
-    this._initialData = {user, clientId, discoveryUrl};
-    this._acmeService = new AcmeService(discoveryUrl);
   }
 
   private async getDirectory(identity: E2eiEnrollment, connection: AcmeService): Promise<AcmeDirectory | undefined> {
@@ -237,11 +191,7 @@ export class E2EIServiceInternal {
    * @param oAuthIdToken
    * @returns RotateBundle
    */
-  private async getRotateBundleAndStoreCertificateData(
-    identity: E2eiEnrollment,
-    oAuthIdToken: string,
-    authData: AuthData,
-  ) {
+  private async getRotateBundle(identity: E2eiEnrollment, oAuthIdToken: string, authData: AuthData) {
     // Step 7: Do OIDC client challenge
     const oidcData = await doWireOidcChallenge({
       oAuthIdToken,
@@ -250,7 +200,7 @@ export class E2EIServiceInternal {
       identity,
       nonce: authData.nonce,
     });
-    this.logger.log('received oidcData', oidcData);
+    this.logger.log('oidc data', oidcData);
 
     if (!oidcData.data.validated) {
       throw new Error('Error while trying to continue OAuth flow. OIDC challenge not validated');
@@ -268,7 +218,8 @@ export class E2EIServiceInternal {
       expirySecs: 30,
       nonce: oidcData.nonce,
     });
-    this.logger.log('acme dpopData', JSON.stringify(dpopData));
+    this.logger.log('dpop data', dpopData);
+
     if (!isResponseStatusValid(dpopData.data.status)) {
       throw new Error('Error while trying to continue OAuth flow. DPOP challenge not validated');
     }
@@ -281,6 +232,7 @@ export class E2EIServiceInternal {
       nonce: dpopData.nonce,
       orderUrl: orderData.orderUrl,
     });
+
     if (!finalizeOrderData.certificateUrl) {
       throw new Error('Error while trying to continue OAuth flow. No certificateUrl received');
     }
@@ -292,59 +244,12 @@ export class E2EIServiceInternal {
       connection: this.acmeService,
       identity,
     });
+
     if (!certificate) {
       throw new Error('Error while trying to continue OAuth flow. No certificate received');
     }
 
     // Step 10: Initialize MLS with the certificate
-    const rotateBundle = await this.coreCryptoClient.e2eiRotateAll(identity, certificate, this.keyPackagesAmount);
-    this.dispatchNewCrlDistributionPoints(rotateBundle);
-    return rotateBundle;
-  }
-
-  /**
-   *  This function starts a new ACME enrollment flow for either a new client
-   *  or a client that wants to refresh its certificate but has no valid refresh token
-   */
-  private async startNewOAuthFlow(identity: E2eiEnrollment) {
-    if (this.e2eiServiceExternal.isEnrollmentInProgress()) {
-      throw new Error('Error while trying to start OAuth flow. There is already a flow in progress');
-    }
-
-    const {authChallenges, orderUrl} = await this.getEnrollmentChallenges(identity);
-    const {
-      authorization: {oidcChallenge: wireOidcChallenge, keyauth},
-    } = authChallenges;
-
-    if (!wireOidcChallenge || !keyauth) {
-      throw new Error('missing wireOidcChallenge or keyauth');
-    }
-    // stash the identity for later use
-    const handle = await this.coreCryptoClient.e2eiEnrollmentStash(identity);
-
-    // Store the values in local storage for later use (e.g. in the continue flow)
-    E2EIStorage.store.handle(Encoder.toBase64(handle).asString);
-    E2EIStorage.store.authData(authChallenges);
-    E2EIStorage.store.orderData({orderUrl});
-
-    // we need to pass back the aquired wireOidcChallenge to the UI
-    return {challenge: wireOidcChallenge, keyAuth: keyauth};
-  }
-
-  /**
-   * This function continues an ACME flow for either a new client
-   * or a client that wants to refresh its certificate but has no valid refresh token
-   *
-   * @param oAuthIdToken
-   * @returns RotateBundle | undefined
-   */
-  private async continueOAuthFlow(oAuthIdToken: string) {
-    const handle = E2EIStorage.get.handle();
-    const authData = E2EIStorage.get.authData();
-
-    const identity = await this.coreCryptoClient.e2eiEnrollmentStashPop(Decoder.fromBase64(handle).asBytes);
-    this.logger.log('retrieved identity from stash');
-
-    return this.getRotateBundleAndStoreCertificateData(identity, oAuthIdToken, authData);
+    return this.coreCryptoClient.e2eiRotateAll(identity, certificate, this.keyPackagesAmount);
   }
 }

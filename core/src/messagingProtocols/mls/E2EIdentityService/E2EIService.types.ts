@@ -17,7 +17,6 @@
  *
  */
 
-import {APIClient} from '@wireapp/api-client';
 import {
   E2eiEnrollment,
   Ciphersuite,
@@ -27,10 +26,6 @@ import {
   E2eiConversationState,
   CredentialType,
 } from '@wireapp/core-crypto';
-
-import {E2EIServiceExternal} from './E2EIServiceExternal';
-
-import {NewCrlDistributionPointsPayload} from '../MLSService/MLSService.types';
 
 /**
  * Proxy types relevant to the E2EIService from CoreCrypto
@@ -56,28 +51,3 @@ export type User = {
 export type Account = Uint8Array;
 export type Nonce = string;
 export type KeyAuth = NewAcmeAuthzOriginal['keyauth'];
-
-export interface FinishOidcChallengeParams {
-  oidcChallenge: AcmeChallenge;
-  nonce: Nonce;
-  account: Account;
-}
-
-export interface GetNewCertificateParams {
-  discoveryUrl: string;
-}
-
-export interface InitParams {
-  apiClient: APIClient;
-  coreCryptClient: CoreCrypto;
-  e2eiServiceExternal: E2EIServiceExternal;
-  user?: User;
-  clientId?: string;
-  // If a entrollment is in progress, the init function will not start a new enrollment
-  skipInit?: boolean;
-  /** number of seconds the certificate should be valid */
-  certificateTtl: number;
-  discoveryUrl?: string;
-  keyPackagesAmount: number;
-  dispatchNewCrlDistributionPoints: (payload: NewCrlDistributionPointsPayload) => void;
-}

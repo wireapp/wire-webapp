@@ -266,7 +266,6 @@ export class Account extends TypedEventEmitter<Events> {
 
     return this.service.mls.enrollE2EI(
       discoveryUrl,
-      this.service.e2eIdentity,
       user,
       this.currentClient,
       this.options.nbPrekeys,
