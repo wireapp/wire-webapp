@@ -53,7 +53,7 @@ import {parseFullQualifiedClientId} from '../../../util/fullyQualifiedClientIdUt
 import {numberToHex} from '../../../util/numberToHex';
 import {RecurringTaskScheduler} from '../../../util/RecurringTaskScheduler';
 import {TaskScheduler} from '../../../util/TaskScheduler';
-import {AcmeChallenge, E2EIServiceExternal, User} from '../E2EIdentityService';
+import {AcmeChallenge, User} from '../E2EIdentityService';
 import {E2EIServiceInternal} from '../E2EIdentityService/E2EIServiceInternal';
 import {handleMLSMessageAdd, handleMLSWelcomeMessage} from '../EventHandler/events';
 import {
@@ -837,7 +837,6 @@ export class MLSService extends TypedEventEmitter<Events> {
    */
   public async enrollE2EI(
     discoveryUrl: string,
-    e2eiServiceExternal: E2EIServiceExternal,
     user: User,
     client: RegisteredClient,
     nbPrekeys: number,
@@ -845,34 +844,26 @@ export class MLSService extends TypedEventEmitter<Events> {
     oAuthIdToken?: string,
   ): Promise<EnrollmentProcessState> {
     const hasActiveCertificate = await this.coreCryptoClient.e2eiIsEnabled(this.config.cipherSuite);
-    const instance = await E2EIServiceInternal.getInstance({
-      apiClient: this.apiClient,
-      coreCryptClient: this.coreCryptoClient,
-      e2eiServiceExternal,
-      user,
-      clientId: client.id,
-      discoveryUrl,
-      keyPackagesAmount: nbPrekeys,
-      dispatchNewCrlDistributionPoints: payload => this.dispatchNewCrlDistributionPoints(payload),
+    const e2eiServiceInternal = new E2EIServiceInternal(
+      this.coreCryptoClient,
+      this.apiClient,
       certificateTtl,
-    });
+      nbPrekeys,
+      {user, clientId: client.id, discoveryUrl},
+    );
 
     // If we don't have an OAuth id token, we need to start the certificate process with Oauth
     if (!oAuthIdToken) {
-      const data = await instance.startCertificateProcess(hasActiveCertificate);
-      const oidcChallenge = data.challenge;
-      if (!oidcChallenge) {
-        throw new Error('Not oidc challenge found');
-      }
+      const data = await e2eiServiceInternal.startCertificateProcess(hasActiveCertificate);
       return {status: 'authentication', authenticationChallenge: data};
     }
 
     // If we have an OAuth id token, we can continue the certificate process / start a refresh
     const rotateBundle = !hasActiveCertificate
       ? // If we are not refreshing the active certificate, we need to continue the certificate process with Oauth
-        await instance.continueCertificateProcess(oAuthIdToken)
+        await e2eiServiceInternal.continueCertificateProcess(oAuthIdToken)
       : // If we are refreshing the active certificate, can start the refresh process
-        await instance.renewCertificate(oAuthIdToken, hasActiveCertificate);
+        await e2eiServiceInternal.renewCertificate(oAuthIdToken, hasActiveCertificate);
 
     if (rotateBundle === undefined) {
       throw new Error('Could not get the rotate bundle');
