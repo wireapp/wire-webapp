@@ -24,7 +24,7 @@ import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {CircleCloseIcon, Input, SearchIcon, StarIcon} from '@wireapp/react-ui-kit';
+import {CircleCloseIcon, GroupIcon, Input, SearchIcon, StarIcon} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {CallingCell} from 'Components/calling/CallingCell';
@@ -81,6 +81,7 @@ export enum ConversationViewStyle {
   RECENT,
   FOLDER,
   FAVORITES,
+  GROUPS,
 }
 
 const Conversations: React.FC<ConversationsProps> = ({
@@ -117,6 +118,8 @@ const Conversations: React.FC<ConversationsProps> = ({
   const {conversationLabelRepository} = conversationRepository;
 
   const favoriteConversations = conversationLabelRepository.getFavorites(conversations);
+  const groupConversations = conversations.filter(conversation => conversation.isGroup());
+  const totalUnreadGroupConversations = groupConversations.filter(conversation => conversation.hasUnread()).length;
 
   const totalUnreadConversations = unreadConversations.length;
 
@@ -145,6 +148,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   const isRecentViewStyle = viewStyle === ConversationViewStyle.RECENT;
   const isFolderViewStyle = viewStyle === ConversationViewStyle.FOLDER;
   const isFavoritesViewStyle = viewStyle === ConversationViewStyle.FAVORITES;
+  const isGroupsViewStyle = viewStyle === ConversationViewStyle.GROUPS;
 
   const hasNoConversations = conversations.length + connectRequests.length === 0;
   const {isOpen: isFolderOpen, openFolder} = useFolderState();
@@ -252,7 +256,7 @@ const Conversations: React.FC<ConversationsProps> = ({
       <div
         role="tablist"
         aria-label={t('accessibility.headings.sidebar')}
-        aria-owns="tab-1 tab-2 tab-3 tab-4 tab-5"
+        aria-owns="tab-1 tab-2 tab-3 tab-4 tab-5 tab-6"
         className="conversations-sidebar-list"
       >
         <div className="conversations-sidebar-title">{t('videoCallOverlayConversations')}</div>
@@ -301,6 +305,26 @@ const Conversations: React.FC<ConversationsProps> = ({
           id="tab-3"
           type="button"
           role="tab"
+          className={cx(`conversations-sidebar-btn`, {active: isGroupsViewStyle})}
+          onClick={() => setViewStyle(ConversationViewStyle.GROUPS)}
+          title={t('conversationLabelGroups')}
+          data-uie-name="go-favorites-view"
+          data-uie-status={isGroupsViewStyle ? 'active' : 'inactive'}
+          aria-selected={isGroupsViewStyle}
+        >
+          <span className="conversations-sidebar-btn--text-wrapper">
+            <GroupIcon />
+            <span className="conversations-sidebar-btn--text">{t('conversationLabelGroups')}</span>
+          </span>
+          {totalUnreadGroupConversations > 0 && (
+            <span className="conversations-sidebar-btn--badge">{totalUnreadGroupConversations}</span>
+          )}
+        </button>
+
+        <button
+          id="tab-4"
+          type="button"
+          role="tab"
           className={cx(`conversations-sidebar-btn`, {active: isFolderViewStyle})}
           onClick={() => setViewStyle(ConversationViewStyle.FOLDER)}
           title={t('folderViewTooltip')}
@@ -319,7 +343,7 @@ const Conversations: React.FC<ConversationsProps> = ({
 
         {archivedConversations.length > 0 && (
           <button
-            id="tab-4"
+            id="tab-5"
             type="button"
             className="conversations-sidebar-btn"
             data-uie-name="go-archive"
@@ -337,7 +361,7 @@ const Conversations: React.FC<ConversationsProps> = ({
         )}
         <div className="conversations-sidebar-title">{t('conversationFooterContacts')}</div>
         <button
-          id="tab-5"
+          id="tab-6"
           type="button"
           className="conversations-sidebar-btn"
           onClick={() => switchList(ListState.START_UI)}
@@ -386,6 +410,10 @@ const Conversations: React.FC<ConversationsProps> = ({
   function getViewStyleConversations() {
     if (viewStyle === ConversationViewStyle.FOLDER || viewStyle === ConversationViewStyle.RECENT) {
       return filteredConversations;
+    }
+
+    if (viewStyle === ConversationViewStyle.GROUPS) {
+      return groupConversations;
     }
 
     if (viewStyle === ConversationViewStyle.FAVORITES) {
