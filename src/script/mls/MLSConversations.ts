@@ -111,8 +111,10 @@ export async function initialiseSelfAndTeamConversations(
     conversationsToEstablish.map(async conversation => {
       if (conversation.epoch < 1) {
         return mlsService.registerConversation(conversation.groupId, [selfUser.qualifiedId], {
-          user: selfUser,
-          client: selfClientId,
+          creator: {
+            user: selfUser,
+            client: selfClientId,
+          },
         });
       }
 

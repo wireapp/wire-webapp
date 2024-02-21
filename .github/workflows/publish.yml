@@ -353,7 +353,7 @@ jobs:
           name: 'build-artifact'
 
       - name: Deploy to ${{matrix.target}}
-        uses: einaregilsson/beanstalk-deploy@v21
+        uses: einaregilsson/beanstalk-deploy@v22
         with:
           application_name: Webapp
           aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}

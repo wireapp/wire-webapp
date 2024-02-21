@@ -4147,15 +4147,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/loadable__component@npm:5.13.8":
-  version: 5.13.8
-  resolution: "@types/loadable__component@npm:5.13.8"
-  dependencies:
-    "@types/react": "*"
-  checksum: a521e104a10acf00210d63b802a2a21a66a8e584aed90762e506f469c7d8c2e4c7e3a852dc7438015326ed3e54245884c32f816f519581f4b240795165bb6bdc
-  languageName: node
-  linkType: hard
-
 "@types/markdown-it@npm:13.0.7":
   version: 13.0.7
   resolution: "@types/markdown-it@npm:13.0.7"
@@ -4183,12 +4174,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:>=13.7.0":
-  version: 20.11.17
-  resolution: "@types/node@npm:20.11.17"
+"@types/node@npm:*, @types/node@npm:>=13.7.0, @types/node@npm:^20.11.19":
+  version: 20.11.19
+  resolution: "@types/node@npm:20.11.19"
   dependencies:
     undici-types: ~5.26.4
-  checksum: 59c0dde187120adc97da30063c86511664b24b50fe777abfe1f557c217d0a0b84a68aaab5ef8ac44f5c2986b3f9cd605a15fa6e4f31195e594da96bbe9617c20
+  checksum: 259d16643ba611ade617a8212e594a3ac014727457507389bbf7213971346ab052d870f1e6e2df0afd0876ecd7874f578bccb130be01e069263cfc7136ddc0c1
   languageName: node
   linkType: hard
 
@@ -4196,15 +4187,6 @@ __metadata:
   version: 16.9.1
   resolution: "@types/node@npm:16.9.1"
   checksum: 41afcf183a22d59323a0199dd7e0f46591247f45fc08a4434edb26d56dc279ae4fdb80f37989ddd7a0f45e3857c4933e6e82057ede09c5a829f77e373e680375
-  languageName: node
-  linkType: hard
-
-"@types/node@npm:^20.11.19":
-  version: 20.11.19
-  resolution: "@types/node@npm:20.11.19"
-  dependencies:
-    undici-types: ~5.26.4
-  checksum: 259d16643ba611ade617a8212e594a3ac014727457507389bbf7213971346ab052d870f1e6e2df0afd0876ecd7874f578bccb130be01e069263cfc7136ddc0c1
   languageName: node
   linkType: hard
 
@@ -4272,14 +4254,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:*, @types/react@npm:16 || 17 || 18, @types/react@npm:18.2.55":
-  version: 18.2.55
-  resolution: "@types/react@npm:18.2.55"
+"@types/react@npm:*, @types/react@npm:16 || 17 || 18, @types/react@npm:18.2.57":
+  version: 18.2.57
+  resolution: "@types/react@npm:18.2.57"
   dependencies:
     "@types/prop-types": "*"
     "@types/scheduler": "*"
     csstype: ^3.0.2
-  checksum: a8eb4fa77f73831b9112d4f11a7006217dc0740361649b9b0da3fd441d151a9cd415d5d68b91c0af4e430e063424d301c77489e5edaddc9f711c4e46cf9818a5
+  checksum: 01e7a3424162468428f3b28acec5e5c6cd1e26775ff605d0f46c883dea2d835924873d36b9ea0b75e40c9593aa78ca56a8ccde66bd58dbf6ecb0dd95af28609d
   languageName: node
   linkType: hard
 
@@ -4786,9 +4768,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^26.10.7":
-  version: 26.10.7
-  resolution: "@wireapp/api-client@npm:26.10.7"
+"@wireapp/api-client@npm:^26.10.10":
+  version: 26.10.10
+  resolution: "@wireapp/api-client@npm:26.10.10"
   dependencies:
     "@wireapp/commons": ^5.2.5
     "@wireapp/priority-queue": ^2.1.4
@@ -4804,14 +4786,14 @@ __metadata:
     tough-cookie: 4.1.3
     ws: 8.16.0
     zod: 3.22.4
-  checksum: 6ef3852994ced47a16f4c08fc0fb13660a615632bef33ce4be7a96b43b2058d7ffa12d167dbee30468f2d804d1345c891acd1cb6be767c34d41b2c1cdc0643d6
+  checksum: b1610c4e8e0661e48d5df6de1d055231cabb2bee74d1dc74aeda8d242d97a79df72e7f4177f7ed17aeb7a30be04dd471283a44657423bbebe99cafdcaf866e37
   languageName: node
   linkType: hard
 
-"@wireapp/avs@npm:9.6.9":
-  version: 9.6.9
-  resolution: "@wireapp/avs@npm:9.6.9"
-  checksum: f21dd8c0711a3f20871eee36e1dcad158eb97c8b4f1355b05256ef70366bc5bfdeeca6e033aa983d62d251bb385559995498f4c9635ee8e428cd068dc4b9a7ad
+"@wireapp/avs@npm:9.6.11":
+  version: 9.6.11
+  resolution: "@wireapp/avs@npm:9.6.11"
+  checksum: fdc8fc9b7ba43c2cf9bedaadb8444443e78ce92e1f8c515b5aa62e762e975c65419a8c04a9c8b6142444c6e929df988ae9ea6cc6a41137d1f8d02df221a267bf
   languageName: node
   linkType: hard
 
@@ -4850,20 +4832,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core-crypto@npm:1.0.0-rc.36":
-  version: 1.0.0-rc.36
-  resolution: "@wireapp/core-crypto@npm:1.0.0-rc.36"
-  checksum: 108f5e983abb35ff65b4d1a62804e69dbc72c9953a5a51401163fab44a8e8dbb63139b66d3d85864f4de21812aa1cda8605f8cfa6161d839f9b8f872f11c4e2b
+"@wireapp/core-crypto@npm:1.0.0-rc.40":
+  version: 1.0.0-rc.40
+  resolution: "@wireapp/core-crypto@npm:1.0.0-rc.40"
+  checksum: ffadd1647b47af3456ebac94be27fc1ef32513b436cec32dcc0de1dcfa19ba1c5ac181a61cd0cf2f67d53574aa6ac67938eeaaeb0126212607ee06ca9c2341b7
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:44.0.1":
-  version: 44.0.1
-  resolution: "@wireapp/core@npm:44.0.1"
+"@wireapp/core@npm:44.0.8":
+  version: 44.0.8
+  resolution: "@wireapp/core@npm:44.0.8"
   dependencies:
-    "@wireapp/api-client": ^26.10.7
+    "@wireapp/api-client": ^26.10.10
     "@wireapp/commons": ^5.2.5
-    "@wireapp/core-crypto": 1.0.0-rc.36
+    "@wireapp/core-crypto": 1.0.0-rc.40
     "@wireapp/cryptobox": 12.8.0
     "@wireapp/promise-queue": ^2.2.10
     "@wireapp/protocol-messaging": 1.44.0
@@ -4878,7 +4860,7 @@ __metadata:
     long: ^5.2.0
     uuidjs: 4.2.13
     zod: 3.22.4
-  checksum: 8c477590775c74d17f243871368e01d9d2670cd943e2dbe8a07da489bb458d6138b05f008080b7c5865adc24154610211937bcf12b0f59f38a7eaf773ea27eb2
+  checksum: c3d43c543dd751cc0632ff2cfdc5c0da71886b23ce59391366654633585f415aaa5cfb45d56843db1c11fa9ac3079b8f8824689a1c151f6fce53ef1f8c9d3613
   languageName: node
   linkType: hard
 
@@ -17511,12 +17493,11 @@ __metadata:
     "@types/keyboardjs": 2.5.3
     "@types/libsodium-wrappers": ^0
     "@types/linkify-it": 3.0.5
-    "@types/loadable__component": 5.13.8
     "@types/markdown-it": 13.0.7
     "@types/node": ^20.11.19
     "@types/open-graph": 0.2.5
     "@types/platform": 1.3.6
-    "@types/react": 18.2.55
+    "@types/react": 18.2.57
     "@types/react-dom": 18.2.19
     "@types/react-transition-group": 4.4.10
     "@types/redux-mock-store": 1.0.6
@@ -17525,10 +17506,10 @@ __metadata:
     "@types/speakingurl": 13.0.6
     "@types/underscore": 1.11.15
     "@types/webpack-env": 1.18.4
-    "@wireapp/avs": 9.6.9
+    "@wireapp/avs": 9.6.11
     "@wireapp/commons": 5.2.5
     "@wireapp/copy-config": 2.1.16
-    "@wireapp/core": 44.0.1
+    "@wireapp/core": 44.0.8
     "@wireapp/eslint-config": 3.0.6
     "@wireapp/prettier-config": 0.6.3
     "@wireapp/react-ui-kit": 9.16.0
