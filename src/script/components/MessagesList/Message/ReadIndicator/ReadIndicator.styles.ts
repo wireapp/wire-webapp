@@ -22,6 +22,7 @@ import {CSSObject} from '@emotion/react';
 export const ReadIndicatorContainer: CSSObject = {
   display: 'inline-block',
   marginLeft: '12px',
+  lineHeight: 1,
 
   '.message-asset &': {
     marginLeft: '12px',

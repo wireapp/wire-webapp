@@ -167,11 +167,11 @@ export const ContentMessageComponent = ({
     });
   };
 
-  const asset = assets[0];
-  const isFileMessage = (asset as FileAssetType).isFile();
-  const isAudioMessage = (asset as FileAssetType).isAudio();
-  const isVideoMessage = (asset as FileAssetType).isVideo();
-  const isImageMessage = (asset as FileAssetType).isImage();
+  const asset = assets?.[0];
+  const isFileMessage = !!(asset as FileAssetType)?.isFile();
+  const isAudioMessage = !!(asset as FileAssetType)?.isAudio();
+  const isVideoMessage = !!(asset as FileAssetType)?.isVideo();
+  const isImageMessage = !!(asset as FileAssetType)?.isImage();
 
   const isAssetMessage = isFileMessage || isAudioMessage || isVideoMessage || isImageMessage;
 
