@@ -323,19 +323,15 @@
 // MESSAGE - BODY
 .message-body {
   position: relative;
-  display: flex;
-  max-width: @conversation-max-width;
-  justify-content: space-between;
-  padding-left: @conversation-message-sender-width;
+  max-width: calc(100% - var(--conversation-message-sender-width));
+  padding-left: var(--conversation-message-sender-width);
 
-  &-content {
-    width: 100%;
-    max-width: calc(@conversation-max-width - var(--conversation-message-sender-width));
-    height: fit-content;
+  .text:has(> .iframe-container) {
+    margin-right: 0;
+  }
 
-    .text:has(> .iframe-container) {
-      margin-right: 0;
-    }
+  &:has(.message-quote__text--full pre) {
+    display: flex;
   }
 
   .text {
@@ -344,7 +340,6 @@
 
     display: inline;
     min-width: 0;
-    margin-right: 12px;
     line-height: @line-height-lg;
     white-space: pre-wrap;
     word-wrap: break-word;

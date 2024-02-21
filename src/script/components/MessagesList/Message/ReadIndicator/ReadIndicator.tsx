@@ -22,7 +22,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatTimeShort} from 'Util/TimeUtil';
 
-import {ReadIndicatorStyles, ReadReceiptText} from './ReadIndicator.styles';
+import {ReadIndicatorContainer, ReadIndicatorStyles, ReadReceiptText} from './ReadIndicator.styles';
 
 import {Message} from '../../../../entity/message/Message';
 
@@ -52,19 +52,21 @@ export const ReadIndicator = ({
     const showDeliveredMessage = isLastDeliveredMessage && readReceiptText === '';
 
     return (
-      <span css={ReadIndicatorStyles(showIconOnly)} data-uie-name="status-message-read-receipts">
-        {showDeliveredMessage && (
-          <span data-uie-name="status-message-read-receipt-delivered">{t('conversationMessageDelivered')}</span>
-        )}
+      <div css={ReadIndicatorContainer} className="read-indicator-wrapper">
+        <span css={ReadIndicatorStyles(showIconOnly)} data-uie-name="status-message-read-receipts">
+          {showDeliveredMessage && (
+            <span data-uie-name="status-message-read-receipt-delivered">{t('conversationMessageDelivered')}</span>
+          )}
 
-        {showIconOnly && readReceiptText && <Icon.Read />}
+          {showIconOnly && readReceiptText && <Icon.Read />}
 
-        {!showIconOnly && !!readReceiptText && (
-          <div css={ReadReceiptText} data-uie-name="status-message-read-receipt-text">
-            <Icon.Read /> {readReceiptText}
-          </div>
-        )}
-      </span>
+          {!showIconOnly && !!readReceiptText && (
+            <div css={ReadReceiptText} data-uie-name="status-message-read-receipt-text">
+              <Icon.Read /> {readReceiptText}
+            </div>
+          )}
+        </span>
+      </div>
     );
   }
 
@@ -83,15 +85,17 @@ export const ReadIndicator = ({
   }
 
   return (
-    <button
-      css={ReadIndicatorStyles(false)}
-      onClick={() => onClick?.(message)}
-      className="button-reset-default read-indicator"
-      data-uie-name="status-message-read-receipts"
-    >
-      <div css={ReadReceiptText} data-uie-name="status-message-read-receipt-count">
-        <Icon.Read /> {readReceiptCount}
-      </div>
-    </button>
+    <div css={ReadIndicatorContainer} className="read-indicator-wrapper">
+      <button
+        css={ReadIndicatorStyles(false)}
+        onClick={() => onClick?.(message)}
+        className="button-reset-default read-indicator"
+        data-uie-name="status-message-read-receipts"
+      >
+        <div css={ReadReceiptText} data-uie-name="status-message-read-receipt-count">
+          <Icon.Read /> {readReceiptCount}
+        </div>
+      </button>
+    </div>
   );
 };

@@ -19,6 +19,8 @@
 
 import {useEffect, FC, useState, HTMLProps, useRef} from 'react';
 
+import cx from 'classnames';
+
 import {isKeyDownEvent} from 'src/script/guards/Event';
 import {isAuxClickEvent, isClickEvent} from 'src/script/guards/Mouse';
 import {getAllFocusableElements, setElementsTabIndex} from 'Util/focusUtil';
@@ -132,8 +134,6 @@ const TextMessage: FC<TextMessageRendererProps> = ({
     }
   };
 
-  const extraClasses = showFullText ? 'message-quote__text--full' : '';
-
   const toggleShowMore = () => setShowFullText(prev => !prev);
 
   return (
@@ -152,9 +152,12 @@ const TextMessage: FC<TextMessageRendererProps> = ({
         onKeyUp={handleInteraction}
         dangerouslySetInnerHTML={{__html: text}}
         dir="auto"
-        className={`${className} ${extraClasses}`}
+        className={cx(className, {
+          'message-quote__text--full': showFullText,
+        })}
         {...props}
       />
+
       {canShowMore && (
         <ShowMoreButton onClick={toggleShowMore} isFocusable={isFocusable} active={showFullText}></ShowMoreButton>
       )}

@@ -20,7 +20,9 @@
 import {useMemo, useState, useEffect} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import cx from 'classnames';
 
+import {ReadIndicator} from 'Components/MessagesList/Message/ReadIndicator';
 import {Conversation} from 'src/script/entity/Conversation';
 import {CompositeMessage} from 'src/script/entity/message/CompositeMessage';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
@@ -40,6 +42,7 @@ import {Quote} from './MessageQuote';
 import {CompleteFailureToSendWarning, PartialFailureToSendWarning} from './Warnings';
 
 import {MessageActions} from '..';
+import type {FileAsset as FileAssetType} from '../../../../entity/message/FileAsset';
 import {EphemeralStatusType} from '../../../../message/EphemeralStatusType';
 import {ContextMenuEntry} from '../../../../ui/ContextMenu';
 import {EphemeralTimer} from '../EphemeralTimer';
@@ -94,7 +97,7 @@ export const ContentMessageComponent = ({
   const {
     senderName,
     timestamp,
-    ephemeral_caption,
+    ephemeral_caption: ephemeralCaption,
     ephemeral_status,
     assets,
     was_edited,
@@ -103,6 +106,7 @@ export const ContentMessageComponent = ({
     status,
     user,
     quote,
+    isObfuscated,
   } = useKoSubscribableChildren(message, [
     'senderName',
     'timestamp',
@@ -115,6 +119,7 @@ export const ContentMessageComponent = ({
     'status',
     'user',
     'quote',
+    'isObfuscated',
   ]);
 
   const shouldShowMessageHeader = (): boolean => {
@@ -153,18 +158,28 @@ export const ContentMessageComponent = ({
 
   const isConversationReadonly = conversation.readOnlyState() !== null;
 
+  const contentMessageWrapperRef = (element: HTMLDivElement | null) => {
+    setTimeout(() => {
+      if (element?.parentElement?.querySelector(':hover') === element) {
+        // Trigger the action menu in case the component is rendered with the mouse already hovering over it
+        setActionMenuVisibility(true);
+      }
+    });
+  };
+
+  const asset = assets[0];
+  const isFileMessage = (asset as FileAssetType).isFile();
+  const isAudioMessage = (asset as FileAssetType).isAudio();
+  const isVideoMessage = (asset as FileAssetType).isVideo();
+  const isImageMessage = (asset as FileAssetType).isImage();
+
+  const isAssetMessage = isFileMessage || isAudioMessage || isVideoMessage || isImageMessage;
+
   return (
     <div
       aria-label={messageAriaLabel}
       className="content-message-wrapper"
-      ref={element => {
-        setTimeout(() => {
-          if (element?.parentElement?.querySelector(':hover') === element) {
-            // Trigger the action menu in case the component is rendered with the mouse already hovering over it
-            setActionMenuVisibility(true);
-          }
-        });
-      }}
+      ref={contentMessageWrapperRef}
       onMouseEnter={() => {
         // open another floating action menu if none already open
         if (!isMenuOpen) {
@@ -192,60 +207,75 @@ export const ContentMessageComponent = ({
         </MessageHeader>
       )}
 
-      <div className="message-body">
-        <div className="message-body-content" title={ephemeral_caption}>
-          {ephemeral_status === EphemeralStatusType.ACTIVE && (
-            <div className="message-ephemeral-timer">
-              <EphemeralTimer message={message} />
-            </div>
-          )}
+      <div
+        className={cx('message-body', {
+          'message-asset': isAssetMessage,
+          'ephemeral-asset-expired': isObfuscated,
+          'icon-file': isObfuscated && isFileMessage,
+          'icon-movie': isObfuscated && isVideoMessage,
+        })}
+        {...(ephemeralCaption && {title: ephemeralCaption})}
+      >
+        {ephemeral_status === EphemeralStatusType.ACTIVE && (
+          <div className="message-ephemeral-timer">
+            <EphemeralTimer message={message} />
+          </div>
+        )}
 
-          {quote && (
-            <Quote
-              conversation={conversation}
-              quote={quote}
-              selfId={selfId}
-              findMessage={findMessage}
-              showDetail={onClickImage}
-              focusMessage={onClickTimestamp}
-              handleClickOnMessage={onClickMessage}
-              showUserDetails={onClickAvatar}
-              isMessageFocused={msgFocusState}
-            />
-          )}
+        {quote && (
+          <Quote
+            conversation={conversation}
+            quote={quote}
+            selfId={selfId}
+            findMessage={findMessage}
+            showDetail={onClickImage}
+            focusMessage={onClickTimestamp}
+            handleClickOnMessage={onClickMessage}
+            showUserDetails={onClickAvatar}
+            isMessageFocused={msgFocusState}
+          />
+        )}
 
-          {assets.map(asset => (
-            <ContentAsset
-              key={asset.type}
-              asset={asset}
-              message={message}
-              selfId={selfId}
-              onClickButton={onClickButton}
-              onClickImage={onClickImage}
-              onClickMessage={onClickMessage}
-              isMessageFocused={msgFocusState}
-              is1to1Conversation={conversation.is1to1()}
-              isLastDeliveredMessage={isLastDeliveredMessage}
-              onClickDetails={() => onClickDetails(message)}
-            />
-          ))}
+        {assets.map(asset => (
+          <ContentAsset
+            key={asset.type}
+            asset={asset}
+            message={message}
+            selfId={selfId}
+            onClickButton={onClickButton}
+            onClickImage={onClickImage}
+            onClickMessage={onClickMessage}
+            isMessageFocused={msgFocusState}
+            is1to1Conversation={conversation.is1to1()}
+            isLastDeliveredMessage={isLastDeliveredMessage}
+            onClickDetails={() => onClickDetails(message)}
+          />
+        ))}
 
-          {failedToSend && (
-            <PartialFailureToSendWarning
-              isMessageFocused={msgFocusState}
-              failedToSend={failedToSend}
-              knownUsers={conversation.allUserEntities()}
-            />
-          )}
+        {failedToSend && (
+          <PartialFailureToSendWarning
+            isMessageFocused={msgFocusState}
+            failedToSend={failedToSend}
+            knownUsers={conversation.allUserEntities()}
+          />
+        )}
 
-          {[StatusType.FAILED, StatusType.FEDERATION_ERROR].includes(status) && (
-            <CompleteFailureToSendWarning
-              {...(status === StatusType.FEDERATION_ERROR && {unreachableDomain: conversation.domain})}
-              isMessageFocused={msgFocusState}
-              onRetry={() => onRetry(message)}
-            />
-          )}
-        </div>
+        {[StatusType.FAILED, StatusType.FEDERATION_ERROR].includes(status) && (
+          <CompleteFailureToSendWarning
+            {...(status === StatusType.FEDERATION_ERROR && {unreachableDomain: conversation.domain})}
+            isMessageFocused={msgFocusState}
+            onRetry={() => onRetry(message)}
+          />
+        )}
+
+        {isAssetMessage && (
+          <ReadIndicator
+            message={message}
+            is1to1Conversation={conversation.is1to1()}
+            isLastDeliveredMessage={isLastDeliveredMessage}
+            onClick={onClickDetails}
+          />
+        )}
 
         {!isConversationReadonly && isActionMenuVisible && (
           <MessageActionsMenu
