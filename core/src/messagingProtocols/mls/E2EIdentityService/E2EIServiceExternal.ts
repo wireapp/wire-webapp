@@ -57,7 +57,6 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
     private readonly mlsService: MLSService,
   ) {
     super();
-    void this.initialiseCrlDistributionTimers();
     this.enrollmentStorage = createE2EIEnrollmentStorage(coreDatabase);
     mlsService.on('newCrlDistributionPoints', distributionPoints =>
       this.handleNewCrlDistributionPoints(distributionPoints),
@@ -181,14 +180,19 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
 
   /**
    * will initialize the E2EIServiceExternal with the given discoveryUrl and userId.
-   * It will also register the server certificates in CoreCrypto.
+   * It will also register the server certificates in CoreCrypto and start the CRL background check process
    *
    * @param discoveryUrl the discovery url of the acme server
-   * @param userId the user that is concerned by the enrollment
    */
   public async initialize(discoveryUrl: string): Promise<void> {
     this._acmeService = new AcmeService(discoveryUrl);
     await this.registerServerCertificates();
+    await this.initialiseCrlDistributionTimers();
+    try {
+      await this.validateSelfCrl();
+    } catch (error) {
+      console.warn('Error validating self CRL', error);
+    }
   }
 
   private get acmeService(): AcmeService {
@@ -271,7 +275,7 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
     await this.coreDatabase.delete('crls', url);
   }
 
-  public async validateSelfCrl(): Promise<void> {
+  private async validateSelfCrl(): Promise<void> {
     const {crl, url} = await this.acmeService.getSelfCRL();
 
     await this.validateCrl(url, crl, async () => {
