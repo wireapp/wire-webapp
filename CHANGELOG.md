@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [44.0.9](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@44.0.8...@wireapp/core@44.0.9) (2024-02-21)
+
+### Bug Fixes
+
+* Use indexeddb to store e2ei enrollment temporary data ([#5996](https://github.com/wireapp/wire-web-packages/issues/5996)) ([40e0c64](https://github.com/wireapp/wire-web-packages/commit/40e0c643cac7e23d59e34913d6e80395993c0be5))
+
 ## [44.0.8](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@44.0.7...@wireapp/core@44.0.8) (2024-02-21)
 
 ### Bug Fixes
