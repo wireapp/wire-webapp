@@ -135,14 +135,6 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     };
 
     await this.coreE2EIService.initialize(discoveryUrl);
-    await this.coreE2EIService.registerServerCertificates();
-
-    try {
-      //FIXME: this doesn't work on curernt core-crypto version
-      await this.coreE2EIService.validateSelfCrl();
-    } catch (error) {
-      console.error('Error validating self CRL', error);
-    }
 
     this.currentStep = E2EIHandlerStep.INITIALIZED;
     this.emit('initialized', {enrollmentConfig: this.config});
@@ -178,7 +170,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     }
 
     // Check if an enrollment is already in progress
-    if (this.coreE2EIService.isEnrollmentInProgress()) {
+    if (await this.coreE2EIService.isEnrollmentInProgress()) {
       return this.enroll();
     }
 
@@ -257,7 +249,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     this.oidcService = this.createOIDCService();
     await this.oidcService.clearProgress(includeOidcServiceUserData);
     // Clear the e2e identity progress
-    this.coreE2EIService.clearAllProgress();
+    await this.coreE2EIService.clearAllProgress();
   }
 
   public async enroll(userData?: User) {
@@ -272,7 +264,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
       if (!userData) {
         // If the enrolment is in progress, we need to get the id token from the oidc service, since oauth should have already been completed
-        if (this.coreE2EIService.isEnrollmentInProgress()) {
+        if (await this.coreE2EIService.isEnrollmentInProgress()) {
           // The redirect-url which is needed inside the OIDCService is stored in the OIDCServiceStore previously
           this.oidcService = this.createOIDCService();
           userData = await this.oidcService.handleAuthentication();
@@ -374,7 +366,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     // Clear the oidc service progress
     await this.oidcService?.clearProgress();
     // Clear the e2e identity progress
-    this.coreE2EIService.clearAllProgress();
+    await this.coreE2EIService.clearAllProgress();
 
     const disableSnooze = await shouldEnableSoftLock(this.config!);
 
@@ -445,7 +437,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   private async startEnrollment(enrollmentType: ModalType.CERTIFICATE_RENEWAL | ModalType.ENROLL): Promise<void> {
     // If the user has already started enrolment, don't show the notification. Instead, show the loading modal
     // This will occur after the redirect from the oauth provider
-    if (this.coreE2EIService.isEnrollmentInProgress()) {
+    if (await this.coreE2EIService.isEnrollmentInProgress()) {
       return this.enroll();
     }
 
