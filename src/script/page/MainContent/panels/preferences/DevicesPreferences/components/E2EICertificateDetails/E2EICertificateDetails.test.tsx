@@ -34,6 +34,9 @@ describe('E2EICertificateDetails', () => {
     handle: '',
     thumbprint: '',
     deviceId: '',
+    notBefore: BigInt(0),
+    notAfter: BigInt(0),
+    serialNumber: '',
   });
 
   it('is e2ei identity not downloaded', async () => {
