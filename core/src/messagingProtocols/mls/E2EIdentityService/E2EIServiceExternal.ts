@@ -114,7 +114,7 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
     for (const userId of userIds) {
       const identities = (userIdentities.get(userId.id) || []).map(identity => ({
         ...identity,
-        deviceId: parseFullQualifiedClientId((identity as any).client_id).client,
+        deviceId: parseFullQualifiedClientId(identity.clientId).client,
       }));
 
       const basicMLSDevices = allUsersMLSDevices
@@ -157,7 +157,7 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
 
     return deviceIdentities.map(identity => ({
       ...identity,
-      deviceId: parseFullQualifiedClientId((identity as any).client_id).client,
+      deviceId: parseFullQualifiedClientId(identity.clientId).client,
     }));
   }
 

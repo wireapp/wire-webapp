@@ -66,7 +66,7 @@ function generateCoreCryptoIdentity({
   deviceId?: string;
 }) {
   return {
-    client_id: `${userId}:${deviceId}@elna.wire.link`,
+    clientId: `${userId}:${deviceId}@elna.wire.link`,
     handle: 'adrian_wire2@elna.wire.link',
     display_name: 'Adrian Weiss 2',
     domain: 'elna.wire.link',
@@ -114,7 +114,7 @@ describe('E2EIServiceExternal', () => {
       coreCrypto.getUserIdentities.mockResolvedValue(new Map([[user1.id, user1Identities]]));
 
       const allClients = [
-        ...user1Identities.map(identity => (identity as any).client_id),
+        ...user1Identities.map(identity => identity.clientId),
         `${user1.id}:74a50c1f4352b41f@elna.wire.link`,
         `${user2.id}:452cb4c65f0369a8@elna.wire.link`,
       ];
