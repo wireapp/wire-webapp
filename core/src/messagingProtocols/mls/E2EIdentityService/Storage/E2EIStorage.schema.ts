@@ -32,15 +32,14 @@ export const InitialDataSchema = z.object({
 });
 export type InitialData = z.infer<typeof InitialDataSchema>;
 
-const Uint8ArraySchema = z.custom<Uint8Array>(value =>
-  value instanceof Uint8Array ? {success: true} : {success: false, message: 'Expected Uint8Array'},
-);
 const AcmeChallengeSchema = z.object({
-  delegate: Uint8ArraySchema,
+  delegate: z.instanceof(Uint8Array),
   url: z.string(),
   target: z.string(),
 });
-export const AuthDataSchema = z.object({
+export const EnrollmentFlowDataSchema = z.object({
+  handle: z.instanceof(Uint8Array),
+  orderUrl: z.string().url(),
   authorization: z.object({
     keyauth: z.string(),
     dpopChallenge: AcmeChallengeSchema,
@@ -48,9 +47,5 @@ export const AuthDataSchema = z.object({
   }),
   nonce: z.string(),
 });
-export type AuthData = z.infer<typeof AuthDataSchema>;
-
-export const OrderDataSchema = z.object({
-  orderUrl: z.string().url(),
-});
-export type OrderData = z.infer<typeof OrderDataSchema>;
+export type EnrollmentFlowData = z.infer<typeof EnrollmentFlowDataSchema>;
+export type UnidentifiedEnrollmentFlowData = Omit<EnrollmentFlowData, 'handle'>;

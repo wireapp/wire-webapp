@@ -20,7 +20,7 @@
 import {AcmeService} from '../Connection';
 import {E2eiEnrollment, NewAcmeAuthz, Nonce} from '../E2EIService.types';
 import {jsonToByteArray} from '../Helper';
-import {AuthData} from '../Storage/E2EIStorage.schema';
+import {EnrollmentFlowData} from '../Storage/E2EIStorage.schema';
 
 interface GetAuthorizationParams {
   nonce: Nonce;
@@ -34,7 +34,7 @@ export const getAuthorizationChallenges = async ({
   nonce,
   identity,
   connection,
-}: GetAuthorizationParams): Promise<AuthData> => {
+}: GetAuthorizationParams): Promise<Pick<EnrollmentFlowData, 'authorization' | 'nonce'>> => {
   const challenges: {type: string; challenge: NewAcmeAuthz}[] = [];
 
   for (const authzUrl of authzUrls) {

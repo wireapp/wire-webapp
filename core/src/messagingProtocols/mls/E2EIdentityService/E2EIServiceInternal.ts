@@ -17,7 +17,6 @@
  *
  */
 
-import {Decoder, Encoder} from 'bazinga64';
 import logdown from 'logdown';
 
 import {APIClient} from '@wireapp/api-client';
@@ -31,14 +30,18 @@ import {getCertificate} from './Steps/Certificate';
 import {doWireDpopChallenge} from './Steps/DpopChallenge';
 import {doWireOidcChallenge} from './Steps/OidcChallenge';
 import {createNewOrder, finalizeOrder} from './Steps/Order';
-import {E2EIStorage} from './Storage/E2EIStorage';
-import {AuthData, InitialData} from './Storage/E2EIStorage.schema';
+import {createE2EIEnrollmentStorage} from './Storage/E2EIStorage';
+import {InitialData, UnidentifiedEnrollmentFlowData} from './Storage/E2EIStorage.schema';
+
+import {CoreDatabase} from '../../../storage/CoreDB';
 
 export class E2EIServiceInternal {
   private readonly logger = logdown('@wireapp/core/E2EIdentityServiceInternal');
   private acmeService: AcmeService;
+  private enrollmentStorage: ReturnType<typeof createE2EIEnrollmentStorage>;
 
   public constructor(
+    coreDb: CoreDatabase,
     private readonly coreCryptoClient: CoreCrypto,
     private readonly apiClient: APIClient,
     /** number of seconds the certificate should be valid */
@@ -48,36 +51,36 @@ export class E2EIServiceInternal {
   ) {
     const {discoveryUrl} = initialData;
     this.acmeService = new AcmeService(discoveryUrl);
+    this.enrollmentStorage = createE2EIEnrollmentStorage(coreDb);
   }
 
   public async startCertificateProcess(hasActiveCertificate: boolean) {
     const identity = await this.initIdentity(hasActiveCertificate);
 
     // Store the values in local storage for later use (e.g. in the continue flow)
-    const {orderUrl, authChallenges} = await this.getEnrollmentChallenges(identity);
-    const {
-      authorization: {keyauth, oidcChallenge},
-    } = authChallenges;
+    const enrollmentData = await this.getEnrollmentChallenges(identity);
+    const {keyauth, oidcChallenge} = enrollmentData.authorization;
 
     // store auth data for continuing the flow later on
     const handle = await this.coreCryptoClient.e2eiEnrollmentStash(identity);
-    E2EIStorage.store.handle(Encoder.toBase64(handle).asString);
-    E2EIStorage.store.authData(authChallenges);
-    E2EIStorage.store.orderData({orderUrl});
+    await this.enrollmentStorage.savePendingEnrollmentData({
+      handle,
+      ...enrollmentData,
+    });
 
     return {challenge: oidcChallenge, keyAuth: keyauth};
   }
 
   public async continueCertificateProcess(oAuthIdToken: string): Promise<RotateBundle | undefined> {
-    const handle = E2EIStorage.get.handle();
-
-    const identity = await this.coreCryptoClient.e2eiEnrollmentStashPop(Decoder.fromBase64(handle).asBytes);
-    if (!identity) {
+    const enrollmentData = await this.enrollmentStorage.getPendingEnrollmentData();
+    if (!enrollmentData) {
       throw new Error('Error while trying to continue OAuth flow. No enrollment in progress found');
     }
 
-    const authData = E2EIStorage.get.authData();
-    return this.getRotateBundle(identity, oAuthIdToken, authData);
+    const {handle} = enrollmentData;
+    const identity = await this.coreCryptoClient.e2eiEnrollmentStashPop(handle);
+
+    return this.getRotateBundle(identity, oAuthIdToken, enrollmentData);
   }
 
   /**
@@ -88,9 +91,9 @@ export class E2EIServiceInternal {
    */
   public async renewCertificate(oAuthIdToken: string, hasActiveCertificate: boolean) {
     const identity = await this.initIdentity(hasActiveCertificate);
-    const authData = await this.getEnrollmentChallenges(identity);
+    const enrollmentData = await this.getEnrollmentChallenges(identity);
 
-    return this.getRotateBundle(identity, oAuthIdToken, authData.authChallenges);
+    return this.getRotateBundle(identity, oAuthIdToken, enrollmentData);
   }
 
   // ############ Internal Functions ############
@@ -180,7 +183,7 @@ export class E2EIServiceInternal {
       nonce: orderData.nonce,
     });
 
-    return {authChallenges, orderUrl: orderData.orderUrl};
+    return {orderUrl: orderData.orderUrl, ...authChallenges};
   }
 
   /**
@@ -191,14 +194,18 @@ export class E2EIServiceInternal {
    * @param oAuthIdToken
    * @returns RotateBundle
    */
-  private async getRotateBundle(identity: E2eiEnrollment, oAuthIdToken: string, authData: AuthData) {
+  private async getRotateBundle(
+    identity: E2eiEnrollment,
+    oAuthIdToken: string,
+    enrollmentData: UnidentifiedEnrollmentFlowData,
+  ) {
     // Step 7: Do OIDC client challenge
     const oidcData = await doWireOidcChallenge({
       oAuthIdToken,
-      authData,
+      authData: enrollmentData,
       connection: this.acmeService,
       identity,
-      nonce: authData.nonce,
+      nonce: enrollmentData.nonce,
     });
     this.logger.log('oidc data', oidcData);
 
@@ -209,7 +216,7 @@ export class E2EIServiceInternal {
     const {user: wireUser, clientId} = this.initialData;
     //Step 8: Do DPOP Challenge
     const dpopData = await doWireDpopChallenge({
-      authData,
+      authData: enrollmentData,
       clientId,
       connection: this.acmeService,
       identity,
@@ -225,12 +232,11 @@ export class E2EIServiceInternal {
     }
 
     //Step 9: Finalize Order
-    const orderData = E2EIStorage.get.orderData();
     const finalizeOrderData = await finalizeOrder({
       connection: this.acmeService,
       identity,
       nonce: dpopData.nonce,
-      orderUrl: orderData.orderUrl,
+      orderUrl: enrollmentData.orderUrl,
     });
 
     if (!finalizeOrderData.certificateUrl) {

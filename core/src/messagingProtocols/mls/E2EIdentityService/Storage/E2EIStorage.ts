@@ -17,77 +17,23 @@
  *
  */
 
-import {Encoder, Decoder} from 'bazinga64';
+import {EnrollmentFlowData} from './E2EIStorage.schema';
 
-import {AuthData, AuthDataSchema, OrderData} from './E2EIStorage.schema';
+import {CoreDatabase} from '../../../../storage/CoreDB';
 
-import {LocalStorageStore} from '../../../../util/LocalStorageStore';
+const PENDING_ENROLLMENT_TABLE = 'pendingEnrollmentData';
+const STORAGE_KEY = 'data';
 
-const HandleKey = 'Handle';
-const AuthDataKey = 'AuthData';
-const OderDataKey = 'OrderData';
-
-const storage = LocalStorageStore<string>('E2EIStorage');
-
-const storeHandle = (handle: string) => storage.add(HandleKey, Encoder.toBase64(handle).asString);
-const storeOrderData = (data: OrderData) => storage.add(OderDataKey, Encoder.toBase64(JSON.stringify(data)).asString);
-const storeAuthData = (data: AuthData) => storage.add(AuthDataKey, Encoder.toBase64(JSON.stringify(data)).asString);
-
-const hasHandle = () => storage.has(HandleKey);
-
-const getAndVerifyHandle = () => {
-  const handle = storage.get(HandleKey);
-  if (!handle) {
-    throw new Error('ACME: No handle found');
-  }
-
-  return Decoder.fromBase64(handle).asString;
-};
-
-const getAndVerifyAuthData = (): AuthData => {
-  const data = storage.get(AuthDataKey);
-  if (!data) {
-    throw new Error('ACME: AuthData not found');
-  }
-  const decodedData = Decoder.fromBase64(data).asString;
-  return AuthDataSchema.parse(JSON.parse(decodedData));
-};
-
-const getAndVerifyOrderData = (): OrderData => {
-  const data = storage.get(OderDataKey);
-  if (!data) {
-    throw new Error('ACME: OrderData not found');
-  }
-  const decodedData = Decoder.fromBase64(data).asString;
-  return JSON.parse(decodedData);
-};
-
-const removeTemporaryData = () => {
-  storage.remove(HandleKey);
-  storage.remove(AuthDataKey);
-  storage.remove(OderDataKey);
-};
-
-const removeAll = () => {
-  removeTemporaryData();
-};
-
-export const E2EIStorage = {
-  store: {
-    handle: storeHandle,
-    authData: storeAuthData,
-    orderData: storeOrderData,
-  },
-  get: {
-    handle: getAndVerifyHandle,
-    authData: getAndVerifyAuthData,
-    orderData: getAndVerifyOrderData,
-  },
-  has: {
-    handle: hasHandle,
-  },
-  remove: {
-    temporaryData: removeTemporaryData,
-    all: removeAll,
-  },
-};
+export function createE2EIEnrollmentStorage(coreDB: CoreDatabase) {
+  return {
+    async getPendingEnrollmentData(): Promise<EnrollmentFlowData | undefined> {
+      return coreDB.get(PENDING_ENROLLMENT_TABLE, STORAGE_KEY);
+    },
+    async savePendingEnrollmentData(data: EnrollmentFlowData): Promise<void> {
+      await coreDB.put(PENDING_ENROLLMENT_TABLE, data, STORAGE_KEY);
+    },
+    async deletePendingEnrollmentData(): Promise<void> {
+      return coreDB.delete(PENDING_ENROLLMENT_TABLE, STORAGE_KEY);
+    },
+  };
+}

@@ -856,6 +856,7 @@ export class MLSService extends TypedEventEmitter<Events> {
   ): Promise<EnrollmentProcessState> {
     const hasActiveCertificate = await this.coreCryptoClient.e2eiIsEnabled(this.config.cipherSuite);
     const e2eiServiceInternal = new E2EIServiceInternal(
+      this.coreDatabase,
       this.coreCryptoClient,
       this.apiClient,
       certificateTtl,
