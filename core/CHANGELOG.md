@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [44.0.8](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@44.0.7...@wireapp/core@44.0.8) (2024-02-21)
+
+### Bug Fixes
+
+* Pass parent conversation external senders to subconversation creation ([#5999](https://github.com/wireapp/wire-web-packages/issues/5999)) ([3a8133f](https://github.com/wireapp/wire-web-packages/commit/3a8133f1f5e79806863904529d351ae466f21bfa))
+
 ## [44.0.7](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@44.0.6...@wireapp/core@44.0.7) (2024-02-21)
 
 ### Bug Fixes
