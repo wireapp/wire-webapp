@@ -108,7 +108,7 @@ describe('MLSService', () => {
       const creator = {user: selfUser, client: 'client-1'};
       const users = [createUserId(), createUserId()];
 
-      await mlsService.registerConversation(groupId, [...users, selfUser], creator);
+      await mlsService.registerConversation(groupId, [...users, selfUser], {creator});
 
       expect(apiClient.api.client.claimMLSKeyPackages).toHaveBeenCalledTimes(3);
       expect(apiClient.api.client.claimMLSKeyPackages).toHaveBeenCalledWith(
