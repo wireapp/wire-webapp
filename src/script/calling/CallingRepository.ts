@@ -52,6 +52,7 @@ import {
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {backgroundBlur} from 'Components/calling/FullscreenVideoCall';
 import {flatten} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
@@ -91,7 +92,6 @@ import * as trackingHelpers from '../tracking/Helpers';
 import {Segmentation} from '../tracking/Segmentation';
 import type {UserRepository} from '../user/UserRepository';
 import {Warnings} from '../view_model/WarningsContainer';
-import {backgroundBlur} from 'Components/calling/FullscreenVideoCall';
 
 const avsLogger = getLogger('avs');
 
@@ -1126,6 +1126,7 @@ export class CallingRepository {
 
   public async refreshVideoInput(): Promise<MediaStream | void> {
     const stream = await this.mediaStreamHandler.requestMediaStream(false, true, false, false);
+
     this.stopMediaSource(MediaType.VIDEO);
     const clonedMediaStream = this.changeMediaSource(stream, MediaType.VIDEO);
     return clonedMediaStream;
@@ -1187,29 +1188,26 @@ export class CallingRepository {
     // Don't update video input (coming from A/V preferences) when screensharing is activated
     if (mediaType === MediaType.VIDEO && selfParticipant.sharesCamera() && !selfParticipant.sharesScreen()) {
       const videoTracks = mediaStream.getVideoTracks().map(track => track.clone());
-      const canvasTracks = mediaStream.getTracks().map(track => track.clone());
-      console.log(videoTracks, canvasTracks);
-      if (videoTracks.length > 0) {
-        const clonedMediaStream = new MediaStream(videoTracks);
-        const clonedCanvasStream = new MediaStream(canvasTracks);
-        console.log(
-          'changeMediaSource',
-          videoTracks,
-          clonedMediaStream,
-          clonedCanvasStream,
-          selfParticipant.isBlurred(),
-        );
-        selfParticipant.setVideoStream(
-          selfParticipant.isBlurred() === backgroundBlur.isBlurred ? clonedCanvasStream : clonedMediaStream,
-          true,
-        );
-        this.wCall?.replaceTrack(
-          this.serializeQualifiedId(call.conversationId),
-          selfParticipant.isBlurred() === backgroundBlur.isBlurred ? canvasTracks[0] : videoTracks[0],
-        );
+      const blurredTracks = selfParticipant
+        .blurStream()
+        ?.getVideoTracks()
+        .map(track => track.clone());
+
+      if (blurredTracks && blurredTracks.length > 0 && selfParticipant.isBlurred() === backgroundBlur.isBlurred) {
+        const clonedCanvasStream = new MediaStream(blurredTracks);
+        selfParticipant.setVideoStream(clonedCanvasStream, true);
+        this.wCall?.replaceTrack(this.serializeQualifiedId(call.conversationId), blurredTracks[0]);
         // Remove the previous video stream
         this.mediaStreamHandler.releaseTracksFromStream(mediaStream);
-        return selfParticipant.isBlurred() === backgroundBlur.isBlurred ? clonedCanvasStream : clonedMediaStream;
+        return clonedCanvasStream;
+      } else if (videoTracks.length > 0) {
+        const clonedMediaStream = new MediaStream(videoTracks);
+
+        selfParticipant.setVideoStream(clonedMediaStream, true);
+        this.wCall?.replaceTrack(this.serializeQualifiedId(call.conversationId), videoTracks[0]);
+        // Remove the previous video stream
+        this.mediaStreamHandler.releaseTracksFromStream(mediaStream);
+        return clonedMediaStream;
       }
     }
   }

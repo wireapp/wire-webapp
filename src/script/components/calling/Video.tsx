@@ -33,6 +33,7 @@ import {useBlur} from './useBlur';
 type VideoProps = VideoHTMLAttributes<HTMLVideoElement | HTMLCanvasElement> & {
   srcObject: MediaStream;
   isBlurred: boolean;
+  blurStream?: MediaStream;
 };
 
 const STATE = {
@@ -42,19 +43,18 @@ const STATE = {
   flags: {},
   modelConfig: {},
   visualization: {
-    foregroundThreshold: 0.4,
-    maskOpacity: 0.7,
-    maskBlur: 0,
-    pixelCellWidth: 10,
-    backgroundBlur: 4,
-    edgeBlur: 3,
+    foregroundThreshold: 0.5,
+    // maskOpacity: 0.5,
+    // maskBlur: 0,
+    backgroundBlur: 10,
+    edgeBlur: 5,
   },
 };
 
-const Video = ({srcObject, isBlurred, ...props}: VideoProps) => {
+const Video = ({srcObject, isBlurred, blurStream, ...props}: VideoProps) => {
   const refVideo = useRef<HTMLVideoElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
-  const stream = useRef<MediaStream | null>(null);
+  const blurRef = useRef<MediaStream | undefined>(undefined);
   const ctx = useRef<CanvasRenderingContext2D | null | undefined>(null);
   const rafId = useRef<number | null>(null);
   const firstRender = useRef(true);
@@ -79,7 +79,7 @@ const Video = ({srcObject, isBlurred, ...props}: VideoProps) => {
     }
     ctx.current = canvas?.current?.getContext('2d');
     draw(ctx.current);
-    stream.current = canvas?.current?.captureStream() ?? null;
+    blurRef.current = canvas?.current?.captureStream();
   }, [draw, isBlurred]);
 
   const segmenterFunc = useCallback(async () => {
@@ -113,7 +113,6 @@ const Video = ({srcObject, isBlurred, ...props}: VideoProps) => {
         );
       }
       draw(ctx.current);
-      stream.current = canvas?.current?.captureStream() ?? null;
     }
   }, [cleanup, draw, segmenter]);
 
@@ -151,6 +150,15 @@ const Video = ({srcObject, isBlurred, ...props}: VideoProps) => {
     refVideo.current.srcObject = srcObject;
   }, [srcObject]);
 
+  useEffect(() => {
+    if (!isBlurred) {
+      return;
+    }
+    if (blurStream && canvas.current) {
+      blurRef.current = blurStream;
+    }
+  }, [blurStream, isBlurred]);
+
   useEffect(
     () => () => {
       if (refVideo.current) {
@@ -163,7 +171,11 @@ const Video = ({srcObject, isBlurred, ...props}: VideoProps) => {
   return (
     <>
       {!!isBlurred && <canvas ref={canvas} {...props} />}
-      <video ref={refVideo} {...props} css={{visibility: !!isBlurred ? 'hidden' : 'visible'}} />
+      <video
+        ref={refVideo}
+        {...props}
+        css={{visibility: !!isBlurred ? 'hidden' : 'visible', display: !!isBlurred ? 'none' : 'inline block'}}
+      />
     </>
   );
 };

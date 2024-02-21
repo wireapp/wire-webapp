@@ -125,7 +125,7 @@ export class MediaStreamHandler {
     });
   }
 
-  private getMediaStream(
+  private async getMediaStream(
     audio: boolean,
     video: boolean,
     screen: boolean,

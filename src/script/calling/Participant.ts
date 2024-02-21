@@ -34,6 +34,7 @@ export class Participant {
   // Video
   public videoState: ko.Observable<VIDEO_STATE>;
   public videoStream: ko.Observable<MediaStream | undefined>;
+  public blurStream: ko.Observable<MediaStream | undefined>;
   public hasActiveVideo: ko.PureComputed<boolean>;
   public hasPausedVideo: ko.PureComputed<boolean>;
   public sharesScreen: ko.PureComputed<boolean>;
@@ -67,6 +68,7 @@ export class Participant {
     this.isBlurred = ko.observable(
       localStorage.getItem('blurState') === 'true' ? backgroundBlur.isBlurred : backgroundBlur.isNotBlurred,
     );
+    this.blurStream = ko.observable();
     this.videoStream = ko.observable();
     this.audioStream = ko.observable();
     this.isActivelySpeaking = ko.observable(false);
@@ -89,6 +91,7 @@ export class Participant {
   setBlur(blurState: backgroundBlur): void {
     this.isBlurred(blurState);
     localStorage.setItem('blurState', blurState === backgroundBlur.isBlurred ? 'true' : 'false');
+    this.setVideoStream(blurState === backgroundBlur.isBlurred ? this.blurStream() : this.videoStream(), true);
   }
 
   setVideoStream(videoStream: MediaStream, stopTracks: boolean): void {
