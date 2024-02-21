@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [44.0.7](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@44.0.6...@wireapp/core@44.0.7) (2024-02-21)
+
+### Bug Fixes
+
+* force npm publish ([dac8b9e](https://github.com/wireapp/wire-web-packages/commit/dac8b9e2b83763e99cfc9ac4d087de6c7644abe6))
+
 ## [44.0.6](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@44.0.5...@wireapp/core@44.0.6) (2024-02-20)
 
 **Note:** Version bump only for package @wireapp/core
