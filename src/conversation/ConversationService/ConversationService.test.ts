@@ -124,7 +124,7 @@ describe('ConversationService', () => {
 
     const mockedDb = await openDB('core-test-db');
 
-    const groupIdFromConversationId = jest.fn();
+    const groupIdFromConversationId = jest.fn(async () => 'groupId');
 
     const mockedSubconversationService = {
       joinConferenceSubconversation: jest.fn(),
@@ -412,7 +412,9 @@ describe('ConversationService', () => {
 
       expect(mlsService.wipeConversation).toHaveBeenCalledWith(mockGroupId);
       expect(mlsService.registerConversation).toHaveBeenCalledTimes(1);
-      expect(mlsService.registerConversation).toHaveBeenCalledWith(mockGroupId, [otherUserId, selfUser.user], selfUser);
+      expect(mlsService.registerConversation).toHaveBeenCalledWith(mockGroupId, [otherUserId, selfUser.user], {
+        creator: selfUser,
+      });
       expect(conversationService.joinByExternalCommit).not.toHaveBeenCalled();
       expect(establishedConversation.epoch).toEqual(updatedEpoch);
     });
@@ -463,7 +465,9 @@ describe('ConversationService', () => {
 
       expect(mlsService.wipeConversation).toHaveBeenCalledWith(mockGroupId);
       expect(mlsService.registerConversation).toHaveBeenCalledTimes(2);
-      expect(mlsService.registerConversation).toHaveBeenCalledWith(mockGroupId, [otherUserId, selfUser.user], selfUser);
+      expect(mlsService.registerConversation).toHaveBeenCalledWith(mockGroupId, [otherUserId, selfUser.user], {
+        creator: selfUser,
+      });
       expect(conversationService.joinByExternalCommit).not.toHaveBeenCalled();
       expect(establishedConversation.epoch).toEqual(updatedEpoch);
     });
@@ -533,7 +537,7 @@ describe('ConversationService', () => {
       await new Promise(resolve => setImmediate(resolve));
 
       expect(conversationService.joinByExternalCommit).not.toHaveBeenCalled();
-      expect(subconversationService.joinConferenceSubconversation).toHaveBeenCalledWith(conversationId);
+      expect(subconversationService.joinConferenceSubconversation).toHaveBeenCalledWith(conversationId, 'groupId');
     });
   });
 

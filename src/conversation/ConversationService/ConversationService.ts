@@ -304,8 +304,10 @@ export class ConversationService extends TypedEventEmitter<Events> {
     }
 
     const response = await this.mlsService.registerConversation(groupId, qualifiedUsers.concat(selfUserId), {
-      user: selfUserId,
-      client: selfClientId,
+      creator: {
+        user: selfUserId,
+        client: selfClientId,
+      },
     });
 
     // We fetch the fresh version of the conversation created on backend with the newly added users
@@ -477,7 +479,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
    * Handles epoch mismatch in a subconversation.
    * @param subconversation - subconversation
    */
-  private async handleSubconversationEpochMismatch(subconversation: Subconversation) {
+  private async handleSubconversationEpochMismatch(subconversation: Subconversation, parentGroupId: string) {
     const {
       parent_qualified_id: parentConversationId,
       group_id: groupId,
@@ -496,7 +498,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
       }
 
       try {
-        await this.subconversationService.joinConferenceSubconversation(parentConversationId);
+        await this.subconversationService.joinConferenceSubconversation(parentConversationId, parentGroupId);
       } catch (error) {
         const message = `There was an error while handling epoch mismatch in MLS subconversation (id: ${parentConversationId.id}, subconv: ${subconversationId}):`;
         this.logger.error(message, error);
@@ -602,7 +604,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
     await this.mlsService.wipeConversation(groupId);
 
     try {
-      await this.mlsService.registerConversation(groupId, [otherUserId, selfUser.user], selfUser);
+      await this.mlsService.registerConversation(groupId, [otherUserId, selfUser.user], {creator: selfUser});
       this.logger.info(`Conversation (id ${mlsConversation.qualified_id.id}) established successfully.`);
 
       return this.getMLS1to1Conversation(otherUserId);
@@ -691,12 +693,16 @@ export class ConversationService extends TypedEventEmitter<Events> {
 
   private async recoverMLSGroupFromEpochMismatch(conversationId: QualifiedId, subconversationId?: SUBCONVERSATION_ID) {
     if (subconversationId) {
+      const parentGroupId = await this.groupIdFromConversationId(conversationId);
       const subconversation = await this.apiClient.api.conversation.getSubconversation(
         conversationId,
         subconversationId,
       );
 
-      return this.handleSubconversationEpochMismatch(subconversation);
+      if (!parentGroupId) {
+        throw new Error('Could not find parent group id for the subconversation');
+      }
+      return this.handleSubconversationEpochMismatch(subconversation, parentGroupId);
     }
 
     const mlsConversation = await this.apiClient.api.conversation.getConversation(conversationId);

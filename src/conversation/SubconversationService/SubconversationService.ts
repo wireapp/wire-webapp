@@ -66,9 +66,11 @@ export class SubconversationService extends TypedEventEmitter<Events> {
    * Will return the secret key derived from the subconversation
    *
    * @param conversationId Id of the parent conversation in which the call should happen
+   * @param groupId groupId of the parent conversation in which the call should happen
    */
   public async joinConferenceSubconversation(
     conversationId: QualifiedId,
+    groupId: string,
     shouldRetry = true,
   ): Promise<{groupId: string; epoch: number}> {
     try {
@@ -86,7 +88,7 @@ export class SubconversationService extends TypedEventEmitter<Events> {
         }
 
         // If subconversation is not yet established, create it and upload the commit bundle.
-        await this.mlsService.registerConversation(subconversationGroupId, []);
+        await this.mlsService.registerConversation(subconversationGroupId, [], {parentGroupId: groupId});
       } else {
         const epochUpdateTime = new Date(subconversationEpochTimestamp).getTime();
         const epochAge = new Date().getTime() - epochUpdateTime;
@@ -99,7 +101,7 @@ export class SubconversationService extends TypedEventEmitter<Events> {
           });
           await this.mlsService.wipeConversation(subconversationGroupId);
 
-          return this.joinConferenceSubconversation(conversationId);
+          return this.joinConferenceSubconversation(conversationId, groupId);
         }
 
         await this.joinSubconversationByExternalCommit(conversationId, SUBCONVERSATION_ID.CONFERENCE);
@@ -113,7 +115,7 @@ export class SubconversationService extends TypedEventEmitter<Events> {
       return {groupId: subconversationGroupId, epoch};
     } catch (error) {
       if (shouldRetry) {
-        return this.joinConferenceSubconversation(conversationId, false);
+        return this.joinConferenceSubconversation(conversationId, groupId, false);
       }
       throw error;
     }
@@ -213,8 +215,10 @@ export class SubconversationService extends TypedEventEmitter<Events> {
       keyLength: number;
     }) => void,
   ): Promise<() => void> {
-    const {epoch: initialEpoch, groupId: subconversationGroupId} =
-      await this.joinConferenceSubconversation(parentConversationId);
+    const {epoch: initialEpoch, groupId: subconversationGroupId} = await this.joinConferenceSubconversation(
+      parentConversationId,
+      parentConversationGroupId,
+    );
 
     const forwardNewEpoch = async ({groupId}: {groupId: string; epoch: number}) => {
       if (groupId !== subconversationGroupId) {

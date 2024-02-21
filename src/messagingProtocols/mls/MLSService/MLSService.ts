@@ -390,14 +390,22 @@ export class MLSService extends TypedEventEmitter<Events> {
   /**
    * Will create an empty conversation inside of coreCrypto.
    * @param groupId the id of the group to create inside of coreCrypto
+   * @param parentGroupId in case the conversation is a subconversation, the id of the parent conversation
    */
-  public async registerEmptyConversation(groupId: string): Promise<void> {
+  public async registerEmptyConversation(groupId: string, parentGroupId?: string): Promise<void> {
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
 
-    const mlsKeys = (await this.apiClient.api.client.getPublicKeys()).removal;
-    const mlsKeyBytes = Object.values(mlsKeys).map((key: string) => Decoder.fromBase64(key).asBytes);
+    let externalSenders: Uint8Array[] = [];
+    if (parentGroupId) {
+      const parentGroupIdBytes = Decoder.fromBase64(parentGroupId).asBytes;
+      externalSenders = [await this.coreCryptoClient.getExternalSender(parentGroupIdBytes)];
+    } else {
+      const mlsKeys = (await this.apiClient.api.client.getPublicKeys()).removal;
+      externalSenders = Object.values(mlsKeys).map((key: string) => Decoder.fromBase64(key).asBytes);
+    }
+
     const configuration: ConversationConfiguration = {
-      externalSenders: mlsKeyBytes,
+      externalSenders,
       ciphersuite: this.config.cipherSuite,
     };
 
@@ -409,15 +417,17 @@ export class MLSService extends TypedEventEmitter<Events> {
    * Will create a conversation inside of coreCrypto, add users to it or update the keying material if empty key packages list is provided.
    * @param groupId the id of the group to create inside of coreCrypto
    * @param users the list of users that will be members of the conversation (including the self user)
-   * @param creator the creator of the list. Most of the time will be the self user (or empty if the conversation was created by backend first)
+   * @param options.creator the creator of the list. Most of the time will be the self user (or empty if the conversation was created by backend first)
+   * @param options.parentGroupId in case the conversation is a subconversation, the id of the parent conversation
    */
   public async registerConversation(
     groupId: string,
     users: QualifiedId[],
-    creator?: {user: QualifiedId; client?: string},
+    options?: {creator?: {user: QualifiedId; client?: string}; parentGroupId?: string},
   ): Promise<PostMlsMessageResponse> {
-    await this.registerEmptyConversation(groupId);
+    await this.registerEmptyConversation(groupId, options?.parentGroupId);
 
+    const creator = options?.creator;
     const {coreCryptoKeyPackagesPayload: keyPackages, failedToFetchKeyPackages} = await this.getKeyPackagesPayload(
       users.map(user => {
         if (user.id === creator?.user.id) {
