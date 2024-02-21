@@ -204,8 +204,6 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
    * - It must be updated every 24 hours.
    *
    * Both must be registered before the first enrollment.
-   *
-   * @param discoveryUrl
    */
   public async registerServerCertificates(): Promise<void> {
     const ROOT_CA_KEY = 'e2ei_root-registered';
