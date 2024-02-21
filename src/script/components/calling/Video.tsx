@@ -57,6 +57,7 @@ const Video = ({srcObject, isBlurred, ...props}: VideoProps) => {
   const stream = useRef<MediaStream | null>(null);
   const ctx = useRef<CanvasRenderingContext2D | null | undefined>(null);
   const rafId = useRef<number | null>(null);
+  const firstRender = useRef(true);
   const {init, segmenter, cleanup} = useBlur();
 
   const draw = useCallback(
@@ -123,6 +124,7 @@ const Video = ({srcObject, isBlurred, ...props}: VideoProps) => {
   }, [segmenterFunc]);
 
   useEffect(() => {
+    firstRender.current = false;
     if (refVideo.current?.srcObject && !!isBlurred) {
       window.cancelAnimationFrame(rafId?.current ?? 0);
       cleanup();
@@ -137,7 +139,7 @@ const Video = ({srcObject, isBlurred, ...props}: VideoProps) => {
       cleanup();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isBlurred, refVideo.current?.srcObject]);
+  }, [isBlurred, refVideo.current, srcObject.getVideoTracks()[0]?.getSettings()?.height, firstRender.current]);
 
   // const gl = window.exposedContext;
   // if (gl) gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(4));
