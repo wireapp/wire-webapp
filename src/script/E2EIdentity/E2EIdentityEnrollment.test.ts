@@ -121,7 +121,7 @@ describe('E2EIHandler', () => {
     await instance.initialize(params);
     void instance.attemptEnrollment();
     await wait(1);
-    expect(container.resolve(Core).service?.e2eIdentity?.registerServerCertificates).toHaveBeenCalled();
+    expect(container.resolve(Core).service?.e2eIdentity?.initialize).toHaveBeenCalled();
     expect(instance['currentStep']).toBe(E2EIHandlerStep.INITIALIZED);
   });
 
@@ -206,7 +206,7 @@ describe('E2EIHandler', () => {
     // set active certificate to be truthy
     (hasActiveCertificate as jest.Mock).mockResolvedValue(true);
 
-    jest.spyOn(container.resolve(Core).service!.e2eIdentity!, 'isEnrollmentInProgress').mockReturnValue(false);
+    jest.spyOn(container.resolve(Core).service!.e2eIdentity!, 'isEnrollmentInProgress').mockResolvedValue(false);
 
     // Spy on renewCertificate to check if it's called
     const renewCertificateSpy = jest.spyOn(handler as any, 'renewCertificate');
@@ -226,7 +226,7 @@ describe('E2EIHandler', () => {
 
     // Set active certificate to be truthy and enrollment in progress
     (hasActiveCertificate as jest.Mock).mockResolvedValue(true);
-    jest.spyOn(container.resolve(Core).service!.e2eIdentity!, 'isEnrollmentInProgress').mockReturnValue(true);
+    jest.spyOn(container.resolve(Core).service!.e2eIdentity!, 'isEnrollmentInProgress').mockResolvedValue(true);
 
     // Spy on enroll to check if it's called
     const enrollSpy = jest.spyOn(handler, 'enroll');
@@ -249,7 +249,7 @@ describe('E2EIHandler', () => {
 
     // Set active certificate to be truthy and enrollment not in progress
     (hasActiveCertificate as jest.Mock).mockResolvedValue(true);
-    jest.spyOn(container.resolve(Core).service!.e2eIdentity!, 'isEnrollmentInProgress').mockReturnValue(false);
+    jest.spyOn(container.resolve(Core).service!.e2eIdentity!, 'isEnrollmentInProgress').mockResolvedValue(false);
 
     const timeRemainingMS = 60 * TimeInMillis.DAY; // 60 days remaining
 
