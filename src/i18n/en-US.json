@@ -483,6 +483,7 @@
   "conversationJustNow": "Just now",
   "conversationLabelFavorites": "Favorites",
   "conversationLabelGroups": "Groups",
+  "conversationLabelDirects": "1:1 Conversations",
   "conversationLabelPeople": "People",
   "conversationLikesCaptionPlural": "[bold]{{firstUser}}[/bold] and [bold]{{secondUser}}[/bold]",
   "conversationLikesCaptionPluralMoreThan2": "[bold]{{userNames}}[/bold] and [showmore]{{number}} more[/showmore]",
