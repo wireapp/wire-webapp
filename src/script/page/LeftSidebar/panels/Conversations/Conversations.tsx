@@ -122,7 +122,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   const groupConversations = conversations.filter(conversation => conversation.isGroup());
   const directConversations = conversations.filter(conversation => conversation.is1to1());
   const totalUnreadGroupConversations = groupConversations.filter(conversation => conversation.hasUnread()).length;
-  const totalUnreadDirectConversations = groupConversations.filter(conversation => conversation.hasUnread()).length;
+  const totalUnreadDirectConversations = directConversations.filter(conversation => conversation.hasUnread()).length;
 
   const totalUnreadConversations = unreadConversations.length;
 
