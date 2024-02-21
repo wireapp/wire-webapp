@@ -20,7 +20,9 @@
 import {SUBCONVERSATION_ID} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {DBSchema, deleteDB as idbDeleteDB, IDBPDatabase, openDB as idbOpenDb} from 'idb';
-const VERSION = 5;
+
+import {EnrollmentFlowData} from '../messagingProtocols/mls/E2EIdentityService/Storage/E2EIStorage.schema';
+const VERSION = 6;
 
 interface CoreDBSchema extends DBSchema {
   prekeys: {
@@ -47,6 +49,10 @@ interface CoreDBSchema extends DBSchema {
     key: string;
     value: {expiresAt: number; url: string};
   };
+  pendingEnrollmentData: {
+    key: string;
+    value: EnrollmentFlowData;
+  };
 }
 
 export type CoreDatabase = IDBPDatabase<CoreDBSchema>;
@@ -68,6 +74,8 @@ export async function openDB(dbName: string): Promise<CoreDatabase> {
           db.createObjectStore('subconversations');
         case 5:
           db.createObjectStore('crls');
+        case 6:
+          db.createObjectStore('pendingEnrollmentData');
       }
     },
   });

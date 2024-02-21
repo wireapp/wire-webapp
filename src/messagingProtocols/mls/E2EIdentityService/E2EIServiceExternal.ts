@@ -26,7 +26,7 @@ import {CoreCrypto, E2eiConversationState, WireIdentity, DeviceStatus} from '@wi
 
 import {AcmeService} from './Connection';
 import {getE2EIClientId} from './Helper';
-import {E2EIStorage} from './Storage/E2EIStorage';
+import {createE2EIEnrollmentStorage} from './Storage/E2EIStorage';
 
 import {ClientService} from '../../../client';
 import {CoreDatabase} from '../../../storage/CoreDB';
@@ -47,6 +47,7 @@ type Events = {
 // This export is meant to be accessible from the outside (e.g the Webapp / UI)
 export class E2EIServiceExternal extends TypedEventEmitter<Events> {
   private _acmeService?: AcmeService;
+  private readonly enrollmentStorage: ReturnType<typeof createE2EIEnrollmentStorage>;
 
   public constructor(
     private readonly coreCryptoClient: CoreCrypto,
@@ -57,18 +58,20 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
   ) {
     super();
     void this.initialiseCrlDistributionTimers();
+    this.enrollmentStorage = createE2EIEnrollmentStorage(coreDatabase);
     mlsService.on('newCrlDistributionPoints', distributionPoints =>
       this.handleNewCrlDistributionPoints(distributionPoints),
     );
   }
 
   // If we have a handle in the local storage, we are in the enrollment process (this handle is saved before oauth redirect)
-  public isEnrollmentInProgress(): boolean {
-    return E2EIStorage.has.handle();
+  public async isEnrollmentInProgress(): Promise<boolean> {
+    const data = await this.enrollmentStorage.getPendingEnrollmentData();
+    return !!data;
   }
 
-  public clearAllProgress(): void {
-    E2EIStorage.remove.temporaryData();
+  public clearAllProgress() {
+    return this.enrollmentStorage.deletePendingEnrollmentData();
   }
 
   public getConversationState(conversationId: Uint8Array): Promise<E2eiConversationState> {
@@ -176,8 +179,16 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
     return localCertificateRoot;
   }
 
+  /**
+   * will initialize the E2EIServiceExternal with the given discoveryUrl and userId.
+   * It will also register the server certificates in CoreCrypto.
+   *
+   * @param discoveryUrl the discovery url of the acme server
+   * @param userId the user that is concerned by the enrollment
+   */
   public async initialize(discoveryUrl: string): Promise<void> {
     this._acmeService = new AcmeService(discoveryUrl);
+    await this.registerServerCertificates();
   }
 
   private get acmeService(): AcmeService {
@@ -205,9 +216,9 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
    *
    * Both must be registered before the first enrollment.
    */
-  public async registerServerCertificates(): Promise<void> {
+  private async registerServerCertificates(): Promise<void> {
     const ROOT_CA_KEY = 'e2ei_root-registered';
-    const store = LocalStorageStore(ROOT_CA_KEY);
+    const store = LocalStorageStore(this.coreDatabase.name);
 
     // Register root certificate if not already registered
     if (!store.has(ROOT_CA_KEY)) {
