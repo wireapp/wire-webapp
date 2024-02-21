@@ -48,6 +48,7 @@ export interface FailedToAddUsersMessageProps {
 const errorMessageType = {
   [AddUsersFailureReasons.NON_FEDERATING_BACKENDS]: 'NonFederatingBackends',
   [AddUsersFailureReasons.UNREACHABLE_BACKENDS]: 'OfflineBackend',
+  [AddUsersFailureReasons.OFFLINE_FOR_TOO_LONG]: 'OfflineForTooLong',
 } as const;
 
 const config = Config.getConfig();
@@ -103,13 +104,15 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
   const {users: allUsers} = useKoSubscribableChildren(userState, ['users']);
 
   const [users, total] = useMemo(() => {
-    const users: User[] = message.qualifiedIds.reduce<User[]>((previous, current) => {
+    //FIXME: 0
+    const users: User[] = message.data[0].users.reduce<User[]>((previous, current) => {
       const foundUser = allUsers.find(user => matchQualifiedIds(current, user.qualifiedId));
       return foundUser ? [...previous, foundUser] : previous;
     }, []);
     const total = users.length;
     return [users, total];
-  }, [allUsers, message.qualifiedIds]);
+    //FIXME: 0
+  }, [allUsers, message.data[0].users]);
 
   if (users.length === 0) {
     return null;
@@ -146,10 +149,11 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
         >
           {total <= 1 && (
             <p data-uie-name="1-user-not-added-details" data-uie-value={users[0].id}>
+              {/* FIXME: [0] */}
               <span
                 css={warning}
                 dangerouslySetInnerHTML={{
-                  __html: t(`failedToAddParticipantSingular${errorMessageType[message.reason]}`, {
+                  __html: t(`failedToAddParticipantSingular${errorMessageType[message.data[0].reason]}`, {
                     name: getUserName(users[0]),
                     domain: users[0].domain,
                   }),
@@ -177,7 +181,8 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
       </div>
       <div className="message-body" css={{flexDirection: 'column'}}>
         {isOpen && (
-          <MessageDetails users={users} reason={message.reason} domains={users.map(user => user.domain)}>
+          // FIXME: [0]
+          <MessageDetails users={users} reason={message.data[0].reason} domains={users.map(user => user.domain)}>
             {learnMore}
           </MessageDetails>
         )}

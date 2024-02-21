@@ -41,7 +41,7 @@ const createFailedToAddUsersMessage = ({
   reason?: AddUsersFailureReasons;
   backends?: string[];
 }) => {
-  return new FailedToAddUsersMessageEntity(users, reason, backends, Date.now());
+  return new FailedToAddUsersMessageEntity([{reason, users, backends}], Date.now());
 };
 
 function createUser(qualifiedId: QualifiedId, name: string) {
