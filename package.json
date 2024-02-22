@@ -6,7 +6,7 @@
     "@lexical/history": "0.13.1",
     "@lexical/react": "0.13.1",
     "@peculiar/x509": "1.9.7",
-    "@wireapp/avs": "9.6.11",
+    "@wireapp/avs": "9.6.12",
     "@wireapp/commons": "5.2.5",
     "@wireapp/core": "44.0.13",
     "@wireapp/react-ui-kit": "9.15.4",
