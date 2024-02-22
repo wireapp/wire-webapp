@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [45.0.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@44.0.13...@wireapp/core@45.0.0) (2024-02-22)
+
+### Code Refactoring
+
+* lazily ask consumer for oAuth token ([#6004](https://github.com/wireapp/wire-web-packages/issues/6004)) ([aeaa3ef](https://github.com/wireapp/wire-web-packages/commit/aeaa3ef7ccb8e7e4dc6058a8c5faee954af0e7b8))
+
+### BREAKING CHANGES
+
+* enrolling to E2EI doesn't take an oAuthToken directly but rather a function that will be called when the token is needed. This makes the consumer not needing to be aware of the start/continuation of the flow (in case there is a redirect needed).
+
 ## [44.0.13](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@44.0.12...@wireapp/core@44.0.13) (2024-02-22)
 
 **Note:** Version bump only for package @wireapp/core
