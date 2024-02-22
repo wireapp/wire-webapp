@@ -59,6 +59,7 @@ import {
   resumeRejoiningMLSConversations,
 } from './messagingProtocols/mls/conversationRejoinQueue';
 import {E2EIServiceExternal, User} from './messagingProtocols/mls/E2EIdentityService';
+import {getTokenCallback} from './messagingProtocols/mls/E2EIdentityService/E2EIServiceInternal';
 import {CoreCallbacks, CoreCryptoConfig, SecretCrypto} from './messagingProtocols/mls/types';
 import {NewClient, ProteusService} from './messagingProtocols/proteus';
 import {CryptoClientType} from './messagingProtocols/proteus/ProteusService/CryptoClient';
@@ -234,14 +235,16 @@ export class Account extends TypedEventEmitter<Events> {
     handle,
     teamId,
     discoveryUrl,
-    oAuthIdToken,
+    getOAuthToken,
     certificateTtl = 90 * (TimeInMillis.DAY / 1000),
   }: {
+    /** display name of the user (should match the identity provider) */
     displayName: string;
+    /** handle of the user (should match the identity provider) */
     handle: string;
     teamId: string;
     discoveryUrl: string;
-    oAuthIdToken?: string;
+    getOAuthToken: getTokenCallback;
     /** number of seconds the certificate should be valid (default 90 days) */
     certificateTtl?: number;
   }) {
@@ -270,7 +273,7 @@ export class Account extends TypedEventEmitter<Events> {
       this.currentClient,
       this.options.nbPrekeys,
       certificateTtl,
-      oAuthIdToken,
+      getOAuthToken,
     );
   }
 

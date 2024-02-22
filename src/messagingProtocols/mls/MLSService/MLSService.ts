@@ -54,7 +54,7 @@ import {numberToHex} from '../../../util/numberToHex';
 import {RecurringTaskScheduler} from '../../../util/RecurringTaskScheduler';
 import {TaskScheduler} from '../../../util/TaskScheduler';
 import {AcmeChallenge, User} from '../E2EIdentityService';
-import {E2EIServiceInternal} from '../E2EIdentityService/E2EIServiceInternal';
+import {E2EIServiceInternal, getTokenCallback} from '../E2EIdentityService/E2EIServiceInternal';
 import {handleMLSMessageAdd, handleMLSWelcomeMessage} from '../EventHandler/events';
 import {
   deleteMLSMessagesQueue,
@@ -908,9 +908,9 @@ export class MLSService extends TypedEventEmitter<Events> {
     client: RegisteredClient,
     nbPrekeys: number,
     certificateTtl: number,
-    oAuthIdToken?: string,
+    getOAuthToken: getTokenCallback,
   ): Promise<EnrollmentProcessState> {
-    const hasActiveCertificate = await this.coreCryptoClient.e2eiIsEnabled(this.config.cipherSuite);
+    const isCertificateRenewal = await this.coreCryptoClient.e2eiIsEnabled(this.config.cipherSuite);
     const e2eiServiceInternal = new E2EIServiceInternal(
       this.coreDatabase,
       this.coreCryptoClient,
@@ -920,25 +920,11 @@ export class MLSService extends TypedEventEmitter<Events> {
       {user, clientId: client.id, discoveryUrl},
     );
 
-    // If we don't have an OAuth id token, we need to start the certificate process with Oauth
-    if (!oAuthIdToken) {
-      const data = await e2eiServiceInternal.startCertificateProcess(hasActiveCertificate);
-      return {status: 'authentication', authenticationChallenge: data};
-    }
+    const rotateBundle = await e2eiServiceInternal.generateCertificate(getOAuthToken, isCertificateRenewal);
 
-    // If we have an OAuth id token, we can continue the certificate process / start a refresh
-    const rotateBundle = !hasActiveCertificate
-      ? // If we are not refreshing the active certificate, we need to continue the certificate process with Oauth
-        await e2eiServiceInternal.continueCertificateProcess(oAuthIdToken)
-      : // If we are refreshing the active certificate, can start the refresh process
-        await e2eiServiceInternal.renewCertificate(oAuthIdToken, hasActiveCertificate);
-
-    if (rotateBundle === undefined) {
-      throw new Error('Could not get the rotate bundle');
-    }
     this.dispatchNewCrlDistributionPoints(rotateBundle);
     // upload the clients public keys
-    if (!hasActiveCertificate) {
+    if (!isCertificateRenewal) {
       // we only upload public keys for the initial certification process. Renewals do not need to upload new public keys
       await this.uploadMLSPublicKeys(client);
     }
