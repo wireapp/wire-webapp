@@ -19,7 +19,6 @@
 
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import {amplify} from 'amplify';
-import {User} from 'oidc-client-ts';
 import {container} from 'tsyringe';
 
 import {TypedEventEmitter} from '@wireapp/commons';
@@ -72,7 +71,6 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   private readonly core = container.resolve(Core);
   private readonly userState = container.resolve(UserState);
   private config?: EnrollmentConfig;
-  private currentStep: E2EIHandlerStep = E2EIHandlerStep.UNINITIALIZED;
   private oidcService?: OIDCService;
   public certificateTtl?: number;
 
@@ -119,7 +117,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
    * @returns
    */
   public isE2EIEnabled() {
-    return this.currentStep !== E2EIHandlerStep.UNINITIALIZED;
+    return !!this.config;
   }
 
   public async initialize({discoveryUrl, gracePeriodInSeconds}: E2EIHandlerParams) {
@@ -136,7 +134,6 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
     await this.coreE2EIService.initialize(discoveryUrl);
 
-    this.currentStep = E2EIHandlerStep.INITIALIZED;
     this.emit('initialized', {enrollmentConfig: this.config});
     return this;
   }
@@ -171,7 +168,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
     // Check if an enrollment is already in progress
     if (await this.coreE2EIService.isEnrollmentInProgress()) {
-      return this.enroll();
+      return this.enroll(this.getOauthToken);
     }
 
     const renewalTimeMS = this.calculateRenewalTime(timeRemainingMS, historyTimeMS, this.config!.gracePeriodInMs);
@@ -200,15 +197,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
    */
   private async renewCertificate(): Promise<void> {
     try {
-      this.oidcService = this.createOIDCService();
-      // Use the oidc service to get the user data via silent authentication (refresh token)
-      const userData = await this.oidcService.handleSilentAuthentication();
-
-      if (!userData) {
-        throw new Error('Received no user data from OIDC service');
-      }
-      // renew without user action
-      await this.enroll(userData);
+      await this.enroll(this.getOauthToken, true);
     } catch (error) {
       this.logger.error('Silent authentication with refresh token failed', error);
 
@@ -252,28 +241,18 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     await this.coreE2EIService.clearAllProgress();
   }
 
-  public async enroll(userData?: User) {
+  private async enroll(getOAuthToken: (silent: boolean) => Promise<string | undefined>, attemptSilentAuth = false) {
     if (!this.config) {
       throw new Error('Trying to enroll for E2EI without initializing the E2EIHandler');
     }
     try {
       // Notify user about E2EI enrolment in progress
-      this.currentStep = E2EIHandlerStep.ENROLL;
       const isCertificateRenewal = await hasActiveCertificate();
       this.showLoadingMessage();
 
-      if (!userData) {
-        // If the enrolment is in progress, we need to get the id token from the oidc service, since oauth should have already been completed
-        if (await this.coreE2EIService.isEnrollmentInProgress()) {
-          // The redirect-url which is needed inside the OIDCService is stored in the OIDCServiceStore previously
-          this.oidcService = this.createOIDCService();
-          userData = await this.oidcService.handleAuthentication();
-          if (!userData) {
-            throw new Error('Received no user data from OIDC service');
-          }
-        }
-      }
-      const oAuthIdToken = userData?.id_token;
+      const isEnrollmentInProgress = await this.coreE2EIService.isEnrollmentInProgress();
+      const oAuthIdToken =
+        isEnrollmentInProgress || attemptSilentAuth ? await getOAuthToken(attemptSilentAuth) : undefined;
 
       const displayName = this.userState.self()?.name();
       const handle = this.userState.self()?.username();
@@ -304,14 +283,12 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       // This setTimeout is needed because there was a timing with the success modal and the loading modal
       setTimeout(removeCurrentModal, 0);
 
-      this.currentStep = E2EIHandlerStep.SUCCESS;
       // clear the oidc service progress/data and successful enrolment
       await this.cleanUp(false);
 
       await this.showSuccessMessage(isCertificateRenewal);
       this.emit('identityUpdated', {enrollmentConfig: this.config!});
     } catch (error) {
-      this.currentStep = E2EIHandlerStep.ERROR;
       this.logger.error('E2EI enrollment failed', error);
 
       setTimeout(removeCurrentModal, 0);
@@ -320,10 +297,6 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   }
 
   private showLoadingMessage(isCertificateRenewal = false): void {
-    if (this.currentStep !== E2EIHandlerStep.ENROLL) {
-      return;
-    }
-
     const {modalOptions, modalType} = getModalOptions({
       type: ModalType.LOADING,
       hideClose: true,
@@ -335,10 +308,6 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   }
 
   private async showSuccessMessage(isCertificateRenewal = false) {
-    if (this.currentStep !== E2EIHandlerStep.SUCCESS) {
-      return;
-    }
-
     return new Promise<void>(resolve => {
       const {modalOptions, modalType} = getModalOptions({
         type: ModalType.SUCCESS,
@@ -357,10 +326,6 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   }
 
   private async showErrorMessage(): Promise<void> {
-    if (this.currentStep !== E2EIHandlerStep.ERROR) {
-      return;
-    }
-
     // Remove the url parameters of the failed enrolment
     removeUrlParameters();
     // Clear the oidc service progress
@@ -376,12 +341,12 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
         hideClose: true,
         hideSecondary: disableSnooze,
         primaryActionFn: async () => {
-          this.currentStep = E2EIHandlerStep.INITIALIZED;
-          await this.enroll();
+          await this.attemptEnrollment();
           resolve();
         },
         secondaryActionFn: async () => {
-          await this.startEnrollment(ModalType.ENROLL);
+          this.config?.timer.snooze();
+          this.showSnoozeConfirmationModal();
           resolve();
         },
         extraParams: {
@@ -403,11 +368,10 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       const {modalOptions, modalType: determinedModalType} = getModalOptions({
         hideSecondary: disableSnooze,
         primaryActionFn: async () => {
-          await this.enroll();
+          await this.enroll(this.getOauthToken);
           resolve();
         },
         secondaryActionFn: () => {
-          this.currentStep = E2EIHandlerStep.SNOOZE;
           this.config?.timer.snooze();
           this.showSnoozeConfirmationModal();
           resolve();
@@ -434,11 +398,23 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     PrimaryModal.show(determinedModalType, modalOptions);
   }
 
+  private getOauthToken = async (silent?: boolean) => {
+    // The redirect-url which is needed inside the OIDCService is stored in the OIDCServiceStore previously
+    this.oidcService = this.createOIDCService();
+    const userData = silent
+      ? await this.oidcService.handleSilentAuthentication()
+      : await this.oidcService.handleAuthentication();
+    if (!userData) {
+      throw new Error('Received no user data from OIDC service');
+    }
+    return userData.id_token;
+  };
+
   private async startEnrollment(enrollmentType: ModalType.CERTIFICATE_RENEWAL | ModalType.ENROLL): Promise<void> {
     // If the user has already started enrolment, don't show the notification. Instead, show the loading modal
     // This will occur after the redirect from the oauth provider
     if (await this.coreE2EIService.isEnrollmentInProgress()) {
-      return this.enroll();
+      return this.enroll(this.getOauthToken);
     }
 
     if (this.config?.timer.isSnoozableTimerActive()) {
