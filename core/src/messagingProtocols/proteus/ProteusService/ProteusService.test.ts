@@ -627,8 +627,8 @@ describe('ProteusService', () => {
       );
       expect(postMembersSpy).toHaveBeenCalledWith(conversationId, expect.arrayContaining(usersDomain2));
 
-      expect(result.failedToAdd?.reason).toBe(AddUsersFailureReasons.UNREACHABLE_BACKENDS);
-      expect(result.failedToAdd?.users).toEqual([...usersDomain1]);
+      expect(result.failedToAdd?.[0]?.reason).toBe(AddUsersFailureReasons.UNREACHABLE_BACKENDS);
+      expect(result.failedToAdd?.[0]?.users).toEqual([...usersDomain1]);
     });
 
     it('completely fails to add users if some backends are unreachable', async () => {
@@ -648,8 +648,8 @@ describe('ProteusService', () => {
       expect(postMembersSpy).toHaveBeenCalledWith(conversationId, expect.arrayContaining(allUsers));
       expect(postMembersSpy).toHaveBeenCalledWith(conversationId, expect.arrayContaining(usersDomain2));
 
-      expect(result.failedToAdd?.reason).toBe(AddUsersFailureReasons.UNREACHABLE_BACKENDS);
-      expect(result.failedToAdd?.users).toEqual(allUsers);
+      expect(result.failedToAdd?.[0]?.reason).toBe(AddUsersFailureReasons.UNREACHABLE_BACKENDS);
+      expect(result.failedToAdd?.[0]?.users).toEqual(allUsers);
     });
 
     it('partially add users if some users are part of not-connected backends', async () => {
@@ -674,8 +674,8 @@ describe('ProteusService', () => {
       );
       expect(postMembersSpy).toHaveBeenCalledWith(conversationId, expect.arrayContaining(usersDomain1));
 
-      expect(result.failedToAdd?.reason).toBe(AddUsersFailureReasons.NON_FEDERATING_BACKENDS);
-      expect(result.failedToAdd?.users).toEqual([...usersDomain2, ...usersDomain3]);
+      expect(result.failedToAdd?.[0]?.reason).toBe(AddUsersFailureReasons.NON_FEDERATING_BACKENDS);
+      expect(result.failedToAdd?.[0]?.users).toEqual([...usersDomain2, ...usersDomain3]);
     });
   });
 
@@ -737,11 +737,13 @@ describe('ProteusService', () => {
       );
       expect(postConversationSpy).toHaveBeenCalledWith(expect.objectContaining({qualified_users: usersDomain2}));
 
-      expect(failedToAdd).toEqual({
-        reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS,
-        backends: ['domain1'],
-        users: expect.arrayContaining([...usersDomain1, ...usersDomain1]),
-      });
+      expect(failedToAdd).toEqual([
+        {
+          reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS,
+          backends: ['domain1'],
+          users: expect.arrayContaining([...usersDomain1, ...usersDomain1]),
+        },
+      ]);
     });
 
     it('creates an empty conversation if no backend is reachable', async () => {
@@ -765,11 +767,13 @@ describe('ProteusService', () => {
       );
       expect(postConversationSpy).toHaveBeenCalledWith(expect.objectContaining({qualified_users: []}));
 
-      expect(failedToAdd).toEqual({
-        reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS,
-        backends: [domain1, domain2],
-        users: expect.arrayContaining([...usersDomain1, ...usersDomain1]),
-      });
+      expect(failedToAdd).toEqual([
+        {
+          reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS,
+          backends: [domain1, domain2],
+          users: expect.arrayContaining([...usersDomain1, ...usersDomain1]),
+        },
+      ]);
     });
 
     it('fails to create a conversation if there are users from non-connected backends', async () => {

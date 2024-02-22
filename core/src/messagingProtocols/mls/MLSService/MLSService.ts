@@ -46,7 +46,7 @@ import {
 import {isCoreCryptoMLSConversationAlreadyExistsError, shouldMLSDecryptionErrorBeIgnored} from './CoreCryptoMLSError';
 import {MLSServiceConfig, NewCrlDistributionPointsPayload, UploadCommitOptions} from './MLSService.types';
 
-import {KeyPackageClaimUser} from '../../../conversation';
+import {AddUsersFailure, AddUsersFailureReasons, KeyPackageClaimUser} from '../../../conversation';
 import {sendMessage} from '../../../conversation/message/messageSender';
 import {CoreDatabase} from '../../../storage/CoreDB';
 import {parseFullQualifiedClientId} from '../../../util/fullyQualifiedClientIdUtils';
@@ -232,17 +232,36 @@ export class MLSService extends TypedEventEmitter<Events> {
    * @param groupId - the group id of the MLS group
    * @param keyPackages - the list of keys of clients to add to the MLS group
    */
-  public addUsersToExistingConversation(groupId: string, keyPackages: Uint8Array[]) {
+  public async addUsersToExistingConversation(
+    groupId: string,
+    keyPackages: Uint8Array[],
+  ): Promise<PostMlsMessageResponse & {failures: AddUsersFailure[]}> {
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
 
     if (keyPackages.length < 1) {
       throw new Error('Empty list of keys provided to addUsersToExistingConversation');
     }
-    return this.processCommitAction(groupIdBytes, async () => {
+
+    //TODO: handle federation error when sending a commit bundle to backend like we do in ProteusService
+    const response = await this.processCommitAction(groupIdBytes, async () => {
       const commitBundle = await this.coreCryptoClient.addClientsToConversation(groupIdBytes, keyPackages);
       this.dispatchNewCrlDistributionPoints(commitBundle);
       return commitBundle;
     });
+
+    const failedUsers = response.failed;
+
+    const failures = failedUsers
+      ? [
+          {
+            users: failedUsers,
+            backends: failedUsers.map(({domain}) => domain),
+            reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS,
+          },
+        ]
+      : [];
+
+    return {...response, failures};
   }
 
   public async getKeyPackagesPayload(qualifiedUsers: KeyPackageClaimUser[]) {
@@ -252,16 +271,31 @@ export class MLSService extends TypedEventEmitter<Events> {
      * includes self user too.
      */
     const failedToFetchKeyPackages: QualifiedId[] = [];
+    const emptyKeyPackagesUsers: QualifiedId[] = [];
+
     const keyPackagesSettledResult = await Promise.allSettled(
-      qualifiedUsers.map(({id, domain, skipOwnClientId}) =>
-        this.apiClient.api.client
-          .claimMLSKeyPackages(id, domain, numberToHex(this.config.cipherSuite), skipOwnClientId)
-          .catch(error => {
-            failedToFetchKeyPackages.push({id, domain});
-            // Throw the error so we don't get {status: 'fulfilled', value: undefined}
-            throw error;
-          }),
-      ),
+      qualifiedUsers.map(async ({id, domain, skipOwnClientId}) => {
+        try {
+          const keys = await this.apiClient.api.client.claimMLSKeyPackages(
+            id,
+            domain,
+            numberToHex(this.config.cipherSuite),
+            skipOwnClientId,
+          );
+
+          // It's possible that user's backend is reachable but they have not uploaded their MLS key packages (or all of them have been claimed already)
+          if (keys.key_packages.length === 0) {
+            this.logger.warn(`User ${id} has no key packages uploaded`);
+            emptyKeyPackagesUsers.push({id, domain});
+          }
+
+          return keys;
+        } catch (error) {
+          failedToFetchKeyPackages.push({id, domain});
+          // Throw the error so we don't get {status: 'fulfilled', value: undefined}
+          throw error;
+        }
+      }),
     );
 
     /**
@@ -285,7 +319,21 @@ export class MLSService extends TypedEventEmitter<Events> {
       return previousValue;
     }, []);
 
-    return {coreCryptoKeyPackagesPayload, failedToFetchKeyPackages};
+    const failures: AddUsersFailure[] = [];
+
+    if (emptyKeyPackagesUsers.length > 0) {
+      failures.push({reason: AddUsersFailureReasons.OFFLINE_FOR_TOO_LONG, users: emptyKeyPackagesUsers});
+    }
+
+    if (failedToFetchKeyPackages.length > 0) {
+      failures.push({
+        reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS,
+        users: failedToFetchKeyPackages,
+        backends: failedToFetchKeyPackages.map(({domain}) => domain),
+      });
+    }
+
+    return {keyPackages: coreCryptoKeyPackagesPayload, failures};
   }
 
   public getEpoch(groupId: string | Uint8Array) {
@@ -424,11 +472,12 @@ export class MLSService extends TypedEventEmitter<Events> {
     groupId: string,
     users: QualifiedId[],
     options?: {creator?: {user: QualifiedId; client?: string}; parentGroupId?: string},
-  ): Promise<PostMlsMessageResponse> {
+  ): Promise<PostMlsMessageResponse & {failures: AddUsersFailure[]}> {
     await this.registerEmptyConversation(groupId, options?.parentGroupId);
 
     const creator = options?.creator;
-    const {coreCryptoKeyPackagesPayload: keyPackages, failedToFetchKeyPackages} = await this.getKeyPackagesPayload(
+
+    const {keyPackages, failures: keysClaimingFailures} = await this.getKeyPackagesPayload(
       users.map(user => {
         if (user.id === creator?.user.id) {
           /**
@@ -441,11 +490,15 @@ export class MLSService extends TypedEventEmitter<Events> {
       }),
     );
 
-    const response =
-      keyPackages.length > 0
-        ? await this.addUsersToExistingConversation(groupId, keyPackages)
-        : // If there are no clients to add, just update the keying material
-          await this.updateKeyingMaterial(groupId);
+    if (keyPackages.length <= 0) {
+      // If there are no clients to add, just update the keying material
+      const response = await this.updateKeyingMaterial(groupId);
+      await this.scheduleKeyMaterialRenewal(groupId);
+
+      return {...response, failures: keysClaimingFailures};
+    }
+
+    const response = await this.addUsersToExistingConversation(groupId, keyPackages);
 
     // We schedule a periodic key material renewal
     await this.scheduleKeyMaterialRenewal(groupId);
@@ -454,7 +507,7 @@ export class MLSService extends TypedEventEmitter<Events> {
      * @note If we can't fetch a user's key packages then we can not add them to mls conversation
      * so we're adding them to the list of failed users.
      */
-    response.failed = response.failed ? [...response.failed, ...failedToFetchKeyPackages] : failedToFetchKeyPackages;
+    response.failures = [...keysClaimingFailures, ...response.failures];
     return response;
   }
 

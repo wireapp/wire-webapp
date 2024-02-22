@@ -50,7 +50,7 @@ import {TypedEventEmitter} from '@wireapp/commons';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {
-  AddUsersFailureReasons,
+  AddUsersFailure,
   AddUsersParams,
   KeyPackageClaimUser,
   MLSCreateConversationResponse,
@@ -303,7 +303,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
       throw new Error('No group_id found in response which is required for creating MLS conversations.');
     }
 
-    const response = await this.mlsService.registerConversation(groupId, qualifiedUsers.concat(selfUserId), {
+    const {events, failures} = await this.mlsService.registerConversation(groupId, qualifiedUsers.concat(selfUserId), {
       creator: {
         user: selfUserId,
         client: selfClientId,
@@ -314,11 +314,9 @@ export class ConversationService extends TypedEventEmitter<Events> {
     const conversation = await this.apiClient.api.conversation.getConversation(qualifiedId);
 
     return {
-      events: response.events,
+      events,
       conversation,
-      failedToAdd: response.failed
-        ? {users: response.failed, backends: [], reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS}
-        : undefined,
+      failedToAdd: failures,
     };
   }
 
@@ -377,25 +375,22 @@ export class ConversationService extends TypedEventEmitter<Events> {
     groupId,
     conversationId,
   }: Required<AddUsersParams>): Promise<MLSCreateConversationResponse> {
-    const {coreCryptoKeyPackagesPayload, failedToFetchKeyPackages} =
-      await this.mlsService.getKeyPackagesPayload(qualifiedUsers);
+    const {keyPackages, failures: keysClaimingFailures} = await this.mlsService.getKeyPackagesPayload(qualifiedUsers);
 
-    const response =
-      coreCryptoKeyPackagesPayload.length > 0
-        ? await this.mlsService.addUsersToExistingConversation(groupId, coreCryptoKeyPackagesPayload)
-        : {events: []};
+    const {events, failures} =
+      keyPackages.length > 0
+        ? await this.mlsService.addUsersToExistingConversation(groupId, keyPackages)
+        : {events: [], failures: [] as AddUsersFailure[]};
 
     const conversation = await this.getConversation(conversationId);
 
     //We store the info when user was added (and key material was created), so we will know when to renew it
     await this.mlsService.resetKeyMaterialRenewal(groupId);
+
     return {
-      events: response.events,
+      events,
       conversation,
-      failedToAdd:
-        failedToFetchKeyPackages.length > 0
-          ? {users: failedToFetchKeyPackages, backends: [], reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS}
-          : undefined,
+      failedToAdd: [...keysClaimingFailures, ...failures],
     };
   }
 

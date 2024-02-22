@@ -118,34 +118,44 @@ export type RemoveUsersParams = {
 export enum AddUsersFailureReasons {
   NON_FEDERATING_BACKENDS = 'NON_FEDERATING_BACKENDS',
   UNREACHABLE_BACKENDS = 'UNREACHABLE_BACKENDS',
+  OFFLINE_FOR_TOO_LONG = 'OFFLINE_FOR_TOO_LONG',
 }
 
 /**
  * List of users that were originaly requested to be in the conversation
  * but could not be added due to their backend not being available
  * @note Added since version 4: https://staging-nginz-https.z
- ra.io/v4/api/swagger-ui/#/default/post_conversations
- * @note Federation only
- */
-export type AddUsersFailure = {
-  users: QualifiedId[];
-  reason: AddUsersFailureReasons;
-  /** the backends that caused the failure */
-  backends: string[];
-};
+ra.io/v4/api/swagger-ui/#/default/post_conversations
+* @note Federation only
+*/
+export type AddUsersFailure =
+  | {
+      reason: AddUsersFailureReasons.NON_FEDERATING_BACKENDS;
+      users: QualifiedId[];
+      backends: string[];
+    }
+  | {
+      reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS;
+      users: QualifiedId[];
+      backends: string[];
+    }
+  | {
+      reason: AddUsersFailureReasons.OFFLINE_FOR_TOO_LONG;
+      users: QualifiedId[];
+    };
 
 /**
  * The backend response of any method that will create (or add users to) a conversation
  */
 export interface BaseCreateConversationResponse {
   conversation: Conversation;
-  failedToAdd?: AddUsersFailure;
+  failedToAdd?: AddUsersFailure[];
 }
 
 export type ProteusCreateConversationResponse = BaseCreateConversationResponse;
 export type ProteusAddUsersResponse = {
   event?: ConversationMemberJoinEvent;
-  failedToAdd?: AddUsersFailure;
+  failedToAdd?: AddUsersFailure[];
 };
 
 export interface MLSCreateConversationResponse extends BaseCreateConversationResponse {

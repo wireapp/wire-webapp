@@ -179,7 +179,7 @@ export class ProteusService {
                 // on a succesfull conversation creation with the available users,
                 // we append the users from an unreachable backend to the response
                 unreachableUsers.length > 0
-                  ? {reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS, backends, users: unreachableUsers}
+                  ? [{reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS, backends, users: unreachableUsers}]
                   : undefined,
             };
           }
@@ -216,7 +216,7 @@ export class ProteusService {
               backends,
             );
             if (availableUsers.length === 0) {
-              return {failedToAdd: {reason: failureReasonsMap[error.label], backends, users: unreachableUsers}};
+              return {failedToAdd: [{reason: failureReasonsMap[error.label], backends, users: unreachableUsers}]};
             }
             // In case the request to add users failed with a `UNREACHABLE_BACKENDS` or `NOT_CONNECTED_BACKENDS` errors, we try again with the users from available backends
             try {
@@ -225,17 +225,19 @@ export class ProteusService {
                 event: response,
                 failedToAdd:
                   unreachableUsers.length > 0
-                    ? {reason: failureReasonsMap[error.label], backends, users: unreachableUsers}
+                    ? [{reason: failureReasonsMap[error.label], backends, users: unreachableUsers}]
                     : undefined,
               };
             } catch (error) {
               if (isFederatedBackendsError(error)) {
                 return {
-                  failedToAdd: {
-                    reason: failureReasonsMap[error.label],
-                    backends: error.backends,
-                    users: qualifiedUsers,
-                  },
+                  failedToAdd: [
+                    {
+                      reason: failureReasonsMap[error.label],
+                      backends: error.backends,
+                      users: qualifiedUsers,
+                    },
+                  ],
                 };
               }
               throw error;
