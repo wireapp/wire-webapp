@@ -4832,20 +4832,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core-crypto@npm:1.0.0-rc.41":
-  version: 1.0.0-rc.41
-  resolution: "@wireapp/core-crypto@npm:1.0.0-rc.41"
-  checksum: e9b41fac8ecaac3f4934aca8bd58deeae4f45aa597caa9c880bee6df2acf9a5973a06f93b459fb1b3005df30a258df6b5dc9dfda42c45ea4a22c6697e0d9596c
+"@wireapp/core-crypto@npm:1.0.0-rc.43":
+  version: 1.0.0-rc.43
+  resolution: "@wireapp/core-crypto@npm:1.0.0-rc.43"
+  checksum: 2481ae8a6322c999e5b5260c34dcb6162d79afa568c0cc444975d90828831acd35b759140e63d994d2cad6a82e74b482408b306460a32c028006c4689407ca3a
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:44.0.13":
-  version: 44.0.13
-  resolution: "@wireapp/core@npm:44.0.13"
+"@wireapp/core@npm:45.0.0":
+  version: 45.0.0
+  resolution: "@wireapp/core@npm:45.0.0"
   dependencies:
     "@wireapp/api-client": ^26.10.10
     "@wireapp/commons": ^5.2.5
-    "@wireapp/core-crypto": 1.0.0-rc.41
+    "@wireapp/core-crypto": 1.0.0-rc.43
     "@wireapp/cryptobox": 12.8.0
     "@wireapp/promise-queue": ^2.2.10
     "@wireapp/protocol-messaging": 1.44.0
@@ -4860,7 +4860,7 @@ __metadata:
     long: ^5.2.0
     uuidjs: 4.2.13
     zod: 3.22.4
-  checksum: b20f6214dd0251e4cc41f24dd743feed0e69c1137350feb3a6b2267dd5e3615062d237c7e664f5f43d7028b851aa4ebbcb0a662568379e12bc846e5cb3c26c85
+  checksum: cd5898cfc51c576de066e951a639c4bdaa9ecc3f7db54e4d7aec203ea7b267d2a27576fa42542f9e65325578c7317065fd8ecc07c567f6992ee03689801eb9f8
   languageName: node
   linkType: hard
 
@@ -12788,7 +12788,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"oidc-client-ts@npm:^3.0.1":
+"oidc-client-ts@npm:3.0.1":
   version: 3.0.1
   resolution: "oidc-client-ts@npm:3.0.1"
   dependencies:
@@ -17509,7 +17509,7 @@ __metadata:
     "@wireapp/avs": 9.6.11
     "@wireapp/commons": 5.2.5
     "@wireapp/copy-config": 2.1.16
-    "@wireapp/core": 44.0.13
+    "@wireapp/core": 45.0.0
     "@wireapp/eslint-config": 3.0.6
     "@wireapp/prettier-config": 0.6.3
     "@wireapp/react-ui-kit": 9.15.4
@@ -17566,7 +17566,7 @@ __metadata:
     long: 5.2.3
     markdown-it: 14.0.0
     murmurhash: 2.0.1
-    oidc-client-ts: ^3.0.1
+    oidc-client-ts: 3.0.1
     os-browserify: 0.3.0
     path-browserify: 1.0.1
     platform: 1.3.6

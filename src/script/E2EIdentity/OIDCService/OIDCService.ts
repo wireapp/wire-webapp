@@ -18,7 +18,7 @@
  */
 
 import {KeyAuth} from '@wireapp/core/lib/messagingProtocols/mls';
-import {UserManager, User, UserManagerSettings, WebStorageStateStore} from 'oidc-client-ts';
+import {UserManager, UserManagerSettings, WebStorageStateStore} from 'oidc-client-ts';
 
 import {clearKeysStartingWith} from 'Util/localStorage';
 
@@ -61,7 +61,7 @@ export class OIDCService {
     this.userManager = new UserManager(dexioConfig);
   }
 
-  public async authenticate(keyAuth: KeyAuth, challengeUrl: string): Promise<void> {
+  public async authenticate(keyAuth: KeyAuth, challengeUrl: string, silent: boolean) {
     // New claims value for keycloak
     const claims = {
       id_token: {
@@ -70,22 +70,16 @@ export class OIDCService {
       },
     };
 
-    await this.userManager.signinRedirect({
-      extraQueryParams: {shouldBeRedirectedByProxy: true, claims: JSON.stringify(claims)},
-    });
+    const params = {shouldBeRedirectedByProxy: true, claims: JSON.stringify(claims)};
+    return silent
+      ? this.userManager.signinSilent({extraTokenParams: params})
+      : this.userManager.signinRedirect({extraQueryParams: params});
   }
 
-  public async handleAuthentication(): Promise<User | undefined> {
+  public getUser() {
     // Remove the hash (hash router) from the url before processing
     const url = window.location.href.replace('/#', '');
-
-    const user = await this.userManager.signinCallback(url);
-
-    if (!user) {
-      return undefined;
-    }
-
-    return user;
+    return this.userManager.signinCallback(url);
   }
 
   public clearProgress(includeUserData: boolean = false): Promise<void> {
@@ -96,9 +90,5 @@ export class OIDCService {
       clearKeysStartingWith('oidc.user:', localStorage);
     }
     return this.userManager.clearStaleState();
-  }
-
-  public async handleSilentAuthentication() {
-    return this.userManager.signinSilent();
   }
 }
