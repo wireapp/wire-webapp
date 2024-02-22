@@ -636,6 +636,11 @@
   "extensionsGiphyMessage": "{{tag}} • via giphy.com",
   "extensionsGiphyNoGifs": "Oops, no gifs",
   "extensionsGiphyRandom": "Random",
+
+  "failedToAddParticipantsPluralDetailsOfflineForTooLong": "[bold]{{names}}[/bold] and [bold]{{name}}[/bold] could not be added to the group as they have been offline for too long.",
+  "failedToAddParticipantSingularOfflineForTooLong": "[bold]{{name}}[/bold] could not be added to the group as they have been offline for too long.",
+  "failedToAddParticipantsSingularDetailsOfflineForTooLong": "[bold]{{name}}[/bold] could not be added to the group as they have been offline for too long.",
+
   "failedToAddParticipantSingularNonFederatingBackends": "[bold]{{name}}[/bold] could not be added to the group as their backend doesn't federate with the backends of all group participants.",
   "failedToAddParticipantSingularOfflineBackend": "[bold]{{name}}[/bold] could not be added to the group as the backend of [bold]{{domain}}[/bold] could not be reached.",
   "failedToAddParticipantsPlural": "[bold]{{total}} participants[/bold] could not be added to the group.",
