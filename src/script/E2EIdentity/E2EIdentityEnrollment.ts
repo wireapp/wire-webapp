@@ -241,6 +241,29 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     await this.coreE2EIService.clearAllProgress();
   }
 
+  private async getOAuthToken(
+    silent: boolean,
+    challengeData?: {keyAuth: string; challenge: {url: string; target: string}},
+  ) {
+    this.oidcService = this.createOIDCService();
+    let userData;
+
+    if (challengeData) {
+      // If a challengeData is provided, that means we are at the beginning of the enrollment process
+      // We need to first authenticate the user (either silently if we are renewing the certificate, or by redirection if it an initial enrollment)
+      const {challenge, keyAuth} = challengeData;
+      OIDCServiceStore.store.targetURL(challenge.target);
+      userData = await this.oidcService.authenticate(keyAuth, challenge.url, silent);
+    } else {
+      // If there is no challengeData, that means we have already authenticated the user and we just need to get the userdata
+      userData = await this.oidcService.getUser();
+    }
+    if (!userData) {
+      throw new Error('No user data received');
+    }
+    return userData.id_token;
+  }
+
   private async enroll(attemptSilentAuth = false) {
     if (!this.config) {
       throw new Error('Trying to enroll for E2EI without initializing the E2EIHandler');
@@ -264,19 +287,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
         handle,
         teamId,
         getOAuthToken: async authenticationChallenge => {
-          this.oidcService = this.createOIDCService();
-          let userData;
-          if (authenticationChallenge) {
-            const {challenge, keyAuth} = authenticationChallenge;
-            OIDCServiceStore.store.targetURL(challenge.target);
-            userData = await this.oidcService.authenticate(keyAuth, challenge.url, attemptSilentAuth);
-          } else {
-            userData = await this.oidcService.getUser();
-          }
-          if (!userData) {
-            throw new Error('No user data received');
-          }
-          return userData.id_token;
+          return this.getOAuthToken(attemptSilentAuth, authenticationChallenge);
         },
         certificateTtl: this.certificateTtl,
       });
