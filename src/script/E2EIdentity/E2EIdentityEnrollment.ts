@@ -354,7 +354,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
         hideClose: true,
         hideSecondary: disableSnooze,
         primaryActionFn: async () => {
-          await this.attemptEnrollment();
+          await this.enroll();
           resolve();
         },
         secondaryActionFn: async () => {

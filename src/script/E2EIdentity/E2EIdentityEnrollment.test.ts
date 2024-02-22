@@ -26,7 +26,7 @@ import {UserState} from 'src/script/user/UserState';
 import {getCertificateDetails} from 'Util/certificateDetails';
 import * as util from 'Util/util';
 
-import {E2EIHandler, E2EIHandlerStep} from './E2EIdentityEnrollment';
+import {E2EIHandler} from './E2EIdentityEnrollment';
 import {hasActiveCertificate} from './E2EIdentityVerification';
 import {getModalOptions, ModalType} from './Modals';
 import {OIDCServiceStore} from './OIDCService/OIDCServiceStorage';
@@ -122,26 +122,6 @@ describe('E2EIHandler', () => {
     void instance.attemptEnrollment();
     await wait(1);
     expect(container.resolve(Core).service?.e2eIdentity?.initialize).toHaveBeenCalled();
-    expect(instance['currentStep']).toBe(E2EIHandlerStep.INITIALIZED);
-  });
-
-  it('should set currentStep to SUCCESS when enrollE2EI is called and enrollment succeeds', async () => {
-    jest.spyOn(container.resolve(Core), 'enrollE2EI').mockResolvedValueOnce({status: 'successful'});
-
-    const instance = await E2EIHandler.getInstance().initialize(params);
-    void instance['enroll']();
-    await wait(1);
-    expect(instance['currentStep']).toBe(E2EIHandlerStep.SUCCESS);
-  });
-
-  it('should set currentStep to ERROR when enrolE2EI is called and enrolment fails', async () => {
-    // Mock the Core service to return an error
-    jest.spyOn(container.resolve(Core), 'enrollE2EI').mockImplementationOnce(jest.fn(() => Promise.reject()));
-
-    const instance = await E2EIHandler.getInstance().initialize(params);
-    void instance['enroll']();
-    await wait(1);
-    expect(instance['currentStep']).toBe(E2EIHandlerStep.ERROR);
   });
 
   it('should display user info message when initialized', async () => {
@@ -156,7 +136,7 @@ describe('E2EIHandler', () => {
   });
 
   it('should throw error if trying to enroll with no config given', async () => {
-    await expect(E2EIHandler.getInstance().enroll()).rejects.toEqual(
+    await expect(E2EIHandler.getInstance()['enroll']()).rejects.toEqual(
       new Error('Trying to enroll for E2EI without initializing the E2EIHandler'),
     );
   });
@@ -229,7 +209,7 @@ describe('E2EIHandler', () => {
     jest.spyOn(container.resolve(Core).service!.e2eIdentity!, 'isEnrollmentInProgress').mockResolvedValue(true);
 
     // Spy on enroll to check if it's called
-    const enrollSpy = jest.spyOn(handler, 'enroll');
+    const enrollSpy = jest.spyOn(handler as any, 'enroll');
 
     // Initialize E2EI
     await handler.initialize(params);
