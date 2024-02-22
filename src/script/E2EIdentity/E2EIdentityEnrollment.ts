@@ -257,7 +257,8 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       if (!displayName || !handle || !teamId) {
         throw new Error('Username, handle or teamId not found');
       }
-      const enrollmentState = await this.core.enrollE2EI({
+
+      await this.core.enrollE2EI({
         discoveryUrl: this.config.discoveryUrl,
         displayName,
         handle,
@@ -279,11 +280,6 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
         },
         certificateTtl: this.certificateTtl,
       });
-      // If the data is false or we dont get the ACMEChallenge, enrolment failed
-
-      if (enrollmentState.status === 'authentication') {
-        // If the data is authentication flow data, we need to kick off the oauth flow to get an oauth token
-      }
 
       // Notify user about E2EI enrolment success
       // This setTimeout is needed because there was a timing with the success modal and the loading modal
