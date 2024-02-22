@@ -245,7 +245,6 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     silent: boolean,
     challengeData?: {keyAuth: string; challenge: {url: string; target: string}},
   ) {
-    this.oidcService = this.createOIDCService();
     let userData;
 
     if (challengeData) {
@@ -253,10 +252,12 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       // We need to first authenticate the user (either silently if we are renewing the certificate, or by redirection if it an initial enrollment)
       const {challenge, keyAuth} = challengeData;
       OIDCServiceStore.store.targetURL(challenge.target);
-      userData = await this.oidcService.authenticate(keyAuth, challenge.url, silent);
+      const oidcService = this.createOIDCService();
+      userData = await oidcService.authenticate(keyAuth, challenge.url, silent);
     } else {
+      const oidcService = this.createOIDCService();
       // If there is no challengeData, that means we have already authenticated the user and we just need to get the userdata
-      userData = await this.oidcService.getUser();
+      userData = await oidcService.getUser();
     }
     if (!userData) {
       throw new Error('No user data received');
