@@ -457,7 +457,7 @@ export class ConversationRepository {
 
       const {failedToAdd} = response;
 
-      if (failedToAdd) {
+      if (failedToAdd && failedToAdd.length) {
         const failedToAddUsersEvent = EventBuilder.buildFailedToAddUsersEvent(
           failedToAdd,
           conversationEntity,
@@ -2325,7 +2325,7 @@ export class ConversationRepository {
         if (memberJoinEvent) {
           await this.eventRepository.injectEvent(memberJoinEvent, EventRepository.SOURCE.BACKEND_RESPONSE);
         }
-        if (failedToAdd) {
+        if (failedToAdd && failedToAdd.length) {
           await this.eventRepository.injectEvent(
             EventBuilder.buildFailedToAddUsersEvent(failedToAdd, conversation, this.userState.self().id),
             EventRepository.SOURCE.INJECTED,
@@ -2339,14 +2339,18 @@ export class ConversationRepository {
           groupId: conversation.groupId,
           qualifiedUsers,
         });
-        if (!!events.length && isMLSConversation(conversation)) {
-          events.forEach(event => this.eventRepository.injectEvent(event));
-        }
-        if (failedToAdd) {
-          await this.eventRepository.injectEvent(
-            EventBuilder.buildFailedToAddUsersEvent(failedToAdd, conversation, this.userState.self().id),
-            EventRepository.SOURCE.INJECTED,
-          );
+
+        if (isMLSConversation(conversation)) {
+          if (events.length) {
+            events.forEach(event => this.eventRepository.injectEvent(event));
+          }
+
+          if (failedToAdd && failedToAdd.length) {
+            await this.eventRepository.injectEvent(
+              EventBuilder.buildFailedToAddUsersEvent(failedToAdd, conversation, this.userState.self().id),
+              EventRepository.SOURCE.INJECTED,
+            );
+          }
         }
       }
     } catch (error) {

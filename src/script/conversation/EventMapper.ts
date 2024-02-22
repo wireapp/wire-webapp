@@ -533,7 +533,7 @@ export class EventMapper {
   }
 
   _mapEventFailedToAddUsers({data, time}: FailedToAddUsersMessageEvent) {
-    return new FailedToAddUsersMessage(data.qualifiedIds, data.reason, data.backends, parseInt(time, 10));
+    return new FailedToAddUsersMessage(data, parseInt(time, 10));
   }
 
   _mapEventFederationStop({data, time}: FederationStopEvent) {
