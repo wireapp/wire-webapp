@@ -404,10 +404,6 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     PrimaryModal.show(determinedModalType, modalOptions);
   }
 
-  private getOauthToken = async () => {
-    // The redirect-url which is needed inside the OIDCService is stored in the OIDCServiceStore previously
-  };
-
   private async startEnrollment(enrollmentType: ModalType.CERTIFICATE_RENEWAL | ModalType.ENROLL): Promise<void> {
     // If the user has already started enrolment, don't show the notification. Instead, show the loading modal
     // This will occur after the redirect from the oauth provider
