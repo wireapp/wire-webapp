@@ -283,8 +283,11 @@ export class MLSService extends TypedEventEmitter<Events> {
             skipOwnClientId,
           );
 
+          const isSelfUser = this.apiClient.userId === id && this.apiClient.domain === domain;
+
           // It's possible that user's backend is reachable but they have not uploaded their MLS key packages (or all of them have been claimed already)
-          if (keys.key_packages.length === 0) {
+          // We don't care about the self user here.
+          if (!isSelfUser && keys.key_packages.length === 0) {
             this.logger.warn(`User ${id} has no key packages uploaded`);
             emptyKeyPackagesUsers.push({id, domain});
           }
