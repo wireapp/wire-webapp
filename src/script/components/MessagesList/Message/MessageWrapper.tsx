@@ -68,6 +68,7 @@ export const MessageWrapper: React.FC<MessageParams> = ({
   isFocused,
   isSelfTemporaryGuest,
   isLastDeliveredMessage,
+  lastMessageInGroup,
   shouldShowInvitePeople,
   hideHeader,
   hasReadReceiptsTurnedOn,
@@ -184,6 +185,7 @@ export const MessageWrapper: React.FC<MessageParams> = ({
     return (
       <ContentMessageComponent
         message={message}
+        lastMessageInGroup={lastMessageInGroup}
         findMessage={findMessage}
         conversation={conversation}
         hideHeader={hideHeader}
