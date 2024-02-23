@@ -3946,7 +3946,11 @@ export class ConversationRepository {
   private async onMLSWelcomeMessage(conversationEntity: Conversation) {
     // If we receive a welcome message in mls 1:1 conversation, we need to make sure proteus 1:1 is hidden (if it exists)
 
-    if (conversationEntity.type() === CONVERSATION_TYPE.ONE_TO_ONE && isMLSConversation(conversationEntity)) {
+    if (!isMLSConversation(conversationEntity)) {
+      return;
+    }
+
+    if (conversationEntity.type() === CONVERSATION_TYPE.ONE_TO_ONE) {
       const [otherUserId] = conversationEntity.participating_user_ids();
 
       if (otherUserId) {
