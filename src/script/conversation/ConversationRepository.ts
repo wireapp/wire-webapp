@@ -179,7 +179,7 @@ export class ConversationRepository {
   private readonly logger: Logger;
   public readonly stateHandler: ConversationStateHandler;
   public readonly proteusVerificationStateHandler: ProteusConversationVerificationStateHandler;
-  private mlsConversationVerificationStateHandler: MLSConversationVerificationStateHandler;
+  private mlsConversationVerificationStateHandler?: MLSConversationVerificationStateHandler;
 
   static get CONFIG() {
     return {
@@ -354,14 +354,12 @@ export class ConversationRepository {
   public registerMLSConversationVerificationStateHandler = (
     onConversationVerificationStateChange: OnConversationE2EIVerificationStateChange = () => {},
     onSelfClientCertificateRevoked: () => Promise<void> = async () => {},
-    conversationState: ConversationState = container.resolve(ConversationState),
-    core: Core = container.resolve(Core),
   ): void => {
     this.mlsConversationVerificationStateHandler = new MLSConversationVerificationStateHandler(
       onConversationVerificationStateChange,
       onSelfClientCertificateRevoked,
-      conversationState,
-      core,
+      this.conversationState,
+      this.core,
     );
   };
 
@@ -3024,6 +3022,7 @@ export class ConversationRepository {
     }
 
     const {conversation, qualified_conversation, data: eventData, type} = eventJson;
+
     const dataConversationId: string = (eventData as any)?.conversationId;
     // data.conversationId is always the conversationId that should be read first. If not found we can fallback to qualified_conversation or conversation
     const conversationId: QualifiedId = dataConversationId
@@ -3956,7 +3955,7 @@ export class ConversationRepository {
     }
 
     // After the welcome message is received (we were added to a conversation), we need to check mls conversation verification state
-    await this.mlsConversationVerificationStateHandler.checkConversationVerificationState(conversationEntity);
+    await this.mlsConversationVerificationStateHandler?.checkConversationVerificationState(conversationEntity);
   }
 
   /**
