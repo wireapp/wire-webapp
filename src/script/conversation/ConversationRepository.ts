@@ -40,7 +40,6 @@ import {
   ConversationTypingEvent,
   CONVERSATION_EVENT,
   ConversationProtocolUpdateEvent,
-  ConversationMLSWelcomeEvent,
 } from '@wireapp/api-client/lib/event';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import type {BackendError} from '@wireapp/api-client/lib/http/';
@@ -97,8 +96,14 @@ import {ConversationState} from './ConversationState';
 import {ConversationStateHandler} from './ConversationStateHandler';
 import {ConversationStatus} from './ConversationStatus';
 import {ConversationVerificationState} from './ConversationVerificationState';
-import {ProteusConversationVerificationStateHandler} from './ConversationVerificationStateHandler';
-import {OnConversationVerificationStateChange} from './ConversationVerificationStateHandler/shared';
+import {
+  MLSConversationVerificationStateHandler,
+  ProteusConversationVerificationStateHandler,
+} from './ConversationVerificationStateHandler';
+import {
+  OnConversationE2EIVerificationStateChange,
+  OnConversationVerificationStateChange,
+} from './ConversationVerificationStateHandler/shared';
 import {EventMapper} from './EventMapper';
 import {MessageRepository} from './MessageRepository';
 import {NOTIFICATION_STATE} from './NotificationSetting';
@@ -174,6 +179,7 @@ export class ConversationRepository {
   private readonly logger: Logger;
   public readonly stateHandler: ConversationStateHandler;
   public readonly proteusVerificationStateHandler: ProteusConversationVerificationStateHandler;
+  private mlsConversationVerificationStateHandler: MLSConversationVerificationStateHandler;
 
   static get CONFIG() {
     return {
@@ -344,6 +350,20 @@ export class ConversationRepository {
   public initMLSConversationRecoveredListener() {
     return this.conversationService.addMLSConversationRecoveredListener(this.onMLSConversationRecovered);
   }
+
+  public registerMLSConversationVerificationStateHandler = (
+    onConversationVerificationStateChange: OnConversationE2EIVerificationStateChange = () => {},
+    onSelfClientCertificateRevoked: () => Promise<void> = async () => {},
+    conversationState: ConversationState = container.resolve(ConversationState),
+    core: Core = container.resolve(Core),
+  ): void => {
+    this.mlsConversationVerificationStateHandler = new MLSConversationVerificationStateHandler(
+      onConversationVerificationStateChange,
+      onSelfClientCertificateRevoked,
+      conversationState,
+      core,
+    );
+  };
 
   private readonly updateLocalMessageEntity = async ({
     obj: updatedEvent,
@@ -3233,7 +3253,7 @@ export class ConversationRepository {
         return this.onRename(conversationEntity, eventJson, eventSource === EventRepository.SOURCE.WEB_SOCKET);
 
       case CONVERSATION_EVENT.MLS_WELCOME_MESSAGE:
-        return this.onMLSWelcomeMessage(conversationEntity, eventJson);
+        return this.onMLSWelcomeMessage(conversationEntity);
 
       case ClientEvent.CONVERSATION.ASSET_ADD:
         return this.onAssetAdd(conversationEntity, eventJson);
@@ -3922,23 +3942,21 @@ export class ConversationRepository {
    * User has received a welcome message in a conversation.
    *
    * @param conversationEntity Conversation entity user has received a welcome message in
-   * @param eventJson JSON data of 'conversation.mls-welcome' event
    * @returns Resolves when the event was handled
    */
-  private async onMLSWelcomeMessage(conversationEntity: Conversation, eventJson: ConversationMLSWelcomeEvent) {
+  private async onMLSWelcomeMessage(conversationEntity: Conversation) {
     // If we receive a welcome message in mls 1:1 conversation, we need to make sure proteus 1:1 is hidden (if it exists)
 
-    if (conversationEntity.type() !== CONVERSATION_TYPE.ONE_TO_ONE || !isMLSConversation(conversationEntity)) {
-      return;
+    if (conversationEntity.type() === CONVERSATION_TYPE.ONE_TO_ONE && isMLSConversation(conversationEntity)) {
+      const [otherUserId] = conversationEntity.participating_user_ids();
+
+      if (otherUserId) {
+        await this.initMLS1to1Conversation(otherUserId, true);
+      }
     }
 
-    const [otherUserId] = conversationEntity.participating_user_ids();
-
-    if (!otherUserId) {
-      return;
-    }
-
-    await this.initMLS1to1Conversation(otherUserId, true);
+    // After the welcome message is received (we were added to a conversation), we need to check mls conversation verification state
+    await this.mlsConversationVerificationStateHandler.checkConversationVerificationState(conversationEntity);
   }
 
   /**

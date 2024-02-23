@@ -20,7 +20,6 @@
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {E2eiConversationState} from '@wireapp/core/lib/messagingProtocols/mls';
-import {container} from 'tsyringe';
 
 import {
   getActiveWireIdentity,
@@ -39,7 +38,7 @@ import {ConversationState} from '../../ConversationState';
 import {ConversationVerificationState} from '../../ConversationVerificationState';
 import {getConversationByGroupId, OnConversationE2EIVerificationStateChange} from '../shared';
 
-class MLSConversationVerificationStateHandler {
+export class MLSConversationVerificationStateHandler {
   private readonly logger: Logger;
 
   public constructor(
@@ -139,7 +138,7 @@ class MLSConversationVerificationStateHandler {
     return this.checkConversationVerificationState(conversation);
   };
 
-  private checkConversationVerificationState = async (conversation: Conversation): Promise<void> => {
+  public checkConversationVerificationState = async (conversation: Conversation): Promise<void> => {
     const isSelfConversation = conversation.type() === CONVERSATION_TYPE.SELF;
     if (!isMLSConversation(conversation) || isSelfConversation) {
       return;
@@ -160,17 +159,3 @@ class MLSConversationVerificationStateHandler {
     }
   };
 }
-
-export const registerMLSConversationVerificationStateHandler = (
-  onConversationVerificationStateChange: OnConversationE2EIVerificationStateChange = () => {},
-  onSelfClientCertificateRevoked: () => Promise<void> = async () => {},
-  conversationState: ConversationState = container.resolve(ConversationState),
-  core: Core = container.resolve(Core),
-): void => {
-  new MLSConversationVerificationStateHandler(
-    onConversationVerificationStateChange,
-    onSelfClientCertificateRevoked,
-    conversationState,
-    core,
-  );
-};
