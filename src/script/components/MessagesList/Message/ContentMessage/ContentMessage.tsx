@@ -140,7 +140,7 @@ export const ContentMessageComponent = ({
     });
   };
 
-  const asset = assets?.[0] as FileAssetType;
+  const asset = assets?.[0] as FileAssetType | undefined;
   const isFileMessage = !!asset?.isFile();
   const isAudioMessage = !!asset?.isAudio();
   const isVideoMessage = !!asset?.isVideo();
