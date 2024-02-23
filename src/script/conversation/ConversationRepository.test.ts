@@ -36,9 +36,11 @@ import {
   ConversationMemberLeaveEvent,
   ConversationCreateEvent,
   ConversationMemberJoinEvent,
+  ConversationMLSWelcomeEvent,
   CONVERSATION_EVENT,
 } from '@wireapp/api-client/lib/event/';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {E2eiConversationState} from '@wireapp/core/lib/messagingProtocols/mls';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import ko from 'knockout';
@@ -71,6 +73,7 @@ import {escapeRegex} from 'Util/SanitizationUtil';
 import {createUuid} from 'Util/uuid';
 
 import {CONVERSATION_READONLY_STATE, ConversationRepository} from './ConversationRepository';
+import {ConversationVerificationState} from './ConversationVerificationState';
 
 import {entities, payload} from '../../../test/api/payloads';
 import {TestFactory} from '../../../test/helper/TestFactory';
@@ -1858,6 +1861,105 @@ describe('ConversationRepository', () => {
           });
           expect(conversationEntity.removeMessageById).toHaveBeenCalledWith(deletedMessagePayload.id);
         });
+      });
+    });
+
+    describe('conversation.mls-welcome', () => {
+      it('should check mls verification state after being added to a mls group', async () => {
+        const conversationRepository = testFactory.conversation_repository!;
+        const onConversationVerificationStateChange = jest.fn();
+
+        conversationRepository.registerMLSConversationVerificationStateHandler(
+          onConversationVerificationStateChange,
+          jest.fn(),
+        );
+
+        const mockedGroupId = 'AAEAAKA0LuGtiU7NjqqlZIE2dQUAZWxuYS53aXJlLmxpbms=';
+
+        const conversation = _generateConversation({
+          groupId: mockedGroupId,
+          type: CONVERSATION_TYPE.REGULAR,
+          protocol: ConversationProtocol.MLS,
+        });
+
+        conversation.mlsVerificationState(ConversationVerificationState.UNVERIFIED);
+
+        await conversationRepository['saveConversation'](conversation);
+
+        const welcomeEvent: ConversationMLSWelcomeEvent = {
+          conversation: conversation.id,
+          data: conversation.groupId!,
+          from: 'd5a39ffb-6ce3-4cc8-9048-0e15d031b4c5',
+          time: '2015-04-27T11:42:31.475Z',
+          type: CONVERSATION_EVENT.MLS_WELCOME_MESSAGE,
+        };
+
+        const coreE2EIService = container.resolve(Core).service!.e2eIdentity!;
+
+        jest.spyOn(coreE2EIService, 'getConversationState').mockResolvedValueOnce(E2eiConversationState.Verified);
+
+        await conversationRepository['handleConversationEvent'](welcomeEvent);
+
+        expect(onConversationVerificationStateChange).toHaveBeenCalledWith({
+          conversationEntity: conversation,
+          conversationVerificationState: ConversationVerificationState.VERIFIED,
+        });
+
+        expect(conversation.mlsVerificationState()).toEqual(ConversationVerificationState.VERIFIED);
+      });
+
+      it('should initialise mls 1:1 conversation after receiving a welcome', async () => {
+        const conversationRepository = testFactory.conversation_repository!;
+        const mockedGroupId = 'AAEAAKA0LuGtiU7NjqqlZIE2dQUAZWxuYS53aXJlLmxpbms=';
+
+        const conversation = _generateConversation({
+          groupId: mockedGroupId,
+          type: CONVERSATION_TYPE.ONE_TO_ONE,
+          protocol: ConversationProtocol.MLS,
+        });
+
+        const otherUserId = {id: 'f718410c-3833-479d-bd80-a5df03f38414', domain: 'test-domain'};
+        const otherUser = new User(otherUserId.id, otherUserId.domain);
+
+        conversationRepository['userState'].users.push(otherUser);
+        conversation.participating_user_ids.push(otherUserId);
+
+        await conversationRepository['saveConversation'](conversation);
+
+        const welcomeEvent: ConversationMLSWelcomeEvent = {
+          conversation: conversation.id,
+          data: conversation.groupId!,
+          from: 'd5a39ffb-6ce3-4cc8-9048-0e15d031b4c5',
+          time: '2015-04-27T11:42:31.475Z',
+          type: CONVERSATION_EVENT.MLS_WELCOME_MESSAGE,
+        };
+
+        const coreConversationService = container.resolve(Core).service!.conversation!;
+
+        jest.spyOn(coreConversationService, 'isMLSGroupEstablishedLocally').mockResolvedValueOnce(false);
+
+        const establishedMls1to1ConversationResponse = generateAPIConversation({
+          id: {id: '04ab891e-ccf1-4dba-9d74-bacec64b5b1e', domain: 'test-domain'},
+          type: CONVERSATION_TYPE.ONE_TO_ONE,
+          protocol: ConversationProtocol.MLS,
+          overwites: {
+            group_id: mockedGroupId,
+            epoch: 1,
+            qualified_others: [otherUserId],
+            members: {
+              others: [{id: otherUserId.id, status: 0, qualified_id: otherUserId}],
+              self: {},
+            } as any,
+          },
+        }) as BackendMLSConversation;
+
+        jest
+          .spyOn(coreConversationService, 'establishMLS1to1Conversation')
+          .mockResolvedValueOnce(establishedMls1to1ConversationResponse);
+
+        await conversationRepository['handleConversationEvent'](welcomeEvent);
+
+        expect(coreConversationService.establishMLS1to1Conversation).toHaveBeenCalled();
       });
     });
 
