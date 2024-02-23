@@ -60,9 +60,8 @@ export class MLSConversationVerificationStateHandler {
   }
 
   /**
-   * This function checks if the conversation is verified and if it is, it will degrade it
+   * Degrades the conversation
    * @param conversation
-   * @param userIds
    */
   private async degradeConversation(conversation: MLSConversation) {
     const state = ConversationVerificationState.DEGRADED;
@@ -84,9 +83,8 @@ export class MLSConversationVerificationStateHandler {
   }
 
   /**
-   * This function checks if the conversation is degraded and if it is, it will verify it
+   * Verifies the conversation
    * @param conversation
-   * @param userIds
    */
   private async verifyConversation(conversation: MLSConversation) {
     const state = ConversationVerificationState.VERIFIED;
