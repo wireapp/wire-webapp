@@ -128,7 +128,7 @@
     "postcss-import": "^16.0.1",
     "postcss-less": "6.0.0",
     "postcss-loader": "^8.1.0",
-    "postcss-preset-env": "^9.3.0",
+    "postcss-preset-env": "^9.4.0",
     "postcss-scss": "4.0.9",
     "prettier": "3.2.5",
     "redux-mock-store": "1.5.4",
