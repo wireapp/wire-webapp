@@ -94,7 +94,7 @@
     "@types/webpack-env": "1.18.4",
     "@wireapp/copy-config": "2.1.16",
     "@wireapp/eslint-config": "3.0.6",
-    "@wireapp/prettier-config": "0.6.3",
+    "@wireapp/prettier-config": "0.6.4",
     "@wireapp/store-engine": "^5.1.4",
     "archiver": "^6.0.1",
     "autoprefixer": "^10.4.17",
