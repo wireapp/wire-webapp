@@ -17,9 +17,10 @@
  *
  */
 
+import {exponentialBackoff} from '@wireapp/commons/lib/util/ExponentialBackoff';
+import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import axios, {AxiosError, AxiosHeaders, AxiosInstance, AxiosRequestConfig, AxiosResponse} from 'axios';
 import axiosRetry, {isNetworkOrIdempotentRequestError, exponentialDelay} from 'axios-retry';
-import {backOff} from 'exponential-backoff';
 import logdown from 'logdown';
 import {gzip} from 'pako';
 
@@ -125,6 +126,12 @@ export class HttpClient extends EventEmitter {
     tokenAsParam = false,
     isFirstTry = true,
   ): Promise<AxiosResponse<T>> {
+    const backoffKey = 'too-many-request-backoff';
+    const {backOff, resetBackOff} = exponentialBackoff(backoffKey, {
+      maxDelay: TimeInMillis.SECOND * 2,
+      minDelay: 100,
+    });
+
     if (this.accessTokenStore.accessToken) {
       const {token_type, access_token} = this.accessTokenStore.accessToken;
 
@@ -152,14 +159,19 @@ export class HttpClient extends EventEmitter {
 
       this.updateConnectionState(ConnectionState.CONNECTED);
 
+      resetBackOff();
       return response;
     } catch (error) {
       const isTooManyRequestsError = axios.isAxiosError(error) && error.response?.status === 420;
+
       if (isTooManyRequestsError) {
-        return backOff(() => this._sendRequest<T>(config, tokenAsParam, false), {
-          jitter: 'full',
-          maxDelay: 2000,
-        });
+        return backOff(
+          () => this._sendRequest<T>(config, tokenAsParam, false),
+          () => {
+            this.logger.error('Too many requests error retry limit reached', error);
+            throw error;
+          },
+        );
       }
 
       const retryWithTokenRefresh = async () => {
