@@ -21,7 +21,6 @@ import {useCallback, useEffect, useState} from 'react';
 
 import {CallingRepository} from '../calling/CallingRepository';
 import {E2EIHandler, EnrollmentConfig, WireIdentity} from '../E2EIdentity';
-import {shouldEnableSoftLock} from '../E2EIdentity/SnoozableTimer/delay';
 import {NotificationRepository} from '../notification/NotificationRepository';
 
 export function useAppSoftLock(callingRepository: CallingRepository, notificationRepository: NotificationRepository) {
@@ -29,7 +28,7 @@ export function useAppSoftLock(callingRepository: CallingRepository, notificatio
 
   const handleSoftLockActivation = useCallback(
     async ({enrollmentConfig, identity}: {enrollmentConfig: EnrollmentConfig; identity?: WireIdentity}) => {
-      const isSoftLockEnabled = await shouldEnableSoftLock(enrollmentConfig, identity);
+      const isSoftLockEnabled = false; // TODO await shouldEnableSoftLock(enrollmentConfig, identity);
 
       setSoftLockEnabled(isSoftLockEnabled);
       callingRepository.setSoftLock(isSoftLockEnabled);
