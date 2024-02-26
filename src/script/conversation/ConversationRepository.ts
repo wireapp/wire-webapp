@@ -3957,9 +3957,6 @@ export class ConversationRepository {
         await this.initMLS1to1Conversation(otherUserId, true);
       }
     }
-
-    // After the welcome message is received (we were added to a conversation), we need to check mls conversation verification state
-    await this.mlsConversationVerificationStateHandler?.checkConversationVerificationState(conversationEntity);
   }
 
   /**
