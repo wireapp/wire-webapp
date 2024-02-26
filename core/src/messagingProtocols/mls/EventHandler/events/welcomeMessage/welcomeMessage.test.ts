@@ -46,6 +46,8 @@ const mockParams = {
   mlsService: {
     processWelcomeMessage: jest.fn().mockResolvedValue('conversationId'),
     scheduleKeyMaterialRenewal: jest.fn(),
+    getEpoch: jest.fn(),
+    emit: jest.fn(),
   } as unknown as MLSService,
   dryRun: false,
 };
@@ -62,6 +64,14 @@ describe('MLS welcomeMessage eventHandler', () => {
       const eventHandlerResult = await handleMLSWelcomeMessage(mockParams);
       expect(eventHandlerResult).toBeDefined();
       expect(eventHandlerResult!.event).toEqual({data: 'conversationId', type: 'conversation.mls-welcome'});
+    });
+
+    it('emits new epoch event after processing a welcome message', async () => {
+      jest.spyOn(mockParams.mlsService, 'getEpoch').mockResolvedValue(1);
+
+      await handleMLSWelcomeMessage(mockParams);
+
+      expect(mockParams.mlsService.emit).toHaveBeenCalledWith('newEpoch', {groupId: 'conversationId', epoch: 1});
     });
   });
 });

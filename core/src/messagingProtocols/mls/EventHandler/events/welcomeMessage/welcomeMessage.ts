@@ -41,6 +41,10 @@ export const handleMLSWelcomeMessage = async ({
 
   // After we were added to the group we need to schedule a periodic key material renewal
   await mlsService.scheduleKeyMaterialRenewal(groupIdStr);
+
+  const newEpoch = await mlsService.getEpoch(groupIdStr);
+  mlsService.emit('newEpoch', {groupId: groupIdStr, epoch: newEpoch});
+
   return {
     event: {...event, data: groupIdStr},
   };
