@@ -195,16 +195,8 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   /**
    * Renew the certificate without user action
    */
-  private async renewCertificate(): Promise<void> {
-    try {
-      await this.enroll(true);
-    } catch (error) {
-      this.logger.error('Silent authentication with refresh token failed', error);
-
-      // If the silent authentication fails, clear the oidc service progress/data and renew manually
-      await this.cleanUp(true);
-      await this.startEnrollment(ModalType.CERTIFICATE_RENEWAL);
-    }
+  private async renewCertificate() {
+    return this.enroll(true);
   }
 
   /**
@@ -241,28 +233,30 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     await this.coreE2EIService.clearAllProgress();
   }
 
-  private async getOAuthToken(
+  private async getUserData(
     silent: boolean,
     challengeData?: {keyAuth: string; challenge: {url: string; target: string}},
   ) {
-    let userData;
-
     if (challengeData) {
       // If a challengeData is provided, that means we are at the beginning of the enrollment process
       // We need to first authenticate the user (either silently if we are renewing the certificate, or by redirection if it an initial enrollment)
       const {challenge, keyAuth} = challengeData;
       OIDCServiceStore.store.targetURL(challenge.target);
       const oidcService = this.createOIDCService();
-      userData = await oidcService.authenticate(keyAuth, challenge.url, silent);
-    } else {
-      const oidcService = this.createOIDCService();
-      // If there is no challengeData, that means we have already authenticated the user and we just need to get the userdata
-      userData = await oidcService.getUser();
+      try {
+        return await oidcService.authenticate(keyAuth, challenge.url, silent);
+      } catch (error) {
+        if (silent) {
+          // if we attempted a silent login and it failed, we need to try again with a redirect
+          return oidcService.authenticate(keyAuth, challenge.url, false);
+        }
+        throw error;
+      }
     }
-    if (!userData) {
-      throw new Error('No user data received');
-    }
-    return userData.id_token;
+
+    const oidcService = this.createOIDCService();
+    // If there is no challengeData, that means we have already authenticated the user and we just need to get the userdata
+    return oidcService.getUser();
   }
 
   private async enroll(attemptSilentAuth = false) {
@@ -288,7 +282,11 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
         handle,
         teamId,
         getOAuthToken: async authenticationChallenge => {
-          return this.getOAuthToken(attemptSilentAuth, authenticationChallenge);
+          const userData = await this.getUserData(attemptSilentAuth, authenticationChallenge);
+          if (!userData) {
+            throw new Error('No user data received');
+          }
+          return userData.id_token;
         },
         certificateTtl: this.certificateTtl,
       });
