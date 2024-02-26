@@ -40,6 +40,17 @@ export type WireIdentity = Omit<DeviceIdentity, 'status'> & {
   status: MLSStatuses;
 };
 
+export function getCertificateDetails(identity: WireIdentity) {
+  const currentDate = new Date();
+  const timeRemainingMS = new Date(Number(identity.notAfter)).getTime() - currentDate.getTime();
+  const certificateCreationTime = new Date(Number(identity.notBefore)).getTime();
+
+  return {
+    timeRemainingMS,
+    certificateCreationTime,
+  };
+}
+
 export function getE2EIdentityService() {
   const e2eIdentityService = container.resolve(Core).service?.e2eIdentity;
   if (!e2eIdentityService) {
