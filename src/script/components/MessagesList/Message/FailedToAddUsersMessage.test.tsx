@@ -284,9 +284,7 @@ describe('FailedToAddUsersMessage', () => {
     expect(details2.length).toBeGreaterThanOrEqual(1);
 
     const details3 = getAllByText(
-      (_, element) =>
-        element?.textContent ===
-        `${user3.name()} could not be added to the group as they have been offline for too long.`,
+      (_, element) => element?.textContent === `${user3.name()} could not be added to the group.`,
     );
 
     expect(details3.length).toBeGreaterThanOrEqual(1);
