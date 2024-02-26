@@ -20,33 +20,40 @@
 import {useCallback, useEffect, useState} from 'react';
 
 import {CallingRepository} from '../calling/CallingRepository';
-import {E2EIHandler, EnrollmentConfig, WireIdentity} from '../E2EIdentity';
+import {E2EIHandler} from '../E2EIdentity';
 import {NotificationRepository} from '../notification/NotificationRepository';
 
 export function useAppSoftLock(callingRepository: CallingRepository, notificationRepository: NotificationRepository) {
   const [softLockEnabled, setSoftLockEnabled] = useState(false);
 
-  const handleSoftLockActivation = useCallback(
-    async ({enrollmentConfig, identity}: {enrollmentConfig: EnrollmentConfig; identity?: WireIdentity}) => {
-      const isSoftLockEnabled = false; // TODO await shouldEnableSoftLock(enrollmentConfig, identity);
-
-      setSoftLockEnabled(isSoftLockEnabled);
-      callingRepository.setSoftLock(isSoftLockEnabled);
-      notificationRepository.setSoftLock(isSoftLockEnabled);
+  const handleTimerFired = useCallback(
+    ({snoozable}: {snoozable: boolean}) => {
+      // When a timer is fired, it means we have reached a renewal point. We need to lock the app if this timer cannot be snoozed
+      const shouldEnableSoftLock = !snoozable;
+      setSoftLockEnabled(shouldEnableSoftLock);
+      callingRepository.setSoftLock(shouldEnableSoftLock);
+      notificationRepository.setSoftLock(shouldEnableSoftLock);
     },
     [callingRepository, notificationRepository],
   );
 
+  const handleSoftLockActivation = useCallback(() => {
+    // If the identity was updated we can unlock the app
+    setSoftLockEnabled(false);
+    callingRepository.setSoftLock(false);
+    notificationRepository.setSoftLock(false);
+  }, [callingRepository, notificationRepository]);
+
   useEffect(() => {
     const e2eiHandler = E2EIHandler.getInstance();
 
-    e2eiHandler.on('initialized', handleSoftLockActivation);
+    e2eiHandler.on('timerFired', handleTimerFired);
     e2eiHandler.on('identityUpdated', handleSoftLockActivation);
     return () => {
-      e2eiHandler.off('initialized', handleSoftLockActivation);
+      e2eiHandler.off('timerFired', handleTimerFired);
       e2eiHandler.off('identityUpdated', handleSoftLockActivation);
     };
-  }, [handleSoftLockActivation]);
+  }, [handleSoftLockActivation, handleTimerFired]);
 
   return {softLockEnabled};
 }

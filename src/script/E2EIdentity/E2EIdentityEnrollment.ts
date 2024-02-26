@@ -31,12 +31,7 @@ import {getLogger} from 'Util/Logger';
 import {formatDelayTime, TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {removeUrlParameters} from 'Util/UrlUtil';
 
-import {
-  hasActiveCertificate,
-  getActiveWireIdentity,
-  WireIdentity,
-  isFreshMLSSelfClient,
-} from './E2EIdentityVerification';
+import {hasActiveCertificate, getActiveWireIdentity, isFreshMLSSelfClient} from './E2EIdentityVerification';
 import {getModalOptions, ModalType} from './Modals';
 import {OIDCService} from './OIDCService';
 import {OIDCServiceStore} from './OIDCService/OIDCServiceStorage';
@@ -50,8 +45,8 @@ interface E2EIHandlerParams {
 }
 
 type Events = {
-  identityUpdated: {enrollmentConfig: EnrollmentConfig; identity?: WireIdentity};
-  initialized: {enrollmentConfig: EnrollmentConfig};
+  identityUpdated: {};
+  timerFired: {snoozable: boolean};
 };
 
 export type EnrollmentConfig = {
@@ -66,7 +61,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   private readonly userState = container.resolve(UserState);
   private config?: EnrollmentConfig;
   private oidcService?: OIDCService;
-  public certificateTtl?: number;
+  public certificateTtl?: number = (30 * TIME_IN_MILLIS.DAY) / 1000;
 
   private get coreE2EIService() {
     const e2eiService = this.core.service?.e2eIdentity;
@@ -124,8 +119,6 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
     await this.coreE2EIService.initialize(discoveryUrl);
 
-    this.emit('initialized', {enrollmentConfig: this.config});
-
     if (await this.coreE2EIService.isEnrollmentInProgress()) {
       // If we have an enrollment in progress, we can just finish it (meaning we are coming back from an idp redirect)
       await this.enroll();
@@ -151,7 +144,10 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     const identity = await getActiveWireIdentity();
     const nextTick = getEnrollmentTimer(identity, deviceCreatedAt, this.config?.gracePeriodInMs);
 
-    const task = () => this.processEnrollmentUponExpiry(nextTick.isSnoozable);
+    const task = async () => {
+      this.emit('timerFired', {snoozable: nextTick.isSnoozable});
+      await this.processEnrollmentUponExpiry(nextTick.isSnoozable);
+    };
 
     if (TaskScheduler.hasActiveTask(timerKey)) {
       TaskScheduler.continueTask({
@@ -255,7 +251,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       await this.cleanUp(false);
 
       await this.showSuccessMessage(isCertificateRenewal);
-      this.emit('identityUpdated', {enrollmentConfig: this.config!});
+      this.emit('identityUpdated');
     } catch (error) {
       this.logger.error('E2EI enrollment failed', error);
 
