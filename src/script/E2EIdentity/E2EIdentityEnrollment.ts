@@ -27,12 +27,17 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {PrimaryModal, removeCurrentModal} from 'Components/Modals/PrimaryModal';
 import {Core} from 'src/script/service/CoreSingleton';
 import {UserState} from 'src/script/user/UserState';
-import {getCertificateDetails} from 'Util/certificateDetails';
 import {getLogger} from 'Util/Logger';
 import {formatDelayTime, TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {removeUrlParameters} from 'Util/UrlUtil';
 
-import {hasActiveCertificate, getActiveWireIdentity, MLSStatuses, WireIdentity} from './E2EIdentityVerification';
+import {
+  hasActiveCertificate,
+  getActiveWireIdentity,
+  MLSStatuses,
+  WireIdentity,
+  getCertificateDetails,
+} from './E2EIdentityVerification';
 import {getModalOptions, ModalType} from './Modals';
 import {OIDCService} from './OIDCService';
 import {OIDCServiceStore} from './OIDCService/OIDCServiceStorage';
@@ -160,7 +165,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       return;
     }
 
-    const {timeRemainingMS, certificateCreationTime} = getCertificateDetails(identity.certificate);
+    const {timeRemainingMS, certificateCreationTime} = getCertificateDetails(identity);
 
     if (!this.shouldRefresh(identity)) {
       return;

@@ -23,11 +23,10 @@ import {container} from 'tsyringe';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {Core} from 'src/script/service/CoreSingleton';
 import {UserState} from 'src/script/user/UserState';
-import {getCertificateDetails} from 'Util/certificateDetails';
 import * as util from 'Util/util';
 
 import {E2EIHandler} from './E2EIdentityEnrollment';
-import {hasActiveCertificate} from './E2EIdentityVerification';
+import {hasActiveCertificate, getCertificateDetails} from './E2EIdentityVerification';
 import {getModalOptions, ModalType} from './Modals';
 import {OIDCServiceStore} from './OIDCService/OIDCServiceStorage';
 
@@ -69,10 +68,6 @@ jest.mock('./E2EIdentityVerification', () => ({
   getActiveWireIdentity: jest.fn().mockResolvedValue({certificate: 'certificate data'}),
   isE2EIEnabled: jest.fn().mockReturnValue(true),
   isFreshMLSSelfClient: jest.fn().mockResolvedValue(false),
-}));
-
-// These values should lead to renewalPromptTime being less than the mocked current time
-jest.mock('Util/certificateDetails', () => ({
   getCertificateDetails: jest.fn().mockReturnValue({
     timeRemainingMS: 5 * 24 * 60 * 60 * 1000,
     certificateCreationTime: new Date().getTime() - 10 * 24 * 60 * 60 * 1000,
