@@ -101,9 +101,7 @@ export const ImageAsset: React.FC<ImageAssetProps> = ({
   });
 
   const imageContainerStyle: CSSObject = {
-    aspectRatio: isFileSharingReceivingEnabled ? `${asset.ratio}` : undefined,
     maxWidth: 'calc(100% - var(--conversation-message-sender-width))',
-    maxHeight: '80vh',
   };
 
   return (
