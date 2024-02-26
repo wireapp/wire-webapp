@@ -40,7 +40,6 @@ import {
   ConversationTypingEvent,
   CONVERSATION_EVENT,
   ConversationProtocolUpdateEvent,
-  ConversationMLSWelcomeEvent,
 } from '@wireapp/api-client/lib/event';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import type {BackendError} from '@wireapp/api-client/lib/http/';
@@ -3233,7 +3232,7 @@ export class ConversationRepository {
         return this.onRename(conversationEntity, eventJson, eventSource === EventRepository.SOURCE.WEB_SOCKET);
 
       case CONVERSATION_EVENT.MLS_WELCOME_MESSAGE:
-        return this.onMLSWelcomeMessage(conversationEntity, eventJson);
+        return this.onMLSWelcomeMessage(conversationEntity);
 
       case ClientEvent.CONVERSATION.ASSET_ADD:
         return this.onAssetAdd(conversationEntity, eventJson);
@@ -3920,10 +3919,9 @@ export class ConversationRepository {
    * User has received a welcome message in a conversation.
    *
    * @param conversationEntity Conversation entity user has received a welcome message in
-   * @param eventJson JSON data of 'conversation.mls-welcome' event
    * @returns Resolves when the event was handled
    */
-  private async onMLSWelcomeMessage(conversationEntity: Conversation, eventJson: ConversationMLSWelcomeEvent) {
+  private async onMLSWelcomeMessage(conversationEntity: Conversation) {
     // If we receive a welcome message in mls 1:1 conversation, we need to make sure proteus 1:1 is hidden (if it exists)
 
     if (conversationEntity.type() !== CONVERSATION_TYPE.ONE_TO_ONE || !isMLSConversation(conversationEntity)) {
