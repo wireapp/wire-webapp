@@ -264,6 +264,8 @@ export const MessagesList: FC<MessagesListParams> = ({
           return messages.map(message => {
             const isLastDeliveredMessage = lastDeliveredMessage?.id === message.id;
 
+            const lastMessageInGroup = group.messages[messages.length - 1];
+
             const visibleCallback = getVisibleCallback(conversation, message);
 
             const key = `${message.id || 'message'}-${message.timestamp()}`;
@@ -276,6 +278,7 @@ export const MessagesList: FC<MessagesListParams> = ({
                 key={key}
                 onVisible={visibleCallback}
                 message={message}
+                lastMessageInGroup={lastMessageInGroup}
                 hideHeader={message.timestamp() !== firstMessageTimestamp}
                 messageActions={messageActions}
                 conversation={conversation}

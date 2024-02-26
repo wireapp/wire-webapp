@@ -59,6 +59,7 @@ export interface MessageParams extends MessageActions {
   conversation: Conversation;
   hasReadReceiptsTurnedOn: boolean;
   isLastDeliveredMessage: boolean;
+  lastMessageInGroup: BaseMessage;
   isSelfTemporaryGuest: boolean;
   message: BaseMessage;
   /** whether the message should display the user avatar and user name before the actual content */
