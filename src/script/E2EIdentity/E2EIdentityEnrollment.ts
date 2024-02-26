@@ -40,7 +40,7 @@ import {
 import {getModalOptions, ModalType} from './Modals';
 import {OIDCService} from './OIDCService';
 import {OIDCServiceStore} from './OIDCService/OIDCServiceStorage';
-import {getEnrollmentTimer, getNextTick} from './SnoozableTimer/delay';
+import {getEnrollmentTimer} from './SnoozableTimer/delay';
 import {SnoozableTimerStore} from './SnoozableTimer/SnoozableTimerStorage';
 
 const {TaskScheduler} = util;
@@ -114,6 +114,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     return !!this.config;
   }
 
+  /** will initialize the e2ei enrollment handler eventually triggering an enrollment flow if the device is a fresh new one */
   public async initialize({discoveryUrl, gracePeriodInSeconds}: E2EIHandlerParams) {
     const gracePeriodInMs = gracePeriodInSeconds * TIME_IN_MILLIS.SECOND;
     this.config = {
@@ -136,6 +137,9 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     return this;
   }
 
+  /**
+   * Will initiate the timer that will regularly prompt the user to enroll (or to renew the certificate if it is about to expire)
+   */
   public async startTimers() {
     if (!this.config) {
       throw new Error('Trying to start timers without initializing the E2EIHandler');
@@ -162,6 +166,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
         persist: true,
       });
     }
+    return nextTick.firingDate - Date.now();
   }
 
   private async processEnrollmentUponExpiry(snoozable: boolean) {
@@ -210,7 +215,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     return oidcService.getUser();
   }
 
-  private async enroll(snoozable: boolean = true) {
+  public async enroll(snoozable: boolean = true) {
     if (!this.config) {
       throw new Error('Trying to enroll for E2EI without initializing the E2EIHandler');
     }
@@ -306,8 +311,8 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
           resolve();
         },
         secondaryActionFn: async () => {
-          // TODO this.config?.timer.snooze();
-          this.showSnoozeConfirmationModal();
+          const delay = await this.startTimers();
+          this.showSnoozeConfirmationModal(delay);
           resolve();
         },
         extraParams: {
@@ -330,9 +335,9 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
           await this.enroll(snoozable);
           resolve();
         },
-        secondaryActionFn: () => {
-          // TODO this.config?.timer.snooze();
-          this.showSnoozeConfirmationModal();
+        secondaryActionFn: async () => {
+          const delay = await this.startTimers();
+          this.showSnoozeConfirmationModal(delay);
           resolve();
         },
         extraParams: {
@@ -345,13 +350,13 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     });
   }
 
-  private showSnoozeConfirmationModal() {
+  private showSnoozeConfirmationModal(delay: number) {
     // Show the modal with the provided modal type
     const {modalOptions, modalType: determinedModalType} = getModalOptions({
       type: ModalType.SNOOZE_REMINDER,
       hideClose: true,
       extraParams: {
-        delayTime: formatDelayTime(getNextTick(this.config!.gracePeriodInMs)),
+        delayTime: formatDelayTime(delay),
       },
     });
     PrimaryModal.show(determinedModalType, modalOptions);
