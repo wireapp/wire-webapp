@@ -37,6 +37,7 @@ import {
   ConversationCreateEvent,
   ConversationMemberJoinEvent,
   CONVERSATION_EVENT,
+  ConversationMLSWelcomeEvent,
 } from '@wireapp/api-client/lib/event/';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
@@ -1258,6 +1259,62 @@ describe('ConversationRepository', () => {
           ],
           new Date(event.time).getTime() - 1,
         );
+      });
+    });
+
+    describe('conversation.mls-welcome', () => {
+      it('should initialise mls 1:1 conversation after receiving a welcome', async () => {
+        const conversationRepository = testFactory.conversation_repository!;
+        const mockedGroupId = 'AAEAAKA0LuGtiU7NjqqlZIE2dQUAZWxuYS53aXJlLmxpbms=';
+
+        const conversation = _generateConversation({
+          groupId: mockedGroupId,
+          type: CONVERSATION_TYPE.ONE_TO_ONE,
+          protocol: ConversationProtocol.MLS,
+        });
+
+        const otherUserId = {id: 'f718410c-3833-479d-bd80-a5df03f38414', domain: 'test-domain'};
+        const otherUser = new User(otherUserId.id, otherUserId.domain);
+
+        conversationRepository['userState'].users.push(otherUser);
+        conversation.participating_user_ids.push(otherUserId);
+
+        await conversationRepository['saveConversation'](conversation);
+
+        const welcomeEvent: ConversationMLSWelcomeEvent = {
+          conversation: conversation.id,
+          data: conversation.groupId!,
+          from: 'd5a39ffb-6ce3-4cc8-9048-0e15d031b4c5',
+          time: '2015-04-27T11:42:31.475Z',
+          type: CONVERSATION_EVENT.MLS_WELCOME_MESSAGE,
+        };
+
+        const coreConversationService = container.resolve(Core).service!.conversation!;
+
+        jest.spyOn(coreConversationService, 'isMLSGroupEstablishedLocally').mockResolvedValueOnce(false);
+
+        const establishedMls1to1ConversationResponse = generateAPIConversation({
+          id: {id: '04ab891e-ccf1-4dba-9d74-bacec64b5b1e', domain: 'test-domain'},
+          type: CONVERSATION_TYPE.ONE_TO_ONE,
+          protocol: ConversationProtocol.MLS,
+          overwites: {
+            group_id: mockedGroupId,
+            epoch: 1,
+            qualified_others: [otherUserId],
+            members: {
+              others: [{id: otherUserId.id, status: 0, qualified_id: otherUserId}],
+              self: {},
+            } as any,
+          },
+        }) as BackendMLSConversation;
+
+        jest
+          .spyOn(coreConversationService, 'establishMLS1to1Conversation')
+          .mockResolvedValueOnce(establishedMls1to1ConversationResponse);
+
+        await conversationRepository['handleConversationEvent'](welcomeEvent);
+
+        expect(coreConversationService.establishMLS1to1Conversation).toHaveBeenCalled();
       });
     });
 
