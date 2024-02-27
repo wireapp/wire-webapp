@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [45.0.5](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@45.0.4...@wireapp/core@45.0.5) (2024-02-27)
+
+### Bug Fixes
+
+* Do not upload public key for registered MLS devices ([#6019](https://github.com/wireapp/wire-web-packages/issues/6019)) ([cdf7d86](https://github.com/wireapp/wire-web-packages/commit/cdf7d86bbe2f083318bfb7de1496d737e81475b0))
+
 ## [45.0.4](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@45.0.3...@wireapp/core@45.0.4) (2024-02-27)
 
 **Note:** Version bump only for package @wireapp/core
