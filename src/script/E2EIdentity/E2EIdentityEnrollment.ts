@@ -17,11 +17,11 @@
  *
  */
 
+import {LowPrecisionTaskScheduler} from '@wireapp/core/lib/util/LowPrecisionTaskScheduler';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
 import {TypedEventEmitter} from '@wireapp/commons';
-import {util} from '@wireapp/core';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal, removeCurrentModal} from 'Components/Modals/PrimaryModal';
@@ -38,7 +38,6 @@ import {getModalOptions, ModalType} from './Modals';
 import {OIDCService} from './OIDCService';
 import {OIDCServiceStore} from './OIDCService/OIDCServiceStorage';
 
-const {TaskScheduler} = util;
 interface E2EIHandlerParams {
   discoveryUrl: string;
   gracePeriodInSeconds: number;
@@ -147,21 +146,28 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
     const timerKey = 'enrollmentTimer';
     const identity = await getActiveWireIdentity();
-    const {firingDate, isSnoozable} = getEnrollmentTimer(identity, e2eActivatedAt, this.config.gracePeriodInMs);
+    const {firingDate: computedFiringDate, isSnoozable} = getEnrollmentTimer(
+      identity,
+      e2eActivatedAt,
+      this.config.gracePeriodInMs,
+    );
 
-    const task = async () => this.processEnrollmentUponExpiry(isSnoozable);
+    const task = async () => {
+      EnrollmentStore.clear.timer();
+      await this.processEnrollmentUponExpiry(isSnoozable);
+    };
 
-    if (TaskScheduler.hasActiveTask(timerKey)) {
-      TaskScheduler.continueTask({
-        key: timerKey,
-        task,
-      });
+    const firingDate = EnrollmentStore.get.timer() || computedFiringDate;
+    EnrollmentStore.store.timer(firingDate);
+
+    if (firingDate <= Date.now()) {
+      void task();
     } else {
-      TaskScheduler.addTask({
+      LowPrecisionTaskScheduler.addTask({
         key: timerKey,
         task,
         firingDate: firingDate,
-        persist: true,
+        intervalDelay: TIME_IN_MILLIS.SECOND * 10,
       });
     }
     return firingDate - Date.now();

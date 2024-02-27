@@ -27,7 +27,7 @@ describe('e2ei delays', () => {
   const gracePeriod = 7 * TimeInMillis.DAY;
   beforeEach(() => {
     jest.useFakeTimers();
-    jest.setSystemTime(1000000);
+    jest.setSystemTime(1709050878009);
   });
 
   it('should return an immediate delay if the identity is expired', () => {
@@ -59,23 +59,25 @@ describe('e2ei delays', () => {
     const gracePeriodStartingPoint = deadline - gracePeriod;
 
     const {firingDate, isSnoozable} = getEnrollmentTimer(
-      {certificate: ' ', notAfter: deadline} as any,
+      {certificate: ' ', notAfter: deadline / 1000} as any,
       Date.now(),
       gracePeriod,
     );
 
     expect(isSnoozable).toBeTruthy();
-    expect(firingDate).toBeGreaterThanOrEqual(gracePeriodStartingPoint);
+    expect(firingDate).toBe(gracePeriodStartingPoint);
   });
 
   it('should return a non snoozable timer if device is out of the grace period', () => {
+    const deadline = Date.now() + gracePeriod + 1000;
+    const gracePeriodStartingPoint = deadline - gracePeriod;
     const {firingDate, isSnoozable} = getEnrollmentTimer(
-      {certificate: ' ', notAfter: (Date.now() - 1000) / 1000} as any,
+      {certificate: ' ', notAfter: deadline / 1000} as any,
       Date.now(),
       gracePeriod,
     );
 
-    expect(isSnoozable).toBeFalsy();
-    expect(firingDate).toBeLessThanOrEqual(gracePeriod);
+    expect(isSnoozable).toBeTruthy();
+    expect(firingDate).toBe(gracePeriodStartingPoint);
   });
 });

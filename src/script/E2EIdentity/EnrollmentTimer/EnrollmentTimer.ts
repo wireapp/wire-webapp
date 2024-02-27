@@ -43,18 +43,16 @@ type GracePeriod = {
  * @param deadline - the full grace period length in milliseconds
  */
 function getNextTick({end, start}: GracePeriod): number {
-  const validityPeriod = end - Date.now();
-  const isInGracePeriod = Date.now() >= start;
-
-  if (validityPeriod <= 0) {
+  if (Date.now() >= end) {
     // If the grace period is over, we should force the user to enroll
     return 0;
   }
 
-  if (!isInGracePeriod) {
+  if (Date.now() < start) {
     // If we are not in the grace period yet, we start the timer when the grace period starts
-    return start;
+    return start - Date.now();
   }
+  const validityPeriod = end - Date.now();
 
   if (validityPeriod <= FIFTEEN_MINUTES) {
     return Math.min(FIVE_MINUTES, validityPeriod);
