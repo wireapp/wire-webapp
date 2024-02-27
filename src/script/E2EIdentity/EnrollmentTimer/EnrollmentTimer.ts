@@ -76,7 +76,7 @@ function getGracePeriod(
   const isFirstEnrollment = !identity?.certificate;
   if (isFirstEnrollment) {
     // For a new device, the deadline is the e2ei activate date + the grace period
-    return {end: e2eActivatedAt + teamGracePeriodDuration, start: teamGracePeriodDuration};
+    return {end: e2eActivatedAt + teamGracePeriodDuration, start: Date.now()};
   }
 
   // To be sure the device does not expire, we want to keep a safe delay
