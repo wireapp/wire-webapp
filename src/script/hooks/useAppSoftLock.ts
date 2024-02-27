@@ -20,14 +20,14 @@
 import {useCallback, useEffect, useState} from 'react';
 
 import {CallingRepository} from '../calling/CallingRepository';
-import {E2EIHandler} from '../E2EIdentity';
+import {E2EIHandler, E2EIDeviceStatus} from '../E2EIdentity';
 import {NotificationRepository} from '../notification/NotificationRepository';
 
 export function useAppSoftLock(callingRepository: CallingRepository, notificationRepository: NotificationRepository) {
   const [softLockEnabled, setSoftLockEnabled] = useState(false);
 
   const handleDeviceStatusChange = useCallback(
-    ({status}: {status: 'valid' | 'locked'}) => {
+    ({status}: {status: E2EIDeviceStatus}) => {
       // If the identity was updated we can unlock the app
       const shouldLock = status === 'locked';
       setSoftLockEnabled(shouldLock);

@@ -44,8 +44,9 @@ interface E2EIHandlerParams {
   gracePeriodInSeconds: number;
 }
 
+export type E2EIDeviceStatus = 'valid' | 'locked';
 type Events = {
-  deviceStatusUpdated: {status: 'valid' | 'locked'};
+  deviceStatusUpdated: {status: E2EIDeviceStatus};
 };
 
 export type EnrollmentConfig = {
