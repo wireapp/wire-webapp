@@ -40,6 +40,7 @@ async function buildE2EIService() {
   const mockedMLSService = {
     on: jest.fn(),
     getClientIds: jest.fn(),
+    conversationExists: jest.fn(),
   } as unknown as MLSService;
 
   const recurringTaskScheduler = new RecurringTaskScheduler({
@@ -81,8 +82,22 @@ const groupId = 'AAEAAhJrE+8TbFFUqiagedTYDUMAZWxuYS53aXJlLmxpbms=';
 
 describe('E2EIServiceExternal', () => {
   describe('getUsersIdentities', () => {
+    it('returns undefined if conversation does not exist', async () => {
+      const [service, {mlsService}] = await buildE2EIService();
+      const user1 = {domain: 'elna.wire.link', id: '48a1c3b0-4b0e-4bcd-93ad-64c7344b1534'};
+      const user2 = {domain: 'elna.wire.link', id: 'b7d287e4-7bbd-40e0-a550-6b18dcaf5f31'};
+      const userIds = [user1, user2];
+
+      jest.spyOn(mlsService, 'conversationExists').mockResolvedValue(false);
+
+      const userIdentities = await service.getUsersIdentities(groupId, userIds);
+
+      expect(userIdentities?.get(user1.id)).toEqual(undefined);
+      expect(userIdentities?.get(user2.id)).toEqual(undefined);
+    });
+
     it('returns the user identities', async () => {
-      const [service, {coreCrypto}] = await buildE2EIService();
+      const [service, {coreCrypto, mlsService}] = await buildE2EIService();
       const user1 = {domain: 'elna.wire.link', id: '48a1c3b0-4b0e-4bcd-93ad-64c7344b1534'};
       const user2 = {domain: 'elna.wire.link', id: 'b7d287e4-7bbd-40e0-a550-6b18dcaf5f31'};
       const userIds = [user1, user2];
@@ -94,14 +109,16 @@ describe('E2EIServiceExternal', () => {
         ]),
       );
 
+      jest.spyOn(mlsService, 'conversationExists').mockResolvedValue(true);
+
       const userIdentities = await service.getUsersIdentities(groupId, userIds);
 
-      expect(userIdentities.get(user1.id)).toHaveLength(2);
-      expect(userIdentities.get(user2.id)).toHaveLength(1);
+      expect(userIdentities?.get(user1.id)).toHaveLength(2);
+      expect(userIdentities?.get(user2.id)).toHaveLength(1);
     });
 
     it('returns MLS basic devices with empty identity', async () => {
-      const [service, {coreCrypto}] = await buildE2EIService();
+      const [service, {coreCrypto, mlsService}] = await buildE2EIService();
       const user1 = {domain: 'elna.wire.link', id: '48a1c3b0-4b0e-4bcd-93ad-64c7344b1534'};
       const user2 = {domain: 'elna.wire.link', id: 'b7d287e4-7bbd-40e0-a550-6b18dcaf5f31'};
       const userIds = [user1, user2];
@@ -120,14 +137,40 @@ describe('E2EIServiceExternal', () => {
       ];
       coreCrypto.getClientIds.mockResolvedValue(allClients.map(clientId => encoder.encode(clientId)));
 
+      jest.spyOn(mlsService, 'conversationExists').mockResolvedValue(true);
+
       const userIdentities = await service.getUsersIdentities(groupId, userIds);
 
-      expect(userIdentities.get(user1.id)).toHaveLength(3);
-      expect(userIdentities.get(user2.id)).toHaveLength(1);
+      expect(userIdentities?.get(user1.id)).toHaveLength(3);
+      expect(userIdentities?.get(user2.id)).toHaveLength(1);
     });
   });
 
   describe('getAllGroupUsersIdentities', () => {
+    it('returns undefined if mls group does not exist', async () => {
+      const [service, {mlsService}] = await buildE2EIService();
+      const user1 = {
+        domain: 'elna.wire.link',
+        userId: '48a1c3b0-4b0e-4bcd-93ad-64c7344b1534',
+        clientId: '74a50c1f4352b41f',
+      };
+      const user2 = {
+        domain: 'elna.wire.link',
+        userId: 'b7d287e4-7bbd-40e0-a550-6b18dcaf5f31',
+        clientId: '452cb4c65f0369a8',
+      };
+
+      const clientIds = [user1, user2];
+
+      jest.spyOn(mlsService, 'getClientIds').mockResolvedValue(clientIds);
+      jest.spyOn(mlsService, 'conversationExists').mockResolvedValue(false);
+
+      const userIdentities = await service.getAllGroupUsersIdentities(groupId);
+
+      expect(userIdentities?.get(user1.userId)).toEqual(undefined);
+      expect(userIdentities?.get(user2.userId)).toEqual(undefined);
+    });
+
     it('returns all the user identities of a mls group', async () => {
       const [service, {coreCrypto, mlsService}] = await buildE2EIService();
       const user1 = {
@@ -143,6 +186,7 @@ describe('E2EIServiceExternal', () => {
       const clientIds = [user1, user2];
 
       jest.spyOn(mlsService, 'getClientIds').mockResolvedValue(clientIds);
+      jest.spyOn(mlsService, 'conversationExists').mockResolvedValue(true);
 
       coreCrypto.getUserIdentities.mockResolvedValue(
         new Map([
@@ -156,8 +200,8 @@ describe('E2EIServiceExternal', () => {
 
       const userIdentities = await service.getAllGroupUsersIdentities(groupId);
 
-      expect(userIdentities.get(user1.userId)).toHaveLength(2);
-      expect(userIdentities.get(user2.userId)).toHaveLength(1);
+      expect(userIdentities?.get(user1.userId)).toHaveLength(2);
+      expect(userIdentities?.get(user2.userId)).toHaveLength(1);
     });
   });
 });
