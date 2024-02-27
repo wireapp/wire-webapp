@@ -36,12 +36,13 @@ const messageRetentionTime = 28 * TimeInMillis.DAY;
  * Will return a suitable snooze time based on the grace period
  * @param expiryDate - the full grace period length in milliseconds
  */
-function getNextTick(expiryDate: number, gracePeriodDuration: number): number {
-  const randomDelay = randomInt(TimeInMillis.DAY); // random number of seconds between 0 and 1 day
-
+function getNextTick(expiryDate: number, gracePeriodDuration: number, isFirstEnrollment: boolean): number {
   const leftoverTimer = expiryDate - Date.now();
 
-  const gracePeriod = Math.max(0, Math.min(gracePeriodDuration, leftoverTimer - randomDelay - messageRetentionTime));
+  // First a first enrollment we only consider the grace period. For enrolled devices we also consider the backend message retention time
+  const extraDelay = isFirstEnrollment ? 0 : randomInt(TimeInMillis.DAY) - messageRetentionTime;
+
+  const gracePeriod = Math.max(0, Math.min(gracePeriodDuration, leftoverTimer - extraDelay));
   if (gracePeriod <= 0) {
     return 0;
   }
@@ -67,10 +68,12 @@ export function getEnrollmentTimer(
     return {isSnoozable: false, firingDate: Date.now()};
   }
 
-  const expiryDate = identity
+  const expiryDate = identity?.certificate
     ? Number(identity.notAfter) * TimeInMillis.SECOND
     : deviceCreatedAt + teamGracePeriodDuration;
-  const nextTick = getNextTick(expiryDate, teamGracePeriodDuration);
+
+  const isFirstEnrollment = !identity?.certificate;
+  const nextTick = getNextTick(expiryDate, teamGracePeriodDuration, isFirstEnrollment);
   // When logging in to a old device that doesn't have an identity yet, we trigger an enrollment timer
   return {isSnoozable: nextTick > 0, firingDate: Date.now() + nextTick};
 }
