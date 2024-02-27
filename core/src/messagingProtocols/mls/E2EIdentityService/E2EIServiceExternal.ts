@@ -25,7 +25,7 @@ import {TypedEventEmitter} from '@wireapp/commons';
 import {CoreCrypto, E2eiConversationState, WireIdentity, DeviceStatus} from '@wireapp/core-crypto';
 
 import {AcmeService} from './Connection';
-import {getE2EIClientId} from './Helper';
+import {getE2EIClientId, isMLSDevice} from './Helper';
 import {createE2EIEnrollmentStorage} from './Storage/E2EIStorage';
 
 import {ClientService} from '../../../client';
@@ -183,7 +183,7 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
     if (!client) {
       return true;
     }
-    return typeof client.mls_public_keys.ed25519 !== 'string' || client.mls_public_keys.ed25519.length === 0;
+    return !isMLSDevice(client);
   }
 
   private async registerLocalCertificateRoot(acmeService: AcmeService): Promise<string> {

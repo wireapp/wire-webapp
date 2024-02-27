@@ -53,8 +53,9 @@ import {parseFullQualifiedClientId} from '../../../util/fullyQualifiedClientIdUt
 import {numberToHex} from '../../../util/numberToHex';
 import {RecurringTaskScheduler} from '../../../util/RecurringTaskScheduler';
 import {TaskScheduler} from '../../../util/TaskScheduler';
-import {AcmeChallenge, User} from '../E2EIdentityService';
+import {User} from '../E2EIdentityService';
 import {E2EIServiceInternal, getTokenCallback} from '../E2EIdentityService/E2EIServiceInternal';
+import {isMLSDevice} from '../E2EIdentityService/Helper';
 import {handleMLSMessageAdd, handleMLSWelcomeMessage} from '../EventHandler/events';
 import {
   deleteMLSMessagesQueue,
@@ -69,13 +70,6 @@ import {generateMLSDeviceId} from '../utils/MLSId';
 export const optionalToUint8Array = (array: Uint8Array | []): Uint8Array => {
   return Array.isArray(array) ? Uint8Array.from(array) : array;
 };
-
-type EnrollmentProcessState =
-  | {
-      status: 'authentication';
-      authenticationChallenge: {keyAuth: string; challenge: AcmeChallenge};
-    }
-  | {status: 'successful'};
 
 interface LocalMLSServiceConfig extends MLSServiceConfig {
   /**
@@ -909,7 +903,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     nbPrekeys: number,
     certificateTtl: number,
     getOAuthToken: getTokenCallback,
-  ): Promise<EnrollmentProcessState> {
+  ): Promise<void> {
     const isCertificateRenewal = await this.coreCryptoClient.e2eiIsEnabled(this.config.cipherSuite);
     const e2eiServiceInternal = new E2EIServiceInternal(
       this.coreDatabase,
@@ -924,8 +918,8 @@ export class MLSService extends TypedEventEmitter<Events> {
 
     this.dispatchNewCrlDistributionPoints(rotateBundle);
     // upload the clients public keys
-    if (!isCertificateRenewal) {
-      // we only upload public keys for the initial certification process. Renewals do not need to upload new public keys
+    if (!isMLSDevice(client)) {
+      // we only upload public keys for the initial certification process if the device is not already a registered MLS device.
       await this.uploadMLSPublicKeys(client);
     }
     // Remove old key packages
@@ -947,6 +941,5 @@ export class MLSService extends TypedEventEmitter<Events> {
 
       await this.uploadCommitBundle(groupIdAsBytes, newCommitBundle);
     }
-    return {status: 'successful'};
   }
 }
