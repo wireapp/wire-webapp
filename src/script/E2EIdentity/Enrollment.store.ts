@@ -19,7 +19,7 @@
 
 const e2eActivatedAtKey = 'e2eActivatedAt';
 
-export const SnoozableTimerStore = {
+export const EnrollmentStore = {
   store: {
     e2eiActivatedAt: (time: number) => localStorage.setItem(e2eActivatedAtKey, String(time)),
   },
