@@ -62,7 +62,7 @@ describe('useAppSoftLock', () => {
   it('should set soft lock to true if the user has used up the entire grace period', async () => {
     E2EIHandlerMock.getInstance.mockReturnValue({
       isE2EIEnabled: jest.fn(() => true),
-      on: jest.fn((eventName, callback) => callback({enrollmentConfig: {timer: {isSnoozeTimeAvailable: () => false}}})),
+      on: jest.fn((eventName, callback) => callback({status: 'locked'})),
       off: jest.fn(),
     } as any);
 
@@ -79,32 +79,16 @@ describe('useAppSoftLock', () => {
     isFreshMLSSelfClientMock.mockResolvedValue(true);
     E2EIHandlerMock.getInstance.mockReturnValue({
       isE2EIEnabled: jest.fn(() => true),
-      on: jest.fn((eventName, callback) => callback({enrollmentConfig: {timer: {isSnoozeTimeAvailable: () => true}}})),
+      on: jest.fn((eventName, callback) => callback({status: 'valid'})),
       off: jest.fn(),
     } as any);
 
     const {result} = renderHook(() => useAppSoftLock(callingRepository, notificationRepository));
 
     await waitFor(() => {
-      expect(result.current.softLockEnabled).toBe(true);
-      expect(callingRepository.setSoftLock).toHaveBeenCalledWith(true);
-      expect(notificationRepository.setSoftLock).toHaveBeenCalledWith(true);
+      expect(result.current.softLockEnabled).toBe(false);
+      expect(callingRepository.setSoftLock).toHaveBeenCalledWith(false);
+      expect(notificationRepository.setSoftLock).toHaveBeenCalledWith(false);
     });
-  });
-
-  it('should not set softLock if the device is an old device and the grace period is not expireds', async () => {
-    E2EIHandlerMock.getInstance.mockReturnValue({
-      isE2EIEnabled: jest.fn(() => true),
-      on: jest.fn((eventName, callback) =>
-        callback({enrollmentConfig: {timer: {isSnoozeTimeAvailable: () => true}, isFreshMLSSelfClient: false}}),
-      ),
-      off: jest.fn(),
-    } as any);
-
-    const {result} = renderHook(() => useAppSoftLock(callingRepository, notificationRepository));
-
-    expect(result.current.softLockEnabled).toBe(false);
-    expect(callingRepository.setSoftLock).not.toHaveBeenCalledWith(true);
-    expect(notificationRepository.setSoftLock).not.toHaveBeenCalledWith(true);
   });
 });

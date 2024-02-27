@@ -40,7 +40,7 @@ const onConfigUpdate = async (configUpdate: {
 
   if (type !== FeatureUpdateType.UNCHANGED) {
     const client = await configureE2EI(logger, configUpdate.newFeatureList);
-    return client?.attemptEnrollment();
+    await client?.startTimers();
   }
 };
 

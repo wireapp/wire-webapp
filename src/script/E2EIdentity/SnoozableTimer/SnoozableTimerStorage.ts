@@ -17,24 +17,16 @@
  *
  */
 
-const FiringDateKey = 'E2EIdentity_DelayTimer_FiringDate';
-const GracePeriodKey = 'E2EIdentity_DelayTimer_GracePeriod';
+const e2eActivatedAtKey = 'e2eActivatedAt';
 
 export const SnoozableTimerStore = {
   store: {
-    firingDate: (firingDate: number) => localStorage.setItem(FiringDateKey, String(firingDate)),
-    gracePeriod: (gracePeriod: number) => localStorage.setItem(GracePeriodKey, String(gracePeriod)),
+    e2eiActivatedAt: (time: number) => localStorage.setItem(e2eActivatedAtKey, String(time)),
   },
   get: {
-    firingDate: () => Number(localStorage.getItem(FiringDateKey)),
-    gracePeriod: () => Number(localStorage.getItem(GracePeriodKey)),
+    e2eiActivatedAt: () => Number(localStorage.getItem(e2eActivatedAtKey)),
   },
   clear: {
-    firingDate: () => localStorage.removeItem(FiringDateKey),
-    gracePeriod: () => localStorage.removeItem(GracePeriodKey),
-    all: () => {
-      SnoozableTimerStore.clear.firingDate();
-      SnoozableTimerStore.clear.gracePeriod();
-    },
+    deviceCreatedAt: () => localStorage.removeItem(e2eActivatedAtKey),
   },
 };
