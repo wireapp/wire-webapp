@@ -31,7 +31,7 @@ export const useUserIdentity = (userId: QualifiedId, groupId?: string, updateAft
       return;
     }
     const userIdentities = await getUsersIdentities(groupId, [userId]);
-    setDeviceIdentities(userIdentities.get(userId.id) ?? []);
+    setDeviceIdentities(userIdentities?.get(userId.id) ?? undefined);
   }, [userId.id, groupId]);
 
   useEffect(() => {
