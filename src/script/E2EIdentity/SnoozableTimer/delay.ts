@@ -68,11 +68,11 @@ export function getEnrollmentTimer(
     return {isSnoozable: false, firingDate: Date.now()};
   }
 
-  const expiryDate = identity?.certificate
-    ? Number(identity.notAfter) * TimeInMillis.SECOND
-    : deviceCreatedAt + teamGracePeriodDuration;
-
   const isFirstEnrollment = !identity?.certificate;
+  const expiryDate = isFirstEnrollment
+    ? deviceCreatedAt + teamGracePeriodDuration
+    : Number(identity.notAfter) * TimeInMillis.SECOND;
+
   const nextTick = getNextTick(expiryDate, teamGracePeriodDuration, isFirstEnrollment);
   // When logging in to a old device that doesn't have an identity yet, we trigger an enrollment timer
   return {isSnoozable: nextTick > 0, firingDate: Date.now() + nextTick};
