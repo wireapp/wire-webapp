@@ -26,34 +26,25 @@ import {NotificationRepository} from '../notification/NotificationRepository';
 export function useAppSoftLock(callingRepository: CallingRepository, notificationRepository: NotificationRepository) {
   const [softLockEnabled, setSoftLockEnabled] = useState(false);
 
-  const handleTimerFired = useCallback(
-    ({snoozable}: {snoozable: boolean}) => {
-      // When a timer is fired, it means we have reached a renewal point. We need to lock the app if this timer cannot be snoozed
-      const shouldEnableSoftLock = !snoozable;
-      setSoftLockEnabled(shouldEnableSoftLock);
-      callingRepository.setSoftLock(shouldEnableSoftLock);
-      notificationRepository.setSoftLock(shouldEnableSoftLock);
+  const handleDeviceStatusChange = useCallback(
+    ({status}: {status: 'valid' | 'locked'}) => {
+      // If the identity was updated we can unlock the app
+      const shouldLock = status === 'locked';
+      setSoftLockEnabled(shouldLock);
+      callingRepository.setSoftLock(shouldLock);
+      notificationRepository.setSoftLock(shouldLock);
     },
     [callingRepository, notificationRepository],
   );
 
-  const handleSoftLockActivation = useCallback(() => {
-    // If the identity was updated we can unlock the app
-    setSoftLockEnabled(false);
-    callingRepository.setSoftLock(false);
-    notificationRepository.setSoftLock(false);
-  }, [callingRepository, notificationRepository]);
-
   useEffect(() => {
     const e2eiHandler = E2EIHandler.getInstance();
 
-    e2eiHandler.on('timerFired', handleTimerFired);
-    e2eiHandler.on('identityUpdated', handleSoftLockActivation);
+    e2eiHandler.on('deviceStatusUpdated', handleDeviceStatusChange);
     return () => {
-      e2eiHandler.off('timerFired', handleTimerFired);
-      e2eiHandler.off('identityUpdated', handleSoftLockActivation);
+      e2eiHandler.off('deviceStatusUpdated', handleDeviceStatusChange);
     };
-  }, [handleSoftLockActivation, handleTimerFired]);
+  }, [handleDeviceStatusChange]);
 
   return {softLockEnabled};
 }

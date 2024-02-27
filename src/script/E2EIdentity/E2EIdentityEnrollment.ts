@@ -45,8 +45,7 @@ interface E2EIHandlerParams {
 }
 
 type Events = {
-  identityUpdated: {};
-  timerFired: {snoozable: boolean};
+  deviceStatusUpdated: {status: 'valid' | 'locked'};
 };
 
 export type EnrollmentConfig = {
@@ -146,12 +145,9 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
     const timerKey = 'enrollmentTimer';
     const identity = await getActiveWireIdentity();
-    const nextTick = getEnrollmentTimer(identity, deviceCreatedAt, this.config.gracePeriodInMs);
+    const {firingDate, isSnoozable} = getEnrollmentTimer(identity, deviceCreatedAt, this.config.gracePeriodInMs);
 
-    const task = async () => {
-      this.emit('timerFired', {snoozable: nextTick.isSnoozable});
-      await this.processEnrollmentUponExpiry(nextTick.isSnoozable);
-    };
+    const task = async () => this.processEnrollmentUponExpiry(isSnoozable);
 
     if (TaskScheduler.hasActiveTask(timerKey)) {
       TaskScheduler.continueTask({
@@ -162,17 +158,21 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       TaskScheduler.addTask({
         key: timerKey,
         task,
-        firingDate: nextTick.firingDate,
+        firingDate: firingDate,
         persist: true,
       });
     }
-    return nextTick.firingDate - Date.now();
+
+    const fireIn = firingDate - Date.now();
+    this.logger.info(`Enrollment timer started {snoozable: ${isSnoozable}, fireAt: ${new Date(firingDate)}}`);
+    return fireIn;
   }
 
   private async processEnrollmentUponExpiry(snoozable: boolean) {
     // TODO lock app
     const hasCertificate = await hasActiveCertificate();
     const enrollmentType = hasCertificate ? ModalType.CERTIFICATE_RENEWAL : ModalType.ENROLL;
+    this.emit('deviceStatusUpdated', {status: snoozable ? 'valid' : 'locked'});
     await this.startEnrollment(enrollmentType, snoozable);
   }
 
@@ -250,9 +250,9 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
       // clear the oidc service progress/data and successful enrolment
       await this.cleanUp(false);
+      this.emit('deviceStatusUpdated', {status: 'valid'});
 
       await this.showSuccessMessage(isCertificateRenewal);
-      this.emit('identityUpdated');
     } catch (error) {
       this.logger.error('E2EI enrollment failed', error);
 
