@@ -36,7 +36,7 @@ const messageRetentionTime = 28 * TimeInMillis.DAY;
  * Will return a suitable snooze time based on the grace period
  * @param expiryDate - the full grace period length in milliseconds
  */
-export function getNextTick(expiryDate: number, gracePeriodDuration: number): number {
+function getNextTick(expiryDate: number, gracePeriodDuration: number): number {
   const randomDelay = randomInt(TimeInMillis.DAY); // random number of seconds between 0 and 1 day
 
   const leftoverTimer = expiryDate - Date.now();

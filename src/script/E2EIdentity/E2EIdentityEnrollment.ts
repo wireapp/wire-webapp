@@ -170,7 +170,6 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   }
 
   private async processEnrollmentUponExpiry(snoozable: boolean) {
-    // TODO lock app
     const hasCertificate = await hasActiveCertificate();
     const enrollmentType = hasCertificate ? ModalType.CERTIFICATE_RENEWAL : ModalType.ENROLL;
     this.emit('deviceStatusUpdated', {status: snoozable ? 'valid' : 'locked'});
@@ -281,7 +280,13 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
         extraParams: {
           isRenewal: isCertificateRenewal,
         },
-        primaryActionFn: resolve,
+        primaryActionFn: async () => {
+          if (isCertificateRenewal) {
+            // restart the timers for device certificate renewal
+            await this.startTimers();
+          }
+          resolve();
+        },
         secondaryActionFn: () => {
           amplify.publish(WebAppEvents.PREFERENCES.MANAGE_DEVICES);
           resolve();
