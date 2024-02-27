@@ -32,13 +32,19 @@ export const ONE_DAY = TimeInMillis.DAY;
 // message retention time on backend (hardcoded to 28 days)
 export const messageRetentionTime = 28 * TimeInMillis.DAY;
 
+type GracePeriod = {
+  /** start date of the grace period (unix timestamp) */
+  start: number;
+  /** end date of the grace period (unix timestamp) */
+  end: number;
+};
 /**
  * Will return a suitable snooze time based on the grace period
  * @param deadline - the full grace period length in milliseconds
  */
-function getNextTick({deadline, gracePeriodStart}: {deadline: number; gracePeriodStart: number}): number {
-  const validityPeriod = deadline - Date.now();
-  const isInGracePeriod = Date.now() >= gracePeriodStart;
+function getNextTick({end, start}: GracePeriod): number {
+  const validityPeriod = end - Date.now();
+  const isInGracePeriod = Date.now() >= start;
 
   if (validityPeriod <= 0) {
     // If the grace period is over, we should force the user to enroll
@@ -47,7 +53,7 @@ function getNextTick({deadline, gracePeriodStart}: {deadline: number; gracePerio
 
   if (!isInGracePeriod) {
     // If we are not in the grace period yet, we start the timer when the grace period starts
-    return gracePeriodStart;
+    return start;
   }
 
   if (validityPeriod <= FIFTEEN_MINUTES) {
@@ -62,20 +68,24 @@ function getNextTick({deadline, gracePeriodStart}: {deadline: number; gracePerio
   return Math.min(ONE_DAY, validityPeriod);
 }
 
-function getDeadline(identity: WireIdentity | undefined, e2eActivatedAt: number, teamGracePeriodDuration: number) {
+function getGracePeriod(
+  identity: WireIdentity | undefined,
+  e2eActivatedAt: number,
+  teamGracePeriodDuration: number,
+): GracePeriod {
   const isFirstEnrollment = !identity?.certificate;
   if (isFirstEnrollment) {
     // For a new device, the deadline is the e2ei activate date + the grace period
-    return {deadline: e2eActivatedAt + teamGracePeriodDuration, gracePeriodStart: teamGracePeriodDuration};
+    return {end: e2eActivatedAt + teamGracePeriodDuration, start: teamGracePeriodDuration};
   }
-
-  const deadline = Number(identity.notAfter) * TimeInMillis.SECOND;
 
   // To be sure the device does not expire, we want to keep a safe delay
   const safeDelay = randomInt(TimeInMillis.DAY) + messageRetentionTime;
-  const gracePeriodStart = Math.max(deadline - safeDelay, deadline - teamGracePeriodDuration);
 
-  return {deadline, gracePeriodStart};
+  const end = Number(identity.notAfter) * TimeInMillis.SECOND;
+  const start = Math.max(end - safeDelay, end - teamGracePeriodDuration);
+
+  return {end, start};
 }
 
 export function getEnrollmentTimer(
@@ -87,7 +97,7 @@ export function getEnrollmentTimer(
     return {isSnoozable: false, firingDate: Date.now()};
   }
 
-  const deadline = getDeadline(identity, e2eiActivatedAt, teamGracePeriodDuration);
+  const deadline = getGracePeriod(identity, e2eiActivatedAt, teamGracePeriodDuration);
   const nextTick = getNextTick(deadline);
 
   // When logging in to a old device that doesn't have an identity yet, we trigger an enrollment timer
