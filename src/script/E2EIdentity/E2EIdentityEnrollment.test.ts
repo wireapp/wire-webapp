@@ -23,7 +23,6 @@ import {container} from 'tsyringe';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {Core} from 'src/script/service/CoreSingleton';
 import {UserState} from 'src/script/user/UserState';
-import {getCertificateDetails} from 'Util/certificateDetails';
 import * as util from 'Util/util';
 
 import {E2EIHandler} from './E2EIdentityEnrollment';

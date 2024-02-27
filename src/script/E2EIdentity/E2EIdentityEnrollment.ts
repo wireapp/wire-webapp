@@ -132,6 +132,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
   /**
    * Will initiate the timer that will regularly prompt the user to enroll (or to renew the certificate if it is about to expire)
+   * @returns the delay under which the next enrollment/renewal modal will be prompted
    */
   public async startTimers() {
     if (!this.config) {
