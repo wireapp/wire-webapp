@@ -17,6 +17,8 @@
  *
  */
 
+import {RegisteredClient} from '@wireapp/api-client/lib/client';
+
 import {ClientIdStringType, constructFullyQualifiedClientId} from '../../../../util/fullyQualifiedClientIdUtils';
 
 export const jsonToByteArray = (data: any): Uint8Array => {
@@ -36,5 +38,8 @@ export const getE2EIClientId = (clientId: string, userId: string, userDomain: st
     asBytes,
   };
 };
+
+export const isMLSDevice = ({mls_public_keys}: RegisteredClient) =>
+  typeof mls_public_keys.ed25519 === 'string' && mls_public_keys.ed25519.length > 0;
 
 export const isResponseStatusValid = (status: string | undefined) => status && status === 'valid';

@@ -242,8 +242,10 @@ export class Account extends TypedEventEmitter<Events> {
     displayName: string;
     /** handle of the user (should match the identity provider) */
     handle: string;
+    /** team of the user */
     teamId: string;
     discoveryUrl: string;
+    /** function called to get the oauth token */
     getOAuthToken: getTokenCallback;
     /** number of seconds the certificate should be valid (default 90 days) */
     certificateTtl?: number;
