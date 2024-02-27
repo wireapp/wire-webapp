@@ -81,7 +81,13 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
     return this.coreCryptoClient.e2eiIsEnabled(this.mlsService.config.cipherSuite);
   }
 
-  public async getAllGroupUsersIdentities(groupId: string): Promise<Map<string, DeviceIdentity[]>> {
+  public async getAllGroupUsersIdentities(groupId: string): Promise<Map<string, DeviceIdentity[]> | undefined> {
+    const conversationExists = await this.mlsService.conversationExists(groupId);
+
+    if (!conversationExists) {
+      return undefined;
+    }
+
     const allGroupClients = await this.mlsService.getClientIds(groupId);
 
     const userIdsMap = allGroupClients.reduce(
@@ -97,7 +103,16 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
     return this.getUsersIdentities(groupId, userIds);
   }
 
-  public async getUsersIdentities(groupId: string, userIds: QualifiedId[]): Promise<Map<string, DeviceIdentity[]>> {
+  public async getUsersIdentities(
+    groupId: string,
+    userIds: QualifiedId[],
+  ): Promise<Map<string, DeviceIdentity[]> | undefined> {
+    const conversationExists = await this.mlsService.conversationExists(groupId);
+
+    if (!conversationExists) {
+      return undefined;
+    }
+
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
     const textDecoder = new TextDecoder();
 
