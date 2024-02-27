@@ -60,7 +60,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   private readonly userState = container.resolve(UserState);
   #config?: EnrollmentConfig;
   private oidcService?: OIDCService;
-  public certificateTtl?: number = (30 * TIME_IN_MILLIS.DAY) / 1000;
+  public certificateTtl?: number;
 
   private get coreE2EIService() {
     const e2eiService = this.core.service?.e2eIdentity;
