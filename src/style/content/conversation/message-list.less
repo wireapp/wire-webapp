@@ -346,7 +346,6 @@
 .image-asset {
   position: relative;
   display: flex;
-  max-width: var(--conversation-message-asset-width);
   cursor: pointer;
 
   &--no-image {
@@ -358,16 +357,11 @@
     fill: white;
   }
 
-  .image-element {
-    position: relative;
-    max-width: 100%;
-    max-height: 80vh;
-
-    &.image-ephemeral {
-      cursor: default;
-      opacity: 0;
-    }
+  .image-ephemeral {
+    cursor: default;
+    opacity: 0;
   }
+
   .asset-loader {
     position: absolute;
     z-index: 1;
