@@ -100,21 +100,13 @@ export const ImageAsset = ({
   });
 
   const imageContainerStyle: CSSObject = {
-    ...(!imageUrl?.url ? {maxWidth: '100%'} : {maxWidth: 'var(--conversation-message-asset-width)'}),
+    maxWidth: 'var(--conversation-message-asset-width)',
   };
 
   const imageAsset: CSSObject = {
     aspectRatio: isFileSharingReceivingEnabled ? `${asset.ratio}` : undefined,
-    ...(!imageUrl?.url
-      ? {
-          maxWidth: '100%',
-          width: asset.width,
-          height: asset.height,
-        }
-      : {
-          maxWidth: asset.width,
-          maxHeight: '80vh',
-        }),
+    maxWidth: asset.width,
+    maxHeight: imageUrl ? '80vh' : asset.height,
   };
 
   const imageStyle: CSSObject = {
