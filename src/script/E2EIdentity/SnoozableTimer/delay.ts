@@ -17,60 +17,63 @@
  *
  */
 
-import {EnrollmentConfig} from '../E2EIdentityEnrollment';
-import {MLSStatuses, WireIdentity, isFreshMLSSelfClient} from '../E2EIdentityVerification';
+import {randomInt} from '@wireapp/commons/lib/util/RandomUtil';
+import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 
-/* eslint-disable no-magic-numbers */
+import {MLSStatuses, WireIdentity} from '../E2EIdentityVerification';
 
-enum TIME_IN_MILLIS {
-  SECOND = 1000,
-  MINUTE = SECOND * 60,
-  HOUR = MINUTE * 60,
-  DAY = HOUR * 24,
-  WEEK = DAY * 7,
-  YEAR = DAY * 365,
-}
+export const ONE_MINUTE = TimeInMillis.MINUTE;
+export const FIVE_MINUTES = TimeInMillis.MINUTE * 5;
+export const FIFTEEN_MINUTES = TimeInMillis.MINUTE * 15;
+export const ONE_HOUR = TimeInMillis.HOUR;
+export const FOUR_HOURS = TimeInMillis.HOUR * 4;
+export const ONE_DAY = TimeInMillis.DAY;
 
-export const ONE_MINUTE = TIME_IN_MILLIS.MINUTE;
-export const FIVE_MINUTES = TIME_IN_MILLIS.MINUTE * 5;
-export const FIFTEEN_MINUTES = TIME_IN_MILLIS.MINUTE * 15;
-export const ONE_HOUR = TIME_IN_MILLIS.HOUR;
-export const FOUR_HOURS = TIME_IN_MILLIS.HOUR * 4;
-export const ONE_DAY = TIME_IN_MILLIS.DAY;
+// message retention time on backend (hardcoded to 28 days)
+const messageRetentionTime = 28 * TimeInMillis.DAY;
 
 /**
  * Will return a suitable snooze time based on the grace period
- * @param gracePeriodInMs - the full grace period length in milliseconds
+ * @param expiryDate - the full grace period length in milliseconds
  */
-export function getSnoozeTime(gracePeriodInMs: number): number {
-  if (gracePeriodInMs > 0) {
-    if (gracePeriodInMs <= FIFTEEN_MINUTES) {
-      return Math.min(FIVE_MINUTES, gracePeriodInMs);
-    } else if (gracePeriodInMs <= ONE_HOUR) {
-      return Math.min(FIFTEEN_MINUTES, gracePeriodInMs);
-    } else if (gracePeriodInMs <= FOUR_HOURS) {
-      return Math.min(ONE_HOUR, gracePeriodInMs);
-    } else if (gracePeriodInMs <= ONE_DAY) {
-      return Math.min(FOUR_HOURS, gracePeriodInMs);
-    }
-    return Math.min(ONE_DAY, gracePeriodInMs);
+function getNextTick(expiryDate: number, gracePeriodDuration: number, isFirstEnrollment: boolean): number {
+  const leftoverTimer = expiryDate - Date.now();
+
+  // First a first enrollment we only consider the grace period. For enrolled devices we also consider the backend message retention time
+  const extraDelay = isFirstEnrollment ? 0 : randomInt(TimeInMillis.DAY) - messageRetentionTime;
+
+  const gracePeriod = Math.max(0, Math.min(gracePeriodDuration, leftoverTimer - extraDelay));
+  if (gracePeriod <= 0) {
+    return 0;
   }
-  return 0;
+
+  if (gracePeriod <= FIFTEEN_MINUTES) {
+    return Math.min(FIVE_MINUTES, gracePeriod);
+  } else if (gracePeriod <= ONE_HOUR) {
+    return Math.min(FIFTEEN_MINUTES, gracePeriod);
+  } else if (gracePeriod <= FOUR_HOURS) {
+    return Math.min(ONE_HOUR, gracePeriod);
+  } else if (gracePeriod <= ONE_DAY) {
+    return Math.min(FOUR_HOURS, gracePeriod);
+  }
+  return Math.min(ONE_DAY, gracePeriod);
 }
 
-export async function shouldEnableSoftLock(
-  enrollmentConfig: EnrollmentConfig,
-  identity?: WireIdentity,
-): Promise<boolean> {
-  if (await isFreshMLSSelfClient()) {
-    return true;
+export function getEnrollmentTimer(
+  identity: WireIdentity | undefined,
+  deviceCreatedAt: number,
+  teamGracePeriodDuration: number,
+) {
+  if (identity?.status === MLSStatuses.EXPIRED) {
+    return {isSnoozable: false, firingDate: Date.now()};
   }
-  if (!enrollmentConfig.timer.isSnoozeTimeAvailable()) {
-    // The user has used up the entire grace period or has a fresh new client, he now needs to enroll
-    return true;
-  }
-  if (!identity?.certificate) {
-    return false;
-  }
-  return identity.status === MLSStatuses.EXPIRED;
+
+  const isFirstEnrollment = !identity?.certificate;
+  const expiryDate = isFirstEnrollment
+    ? deviceCreatedAt + teamGracePeriodDuration
+    : Number(identity.notAfter) * TimeInMillis.SECOND;
+
+  const nextTick = getNextTick(expiryDate, teamGracePeriodDuration, isFirstEnrollment);
+  // When logging in to a old device that doesn't have an identity yet, we trigger an enrollment timer
+  return {isSnoozable: nextTick > 0, firingDate: Date.now() + nextTick};
 }
