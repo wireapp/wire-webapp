@@ -19,6 +19,7 @@
 
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {FEATURE_KEY, FeatureStatus, FeatureList} from '@wireapp/api-client/lib/team/feature/';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
@@ -32,6 +33,7 @@ import {SelfService} from './SelfService';
 import {evaluateSelfSupportedProtocols} from './SelfSupportedProtocols/SelfSupportedProtocols';
 
 import {ClientEntity, ClientRepository} from '../client';
+import {EventSource} from '../event/EventSource';
 import {Core} from '../service/CoreSingleton';
 import {
   FeatureUpdateType,
@@ -60,7 +62,7 @@ export class SelfRepository extends TypedEventEmitter<Events> {
 
     // Every time user's client is deleted, we need to re-evaluate self supported protocols.
     // It's possible that they have removed proteus client, and now all their clients are mls-capable.
-    amplify.subscribe(WebAppEvents.CLIENT.REMOVE, this.refreshSelfSupportedProtocols);
+    amplify.subscribe(WebAppEvents.CLIENT.REMOVE, this.handleSelfClientRemoved);
 
     teamRepository.on('featureConfigUpdated', async configUpdate => {
       await this.handleMLSFeatureUpdate(configUpdate);
@@ -68,6 +70,18 @@ export class SelfRepository extends TypedEventEmitter<Events> {
       await this.handleDownloadPathFeatureUpdate(configUpdate);
     });
   }
+
+  private handleSelfClientRemoved = async (
+    _userId: QualifiedId,
+    _clientId: string,
+    source: EventSource,
+  ): Promise<void> => {
+    if (source !== EventSource.WEBSOCKET) {
+      return;
+    }
+
+    await this.refreshSelfSupportedProtocols();
+  };
 
   private get selfUser() {
     const selfUser = this.userState.self();
