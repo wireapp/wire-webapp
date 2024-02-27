@@ -30,7 +30,7 @@ export const FOUR_HOURS = TimeInMillis.HOUR * 4;
 export const ONE_DAY = TimeInMillis.DAY;
 
 // message retention time on backend (hardcoded to 28 days)
-const messageRetentionTime = 28 * TimeInMillis.DAY;
+export const messageRetentionTime = 28 * TimeInMillis.DAY;
 
 /**
  * Will return a suitable snooze time based on the grace period
@@ -40,7 +40,7 @@ function getNextTick(expiryDate: number, gracePeriodDuration: number, isFirstEnr
   const leftoverTimer = expiryDate - Date.now();
 
   // First a first enrollment we only consider the grace period. For enrolled devices we also consider the backend message retention time
-  const extraDelay = isFirstEnrollment ? 0 : randomInt(TimeInMillis.DAY) - messageRetentionTime;
+  const extraDelay = isFirstEnrollment ? 0 : randomInt(TimeInMillis.DAY) + messageRetentionTime;
 
   const gracePeriod = Math.max(0, Math.min(gracePeriodDuration, leftoverTimer - extraDelay));
   if (gracePeriod <= 0) {
@@ -61,7 +61,7 @@ function getNextTick(expiryDate: number, gracePeriodDuration: number, isFirstEnr
 
 export function getEnrollmentTimer(
   identity: WireIdentity | undefined,
-  deviceCreatedAt: number,
+  e2eiActivatedAt: number,
   teamGracePeriodDuration: number,
 ) {
   if (identity?.status === MLSStatuses.EXPIRED) {
@@ -70,7 +70,7 @@ export function getEnrollmentTimer(
 
   const isFirstEnrollment = !identity?.certificate;
   const expiryDate = isFirstEnrollment
-    ? deviceCreatedAt + teamGracePeriodDuration
+    ? e2eiActivatedAt + teamGracePeriodDuration
     : Number(identity.notAfter) * TimeInMillis.SECOND;
 
   const nextTick = getNextTick(expiryDate, teamGracePeriodDuration, isFirstEnrollment);
