@@ -42,9 +42,9 @@ export const useUserIdentity = (userId: QualifiedId, groupId?: string, updateAft
     if (!updateAfterEnrollment) {
       return () => {};
     }
-    E2EIHandler.getInstance().on('identityUpdated', refreshDeviceIdentities);
+    E2EIHandler.getInstance().on('deviceStatusUpdated', refreshDeviceIdentities);
     return () => {
-      E2EIHandler.getInstance().off('identityUpdated', refreshDeviceIdentities);
+      E2EIHandler.getInstance().off('deviceStatusUpdated', refreshDeviceIdentities);
     };
   }, [refreshDeviceIdentities, updateAfterEnrollment]);
 
