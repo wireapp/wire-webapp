@@ -164,9 +164,8 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       });
     }
 
-    const fireIn = firingDate - Date.now();
     this.logger.info(`Enrollment timer started {snoozable: ${isSnoozable}, fireAt: ${new Date(firingDate)}}`);
-    return fireIn;
+    return firingDate - Date.now();
   }
 
   private async processEnrollmentUponExpiry(snoozable: boolean) {
