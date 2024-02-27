@@ -534,13 +534,16 @@ export class ClientRepository {
    *
    * @param eventJson JSON data for event
    */
-  private readonly onUserEvent = (eventJson: UserClientAddEvent | UserClientRemoveEvent): void => {
+  private readonly onUserEvent = async (
+    eventJson: UserClientAddEvent | UserClientRemoveEvent,
+    source: EventSource,
+  ): Promise<void> => {
     if (eventJson.type === USER_EVENT.CLIENT_ADD) {
       return this.onClientAdd(eventJson);
     }
 
     if (eventJson.type === USER_EVENT.CLIENT_REMOVE) {
-      this.onClientRemove(eventJson);
+      return this.onClientRemove(eventJson, source);
     }
   };
 
@@ -558,7 +561,7 @@ export class ClientRepository {
    * @param JSON data of 'user.client-remove' event
    * @returns Resolves when the event has been handled
    */
-  private async onClientRemove(eventJson?: UserClientRemoveEvent): Promise<void> {
+  private async onClientRemove(eventJson: UserClientRemoveEvent, source: EventSource): Promise<void> {
     const clientId = eventJson?.client ? eventJson.client.id : undefined;
     if (!clientId) {
       return;
@@ -584,7 +587,7 @@ export class ClientRepository {
         'legalHoldDeactivated',
       );
     }
-    amplify.publish(WebAppEvents.CLIENT.REMOVE, this.selfUser().qualifiedId, clientId);
+    amplify.publish(WebAppEvents.CLIENT.REMOVE, this.selfUser().qualifiedId, clientId, source);
   }
 
   public async haveAllActiveSelfClientsRegisteredMLSDevice(): Promise<boolean> {
