@@ -17,16 +17,16 @@
  *
  */
 
-const deviceCreatedAtKey = 'deviceCreatedAt';
+const e2eActivatedAtKey = 'e2eActivatedAt';
 
 export const SnoozableTimerStore = {
   store: {
-    deviceCreatedAt: (time: number) => localStorage.setItem(deviceCreatedAtKey, String(time)),
+    e2eiActivatedAt: (time: number) => localStorage.setItem(e2eActivatedAtKey, String(time)),
   },
   get: {
-    deviceCreatedAt: () => Number(localStorage.getItem(deviceCreatedAtKey)),
+    e2eiActivatedAt: () => Number(localStorage.getItem(e2eActivatedAtKey)),
   },
   clear: {
-    deviceCreatedAt: () => localStorage.removeItem(deviceCreatedAtKey),
+    deviceCreatedAt: () => localStorage.removeItem(e2eActivatedAtKey),
   },
 };

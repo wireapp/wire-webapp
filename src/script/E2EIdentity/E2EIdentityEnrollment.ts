@@ -140,12 +140,13 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
    * @returns the delay under which the next enrollment/renewal modal will be prompted
    */
   public async startTimers() {
-    const deviceCreatedAt = SnoozableTimerStore.get.deviceCreatedAt() || Date.now();
-    SnoozableTimerStore.store.deviceCreatedAt(deviceCreatedAt);
+    // We store the first time the user was prompted with the enrollment modal
+    const e2eActivatedAt = SnoozableTimerStore.get.e2eiActivatedAt() || Date.now();
+    SnoozableTimerStore.store.e2eiActivatedAt(e2eActivatedAt);
 
     const timerKey = 'enrollmentTimer';
     const identity = await getActiveWireIdentity();
-    const {firingDate, isSnoozable} = getEnrollmentTimer(identity, deviceCreatedAt, this.config.gracePeriodInMs);
+    const {firingDate, isSnoozable} = getEnrollmentTimer(identity, e2eActivatedAt, this.config.gracePeriodInMs);
 
     const task = async () => this.processEnrollmentUponExpiry(isSnoozable);
 
