@@ -18,6 +18,7 @@
  */
 
 import {waitFor} from '@testing-library/react';
+import {TaskScheduler} from '@wireapp/core/lib/util';
 import {container} from 'tsyringe';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
@@ -28,6 +29,9 @@ import * as util from 'Util/util';
 
 import {E2EIHandler} from './E2EIdentityEnrollment';
 import {OIDCServiceStore} from './OIDCService/OIDCServiceStorage';
+
+import {ConversationState} from '../conversation/ConversationState';
+import {Conversation} from '../entity/Conversation';
 
 jest.mock('./OIDCService', () => {
   return {
@@ -150,5 +154,21 @@ describe('E2EIHandler', () => {
     modalMock.mock.lastCall?.[1].primaryAction?.action?.();
 
     return enrollPromise;
+  });
+
+  it('registers a renew timer when device is enrolled', async () => {
+    const conversationState = container.resolve(ConversationState);
+    jest.spyOn(conversationState, 'getSelfMLSConversation').mockReturnValue(new Conversation() as any);
+
+    jest.spyOn(coreMock.service!.e2eIdentity!, 'isEnrollmentInProgress').mockResolvedValue(false);
+    jest.spyOn(coreMock.service!.e2eIdentity!, 'isFreshMLSSelfClient').mockResolvedValue(false);
+
+    const taskMock = jest.spyOn(TaskScheduler, 'addTask');
+
+    const instance = await E2EIHandler.getInstance().initialize(params);
+
+    await instance.startTimers();
+
+    expect(taskMock).toHaveBeenCalledWith(expect.objectContaining({key: 'enrollmentTimer', persist: true}));
   });
 });
