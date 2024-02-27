@@ -59,7 +59,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   private static instance: E2EIHandler | null = null;
   private readonly core = container.resolve(Core);
   private readonly userState = container.resolve(UserState);
-  private config?: EnrollmentConfig;
+  #config?: EnrollmentConfig;
   private oidcService?: OIDCService;
   public certificateTtl?: number = (30 * TIME_IN_MILLIS.DAY) / 1000;
 
@@ -94,6 +94,13 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     return E2EIHandler.instance;
   }
 
+  private get config() {
+    if (!this.#config) {
+      throw new Error('Trying to access config without initializing the E2EIHandler');
+    }
+    return this.#config;
+  }
+
   /**
    * Reset the instance
    */
@@ -106,13 +113,13 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
    * @returns
    */
   public isE2EIEnabled() {
-    return !!this.config;
+    return !!this.#config;
   }
 
   /** will initialize the e2ei enrollment handler eventually triggering an enrollment flow if the device is a fresh new one */
   public async initialize({discoveryUrl, gracePeriodInSeconds}: E2EIHandlerParams) {
     const gracePeriodInMs = gracePeriodInSeconds * TIME_IN_MILLIS.SECOND;
-    this.config = {
+    this.#config = {
       discoveryUrl,
       gracePeriodInMs,
     };
@@ -122,8 +129,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     if (await this.coreE2EIService.isEnrollmentInProgress()) {
       // If we have an enrollment in progress, we can just finish it (meaning we are coming back from an idp redirect)
       await this.enroll();
-    }
-    if (await isFreshMLSSelfClient()) {
+    } else if (await isFreshMLSSelfClient()) {
       // When the user logs in to a new device in an environment that has e2ei enabled, they should be forced to enroll
       await this.startEnrollment(ModalType.ENROLL, false);
     }
@@ -135,15 +141,12 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
    * @returns the delay under which the next enrollment/renewal modal will be prompted
    */
   public async startTimers() {
-    if (!this.config) {
-      throw new Error('Trying to start timers without initializing the E2EIHandler');
-    }
     const deviceCreatedAt = SnoozableTimerStore.get.deviceCreatedAt() || Date.now();
     SnoozableTimerStore.store.deviceCreatedAt(deviceCreatedAt);
 
     const timerKey = 'enrollmentTimer';
     const identity = await getActiveWireIdentity();
-    const nextTick = getEnrollmentTimer(identity, deviceCreatedAt, this.config?.gracePeriodInMs);
+    const nextTick = getEnrollmentTimer(identity, deviceCreatedAt, this.config.gracePeriodInMs);
 
     const task = async () => {
       this.emit('timerFired', {snoozable: nextTick.isSnoozable});
@@ -213,9 +216,6 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   }
 
   public async enroll(snoozable: boolean = true) {
-    if (!this.config) {
-      throw new Error('Trying to enroll for E2EI without initializing the E2EIHandler');
-    }
     try {
       // Notify user about E2EI enrolment in progress
       const isCertificateRenewal = await hasActiveCertificate();
@@ -321,7 +321,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     });
   }
 
-  private async showEnrollmentModal(
+  private async startEnrollment(
     modalType: ModalType.ENROLL | ModalType.CERTIFICATE_RENEWAL,
     snoozable: boolean,
   ): Promise<void> {
@@ -357,15 +357,5 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       },
     });
     PrimaryModal.show(determinedModalType, modalOptions);
-  }
-
-  private async startEnrollment(
-    enrollmentType: ModalType.CERTIFICATE_RENEWAL | ModalType.ENROLL,
-    snoozable: boolean,
-  ): Promise<void> {
-    // If the timer is not active, show the notification modal
-    if (this.config) {
-      return this.showEnrollmentModal(enrollmentType, snoozable);
-    }
   }
 }
