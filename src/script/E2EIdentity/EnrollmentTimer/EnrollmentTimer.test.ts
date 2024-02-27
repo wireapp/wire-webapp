@@ -17,7 +17,7 @@
  *
  */
 
-import {getEnrollmentTimer, messageRetentionTime} from './delay';
+import {getEnrollmentTimer, messageRetentionTime} from './EnrollmentTimer';
 
 import {MLSStatuses} from '../E2EIdentityVerification';
 
