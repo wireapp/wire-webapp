@@ -256,6 +256,10 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       await this.cleanUp(false);
       this.emit('deviceStatusUpdated', {status: 'valid'});
 
+      if (isCertificateRenewal) {
+        await this.startTimers();
+      }
+
       await this.showSuccessMessage(isCertificateRenewal);
     } catch (error) {
       this.logger.error('E2EI enrollment failed', error);
@@ -278,19 +282,14 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
   private async showSuccessMessage(isCertificateRenewal = false) {
     return new Promise<void>(resolve => {
-      const startTimers = isCertificateRenewal ? () => this.startTimers() : () => {};
       const {modalOptions, modalType} = getModalOptions({
         type: ModalType.SUCCESS,
         hideClose: false,
         extraParams: {
           isRenewal: isCertificateRenewal,
         },
-        primaryActionFn: async () => {
-          startTimers();
-          resolve();
-        },
+        primaryActionFn: resolve,
         secondaryActionFn: () => {
-          startTimers();
           amplify.publish(WebAppEvents.PREFERENCES.MANAGE_DEVICES);
           resolve();
         },
