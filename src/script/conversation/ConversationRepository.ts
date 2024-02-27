@@ -2464,7 +2464,8 @@ export class ConversationRepository {
    * @param mlsConversation mls conversation
    */
   async wipeMLSCapableConversation(conversation: MLSCapableConversation) {
-    return this.conversationService.wipeMLSCapableConversation(conversation);
+    await this.conversationService.wipeMLSCapableConversation(conversation);
+    conversation.mlsVerificationState(ConversationVerificationState.UNVERIFIED);
   }
 
   async leaveGuestRoom(): Promise<void> {
