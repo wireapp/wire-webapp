@@ -100,13 +100,14 @@ export const ImageAsset = ({
   });
 
   const imageContainerStyle: CSSObject = {
-    maxWidth: 'var(--conversation-message-asset-width)',
+    ...(!imageUrl?.url ? {maxWidth: '100%'} : {maxWidth: 'var(--conversation-message-asset-width)'}),
   };
 
   const imageAsset: CSSObject = {
     aspectRatio: isFileSharingReceivingEnabled ? `${asset.ratio}` : undefined,
     ...(!imageUrl?.url
       ? {
+          maxWidth: '100%',
           width: asset.width,
           height: asset.height,
         }
