@@ -31,7 +31,7 @@ export const messageBodyActions: CSSObject = {
   minHeight: '32px',
   minWidth: '40px',
   position: 'absolute',
-  right: 0,
+  right: '16px',
   top: '-34px',
   userSelect: 'none',
   '@media (max-width: @screen-md-min)': {
