@@ -278,6 +278,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
   private async showSuccessMessage(isCertificateRenewal = false) {
     return new Promise<void>(resolve => {
+      const startTimers = isCertificateRenewal ? () => this.startTimers() : () => {};
       const {modalOptions, modalType} = getModalOptions({
         type: ModalType.SUCCESS,
         hideClose: false,
@@ -285,13 +286,11 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
           isRenewal: isCertificateRenewal,
         },
         primaryActionFn: async () => {
-          if (isCertificateRenewal) {
-            // restart the timers for device certificate renewal
-            await this.startTimers();
-          }
+          startTimers();
           resolve();
         },
         secondaryActionFn: () => {
+          startTimers();
           amplify.publish(WebAppEvents.PREFERENCES.MANAGE_DEVICES);
           resolve();
         },
