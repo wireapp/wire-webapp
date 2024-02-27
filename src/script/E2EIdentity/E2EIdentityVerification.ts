@@ -63,12 +63,12 @@ function mapUserIdentities(userVerifications: Map<string, DeviceIdentity[]>): Ma
 
 export async function getUsersIdentities(groupId: string, userIds: QualifiedId[]) {
   const userVerifications = await getE2EIdentityService().getUsersIdentities(groupId, userIds);
-  return mapUserIdentities(userVerifications);
+  return userVerifications && mapUserIdentities(userVerifications);
 }
 
 export async function getAllGroupUsersIdentities(groupId: string) {
   const userVerifications = await getE2EIdentityService().getAllGroupUsersIdentities(groupId);
-  return mapUserIdentities(userVerifications);
+  return userVerifications && mapUserIdentities(userVerifications);
 }
 
 export async function getConversationVerificationState(groupId: string) {
@@ -82,6 +82,11 @@ const fetchSelfDeviceIdentity = async (): Promise<WireIdentity | undefined> => {
   const conversationState = container.resolve(ConversationState);
   const selfMLSConversation = conversationState.getSelfMLSConversation();
   const userIdentities = await getAllGroupUsersIdentities(selfMLSConversation.groupId);
+
+  if (!userIdentities) {
+    return undefined;
+  }
+
   const currentClientId = selfMLSConversation.selfUser()?.localClient?.id;
   const userId = selfMLSConversation.selfUser()?.id;
 

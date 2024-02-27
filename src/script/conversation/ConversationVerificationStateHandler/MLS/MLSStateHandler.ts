@@ -65,9 +65,14 @@ class MLSConversationVerificationStateHandler {
    * @param conversation
    */
   private async degradeConversation(conversation: MLSConversation) {
+    const userIdentities = await getAllGroupUsersIdentities(conversation.groupId);
+    if (!userIdentities) {
+      return;
+    }
+
     const state = ConversationVerificationState.DEGRADED;
     conversation.mlsVerificationState(state);
-    const userIdentities = await getAllGroupUsersIdentities(conversation.groupId);
+
     const degradedUsers: QualifiedId[] = [];
     for (const [userId, identities] of userIdentities.entries()) {
       if (identities.some(identity => identity.status !== MLSStatuses.VALID)) {
@@ -140,6 +145,12 @@ class MLSConversationVerificationStateHandler {
   private checkConversationVerificationState = async (conversation: Conversation): Promise<void> => {
     const isSelfConversation = conversation.type() === CONVERSATION_TYPE.SELF;
     if (!isMLSConversation(conversation) || isSelfConversation) {
+      return;
+    }
+
+    const conversationExists = await this.core.service?.mls?.conversationExists(conversation.groupId);
+    if (!conversationExists) {
+      conversation.mlsVerificationState(ConversationVerificationState.UNVERIFIED);
       return;
     }
 

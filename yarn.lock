@@ -4882,9 +4882,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:45.0.3":
+"@wireapp/core@file:.yalc/@wireapp/core::locator=wire-webapp%40workspace%3A.":
   version: 45.0.3
-  resolution: "@wireapp/core@npm:45.0.3"
+  resolution: "@wireapp/core@file:.yalc/@wireapp/core#.yalc/@wireapp/core::hash=0d2982&locator=wire-webapp%40workspace%3A."
   dependencies:
     "@wireapp/api-client": ^26.10.12
     "@wireapp/commons": ^5.2.5
@@ -4903,7 +4903,7 @@ __metadata:
     long: ^5.2.0
     uuidjs: 4.2.13
     zod: 3.22.4
-  checksum: f268ff0b5e02d72d764cab8ad5623d19233ba55ba6a81851fd68fd253c09a343bb40b335be09cb5a10ebf4347b39de9874455f903624345e0141c5edc7d2e19b
+  checksum: c02d0d23a05d8a51e829acd10071755fbdfb1d85a6557dd7a27e19fc5691de45b8e5c1acb96659aa84d731756c77d9df348246bff41a4a5c0e8bb341dc33708d
   languageName: node
   linkType: hard
 
@@ -17603,7 +17603,7 @@ __metadata:
     "@wireapp/avs": 9.6.12
     "@wireapp/commons": 5.2.5
     "@wireapp/copy-config": 2.1.14
-    "@wireapp/core": 45.0.3
+    "@wireapp/core": "file:.yalc/@wireapp/core"
     "@wireapp/eslint-config": 3.0.5
     "@wireapp/prettier-config": 0.6.3
     "@wireapp/react-ui-kit": 9.16.0
