@@ -164,8 +164,6 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
         persist: true,
       });
     }
-
-    this.logger.info(`Enrollment timer started {snoozable: ${isSnoozable}, fireAt: ${new Date(firingDate)}}`);
     return firingDate - Date.now();
   }
 
