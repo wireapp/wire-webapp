@@ -32,11 +32,11 @@ import {formatDelayTime, TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {removeUrlParameters} from 'Util/UrlUtil';
 
 import {hasActiveCertificate, getActiveWireIdentity, isFreshMLSSelfClient} from './E2EIdentityVerification';
+import {EnrollmentStore} from './Enrollment.store';
+import {getEnrollmentTimer} from './EnrollmentTimer';
 import {getModalOptions, ModalType} from './Modals';
 import {OIDCService} from './OIDCService';
 import {OIDCServiceStore} from './OIDCService/OIDCServiceStorage';
-import {getEnrollmentTimer} from './SnoozableTimer/delay';
-import {SnoozableTimerStore} from './SnoozableTimer/SnoozableTimerStorage';
 
 const {TaskScheduler} = util;
 interface E2EIHandlerParams {
@@ -142,8 +142,8 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
    */
   public async startTimers() {
     // We store the first time the user was prompted with the enrollment modal
-    const e2eActivatedAt = SnoozableTimerStore.get.e2eiActivatedAt() || Date.now();
-    SnoozableTimerStore.store.e2eiActivatedAt(e2eActivatedAt);
+    const e2eActivatedAt = EnrollmentStore.get.e2eiActivatedAt() || Date.now();
+    EnrollmentStore.store.e2eiActivatedAt(e2eActivatedAt);
 
     const timerKey = 'enrollmentTimer';
     const identity = await getActiveWireIdentity();
