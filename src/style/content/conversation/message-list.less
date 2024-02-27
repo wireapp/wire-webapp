@@ -281,7 +281,7 @@
     margin-right: 0;
   }
 
-  &:has(.message-quote__text--full pre) {
+  &:not(&.message-quoted):has(.message-quote__text--full pre) {
     display: flex;
   }
 
