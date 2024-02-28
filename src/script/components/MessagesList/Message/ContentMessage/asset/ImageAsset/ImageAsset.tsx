@@ -46,6 +46,8 @@ export interface ImageAssetProps {
   isFocusable?: boolean;
 }
 
+const MAX_ASSET_WIDTH = 800;
+
 export const ImageAsset = ({
   asset,
   message,
@@ -103,21 +105,29 @@ export const ImageAsset = ({
     maxWidth: 'var(--conversation-message-asset-width)',
   };
 
+  const isImageWidthLargerThanDefined = parseInt(asset.width, 10) >= MAX_ASSET_WIDTH;
+  const imageWidth = isImageWidthLargerThanDefined ? `${MAX_ASSET_WIDTH}px` : asset.width;
+
   const imageAsset: CSSObject = {
     aspectRatio: isFileSharingReceivingEnabled ? `${asset.ratio}` : undefined,
     ...(!imageUrl?.url
       ? {
-          maxWidth: asset.width,
-          maxHeight: asset.height,
+          maxWidth: '100%',
+          ...(!isImageWidthLargerThanDefined && {
+            height: asset.height,
+          }),
+          maxHeight: '80vh',
         }
       : {
-          maxWidth: asset.width,
+          maxWidth: imageWidth,
           maxHeight: '80vh',
         }),
   };
 
   const imageStyle: CSSObject = {
-    width: '100%',
+    width: imageWidth,
+    maxWidth: '100%',
+    height: 'auto',
   };
 
   return (
