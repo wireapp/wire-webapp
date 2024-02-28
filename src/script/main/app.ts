@@ -530,7 +530,7 @@ export class App {
       telemetry.timeStep(AppInitTimingsStep.APP_LOADED);
 
       await e2eiHandler?.startTimers();
-      this.logger.info(`App loaded in ${Date.now() - startTime}ms`);
+      this.logger.info(`App version ${Environment.version()} loaded in ${Date.now() - startTime}ms`);
 
       return selfUser;
     } catch (error) {
