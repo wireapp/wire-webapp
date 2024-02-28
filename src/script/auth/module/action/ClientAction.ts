@@ -91,6 +91,7 @@ export class ClientAction {
     }
     const deviceLabel = `${Runtime.getOS()}${Runtime.getOS().version ? ` ${Runtime.getOS().version}` : ''}`;
     let deviceModel = StringUtil.capitalize(Runtime.getBrowserName());
+    const dev = Runtime.isEdgeEnvironment() ? '(Edge)' : Runtime.isStagingEnvironment() ? '(Staging)' : false;
 
     if (Runtime.isDesktopApp()) {
       if (Runtime.isMacOS()) {
@@ -103,7 +104,9 @@ export class ClientAction {
     } else if (clientType === ClientType.TEMPORARY) {
       deviceModel = `${deviceModel} (Temporary)`;
     }
-
+    if (dev) {
+      deviceModel = `${deviceModel} ${dev}`;
+    }
     return {
       classification: ClientClassification.DESKTOP,
       cookieLabel: undefined,
