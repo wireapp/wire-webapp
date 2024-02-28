@@ -27,17 +27,24 @@ import {
   getAllGroupUsersIdentities,
   getConversationVerificationState,
   MLSStatuses,
+  WireIdentity,
 } from 'src/script/E2EIdentity';
 import {Conversation} from 'src/script/entity/Conversation';
+import {User} from 'src/script/entity/User';
 import {E2EIVerificationMessageType} from 'src/script/message/E2EIVerificationMessageType';
 import {Core} from 'src/script/service/CoreSingleton';
 import {Logger, getLogger} from 'Util/Logger';
 import {waitFor} from 'Util/waitFor';
 
-import {isMLSConversation, MLSConversation} from '../../ConversationSelectors';
+import {isMLSConversation, MLSCapableConversation, MLSConversation} from '../../ConversationSelectors';
 import {ConversationState} from '../../ConversationState';
 import {ConversationVerificationState} from '../../ConversationVerificationState';
 import {getConversationByGroupId, OnConversationE2EIVerificationStateChange} from '../shared';
+
+enum UserVerificationState {
+  ALL_VALID = 0,
+  SOME_INVALID = 1,
+}
 
 class MLSConversationVerificationStateHandler {
   private readonly logger: Logger;
@@ -64,15 +71,9 @@ class MLSConversationVerificationStateHandler {
    * Changes mls verification state to "degraded"
    * @param conversation
    */
-  private async degradeConversation(conversation: MLSConversation) {
-    const userIdentities = await getAllGroupUsersIdentities(conversation.groupId);
-    if (!userIdentities) {
-      return;
-    }
-
+  private async degradeConversation(conversation: MLSConversation, userIdentities: Map<string, WireIdentity[]>) {
     const state = ConversationVerificationState.DEGRADED;
     conversation.mlsVerificationState(state);
-
     const degradedUsers: QualifiedId[] = [];
     for (const [, identities] of userIdentities.entries()) {
       if (identities.length > 0 && identities.some(identity => identity.status !== MLSStatuses.VALID)) {
@@ -115,6 +116,63 @@ class MLSConversationVerificationStateHandler {
     await this.checkAllConversationsVerificationState();
   };
 
+  private checkUserHandle = (identity: WireIdentity, user: User): boolean => {
+    // WireIdentity handle format is "{scheme}%40{username}@{domain}"
+    // Example: wireapp://%40hans.wurst@elna.wire.link
+    const {handle: identityHandle} = identity;
+    // We only want to check the username part of the handle
+    const regex = /.*%40([^@]+)@[^@]+/;
+    const match = identityHandle.match(regex);
+    if (!match) {
+      return false;
+    }
+
+    const {username: userHandle} = user;
+
+    return match[1] === userHandle();
+  };
+
+  private checkAllUserCredentialsInConversation = async (
+    conversation: MLSCapableConversation,
+  ): Promise<{
+    userVerificationState: UserVerificationState;
+    userIdentities: Map<string, WireIdentity[]>;
+    problematicUserIds: Set<string>;
+  }> => {
+    const userIdentities = await getAllGroupUsersIdentities(conversation.groupId);
+    const users = conversation.allUserEntities();
+    const processedUserIds: string[] = [];
+    const problematicUserIds: Set<string> = new Set();
+
+    for (const [userId, identities] of userIdentities.entries()) {
+      if (processedUserIds.includes(userId)) {
+        continue;
+      }
+      processedUserIds.push(userId);
+      const user = users.find(user => user.qualifiedId.id === userId);
+      const identity = identities.at(0);
+      if (!identity || !user) {
+        console.log('adrian', 'identity or user not found', identity, user);
+        problematicUserIds.add(userId);
+        continue;
+      }
+
+      const matchingName = identity.displayName === user.name();
+      const matchingHandle = this.checkUserHandle(identity, user);
+      if (!matchingHandle || !matchingName) {
+        console.log('adrian', 'handle or name mismatch');
+        problematicUserIds.add(userId);
+      }
+    }
+
+    return {
+      userVerificationState:
+        problematicUserIds.size > 0 ? UserVerificationState.SOME_INVALID : UserVerificationState.ALL_VALID,
+      userIdentities,
+      problematicUserIds,
+    };
+  };
+
   /**
    * This function checks all conversations if they are verified or degraded and updates them accordingly
    */
@@ -126,6 +184,7 @@ class MLSConversationVerificationStateHandler {
   private onEpochChanged = async ({groupId}: {groupId: string}): Promise<void> => {
     // There could be a race condition where we would receive an epoch update for a conversation that is not yet known by the webapp.
     // We just wait for it to be available and then check the verification state
+
     const conversation = await waitFor(() =>
       getConversationByGroupId({conversationState: this.conversationState, groupId}),
     );
@@ -150,14 +209,21 @@ class MLSConversationVerificationStateHandler {
     }
 
     const verificationState = await getConversationVerificationState(conversation.groupId);
+    const {userIdentities, userVerificationState, problematicUserIds} =
+      await this.checkAllUserCredentialsInConversation(conversation);
+
+    const isConversationStateAndAllUsersVerified =
+      verificationState === E2eiConversationState.Verified && userVerificationState === UserVerificationState.ALL_VALID;
+
+    console.log('adrian', isConversationStateAndAllUsersVerified, userVerificationState, problematicUserIds);
 
     if (
-      verificationState === E2eiConversationState.NotVerified &&
+      !isConversationStateAndAllUsersVerified &&
       conversation.mlsVerificationState() === ConversationVerificationState.VERIFIED
     ) {
-      return this.degradeConversation(conversation);
+      return this.degradeConversation(conversation, userIdentities);
     } else if (
-      verificationState === E2eiConversationState.Verified &&
+      isConversationStateAndAllUsersVerified &&
       conversation.mlsVerificationState() !== ConversationVerificationState.VERIFIED
     ) {
       return this.verifyConversation(conversation);
