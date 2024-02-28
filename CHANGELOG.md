@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [45.0.11](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@45.0.10...@wireapp/core@45.0.11) (2024-02-28)
+
+### Bug Fixes
+
+* Rely on new distribution points to update CRL ([#6027](https://github.com/wireapp/wire-web-packages/issues/6027)) ([35c49e8](https://github.com/wireapp/wire-web-packages/commit/35c49e8668a7bb771ee9c2267f15aa42d42b5f9b))
+
 ## [45.0.10](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@45.0.9...@wireapp/core@45.0.10) (2024-02-28)
 
 ### Performance Improvements
