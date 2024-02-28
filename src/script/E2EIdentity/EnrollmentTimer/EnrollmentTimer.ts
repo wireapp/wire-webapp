@@ -32,31 +32,58 @@ export const ONE_DAY = TimeInMillis.DAY;
 // message retention time on backend (hardcoded to 28 days)
 export const messageRetentionTime = 28 * TimeInMillis.DAY;
 
+type GracePeriod = {
+  /** start date of the grace period (unix timestamp) */
+  start: number;
+  /** end date of the grace period (unix timestamp) */
+  end: number;
+};
 /**
  * Will return a suitable snooze time based on the grace period
- * @param expiryDate - the full grace period length in milliseconds
+ * @param deadline - the full grace period length in milliseconds
  */
-function getNextTick(expiryDate: number, gracePeriodDuration: number, isFirstEnrollment: boolean): number {
-  const leftoverTimer = expiryDate - Date.now();
-
-  // First a first enrollment we only consider the grace period. For enrolled devices we also consider the backend message retention time
-  const extraDelay = isFirstEnrollment ? 0 : randomInt(TimeInMillis.DAY) + messageRetentionTime;
-
-  const gracePeriod = Math.max(0, Math.min(gracePeriodDuration, leftoverTimer - extraDelay));
-  if (gracePeriod <= 0) {
+function getNextTick({end, start}: GracePeriod): number {
+  if (Date.now() >= end) {
+    // If the grace period is over, we should force the user to enroll
     return 0;
   }
 
-  if (gracePeriod <= FIFTEEN_MINUTES) {
-    return Math.min(FIVE_MINUTES, gracePeriod);
-  } else if (gracePeriod <= ONE_HOUR) {
-    return Math.min(FIFTEEN_MINUTES, gracePeriod);
-  } else if (gracePeriod <= FOUR_HOURS) {
-    return Math.min(ONE_HOUR, gracePeriod);
-  } else if (gracePeriod <= ONE_DAY) {
-    return Math.min(FOUR_HOURS, gracePeriod);
+  if (Date.now() < start) {
+    // If we are not in the grace period yet, we start the timer when the grace period starts
+    return start - Date.now();
   }
-  return Math.min(ONE_DAY, gracePeriod);
+  const validityPeriod = end - Date.now();
+
+  if (validityPeriod <= FIFTEEN_MINUTES) {
+    return Math.min(FIVE_MINUTES, validityPeriod);
+  } else if (validityPeriod <= ONE_HOUR) {
+    return Math.min(FIFTEEN_MINUTES, validityPeriod);
+  } else if (validityPeriod <= FOUR_HOURS) {
+    return Math.min(ONE_HOUR, validityPeriod);
+  } else if (validityPeriod <= ONE_DAY) {
+    return Math.min(FOUR_HOURS, validityPeriod);
+  }
+  return Math.min(ONE_DAY, validityPeriod);
+}
+
+function getGracePeriod(
+  identity: WireIdentity | undefined,
+  e2eActivatedAt: number,
+  teamGracePeriodDuration: number,
+): GracePeriod {
+  const isFirstEnrollment = !identity?.certificate;
+  if (isFirstEnrollment) {
+    // For a new device, the deadline is the e2ei activate date + the grace period
+    return {end: e2eActivatedAt + teamGracePeriodDuration, start: Date.now()};
+  }
+
+  // To be sure the device does not expire, we want to keep a safe delay
+  const safeDelay = randomInt(TimeInMillis.DAY) + messageRetentionTime;
+
+  const end = Number(identity.notAfter) * TimeInMillis.SECOND;
+  const start = Math.max(end - safeDelay, end - teamGracePeriodDuration);
+
+  return {end, start};
 }
 
 export function getEnrollmentTimer(
@@ -68,12 +95,9 @@ export function getEnrollmentTimer(
     return {isSnoozable: false, firingDate: Date.now()};
   }
 
-  const isFirstEnrollment = !identity?.certificate;
-  const expiryDate = isFirstEnrollment
-    ? e2eiActivatedAt + teamGracePeriodDuration
-    : Number(identity.notAfter) * TimeInMillis.SECOND;
+  const deadline = getGracePeriod(identity, e2eiActivatedAt, teamGracePeriodDuration);
+  const nextTick = getNextTick(deadline);
 
-  const nextTick = getNextTick(expiryDate, teamGracePeriodDuration, isFirstEnrollment);
   // When logging in to a old device that doesn't have an identity yet, we trigger an enrollment timer
   return {isSnoozable: nextTick > 0, firingDate: Date.now() + nextTick};
 }
