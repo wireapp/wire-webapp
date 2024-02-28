@@ -140,7 +140,6 @@ class MLSConversationVerificationStateHandler {
     problematicUserIds: Set<string>;
   }> => {
     const userIdentities = await getAllGroupUsersIdentities(conversation.groupId);
-    const users = conversation.allUserEntities();
     const processedUserIds: string[] = [];
     const problematicUserIds: Set<string> = new Set();
 
@@ -149,10 +148,12 @@ class MLSConversationVerificationStateHandler {
         continue;
       }
       processedUserIds.push(userId);
-      const user = users.find(user => user.qualifiedId.id === userId);
+
+      const user = await waitFor(() => conversation.allUserEntities().find(user => user.qualifiedId.id === userId));
       const identity = identities.at(0);
+
       if (!identity || !user) {
-        console.log('adrian', 'identity or user not found', identity, user);
+        this.logger.warn(`Could not find user or identity for userId: ${userId}`);
         problematicUserIds.add(userId);
         continue;
       }
@@ -160,7 +161,7 @@ class MLSConversationVerificationStateHandler {
       const matchingName = identity.displayName === user.name();
       const matchingHandle = this.checkUserHandle(identity, user);
       if (!matchingHandle || !matchingName) {
-        console.log('adrian', 'handle or name mismatch');
+        this.logger.warn(`User identity and user entity do not match for userId: ${userId}`);
         problematicUserIds.add(userId);
       }
     }
@@ -209,13 +210,10 @@ class MLSConversationVerificationStateHandler {
     }
 
     const verificationState = await getConversationVerificationState(conversation.groupId);
-    const {userIdentities, userVerificationState, problematicUserIds} =
-      await this.checkAllUserCredentialsInConversation(conversation);
+    const {userIdentities, userVerificationState} = await this.checkAllUserCredentialsInConversation(conversation);
 
     const isConversationStateAndAllUsersVerified =
       verificationState === E2eiConversationState.Verified && userVerificationState === UserVerificationState.ALL_VALID;
-
-    console.log('adrian', isConversationStateAndAllUsersVerified, userVerificationState, problematicUserIds);
 
     if (
       !isConversationStateAndAllUsersVerified &&
