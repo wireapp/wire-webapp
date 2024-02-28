@@ -18,7 +18,7 @@
  */
 
 import {waitFor} from '@testing-library/react';
-import {TaskScheduler} from '@wireapp/core/lib/util';
+import {LowPrecisionTaskScheduler} from '@wireapp/core/lib/util/LowPrecisionTaskScheduler';
 import {container} from 'tsyringe';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
@@ -163,12 +163,12 @@ describe('E2EIHandler', () => {
     jest.spyOn(coreMock.service!.e2eIdentity!, 'isEnrollmentInProgress').mockResolvedValue(false);
     jest.spyOn(coreMock.service!.e2eIdentity!, 'isFreshMLSSelfClient').mockResolvedValue(false);
 
-    const taskMock = jest.spyOn(TaskScheduler, 'addTask');
+    const taskMock = jest.spyOn(LowPrecisionTaskScheduler, 'addTask');
 
     const instance = await E2EIHandler.getInstance().initialize(params);
 
     await instance.startTimers();
 
-    expect(taskMock).toHaveBeenCalledWith(expect.objectContaining({key: 'enrollmentTimer', persist: true}));
+    expect(taskMock).toHaveBeenCalledWith(expect.objectContaining({key: 'enrollmentTimer'}));
   });
 });
