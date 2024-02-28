@@ -51,6 +51,75 @@ describe('PromiseQueue', () => {
       expect(result).toEqual([0, 1, 2]);
     });
 
+    it('processes promises with some delay in between', async () => {
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date());
+
+      let counter = 0;
+      const result: number[] = [];
+
+      const promiseFn = function () {
+        result.push(counter++);
+        return Promise.resolve();
+      };
+
+      const queue = new PromiseQueue({name: 'TestQueue', delay: 100});
+
+      void queue.push(promiseFn);
+      void queue.push(promiseFn);
+      void queue.push(promiseFn);
+
+      expect(result).toEqual([0]);
+
+      await new Promise(jest.requireActual('timers').setImmediate);
+      jest.advanceTimersByTime(100);
+      expect(result).toEqual([0, 1]);
+
+      await new Promise(jest.requireActual('timers').setImmediate);
+      jest.advanceTimersByTime(100);
+      expect(result).toEqual([0, 1, 2]);
+
+      jest.useRealTimers();
+    });
+
+    it('processes promises with some delay in between with delay changes in between', async () => {
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date());
+
+      let counter = 0;
+      const result: number[] = [];
+
+      const promiseFn = function () {
+        result.push(counter++);
+        return Promise.resolve();
+      };
+
+      const queue = new PromiseQueue({name: 'TestQueue', delay: 100});
+
+      void queue.push(promiseFn);
+      void queue.push(promiseFn);
+      void queue.push(promiseFn);
+
+      expect(result).toEqual([0]);
+
+      await new Promise(jest.requireActual('timers').setImmediate);
+      jest.advanceTimersByTime(100);
+      expect(result).toEqual([0, 1]);
+
+      queue.setDelay(200);
+
+      await new Promise(jest.requireActual('timers').setImmediate);
+      jest.advanceTimersByTime(100);
+      expect(result).toEqual([0, 1]);
+
+      await new Promise(jest.requireActual('timers').setImmediate);
+      jest.advanceTimersByTime(100);
+
+      expect(result).toEqual([0, 1, 2]);
+
+      jest.useRealTimers();
+    });
+
     it('continues to process the queue even when a prior promise rejects', async () => {
       /**
        * Prevents Jest from failing due to unhandled promise rejection.

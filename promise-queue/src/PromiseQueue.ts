@@ -24,6 +24,7 @@ const defaultOptions = {
   timeout: 1000 * 60, // 1 minute
   concurrent: 1,
   paused: false,
+  delay: 0,
 };
 
 export class PromiseQueue {
@@ -35,6 +36,7 @@ export class PromiseQueue {
   private readonly logger?: {warn: (...args: any[]) => void};
   private readonly queue: QueueEntry<any>[];
   private readonly timeout: number;
+  private delay: number;
 
   constructor(options?: PromiseQueueOptions) {
     this.blocked = false;
@@ -44,6 +46,7 @@ export class PromiseQueue {
     this.paused = options?.paused ?? defaultOptions.paused;
     this.queue = [];
     this.timeout = options?.timeout ?? defaultOptions.timeout;
+    this.delay = options?.delay ?? defaultOptions.delay;
   }
 
   /**
@@ -91,7 +94,11 @@ export class PromiseQueue {
           this.blocked = false;
         }
 
-        this.execute();
+        if (this.delay) {
+          setTimeout(() => this.execute(), this.delay);
+        } else {
+          this.execute();
+        }
       });
   }
 
@@ -105,6 +112,10 @@ export class PromiseQueue {
    */
   getLength(): number {
     return this.queue.length;
+  }
+
+  setDelay(delay: number) {
+    this.delay = delay;
   }
 
   /**
