@@ -235,14 +235,6 @@ export const ContentMessageComponent = ({
           />
         ))}
 
-        {failedToSend && (
-          <PartialFailureToSendWarning
-            isMessageFocused={msgFocusState}
-            failedToSend={failedToSend}
-            knownUsers={conversation.allUserEntities()}
-          />
-        )}
-
         {isAssetMessage && (
           <ReadIndicator
             message={message}
