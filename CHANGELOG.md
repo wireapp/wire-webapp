@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [45.0.8](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@45.0.7...@wireapp/core@45.0.8) (2024-02-28)
+
+### Bug Fixes
+
+* Upgrade core-crypto to rc46 ([#6023](https://github.com/wireapp/wire-web-packages/issues/6023)) ([adb19df](https://github.com/wireapp/wire-web-packages/commit/adb19dfdc7dcba1ad504ecfc4756bb3961010b25))
+
 ## [45.0.7](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@45.0.6...@wireapp/core@45.0.7) (2024-02-28)
 
 ### Bug Fixes
