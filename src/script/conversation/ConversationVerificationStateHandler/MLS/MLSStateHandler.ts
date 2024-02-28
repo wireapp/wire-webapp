@@ -121,48 +121,47 @@ class MLSConversationVerificationStateHandler {
     // Example: wireapp://%40hans.wurst@elna.wire.link
     const {handle: identityHandle} = identity;
     // We only want to check the username part of the handle
-    const regex = /.*%40([^@]+)@[^@]+/;
-    const match = identityHandle.match(regex);
-    if (!match) {
-      return false;
-    }
-
-    const {username: userHandle} = user;
-
-    return match[1] === userHandle();
+    const {username, domain} = user;
+    return identityHandle.includes(`${username()}@${domain}`);
   };
 
   private checkAllUserCredentialsInConversation = async (
     conversation: MLSCapableConversation,
   ): Promise<{
     userVerificationState: UserVerificationState;
-    userIdentities: Map<string, WireIdentity[]>;
+    userIdentities: Map<string, WireIdentity[]> | undefined;
     problematicUserIds: Set<string>;
   }> => {
     const userIdentities = await getAllGroupUsersIdentities(conversation.groupId);
     const processedUserIds: string[] = [];
     const problematicUserIds: Set<string> = new Set();
 
-    for (const [userId, identities] of userIdentities.entries()) {
-      if (processedUserIds.includes(userId)) {
-        continue;
-      }
-      processedUserIds.push(userId);
+    if (userIdentities) {
+      for (const [userId, identities] of userIdentities.entries()) {
+        if (processedUserIds.includes(userId)) {
+          continue;
+        }
+        processedUserIds.push(userId);
 
-      const user = await waitFor(() => conversation.allUserEntities().find(user => user.qualifiedId.id === userId));
-      const identity = identities.at(0);
+        /**
+         * We need to wait for the user entity to be available
+         * There is a race condition when adding a new user to a conversation, the host will receive the epoch update before the user entity is available
+         */
+        const user = await waitFor(() => conversation.allUserEntities().find(user => user.qualifiedId.id === userId));
+        const identity = identities.at(0);
 
-      if (!identity || !user) {
-        this.logger.warn(`Could not find user or identity for userId: ${userId}`);
-        problematicUserIds.add(userId);
-        continue;
-      }
+        if (!identity || !user) {
+          this.logger.warn(`Could not find user or identity for userId: ${userId}`);
+          problematicUserIds.add(userId);
+          continue;
+        }
 
-      const matchingName = identity.displayName === user.name();
-      const matchingHandle = this.checkUserHandle(identity, user);
-      if (!matchingHandle || !matchingName) {
-        this.logger.warn(`User identity and user entity do not match for userId: ${userId}`);
-        problematicUserIds.add(userId);
+        const matchingName = identity.displayName === user.name();
+        const matchingHandle = this.checkUserHandle(identity, user);
+        if (!matchingHandle || !matchingName) {
+          this.logger.warn(`User identity and user entity do not match for userId: ${userId}`);
+          problematicUserIds.add(userId);
+        }
       }
     }
 
@@ -181,7 +180,6 @@ class MLSConversationVerificationStateHandler {
     const conversations = this.conversationState.conversations();
     await Promise.all(conversations.map(conversation => this.checkConversationVerificationState(conversation)));
   };
-
   private onEpochChanged = async ({groupId}: {groupId: string}): Promise<void> => {
     // There could be a race condition where we would receive an epoch update for a conversation that is not yet known by the webapp.
     // We just wait for it to be available and then check the verification state
