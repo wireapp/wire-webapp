@@ -128,6 +128,14 @@ export class Runtime {
     }
   };
 
+  public static isStagingEnvironment = (): boolean => {
+    return window.location.hostname.includes('staging');
+  };
+
+  public static isEdgeEnvironment = (): boolean => {
+    return window.location.hostname.includes('edge');
+  };
+
   public static isSupportingLegacyCalling = (): boolean => {
     return (
       Runtime.isSupportingRTCPeerConnection() &&
