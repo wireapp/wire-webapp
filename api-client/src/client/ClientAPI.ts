@@ -148,6 +148,21 @@ export class ClientAPI {
   }
 
   /**
+   * Will replace all keypackages on backend by the keypackages provided
+   * @see https://staging-nginz-https.zinfra.io/v5/api/swagger-ui/#/default/put_mls_key_packages_self__client_
+   * @param {string} clientId The client to upload the key packages for
+   * @param {string[]} keyPackages The key packages to upload
+   */
+  public async replaceMLSKeyPackages(clientId: string, keyPackages: string[]) {
+    const config: AxiosRequestConfig = {
+      data: {key_packages: keyPackages},
+      method: 'PUT',
+      url: `/${ClientAPI.URL.MLS_CLIENTS}/${ClientAPI.URL.MLS_KEY_PACKAGES}/self/${clientId}`,
+    };
+
+    await this.client.sendJSON<PreKeyBundle>(config, true);
+  }
+  /**
    * Will upload keypackages for an MLS capable client
    * @see https://staging-nginz-https.zinfra.io/api/swagger-ui/#/default/post_mls_key_packages_self__client_
    * @param {string} clientId The client to upload the key packages for

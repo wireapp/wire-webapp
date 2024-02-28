@@ -36,10 +36,3 @@ export interface DoWireDpopChallengeParams {
 }
 
 export type GetClientNonceParams = Pick<DoWireDpopChallengeParams, 'clientId' | 'apiClient'>;
-
-export type GetClientAccessTokenParams = Pick<
-  DoWireDpopChallengeParams,
-  'clientId' | 'apiClient' | 'identity' | 'expirySecs' | 'userDomain'
-> & {
-  clientNonce: Nonce;
-};

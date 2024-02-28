@@ -711,6 +711,13 @@ export class MLSService extends TypedEventEmitter<Events> {
     });
   }
 
+  private async replaceKeyPackages(clientId: string, keyPackages: Uint8Array[]) {
+    return this.apiClient.api.client.replaceMLSKeyPackages(
+      clientId,
+      keyPackages.map(keyPackage => btoa(Converter.arrayBufferViewToBaselineString(keyPackage))),
+    );
+  }
+
   private async uploadMLSKeyPackages(clientId: string, keyPackages: Uint8Array[]) {
     return this.apiClient.api.client.uploadMLSKeyPackages(
       clientId,
@@ -878,15 +885,6 @@ export class MLSService extends TypedEventEmitter<Events> {
     return handleMLSWelcomeMessage({event, mlsService: this});
   }
 
-  public async deleteMLSKeyPackages(clientId: ClientId, keyPackagRefs: Uint8Array[]) {
-    return this.apiClient.api.client.deleteMLSKeyPackages(
-      clientId,
-      keyPackagRefs.map(keypackage => btoa(Converter.arrayBufferViewToBaselineString(keypackage))),
-    );
-  }
-
-  // E2E Identity Service related methods below this line
-
   /**
    *
    * @param discoveryUrl URL of the acme server
@@ -922,10 +920,8 @@ export class MLSService extends TypedEventEmitter<Events> {
       // we only upload public keys for the initial certification process if the device is not already a registered MLS device.
       await this.uploadMLSPublicKeys(client);
     }
-    // Remove old key packages
-    await this.deleteMLSKeyPackages(client.id, rotateBundle.keyPackageRefsToRemove);
-    // Upload new key packages with x509 certificate
-    await this.uploadMLSKeyPackages(client.id, rotateBundle.newKeyPackages);
+    // replace old key packages with new key packages with x509 certificate
+    await this.replaceKeyPackages(client.id, rotateBundle.newKeyPackages);
     // Verify that we have enough key packages
     await this.verifyRemoteMLSKeyPackagesAmount(client.id);
     // Update keying material
