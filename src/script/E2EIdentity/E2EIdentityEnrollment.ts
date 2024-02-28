@@ -239,7 +239,10 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
         handle,
         teamId,
         getOAuthToken: async authenticationChallenge => {
-          const userData = await this.getUserData(isCertificateRenewal, authenticationChallenge);
+          // For now we cannot do silent login as keycloak refresh token extension is not supported
+          // We can fix this condition when the plugin is enabled on keycloak
+          const silent = false && isCertificateRenewal;
+          const userData = await this.getUserData(silent, authenticationChallenge);
           if (!userData) {
             throw new Error('No user data received');
           }
