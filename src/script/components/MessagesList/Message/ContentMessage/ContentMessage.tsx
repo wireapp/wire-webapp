@@ -243,14 +243,6 @@ export const ContentMessageComponent = ({
           />
         )}
 
-        {[StatusType.FAILED, StatusType.FEDERATION_ERROR].includes(status) && (
-          <CompleteFailureToSendWarning
-            {...(status === StatusType.FEDERATION_ERROR && {unreachableDomain: conversation.domain})}
-            isMessageFocused={msgFocusState}
-            onRetry={() => onRetry(message)}
-          />
-        )}
-
         {isAssetMessage && (
           <ReadIndicator
             message={message}
@@ -273,6 +265,22 @@ export const ContentMessageComponent = ({
           />
         )}
       </div>
+
+      {[StatusType.FAILED, StatusType.FEDERATION_ERROR].includes(status) && (
+        <CompleteFailureToSendWarning
+          {...(status === StatusType.FEDERATION_ERROR && {unreachableDomain: conversation.domain})}
+          isMessageFocused={msgFocusState}
+          onRetry={() => onRetry(message)}
+        />
+      )}
+
+      {failedToSend && (
+        <PartialFailureToSendWarning
+          isMessageFocused={msgFocusState}
+          failedToSend={failedToSend}
+          knownUsers={conversation.allUserEntities()}
+        />
+      )}
 
       {!!reactions.length && (
         <MessageReactionsList
