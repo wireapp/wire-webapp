@@ -71,10 +71,18 @@ class MLSConversationVerificationStateHandler {
    * Changes mls verification state to "degraded"
    * @param conversation
    */
-  private async degradeConversation(conversation: MLSConversation, userIdentities: Map<string, WireIdentity[]>) {
+  private async degradeConversation(
+    conversation: MLSConversation,
+    userIdentities: Map<string, WireIdentity[]> | undefined,
+  ) {
+    if (!userIdentities) {
+      return;
+    }
+
     const state = ConversationVerificationState.DEGRADED;
     conversation.mlsVerificationState(state);
     const degradedUsers: QualifiedId[] = [];
+
     for (const [, identities] of userIdentities.entries()) {
       if (identities.length > 0 && identities.some(identity => identity.status !== MLSStatuses.VALID)) {
         degradedUsers.push(identities[0].qualifiedUserId);
@@ -130,18 +138,17 @@ class MLSConversationVerificationStateHandler {
   ): Promise<{
     userVerificationState: UserVerificationState;
     userIdentities: Map<string, WireIdentity[]> | undefined;
-    problematicUserIds: Set<string>;
   }> => {
     const userIdentities = await getAllGroupUsersIdentities(conversation.groupId);
-    const processedUserIds: string[] = [];
-    const problematicUserIds: Set<string> = new Set();
+    const processedUserIds: Set<string> = new Set();
+    let problemFound = false;
 
     if (userIdentities) {
       for (const [userId, identities] of userIdentities.entries()) {
-        if (processedUserIds.includes(userId)) {
+        if (processedUserIds.has(userId)) {
           continue;
         }
-        processedUserIds.push(userId);
+        processedUserIds.add(userId);
 
         /**
          * We need to wait for the user entity to be available
@@ -152,24 +159,23 @@ class MLSConversationVerificationStateHandler {
 
         if (!identity || !user) {
           this.logger.warn(`Could not find user or identity for userId: ${userId}`);
-          problematicUserIds.add(userId);
-          continue;
+          problemFound = true;
+          break;
         }
 
         const matchingName = identity.displayName === user.name();
         const matchingHandle = this.checkUserHandle(identity, user);
         if (!matchingHandle || !matchingName) {
           this.logger.warn(`User identity and user entity do not match for userId: ${userId}`);
-          problematicUserIds.add(userId);
+          problemFound = true;
+          break;
         }
       }
     }
 
     return {
-      userVerificationState:
-        problematicUserIds.size > 0 ? UserVerificationState.SOME_INVALID : UserVerificationState.ALL_VALID,
+      userVerificationState: problemFound ? UserVerificationState.SOME_INVALID : UserVerificationState.ALL_VALID,
       userIdentities,
-      problematicUserIds,
     };
   };
 
