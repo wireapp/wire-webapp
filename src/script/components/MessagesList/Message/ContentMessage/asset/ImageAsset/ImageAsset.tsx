@@ -112,6 +112,11 @@ export const ImageAsset = ({
     aspectRatio: isFileSharingReceivingEnabled ? `${asset.ratio}` : undefined,
     maxHeight: '80vh',
     maxWidth: !imageUrl?.url ? '100%' : imageWidth,
+
+    ...(!imageUrl?.url &&
+      !isImageWidthLargerThanDefined && {
+        height: asset.height,
+      }),
   };
 
   const imageStyle: CSSObject = {
