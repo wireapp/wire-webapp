@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.3.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/promise-queue@2.2.10...@wireapp/promise-queue@2.3.0) (2024-02-28)
+
+### Features
+
+* **promise-queue:** add optional delay to promise queue ([#6024](https://github.com/wireapp/wire-web-packages/issues/6024)) ([6860423](https://github.com/wireapp/wire-web-packages/commit/68604239b21d17f994a37300b3501483b5c09f3c))
+
 ## [2.2.10](https://github.com/wireapp/wire-web-packages/compare/@wireapp/promise-queue@2.2.9...@wireapp/promise-queue@2.2.10) (2024-02-08)
 
 **Note:** Version bump only for package @wireapp/promise-queue
