@@ -18,15 +18,19 @@
  */
 
 const e2eActivatedAtKey = 'e2eActivatedAt';
+const e2eTimer = 'e2eTimer';
 
 export const EnrollmentStore = {
   store: {
     e2eiActivatedAt: (time: number) => localStorage.setItem(e2eActivatedAtKey, String(time)),
+    timer: (time: number) => localStorage.setItem(e2eTimer, String(time)),
   },
   get: {
     e2eiActivatedAt: () => Number(localStorage.getItem(e2eActivatedAtKey)),
+    timer: () => Number(localStorage.getItem(e2eTimer)),
   },
   clear: {
     deviceCreatedAt: () => localStorage.removeItem(e2eActivatedAtKey),
+    timer: () => localStorage.removeItem(e2eTimer),
   },
 };
