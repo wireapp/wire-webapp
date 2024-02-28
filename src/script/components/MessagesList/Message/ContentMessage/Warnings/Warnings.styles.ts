@@ -19,8 +19,18 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const warning: CSSObject = {color: 'var(--danger-color)', fontSize: 'var(--font-size-small)'};
+export const warning: CSSObject = {
+  color: 'var(--danger-color)',
+  fontSize: 'var(--font-size-small)',
+};
+export const wrapper: CSSObject = {
+  paddingLeft: 'var(--conversation-message-sender-width)',
+  marginTop: '6px',
+};
 export const backendErrorLink: CSSObject = {
   fontSize: 'var(--font-size-small)',
   '&:visited:hover, &:hover': {color: 'var(--blue-500)'},
+};
+export const button: CSSObject = {
+  marginBlock: '4px 0',
 };
