@@ -19,7 +19,7 @@
 
 import {Converter} from 'bazinga64';
 
-import {DoWireDpopChallengeParams, GetClientAccessTokenParams, GetClientNonceParams} from './DpopChallenge.types';
+import {DoWireDpopChallengeParams, GetClientNonceParams} from './DpopChallenge.types';
 
 const getClientNonce = async ({apiClient, clientId}: GetClientNonceParams) => {
   try {
@@ -33,21 +33,6 @@ const getClientNonce = async ({apiClient, clientId}: GetClientNonceParams) => {
   }
 };
 
-const getClientAccessToken = async ({
-  apiClient,
-  clientNonce,
-  identity,
-  clientId,
-  expirySecs,
-}: GetClientAccessTokenParams) => {
-  const dpopToken = await identity.createDpopToken(expirySecs, clientNonce);
-
-  // Remove this when the server is ready to accept the token
-  await new Promise(resolve => setTimeout(resolve, 2000));
-
-  return apiClient.api.client.getAccessToken(clientId, dpopToken);
-};
-
 export const doWireDpopChallenge = async ({
   apiClient,
   clientId,
@@ -56,7 +41,6 @@ export const doWireDpopChallenge = async ({
   nonce,
   connection,
   expirySecs,
-  userDomain,
 }: DoWireDpopChallengeParams) => {
   const {dpopChallenge} = authData.authorization;
   if (!dpopChallenge) {
@@ -65,17 +49,8 @@ export const doWireDpopChallenge = async ({
 
   const clientNonce = await getClientNonce({clientId, apiClient});
 
-  // We need to wait for the server to be ready to accept the token, there are some issues with the timing
-  await new Promise(resolve => setTimeout(resolve, 1000));
-
-  const clientAccessTokenData = await getClientAccessToken({
-    apiClient,
-    clientId,
-    clientNonce,
-    identity,
-    expirySecs,
-    userDomain,
-  });
+  const dpopToken = await identity.createDpopToken(expirySecs, clientNonce);
+  const clientAccessTokenData = await apiClient.api.client.getAccessToken(clientId, dpopToken);
 
   const reqBody = await identity.newDpopChallengeRequest(clientAccessTokenData.token, nonce);
 
@@ -83,6 +58,7 @@ export const doWireDpopChallenge = async ({
   if (!dpopChallengeResponse) {
     throw new Error('No response received while validating DPOP challenge');
   }
+
   await identity.newDpopChallengeResponse(
     Converter.stringToArrayBufferViewUTF8(JSON.stringify(dpopChallengeResponse.data)),
   );
