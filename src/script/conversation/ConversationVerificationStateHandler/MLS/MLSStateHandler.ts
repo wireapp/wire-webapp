@@ -189,7 +189,6 @@ class MLSConversationVerificationStateHandler {
   private onEpochChanged = async ({groupId}: {groupId: string}): Promise<void> => {
     // There could be a race condition where we would receive an epoch update for a conversation that is not yet known by the webapp.
     // We just wait for it to be available and then check the verification state
-
     const conversation = await waitFor(() =>
       getConversationByGroupId({conversationState: this.conversationState, groupId}),
     );
