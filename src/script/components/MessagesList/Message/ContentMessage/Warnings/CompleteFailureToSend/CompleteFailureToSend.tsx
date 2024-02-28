@@ -36,7 +36,7 @@ const config = Config.getConfig();
 export const CompleteFailureToSendWarning = ({isMessageFocused, onRetry, unreachableDomain}: Props) => {
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
   return (
-    <div className="message-warning">
+    <>
       {unreachableDomain ? (
         <p>
           <span
@@ -64,6 +64,6 @@ export const CompleteFailureToSendWarning = ({isMessageFocused, onRetry, unreach
           {t('messageCouldNotBeSentRetry')}
         </Button>
       </div>
-    </div>
+    </>
   );
 };
