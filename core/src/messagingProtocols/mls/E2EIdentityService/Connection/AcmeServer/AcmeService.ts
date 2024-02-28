@@ -117,7 +117,8 @@ export class AcmeService {
     const crl = CrlResponseSchema.parse(data);
     const crlUint8Array = new Uint8Array(crl);
 
-    return {url, crl: crlUint8Array};
+    const fixedUrl = url.replace('https://', 'http://');
+    return {url: fixedUrl, crl: crlUint8Array};
   }
 
   public async getLocalCertificateRoot(): Promise<string> {
