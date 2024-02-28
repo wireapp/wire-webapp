@@ -451,6 +451,7 @@ export class App {
         //if mls is supported, we need to initialize the callbacks (they are used when decrypting messages)
         conversationRepository.initMLSConversationRecoveredListener();
         registerMLSConversationVerificationStateHandler(
+          selfUser.qualifiedId.domain,
           this.updateConversationE2EIVerificationState,
           this.showClientCertificateRevokedWarning,
         );
