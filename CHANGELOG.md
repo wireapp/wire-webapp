@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [26.10.13](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@26.10.12...@wireapp/api-client@26.10.13) (2024-02-28)
+
+### Performance Improvements
+
+* improve enrollment performances ([#6026](https://github.com/wireapp/wire-web-packages/issues/6026)) ([c3f9097](https://github.com/wireapp/wire-web-packages/commit/c3f909717fef5cdfc44912b1df0b42adb3c1343b))
+
 ## [26.10.12](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@26.10.11...@wireapp/api-client@26.10.12) (2024-02-26)
 
 **Note:** Version bump only for package @wireapp/api-client
