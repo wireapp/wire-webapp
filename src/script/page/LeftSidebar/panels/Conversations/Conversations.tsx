@@ -78,7 +78,7 @@ type ConversationsProps = {
   userState?: UserState;
 };
 
-export enum ConversationViewStyle {
+export enum SidebarTabs {
   RECENT,
   FOLDER,
   FAVORITES,
@@ -139,17 +139,17 @@ const Conversations: React.FC<ConversationsProps> = ({
   const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
 
   const initialViewStyle = propertiesRepository.getPreference(PROPERTIES_TYPE.INTERFACE.VIEW_FOLDERS)
-    ? ConversationViewStyle.FOLDER
-    : ConversationViewStyle.RECENT;
+    ? SidebarTabs.FOLDER
+    : SidebarTabs.RECENT;
 
-  const [viewStyle, setViewStyle] = useState<ConversationViewStyle>(initialViewStyle);
+  const [viewStyle, setViewStyle] = useState<SidebarTabs>(initialViewStyle);
   const showBadge = notifications.length > 0;
 
-  const isRecentViewStyle = viewStyle === ConversationViewStyle.RECENT;
-  const isFolderViewStyle = viewStyle === ConversationViewStyle.FOLDER;
-  const isFavoritesViewStyle = viewStyle === ConversationViewStyle.FAVORITES;
-  const isGroupsViewStyle = viewStyle === ConversationViewStyle.GROUPS;
-  const isDirectsViewStyle = viewStyle === ConversationViewStyle.DIRECTS;
+  const isRecentViewStyle = viewStyle === SidebarTabs.RECENT;
+  const isFolderViewStyle = viewStyle === SidebarTabs.FOLDER;
+  const isFavoritesViewStyle = viewStyle === SidebarTabs.FAVORITES;
+  const isGroupsViewStyle = viewStyle === SidebarTabs.GROUPS;
+  const isDirectsViewStyle = viewStyle === SidebarTabs.DIRECTS;
 
   const showSearchInput = isRecentViewStyle || isFavoritesViewStyle || isGroupsViewStyle || isDirectsViewStyle;
 
@@ -254,8 +254,8 @@ const Conversations: React.FC<ConversationsProps> = ({
     </>
   );
 
-  function changeViewStyle(viewStyle: ConversationViewStyle) {
-    if (viewStyle !== ConversationViewStyle.RECENT) {
+  function changeViewStyle(viewStyle: SidebarTabs) {
+    if (viewStyle !== SidebarTabs.RECENT) {
       setConversationsFilter('');
     }
     setViewStyle(viewStyle);
@@ -276,7 +276,7 @@ const Conversations: React.FC<ConversationsProps> = ({
           type="button"
           role="tab"
           className={cx(`conversations-sidebar-btn`, {active: isRecentViewStyle})}
-          onClick={() => changeViewStyle(ConversationViewStyle.RECENT)}
+          onClick={() => changeViewStyle(SidebarTabs.RECENT)}
           title={t('conversationViewTooltip')}
           data-uie-name="go-recent-view"
           data-uie-status={isRecentViewStyle ? 'active' : 'inactive'}
@@ -296,7 +296,7 @@ const Conversations: React.FC<ConversationsProps> = ({
           type="button"
           role="tab"
           className={cx(`conversations-sidebar-btn`, {active: isFavoritesViewStyle})}
-          onClick={() => changeViewStyle(ConversationViewStyle.FAVORITES)}
+          onClick={() => changeViewStyle(SidebarTabs.FAVORITES)}
           title={t('conversationLabelFavorites')}
           data-uie-name="go-favorites-view"
           data-uie-status={isFavoritesViewStyle ? 'active' : 'inactive'}
@@ -316,7 +316,7 @@ const Conversations: React.FC<ConversationsProps> = ({
           type="button"
           role="tab"
           className={cx(`conversations-sidebar-btn`, {active: isGroupsViewStyle})}
-          onClick={() => changeViewStyle(ConversationViewStyle.GROUPS)}
+          onClick={() => changeViewStyle(SidebarTabs.GROUPS)}
           title={t('conversationLabelGroups')}
           data-uie-name="go-favorites-view"
           data-uie-status={isGroupsViewStyle ? 'active' : 'inactive'}
@@ -336,7 +336,7 @@ const Conversations: React.FC<ConversationsProps> = ({
           type="button"
           role="tab"
           className={cx(`conversations-sidebar-btn`, {active: isDirectsViewStyle})}
-          onClick={() => changeViewStyle(ConversationViewStyle.DIRECTS)}
+          onClick={() => changeViewStyle(SidebarTabs.DIRECTS)}
           title={t('conversationLabelDirects')}
           data-uie-name="go-favorites-view"
           data-uie-status={isDirectsViewStyle ? 'active' : 'inactive'}
@@ -356,7 +356,7 @@ const Conversations: React.FC<ConversationsProps> = ({
           type="button"
           role="tab"
           className={cx(`conversations-sidebar-btn`, {active: isFolderViewStyle})}
-          onClick={() => changeViewStyle(ConversationViewStyle.FOLDER)}
+          onClick={() => changeViewStyle(SidebarTabs.FOLDER)}
           title={t('folderViewTooltip')}
           data-uie-name="go-folder-view"
           data-uie-status={isFolderViewStyle ? 'active' : 'inactive'}
@@ -442,28 +442,28 @@ const Conversations: React.FC<ConversationsProps> = ({
   }
 
   function getViewStyleConversations() {
-    if (viewStyle === ConversationViewStyle.FOLDER || viewStyle === ConversationViewStyle.RECENT) {
+    if (viewStyle === SidebarTabs.FOLDER || viewStyle === SidebarTabs.RECENT) {
       return {
         conversations: conversations.filter(conversationSearchFilter),
         searchInputPlaceholder: t('searchConversations'),
       };
     }
 
-    if (viewStyle === ConversationViewStyle.GROUPS) {
+    if (viewStyle === SidebarTabs.GROUPS) {
       return {
         conversations: groupConversations.filter(conversationSearchFilter),
         searchInputPlaceholder: t('searchGroupConversations'),
       };
     }
 
-    if (viewStyle === ConversationViewStyle.DIRECTS) {
+    if (viewStyle === SidebarTabs.DIRECTS) {
       return {
         conversations: directConversations.filter(conversationSearchFilter),
         searchInputPlaceholder: t('searchDirectConversations'),
       };
     }
 
-    if (viewStyle === ConversationViewStyle.FAVORITES) {
+    if (viewStyle === SidebarTabs.FAVORITES) {
       return {
         conversations: favoriteConversations.filter(conversationSearchFilter),
         searchInputPlaceholder: t('searchFavoriteConversations'),

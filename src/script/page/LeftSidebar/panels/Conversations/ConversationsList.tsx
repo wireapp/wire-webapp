@@ -32,7 +32,7 @@ import {handleKeyDown, isKeyboardEvent} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
-import {ConversationViewStyle} from './Conversations';
+import {SidebarTabs} from './Conversations';
 import {GroupedConversations} from './GroupedConversations';
 
 import {CallState} from '../../../../calling/CallState';
@@ -52,7 +52,7 @@ interface ConversationsListProps {
   conversations: Conversation[];
   conversationState: ConversationState;
   listViewModel: ListViewModel;
-  viewStyle: ConversationViewStyle;
+  viewStyle: SidebarTabs;
   currentFocus: string;
   resetConversationFocus: () => void;
   handleArrowKeyDown: (index: number) => (e: React.KeyboardEvent) => void;
@@ -126,7 +126,7 @@ export const ConversationsList = ({
   });
 
   const getConversationView = () => {
-    if (viewStyle === ConversationViewStyle.FOLDER) {
+    if (viewStyle === SidebarTabs.FOLDER) {
       return (
         <li tabIndex={TabIndex.UNFOCUSABLE}>
           <GroupedConversations
@@ -151,7 +151,7 @@ export const ConversationsList = ({
     );
   };
 
-  const isFolderView = viewStyle === ConversationViewStyle.FOLDER;
+  const isFolderView = viewStyle === SidebarTabs.FOLDER;
   const uieName = isFolderView ? 'folder-view' : 'recent-view';
 
   const connectionText =
