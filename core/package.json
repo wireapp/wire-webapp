@@ -15,6 +15,7 @@
     "@wireapp/commons": "workspace:^",
     "@wireapp/core-crypto": "1.0.0-rc.46",
     "@wireapp/cryptobox": "12.8.0",
+    "@wireapp/priority-queue": "workspace:^",
     "@wireapp/promise-queue": "workspace:^",
     "@wireapp/protocol-messaging": "1.44.0",
     "@wireapp/store-engine": "workspace:*",
