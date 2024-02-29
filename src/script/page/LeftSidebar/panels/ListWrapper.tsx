@@ -17,7 +17,7 @@
  *
  */
 
-import React, {ReactElement} from 'react';
+import React, {ReactElement, ReactNode} from 'react';
 
 import {css} from '@emotion/react';
 import {throttle} from 'underscore';
@@ -50,10 +50,11 @@ interface LeftListWrapperProps {
   sidebar?: React.ReactNode;
   footer?: ReactElement;
   header?: string;
-  headerElement?: ReactElement;
+  headerElement?: ReactNode;
   headerUieName?: string;
   id: string;
   onClose?: () => void;
+  hasHeader?: boolean;
 }
 
 const ListWrapper = ({
@@ -63,6 +64,7 @@ const ListWrapper = ({
   headerElement,
   onClose,
   children,
+  hasHeader = true,
   footer,
   before,
   headerUieName,
@@ -91,27 +93,29 @@ const ListWrapper = ({
     <>
       {sidebar}
       <div id={id} className={`left-list-${id} ${id}`} css={style}>
-        <header className={`left-list-header left-list-header-${id}`}>
-          {headerElement ? (
-            headerElement
-          ) : (
-            <>
-              <h2 className="left-list-header-text" data-uie-name={headerUieName}>
-                {header}
-              </h2>
+        {hasHeader && (
+          <header className={`left-list-header left-list-header-${id}`}>
+            {headerElement ? (
+              headerElement
+            ) : (
+              <>
+                <h2 className="left-list-header-text" data-uie-name={headerUieName}>
+                  {header}
+                </h2>
 
-              <button
-                type="button"
-                className="left-list-header-close-button button-icon-large"
-                onClick={onClose}
-                title={t('tooltipSearchClose')}
-                data-uie-name={`do-close-${id}`}
-              >
-                <Icon.Close />
-              </button>
-            </>
-          )}
-        </header>
+                <button
+                  type="button"
+                  className="left-list-header-close-button button-icon-large"
+                  onClick={onClose}
+                  title={t('tooltipSearchClose')}
+                  data-uie-name={`do-close-${id}`}
+                >
+                  <Icon.Close />
+                </button>
+              </>
+            )}
+          </header>
+        )}
 
         {before ?? null}
 

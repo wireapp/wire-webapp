@@ -25,10 +25,8 @@ import {CSSTransition, SwitchTransition} from 'react-transition-group';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {Archive} from './panels/Archive';
 import {Conversations} from './panels/Conversations';
 import {Preferences} from './panels/Preferences';
-import {StartUI} from './panels/StartUI';
 import {TemporaryGuestConversations} from './panels/TemporatyGuestConversations';
 
 import {User} from '../../entity/User';
@@ -67,18 +65,25 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({listViewModel, selfUser, isAct
       <SwitchTransition>
         <Animated key={listState}>
           <>
-            {listState === ListState.CONVERSATIONS && (
+            {(listState === ListState.CONVERSATIONS ||
+              listState === ListState.START_UI ||
+              listState === ListState.PREFERENCES ||
+              listState === ListState.ARCHIVE) && (
               <Conversations
-                listViewModel={listViewModel}
-                preferenceNotificationRepository={repositories.preferenceNotification}
-                conversationRepository={conversationRepository}
-                propertiesRepository={propertiesRepository}
-                switchList={switchList}
                 selfUser={selfUser}
+                listState={listState}
+                listViewModel={listViewModel}
+                searchRepository={repositories.search}
+                teamRepository={repositories.team}
+                integrationRepository={repositories.integration}
+                userRepository={repositories.user}
+                propertiesRepository={propertiesRepository}
+                conversationRepository={conversationRepository}
+                preferenceNotificationRepository={repositories.preferenceNotification}
               />
             )}
 
-            {listState === ListState.PREFERENCES && (
+            {false && (
               <Preferences
                 contentViewModel={listViewModel.contentViewModel}
                 teamRepository={repositories.team}
@@ -87,33 +92,10 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({listViewModel, selfUser, isAct
               />
             )}
 
-            {listState === ListState.ARCHIVE && (
-              <Archive
-                answerCall={listViewModel.answerCall}
-                conversationRepository={conversationRepository}
-                listViewModel={listViewModel}
-                onClose={goHome}
-              />
-            )}
-
             {listState === ListState.TEMPORARY_GUEST && (
               <TemporaryGuestConversations
                 callingViewModel={listViewModel.callingViewModel}
                 listViewModel={listViewModel}
-                selfUser={selfUser}
-              />
-            )}
-
-            {listState === ListState.START_UI && (
-              <StartUI
-                onClose={goHome}
-                conversationRepository={conversationRepository}
-                searchRepository={repositories.search}
-                teamRepository={repositories.team}
-                integrationRepository={repositories.integration}
-                mainViewModel={listViewModel.mainViewModel}
-                userRepository={repositories.user}
-                isFederated={listViewModel.isFederated}
                 selfUser={selfUser}
               />
             )}

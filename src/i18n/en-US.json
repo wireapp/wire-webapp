@@ -1341,6 +1341,7 @@
   "searchFavoriteConversations": "Search favorites",
   "searchGroupConversations": "Search group conversations",
   "searchDirectConversations": "Search 1:1 conversations",
+  "searchArchivedConversations": "Search archived conversations",
   "searchConversationsNoResult": "No conversations could be found.",
   "searchConversationsNoResultConnectSuggestion": "Connect with new users or start a new conversation",
   "searchCreateGroup": "Create group",

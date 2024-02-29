@@ -34,13 +34,18 @@ import {UserInfo} from 'Components/UserInfo';
 import {UserVerificationBadges} from 'Components/VerificationBadge';
 import {Config} from 'src/script/Config';
 import {Conversation} from 'src/script/entity/Conversation';
+import {IntegrationRepository} from 'src/script/integration/IntegrationRepository';
 import {
   closeIconStyles,
   searchIconStyles,
   searchInputStyles,
   searchInputWrapperStyles,
 } from 'src/script/page/LeftSidebar/panels/Conversations/Conversations.styles';
+import {StartUI} from 'src/script/page/LeftSidebar/panels/StartUI';
 import {ListState} from 'src/script/page/useAppState';
+import {SearchRepository} from 'src/script/search/SearchRepository';
+import {TeamRepository} from 'src/script/team/TeamRepository';
+import {UserRepository} from 'src/script/user/UserRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -62,7 +67,6 @@ import {Shortcut} from '../../../../ui/Shortcut';
 import {ShortcutType} from '../../../../ui/ShortcutType';
 import {UserState} from '../../../../user/UserState';
 import {ListViewModel} from '../../../../view_model/ListViewModel';
-import {useAppMainState, ViewType} from '../../../state';
 import {ListWrapper} from '../ListWrapper';
 
 type ConversationsProps = {
@@ -73,9 +77,13 @@ type ConversationsProps = {
   preferenceNotificationRepository: PreferenceNotificationRepository;
   propertiesRepository: PropertiesRepository;
   selfUser: User;
-  switchList: (list: ListState) => void;
   teamState?: TeamState;
   userState?: UserState;
+  listState: ListState;
+  integrationRepository: IntegrationRepository;
+  searchRepository: SearchRepository;
+  teamRepository: TeamRepository;
+  userRepository: UserRepository;
 };
 
 export enum SidebarTabs {
@@ -85,9 +93,15 @@ export enum SidebarTabs {
   GROUPS,
   DIRECTS,
   ARCHIVES,
+  CONNECT,
+  PREFERENCES,
 }
 
 const Conversations: React.FC<ConversationsProps> = ({
+  integrationRepository,
+  searchRepository,
+  teamRepository,
+  userRepository,
   propertiesRepository,
   conversationRepository,
   preferenceNotificationRepository,
@@ -97,7 +111,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   callState = container.resolve(CallState),
   userState = container.resolve(UserState),
   selfUser,
-  switchList,
+  listState,
 }) => {
   const [conversationsFilter, setConversationsFilter] = useState<string>('');
   const {
@@ -151,21 +165,22 @@ const Conversations: React.FC<ConversationsProps> = ({
   const isFavoritesTab = currentTab === SidebarTabs.FAVORITES;
   const isGroupsTab = currentTab === SidebarTabs.GROUPS;
   const isDirectsTab = currentTab === SidebarTabs.DIRECTS;
+  const isArchivesTab = currentTab === SidebarTabs.ARCHIVES;
+  const isConnectTab = currentTab === SidebarTabs.CONNECT;
 
-  const showSearchInput = isRecentTab || isFavoritesTab || isGroupsTab || isDirectsTab;
+  const showSearchInput = isRecentTab || isFavoritesTab || isGroupsTab || isDirectsTab || isArchivesTab;
 
   const hasNoConversations = conversations.length + connectRequests.length === 0;
   const {isOpen: isFolderOpen, openFolder} = useFolderState();
 
-  const {setCurrentView} = useAppMainState(state => state.responsiveView);
-  const {close: closeRightSidebar} = useAppMainState(state => state.rightSidebar);
-
   const showLegalHold = isOnLegalHold || hasPendingLegalHold;
 
+  // const {setCurrentView} = useAppMainState(state => state.responsiveView);
+  // const {close: closeRightSidebar} = useAppMainState(state => state.rightSidebar);
   const onClickPreferences = () => {
-    setCurrentView(ViewType.LEFT_SIDEBAR);
-    switchList(ListState.PREFERENCES);
-    closeRightSidebar();
+    // setCurrentView(ViewType.LEFT_SIDEBAR);
+    // switchList(ListState.PREFERENCES);
+    // closeRightSidebar();
   };
 
   useEffect(() => {
@@ -255,11 +270,14 @@ const Conversations: React.FC<ConversationsProps> = ({
     </>
   );
 
-  function changeTab(currentTab: SidebarTabs) {
-    if (currentTab !== SidebarTabs.RECENT) {
-      setConversationsFilter('');
+  function changeTab(nextTab: SidebarTabs) {
+    if (nextTab === SidebarTabs.ARCHIVES) {
+      // will eventually load missing events from the db
+      conversationRepository.updateArchivedConversations();
     }
-    setCurrentTab(currentTab);
+
+    setConversationsFilter('');
+    setCurrentTab(nextTab);
   }
 
   const sidebar = (
@@ -378,7 +396,7 @@ const Conversations: React.FC<ConversationsProps> = ({
             type="button"
             className="conversations-sidebar-btn"
             data-uie-name="go-archive"
-            onClick={() => switchList(ListState.ARCHIVE)}
+            onClick={() => changeTab(SidebarTabs.ARCHIVES)}
             title={t('tooltipConversationsArchived', archivedConversations.length)}
           >
             <span className="conversations-sidebar-btn--text-wrapper">
@@ -395,7 +413,7 @@ const Conversations: React.FC<ConversationsProps> = ({
           id="tab-7"
           type="button"
           className="conversations-sidebar-btn"
-          onClick={() => switchList(ListState.START_UI)}
+          onClick={() => changeTab(SidebarTabs.CONNECT)}
           title={t('searchConnect', Shortcut.getShortcutTooltip(ShortcutType.START))}
           data-uie-name="go-people"
         >
@@ -471,6 +489,13 @@ const Conversations: React.FC<ConversationsProps> = ({
       };
     }
 
+    if (currentTab === SidebarTabs.ARCHIVES) {
+      return {
+        conversations: archivedConversations.filter(conversationSearchFilter),
+        searchInputPlaceholder: t('searchArchivedConversations'),
+      };
+    }
+
     return {
       conversations: [],
       searchInputPlaceholder: '',
@@ -491,7 +516,7 @@ const Conversations: React.FC<ConversationsProps> = ({
                     brandName: Config.getConfig().BRAND_NAME,
                   })}
                 </div>
-                <button className="button-reset-default text-underline" onClick={() => switchList(ListState.START_UI)}>
+                <button className="button-reset-default text-underline" onClick={() => changeTab(SidebarTabs.CONNECT)}>
                   {t('conversationsNoConversations')}
                 </button>
               </div>
@@ -523,26 +548,42 @@ const Conversations: React.FC<ConversationsProps> = ({
                 placeholder={searchInputPlaceholder}
               />
             )}
-            {currentTabConversations.length === 0 && (
+            {showSearchInput && currentTabConversations.length === 0 && (
               <div className="conversations-centered">
                 <div>{t('searchConversationsNoResult')}</div>
-                <button className="button-reset-default text-underline" onClick={() => switchList(ListState.START_UI)}>
+                <button className="button-reset-default text-underline" onClick={() => changeTab(SidebarTabs.CONNECT)}>
                   {t('searchConversationsNoResultConnectSuggestion')}
                 </button>
               </div>
             )}
-            <ConversationsList
-              connectRequests={connectRequests}
-              callState={callState}
-              conversations={currentTabConversations}
-              currentTab={currentTab}
-              listViewModel={listViewModel}
-              conversationState={conversationState}
-              conversationRepository={conversationRepository}
-              currentFocus={currentFocus}
-              resetConversationFocus={resetConversationFocus}
-              handleArrowKeyDown={handleKeyDown}
-            />
+
+            {isConnectTab && (
+              <StartUI
+                conversationRepository={conversationRepository}
+                searchRepository={searchRepository}
+                teamRepository={teamRepository}
+                integrationRepository={integrationRepository}
+                mainViewModel={listViewModel.mainViewModel}
+                userRepository={userRepository}
+                isFederated={listViewModel.isFederated}
+                selfUser={selfUser}
+              />
+            )}
+
+            {showSearchInput && (
+              <ConversationsList
+                callState={callState}
+                currentTab={currentTab}
+                currentFocus={currentFocus}
+                listViewModel={listViewModel}
+                connectRequests={connectRequests}
+                handleArrowKeyDown={handleKeyDown}
+                conversationState={conversationState}
+                conversations={currentTabConversations}
+                conversationRepository={conversationRepository}
+                resetConversationFocus={resetConversationFocus}
+              />
+            )}
           </>
         )}
       </ListWrapper>
