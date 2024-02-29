@@ -33,8 +33,6 @@ import {
   ConversationLabel,
   ConversationLabelRepository,
   createLabel,
-  createLabelGroups,
-  createLabelPeople,
 } from '../../../../conversation/ConversationLabelRepository';
 import type {ConversationRepository} from '../../../../conversation/ConversationRepository';
 import {ConversationState} from '../../../../conversation/ConversationState';
@@ -75,7 +73,6 @@ const GroupedConversations: React.FC<GroupedConversationsProps> = ({
   callState = container.resolve(CallState),
 }) => {
   const {conversationLabelRepository} = conversationRepository;
-  const {visibleConversations: conversations} = useKoSubscribableChildren(conversationState, ['visibleConversations']);
 
   useKoSubscribableChildren(callState, ['activeCalls']);
 
@@ -84,18 +81,12 @@ const GroupedConversations: React.FC<GroupedConversationsProps> = ({
 
   useLabels(conversationLabelRepository);
 
-  const groups = conversationLabelRepository.getGroupsWithoutLabel(conversations);
-  const contacts = conversationLabelRepository.getContactsWithoutLabel(conversations);
   const custom = conversationLabelRepository
     .getLabels()
     .map(label => createLabel(label.name, conversationLabelRepository.getLabelConversations(label), label.id))
     .filter(({conversations}) => !!conversations().length);
 
-  const folders = [
-    ...(groups.length > 0 ? [createLabelGroups(groups)] : []),
-    ...(contacts.length > 0 ? [createLabelPeople(contacts)] : []),
-    ...custom,
-  ];
+  const folders = [...custom];
 
   return (
     <ul className="conversation-folder-list">
