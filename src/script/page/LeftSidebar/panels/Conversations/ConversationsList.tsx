@@ -125,8 +125,10 @@ export const ConversationsList = ({
     showJoinButton: hasJoinableCall(conversation),
   });
 
+  const isFolderView = currentTab === SidebarTabs.FOLDER;
+
   const getConversationView = () => {
-    if (currentTab === SidebarTabs.FOLDER) {
+    if (isFolderView) {
       return (
         <li tabIndex={TabIndex.UNFOCUSABLE}>
           <GroupedConversations
@@ -151,7 +153,6 @@ export const ConversationsList = ({
     );
   };
 
-  const isFolderView = currentTab === SidebarTabs.FOLDER;
   const uieName = isFolderView ? 'folder-view' : 'recent-view';
 
   const connectionText =
