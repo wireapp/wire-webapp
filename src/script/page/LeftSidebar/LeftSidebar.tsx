@@ -65,9 +65,9 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({listViewModel, selfUser, isAct
       <SwitchTransition>
         <Animated key={listState}>
           <>
-            {(listState === ListState.CONVERSATIONS ||
-              listState === ListState.START_UI ||
-              listState === ListState.ARCHIVE) && (
+            {[ListState.CONVERSATIONS, ListState.START_UI, ListState.PREFERENCES, ListState.ARCHIVE].includes(
+              listState,
+            ) && (
               <Conversations
                 selfUser={selfUser}
                 listState={listState}
