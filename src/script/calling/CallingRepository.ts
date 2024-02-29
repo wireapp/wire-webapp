@@ -382,16 +382,7 @@ export class CallingRepository {
     }
     const allClients = await this.core.service!.conversation.fetchAllParticipantsClients(call.conversationId);
 
-    if (isGroupMLSConversation(conversation)) {
-      const subconversationEpochInfo = await this.subconversationService.getSubconversationEpochInfo(
-        conversation.qualifiedId,
-        conversation.groupId,
-      );
-
-      if (subconversationEpochInfo) {
-        this.setEpochInfo(conversation.qualifiedId, subconversationEpochInfo);
-      }
-    } else {
+    if (!isGroupMLSConversation(conversation)) {
       const qualifiedClients = flattenUserMap(allClients);
 
       const clients: Clients = flatten(
@@ -1673,6 +1664,22 @@ export class CallingRepository {
       this.logger.warn(`Unable to find a call for the conversation id of ${convId}`);
       return;
     }
+
+    const conversation = this.getConversationById(call.conversationId);
+
+    if (conversation && isGroupMLSConversation(conversation)) {
+      const subconversationEpochInfo = await this.subconversationService.getSubconversationEpochInfo(
+        conversation.qualifiedId,
+        conversation.groupId,
+      );
+
+      if (subconversationEpochInfo) {
+        this.setEpochInfo(conversation.qualifiedId, subconversationEpochInfo);
+      }
+
+      return;
+    }
+
     await this.pushClients(call);
   };
 
