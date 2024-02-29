@@ -394,7 +394,7 @@ const Conversations: React.FC<ConversationsProps> = ({
           <button
             id="tab-6"
             type="button"
-            className="conversations-sidebar-btn"
+            className={cx(`conversations-sidebar-btn`, {active: isArchivesTab})}
             data-uie-name="go-archive"
             onClick={() => changeTab(SidebarTabs.ARCHIVES)}
             title={t('tooltipConversationsArchived', archivedConversations.length)}
@@ -412,7 +412,7 @@ const Conversations: React.FC<ConversationsProps> = ({
         <button
           id="tab-7"
           type="button"
-          className="conversations-sidebar-btn"
+          className={cx(`conversations-sidebar-btn`, {active: isConnectTab})}
           onClick={() => changeTab(SidebarTabs.CONNECT)}
           title={t('searchConnect', Shortcut.getShortcutTooltip(ShortcutType.START))}
           data-uie-name="go-people"
