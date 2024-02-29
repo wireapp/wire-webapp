@@ -3426,6 +3426,152 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@peculiar/asn1-cms@npm:^2.3.8":
+  version: 2.3.8
+  resolution: "@peculiar/asn1-cms@npm:2.3.8"
+  dependencies:
+    "@peculiar/asn1-schema": ^2.3.8
+    "@peculiar/asn1-x509": ^2.3.8
+    "@peculiar/asn1-x509-attr": ^2.3.8
+    asn1js: ^3.0.5
+    tslib: ^2.6.2
+  checksum: 5c5f833ad62bd5ba9391dc2f1fe80e49e5067688ee54c1a3ee37b659507049b652888c6e78f6e38ee8c73a1093dbe531dd47a8e4e2b09842bda737e8952001c1
+  languageName: node
+  linkType: hard
+
+"@peculiar/asn1-csr@npm:^2.3.8":
+  version: 2.3.8
+  resolution: "@peculiar/asn1-csr@npm:2.3.8"
+  dependencies:
+    "@peculiar/asn1-schema": ^2.3.8
+    "@peculiar/asn1-x509": ^2.3.8
+    asn1js: ^3.0.5
+    tslib: ^2.6.2
+  checksum: d2bc7641f5e71e55ebb0bcfbbdb63e5168ac676e5ee56ee549c61f63414d9699600d1267fca223d1d6dad4fdb0a50be2a125bee37828a91b9b4c138a2b8295b7
+  languageName: node
+  linkType: hard
+
+"@peculiar/asn1-ecc@npm:^2.3.8":
+  version: 2.3.8
+  resolution: "@peculiar/asn1-ecc@npm:2.3.8"
+  dependencies:
+    "@peculiar/asn1-schema": ^2.3.8
+    "@peculiar/asn1-x509": ^2.3.8
+    asn1js: ^3.0.5
+    tslib: ^2.6.2
+  checksum: c7db2004a03f88c35fcd21957c8c15bfbf29c137a636bbc35d51dcebbc287ec253762e127d50197f0b5910600e3641a738c8ca756a15741fc09272272b0303f4
+  languageName: node
+  linkType: hard
+
+"@peculiar/asn1-pfx@npm:^2.3.8":
+  version: 2.3.8
+  resolution: "@peculiar/asn1-pfx@npm:2.3.8"
+  dependencies:
+    "@peculiar/asn1-cms": ^2.3.8
+    "@peculiar/asn1-pkcs8": ^2.3.8
+    "@peculiar/asn1-rsa": ^2.3.8
+    "@peculiar/asn1-schema": ^2.3.8
+    asn1js: ^3.0.5
+    tslib: ^2.6.2
+  checksum: a01dda82d077d52b343faafd14d58892813c4c43e37fb13e7531ab761d18fd453c50b5f0dbdffeb9310f0f502f97ab668d966bd899bae9604bd0aa43cd3874ea
+  languageName: node
+  linkType: hard
+
+"@peculiar/asn1-pkcs8@npm:^2.3.8":
+  version: 2.3.8
+  resolution: "@peculiar/asn1-pkcs8@npm:2.3.8"
+  dependencies:
+    "@peculiar/asn1-schema": ^2.3.8
+    "@peculiar/asn1-x509": ^2.3.8
+    asn1js: ^3.0.5
+    tslib: ^2.6.2
+  checksum: c1337df0097104b500f9428f839a699a9222125c9cdd34c288c95e52f5d0eec533d75ac45e41200ca8e328d135d3eda7638d2e7e91d1791419a04cd14b2d36a1
+  languageName: node
+  linkType: hard
+
+"@peculiar/asn1-pkcs9@npm:^2.3.8":
+  version: 2.3.8
+  resolution: "@peculiar/asn1-pkcs9@npm:2.3.8"
+  dependencies:
+    "@peculiar/asn1-cms": ^2.3.8
+    "@peculiar/asn1-pfx": ^2.3.8
+    "@peculiar/asn1-pkcs8": ^2.3.8
+    "@peculiar/asn1-schema": ^2.3.8
+    "@peculiar/asn1-x509": ^2.3.8
+    "@peculiar/asn1-x509-attr": ^2.3.8
+    asn1js: ^3.0.5
+    tslib: ^2.6.2
+  checksum: 22ee32733a5abb14039c858093f4e79c989ed32c5ece746dd638afa23428f34a0a4c207126b75c2ae18198a20083fbc08dee9309771569eb8ef3734a37ff950f
+  languageName: node
+  linkType: hard
+
+"@peculiar/asn1-rsa@npm:^2.3.8":
+  version: 2.3.8
+  resolution: "@peculiar/asn1-rsa@npm:2.3.8"
+  dependencies:
+    "@peculiar/asn1-schema": ^2.3.8
+    "@peculiar/asn1-x509": ^2.3.8
+    asn1js: ^3.0.5
+    tslib: ^2.6.2
+  checksum: d9bf0f143686b475d3cc9f9b7d948826dc8c8764bc865697705351278541f0bf31a8f788ec8ff8bf6e4150b04aa65b20853bda45d77e4abbac717d7019e6fd56
+  languageName: node
+  linkType: hard
+
+"@peculiar/asn1-schema@npm:^2.3.8":
+  version: 2.3.8
+  resolution: "@peculiar/asn1-schema@npm:2.3.8"
+  dependencies:
+    asn1js: ^3.0.5
+    pvtsutils: ^1.3.5
+    tslib: ^2.6.2
+  checksum: 1f4dd421f1411df8bc52bca12b1cef710434c13ff0a8b5746ede42b10d62b5ad06a3925c4a6db53102aaf1e589947539a6955fa8554a9b8ebb1ffa38b0155a24
+  languageName: node
+  linkType: hard
+
+"@peculiar/asn1-x509-attr@npm:^2.3.8":
+  version: 2.3.8
+  resolution: "@peculiar/asn1-x509-attr@npm:2.3.8"
+  dependencies:
+    "@peculiar/asn1-schema": ^2.3.8
+    "@peculiar/asn1-x509": ^2.3.8
+    asn1js: ^3.0.5
+    tslib: ^2.6.2
+  checksum: 07a64f1cf50af87f510aa857794e9f9334f36bd1682df3ece7bb4935575bca36111e0ba263e8559a738ae77116bc3ee576c2d4d713b2c720fa31a809452b2f4e
+  languageName: node
+  linkType: hard
+
+"@peculiar/asn1-x509@npm:^2.3.8":
+  version: 2.3.8
+  resolution: "@peculiar/asn1-x509@npm:2.3.8"
+  dependencies:
+    "@peculiar/asn1-schema": ^2.3.8
+    asn1js: ^3.0.5
+    ipaddr.js: ^2.1.0
+    pvtsutils: ^1.3.5
+    tslib: ^2.6.2
+  checksum: 23856e5d024298447afca55bd68d19a7440c0ae076437aee5ced26a0fa2e4efa3e0e4a354fa6ee9968d62ac21ee1c2186fc427942bacfc824d3a3a4d2e80d14b
+  languageName: node
+  linkType: hard
+
+"@peculiar/x509@npm:1.9.7":
+  version: 1.9.7
+  resolution: "@peculiar/x509@npm:1.9.7"
+  dependencies:
+    "@peculiar/asn1-cms": ^2.3.8
+    "@peculiar/asn1-csr": ^2.3.8
+    "@peculiar/asn1-ecc": ^2.3.8
+    "@peculiar/asn1-pkcs9": ^2.3.8
+    "@peculiar/asn1-rsa": ^2.3.8
+    "@peculiar/asn1-schema": ^2.3.8
+    "@peculiar/asn1-x509": ^2.3.8
+    pvtsutils: ^1.3.5
+    reflect-metadata: ^0.2.1
+    tslib: ^2.6.2
+    tsyringe: ^4.8.0
+  checksum: 7fe1de9a0dd4be7277c35345a119c9851223cbd9535f45dc733702d1a7ad135e21ad6e98626c6c6c2931e4ab0e836e5a5102c6d280032acd1795fe89c980c97a
+  languageName: node
+  linkType: hard
+
 "@pkgjs/parseargs@npm:^0.11.0":
   version: 0.11.0
   resolution: "@pkgjs/parseargs@npm:0.11.0"
@@ -4684,16 +4830,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^26.10.14":
-  version: 26.10.14
-  resolution: "@wireapp/api-client@npm:26.10.14"
+"@wireapp/api-client@npm:^26.10.7":
+  version: 26.10.16
+  resolution: "@wireapp/api-client@npm:26.10.16"
   dependencies:
-    "@wireapp/commons": ^5.2.6
-    "@wireapp/priority-queue": ^2.1.4
+    "@wireapp/commons": ^5.2.7
+    "@wireapp/priority-queue": ^2.1.5
     "@wireapp/protocol-messaging": 1.44.0
     axios: 1.6.7
     axios-retry: 4.0.0
-    exponential-backoff: 3.1.1
     http-status-codes: 2.3.0
     logdown: 3.3.1
     pako: 2.1.0
@@ -4702,14 +4847,14 @@ __metadata:
     tough-cookie: 4.1.3
     ws: 8.16.0
     zod: 3.22.4
-  checksum: 5c6ebf62bd5bb224006a70cbd228936482936f9d6b0bd843d425d2666e7035bb6696a18ac7266a71a79635e3bb52256ddef2f71400ce7f2adc40c66f9a0dab0e
+  checksum: fa6a5a0490e82aee7c1a72f0dc8ff0a1bfd87c4f0d5669e7977bc8bdbf879e2e2514c3d9a645a8f7d8a0eee2cf45b452a7a8770b511e2117632f3afd4fa3aef4
   languageName: node
   linkType: hard
 
-"@wireapp/avs@npm:9.6.12":
-  version: 9.6.12
-  resolution: "@wireapp/avs@npm:9.6.12"
-  checksum: 3aec85fa8f5577319e70f5459145759573f377681fda15a944d32ed32fcc23a07782289781dc75e2a30a0da2f0670efe49d64892925c24f4e94bd39a1523e36d
+"@wireapp/avs@npm:9.6.9":
+  version: 9.6.9
+  resolution: "@wireapp/avs@npm:9.6.9"
+  checksum: f21dd8c0711a3f20871eee36e1dcad158eb97c8b4f1355b05256ef70366bc5bfdeeca6e033aa983d62d251bb385559995498f4c9635ee8e428cd068dc4b9a7ad
   languageName: node
   linkType: hard
 
@@ -4720,15 +4865,27 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/commons@npm:5.2.6, @wireapp/commons@npm:^5.2.6":
-  version: 5.2.6
-  resolution: "@wireapp/commons@npm:5.2.6"
+"@wireapp/commons@npm:5.2.5":
+  version: 5.2.5
+  resolution: "@wireapp/commons@npm:5.2.5"
   dependencies:
     ansi-regex: 5.0.1
     fs-extra: 11.1.0
     logdown: 3.3.1
     platform: 1.3.6
-  checksum: f3dc658d900db286aad80888e81424dfee580395c5a6ef0238a1ecc34920bf4a5bedc12e8cb9104663579e87c5655f9b0c28ba9b6e29e4bf5929d5ecfd32e026
+  checksum: 10d267c4caee8d777ab4ed899226c8973cf0701e7a89e7c4a972e1408c182dba0344af25036bc40739c4a8032dde77c08f7ae182e77847743f36813e21009f67
+  languageName: node
+  linkType: hard
+
+"@wireapp/commons@npm:^5.2.5, @wireapp/commons@npm:^5.2.7":
+  version: 5.2.7
+  resolution: "@wireapp/commons@npm:5.2.7"
+  dependencies:
+    ansi-regex: 5.0.1
+    fs-extra: 11.1.0
+    logdown: 3.3.1
+    platform: 1.3.6
+  checksum: e875e242c706b6719aea8f6dea4b547e6ce189c853dcb78cdbe87d238d3c99e92a8acbf76a80f100ee9642b2638081bafa1b050d8c3fea407fe6f7ea517f6328
   languageName: node
   linkType: hard
 
@@ -4748,22 +4905,22 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core-crypto@npm:1.0.0-rc.46":
-  version: 1.0.0-rc.46
-  resolution: "@wireapp/core-crypto@npm:1.0.0-rc.46"
-  checksum: 09bdf262338cc7a4edaf2b91aa6d5be90c96412994589769ed0c6236d44a39fcfd766563a63ff32e330fe61b18758929cdcdb14374c9c43b01029822ac806a0f
+"@wireapp/core-crypto@npm:1.0.0-rc.36":
+  version: 1.0.0-rc.36
+  resolution: "@wireapp/core-crypto@npm:1.0.0-rc.36"
+  checksum: 108f5e983abb35ff65b4d1a62804e69dbc72c9953a5a51401163fab44a8e8dbb63139b66d3d85864f4de21812aa1cda8605f8cfa6161d839f9b8f872f11c4e2b
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:45.0.11":
-  version: 45.0.11
-  resolution: "@wireapp/core@npm:45.0.11"
+"@wireapp/core@npm:44.0.1":
+  version: 44.0.1
+  resolution: "@wireapp/core@npm:44.0.1"
   dependencies:
-    "@wireapp/api-client": ^26.10.14
-    "@wireapp/commons": ^5.2.6
-    "@wireapp/core-crypto": 1.0.0-rc.46
+    "@wireapp/api-client": ^26.10.7
+    "@wireapp/commons": ^5.2.5
+    "@wireapp/core-crypto": 1.0.0-rc.36
     "@wireapp/cryptobox": 12.8.0
-    "@wireapp/promise-queue": ^2.3.1
+    "@wireapp/promise-queue": ^2.2.10
     "@wireapp/protocol-messaging": 1.44.0
     "@wireapp/store-engine": 5.1.5
     axios: 1.6.7
@@ -4776,7 +4933,7 @@ __metadata:
     long: ^5.2.0
     uuidjs: 4.2.13
     zod: 3.22.4
-  checksum: 588e69c2e5d64108f0164b9643e00f2260bd4fdc3f0a9ea8758327a4ec33e7446ee8300ef939e4675c88e62d4484458043e885e1171a37db0d6753873eab4453
+  checksum: 8c477590775c74d17f243871368e01d9d2670cd943e2dbe8a07da489bb458d6138b05f008080b7c5865adc24154610211937bcf12b0f59f38a7eaf773ea27eb2
   languageName: node
   linkType: hard
 
@@ -4852,17 +5009,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/priority-queue@npm:^2.1.4":
-  version: 2.1.4
-  resolution: "@wireapp/priority-queue@npm:2.1.4"
-  checksum: 2e188dbcd12ff75038c66a37709d0ed99cfd58bf92210c9ef720ea39f916f95a3627a3d693e3d017c30e0a92a50a556244b62f1e6961fa2ffdc7028ed6050c7c
+"@wireapp/priority-queue@npm:^2.1.5":
+  version: 2.1.5
+  resolution: "@wireapp/priority-queue@npm:2.1.5"
+  checksum: 7d150e376a8df680ccf80518d86a455972892f66e7f837e5dec3a5c4a1cd7983223574a43c4dae24e8c0f9ac788effc1b8e82952f35c5e1940aacfee824b230a
   languageName: node
   linkType: hard
 
-"@wireapp/promise-queue@npm:^2.3.1":
-  version: 2.3.1
-  resolution: "@wireapp/promise-queue@npm:2.3.1"
-  checksum: 3b640650d04f7d04e3792c41b06b66cbd32da41708799881b9f06ae33ade8d50fac20a86620af8bb81bf32db6b60b124da3afcc109288a5c245f9e899d1d0058
+"@wireapp/promise-queue@npm:^2.2.10":
+  version: 2.3.2
+  resolution: "@wireapp/promise-queue@npm:2.3.2"
+  checksum: 818d97f43bcf19de3ff965b143500679ef291ba4510dca8951c18a049c4744bf7c146f29d9ac6fcc0d8ee9680e2c7d1ddabca780dd2a1af514074a2f4c0989f1
   languageName: node
   linkType: hard
 
@@ -4911,14 +5068,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/store-engine-dexie@npm:2.1.8":
-  version: 2.1.8
-  resolution: "@wireapp/store-engine-dexie@npm:2.1.8"
+"@wireapp/store-engine-dexie@npm:2.1.7":
+  version: 2.1.7
+  resolution: "@wireapp/store-engine-dexie@npm:2.1.7"
   dependencies:
     dexie: ^3.2.0
   peerDependencies:
     "@wireapp/store-engine": 5.x.x
-  checksum: 2a148e992948cff57811a8c01a7b880d63edddc9e0d2deb9b56ca190aa0eb15bdc2adfbbddd11ae4fbd07d0aa4ff91b5140fd4fad94e4941253e28d5dbdb1427
+  checksum: 0fa07ff35a8cc15d56ae28a23f14a6a31076331b54d54644f4ac56bcba8d89a54bc5b09f00bb3d331a2a806dc9009fc8d49fb86498c6994bf36fa1d227380ca9
   languageName: node
   linkType: hard
 
@@ -5490,6 +5647,17 @@ __metadata:
     is-array-buffer: ^3.0.2
     is-shared-array-buffer: ^1.0.2
   checksum: c200faf437786f5b2c80d4564ff5481c886a16dee642ef02abdc7306c7edd523d1f01d1dd12b769c7eb42ac9bc53874510db19a92a2c035c0f6696172aafa5d3
+  languageName: node
+  linkType: hard
+
+"asn1js@npm:^3.0.5":
+  version: 3.0.5
+  resolution: "asn1js@npm:3.0.5"
+  dependencies:
+    pvtsutils: ^1.3.2
+    pvutils: ^1.1.3
+    tslib: ^2.4.0
+  checksum: 3b6af1bbadd5762ef8ead5daf2f6bda1bc9e23bc825c4dcc996aa1f9521ad7390a64028565d95d98090d69c8431f004c71cccb866004759169d7c203cf9075eb
   languageName: node
   linkType: hard
 
@@ -8359,7 +8527,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"exponential-backoff@npm:3.1.1, exponential-backoff@npm:^3.1.1":
+"exponential-backoff@npm:^3.1.1":
   version: 3.1.1
   resolution: "exponential-backoff@npm:3.1.1"
   checksum: 3d21519a4f8207c99f7457287291316306255a328770d320b401114ec8481986e4e467e854cb9914dd965e0a1ca810a23ccb559c642c88f4c7f55c55778a9b48
@@ -9729,6 +9897,13 @@ __metadata:
   version: 2.0.0
   resolution: "ip@npm:2.0.0"
   checksum: cfcfac6b873b701996d71ec82a7dd27ba92450afdb421e356f44044ed688df04567344c36cbacea7d01b1c39a4c732dc012570ebe9bebfb06f27314bca625349
+  languageName: node
+  linkType: hard
+
+"ipaddr.js@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "ipaddr.js@npm:2.1.0"
+  checksum: 807a054f2bd720c4d97ee479d6c9e865c233bea21f139fb8dabd5a35c4226d2621c42e07b4ad94ff3f82add926a607d8d9d37c625ad0319f0e08f9f2bd1968e2
   languageName: node
   linkType: hard
 
@@ -14321,6 +14496,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"pvtsutils@npm:^1.3.2, pvtsutils@npm:^1.3.5":
+  version: 1.3.5
+  resolution: "pvtsutils@npm:1.3.5"
+  dependencies:
+    tslib: ^2.6.1
+  checksum: e734516b3cb26086c18bd9c012fefe818928a5073178842ab7e62885a090f1dd7bda9c7bb8cd317167502cb8ec86c0b1b0ccd71dac7ab469382a4518157b0d12
+  languageName: node
+  linkType: hard
+
+"pvutils@npm:^1.1.3":
+  version: 1.1.3
+  resolution: "pvutils@npm:1.1.3"
+  checksum: 2ee26a9e5176c348977d6ec00d8ee80bff62f51743b1c5fe8abeeb4c5d29d9959cdfe0ce146707a9e6801bce88190fed3002d720b072dc87d031c692820b44c9
+  languageName: node
+  linkType: hard
+
 "querystringify@npm:^2.1.1":
   version: 2.2.0
   resolution: "querystringify@npm:2.2.0"
@@ -14657,6 +14848,13 @@ __metadata:
   dependencies:
     "@babel/runtime": ^7.9.2
   checksum: f63b9060c3a1d930ae775252bb6e579b42415aee7a23c4114e21a0b4ba7ec12f0ec76936c00f546893f06e139819f0e2855e0d55ebfce34ca9c026241a6950dd
+  languageName: node
+  linkType: hard
+
+"reflect-metadata@npm:^0.2.1":
+  version: 0.2.1
+  resolution: "reflect-metadata@npm:0.2.1"
+  checksum: 772f552a544e04b999c1bf2c868225fef10032274e9d9e315bc3e7a687a504b8b115fa71966665b9619acfd323123a941f892b593250140da809330d41564181
   languageName: node
   linkType: hard
 
@@ -16482,7 +16680,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tslib@npm:^2.0.3, tslib@npm:^2.3.0, tslib@npm:^2.4.0, tslib@npm:^2.6.0, tslib@npm:^2.6.2":
+"tslib@npm:^2.0.3, tslib@npm:^2.3.0, tslib@npm:^2.4.0, tslib@npm:^2.6.0, tslib@npm:^2.6.1, tslib@npm:^2.6.2":
   version: 2.6.2
   resolution: "tslib@npm:2.6.2"
   checksum: 329ea56123005922f39642318e3d1f0f8265d1e7fcb92c633e0809521da75eeaca28d2cf96d7248229deb40e5c19adf408259f4b9640afd20d13aecc1430f3ad
@@ -16500,7 +16698,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tsyringe@npm:4.8.0":
+"tsyringe@npm:4.8.0, tsyringe@npm:^4.8.0":
   version: 4.8.0
   resolution: "tsyringe@npm:4.8.0"
   dependencies:
@@ -17410,6 +17608,7 @@ __metadata:
     "@koush/wrtc": 0.5.3
     "@lexical/history": 0.13.1
     "@lexical/react": 0.13.1
+    "@peculiar/x509": 1.9.7
     "@testing-library/react": 14.2.1
     "@types/dexie-batch": 0.4.7
     "@types/eslint": 8.56.2
@@ -17435,15 +17634,15 @@ __metadata:
     "@types/speakingurl": 13.0.6
     "@types/underscore": 1.11.15
     "@types/webpack-env": 1.18.4
-    "@wireapp/avs": 9.6.12
-    "@wireapp/commons": 5.2.6
+    "@wireapp/avs": 9.6.9
+    "@wireapp/commons": 5.2.5
     "@wireapp/copy-config": 2.1.16
-    "@wireapp/core": 45.0.11
+    "@wireapp/core": 44.0.1
     "@wireapp/eslint-config": 3.0.6
     "@wireapp/prettier-config": 0.6.4
     "@wireapp/react-ui-kit": 9.16.0
     "@wireapp/store-engine": ^5.1.4
-    "@wireapp/store-engine-dexie": 2.1.8
+    "@wireapp/store-engine-dexie": 2.1.7
     "@wireapp/webapp-events": 0.20.1
     amplify: "https://github.com/wireapp/amplify#head=master"
     archiver: ^6.0.1

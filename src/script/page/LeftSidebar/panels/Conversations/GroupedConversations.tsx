@@ -81,12 +81,10 @@ const GroupedConversations: React.FC<GroupedConversationsProps> = ({
 
   useLabels(conversationLabelRepository);
 
-  const custom = conversationLabelRepository
+  const folders = conversationLabelRepository
     .getLabels()
     .map(label => createLabel(label.name, conversationLabelRepository.getLabelConversations(label), label.id))
     .filter(({conversations}) => !!conversations().length);
-
-  const folders = [...custom];
 
   return (
     <ul className="conversation-folder-list">
