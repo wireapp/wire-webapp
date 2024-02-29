@@ -52,7 +52,7 @@ interface ConversationsListProps {
   conversations: Conversation[];
   conversationState: ConversationState;
   listViewModel: ListViewModel;
-  viewStyle: SidebarTabs;
+  currentTab: SidebarTabs;
   currentFocus: string;
   resetConversationFocus: () => void;
   handleArrowKeyDown: (index: number) => (e: React.KeyboardEvent) => void;
@@ -61,7 +61,7 @@ interface ConversationsListProps {
 export const ConversationsList = ({
   conversations,
   listViewModel,
-  viewStyle,
+  currentTab,
   connectRequests,
   conversationState,
   conversationRepository,
@@ -126,7 +126,7 @@ export const ConversationsList = ({
   });
 
   const getConversationView = () => {
-    if (viewStyle === SidebarTabs.FOLDER) {
+    if (currentTab === SidebarTabs.FOLDER) {
       return (
         <li tabIndex={TabIndex.UNFOCUSABLE}>
           <GroupedConversations
@@ -151,7 +151,7 @@ export const ConversationsList = ({
     );
   };
 
-  const isFolderView = viewStyle === SidebarTabs.FOLDER;
+  const isFolderView = currentTab === SidebarTabs.FOLDER;
   const uieName = isFolderView ? 'folder-view' : 'recent-view';
 
   const connectionText =
