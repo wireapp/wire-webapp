@@ -33,6 +33,7 @@ import {LegalHoldDot} from 'Components/LegalHoldDot';
 import {UserInfo} from 'Components/UserInfo';
 import {UserVerificationBadges} from 'Components/VerificationBadge';
 import {Config} from 'src/script/Config';
+import {Conversation} from 'src/script/entity/Conversation';
 import {
   closeIconStyles,
   searchIconStyles,
@@ -137,10 +138,6 @@ const Conversations: React.FC<ConversationsProps> = ({
   const {notifications} = useKoSubscribableChildren(preferenceNotificationRepository, ['notifications']);
   const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
 
-  const filteredConversations = conversations.filter(conversation =>
-    conversation.display_name().toLowerCase().includes(conversationsFilter.toLowerCase()),
-  );
-
   const initialViewStyle = propertiesRepository.getPreference(PROPERTIES_TYPE.INTERFACE.VIEW_FOLDERS)
     ? ConversationViewStyle.FOLDER
     : ConversationViewStyle.RECENT;
@@ -153,6 +150,8 @@ const Conversations: React.FC<ConversationsProps> = ({
   const isFavoritesViewStyle = viewStyle === ConversationViewStyle.FAVORITES;
   const isGroupsViewStyle = viewStyle === ConversationViewStyle.GROUPS;
   const isDirectsViewStyle = viewStyle === ConversationViewStyle.DIRECTS;
+
+  const showSearchInput = isRecentViewStyle || isFavoritesViewStyle || isGroupsViewStyle || isDirectsViewStyle;
 
   const hasNoConversations = conversations.length + connectRequests.length === 0;
   const {isOpen: isFolderOpen, openFolder} = useFolderState();
@@ -438,25 +437,46 @@ const Conversations: React.FC<ConversationsProps> = ({
 
   const {currentFocus, handleKeyDown, resetConversationFocus} = useConversationFocus(conversations);
 
+  function conversationSearchFilter(conversation: Conversation) {
+    return conversation.display_name().toLowerCase().includes(conversationsFilter.toLowerCase());
+  }
+
   function getViewStyleConversations() {
     if (viewStyle === ConversationViewStyle.FOLDER || viewStyle === ConversationViewStyle.RECENT) {
-      return filteredConversations;
+      return {
+        conversations: conversations.filter(conversationSearchFilter),
+        searchInputPlaceholder: t('searchConversations'),
+      };
     }
 
     if (viewStyle === ConversationViewStyle.GROUPS) {
-      return groupConversations;
+      return {
+        conversations: groupConversations.filter(conversationSearchFilter),
+        searchInputPlaceholder: t('searchGroupConversations'),
+      };
     }
 
     if (viewStyle === ConversationViewStyle.DIRECTS) {
-      return directConversations;
+      return {
+        conversations: directConversations.filter(conversationSearchFilter),
+        searchInputPlaceholder: t('searchDirectConversations'),
+      };
     }
 
     if (viewStyle === ConversationViewStyle.FAVORITES) {
-      return favoriteConversations;
+      return {
+        conversations: favoriteConversations.filter(conversationSearchFilter),
+        searchInputPlaceholder: t('searchFavoriteConversations'),
+      };
     }
 
-    return [];
+    return {
+      conversations: [],
+      searchInputPlaceholder: '',
+    };
   }
+
+  const {conversations: viewStyleConversations, searchInputPlaceholder} = getViewStyleConversations();
 
   return (
     <div className="conversations-wrapper">
@@ -480,7 +500,7 @@ const Conversations: React.FC<ConversationsProps> = ({
           </>
         ) : (
           <>
-            {isRecentViewStyle && (
+            {showSearchInput && (
               <Input
                 className="label-1"
                 value={conversationsFilter}
@@ -499,10 +519,10 @@ const Conversations: React.FC<ConversationsProps> = ({
                 }
                 inputCSS={searchInputStyles}
                 wrapperCSS={searchInputWrapperStyles}
-                placeholder={t('searchConversations')}
+                placeholder={searchInputPlaceholder}
               />
             )}
-            {filteredConversations.length === 0 && (
+            {viewStyleConversations.length === 0 && (
               <div className="conversations-centered">
                 <div>{t('searchConversationsNoResult')}</div>
                 <button className="button-reset-default text-underline" onClick={() => switchList(ListState.START_UI)}>
@@ -513,7 +533,7 @@ const Conversations: React.FC<ConversationsProps> = ({
             <ConversationsList
               connectRequests={connectRequests}
               callState={callState}
-              conversations={getViewStyleConversations()}
+              conversations={viewStyleConversations}
               viewStyle={viewStyle}
               listViewModel={listViewModel}
               conversationState={conversationState}
