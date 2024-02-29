@@ -461,7 +461,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   }
 
   function getTabConversations() {
-    if (currentTab === SidebarTabs.FOLDER || currentTab === SidebarTabs.RECENT) {
+    if ([SidebarTabs.FOLDER,  SidebarTabs.RECENT].includes(currentTab)) {
       return {
         conversations: conversations.filter(conversationSearchFilter),
         searchInputPlaceholder: t('searchConversations'),
