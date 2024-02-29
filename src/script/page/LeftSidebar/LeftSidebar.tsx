@@ -67,7 +67,6 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({listViewModel, selfUser, isAct
           <>
             {(listState === ListState.CONVERSATIONS ||
               listState === ListState.START_UI ||
-              listState === ListState.PREFERENCES ||
               listState === ListState.ARCHIVE) && (
               <Conversations
                 selfUser={selfUser}
@@ -83,7 +82,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({listViewModel, selfUser, isAct
               />
             )}
 
-            {false && (
+            {listState === ListState.PREFERENCES && (
               <Preferences
                 contentViewModel={listViewModel.contentViewModel}
                 teamRepository={repositories.team}
