@@ -25,4 +25,5 @@ export interface Config {
   maxRetryDelay: number;
   retryDelay: number;
   retryGrowthFactor: number;
+  shouldRetry: (error: unknown) => boolean;
 }

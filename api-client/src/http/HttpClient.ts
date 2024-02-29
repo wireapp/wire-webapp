@@ -17,8 +17,6 @@
  *
  */
 
-import {exponentialBackoff} from '@wireapp/commons/lib/util/ExponentialBackoff';
-import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import axios, {AxiosError, AxiosHeaders, AxiosInstance, AxiosRequestConfig, AxiosResponse} from 'axios';
 import axiosRetry, {isNetworkOrIdempotentRequestError, exponentialDelay} from 'axios-retry';
 import logdown from 'logdown';
@@ -60,6 +58,7 @@ export class HttpClient extends EventEmitter {
   private readonly logger: logdown.Logger;
   private connectionState: ConnectionState;
   private readonly requestQueue: PriorityQueue;
+  private readonly backOffQueue: PriorityQueue;
   public static readonly TOPIC = TOPIC;
   private versionPrefix = '';
 
@@ -104,6 +103,16 @@ export class HttpClient extends EventEmitter {
       maxRetries: 0,
       retryDelay: TimeUtil.TimeInMillis.SECOND,
     });
+
+    this.backOffQueue = new PriorityQueue({
+      maxRetries: 10,
+      retryDelay: 200,
+      maxRetryDelay: 2000,
+      shouldRetry: error => {
+        const isTooManyRequestsError = axios.isAxiosError(error) && error.response?.status === 420;
+        return isTooManyRequestsError;
+      },
+    });
   }
 
   public getBaseUrl() {
@@ -126,12 +135,6 @@ export class HttpClient extends EventEmitter {
     tokenAsParam = false,
     isFirstTry = true,
   ): Promise<AxiosResponse<T>> {
-    const backoffKey = 'too-many-request-backoff';
-    const {backOff, resetBackOff} = exponentialBackoff(backoffKey, {
-      maxDelay: TimeInMillis.SECOND * 2,
-      minDelay: 100,
-    });
-
     if (this.accessTokenStore.accessToken) {
       const {token_type, access_token} = this.accessTokenStore.accessToken;
 
@@ -159,21 +162,8 @@ export class HttpClient extends EventEmitter {
 
       this.updateConnectionState(ConnectionState.CONNECTED);
 
-      resetBackOff();
       return response;
     } catch (error) {
-      const isTooManyRequestsError = axios.isAxiosError(error) && error.response?.status === 420;
-
-      if (isTooManyRequestsError) {
-        return backOff(
-          () => this._sendRequest<T>(config, tokenAsParam, false),
-          () => {
-            this.logger.error('Too many requests error retry limit reached', error);
-            throw error;
-          },
-        );
-      }
-
       const retryWithTokenRefresh = async () => {
         this.logger.warn(`Access token refresh triggered for "${config.method}" request to "${config.url}".`);
         await this.refreshAccessToken();
@@ -293,9 +283,23 @@ export class HttpClient extends EventEmitter {
     tokenAsParam: boolean = false,
     isSynchronousRequest: boolean = false,
   ): Promise<AxiosResponse<T>> {
-    return isSynchronousRequest
+    const promise = isSynchronousRequest
       ? this.requestQueue.add(() => this._sendRequest<T>(config, tokenAsParam))
       : this._sendRequest<T>(config, tokenAsParam);
+
+    try {
+      return await promise;
+    } catch (error) {
+      // If the request failed due to too many requests, we want put it into the backoff queue
+      // It will be retried after a (growing) delay
+      const isTooManyRequestsError = axios.isAxiosError(error) && error.response?.status === 420;
+
+      if (isTooManyRequestsError) {
+        return this.backOffQueue.add(() => this._sendRequest<T>(config, tokenAsParam));
+      }
+
+      throw error;
+    }
   }
 
   public sendJSON<T>(config: AxiosRequestConfig, isSynchronousRequest: boolean = false): Promise<AxiosResponse<T>> {

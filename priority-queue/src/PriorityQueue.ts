@@ -33,6 +33,7 @@ export class PriorityQueue {
     maxRetryDelay: Number.MAX_SAFE_INTEGER,
     retryDelay: 1000,
     retryGrowthFactor: 1.3,
+    shouldRetry: () => true,
   };
 
   private isRunning: boolean = false;
@@ -103,13 +104,13 @@ export class PriorityQueue {
       item.resolve(await item.fn());
       void this.processList();
     } catch (error) {
-      if (item.retry >= this.config.maxRetries) {
-        item.reject(error);
-        void this.processList();
-      } else {
+      if (this.config.shouldRetry(error) && item.retry < this.config.maxRetries) {
         this.enqueue(item);
         setTimeout(() => this.processList(), this.getGrowingDelay(item.retry));
         item.retry++;
+      } else {
+        item.reject(error);
+        void this.processList();
       }
     }
   }
