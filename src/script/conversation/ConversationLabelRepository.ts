@@ -72,15 +72,6 @@ export const createLabel = (
   type,
 });
 
-export const createLabelGroups = (groups: Conversation[] = []) =>
-  createLabel(t('conversationLabelGroups'), groups, DefaultLabelIds.Groups);
-
-export const createLabelPeople = (contacts: Conversation[] = []) =>
-  createLabel(t('conversationLabelPeople'), contacts, DefaultLabelIds.Contacts);
-
-export const createLabelFavorites = (favorites: Conversation[] = []) =>
-  createLabel(t('conversationLabelFavorites'), favorites, DefaultLabelIds.Favorites);
-
 export class ConversationLabelRepository extends TypedEventTarget<{type: 'conversation-favorited'}> {
   labels: ko.ObservableArray<ConversationLabel>;
   private allLabeledConversations: ko.Computed<Conversation[]>;
