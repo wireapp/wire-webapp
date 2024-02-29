@@ -43,6 +43,7 @@ class MLSConversationVerificationStateHandler {
   private readonly logger: Logger;
 
   public constructor(
+    private readonly selfDomain: string,
     private readonly onConversationVerificationStateChange: OnConversationE2EIVerificationStateChange,
     private readonly onSelfClientCertificateRevoked: () => Promise<void>,
     private readonly conversationState: ConversationState,
@@ -56,19 +57,22 @@ class MLSConversationVerificationStateHandler {
 
     // We hook into the newEpoch event of the MLS service to check if the conversation needs to be verified or degraded
     this.core.service.mls.on('newEpoch', this.onEpochChanged);
-    this.core.service.e2eIdentity.on('remoteCrlChanged', this.checkAllConversationsVerificationState);
-    this.core.service.e2eIdentity.on('selfCrlChanged', this.checkSelfCertificateRevocation);
+    this.core.service.e2eIdentity.on('crlChanged', ({domain}) => this.handleNewRevocationList(domain));
   }
 
   /**
-   * This function checks if the conversation is verified and if it is, it will degrade it
+   * Changes mls verification state to "degraded"
    * @param conversation
-   * @param userIds
    */
   private async degradeConversation(conversation: MLSConversation) {
+    const userIdentities = await getAllGroupUsersIdentities(conversation.groupId);
+    if (!userIdentities) {
+      return;
+    }
+
     const state = ConversationVerificationState.DEGRADED;
     conversation.mlsVerificationState(state);
-    const userIdentities = await getAllGroupUsersIdentities(conversation.groupId);
+
     const degradedUsers: QualifiedId[] = [];
     for (const [userId, identities] of userIdentities.entries()) {
       if (identities.some(identity => identity.status !== MLSStatuses.VALID)) {
@@ -85,9 +89,8 @@ class MLSConversationVerificationStateHandler {
   }
 
   /**
-   * This function checks if the conversation is degraded and if it is, it will verify it
+   * Changes mls verification state to "verified"
    * @param conversation
-   * @param userIds
    */
   private async verifyConversation(conversation: MLSConversation) {
     const state = ConversationVerificationState.VERIFIED;
@@ -101,19 +104,14 @@ class MLSConversationVerificationStateHandler {
   /**
    * This function checks if self client certificate is revoked
    */
-  private checkSelfCertificateRevocation = async (): Promise<void> => {
-    const activeIdentity = await getActiveWireIdentity();
-
-    if (!activeIdentity) {
-      return;
+  private handleNewRevocationList = async (domain: string): Promise<void> => {
+    if (domain === this.selfDomain) {
+      // The crl of the self user has changed, we need to check if the self client certificate is revoked
+      const activeIdentity = await getActiveWireIdentity();
+      if (activeIdentity?.status === MLSStatuses.REVOKED) {
+        await this.onSelfClientCertificateRevoked();
+      }
     }
-
-    const isRevoked = activeIdentity.status === MLSStatuses.REVOKED;
-
-    if (isRevoked) {
-      await this.onSelfClientCertificateRevoked();
-    }
-
     await this.checkAllConversationsVerificationState();
   };
 
@@ -145,6 +143,12 @@ class MLSConversationVerificationStateHandler {
       return;
     }
 
+    const conversationExists = await this.core.service?.mls?.conversationExists(conversation.groupId);
+    if (!conversationExists) {
+      conversation.mlsVerificationState(ConversationVerificationState.UNVERIFIED);
+      return;
+    }
+
     const verificationState = await getConversationVerificationState(conversation.groupId);
 
     if (
@@ -162,12 +166,14 @@ class MLSConversationVerificationStateHandler {
 }
 
 export const registerMLSConversationVerificationStateHandler = (
+  domain: string,
   onConversationVerificationStateChange: OnConversationE2EIVerificationStateChange = () => {},
   onSelfClientCertificateRevoked: () => Promise<void> = async () => {},
   conversationState: ConversationState = container.resolve(ConversationState),
   core: Core = container.resolve(Core),
 ): void => {
   new MLSConversationVerificationStateHandler(
+    domain,
     onConversationVerificationStateChange,
     onSelfClientCertificateRevoked,
     conversationState,

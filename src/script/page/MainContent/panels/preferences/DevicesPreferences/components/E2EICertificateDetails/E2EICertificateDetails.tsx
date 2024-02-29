@@ -43,11 +43,6 @@ export const E2EICertificateDetails = ({identity, isCurrentDevice}: E2EICertific
   const isNotDownloaded = certificateState === MLSStatuses.NOT_DOWNLOADED;
   const isValid = certificateState === MLSStatuses.VALID;
 
-  const updateCertificate = (): null => {
-    // TODO: Waiting for update certificate implementation
-    return null;
-  };
-
   const getCertificate = async () => {
     try {
       await E2EIHandler.getInstance().enroll();
@@ -96,7 +91,7 @@ export const E2EICertificateDetails = ({identity, isCurrentDevice}: E2EICertific
             )}
 
             {identity?.certificate && !isValid && (
-              <Button variant={ButtonVariant.TERTIARY} onClick={updateCertificate} data-uie-name="update-certificate">
+              <Button variant={ButtonVariant.TERTIARY} onClick={getCertificate} data-uie-name="update-certificate">
                 {t('E2EI.updateCertificate')}
               </Button>
             )}

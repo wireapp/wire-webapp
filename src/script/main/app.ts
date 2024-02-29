@@ -398,14 +398,6 @@ export class App {
       const e2eiHandler = await configureE2EI(this.logger, teamFeatures);
       configureDownloadPath(teamFeatures);
 
-      if (e2eiHandler) {
-        /* We first try to do the initial enrollment (if the user has not yet enrolled)
-         * We need to enroll before anything else (in particular joining MLS conversations)
-         * Until the user is enrolled, we need to pause loading the app
-         */
-        await e2eiHandler.attemptEnrollment();
-      }
-
       this.core.configureCoreCallbacks({
         groupIdFromConversationId: async conversationId => {
           const conversation = await conversationRepository.getConversationById(conversationId);
@@ -459,6 +451,7 @@ export class App {
         //if mls is supported, we need to initialize the callbacks (they are used when decrypting messages)
         conversationRepository.initMLSConversationRecoveredListener();
         registerMLSConversationVerificationStateHandler(
+          selfUser.qualifiedId.domain,
           this.updateConversationE2EIVerificationState,
           this.showClientCertificateRevokedWarning,
         );
@@ -537,16 +530,9 @@ export class App {
       callingRepository.setReady();
       telemetry.timeStep(AppInitTimingsStep.APP_LOADED);
 
-      this.logger.info(`App loaded in ${Date.now() - startTime}ms`);
+      await e2eiHandler?.startTimers();
+      this.logger.info(`App version ${Environment.version()} loaded in ${Date.now() - startTime}ms`);
 
-      if (e2eiHandler) {
-        // At the end of the process (once conversations are loaded and joined), we can check if we need to renew the user's certificate
-        try {
-          await e2eiHandler.attemptRenewal();
-        } catch (error) {
-          this.logger.error('Failed to renew user certificate: ', error);
-        }
-      }
       return selfUser;
     } catch (error) {
       if (error instanceof BaseError) {

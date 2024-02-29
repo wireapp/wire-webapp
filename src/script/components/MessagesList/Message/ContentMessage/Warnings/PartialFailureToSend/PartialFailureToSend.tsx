@@ -30,7 +30,7 @@ import {Config} from 'src/script/Config';
 import {t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
-import {backendErrorLink, warning} from '../Warnings.styles';
+import {backendErrorLink, button, warning, wrapper} from '../Warnings.styles';
 
 export type User = {qualifiedId: QualifiedId; name: () => string};
 type Props = {
@@ -125,7 +125,7 @@ export const PartialFailureToSendWarning = ({failedToSend, isMessageFocused, kno
   }
 
   return (
-    <div>
+    <div css={wrapper}>
       <p css={warning}>
         <Bold css={warning}>{message.head}</Bold> {message.rest}
       </p>
@@ -191,6 +191,7 @@ export const PartialFailureToSendWarning = ({failedToSend, isMessageFocused, kno
             </>
           )}
           <Button
+            css={button}
             type="button"
             tabIndex={messageFocusedTabIndex}
             variant={ButtonVariant.TERTIARY}

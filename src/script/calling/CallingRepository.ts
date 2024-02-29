@@ -382,7 +382,16 @@ export class CallingRepository {
     }
     const allClients = await this.core.service!.conversation.fetchAllParticipantsClients(call.conversationId);
 
-    if (!isGroupMLSConversation(conversation)) {
+    if (isGroupMLSConversation(conversation)) {
+      const subconversationEpochInfo = await this.subconversationService.getSubconversationEpochInfo(
+        conversation.qualifiedId,
+        conversation.groupId,
+      );
+
+      if (subconversationEpochInfo) {
+        this.setEpochInfo(conversation.qualifiedId, subconversationEpochInfo);
+      }
+    } else {
       const qualifiedClients = flattenUserMap(allClients);
 
       const clients: Clients = flatten(

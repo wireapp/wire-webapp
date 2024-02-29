@@ -17,8 +17,6 @@
  *
  */
 
-import React from 'react';
-
 import cx from 'classnames';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -33,7 +31,7 @@ export interface PingMessageProps {
   isLastDeliveredMessage: boolean;
 }
 
-const PingMessage: React.FC<PingMessageProps> = ({message, is1to1Conversation, isLastDeliveredMessage}) => {
+const PingMessage = ({message, is1to1Conversation, isLastDeliveredMessage}: PingMessageProps) => {
   const {unsafeSenderName, caption, ephemeral_caption, isObfuscated, get_icon_classes} = useKoSubscribableChildren(
     message,
     ['unsafeSenderName', 'caption', 'ephemeral_caption', 'isObfuscated', 'get_icon_classes'],
@@ -45,7 +43,7 @@ const PingMessage: React.FC<PingMessageProps> = ({message, is1to1Conversation, i
         <div className={`icon-ping ${get_icon_classes}`} />
       </div>
       <div
-        className={cx('message-body-content', 'message-header-label', {
+        className={cx('message-header-label', {
           'ephemeral-message-obfuscated': isObfuscated,
         })}
         title={ephemeral_caption}
