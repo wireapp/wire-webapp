@@ -923,7 +923,33 @@ export class CallingRepository {
         call.getSelfParticipant().releaseVideoStream(true);
       }
       await this.warmupMediaStreams(call, true, isVideoCall);
-      const shouldContinueCall = await this.pushClients(call, true);
+      const conversation = this.getConversationById(call.conversationId);
+
+      const isE2EIDegradedConversation =
+        conversation?.mlsVerificationState() === ConversationVerificationState.DEGRADED;
+      let userConsentWithDegradation = true;
+      if (isE2EIDegradedConversation) {
+        userConsentWithDegradation = await new Promise(resolve =>
+          PrimaryModal.show(PrimaryModal.type.CONFIRM, {
+            primaryAction: {
+              action: () => {
+                conversation.mlsVerificationState(ConversationVerificationState.UNVERIFIED);
+                resolve(true);
+              },
+              text: t('conversation.E2EIJoinAnyway'),
+            },
+            secondaryAction: {
+              action: () => resolve(false),
+              text: t('conversation.E2EICancel'),
+            },
+            text: {
+              message: t('conversation.E2EIDegradedJoinCall'),
+              title: t('conversation.E2EIConversationNoLongerVerified'),
+            },
+          }),
+        );
+      }
+      const shouldContinueCall = userConsentWithDegradation && (await this.pushClients(call, true));
       if (!shouldContinueCall) {
         this.rejectCall(call.conversationId);
         return;
@@ -940,8 +966,6 @@ export class CallingRepository {
       this.sendCallingEvent(EventName.CALLING.JOINED_CALL, call, {
         [Segmentation.CALL.DIRECTION]: this.getCallDirection(call),
       });
-
-      const conversation = this.getConversationById(call.conversationId);
 
       if (!conversation || !isGroupMLSConversation(conversation)) {
         return;
