@@ -150,7 +150,7 @@ jobs:
           release_name="${TAG:-v${packageVersion}}"
           echo "release_name=$release_name" >> $GITHUB_OUTPUT
 
-      - uses: azure/setup-helm@v3
+      - uses: azure/setup-helm@v4
         with:
           version: '3.12.2'
         id: install
