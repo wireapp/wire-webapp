@@ -95,9 +95,7 @@ const ListWrapper = ({
       <div id={id} className={`left-list-${id} ${id}`} css={style}>
         {hasHeader && (
           <header className={`left-list-header left-list-header-${id}`}>
-            {headerElement ? (
-              headerElement
-            ) : (
+            {headerElement || (
               <>
                 <h2 className="left-list-header-text" data-uie-name={headerUieName}>
                   {header}
