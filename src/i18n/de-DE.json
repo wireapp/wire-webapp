@@ -368,7 +368,7 @@
   "conversation.E2EIDegradedJoinCall": "At least one participant started using a new device or has an invalid certificate.\nDo you still want to join the call?",
   "conversation.E2EIDegradedNewMessage": "Mindestens ein Teilnehmer hat begonnen, ein neues Gerät zu verwenden oder hat ein ungültiges Zertifikat. \nMöchten Sie die Nachricht trotzdem senden?",
   "conversation.E2EIGroupCallDisconnected": "Der Anruf wurde unterbrochen, da mindestens ein Teilnehmer ein neues Gerät verwendet oder ein ungültiges Zertifikat hat.",
-  "conversation.E2EIJoinAnyway": "Join Anyway",
+  "conversation.E2EIJoinAnyway": "Trotzdem beitreten",
   "conversation.E2EINewDeviceAdded": "Diese Unterhaltung ist nicht mehr überprüft, da [bold]{{user}}[/bold] mindestens ein Gerät ohne gültiges Ende-zu-Ende-Identitätszertifikat verwendet.",
   "conversation.E2EINewUserAdded": "Diese Unterhaltung ist nicht mehr überprüft, da [bold]{{user}}[/bold] mindestens ein Gerät ohne gültiges Ende-zu-Ende-Identitätszertifikat verwendet.",
   "conversation.E2EIOk": "Verstanden",
