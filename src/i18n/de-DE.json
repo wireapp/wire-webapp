@@ -365,7 +365,7 @@
   "conversation.E2EICertificateRevoked": "Diese Unterhaltung ist nicht mehr überprüft, da ein Team-Admin das Ende-zu-Ende-Identitätszertifikat für mindestens ein Gerät von [bold]{{user}}[/bold] widerrufen hat. [link]Mehr erfahren[/link]",
   "conversation.E2EIConversationNoLongerVerified": "Unterhaltung nicht mehr überprüft",
   "conversation.E2EIDegradedInitiateCall": "Mindestens ein Teilnehmer hat begonnen, ein neues Gerät zu verwenden oder hat ein ungültiges Zertifikat.\nMöchten Sie trotzdem anrufen?",
-  "conversation.E2EIDegradedJoinCall": "At least one participant started using a new device or has an invalid certificate.\nDo you still want to join the call?",
+  "conversation.E2EIDegradedJoinCall": "Mindestens ein Teilnehmer hat begonnen, ein neues Gerät zu verwenden oder hat ein ungültiges Zertifikat.\nMöchten Sie dem Anruf trotzdem beitreten?",
   "conversation.E2EIDegradedNewMessage": "Mindestens ein Teilnehmer hat begonnen, ein neues Gerät zu verwenden oder hat ein ungültiges Zertifikat. \nMöchten Sie die Nachricht trotzdem senden?",
   "conversation.E2EIGroupCallDisconnected": "Der Anruf wurde unterbrochen, da mindestens ein Teilnehmer ein neues Gerät verwendet oder ein ungültiges Zertifikat hat.",
   "conversation.E2EIJoinAnyway": "Trotzdem beitreten",
