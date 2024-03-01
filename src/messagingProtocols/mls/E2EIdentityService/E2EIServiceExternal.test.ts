@@ -168,8 +168,8 @@ describe('E2EIServiceExternal', () => {
 
       const userIdentities = await service.getAllGroupUsersIdentities(groupId);
 
-      expect(userIdentities?.get(user1.userId)).toEqual(undefined);
-      expect(userIdentities?.get(user2.userId)).toEqual(undefined);
+      expect(userIdentities?.get(stringifyQualifiedId({domain: user1.domain, id: user1.userId}))).toEqual(undefined);
+      expect(userIdentities?.get(stringifyQualifiedId({domain: user2.domain, id: user2.userId}))).toEqual(undefined);
     });
 
     it('returns all the user identities of a mls group', async () => {

@@ -84,7 +84,9 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
     return this.coreCryptoClient.e2eiIsEnabled(this.mlsService.config.cipherSuite);
   }
 
-  public async getAllGroupUsersIdentities(groupId: string): Promise<Map<string, DeviceIdentity[]> | undefined> {
+  public async getAllGroupUsersIdentities(
+    groupId: string,
+  ): Promise<Map<StringifiedQualifiedId, DeviceIdentity[]> | undefined> {
     const conversationExists = await this.mlsService.conversationExists(groupId);
 
     if (!conversationExists) {
