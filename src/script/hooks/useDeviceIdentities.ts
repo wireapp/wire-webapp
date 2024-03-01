@@ -26,24 +26,19 @@ import {E2EIHandler, getUsersIdentities, MLSStatuses, WireIdentity} from '../E2E
 
 export const useUserIdentity = (userId: QualifiedId, groupId?: string, updateAfterEnrollment?: boolean) => {
   const [deviceIdentities, setDeviceIdentities] = useState<WireIdentity[] | undefined>();
-  const [previousUserId, setPreviousUserId] = useState<QualifiedId | undefined>();
 
   const refreshDeviceIdentities = useCallback(async () => {
     if (!E2EIHandler.getInstance().isE2EIEnabled() || !groupId) {
       return;
     }
 
+    const qualifiedId: QualifiedId = {id: userId.id, domain: userId.domain};
+    const userIdentities = await getUsersIdentities(groupId, [qualifiedId]);
+    setDeviceIdentities(userIdentities?.get(stringifyQualifiedId(qualifiedId)) ?? undefined);
     /**
-     * Additional check to prevent unnecessary requests, since the userId in the dependency array is a new object on every render and causes an infinite loop.
+     * Dont check the userId directly, as it is a object that changes on every render, will cause infinite loop
      */
-    if (userId.id === previousUserId?.id && userId.domain === previousUserId?.domain) {
-      return;
-    }
-
-    const userIdentities = await getUsersIdentities(groupId, [userId]);
-    setDeviceIdentities(userIdentities?.get(stringifyQualifiedId(userId)) ?? undefined);
-    setPreviousUserId(userId);
-  }, [userId, previousUserId, groupId]);
+  }, [userId.id, userId.domain, groupId]);
 
   useEffect(() => {
     void refreshDeviceIdentities();
