@@ -19,6 +19,7 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {DeviceIdentity} from '@wireapp/core/lib/messagingProtocols/mls';
+import {StringifiedQualifiedId, stringifyQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 import {container} from 'tsyringe';
 
 import {Core} from 'src/script/service/CoreSingleton';
@@ -48,12 +49,14 @@ export function getE2EIdentityService() {
   return e2eIdentityService;
 }
 
-function mapUserIdentities(userVerifications: Map<string, DeviceIdentity[]>): Map<string, WireIdentity[]> {
-  const mappedUsers = new Map<string, WireIdentity[]>();
+function mapUserIdentities(
+  userVerifications: Map<StringifiedQualifiedId, DeviceIdentity[]>,
+): Map<StringifiedQualifiedId, WireIdentity[]> {
+  const mappedUsers = new Map<StringifiedQualifiedId, WireIdentity[]>();
 
-  for (const [userId, identities] of userVerifications.entries()) {
+  for (const [stringifiedQualifiedId, identities] of userVerifications.entries()) {
     mappedUsers.set(
-      userId,
+      stringifiedQualifiedId,
       identities.map(identity => ({...identity, status: mapMLSStatus(identity.status)})),
     );
   }
@@ -88,10 +91,12 @@ const fetchSelfDeviceIdentity = async (): Promise<WireIdentity | undefined> => {
   }
 
   const currentClientId = selfMLSConversation.selfUser()?.localClient?.id;
-  const userId = selfMLSConversation.selfUser()?.id;
+  const userId = selfMLSConversation.selfUser()?.qualifiedId;
 
   if (userId && currentClientId) {
-    const identity = userIdentities.get(userId)?.find(identity => identity.deviceId === currentClientId);
+    const identity = userIdentities
+      .get(stringifyQualifiedId(userId))
+      ?.find(identity => identity.deviceId === currentClientId);
     return identity;
   }
   return undefined;
