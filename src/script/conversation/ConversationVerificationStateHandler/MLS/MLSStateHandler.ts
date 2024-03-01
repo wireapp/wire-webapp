@@ -74,9 +74,9 @@ class MLSConversationVerificationStateHandler {
     conversation.mlsVerificationState(state);
 
     const degradedUsers: QualifiedId[] = [];
-    for (const [userId, identities] of userIdentities.entries()) {
-      if (identities.some(identity => identity.status !== MLSStatuses.VALID)) {
-        degradedUsers.push({id: userId, domain: ''});
+    for (const [, identities] of userIdentities.entries()) {
+      if (identities.length > 0 && identities.some(identity => identity.status !== MLSStatuses.VALID)) {
+        degradedUsers.push(identities[0].qualifiedUserId);
       }
     }
 

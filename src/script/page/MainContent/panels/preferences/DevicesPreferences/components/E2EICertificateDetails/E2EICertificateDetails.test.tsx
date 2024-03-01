@@ -37,6 +37,10 @@ describe('E2EICertificateDetails', () => {
     notBefore: BigInt(0),
     notAfter: BigInt(0),
     serialNumber: '',
+    qualifiedUserId: {
+      domain: '',
+      id: '',
+    },
   });
 
   it('is e2ei identity not downloaded', async () => {
