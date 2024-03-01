@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [45.1.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@45.1.0...@wireapp/core@45.1.1) (2024-03-01)
+
+### Bug Fixes
+
+* return type of getAllGroupUsersIdentities ([#6031](https://github.com/wireapp/wire-web-packages/issues/6031)) ([b94f805](https://github.com/wireapp/wire-web-packages/commit/b94f8056632a976c151a58d435006e86fe11b662))
+
 # [45.1.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@45.0.13...@wireapp/core@45.1.0) (2024-03-01)
 
 ### Features
