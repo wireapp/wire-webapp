@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [45.1.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@45.0.13...@wireapp/core@45.1.0) (2024-03-01)
+
+### Features
+
+* **e2ei:** use qualifiedId as key and add to DeviceIdentity ([#6030](https://github.com/wireapp/wire-web-packages/issues/6030)) ([604d350](https://github.com/wireapp/wire-web-packages/commit/604d350d64a6f6a81f2020937cb60b2568af5991))
+
 ## [45.0.13](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@45.0.12...@wireapp/core@45.0.13) (2024-02-29)
 
 **Note:** Version bump only for package @wireapp/core
