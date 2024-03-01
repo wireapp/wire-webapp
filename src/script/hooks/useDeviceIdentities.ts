@@ -20,19 +20,30 @@
 import {useCallback, useEffect, useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {stringifyQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 
 import {E2EIHandler, getUsersIdentities, MLSStatuses, WireIdentity} from '../E2EIdentity';
 
 export const useUserIdentity = (userId: QualifiedId, groupId?: string, updateAfterEnrollment?: boolean) => {
   const [deviceIdentities, setDeviceIdentities] = useState<WireIdentity[] | undefined>();
+  const [previousUserId, setPreviousUserId] = useState<QualifiedId | undefined>();
 
   const refreshDeviceIdentities = useCallback(async () => {
     if (!E2EIHandler.getInstance().isE2EIEnabled() || !groupId) {
       return;
     }
+
+    /**
+     * Additional check to prevent unnecessary requests, since the userId in the dependency array is a new object on every render and causes an infinite loop.
+     */
+    if (userId.id === previousUserId?.id && userId.domain === previousUserId?.domain) {
+      return;
+    }
+
     const userIdentities = await getUsersIdentities(groupId, [userId]);
-    setDeviceIdentities(userIdentities?.get(userId.id) ?? undefined);
-  }, [userId.id, groupId]);
+    setDeviceIdentities(userIdentities?.get(stringifyQualifiedId(userId)) ?? undefined);
+    setPreviousUserId(userId);
+  }, [userId, previousUserId, groupId]);
 
   useEffect(() => {
     void refreshDeviceIdentities();
