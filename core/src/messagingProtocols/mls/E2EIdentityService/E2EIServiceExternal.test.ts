@@ -24,6 +24,7 @@ import {E2EIServiceExternal} from './E2EIServiceExternal';
 import {ClientService} from '../../../client';
 import {openDB} from '../../../storage/CoreDB';
 import {getUUID} from '../../../test/PayloadHelper';
+import {stringifyQualifiedId} from '../../../util/qualifiedIdUtil';
 import {RecurringTaskScheduler} from '../../../util/RecurringTaskScheduler';
 import {MLSService} from '../MLSService';
 
@@ -92,8 +93,8 @@ describe('E2EIServiceExternal', () => {
 
       const userIdentities = await service.getUsersIdentities(groupId, userIds);
 
-      expect(userIdentities?.get(user1.id)).toEqual(undefined);
-      expect(userIdentities?.get(user2.id)).toEqual(undefined);
+      expect(userIdentities?.get(stringifyQualifiedId(user1))).toEqual(undefined);
+      expect(userIdentities?.get(stringifyQualifiedId(user2))).toEqual(undefined);
     });
 
     it('returns the user identities', async () => {
@@ -113,8 +114,8 @@ describe('E2EIServiceExternal', () => {
 
       const userIdentities = await service.getUsersIdentities(groupId, userIds);
 
-      expect(userIdentities?.get(user1.id)).toHaveLength(2);
-      expect(userIdentities?.get(user2.id)).toHaveLength(1);
+      expect(userIdentities?.get(stringifyQualifiedId(user1))).toHaveLength(2);
+      expect(userIdentities?.get(stringifyQualifiedId(user2))).toHaveLength(1);
     });
 
     it('returns MLS basic devices with empty identity', async () => {
@@ -141,8 +142,8 @@ describe('E2EIServiceExternal', () => {
 
       const userIdentities = await service.getUsersIdentities(groupId, userIds);
 
-      expect(userIdentities?.get(user1.id)).toHaveLength(3);
-      expect(userIdentities?.get(user2.id)).toHaveLength(1);
+      expect(userIdentities?.get(stringifyQualifiedId(user1))).toHaveLength(3);
+      expect(userIdentities?.get(stringifyQualifiedId(user2))).toHaveLength(1);
     });
   });
 
@@ -200,8 +201,8 @@ describe('E2EIServiceExternal', () => {
 
       const userIdentities = await service.getAllGroupUsersIdentities(groupId);
 
-      expect(userIdentities?.get(user1.userId)).toHaveLength(2);
-      expect(userIdentities?.get(user2.userId)).toHaveLength(1);
+      expect(userIdentities?.get(stringifyQualifiedId({id: user1.userId, domain: user1.domain}))).toHaveLength(2);
+      expect(userIdentities?.get(stringifyQualifiedId({id: user2.userId, domain: user2.domain}))).toHaveLength(1);
     });
   });
 });

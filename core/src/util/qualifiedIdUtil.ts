@@ -19,7 +19,8 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-export const stringifyQualifiedId = (qualifiedId: QualifiedId): `${string}@${string}` =>
+export type StringifiedQualifiedId = `${string}@${string}`;
+export const stringifyQualifiedId = (qualifiedId: QualifiedId): StringifiedQualifiedId =>
   `${qualifiedId.id}@${qualifiedId.domain}`;
 
 export const parseQualifiedId = (qualifiedId: string): QualifiedId => {
