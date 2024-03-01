@@ -33,11 +33,15 @@ import {CoreDatabase} from '../../../storage/CoreDB';
 import {parseFullQualifiedClientId} from '../../../util/fullyQualifiedClientIdUtils';
 import {LocalStorageStore} from '../../../util/LocalStorageStore';
 import {LowPrecisionTaskScheduler} from '../../../util/LowPrecisionTaskScheduler';
-import {stringifyQualifiedId} from '../../../util/qualifiedIdUtil';
+import {StringifiedQualifiedId, stringifyQualifiedId} from '../../../util/qualifiedIdUtil';
 import {RecurringTaskScheduler} from '../../../util/RecurringTaskScheduler';
 import {MLSService} from '../MLSService';
 
-export type DeviceIdentity = Omit<WireIdentity, 'free' | 'status'> & {status?: DeviceStatus; deviceId: string};
+export type DeviceIdentity = Omit<WireIdentity, 'free' | 'status'> & {
+  status?: DeviceStatus;
+  deviceId: string;
+  qualifiedUserId: QualifiedId;
+};
 
 type Events = {
   crlChanged: {domain: string};
@@ -105,7 +109,7 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
   public async getUsersIdentities(
     groupId: string,
     userIds: QualifiedId[],
-  ): Promise<Map<string, DeviceIdentity[]> | undefined> {
+  ): Promise<Map<StringifiedQualifiedId, DeviceIdentity[]> | undefined> {
     const conversationExists = await this.mlsService.conversationExists(groupId);
 
     if (!conversationExists) {
@@ -126,11 +130,12 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
       .map(id => textDecoder.decode(id))
       .map(fullyQualifiedId => parseFullQualifiedClientId(fullyQualifiedId));
 
-    const mappedUserIdentities = new Map<string, DeviceIdentity[]>();
+    const mappedUserIdentities = new Map<StringifiedQualifiedId, DeviceIdentity[]>();
     for (const userId of userIds) {
       const identities = (userIdentities.get(userId.id) || []).map(identity => ({
         ...identity,
         deviceId: parseFullQualifiedClientId(identity.clientId).client,
+        qualifiedUserId: userId,
       }));
 
       const basicMLSDevices = allUsersMLSDevices
@@ -150,9 +155,10 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
           notBefore: BigInt(0),
           serialNumber: '',
           clientId: id.client,
+          qualifiedUserId: userId,
         }));
 
-      mappedUserIdentities.set(userId.id, [...identities, ...basicMLSDevices]);
+      mappedUserIdentities.set(stringifyQualifiedId(userId), [...identities, ...basicMLSDevices]);
     }
 
     return mappedUserIdentities;
@@ -174,6 +180,7 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
     return deviceIdentities.map(identity => ({
       ...identity,
       deviceId: parseFullQualifiedClientId(identity.clientId).client,
+      qualifiedUserId: userClientsMap[identity.clientId],
     }));
   }
 
