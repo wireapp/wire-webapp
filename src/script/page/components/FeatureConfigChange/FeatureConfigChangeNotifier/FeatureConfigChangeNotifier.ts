@@ -243,6 +243,13 @@ export function FeatureConfigChangeNotifier({teamState, selfUserId}: Props): nul
           primaryAction: message.primaryAction,
           hideCloseBtn: isEnforceDownloadPath,
           preventClose: isEnforceDownloadPath,
+          close: isEnforceDownloadPath
+            ? () => {
+                if (Runtime.isDesktopApp() && config[featureKey]?.status !== FeatureStatus.DISABLED) {
+                  amplify.publish(WebAppEvents.LIFECYCLE.RESTART);
+                }
+              }
+            : undefined,
         });
       });
     }
