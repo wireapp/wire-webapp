@@ -14598,14 +14598,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-error-boundary@npm:4.0.12":
-  version: 4.0.12
-  resolution: "react-error-boundary@npm:4.0.12"
+"react-error-boundary@npm:4.0.13":
+  version: 4.0.13
+  resolution: "react-error-boundary@npm:4.0.13"
   dependencies:
     "@babel/runtime": ^7.12.5
   peerDependencies:
     react: ">=16.13.1"
-  checksum: c4a14c2b609037baba394d8871fb021a7c16fb1abfd8d23b2d2aa331bdcc420e5cff4b3d48f2f2ac7fa64ac90c322d0bcf358d706995b30df5a8d5fcb0c27b1e
+  checksum: 50398d080015d51d22c6f94c56f4ea336d10232d72345b36ee6f15b6b643666d20b072829b02f091a80e5af68fe67f68a62ef0d2b649dbd759ead929304449af
   languageName: node
   linkType: hard
 
@@ -17747,7 +17747,7 @@ __metadata:
     prettier: 3.2.5
     react: 18.2.0
     react-dom: 18.2.0
-    react-error-boundary: 4.0.12
+    react-error-boundary: 4.0.13
     react-intl: 6.6.2
     react-redux: 9.1.0
     react-router: 6.22.2
