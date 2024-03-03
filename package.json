@@ -57,7 +57,7 @@
     "zustand": "4.5.1"
   },
   "devDependencies": {
-    "@babel/core": "7.23.9",
+    "@babel/core": "7.24.0",
     "@babel/plugin-proposal-decorators": "7.23.9",
     "@babel/preset-env": "7.23.9",
     "@babel/preset-react": "7.23.3",
