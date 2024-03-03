@@ -126,7 +126,7 @@
     "postcss": "8.4.35",
     "postcss-import": "^16.0.1",
     "postcss-less": "6.0.0",
-    "postcss-loader": "^8.1.0",
+    "postcss-loader": "^8.1.1",
     "postcss-preset-env": "^9.4.0",
     "postcss-scss": "4.0.9",
     "prettier": "3.2.5",

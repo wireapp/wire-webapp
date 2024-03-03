@@ -13585,9 +13585,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss-loader@npm:^8.1.0":
-  version: 8.1.0
-  resolution: "postcss-loader@npm:8.1.0"
+"postcss-loader@npm:^8.1.1":
+  version: 8.1.1
+  resolution: "postcss-loader@npm:8.1.1"
   dependencies:
     cosmiconfig: ^9.0.0
     jiti: ^1.20.0
@@ -13601,7 +13601,7 @@ __metadata:
       optional: true
     webpack:
       optional: true
-  checksum: 72fd4975f7342efedaa62eb944cf309736ffde2e92ad4298d93b357f5131bc98dc219ee33d8157964868d30336e5e46a9def40873385a8b69ec9c8f1c53dcb36
+  checksum: b09e230181ff70b374a3e265dc526302b9865e2697b5f9c4ff78dfeb716a3508f3247ed49c8ee6630dddfdf6df7d73556d6bd2eb165a00c48dba3a1bd01e3a2e
   languageName: node
   linkType: hard
 
@@ -17515,7 +17515,7 @@ __metadata:
     postcss: 8.4.35
     postcss-import: ^16.0.1
     postcss-less: 6.0.0
-    postcss-loader: ^8.1.0
+    postcss-loader: ^8.1.1
     postcss-preset-env: ^9.4.0
     postcss-scss: 4.0.9
     prettier: 3.2.5
