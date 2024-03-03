@@ -2,7 +2,7 @@
   "dependencies": {
     "@datadog/browser-logs": "^5.10.0",
     "@datadog/browser-rum": "^5.10.0",
-    "@emotion/react": "11.11.3",
+    "@emotion/react": "11.11.4",
     "@lexical/history": "0.13.1",
     "@lexical/react": "0.13.1",
     "@wireapp/avs": "9.6.12",
