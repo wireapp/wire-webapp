@@ -49,6 +49,14 @@ export function getE2EIdentityService() {
   return e2eIdentityService;
 }
 
+export function getCoreConversationService() {
+  const conversationService = container.resolve(Core).service?.conversation;
+  if (!conversationService) {
+    throw new Error('Conversation service not available');
+  }
+  return conversationService;
+}
+
 function mapUserIdentities(
   userVerifications: Map<StringifiedQualifiedId, DeviceIdentity[]>,
 ): Map<StringifiedQualifiedId, WireIdentity[]> {
@@ -81,17 +89,28 @@ export async function getConversationVerificationState(groupId: string) {
 /**
  * Checks if E2EI has active certificate.
  */
-const fetchSelfDeviceIdentity = async (): Promise<WireIdentity | undefined> => {
-  const conversationState = container.resolve(ConversationState);
-  const selfMLSConversation = conversationState.getSelfMLSConversation();
-  const userIdentities = await getAllGroupUsersIdentities(selfMLSConversation.groupId);
+const getSelfDeviceIdentity = async (): Promise<WireIdentity | undefined> => {
+  let selfMLSConversationGroupId: string;
+  try {
+    // Try to get the self MLS conversation from the conversation state
+    const conversationState = container.resolve(ConversationState);
+    selfMLSConversationGroupId = conversationState.getSelfMLSConversation().groupId;
+  } catch {
+    // If the conversation state is not available, try to get the self MLS conversation from backend
+    const selfMLSConversation = await getCoreConversationService().getMLSSelfConversation();
+    selfMLSConversationGroupId = selfMLSConversation.group_id;
+  }
+
+  const userIdentities = await getAllGroupUsersIdentities(selfMLSConversationGroupId);
 
   if (!userIdentities) {
     return undefined;
   }
 
-  const currentClientId = selfMLSConversation.selfUser()?.localClient?.id;
-  const userId = selfMLSConversation.selfUser()?.qualifiedId;
+  const core = container.resolve(Core);
+
+  const currentClientId = core.clientId;
+  const userId = {id: core.userId, domain: core.backendFeatures.domain};
 
   if (userId && currentClientId) {
     const identity = userIdentities
@@ -108,7 +127,7 @@ export async function hasActiveCertificate(): Promise<boolean> {
 }
 
 export async function getActiveWireIdentity(): Promise<WireIdentity | undefined> {
-  const selfDeviceIdentity = await fetchSelfDeviceIdentity();
+  const selfDeviceIdentity = await getSelfDeviceIdentity();
 
   if (!selfDeviceIdentity) {
     return undefined;
