@@ -95,7 +95,7 @@ const getSelfDeviceIdentity = async (): Promise<WireIdentity | undefined> => {
   // Try to get the self MLS conversation from the conversation state
   // If the conversation state is not available, try to get the self MLS conversation from backend
   const selfMLSConversationGroupId =
-    conversationState.selfMLSConversation()?.groupId ||
+    conversationState.selfMLSConversation()?.groupId ??
     (await getCoreConversationService().getMLSSelfConversation()).group_id;
 
   const userIdentities = await getAllGroupUsersIdentities(selfMLSConversationGroupId);
