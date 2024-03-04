@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [45.2.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@45.1.1...@wireapp/core@45.2.0) (2024-03-04)
+
+### Features
+
+* add method to fetch self mls conversation ([#6042](https://github.com/wireapp/wire-web-packages/issues/6042)) ([dc11514](https://github.com/wireapp/wire-web-packages/commit/dc115146eedc9e1eac1ca6a48aff99bffb6bf658))
+
 ## [45.1.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@45.1.0...@wireapp/core@45.1.1) (2024-03-01)
 
 ### Bug Fixes
