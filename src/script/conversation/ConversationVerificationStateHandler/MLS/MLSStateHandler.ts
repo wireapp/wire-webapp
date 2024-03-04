@@ -141,7 +141,7 @@ class MLSConversationVerificationStateHandler {
   }> => {
     const userIdentities = await getAllGroupUsersIdentities(conversation.groupId);
     const processedUserIds: Set<string> = new Set();
-    let problemFound = false;
+    let userVerificationState = UserVerificationState.ALL_VALID;
 
     if (userIdentities) {
       for (const [userId, identities] of userIdentities.entries()) {
@@ -159,7 +159,7 @@ class MLSConversationVerificationStateHandler {
 
         if (!identity || !user) {
           this.logger.warn(`Could not find user or identity for userId: ${userId}`);
-          problemFound = true;
+          userVerificationState = UserVerificationState.SOME_INVALID;
           break;
         }
 
@@ -167,14 +167,14 @@ class MLSConversationVerificationStateHandler {
         const matchingHandle = this.checkUserHandle(identity, user);
         if (!matchingHandle || !matchingName) {
           this.logger.warn(`User identity and user entity do not match for userId: ${userId}`);
-          problemFound = true;
+          userVerificationState = UserVerificationState.SOME_INVALID;
           break;
         }
       }
     }
 
     return {
-      userVerificationState: problemFound ? UserVerificationState.SOME_INVALID : UserVerificationState.ALL_VALID,
+      userVerificationState,
       userIdentities,
     };
   };
