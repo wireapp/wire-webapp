@@ -162,6 +162,9 @@ describe('E2EIHandler', () => {
 
     jest.spyOn(coreMock.service!.e2eIdentity!, 'isEnrollmentInProgress').mockResolvedValue(false);
     jest.spyOn(coreMock.service!.e2eIdentity!, 'isFreshMLSSelfClient').mockResolvedValue(false);
+    jest
+      .spyOn(coreMock.service!.conversation!, 'getMLSSelfConversation')
+      .mockResolvedValue({group_id: 'groupId'} as any);
 
     const taskMock = jest.spyOn(LowPrecisionTaskScheduler, 'addTask');
 
