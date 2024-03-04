@@ -149,6 +149,10 @@ export class ConversationService extends TypedEventEmitter<Events> {
     return this.apiClient.api.conversation.getConversation(conversationId);
   }
 
+  public async getMLSSelfConversation(): Promise<MLSConversation> {
+    return this.apiClient.api.conversation.getMLSSelfConversation();
+  }
+
   public async getConversations(conversationIds?: QualifiedId[]): Promise<RemoteConversations> {
     if (!conversationIds) {
       const conversationIdsToSkip = await this.coreDatabase.getAll('conversationBlacklist');

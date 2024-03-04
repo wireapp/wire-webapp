@@ -103,6 +103,7 @@ export class ConversationAPI {
     RECEIPT_MODE: 'receipt-mode',
     ROLES: 'roles',
     SELF: 'self',
+    MLS_SELF: 'mls-self',
     TYPING: 'typing',
     V2: 'v2',
     ONE_2_ONE: 'one2one',
@@ -207,6 +208,16 @@ export class ConversationAPI {
       url,
     };
     const response = await this.client.sendJSON<Conversation>(config);
+    return response.data;
+  }
+
+  public async getMLSSelfConversation(): Promise<MLSConversation> {
+    const config: AxiosRequestConfig = {
+      method: 'get',
+      url: `${ConversationAPI.URL.CONVERSATIONS}/${ConversationAPI.URL.MLS_SELF}`,
+    };
+
+    const response = await this.client.sendJSON<MLSConversation>(config);
     return response.data;
   }
 
