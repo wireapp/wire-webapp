@@ -86,6 +86,7 @@ export class Account extends EventEmitter {
       establishMLS1to1Conversation: jest.fn(),
       blacklistConversation: jest.fn(),
       removeConversationFromBlacklist: jest.fn(),
+      getMLSSelfConversation: jest.fn(),
     },
     subconversation: {
       joinConferenceSubconversation: jest.fn(),
