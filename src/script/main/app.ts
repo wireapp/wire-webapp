@@ -395,7 +395,7 @@ export class App {
       }
       await this.core.initClient(localClient, willEnrollE2ei);
 
-      const e2eiHandler = await configureE2EI(this.logger, teamFeatures);
+      await configureE2EI(this.logger, teamFeatures);
       configureDownloadPath(teamFeatures);
 
       this.core.configureCoreCallbacks({
@@ -530,7 +530,6 @@ export class App {
       callingRepository.setReady();
       telemetry.timeStep(AppInitTimingsStep.APP_LOADED);
 
-      await e2eiHandler?.startTimers();
       this.logger.info(`App loaded in ${Date.now() - startTime}ms`);
 
       return selfUser;

@@ -168,9 +168,7 @@ describe('E2EIHandler', () => {
 
     const taskMock = jest.spyOn(LowPrecisionTaskScheduler, 'addTask');
 
-    const instance = await E2EIHandler.getInstance().initialize(params);
-
-    await instance.startTimers();
+    await E2EIHandler.getInstance().initialize(params);
 
     expect(taskMock).toHaveBeenCalledWith(expect.objectContaining({key: 'enrollmentTimer'}));
   });

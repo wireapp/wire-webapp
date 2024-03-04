@@ -39,8 +39,7 @@ const onConfigUpdate = async (configUpdate: {
   const {type} = detectTeamFeatureUpdate(configUpdate, FEATURE_KEY.MLSE2EID);
 
   if (type !== FeatureUpdateType.UNCHANGED) {
-    const client = await configureE2EI(logger, configUpdate.newFeatureList);
-    await client?.startTimers();
+    await configureE2EI(logger, configUpdate.newFeatureList);
   }
 };
 

@@ -132,6 +132,9 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       // When the user logs in to a new device in an environment that has e2ei enabled, they should be forced to enroll
       await this.startEnrollment(ModalType.ENROLL, false);
     }
+
+    // We start the timers to prompt the user to enroll (or renew) at the end of the expiration/grace period
+    await this.startTimers();
     return this;
   }
 
@@ -139,7 +142,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
    * Will initiate the timer that will regularly prompt the user to enroll (or to renew the certificate if it is about to expire)
    * @returns the delay under which the next enrollment/renewal modal will be prompted
    */
-  public async startTimers() {
+  private async startTimers() {
     // We store the first time the user was prompted with the enrollment modal
     const e2eActivatedAt = EnrollmentStore.get.e2eiActivatedAt() || Date.now();
     EnrollmentStore.store.e2eiActivatedAt(e2eActivatedAt);
@@ -259,9 +262,8 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       await this.cleanUp(false);
       this.emit('deviceStatusUpdated', {status: 'valid'});
 
-      if (isCertificateRenewal) {
-        await this.startTimers();
-      }
+      // Start the renewal timer
+      await this.startTimers();
 
       await this.showSuccessMessage(isCertificateRenewal);
     } catch (error) {
@@ -319,8 +321,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
           resolve();
         },
         secondaryActionFn: async () => {
-          const delay = await this.startTimers();
-          this.showSnoozeConfirmationModal(delay);
+          await this.snooze();
           resolve();
         },
         extraParams: {
@@ -344,8 +345,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
           resolve();
         },
         secondaryActionFn: async () => {
-          const delay = await this.startTimers();
-          this.showSnoozeConfirmationModal(delay);
+          await this.snooze();
           resolve();
         },
         extraParams: {
@@ -356,6 +356,11 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       });
       PrimaryModal.show(determinedModalType, modalOptions);
     });
+  }
+
+  private async snooze() {
+    const delay = await this.startTimers();
+    this.showSnoozeConfirmationModal(delay);
   }
 
   private showSnoozeConfirmationModal(delay: number) {
