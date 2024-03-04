@@ -90,16 +90,13 @@ export async function getConversationVerificationState(groupId: string) {
  * Checks if E2EI has active certificate.
  */
 const getSelfDeviceIdentity = async (): Promise<WireIdentity | undefined> => {
-  let selfMLSConversationGroupId: string;
-  try {
-    // Try to get the self MLS conversation from the conversation state
-    const conversationState = container.resolve(ConversationState);
-    selfMLSConversationGroupId = conversationState.getSelfMLSConversation().groupId;
-  } catch {
-    // If the conversation state is not available, try to get the self MLS conversation from backend
-    const selfMLSConversation = await getCoreConversationService().getMLSSelfConversation();
-    selfMLSConversationGroupId = selfMLSConversation.group_id;
-  }
+  const conversationState = container.resolve(ConversationState);
+
+  // Try to get the self MLS conversation from the conversation state
+  // If the conversation state is not available, try to get the self MLS conversation from backend
+  const selfMLSConversationGroupId =
+    conversationState.selfMLSConversation()?.groupId ||
+    (await getCoreConversationService().getMLSSelfConversation()).group_id;
 
   const userIdentities = await getAllGroupUsersIdentities(selfMLSConversationGroupId);
 
