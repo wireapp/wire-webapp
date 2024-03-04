@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [26.11.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@26.10.16...@wireapp/api-client@26.11.0) (2024-03-04)
+
+### Features
+
+* add method to fetch self mls conversation ([#6042](https://github.com/wireapp/wire-web-packages/issues/6042)) ([dc11514](https://github.com/wireapp/wire-web-packages/commit/dc115146eedc9e1eac1ca6a48aff99bffb6bf658))
+
 ## [26.10.16](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@26.10.15...@wireapp/api-client@26.10.16) (2024-02-29)
 
 **Note:** Version bump only for package @wireapp/api-client
