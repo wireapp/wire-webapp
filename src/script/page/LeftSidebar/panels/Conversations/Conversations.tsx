@@ -33,13 +33,19 @@ import {LegalHoldDot} from 'Components/LegalHoldDot';
 import {UserInfo} from 'Components/UserInfo';
 import {UserVerificationBadges} from 'Components/VerificationBadge';
 import {Config} from 'src/script/Config';
+import {Conversation} from 'src/script/entity/Conversation';
+import {IntegrationRepository} from 'src/script/integration/IntegrationRepository';
 import {
   closeIconStyles,
   searchIconStyles,
   searchInputStyles,
   searchInputWrapperStyles,
 } from 'src/script/page/LeftSidebar/panels/Conversations/Conversations.styles';
+import {StartUI} from 'src/script/page/LeftSidebar/panels/StartUI';
 import {ListState} from 'src/script/page/useAppState';
+import {SearchRepository} from 'src/script/search/SearchRepository';
+import {TeamRepository} from 'src/script/team/TeamRepository';
+import {UserRepository} from 'src/script/user/UserRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -61,7 +67,6 @@ import {Shortcut} from '../../../../ui/Shortcut';
 import {ShortcutType} from '../../../../ui/ShortcutType';
 import {UserState} from '../../../../user/UserState';
 import {ListViewModel} from '../../../../view_model/ListViewModel';
-import {useAppMainState, ViewType} from '../../../state';
 import {ListWrapper} from '../ListWrapper';
 
 type ConversationsProps = {
@@ -72,20 +77,31 @@ type ConversationsProps = {
   preferenceNotificationRepository: PreferenceNotificationRepository;
   propertiesRepository: PropertiesRepository;
   selfUser: User;
-  switchList: (list: ListState) => void;
   teamState?: TeamState;
   userState?: UserState;
+  listState: ListState;
+  integrationRepository: IntegrationRepository;
+  searchRepository: SearchRepository;
+  teamRepository: TeamRepository;
+  userRepository: UserRepository;
 };
 
-export enum ConversationViewStyle {
+export enum SidebarTabs {
   RECENT,
   FOLDER,
   FAVORITES,
   GROUPS,
   DIRECTS,
+  ARCHIVES,
+  CONNECT,
+  PREFERENCES,
 }
 
 const Conversations: React.FC<ConversationsProps> = ({
+  integrationRepository,
+  searchRepository,
+  teamRepository,
+  userRepository,
   propertiesRepository,
   conversationRepository,
   preferenceNotificationRepository,
@@ -95,7 +111,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   callState = container.resolve(CallState),
   userState = container.resolve(UserState),
   selfUser,
-  switchList,
+  listState,
 }) => {
   const [conversationsFilter, setConversationsFilter] = useState<string>('');
   const {
@@ -137,35 +153,34 @@ const Conversations: React.FC<ConversationsProps> = ({
   const {notifications} = useKoSubscribableChildren(preferenceNotificationRepository, ['notifications']);
   const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
 
-  const filteredConversations = conversations.filter(conversation =>
-    conversation.display_name().toLowerCase().includes(conversationsFilter.toLowerCase()),
-  );
+  const initialTab = propertiesRepository.getPreference(PROPERTIES_TYPE.INTERFACE.VIEW_FOLDERS)
+    ? SidebarTabs.FOLDER
+    : SidebarTabs.RECENT;
 
-  const initialViewStyle = propertiesRepository.getPreference(PROPERTIES_TYPE.INTERFACE.VIEW_FOLDERS)
-    ? ConversationViewStyle.FOLDER
-    : ConversationViewStyle.RECENT;
-
-  const [viewStyle, setViewStyle] = useState<ConversationViewStyle>(initialViewStyle);
+  const [currentTab, setCurrentTab] = useState<SidebarTabs>(initialTab);
   const showBadge = notifications.length > 0;
 
-  const isRecentViewStyle = viewStyle === ConversationViewStyle.RECENT;
-  const isFolderViewStyle = viewStyle === ConversationViewStyle.FOLDER;
-  const isFavoritesViewStyle = viewStyle === ConversationViewStyle.FAVORITES;
-  const isGroupsViewStyle = viewStyle === ConversationViewStyle.GROUPS;
-  const isDirectsViewStyle = viewStyle === ConversationViewStyle.DIRECTS;
+  const isRecentTab = currentTab === SidebarTabs.RECENT;
+  const isFolderTab = currentTab === SidebarTabs.FOLDER;
+  const isFavoritesTab = currentTab === SidebarTabs.FAVORITES;
+  const isGroupsTab = currentTab === SidebarTabs.GROUPS;
+  const isDirectsTab = currentTab === SidebarTabs.DIRECTS;
+  const isArchivesTab = currentTab === SidebarTabs.ARCHIVES;
+  const isConnectTab = currentTab === SidebarTabs.CONNECT;
+
+  const showSearchInput = isRecentTab || isFavoritesTab || isGroupsTab || isDirectsTab || isArchivesTab;
 
   const hasNoConversations = conversations.length + connectRequests.length === 0;
   const {isOpen: isFolderOpen, openFolder} = useFolderState();
 
-  const {setCurrentView} = useAppMainState(state => state.responsiveView);
-  const {close: closeRightSidebar} = useAppMainState(state => state.rightSidebar);
-
   const showLegalHold = isOnLegalHold || hasPendingLegalHold;
 
+  // const {setCurrentView} = useAppMainState(state => state.responsiveView);
+  // const {close: closeRightSidebar} = useAppMainState(state => state.rightSidebar);
   const onClickPreferences = () => {
-    setCurrentView(ViewType.LEFT_SIDEBAR);
-    switchList(ListState.PREFERENCES);
-    closeRightSidebar();
+    // setCurrentView(ViewType.LEFT_SIDEBAR);
+    // switchList(ListState.PREFERENCES);
+    // closeRightSidebar();
   };
 
   useEffect(() => {
@@ -201,8 +216,8 @@ const Conversations: React.FC<ConversationsProps> = ({
   }, []);
 
   useEffect(() => {
-    propertiesRepository.savePreference(PROPERTIES_TYPE.INTERFACE.VIEW_FOLDERS, isFolderViewStyle);
-  }, [isFolderViewStyle]);
+    propertiesRepository.savePreference(PROPERTIES_TYPE.INTERFACE.VIEW_FOLDERS, isFolderTab);
+  }, [isFolderTab]);
 
   const header = (
     <>
@@ -255,11 +270,14 @@ const Conversations: React.FC<ConversationsProps> = ({
     </>
   );
 
-  function changeViewStyle(viewStyle: ConversationViewStyle) {
-    if (viewStyle !== ConversationViewStyle.RECENT) {
-      setConversationsFilter('');
+  function changeTab(nextTab: SidebarTabs) {
+    if (nextTab === SidebarTabs.ARCHIVES) {
+      // will eventually load missing events from the db
+      conversationRepository.updateArchivedConversations();
     }
-    setViewStyle(viewStyle);
+
+    setConversationsFilter('');
+    setCurrentTab(nextTab);
   }
 
   const sidebar = (
@@ -276,12 +294,12 @@ const Conversations: React.FC<ConversationsProps> = ({
           id="tab-1"
           type="button"
           role="tab"
-          className={cx(`conversations-sidebar-btn`, {active: isRecentViewStyle})}
-          onClick={() => changeViewStyle(ConversationViewStyle.RECENT)}
+          className={cx(`conversations-sidebar-btn`, {active: isRecentTab})}
+          onClick={() => changeTab(SidebarTabs.RECENT)}
           title={t('conversationViewTooltip')}
           data-uie-name="go-recent-view"
-          data-uie-status={isRecentViewStyle ? 'active' : 'inactive'}
-          aria-selected={isRecentViewStyle}
+          data-uie-status={isRecentTab ? 'active' : 'inactive'}
+          aria-selected={isRecentTab}
         >
           <span className="conversations-sidebar-btn--text-wrapper">
             <Icon.ConversationsOutline />
@@ -296,12 +314,12 @@ const Conversations: React.FC<ConversationsProps> = ({
           id="tab-2"
           type="button"
           role="tab"
-          className={cx(`conversations-sidebar-btn`, {active: isFavoritesViewStyle})}
-          onClick={() => changeViewStyle(ConversationViewStyle.FAVORITES)}
+          className={cx(`conversations-sidebar-btn`, {active: isFavoritesTab})}
+          onClick={() => changeTab(SidebarTabs.FAVORITES)}
           title={t('conversationLabelFavorites')}
           data-uie-name="go-favorites-view"
-          data-uie-status={isFavoritesViewStyle ? 'active' : 'inactive'}
-          aria-selected={isFavoritesViewStyle}
+          data-uie-status={isFavoritesTab ? 'active' : 'inactive'}
+          aria-selected={isFavoritesTab}
         >
           <span className="conversations-sidebar-btn--text-wrapper">
             <StarIcon />
@@ -316,12 +334,12 @@ const Conversations: React.FC<ConversationsProps> = ({
           id="tab-3"
           type="button"
           role="tab"
-          className={cx(`conversations-sidebar-btn`, {active: isGroupsViewStyle})}
-          onClick={() => changeViewStyle(ConversationViewStyle.GROUPS)}
+          className={cx(`conversations-sidebar-btn`, {active: isGroupsTab})}
+          onClick={() => changeTab(SidebarTabs.GROUPS)}
           title={t('conversationLabelGroups')}
           data-uie-name="go-favorites-view"
-          data-uie-status={isGroupsViewStyle ? 'active' : 'inactive'}
-          aria-selected={isGroupsViewStyle}
+          data-uie-status={isGroupsTab ? 'active' : 'inactive'}
+          aria-selected={isGroupsTab}
         >
           <span className="conversations-sidebar-btn--text-wrapper">
             <GroupIcon />
@@ -336,12 +354,12 @@ const Conversations: React.FC<ConversationsProps> = ({
           id="tab-4"
           type="button"
           role="tab"
-          className={cx(`conversations-sidebar-btn`, {active: isDirectsViewStyle})}
-          onClick={() => changeViewStyle(ConversationViewStyle.DIRECTS)}
+          className={cx(`conversations-sidebar-btn`, {active: isDirectsTab})}
+          onClick={() => changeTab(SidebarTabs.DIRECTS)}
           title={t('conversationLabelDirects')}
           data-uie-name="go-favorites-view"
-          data-uie-status={isDirectsViewStyle ? 'active' : 'inactive'}
-          aria-selected={isDirectsViewStyle}
+          data-uie-status={isDirectsTab ? 'active' : 'inactive'}
+          aria-selected={isDirectsTab}
         >
           <span className="conversations-sidebar-btn--text-wrapper">
             <Icon.People />
@@ -356,12 +374,12 @@ const Conversations: React.FC<ConversationsProps> = ({
           id="tab-5"
           type="button"
           role="tab"
-          className={cx(`conversations-sidebar-btn`, {active: isFolderViewStyle})}
-          onClick={() => changeViewStyle(ConversationViewStyle.FOLDER)}
+          className={cx(`conversations-sidebar-btn`, {active: isFolderTab})}
+          onClick={() => changeTab(SidebarTabs.FOLDER)}
           title={t('folderViewTooltip')}
           data-uie-name="go-folder-view"
-          data-uie-status={isFolderViewStyle ? 'active' : 'inactive'}
-          aria-selected={isFolderViewStyle}
+          data-uie-status={isFolderTab ? 'active' : 'inactive'}
+          aria-selected={isFolderTab}
         >
           <span className="conversations-sidebar-btn--text-wrapper">
             <Icon.ConversationsFolder />
@@ -376,9 +394,9 @@ const Conversations: React.FC<ConversationsProps> = ({
           <button
             id="tab-6"
             type="button"
-            className="conversations-sidebar-btn"
+            className={cx(`conversations-sidebar-btn`, {active: isArchivesTab})}
             data-uie-name="go-archive"
-            onClick={() => switchList(ListState.ARCHIVE)}
+            onClick={() => changeTab(SidebarTabs.ARCHIVES)}
             title={t('tooltipConversationsArchived', archivedConversations.length)}
           >
             <span className="conversations-sidebar-btn--text-wrapper">
@@ -394,8 +412,8 @@ const Conversations: React.FC<ConversationsProps> = ({
         <button
           id="tab-7"
           type="button"
-          className="conversations-sidebar-btn"
-          onClick={() => switchList(ListState.START_UI)}
+          className={cx(`conversations-sidebar-btn`, {active: isConnectTab})}
+          onClick={() => changeTab(SidebarTabs.CONNECT)}
           title={t('searchConnect', Shortcut.getShortcutTooltip(ShortcutType.START))}
           data-uie-name="go-people"
         >
@@ -438,25 +456,53 @@ const Conversations: React.FC<ConversationsProps> = ({
 
   const {currentFocus, handleKeyDown, resetConversationFocus} = useConversationFocus(conversations);
 
-  function getViewStyleConversations() {
-    if (viewStyle === ConversationViewStyle.FOLDER || viewStyle === ConversationViewStyle.RECENT) {
-      return filteredConversations;
-    }
-
-    if (viewStyle === ConversationViewStyle.GROUPS) {
-      return groupConversations;
-    }
-
-    if (viewStyle === ConversationViewStyle.DIRECTS) {
-      return directConversations;
-    }
-
-    if (viewStyle === ConversationViewStyle.FAVORITES) {
-      return favoriteConversations;
-    }
-
-    return [];
+  function conversationSearchFilter(conversation: Conversation) {
+    return conversation.display_name().toLowerCase().includes(conversationsFilter.toLowerCase());
   }
+
+  function getTabConversations() {
+    if ([SidebarTabs.FOLDER, SidebarTabs.RECENT].includes(currentTab)) {
+      return {
+        conversations: conversations.filter(conversationSearchFilter),
+        searchInputPlaceholder: t('searchConversations'),
+      };
+    }
+
+    if (currentTab === SidebarTabs.GROUPS) {
+      return {
+        conversations: groupConversations.filter(conversationSearchFilter),
+        searchInputPlaceholder: t('searchGroupConversations'),
+      };
+    }
+
+    if (currentTab === SidebarTabs.DIRECTS) {
+      return {
+        conversations: directConversations.filter(conversationSearchFilter),
+        searchInputPlaceholder: t('searchDirectConversations'),
+      };
+    }
+
+    if (currentTab === SidebarTabs.FAVORITES) {
+      return {
+        conversations: favoriteConversations.filter(conversationSearchFilter),
+        searchInputPlaceholder: t('searchFavoriteConversations'),
+      };
+    }
+
+    if (currentTab === SidebarTabs.ARCHIVES) {
+      return {
+        conversations: archivedConversations.filter(conversationSearchFilter),
+        searchInputPlaceholder: t('searchArchivedConversations'),
+      };
+    }
+
+    return {
+      conversations: [],
+      searchInputPlaceholder: '',
+    };
+  }
+
+  const {conversations: currentTabConversations, searchInputPlaceholder} = getTabConversations();
 
   return (
     <div className="conversations-wrapper">
@@ -470,7 +516,7 @@ const Conversations: React.FC<ConversationsProps> = ({
                     brandName: Config.getConfig().BRAND_NAME,
                   })}
                 </div>
-                <button className="button-reset-default text-underline" onClick={() => switchList(ListState.START_UI)}>
+                <button className="button-reset-default text-underline" onClick={() => changeTab(SidebarTabs.CONNECT)}>
                   {t('conversationsNoConversations')}
                 </button>
               </div>
@@ -480,7 +526,7 @@ const Conversations: React.FC<ConversationsProps> = ({
           </>
         ) : (
           <>
-            {isRecentViewStyle && (
+            {showSearchInput && (
               <Input
                 className="label-1"
                 value={conversationsFilter}
@@ -499,29 +545,45 @@ const Conversations: React.FC<ConversationsProps> = ({
                 }
                 inputCSS={searchInputStyles}
                 wrapperCSS={searchInputWrapperStyles}
-                placeholder={t('searchConversations')}
+                placeholder={searchInputPlaceholder}
               />
             )}
-            {filteredConversations.length === 0 && (
+            {showSearchInput && currentTabConversations.length === 0 && (
               <div className="conversations-centered">
                 <div>{t('searchConversationsNoResult')}</div>
-                <button className="button-reset-default text-underline" onClick={() => switchList(ListState.START_UI)}>
+                <button className="button-reset-default text-underline" onClick={() => changeTab(SidebarTabs.CONNECT)}>
                   {t('searchConversationsNoResultConnectSuggestion')}
                 </button>
               </div>
             )}
-            <ConversationsList
-              connectRequests={connectRequests}
-              callState={callState}
-              conversations={getViewStyleConversations()}
-              viewStyle={viewStyle}
-              listViewModel={listViewModel}
-              conversationState={conversationState}
-              conversationRepository={conversationRepository}
-              currentFocus={currentFocus}
-              resetConversationFocus={resetConversationFocus}
-              handleArrowKeyDown={handleKeyDown}
-            />
+
+            {isConnectTab && (
+              <StartUI
+                conversationRepository={conversationRepository}
+                searchRepository={searchRepository}
+                teamRepository={teamRepository}
+                integrationRepository={integrationRepository}
+                mainViewModel={listViewModel.mainViewModel}
+                userRepository={userRepository}
+                isFederated={listViewModel.isFederated}
+                selfUser={selfUser}
+              />
+            )}
+
+            {showSearchInput && (
+              <ConversationsList
+                callState={callState}
+                currentTab={currentTab}
+                currentFocus={currentFocus}
+                listViewModel={listViewModel}
+                connectRequests={connectRequests}
+                handleArrowKeyDown={handleKeyDown}
+                conversationState={conversationState}
+                conversations={currentTabConversations}
+                conversationRepository={conversationRepository}
+                resetConversationFocus={resetConversationFocus}
+              />
+            )}
           </>
         )}
       </ListWrapper>
