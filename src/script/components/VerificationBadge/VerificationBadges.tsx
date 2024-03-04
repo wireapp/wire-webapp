@@ -38,9 +38,10 @@ import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import {useUserIdentity} from 'src/script/hooks/useDeviceIdentities';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
+import {StringIdentifer, t} from 'Util/LocalizerUtil';
 
 type VerificationBadgeContext = 'user' | 'conversation' | 'device';
+
 interface VerificationBadgesProps {
   conversationProtocol?: ConversationProtocol;
   isProteusVerified?: boolean;
@@ -131,8 +132,14 @@ const MLSVerificationBadge = ({context, MLSStatus}: {MLSStatus?: MLSStatuses; co
 
   switch (MLSStatus) {
     case MLSStatuses.VALID:
+      const translationKeys: Record<VerificationBadgeContext, StringIdentifer> = {
+        conversation: 'E2EI.conversationVerified',
+        user: 'E2EI.userDevicesVerified',
+        device: 'E2EI.deviceVerified',
+      };
+
       return (
-        <Tooltip body={t('E2EI.deviceVerified')} {...mlsVerificationProps}>
+        <Tooltip body={t(translationKeys[context])} {...mlsVerificationProps}>
           <MLSVerified />
         </Tooltip>
       );
