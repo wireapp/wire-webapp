@@ -859,7 +859,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     // We should not receive a message for a group the client is not aware of
     if (!groupId) {
       throw new Error(
-        `Could not find a group_id for conversation ${qualifiedConversationId.id}@${qualifiedConversationId.domain}`,
+        `Could not find a group_id for conversation ${qualifiedConversationId.id}@${qualifiedConversationId.domain}${event.subconv ? `/subconversation:${event.subconv}` : ''}`,
       );
     }
 
