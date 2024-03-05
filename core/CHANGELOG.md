@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [45.2.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@45.2.0...@wireapp/core@45.2.1) (2024-03-05)
+
+### Bug Fixes
+
+* Address non-e2ei devices not being able to join conversations ([#6043](https://github.com/wireapp/wire-web-packages/issues/6043)) ([6d904b3](https://github.com/wireapp/wire-web-packages/commit/6d904b30ba392e99d30d14cfc931bc979d9626aa))
+
 # [45.2.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@45.1.1...@wireapp/core@45.2.0) (2024-03-04)
 
 ### Features
