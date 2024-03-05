@@ -20,6 +20,7 @@
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {E2eiConversationState} from '@wireapp/core/lib/messagingProtocols/mls';
+import {StringifiedQualifiedId, stringifyQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 import {container} from 'tsyringe';
 
 import {
@@ -140,25 +141,29 @@ class MLSConversationVerificationStateHandler {
     userIdentities: Map<string, WireIdentity[]> | undefined;
   }> => {
     const userIdentities = await getAllGroupUsersIdentities(conversation.groupId);
-    const processedUserIds: Set<string> = new Set();
+    const processedUserIds: Set<StringifiedQualifiedId> = new Set();
     let userVerificationState = UserVerificationState.ALL_VALID;
 
     if (userIdentities) {
-      for (const [userId, identities] of userIdentities.entries()) {
-        if (processedUserIds.has(userId)) {
+      for (const [stringifiedQualifiedId, identities] of userIdentities.entries()) {
+        if (processedUserIds.has(stringifiedQualifiedId)) {
           continue;
         }
-        processedUserIds.add(userId);
+        processedUserIds.add(stringifiedQualifiedId);
 
         /**
          * We need to wait for the user entity to be available
          * There is a race condition when adding a new user to a conversation, the host will receive the epoch update before the user entity is available
          */
-        const user = await waitFor(() => conversation.allUserEntities().find(user => user.qualifiedId.id === userId));
+        const user = await waitFor(() =>
+          conversation
+            .allUserEntities()
+            .find(user => stringifyQualifiedId(user.qualifiedId) === stringifiedQualifiedId),
+        );
         const identity = identities.at(0);
 
         if (!identity || !user) {
-          this.logger.warn(`Could not find user or identity for userId: ${userId}`);
+          this.logger.warn(`Could not find user or identity for userId: ${stringifiedQualifiedId}`);
           userVerificationState = UserVerificationState.SOME_INVALID;
           break;
         }
@@ -166,7 +171,7 @@ class MLSConversationVerificationStateHandler {
         const matchingName = identity.displayName === user.name();
         const matchingHandle = this.checkUserHandle(identity, user);
         if (!matchingHandle || !matchingName) {
-          this.logger.warn(`User identity and user entity do not match for userId: ${userId}`);
+          this.logger.warn(`User identity and user entity do not match for userId: ${stringifiedQualifiedId}`);
           userVerificationState = UserVerificationState.SOME_INVALID;
           break;
         }
