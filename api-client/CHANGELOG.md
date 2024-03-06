@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [26.11.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@26.11.1...@wireapp/api-client@26.11.2) (2024-03-06)
+
+### Bug Fixes
+
+* **sec:** update deps to silence warning ([#6047](https://github.com/wireapp/wire-web-packages/issues/6047)) ([5ebd008](https://github.com/wireapp/wire-web-packages/commit/5ebd008f2c79ea4dd7291381a03c40435fffb2c5))
+
 ## [26.11.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@26.11.0...@wireapp/api-client@26.11.1) (2024-03-05)
 
 **Note:** Version bump only for package @wireapp/api-client
