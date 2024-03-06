@@ -285,7 +285,7 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
   }
 
   private async addCrlDistributionTimer({expiresAt, url}: {expiresAt: number; url: string}): Promise<void> {
-    await this.coreDatabase.add('crls', {expiresAt, url}, url);
+    await this.coreDatabase.put('crls', {expiresAt, url}, url);
     this.scheduleCrlDistributionTimer({expiresAt, url});
   }
 
@@ -319,7 +319,8 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
   }
 
   private async handleNewCrlDistributionPoints(distributionPoints: string[]): Promise<void> {
-    for (const distributionPointUrl of distributionPoints) {
+    const uniqueDistributionPoints = Array.from(new Set(distributionPoints));
+    for (const distributionPointUrl of uniqueDistributionPoints) {
       await this.validateCrlDistributionPoint(distributionPointUrl);
     }
   }
