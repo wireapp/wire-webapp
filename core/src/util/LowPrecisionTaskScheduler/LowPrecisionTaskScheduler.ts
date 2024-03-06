@@ -20,12 +20,12 @@
 import logdown from 'logdown';
 
 interface IntervalTask {
-  key: string;
   firingDate: number;
   task: () => void;
 }
 
 interface ScheduleLowPrecisionTaskParams extends IntervalTask {
+  key: string;
   intervalDelay: number;
 }
 
@@ -35,7 +35,7 @@ interface CancelLowPrecisionTaskParams {
 }
 
 const logger = logdown('@wireapp/core/TaskScheduler');
-const intervals: Record<number, {timeoutId: NodeJS.Timeout; tasks: IntervalTask[]}> = {};
+const intervals: Record<number, {timeoutId: NodeJS.Timeout; tasks: Record<string, IntervalTask>}> = {};
 
 const addTask = ({key, firingDate, task, intervalDelay}: ScheduleLowPrecisionTaskParams) => {
   const existingIntervalId = intervals[intervalDelay]?.timeoutId;
@@ -43,21 +43,25 @@ const addTask = ({key, firingDate, task, intervalDelay}: ScheduleLowPrecisionTas
     clearInterval(existingIntervalId);
   }
 
-  const tasks = intervals[intervalDelay]?.tasks || [];
-  tasks.push({key, firingDate, task});
+  const tasks = intervals[intervalDelay]?.tasks || {};
+
+  tasks[key] = {firingDate, task};
 
   const timeoutId = setInterval(async () => {
     const nowTime = new Date().getTime();
 
     const tasks = intervals[intervalDelay]?.tasks;
-    if (tasks?.length !== 0) {
-      for (const taskData of tasks) {
-        if (nowTime >= taskData.firingDate) {
-          const {task, key} = taskData;
-          logger.info(`Executing task with key "${key}"`);
-          cancelTask({intervalDelay, key});
-          task();
-        }
+
+    if (!tasks) {
+      return;
+    }
+
+    for (const key in tasks) {
+      if (tasks[key].firingDate <= nowTime) {
+        const {task} = tasks[key];
+        logger.info(`Executing task with key "${key}"`);
+        delete tasks[key];
+        task();
       }
     }
   }, intervalDelay);
@@ -73,12 +77,15 @@ interface CancelLowPrecisionTaskParams {
 
 const cancelTask = ({intervalDelay, key}: CancelLowPrecisionTaskParams) => {
   if (intervals[intervalDelay]) {
-    const tasks = intervals[intervalDelay].tasks || [];
-    const newTasks = tasks.filter(task => task.key !== key);
+    const tasks = intervals[intervalDelay].tasks || {};
+
+    const newTasks = {...tasks};
+    delete newTasks[key];
+
     intervals[intervalDelay].tasks = newTasks;
 
     logger.info(`Scheduled task with key "${key}" prematurely cleared`);
-    if (newTasks.length === 0) {
+    if (Object.keys(newTasks).length === 0) {
       clearInterval(intervals[intervalDelay].timeoutId);
       delete intervals[intervalDelay];
     }

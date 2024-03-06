@@ -86,6 +86,30 @@ describe('LowPrecisionTaskScheduler', () => {
     expect(mockedTask2).toHaveBeenCalled();
   });
 
+  it('adding a task with the same delay and key should overwrite the previous task', async () => {
+    const mockedTask1 = jest.fn().mockReturnValue(Promise.resolve('hello task 1'));
+
+    LowPrecisionTaskScheduler.addTask({
+      key: 'same-key',
+      firingDate: 5000,
+      intervalDelay: 1000,
+      task: mockedTask1,
+    });
+
+    LowPrecisionTaskScheduler.addTask({
+      key: 'same-key',
+      firingDate: 7000,
+      intervalDelay: 1000,
+      task: mockedTask1,
+    });
+
+    await advanceJestTimersWithPromise(5000);
+    expect(mockedTask1).not.toHaveBeenCalled();
+
+    await advanceJestTimersWithPromise(2000);
+    expect(mockedTask1).toHaveBeenCalled();
+  });
+
   it('cancels tasks', async () => {
     const mockedTask3 = jest.fn().mockReturnValue(Promise.resolve('hello task 3'));
     const mockedTask4 = jest.fn().mockReturnValue(Promise.resolve('hello task 4'));
