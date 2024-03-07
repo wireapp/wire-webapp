@@ -156,7 +156,7 @@ jobs:
 
           helm s3 push webapp-*.tgz charts-webapp
 
-      # generates a mapping between branches/tag to aws envs to deploy to
+      # generates a mapping between branches/tag to wire-build branches
       - name: Define target branches in wireapp/wire-builds to bump
         uses: kanga333/variable-mapper@master
         id: output_target_branches
@@ -176,6 +176,9 @@ jobs:
                 "targets": "[\"dev\"]"
               },
               "release/q1-2024": {
+                "targets": "[\"q1-2024\"]"
+              },
+              "release-q1-2024": {
                 "targets": "[\"q1-2024\"]"
               }
             }
