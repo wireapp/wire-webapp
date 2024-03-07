@@ -17,10 +17,12 @@
  *
  */
 
-import {CSSProperties} from 'react';
+import {CSSProperties, useEffect, useRef, useState} from 'react';
 
 import {CSSObject} from '@emotion/react';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
+import {stringifyQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
+import {container} from 'tsyringe';
 
 import {
   CertificateExpiredIcon,
@@ -33,12 +35,15 @@ import {
 
 import {ClientEntity} from 'src/script/client';
 import {ConversationVerificationState} from 'src/script/conversation/ConversationVerificationState';
+import {checkUserHandle} from 'src/script/conversation/ConversationVerificationStateHandler';
 import {MLSStatuses, WireIdentity} from 'src/script/E2EIdentity/E2EIdentityVerification';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import {useUserIdentity} from 'src/script/hooks/useDeviceIdentities';
+import {UserState} from 'src/script/user/UserState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {StringIdentifer, t} from 'Util/LocalizerUtil';
+import {waitFor} from 'Util/waitFor';
 
 type VerificationBadgeContext = 'user' | 'conversation' | 'device';
 
@@ -76,6 +81,32 @@ const useConversationVerificationState = (conversation: Conversation) => {
   return {MLS: mlsState, proteus: proteusVerificationState};
 };
 
+const useMLSStatus = (identity?: WireIdentity) => {
+  const [MLSStatus, setMLSStatus] = useState<MLSStatuses | undefined>(undefined);
+  const {current: userState} = useRef(container.resolve(UserState));
+
+  useEffect(() => {
+    if (!identity) {
+      setMLSStatus(undefined);
+      return;
+    }
+    void (async () => {
+      const user = await waitFor(() =>
+        userState
+          .users()
+          .find(user => stringifyQualifiedId(user.qualifiedId) === stringifyQualifiedId(identity.qualifiedUserId)),
+      );
+      if (!!user) {
+        const matchingName = identity.displayName === user.name();
+        const matchingHandle = checkUserHandle(identity, user);
+        setMLSStatus(matchingName && matchingHandle ? identity.status : undefined);
+      }
+    })();
+  }, [identity, userState]);
+
+  return {MLSStatus};
+};
+
 export const UserVerificationBadges = ({
   user,
   groupId,
@@ -85,7 +116,10 @@ export const UserVerificationBadges = ({
   groupId?: string;
   isSelfUser?: boolean;
 }) => {
-  const {status: MLSStatus} = useUserIdentity(user.qualifiedId, groupId, isSelfUser);
+  const {deviceIdentities} = useUserIdentity(user.qualifiedId, groupId, isSelfUser);
+  const identity = deviceIdentities ? deviceIdentities[0] : undefined;
+  const {MLSStatus} = useMLSStatus(identity);
+
   const {is_verified: isProteusVerified} = useKoSubscribableChildren(user, ['is_verified']);
 
   return <VerificationBadges context="user" isProteusVerified={isProteusVerified} MLSStatus={MLSStatus} />;
@@ -98,7 +132,8 @@ export const DeviceVerificationBadges = ({
   device: ClientEntity;
   getIdentity?: (deviceId: string) => WireIdentity | undefined;
 }) => {
-  const MLSStatus = getIdentity?.(device.id)?.status;
+  const identity = getIdentity?.(device.id);
+  const {MLSStatus} = useMLSStatus(identity);
 
   return (
     <VerificationBadges context="device" isProteusVerified={!!device.meta?.isVerified?.()} MLSStatus={MLSStatus} />
