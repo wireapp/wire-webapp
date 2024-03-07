@@ -20,7 +20,7 @@ jobs:
       wire_builds_target_branches: ${{ steps.output_target_branches.outputs.targets }}
       image_tag: ${{ steps.push_docker_image.outputs.image_tag }}
       release_name: ${{ steps.push_docker_image.outputs.release_name }}
-      chart_version: ${{ steps.publish_helm_chart.outputs.chart_version }}
+      chart_version: ${{ steps.bump_chart_version.outputs.chart_version }}
       changelog: ${{ steps.generate_changelog.outputs.changelog }}
       unit_tests_report: ${{ env.UNIT_TEST_REPORT_FILE }}
       build_artifact: ${{ env.BUILD_ARTIFACT }}
@@ -123,6 +123,39 @@ jobs:
           release_name="${TAG:-v${packageVersion}}"
           echo "release_name=$release_name" >> $GITHUB_OUTPUT
 
+      - uses: azure/setup-helm@v4
+        with:
+          version: '3.12.2'
+
+      - name: Bump helm chart version
+        shell: bash
+        id: bump_chart_version
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_SECRET_ACCESS_KEY }}
+        run: |
+          set -eo pipefail
+
+          image_tag="${{steps.push_docker_image.outputs.image_tag}}"
+
+          helm plugin install https://github.com/hypnoglow/helm-s3.git --version 0.15.1
+
+          helm repo add charts-webapp s3://public.wire.com/charts-webapp
+
+          if [ "${{github.ref}}" =~ "/refs/tags" ]; then
+            chart_version="$(./bin/chart-next-version.sh release)"
+          else
+            chart_version="$(./bin/chart-next-version.sh prerelease)"
+          fi
+          echo "chart_version=$chart_version" >> $GITHUB_OUTPUT
+
+          chart_patched="$(yq -Mr ".version = \"$chart_version\" | .appVersion = \"$image_tag\"" ./charts/webapp/Chart.yaml)"
+          echo "$chart_patched" > ./charts/webapp/Chart.yaml
+
+          helm package ./charts/webapp
+
+          helm s3 push webapp-*.tgz charts-webapp
+
       # generates a mapping between branches/tag to aws envs to deploy to
       - name: Define target branches in wireapp/wire-builds to bump
         uses: kanga333/variable-mapper@master
@@ -159,42 +192,6 @@ jobs:
         target_branch: ${{fromJSON(needs.build.outputs.wire_builds_target_branches)}}
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - uses: azure/setup-helm@v4
-        with:
-          version: '3.12.2'
-
-      - name: Generate helm chart version
-        shell: bash
-        id: generate_chart_version
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_SECRET_ACCESS_KEY }}
-        run: |
-          set -eo pipefail
-
-          image_tag="${{needs.build.outputs.image_tag}}"
-
-          helm plugin install https://github.com/hypnoglow/helm-s3.git --version 0.15.1
-
-          helm repo add charts-webapp s3://public.wire.com/charts-webapp
-
-          if [ "${{github.ref}}" =~ "/refs/tags" ]; then
-            chart_version="$(./bin/chart-next-version.sh release)"
-          else
-            chart_version="$(./bin/chart-next-version.sh prerelease)"
-          fi
-          echo "chart_version=$chart_version" >> $GITHUB_OUTPUT
-
-          chart_patched="$(yq -Mr ".version = \"$chart_version\" | .appVersion = \"$image_tag\"" ./charts/webapp/Chart.yaml)"
-          echo "$chart_patched" > ./charts/webapp/Chart.yaml
-
-          helm package ./charts/webapp
-
-          helm s3 push webapp-*.tgz charts-webapp
-
       - name: Check out wire-builds
         uses: actions/checkout@v4
         with:
