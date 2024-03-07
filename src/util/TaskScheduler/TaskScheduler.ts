@@ -99,9 +99,11 @@ const continueTask = ({key, task}: Omit<ScheduleTaskParams, 'firingDate' | 'pers
   }
 };
 
+const hasActiveTask = (key: string) => !!activeTimeouts[key];
+
 export const TaskScheduler = {
   addTask,
   cancelTask,
   continueTask,
-  hasActiveTask: TaskSchedulerStore.has,
+  hasActiveTask,
 };
