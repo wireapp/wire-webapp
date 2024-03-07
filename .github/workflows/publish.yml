@@ -249,7 +249,7 @@ jobs:
 
   #FUTUREWORK: Remove this job once production builds are based on wireapp/wire-builds
   update_helm_chart:
-    name: 'Bump Helm chart'
+    name: 'Bump Helm chart in wire-server'
     runs-on: ubuntu-latest
     needs: build
 
