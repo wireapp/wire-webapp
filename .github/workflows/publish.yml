@@ -4,6 +4,7 @@ on:
   push:
     branches: [master, dev, release/*]
     tags:
+      - '*q1-2024*'
       - '*staging*'
       - '*production*'
 
