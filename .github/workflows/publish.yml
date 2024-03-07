@@ -175,10 +175,7 @@ jobs:
               "dev": {
                 "targets": "[\"dev\"]"
               },
-              "release/q1-2024": {
-                "targets": "[\"q1-2024\"]"
-              },
-              "release-q1-2024": {
+              "q1-2024": {
                 "targets": "[\"q1-2024\"]"
               }
             }
