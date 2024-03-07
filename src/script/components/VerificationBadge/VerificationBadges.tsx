@@ -81,28 +81,37 @@ const useConversationVerificationState = (conversation: Conversation) => {
   return {MLS: mlsState, proteus: proteusVerificationState};
 };
 
-const useMLSStatus = (identity?: WireIdentity) => {
+const useMLSStatus = (identity?: WireIdentity, userEntity?: User) => {
   const [MLSStatus, setMLSStatus] = useState<MLSStatuses | undefined>(undefined);
+  const [user, setUser] = useState<User | undefined>(userEntity);
   const {current: userState} = useRef(container.resolve(UserState));
 
   useEffect(() => {
     if (!identity) {
-      setMLSStatus(undefined);
       return;
     }
-    void (async () => {
-      const user = await waitFor(() =>
-        userState
-          .users()
-          .find(user => stringifyQualifiedId(user.qualifiedId) === stringifyQualifiedId(identity.qualifiedUserId)),
-      );
-      if (!!user) {
-        const matchingName = identity.displayName === user.name();
-        const matchingHandle = checkUserHandle(identity, user);
-        setMLSStatus(matchingName && matchingHandle ? identity.status : undefined);
-      }
-    })();
-  }, [identity, userState]);
+
+    if (!user) {
+      void (async () => {
+        const user = await waitFor(() =>
+          userState
+            .users()
+            .find(user => stringifyQualifiedId(user.qualifiedId) === stringifyQualifiedId(identity.qualifiedUserId)),
+        );
+        setUser(user);
+      })();
+    }
+  }, [identity, userEntity]);
+
+  useEffect(() => {
+    if (!identity || !user) {
+      return;
+    }
+
+    const matchingName = identity.displayName === user.name();
+    const matchingHandle = checkUserHandle(identity, user);
+    setMLSStatus(matchingName && matchingHandle ? identity.status : undefined);
+  }, [identity, user]);
 
   return {MLSStatus};
 };
@@ -118,7 +127,7 @@ export const UserVerificationBadges = ({
 }) => {
   const {deviceIdentities} = useUserIdentity(user.qualifiedId, groupId, isSelfUser);
   const identity = deviceIdentities ? deviceIdentities[0] : undefined;
-  const {MLSStatus} = useMLSStatus(identity);
+  const {MLSStatus} = useMLSStatus(identity, user);
 
   const {is_verified: isProteusVerified} = useKoSubscribableChildren(user, ['is_verified']);
 
