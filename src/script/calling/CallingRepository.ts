@@ -1034,6 +1034,11 @@ export class CallingRepository {
         continue;
       }
 
+      // If there is already a task for the client, don't overwrite it
+      if (TaskScheduler.hasActiveTask(key)) {
+        continue;
+      }
+
       // otherwise, remove the client from subconversation if it won't establish their audio state in 3 mins timeout
       const firingDate = new Date().getTime() + TIME_IN_MILLIS.MINUTE * 3;
 
