@@ -2,7 +2,7 @@ name: Publish
 
 on:
   push:
-    branches: [master, dev, release/*, chore/publish-tags]
+    branches: [master, dev, release/*]
     tags:
       - '*staging*'
       - '*production*'
@@ -61,29 +61,24 @@ jobs:
         run: yarn --immutable
 
       - name: Test
-        if: false
         run: |
           set -o pipefail
           yarn test --detectOpenHandles=false 2>&1 | tee ${{ env.UNIT_TEST_REPORT_FILE }}
 
       - uses: actions/upload-artifact@v4
-        if: false
         with:
           name: 'unit-tests-report'
           path: ${{env.UNIT_TEST_REPORT_FILE}}
 
       - name: Build
-        if: false
         run: yarn build:prod
 
       - uses: actions/upload-artifact@v4
-        if: false
         with:
           name: 'build-artifact'
           path: '${{env.BUILD_DIR}}${{env.BUILD_ARTIFACT}}'
 
       - uses: kanga333/variable-mapper@master
-        if: false
         id: changelog
         with:
           key: '${{github.ref}}'
@@ -112,7 +107,6 @@ jobs:
           path: ${{ env.CHANGELOG_FILE }}
 
       - name: Push Docker image
-        if: false
         id: push_docker_image
         env:
           DOCKER_PASSWORD: ${{secrets.WEBTEAM_QUAY_PASSWORD}}
@@ -150,9 +144,6 @@ jobs:
               },
               "release/q1-2024": {
                 "targets": "[\"q1-2024\"]"
-              },
-              "chore/publish-tags": {
-                "targets": "[\"test\"]"
               }
             }
           export_to: log,output
@@ -228,7 +219,7 @@ jobs:
             set -e
 
             if (( retry > 1 )); then
-            echo "Retrying..."
+              echo "Retrying..."
             fi
 
             git fetch --depth 1 origin "${{ matrix.target_branch }}"
@@ -247,6 +238,7 @@ jobs:
 
             git add build.json
             git commit -m "Bump webapp to $chart_version"
+            git push origin "${{ matrix.target_branch }}"
 
             ) && break
           done
