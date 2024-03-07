@@ -347,7 +347,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/parser@npm:^7.1.0, @babel/parser@npm:^7.14.7, @babel/parser@npm:^7.20.7, @babel/parser@npm:^7.24.0, @babel/parser@npm:^7.9.4":
+"@babel/parser@npm:^7.1.0, @babel/parser@npm:^7.14.7, @babel/parser@npm:^7.20.15, @babel/parser@npm:^7.20.7, @babel/parser@npm:^7.24.0":
   version: 7.24.0
   resolution: "@babel/parser@npm:7.24.0"
   bin:
@@ -3067,6 +3067,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@jsdoc/salty@npm:^0.2.1":
+  version: 0.2.7
+  resolution: "@jsdoc/salty@npm:0.2.7"
+  dependencies:
+    lodash: ^4.17.21
+  checksum: 020bc5a7f7270c281b854c73ca989c3a8947f0a520cd5142d3d0532ecc54cff05efef56ec2b04ee7628f605776d054033aa7948cd605963c406fe4c6cd4285df
+  languageName: node
+  linkType: hard
+
 "@koush/wrtc@npm:0.5.3":
   version: 0.5.3
   resolution: "@koush/wrtc@npm:0.5.3"
@@ -4648,13 +4657,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^26.11.1":
-  version: 26.11.1
-  resolution: "@wireapp/api-client@npm:26.11.1"
+"@wireapp/api-client@npm:^26.11.2":
+  version: 26.11.2
+  resolution: "@wireapp/api-client@npm:26.11.2"
   dependencies:
     "@wireapp/commons": ^5.2.7
     "@wireapp/priority-queue": ^2.1.5
-    "@wireapp/protocol-messaging": 1.45.0
+    "@wireapp/protocol-messaging": 1.46.0
     axios: 1.6.7
     axios-retry: 4.0.0
     exponential-backoff: 3.1.1
@@ -4666,7 +4675,7 @@ __metadata:
     tough-cookie: 4.1.3
     ws: 8.16.0
     zod: 3.22.4
-  checksum: dcbe8a5da39e7868e7b0a2ad9ada5d2d0111dcf82ec6ce07fbb9f0c8dd750f012740af60df2fcf5d046cc7542848c0a8d2f18daedeb9387f5289e020844730f5
+  checksum: 0090d0fed33c156210447b1c88cd9da7346b94dca195c4e2e821c7fc878829e1030320040ada667e30f029fb77b07b307f282e3ac1e172f9d21766795b6fe264
   languageName: node
   linkType: hard
 
@@ -4712,24 +4721,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core-crypto@npm:1.0.0-rc.47":
-  version: 1.0.0-rc.47
-  resolution: "@wireapp/core-crypto@npm:1.0.0-rc.47"
-  checksum: c6f550346b0ddc30e8efa2a2a50a0a9d69ba7e9bf65512837e059aecd49b2c5eca2564960ff798e8972bf54a12b0c3ed39a388920a2a9b825cf25de1ee0a4132
+"@wireapp/core-crypto@npm:1.0.0-rc.48":
+  version: 1.0.0-rc.48
+  resolution: "@wireapp/core-crypto@npm:1.0.0-rc.48"
+  checksum: 5d20d3978820ec54440573f548857fcef385e9af3fb197e407ba150abac57eb47e5251358eeebfdc3a6747164c4d4032617b83443e4c24aa77cfb65e823daf49
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:45.2.3":
-  version: 45.2.3
-  resolution: "@wireapp/core@npm:45.2.3"
+"@wireapp/core@npm:45.2.5":
+  version: 45.2.5
+  resolution: "@wireapp/core@npm:45.2.5"
   dependencies:
-    "@wireapp/api-client": ^26.11.1
+    "@wireapp/api-client": ^26.11.2
     "@wireapp/commons": ^5.2.7
-    "@wireapp/core-crypto": 1.0.0-rc.47
+    "@wireapp/core-crypto": 1.0.0-rc.48
     "@wireapp/cryptobox": 12.8.0
     "@wireapp/priority-queue": ^2.1.5
     "@wireapp/promise-queue": ^2.3.2
-    "@wireapp/protocol-messaging": 1.45.0
+    "@wireapp/protocol-messaging": 1.46.0
     "@wireapp/store-engine": 5.1.5
     axios: 1.6.7
     bazinga64: ^6.3.4
@@ -4741,7 +4750,7 @@ __metadata:
     long: ^5.2.0
     uuidjs: 4.2.13
     zod: 3.22.4
-  checksum: cea14b4882603c7b18b9b3d467463ff8bff5cbc1e14d0e2bec1f70c63d128b6396cbba3b0950d1c801a9080ec56c116c21b4c6b82110fe8017d6f15e87609443
+  checksum: 5cc83b298c2b67bcbaa228ee408577c610c86b08c44bf330259c09665ec0aa2ac79db03541f5877b5c239abb6a819ca4709574b46045f821fc2faaa96f284f68
   languageName: node
   linkType: hard
 
@@ -4843,15 +4852,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/protocol-messaging@npm:1.45.0":
-  version: 1.45.0
-  resolution: "@wireapp/protocol-messaging@npm:1.45.0"
+"@wireapp/protocol-messaging@npm:1.46.0":
+  version: 1.46.0
+  resolution: "@wireapp/protocol-messaging@npm:1.46.0"
   dependencies:
     long: 5.2.0
     protobufjs: 7.2.4
-    protobufjs-cli: 1.0.2
+    protobufjs-cli: 1.1.2
     typescript: 4.8.4
-  checksum: 5d4fd6689e9ebb59c32cb380e64b852320d6c889caa7735b24e8c0772ddb226655b1a80a4cdd203adfda32fe412b1294bafecee0f745791e2e808fa35a564e16
+  checksum: b4a75b69f0c1b03962f7215aa25da1172bc511f748e463d1aba675c71fc4482d0e5dd70bf267eef833a5fc24a9c9b65c12b0538a3cd113e4e0227335e6675e27
   languageName: node
   linkType: hard
 
@@ -10995,11 +11004,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jsdoc@npm:^3.6.3":
-  version: 3.6.11
-  resolution: "jsdoc@npm:3.6.11"
+"jsdoc@npm:^4.0.0":
+  version: 4.0.2
+  resolution: "jsdoc@npm:4.0.2"
   dependencies:
-    "@babel/parser": ^7.9.4
+    "@babel/parser": ^7.20.15
+    "@jsdoc/salty": ^0.2.1
     "@types/markdown-it": ^12.2.3
     bluebird: ^3.7.2
     catharsis: ^0.9.0
@@ -11012,11 +11022,10 @@ __metadata:
     mkdirp: ^1.0.4
     requizzle: ^0.2.3
     strip-json-comments: ^3.1.0
-    taffydb: 2.6.2
     underscore: ~1.13.2
   bin:
     jsdoc: jsdoc.js
-  checksum: 7920b5cba6200c8f56c9ac2ac5e89d06b6581dd1ce22e66976409fad8b68c16bfd8cd30fe9af58baeacc9f6bd9ba06d901ca4f5e234944f42a3c37e55e4ddcf0
+  checksum: 04bf5ab005349b7581bd0e72ed99933eb71a41dcb47235b486b7d9146fbdf212a53e0cc044abe48ccf46012bd812dc1dfc007c6d679660ebdd053cd000242515
   languageName: node
   linkType: hard
 
@@ -14178,16 +14187,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"protobufjs-cli@npm:1.0.2":
-  version: 1.0.2
-  resolution: "protobufjs-cli@npm:1.0.2"
+"protobufjs-cli@npm:1.1.2":
+  version: 1.1.2
+  resolution: "protobufjs-cli@npm:1.1.2"
   dependencies:
     chalk: ^4.0.0
     escodegen: ^1.13.0
     espree: ^9.0.0
     estraverse: ^5.1.0
     glob: ^8.0.0
-    jsdoc: ^3.6.3
+    jsdoc: ^4.0.0
     minimist: ^1.2.0
     semver: ^7.1.2
     tmp: ^0.2.1
@@ -14197,7 +14206,7 @@ __metadata:
   bin:
     pbjs: bin/pbjs
     pbts: bin/pbts
-  checksum: 75dfa8bb76ea390c4f4926120439892fce6c730ec56960e85d5f03cac9c390fd7467d1254833542d722616ab4cb64a622e6de2fb7c75e7c42972878ae447b773
+  checksum: 21f8e329e7e04d9451f35768502efd4d7adf07153dd214853320ee94ffd22cfa8cf98d8df7b83692adf5e4f041fc78c469dadb508afa60d8c229bed4ebc79345
   languageName: node
   linkType: hard
 
@@ -16049,13 +16058,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"taffydb@npm:2.6.2":
-  version: 2.6.2
-  resolution: "taffydb@npm:2.6.2"
-  checksum: 8fea9cdff71735a40320c4beeb80cb98837076cb89614bc55ac5d67561f35ebae158cfc07a193a1099b5e32746433b2c086b0cd6d56f29aa7c7678e74968335b
-  languageName: node
-  linkType: hard
-
 "tapable@npm:^2.0.0, tapable@npm:^2.1.1, tapable@npm:^2.2.0":
   version: 2.2.1
   resolution: "tapable@npm:2.2.1"
@@ -17393,7 +17395,7 @@ __metadata:
     "@wireapp/avs": 9.6.12
     "@wireapp/commons": 5.2.7
     "@wireapp/copy-config": 2.1.16
-    "@wireapp/core": 45.2.3
+    "@wireapp/core": 45.2.5
     "@wireapp/eslint-config": 3.0.7
     "@wireapp/prettier-config": 0.6.4
     "@wireapp/react-ui-kit": 9.16.0
