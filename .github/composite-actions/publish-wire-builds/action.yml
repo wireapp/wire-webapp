@@ -60,8 +60,6 @@ runs:
           git add build.json
           git commit -m "Bump webapp to $chart_version"
 
-          git push origin "${{ inputs.target_branch }}"
-
           ) && break
         done
         if (( $? != 0 )); then
