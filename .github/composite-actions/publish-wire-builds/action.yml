@@ -13,6 +13,10 @@ inputs:
     description: 'the wire-builds branch to bump the webapp version in'
     required: true
 
+  gh_token:
+    description: 'GitHub token to use for pushing to wire-builds'
+    required: true
+
 runs:
   using: 'composite'
   steps:
@@ -20,7 +24,7 @@ runs:
       uses: actions/checkout@v4
       with:
         repository: wireapp/wire-builds
-        token: ${{secrets.WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN}}
+        token: ${{inputs.gh_token}}
         ref: ${{inputs.target_branch}}
         fetch-depth: 1
 

@@ -211,6 +211,7 @@ jobs:
           chart_version: ${{steps.generate_chart_version.outputs.chart_version}}
           image_tag: ${{needs.build.outputs.image_tag}}
           release_name: ${{needs.build.outputs.release_name}}
+          gh_token: ${{secrets.WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN}}
 
   #FUTUREWORK: Remove this job once production builds are based on wireapp/wire-builds
   update_helm_chart:
