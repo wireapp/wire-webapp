@@ -123,7 +123,7 @@ jobs:
           release_name="${TAG:-v${packageVersion}}"
           echo "release_name=$release_name" >> $GITHUB_OUTPUT
 
-      - uses: azure/setup-helm@v3
+      - uses: azure/setup-helm@v4
         with:
           version: '3.12.2'
         id: install
@@ -193,59 +193,15 @@ jobs:
         target_branch: ${{fromJSON(needs.build.outputs.wire_builds_target_branches)}}
 
     steps:
-      - name: Check out wire-builds
+      - name: Checkout
         uses: actions/checkout@v4
+
+      - uses: ./../composite-actions/publish-wire-builds
         with:
-          repository: wireapp/wire-builds
-          token: ${{secrets.WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN}}
-          ref: ${{matrix.target_branch}}
-          fetch-depth: 1
-
-      - name: Create new build in wire-build
-        shell: bash
-        run: |
-          set -eo pipefail
-
-          chart_version="${{needs.build.outputs.chart_version}}"
-
-          image_tag="${{needs.build.outputs.image_tag}}"
-
-          git config --global user.email "zebot@users.noreply.github.com"
-          git config --global user.name "Zebot"
-
-          for retry in $(seq 3); do
-            (
-            set -e
-
-            if (( retry > 1 )); then
-             echo "Retrying..."
-            fi
-
-            git fetch --depth 1 origin "${{ matrix.target_branch }}"
-            git checkout "${{ matrix.target_branch }}"
-            git reset --hard @{upstream}
-
-            build_json=$(cat ./build.json | \
-              ./bin/set-chart-fields webapp \
-              "version=$chart_version" \
-              "repo=https://s3-eu-west-1.amazonaws.com/public.wire.com/charts-webapp" \
-              "meta.appVersion=$image_tag" \
-              "meta.commitURL=${{github.event.head_commit.url}}" \
-              "meta.commit=${{github.event.head_commit.id}}" \
-              | ./bin/bump-prerelease )
-            echo "$build_json" > ./build.json
-
-            git add build.json
-            git commit -m "Bump webapp to $chart_version"
-
-            git push origin "${{ matrix.target_branch }}"
-
-            ) && break
-          done
-          if (( $? != 0 )); then
-              echo "Retrying didn't help. Failing the step."
-              exit 1
-          fi
+          target_branch: ${{matrix.target_branch}}
+          chart_version: ${{needs.build.outputs.chart_version}}
+          image_tag: ${{needs.build.outputs.image_tag}}
+          release_name: ${{needs.build.outputs.release_name}}
 
   #FUTUREWORK: Remove this job once production builds are based on wireapp/wire-builds
   update_helm_chart:
@@ -286,7 +242,7 @@ jobs:
       - name: Creating Pull Request
         id: create-pr
         if: ${{ steps.release-info-file.outputs.exists == 'true' }}
-        uses: peter-evans/create-pull-request@v5
+        uses: peter-evans/create-pull-request@v6
         with:
           draft: false
           token: ${{ secrets.ZEBOT_GH_TOKEN }}
@@ -347,16 +303,12 @@ jobs:
         target: ${{fromJson(needs.set_deployment_targets.outputs.deployment_targets)}}
 
     steps:
-      - name: Set tag
-        run: |
-          echo "TAG=$(git tag --points-at ${{github.sha}})" >> $GITHUB_ENV
-
       - uses: actions/download-artifact@v4
         with:
           name: 'build-artifact'
 
       - name: Deploy to ${{matrix.target}}
-        uses: einaregilsson/beanstalk-deploy@v21
+        uses: einaregilsson/beanstalk-deploy@v22
         with:
           application_name: Webapp
           aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
@@ -380,10 +332,6 @@ jobs:
       release_url: ${{ steps.release.outputs.url }}
 
     steps:
-      - name: Set tag
-        run: |
-          echo "TAG=$(git tag --points-at ${{github.sha}})" >> $GITHUB_ENV
-
       - uses: actions/download-artifact@v4
         with:
           name: 'changelog'
@@ -393,17 +341,16 @@ jobs:
           name: 'unit-tests-report'
 
       - name: Create GitHub release
-        if: ${{env.TAG}}
         id: 'release'
         uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{github.token}}
         with:
-          tag_name: ${{env.TAG}}
+          tag_name: ${{needs.build.outputs.release_name}}
           body_path: ${{ needs.build.outputs.changelog }}
           files: ${{ needs.build.outputs.unit_tests_report }}
           draft: true
-          prerelease: ${{contains(env.TAG, 'staging')}}
+          prerelease: ${{contains(needs.build.outputs.release_name, 'staging')}}
 
   announce_deployment:
     name: 'Announce deployment to wire chats'
