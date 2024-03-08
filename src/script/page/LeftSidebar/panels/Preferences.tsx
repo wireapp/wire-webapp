@@ -41,7 +41,6 @@ import {ContentState, useAppState} from '../../useAppState';
 
 type PreferencesProps = {
   onPreferenceItemClick: (itemId: ContentState) => void;
-  onClose: () => void;
   teamRepository: Pick<TeamRepository, 'getTeam'>;
   preferenceNotificationRepository: Pick<PreferenceNotificationRepository, 'getNotifications'>;
 };
@@ -152,7 +151,6 @@ const preferencesItems = [
 const Preferences: React.FC<PreferencesProps> = ({
   teamRepository,
   preferenceNotificationRepository,
-  onClose,
   onPreferenceItemClick,
 }) => {
   const contentState = useAppState(state => state.contentState);
@@ -171,7 +169,7 @@ const Preferences: React.FC<PreferencesProps> = ({
   }, [contentState, preferenceNotificationRepository]);
 
   return (
-    <ListWrapper id="preferences" header={t('preferencesHeadline')} onClose={onClose}>
+    <ListWrapper id="preferences" header={t('preferencesHeadline')}>
       <ul
         role="tablist"
         aria-label={t('tooltipPreferencesTabs')}

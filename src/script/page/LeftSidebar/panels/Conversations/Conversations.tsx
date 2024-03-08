@@ -215,56 +215,67 @@ const Conversations: React.FC<ConversationsProps> = ({
     propertiesRepository.savePreference(PROPERTIES_TYPE.INTERFACE.VIEW_FOLDERS, isFolderTab);
   }, [isFolderTab]);
 
-  const header = (
-    <>
-      <button
-        type="button"
-        className={cx(`conversations-settings-button accent-text`, {'conversations-settings--badge': showBadge})}
-        title={t('tooltipConversationsPreferences')}
-        onClick={() => onClickPreferences(ContentState.PREFERENCES_ABOUT)}
-        data-uie-name="go-preferences"
-      >
-        <Icon.Settings />
-      </button>
+  function getHeader() {
+    if (isPreferences) {
+      return null;
+    }
 
-      {teamState.isTeam() ? (
-        <>
-          <button
-            type="button"
-            className="left-list-header-availability"
-            css={{...(showLegalHold && {gridColumn: '2/3'})}}
-            onClick={event => AvailabilityContextMenu.show(event.nativeEvent, 'left-list-availability-menu')}
-          >
-            <UserInfo user={selfUser} className="availability-state" dataUieName="status-availability" showAvailability>
-              <UserVerificationBadges
-                user={selfUser}
-                isSelfUser
-                groupId={conversationState.selfMLSConversation()?.groupId}
-              />
-            </UserInfo>
-          </button>
-
-          {showLegalHold && (
-            <LegalHoldDot
-              isPending={hasPendingLegalHold}
-              dataUieName={hasPendingLegalHold ? 'status-legal-hold-pending' : 'status-legal-hold'}
-              showText
-              isInteractive
-            />
-          )}
-        </>
-      ) : (
-        <span
-          className="left-list-header-text"
-          data-uie-name="status-name"
-          role="presentation"
-          tabIndex={TabIndex.FOCUSABLE}
+    return (
+      <>
+        <button
+          type="button"
+          className={cx(`conversations-settings-button accent-text`, {'conversations-settings--badge': showBadge})}
+          title={t('tooltipConversationsPreferences')}
+          onClick={() => onClickPreferences(ContentState.PREFERENCES_ABOUT)}
+          data-uie-name="go-preferences"
         >
-          {userName}
-        </span>
-      )}
-    </>
-  );
+          <Icon.Settings />
+        </button>
+
+        {teamState.isTeam() ? (
+          <>
+            <button
+              type="button"
+              className="left-list-header-availability"
+              css={{...(showLegalHold && {gridColumn: '2/3'})}}
+              onClick={event => AvailabilityContextMenu.show(event.nativeEvent, 'left-list-availability-menu')}
+            >
+              <UserInfo
+                user={selfUser}
+                className="availability-state"
+                dataUieName="status-availability"
+                showAvailability
+              >
+                <UserVerificationBadges
+                  user={selfUser}
+                  isSelfUser
+                  groupId={conversationState.selfMLSConversation()?.groupId}
+                />
+              </UserInfo>
+            </button>
+
+            {showLegalHold && (
+              <LegalHoldDot
+                isPending={hasPendingLegalHold}
+                dataUieName={hasPendingLegalHold ? 'status-legal-hold-pending' : 'status-legal-hold'}
+                showText
+                isInteractive
+              />
+            )}
+          </>
+        ) : (
+          <span
+            className="left-list-header-text"
+            data-uie-name="status-name"
+            role="presentation"
+            tabIndex={TabIndex.FOCUSABLE}
+          >
+            {userName}
+          </span>
+        )}
+      </>
+    );
+  }
 
   function changeTab(nextTab: SidebarTabs) {
     if (nextTab === SidebarTabs.ARCHIVES) {
@@ -546,10 +557,6 @@ const Conversations: React.FC<ConversationsProps> = ({
     }, ANIMATED_PAGE_TRANSITION_DURATION + 1);
   }
 
-  function goHome() {
-    return selfUser.isTemporaryGuest() ? switchList(ListState.TEMPORARY_GUEST) : switchList(ListState.CONVERSATIONS);
-  }
-
   function getListWrapperItems() {
     if (isPreferences) {
       return (
@@ -557,7 +564,6 @@ const Conversations: React.FC<ConversationsProps> = ({
           onPreferenceItemClick={onClickPreferences}
           teamRepository={teamRepository}
           preferenceNotificationRepository={preferenceNotificationRepository}
-          onClose={goHome}
         />
       );
     }
@@ -643,9 +649,17 @@ const Conversations: React.FC<ConversationsProps> = ({
     );
   }
 
+  const header = getHeader();
+
   return (
     <div className="conversations-wrapper">
-      <ListWrapper id="conversations" headerElement={header} sidebar={sidebar} before={callingView}>
+      <ListWrapper
+        id="conversations"
+        headerElement={header}
+        hasHeader={Boolean(header)}
+        sidebar={sidebar}
+        before={callingView}
+      >
         {getListWrapperItems()}
       </ListWrapper>
     </div>
