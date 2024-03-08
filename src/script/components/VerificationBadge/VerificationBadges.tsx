@@ -17,7 +17,7 @@
  *
  */
 
-import {CSSProperties, useEffect, useRef, useState} from 'react';
+import {CSSProperties, useEffect, useMemo, useRef, useState} from 'react';
 
 import {CSSObject} from '@emotion/react';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
@@ -81,39 +81,15 @@ const useConversationVerificationState = (conversation: Conversation) => {
   return {MLS: mlsState, proteus: proteusVerificationState};
 };
 
-const useMLSStatus = (identity?: WireIdentity, userEntity?: User) => {
-  const [MLSStatus, setMLSStatus] = useState<MLSStatuses | undefined>(undefined);
-  const [user, setUser] = useState<User | undefined>(userEntity);
-  const {current: userState} = useRef(container.resolve(UserState));
+const useMLSStatus = ({identity, user}: {identity?: WireIdentity; user?: User}) => {
+  if (!identity || !user) {
+    return {MLSStatus: undefined};
+  }
 
-  useEffect(() => {
-    if (!identity) {
-      return;
-    }
+  const matchingName = identity.displayName === user.name();
+  const matchingHandle = checkUserHandle(identity, user);
 
-    if (!user) {
-      void (async () => {
-        const user = await waitFor(() =>
-          userState
-            .users()
-            .find(user => stringifyQualifiedId(user.qualifiedId) === stringifyQualifiedId(identity.qualifiedUserId)),
-        );
-        setUser(user);
-      })();
-    }
-  }, [identity, userEntity]);
-
-  useEffect(() => {
-    if (!identity || !user) {
-      return;
-    }
-
-    const matchingName = identity.displayName === user.name();
-    const matchingHandle = checkUserHandle(identity, user);
-    setMLSStatus(matchingName && matchingHandle ? identity.status : undefined);
-  }, [identity, user]);
-
-  return {MLSStatus};
+  return {MLSStatus: matchingName && matchingHandle ? identity.status : undefined};
 };
 
 export const UserVerificationBadges = ({
@@ -125,11 +101,9 @@ export const UserVerificationBadges = ({
   groupId?: string;
   isSelfUser?: boolean;
 }) => {
-  const {deviceIdentities} = useUserIdentity(user.qualifiedId, groupId, isSelfUser);
-  const identity = deviceIdentities ? deviceIdentities[0] : undefined;
-  const {MLSStatus} = useMLSStatus(identity, user);
-
   const {is_verified: isProteusVerified} = useKoSubscribableChildren(user, ['is_verified']);
+  const {deviceIdentities} = useUserIdentity(user.qualifiedId, groupId, isSelfUser);
+  const {MLSStatus} = useMLSStatus({identity: deviceIdentities ? deviceIdentities[0] : undefined, user});
 
   return <VerificationBadges context="user" isProteusVerified={isProteusVerified} MLSStatus={MLSStatus} />;
 };
@@ -141,8 +115,35 @@ export const DeviceVerificationBadges = ({
   device: ClientEntity;
   getIdentity?: (deviceId: string) => WireIdentity | undefined;
 }) => {
-  const identity = getIdentity?.(device.id);
-  const {MLSStatus} = useMLSStatus(identity);
+  const userState = useRef(container.resolve(UserState));
+  const identity = useMemo(() => getIdentity?.(device.id), [device, getIdentity]);
+  const [user, setUser] = useState<User | undefined>(undefined);
+
+  useEffect(() => {
+    // using active flag in combination with the cleanup to prevent race conditions
+    let active = true;
+    void loadUser();
+    return () => {
+      active = false;
+    };
+
+    async function loadUser() {
+      if (!identity) {
+        return;
+      }
+      const userEntity = await waitFor(() =>
+        userState.current
+          .users()
+          .find(user => stringifyQualifiedId(user.qualifiedId) === stringifyQualifiedId(identity.qualifiedUserId)),
+      );
+      if (!active) {
+        return;
+      }
+      setUser(userEntity);
+    }
+  }, [identity]);
+
+  const {MLSStatus} = useMLSStatus({identity, user});
 
   return (
     <VerificationBadges context="device" isProteusVerified={!!device.meta?.isVerified?.()} MLSStatus={MLSStatus} />
