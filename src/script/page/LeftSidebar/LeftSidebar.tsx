@@ -26,7 +26,6 @@ import {CSSTransition, SwitchTransition} from 'react-transition-group';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Conversations} from './panels/Conversations';
-import {Preferences} from './panels/Preferences';
 import {TemporaryGuestConversations} from './panels/TemporatyGuestConversations';
 
 import {User} from '../../entity/User';
@@ -53,9 +52,6 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({listViewModel, selfUser, isAct
 
   const switchList = (list: ListState) => listViewModel.switchList(list);
 
-  const goHome = () =>
-    selfUser.isTemporaryGuest() ? switchList(ListState.TEMPORARY_GUEST) : switchList(ListState.CONVERSATIONS);
-
   useEffect(() => {
     amplify.subscribe(WebAppEvents.SHORTCUT.START, () => switchList(ListState.START_UI));
   }, []);
@@ -79,15 +75,6 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({listViewModel, selfUser, isAct
                 propertiesRepository={propertiesRepository}
                 conversationRepository={conversationRepository}
                 preferenceNotificationRepository={repositories.preferenceNotification}
-              />
-            )}
-
-            {listState === ListState.PREFERENCES && (
-              <Preferences
-                contentViewModel={listViewModel.contentViewModel}
-                teamRepository={repositories.team}
-                preferenceNotificationRepository={repositories.preferenceNotification}
-                onClose={goHome}
               />
             )}
 

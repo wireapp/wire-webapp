@@ -488,7 +488,6 @@ export const Conversation = ({
             isRightSidebarOpen={isRightSidebarOpen}
             isReadOnlyConversation={showReadOnlyConversationMessage}
           />
-
           {activeCalls.map(call => {
             const conversation = conversationState.findConversation(call.conversationId);
             const callingViewModel = mainViewModel.calling;
@@ -511,7 +510,6 @@ export const Conversation = ({
               </div>
             );
           })}
-
           <MessagesList
             conversation={activeConversation}
             selfUser={selfUser}
@@ -535,7 +533,6 @@ export const Conversation = ({
             setMsgElementsFocusable={setMsgElementsFocusable}
             isRightSidebarOpen={isRightSidebarOpen}
           />
-
           {isConversationLoaded &&
             (showReadOnlyConversationMessage ? (
               <ReadOnlyConversationMessage
@@ -562,7 +559,6 @@ export const Conversation = ({
                 uploadFiles={uploadFiles}
               />
             ))}
-
           <div className="conversation-loading">
             <div className="icon-spinner spin accent-text"></div>
           </div>
