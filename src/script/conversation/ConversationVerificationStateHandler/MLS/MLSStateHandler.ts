@@ -125,15 +125,6 @@ class MLSConversationVerificationStateHandler {
     await this.checkAllConversationsVerificationState();
   };
 
-  private checkUserHandle = (identity: WireIdentity, user: User): boolean => {
-    // WireIdentity handle format is "{scheme}%40{username}@{domain}"
-    // Example: wireapp://%40hans.wurst@elna.wire.link
-    const {handle: identityHandle} = identity;
-    // We only want to check the username part of the handle
-    const {username, domain} = user;
-    return identityHandle.includes(`${username()}@${domain}`);
-  };
-
   private checkAllUserCredentialsInConversation = async (
     conversation: MLSCapableConversation,
   ): Promise<{
@@ -169,7 +160,7 @@ class MLSConversationVerificationStateHandler {
         }
 
         const matchingName = identity.displayName === user.name();
-        const matchingHandle = this.checkUserHandle(identity, user);
+        const matchingHandle = checkUserHandle(identity, user);
         if (!matchingHandle || !matchingName) {
           this.logger.warn(`User identity and user entity do not match for userId: ${stringifiedQualifiedId}`);
           userVerificationState = UserVerificationState.SOME_INVALID;
@@ -236,6 +227,15 @@ class MLSConversationVerificationStateHandler {
     }
   };
 }
+
+export const checkUserHandle = (identity: WireIdentity, user: User): boolean => {
+  // WireIdentity handle format is "{scheme}%40{username}@{domain}"
+  // Example: wireapp://%40hans.wurst@elna.wire.link
+  const {handle: identityHandle} = identity;
+  // We only want to check the username part of the handle
+  const {username, domain} = user;
+  return identityHandle.includes(`${username()}@${domain}`);
+};
 
 export const registerMLSConversationVerificationStateHandler = (
   domain: string,
