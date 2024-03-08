@@ -17,10 +17,12 @@
  *
  */
 
-import {CSSProperties} from 'react';
+import {CSSProperties, useEffect, useMemo, useRef, useState} from 'react';
 
 import {CSSObject} from '@emotion/react';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
+import {stringifyQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
+import {container} from 'tsyringe';
 
 import {
   CertificateExpiredIcon,
@@ -33,14 +35,18 @@ import {
 
 import {ClientEntity} from 'src/script/client';
 import {ConversationVerificationState} from 'src/script/conversation/ConversationVerificationState';
+import {checkUserHandle} from 'src/script/conversation/ConversationVerificationStateHandler';
 import {MLSStatuses, WireIdentity} from 'src/script/E2EIdentity/E2EIdentityVerification';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import {useUserIdentity} from 'src/script/hooks/useDeviceIdentities';
+import {UserState} from 'src/script/user/UserState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
+import {StringIdentifer, t} from 'Util/LocalizerUtil';
+import {waitFor} from 'Util/waitFor';
 
 type VerificationBadgeContext = 'user' | 'conversation' | 'device';
+
 interface VerificationBadgesProps {
   conversationProtocol?: ConversationProtocol;
   isProteusVerified?: boolean;
@@ -75,6 +81,17 @@ const useConversationVerificationState = (conversation: Conversation) => {
   return {MLS: mlsState, proteus: proteusVerificationState};
 };
 
+const useMLSStatus = ({identity, user}: {identity?: WireIdentity; user?: User}) => {
+  if (!identity || !user) {
+    return {MLSStatus: undefined};
+  }
+
+  const matchingName = identity.displayName === user.name();
+  const matchingHandle = checkUserHandle(identity, user);
+
+  return {MLSStatus: matchingName && matchingHandle ? identity.status : undefined};
+};
+
 export const UserVerificationBadges = ({
   user,
   groupId,
@@ -84,8 +101,9 @@ export const UserVerificationBadges = ({
   groupId?: string;
   isSelfUser?: boolean;
 }) => {
-  const {status: MLSStatus} = useUserIdentity(user.qualifiedId, groupId, isSelfUser);
   const {is_verified: isProteusVerified} = useKoSubscribableChildren(user, ['is_verified']);
+  const {deviceIdentities} = useUserIdentity(user.qualifiedId, groupId, isSelfUser);
+  const {MLSStatus} = useMLSStatus({identity: deviceIdentities ? deviceIdentities[0] : undefined, user});
 
   return <VerificationBadges context="user" isProteusVerified={isProteusVerified} MLSStatus={MLSStatus} />;
 };
@@ -97,7 +115,35 @@ export const DeviceVerificationBadges = ({
   device: ClientEntity;
   getIdentity?: (deviceId: string) => WireIdentity | undefined;
 }) => {
-  const MLSStatus = getIdentity?.(device.id)?.status;
+  const userState = useRef(container.resolve(UserState));
+  const identity = useMemo(() => getIdentity?.(device.id), [device, getIdentity]);
+  const [user, setUser] = useState<User | undefined>(undefined);
+
+  useEffect(() => {
+    // using active flag in combination with the cleanup to prevent race conditions
+    let active = true;
+    void loadUser();
+    return () => {
+      active = false;
+    };
+
+    async function loadUser() {
+      if (!identity) {
+        return;
+      }
+      const userEntity = await waitFor(() =>
+        userState.current
+          .users()
+          .find(user => stringifyQualifiedId(user.qualifiedId) === stringifyQualifiedId(identity.qualifiedUserId)),
+      );
+      if (!active) {
+        return;
+      }
+      setUser(userEntity);
+    }
+  }, [identity]);
+
+  const {MLSStatus} = useMLSStatus({identity, user});
 
   return (
     <VerificationBadges context="device" isProteusVerified={!!device.meta?.isVerified?.()} MLSStatus={MLSStatus} />
@@ -131,8 +177,14 @@ const MLSVerificationBadge = ({context, MLSStatus}: {MLSStatus?: MLSStatuses; co
 
   switch (MLSStatus) {
     case MLSStatuses.VALID:
+      const translationKeys: Record<VerificationBadgeContext, StringIdentifer> = {
+        conversation: 'E2EI.conversationVerified',
+        user: 'E2EI.userDevicesVerified',
+        device: 'E2EI.deviceVerified',
+      };
+
       return (
-        <Tooltip body={t('E2EI.deviceVerified')} {...mlsVerificationProps}>
+        <Tooltip body={t(translationKeys[context])} {...mlsVerificationProps}>
           <MLSVerified />
         </Tooltip>
       );
