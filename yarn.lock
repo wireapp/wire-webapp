@@ -4062,7 +4062,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:>=13.7.0, @types/node@npm:^20.11.24":
+"@types/node@npm:*, @types/node@npm:>=13.7.0":
   version: 20.11.24
   resolution: "@types/node@npm:20.11.24"
   dependencies:
@@ -4075,6 +4075,15 @@ __metadata:
   version: 16.9.1
   resolution: "@types/node@npm:16.9.1"
   checksum: 41afcf183a22d59323a0199dd7e0f46591247f45fc08a4434edb26d56dc279ae4fdb80f37989ddd7a0f45e3857c4933e6e82057ede09c5a829f77e373e680375
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:^20.11.25":
+  version: 20.11.25
+  resolution: "@types/node@npm:20.11.25"
+  dependencies:
+    undici-types: ~5.26.4
+  checksum: bdb29da3f3dc687a0104cb70e30b5277d9df8f22843a4ed94835762683a95a8a0ea0c2ed0cf96f6eeff348491dd50dd9b20307d08f71ba7cb489d54a81cbbfec
   languageName: node
   linkType: hard
 
@@ -17406,7 +17415,7 @@ __metadata:
     "@types/libsodium-wrappers": ^0
     "@types/linkify-it": 3.0.5
     "@types/markdown-it": 13.0.7
-    "@types/node": ^20.11.24
+    "@types/node": ^20.11.25
     "@types/open-graph": 0.2.5
     "@types/platform": 1.3.6
     "@types/react": 18.2.61
