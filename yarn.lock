@@ -1652,9 +1652,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@csstools/postcss-gradients-interpolation-method@npm:^4.0.10":
-  version: 4.0.10
-  resolution: "@csstools/postcss-gradients-interpolation-method@npm:4.0.10"
+"@csstools/postcss-gradients-interpolation-method@npm:^4.0.11":
+  version: 4.0.11
+  resolution: "@csstools/postcss-gradients-interpolation-method@npm:4.0.11"
   dependencies:
     "@csstools/css-color-parser": ^1.5.2
     "@csstools/css-parser-algorithms": ^2.6.0
@@ -1663,7 +1663,7 @@ __metadata:
     "@csstools/utilities": ^1.0.0
   peerDependencies:
     postcss: ^8.4
-  checksum: f9b68c24ccc8a0c544f24481b6dba10696e6d8efd5e404d7396d515e8ee09b3ce0ec3da2b87697b9409e05e5cbcc00c2451c6e421db49a6f42ee567d8ba43aad
+  checksum: 788affb86d16ef00b1aa8e239c5b6e45bb78d5b67842cbd9ab2bad0227707a35abd2cfae28dbcfd00e578279ddeb3024b325e5d2c44315f4ebf051ec17fc14be
   languageName: node
   linkType: hard
 
@@ -1926,6 +1926,15 @@ __metadata:
   peerDependencies:
     postcss: ^8.4
   checksum: fef582b05fefde5353a5b9931dbd9af64d9b9263a02a7016241ebf061603c91c609c62ee0153fa080e29c46618754b81a7281eaf4574b00c0d67f573b62356a0
+  languageName: node
+  linkType: hard
+
+"@csstools/selector-resolve-nested@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "@csstools/selector-resolve-nested@npm:1.1.0"
+  peerDependencies:
+    postcss-selector-parser: ^6.0.13
+  checksum: bb7591e790cf6112157870f8ba3ebb7018924b88f49feff51ab07476ceca3b290cae900734e0aad30d308add07e07082f0e61625b3931572c04952c5531df2b2
   languageName: node
   linkType: hard
 
@@ -5534,7 +5543,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"autoprefixer@npm:^10.4.17, autoprefixer@npm:^10.4.18":
+"autoprefixer@npm:^10.4.18":
   version: 10.4.18
   resolution: "autoprefixer@npm:10.4.18"
   dependencies:
@@ -6780,10 +6789,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cssdb@npm:^7.11.0":
-  version: 7.11.0
-  resolution: "cssdb@npm:7.11.0"
-  checksum: 49ec8f2224bd353eb042e267c71dc3e2140fceb1f8203b80234625b2c99d8c514ab13564f00342712b756d17887ce47db2417c58e2e95db43c1f88f3a0954a01
+"cssdb@npm:^7.11.1":
+  version: 7.11.2
+  resolution: "cssdb@npm:7.11.2"
+  checksum: 79b2c3b6de1d80c7f3e40f28c06138b7f1ca27fe5d9173195cc781d8acc0261c2bdeccdf141bd035b13709655cf724c8ad4757ddf12a3d21b6d002368c9cb027
   languageName: node
   linkType: hard
 
@@ -13683,15 +13692,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss-nesting@npm:^12.0.3":
-  version: 12.0.3
-  resolution: "postcss-nesting@npm:12.0.3"
+"postcss-nesting@npm:^12.1.0":
+  version: 12.1.0
+  resolution: "postcss-nesting@npm:12.1.0"
   dependencies:
+    "@csstools/selector-resolve-nested": ^1.1.0
     "@csstools/selector-specificity": ^3.0.2
     postcss-selector-parser: ^6.0.13
   peerDependencies:
     postcss: ^8.4
-  checksum: fc876827171e7dd7b14a886515dcfbb8733ccd2b1105ad8f3e6e234956f9c8a180202a8b761aeccdbfcb1ff2beeaaaf2c6009efb13311f6f1a4bbfef6a39879d
+  checksum: 0ed54aed44a7041a28f2e680d07336637ced7366aeba96431b2469cc405e80d74bdebcc3fe0be56a36b9885919ae765a40664923745008577ffd427e22388640
   languageName: node
   linkType: hard
 
@@ -13845,9 +13855,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss-preset-env@npm:^9.4.0":
-  version: 9.4.0
-  resolution: "postcss-preset-env@npm:9.4.0"
+"postcss-preset-env@npm:^9.5.0":
+  version: 9.5.0
+  resolution: "postcss-preset-env@npm:9.5.0"
   dependencies:
     "@csstools/postcss-cascade-layers": ^4.0.3
     "@csstools/postcss-color-function": ^3.0.10
@@ -13855,7 +13865,7 @@ __metadata:
     "@csstools/postcss-exponential-functions": ^1.0.4
     "@csstools/postcss-font-format-keywords": ^3.0.2
     "@csstools/postcss-gamut-mapping": ^1.0.3
-    "@csstools/postcss-gradients-interpolation-method": ^4.0.10
+    "@csstools/postcss-gradients-interpolation-method": ^4.0.11
     "@csstools/postcss-hwb-function": ^3.0.9
     "@csstools/postcss-ic-unit": ^3.0.4
     "@csstools/postcss-initial": ^1.0.1
@@ -13878,12 +13888,12 @@ __metadata:
     "@csstools/postcss-text-decoration-shorthand": ^3.0.4
     "@csstools/postcss-trigonometric-functions": ^3.0.5
     "@csstools/postcss-unset-value": ^3.0.1
-    autoprefixer: ^10.4.17
+    autoprefixer: ^10.4.18
     browserslist: ^4.22.3
     css-blank-pseudo: ^6.0.1
     css-has-pseudo: ^6.0.2
     css-prefers-color-scheme: ^9.0.1
-    cssdb: ^7.11.0
+    cssdb: ^7.11.1
     postcss-attribute-case-insensitive: ^6.0.3
     postcss-clamp: ^4.1.0
     postcss-color-functional-notation: ^6.0.5
@@ -13901,7 +13911,7 @@ __metadata:
     postcss-image-set-function: ^6.0.3
     postcss-lab-function: ^6.0.10
     postcss-logical: ^7.0.1
-    postcss-nesting: ^12.0.3
+    postcss-nesting: ^12.1.0
     postcss-opacity-percentage: ^2.0.0
     postcss-overflow-shorthand: ^5.0.1
     postcss-page-break: ^3.0.4
@@ -13911,7 +13921,7 @@ __metadata:
     postcss-selector-not: ^7.0.2
   peerDependencies:
     postcss: ^8.4
-  checksum: 545ff6f7ce24d40faf9f741fc1939d7ba7ee1fd08089d657689a4c128f0634f3f048e3b6711105f6ccdafa520e4ddb22c68aad7c0c2a1a31ee047ffcd2d64808
+  checksum: dfb5ce90b9547ddeae3a7249c418fb5116949c5d2a445c6e70edb477a59685c01a5c99a76d51db60115a368b9ca92c1210339772aefef09928f4603ae62e0d5e
   languageName: node
   linkType: hard
 
@@ -17460,7 +17470,7 @@ __metadata:
     postcss-import: ^16.0.1
     postcss-less: 6.0.0
     postcss-loader: ^8.1.1
-    postcss-preset-env: ^9.4.0
+    postcss-preset-env: ^9.5.0
     postcss-scss: 4.0.9
     prettier: 3.2.5
     react: 18.2.0
