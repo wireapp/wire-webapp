@@ -31,7 +31,7 @@ import {ConversationState} from '../conversation/ConversationState';
 
 export enum MLSStatuses {
   VALID = 'valid',
-  NOT_DOWNLOADED = 'not_downloaded',
+  NOT_ACTIVATED = 'not_activated',
   EXPIRED = 'expired',
   EXPIRES_SOON = 'expires_soon',
   REVOKED = 'revoked',
