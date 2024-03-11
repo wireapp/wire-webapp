@@ -29,6 +29,8 @@ export const CoreCryptoMLSError = {
     DUPLICATE_MESSAGE: 'We already decrypted this message once',
   },
   CONVERSATION_ALREADY_EXISTS: 'Conversation already exists',
+  ORPHAN_WELCOME_MESSAGE:
+    'Although this Welcome seems valid, the local KeyPackage it references has already been deleted locally. Join this group with an external commit',
 } as const;
 
 export const isCoreCryptoMLSWrongEpochError = (error: unknown): boolean => {
@@ -37,6 +39,10 @@ export const isCoreCryptoMLSWrongEpochError = (error: unknown): boolean => {
 
 export const isCoreCryptoMLSConversationAlreadyExistsError = (error: unknown): boolean => {
   return error instanceof Error && error.message === CoreCryptoMLSError.CONVERSATION_ALREADY_EXISTS;
+};
+
+export const isCoreCryptoMLSOrphanWelcomeMessageError = (error: unknown): boolean => {
+  return error instanceof Error && error.message === CoreCryptoMLSError.ORPHAN_WELCOME_MESSAGE;
 };
 
 const mlsDecryptionErrorsToIgnore: string[] = [

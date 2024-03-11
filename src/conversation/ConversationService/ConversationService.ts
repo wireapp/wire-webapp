@@ -62,7 +62,10 @@ import {MessageTimer, MessageSendingState, RemoveUsersParams} from '../../conver
 import {decryptAsset} from '../../cryptography/AssetCryptography';
 import {MLSService} from '../../messagingProtocols/mls';
 import {queueConversationRejoin} from '../../messagingProtocols/mls/conversationRejoinQueue';
-import {isCoreCryptoMLSWrongEpochError} from '../../messagingProtocols/mls/MLSService/CoreCryptoMLSError';
+import {
+  isCoreCryptoMLSOrphanWelcomeMessageError,
+  isCoreCryptoMLSWrongEpochError,
+} from '../../messagingProtocols/mls/MLSService/CoreCryptoMLSError';
 import {getConversationQualifiedMembers, ProteusService} from '../../messagingProtocols/proteus';
 import {
   AddUsersToProteusConversationParams,
@@ -716,7 +719,29 @@ export class ConversationService extends TypedEventEmitter<Events> {
   }
 
   private async handleMLSWelcomeMessageEvent(event: ConversationMLSWelcomeEvent) {
-    return this.mlsService.handleMLSWelcomeMessageEvent(event, this.apiClient.validatedClientId);
+    try {
+      return await this.mlsService.handleMLSWelcomeMessageEvent(event, this.apiClient.validatedClientId);
+    } catch (error) {
+      if (isCoreCryptoMLSOrphanWelcomeMessageError(error)) {
+        const {qualified_conversation: conversationId} = event;
+
+        // Note that we don't care about a subconversation here, as the welcome message is always for the parent conversation.
+        // Subconversations are always joined via external commit.
+
+        if (!conversationId) {
+          throw new Error('Qualified conversation id is missing in the event');
+        }
+
+        this.logger.info(
+          `Received an orphan welcome message, joining the conversation (${conversationId.id}) via external commit...`,
+        );
+
+        void queueConversationRejoin(conversationId.id, () => this.joinByExternalCommit(conversationId));
+        return null;
+      }
+
+      throw error;
+    }
   }
 
   private async handleOtrMessageAddEvent(event: ConversationOtrMessageAddEvent) {
