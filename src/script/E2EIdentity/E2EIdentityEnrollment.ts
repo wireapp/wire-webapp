@@ -161,7 +161,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     const firingDate = EnrollmentStore.get.timer() || computedFiringDate;
     EnrollmentStore.store.timer(firingDate);
 
-    const isFirstE2EIActivation = !storedE2eActivatedAt;
+    const isFirstE2EIActivation = !storedE2eActivatedAt && !identity;
     if (isFirstE2EIActivation || firingDate <= Date.now()) {
       // We want to automatically trigger the enrollment modal if it's a devices in team that just activated e2eidentity
       // Or if the timer is supposed to fire now
