@@ -25,7 +25,11 @@ import {
   Subconversation,
   SUBCONVERSATION_ID,
 } from '@wireapp/api-client/lib/conversation';
-import {CONVERSATION_EVENT, ConversationMLSMessageAddEvent} from '@wireapp/api-client/lib/event';
+import {
+  CONVERSATION_EVENT,
+  ConversationMLSMessageAddEvent,
+  ConversationMLSWelcomeEvent,
+} from '@wireapp/api-client/lib/event';
 import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
@@ -55,6 +59,15 @@ const createMLSMessageAddEventMock = (
   type: CONVERSATION_EVENT.MLS_MESSAGE_ADD,
   time: '2023-08-21T06:47:43.387Z',
   subconv: subconversationId,
+});
+
+const createMLSWelcomeMessageEventMock = (conversationId: QualifiedId): ConversationMLSWelcomeEvent => ({
+  data: '',
+  conversation: conversationId.id,
+  qualified_conversation: conversationId,
+  from: '',
+  type: CONVERSATION_EVENT.MLS_WELCOME_MESSAGE,
+  time: '2023-08-21T06:47:43.387Z',
 });
 
 jest.mock('../../messagingProtocols/proteus', () => ({
@@ -119,6 +132,7 @@ describe('ConversationService', () => {
       getKeyPackagesPayload: jest.fn(),
       addUsersToExistingConversation: jest.fn(),
       resetKeyMaterialRenewal: jest.fn(),
+      handleMLSWelcomeMessageEvent: jest.fn(),
     } as unknown as MLSService;
 
     const mockedDb = await openDB('core-test-db');
@@ -537,6 +551,28 @@ describe('ConversationService', () => {
 
       expect(conversationService.joinByExternalCommit).not.toHaveBeenCalled();
       expect(subconversationService.joinConferenceSubconversation).toHaveBeenCalledWith(conversationId, 'groupId');
+    });
+
+    it('joins a MLS conversation if it was sent an orphan welcome message', async () => {
+      const [conversationService, {apiClient, mlsService}] = await buildConversationService();
+      const conversationId = {id: 'conversationId', domain: 'staging.zinfra.io'};
+
+      const mockMLSWelcomeMessageEvent = createMLSWelcomeMessageEventMock(conversationId);
+
+      jest
+        .spyOn(mlsService, 'handleMLSWelcomeMessageEvent')
+        .mockRejectedValueOnce(new Error(CoreCryptoMLSError.ORPHAN_WELCOME_MESSAGE));
+
+      jest.spyOn(apiClient.api.conversation, 'getConversation').mockResolvedValueOnce({
+        qualified_id: conversationId,
+        protocol: ConversationProtocol.MLS,
+      } as unknown as Conversation);
+
+      await conversationService.handleEvent(mockMLSWelcomeMessageEvent);
+
+      await new Promise(resolve => setImmediate(resolve));
+
+      expect(conversationService.joinByExternalCommit).toHaveBeenCalledWith(conversationId);
     });
   });
 
