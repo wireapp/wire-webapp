@@ -28,6 +28,7 @@ import {UserState} from 'src/script/user/UserState';
 import * as util from 'Util/util';
 
 import {E2EIHandler} from './E2EIdentityEnrollment';
+import {EnrollmentStore} from './Enrollment.store';
 import {OIDCServiceStore} from './OIDCService/OIDCServiceStorage';
 
 import {ConversationState} from '../conversation/ConversationState';
@@ -69,6 +70,8 @@ describe('E2EIHandler', () => {
     E2EIHandler.resetInstance();
     // Clear all mocks before each test
     jest.clearAllMocks();
+    EnrollmentStore.clear.deviceCreatedAt();
+    EnrollmentStore.clear.timer();
 
     // Mock the Config to enable e2eIdentity
     (util.supportsMLS as jest.Mock).mockReturnValue(true);
@@ -160,6 +163,7 @@ describe('E2EIHandler', () => {
     const conversationState = container.resolve(ConversationState);
     jest.spyOn(conversationState, 'getSelfMLSConversation').mockReturnValue(new Conversation() as any);
 
+    EnrollmentStore.store.e2eiActivatedAt(Date.now());
     jest.spyOn(coreMock.service!.e2eIdentity!, 'isEnrollmentInProgress').mockResolvedValue(false);
     jest.spyOn(coreMock.service!.e2eIdentity!, 'isFreshMLSSelfClient').mockResolvedValue(false);
     jest
