@@ -30,22 +30,24 @@ import {FormattedId} from '../FormattedId';
 interface MLSDeviceDetailsProps {
   isCurrentDevice?: boolean;
   identity?: WireIdentity;
+  isSelfUser?: boolean;
 }
 
-export const MLSDeviceDetails = ({isCurrentDevice, identity}: MLSDeviceDetailsProps) => {
+export const MLSDeviceDetails = ({isCurrentDevice, identity, isSelfUser = false}: MLSDeviceDetailsProps) => {
   if (!isCurrentDevice && !identity) {
     return null;
   }
 
   const certificateState = identity?.status ?? MLSStatuses.NOT_DOWNLOADED;
 
-  if (certificateState === MLSStatuses.NOT_DOWNLOADED && !identity?.thumbprint) {
+  if (!isSelfUser && certificateState === MLSStatuses.NOT_DOWNLOADED) {
     return null;
   }
 
   return (
     <div css={styles.wrapper}>
       <h4 className="paragraph-body-3">{t('mlsSignature', MLSPublicKeys.ED25519.toUpperCase())}</h4>
+
       {identity?.thumbprint && (
         <>
           <p className="label-2 preferences-label preferences-devices-fingerprint-label">{t('mlsThumbprint')}</p>
@@ -56,7 +58,7 @@ export const MLSDeviceDetails = ({isCurrentDevice, identity}: MLSDeviceDetailsPr
         </>
       )}
 
-      {certificateState !== MLSStatuses.NOT_DOWNLOADED && (
+      {(isSelfUser || (!isSelfUser && certificateState !== MLSStatuses.NOT_DOWNLOADED)) && (
         <E2EICertificateDetails identity={identity} isCurrentDevice={isCurrentDevice} />
       )}
     </div>
