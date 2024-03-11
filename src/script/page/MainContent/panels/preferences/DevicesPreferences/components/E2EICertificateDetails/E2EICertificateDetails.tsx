@@ -39,8 +39,8 @@ interface E2EICertificateDetailsProps {
 export const E2EICertificateDetails = ({identity, isCurrentDevice}: E2EICertificateDetailsProps) => {
   const [isCertificateDetailsModalOpen, setIsCertificateDetailsModalOpen] = useState(false);
 
-  const certificateState = identity?.status ?? MLSStatuses.NOT_DOWNLOADED;
-  const isNotDownloaded = certificateState === MLSStatuses.NOT_DOWNLOADED;
+  const certificateState = identity?.status ?? MLSStatuses.NOT_ACTIVATED;
+  const isNotActivated = certificateState === MLSStatuses.NOT_ACTIVATED;
   const isValid = certificateState === MLSStatuses.VALID;
 
   const getCertificate = async () => {
@@ -65,7 +65,7 @@ export const E2EICertificateDetails = ({identity, isCurrentDevice}: E2EICertific
       </div>
 
       <div css={styles.buttonsGroup}>
-        {!isNotDownloaded && (
+        {!isNotActivated && (
           <Button
             variant={ButtonVariant.TERTIARY}
             onClick={() => setIsCertificateDetailsModalOpen(true)}
@@ -84,7 +84,7 @@ export const E2EICertificateDetails = ({identity, isCurrentDevice}: E2EICertific
 
         {isCurrentDevice && (
           <>
-            {isNotDownloaded && (
+            {isNotActivated && (
               <Button variant={ButtonVariant.TERTIARY} onClick={getCertificate} data-uie-name="get-certificate">
                 {t('E2EI.getCertificate')}
               </Button>
