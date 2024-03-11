@@ -77,7 +77,7 @@ export const Device = ({device, isSSO, onSelect, onRemove, getDeviceIdentity, de
           <DeviceVerificationBadges device={device} getIdentity={getDeviceIdentity} />
         </div>
 
-        {deviceIdentity && (
+        {deviceIdentity?.thumbprint && (
           <p className="preferences-devices-id">
             <span>{t('preferencesMLSThumbprint')}</span>
 
