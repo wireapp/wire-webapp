@@ -114,11 +114,11 @@ export const UserVerificationBadges = ({
     identities: deviceIdentities,
     user,
   });
-  const status = !mlsStatuses
-    ? undefined
-    : mlsStatuses.length > 0 && mlsStatuses.every(status => status === MLSStatuses.VALID)
-      ? MLSStatuses.VALID
-      : MLSStatuses.NOT_ACTIVATED;
+
+  let status: MLSStatuses | undefined = undefined;
+  if (mlsStatuses && mlsStatuses.length > 0 && mlsStatuses.every(status => status === MLSStatuses.VALID)) {
+    status = MLSStatuses.VALID;
+  }
 
   return <VerificationBadges context="user" isProteusVerified={isProteusVerified} MLSStatus={status} />;
 };
