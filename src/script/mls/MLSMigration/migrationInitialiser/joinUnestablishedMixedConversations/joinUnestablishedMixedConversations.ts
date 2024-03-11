@@ -17,28 +17,69 @@
  *
  */
 
+import {QualifiedId} from '@wireapp/api-client/lib/user';
+
 import {Account} from '@wireapp/core';
 
 import {isMixedConversation} from 'src/script/conversation/ConversationSelectors';
 import {Conversation} from 'src/script/entity/Conversation';
 import {initMLSGroupConversations} from 'src/script/mls/MLSConversations';
+import {partition} from 'Util/ArrayUtil';
 
 import {mlsMigrationLogger} from '../../MLSMigrationLogger';
 
+interface MigrationJoinMixedConversationHandler {
+  tryEstablishingMLSGroup: (params: {
+    groupId: string;
+    conversationId: QualifiedId;
+    selfUserId: QualifiedId;
+    qualifiedUsers: QualifiedId[];
+  }) => Promise<void>;
+}
+
 interface JoinUnestablishedMixedConversationsParams {
   core: Account;
+  conversationHandler: MigrationJoinMixedConversationHandler;
 }
 
 export const joinUnestablishedMixedConversations = async (
   conversations: Conversation[],
-  {core}: JoinUnestablishedMixedConversationsParams,
+  selfUserId: QualifiedId,
+  {core, conversationHandler}: JoinUnestablishedMixedConversationsParams,
 ) => {
   const mixedConversations = conversations.filter(isMixedConversation);
   mlsMigrationLogger.info(`Found ${mixedConversations.length} "mixed" conversations, joining unestablished ones...`);
 
-  await initMLSGroupConversations(mixedConversations, {
+  const [establishedMixedConversations, unestablishedMixedConversations] = partition(
+    mixedConversations,
+    mixedConversation => mixedConversation.epoch > 0,
+  );
+
+  await initMLSGroupConversations(establishedMixedConversations, {
     core,
     onError: ({id}, error) =>
       mlsMigrationLogger.error(`Failed when joining a mls group of mixed conversation with id ${id}, error: `, error),
   });
+
+  // It's possible that the client has updated the protocol to mixed and then crashed, before it has established the MLS group.
+  // In this case, we should try to establish the MLS group again.
+  for (const conversation of unestablishedMixedConversations) {
+    mlsMigrationLogger.info(`Trying to establish MLS group for mixed conversation with id ${conversation.id}`);
+
+    const otherUsersToAdd = conversation.participating_user_ids();
+
+    try {
+      await conversationHandler.tryEstablishingMLSGroup({
+        conversationId: conversation.qualifiedId,
+        groupId: conversation.groupId,
+        qualifiedUsers: otherUsersToAdd,
+        selfUserId: selfUserId,
+      });
+    } catch (error) {
+      mlsMigrationLogger.error(
+        `Failed to establish MLS group for mixed conversation with id ${conversation.id}, error: `,
+        error,
+      );
+    }
+  }
 };
