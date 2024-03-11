@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [45.2.9](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@45.2.8...@wireapp/core@45.2.9) (2024-03-11)
+
+### Bug Fixes
+
+* Address revoked clients not being detected ([#6068](https://github.com/wireapp/wire-web-packages/issues/6068)) ([00d331b](https://github.com/wireapp/wire-web-packages/commit/00d331bbb37608c208d640d6c7f20ef65a692963))
+
 ## [45.2.8](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@45.2.7...@wireapp/core@45.2.8) (2024-03-11)
 
 **Note:** Version bump only for package @wireapp/core
