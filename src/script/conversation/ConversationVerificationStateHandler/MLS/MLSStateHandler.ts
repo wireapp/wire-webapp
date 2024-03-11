@@ -182,7 +182,7 @@ class MLSConversationVerificationStateHandler {
     const conversations = this.conversationState.conversations();
     await Promise.all(conversations.map(conversation => this.checkConversationVerificationState(conversation)));
   };
-  private onEpochChanged = async ({groupId}: {groupId: string}): Promise<void> => {
+  private onEpochChanged = async ({groupId, epoch: newEpoch}: {groupId: string; epoch: number}): Promise<void> => {
     // There could be a race condition where we would receive an epoch update for a conversation that is not yet known by the webapp.
     // We just wait for it to be available and then check the verification state
     const conversation = await waitFor(() =>
@@ -193,6 +193,7 @@ class MLSConversationVerificationStateHandler {
       return this.logger.warn(`Epoch changed but conversation could not be found after waiting for 5 seconds`);
     }
 
+    conversation.epoch = Number(newEpoch);
     return this.checkConversationVerificationState(conversation);
   };
 
