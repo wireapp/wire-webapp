@@ -188,7 +188,7 @@ const MLSVerificationBadge = ({context, MLSStatus}: {MLSStatus?: MLSStatuses; co
           <MLSVerified />
         </Tooltip>
       );
-    case MLSStatuses.NOT_DOWNLOADED:
+    case MLSStatuses.NOT_ACTIVATED:
       return (
         <Tooltip {...mlsVerificationProps} body={t('E2EI.certificateNotDownloaded')}>
           <CertificateExpiredIcon />
