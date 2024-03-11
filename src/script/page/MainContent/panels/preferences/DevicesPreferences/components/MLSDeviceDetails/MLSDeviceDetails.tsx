@@ -38,9 +38,9 @@ export const MLSDeviceDetails = ({isCurrentDevice, identity, isSelfUser = false}
     return null;
   }
 
-  const certificateState = identity?.status ?? MLSStatuses.NOT_DOWNLOADED;
+  const certificateState = identity?.status ?? MLSStatuses.NOT_ACTIVATED;
 
-  if (!isSelfUser && certificateState === MLSStatuses.NOT_DOWNLOADED) {
+  if (!isSelfUser && certificateState === MLSStatuses.NOT_ACTIVATED) {
     return null;
   }
 
@@ -58,7 +58,7 @@ export const MLSDeviceDetails = ({isCurrentDevice, identity, isSelfUser = false}
         </>
       )}
 
-      {(isSelfUser || (!isSelfUser && certificateState !== MLSStatuses.NOT_DOWNLOADED)) && (
+      {(isSelfUser || (!isSelfUser && certificateState !== MLSStatuses.NOT_ACTIVATED)) && (
         <E2EICertificateDetails identity={identity} isCurrentDevice={isCurrentDevice} />
       )}
     </div>
