@@ -81,7 +81,7 @@ const useConversationVerificationState = (conversation: Conversation) => {
   return {MLS: mlsState, proteus: proteusVerificationState};
 };
 
-const useMLSStatuses = ({identities, user}: {identities?: WireIdentity[]; user?: User}): MLSStatuses[] | undefined => {
+const getMLSStatuses = ({identities, user}: {identities?: WireIdentity[]; user?: User}): MLSStatuses[] | undefined => {
   if (!identities || !user) {
     return undefined;
   }
@@ -109,11 +109,11 @@ export const UserVerificationBadges = ({
 }) => {
   const {is_verified: isProteusVerified} = useKoSubscribableChildren(user, ['is_verified']);
   const {deviceIdentities} = useUserIdentity(user.qualifiedId, groupId, isSelfUser);
-  const mlsStatuses = useMLSStatuses({
+
+  const mlsStatuses = getMLSStatuses({
     identities: deviceIdentities,
     user,
   });
-
   const status = !mlsStatuses
     ? undefined
     : mlsStatuses.length > 0 && mlsStatuses.every(status => status === MLSStatuses.VALID)
@@ -158,12 +158,13 @@ export const DeviceVerificationBadges = ({
     }
   }, [identity]);
 
-  const mlsStatuses = useMLSStatuses({identities: identity ? [identity] : [], user});
-  const mlsStatus = mlsStatuses?.[0];
+  let status: MLSStatuses | undefined = undefined;
+  if (identity && user) {
+    const mlsStatuses = getMLSStatuses({identities: [identity], user});
+    status = mlsStatuses?.[0];
+  }
 
-  return (
-    <VerificationBadges context="device" isProteusVerified={!!device.meta?.isVerified?.()} MLSStatus={mlsStatus} />
-  );
+  return <VerificationBadges context="device" isProteusVerified={!!device.meta?.isVerified?.()} MLSStatus={status} />;
 };
 
 type ConversationVerificationBadgeProps = {
