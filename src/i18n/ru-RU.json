@@ -67,7 +67,6 @@
   "E2EI.getCertificate": "Получить сертификат",
   "E2EI.notAvailable": "Недоступно",
   "E2EI.not_activated": "Не активирован",
-  "E2EI.not_downloaded": "Не скачан",
   "E2EI.revoked": "Отозван",
   "E2EI.serialNumber": "Серийный номер: ",
   "E2EI.showCertificateDetails": "Показать сведения о сертификате",

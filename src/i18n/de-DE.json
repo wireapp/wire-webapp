@@ -67,7 +67,6 @@
   "E2EI.getCertificate": "Zertifikat erhalten",
   "E2EI.notAvailable": "Nicht verfügbar",
   "E2EI.not_activated": "Nicht aktiviert",
-  "E2EI.not_downloaded": "Nicht heruntergeladen",
   "E2EI.revoked": "Widerrufen",
   "E2EI.serialNumber": "Seriennummer: ",
   "E2EI.showCertificateDetails": "Zertifikatsdetails anzeigen",
