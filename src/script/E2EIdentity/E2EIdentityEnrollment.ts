@@ -141,7 +141,8 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
    */
   public async startTimers() {
     // We store the first time the user was prompted with the enrollment modal
-    const e2eActivatedAt = EnrollmentStore.get.e2eiActivatedAt() || Date.now();
+    const storedE2eActivatedAt = EnrollmentStore.get.e2eiActivatedAt();
+    const e2eActivatedAt = storedE2eActivatedAt || Date.now();
     EnrollmentStore.store.e2eiActivatedAt(e2eActivatedAt);
 
     const timerKey = 'enrollmentTimer';
@@ -160,7 +161,10 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     const firingDate = EnrollmentStore.get.timer() || computedFiringDate;
     EnrollmentStore.store.timer(firingDate);
 
-    if (firingDate <= Date.now()) {
+    const isFirstE2EIActivation = !storedE2eActivatedAt;
+    if (isFirstE2EIActivation || firingDate <= Date.now()) {
+      // We want to automatically trigger the enrollment modal if it's a devices in team that just activated e2eidentity
+      // Or if the timer is supposed to fire now
       void task();
     } else {
       LowPrecisionTaskScheduler.addTask({
