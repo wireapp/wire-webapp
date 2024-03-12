@@ -101,10 +101,7 @@ const centerInputAction: CSSObject = {
   transform: 'translateY(-50%)',
 };
 
-export const Input: React.FC<InputProps<HTMLInputElement>> = React.forwardRef<
-  HTMLInputElement,
-  InputProps<HTMLInputElement>
->(
+export const Input = React.forwardRef<HTMLInputElement, InputProps<HTMLInputElement>>(
   (
     {
       type,

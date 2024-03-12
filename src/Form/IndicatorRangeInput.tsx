@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, HTMLProps, PropsWithRef, forwardRef, useMemo} from 'react';
+import {HTMLProps, PropsWithRef, forwardRef, useMemo} from 'react';
 
 import {CSSObject} from '@emotion/react';
 
@@ -39,10 +39,7 @@ export interface IndicatorRangeInputProps<T = HTMLInputElement> extends PropsWit
   dataListOptions: DataListOptions[];
 }
 
-export const IndicatorRangeInput: FC<IndicatorRangeInputProps> = forwardRef<
-  HTMLInputElement,
-  IndicatorRangeInputProps<HTMLInputElement>
->(
+export const IndicatorRangeInput = forwardRef<HTMLInputElement, IndicatorRangeInputProps<HTMLInputElement>>(
   (
     {
       id = Math.random().toString(),
