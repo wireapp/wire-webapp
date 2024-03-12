@@ -825,7 +825,7 @@ export class MessageRepository {
     }
 
     if (isMLS) {
-      void this.conversationRepositoryProvider().refreshMLSConversationVerificationState(conversation);
+      await this.conversationRepositoryProvider().refreshMLSConversationVerificationState(conversation);
     }
 
     const sendOptions: Parameters<typeof conversationService.send>[0] = isMLS
