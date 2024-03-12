@@ -349,7 +349,8 @@ export const InputBar = ({
     resetDraftState();
   };
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
+    await conversationRepository.refreshMLSConversationVerificationState(conversation);
     const isE2EIDegraded = conversation.mlsVerificationState() === ConversationVerificationState.DEGRADED;
 
     if (isE2EIDegraded) {
