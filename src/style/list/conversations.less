@@ -128,34 +128,6 @@
   svg {
     margin-bottom: 4px;
   }
-
-  .people-outline path {
-    body.theme-dark & {
-      fill: var(--gray-100);
-    }
-  }
-
-  .conversations-outline,
-  .folders-outline {
-    fill: transparent;
-    body.theme-dark & path {
-      stroke: var(--gray-100);
-    }
-
-    &.active path {
-      fill: var(--accent-color-500) !important;
-      stroke: var(--accent-color-500) !important;
-    }
-  }
-
-  .conversations-outline.active {
-    path:last-child {
-      stroke: var(--gray-10) !important;
-    }
-    body.theme-dark & path:last-child {
-      stroke: var(--gray-95) !important;
-    }
-  }
 }
 
 .conversations-settings-button {
