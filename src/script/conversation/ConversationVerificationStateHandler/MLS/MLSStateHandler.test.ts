@@ -28,25 +28,8 @@ import {waitFor} from 'Util/waitFor';
 
 import {MLSConversationVerificationStateHandler} from './MLSStateHandler';
 
-const createMLSConversationVerificationStateHandler = (
-  domain: string,
-  onConversationVerificationStateChange: OnConversationE2EIVerificationStateChange,
-  onSelfClientCertificateRevoked: () => Promise<void>,
-  conversationState: ConversationState,
-  core: Core,
-) => {
-  return new MLSConversationVerificationStateHandler(
-    domain,
-    onConversationVerificationStateChange,
-    onSelfClientCertificateRevoked,
-    conversationState,
-    core,
-  );
-};
-
 import {ConversationState} from '../../ConversationState';
 import {ConversationVerificationState} from '../../ConversationVerificationState';
-import {OnConversationE2EIVerificationStateChange} from '../shared';
 
 describe('MLSConversationVerificationStateHandler', () => {
   const conversationState = new ConversationState();
@@ -65,7 +48,7 @@ describe('MLSConversationVerificationStateHandler', () => {
     core.service!.mls = undefined;
 
     const t = () =>
-      createMLSConversationVerificationStateHandler(
+      new MLSConversationVerificationStateHandler(
         'domain',
         () => {},
         async () => {},
@@ -79,7 +62,7 @@ describe('MLSConversationVerificationStateHandler', () => {
   it('should do nothing if e2eIdentity service is not available', () => {
     core.service!.e2eIdentity = undefined;
 
-    createMLSConversationVerificationStateHandler(
+    new MLSConversationVerificationStateHandler(
       'domain',
       () => {},
       async () => {},
@@ -100,7 +83,7 @@ describe('MLSConversationVerificationStateHandler', () => {
         .spyOn(core.service!.mls!, 'on')
         .mockImplementation((_event, listener) => (triggerEpochChange = listener) as any);
 
-      createMLSConversationVerificationStateHandler(
+      new MLSConversationVerificationStateHandler(
         'domain',
         () => {},
         async () => {},
@@ -123,7 +106,7 @@ describe('MLSConversationVerificationStateHandler', () => {
         .spyOn(core.service!.mls!, 'on')
         .mockImplementation((_event, listener) => (triggerEpochChange = listener) as any);
 
-      createMLSConversationVerificationStateHandler(
+      new MLSConversationVerificationStateHandler(
         'domain',
         () => {},
         async () => {},
@@ -147,7 +130,7 @@ describe('MLSConversationVerificationStateHandler', () => {
         .spyOn(core.service!.mls!, 'on')
         .mockImplementation((_event, listener) => (triggerEpochChange = listener) as any);
 
-      createMLSConversationVerificationStateHandler(
+      new MLSConversationVerificationStateHandler(
         'domain',
         () => {},
         async () => {},
@@ -171,7 +154,7 @@ describe('MLSConversationVerificationStateHandler', () => {
         .spyOn(core.service!.mls!, 'on')
         .mockImplementation((_event, listener) => (triggerEpochChange = listener) as any);
 
-      createMLSConversationVerificationStateHandler(
+      new MLSConversationVerificationStateHandler(
         'domain',
         () => {},
         async () => {},
@@ -197,7 +180,7 @@ describe('MLSConversationVerificationStateHandler', () => {
         .spyOn(core.service!.mls!, 'on')
         .mockImplementation((_event, listener) => (triggerEpochChange = listener) as any);
 
-      createMLSConversationVerificationStateHandler(
+      new MLSConversationVerificationStateHandler(
         'domain',
         () => {},
         async () => {},
