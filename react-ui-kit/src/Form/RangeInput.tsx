@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, forwardRef} from 'react';
+import {forwardRef} from 'react';
 
 import {CSSObject} from '@emotion/react';
 
@@ -39,7 +39,7 @@ export interface RangeInputProps<T = HTMLInputElement> extends TextProps<T> {
   wrapperCSS?: CSSObject;
 }
 
-export const RangeInput: FC<RangeInputProps> = forwardRef<HTMLInputElement, RangeInputProps<HTMLInputElement>>(
+export const RangeInput = forwardRef<HTMLInputElement, RangeInputProps<HTMLInputElement>>(
   (
     {
       id = Math.random().toString(),

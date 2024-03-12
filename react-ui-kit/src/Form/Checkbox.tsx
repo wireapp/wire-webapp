@@ -120,7 +120,7 @@ interface CheckboxProps<T = HTMLInputElement> extends InputProps<T> {
   outlineOffset?: string;
 }
 
-export const Checkbox: React.FC<CheckboxProps> = React.forwardRef<HTMLInputElement, CheckboxProps>(
+export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
   (
     {
       id,

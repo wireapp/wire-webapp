@@ -57,10 +57,9 @@ const digitInputStyle: <T>(theme: Theme, props: DigitInputProps<T>) => CSSObject
   height: '56px',
 });
 
-const DigitInput: React.FC<DigitInputProps<HTMLInputElement>> = React.forwardRef<
-  HTMLInputElement,
-  DigitInputProps<HTMLInputElement>
->((props, ref) => <input ref={ref} css={(theme: Theme) => digitInputStyle(theme, props)} {...props} type="tel" />);
+const DigitInput = React.forwardRef<HTMLInputElement, DigitInputProps<HTMLInputElement>>((props, ref) => (
+  <input ref={ref} css={(theme: Theme) => digitInputStyle(theme, props)} {...props} type="tel" />
+));
 DigitInput.displayName = 'DigitInput';
 export interface CodeInputProps<T = HTMLInputElement> extends InputProps<T> {
   autoFocus?: boolean;

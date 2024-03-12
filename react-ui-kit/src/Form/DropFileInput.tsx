@@ -17,7 +17,7 @@
  *
  */
 
-import {useState, FC, forwardRef, DragEvent} from 'react';
+import {useState, forwardRef, DragEvent} from 'react';
 import * as React from 'react';
 
 import {CSSObject} from '@emotion/react';
@@ -92,10 +92,7 @@ export const dropFileZonDescriptionStyle: CSSObject = {
   whiteSpace: 'pre-line',
 };
 
-export const DropFileInput: FC<DropFileInputProps<HTMLInputElement>> = forwardRef<
-  HTMLInputElement,
-  DropFileInputProps<HTMLInputElement>
->(
+export const DropFileInput = forwardRef<HTMLInputElement, DropFileInputProps<HTMLInputElement>>(
   (
     {
       onFilesUploaded,
