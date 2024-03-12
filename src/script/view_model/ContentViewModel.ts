@@ -33,6 +33,7 @@ import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 
 import {Config} from '../Config';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
+import {isMLSConversation} from '../conversation/ConversationSelectors';
 import {ConversationState} from '../conversation/ConversationState';
 import {MessageRepository} from '../conversation/MessageRepository';
 import {Conversation} from '../entity/Conversation';
@@ -297,7 +298,9 @@ export class ContentViewModel {
         this.conversationState.activeConversation(conversationEntity);
       }
 
-      void this.conversationRepository.refreshMLSConversationVerificationState(conversationEntity);
+      if (isMLSConversation(conversationEntity)) {
+        void this.conversationRepository.refreshMLSConversationVerificationState(conversationEntity);
+      }
       const messageEntity = openFirstSelfMention ? conversationEntity.getFirstUnreadSelfMention() : exposeMessageEntity;
       this.changeConversation(conversationEntity, messageEntity);
       this.showAndNavigate(conversationEntity, openNotificationSettings);
