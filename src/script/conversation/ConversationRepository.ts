@@ -48,7 +48,7 @@ import {MLSCreateConversationResponse} from '@wireapp/core/lib/conversation';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {container} from 'tsyringe';
-import {flatten} from 'underscore';
+import {flatten, throttle} from 'underscore';
 
 import {Asset as ProtobufAsset, Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -337,13 +337,13 @@ export class ConversationRepository {
     );
   };
 
-  public refreshMLSConversationVerificationState = (conversation: Conversation): Promise<void> => {
+  public refreshMLSConversationVerificationState = throttle((conversation: Conversation) => {
     if (!this.mlsConversationVerificationStateHandler) {
       throw new Error('MLSConversationVerificationStateHandler is not registered');
     }
 
     return this.mlsConversationVerificationStateHandler.checkConversationVerificationState(conversation);
-  };
+  }, 3000);
 
   checkMessageTimer(messageEntity: ContentMessage): void {
     this.ephemeralHandler.checkMessageTimer(messageEntity, this.serverTimeHandler.getTimeOffset());

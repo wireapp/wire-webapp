@@ -824,6 +824,10 @@ export class MessageRepository {
       await this.conversationRepositoryProvider().makeSureMLS1to1ConversationIsEstablished(conversation);
     }
 
+    if (isMLS) {
+      void this.conversationRepositoryProvider().refreshMLSConversationVerificationState(conversation);
+    }
+
     const sendOptions: Parameters<typeof conversationService.send>[0] = isMLS
       ? {
           groupId: conversation.groupId,
