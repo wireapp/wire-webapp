@@ -337,12 +337,10 @@ export class ConversationRepository {
     );
   };
 
-  public refreshMLSConversationVerificationState = (conversation: Conversation) => {
-    if (!this.mlsConversationVerificationStateHandler) {
-      return;
+  public refreshMLSConversationVerificationState = async (conversation: Conversation) => {
+    if (this.mlsConversationVerificationStateHandler) {
+      await this.mlsConversationVerificationStateHandler.checkConversationVerificationState(conversation);
     }
-
-    return this.mlsConversationVerificationStateHandler.checkConversationVerificationState(conversation);
   };
 
   checkMessageTimer(messageEntity: ContentMessage): void {
