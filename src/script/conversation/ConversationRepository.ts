@@ -339,7 +339,7 @@ export class ConversationRepository {
 
   public refreshMLSConversationVerificationState = throttle((conversation: Conversation) => {
     if (!this.mlsConversationVerificationStateHandler) {
-      throw new Error('MLSConversationVerificationStateHandler is not registered');
+      return;
     }
 
     return this.mlsConversationVerificationStateHandler.checkConversationVerificationState(conversation);
