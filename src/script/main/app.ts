@@ -59,7 +59,6 @@ import {ConnectionService} from '../connection/ConnectionService';
 import {ConversationRepository} from '../conversation/ConversationRepository';
 import {ConversationService} from '../conversation/ConversationService';
 import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
-import {registerMLSConversationVerificationStateHandler} from '../conversation/ConversationVerificationStateHandler';
 import {OnConversationE2EIVerificationStateChange} from '../conversation/ConversationVerificationStateHandler/shared';
 import {EventBuilder} from '../conversation/EventBuilder';
 import {MessageRepository} from '../conversation/MessageRepository';
@@ -450,7 +449,7 @@ export class App {
       if (supportsMLS()) {
         //if mls is supported, we need to initialize the callbacks (they are used when decrypting messages)
         conversationRepository.initMLSConversationRecoveredListener();
-        registerMLSConversationVerificationStateHandler(
+        conversationRepository.registerMLSConversationVerificationStateHandler(
           selfUser.qualifiedId.domain,
           this.updateConversationE2EIVerificationState,
           this.showClientCertificateRevokedWarning,
