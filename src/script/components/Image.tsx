@@ -118,14 +118,12 @@ export const Image = ({
     objectFit: 'contain',
   };
 
-  const status = imageUrl ? 'loaded' : 'loading';
-
   return (
     <InViewport
       onVisible={() => setIsInViewport(true)}
       css={imageWrapperStyle}
       className={className}
-      data-uie-status={status}
+      data-uie-status={imageUrl ? 'loaded' : 'loading'}
       {...props}
     >
       {imageUrl ? (
