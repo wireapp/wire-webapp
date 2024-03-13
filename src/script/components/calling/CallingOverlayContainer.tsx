@@ -106,7 +106,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
     call.maximizedParticipant(participant);
   };
 
-  const setActiveCallViewTab = (tab: string) => {
+  const setActiveCallViewTab = (tab: CallViewTab) => {
     callState.activeCallViewTab(tab);
     if (tab === CallViewTab.ALL && joinedCall) {
       callingRepository.requestCurrentPageVideoStreams(joinedCall);

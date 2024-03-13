@@ -19,7 +19,7 @@
 
 import {act, render} from '@testing-library/react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {AddUsersFailureReasons} from '@wireapp/core/lib/conversation';
+import {AddUsersFailure, AddUsersFailureReasons} from '@wireapp/core/lib/conversation';
 
 import en from 'I18n/en-US.json';
 import {withTheme, generateQualifiedIds} from 'src/script/auth/util/test/TestUtil';
@@ -32,16 +32,10 @@ import {FailedToAddUsersMessage} from './FailedToAddUsersMessage';
 
 setStrings({en});
 
-const createFailedToAddUsersMessage = ({
-  users,
-  reason = AddUsersFailureReasons.UNREACHABLE_BACKENDS,
-  backends = [],
-}: {
-  users: QualifiedId[];
-  reason?: AddUsersFailureReasons;
-  backends?: string[];
-}) => {
-  return new FailedToAddUsersMessageEntity(users, reason, backends, Date.now());
+const createFailedToAddUsersMessages = (
+  failures: AddUsersFailure[] = [{users: [], backends: [], reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS}],
+) => {
+  return new FailedToAddUsersMessageEntity(failures, Date.now());
 };
 
 function createUser(qualifiedId: QualifiedId, name: string) {
@@ -58,9 +52,13 @@ describe('FailedToAddUsersMessage', () => {
     const user1 = createUser(qualifiedId1, 'Felix');
     userState.users.push(user1);
 
-    const message = createFailedToAddUsersMessage({
-      users: [qualifiedId1],
-    });
+    const message = createFailedToAddUsersMessages([
+      {
+        users: [qualifiedId1],
+        reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS,
+        backends: [],
+      },
+    ]);
 
     const {getAllByText} = render(
       withTheme(<FailedToAddUsersMessage isMessageFocused message={message} userState={userState} />),
@@ -83,10 +81,13 @@ describe('FailedToAddUsersMessage', () => {
     const user3 = createUser(qualifiedId3, 'Patryk');
     userState.users([user1, user2, user3]);
 
-    const message = createFailedToAddUsersMessage({
-      users: [qualifiedId1, qualifiedId2, qualifiedId3],
-      reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS,
-    });
+    const message = createFailedToAddUsersMessages([
+      {
+        users: [qualifiedId1, qualifiedId2, qualifiedId3],
+        reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS,
+        backends: [],
+      },
+    ]);
 
     const {getAllByText} = render(
       withTheme(<FailedToAddUsersMessage isMessageFocused message={message} userState={userState} />),
@@ -107,11 +108,13 @@ describe('FailedToAddUsersMessage', () => {
     const user3 = createUser(qualifiedId3, 'Przemek');
     userState.users([user1, user2, user3]);
 
-    const message = createFailedToAddUsersMessage({
-      users: [qualifiedId1, qualifiedId2, qualifiedId3],
-      backends: ['test.domain'],
-      reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS,
-    });
+    const message = createFailedToAddUsersMessages([
+      {
+        users: [qualifiedId1, qualifiedId2, qualifiedId3],
+        backends: ['test.domain'],
+        reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS,
+      },
+    ]);
 
     const {getByText, getAllByText} = render(
       withTheme(<FailedToAddUsersMessage isMessageFocused message={message} userState={userState} />),
@@ -147,11 +150,13 @@ describe('FailedToAddUsersMessage', () => {
     const user2 = createUser(qualifiedId2, 'Arjita');
     userState.users([user1, user2]);
 
-    const message = createFailedToAddUsersMessage({
-      users: [qualifiedId1, qualifiedId2],
-      reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS,
-      backends: ['test.domain', 'test-2.domain'],
-    });
+    const message = createFailedToAddUsersMessages([
+      {
+        users: [qualifiedId1, qualifiedId2],
+        reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS,
+        backends: ['test.domain', 'test-2.domain'],
+      },
+    ]);
 
     const {getByText, getAllByText} = render(
       withTheme(<FailedToAddUsersMessage isMessageFocused message={message} userState={userState} />),
@@ -186,10 +191,13 @@ describe('FailedToAddUsersMessage', () => {
     const user2 = createUser(qualifiedId2, 'Przemek');
     userState.users([user1, user2]);
 
-    const message = createFailedToAddUsersMessage({
-      users: [qualifiedId1, qualifiedId2],
-      reason: AddUsersFailureReasons.NON_FEDERATING_BACKENDS,
-    });
+    const message = createFailedToAddUsersMessages([
+      {
+        users: [qualifiedId1, qualifiedId2],
+        reason: AddUsersFailureReasons.NON_FEDERATING_BACKENDS,
+        backends: [],
+      },
+    ]);
 
     const {getByTestId, getAllByText} = render(
       withTheme(<FailedToAddUsersMessage isMessageFocused message={message} userState={userState} />),
@@ -211,5 +219,74 @@ describe('FailedToAddUsersMessage', () => {
     );
 
     expect(details.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('shows details of multiple failed reasons', async () => {
+    const userState = new UserState();
+    const [qualifiedId1] = generateQualifiedIds(1, 'test.domain');
+    const [qualifiedId2] = generateQualifiedIds(1, 'test-2.domain');
+    const [qualifiedId3] = generateQualifiedIds(1, 'test-3.domain');
+
+    const user1 = createUser(qualifiedId1, 'Patryk');
+    const user2 = createUser(qualifiedId2, 'Przemek');
+    const user3 = createUser(qualifiedId3, 'Tom');
+    userState.users([user1, user2, user3]);
+
+    const message = createFailedToAddUsersMessages([
+      {
+        users: [qualifiedId1],
+        reason: AddUsersFailureReasons.NON_FEDERATING_BACKENDS,
+        backends: [],
+      },
+      {
+        users: [qualifiedId2],
+        reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS,
+        backends: [qualifiedId2.domain],
+      },
+      {
+        users: [qualifiedId3],
+        reason: AddUsersFailureReasons.OFFLINE_FOR_TOO_LONG,
+      },
+    ]);
+
+    const {getByTestId, getAllByText} = render(
+      withTheme(<FailedToAddUsersMessage isMessageFocused message={message} userState={userState} />),
+    );
+
+    const elementMessageFailedToAdd = getByTestId('element-message-failed-to-add-users');
+    expect(elementMessageFailedToAdd.getAttribute('data-uie-value')).toEqual('multi-users-not-added');
+
+    const toggleButton = getByTestId('toggle-failed-to-add-users');
+
+    act(() => {
+      toggleButton.click();
+    });
+
+    const mainMessage = getAllByText(
+      (_, element) => element?.textContent === '3 participants could not be added to the group.',
+    );
+    expect(mainMessage.length).toBeGreaterThanOrEqual(1);
+
+    const details1 = getAllByText(
+      (_, element) =>
+        element?.textContent ===
+        `${user1.name()} could not be added to the group as their backends do not federate with each other.`,
+    );
+
+    expect(details1.length).toBeGreaterThanOrEqual(1);
+
+    const details2 = getAllByText(
+      (_, element) =>
+        element?.textContent ===
+        `${user2.name()} could not be added to the group as the backend of ${user2.qualifiedId.domain} could not be reached.`,
+    );
+
+    expect(details2.length).toBeGreaterThanOrEqual(1);
+
+    const details3 = getAllByText(
+      (_, element) => element?.textContent === `${user3.name()} could not be added to the group.`,
+    );
+
+    expect(details3.length).toBeGreaterThanOrEqual(1);
   });
 });

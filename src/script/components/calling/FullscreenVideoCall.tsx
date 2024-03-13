@@ -71,7 +71,7 @@ export interface FullscreenVideoCallProps {
   mediaDevicesHandler: MediaDevicesHandler;
   multitasking: Multitasking;
   muteState: MuteState;
-  setActiveCallViewTab: (tab: string) => void;
+  setActiveCallViewTab: (tab: CallViewTab) => void;
   setMaximizedParticipant: (call: Call, participant: Participant | null) => void;
   switchCameraInput: (deviceId: string) => void;
   switchMicrophoneInput: (deviceId: string) => void;
@@ -634,7 +634,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                   <ButtonGroup
                     items={Object.values(CallViewTabs)}
                     onChangeItem={item => {
-                      setActiveCallViewTab(item);
+                      setActiveCallViewTab(item as CallViewTab);
                       setMaximizedParticipant(call, null);
                     }}
                     currentItem={activeCallViewTab}

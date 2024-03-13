@@ -71,13 +71,19 @@
 
       pre {
         overflow: auto;
+        max-width: var(--conversation-message-asset-width);
+        padding: 12px;
+        border-radius: 12px;
+        background: var(--foreground-fade-8);
+        font-size: var(--font-size-small);
+        margin-block: 4px;
         text-overflow: unset;
       }
     }
 
     &__show-more {
       display: block;
-      color: @w-blue;
+      color: var(--accent-color-500);
       cursor: pointer;
       font-size: @font-size-small;
       font-weight: @font-weight-regular;
@@ -85,15 +91,12 @@
 
       .disclose-icon {
         margin-left: 4px;
-        svg {
-          fill: currentColor;
-          transform: rotate(90deg);
-        }
+        color: var(--foreground);
+        fill: currentColor;
+        transform: rotate(90deg);
 
         &.upside-down {
-          svg {
-            transform: rotate(-90deg);
-          }
+          transform: rotate(-90deg);
         }
       }
     }

@@ -265,7 +265,7 @@ describe('UserRepository', () => {
         const connections = createConnections(users);
         const fetchUserSpy = jest.spyOn(userService, 'getUsers').mockResolvedValue({found: users});
 
-        await userRepository.loadUsers(new User('self'), connections, []);
+        await userRepository.loadUsers(new User('self'), connections, [], []);
 
         expect(userState.users()).toHaveLength(users.length + 1);
         expect(fetchUserSpy).toHaveBeenCalledWith(users.map(user => user.qualified_id!));
@@ -277,7 +277,7 @@ describe('UserRepository', () => {
         const connections = createConnections(users);
         jest.spyOn(userService, 'getUsers').mockResolvedValue({found: users});
 
-        await userRepository.loadUsers(new User('self'), connections, []);
+        await userRepository.loadUsers(new User('self'), connections, [], []);
 
         expect(userState.users()).toHaveLength(users.length + 1);
         users.forEach(user => {
@@ -297,7 +297,7 @@ describe('UserRepository', () => {
         jest.spyOn(userRepository['userService'], 'loadUserFromDb').mockResolvedValue(partialUsers as any);
         const fetchUserSpy = jest.spyOn(userService, 'getUsers').mockResolvedValue({found: localUsers});
 
-        await userRepository.loadUsers(new User('self'), connections, []);
+        await userRepository.loadUsers(new User('self'), connections, [], []);
 
         expect(userState.users()).toHaveLength(localUsers.length + 1);
         expect(fetchUserSpy).toHaveBeenCalledWith(userIds);
@@ -312,7 +312,7 @@ describe('UserRepository', () => {
         const removeUserSpy = jest.spyOn(userService, 'removeUserFromDb').mockResolvedValue();
         jest.spyOn(userService, 'getUsers').mockResolvedValue({found: newUsers});
 
-        await userRepository.loadUsers(new User(), connections, []);
+        await userRepository.loadUsers(new User(), connections, [], []);
 
         expect(userState.users()).toHaveLength(newUsers.length + 1);
         expect(removeUserSpy).toHaveBeenCalledTimes(localUsers.length);

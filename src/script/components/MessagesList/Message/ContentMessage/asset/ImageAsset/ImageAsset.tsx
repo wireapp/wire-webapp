@@ -30,14 +30,13 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import {AssetLoader} from './AssetLoader';
-import {AssetUrl, useAssetTransfer} from './useAssetTransfer';
-
-import {Config} from '../../../../../Config';
-import {ContentMessage} from '../../../../../entity/message/ContentMessage';
-import {MediumImage} from '../../../../../entity/message/MediumImage';
-import {TeamState} from '../../../../../team/TeamState';
-import {useMessageFocusedTabIndex} from '../../util';
+import {Config} from '../../../../../../Config';
+import {ContentMessage} from '../../../../../../entity/message/ContentMessage';
+import {MediumImage} from '../../../../../../entity/message/MediumImage';
+import {TeamState} from '../../../../../../team/TeamState';
+import {useMessageFocusedTabIndex} from '../../../util';
+import {AssetLoader} from '../AssetLoader';
+import {AssetUrl, useAssetTransfer} from '../useAssetTransfer';
 
 export interface ImageAssetProps {
   asset: MediumImage;
@@ -47,13 +46,15 @@ export interface ImageAssetProps {
   isFocusable?: boolean;
 }
 
-export const ImageAsset: React.FC<ImageAssetProps> = ({
+const MAX_ASSET_WIDTH = 800;
+
+export const ImageAsset = ({
   asset,
   message,
   onClick,
   teamState = container.resolve(TeamState),
   isFocusable = true,
-}) => {
+}: ImageAssetProps) => {
   const [imageUrl, setImageUrl] = useState<AssetUrl>();
   const {resource} = useKoSubscribableChildren(asset, ['resource']);
   const {isObfuscated, visible} = useKoSubscribableChildren(message, ['isObfuscated', 'visible']);
@@ -63,7 +64,7 @@ export const ImageAsset: React.FC<ImageAssetProps> = ({
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isFocusable);
 
   /** keeps track of whether the component is mounted or not to avoid setting the image url in case it's not */
-  const isUnmouted = useRef(false);
+  const isUnmounted = useRef(false);
 
   useEffect(() => {
     if (!imageUrl && isInViewport && resource && isFileSharingReceivingEnabled) {
@@ -74,7 +75,7 @@ export const ImageAsset: React.FC<ImageAssetProps> = ({
             ...Config.getConfig().ALLOWED_IMAGE_TYPES,
           ];
           const url = await getAssetUrl(resource, allowedImageTypes);
-          if (isUnmouted.current) {
+          if (isUnmounted.current) {
             // Avoid re-rendering a component that is umounted
             return;
           }
@@ -88,7 +89,7 @@ export const ImageAsset: React.FC<ImageAssetProps> = ({
 
   useEffect(() => {
     return () => {
-      isUnmouted.current = true;
+      isUnmounted.current = true;
       imageUrl?.dispose();
     };
   }, []);
@@ -101,16 +102,34 @@ export const ImageAsset: React.FC<ImageAssetProps> = ({
   });
 
   const imageContainerStyle: CSSObject = {
-    aspectRatio: isFileSharingReceivingEnabled ? `${asset.ratio}` : undefined,
     maxWidth: 'var(--conversation-message-asset-width)',
-    width: asset.width,
+  };
+
+  const isImageWidthLargerThanDefined = parseInt(asset.width, 10) >= MAX_ASSET_WIDTH;
+  const imageWidth = isImageWidthLargerThanDefined ? `${MAX_ASSET_WIDTH}px` : asset.width;
+
+  const imageAsset: CSSObject = {
+    aspectRatio: isFileSharingReceivingEnabled ? `${asset.ratio}` : undefined,
     maxHeight: '80vh',
+    maxWidth: !imageUrl?.url ? '100%' : imageWidth,
+
+    ...(!imageUrl?.url &&
+      !isImageWidthLargerThanDefined && {
+        height: asset.height,
+      }),
+  };
+
+  const imageStyle: CSSObject = {
+    width: imageWidth,
+    maxWidth: '100%',
+    height: 'auto',
   };
 
   return (
     <div data-uie-name="image-asset" css={imageContainerStyle}>
       {isFileSharingReceivingEnabled ? (
         <InViewport
+          css={imageAsset}
           className={cx('image-asset', {
             'bg-color-ephemeral': isObfuscated,
             'image-asset--no-image': !isObfuscated && !imageUrl,
@@ -137,9 +156,11 @@ export const ImageAsset: React.FC<ImageAssetProps> = ({
               <Icon.Image />
             </div>
           )}
+
           <img
+            css={imageStyle}
             data-uie-name="image-asset-img"
-            className={cx('image-element', {'image-ephemeral': isObfuscated})}
+            className={cx({'image-ephemeral': isObfuscated})}
             src={imageUrl?.url || dummyImageUrl}
             alt={imageAltText}
           />

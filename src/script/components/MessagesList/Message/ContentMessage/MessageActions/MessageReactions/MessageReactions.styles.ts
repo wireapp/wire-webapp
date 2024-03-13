@@ -40,7 +40,7 @@ import {CSSObject} from '@emotion/react';
 
 export const messageReactionWrapper: CSSObject = {
   display: 'flex',
-  paddingBlock: '0.5rem',
+  paddingTop: '6px',
   gap: '0.5rem',
   paddingInline: 'var(--conversation-message-sender-width)',
   flexWrap: 'wrap',
@@ -78,7 +78,7 @@ export const messageReactionButton: CSSObject = {
 export const messageReactionButtonTooltip: CSSObject = {
   display: 'flex',
   flexDirection: 'column',
-  maxWidth: 145,
+  maxWidth: 160,
   whiteSpace: 'break-spaces',
 };
 export const messageReactionButtonTooltipImage: CSSObject = {

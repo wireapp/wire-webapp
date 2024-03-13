@@ -80,9 +80,6 @@ export type Env = {
   /** will enable the MLS protocol */
   FEATURE_ENABLE_MLS?: string;
 
-  /** will enable the E2E-Identification protocol, needs active FEATURE_ENABLE_MLS to work */
-  FEATURE_ENABLE_E2EI?: string;
-
   FEATURE_USE_CORE_CRYPTO?: string;
 
   FEATURE_MLS_CONFIG_KEYING_MATERIAL_UPDATE_THRESHOLD?: string;
@@ -220,6 +217,16 @@ export type Env = {
   /** Sets the host URL for the website, e.g. https://wire.com */
   URL_WEBSITE_BASE: string;
 
+  /** Sets paths to append to a base URL */
+  URL_PATH_CREATE_TEAM: string;
+
+  URL_PATH_MANAGE_SERVICES: string;
+
+  URL_PATH_MANAGE_TEAM: string;
+
+  URL_PATH_PASSWORD_RESET: string;
+
+  /** Sets Support URLs to specific pages */
   URL_SUPPORT_INDEX: string;
 
   URL_SUPPORT_BUG_REPORT: string;
@@ -257,7 +264,14 @@ export type Env = {
   URL_SUPPORT_OFFLINE_BACKEND: string;
 
   URL_SUPPORT_FEDERATION_STOP: string;
+
   URL_SUPPORT_E2EI_VERIFICATION: string;
+
+  URL_SUPPORT_DECRYPT_ERROR: string;
+
+  URL_SUPPORT_PRIVACY_UNVERIFIED_USERS: string;
+
+  URL_SUPPORT_PRIVACY_WHY: string;
 
   URL_WHATS_NEW: string;
 

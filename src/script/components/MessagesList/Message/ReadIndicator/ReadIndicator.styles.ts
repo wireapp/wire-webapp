@@ -19,6 +19,16 @@
 
 import {CSSObject} from '@emotion/react';
 
+export const ReadIndicatorContainer: CSSObject = {
+  display: 'inline-block',
+  marginLeft: '12px',
+  lineHeight: 1,
+
+  '.message-asset &': {
+    marginLeft: '12px',
+  },
+};
+
 export const ReadReceiptText: CSSObject = {
   display: 'inline-flex',
   alignItems: 'center',
@@ -43,10 +53,6 @@ export const ReadIndicatorStyles = (showIconOnly = false): CSSObject => ({
     alignItems: 'center',
     marginLeft: '8px',
   }),
-
-  '.message-asset &': {
-    marginLeft: '12px',
-  },
 
   ...(!showIconOnly && {
     opacity: 0,

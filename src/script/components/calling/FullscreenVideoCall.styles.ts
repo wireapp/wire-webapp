@@ -87,4 +87,5 @@ export const paginationButtonStyles: CSSObject = {
   position: 'absolute',
   top: 'calc(50% - 75px)',
   width: 56,
+  zIndex: 1,
 };

@@ -37,6 +37,7 @@ import {
   ConversationCreateEvent,
   ConversationMemberJoinEvent,
   CONVERSATION_EVENT,
+  ConversationMLSWelcomeEvent,
 } from '@wireapp/api-client/lib/event/';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
@@ -66,6 +67,7 @@ import {
   generateAPIConversation,
 } from 'test/helper/ConversationGenerator';
 import {createDeleteEvent} from 'test/helper/EventGenerator';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 import {escapeRegex} from 'Util/SanitizationUtil';
 import {createUuid} from 'Util/uuid';
 
@@ -267,6 +269,41 @@ describe('ConversationRepository', () => {
 
       const conversationEntity = await conversationRepository.init1to1Conversation(conversation, true);
       expect(conversationEntity).toEqual(conversation);
+    });
+
+    it('returns a proteus conversation even if both users support mls but the user was deleted on backend', async () => {
+      const conversationRepository = testFactory.conversation_repository!;
+      const userRepository = testFactory.user_repository!;
+
+      const otherUserId = {id: 'f718410c-3833-479d-bd80-af03f38416', domain: 'test-domain'};
+      const otherUser = new User(otherUserId.id, otherUserId.domain);
+      otherUser.isDeleted = true;
+
+      otherUser.supportedProtocols([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]);
+
+      userRepository['userState'].users.push(otherUser);
+
+      const selfUserId = {id: '109da9ca-a495-47a870-9ffbe924b2d1', domain: 'test-domain'};
+      const selfUser = new User(selfUserId.id, selfUserId.domain);
+      selfUser.supportedProtocols([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]);
+      jest.spyOn(conversationRepository['userState'], 'self').mockReturnValueOnce(selfUser);
+
+      const proteus1to1Conversation = _generateConversation({
+        type: CONVERSATION_TYPE.ONE_TO_ONE,
+        protocol: ConversationProtocol.PROTEUS,
+      });
+
+      const connection = new ConnectionEntity();
+      proteus1to1Conversation.connection(connection);
+      connection.conversationId = proteus1to1Conversation.qualifiedId;
+      connection.userId = otherUserId;
+      otherUser.connection(connection);
+
+      jest.spyOn(conversationRepository['conversationService'], 'getMLS1to1Conversation');
+
+      const conversationEntity = await conversationRepository.init1to1Conversation(proteus1to1Conversation, true);
+      expect(conversationEntity).toEqual(proteus1to1Conversation);
+      expect(conversationRepository['conversationService'].getMLS1to1Conversation).not.toHaveBeenCalled();
     });
   });
 
@@ -653,6 +690,61 @@ describe('ConversationRepository', () => {
       jest.spyOn(conversationRepository['userState'], 'self').mockReturnValueOnce(selfUser);
 
       expect(container.resolve(Core).service!.conversation.establishMLS1to1Conversation).not.toHaveBeenCalled();
+    });
+
+    it("establishes MLS 1:1 conversation if it's a team-owned 1:1 conversation only if it was already established on backend", async () => {
+      const conversationRepository = testFactory.conversation_repository!;
+      const userRepository = testFactory.user_repository!;
+      const teamId = 'team-id';
+      const mockedGroupId = 'groupId';
+
+      const otherUserId = {id: 'f718410c-3833-479d-bd80-a5df03aa8414', domain: 'test-domain'};
+      const otherUser = new User(otherUserId.id, otherUserId.domain);
+      otherUser.supportedProtocols([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]);
+      userRepository['userState'].users.push(otherUser);
+
+      const selfUserId = {id: '109da9ca-a495-47a8-ac70-9ffbeaa4b2d0', domain: 'test-domain'};
+      const selfUser = new User(selfUserId.id, selfUserId.domain);
+      selfUser.supportedProtocols([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]);
+      jest.spyOn(conversationRepository['userState'], 'self').mockReturnValue(selfUser);
+
+      selfUser.teamId = teamId;
+      otherUser.teamId = teamId;
+
+      const establishedMls1to1ConversationResponse = generateAPIConversation({
+        id: {id: '04ab891e-ccf1-4dba-9d74-bacec64b5b1e', domain: 'test-domain'},
+        type: CONVERSATION_TYPE.ONE_TO_ONE,
+        protocol: ConversationProtocol.MLS,
+        overwites: {
+          group_id: mockedGroupId,
+          epoch: 1,
+          qualified_others: [otherUserId],
+          members: {
+            others: [{id: otherUserId.id, status: 0, qualified_id: otherUserId}],
+            self: {},
+          } as any,
+        },
+      }) as BackendMLSConversation;
+
+      jest
+        .spyOn(conversationRepository['conversationService'], 'getMLS1to1Conversation')
+        .mockResolvedValueOnce(establishedMls1to1ConversationResponse);
+      jest
+        .spyOn(container.resolve(Core).service!.conversation, 'establishMLS1to1Conversation')
+        .mockResolvedValueOnce(establishedMls1to1ConversationResponse);
+
+      const [mls1to1Conversation] = conversationRepository.mapConversations([establishedMls1to1ConversationResponse]);
+
+      conversationRepository['conversationState'].conversations.push(mls1to1Conversation);
+
+      jest
+        .spyOn(conversationRepository['conversationService'], 'isMLSGroupEstablishedLocally')
+        .mockResolvedValueOnce(false);
+
+      const conversationEntity = await conversationRepository.getInitialised1To1Conversation(otherUser);
+
+      expect(conversationEntity?.serialize()).toEqual(mls1to1Conversation.serialize());
+      expect(container.resolve(Core).service!.conversation.establishMLS1to1Conversation).toHaveBeenCalled();
     });
 
     it('returns established mls 1:1 conversation if conversation exists locally even when proteus is choosen.', async () => {
@@ -1167,6 +1259,62 @@ describe('ConversationRepository', () => {
           ],
           new Date(event.time).getTime() - 1,
         );
+      });
+    });
+
+    describe('conversation.mls-welcome', () => {
+      it('should initialise mls 1:1 conversation after receiving a welcome', async () => {
+        const conversationRepository = testFactory.conversation_repository!;
+        const mockedGroupId = 'AAEAAKA0LuGtiU7NjqqlZIE2dQUAZWxuYS53aXJlLmxpbms=';
+
+        const conversation = _generateConversation({
+          groupId: mockedGroupId,
+          type: CONVERSATION_TYPE.ONE_TO_ONE,
+          protocol: ConversationProtocol.MLS,
+        });
+
+        const otherUserId = {id: 'f718410c-3833-479d-bd80-a5df03f38414', domain: 'test-domain'};
+        const otherUser = new User(otherUserId.id, otherUserId.domain);
+
+        conversationRepository['userState'].users.push(otherUser);
+        conversation.participating_user_ids.push(otherUserId);
+
+        await conversationRepository['saveConversation'](conversation);
+
+        const welcomeEvent: ConversationMLSWelcomeEvent = {
+          conversation: conversation.id,
+          data: conversation.groupId!,
+          from: 'd5a39ffb-6ce3-4cc8-9048-0e15d031b4c5',
+          time: '2015-04-27T11:42:31.475Z',
+          type: CONVERSATION_EVENT.MLS_WELCOME_MESSAGE,
+        };
+
+        const coreConversationService = container.resolve(Core).service!.conversation!;
+
+        jest.spyOn(coreConversationService, 'isMLSGroupEstablishedLocally').mockResolvedValueOnce(false);
+
+        const establishedMls1to1ConversationResponse = generateAPIConversation({
+          id: {id: '04ab891e-ccf1-4dba-9d74-bacec64b5b1e', domain: 'test-domain'},
+          type: CONVERSATION_TYPE.ONE_TO_ONE,
+          protocol: ConversationProtocol.MLS,
+          overwites: {
+            group_id: mockedGroupId,
+            epoch: 1,
+            qualified_others: [otherUserId],
+            members: {
+              others: [{id: otherUserId.id, status: 0, qualified_id: otherUserId}],
+              self: {},
+            } as any,
+          },
+        }) as BackendMLSConversation;
+
+        jest
+          .spyOn(coreConversationService, 'establishMLS1to1Conversation')
+          .mockResolvedValueOnce(establishedMls1to1ConversationResponse);
+
+        await conversationRepository['handleConversationEvent'](welcomeEvent);
+
+        expect(coreConversationService.establishMLS1to1Conversation).toHaveBeenCalled();
       });
     });
 
@@ -1948,12 +2096,22 @@ describe('ConversationRepository', () => {
     describe('checkForDeletedConversations', () => {
       it('removes conversations that have been deleted on the backend', async () => {
         const deletedGroup = _generateConversation();
+        const oldGroup = _generateConversation();
         const conversationRepository = testFactory.conversation_repository!;
 
         jest.spyOn(testFactory.conversation_service!, 'getConversationByIds').mockResolvedValue({
-          not_found: [deletedGroup],
+          not_found: [deletedGroup, oldGroup],
         });
+        jest
+          .spyOn(conversationRepository['conversationService'], 'getConversationById')
+          .mockImplementation(async conversationId => {
+            if (matchQualifiedIds(conversationId, deletedGroup.qualifiedId)) {
+              throw new ConversationError(ConversationError.TYPE.CONVERSATION_NOT_FOUND, 'Conversation not found');
+            }
+            return {} as any;
+          });
         await conversationRepository['saveConversation'](deletedGroup);
+        await conversationRepository['saveConversation'](oldGroup);
 
         const currentNbConversations = conversationRepository['conversationState'].conversations().length;
         await testFactory.conversation_repository!.syncDeletedConversations();
@@ -2020,7 +2178,7 @@ describe('ConversationRepository', () => {
           .mockResolvedValue(localConversations as unknown as ConversationDatabaseData[]);
         jest.spyOn(conversationService, 'saveConversationsInDb').mockImplementation(data => Promise.resolve(data));
 
-        const conversations = await conversationRepository.loadConversations();
+        const conversations = await conversationRepository.loadConversations([]);
 
         expect(conversations).toHaveLength(remoteConversations.found.length);
       });
@@ -2065,7 +2223,7 @@ describe('ConversationRepository', () => {
           .mockResolvedValue(localConversations as unknown as ConversationDatabaseData[]);
         jest.spyOn(conversationService, 'saveConversationsInDb').mockImplementation(data => Promise.resolve(data));
 
-        const conversations = await conversationRepository.loadConversations();
+        const conversations = await conversationRepository.loadConversations([]);
 
         expect(conversations).toHaveLength(1);
       });
@@ -2110,9 +2268,47 @@ describe('ConversationRepository', () => {
           .mockResolvedValue(localConversations as unknown as ConversationDatabaseData[]);
         jest.spyOn(conversationService, 'saveConversationsInDb').mockImplementation(data => Promise.resolve(data));
 
-        const conversations = await conversationRepository.loadConversations();
+        const conversations = await conversationRepository.loadConversations([]);
 
         expect(conversations).toHaveLength(remoteConversations.found.length);
+      });
+
+      it('does not load connection request (type 3) conversations if their users were deleted on backend', async () => {
+        const conversationRepository = testFactory.conversation_repository!;
+        const conversationService = conversationRepository['conversationService'];
+        const userId = {id: '05d0f240-bfe9-40d7-b6cb-602dac89fa1b', domain: 'staging.zinfra.io'};
+
+        const connectionReq = generateConversation(
+          {
+            domain: 'staging.zinfra.io',
+            id: '05d0f240-bfe9-1234-b6cb-602dac89fa1b',
+          },
+          'conv2',
+          [userId],
+          ConversationProtocol.PROTEUS,
+          CONVERSATION_TYPE.CONNECT,
+        );
+
+        const remoteConversations = {
+          found: [connectionReq],
+        };
+        const localConversations: any = [connectionReq];
+
+        jest.spyOn(conversationService, 'deleteConversationFromDb');
+        jest.spyOn(conversationService, 'blacklistConversation');
+        jest
+          .spyOn(conversationService, 'getAllConversations')
+          .mockResolvedValue(remoteConversations as unknown as RemoteConversations);
+        jest
+          .spyOn(conversationService, 'loadConversationStatesFromDb')
+          .mockResolvedValue(localConversations as unknown as ConversationDatabaseData[]);
+        jest.spyOn(conversationService, 'saveConversationsInDb').mockImplementation(data => Promise.resolve(data));
+
+        const conversations = await conversationRepository.loadConversations([]);
+
+        expect(conversations).toHaveLength(0);
+        expect(conversationService.deleteConversationFromDb).toHaveBeenCalledWith(connectionReq.qualified_id.id);
+        expect(conversationService.blacklistConversation).toHaveBeenCalledWith(connectionReq.qualified_id);
       });
 
       it('keeps track of missing conversations', async () => {
@@ -2152,7 +2348,7 @@ describe('ConversationRepository', () => {
           .spyOn(conversationService, 'getAllConversations')
           .mockResolvedValue(remoteConversations as unknown as RemoteConversations);
 
-        await conversationRepository.loadConversations();
+        await conversationRepository.loadConversations([]);
 
         expect(conversationState.missingConversations).toHaveLength(remoteConversations.failed.length);
       });

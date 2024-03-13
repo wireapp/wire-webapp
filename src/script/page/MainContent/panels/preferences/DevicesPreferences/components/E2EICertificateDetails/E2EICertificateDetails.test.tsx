@@ -34,13 +34,20 @@ describe('E2EICertificateDetails', () => {
     handle: '',
     thumbprint: '',
     deviceId: '',
+    notBefore: BigInt(0),
+    notAfter: BigInt(0),
+    serialNumber: '',
+    qualifiedUserId: {
+      domain: '',
+      id: '',
+    },
   });
 
   it('is e2ei identity not downloaded', async () => {
     const {getByTestId} = render(withTheme(<E2EICertificateDetails />));
 
     const E2EIdentityStatus = getByTestId('e2ei-identity-status');
-    expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.NOT_DOWNLOADED);
+    expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.NOT_ACTIVATED);
   });
 
   it('is e2ei identity expired', async () => {

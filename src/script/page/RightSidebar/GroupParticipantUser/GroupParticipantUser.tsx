@@ -77,11 +77,7 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
 }) => {
   const {isGroup, roles} = useKoSubscribableChildren(activeConversation, ['isGroup', 'roles']);
   const {isTemporaryGuest, isAvailable} = useKoSubscribableChildren(currentUser, ['isTemporaryGuest', 'isAvailable']);
-  const {classifiedDomains, isTeam, team} = useKoSubscribableChildren(teamState, [
-    'classifiedDomains',
-    'isTeam',
-    'team',
-  ]);
+  const {classifiedDomains, team} = useKoSubscribableChildren(teamState, ['classifiedDomains', 'team']);
   const {isActivatedAccount} = useKoSubscribableChildren(selfUser, ['isActivatedAccount']);
 
   const canChangeRole =
@@ -124,10 +120,10 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
   }, [currentUser]);
 
   useEffect(() => {
-    if (isTeam) {
-      teamRepository.updateTeamMembersByIds(team, [currentUser.id], true);
+    if (team.id) {
+      teamRepository.updateTeamMembersByIds(team.id, [currentUser.id], true);
     }
-  }, [isTeam, currentUser, teamRepository, team]);
+  }, [currentUser, teamRepository, team]);
 
   useEffect(() => {
     if (isTemporaryGuest) {

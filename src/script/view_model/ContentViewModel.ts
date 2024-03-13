@@ -297,6 +297,7 @@ export class ContentViewModel {
         this.conversationState.activeConversation(conversationEntity);
       }
 
+      void this.conversationRepository.refreshMLSConversationVerificationState(conversationEntity);
       const messageEntity = openFirstSelfMention ? conversationEntity.getFirstUnreadSelfMention() : exposeMessageEntity;
       this.changeConversation(conversationEntity, messageEntity);
       this.showAndNavigate(conversationEntity, openNotificationSettings);

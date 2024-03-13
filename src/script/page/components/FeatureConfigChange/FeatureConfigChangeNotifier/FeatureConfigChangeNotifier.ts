@@ -80,23 +80,17 @@ const featureNotifications: Partial<
     };
   },
   [FEATURE_KEY.ENFORCE_DOWNLOAD_PATH]: (oldConfig, newConfig) => {
-    if (
-      newConfig &&
-      'config' in newConfig &&
-      oldConfig &&
-      'config' in oldConfig &&
-      Runtime.isDesktopApp() &&
-      Runtime.isWindows()
-    ) {
-      const status = wasTurnedOnOrOff(oldConfig, newConfig);
-      const configStatus = newConfig?.config?.enforcedDownloadLocation !== oldConfig?.config?.enforcedDownloadLocation;
-      if (!status && !configStatus) {
-        return undefined;
+    const handleDlPathChange: (
+      status: FeatureStatus | boolean,
+    ) => undefined | {htmlMessage: string; title: StringIdentifer; primaryAction?: Action} = status => {
+      if (newConfig && 'config' in newConfig) {
+        localStorage.setItem('enforcedDownloadLocation', newConfig.config.enforcedDownloadLocation);
+        amplify.publish(
+          WebAppEvents.TEAM.DOWNLOAD_PATH_UPDATE,
+          newConfig.status === FeatureStatus.ENABLED ? newConfig.config.enforcedDownloadLocation : undefined,
+        );
       }
-      amplify.publish(
-        WebAppEvents.TEAM.DOWNLOAD_PATH_UPDATE,
-        newConfig.status === FeatureStatus.ENABLED ? newConfig.config.enforcedDownloadLocation : undefined,
-      );
+
       return {
         htmlMessage:
           status === FeatureStatus.ENABLED
@@ -113,6 +107,27 @@ const featureNotifications: Partial<
           },
         },
       };
+    };
+
+    if (!oldConfig && newConfig?.status === FeatureStatus.ENABLED && 'config' in newConfig) {
+      return handleDlPathChange(FeatureStatus.ENABLED);
+    }
+
+    if (
+      newConfig &&
+      'config' in newConfig &&
+      oldConfig &&
+      'config' in oldConfig &&
+      Runtime.isDesktopApp() &&
+      Runtime.isWindows()
+    ) {
+      const status = wasTurnedOnOrOff(oldConfig, newConfig);
+      const configStatus = newConfig?.config?.enforcedDownloadLocation !== oldConfig?.config?.enforcedDownloadLocation;
+      if (!status && !configStatus) {
+        return undefined;
+      }
+      localStorage.setItem('enforcedDownloadLocation', newConfig.config.enforcedDownloadLocation);
+      return handleDlPathChange(status);
     }
     return undefined;
   },
@@ -228,6 +243,13 @@ export function FeatureConfigChangeNotifier({teamState, selfUserId}: Props): nul
           primaryAction: message.primaryAction,
           hideCloseBtn: isEnforceDownloadPath,
           preventClose: isEnforceDownloadPath,
+          close: isEnforceDownloadPath
+            ? () => {
+                if (Runtime.isDesktopApp() && config[featureKey]?.status !== FeatureStatus.DISABLED) {
+                  amplify.publish(WebAppEvents.LIFECYCLE.RESTART);
+                }
+              }
+            : undefined,
         });
       });
     }

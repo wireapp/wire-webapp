@@ -25,6 +25,7 @@ import {
   AssetAddEvent,
   DeleteEvent,
   EventBuilder,
+  GroupCreationEvent,
   MemberLeaveEvent,
   MessageAddEvent,
   ReactionEvent,
@@ -120,6 +121,22 @@ export function createAssetAddEvent(overrides: Partial<AssetAddEvent> = {}): Ass
     id: createUuid(),
     time: new Date().toISOString(),
     type: CONVERSATION.ASSET_ADD,
+    ...overrides,
+  };
+}
+
+export function createGroupCreationEvent(overrides: Partial<GroupCreationEvent>): GroupCreationEvent {
+  return {
+    conversation: createUuid(),
+    data: {
+      userIds: [],
+      allTeamMembers: false,
+      name: '',
+    },
+    from: createUuid(),
+    id: createUuid(),
+    time: new Date().toISOString(),
+    type: CONVERSATION.GROUP_CREATION,
     ...overrides,
   };
 }

@@ -29,7 +29,6 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Icon} from 'Components/Icon';
 import {ModalComponent} from 'Components/ModalComponent';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {SIGN_OUT_REASON} from 'src/script/auth/SignOutReason';
 import {ClientRepository} from 'src/script/client';
 import {ClientState} from 'src/script/client/ClientState';
@@ -136,13 +135,6 @@ const AppLock: React.FC<AppLockProps> = ({
       showAppLock();
     } else if (appLockState.hasPassphrase()) {
       appLockRepository.removeCode();
-      PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-        text: {
-          closeBtnLabel: t('teamSettingsModalCloseBtn'),
-          htmlMessage: t('featureConfigChangeModalApplock'),
-          title: t('featureConfigChangeModalApplockHeadline'),
-        },
-      });
     }
   }, [isAppLockEnabled]);
 

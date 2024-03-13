@@ -31,7 +31,7 @@ export const mapMLSStatus = (status?: CoreStatus) => {
   };
 
   if (!status) {
-    return MLSStatuses.NOT_DOWNLOADED;
+    return MLSStatuses.NOT_ACTIVATED;
   }
   return statusMap[status];
 };

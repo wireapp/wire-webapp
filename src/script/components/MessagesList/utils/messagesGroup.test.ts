@@ -22,7 +22,7 @@ import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import {EventMapper} from 'src/script/conversation/EventMapper';
 import {Conversation} from 'src/script/entity/Conversation';
 import {Message} from 'src/script/entity/message/Message';
-import {createMessageAddEvent} from 'test/helper/EventGenerator';
+import {createGroupCreationEvent, createMessageAddEvent} from 'test/helper/EventGenerator';
 import {getRandomNumber} from 'Util/NumberUtil';
 import {createUuid} from 'Util/uuid';
 
@@ -54,6 +54,19 @@ describe('MessagesGroup', () => {
     const lastGroup: any = groupedMessages[groupedMessages.length - 1];
     expect(lastGroup.messages.length).toBe(sizeGroup);
     expect(lastGroup.sender).toBe(sender);
+  });
+
+  it('does not group together system messages and content messages', () => {
+    const sender = createUuid();
+    const groupCreationMessage = createGroupCreationEvent({from: sender});
+    const contentMessage = createMessageAddEvent({overrides: {from: sender}});
+
+    const allMessages = [groupCreationMessage, contentMessage].map(
+      event => eventMapper.mapJsonEvent(event, conversation) as Message,
+    );
+
+    const groupedMessages = groupMessagesBySenderAndTime(allMessages, 0);
+    expect(groupedMessages).toHaveLength(2);
   });
 
   it('adds markers for unread messages', () => {
@@ -122,5 +135,36 @@ describe('MessagesGroup', () => {
     const marker = groupedMessages[firstMarkerIndex] as any;
     expect(firstMarkerIndex).toBe(nbPrevHourMessages);
     expect(marker.type).toBe('day');
+  });
+
+  it('splits current group when new unread messages are detected', () => {
+    const nbReadMessages = getRandomNumber(1, 10);
+    const nbUnreadMessages = getRandomNumber(1, 10);
+    const lastReadTimestamp = 10;
+    const senderId = 'same-sender';
+
+    const readMessages = [...Array(nbReadMessages)].map((_, index) =>
+      createMessageAddEvent({overrides: {from: senderId, time: new Date(index).toISOString()}}),
+    );
+    const unreadMessages = [...Array(nbUnreadMessages)].map((_, index) =>
+      createMessageAddEvent({
+        overrides: {from: senderId, time: new Date(lastReadTimestamp + 1 + index).toISOString()},
+      }),
+    );
+
+    const allMessages = [...readMessages, ...unreadMessages].map(
+      event => eventMapper.mapJsonEvent(event, conversation) as Message,
+    );
+
+    const groupedMessages = groupMessagesBySenderAndTime(allMessages, lastReadTimestamp);
+    /* There should be :
+      - one group for read messages from the sender
+      - one marker for unread messages
+      - one group for unread messages from the sender
+    */
+    expect(groupedMessages).toHaveLength(3);
+    expect((groupedMessages[0] as any).messages).toHaveLength(nbReadMessages);
+    expect(isMarker(groupedMessages[1])).toBeTruthy();
+    expect((groupedMessages[2] as any).messages).toHaveLength(nbUnreadMessages);
   });
 });

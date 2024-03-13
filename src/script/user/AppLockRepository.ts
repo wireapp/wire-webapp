@@ -20,6 +20,9 @@
 import sodium from 'libsodium-wrappers';
 import {container, singleton} from 'tsyringe';
 
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {t} from 'Util/LocalizerUtil';
+
 import {AppLockState} from './AppLockState';
 import {UserState} from './UserState';
 
@@ -75,10 +78,25 @@ export class AppLockRepository {
   setEnabled = (enabled: boolean) => {
     if (enabled) {
       window.localStorage.setItem(this.getEnabledStorageKey(), 'true');
+      this.appLockState.isActivatedInPreferences(true);
     } else {
-      window.localStorage.removeItem(this.getEnabledStorageKey());
+      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
+        primaryAction: {
+          action: () => {
+            this.appLockState.isActivatedInPreferences(false);
+            window.localStorage.removeItem(this.getEnabledStorageKey());
+          },
+          text: t('featureConfigAppLockTurnOff'),
+        },
+        secondaryAction: {
+          text: t('featureConfigAppLockCancel'),
+        },
+        text: {
+          title: t('featureConfigChangeModalApplockHeadline'),
+          message: t('featureConfigChangeModalApplock'),
+        },
+      });
     }
-    this.appLockState.isActivatedInPreferences(enabled);
   };
 
   setCode = async (code: string): Promise<void> => {

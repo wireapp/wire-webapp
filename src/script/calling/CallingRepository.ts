@@ -915,7 +915,33 @@ export class CallingRepository {
         call.getSelfParticipant().releaseVideoStream(true);
       }
       await this.warmupMediaStreams(call, true, isVideoCall);
-      const shouldContinueCall = await this.pushClients(call, true);
+      const conversation = this.getConversationById(call.conversationId);
+
+      const isE2EIDegradedConversation =
+        conversation?.mlsVerificationState() === ConversationVerificationState.DEGRADED;
+      let userConsentWithDegradation = true;
+      if (isE2EIDegradedConversation) {
+        userConsentWithDegradation = await new Promise(resolve =>
+          PrimaryModal.show(PrimaryModal.type.CONFIRM, {
+            primaryAction: {
+              action: () => {
+                conversation.mlsVerificationState(ConversationVerificationState.UNVERIFIED);
+                resolve(true);
+              },
+              text: t('conversation.E2EIJoinAnyway'),
+            },
+            secondaryAction: {
+              action: () => resolve(false),
+              text: t('conversation.E2EICancel'),
+            },
+            text: {
+              message: t('conversation.E2EIDegradedJoinCall'),
+              title: t('conversation.E2EIConversationNoLongerVerified'),
+            },
+          }),
+        );
+      }
+      const shouldContinueCall = userConsentWithDegradation && (await this.pushClients(call, true));
       if (!shouldContinueCall) {
         this.rejectCall(call.conversationId);
         return;
@@ -932,8 +958,6 @@ export class CallingRepository {
       this.sendCallingEvent(EventName.CALLING.JOINED_CALL, call, {
         [Segmentation.CALL.DIRECTION]: this.getCallDirection(call),
       });
-
-      const conversation = this.getConversationById(call.conversationId);
 
       if (!conversation || !isGroupMLSConversation(conversation)) {
         return;
@@ -1008,6 +1032,11 @@ export class CallingRepository {
       // audio state is established -> clear timer
       if (member.aestab === AUDIO_STATE.ESTABLISHED) {
         TaskScheduler.cancelTask(key);
+        continue;
+      }
+
+      // If there is already a task for the client, don't overwrite it
+      if (TaskScheduler.hasActiveTask(key)) {
         continue;
       }
 
@@ -1655,6 +1684,22 @@ export class CallingRepository {
       this.logger.warn(`Unable to find a call for the conversation id of ${convId}`);
       return;
     }
+
+    const conversation = this.getConversationById(call.conversationId);
+
+    if (conversation && isGroupMLSConversation(conversation)) {
+      const subconversationEpochInfo = await this.subconversationService.getSubconversationEpochInfo(
+        conversation.qualifiedId,
+        conversation.groupId,
+      );
+
+      if (subconversationEpochInfo) {
+        this.setEpochInfo(conversation.qualifiedId, subconversationEpochInfo);
+      }
+
+      return;
+    }
+
     await this.pushClients(call);
   };
 

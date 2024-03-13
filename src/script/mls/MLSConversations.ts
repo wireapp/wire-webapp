@@ -62,23 +62,49 @@ export async function initMLSGroupConversations(
   );
 
   for (const mlsConversation of mlsGroupConversations) {
-    try {
-      const {groupId, qualifiedId} = mlsConversation;
+    await initMLSGroupConversation(mlsConversation, {core, onSuccessfulJoin, onError});
+  }
+}
 
-      const doesMLSGroupExist = await conversationService.mlsGroupExistsLocally(groupId);
+/**
+ * Will initialize a single MLS conversation that the user is member of but that are not yet locally established.
+ *
+ * @param mlsConversation - the conversation to initialize
+ * @param core - the instance of the core
+ */
+export async function initMLSGroupConversation(
+  mlsConversation: MLSCapableConversation,
+  {
+    core,
+    onSuccessfulJoin,
+    onError,
+  }: {
+    core: Account;
+    onSuccessfulJoin?: (conversation: Conversation) => void;
+    onError?: (conversation: Conversation, error: unknown) => void;
+  },
+): Promise<void> {
+  const {mls: mlsService, conversation: conversationService} = core.service || {};
+  if (!mlsService || !conversationService) {
+    throw new Error('MLS or Conversation service is not available!');
+  }
 
-      //if group is already established, we just schedule periodic key material updates
-      if (doesMLSGroupExist) {
-        await mlsService.scheduleKeyMaterialRenewal(groupId);
-        continue;
-      }
+  try {
+    const {groupId, qualifiedId} = mlsConversation;
 
-      //otherwise we should try joining via external commit
-      await conversationService.joinByExternalCommit(qualifiedId);
-      onSuccessfulJoin?.(mlsConversation);
-    } catch (error) {
-      onError?.(mlsConversation, error);
+    const doesMLSGroupExist = await conversationService.mlsGroupExistsLocally(groupId);
+
+    //if group is already established, we just schedule periodic key material updates
+    if (doesMLSGroupExist) {
+      await mlsService.scheduleKeyMaterialRenewal(groupId);
+      return;
     }
+
+    //otherwise we should try joining via external commit
+    await conversationService.joinByExternalCommit(qualifiedId);
+    onSuccessfulJoin?.(mlsConversation);
+  } catch (error) {
+    onError?.(mlsConversation, error);
   }
 }
 
@@ -111,8 +137,10 @@ export async function initialiseSelfAndTeamConversations(
     conversationsToEstablish.map(async conversation => {
       if (conversation.epoch < 1) {
         return mlsService.registerConversation(conversation.groupId, [selfUser.qualifiedId], {
-          user: selfUser,
-          client: selfClientId,
+          creator: {
+            user: selfUser,
+            client: selfClientId,
+          },
         });
       }
 

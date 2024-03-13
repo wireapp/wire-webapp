@@ -35,7 +35,9 @@ export class Account extends EventEmitter {
   enrollE2EI = jest.fn();
   service = {
     e2eIdentity: {
+      isE2EIEnabled: jest.fn(),
       isEnrollmentInProgress: jest.fn(),
+      isFreshMLSSelfClient: jest.fn(),
       clearAllProgress: jest.fn(),
       getUsersIdentities: jest.fn(() => new Map()),
       getAllGroupUsersIdentities: jest.fn(() => new Map()),
@@ -84,6 +86,7 @@ export class Account extends EventEmitter {
       establishMLS1to1Conversation: jest.fn(),
       blacklistConversation: jest.fn(),
       removeConversationFromBlacklist: jest.fn(),
+      getMLSSelfConversation: jest.fn(),
     },
     subconversation: {
       joinConferenceSubconversation: jest.fn(),

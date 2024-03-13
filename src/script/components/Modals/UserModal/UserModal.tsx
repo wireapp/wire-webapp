@@ -31,7 +31,6 @@ import {ModalComponent} from 'Components/ModalComponent';
 import {EnrichedFields} from 'Components/panel/EnrichedFields';
 import {UserActions} from 'Components/panel/UserActions';
 import {UserDetails} from 'Components/panel/UserDetails';
-import {getPrivacyUnverifiedUsersUrl} from 'src/script/externalRoute';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {replaceLink, t} from 'Util/LocalizerUtil';
@@ -117,7 +116,7 @@ export const UnverifiedUserWarning: React.FC<UnverifiedUserWarningProps> = ({use
           css={{fontSize: 'var(--font-size-medium)', margin: '0 0.2em'}}
           variant={LinkVariant.PRIMARY}
           targetBlank
-          href={getPrivacyUnverifiedUsersUrl()}
+          href={Config.getConfig().URL.SUPPORT.PRIVACY_UNVERIFIED_USERS}
         >
           {t('modalUserLearnMore')}
         </Link>
