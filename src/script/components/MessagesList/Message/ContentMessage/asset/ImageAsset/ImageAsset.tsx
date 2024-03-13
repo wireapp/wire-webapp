@@ -20,7 +20,6 @@
 import React from 'react';
 
 import {CSSObject} from '@emotion/react';
-import {container} from 'tsyringe';
 
 import {Icon} from 'Components/Icon';
 import {Image} from 'Components/Image';
@@ -30,7 +29,6 @@ import {t} from 'Util/LocalizerUtil';
 
 import {ContentMessage} from '../../../../../../entity/message/ContentMessage';
 import {MediumImage} from '../../../../../../entity/message/MediumImage';
-import {TeamState} from '../../../../../../team/TeamState';
 import {AssetLoader} from '../AssetLoader';
 import {useAssetTransfer} from '../useAssetTransfer';
 
@@ -38,11 +36,10 @@ export interface ImageAssetProps {
   asset: MediumImage;
   message: ContentMessage;
   onClick: (message: ContentMessage, event: React.MouseEvent | React.KeyboardEvent) => void;
-  teamState?: TeamState;
   isFocusable?: boolean;
 }
 
-export const ImageAsset = ({asset, message, onClick, teamState = container.resolve(TeamState)}: ImageAssetProps) => {
+export const ImageAsset = ({asset, message, onClick}: ImageAssetProps) => {
   const {isObfuscated, visible} = useKoSubscribableChildren(message, ['isObfuscated', 'visible']);
   const {isUploading, uploadProgress, cancelUpload} = useAssetTransfer(message);
 
@@ -53,6 +50,7 @@ export const ImageAsset = ({asset, message, onClick, teamState = container.resol
 
   const imageContainerStyle: CSSObject = {
     maxWidth: 'var(--conversation-message-asset-width)',
+    width: '100%',
   };
 
   return (

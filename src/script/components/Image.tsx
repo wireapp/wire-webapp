@@ -19,7 +19,6 @@
 
 import React, {useEffect, useRef, useState} from 'react';
 
-import cx from 'classnames';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
@@ -33,6 +32,10 @@ import {AssetRemoteData} from '../assets/AssetRemoteData';
 import {Config} from '../Config';
 import {MediumImage} from '../entity/message/MediumImage';
 import {TeamState} from '../team/TeamState';
+
+const imageWrapperStyle = {
+  width: '100%',
+};
 
 export interface ImageProps extends React.HTMLProps<HTMLDivElement> {
   image: MediumImage | AssetRemoteData;
@@ -95,21 +98,34 @@ export const Image: React.FC<ImageProps> = ({
     return <RestrictedImage className={className} showMessage={!isQuote} isSmall={isQuote} />;
   }
 
-  const placeholderStyle = {aspectRatio: `${imageData.ratio}`, maxWidth: '100%'};
+  const imageStyle = {
+    aspectRatio: `${imageData.ratio}`,
+    maxWidth: '100%',
+    width: imageData.width,
+    cursor: onClick ? 'pointer' : 'default',
+  };
 
   const status = imageUrl ? 'loaded' : 'loading';
 
   return (
     <InViewport
-      onVisible={() => setIsInViewport(true)}
-      className={cx('image-wrapper', className)}
+      onVisible={() => setIsInViewport(false)}
+      css={imageWrapperStyle}
+      className={className}
       data-uie-status={status}
       {...props}
     >
       {imageUrl ? (
-        <img onClick={onClick} src={imageUrl.url} role="presentation" alt={alt} data-uie-name="image-asset-img" />
+        <img
+          css={imageStyle}
+          onClick={onClick}
+          src={imageUrl.url}
+          role="presentation"
+          alt={alt}
+          data-uie-name="image-asset-img"
+        />
       ) : (
-        <div style={placeholderStyle} className={cx('loading-dots')} data-uie-name="image-loader"></div>
+        <div css={imageStyle} className="loading-dots" data-uie-name="image-loader"></div>
       )}
     </InViewport>
   );
