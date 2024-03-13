@@ -106,12 +106,11 @@ export const ImageAsset = ({
   };
 
   const isImageWidthLargerThanDefined = parseInt(asset.width, 10) >= MAX_ASSET_WIDTH;
-  const imageWidth = isImageWidthLargerThanDefined ? `${MAX_ASSET_WIDTH}px` : asset.width;
 
   const imageAsset: CSSObject = {
     aspectRatio: isFileSharingReceivingEnabled ? `${asset.ratio}` : undefined,
     maxHeight: '80vh',
-    maxWidth: !imageUrl?.url ? '100%' : imageWidth,
+    maxWidth: 'max-content',
 
     ...(!imageUrl?.url &&
       !isImageWidthLargerThanDefined && {
@@ -120,7 +119,7 @@ export const ImageAsset = ({
   };
 
   const imageStyle: CSSObject = {
-    width: imageWidth,
+    width: 'max-content',
     maxWidth: '100%',
     height: 'auto',
   };
