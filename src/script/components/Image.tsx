@@ -59,7 +59,9 @@ export const Image: React.FC<ImageProps> = ({
 
   const [imageUrl, setImageUrl] = useState<AssetUrl>();
   const imageData =
-    image instanceof AssetRemoteData ? {resource: ko.observable(image), ratio: undefined as undefined} : image;
+    image instanceof AssetRemoteData
+      ? {resource: ko.observable(image), ratio: undefined as undefined, width: undefined}
+      : image;
   const {resource} = useKoSubscribableChildren(imageData, ['resource']);
 
   const {getAssetUrl} = useAssetTransfer();
