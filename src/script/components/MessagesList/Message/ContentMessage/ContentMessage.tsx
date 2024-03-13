@@ -27,7 +27,6 @@ import {ReadIndicator} from 'Components/MessagesList/Message/ReadIndicator';
 import {Conversation} from 'src/script/entity/Conversation';
 import {CompositeMessage} from 'src/script/entity/message/CompositeMessage';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {Message} from 'src/script/entity/message/Message';
 import {useRelativeTimestamp} from 'src/script/hooks/useRelativeTimestamp';
 import {StatusType} from 'src/script/message/StatusType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -59,7 +58,6 @@ export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetS
   isFocused: boolean;
   isLastDeliveredMessage: boolean;
   message: ContentMessage;
-  lastMessageInGroup: Message;
   onClickButton: (message: CompositeMessage, buttonId: string) => void;
   onRetry: (message: ContentMessage) => void;
   quotedMessage?: ContentMessage;
@@ -71,7 +69,6 @@ export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetS
 export const ContentMessageComponent = ({
   conversation,
   message,
-  lastMessageInGroup,
   findMessage,
   selfId,
   hideHeader,
@@ -180,12 +177,6 @@ export const ContentMessageComponent = ({
               {timeAgo}
             </MessageTime>
           </span>
-          <ReadIndicator
-            message={lastMessageInGroup}
-            is1to1Conversation={conversation.is1to1()}
-            isLastDeliveredMessage={isLastDeliveredMessage || lastMessageInGroup.status() === StatusType.DELIVERED}
-            showIconOnly
-          />
         </MessageHeader>
       )}
 
