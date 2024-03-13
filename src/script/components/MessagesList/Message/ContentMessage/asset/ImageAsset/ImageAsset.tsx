@@ -38,6 +38,10 @@ import {useMessageFocusedTabIndex} from '../../../util';
 import {AssetLoader} from '../AssetLoader';
 import {AssetUrl, useAssetTransfer} from '../useAssetTransfer';
 
+const getMaxAssetWidth = () => {
+  return document.getElementById('message-list')?.offsetWidth || 800;
+};
+
 export interface ImageAssetProps {
   asset: MediumImage;
   message: ContentMessage;
@@ -45,8 +49,6 @@ export interface ImageAssetProps {
   teamState?: TeamState;
   isFocusable?: boolean;
 }
-
-const MAX_ASSET_WIDTH = 800;
 
 export const ImageAsset = ({
   asset,
@@ -62,6 +64,7 @@ export const ImageAsset = ({
   const [isInViewport, setIsInViewport] = useState(false);
   const {isUploading, uploadProgress, cancelUpload, getAssetUrl} = useAssetTransfer(message);
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isFocusable);
+  const [maxAssetWidth, setMaxAssetWidth] = useState<number>(getMaxAssetWidth());
 
   /** keeps track of whether the component is mounted or not to avoid setting the image url in case it's not */
   const isUnmounted = useRef(false);
@@ -94,7 +97,16 @@ export const ImageAsset = ({
     };
   }, []);
 
-  const dummyImageUrl = `data:image/svg+xml;utf8,<svg aria-hidden="true" xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1' width='${asset.width}' height='${asset.height}'></svg>`;
+  useEffect(() => {
+    window.addEventListener('resize', () => {
+      setMaxAssetWidth(getMaxAssetWidth());
+    });
+    return () => {
+      window.removeEventListener('resize', () => {
+        setMaxAssetWidth(getMaxAssetWidth());
+      });
+    };
+  }, []);
 
   const imageAltText = t('accessibility.conversationAssetImageAlt', {
     messageDate: `${message.displayTimestampShort()}`,
@@ -105,12 +117,15 @@ export const ImageAsset = ({
     maxWidth: 'var(--conversation-message-asset-width)',
   };
 
-  const isImageWidthLargerThanDefined = parseInt(asset.width, 10) >= MAX_ASSET_WIDTH;
+  const isImageWidthLargerThanDefined = parseInt(asset.width, 10) >= maxAssetWidth;
+  const imageWidth = isImageWidthLargerThanDefined ? `${maxAssetWidth}px` : asset.width;
+
+  const dummyImageUrl = `data:image/svg+xml;utf8,<svg aria-hidden="true" xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1' width='${imageWidth}' height='${asset.height}'></svg>`;
 
   const imageAsset: CSSObject = {
     aspectRatio: isFileSharingReceivingEnabled ? `${asset.ratio}` : undefined,
     maxHeight: '80vh',
-    maxWidth: 'max-content',
+    maxWidth: imageWidth,
 
     ...(!imageUrl?.url &&
       !isImageWidthLargerThanDefined && {
@@ -119,7 +134,7 @@ export const ImageAsset = ({
   };
 
   const imageStyle: CSSObject = {
-    width: 'max-content',
+    width: imageWidth,
     maxWidth: '100%',
     height: 'auto',
   };
