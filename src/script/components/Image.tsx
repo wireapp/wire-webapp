@@ -19,7 +19,6 @@
 
 import React, {useEffect, useRef, useState} from 'react';
 
-import ko from 'knockout';
 import {container} from 'tsyringe';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -37,46 +36,56 @@ const imageWrapperStyle = {
   width: '100%',
 };
 
-export interface ImageProps extends React.HTMLProps<HTMLDivElement> {
-  image: MediumImage | AssetRemoteData;
+interface BaseImageProps extends React.HTMLProps<HTMLDivElement> {
   alt?: string;
   isQuote?: boolean;
   teamState?: TeamState;
 }
 
-export const Image: React.FC<ImageProps> = ({
+interface RemoteDataImageProps extends BaseImageProps {
+  image: AssetRemoteData;
+  imageSizes?: {width: string; height: string; ratio: number};
+}
+export interface AssetImageProps extends BaseImageProps {
+  image: MediumImage;
+}
+
+export const AssetImage = ({image, alt, ...props}: AssetImageProps) => {
+  const imageData = image;
+  const {resource} = useKoSubscribableChildren(imageData, ['resource']);
+
+  return <Image image={resource} imageSizes={image} alt={alt} {...props} />;
+};
+
+export const Image = ({
   image,
+  imageSizes,
   onClick,
   className,
   isQuote = false,
   teamState = container.resolve(TeamState),
   alt,
   ...props
-}) => {
+}: RemoteDataImageProps) => {
   const [isInViewport, setIsInViewport] = useState(false);
   /** keeps track of whether the component is mounted or not to avoid setting the image url in case it's not */
   const isUnmouted = useRef(false);
 
   const [imageUrl, setImageUrl] = useState<AssetUrl>();
-  const imageData =
-    image instanceof AssetRemoteData
-      ? {resource: ko.observable(image), ratio: undefined as undefined, width: undefined}
-      : image;
-  const {resource} = useKoSubscribableChildren(imageData, ['resource']);
 
   const {getAssetUrl} = useAssetTransfer();
 
   const {isFileSharingReceivingEnabled} = useKoSubscribableChildren(teamState, ['isFileSharingReceivingEnabled']);
 
   useEffect(() => {
-    if (!imageUrl && isInViewport && resource && isFileSharingReceivingEnabled) {
+    if (!imageUrl && isInViewport && image && isFileSharingReceivingEnabled) {
       void (async () => {
         try {
           const allowedImageTypes = [
             'application/octet-stream', // Octet-stream is required to paste images from clipboard
             ...Config.getConfig().ALLOWED_IMAGE_TYPES,
           ];
-          const url = await getAssetUrl(resource, allowedImageTypes);
+          const url = await getAssetUrl(image, allowedImageTypes);
           if (isUnmouted.current) {
             // Avoid re-rendering a component that is umounted
             return;
@@ -87,7 +96,7 @@ export const Image: React.FC<ImageProps> = ({
         }
       })();
     }
-  }, [imageUrl, isInViewport, resource, isFileSharingReceivingEnabled, getAssetUrl]);
+  }, [imageUrl, isInViewport, image, isFileSharingReceivingEnabled, getAssetUrl]);
 
   useEffect(() => {
     return () => {
@@ -101,9 +110,9 @@ export const Image: React.FC<ImageProps> = ({
   }
 
   const imageStyle = {
-    aspectRatio: `${imageData.ratio}`,
+    aspectRatio: `${imageSizes?.ratio}`,
     maxWidth: '100%',
-    width: imageData.width,
+    width: imageSizes?.width,
     cursor: onClick ? 'pointer' : 'default',
   };
 
@@ -128,7 +137,7 @@ export const Image: React.FC<ImageProps> = ({
         />
       ) : (
         <div
-          css={{width: '100%', aspectRatio: imageData.ratio}}
+          css={{width: '100%', aspectRatio: imageSizes?.ratio}}
           className="loading-dots"
           data-uie-name="image-loader"
         ></div>

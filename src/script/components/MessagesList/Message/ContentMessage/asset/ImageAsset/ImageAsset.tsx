@@ -22,7 +22,7 @@ import React from 'react';
 import {CSSObject} from '@emotion/react';
 
 import {Icon} from 'Components/Icon';
-import {Image} from 'Components/Image';
+import {AssetImage} from 'Components/Image';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -69,7 +69,7 @@ export const ImageAsset = ({asset, message, onClick}: ImageAssetProps) => {
       )}
 
       {!isUploading && !isObfuscated && (
-        <Image
+        <AssetImage
           image={asset}
           alt={imageAltText}
           data-uie-name="go-image-detail"

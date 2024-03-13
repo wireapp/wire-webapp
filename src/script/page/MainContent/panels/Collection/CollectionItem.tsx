@@ -19,7 +19,7 @@
 
 import {FC} from 'react';
 
-import {Image} from 'Components/Image';
+import {AssetImage} from 'Components/Image';
 import {AudioAsset} from 'Components/MessagesList/Message/ContentMessage/asset/AudioAsset';
 import {FileAsset} from 'Components/MessagesList/Message/ContentMessage/asset/FileAssetComponent';
 import {LinkPreviewAsset} from 'Components/MessagesList/Message/ContentMessage/asset/LinkPreviewAssetComponent';
@@ -42,7 +42,7 @@ const CollectionItem: FC<CollectionItemProps> = ({message, onImageClick}) => {
 
   if (isOfCategory('images', message) && firstAsset.isImage() && resource) {
     return (
-      <Image
+      <AssetImage
         className="collection-image"
         image={firstAsset}
         data-uie-name="image-asset"
