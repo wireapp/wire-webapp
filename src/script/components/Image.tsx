@@ -109,7 +109,7 @@ export const Image: React.FC<ImageProps> = ({
 
   return (
     <InViewport
-      onVisible={() => setIsInViewport(false)}
+      onVisible={() => setIsInViewport(true)}
       css={imageWrapperStyle}
       className={className}
       data-uie-status={status}
