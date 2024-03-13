@@ -42,12 +42,9 @@ export interface ImageAssetProps {
   isFocusable?: boolean;
 }
 
-const MAX_ASSET_WIDTH = 800;
-
 export const ImageAsset = ({asset, message, onClick, teamState = container.resolve(TeamState)}: ImageAssetProps) => {
   const {isObfuscated, visible} = useKoSubscribableChildren(message, ['isObfuscated', 'visible']);
   const {isUploading, uploadProgress, cancelUpload} = useAssetTransfer(message);
-  const {isFileSharingReceivingEnabled} = useKoSubscribableChildren(teamState, ['isFileSharingReceivingEnabled']);
 
   const imageAltText = t('accessibility.conversationAssetImageAlt', {
     messageDate: `${message.displayTimestampShort()}`,
@@ -56,26 +53,6 @@ export const ImageAsset = ({asset, message, onClick, teamState = container.resol
 
   const imageContainerStyle: CSSObject = {
     maxWidth: 'var(--conversation-message-asset-width)',
-  };
-
-  const isImageWidthLargerThanDefined = parseInt(asset.width, 10) >= MAX_ASSET_WIDTH;
-  const imageWidth = isImageWidthLargerThanDefined ? `${MAX_ASSET_WIDTH}px` : asset.width;
-
-  const imageAsset: CSSObject = {
-    aspectRatio: isFileSharingReceivingEnabled ? `${asset.ratio}` : undefined,
-    maxHeight: '80vh',
-    maxWidth: !imageUrl?.url ? '100%' : imageWidth,
-
-    ...(!imageUrl?.url &&
-      !isImageWidthLargerThanDefined && {
-        height: asset.height,
-      }),
-  };
-
-  const imageStyle: CSSObject = {
-    width: imageWidth,
-    maxWidth: '100%',
-    height: 'auto',
   };
 
   return (
