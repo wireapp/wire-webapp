@@ -51,8 +51,7 @@ export interface AssetImageProps extends BaseImageProps {
 }
 
 export const AssetImage = ({image, alt, ...props}: AssetImageProps) => {
-  const imageData = image;
-  const {resource} = useKoSubscribableChildren(imageData, ['resource']);
+  const {resource} = useKoSubscribableChildren(image, ['resource']);
 
   return <Image image={resource} imageSizes={image} alt={alt} {...props} />;
 };
@@ -112,8 +111,10 @@ export const Image = ({
   const imageStyle = {
     aspectRatio: `${imageSizes?.ratio}`,
     maxWidth: '100%',
+    maxHeight: '100%',
     width: imageSizes?.width,
     cursor: onClick ? 'pointer' : 'default',
+    objectFit: 'contain',
   };
 
   const status = imageUrl ? 'loaded' : 'loading';
