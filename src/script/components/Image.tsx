@@ -127,7 +127,11 @@ export const Image: React.FC<ImageProps> = ({
           data-uie-name="image-asset-img"
         />
       ) : (
-        <div css={imageStyle} className="loading-dots" data-uie-name="image-loader"></div>
+        <div
+          css={{width: '100%', aspectRatio: imageData.ratio}}
+          className="loading-dots"
+          data-uie-name="image-loader"
+        ></div>
       )}
     </InViewport>
   );
