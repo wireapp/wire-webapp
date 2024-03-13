@@ -19,6 +19,7 @@
 
 import React, {useEffect, useRef, useState} from 'react';
 
+import {CSSObject} from '@emotion/react';
 import {container} from 'tsyringe';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -108,7 +109,7 @@ export const Image = ({
     return <RestrictedImage className={className} showMessage={!isQuote} isSmall={isQuote} />;
   }
 
-  const imageStyle = {
+  const imageStyle: CSSObject = {
     aspectRatio: `${imageSizes?.ratio}`,
     maxWidth: '100%',
     maxHeight: '100%',
