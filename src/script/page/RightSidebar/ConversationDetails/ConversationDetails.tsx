@@ -442,13 +442,11 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
                   <span className="panel__info-item__icon">{hasReceiptsEnabled ? <Icon.Read /> : <HideIcon />}</span>
 
                   <span>
-                    <span>
-                      <p>
-                        {hasReceiptsEnabled
-                          ? t('conversationDetails1to1ReceiptsHeadEnabled')
-                          : t('conversationDetails1to1ReceiptsHeadDisabled')}
-                      </p>
-                    </span>
+                    <p className="panel__action-item__status-title">
+                      {hasReceiptsEnabled
+                        ? t('conversationDetails1to1ReceiptsHeadEnabled')
+                        : t('conversationDetails1to1ReceiptsHeadDisabled')}
+                    </p>
                     <p className="panel__action-item__status">{t('conversationDetails1to1ReceiptsFirst')}</p>
                     <p className="panel__action-item__status">{t('conversationDetails1to1ReceiptsSecond')}</p>
                   </span>
