@@ -50,7 +50,6 @@ describe('message', () => {
       isLastDeliveredMessage: false,
       hideHeader: false,
       message,
-      lastMessageInGroup: new ContentMessage(),
       onClickAvatar: jest.fn(),
       onClickButton: jest.fn(),
       onClickCancelRequest: jest.fn(),
