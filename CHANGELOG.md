@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [45.2.10](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@45.2.9...@wireapp/core@45.2.10) (2024-03-13)
+
+### Bug Fixes
+
+* Address revoked devices not being detected ([#6070](https://github.com/wireapp/wire-web-packages/issues/6070)) ([028fbd3](https://github.com/wireapp/wire-web-packages/commit/028fbd3c0b42f0e46088afb777569718db3525ac))
+
 ## [45.2.9](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@45.2.8...@wireapp/core@45.2.9) (2024-03-11)
 
 ### Bug Fixes
