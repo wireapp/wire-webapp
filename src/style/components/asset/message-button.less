@@ -21,24 +21,55 @@
   position: relative;
   overflow: hidden;
   width: 100%;
-  max-width: 287px;
-  padding: 16px;
-  border: 1px solid @w-red;
+  max-width: 400px;
+  padding: 12px;
+
+  border: 1px solid var(--gray-40);
   border-radius: 6px;
+
   margin-top: 8px;
-  background-color: transparent;
-  color: @w-red;
-  font-size: @font-size-xs;
-  font-weight: @font-weight-bold;
-  line-height: 1.45;
+
+  background-color: var(--white);
+  color: var(--main-color);
+  font-size: 1rem;
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--font-size-xlarge);
   outline: none;
-  text-align: start;
-  text-transform: uppercase;
+  text-align: center;
   transition: all 0.1s linear;
 
+  .theme-dark & {
+    border-color: var(--gray-80);
+    background-color: var(--gray-95);
+  }
+
+  &:focus,
+  &:hover {
+    border-color: var(--button-secondary-active-border);
+    color: var(--accent-color);
+
+    .theme-dark & {
+      border-color: var(--button-primary-active);
+    }
+  }
+
   &--selected {
-    background-color: @w-red;
-    color: white;
+    border-color: var(--button-secondary-active-border);
+    background-color: var(--button-secondary-active-bg);
+    color: var(--accent-color);
+
+    .theme-dark & {
+      border-color: var(--accent-color);
+      background-color: var(--button-primary-active);
+    }
+
+    &:focus,
+    &:hover {
+      .theme-dark & {
+        border-color: var(--accent-color);
+        background-color: var(--button-primary-active);
+      }
+    }
   }
 
   &__waiting-overlay {
@@ -73,7 +104,5 @@
   &__error {
     margin-top: 4px;
     color: @w-red;
-    font-size: @font-size-xs;
-    font-weight: @font-weight-regular;
   }
 }
