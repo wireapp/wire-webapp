@@ -38,6 +38,12 @@ export enum RatchetTreeType {
   ByRef = 3,
 }
 
+export enum DeviceStatus {
+  Valid = 1,
+  Expired = 2,
+  Revoked = 3,
+}
+
 export class CoreCrypto {
   proteusInit = jest.fn();
   proteusNewPrekey = jest.fn(() => Uint8Array.from([]));
