@@ -42,7 +42,7 @@ export const getEnrollmentStore = ({id: userId, domain}: QualifiedId, clientId: 
   const clientStoreId = constructFullyQualifiedClientId(userId, clientId, domain);
   const constructKey = (key: string) => `${clientStoreId}_${key}`;
 
-  const store = {
+  return {
     store: {
       e2eiActivatedAt: (time: number) => localStorage.setItem(constructKey(e2eActivatedAtKey), String(time)),
       timer: (time: number) => localStorage.setItem(constructKey(e2eTimer), String(time)),
@@ -56,6 +56,4 @@ export const getEnrollmentStore = ({id: userId, domain}: QualifiedId, clientId: 
       timer: () => localStorage.removeItem(constructKey(e2eTimer)),
     },
   };
-
-  return store;
 };
