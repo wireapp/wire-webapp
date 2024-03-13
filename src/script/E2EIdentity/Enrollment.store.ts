@@ -17,20 +17,45 @@
  *
  */
 
+import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {constructFullyQualifiedClientId} from '@wireapp/core/lib/util/fullyQualifiedClientIdUtils';
+
 const e2eActivatedAtKey = 'e2eActivatedAt';
 const e2eTimer = 'e2eTimer';
 
-export const EnrollmentStore = {
+interface EnrollmentStore {
   store: {
-    e2eiActivatedAt: (time: number) => localStorage.setItem(e2eActivatedAtKey, String(time)),
-    timer: (time: number) => localStorage.setItem(e2eTimer, String(time)),
-  },
+    e2eiActivatedAt: (time: number) => void;
+    timer: (time: number) => void;
+  };
   get: {
-    e2eiActivatedAt: () => Number(localStorage.getItem(e2eActivatedAtKey)),
-    timer: () => Number(localStorage.getItem(e2eTimer)),
-  },
+    e2eiActivatedAt: () => number;
+    timer: () => number;
+  };
   clear: {
-    deviceCreatedAt: () => localStorage.removeItem(e2eActivatedAtKey),
-    timer: () => localStorage.removeItem(e2eTimer),
-  },
+    deviceCreatedAt: () => void;
+    timer: () => void;
+  };
+}
+
+export const getEnrollmentStore = ({id: userId, domain}: QualifiedId, clientId: string): EnrollmentStore => {
+  const clientStoreId = constructFullyQualifiedClientId(userId, clientId, domain);
+  const constructKey = (key: string) => `${clientStoreId}_${key}`;
+
+  const store = {
+    store: {
+      e2eiActivatedAt: (time: number) => localStorage.setItem(constructKey(e2eActivatedAtKey), String(time)),
+      timer: (time: number) => localStorage.setItem(constructKey(e2eTimer), String(time)),
+    },
+    get: {
+      e2eiActivatedAt: () => Number(localStorage.getItem(constructKey(e2eActivatedAtKey))),
+      timer: () => Number(localStorage.getItem(constructKey(e2eTimer))),
+    },
+    clear: {
+      deviceCreatedAt: () => localStorage.removeItem(constructKey(e2eActivatedAtKey)),
+      timer: () => localStorage.removeItem(constructKey(e2eTimer)),
+    },
+  };
+
+  return store;
 };
