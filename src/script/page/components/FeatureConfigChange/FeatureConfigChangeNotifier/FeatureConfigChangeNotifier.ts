@@ -203,7 +203,7 @@ const featureNotifications: FeatureMessageGenerator = {
       title: 'featureConfigChangeModalConversationGuestLinksHeadline',
     };
   },
-};
+} as const;
 
 function wasTurnedOnOrOff(oldConfig?: FeatureWithoutConfig, newConfig?: FeatureWithoutConfig): boolean | FeatureStatus {
   if (oldConfig?.status && newConfig?.status && oldConfig.status !== newConfig.status) {
@@ -232,7 +232,7 @@ export function FeatureConfigChangeNotifier({teamState, selfUserId}: Props): nul
     if (previous && config) {
       Object.entries(featureNotifications).forEach(([feature, getMessage]) => {
         const featureKey = feature as FEATURE_KEY;
-        const message = getMessage(previous?.[featureKey], config[featureKey]);
+        const message = getMessage(previous?.[featureKey] as any, config[featureKey] as any);
         const isEnforceDownloadPath = featureKey === FEATURE_KEY.ENFORCE_DOWNLOAD_PATH;
 
         if (!message) {
