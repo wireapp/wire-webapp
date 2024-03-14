@@ -109,14 +109,14 @@ describe('getFirstLinkWithOffset', () => {
   });
 
   it('should return the correct link and offset for a single link preceded by a code block', () => {
-    const Link = getFirstLinkWithOffset('```\ntrap.com\n```\nwire.com');
+    const Link = getFirstLinkWithOffset('```\ntrap.com `extra trap!`\n```\nwire.com');
 
     expect(Link.offset).toEqual(1);
     expect(Link.url).toEqual('wire.com');
   });
 
   it('should return the correct link and offset for a single link followed by a code block', () => {
-    const Link = getFirstLinkWithOffset('wire.com\n```\ntrap.com\n```');
+    const Link = getFirstLinkWithOffset('wire.com\n```\ntrap.com `extra trap!`\n```');
 
     expect(Link.offset).toEqual(0);
     expect(Link.url).toEqual('wire.com');
