@@ -153,7 +153,6 @@ const Conversations: React.FC<ConversationsProps> = ({
     conversation.hasUnread(),
   ).length;
 
-  const {notifications} = useKoSubscribableChildren(preferenceNotificationRepository, ['notifications']);
   const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
 
   const initialTab = propertiesRepository.getPreference(PROPERTIES_TYPE.INTERFACE.VIEW_FOLDERS)
@@ -161,7 +160,6 @@ const Conversations: React.FC<ConversationsProps> = ({
     : SidebarTabs.RECENT;
 
   const [currentTab, setCurrentTab] = useState<SidebarTabs>(initialTab);
-  const showBadge = notifications.length > 0;
 
   const isRecentTab = currentTab === SidebarTabs.RECENT;
   const isFolderTab = currentTab === SidebarTabs.FOLDER;
@@ -222,16 +220,6 @@ const Conversations: React.FC<ConversationsProps> = ({
 
     return (
       <>
-        <button
-          type="button"
-          className={cx(`conversations-settings-button accent-text`, {'conversations-settings--badge': showBadge})}
-          title={t('tooltipConversationsPreferences')}
-          onClick={() => onClickPreferences(ContentState.PREFERENCES_ABOUT)}
-          data-uie-name="go-preferences"
-        >
-          <Icon.Settings />
-        </button>
-
         {teamState.isTeam() ? (
           <>
             <button
