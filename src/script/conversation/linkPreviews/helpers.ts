@@ -23,6 +23,7 @@ import Linkify from 'linkify-it';
 const codeBlockRegex = /(`{3,})([\s\S]*?)(?:\1|$)/g;
 // Matches with inline code, even if it opens or closes on a different line
 const inlineCodeRegex = /(`+)(.*?)\1/gs;
+
 const linkify = new Linkify();
 
 /**
@@ -32,6 +33,7 @@ const linkify = new Linkify();
  */
 export const containsOnlyLink = (text: string): boolean => {
   const textWithoutCode = text.trim().replace(codeBlockRegex, '').replace(inlineCodeRegex, ``);
+
   const urls = linkify.match(textWithoutCode) || [];
   return urls.length === 1 && urls[0].raw === textWithoutCode;
 };

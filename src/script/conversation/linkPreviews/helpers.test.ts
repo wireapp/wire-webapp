@@ -73,10 +73,16 @@ describe('getFirstLinkWithOffset', () => {
     const singleTick = 'cool code: `wire.com`';
     const moreTicks = 'cool code: ```\nwire.com\n```';
     const manyTicks = 'cool code: ``````\nwire.com\n``````';
+    const multilineSingleTick = '\ncool code: `wire.com`';
+    const noClosingTicks = 'cool code: ```\nwire.com';
+    const ticksception = "cool code: ```\nwire.com `it's a trap!`\n```";
 
     expect(getFirstLinkWithOffset(singleTick)).toBeUndefined();
     expect(getFirstLinkWithOffset(moreTicks)).toBeUndefined();
     expect(getFirstLinkWithOffset(manyTicks)).toBeUndefined();
+    expect(getFirstLinkWithOffset(multilineSingleTick)).toBeUndefined();
+    expect(getFirstLinkWithOffset(noClosingTicks)).toBeUndefined();
+    expect(getFirstLinkWithOffset(ticksception)).toBeUndefined();
   });
 
   it('should return the correct link and offset for a single link without text', () => {
