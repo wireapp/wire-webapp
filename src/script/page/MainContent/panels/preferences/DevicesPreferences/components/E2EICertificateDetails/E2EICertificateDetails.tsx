@@ -73,7 +73,7 @@ export const E2EICertificateDetails = ({identity, isCurrentDevice}: E2EICertific
             onClick={() => setIsCertificateDetailsModalOpen(true)}
             data-uie-name="show-certificate-details"
             aria-label={t('E2EI.showCertificateDetails')}
-            tabIndex={TabIndex.FOCUSABLE}
+            //tabIndex={TabIndex.FOCUSABLE}
           >
             {t('E2EI.showCertificateDetails')}
           </Button>
