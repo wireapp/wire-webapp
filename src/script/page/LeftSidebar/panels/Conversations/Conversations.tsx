@@ -172,7 +172,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   const isConnectTab = currentTab === SidebarTabs.CONNECT;
   const isPreferences = currentTab === SidebarTabs.PREFERENCES;
 
-  const showSearchInput = isRecentTab || isFavoritesTab || isGroupsTab || isDirectsTab || isArchivesTab;
+  const showSearchInput = isRecentTab || isFolderTab || isFavoritesTab || isGroupsTab || isDirectsTab || isArchivesTab;
 
   const hasNoConversations = conversations.length + connectRequests.length === 0;
   const {isOpen: isFolderOpen, openFolder} = useFolderState();
