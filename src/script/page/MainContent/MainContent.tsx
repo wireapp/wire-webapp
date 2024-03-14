@@ -83,14 +83,14 @@ const MainContent: FC<MainContentProps> = ({
   const {isActivatedAccount} = useKoSubscribableChildren(selfUser, ['isActivatedAccount']);
 
   const contentState = useAppState(state => state.contentState);
-  // const isShowingConversation = useAppState(state => state.isShowingConversation);
+  const isShowingConversation = useAppState(state => state.isShowingConversation);
 
-  // useEffect(() => {
-  //   if (!isShowingConversation() && conversationState.activeConversation()) {
-  //     // Reset active conversation for all states that do not require a loaded conversation
-  //     conversationState.activeConversation(undefined);
-  //   }
-  // }, [contentState, conversationState]);
+  useEffect(() => {
+    if (!isShowingConversation() && conversationState.activeConversation()) {
+      // Reset active conversation for all states that do not require a loaded conversation
+      conversationState.activeConversation(undefined);
+    }
+  }, [contentState, conversationState]);
 
   useEffect(() => {
     // Show legal hold on mount when legal hold is enabled for team

@@ -547,6 +547,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   };
 
   function onClickPreferences(itemId: ContentState) {
+    switchList(ListState.PREFERENCES);
     setCurrentView(ViewType.CENTRAL_COLUMN);
     listViewModel.contentViewModel.switchContent(itemId);
 

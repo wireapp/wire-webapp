@@ -21,7 +21,6 @@ import React, {useEffect} from 'react';
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
-import {CSSTransition, SwitchTransition} from 'react-transition-group';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
@@ -37,13 +36,6 @@ type LeftSidebarProps = {
   selfUser: User;
   isActivatedAccount: boolean;
 };
-const Animated: React.FC<{children: React.ReactNode}> = ({children, ...rest}) => {
-  return (
-    <CSSTransition classNames="fade-in-out" timeout={{enter: 700, exit: 300}} {...rest}>
-      {children}
-    </CSSTransition>
-  );
-};
 
 const LeftSidebar: React.FC<LeftSidebarProps> = ({listViewModel, selfUser, isActivatedAccount}) => {
   const {conversationRepository, propertiesRepository} = listViewModel;
@@ -58,36 +50,28 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({listViewModel, selfUser, isAct
 
   return (
     <aside id="left-column" className={cx('left-column', {'left-column--light-theme': !isActivatedAccount})}>
-      <SwitchTransition>
-        <Animated key={listState}>
-          <>
-            {[ListState.CONVERSATIONS, ListState.START_UI, ListState.PREFERENCES, ListState.ARCHIVE].includes(
-              listState,
-            ) && (
-              <Conversations
-                selfUser={selfUser}
-                listState={listState}
-                listViewModel={listViewModel}
-                searchRepository={repositories.search}
-                teamRepository={repositories.team}
-                integrationRepository={repositories.integration}
-                userRepository={repositories.user}
-                propertiesRepository={propertiesRepository}
-                conversationRepository={conversationRepository}
-                preferenceNotificationRepository={repositories.preferenceNotification}
-              />
-            )}
+      {[ListState.CONVERSATIONS, ListState.START_UI, ListState.PREFERENCES, ListState.ARCHIVE].includes(listState) && (
+        <Conversations
+          selfUser={selfUser}
+          listState={listState}
+          listViewModel={listViewModel}
+          searchRepository={repositories.search}
+          teamRepository={repositories.team}
+          integrationRepository={repositories.integration}
+          userRepository={repositories.user}
+          propertiesRepository={propertiesRepository}
+          conversationRepository={conversationRepository}
+          preferenceNotificationRepository={repositories.preferenceNotification}
+        />
+      )}
 
-            {listState === ListState.TEMPORARY_GUEST && (
-              <TemporaryGuestConversations
-                callingViewModel={listViewModel.callingViewModel}
-                listViewModel={listViewModel}
-                selfUser={selfUser}
-              />
-            )}
-          </>
-        </Animated>
-      </SwitchTransition>
+      {listState === ListState.TEMPORARY_GUEST && (
+        <TemporaryGuestConversations
+          callingViewModel={listViewModel.callingViewModel}
+          listViewModel={listViewModel}
+          selfUser={selfUser}
+        />
+      )}
     </aside>
   );
 };
