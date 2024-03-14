@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [45.2.11](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@45.2.10...@wireapp/core@45.2.11) (2024-03-14)
+
+### Bug Fixes
+
+* Address federated crl distribution points not being detected ([#6071](https://github.com/wireapp/wire-web-packages/issues/6071)) ([ced9cd9](https://github.com/wireapp/wire-web-packages/commit/ced9cd959983d12524c6ac094a9b12e59ef29991))
+
 ## [45.2.10](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@45.2.9...@wireapp/core@45.2.10) (2024-03-13)
 
 ### Bug Fixes
