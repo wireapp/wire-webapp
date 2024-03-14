@@ -43,6 +43,7 @@ const CollectionItem: FC<CollectionItemProps> = ({message, onImageClick}) => {
   if (isOfCategory('images', message) && firstAsset.isImage() && resource) {
     return (
       <AssetImage
+        css={{width: '110px'}}
         className="collection-image"
         image={firstAsset}
         data-uie-name="image-asset"

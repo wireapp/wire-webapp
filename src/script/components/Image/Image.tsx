@@ -19,23 +19,19 @@
 
 import React, {useEffect, useRef, useState} from 'react';
 
-import {CSSObject} from '@emotion/react';
 import {container} from 'tsyringe';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
-import {RestrictedImage} from './asset/RestrictedImage';
-import {AssetUrl, useAssetTransfer} from './MessagesList/Message/ContentMessage/asset/useAssetTransfer';
-import {InViewport} from './utils/InViewport';
+import {getImageStyle, imageWrapperStyle} from './Image.styles';
+import {RestrictedImage} from './RestrictedImage';
 
-import {AssetRemoteData} from '../assets/AssetRemoteData';
-import {Config} from '../Config';
-import {MediumImage} from '../entity/message/MediumImage';
-import {TeamState} from '../team/TeamState';
-
-const imageWrapperStyle = {
-  width: '100%',
-};
+import {AssetRemoteData} from '../../assets/AssetRemoteData';
+import {Config} from '../../Config';
+import {MediumImage} from '../../entity/message/MediumImage';
+import {TeamState} from '../../team/TeamState';
+import {AssetUrl, useAssetTransfer} from '../MessagesList/Message/ContentMessage/asset/useAssetTransfer';
+import {InViewport} from '../utils/InViewport';
 
 interface BaseImageProps extends React.HTMLProps<HTMLDivElement> {
   alt?: string;
@@ -109,15 +105,6 @@ export const Image = ({
     return <RestrictedImage className={className} showMessage={!isQuote} isSmall={isQuote} />;
   }
 
-  const imageStyle: CSSObject = {
-    aspectRatio: `${imageSizes?.ratio}`,
-    maxWidth: '100%',
-    maxHeight: '100%',
-    width: imageSizes?.width,
-    cursor: onClick ? 'pointer' : 'default',
-    objectFit: 'contain',
-  };
-
   return (
     <InViewport
       onVisible={() => setIsInViewport(true)}
@@ -128,7 +115,7 @@ export const Image = ({
     >
       {imageUrl ? (
         <img
-          css={imageStyle}
+          css={getImageStyle(imageSizes, !!onClick)}
           onClick={onClick}
           src={imageUrl.url}
           role="presentation"
