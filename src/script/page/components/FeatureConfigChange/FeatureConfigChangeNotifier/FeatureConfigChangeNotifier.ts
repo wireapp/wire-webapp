@@ -22,7 +22,6 @@ import {useEffect, useRef} from 'react';
 import {
   FeatureList,
   FeatureWithoutConfig,
-  Feature,
   FEATURE_KEY,
   FeatureStatus,
   SelfDeletingTimeout,
@@ -44,15 +43,14 @@ import {loadFeatureConfig, saveFeatureConfig} from './FeatureConfigChangeNotifie
 import {Config} from '../../../../Config';
 import {TeamState} from '../../../../team/TeamState';
 
-const featureNotifications: Partial<
-  Record<
-    FEATURE_KEY,
-    (
-      oldConfig?: Feature<any> | FeatureWithoutConfig,
-      newConfig?: FeatureWithoutConfig | Feature<any> | undefined,
-    ) => undefined | {htmlMessage: string; title: StringIdentifer; primaryAction?: Action}
-  >
-> = {
+type FeatureMessageGenerator = {
+  [K in keyof FeatureList]: (
+    oldConfig?: FeatureList[K],
+    newConfig?: FeatureList[K],
+  ) => undefined | {htmlMessage: string; title: StringIdentifer; primaryAction?: Action};
+};
+
+const featureNotifications: FeatureMessageGenerator = {
   [FEATURE_KEY.FILE_SHARING]: (oldConfig, newConfig) => {
     const status = wasTurnedOnOrOff(oldConfig, newConfig);
     if (!status) {
@@ -79,6 +77,18 @@ const featureNotifications: Partial<
       title: 'featureConfigChangeModalAudioVideoHeadline',
     };
   },
+
+  [FEATURE_KEY.APPLOCK]: (oldConfig, newConfig) => {
+    const shouldWarn = oldConfig?.config.enforceAppLock === true && newConfig?.config.enforceAppLock === false;
+    if (!shouldWarn) {
+      return undefined;
+    }
+    return {
+      htmlMessage: t('featureConfigChangeModalApplock'),
+      title: 'featureConfigChangeModalApplockHeadline',
+    };
+  },
+
   [FEATURE_KEY.ENFORCE_DOWNLOAD_PATH]: (oldConfig, newConfig) => {
     const handleDlPathChange: (
       status: FeatureStatus | boolean,
