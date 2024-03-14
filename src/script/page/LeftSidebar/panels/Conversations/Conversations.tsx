@@ -67,6 +67,7 @@ import {Shortcut} from '../../../../ui/Shortcut';
 import {ShortcutType} from '../../../../ui/ShortcutType';
 import {UserState} from '../../../../user/UserState';
 import {ListViewModel} from '../../../../view_model/ListViewModel';
+import {UserDetails} from '../../UserDetails';
 import {ListWrapper} from '../ListWrapper';
 
 type ConversationsProps = {
@@ -282,6 +283,12 @@ const Conversations: React.FC<ConversationsProps> = ({
 
   const sidebar = (
     <nav className="conversations-sidebar">
+      <UserDetails
+        user={selfUser}
+        groupId={conversationState.selfMLSConversation()?.groupId}
+        isTeam={teamState.isTeam()}
+      />
+
       <div
         role="tablist"
         aria-label={t('accessibility.headings.sidebar')}
