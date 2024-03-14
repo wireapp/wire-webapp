@@ -258,11 +258,11 @@ export const VerificationBadges = ({
   displayTitle = false,
   context,
 }: VerificationBadgesProps) => {
+  const id = useRef(new Date().getTime());
+
   if (!MLSStatus && !isProteusVerified) {
     return null;
   }
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const id = useRef(new Date().getTime());
 
   const conversationHasProtocol = !!conversationProtocol;
 
