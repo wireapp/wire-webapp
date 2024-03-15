@@ -101,15 +101,17 @@ const ListWrapper = ({
                   {header}
                 </h2>
 
-                <button
-                  type="button"
-                  className="left-list-header-close-button button-icon-large"
-                  onClick={onClose}
-                  title={t('tooltipSearchClose')}
-                  data-uie-name={`do-close-${id}`}
-                >
-                  <Icon.Close />
-                </button>
+                {onClose && (
+                  <button
+                    type="button"
+                    className="left-list-header-close-button button-icon-large"
+                    onClick={onClose}
+                    title={t('tooltipSearchClose')}
+                    data-uie-name={`do-close-${id}`}
+                  >
+                    <Icon.Close />
+                  </button>
+                )}
               </>
             )}
           </header>

@@ -41,8 +41,11 @@ import {
   searchInputStyles,
   searchInputWrapperStyles,
 } from 'src/script/page/LeftSidebar/panels/Conversations/Conversations.styles';
+import {Preferences} from 'src/script/page/LeftSidebar/panels/Preferences';
 import {StartUI} from 'src/script/page/LeftSidebar/panels/StartUI';
-import {ListState} from 'src/script/page/useAppState';
+import {ANIMATED_PAGE_TRANSITION_DURATION} from 'src/script/page/MainContent';
+import {useAppMainState, ViewType} from 'src/script/page/state';
+import {ContentState, ListState} from 'src/script/page/useAppState';
 import {SearchRepository} from 'src/script/search/SearchRepository';
 import {TeamRepository} from 'src/script/team/TeamRepository';
 import {UserRepository} from 'src/script/user/UserRepository';
@@ -150,7 +153,6 @@ const Conversations: React.FC<ConversationsProps> = ({
     conversation.hasUnread(),
   ).length;
 
-  const {notifications} = useKoSubscribableChildren(preferenceNotificationRepository, ['notifications']);
   const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
 
   const initialTab = propertiesRepository.getPreference(PROPERTIES_TYPE.INTERFACE.VIEW_FOLDERS)
@@ -158,7 +160,6 @@ const Conversations: React.FC<ConversationsProps> = ({
     : SidebarTabs.RECENT;
 
   const [currentTab, setCurrentTab] = useState<SidebarTabs>(initialTab);
-  const showBadge = notifications.length > 0;
 
   const isRecentTab = currentTab === SidebarTabs.RECENT;
   const isFolderTab = currentTab === SidebarTabs.FOLDER;
@@ -167,21 +168,14 @@ const Conversations: React.FC<ConversationsProps> = ({
   const isDirectsTab = currentTab === SidebarTabs.DIRECTS;
   const isArchivesTab = currentTab === SidebarTabs.ARCHIVES;
   const isConnectTab = currentTab === SidebarTabs.CONNECT;
+  const isPreferences = currentTab === SidebarTabs.PREFERENCES;
 
-  const showSearchInput = isRecentTab || isFavoritesTab || isGroupsTab || isDirectsTab || isArchivesTab;
+  const showSearchInput = isRecentTab || isFolderTab || isFavoritesTab || isGroupsTab || isDirectsTab || isArchivesTab;
 
   const hasNoConversations = conversations.length + connectRequests.length === 0;
   const {isOpen: isFolderOpen, openFolder} = useFolderState();
 
   const showLegalHold = isOnLegalHold || hasPendingLegalHold;
-
-  // const {setCurrentView} = useAppMainState(state => state.responsiveView);
-  // const {close: closeRightSidebar} = useAppMainState(state => state.rightSidebar);
-  const onClickPreferences = () => {
-    // setCurrentView(ViewType.LEFT_SIDEBAR);
-    // switchList(ListState.PREFERENCES);
-    // closeRightSidebar();
-  };
 
   useEffect(() => {
     if (activeConversation && !conversationState.isVisible(activeConversation)) {
@@ -219,61 +213,71 @@ const Conversations: React.FC<ConversationsProps> = ({
     propertiesRepository.savePreference(PROPERTIES_TYPE.INTERFACE.VIEW_FOLDERS, isFolderTab);
   }, [isFolderTab]);
 
-  const header = (
-    <>
-      <button
-        type="button"
-        className={cx(`conversations-settings-button accent-text`, {'conversations-settings--badge': showBadge})}
-        title={t('tooltipConversationsPreferences')}
-        onClick={onClickPreferences}
-        data-uie-name="go-preferences"
-      >
-        <Icon.Settings />
-      </button>
+  function getHeader() {
+    if (isPreferences) {
+      return null;
+    }
 
-      {teamState.isTeam() ? (
-        <>
-          <button
-            type="button"
-            className="left-list-header-availability"
-            css={{...(showLegalHold && {gridColumn: '2/3'})}}
-            onClick={event => AvailabilityContextMenu.show(event.nativeEvent, 'left-list-availability-menu')}
-          >
-            <UserInfo user={selfUser} className="availability-state" dataUieName="status-availability" showAvailability>
-              <UserVerificationBadges
+    return (
+      <>
+        {teamState.isTeam() ? (
+          <>
+            <button
+              type="button"
+              className="left-list-header-availability"
+              css={{...(showLegalHold && {gridColumn: '2/3'})}}
+              onClick={event => AvailabilityContextMenu.show(event.nativeEvent, 'left-list-availability-menu')}
+            >
+              <UserInfo
                 user={selfUser}
-                isSelfUser
-                groupId={conversationState.selfMLSConversation()?.groupId}
-              />
-            </UserInfo>
-          </button>
+                className="availability-state"
+                dataUieName="status-availability"
+                showAvailability
+              >
+                <UserVerificationBadges
+                  user={selfUser}
+                  isSelfUser
+                  groupId={conversationState.selfMLSConversation()?.groupId}
+                />
+              </UserInfo>
+            </button>
 
-          {showLegalHold && (
-            <LegalHoldDot
-              isPending={hasPendingLegalHold}
-              dataUieName={hasPendingLegalHold ? 'status-legal-hold-pending' : 'status-legal-hold'}
-              showText
-              isInteractive
-            />
-          )}
-        </>
-      ) : (
-        <span
-          className="left-list-header-text"
-          data-uie-name="status-name"
-          role="presentation"
-          tabIndex={TabIndex.FOCUSABLE}
-        >
-          {userName}
-        </span>
-      )}
-    </>
-  );
+            {showLegalHold && (
+              <LegalHoldDot
+                isPending={hasPendingLegalHold}
+                dataUieName={hasPendingLegalHold ? 'status-legal-hold-pending' : 'status-legal-hold'}
+                showText
+                isInteractive
+              />
+            )}
+          </>
+        ) : (
+          <span
+            className="left-list-header-text"
+            data-uie-name="status-name"
+            role="presentation"
+            tabIndex={TabIndex.FOCUSABLE}
+          >
+            {userName}
+          </span>
+        )}
+      </>
+    );
+  }
 
   function changeTab(nextTab: SidebarTabs) {
     if (nextTab === SidebarTabs.ARCHIVES) {
       // will eventually load missing events from the db
       conversationRepository.updateArchivedConversations();
+    }
+
+    if (
+      nextTab !== SidebarTabs.PREFERENCES
+      //  && isPreferences
+    ) {
+      onExitPreferences();
+      // switchList(ListState.CONVERSATIONS);
+      // listViewModel.contentViewModel.switchContent(ContentState.COLLECTION);
     }
 
     setConversationsFilter('');
@@ -285,7 +289,7 @@ const Conversations: React.FC<ConversationsProps> = ({
       <div
         role="tablist"
         aria-label={t('accessibility.headings.sidebar')}
-        aria-owns="tab-1 tab-2 tab-3 tab-4 tab-5 tab-6 tab-7"
+        aria-owns="tab-1 tab-2 tab-3 tab-4 tab-5 tab-6 tab-7 tab-8"
         className="conversations-sidebar-list"
       >
         <div className="conversations-sidebar-title">{t('videoCallOverlayConversations')}</div>
@@ -422,6 +426,22 @@ const Conversations: React.FC<ConversationsProps> = ({
             <span className="conversations-sidebar-btn--text">{t('searchConnect')}</span>
           </span>
         </button>
+        <button
+          id="tab-8"
+          type="button"
+          className={cx(`conversations-sidebar-btn`, {active: isPreferences})}
+          onClick={() => {
+            changeTab(SidebarTabs.PREFERENCES);
+            onClickPreferences(ContentState.PREFERENCES_ACCOUNT);
+          }}
+          title={t('preferencesHeadline', Shortcut.getShortcutTooltip(ShortcutType.START))}
+          data-uie-name="go-people"
+        >
+          <span className="conversations-sidebar-btn--text-wrapper">
+            <Icon.Settings />
+            <span className="conversations-sidebar-btn--text">{t('preferencesHeadline')}</span>
+          </span>
+        </button>
       </div>
     </nav>
   );
@@ -504,88 +524,132 @@ const Conversations: React.FC<ConversationsProps> = ({
 
   const {conversations: currentTabConversations, searchInputPlaceholder} = getTabConversations();
 
+  const {setCurrentView} = useAppMainState(state => state.responsiveView);
+
+  const switchList = listViewModel.switchList;
+
+  const onExitPreferences = () => {
+    setCurrentView(ViewType.LEFT_SIDEBAR);
+    switchList(ListState.CONVERSATIONS);
+    listViewModel.contentViewModel.switchContent(ContentState.CONVERSATION);
+  };
+
+  function onClickPreferences(itemId: ContentState) {
+    switchList(ListState.PREFERENCES);
+    setCurrentView(ViewType.CENTRAL_COLUMN);
+    listViewModel.contentViewModel.switchContent(itemId);
+
+    setTimeout(() => {
+      const centerColumn = document.getElementById('center-column');
+      const nextElementToFocus = centerColumn?.querySelector("[tabindex='0']") as HTMLElement | null;
+      nextElementToFocus?.focus();
+    }, ANIMATED_PAGE_TRANSITION_DURATION + 1);
+  }
+
+  function getListWrapperItems() {
+    if (isPreferences) {
+      return (
+        <Preferences
+          onPreferenceItemClick={onClickPreferences}
+          teamRepository={teamRepository}
+          preferenceNotificationRepository={preferenceNotificationRepository}
+        />
+      );
+    }
+
+    return hasNoConversations ? (
+      <>
+        {archivedConversations.length === 0 ? (
+          <div className="conversations-centered">
+            <div>
+              {t('conversationsWelcome', {
+                brandName: Config.getConfig().BRAND_NAME,
+              })}
+            </div>
+            <button className="button-reset-default text-underline" onClick={() => changeTab(SidebarTabs.CONNECT)}>
+              {t('conversationsNoConversations')}
+            </button>
+          </div>
+        ) : (
+          <div className="conversations-all-archived">{t('conversationsAllArchived')}</div>
+        )}
+      </>
+    ) : (
+      <>
+        {showSearchInput && (
+          <Input
+            className="label-1"
+            value={conversationsFilter}
+            onChange={event => {
+              setConversationsFilter(event.currentTarget.value);
+            }}
+            startContent={<SearchIcon width={14} height={14} css={searchIconStyles} />}
+            endContent={
+              conversationsFilter && (
+                <CircleCloseIcon
+                  className="cursor-pointer"
+                  onClick={() => setConversationsFilter('')}
+                  css={closeIconStyles}
+                />
+              )
+            }
+            inputCSS={searchInputStyles}
+            wrapperCSS={searchInputWrapperStyles}
+            placeholder={searchInputPlaceholder}
+          />
+        )}
+        {showSearchInput && currentTabConversations.length === 0 && (
+          <div className="conversations-centered">
+            <div>{t('searchConversationsNoResult')}</div>
+            <button className="button-reset-default text-underline" onClick={() => changeTab(SidebarTabs.CONNECT)}>
+              {t('searchConversationsNoResultConnectSuggestion')}
+            </button>
+          </div>
+        )}
+
+        {isConnectTab && (
+          <StartUI
+            conversationRepository={conversationRepository}
+            searchRepository={searchRepository}
+            teamRepository={teamRepository}
+            integrationRepository={integrationRepository}
+            mainViewModel={listViewModel.mainViewModel}
+            userRepository={userRepository}
+            isFederated={listViewModel.isFederated}
+            selfUser={selfUser}
+          />
+        )}
+
+        {showSearchInput && (
+          <ConversationsList
+            callState={callState}
+            currentTab={currentTab}
+            currentFocus={currentFocus}
+            listViewModel={listViewModel}
+            connectRequests={connectRequests}
+            handleArrowKeyDown={handleKeyDown}
+            conversationState={conversationState}
+            conversations={currentTabConversations}
+            conversationRepository={conversationRepository}
+            resetConversationFocus={resetConversationFocus}
+          />
+        )}
+      </>
+    );
+  }
+
+  const header = getHeader();
+
   return (
     <div className="conversations-wrapper">
-      <ListWrapper id="conversations" headerElement={header} sidebar={sidebar} before={callingView}>
-        {hasNoConversations ? (
-          <>
-            {archivedConversations.length === 0 ? (
-              <div className="conversations-centered">
-                <div>
-                  {t('conversationsWelcome', {
-                    brandName: Config.getConfig().BRAND_NAME,
-                  })}
-                </div>
-                <button className="button-reset-default text-underline" onClick={() => changeTab(SidebarTabs.CONNECT)}>
-                  {t('conversationsNoConversations')}
-                </button>
-              </div>
-            ) : (
-              <div className="conversations-all-archived">{t('conversationsAllArchived')}</div>
-            )}
-          </>
-        ) : (
-          <>
-            {showSearchInput && (
-              <Input
-                className="label-1"
-                value={conversationsFilter}
-                onChange={event => {
-                  setConversationsFilter(event.currentTarget.value);
-                }}
-                startContent={<SearchIcon width={14} height={14} css={searchIconStyles} />}
-                endContent={
-                  conversationsFilter && (
-                    <CircleCloseIcon
-                      className="cursor-pointer"
-                      onClick={() => setConversationsFilter('')}
-                      css={closeIconStyles}
-                    />
-                  )
-                }
-                inputCSS={searchInputStyles}
-                wrapperCSS={searchInputWrapperStyles}
-                placeholder={searchInputPlaceholder}
-              />
-            )}
-            {showSearchInput && currentTabConversations.length === 0 && (
-              <div className="conversations-centered">
-                <div>{t('searchConversationsNoResult')}</div>
-                <button className="button-reset-default text-underline" onClick={() => changeTab(SidebarTabs.CONNECT)}>
-                  {t('searchConversationsNoResultConnectSuggestion')}
-                </button>
-              </div>
-            )}
-
-            {isConnectTab && (
-              <StartUI
-                conversationRepository={conversationRepository}
-                searchRepository={searchRepository}
-                teamRepository={teamRepository}
-                integrationRepository={integrationRepository}
-                mainViewModel={listViewModel.mainViewModel}
-                userRepository={userRepository}
-                isFederated={listViewModel.isFederated}
-                selfUser={selfUser}
-              />
-            )}
-
-            {showSearchInput && (
-              <ConversationsList
-                callState={callState}
-                currentTab={currentTab}
-                currentFocus={currentFocus}
-                listViewModel={listViewModel}
-                connectRequests={connectRequests}
-                handleArrowKeyDown={handleKeyDown}
-                conversationState={conversationState}
-                conversations={currentTabConversations}
-                conversationRepository={conversationRepository}
-                resetConversationFocus={resetConversationFocus}
-              />
-            )}
-          </>
-        )}
+      <ListWrapper
+        id="conversations"
+        headerElement={header}
+        hasHeader={Boolean(header)}
+        sidebar={sidebar}
+        before={callingView}
+      >
+        {getListWrapperItems()}
       </ListWrapper>
     </div>
   );
