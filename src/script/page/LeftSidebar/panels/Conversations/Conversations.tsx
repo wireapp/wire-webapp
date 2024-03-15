@@ -24,7 +24,7 @@ import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {CircleCloseIcon, GroupIcon, Input, SearchIcon, StarIcon} from '@wireapp/react-ui-kit';
+import {CircleCloseIcon, GroupIcon, Input, SearchIcon, StarIcon, InfoIcon} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {CallingCell} from 'Components/calling/CallingCell';
@@ -289,7 +289,7 @@ const Conversations: React.FC<ConversationsProps> = ({
       <div
         role="tablist"
         aria-label={t('accessibility.headings.sidebar')}
-        aria-owns="tab-1 tab-2 tab-3 tab-4 tab-5 tab-6 tab-7 tab-8"
+        aria-owns="tab-1 tab-2 tab-3 tab-4 tab-5 tab-6 tab-7 tab-8 tab-9"
         className="conversations-sidebar-list"
       >
         <div className="conversations-sidebar-title">{t('videoCallOverlayConversations')}</div>
@@ -442,6 +442,21 @@ const Conversations: React.FC<ConversationsProps> = ({
             <span className="conversations-sidebar-btn--text">{t('preferencesHeadline')}</span>
           </span>
         </button>
+        <a
+          rel="nofollow noopener noreferrer"
+          target="_blank"
+          href={Config.getConfig().URL.SUPPORT.INDEX}
+          id="tab-9"
+          type="button"
+          className="conversations-sidebar-btn"
+          title={t('preferencesAboutSupport', Shortcut.getShortcutTooltip(ShortcutType.START))}
+          data-uie-name="go-people"
+        >
+          <span className="conversations-sidebar-btn--text-wrapper">
+            <InfoIcon />
+            <span className="conversations-sidebar-btn--text">{t('preferencesAboutSupport')}</span>
+          </span>
+        </a>
       </div>
     </nav>
   );
