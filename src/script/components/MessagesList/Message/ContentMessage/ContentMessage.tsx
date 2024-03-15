@@ -184,7 +184,7 @@ export const ContentMessageComponent = ({
         className={cx('message-body', {
           'message-asset': isAssetMessage,
           'message-quoted': !!quote,
-          'ephemeral-asset-expired': isObfuscated,
+          'ephemeral-asset-expired': isObfuscated && isAssetMessage,
           'icon-file': isObfuscated && isFileMessage,
           'icon-movie': isObfuscated && isVideoMessage,
         })}
