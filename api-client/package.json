@@ -16,7 +16,7 @@
     "@wireapp/commons": "workspace:^",
     "@wireapp/priority-queue": "workspace:^",
     "@wireapp/protocol-messaging": "1.46.0",
-    "axios": "1.6.7",
+    "axios": "1.6.8",
     "axios-retry": "4.0.0",
     "http-status-codes": "2.3.0",
     "logdown": "3.3.1",
