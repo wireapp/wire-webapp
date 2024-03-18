@@ -50,7 +50,7 @@ export const PrimaryModalComponent: FC = () => {
   const updateErrorMessage = usePrimaryModalState(state => state.updateErrorMessage);
   const updateCurrentModalContent = usePrimaryModalState(state => state.updateCurrentModalContent);
   const currentId = usePrimaryModalState(state => state.currentModalId);
-  const primaryActionButtonRef = useRef<HTMLButtonElement | null>(null);
+  const primaryActionButtonRef = useRef<HTMLButtonElement>(null);
   const isModalVisible = currentId !== null;
   const {
     checkboxLabel,
@@ -216,10 +216,7 @@ export const PrimaryModalComponent: FC = () => {
 
   const primaryButton = !!primaryAction?.text && (
     <button
-      ref={ref => {
-        ref?.focus();
-        primaryActionButtonRef.current = ref;
-      }}
+      ref={primaryActionButtonRef}
       type="button"
       onClick={doAction(confirm, !!closeOnConfirm)}
       disabled={isPrimaryActionDisabled()}
