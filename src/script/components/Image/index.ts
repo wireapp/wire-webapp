@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2024 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,29 +17,4 @@
  *
  */
 
-.image-restricted {
-  display: flex;
-  width: 200px;
-  height: 113px;
-  border-radius: 4px;
-  background-color: var(--foreground-fade-8);
-
-  &--small {
-    width: 64px;
-    height: 36px;
-  }
-
-  &--container {
-    padding: 8px;
-    margin: auto;
-  }
-
-  &--message {
-    .label-xs;
-    .text-foreground;
-    .text-center;
-
-    margin-top: 8px;
-    line-height: 1.3em;
-  }
-}
+export * from './Image';

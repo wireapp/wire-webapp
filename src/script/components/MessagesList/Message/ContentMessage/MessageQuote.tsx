@@ -26,7 +26,7 @@ import cx from 'classnames';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Icon} from 'Components/Icon';
-import {Image} from 'Components/Image';
+import {AssetImage} from 'Components/Image';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -185,11 +185,11 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
         <Fragment key={index}>
           {asset.isImage() && (
             <div data-uie-name="media-picture-quote">
-              <Image
+              <AssetImage
                 className="message-quote__image"
-                asset={asset.resource()}
-                aspectRatio={asset.ratio}
-                click={(asset, event) => showDetail(quotedMessage, event)}
+                imageStyles={{objectFit: 'cover'}}
+                image={asset}
+                onClick={event => showDetail(quotedMessage, event)}
               />
             </div>
           )}

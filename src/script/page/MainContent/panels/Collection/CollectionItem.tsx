@@ -19,7 +19,7 @@
 
 import {FC} from 'react';
 
-import {Image} from 'Components/Image';
+import {AssetImage} from 'Components/Image';
 import {AudioAsset} from 'Components/MessagesList/Message/ContentMessage/asset/AudioAsset';
 import {FileAsset} from 'Components/MessagesList/Message/ContentMessage/asset/FileAssetComponent';
 import {LinkPreviewAsset} from 'Components/MessagesList/Message/ContentMessage/asset/LinkPreviewAssetComponent';
@@ -40,13 +40,15 @@ const CollectionItem: FC<CollectionItemProps> = ({message, onImageClick}) => {
   const firstAsset = assets[0];
   const {resource} = useKoSubscribableChildren(firstAsset as MediumImage, ['resource']);
 
-  if (isOfCategory('images', message) && resource) {
+  if (isOfCategory('images', message) && firstAsset.isImage() && resource) {
     return (
-      <Image
+      <AssetImage
+        css={{width: '110px', height: '110px'}}
         className="collection-image"
-        asset={resource}
+        image={firstAsset}
         data-uie-name="image-asset"
-        click={() => onImageClick?.(message)}
+        onClick={() => onImageClick?.(message)}
+        imageStyles={{objectFit: 'cover', objectPosition: 'center'}}
       />
     );
   }
