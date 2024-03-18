@@ -127,7 +127,7 @@ export const Image = ({
         />
       ) : (
         <div
-          css={{width: '100%', aspectRatio: imageSizes?.ratio}}
+          css={{width: '100%', aspectRatio: imageSizes?.ratio, maxHeight: '100%'}}
           className="loading-dots"
           data-uie-name="image-loader"
         ></div>
