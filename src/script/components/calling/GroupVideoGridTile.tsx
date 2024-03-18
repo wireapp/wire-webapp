@@ -148,7 +148,7 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
         <div className="tile-wrapper">
           <Video
             isBlurred={participant.user.id === selfParticipant.user.id && !!participant.isBlurred()}
-            blurStream={participant.user.id === selfParticipant.user.id ? participant.blurStream() : undefined}
+            blurStream={participant.user.id === selfParticipant.user.id ? selfParticipant.setBlurStream : undefined}
             autoPlay
             playsInline
             srcObject={videoStream}

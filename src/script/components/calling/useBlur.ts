@@ -24,7 +24,22 @@ import '@tensorflow/tfjs-backend-webgl';
 import '@tensorflow/tfjs-core';
 import * as bodySegmentation from '@tensorflow-models/body-segmentation';
 
-export const useBlur = () => {
+const STATE = {
+  camera: {targetFPS: 60, sizeOption: '640 X 480', cameraSelector: ''},
+  fpsDisplay: {mode: 'model'},
+  backend: '',
+  flags: {},
+  modelConfig: {},
+  visualization: {
+    foregroundThreshold: 0.5,
+    // maskOpacity: 0.5,
+    // maskBlur: 0,
+    backgroundBlur: 10,
+    edgeBlur: 5,
+  },
+};
+
+export const useBlur = (src: MediaStream, canvasRef: React.RefObject<HTMLCanvasElement>) => {
   const segmenter = useRef<bodySegmentation.BodySegmenter | null>(null);
   const model = useRef(bodySegmentation.SupportedModels.MediaPipeSelfieSegmentation);
 
@@ -38,10 +53,68 @@ export const useBlur = () => {
     segmenter.current = await bodySegmentation.createSegmenter(model.current, segmenterConfig);
   }, []);
 
-  const cleanup = () => {
-    segmenter.current?.dispose();
-    segmenter.current = null;
-  };
+  const cleanup = useCallback(() => {
+    try {
+      segmenter.current?.dispose();
+      segmenter.current = null;
+    } catch (e) {
+      console.error(e);
+    }
+  }, []);
 
-  return {segmenter, cleanup, init};
+  const draw = useCallback(
+    (ctx: CanvasRenderingContext2D | null | undefined) => {
+      ctx?.drawImage(
+        canvasRef!.current!,
+        0,
+        0,
+        src.getVideoTracks()[0]?.getSettings().width ?? 1280,
+        src.getVideoTracks()[0]?.getSettings().height ?? 720,
+      );
+    },
+    [canvasRef, src],
+  );
+
+  const segmenterFunc = useCallback(
+    async (
+      canvasRef: React.RefObject<HTMLCanvasElement>,
+      refVideo: React.RefObject<HTMLVideoElement>,
+      ctx: React.MutableRefObject<CanvasRenderingContext2D | null | undefined>,
+    ) => {
+      let segmentation = null;
+
+      // Segmenter can be null if initialization failed (for example when loading
+      // from a URL that does not exist).
+      if (segmenter.current != null && canvasRef.current != null) {
+        try {
+          if (segmenter.current.segmentPeople != null && refVideo.current != null) {
+            segmentation = await segmenter.current.segmentPeople(refVideo.current, {
+              flipHorizontal: false,
+              multiSegmentation: false,
+              segmentBodyParts: true,
+              segmentationThreshold: STATE.visualization.foregroundThreshold,
+            });
+          }
+        } catch (error) {
+          cleanup();
+        }
+
+        const options = STATE.visualization;
+        if (segmentation != null && canvasRef.current != null && refVideo.current != null) {
+          await bodySegmentation.drawBokehEffect(
+            canvasRef.current,
+            refVideo.current,
+            segmentation,
+            options.foregroundThreshold,
+            options.backgroundBlur,
+            options.edgeBlur,
+          );
+        }
+        draw(ctx.current);
+      }
+    },
+    [cleanup, draw, segmenter],
+  );
+
+  return {segmenter, cleanup, init, draw, segmenterFunc};
 };

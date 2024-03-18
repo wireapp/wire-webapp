@@ -78,6 +78,7 @@ export class Participant {
       return this.videoState() !== VIDEO_STATE.STOPPED;
     });
     this.isAudioEstablished = ko.observable(false);
+    this.setBlurStream = this.setBlurStream.bind(this);
   }
 
   readonly doesMatchIds = (userId: QualifiedId, clientId: ClientId): boolean =>
@@ -88,10 +89,23 @@ export class Participant {
     this.audioStream(audioStream);
   }
 
-  setBlur(blurState: backgroundBlur): void {
+  async setBlur(blurState: backgroundBlur): Promise<void> {
     this.isBlurred(blurState);
+    console.log('blurState', blurState);
     localStorage.setItem('blurState', blurState === backgroundBlur.isBlurred ? 'true' : 'false');
-    this.setVideoStream(blurState === backgroundBlur.isBlurred ? this.blurStream() : this.videoStream(), true);
+    this.setVideoStream(
+      blurState === backgroundBlur.isBlurred
+        ? !!this.blurStream()
+          ? this.blurStream()
+          : await this.getBlurStream()
+        : this.videoStream(),
+      false,
+    );
+  }
+
+  public setBlurStream(stream: MediaStream, stopTracks: boolean): void {
+    this.releaseStream(this.blurStream()!, stopTracks);
+    this.blurStream(stream);
   }
 
   setVideoStream(videoStream: MediaStream, stopTracks: boolean): void {
@@ -110,9 +124,15 @@ export class Participant {
   }
 
   getMediaStream(): MediaStream {
-    const audioTracks: MediaStreamTrack[] = this.audioStream() ? this.audioStream().getTracks() : [];
-    const videoTracks: MediaStreamTrack[] = this.videoStream() ? this.videoStream().getTracks() : [];
+    const audioTracks: MediaStreamTrack[] = this.audioStream() ? this.audioStream()!.getTracks() : [];
+    const videoTracks: MediaStreamTrack[] = this.videoStream() ? this.videoStream()!.getTracks() : [];
     return new MediaStream(audioTracks.concat(videoTracks));
+  }
+
+  async getBlurStream(): Promise<MediaStream> {
+    const blurStream = this.blurStream() ? this.blurStream()!.getTracks() : [];
+    const audioTracks: MediaStreamTrack[] = this.audioStream() ? this.audioStream()!.getTracks() : [];
+    return new MediaStream(audioTracks.concat(blurStream));
   }
 
   releaseVideoStream(stopTracks: boolean): void {

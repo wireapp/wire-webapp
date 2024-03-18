@@ -23,7 +23,7 @@ import {VideoHTMLAttributes, useCallback, useEffect, useRef} from 'react';
 import '@mediapipe/selfie_segmentation';
 import '@tensorflow/tfjs-backend-webgl';
 import '@tensorflow/tfjs-core';
-import * as bodySegmentation from '@tensorflow-models/body-segmentation';
+// import * as bodySegmentation from '@tensorflow-models/body-segmentation';
 
 // //imports for blur effect
 // import * as bodySegmentation from '@tensorflow-models/body-segmentation';
@@ -33,101 +33,44 @@ import {useBlur} from './useBlur';
 type VideoProps = VideoHTMLAttributes<HTMLVideoElement | HTMLCanvasElement> & {
   srcObject: MediaStream;
   isBlurred: boolean;
-  blurStream?: MediaStream;
-};
-
-const STATE = {
-  camera: {targetFPS: 60, sizeOption: '640 X 480', cameraSelector: ''},
-  fpsDisplay: {mode: 'model'},
-  backend: '',
-  flags: {},
-  modelConfig: {},
-  visualization: {
-    foregroundThreshold: 0.5,
-    // maskOpacity: 0.5,
-    // maskBlur: 0,
-    backgroundBlur: 10,
-    edgeBlur: 5,
-  },
+  blurStream: ((stream: MediaStream, stopTracks: boolean) => void) | undefined;
 };
 
 const Video = ({srcObject, isBlurred, blurStream, ...props}: VideoProps) => {
   const refVideo = useRef<HTMLVideoElement>(null);
-  const canvas = useRef<HTMLCanvasElement>(null);
+  // const video2ref = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const blurRef = useRef<MediaStream | undefined>(undefined);
   const ctx = useRef<CanvasRenderingContext2D | null | undefined>(null);
   const rafId = useRef<number | null>(null);
-  const firstRender = useRef(true);
-  const {init, segmenter, cleanup} = useBlur();
+  const {init, segmenter, cleanup, draw, segmenterFunc} = useBlur(srcObject, canvasRef);
 
-  const draw = useCallback(
-    (ctx: CanvasRenderingContext2D | null | undefined) => {
-      ctx?.drawImage(
-        canvas!.current!,
-        0,
-        0,
-        srcObject.getVideoTracks()[0]?.getSettings().width,
-        srcObject.getVideoTracks()[0]?.getSettings().height,
-      );
-    },
-    [srcObject],
-  );
-
+  console.log(isBlurred, 'isBlurred');
   useEffect(() => {
-    if (!isBlurred && !canvas.current) {
+    if (!canvasRef.current || !isBlurred) {
       return;
     }
-    ctx.current = canvas?.current?.getContext('2d');
+    ctx.current = canvasRef?.current?.getContext('2d');
     draw(ctx.current);
-    blurRef.current = canvas?.current?.captureStream();
-  }, [draw, isBlurred]);
-
-  const segmenterFunc = useCallback(async () => {
-    let segmentation = null;
-
-    // Segmenter can be null if initialization failed (for example when loading
-    // from a URL that does not exist).
-    if (segmenter.current != null && canvas.current != null) {
-      try {
-        if (segmenter.current.segmentPeople != null && refVideo.current != null) {
-          segmentation = await segmenter.current.segmentPeople(refVideo.current, {
-            flipHorizontal: false,
-            multiSegmentation: false,
-            segmentBodyParts: true,
-            segmentationThreshold: STATE.visualization.foregroundThreshold,
-          });
-        }
-      } catch (error) {
-        cleanup();
-      }
-
-      const options = STATE.visualization;
-      if (segmentation != null && canvas.current != null && refVideo.current != null) {
-        await bodySegmentation.drawBokehEffect(
-          canvas.current,
-          refVideo.current,
-          segmentation,
-          options.foregroundThreshold,
-          options.backgroundBlur,
-          options.edgeBlur,
-        );
-      }
-      draw(ctx.current);
-    }
-  }, [cleanup, draw, segmenter]);
+    blurRef.current = canvasRef?.current?.captureStream();
+    blurStream?.(canvasRef?.current?.captureStream(), false);
+    // video2ref.current!.srcObject = blurRef.current;
+  }, [draw, isBlurred, blurStream]);
 
   const renderPrediction = useCallback(async () => {
-    await segmenterFunc().catch(console.warn);
+    await segmenterFunc(canvasRef, refVideo, ctx).catch(console.warn);
 
     rafId.current = requestAnimationFrame(async () => await renderPrediction());
   }, [segmenterFunc]);
 
   useEffect(() => {
-    firstRender.current = false;
+    async function initSegmenter() {
+      await init();
+    }
     if (refVideo.current?.srcObject && !!isBlurred) {
       window.cancelAnimationFrame(rafId?.current ?? 0);
       cleanup();
-      init().catch(err => {
+      initSegmenter().catch(err => {
         segmenter.current = null;
         console.warn(err);
       });
@@ -137,8 +80,7 @@ const Video = ({srcObject, isBlurred, blurStream, ...props}: VideoProps) => {
     return () => {
       cleanup();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isBlurred, refVideo.current, srcObject.getVideoTracks()[0]?.getSettings()?.height, firstRender.current]);
+  }, [refVideo.current?.srcObject, isBlurred, segmenter.current]);
 
   // const gl = window.exposedContext;
   // if (gl) gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(4));
@@ -150,19 +92,11 @@ const Video = ({srcObject, isBlurred, blurStream, ...props}: VideoProps) => {
     refVideo.current.srcObject = srcObject;
   }, [srcObject]);
 
-  useEffect(() => {
-    if (!isBlurred) {
-      return;
-    }
-    if (blurStream && canvas.current) {
-      blurRef.current = blurStream;
-    }
-  }, [blurStream, isBlurred]);
-
   useEffect(
     () => () => {
       if (refVideo.current) {
         refVideo.current.srcObject = null;
+        cleanup();
       }
     },
     [],
@@ -170,7 +104,14 @@ const Video = ({srcObject, isBlurred, blurStream, ...props}: VideoProps) => {
 
   return (
     <>
-      {!!isBlurred && <canvas ref={canvas} {...props} />}
+      {!!isBlurred && (
+        <canvas
+          ref={canvasRef}
+          {...props}
+          // css={{visibility: !!isBlurred ? 'hidden' : 'visible', display: !!isBlurred ? 'none' : 'inline block'}}
+        />
+      )}
+      {/* {!!isBlurred && <video ref={video2ref} {...props} />} */}
       <video
         ref={refVideo}
         {...props}

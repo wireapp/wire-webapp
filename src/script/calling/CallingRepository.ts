@@ -1123,11 +1123,15 @@ export class CallingRepository {
     this.avsVersion = version;
   };
 
-  private getMediaStream(
+  private async getMediaStream(
     {audio = false, camera = false, screen = false}: MediaStreamQuery,
     isGroup: boolean,
   ): Promise<MediaStream> {
-    return this.mediaStreamHandler.requestMediaStream(audio, camera, screen, isGroup);
+    const selfParticipant = this.callState.joinedCall()?.getSelfParticipant();
+    const isBlurred = selfParticipant?.isBlurred();
+    return !!isBlurred
+      ? selfParticipant?.getBlurStream()
+      : this.mediaStreamHandler.requestMediaStream(audio, camera, screen, isGroup);
   }
 
   private handleMediaStreamError(call: Call, requestedStreams: MediaStreamQuery, error: Error | unknown): void {
@@ -1153,7 +1157,24 @@ export class CallingRepository {
     }
   }
 
+  private async blurState(): Promise<MediaStream | undefined> {
+    const activeCall = this.callState.joinedCall();
+    const selfParticipant = activeCall?.getSelfParticipant();
+    const isBlurred = selfParticipant?.isBlurred();
+    const blurStream = await selfParticipant?.getBlurStream();
+    return isBlurred ? blurStream : undefined;
+  }
+
   public async refreshVideoInput(): Promise<MediaStream | void> {
+    const blurStream = await this.blurState();
+    if (!!blurStream) {
+      this.stopMediaSource(MediaType.VIDEO);
+      const stream = await this.mediaStreamHandler.requestMediaStream(false, true, false, false);
+
+      const clonedBlurStream = this.changeMediaSource(blurStream ?? stream, MediaType.VIDEO);
+      return clonedBlurStream;
+    }
+
     const stream = await this.mediaStreamHandler.requestMediaStream(false, true, false, false);
 
     this.stopMediaSource(MediaType.VIDEO);
@@ -1216,20 +1237,18 @@ export class CallingRepository {
 
     // Don't update video input (coming from A/V preferences) when screensharing is activated
     if (mediaType === MediaType.VIDEO && selfParticipant.sharesCamera() && !selfParticipant.sharesScreen()) {
-      const videoTracks = mediaStream.getVideoTracks().map(track => track.clone());
-      const blurredTracks = selfParticipant
-        .blurStream()
-        ?.getVideoTracks()
-        .map(track => track.clone());
+      const videoTracks = mediaStream.getVideoTracks?.().map(track => track.clone());
+      // const blurredTracks = selfParticipant
+      const blurredTracks = mediaStream?.getTracks?.().map(track => track.clone());
 
-      if (blurredTracks && blurredTracks.length > 0 && selfParticipant.isBlurred() === backgroundBlur.isBlurred) {
+      if (blurredTracks && blurredTracks?.length > 0 && selfParticipant.isBlurred() === backgroundBlur.isBlurred) {
         const clonedCanvasStream = new MediaStream(blurredTracks);
         selfParticipant.setVideoStream(clonedCanvasStream, true);
         this.wCall?.replaceTrack(this.serializeQualifiedId(call.conversationId), blurredTracks[0]);
         // Remove the previous video stream
         this.mediaStreamHandler.releaseTracksFromStream(mediaStream);
         return clonedCanvasStream;
-      } else if (videoTracks.length > 0) {
+      } else if (videoTracks?.length > 0) {
         const clonedMediaStream = new MediaStream(videoTracks);
 
         selfParticipant.setVideoStream(clonedMediaStream, true);

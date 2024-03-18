@@ -257,12 +257,12 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     ),
   );
 
-  const updateVideoOptions = (selectedOption: string | backgroundBlur) => {
+  const updateVideoOptions = async (selectedOption: string | backgroundBlur) => {
     const camera = videoOptions[0].options.find(item => item.value === selectedOption) ?? selectedVideoOptions[0];
     const blur = videoOptions[1].options.find(item => item.value == selectedOption) ?? selectedVideoOptions[1];
 
     if (blur.id !== isBlurred) {
-      selfParticipant.setBlur(blur.id as backgroundBlur);
+      await selfParticipant.setBlur(blur.id as backgroundBlur);
     }
 
     setSelectedVideoOptions([camera, blur]);

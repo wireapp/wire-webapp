@@ -84,7 +84,7 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
   setMaximizedParticipant,
 }) => {
   const thumbnail = useKoSubscribableChildren(grid.thumbnail, ['hasActiveVideo', 'sharesScreen', 'videoStream']);
-
+  console.log(selfParticipant.isBlurred(), 'groupvideogrid');
   const [rowsAndColumns, setRowsAndColumns] = useState<RowsAndColumns>(calculateRowsAndColumns(grid?.grid.length));
 
   const doubleClickedOnVideo = (userId: QualifiedId, clientId: string) => {
@@ -163,7 +163,7 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
           <Video
             isBlurred={!!selfParticipant.isBlurred()}
             className="group-video__thumbnail-video"
-            blurStream={selfParticipant.blurStream()}
+            blurStream={selfParticipant.setBlurStream}
             autoPlay
             playsInline
             data-uie-name="self-video-thumbnail"
