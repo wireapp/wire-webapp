@@ -355,14 +355,14 @@ export const InputBar = ({
 
     if (isE2EIDegraded) {
       PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-        primaryAction: {
+        secondaryAction: {
           action: () => {
             conversation.mlsVerificationState(ConversationVerificationState.UNVERIFIED);
             sendMessage();
           },
           text: t('conversation.E2EISendAnyway'),
         },
-        secondaryAction: {
+        primaryAction: {
           action: () => {},
           text: t('conversation.E2EICancel'),
         },

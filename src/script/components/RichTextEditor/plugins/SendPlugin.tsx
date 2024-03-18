@@ -33,12 +33,20 @@ export function SendPlugin({onSend}: Props): null {
     return editor.registerCommand(
       KEY_ENTER_COMMAND,
       event => {
-        if (event?.shiftKey) {
+        if (!event) {
+          return false;
+        }
+
+        if (event.shiftKey) {
           return true;
         }
 
+        // When sending a message with "Enter", we want to prevent the default behavior (new line)
+        event.preventDefault();
         onSend();
-        return false;
+
+        // By returning true, we tell the editor that we've handled the event and it should stop propagation (only for the same command priority level)
+        return true;
       },
       COMMAND_PRIORITY_LOW,
     );
