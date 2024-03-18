@@ -20,6 +20,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 
 import {CSSObject} from '@emotion/react';
+import cx from 'classnames';
 import {container} from 'tsyringe';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -108,30 +109,26 @@ export const Image = ({
     return <RestrictedImage className={className} showMessage={!isQuote} isSmall={isQuote} />;
   }
 
+  const dummyImageUrl = `data:image/svg+xml;utf8,<svg aria-hidden="true" xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1' width='${imageSizes?.width}' height='${imageSizes?.height}'></svg>`;
+  const assetUrl = imageUrl?.url || dummyImageUrl;
+  const isLoading = !imageUrl;
+
   return (
     <InViewport
       onVisible={() => setIsInViewport(true)}
       css={imageWrapperStyle}
-      className={className}
-      data-uie-status={imageUrl ? 'loaded' : 'loading'}
+      className={cx(className, {'loading-dots': isLoading})}
+      data-uie-status={isLoading ? 'loading' : 'loaded'}
       {...props}
     >
-      {imageUrl ? (
-        <img
-          css={{...getImageStyle(imageSizes, !!onClick), ...imageStyles}}
-          onClick={onClick}
-          src={imageUrl.url}
-          role="presentation"
-          alt={alt}
-          data-uie-name="image-asset-img"
-        />
-      ) : (
-        <div
-          css={{width: '100%', aspectRatio: imageSizes?.ratio, maxHeight: '100%'}}
-          className="loading-dots"
-          data-uie-name="image-loader"
-        ></div>
-      )}
+      <img
+        css={{...getImageStyle(imageSizes, !!onClick), ...imageStyles}}
+        onClick={onClick}
+        src={assetUrl}
+        role="presentation"
+        alt={alt}
+        data-uie-name="image-asset-img"
+      />
     </InViewport>
   );
 };
