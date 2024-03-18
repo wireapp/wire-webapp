@@ -31,5 +31,6 @@ export function getImageStyle(sizes: {ratio: number; width: string} | undefined,
     width: sizes?.width,
     cursor: interactive ? 'pointer' : 'default',
     objectFit: 'contain',
+    objectPosition: 'left',
   };
 }

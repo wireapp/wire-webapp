@@ -19,6 +19,7 @@
 
 import React, {useEffect, useRef, useState} from 'react';
 
+import {CSSObject} from '@emotion/react';
 import {container} from 'tsyringe';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -37,6 +38,7 @@ interface BaseImageProps extends React.HTMLProps<HTMLDivElement> {
   alt?: string;
   isQuote?: boolean;
   teamState?: TeamState;
+  imageStyles?: CSSObject;
 }
 
 interface RemoteDataImageProps extends BaseImageProps {
@@ -61,6 +63,7 @@ export const Image = ({
   isQuote = false,
   teamState = container.resolve(TeamState),
   alt,
+  imageStyles,
   ...props
 }: RemoteDataImageProps) => {
   const [isInViewport, setIsInViewport] = useState(false);
@@ -115,7 +118,7 @@ export const Image = ({
     >
       {imageUrl ? (
         <img
-          css={getImageStyle(imageSizes, !!onClick)}
+          css={{...getImageStyle(imageSizes, !!onClick), ...imageStyles}}
           onClick={onClick}
           src={imageUrl.url}
           role="presentation"

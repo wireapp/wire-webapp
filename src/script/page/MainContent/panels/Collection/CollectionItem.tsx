@@ -48,6 +48,7 @@ const CollectionItem: FC<CollectionItemProps> = ({message, onImageClick}) => {
         image={firstAsset}
         data-uie-name="image-asset"
         onClick={() => onImageClick?.(message)}
+        imageStyles={{objectFit: 'cover', objectPosition: 'center'}}
       />
     );
   }
