@@ -127,7 +127,7 @@ export const Image = ({
         src={assetUrl}
         role="presentation"
         alt={alt}
-        data-uie-name="image-asset-img"
+        data-uie-name={isLoading ? 'image-loader' : 'image-asset-img'}
       />
     </InViewport>
   );
