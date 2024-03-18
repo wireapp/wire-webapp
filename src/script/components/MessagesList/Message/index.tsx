@@ -182,9 +182,7 @@ export const Message: React.FC<MessageParams & {scrollTo?: ScrollToElement}> = p
         ref={messageRef}
         role="listitem"
         onKeyDown={handleDivKeyDown}
-        onClick={event => {
-          handleFocus(message.id);
-        }}
+        onClick={() => handleFocus(message.id)}
         className="message-wrapper"
       >
         {wrappedContent}

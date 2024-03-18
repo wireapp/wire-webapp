@@ -253,7 +253,7 @@ export const MessagesList: FC<MessagesListParams> = ({
       tabIndex={TabIndex.UNFOCUSABLE}
     >
       <div ref={setMessageContainer} className={cx('messages', {'flex-center': verticallyCenterMessage()})}>
-        {groupedMessages.map(group => {
+        {groupedMessages.flatMap(group => {
           if (isMarker(group)) {
             return (
               <MarkerComponent key={`${group.type}-${group.timestamp}`} scrollTo={scrollToElement} marker={group} />
