@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.16.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.16.2...@wireapp/react-ui-kit@9.16.3) (2024-03-19)
+
+### Bug Fixes
+
+* mls verified icon color based on theme ([#6084](https://github.com/wireapp/wire-web-packages/issues/6084)) ([6534200](https://github.com/wireapp/wire-web-packages/commit/65342000b50d141fb58b2569ba08bc2354f7fd3b))
+
 ## [9.16.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.16.1...@wireapp/react-ui-kit@9.16.2) (2024-03-13)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
