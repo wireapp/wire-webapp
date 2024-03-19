@@ -86,6 +86,7 @@ export interface Theme extends ETheme {
     color: string;
     contrastColor: string;
     dangerColor: string;
+    successColor: string;
     focusColor: string;
     primaryColor: string;
   };
@@ -184,6 +185,7 @@ export const themes: {[themeId in THEME_ID]: Theme} = {
       backgroundColor: 'var(--app-bg)',
       color: 'var(--main-color)',
       dangerColor: 'var(--danger-color)',
+      successColor: 'var(--success-color)',
       primaryColor: 'var(--accent-color)',
       contrastColor: 'var(--text-input-background)',
       focusColor: 'var(--accent-color-focus)',
@@ -259,6 +261,7 @@ export const themes: {[themeId in THEME_ID]: Theme} = {
       color: COLOR.TEXT,
       primaryColor: COLOR_V2.BLUE,
       dangerColor: COLOR_V2.RED,
+      successColor: COLOR_V2.GREEN_LIGHT_500,
       contrastColor: 'var(--text-input-background)',
       focusColor: 'var(--accent-color-focus)',
     },
@@ -333,6 +336,7 @@ export const themes: {[themeId in THEME_ID]: Theme} = {
       color: COLOR.WHITE,
       primaryColor: COLOR_V2.BLUE,
       dangerColor: COLOR_V2.RED,
+      successColor: COLOR_V2.GREEN_DARK_500,
       contrastColor: 'var(--text-input-background)',
       focusColor: 'var(--accent-color-focus)',
     },
