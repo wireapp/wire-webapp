@@ -93,7 +93,12 @@ const LinkPreviewAsset: React.FC<LinkPreviewAssetProps> = ({header = false, mess
     >
       <div className="link-preview-image-container">
         {preview && previewImage ? (
-          <Image className="link-preview-image" image={previewImage} data-uie-name="link-preview-image" />
+          <Image
+            className="link-preview-image"
+            imageStyles={{height: '100%', objectFit: 'cover', objectPosition: 'center'}}
+            image={previewImage}
+            data-uie-name="link-preview-image"
+          />
         ) : (
           <div className="link-preview-image-placeholder icon-link" />
         )}
