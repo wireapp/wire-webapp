@@ -95,7 +95,7 @@ const LinkPreviewAsset: React.FC<LinkPreviewAssetProps> = ({header = false, mess
         {preview && previewImage ? (
           <Image
             className="link-preview-image"
-            imageStyles={{height: '100%'}}
+            imageStyles={{height: '100%', objectFit: 'cover', objectPosition: 'center'}}
             image={previewImage}
             data-uie-name="link-preview-image"
           />
