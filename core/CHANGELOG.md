@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [45.2.12](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@45.2.11...@wireapp/core@45.2.12) (2024-03-19)
+
+**Note:** Version bump only for package @wireapp/core
+
 ## [45.2.11](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@45.2.10...@wireapp/core@45.2.11) (2024-03-14)
 
 ### Bug Fixes
