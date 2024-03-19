@@ -70,14 +70,14 @@ const UserDetailsComponent = ({user, isTeam = false, groupId}: UserDetailsProps)
       <div css={styles.userDetailsWrapper}>
         {isTeam ? (
           <>
-            <div css={styles.userDetails}>
+            <div css={styles.userDetails} data-uie-name="status-availability">
               <button
                 css={styles.userFullName}
                 onClick={event => AvailabilityContextMenu.show(event.nativeEvent, 'left-list-availability-menu')}
               >
                 {renderAvailabilityIcon()}
 
-                <span data-uie-name="user-name" css={styles.userName} title={userName}>
+                <span data-uie-name="status-label" css={styles.userName} title={userName}>
                   {userName}
                 </span>
               </button>
@@ -97,7 +97,7 @@ const UserDetailsComponent = ({user, isTeam = false, groupId}: UserDetailsProps)
             )}
           </>
         ) : (
-          <span css={styles.userFullName} data-uie-name="user-name" role="presentation" tabIndex={TabIndex.FOCUSABLE}>
+          <span css={styles.userFullName} data-uie-name="status-name" role="presentation" tabIndex={TabIndex.FOCUSABLE}>
             {userName} - very long name for testing purposes
           </span>
         )}

@@ -19,7 +19,6 @@
 
 import React, {useEffect, useState} from 'react';
 
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -29,9 +28,6 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {CallingCell} from 'Components/calling/CallingCell';
 import {Icon} from 'Components/Icon';
-import {LegalHoldDot} from 'Components/LegalHoldDot';
-import {UserInfo} from 'Components/UserInfo';
-import {UserVerificationBadges} from 'Components/VerificationBadge';
 import {Config} from 'src/script/Config';
 import {Conversation} from 'src/script/entity/Conversation';
 import {IntegrationRepository} from 'src/script/integration/IntegrationRepository';
@@ -62,7 +58,6 @@ import {PreferenceNotificationRepository} from '../../../../notification/Prefere
 import {PropertiesRepository} from '../../../../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../../../../properties/PropertiesType';
 import {TeamState} from '../../../../team/TeamState';
-import {AvailabilityContextMenu} from '../../../../ui/AvailabilityContextMenu';
 import {Shortcut} from '../../../../ui/Shortcut';
 import {ShortcutType} from '../../../../ui/ShortcutType';
 import {UserState} from '../../../../user/UserState';
@@ -115,11 +110,6 @@ const Conversations: React.FC<ConversationsProps> = ({
   listState,
 }) => {
   const [conversationsFilter, setConversationsFilter] = useState<string>('');
-  const {
-    name: userName,
-    isOnLegalHold,
-    hasPendingLegalHold,
-  } = useKoSubscribableChildren(selfUser, ['hasPendingLegalHold', 'isOnLegalHold', 'name']);
   const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
   const {connectRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
   const {activeConversation, unreadConversations} = useKoSubscribableChildren(conversationState, [
@@ -151,7 +141,6 @@ const Conversations: React.FC<ConversationsProps> = ({
     conversation.hasUnread(),
   ).length;
 
-  const {notifications} = useKoSubscribableChildren(preferenceNotificationRepository, ['notifications']);
   const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
 
   const initialTab = propertiesRepository.getPreference(PROPERTIES_TYPE.INTERFACE.VIEW_FOLDERS)
@@ -159,7 +148,6 @@ const Conversations: React.FC<ConversationsProps> = ({
     : SidebarTabs.RECENT;
 
   const [currentTab, setCurrentTab] = useState<SidebarTabs>(initialTab);
-  const showBadge = notifications.length > 0;
 
   const isRecentTab = currentTab === SidebarTabs.RECENT;
   const isFolderTab = currentTab === SidebarTabs.FOLDER;
@@ -174,15 +162,13 @@ const Conversations: React.FC<ConversationsProps> = ({
   const hasNoConversations = conversations.length + connectRequests.length === 0;
   const {isOpen: isFolderOpen, openFolder} = useFolderState();
 
-  const showLegalHold = isOnLegalHold || hasPendingLegalHold;
-
   // const {setCurrentView} = useAppMainState(state => state.responsiveView);
   // const {close: closeRightSidebar} = useAppMainState(state => state.rightSidebar);
-  const onClickPreferences = () => {
-    // setCurrentView(ViewType.LEFT_SIDEBAR);
-    // switchList(ListState.PREFERENCES);
-    // closeRightSidebar();
-  };
+  // const onClickPreferences = () => {
+  //   // setCurrentView(ViewType.LEFT_SIDEBAR);
+  //   // switchList(ListState.PREFERENCES);
+  //   // closeRightSidebar();
+  // };
 
   useEffect(() => {
     if (activeConversation && !conversationState.isVisible(activeConversation)) {
@@ -219,57 +205,6 @@ const Conversations: React.FC<ConversationsProps> = ({
   useEffect(() => {
     propertiesRepository.savePreference(PROPERTIES_TYPE.INTERFACE.VIEW_FOLDERS, isFolderTab);
   }, [isFolderTab]);
-
-  const header = (
-    <>
-      <button
-        type="button"
-        className={cx(`conversations-settings-button accent-text`, {'conversations-settings--badge': showBadge})}
-        title={t('tooltipConversationsPreferences')}
-        onClick={onClickPreferences}
-        data-uie-name="go-preferences"
-      >
-        <Icon.Settings />
-      </button>
-
-      {teamState.isTeam() ? (
-        <>
-          <button
-            type="button"
-            className="left-list-header-availability"
-            css={{...(showLegalHold && {gridColumn: '2/3'})}}
-            onClick={event => AvailabilityContextMenu.show(event.nativeEvent, 'left-list-availability-menu')}
-          >
-            <UserInfo user={selfUser} className="availability-state" dataUieName="status-availability" showAvailability>
-              <UserVerificationBadges
-                user={selfUser}
-                isSelfUser
-                groupId={conversationState.selfMLSConversation()?.groupId}
-              />
-            </UserInfo>
-          </button>
-
-          {showLegalHold && (
-            <LegalHoldDot
-              isPending={hasPendingLegalHold}
-              dataUieName={hasPendingLegalHold ? 'status-legal-hold-pending' : 'status-legal-hold'}
-              showText
-              isInteractive
-            />
-          )}
-        </>
-      ) : (
-        <span
-          className="left-list-header-text"
-          data-uie-name="status-name"
-          role="presentation"
-          tabIndex={TabIndex.FOCUSABLE}
-        >
-          {userName}
-        </span>
-      )}
-    </>
-  );
 
   function changeTab(nextTab: SidebarTabs) {
     if (nextTab === SidebarTabs.ARCHIVES) {
@@ -513,7 +448,8 @@ const Conversations: React.FC<ConversationsProps> = ({
 
   return (
     <div className="conversations-wrapper">
-      <ListWrapper id="conversations" headerElement={header} sidebar={sidebar} before={callingView}>
+      {/* headerElement should be replaced with another data */}
+      <ListWrapper id="conversations" headerElement={<></>} sidebar={sidebar} before={callingView}>
         {hasNoConversations ? (
           <>
             {archivedConversations.length === 0 ? (
