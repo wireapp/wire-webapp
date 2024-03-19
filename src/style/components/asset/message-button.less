@@ -19,17 +19,18 @@
 
 .message-button {
   position: relative;
+  display: block;
   overflow: hidden;
   width: 100%;
   max-width: 400px;
   padding: 12px;
 
-  border: 1px solid var(--gray-40);
+  border: 1px solid var(--border-color);
   border-radius: 6px;
 
   margin-top: 8px;
 
-  background-color: var(--white);
+  background-color: var(--app-bg);
   color: var(--main-color);
   font-size: 1rem;
   font-weight: var(--font-weight-semibold);
@@ -38,37 +39,21 @@
   text-align: center;
   transition: all 0.1s linear;
 
-  .theme-dark & {
-    border-color: var(--gray-80);
-    background-color: var(--gray-95);
-  }
-
   &:focus,
   &:hover {
-    border-color: var(--button-secondary-active-border);
+    border-color: var(--button-primary-active-border);
     color: var(--accent-color);
-
-    .theme-dark & {
-      border-color: var(--button-primary-active);
-    }
   }
 
   &--selected {
-    border-color: var(--button-secondary-active-border);
-    background-color: var(--button-secondary-active-bg);
+    border-color: var(--button-primary-active-border);
+    background-color: var(--button-primary-active-bg);
     color: var(--accent-color);
-
-    .theme-dark & {
-      border-color: var(--accent-color);
-      background-color: var(--button-primary-active);
-    }
 
     &:focus,
     &:hover {
-      .theme-dark & {
-        border-color: var(--accent-color);
-        background-color: var(--button-primary-active);
-      }
+      border-color: var(--accent-color);
+      background-color: var(--button-primary-active-bg);
     }
   }
 
