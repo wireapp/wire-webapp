@@ -66,7 +66,7 @@ const iconStyles: CSSObject = {
 };
 
 const title = (isMLSConversation = false): CSSProperties => ({
-  color: isMLSConversation ? 'var(--green-500)' : 'var(--blue-500)',
+  color: isMLSConversation ? 'var(--success-color)' : 'var(--blue-500)',
   fontSize: '12px',
   lineHeight: '14px',
   marginRight: '4px',
