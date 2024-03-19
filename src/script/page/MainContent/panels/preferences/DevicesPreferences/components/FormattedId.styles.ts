@@ -23,6 +23,7 @@ export const devicePart = (smallPadding = false): CSSObject => ({
   display: 'inline-block',
   marginRight: smallPadding ? '4px' : '12px',
   textTransform: 'uppercase',
+  whiteSpace: 'nowrap',
 
   ...(!smallPadding && {
     width: '18px',
