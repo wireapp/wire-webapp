@@ -50,7 +50,7 @@ export const ImageAsset = ({asset, message, onClick}: ImageAssetProps) => {
 
   const imageContainerStyle: CSSObject = {
     maxWidth: 'var(--conversation-message-asset-width)',
-    maxHeight: '80vh',
+    maxHeight: 'calc(100vh - 155px - 1rem)',
     width: asset.width,
     aspectRatio: asset.ratio,
   };
