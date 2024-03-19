@@ -207,14 +207,9 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
         <>
           <LoadingBar progress={loadingProgress} message={loadingMessage} className="with-cancel" />
 
-          <button
-            type="button"
-            className="cancel-button accent-text"
-            onClick={onCancel}
-            data-uie-name="do-cancel-history-export"
-          >
+          <Button variant={ButtonVariant.SECONDARY} onClick={onCancel} data-uie-name="do-cancel-history-export">
             {t('backupCancel')}
-          </button>
+          </Button>
         </>
       )}
 
