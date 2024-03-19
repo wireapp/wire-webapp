@@ -19,13 +19,15 @@
 
 import {SVGIcon, SVGIconProps} from './SVGIcon';
 
+import {Theme} from '../Layout';
+
 export const CertificateRevoked = (props: SVGIconProps) => (
   <SVGIcon realWidth={16} realHeight={16} {...props}>
     <path
       fillRule="evenodd"
       clipRule="evenodd"
       d="M15 8V1.87197L8 0L1 2V8C1 12 4.00718 15.0977 8 16C12.0344 15.0977 15 12 15 8ZM8 9.27467L5.27467 12L4 10.7253L6.72533 8L4 5.27467L5.27467 4L8 6.72533L10.7253 4L12 5.27467L9.27467 8L12 10.7253L10.7253 12L8 9.27467Z"
-      fill="#C20013"
+      css={(theme: Theme) => ({fill: theme.general.dangerColor})}
     />
   </SVGIcon>
 );

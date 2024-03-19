@@ -19,13 +19,15 @@
 
 import {SVGIcon, SVGIconProps} from './SVGIcon';
 
+import {Theme} from '../Layout';
+
 export const ExpiresSoon = (props: SVGIconProps) => (
   <SVGIcon realWidth={17} realHeight={18} {...props}>
     <path
       fillRule="evenodd"
       clipRule="evenodd"
       d="M15 2.87197V9C15 13 12.0344 16.0977 8 17C4.00718 16.0977 1 13 1 9V3L8 1L15 2.87197Z"
-      stroke="#1D7833"
+      css={(theme: Theme) => ({stroke: theme.general.successColor})}
       strokeWidth="1.5"
       strokeMiterlimit="3.62796"
       strokeDasharray="1 1"
@@ -35,7 +37,7 @@ export const ExpiresSoon = (props: SVGIconProps) => (
       fillRule="evenodd"
       clipRule="evenodd"
       d="M6.85214 13L13 6.34572L11.7691 5L6.85214 10.3086L4.23094 7.50033L3 8.84605L6.85214 13Z"
-      fill="#1D7833"
+      css={(theme: Theme) => ({fill: theme.general.successColor})}
     />
   </SVGIcon>
 );

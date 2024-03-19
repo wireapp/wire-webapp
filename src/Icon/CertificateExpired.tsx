@@ -19,16 +19,18 @@
 
 import {SVGIcon, SVGIconProps} from './SVGIcon';
 
+import {Theme} from '../Layout';
+
 export const CertificateExpiredIcon = (props: SVGIconProps) => (
   <SVGIcon realWidth={16} realHeight={16} {...props}>
     <path
       d="M8.00661 0.778123L14.25 2.44775V8C14.25 11.5269 11.6778 14.3426 8.00089 15.2298C4.35861 14.3417 1.75 11.5234 1.75 8V2.56573L8.00661 0.778123Z"
-      stroke="#C20013"
+      css={(theme: Theme) => ({stroke: theme.general.dangerColor})}
       strokeWidth="1.5"
       strokeMiterlimit="16"
       fill="transparent"
     />
-    <rect x="7" y="3.5" width="2" height="5" fill="#C20013" />
-    <rect x="7" y="9.5" width="2" height="2" fill="#C20013" />
+    <rect x="7" y="3.5" width="2" height="5" css={(theme: Theme) => ({fill: theme.general.dangerColor})} />
+    <rect x="7" y="9.5" width="2" height="2" css={(theme: Theme) => ({fill: theme.general.dangerColor})} />
   </SVGIcon>
 );
