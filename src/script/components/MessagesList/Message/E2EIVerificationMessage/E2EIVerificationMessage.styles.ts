@@ -29,7 +29,7 @@ export const MessageIcon: CSSObject = {
 };
 
 export const IconInfo: CSSObject = {
-  fill: 'var(--red-500)',
+  fill: 'var(--danger-color)',
 };
 
 export const Link: CSSObject = {
