@@ -166,14 +166,6 @@ const Conversations: React.FC<ConversationsProps> = ({
   const hasNoConversations = conversations.length + connectRequests.length === 0;
   const {isOpen: isFolderOpen, openFolder} = useFolderState();
 
-  // const {setCurrentView} = useAppMainState(state => state.responsiveView);
-  // const {close: closeRightSidebar} = useAppMainState(state => state.rightSidebar);
-  // const onClickPreferences = () => {
-  //   // setCurrentView(ViewType.LEFT_SIDEBAR);
-  //   // switchList(ListState.PREFERENCES);
-  //   // closeRightSidebar();
-  // };
-
   useEffect(() => {
     if (activeConversation && !conversationState.isVisible(activeConversation)) {
       // If the active conversation is not visible, switch to the recent view
