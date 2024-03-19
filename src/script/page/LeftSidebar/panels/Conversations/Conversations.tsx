@@ -19,7 +19,6 @@
 
 import React, {useEffect, useState} from 'react';
 
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -29,9 +28,6 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {CallingCell} from 'Components/calling/CallingCell';
 import {Icon} from 'Components/Icon';
-import {LegalHoldDot} from 'Components/LegalHoldDot';
-import {UserInfo} from 'Components/UserInfo';
-import {UserVerificationBadges} from 'Components/VerificationBadge';
 import {Config} from 'src/script/Config';
 import {Conversation} from 'src/script/entity/Conversation';
 import {IntegrationRepository} from 'src/script/integration/IntegrationRepository';
@@ -65,11 +61,11 @@ import {PreferenceNotificationRepository} from '../../../../notification/Prefere
 import {PropertiesRepository} from '../../../../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../../../../properties/PropertiesType';
 import {TeamState} from '../../../../team/TeamState';
-import {AvailabilityContextMenu} from '../../../../ui/AvailabilityContextMenu';
 import {Shortcut} from '../../../../ui/Shortcut';
 import {ShortcutType} from '../../../../ui/ShortcutType';
 import {UserState} from '../../../../user/UserState';
 import {ListViewModel} from '../../../../view_model/ListViewModel';
+import {UserDetails} from '../../UserDetails';
 import {ListWrapper} from '../ListWrapper';
 
 type ConversationsProps = {
@@ -117,11 +113,6 @@ const Conversations: React.FC<ConversationsProps> = ({
   listState,
 }) => {
   const [conversationsFilter, setConversationsFilter] = useState<string>('');
-  const {
-    name: userName,
-    isOnLegalHold,
-    hasPendingLegalHold,
-  } = useKoSubscribableChildren(selfUser, ['hasPendingLegalHold', 'isOnLegalHold', 'name']);
   const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
   const {connectRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
   const {activeConversation, unreadConversations} = useKoSubscribableChildren(conversationState, [
@@ -175,8 +166,6 @@ const Conversations: React.FC<ConversationsProps> = ({
   const hasNoConversations = conversations.length + connectRequests.length === 0;
   const {isOpen: isFolderOpen, openFolder} = useFolderState();
 
-  const showLegalHold = isOnLegalHold || hasPendingLegalHold;
-
   useEffect(() => {
     if (activeConversation && !conversationState.isVisible(activeConversation)) {
       // If the active conversation is not visible, switch to the recent view
@@ -213,58 +202,6 @@ const Conversations: React.FC<ConversationsProps> = ({
     propertiesRepository.savePreference(PROPERTIES_TYPE.INTERFACE.VIEW_FOLDERS, isFolderTab);
   }, [isFolderTab]);
 
-  function getHeader() {
-    if (isPreferences) {
-      return null;
-    }
-
-    return (
-      <>
-        {teamState.isTeam() ? (
-          <>
-            <button
-              type="button"
-              className="left-list-header-availability"
-              css={{...(showLegalHold && {gridColumn: '2/3'})}}
-              onClick={event => AvailabilityContextMenu.show(event.nativeEvent, 'left-list-availability-menu')}
-            >
-              <UserInfo
-                user={selfUser}
-                className="availability-state"
-                dataUieName="status-availability"
-                showAvailability
-              >
-                <UserVerificationBadges
-                  user={selfUser}
-                  isSelfUser
-                  groupId={conversationState.selfMLSConversation()?.groupId}
-                />
-              </UserInfo>
-            </button>
-
-            {showLegalHold && (
-              <LegalHoldDot
-                isPending={hasPendingLegalHold}
-                dataUieName={hasPendingLegalHold ? 'status-legal-hold-pending' : 'status-legal-hold'}
-                showText
-                isInteractive
-              />
-            )}
-          </>
-        ) : (
-          <span
-            className="left-list-header-text"
-            data-uie-name="status-name"
-            role="presentation"
-            tabIndex={TabIndex.FOCUSABLE}
-          >
-            {userName}
-          </span>
-        )}
-      </>
-    );
-  }
-
   function changeTab(nextTab: SidebarTabs) {
     if (nextTab === SidebarTabs.ARCHIVES) {
       // will eventually load missing events from the db
@@ -286,6 +223,12 @@ const Conversations: React.FC<ConversationsProps> = ({
 
   const sidebar = (
     <nav className="conversations-sidebar">
+      <UserDetails
+        user={selfUser}
+        groupId={conversationState.selfMLSConversation()?.groupId}
+        isTeam={teamState.isTeam()}
+      />
+
       <div
         role="tablist"
         aria-label={t('accessibility.headings.sidebar')}
@@ -653,17 +596,9 @@ const Conversations: React.FC<ConversationsProps> = ({
     );
   }
 
-  const header = getHeader();
-
   return (
     <div className="conversations-wrapper">
-      <ListWrapper
-        id="conversations"
-        headerElement={header}
-        hasHeader={Boolean(header)}
-        sidebar={sidebar}
-        before={callingView}
-      >
+      <ListWrapper id="conversations" headerElement={<></>} hasHeader={false} sidebar={sidebar} before={callingView}>
         {getListWrapperItems()}
       </ListWrapper>
     </div>
