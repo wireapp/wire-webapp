@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.16.4](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.16.3...@wireapp/react-ui-kit@9.16.4) (2024-03-19)
+
+### Bug Fixes
+
+* mls status dark theme icon colors [WPB-6888] ([#6085](https://github.com/wireapp/wire-web-packages/issues/6085)) ([897cbaa](https://github.com/wireapp/wire-web-packages/commit/897cbaac4f86f0cd7a25f1a05aa7e8c5b0f4b1f9))
+
 ## [9.16.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.16.2...@wireapp/react-ui-kit@9.16.3) (2024-03-19)
 
 ### Bug Fixes
