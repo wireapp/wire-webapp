@@ -2100,7 +2100,7 @@ export class ConversationRepository {
         // We need to check if the conversation exists on backend
         await this.conversationService.getConversationById(inccessibleConversation);
       } catch (error) {
-        if (error instanceof ConversationError && error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND) {
+        if (isBackendError(error) && error.label === BackendErrorLabel.NO_CONVERSATION) {
           // Only if the conversation triggers a not found error, we delete it locally
           await this.deleteConversationLocally(inccessibleConversation, true);
         }
