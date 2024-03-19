@@ -19,17 +19,19 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const imageWrapperStyle = {
-  width: '100%',
-};
+export function getWrapperStyles(interactive: boolean) {
+  return {
+    cursor: interactive ? 'pointer' : 'default',
+    width: '100%',
+  };
+}
 
-export function getImageStyle(sizes: {ratio: number; width: string} | undefined, interactive: boolean): CSSObject {
+export function getImageStyle(sizes: {ratio: number; width: string} | undefined): CSSObject {
   return {
     aspectRatio: `${sizes?.ratio}`,
     maxWidth: '100%',
     maxHeight: '100%',
     width: sizes?.width,
-    cursor: interactive ? 'pointer' : 'default',
     objectFit: 'contain',
     objectPosition: 'left',
   };

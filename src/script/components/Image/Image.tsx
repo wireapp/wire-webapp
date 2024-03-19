@@ -25,7 +25,7 @@ import {container} from 'tsyringe';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
-import {getImageStyle, imageWrapperStyle} from './Image.styles';
+import {getImageStyle, getWrapperStyles} from './Image.styles';
 import {RestrictedImage} from './RestrictedImage';
 
 import {AssetRemoteData} from '../../assets/AssetRemoteData';
@@ -116,14 +116,14 @@ export const Image = ({
   return (
     <InViewport
       onVisible={() => setIsInViewport(true)}
-      css={imageWrapperStyle}
+      css={getWrapperStyles(!!onClick)}
       className={cx(className, {'loading-dots': isLoading})}
+      onClick={onClick}
       data-uie-status={isLoading ? 'loading' : 'loaded'}
       {...props}
     >
       <img
-        css={{...getImageStyle(imageSizes, !!onClick), ...imageStyles}}
-        onClick={onClick}
+        css={{...getImageStyle(imageSizes), ...imageStyles}}
         src={assetUrl}
         role="presentation"
         alt={alt}
