@@ -7174,12 +7174,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dexie@npm:3.2.5, dexie@npm:^3.2.0":
-  version: 3.2.5
-  resolution: "dexie@npm:3.2.5"
+"dexie@npm:3.2.6, dexie@npm:^3.2.0":
+  version: 3.2.6
+  resolution: "dexie@npm:3.2.6"
   dependencies:
     karma-safari-launcher: ^1.0.0
-  checksum: 648497ae25ca5c25bb7027d2db8335d7d890e424c7dc400c79d52c75beab1ae073962b83717dccec5d0281249476baf580ecb62bdcbeef9b7f97aa4dfe5ddb45
+  checksum: 8d07579c64582a80f3dfac4a0ad482ee93320f5919d3186756d30331babb2321a9826c9e066b78f2a6bba8c5d04ef5750630da0d8c36738522e3ba638ac16199
   languageName: node
   linkType: hard
 
@@ -17429,7 +17429,7 @@ __metadata:
     css-loader: ^6.10.0
     cssnano: 6.1.0
     date-fns: 3.5.0
-    dexie: 3.2.5
+    dexie: 3.2.6
     dexie-batch: 0.4.3
     dexie-encrypted: 2.0.0
     dotenv: 16.4.5
