@@ -19,7 +19,11 @@
 
 import Linkify from 'linkify-it';
 
-const codeBlockRegex = /(`+)[^`]*?\1$/gm;
+// Matches with a fenced code block (```), whether it is closed or not
+const codeBlockRegex = /(`{3,})([\s\S]*?)(?:\1|$)/g;
+// Matches with inline code, even if it opens or closes on a different line
+const inlineCodeRegex = /(`+)(.*?)\1/gs;
+
 const linkify = new Linkify();
 
 /**
@@ -28,7 +32,8 @@ const linkify = new Linkify();
  * @returns Text contains only a link
  */
 export const containsOnlyLink = (text: string): boolean => {
-  const textWithoutCode = text.trim().replace(codeBlockRegex, '');
+  const textWithoutCode = text.trim().replace(codeBlockRegex, '').replace(inlineCodeRegex, ``);
+
   const urls = linkify.match(textWithoutCode) || [];
   return urls.length === 1 && urls[0].raw === textWithoutCode;
 };
@@ -39,7 +44,7 @@ export const containsOnlyLink = (text: string): boolean => {
  * @returns Containing link and its offset
  */
 export const getFirstLinkWithOffset = (text: string): {offset: number; url: string} | undefined => {
-  const textWithoutCode = text.trim().replace(codeBlockRegex, '');
+  const textWithoutCode = text.trim().replace(codeBlockRegex, '').replace(inlineCodeRegex, ``);
 
   const links = linkify.match(textWithoutCode) || [];
   const [firstLink] = links.filter(link => ['http:', 'https:', ''].includes(link.schema));

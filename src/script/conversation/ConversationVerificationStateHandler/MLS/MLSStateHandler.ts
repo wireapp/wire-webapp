@@ -21,7 +21,6 @@ import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {E2eiConversationState} from '@wireapp/core/lib/messagingProtocols/mls';
 import {StringifiedQualifiedId, stringifyQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
-import {container} from 'tsyringe';
 
 import {
   getActiveWireIdentity,
@@ -47,7 +46,7 @@ enum UserVerificationState {
   SOME_INVALID = 1,
 }
 
-class MLSConversationVerificationStateHandler {
+export class MLSConversationVerificationStateHandler {
   private readonly logger: Logger;
 
   public constructor(
@@ -197,7 +196,7 @@ class MLSConversationVerificationStateHandler {
     return this.checkConversationVerificationState(conversation);
   };
 
-  private checkConversationVerificationState = async (conversation: Conversation): Promise<void> => {
+  public checkConversationVerificationState = async (conversation: Conversation): Promise<void> => {
     const isSelfConversation = conversation.type() === CONVERSATION_TYPE.SELF;
     if (!isMLSConversation(conversation) || isSelfConversation) {
       return;
@@ -236,20 +235,4 @@ export const checkUserHandle = (identity: WireIdentity, user: User): boolean => 
   // We only want to check the username part of the handle
   const {username, domain} = user;
   return identityHandle.includes(`${username()}@${domain}`);
-};
-
-export const registerMLSConversationVerificationStateHandler = (
-  domain: string,
-  onConversationVerificationStateChange: OnConversationE2EIVerificationStateChange = () => {},
-  onSelfClientCertificateRevoked: () => Promise<void> = async () => {},
-  conversationState: ConversationState = container.resolve(ConversationState),
-  core: Core = container.resolve(Core),
-): void => {
-  new MLSConversationVerificationStateHandler(
-    domain,
-    onConversationVerificationStateChange,
-    onSelfClientCertificateRevoked,
-    conversationState,
-    core,
-  );
 };

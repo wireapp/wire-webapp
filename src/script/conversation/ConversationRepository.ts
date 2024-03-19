@@ -96,8 +96,14 @@ import {ConversationState} from './ConversationState';
 import {ConversationStateHandler} from './ConversationStateHandler';
 import {ConversationStatus} from './ConversationStatus';
 import {ConversationVerificationState} from './ConversationVerificationState';
-import {ProteusConversationVerificationStateHandler} from './ConversationVerificationStateHandler';
-import {OnConversationVerificationStateChange} from './ConversationVerificationStateHandler/shared';
+import {
+  MLSConversationVerificationStateHandler,
+  ProteusConversationVerificationStateHandler,
+} from './ConversationVerificationStateHandler';
+import {
+  OnConversationE2EIVerificationStateChange,
+  OnConversationVerificationStateChange,
+} from './ConversationVerificationStateHandler/shared';
 import {EventMapper} from './EventMapper';
 import {MessageRepository} from './MessageRepository';
 import {NOTIFICATION_STATE} from './NotificationSetting';
@@ -173,6 +179,7 @@ export class ConversationRepository {
   private readonly logger: Logger;
   public readonly stateHandler: ConversationStateHandler;
   public readonly proteusVerificationStateHandler: ProteusConversationVerificationStateHandler;
+  private mlsConversationVerificationStateHandler?: MLSConversationVerificationStateHandler;
 
   static get CONFIG() {
     return {
@@ -315,6 +322,26 @@ export class ConversationRepository {
       this.scheduleMissingUsersAndConversationsMetadataRefresh();
     }
   }
+
+  public registerMLSConversationVerificationStateHandler = (
+    domain: string,
+    onConversationVerificationStateChange: OnConversationE2EIVerificationStateChange = () => {},
+    onSelfClientCertificateRevoked: () => Promise<void> = async () => {},
+  ): void => {
+    this.mlsConversationVerificationStateHandler = new MLSConversationVerificationStateHandler(
+      domain,
+      onConversationVerificationStateChange,
+      onSelfClientCertificateRevoked,
+      this.conversationState,
+      this.core,
+    );
+  };
+
+  public refreshMLSConversationVerificationState = async (conversation: Conversation) => {
+    if (this.mlsConversationVerificationStateHandler) {
+      await this.mlsConversationVerificationStateHandler.checkConversationVerificationState(conversation);
+    }
+  };
 
   checkMessageTimer(messageEntity: ContentMessage): void {
     this.ephemeralHandler.checkMessageTimer(messageEntity, this.serverTimeHandler.getTimeOffset());
@@ -1059,20 +1086,28 @@ export class ConversationRepository {
     });
   }
 
-  public deleteConversation(conversationEntity: Conversation) {
-    this.conversationService
-      .deleteConversation(this.teamState.team().id, conversationEntity.id)
-      .then(() => {
-        this.deleteConversationLocally(conversationEntity, true);
-      })
-      .catch(() => {
-        PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-          text: {
-            message: t('modalConversationDeleteErrorMessage', conversationEntity.name()),
-            title: t('modalConversationDeleteErrorHeadline'),
-          },
-        });
+  public async deleteConversation(conversationEntity: Conversation) {
+    const teamId = this.teamState.team().id;
+    if (!teamId) {
+      throw new Error('Team ID is missing');
+    }
+
+    try {
+      await this.conversationService.deleteConversation(teamId, conversationEntity.id);
+      return this.deleteConversationLocally(conversationEntity, true);
+    } catch (error) {
+      const isAlreadyDeletedOnBackend = isBackendError(error) && error.label === BackendErrorLabel.NO_CONVERSATION;
+      if (isAlreadyDeletedOnBackend) {
+        return this.deleteConversationLocally(conversationEntity, true);
+      }
+
+      PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
+        text: {
+          message: t('modalConversationDeleteErrorMessage', conversationEntity.name()),
+          title: t('modalConversationDeleteErrorHeadline'),
+        },
       });
+    }
   }
 
   private readonly deleteConversationLocally = async (conversationId: QualifiedId, skipNotification: boolean) => {

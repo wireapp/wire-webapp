@@ -25,17 +25,11 @@ import {container} from 'tsyringe';
 import {Core} from 'src/script/service/CoreSingleton';
 import {base64ToArray} from 'Util/util';
 
-import {mapMLSStatus} from './certificateDetails';
+import {mapMLSStatus, MLSStatuses} from './mlsStatus';
 
 import {ConversationState} from '../conversation/ConversationState';
 
-export enum MLSStatuses {
-  VALID = 'valid',
-  NOT_ACTIVATED = 'not_activated',
-  EXPIRED = 'expired',
-  EXPIRES_SOON = 'expires_soon',
-  REVOKED = 'revoked',
-}
+export {MLSStatuses};
 
 export type WireIdentity = Omit<DeviceIdentity, 'status'> & {
   status: MLSStatuses;

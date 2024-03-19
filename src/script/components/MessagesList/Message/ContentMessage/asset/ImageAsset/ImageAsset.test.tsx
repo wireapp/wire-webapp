@@ -36,13 +36,19 @@ jest.mock('Components/utils/InViewport', () => ({
 }));
 
 describe('image-asset', () => {
+  const fakeImageUrl = 'https://test.com/image.png';
   const defaultProps: ImageAssetProps = {
     asset: new MediumImage('image'),
     message: new ContentMessage(),
     onClick: () => {},
   };
 
-  it('displays a dummy image when resource is not loaded', () => {
+  beforeAll(() => {
+    jest.spyOn(window.URL, 'createObjectURL').mockReturnValue(fakeImageUrl);
+    jest.spyOn(window.URL, 'revokeObjectURL').mockReturnValue();
+  });
+
+  it('displays loading dots when resource is not loaded', () => {
     const image = new MediumImage('image');
     image.height = '10';
     image.width = '100';
@@ -51,13 +57,8 @@ describe('image-asset', () => {
 
     render(<ImageAsset {...props} />);
 
-    const imageElement = screen.getByTestId('image-asset-img');
-
-    const imgSrc = imageElement.getAttribute('src');
-
-    expect(imgSrc).toContain('svg');
-    expect(imgSrc).toContain('10');
-    expect(imgSrc).toContain('100');
+    const imageElement = screen.getByTestId('image-loader');
+    expect(imageElement).toBeDefined();
   });
 
   it('displays the dummy image url when resource is loaded', async () => {
@@ -80,12 +81,11 @@ describe('image-asset', () => {
 
     render(<ImageAsset {...props} />);
 
-    const imageElement = screen.getByTestId('image-asset-img');
-
     await waitFor(() => {
       expect(window.URL.createObjectURL).toHaveBeenCalled();
+      const imageElement = screen.getByTestId('image-asset-img');
       const imgSrc = imageElement.getAttribute('src');
-      expect(imgSrc).toContain('data:image/svg+xml');
+      expect(imgSrc).toBe(fakeImageUrl);
     });
   });
 });

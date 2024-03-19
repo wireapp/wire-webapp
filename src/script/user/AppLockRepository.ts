@@ -86,14 +86,14 @@ export class AppLockRepository {
             this.appLockState.isActivatedInPreferences(false);
             window.localStorage.removeItem(this.getEnabledStorageKey());
           },
-          text: t('featureConfigAppLockTurnOff'),
+          text: t('AppLockDisableTurnOff'),
         },
         secondaryAction: {
-          text: t('featureConfigAppLockCancel'),
+          text: t('AppLockDisableCancel'),
         },
         text: {
-          title: t('featureConfigChangeModalApplockHeadline'),
-          message: t('featureConfigChangeModalApplock'),
+          title: t('ApplockDisableHeadline'),
+          message: t('AppLockDisableInfo'),
         },
       });
     }

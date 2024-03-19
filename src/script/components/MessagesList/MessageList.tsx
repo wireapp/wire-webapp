@@ -253,7 +253,7 @@ export const MessagesList: FC<MessagesListParams> = ({
       tabIndex={TabIndex.UNFOCUSABLE}
     >
       <div ref={setMessageContainer} className={cx('messages', {'flex-center': verticallyCenterMessage()})}>
-        {groupedMessages.map(group => {
+        {groupedMessages.flatMap(group => {
           if (isMarker(group)) {
             return (
               <MarkerComponent key={`${group.type}-${group.timestamp}`} scrollTo={scrollToElement} marker={group} />
@@ -263,8 +263,6 @@ export const MessagesList: FC<MessagesListParams> = ({
 
           return messages.map(message => {
             const isLastDeliveredMessage = lastDeliveredMessage?.id === message.id;
-
-            const lastMessageInGroup = group.messages[messages.length - 1];
 
             const visibleCallback = getVisibleCallback(conversation, message);
 
@@ -278,7 +276,6 @@ export const MessagesList: FC<MessagesListParams> = ({
                 key={key}
                 onVisible={visibleCallback}
                 message={message}
-                lastMessageInGroup={lastMessageInGroup}
                 hideHeader={message.timestamp() !== firstMessageTimestamp}
                 messageActions={messageActions}
                 conversation={conversation}

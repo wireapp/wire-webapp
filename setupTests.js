@@ -66,6 +66,7 @@ window.wire = {
 window.z = {userPermission: {}};
 
 window.URL.createObjectURL = jest.fn();
+window.URL.revokeObjectURL = jest.fn();
 
 const testLib = require('@testing-library/react');
 testLib.configure({testIdAttribute: 'data-uie-name'});

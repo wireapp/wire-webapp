@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import React, {UIEvent} from 'react';
 
 import cx from 'classnames';
 
@@ -54,8 +54,13 @@ const LinkPreviewAsset: React.FC<LinkPreviewAssetProps> = ({header = false, mess
   const {isObfuscated} = useKoSubscribableChildren(message, ['isObfuscated']);
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isFocusable);
 
-  const onClick = () => {
-    if (!message.isExpired()) {
+  const linkRef = React.useRef<HTMLAnchorElement>(null);
+
+  const onClick = ({target}: UIEvent) => {
+    // Clicking on the link directly will already open the link, so we don't want to open it manually
+    const wasLinkClicked = target === linkRef.current;
+
+    if (!message.isExpired() && !wasLinkClicked) {
       safeWindowOpen(preview?.url);
     }
   };
@@ -84,11 +89,11 @@ const LinkPreviewAsset: React.FC<LinkPreviewAssetProps> = ({header = false, mess
       tabIndex={messageFocusedTabIndex}
       className="link-preview-asset"
       onClick={onClick}
-      onKeyDown={e => handleKeyDown(e, onClick)}
+      onKeyDown={e => handleKeyDown(e, () => onClick(e))}
     >
       <div className="link-preview-image-container">
         {preview && previewImage ? (
-          <Image className="link-preview-image" asset={previewImage} data-uie-name="link-preview-image" />
+          <Image className="link-preview-image" image={previewImage} data-uie-name="link-preview-image" />
         ) : (
           <div className="link-preview-image-placeholder icon-link" />
         )}
@@ -123,6 +128,7 @@ const LinkPreviewAsset: React.FC<LinkPreviewAssetProps> = ({header = false, mess
                 rel="noopener noreferrer"
                 title={preview.url}
                 data-uie-name="link-preview-url"
+                ref={linkRef}
               >
                 {cleanURL(preview.url)}
               </a>
