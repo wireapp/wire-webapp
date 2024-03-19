@@ -39,12 +39,15 @@
 
   display: flex;
   width: 100%;
-  height: @conversation-input-min-height;
+  height: calc(100% - 80px);
   flex-direction: column;
-  justify-content: space-between;
   padding: 2px 0;
   margin: 0;
   gap: 8px;
+
+  button.conversations-sidebar-btn:last-of-type {
+    margin-top: auto;
+  }
 
   .conversations-sidebar-contacts-label {
     .label-xs;
@@ -70,8 +73,6 @@
   .button-reset-default;
   display: flex;
   width: 100%;
-  height: 100%;
-  flex: 1;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
@@ -98,7 +99,7 @@
 
   .conversations-sidebar-btn--badge {
     padding: 1px 4px;
-    border: 1px solid #fff;
+    border: 1px solid var(--app-bg-secondary);
     border-radius: 10px;
     background: var(--red-500);
     color: var(--button-tertiary-bg);
@@ -107,7 +108,7 @@
   }
 
   .conversations-sidebar-btn--text {
-    color: var(--gray-100);
+    color: var(--main-color);
   }
 
   &.active {
@@ -115,11 +116,11 @@
     color: var(--accent-color-500);
 
     svg {
-      fill: var(--white) !important;
+      fill: var(--app-bg-secondary) !important;
     }
 
     .conversations-sidebar-btn--text {
-      color: var(--white) !important;
+      color: var(--app-bg-secondary) !important;
     }
   }
 }
@@ -127,34 +128,6 @@
 .conversations-sidebar-btn {
   svg {
     margin-bottom: 4px;
-  }
-
-  .people-outline path {
-    body.theme-dark & {
-      fill: var(--gray-100);
-    }
-  }
-
-  .conversations-outline,
-  .folders-outline {
-    fill: transparent;
-    body.theme-dark & path {
-      stroke: var(--gray-100);
-    }
-
-    &.active path {
-      fill: var(--accent-color-500) !important;
-      stroke: var(--accent-color-500) !important;
-    }
-  }
-
-  .conversations-outline.active {
-    path:last-child {
-      stroke: var(--gray-10) !important;
-    }
-    body.theme-dark & path:last-child {
-      stroke: var(--gray-95) !important;
-    }
   }
 }
 
