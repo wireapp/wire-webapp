@@ -2105,7 +2105,7 @@ describe('ConversationRepository', () => {
         .spyOn(conversationRepository['conversationService'], 'getConversationById')
         .mockImplementation(async conversationId => {
           if (matchQualifiedIds(conversationId, deletedGroup.qualifiedId)) {
-            throw new ConversationError(ConversationError.TYPE.CONVERSATION_NOT_FOUND, 'Conversation not found');
+            throw new BackendError('', BackendErrorLabel.NO_CONVERSATION);
           }
           return {} as any;
         });
