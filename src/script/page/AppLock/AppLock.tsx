@@ -78,11 +78,20 @@ const AppLock: React.FC<AppLockProps> = ({
   const [setupPassphrase, setSetupPassphrase] = useState('');
   const [inactivityTimeoutId, setInactivityTimeoutId] = useState<number>();
   const [scheduledTimeoutId, setScheduledTimeoutId] = useState<number>();
+  const prevAppLockEnabled = useRef(appLockState.isAppLockEnabled());
   const {isAppLockActivated, isAppLockEnabled, isAppLockEnforced} = useKoSubscribableChildren(appLockState, [
     'isAppLockActivated',
     'isAppLockEnabled',
     'isAppLockEnforced',
   ]);
+
+  const MAX_RETRIES = 3;
+  const signUserOut = (count: number) => {
+    if (count <= MAX_RETRIES) {
+      return;
+    }
+    amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED);
+  };
 
   const {current: appObserver} = useRef(
     new MutationObserver(mutationRecords => {
@@ -95,10 +104,17 @@ const AppLock: React.FC<AppLockProps> = ({
 
   const {current: modalObserver} = useRef(
     new MutationObserver(() => {
-      const modalInDOM = document.querySelector('[data-uie-name="applock-modal"]');
-      if (!modalInDOM) {
-        amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED);
-      }
+      let retries = 0;
+
+      const interval = setInterval(() => {
+        const isModalVisible = document.querySelector('[data-uie-name="applock-modal"]') !== null;
+        if (isModalVisible) {
+          clearInterval(interval);
+          return;
+        }
+        retries++;
+        signUserOut(retries);
+      }, 500);
     }),
   );
 
@@ -131,11 +147,16 @@ const AppLock: React.FC<AppLockProps> = ({
   }, []);
 
   useEffect(() => {
+    const hasBeenEnabled = !prevAppLockEnabled.current && isAppLockEnabled;
+
     if (isAppLockEnabled) {
-      showAppLock();
-    } else if (appLockState.hasPassphrase()) {
-      appLockRepository.removeCode();
+      if (!appLockState.hasPassphrase()) {
+        appLockRepository.setDisabled();
+        return;
+      }
+      showAppLock(hasBeenEnabled ? APPLOCK_STATE.SETUP : APPLOCK_STATE.LOCKED);
     }
+    prevAppLockEnabled.current = isAppLockEnabled;
   }, [isAppLockEnabled]);
 
   useEffect(() => {
@@ -168,8 +189,8 @@ const AppLock: React.FC<AppLockProps> = ({
     };
   }, [state, isVisible]);
 
-  const showAppLock = () => {
-    setState(appLockState.hasPassphrase() ? APPLOCK_STATE.LOCKED : APPLOCK_STATE.SETUP);
+  const showAppLock = (state: APPLOCK_STATE) => {
+    setState(state);
     setIsVisible(true);
   };
 
@@ -239,7 +260,7 @@ const AppLock: React.FC<AppLockProps> = ({
     setSetupPassphrase('');
   };
   const onCancelAppLock = () => {
-    appLockRepository.setEnabled(false);
+    appLockRepository.setDisabled();
     setIsVisible(false);
   };
 
