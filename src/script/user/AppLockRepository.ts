@@ -76,6 +76,10 @@ export class AppLockRepository {
   };
 
   setEnabled = (enabled: boolean) => {
+    const disableFeature = () => {
+      this.appLockState.isActivatedInPreferences(false);
+      window.localStorage.removeItem(this.getEnabledStorageKey());
+    };
     if (enabled) {
       window.localStorage.setItem(this.getEnabledStorageKey(), 'true');
       this.appLockState.isActivatedInPreferences(true);
@@ -83,9 +87,7 @@ export class AppLockRepository {
       // If the user has set a passphrase we want to ask confirmation before disabling the feature
       PrimaryModal.show(PrimaryModal.type.CONFIRM, {
         primaryAction: {
-          action: () => {
-            this.removeCode();
-          },
+          action: disableFeature,
           text: t('AppLockDisableTurnOff'),
         },
         secondaryAction: {
@@ -97,7 +99,7 @@ export class AppLockRepository {
         },
       });
     } else {
-      this.removeCode();
+      disableFeature();
     }
   };
 
