@@ -86,8 +86,8 @@ const AppLock: React.FC<AppLockProps> = ({
   ]);
 
   const MAX_RETRIES = 3;
-  const signUserOut = (count: number) => {
-    if (count <= MAX_RETRIES) {
+  const signUserOut = (count?: number) => {
+    if (count && count <= MAX_RETRIES) {
       return;
     }
     amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED);
@@ -97,7 +97,7 @@ const AppLock: React.FC<AppLockProps> = ({
     new MutationObserver(mutationRecords => {
       const [{attributeName}] = mutationRecords;
       if (attributeName === 'style') {
-        amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED);
+        signUserOut();
       }
     }),
   );
