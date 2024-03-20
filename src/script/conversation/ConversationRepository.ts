@@ -2752,6 +2752,7 @@ export class ConversationRepository {
       })
       .map(conversationEntity => {
         const leaveEvent = EventBuilder.buildTeamMemberLeave(conversationEntity, userEntity, isoDate);
+        //FIXME: we are never removing the user from participating_user_ids
         return this.eventRepository.injectEvent(leaveEvent);
       });
     userEntity.isDeleted = true;
