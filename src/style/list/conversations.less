@@ -29,9 +29,12 @@
 }
 
 .conversations-sidebar {
+  display: flex;
   width: 220px;
+  flex-direction: column;
   padding: 8px 8px;
   border-right: 1px solid var(--border-color);
+  overflow-y: auto;
 }
 
 .conversations-sidebar-list {
@@ -39,15 +42,10 @@
 
   display: flex;
   width: 100%;
-  height: calc(100% - 80px);
   flex-direction: column;
   padding: 2px 0;
   margin: 0;
   gap: 8px;
-
-  button.conversations-sidebar-btn:last-of-type {
-    margin-top: auto;
-  }
 
   .conversations-sidebar-contacts-label {
     .label-xs;
@@ -61,6 +59,10 @@
     .text-uppercase;
     .label-2;
   }
+}
+
+.conversations-sidebar-list-footer {
+  margin-top: auto;
 }
 
 .conversations-sidebar-list-item {
@@ -82,6 +84,7 @@
 
   &--text-wrapper {
     display: flex;
+    align-items: center;
     gap: 12px;
   }
 
@@ -99,10 +102,10 @@
 
   .conversations-sidebar-btn--badge {
     padding: 1px 4px;
-    border: 1px solid var(--app-bg-secondary);
-    border-radius: 10px;
-    background: var(--red-500);
-    color: var(--button-tertiary-bg);
+    border: 1px solid var(--white);
+    border-radius: 5px;
+    background: @red-500;
+    color: var(--white);
     font-size: @font-size-small;
     font-weight: @font-weight-semibold;
   }
@@ -127,7 +130,8 @@
 
 .conversations-sidebar-btn {
   svg {
-    margin-bottom: 4px;
+    width: 12px;
+    height: 12px;
   }
 }
 

@@ -20,7 +20,6 @@
 import React, {useEffect, useState} from 'react';
 
 import {amplify} from 'amplify';
-import cx from 'classnames';
 import {container} from 'tsyringe';
 
 import {CircleCloseIcon, GroupIcon, Input, SearchIcon, StarIcon, InfoIcon} from '@wireapp/react-ui-kit';
@@ -49,6 +48,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {ConversationsList} from './ConversationsList';
+import {ConversationTab} from './ConversationTab';
 import {useFolderState} from './state';
 
 import {CallState} from '../../../../calling/CallState';
@@ -131,8 +131,6 @@ const Conversations: React.FC<ConversationsProps> = ({
   const favoriteConversations = conversationLabelRepository.getFavorites(conversations);
   const groupConversations = conversations.filter(conversation => conversation.isGroup());
   const directConversations = conversations.filter(conversation => conversation.is1to1());
-  const totalUnreadGroupConversations = groupConversations.filter(conversation => conversation.hasUnread()).length;
-  const totalUnreadDirectConversations = directConversations.filter(conversation => conversation.hasUnread()).length;
 
   const totalUnreadConversations = unreadConversations.length;
 
@@ -221,6 +219,53 @@ const Conversations: React.FC<ConversationsProps> = ({
     setCurrentTab(nextTab);
   }
 
+  const conversationTabs = [
+    {
+      type: SidebarTabs.RECENT,
+      title: t('conversationViewTooltip'),
+      dataUieName: 'go-recent-view',
+      Icon: <Icon.ConversationsOutline />,
+      unreadConversations: unreadConversations.length,
+    },
+    {
+      type: SidebarTabs.FAVORITES,
+      title: t('conversationLabelFavorites'),
+      dataUieName: 'go-favorites-view',
+      Icon: <StarIcon />,
+      unreadConversations: totalUnreadFavoriteConversations,
+    },
+    {
+      type: SidebarTabs.GROUPS,
+      title: t('conversationLabelGroups'),
+      dataUieName: 'go-groups-view',
+      Icon: <GroupIcon />,
+      unreadConversations: groupConversations.filter(conversation => conversation.hasUnread()).length,
+    },
+    {
+      type: SidebarTabs.DIRECTS,
+      title: t('conversationLabelDirects'),
+      dataUieName: 'go-directs-view',
+      Icon: <Icon.People />,
+      unreadConversations: directConversations.filter(conversation => conversation.hasUnread()).length,
+    },
+    {
+      type: SidebarTabs.FOLDER,
+      title: t('folderViewTooltip'),
+      dataUieName: 'go-folders-view',
+      Icon: <Icon.ConversationsFolder />,
+      unreadConversations: totalUnreadConversations,
+    },
+    {
+      hideTab: archivedConversations.length === 0,
+      type: SidebarTabs.ARCHIVES,
+      title: t('tooltipConversationsArchived', archivedConversations.length),
+      label: t('conversationFooterArchive'),
+      dataUieName: 'go-archive',
+      Icon: <Icon.Archive />,
+      unreadConversations: totalUnreadArchivedConversations,
+    },
+  ];
+
   const sidebar = (
     <nav className="conversations-sidebar">
       <UserDetails
@@ -232,164 +277,66 @@ const Conversations: React.FC<ConversationsProps> = ({
       <div
         role="tablist"
         aria-label={t('accessibility.headings.sidebar')}
-        aria-owns="tab-1 tab-2 tab-3 tab-4 tab-5 tab-6 tab-7 tab-8 tab-9"
+        aria-owns="tab-1 tab-2 tab-3 tab-4 tab-5 tab-6 tab-7"
         className="conversations-sidebar-list"
       >
         <div className="conversations-sidebar-title">{t('videoCallOverlayConversations')}</div>
 
-        <button
-          id="tab-1"
-          type="button"
-          role="tab"
-          className={cx(`conversations-sidebar-btn`, {active: isRecentTab})}
-          onClick={() => changeTab(SidebarTabs.RECENT)}
-          title={t('conversationViewTooltip')}
-          data-uie-name="go-recent-view"
-          data-uie-status={isRecentTab ? 'active' : 'inactive'}
-          aria-selected={isRecentTab}
-        >
-          <span className="conversations-sidebar-btn--text-wrapper">
-            <Icon.ConversationsOutline />
-            <span className="conversations-sidebar-btn--text">{t('conversationViewTooltip')}</span>
-          </span>
-          {totalUnreadConversations > 0 && (
-            <span className="conversations-sidebar-btn--badge">{unreadConversations.length}</span>
-          )}
-        </button>
+        {conversationTabs.map((conversationTab, index) => {
+          if (conversationTab.hideTab) {
+            return null;
+          }
 
-        <button
-          id="tab-2"
-          type="button"
-          role="tab"
-          className={cx(`conversations-sidebar-btn`, {active: isFavoritesTab})}
-          onClick={() => changeTab(SidebarTabs.FAVORITES)}
-          title={t('conversationLabelFavorites')}
-          data-uie-name="go-favorites-view"
-          data-uie-status={isFavoritesTab ? 'active' : 'inactive'}
-          aria-selected={isFavoritesTab}
-        >
-          <span className="conversations-sidebar-btn--text-wrapper">
-            <StarIcon />
-            <span className="conversations-sidebar-btn--text">{t('conversationLabelFavorites')}</span>
-          </span>
-          {totalUnreadFavoriteConversations > 0 && (
-            <span className="conversations-sidebar-btn--badge">{totalUnreadFavoriteConversations}</span>
-          )}
-        </button>
+          return (
+            <ConversationTab
+              {...conversationTab}
+              key={conversationTab.type}
+              conversationTabIndex={index + 1}
+              onChangeTab={changeTab}
+              isActive={conversationTab.type === currentTab}
+            />
+          );
+        })}
 
-        <button
-          id="tab-3"
-          type="button"
-          role="tab"
-          className={cx(`conversations-sidebar-btn`, {active: isGroupsTab})}
-          onClick={() => changeTab(SidebarTabs.GROUPS)}
-          title={t('conversationLabelGroups')}
-          data-uie-name="go-favorites-view"
-          data-uie-status={isGroupsTab ? 'active' : 'inactive'}
-          aria-selected={isGroupsTab}
-        >
-          <span className="conversations-sidebar-btn--text-wrapper">
-            <GroupIcon />
-            <span className="conversations-sidebar-btn--text">{t('conversationLabelGroups')}</span>
-          </span>
-          {totalUnreadGroupConversations > 0 && (
-            <span className="conversations-sidebar-btn--badge">{totalUnreadGroupConversations}</span>
-          )}
-        </button>
-
-        <button
-          id="tab-4"
-          type="button"
-          role="tab"
-          className={cx(`conversations-sidebar-btn`, {active: isDirectsTab})}
-          onClick={() => changeTab(SidebarTabs.DIRECTS)}
-          title={t('conversationLabelDirects')}
-          data-uie-name="go-favorites-view"
-          data-uie-status={isDirectsTab ? 'active' : 'inactive'}
-          aria-selected={isDirectsTab}
-        >
-          <span className="conversations-sidebar-btn--text-wrapper">
-            <Icon.People />
-            <span className="conversations-sidebar-btn--text">{t('conversationLabelDirects')}</span>
-          </span>
-          {totalUnreadDirectConversations > 0 && (
-            <span className="conversations-sidebar-btn--badge">{totalUnreadDirectConversations}</span>
-          )}
-        </button>
-
-        <button
-          id="tab-5"
-          type="button"
-          role="tab"
-          className={cx(`conversations-sidebar-btn`, {active: isFolderTab})}
-          onClick={() => changeTab(SidebarTabs.FOLDER)}
-          title={t('folderViewTooltip')}
-          data-uie-name="go-folder-view"
-          data-uie-status={isFolderTab ? 'active' : 'inactive'}
-          aria-selected={isFolderTab}
-        >
-          <span className="conversations-sidebar-btn--text-wrapper">
-            <Icon.ConversationsFolder />
-            <span className="conversations-sidebar-btn--text">{t('folderViewTooltip')}</span>
-          </span>
-          {totalUnreadConversations > 0 && (
-            <span className="conversations-sidebar-btn--badge">{totalUnreadConversations}</span>
-          )}
-        </button>
-
-        {archivedConversations.length > 0 && (
-          <button
-            id="tab-6"
-            type="button"
-            className={cx(`conversations-sidebar-btn`, {active: isArchivesTab})}
-            data-uie-name="go-archive"
-            onClick={() => changeTab(SidebarTabs.ARCHIVES)}
-            title={t('tooltipConversationsArchived', archivedConversations.length)}
-          >
-            <span className="conversations-sidebar-btn--text-wrapper">
-              <Icon.Archive />
-              <span className="conversations-sidebar-btn--text">{t('conversationFooterArchive')}</span>
-            </span>
-            {totalUnreadArchivedConversations > 0 && (
-              <span className="conversations-sidebar-btn--badge">{totalUnreadArchivedConversations}</span>
-            )}
-          </button>
-        )}
         <div className="conversations-sidebar-title">{t('conversationFooterContacts')}</div>
-        <button
-          id="tab-7"
-          type="button"
-          className={cx(`conversations-sidebar-btn`, {active: isConnectTab})}
-          onClick={() => changeTab(SidebarTabs.CONNECT)}
+
+        <ConversationTab
           title={t('searchConnect', Shortcut.getShortcutTooltip(ShortcutType.START))}
-          data-uie-name="go-people"
-        >
-          <span className="conversations-sidebar-btn--text-wrapper">
-            <Icon.Plus className="people-outline" />
-            <span className="conversations-sidebar-btn--text">{t('searchConnect')}</span>
-          </span>
-        </button>
-        <button
-          id="tab-8"
-          type="button"
-          className={cx(`conversations-sidebar-btn`, {active: isPreferences})}
-          onClick={() => {
-            changeTab(SidebarTabs.PREFERENCES);
+          label={t('searchConnect')}
+          type={SidebarTabs.CONNECT}
+          Icon={<Icon.Plus />}
+          onChangeTab={changeTab}
+          conversationTabIndex={conversationTabs.length + 1}
+          dataUieName="go-people"
+          isActive={isConnectTab}
+        />
+      </div>
+
+      <div
+        role="tablist"
+        aria-label={t('accessibility.headings.sidebar.footer')}
+        aria-owns="tab-1 tab-2"
+        className="conversations-sidebar-list-footer"
+      >
+        <ConversationTab
+          title={t('preferencesHeadline', Shortcut.getShortcutTooltip(ShortcutType.START))}
+          label={t('preferencesHeadline')}
+          type={SidebarTabs.PREFERENCES}
+          Icon={<Icon.Settings />}
+          onChangeTab={tab => {
+            changeTab(tab);
             onClickPreferences(ContentState.PREFERENCES_ACCOUNT);
           }}
-          title={t('preferencesHeadline', Shortcut.getShortcutTooltip(ShortcutType.START))}
-          data-uie-name="go-people"
-        >
-          <span className="conversations-sidebar-btn--text-wrapper">
-            <Icon.Settings />
-            <span className="conversations-sidebar-btn--text">{t('preferencesHeadline')}</span>
-          </span>
-        </button>
+          conversationTabIndex={1}
+          dataUieName="go-preferences"
+          isActive={isPreferences}
+        />
+
         <a
           rel="nofollow noopener noreferrer"
           target="_blank"
           href={Config.getConfig().URL.SUPPORT.INDEX}
-          id="tab-9"
+          id="tab-2"
           type="button"
           className="conversations-sidebar-btn"
           title={t('preferencesAboutSupport', Shortcut.getShortcutTooltip(ShortcutType.START))}
