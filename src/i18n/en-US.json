@@ -139,6 +139,7 @@
   "accessibility.headings.preferencesDevices": "Preferences - devices",
   "accessibility.headings.preferencesOptions": "Preferences - options",
   "accessibility.headings.sidebar": "Navigation",
+  "accessibility.headings.sidebar.footer": "Navigation Footer",
   "accessibility.messageActionsMenuEmoji": "Select emoji",
   "accessibility.messageActionsMenuLabel": "Message actions",
   "accessibility.messageActionsMenuLike": "React with heart",
