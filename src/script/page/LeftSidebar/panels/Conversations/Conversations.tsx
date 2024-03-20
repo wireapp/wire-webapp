@@ -269,8 +269,8 @@ const Conversations: React.FC<ConversationsProps> = ({
 
   const sidebar = (
     <div className="conversations-sidebar-wrapper">
-      {!isSidebarCollapsed && (
-        <nav className="conversations-sidebar">
+      <nav className="conversations-sidebar" data-is-collapsed={isSidebarCollapsed}>
+        <div className="conversations-sidebar-items">
           <UserDetails
             user={selfUser}
             groupId={conversationState.selfMLSConversation()?.groupId}
@@ -351,8 +351,8 @@ const Conversations: React.FC<ConversationsProps> = ({
               </span>
             </a>
           </div>
-        </nav>
-      )}
+        </div>
+      </nav>
       {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
       <div className="conversations-sidebar-handle" onClick={() => setIsSidebarCollapsed(previous => !previous)}>
         <div className="conversations-sidebar-handle-icon" data-is-collapsed={isSidebarCollapsed}>

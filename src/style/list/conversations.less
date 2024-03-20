@@ -31,6 +31,12 @@
 .conversations-sidebar-wrapper {
   display: flex;
 
+  &:hover {
+    .conversations-sidebar .conversations-sidebar-items {
+      transform: translateX(0);
+    }
+  }
+
   .conversations-sidebar-handle {
     position: relative;
     width: 16px;
@@ -68,9 +74,34 @@
   display: flex;
   width: 220px;
   flex-direction: column;
-  padding: 8px 8px;
   border-right: 1px solid var(--border-color);
   overflow-y: auto;
+
+  transition: width 0.3s ease-in-out;
+
+  .conversations-sidebar-items {
+    position: fixed;
+    z-index: 999999;
+    overflow: auto;
+    width: 220px;
+    height: 100vh;
+    background: var(--sidebar-bg);
+    transform: translateX(0);
+  }
+
+  &[data-is-collapsed='true'] {
+    width: 0;
+
+    .conversations-sidebar-items {
+      transform: translateX(-100%);
+    }
+  }
+
+  .conversations-sidebar-items {
+    min-width: 220px;
+    padding: 8px 8px;
+    transition: all 0.3s ease-in-out;
+  }
 }
 
 .conversations-sidebar-list {
