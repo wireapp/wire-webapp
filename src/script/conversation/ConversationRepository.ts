@@ -2745,18 +2745,35 @@ export class ConversationRepository {
     const userEntity = await this.userRepository.getUserById(userId);
     const eventInjections = this.conversationState
       .conversations()
-      .filter(conversationEntity => {
-        const conversationInTeam = conversationEntity.teamId === teamId;
-        const userIsParticipant = UserFilter.isParticipant(conversationEntity, userId);
-        return conversationInTeam && userIsParticipant && !conversationEntity.removed_from_conversation();
+      .filter(conversation => {
+        const conversationInTeam = conversation.teamId === teamId;
+        const userIsParticipant = UserFilter.isParticipant(conversation, userId);
+        return conversationInTeam && userIsParticipant && !conversation.removed_from_conversation();
       })
-      .map(conversationEntity => {
-        const leaveEvent = EventBuilder.buildTeamMemberLeave(conversationEntity, userEntity, isoDate);
-        return this.eventRepository.injectEvent(leaveEvent);
+      .map(async conversation => {
+        const leaveEvent = EventBuilder.buildTeamMemberLeave(conversation, userEntity, isoDate);
+        await this.eventRepository.injectEvent(leaveEvent);
+        await this.clearUsersFromConversation(conversation, [userEntity]);
       });
     userEntity.isDeleted = true;
     return Promise.all(eventInjections);
   };
+
+  /**
+   * Will remove users from the conversation and update its participants list accordingly.
+   *
+   * @param conversation - conversation to remove users from
+   * @param users - users to remove from the conversation
+   */
+  private async clearUsersFromConversation(conversation: Conversation, users: User[]) {
+    users.forEach(user => {
+      conversation.participating_user_ids.remove(userId => matchQualifiedIds(userId, user));
+      if (user.isTemporaryGuest()) {
+        user.clearExpirationTimeout();
+      }
+    });
+    await this.updateParticipatingUserEntities(conversation);
+  }
 
   /**
    * Set the notification state of a conversation.
@@ -3677,18 +3694,10 @@ export class ConversationRepository {
     }
 
     const {messageEntity} = await this.addEventToConversation(conversationEntity, eventJson);
-    (messageEntity as MemberMessage)
-      .userEntities()
-      .filter(userEntity => !userEntity.isMe)
-      .forEach(userEntity => {
-        conversationEntity.participating_user_ids.remove(userId => matchQualifiedIds(userId, userEntity));
 
-        if (userEntity.isTemporaryGuest()) {
-          userEntity.clearExpirationTimeout();
-        }
-      });
+    const usersToRemove = (messageEntity as MemberMessage).userEntities().filter(userEntity => !userEntity.isMe);
 
-    await this.updateParticipatingUserEntities(conversationEntity);
+    await this.clearUsersFromConversation(conversationEntity, usersToRemove);
 
     this.proteusVerificationStateHandler.onMemberLeft(conversationEntity);
 
