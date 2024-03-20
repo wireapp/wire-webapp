@@ -112,8 +112,7 @@ const AppLock: React.FC<AppLockProps> = ({
           clearInterval(interval);
           return;
         }
-        retries++;
-        signUserOut(retries);
+        signUserOut(retries++);
       }, 500);
     }),
   );
