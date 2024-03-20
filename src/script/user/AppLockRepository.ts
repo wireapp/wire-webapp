@@ -99,6 +99,7 @@ export class AppLockRepository {
   public setDisabled = () => {
     this.appLockState.isActivatedInPreferences(false);
     window.localStorage.removeItem(this.getEnabledStorageKey());
+    window.localStorage.removeItem(this.getPassphraseStorageKey());
   };
 
   public setCode = async (code: string): Promise<void> => {

@@ -149,12 +149,16 @@ const AppLock: React.FC<AppLockProps> = ({
   useEffect(() => {
     const hasBeenEnabled = !prevAppLockEnabled.current && isAppLockEnabled;
 
+    if (hasBeenEnabled) {
+      showAppLock(APPLOCK_STATE.SETUP);
+      return;
+    }
     if (isAppLockEnabled) {
       if (!appLockState.hasPassphrase()) {
         appLockRepository.setDisabled();
         return;
       }
-      showAppLock(hasBeenEnabled ? APPLOCK_STATE.SETUP : APPLOCK_STATE.LOCKED);
+      showAppLock(APPLOCK_STATE.LOCKED);
     }
     prevAppLockEnabled.current = isAppLockEnabled;
   }, [isAppLockEnabled]);
