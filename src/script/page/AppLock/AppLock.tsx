@@ -87,7 +87,7 @@ const AppLock: React.FC<AppLockProps> = ({
 
   const MAX_RETRIES = 3;
   const signUserOut = (count?: number) => {
-    if (count && count <= MAX_RETRIES) {
+    if (!!count && count <= MAX_RETRIES) {
       return;
     }
     amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED);
