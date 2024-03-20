@@ -22,7 +22,7 @@ import React, {useEffect, useState} from 'react';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
-import {CircleCloseIcon, GroupIcon, Input, SearchIcon, StarIcon, InfoIcon} from '@wireapp/react-ui-kit';
+import {CircleCloseIcon, GroupIcon, Input, SearchIcon, StarIcon, InfoIcon, ChevronIcon} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {CallingCell} from 'Components/calling/CallingCell';
@@ -112,6 +112,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   selfUser,
   listState,
 }) => {
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [conversationsFilter, setConversationsFilter] = useState<string>('');
   const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
   const {connectRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
@@ -267,88 +268,98 @@ const Conversations: React.FC<ConversationsProps> = ({
   ];
 
   const sidebar = (
-    <nav className="conversations-sidebar">
-      <UserDetails
-        user={selfUser}
-        groupId={conversationState.selfMLSConversation()?.groupId}
-        isTeam={teamState.isTeam()}
-      />
+    <div className="conversations-sidebar-wrapper">
+      {!isSidebarCollapsed && (
+        <nav className="conversations-sidebar">
+          <UserDetails
+            user={selfUser}
+            groupId={conversationState.selfMLSConversation()?.groupId}
+            isTeam={teamState.isTeam()}
+          />
 
-      <div
-        role="tablist"
-        aria-label={t('accessibility.headings.sidebar')}
-        aria-owns="tab-1 tab-2 tab-3 tab-4 tab-5 tab-6 tab-7"
-        className="conversations-sidebar-list"
-      >
-        <div className="conversations-sidebar-title">{t('videoCallOverlayConversations')}</div>
+          <div
+            role="tablist"
+            aria-label={t('accessibility.headings.sidebar')}
+            aria-owns="tab-1 tab-2 tab-3 tab-4 tab-5 tab-6 tab-7"
+            className="conversations-sidebar-list"
+          >
+            <div className="conversations-sidebar-title">{t('videoCallOverlayConversations')}</div>
 
-        {conversationTabs.map((conversationTab, index) => {
-          if (conversationTab.hideTab) {
-            return null;
-          }
+            {conversationTabs.map((conversationTab, index) => {
+              if (conversationTab.hideTab) {
+                return null;
+              }
 
-          return (
+              return (
+                <ConversationTab
+                  {...conversationTab}
+                  key={conversationTab.type}
+                  conversationTabIndex={index + 1}
+                  onChangeTab={changeTab}
+                  isActive={conversationTab.type === currentTab}
+                />
+              );
+            })}
+
+            <div className="conversations-sidebar-title">{t('conversationFooterContacts')}</div>
+
             <ConversationTab
-              {...conversationTab}
-              key={conversationTab.type}
-              conversationTabIndex={index + 1}
+              title={t('searchConnect', Shortcut.getShortcutTooltip(ShortcutType.START))}
+              label={t('searchConnect')}
+              type={SidebarTabs.CONNECT}
+              Icon={<Icon.Plus />}
               onChangeTab={changeTab}
-              isActive={conversationTab.type === currentTab}
+              conversationTabIndex={conversationTabs.length + 1}
+              dataUieName="go-people"
+              isActive={isConnectTab}
             />
-          );
-        })}
+          </div>
 
-        <div className="conversations-sidebar-title">{t('conversationFooterContacts')}</div>
+          <div
+            role="tablist"
+            aria-label={t('accessibility.headings.sidebar.footer')}
+            aria-owns="tab-1 tab-2"
+            className="conversations-sidebar-list-footer"
+          >
+            <ConversationTab
+              title={t('preferencesHeadline', Shortcut.getShortcutTooltip(ShortcutType.START))}
+              label={t('preferencesHeadline')}
+              type={SidebarTabs.PREFERENCES}
+              Icon={<Icon.Settings />}
+              onChangeTab={tab => {
+                changeTab(tab);
+                onClickPreferences(ContentState.PREFERENCES_ACCOUNT);
+              }}
+              conversationTabIndex={1}
+              dataUieName="go-preferences"
+              isActive={isPreferences}
+            />
 
-        <ConversationTab
-          title={t('searchConnect', Shortcut.getShortcutTooltip(ShortcutType.START))}
-          label={t('searchConnect')}
-          type={SidebarTabs.CONNECT}
-          Icon={<Icon.Plus />}
-          onChangeTab={changeTab}
-          conversationTabIndex={conversationTabs.length + 1}
-          dataUieName="go-people"
-          isActive={isConnectTab}
-        />
+            <a
+              rel="nofollow noopener noreferrer"
+              target="_blank"
+              href={Config.getConfig().URL.SUPPORT.INDEX}
+              id="tab-2"
+              type="button"
+              className="conversations-sidebar-btn"
+              title={t('preferencesAboutSupport', Shortcut.getShortcutTooltip(ShortcutType.START))}
+              data-uie-name="go-people"
+            >
+              <span className="conversations-sidebar-btn--text-wrapper">
+                <InfoIcon />
+                <span className="conversations-sidebar-btn--text">{t('preferencesAboutSupport')}</span>
+              </span>
+            </a>
+          </div>
+        </nav>
+      )}
+      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
+      <div className="conversations-sidebar-handle" onClick={() => setIsSidebarCollapsed(previous => !previous)}>
+        <div className="conversations-sidebar-handle-icon" data-is-collapsed={isSidebarCollapsed}>
+          <ChevronIcon width={12} height={12} />
+        </div>
       </div>
-
-      <div
-        role="tablist"
-        aria-label={t('accessibility.headings.sidebar.footer')}
-        aria-owns="tab-1 tab-2"
-        className="conversations-sidebar-list-footer"
-      >
-        <ConversationTab
-          title={t('preferencesHeadline', Shortcut.getShortcutTooltip(ShortcutType.START))}
-          label={t('preferencesHeadline')}
-          type={SidebarTabs.PREFERENCES}
-          Icon={<Icon.Settings />}
-          onChangeTab={tab => {
-            changeTab(tab);
-            onClickPreferences(ContentState.PREFERENCES_ACCOUNT);
-          }}
-          conversationTabIndex={1}
-          dataUieName="go-preferences"
-          isActive={isPreferences}
-        />
-
-        <a
-          rel="nofollow noopener noreferrer"
-          target="_blank"
-          href={Config.getConfig().URL.SUPPORT.INDEX}
-          id="tab-2"
-          type="button"
-          className="conversations-sidebar-btn"
-          title={t('preferencesAboutSupport', Shortcut.getShortcutTooltip(ShortcutType.START))}
-          data-uie-name="go-people"
-        >
-          <span className="conversations-sidebar-btn--text-wrapper">
-            <InfoIcon />
-            <span className="conversations-sidebar-btn--text">{t('preferencesAboutSupport')}</span>
-          </span>
-        </a>
-      </div>
-    </nav>
+    </div>
   );
 
   const callingView = (

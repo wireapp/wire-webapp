@@ -28,6 +28,42 @@
   text-align: center;
 }
 
+.conversations-sidebar-wrapper {
+  display: flex;
+
+  .conversations-sidebar-handle {
+    position: relative;
+    width: 16px;
+    height: 100%;
+    opacity: 0;
+
+    &:hover {
+      opacity: 1;
+    }
+
+    .conversations-sidebar-handle-icon {
+      position: absolute;
+      z-index: 99999999999;
+      top: 8px;
+      left: 3px;
+      display: flex;
+      width: 24px;
+      height: 24px;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #dce0e3;
+      border-radius: 20px;
+      background-color: #fff;
+      cursor: pointer;
+      transform: rotate(180deg);
+
+      &[data-is-collapsed='true'] {
+        transform: rotate(0deg);
+      }
+    }
+  }
+}
+
 .conversations-sidebar {
   display: flex;
   width: 220px;
