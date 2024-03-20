@@ -50,9 +50,9 @@ export class AppLockRepository {
     this.handleDisabledOnTeam(this.appLockState.isAppLockDisabledOnTeam());
   }
 
-  public getStoredPassphrase = (): string => window.localStorage.getItem(this.getPassphraseStorageKey());
+  getStoredPassphrase = (): string => window.localStorage.getItem(this.getPassphraseStorageKey());
 
-  public getStoredEnabled = (): string => window.localStorage.getItem(this.getEnabledStorageKey());
+  getStoredEnabled = (): string => window.localStorage.getItem(this.getEnabledStorageKey());
 
   handlePassphraseStorageEvent = ({key, oldValue}: StorageEvent): void => {
     const storageKey = this.getPassphraseStorageKey();
@@ -75,14 +75,19 @@ export class AppLockRepository {
     window.removeEventListener('storage', this.handlePassphraseStorageEvent);
   };
 
-  public setEnabled = (enabled: boolean) => {
+  setEnabled = (enabled: boolean) => {
+    const disableFeature = () => {
+      this.appLockState.isActivatedInPreferences(false);
+      window.localStorage.removeItem(this.getEnabledStorageKey());
+    };
     if (enabled) {
       window.localStorage.setItem(this.getEnabledStorageKey(), 'true');
       this.appLockState.isActivatedInPreferences(true);
-    } else {
+    } else if (this.appLockState.hasPassphrase()) {
+      // If the user has set a passphrase we want to ask confirmation before disabling the feature
       PrimaryModal.show(PrimaryModal.type.CONFIRM, {
         primaryAction: {
-          action: this.setDisabled,
+          action: disableFeature,
           text: t('AppLockDisableTurnOff'),
         },
         secondaryAction: {
@@ -93,16 +98,12 @@ export class AppLockRepository {
           message: t('AppLockDisableInfo'),
         },
       });
+    } else {
+      disableFeature();
     }
   };
 
-  public setDisabled = () => {
-    this.appLockState.isActivatedInPreferences(false);
-    window.localStorage.removeItem(this.getEnabledStorageKey());
-    window.localStorage.removeItem(this.getPassphraseStorageKey());
-  };
-
-  public setCode = async (code: string): Promise<void> => {
+  setCode = async (code: string): Promise<void> => {
     this.stopPassphraseObserver();
     await sodium.ready;
     const hashed = sodium.crypto_pwhash_str(
@@ -115,13 +116,13 @@ export class AppLockRepository {
     this.appLockState.hasPassphrase(true);
   };
 
-  public removeCode = () => {
+  removeCode = () => {
     this.stopPassphraseObserver();
     window.localStorage.removeItem(this.getPassphraseStorageKey());
     this.appLockState.hasPassphrase(false);
   };
 
-  public checkCode = async (code: string): Promise<boolean> => {
+  checkCode = async (code: string): Promise<boolean> => {
     const hashedCode = this.getStoredPassphrase();
     await sodium.ready;
     return sodium.crypto_pwhash_str_verify(hashedCode, code);
