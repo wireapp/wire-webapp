@@ -55,7 +55,15 @@ export async function generateSecretKey({
       throw new CorruptedKeyError('Invalid key');
     }
     if (!key) {
-      key = crypto.getRandomValues(new Uint8Array(keySize));
+      key = await crypto.subtle.generateKey(
+        {
+          name: 'AES-GCM',
+          length: keySize * 8,
+        },
+        true,
+        ['encrypt', 'decrypt'],
+      );
+      key = new Uint8Array(await crypto.subtle.exportKey('raw', key));
       await secretsDb.saveSecretValue(keyId, key);
     }
     return {key, deleteKey: () => secretsDb.deleteSecretValue(keyId)};
