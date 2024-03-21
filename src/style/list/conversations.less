@@ -51,7 +51,7 @@
       position: absolute;
       z-index: 99999999999;
       top: 8px;
-      left: 3px;
+      right: -8px;
       display: flex;
       width: 24px;
       height: 24px;
@@ -82,6 +82,7 @@
   .conversations-sidebar-items {
     position: fixed;
     z-index: 999999;
+    display: flex;
     overflow: auto;
     width: 220px;
     height: 100vh;
@@ -90,10 +91,10 @@
   }
 
   &[data-is-collapsed='true'] {
-    width: 0;
+    width: 20px;
 
     .conversations-sidebar-items {
-      transform: translateX(-100%);
+      transform: translateX(calc(-100% + 16px));
     }
   }
 
