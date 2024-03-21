@@ -83,6 +83,11 @@ export interface FullscreenVideoCallProps {
   videoGrid: Grid;
 }
 
+export enum backgroundBlur {
+  isNotBlurred,
+  isBlurred,
+}
+
 const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   call,
   canShareScreen,
@@ -108,10 +113,11 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   teamState = container.resolve(TeamState),
 }) => {
   const selfParticipant = call.getSelfParticipant();
-  const {sharesScreen: selfSharesScreen, sharesCamera: selfSharesCamera} = useKoSubscribableChildren(selfParticipant, [
-    'sharesScreen',
-    'sharesCamera',
-  ]);
+  const {
+    sharesScreen: selfSharesScreen,
+    sharesCamera: selfSharesCamera,
+    isBlurred,
+  } = useKoSubscribableChildren(selfParticipant, ['sharesScreen', 'sharesCamera', 'isBlurred']);
 
   const {
     activeSpeakers,
@@ -150,7 +156,6 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     (call.initialType === CALL_TYPE.VIDEO || conversation.supportsVideoCall(call.isConference));
 
   const showSwitchMicrophone = audioinput.length > 1;
-  const showSwitchVideo = videoinput.length > 1;
 
   const audioOptions = [
     {
@@ -227,17 +232,41 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
             };
       }),
     },
+    {
+      label: t('videoCallbackgroundBlurHeadline'),
+      options: [
+        {
+          label: t('videoCallbackgroundBlur'),
+          value: backgroundBlur.isBlurred,
+          dataUieName: backgroundBlur.isBlurred,
+          id: backgroundBlur.isBlurred,
+        },
+        {
+          label: t('videoCallbackgroundNotBlurred'),
+          value: backgroundBlur.isNotBlurred,
+          dataUieName: backgroundBlur.isNotBlurred,
+          id: backgroundBlur.isNotBlurred,
+        },
+      ],
+    },
   ];
 
   const [selectedVideoOptions, setSelectedVideoOptions] = React.useState(() =>
-    [currentCameraDevice].flatMap(
+    [currentCameraDevice, isBlurred].flatMap(
       device => videoOptions.flatMap(options => options.options.filter(item => item.id === device)) ?? [],
     ),
   );
-  const updateVideoOptions = (selectedOption: string) => {
+
+  const updateVideoOptions = async (selectedOption: string | backgroundBlur) => {
     const camera = videoOptions[0].options.find(item => item.value === selectedOption) ?? selectedVideoOptions[0];
-    setSelectedVideoOptions([camera]);
-    switchCameraInput(camera.id);
+    const blur = videoOptions[1].options.find(item => item.value == selectedOption) ?? selectedVideoOptions[1];
+
+    if (blur.id !== isBlurred) {
+      await selfParticipant.setBlur(blur.id as backgroundBlur);
+    }
+
+    setSelectedVideoOptions([camera, blur]);
+    switchCameraInput(String(camera.id));
   };
 
   const unreadMessagesCount = useAppState(state => state.unreadMessagesCount);
@@ -510,44 +539,44 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                     </span>
                   </button>
 
-                  {showSwitchVideo && (
-                    <button
-                      className="device-toggle-button"
-                      css={videoOptionsOpen ? videoControlActiveStyles : videoControlInActiveStyles}
-                      onClick={() => setVideoOptionsOpen(prev => !prev)}
-                      onKeyDown={event => handleKeyDown(event, () => setVideoOptionsOpen(prev => !prev))}
-                      onBlur={event => {
-                        if (!event.currentTarget.contains(event.relatedTarget)) {
-                          setVideoOptionsOpen(false);
-                        }
-                      }}
-                    >
-                      {videoOptionsOpen ? (
-                        <>
-                          <Select
-                            // eslint-disable-next-line jsx-a11y/no-autofocus
-                            autoFocus
-                            value={selectedVideoOptions}
-                            onChange={selectedOption => updateVideoOptions(String(selectedOption?.value))}
-                            onKeyDown={event => isEscapeKey(event) && setVideoOptionsOpen(false)}
-                            id="select-camera"
-                            dataUieName="select-camera"
-                            controlShouldRenderValue={false}
-                            isClearable={false}
-                            backspaceRemovesValue={false}
-                            hideSelectedOptions={false}
-                            options={videoOptions}
-                            menuPlacement="top"
-                            menuIsOpen
-                            wrapperCSS={{marginBottom: 0}}
-                          />
-                          <Icon.Chevron css={{height: '16px'}} />
-                        </>
-                      ) : (
-                        <Icon.Chevron css={{rotate: '180deg', height: '16px'}} />
-                      )}
-                    </button>
-                  )}
+                  <button
+                    className="device-toggle-button"
+                    css={videoOptionsOpen ? videoControlActiveStyles : videoControlInActiveStyles}
+                    onClick={() => {
+                      setVideoOptionsOpen(prev => !prev);
+                    }}
+                    onKeyDown={event => handleKeyDown(event, () => setVideoOptionsOpen(prev => !prev))}
+                    onBlur={event => {
+                      if (!event.currentTarget.contains(event.relatedTarget)) {
+                        setVideoOptionsOpen(false);
+                      }
+                    }}
+                  >
+                    {videoOptionsOpen ? (
+                      <>
+                        <Select
+                          value={selectedVideoOptions}
+                          onKeyDown={event => isEscapeKey(event) && setVideoOptionsOpen(false)}
+                          onChange={selectedOption => {
+                            updateVideoOptions(String(selectedOption?.value));
+                          }}
+                          id="select-camera"
+                          dataUieName="select-camera"
+                          controlShouldRenderValue={false}
+                          isClearable={false}
+                          backspaceRemovesValue={false}
+                          hideSelectedOptions={false}
+                          options={videoOptions}
+                          menuPlacement="top"
+                          menuIsOpen
+                          wrapperCSS={{marginBottom: 0}}
+                        />
+                        <Icon.Chevron css={{height: '16px'}} />
+                      </>
+                    ) : (
+                      <Icon.Chevron css={{rotate: '180deg', height: '16px'}} />
+                    )}
+                  </button>
                 </li>
               )}
 

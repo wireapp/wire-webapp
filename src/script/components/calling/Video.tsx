@@ -18,14 +18,72 @@
  */
 
 // https://github.com/facebook/react/issues/11163#issuecomment-628379291
-import {VideoHTMLAttributes, useEffect, useRef} from 'react';
+import {VideoHTMLAttributes, useCallback, useEffect, useRef} from 'react';
 
-type VideoProps = VideoHTMLAttributes<HTMLVideoElement> & {
+import '@mediapipe/selfie_segmentation';
+import '@tensorflow/tfjs-backend-webgl';
+import '@tensorflow/tfjs-core';
+// import * as bodySegmentation from '@tensorflow-models/body-segmentation';
+
+// //imports for blur effect
+// import * as bodySegmentation from '@tensorflow-models/body-segmentation';
+import {useBlur} from './useBlur';
+// Register WebGL backend.
+
+type VideoProps = VideoHTMLAttributes<HTMLVideoElement | HTMLCanvasElement> & {
   srcObject: MediaStream;
+  isBlurred: boolean;
+  blurStream: ((stream: MediaStream, stopTracks: boolean) => void) | undefined;
 };
 
-const Video = ({srcObject, ...props}: VideoProps) => {
+const Video = ({srcObject, isBlurred, blurStream, ...props}: VideoProps) => {
   const refVideo = useRef<HTMLVideoElement>(null);
+  // const video2ref = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const blurRef = useRef<MediaStream | undefined>(undefined);
+  const ctx = useRef<CanvasRenderingContext2D | null | undefined>(null);
+  const rafId = useRef<number | null>(null);
+  const {init, segmenter, cleanup, draw, segmenterFunc} = useBlur(srcObject, canvasRef);
+
+  console.log(isBlurred, 'isBlurred');
+  useEffect(() => {
+    if (!canvasRef.current || !isBlurred) {
+      return;
+    }
+    ctx.current = canvasRef?.current?.getContext('2d');
+    draw(ctx.current);
+    blurRef.current = canvasRef?.current?.captureStream();
+    blurStream?.(canvasRef?.current?.captureStream(), false);
+    // video2ref.current!.srcObject = blurRef.current;
+  }, [draw, isBlurred, blurStream]);
+
+  const renderPrediction = useCallback(async () => {
+    await segmenterFunc(canvasRef, refVideo, ctx).catch(console.warn);
+
+    rafId.current = requestAnimationFrame(async () => await renderPrediction());
+  }, [segmenterFunc]);
+
+  useEffect(() => {
+    async function initSegmenter() {
+      await init();
+    }
+    if (refVideo.current?.srcObject && !!isBlurred) {
+      window.cancelAnimationFrame(rafId?.current ?? 0);
+      cleanup();
+      initSegmenter().catch(err => {
+        segmenter.current = null;
+        console.warn(err);
+      });
+
+      renderPrediction().catch(console.warn);
+    }
+    return () => {
+      cleanup();
+    };
+  }, [refVideo.current?.srcObject, isBlurred, segmenter.current]);
+
+  // const gl = window.exposedContext;
+  // if (gl) gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(4));
 
   useEffect(() => {
     if (!refVideo.current) {
@@ -38,12 +96,29 @@ const Video = ({srcObject, ...props}: VideoProps) => {
     () => () => {
       if (refVideo.current) {
         refVideo.current.srcObject = null;
+        cleanup();
       }
     },
     [],
   );
 
-  return <video ref={refVideo} {...props} />;
+  return (
+    <>
+      {!!isBlurred && (
+        <canvas
+          ref={canvasRef}
+          {...props}
+          // css={{visibility: !!isBlurred ? 'hidden' : 'visible', display: !!isBlurred ? 'none' : 'inline block'}}
+        />
+      )}
+      {/* {!!isBlurred && <video ref={video2ref} {...props} />} */}
+      <video
+        ref={refVideo}
+        {...props}
+        css={{visibility: !!isBlurred ? 'hidden' : 'visible', display: !!isBlurred ? 'none' : 'inline block'}}
+      />
+    </>
+  );
 };
 
 export {Video};
