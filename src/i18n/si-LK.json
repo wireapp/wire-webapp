@@ -723,7 +723,7 @@
   "guestLinkPasswordModal.conversationPasswordProtected": "මෙම සංවාදය මුරපදයකින් ආරක්‍ෂිතයි.",
   "guestLinkPasswordModal.description": "මෙම සංවාදයට ප්‍රවේශය සඳහා සබැඳියක් සමඟ ඔබට ලැබී ඇති මුරපදය ඇතුල් කරන්න.",
   "guestLinkPasswordModal.headline": "{conversationName} මුරපදය යොදන්න",
-  "guestLinkPasswordModal.headlineDefault": "[Group Conversation] මුරපදය යොදන්න",
+  "guestLinkPasswordModal.headlineDefault": "Enter password",
   "guestLinkPasswordModal.joinConversation": "සංවාදයට එක්වන්න",
   "guestLinkPasswordModal.learnMoreLink": "ආගන්තුක සබැඳි ගැන තව දැනගන්න",
   "guestLinkPasswordModal.passwordIncorrect": "මුරපදය වැරදියි, නැවත උත්සාහ කරන්න.",
