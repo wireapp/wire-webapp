@@ -3380,6 +3380,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@mediapipe/tasks-vision@npm:^0.10.12":
+  version: 0.10.12
+  resolution: "@mediapipe/tasks-vision@npm:0.10.12"
+  checksum: cc18aa6be2e6dddf9e60a12f5e2aade30a0711a9827372a47bcf1c5c89df672bca7aa59954e7d482b73028818ee3d57e5c7a254440f05c930893532974fcc587
+  languageName: node
+  linkType: hard
+
 "@nodelib/fs.scandir@npm:2.1.5":
   version: 2.1.5
   resolution: "@nodelib/fs.scandir@npm:2.1.5"
@@ -17380,6 +17387,7 @@ __metadata:
     "@koush/wrtc": 0.5.3
     "@lexical/history": 0.13.1
     "@lexical/react": 0.13.1
+    "@mediapipe/tasks-vision": ^0.10.12
     "@testing-library/react": 14.2.1
     "@types/dexie-batch": 0.4.7
     "@types/eslint": 8.56.5

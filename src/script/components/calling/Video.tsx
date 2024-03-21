@@ -18,14 +18,37 @@
  */
 
 // https://github.com/facebook/react/issues/11163#issuecomment-628379291
+
 import {VideoHTMLAttributes, useEffect, useRef} from 'react';
+
+import {applyBlur} from 'Util/applyBlur';
 
 type VideoProps = VideoHTMLAttributes<HTMLVideoElement> & {
   srcObject: MediaStream;
+  blur: boolean;
 };
 
-const Video = ({srcObject, ...props}: VideoProps) => {
+const Video = ({srcObject, blur, ...props}: VideoProps) => {
   const refVideo = useRef<HTMLVideoElement>(null);
+  const blurRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    if (!refVideo.current) {
+      return;
+    }
+
+    const asyncBlur = async () => {
+      return await applyBlur(refVideo.current);
+    };
+
+    if (blur && blurRef.current) {
+      asyncBlur()
+        .then(stream => {
+          blurRef.current.srcObject = stream;
+        })
+        .catch(console.error);
+    }
+  }, [blur]);
 
   useEffect(() => {
     if (!refVideo.current) {
@@ -36,6 +59,9 @@ const Video = ({srcObject, ...props}: VideoProps) => {
 
   useEffect(
     () => () => {
+      if (blurRef.current) {
+        blurRef.current.srcObject = null;
+      }
       if (refVideo.current) {
         refVideo.current.srcObject = null;
       }
@@ -43,7 +69,20 @@ const Video = ({srcObject, ...props}: VideoProps) => {
     [],
   );
 
-  return <video ref={refVideo} {...props} />;
+  return (
+    <>
+      <video
+        ref={refVideo}
+        {...props}
+        css={{visibility: !blur ? 'hidden' : 'visible', display: !blur ? 'none' : 'inline block'}}
+      />
+      <video
+        ref={blurRef}
+        {...props}
+        css={{visibility: blur ? 'hidden' : 'visible', display: blur ? 'none' : 'inline block'}}
+      />
+    </>
+  );
 };
 
 export {Video};
