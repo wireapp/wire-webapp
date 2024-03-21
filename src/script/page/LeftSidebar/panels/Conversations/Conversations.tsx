@@ -271,7 +271,7 @@ const Conversations: React.FC<ConversationsProps> = ({
     <div className="conversations-sidebar-wrapper">
       <nav className="conversations-sidebar" data-is-collapsed={isSidebarCollapsed}>
         <div className="conversations-sidebar-items">
-          <div>
+          <div className="conversations-sidebar-items-children">
             <UserDetails
               user={selfUser}
               groupId={conversationState.selfMLSConversation()?.groupId}
