@@ -723,7 +723,7 @@
   "guestLinkPasswordModal.conversationPasswordProtected": "Эта беседа защищена паролем.",
   "guestLinkPasswordModal.description": "Введите пароль, который вы получили по ссылке для доступа к этой беседе.",
   "guestLinkPasswordModal.headline": "{conversationName} Введите пароль",
-  "guestLinkPasswordModal.headlineDefault": "Enter password",
+  "guestLinkPasswordModal.headlineDefault": "Введите пароль",
   "guestLinkPasswordModal.joinConversation": "Присоединиться к беседе",
   "guestLinkPasswordModal.learnMoreLink": "Узнать больше о гостевых ссылках",
   "guestLinkPasswordModal.passwordIncorrect": "Пароль неверен, попробуйте еще раз.",
