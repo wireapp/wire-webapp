@@ -26,7 +26,6 @@ import {CircleCloseIcon, Input, SearchIcon} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {CallingCell} from 'Components/calling/CallingCell';
-import {Config} from 'src/script/Config';
 import {IntegrationRepository} from 'src/script/integration/IntegrationRepository';
 import {
   closeIconStyles,
@@ -45,8 +44,10 @@ import {UserRepository} from 'src/script/user/UserRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
+import {ConversationHeader} from './ConversationHeader';
 import {ConversationsList} from './ConversationsList';
 import {ConversationTabs} from './ConversationTabs';
+import {EmptyConversationList} from './EmptyConversationList';
 import {getTabConversations} from './helpers';
 import {useFolderState} from './state';
 
@@ -292,7 +293,13 @@ const Conversations: React.FC<ConversationsProps> = ({
 
   return (
     <div className="conversations-wrapper">
-      <ListWrapper id="conversations" headerElement={<></>} hasHeader={false} sidebar={sidebar} before={callingView}>
+      <ListWrapper
+        id="conversations"
+        headerElement={<ConversationHeader currentTab={currentTab} selfUser={selfUser} />}
+        hasHeader={!isPreferences}
+        sidebar={sidebar}
+        before={callingView}
+      >
         {isPreferences && (
           <Preferences
             onPreferenceItemClick={onClickPreferences}
@@ -304,16 +311,7 @@ const Conversations: React.FC<ConversationsProps> = ({
         {isPreferences ? null : hasNoConversations ? (
           <>
             {archivedConversations.length === 0 ? (
-              <div className="conversations-centered">
-                <div>
-                  {t('conversationsWelcome', {
-                    brandName: Config.getConfig().BRAND_NAME,
-                  })}
-                </div>
-                <button className="button-reset-default text-underline" onClick={() => changeTab(SidebarTabs.CONNECT)}>
-                  {t('conversationsNoConversations')}
-                </button>
-              </div>
+              <EmptyConversationList currentTab={currentTab} onChangeTab={changeTab} />
             ) : (
               <div className="conversations-all-archived">{t('conversationsAllArchived')}</div>
             )}
