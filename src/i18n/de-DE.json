@@ -723,7 +723,7 @@
   "guestLinkPasswordModal.conversationPasswordProtected": "Diese Unterhaltung ist passwortgeschützt.",
   "guestLinkPasswordModal.description": "Please enter the password you have received with the access link for this conversation.",
   "guestLinkPasswordModal.headline": "{conversationName} Passwort eingeben",
-  "guestLinkPasswordModal.headlineDefault": "Enter password",
+  "guestLinkPasswordModal.headlineDefault": "Passwort eingeben",
   "guestLinkPasswordModal.joinConversation": "Unterhaltung beitreten",
   "guestLinkPasswordModal.learnMoreLink": "Erfahren Sie mehr über Gäste-Links",
   "guestLinkPasswordModal.passwordIncorrect": "Passwort ist nicht korrekt, bitte versuchen Sie es erneut.",
