@@ -8052,7 +8052,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dexie@npm:3.2.6, dexie@npm:^3.2.0":
+"dexie@npm:3.2.7":
+  version: 3.2.7
+  resolution: "dexie@npm:3.2.7"
+  checksum: 257504ed23cea2e5ed5c18a17a031c0a44aff70c5b3d6a63536b544cec9027c4c492a608165d5e7a44a104570c92dec2aa59c7bcec0c65f52000f979e1193dfd
+  languageName: node
+  linkType: hard
+
+"dexie@npm:^3.2.0":
   version: 3.2.6
   resolution: "dexie@npm:3.2.6"
   dependencies:
@@ -18370,7 +18377,7 @@ __metadata:
     css-loader: ^6.10.0
     cssnano: 6.1.1
     date-fns: 3.6.0
-    dexie: 3.2.6
+    dexie: 3.2.7
     dexie-batch: 0.4.3
     dexie-encrypted: 2.0.0
     dotenv: 16.4.5
