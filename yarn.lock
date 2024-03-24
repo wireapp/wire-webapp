@@ -7448,14 +7448,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"emoji-picker-react@npm:4.8.0":
-  version: 4.8.0
-  resolution: "emoji-picker-react@npm:4.8.0"
+"emoji-picker-react@npm:4.9.2":
+  version: 4.9.2
+  resolution: "emoji-picker-react@npm:4.9.2"
   dependencies:
     flairup: 0.0.38
   peerDependencies:
     react: ">=16"
-  checksum: edf39a95091115c92d0c7b287de17778f79a314f2320a6b7d6888d4da5a91e532156cbb8b71a144d62df0f400c956fa03825b8e34483520682ad53ffddd8b940
+  checksum: 5927788f2a936e11b50f5b1ca9866628fa3e9ad3864088f48421c3fdd5c0d466730aba827caca28f3bdb6feb58c1133b98da66bf9d72c7475d9a5d7230fb3216
   languageName: node
   linkType: hard
 
@@ -17471,7 +17471,7 @@ __metadata:
     dexie-encrypted: 2.0.0
     dotenv: 16.4.5
     dpdm: 3.14.0
-    emoji-picker-react: 4.8.0
+    emoji-picker-react: 4.9.2
     eslint: ^8.57.0
     eslint-plugin-prettier: ^5.1.3
     fake-indexeddb: 5.0.2
