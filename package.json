@@ -12,11 +12,13 @@
   ],
   "dependencies": {
     "husky": "^9.0.11",
-    "lint-staged": "^15.2.2"
+    "lint-staged": "^15.2.2",
+    "prettier": "^3.2.5"
   },
   "scripts": {
     "postinstall": "husky install"
   },
+  "prettier": "@wireapp/prettier-config",
   "lint-staged": {
     "*": "prettier --ignore-unknown --write",
     "*.less": [
