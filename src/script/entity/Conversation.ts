@@ -149,7 +149,6 @@ export class Conversation {
   public readonly legalHoldStatus: ko.Observable<LegalHoldStatus>;
   public readonly localMessageTimer: ko.Observable<number>;
   public readonly messages_unordered: ko.ObservableArray<Message>;
-  public readonly messages_visible: ko.PureComputed<Message[]>;
   public readonly messages: ko.PureComputed<Message[]>;
   public readonly messageTimer: ko.PureComputed<number>;
   public readonly name: ko.Observable<string>;
@@ -423,10 +422,6 @@ export class Conversation {
     this.hasContentMessages = ko.observable(
       [...this.messages(), ...this.incomingMessages()].some(message => message.isContent()),
     );
-
-    this.messages_visible = ko
-      .pureComputed(() => (!this.id ? [] : this.messages().filter(messageEntity => messageEntity.visible())))
-      .extend({trackArrayChanges: true});
 
     // Calling
     this.unreadState = ko.pureComputed(() => {

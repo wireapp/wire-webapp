@@ -717,38 +717,6 @@ describe('Conversation', () => {
     });
   });
 
-  describe('messages_visible', () => {
-    it('should return no messages if conversation ID is empty', () => {
-      expect(conversation_et.id).toBe('');
-      expect(conversation_et.messages_visible().length).toBe(0);
-    });
-
-    it('returns visible unmerged pings', () => {
-      const timestamp = Date.now();
-      conversation_et.id = createUuid();
-
-      const ping_message_1 = new PingMessage();
-      ping_message_1.timestamp(timestamp - 4000);
-      ping_message_1.id = createUuid();
-
-      const ping_message_2 = new PingMessage();
-      ping_message_2.timestamp(timestamp - 2000);
-      ping_message_2.id = createUuid();
-
-      const ping_message_3 = new PingMessage();
-      ping_message_3.timestamp(timestamp);
-      ping_message_3.id = createUuid();
-
-      conversation_et.addMessage(ping_message_1);
-      conversation_et.addMessage(ping_message_2);
-      conversation_et.addMessage(ping_message_3);
-
-      expect(conversation_et.messages_unordered().length).toBe(3);
-      expect(conversation_et.messages().length).toBe(3);
-      expect(conversation_et.messages_visible().length).toBe(3);
-    });
-  });
-
   describe('release', () => {
     it('should not release messages if conversation has unread messages', () => {
       const message_et = new Message(createUuid());
