@@ -127,7 +127,6 @@ export class Conversation {
   public readonly lastDeliveredMessage: ko.PureComputed<Message | undefined>;
   public readonly is_archived: ko.Observable<boolean>;
   public readonly is_cleared: ko.PureComputed<boolean>;
-  public readonly is_loaded: ko.Observable<boolean>;
   public readonly is_pending: ko.Observable<boolean>;
   public readonly is_verified: ko.PureComputed<boolean | undefined>;
   public readonly is1to1: ko.PureComputed<boolean>;
@@ -204,7 +203,6 @@ export class Conversation {
     this.teamId = undefined;
     this.type = ko.observable();
 
-    this.is_loaded = ko.observable(false);
     this.is_pending = ko.observable(false);
 
     this.participating_user_ets = ko.observableArray([]); // Does not include self user
@@ -611,7 +609,6 @@ export class Conversation {
   release(): void {
     if (!this.unreadState().allEvents.length) {
       this.removeMessages();
-      this.is_loaded(false);
       this.hasAdditionalMessages(true);
     }
   }

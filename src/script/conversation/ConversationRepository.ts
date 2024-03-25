@@ -4152,7 +4152,7 @@ export class ConversationRepository {
    * @param conversationEntity Conversation fetch events and users for
    */
   private async fetchUsersAndEvents(conversationEntity: Conversation) {
-    if (!conversationEntity.is_loaded() && !conversationEntity.is_pending()) {
+    if (!conversationEntity.is_pending()) {
       await this.updateParticipatingUserEntities(conversationEntity);
       await this.getUnreadEvents(conversationEntity);
     }

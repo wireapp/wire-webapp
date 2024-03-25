@@ -777,7 +777,6 @@ describe('Conversation', () => {
       conversation_et.release();
 
       expect(conversation_et.hasAdditionalMessages()).toBeTruthy();
-      expect(conversation_et.is_loaded()).toBeFalsy();
       expect(conversation_et.messages().length).toBe(0);
       expect(conversation_et.unreadState().allEvents.length).toBe(0);
     });
