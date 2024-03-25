@@ -16,16 +16,8 @@
     "prettier": "^3.2.5"
   },
   "scripts": {
-    "postinstall": "husky install"
+    "postinstall": "husky install",
+    "lint": "yarn workspaces foreach --since run lint"
   },
-  "prettier": "@wireapp/prettier-config",
-  "lint-staged": {
-    "*": "prettier --ignore-unknown --write",
-    "*.less": [
-      "stylelint --fix"
-    ],
-    "*.{js,jsx,ts,tsx}": [
-      "eslint --fix"
-    ]
-  }
+  "prettier": "@wireapp/prettier-config"
 }
