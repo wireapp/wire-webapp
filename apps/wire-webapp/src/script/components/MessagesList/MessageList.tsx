@@ -103,7 +103,7 @@ export const MessagesList: FC<MessagesListParams> = ({
     isGuestAndServicesRoom,
     isActiveParticipant,
     inTeam,
-    is_pending: isPending,
+    isLoadingMessages,
     hasAdditionalMessages,
   } = useKoSubscribableChildren(conversation, [
     'inTeam',
@@ -112,7 +112,7 @@ export const MessagesList: FC<MessagesListParams> = ({
     'lastDeliveredMessage',
     'isGuestRoom',
     'isGuestAndServicesRoom',
-    'is_pending',
+    'isLoadingMessages',
     'hasAdditionalMessages',
   ]);
 
@@ -176,7 +176,7 @@ export const MessagesList: FC<MessagesListParams> = ({
   useLayoutEffect(syncScrollPosition, [syncScrollPosition]);
 
   const loadPrecedingMessages = async (): Promise<void> => {
-    const shouldPullMessages = !isPending && hasAdditionalMessages;
+    const shouldPullMessages = !isLoadingMessages && hasAdditionalMessages;
 
     if (shouldPullMessages) {
       await conversationRepository.getPrecedingMessages(conversation);

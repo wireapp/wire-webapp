@@ -127,8 +127,8 @@ export class Conversation {
   public readonly lastDeliveredMessage: ko.PureComputed<Message | undefined>;
   public readonly is_archived: ko.Observable<boolean>;
   public readonly is_cleared: ko.PureComputed<boolean>;
-  public readonly is_loaded: ko.Observable<boolean>;
-  public readonly is_pending: ko.Observable<boolean>;
+  /** Indicates if the conversation is currently loading messages into its state. */
+  public readonly isLoadingMessages: ko.Observable<boolean>;
   public readonly is_verified: ko.PureComputed<boolean | undefined>;
   public readonly is1to1: ko.PureComputed<boolean>;
   public readonly isActiveParticipant: ko.PureComputed<boolean>;
@@ -150,7 +150,7 @@ export class Conversation {
   public readonly legalHoldStatus: ko.Observable<LegalHoldStatus>;
   public readonly localMessageTimer: ko.Observable<number>;
   public readonly messages_unordered: ko.ObservableArray<Message>;
-  public readonly messages_visible: ko.PureComputed<Message[]>;
+  /** Sorted messages that are ready to be displayed in the conversation */
   public readonly messages: ko.PureComputed<Message[]>;
   public readonly messageTimer: ko.PureComputed<number>;
   public readonly name: ko.Observable<string>;
@@ -204,8 +204,7 @@ export class Conversation {
     this.teamId = undefined;
     this.type = ko.observable();
 
-    this.is_loaded = ko.observable(false);
-    this.is_pending = ko.observable(false);
+    this.isLoadingMessages = ko.observable(false);
 
     this.participating_user_ets = ko.observableArray([]); // Does not include self user
     this.participating_user_ids = ko.observableArray([]); // Does not include self user
@@ -426,10 +425,6 @@ export class Conversation {
       [...this.messages(), ...this.incomingMessages()].some(message => message.isContent()),
     );
 
-    this.messages_visible = ko
-      .pureComputed(() => (!this.id ? [] : this.messages().filter(messageEntity => messageEntity.visible())))
-      .extend({trackArrayChanges: true});
-
     // Calling
     this.unreadState = ko.pureComputed(() => {
       const unreadState: UnreadState = {
@@ -606,13 +601,19 @@ export class Conversation {
   }
 
   /**
-   * Remove all message from conversation unless there are unread messages.
+   * Remove all the messages from conversation.
+   * If there are any incoming messages, they will be moved to the regular messages.
    */
   release(): void {
+    this.messages_unordered.removeAll();
+
     if (!this.unreadState().allEvents.length) {
-      this.removeMessages();
-      this.is_loaded(false);
       this.hasAdditionalMessages(true);
+    }
+
+    if (this.incomingMessages().length) {
+      this.messages_unordered.push(...this.incomingMessages());
+      this.incomingMessages.removeAll();
     }
   }
 
@@ -701,8 +702,10 @@ export class Conversation {
       if (alreadyAdded) {
         return false;
       }
+
+      this.updateTimestamps(messageEntity);
+
       if (this.hasLastReceivedMessageLoaded()) {
-        this.updateTimestamps(messageEntity);
         this.incomingMessages.remove(({id}) => messageEntity.id === id);
         // If the last received message is currently in memory, we can add this message to the displayed messages
         this.messages_unordered.push(messageEntity);

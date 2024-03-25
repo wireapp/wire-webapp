@@ -836,7 +836,7 @@ export class ConversationRepository {
    * @returns Resolves with the messages
    */
   public async getPrecedingMessages(conversationEntity: Conversation): Promise<ContentMessage[]> {
-    conversationEntity.is_pending(true);
+    conversationEntity.isLoadingMessages(true);
 
     const firstMessageEntity = conversationEntity.getOldestMessage();
     const upperBound =
@@ -851,7 +851,7 @@ export class ConversationRepository {
       Config.getConfig().MESSAGES_FETCH_LIMIT,
     )) as EventRecord[];
     const mappedMessageEntities = await this.addPrecedingEventsToConversation(events, conversationEntity);
-    conversationEntity.is_pending(false);
+    conversationEntity.isLoadingMessages(false);
     return mappedMessageEntities;
   }
 
@@ -932,7 +932,7 @@ export class ConversationRepository {
     const messageDate = new Date(messageEntity.timestamp());
     const conversationId = conversationEntity.id;
 
-    conversationEntity.is_pending(true);
+    conversationEntity.isLoadingMessages(true);
 
     const precedingMessages = (await this.eventService.loadPrecedingEvents(
       conversationId,
@@ -947,7 +947,7 @@ export class ConversationRepository {
     )) as EventRecord[];
     const messages = precedingMessages.concat(followingMessages);
     const mappedMessageEntities = await this.addEventsToConversation(messages, conversationEntity);
-    conversationEntity.is_pending(false);
+    conversationEntity.isLoadingMessages(false);
     return mappedMessageEntities;
   }
 
@@ -957,7 +957,7 @@ export class ConversationRepository {
    */
   async getSubsequentMessages(conversationEntity: Conversation, messageEntity: ContentMessage) {
     const messageDate = new Date(messageEntity.timestamp());
-    conversationEntity.is_pending(true);
+    conversationEntity.isLoadingMessages(true);
 
     const events = (await this.eventService.loadFollowingEvents(
       conversationEntity.id,
@@ -965,7 +965,7 @@ export class ConversationRepository {
       Config.getConfig().MESSAGES_FETCH_LIMIT,
     )) as EventRecord[];
     const mappedMessageEntities = await this.addEventsToConversation(events, conversationEntity, {prepend: false});
-    conversationEntity.is_pending(false);
+    conversationEntity.isLoadingMessages(false);
     return mappedMessageEntities;
   }
 
@@ -1009,7 +1009,7 @@ export class ConversationRepository {
       : new Date(conversationEntity.getLatestTimestamp(this.serverTimeHandler.toServerTimestamp()) + 1);
 
     if (lower_bound < upper_bound) {
-      conversationEntity.is_pending(true);
+      conversationEntity.isLoadingMessages(true);
 
       try {
         const events = (await this.eventService.loadPrecedingEvents(
@@ -1025,7 +1025,7 @@ export class ConversationRepository {
       } catch (error) {
         this.logger.info(`Could not load unread events for conversation: ${conversationEntity.id}`, error);
       }
-      conversationEntity.is_pending(false);
+      conversationEntity.isLoadingMessages(false);
     }
   }
 
@@ -4152,7 +4152,7 @@ export class ConversationRepository {
    * @param conversationEntity Conversation fetch events and users for
    */
   private async fetchUsersAndEvents(conversationEntity: Conversation) {
-    if (!conversationEntity.is_loaded() && !conversationEntity.is_pending()) {
+    if (!conversationEntity.isLoadingMessages()) {
       await this.updateParticipatingUserEntities(conversationEntity);
       await this.getUnreadEvents(conversationEntity);
     }
