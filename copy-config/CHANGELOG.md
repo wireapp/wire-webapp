@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.1.18](https://github.com/wireapp/wire-web-packages/compare/@wireapp/copy-config@2.1.17...@wireapp/copy-config@2.1.18) (2024-03-25)
+
+### Bug Fixes
+
+* **copy-config:** make rimraf production dependency ([#6107](https://github.com/wireapp/wire-web-packages/issues/6107)) ([95f956e](https://github.com/wireapp/wire-web-packages/commit/95f956e2617934acdb20c61a3534a37e7cd88d0f))
+
 ## [2.1.17](https://github.com/wireapp/wire-web-packages/compare/@wireapp/copy-config@2.1.16...@wireapp/copy-config@2.1.17) (2024-03-19)
 
 **Note:** Version bump only for package @wireapp/copy-config
