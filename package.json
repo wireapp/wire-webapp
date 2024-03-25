@@ -2,7 +2,6 @@
   "name": "wire-web-monorepo",
   "version": "1.0.0",
   "description": "Wire web apps monorepo (wire-webapp, account pages, team settings)",
-  "main": "index.js",
   "license": "MIT",
   "private": true,
   "packageManager": "yarn@4.1.0",
