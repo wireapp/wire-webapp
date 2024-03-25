@@ -17,6 +17,7 @@
   },
   "scripts": {
     "postinstall": "husky install",
+    "dev": "yarn workspaces foreach -A run dev",
     "lint": "yarn workspaces foreach -A run lint",
     "test": "yarn workspaces foreach -A run test"
   },
