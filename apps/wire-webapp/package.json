@@ -119,7 +119,6 @@
     "jsdom-worker": "0.3.0",
     "less": "4.2.0",
     "less-loader": "^12.2.0",
-    "lint-staged": "15.2.2",
     "os-browserify": "0.3.0",
     "path-browserify": "1.0.1",
     "postcss": "8.4.38",
@@ -153,15 +152,6 @@
     "node": ">=16"
   },
   "license": "GPL-3.0",
-  "lint-staged": {
-    "*": "prettier --ignore-unknown --write",
-    "*.less": [
-      "stylelint --fix"
-    ],
-    "*.{js,jsx,ts,tsx}": [
-      "eslint --fix"
-    ]
-  },
   "name": "wire-webapp",
   "prettier": "@wireapp/prettier-config",
   "private": true,

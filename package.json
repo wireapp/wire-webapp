@@ -11,9 +11,19 @@
     "apps/wire-webapp/server"
   ],
   "dependencies": {
-    "husky": "^9.0.11"
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.2"
   },
   "scripts": {
     "postinstall": "husky install"
+  },
+  "lint-staged": {
+    "*": "prettier --ignore-unknown --write",
+    "*.less": [
+      "stylelint --fix"
+    ],
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix"
+    ]
   }
 }
