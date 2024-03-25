@@ -599,12 +599,19 @@ export class Conversation {
   }
 
   /**
-   * Remove all message from conversation unless there are unread messages.
+   * Remove all the messages from conversation.
+   * If there are any incoming messages, they will be moved to the regular messages.
    */
   release(): void {
+    this.messages_unordered.removeAll();
+
     if (!this.unreadState().allEvents.length) {
-      this.removeMessages();
       this.hasAdditionalMessages(true);
+    }
+
+    if (this.incomingMessages().length) {
+      this.messages_unordered.push(...this.incomingMessages());
+      this.incomingMessages.removeAll();
     }
   }
 
@@ -693,8 +700,10 @@ export class Conversation {
       if (alreadyAdded) {
         return false;
       }
+
+      this.updateTimestamps(messageEntity);
+
       if (this.hasLastReceivedMessageLoaded()) {
-        this.updateTimestamps(messageEntity);
         this.incomingMessages.remove(({id}) => messageEntity.id === id);
         // If the last received message is currently in memory, we can add this message to the displayed messages
         this.messages_unordered.push(messageEntity);
