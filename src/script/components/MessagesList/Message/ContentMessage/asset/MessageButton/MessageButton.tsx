@@ -19,6 +19,8 @@
 
 import classNames from 'classnames';
 
+import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
+
 import {Icon} from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {noop} from 'Util/util';
@@ -46,6 +48,20 @@ export const MessageButton = ({id, label, message, onClick = noop}: MessageButto
 
   return (
     <>
+      <Button
+        variant={ButtonVariant.SECONDARY}
+        onClick={onClick}
+        data-uie-name={label}
+        data-uie-uid={id}
+        data-uie-selected={isSelected}
+        data-uie-waiting={isWaiting}
+        // showLoading={isWaiting}
+        isActive={isSelected}
+        style={{maxWidth: '400px', width: '100%'}}
+      >
+        {label}
+      </Button>
+
       <button
         type="button"
         className={classNames('message-button', {
