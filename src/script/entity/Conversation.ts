@@ -128,7 +128,7 @@ export class Conversation {
   public readonly is_archived: ko.Observable<boolean>;
   public readonly is_cleared: ko.PureComputed<boolean>;
   //* Indicates if the conversation is currently loading messages into its state. */
-  public readonly is_pending: ko.Observable<boolean>;
+  public readonly isLoadingMessages: ko.Observable<boolean>;
   public readonly is_verified: ko.PureComputed<boolean | undefined>;
   public readonly is1to1: ko.PureComputed<boolean>;
   public readonly isActiveParticipant: ko.PureComputed<boolean>;
@@ -204,7 +204,7 @@ export class Conversation {
     this.teamId = undefined;
     this.type = ko.observable();
 
-    this.is_pending = ko.observable(false);
+    this.isLoadingMessages = ko.observable(false);
 
     this.participating_user_ets = ko.observableArray([]); // Does not include self user
     this.participating_user_ids = ko.observableArray([]); // Does not include self user
