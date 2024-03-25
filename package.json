@@ -17,7 +17,7 @@
   },
   "scripts": {
     "postinstall": "husky install",
-    "lint": "yarn workspaces foreach --since run lint"
+    "lint": "yarn workspaces foreach --since=dev run lint"
   },
   "prettier": "@wireapp/prettier-config"
 }
