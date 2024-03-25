@@ -1,9 +1,0 @@
-{
-  "LABEL": {
-    "name": "blocked: fix-pr-title",
-    "color": "b60205"
-  },
-  "CHECKS": {
-    "regexp": "^((docs|feat|fix|refactor|style|test)\\((services|call|core)\\): |chore|runfix)"
-  }
-}

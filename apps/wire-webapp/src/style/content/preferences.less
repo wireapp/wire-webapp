@@ -1,0 +1,233 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+.preferences-page {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+}
+
+.preferences-titlebar {
+  .heading-h3;
+  .flex-center;
+
+  position: relative;
+  width: 100%;
+  min-height: @content-title-bar-height;
+  padding: 0;
+  margin: 0;
+  background-color: var(--sidebar-bg);
+  color: @black;
+}
+
+body.theme-dark {
+  .preferences-titlebar {
+    color: @white;
+  }
+}
+
+.preferences-content {
+  width: 100%;
+  min-width: var(--preferences-width);
+  height: 100%;
+  padding: 32px 32px 32px 72px;
+  overflow-x: hidden;
+
+  @media (max-width: @screen-md-min) {
+    padding: 40px;
+  }
+
+  @media (max-width: @screen-sm) {
+    padding: 20px;
+  }
+
+  input {
+    color: var(--background);
+  }
+}
+
+.preferences-button {
+  margin-top: 8px;
+}
+
+.preferences-detail {
+  margin-top: 10px;
+  font-size: @font-size-small;
+
+  &-intended {
+    margin-left: 30px;
+  }
+}
+
+body.theme-dark {
+  .preferences-detail {
+    color: @gray-20;
+  }
+}
+
+.preferences-detail-bold {
+  font-weight: @font-weight-bold;
+}
+
+.preferences-detail-emoji {
+  display: flex;
+  align-items: center;
+  white-space: pre;
+}
+
+.preferences-header {
+  .heading-h4;
+  margin-bottom: 16px;
+  color: var(--background);
+  line-height: @line-height-sm;
+}
+
+.preferences-hint {
+  color: var(--foreground);
+}
+
+.preferences-label {
+  color: var(--text-input-label);
+}
+
+.preferences-info {
+  line-height: @line-height-lg;
+}
+
+.preferences-link {
+  .button-reset-default;
+
+  display: inline-block;
+  margin-bottom: 10px;
+  color: @black;
+  cursor: pointer;
+  font-size: @font-size-base;
+  line-height: @line-height-lg;
+
+  &:hover {
+    .accent-text;
+    text-decoration: underline;
+  }
+}
+
+body.theme-dark {
+  .preferences-link {
+    color: @white;
+
+    &:hover {
+      .accent-text;
+      text-decoration: underline;
+    }
+  }
+}
+
+.preferences-option {
+  position: relative;
+  display: flex;
+
+  input:disabled {
+    &,
+    & + label {
+      cursor: default;
+      opacity: 0.5;
+    }
+  }
+
+  & ~ & {
+    margin-top: 24px;
+  }
+}
+
+.checkbox-margin {
+  margin-top: 1.5rem;
+}
+
+.preferences-option-pointer {
+  cursor: pointer;
+}
+
+.preferences-option-icon {
+  height: @line-height-sm;
+  padding-right: 18px;
+  margin: 0;
+  font-size: @font-size-sm;
+  line-height: @line-height-sm;
+
+  div,
+  svg {
+    display: inline;
+    width: @line-height-sm;
+    height: @line-height-sm;
+
+    path {
+      fill: currentColor;
+    }
+  }
+}
+
+.preferences-option-label {
+  display: inline;
+  height: @line-height-sm;
+  cursor: pointer;
+  line-height: @line-height-sm;
+}
+
+.preferences-section {
+  display: flex;
+  width: var(--preferences-width);
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0;
+  border: none;
+  margin: 0;
+  margin-bottom: 32px;
+
+  .preferences-device-details & {
+    margin: 0;
+  }
+}
+
+.preferences-reset-session {
+  margin-top: 12px;
+}
+
+.preferences-separator {
+  width: var(--preferences-width);
+  height: 1px;
+  border: 0;
+  margin: 22px 0 22px;
+  background: @gray-50;
+}
+
+.preferences-about-list {
+  .list-unstyled;
+  margin: 0;
+}
+
+.preferences-history-restore-button {
+  margin-top: 20px;
+}
+
+.preferences-wrapper {
+  width: var(--preferences-width);
+
+  .buttons-group {
+    justify-content: center;
+  }
+}

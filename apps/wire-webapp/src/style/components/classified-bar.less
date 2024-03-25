@@ -1,0 +1,70 @@
+/*
+ * Wire
+ * Copyright (C) 2023 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+.classified-bar {
+  display: flex;
+  width: 100%;
+  min-height: 1rem;
+  align-items: center;
+  justify-content: center;
+  border-width: 1px 0;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+
+  & svg {
+    margin-right: 5px;
+  }
+
+  &.green {
+    border-style: solid;
+    border-color: var(--green-500);
+    background-color: @green-50;
+    color: var(--green-500);
+    & svg {
+      width: 12px;
+      fill: var(--green-500);
+    }
+  }
+
+  &.red {
+    border-style: none;
+    background-color: @red-600;
+    color: var(--white);
+    & svg {
+      width: 12px;
+      fill: var(--white);
+    }
+  }
+
+  body.theme-dark & {
+    &.green {
+      border-style: none;
+      background-color: @green-dark-900;
+    }
+
+    &.red {
+      background-color: @red-dark-500;
+      color: var(--black);
+      & svg {
+        fill: var(--black);
+      }
+    }
+  }
+}

@@ -1,0 +1,232 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+@keyframes video-fade-in {
+  to {
+    opacity: 1;
+  }
+}
+
+.video-calling {
+  position: absolute;
+  z-index: @z-index-video;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #323739;
+}
+
+// common
+.video-element-overlay {
+  .full-screen;
+  .flex-center;
+
+  background-color: fade(#000, 24%);
+  color: #fff;
+  pointer-events: none;
+}
+
+.video-element-remote {
+  display: flex;
+  height: calc(100% - 115px);
+  flex-direction: column;
+  padding: 0 4px 0 4px;
+  // fade in animation
+  animation: video-fade-in @animation-timing-slower @ease-out-quart forwards;
+  background-color: var(--app-bg-secondary);
+  opacity: 0;
+}
+
+.video-element-remote-participant {
+  .flex-center;
+
+  height: 100%;
+  background: #fff;
+}
+
+.video-message {
+  .full-screen;
+  .flex-center;
+
+  color: #fff;
+}
+
+.video-title {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  background-color: var(--sidebar-bg);
+
+  &__info-bar {
+    .label-small-medium;
+    padding: 5px 10px;
+    border-radius: 6px;
+    background-color: var(--accent-color);
+    color: var(--app-bg-secondary);
+  }
+}
+
+.pagination-wrapper {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  background-color: var(--app-bg-secondary);
+}
+
+.video-remote-name {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.video-remote-title {
+  .heading-h3;
+  overflow: hidden;
+  margin: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.video-controls {
+  width: 100%;
+  height: 100%;
+  background-color: var(--app-bg-secondary);
+  transition: opacity 0.25s ease-in-out;
+
+  &__item {
+    position: relative;
+  }
+
+  &__centered-items {
+    display: flex;
+    justify-content: space-between;
+
+    @media (max-width: @call-ui-xs) {
+      width: 100%;
+      justify-content: space-around;
+    }
+  }
+
+  &__fit-info {
+    width: 100%;
+    color: #fff;
+    font-size: @font-size-xsmall;
+    font-weight: @font-weight-regular;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  &__wrapper {
+    .list-unstyled;
+
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    padding: 10px 40px 0 40px;
+    margin: 0;
+
+    @media (max-width: @call-ui-sm) {
+      justify-content: center;
+    }
+  }
+
+  &__item__minimize {
+    display: flex;
+    min-width: 157px;
+  }
+
+  &__button {
+    .button-reset-default;
+    position: relative;
+    display: flex;
+    width: 68px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 24px;
+    margin: 0 10px;
+    cursor: pointer;
+    line-height: 0;
+
+    @media (max-width: @call-ui-xs) {
+      margin: 0 5px;
+    }
+
+    &__label {
+      position: absolute;
+      bottom: -16px;
+      left: 50%;
+      margin: 0;
+      color: var(--main-color);
+      font-size: 11px;
+      font-weight: @font-weight-regular;
+      transform: translateX(-50%);
+      white-space: nowrap;
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--accent-color-focus);
+    }
+
+    &--red {
+      border: 1px solid var(--red-500);
+      background-color: var(--red-500);
+      svg > path {
+        fill: var(--app-bg-secondary);
+      }
+      &:hover {
+        background-color: #9b000f;
+        body.theme-dark & {
+          background-color: #ff928d;
+        }
+        &:active {
+          border: 1px solid #74000b;
+          background-color: var(--red-500);
+          body.theme-dark & {
+            border: 1px solid #ffc9c6;
+            background-color: var(--red-500);
+          }
+        }
+      }
+    }
+  }
+}
+
+.video-controls .video-element-dark {
+  color: #fff;
+}
+
+.device-toggle-button {
+  .button-reset-default;
+  position: absolute;
+  top: -5px;
+  left: 60px;
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--inactive-call-button-border);
+  border-radius: 50%;
+  margin-bottom: 30px;
+  background-color: var(--inactive-call-button-bg);
+  cursor: pointer;
+  line-height: 0;
+  > svg {
+    fill: var(--main-color);
+  }
+}

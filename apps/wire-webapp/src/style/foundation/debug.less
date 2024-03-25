@@ -1,0 +1,43 @@
+body {
+  .message[data-uie-uid] .debug-info,
+  .conversation-list-cell[data-uie-uid] .debug-info {
+    position: absolute;
+    top: auto;
+    right: auto;
+    bottom: 0;
+    left: 0;
+    display: block;
+    height: auto;
+    padding: 4px;
+    border-radius: 4px;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 300;
+    opacity: 0.5;
+    user-select: text;
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  .message[data-uie-uid] .debug-info {
+    &::before {
+      content: 'message: ';
+    }
+    background-color: rgba(0, 0, 128);
+  }
+
+  [data-uie-name='sender-name'][data-uie-uid] .debug-info {
+    &::before {
+      content: 'user: ';
+    }
+    background-color: rgba(0, 128, 32);
+  }
+
+  .conversation-list-cell[data-uie-uid] .debug-info {
+    &::before {
+      content: 'conversation: ';
+    }
+    background-color: rgba(128, 0, 0);
+  }
+}
