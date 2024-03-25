@@ -48,6 +48,7 @@ describe('Conversation', () => {
 
   const first_timestamp = new Date('2017-09-26T09:21:14.225Z').getTime();
   const second_timestamp = new Date('2017-09-26T10:27:18.837Z').getTime();
+  const third_timestamp = new Date('2017-09-26T11:29:21.837Z').getTime();
 
   beforeEach(() => {
     conversation_et = new Conversation();
@@ -718,18 +719,23 @@ describe('Conversation', () => {
   });
 
   describe('release', () => {
-    it('should not release messages if conversation has unread messages', () => {
+    it('if there are any incoming messages, they should be moved to regular messages', () => {
       const message_et = new Message(createUuid());
       message_et.timestamp(second_timestamp);
       conversation_et.addMessage(message_et);
       conversation_et.last_read_timestamp(first_timestamp);
 
+      const incomingMessage = new Message(createUuid());
+      conversation_et.last_event_timestamp(third_timestamp);
+      conversation_et.addMessage(incomingMessage);
+
       expect(conversation_et.messages().length).toBe(1);
-      expect(conversation_et.unreadState().allEvents.length).toBe(1);
+      expect(conversation_et.unreadState().allEvents.length).toBe(2);
 
       conversation_et.release();
 
       expect(conversation_et.messages().length).toBe(1);
+      expect(conversation_et.messages()).toEqual([incomingMessage]);
       expect(conversation_et.unreadState().allEvents.length).toBe(1);
     });
 
