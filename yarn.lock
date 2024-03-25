@@ -10393,7 +10393,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"husky@npm:9.0.11":
+"husky@npm:^9.0.11":
   version: 9.0.11
   resolution: "husky@npm:9.0.11"
   bin:
@@ -18928,6 +18928,8 @@ __metadata:
 "wire-web-monorepo@workspace:.":
   version: 0.0.0-use.local
   resolution: "wire-web-monorepo@workspace:."
+  dependencies:
+    husky: "npm:^9.0.11"
   languageName: unknown
   linkType: soft
 
@@ -19046,7 +19048,6 @@ __metadata:
     highlight.js: "npm:11.9.0"
     html-webpack-plugin: "npm:^5.6.0"
     http-status-codes: "npm:2.3.0"
-    husky: "npm:9.0.11"
     i18next-scanner: "npm:4.4.0"
     intersection-observer: "npm:0.12.2"
     jest: "npm:29.7.0"

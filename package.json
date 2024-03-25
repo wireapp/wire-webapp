@@ -9,5 +9,11 @@
   "workspaces": [
     "apps/*",
     "apps/wire-webapp/server"
-  ]
+  ],
+  "dependencies": {
+    "husky": "^9.0.11"
+  },
+  "scripts": {
+    "postinstall": "husky install"
+  }
 }
