@@ -703,9 +703,8 @@ export class Conversation {
         return false;
       }
 
-      this.updateTimestamps(messageEntity);
-
       if (this.hasLastReceivedMessageLoaded()) {
+        this.updateTimestamps(messageEntity);
         this.incomingMessages.remove(({id}) => messageEntity.id === id);
         // If the last received message is currently in memory, we can add this message to the displayed messages
         this.messages_unordered.push(messageEntity);
