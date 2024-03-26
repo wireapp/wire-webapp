@@ -27,7 +27,15 @@ import {formatLocale} from 'Util/TimeUtil';
 import {noop} from 'Util/util';
 import {createUuid} from 'Util/uuid';
 
-import {Action, ModalContent, ModalItem, ModalOptions, ModalQueue, PrimaryModalType, Text} from './PrimaryModalTypes';
+import {
+  ButtonAction,
+  ModalContent,
+  ModalItem,
+  ModalOptions,
+  ModalQueue,
+  PrimaryModalType,
+  Text,
+} from './PrimaryModalTypes';
 
 import {Config} from '../../../Config';
 import {ClientNotificationData} from '../../../notification/PreferenceNotificationRepository';
@@ -56,7 +64,7 @@ const defaultContent: ModalContent = {
   messageHtml: '',
   modalUie: '',
   onBgClick: noop,
-  primaryAction: {} as Action,
+  primaryAction: {} as ButtonAction,
   secondaryAction: [],
   titleText: '',
   copyPassword: false,
@@ -137,6 +145,7 @@ const updateCurrentModalContent = (type: PrimaryModalType, options: ModalOptions
     confirmCancelBtnLabel,
     allButtonsFullWidth = false,
     primaryBtnFirst = false,
+    closeOnSecondaryAction = true,
   } = options;
 
   const content = {
@@ -159,6 +168,7 @@ const updateCurrentModalContent = (type: PrimaryModalType, options: ModalOptions
     confirmCancelBtnLabel,
     allButtonsFullWidth,
     primaryBtnFirst,
+    closeOnSecondaryAction,
   };
 
   switch (type) {
