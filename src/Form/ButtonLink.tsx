@@ -19,7 +19,8 @@
 
 import {CSSObject} from '@emotion/react';
 
-import {ButtonProps, buttonStyle} from './Button';
+import {ButtonProps} from './Button';
+import {buttonStyle} from './Button.styles';
 
 import {COLOR} from '../Identity';
 import {Theme} from '../Layout';
