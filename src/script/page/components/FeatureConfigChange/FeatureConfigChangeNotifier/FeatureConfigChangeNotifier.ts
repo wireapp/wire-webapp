@@ -82,7 +82,7 @@ const featureNotifications: Partial<
   [FEATURE_KEY.ENFORCE_DOWNLOAD_PATH]: (oldConfig, newConfig) => {
     const handleDlPathChange: (
       status: FeatureStatus | boolean,
-    ) => undefined | {htmlMessage: string; title: StringIdentifer; primaryAction?: Action} = status => {
+    ) => undefined | {htmlMessage: string; title: StringIdentifer; primaryAction?: ButtonAction} = status => {
       if (newConfig && 'config' in newConfig) {
         localStorage.setItem('enforcedDownloadLocation', newConfig.config.enforcedDownloadLocation);
         amplify.publish(
