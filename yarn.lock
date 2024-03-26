@@ -10384,7 +10384,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"husky@npm:^9.0.11":
+"husky@npm:9.0.11":
   version: 9.0.11
   resolution: "husky@npm:9.0.11"
   bin:
@@ -12465,7 +12465,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lint-staged@npm:^15.2.2":
+"lint-staged@npm:15.2.2":
   version: 15.2.2
   resolution: "lint-staged@npm:15.2.2"
   dependencies:
@@ -15328,7 +15328,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier@npm:*, prettier@npm:3.2.5, prettier@npm:^3, prettier@npm:^3.2.5":
+"prettier@npm:*, prettier@npm:3.2.5, prettier@npm:^3":
   version: 3.2.5
   resolution: "prettier@npm:3.2.5"
   bin:
@@ -18911,9 +18911,10 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "wire-web-monorepo@workspace:."
   dependencies:
-    husky: "npm:^9.0.11"
-    lint-staged: "npm:^15.2.2"
-    prettier: "npm:^3.2.5"
+    husky: "npm:9.0.11"
+    lint-staged: "npm:15.2.2"
+    prettier: "npm:3.2.5"
+    ts-node: "npm:10.9.2"
   languageName: unknown
   linkType: soft
 
