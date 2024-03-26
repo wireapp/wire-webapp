@@ -17,12 +17,15 @@
  *
  */
 
+import React from 'react';
+
 import {ClientNotificationData} from '../../../notification/PreferenceNotificationRepository';
 
-export interface Action {
+export interface ButtonAction {
   action?: Function;
   uieName?: string;
-  text?: string;
+  text?: React.ReactNode;
+  disabled?: boolean;
 }
 
 export interface Text {
@@ -36,6 +39,7 @@ export interface Text {
 
 export interface ModalOptions {
   close?: () => void;
+  closeOnSecondaryAction?: boolean;
   closeOnConfirm?: boolean;
   /** Set to `true` to add a password copy to clipboard button */
   copyPassword?: boolean;
@@ -45,9 +49,9 @@ export interface ModalOptions {
   /** Set to `true` to disable autoclose behavior */
   preventClose?: boolean;
   /** Called when action in modal is triggered */
-  primaryAction?: Action;
+  primaryAction?: ButtonAction;
   /** Called when secondary action in modal is triggered */
-  secondaryAction?: Action[] | Action;
+  secondaryAction?: ButtonAction[] | ButtonAction;
   hideCloseBtn?: boolean;
   text?: Text;
   passwordOptional?: boolean;
@@ -77,6 +81,7 @@ export interface ModalContent {
   checkboxLabel: string;
   closeBtnTitle?: string;
   closeFn: () => void;
+  closeOnSecondaryAction?: boolean;
   closeOnConfirm?: boolean;
   copyPassword?: boolean;
   currentType: string | PrimaryModalType;
@@ -86,8 +91,8 @@ export interface ModalContent {
   messageHtml?: string;
   modalUie: string;
   onBgClick: () => void;
-  primaryAction: Action | null;
-  secondaryAction: Action[] | Action | null;
+  primaryAction: ButtonAction | null;
+  secondaryAction: ButtonAction[] | ButtonAction | null;
   titleText: string;
   hideCloseBtn?: boolean;
   passwordOptional?: boolean;

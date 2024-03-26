@@ -22,7 +22,6 @@ import {useEffect, useRef} from 'react';
 import {
   FeatureList,
   FeatureWithoutConfig,
-  Feature,
   FEATURE_KEY,
   FeatureStatus,
   SelfDeletingTimeout,
@@ -33,7 +32,7 @@ import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {Action} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
+import {ButtonAction} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {StringIdentifer, replaceLink, t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
@@ -44,15 +43,14 @@ import {loadFeatureConfig, saveFeatureConfig} from './FeatureConfigChangeNotifie
 import {Config} from '../../../../Config';
 import {TeamState} from '../../../../team/TeamState';
 
-const featureNotifications: Partial<
-  Record<
-    FEATURE_KEY,
-    (
-      oldConfig?: Feature<any> | FeatureWithoutConfig,
-      newConfig?: FeatureWithoutConfig | Feature<any> | undefined,
-    ) => undefined | {htmlMessage: string; title: StringIdentifer; primaryAction?: Action}
-  >
-> = {
+type FeatureMessageGenerator = {
+  [K in keyof FeatureList]: (
+    oldConfig?: FeatureList[K],
+    newConfig?: FeatureList[K],
+  ) => undefined | {htmlMessage: string; title: StringIdentifer; primaryAction?: ButtonAction};
+};
+
+const featureNotifications: FeatureMessageGenerator = {
   [FEATURE_KEY.FILE_SHARING]: (oldConfig, newConfig) => {
     const status = wasTurnedOnOrOff(oldConfig, newConfig);
     if (!status) {
@@ -82,7 +80,7 @@ const featureNotifications: Partial<
   [FEATURE_KEY.ENFORCE_DOWNLOAD_PATH]: (oldConfig, newConfig) => {
     const handleDlPathChange: (
       status: FeatureStatus | boolean,
-    ) => undefined | {htmlMessage: string; title: StringIdentifer; primaryAction?: Action} = status => {
+    ) => undefined | {htmlMessage: string; title: StringIdentifer; primaryAction?: ButtonAction} = status => {
       if (newConfig && 'config' in newConfig) {
         localStorage.setItem('enforcedDownloadLocation', newConfig.config.enforcedDownloadLocation);
         amplify.publish(
