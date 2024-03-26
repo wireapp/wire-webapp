@@ -21,7 +21,8 @@ import * as React from 'react';
 
 import {CSSObject} from '@emotion/react';
 
-import {ButtonProps, buttonStyle, filterButtonProps} from './Button';
+import {ButtonProps, filterButtonProps} from './Button';
+import {buttonStyle} from './Button.styles';
 
 import {SVGIconProps} from '../Icon/SVGIcon';
 import {COLOR} from '../Identity';
