@@ -59,7 +59,6 @@ import {
 } from './ConversationService.types';
 
 import {MessageTimer, MessageSendingState, RemoveUsersParams} from '../../conversation/';
-import {decryptAsset} from '../../cryptography/AssetCryptography';
 import {MLSService} from '../../messagingProtocols/mls';
 import {queueConversationRejoin} from '../../messagingProtocols/mls/conversationRejoinQueue';
 import {
@@ -75,7 +74,6 @@ import {HandledEventPayload, HandledEventResult} from '../../notification';
 import {CoreDatabase} from '../../storage/CoreDB';
 import {isMLSConversation} from '../../util';
 import {mapQualifiedUserClientIdsToFullyQualifiedClientIds} from '../../util/fullyQualifiedClientIdUtils';
-import {RemoteData} from '../content';
 import {isSendingMessage, sendMessage} from '../message/messageSender';
 import {SubconversationService} from '../SubconversationService/SubconversationService';
 
@@ -162,22 +160,6 @@ export class ConversationService extends TypedEventEmitter<Events> {
       return this.apiClient.api.conversation.getConversationList(conversationIdsToSkip);
     }
     return this.apiClient.api.conversation.getConversationsByQualifiedIds(conversationIds);
-  }
-
-  public async getAsset({assetId, assetToken, otrKey, sha256}: RemoteData): Promise<Uint8Array> {
-    const request = this.apiClient.api.asset.getAssetV3(assetId, assetToken);
-    const encryptedBuffer = (await request.response).buffer;
-
-    return decryptAsset({
-      cipherText: new Uint8Array(encryptedBuffer),
-      keyBytes: otrKey,
-      sha256: sha256,
-    });
-  }
-
-  public async getUnencryptedAsset(assetId: string, assetToken?: string): Promise<ArrayBuffer> {
-    const request = await this.apiClient.api.asset.getAssetV3(assetId, assetToken);
-    return (await request.response).buffer;
   }
 
   public async addUsersToProteusConversation(params: AddUsersToProteusConversationParams) {

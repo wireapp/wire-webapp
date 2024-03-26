@@ -17,42 +17,43 @@
  *
  */
 
-import {AssetOptions} from '@wireapp/api-client/lib/asset';
+import {AssetOptions, AssetResponse} from '@wireapp/api-client/lib/asset';
 import {ProgressCallback, RequestCancelable} from '@wireapp/api-client/lib/http';
 
 import {APIClient} from '@wireapp/api-client';
 
-import {EncryptedAssetUploaded} from '../../cryptography';
-import {encryptAsset} from '../../cryptography/AssetCryptography';
+import {EncryptedAsset, EncryptedAssetUploaded} from '../../cryptography';
+import {decryptAsset, encryptAsset} from '../../cryptography/AssetCryptography/AssetCryptography';
 
-export interface AssetDataV4 {
+interface AssetDataV4 {
   assetKey: string;
   assetToken: string;
   assetDomain: string;
   forceCaching: boolean;
   version: 4;
 }
-export interface AssetDataV3 {
+interface AssetDataV3 {
   assetKey: string;
   assetToken: string;
   forceCaching: boolean;
   version: 3;
 }
 
-export interface AssetDataV2 {
+interface AssetDataV2 {
   assetId: string;
   conversationId: string;
   forceCaching: boolean;
   version: 2;
 }
 
-export interface AssetDataV1 {
+interface AssetDataV1 {
   assetId: string;
   conversationId: string;
   forceCaching: boolean;
   version: 1;
 }
 
+export {ProgressCallback};
 export type AssetUrlData = AssetDataV1 | AssetDataV2 | AssetDataV3 | AssetDataV4;
 
 export class AssetService {
@@ -66,7 +67,7 @@ export class AssetService {
    * @param progressCallback?
    * @return Resolves when the asset has been uploaded
    */
-  public downloadAsset(assetData: AssetUrlData, progressCallback?: ProgressCallback) {
+  public downloadRawAsset(assetData: AssetUrlData, progressCallback?: ProgressCallback) {
     const {forceCaching} = assetData;
 
     switch (assetData.version) {
@@ -148,6 +149,39 @@ export class AssetService {
           token,
         };
       }),
+    };
+  }
+
+  public decryptAsset(asset: EncryptedAsset) {
+    return decryptAsset(asset);
+  }
+
+  /**
+   * Will download and decrypt an asset stored on the server
+   * @param assetData - the data of the asset to download
+   * @param otrKey the encryption key used to encrypt the asset
+   * @param sha256 the sha256 hash of the asset
+   * @param progressCallback a progress callback to inform about the download progress
+   */
+  public downloadAsset(
+    assetData: AssetUrlData,
+    otrKey: Uint8Array,
+    sha256: Uint8Array,
+    progressCallback?: ProgressCallback,
+  ): {response: Promise<AssetResponse>; cancel: () => void} {
+    const request = this.downloadRawAsset(assetData, progressCallback);
+    const {response} = request;
+
+    return {
+      response: response.then(async response => ({
+        ...response,
+        buffer: await decryptAsset({
+          cipherText: new Uint8Array(response.buffer),
+          keyBytes: otrKey,
+          sha256: sha256,
+        }),
+      })),
+      cancel: request.cancel,
     };
   }
 }
