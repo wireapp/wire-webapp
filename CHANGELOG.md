@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [45.3.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@45.2.14...@wireapp/core@45.3.0) (2024-03-26)
+
+### Features
+
+* **core:** Allow downloading and decrypting assets ([#6110](https://github.com/wireapp/wire-web-packages/issues/6110)) ([7861173](https://github.com/wireapp/wire-web-packages/commit/786117338534803fdf2e25e07fb132c20e597d76))
+
 ## [45.2.14](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@45.2.13...@wireapp/core@45.2.14) (2024-03-25)
 
 **Note:** Version bump only for package @wireapp/core
