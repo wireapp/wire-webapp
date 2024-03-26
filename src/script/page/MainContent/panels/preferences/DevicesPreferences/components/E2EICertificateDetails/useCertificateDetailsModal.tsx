@@ -31,7 +31,7 @@ const CERTIFICATE_TYPE = 'application/x-pem-file';
 
 const ModalMessageWrapper = ({message}: {message: string}) => (
   <div
-    style={{
+    css={{
       overflow: 'auto',
       maxHeight: '350px',
       fontSize: 'var(--font-size-small)',
@@ -55,6 +55,7 @@ export const useCertificateDetailsModal = (certificate: string) => {
     if (isModalActive) {
       removeCurrentModal();
       showModal();
+      // removeCurrentModal will trigger the close callback of the previous modal, so we need to reset the state
       setIsModalActive(true);
     }
   }, [isTextCopied, isDownloading, isModalActive]);
