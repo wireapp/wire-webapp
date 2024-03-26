@@ -59,7 +59,6 @@ export interface MessageParams extends MessageActions {
   conversation: Conversation;
   hasReadReceiptsTurnedOn: boolean;
   isLastDeliveredMessage: boolean;
-  lastMessageInGroup: BaseMessage;
   isSelfTemporaryGuest: boolean;
   message: BaseMessage;
   /** whether the message should display the user avatar and user name before the actual content */
@@ -183,9 +182,7 @@ export const Message: React.FC<MessageParams & {scrollTo?: ScrollToElement}> = p
         ref={messageRef}
         role="listitem"
         onKeyDown={handleDivKeyDown}
-        onClick={event => {
-          handleFocus(message.id);
-        }}
+        onClick={() => handleFocus(message.id)}
         className="message-wrapper"
       >
         {wrappedContent}

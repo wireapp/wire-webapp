@@ -229,6 +229,7 @@ const LoginComponent = ({
           await doLoginAndJoin(login, conversationKey, conversationCode, undefined, getEntropy, conversationPassword);
         } catch (error) {
           if (isBackendError(error) && error.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD) {
+            await resetAuthError();
             setConversationSubmitData(formLoginData);
             setIsLinkPasswordModalOpen(true);
             return;

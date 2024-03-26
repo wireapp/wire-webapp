@@ -17,24 +17,22 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {DeviceStatus} from '@wireapp/core/lib/messagingProtocols/mls';
 
-export const devicePart = (smallPadding = false): CSSObject => ({
-  display: 'inline-block',
-  marginRight: smallPadding ? '4px' : '12px',
-  textTransform: 'uppercase',
-  whiteSpace: 'nowrap',
+export enum MLSStatuses {
+  VALID = 'valid',
+  NOT_ACTIVATED = 'not_activated',
+  EXPIRED = 'expired',
+  EXPIRES_SOON = 'expires_soon',
+  REVOKED = 'revoked',
+}
 
-  ...(!smallPadding && {
-    width: '18px',
+const statusMap: Record<DeviceStatus, MLSStatuses> = {
+  [DeviceStatus.Valid]: MLSStatuses.VALID,
+  [DeviceStatus.Expired]: MLSStatuses.EXPIRED,
+  [DeviceStatus.Revoked]: MLSStatuses.REVOKED,
+};
 
-    '&:nth-of-type(8n)': {
-      marginRight: 0,
-
-      '&::after': {
-        display: 'block',
-        content: "' '",
-      },
-    },
-  }),
-});
+export const mapMLSStatus = (status?: DeviceStatus) => {
+  return !status ? MLSStatuses.NOT_ACTIVATED : statusMap[status];
+};

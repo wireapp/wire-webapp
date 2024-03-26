@@ -29,7 +29,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 16.x
+          node-version: 18.x
           cache: 'yarn'
 
       - name: Install JS dependencies
@@ -56,7 +56,7 @@ jobs:
       - name: Create GitHub release
         if: ${{inputs.create_release}}
         id: create_release_production
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{github.token}}
         with:

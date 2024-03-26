@@ -129,6 +129,17 @@
     overflow-y: auto;
     transform: translateX(0);
 
+    .conversation-details__read-receipts {
+      &::after {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        left: @left-list-item-left-width;
+        border-bottom: 1px solid var(--border-color);
+        content: '';
+      }
+    }
+
     ul {
       padding: 0;
       margin: 0;
@@ -303,6 +314,12 @@
       .subline;
       color: var(--gray-70);
       justify-self: flex-end;
+
+      &-title {
+        margin-bottom: 4px;
+        font-size: 0.875rem;
+        font-weight: 500;
+      }
 
       body.theme-dark & {
         color: var(--white);

@@ -453,7 +453,7 @@ function LexicalPopoverMenu<TOption extends TypeaheadOption>({
           selectOptionAndCleanUp(options[selectedIndex]);
           return true;
         },
-        COMMAND_PRIORITY_LOW,
+        COMMAND_PRIORITY_NORMAL,
       ),
     );
   }, [selectOptionAndCleanUp, close, editor, options, selectedIndex, updateSelectedIndex]);

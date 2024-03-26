@@ -222,6 +222,7 @@ each(.colors(), .(@color-key, @color-name) {
   @button-primary-hover: '@{name}-600';
   @button-primary-focus-border: '@{name}-700';
   @button-primary-active: '@{name}-800';
+  @button-primary-active-bg: '@{name}-50';
   @button-primary-active-border: '@{name}-800';
   @button-secondary-hover-border: '@{name}-500';
   @button-secondary-active-bg: '@{name}-50';
@@ -245,6 +246,7 @@ each(.colors(), .(@color-key, @color-name) {
     --button-primary-hover: @@button-primary-hover;
     --button-primary-focus-border: @@button-primary-focus-border;
     --button-primary-active: @@button-primary-active;
+    --button-primary-active-bg: @@button-primary-active-bg;
     --button-primary-active-border: @@button-primary-active-border;
     --button-secondary-hover-border: @@button-secondary-hover-border;
     --button-secondary-active-bg: @@button-secondary-active-bg;
@@ -294,6 +296,7 @@ each(.colors(), .(@color-key, @color-name) {
     @button-primary-hover-dark: '@{name}-dark-400';
     @button-primary-focus-border-dark: '@{name}-dark-100';
     @button-primary-active-dark: '@{name}-dark-800';
+    @button-primary-active-bg-dark: '@{name}-dark-800';
     @button-primary-active-border-dark: '@{name}-dark-600';
     @button-secondary-hover-border-dark: 'w-gray-70';
     @button-secondary-active-bg-dark: 'w-gray-95';
@@ -316,6 +319,7 @@ each(.colors(), .(@color-key, @color-name) {
       --button-primary-hover: @@button-primary-hover-dark;
       --button-primary-focus-border: @@button-primary-focus-border-dark;
       --button-primary-active: @@button-primary-active-dark;
+      --button-primary-active-bg: @@button-primary-active-bg-dark;
       --button-primary-active-border: @@button-primary-active-border-dark;
       --button-secondary-hover-border: @@button-secondary-hover-border-dark;
       --button-secondary-active-bg: @@button-secondary-active-bg-dark;

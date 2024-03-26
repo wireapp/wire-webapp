@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2023 Wire Swiss GmbH
+ * Copyright (C) 2024 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,24 +17,4 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
-
-export const devicePart = (smallPadding = false): CSSObject => ({
-  display: 'inline-block',
-  marginRight: smallPadding ? '4px' : '12px',
-  textTransform: 'uppercase',
-  whiteSpace: 'nowrap',
-
-  ...(!smallPadding && {
-    width: '18px',
-
-    '&:nth-of-type(8n)': {
-      marginRight: 0,
-
-      '&::after': {
-        display: 'block',
-        content: "' '",
-      },
-    },
-  }),
-});
+export * from './MessageButton';

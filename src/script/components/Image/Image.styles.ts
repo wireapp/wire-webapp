@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2023 Wire Swiss GmbH
+ * Copyright (C) 2024 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,22 +19,20 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const devicePart = (smallPadding = false): CSSObject => ({
-  display: 'inline-block',
-  marginRight: smallPadding ? '4px' : '12px',
-  textTransform: 'uppercase',
-  whiteSpace: 'nowrap',
+export function getWrapperStyles(interactive: boolean) {
+  return {
+    cursor: interactive ? 'pointer' : 'default',
+    width: '100%',
+  };
+}
 
-  ...(!smallPadding && {
-    width: '18px',
-
-    '&:nth-of-type(8n)': {
-      marginRight: 0,
-
-      '&::after': {
-        display: 'block',
-        content: "' '",
-      },
-    },
-  }),
-});
+export function getImageStyle(sizes: {ratio: number; width: string} | undefined): CSSObject {
+  return {
+    aspectRatio: `${sizes?.ratio}`,
+    maxWidth: '100%',
+    maxHeight: '100%',
+    width: sizes?.width,
+    objectFit: 'contain',
+    objectPosition: 'left',
+  };
+}

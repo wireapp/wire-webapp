@@ -43,11 +43,11 @@ describe('VerificationBadges', () => {
 
   it('is not downloaded', async () => {
     const {getByTestId} = render(
-      withTheme(<VerificationBadges context="conversation" MLSStatus={MLSStatuses.NOT_DOWNLOADED} />),
+      withTheme(<VerificationBadges context="conversation" MLSStatus={MLSStatuses.NOT_ACTIVATED} />),
     );
 
     const E2EIdentityStatus = getByTestId('mls-conversation-status');
-    expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.NOT_DOWNLOADED);
+    expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.NOT_ACTIVATED);
   });
 
   it('is expired', async () => {
