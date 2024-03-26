@@ -38,7 +38,6 @@ import {
   Text,
 } from '@wireapp/protocol-messaging';
 
-import {encryptAesAsset} from 'src/script/assets/AssetCrypto';
 import {PROTO_MESSAGE_TYPE} from 'src/script/cryptography/ProtoMessageType';
 import {CryptographyError} from 'src/script/error/CryptographyError';
 import {ClientEvent} from 'src/script/event/Client';
@@ -48,7 +47,14 @@ import {createUuid} from 'Util/uuid';
 import {CryptographyMapper} from './CryptographyMapper';
 
 describe('CryptographyMapper', () => {
-  const mapper = new CryptographyMapper();
+  const coreMock = {
+    service: {
+      asset: {
+        decryptAsset: jest.fn(payload => Promise.resolve(payload.cipherText)),
+      },
+    },
+  };
+  const mapper = new CryptographyMapper(coreMock as any);
 
   let event: any = undefined;
   const emojiReaction = '😇';
@@ -499,10 +505,10 @@ describe('CryptographyMapper', () => {
         messageId: createUuid(),
       });
 
-      const encryptedAsset = await encryptAesAsset(GenericMessage.encode(generic_message).finish());
-      const keyBytes = new Uint8Array(encryptedAsset.keyBytes);
-      const sha256 = new Uint8Array(encryptedAsset.sha256);
-      event.data.data = arrayToBase64(encryptedAsset.cipherText);
+      const encryptedAsset = GenericMessage.encode(generic_message).finish();
+      const keyBytes = new Uint8Array([]);
+      const sha256 = new Uint8Array([]);
+      event.data.data = arrayToBase64(encryptedAsset);
 
       const external_message = new GenericMessage({
         external: new External({otrKey: keyBytes, sha256}),
@@ -523,10 +529,10 @@ describe('CryptographyMapper', () => {
         messageId: createUuid(),
       });
 
-      const encryptedAsset = await encryptAesAsset(GenericMessage.encode(genericMessage).finish());
-      const keyBytes = new Uint8Array(encryptedAsset.keyBytes);
-      const sha256 = new Uint8Array(encryptedAsset.sha256);
-      event.data.data = arrayToBase64(encryptedAsset.cipherText);
+      const encryptedAsset = GenericMessage.encode(genericMessage).finish();
+      const keyBytes = new Uint8Array([]);
+      const sha256 = new Uint8Array([]);
+      event.data.data = arrayToBase64(encryptedAsset);
 
       external_message = new GenericMessage({
         external: new External({otrKey: keyBytes, sha256}),
