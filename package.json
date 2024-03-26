@@ -4,7 +4,7 @@
   "description": "Wire web apps monorepo (wire-webapp, account pages, team settings)",
   "license": "MIT",
   "private": true,
-  "packageManager": "yarn@4.1.0",
+  "packageManager": "yarn@4.1.1",
   "workspaces": [
     "apps/*",
     "apps/wire-webapp/server"
