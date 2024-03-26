@@ -34,6 +34,7 @@ import {isEscapeKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {isValidPassword} from 'Util/StringUtil';
 
+import {MessageContent} from './Components/MessageContent';
 import {guestLinkPasswordInputStyles} from './PrimaryModal.styles';
 import {usePrimaryModalState, showNextModalInQueue, defaultContent, removeCurrentModal} from './PrimaryModalState';
 import {ButtonAction, PrimaryModalType} from './PrimaryModalTypes';
@@ -236,7 +237,6 @@ export const PrimaryModalComponent: FC = () => {
   );
 
   const buttons = primaryBtnFirst ? [primaryButton, ...secondaryButtons] : [...secondaryButtons, primaryButton];
-  const isStringMessage = (message: unknown): message is string => typeof message === 'string';
 
   return (
     <div
@@ -274,14 +274,7 @@ export const PrimaryModalComponent: FC = () => {
             </div>
 
             <FadingScrollbar className="modal__body">
-              {(messageHtml || message) && (
-                <div className="modal__text" data-uie-name="status-modal-text">
-                  {messageHtml && <p id="modal-description-html" dangerouslySetInnerHTML={{__html: messageHtml}} />}
-                  {message && (
-                    <div id="modal-description-text">{isStringMessage(message) ? <p>{message}</p> : message}</div>
-                  )}
-                </div>
-              )}
+              <MessageContent message={message} messageHtml={messageHtml} />
 
               {isGuestLinkPassword && (
                 <PasswordGeneratorButton
