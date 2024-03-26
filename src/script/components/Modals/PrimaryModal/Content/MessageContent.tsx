@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2023 Wire Swiss GmbH
+ * Copyright (C) 2024 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,24 +17,22 @@
  *
  */
 
-import {CSSObject} from '@emotion/serialize';
-
-interface Styles {
-  content: CSSObject;
-  modalWrapper: CSSObject;
+interface MessageContentProps {
+  messageHtml?: string;
+  message?: React.ReactNode;
 }
 
-export const styles: Styles = {
-  modalWrapper: {
-    maxWidth: '460px',
-    width: '100%',
-  },
-  content: {
-    overflow: 'auto',
-    maxHeight: '251px',
-    fontSize: 'var(--font-size-small)',
-    letterSpacing: '0.05px',
-    lineHeight: 'var(--line-height-md)',
-    wordBreak: 'break-word',
-  },
+const isStringMessage = (message: unknown): message is string => typeof message === 'string';
+
+export const MessageContent = ({message, messageHtml}: MessageContentProps) => {
+  if (!message && !messageHtml) {
+    return null;
+  }
+
+  return (
+    <div className="modal__text" data-uie-name="status-modal-text">
+      {messageHtml && <p id="modal-description-html" dangerouslySetInnerHTML={{__html: messageHtml}} />}
+      {message && <div id="modal-description-text">{isStringMessage(message) ? <p>{message}</p> : message}</div>}
+    </div>
+  );
 };
