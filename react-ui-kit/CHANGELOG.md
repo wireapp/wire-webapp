@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.17.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.16.5...@wireapp/react-ui-kit@9.17.0) (2024-03-26)
+
+### Features
+
+* **react-ui-kit:** add button active state ([#6108](https://github.com/wireapp/wire-web-packages/issues/6108)) ([9552ab1](https://github.com/wireapp/wire-web-packages/commit/9552ab1f4e9524efb027b6ff5f3e658138b0f2a2))
+
 ## [9.16.5](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.16.4...@wireapp/react-ui-kit@9.16.5) (2024-03-25)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
