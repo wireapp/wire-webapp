@@ -95,20 +95,6 @@ const ContentAsset = ({
             />
           )}
 
-          <MessageButton
-            onClick={() => onClickButton(message, asset.id)}
-            label={'asset.text'}
-            id={asset.id}
-            message={message as CompositeMessage}
-          />
-
-          <MessageButton
-            onClick={() => onClickButton(message, 'random-id')}
-            label={'asset.text 2'}
-            id={'random-id'}
-            message={message as CompositeMessage}
-          />
-
           {shouldRenderText && (
             <ReadIndicator
               message={message}
