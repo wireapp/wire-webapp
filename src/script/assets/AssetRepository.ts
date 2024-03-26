@@ -92,7 +92,8 @@ export class AssetRepository {
 
   public async load(asset: AssetRemoteData): Promise<undefined | Blob> {
     try {
-      const {response} = this.loadBuffer(asset);
+      const {response, cancel} = this.loadBuffer(asset);
+      asset.cancelDownload = cancel;
       const {buffer, mimeType} = await response;
 
       return new Blob([new Uint8Array(buffer)], {type: mimeType});
