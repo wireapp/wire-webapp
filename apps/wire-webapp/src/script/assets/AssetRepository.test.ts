@@ -23,7 +23,6 @@ import {container} from 'tsyringe';
 import {createUuid} from 'Util/uuid';
 import {ValidationUtilError} from 'Util/ValidationUtil';
 
-import {encryptAesAsset} from './AssetCrypto';
 import {AssetRemoteData} from './AssetRemoteData';
 import {AssetRepository, AssetUploadOptions} from './AssetRepository';
 import {AssetService} from './AssetService';
@@ -66,9 +65,9 @@ describe('AssetRepository', () => {
       const conversation_id = createUuid();
       const asset_id = createUuid();
       remote_data = AssetRemoteData.v1(conversation_id, asset_id);
-      spyOn(assetRepository as any, 'loadBuffer').and.returnValue(
-        Promise.resolve({buffer: video_bytes.buffer, mimeType: video_type}),
-      );
+      jest.spyOn(assetRepository as any, 'loadBuffer').mockReturnValue({
+        response: Promise.resolve({buffer: video_bytes.buffer, mimeType: video_type}),
+      });
     });
 
     it('should load and decrypt v1 asset', async () => {
@@ -83,13 +82,15 @@ describe('AssetRepository', () => {
     const video_type = 'video/mp4';
 
     beforeEach(async () => {
-      const {cipherText, keyBytes, sha256} = await encryptAesAsset(video_bytes);
+      const cipherText = new Uint8Array();
+      const keyBytes = new Uint8Array();
+      const sha256 = new Uint8Array();
       const conversation_id = createUuid();
       const asset_id = createUuid();
       remote_data = AssetRemoteData.v2(conversation_id, asset_id, new Uint8Array(keyBytes), new Uint8Array(sha256));
-      spyOn(assetRepository as any, 'loadBuffer').and.returnValue(
-        Promise.resolve({buffer: cipherText, mimeType: video_type}),
-      );
+      jest.spyOn(assetRepository as any, 'loadBuffer').mockReturnValue({
+        response: Promise.resolve({buffer: cipherText, mimeType: video_type}),
+      });
     });
 
     it('should load and decrypt v2 asset', async () => {
