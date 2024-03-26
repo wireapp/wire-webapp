@@ -29,15 +29,11 @@ const DOWNLOAD_CERTIFICATE_TIMEOUT = 500;
 const CERTIFICATE_NAME = 'certificate.pem';
 const CERTIFICATE_TYPE = 'application/x-pem-file';
 
-export interface UseCertificateDetailsModalProps {
-  certificate: string;
-}
-
 const ModalMessageWrapper = ({message}: {message: string}) => (
   <div
     style={{
       overflow: 'auto',
-      maxHeight: '375px',
+      maxHeight: '350px',
       fontSize: 'var(--font-size-small)',
       letterSpacing: '0.05px',
       lineHeight: 'var(--line-height-md)',
@@ -50,7 +46,7 @@ const ModalMessageWrapper = ({message}: {message: string}) => (
   </div>
 );
 
-export const useCertificateDetailsModal = ({certificate}: UseCertificateDetailsModalProps) => {
+export const useCertificateDetailsModal = (certificate: string) => {
   const [isTextCopied, setIsTextCopied] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [isModalActive, setIsModalActive] = useState(false);

@@ -17,6 +17,8 @@
  *
  */
 
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {VerificationBadges} from 'Components/VerificationBadge';
@@ -35,7 +37,7 @@ interface E2EICertificateDetailsProps {
 }
 
 export const E2EICertificateDetails = ({identity, isCurrentDevice}: E2EICertificateDetailsProps) => {
-  const showModal = useCertificateDetailsModal({certificate: identity?.certificate ?? ''});
+  const showModal = useCertificateDetailsModal(identity?.certificate ?? '');
 
   const certificateState = identity?.status ?? MLSStatuses.NOT_ACTIVATED;
   const isNotActivated = certificateState === MLSStatuses.NOT_ACTIVATED;
@@ -65,7 +67,13 @@ export const E2EICertificateDetails = ({identity, isCurrentDevice}: E2EICertific
 
       <div css={styles.buttonsGroup}>
         {!isNotActivated && hasCertificate && (
-          <Button variant={ButtonVariant.TERTIARY} onClick={() => showModal()} data-uie-name="show-certificate-details">
+          <Button
+            variant={ButtonVariant.TERTIARY}
+            onClick={showModal}
+            data-uie-name="show-certificate-details"
+            aria-label={t('E2EI.showCertificateDetails')}
+            tabIndex={TabIndex.FOCUSABLE}
+          >
             {t('E2EI.showCertificateDetails')}
           </Button>
         )}
@@ -73,13 +81,25 @@ export const E2EICertificateDetails = ({identity, isCurrentDevice}: E2EICertific
         {isCurrentDevice && (
           <>
             {isNotActivated && (
-              <Button variant={ButtonVariant.TERTIARY} onClick={getCertificate} data-uie-name="get-certificate">
+              <Button
+                variant={ButtonVariant.TERTIARY}
+                onClick={getCertificate}
+                data-uie-name="get-certificate"
+                aria-label={t('E2EI.getCertificate')}
+                tabIndex={TabIndex.FOCUSABLE}
+              >
                 {t('E2EI.getCertificate')}
               </Button>
             )}
 
             {identity?.certificate && !isValid && (
-              <Button variant={ButtonVariant.TERTIARY} onClick={getCertificate} data-uie-name="update-certificate">
+              <Button
+                variant={ButtonVariant.TERTIARY}
+                onClick={getCertificate}
+                data-uie-name="update-certificate"
+                aria-label={t('E2EI.updateCertificate')}
+                tabIndex={TabIndex.FOCUSABLE}
+              >
                 {t('E2EI.updateCertificate')}
               </Button>
             )}
