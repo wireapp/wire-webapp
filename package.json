@@ -154,15 +154,6 @@
     "node": ">=16"
   },
   "license": "GPL-3.0",
-  "lint-staged": {
-    "*": "prettier --ignore-unknown --write",
-    "*.less": [
-      "stylelint --fix"
-    ],
-    "*.{js,jsx,ts,tsx}": [
-      "eslint --fix"
-    ]
-  },
   "name": "wire-webapp",
   "prettier": "@wireapp/prettier-config",
   "private": true,
