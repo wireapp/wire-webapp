@@ -22,6 +22,7 @@ import {useEffect, useRef} from 'react';
 import {
   FeatureList,
   FeatureWithoutConfig,
+  Feature,
   FEATURE_KEY,
   FeatureStatus,
   SelfDeletingTimeout,
@@ -43,14 +44,15 @@ import {loadFeatureConfig, saveFeatureConfig} from './FeatureConfigChangeNotifie
 import {Config} from '../../../../Config';
 import {TeamState} from '../../../../team/TeamState';
 
-type FeatureMessageGenerator = {
-  [K in keyof FeatureList]: (
-    oldConfig?: FeatureList[K],
-    newConfig?: FeatureList[K],
-  ) => undefined | {htmlMessage: string; title: StringIdentifer; primaryAction?: ButtonAction};
-};
-
-const featureNotifications: FeatureMessageGenerator = {
+const featureNotifications: Partial<
+  Record<
+    FEATURE_KEY,
+    (
+      oldConfig?: Feature<any> | FeatureWithoutConfig,
+      newConfig?: FeatureWithoutConfig | Feature<any> | undefined,
+    ) => undefined | {htmlMessage: string; title: StringIdentifer; primaryAction?: ButtonAction}
+  >
+> = {
   [FEATURE_KEY.FILE_SHARING]: (oldConfig, newConfig) => {
     const status = wasTurnedOnOrOff(oldConfig, newConfig);
     if (!status) {
@@ -80,7 +82,7 @@ const featureNotifications: FeatureMessageGenerator = {
   [FEATURE_KEY.ENFORCE_DOWNLOAD_PATH]: (oldConfig, newConfig) => {
     const handleDlPathChange: (
       status: FeatureStatus | boolean,
-    ) => undefined | {htmlMessage: string; title: StringIdentifer; primaryAction?: ButtonAction} = status => {
+    ) => undefined | {htmlMessage: string; title: StringIdentifer; primaryAction?: Action} = status => {
       if (newConfig && 'config' in newConfig) {
         localStorage.setItem('enforcedDownloadLocation', newConfig.config.enforcedDownloadLocation);
         amplify.publish(
