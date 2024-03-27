@@ -336,7 +336,7 @@ export class ActionsViewModel {
   };
 
   getOrCreate1to1Conversation = async (userEntity: User): Promise<Conversation> => {
-    const conversationEntity = await this.conversationRepository.getInitialised1To1Conversation(userEntity);
+    const conversationEntity = await this.conversationRepository.getInitialised1To1Conversation(userEntity.qualifiedId);
     if (conversationEntity) {
       return conversationEntity;
     }
@@ -431,7 +431,9 @@ export class ActionsViewModel {
         primaryAction: {
           action: async () => {
             await this.connectionRepository.unblockUser(userEntity);
-            const conversationEntity = await this.conversationRepository.getInitialised1To1Conversation(userEntity);
+            const conversationEntity = await this.conversationRepository.getInitialised1To1Conversation(
+              userEntity.qualifiedId,
+            );
             resolve();
             if (conversationEntity) {
               await this.conversationRepository.updateParticipatingUserEntities(conversationEntity);

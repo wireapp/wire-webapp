@@ -141,7 +141,7 @@ export class ContentViewModel {
   private readonly getConversationEntity = async (
     conversation: Conversation | string,
     domain: string | null = null,
-  ): Promise<Conversation> => {
+  ): Promise<Conversation | null> => {
     const conversationEntity = isConversationEntity(conversation)
       ? conversation
       : await this.conversationRepository.getConversationById({domain: domain || '', id: conversation});
