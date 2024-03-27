@@ -1033,7 +1033,7 @@ export class ConversationRepository {
    * Update conversation with a user you just unblocked
    */
   private readonly onUnblockUser = async (user_et: User): Promise<void> => {
-    const conversationEntity = await this.getInitialised1To1Conversation(user_et);
+    const conversationEntity = await this.getInitialised1To1Conversation(user_et.qualifiedId);
     if (conversationEntity) {
       conversationEntity.status(ConversationStatus.CURRENT_MEMBER);
     }
@@ -1280,34 +1280,13 @@ export class ConversationRepository {
    * @param isLiveUpdate Whether the conversation is being initialised because of a live update (e.g. some websocket event)
    * @returns Resolves with the initialised 1:1 conversation with requested user
    */
-  async getInitialised1To1Conversation(userEntity: User, isLiveUpdate = false): Promise<Conversation | null> {
-    const {qualifiedId: otherUserId} = userEntity;
-
-    const {protocol, isMLSSupportedByTheOtherUser, isProteusSupportedByTheOtherUser} =
-      await this.getProtocolFor1to1Conversation(otherUserId);
-
-    const localMLSConversation = this.conversationState.findMLS1to1Conversation(otherUserId);
-
-    if (protocol === ConversationProtocol.MLS || localMLSConversation) {
-      /**
-       * When mls 1:1 conversation initialisation is triggered by some live update (e.g other user updates their supported protocols), it's very likely that we will also receive a welcome message shortly.
-       * We have to add a delay to make sure the welcome message is not wasted, in case the self client would establish mls group themselves before receiving the welcome.
-       */
-      const shouldDelayMLSGroupEstablishment = isLiveUpdate && isMLSSupportedByTheOtherUser;
-      return this.initMLS1to1Conversation(otherUserId, isMLSSupportedByTheOtherUser, shouldDelayMLSGroupEstablishment);
-    }
-
-    const proteusConversation = await this.getOrCreateProteus1To1Conversation(userEntity);
-
-    if (!proteusConversation) {
-      return null;
-    }
-
-    return this.initProteus1to1Conversation(proteusConversation.qualifiedId, isProteusSupportedByTheOtherUser);
-  }
-
-  async get1to1WithUser(userId: QualifiedId, isLiveUpdate = false): Promise<Conversation | null> {
+  async getInitialised1To1Conversation(userId: QualifiedId, isLiveUpdate = false): Promise<Conversation | null> {
     const user = await this.userRepository.getUserById(userId);
+
+    const connection = user.connection();
+    if (connection) {
+      return this.get1to1ConversationForConnection(connection, isLiveUpdate);
+    }
 
     const {protocol, isMLSSupportedByTheOtherUser, isProteusSupportedByTheOtherUser} =
       await this.getProtocolFor1to1Conversation(userId);
@@ -2014,34 +1993,35 @@ export class ConversationRepository {
     return conversation;
   };
 
-  private readonly getConnectionConversation = async (connectionEntity: ConnectionEntity, source?: EventSource) => {
+  private readonly get1to1ConversationForConnection = async (
+    connection: ConnectionEntity,
+    isLiveUpdate: boolean,
+  ): Promise<Conversation | null> => {
     // As of how backed works now (August 2023), proteus 1:1 conversations will always be created, even if both users support MLS conversation.
     // Proteus 1:1 conversation is created right after a connection request is sent.
     // Therefore, conversationId filed on connectionEntity will always indicate proteus 1:1 conversation.
     // We need to manually check if mls 1:1 conversation can be used instead.
     // If mls 1:1 conversation is used, proteus 1:1 conversation will be deleted locally.
 
-    const {conversationId: proteusConversationId, userId: otherUserId} = connectionEntity;
-    const localProteusConversation = this.conversationState.findConversation(proteusConversationId);
+    const {conversationId: proteusConversationId, userId: otherUserId} = connection;
+    const localProteusConversation = this.conversationState.findConversation(proteusConversationId) || null;
 
     // For connection request, we simply display proteus conversation of type 3 (connect) it will be displayed as a connection request
-    if (connectionEntity.isOutgoingRequest()) {
+    if (connection.isOutgoingRequest()) {
       const proteusConversation = localProteusConversation || (await this.fetchConversationById(proteusConversationId));
       proteusConversation.type(CONVERSATION_TYPE.CONNECT);
       return proteusConversation;
     }
 
-    const isConnectionAccepted = connectionEntity.isConnected();
-
     // Check what protocol should be used for 1:1 conversation
     const {protocol, isMLSSupportedByTheOtherUser, isProteusSupportedByTheOtherUser} =
       await this.getProtocolFor1to1Conversation(otherUserId);
 
-    const isWebSocketEvent = source === EventSource.WEBSOCKET;
-    const shouldDelayMLSGroupEstablishment = isWebSocketEvent && isMLSSupportedByTheOtherUser;
+    const shouldDelayMLSGroupEstablishment = isLiveUpdate && isMLSSupportedByTheOtherUser;
 
     const localMLSConversation = this.conversationState.findMLS1to1Conversation(otherUserId);
 
+    const isConnectionAccepted = connection.isConnected();
     // If it's accepted, initialise conversation so it's ready to be used
     if (isConnectionAccepted) {
       if (protocol === ConversationProtocol.MLS || localMLSConversation) {
@@ -2065,7 +2045,7 @@ export class ConversationRepository {
       return this.initMLS1to1Conversation(otherUserId, isMLSSupportedByTheOtherUser, shouldDelayMLSGroupEstablishment);
     }
 
-    return protocol === ConversationProtocol.PROTEUS ? localProteusConversation : undefined;
+    return protocol === ConversationProtocol.PROTEUS ? localProteusConversation : null;
   };
 
   /**
@@ -2082,7 +2062,8 @@ export class ConversationRepository {
     source?: EventSource,
   ): Promise<Conversation | undefined> => {
     try {
-      const conversation = await this.getConnectionConversation(connectionEntity, source);
+      const userId = connectionEntity.userId;
+      const conversation = await this.get1to1WithUser(userId, source === EventSource.WEBSOCKET);
 
       if (!conversation) {
         return undefined;
@@ -2138,7 +2119,7 @@ export class ConversationRepository {
       return;
     }
 
-    await this.getInitialised1To1Conversation(user, true);
+    await this.getInitialised1To1Conversation(user.qualifiedId, true);
   };
 
   /**
