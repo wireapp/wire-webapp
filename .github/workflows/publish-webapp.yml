@@ -2,7 +2,7 @@ name: Publish Webapp
 
 on:
   push:
-    branches: [master, dev, release/*, chore/monorepo]
+    branches: [master, dev, release/*]
     tags:
       - '*q1-2024*'
       - '*staging*'
@@ -65,13 +65,11 @@ jobs:
         run: yarn --immutable
 
       - name: Test
-        if: ${{false}}
         run: |
           set -o pipefail
           yarn test --detectOpenHandles=false 2>&1 | tee ${{ env.UNIT_TEST_REPORT_FILE }}
 
       - uses: actions/upload-artifact@v4
-        if: ${{false}}
         with:
           name: 'unit-tests-report'
           path: ${{env.UNIT_TEST_REPORT_FILE}}
@@ -114,7 +112,6 @@ jobs:
 
       - name: Push Docker image
         id: push_docker_image
-        if: ${{false}}
         env:
           DOCKER_PASSWORD: ${{secrets.WEBTEAM_QUAY_PASSWORD}}
           DOCKER_USERNAME: ${{secrets.WEBTEAM_QUAY_USERNAME}}
@@ -136,7 +133,6 @@ jobs:
 
       - name: Bump helm chart version
         shell: bash
-        if: ${{false}}
         id: bump_chart_version
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_ACCESS_KEY_ID }}
@@ -191,9 +187,9 @@ jobs:
 
   publish_wire_builds:
     name: Bump webapp chart in wire-builds
-    if: ${{false}}
     runs-on: ubuntu-latest
     needs: build
+    if: ${{needs.build.outputs.wire_builds_target_branches}}
 
     strategy:
       matrix:
@@ -254,7 +250,6 @@ jobs:
 
   #FUTUREWORK: Remove this job once production builds are based on wireapp/wire-builds
   update_helm_chart:
-    if: ${{false}}
     name: 'Bump Helm chart in wire-server'
     runs-on: ubuntu-latest
     needs: build
