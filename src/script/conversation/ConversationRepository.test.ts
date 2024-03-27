@@ -377,7 +377,7 @@ describe('ConversationRepository', () => {
 
       jest.spyOn(conversationRepository['userState'], 'self').mockReturnValue(selfUser);
 
-      const conversationEntity = await conversationRepository.getInitialised1To1Conversation(userEntity);
+      const conversationEntity = await conversationRepository.getInitialised1To1Conversation(userEntity.qualifiedId);
 
       expect(conversationEntity).toBe(newConversationEntity);
     });
@@ -403,6 +403,8 @@ describe('ConversationRepository', () => {
       }) as BackendConversation;
 
       const connection = new ConnectionEntity();
+      connection.userId = otherUserId;
+      connection.status(ConnectionStatus.ACCEPTED);
       connection.conversationId = proteus1to1ConversationResponse.qualified_id;
       otherUser.connection(connection);
 
@@ -413,7 +415,7 @@ describe('ConversationRepository', () => {
         .spyOn(conversationRepository['conversationService'], 'getConversationById')
         .mockResolvedValueOnce(proteus1to1ConversationResponse);
 
-      const conversationEntity = await conversationRepository.getInitialised1To1Conversation(otherUser);
+      const conversationEntity = await conversationRepository.getInitialised1To1Conversation(otherUser.qualifiedId);
 
       expect(conversationEntity?.serialize()).toEqual(proteus1to1Conversation.serialize());
       expect(conversationEntity?.readOnlyState()).toEqual(null);
@@ -443,6 +445,8 @@ describe('ConversationRepository', () => {
       }) as BackendConversation;
 
       const connection = new ConnectionEntity();
+      connection.status(ConnectionStatus.ACCEPTED);
+      connection.userId = otherUserId;
       connection.conversationId = proteus1to1ConversationResponse.qualified_id;
       otherUser.connection(connection);
 
@@ -451,7 +455,7 @@ describe('ConversationRepository', () => {
         .spyOn(conversationRepository['conversationService'], 'getConversationById')
         .mockResolvedValueOnce(proteus1to1ConversationResponse);
 
-      const conversationEntity = await conversationRepository.getInitialised1To1Conversation(otherUser);
+      const conversationEntity = await conversationRepository.getInitialised1To1Conversation(otherUser.qualifiedId);
 
       expect(conversationEntity?.readOnlyState()).toEqual(
         CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_SELF_UNSUPPORTED_MLS,
@@ -492,7 +496,7 @@ describe('ConversationRepository', () => {
         .spyOn(conversationRepository['conversationService'], 'isMLSGroupEstablishedLocally')
         .mockResolvedValueOnce(true);
 
-      const conversationEntity = await conversationRepository.getInitialised1To1Conversation(otherUser);
+      const conversationEntity = await conversationRepository.getInitialised1To1Conversation(otherUser.qualifiedId);
 
       expect(conversationEntity?.serialize()).toEqual(mls1to1Conversation.serialize());
     });
@@ -577,7 +581,7 @@ describe('ConversationRepository', () => {
       jest.spyOn(conversationRepository['conversationService'], 'blacklistConversation');
       jest.spyOn(conversationRepository['eventRepository'], 'injectEvent').mockResolvedValueOnce(undefined);
 
-      const conversationEntity = await conversationRepository.getInitialised1To1Conversation(otherUser);
+      const conversationEntity = await conversationRepository.getInitialised1To1Conversation(otherUser.qualifiedId);
 
       expect(conversationRepository['eventService'].moveEventsToConversation).toHaveBeenCalledWith(
         proteus1to1Conversation.id,
@@ -661,7 +665,7 @@ describe('ConversationRepository', () => {
 
       const [mls1to1Conversation] = conversationRepository.mapConversations([establishedMls1to1ConversationResponse]);
 
-      const conversationEntity = await conversationRepository.getInitialised1To1Conversation(otherUser);
+      const conversationEntity = await conversationRepository.getInitialised1To1Conversation(otherUser.qualifiedId);
 
       expect(container.resolve(Core).service!.conversation.establishMLS1to1Conversation).toHaveBeenCalledWith(
         mockedGroupId,
@@ -741,7 +745,7 @@ describe('ConversationRepository', () => {
         .spyOn(conversationRepository['conversationService'], 'isMLSGroupEstablishedLocally')
         .mockResolvedValueOnce(false);
 
-      const conversationEntity = await conversationRepository.getInitialised1To1Conversation(otherUser);
+      const conversationEntity = await conversationRepository.getInitialised1To1Conversation(otherUser.qualifiedId);
 
       expect(conversationEntity?.serialize()).toEqual(mls1to1Conversation.serialize());
       expect(container.resolve(Core).service!.conversation.establishMLS1to1Conversation).toHaveBeenCalled();
@@ -782,7 +786,7 @@ describe('ConversationRepository', () => {
         .spyOn(conversationRepository['conversationService'], 'isMLSGroupEstablishedLocally')
         .mockResolvedValueOnce(true);
 
-      const conversationEntity = await conversationRepository.getInitialised1To1Conversation(otherUser);
+      const conversationEntity = await conversationRepository.getInitialised1To1Conversation(otherUser.qualifiedId);
 
       expect(conversationEntity?.serialize()).toEqual(mls1to1Conversation.serialize());
     });
@@ -822,7 +826,7 @@ describe('ConversationRepository', () => {
         .spyOn(conversationRepository['conversationService'], 'isMLSGroupEstablishedLocally')
         .mockResolvedValueOnce(false);
 
-      const conversationEntity = await conversationRepository.getInitialised1To1Conversation(otherUser);
+      const conversationEntity = await conversationRepository.getInitialised1To1Conversation(otherUser.qualifiedId);
 
       expect(conversationEntity?.serialize()).toEqual(mls1to1Conversation.serialize());
       expect(conversationEntity?.readOnlyState()).toEqual(
@@ -865,7 +869,7 @@ describe('ConversationRepository', () => {
         .spyOn(conversationRepository['conversationService'], 'isMLSGroupEstablishedLocally')
         .mockResolvedValueOnce(true);
 
-      const conversationEntity = await conversationRepository.getInitialised1To1Conversation(otherUser);
+      const conversationEntity = await conversationRepository.getInitialised1To1Conversation(otherUser.qualifiedId);
 
       expect(conversationEntity?.serialize()).toEqual(mls1to1Conversation.serialize());
       expect(conversationEntity?.readOnlyState()).toEqual(null);
@@ -943,7 +947,7 @@ describe('ConversationRepository', () => {
       });
 
       await waitFor(() => {
-        expect(conversationRepository.getInitialised1To1Conversation).toHaveBeenCalledWith(otherUser, true);
+        expect(conversationRepository.getInitialised1To1Conversation).toHaveBeenCalledWith(otherUser.qualifiedId, true);
       });
     });
 
@@ -990,6 +994,7 @@ describe('ConversationRepository', () => {
       const connection = new ConnectionEntity();
       connection.status(ConnectionStatus.SENT);
       connection.conversationId = conversation.qualifiedId;
+      connection.userId = otherUserId;
       otherUser.connection(connection);
 
       jest.spyOn(conversationRepository['conversationService'], 'removeConversationFromBlacklist');
@@ -1186,6 +1191,12 @@ describe('ConversationRepository', () => {
     it('should map a connection to an existing conversation', () => {
       conversation_et.type(CONVERSATION_TYPE.ONE_TO_ONE);
 
+      const conversationRepository = testFactory.conversation_repository!;
+      const user = new User('id', 'domain');
+      user.connection(connectionEntity);
+      connectionEntity.userId = user.qualifiedId;
+      conversationRepository['userState'].users.push(user);
+
       return testFactory.conversation_repository['mapConnection'](connectionEntity).then(
         (_conversation: Conversation) => {
           expect(testFactory.conversation_repository['fetchConversationById']).not.toHaveBeenCalled();
@@ -1196,31 +1207,40 @@ describe('ConversationRepository', () => {
     });
 
     it('should map a connection to a new conversation', () => {
-      connectionEntity.status(ConnectionStatus.ACCEPTED);
-      testFactory.conversation_repository['conversationState'].conversations.removeAll();
+      const conversationRepository = testFactory.conversation_repository!;
+      const user = new User('id1', 'domain1');
+      user.connection(connectionEntity);
+      connectionEntity.userId = user.qualifiedId;
+      conversationRepository['userState'].users.push(user);
 
-      return testFactory.conversation_repository['mapConnection'](connectionEntity).then(_conversation => {
-        expect(testFactory.conversation_repository['fetchConversationById']).toHaveBeenCalled();
+      connectionEntity.status(ConnectionStatus.ACCEPTED);
+      conversationRepository['conversationState'].conversations.removeAll();
+
+      return conversationRepository['mapConnection'](connectionEntity).then(_conversation => {
+        expect(conversationRepository['fetchConversationById']).toHaveBeenCalled();
         expect(testFactory.conversation_service.getConversationById).toHaveBeenCalled();
         expect(_conversation.connection()).toBe(connectionEntity);
       });
     });
 
     it('should map a cancelled connection to an existing conversation and filter it', () => {
+      const conversationRepository = testFactory.conversation_repository!;
+      const user = new User('id', 'domain');
+      user.connection(connectionEntity);
+      connectionEntity.userId = user.qualifiedId;
+      conversationRepository['userState'].users.push(user);
+
       conversation_et.type(CONVERSATION_TYPE.ONE_TO_ONE);
       connectionEntity.status(ConnectionStatus.CANCELLED);
 
-      return testFactory.conversation_repository['mapConnection'](connectionEntity).then(_conversation => {
+      return conversationRepository['mapConnection'](connectionEntity).then(_conversation => {
         expect(_conversation.connection()).toBe(connectionEntity);
         expect(
-          _findConversation(_conversation, testFactory.conversation_repository['conversationState'].conversations),
+          _findConversation(_conversation, conversationRepository['conversationState'].conversations),
         ).not.toBeUndefined();
 
         expect(
-          _findConversation(
-            _conversation,
-            testFactory.conversation_repository['conversationState'].filteredConversations,
-          ),
+          _findConversation(_conversation, conversationRepository['conversationState'].filteredConversations),
         ).toBeUndefined();
       });
     });
@@ -1273,8 +1293,9 @@ describe('ConversationRepository', () => {
           protocol: ConversationProtocol.MLS,
         });
 
-        const otherUserId = {id: 'f718410c-3833-479d-bd80-a5df03f38414', domain: 'test-domain'};
+        const otherUserId = {id: 'f718410c-3833-479d-bd80-a5df01138411', domain: 'test-domain'};
         const otherUser = new User(otherUserId.id, otherUserId.domain);
+        otherUser.supportedProtocols([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]);
 
         conversationRepository['userState'].users.push(otherUser);
         conversation.participating_user_ids.push(otherUserId);
