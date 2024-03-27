@@ -24,6 +24,8 @@ import {CompositeMessage} from 'src/script/entity/message/CompositeMessage';
 
 import {MessageButton} from './MessageButton';
 
+import {withTheme} from '../../../../../../auth/util/test/TestUtil';
+
 describe('MessageButton', () => {
   it('shows error message', async () => {
     const messageId = 'id';
@@ -41,7 +43,7 @@ describe('MessageButton', () => {
       message: message as CompositeMessage,
     };
 
-    const {queryByText} = render(<MessageButton {...props} />);
+    const {queryByText} = render(withTheme(<MessageButton {...props} />));
     expect(queryByText(messageError)).not.toBeNull();
   });
 
@@ -60,7 +62,7 @@ describe('MessageButton', () => {
       message: message as CompositeMessage,
     };
 
-    const {queryByTestId, container} = render(<MessageButton {...props} />);
+    const {queryByTestId, container} = render(withTheme(<MessageButton {...props} />));
 
     expect(queryByTestId('message-button-error')).toBeNull();
 
