@@ -2536,6 +2536,9 @@ describe('ConversationRepository', () => {
       } as ConversationProtocolUpdateEvent;
 
       jest
+        .spyOn(conversationRepository['conversationService'], 'saveConversationStateInDb')
+        .mockResolvedValue({} as any);
+      jest
         .spyOn(conversationRepository['conversationService'], 'updateConversationProtocol')
         .mockResolvedValueOnce(mockedProtocolUpdateEventResponse);
 
@@ -2551,14 +2554,16 @@ describe('ConversationRepository', () => {
         .spyOn(conversationRepository['conversationService'], 'getConversationById')
         .mockResolvedValueOnce(mockedConversationResponse);
 
-      jest.spyOn(conversationRepository['eventRepository'], 'injectEvent').mockResolvedValueOnce(undefined);
+      const injectEventSpy = jest
+        .spyOn(conversationRepository['eventRepository'], 'injectEvent')
+        .mockResolvedValueOnce(undefined);
 
       const updatedConversation = await conversationRepository.updateConversationProtocol(
         conversation,
         ConversationProtocol.MIXED,
       );
 
-      expect(conversationRepository['eventRepository'].injectEvent).toHaveBeenCalledWith(
+      expect(injectEventSpy).toHaveBeenCalledWith(
         mockedProtocolUpdateEventResponse,
         EventRepository.SOURCE.BACKEND_RESPONSE,
       );
@@ -2585,6 +2590,9 @@ describe('ConversationRepository', () => {
         type: CONVERSATION_EVENT.PROTOCOL_UPDATE,
       } as ConversationProtocolUpdateEvent;
 
+      jest
+        .spyOn(conversationRepository['conversationService'], 'saveConversationStateInDb')
+        .mockResolvedValue({} as any);
       jest
         .spyOn(conversationRepository['conversationService'], 'updateConversationProtocol')
         .mockResolvedValueOnce(mockedProtocolUpdateEventResponse);
@@ -2631,6 +2639,9 @@ describe('ConversationRepository', () => {
         type: CONVERSATION_EVENT.PROTOCOL_UPDATE,
       } as ConversationProtocolUpdateEvent;
 
+      jest
+        .spyOn(conversationRepository['conversationService'], 'saveConversationStateInDb')
+        .mockResolvedValue({} as any);
       jest
         .spyOn(conversationRepository['conversationService'], 'updateConversationProtocol')
         .mockResolvedValueOnce(mockedProtocolUpdateEventResponse);
@@ -2835,12 +2846,13 @@ describe('ConversationRepository', () => {
 
       spyOn(conversationRepository['teamState'], 'team').and.returnValue({id: teamId} as any);
 
+      const conversationService = conversationRepository['conversationService'];
       const conversation = _generateConversation({protocol: ConversationProtocol.MLS});
       conversationRepository['conversationState'].conversations.push(conversation);
 
-      jest.spyOn(conversationRepository['conversationService'], 'deleteConversation');
-      jest.spyOn(conversationRepository['conversationService'], 'deleteConversationFromDb');
-      jest.spyOn(conversationRepository['conversationService'], 'wipeMLSCapableConversation');
+      jest.spyOn(conversationService, 'deleteConversation');
+      jest.spyOn(conversationService, 'deleteConversationFromDb');
+      jest.spyOn(conversationService, 'wipeMLSCapableConversation');
 
       await conversationRepository.deleteConversation(conversation);
 
@@ -2862,31 +2874,28 @@ describe('ConversationRepository', () => {
       const conversationRepository = await testFactory.exposeConversationActors();
       const teamId = createUuid();
 
-      spyOn(conversationRepository['teamState'], 'team').and.returnValue({id: teamId} as any);
+      const conversationService = conversationRepository['conversationService'];
+      jest.spyOn(conversationRepository['teamState'], 'team').mockReturnValue({id: teamId} as any);
 
       const conversation = _generateConversation({protocol: ConversationProtocol.MLS});
-      conversationRepository['conversationState'].conversations.push(conversation);
+      conversationRepository['conversationState'].conversations([conversation]);
 
-      jest
-        .spyOn(conversationRepository['conversationService'], 'deleteConversation')
+      const deleteConversationSpy = jest
+        .spyOn(conversationService, 'deleteConversation')
         .mockRejectedValueOnce(new BackendError('Conversation not found', BackendErrorLabel.NO_CONVERSATION));
-      jest.spyOn(conversationRepository['conversationService'], 'deleteConversationFromDb');
-      jest.spyOn(conversationRepository['conversationService'], 'wipeMLSCapableConversation');
+
+      const deleteConversationFromDbSpy = jest
+        .spyOn(conversationService, 'deleteConversationFromDb')
+        .mockReturnValue(undefined);
+      const wipeMLSCapableConversationSpy = jest.spyOn(conversationService, 'wipeMLSCapableConversation');
 
       await conversationRepository.deleteConversation(conversation);
 
-      expect(conversationRepository['conversationService'].deleteConversation).toHaveBeenCalledWith(
-        teamId,
-        conversation.id,
-      );
+      expect(deleteConversationSpy).toHaveBeenCalledWith(teamId, conversation.id);
 
       expect(conversationRepository['conversationState'].conversations()).toEqual([]);
-      expect(conversationRepository['conversationService'].deleteConversationFromDb).toHaveBeenCalledWith(
-        conversation.id,
-      );
-      expect(conversationRepository['conversationService'].wipeMLSCapableConversation).toHaveBeenCalledWith(
-        conversation,
-      );
+      expect(deleteConversationFromDbSpy).toHaveBeenCalledWith(conversation.id);
+      expect(wipeMLSCapableConversationSpy).toHaveBeenCalledWith(conversation);
     });
   });
 });
