@@ -2841,37 +2841,38 @@ describe('ConversationRepository', () => {
 
   describe('deleteConversation', () => {
     it('should delete conversation on backend and locally', async () => {
-      const conversationRepository = await testFactory.exposeConversationActors();
+      const conversationRepository = testFactory.conversation_repository!;
       const teamId = createUuid();
 
       spyOn(conversationRepository['teamState'], 'team').and.returnValue({id: teamId} as any);
 
       const conversationService = conversationRepository['conversationService'];
+      const conversationState = conversationRepository['conversationState'];
       const conversation = _generateConversation({protocol: ConversationProtocol.MLS});
-      conversationRepository['conversationState'].conversations.push(conversation);
 
       const deleteConversationSpy = jest.spyOn(conversationService, 'deleteConversation');
       const deleteConversationFromDbSpy = jest.spyOn(conversationService, 'deleteConversationFromDb');
       const wipeMLSCapableConversationSpy = jest.spyOn(conversationService, 'wipeMLSCapableConversation');
 
+      conversationState.conversations([conversation]);
       await conversationRepository.deleteConversation(conversation);
 
       expect(deleteConversationSpy).toHaveBeenCalledWith(teamId, conversation.id);
 
-      expect(conversationRepository['conversationState'].conversations()).toEqual([]);
+      expect(conversationState.conversations()).toEqual([]);
       expect(deleteConversationFromDbSpy).toHaveBeenCalledWith(conversation.id);
       expect(wipeMLSCapableConversationSpy).toHaveBeenCalledWith(conversation);
     });
 
     it('should still delete conversation locally if it is deleted on backend already', async () => {
-      const conversationRepository = await testFactory.exposeConversationActors();
+      const conversationRepository = testFactory.conversation_repository!;
       const teamId = createUuid();
 
       const conversationService = conversationRepository['conversationService'];
+      const conversationState = conversationRepository['conversationState'];
       jest.spyOn(conversationRepository['teamState'], 'team').mockReturnValue({id: teamId} as any);
 
       const conversation = _generateConversation({protocol: ConversationProtocol.MLS});
-      conversationRepository['conversationState'].conversations([conversation]);
 
       const deleteConversationSpy = jest
         .spyOn(conversationService, 'deleteConversation')
@@ -2882,11 +2883,12 @@ describe('ConversationRepository', () => {
         .mockReturnValue(undefined as any);
       const wipeMLSCapableConversationSpy = jest.spyOn(conversationService, 'wipeMLSCapableConversation');
 
+      conversationState.conversations([conversation]);
       await conversationRepository.deleteConversation(conversation);
 
       expect(deleteConversationSpy).toHaveBeenCalledWith(teamId, conversation.id);
 
-      expect(conversationRepository['conversationState'].conversations()).toEqual([]);
+      expect(conversationState.conversations()).toEqual([]);
       expect(deleteConversationFromDbSpy).toHaveBeenCalledWith(conversation.id);
       expect(wipeMLSCapableConversationSpy).toHaveBeenCalledWith(conversation);
     });
