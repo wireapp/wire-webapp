@@ -2850,24 +2850,17 @@ describe('ConversationRepository', () => {
       const conversation = _generateConversation({protocol: ConversationProtocol.MLS});
       conversationRepository['conversationState'].conversations.push(conversation);
 
-      jest.spyOn(conversationService, 'deleteConversation');
-      jest.spyOn(conversationService, 'deleteConversationFromDb');
-      jest.spyOn(conversationService, 'wipeMLSCapableConversation');
+      const deleteConversationSpy = jest.spyOn(conversationService, 'deleteConversation');
+      const deleteConversationFromDbSpy = jest.spyOn(conversationService, 'deleteConversationFromDb');
+      const wipeMLSCapableConversationSpy = jest.spyOn(conversationService, 'wipeMLSCapableConversation');
 
       await conversationRepository.deleteConversation(conversation);
 
-      expect(conversationRepository['conversationService'].deleteConversation).toHaveBeenCalledWith(
-        teamId,
-        conversation.id,
-      );
+      expect(deleteConversationSpy).toHaveBeenCalledWith(teamId, conversation.id);
 
       expect(conversationRepository['conversationState'].conversations()).toEqual([]);
-      expect(conversationRepository['conversationService'].deleteConversationFromDb).toHaveBeenCalledWith(
-        conversation.id,
-      );
-      expect(conversationRepository['conversationService'].wipeMLSCapableConversation).toHaveBeenCalledWith(
-        conversation,
-      );
+      expect(deleteConversationFromDbSpy).toHaveBeenCalledWith(conversation.id);
+      expect(wipeMLSCapableConversationSpy).toHaveBeenCalledWith(conversation);
     });
 
     it('should still delete conversation locally if it is deleted on backend already', async () => {
