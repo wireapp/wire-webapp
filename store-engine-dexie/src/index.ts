@@ -25,7 +25,7 @@ import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
 type DexieObservable = {_dbSchema?: Object};
 
 export class IndexedDBEngine implements CRUDEngine {
-  private db: Dexie & DexieObservable = new Dexie('');
+  private db = new Dexie('') satisfies DexieObservable;
   private readonly logger: logdown.Logger;
   public storeName = '';
 
