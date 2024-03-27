@@ -18907,9 +18907,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"wire-web-server@workspace:apps/wire-webapp/server":
+"wire-web-server@workspace:apps/webapp/server":
   version: 0.0.0-use.local
-  resolution: "wire-web-server@workspace:apps/wire-webapp/server"
+  resolution: "wire-web-server@workspace:apps/webapp/server"
   dependencies:
     "@types/express": "npm:4.17.21"
     "@types/express-sitemap-xml": "npm:3.0.4"
@@ -18942,9 +18942,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"wire-webapp@workspace:apps/wire-webapp":
+"wire-webapp@workspace:apps/webapp":
   version: 0.0.0-use.local
-  resolution: "wire-webapp@workspace:apps/wire-webapp"
+  resolution: "wire-webapp@workspace:apps/webapp"
   dependencies:
     "@babel/core": "npm:7.24.3"
     "@babel/plugin-proposal-decorators": "npm:7.24.1"

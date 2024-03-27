@@ -7,7 +7,7 @@
   "packageManager": "yarn@4.1.1",
   "workspaces": [
     "apps/*",
-    "apps/wire-webapp/server"
+    "apps/webapp/server"
   ],
   "dependencies": {
     "husky": "9.0.11",
