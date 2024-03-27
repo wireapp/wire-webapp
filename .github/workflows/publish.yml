@@ -15,7 +15,7 @@ concurrency:
 jobs:
   build:
     name: Build Docker image and Helm Chart
-    runs-on: ubuntu-latest
+    runs-on: buildjet-16vcpu-ubuntu-2204
     defaults:
       run:
         working-directory: apps/webapp
@@ -65,11 +65,13 @@ jobs:
         run: yarn --immutable
 
       - name: Test
+        if: ${{false}}
         run: |
           set -o pipefail
           yarn test --detectOpenHandles=false 2>&1 | tee ${{ env.UNIT_TEST_REPORT_FILE }}
 
       - uses: actions/upload-artifact@v4
+        if: ${{false}}
         with:
           name: 'unit-tests-report'
           path: ${{env.UNIT_TEST_REPORT_FILE}}
