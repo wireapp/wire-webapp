@@ -96,7 +96,11 @@ function buildConversationRepository() {
   const teamState = new TeamState();
   const conversationState = new ConversationState();
   // @ts-ignore
-  const conversationService = new ConversationService();
+  const conversationService = {
+    deleteConversation: () => {},
+    deleteConversationFromDb: () => {},
+    wipeMLSCapableConversation: () => {},
+  } as ConversationService;
   const messageRepository = {setClientMismatchHandler: () => {}} as unknown as MessageRepository;
   // @ts-ignore
   const callingRepository = new CallingRepository();
@@ -2874,9 +2878,6 @@ describe('ConversationRepository', () => {
 });
 
 describe('leaveConversation', () => {
-  beforeEach(() => {
-    //jest.clearAllMocks();
-  });
   it.each([ConversationProtocol.PROTEUS, ConversationProtocol.MIXED, ConversationProtocol.MLS])(
     'should leave %s conversation',
     async protocol => {
