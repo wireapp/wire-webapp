@@ -15,7 +15,10 @@ concurrency:
 jobs:
   build:
     name: Build Docker image and Helm Chart
-    runs-on: buildjet-8vcpu-ubuntu-2204
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/webapp
 
     outputs:
       wire_builds_target_branches: ${{ steps.output_target_branches.outputs.targets }}
