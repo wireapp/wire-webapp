@@ -17,6 +17,8 @@
  *
  */
 
+import {VideoHTMLAttributes} from 'react';
+
 import {ImageSegmenter, FilesetResolver, ImageSegmenterResult} from '@mediapipe/tasks-vision';
 
 function makeGaussKernel(sigma: number) {
@@ -79,19 +81,24 @@ function blurPixels(pixels: Uint8ClampedArray, sigma: number, imageWidth: number
   return pixels;
 }
 
-export async function applyBlur(videoStream: HTMLVideoElement): Promise<MediaStream> {
-  if (!videoStream) {
+export async function applyBlur(
+  videoElement: HTMLVideoElement,
+  props: VideoHTMLAttributes<HTMLVideoElement>,
+): Promise<MediaStream> {
+  if (!videoElement) {
     throw new Error('No video stream provided');
   }
-  const imageWidth = videoStream.videoWidth;
-  const imageHeight = videoStream.videoHeight;
+
+  const imageWidth = Number(props?.width ?? 1280);
+  const imageHeight = Number(props?.height ?? 720);
+
   const canvasEl = document.createElement('canvas');
   canvasEl.width = imageWidth;
   canvasEl.height = imageHeight;
   const ctx = canvasEl.getContext('2d', {willReadFrequently: true});
 
   async function callbackForVideo(result: ImageSegmenterResult) {
-    if (!ctx) {
+    if (!ctx || !result) {
       return;
     }
 
@@ -126,43 +133,43 @@ export async function applyBlur(videoStream: HTMLVideoElement): Promise<MediaStr
   let imageSegmenter: ImageSegmenter | undefined;
 
   const createImageSegmenter = async () => {
-    const video = await FilesetResolver.forVisionTasks(
-      'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.2/wasm',
-    );
+    try {
+      const video = await FilesetResolver.forVisionTasks('/min/vision-wasm');
 
-    imageSegmenter = await ImageSegmenter.createFromOptions(video, {
-      baseOptions: {
-        modelAssetPath:
-          'https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_multiclass_256x256/float32/latest/selfie_multiclass_256x256.tflite',
-        delegate: 'GPU',
-      },
-      runningMode: 'VIDEO',
-      outputCategoryMask: false,
-      outputConfidenceMasks: true,
-    });
+      imageSegmenter = await ImageSegmenter.createFromOptions(video, {
+        baseOptions: {
+          modelAssetPath: '/models/selfie_multiclass_256x256.tflite',
+          delegate: 'GPU',
+        },
+        runningMode: 'VIDEO',
+        outputCategoryMask: false,
+        outputConfidenceMasks: true,
+      });
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   async function predictWebcam() {
-    if (ctx === null) {
-      return;
+    if (ctx === null || videoElement === null) {
+      throw new Error('No video stream provided');
     }
     let lastWebcamTime = -1;
-    if (videoStream.currentTime === lastWebcamTime) {
+    if (videoElement.currentTime === lastWebcamTime) {
       window.requestAnimationFrame(predictWebcam);
-
       return;
     }
 
-    lastWebcamTime = videoStream.currentTime;
-    ctx.drawImage(videoStream, 0, 0, imageWidth, imageHeight);
+    lastWebcamTime = videoElement.currentTime;
+    ctx.drawImage(videoElement, 0, 0, imageWidth, imageHeight);
     // Do not segmented if imageSegmenter.current hasn't loaded
     if (imageSegmenter === undefined) {
-      return;
+      throw new Error('Image segmenter not loaded');
     }
     const startTimeMs = performance.now();
 
     // Start segmenting the stream.
-    imageSegmenter.segmentForVideo(videoStream, startTimeMs, callbackForVideo);
+    imageSegmenter.segmentForVideo(videoElement, startTimeMs, callbackForVideo);
   }
 
   await createImageSegmenter();

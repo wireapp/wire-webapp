@@ -26,29 +26,12 @@ import {applyBlur} from 'Util/applyBlur';
 type VideoProps = VideoHTMLAttributes<HTMLVideoElement> & {
   srcObject: MediaStream;
   blur: boolean;
+  handleBlur?: (stream: MediaStream, stopTracks: boolean) => void;
 };
 
-const Video = ({srcObject, blur, ...props}: VideoProps) => {
+const Video = ({srcObject, blur, handleBlur, ...props}: VideoProps) => {
   const refVideo = useRef<HTMLVideoElement>(null);
   const blurRef = useRef<HTMLVideoElement>(null);
-
-  useEffect(() => {
-    if (!refVideo.current) {
-      return;
-    }
-
-    const asyncBlur = async () => {
-      return await applyBlur(refVideo.current);
-    };
-
-    if (blur && blurRef.current) {
-      asyncBlur()
-        .then(stream => {
-          blurRef.current.srcObject = stream;
-        })
-        .catch(console.error);
-    }
-  }, [blur]);
 
   useEffect(() => {
     if (!refVideo.current) {
@@ -69,17 +52,38 @@ const Video = ({srcObject, blur, ...props}: VideoProps) => {
     [],
   );
 
+  useEffect(() => {
+    const asyncBlur = async () => {
+      if (!refVideo.current) {
+        throw new Error('No ref video');
+      }
+      return await applyBlur(refVideo.current, props);
+    };
+
+    if (blur) {
+      asyncBlur()
+        .then(stream => {
+          if (!stream) {
+            throw new Error('Failed to apply blur');
+          }
+          // handleBlur?.(stream, false);
+          blurRef.current!.srcObject = stream;
+        })
+        .catch(console.error);
+    }
+  }, [blur, handleBlur, props]);
+
   return (
     <>
       <video
         ref={refVideo}
         {...props}
-        css={{visibility: !blur ? 'hidden' : 'visible', display: !blur ? 'none' : 'inline block'}}
+        // css={{visibility: blur ? 'hidden' : 'visible', display: blur ? 'none' : 'inline block'}}
       />
       <video
         ref={blurRef}
         {...props}
-        css={{visibility: blur ? 'hidden' : 'visible', display: blur ? 'none' : 'inline block'}}
+        // css={{visibility: !blur ? 'hidden' : 'visible', display: !blur ? 'none' : 'inline block'}}
       />
     </>
   );

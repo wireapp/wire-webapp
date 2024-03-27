@@ -113,10 +113,11 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   teamState = container.resolve(TeamState),
 }) => {
   const selfParticipant = call.getSelfParticipant();
-  const {sharesScreen: selfSharesScreen, sharesCamera: selfSharesCamera} = useKoSubscribableChildren(selfParticipant, [
-    'sharesScreen',
-    'sharesCamera',
-  ]);
+  const {
+    sharesScreen: selfSharesScreen,
+    sharesCamera: selfSharesCamera,
+    isBlurred,
+  } = useKoSubscribableChildren(selfParticipant, ['sharesScreen', 'sharesCamera', 'isBlurred']);
 
   const {
     activeSpeakers,
@@ -252,7 +253,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   ];
 
   const [selectedVideoOptions, setSelectedVideoOptions] = React.useState(() =>
-    [currentCameraDevice].flatMap(
+    [currentCameraDevice, isBlurred].flatMap(
       device => videoOptions.flatMap(options => options.options.filter(item => item.id === device)) ?? [],
     ),
   );
@@ -261,9 +262,9 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     const camera = videoOptions[0].options.find(item => item.value === selectedOption) ?? selectedVideoOptions[0];
     const blur = videoOptions[1].options.find(item => item.value == selectedOption) ?? selectedVideoOptions[1];
 
-    // if (blur.id !== isBlurred) {
-    //   await selfParticipant.setBlur(blur.id as backgroundBlur);
-    // }
+    if (blur.id !== isBlurred) {
+      await selfParticipant.setBlur(blur.id as backgroundBlur);
+    }
 
     setSelectedVideoOptions([camera, blur]);
     switchCameraInput(String(camera.id));
