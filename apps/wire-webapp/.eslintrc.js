@@ -33,6 +33,7 @@ module.exports = {
     '@emotion/import-from-emotion': 'error',
     '@emotion/styled-import': 'error',
     'id-length': 'warn',
+    'jsx-a11y/label-has-associated-control': 'warn',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/ban-ts-comment': 'off',
     '@typescript-eslint/no-var-requires': 'off',
