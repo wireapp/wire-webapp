@@ -92,6 +92,62 @@ import {TeamState} from '../team/TeamState';
 import {UserRepository} from '../user/UserRepository';
 import {UserState} from '../user/UserState';
 
+function buildConversationRepository() {
+  const teamState = new TeamState();
+  const conversationState = new ConversationState();
+  // @ts-ignore
+  const conversationService = new ConversationService();
+  const messageRepository = {setClientMismatchHandler: () => {}} as unknown as MessageRepository;
+  // @ts-ignore
+  const callingRepository = new CallingRepository();
+  const connectionRepository = {
+    setDeleteConnectionRequestConversationHandler: () => {},
+  } as unknown as ConnectionRepository;
+  const eventRepository = {
+    eventService: new EventService(),
+    injectEvent: () => {},
+    injectEvents: () => {},
+  } as unknown as EventRepository;
+  const selfRepository = {on: () => {}} as unknown as SelfRepository;
+  const teamRepository = {} as TeamRepository;
+  const userRepository = {on: () => {}} as unknown as UserRepository;
+  const userState = new UserState();
+  const core = new Core();
+
+  const conversationRepository = new ConversationRepository(
+    conversationService,
+    messageRepository,
+    connectionRepository,
+    eventRepository,
+    teamRepository,
+    userRepository,
+    selfRepository,
+    {} as any,
+    callingRepository,
+    {} as any,
+    userState,
+    teamState,
+    conversationState,
+    {} as any,
+    core,
+  );
+  return [
+    conversationRepository,
+    {
+      conversationState,
+      teamState,
+      userState,
+      eventRepository,
+      callingRepository,
+      userRepository,
+      teamRepository,
+      messageRepository,
+      conversationService,
+      core,
+    },
+  ] as const;
+}
+
 describe('ConversationRepository', () => {
   const testFactory = new TestFactory();
 
@@ -2815,141 +2871,84 @@ describe('ConversationRepository', () => {
       });
     });
   });
+});
 
-  describe('leaveConversation', () => {
-    afterEach(() => {
-      jest.clearAllMocks();
-    });
+describe('leaveConversation', () => {
+  beforeEach(() => {
+    //jest.clearAllMocks();
+  });
+  it.each([ConversationProtocol.PROTEUS, ConversationProtocol.MIXED, ConversationProtocol.MLS])(
+    'should leave %s conversation',
+    async protocol => {
+      const [conversationRepository, {userState, core, eventRepository}] = buildConversationRepository();
 
-    it.each([ConversationProtocol.PROTEUS, ConversationProtocol.MIXED, ConversationProtocol.MLS])(
-      'should leave %s conversation',
-      async protocol => {
-        const conversationRepository = await testFactory.exposeConversationActors();
+      const conversation = _generateConversation({protocol});
 
-        const conversation = _generateConversation({protocol});
+      const selfUser = generateUser();
+      conversation.selfUser(selfUser);
 
-        const selfUser = generateUser();
-        conversation.selfUser(selfUser);
+      userState.self(selfUser);
 
-        spyOn(conversationRepository['userState'], 'self').and.returnValue(selfUser);
+      conversation.participating_user_ets([generateUser(), generateUser()]);
 
-        conversation.participating_user_ets([generateUser(), generateUser()]);
+      const removeUserFromConversationSpy = jest.spyOn(core.service!.conversation, 'removeUserFromConversation');
 
-        const coreConversationService = container.resolve(Core).service!.conversation;
+      const injectEventsSpy = jest.spyOn(eventRepository, 'injectEvents');
 
-        jest.spyOn(conversationRepository['eventRepository'], 'injectEvent').mockImplementation(jest.fn());
+      await conversationRepository.leaveConversation(conversation);
 
-        await conversationRepository.leaveConversation(conversation);
+      expect(removeUserFromConversationSpy).toHaveBeenCalledWith(conversation.qualifiedId, selfUser.qualifiedId);
+      expect(injectEventsSpy).toHaveBeenCalled();
+    },
+  );
+});
 
-        expect(coreConversationService.removeUserFromConversation).toHaveBeenCalledWith(
-          conversation.qualifiedId,
-          selfUser.qualifiedId,
-        );
-        expect(conversationRepository['eventRepository'].injectEvent).toHaveBeenCalled();
-      },
-    );
+describe('deleteConversation', () => {
+  it('should delete conversation on backend and locally', async () => {
+    const [conversationRepository, {teamState, conversationState, conversationService}] = buildConversationRepository();
+    const teamId = createUuid();
+
+    teamState.team({id: teamId} as any);
+    const conversation = _generateConversation({protocol: ConversationProtocol.MLS});
+
+    const deleteConversationSpy = jest.spyOn(conversationService, 'deleteConversation');
+    const deleteConversationFromDbSpy = jest.spyOn(conversationService, 'deleteConversationFromDb');
+    const wipeMLSCapableConversationSpy = jest.spyOn(conversationService, 'wipeMLSCapableConversation');
+
+    conversationState.conversations([conversation]);
+    await conversationRepository.deleteConversation(conversation);
+
+    expect(deleteConversationSpy).toHaveBeenCalledWith(teamId, conversation.id);
+
+    expect(conversationState.conversations()).toEqual([]);
+    expect(deleteConversationFromDbSpy).toHaveBeenCalledWith(conversation.id);
+    expect(wipeMLSCapableConversationSpy).toHaveBeenCalledWith(conversation);
   });
 
-  describe('deleteConversation', () => {
-    function buildConversationRepository() {
-      const teamState = new TeamState();
-      const conversationState = new ConversationState();
-      // @ts-ignore
-      const conversationService = new ConversationService();
-      const messageRepository = {setClientMismatchHandler: () => {}} as unknown as MessageRepository;
-      // @ts-ignore
-      const callingRepository = new CallingRepository();
-      const connectionRepository = {
-        setDeleteConnectionRequestConversationHandler: () => {},
-      } as unknown as ConnectionRepository;
-      const eventRepository = {eventService: new EventService()} as unknown as EventRepository;
-      const selfRepository = {on: () => {}} as unknown as SelfRepository;
-      const teamRepository = {} as TeamRepository;
-      const userRepository = {on: () => {}} as unknown as UserRepository;
-      const userState = new UserState();
-      const core = new Core();
+  it('should still delete conversation locally if it is deleted on backend already', async () => {
+    const [conversationRepository, {conversationState, conversationService}] = buildConversationRepository();
+    const teamId = createUuid();
 
-      const conversationRepository = new ConversationRepository(
-        conversationService,
-        messageRepository,
-        connectionRepository,
-        eventRepository,
-        teamRepository,
-        userRepository,
-        selfRepository,
-        {} as any,
-        callingRepository,
-        {} as any,
-        userState,
-        teamState,
-        conversationState,
-        {} as any,
-        core,
-      );
-      return [
-        conversationRepository,
-        {
-          conversationState,
-          teamState,
-          userState,
-          eventRepository,
-          callingRepository,
-          userRepository,
-          teamRepository,
-          messageRepository,
-          conversationService,
-          core,
-        },
-      ] as const;
-    }
+    jest.spyOn(conversationRepository['teamState'], 'team').mockReturnValue({id: teamId} as any);
 
-    it('should delete conversation on backend and locally', async () => {
-      const [conversationRepository, {teamState, conversationState, conversationService}] =
-        buildConversationRepository();
-      const teamId = createUuid();
+    const conversation = _generateConversation({protocol: ConversationProtocol.MLS});
 
-      teamState.team({id: teamId} as any);
-      const conversation = _generateConversation({protocol: ConversationProtocol.MLS});
+    const deleteConversationSpy = jest
+      .spyOn(conversationService, 'deleteConversation')
+      .mockRejectedValueOnce(new BackendError('Conversation not found', BackendErrorLabel.NO_CONVERSATION));
 
-      const deleteConversationSpy = jest.spyOn(conversationService, 'deleteConversation');
-      const deleteConversationFromDbSpy = jest.spyOn(conversationService, 'deleteConversationFromDb');
-      const wipeMLSCapableConversationSpy = jest.spyOn(conversationService, 'wipeMLSCapableConversation');
+    const deleteConversationFromDbSpy = jest
+      .spyOn(conversationService, 'deleteConversationFromDb')
+      .mockReturnValue(undefined as any);
+    const wipeMLSCapableConversationSpy = jest.spyOn(conversationService, 'wipeMLSCapableConversation');
 
-      conversationState.conversations([conversation]);
-      await conversationRepository.deleteConversation(conversation);
+    conversationState.conversations([conversation]);
+    await conversationRepository.deleteConversation(conversation);
 
-      expect(deleteConversationSpy).toHaveBeenCalledWith(teamId, conversation.id);
+    expect(deleteConversationSpy).toHaveBeenCalledWith(teamId, conversation.id);
 
-      expect(conversationState.conversations()).toEqual([]);
-      expect(deleteConversationFromDbSpy).toHaveBeenCalledWith(conversation.id);
-      expect(wipeMLSCapableConversationSpy).toHaveBeenCalledWith(conversation);
-    });
-
-    it('should still delete conversation locally if it is deleted on backend already', async () => {
-      const [conversationRepository, {conversationState, conversationService}] = buildConversationRepository();
-      const teamId = createUuid();
-
-      jest.spyOn(conversationRepository['teamState'], 'team').mockReturnValue({id: teamId} as any);
-
-      const conversation = _generateConversation({protocol: ConversationProtocol.MLS});
-
-      const deleteConversationSpy = jest
-        .spyOn(conversationService, 'deleteConversation')
-        .mockRejectedValueOnce(new BackendError('Conversation not found', BackendErrorLabel.NO_CONVERSATION));
-
-      const deleteConversationFromDbSpy = jest
-        .spyOn(conversationService, 'deleteConversationFromDb')
-        .mockReturnValue(undefined as any);
-      const wipeMLSCapableConversationSpy = jest.spyOn(conversationService, 'wipeMLSCapableConversation');
-
-      conversationState.conversations([conversation]);
-      await conversationRepository.deleteConversation(conversation);
-
-      expect(deleteConversationSpy).toHaveBeenCalledWith(teamId, conversation.id);
-
-      expect(conversationState.conversations()).toEqual([]);
-      expect(deleteConversationFromDbSpy).toHaveBeenCalledWith(conversation.id);
-      expect(wipeMLSCapableConversationSpy).toHaveBeenCalledWith(conversation);
-    });
+    expect(conversationState.conversations()).toEqual([]);
+    expect(deleteConversationFromDbSpy).toHaveBeenCalledWith(conversation.id);
+    expect(wipeMLSCapableConversationSpy).toHaveBeenCalledWith(conversation);
   });
 });
