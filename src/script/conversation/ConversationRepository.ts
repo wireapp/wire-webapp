@@ -1297,11 +1297,15 @@ export class ConversationRepository {
 
     const connection = user.connection();
     if (connection) {
+      this.logger.log(`There's a connection with user ${userId.id}, getting a 1:1 conversation for the connection`);
       return this.get1to1ConversationForConnection(connection, isLiveUpdate);
     }
 
     const {protocol, isMLSSupportedByTheOtherUser, isProteusSupportedByTheOtherUser} =
       await this.getProtocolFor1to1Conversation(userId, shouldRefreshUser);
+    this.logger.log(
+      `Protocol for 1:1 conversation with user ${userId.id} is ${protocol}, isMLSSupportedByTheOtherUser: ${isMLSSupportedByTheOtherUser}, isProteusSupportedByTheOtherUser: ${isProteusSupportedByTheOtherUser}`,
+    );
 
     const localMLSConversation = this.conversationState.findMLS1to1Conversation(userId);
 
@@ -1987,6 +1991,9 @@ export class ConversationRepository {
 
     // For connection request, we simply display proteus conversation of type 3 (connect) it will be displayed as a connection request
     if (connection.isOutgoingRequest()) {
+      this.logger.log(
+        `Connection request with user ${otherUserId.id}, using proteus conversation ${proteusConversationId.id}`,
+      );
       const proteusConversation = localProteusConversation || (await this.fetchConversationById(proteusConversationId));
       proteusConversation.type(CONVERSATION_TYPE.CONNECT);
       return proteusConversation;
@@ -2003,6 +2010,9 @@ export class ConversationRepository {
     const isConnectionAccepted = connection.isConnected();
     // If it's accepted, initialise conversation so it's ready to be used
     if (isConnectionAccepted) {
+      this.logger.log(
+        `Connection with user ${otherUserId.id} is accepted, using protocol ${protocol} for 1:1 conversation`,
+      );
       if (protocol === ConversationProtocol.MLS || localMLSConversation) {
         return this.initMLS1to1Conversation(
           otherUserId,
@@ -2020,9 +2030,17 @@ export class ConversationRepository {
     // If we already know mls 1:1 conversation, we use it, even if proteus protocol was now choosen as common,
     // we do not support switching back to proteus after mls conversation was established,
     // only proteus -> mls migration is supported, never the other way around.
+
     if (localMLSConversation) {
+      this.logger.log(
+        `Connection with user ${otherUserId.id} is not accepted, using already known MLS 1:1 conversation ${localMLSConversation.id}`,
+      );
       return this.initMLS1to1Conversation(otherUserId, isMLSSupportedByTheOtherUser, shouldDelayMLSGroupEstablishment);
     }
+
+    this.logger.log(
+      `Connection with user ${otherUserId.id} is not accepted, defaulting to local proteus 1:1 conversation ${proteusConversationId.id}`,
+    );
 
     return protocol === ConversationProtocol.PROTEUS ? localProteusConversation : null;
   };
