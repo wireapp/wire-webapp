@@ -1280,7 +1280,11 @@ export class ConversationRepository {
    * @param isLiveUpdate Whether the conversation is being initialised because of a live update (e.g. some websocket event)
    * @returns Resolves with the initialised 1:1 conversation with requested user
    */
-  public async getInitialised1To1Conversation(userId: QualifiedId, isLiveUpdate = false): Promise<Conversation | null> {
+  public async getInitialised1To1Conversation(
+    userId: QualifiedId,
+    isLiveUpdate = false,
+    shouldRefreshUser = false,
+  ): Promise<Conversation | null> {
     const user = await this.userRepository.getUserById(userId);
 
     const connection = user.connection();
@@ -1289,7 +1293,7 @@ export class ConversationRepository {
     }
 
     const {protocol, isMLSSupportedByTheOtherUser, isProteusSupportedByTheOtherUser} =
-      await this.getProtocolFor1to1Conversation(userId);
+      await this.getProtocolFor1to1Conversation(userId, shouldRefreshUser);
 
     const localMLSConversation = this.conversationState.findMLS1to1Conversation(userId);
 
@@ -1930,7 +1934,7 @@ export class ConversationRepository {
   public readonly init1to1Conversation = async (
     conversation: Conversation,
     shouldRefreshUser = false,
-  ): Promise<Conversation> => {
+  ): Promise<Conversation | null> => {
     if (!conversation.is1to1()) {
       throw new Error('Conversation is not 1:1');
     }
@@ -1942,52 +1946,19 @@ export class ConversationRepository {
       return conversation;
     }
 
+    const otherUser = await this.userRepository.getUserById(otherUserId);
+    // If the other user is deleted on backend, just open a conversation and do not try to migrate it to mls.
+    if (otherUser.isDeleted) {
+      this.logger.warn(`User ${otherUserId.id} is deleted, opening proteus conversation`);
+      return conversation;
+    }
+
     this.logger.info(
       `Initialising 1:1 conversation ${conversation.id} of type ${conversation.type()} with user ${otherUserId.id}`,
     );
 
     try {
-      const {protocol, isMLSSupportedByTheOtherUser, isProteusSupportedByTheOtherUser} =
-        await this.getProtocolFor1to1Conversation(otherUserId, shouldRefreshUser);
-      this.logger.info(
-        `Protocol for 1:1 conversation ${conversation.id} with user ${otherUserId.id} is ${protocol}, ${JSON.stringify({
-          isMLSSupportedByTheOtherUser,
-          isProteusSupportedByTheOtherUser,
-        })}`,
-      );
-
-      // When called with mls conversation, we just make sure it is initialised.
-      if (isMLSConversation(conversation)) {
-        return this.initMLS1to1Conversation(otherUserId, isMLSSupportedByTheOtherUser);
-      }
-
-      // If there's local mls conversation, we want to use it
-      const localMLSConversation = this.conversationState.findMLS1to1Conversation(otherUserId);
-
-      // If mls conversation is already known, we use it
-      // we never go back to proteus conversation, even if one of the users do not support mls anymore
-      // (e.g. due to the change of supported protocols in team configuration)
-      if (localMLSConversation) {
-        return this.initMLS1to1Conversation(otherUserId, isMLSSupportedByTheOtherUser);
-      }
-
-      // If both users support mls, we will initialise mls 1:1 conversation (unless it's a proteus 1:1 conversation with a user that has been deleted)
-      if (protocol === ConversationProtocol.MLS) {
-        // If the other user is deleted on backend, just open a proteus conversation and do not try to migrate it to mls.
-        if (isProteusConversation(conversation)) {
-          const otherUser = await this.userRepository.getUserById(otherUserId);
-          if (otherUser.isDeleted) {
-            this.logger.warn(`User ${otherUserId.id} is deleted, opening proteus conversation`);
-            return conversation;
-          }
-        }
-
-        return this.initMLS1to1Conversation(otherUserId, isMLSSupportedByTheOtherUser);
-      }
-
-      if (protocol === ConversationProtocol.PROTEUS && isProteusConversation(conversation)) {
-        return this.initProteus1to1Conversation(conversation.qualifiedId, isProteusSupportedByTheOtherUser);
-      }
+      return await this.getInitialised1To1Conversation(otherUserId, false, shouldRefreshUser);
     } catch {}
 
     return conversation;
