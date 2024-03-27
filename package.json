@@ -179,7 +179,7 @@
     "fix:code": "yarn lint:code --fix",
     "lint": "yarn lint:other && yarn lint:code",
     "lint:other": "yarn prettier --list-different && yarn stylelint",
-    "lint:code": "eslint -c .eslintrc.json --ext .js,.ts,.tsx .",
+    "lint:code": "eslint --ext .js,.ts,.tsx .",
     "check:circular-dependencies": "dpdm --no-warning --no-tree -T  ./src/script/auth/main.tsx ./src/script/main/app.ts",
     "postinstall": "yarn configure && cd server && yarn && cd .. && husky install",
     "prettier": "prettier --ignore-path .prettierignore \"**/*.{json,md,yml}\"",
