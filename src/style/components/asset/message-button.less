@@ -17,76 +17,7 @@
  *
  */
 
-.message-button {
-  position: relative;
-  display: block;
-  overflow: hidden;
-  width: 100%;
-  max-width: 400px;
-  padding: 12px;
-
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-
-  margin-top: 8px;
-
-  background-color: var(--app-bg);
-  color: var(--main-color);
-  font-size: 1rem;
-  font-weight: var(--font-weight-semibold);
-  line-height: var(--font-size-lg);
-  outline: none;
-  text-align: center;
-  transition: all 0.1s linear;
-
-  &:focus,
-  &:hover {
-    border-color: var(--button-primary-active-border);
-    color: var(--accent-color);
-  }
-
-  &--selected {
-    border-color: var(--button-primary-active-border);
-    background-color: var(--button-primary-active-bg);
-    color: var(--accent-color);
-
-    &:focus,
-    &:hover {
-      border-color: var(--accent-color);
-      background-color: var(--button-primary-active-bg);
-    }
-  }
-
-  &__waiting-overlay {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    display: flex;
-    width: 48px;
-    align-items: center;
-    justify-content: center;
-    background-color: transparent;
-    opacity: 0;
-    transform: translateX(50%);
-    transition:
-      background-color 0.05s,
-      transform 0.2s ease-in-out,
-      opacity 0.2s ease-in-out;
-
-    svg {
-      fill: var(--accent-color);
-    }
-
-    &--visible {
-      opacity: 0.9;
-      transform: translateX(0);
-      transition: all 0.2s ease-in-out;
-    }
-  }
-
-  &__error {
-    margin-top: 4px;
-    color: @w-red;
-  }
+.message-button__error {
+  margin-top: 4px;
+  color: @w-red;
 }
