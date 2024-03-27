@@ -38,7 +38,6 @@ module.exports = {
     '@typescript-eslint/no-var-requires': 'off',
     '@typescript-eslint/no-non-null-assertion': 'off',
     '@typescript-eslint/no-floating-promises': 'warn',
-    'jsx-a11y/label-has-associated-control': 'warn',
     '@typescript-eslint/typedef': 'off',
     'no-dupe-class-members': 'off',
     'no-unsanitized/property': 'off',
