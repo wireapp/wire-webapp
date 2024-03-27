@@ -2886,7 +2886,7 @@ describe('ConversationRepository', () => {
 
       const deleteConversationFromDbSpy = jest
         .spyOn(conversationService, 'deleteConversationFromDb')
-        .mockReturnValue(undefined);
+        .mockReturnValue(undefined as any);
       const wipeMLSCapableConversationSpy = jest.spyOn(conversationService, 'wipeMLSCapableConversation');
 
       await conversationRepository.deleteConversation(conversation);
