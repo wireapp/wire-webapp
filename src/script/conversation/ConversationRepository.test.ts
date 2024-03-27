@@ -73,13 +73,24 @@ import {escapeRegex} from 'Util/SanitizationUtil';
 import {createUuid} from 'Util/uuid';
 
 import {CONVERSATION_READONLY_STATE, ConversationRepository} from './ConversationRepository';
+import {ConversationService} from './ConversationService';
+import {ConversationState} from './ConversationState';
+import {MessageRepository} from './MessageRepository';
 
 import {entities, payload} from '../../../test/api/payloads';
 import {TestFactory} from '../../../test/helper/TestFactory';
 import {generateUser} from '../../../test/helper/UserGenerator';
+import {CallingRepository} from '../calling/CallingRepository';
+import {ConnectionRepository} from '../connection/ConnectionRepository';
 import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
+import {EventService} from '../event/EventService';
+import {SelfRepository} from '../self/SelfRepository';
 import {Core} from '../service/CoreSingleton';
 import {LegacyEventRecord, StorageService} from '../storage';
+import {TeamRepository} from '../team/TeamRepository';
+import {TeamState} from '../team/TeamState';
+import {UserRepository} from '../user/UserRepository';
+import {UserState} from '../user/UserState';
 
 describe('ConversationRepository', () => {
   const testFactory = new TestFactory();
@@ -2840,14 +2851,64 @@ describe('ConversationRepository', () => {
   });
 
   describe('deleteConversation', () => {
+    function buildConversationRepository() {
+      const teamState = new TeamState();
+      const conversationState = new ConversationState();
+      // @ts-ignore
+      const conversationService = new ConversationService();
+      const messageRepository = {setClientMismatchHandler: () => {}} as unknown as MessageRepository;
+      // @ts-ignore
+      const callingRepository = new CallingRepository();
+      const connectionRepository = {
+        setDeleteConnectionRequestConversationHandler: () => {},
+      } as unknown as ConnectionRepository;
+      const eventRepository = {eventService: new EventService()} as unknown as EventRepository;
+      const selfRepository = {on: () => {}} as unknown as SelfRepository;
+      const teamRepository = {} as TeamRepository;
+      const userRepository = {on: () => {}} as unknown as UserRepository;
+      const userState = new UserState();
+      const core = new Core();
+
+      const conversationRepository = new ConversationRepository(
+        conversationService,
+        messageRepository,
+        connectionRepository,
+        eventRepository,
+        teamRepository,
+        userRepository,
+        selfRepository,
+        {} as any,
+        callingRepository,
+        {} as any,
+        userState,
+        teamState,
+        conversationState,
+        {} as any,
+        core,
+      );
+      return [
+        conversationRepository,
+        {
+          conversationState,
+          teamState,
+          userState,
+          eventRepository,
+          callingRepository,
+          userRepository,
+          teamRepository,
+          messageRepository,
+          conversationService,
+          core,
+        },
+      ] as const;
+    }
+
     it('should delete conversation on backend and locally', async () => {
-      const conversationRepository = testFactory.conversation_repository!;
+      const [conversationRepository, {teamState, conversationState, conversationService}] =
+        buildConversationRepository();
       const teamId = createUuid();
 
-      spyOn(conversationRepository['teamState'], 'team').and.returnValue({id: teamId} as any);
-
-      const conversationService = conversationRepository['conversationService'];
-      const conversationState = conversationRepository['conversationState'];
+      teamState.team({id: teamId} as any);
       const conversation = _generateConversation({protocol: ConversationProtocol.MLS});
 
       const deleteConversationSpy = jest.spyOn(conversationService, 'deleteConversation');
@@ -2865,11 +2926,9 @@ describe('ConversationRepository', () => {
     });
 
     it('should still delete conversation locally if it is deleted on backend already', async () => {
-      const conversationRepository = testFactory.conversation_repository!;
+      const [conversationRepository, {conversationState, conversationService}] = buildConversationRepository();
       const teamId = createUuid();
 
-      const conversationService = conversationRepository['conversationService'];
-      const conversationState = conversationRepository['conversationState'];
       jest.spyOn(conversationRepository['teamState'], 'team').mockReturnValue({id: teamId} as any);
 
       const conversation = _generateConversation({protocol: ConversationProtocol.MLS});
