@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.1.9](https://github.com/wireapp/wire-web-packages/compare/@wireapp/store-engine-dexie@2.1.8...@wireapp/store-engine-dexie@2.1.9) (2024-03-27)
+
+### Bug Fixes
+
+* **store-engine-dexie:** Allow wider range of dexie version ([#6111](https://github.com/wireapp/wire-web-packages/issues/6111)) ([57fe3df](https://github.com/wireapp/wire-web-packages/commit/57fe3df13f2006428dc808e5134f0d75159fec4c))
+
 ## [2.1.8](https://github.com/wireapp/wire-web-packages/compare/@wireapp/store-engine-dexie@2.1.7...@wireapp/store-engine-dexie@2.1.8) (2024-02-19)
 
 **Note:** Version bump only for package @wireapp/store-engine-dexie
