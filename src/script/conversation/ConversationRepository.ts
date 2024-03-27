@@ -1288,7 +1288,7 @@ export class ConversationRepository {
    * @param isLiveUpdate Whether the conversation is being initialised because of a live update (e.g. some websocket event)
    * @returns Resolves with the initialised 1:1 conversation with requested user
    */
-  async getInitialised1To1Conversation(userId: QualifiedId, isLiveUpdate = false): Promise<Conversation | null> {
+  public async getInitialised1To1Conversation(userId: QualifiedId, isLiveUpdate = false): Promise<Conversation | null> {
     const user = await this.userRepository.getUserById(userId);
 
     const connection = user.connection();
@@ -2071,7 +2071,7 @@ export class ConversationRepository {
   ): Promise<Conversation | undefined> => {
     try {
       const userId = connectionEntity.userId;
-      const conversation = await this.get1to1WithUser(userId, source === EventSource.WEBSOCKET);
+      const conversation = await this.getInitialised1To1Conversation(userId, source === EventSource.WEBSOCKET);
 
       if (!conversation) {
         return undefined;
@@ -3986,7 +3986,7 @@ export class ConversationRepository {
       return;
     }
 
-    await this.initMLS1to1Conversation(otherUserId, true);
+    await this.getInitialised1To1Conversation(otherUserId, true);
   }
 
   /**
