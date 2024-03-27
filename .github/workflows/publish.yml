@@ -34,8 +34,8 @@ jobs:
       BUILD_ARTIFACT: ebs.zip
       COMMIT_URL: ${{github.event.head_commit.url}}
       COMMITTER: ${{github.event.head_commit.committer.name}}
-      CHANGELOG_FILE: './changelog.md'
-      UNIT_TEST_REPORT_FILE: './unit-tests.log'
+      CHANGELOG_FILE: 'apps/webapp/changelog.md'
+      UNIT_TEST_REPORT_FILE: 'apps/webapp/unit-tests.log'
 
     steps:
       - name: Checkout
