@@ -1306,6 +1306,32 @@ export class ConversationRepository {
     return this.initProteus1to1Conversation(proteusConversation.qualifiedId, isProteusSupportedByTheOtherUser);
   }
 
+  async get1to1WithUser(userId: QualifiedId, isLiveUpdate = false): Promise<Conversation | null> {
+    const user = await this.userRepository.getUserById(userId);
+
+    const {protocol, isMLSSupportedByTheOtherUser, isProteusSupportedByTheOtherUser} =
+      await this.getProtocolFor1to1Conversation(userId);
+
+    const localMLSConversation = this.conversationState.findMLS1to1Conversation(userId);
+
+    if (protocol === ConversationProtocol.MLS || localMLSConversation) {
+      /**
+       * When mls 1:1 conversation initialisation is triggered by some live update (e.g other user updates their supported protocols), it's very likely that we will also receive a welcome message shortly.
+       * We have to add a delay to make sure the welcome message is not wasted, in case the self client would establish mls group themselves before receiving the welcome.
+       */
+      const shouldDelayMLSGroupEstablishment = isLiveUpdate && isMLSSupportedByTheOtherUser;
+      return this.initMLS1to1Conversation(userId, isMLSSupportedByTheOtherUser, shouldDelayMLSGroupEstablishment);
+    }
+
+    const proteusConversation = await this.getOrCreateProteus1To1Conversation(user);
+
+    if (!proteusConversation) {
+      return null;
+    }
+
+    return this.initProteus1to1Conversation(proteusConversation.qualifiedId, isProteusSupportedByTheOtherUser);
+  }
+
   /**
    * Get or create a proteus 1:1 conversation with a user.
    * If a conversation does not exist, but user is in the current team, or there's a connection with this user, proteus 1:1 conversation will be created and saved.
