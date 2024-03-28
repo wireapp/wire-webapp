@@ -242,7 +242,6 @@ export class TestFactory {
     await this.exposeTeamActors();
     await this.exposeEventActors();
     await this.exposeSelfActors();
-    await this.exposeCallingActors();
 
     this.conversation_service = new ConversationService(this.event_service);
 
