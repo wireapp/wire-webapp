@@ -45,7 +45,7 @@ import {getTabConversations} from './helpers';
 import {useFolderState} from './state';
 
 import {CallState} from '../../../../calling/CallState';
-import {DefaultLabelIds} from '../../../../conversation/ConversationLabelRepository';
+import {createLabel, DefaultLabelIds} from '../../../../conversation/ConversationLabelRepository';
 import {ConversationRepository} from '../../../../conversation/ConversationRepository';
 import {ConversationState} from '../../../../conversation/ConversationState';
 import {User} from '../../../../entity/User';
@@ -145,7 +145,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   ].includes(currentTab);
 
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
-  const {isOpen: isFolderOpen, openFolder, closeFolder} = useFolderState();
+  const {isOpen: isFolderOpen, openFolder, closeFolder, expandedFolder} = useFolderState();
   const {currentFocus, handleKeyDown, resetConversationFocus} = useConversationFocus(conversations);
   const {conversations: currentTabConversations, searchInputPlaceholder} = getTabConversations({
     currentTab,
@@ -156,6 +156,13 @@ const Conversations: React.FC<ConversationsProps> = ({
     directConversations,
     favoriteConversations,
   });
+
+  const folders = conversationLabelRepository
+    .getLabels()
+    .map(label => createLabel(label.name, conversationLabelRepository.getLabelConversations(label), label.id))
+    .filter(folder => folder.id === expandedFolder);
+
+  const currentFolder = folders[0] ?? null;
 
   const hasNoConversations = conversations.length + connectRequests.length === 0;
 
@@ -309,7 +316,7 @@ const Conversations: React.FC<ConversationsProps> = ({
         id="conversations"
         headerElement={
           <ConversationHeader
-            conversationLabelRepository={conversationLabelRepository}
+            currentFolder={currentFolder}
             currentTab={currentTab}
             selfUser={selfUser}
             showSearchInput={(showSearchInput && currentTabConversations.length !== 0) || !!conversationsFilter}
@@ -353,6 +360,7 @@ const Conversations: React.FC<ConversationsProps> = ({
 
             {showSearchInput && (
               <ConversationsList
+                currentFolder={currentFolder}
                 conversationLabelRepository={conversationLabelRepository}
                 callState={callState}
                 currentTab={currentTab}
