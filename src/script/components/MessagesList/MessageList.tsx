@@ -103,7 +103,7 @@ export const MessagesList: FC<MessagesListParams> = ({
     isGuestAndServicesRoom,
     isActiveParticipant,
     inTeam,
-    is_pending: isPending,
+    isLoadingMessages,
     hasAdditionalMessages,
   } = useKoSubscribableChildren(conversation, [
     'inTeam',
@@ -112,7 +112,7 @@ export const MessagesList: FC<MessagesListParams> = ({
     'lastDeliveredMessage',
     'isGuestRoom',
     'isGuestAndServicesRoom',
-    'is_pending',
+    'isLoadingMessages',
     'hasAdditionalMessages',
   ]);
 
@@ -176,7 +176,7 @@ export const MessagesList: FC<MessagesListParams> = ({
   useLayoutEffect(syncScrollPosition, [syncScrollPosition]);
 
   const loadPrecedingMessages = async (): Promise<void> => {
-    const shouldPullMessages = !isPending && hasAdditionalMessages;
+    const shouldPullMessages = !isLoadingMessages && hasAdditionalMessages;
 
     if (shouldPullMessages) {
       await conversationRepository.getPrecedingMessages(conversation);
@@ -253,7 +253,7 @@ export const MessagesList: FC<MessagesListParams> = ({
       tabIndex={TabIndex.UNFOCUSABLE}
     >
       <div ref={setMessageContainer} className={cx('messages', {'flex-center': verticallyCenterMessage()})}>
-        {groupedMessages.map(group => {
+        {groupedMessages.flatMap(group => {
           if (isMarker(group)) {
             return (
               <MarkerComponent key={`${group.type}-${group.timestamp}`} scrollTo={scrollToElement} marker={group} />
@@ -263,8 +263,6 @@ export const MessagesList: FC<MessagesListParams> = ({
 
           return messages.map(message => {
             const isLastDeliveredMessage = lastDeliveredMessage?.id === message.id;
-
-            const lastMessageInGroup = group.messages[messages.length - 1];
 
             const visibleCallback = getVisibleCallback(conversation, message);
 
@@ -278,7 +276,6 @@ export const MessagesList: FC<MessagesListParams> = ({
                 key={key}
                 onVisible={visibleCallback}
                 message={message}
-                lastMessageInGroup={lastMessageInGroup}
                 hideHeader={message.timestamp() !== firstMessageTimestamp}
                 messageActions={messageActions}
                 conversation={conversation}

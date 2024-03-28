@@ -47,7 +47,7 @@ describe('E2EICertificateDetails', () => {
     const {getByTestId} = render(withTheme(<E2EICertificateDetails />));
 
     const E2EIdentityStatus = getByTestId('e2ei-identity-status');
-    expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.NOT_DOWNLOADED);
+    expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.NOT_ACTIVATED);
   });
 
   it('is e2ei identity expired', async () => {

@@ -89,6 +89,7 @@ const ConversationParticipants: FC<ConversationParticipantsProps> = ({
         onClose={onClose}
         goBackUie="go-back-conversation-participants"
         title={t('conversationParticipantsTitle')}
+        shouldFocusFirstButton={false}
       />
 
       <div className="panel__content conversation-participants__content">

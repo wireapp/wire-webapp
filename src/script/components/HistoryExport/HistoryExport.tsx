@@ -21,6 +21,8 @@ import {useContext, useEffect, useState} from 'react';
 
 import {container} from 'tsyringe';
 
+import {Button, ButtonVariant, FlexBox} from '@wireapp/react-ui-kit';
+
 import {LoadingBar} from 'Components/LoadingBar/LoadingBar';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {ClientState} from 'src/script/client/ClientState';
@@ -205,14 +207,9 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
         <>
           <LoadingBar progress={loadingProgress} message={loadingMessage} className="with-cancel" />
 
-          <button
-            type="button"
-            className="cancel-button accent-text"
-            onClick={onCancel}
-            data-uie-name="do-cancel-history-export"
-          >
+          <Button variant={ButtonVariant.SECONDARY} onClick={onCancel} data-uie-name="do-cancel-history-export">
             {t('backupCancel')}
-          </button>
+          </Button>
         </>
       )}
 
@@ -226,22 +223,20 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
             <p className="history-message__info" data-uie-name="status-history-export-success-info">
               {t('backupExportSuccessSecondary')}
             </p>
+            <FlexBox className="history-message__buttons" justify="center">
+              <Button
+                variant={ButtonVariant.SECONDARY}
+                onClick={dismissExport}
+                data-uie-name="do-cancel-history-export"
+              >
+                {t('backupCancel')}
+              </Button>
 
-            <div className="history-message__buttons">
-              <button className="button" onClick={downloadArchiveFile} data-uie-name="do-save-history-export">
+              <Button onClick={downloadArchiveFile} data-uie-name="do-save-history-export">
                 {t('backupExportSaveFileAction')}
-              </button>
-            </div>
+              </Button>
+            </FlexBox>
           </div>
-
-          <button
-            type="button"
-            className="cancel-button accent-text"
-            onClick={dismissExport}
-            data-uie-name="do-cancel-history-export"
-          >
-            {t('backupCancel')}
-          </button>
         </>
       )}
 
@@ -254,20 +249,19 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
           <p className="history-message__info" data-uie-name="status-history-export-error-info">
             {t('backupExportGenericErrorSecondary')}
           </p>
-
-          <div className="history-message__buttons">
-            <button
-              className="button button-inverted"
-              onClick={exportHistory}
-              data-uie-name="do-try-again-history-export-error"
+          <FlexBox justify="center" className="history-message__buttons">
+            <Button
+              variant={ButtonVariant.SECONDARY}
+              data-uie-name="do-dismiss-history-export-error"
+              onClick={dismissExport}
             >
-              {t('backupTryAgain')}
-            </button>
-
-            <button className="button" data-uie-name="do-dismiss-history-export-error" onClick={dismissExport}>
               {t('backupCancel')}
-            </button>
-          </div>
+            </Button>
+
+            <Button onClick={exportHistory} data-uie-name="do-try-again-history-export-error">
+              {t('backupTryAgain')}
+            </Button>
+          </FlexBox>
         </div>
       )}
     </div>

@@ -216,14 +216,9 @@ const HistoryImport = ({user, backupRepository, file, switchContent}: HistoryImp
           <>
             <LoadingBar progress={loadingProgress} message={loadingMessage} className="with-cancel" />
 
-            <button
-              type="button"
-              className="cancel-button accent-text"
-              onClick={onCancel}
-              data-uie-name="do-cancel-history-import"
-            >
+            <Button variant={ButtonVariant.SECONDARY} onClick={onCancel} data-uie-name="do-cancel-history-import">
               {t('backupCancel')}
-            </button>
+            </Button>
           </>
         )}
 

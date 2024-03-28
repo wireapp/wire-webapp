@@ -76,26 +76,30 @@ export class AppLockRepository {
   };
 
   setEnabled = (enabled: boolean) => {
+    const disableFeature = () => {
+      this.appLockState.isActivatedInPreferences(false);
+      window.localStorage.removeItem(this.getEnabledStorageKey());
+    };
     if (enabled) {
       window.localStorage.setItem(this.getEnabledStorageKey(), 'true');
       this.appLockState.isActivatedInPreferences(true);
-    } else {
+    } else if (this.appLockState.hasPassphrase()) {
+      // If the user has set a passphrase we want to ask confirmation before disabling the feature
       PrimaryModal.show(PrimaryModal.type.CONFIRM, {
         primaryAction: {
-          action: () => {
-            this.appLockState.isActivatedInPreferences(false);
-            window.localStorage.removeItem(this.getEnabledStorageKey());
-          },
-          text: t('featureConfigAppLockTurnOff'),
+          action: disableFeature,
+          text: t('AppLockDisableTurnOff'),
         },
         secondaryAction: {
-          text: t('featureConfigAppLockCancel'),
+          text: t('AppLockDisableCancel'),
         },
         text: {
-          title: t('featureConfigChangeModalApplockHeadline'),
-          message: t('featureConfigChangeModalApplock'),
+          title: t('ApplockDisableHeadline'),
+          message: t('AppLockDisableInfo'),
         },
       });
+    } else {
+      disableFeature();
     }
   };
 

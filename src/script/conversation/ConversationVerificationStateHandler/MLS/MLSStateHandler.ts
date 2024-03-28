@@ -21,7 +21,6 @@ import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {E2eiConversationState} from '@wireapp/core/lib/messagingProtocols/mls';
 import {StringifiedQualifiedId, stringifyQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
-import {container} from 'tsyringe';
 
 import {
   getActiveWireIdentity,
@@ -47,7 +46,7 @@ enum UserVerificationState {
   SOME_INVALID = 1,
 }
 
-class MLSConversationVerificationStateHandler {
+export class MLSConversationVerificationStateHandler {
   private readonly logger: Logger;
 
   public constructor(
@@ -182,7 +181,7 @@ class MLSConversationVerificationStateHandler {
     const conversations = this.conversationState.conversations();
     await Promise.all(conversations.map(conversation => this.checkConversationVerificationState(conversation)));
   };
-  private onEpochChanged = async ({groupId}: {groupId: string}): Promise<void> => {
+  private onEpochChanged = async ({groupId, epoch: newEpoch}: {groupId: string; epoch: number}): Promise<void> => {
     // There could be a race condition where we would receive an epoch update for a conversation that is not yet known by the webapp.
     // We just wait for it to be available and then check the verification state
     const conversation = await waitFor(() =>
@@ -193,10 +192,11 @@ class MLSConversationVerificationStateHandler {
       return this.logger.warn(`Epoch changed but conversation could not be found after waiting for 5 seconds`);
     }
 
+    conversation.epoch = Number(newEpoch);
     return this.checkConversationVerificationState(conversation);
   };
 
-  private checkConversationVerificationState = async (conversation: Conversation): Promise<void> => {
+  public checkConversationVerificationState = async (conversation: Conversation): Promise<void> => {
     const isSelfConversation = conversation.type() === CONVERSATION_TYPE.SELF;
     if (!isMLSConversation(conversation) || isSelfConversation) {
       return;
@@ -235,20 +235,4 @@ export const checkUserHandle = (identity: WireIdentity, user: User): boolean => 
   // We only want to check the username part of the handle
   const {username, domain} = user;
   return identityHandle.includes(`${username()}@${domain}`);
-};
-
-export const registerMLSConversationVerificationStateHandler = (
-  domain: string,
-  onConversationVerificationStateChange: OnConversationE2EIVerificationStateChange = () => {},
-  onSelfClientCertificateRevoked: () => Promise<void> = async () => {},
-  conversationState: ConversationState = container.resolve(ConversationState),
-  core: Core = container.resolve(Core),
-): void => {
-  new MLSConversationVerificationStateHandler(
-    domain,
-    onConversationVerificationStateChange,
-    onSelfClientCertificateRevoked,
-    conversationState,
-    core,
-  );
 };

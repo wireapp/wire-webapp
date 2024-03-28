@@ -73,10 +73,18 @@ describe('getFirstLinkWithOffset', () => {
     const singleTick = 'cool code: `wire.com`';
     const moreTicks = 'cool code: ```\nwire.com\n```';
     const manyTicks = 'cool code: ``````\nwire.com\n``````';
+    const multilineSingleTick = '\ncool code:\n`wire.com`';
+    const multilineManyTicks = '\ncool code:\n```wire.com\nsome more code\n```';
+    const noClosingTicks = 'cool code: ```\nwire.com';
+    const ticksception = "cool code: ```\nwire.com `it's a trap!`\n```";
 
     expect(getFirstLinkWithOffset(singleTick)).toBeUndefined();
     expect(getFirstLinkWithOffset(moreTicks)).toBeUndefined();
     expect(getFirstLinkWithOffset(manyTicks)).toBeUndefined();
+    expect(getFirstLinkWithOffset(multilineSingleTick)).toBeUndefined();
+    expect(getFirstLinkWithOffset(multilineManyTicks)).toBeUndefined();
+    expect(getFirstLinkWithOffset(noClosingTicks)).toBeUndefined();
+    expect(getFirstLinkWithOffset(ticksception)).toBeUndefined();
   });
 
   it('should return the correct link and offset for a single link without text', () => {
@@ -97,6 +105,20 @@ describe('getFirstLinkWithOffset', () => {
     const Link = getFirstLinkWithOffset('Hey check wire.com PLEASE!');
 
     expect(Link.offset).toEqual(10);
+    expect(Link.url).toEqual('wire.com');
+  });
+
+  it('should return the correct link and offset for a single link preceded by a code block', () => {
+    const Link = getFirstLinkWithOffset('```\ntrap.com `extra trap!`\n```\nwire.com');
+
+    expect(Link.offset).toEqual(1);
+    expect(Link.url).toEqual('wire.com');
+  });
+
+  it('should return the correct link and offset for a single link followed by a code block', () => {
+    const Link = getFirstLinkWithOffset('wire.com\n```\ntrap.com `extra trap!`\n```');
+
+    expect(Link.offset).toEqual(0);
     expect(Link.url).toEqual('wire.com');
   });
 

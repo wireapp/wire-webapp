@@ -22,35 +22,50 @@ import {container} from 'tsyringe';
 
 import {MixedConversation} from 'src/script/conversation/ConversationSelectors';
 import {Conversation} from 'src/script/entity/Conversation';
+import {User} from 'src/script/entity/User';
 import {Core} from 'src/script/service/CoreSingleton';
+import {TestFactory} from 'test/helper/TestFactory';
 import {createUuid} from 'Util/uuid';
 
 import {joinUnestablishedMixedConversations} from '.';
 
-const createMixedConversation = (mockGroupId: string): MixedConversation => {
+const createMixedConversation = (mockGroupId: string, epoch = 1): MixedConversation => {
   const conversation = new Conversation(createUuid(), '', ConversationProtocol.MIXED);
   conversation.groupId = mockGroupId;
   conversation.type(CONVERSATION_TYPE.REGULAR);
+  conversation.epoch = epoch;
   return conversation as MixedConversation;
 };
 
 const mockCore = container.resolve(Core);
 
 describe('joinUnestablishedMixedConversations', () => {
+  const testFactory = new TestFactory();
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('Should join known "mixed" conversations with unestablished MLS groups', async () => {
     const mixedConversation1 = createMixedConversation('groupId1');
     const mixedConversation2 = createMixedConversation('groupId2');
     const mixedConversation3 = createMixedConversation('unestablishedGroup3');
     const mixedConversation4 = createMixedConversation('unestablishedGroup4');
 
+    const selfUser = new User(createUuid(), 'domain');
+
     jest.spyOn(mockCore.service!.conversation!, 'mlsGroupExistsLocally').mockImplementation(groupId => {
       return Promise.resolve(!groupId.includes('unestablished'));
     });
 
+    const mockedConversationRepository = await testFactory.exposeConversationActors();
+
     await joinUnestablishedMixedConversations(
       [mixedConversation1, mixedConversation2, mixedConversation3, mixedConversation4],
+      selfUser.qualifiedId,
       {
         core: mockCore,
+        conversationHandler: mockedConversationRepository,
       },
     );
 
@@ -59,5 +74,35 @@ describe('joinUnestablishedMixedConversations', () => {
 
     expect(mockCore.service?.conversation?.joinByExternalCommit).toHaveBeenCalledWith(mixedConversation3.qualifiedId);
     expect(mockCore.service?.conversation?.joinByExternalCommit).toHaveBeenCalledWith(mixedConversation4.qualifiedId);
+  });
+
+  it('Should establish not initialised (epoch 0) mls groups for known "mixed" conversations', async () => {
+    const mixedConversation1 = createMixedConversation('groupId1');
+    const mixedConversation2 = createMixedConversation('groupId2');
+    const mixedConversation3 = createMixedConversation('unestablishedGroup3', 0);
+    const mixedConversation4 = createMixedConversation('unestablishedGroup4', 0);
+
+    const selfUser = new User(createUuid(), 'domain');
+
+    jest.spyOn(mockCore.service!.conversation!, 'mlsGroupExistsLocally').mockImplementation(groupId => {
+      return Promise.resolve(!groupId.includes('unestablished'));
+    });
+
+    const mockedConversationRepository = await testFactory.exposeConversationActors();
+    jest.spyOn(mockedConversationRepository, 'tryEstablishingMLSGroup');
+
+    await joinUnestablishedMixedConversations(
+      [mixedConversation1, mixedConversation2, mixedConversation3, mixedConversation4],
+      selfUser.qualifiedId,
+      {
+        core: mockCore,
+        conversationHandler: mockedConversationRepository,
+      },
+    );
+
+    expect(mockCore.service?.conversation?.mlsGroupExistsLocally).toHaveBeenCalledTimes(2);
+    expect(mockCore.service?.conversation?.joinByExternalCommit).not.toHaveBeenCalled();
+
+    expect(mockedConversationRepository.tryEstablishingMLSGroup).toHaveBeenCalledTimes(2);
   });
 });
