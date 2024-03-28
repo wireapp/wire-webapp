@@ -2194,7 +2194,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@faker-js/faker@npm:8.4.1, @faker-js/faker@npm:^8.0.0":
+"@faker-js/faker@npm:8.4.1":
   version: 8.4.1
   resolution: "@faker-js/faker@npm:8.4.1"
   checksum: 10/5983c2ea64f26055ad6648de748878e11ebe2fb751e3c7435ae141cdffabc2dccfe4c4f49da69a3d2add71e21b415c683ac5fba196fab0d5ed6779fbec436c80
@@ -4459,7 +4459,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/long@npm:^5.0.0":
+"@types/long@npm:5.0.0":
   version: 5.0.0
   resolution: "@types/long@npm:5.0.0"
   dependencies:
@@ -5285,12 +5285,11 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@wireapp/core@workspace:libraries/core"
   dependencies:
-    "@faker-js/faker": "npm:^8.0.0"
-    "@swc/core": "npm:^1.3.10"
-    "@swc/jest": "npm:^0.2.23"
-    "@types/jest": "npm:^29.2.0"
-    "@types/long": "npm:^5.0.0"
-    "@types/tough-cookie": "npm:4.0.5"
+    "@faker-js/faker": "npm:8.4.1"
+    "@swc/core": "npm:1.4.11"
+    "@swc/jest": "npm:0.2.36"
+    "@types/jest": "npm:29.5.12"
+    "@types/long": "npm:5.0.0"
     "@wireapp/api-client": "workspace:^"
     "@wireapp/commons": "workspace:^"
     "@wireapp/core-crypto": "npm:1.0.0-rc.52"
@@ -5301,21 +5300,18 @@ __metadata:
     "@wireapp/store-engine": "npm:5.1.5"
     axios: "npm:1.6.8"
     bazinga64: "npm:6.3.4"
-    commander: "npm:12.0.0"
-    cross-env: "npm:7.0.3"
     deepmerge-ts: "npm:5.1.0"
-    dotenv-defaults: "npm:5.0.2"
-    fake-indexeddb: "npm:^5.0.2"
+    fake-indexeddb: "npm:5.0.2"
     hash.js: "npm:1.1.7"
     http-status-codes: "npm:2.3.0"
     idb: "npm:8.0.0"
-    jest: "npm:^29.2.1"
+    jest: "npm:29.7.0"
     jest-websocket-mock: "npm:2.5.0"
     logdown: "npm:3.3.1"
-    long: "npm:^5.2.0"
+    long: "npm:5.2.3"
     nock: "npm:13.5.4"
     rimraf: "npm:^3.0.2"
-    typescript: "npm:^5.0.4"
+    typescript: "npm:5.4.3"
     uuidjs: "npm:4.2.13"
     zod: "npm:3.22.4"
   languageName: unknown
@@ -7220,13 +7216,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"commander@npm:12.0.0":
-  version: 12.0.0
-  resolution: "commander@npm:12.0.0"
-  checksum: 10/62062e2ffe6abd5aa42a551e62fd5eb9b2620f6ac4299382b2aa9fb02f95cda0242d7e84acb890479bd6491edb805f7f91aecb5b4f5c70dc57df49ed7f02ef14
-  languageName: node
-  linkType: hard
-
 "commander@npm:2.15.1":
   version: 2.15.1
   resolution: "commander@npm:2.15.1"
@@ -8395,15 +8384,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dotenv-defaults@npm:5.0.2":
-  version: 5.0.2
-  resolution: "dotenv-defaults@npm:5.0.2"
-  dependencies:
-    dotenv: "npm:^14.0.0"
-  checksum: 10/72bb863a2e239d09c539af05f9bc62d6fc8fbc51d9eca23829b1a063cf3129da01f6eb8438b320239c3b33e8be325ba8c9c5b8845bb3082e65c75340bdb6a209
-  languageName: node
-  linkType: hard
-
 "dotenv-extended@npm:2.9.0":
   version: 2.9.0
   resolution: "dotenv-extended@npm:2.9.0"
@@ -8422,13 +8402,6 @@ __metadata:
   version: 16.4.5
   resolution: "dotenv@npm:16.4.5"
   checksum: 10/55a3134601115194ae0f924e54473459ed0d9fc340ae610b676e248cca45aa7c680d86365318ea964e6da4e2ea80c4514c1adab5adb43d6867fb57ff068f95c8
-  languageName: node
-  linkType: hard
-
-"dotenv@npm:^14.0.0":
-  version: 14.3.2
-  resolution: "dotenv@npm:14.3.2"
-  checksum: 10/b735b395979a62a046bf3e853e747c6f7128c2c4629c5a1dc598171b7fac90e232d8fb93bee2636934de5b2f78b7de92ca668609911e9b33f3ce2c17e021d84e
   languageName: node
   linkType: hard
 
@@ -9625,7 +9598,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fake-indexeddb@npm:5.0.2, fake-indexeddb@npm:^5.0.2":
+"fake-indexeddb@npm:5.0.2":
   version: 5.0.2
   resolution: "fake-indexeddb@npm:5.0.2"
   checksum: 10/8bbe74fe29c2d8e9bf97928f4c7af87afa63f2458cd4992897f65aa5a8c2828fd48cb6f0510593442eb1ab5465d5cc08a1cd4c478fa234514e22a627adf0e2ac
@@ -13346,7 +13319,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"long@npm:*, long@npm:5.2.3, long@npm:^5.0.0, long@npm:^5.2.0":
+"long@npm:*, long@npm:5.2.3, long@npm:^5.0.0":
   version: 5.2.3
   resolution: "long@npm:5.2.3"
   checksum: 10/9167ec6947a825b827c30da169a7384eec6c0c9ec2f0b9c74da2e93d81159bbe39fb09c3f13dae9721d4b807ccfa09797a7dd1012f5d478e3e33ca3c78b608e6
