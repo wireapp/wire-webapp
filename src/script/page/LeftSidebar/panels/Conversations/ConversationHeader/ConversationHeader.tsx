@@ -19,13 +19,21 @@
 
 import {amplify} from 'amplify';
 
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
+import {Button, ButtonVariant, CircleCloseIcon, Input, SearchIcon} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Icon} from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 
-import {button, header, label} from './ConversationHeader.styles';
+import {
+  button,
+  header,
+  label,
+  closeIconStyles,
+  searchIconStyles,
+  searchInputStyles,
+  searchInputWrapperStyles,
+} from './ConversationHeader.styles';
 
 import {User} from '../../../../../entity/User';
 import {generatePermissionHelpers} from '../../../../../user/UserPermission';
@@ -34,9 +42,20 @@ import {SidebarTabs} from '../Conversations';
 interface ConversationHeaderProps {
   currentTab: SidebarTabs;
   selfUser: User;
+  showSearchInput?: boolean;
+  searchValue?: string;
+  setSearchValue: (searchValue: string) => void;
+  searchInputPlaceholder: string;
 }
 
-export const ConversationHeader = ({currentTab, selfUser}: ConversationHeaderProps) => {
+export const ConversationHeader = ({
+  currentTab,
+  selfUser,
+  showSearchInput = false,
+  searchValue = '',
+  setSearchValue,
+  searchInputPlaceholder,
+}: ConversationHeaderProps) => {
   const {canCreateGroupConversation} = generatePermissionHelpers(selfUser.teamRole());
 
   const conversationsHeaderTitle: Partial<Record<SidebarTabs, string>> = {
@@ -50,21 +69,40 @@ export const ConversationHeader = ({currentTab, selfUser}: ConversationHeaderPro
   };
 
   return (
-    <div css={header}>
-      <span css={label}>{conversationsHeaderTitle[currentTab]}</span>
+    <>
+      <div css={header}>
+        <span css={label}>{conversationsHeaderTitle[currentTab]}</span>
 
-      {canCreateGroupConversation() && (
-        <Button
-          variant={ButtonVariant.TERTIARY}
-          onClick={() => amplify.publish(WebAppEvents.CONVERSATION.CREATE_GROUP, 'conversation_details')}
-          data-uie-name="go-create-group"
-          css={button}
-        >
-          <Icon.Plus />
+        {currentTab !== SidebarTabs.ARCHIVES && canCreateGroupConversation() && (
+          <Button
+            variant={ButtonVariant.TERTIARY}
+            onClick={() => amplify.publish(WebAppEvents.CONVERSATION.CREATE_GROUP, 'conversation_details')}
+            data-uie-name="go-create-group"
+            css={button}
+          >
+            <Icon.Plus />
 
-          {t('conversationGroupCreate')}
-        </Button>
+            {t('conversationGroupCreate')}
+          </Button>
+        )}
+      </div>
+
+      {showSearchInput && (
+        <Input
+          className="label-1"
+          value={searchValue}
+          onChange={event => setSearchValue(event.currentTarget.value)}
+          startContent={<SearchIcon width={14} height={14} css={searchIconStyles} />}
+          endContent={
+            searchValue && (
+              <CircleCloseIcon className="cursor-pointer" onClick={() => setSearchValue('')} css={closeIconStyles} />
+            )
+          }
+          inputCSS={searchInputStyles}
+          wrapperCSS={searchInputWrapperStyles}
+          placeholder={searchInputPlaceholder}
+        />
       )}
-    </div>
+    </>
   );
 };

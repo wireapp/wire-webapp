@@ -32,9 +32,10 @@ import {SidebarTabs} from '../Conversations';
 interface EmptyConversationListProps {
   currentTab: SidebarTabs;
   onChangeTab: (tab: SidebarTabs) => void;
+  searchValue?: string;
 }
 
-export const EmptyConversationList = ({currentTab, onChangeTab}: EmptyConversationListProps) => {
+export const EmptyConversationList = ({currentTab, onChangeTab, searchValue = ''}: EmptyConversationListProps) => {
   const ConnectWithNewUsersButton = () => (
     <Button
       variant={ButtonVariant.TERTIARY}
@@ -50,7 +51,7 @@ export const EmptyConversationList = ({currentTab, onChangeTab}: EmptyConversati
     return (
       <div css={wrapper}>
         <div>
-          <p css={paragraph}>{t('conversationAllWelcomeMessage')}</p>
+          <p css={paragraph}>{searchValue ? t('searchConversationsNoResult') : t('conversationAllWelcomeMessage')}</p>
 
           <ConnectWithNewUsersButton />
 
@@ -73,7 +74,9 @@ export const EmptyConversationList = ({currentTab, onChangeTab}: EmptyConversati
     return (
       <div css={wrapper}>
         <div>
-          <p css={paragraph}>{t('conversationFavoritesTabEmptyMessage')}</p>
+          <p css={paragraph}>
+            {searchValue ? t('searchConversationsNoResult') : t('conversationFavoritesTabEmptyMessage')}
+          </p>
 
           <Link
             variant={LinkVariant.PRIMARY}
@@ -92,7 +95,7 @@ export const EmptyConversationList = ({currentTab, onChangeTab}: EmptyConversati
     return (
       <div css={wrapper}>
         <div>
-          <p css={paragraph}>{t('conversationGroupEmptyMessage')}</p>
+          <p css={paragraph}>{searchValue ? t('searchConversationsNoResult') : t('conversationGroupEmptyMessage')}</p>
 
           <ConnectWithNewUsersButton />
 
@@ -115,9 +118,19 @@ export const EmptyConversationList = ({currentTab, onChangeTab}: EmptyConversati
     return (
       <div css={wrapper}>
         <div>
-          <p css={paragraph}>{t('conversationDirectEmptyMessage')}</p>
+          <p css={paragraph}>{searchValue ? t('searchConversationsNoResult') : t('conversationDirectEmptyMessage')}</p>
 
           <ConnectWithNewUsersButton />
+        </div>
+      </div>
+    );
+  }
+
+  if (currentTab === SidebarTabs.ARCHIVES) {
+    return (
+      <div css={wrapper}>
+        <div>
+          <p css={paragraph}>{searchValue ? t('searchConversationsNoResult') : t('conversationsAllArchived')}</p>
         </div>
       </div>
     );
