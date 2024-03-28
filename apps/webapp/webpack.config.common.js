@@ -26,6 +26,8 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const DIST_PATH = path.resolve(__dirname, 'server/dist');
 const ROOT_PATH = path.resolve(__dirname);
 const SRC_PATH = path.resolve(__dirname, 'src');
+// to get the root node_modules path, we resolve the path to `webpack` and then just get the base of the node_modules path
+const ROOT_NODE_MODULES = require.resolve('webpack').replace(/node_modules\/webpack\/.*$/, 'node_modules');
 
 const dist = path.resolve(DIST_PATH, 'static');
 const auth = path.resolve(SRC_PATH, 'script/auth');
@@ -142,7 +144,7 @@ module.exports = {
     new CopyPlugin({
       patterns: [
         {
-          context: 'node_modules/@wireapp/core-crypto/platforms/web',
+          context: `${ROOT_NODE_MODULES}/@wireapp/core-crypto/platforms/web`,
           from: '*.wasm',
           to: `${dist}/min/core-crypto.wasm`,
         },

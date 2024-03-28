@@ -29,7 +29,6 @@ const config: Config = {
     'I18n/(.*)': '<rootDir>/src/i18n/$1',
     'Resource/(.*)': '<rootDir>/resource/$1',
     'Util/(.*)': '<rootDir>/src/script/util/$1',
-    '^react(.*)$': '<rootDir>/node_modules/react$1',
   },
   reporters: ['default', 'github-actions'],
   setupFilesAfterEnv: ['<rootDir>/setupTests.js'],
