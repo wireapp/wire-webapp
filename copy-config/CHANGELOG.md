@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.2.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/copy-config@2.1.18...@wireapp/copy-config@2.2.0) (2024-03-28)
+
+### Features
+
+* **copy-config:** allow configuring the log level ([#6112](https://github.com/wireapp/wire-web-packages/issues/6112)) ([e59b90c](https://github.com/wireapp/wire-web-packages/commit/e59b90c54d95dba24bdde5933972fa8d536e9c12))
+
 ## [2.1.18](https://github.com/wireapp/wire-web-packages/compare/@wireapp/copy-config@2.1.17...@wireapp/copy-config@2.1.18) (2024-03-25)
 
 ### Bug Fixes
