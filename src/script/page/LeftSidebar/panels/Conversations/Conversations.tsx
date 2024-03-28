@@ -22,17 +22,10 @@ import React, {useEffect, useState} from 'react';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
-import {CircleCloseIcon, Input, SearchIcon} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {CallingCell} from 'Components/calling/CallingCell';
 import {IntegrationRepository} from 'src/script/integration/IntegrationRepository';
-import {
-  closeIconStyles,
-  searchIconStyles,
-  searchInputStyles,
-  searchInputWrapperStyles,
-} from 'src/script/page/LeftSidebar/panels/Conversations/Conversations.styles';
 import {Preferences} from 'src/script/page/LeftSidebar/panels/Preferences';
 import {StartUI} from 'src/script/page/LeftSidebar/panels/StartUI';
 import {ANIMATED_PAGE_TRANSITION_DURATION} from 'src/script/page/MainContent';
@@ -42,7 +35,6 @@ import {SearchRepository} from 'src/script/search/SearchRepository';
 import {TeamRepository} from 'src/script/team/TeamRepository';
 import {UserRepository} from 'src/script/user/UserRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
 
 import {ConversationHeader} from './ConversationHeader';
 import {ConversationsList} from './ConversationsList';
@@ -295,60 +287,28 @@ const Conversations: React.FC<ConversationsProps> = ({
     <div className="conversations-wrapper">
       <ListWrapper
         id="conversations"
-        headerElement={<ConversationHeader currentTab={currentTab} selfUser={selfUser} />}
+        headerElement={
+          <ConversationHeader
+            currentTab={currentTab}
+            selfUser={selfUser}
+            showSearchInput={(showSearchInput && currentTabConversations.length !== 0) || !!conversationsFilter}
+            searchValue={conversationsFilter}
+            setSearchValue={setConversationsFilter}
+            searchInputPlaceholder={searchInputPlaceholder}
+          />
+        }
         hasHeader={!isPreferences}
         sidebar={sidebar}
         before={callingView}
       >
-        {isPreferences && (
+        {isPreferences ? (
           <Preferences
             onPreferenceItemClick={onClickPreferences}
             teamRepository={teamRepository}
             preferenceNotificationRepository={preferenceNotificationRepository}
           />
-        )}
-
-        {isPreferences ? null : hasNoConversations ? (
-          <>
-            {archivedConversations.length === 0 ? (
-              <EmptyConversationList currentTab={currentTab} onChangeTab={changeTab} />
-            ) : (
-              <div className="conversations-all-archived">{t('conversationsAllArchived')}</div>
-            )}
-          </>
         ) : (
           <>
-            {showSearchInput && (
-              <Input
-                className="label-1"
-                value={conversationsFilter}
-                onChange={event => {
-                  setConversationsFilter(event.currentTarget.value);
-                }}
-                startContent={<SearchIcon width={14} height={14} css={searchIconStyles} />}
-                endContent={
-                  conversationsFilter && (
-                    <CircleCloseIcon
-                      className="cursor-pointer"
-                      onClick={() => setConversationsFilter('')}
-                      css={closeIconStyles}
-                    />
-                  )
-                }
-                inputCSS={searchInputStyles}
-                wrapperCSS={searchInputWrapperStyles}
-                placeholder={searchInputPlaceholder}
-              />
-            )}
-            {showSearchInput && currentTabConversations.length === 0 && (
-              <div className="conversations-centered">
-                <div>{t('searchConversationsNoResult')}</div>
-                <button className="button-reset-default text-underline" onClick={() => changeTab(SidebarTabs.CONNECT)}>
-                  {t('searchConversationsNoResultConnectSuggestion')}
-                </button>
-              </div>
-            )}
-
             {currentTab === SidebarTabs.CONNECT && (
               <StartUI
                 conversationRepository={conversationRepository}
@@ -359,6 +319,14 @@ const Conversations: React.FC<ConversationsProps> = ({
                 userRepository={userRepository}
                 isFederated={listViewModel.isFederated}
                 selfUser={selfUser}
+              />
+            )}
+
+            {((showSearchInput && currentTabConversations.length === 0) || hasNoConversations) && (
+              <EmptyConversationList
+                currentTab={currentTab}
+                onChangeTab={changeTab}
+                searchValue={conversationsFilter}
               />
             )}
 
