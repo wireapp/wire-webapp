@@ -251,24 +251,6 @@ export class CallingRepository {
         this.requestVideoStreams(call.conversationId, call.activeSpeakers());
       }
     });
-
-    this.mediaDevicesHandler.setOnMediaDevicesRefreshHandler(() => {
-      const activeCall = this.callState.joinedCall();
-
-      if (!activeCall) {
-        return;
-      }
-
-      const selfParticipant = activeCall.getSelfParticipant();
-
-      if (!selfParticipant.isMuted()) {
-        void this.refreshAudioInput();
-      }
-
-      if (selfParticipant.isSendingVideo()) {
-        void this.refreshVideoInput();
-      }
-    });
   }
 
   get subconversationService() {
@@ -301,6 +283,25 @@ export class CallingRepository {
 
     this.wCall = this.configureCallingApi(callingInstance);
     this.wUser = this.createWUser(this.wCall, this.serializeQualifiedId(this.selfUser.qualifiedId), clientId);
+
+    this.mediaDevicesHandler.setOnMediaDevicesRefreshHandler(() => {
+      const activeCall = this.callState.joinedCall();
+
+      if (!activeCall) {
+        return;
+      }
+
+      const selfParticipant = activeCall.getSelfParticipant();
+
+      if (!selfParticipant.isMuted()) {
+        void this.refreshAudioInput();
+      }
+
+      if (selfParticipant.isSendingVideo()) {
+        void this.refreshVideoInput();
+      }
+    });
+
     return {wCall: this.wCall, wUser: this.wUser};
   }
 
