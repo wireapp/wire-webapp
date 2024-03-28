@@ -55,7 +55,7 @@ interface ConversationsListProps {
   conversationLabelRepository: ConversationLabelRepository;
   currentTab: SidebarTabs;
   currentFocus: string;
-  currentFolder: ConversationLabel;
+  currentFolder?: ConversationLabel;
   resetConversationFocus: () => void;
   handleArrowKeyDown: (index: number) => (e: React.KeyboardEvent) => void;
 }

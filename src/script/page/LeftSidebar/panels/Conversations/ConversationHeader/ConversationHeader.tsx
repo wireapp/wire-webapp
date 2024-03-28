@@ -47,7 +47,7 @@ interface ConversationHeaderProps {
   searchValue?: string;
   setSearchValue: (searchValue: string) => void;
   searchInputPlaceholder: string;
-  currentFolder: ConversationLabel;
+  currentFolder?: ConversationLabel;
 }
 
 export const ConversationHeader = ({

@@ -157,12 +157,10 @@ const Conversations: React.FC<ConversationsProps> = ({
     favoriteConversations,
   });
 
-  const folders = conversationLabelRepository
+  const currentFolder = conversationLabelRepository
     .getLabels()
     .map(label => createLabel(label.name, conversationLabelRepository.getLabelConversations(label), label.id))
-    .filter(folder => folder.id === expandedFolder);
-
-  const currentFolder = folders[0] ?? null;
+    .find(folder => folder.id === expandedFolder);
 
   const hasNoConversations = conversations.length + connectRequests.length === 0;
 
