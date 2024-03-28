@@ -6,6 +6,7 @@
   "private": true,
   "packageManager": "yarn@4.1.1",
   "workspaces": [
+    "libraries/*",
     "apps/*",
     "apps/webapp/server"
   ],
@@ -17,9 +18,9 @@
   },
   "scripts": {
     "postinstall": "husky install",
-    "dev": "yarn workspaces foreach -A run dev",
-    "lint": "yarn workspaces foreach -A run lint",
-    "test": "yarn workspaces foreach -A run test"
+    "dev": "yarn workspaces foreach -Api run dev",
+    "lint": "yarn workspaces foreach -Ap run lint",
+    "test": "yarn workspaces foreach -Ap run test"
   },
   "prettier": "@wireapp/prettier-config"
 }
