@@ -29,12 +29,10 @@
   },
   "scripts": {
     "build": "yarn clean && tsc",
-    "dev": "tsc -w",
     "clean": "rimraf lib",
-    "dist": "yarn build",
+    "dev": "tsc -w",
     "test": "jest",
-    "test:coverage": "yarn test",
-    "test:watch": "yarn jest --watch"
+    "test:coverage": "yarn test"
   },
   "version": "5.2.7"
 }
