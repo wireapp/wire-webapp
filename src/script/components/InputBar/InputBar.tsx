@@ -349,19 +349,20 @@ export const InputBar = ({
     resetDraftState();
   };
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
+    await conversationRepository.refreshMLSConversationVerificationState(conversation);
     const isE2EIDegraded = conversation.mlsVerificationState() === ConversationVerificationState.DEGRADED;
 
     if (isE2EIDegraded) {
       PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-        primaryAction: {
+        secondaryAction: {
           action: () => {
             conversation.mlsVerificationState(ConversationVerificationState.UNVERIFIED);
             sendMessage();
           },
           text: t('conversation.E2EISendAnyway'),
         },
-        secondaryAction: {
+        primaryAction: {
           action: () => {},
           text: t('conversation.E2EICancel'),
         },

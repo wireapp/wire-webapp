@@ -64,8 +64,9 @@ export const Device = ({device, isSSO, onSelect, onRemove, getDeviceIdentity, de
       className="preferences-devices-card"
       onClick={onDeviceSelect}
       onKeyDown={event => handleKeyDown(event, onDeviceSelect)}
-      tabIndex={TabIndex.FOCUSABLE}
       role="button"
+      aria-label={t('accessibility.headings.preferencesDeviceDetails')}
+      tabIndex={TabIndex.FOCUSABLE}
     >
       <div className="preferences-devices-card-info">
         <div
@@ -77,7 +78,7 @@ export const Device = ({device, isSSO, onSelect, onRemove, getDeviceIdentity, de
           <DeviceVerificationBadges device={device} getIdentity={getDeviceIdentity} />
         </div>
 
-        {deviceIdentity && (
+        {deviceIdentity?.thumbprint && (
           <p className="preferences-devices-id">
             <span>{t('preferencesMLSThumbprint')}</span>
 

@@ -43,6 +43,7 @@ export interface PanelHeaderProps {
   title?: string;
   handleBlur?: () => void;
   onToggleMute?: () => void;
+  shouldFocusFirstButton?: boolean;
 }
 
 const PanelHeader: FC<PanelHeaderProps> = ({
@@ -61,11 +62,12 @@ const PanelHeader: FC<PanelHeaderProps> = ({
   handleBlur = noop,
   onGoBack = noop,
   onToggleMute = noop,
+  shouldFocusFirstButton = true,
 }: PanelHeaderProps) => {
   const panelHeaderRef = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
-    if (!!panelHeaderRef.current) {
+    if (!!panelHeaderRef.current && shouldFocusFirstButton) {
       const nextElementToFocus = panelHeaderRef.current.querySelector('button');
       // TO-DO Remove setTimeout after replacing transition group animation libray
       // triggering focus method without setTimeout is not working due to right side bar animation
@@ -73,7 +75,7 @@ const PanelHeader: FC<PanelHeaderProps> = ({
         nextElementToFocus?.focus();
       }, 0);
     }
-  }, []);
+  }, [shouldFocusFirstButton]);
 
   return (
     <header className={cx('panel__header', {'panel__header--reverse': isReverse}, className)} ref={panelHeaderRef}>

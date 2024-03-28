@@ -34,24 +34,27 @@ export type AssetUrl = {
   dispose: () => void;
 };
 
-export const useAssetTransfer = (message: ContentMessage, assetRepository = container.resolve(AssetRepository)) => {
+export const useAssetTransfer = (message?: ContentMessage, assetRepository = container.resolve(AssetRepository)) => {
   const asset = message?.getFirstAsset() as FileAsset;
   const [uploadProgress, setUploadProgress] = useState<number>(0);
 
   useEffect(() => {
+    if (!message) {
+      return () => {};
+    }
     const progressSubscribable = assetRepository.getUploadProgress(message?.id);
     setUploadProgress(progressSubscribable());
     const subscription = progressSubscribable.subscribe(value => setUploadProgress(value));
     return () => {
       subscription.dispose();
     };
-  }, [message]);
+  }, [assetRepository, message]);
 
   const {status} = useKoSubscribableChildren(asset, ['status']);
   const transferState = uploadProgress > -1 ? AssetTransferState.UPLOADING : status;
 
   return {
-    cancelUpload: () => assetRepository.cancelUpload(message.id),
+    cancelUpload: () => message && assetRepository.cancelUpload(message?.id),
     downloadAsset: (asset: FileAsset) => assetRepository.downloadFile(asset),
     isDownloading: transferState === AssetTransferState.DOWNLOADING,
     isPendingUpload: transferState === AssetTransferState.UPLOAD_PENDING,

@@ -30,6 +30,7 @@ export const header: CSSObject = {
 export const label: CSSObject = {
   color: 'var(--main-color)',
   fontWeight: 'var(--font-weight-semibold)',
+  paddingBlock: '8px',
 };
 
 export const button: CSSObject = {
@@ -38,4 +39,32 @@ export const button: CSSObject = {
   svg: {
     marginRight: '8px',
   },
+};
+
+const commonIconStyles: CSSObject = {
+  top: '50%',
+  position: 'absolute',
+  transform: 'translateY(-50%)',
+};
+
+export const searchIconStyles: CSSObject = {
+  ...commonIconStyles,
+  left: 10,
+};
+
+export const closeIconStyles: CSSObject = {
+  ...commonIconStyles,
+  right: 10,
+};
+
+export const searchInputStyles: CSSObject = {
+  height: '32px',
+  borderRadius: 8,
+  paddingLeft: 36,
+};
+
+export const searchInputWrapperStyles: CSSObject = {
+  zIndex: 1,
+  position: 'relative',
+  marginBlock: '8px',
 };

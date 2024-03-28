@@ -159,6 +159,7 @@
   .flex-center;
   width: var(--conversation-message-sender-width);
   max-height: @avatar-diameter-xs;
+  flex-shrink: 0;
 
   align-self: center;
   color: var(--background);
@@ -283,6 +284,7 @@
 
   &:not(&.message-quoted):has(.message-quote__text--full pre) {
     display: flex;
+    flex-wrap: wrap;
   }
 
   .text {
@@ -679,6 +681,7 @@
 // MESSAGE SPACING
 .message-asset {
   display: flex;
+  flex-basis: 100%;
   align-items: flex-start;
   padding-block: 6px;
 }

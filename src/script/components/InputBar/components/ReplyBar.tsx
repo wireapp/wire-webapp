@@ -26,7 +26,7 @@ import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {RestrictedVideo} from 'Components/asset/RestrictedVideo';
 import {ParticipantMicOnIcon} from 'Components/calling/ParticipantMicOnIcon';
 import {Icon} from 'Components/Icon';
-import {Image} from 'Components/Image';
+import {AssetImage} from 'Components/Image';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {renderMessage} from 'Util/messageRenderer';
@@ -93,11 +93,7 @@ const ReplyBar: FC<ReplyBarProps> = ({replyMessageEntity, onCancel}) => {
               tabIndex={TabIndex.FOCUSABLE}
               aria-label={replyAsset.file_name}
             >
-              <Image
-                className="bar__reply__message input-bar__reply__message__image"
-                asset={replyAsset.resource()}
-                isQuote
-              />
+              <AssetImage className="bar__reply__message input-bar__reply__message__image" image={replyAsset} isQuote />
             </div>
           )}
 

@@ -17,33 +17,4 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
-
-const commonIconStyles: CSSObject = {
-  top: '50%',
-  position: 'absolute',
-  transform: 'translateY(-50%)',
-};
-
-export const searchIconStyles: CSSObject = {
-  ...commonIconStyles,
-  left: 10,
-};
-
-export const closeIconStyles: CSSObject = {
-  ...commonIconStyles,
-  right: 10,
-};
-
-export const searchInputStyles: CSSObject = {
-  height: '32px',
-  borderRadius: 8,
-  paddingLeft: 36,
-};
-
-export const searchInputWrapperStyles: CSSObject = {
-  marginBlock: 12,
-  paddingInline: 16,
-  zIndex: 1,
-  position: 'relative',
-};
+export * from './MessageButton';

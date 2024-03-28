@@ -116,9 +116,9 @@ const GuestOptions: FC<GuestOptionsProps> = ({
     return isGuestEnabled ? t('guestOptionsInfoText', Config.getConfig().BRAND_NAME) : t('guestRoomToggleInfo');
   }, [inTeam, isGuestEnabled, accessCodeHasPassword]);
 
-  const guestLinkDisabledInfo = !conversationHasGuestLinkEnabled
-    ? t('guestLinkDisabledByOtherTeam')
-    : t('guestLinkDisabled');
+  const guestLinkDisabledInfo = !isTeamStateGuestLinkEnabled
+    ? t('guestLinkDisabled')
+    : t('guestLinkDisabledByOtherTeam');
 
   const toggleGuestAccess = async () => {
     await toggleAccessState(

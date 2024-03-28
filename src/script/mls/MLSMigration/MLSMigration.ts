@@ -169,7 +169,10 @@ const migrateConversationsToMLS = async ({
   await initialiseMigrationOfProteusConversations(selfTeamGroupConversations, selfUserId, conversationHandler);
 
   const allGroupConversations = conversationHandler.getAllGroupConversations();
-  await joinUnestablishedMixedConversations(allGroupConversations, {core});
+  await joinUnestablishedMixedConversations(allGroupConversations, selfUserId, {
+    core,
+    conversationHandler,
+  });
 
   await finaliseMigrationOfMixedConversations(
     selfTeamGroupConversations,

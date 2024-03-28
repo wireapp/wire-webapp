@@ -96,8 +96,14 @@ import {ConversationState} from './ConversationState';
 import {ConversationStateHandler} from './ConversationStateHandler';
 import {ConversationStatus} from './ConversationStatus';
 import {ConversationVerificationState} from './ConversationVerificationState';
-import {ProteusConversationVerificationStateHandler} from './ConversationVerificationStateHandler';
-import {OnConversationVerificationStateChange} from './ConversationVerificationStateHandler/shared';
+import {
+  MLSConversationVerificationStateHandler,
+  ProteusConversationVerificationStateHandler,
+} from './ConversationVerificationStateHandler';
+import {
+  OnConversationE2EIVerificationStateChange,
+  OnConversationVerificationStateChange,
+} from './ConversationVerificationStateHandler/shared';
 import {EventMapper} from './EventMapper';
 import {MessageRepository} from './MessageRepository';
 import {NOTIFICATION_STATE} from './NotificationSetting';
@@ -173,6 +179,7 @@ export class ConversationRepository {
   private readonly logger: Logger;
   public readonly stateHandler: ConversationStateHandler;
   public readonly proteusVerificationStateHandler: ProteusConversationVerificationStateHandler;
+  private mlsConversationVerificationStateHandler?: MLSConversationVerificationStateHandler;
 
   static get CONFIG() {
     return {
@@ -315,6 +322,26 @@ export class ConversationRepository {
       this.scheduleMissingUsersAndConversationsMetadataRefresh();
     }
   }
+
+  public registerMLSConversationVerificationStateHandler = (
+    domain: string,
+    onConversationVerificationStateChange: OnConversationE2EIVerificationStateChange = () => {},
+    onSelfClientCertificateRevoked: () => Promise<void> = async () => {},
+  ): void => {
+    this.mlsConversationVerificationStateHandler = new MLSConversationVerificationStateHandler(
+      domain,
+      onConversationVerificationStateChange,
+      onSelfClientCertificateRevoked,
+      this.conversationState,
+      this.core,
+    );
+  };
+
+  public refreshMLSConversationVerificationState = async (conversation: Conversation) => {
+    if (this.mlsConversationVerificationStateHandler) {
+      await this.mlsConversationVerificationStateHandler.checkConversationVerificationState(conversation);
+    }
+  };
 
   checkMessageTimer(messageEntity: ContentMessage): void {
     this.ephemeralHandler.checkMessageTimer(messageEntity, this.serverTimeHandler.getTimeOffset());
@@ -809,7 +836,7 @@ export class ConversationRepository {
    * @returns Resolves with the messages
    */
   public async getPrecedingMessages(conversationEntity: Conversation): Promise<ContentMessage[]> {
-    conversationEntity.is_pending(true);
+    conversationEntity.isLoadingMessages(true);
 
     const firstMessageEntity = conversationEntity.getOldestMessage();
     const upperBound =
@@ -824,7 +851,7 @@ export class ConversationRepository {
       Config.getConfig().MESSAGES_FETCH_LIMIT,
     )) as EventRecord[];
     const mappedMessageEntities = await this.addPrecedingEventsToConversation(events, conversationEntity);
-    conversationEntity.is_pending(false);
+    conversationEntity.isLoadingMessages(false);
     return mappedMessageEntities;
   }
 
@@ -905,7 +932,7 @@ export class ConversationRepository {
     const messageDate = new Date(messageEntity.timestamp());
     const conversationId = conversationEntity.id;
 
-    conversationEntity.is_pending(true);
+    conversationEntity.isLoadingMessages(true);
 
     const precedingMessages = (await this.eventService.loadPrecedingEvents(
       conversationId,
@@ -920,7 +947,7 @@ export class ConversationRepository {
     )) as EventRecord[];
     const messages = precedingMessages.concat(followingMessages);
     const mappedMessageEntities = await this.addEventsToConversation(messages, conversationEntity);
-    conversationEntity.is_pending(false);
+    conversationEntity.isLoadingMessages(false);
     return mappedMessageEntities;
   }
 
@@ -930,7 +957,7 @@ export class ConversationRepository {
    */
   async getSubsequentMessages(conversationEntity: Conversation, messageEntity: ContentMessage) {
     const messageDate = new Date(messageEntity.timestamp());
-    conversationEntity.is_pending(true);
+    conversationEntity.isLoadingMessages(true);
 
     const events = (await this.eventService.loadFollowingEvents(
       conversationEntity.id,
@@ -938,7 +965,7 @@ export class ConversationRepository {
       Config.getConfig().MESSAGES_FETCH_LIMIT,
     )) as EventRecord[];
     const mappedMessageEntities = await this.addEventsToConversation(events, conversationEntity, {prepend: false});
-    conversationEntity.is_pending(false);
+    conversationEntity.isLoadingMessages(false);
     return mappedMessageEntities;
   }
 
@@ -982,7 +1009,7 @@ export class ConversationRepository {
       : new Date(conversationEntity.getLatestTimestamp(this.serverTimeHandler.toServerTimestamp()) + 1);
 
     if (lower_bound < upper_bound) {
-      conversationEntity.is_pending(true);
+      conversationEntity.isLoadingMessages(true);
 
       try {
         const events = (await this.eventService.loadPrecedingEvents(
@@ -998,7 +1025,7 @@ export class ConversationRepository {
       } catch (error) {
         this.logger.info(`Could not load unread events for conversation: ${conversationEntity.id}`, error);
       }
-      conversationEntity.is_pending(false);
+      conversationEntity.isLoadingMessages(false);
     }
   }
 
@@ -1059,20 +1086,28 @@ export class ConversationRepository {
     });
   }
 
-  public deleteConversation(conversationEntity: Conversation) {
-    this.conversationService
-      .deleteConversation(this.teamState.team().id, conversationEntity.id)
-      .then(() => {
-        this.deleteConversationLocally(conversationEntity, true);
-      })
-      .catch(() => {
-        PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-          text: {
-            message: t('modalConversationDeleteErrorMessage', conversationEntity.name()),
-            title: t('modalConversationDeleteErrorHeadline'),
-          },
-        });
+  public async deleteConversation(conversationEntity: Conversation) {
+    const teamId = this.teamState.team().id;
+    if (!teamId) {
+      throw new Error('Team ID is missing');
+    }
+
+    try {
+      await this.conversationService.deleteConversation(teamId, conversationEntity.id);
+      return this.deleteConversationLocally(conversationEntity, true);
+    } catch (error) {
+      const isAlreadyDeletedOnBackend = isBackendError(error) && error.label === BackendErrorLabel.NO_CONVERSATION;
+      if (isAlreadyDeletedOnBackend) {
+        return this.deleteConversationLocally(conversationEntity, true);
+      }
+
+      PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
+        text: {
+          message: t('modalConversationDeleteErrorMessage', conversationEntity.name()),
+          title: t('modalConversationDeleteErrorHeadline'),
+        },
       });
+    }
   }
 
   private readonly deleteConversationLocally = async (conversationId: QualifiedId, skipNotification: boolean) => {
@@ -2065,7 +2100,7 @@ export class ConversationRepository {
         // We need to check if the conversation exists on backend
         await this.conversationService.getConversationById(inccessibleConversation);
       } catch (error) {
-        if (error instanceof ConversationError && error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND) {
+        if (isBackendError(error) && error.label === BackendErrorLabel.NO_CONVERSATION) {
           // Only if the conversation triggers a not found error, we delete it locally
           await this.deleteConversationLocally(inccessibleConversation, true);
         }
@@ -2710,18 +2745,35 @@ export class ConversationRepository {
     const userEntity = await this.userRepository.getUserById(userId);
     const eventInjections = this.conversationState
       .conversations()
-      .filter(conversationEntity => {
-        const conversationInTeam = conversationEntity.teamId === teamId;
-        const userIsParticipant = UserFilter.isParticipant(conversationEntity, userId);
-        return conversationInTeam && userIsParticipant && !conversationEntity.removed_from_conversation();
+      .filter(conversation => {
+        const conversationInTeam = conversation.teamId === teamId;
+        const userIsParticipant = UserFilter.isParticipant(conversation, userId);
+        return conversationInTeam && userIsParticipant && !conversation.removed_from_conversation();
       })
-      .map(conversationEntity => {
-        const leaveEvent = EventBuilder.buildTeamMemberLeave(conversationEntity, userEntity, isoDate);
-        return this.eventRepository.injectEvent(leaveEvent);
+      .map(async conversation => {
+        const leaveEvent = EventBuilder.buildTeamMemberLeave(conversation, userEntity, isoDate);
+        await this.eventRepository.injectEvent(leaveEvent);
+        await this.clearUsersFromConversation(conversation, [userEntity]);
       });
     userEntity.isDeleted = true;
     return Promise.all(eventInjections);
   };
+
+  /**
+   * Will remove users from the conversation and update its participants list accordingly.
+   *
+   * @param conversation - conversation to remove users from
+   * @param users - users to remove from the conversation
+   */
+  private async clearUsersFromConversation(conversation: Conversation, users: User[]) {
+    users.forEach(user => {
+      conversation.participating_user_ids.remove(userId => matchQualifiedIds(userId, user));
+      if (user.isTemporaryGuest()) {
+        user.clearExpirationTimeout();
+      }
+    });
+    await this.updateParticipatingUserEntities(conversation);
+  }
 
   /**
    * Set the notification state of a conversation.
@@ -3642,18 +3694,10 @@ export class ConversationRepository {
     }
 
     const {messageEntity} = await this.addEventToConversation(conversationEntity, eventJson);
-    (messageEntity as MemberMessage)
-      .userEntities()
-      .filter(userEntity => !userEntity.isMe)
-      .forEach(userEntity => {
-        conversationEntity.participating_user_ids.remove(userId => matchQualifiedIds(userId, userEntity));
 
-        if (userEntity.isTemporaryGuest()) {
-          userEntity.clearExpirationTimeout();
-        }
-      });
+    const usersToRemove = (messageEntity as MemberMessage).userEntities().filter(userEntity => !userEntity.isMe);
 
-    await this.updateParticipatingUserEntities(conversationEntity);
+    await this.clearUsersFromConversation(conversationEntity, usersToRemove);
 
     this.proteusVerificationStateHandler.onMemberLeft(conversationEntity);
 
@@ -4108,7 +4152,7 @@ export class ConversationRepository {
    * @param conversationEntity Conversation fetch events and users for
    */
   private async fetchUsersAndEvents(conversationEntity: Conversation) {
-    if (!conversationEntity.is_loaded() && !conversationEntity.is_pending()) {
+    if (!conversationEntity.isLoadingMessages()) {
       await this.updateParticipatingUserEntities(conversationEntity);
       await this.getUnreadEvents(conversationEntity);
     }

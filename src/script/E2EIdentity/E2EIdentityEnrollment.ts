@@ -32,7 +32,7 @@ import {formatDelayTime, TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {removeUrlParameters} from 'Util/UrlUtil';
 
 import {hasActiveCertificate, getActiveWireIdentity, isFreshMLSSelfClient} from './E2EIdentityVerification';
-import {EnrollmentStore} from './Enrollment.store';
+import {getEnrollmentStore} from './Enrollment.store';
 import {getEnrollmentTimer} from './EnrollmentTimer';
 import {getModalOptions, ModalType} from './Modals';
 import {OIDCService} from './OIDCService';
@@ -70,6 +70,17 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     }
 
     return e2eiService;
+  }
+
+  private get enrollmentStore() {
+    const selfUserId = this.userState.self()?.qualifiedId;
+
+    if (!selfUserId) {
+      throw new Error('Self user not found');
+    }
+
+    const enrollmentStore = getEnrollmentStore(selfUserId, this.core.clientId);
+    return enrollmentStore;
   }
 
   private createOIDCService() {
@@ -141,8 +152,9 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
    */
   public async startTimers() {
     // We store the first time the user was prompted with the enrollment modal
-    const e2eActivatedAt = EnrollmentStore.get.e2eiActivatedAt() || Date.now();
-    EnrollmentStore.store.e2eiActivatedAt(e2eActivatedAt);
+    const storedE2eActivatedAt = this.enrollmentStore.get.e2eiActivatedAt();
+    const e2eActivatedAt = storedE2eActivatedAt || Date.now();
+    this.enrollmentStore.store.e2eiActivatedAt(e2eActivatedAt);
 
     const timerKey = 'enrollmentTimer';
     const identity = await getActiveWireIdentity();
@@ -153,14 +165,17 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     );
 
     const task = async () => {
-      EnrollmentStore.clear.timer();
+      this.enrollmentStore.clear.timer();
       await this.processEnrollmentUponExpiry(isSnoozable);
     };
 
-    const firingDate = EnrollmentStore.get.timer() || computedFiringDate;
-    EnrollmentStore.store.timer(firingDate);
+    const firingDate = this.enrollmentStore.get.timer() || computedFiringDate;
+    this.enrollmentStore.store.timer(firingDate);
 
-    if (firingDate <= Date.now()) {
+    const isFirstE2EIActivation = !storedE2eActivatedAt && !identity;
+    if (isFirstE2EIActivation || firingDate <= Date.now()) {
+      // We want to automatically trigger the enrollment modal if it's a devices in team that just activated e2eidentity
+      // Or if the timer is supposed to fire now
       void task();
     } else {
       LowPrecisionTaskScheduler.addTask({

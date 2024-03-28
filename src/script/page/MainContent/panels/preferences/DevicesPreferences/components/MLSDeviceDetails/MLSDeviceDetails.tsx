@@ -17,7 +17,7 @@
  *
  */
 
-import {WireIdentity} from 'src/script/E2EIdentity';
+import {MLSStatuses, WireIdentity} from 'src/script/E2EIdentity';
 import {t} from 'Util/LocalizerUtil';
 import {splitFingerprint} from 'Util/StringUtil';
 
@@ -30,15 +30,24 @@ import {FormattedId} from '../FormattedId';
 interface MLSDeviceDetailsProps {
   isCurrentDevice?: boolean;
   identity?: WireIdentity;
+  isSelfUser?: boolean;
 }
 
-export const MLSDeviceDetails = ({isCurrentDevice, identity}: MLSDeviceDetailsProps) => {
+export const MLSDeviceDetails = ({isCurrentDevice, identity, isSelfUser = false}: MLSDeviceDetailsProps) => {
   if (!isCurrentDevice && !identity) {
     return null;
   }
+
+  const certificateState = identity?.status ?? MLSStatuses.NOT_ACTIVATED;
+
+  if (!isSelfUser && certificateState === MLSStatuses.NOT_ACTIVATED) {
+    return null;
+  }
+
   return (
     <div css={styles.wrapper}>
       <h4 className="paragraph-body-3">{t('mlsSignature', MLSPublicKeys.ED25519.toUpperCase())}</h4>
+
       {identity?.thumbprint && (
         <>
           <p className="label-2 preferences-label preferences-devices-fingerprint-label">{t('mlsThumbprint')}</p>
@@ -48,7 +57,10 @@ export const MLSDeviceDetails = ({isCurrentDevice, identity}: MLSDeviceDetailsPr
           </p>
         </>
       )}
-      <E2EICertificateDetails identity={identity} isCurrentDevice={isCurrentDevice} />
+
+      {(isSelfUser || (!isSelfUser && certificateState !== MLSStatuses.NOT_ACTIVATED)) && (
+        <E2EICertificateDetails identity={identity} isCurrentDevice={isCurrentDevice} />
+      )}
     </div>
   );
 };

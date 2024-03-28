@@ -350,7 +350,7 @@ export const joinGuestLinkPasswordModalStrings = defineMessages({
     id: 'guestLinkPasswordModal.headline',
   },
   headlineDefault: {
-    defaultMessage: '[Group Conversation] \n Enter password',
+    defaultMessage: 'Enter password',
     id: 'guestLinkPasswordModal.headlineDefault',
   },
   description: {
