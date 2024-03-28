@@ -423,7 +423,7 @@
   "conversationDetails1to1ReceiptsFirst": "Si les deux participants ont activé les accusés de lecture, vous pouvez voir quand les messages sont lus.",
   "conversationDetails1to1ReceiptsHeadDisabled": "Vous avez désactivé les accusés de lecture",
   "conversationDetails1to1ReceiptsHeadEnabled": "Vous avez activé les accusés de lecture",
-  "conversationDetails1to1ReceiptsSecond": "Vous pouvez changer cette option dans les paramètres de votre compte.",
+  "conversationDetails1to1ReceiptsSecond": "You can change this option in your [button]account settings[/button].",
   "conversationDetailsActionAddParticipants": "Ajouter des participants",
   "conversationDetailsActionArchive": "Archiver",
   "conversationDetailsActionBlock": "Block",

@@ -423,7 +423,7 @@
   "conversationDetails1to1ReceiptsFirst": "Wenn beide Seiten Lesebestätigungen aktivieren, können alle sehen, wenn Nachrichten gelesen werden.",
   "conversationDetails1to1ReceiptsHeadDisabled": "Lesebestätigungen sind deaktiviert",
   "conversationDetails1to1ReceiptsHeadEnabled": "Lesebestätigungen sind aktiviert",
-  "conversationDetails1to1ReceiptsSecond": "Diese Option kann in den Kontoeinstellungen geändert werden.",
+  "conversationDetails1to1ReceiptsSecond": "You can change this option in your [button]account settings[/button].",
   "conversationDetailsActionAddParticipants": "Teilnehmer hinzufügen",
   "conversationDetailsActionArchive": "Archivieren",
   "conversationDetailsActionBlock": "Blockieren",

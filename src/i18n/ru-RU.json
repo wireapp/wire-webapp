@@ -423,7 +423,7 @@
   "conversationDetails1to1ReceiptsFirst": "Если обе стороны включат отчеты о прочтении, вы сможете видеть когда были прочитаны ваши сообщения.",
   "conversationDetails1to1ReceiptsHeadDisabled": "У вас отключены отчеты о прочтении",
   "conversationDetails1to1ReceiptsHeadEnabled": "Вы включили отчеты о прочтении",
-  "conversationDetails1to1ReceiptsSecond": "Вы можете изменить эту опцию в настройках своего аккаунта.",
+  "conversationDetails1to1ReceiptsSecond": "You can change this option in your [button]account settings[/button].",
   "conversationDetailsActionAddParticipants": "Добавить участников",
   "conversationDetailsActionArchive": "Архивировать",
   "conversationDetailsActionBlock": "Заблокировать",
