@@ -112,6 +112,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
   const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
   const {connectRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
+
   const {
     activeConversation,
     unreadConversations,
@@ -150,7 +151,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   ].includes(currentTab);
 
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
-  const {isOpen: isFolderOpen, openFolder} = useFolderState();
+  const {isOpen: isFolderOpen, openFolder, closeFolder} = useFolderState();
   const {currentFocus, handleKeyDown, resetConversationFocus} = useConversationFocus(conversations);
   const {conversations: currentTabConversations, searchInputPlaceholder} = getTabConversations({
     currentTab,
@@ -200,19 +201,18 @@ const Conversations: React.FC<ConversationsProps> = ({
     propertiesRepository.savePreference(PROPERTIES_TYPE.INTERFACE.VIEW_FOLDERS, isFolderTab);
   }, [isFolderTab]);
 
-  function changeTab(nextTab: SidebarTabs) {
+  function changeTab(nextTab: SidebarTabs, folderId?: string) {
+    if (!folderId) {
+      closeFolder();
+    }
+
     if (nextTab === SidebarTabs.ARCHIVES) {
       // will eventually load missing events from the db
       conversationRepository.updateArchivedConversations();
     }
 
-    if (
-      nextTab !== SidebarTabs.PREFERENCES
-      //  && isPreferences
-    ) {
+    if (nextTab !== SidebarTabs.PREFERENCES) {
       onExitPreferences();
-      // switchList(ListState.CONVERSATIONS);
-      // listViewModel.contentViewModel.switchContent(ContentState.COLLECTION);
     }
 
     setConversationsFilter('');
@@ -248,6 +248,7 @@ const Conversations: React.FC<ConversationsProps> = ({
       />
 
       <ConversationTabs
+        conversationRepository={conversationRepository}
         unreadConversations={unreadConversations}
         favoriteConversations={favoriteConversations}
         archivedConversations={archivedConversations}
@@ -295,7 +296,13 @@ const Conversations: React.FC<ConversationsProps> = ({
     <div className="conversations-wrapper">
       <ListWrapper
         id="conversations"
-        headerElement={<ConversationHeader currentTab={currentTab} selfUser={selfUser} />}
+        headerElement={
+          <ConversationHeader
+            conversationLabelRepository={conversationLabelRepository}
+            currentTab={currentTab}
+            selfUser={selfUser}
+          />
+        }
         hasHeader={!isPreferences}
         sidebar={sidebar}
         before={callingView}
@@ -364,6 +371,7 @@ const Conversations: React.FC<ConversationsProps> = ({
 
             {showSearchInput && (
               <ConversationsList
+                conversationLabelRepository={conversationLabelRepository}
                 callState={callState}
                 currentTab={currentTab}
                 currentFocus={currentFocus}

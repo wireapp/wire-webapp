@@ -69,6 +69,79 @@
   padding: 2px 0;
 }
 
+.conversations-sidebar-folders {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.3s ease-in-out;
+
+  &.active {
+    grid-template-rows: 1fr;
+  }
+}
+
+.conversations-sidebar-folders-wrapper {
+  svg {
+    transition: transform 0.3s ease-in-out;
+  }
+
+  &.active {
+    border-radius: 10px;
+    background-color: #e5e8ea;
+
+    svg {
+      transform: rotate(90deg);
+    }
+  }
+}
+
+.conversations-sidebar-folders {
+  padding: 0.5rem 0;
+
+  &--inner-wrapper {
+    display: flex;
+    overflow: hidden;
+    flex-direction: column;
+    align-items: start;
+    justify-content: center;
+    padding: 0 1.5rem;
+    gap: 4px;
+  }
+
+  &--item {
+    .button-reset-default;
+    display: flex;
+    width: 100%;
+    height: 28px;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 8px 6px 12px;
+    border-radius: 8px;
+
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 400;
+    &:hover {
+      background-color: #fff;
+    }
+  }
+
+  &--item.active {
+    background-color: var(--accent-color-500);
+    color: var(--app-bg-secondary) !important;
+  }
+
+  .conversations-sidebar-btn--badge {
+    padding: 1px 6px;
+    border: 1px solid var(--white);
+    border-radius: 5px;
+    background: @red-500;
+    color: var(--white);
+    font-size: @font-size-small;
+    font-weight: @font-weight-semibold;
+  }
+}
+
 .conversations-sidebar-btn {
   .button-reset-default;
   display: flex;
@@ -99,7 +172,7 @@
   }
 
   .conversations-sidebar-btn--badge {
-    padding: 1px 4px;
+    padding: 1px 6px;
     border: 1px solid var(--white);
     border-radius: 5px;
     background: @red-500;

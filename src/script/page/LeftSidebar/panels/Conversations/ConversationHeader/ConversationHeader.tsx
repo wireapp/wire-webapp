@@ -23,6 +23,8 @@ import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Icon} from 'Components/Icon';
+import {ConversationLabelRepository, createLabel} from 'src/script/conversation/ConversationLabelRepository';
+import {useFolderState} from 'src/script/page/LeftSidebar/panels/Conversations/state';
 import {t} from 'Util/LocalizerUtil';
 
 import {button, header, label} from './ConversationHeader.styles';
@@ -34,10 +36,21 @@ import {SidebarTabs} from '../Conversations';
 interface ConversationHeaderProps {
   currentTab: SidebarTabs;
   selfUser: User;
+  conversationLabelRepository: ConversationLabelRepository;
 }
 
-export const ConversationHeader = ({currentTab, selfUser}: ConversationHeaderProps) => {
+export const ConversationHeader = ({currentTab, selfUser, conversationLabelRepository}: ConversationHeaderProps) => {
+  const {expandedFolder} = useFolderState();
+
   const {canCreateGroupConversation} = generatePermissionHelpers(selfUser.teamRole());
+  const isFolderView = currentTab === SidebarTabs.FOLDER;
+  const folders = conversationLabelRepository
+    .getLabels()
+    .map(label => createLabel(label.name, conversationLabelRepository.getLabelConversations(label), label.id))
+    .filter(({conversations}) => !!conversations().length)
+    .filter(folder => folder.id === expandedFolder);
+
+  const currentFolder = folders[0] ?? null;
 
   const conversationsHeaderTitle: Partial<Record<SidebarTabs, string>> = {
     [SidebarTabs.RECENT]: t('conversationViewAllConversations'),
@@ -51,7 +64,9 @@ export const ConversationHeader = ({currentTab, selfUser}: ConversationHeaderPro
 
   return (
     <div css={header}>
-      <span css={label}>{conversationsHeaderTitle[currentTab]}</span>
+      <span css={label}>
+        {isFolderView && currentFolder ? currentFolder.name : conversationsHeaderTitle[currentTab]}
+      </span>
 
       {canCreateGroupConversation() && (
         <Button
