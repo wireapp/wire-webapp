@@ -278,15 +278,15 @@ export class MediaDevicesHandler {
         throw new Error('No media devices found');
       }
 
-      const filteredDevices = this.filterMediaDevices(mediaDevices);
+      const {microphones, speakers, cameras} = this.filterMediaDevices(mediaDevices);
 
-      setDevices(MediaDeviceType.AUDIO_INPUT, filteredDevices.microphones);
-      setDevices(MediaDeviceType.AUDIO_OUTPUT, filteredDevices.speakers);
-      setDevices(MediaDeviceType.VIDEO_INPUT, filteredDevices.cameras);
+      setDevices(MediaDeviceType.AUDIO_INPUT, microphones);
+      setDevices(MediaDeviceType.AUDIO_OUTPUT, speakers);
+      setDevices(MediaDeviceType.VIDEO_INPUT, cameras);
       this.previousDeviceSupport = {
-        audioinput: filteredDevices.microphones.length,
-        audiooutput: filteredDevices.speakers.length,
-        videoinput: filteredDevices.cameras.length,
+        audioinput: microphones.length,
+        audiooutput: speakers.length,
+        videoinput: cameras.length,
       };
 
       this.onMediaDevicesRefresh?.();

@@ -259,14 +259,13 @@ export class CallingRepository {
         return;
       }
 
-      const isSelfUserMuted = activeCall.getSelfParticipant().isMuted();
-      const isSelfSendingVideo = activeCall.getSelfParticipant().isSendingVideo();
+      const selfParticipant = activeCall.getSelfParticipant();
 
-      if (!isSelfUserMuted) {
+      if (!selfParticipant.isMuted()) {
         void this.refreshAudioInput();
       }
 
-      if (isSelfSendingVideo) {
+      if (selfParticipant.isSendingVideo()) {
         void this.refreshVideoInput();
       }
     });
