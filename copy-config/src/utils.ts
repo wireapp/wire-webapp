@@ -86,6 +86,6 @@ export async function extractAsync(zipFile: string, destination: string): Promis
   );
 }
 
-export const isFile = (path: string) => /[^.\/\\]+\..+$/.test(path);
+export const isFile = (path: string) => /\w\.\w+$/.test(path);
 export const rimrafAsync = promisify(rimraf);
 export const execAsync = promisify(exec);

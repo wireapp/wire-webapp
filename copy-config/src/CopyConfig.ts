@@ -29,18 +29,21 @@ const defaultOptions: Required<CopyConfigOptions> = {
   baseDir: 'config',
   externalDir: '',
   files: {},
+  logLevel: 'info',
   forceDownload: false,
   repositoryUrl: 'https://github.com/wireapp/wire-web-config-default#master',
 };
 
 export class CopyConfig {
   private readonly options: Required<CopyConfigOptions>;
-  private readonly logger: logdown.Logger;
   private readonly noClone: boolean = false;
   private readonly noCleanup: boolean = false;
   private readonly filterFiles: string[] = ['.DS_Store'];
 
-  constructor(options: CopyConfigOptions) {
+  constructor(
+    options: CopyConfigOptions | undefined,
+    private readonly logger?: logdown.Logger,
+  ) {
     this.options = {...defaultOptions, ...options};
     this.readEnvVars();
 
@@ -54,11 +57,6 @@ export class CopyConfig {
       this.options.baseDir = this.options.externalDir;
     }
     this.options.baseDir = path.resolve(this.options.baseDir);
-
-    this.logger = logdown('@wireapp/copy-config/CopyConfig', {
-      markdown: false,
-    });
-    this.logger.state.isEnabled = true;
   }
 
   private readEnvVars(): void {
@@ -134,13 +132,13 @@ export class CopyConfig {
     }
 
     if (isGlob(source)) {
-      this.logger.info(`Resolving "${source}"`);
+      this.logger?.info(`Resolving "${source}"`);
 
       const copiedFiles = await utils.copyAsync(source, destination);
 
       for (const copiedFile of copiedFiles) {
         const [copiedFrom, copiedTo] = copiedFile.history;
-        this.logger.info(`Copying "${copiedFrom}" -> "${copiedTo}"`);
+        this.logger?.debug(`Copying "${copiedFrom}" -> "${copiedTo}"`);
       }
 
       return copiedFiles.map(file => file.path);
@@ -150,7 +148,7 @@ export class CopyConfig {
       destination = path.join(destination, path.basename(source));
     }
 
-    this.logger.info(`Copying "${source}" -> "${destination}"`);
+    this.logger?.debug(`Copying "${source}" -> "${destination}"`);
 
     // Info: "fs.copy" creates all sub-folders which are needed along the way:
     // see https://github.com/jprichardson/node-fs-extra/blob/7.0.1/lib/copy/copy.js#L43
@@ -170,7 +168,7 @@ export class CopyConfig {
     }
 
     if (stderrVersion) {
-      this.logger.error(`No git installation found: (error: "${stderrVersion}"). Trying to download the zip file ...`);
+      this.logger?.error(`No git installation found: (error: "${stderrVersion}"). Trying to download the zip file ...`);
     }
 
     if (stderrVersion || this.options.forceDownload) {
@@ -179,10 +177,10 @@ export class CopyConfig {
         bareUrl = bareUrl.replace(gitProtocolRegex, 'https://$1$2/$3');
       }
       const url = `${bareUrl}/archive/${branch}.zip`;
-      this.logger.info(`Downloading "${url}" ...`);
+      this.logger?.info(`Downloading "${url}" ...`);
       await utils.downloadFileAsync(url, this.options.baseDir);
     } else {
-      this.logger.info(`Cloning "${bareUrl}" (branch "${branch}") ...`);
+      this.logger?.info(`Cloning "${bareUrl}" (branch "${branch}") ...`);
       const command = `git clone --depth 1 -b ${branch} ${bareUrl} ${this.options.baseDir}`;
 
       const {stderr: stderrClone} = await utils.execAsync(command);
@@ -194,7 +192,7 @@ export class CopyConfig {
   }
 
   private async removeBasedir(): Promise<void> {
-    this.logger.info(`Cleaning up "${this.options.baseDir}" ...`);
+    this.logger?.debug(`Cleaning up "${this.options.baseDir}" ...`);
     await utils.rimrafAsync(this.options.baseDir);
   }
 

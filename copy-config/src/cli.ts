@@ -26,22 +26,27 @@ import logdown from 'logdown';
 
 import {CopyConfig, CopyConfigOptions} from './';
 
-const configExplorer = cosmiconfig('copyconfig');
-const logger = logdown('@wireapp/copy-config/cli', {
-  markdown: false,
-});
-logger.state.isEnabled = true;
-
 (async () => {
+  const configExplorer = cosmiconfig('copyconfig');
   const configFile = await configExplorer.search();
-  if (configFile) {
-    logger.info(`Found configuration file "${configFile.filepath}".`);
-  }
-  const config: CopyConfigOptions = configFile ? configFile.config : undefined;
+  const config: CopyConfigOptions | undefined = configFile ? configFile.config : undefined;
 
-  const copiedFiles = await new CopyConfig(config).copy();
+  const logLevel = config?.logLevel || 'info';
+  const logger = logLevel !== 'silent' ? logdown('@wireapp/copy-config', {markdown: false}) : undefined;
+  if (logger) {
+    logger.state.isEnabled = true;
+    if (configFile) {
+      logger.info(`Found configuration file "${configFile.filepath}".`);
+    }
+    if (logLevel !== 'verbose') {
+      // Disable debug logging when not in verbose mode
+      logger.debug = () => {};
+    }
+  }
+
+  const copiedFiles = await new CopyConfig(config, logger).copy();
   const copyMessage = copiedFiles.length ? `Copied ${copiedFiles.length}` : "Didn't copy any";
-  logger.info(`${copyMessage} file${copiedFiles.length === 1 ? '' : 's'}.`);
+  logger?.info(`${copyMessage} file${copiedFiles.length === 1 ? '' : 's'}.`);
 })().catch(error => {
   console.error(error);
   process.exit(1);

@@ -52,4 +52,5 @@ export interface CopyConfigOptions {
    * @example `https://github.com/wireapp/wire-web-config-default#v0.7.1`
    */
   repositoryUrl: string;
+  logLevel?: 'verbose' | 'info' | 'silent';
 }
