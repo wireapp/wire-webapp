@@ -22,6 +22,7 @@ import React, {useEffect, useState} from 'react';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
+import {ChevronIcon} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {CallingCell} from 'Components/calling/CallingCell';
@@ -100,6 +101,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   userState = container.resolve(UserState),
   selfUser,
 }) => {
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [conversationsFilter, setConversationsFilter] = useState<string>('');
   const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
   const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
@@ -232,24 +234,41 @@ const Conversations: React.FC<ConversationsProps> = ({
   }
 
   const sidebar = (
-    <nav className="conversations-sidebar">
-      <UserDetails
-        user={selfUser}
-        groupId={conversationState.selfMLSConversation()?.groupId}
-        isTeam={teamState.isTeam()}
-      />
+    <div className="conversations-sidebar-wrapper">
+      <nav className="conversations-sidebar" data-is-collapsed={isSidebarCollapsed}>
+        <div className="conversations-sidebar-items">
+          <div className="conversations-sidebar-items-children">
+            <UserDetails
+              user={selfUser}
+              groupId={conversationState.selfMLSConversation()?.groupId}
+              isTeam={teamState.isTeam()}
+            />
 
-      <ConversationTabs
-        unreadConversations={unreadConversations}
-        favoriteConversations={favoriteConversations}
-        archivedConversations={archivedConversations}
-        groupConversations={groupConversations}
-        directConversations={directConversations}
-        onChangeTab={changeTab}
-        currentTab={currentTab}
-        onClickPreferences={() => onClickPreferences(ContentState.PREFERENCES_ACCOUNT)}
-      />
-    </nav>
+            <ConversationTabs
+              unreadConversations={unreadConversations}
+              favoriteConversations={favoriteConversations}
+              archivedConversations={archivedConversations}
+              groupConversations={groupConversations}
+              directConversations={directConversations}
+              onChangeTab={changeTab}
+              currentTab={currentTab}
+              onClickPreferences={() => onClickPreferences(ContentState.PREFERENCES_ACCOUNT)}
+            />
+          </div>
+          <button
+            type="button"
+            role="tab"
+            className="conversations-sidebar-handle"
+            data-is-collapsed={isSidebarCollapsed}
+            onClick={() => setIsSidebarCollapsed(previous => !previous)}
+          >
+            <div className="conversations-sidebar-handle-icon" data-is-collapsed={isSidebarCollapsed}>
+              <ChevronIcon width={12} height={12} />
+            </div>
+          </button>
+        </div>
+      </nav>
+    </div>
   );
 
   const callingView = (
