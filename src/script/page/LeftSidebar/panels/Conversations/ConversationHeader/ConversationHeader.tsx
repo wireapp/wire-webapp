@@ -66,7 +66,6 @@ export const ConversationHeader = ({
   const folders = conversationLabelRepository
     .getLabels()
     .map(label => createLabel(label.name, conversationLabelRepository.getLabelConversations(label), label.id))
-    .filter(({conversations}) => !!conversations().length)
     .filter(folder => folder.id === expandedFolder);
 
   const currentFolder = folders[0] ?? null;
