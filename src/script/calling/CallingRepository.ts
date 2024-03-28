@@ -252,7 +252,7 @@ export class CallingRepository {
       }
     });
 
-    this.mediaDevicesHandler.setOnMediaDevicesRefreshHandler(() => {
+    mediaDevicesHandler.setOnMediaDevicesRefreshHandler(() => {
       const activeCall = this.callState.joinedCall();
 
       if (!activeCall) {
