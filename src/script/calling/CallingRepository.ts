@@ -251,6 +251,25 @@ export class CallingRepository {
         this.requestVideoStreams(call.conversationId, call.activeSpeakers());
       }
     });
+
+    this.mediaDevicesHandler.setOnMediaDevicesRefreshHandler(() => {
+      const activeCall = this.callState.joinedCall();
+
+      if (!activeCall) {
+        return;
+      }
+
+      const isSelfUserMuted = activeCall.getSelfParticipant().isMuted();
+      const isSelfSendingVideo = activeCall.getSelfParticipant().isSendingVideo();
+
+      if (!isSelfUserMuted) {
+        void this.refreshAudioInput();
+      }
+
+      if (isSelfSendingVideo) {
+        void this.refreshVideoInput();
+      }
+    });
   }
 
   get subconversationService() {
