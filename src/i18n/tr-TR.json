@@ -423,7 +423,7 @@
   "conversationDetails1to1ReceiptsFirst": "Her iki taraf da okundu bilgilerini açarsa, mesajların ne zaman okunduğunu görebilirsiniz.",
   "conversationDetails1to1ReceiptsHeadDisabled": "Okundu bilgisini devre dışı bıraktınız",
   "conversationDetails1to1ReceiptsHeadEnabled": "Okundu bilgisini etkinleştirdiniz",
-  "conversationDetails1to1ReceiptsSecond": "Bu seçeneği hesap ayarlarınızdan değiştirebilirsiniz.",
+  "conversationDetails1to1ReceiptsSecond": "You can change this option in your [button]account settings[/button].",
   "conversationDetailsActionAddParticipants": "Katılımcıları ekle",
   "conversationDetailsActionArchive": "Arşivle",
   "conversationDetailsActionBlock": "Block",

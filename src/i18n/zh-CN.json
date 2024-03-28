@@ -423,7 +423,7 @@
   "conversationDetails1to1ReceiptsFirst": "如果双方都打开阅读回执，您可以看到消息是否已读。",
   "conversationDetails1to1ReceiptsHeadDisabled": "您已禁用已读回执",
   "conversationDetails1to1ReceiptsHeadEnabled": "您已启用已读回执",
-  "conversationDetails1to1ReceiptsSecond": "您可以在您的帐户设置中更改此选项。",
+  "conversationDetails1to1ReceiptsSecond": "You can change this option in your [button]account settings[/button].",
   "conversationDetailsActionAddParticipants": "添加成员",
   "conversationDetailsActionArchive": "存档",
   "conversationDetailsActionBlock": "Block",
