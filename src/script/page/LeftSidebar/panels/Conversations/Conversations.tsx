@@ -262,8 +262,9 @@ const Conversations: React.FC<ConversationsProps> = ({
               onClickPreferences={() => onClickPreferences(ContentState.PREFERENCES_ACCOUNT)}
             />
           </div>
-          {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
-          <div
+          <button
+            type="button"
+            role="tab"
             className="conversations-sidebar-handle"
             data-is-collapsed={isSidebarCollapsed}
             onClick={() => setIsSidebarCollapsed(previous => !previous)}
@@ -271,7 +272,7 @@ const Conversations: React.FC<ConversationsProps> = ({
             <div className="conversations-sidebar-handle-icon" data-is-collapsed={isSidebarCollapsed}>
               <ChevronIcon width={12} height={12} />
             </div>
-          </div>
+          </button>
         </div>
       </nav>
     </div>
