@@ -57,9 +57,9 @@
       height: 24px;
       align-items: center;
       justify-content: center;
-      border: 1px solid #dce0e3;
+      border: 1px solid var(--border-color);
       border-radius: 20px;
-      background-color: #fff;
+      background-color: var(--app-bg-secondary);
       cursor: pointer;
       transform: rotate(180deg);
 
@@ -161,7 +161,7 @@
 
   &.active {
     border-radius: 10px;
-    background-color: #e5e8ea;
+    background-color: var(--sidebar-folder-selected-bg);
 
     svg {
       transform: rotate(90deg);
@@ -197,23 +197,13 @@
     font-size: 12px;
     font-weight: 400;
     &:hover {
-      background-color: #fff;
+      background-color: var(--app-bg-secondary);
     }
   }
 
   &--item.active {
-    background-color: var(--accent-color-500);
+    background-color: var(--list-item-selected-bg);
     color: var(--app-bg-secondary) !important;
-  }
-
-  .conversations-sidebar-btn--badge {
-    padding: 1px 6px;
-    border: 1px solid var(--white);
-    border-radius: 5px;
-    background: @red-500;
-    color: var(--white);
-    font-size: @font-size-small;
-    font-weight: @font-weight-semibold;
   }
 }
 
@@ -246,22 +236,12 @@
     outline-offset: -2px;
   }
 
-  .conversations-sidebar-btn--badge {
-    padding: 1px 6px;
-    border: 1px solid var(--white);
-    border-radius: 5px;
-    background: @red-500;
-    color: var(--white);
-    font-size: @font-size-small;
-    font-weight: @font-weight-semibold;
-  }
-
   .conversations-sidebar-btn--text {
     color: var(--main-color);
   }
 
   &.active {
-    background-color: var(--accent-color-500);
+    background-color: var(--list-item-selected-bg);
     color: var(--accent-color-500);
 
     svg {
@@ -272,6 +252,16 @@
       color: var(--app-bg-secondary) !important;
     }
   }
+}
+
+.conversations-sidebar-btn--badge {
+  padding: 1px 6px;
+  border: 1px solid var(--app-bg-secondary);
+  border-radius: 5px;
+  background: var(--red-500);
+  color: var(--app-bg-secondary);
+  font-size: @font-size-small;
+  font-weight: @font-weight-semibold;
 }
 
 .conversations-sidebar-btn {

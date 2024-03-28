@@ -76,7 +76,7 @@ export const userFullName: CSSObject = {
 };
 
 export const userHandle: CSSObject = {
-  color: 'var(--gray-70)',
+  color: 'var(--text-input-placeholder)',
   fontSize: 'var(--font-size-small)',
   fontWeight: 'var(--font-weight-regular)',
   lineHeight: 'var(--line-height-md)',
