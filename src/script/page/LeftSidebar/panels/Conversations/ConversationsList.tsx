@@ -26,6 +26,7 @@ import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {GroupAvatar, Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {ConversationListCell} from 'Components/list/ConversationListCell';
 import {Call} from 'src/script/calling/Call';
+import {ConversationLabel, ConversationLabelRepository} from 'src/script/conversation/ConversationLabelRepository';
 import {User} from 'src/script/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown, isKeyboardEvent} from 'Util/KeyboardUtil';
@@ -33,7 +34,6 @@ import {t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import {SidebarTabs} from './Conversations';
-import {GroupedConversations} from './GroupedConversations';
 
 import {CallState} from '../../../../calling/CallState';
 import {ConversationRepository} from '../../../../conversation/ConversationRepository';
@@ -52,8 +52,10 @@ interface ConversationsListProps {
   conversations: Conversation[];
   conversationState: ConversationState;
   listViewModel: ListViewModel;
+  conversationLabelRepository: ConversationLabelRepository;
   currentTab: SidebarTabs;
   currentFocus: string;
+  currentFolder?: ConversationLabel;
   resetConversationFocus: () => void;
   handleArrowKeyDown: (index: number) => (e: React.KeyboardEvent) => void;
 }
@@ -64,9 +66,9 @@ export const ConversationsList = ({
   currentTab,
   connectRequests,
   conversationState,
-  conversationRepository,
   callState,
   currentFocus,
+  currentFolder,
   resetConversationFocus,
   handleArrowKeyDown,
 }: ConversationsListProps) => {
@@ -128,19 +130,15 @@ export const ConversationsList = ({
   const isFolderView = currentTab === SidebarTabs.FOLDER;
 
   const getConversationView = () => {
-    if (isFolderView) {
+    if (isFolderView && currentFolder) {
       return (
-        <li tabIndex={TabIndex.UNFOCUSABLE}>
-          <GroupedConversations
-            callState={callState}
-            conversationRepository={conversationRepository}
-            conversationState={conversationState}
-            hasJoinableCall={hasJoinableCall}
-            isSelectedConversation={isActiveConversation}
-            listViewModel={listViewModel}
-            onJoinCall={answerCall}
-          />
-        </li>
+        <>
+          {currentFolder
+            ?.conversations()
+            .map((conversation, index) => (
+              <ConversationListCell key={conversation.id} {...getCommonConversationCellProps(conversation, index)} />
+            ))}
+        </>
       );
     }
 

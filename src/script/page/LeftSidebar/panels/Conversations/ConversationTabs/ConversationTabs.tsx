@@ -17,9 +17,11 @@
  *
  */
 
-import {GroupIcon, InfoIcon, StarIcon} from '@wireapp/react-ui-kit';
+import {ChevronIcon, GroupIcon, InfoIcon, StarIcon} from '@wireapp/react-ui-kit';
 
 import {Icon} from 'Components/Icon';
+import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
+import {ConversationFolderTab} from 'src/script/page/LeftSidebar/panels/Conversations/ConversationTab/ConversationFolderTab';
 import {t} from 'Util/LocalizerUtil';
 
 import {Config} from '../../../../../Config';
@@ -35,7 +37,8 @@ interface ConversationTabsProps {
   archivedConversations: Conversation[];
   groupConversations: Conversation[];
   directConversations: Conversation[];
-  onChangeTab: (tab: SidebarTabs) => void;
+  conversationRepository: ConversationRepository;
+  onChangeTab: (tab: SidebarTabs, folderId?: string) => void;
   currentTab: SidebarTabs;
   onClickPreferences: () => void;
 }
@@ -45,6 +48,7 @@ export const ConversationTabs = ({
   favoriteConversations,
   archivedConversations,
   groupConversations,
+  conversationRepository,
   directConversations,
   onChangeTab,
   currentTab,
@@ -93,7 +97,7 @@ export const ConversationTabs = ({
       type: SidebarTabs.FOLDER,
       title: t('folderViewTooltip'),
       dataUieName: 'go-folders-view',
-      Icon: <Icon.ConversationsFolder />,
+      Icon: <ChevronIcon />,
       unreadConversations: totalUnreadConversations,
     },
     {
@@ -120,6 +124,20 @@ export const ConversationTabs = ({
         {conversationTabs.map((conversationTab, index) => {
           if (conversationTab.hideTab) {
             return null;
+          }
+
+          if (conversationTab.type === SidebarTabs.FOLDER) {
+            return (
+              <ConversationFolderTab
+                {...conversationTab}
+                unreadConversations={unreadConversations}
+                conversationRepository={conversationRepository}
+                key={conversationTab.type}
+                conversationTabIndex={index + 1}
+                onChangeTab={onChangeTab}
+                isActive={conversationTab.type === currentTab}
+              />
+            );
           }
 
           return (

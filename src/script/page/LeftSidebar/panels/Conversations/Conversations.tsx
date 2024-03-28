@@ -45,7 +45,7 @@ import {getTabConversations} from './helpers';
 import {useFolderState} from './state';
 
 import {CallState} from '../../../../calling/CallState';
-import {DefaultLabelIds} from '../../../../conversation/ConversationLabelRepository';
+import {createLabel, DefaultLabelIds} from '../../../../conversation/ConversationLabelRepository';
 import {ConversationRepository} from '../../../../conversation/ConversationRepository';
 import {ConversationState} from '../../../../conversation/ConversationState';
 import {User} from '../../../../entity/User';
@@ -106,6 +106,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
   const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
   const {connectRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
+
   const {
     activeConversation,
     unreadConversations,
@@ -144,7 +145,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   ].includes(currentTab);
 
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
-  const {isOpen: isFolderOpen, openFolder} = useFolderState();
+  const {isOpen: isFolderOpen, openFolder, closeFolder, expandedFolder} = useFolderState();
   const {currentFocus, handleKeyDown, resetConversationFocus} = useConversationFocus(conversations);
   const {conversations: currentTabConversations, searchInputPlaceholder} = getTabConversations({
     currentTab,
@@ -155,6 +156,11 @@ const Conversations: React.FC<ConversationsProps> = ({
     directConversations,
     favoriteConversations,
   });
+
+  const currentFolder = conversationLabelRepository
+    .getLabels()
+    .map(label => createLabel(label.name, conversationLabelRepository.getLabelConversations(label), label.id))
+    .find(folder => folder.id === expandedFolder);
 
   const hasNoConversations = conversations.length + connectRequests.length === 0;
 
@@ -194,19 +200,18 @@ const Conversations: React.FC<ConversationsProps> = ({
     propertiesRepository.savePreference(PROPERTIES_TYPE.INTERFACE.VIEW_FOLDERS, isFolderTab);
   }, [isFolderTab]);
 
-  function changeTab(nextTab: SidebarTabs) {
+  function changeTab(nextTab: SidebarTabs, folderId?: string) {
+    if (!folderId) {
+      closeFolder();
+    }
+
     if (nextTab === SidebarTabs.ARCHIVES) {
       // will eventually load missing events from the db
       conversationRepository.updateArchivedConversations();
     }
 
-    if (
-      nextTab !== SidebarTabs.PREFERENCES
-      //  && isPreferences
-    ) {
+    if (nextTab !== SidebarTabs.PREFERENCES) {
       onExitPreferences();
-      // switchList(ListState.CONVERSATIONS);
-      // listViewModel.contentViewModel.switchContent(ContentState.COLLECTION);
     }
 
     setConversationsFilter('');
@@ -245,6 +250,7 @@ const Conversations: React.FC<ConversationsProps> = ({
             />
 
             <ConversationTabs
+              conversationRepository={conversationRepository}
               unreadConversations={unreadConversations}
               favoriteConversations={favoriteConversations}
               archivedConversations={archivedConversations}
@@ -308,6 +314,7 @@ const Conversations: React.FC<ConversationsProps> = ({
         id="conversations"
         headerElement={
           <ConversationHeader
+            currentFolder={currentFolder}
             currentTab={currentTab}
             selfUser={selfUser}
             showSearchInput={(showSearchInput && currentTabConversations.length !== 0) || !!conversationsFilter}
@@ -351,6 +358,8 @@ const Conversations: React.FC<ConversationsProps> = ({
 
             {showSearchInput && (
               <ConversationsList
+                currentFolder={currentFolder}
+                conversationLabelRepository={conversationLabelRepository}
                 callState={callState}
                 currentTab={currentTab}
                 currentFocus={currentFocus}

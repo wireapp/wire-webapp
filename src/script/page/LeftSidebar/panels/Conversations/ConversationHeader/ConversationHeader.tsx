@@ -23,6 +23,7 @@ import {Button, ButtonVariant, CircleCloseIcon, Input, SearchIcon} from '@wireap
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Icon} from 'Components/Icon';
+import {ConversationLabel} from 'src/script/conversation/ConversationLabelRepository';
 import {t} from 'Util/LocalizerUtil';
 
 import {
@@ -46,6 +47,7 @@ interface ConversationHeaderProps {
   searchValue?: string;
   setSearchValue: (searchValue: string) => void;
   searchInputPlaceholder: string;
+  currentFolder?: ConversationLabel;
 }
 
 export const ConversationHeader = ({
@@ -54,9 +56,11 @@ export const ConversationHeader = ({
   showSearchInput = false,
   searchValue = '',
   setSearchValue,
+  currentFolder,
   searchInputPlaceholder,
 }: ConversationHeaderProps) => {
   const {canCreateGroupConversation} = generatePermissionHelpers(selfUser.teamRole());
+  const isFolderView = currentTab === SidebarTabs.FOLDER;
 
   const conversationsHeaderTitle: Partial<Record<SidebarTabs, string>> = {
     [SidebarTabs.RECENT]: t('conversationViewAllConversations'),
@@ -71,7 +75,9 @@ export const ConversationHeader = ({
   return (
     <>
       <div css={header}>
-        <span css={label}>{conversationsHeaderTitle[currentTab]}</span>
+        <span css={label}>
+          {isFolderView && currentFolder ? currentFolder.name : conversationsHeaderTitle[currentTab]}
+        </span>
 
         {currentTab !== SidebarTabs.ARCHIVES && canCreateGroupConversation() && (
           <Button
