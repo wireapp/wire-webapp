@@ -20,35 +20,40 @@
 import {create} from 'zustand';
 
 type FolderState = {
-  expandedFolders: string[];
+  expandedFolder: string;
+  isFoldersTabOpen: boolean;
   isOpen: (folderId: string) => boolean;
   openFolder: (folderId: string) => void;
-  toggleFolder: (folderId: string) => void;
+  closeFolder: () => void;
+  toggleFoldersTab: () => void;
 };
 
-const openFolder = (folderId: string, state: FolderState) => {
-  return {...state, expandedFolders: state.expandedFolders.concat(folderId)};
+const openFolder = (folderId: string, state: FolderState): FolderState => {
+  return {...state, isFoldersTabOpen: true, expandedFolder: folderId};
 };
 
-const closeFolder = (folderId: string, state: FolderState) => {
-  return {...state, expandedFolders: state.expandedFolders.filter(id => id !== folderId)};
+const closeFolder = (state: FolderState): FolderState => {
+  return {...state, expandedFolder: ''};
 };
 
 const useFolderState = create<FolderState>((set, get) => ({
-  expandedFolders: [],
+  expandedFolder: '',
+  isFoldersTabOpen: false,
 
   isOpen: folderId => {
-    return get().expandedFolders.includes(folderId);
+    return get().expandedFolder === folderId;
   },
+
+  toggleFoldersTab: () => set(state => ({...state, isFoldersTabOpen: !state.isFoldersTabOpen})),
 
   openFolder: folderId =>
     set(state => {
-      return get().isOpen(folderId) ? state : openFolder(folderId, state);
+      return openFolder(folderId, state);
     }),
 
-  toggleFolder: folderId =>
+  closeFolder: () =>
     set(state => {
-      return get().isOpen(folderId) ? closeFolder(folderId, state) : openFolder(folderId, state);
+      return closeFolder(state);
     }),
 }));
 
