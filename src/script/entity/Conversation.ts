@@ -129,7 +129,7 @@ export class Conversation {
   public readonly is_cleared: ko.PureComputed<boolean>;
   /** Indicates if the conversation is currently loading messages into its state. */
   public readonly isLoadingMessages: ko.Observable<boolean>;
-  public readonly isTextInputReady: ko.PureComputed<boolean>;
+  public readonly isTextInputReady: ko.Observable<boolean>;
   public readonly is_verified: ko.PureComputed<boolean | undefined>;
   public readonly is1to1: ko.PureComputed<boolean>;
   public readonly isActiveParticipant: ko.PureComputed<boolean>;
