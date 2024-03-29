@@ -17,12 +17,22 @@
  *
  */
 
-const subscribe = (key: string, toggleMute: (shouldMute: boolean) => void, isMuted: () => boolean) => {
+/**
+ * Subscribe to push-to-talk functionality.
+ * @param getKey The key to listen to (getter).
+ * @param toggleMute A function to toggle the mute state.
+ * @param isMuted A function to check if the user is muted.
+ * @returns A function to unsubscribe.
+ * @example
+ * const unsubscribe = pushToTalk.subscribe(() => settings.getToggleKey(), toggleMute, isMuted);
+ * unsubscribe();
+ */
+const subscribe = (getKey: () => string, toggleMute: (shouldMute: boolean) => void, isMuted: () => boolean) => {
   let isKeyDown = false;
   let wasUnmutedWithKeyPress = false;
 
   const handleKeyDown = (event: KeyboardEvent) => {
-    if (event.key !== key) {
+    if (event.key !== getKey()) {
       return;
     }
 
@@ -49,7 +59,7 @@ const subscribe = (key: string, toggleMute: (shouldMute: boolean) => void, isMut
     }
 
     // Release the key.
-    if (event.key === key) {
+    if (event.key === getKey()) {
       isKeyDown = false;
     }
 
