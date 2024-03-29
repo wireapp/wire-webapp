@@ -446,12 +446,14 @@ export const InputBar = ({
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REPLY, replyMessage);
     amplify.subscribe(WebAppEvents.EXTENSIONS.GIPHY.SEND, sendGiphy);
     amplify.subscribe(WebAppEvents.SHORTCUT.PING, onPingClick);
+    conversation.isTextInputReady(true);
 
     return () => {
       amplify.unsubscribeAll(WebAppEvents.SHORTCUT.PING);
       amplify.unsubscribeAll(WebAppEvents.CONVERSATION.IMAGE.SEND);
       amplify.unsubscribeAll(WebAppEvents.CONVERSATION.MESSAGE.REPLY);
       amplify.unsubscribeAll(WebAppEvents.EXTENSIONS.GIPHY.SEND);
+      conversation.isTextInputReady(false);
     };
   }, []);
 
