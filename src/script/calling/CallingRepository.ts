@@ -65,6 +65,7 @@ import {CallState, MuteState} from './CallState';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
 import {ClientId, Participant, UserId} from './Participant';
+import {pushToTalk} from './pushToTalk';
 
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
@@ -353,7 +354,7 @@ export class CallingRepository {
       this.incomingCall, // `incomingh`,
       this.handleMissedCall, // `missedh`,
       () => {}, // `answer
-      () => {}, // `estabh`,
+      this.establishCall, // `estabh`,
       this.callClosed, // `closeh`,
       () => {}, // `metricsh`,
       this.requestConfig, // `cfg_reqh`,
@@ -371,6 +372,20 @@ export class CallingRepository {
 
     return wUser;
   }
+
+  private readonly establishCall = (conversationId: string) => {
+    const call = this.findCall(this.parseQualifiedId(conversationId));
+
+    if (!call) {
+      return;
+    }
+
+    pushToTalk.subscribe(
+      ' ',
+      (shouldMute: boolean) => this.muteCall(call, shouldMute),
+      () => call.muteState() === MuteState.SELF_MUTED,
+    );
+  };
 
   private readonly handleMissedCall = (conversationId: string, timestamp: number, userId: string) => {
     const callDuration = 0;
@@ -1424,6 +1439,8 @@ export class CallingRepository {
     if (!call) {
       return;
     }
+
+    //TODO: stop listening for push to talk events
 
     // There's nothing we need to do for non-mls calls
     if (call.conversationType === CONV_TYPE.CONFERENCE_MLS) {
