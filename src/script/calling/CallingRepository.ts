@@ -1017,7 +1017,6 @@ export class CallingRepository {
 
   private readonly leaveMLSConference = async (conversationId: QualifiedId) => {
     await this.subconversationService.leaveConferenceSubconversation(conversationId);
-    callingSubscriptions.removeCall(conversationId);
   };
 
   private readonly joinMlsConferenceSubconversation = async ({qualifiedId, groupId}: MLSConversation) => {
@@ -1444,12 +1443,13 @@ export class CallingRepository {
       return;
     }
 
-    //TODO: stop listening for push to talk events
-
     // There's nothing we need to do for non-mls calls
     if (call.conversationType === CONV_TYPE.CONFERENCE_MLS) {
       await this.leaveMLSConference(conversationId);
     }
+
+    // Remove all the tasks related to the call
+    callingSubscriptions.removeCall(conversationId);
 
     if (reason === REASON.NORMAL) {
       this.callState.selectableScreens([]);
