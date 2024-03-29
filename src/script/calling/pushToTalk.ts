@@ -17,7 +17,7 @@
  *
  */
 
-const defaultKey = ' '; // spacebar;
+const defaultKey = ' '; // Spacebar
 
 const subscribe = (key = defaultKey, toggleMute: (shouldMute: boolean) => void, isMuted: () => boolean) => {
   let isKeyDown = false;

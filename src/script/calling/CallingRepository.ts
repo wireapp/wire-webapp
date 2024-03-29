@@ -354,7 +354,7 @@ export class CallingRepository {
       this.incomingCall, // `incomingh`,
       this.handleMissedCall, // `missedh`,
       () => {}, // `answer
-      this.establishCall, // `estabh`,
+      this.callEstablished, // `estabh`,
       this.callClosed, // `closeh`,
       () => {}, // `metricsh`,
       this.requestConfig, // `cfg_reqh`,
@@ -373,18 +373,21 @@ export class CallingRepository {
     return wUser;
   }
 
-  private readonly establishCall = (conversationId: string) => {
-    const call = this.findCall(this.parseQualifiedId(conversationId));
+  private readonly callEstablished = (conversationId: string) => {
+    const qualifiedId = this.parseQualifiedId(conversationId);
+    const call = this.findCall(qualifiedId);
 
     if (!call) {
       return;
     }
 
-    pushToTalk.subscribe(
+    const unsubscribe = pushToTalk.subscribe(
       ' ',
       (shouldMute: boolean) => this.muteCall(call, shouldMute),
       () => call.muteState() === MuteState.SELF_MUTED,
     );
+
+    callingSubscriptions.addCall(qualifiedId, unsubscribe);
   };
 
   private readonly handleMissedCall = (conversationId: string, timestamp: number, userId: string) => {
