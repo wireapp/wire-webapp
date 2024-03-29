@@ -53,6 +53,7 @@ import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {flatten} from 'Util/ArrayUtil';
+import {KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {roundLogarithmic} from 'Util/NumberUtil';
@@ -382,7 +383,7 @@ export class CallingRepository {
     }
 
     const unsubscribe = pushToTalk.subscribe(
-      ' ',
+      KEY.SPACE,
       (shouldMute: boolean) => this.muteCall(call, shouldMute),
       () => call.muteState() === MuteState.SELF_MUTED,
     );

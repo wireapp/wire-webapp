@@ -17,43 +17,44 @@
  *
  */
 
-const defaultKey = ' '; // Spacebar
-
-const subscribe = (key = defaultKey, toggleMute: (shouldMute: boolean) => void, isMuted: () => boolean) => {
+const subscribe = (key: string, toggleMute: (shouldMute: boolean) => void, isMuted: () => boolean) => {
   let isKeyDown = false;
   let wasUnmutedWithKeyPress = false;
 
   const handleKeyDown = (event: KeyboardEvent) => {
+    if (event.key !== key) {
+      return;
+    }
+
+    // Do nothing if the key press was already registered.
     if (isKeyDown) {
       return;
     }
 
-    isKeyDown = event.key === key;
+    isKeyDown = true;
 
-    // If we are already unmuted, we do nothing
+    // If we are already unmuted, we do nothing.
     if (!isMuted()) {
       return;
     }
 
-    if (!isKeyDown) {
-      return;
-    }
-
     wasUnmutedWithKeyPress = true;
-
     toggleMute(false);
   };
 
   const handleKeyUp = (event: KeyboardEvent) => {
-    // If the key was not pressed, we do nothing
+    // If the key was not pressed, we do nothing.
     if (!isKeyDown) {
       return;
     }
 
+    // Release the key.
     if (event.key === key) {
       isKeyDown = false;
     }
 
+    // If we were unmuted with the key press, we mute again.
+    // (This is to prevent muting when first unmuted with the unmute button)
     if (wasUnmutedWithKeyPress) {
       toggleMute(true);
     }

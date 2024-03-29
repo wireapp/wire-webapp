@@ -35,7 +35,7 @@ export const KEY = {
   PAGE_UP: 'PageUp',
   SPACE: ' ',
   TAB: 'Tab',
-};
+} as const;
 
 export const isOneOfKeys = (keyboardEvent: KeyboardEvent | ReactKeyboardEvent, expectedKeys: string[] = []) => {
   expectedKeys = expectedKeys.map(key => key.toLowerCase());
