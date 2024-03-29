@@ -35,7 +35,7 @@ import {Icon} from 'Components/Icon';
 import {ConversationClassifiedBar} from 'Components/input/ClassifiedBar';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {isEnterKey, KEY} from 'Util/KeyboardUtil';
+import {isEnterKey, isSpaceOrEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
@@ -207,7 +207,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
       if (!isOngoing) {
         return;
       }
-      if ([KEY.ENTER, KEY.SPACE].includes(event.key)) {
+      if (isSpaceOrEnterKey(event.key)) {
         multitasking?.isMinimized(false);
       }
     },
