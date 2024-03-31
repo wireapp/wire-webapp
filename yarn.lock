@@ -6592,10 +6592,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"countly-sdk-web@npm:23.12.5":
-  version: 23.12.5
-  resolution: "countly-sdk-web@npm:23.12.5"
-  checksum: 10/950b89aad558ae8289e19927e6f4c57215b952186630c3869943f48ebea8937b17d80287d921cac0ad355661d1538a56b7836b45cfd2cbef504b864069194331
+"countly-sdk-web@npm:23.12.6":
+  version: 23.12.6
+  resolution: "countly-sdk-web@npm:23.12.6"
+  checksum: 10/2faf8b29799d36dee9454a4288358e64675feb251178822c57e1e38974121ec1ba95e36505516317a4a5bbdc1e4ea46b538ab0c829339850918d3f95b6e75c5b
   languageName: node
   linkType: hard
 
@@ -17438,7 +17438,7 @@ __metadata:
     classnames: "npm:2.5.1"
     copy-webpack-plugin: "npm:12.0.2"
     core-js: "npm:3.36.1"
-    countly-sdk-web: "npm:23.12.5"
+    countly-sdk-web: "npm:23.12.6"
     cross-env: "npm:7.0.3"
     css-loader: "npm:^6.10.0"
     cssnano: "npm:6.1.1"
