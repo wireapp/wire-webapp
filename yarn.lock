@@ -16430,9 +16430,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tsc-watch@npm:6.0.4":
-  version: 6.0.4
-  resolution: "tsc-watch@npm:6.0.4"
+"tsc-watch@npm:6.2.0":
+  version: 6.2.0
+  resolution: "tsc-watch@npm:6.2.0"
   dependencies:
     cross-spawn: "npm:^7.0.3"
     node-cleanup: "npm:^2.1.2"
@@ -16442,7 +16442,7 @@ __metadata:
     typescript: "*"
   bin:
     tsc-watch: dist/lib/tsc-watch.js
-  checksum: 10/b0e793f63fbb260d4bb94f7fac6cb4b31c7bd710f16cac5018859b87a4550663d404a2cf8478105a48d77f7c72a9cf5568d605381eb6e44b77055e4f9031886a
+  checksum: 10/53a81d3c77f71e40a54179b5a7f25e06d0a2fc0a59f9a6406a04e187751baa1995b6854cb6e0881519c8139c6cbd40c140bc862d7aed4cf9474a827c39567157
   languageName: node
   linkType: hard
 
@@ -17514,7 +17514,7 @@ __metadata:
     terser-webpack-plugin: "npm:5.3.10"
     text-encoding: "npm:0.7.0"
     ts-node: "npm:10.9.2"
-    tsc-watch: "npm:6.0.4"
+    tsc-watch: "npm:6.2.0"
     tsyringe: "npm:4.8.0"
     typescript: "npm:5.4.2"
     underscore: "npm:1.13.6"
