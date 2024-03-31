@@ -17199,12 +17199,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webrtc-adapter@npm:8.2.3":
-  version: 8.2.3
-  resolution: "webrtc-adapter@npm:8.2.3"
+"webrtc-adapter@npm:9.0.1":
+  version: 9.0.1
+  resolution: "webrtc-adapter@npm:9.0.1"
   dependencies:
     sdp: "npm:^3.2.0"
-  checksum: 10/13a988ac12e0bd89abe66aa578f3d2ba9c93d222ca1c3b0b2e00bb784b771fb964f0fa1b6a2d68663c6307d17719878b164211008a9546a57c930fecc421c2be
+  checksum: 10/5e73ddb6fb807e28fc4bb727bdee2717a697bcf24cfbe1e401c5a3c57d61627fa000b6185470ec3c9fcc1dca42093b67776742c7fde7002fbc14da272a020cbf
   languageName: node
   linkType: hard
 
@@ -17523,7 +17523,7 @@ __metadata:
     webpack-cli: "npm:5.1.4"
     webpack-dev-middleware: "npm:7.1.1"
     webpack-hot-middleware: "npm:2.26.1"
-    webrtc-adapter: "npm:8.2.3"
+    webrtc-adapter: "npm:9.0.1"
     workbox-webpack-plugin: "npm:7.0.0"
     zustand: "npm:4.5.2"
   languageName: unknown
