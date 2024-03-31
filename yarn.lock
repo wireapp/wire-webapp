@@ -16636,7 +16636,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:5.4.2, typescript@npm:^5, typescript@npm:^5.2.2":
+"typescript@npm:5.4.3":
+  version: 5.4.3
+  resolution: "typescript@npm:5.4.3"
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: 10/de4c69f49a7ad4b1ea66a6dcc8b055ac34eb56af059a069d8988dd811c5e649be07e042e5bf573e8d0ac3ec2f30e6c999aa651cd09f6e9cbc6113749e8b6be20
+  languageName: node
+  linkType: hard
+
+"typescript@npm:^5, typescript@npm:^5.2.2":
   version: 5.4.2
   resolution: "typescript@npm:5.4.2"
   bin:
@@ -16656,7 +16666,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@npm%3A5.4.2#optional!builtin<compat/typescript>, typescript@patch:typescript@npm%3A^5#optional!builtin<compat/typescript>, typescript@patch:typescript@npm%3A^5.2.2#optional!builtin<compat/typescript>":
+"typescript@patch:typescript@npm%3A5.4.3#optional!builtin<compat/typescript>":
+  version: 5.4.3
+  resolution: "typescript@patch:typescript@npm%3A5.4.3#optional!builtin<compat/typescript>::version=5.4.3&hash=5adc0c"
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: 10/5aedd97595582b08aadb8a70e8e3ddebaf5a9c1e5ad4d6503c2fcfc15329b5cf8d01145b09913e9555683ac16c5123a96be32b6d72614098ebd42df520eed9b1
+  languageName: node
+  linkType: hard
+
+"typescript@patch:typescript@npm%3A^5#optional!builtin<compat/typescript>, typescript@patch:typescript@npm%3A^5.2.2#optional!builtin<compat/typescript>":
   version: 5.4.2
   resolution: "typescript@patch:typescript@npm%3A5.4.2#optional!builtin<compat/typescript>::version=5.4.2&hash=5adc0c"
   bin:
@@ -17543,7 +17563,7 @@ __metadata:
     ts-node: "npm:10.9.2"
     tsc-watch: "npm:6.2.0"
     tsyringe: "npm:4.8.0"
-    typescript: "npm:5.4.2"
+    typescript: "npm:5.4.3"
     underscore: "npm:1.13.6"
     uuidjs: "npm:4.2.13"
     webpack: "npm:5.91.0"
