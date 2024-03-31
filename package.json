@@ -132,7 +132,7 @@
     "prettier": "3.2.5",
     "redux-mock-store": "1.5.4",
     "seedrandom": "^3.0.5",
-    "simple-git": "3.23.0",
+    "simple-git": "3.24.0",
     "sinon": "17.0.1",
     "style-loader": "^3.3.4",
     "stylelint": "16.3.0",

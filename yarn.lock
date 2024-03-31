@@ -15295,14 +15295,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"simple-git@npm:3.23.0":
-  version: 3.23.0
-  resolution: "simple-git@npm:3.23.0"
+"simple-git@npm:3.24.0":
+  version: 3.24.0
+  resolution: "simple-git@npm:3.24.0"
   dependencies:
     "@kwsites/file-exists": "npm:^1.1.1"
     "@kwsites/promise-deferred": "npm:^1.1.1"
     debug: "npm:^4.3.4"
-  checksum: 10/08ddfcbc310bfeaba066ef7b0d178967d9984aa1bc5e29f0360d166b0ccf820a3e5bb67d02036fca40fde6cdfc998f2b5fb2db9a8bbbad29b4feb4c1391f39e0
+  checksum: 10/be1b93c799cbb1daa6ceb0c9b8a5a501026c7add69cadf50b10e74fd03bdc801a582c45ff7f69f998c736defd495cc5c5840e95d069e0fb4ed5014e8af0abaf6
   languageName: node
   linkType: hard
 
@@ -17503,7 +17503,7 @@ __metadata:
     redux-mock-store: "npm:1.5.4"
     redux-thunk: "npm:3.1.0"
     seedrandom: "npm:^3.0.5"
-    simple-git: "npm:3.23.0"
+    simple-git: "npm:3.24.0"
     sinon: "npm:17.0.1"
     speakingurl: "npm:14.0.1"
     style-loader: "npm:^3.3.4"
