@@ -383,7 +383,7 @@ export class CallingRepository {
     }
 
     const unsubscribe = pushToTalk.subscribe(
-      () => KEY.SPACE,
+      KEY.SPACE,
       (shouldMute: boolean) => this.muteCall(call, shouldMute),
       () => call.muteState() === MuteState.SELF_MUTED,
     );

@@ -19,7 +19,7 @@
 
 /**
  * Subscribe to push-to-talk functionality.
- * @param getKey The key to listen to (getter).
+ * @param key The key to listen to.
  * @param toggleMute A function to toggle the mute state.
  * @param isMuted A function to check if the user is muted.
  * @returns A function to unsubscribe.
@@ -27,12 +27,40 @@
  * const unsubscribe = pushToTalk.subscribe(() => settings.getToggleKey(), toggleMute, isMuted);
  * unsubscribe();
  */
-const subscribe = (getKey: () => string, toggleMute: (shouldMute: boolean) => void, isMuted: () => boolean) => {
-  let isKeyDown = false;
+const subscribe = (key: string, toggleMute: (shouldMute: boolean) => void, isMuted: () => boolean) => {
   let wasUnmutedWithKeyPress = false;
 
+  return handleKeyPress(key, {
+    onPress: () => {
+      // If we are already unmuted, we do nothing.
+      if (!isMuted()) {
+        return;
+      }
+
+      wasUnmutedWithKeyPress = true;
+      toggleMute(false);
+    },
+    onRelease: () => {
+      // If we were unmuted with the key press, we mute again.
+      // (This is to prevent muting when first unmuted with the unmute button)
+      if (wasUnmutedWithKeyPress) {
+        toggleMute(true);
+      }
+
+      wasUnmutedWithKeyPress = false;
+    },
+  });
+};
+
+export const pushToTalk = {
+  subscribe,
+};
+
+const handleKeyPress = (key: string, {onPress, onRelease}: {onPress: () => void; onRelease: () => void}) => {
+  let isKeyDown = false;
+
   const handleKeyDown = (event: KeyboardEvent) => {
-    if (event.key !== getKey()) {
+    if (event.key !== key) {
       return;
     }
 
@@ -45,17 +73,11 @@ const subscribe = (getKey: () => string, toggleMute: (shouldMute: boolean) => vo
 
     isKeyDown = true;
 
-    // If we are already unmuted, we do nothing.
-    if (!isMuted()) {
-      return;
-    }
-
-    wasUnmutedWithKeyPress = true;
-    toggleMute(false);
+    onPress();
   };
 
   const handleKeyUp = (event: KeyboardEvent) => {
-    if (event.key !== getKey()) {
+    if (event.key !== key) {
       return;
     }
 
@@ -69,13 +91,7 @@ const subscribe = (getKey: () => string, toggleMute: (shouldMute: boolean) => vo
     // Release the key.
     isKeyDown = false;
 
-    // If we were unmuted with the key press, we mute again.
-    // (This is to prevent muting when first unmuted with the unmute button)
-    if (wasUnmutedWithKeyPress) {
-      toggleMute(true);
-    }
-
-    wasUnmutedWithKeyPress = false;
+    onRelease();
   };
 
   const listenerOptions = {capture: true};
@@ -87,8 +103,4 @@ const subscribe = (getKey: () => string, toggleMute: (shouldMute: boolean) => vo
     window.removeEventListener('keydown', handleKeyDown, listenerOptions);
     window.removeEventListener('keyup', handleKeyUp, listenerOptions);
   };
-};
-
-export const pushToTalk = {
-  subscribe,
 };
