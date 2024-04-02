@@ -32,7 +32,7 @@ import {handleKeyPress} from 'Util/KeyboardUtil';
 const subscribe = (key: string, toggleMute: (shouldMute: boolean) => void, isMuted: () => boolean) => {
   let wasUnmutedWithKeyPress = false;
 
-  return handleKeyPress(key, {
+  const unsubscribe = handleKeyPress(key, {
     onPress: () => {
       // If we are already unmuted, we do nothing.
       if (!isMuted()) {
@@ -52,6 +52,8 @@ const subscribe = (key: string, toggleMute: (shouldMute: boolean) => void, isMut
       wasUnmutedWithKeyPress = false;
     },
   });
+
+  return {unsubscribe};
 };
 
 export const pushToTalk = {

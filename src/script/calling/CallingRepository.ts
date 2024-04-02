@@ -144,6 +144,7 @@ export class CallingRepository {
   private wUser: number = 0;
   private nextMuteState: MuteState = MuteState.SELF_MUTED;
   private isConferenceCallingSupported = false;
+  private pushToTalkSubscription?: {unsubscribe: () => void};
   /**
    * Keeps track of the size of the avs log once the webapp is initiated. This allows detecting meaningless avs logs (logs that have a length equal to the length when the webapp was initiated)
    */
@@ -382,13 +383,21 @@ export class CallingRepository {
       return;
     }
 
-    const unsubscribe = pushToTalk.subscribe(
-      KEY.SPACE,
+    this.subscribeToPushToTalk(KEY.SPACE, call);
+  };
+
+  private readonly subscribeToPushToTalk = (key: string, call: Call) => {
+    this.pushToTalkSubscription?.unsubscribe();
+    this.pushToTalkSubscription = pushToTalk.subscribe(
+      key,
       (shouldMute: boolean) => this.muteCall(call, shouldMute),
       () => call.muteState() === MuteState.SELF_MUTED,
     );
+  };
 
-    callingSubscriptions.addCall(qualifiedId, unsubscribe);
+  private readonly unsubscribeFromPushToTalk = () => {
+    this.pushToTalkSubscription?.unsubscribe();
+    this.pushToTalkSubscription = undefined;
   };
 
   private readonly handleMissedCall = (conversationId: string, timestamp: number, userId: string) => {
@@ -1450,6 +1459,7 @@ export class CallingRepository {
 
     // Remove all the tasks related to the call
     callingSubscriptions.removeCall(conversationId);
+    this.unsubscribeFromPushToTalk();
 
     if (reason === REASON.NORMAL) {
       this.callState.selectableScreens([]);
