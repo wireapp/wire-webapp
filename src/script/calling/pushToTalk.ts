@@ -36,6 +36,8 @@ const subscribe = (getKey: () => string, toggleMute: (shouldMute: boolean) => vo
       return;
     }
 
+    event.stopPropagation();
+
     // Do nothing if the key press was already registered.
     if (isKeyDown) {
       return;
@@ -53,15 +55,19 @@ const subscribe = (getKey: () => string, toggleMute: (shouldMute: boolean) => vo
   };
 
   const handleKeyUp = (event: KeyboardEvent) => {
+    if (event.key !== getKey()) {
+      return;
+    }
+
+    event.stopPropagation();
+
     // If the key was not pressed, we do nothing.
     if (!isKeyDown) {
       return;
     }
 
     // Release the key.
-    if (event.key === getKey()) {
-      isKeyDown = false;
-    }
+    isKeyDown = false;
 
     // If we were unmuted with the key press, we mute again.
     // (This is to prevent muting when first unmuted with the unmute button)
@@ -72,12 +78,14 @@ const subscribe = (getKey: () => string, toggleMute: (shouldMute: boolean) => vo
     wasUnmutedWithKeyPress = false;
   };
 
-  document.addEventListener('keydown', handleKeyDown);
-  document.addEventListener('keyup', handleKeyUp);
+  const listenerOptions = {capture: true};
+
+  window.addEventListener('keydown', handleKeyDown, listenerOptions);
+  window.addEventListener('keyup', handleKeyUp, listenerOptions);
 
   return () => {
-    document.removeEventListener('keydown', handleKeyDown);
-    document.removeEventListener('keyup', handleKeyUp);
+    window.removeEventListener('keydown', handleKeyDown, listenerOptions);
+    window.removeEventListener('keyup', handleKeyUp, listenerOptions);
   };
 };
 
