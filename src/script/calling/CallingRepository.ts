@@ -66,7 +66,7 @@ import {CallState, MuteState} from './CallState';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
 import {ClientId, Participant, UserId} from './Participant';
-import {pushToTalk} from './PushToTalk';
+import {pushToTalk} from './PushToTalk/PushToTalk';
 
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
