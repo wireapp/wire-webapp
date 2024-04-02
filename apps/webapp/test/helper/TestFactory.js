@@ -299,12 +299,15 @@ export class TestFactory {
    */
   async exposeCallingActors() {
     await this.exposeConversationActors();
+
+    const mediaRepository = new MediaRepository(new PermissionRepository());
+
     this.calling_repository = new CallingRepository(
       this.message_repository,
       this.event_repository,
       this.user_repository,
-      new MediaRepository(new PermissionRepository()).streamHandler,
-      new MediaRepository(new PermissionRepository()).devicesHandler,
+      mediaRepository.streamHandler,
+      mediaRepository.devicesHandler,
       serverTimeHandler,
       undefined,
       this.conversation_repository['conversationState'],

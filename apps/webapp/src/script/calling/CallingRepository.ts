@@ -283,8 +283,29 @@ export class CallingRepository {
 
     this.wCall = this.configureCallingApi(callingInstance);
     this.wUser = this.createWUser(this.wCall, this.serializeQualifiedId(this.selfUser.qualifiedId), clientId);
+
+    this.mediaDevicesHandler.setOnMediaDevicesRefreshHandler(this.onMediaDevicesRefresh);
+
     return {wCall: this.wCall, wUser: this.wUser};
   }
+
+  private onMediaDevicesRefresh = () => {
+    const activeCall = this.callState.joinedCall();
+
+    if (!activeCall) {
+      return;
+    }
+
+    const selfParticipant = activeCall.getSelfParticipant();
+
+    if (!selfParticipant.isMuted()) {
+      void this.refreshAudioInput();
+    }
+
+    if (selfParticipant.isSendingVideo()) {
+      void this.refreshVideoInput();
+    }
+  };
 
   setReady(): void {
     this.isReady = true;

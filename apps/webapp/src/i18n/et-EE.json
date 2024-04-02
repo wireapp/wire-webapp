@@ -423,7 +423,7 @@
   "conversationDetails1to1ReceiptsFirst": "Kui mõlemad osapooled lülitavad lugemiskinnitused sisse, saad sa näha, kas sõnumid on loetud.",
   "conversationDetails1to1ReceiptsHeadDisabled": "Sa keelasid lugemiskinnitused",
   "conversationDetails1to1ReceiptsHeadEnabled": "Sa lubasid lugemiskinnitused",
-  "conversationDetails1to1ReceiptsSecond": "Sa saad seda valikut oma konto seadetes muuta.",
+  "conversationDetails1to1ReceiptsSecond": "You can change this option in your [button]account settings[/button].",
   "conversationDetailsActionAddParticipants": "Lisa osalejaid",
   "conversationDetailsActionArchive": "Arhiveeri",
   "conversationDetailsActionBlock": "Block",

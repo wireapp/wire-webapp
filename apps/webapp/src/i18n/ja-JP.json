@@ -423,7 +423,7 @@
   "conversationDetails1to1ReceiptsFirst": "両者が開封通知をオンにした場合に、メッセージが開封されたかが分かります。",
   "conversationDetails1to1ReceiptsHeadDisabled": "開封通知を無効にします",
   "conversationDetails1to1ReceiptsHeadEnabled": "開封通知を有効にします",
-  "conversationDetails1to1ReceiptsSecond": "あなたの アカウント設定 から、この設定を変更することができます。",
+  "conversationDetails1to1ReceiptsSecond": "You can change this option in your [button]account settings[/button].",
   "conversationDetailsActionAddParticipants": "参加者を追加",
   "conversationDetailsActionArchive": "アーカイブ",
   "conversationDetailsActionBlock": "Block",

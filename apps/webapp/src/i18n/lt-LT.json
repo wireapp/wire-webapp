@@ -423,7 +423,7 @@
   "conversationDetails1to1ReceiptsFirst": "Jei abi šalys įjungs pranešimus apie skatymą, galėsite matyti, kai pranešimai yra perskaitomi.",
   "conversationDetails1to1ReceiptsHeadDisabled": "Esate išjungę pranešimus apie skaitymą",
   "conversationDetails1to1ReceiptsHeadEnabled": "Esate įjungę pranešimus apie skaitymą",
-  "conversationDetails1to1ReceiptsSecond": "Galite pakeisti šią parinktį savo paskyros nustatymuose.",
+  "conversationDetails1to1ReceiptsSecond": "You can change this option in your [button]account settings[/button].",
   "conversationDetailsActionAddParticipants": "Pridėti dalyvių",
   "conversationDetailsActionArchive": "Archyvuoti susirašinėjimą",
   "conversationDetailsActionBlock": "Block",
