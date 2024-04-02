@@ -17,6 +17,8 @@
  *
  */
 
+import {handleKeyPress} from 'Util/KeyboardUtil';
+
 /**
  * Subscribe to push-to-talk functionality.
  * @param key The key to listen to.
@@ -54,53 +56,4 @@ const subscribe = (key: string, toggleMute: (shouldMute: boolean) => void, isMut
 
 export const pushToTalk = {
   subscribe,
-};
-
-const handleKeyPress = (key: string, {onPress, onRelease}: {onPress: () => void; onRelease: () => void}) => {
-  let isKeyDown = false;
-
-  const handleKeyDown = (event: KeyboardEvent) => {
-    if (event.key !== key) {
-      return;
-    }
-
-    event.stopPropagation();
-
-    // Do nothing if the key press was already registered.
-    if (isKeyDown) {
-      return;
-    }
-
-    isKeyDown = true;
-
-    onPress();
-  };
-
-  const handleKeyUp = (event: KeyboardEvent) => {
-    if (event.key !== key) {
-      return;
-    }
-
-    event.stopPropagation();
-
-    // If the key was not pressed, we do nothing.
-    if (!isKeyDown) {
-      return;
-    }
-
-    // Release the key.
-    isKeyDown = false;
-
-    onRelease();
-  };
-
-  const listenerOptions = {capture: true};
-
-  window.addEventListener('keydown', handleKeyDown, listenerOptions);
-  window.addEventListener('keyup', handleKeyUp, listenerOptions);
-
-  return () => {
-    window.removeEventListener('keydown', handleKeyDown, listenerOptions);
-    window.removeEventListener('keyup', handleKeyUp, listenerOptions);
-  };
 };
