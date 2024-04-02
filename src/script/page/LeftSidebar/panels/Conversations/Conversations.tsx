@@ -22,7 +22,7 @@ import React, {useEffect, useState} from 'react';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
-import {ChevronIcon} from '@wireapp/react-ui-kit';
+import {ChevronIcon, useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {CallingCell} from 'Components/calling/CallingCell';
@@ -164,6 +164,8 @@ const Conversations: React.FC<ConversationsProps> = ({
 
   const hasNoConversations = conversations.length + connectRequests.length === 0;
 
+  const mdBreakpoint = useMatchMedia('(max-width: 1000px)');
+
   useEffect(() => {
     if (activeConversation && !conversationState.isVisible(activeConversation)) {
       // If the active conversation is not visible, switch to the recent view
@@ -240,7 +242,7 @@ const Conversations: React.FC<ConversationsProps> = ({
 
   const sidebar = (
     <div className="conversations-sidebar-wrapper">
-      <nav className="conversations-sidebar" data-is-collapsed={isSidebarCollapsed}>
+      <nav className="conversations-sidebar" data-is-collapsed={isSidebarCollapsed || mdBreakpoint}>
         <div className="conversations-sidebar-items">
           <div className="conversations-sidebar-items-children">
             <UserDetails
@@ -261,17 +263,19 @@ const Conversations: React.FC<ConversationsProps> = ({
               onClickPreferences={() => onClickPreferences(ContentState.PREFERENCES_ACCOUNT)}
             />
           </div>
-          <button
-            type="button"
-            role="tab"
-            className="conversations-sidebar-handle"
-            data-is-collapsed={isSidebarCollapsed}
-            onClick={() => setIsSidebarCollapsed(previous => !previous)}
-          >
-            <div className="conversations-sidebar-handle-icon" data-is-collapsed={isSidebarCollapsed}>
-              <ChevronIcon width={12} height={12} />
-            </div>
-          </button>
+          {!mdBreakpoint && (
+            <button
+              type="button"
+              role="tab"
+              className="conversations-sidebar-handle"
+              data-is-collapsed={isSidebarCollapsed || mdBreakpoint}
+              onClick={() => setIsSidebarCollapsed(previous => !previous)}
+            >
+              <div className="conversations-sidebar-handle-icon" data-is-collapsed={isSidebarCollapsed}>
+                <ChevronIcon width={12} height={12} />
+              </div>
+            </button>
+          )}
         </div>
       </nav>
     </div>
