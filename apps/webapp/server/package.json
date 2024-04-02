@@ -41,6 +41,8 @@
     "generate-version-file": "node ./bin/generateVersionFile.js",
     "clean": "rimraf ./dist/",
     "start:prod": "pm2 start \"./index.js\" --name \"Webapp\" && pm2 logs",
-    "test": "jest"
+    "test:types": "tsc --noEmit",
+    "test:app": "jest",
+    "test": "yarn test:types && yarn test:app"
   }
 }
