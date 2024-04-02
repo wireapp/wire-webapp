@@ -30,6 +30,9 @@ jobs:
       - name: Install JS dependencies
         run: yarn --immutable
 
+      - name: Build packages
+        run: yarn build:packages
+
       - name: Lint
         run: yarn lint
 
@@ -40,6 +43,5 @@ jobs:
         uses: codecov/codecov-action@v4.1.1
         with:
           fail_ci_if_error: false
-          files: ./coverage/lcov.info
           flags: unittests
           token: ${{ secrets.CODECOV_TOKEN }}
