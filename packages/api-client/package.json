@@ -57,8 +57,6 @@
     "build": "yarn clean && tsc",
     "clean": "rimraf lib",
     "dist": "yarn build",
-    "demo:http401": "cross-env NODE_DEBUG='@wireapp/api-client*' ts-node src/demo/http401.ts",
-    "demo:self": "cross-env NODE_DEBUG='@wireapp/api-client*' ts-node src/demo/self.ts",
     "start": "concurrently \"tsc -w\" \"webpack -w\" \"browser-sync start -c bs-config.js\"",
     "start:node": "cross-env NODE_DEBUG='@wireapp*' node --inspect -r ts-node/register demo.ts",
     "test": "jest",
