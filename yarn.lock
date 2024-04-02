@@ -5169,9 +5169,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@workspace:^, @wireapp/api-client@workspace:libraries/api-client":
+"@wireapp/api-client@workspace:^, @wireapp/api-client@workspace:packages/api-client":
   version: 0.0.0-use.local
-  resolution: "@wireapp/api-client@workspace:libraries/api-client"
+  resolution: "@wireapp/api-client@workspace:packages/api-client"
   dependencies:
     "@swc/core": "npm:^1.3.10"
     "@swc/jest": "npm:^0.2.23"
@@ -5226,9 +5226,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/commons@workspace:^, @wireapp/commons@workspace:libraries/commons":
+"@wireapp/commons@workspace:^, @wireapp/commons@workspace:packages/commons":
   version: 0.0.0-use.local
-  resolution: "@wireapp/commons@workspace:libraries/commons"
+  resolution: "@wireapp/commons@workspace:packages/commons"
   dependencies:
     "@swc/core": "npm:1.4.11"
     "@swc/jest": "npm:0.2.36"
@@ -5269,9 +5269,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@workspace:^, @wireapp/core@workspace:libraries/core":
+"@wireapp/core@workspace:^, @wireapp/core@workspace:packages/core":
   version: 0.0.0-use.local
-  resolution: "@wireapp/core@workspace:libraries/core"
+  resolution: "@wireapp/core@workspace:packages/core"
   dependencies:
     "@faker-js/faker": "npm:8.4.1"
     "@swc/core": "npm:1.4.11"
