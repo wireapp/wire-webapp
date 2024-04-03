@@ -81,7 +81,7 @@
 
   .conversations-sidebar-items {
     position: fixed;
-    z-index: 999999;
+    z-index: 1000;
     display: flex;
     overflow: auto;
     width: 220px;
@@ -171,6 +171,11 @@
 
 .conversations-sidebar-folders {
   padding: 0.5rem 0;
+
+  &--empty {
+    font-size: 14px;
+    font-weight: 400;
+  }
 
   &--inner-wrapper {
     display: flex;

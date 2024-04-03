@@ -475,6 +475,7 @@
   "conversationFederationIndicator": "Federated",
   "conversationFileAssetRestricted": "Receiving files is prohibited",
   "conversationFooterArchive": "Archive",
+  "conversationFoldersEmptyText": "Add your conversations to folders to stay organized. [link]Learn more[/link]",
   "conversationFooterContacts": "Contacts",
   "conversationGuestIndicator": "Guest",
   "conversationImageAssetRestricted": "Receiving images is prohibited",
