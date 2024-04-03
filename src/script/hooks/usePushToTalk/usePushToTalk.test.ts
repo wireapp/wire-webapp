@@ -17,7 +17,9 @@
  *
  */
 
-import {pushToTalk} from './PushToTalk';
+import {renderHook} from '@testing-library/react';
+
+import {usePushToTalk} from './usePushToTalk';
 
 describe('PushToTalk', () => {
   it('unmutes if key was pressed when muted', async () => {
@@ -25,7 +27,7 @@ describe('PushToTalk', () => {
     const mockIsMuted = jest.fn();
 
     const key = 'a';
-    pushToTalk.subscribe(key, mockToggleMute, mockIsMuted);
+    renderHook(() => usePushToTalk({key, toggleMute: mockToggleMute, isMuted: mockIsMuted}));
 
     mockIsMuted.mockReturnValueOnce(true);
 
@@ -41,7 +43,7 @@ describe('PushToTalk', () => {
     const mockIsMuted = jest.fn();
 
     const key = 'a';
-    pushToTalk.subscribe(key, mockToggleMute, mockIsMuted);
+    renderHook(() => usePushToTalk({key, toggleMute: mockToggleMute, isMuted: mockIsMuted}));
 
     mockIsMuted.mockReturnValueOnce(false);
 
@@ -56,7 +58,7 @@ describe('PushToTalk', () => {
     const mockIsMuted = jest.fn();
 
     const key = 'a';
-    pushToTalk.subscribe(key, mockToggleMute, mockIsMuted);
+    renderHook(() => usePushToTalk({key, toggleMute: mockToggleMute, isMuted: mockIsMuted}));
 
     mockIsMuted.mockReturnValueOnce(true);
     window.dispatchEvent(new KeyboardEvent('keydown', {key}));
@@ -74,7 +76,7 @@ describe('PushToTalk', () => {
     const mockIsMuted = jest.fn();
 
     const key = 'a';
-    pushToTalk.subscribe(key, mockToggleMute, mockIsMuted);
+    renderHook(() => usePushToTalk({key, toggleMute: mockToggleMute, isMuted: mockIsMuted}));
 
     mockIsMuted.mockReturnValueOnce(false);
     window.dispatchEvent(new KeyboardEvent('keyup', {key}));
@@ -86,7 +88,7 @@ describe('PushToTalk', () => {
     const mockIsMuted = jest.fn();
 
     const key = 'a';
-    pushToTalk.subscribe(key, mockToggleMute, mockIsMuted);
+    renderHook(() => usePushToTalk({key, toggleMute: mockToggleMute, isMuted: mockIsMuted}));
 
     mockIsMuted.mockReturnValue(true);
 

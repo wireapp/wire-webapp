@@ -17,22 +17,24 @@
  *
  */
 
+import {useEffect, useState} from 'react';
+
+import {amplify} from 'amplify';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {handleKeyPress} from 'Util/KeyboardUtil';
 
-/**
- * Subscribe to push-to-talk functionality.
- * @param key The key to listen to.
- * @param toggleMute A function to toggle the mute state.
- * @param isMuted A function to check if the user is muted.
- * @returns A function to unsubscribe.
- * @example
- * const unsubscribe = pushToTalk.subscribe(() => settings.getToggleKey(), toggleMute, isMuted);
- * unsubscribe();
- */
-const subscribe = (key: string, toggleMute: (shouldMute: boolean) => void, isMuted: () => boolean) => {
+interface PushToTalk {
+  key: string | null;
+  toggleMute: (shouldMute: boolean) => void;
+  isMuted: () => boolean;
+}
+
+const subscribe = ({key, toggleMute, isMuted}: PushToTalk & {key: string}) => {
   let wasUnmutedWithKeyPress = false;
 
-  const unsubscribe = handleKeyPress(key, {
+  return handleKeyPress(key, {
     onPress: () => {
       // If we are already unmuted, we do nothing.
       if (!isMuted()) {
@@ -52,10 +54,31 @@ const subscribe = (key: string, toggleMute: (shouldMute: boolean) => void, isMut
       wasUnmutedWithKeyPress = false;
     },
   });
-
-  return {unsubscribe};
 };
 
-export const pushToTalk = {
-  subscribe,
+/**
+ * Subscribe to push-to-talk functionality.
+ * @param key The key to listen to.
+ * @param toggleMute A function to toggle the mute state.
+ * @param isMuted A function to check if the user is muted.
+ * @returns A function to unsubscribe.
+ * @example
+ * const unsubscribe = pushToTalk.subscribe(() => settings.getToggleKey(), toggleMute, isMuted);
+ * unsubscribe();
+ */
+export const usePushToTalk = ({key: initialKey, toggleMute, isMuted}: PushToTalk) => {
+  const [key, setKey] = useState<string | null>(initialKey);
+
+  useEffect(() => {
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.CALL.PUSH_TO_TALK_KEY, setKey);
+    return () => amplify.unsubscribe(WebAppEvents.PROPERTIES.UPDATE.CALL.PUSH_TO_TALK_KEY, setKey);
+  }, []);
+
+  useEffect(() => {
+    if (!key) {
+      return () => {};
+    }
+
+    return subscribe({key, toggleMute, isMuted});
+  }, [key, toggleMute, isMuted]);
 };

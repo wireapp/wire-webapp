@@ -65,7 +65,6 @@ import {CallState, MuteState} from './CallState';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
 import {ClientId, Participant, UserId} from './Participant';
-import {pushToTalk} from './PushToTalk/PushToTalk';
 
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
@@ -83,7 +82,6 @@ import {EventSource} from '../event/EventSource';
 import type {MediaDevicesHandler} from '../media/MediaDevicesHandler';
 import type {MediaStreamHandler} from '../media/MediaStreamHandler';
 import {MediaType} from '../media/MediaType';
-import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
 import {TeamState} from '../team/TeamState';
@@ -144,7 +142,6 @@ export class CallingRepository {
   private wUser: number = 0;
   private nextMuteState: MuteState = MuteState.SELF_MUTED;
   private isConferenceCallingSupported = false;
-  private pushToTalkSubscription?: {unsubscribe: () => void};
   /**
    * Keeps track of the size of the avs log once the webapp is initiated. This allows detecting meaningless avs logs (logs that have a length equal to the length when the webapp was initiated)
    */
@@ -164,7 +161,6 @@ export class CallingRepository {
     private readonly messageRepository: MessageRepository,
     private readonly eventRepository: EventRepository,
     private readonly userRepository: UserRepository,
-    private readonly propertiesRepository: PropertiesRepository,
     private readonly mediaStreamHandler: MediaStreamHandler,
     private readonly mediaDevicesHandler: MediaDevicesHandler,
     private readonly serverTimeHandler: ServerTimeHandler,
@@ -272,22 +268,6 @@ export class CallingRepository {
     }
   };
 
-  readonly updatePushToTalkKey = (key: string | null = null): void => {
-    this.unsubscribeFromPushToTalk();
-
-    if (key === null) {
-      return;
-    }
-
-    const activeCall = this.callState.joinedCall();
-
-    if (!activeCall) {
-      return;
-    }
-
-    this.subscribeToPushToTalk(key, activeCall);
-  };
-
   getStats(conversationId: QualifiedId) {
     return this.wCall?.getStats(this.serializeQualifiedId(conversationId));
   }
@@ -373,7 +353,7 @@ export class CallingRepository {
       this.incomingCall, // `incomingh`,
       this.handleMissedCall, // `missedh`,
       () => {}, // `answer
-      this.callEstablished, // `estabh`,
+      () => {}, // `estabh`,
       this.callClosed, // `closeh`,
       () => {}, // `metricsh`,
       this.requestConfig, // `cfg_reqh`,
@@ -391,37 +371,6 @@ export class CallingRepository {
 
     return wUser;
   }
-
-  private readonly callEstablished = (conversationId: string) => {
-    const qualifiedId = this.parseQualifiedId(conversationId);
-    const call = this.findCall(qualifiedId);
-
-    if (!call) {
-      return;
-    }
-
-    const key = this.propertiesRepository.properties.settings.call.push_to_talk_key;
-
-    if (key === null) {
-      return;
-    }
-
-    this.subscribeToPushToTalk(key, call);
-  };
-
-  private readonly subscribeToPushToTalk = (key: string, call: Call) => {
-    this.pushToTalkSubscription?.unsubscribe();
-    this.pushToTalkSubscription = pushToTalk.subscribe(
-      key,
-      (shouldMute: boolean) => this.muteCall(call, shouldMute),
-      () => call.muteState() === MuteState.SELF_MUTED,
-    );
-  };
-
-  private readonly unsubscribeFromPushToTalk = () => {
-    this.pushToTalkSubscription?.unsubscribe();
-    this.pushToTalkSubscription = undefined;
-  };
 
   private readonly handleMissedCall = (conversationId: string, timestamp: number, userId: string) => {
     const callDuration = 0;
@@ -624,7 +573,6 @@ export class CallingRepository {
   subscribeToEvents(): void {
     amplify.subscribe(WebAppEvents.CALL.EVENT_FROM_BACKEND, this.onCallEvent);
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_VBR_ENCODING, this.toggleCbrEncoding);
-    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.CALL.PUSH_TO_TALK_KEY, this.updatePushToTalkKey);
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, ({settings}: WebappProperties) => {
       this.toggleCbrEncoding(settings.call.enable_vbr_encoding);
     });
@@ -1483,7 +1431,6 @@ export class CallingRepository {
 
     // Remove all the tasks related to the call
     callingSubscriptions.removeCall(conversationId);
-    this.unsubscribeFromPushToTalk();
 
     if (reason === REASON.NORMAL) {
       this.callState.selectableScreens([]);

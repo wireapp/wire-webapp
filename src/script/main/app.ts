@@ -256,7 +256,6 @@ export class App {
       repositories.message,
       repositories.event,
       repositories.user,
-      repositories.properties,
       repositories.media.streamHandler,
       repositories.media.devicesHandler,
       serverTimeHandler,

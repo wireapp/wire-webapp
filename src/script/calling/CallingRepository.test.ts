@@ -48,7 +48,6 @@ import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
 import {CallingEvent} from '../event/CallingEvent';
 import {CALL} from '../event/Client';
 import {MediaDevicesHandler} from '../media/MediaDevicesHandler';
-import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {Core} from '../service/CoreSingleton';
 import {UserRepository} from '../user/UserRepository';
 
@@ -534,7 +533,6 @@ describe('CallingRepository ISO', () => {
           injectEvent: jest.fn(),
         } as any, // EventRepository
         {} as any, // UserRepository
-        {} as any, // PropertiesRepository
         {} as any, // MediaStreamHandler
         buildMediaDevicesHandler(), // mediaDevicesHandler
         {
@@ -660,7 +658,6 @@ describe.skip('E2E audio call', () => {
     messageRepository,
     eventRepository,
     {} as UserRepository,
-    {} as PropertiesRepository,
     serverTimeHandler as any,
     {} as any,
     {} as any,
