@@ -24,6 +24,7 @@ enum EMOJI {
 enum CALL {
   ENABLE_SOUNDLESS_INCOMING_CALLS = 'settings.call.enable_soundless_incoming_calls',
   ENABLE_VBR_ENCODING = 'settings.call.enable_vbr_encoding',
+  PUSH_TO_TALK_KEY = 'settings.call.push_to_talk_key',
 }
 
 enum INTERFACE {

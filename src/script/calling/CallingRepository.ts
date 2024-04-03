@@ -53,7 +53,6 @@ import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {flatten} from 'Util/ArrayUtil';
-import {KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {roundLogarithmic} from 'Util/NumberUtil';
@@ -84,6 +83,7 @@ import {EventSource} from '../event/EventSource';
 import type {MediaDevicesHandler} from '../media/MediaDevicesHandler';
 import type {MediaStreamHandler} from '../media/MediaStreamHandler';
 import {MediaType} from '../media/MediaType';
+import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
 import {TeamState} from '../team/TeamState';
@@ -164,6 +164,7 @@ export class CallingRepository {
     private readonly messageRepository: MessageRepository,
     private readonly eventRepository: EventRepository,
     private readonly userRepository: UserRepository,
+    private readonly propertiesRepository: PropertiesRepository,
     private readonly mediaStreamHandler: MediaStreamHandler,
     private readonly mediaDevicesHandler: MediaDevicesHandler,
     private readonly serverTimeHandler: ServerTimeHandler,
@@ -269,6 +270,22 @@ export class CallingRepository {
     if (!Config.getConfig().FEATURE.ENFORCE_CONSTANT_BITRATE) {
       this.callState.cbrEncoding(vbrEnabled ? 0 : 1);
     }
+  };
+
+  readonly updatePushToTalkKey = (key: string | null = null): void => {
+    this.unsubscribeFromPushToTalk();
+
+    if (key === null) {
+      return;
+    }
+
+    const activeCall = this.callState.joinedCall();
+
+    if (!activeCall) {
+      return;
+    }
+
+    this.subscribeToPushToTalk(key, activeCall);
   };
 
   getStats(conversationId: QualifiedId) {
@@ -383,7 +400,13 @@ export class CallingRepository {
       return;
     }
 
-    this.subscribeToPushToTalk(KEY.SPACE, call);
+    const key = this.propertiesRepository.properties.settings.call.push_to_talk_key;
+
+    if (key === null) {
+      return;
+    }
+
+    this.subscribeToPushToTalk(key, call);
   };
 
   private readonly subscribeToPushToTalk = (key: string, call: Call) => {
@@ -601,6 +624,7 @@ export class CallingRepository {
   subscribeToEvents(): void {
     amplify.subscribe(WebAppEvents.CALL.EVENT_FROM_BACKEND, this.onCallEvent);
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_VBR_ENCODING, this.toggleCbrEncoding);
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.CALL.PUSH_TO_TALK_KEY, this.updatePushToTalkKey);
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, ({settings}: WebappProperties) => {
       this.toggleCbrEncoding(settings.call.enable_vbr_encoding);
     });
