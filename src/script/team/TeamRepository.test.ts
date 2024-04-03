@@ -111,6 +111,12 @@ describe('TeamRepository', () => {
 
       jest.spyOn(teamService, 'getAllTeamFeatures').mockResolvedValue(featuresFromBackend);
 
+      teamRepo.on('featureConfigUpdated', update => {
+        expect(update.prevFeatureList).toEqual(localFeatures);
+        expect(update.newFeatureList).toEqual(featuresFromBackend);
+        expect(teamState.teamFeatures()).toEqual(featuresFromBackend);
+      });
+
       await teamRepo.initTeam();
 
       expect(teamState.teamFeatures()).toEqual(featuresFromBackend);
