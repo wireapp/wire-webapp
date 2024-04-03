@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [26.12.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@26.11.4...@wireapp/api-client@26.12.0) (2024-04-03)
+
+### Features
+
+* add call push to talk properties events ([#6121](https://github.com/wireapp/wire-web-packages/issues/6121)) ([9c713d6](https://github.com/wireapp/wire-web-packages/commit/9c713d6f2600e7ff5a49df5b556c7c557efdaf05))
+
 ## [26.11.4](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@26.11.3...@wireapp/api-client@26.11.4) (2024-03-25)
 
 **Note:** Version bump only for package @wireapp/api-client

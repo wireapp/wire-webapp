@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.21.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.20.1...@wireapp/webapp-events@0.21.0) (2024-04-03)
+
+### Features
+
+* add call push to talk properties events ([#6121](https://github.com/wireapp/wire-web-packages/issues/6121)) ([9c713d6](https://github.com/wireapp/wire-web-packages/commit/9c713d6f2600e7ff5a49df5b556c7c557efdaf05))
+
 ## [0.20.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.20.0...@wireapp/webapp-events@0.20.1) (2024-01-12)
 
 **Note:** Version bump only for package @wireapp/webapp-events
