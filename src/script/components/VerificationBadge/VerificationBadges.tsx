@@ -87,16 +87,15 @@ const getMLSStatuses = ({identities, user}: {identities?: WireIdentity[]; user?:
     return undefined;
   }
 
-  identities.forEach(identity => {
-    const matchingName = identity.displayName === user.name();
+  return identities.map(identity => {
+    const matchingName = identity.x509Identity?.displayName === user.name();
     const matchingHandle = checkUserHandle(identity, user);
 
     if (!matchingName || !matchingHandle) {
-      return undefined;
+      return MLSStatuses.NOT_ACTIVATED;
     }
+    return identity.status;
   });
-
-  return identities.map(identity => identity.status);
 };
 
 export const UserVerificationBadges = ({

@@ -79,6 +79,7 @@ export class PropertiesRepository {
       enable_debugging: false,
       settings: {
         call: {
+          push_to_talk_key: '',
           enable_soundless_incoming_calls: false,
           enable_vbr_encoding: true,
         },
