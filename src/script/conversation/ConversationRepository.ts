@@ -169,6 +169,11 @@ export enum CONVERSATION_READONLY_STATE {
   READONLY_ONE_TO_ONE_OTHER_UNSUPPORTED_MLS = 'READONLY_ONE_TO_ONE_OTHER_UNSUPPORTED_MLS',
 }
 
+interface GetInitialised1To1ConversationOptions {
+  isLiveUpdate?: boolean;
+  shouldRefreshUser?: boolean;
+}
+
 export class ConversationRepository {
   private isBlockingNotificationHandling: boolean;
   private readonly ephemeralHandler: ConversationEphemeralHandler;
@@ -1283,7 +1288,7 @@ export class ConversationRepository {
    */
   public async getInitialised1To1Conversation(
     userId: QualifiedId,
-    {isLiveUpdate = false, shouldRefreshUser = false}: {isLiveUpdate?: boolean; shouldRefreshUser?: boolean} = {
+    options: GetInitialised1To1ConversationOptions = {
       isLiveUpdate: false,
       shouldRefreshUser: false,
     },
@@ -1293,11 +1298,11 @@ export class ConversationRepository {
     const connection = user.connection();
     if (connection) {
       this.logger.log(`There's a connection with user ${userId.id}, getting a 1:1 conversation for the connection`);
-      return this.get1to1ConversationForConnection(connection, isLiveUpdate);
+      return this.get1to1ConversationForConnection(connection, options);
     }
 
     const {protocol, isMLSSupportedByTheOtherUser, isProteusSupportedByTheOtherUser} =
-      await this.getProtocolFor1to1Conversation(userId, shouldRefreshUser);
+      await this.getProtocolFor1to1Conversation(userId, options.shouldRefreshUser);
     this.logger.log(
       `Protocol for 1:1 conversation with user ${userId.id} is ${protocol}, isMLSSupportedByTheOtherUser: ${isMLSSupportedByTheOtherUser}, isProteusSupportedByTheOtherUser: ${isProteusSupportedByTheOtherUser}`,
     );
@@ -1309,7 +1314,7 @@ export class ConversationRepository {
        * When mls 1:1 conversation initialisation is triggered by some live update (e.g other user updates their supported protocols), it's very likely that we will also receive a welcome message shortly.
        * We have to add a delay to make sure the welcome message is not wasted, in case the self client would establish mls group themselves before receiving the welcome.
        */
-      const shouldDelayMLSGroupEstablishment = isLiveUpdate && isMLSSupportedByTheOtherUser;
+      const shouldDelayMLSGroupEstablishment = options.isLiveUpdate && isMLSSupportedByTheOtherUser;
       return this.initMLS1to1Conversation(userId, isMLSSupportedByTheOtherUser, shouldDelayMLSGroupEstablishment);
     }
 
@@ -1973,7 +1978,10 @@ export class ConversationRepository {
 
   private readonly get1to1ConversationForConnection = async (
     connection: ConnectionEntity,
-    isLiveUpdate: boolean,
+    options: GetInitialised1To1ConversationOptions = {
+      isLiveUpdate: false,
+      shouldRefreshUser: false,
+    },
   ): Promise<Conversation | null> => {
     // As of how backed works now (August 2023), proteus 1:1 conversations will always be created, even if both users support MLS conversation.
     // Proteus 1:1 conversation is created right after a connection request is sent.
@@ -1996,9 +2004,9 @@ export class ConversationRepository {
 
     // Check what protocol should be used for 1:1 conversation
     const {protocol, isMLSSupportedByTheOtherUser, isProteusSupportedByTheOtherUser} =
-      await this.getProtocolFor1to1Conversation(otherUserId);
+      await this.getProtocolFor1to1Conversation(otherUserId, options.shouldRefreshUser);
 
-    const shouldDelayMLSGroupEstablishment = isLiveUpdate && isMLSSupportedByTheOtherUser;
+    const shouldDelayMLSGroupEstablishment = options.isLiveUpdate && isMLSSupportedByTheOtherUser;
 
     const localMLSConversation = this.conversationState.findMLS1to1Conversation(otherUserId);
 
