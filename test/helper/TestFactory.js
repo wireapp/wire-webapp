@@ -306,6 +306,7 @@ export class TestFactory {
       this.message_repository,
       this.event_repository,
       this.user_repository,
+      this.propertyRepository,
       mediaRepository.streamHandler,
       mediaRepository.devicesHandler,
       serverTimeHandler,
