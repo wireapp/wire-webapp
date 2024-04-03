@@ -264,10 +264,10 @@ export const DetailViewModal = ({
             aria-label={t('accessibility.conversationDetailsCloseLabel')}
           >
             <ZoomableImage
+              key={currentMessageEntityId.current}
               src={imageSrc}
               className="detail-view-image"
               data-uie-name="status-picture"
-              id={currentMessageEntityId.current}
             />
           </button>
 

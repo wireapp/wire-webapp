@@ -17,20 +17,15 @@
  *
  */
 
-import React, {useEffect, useRef, useState} from 'react';
+import React, {HTMLProps, useRef, useState} from 'react';
 
 import cx from 'classnames';
 
 const ZOOM_IMAGE_SCALE = 3;
 
-interface ZoomableImageProps {
-  src: string;
-  id: string;
-  alt?: string;
-  className?: string;
-}
+type ZoomableImageProps = HTMLProps<HTMLImageElement>;
 
-export const ZoomableImage = ({src, id, alt = '', className = '', ...props}: ZoomableImageProps) => {
+export const ZoomableImage = (props: ZoomableImageProps) => {
   const imageRef = useRef<HTMLImageElement | null>(null);
 
   const [isZoomEnabled, setIsZoomEnabled] = useState<boolean>(false);
@@ -108,21 +103,14 @@ export const ZoomableImage = ({src, id, alt = '', className = '', ...props}: Zoo
     }
   };
 
-  useEffect(() => {
-    setIsZoomEnabled(false);
-  }, [id]);
-
   return (
-    // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-noninteractive-element-interactions
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-noninteractive-element-interactions,jsx-a11y/alt-text
     <img
-      key={id}
       {...props}
       ref={imageRef}
-      src={src}
-      alt={alt}
       onClick={onButtonClick}
       onMouseMove={handleMouseMove}
-      className={cx(className, {zoomed: isZoomEnabled})}
+      className={cx(props.className, {zoomed: isZoomEnabled})}
     />
   );
 };
