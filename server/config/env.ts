@@ -229,6 +229,8 @@ export type Env = {
   /** Sets Support URLs to specific pages */
   URL_SUPPORT_INDEX: string;
 
+  URL_SUPPORT_FOLDERS: string;
+
   URL_SUPPORT_BUG_REPORT: string;
 
   URL_SUPPORT_CALLING: string;

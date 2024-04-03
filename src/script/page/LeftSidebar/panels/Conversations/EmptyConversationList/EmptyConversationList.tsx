@@ -80,7 +80,7 @@ export const EmptyConversationList = ({currentTab, onChangeTab, searchValue = ''
 
           <Link
             variant={LinkVariant.PRIMARY}
-            href={Config.getConfig().URL.SUPPORT.URL_SUPPORT_FAVORITES}
+            href={Config.getConfig().URL.SUPPORT.URL_SUPPORT_FOLDERS}
             target="_blank"
             data-uie-name="how-to-label-conversation-as-favorites"
           >
