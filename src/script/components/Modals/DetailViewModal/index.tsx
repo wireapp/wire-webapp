@@ -24,6 +24,7 @@ import cx from 'classnames';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {ZoomableImage} from 'Components/ZoomableImage';
 import {User} from 'src/script/entity/User';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -43,8 +44,6 @@ import {isContentMessage} from '../../../guards/Message';
 import {MessageCategory} from '../../../message/MessageCategory';
 import {isOfCategory} from '../../../page/MainContent/panels/Collection/utils';
 
-const ZOOM_IMAGE_SCALE = 3;
-
 interface DetailViewModalProps {
   readonly assetRepository: AssetRepository;
   readonly conversationRepository: ConversationRepository;
@@ -63,7 +62,6 @@ export const DetailViewModal = ({
   selfUser,
 }: DetailViewModalProps) => {
   const currentMessageEntityId = useRef<string>(currentMessageEntity.id);
-  const imageRef = useRef<HTMLImageElement | null>(null);
 
   const [conversationEntity, setConversationEntity] = useState<Conversation | null>(null);
   const [messageEntity, setMessageEntity] = useState<ContentMessage | null>(currentMessageEntity);
@@ -71,9 +69,6 @@ export const DetailViewModal = ({
 
   const [isImageVisible, setIsImageVisible] = useState(false);
   const [imageSrc, setImageSrc] = useState<string>('');
-
-  const [isZoomEnabled, setIsZoomEnabled] = useState<boolean>(false);
-  const [maxOffset, setMaxOffset] = useState({x: 0, y: 0});
 
   const onCloseClick = () => {
     document.removeEventListener('keydown', onKeyDownLightBox);
@@ -117,12 +112,6 @@ export const DetailViewModal = ({
 
     if (currentIndex === -1) {
       return;
-    }
-
-    setIsZoomEnabled(false);
-
-    if (imageRef.current) {
-      imageRef.current.style.transform = `scale(1) translate(0%, 0%)`;
     }
 
     const lastIndex = items.length - 1;
@@ -259,78 +248,6 @@ export const DetailViewModal = ({
     };
   }, []);
 
-  const onButtonClick = (event: React.MouseEvent<HTMLElement>) => {
-    setIsZoomEnabled(prevState => !prevState);
-
-    const element = event.target as HTMLElement;
-
-    if (isZoomEnabled) {
-      element.style.transform = `scale(1) translate(0%, 0%)`;
-      element.style.transition = '';
-      return;
-    }
-
-    if (!element.parentElement) {
-      return;
-    }
-
-    const parentRect = element.parentElement.getBoundingClientRect();
-    const mouseX = event.clientX - parentRect.left;
-    const mouseY = event.clientY - parentRect.top;
-
-    const imageCenterX = element.offsetWidth / 2;
-    const imageCenterY = element.offsetHeight / 2;
-
-    const maxXOffset = Math.max((parentRect.width / (parentRect.width * ZOOM_IMAGE_SCALE)) * 100);
-    const maxYOffset = Math.max((parentRect.height / (parentRect.height * ZOOM_IMAGE_SCALE)) * 100);
-
-    setMaxOffset({x: maxXOffset, y: maxYOffset});
-
-    const xOffset = Math.min(
-      Math.max(((mouseX - imageCenterX) / parentRect.width) * (ZOOM_IMAGE_SCALE - 1) * 100, -maxXOffset),
-      maxXOffset,
-    );
-
-    const yOffset = Math.min(
-      Math.max(((mouseY - imageCenterY) / parentRect.height) * (ZOOM_IMAGE_SCALE - 1) * 100, -maxYOffset),
-      maxYOffset,
-    );
-
-    element.style.transition = 'transform 0.3s ease';
-    element.style.transform = `scale(${ZOOM_IMAGE_SCALE}) translate(${xOffset}%, ${yOffset}%)`;
-  };
-
-  const handleMouseMove = (event: React.MouseEvent<HTMLImageElement>) => {
-    if (isZoomEnabled) {
-      const element = event.target as HTMLElement;
-
-      if (!element.parentElement) {
-        return;
-      }
-
-      const parentRect = element.parentElement.getBoundingClientRect();
-
-      const mouseX = event.clientX - parentRect.left;
-      const mouseY = event.clientY - parentRect.top;
-      const centerX = parentRect.width / 2;
-      const centerY = parentRect.height / 2;
-
-      const {x: maxXOffset, y: maxYOffset} = maxOffset;
-
-      const xOffset = Math.min(
-        Math.max(((mouseX - centerX) / parentRect.width) * (ZOOM_IMAGE_SCALE - 1) * 100, -maxXOffset),
-        maxXOffset,
-      );
-
-      const yOffset = Math.min(
-        Math.max(((mouseY - centerY) / parentRect.height) * (ZOOM_IMAGE_SCALE - 1) * 100, -maxYOffset),
-        maxYOffset,
-      );
-
-      element.style.transform = `scale(${ZOOM_IMAGE_SCALE}) translate(${-xOffset}%, ${-yOffset}%)`;
-    }
-  };
-
   return (
     <div id={modalId} className={cx('modal detail-view modal-show', {'modal-fadein': isImageVisible})}>
       {messageEntity && conversationEntity && (
@@ -346,15 +263,11 @@ export const DetailViewModal = ({
             onKeyDown={handleOnClosePress}
             aria-label={t('accessibility.conversationDetailsCloseLabel')}
           >
-            {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-noninteractive-element-interactions */}
-            <img
-              ref={imageRef}
-              className={cx('detail-view-image', {zoomed: isZoomEnabled})}
+            <ZoomableImage
               src={imageSrc}
+              className="detail-view-image"
               data-uie-name="status-picture"
-              alt=""
-              onClick={onButtonClick}
-              onMouseMove={handleMouseMove}
+              id={currentMessageEntityId.current}
             />
           </button>
 
