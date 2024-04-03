@@ -948,7 +948,9 @@ describe('ConversationRepository', () => {
       });
 
       await waitFor(() => {
-        expect(conversationRepository.getInitialised1To1Conversation).toHaveBeenCalledWith(otherUser.qualifiedId, true);
+        expect(conversationRepository.getInitialised1To1Conversation).toHaveBeenCalledWith(otherUser.qualifiedId, {
+          isLiveUpdate: true,
+        });
       });
     });
 

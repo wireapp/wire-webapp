@@ -1286,12 +1286,15 @@ export class ConversationRepository {
    * If there's no common protocol, it will pick the protocol that is supported by the current user and mark conversation as read-only.
    * @param userEntity User entity for whom to get the conversation
    * @param isLiveUpdate Whether the conversation is being initialised because of a live update (e.g. some websocket event)
+   * @param shouldRefreshUser Whether the user should be refetched from backend before getting the conversation
    * @returns Resolves with the initialised 1:1 conversation with requested user
    */
   public async getInitialised1To1Conversation(
     userId: QualifiedId,
-    isLiveUpdate = false,
-    shouldRefreshUser = false,
+    {isLiveUpdate = false, shouldRefreshUser = false}: {isLiveUpdate?: boolean; shouldRefreshUser?: boolean} = {
+      isLiveUpdate: false,
+      shouldRefreshUser: false,
+    },
   ): Promise<Conversation | null> {
     const user = await this.userRepository.getUserById(userId);
 
@@ -1970,7 +1973,7 @@ export class ConversationRepository {
     );
 
     try {
-      return await this.getInitialised1To1Conversation(otherUserId, false, shouldRefreshUser);
+      return await this.getInitialised1To1Conversation(otherUserId, {shouldRefreshUser});
     } catch {}
 
     return conversation;
@@ -2060,7 +2063,9 @@ export class ConversationRepository {
   ): Promise<Conversation | undefined> => {
     try {
       const userId = connectionEntity.userId;
-      const conversation = await this.getInitialised1To1Conversation(userId, source === EventSource.WEBSOCKET);
+      const conversation = await this.getInitialised1To1Conversation(userId, {
+        isLiveUpdate: source === EventSource.WEBSOCKET,
+      });
 
       if (!conversation) {
         return undefined;
@@ -2116,7 +2121,7 @@ export class ConversationRepository {
       return;
     }
 
-    await this.getInitialised1To1Conversation(user.qualifiedId, true);
+    await this.getInitialised1To1Conversation(user.qualifiedId, {isLiveUpdate: true});
   };
 
   /**
@@ -3975,7 +3980,7 @@ export class ConversationRepository {
       return;
     }
 
-    await this.getInitialised1To1Conversation(otherUserId, true);
+    await this.getInitialised1To1Conversation(otherUserId, {isLiveUpdate: true});
   }
 
   /**
