@@ -18,6 +18,7 @@
  */
 
 import {render} from '@testing-library/react';
+import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
 
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {MLSStatuses, WireIdentity} from 'src/script/E2EIdentity';
@@ -27,16 +28,19 @@ import {E2EICertificateDetails} from './E2EICertificateDetails';
 describe('E2EICertificateDetails', () => {
   const generateIdentity = (status: MLSStatuses): WireIdentity => ({
     status,
-    certificate: 'certificate',
-    clientId: '',
-    displayName: '',
-    domain: '',
-    handle: '',
-    thumbprint: '',
+    x509Identity: {
+      certificate: 'certificate',
+      displayName: '',
+      domain: '',
+      handle: '',
+      notBefore: BigInt(0),
+      notAfter: BigInt(0),
+      serialNumber: '',
+    },
+    credentialType: CredentialType.Basic,
     deviceId: '',
-    notBefore: BigInt(0),
-    notAfter: BigInt(0),
-    serialNumber: '',
+    clientId: '',
+    thumbprint: '',
     qualifiedUserId: {
       domain: '',
       id: '',
