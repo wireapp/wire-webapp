@@ -96,9 +96,6 @@ export const ConversationFolderTab = ({
           {Icon}
           <span className="conversations-sidebar-btn--text">{label || title}</span>
         </span>
-        {unreadConversations.length > 0 && (
-          <span className="conversations-sidebar-btn--badge">{unreadConversations.length}</span>
-        )}
       </button>
       <div className={cx('conversations-sidebar-folders', {active: isFoldersTabOpen})}>
         <div className="conversations-sidebar-folders--inner-wrapper">
