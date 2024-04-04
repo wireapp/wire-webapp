@@ -109,7 +109,9 @@ export class ConversationState {
     });
 
     this.directConversations = ko.pureComputed(() => {
-      return this.sortedConversations().filter(conversation => conversation.is1to1());
+      return this.sortedConversations().filter(
+        conversation => conversation.is1to1() && conversation.firstUserEntity()?.isAvailable(),
+      );
     });
 
     this.filteredConversations = ko.pureComputed(() => {
