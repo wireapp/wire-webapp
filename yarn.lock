@@ -1939,11 +1939,11 @@ __metadata:
   linkType: hard
 
 "@csstools/selector-specificity@npm:^3.0.2":
-  version: 3.0.2
-  resolution: "@csstools/selector-specificity@npm:3.0.2"
+  version: 3.0.3
+  resolution: "@csstools/selector-specificity@npm:3.0.3"
   peerDependencies:
     postcss-selector-parser: ^6.0.13
-  checksum: 10/af3cc9282b600170b7de0fed2106830ab353359bd11f66cf71259419c9bddf8f0773c3a6e513cd9f66fd7e4920a1786a7c288723cbb3ae207974c1e7de26293e
+  checksum: 10/287f17aefe2f22a39cb1c01d45d9e2c4c8c7cf11d9af67c44fe14fa2ed2e11178406661d1b6b023c8a447cdb08933ac134352a0c1452d409af4e7db2570684f3
   languageName: node
   linkType: hard
 
@@ -4487,11 +4487,11 @@ __metadata:
   linkType: hard
 
 "@types/node@npm:*, @types/node@npm:>=13.7.0, @types/node@npm:^20.1.0, @types/node@npm:^20.11.30":
-  version: 20.11.30
-  resolution: "@types/node@npm:20.11.30"
+  version: 20.12.2
+  resolution: "@types/node@npm:20.12.2"
   dependencies:
     undici-types: "npm:~5.26.4"
-  checksum: 10/78515bc768d2b878e2e06a1c20eb4f5840072b79b8d28ff3dd0a7feaaf48fd3a2ac03cfa5bc7564da82db5906b43e9ba0e5df9f43d870b7aae2942306e208815
+  checksum: 10/f1f0ebfe475aefa183763b856e0023b81b76554196e8676a45b9fcfd1012cdd20d32adefb3c0330001c0011e074676603c34c24821a4924228250ea13a75da43
   languageName: node
   linkType: hard
 
@@ -7976,10 +7976,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dexie@npm:4.0.1, dexie@npm:>3.2.0, dexie@npm:latest":
+"dexie@npm:4.0.1, dexie@npm:>3.2.0":
   version: 4.0.1
   resolution: "dexie@npm:4.0.1"
   checksum: 10/c58760b3b0fd5d3781ccfa049fdb730958322c767f03598539e058307248845e846aa8aa9bcfc5279271a4e816d4eba6e049dcd883af2c2b7142cba1475958da
+  languageName: node
+  linkType: hard
+
+"dexie@npm:latest":
+  version: 3.2.4
+  resolution: "dexie@npm:3.2.4"
+  checksum: 10/361f7e05fda5db20d9d90ce3e39f4539d1a56acad35a6e4ba26e48ab74c55d81e6daba502a7412be6c0e67ebad3e232e6dbbc1b50426f5743cc0f166cd4e8671
   languageName: node
   linkType: hard
 

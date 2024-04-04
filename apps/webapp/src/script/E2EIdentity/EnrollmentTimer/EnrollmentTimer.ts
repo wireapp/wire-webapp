@@ -19,6 +19,7 @@
 
 import {randomInt} from '@wireapp/commons/lib/util/RandomUtil';
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
+import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
 
 import {MLSStatuses, WireIdentity} from '../E2EIdentityVerification';
 
@@ -71,7 +72,7 @@ function getGracePeriod(
   e2eActivatedAt: number,
   teamGracePeriodDuration: number,
 ): GracePeriod {
-  const isFirstEnrollment = !identity?.certificate;
+  const isFirstEnrollment = identity?.credentialType === CredentialType.Basic;
   if (isFirstEnrollment) {
     // For a new device, the deadline is the e2ei activate date + the grace period
     return {end: e2eActivatedAt + teamGracePeriodDuration, start: Date.now()};
@@ -80,7 +81,7 @@ function getGracePeriod(
   // To be sure the device does not expire, we want to keep a safe delay
   const safeDelay = randomInt(TimeInMillis.DAY) + messageRetentionTime;
 
-  const end = Number(identity.notAfter) * TimeInMillis.SECOND;
+  const end = Number(identity?.x509Identity?.notAfter) * TimeInMillis.SECOND;
   const start = Math.max(end - safeDelay, end - teamGracePeriodDuration);
 
   return {end, start};

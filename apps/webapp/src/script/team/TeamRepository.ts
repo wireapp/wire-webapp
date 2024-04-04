@@ -150,9 +150,9 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     const prevFeatureList = this.teamState.teamFeatures();
     const newFeatureList = await this.teamService.getAllTeamFeatures();
 
-    this.emit('featureConfigUpdated', {prevFeatureList, newFeatureList});
-
     this.teamState.teamFeatures(newFeatureList);
+
+    this.emit('featureConfigUpdated', {prevFeatureList, newFeatureList});
 
     return {
       newFeatureList,

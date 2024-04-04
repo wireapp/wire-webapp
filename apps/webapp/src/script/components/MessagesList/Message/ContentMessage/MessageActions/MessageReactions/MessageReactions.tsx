@@ -19,7 +19,7 @@
 
 import {useState, RefObject, FC, useRef} from 'react';
 
-import {KEY} from 'Util/KeyboardUtil';
+import {isSpaceOrEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {EmojiChar} from './EmojiChar';
@@ -101,7 +101,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
     event.stopPropagation();
     const selectedMsgActionName = event.currentTarget.dataset.uieName;
     handleKeyDown(event);
-    if ([KEY.SPACE, KEY.ENTER].includes(event.key)) {
+    if (isSpaceOrEnterKey(event.key)) {
       if (currentMsgActionName === selectedMsgActionName) {
         // reset on double click
         handleReactionCurrentState('');

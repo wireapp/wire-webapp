@@ -18,6 +18,7 @@
  */
 
 import {waitFor} from '@testing-library/react';
+import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
 import {LowPrecisionTaskScheduler} from '@wireapp/core/lib/util/LowPrecisionTaskScheduler';
 import {container} from 'tsyringe';
 
@@ -215,16 +216,19 @@ describe('E2EIHandler', () => {
         jest.spyOn(coreMock.service!.e2eIdentity!, 'isEnrollmentInProgress').mockResolvedValue(false);
         jest.spyOn(coreMock.service!.e2eIdentity!, 'isFreshMLSSelfClient').mockResolvedValue(false);
         jest.spyOn(e2EIdentityVerification, 'getActiveWireIdentity').mockResolvedValue({
-          certificate: '',
+          x509Identity: {
+            certificate: '',
+            displayName: 'John Doe',
+            domain: 'domain',
+            handle: 'johndoe',
+            notAfter: BigInt(0),
+            notBefore: BigInt(0),
+            serialNumber: '',
+          },
+          thumbprint: '',
+          credentialType: CredentialType.X509,
           status: e2EIdentityVerification.MLSStatuses.NOT_ACTIVATED,
           clientId: selfClientId,
-          displayName: 'John Doe',
-          domain: 'domain',
-          handle: 'johndoe',
-          serialNumber: '',
-          thumbprint: '',
-          notBefore: BigInt(0),
-          notAfter: BigInt(0),
           deviceId: selfClientId,
           qualifiedUserId: {id: 'userId', domain: 'domain'},
         });

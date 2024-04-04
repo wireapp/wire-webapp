@@ -37,12 +37,13 @@ interface E2EICertificateDetailsProps {
 }
 
 export const E2EICertificateDetails = ({identity, isCurrentDevice}: E2EICertificateDetailsProps) => {
-  const showModal = useCertificateDetailsModal(identity?.certificate ?? '');
+  const certificate = identity?.x509Identity?.certificate;
+  const showModal = useCertificateDetailsModal(certificate ?? '');
 
   const certificateState = identity?.status ?? MLSStatuses.NOT_ACTIVATED;
   const isNotActivated = certificateState === MLSStatuses.NOT_ACTIVATED;
   const isValid = certificateState === MLSStatuses.VALID;
-  const hasCertificate = !!identity?.certificate && Boolean(identity?.certificate.length);
+  const hasCertificate = !!certificate && Boolean(certificate.length);
 
   const getCertificate = async () => {
     try {
@@ -92,7 +93,7 @@ export const E2EICertificateDetails = ({identity, isCurrentDevice}: E2EICertific
               </Button>
             )}
 
-            {identity?.certificate && !isValid && (
+            {certificate && !isValid && (
               <Button
                 variant={ButtonVariant.TERTIARY}
                 onClick={getCertificate}
