@@ -5231,10 +5231,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core-crypto@npm:1.0.0-rc.52":
-  version: 1.0.0-rc.52
-  resolution: "@wireapp/core-crypto@npm:1.0.0-rc.52"
-  checksum: 10/57c79d6f75402d918ef886d3c6c5a7c873b6231519346fd718cd378db13b3b0a5c3ac4f250846ecf7f23c5e4dc97d5185772ee46794b888f914a11d17065f58e
+"@wireapp/core-crypto@npm:1.0.0-rc.55":
+  version: 1.0.0-rc.55
+  resolution: "@wireapp/core-crypto@npm:1.0.0-rc.55"
+  checksum: 10/1b80f592f8adbbba2bd49527dec2a107ab364587891fd0fd8404b8ace7bd810499ef83cafa36395851b9005f70915ebd4d9378b888e8be0e21f3ba575d0a024c
   languageName: node
   linkType: hard
 
@@ -5249,7 +5249,7 @@ __metadata:
     "@types/long": "npm:5.0.0"
     "@wireapp/api-client": "workspace:^"
     "@wireapp/commons": "workspace:^"
-    "@wireapp/core-crypto": "npm:1.0.0-rc.52"
+    "@wireapp/core-crypto": "npm:1.0.0-rc.55"
     "@wireapp/cryptobox": "npm:12.8.0"
     "@wireapp/priority-queue": "npm:2.1.5"
     "@wireapp/promise-queue": "npm:2.3.2"

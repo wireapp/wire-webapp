@@ -22,7 +22,7 @@ import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import {Decoder} from 'bazinga64';
 
 import {TypedEventEmitter} from '@wireapp/commons';
-import {CoreCrypto, E2eiConversationState, WireIdentity, DeviceStatus} from '@wireapp/core-crypto';
+import {CoreCrypto, E2eiConversationState, WireIdentity, DeviceStatus, CredentialType} from '@wireapp/core-crypto';
 
 import {AcmeService} from './Connection';
 import {getE2EIClientId, isMLSDevice} from './Helper';
@@ -178,6 +178,7 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
           serialNumber: '',
           clientId: id.client,
           qualifiedUserId: userId,
+          credentialType: CredentialType.Basic,
         }));
 
       mappedUserIdentities.set(stringifyQualifiedId(userId), [...identities, ...basicMLSDevices]);
