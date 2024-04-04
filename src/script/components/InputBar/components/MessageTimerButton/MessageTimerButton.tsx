@@ -28,7 +28,7 @@ import {EphemeralTimings} from 'src/script/ephemeral/EphemeralTimings';
 import {TeamState} from 'src/script/team/TeamState';
 import {showContextMenu} from 'src/script/ui/ContextMenu';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {KEY} from 'Util/KeyboardUtil';
+import {isSpaceOrEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {DurationUnit, formatDuration} from 'Util/TimeUtil';
 import {setContextMenuPosition} from 'Util/util';
@@ -82,7 +82,7 @@ const MessageTimerButton: React.FC<MessageTimerButtonProps> = ({
   }
 
   const handleContextKeyDown = (event: React.KeyboardEvent) => {
-    if ([KEY.SPACE, KEY.ENTER].includes(event.key)) {
+    if (isSpaceOrEnterKey(event.key)) {
       const newEvent = setContextMenuPosition(event);
       const entries = setEntries();
       showContextMenu(newEvent, entries, 'message-timer-menu');

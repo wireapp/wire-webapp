@@ -79,9 +79,9 @@ export class PropertiesRepository {
       enable_debugging: false,
       settings: {
         call: {
-          push_to_talk_key: '',
           enable_soundless_incoming_calls: false,
           enable_vbr_encoding: true,
+          push_to_talk_key: null,
         },
         emoji: {
           replace_inline: true,
@@ -342,6 +342,9 @@ export class PropertiesRepository {
         break;
       case PROPERTIES_TYPE.CALL.ENABLE_SOUNDLESS_INCOMING_CALLS:
         amplify.publish(WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_SOUNDLESS_INCOMING_CALLS, updatedPreference);
+        break;
+      case PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY:
+        amplify.publish(WebAppEvents.PROPERTIES.UPDATE.CALL.PUSH_TO_TALK_KEY, updatedPreference);
         break;
       default:
         throw new Error(`Failed to update preference of unhandled type '${propertiesType}'`);

@@ -33,9 +33,10 @@ import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Icon} from 'Components/Icon';
 import {ConversationClassifiedBar} from 'Components/input/ClassifiedBar';
+import {usePushToTalk} from 'src/script/hooks/usePushToTalk/usePushToTalk';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {isEnterKey, KEY} from 'Util/KeyboardUtil';
+import {isEnterKey, isSpaceOrEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
@@ -65,6 +66,7 @@ interface AnsweringControlsProps {
   call: Call;
   callActions: CallActions;
   callingRepository: Pick<CallingRepository, 'supportsScreenSharing' | 'sendModeratorMute'>;
+  pushToTalkKey: string | null;
   conversation: Conversation;
   isFullUi?: boolean;
   callState?: CallState;
@@ -87,6 +89,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
   hasAccessToCamera,
   isSelfVerified,
   callingRepository,
+  pushToTalkKey,
   teamState = container.resolve(TeamState),
   callState = container.resolve(CallState),
 }) => {
@@ -175,6 +178,22 @@ const CallingCell: React.FC<CallingCellProps> = ({
   const [showParticipants, setShowParticipants] = useState(false);
   const isModerator = selfUser && roles[selfUser.id] === DefaultConversationRoleName.WIRE_ADMIN;
 
+  const toggleMute = useCallback(
+    (shouldMute: boolean) => callActions.toggleMute(call, shouldMute),
+    [call, callActions],
+  );
+
+  const isCurrentlyMuted = useCallback(() => {
+    const isMuted = call.muteState() === MuteState.SELF_MUTED;
+    return isMuted;
+  }, [call]);
+
+  usePushToTalk({
+    key: pushToTalkKey,
+    toggleMute,
+    isMuted: isCurrentlyMuted,
+  });
+
   const getParticipantContext = (event: React.MouseEvent<HTMLDivElement>, participant: Participant) => {
     event.preventDefault();
 
@@ -207,7 +226,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
       if (!isOngoing) {
         return;
       }
-      if ([KEY.ENTER, KEY.SPACE].includes(event.key)) {
+      if (isSpaceOrEnterKey(event.key)) {
         multitasking?.isMinimized(false);
       }
     },
