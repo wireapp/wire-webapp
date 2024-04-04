@@ -68,6 +68,7 @@
 
   flex: 1 1;
   contain: strict;
+  cursor: default;
 }
 
 // fix flexbox issue in FF
@@ -107,9 +108,8 @@
 
 .detail-view-image {
   display: block;
-  overflow: hidden;
-  cursor: zoom-in;
-  transform: scale(1) translate(0%, 0%);
+  max-width: 100%;
+  transition: transform 0.3s linear;
   will-change: transform;
 
   &.zoomed {

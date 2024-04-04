@@ -21,7 +21,11 @@ import React, {HTMLProps, useRef, useState} from 'react';
 
 import cx from 'classnames';
 
-const ZOOM_IMAGE_SCALE = 3;
+import {imageStyle} from 'Components/ZoomableImage/ZoomableImage.style';
+
+function checkIfCanZoomImage(element: HTMLImageElement) {
+  return element.naturalWidth !== element.offsetWidth || element.naturalHeight !== element.offsetHeight;
+}
 
 type ZoomableImageProps = HTMLProps<HTMLImageElement>;
 
@@ -31,75 +35,69 @@ export const ZoomableImage = (props: ZoomableImageProps) => {
   const [isZoomEnabled, setIsZoomEnabled] = useState<boolean>(false);
   const [maxOffset, setMaxOffset] = useState({x: 0, y: 0});
 
-  const onButtonClick = (event: React.MouseEvent<HTMLElement>) => {
+  const onButtonClick = (event: React.MouseEvent<HTMLImageElement>) => {
+    const element = event.target as HTMLImageElement;
+
+    if (!checkIfCanZoomImage(element)) {
+      setIsZoomEnabled(false);
+
+      if (isZoomEnabled) {
+        element.style.width = `unset`;
+        element.style.height = `unset`;
+        element.style.transform = `translate(0%, 0%)`;
+        element.style.maxWidth = ``;
+        return;
+      }
+
+      return;
+    }
+
     setIsZoomEnabled(prevState => !prevState);
 
-    const element = event.target as HTMLElement;
+    const {naturalWidth, naturalHeight, offsetWidth, offsetHeight} = element;
+    const {clientX, clientY} = event;
 
-    if (isZoomEnabled) {
-      element.style.transform = `scale(1) translate(0%, 0%)`;
-      element.style.transition = '';
-      return;
-    }
+    element.style.width = `${naturalWidth}px`;
+    element.style.height = `${naturalHeight}px`;
+    element.style.maxWidth = `unset`;
 
-    if (!element.parentElement) {
-      return;
-    }
+    const {left, top} = element.getBoundingClientRect();
 
-    const parentRect = element.parentElement.getBoundingClientRect();
-    const mouseX = event.clientX - parentRect.left;
-    const mouseY = event.clientY - parentRect.top;
+    const imageCenterX = naturalWidth / 2;
+    const imageCenterY = naturalHeight / 2;
 
-    const imageCenterX = element.offsetWidth / 2;
-    const imageCenterY = element.offsetHeight / 2;
+    const deltaX = clientX - left;
+    const deltaY = clientY - top;
 
-    const maxXOffset = Math.max((parentRect.width / (parentRect.width * ZOOM_IMAGE_SCALE)) * 100);
-    const maxYOffset = Math.max((parentRect.height / (parentRect.height * ZOOM_IMAGE_SCALE)) * 100);
+    const maxXOffset = ((naturalWidth - offsetWidth) / 2 / naturalWidth) * 100;
+    const maxYOffset = ((naturalHeight - offsetHeight) / 2 / naturalHeight) * 100;
 
     setMaxOffset({x: maxXOffset, y: maxYOffset});
 
-    const xOffset = Math.min(
-      Math.max(((mouseX - imageCenterX) / parentRect.width) * (ZOOM_IMAGE_SCALE - 1) * 100, -maxXOffset),
-      maxXOffset,
-    );
+    const xOffset = Math.min(Math.max(((deltaX - imageCenterX) / naturalWidth) * 100, -maxXOffset), maxXOffset);
+    const yOffset = Math.min(Math.max(((deltaY - imageCenterY) / naturalWidth) * 100, -maxYOffset), maxYOffset);
 
-    const yOffset = Math.min(
-      Math.max(((mouseY - imageCenterY) / parentRect.height) * (ZOOM_IMAGE_SCALE - 1) * 100, -maxYOffset),
-      maxYOffset,
-    );
-
-    element.style.transition = 'transform 0.3s ease';
-    element.style.transform = `scale(${ZOOM_IMAGE_SCALE}) translate(${xOffset}%, ${yOffset}%)`;
+    element.style.transform = `translate(${-xOffset}%, ${-yOffset}%)`;
   };
 
   const handleMouseMove = (event: React.MouseEvent<HTMLImageElement>) => {
     if (isZoomEnabled) {
-      const element = event.target as HTMLElement;
+      const element = event.target as HTMLImageElement;
 
-      if (!element.parentElement) {
-        return;
-      }
+      const {naturalWidth, naturalHeight} = element;
+      const {left, top} = element.getBoundingClientRect();
 
-      const parentRect = element.parentElement.getBoundingClientRect();
-
-      const mouseX = event.clientX - parentRect.left;
-      const mouseY = event.clientY - parentRect.top;
-      const centerX = parentRect.width / 2;
-      const centerY = parentRect.height / 2;
+      const mouseX = event.clientX - left;
+      const mouseY = event.clientY - top;
+      const centerX = naturalWidth / 2;
+      const centerY = naturalHeight / 2;
 
       const {x: maxXOffset, y: maxYOffset} = maxOffset;
 
-      const xOffset = Math.min(
-        Math.max(((mouseX - centerX) / parentRect.width) * (ZOOM_IMAGE_SCALE - 1) * 100, -maxXOffset),
-        maxXOffset,
-      );
+      const xOffset = Math.min(Math.max(((mouseX - centerX) / naturalWidth) * 100, -maxXOffset), maxXOffset);
+      const yOffset = Math.min(Math.max(((mouseY - centerY) / naturalHeight) * 100, -maxYOffset), maxYOffset);
 
-      const yOffset = Math.min(
-        Math.max(((mouseY - centerY) / parentRect.height) * (ZOOM_IMAGE_SCALE - 1) * 100, -maxYOffset),
-        maxYOffset,
-      );
-
-      element.style.transform = `scale(${ZOOM_IMAGE_SCALE}) translate(${-xOffset}%, ${-yOffset}%)`;
+      element.style.transform = `translate(${-xOffset}%, ${-yOffset}%)`;
     }
   };
 
@@ -108,6 +106,7 @@ export const ZoomableImage = (props: ZoomableImageProps) => {
     <img
       {...props}
       ref={imageRef}
+      css={imageStyle(!!imageRef.current && checkIfCanZoomImage(imageRef.current), isZoomEnabled)}
       onClick={onButtonClick}
       onMouseMove={handleMouseMove}
       className={cx(props.className, {zoomed: isZoomEnabled})}
