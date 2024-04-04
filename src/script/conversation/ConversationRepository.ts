@@ -1558,7 +1558,7 @@ export class ConversationRepository {
 
   /**
    * Tries to find a MLS 1:1 conversation between self user and given userId in the local state,
-   * otherwise it will try to fetch it from the backend and save it in both memory and database.
+   * otherwise it will try to fetch it from the backend.
    *
    * @param otherUserId - id of the other user
    * @returns MLS conversation entity
@@ -1574,16 +1574,14 @@ export class ConversationRepository {
   };
 
   /**
-   * Fetches a MLS 1:1 conversation between self user and given userId from backend and saves it in both local state and database.
+   * Fetches a MLS 1:1 conversation between self user and given userId from backend and creates a conversation entity.
    *
    * @param otherUserId - id of the other user
    * @returns MLS conversation entity
    */
   private readonly fetchMLS1to1Conversation = async (otherUserId: QualifiedId): Promise<MLSConversation> => {
     const remoteConversation = await this.conversationService.getMLS1to1Conversation(otherUserId);
-    const [conversationEntity] = this.mapConversations([remoteConversation]);
-
-    const conversation = await this.saveConversation(conversationEntity);
+    const [conversation] = this.mapConversations([remoteConversation]);
 
     if (!isMLSConversation(conversation)) {
       throw new Error('Conversation is not MLS');
@@ -1599,12 +1597,12 @@ export class ConversationRepository {
    *
    * @param proteusConversation - proteus 1:1 conversation
    * @param mlsConversation - mls 1:1 conversation
-   * @returns {shouldOpenMLS1to1Conversation, wasProteus1to1Replaced} - whether proteus 1:1 was replaced with mls and whether it was an active conversation and mls 1:1 conversation should be opened in the UI
+   * @returns {shouldOpenMLS1to1Conversation} - whether it was an active conversation and mls 1:1 conversation should be opened in the UI
    */
   private readonly migrateProteus1to1MLS = async (
     otherUserId: QualifiedId,
     mlsConversation: MLSConversation,
-  ): Promise<{shouldOpenMLS1to1Conversation: boolean; wasProteus1to1Replaced: boolean}> => {
+  ): Promise<{shouldOpenMLS1to1Conversation: boolean}> => {
     const proteusConversations = this.conversationState.findProteus1to1Conversations(otherUserId);
 
     if (!proteusConversations || proteusConversations.length < 1) {
@@ -1616,7 +1614,7 @@ export class ConversationRepository {
       if (conversationId) {
         await this.blacklistConversation(conversationId);
       }
-      return {shouldOpenMLS1to1Conversation: false, wasProteus1to1Replaced: false};
+      return {shouldOpenMLS1to1Conversation: false};
     }
 
     this.logger.info(`Replacing proteus 1:1 conversation(s) with mls 1:1 conversation ${mlsConversation.id}`);
@@ -1690,7 +1688,7 @@ export class ConversationRepository {
 
     const shouldOpenMLS1to1Conversation = wasProteus1to1ActiveConversation && !isMLS1to1ActiveConversation;
 
-    return {shouldOpenMLS1to1Conversation, wasProteus1to1Replaced: true};
+    return {shouldOpenMLS1to1Conversation};
   };
 
   private async blacklistConversation(conversationId: QualifiedId) {
@@ -1805,10 +1803,7 @@ export class ConversationRepository {
     }
 
     // If proteus 1:1 conversation with the same user is known, we have to make sure it is replaced with mls 1:1 conversation.
-    const {shouldOpenMLS1to1Conversation, wasProteus1to1Replaced} = await this.migrateProteus1to1MLS(
-      otherUserId,
-      mlsConversation,
-    );
+    const {shouldOpenMLS1to1Conversation} = await this.migrateProteus1to1MLS(otherUserId, mlsConversation);
 
     if (mlsConversation.participating_user_ids.length === 0) {
       ConversationMapper.updateProperties(mlsConversation, {participating_user_ids: [otherUser.qualifiedId]});
@@ -1839,6 +1834,7 @@ export class ConversationRepository {
         amplify.publish(WebAppEvents.CONVERSATION.SHOW, mlsConversation, {});
       }
 
+      await this.saveConversation(mlsConversation);
       return mlsConversation;
     }
 
@@ -1850,25 +1846,23 @@ export class ConversationRepository {
       throw new Error('Self user is not available!');
     }
 
-    // If its a 1:1 conversation between two users from the same team we should not establish it automatically,
-    // unless there was already a proteus 1:1 conversation or the MLS group is already established on backend.
-    // It will be established once first mls message is sent in a conversation.
-    const isTeamMember = !!selfUser.teamId && !!otherUser.teamId && selfUser.teamId === otherUser.teamId;
+    try {
+      const initialisedMLSConversation = await this.establishMLS1to1Conversation(mlsConversation, otherUserId);
 
-    const isMLSGroupEstablishedOnBackend = mlsConversation.epoch > 0;
+      if (shouldOpenMLS1to1Conversation) {
+        // If proteus conversation was previously active conversaiton, we want to make mls 1:1 conversation active.
+        amplify.publish(WebAppEvents.CONVERSATION.SHOW, initialisedMLSConversation, {});
+      }
 
-    const shouldEstablishMLS1to1 = isMLSGroupEstablishedOnBackend || !isTeamMember || wasProteus1to1Replaced;
-
-    const initialisedMLSConversation = shouldEstablishMLS1to1
-      ? await this.establishMLS1to1Conversation(mlsConversation, otherUserId)
-      : mlsConversation;
-
-    if (shouldOpenMLS1to1Conversation) {
-      // If proteus conversation was previously active conversaiton, we want to make mls 1:1 conversation active.
-      amplify.publish(WebAppEvents.CONVERSATION.SHOW, initialisedMLSConversation, {});
+      await this.saveConversation(initialisedMLSConversation);
+      return initialisedMLSConversation;
+    } catch (error) {
+      this.logger.error(
+        `Failed to establish MLS 1:1 conversation with user ${otherUserId.id}, deleting the conversation from the local state:`,
+        error,
+      );
+      throw error;
     }
-
-    return initialisedMLSConversation;
   };
 
   /**
