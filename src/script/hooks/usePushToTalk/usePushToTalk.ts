@@ -29,10 +29,14 @@ interface PushToTalk {
   key: string | null;
   toggleMute: (shouldMute: boolean) => void;
   isMuted: () => boolean;
-  wasUnmutedWithKeyPressRef: React.MutableRefObject<boolean>;
 }
 
-const subscribeToKeyPress = ({key, toggleMute, isMuted, wasUnmutedWithKeyPressRef}: PushToTalk & {key: string}) => {
+const subscribeToKeyPress = ({
+  key,
+  toggleMute,
+  isMuted,
+  wasUnmutedWithKeyPressRef,
+}: PushToTalk & {key: string; wasUnmutedWithKeyPressRef: React.MutableRefObject<boolean>}) => {
   return handleKeyPress(key, {
     onPress: () => {
       // If we are already unmuted, we do nothing.
