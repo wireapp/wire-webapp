@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 
 import {amplify} from 'amplify';
 
@@ -29,11 +29,10 @@ interface PushToTalk {
   key: string | null;
   toggleMute: (shouldMute: boolean) => void;
   isMuted: () => boolean;
+  wasUnmutedWithKeyPressRef: React.MutableRefObject<boolean>;
 }
 
-const subscribe = ({key, toggleMute, isMuted}: PushToTalk & {key: string}) => {
-  let wasUnmutedWithKeyPress = false;
-
+const subscribeToKeyPress = ({key, toggleMute, isMuted, wasUnmutedWithKeyPressRef}: PushToTalk & {key: string}) => {
   return handleKeyPress(key, {
     onPress: () => {
       // If we are already unmuted, we do nothing.
@@ -41,17 +40,17 @@ const subscribe = ({key, toggleMute, isMuted}: PushToTalk & {key: string}) => {
         return;
       }
 
-      wasUnmutedWithKeyPress = true;
+      wasUnmutedWithKeyPressRef.current = true;
       toggleMute(false);
     },
     onRelease: () => {
       // If we were unmuted with the key press, we mute again.
       // (This is to prevent muting when first unmuted with the unmute button)
-      if (wasUnmutedWithKeyPress) {
+      if (wasUnmutedWithKeyPressRef.current) {
         toggleMute(true);
       }
 
-      wasUnmutedWithKeyPress = false;
+      wasUnmutedWithKeyPressRef.current = false;
     },
   });
 };
@@ -68,6 +67,7 @@ const subscribe = ({key, toggleMute, isMuted}: PushToTalk & {key: string}) => {
  */
 export const usePushToTalk = ({key: initialKey, toggleMute, isMuted}: PushToTalk) => {
   const [key, setKey] = useState<string | null>(initialKey);
+  const wasUnmutedWithKeyPressRef = useRef(false);
 
   useEffect(() => {
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.CALL.PUSH_TO_TALK_KEY, setKey);
@@ -79,6 +79,6 @@ export const usePushToTalk = ({key: initialKey, toggleMute, isMuted}: PushToTalk
       return () => {};
     }
 
-    return subscribe({key, toggleMute, isMuted});
+    return subscribeToKeyPress({key, toggleMute, isMuted, wasUnmutedWithKeyPressRef});
   }, [key, toggleMute, isMuted]);
 };
