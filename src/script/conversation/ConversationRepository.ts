@@ -1805,11 +1805,6 @@ export class ConversationRepository {
     // If proteus 1:1 conversation with the same user is known, we have to make sure it is replaced with mls 1:1 conversation.
     const {shouldOpenMLS1to1Conversation} = await this.migrateProteus1to1MLS(otherUserId, mlsConversation);
 
-    if (mlsConversation.participating_user_ids.length === 0) {
-      ConversationMapper.updateProperties(mlsConversation, {participating_user_ids: [otherUser.qualifiedId]});
-      await this.updateParticipatingUserEntities(mlsConversation);
-    }
-
     // If mls is not supported by the other user we do not establish the group yet.
     if (!isMLSSupportedByTheOtherUser) {
       const isMLSGroupEstablishedLocally = await this.conversationService.isMLSGroupEstablishedLocally(
@@ -1818,28 +1813,24 @@ export class ConversationRepository {
 
       // If group was not yet established, we mark the mls conversation as readonly
       if (!isMLSGroupEstablishedLocally) {
-        await this.updateConversationReadOnlyState(
-          mlsConversation,
-          CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_OTHER_UNSUPPORTED_MLS,
-        );
+        mlsConversation.readOnlyState(CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_OTHER_UNSUPPORTED_MLS);
         this.logger.info(
           `MLS 1:1 conversation with user ${otherUserId.id} is not supported by the other user, conversation will become readonly`,
         );
       } else {
-        await this.updateConversationReadOnlyState(mlsConversation, null);
+        mlsConversation.readOnlyState(null);
       }
+
+      await this.update1To1ConversationParticipants(mlsConversation, otherUserId);
+      await this.saveConversation(mlsConversation);
 
       if (shouldOpenMLS1to1Conversation) {
         // If proteus conversation was previously active conversaiton, we want to make mls 1:1 conversation active.
         amplify.publish(WebAppEvents.CONVERSATION.SHOW, mlsConversation, {});
       }
 
-      await this.saveConversation(mlsConversation);
       return mlsConversation;
     }
-
-    // If mls is supported by the other user, we can establish the group and remove readonly state from the conversation.
-    await this.updateConversationReadOnlyState(mlsConversation, null);
 
     const selfUser = this.userState.self();
     if (!selfUser) {
@@ -1854,6 +1845,9 @@ export class ConversationRepository {
         amplify.publish(WebAppEvents.CONVERSATION.SHOW, initialisedMLSConversation, {});
       }
 
+      // If mls is supported by the other user, we can establish the group and remove readonly state from the conversation.
+      initialisedMLSConversation.readOnlyState(null);
+      await this.update1To1ConversationParticipants(mlsConversation, otherUserId);
       await this.saveConversation(initialisedMLSConversation);
       return initialisedMLSConversation;
     } catch (error) {
@@ -1862,6 +1856,13 @@ export class ConversationRepository {
         error,
       );
       throw error;
+    }
+  };
+
+  private update1To1ConversationParticipants = async (conversation: Conversation, otherUserId: QualifiedId) => {
+    if (conversation.participating_user_ids.length === 0) {
+      ConversationMapper.updateProperties(conversation, {participating_user_ids: [otherUserId]});
+      await this.updateParticipatingUserEntities(conversation);
     }
   };
 
