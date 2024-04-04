@@ -98,7 +98,7 @@ const UserDetailsComponent = ({user, isTeam = false, groupId}: UserDetailsProps)
           </>
         ) : (
           <span css={styles.userFullName} data-uie-name="status-name" role="presentation" tabIndex={TabIndex.FOCUSABLE}>
-            {userName} - very long name for testing purposes
+            {userName}
           </span>
         )}
       </div>
