@@ -31,13 +31,13 @@
 
   .conversations-sidebar-items {
     display: flex;
+    overflow: hidden;
     width: 220px;
     height: 100vh;
     flex-direction: column;
     padding: 8px 8px;
     border-right: 1px solid var(--border-color);
     background: var(--sidebar-bg);
-    overflow-y: auto;
     transition: width 0.3s ease-in-out;
 
     &[data-is-collapsed='true'] {
