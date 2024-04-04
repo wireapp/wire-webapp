@@ -153,6 +153,8 @@ const UserModal: React.FC<UserModalProps> = ({
   ]);
   const isFederated = core.backendFeatures?.isFederated;
 
+  const isSameTeam = user && user.teamId && selfUser.teamId && user.teamId === selfUser.teamId;
+
   useEffect(() => {
     if (userId) {
       userRepository
@@ -210,7 +212,7 @@ const UserModal: React.FC<UserModalProps> = ({
 
             <EnrichedFields user={user} showDomain={isFederated} />
 
-            {!isTrusted && <UnverifiedUserWarning user={user} />}
+            {!isTrusted && !isSameTeam && <UnverifiedUserWarning user={user} />}
 
             <UserModalUserActionsSection
               user={user}

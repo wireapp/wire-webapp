@@ -708,6 +708,7 @@
   "groupParticipantActionIncomingRequest": "Accept request",
   "groupParticipantActionLeave": "Leave group…",
   "groupParticipantActionOpenConversation": "Open conversation",
+  "groupParticipantActionStartConversation": "Start conversation",
   "groupParticipantActionPending": "Pending",
   "groupParticipantActionRemove": "Remove from group…",
   "groupParticipantActionSelfProfile": "Open profile",
