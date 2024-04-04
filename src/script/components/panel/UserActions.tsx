@@ -21,11 +21,13 @@ import React from 'react';
 
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {ClientMLSError, ClientMLSErrorLabel} from '@wireapp/core/lib/messagingProtocols/mls';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {ConversationState} from 'src/script/conversation/ConversationState';
 import {TeamState} from 'src/script/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -195,8 +197,20 @@ const UserActions: React.FC<UserActionsProps> = ({
     isNotMe && isAvailable && (isConnected || isTeamMember) && !has1to1Conversation
       ? {
           click: async () => {
-            await create1to1Conversation(user, true);
-            onAction(Actions.START_CONVERSATION);
+            try {
+              await create1to1Conversation(user, true);
+              onAction(Actions.START_CONVERSATION);
+            } catch (error) {
+              if (error instanceof ClientMLSError && error.label === ClientMLSErrorLabel.NO_KEY_PACKAGES_AVAILABLE) {
+                PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
+                  text: {
+                    title: t('modal1To1ConversationCreateErrorNoKeyPackagesHeadline'),
+                    htmlMessage: t('modal1To1ConversationCreateErrorNoKeyPackagesMessage', user.name()),
+                  },
+                });
+              }
+              throw error;
+            }
           },
           icon: 'message-icon',
           identifier: ActionIdentifier[Actions.START_CONVERSATION],

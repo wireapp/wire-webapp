@@ -975,6 +975,8 @@
   "modalConversationClearHeadline": "Clear content?",
   "modalConversationClearMessage": "This will clear the conversation history on all your devices.",
   "modalConversationClearOption": "Also leave the conversation",
+  "modal1To1ConversationCreateErrorNoKeyPackagesHeadline": "Unable to start conversation",
+  "modal1To1ConversationCreateErrorNoKeyPackagesMessage": "You can’t start the conversation with {{name}} right now.<br/>{{name}} needs to open Wire or log in again first.<br/>Please try again later.",
   "modalConversationDeleteErrorHeadline": "Group not deleted",
   "modalConversationDeleteErrorMessage": "An error occurred while trying to delete the group {{name}}. Please try again.",
   "modalConversationDeleteGroupAction": "Delete",
