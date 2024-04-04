@@ -57,4 +57,16 @@ const useFolderState = create<FolderState>((set, get) => ({
     }),
 }));
 
-export {useFolderState};
+export interface SidebarStore {
+  isOpen: boolean;
+  setIsOpen: (isOpen: boolean) => void;
+  toggleIsOpen: () => void;
+}
+
+const useSidebarStore = create<SidebarStore>((set, get) => ({
+  isOpen: false,
+  setIsOpen: isOpen => set({isOpen}),
+  toggleIsOpen: () => set({isOpen: !get().isOpen}),
+}));
+
+export {useFolderState, useSidebarStore};
