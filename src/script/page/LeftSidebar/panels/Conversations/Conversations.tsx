@@ -26,6 +26,7 @@ import {ChevronIcon, useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {CallingCell} from 'Components/calling/CallingCell';
+import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {IntegrationRepository} from 'src/script/integration/IntegrationRepository';
 import {Preferences} from 'src/script/page/LeftSidebar/panels/Preferences';
 import {StartUI} from 'src/script/page/LeftSidebar/panels/StartUI';
@@ -243,7 +244,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   const sidebar = (
     <div className="conversations-sidebar-wrapper">
       <nav className="conversations-sidebar" data-is-collapsed={isSidebarCollapsed || mdBreakpoint}>
-        <div className="conversations-sidebar-items">
+        <FadingScrollbar className="conversations-sidebar-items">
           <div className="conversations-sidebar-items-children">
             <UserDetails
               user={selfUser}
@@ -276,7 +277,7 @@ const Conversations: React.FC<ConversationsProps> = ({
               </div>
             </button>
           )}
-        </div>
+        </FadingScrollbar>
       </nav>
     </div>
   );
