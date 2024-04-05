@@ -55,7 +55,7 @@ export const MessageButton = ({id, label, message, onClick = noop}: MessageButto
         showLoading={isWaiting}
         isActive={isSelected}
         loadingColor={COLOR.GRAY}
-        style={{maxWidth: '400px', width: '100%'}}
+        style={{maxWidth: '400px', width: '100%', marginTop: '8px', marginBottom: 0}}
       >
         {label}
       </Button>
