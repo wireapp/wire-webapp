@@ -19,13 +19,19 @@
 
 import {render} from '@testing-library/react';
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
+import {ConversationProtocol, CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
 import ko from 'knockout';
+import {container} from 'tsyringe';
 
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';
 import {ConversationRoleRepository} from 'src/script/conversation/ConversationRoleRepository';
+import {ConversationState} from 'src/script/conversation/ConversationState';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
+import {TeamEntity} from 'src/script/team/TeamEntity';
+import {TeamState} from 'src/script/team/TeamState';
+import {UserState} from 'src/script/user/UserState';
 import {ActionsViewModel} from 'src/script/view_model/ActionsViewModel';
 import {noop} from 'Util/util';
 
@@ -39,6 +45,14 @@ const getAllActions = (queryFunction: (id: string) => HTMLElement | null) =>
     .filter(action => action !== null);
 
 describe('UserActions', () => {
+  const conversationState = container.resolve(ConversationState);
+  const teamState = container.resolve(TeamState);
+  const userState = container.resolve(UserState);
+
+  afterEach(() => {
+    conversationState.conversations.removeAll();
+  });
+
   it('generates actions for self user profile', () => {
     const user = new User('');
     user.isMe = true;
@@ -94,7 +108,12 @@ describe('UserActions', () => {
   it('generates actions for another user profile to which I am connected', () => {
     const user = new User('');
     const connection = new ConnectionEntity();
+
     user.connection(connection);
+    user.teamId = 'teamId';
+
+    const selfUser = new User('');
+    selfUser.teamId = 'teamId2';
 
     jest.spyOn(user, 'isAvailable').mockImplementation(ko.pureComputed(() => true));
     const conversation = new Conversation();
@@ -102,6 +121,10 @@ describe('UserActions', () => {
     jest.spyOn(conversation, 'isGroup').mockImplementation(ko.pureComputed(() => true));
     jest.spyOn(conversation, 'participating_user_ids').mockImplementation(ko.observableArray([new User()]));
     user.connection()?.status(ConnectionStatus.ACCEPTED);
+    connection.userId = user.qualifiedId;
+
+    conversationState.conversations.push(conversation);
+
     const conversationRoleRepository: Partial<ConversationRoleRepository> = {canRemoveParticipants: () => true};
 
     const props = {
@@ -110,7 +133,7 @@ describe('UserActions', () => {
       conversationRoleRepository: conversationRoleRepository as ConversationRoleRepository,
       isSelfActivated: true,
       onAction: noop,
-      selfUser: new User(''),
+      selfUser,
       user,
     };
 
@@ -120,6 +143,94 @@ describe('UserActions', () => {
     expect(allActions).toHaveLength(3);
 
     [Actions.OPEN_CONVERSATION, Actions.BLOCK].forEach(action => {
+      const identifier = ActionIdentifier[action];
+      expect(queryByTestId(identifier)).not.toBeNull();
+    });
+  });
+
+  it("shows start conversation if there's no existing conversation between two users from the same team", () => {
+    const user = new User('');
+
+    const team = new TeamEntity('teamId');
+    teamState.team(team);
+
+    user.teamId = team.id;
+
+    const selfUser = new User('');
+    selfUser.teamId = team.id;
+
+    userState.self(selfUser);
+
+    jest.spyOn(user, 'isAvailable').mockImplementation(ko.pureComputed(() => true));
+    const conversation = new Conversation();
+    conversation.participating_user_ids([user]);
+
+    const conversationRoleRepository: Partial<ConversationRoleRepository> = {canRemoveParticipants: () => true};
+
+    const props = {
+      actionsViewModel,
+      conversation,
+      conversationRoleRepository: conversationRoleRepository as ConversationRoleRepository,
+      isSelfActivated: true,
+      onAction: noop,
+      selfUser,
+      user,
+    };
+
+    const {queryByTestId} = render(<UserActions {...props} />);
+
+    const allActions = getAllActions(queryByTestId);
+    expect(allActions).toHaveLength(2);
+
+    [Actions.START_CONVERSATION, Actions.REMOVE].forEach(action => {
+      const identifier = ActionIdentifier[action];
+      expect(queryByTestId(identifier)).not.toBeNull();
+    });
+  });
+
+  it("shows open conversation if there's an existing conversation between two users from the same team", () => {
+    const teamDomain = 'team-domain';
+    const user = new User('userid1', teamDomain);
+
+    const team = new TeamEntity('teamId');
+    teamState.team(team);
+
+    user.teamId = team.id;
+
+    const selfUser = new User('userid2', teamDomain);
+    selfUser.teamId = team.id;
+
+    userState.self(selfUser);
+
+    jest.spyOn(user, 'isAvailable').mockImplementation(ko.pureComputed(() => true));
+    const conversation = new Conversation();
+    jest.spyOn(conversation, 'participating_user_ids').mockImplementation(ko.observableArray([user]));
+
+    const one2oneConversation = new Conversation('123', 'domain', ConversationProtocol.PROTEUS);
+    one2oneConversation.type(CONVERSATION_TYPE.ONE_TO_ONE);
+    one2oneConversation.participating_user_ids.push(user.qualifiedId);
+    one2oneConversation.participating_user_ets.push(user);
+
+    conversationState.conversations.push(one2oneConversation);
+
+    const conversationRoleRepository: Partial<ConversationRoleRepository> = {canRemoveParticipants: () => true};
+
+    const props = {
+      actionsViewModel,
+      conversation,
+      conversationRoleRepository: conversationRoleRepository as ConversationRoleRepository,
+      isSelfActivated: true,
+      onAction: noop,
+      selfUser,
+      user,
+    };
+
+    const {queryByTestId} = render(<UserActions {...props} />);
+
+    const allActions = getAllActions(queryByTestId);
+    expect(allActions).toHaveLength(2);
+
+    [Actions.OPEN_CONVERSATION, Actions.REMOVE].forEach(action => {
       const identifier = ActionIdentifier[action];
       expect(queryByTestId(identifier)).not.toBeNull();
     });
