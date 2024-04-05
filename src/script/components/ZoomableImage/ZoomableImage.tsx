@@ -17,11 +17,9 @@
  *
  */
 
-import React, {HTMLProps, useRef, useState} from 'react';
+import React, {HTMLProps, useState} from 'react';
 
-import cx from 'classnames';
-
-import {imageStyle} from 'Components/ZoomableImage/ZoomableImage.style';
+import {imageStyle} from './ZoomableImage.style';
 
 function checkIfCanZoomImage(element: HTMLImageElement) {
   return element.naturalWidth !== element.offsetWidth || element.naturalHeight !== element.offsetHeight;
@@ -30,8 +28,6 @@ function checkIfCanZoomImage(element: HTMLImageElement) {
 type ZoomableImageProps = HTMLProps<HTMLImageElement>;
 
 export const ZoomableImage = (props: ZoomableImageProps) => {
-  const imageRef = useRef<HTMLImageElement | null>(null);
-
   const [isZoomEnabled, setIsZoomEnabled] = useState<boolean>(false);
   const [maxOffset, setMaxOffset] = useState({x: 0, y: 0});
 
@@ -42,10 +38,9 @@ export const ZoomableImage = (props: ZoomableImageProps) => {
       setIsZoomEnabled(false);
 
       if (isZoomEnabled) {
-        element.style.width = `unset`;
-        element.style.height = `unset`;
-        element.style.transform = `translate(0%, 0%)`;
-        element.style.maxWidth = ``;
+        element.style.width = ``;
+        element.style.height = ``;
+        element.style.transform = ``;
         return;
       }
 
@@ -54,15 +49,15 @@ export const ZoomableImage = (props: ZoomableImageProps) => {
 
     setIsZoomEnabled(prevState => !prevState);
 
-    const {naturalWidth, naturalHeight, offsetWidth, offsetHeight} = element;
+    const {naturalWidth, naturalHeight, offsetWidth, offsetHeight, parentElement} = element;
     const {clientX, clientY} = event;
 
     element.style.width = `${naturalWidth}px`;
     element.style.height = `${naturalHeight}px`;
-    element.style.maxWidth = `unset`;
 
     const {left, top} = element.getBoundingClientRect();
 
+    const parentElementHeight = parentElement?.offsetHeight || offsetHeight;
     const imageCenterX = naturalWidth / 2;
     const imageCenterY = naturalHeight / 2;
 
@@ -70,12 +65,13 @@ export const ZoomableImage = (props: ZoomableImageProps) => {
     const deltaY = clientY - top;
 
     const maxXOffset = ((naturalWidth - offsetWidth) / 2 / naturalWidth) * 100;
-    const maxYOffset = ((naturalHeight - offsetHeight) / 2 / naturalHeight) * 100;
+    const calculatedYOffset = ((naturalHeight - parentElementHeight) / 2 / naturalHeight) * 100;
+    const maxYOffset = calculatedYOffset >= 0 ? calculatedYOffset : 0;
 
     setMaxOffset({x: maxXOffset, y: maxYOffset});
 
     const xOffset = Math.min(Math.max(((deltaX - imageCenterX) / naturalWidth) * 100, -maxXOffset), maxXOffset);
-    const yOffset = Math.min(Math.max(((deltaY - imageCenterY) / naturalWidth) * 100, -maxYOffset), maxYOffset);
+    const yOffset = Math.min(Math.max(((deltaY - imageCenterY) / naturalHeight) * 100, -maxYOffset), maxYOffset);
 
     element.style.transform = `translate(${-xOffset}%, ${-yOffset}%)`;
   };
@@ -105,11 +101,13 @@ export const ZoomableImage = (props: ZoomableImageProps) => {
     // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-noninteractive-element-interactions,jsx-a11y/alt-text
     <img
       {...props}
-      ref={imageRef}
-      css={imageStyle(!!imageRef.current && checkIfCanZoomImage(imageRef.current), isZoomEnabled)}
+      css={imageStyle(isZoomEnabled)}
       onClick={onButtonClick}
       onMouseMove={handleMouseMove}
-      className={cx(props.className, {zoomed: isZoomEnabled})}
+      onLoad={event => {
+        const element = event.target as HTMLImageElement;
+        element.style.cursor = checkIfCanZoomImage(element) ? 'zoom-in' : '';
+      }}
     />
   );
 };

@@ -263,12 +263,7 @@ export const DetailViewModal = ({
             onKeyDown={handleOnClosePress}
             aria-label={t('accessibility.conversationDetailsCloseLabel')}
           >
-            <ZoomableImage
-              key={currentMessageEntityId.current}
-              src={imageSrc}
-              className="detail-view-image"
-              data-uie-name="status-picture"
-            />
+            <ZoomableImage key={currentMessageEntityId.current} src={imageSrc} data-uie-name="status-picture" />
           </button>
 
           <DetailViewModalFooter
