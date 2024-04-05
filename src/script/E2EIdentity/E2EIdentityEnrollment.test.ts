@@ -18,6 +18,7 @@
  */
 
 import {waitFor} from '@testing-library/react';
+import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
 import {LowPrecisionTaskScheduler} from '@wireapp/core/lib/util/LowPrecisionTaskScheduler';
 import {container} from 'tsyringe';
 
@@ -28,6 +29,7 @@ import {UserState} from 'src/script/user/UserState';
 import * as util from 'Util/util';
 
 import {E2EIHandler} from './E2EIdentityEnrollment';
+import * as e2EIdentityVerification from './E2EIdentityVerification';
 import {getEnrollmentStore} from './Enrollment.store';
 import {OIDCServiceStore} from './OIDCService/OIDCServiceStorage';
 
@@ -190,5 +192,57 @@ describe('E2EIHandler', () => {
     await instance.startTimers();
 
     expect(taskMock).toHaveBeenCalledWith(expect.objectContaining({key: 'enrollmentTimer'}));
+  });
+
+  describe('startTimers()', () => {
+    describe('should start enrollment for existing devices', () => {
+      it('without existing WireIdentity', async () => {
+        jest.spyOn(coreMock.service!.e2eIdentity!, 'isEnrollmentInProgress').mockResolvedValue(false);
+        jest.spyOn(coreMock.service!.e2eIdentity!, 'isFreshMLSSelfClient').mockResolvedValue(false);
+        jest.spyOn(e2EIdentityVerification, 'getActiveWireIdentity').mockResolvedValue(undefined);
+
+        const instance = await E2EIHandler.getInstance().initialize(params);
+
+        const taskSchedulerMock = jest.spyOn(LowPrecisionTaskScheduler, 'addTask');
+        const primaryModalMock = jest.spyOn(PrimaryModal, 'show');
+
+        await instance.startTimers();
+
+        expect(taskSchedulerMock).not.toHaveBeenCalled();
+        expect(primaryModalMock).toHaveBeenCalled();
+      });
+
+      it('with pristine WireIdentity', async () => {
+        jest.spyOn(coreMock.service!.e2eIdentity!, 'isEnrollmentInProgress').mockResolvedValue(false);
+        jest.spyOn(coreMock.service!.e2eIdentity!, 'isFreshMLSSelfClient').mockResolvedValue(false);
+        jest.spyOn(e2EIdentityVerification, 'getActiveWireIdentity').mockResolvedValue({
+          x509Identity: {
+            certificate: '',
+            displayName: 'John Doe',
+            domain: 'domain',
+            handle: 'johndoe',
+            notAfter: BigInt(0),
+            notBefore: BigInt(0),
+            serialNumber: '',
+          },
+          thumbprint: '',
+          credentialType: CredentialType.X509,
+          status: e2EIdentityVerification.MLSStatuses.NOT_ACTIVATED,
+          clientId: selfClientId,
+          deviceId: selfClientId,
+          qualifiedUserId: {id: 'userId', domain: 'domain'},
+        });
+
+        const instance = await E2EIHandler.getInstance().initialize(params);
+
+        const taskSchedulerMock = jest.spyOn(LowPrecisionTaskScheduler, 'addTask');
+        const primaryModalMock = jest.spyOn(PrimaryModal, 'show');
+
+        await instance.startTimers();
+
+        expect(taskSchedulerMock).not.toHaveBeenCalled();
+        expect(primaryModalMock).toHaveBeenCalled();
+      });
+    });
   });
 });

@@ -129,6 +129,7 @@ export class Conversation {
   public readonly is_cleared: ko.PureComputed<boolean>;
   /** Indicates if the conversation is currently loading messages into its state. */
   public readonly isLoadingMessages: ko.Observable<boolean>;
+  public readonly isTextInputReady: ko.Observable<boolean>;
   public readonly is_verified: ko.PureComputed<boolean | undefined>;
   public readonly is1to1: ko.PureComputed<boolean>;
   public readonly isActiveParticipant: ko.PureComputed<boolean>;
@@ -205,6 +206,7 @@ export class Conversation {
     this.type = ko.observable();
 
     this.isLoadingMessages = ko.observable(false);
+    this.isTextInputReady = ko.observable(false);
 
     this.participating_user_ets = ko.observableArray([]); // Does not include self user
     this.participating_user_ids = ko.observableArray([]); // Does not include self user

@@ -31,7 +31,12 @@ import {getLogger} from 'Util/Logger';
 import {formatDelayTime, TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {removeUrlParameters} from 'Util/UrlUtil';
 
-import {hasActiveCertificate, getActiveWireIdentity, isFreshMLSSelfClient} from './E2EIdentityVerification';
+import {
+  hasActiveCertificate,
+  getActiveWireIdentity,
+  isFreshMLSSelfClient,
+  MLSStatuses,
+} from './E2EIdentityVerification';
 import {getEnrollmentStore} from './Enrollment.store';
 import {getEnrollmentTimer} from './EnrollmentTimer';
 import {getModalOptions, ModalType} from './Modals';
@@ -158,6 +163,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
     const timerKey = 'enrollmentTimer';
     const identity = await getActiveWireIdentity();
+
     const {firingDate: computedFiringDate, isSnoozable} = getEnrollmentTimer(
       identity,
       e2eActivatedAt,
@@ -172,7 +178,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     const firingDate = this.enrollmentStore.get.timer() || computedFiringDate;
     this.enrollmentStore.store.timer(firingDate);
 
-    const isFirstE2EIActivation = !storedE2eActivatedAt && !identity;
+    const isFirstE2EIActivation = !storedE2eActivatedAt && (!identity || identity.status === MLSStatuses.NOT_ACTIVATED);
     if (isFirstE2EIActivation || firingDate <= Date.now()) {
       // We want to automatically trigger the enrollment modal if it's a devices in team that just activated e2eidentity
       // Or if the timer is supposed to fire now

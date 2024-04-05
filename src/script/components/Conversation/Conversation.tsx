@@ -36,6 +36,7 @@ import {TitleBar} from 'Components/TitleBar';
 import {CallState} from 'src/script/calling/CallState';
 import {Config} from 'src/script/Config';
 import {CONVERSATION_READONLY_STATE} from 'src/script/conversation/ConversationRepository';
+import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {allowsAllFiles, getFileExtensionOrName, hasAllowedExtension} from 'Util/FileTypeUtil';
 import {isHittingUploadLimit} from 'Util/isHittingUploadLimit';
@@ -507,6 +508,9 @@ export const Conversation = ({
                   callingRepository={callingRepository}
                   conversation={conversation}
                   multitasking={callingViewModel.multitasking}
+                  pushToTalkKey={callingViewModel.propertiesRepository.getPreference(
+                    PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY,
+                  )}
                 />
               </div>
             );

@@ -423,7 +423,7 @@
   "conversationDetails1to1ReceiptsFirst": "Якщо обидві сторони увімкнуть звіти про перегляд, то ви зможете бачити, коли повідомлення було переглянуте.",
   "conversationDetails1to1ReceiptsHeadDisabled": "Ви вимкнули звіти про перегляд",
   "conversationDetails1to1ReceiptsHeadEnabled": "Ви увімкнули звіти про перегляд",
-  "conversationDetails1to1ReceiptsSecond": "Дану опцію можна змінити в налаштуваннях акаунту.",
+  "conversationDetails1to1ReceiptsSecond": "You can change this option in your [button]account settings[/button].",
   "conversationDetailsActionAddParticipants": "Додати учасників",
   "conversationDetailsActionArchive": "Заархівувати",
   "conversationDetailsActionBlock": "Block",
