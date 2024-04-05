@@ -1699,27 +1699,6 @@ export class ConversationRepository {
     return this.conversationService.removeConversationFromBlacklist(conversationId);
   }
 
-  public readonly makeSureMLS1to1ConversationIsEstablished = async (mlsConversation: MLSConversation) => {
-    const isMLSGroupEstablished = await this.conversationService.isMLSGroupEstablishedLocally(mlsConversation.groupId);
-    if (isMLSGroupEstablished) {
-      return;
-    }
-
-    const selfUser = this.userState.self();
-
-    if (!selfUser) {
-      throw new Error('Self user not found');
-    }
-
-    const otherUserId = this.getUserIdOf1to1Conversation(mlsConversation);
-
-    if (!otherUserId) {
-      throw new Error('Other user not found');
-    }
-
-    await this.establishMLS1to1Conversation(mlsConversation, otherUserId);
-  };
-
   /**
    * Will establish mls 1:1 conversation.
    * If proteus conversation is provided, it will be replaced with mls 1:1 conversation.
