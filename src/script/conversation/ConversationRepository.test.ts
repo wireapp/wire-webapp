@@ -675,10 +675,11 @@ describe('ConversationRepository', () => {
       expect(conversationEntity?.serialize()).toEqual(mls1to1Conversation.serialize());
     });
 
-    it("does not establish MLS 1:1 conversation if it's a team-owned 1:1 conversation", async () => {
+    it('establishes MLS 1:1 conversation between team members', async () => {
       const conversationRepository = testFactory.conversation_repository!;
       const userRepository = testFactory.user_repository!;
       const teamId = 'team-id';
+      const mockedGroupId = 'groupId';
 
       const otherUserId = {id: 'f71840c-3833-479d-bd80-a5dk03f38414', domain: 'testt-domain'};
       const otherUser = new User(otherUserId.id, otherUserId.domain);
@@ -690,10 +691,49 @@ describe('ConversationRepository', () => {
       const selfUser = new User(selfUserId.id, selfUserId.domain);
       selfUser.teamId = teamId;
 
+      const mls1to1ConversationResponse = generateAPIConversation({
+        id: {id: '04ab891e-ccf1-4dba-9d74-bacec64b5b1e', domain: 'test-domain'},
+        type: CONVERSATION_TYPE.ONE_TO_ONE,
+        protocol: ConversationProtocol.MLS,
+        overwites: {group_id: mockedGroupId},
+      }) as BackendMLSConversation;
+
+      jest
+        .spyOn(conversationRepository['conversationService'], 'getMLS1to1Conversation')
+        .mockResolvedValueOnce(mls1to1ConversationResponse);
+
+      jest
+        .spyOn(conversationRepository['conversationService'], 'isMLSGroupEstablishedLocally')
+        .mockResolvedValueOnce(false);
+
+      const establishedMls1to1ConversationResponse = generateAPIConversation({
+        id: {id: '04ab891e-ccf1-4dba-9d74-bacec64b5b1e', domain: 'test-domain'},
+        type: CONVERSATION_TYPE.ONE_TO_ONE,
+        protocol: ConversationProtocol.MLS,
+        overwites: {
+          group_id: mockedGroupId,
+          epoch: 1,
+          qualified_others: [otherUserId],
+          members: {
+            others: [{id: otherUserId.id, status: 0, qualified_id: otherUserId}],
+            self: {},
+          } as any,
+        },
+      }) as BackendMLSConversation;
+
+      jest
+        .spyOn(conversationRepository['conversationService'], 'getMLS1to1Conversation')
+        .mockResolvedValueOnce(establishedMls1to1ConversationResponse);
+      jest
+        .spyOn(container.resolve(Core).service!.conversation, 'establishMLS1to1Conversation')
+        .mockResolvedValueOnce(establishedMls1to1ConversationResponse);
+
       selfUser.supportedProtocols([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]);
       jest.spyOn(conversationRepository['userState'], 'self').mockReturnValueOnce(selfUser);
 
-      expect(container.resolve(Core).service!.conversation.establishMLS1to1Conversation).not.toHaveBeenCalled();
+      await conversationRepository.getInitialised1To1Conversation(otherUser.qualifiedId);
+
+      expect(container.resolve(Core).service!.conversation.establishMLS1to1Conversation).toHaveBeenCalled();
     });
 
     it("establishes MLS 1:1 conversation if it's a team-owned 1:1 conversation only if it was already established on backend", async () => {
