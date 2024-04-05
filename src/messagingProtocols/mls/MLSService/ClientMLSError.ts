@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2022 Wire Swiss GmbH
+ * Copyright (C) 2024 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,5 +17,16 @@
  *
  */
 
-export * from './MLSService';
-export * from './ClientMLSError';
+export enum ClientMLSErrorLabel {
+  NO_KEY_PACKAGES_AVAILABLE = 'no-key-packages-available',
+}
+
+export class ClientMLSError extends Error {
+  label: ClientMLSErrorLabel;
+
+  constructor(label: ClientMLSErrorLabel) {
+    super();
+    this.label = label;
+    Object.setPrototypeOf(this, new.target.prototype);
+  }
+}

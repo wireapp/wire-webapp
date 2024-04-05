@@ -124,6 +124,7 @@ describe('ConversationService', () => {
       getEpoch: () => Promise.resolve(),
       joinByExternalCommit: jest.fn(),
       registerConversation: jest.fn(),
+      register1to1Conversation: jest.fn(),
       wipeConversation: jest.fn(),
       handleMLSMessageAddEvent: jest.fn(),
       conversationExists: jest.fn(),
@@ -424,10 +425,8 @@ describe('ConversationService', () => {
       );
 
       expect(mlsService.wipeConversation).toHaveBeenCalledWith(mockGroupId);
-      expect(mlsService.registerConversation).toHaveBeenCalledTimes(1);
-      expect(mlsService.registerConversation).toHaveBeenCalledWith(mockGroupId, [otherUserId, selfUser.user], {
-        creator: selfUser,
-      });
+      expect(mlsService.register1to1Conversation).toHaveBeenCalledTimes(1);
+      expect(mlsService.register1to1Conversation).toHaveBeenCalledWith(mockGroupId, otherUserId, selfUser);
       expect(conversationService.joinByExternalCommit).not.toHaveBeenCalled();
       expect(establishedConversation.epoch).toEqual(updatedEpoch);
     });
@@ -467,7 +466,7 @@ describe('ConversationService', () => {
         group_id: mockGroupId,
       } as unknown as MLSConversation);
 
-      jest.spyOn(mlsService, 'registerConversation').mockRejectedValueOnce(undefined);
+      jest.spyOn(mlsService, 'register1to1Conversation').mockRejectedValueOnce(undefined);
       jest.spyOn(mlsService, 'wipeConversation');
 
       const establishedConversation = await conversationService.establishMLS1to1Conversation(
@@ -477,10 +476,8 @@ describe('ConversationService', () => {
       );
 
       expect(mlsService.wipeConversation).toHaveBeenCalledWith(mockGroupId);
-      expect(mlsService.registerConversation).toHaveBeenCalledTimes(2);
-      expect(mlsService.registerConversation).toHaveBeenCalledWith(mockGroupId, [otherUserId, selfUser.user], {
-        creator: selfUser,
-      });
+      expect(mlsService.register1to1Conversation).toHaveBeenCalledTimes(2);
+      expect(mlsService.register1to1Conversation).toHaveBeenCalledWith(mockGroupId, otherUserId, selfUser);
       expect(conversationService.joinByExternalCommit).not.toHaveBeenCalled();
       expect(establishedConversation.epoch).toEqual(updatedEpoch);
     });
