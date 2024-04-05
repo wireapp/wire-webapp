@@ -64,7 +64,7 @@ export interface SidebarStore {
 }
 
 const useSidebarStore = create<SidebarStore>((set, get) => ({
-  isOpen: false,
+  isOpen: true,
   setIsOpen: isOpen => set({isOpen}),
   toggleIsOpen: () => set({isOpen: !get().isOpen}),
 }));
