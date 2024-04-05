@@ -43,6 +43,7 @@ import {
 } from '@wireapp/core-crypto';
 import {PriorityQueue} from '@wireapp/priority-queue';
 
+import {ClientMLSError, ClientMLSErrorLabel} from './ClientMLSError';
 import {isCoreCryptoMLSConversationAlreadyExistsError, shouldMLSDecryptionErrorBeIgnored} from './CoreCryptoMLSError';
 import {MLSServiceConfig, NewCrlDistributionPointsPayload, UploadCommitOptions} from './MLSService.types';
 
@@ -501,6 +502,54 @@ export class MLSService extends TypedEventEmitter<Events> {
      */
     response.failures = [...keysClaimingFailures, ...response.failures];
     return response;
+  }
+
+  /**
+   * Will create a 1:1 conversation inside of coreCrypto, try claiming key packages for user and (if succesfull) add them to the MLS group.
+   * @param groupId the id of the group to create inside of coreCrypto
+   * @param userId the id of the user to register the conversation with
+   * @param selfUser the self user that is creating the 1:1 conversation (user and client ids)
+   */
+  public async register1to1Conversation(
+    groupId: string,
+    userId: QualifiedId,
+    selfUser: {user: QualifiedId; client: string},
+  ): Promise<PostMlsMessageResponse & {failures: AddUsersFailure[]}> {
+    try {
+      await this.registerEmptyConversation(groupId);
+
+      // We fist fetch key packages for the user we want to add
+      const {keyPackages: otherUserKeyPackages, failures: otherUserKeysClaimingFailures} =
+        await this.getKeyPackagesPayload([userId]);
+
+      // If we're missing key packages for the user we want to add, we can't register the conversation
+      if (otherUserKeyPackages.length <= 0) {
+        if (
+          otherUserKeysClaimingFailures.length > 0 &&
+          otherUserKeysClaimingFailures.some(({reason}) => reason === AddUsersFailureReasons.OFFLINE_FOR_TOO_LONG)
+        ) {
+          throw new ClientMLSError(ClientMLSErrorLabel.NO_KEY_PACKAGES_AVAILABLE);
+        }
+      }
+
+      const {keyPackages: selfKeyPackages, failures: selfKeysClaimingFailures} = await this.getKeyPackagesPayload([
+        {...selfUser.user, skipOwnClientId: selfUser.client},
+      ]);
+
+      const response = await this.addUsersToExistingConversation(groupId, [
+        ...otherUserKeyPackages,
+        ...selfKeyPackages,
+      ]);
+
+      // We schedule a periodic key material renewal
+      await this.scheduleKeyMaterialRenewal(groupId);
+
+      response.failures = [...otherUserKeysClaimingFailures, ...selfKeysClaimingFailures, ...response.failures];
+      return response;
+    } catch (error) {
+      await this.wipeConversation(groupId);
+      throw error;
+    }
   }
 
   /**

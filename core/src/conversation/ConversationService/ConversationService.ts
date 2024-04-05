@@ -588,7 +588,8 @@ export class ConversationService extends TypedEventEmitter<Events> {
     await this.mlsService.wipeConversation(groupId);
 
     try {
-      await this.mlsService.registerConversation(groupId, [otherUserId, selfUser.user], {creator: selfUser});
+      await this.mlsService.register1to1Conversation(groupId, otherUserId, selfUser);
+
       this.logger.info(`Conversation (id ${mlsConversation.qualified_id.id}) established successfully.`);
 
       return this.getMLS1to1Conversation(otherUserId);
