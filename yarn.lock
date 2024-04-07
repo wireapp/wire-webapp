@@ -17113,9 +17113,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack-dev-middleware@npm:7.2.0":
-  version: 7.2.0
-  resolution: "webpack-dev-middleware@npm:7.2.0"
+"webpack-dev-middleware@npm:7.2.1":
+  version: 7.2.1
+  resolution: "webpack-dev-middleware@npm:7.2.1"
   dependencies:
     colorette: "npm:^2.0.10"
     memfs: "npm:^4.6.0"
@@ -17128,7 +17128,7 @@ __metadata:
   peerDependenciesMeta:
     webpack:
       optional: true
-  checksum: 10/f1808d8e730805b2b5c82eb947fd8f1bb5729a6519aac8e07f99a1ff89974eac854f556ba9f89c0ff9cbc155aa30396bbb3732157b3a236c58b046af1cc9d435
+  checksum: 10/e1fa9b40cba7b954f901b085cdded62df6f3c10d1d4e24d4850bd35ebe3dcfb18e7159e6579d6ac854e8e3611e5895aaf45ea1f3e29da2287659d36f0cb614d1
   languageName: node
   linkType: hard
 
@@ -17530,7 +17530,7 @@ __metadata:
     uuidjs: "npm:4.2.13"
     webpack: "npm:5.91.0"
     webpack-cli: "npm:5.1.4"
-    webpack-dev-middleware: "npm:7.2.0"
+    webpack-dev-middleware: "npm:7.2.1"
     webpack-hot-middleware: "npm:2.26.1"
     webrtc-adapter: "npm:9.0.1"
     workbox-webpack-plugin: "npm:7.0.0"
