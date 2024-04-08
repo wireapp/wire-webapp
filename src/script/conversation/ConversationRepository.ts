@@ -1816,26 +1816,18 @@ export class ConversationRepository {
       throw new Error('Self user is not available!');
     }
 
-    try {
-      const initialisedMLSConversation = await this.establishMLS1to1Conversation(mlsConversation, otherUserId);
+    const initialisedMLSConversation = await this.establishMLS1to1Conversation(mlsConversation, otherUserId);
 
-      if (shouldOpenMLS1to1Conversation) {
-        // If proteus conversation was previously active conversaiton, we want to make mls 1:1 conversation active.
-        amplify.publish(WebAppEvents.CONVERSATION.SHOW, initialisedMLSConversation, {});
-      }
-
-      // If mls is supported by the other user, we can establish the group and remove readonly state from the conversation.
-      initialisedMLSConversation.readOnlyState(null);
-      await this.update1To1ConversationParticipants(mlsConversation, otherUserId);
-      await this.saveConversation(initialisedMLSConversation);
-      return initialisedMLSConversation;
-    } catch (error) {
-      this.logger.error(
-        `Failed to establish MLS 1:1 conversation with user ${otherUserId.id}, deleting the conversation from the local state:`,
-        error,
-      );
-      throw error;
+    if (shouldOpenMLS1to1Conversation) {
+      // If proteus conversation was previously active conversaiton, we want to make mls 1:1 conversation active.
+      amplify.publish(WebAppEvents.CONVERSATION.SHOW, initialisedMLSConversation, {});
     }
+
+    // If mls is supported by the other user, we can establish the group and remove readonly state from the conversation.
+    initialisedMLSConversation.readOnlyState(null);
+    await this.update1To1ConversationParticipants(mlsConversation, otherUserId);
+    await this.saveConversation(initialisedMLSConversation);
+    return initialisedMLSConversation;
   };
 
   private update1To1ConversationParticipants = async (conversation: Conversation, otherUserId: QualifiedId) => {
