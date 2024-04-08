@@ -17,12 +17,14 @@
  *
  */
 
-import {render} from '@testing-library/react';
+import {act, render} from '@testing-library/react';
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {ConversationProtocol, CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
+import {ClientMLSError, ClientMLSErrorLabel} from '@wireapp/core/lib/messagingProtocols/mls';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
+import {PrimaryModalComponent} from 'Components/Modals/PrimaryModal/PrimaryModal';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';
 import {ConversationRoleRepository} from 'src/script/conversation/ConversationRoleRepository';
@@ -37,7 +39,10 @@ import {noop} from 'Util/util';
 
 import {ActionIdentifier, Actions, UserActions} from './UserActions';
 
-const actionsViewModel = {} as ActionsViewModel;
+const actionsViewModel = {
+  open1to1Conversation: jest.fn(),
+  getOrCreate1to1Conversation: jest.fn(),
+} as unknown as ActionsViewModel;
 
 const getAllActions = (queryFunction: (id: string) => HTMLElement | null) =>
   Object.values(ActionIdentifier)
@@ -186,6 +191,54 @@ describe('UserActions', () => {
       const identifier = ActionIdentifier[action];
       expect(queryByTestId(identifier)).not.toBeNull();
     });
+  });
+
+  it('opens a no available keys modal if failed when trying to establish mls 1:1', async () => {
+    const user = new User('');
+
+    const team = new TeamEntity('teamId');
+    teamState.team(team);
+
+    user.teamId = team.id;
+
+    const selfUser = new User('');
+    selfUser.teamId = team.id;
+
+    userState.self(selfUser);
+
+    jest.spyOn(user, 'isAvailable').mockImplementation(ko.pureComputed(() => true));
+    const conversation = new Conversation();
+    conversation.participating_user_ids([user]);
+
+    const conversationRoleRepository: Partial<ConversationRoleRepository> = {canRemoveParticipants: () => true};
+
+    const props = {
+      actionsViewModel,
+      conversation,
+      conversationRoleRepository: conversationRoleRepository as ConversationRoleRepository,
+      isSelfActivated: true,
+      onAction: noop,
+      selfUser,
+      user,
+    };
+
+    jest
+      .spyOn(actionsViewModel, 'getOrCreate1to1Conversation')
+      .mockRejectedValueOnce(new ClientMLSError(ClientMLSErrorLabel.NO_KEY_PACKAGES_AVAILABLE));
+
+    const {getByTestId, getByText} = render(
+      <>
+        <UserActions {...props} />
+        <PrimaryModalComponent />
+      </>,
+    );
+
+    const button = getByTestId(ActionIdentifier[Actions.START_CONVERSATION]);
+
+    await act(async () => button?.click());
+
+    expect(getByText('modal1To1ConversationCreateErrorNoKeyPackagesHeadline')).toBeDefined();
+    expect(getByText('modal1To1ConversationCreateErrorNoKeyPackagesMessage')).toBeDefined();
   });
 
   it("shows open conversation if there's an existing conversation between two users from the same team", () => {

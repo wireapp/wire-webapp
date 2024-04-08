@@ -202,7 +202,7 @@ const UserActions: React.FC<UserActionsProps> = ({
               onAction(Actions.START_CONVERSATION);
             } catch (error) {
               if (error instanceof ClientMLSError && error.label === ClientMLSErrorLabel.NO_KEY_PACKAGES_AVAILABLE) {
-                PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
+                return PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
                   text: {
                     title: t('modal1To1ConversationCreateErrorNoKeyPackagesHeadline'),
                     htmlMessage: t('modal1To1ConversationCreateErrorNoKeyPackagesMessage', user.name()),
