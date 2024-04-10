@@ -219,25 +219,8 @@ export class ContentViewModel {
     );
   }
 
-  private showConversationWithBlockedUserErrorModal(): void {
-    PrimaryModal.show(
-      PrimaryModal.type.ACKNOWLEDGE,
-      {
-        text: {
-          message: t('conversationWithBlockedUserMessage'),
-          title: t('conversationWithBlockedUserTitle'),
-        },
-      },
-      undefined,
-    );
-  }
-
   private isConversationNotFoundError(error: any): boolean {
     return error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;
-  }
-
-  private isConversationWithBlockedUserError(error: any): boolean {
-    return error.type === ConversationError.TYPE.CONVERSATION_WITH_BLOCKED_USER;
   }
 
   /**
@@ -265,21 +248,12 @@ export class ContentViewModel {
 
     try {
       const conversationEntity = await this.getConversationEntity(conversation);
-      const isConnectionBlocked = conversationEntity?.connection()?.isBlocked();
 
       if (!conversationEntity) {
         this.closeRightSidebar();
         throw new ConversationError(
           ConversationError.TYPE.CONVERSATION_NOT_FOUND,
           ConversationError.MESSAGE.CONVERSATION_NOT_FOUND,
-        );
-      }
-
-      if (isConnectionBlocked) {
-        this.closeRightSidebar();
-        throw new ConversationError(
-          ConversationError.TYPE.CONVERSATION_WITH_BLOCKED_USER,
-          ConversationError.MESSAGE.CONVERSATION_WITH_BLOCKED_USER,
         );
       }
 
@@ -303,10 +277,6 @@ export class ContentViewModel {
     } catch (error: any) {
       if (this.isConversationNotFoundError(error)) {
         return this.showConversationNotFoundErrorModal();
-      }
-
-      if (this.isConversationWithBlockedUserError(error)) {
-        return this.showConversationWithBlockedUserErrorModal();
       }
 
       throw error;
