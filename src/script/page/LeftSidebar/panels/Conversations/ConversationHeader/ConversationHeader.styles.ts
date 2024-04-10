@@ -24,6 +24,7 @@ export const header: CSSObject = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
+  minHeight: 'var(--content-title-bar-height)',
   width: '100%',
 };
 
