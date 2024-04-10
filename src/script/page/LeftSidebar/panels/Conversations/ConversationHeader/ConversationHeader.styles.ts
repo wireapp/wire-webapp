@@ -24,6 +24,7 @@ export const header: CSSObject = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
+  minHeight: 'var(--content-title-bar-height)',
   width: '100%',
 };
 
@@ -66,5 +67,5 @@ export const searchInputStyles: CSSObject = {
 export const searchInputWrapperStyles: CSSObject = {
   zIndex: 1,
   position: 'relative',
-  marginBlock: '8px',
+  marginBlock: '4px 16px',
 };
