@@ -44,8 +44,21 @@
 }
 
 .left-list-header {
-  position: relative;
-  padding: 0 16px 8px;
+  padding-inline: 16px;
+
+  //position: relative;
+  //padding: 8px 16px;
+  //min-height: @content-title-bar-height;
+
+  //&.left-list-header-conversations {
+  //  padding: 0 16px 8px;
+  //}
+}
+
+.left-list-header-preferences {
+  display: grid;
+  min-height: var(--content-title-bar-height);
+  place-content: center;
 }
 
 body.theme-dark {

@@ -66,5 +66,5 @@ export const searchInputStyles: CSSObject = {
 export const searchInputWrapperStyles: CSSObject = {
   zIndex: 1,
   position: 'relative',
-  marginBlock: '8px',
+  marginBlock: '4px 16px',
 };
