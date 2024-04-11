@@ -89,6 +89,7 @@ export class Conversation {
   public readonly readOnlyState: ko.Observable<CONVERSATION_READONLY_STATE | null>;
   private readonly incomingMessages: ko.ObservableArray<Message>;
   public readonly isProteusTeam1to1: ko.PureComputed<boolean>;
+  public readonly isConversationWithBlockedUser: ko.PureComputed<boolean>;
   public readonly isReadOnlyConversation: ko.PureComputed<boolean>;
   public readonly last_server_timestamp: ko.Observable<number>;
   private readonly logger: Logger;
@@ -245,8 +246,10 @@ export class Conversation {
       }),
     );
 
+    this.isConversationWithBlockedUser = ko.pureComputed(() => !!this.connection()?.isBlocked());
+
     this.isReadOnlyConversation = ko.pureComputed(
-      () => this.connection()?.isBlocked() || this.readOnlyState() !== null,
+      () => this.isConversationWithBlockedUser() || this.readOnlyState() !== null,
     );
 
     this.isGroup = ko.pureComputed(() => {

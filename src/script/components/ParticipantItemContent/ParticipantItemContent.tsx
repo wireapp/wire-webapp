@@ -20,6 +20,7 @@
 import React from 'react';
 
 import {Icon} from 'Components/Icon';
+import {UserBlockedBadge} from 'Components/UserBlockedBadge/UserBlockedBadge';
 import {UserInfo} from 'Components/UserInfo';
 import {UserVerificationBadges} from 'Components/VerificationBadge';
 import {User} from 'src/script/entity/User';
@@ -80,7 +81,13 @@ export const ParticipantItemContent = ({
               selfString={selfString}
               showAvailability={showAvailabilityState && selfInTeam}
             >
-              <UserVerificationBadges user={participant} groupId={groupId} />
+              {/* TODO: test with mls verification state */}
+              <UserVerificationBadges user={participant} groupId={groupId} />k
+              {participant.isBlocked() && (
+                <span css={{marginLeft: 4}}>
+                  <UserBlockedBadge />
+                </span>
+              )}
             </UserInfo>
           ) : (
             <>

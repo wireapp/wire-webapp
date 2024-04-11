@@ -1482,6 +1482,7 @@
   "urlWebsiteCreateTeam": "/create-team/",
   "urlWebsitePrivacy": "/privacy",
   "urlWebsiteRoot": "/",
+  "userBlockedConnectionBadge": "Blocked",
   "userAvailabilityAvailable": "Available",
   "userAvailabilityAway": "Away",
   "userAvailabilityBusy": "Busy",
