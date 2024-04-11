@@ -17,6 +17,9 @@
  *
  */
 
+import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
+import axios from 'axios';
+
 import {CoreCrypto, WireIdentity} from '@wireapp/core-crypto';
 
 import {E2EIServiceExternal} from './E2EIServiceExternal';
@@ -28,15 +31,18 @@ import {stringifyQualifiedId} from '../../../util/qualifiedIdUtil';
 import {RecurringTaskScheduler} from '../../../util/RecurringTaskScheduler';
 import {MLSService} from '../MLSService';
 
-async function buildE2EIService() {
+async function buildE2EIService(dbName = 'core-test-db') {
   const coreCrypto = {
     getUserIdentities: jest.fn(),
     getClientIds: jest.fn().mockResolvedValue([]),
+    e2eiIsPKIEnvSetup: jest.fn(),
+    e2eiRegisterAcmeCA: jest.fn(),
+    e2eiRegisterIntermediateCA: jest.fn(),
   } as unknown as jest.Mocked<CoreCrypto>;
 
   const clientService = {} as jest.Mocked<ClientService>;
 
-  const mockedDb = await openDB('core-test-db');
+  const mockedDb = await openDB(dbName);
 
   const mockedMLSService = {
     on: jest.fn(),
@@ -48,13 +54,13 @@ async function buildE2EIService() {
     delete: key => mockedDb.delete('recurringTasks', key),
     get: async key => (await mockedDb.get('recurringTasks', key))?.firingDate,
     set: async (key, timestamp) => {
-      await mockedDb.put('recurringTasks', {key, firingDate: timestamp});
+      await mockedDb.put('recurringTasks', {key, firingDate: timestamp}, key);
     },
   });
 
   return [
     new E2EIServiceExternal(coreCrypto, mockedDb, recurringTaskScheduler, clientService, mockedMLSService),
-    {coreCrypto, mlsService: mockedMLSService},
+    {coreCrypto, mlsService: mockedMLSService, recurringTaskScheduler},
   ] as const;
 }
 
@@ -203,6 +209,66 @@ describe('E2EIServiceExternal', () => {
 
       expect(userIdentities?.get(stringifyQualifiedId({id: user1.userId, domain: user1.domain}))).toHaveLength(2);
       expect(userIdentities?.get(stringifyQualifiedId({id: user2.userId, domain: user2.domain}))).toHaveLength(1);
+    });
+  });
+
+  describe('initialize', () => {
+    const axiosMock = axios as jest.Mocked<typeof axios>;
+    axiosMock.get = jest.fn();
+    axiosMock.get.mockImplementation(async url => {
+      if (url === `${mockDiscoveryUrl}/roots.pem`) {
+        return {data: mockedRootCA};
+      }
+
+      if (url === `${mockDiscoveryUrl}/federation`) {
+        return {data: {crts: federatedCerts}};
+      }
+
+      return {data: null};
+    });
+    axios.create = jest.fn(() => axiosMock);
+
+    const mockDiscoveryUrl = 'https://some.crl.discovery.url';
+
+    const mockedRootCA = 'cert';
+    const federatedCerts = ['federatedCert1', 'federatedCert2'];
+
+    afterEach(() => {
+      jest.clearAllMocks();
+      jest.useRealTimers();
+    });
+
+    it('registers the server certificates and shedules a timer to refresh intermediate certs every', async () => {
+      jest.useFakeTimers();
+
+      const [service, {coreCrypto}] = await buildE2EIService('mockedDB1');
+
+      jest.spyOn(coreCrypto, 'e2eiIsPKIEnvSetup').mockResolvedValueOnce(false);
+
+      await service.initialize('https://some.crl.discovery.url');
+
+      expect(coreCrypto.e2eiRegisterAcmeCA).toHaveBeenCalledWith(mockedRootCA);
+      expect(coreCrypto.e2eiRegisterIntermediateCA).toHaveBeenCalledWith(federatedCerts[0]);
+      expect(coreCrypto.e2eiRegisterIntermediateCA).toHaveBeenCalledWith(federatedCerts[1]);
+      expect(coreCrypto.e2eiRegisterIntermediateCA).toHaveBeenCalledTimes(2);
+
+      await jest.advanceTimersByTimeAsync(TimeInMillis.DAY);
+      await jest.runAllTimersAsync();
+
+      expect(coreCrypto.e2eiRegisterIntermediateCA).toHaveBeenCalledTimes(4);
+    });
+
+    it('does not register the root cert if it was already registered', async () => {
+      jest.useFakeTimers();
+
+      const [service, {coreCrypto}] = await buildE2EIService('mockedDB2');
+
+      jest.spyOn(coreCrypto, 'e2eiIsPKIEnvSetup').mockResolvedValueOnce(true);
+
+      await service.initialize('https://some.crl.discovery.url');
+
+      expect(coreCrypto.e2eiRegisterAcmeCA).not.toHaveBeenCalled();
+      expect(coreCrypto.e2eiRegisterIntermediateCA).toHaveBeenCalledTimes(2);
     });
   });
 });

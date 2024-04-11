@@ -70,7 +70,7 @@ const createMLSService = async () => {
     delete: key => mockedDb.delete('recurringTasks', key),
     get: async key => (await mockedDb.get('recurringTasks', key))?.firingDate,
     set: async (key, timestamp) => {
-      await mockedDb.put('recurringTasks', {key, firingDate: timestamp});
+      await mockedDb.put('recurringTasks', {key, firingDate: timestamp}, key);
     },
   });
 
