@@ -23,7 +23,7 @@ import {Config} from 'src/script/Config';
 import {createLabel} from 'src/script/conversation/ConversationLabelRepository';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {Conversation} from 'src/script/entity/Conversation';
-import {useFolderState} from 'src/script/page/LeftSidebar/panels/Conversations/state';
+import {useFolderState, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/state';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 
 import {SidebarTabs} from '../Conversations';
@@ -53,12 +53,19 @@ export const ConversationFolderTab = ({
   dataUieName,
 }: ConversationFolderTabProps) => {
   const {openFolder, isFoldersTabOpen, toggleFoldersTab, expandedFolder} = useFolderState();
-
+  const {isOpen: isSidebarOpen, setIsOpen: setIsSidebarOpen} = useSidebarStore();
   const {conversationLabelRepository} = conversationRepository;
 
   function toggleFolder(folderId: string) {
     openFolder(folderId);
     onChangeTab(type, folderId);
+  }
+
+  function handleToggleFoldersTab() {
+    if (!isSidebarOpen) {
+      setIsSidebarOpen(true);
+    }
+    toggleFoldersTab();
   }
 
   const folders = conversationLabelRepository
@@ -88,7 +95,7 @@ export const ConversationFolderTab = ({
         type="button"
         role="tab"
         className="conversations-sidebar-btn"
-        onClick={toggleFoldersTab}
+        onClick={handleToggleFoldersTab}
         title={title}
         data-uie-name={dataUieName}
       >

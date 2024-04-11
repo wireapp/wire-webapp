@@ -26,12 +26,33 @@
   text-align: center;
 }
 
-.conversations-sidebar-wrapper {
-  display: flex;
+.conversations-sidebar {
+  position: relative;
 
-  &:hover {
-    .conversations-sidebar .conversations-sidebar-items {
-      transform: translateX(0);
+  .conversations-sidebar-items {
+    display: flex;
+    overflow: hidden;
+    width: 220px;
+    height: 100vh;
+    flex-direction: column;
+    padding: 8px;
+    border-right: 1px solid var(--border-color);
+    background: var(--sidebar-bg);
+    transition: width 0.3s ease-in-out;
+
+    &[data-is-collapsed='true'] {
+      width: 50px;
+
+      .conversations-sidebar-btn--text,
+      .conversations-sidebar-folders,
+      .conversations-sidebar-title {
+        display: none;
+      }
+
+      .conversations-sidebar-btn svg {
+        width: 16px;
+        height: 16px;
+      }
     }
   }
 
@@ -39,74 +60,25 @@
     .button-reset-default;
 
     position: relative;
-    width: 16px;
-    height: 100%;
-    opacity: 0;
-
-    &:hover {
-      opacity: 1;
-    }
-
-    .conversations-sidebar-handle-icon {
-      position: absolute;
-      z-index: 99999999999;
-      top: 8px;
-      right: -8px;
-      display: flex;
-      width: 24px;
-      height: 24px;
-      align-items: center;
-      justify-content: center;
-      border: 1px solid var(--border-color);
-      border-radius: 20px;
-      background-color: var(--app-bg-secondary);
-      cursor: pointer;
-      transform: rotate(180deg);
-
-      &[data-is-collapsed='true'] {
-        transform: rotate(0deg);
-      }
-    }
-  }
-}
-
-.conversations-sidebar {
-  display: flex;
-  width: 220px;
-  flex-direction: column;
-  border-right: 1px solid var(--border-color);
-  overflow-y: auto;
-
-  transition: width 0.3s ease-in-out;
-
-  .conversations-sidebar-items {
-    position: fixed;
+    position: absolute;
     z-index: 1000;
+    top: 8px;
+    right: -12px;
+
     display: flex;
-    overflow: auto;
-    width: 220px;
-    height: 100vh;
-    background: var(--sidebar-bg);
-    transform: translateX(0);
+    width: 24px;
+    height: 24px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    background-color: var(--app-bg-secondary);
+    cursor: pointer;
+    transform: rotate(180deg);
 
-    .conversations-sidebar-items-children {
-      display: flex;
-      flex-direction: column;
+    &[data-is-collapsed='true'] {
+      transform: rotate(0deg);
     }
-  }
-
-  &[data-is-collapsed='true'] {
-    width: 20px;
-
-    .conversations-sidebar-items {
-      transform: translateX(calc(-100% + 16px));
-    }
-  }
-
-  .conversations-sidebar-items {
-    min-width: 220px;
-    padding: 8px 8px;
-    transition: all 0.3s ease-in-out;
   }
 }
 

@@ -26,7 +26,6 @@ import {ChevronIcon, useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {CallingCell} from 'Components/calling/CallingCell';
-import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {IntegrationRepository} from 'src/script/integration/IntegrationRepository';
 import {Preferences} from 'src/script/page/LeftSidebar/panels/Preferences';
 import {StartUI} from 'src/script/page/LeftSidebar/panels/StartUI';
@@ -43,7 +42,7 @@ import {ConversationsList} from './ConversationsList';
 import {ConversationTabs} from './ConversationTabs';
 import {EmptyConversationList} from './EmptyConversationList';
 import {getTabConversations} from './helpers';
-import {useFolderState} from './state';
+import {useFolderState, useSidebarStore} from './state';
 
 import {CallState} from '../../../../calling/CallState';
 import {createLabel, DefaultLabelIds} from '../../../../conversation/ConversationLabelRepository';
@@ -102,7 +101,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   userState = container.resolve(UserState),
   selfUser,
 }) => {
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const {isOpen: isSideBarOpen, toggleIsOpen: toggleSidebarIsOpen} = useSidebarStore();
   const [conversationsFilter, setConversationsFilter] = useState<string>('');
   const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
   const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
@@ -146,7 +145,14 @@ const Conversations: React.FC<ConversationsProps> = ({
   ].includes(currentTab);
 
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
-  const {isOpen: isFolderOpen, openFolder, closeFolder, expandedFolder} = useFolderState();
+  const {
+    isOpen: isFolderOpen,
+    openFolder,
+    closeFolder,
+    expandedFolder,
+    isFoldersTabOpen,
+    toggleFoldersTab,
+  } = useFolderState();
   const {currentFocus, handleKeyDown, resetConversationFocus} = useConversationFocus(conversations);
   const {conversations: currentTabConversations, searchInputPlaceholder} = getTabConversations({
     currentTab,
@@ -162,6 +168,13 @@ const Conversations: React.FC<ConversationsProps> = ({
     .getLabels()
     .map(label => createLabel(label.name, conversationLabelRepository.getLabelConversations(label), label.id))
     .find(folder => folder.id === expandedFolder);
+
+  function toggleSidebar() {
+    if (isFoldersTabOpen) {
+      toggleFoldersTab();
+    }
+    toggleSidebarIsOpen();
+  }
 
   const hasNoConversations = conversations.length + connectRequests.length === 0;
 
@@ -242,44 +255,41 @@ const Conversations: React.FC<ConversationsProps> = ({
   }
 
   const sidebar = (
-    <div className="conversations-sidebar-wrapper">
-      <nav className="conversations-sidebar" data-is-collapsed={isSidebarCollapsed || mdBreakpoint}>
-        <FadingScrollbar className="conversations-sidebar-items">
-          <div className="conversations-sidebar-items-children">
-            <UserDetails
-              user={selfUser}
-              groupId={conversationState.selfMLSConversation()?.groupId}
-              isTeam={teamState.isTeam()}
-            />
+    <nav className="conversations-sidebar">
+      <div className="conversations-sidebar-items" data-is-collapsed={!isSideBarOpen || mdBreakpoint}>
+        {!(!isSideBarOpen || mdBreakpoint) && (
+          <UserDetails
+            user={selfUser}
+            groupId={conversationState.selfMLSConversation()?.groupId}
+            isTeam={teamState.isTeam()}
+          />
+        )}
 
-            <ConversationTabs
-              conversationRepository={conversationRepository}
-              unreadConversations={unreadConversations}
-              favoriteConversations={favoriteConversations}
-              archivedConversations={archivedConversations}
-              groupConversations={groupConversations}
-              directConversations={directConversations}
-              onChangeTab={changeTab}
-              currentTab={currentTab}
-              onClickPreferences={() => onClickPreferences(ContentState.PREFERENCES_ACCOUNT)}
-            />
-          </div>
-          {!mdBreakpoint && (
-            <button
-              type="button"
-              role="tab"
-              className="conversations-sidebar-handle"
-              data-is-collapsed={isSidebarCollapsed || mdBreakpoint}
-              onClick={() => setIsSidebarCollapsed(previous => !previous)}
-            >
-              <div className="conversations-sidebar-handle-icon" data-is-collapsed={isSidebarCollapsed}>
-                <ChevronIcon width={12} height={12} />
-              </div>
-            </button>
-          )}
-        </FadingScrollbar>
-      </nav>
-    </div>
+        <ConversationTabs
+          onChangeTab={changeTab}
+          currentTab={currentTab}
+          groupConversations={groupConversations}
+          directConversations={directConversations}
+          unreadConversations={unreadConversations}
+          favoriteConversations={favoriteConversations}
+          archivedConversations={archivedConversations}
+          conversationRepository={conversationRepository}
+          onClickPreferences={() => onClickPreferences(ContentState.PREFERENCES_ACCOUNT)}
+        />
+      </div>
+
+      {!mdBreakpoint && (
+        <button
+          type="button"
+          role="tab"
+          className="conversations-sidebar-handle"
+          data-is-collapsed={!isSideBarOpen || mdBreakpoint}
+          onClick={toggleSidebar}
+        >
+          <ChevronIcon width={12} height={12} />
+        </button>
+      )}
+    </nav>
   );
 
   const callingView = (
