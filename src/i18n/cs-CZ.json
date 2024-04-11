@@ -423,7 +423,7 @@
   "conversationDetails1to1ReceiptsFirst": "If both sides turn on read receipts, you can see when messages are read.",
   "conversationDetails1to1ReceiptsHeadDisabled": "Vypnuli jste čtení doručenek",
   "conversationDetails1to1ReceiptsHeadEnabled": "Zapnuli jste čtení doručenek",
-  "conversationDetails1to1ReceiptsSecond": "Toto nastavení můžete změnit v nastavení vašeho účtu.",
+  "conversationDetails1to1ReceiptsSecond": "You can change this option in your [button]account settings[/button].",
   "conversationDetailsActionAddParticipants": "Add participants",
   "conversationDetailsActionArchive": "Archivovat",
   "conversationDetailsActionBlock": "Block",

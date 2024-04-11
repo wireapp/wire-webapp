@@ -433,7 +433,7 @@
   "conversationDetails1to1ReceiptsFirst": "If both sides turn on read receipts, you can see when messages are read.",
   "conversationDetails1to1ReceiptsHeadDisabled": "You have disabled read receipts",
   "conversationDetails1to1ReceiptsHeadEnabled": "You have enabled read receipts",
-  "conversationDetails1to1ReceiptsSecond": "You can change this option in your account settings.",
+  "conversationDetails1to1ReceiptsSecond": "You can change this option in your [button]account settings[/button].",
   "conversationDetailsActionAddParticipants": "Add participants",
   "conversationDetailsActionArchive": "Archive",
   "conversationDetailsActionBlock": "Block",

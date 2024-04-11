@@ -423,7 +423,7 @@
   "conversationDetails1to1ReceiptsFirst": "Ако обе стране укључе потврде за читање, можете видети када се поруке читају.",
   "conversationDetails1to1ReceiptsHeadDisabled": "Онемогућили сте потврде о читању",
   "conversationDetails1to1ReceiptsHeadEnabled": "Омогућили сте потврде о читању",
-  "conversationDetails1to1ReceiptsSecond": "Ову опцију можете да промените у подешавањима налога.",
+  "conversationDetails1to1ReceiptsSecond": "You can change this option in your [button]account settings[/button].",
   "conversationDetailsActionAddParticipants": "Додајте учеснике",
   "conversationDetailsActionArchive": "Архивирај",
   "conversationDetailsActionBlock": "Block",

@@ -32,7 +32,7 @@ import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {Action} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
+import {ButtonAction} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {StringIdentifer, replaceLink, t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
@@ -47,7 +47,7 @@ type FeatureMessageGenerator = {
   [K in keyof FeatureList]: (
     oldConfig?: FeatureList[K],
     newConfig?: FeatureList[K],
-  ) => undefined | {htmlMessage: string; title: StringIdentifer; primaryAction?: Action};
+  ) => undefined | {htmlMessage: string; title: StringIdentifer; primaryAction?: ButtonAction};
 };
 
 const featureNotifications: FeatureMessageGenerator = {
@@ -92,7 +92,7 @@ const featureNotifications: FeatureMessageGenerator = {
   [FEATURE_KEY.ENFORCE_DOWNLOAD_PATH]: (oldConfig, newConfig) => {
     const handleDlPathChange: (
       status: FeatureStatus | boolean,
-    ) => undefined | {htmlMessage: string; title: StringIdentifer; primaryAction?: Action} = status => {
+    ) => undefined | {htmlMessage: string; title: StringIdentifer; primaryAction?: ButtonAction} = status => {
       if (newConfig && 'config' in newConfig) {
         localStorage.setItem('enforcedDownloadLocation', newConfig.config.enforcedDownloadLocation);
         amplify.publish(
