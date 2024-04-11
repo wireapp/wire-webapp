@@ -31,7 +31,6 @@ import {createE2EIEnrollmentStorage} from './Storage/E2EIStorage';
 import {ClientService} from '../../../client';
 import {CoreDatabase} from '../../../storage/CoreDB';
 import {parseFullQualifiedClientId} from '../../../util/fullyQualifiedClientIdUtils';
-import {LocalStorageStore} from '../../../util/LocalStorageStore';
 import {LowPrecisionTaskScheduler} from '../../../util/LowPrecisionTaskScheduler';
 import {StringifiedQualifiedId, stringifyQualifiedId} from '../../../util/qualifiedIdUtil';
 import {RecurringTaskScheduler} from '../../../util/RecurringTaskScheduler';
@@ -260,13 +259,11 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
    * Both must be registered before the first enrollment.
    */
   private async registerServerCertificates(): Promise<void> {
-    const ROOT_CA_KEY = 'e2ei_root-registered';
-    const store = LocalStorageStore(this.coreDatabase.name);
+    const isRootRegistered = await this.coreCryptoClient.e2eiIsPKIEnvSetup();
 
     // Register root certificate if not already registered
-    if (!store.has(ROOT_CA_KEY)) {
+    if (!isRootRegistered) {
       await this.registerLocalCertificateRoot(this.acmeService);
-      store.add(ROOT_CA_KEY, 'true');
     }
 
     // Register intermediate certificate and update it every 24 hours
