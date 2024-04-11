@@ -21,11 +21,14 @@ import React from 'react';
 
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {ClientMLSError, ClientMLSErrorLabel} from '@wireapp/core/lib/messagingProtocols/mls';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {ConversationState} from 'src/script/conversation/ConversationState';
 import {TeamState} from 'src/script/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -48,6 +51,7 @@ export enum Actions {
   IGNORE_REQUEST = 'UserActions.IGNORE_REQUEST',
   LEAVE = 'UserActions.LEAVE',
   OPEN_CONVERSATION = 'UserActions.OPEN_CONVERSATION',
+  START_CONVERSATION = 'UserActions.START_CONVERSATION',
   OPEN_PROFILE = 'UserActions.OPEN_PROFILE',
   REMOVE = 'UserActions.REMOVE',
   SEND_REQUEST = 'UserActions.SEND_REQUEST',
@@ -61,6 +65,7 @@ export const ActionIdentifier = {
   [Actions.IGNORE_REQUEST]: 'do-ignore-request',
   [Actions.LEAVE]: 'do-leave',
   [Actions.OPEN_CONVERSATION]: 'go-conversation',
+  [Actions.START_CONVERSATION]: 'start-conversation',
   [Actions.OPEN_PROFILE]: 'go-profile',
   [Actions.REMOVE]: 'do-remove',
   [Actions.SEND_REQUEST]: 'do-send-request',
@@ -77,6 +82,7 @@ export interface UserActionsProps {
   user: User;
   isModal?: boolean;
   teamState?: TeamState;
+  conversationState?: ConversationState;
 }
 
 function createPlaceholder1to1Conversation(user: User, selfUser: User) {
@@ -109,6 +115,7 @@ const UserActions: React.FC<UserActionsProps> = ({
   selfUser,
   isModal = false,
   teamState = container.resolve(TeamState),
+  conversationState = container.resolve(ConversationState),
 }) => {
   const {
     isAvailable,
@@ -132,6 +139,8 @@ const UserActions: React.FC<UserActionsProps> = ({
     'isConnected',
   ]);
   const isTeamMember = teamState.isInTeam(user);
+
+  const has1to1Conversation = conversationState.has1to1ConversationWithUser(user.qualifiedId);
 
   const isNotMe = !user.isMe && isSelfActivated;
 
@@ -172,7 +181,7 @@ const UserActions: React.FC<UserActionsProps> = ({
       : undefined;
 
   const open1To1Conversation: MenuItem | undefined =
-    isNotMe && isAvailable && (isConnected || isTeamMember)
+    isNotMe && isAvailable && (isConnected || isTeamMember) && has1to1Conversation
       ? {
           click: async () => {
             await create1to1Conversation(user, true);
@@ -181,6 +190,31 @@ const UserActions: React.FC<UserActionsProps> = ({
           icon: 'message-icon',
           identifier: ActionIdentifier[Actions.OPEN_CONVERSATION],
           label: t('groupParticipantActionOpenConversation'),
+        }
+      : undefined;
+
+  const start1To1Conversation: MenuItem | undefined =
+    isNotMe && isAvailable && (isConnected || isTeamMember) && !has1to1Conversation
+      ? {
+          click: async () => {
+            try {
+              await create1to1Conversation(user, true);
+              onAction(Actions.START_CONVERSATION);
+            } catch (error) {
+              if (error instanceof ClientMLSError && error.label === ClientMLSErrorLabel.NO_KEY_PACKAGES_AVAILABLE) {
+                return PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
+                  text: {
+                    title: t('modal1To1ConversationCreateErrorNoKeyPackagesHeadline'),
+                    htmlMessage: t('modal1To1ConversationCreateErrorNoKeyPackagesMessage', user.name()),
+                  },
+                });
+              }
+              throw error;
+            }
+          },
+          icon: 'message-icon',
+          identifier: ActionIdentifier[Actions.START_CONVERSATION],
+          label: t('groupParticipantActionStartConversation'),
         }
       : undefined;
 
@@ -310,6 +344,7 @@ const UserActions: React.FC<UserActionsProps> = ({
     openSelfProfile,
     leaveConversation,
     open1To1Conversation,
+    start1To1Conversation,
     acceptConnectionRequest,
     ignoreConnectionRequest,
     cancelConnectionRequest,
@@ -320,7 +355,11 @@ const UserActions: React.FC<UserActionsProps> = ({
   ].filter((item): item is MenuItem => !!item);
 
   return items.length === 1 && isModal ? (
-    <SingleAction item={items[0]} onCancel={onAction} />
+    <SingleAction
+      oneButtonPerRow={items[0].identifier === ActionIdentifier[Actions.START_CONVERSATION]}
+      item={items[0]}
+      onCancel={onAction}
+    />
   ) : (
     <PanelActions items={items} />
   );

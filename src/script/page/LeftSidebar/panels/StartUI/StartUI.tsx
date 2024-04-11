@@ -114,6 +114,13 @@ const StartUI: React.FC<StartUIProps> = ({
   };
 
   const openContact = async (user: User) => {
+    const isSameTeam = user.teamId && selfUser.teamId && user.teamId === selfUser.teamId;
+    const has1to1Conversation = conversationState.has1to1ConversationWithUser(user.qualifiedId);
+
+    if (isSameTeam && !has1to1Conversation) {
+      return showUserModal({domain: user.domain, id: user.id});
+    }
+
     const conversationEntity = await actions.getOrCreate1to1Conversation(user);
     return actions.open1to1Conversation(conversationEntity);
   };
