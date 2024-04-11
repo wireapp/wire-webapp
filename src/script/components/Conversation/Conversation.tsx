@@ -35,6 +35,7 @@ import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
 import {TitleBar} from 'Components/TitleBar';
 import {CallState} from 'src/script/calling/CallState';
 import {Config} from 'src/script/Config';
+import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';
 import {CONVERSATION_READONLY_STATE} from 'src/script/conversation/ConversationRepository';
 import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -66,6 +67,8 @@ import {PanelState} from '../../page/RightSidebar';
 import {useMainViewModel} from '../../page/RootProvider';
 import {TeamState} from '../../team/TeamState';
 import {ElementType, MessageDetails} from '../MessagesList/Message/ContentMessage/asset/TextMessageRenderer';
+
+const emptyConnection = new ConnectionEntity();
 
 interface ConversationProps {
   readonly initialMessage?: Message;
@@ -108,15 +111,25 @@ export const Conversation = ({
     is1to1,
     isRequest,
     readOnlyState,
-    display_name: displayName,
-  } = useKoSubscribableChildren(activeConversation!, ['is1to1', 'isRequest', 'display_name', 'readOnlyState']);
+    connection: conversationConnection,
+  } = useKoSubscribableChildren(activeConversation!, [
+    'is1to1',
+    'isRequest',
+    'readOnlyState',
+    'participating_user_ets',
+    'connection',
+  ]);
 
-  const showReadOnlyConversationMessage =
-    readOnlyState !== null &&
-    [
-      CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_OTHER_UNSUPPORTED_MLS,
-      CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_SELF_UNSUPPORTED_MLS,
-    ].includes(readOnlyState);
+  const connection = conversationConnection || emptyConnection;
+  const {isBlocked: isConversationWithBlockedConnection} = useKoSubscribableChildren(connection, ['isBlocked']);
+
+  const isReadOnlyConversation =
+    (readOnlyState &&
+      [
+        CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_OTHER_UNSUPPORTED_MLS,
+        CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_SELF_UNSUPPORTED_MLS,
+      ].includes(readOnlyState)) ||
+    isConversationWithBlockedConnection;
 
   const inTeam = teamState.isInTeam(selfUser);
 
@@ -487,7 +500,7 @@ export const Conversation = ({
             callActions={mainViewModel.calling.callActions}
             openRightSidebar={openRightSidebar}
             isRightSidebarOpen={isRightSidebarOpen}
-            isReadOnlyConversation={showReadOnlyConversationMessage}
+            isReadOnlyConversation={isReadOnlyConversation}
           />
 
           {activeCalls.map(call => {
@@ -539,14 +552,9 @@ export const Conversation = ({
             setMsgElementsFocusable={setMsgElementsFocusable}
             isRightSidebarOpen={isRightSidebarOpen}
           />
-
           {isConversationLoaded &&
-            (showReadOnlyConversationMessage ? (
-              <ReadOnlyConversationMessage
-                state={readOnlyState}
-                handleMLSUpdate={reloadApp}
-                displayName={displayName}
-              />
+            (isReadOnlyConversation ? (
+              <ReadOnlyConversationMessage handleMLSUpdate={reloadApp} conversation={activeConversation} />
             ) : (
               <InputBar
                 key={activeConversation?.id}
