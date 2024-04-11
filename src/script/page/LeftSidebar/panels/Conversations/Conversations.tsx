@@ -107,8 +107,6 @@ const Conversations: React.FC<ConversationsProps> = ({
   const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
   const {connectRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
 
-  const isSidebarCollapsed = !isSideBarOpen;
-
   const {
     activeConversation,
     unreadConversations,
@@ -258,8 +256,8 @@ const Conversations: React.FC<ConversationsProps> = ({
 
   const sidebar = (
     <nav className="conversations-sidebar">
-      <div className="conversations-sidebar-items" data-is-collapsed={isSidebarCollapsed || mdBreakpoint}>
-        {!(isSidebarCollapsed || mdBreakpoint) && (
+      <div className="conversations-sidebar-items" data-is-collapsed={!isSideBarOpen || mdBreakpoint}>
+        {!(!isSideBarOpen || mdBreakpoint) && (
           <UserDetails
             user={selfUser}
             groupId={conversationState.selfMLSConversation()?.groupId}
@@ -285,7 +283,7 @@ const Conversations: React.FC<ConversationsProps> = ({
           type="button"
           role="tab"
           className="conversations-sidebar-handle"
-          data-is-collapsed={isSidebarCollapsed || mdBreakpoint}
+          data-is-collapsed={!isSideBarOpen || mdBreakpoint}
           onClick={toggleSidebar}
         >
           <ChevronIcon width={12} height={12} />
