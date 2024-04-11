@@ -428,6 +428,7 @@
   "conversationDetailsActionAddParticipants": "Add participants",
   "conversationDetailsActionArchive": "Archive",
   "conversationDetailsActionBlock": "Block",
+  "conversationDetailsActionUnblock": "Unblock",
   "conversationDetailsActionCancelRequest": "Cancel request",
   "conversationDetailsActionClear": "Clear content",
   "conversationDetailsActionConversationParticipants": "Show all ({{number}})",
