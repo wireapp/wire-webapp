@@ -158,7 +158,7 @@ export class MLSConversationVerificationStateHandler {
           break;
         }
 
-        const matchingName = identity.displayName === user.name();
+        const matchingName = identity.x509Identity?.displayName === user.name();
         const matchingHandle = checkUserHandle(identity, user);
         if (!matchingHandle || !matchingName) {
           this.logger.warn(`User identity and user entity do not match for userId: ${stringifiedQualifiedId}`);
@@ -229,9 +229,12 @@ export class MLSConversationVerificationStateHandler {
 }
 
 export const checkUserHandle = (identity: WireIdentity, user: User): boolean => {
+  if (!identity.x509Identity) {
+    return false;
+  }
   // WireIdentity handle format is "{scheme}%40{username}@{domain}"
   // Example: wireapp://%40hans.wurst@elna.wire.link
-  const {handle: identityHandle} = identity;
+  const {handle: identityHandle} = identity.x509Identity;
   // We only want to check the username part of the handle
   const {username, domain} = user;
   return identityHandle.includes(`${username()}@${domain}`);

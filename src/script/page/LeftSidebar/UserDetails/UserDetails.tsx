@@ -58,9 +58,10 @@ const UserDetailsComponent = ({user, isTeam = false, groupId}: UserDetailsProps)
   const {
     availability,
     name: userName,
+    username: userHandle,
     isOnLegalHold,
     hasPendingLegalHold,
-  } = useKoSubscribableChildren(user, ['availability', 'hasPendingLegalHold', 'isOnLegalHold', 'name']);
+  } = useKoSubscribableChildren(user, ['availability', 'hasPendingLegalHold', 'isOnLegalHold', 'name', 'username']);
 
   const renderAvailabilityIcon = availabilityIconRenderer[availability];
   const showLegalHold = isOnLegalHold || hasPendingLegalHold;
@@ -104,7 +105,7 @@ const UserDetailsComponent = ({user, isTeam = false, groupId}: UserDetailsProps)
       </div>
 
       <div css={styles.userHandle} data-uie-name="user-handle">
-        {user.handle}
+        @{userHandle}
       </div>
     </div>
   );

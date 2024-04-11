@@ -423,7 +423,7 @@
   "conversationDetails1to1ReceiptsFirst": "දෙපාර්ශ්වයම කියවූ බවට ලදුපත් සක්‍රිය කරන්නේ නම් පණිවිඩ කියවන විට ඔබට දැකගත හැකිය.",
   "conversationDetails1to1ReceiptsHeadDisabled": "ඔබ කියවූ බවට ලදුපත් අබල කර ඇත",
   "conversationDetails1to1ReceiptsHeadEnabled": "ඔබ කියවූ බවට ලදුපත් සබල කර ඇත",
-  "conversationDetails1to1ReceiptsSecond": "ඔබගේ ගිණුමේ සැකසුම් තුළ මෙම විකල්පය සැකසීමට හැකිය.",
+  "conversationDetails1to1ReceiptsSecond": "You can change this option in your [button]account settings[/button].",
   "conversationDetailsActionAddParticipants": "සහභාගීන් එකතු කරන්න",
   "conversationDetailsActionArchive": "සංරක්‍ෂණය",
   "conversationDetailsActionBlock": "අවහිර",

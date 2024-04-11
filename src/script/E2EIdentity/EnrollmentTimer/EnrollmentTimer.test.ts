@@ -45,7 +45,12 @@ describe('e2ei delays', () => {
     [TimeInMillis.MINUTE * 30, TimeInMillis.DAY * 30, TimeInMillis.MINUTE * 15],
   ])('should return a snoozable timer if device is still valid', (validityPeriod, grace, expectedTimer) => {
     const {firingDate, isSnoozable} = getEnrollmentTimer(
-      {certificate: ' ', notAfter: (Date.now() + validityPeriod) / 1000} as any,
+      {
+        x509Identity: {
+          certificate: ' ',
+          notAfter: (Date.now() + validityPeriod) / 1000,
+        },
+      } as any,
       Date.now(),
       grace,
     );
@@ -59,7 +64,12 @@ describe('e2ei delays', () => {
     const gracePeriodStartingPoint = deadline - gracePeriod;
 
     const {firingDate, isSnoozable} = getEnrollmentTimer(
-      {certificate: ' ', notAfter: deadline / 1000} as any,
+      {
+        x509Identity: {
+          certificate: ' ',
+          notAfter: deadline / 1000,
+        },
+      } as any,
       Date.now(),
       gracePeriod,
     );
@@ -72,7 +82,12 @@ describe('e2ei delays', () => {
     const deadline = Date.now() + gracePeriod + 1000;
     const gracePeriodStartingPoint = deadline - gracePeriod;
     const {firingDate, isSnoozable} = getEnrollmentTimer(
-      {certificate: ' ', notAfter: deadline / 1000} as any,
+      {
+        x509Identity: {
+          certificate: ' ',
+          notAfter: deadline / 1000,
+        },
+      } as any,
       Date.now(),
       gracePeriod,
     );

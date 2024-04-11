@@ -313,6 +313,7 @@ const Conversations: React.FC<ConversationsProps> = ({
               call={call}
               callActions={callingViewModel.callActions}
               callingRepository={callingRepository}
+              pushToTalkKey={propertiesRepository.getPreference(PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY)}
               conversation={conversation}
               isFullUi
               hasAccessToCamera={callingViewModel.hasAccessToCamera()}
