@@ -24,7 +24,7 @@ import {createLabel} from 'src/script/conversation/ConversationLabelRepository';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {Conversation} from 'src/script/entity/Conversation';
 import {useFolderState, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/state';
-import {replaceLink, t} from 'Util/LocalizerUtil';
+import {t} from 'Util/LocalizerUtil';
 
 import {SidebarTabs} from '../Conversations';
 
@@ -86,8 +86,6 @@ export const ConversationFolderTab = ({
     return total;
   }
 
-  const learnMoreReplacement = replaceLink(Config.getConfig().URL.SUPPORT.INDEX);
-
   return (
     <div className={cx('conversations-sidebar-folders-wrapper', {active: isFoldersTabOpen})}>
       <button
@@ -107,12 +105,12 @@ export const ConversationFolderTab = ({
       <div className={cx('conversations-sidebar-folders', {active: isFoldersTabOpen})}>
         <div className="conversations-sidebar-folders--inner-wrapper">
           {folders.length === 0 && (
-            <div
-              className="conversations-sidebar-folders--empty"
-              dangerouslySetInnerHTML={{
-                __html: t('conversationFoldersEmptyText', {}, learnMoreReplacement),
-              }}
-            />
+            <div className="conversations-sidebar-folders--empty">
+              {t('conversationFoldersEmptyText')}
+              <a href={Config.getConfig().URL.SUPPORT.FOLDERS} target="_blank" rel="noreferrer">
+                {t('conversationFoldersEmptyTextLearnMore')}
+              </a>
+            </div>
           )}
           {folders.map(folder => {
             const unreadCount = getTotalUnreadConversationMessages(folder.conversations());
