@@ -16057,7 +16057,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"terser-webpack-plugin@npm:5.3.10, terser-webpack-plugin@npm:^5.3.10":
+"terser-webpack-plugin@npm:^5.3.10":
   version: 5.3.10
   resolution: "terser-webpack-plugin@npm:5.3.10"
   dependencies:
@@ -17424,7 +17424,6 @@ __metadata:
     stylelint-config-idiomatic-order: "npm:10.0.0"
     svg-inline-loader: "npm:0.8.2"
     switch-path: "npm:1.2.0"
-    terser-webpack-plugin: "npm:5.3.10"
     text-encoding: "npm:0.7.0"
     ts-node: "npm:10.9.2"
     tsc-watch: "npm:6.2.0"

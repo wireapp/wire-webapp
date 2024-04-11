@@ -138,7 +138,6 @@
     "stylelint": "16.3.1",
     "stylelint-config-idiomatic-order": "10.0.0",
     "svg-inline-loader": "0.8.2",
-    "terser-webpack-plugin": "5.3.10",
     "text-encoding": "0.7.0",
     "ts-node": "10.9.2",
     "tsc-watch": "6.2.0",
@@ -150,8 +149,8 @@
     "workbox-webpack-plugin": "7.0.0"
   },
   "engines": {
-    "yarn": ">= 1.0.0",
-    "node": ">=16"
+    "yarn": ">= 4.1.1",
+    "node": ">=18.16.0"
   },
   "license": "GPL-3.0",
   "name": "wire-webapp",
@@ -166,6 +165,8 @@
     "build:server": "cd server && yarn build",
     "bundle:dev": "webpack --config webpack.config.dev.js --progress",
     "bundle:prod": "webpack --config webpack.config.js",
+    "clean:jest": "jest --clearCache",
+    "clean:yarn": "rm -rf node_modules && yarn cache clean",
     "changelog:production": "ts-node ./bin/changelog.ts production",
     "changelog:staging": "ts-node ./bin/changelog.ts staging",
     "changelog:rc": "ts-node ./bin/changelog.ts production master",
