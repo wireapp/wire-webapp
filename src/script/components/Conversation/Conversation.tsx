@@ -35,8 +35,6 @@ import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
 import {TitleBar} from 'Components/TitleBar';
 import {CallState} from 'src/script/calling/CallState';
 import {Config} from 'src/script/Config';
-import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';
-import {CONVERSATION_READONLY_STATE} from 'src/script/conversation/ConversationRepository';
 import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {allowsAllFiles, getFileExtensionOrName, hasAllowedExtension} from 'Util/FileTypeUtil';
@@ -67,8 +65,6 @@ import {PanelState} from '../../page/RightSidebar';
 import {useMainViewModel} from '../../page/RootProvider';
 import {TeamState} from '../../team/TeamState';
 import {ElementType, MessageDetails} from '../MessagesList/Message/ContentMessage/asset/TextMessageRenderer';
-
-const emptyConnection = new ConnectionEntity();
 
 interface ConversationProps {
   readonly initialMessage?: Message;
@@ -107,29 +103,14 @@ export const Conversation = ({
     'isFileSharingSendingEnabled',
   ]);
 
-  const {
-    is1to1,
-    isRequest,
-    readOnlyState,
-    connection: conversationConnection,
-  } = useKoSubscribableChildren(activeConversation!, [
+  const {is1to1, isRequest, isReadOnlyConversation} = useKoSubscribableChildren(activeConversation!, [
     'is1to1',
     'isRequest',
     'readOnlyState',
     'participating_user_ets',
     'connection',
+    'isReadOnlyConversation',
   ]);
-
-  const connection = conversationConnection || emptyConnection;
-  const {isBlocked: isConversationWithBlockedConnection} = useKoSubscribableChildren(connection, ['isBlocked']);
-
-  const isReadOnlyConversation =
-    (readOnlyState &&
-      [
-        CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_OTHER_UNSUPPORTED_MLS,
-        CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_SELF_UNSUPPORTED_MLS,
-      ].includes(readOnlyState)) ||
-    isConversationWithBlockedConnection;
 
   const inTeam = teamState.isInTeam(selfUser);
 
