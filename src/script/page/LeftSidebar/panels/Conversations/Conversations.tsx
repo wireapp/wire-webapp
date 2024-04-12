@@ -102,7 +102,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   userState = container.resolve(UserState),
   selfUser,
 }) => {
-  const {isOpen: isSideBarOpen, toggleIsOpen: toggleSidebarIsOpen} = useSidebarStore();
+  const {isOpen: isSideBarOpen, toggleIsOpen: toggleSidebarIsOpen, setIsOpen: setIsSidebarOpen} = useSidebarStore();
   const [conversationsFilter, setConversationsFilter] = useState<string>('');
   const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
   const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
@@ -175,6 +175,15 @@ const Conversations: React.FC<ConversationsProps> = ({
   const mdBreakpoint = useMatchMedia('(max-width: 1000px)');
 
   useEffect(() => {
+    if (mdBreakpoint) {
+      setIsSidebarOpen(false);
+      return;
+    }
+
+    setIsSidebarOpen(true);
+  }, [mdBreakpoint, setIsSidebarOpen]);
+
+  useEffect(() => {
     if (activeConversation && !conversationState.isVisible(activeConversation)) {
       // If the active conversation is not visible, switch to the recent view
       listViewModel.contentViewModel.loadPreviousContent();
@@ -245,7 +254,7 @@ const Conversations: React.FC<ConversationsProps> = ({
 
   const sidebar = (
     <nav className="conversations-sidebar">
-      <FadingScrollbar className="conversations-sidebar-items" data-is-collapsed={!isSideBarOpen || mdBreakpoint}>
+      <FadingScrollbar className="conversations-sidebar-items" data-is-collapsed={!isSideBarOpen}>
         <UserDetails
           user={selfUser}
           groupId={conversationState.selfMLSConversation()?.groupId}
