@@ -77,8 +77,6 @@ export class ActionsViewModel {
 
   /**
    * @param userEntity User to block
-   * @param hideConversation Hide current conversation
-   * @param nextConversationEntity Conversation to be switched to
    * @returns Resolves when the user was blocked
    */
   readonly blockUser = (userEntity: User): Promise<void> => {
