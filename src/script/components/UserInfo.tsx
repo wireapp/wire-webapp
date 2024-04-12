@@ -17,19 +17,15 @@
  *
  */
 
-import React, {ReactNode} from 'react';
+import React from 'react';
 
 import {CSSObject} from '@emotion/react';
 import cx from 'classnames';
 
-import {Availability} from '@wireapp/protocol-messaging';
-
 import {selfIndicator} from 'Components/ParticipantItemContent/ParticipantItem.styles';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {CSS_SQUARE} from 'Util/CSSMixin';
 import {KEY} from 'Util/KeyboardUtil';
 
-import {Icon} from './Icon';
 import {UserName} from './UserName';
 
 import {User} from '../entity/User';
@@ -46,49 +42,23 @@ interface AvailabilityStateProps {
   children?: React.ReactNode;
 }
 
-const iconStyles: CSSObject = {
-  ...CSS_SQUARE(10),
-  fill: 'currentColor',
-  margin: '0 6px 1px 0',
-  minWidth: 10,
-  stroke: 'currentColor',
-};
-
 const buttonCommonStyles: CSSObject = {
   background: 'none',
   border: 'none',
   textTransform: 'uppercase',
 };
 
-const availabilityIconBaseProps = {
-  className: 'availability-state-icon',
-  css: iconStyles,
-  'data-uie-name': 'status-availability-icon',
-};
-const availabilityIconRenderer: Record<Availability.Type, () => ReactNode> = {
-  [Availability.Type.AVAILABLE]: () => (
-    <Icon.AvailabilityAvailable {...availabilityIconBaseProps} data-uie-value="available" />
-  ),
-  [Availability.Type.AWAY]: () => <Icon.AvailabilityAway {...availabilityIconBaseProps} data-uie-value="away" />,
-  [Availability.Type.BUSY]: () => <Icon.AvailabilityBusy {...availabilityIconBaseProps} data-uie-value="busy" />,
-  [Availability.Type.NONE]: () => null,
-};
-
-export const UserInfo: React.FC<AvailabilityStateProps> = ({
+export const UserInfo = ({
   user,
   className,
   dataUieName,
   selfString,
   title,
   theme = false,
-  showAvailability,
   onClick,
   children,
-}) => {
-  const {availability: userAvailability, name} = useKoSubscribableChildren(user, ['availability', 'name']);
-
-  const availability = showAvailability ? userAvailability : Availability.Type.NONE;
-  const renderAvailabilityIcon = availabilityIconRenderer[availability];
+}: AvailabilityStateProps) => {
+  const {name} = useKoSubscribableChildren(user, ['name']);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
     const {key} = event;
@@ -109,8 +79,6 @@ export const UserInfo: React.FC<AvailabilityStateProps> = ({
 
   const content = (
     <span data-uie-name={dataUieName} css={{alignItems: 'center', display: 'flex', overflow: 'hidden'}}>
-      {renderAvailabilityIcon()}
-
       <span
         className={cx('availability-state-label', {'availability-state-label--active': theme})}
         css={{userSelect: 'none'}}
@@ -119,9 +87,7 @@ export const UserInfo: React.FC<AvailabilityStateProps> = ({
       >
         <UserName user={user} />
       </span>
-
       {selfString && <span css={selfIndicator}>{selfString}</span>}
-
       {children}
     </span>
   );

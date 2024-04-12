@@ -26,6 +26,7 @@ import {ChevronIcon, useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {CallingCell} from 'Components/calling/CallingCell';
+import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {IntegrationRepository} from 'src/script/integration/IntegrationRepository';
 import {Preferences} from 'src/script/page/LeftSidebar/panels/Preferences';
 import {StartUI} from 'src/script/page/LeftSidebar/panels/StartUI';
@@ -256,14 +257,13 @@ const Conversations: React.FC<ConversationsProps> = ({
 
   const sidebar = (
     <nav className="conversations-sidebar">
-      <div className="conversations-sidebar-items" data-is-collapsed={!isSideBarOpen || mdBreakpoint}>
-        {!(!isSideBarOpen || mdBreakpoint) && (
-          <UserDetails
-            user={selfUser}
-            groupId={conversationState.selfMLSConversation()?.groupId}
-            isTeam={teamState.isTeam()}
-          />
-        )}
+      <FadingScrollbar className="conversations-sidebar-items" data-is-collapsed={!isSideBarOpen || mdBreakpoint}>
+        <UserDetails
+          user={selfUser}
+          groupId={conversationState.selfMLSConversation()?.groupId}
+          isTeam={teamState.isTeam()}
+          isSideBarOpen={isSideBarOpen}
+        />
 
         <ConversationTabs
           onChangeTab={changeTab}
@@ -276,7 +276,7 @@ const Conversations: React.FC<ConversationsProps> = ({
           conversationRepository={conversationRepository}
           onClickPreferences={() => onClickPreferences(ContentState.PREFERENCES_ACCOUNT)}
         />
-      </div>
+      </FadingScrollbar>
 
       {!mdBreakpoint && (
         <button

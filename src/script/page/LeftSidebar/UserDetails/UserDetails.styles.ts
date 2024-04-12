@@ -19,32 +19,38 @@
 
 import {CSSObject} from '@emotion/react';
 
-import {CSS_SQUARE} from 'Util/CSSMixin';
+export const textEllipsis: CSSObject = {
+  textOverflow: 'ellipsis',
+  overflow: 'hidden',
+  whiteSpace: 'nowrap',
+};
 
-export const wrapper: CSSObject = {
+export const wrapper = (isSideBarOpen: boolean): CSSObject => ({
   marginBottom: '32px',
-};
 
-export const userDetailsWrapper: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  marginBottom: '2px',
-  gap: '10px',
-};
+  ...(isSideBarOpen && {
+    display: 'grid',
+    gridTemplateAreas: '"avatar userName" "avatar userHandle"',
+    gap: '0 8px',
+    gridTemplateColumns: 'auto 1fr',
+  }),
+
+  '.user-details-avatar': {
+    gridArea: 'avatar',
+  },
+});
+
+export const userDetailsWrapper = (isSideBarOpen: boolean): CSSObject => ({
+  ...(!isSideBarOpen && {
+    display: 'none',
+  }),
+  gridArea: 'userName',
+});
 
 export const userDetails: CSSObject = {
   display: 'flex',
   alignItems: 'center',
   width: '100%',
-};
-
-export const iconStyles: CSSObject = {
-  ...CSS_SQUARE(10),
-  fill: 'currentColor',
-  margin: '0 6px 1px 0',
-  minWidth: 10,
-  stroke: 'currentColor',
 };
 
 export const userName: CSSObject = {
@@ -75,12 +81,17 @@ export const userFullName: CSSObject = {
   alignItems: 'center',
 };
 
-export const userHandle: CSSObject = {
+export const userHandle = (isSideBarOpen: boolean): CSSObject => ({
+  ...(!isSideBarOpen && {
+    display: 'none',
+  }),
+
   color: 'var(--text-input-placeholder)',
   fontSize: 'var(--font-size-small)',
   fontWeight: 'var(--font-weight-regular)',
   lineHeight: 'var(--line-height-md)',
-};
+  gridArea: 'userHandle',
+});
 
 export const legalHold: CSSObject = {
   flex: '1 0 auto',
