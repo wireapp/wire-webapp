@@ -21,9 +21,8 @@ import {render} from '@testing-library/react';
 
 import {UserAvatar} from './UserAvatar';
 
-import {User} from '../../entity/User';
-
-import {AVATAR_SIZE, STATE} from '.';
+import {User} from '../../../entity/User';
+import {AVATAR_SIZE, STATE} from '../Avatar';
 jest.mock('../../auth/util/SVGProvider');
 
 describe('UserAvatar', () => {

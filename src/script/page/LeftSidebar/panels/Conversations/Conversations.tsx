@@ -258,13 +258,12 @@ const Conversations: React.FC<ConversationsProps> = ({
   const sidebar = (
     <nav className="conversations-sidebar">
       <FadingScrollbar className="conversations-sidebar-items" data-is-collapsed={!isSideBarOpen || mdBreakpoint}>
-        {!(!isSideBarOpen || mdBreakpoint) && (
-          <UserDetails
-            user={selfUser}
-            groupId={conversationState.selfMLSConversation()?.groupId}
-            isTeam={teamState.isTeam()}
-          />
-        )}
+        <UserDetails
+          user={selfUser}
+          groupId={conversationState.selfMLSConversation()?.groupId}
+          isTeam={teamState.isTeam()}
+          isSideBarOpen={isSideBarOpen}
+        />
 
         <ConversationTabs
           onChangeTab={changeTab}

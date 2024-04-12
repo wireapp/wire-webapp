@@ -19,25 +19,27 @@
 
 import React, {MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent} from 'react';
 
+import {Availability as AvailabilityType} from '@wireapp/protocol-messaging';
 import {COLOR} from '@wireapp/react-ui-kit';
 
+import {AvailabilityIcon} from 'Components/AvailabilityIcon';
+import {AvailabilityWrapper} from 'Components/Avatar/UserAvatar/UserAvatar.styles';
 import {useUserName} from 'Components/UserName';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import {AvatarBackground} from './AvatarBackground';
-import {AvatarBadge} from './AvatarBadge';
-import {AvatarBorder} from './AvatarBorder';
-import {AvatarImage} from './AvatarImage';
-import {AvatarInitials} from './AvatarInitials';
-import {AvatarWrapper} from './AvatarWrapper';
-
-import {User} from '../../entity/User';
-
-import {AVATAR_SIZE, STATE} from '.';
+import {User} from '../../../entity/User';
+import {AVATAR_SIZE, STATE} from '../Avatar';
+import {AvatarBackground} from '../AvatarBackground';
+import {AvatarBadge} from '../AvatarBadge';
+import {AvatarBorder} from '../AvatarBorder';
+import {AvatarImage} from '../AvatarImage';
+import {AvatarInitials} from '../AvatarInitials';
+import {AvatarWrapper} from '../AvatarWrapper';
 
 export interface UserAvatarProps extends React.HTMLProps<HTMLDivElement> {
   avatarSize: AVATAR_SIZE;
+  availability?: AvailabilityType.Type;
   avatarAlt?: string;
   noBadge?: boolean;
   noFilter?: boolean;
@@ -55,7 +57,8 @@ export const shouldShowBadge = (size: AVATAR_SIZE, state: STATE): boolean => {
   return !isTooSmall && isBadgeState;
 };
 
-const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
+export const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
+  availability,
   participant,
   avatarSize,
   avatarAlt = '',
@@ -109,8 +112,12 @@ const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
       {!noBadge && shouldShowBadge(avatarSize, state) && <AvatarBadge state={state} />}
 
       {!isImageGrey && <AvatarBorder />}
+
+      {typeof availability === 'number' && (
+        <div css={AvailabilityWrapper}>
+          <AvailabilityIcon availability={availability} />
+        </div>
+      )}
     </AvatarWrapper>
   );
 };
-
-export {UserAvatar};

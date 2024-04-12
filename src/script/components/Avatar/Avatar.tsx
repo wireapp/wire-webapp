@@ -17,7 +17,9 @@
  *
  */
 
-import {FC, HTMLProps, MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent} from 'react';
+import {HTMLProps, MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent} from 'react';
+
+import {Availability} from '@wireapp/protocol-messaging';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown, isKeyboardEvent} from 'Util/KeyboardUtil';
@@ -73,6 +75,7 @@ export const INITIALS_SIZE = {
 
 export interface AvatarProps extends HTMLProps<HTMLDivElement> {
   participant: User | ServiceEntity;
+  availability?: Availability.Type;
   avatarSize?: AVATAR_SIZE;
   avatarAlt?: string;
   noBadge?: boolean;
@@ -81,7 +84,8 @@ export interface AvatarProps extends HTMLProps<HTMLDivElement> {
   onAvatarClick?: (participant: User | ServiceEntity) => void;
 }
 
-const Avatar: FC<AvatarProps> = ({
+const Avatar = ({
+  availability,
   avatarSize = AVATAR_SIZE.LARGE,
   noBadge = false,
   noFilter = false,
@@ -89,7 +93,7 @@ const Avatar: FC<AvatarProps> = ({
   participant,
   isResponsive = false,
   ...props
-}) => {
+}: AvatarProps) => {
   const handleAvatarInteraction = (
     event: ReactMouseEvent<HTMLDivElement, MouseEvent> | ReactKeyBoardEvent<HTMLDivElement>,
   ) => {
@@ -160,6 +164,7 @@ const Avatar: FC<AvatarProps> = ({
   return (
     <UserAvatar
       avatarSize={avatarSize}
+      availability={availability}
       noBadge={noBadge}
       noFilter={noFilter}
       onAvatarInteraction={handleAvatarInteraction}

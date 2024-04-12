@@ -17,44 +17,29 @@
  *
  */
 
-import {memo, ReactNode} from 'react';
+import {memo} from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
-import {Availability} from '@wireapp/protocol-messaging';
-
-import {Icon} from 'Components/Icon';
+import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
 import {UserVerificationBadges} from 'Components/VerificationBadge';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {t} from 'Util/LocalizerUtil';
 
 import * as styles from './UserDetails.styles';
 
 import {User} from '../../../entity/User';
 import {AvailabilityContextMenu} from '../../../ui/AvailabilityContextMenu';
 
-const availabilityIconBaseProps = {
-  className: 'availability-state-icon',
-  css: styles.iconStyles,
-  'data-uie-name': 'status-availability-icon',
-};
-
-const availabilityIconRenderer: Record<Availability.Type, () => ReactNode> = {
-  [Availability.Type.AVAILABLE]: () => (
-    <Icon.AvailabilityAvailable {...availabilityIconBaseProps} data-uie-value="available" />
-  ),
-  [Availability.Type.AWAY]: () => <Icon.AvailabilityAway {...availabilityIconBaseProps} data-uie-value="away" />,
-  [Availability.Type.BUSY]: () => <Icon.AvailabilityBusy {...availabilityIconBaseProps} data-uie-value="busy" />,
-  [Availability.Type.NONE]: () => null,
-};
-
 type UserDetailsProps = {
   user: User;
   groupId?: string;
   isTeam?: boolean;
+  isSideBarOpen?: boolean;
 };
 
-const UserDetailsComponent = ({user, isTeam = false, groupId}: UserDetailsProps) => {
+const UserDetailsComponent = ({user, isTeam = false, groupId, isSideBarOpen = false}: UserDetailsProps) => {
   const {
     availability,
     name: userName,
@@ -63,22 +48,27 @@ const UserDetailsComponent = ({user, isTeam = false, groupId}: UserDetailsProps)
     hasPendingLegalHold,
   } = useKoSubscribableChildren(user, ['availability', 'hasPendingLegalHold', 'isOnLegalHold', 'name', 'username']);
 
-  const renderAvailabilityIcon = availabilityIconRenderer[availability];
   const showLegalHold = isOnLegalHold || hasPendingLegalHold;
 
   return (
-    <div css={styles.wrapper}>
-      <div css={styles.userDetailsWrapper}>
-        {isTeam ? (
+    <div css={styles.wrapper(isSideBarOpen)}>
+      <Avatar
+        availability={availability}
+        className="see-through user-details-avatar"
+        participant={user}
+        avatarSize={isSideBarOpen ? AVATAR_SIZE.MEDIUM : AVATAR_SIZE.SMALL}
+        avatarAlt={t('selfProfileImageAlt')}
+      />
+
+      <div css={styles.userDetailsWrapper(isSideBarOpen)}>
+        {!isTeam ? (
           <>
             <div css={styles.userDetails} data-uie-name="status-availability">
               <button
                 css={styles.userFullName}
                 onClick={event => AvailabilityContextMenu.show(event.nativeEvent, 'left-list-availability-menu')}
               >
-                {renderAvailabilityIcon()}
-
-                <span data-uie-name="status-label" css={styles.userName} title={userName}>
+                <span data-uie-name="status-label" css={{...styles.userName, ...styles.textEllipsis}} title={userName}>
                   {userName}
                 </span>
               </button>
@@ -98,13 +88,21 @@ const UserDetailsComponent = ({user, isTeam = false, groupId}: UserDetailsProps)
             )}
           </>
         ) : (
-          <span css={styles.userFullName} data-uie-name="status-name" role="presentation" tabIndex={TabIndex.FOCUSABLE}>
-            {userName}
-          </span>
+          <div css={styles.userFullName}>
+            <span
+              css={styles.textEllipsis}
+              data-uie-name="status-name"
+              role="presentation"
+              tabIndex={TabIndex.FOCUSABLE}
+              title={userName}
+            >
+              {userName}
+            </span>
+          </div>
         )}
       </div>
 
-      <div css={styles.userHandle} data-uie-name="user-handle">
+      <div css={styles.userHandle(isSideBarOpen)} data-uie-name="user-handle">
         @{userHandle}
       </div>
     </div>
