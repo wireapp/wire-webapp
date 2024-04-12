@@ -146,14 +146,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   ].includes(currentTab);
 
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
-  const {
-    isOpen: isFolderOpen,
-    openFolder,
-    closeFolder,
-    expandedFolder,
-    isFoldersTabOpen,
-    toggleFoldersTab,
-  } = useFolderState();
+  const {openFolder, closeFolder, expandedFolder, isFoldersTabOpen, toggleFoldersTab} = useFolderState();
   const {currentFocus, handleKeyDown, resetConversationFocus} = useConversationFocus(conversations);
   const {conversations: currentTabConversations, searchInputPlaceholder} = getTabConversations({
     currentTab,
@@ -193,12 +186,7 @@ const Conversations: React.FC<ConversationsProps> = ({
       return () => {};
     }
 
-    const conversationLabels = conversationLabelRepository.getConversationLabelIds(activeConversation);
     amplify.subscribe(WebAppEvents.CONTENT.EXPAND_FOLDER, openFolder);
-
-    if (!conversationLabels.some(isFolderOpen)) {
-      openFolder(conversationLabels[0]);
-    }
 
     return () => {
       amplify.unsubscribe(WebAppEvents.CONTENT.EXPAND_FOLDER, openFolder);
@@ -224,7 +212,7 @@ const Conversations: React.FC<ConversationsProps> = ({
 
     if (nextTab === SidebarTabs.ARCHIVES) {
       // will eventually load missing events from the db
-      conversationRepository.updateArchivedConversations();
+      void conversationRepository.updateArchivedConversations();
     }
 
     if (nextTab !== SidebarTabs.PREFERENCES) {
