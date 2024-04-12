@@ -82,7 +82,7 @@ export const ParticipantItemContent = ({
               showAvailability={showAvailabilityState && selfInTeam}
             >
               {/* TODO: test with mls verification state */}
-              <UserVerificationBadges user={participant} groupId={groupId} />k
+              <UserVerificationBadges user={participant} groupId={groupId} />
               {participant.isBlocked() && (
                 <span css={{marginLeft: 4}}>
                   <UserBlockedBadge />

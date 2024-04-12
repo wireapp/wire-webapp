@@ -29,7 +29,7 @@ export const AvatarBorder: React.FunctionComponent<AvatarBorderProps> = ({border
   <div
     css={{
       ...CSS_FILL_PARENT,
-      border: '1px solid rgba(0, 0, 0, 0.08)',
+      border: '1px solid var(--gray-60)',
       borderRadius,
     }}
   />
