@@ -78,6 +78,7 @@ export class MediaDevicesHandler {
   public currentAvailableDeviceId: CurrentAvailableDeviceId;
   public deviceSupport: DeviceSupport;
   private previousDeviceSupport: PreviousDeviceSupport;
+  private onMediaDevicesRefresh?: () => void;
 
   static get CONFIG() {
     return {
@@ -153,6 +154,10 @@ export class MediaDevicesHandler {
     };
 
     this.initializeMediaDevices();
+  }
+
+  public setOnMediaDevicesRefreshHandler(handler: () => void): void {
+    this.onMediaDevicesRefresh = handler;
   }
 
   /**
@@ -245,7 +250,7 @@ export class MediaDevicesHandler {
    * Update list of available MediaDevices.
    * @returns Resolves with all MediaDevices when the list has been updated
    */
-  refreshMediaDevices(): Promise<MediaDeviceInfo[]> {
+  public async refreshMediaDevices(): Promise<MediaDeviceInfo[]> {
     const setDevices = (type: MediaDeviceType, devices: MediaDeviceInfo[]): void => {
       this.availableDevices[type](devices);
       const currentId = this.currentDeviceId[type];
@@ -265,31 +270,32 @@ export class MediaDevicesHandler {
       }
     };
 
-    return navigator.mediaDevices
-      .enumerateDevices()
-      .catch(error => {
-        this.logger.error(`Failed to update MediaDevice list: ${error.message}`, error);
-        throw error;
-      })
-      .then(mediaDevices => {
-        this.removeAllDevices();
+    try {
+      this.removeAllDevices();
+      const mediaDevices = await navigator.mediaDevices.enumerateDevices();
 
-        if (mediaDevices) {
-          const filteredDevices = this.filterMediaDevices(mediaDevices);
-
-          setDevices(MediaDeviceType.AUDIO_INPUT, filteredDevices.microphones);
-          setDevices(MediaDeviceType.AUDIO_OUTPUT, filteredDevices.speakers);
-          setDevices(MediaDeviceType.VIDEO_INPUT, filteredDevices.cameras);
-          this.previousDeviceSupport = {
-            audioinput: filteredDevices.microphones.length,
-            audiooutput: filteredDevices.speakers.length,
-            videoinput: filteredDevices.cameras.length,
-          };
-          return mediaDevices;
-        }
-
+      if (!mediaDevices) {
         throw new Error('No media devices found');
-      });
+      }
+
+      const {microphones, speakers, cameras} = this.filterMediaDevices(mediaDevices);
+
+      setDevices(MediaDeviceType.AUDIO_INPUT, microphones);
+      setDevices(MediaDeviceType.AUDIO_OUTPUT, speakers);
+      setDevices(MediaDeviceType.VIDEO_INPUT, cameras);
+      this.previousDeviceSupport = {
+        audioinput: microphones.length,
+        audiooutput: speakers.length,
+        videoinput: cameras.length,
+      };
+
+      this.onMediaDevicesRefresh?.();
+
+      return mediaDevices;
+    } catch (error) {
+      this.logger.error(`Failed to update MediaDevice list: ${error instanceof Error ? error.message : ''}`, error);
+      throw error;
+    }
   }
 
   /**

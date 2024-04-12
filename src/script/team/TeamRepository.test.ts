@@ -86,6 +86,47 @@ describe('TeamRepository', () => {
     });
   });
 
+  describe('initTeam', () => {
+    it('updates team feature config from backend', async () => {
+      const [teamRepo, {teamService, teamState}] = buildConnectionRepository();
+      jest.spyOn(teamService, 'getTeamById').mockResolvedValue(team_metadata);
+      jest.spyOn(teamRepo, 'getSelfMember').mockResolvedValue(new TeamMemberEntity(randomUUID()));
+      jest.spyOn(teamRepo, 'emit');
+
+      const localFeatures = {
+        mls: {
+          config: {supportedProtocols: [ConversationProtocol.PROTEUS]},
+          status: FeatureStatus.ENABLED,
+        },
+      } as FeatureList;
+
+      teamState.teamFeatures(localFeatures);
+
+      const featuresFromBackend = {
+        mls: {
+          config: {supportedProtocols: [ConversationProtocol.PROTEUS, ConversationProtocol.MLS]},
+          status: FeatureStatus.ENABLED,
+        },
+      } as FeatureList;
+
+      jest.spyOn(teamService, 'getAllTeamFeatures').mockResolvedValue(featuresFromBackend);
+
+      teamRepo.on('featureConfigUpdated', update => {
+        expect(update.prevFeatureList).toEqual(localFeatures);
+        expect(update.newFeatureList).toEqual(featuresFromBackend);
+        expect(teamState.teamFeatures()).toEqual(featuresFromBackend);
+      });
+
+      await teamRepo.initTeam();
+
+      expect(teamState.teamFeatures()).toEqual(featuresFromBackend);
+      expect(teamRepo.emit).toHaveBeenCalledWith('featureConfigUpdated', {
+        prevFeatureList: localFeatures,
+        newFeatureList: featuresFromBackend,
+      });
+    });
+  });
+
   describe('sendAccountInfo', () => {
     it('does not crash when there is no team logo', async () => {
       const [teamRepo] = buildConnectionRepository();

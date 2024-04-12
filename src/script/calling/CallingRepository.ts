@@ -283,8 +283,29 @@ export class CallingRepository {
 
     this.wCall = this.configureCallingApi(callingInstance);
     this.wUser = this.createWUser(this.wCall, this.serializeQualifiedId(this.selfUser.qualifiedId), clientId);
+
+    this.mediaDevicesHandler.setOnMediaDevicesRefreshHandler(this.onMediaDevicesRefresh);
+
     return {wCall: this.wCall, wUser: this.wUser};
   }
+
+  private onMediaDevicesRefresh = () => {
+    const activeCall = this.callState.joinedCall();
+
+    if (!activeCall) {
+      return;
+    }
+
+    const selfParticipant = activeCall.getSelfParticipant();
+
+    if (!selfParticipant.isMuted()) {
+      void this.refreshAudioInput();
+    }
+
+    if (selfParticipant.isSendingVideo()) {
+      void this.refreshVideoInput();
+    }
+  };
 
   setReady(): void {
     this.isReady = true;
@@ -977,7 +998,6 @@ export class CallingRepository {
 
   private readonly leaveMLSConference = async (conversationId: QualifiedId) => {
     await this.subconversationService.leaveConferenceSubconversation(conversationId);
-    callingSubscriptions.removeCall(conversationId);
   };
 
   private readonly joinMlsConferenceSubconversation = async ({qualifiedId, groupId}: MLSConversation) => {
@@ -1408,6 +1428,9 @@ export class CallingRepository {
     if (call.conversationType === CONV_TYPE.CONFERENCE_MLS) {
       await this.leaveMLSConference(conversationId);
     }
+
+    // Remove all the tasks related to the call
+    callingSubscriptions.removeCall(conversationId);
 
     if (reason === REASON.NORMAL) {
       this.callState.selectableScreens([]);

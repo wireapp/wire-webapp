@@ -24,6 +24,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {CallingCell} from 'Components/calling/CallingCell';
 import {Icon} from 'Components/Icon';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -88,6 +89,7 @@ const TemporaryGuestConversations: React.FC<TemporaryGuestConversations> = ({
               callingRepository={callingViewModel.callingRepository}
               hasAccessToCamera={callingViewModel.hasAccessToCamera()}
               multitasking={callingViewModel.multitasking}
+              pushToTalkKey={callingViewModel.propertiesRepository.getPreference(PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY)}
             />
           </div>
         );

@@ -28,7 +28,7 @@ import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {useClickOutside} from 'src/script/hooks/useClickOutside';
 import {ContextMenuEntry, showContextMenu} from 'src/script/ui/ContextMenu';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {isTabKey, KEY} from 'Util/KeyboardUtil';
+import {isSpaceOrEnterKey, isTabKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {setContextMenuPosition} from 'Util/util';
 
@@ -97,7 +97,7 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
   const handleContextKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLButtonElement>) => {
       const selectedMsgActionName = event.currentTarget.dataset.uieName;
-      if ([KEY.SPACE, KEY.ENTER].includes(event.key)) {
+      if (isSpaceOrEnterKey(event.key)) {
         if (selectedMsgActionName) {
           setCurrentMsgAction(selectedMsgActionName);
           handleMenuOpen(true);

@@ -214,6 +214,16 @@ export class ConversationState {
     return mlsConversation || null;
   }
 
+  has1to1ConversationWithUser(userId: QualifiedId): boolean {
+    const foundMLSConversation = this.findMLS1to1Conversation(userId);
+    if (foundMLSConversation) {
+      return true;
+    }
+
+    const foundProteusConversations = this.findProteus1to1Conversations(userId);
+    return !!foundProteusConversations && foundProteusConversations.length > 0;
+  }
+
   isSelfConversation(conversationId: QualifiedId): boolean {
     const selfConversationIds: QualifiedId[] = [this.selfProteusConversation(), this.selfMLSConversation()]
       .filter((conversation): conversation is Conversation => !!conversation)

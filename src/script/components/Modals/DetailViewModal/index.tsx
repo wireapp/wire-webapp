@@ -30,6 +30,7 @@ import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {renderElement} from 'Util/renderElement';
 import {preventFocusOutside} from 'Util/util';
+import {waitFor} from 'Util/waitFor';
 
 import {DetailViewModalFooter} from './DetailViewModalFooter';
 import {DetailViewModalHeader} from './DetailViewModalHeader';
@@ -87,9 +88,15 @@ export const DetailViewModal = ({
     handleKeyDown(event, onCloseClick);
   };
 
-  const onReplyClick = (conversation: Conversation, message: ContentMessage) => {
+  const onReplyClick = async (conversation: Conversation, message: ContentMessage) => {
     amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversation, {});
-    amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.REPLY, message);
+
+    // The event above will make react to render the conversation view,
+    // so we need to wait for the text input to be ready before inserting the reply.
+    const isTextInputReady = await waitFor(() => conversation.isTextInputReady());
+    if (isTextInputReady) {
+      amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.REPLY, message);
+    }
 
     onCloseClick();
   };
