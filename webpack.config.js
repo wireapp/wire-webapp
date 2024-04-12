@@ -27,12 +27,8 @@ module.exports = {
   mode: 'production',
   optimization: {
     ...commonConfig.optimization,
-    minimizer: [
-      new TerserJSPlugin({
-        /* Dexie has issues with UglifyJS */
-        exclude: /dexie/g,
-      }),
-    ],
+    minimize: true,
+    minimizer: [new TerserJSPlugin({})],
   },
   plugins: [
     ...commonConfig.plugins,
