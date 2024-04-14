@@ -6918,9 +6918,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"css-loader@npm:^7.0.0":
-  version: 7.0.0
-  resolution: "css-loader@npm:7.0.0"
+"css-loader@npm:^7.1.1":
+  version: 7.1.1
+  resolution: "css-loader@npm:7.1.1"
   dependencies:
     icss-utils: "npm:^5.1.0"
     postcss: "npm:^8.4.33"
@@ -6938,7 +6938,7 @@ __metadata:
       optional: true
     webpack:
       optional: true
-  checksum: 10/dfd916dc9d7ecdda6d17a4798ef6f96cc61a3ed2f640c27ae17cfa2cbf534826ef402927e0650171d5a690945f98cc052ee7d6214146eb6f4ee917f98d726652
+  checksum: 10/435a21f19594f89e4d5da51f4d6d2de4d25d6f882117890875f6529e99fbe931ea258662fb680b70e7ccab2fd723084f2c3fff022c76d45c38893ae50ab6f08e
   languageName: node
   linkType: hard
 
@@ -17574,7 +17574,7 @@ __metadata:
     core-js: "npm:3.36.1"
     countly-sdk-web: "npm:23.12.6"
     cross-env: "npm:7.0.3"
-    css-loader: "npm:^7.0.0"
+    css-loader: "npm:^7.1.1"
     cssnano: "npm:6.1.2"
     date-fns: "npm:3.6.0"
     dexie: "npm:4.0.1"
