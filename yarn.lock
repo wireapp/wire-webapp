@@ -13595,9 +13595,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss-custom-properties@npm:^13.3.6":
-  version: 13.3.6
-  resolution: "postcss-custom-properties@npm:13.3.6"
+"postcss-custom-properties@npm:^13.3.7":
+  version: 13.3.7
+  resolution: "postcss-custom-properties@npm:13.3.7"
   dependencies:
     "@csstools/cascade-layer-name-parser": "npm:^1.0.9"
     "@csstools/css-parser-algorithms": "npm:^2.6.1"
@@ -13606,7 +13606,7 @@ __metadata:
     postcss-value-parser: "npm:^4.2.0"
   peerDependencies:
     postcss: ^8.4
-  checksum: 10/a8bbdcb1ee482084abb7835dfb93a6227bbd5e1fc24a977baef0f1296205eaca9e4ac16aa33564038b41e548dfe412f9d39f78bdef5682b83cd926719850753d
+  checksum: 10/49eaae48fc366592ce60cb3c35a260026ced615b684213c668a29fcd98d56874da6b6ce224df5d52e8738aa1a52845bc4bf70ab6ceb2c22ec4bcfe9a60f6e9f9
   languageName: node
   linkType: hard
 
@@ -14085,9 +14085,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss-preset-env@npm:^9.5.4":
-  version: 9.5.4
-  resolution: "postcss-preset-env@npm:9.5.4"
+"postcss-preset-env@npm:^9.5.5":
+  version: 9.5.5
+  resolution: "postcss-preset-env@npm:9.5.5"
   dependencies:
     "@csstools/postcss-cascade-layers": "npm:^4.0.4"
     "@csstools/postcss-color-function": "npm:^3.0.13"
@@ -14130,7 +14130,7 @@ __metadata:
     postcss-color-hex-alpha: "npm:^9.0.4"
     postcss-color-rebeccapurple: "npm:^9.0.3"
     postcss-custom-media: "npm:^10.0.4"
-    postcss-custom-properties: "npm:^13.3.6"
+    postcss-custom-properties: "npm:^13.3.7"
     postcss-custom-selectors: "npm:^7.1.8"
     postcss-dir-pseudo-class: "npm:^8.0.1"
     postcss-double-position-gradients: "npm:^5.0.6"
@@ -14151,7 +14151,7 @@ __metadata:
     postcss-selector-not: "npm:^7.0.2"
   peerDependencies:
     postcss: ^8.4
-  checksum: 10/209308757c12fcaf7fdbc04536ff292041857afc7cd30038d8dbfe484216aa9dfabec635263cf7e577098f759cd96fa121a93d6deeba2ffcea64c33a73bf6fbb
+  checksum: 10/17e6083cd45a3be56c792ea37937a779b4f3d2b57588a5507dcfd3caf3cc8d46398491386bebe71cdf6a9a03c2ef7049c7a7fd80396ade124f626554e8a8384d
   languageName: node
   linkType: hard
 
@@ -17702,7 +17702,7 @@ __metadata:
     postcss-import: "npm:^16.1.0"
     postcss-less: "npm:6.0.0"
     postcss-loader: "npm:^8.1.1"
-    postcss-preset-env: "npm:^9.5.4"
+    postcss-preset-env: "npm:^9.5.5"
     postcss-scss: "npm:4.0.9"
     prettier: "npm:3.2.5"
     react: "npm:18.2.0"
