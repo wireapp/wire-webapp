@@ -284,7 +284,8 @@ const LoginComponent = ({
           }
           case BackendErrorLabel.INVALID_CREDENTIALS:
           case BackendErrorLabel.ACCOUNT_SUSPENDED:
-          case LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE: {
+          case LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE:
+          case LabeledError.GENERAL_ERRORS.SYSTEM_KEYCHAIN_ACCESS: {
             break;
           }
           default: {

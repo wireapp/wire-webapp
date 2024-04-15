@@ -40,6 +40,10 @@ import type {LoginDataState, RegistrationDataState} from '../reducer/authReducer
 
 type LoginLifecycleFunction = (dispatch: ThunkDispatch, getState: () => RootState, global: Api) => Promise<void>;
 
+const isSystemKeychainAccessError = (error: any): error is Error => {
+  return error instanceof Error && error.message.includes("Error invoking remote method 'EVENT_TYPE.ACTION.ENCRYPT'");
+};
+
 export class AuthAction {
   doLogin = (loginData: LoginData, getEntropy?: () => Promise<Uint8Array>): ThunkAction => {
     const onBeforeLogin: LoginLifecycleFunction = async (dispatch, getState, {actions: {authAction}}) =>
@@ -116,6 +120,9 @@ export class AuthAction {
         } else {
           if (error instanceof LowDiskSpaceError) {
             error = new LabeledError(LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE, error);
+          }
+          if (isSystemKeychainAccessError(error)) {
+            error = new LabeledError(LabeledError.GENERAL_ERRORS.SYSTEM_KEYCHAIN_ACCESS, error);
           }
           dispatch(AuthActionCreator.failedLogin(error));
         }
