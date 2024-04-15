@@ -28,10 +28,10 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 interface ReadOnlyConversationMessageProps {
-  handleMLSUpdate: () => void;
+  reloadApp: () => void;
   conversation: Conversation;
 }
-export const ReadOnlyConversationMessage: FC<ReadOnlyConversationMessageProps> = ({conversation, handleMLSUpdate}) => {
+export const ReadOnlyConversationMessage: FC<ReadOnlyConversationMessageProps> = ({conversation, reloadApp}) => {
   const {
     readOnlyState,
     is1to1,
@@ -81,7 +81,7 @@ export const ReadOnlyConversationMessage: FC<ReadOnlyConversationMessageProps> =
               {' '}
               <Link
                 css={{fontSize: 'var(--font-size-small)', fontWeight: 600}}
-                onClick={handleMLSUpdate}
+                onClick={reloadApp}
                 variant={LinkVariant.PRIMARY}
                 data-uie-name="do-update-mls"
               >

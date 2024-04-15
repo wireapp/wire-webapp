@@ -535,7 +535,7 @@ export const Conversation = ({
           />
           {isConversationLoaded &&
             (isReadOnlyConversation ? (
-              <ReadOnlyConversationMessage handleMLSUpdate={reloadApp} conversation={activeConversation} />
+              <ReadOnlyConversationMessage reloadApp={reloadApp} conversation={activeConversation} />
             ) : (
               <InputBar
                 key={activeConversation?.id}

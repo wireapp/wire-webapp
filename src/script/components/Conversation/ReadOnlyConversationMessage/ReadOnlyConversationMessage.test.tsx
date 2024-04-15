@@ -63,7 +63,7 @@ describe('ReadOnlyConversationMessage', () => {
     );
 
     const {getByText} = render(
-      withTheme(<ReadOnlyConversationMessage conversation={conversation} handleMLSUpdate={() => {}} />),
+      withTheme(<ReadOnlyConversationMessage conversation={conversation} reloadApp={() => {}} />),
     );
 
     expect(getByText('otherUserNotSupportMLSMsg')).toBeDefined();
@@ -75,20 +75,28 @@ describe('ReadOnlyConversationMessage', () => {
       false,
     );
 
+    const reloadAppMock = jest.fn();
+
     const {getByText} = render(
-      withTheme(<ReadOnlyConversationMessage handleMLSUpdate={() => {}} conversation={conversation} />),
+      withTheme(<ReadOnlyConversationMessage reloadApp={reloadAppMock} conversation={conversation} />),
     );
 
+    const reloadButton = getByText('downloadLatestMLS');
+
     expect(getByText('selfNotSupportMLSMsgPart1')).toBeDefined();
-    expect(getByText('downloadLatestMLS')).toBeDefined();
+    expect(reloadButton).toBeDefined();
     expect(getByText('selfNotSupportMLSMsgPart2')).toBeDefined();
+
+    reloadButton.click();
+
+    expect(reloadAppMock).toHaveBeenCalled();
   });
 
   it('renders a conversation with a blocked user', () => {
     const conversation = generateConversation(null, true);
 
     const {getByText} = render(
-      withTheme(<ReadOnlyConversationMessage handleMLSUpdate={() => {}} conversation={conversation} />),
+      withTheme(<ReadOnlyConversationMessage reloadApp={() => {}} conversation={conversation} />),
     );
 
     expect(getByText('conversationWithBlockedUser')).toBeDefined();
