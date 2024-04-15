@@ -17,6 +17,8 @@
  *
  */
 
+import {render} from '@testing-library/react';
+
 import {replaceReactComponents} from './ReactLocalizerUtil';
 
 describe('replaceReactComponents', () => {
@@ -64,5 +66,71 @@ describe('replaceReactComponents', () => {
     ]);
 
     expect(result).toHaveLength(4);
+  });
+
+  it('replaces literal strings with a component', () => {
+    const username = 'Patryk';
+    const result = replaceReactComponents('Hello {{username}}!', [
+      {
+        value: '{{username}}',
+        render: () => <strong>{username}</strong>,
+      },
+    ]);
+    const {getByText} = render(<div>{result}</div>);
+
+    expect(getByText(username)).toBeTruthy();
+  });
+
+  it('replaces literal strings with a string', () => {
+    const username = 'Przemek';
+    const result = replaceReactComponents('Hello {{username}}!', [
+      {
+        value: '{{username}}',
+        render: () => username,
+      },
+    ]);
+
+    const {getByTestId} = render(<p data-uie-name="parent">{result}</p>);
+
+    expect(getByTestId('parent').textContent).toEqual('Hello Przemek!');
+  });
+
+  it('replaces multiple literal strings', () => {
+    const username1 = 'John';
+    const username2 = 'Jerry';
+    const result = replaceReactComponents(`Hello {{username1}} and {{username2}}, my name is also {{username1}}!`, [
+      {
+        value: '{{username1}}',
+        render: () => <u>{username1}</u>,
+      },
+      {
+        value: '{{username2}}',
+        render: () => <u>{username2}</u>,
+      },
+    ]);
+
+    const {getByTestId} = render(<p data-uie-name="parent">{result}</p>);
+
+    expect(getByTestId('parent').textContent).toEqual('Hello John and Jerry, my name is also John!');
+  });
+
+  it('replaces components and literal strings at the same time', () => {
+    const username1 = 'Tom';
+    const username2 = 'Tim';
+    const result = replaceReactComponents(`Hello [bold]${username1}[/bold] and {{username2}}!`, [
+      {
+        start: '[bold]',
+        end: '[/bold]',
+        render: text => <strong>{text}</strong>,
+      },
+      {
+        value: '{{username2}}',
+        render: () => <u>{username2}</u>,
+      },
+    ]);
+
+    const {getByTestId} = render(<p data-uie-name="parent">{result}</p>);
+
+    expect(getByTestId('parent').textContent).toEqual('Hello Tom and Tim!');
   });
 });
