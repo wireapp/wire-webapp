@@ -119,7 +119,7 @@ const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
         <AvatarBadge state={state} iconSize={getIconSize(avatarSize)} />
       )}
 
-      {(!isImageGrey || isBlocked) && <AvatarBorder />}
+      {(!isImageGrey || isBlocked) && <AvatarBorder isTransparent={!isBlocked} />}
     </AvatarWrapper>
   );
 };
