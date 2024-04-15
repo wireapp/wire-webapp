@@ -26,6 +26,7 @@ import {CONVERSATION_READONLY_STATE} from 'src/script/conversation/ConversationR
 import {Conversation} from 'src/script/entity/Conversation';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
+import {replaceReactComponents} from 'Util/LocalizerUtil/ReactLocalizerUtil';
 
 interface ReadOnlyConversationMessageProps {
   reloadApp: () => void;
@@ -58,21 +59,29 @@ export const ReadOnlyConversationMessage: FC<ReadOnlyConversationMessageProps> =
       case CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_OTHER_UNSUPPORTED_MLS:
         return (
           <ReadOnlyConversationMessageBase>
-            <span
-              dangerouslySetInnerHTML={{
-                __html: t('otherUserNotSupportMLSMsg', user.name()),
-              }}
-            />
+            <span>
+              {replaceReactComponents(t('otherUserNotSupportMLSMsg'), [
+                {
+                  start: '[username]',
+                  end: '[/username]',
+                  render: () => <strong>{user.name()}</strong>,
+                },
+              ])}
+            </span>
           </ReadOnlyConversationMessageBase>
         );
       case CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_SELF_UNSUPPORTED_MLS:
         return (
           <ReadOnlyConversationMessageBase>
-            <span
-              dangerouslySetInnerHTML={{
-                __html: t('selfNotSupportMLSMsgPart1', user.name()),
-              }}
-            />
+            <span>
+              {replaceReactComponents(t('selfNotSupportMLSMsgPart1'), [
+                {
+                  start: '[username]',
+                  end: '[/username]',
+                  render: () => <strong>{user.name()}</strong>,
+                },
+              ])}
+            </span>
             <>
               {' '}
               <Link
