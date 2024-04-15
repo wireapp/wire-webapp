@@ -33,7 +33,7 @@ export const AvatarBorder: React.FunctionComponent<AvatarBorderProps> = ({
   <div
     css={{
       ...CSS_FILL_PARENT,
-      border: `1px solid ${isTransparent ? 'rgba(0, 0, 0, 0.08)' : 'var(--icon-button-primary-disabled-border)'}`,
+      border: `1px solid ${isTransparent ? 'rgba(0, 0, 0, 0.08)' : 'var(--border-color)'}`,
       borderRadius,
     }}
   />
