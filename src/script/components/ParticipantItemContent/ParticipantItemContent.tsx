@@ -19,6 +19,8 @@
 
 import React from 'react';
 
+import {observable} from 'knockout';
+
 import {Icon} from 'Components/Icon';
 import {UserBlockedBadge} from 'Components/UserBlockedBadge/UserBlockedBadge';
 import {UserInfo} from 'Components/UserInfo';
@@ -69,6 +71,10 @@ export const ParticipantItemContent = ({
 
   const isService = participant instanceof ServiceEntity;
 
+  const {isBlocked} = useKoSubscribableChildren(!isService ? participant : {isBlocked: observable(false)}, [
+    'isBlocked',
+  ]);
+
   return (
     <div css={wrapper}>
       <div css={contentText}>
@@ -82,7 +88,7 @@ export const ParticipantItemContent = ({
               showAvailability={showAvailabilityState && selfInTeam}
             >
               <UserVerificationBadges user={participant} groupId={groupId} />
-              {participant.isBlocked() && (
+              {isBlocked && (
                 <span css={{marginLeft: 4}}>
                   <UserBlockedBadge />
                 </span>
