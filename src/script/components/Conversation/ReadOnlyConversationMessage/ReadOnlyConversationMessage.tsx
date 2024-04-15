@@ -48,11 +48,7 @@ export const ReadOnlyConversationMessage: FC<ReadOnlyConversationMessageProps> =
   if (user.isBlocked()) {
     return (
       <ReadOnlyConversationMessageBase>
-        <span
-          dangerouslySetInnerHTML={{
-            __html: t('conversationWithBlockedUser'),
-          }}
-        />
+        <span>{t('conversationWithBlockedUser')}</span>
       </ReadOnlyConversationMessageBase>
     );
   }
@@ -87,11 +83,7 @@ export const ReadOnlyConversationMessage: FC<ReadOnlyConversationMessageProps> =
               >
                 {t('downloadLatestMLS')}
               </Link>{' '}
-              <span
-                dangerouslySetInnerHTML={{
-                  __html: t('selfNotSupportMLSMsgPart2'),
-                }}
-              />
+              <span>{t('selfNotSupportMLSMsgPart2')}</span>
             </>
           </ReadOnlyConversationMessageBase>
         );
