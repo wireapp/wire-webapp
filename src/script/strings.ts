@@ -682,7 +682,7 @@ export const errorHandlerStrings = defineMessages({
     id: 'LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE',
   },
   [LabeledError.GENERAL_ERRORS.SYSTEM_KEYCHAIN_ACCESS]: {
-    defaultMessage: 'Wire could not access your system safe storage {supportKeychainLink}',
+    defaultMessage: 'Wire could not access your system safe storage. {supportKeychainLink}',
     id: 'LabeledError.GENERAL_ERRORS.SYSTEM_KEYCHAIN_ACCESS',
   },
   [BackendErrorLabel.CUSTOM_BACKEND_NOT_FOUND]: {
