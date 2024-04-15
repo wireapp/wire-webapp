@@ -29,6 +29,8 @@ export const imageStyle = (isZoomEnabled: boolean): CSSObject => {
         }
       : {
           maxWidth: '100%',
+          height: '100%',
+          objectFit: 'scale-down',
         }),
   };
 };
