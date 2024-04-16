@@ -72,7 +72,7 @@ describe('replaceReactComponents', () => {
     const username = 'Patryk';
     const result = replaceReactComponents('Hello {{username}}!', [
       {
-        value: '{{username}}',
+        exactMatch: '{{username}}',
         render: () => <strong>{username}</strong>,
       },
     ]);
@@ -85,7 +85,7 @@ describe('replaceReactComponents', () => {
     const username = 'Przemek';
     const result = replaceReactComponents('Hello {{username}}!', [
       {
-        value: '{{username}}',
+        exactMatch: '{{username}}',
         render: () => username,
       },
     ]);
@@ -101,11 +101,11 @@ describe('replaceReactComponents', () => {
     const username2 = 'Jerry';
     const result = replaceReactComponents(`Hello {{username1}} and {{username2}}, my name is also {{username1}}!`, [
       {
-        value: '{{username1}}',
+        exactMatch: '{{username1}}',
         render: () => <u>{username1}</u>,
       },
       {
-        value: '{{username2}}',
+        exactMatch: '{{username2}}',
         render: () => <u>{username2}</u>,
       },
     ]);
@@ -126,7 +126,7 @@ describe('replaceReactComponents', () => {
         render: text => <strong>{text}</strong>,
       },
       {
-        value: '{{username2}}',
+        exactMatch: '{{username2}}',
         render: () => <u>{username2}</u>,
       },
     ]);
@@ -147,11 +147,11 @@ describe('replaceReactComponents', () => {
         render: text => <strong>{text}</strong>,
       },
       {
-        value: '{{username}}',
+        exactMatch: '{{username}}',
         render: () => <u>{username}</u>,
       },
       {
-        value: '{{username2}}',
+        exactMatch: '{{username2}}',
         render: () => <u>{username2}</u>,
       },
     ]);

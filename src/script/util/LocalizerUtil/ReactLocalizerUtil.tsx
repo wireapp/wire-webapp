@@ -26,7 +26,7 @@ interface ComponentReplacement {
 }
 
 interface StringReplacement {
-  value: string;
+  exactMatch: string;
   render: () => React.ReactNode | string;
 }
 
@@ -42,7 +42,7 @@ function sanitizeRegexp(text: string) {
 export function replaceReactComponents(html: string, replacements: Replacement[]): React.ReactNode[] {
   const [stringReplacements, componentReplacements] = replacements.reduce(
     (acc, replacement) => {
-      if ('value' in replacement) {
+      if ('exactMatch' in replacement) {
         acc[0].push(replacement);
       } else {
         acc[1].push(replacement);
@@ -63,7 +63,7 @@ export function replaceReactComponents(html: string, replacements: Replacement[]
     : null;
 
   const stringSplitRegexpStr = stringReplacements.length
-    ? `(${stringReplacements.map(replacement => sanitizeRegexp(replacement.value)).join('|')})`
+    ? `(${stringReplacements.map(replacement => sanitizeRegexp(replacement.exactMatch)).join('|')})`
     : null;
 
   const regexpStr = [componentsSplitRegexpStr, stringSplitRegexpStr].filter(Boolean).join('|');
@@ -91,7 +91,7 @@ export function replaceReactComponents(html: string, replacements: Replacement[]
           const split = text.split(regexp);
           return split
             .map(node => {
-              const stringReplacementMatch = stringReplacements.find(replacement => node === replacement.value);
+              const stringReplacementMatch = stringReplacements.find(replacement => node === replacement.exactMatch);
               if (stringReplacementMatch) {
                 return stringReplacementMatch.render();
               }
@@ -104,7 +104,7 @@ export function replaceReactComponents(html: string, replacements: Replacement[]
         return componentsReplacementMatch.render(text);
       }
 
-      const stringReplacementMatch = stringReplacements.find(replacement => node === replacement.value);
+      const stringReplacementMatch = stringReplacements.find(replacement => node === replacement.exactMatch);
 
       if (stringReplacementMatch) {
         return stringReplacementMatch.render();
