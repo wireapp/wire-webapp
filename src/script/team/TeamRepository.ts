@@ -161,14 +161,16 @@ export class TeamRepository extends TypedEventEmitter<Events> {
   }
 
   private readonly scheduleTeamRefresh = (): void => {
-    window.setInterval(async () => {
+    const updateTeam = async () => {
       try {
         await this.getTeam();
         await this.updateFeatureConfig();
       } catch (error) {
         this.logger.error(error);
       }
-    }, TIME_IN_MILLIS.SECOND * 30);
+    };
+    window.addEventListener('focus', updateTeam);
+    window.setInterval(updateTeam, TIME_IN_MILLIS.DAY);
   };
 
   private async getInitialTeamMembers(teamId: string): Promise<TeamMemberEntity[]> {
