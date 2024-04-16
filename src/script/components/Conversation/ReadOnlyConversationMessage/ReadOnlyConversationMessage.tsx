@@ -88,7 +88,7 @@ export const ReadOnlyConversationMessage: FC<ReadOnlyConversationMessageProps> =
             <>
               {' '}
               <Link
-                css={{fontSize: 'var(--font-size-small)', fontWeight: 600}}
+                css={{fontSize: 'var(--font-size-small)', fontWeight: 'var(--font-weight-semibold)'}}
                 onClick={reloadApp}
                 variant={LinkVariant.PRIMARY}
                 data-uie-name="do-update-mls"
