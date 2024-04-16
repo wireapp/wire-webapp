@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2020 Wire Swiss GmbH
+ * Copyright (C) 2024 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,24 +17,19 @@
  *
  */
 
-import React from 'react';
+import {CSSObject} from '@emotion/react';
 
-import {CSS_FILL_PARENT} from 'Util/CSSMixin';
-
-interface AvatarBorderProps {
-  borderRadius?: string;
-  isTransparent?: boolean;
-}
-
-export const AvatarBorder: React.FunctionComponent<AvatarBorderProps> = ({
-  borderRadius = '50%',
-  isTransparent = false,
-}) => (
-  <div
-    css={{
-      ...CSS_FILL_PARENT,
-      border: `1px solid ${isTransparent ? 'rgba(0, 0, 0, 0.08)' : 'var(--border-color)'}`,
-      borderRadius,
-    }}
-  />
-);
+export const wrapper: CSSObject = {
+  border: '1px solid var(--border-color)',
+  borderRadius: 4,
+  backgroundColor: 'var(--app-bg)',
+  color: 'var(--foreground)',
+  fontSize: 'var(--font-size-xsmall)',
+  width: 54,
+  height: 16,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  flexShrink: 0,
+  fontWeight: 'var(--font-weight-medium)',
+};

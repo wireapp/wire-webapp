@@ -234,7 +234,7 @@ describe('ConversationRepository', () => {
       });
     });
 
-    it('should not contain a blocked conversations', () => {
+    it('should contain blocked conversations', () => {
       const blocked_conversation_et = _generateConversation({
         type: CONVERSATION_TYPE.ONE_TO_ONE,
         status: ConnectionStatus.BLOCKED,
@@ -253,7 +253,7 @@ describe('ConversationRepository', () => {
             blocked_conversation_et,
             testFactory.conversation_repository['conversationState'].filteredConversations,
           ),
-        ).toBeUndefined();
+        ).toEqual(blocked_conversation_et);
       });
     });
 

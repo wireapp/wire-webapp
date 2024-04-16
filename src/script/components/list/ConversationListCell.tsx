@@ -30,6 +30,7 @@ import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
 
 import {Avatar, AVATAR_SIZE, GroupAvatar} from 'Components/Avatar';
+import {UserBlockedBadge} from 'Components/UserBlockedBadge/UserBlockedBadge';
 import {UserInfo} from 'Components/UserInfo';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isKey, isOneOfKeys, KEY} from 'Util/KeyboardUtil';
@@ -78,6 +79,7 @@ const ConversationListCell = ({
     unreadState,
     mutedState,
     isRequest,
+    isConversationWithBlockedUser,
   } = useKoSubscribableChildren(conversation, [
     'isGroup',
     'is1to1',
@@ -88,6 +90,7 @@ const ConversationListCell = ({
     'unreadState',
     'mutedState',
     'isRequest',
+    'isConversationWithBlockedUser',
   ]);
 
   const isActive = isSelected(conversation);
@@ -197,7 +200,9 @@ const ConversationListCell = ({
                 theme={isActive}
                 dataUieName="status-availability-item"
                 showAvailability={is1to1 && !!selfUser?.teamId}
-              />
+              >
+                {isConversationWithBlockedUser && <UserBlockedBadge />}
+              </UserInfo>
             ) : (
               <span className={cx('conversation-list-cell-name', {'conversation-list-cell-name--active': isActive})}>
                 {displayName}

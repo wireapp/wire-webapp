@@ -50,9 +50,17 @@ export interface UserAvatarProps extends React.HTMLProps<HTMLDivElement> {
 }
 
 export const shouldShowBadge = (size: AVATAR_SIZE, state: STATE): boolean => {
-  const isTooSmall = [AVATAR_SIZE.X_SMALL, AVATAR_SIZE.XX_SMALL, AVATAR_SIZE.XXX_SMALL].includes(size);
+  const isTooSmall = [AVATAR_SIZE.XX_SMALL, AVATAR_SIZE.XXX_SMALL].includes(size);
   const isBadgeState = [STATE.PENDING, STATE.BLOCKED].includes(state);
   return !isTooSmall && isBadgeState;
+};
+
+const getIconSize = (size: AVATAR_SIZE): string => {
+  if (size === AVATAR_SIZE.X_LARGE) {
+    return '116px';
+  }
+
+  return '16px';
 };
 
 const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
@@ -67,6 +75,7 @@ const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
   ...props
 }) => {
   const isImageGrey = !noFilter && [STATE.BLOCKED, STATE.IGNORED, STATE.PENDING, STATE.UNKNOWN].includes(state);
+  const isBlocked = state === STATE.BLOCKED;
   const backgroundColor = state === STATE.UNKNOWN ? COLOR.GRAY : undefined;
   const name = useUserName(participant);
   const {
@@ -106,9 +115,11 @@ const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
         mediumPicture={mediumPictureResource}
         previewPicture={previewPictureResource}
       />
-      {!noBadge && shouldShowBadge(avatarSize, state) && <AvatarBadge state={state} />}
+      {!noBadge && shouldShowBadge(avatarSize, state) && (
+        <AvatarBadge state={state} iconSize={getIconSize(avatarSize)} />
+      )}
 
-      {!isImageGrey && <AvatarBorder />}
+      {(!isImageGrey || isBlocked) && <AvatarBorder isTransparent={!isBlocked} />}
     </AvatarWrapper>
   );
 };

@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2020 Wire Swiss GmbH
+ * Copyright (C) 2024 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,24 +17,4 @@
  *
  */
 
-import React from 'react';
-
-import {CSS_FILL_PARENT} from 'Util/CSSMixin';
-
-interface AvatarBorderProps {
-  borderRadius?: string;
-  isTransparent?: boolean;
-}
-
-export const AvatarBorder: React.FunctionComponent<AvatarBorderProps> = ({
-  borderRadius = '50%',
-  isTransparent = false,
-}) => (
-  <div
-    css={{
-      ...CSS_FILL_PARENT,
-      border: `1px solid ${isTransparent ? 'rgba(0, 0, 0, 0.08)' : 'var(--border-color)'}`,
-      borderRadius,
-    }}
-  />
-);
+export * from './ReadOnlyConversationMessage';

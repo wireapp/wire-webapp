@@ -77,21 +77,15 @@ export class ActionsViewModel {
 
   /**
    * @param userEntity User to block
-   * @param hideConversation Hide current conversation
-   * @param nextConversationEntity Conversation to be switched to
    * @returns Resolves when the user was blocked
    */
-  readonly blockUser = (
-    userEntity: User,
-    hideConversation?: boolean,
-    nextConversationEntity?: Conversation,
-  ): Promise<void> => {
+  readonly blockUser = (userEntity: User): Promise<void> => {
     // TODO: Does the promise resolve when there is no primary action (i.e. cancel button gets clicked)?
     return new Promise(resolve => {
       PrimaryModal.show(PrimaryModal.type.CONFIRM, {
         primaryAction: {
           action: async () => {
-            await this.connectionRepository.blockUser(userEntity, hideConversation, nextConversationEntity);
+            await this.connectionRepository.blockUser(userEntity);
             resolve();
           },
           text: t('modalUserBlockAction'),
