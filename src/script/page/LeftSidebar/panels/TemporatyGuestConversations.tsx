@@ -88,7 +88,6 @@ const TemporaryGuestConversations: React.FC<TemporaryGuestConversations> = ({
               callActions={callingViewModel.callActions}
               callingRepository={callingViewModel.callingRepository}
               hasAccessToCamera={callingViewModel.hasAccessToCamera()}
-              multitasking={callingViewModel.multitasking}
               pushToTalkKey={callingViewModel.propertiesRepository.getPreference(PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY)}
             />
           </div>

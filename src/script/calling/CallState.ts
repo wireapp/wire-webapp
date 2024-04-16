@@ -38,6 +38,11 @@ export enum MuteState {
   REMOTE_FORCE_MUTED,
 }
 
+export enum CallingViewMode {
+  FULL_SCREEN_GRID = 'full-screen-grid',
+  MINIMIZED = 'minimized',
+}
+
 @singleton()
 export class CallState {
   public readonly calls: ko.ObservableArray<Call> = ko.observableArray();
@@ -53,6 +58,7 @@ export class CallState {
   public readonly activeCallViewTab = ko.observable(CallViewTab.ALL);
   readonly isChoosingScreen: ko.PureComputed<boolean>;
   readonly isSpeakersViewActive: ko.PureComputed<boolean>;
+  public readonly viewMode = ko.observable<CallingViewMode>(CallingViewMode.MINIMIZED);
 
   constructor() {
     this.joinedCall = ko.pureComputed(() => this.calls().find(call => call.state() === CALL_STATE.MEDIA_ESTAB));

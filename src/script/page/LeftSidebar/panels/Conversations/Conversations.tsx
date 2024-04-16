@@ -300,7 +300,6 @@ const Conversations: React.FC<ConversationsProps> = ({
                 isFullUi
                 hasAccessToCamera={callingViewModel.hasAccessToCamera()}
                 isSelfVerified={selfUser.is_verified()}
-                multitasking={callingViewModel.multitasking}
               />
             </div>
           )
