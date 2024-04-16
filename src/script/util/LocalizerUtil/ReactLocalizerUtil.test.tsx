@@ -92,6 +92,7 @@ describe('replaceReactComponents', () => {
 
     const {getByTestId} = render(<p data-uie-name="parent">{result}</p>);
 
+    expect(result).toHaveLength(3);
     expect(getByTestId('parent').textContent).toEqual('Hello Przemek!');
   });
 
@@ -111,6 +112,7 @@ describe('replaceReactComponents', () => {
 
     const {getByTestId} = render(<p data-uie-name="parent">{result}</p>);
 
+    expect(result).toHaveLength(7);
     expect(getByTestId('parent').textContent).toEqual('Hello John and Jerry, my name is also John!');
   });
 
@@ -131,6 +133,32 @@ describe('replaceReactComponents', () => {
 
     const {getByTestId} = render(<p data-uie-name="parent">{result}</p>);
 
+    expect(result).toHaveLength(5);
     expect(getByTestId('parent').textContent).toEqual('Hello Tom and Tim!');
+  });
+
+  it('replaces literal string inside of a component', () => {
+    const username = 'Jake';
+    const username2 = 'Marco';
+    const result = replaceReactComponents(`Hello [bold]{{username}}[/bold], [bold]Paul[/bold] and {{username2}}!`, [
+      {
+        start: '[bold]',
+        end: '[/bold]',
+        render: text => <strong>{text}</strong>,
+      },
+      {
+        value: '{{username}}',
+        render: () => <u>{username}</u>,
+      },
+      {
+        value: '{{username2}}',
+        render: () => <u>{username2}</u>,
+      },
+    ]);
+
+    const {getByTestId} = render(<p data-uie-name="parent">{result}</p>);
+
+    expect(result).toHaveLength(7);
+    expect(getByTestId('parent').textContent).toEqual('Hello Jake, Paul and Marco!');
   });
 });

@@ -85,6 +85,22 @@ export function replaceReactComponents(html: string, replacements: Replacement[]
           componentsReplacementMatch.start.length,
           node.length - componentsReplacementMatch.end.length,
         );
+
+        if (stringSplitRegexpStr) {
+          const regexp = new RegExp(stringSplitRegexpStr, 'g');
+          const split = text.split(regexp);
+          return split
+            .map(node => {
+              const stringReplacementMatch = stringReplacements.find(replacement => node === replacement.value);
+              if (stringReplacementMatch) {
+                return stringReplacementMatch.render();
+              }
+              return componentsReplacementMatch.render(node);
+            })
+            .filter(Boolean)
+            .map((node, index) => <React.Fragment key={index}>{node}</React.Fragment>);
+        }
+
         return componentsReplacementMatch.render(text);
       }
 
