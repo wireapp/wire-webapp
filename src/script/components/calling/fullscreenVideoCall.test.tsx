@@ -69,7 +69,6 @@ describe('fullscreenVideoCall', () => {
           videoinput: ko.observable(''),
         },
       } as MediaDevicesHandler,
-      multitasking: {isMinimized: ko.observable(false)},
       videoGrid: {grid: [], thumbnail: null} as Grid,
     };
     return props as FullscreenVideoCallProps;

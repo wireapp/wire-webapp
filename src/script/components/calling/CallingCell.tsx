@@ -44,11 +44,10 @@ import {CallParticipantsListItem} from './CallParticipantsListItem';
 
 import type {Call} from '../../calling/Call';
 import type {CallingRepository} from '../../calling/CallingRepository';
-import {CallState, MuteState} from '../../calling/CallState';
+import {CallingViewMode, CallState, MuteState} from '../../calling/CallState';
 import type {Participant} from '../../calling/Participant';
 import {useVideoGrid} from '../../calling/videoGridHandler';
 import type {Conversation} from '../../entity/Conversation';
-import type {Multitasking} from '../../notification/NotificationRepository';
 import {generateConversationUrl} from '../../router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from '../../router/routerBindings';
 import {TeamState} from '../../team/TeamState';
@@ -56,7 +55,6 @@ import {ContextMenuEntry, showContextMenu} from '../../ui/ContextMenu';
 import {CallActions, CallViewTab} from '../../view_model/CallingViewModel';
 
 interface VideoCallProps {
-  multitasking: Multitasking;
   hasAccessToCamera?: boolean;
   isSelfVerified?: boolean;
   teamState?: TeamState;
@@ -85,7 +83,6 @@ const CallingCell: React.FC<CallingCellProps> = ({
   call,
   callActions,
   isFullUi = false,
-  multitasking,
   hasAccessToCamera,
   isSelfVerified,
   callingRepository,
@@ -120,7 +117,9 @@ const CallingCell: React.FC<CallingCellProps> = ({
     'roles',
   ]);
 
-  const {isMinimized} = useKoSubscribableChildren(multitasking, ['isMinimized']);
+  const {viewMode} = useKoSubscribableChildren(callState, ['viewMode']);
+  const isMinimized = viewMode === CallingViewMode.MINIMIZED;
+
   const {isVideoCallingEnabled} = useKoSubscribableChildren(teamState, ['isVideoCallingEnabled']);
 
   const {activeCallViewTab} = useKoSubscribableChildren(callState, ['activeCallViewTab']);
@@ -221,24 +220,24 @@ const CallingCell: React.FC<CallingCellProps> = ({
     showContextMenu(event, entries, 'participant-moderator-menu');
   };
 
-  const handleMinimizedKeydown = useCallback(
+  const handleMaximizeKeydown = useCallback(
     (event: React.KeyboardEvent<HTMLInputElement>) => {
       if (!isOngoing) {
         return;
       }
       if (isSpaceOrEnterKey(event.key)) {
-        multitasking?.isMinimized(false);
+        callState.viewMode(CallingViewMode.FULL_SCREEN_GRID);
       }
     },
-    [isOngoing, multitasking],
+    [isOngoing, callState],
   );
 
-  const handleMinimizedClick = useCallback(() => {
+  const handleMaximizeClick = useCallback(() => {
     if (!isOngoing) {
       return;
     }
-    multitasking?.isMinimized(false);
-  }, [isOngoing, multitasking]);
+    callState.viewMode(CallingViewMode.FULL_SCREEN_GRID);
+  }, [isOngoing, callState]);
 
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
   const {showAlert, clearShowAlert} = useCallAlertState();
@@ -419,8 +418,8 @@ const CallingCell: React.FC<CallingCellProps> = ({
           {(isOngoing || selfHasActiveVideo) && isMinimized && !!videoGrid?.grid?.length && isFullUi ? (
             <div
               className="group-video__minimized-wrapper"
-              onClick={handleMinimizedClick}
-              onKeyDown={handleMinimizedKeydown}
+              onClick={handleMaximizeClick}
+              onKeyDown={handleMaximizeKeydown}
               role="button"
               tabIndex={TabIndex.FOCUSABLE}
               aria-label={t('callMaximizeLabel')}

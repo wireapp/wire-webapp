@@ -36,7 +36,7 @@ import type {AudioRepository} from '../audio/AudioRepository';
 import {AudioType} from '../audio/AudioType';
 import type {Call} from '../calling/Call';
 import {CallingRepository} from '../calling/CallingRepository';
-import {CallState} from '../calling/CallState';
+import {CallingViewMode, CallState} from '../calling/CallState';
 import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
@@ -46,7 +46,6 @@ import type {Conversation} from '../entity/Conversation';
 import type {User} from '../entity/User';
 import type {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../media/MediaDevicesHandler';
 import type {MediaStreamHandler} from '../media/MediaStreamHandler';
-import type {Multitasking} from '../notification/NotificationRepository';
 import type {PermissionRepository} from '../permission/PermissionRepository';
 import {PermissionStatusState} from '../permission/PermissionStatusState';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
@@ -100,7 +99,6 @@ export class CallingViewModel {
     readonly teamRepository: TeamRepository,
     readonly propertiesRepository: PropertiesRepository,
     private readonly selfUser: ko.Observable<User>,
-    readonly multitasking: Multitasking,
     private readonly conversationState = container.resolve(ConversationState),
     readonly callState = container.resolve(CallState),
     private readonly teamState = container.resolve(TeamState),
@@ -346,9 +344,10 @@ export class CallingViewModel {
 
         this.mediaStreamHandler.selectScreenToShare(showScreenSelection).then(() => {
           const isAudioCall = [CALL_TYPE.NORMAL, CALL_TYPE.FORCED_AUDIO].includes(call.initialType);
-          const isFullScreenVideoCall = call.initialType === CALL_TYPE.VIDEO && !this.multitasking.isMinimized();
+          const isFullScreenVideoCall =
+            call.initialType === CALL_TYPE.VIDEO && this.callState.viewMode() === CallingViewMode.FULL_SCREEN_GRID;
           if (isAudioCall || isFullScreenVideoCall) {
-            this.multitasking.isMinimized(true);
+            this.callState.viewMode(CallingViewMode.MINIMIZED);
           }
           return this.callingRepository.toggleScreenshare(call);
         });

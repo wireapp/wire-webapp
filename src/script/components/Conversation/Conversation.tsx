@@ -501,7 +501,6 @@ export const Conversation = ({
                   callActions={callingViewModel.callActions}
                   callingRepository={callingRepository}
                   conversation={conversation}
-                  multitasking={callingViewModel.multitasking}
                   pushToTalkKey={callingViewModel.propertiesRepository.getPreference(
                     PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY,
                   )}

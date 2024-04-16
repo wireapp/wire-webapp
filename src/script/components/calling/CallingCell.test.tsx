@@ -73,7 +73,6 @@ const createProps = async () => {
     conversation,
     hasAccessToCamera: true,
     isSelfVerified: true,
-    multitasking: {isMinimized: ko.observable(false)},
     teamState: mockTeamState,
     videoGrid: {grid: [], thumbnail: undefined},
   } as CallingCellProps;
