@@ -34,6 +34,9 @@ interface ReadOnlyConversationMessageProps {
   reloadApp: () => void;
   conversation: Conversation;
 }
+
+const userPlaceholder = {isBlocked: ko.observable(false)};
+
 export const ReadOnlyConversationMessage: FC<ReadOnlyConversationMessageProps> = ({conversation, reloadApp}) => {
   const {
     readOnlyState,
@@ -42,9 +45,7 @@ export const ReadOnlyConversationMessage: FC<ReadOnlyConversationMessageProps> =
   } = useKoSubscribableChildren(conversation, ['readOnlyState', 'is1to1', 'participating_user_ets']);
 
   const user = (is1to1 && participatingUserEts[0]) || null;
-  const {isBlocked: isUserBlocked} = useKoSubscribableChildren(user || {isBlocked: ko.observable(false)}, [
-    'isBlocked',
-  ]);
+  const {isBlocked: isUserBlocked} = useKoSubscribableChildren(user || userPlaceholder, ['isBlocked']);
 
   if (!user) {
     // This should never happen for 1:1 conversations
