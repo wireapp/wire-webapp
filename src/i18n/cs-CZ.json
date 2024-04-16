@@ -84,6 +84,7 @@
   "LOGOUT_REASON.NO_APP_CONFIG": "You were signed out because the initial configuration could not be loaded.",
   "LOGOUT_REASON.SESSION_EXPIRED": "Byli jste odhlášeni, protože platnost relace vypršela.{newline}Prosím, přihlaste se znovu.",
   "LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE": "Nedostatek volného místa na disku",
+  "LabeledError.GENERAL_ERRORS.SYSTEM_KEYCHAIN_ACCESS": "Wire could not access your system safe storage. {supportKeychainLink}",
   "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": "Zadejte prosím platnou emailovou adresu",
   "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "Zadejte jméno s alespoň 2 znaky",
   "ValidationError.FIELD.NAME.VALUE_MISSING": "Zadejte jméno s alespoň 2 znaky",

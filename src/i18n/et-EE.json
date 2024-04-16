@@ -84,6 +84,7 @@
   "LOGOUT_REASON.NO_APP_CONFIG": "You were signed out because the initial configuration could not be loaded.",
   "LOGOUT_REASON.SESSION_EXPIRED": "Sind logiti välja, kuna su seanss aegus.{newline}Palun logi uuesti sisse.",
   "LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE": "Puudub piisav salvestusruum",
+  "LabeledError.GENERAL_ERRORS.SYSTEM_KEYCHAIN_ACCESS": "Wire could not access your system safe storage. {supportKeychainLink}",
   "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": "Palun sisesta kehtiv e-posti aadress",
   "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "Sisesta vähemalt 2-täheline nimi",
   "ValidationError.FIELD.NAME.VALUE_MISSING": "Sisesta vähemalt 2-täheline nimi",

@@ -84,6 +84,7 @@
   "LOGOUT_REASON.NO_APP_CONFIG": "You were signed out because the initial configuration could not be loaded.",
   "LOGOUT_REASON.SESSION_EXPIRED": "セッションの有効期限が切れたため、サインアウトしました。{newline}もう一度ログインしてください。",
   "LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE": "ディスク領域不足",
+  "LabeledError.GENERAL_ERRORS.SYSTEM_KEYCHAIN_ACCESS": "Wire could not access your system safe storage. {supportKeychainLink}",
   "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": "有効なメール アドレスを入力してください",
   "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "最低２文字以上で名前を入力してください。",
   "ValidationError.FIELD.NAME.VALUE_MISSING": "最低２文字以上で名前を入力してください。",

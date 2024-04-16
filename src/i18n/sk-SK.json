@@ -84,6 +84,7 @@
   "LOGOUT_REASON.NO_APP_CONFIG": "You were signed out because the initial configuration could not be loaded.",
   "LOGOUT_REASON.SESSION_EXPIRED": "You were signed out because your session expired.{newline}Please log in again.",
   "LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE": "Not enough disk space",
+  "LabeledError.GENERAL_ERRORS.SYSTEM_KEYCHAIN_ACCESS": "Wire could not access your system safe storage. {supportKeychainLink}",
   "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": "Please enter a valid email address",
   "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "Zadajte meno s minimálne 2 znakmi",
   "ValidationError.FIELD.NAME.VALUE_MISSING": "Zadajte meno s minimálne 2 znakmi",

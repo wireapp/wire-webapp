@@ -84,6 +84,7 @@
   "LOGOUT_REASON.NO_APP_CONFIG": "You were signed out because the initial configuration could not be loaded.",
   "LOGOUT_REASON.SESSION_EXPIRED": "帐号由于会话过期而注销{newline}请重新登录。",
   "LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE": "磁盘空间不足",
+  "LabeledError.GENERAL_ERRORS.SYSTEM_KEYCHAIN_ACCESS": "Wire could not access your system safe storage. {supportKeychainLink}",
   "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": "请输入一个有效的电子邮件地址",
   "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "请输入至少2个字符的用户名",
   "ValidationError.FIELD.NAME.VALUE_MISSING": "请输入至少2个字符的用户名",
