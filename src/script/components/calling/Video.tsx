@@ -78,12 +78,12 @@ const Video = ({srcObject, blur, handleBlur, ...props}: VideoProps) => {
       <video
         ref={refVideo}
         {...props}
-        // css={{visibility: blur ? 'hidden' : 'visible', display: blur ? 'none' : 'inline block'}}
+        css={{visibility: blur ? 'hidden' : 'visible', display: blur ? 'none' : 'inline block'}}
       />
       <video
         ref={blurRef}
         {...props}
-        // css={{visibility: !blur ? 'hidden' : 'visible', display: !blur ? 'none' : 'inline block'}}
+        css={{visibility: !blur ? 'hidden' : 'visible', display: !blur ? 'none' : 'inline block'}}
       />
     </>
   );

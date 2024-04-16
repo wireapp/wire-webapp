@@ -41,7 +41,7 @@ function makeGaussKernel(sigma: number) {
   return kernel;
 }
 
-function blurPixels(pixels: Uint8ClampedArray, sigma: number, imageWidth: number, imageHeight: number) {
+export function blurPixels(pixels: Uint8ClampedArray, sigma: number, imageWidth: number, imageHeight: number) {
   const kernel = makeGaussKernel(sigma);
 
   const w = imageWidth;
@@ -103,9 +103,9 @@ export async function applyBlur(
     }
 
     const originalImage = ctx.getImageData(0, 0, imageWidth, imageHeight).data;
-    const backgroundImageData = new Uint8ClampedArray(originalImage.slice(0).buffer);
+    // const backgroundImageData = new Uint8ClampedArray(originalImage.slice(0).buffer);
 
-    const blurredImage = blurPixels(backgroundImageData, 5, imageWidth, imageHeight);
+    // const blurredImage = blurPixels(backgroundImageData, 5, imageWidth, imageHeight);
 
     const mask: Float32Array =
       result?.confidenceMasks?.[0].getAsFloat32Array() ?? new Float32Array(imageWidth * imageHeight);
@@ -115,10 +115,10 @@ export async function applyBlur(
       return;
     }
     for (let i = 0; i < mask.length; ++i) {
-      originalImage[j] = mask[i] <= 0.5 ? originalImage[j] : blurredImage[j];
-      originalImage[j + 1] = mask[i + 1] <= 0.5 ? originalImage[j + 1] : blurredImage[j + 1];
-      originalImage[j + 2] = mask[i + 2] <= 0.5 ? originalImage[j + 2] : blurredImage[j + 2];
-      originalImage[j + 3] = 255;
+      //black mask
+      originalImage[j] = mask[i] <= 0.5 ? originalImage[j] : 50;
+      originalImage[j + 1] = mask[i + 1] <= 0.5 ? originalImage[j + 1] : 50;
+      originalImage[j + 2] = mask[i + 2] <= 0.5 ? originalImage[j + 2] : 50;
       j += 4;
     }
 
