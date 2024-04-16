@@ -84,7 +84,7 @@
   "LOGOUT_REASON.NO_APP_CONFIG": "Вы были деавторизованы, поскольку не удалось загрузить первоначальную конфигурацию.",
   "LOGOUT_REASON.SESSION_EXPIRED": "Вы были деавторизованы из-за истечения продолжительности вашей сессии.{newline}Пожалуйста, войдите снова.",
   "LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE": "Недостаточно места на диске",
-  "LabeledError.GENERAL_ERRORS.SYSTEM_KEYCHAIN_ACCESS": "Wire could not access your system safe storage. {supportKeychainLink}",
+  "LabeledError.GENERAL_ERRORS.SYSTEM_KEYCHAIN_ACCESS": "Wire не смог получить доступ к вашему системному хранилищу. {supportKeychainLink}",
   "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": "Пожалуйста, введите правильный email",
   "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "Введите имя длиной не менее 2 символов",
   "ValidationError.FIELD.NAME.VALUE_MISSING": "Введите имя длиной не менее 2 символов",
