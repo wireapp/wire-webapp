@@ -39,7 +39,7 @@ const AvatarBadge: React.FunctionComponent<AvatarBadgeProps> = ({state, iconSize
     [STATE.BLOCKED]: 'var(--white)',
   };
 
-  const defaultColor = '#fff';
+  const defaultColor = 'var(--white)';
   const color: Record<string, string> = {
     [STATE.BLOCKED]: 'var(--gray-70)',
   };
