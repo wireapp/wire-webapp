@@ -1306,7 +1306,9 @@ export class ConversationRepository {
     const connection = user.connection();
     if (connection) {
       this.logger.log(`There's a connection with user ${userId.id}, getting a 1:1 conversation for the connection`);
-      return this.get1to1ConversationForConnection(connection, options);
+      const conversation = await this.get1to1ConversationForConnection(connection, options);
+      // In case we got a conversation back, we make sure the participating user entities are up to date
+      return conversation ? this.updateParticipatingUserEntities(conversation) : null;
     }
 
     const {protocol, isMLSSupportedByTheOtherUser, isProteusSupportedByTheOtherUser} =
