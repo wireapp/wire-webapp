@@ -24,6 +24,7 @@ import {createLabel} from 'src/script/conversation/ConversationLabelRepository';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {Conversation} from 'src/script/entity/Conversation';
 import {useFolderState, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/state';
+import {ContextMenuEntry, showContextMenu} from 'src/script/ui/ContextMenu';
 import {t} from 'Util/LocalizerUtil';
 
 import {SidebarTabs} from '../Conversations';
@@ -52,8 +53,8 @@ export const ConversationFolderTab = ({
   unreadConversations = [],
   dataUieName,
 }: ConversationFolderTabProps) => {
-  const {openFolder, isFoldersTabOpen, toggleFoldersTab, expandedFolder} = useFolderState();
   const {isOpen: isSidebarOpen, setIsOpen: setIsSidebarOpen} = useSidebarStore();
+  const {openFolder, isFoldersTabOpen, toggleFoldersTab, expandedFolder} = useFolderState();
   const {conversationLabelRepository} = conversationRepository;
 
   function toggleFolder(folderId: string) {
@@ -61,17 +62,44 @@ export const ConversationFolderTab = ({
     onChangeTab(type, folderId);
   }
 
-  function handleToggleFoldersTab() {
-    if (!isSidebarOpen) {
-      setIsSidebarOpen(true);
-    }
-    toggleFoldersTab();
-  }
-
   const folders = conversationLabelRepository
     .getLabels()
     .map(label => createLabel(label.name, conversationLabelRepository.getLabelConversations(label), label.id))
     .filter(({conversations}) => !!conversations().length);
+
+  function openFoldersContextMenu(event: React.MouseEvent<HTMLButtonElement>) {
+    const entries: ContextMenuEntry[] = folders.map(folder => ({
+      click: () => {
+        openFolder(folder.id);
+        onChangeTab(type, folder.id);
+      },
+      identifier: `folder-${folder.id}`,
+      label: folder.name,
+    }));
+
+    const boundingRect = event.currentTarget.getBoundingClientRect();
+
+    event.clientX = boundingRect.right + 4;
+    event.clientY = boundingRect.top;
+
+    showContextMenu(event, entries, 'navigation-folders-menu');
+  }
+
+  function handleToggleFoldersTab(event: React.MouseEvent<HTMLButtonElement>) {
+    if (isSidebarOpen) {
+      toggleFoldersTab();
+      return;
+    }
+
+    if (folders.length === 0) {
+      setIsSidebarOpen(true);
+      return;
+    }
+
+    if (folders.length !== 0) {
+      openFoldersContextMenu(event);
+    }
+  }
 
   function getTotalUnreadConversationMessages(conversations: Conversation[]) {
     let total = 0;
