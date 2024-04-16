@@ -175,12 +175,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   const mdBreakpoint = useMatchMedia('(max-width: 1000px)');
 
   useEffect(() => {
-    if (mdBreakpoint) {
-      setIsSidebarOpen(false);
-      return;
-    }
-
-    setIsSidebarOpen(true);
+    setIsSidebarOpen(!mdBreakpoint);
   }, [mdBreakpoint, setIsSidebarOpen]);
 
   useEffect(() => {
