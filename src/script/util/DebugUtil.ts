@@ -281,6 +281,11 @@ export class DebugUtil {
     });
   }
 
+  // Used by QA to trigger a focus event on the app (in order to trigger the update of the team feature-config)
+  simulateAppToForeground() {
+    window.dispatchEvent(new FocusEvent('focus'));
+  }
+
   setE2EICertificateTtl(ttl: number) {
     E2EIHandler.getInstance().certificateTtl = ttl;
   }
