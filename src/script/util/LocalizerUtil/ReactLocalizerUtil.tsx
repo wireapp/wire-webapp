@@ -86,6 +86,7 @@ export function replaceReactComponents(html: string, replacements: Replacement[]
           node.length - componentsReplacementMatch.end.length,
         );
 
+        // There is a special case where we have a string replacement inside a component replacement.
         if (stringSplitRegexpStr) {
           const regexp = new RegExp(stringSplitRegexpStr, 'g');
           const split = text.split(regexp);
