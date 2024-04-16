@@ -19,6 +19,8 @@
 
 import {FC, ReactNode} from 'react';
 
+import ko from 'knockout';
+
 import {Link, LinkVariant} from '@wireapp/react-ui-kit';
 
 import {Icon} from 'Components/Icon';
@@ -40,13 +42,16 @@ export const ReadOnlyConversationMessage: FC<ReadOnlyConversationMessageProps> =
   } = useKoSubscribableChildren(conversation, ['readOnlyState', 'is1to1', 'participating_user_ets']);
 
   const user = (is1to1 && participatingUserEts[0]) || null;
+  const {isBlocked: isUserBlocked} = useKoSubscribableChildren(user || {isBlocked: ko.observable(false)}, [
+    'isBlocked',
+  ]);
 
   if (!user) {
     // This should never happen for 1:1 conversations
     return null;
   }
 
-  if (user.isBlocked()) {
+  if (isUserBlocked) {
     return (
       <ReadOnlyConversationMessageBase>
         <span>{t('conversationWithBlockedUser')}</span>
@@ -62,8 +67,7 @@ export const ReadOnlyConversationMessage: FC<ReadOnlyConversationMessageProps> =
             <span>
               {replaceReactComponents(t('otherUserNotSupportMLSMsg'), [
                 {
-                  start: '[username]',
-                  end: '[/username]',
+                  exactMatch: '{{participantName}}',
                   render: () => <strong>{user.name()}</strong>,
                 },
               ])}
@@ -76,8 +80,7 @@ export const ReadOnlyConversationMessage: FC<ReadOnlyConversationMessageProps> =
             <span>
               {replaceReactComponents(t('selfNotSupportMLSMsgPart1'), [
                 {
-                  start: '[username]',
-                  end: '[/username]',
+                  exactMatch: '{{selfUserName}}',
                   render: () => <strong>{user.name()}</strong>,
                 },
               ])}
