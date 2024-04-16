@@ -41,7 +41,7 @@ import type {LoginDataState, RegistrationDataState} from '../reducer/authReducer
 type LoginLifecycleFunction = (dispatch: ThunkDispatch, getState: () => RootState, global: Api) => Promise<void>;
 
 const isSystemKeychainAccessError = (error: any): error is Error => {
-  return error instanceof Error && error.message.includes("Error invoking remote method 'EVENT_TYPE.ACTION.ENCRYPT'");
+  return error instanceof Error && error.message.includes('cryption is not available');
 };
 
 export class AuthAction {
