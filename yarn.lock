@@ -3380,6 +3380,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@mediapipe/selfie_segmentation@npm:^0.1.1675465747":
+  version: 0.1.1675465747
+  resolution: "@mediapipe/selfie_segmentation@npm:0.1.1675465747"
+  checksum: c3a6e2a58ce00a6cd62696a50c29a3de317bba023da21b82ebf7e9820ac924c6329afeb9653f277451f56505b8fad82f28402c855ad82cb60ff0ffd5b26ee677
+  languageName: node
+  linkType: hard
+
 "@mediapipe/tasks-vision@npm:^0.10.12":
   version: 0.10.12
   resolution: "@mediapipe/tasks-vision@npm:0.10.12"
@@ -3666,6 +3673,70 @@ __metadata:
     magic-string: ^0.25.0
     string.prototype.matchall: ^4.0.6
   checksum: 2c021349442e2e2cec96bb50fd82ec8bf8514d909bc73594f6cfc89b3b68f2feed909a8161d7d307d9455585c97e6b66853ce334db432626c7596836d4549c0c
+  languageName: node
+  linkType: hard
+
+"@tensorflow-models/body-segmentation@npm:^1.0.2":
+  version: 1.0.2
+  resolution: "@tensorflow-models/body-segmentation@npm:1.0.2"
+  dependencies:
+    rimraf: ^3.0.2
+  peerDependencies:
+    "@mediapipe/selfie_segmentation": ~0.1.0
+    "@tensorflow/tfjs-backend-webgl": ^4.9.0
+    "@tensorflow/tfjs-converter": ^4.9.0
+    "@tensorflow/tfjs-core": ^4.9.0
+  checksum: ba3ed8007a89cab679b960236236cefdd655475253fb908926a0c2e638cc0fde47f1bf8994329e6a0a95456d92bacc106eeb7bcf3ebd057d8117cdb58a3e6698
+  languageName: node
+  linkType: hard
+
+"@tensorflow/tfjs-backend-cpu@npm:4.17.0":
+  version: 4.17.0
+  resolution: "@tensorflow/tfjs-backend-cpu@npm:4.17.0"
+  dependencies:
+    "@types/seedrandom": ^2.4.28
+    seedrandom: ^3.0.5
+  peerDependencies:
+    "@tensorflow/tfjs-core": 4.17.0
+  checksum: f482bed84e81ccb9af9e63555bd752ebe45cfa39f70805b39c1823db20be2132e41026dee27ee3b3d33d8ddd81e3c3d16fc42f6302472c091a247f52c8a82111
+  languageName: node
+  linkType: hard
+
+"@tensorflow/tfjs-backend-webgl@npm:^4.17.0":
+  version: 4.17.0
+  resolution: "@tensorflow/tfjs-backend-webgl@npm:4.17.0"
+  dependencies:
+    "@tensorflow/tfjs-backend-cpu": 4.17.0
+    "@types/offscreencanvas": ~2019.3.0
+    "@types/seedrandom": ^2.4.28
+    seedrandom: ^3.0.5
+  peerDependencies:
+    "@tensorflow/tfjs-core": 4.17.0
+  checksum: dbce1bfa7c1d03ec2e0b1b7bb0ded24009c4ff4dbe81175b5cfef8bc55114b3c90517ae4e43c4baac40685e57cbc34c4f57669aea30649391608faa8ae5752bb
+  languageName: node
+  linkType: hard
+
+"@tensorflow/tfjs-converter@npm:^4.17.0":
+  version: 4.17.0
+  resolution: "@tensorflow/tfjs-converter@npm:4.17.0"
+  peerDependencies:
+    "@tensorflow/tfjs-core": 4.17.0
+  checksum: 82dcd44799483358c1395cba00d80c77c41f8fe36e30c24c2066ed14b6194c8c0d91189a5bca83bfcdc5295cdbdc4df4a0b45d59b389964d5b05019762a1c4a9
+  languageName: node
+  linkType: hard
+
+"@tensorflow/tfjs-core@npm:^4.17.0":
+  version: 4.17.0
+  resolution: "@tensorflow/tfjs-core@npm:4.17.0"
+  dependencies:
+    "@types/long": ^4.0.1
+    "@types/offscreencanvas": ~2019.7.0
+    "@types/seedrandom": ^2.4.28
+    "@webgpu/types": 0.1.38
+    long: 4.0.0
+    node-fetch: ~2.6.1
+    seedrandom: ^3.0.5
+  checksum: 303f912317f73b3b311b6c5205d25e0fe89310f76da5e30f8398b7e4ad36de369a6e9e066c44ab8db8c93b7b3419ab3f92debef4c86b26c0b367c5e97677fdc5
   languageName: node
   linkType: hard
 
@@ -4051,6 +4122,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/long@npm:^4.0.1":
+  version: 4.0.2
+  resolution: "@types/long@npm:4.0.2"
+  checksum: d16cde7240d834cf44ba1eaec49e78ae3180e724cd667052b194a372f350d024cba8dd3f37b0864931683dab09ca935d52f0c4c1687178af5ada9fc85b0635f4
+  languageName: node
+  linkType: hard
+
 "@types/markdown-it@npm:13.0.7":
   version: 13.0.7
   resolution: "@types/markdown-it@npm:13.0.7"
@@ -4098,6 +4176,20 @@ __metadata:
   version: 14.18.63
   resolution: "@types/node@npm:14.18.63"
   checksum: be909061a54931778c71c49dc562586c32f909c4b6197e3d71e6dac726d8bd9fccb9f599c0df99f52742b68153712b5097c0f00cac4e279fa894b0ea6719a8fd
+  languageName: node
+  linkType: hard
+
+"@types/offscreencanvas@npm:~2019.3.0":
+  version: 2019.3.0
+  resolution: "@types/offscreencanvas@npm:2019.3.0"
+  checksum: 006361d170aac80925b16a8c0421d5ee7bfe6acb5cd6b22407e2c28be091becc7de5ba1fd21293a1fdff70648918d9c035001ffafd4d6c49d1c5a22dab88ed0d
+  languageName: node
+  linkType: hard
+
+"@types/offscreencanvas@npm:~2019.7.0":
+  version: 2019.7.3
+  resolution: "@types/offscreencanvas@npm:2019.7.3"
+  checksum: 53a394a65ae08eddff6e0a2a8db72abecc94f41fc8fee166e8900075d3c1ca32540ddf5b4836c37357d53a0253a03fea4d781b2db543e3f08bc1cdc2dc0fefb5
   languageName: node
   linkType: hard
 
@@ -4198,6 +4290,13 @@ __metadata:
   version: 3.0.8
   resolution: "@types/seedrandom@npm:3.0.8"
   checksum: 9651de4ecb5ad060053678d6a42403dd78222bcca80016417c23b58b4f739e544b7197a78b97d6862cf417ea80fd2df612cc50ca0fa387fbe794e326a382ab0b
+  languageName: node
+  linkType: hard
+
+"@types/seedrandom@npm:^2.4.28":
+  version: 2.4.34
+  resolution: "@types/seedrandom@npm:2.4.34"
+  checksum: d9bcf58dbdbf7f3c708e6d252e15a452ee9a289905d1dedec80d18d5c57cc6ab777687da189ebc4ad8840bd2d89a6b8812c878c90f014ed5a598f09157a9ad3e
   languageName: node
   linkType: hard
 
@@ -4637,6 +4736,13 @@ __metadata:
     "@webassemblyjs/ast": 1.11.6
     "@xtuc/long": 4.2.2
   checksum: d2fa6a4c427325ec81463e9c809aa6572af6d47f619f3091bf4c4a6fc34f1da3df7caddaac50b8e7a457f8784c62cd58c6311b6cb69b0162ccd8d4c072f79cf8
+  languageName: node
+  linkType: hard
+
+"@webgpu/types@npm:0.1.38":
+  version: 0.1.38
+  resolution: "@webgpu/types@npm:0.1.38"
+  checksum: a3eb01e601a22e1722a0dad4080fbaacb145a927b88479224a65a932d83dbc21308609b00dbf46acf411aedfac49ff45e222b81e6093c4abbeb2686f881b8e5d
   languageName: node
   linkType: hard
 
@@ -11789,6 +11895,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"long@npm:4.0.0":
+  version: 4.0.0
+  resolution: "long@npm:4.0.0"
+  checksum: 16afbe8f749c7c849db1f4de4e2e6a31ac6e617cead3bdc4f9605cb703cd20e1e9fc1a7baba674ffcca57d660a6e5b53a9e236d7b25a295d3855cca79cc06744
+  languageName: node
+  linkType: hard
+
 "long@npm:5.2.0":
   version: 5.2.0
   resolution: "long@npm:5.2.0"
@@ -12444,6 +12557,20 @@ __metadata:
     encoding:
       optional: true
   checksum: d76d2f5edb451a3f05b15115ec89fc6be39de37c6089f1b6368df03b91e1633fd379a7e01b7ab05089a25034b2023d959b47e59759cb38d88341b2459e89d6e5
+  languageName: node
+  linkType: hard
+
+"node-fetch@npm:~2.6.1":
+  version: 2.6.13
+  resolution: "node-fetch@npm:2.6.13"
+  dependencies:
+    whatwg-url: ^5.0.0
+  peerDependencies:
+    encoding: ^0.1.0
+  peerDependenciesMeta:
+    encoding:
+      optional: true
+  checksum: 055845ae5b4796c78c7053564745345025cf959563b3568b43c385f67d311779e6b00e5fef6ed1b79f86ba4048e4b4b722e1aa948305521b9353eb7e788912c9
   languageName: node
   linkType: hard
 
@@ -17387,7 +17514,12 @@ __metadata:
     "@koush/wrtc": 0.5.3
     "@lexical/history": 0.13.1
     "@lexical/react": 0.13.1
+    "@mediapipe/selfie_segmentation": ^0.1.1675465747
     "@mediapipe/tasks-vision": ^0.10.12
+    "@tensorflow-models/body-segmentation": ^1.0.2
+    "@tensorflow/tfjs-backend-webgl": ^4.17.0
+    "@tensorflow/tfjs-converter": ^4.17.0
+    "@tensorflow/tfjs-core": ^4.17.0
     "@testing-library/react": 14.2.1
     "@types/dexie-batch": 0.4.7
     "@types/eslint": 8.56.5

@@ -31,7 +31,8 @@ type VideoProps = VideoHTMLAttributes<HTMLVideoElement> & {
 
 const Video = ({srcObject, blur, handleBlur, ...props}: VideoProps) => {
   const refVideo = useRef<HTMLVideoElement>(null);
-  const blurRef = useRef<HTMLVideoElement>(null);
+  const blurElemRef = useRef<HTMLVideoElement>(null);
+  const blurRef = useRef(blur);
 
   useEffect(() => {
     if (!refVideo.current) {
@@ -42,8 +43,8 @@ const Video = ({srcObject, blur, handleBlur, ...props}: VideoProps) => {
 
   useEffect(
     () => () => {
-      if (blurRef.current) {
-        blurRef.current.srcObject = null;
+      if (blurElemRef.current) {
+        blurElemRef.current.srcObject = null;
       }
       if (refVideo.current) {
         refVideo.current.srcObject = null;
@@ -60,28 +61,28 @@ const Video = ({srcObject, blur, handleBlur, ...props}: VideoProps) => {
       return await applyBlur(refVideo.current, props);
     };
 
-    if (blur) {
+    if (blurRef && blurElemRef.current) {
       asyncBlur()
         .then(stream => {
           if (!stream) {
             throw new Error('Failed to apply blur');
           }
           // handleBlur?.(stream, false);
-          blurRef.current!.srcObject = stream;
+          blurElemRef.current!.srcObject = stream;
         })
         .catch(console.error);
     }
-  }, [blur, handleBlur, props]);
+  }, [blurRef, handleBlur, props]);
 
   return (
     <>
       <video
         ref={refVideo}
         {...props}
-        css={{visibility: blur ? 'hidden' : 'visible', display: blur ? 'none' : 'inline block'}}
+        css={{visibility: blur ? 'hidden' : 'visible', display: blur ? 'contents' : 'inline block'}}
       />
       <video
-        ref={blurRef}
+        ref={blurElemRef}
         {...props}
         css={{visibility: !blur ? 'hidden' : 'visible', display: !blur ? 'none' : 'inline block'}}
       />
@@ -89,4 +90,5 @@ const Video = ({srcObject, blur, handleBlur, ...props}: VideoProps) => {
   );
 };
 
+Video.WhyDidYouRender = true;
 export {Video};
