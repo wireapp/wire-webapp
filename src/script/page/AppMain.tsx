@@ -227,8 +227,6 @@ export const AppMain: FC<AppMainProps> = ({
     callState.viewMode(CallingViewMode.MINIMIZED);
   };
 
-  const conversation = activeCall?.conversationId && conversationState.findConversation(activeCall?.conversationId);
-
   return (
     <StyledApp
       themeId={THEME_ID.DEFAULT}
@@ -277,8 +275,7 @@ export const AppMain: FC<AppMainProps> = ({
           <AppLock clientRepository={repositories.client} />
           <WarningsContainer onRefresh={app.refresh} />
 
-          {/*FIXME: make conversation optional */}
-          {activeCall && conversation && isPopOutView && (
+          {activeCall && isPopOutView && (
             <WindowPopup onClose={onPopOutClose}>
               <CallingCell
                 classifiedDomains={classifiedDomains}
@@ -286,7 +283,6 @@ export const AppMain: FC<AppMainProps> = ({
                 callActions={mainView.calling.callActions}
                 callingRepository={repositories.calling}
                 pushToTalkKey={repositories.properties.getPreference(PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY)}
-                conversation={conversation}
                 isFullUi
                 hasAccessToCamera={mainView.calling.hasAccessToCamera()}
                 isSelfVerified={selfUser.is_verified()}
