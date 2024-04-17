@@ -46,7 +46,6 @@ interface CompressedImage {
 
 export interface AssetUploadOptions extends AssetOptions {
   domain?: string;
-  expectsReadConfirmation: boolean;
   legalHoldStatus?: LegalHoldStatus;
 }
 
@@ -194,7 +193,6 @@ export class AssetRepository {
     ]);
 
     const options: AssetUploadOptions = {
-      expectsReadConfirmation: false,
       public: true,
       retention: AssetRetentionPolicy.ETERNAL,
     };

@@ -26,7 +26,11 @@ import {
   MessageSendingStatus,
   RemoteConversations,
 } from '@wireapp/api-client/lib/conversation';
-import {MemberLeaveReason, ConversationReceiptModeUpdateData} from '@wireapp/api-client/lib/conversation/data';
+import {
+  MemberLeaveReason,
+  ConversationReceiptModeUpdateData,
+  RECEIPT_MODE,
+} from '@wireapp/api-client/lib/conversation/data';
 import {CONVERSATION_TYPING} from '@wireapp/api-client/lib/conversation/data/ConversationTypingData';
 import {
   ConversationCreateEvent,
@@ -4199,11 +4203,11 @@ export class ConversationRepository {
 
   expectReadReceipt(conversationEntity: Conversation): boolean {
     if (conversationEntity.is1to1()) {
-      return !!this.propertyRepository.receiptMode();
+      return this.propertyRepository.receiptMode() === RECEIPT_MODE.ON;
     }
 
     if (conversationEntity.teamId && conversationEntity.isGroup()) {
-      return !!conversationEntity.receiptMode();
+      return conversationEntity.receiptMode() === RECEIPT_MODE.ON;
     }
 
     return false;
