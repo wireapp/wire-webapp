@@ -23,28 +23,42 @@ import {createPortal} from 'react-dom';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
+import {calculatePopupPosition} from 'Util/DOM/calculatePopupPosition';
+
 interface WindowPopupProps {
   children: React.ReactNode;
+  width?: number;
+  height?: number;
   onClose: () => void;
 }
 
-export const WindowPopup = ({children, onClose}: WindowPopupProps) => {
+export const WindowPopup = ({children, onClose, width = 400, height = 250}: WindowPopupProps) => {
   const [newWindow, setNewWindow] = useState<Window | null>(null);
 
   useEffect(() => {
+    const {top, left} = calculatePopupPosition(height, width);
+
     const newWindow = window.open(
-      '',
-      'newWin',
-      `width=400,height=300,left=${window.screen.availWidth / 2 - 200},top=${window.screen.availHeight / 2 - 150},resizable=0,scrollbars=no,toolbar=no,menubar=no,location=no,directories=no,status=no`,
+      'about:blank',
+      'popout',
+      `
+        width=${width}
+        height=${height},
+        top=${top},
+        left=${left}
+        location=no,
+        menubar=no,
+        resizable=no,
+        status=no,
+        toolbar=no,
+      `,
     );
 
     if (!newWindow) {
       return;
     }
 
-    window.document.head.querySelectorAll('link, style').forEach(htmlElement => {
-      newWindow.document.head.appendChild(htmlElement.cloneNode(true));
-    });
+    copyStyles(document, newWindow.document);
 
     newWindow.onbeforeunload = onClose;
     setNewWindow(newWindow);
@@ -57,9 +71,33 @@ export const WindowPopup = ({children, onClose}: WindowPopupProps) => {
   return !newWindow
     ? null
     : createPortal(
-        <StyledApp themeId={THEME_ID.DEFAULT} css={{backgroundColor: 'green', height: '100%'}}>
+        <StyledApp themeId={THEME_ID.DEFAULT} css={{backgroundColor: 'unset', height: '100%'}}>
           {children}
         </StyledApp>,
         newWindow.document.body,
       );
+};
+
+const copyStyles = (source: Document, target: Document) => {
+  source.head.querySelectorAll('link, style').forEach(htmlElement => {
+    target.head.appendChild(htmlElement.cloneNode(true));
+  });
+
+  // [...document.styleSheets].forEach(styleSheet => {
+  //   try {
+  //     const cssRules = [...styleSheet.cssRules].map(rule => rule.cssText).join('');
+  //     const style = document.createElement('style');
+
+  //     style.textContent = cssRules;
+  //     newWindow.document.head.appendChild(style);
+  //   } catch (e) {
+  //     const link = document.createElement('link');
+
+  //     link.rel = 'stylesheet';
+  //     link.type = styleSheet.type;
+  //     link.media = styleSheet.media;
+  //     link.href = styleSheet.href;
+  //     newWindow.document.head.appendChild(link);
+  //   }
+  // });
 };

@@ -44,6 +44,7 @@ import {
 } from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {calculatePopupPosition} from 'Util/DOM/calculatePopupPosition';
 import {getLogger} from 'Util/Logger';
 
 import {Page} from './Page';
@@ -129,7 +130,7 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
       };
       window.addEventListener('message', onReceiveChildWindowMessage, {once: false});
 
-      const childPosition = calculateChildPosition(POPUP_HEIGHT, POPUP_WIDTH);
+      const childPosition = calculatePopupPosition(POPUP_HEIGHT, POPUP_WIDTH);
 
       ssoWindowRef.current = window.open(
         `${Config.getConfig().BACKEND_REST}/sso/initiate-login/${code}`,
@@ -176,24 +177,6 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
         window.addEventListener('unload', onParentWindowClose);
       }
     });
-  };
-
-  const calculateChildPosition = (childHeight: number, childWidth: number) => {
-    const screenLeft = window.screenLeft || window.screenX;
-    const screenTop = window.screenTop || window.screenY;
-
-    const hasInnerMeasurements = window.innerHeight && window.innerWidth;
-
-    const parentHeight = hasInnerMeasurements
-      ? window.innerHeight
-      : document.documentElement.clientHeight || window.screen.height;
-    const parentWidth = hasInnerMeasurements
-      ? window.innerWidth
-      : document.documentElement.clientWidth || window.screen.width;
-
-    const left = parentWidth / 2 - childWidth / 2 + screenLeft;
-    const top = parentHeight / 2 - childHeight / 2 + screenTop;
-    return {left, top};
   };
 
   const focusChildWindow = () => {
