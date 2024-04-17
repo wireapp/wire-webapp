@@ -25,6 +25,8 @@ const commonConfig = require('./webpack.config.common');
 
 const srcScript = 'src/script/';
 
+const DeadCodePlugin = require('webpack-deadcode-plugin');
+
 module.exports = {
   ...commonConfig,
   devtool: 'eval-source-map',
@@ -34,7 +36,14 @@ module.exports = {
     auth: ['webpack-hot-middleware/client', path.resolve(__dirname, srcScript, 'auth/main.tsx')],
   },
   mode: 'development',
-  plugins: [...commonConfig.plugins, new webpack.HotModuleReplacementPlugin()],
+  plugins: [
+    ...commonConfig.plugins,
+    new webpack.HotModuleReplacementPlugin(),
+    new DeadCodePlugin({
+      patterns: ['src/**/*.(js|jsx|css|ts|tsx)'],
+      exclude: ['**/*.(stories|spec|test).(js|jsx|ts|tsx)', 'src/types/*.*', '**/*.d.ts', '**/__mocks__'],
+    }),
+  ],
   snapshot: {
     // This will make sure that changes in the node_modules will be detected and recompiled automatically (when using yalc for example)
     managedPaths: [],
