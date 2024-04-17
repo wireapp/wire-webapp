@@ -78,7 +78,6 @@ const TemporaryGuestConversations: React.FC<TemporaryGuestConversations> = ({
               data-uie-uid={conversation.id}
               data-uie-value={conversation.display_name()}
               call={call}
-              conversation={conversation}
               isTemporaryUser
               isFullUi
               isSelfVerified={false}

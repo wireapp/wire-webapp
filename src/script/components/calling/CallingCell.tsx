@@ -47,7 +47,6 @@ import type {CallingRepository} from '../../calling/CallingRepository';
 import {CallingViewMode, CallState, MuteState} from '../../calling/CallState';
 import type {Participant} from '../../calling/Participant';
 import {useVideoGrid} from '../../calling/videoGridHandler';
-import type {Conversation} from '../../entity/Conversation';
 import {generateConversationUrl} from '../../router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from '../../router/routerBindings';
 import {TeamState} from '../../team/TeamState';
@@ -65,7 +64,6 @@ interface AnsweringControlsProps {
   callActions: CallActions;
   callingRepository: Pick<CallingRepository, 'supportsScreenSharing' | 'sendModeratorMute'>;
   pushToTalkKey: string | null;
-  conversation: Conversation;
   isFullUi?: boolean;
   callState?: CallState;
   classifiedDomains?: string[];
@@ -77,7 +75,6 @@ export type CallingCellProps = VideoCallProps & AnsweringControlsProps;
 type labels = {dataUieName: string; text: string};
 
 const CallingCell: React.FC<CallingCellProps> = ({
-  conversation,
   classifiedDomains,
   isTemporaryUser,
   call,
@@ -90,6 +87,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
   teamState = container.resolve(TeamState),
   callState = container.resolve(CallState),
 }) => {
+  const {conversation} = call;
   const {reason, state, isCbrEnabled, startedAt, participants, maximizedParticipant, muteState} =
     useKoSubscribableChildren(call, [
       'reason',
