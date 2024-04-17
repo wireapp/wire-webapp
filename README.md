@@ -52,6 +52,18 @@ If you would like your browser to trust the certificate from "local.wire.com" or
 1. Run `yarn build:prod`
 1. Run `cd server && yarn start:prod`
 
+#### Test production build locally
+
+1. `cd server`
+1. `yarn build`
+1. `cd ..`
+1. (optional: `rm -rf node_modules/.cache/webpack`) `yarn bundle:prod`
+1. edit `dist/Server.js`, change line 211 from `if (this.config.DEVELOPMENT)` to `if (true)`
+1. `cd server/dist`
+1. `cp ../../.env .`
+1. Edit `.env`, add `BRAND_NAME=Wire`
+1. `node index.js`
+
 ## Testing
 
 To launch the full test suite (types check + linting + server tests + app tests), simply run:
