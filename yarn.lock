@@ -6108,16 +6108,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chalk@npm:^3.0.0":
-  version: 3.0.0
-  resolution: "chalk@npm:3.0.0"
-  dependencies:
-    ansi-styles: "npm:^4.1.0"
-    supports-color: "npm:^7.1.0"
-  checksum: 10/37f90b31fd655fb49c2bd8e2a68aebefddd64522655d001ef417e6f955def0ed9110a867ffc878a533f2dafea5f2032433a37c8a7614969baa7f8a1cd424ddfc
-  languageName: node
-  linkType: hard
-
 "chalk@npm:^4.0.0, chalk@npm:^4.0.2, chalk@npm:^4.1.0, chalk@npm:^4.1.2":
   version: 4.1.2
   resolution: "chalk@npm:4.1.2"
@@ -8348,7 +8338,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fast-glob@npm:^3.1.1, fast-glob@npm:^3.2.9, fast-glob@npm:^3.3.0, fast-glob@npm:^3.3.1, fast-glob@npm:^3.3.2":
+"fast-glob@npm:^3.2.9, fast-glob@npm:^3.3.0, fast-glob@npm:^3.3.1, fast-glob@npm:^3.3.2":
   version: 3.3.2
   resolution: "fast-glob@npm:3.3.2"
   dependencies:
@@ -17034,18 +17024,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack-deadcode-plugin@npm:0.1.17":
-  version: 0.1.17
-  resolution: "webpack-deadcode-plugin@npm:0.1.17"
-  dependencies:
-    chalk: "npm:^3.0.0"
-    fast-glob: "npm:^3.1.1"
-  peerDependencies:
-    webpack: "> 3"
-  checksum: 10/f1302613cd1e8064fd05f9c2bb3e8553384c34371b519b5bb2939b1c4a7f37f453d1d7ddc97d0d0e4a4458d21776601f9807d14cb91fd64d812d12907d81afae
-  languageName: node
-  linkType: hard
-
 "webpack-dev-middleware@npm:7.2.1":
   version: 7.2.1
   resolution: "webpack-dev-middleware@npm:7.2.1"
@@ -17462,7 +17440,6 @@ __metadata:
     uuidjs: "npm:4.2.13"
     webpack: "npm:5.91.0"
     webpack-cli: "npm:5.1.4"
-    webpack-deadcode-plugin: "npm:0.1.17"
     webpack-dev-middleware: "npm:7.2.1"
     webpack-hot-middleware: "npm:2.26.1"
     webrtc-adapter: "npm:9.0.1"

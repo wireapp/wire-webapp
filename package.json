@@ -144,7 +144,6 @@
     "typescript": "5.4.5",
     "webpack": "5.91.0",
     "webpack-cli": "5.1.4",
-    "webpack-deadcode-plugin": "0.1.17",
     "webpack-dev-middleware": "7.2.1",
     "webpack-hot-middleware": "2.26.1",
     "workbox-webpack-plugin": "7.0.0"

@@ -13,7 +13,6 @@ CHANGELOG.md
 node_modules
 npm-debug.log
 yarn-error.log
-*.dump
 
 # yarn 2 - not using zero-installs
 .pnp.*
@@ -22,5 +21,3 @@ yarn-error.log
 !.yarn/plugins
 !.yarn/releases
 !.yarn/sdks
-!.yarn/versions
-/wire-webapp.iml
