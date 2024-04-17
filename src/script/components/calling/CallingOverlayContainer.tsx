@@ -53,7 +53,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
 }) => {
   const {devicesHandler: mediaDevicesHandler} = mediaRepository;
   const {viewMode} = useKoSubscribableChildren(callState, ['viewMode']);
-  const isMinimized = viewMode === CallingViewMode.MINIMIZED;
+  const isFullScreenGrid = viewMode === CallingViewMode.FULL_SCREEN_GRID;
 
   const {activeCallViewTab, joinedCall, selectableScreens, selectableWindows, isChoosingScreen} =
     useKoSubscribableChildren(callState, [
@@ -136,7 +136,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
 
   return (
     <Fragment>
-      {!isMinimized && !!videoGrid?.grid.length && (
+      {isFullScreenGrid && !!videoGrid?.grid.length && (
         <FullscreenVideoCall
           key={joinedCall.conversation.id}
           videoGrid={videoGrid}

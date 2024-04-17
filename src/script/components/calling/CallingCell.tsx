@@ -116,7 +116,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
   ]);
 
   const {viewMode} = useKoSubscribableChildren(callState, ['viewMode']);
-  const isMinimized = viewMode === CallingViewMode.MINIMIZED;
+  const isFullScreenGrid = viewMode === CallingViewMode.FULL_SCREEN_GRID;
 
   const {isVideoCallingEnabled} = useKoSubscribableChildren(teamState, ['isVideoCallingEnabled']);
 
@@ -413,7 +413,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
             </div>
           </div>
 
-          {(isOngoing || selfHasActiveVideo) && isMinimized && !!videoGrid?.grid?.length && isFullUi ? (
+          {(isOngoing || selfHasActiveVideo) && !isFullScreenGrid && !!videoGrid?.grid?.length && isFullUi ? (
             <div
               className="group-video__minimized-wrapper"
               onClick={handleMaximizeClick}

@@ -21,8 +21,6 @@ import {useEffect, useState} from 'react';
 
 import {createPortal} from 'react-dom';
 
-import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
-
 import {calculatePopupPosition} from 'Util/DOM/calculatePopupPosition';
 
 interface WindowPopupProps {
@@ -68,14 +66,7 @@ export const WindowPopup = ({children, onClose, width = 400, height = 250}: Wind
     };
   }, [onClose]);
 
-  return !newWindow
-    ? null
-    : createPortal(
-        <StyledApp themeId={THEME_ID.DEFAULT} css={{backgroundColor: 'unset', height: '100%'}}>
-          {children}
-        </StyledApp>,
-        newWindow.document.body,
-      );
+  return !newWindow ? null : createPortal(children, newWindow.document.body);
 };
 
 const copyStyles = (source: Document, target: Document) => {
@@ -83,13 +74,13 @@ const copyStyles = (source: Document, target: Document) => {
     target.head.appendChild(htmlElement.cloneNode(true));
   });
 
-  // [...document.styleSheets].forEach(styleSheet => {
+  // [...source.styleSheets].forEach(styleSheet => {
   //   try {
   //     const cssRules = [...styleSheet.cssRules].map(rule => rule.cssText).join('');
   //     const style = document.createElement('style');
 
   //     style.textContent = cssRules;
-  //     newWindow.document.head.appendChild(style);
+  //     target.head.appendChild(style);
   //   } catch (e) {
   //     const link = document.createElement('link');
 
@@ -97,7 +88,7 @@ const copyStyles = (source: Document, target: Document) => {
   //     link.type = styleSheet.type;
   //     link.media = styleSheet.media;
   //     link.href = styleSheet.href;
-  //     newWindow.document.head.appendChild(link);
+  //     target.head.appendChild(link);
   //   }
   // });
 };

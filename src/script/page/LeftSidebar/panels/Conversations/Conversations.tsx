@@ -31,7 +31,6 @@ import {Icon} from 'Components/Icon';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
 import {UserInfo} from 'Components/UserInfo';
 import {UserVerificationBadges} from 'Components/VerificationBadge';
-import {WindowPopup} from 'Components/WindowPopup/WindowPopup';
 import {ListState} from 'src/script/page/useAppState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -39,7 +38,7 @@ import {t} from 'Util/LocalizerUtil';
 import {ConversationsList} from './ConversationsList';
 import {useFolderState} from './state';
 
-import {CallState} from '../../../../calling/CallState';
+import {CallingViewMode, CallState} from '../../../../calling/CallState';
 import {DefaultLabelIds} from '../../../../conversation/ConversationLabelRepository';
 import {ConversationRepository} from '../../../../conversation/ConversationRepository';
 import {ConversationState} from '../../../../conversation/ConversationState';
@@ -281,8 +280,6 @@ const Conversations: React.FC<ConversationsProps> = ({
     </nav>
   );
 
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
-
   const callingView = (
     <>
       {activeCalls.map(call => {
@@ -293,32 +290,17 @@ const Conversations: React.FC<ConversationsProps> = ({
         return (
           conversation && (
             <div className="calling-cell" key={conversation.id}>
-              <button onClick={() => setIsPopupOpen(true)}>open popup</button>
-              {isPopupOpen ? (
-                <WindowPopup onClose={() => setIsPopupOpen(false)}>
-                  <CallingCell
-                    classifiedDomains={classifiedDomains}
-                    call={call}
-                    callActions={callingViewModel.callActions}
-                    callingRepository={callingRepository}
-                    pushToTalkKey={propertiesRepository.getPreference(PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY)}
-                    isFullUi
-                    hasAccessToCamera={callingViewModel.hasAccessToCamera()}
-                    isSelfVerified={selfUser.is_verified()}
-                  />
-                </WindowPopup>
-              ) : (
-                <CallingCell
-                  classifiedDomains={classifiedDomains}
-                  call={call}
-                  callActions={callingViewModel.callActions}
-                  callingRepository={callingRepository}
-                  pushToTalkKey={propertiesRepository.getPreference(PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY)}
-                  isFullUi
-                  hasAccessToCamera={callingViewModel.hasAccessToCamera()}
-                  isSelfVerified={selfUser.is_verified()}
-                />
-              )}
+              <button onClick={() => callState.viewMode(CallingViewMode.POPOUT)}>open popup</button>
+              <CallingCell
+                classifiedDomains={classifiedDomains}
+                call={call}
+                callActions={callingViewModel.callActions}
+                callingRepository={callingRepository}
+                pushToTalkKey={propertiesRepository.getPreference(PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY)}
+                isFullUi
+                hasAccessToCamera={callingViewModel.hasAccessToCamera()}
+                isSelfVerified={selfUser.is_verified()}
+              />
             </div>
           )
         );
