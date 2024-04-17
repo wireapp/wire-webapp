@@ -73,7 +73,7 @@ export class CallState {
     );
 
     this.calls.subscribe(activeCalls => {
-      const activeCallIds = activeCalls.map(call => call.conversationId);
+      const activeCallIds = activeCalls.map(call => call.conversation.qualifiedId);
       this.acceptedVersionWarnings.remove(
         acceptedId => !activeCallIds.some(callId => matchQualifiedIds(acceptedId, callId)),
       );

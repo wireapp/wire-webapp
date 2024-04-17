@@ -125,7 +125,7 @@ describe('CallingRepository', () => {
       const selfClientId = callingRepository['selfClientId']!;
       const call = new Call(
         selfUserId,
-        conversation.qualifiedId,
+        conversation,
         CONV_TYPE.CONFERENCE,
         selfParticipant,
         CALL_TYPE.NORMAL,
@@ -167,7 +167,7 @@ describe('CallingRepository', () => {
       const selfClientId = callingRepository['selfClientId']!;
       const call = new Call(
         selfUserId,
-        conversation.qualifiedId,
+        conversation,
         CONV_TYPE.CONFERENCE,
         selfParticipant,
         CALL_TYPE.NORMAL,
@@ -209,7 +209,7 @@ describe('CallingRepository', () => {
 
       const call = new Call(
         selfUserId,
-        conversation.qualifiedId,
+        conversation,
         CONV_TYPE.CONFERENCE,
         selfParticipant,
         CALL_TYPE.NORMAL,
@@ -330,7 +330,7 @@ describe('CallingRepository', () => {
 
       const incomingCall = new Call(
         userId,
-        mlsConversation.qualifiedId,
+        mlsConversation,
         CONV_TYPE.CONFERENCE_MLS,
         selfParticipant,
         CALL_TYPE.NORMAL,
@@ -365,7 +365,7 @@ describe('CallingRepository', () => {
 
       const incomingCall = new Call(
         userId,
-        mlsConversation.qualifiedId,
+        mlsConversation,
         CONV_TYPE.ONEONONE,
         selfParticipant,
         CALL_TYPE.NORMAL,
@@ -387,7 +387,7 @@ describe('CallingRepository', () => {
       const userId = {domain: '', id: ''};
       const incomingCall = new Call(
         userId,
-        createConversation().qualifiedId,
+        createConversation(),
         CONV_TYPE.CONFERENCE,
         selfParticipant,
         CALL_TYPE.NORMAL,
@@ -397,7 +397,7 @@ describe('CallingRepository', () => {
 
       const activeCall = new Call(
         userId,
-        createConversation().qualifiedId,
+        createConversation(),
         CONV_TYPE.CONFERENCE,
         selfParticipant,
         CALL_TYPE.NORMAL,
@@ -407,7 +407,7 @@ describe('CallingRepository', () => {
 
       const declinedCall = new Call(
         userId,
-        createConversation().qualifiedId,
+        createConversation(),
         CONV_TYPE.CONFERENCE,
         selfParticipant,
         CALL_TYPE.NORMAL,
@@ -428,7 +428,7 @@ describe('CallingRepository', () => {
       const userId = {domain: '', id: ''};
       const call = new Call(
         userId,
-        createConversation().qualifiedId,
+        createConversation(),
         CONV_TYPE.CONFERENCE,
         selfParticipant,
         CALL_TYPE.NORMAL,
@@ -456,7 +456,7 @@ describe('CallingRepository', () => {
       const selfParticipant = createSelfParticipant();
       const call = new Call(
         {domain: '', id: ''},
-        createConversation().qualifiedId,
+        createConversation(),
         CONV_TYPE.CONFERENCE,
         selfParticipant,
         CALL_TYPE.NORMAL,
@@ -490,7 +490,7 @@ describe('CallingRepository', () => {
 
       const call = new Call(
         {domain: '', id: ''},
-        createConversation().qualifiedId,
+        createConversation(),
         0,
         selfParticipant,
         CALL_TYPE.NORMAL,
@@ -714,7 +714,7 @@ describe.skip('E2E audio call', () => {
            * Jasmine will eventually timeout if the audio is not flowing after 5s
            */
           client
-            .getStats(call.conversationId)
+            .getStats(call.conversation.qualifiedId)
             ?.then(extractAudioStats)
             .then(audioStats => {
               if (audioStats.length > 0) {

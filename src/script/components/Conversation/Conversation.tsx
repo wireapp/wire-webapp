@@ -485,11 +485,11 @@ export const Conversation = ({
           />
 
           {activeCalls.map(call => {
-            const conversation = conversationState.findConversation(call.conversationId);
+            const {conversation} = call;
             const callingViewModel = mainViewModel.calling;
             const callingRepository = callingViewModel.callingRepository;
 
-            if (!conversation || !smBreakpoint) {
+            if (!smBreakpoint) {
               return null;
             }
 
@@ -500,7 +500,6 @@ export const Conversation = ({
                   call={call}
                   callActions={callingViewModel.callActions}
                   callingRepository={callingRepository}
-                  conversation={conversation}
                   pushToTalkKey={callingViewModel.propertiesRepository.getPreference(
                     PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY,
                   )}

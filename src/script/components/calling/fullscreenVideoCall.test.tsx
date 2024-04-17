@@ -45,7 +45,7 @@ describe('fullscreenVideoCall', () => {
     spyOn(conversation, 'supportsVideoCall').and.returnValue(true);
     const selfUser = new User('');
     selfUser.isMe = true;
-    const call = new Call({domain: '', id: ''}, {domain: '', id: ''}, 0, new Participant(selfUser, ''), 0, {
+    const call = new Call({domain: '', id: ''}, new Conversation('', ''), 0, new Participant(selfUser, ''), 0, {
       currentAvailableDeviceId: {
         audiooutput: ko.pureComputed(() => 'test'),
       },

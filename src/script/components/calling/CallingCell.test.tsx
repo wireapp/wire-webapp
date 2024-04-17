@@ -45,7 +45,7 @@ jest.mock('Components/utils/InViewport', () => ({
 
 const createCall = (state: CALL_STATE, selfUser = new User(createUuid()), selfClientId = createUuid()) => {
   const selfParticipant = new Participant(selfUser, selfClientId);
-  const call = new Call({domain: '', id: ''}, {domain: '', id: ''}, 0, selfParticipant, CALL_TYPE.NORMAL, {
+  const call = new Call({domain: '', id: ''}, new Conversation('', ''), 0, selfParticipant, CALL_TYPE.NORMAL, {
     currentAvailableDeviceId: {
       audiooutput: ko.pureComputed(() => 'test'),
     },
