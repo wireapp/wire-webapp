@@ -485,11 +485,11 @@ export const Conversation = ({
           />
 
           {activeCalls.map(call => {
-            const conversation = conversationState.findConversation(call.conversationId);
+            const {conversation} = call;
             const callingViewModel = mainViewModel.calling;
             const callingRepository = callingViewModel.callingRepository;
 
-            if (!conversation || !smBreakpoint) {
+            if (!smBreakpoint) {
               return null;
             }
 

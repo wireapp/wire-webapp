@@ -95,7 +95,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
   const {clearShowAlert} = useCallAlertState();
 
   const leave = (call: Call) => {
-    callingRepository.leaveCall(call.conversationId, LEAVE_CALL_REASON.MANUAL_LEAVE_BY_UI_CLICK);
+    callingRepository.leaveCall(call.conversation.qualifiedId, LEAVE_CALL_REASON.MANUAL_LEAVE_BY_UI_CLICK);
     callState.activeCallViewTab(CallViewTab.ALL);
     call.maximizedParticipant(null);
     clearShowAlert();
@@ -162,7 +162,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
     });
   };
 
-  const conversation = joinedCall && conversationState.findConversation(joinedCall.conversationId);
+  const conversation = joinedCall?.conversation;
 
   if (!joinedCall || !conversation || conversation.removed_from_conversation()) {
     return null;
@@ -172,7 +172,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
     <Fragment>
       {!isMinimized && !!videoGrid?.grid.length && (
         <FullscreenVideoCall
-          key={joinedCall.conversationId.id}
+          key={joinedCall.conversation.id}
           videoGrid={videoGrid}
           call={joinedCall}
           activeCallViewTab={activeCallViewTab}

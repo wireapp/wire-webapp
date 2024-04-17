@@ -19,7 +19,6 @@
 
 import React, {useEffect, useState} from 'react';
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
 import {ListViewModel} from 'src/script/view_model/ListViewModel';
@@ -60,7 +59,7 @@ export interface GroupedConversationsProps {
   callState: CallState;
   conversationRepository: ConversationRepository;
   conversationState: ConversationState;
-  hasJoinableCall: (conversationId: QualifiedId) => boolean;
+  hasJoinableCall: (conversation: Conversation) => boolean;
   isSelectedConversation: (conversationEntity: Conversation) => boolean;
   listViewModel: ListViewModel;
   onJoinCall: (conversationEntity: Conversation) => void;

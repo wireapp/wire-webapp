@@ -47,7 +47,6 @@ import type {Message} from './message/Message';
 import {PingMessage} from './message/PingMessage';
 import type {User} from './User';
 
-import type {Call} from '../calling/Call';
 import {ClientRepository} from '../client';
 import {Config} from '../Config';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
@@ -103,7 +102,6 @@ export class Conversation {
   public readonly accessCodeHasPassword: ko.Observable<boolean | undefined>;
   public readonly accessState: ko.Observable<ACCESS_STATE>;
   public readonly archivedTimestamp: ko.Observable<number>;
-  public readonly call: ko.Observable<Call | null>;
   public readonly cleared_timestamp: ko.Observable<number>;
   public readonly connection: ko.Observable<ConnectionEntity | null>;
   // TODO(Federation): Currently the 'creator' just refers to a user id but it has to become a qualified id
@@ -302,8 +300,6 @@ export class Conversation {
     this.last_read_timestamp = ko.observable(0);
     this.last_server_timestamp = ko.observable(0);
     this.mutedTimestamp = ko.observable(0);
-
-    this.call = ko.observable(null);
 
     this.readOnlyState = ko.observable<CONVERSATION_READONLY_STATE | null>(null);
 

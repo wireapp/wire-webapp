@@ -283,26 +283,24 @@ const Conversations: React.FC<ConversationsProps> = ({
   const callingView = (
     <>
       {activeCalls.map(call => {
-        const conversation = conversationState.findConversation(call.conversationId);
+        const {conversation} = call;
         const callingViewModel = listViewModel.callingViewModel;
         const callingRepository = callingViewModel.callingRepository;
 
         return (
-          conversation && (
-            <div className="calling-cell" key={conversation.id}>
-              <CallingCell
-                classifiedDomains={classifiedDomains}
-                call={call}
-                callActions={callingViewModel.callActions}
-                callingRepository={callingRepository}
-                pushToTalkKey={propertiesRepository.getPreference(PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY)}
-                conversation={conversation}
-                isFullUi
-                hasAccessToCamera={callingViewModel.hasAccessToCamera()}
-                isSelfVerified={selfUser.is_verified()}
-              />
-            </div>
-          )
+          <div className="calling-cell" key={conversation.id}>
+            <CallingCell
+              classifiedDomains={classifiedDomains}
+              call={call}
+              callActions={callingViewModel.callActions}
+              callingRepository={callingRepository}
+              pushToTalkKey={propertiesRepository.getPreference(PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY)}
+              conversation={conversation}
+              isFullUi
+              hasAccessToCamera={callingViewModel.hasAccessToCamera()}
+              isSelfVerified={selfUser.is_verified()}
+            />
+          </div>
         );
       })}
     </>

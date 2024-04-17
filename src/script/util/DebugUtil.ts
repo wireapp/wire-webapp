@@ -421,7 +421,7 @@ export class DebugUtil {
     if (!activeCall) {
       throw new Error('no active call found');
     }
-    return this.callingRepository.getStats(activeCall.conversationId);
+    return this.callingRepository.getStats(activeCall.conversation.qualifiedId);
   }
 
   /** Used by QA test automation. */

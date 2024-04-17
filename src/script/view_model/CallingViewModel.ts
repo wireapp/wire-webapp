@@ -106,7 +106,7 @@ export class CallingViewModel {
     this.isSelfVerified = ko.pureComputed(() => selfUser().is_verified());
     this.activeCalls = ko.pureComputed(() =>
       this.callState.calls().filter(call => {
-        const conversation = this.conversationState.findConversation(call.conversationId);
+        const {conversation} = call;
         if (!conversation || conversation.removed_from_conversation()) {
           return false;
         }
@@ -175,7 +175,7 @@ export class CallingViewModel {
     };
 
     const answerCall = async (call: Call) => {
-      const canAnswer = await this.canInitiateCall(call.conversationId, {
+      const canAnswer = await this.canInitiateCall(call.conversation.qualifiedId, {
         action: t('modalCallSecondIncomingAction'),
         message: t('modalCallSecondIncomingMessage'),
         title: t('modalCallSecondIncomingHeadline'),
@@ -269,7 +269,7 @@ export class CallingViewModel {
           PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
             primaryAction: {
               action: () => {
-                this.callingRepository.rejectCall(call.conversationId);
+                this.callingRepository.rejectCall(call.conversation.qualifiedId);
               },
             },
             text: {
@@ -286,12 +286,12 @@ export class CallingViewModel {
       changePage: (newPage, call) => {
         this.callingRepository.changeCallPage(call, newPage);
       },
-      leave: (call: Call) => {
-        this.callingRepository.leaveCall(call.conversationId, LEAVE_CALL_REASON.MANUAL_LEAVE_BY_UI_CLICK);
+      leave: ({conversation}: Call) => {
+        this.callingRepository.leaveCall(conversation.qualifiedId, LEAVE_CALL_REASON.MANUAL_LEAVE_BY_UI_CLICK);
         callState.activeCallViewTab(CallViewTab.ALL);
       },
-      reject: (call: Call) => {
-        this.callingRepository.rejectCall(call.conversationId);
+      reject: ({conversation}: Call) => {
+        this.callingRepository.rejectCall(conversation.qualifiedId);
       },
       startAudio: async (conversationEntity: Conversation) => {
         if (conversationEntity.isGroup() && !this.teamState.isConferenceCallingEnabled()) {
@@ -360,10 +360,11 @@ export class CallingViewModel {
    * @param activeCall - the call to gracefully tear down
    */
   private async gracefullyTeardownCall(activeCall: Call): Promise<void> {
+    const {conversation} = activeCall;
     if (activeCall.state() === CALL_STATE.INCOMING) {
-      this.callingRepository.rejectCall(activeCall.conversationId);
+      this.callingRepository.rejectCall(conversation.qualifiedId);
     } else {
-      this.callingRepository.leaveCall(activeCall.conversationId, LEAVE_CALL_REASON.MANUAL_LEAVE_TO_JOIN_ANOTHER_CALL);
+      this.callingRepository.leaveCall(conversation.qualifiedId, LEAVE_CALL_REASON.MANUAL_LEAVE_TO_JOIN_ANOTHER_CALL);
     }
     // We want to wait a bit to be sure the call have been tear down properly
     await new Promise(resolve => setTimeout(resolve, 1000));
@@ -384,7 +385,10 @@ export class CallingViewModel {
     const idleCallStates = [CALL_STATE.INCOMING, CALL_STATE.NONE, CALL_STATE.UNKNOWN];
     const otherActiveCall = this.callState
       .calls()
-      .find(call => !matchQualifiedIds(call.conversationId, conversationId) && !idleCallStates.includes(call.state()));
+      .find(
+        call =>
+          !matchQualifiedIds(call.conversation.qualifiedId, conversationId) && !idleCallStates.includes(call.state()),
+      );
     if (!otherActiveCall) {
       return Promise.resolve(true);
     }
