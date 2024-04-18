@@ -61,7 +61,11 @@ export const ConversationTab = ({
         <span className="conversations-sidebar-btn--text">{label || title}</span>
       </span>
 
-      {unreadConversations > 0 && <span className="conversations-sidebar-btn--badge">{unreadConversations}</span>}
+      {unreadConversations > 0 && (
+        <span className="conversations-sidebar-btn--badge">
+          <span className="conversations-sidebar-btn--badge-text">{unreadConversations}</span>
+        </span>
+      )}
     </button>
   );
 };
