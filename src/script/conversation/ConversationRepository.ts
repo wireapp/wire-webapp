@@ -1945,6 +1945,12 @@ export class ConversationRepository {
       return conversation;
     }
 
+    // If it is a 1:1 conversaiton with a bot/service, just open a conversation.
+    if (otherUser.isService) {
+      this.logger.warn(`User ${otherUserId.id} is a service, opening proteus conversation`);
+      return conversation;
+    }
+
     this.logger.info(
       `Initialising 1:1 conversation ${conversation.id} of type ${conversation.type()} with user ${otherUserId.id}`,
     );
