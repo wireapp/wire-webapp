@@ -290,7 +290,7 @@ const Conversations: React.FC<ConversationsProps> = ({
         return (
           conversation && (
             <div className="calling-cell" key={conversation.id}>
-              <button onClick={() => callState.viewMode(CallingViewMode.POPOUT)}>open popup</button>
+              <button onClick={() => callState.viewMode(CallingViewMode.DETACHED_WINDOW)}>detach</button>
               <CallingCell
                 classifiedDomains={classifiedDomains}
                 call={call}

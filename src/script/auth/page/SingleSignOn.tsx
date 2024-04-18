@@ -44,7 +44,7 @@ import {
 } from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {calculatePopupPosition} from 'Util/DOM/calculatePopupPosition';
+import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition';
 import {getLogger} from 'Util/Logger';
 
 import {Page} from './Page';
@@ -130,7 +130,7 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
       };
       window.addEventListener('message', onReceiveChildWindowMessage, {once: false});
 
-      const childPosition = calculatePopupPosition(POPUP_HEIGHT, POPUP_WIDTH);
+      const childPosition = calculateChildWindowPosition(POPUP_HEIGHT, POPUP_WIDTH);
 
       ssoWindowRef.current = window.open(
         `${Config.getConfig().BACKEND_REST}/sso/initiate-login/${code}`,

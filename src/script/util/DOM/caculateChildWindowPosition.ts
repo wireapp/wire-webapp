@@ -17,7 +17,7 @@
  *
  */
 
-export const calculatePopupPosition = (childHeight: number, childWidth: number) => {
+export const calculateChildWindowPosition = (childHeight: number, childWidth: number) => {
   const screenLeft = window.screenLeft || window.screenX;
   const screenTop = window.screenTop || window.screenY;
 

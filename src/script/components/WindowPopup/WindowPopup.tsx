@@ -21,24 +21,26 @@ import {useEffect, useState} from 'react';
 
 import {createPortal} from 'react-dom';
 
-import {calculatePopupPosition} from 'Util/DOM/calculatePopupPosition';
+import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition';
 
-interface WindowPopupProps {
+interface DetachedWindowProps {
   children: React.ReactNode;
   width?: number;
   height?: number;
   onClose: () => void;
+  url?: string;
+  name: string;
 }
 
-export const WindowPopup = ({children, onClose, width = 400, height = 250}: WindowPopupProps) => {
+export const DetachedWindow = ({children, url = '', name, onClose, width = 400, height = 250}: DetachedWindowProps) => {
   const [newWindow, setNewWindow] = useState<Window | null>(null);
 
   useEffect(() => {
-    const {top, left} = calculatePopupPosition(height, width);
+    const {top, left} = calculateChildWindowPosition(height, width);
 
     const newWindow = window.open(
-      'about:blank',
-      'popout',
+      url,
+      name,
       `
         width=${width}
         height=${height},
@@ -64,7 +66,7 @@ export const WindowPopup = ({children, onClose, width = 400, height = 250}: Wind
     return () => {
       newWindow.close();
     };
-  }, [onClose]);
+  }, [height, name, url, width, onClose]);
 
   return !newWindow ? null : createPortal(children, newWindow.document.body);
 };
@@ -73,22 +75,4 @@ const copyStyles = (source: Document, target: Document) => {
   source.head.querySelectorAll('link, style').forEach(htmlElement => {
     target.head.appendChild(htmlElement.cloneNode(true));
   });
-
-  // [...source.styleSheets].forEach(styleSheet => {
-  //   try {
-  //     const cssRules = [...styleSheet.cssRules].map(rule => rule.cssText).join('');
-  //     const style = document.createElement('style');
-
-  //     style.textContent = cssRules;
-  //     target.head.appendChild(style);
-  //   } catch (e) {
-  //     const link = document.createElement('link');
-
-  //     link.rel = 'stylesheet';
-  //     link.type = styleSheet.type;
-  //     link.media = styleSheet.media;
-  //     link.href = styleSheet.href;
-  //     target.head.appendChild(link);
-  //   }
-  // });
 };

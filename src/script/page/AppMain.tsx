@@ -33,7 +33,7 @@ import {GroupCreationModal} from 'Components/Modals/GroupCreation/GroupCreationM
 import {LegalHoldModal} from 'Components/Modals/LegalHoldModal/LegalHoldModal';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {showUserModal, UserModal} from 'Components/Modals/UserModal';
-import {WindowPopup} from 'Components/WindowPopup/WindowPopup';
+import {DetachedWindow} from 'Components/WindowPopup/WindowPopup';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {AppLock} from './AppLock';
@@ -221,9 +221,9 @@ export const AppMain: FC<AppMainProps> = ({
 
   const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
   const {joinedCall: activeCall, viewMode} = useKoSubscribableChildren(callState, ['joinedCall', 'viewMode']);
-  const isPopOutView = viewMode === CallingViewMode.POPOUT;
+  const isDetachedWindow = viewMode === CallingViewMode.DETACHED_WINDOW;
 
-  const onPopOutClose = () => {
+  const closeDetachedWindow = () => {
     callState.viewMode(CallingViewMode.MINIMIZED);
   };
 
@@ -275,8 +275,8 @@ export const AppMain: FC<AppMainProps> = ({
           <AppLock clientRepository={repositories.client} />
           <WarningsContainer onRefresh={app.refresh} />
 
-          {activeCall && isPopOutView && (
-            <WindowPopup onClose={onPopOutClose}>
+          {activeCall && isDetachedWindow && (
+            <DetachedWindow name="popout" onClose={closeDetachedWindow}>
               <CallingCell
                 classifiedDomains={classifiedDomains}
                 call={activeCall}
@@ -287,7 +287,7 @@ export const AppMain: FC<AppMainProps> = ({
                 hasAccessToCamera={mainView.calling.hasAccessToCamera()}
                 isSelfVerified={selfUser.is_verified()}
               />
-            </WindowPopup>
+            </DetachedWindow>
           )}
 
           {!locked && (
