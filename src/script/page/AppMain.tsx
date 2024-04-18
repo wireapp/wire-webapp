@@ -28,12 +28,12 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {CallingCell} from 'Components/calling/CallingCell';
 import {CallingContainer} from 'Components/calling/CallingOverlayContainer';
+import {DetachedWindow} from 'Components/DetachedWindow';
 import {ErrorFallback} from 'Components/ErrorFallback';
 import {GroupCreationModal} from 'Components/Modals/GroupCreation/GroupCreationModal';
 import {LegalHoldModal} from 'Components/Modals/LegalHoldModal/LegalHoldModal';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {showUserModal, UserModal} from 'Components/Modals/UserModal';
-import {DetachedWindow} from 'Components/WindowPopup/WindowPopup';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {AppLock} from './AppLock';
@@ -276,7 +276,7 @@ export const AppMain: FC<AppMainProps> = ({
           <WarningsContainer onRefresh={app.refresh} />
 
           {activeCall && isDetachedWindow && (
-            <DetachedWindow name="popout" onClose={closeDetachedWindow}>
+            <DetachedWindow name="popout" width={290} height={290} onClose={closeDetachedWindow}>
               <CallingCell
                 classifiedDomains={classifiedDomains}
                 call={activeCall}

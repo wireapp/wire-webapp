@@ -32,7 +32,7 @@ interface DetachedWindowProps {
   name: string;
 }
 
-export const DetachedWindow = ({children, url = '', name, onClose, width = 400, height = 250}: DetachedWindowProps) => {
+export const DetachedWindow = ({children, url = '', name, onClose, width = 600, height = 600}: DetachedWindowProps) => {
   const [newWindow, setNewWindow] = useState<Window | null>(null);
 
   useEffect(() => {
@@ -61,6 +61,7 @@ export const DetachedWindow = ({children, url = '', name, onClose, width = 400, 
     copyStyles(document, newWindow.document);
 
     newWindow.onbeforeunload = onClose;
+    window.onbeforeunload = onClose;
     setNewWindow(newWindow);
 
     return () => {

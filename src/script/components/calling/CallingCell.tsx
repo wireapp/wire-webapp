@@ -117,6 +117,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
 
   const {viewMode} = useKoSubscribableChildren(callState, ['viewMode']);
   const isFullScreenGrid = viewMode === CallingViewMode.FULL_SCREEN_GRID;
+  const isDetachedWindow = viewMode === CallingViewMode.DETACHED_WINDOW;
 
   const {isVideoCallingEnabled} = useKoSubscribableChildren(teamState, ['isVideoCallingEnabled']);
 
@@ -311,7 +312,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
   const ongoingCallAlert = isGroup ? onGoingGroupCallAlert : onGoingCallAlert;
 
   return (
-    <div className="conversation-calling-cell">
+    <div style={{height: isDetachedWindow ? '100%' : 'unset'}}>
       {isIncoming && (
         <p role="alert" className="visually-hidden">
           {t('callConversationAcceptOrDecline', conversationName)}
@@ -324,6 +325,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
           data-uie-name="item-call"
           data-uie-id={conversation.id}
           data-uie-value={conversation.display_name()}
+          style={{height: isDetachedWindow ? '100%' : 'unset'}}
         >
           {muteState === MuteState.REMOTE_MUTED && isFullUi && (
             <div className="conversation-list-calling-cell__info-bar">{t('muteStateRemoteMute')}</div>
@@ -421,6 +423,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
               role="button"
               tabIndex={TabIndex.FOCUSABLE}
               aria-label={t('callMaximizeLabel')}
+              style={{flex: isDetachedWindow ? 1 : 'unset'}}
             >
               <GroupVideoGrid
                 grid={activeCallViewTab === CallViewTab.ALL ? videoGrid : {grid: activeSpeakers, thumbnail: null}}
@@ -527,6 +530,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
                     className={cx('call-ui__button call-ui__button--participants', {
                       'call-ui__button--active': showParticipants,
                     })}
+                    disabled={isDetachedWindow}
                     onClick={() => setShowParticipants(prevState => !prevState)}
                     type="button"
                     data-uie-name="do-toggle-participants"

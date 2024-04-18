@@ -99,7 +99,9 @@ const Conversations: React.FC<ConversationsProps> = ({
     'visibleConversations',
   ]);
   const {notifications} = useKoSubscribableChildren(preferenceNotificationRepository, ['notifications']);
-  const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
+  const {activeCalls, viewMode} = useKoSubscribableChildren(callState, ['activeCalls', 'viewMode']);
+
+  const isCallWindowDetached = viewMode === CallingViewMode.DETACHED_WINDOW;
 
   const initialViewStyle = propertiesRepository.getPreference(PROPERTIES_TYPE.INTERFACE.VIEW_FOLDERS)
     ? ConversationViewStyle.FOLDER
@@ -291,16 +293,18 @@ const Conversations: React.FC<ConversationsProps> = ({
           conversation && (
             <div className="calling-cell" key={conversation.id}>
               <button onClick={() => callState.viewMode(CallingViewMode.DETACHED_WINDOW)}>detach</button>
-              <CallingCell
-                classifiedDomains={classifiedDomains}
-                call={call}
-                callActions={callingViewModel.callActions}
-                callingRepository={callingRepository}
-                pushToTalkKey={propertiesRepository.getPreference(PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY)}
-                isFullUi
-                hasAccessToCamera={callingViewModel.hasAccessToCamera()}
-                isSelfVerified={selfUser.is_verified()}
-              />
+              {!isCallWindowDetached && (
+                <CallingCell
+                  classifiedDomains={classifiedDomains}
+                  call={call}
+                  callActions={callingViewModel.callActions}
+                  callingRepository={callingRepository}
+                  pushToTalkKey={propertiesRepository.getPreference(PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY)}
+                  isFullUi
+                  hasAccessToCamera={callingViewModel.hasAccessToCamera()}
+                  isSelfVerified={selfUser.is_verified()}
+                />
+              )}
             </div>
           )
         );
