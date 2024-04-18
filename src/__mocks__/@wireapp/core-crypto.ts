@@ -41,6 +41,11 @@ export enum CredentialType {
   Basic = 1,
   X509 = 2,
 }
+export enum DeviceStatus {
+  Valid = 1,
+  Expired = 2,
+  Revoked = 3,
+}
 export enum E2eiConversationState {
   /**
    * All clients have a valid E2EI certificate

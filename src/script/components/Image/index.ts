@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2023 Wire Swiss GmbH
+ * Copyright (C) 2024 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,21 +17,4 @@
  *
  */
 
-import {WireIdentity} from '@wireapp/core/lib/messagingProtocols/mls';
-
-import {MLSStatuses} from './E2EIdentityVerification';
-
-type CoreStatus = WireIdentity['status'];
-
-export const mapMLSStatus = (status?: CoreStatus) => {
-  const statusMap: Record<any, MLSStatuses> = {
-    Valid: MLSStatuses.VALID,
-    Expired: MLSStatuses.EXPIRED,
-    Revoked: MLSStatuses.REVOKED,
-  };
-
-  if (!status) {
-    return MLSStatuses.NOT_ACTIVATED;
-  }
-  return statusMap[status];
-};
+export * from './Image';

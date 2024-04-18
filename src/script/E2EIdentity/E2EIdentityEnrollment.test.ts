@@ -18,6 +18,7 @@
  */
 
 import {waitFor} from '@testing-library/react';
+import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
 import {LowPrecisionTaskScheduler} from '@wireapp/core/lib/util/LowPrecisionTaskScheduler';
 import {container} from 'tsyringe';
 
@@ -28,11 +29,13 @@ import {UserState} from 'src/script/user/UserState';
 import * as util from 'Util/util';
 
 import {E2EIHandler} from './E2EIdentityEnrollment';
-import {EnrollmentStore} from './Enrollment.store';
+import * as e2EIdentityVerification from './E2EIdentityVerification';
+import {getEnrollmentStore} from './Enrollment.store';
 import {OIDCServiceStore} from './OIDCService/OIDCServiceStorage';
 
 import {ConversationState} from '../conversation/ConversationState';
 import {Conversation} from '../entity/Conversation';
+import {User} from '../entity/User';
 
 jest.mock('./OIDCService', () => {
   return {
@@ -61,7 +64,13 @@ const modalMock = jest.spyOn(PrimaryModal, 'show');
 
 describe('E2EIHandler', () => {
   const params = {discoveryUrl: 'http://example.com', gracePeriodInSeconds: 30};
-  const user = {name: () => 'John Doe', username: () => 'johndoe', teamId: 'team'};
+  const user = new User('userId', 'domain');
+  user.name('John Doe');
+  user.username('johndoe');
+  user.teamId = 'team';
+
+  const selfClientId = 'clientId';
+
   const coreMock = container.resolve(Core);
 
   beforeEach(() => {
@@ -70,17 +79,21 @@ describe('E2EIHandler', () => {
     E2EIHandler.resetInstance();
     // Clear all mocks before each test
     jest.clearAllMocks();
-    EnrollmentStore.clear.deviceCreatedAt();
-    EnrollmentStore.clear.timer();
+
+    jest.spyOn(container.resolve(UserState), 'self').mockReturnValue(user);
+    const enrollmentStore = getEnrollmentStore(user.qualifiedId, selfClientId);
+
+    enrollmentStore.clear.deviceCreatedAt();
+    enrollmentStore.clear.timer();
 
     // Mock the Config to enable e2eIdentity
     (util.supportsMLS as jest.Mock).mockReturnValue(true);
 
     jest.spyOn(PrimaryModal, 'show');
 
-    jest.spyOn(container.resolve(UserState), 'self').mockReturnValue(user);
     OIDCServiceStore.store.targetURL('http://example.com');
     coreMock.key = new Uint8Array();
+    (coreMock as any).clientId = selfClientId;
   });
 
   it('should create instance with valid params', async () => {
@@ -163,7 +176,9 @@ describe('E2EIHandler', () => {
     const conversationState = container.resolve(ConversationState);
     jest.spyOn(conversationState, 'getSelfMLSConversation').mockReturnValue(new Conversation() as any);
 
-    EnrollmentStore.store.e2eiActivatedAt(Date.now());
+    const enrollmentStore = getEnrollmentStore({id: 'userId', domain: 'domain'}, 'clientId');
+    enrollmentStore.store.e2eiActivatedAt(Date.now());
+
     jest.spyOn(coreMock.service!.e2eIdentity!, 'isEnrollmentInProgress').mockResolvedValue(false);
     jest.spyOn(coreMock.service!.e2eIdentity!, 'isFreshMLSSelfClient').mockResolvedValue(false);
     jest
@@ -177,5 +192,57 @@ describe('E2EIHandler', () => {
     await instance.startTimers();
 
     expect(taskMock).toHaveBeenCalledWith(expect.objectContaining({key: 'enrollmentTimer'}));
+  });
+
+  describe('startTimers()', () => {
+    describe('should start enrollment for existing devices', () => {
+      it('without existing WireIdentity', async () => {
+        jest.spyOn(coreMock.service!.e2eIdentity!, 'isEnrollmentInProgress').mockResolvedValue(false);
+        jest.spyOn(coreMock.service!.e2eIdentity!, 'isFreshMLSSelfClient').mockResolvedValue(false);
+        jest.spyOn(e2EIdentityVerification, 'getActiveWireIdentity').mockResolvedValue(undefined);
+
+        const instance = await E2EIHandler.getInstance().initialize(params);
+
+        const taskSchedulerMock = jest.spyOn(LowPrecisionTaskScheduler, 'addTask');
+        const primaryModalMock = jest.spyOn(PrimaryModal, 'show');
+
+        await instance.startTimers();
+
+        expect(taskSchedulerMock).not.toHaveBeenCalled();
+        expect(primaryModalMock).toHaveBeenCalled();
+      });
+
+      it('with pristine WireIdentity', async () => {
+        jest.spyOn(coreMock.service!.e2eIdentity!, 'isEnrollmentInProgress').mockResolvedValue(false);
+        jest.spyOn(coreMock.service!.e2eIdentity!, 'isFreshMLSSelfClient').mockResolvedValue(false);
+        jest.spyOn(e2EIdentityVerification, 'getActiveWireIdentity').mockResolvedValue({
+          x509Identity: {
+            certificate: '',
+            displayName: 'John Doe',
+            domain: 'domain',
+            handle: 'johndoe',
+            notAfter: BigInt(0),
+            notBefore: BigInt(0),
+            serialNumber: '',
+          },
+          thumbprint: '',
+          credentialType: CredentialType.X509,
+          status: e2EIdentityVerification.MLSStatuses.NOT_ACTIVATED,
+          clientId: selfClientId,
+          deviceId: selfClientId,
+          qualifiedUserId: {id: 'userId', domain: 'domain'},
+        });
+
+        const instance = await E2EIHandler.getInstance().initialize(params);
+
+        const taskSchedulerMock = jest.spyOn(LowPrecisionTaskScheduler, 'addTask');
+        const primaryModalMock = jest.spyOn(PrimaryModal, 'show');
+
+        await instance.startTimers();
+
+        expect(taskSchedulerMock).not.toHaveBeenCalled();
+        expect(primaryModalMock).toHaveBeenCalled();
+      });
+    });
   });
 });

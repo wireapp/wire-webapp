@@ -17,10 +17,10 @@
  *
  */
 
+import {waitFor} from '@testing-library/react';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {FeatureList, FeatureStatus} from '@wireapp/api-client/lib/team';
 import {FEATURE_KEY} from '@wireapp/api-client/lib/team/feature';
-import {act} from 'react-dom/test-utils';
 import {container} from 'tsyringe';
 
 import {TestFactory} from 'test/helper/TestFactory';
@@ -68,12 +68,12 @@ describe('SelfRepository', () => {
       jest.spyOn(SelfSupportedProtocols, 'evaluateSelfSupportedProtocols').mockResolvedValueOnce(evaluatedProtocols);
       jest.spyOn(selfRepository['selfService'], 'putSupportedProtocols');
 
-      await act(async () => {
-        await selfRepository.initialisePeriodicSelfSupportedProtocolsCheck();
-      });
+      void selfRepository.initialisePeriodicSelfSupportedProtocolsCheck();
 
-      expect(selfUser.supportedProtocols()).toEqual(evaluatedProtocols);
-      expect(selfRepository['selfService'].putSupportedProtocols).toHaveBeenCalledWith(evaluatedProtocols);
+      await waitFor(() => {
+        expect(selfUser.supportedProtocols()).toEqual(evaluatedProtocols);
+        expect(selfRepository['selfService'].putSupportedProtocols).toHaveBeenCalledWith(evaluatedProtocols);
+      });
     });
 
     it("Does not update supported protocols if they didn't change", async () => {
@@ -109,9 +109,7 @@ describe('SelfRepository', () => {
       jest.spyOn(SelfSupportedProtocols, 'evaluateSelfSupportedProtocols').mockResolvedValueOnce(evaluatedProtocols);
       jest.spyOn(core.recurringTaskScheduler, 'registerTask');
 
-      await act(async () => {
-        await selfRepository.initialisePeriodicSelfSupportedProtocolsCheck();
-      });
+      await selfRepository.initialisePeriodicSelfSupportedProtocolsCheck();
 
       expect(core.recurringTaskScheduler.registerTask).toHaveBeenCalledWith({
         every: TIME_IN_MILLIS.DAY,
@@ -144,9 +142,7 @@ describe('SelfRepository', () => {
 
       const expectedClients = [...initialClients].filter(client => client.id !== clientToDelete.id);
 
-      await act(async () => {
-        await selfRepository.deleteSelfUserClient(clientToDelete.id);
-      });
+      await selfRepository.deleteSelfUserClient(clientToDelete.id);
 
       expect(selfUser.devices()).toEqual(expectedClients);
       expect(selfRepository.refreshSelfSupportedProtocols).toHaveBeenCalled();

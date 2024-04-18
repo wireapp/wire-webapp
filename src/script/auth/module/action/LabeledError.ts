@@ -38,5 +38,6 @@ export class LabeledError extends Error {
 
   static GENERAL_ERRORS = {
     LOW_DISK_SPACE: 'low-disk-space',
+    SYSTEM_KEYCHAIN_ACCESS: 'system-keychain-access',
   };
 }

@@ -77,21 +77,15 @@ export class ActionsViewModel {
 
   /**
    * @param userEntity User to block
-   * @param hideConversation Hide current conversation
-   * @param nextConversationEntity Conversation to be switched to
    * @returns Resolves when the user was blocked
    */
-  readonly blockUser = (
-    userEntity: User,
-    hideConversation?: boolean,
-    nextConversationEntity?: Conversation,
-  ): Promise<void> => {
+  readonly blockUser = (userEntity: User): Promise<void> => {
     // TODO: Does the promise resolve when there is no primary action (i.e. cancel button gets clicked)?
     return new Promise(resolve => {
       PrimaryModal.show(PrimaryModal.type.CONFIRM, {
         primaryAction: {
           action: async () => {
-            await this.connectionRepository.blockUser(userEntity, hideConversation, nextConversationEntity);
+            await this.connectionRepository.blockUser(userEntity);
             resolve();
           },
           text: t('modalUserBlockAction'),
@@ -336,7 +330,7 @@ export class ActionsViewModel {
   };
 
   getOrCreate1to1Conversation = async (userEntity: User): Promise<Conversation> => {
-    const conversationEntity = await this.conversationRepository.getInitialised1To1Conversation(userEntity);
+    const conversationEntity = await this.conversationRepository.getInitialised1To1Conversation(userEntity.qualifiedId);
     if (conversationEntity) {
       return conversationEntity;
     }
@@ -431,7 +425,9 @@ export class ActionsViewModel {
         primaryAction: {
           action: async () => {
             await this.connectionRepository.unblockUser(userEntity);
-            const conversationEntity = await this.conversationRepository.getInitialised1To1Conversation(userEntity);
+            const conversationEntity = await this.conversationRepository.getInitialised1To1Conversation(
+              userEntity.qualifiedId,
+            );
             resolve();
             if (conversationEntity) {
               await this.conversationRepository.updateParticipatingUserEntities(conversationEntity);

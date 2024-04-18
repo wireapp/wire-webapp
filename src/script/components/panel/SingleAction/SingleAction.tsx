@@ -33,11 +33,17 @@ export interface MenuItem {
 export interface SingleActionProps {
   item: MenuItem;
   onCancel: (action: any) => void;
+  oneButtonPerRow?: boolean;
 }
 
-const SingleAction = ({item, onCancel}: SingleActionProps) => {
+const SingleAction = ({item, onCancel, oneButtonPerRow = false}: SingleActionProps) => {
   return (
-    <FlexBox justify="space-evenly" className="modal__buttons">
+    <FlexBox
+      flexWrap={oneButtonPerRow ? 'wrap-reverse' : 'nowrap'}
+      css={{rowGap: '8px'}}
+      justify="space-evenly"
+      className="modal__buttons"
+    >
       <Button
         variant={ButtonVariant.SECONDARY}
         onClick={onCancel}

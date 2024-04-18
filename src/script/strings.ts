@@ -350,7 +350,7 @@ export const joinGuestLinkPasswordModalStrings = defineMessages({
     id: 'guestLinkPasswordModal.headline',
   },
   headlineDefault: {
-    defaultMessage: '[Group Conversation] \n Enter password',
+    defaultMessage: 'Enter password',
     id: 'guestLinkPasswordModal.headlineDefault',
   },
   description: {
@@ -680,6 +680,10 @@ export const errorHandlerStrings = defineMessages({
   [LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE]: {
     defaultMessage: 'Not enough disk space',
     id: 'LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE',
+  },
+  [LabeledError.GENERAL_ERRORS.SYSTEM_KEYCHAIN_ACCESS]: {
+    defaultMessage: 'Wire could not access your system safe storage. {supportKeychainLink}',
+    id: 'LabeledError.GENERAL_ERRORS.SYSTEM_KEYCHAIN_ACCESS',
   },
   [BackendErrorLabel.CUSTOM_BACKEND_NOT_FOUND]: {
     defaultMessage: 'This email cannot be used for enterprise login. Please enter the SSO code to proceed.',

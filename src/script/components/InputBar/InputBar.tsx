@@ -355,14 +355,14 @@ export const InputBar = ({
 
     if (isE2EIDegraded) {
       PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-        primaryAction: {
+        secondaryAction: {
           action: () => {
             conversation.mlsVerificationState(ConversationVerificationState.UNVERIFIED);
             sendMessage();
           },
           text: t('conversation.E2EISendAnyway'),
         },
-        secondaryAction: {
+        primaryAction: {
           action: () => {},
           text: t('conversation.E2EICancel'),
         },
@@ -446,12 +446,14 @@ export const InputBar = ({
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REPLY, replyMessage);
     amplify.subscribe(WebAppEvents.EXTENSIONS.GIPHY.SEND, sendGiphy);
     amplify.subscribe(WebAppEvents.SHORTCUT.PING, onPingClick);
+    conversation.isTextInputReady(true);
 
     return () => {
       amplify.unsubscribeAll(WebAppEvents.SHORTCUT.PING);
       amplify.unsubscribeAll(WebAppEvents.CONVERSATION.IMAGE.SEND);
       amplify.unsubscribeAll(WebAppEvents.CONVERSATION.MESSAGE.REPLY);
       amplify.unsubscribeAll(WebAppEvents.EXTENSIONS.GIPHY.SEND);
+      conversation.isTextInputReady(false);
     };
   }, []);
 

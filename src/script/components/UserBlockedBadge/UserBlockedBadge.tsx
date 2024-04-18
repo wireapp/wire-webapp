@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2023 Wire Swiss GmbH
+ * Copyright (C) 2024 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,24 +17,10 @@
  *
  */
 
-import {CSSObject} from '@emotion/serialize';
+import {t} from 'Util/LocalizerUtil';
 
-interface Styles {
-  content: CSSObject;
-  modalWrapper: CSSObject;
-}
+import {wrapper} from './UserBlockedBadge.styles';
 
-export const styles: Styles = {
-  modalWrapper: {
-    maxWidth: '460px',
-    width: '100%',
-  },
-  content: {
-    overflow: 'auto',
-    maxHeight: '251px',
-    fontSize: 'var(--font-size-small)',
-    letterSpacing: '0.05px',
-    lineHeight: 'var(--line-height-md)',
-    wordBreak: 'break-word',
-  },
+export const UserBlockedBadge = () => {
+  return <span css={wrapper}>{t('userBlockedConnectionBadge')}</span>;
 };

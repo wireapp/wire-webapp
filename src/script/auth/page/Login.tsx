@@ -63,6 +63,7 @@ import {Page} from './Page';
 import {Config} from '../../Config';
 import {loginStrings, verifyStrings} from '../../strings';
 import {AppAlreadyOpen} from '../component/AppAlreadyOpen';
+import {Exception} from '../component/Exception';
 import {JoinGuestLinkPasswordModal} from '../component/JoinGuestLinkPasswordModal';
 import {LoginForm} from '../component/LoginForm';
 import {RouterLink} from '../component/RouterLink';
@@ -229,6 +230,7 @@ const LoginComponent = ({
           await doLoginAndJoin(login, conversationKey, conversationCode, undefined, getEntropy, conversationPassword);
         } catch (error) {
           if (isBackendError(error) && error.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD) {
+            await resetAuthError();
             setConversationSubmitData(formLoginData);
             setIsLinkPasswordModalOpen(true);
             return;
@@ -283,7 +285,8 @@ const LoginComponent = ({
           }
           case BackendErrorLabel.INVALID_CREDENTIALS:
           case BackendErrorLabel.ACCOUNT_SUSPENDED:
-          case LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE: {
+          case LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE:
+          case LabeledError.GENERAL_ERRORS.SYSTEM_KEYCHAIN_ACCESS: {
             break;
           }
           default: {
@@ -436,7 +439,7 @@ const LoginComponent = ({
                         {validationErrors.length ? (
                           parseValidationErrors(validationErrors)
                         ) : authError ? (
-                          parseError(authError)
+                          <Exception errors={[authError]} />
                         ) : (
                           <div style={{marginTop: '4px'}}>&nbsp;</div>
                         )}

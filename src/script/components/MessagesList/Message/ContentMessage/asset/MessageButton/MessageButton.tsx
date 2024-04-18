@@ -17,15 +17,12 @@
  *
  */
 
-import React from 'react';
+import {Button, ButtonVariant, COLOR} from '@wireapp/react-ui-kit';
 
-import classNames from 'classnames';
-
-import {Icon} from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {noop} from 'Util/util';
 
-import type {CompositeMessage} from '../../../../../entity/message/CompositeMessage';
+import type {CompositeMessage} from '../../../../../../entity/message/CompositeMessage';
 
 export interface MessageButtonProps {
   id: string;
@@ -34,7 +31,7 @@ export interface MessageButtonProps {
   onClick?: () => void;
 }
 
-const MessageButton: React.FC<MessageButtonProps> = ({id, label, message, onClick = noop}) => {
+export const MessageButton = ({id, label, message, onClick = noop}: MessageButtonProps) => {
   const {errorButtonId, errorMessage, selectedButtonId, waitingButtonId} = useKoSubscribableChildren(message, [
     'errorButtonId',
     'errorMessage',
@@ -48,26 +45,21 @@ const MessageButton: React.FC<MessageButtonProps> = ({id, label, message, onClic
 
   return (
     <>
-      <button
-        type="button"
-        className={classNames('message-button', {
-          'message-button--selected': isSelected,
-        })}
+      <Button
+        variant={ButtonVariant.SECONDARY}
         onClick={onClick}
         data-uie-name={label}
         data-uie-uid={id}
         data-uie-selected={isSelected}
         data-uie-waiting={isWaiting}
+        showLoading={isWaiting}
+        isActive={isSelected}
+        loadingColor={COLOR.GRAY}
+        style={{maxWidth: '400px', width: '100%', marginTop: '8px', marginBottom: 0}}
       >
-        <span>{label}</span>
-        <div
-          className={classNames('message-button__waiting-overlay', {
-            'message-button__waiting-overlay--visible': isWaiting,
-          })}
-        >
-          <Icon.Loading data-uie-name="message-button-loading-icon" />
-        </div>
-      </button>
+        {label}
+      </Button>
+
       {hasError && errorMessage && (
         <div className="message-button__error" data-uie-name="message-button-error">
           {errorMessage}
@@ -76,5 +68,3 @@ const MessageButton: React.FC<MessageButtonProps> = ({id, label, message, onClic
     </>
   );
 };
-
-export {MessageButton};

@@ -23,6 +23,7 @@ import {
   CONVERSATION_EVENT,
 } from '@wireapp/api-client/lib/event';
 import {GenericMessageType} from '@wireapp/core/lib/conversation';
+import {container} from 'tsyringe';
 
 import {
   Asset,
@@ -54,7 +55,6 @@ import {getLogger, Logger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {base64ToArray, arrayToBase64} from 'Util/util';
 
-import {decryptAesAsset} from '../assets/AssetCrypto';
 import {AssetTransferState} from '../assets/AssetTransferState';
 import {ConversationEphemeralHandler} from '../conversation/ConversationEphemeralHandler';
 import {MessageAddEvent} from '../conversation/EventBuilder';
@@ -62,6 +62,7 @@ import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 import {CryptographyError} from '../error/CryptographyError';
 import {ClientEvent, CONVERSATION} from '../event/Client';
 import {StatusType} from '../message/StatusType';
+import {Core} from '../service/CoreSingleton';
 
 export interface MappedText {
   data: {content: string; mentions: string[]; previews: string[]; quote?: string; replacing_message_id?: string};
@@ -115,7 +116,7 @@ export class CryptographyMapper {
     };
   }
 
-  constructor() {
+  constructor(private readonly core = container.resolve(Core)) {
     this.logger = getLogger('CryptographyMapper');
   }
 
@@ -474,10 +475,12 @@ export class CryptographyMapper {
         throw new Error('Not all expected properties defined');
       }
       const cipherTextArray = base64ToArray(eventData.data);
-      const cipherText = cipherTextArray.buffer;
-      const keyBytes = new Uint8Array(otrKey).buffer;
-      const referenceSha256 = new Uint8Array(sha256).buffer;
-      const externalMessageBuffer = await decryptAesAsset(cipherText, keyBytes, referenceSha256);
+      const cipherText = cipherTextArray;
+      const externalMessageBuffer = await this.core.service!.asset.decryptAsset({
+        cipherText,
+        keyBytes: otrKey,
+        sha256,
+      });
       return GenericMessage.decode(new Uint8Array(externalMessageBuffer));
     } catch (error) {
       this.logger.error(`Failed to unwrap external message: ${error.message}`, error);

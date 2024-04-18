@@ -60,7 +60,7 @@ import {createUuid} from 'Util/uuid';
 import {NotificationRepository} from './NotificationRepository';
 
 import {AudioRepository} from '../audio/AudioRepository';
-import {CallState} from '../calling/CallState';
+import {CallingViewMode, CallState} from '../calling/CallState';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
 import {ConversationState} from '../conversation/ConversationState';
 import {Message} from '../entity/message/Message';
@@ -99,7 +99,6 @@ describe('NotificationRepository', () => {
   let calculateTitleLength: (sectionString: string) => number;
 
   let notification_content: any;
-  const contentViewModelState: any = {};
 
   beforeEach(() => {
     [notificationRepository] = buildNotificationRepository();
@@ -140,11 +139,6 @@ describe('NotificationRepository', () => {
 
     const {setContentState} = useAppState.getState();
     setContentState(ContentState.CONVERSATION);
-    contentViewModelState.multitasking = {
-      isMinimized: () => true,
-    };
-    notificationRepository.setContentViewModelStates(contentViewModelState.state, contentViewModelState.multitasking);
-
     const showNotificationSpy = jest.spyOn(notificationRepository as any, 'showNotification');
 
     calculateTitleLength = sectionString => {
@@ -266,13 +260,14 @@ describe('NotificationRepository', () => {
       conversationState.activeConversation(conversation);
       document.hasFocus = () => true;
       spyOn(callState, 'joinedCall').and.returnValue(true);
+      jest.spyOn(callState, 'viewMode').mockReturnValueOnce(CallingViewMode.MINIMIZED);
 
       return notificationRepository
         .notify(message, undefined, conversation)
         .then(() => {
           expect(notificationRepository['showNotification']).not.toHaveBeenCalled();
 
-          contentViewModelState.multitasking.isMinimized = () => false;
+          jest.spyOn(callState, 'viewMode').mockReturnValueOnce(CallingViewMode.FULL_SCREEN_GRID);
 
           return notificationRepository.notify(message, undefined, conversation);
         })

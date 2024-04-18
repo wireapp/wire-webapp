@@ -17,12 +17,7 @@
  *
  */
 
-import {
-  CONVERSATION_TYPE,
-  ConversationProtocol,
-  MessageSendingStatus,
-  QualifiedUserClients,
-} from '@wireapp/api-client/lib/conversation';
+import {ConversationProtocol, MessageSendingStatus, QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import {QualifiedId, RequestCancellationError} from '@wireapp/api-client/lib/user';
 import {
@@ -609,7 +604,6 @@ export class MessageRepository {
   private async sendAssetRemotedata(conversation: Conversation, file: Blob, messageId: string, asImage: boolean) {
     const retention = this.assetRepository.getAssetRetention(this.userState.self(), conversation);
     const options = {
-      expectsReadConfirmation: this.expectReadReceipt(conversation),
       legalHoldStatus: conversation.legalHoldStatus(),
       public: true,
       retention,
@@ -619,10 +613,23 @@ export class MessageRepository {
     );
 
     const metadata = asImage ? ((await buildMetadata(file)) as ImageMetadata) : undefined;
+    const commonMessageData = {
+      asset: asset,
+      expectsReadConfirmation: this.expectReadReceipt(conversation),
+    };
     const assetMessage = metadata
-      ? MessageBuilder.buildImageMessage({asset: asset, image: metadata}, messageId)
+      ? MessageBuilder.buildImageMessage(
+          {
+            ...commonMessageData,
+            image: metadata,
+          },
+          messageId,
+        )
       : MessageBuilder.buildFileDataMessage(
-          {asset: asset, file: {data: Buffer.from(await file.arrayBuffer())}},
+          {
+            ...commonMessageData,
+            file: {data: Buffer.from(await file.arrayBuffer())},
+          },
           messageId,
         );
     return this.sendAndInjectMessage(assetMessage, conversation, {enableEphemeral: true, syncTimestamp: false});
@@ -816,15 +823,7 @@ export class MessageRepository {
     // Configure ephemeral messages
     conversationService.messageTimer.setConversationLevelTimer(conversation.id, conversation.messageTimer());
 
-    const isMLS = isMLSConversation(conversation);
-    const is1to1 = conversation.type() === CONVERSATION_TYPE.ONE_TO_ONE;
-
-    //Before sending a message in MLS 1:1 conversation we need to make sure that the group is established
-    if (isMLS && is1to1) {
-      await this.conversationRepositoryProvider().makeSureMLS1to1ConversationIsEstablished(conversation);
-    }
-
-    const sendOptions: Parameters<typeof conversationService.send>[0] = isMLS
+    const sendOptions: Parameters<typeof conversationService.send>[0] = isMLSConversation(conversation)
       ? {
           groupId: conversation.groupId,
           payload,

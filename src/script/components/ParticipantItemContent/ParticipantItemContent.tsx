@@ -19,7 +19,10 @@
 
 import React from 'react';
 
+import ko from 'knockout';
+
 import {Icon} from 'Components/Icon';
+import {UserBlockedBadge} from 'Components/UserBlockedBadge/UserBlockedBadge';
 import {UserInfo} from 'Components/UserInfo';
 import {UserVerificationBadges} from 'Components/VerificationBadge';
 import {User} from 'src/script/entity/User';
@@ -54,6 +57,8 @@ export interface ParticipantItemContentProps {
   isMLSVerified?: boolean;
 }
 
+const servicePlaceholder = {isBlocked: ko.observable(false)};
+
 export const ParticipantItemContent = ({
   groupId,
   participant,
@@ -68,6 +73,8 @@ export const ParticipantItemContent = ({
 
   const isService = participant instanceof ServiceEntity;
 
+  const {isBlocked} = useKoSubscribableChildren(!isService ? participant : servicePlaceholder, ['isBlocked']);
+
   return (
     <div css={wrapper}>
       <div css={contentText}>
@@ -81,6 +88,11 @@ export const ParticipantItemContent = ({
               showAvailability={showAvailabilityState && selfInTeam}
             >
               <UserVerificationBadges user={participant} groupId={groupId} />
+              {isBlocked && (
+                <span css={{marginLeft: 4}}>
+                  <UserBlockedBadge />
+                </span>
+              )}
             </UserInfo>
           ) : (
             <>

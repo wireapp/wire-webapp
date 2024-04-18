@@ -48,12 +48,11 @@ import {GroupVideoGrid} from './GroupVideoGrid';
 import {Pagination} from './Pagination';
 
 import type {Call} from '../../calling/Call';
-import {MuteState} from '../../calling/CallState';
+import {CallingViewMode, CallState, MuteState} from '../../calling/CallState';
 import type {Participant} from '../../calling/Participant';
 import type {Grid} from '../../calling/videoGridHandler';
 import type {Conversation} from '../../entity/Conversation';
 import {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../media/MediaDevicesHandler';
-import type {Multitasking} from '../../notification/NotificationRepository';
 import {useAppState} from '../../page/useAppState';
 import {TeamState} from '../../team/TeamState';
 import {CallViewTab, CallViewTabs} from '../../view_model/CallingViewModel';
@@ -69,7 +68,6 @@ export interface FullscreenVideoCallProps {
   leave: (call: Call) => void;
   maximizedParticipant: Participant | null;
   mediaDevicesHandler: MediaDevicesHandler;
-  multitasking: Multitasking;
   muteState: MuteState;
   setActiveCallViewTab: (tab: CallViewTab) => void;
   setMaximizedParticipant: (call: Call, participant: Participant | null) => void;
@@ -77,6 +75,7 @@ export interface FullscreenVideoCallProps {
   switchMicrophoneInput: (deviceId: string) => void;
   switchSpeakerOutput: (deviceId: string) => void;
   teamState?: TeamState;
+  callState?: CallState;
   toggleCamera: (call: Call) => void;
   toggleMute: (call: Call, muteState: boolean) => void;
   toggleScreenshare: (call: Call) => void;
@@ -96,7 +95,6 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   isMuted,
   muteState,
   mediaDevicesHandler,
-  multitasking,
   videoGrid,
   maximizedParticipant,
   activeCallViewTab,
@@ -111,6 +109,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   leave,
   changePage,
   teamState = container.resolve(TeamState),
+  callState = container.resolve(CallState),
 }) => {
   const selfParticipant = call.getSelfParticipant();
   const {
@@ -149,7 +148,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   ]);
   const [audioOptionsOpen, setAudioOptionsOpen] = React.useState(false);
   const [videoOptionsOpen, setVideoOptionsOpen] = React.useState(false);
-  const minimize = () => multitasking.isMinimized(true);
+  const minimize = () => callState.viewMode(CallingViewMode.MINIMIZED);
 
   const showToggleVideo =
     isVideoCallingEnabled &&

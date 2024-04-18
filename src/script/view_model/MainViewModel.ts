@@ -17,7 +17,6 @@
  *
  */
 
-import ko from 'knockout';
 import {container} from 'tsyringe';
 
 import {ActionsViewModel} from './ActionsViewModel';
@@ -38,7 +37,7 @@ import type {EventRepository} from '../event/EventRepository';
 import type {GiphyRepository} from '../extension/GiphyRepository';
 import type {IntegrationRepository} from '../integration/IntegrationRepository';
 import type {MediaRepository} from '../media/MediaRepository';
-import type {Multitasking, NotificationRepository} from '../notification/NotificationRepository';
+import type {NotificationRepository} from '../notification/NotificationRepository';
 import type {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
 import type {PermissionRepository} from '../permission/PermissionRepository';
 import type {PropertiesRepository} from '../properties/PropertiesRepository';
@@ -84,7 +83,6 @@ export class MainViewModel {
   calling: CallingViewModel;
   content: ContentViewModel;
   list: ListViewModel;
-  multitasking: Multitasking;
   private readonly core = container.resolve(Core);
 
   static get CONFIG() {
@@ -102,10 +100,6 @@ export class MainViewModel {
 
   constructor(repositories: ViewModelRepositories) {
     const userState = container.resolve(UserState);
-
-    this.multitasking = {
-      isMinimized: ko.observable(true),
-    };
 
     this.actions = new ActionsViewModel(
       repositories.self,
@@ -126,7 +120,6 @@ export class MainViewModel {
       repositories.team,
       repositories.properties,
       userState.self,
-      this.multitasking,
     );
     this.content = new ContentViewModel(this, repositories);
     this.list = new ListViewModel(this, repositories);

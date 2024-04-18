@@ -1,4 +1,3 @@
-chrome >= 51
-firefox >= 60
-edge >= 15
-opera >= 43
+chrome >= 99, not dead
+firefox >= 99, not dead
+edge >= 99, not dead

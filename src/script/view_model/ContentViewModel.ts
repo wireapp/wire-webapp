@@ -18,6 +18,7 @@
  */
 
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
+import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
@@ -56,7 +57,7 @@ interface ShowConversationOptions {
 
 interface ShowConversationOverload {
   (conversation: Conversation | undefined, options: ShowConversationOptions): Promise<void>;
-  (conversationId: string, options: ShowConversationOptions, domain: string | null): Promise<void>;
+  (conversationId: QualifiedId, options: ShowConversationOptions): Promise<void>;
 }
 
 export class ContentViewModel {
@@ -139,12 +140,11 @@ export class ContentViewModel {
   }
 
   private readonly getConversationEntity = async (
-    conversation: Conversation | string,
-    domain: string | null = null,
-  ): Promise<Conversation> => {
+    conversation: Conversation | QualifiedId,
+  ): Promise<Conversation | null> => {
     const conversationEntity = isConversationEntity(conversation)
       ? conversation
-      : await this.conversationRepository.getConversationById({domain: domain || '', id: conversation});
+      : await this.conversationRepository.getConversationById(conversation);
 
     if (!conversationEntity.is1to1()) {
       return conversationEntity;
@@ -219,25 +219,8 @@ export class ContentViewModel {
     );
   }
 
-  private showConversationWithBlockedUserErrorModal(): void {
-    PrimaryModal.show(
-      PrimaryModal.type.ACKNOWLEDGE,
-      {
-        text: {
-          message: t('conversationWithBlockedUserMessage'),
-          title: t('conversationWithBlockedUserTitle'),
-        },
-      },
-      undefined,
-    );
-  }
-
   private isConversationNotFoundError(error: any): boolean {
     return error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;
-  }
-
-  private isConversationWithBlockedUserError(error: any): boolean {
-    return error.type === ConversationError.TYPE.CONVERSATION_WITH_BLOCKED_USER;
   }
 
   /**
@@ -250,9 +233,8 @@ export class ContentViewModel {
    * @param domain Domain name
    */
   readonly showConversation: ShowConversationOverload = async (
-    conversation: Conversation | string | undefined,
+    conversation: Conversation | QualifiedId | undefined,
     options: ShowConversationOptions,
-    domain: string | null = null,
   ) => {
     const {
       exposeMessage: exposeMessageEntity,
@@ -265,22 +247,13 @@ export class ContentViewModel {
     }
 
     try {
-      const conversationEntity = await this.getConversationEntity(conversation, domain);
-      const isConnectionBlocked = conversationEntity?.connection()?.isBlocked();
+      const conversationEntity = await this.getConversationEntity(conversation);
 
       if (!conversationEntity) {
         this.closeRightSidebar();
         throw new ConversationError(
           ConversationError.TYPE.CONVERSATION_NOT_FOUND,
           ConversationError.MESSAGE.CONVERSATION_NOT_FOUND,
-        );
-      }
-
-      if (isConnectionBlocked) {
-        this.closeRightSidebar();
-        throw new ConversationError(
-          ConversationError.TYPE.CONVERSATION_WITH_BLOCKED_USER,
-          ConversationError.MESSAGE.CONVERSATION_WITH_BLOCKED_USER,
         );
       }
 
@@ -304,10 +277,6 @@ export class ContentViewModel {
     } catch (error: any) {
       if (this.isConversationNotFoundError(error)) {
         return this.showConversationNotFoundErrorModal();
-      }
-
-      if (this.isConversationWithBlockedUserError(error)) {
-        return this.showConversationWithBlockedUserErrorModal();
       }
 
       throw error;

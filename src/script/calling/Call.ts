@@ -31,6 +31,7 @@ import {MuteState} from './CallState';
 import {ClientId, Participant} from './Participant';
 
 import {Config} from '../Config';
+import {Conversation} from '../entity/Conversation';
 import type {MediaDevicesHandler} from '../media/MediaDevicesHandler';
 
 export type SerializedConversationId = string;
@@ -83,7 +84,7 @@ export class Call {
 
   constructor(
     public readonly initiator: QualifiedId,
-    public readonly conversationId: QualifiedId,
+    public readonly conversation: Conversation,
     public readonly conversationType: CONV_TYPE,
     private readonly selfParticipant: Participant,
     callType: CALL_TYPE,

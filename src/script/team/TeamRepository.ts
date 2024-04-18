@@ -22,6 +22,7 @@ import type {
   TeamConversationDeleteEvent,
   TeamDeleteEvent,
   TeamEvent,
+  TeamFeatureConfigurationUpdateEvent,
   TeamMemberLeaveEvent,
 } from '@wireapp/api-client/lib/event';
 import {TEAM_EVENT} from '@wireapp/api-client/lib/event/TeamEvent';
@@ -149,9 +150,9 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     const prevFeatureList = this.teamState.teamFeatures();
     const newFeatureList = await this.teamService.getAllTeamFeatures();
 
-    this.emit('featureConfigUpdated', {prevFeatureList, newFeatureList});
-
     this.teamState.teamFeatures(newFeatureList);
+
+    this.emit('featureConfigUpdated', {prevFeatureList, newFeatureList});
 
     return {
       newFeatureList,
@@ -160,14 +161,17 @@ export class TeamRepository extends TypedEventEmitter<Events> {
   }
 
   private readonly scheduleTeamRefresh = (): void => {
-    window.setInterval(async () => {
+    const updateTeam = async () => {
       try {
         await this.getTeam();
         await this.updateFeatureConfig();
       } catch (error) {
         this.logger.error(error);
       }
-    }, TIME_IN_MILLIS.SECOND * 30);
+    };
+    // We want to poll the latest team data every time the app is focused and every day
+    window.addEventListener('focus', updateTeam);
+    window.setInterval(updateTeam, TIME_IN_MILLIS.DAY);
   };
 
   private async getInitialTeamMembers(teamId: string): Promise<TeamMemberEntity[]> {
@@ -276,6 +280,10 @@ export class TeamRepository extends TypedEventEmitter<Events> {
         this.onMemberLeave(eventJson);
         break;
       }
+      case TEAM_EVENT.FEATURE_CONFIG_UPDATE: {
+        await this.onFeatureConfigUpdate(eventJson, source);
+        break;
+      }
       case TEAM_EVENT.CONVERSATION_CREATE:
       default: {
         this.onUnhandled(eventJson);
@@ -366,6 +374,19 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     if (shouldFetchConfig) {
       await this.updateFeatureConfig();
     }
+  };
+
+  private readonly onFeatureConfigUpdate = async (
+    event: TeamFeatureConfigurationUpdateEvent,
+    source: EventSource,
+  ): Promise<void> => {
+    if (source !== EventSource.WEBSOCKET) {
+      // Ignore notification stream events
+      return;
+    }
+
+    // When we receive a `feature-config.update` event, we will refetch the entire feature config
+    await this.updateFeatureConfig();
   };
 
   private onMemberLeave(eventJson: TeamMemberLeaveEvent): void {

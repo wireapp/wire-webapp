@@ -47,7 +47,6 @@ import type {Message} from './message/Message';
 import {PingMessage} from './message/PingMessage';
 import type {User} from './User';
 
-import type {Call} from '../calling/Call';
 import {ClientRepository} from '../client';
 import {Config} from '../Config';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
@@ -89,6 +88,8 @@ export class Conversation {
   public readonly readOnlyState: ko.Observable<CONVERSATION_READONLY_STATE | null>;
   private readonly incomingMessages: ko.ObservableArray<Message>;
   public readonly isProteusTeam1to1: ko.PureComputed<boolean>;
+  public readonly isConversationWithBlockedUser: ko.PureComputed<boolean>;
+  public readonly isReadOnlyConversation: ko.PureComputed<boolean>;
   public readonly last_server_timestamp: ko.Observable<number>;
   private readonly logger: Logger;
   public readonly mutedState: ko.Observable<number>;
@@ -101,7 +102,6 @@ export class Conversation {
   public readonly accessCodeHasPassword: ko.Observable<boolean | undefined>;
   public readonly accessState: ko.Observable<ACCESS_STATE>;
   public readonly archivedTimestamp: ko.Observable<number>;
-  public readonly call: ko.Observable<Call | null>;
   public readonly cleared_timestamp: ko.Observable<number>;
   public readonly connection: ko.Observable<ConnectionEntity | null>;
   // TODO(Federation): Currently the 'creator' just refers to a user id but it has to become a qualified id
@@ -127,8 +127,9 @@ export class Conversation {
   public readonly lastDeliveredMessage: ko.PureComputed<Message | undefined>;
   public readonly is_archived: ko.Observable<boolean>;
   public readonly is_cleared: ko.PureComputed<boolean>;
-  public readonly is_loaded: ko.Observable<boolean>;
-  public readonly is_pending: ko.Observable<boolean>;
+  /** Indicates if the conversation is currently loading messages into its state. */
+  public readonly isLoadingMessages: ko.Observable<boolean>;
+  public readonly isTextInputReady: ko.Observable<boolean>;
   public readonly is_verified: ko.PureComputed<boolean | undefined>;
   public readonly is1to1: ko.PureComputed<boolean>;
   public readonly isActiveParticipant: ko.PureComputed<boolean>;
@@ -150,7 +151,7 @@ export class Conversation {
   public readonly legalHoldStatus: ko.Observable<LegalHoldStatus>;
   public readonly localMessageTimer: ko.Observable<number>;
   public readonly messages_unordered: ko.ObservableArray<Message>;
-  public readonly messages_visible: ko.PureComputed<Message[]>;
+  /** Sorted messages that are ready to be displayed in the conversation */
   public readonly messages: ko.PureComputed<Message[]>;
   public readonly messageTimer: ko.PureComputed<number>;
   public readonly name: ko.Observable<string>;
@@ -204,8 +205,8 @@ export class Conversation {
     this.teamId = undefined;
     this.type = ko.observable();
 
-    this.is_loaded = ko.observable(false);
-    this.is_pending = ko.observable(false);
+    this.isLoadingMessages = ko.observable(false);
+    this.isTextInputReady = ko.observable(false);
 
     this.participating_user_ets = ko.observableArray([]); // Does not include self user
     this.participating_user_ids = ko.observableArray([]); // Does not include self user
@@ -242,6 +243,13 @@ export class Conversation {
         otherMembersLength: this.participating_user_ids().length,
       }),
     );
+
+    this.isConversationWithBlockedUser = ko.pureComputed(() => !!this.connection()?.isBlocked());
+
+    this.isReadOnlyConversation = ko.pureComputed(
+      () => this.isConversationWithBlockedUser() || this.readOnlyState() !== null,
+    );
+
     this.isGroup = ko.pureComputed(() => {
       const isGroupConversation = this.type() === CONVERSATION_TYPE.REGULAR;
       return isGroupConversation && !this.isProteusTeam1to1();
@@ -292,8 +300,6 @@ export class Conversation {
     this.last_read_timestamp = ko.observable(0);
     this.last_server_timestamp = ko.observable(0);
     this.mutedTimestamp = ko.observable(0);
-
-    this.call = ko.observable(null);
 
     this.readOnlyState = ko.observable<CONVERSATION_READONLY_STATE | null>(null);
 
@@ -425,10 +431,6 @@ export class Conversation {
     this.hasContentMessages = ko.observable(
       [...this.messages(), ...this.incomingMessages()].some(message => message.isContent()),
     );
-
-    this.messages_visible = ko
-      .pureComputed(() => (!this.id ? [] : this.messages().filter(messageEntity => messageEntity.visible())))
-      .extend({trackArrayChanges: true});
 
     // Calling
     this.unreadState = ko.pureComputed(() => {
@@ -606,13 +608,19 @@ export class Conversation {
   }
 
   /**
-   * Remove all message from conversation unless there are unread messages.
+   * Remove all the messages from conversation.
+   * If there are any incoming messages, they will be moved to the regular messages.
    */
   release(): void {
+    this.messages_unordered.removeAll();
+
     if (!this.unreadState().allEvents.length) {
-      this.removeMessages();
-      this.is_loaded(false);
       this.hasAdditionalMessages(true);
+    }
+
+    if (this.incomingMessages().length) {
+      this.messages_unordered.push(...this.incomingMessages());
+      this.incomingMessages.removeAll();
     }
   }
 
@@ -701,6 +709,7 @@ export class Conversation {
       if (alreadyAdded) {
         return false;
       }
+
       if (this.hasLastReceivedMessageLoaded()) {
         this.updateTimestamps(messageEntity);
         this.incomingMessages.remove(({id}) => messageEntity.id === id);

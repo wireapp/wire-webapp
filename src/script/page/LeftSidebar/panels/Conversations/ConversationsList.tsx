@@ -82,7 +82,7 @@ export const ConversationsList = ({
 
   const hasJoinableCall = (conversation: Conversation) => {
     const call = joinableCalls.find((callInstance: Call) =>
-      matchQualifiedIds(callInstance.conversationId, conversation.qualifiedId),
+      matchQualifiedIds(callInstance.conversation.qualifiedId, conversation.qualifiedId),
     );
     if (!call) {
       return false;

@@ -31,14 +31,13 @@ import {FullscreenVideoCall} from './FullscreenVideoCall';
 
 import {Call} from '../../calling/Call';
 import {CallingRepository} from '../../calling/CallingRepository';
-import {CallState, MuteState} from '../../calling/CallState';
+import {CallingViewMode, CallState, MuteState} from '../../calling/CallState';
 import {LEAVE_CALL_REASON} from '../../calling/enum/LeaveCallReason';
 import {Participant} from '../../calling/Participant';
 import {useVideoGrid} from '../../calling/videoGridHandler';
 import {ConversationState} from '../../conversation/ConversationState';
 import {ElectronDesktopCapturerSource} from '../../media/MediaDevicesHandler';
 import {MediaRepository} from '../../media/MediaRepository';
-import {Multitasking} from '../../notification/NotificationRepository';
 import {CallViewTab} from '../../view_model/CallingViewModel';
 
 export interface CallingContainerProps {
@@ -46,18 +45,18 @@ export interface CallingContainerProps {
   readonly mediaRepository: MediaRepository;
   readonly callState?: CallState;
   readonly conversationState?: ConversationState;
-  readonly multitasking: Multitasking;
 }
 
 const CallingContainer: React.FC<CallingContainerProps> = ({
-  multitasking,
   mediaRepository,
   callingRepository,
   callState = container.resolve(CallState),
   conversationState = container.resolve(ConversationState),
 }) => {
   const {streamHandler: mediaStreamHandler, devicesHandler: mediaDevicesHandler} = mediaRepository;
-  const {isMinimized} = useKoSubscribableChildren(multitasking, ['isMinimized']);
+  const {viewMode} = useKoSubscribableChildren(callState, ['viewMode']);
+  const isMinimized = viewMode === CallingViewMode.MINIMIZED;
+
   const {activeCallViewTab, joinedCall, selectableScreens, selectableWindows, isChoosingScreen} =
     useKoSubscribableChildren(callState, [
       'activeCallViewTab',
@@ -77,10 +76,10 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
 
   useEffect(() => {
     if (currentCallState === CALL_STATE.MEDIA_ESTAB && joinedCall?.initialType === CALL_TYPE.VIDEO) {
-      multitasking.isMinimized(false);
+      callState.viewMode(CallingViewMode.FULL_SCREEN_GRID);
     }
     if (currentCallState === undefined) {
-      multitasking.isMinimized(true);
+      callState.viewMode(CallingViewMode.MINIMIZED);
     }
   }, [currentCallState]);
 
@@ -96,7 +95,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
   const {clearShowAlert} = useCallAlertState();
 
   const leave = (call: Call) => {
-    callingRepository.leaveCall(call.conversationId, LEAVE_CALL_REASON.MANUAL_LEAVE_BY_UI_CLICK);
+    callingRepository.leaveCall(call.conversation.qualifiedId, LEAVE_CALL_REASON.MANUAL_LEAVE_BY_UI_CLICK);
     callState.activeCallViewTab(CallViewTab.ALL);
     call.maximizedParticipant(null);
     clearShowAlert();
@@ -155,15 +154,15 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
 
     mediaStreamHandler.selectScreenToShare(showScreenSelection).then(() => {
       const isAudioCall = [CALL_TYPE.NORMAL, CALL_TYPE.FORCED_AUDIO].includes(call.initialType);
-      const isFullScreenVideoCall = call.initialType === CALL_TYPE.VIDEO && !multitasking.isMinimized();
+      const isFullScreenVideoCall = call.initialType === CALL_TYPE.VIDEO && !isMinimized;
       if (isAudioCall || isFullScreenVideoCall) {
-        multitasking.isMinimized(true);
+        callState.viewMode(CallingViewMode.MINIMIZED);
       }
       return callingRepository.toggleScreenshare(call);
     });
   };
 
-  const conversation = joinedCall && conversationState.findConversation(joinedCall.conversationId);
+  const conversation = joinedCall?.conversation;
 
   if (!joinedCall || !conversation || conversation.removed_from_conversation()) {
     return null;
@@ -173,12 +172,11 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
     <Fragment>
       {!isMinimized && !!videoGrid?.grid.length && (
         <FullscreenVideoCall
-          key={joinedCall.conversationId.id}
+          key={joinedCall.conversation.id}
           videoGrid={videoGrid}
           call={joinedCall}
           activeCallViewTab={activeCallViewTab}
           conversation={conversation}
-          multitasking={multitasking}
           canShareScreen={callingRepository.supportsScreenSharing}
           maximizedParticipant={maximizedParticipant}
           mediaDevicesHandler={mediaDevicesHandler}

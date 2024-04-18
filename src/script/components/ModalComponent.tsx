@@ -161,7 +161,7 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
           onClick={event => event.stopPropagation()}
           role="button"
           tabIndex={TabIndex.UNFOCUSABLE}
-          onKeyDown={noop}
+          onKeyDown={event => event.stopPropagation()}
           css={{...(hasVisibleClass ? ModalContentVisibleStyles : ModalContentStyles), ...wrapperCSS}}
         >
           {hasVisibleClass ? children : null}

@@ -21,8 +21,10 @@ import {forwardRef, useCallback, useEffect, useMemo, useState} from 'react';
 
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/';
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+import {amplify} from 'amplify';
 
 import {HideIcon} from '@wireapp/react-ui-kit';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Icon} from 'Components/Icon';
@@ -35,6 +37,7 @@ import {ServiceList} from 'Components/ServiceList/ServiceList';
 import {UserList} from 'Components/UserList';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
+import {replaceReactComponents} from 'Util/LocalizerUtil/ReactLocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 import {formatDuration} from 'Util/TimeUtil';
 
@@ -442,15 +445,32 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
                   <span className="panel__info-item__icon">{hasReceiptsEnabled ? <Icon.Read /> : <HideIcon />}</span>
 
                   <span>
-                    <span>
-                      <p>
-                        {hasReceiptsEnabled
-                          ? t('conversationDetails1to1ReceiptsHeadEnabled')
-                          : t('conversationDetails1to1ReceiptsHeadDisabled')}
-                      </p>
-                    </span>
+                    <p className="panel__action-item__status-title">
+                      {hasReceiptsEnabled
+                        ? t('conversationDetails1to1ReceiptsHeadEnabled')
+                        : t('conversationDetails1to1ReceiptsHeadDisabled')}
+                    </p>
                     <p className="panel__action-item__status">{t('conversationDetails1to1ReceiptsFirst')}</p>
-                    <p className="panel__action-item__status">{t('conversationDetails1to1ReceiptsSecond')}</p>
+                    <p className="panel__action-item__status">
+                      {replaceReactComponents(t('conversationDetails1to1ReceiptsSecond'), [
+                        {
+                          start: '[button]',
+                          end: '[/button]',
+                          render: text => (
+                            <button
+                              className="button-reset-default"
+                              css={{
+                                textDecoration: 'underline',
+                              }}
+                              key={text}
+                              onClick={() => amplify.publish(WebAppEvents.PREFERENCES.MANAGE_ACCOUNT)}
+                            >
+                              {text}
+                            </button>
+                          ),
+                        },
+                      ])}
+                    </p>
                   </span>
                 </div>
               )}

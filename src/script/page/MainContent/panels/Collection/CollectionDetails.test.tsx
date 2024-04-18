@@ -32,7 +32,7 @@ import {CollectionDetails} from './CollectionDetails';
 import {Text} from '../../../../entity/message/Text';
 
 jest.mock('Components/Image', () => ({
-  Image: () => <div>Image</div>,
+  AssetImage: () => <div>Image</div>,
   __esModule: true,
 }));
 jest.mock('Components/MessagesList/Message/ContentMessage/asset/AudioAsset', () => ({

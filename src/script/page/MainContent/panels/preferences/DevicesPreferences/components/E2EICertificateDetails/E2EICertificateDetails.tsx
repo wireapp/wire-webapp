@@ -17,17 +17,17 @@
  *
  */
 
-import {useState} from 'react';
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {CertificateDetailsModal} from 'Components/Modals/CertificateDetailsModal';
 import {VerificationBadges} from 'Components/VerificationBadge';
 import {E2EIHandler, MLSStatuses, WireIdentity} from 'src/script/E2EIdentity';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 
 import {styles} from './E2EICertificateDetails.styles';
+import {useCertificateDetailsModal} from './useCertificateDetailsModal';
 
 const logger = getLogger('E2EICertificateDetails');
 
@@ -37,11 +37,13 @@ interface E2EICertificateDetailsProps {
 }
 
 export const E2EICertificateDetails = ({identity, isCurrentDevice}: E2EICertificateDetailsProps) => {
-  const [isCertificateDetailsModalOpen, setIsCertificateDetailsModalOpen] = useState(false);
+  const certificate = identity?.x509Identity?.certificate;
+  const showModal = useCertificateDetailsModal(certificate ?? '');
 
   const certificateState = identity?.status ?? MLSStatuses.NOT_ACTIVATED;
   const isNotActivated = certificateState === MLSStatuses.NOT_ACTIVATED;
   const isValid = certificateState === MLSStatuses.VALID;
+  const hasCertificate = !!certificate && Boolean(certificate.length);
 
   const getCertificate = async () => {
     try {
@@ -65,33 +67,40 @@ export const E2EICertificateDetails = ({identity, isCurrentDevice}: E2EICertific
       </div>
 
       <div css={styles.buttonsGroup}>
-        {!isNotActivated && (
+        {!isNotActivated && hasCertificate && (
           <Button
             variant={ButtonVariant.TERTIARY}
-            onClick={() => setIsCertificateDetailsModalOpen(true)}
+            onClick={showModal}
             data-uie-name="show-certificate-details"
+            aria-label={t('E2EI.showCertificateDetails')}
+            tabIndex={TabIndex.FOCUSABLE}
           >
             {t('E2EI.showCertificateDetails')}
           </Button>
         )}
 
-        {isCertificateDetailsModalOpen && identity?.certificate && (
-          <CertificateDetailsModal
-            certificate={identity.certificate}
-            onClose={() => setIsCertificateDetailsModalOpen(false)}
-          />
-        )}
-
         {isCurrentDevice && (
           <>
             {isNotActivated && (
-              <Button variant={ButtonVariant.TERTIARY} onClick={getCertificate} data-uie-name="get-certificate">
+              <Button
+                variant={ButtonVariant.TERTIARY}
+                onClick={getCertificate}
+                data-uie-name="get-certificate"
+                aria-label={t('E2EI.getCertificate')}
+                tabIndex={TabIndex.FOCUSABLE}
+              >
                 {t('E2EI.getCertificate')}
               </Button>
             )}
 
-            {identity?.certificate && !isValid && (
-              <Button variant={ButtonVariant.TERTIARY} onClick={getCertificate} data-uie-name="update-certificate">
+            {certificate && !isValid && (
+              <Button
+                variant={ButtonVariant.TERTIARY}
+                onClick={getCertificate}
+                data-uie-name="update-certificate"
+                aria-label={t('E2EI.updateCertificate')}
+                tabIndex={TabIndex.FOCUSABLE}
+              >
                 {t('E2EI.updateCertificate')}
               </Button>
             )}

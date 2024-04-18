@@ -88,8 +88,6 @@ export const AppMain: FC<AppMainProps> = ({
     throw new Error('API Context has not been set');
   }
 
-  const contentState = useAppState(state => state.contentState);
-
   const {repository: repositories} = app;
 
   const {availability: userAvailability, isActivatedAccount} = useKoSubscribableChildren(selfUser, [
@@ -127,8 +125,6 @@ export const AppMain: FC<AppMainProps> = ({
   const isLeftSidebarVisible = currentView == ViewType.LEFT_SIDEBAR;
 
   const initializeApp = async () => {
-    repositories.notification.setContentViewModelStates(contentState, mainView.multitasking);
-
     const showMostRecentConversation = () => {
       const isShowingConversation = useAppState.getState().isShowingConversation();
       if (!isShowingConversation) {
@@ -163,7 +159,7 @@ export const AppMain: FC<AppMainProps> = ({
     configureRoutes({
       '/': showMostRecentConversation,
       '/conversation/:conversationId(/:domain)': (conversationId: string, domain: string = apiContext.domain ?? '') =>
-        mainView.content.showConversation(conversationId, {}, domain),
+        mainView.content.showConversation({id: conversationId, domain}, {}),
       '/preferences/about': () => mainView.list.openPreferencesAbout(),
       '/preferences/account': () => mainView.list.openPreferencesAccount(),
       '/preferences/av': () => mainView.list.openPreferencesAudioVideo(),
@@ -269,11 +265,7 @@ export const AppMain: FC<AppMainProps> = ({
           {!locked && (
             <>
               <FeatureConfigChangeNotifier selfUserId={selfUser.id} teamState={teamState} />
-              <CallingContainer
-                multitasking={mainView.multitasking}
-                callingRepository={repositories.calling}
-                mediaRepository={repositories.media}
-              />
+              <CallingContainer callingRepository={repositories.calling} mediaRepository={repositories.media} />
 
               <LegalHoldModal
                 selfUser={selfUser}

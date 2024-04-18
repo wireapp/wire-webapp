@@ -26,7 +26,8 @@ import cx from 'classnames';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Icon} from 'Components/Icon';
-import {Image} from 'Components/Image';
+import {AssetImage} from 'Components/Image';
+import {Text} from 'src/script/entity/message/Text';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -40,11 +41,21 @@ import {VideoAsset} from './asset/VideoAsset';
 
 import {MessageActions} from '..';
 import type {Conversation} from '../../../../entity/Conversation';
-import type {ContentMessage} from '../../../../entity/message/ContentMessage';
-import type {User} from '../../../../entity/User';
+import {ContentMessage} from '../../../../entity/message/ContentMessage';
+import {User} from '../../../../entity/User';
 import {ConversationError} from '../../../../error/ConversationError';
 import {QuoteEntity} from '../../../../message/QuoteEntity';
 import {useMessageFocusedTabIndex} from '../util';
+
+function createPlaceholderMessage() {
+  const message = new ContentMessage();
+  const user = new User();
+  user.name(' ');
+  message.user(user);
+  const textAsset = new Text('fake-text', ' ');
+  message.assets.push(textAsset);
+  return message;
+}
 
 export interface QuoteProps {
   conversation: Conversation;
@@ -110,26 +121,22 @@ export const Quote: FC<QuoteProps> = ({
     }
   }, [quote, error]);
 
-  return !quotedMessage && !error ? (
-    <div />
-  ) : (
+  return (
     <div className="message-quote" data-uie-name="quote-item">
       {error ? (
         <div className="message-quote__error" data-uie-name="label-error-quote">
           {t('replyQuoteError')}
         </div>
       ) : (
-        quotedMessage && (
-          <QuotedMessage
-            quotedMessage={quotedMessage}
-            selfId={selfId}
-            focusMessage={focusMessage}
-            handleClickOnMessage={handleClickOnMessage}
-            showDetail={showDetail}
-            showUserDetails={showUserDetails}
-            isMessageFocused={isMessageFocused}
-          />
-        )
+        <QuotedMessage
+          quotedMessage={quotedMessage ?? createPlaceholderMessage()}
+          selfId={selfId}
+          focusMessage={focusMessage}
+          handleClickOnMessage={handleClickOnMessage}
+          showDetail={showDetail}
+          showUserDetails={showUserDetails}
+          isMessageFocused={isMessageFocused}
+        />
       )}
     </div>
   );
@@ -154,13 +161,13 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
   showUserDetails,
   isMessageFocused,
 }) => {
-  const {
-    user: quotedUser,
-    assets: quotedAssets,
-    senderName,
-    was_edited,
-    timestamp,
-  } = useKoSubscribableChildren(quotedMessage, ['user', 'assets', 'senderName', 'was_edited', 'timestamp']);
+  const {user, assets, senderName, was_edited, timestamp} = useKoSubscribableChildren(quotedMessage, [
+    'user',
+    'assets',
+    'senderName',
+    'was_edited',
+    'timestamp',
+  ]);
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
 
   return (
@@ -169,7 +176,7 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
         <button
           type="button"
           className="button-reset-default text-left"
-          onClick={() => showUserDetails(quotedUser)}
+          onClick={() => showUserDetails(user)}
           data-uie-name="label-name-quote"
           tabIndex={messageFocusedTabIndex}
         >
@@ -181,15 +188,15 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
           </span>
         )}
       </div>
-      {quotedAssets.map((asset, index) => (
+      {assets.map((asset, index) => (
         <Fragment key={index}>
           {asset.isImage() && (
             <div data-uie-name="media-picture-quote">
-              <Image
+              <AssetImage
                 className="message-quote__image"
-                asset={asset.resource()}
-                aspectRatio={asset.ratio}
-                click={(asset, event) => showDetail(quotedMessage, event)}
+                imageStyles={{objectFit: 'cover'}}
+                image={asset}
+                onClick={event => showDetail(quotedMessage, event)}
               />
             </div>
           )}

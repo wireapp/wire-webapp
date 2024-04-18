@@ -33,9 +33,10 @@ import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Icon} from 'Components/Icon';
 import {ConversationClassifiedBar} from 'Components/input/ClassifiedBar';
+import {usePushToTalk} from 'src/script/hooks/usePushToTalk/usePushToTalk';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {isEnterKey, KEY} from 'Util/KeyboardUtil';
+import {isEnterKey, isSpaceOrEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
@@ -43,11 +44,9 @@ import {CallParticipantsListItem} from './CallParticipantsListItem';
 
 import type {Call} from '../../calling/Call';
 import type {CallingRepository} from '../../calling/CallingRepository';
-import {CallState, MuteState} from '../../calling/CallState';
+import {CallingViewMode, CallState, MuteState} from '../../calling/CallState';
 import type {Participant} from '../../calling/Participant';
 import {useVideoGrid} from '../../calling/videoGridHandler';
-import type {Conversation} from '../../entity/Conversation';
-import type {Multitasking} from '../../notification/NotificationRepository';
 import {generateConversationUrl} from '../../router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from '../../router/routerBindings';
 import {TeamState} from '../../team/TeamState';
@@ -55,7 +54,6 @@ import {ContextMenuEntry, showContextMenu} from '../../ui/ContextMenu';
 import {CallActions, CallViewTab} from '../../view_model/CallingViewModel';
 
 interface VideoCallProps {
-  multitasking: Multitasking;
   hasAccessToCamera?: boolean;
   isSelfVerified?: boolean;
   teamState?: TeamState;
@@ -65,7 +63,7 @@ interface AnsweringControlsProps {
   call: Call;
   callActions: CallActions;
   callingRepository: Pick<CallingRepository, 'supportsScreenSharing' | 'sendModeratorMute'>;
-  conversation: Conversation;
+  pushToTalkKey: string | null;
   isFullUi?: boolean;
   callState?: CallState;
   classifiedDomains?: string[];
@@ -77,19 +75,19 @@ export type CallingCellProps = VideoCallProps & AnsweringControlsProps;
 type labels = {dataUieName: string; text: string};
 
 const CallingCell: React.FC<CallingCellProps> = ({
-  conversation,
   classifiedDomains,
   isTemporaryUser,
   call,
   callActions,
   isFullUi = false,
-  multitasking,
   hasAccessToCamera,
   isSelfVerified,
   callingRepository,
+  pushToTalkKey,
   teamState = container.resolve(TeamState),
   callState = container.resolve(CallState),
 }) => {
+  const {conversation} = call;
   const {reason, state, isCbrEnabled, startedAt, participants, maximizedParticipant, muteState} =
     useKoSubscribableChildren(call, [
       'reason',
@@ -117,7 +115,9 @@ const CallingCell: React.FC<CallingCellProps> = ({
     'roles',
   ]);
 
-  const {isMinimized} = useKoSubscribableChildren(multitasking, ['isMinimized']);
+  const {viewMode} = useKoSubscribableChildren(callState, ['viewMode']);
+  const isMinimized = viewMode === CallingViewMode.MINIMIZED;
+
   const {isVideoCallingEnabled} = useKoSubscribableChildren(teamState, ['isVideoCallingEnabled']);
 
   const {activeCallViewTab} = useKoSubscribableChildren(callState, ['activeCallViewTab']);
@@ -175,6 +175,22 @@ const CallingCell: React.FC<CallingCellProps> = ({
   const [showParticipants, setShowParticipants] = useState(false);
   const isModerator = selfUser && roles[selfUser.id] === DefaultConversationRoleName.WIRE_ADMIN;
 
+  const toggleMute = useCallback(
+    (shouldMute: boolean) => callActions.toggleMute(call, shouldMute),
+    [call, callActions],
+  );
+
+  const isCurrentlyMuted = useCallback(() => {
+    const isMuted = call.muteState() === MuteState.SELF_MUTED;
+    return isMuted;
+  }, [call]);
+
+  usePushToTalk({
+    key: pushToTalkKey,
+    toggleMute,
+    isMuted: isCurrentlyMuted,
+  });
+
   const getParticipantContext = (event: React.MouseEvent<HTMLDivElement>, participant: Participant) => {
     event.preventDefault();
 
@@ -202,24 +218,24 @@ const CallingCell: React.FC<CallingCellProps> = ({
     showContextMenu(event, entries, 'participant-moderator-menu');
   };
 
-  const handleMinimizedKeydown = useCallback(
+  const handleMaximizeKeydown = useCallback(
     (event: React.KeyboardEvent<HTMLInputElement>) => {
       if (!isOngoing) {
         return;
       }
-      if ([KEY.ENTER, KEY.SPACE].includes(event.key)) {
-        multitasking?.isMinimized(false);
+      if (isSpaceOrEnterKey(event.key)) {
+        callState.viewMode(CallingViewMode.FULL_SCREEN_GRID);
       }
     },
-    [isOngoing, multitasking],
+    [isOngoing, callState],
   );
 
-  const handleMinimizedClick = useCallback(() => {
+  const handleMaximizeClick = useCallback(() => {
     if (!isOngoing) {
       return;
     }
-    multitasking?.isMinimized(false);
-  }, [isOngoing, multitasking]);
+    callState.viewMode(CallingViewMode.FULL_SCREEN_GRID);
+  }, [isOngoing, callState]);
 
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
   const {showAlert, clearShowAlert} = useCallAlertState();
@@ -400,8 +416,8 @@ const CallingCell: React.FC<CallingCellProps> = ({
           {(isOngoing || selfHasActiveVideo) && isMinimized && !!videoGrid?.grid?.length && isFullUi ? (
             <div
               className="group-video__minimized-wrapper"
-              onClick={handleMinimizedClick}
-              onKeyDown={handleMinimizedKeydown}
+              onClick={handleMaximizeClick}
+              onKeyDown={handleMaximizeKeydown}
               role="button"
               tabIndex={TabIndex.FOCUSABLE}
               aria-label={t('callMaximizeLabel')}
