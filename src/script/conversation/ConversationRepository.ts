@@ -2412,7 +2412,7 @@ export class ConversationRepository {
       }
 
       try {
-        await this.addService(conversationEntity, providerId, serviceId);
+        await this.addService(conversationEntity, {providerId, serviceId});
         return conversationEntity;
       } catch (error) {
         // If we fail to add the service to the newly created conversation, we should delete the conversation
@@ -2438,7 +2438,10 @@ export class ConversationRepository {
    * @param serviceId ID of service
    * @returns Resolves when service was added
    */
-  private async addService(conversationEntity: Conversation, providerId: string, serviceId: string) {
+  private async addService(
+    conversationEntity: Conversation,
+    {providerId, serviceId}: {providerId: string; serviceId: string},
+  ) {
     return this.conversationService.postBots(conversationEntity.id, providerId, serviceId).then((response: any) => {
       const event = response?.event;
       if (event) {
@@ -2465,7 +2468,7 @@ export class ConversationRepository {
     serviceId: string,
   ) {
     try {
-      await this.addService(conversationEntity, providerId, serviceId);
+      await this.addService(conversationEntity, {providerId, serviceId});
     } catch (error) {
       if (isBackendError(error)) {
         return this.handleAddToConversationError(error, conversationEntity, [{domain: '', id: serviceId}]);
