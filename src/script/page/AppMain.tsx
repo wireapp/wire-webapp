@@ -26,9 +26,7 @@ import {container} from 'tsyringe';
 import {StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {CallingCell} from 'Components/calling/CallingCell';
 import {CallingContainer} from 'Components/calling/CallingOverlayContainer';
-import {DetachedWindow} from 'Components/DetachedWindow';
 import {ErrorFallback} from 'Components/ErrorFallback';
 import {GroupCreationModal} from 'Components/Modals/GroupCreation/GroupCreationModal';
 import {LegalHoldModal} from 'Components/Modals/LegalHoldModal/LegalHoldModal';
@@ -47,13 +45,11 @@ import {RootProvider} from './RootProvider';
 import {useAppMainState, ViewType} from './state';
 import {useAppState, ContentState} from './useAppState';
 
-import {CallingViewMode, CallState} from '../calling/CallState';
 import {ConversationState} from '../conversation/ConversationState';
 import {User} from '../entity/User';
 import {useInitializeRootFontSize} from '../hooks/useRootFontSize';
 import {App} from '../main/app';
 import {initialiseMLSMigrationFlow} from '../mls/MLSMigration';
-import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 import {generateConversationUrl} from '../router/routeGenerator';
 import {configureRoutes, navigate} from '../router/Router';
 import {TeamState} from '../team/TeamState';
@@ -101,7 +97,6 @@ export const AppMain: FC<AppMainProps> = ({
 
   const teamState = container.resolve(TeamState);
   const userState = container.resolve(UserState);
-  const callState = container.resolve(CallState);
 
   const {
     history,
@@ -219,14 +214,6 @@ export const AppMain: FC<AppMainProps> = ({
 
   useE2EIFeatureConfigUpdate(repositories.team);
 
-  const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
-  const {joinedCall: activeCall, viewMode} = useKoSubscribableChildren(callState, ['joinedCall', 'viewMode']);
-  const isDetachedWindow = viewMode === CallingViewMode.DETACHED_WINDOW;
-
-  const closeDetachedWindow = () => {
-    callState.viewMode(CallingViewMode.MINIMIZED);
-  };
-
   return (
     <StyledApp
       themeId={THEME_ID.DEFAULT}
@@ -274,21 +261,6 @@ export const AppMain: FC<AppMainProps> = ({
 
           <AppLock clientRepository={repositories.client} />
           <WarningsContainer onRefresh={app.refresh} />
-
-          {activeCall && isDetachedWindow && (
-            <DetachedWindow name="popout" width={290} height={290} onClose={closeDetachedWindow}>
-              <CallingCell
-                classifiedDomains={classifiedDomains}
-                call={activeCall}
-                callActions={mainView.calling.callActions}
-                callingRepository={repositories.calling}
-                pushToTalkKey={repositories.properties.getPreference(PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY)}
-                isFullUi
-                hasAccessToCamera={mainView.calling.hasAccessToCamera()}
-                isSelfVerified={selfUser.is_verified()}
-              />
-            </DetachedWindow>
-          )}
 
           {!locked && (
             <>
