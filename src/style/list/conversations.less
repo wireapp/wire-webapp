@@ -38,7 +38,10 @@
     padding: 8px;
     border-right: 1px solid var(--border-color);
     background: var(--sidebar-bg);
-    transition: width 0.3s ease-in-out;
+
+    @media (min-width: 1000px) {
+      transition: width 0.3s ease-in-out;
+    }
 
     &[data-is-collapsed='true'] {
       width: 64px;
@@ -61,7 +64,6 @@
   .conversations-sidebar-handle {
     .button-reset-default;
 
-    position: relative;
     position: absolute;
     z-index: 1000;
     top: 8px;

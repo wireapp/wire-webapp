@@ -237,7 +237,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   }
 
   const sidebar = (
-    <nav className="conversations-sidebar">
+    <nav className="conversations-sidebar" css={isSideBarOpen && mdBreakpoint && {position: 'fixed', zIndex: '1000'}}>
       <FadingScrollbar className="conversations-sidebar-items" data-is-collapsed={!isSideBarOpen}>
         <UserDetails
           user={selfUser}
@@ -259,17 +259,15 @@ const Conversations: React.FC<ConversationsProps> = ({
         />
       </FadingScrollbar>
 
-      {!mdBreakpoint && (
-        <button
-          type="button"
-          role="tab"
-          className="conversations-sidebar-handle"
-          data-is-collapsed={!isSideBarOpen || mdBreakpoint}
-          onClick={toggleSidebar}
-        >
-          <ChevronIcon width={12} height={12} />
-        </button>
-      )}
+      <button
+        type="button"
+        role="tab"
+        className="conversations-sidebar-handle"
+        data-is-collapsed={!isSideBarOpen}
+        onClick={toggleSidebar}
+      >
+        <ChevronIcon width={12} height={12} />
+      </button>
     </nav>
   );
 
