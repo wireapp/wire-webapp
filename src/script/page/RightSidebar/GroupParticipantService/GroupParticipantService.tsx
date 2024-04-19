@@ -87,7 +87,7 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
   };
 
   const onAdd = () => {
-    integrationRepository.addService(activeConversation, serviceEntity);
+    integrationRepository.addServiceToExistingConversation(activeConversation, serviceEntity);
     goToRoot();
   };
 
