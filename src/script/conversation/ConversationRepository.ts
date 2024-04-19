@@ -2464,8 +2464,7 @@ export class ConversationRepository {
    */
   public async addServiceToExistingConversation(
     conversationEntity: Conversation,
-    providerId: string,
-    serviceId: string,
+    {providerId, serviceId}: {providerId: string; serviceId: string},
   ) {
     try {
       await this.addService(conversationEntity, {providerId, serviceId});

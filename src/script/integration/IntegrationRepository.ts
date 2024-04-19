@@ -115,7 +115,7 @@ export class IntegrationRepository {
     const {id: serviceId, name, providerId} = serviceEntity;
     this.logger.info(`Adding service '${name}' to conversation '${conversationEntity.id}'`);
 
-    return this.conversationRepository.addServiceToExistingConversation(conversationEntity, providerId, serviceId);
+    return this.conversationRepository.addServiceToExistingConversation(conversationEntity, {providerId, serviceId});
   }
 
   /**
