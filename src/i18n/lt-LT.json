@@ -84,6 +84,8 @@
   "LOGOUT_REASON.NO_APP_CONFIG": "You were signed out because the initial configuration could not be loaded.",
   "LOGOUT_REASON.SESSION_EXPIRED": "Buvote atjungti, nes pasibaigė jūsų seansas.{newline}Prisijunkite dar kartą.",
   "LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE": "Trūksta vietos diske",
+  "LabeledError.GENERAL_ERRORS.SYSTEM_KEYCHAIN_ACCESS": "Wire can’t access your system's safe storage. {supportKeychainLink}",
+  "LabeledError.howToLogIn": "Find out how to log in",
   "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": "Įrašykite teisingą el. pašto adresą",
   "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "Įveskite bent 2 simbolių vardą",
   "ValidationError.FIELD.NAME.VALUE_MISSING": "Įveskite bent 2 simbolių vardą",
