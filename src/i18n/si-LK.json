@@ -84,6 +84,8 @@
   "LOGOUT_REASON.NO_APP_CONFIG": "ආරම්භක වින්‍යාසය පූරණයට නොහැකි නිසා ඔබව නික්මවිණි.",
   "LOGOUT_REASON.SESSION_EXPIRED": "ඔබගේ වාරය කල් ඉකුත් වූ බැවින් ඔබව නික්මවිණි.{newline}නැවත පිවිසෙන්න.",
   "LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE": "තැටියේ ප්‍රමාණවත් ඉඩක් නැත",
+  "LabeledError.GENERAL_ERRORS.SYSTEM_KEYCHAIN_ACCESS": "Wire can’t access your system's safe storage. {supportKeychainLink}",
+  "LabeledError.howToLogIn": "Find out how to log in",
   "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": "වලංගු වි-තැපැල් ලිපිනයක් යොදන්න",
   "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "අවම වශයෙන් අකුරු 2 ක් සහිත නමක් ඇතුල් කරන්න",
   "ValidationError.FIELD.NAME.VALUE_MISSING": "අවම වශයෙන් අකුරු 2 ක් සහිත නමක් ඇතුල් කරන්න",

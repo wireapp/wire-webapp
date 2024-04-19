@@ -84,6 +84,8 @@
   "LOGOUT_REASON.NO_APP_CONFIG": "You were signed out because the initial configuration could not be loaded.",
   "LOGOUT_REASON.SESSION_EXPIRED": "You were signed out because your session expired.{newline}Please log in again.",
   "LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE": "Not enough disk space",
+  "LabeledError.GENERAL_ERRORS.SYSTEM_KEYCHAIN_ACCESS": "Wire can’t access your system's safe storage. {supportKeychainLink}",
+  "LabeledError.howToLogIn": "Find out how to log in",
   "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": "Please enter a valid email address",
   "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "Introduza um nome com pelo menos 2 caracteres",
   "ValidationError.FIELD.NAME.VALUE_MISSING": "Introduza um nome com pelo menos 2 caracteres",

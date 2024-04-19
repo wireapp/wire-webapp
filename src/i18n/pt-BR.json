@@ -84,6 +84,8 @@
   "LOGOUT_REASON.NO_APP_CONFIG": "Você foi desconectado porque a configuração inicial não pôde ser carregada.",
   "LOGOUT_REASON.SESSION_EXPIRED": "Você foi desconectado porque sua sessão expirou. {Newline}Por favor, inicie sessão novamente.",
   "LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE": "Espaço em disco insuficiente",
+  "LabeledError.GENERAL_ERRORS.SYSTEM_KEYCHAIN_ACCESS": "Wire can’t access your system's safe storage. {supportKeychainLink}",
+  "LabeledError.howToLogIn": "Find out how to log in",
   "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": "Por favor, insira um endereço de e-mail válido",
   "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "Insira um nome com pelo menos 2 caracteres",
   "ValidationError.FIELD.NAME.VALUE_MISSING": "Insira um nome com pelo menos 2 caracteres",

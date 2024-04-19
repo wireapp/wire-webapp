@@ -84,6 +84,8 @@
   "LOGOUT_REASON.NO_APP_CONFIG": "You were signed out because the initial configuration could not be loaded.",
   "LOGOUT_REASON.SESSION_EXPIRED": "A munkamenet lejárt, ezért ki lettél jelentkeztetve.{newline}Kérjük, jelentkezz be újra.",
   "LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE": "Nincs elég tárhely",
+  "LabeledError.GENERAL_ERRORS.SYSTEM_KEYCHAIN_ACCESS": "Wire can’t access your system's safe storage. {supportKeychainLink}",
+  "LabeledError.howToLogIn": "Find out how to log in",
   "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": "Kérjük, érvényes e-mail címet adj meg",
   "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "Legalább 2 karakterből álló nevet adj meg",
   "ValidationError.FIELD.NAME.VALUE_MISSING": "Legalább 2 karakterből álló nevet adj meg",
