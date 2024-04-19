@@ -101,6 +101,7 @@ function buildConversationRepository() {
     deleteConversationFromDb: () => {},
     wipeMLSCapableConversation: () => {},
     postBots: () => {},
+    saveConversationStateInDb: () => {},
   } as ConversationService;
   const messageRepository = {setClientMismatchHandler: () => {}} as unknown as MessageRepository;
   // @ts-ignore
