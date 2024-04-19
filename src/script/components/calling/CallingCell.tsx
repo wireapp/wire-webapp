@@ -311,6 +311,14 @@ const CallingCell: React.FC<CallingCellProps> = ({
   const callStartedAlert = isGroup ? callGroupStartedAlert : call1To1StartedAlert;
   const ongoingCallAlert = isGroup ? onGoingGroupCallAlert : onGoingCallAlert;
 
+  const toggleDetachedWindow = () => {
+    if (isDetachedWindow) {
+      callState.viewMode(CallingViewMode.MINIMIZED);
+    } else {
+      callState.viewMode(CallingViewMode.DETACHED_WINDOW);
+    }
+  };
+
   return (
     <div style={{height: isDetachedWindow ? '100%' : 'unset'}}>
       {isIncoming && (
@@ -362,6 +370,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
                   )}
                 </div>
               )}
+
               <h2
                 className={cx('conversation-list-cell-center ', {
                   'conversation-list-cell-center-no-left': isTemporaryUser,
@@ -431,6 +440,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
                 maximizedParticipant={maximizedParticipant}
                 selfParticipant={selfParticipant}
               />
+
               {isOngoing && (
                 <div className="group-video__minimized-wrapper__overlay" data-uie-name="do-maximize-call">
                   <Icon.Fullscreen />
@@ -519,6 +529,14 @@ const CallingCell: React.FC<CallingCellProps> = ({
                       </button>
                     </li>
                   )}
+
+                  <button className="call-ui__button" onClick={toggleDetachedWindow}>
+                    {isDetachedWindow ? (
+                      <Icon.Chevron className="small-icon" />
+                    ) : (
+                      <Icon.Fullscreen className="small-icon" />
+                    )}
+                  </button>
                 </>
               )}
             </ul>

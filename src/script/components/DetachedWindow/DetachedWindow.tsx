@@ -21,7 +21,11 @@ import {useEffect, useState} from 'react';
 
 import {createPortal} from 'react-dom';
 
+import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
+
 import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition';
+
+import '../../../style/default.less';
 
 interface DetachedWindowProps {
   children: React.ReactNode;
@@ -59,17 +63,29 @@ export const DetachedWindow = ({children, url = '', name, onClose, width = 600, 
     }
 
     copyStyles(document, newWindow.document);
+    newWindow.document.title = window.document.title;
+    newWindow.document.body.className = window.document.body.className;
 
-    newWindow.onbeforeunload = onClose;
-    window.onbeforeunload = onClose;
+    newWindow.addEventListener('beforeunload', onClose);
+    window.addEventListener('beforeunload', onClose);
+
     setNewWindow(newWindow);
 
     return () => {
       newWindow.close();
+      newWindow.removeEventListener('beforeunload', onClose);
+      window.removeEventListener('beforeunload', onClose);
     };
   }, [height, name, url, width, onClose]);
 
-  return !newWindow ? null : createPortal(children, newWindow.document.body);
+  return !newWindow
+    ? null
+    : createPortal(
+        <StyledApp id="detached-window" themeId={THEME_ID.DEFAULT} style={{height: '100%'}}>
+          {children}
+        </StyledApp>,
+        newWindow.document.body,
+      );
 };
 
 const copyStyles = (source: Document, target: Document) => {
