@@ -59,6 +59,7 @@ const UserDetailsComponent: React.FC<UserDetailsProps> = ({
 }) => {
   const user = useKoSubscribableChildren(participant, [
     'isGuest',
+    'isBlocked',
     'isDirectGuest',
     'isTemporaryGuest',
     'expirationText',

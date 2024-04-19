@@ -105,7 +105,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   const {isOpen: isSideBarOpen, toggleIsOpen: toggleSidebarIsOpen} = useSidebarStore();
   const [conversationsFilter, setConversationsFilter] = useState<string>('');
   const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
-  const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
+  const {classifiedDomains, isTeam} = useKoSubscribableChildren(teamState, ['classifiedDomains', 'isTeam']);
   const {connectRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
 
   const {
@@ -261,7 +261,7 @@ const Conversations: React.FC<ConversationsProps> = ({
         <UserDetails
           user={selfUser}
           groupId={conversationState.selfMLSConversation()?.groupId}
-          isTeam={teamState.isTeam()}
+          isTeam={isTeam}
           isSideBarOpen={isSideBarOpen}
         />
 

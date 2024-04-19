@@ -113,7 +113,7 @@ export const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
 
       {!isImageGrey && <AvatarBorder />}
 
-      {typeof availability === 'number' && (
+      {typeof availability === 'number' && availability !== AvailabilityType.Type.NONE && (
         <div css={AvailabilityWrapper}>
           <AvailabilityIcon availability={availability} />
         </div>
