@@ -682,7 +682,7 @@ export const errorHandlerStrings = defineMessages({
     id: 'LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE',
   },
   [LabeledError.GENERAL_ERRORS.SYSTEM_KEYCHAIN_ACCESS]: {
-    defaultMessage: 'Wire could not access your system safe storage. {supportKeychainLink}',
+    defaultMessage: "Wire can’t access your system's safe storage. {supportKeychainLink}",
     id: 'LabeledError.GENERAL_ERRORS.SYSTEM_KEYCHAIN_ACCESS',
   },
   [BackendErrorLabel.CUSTOM_BACKEND_NOT_FOUND]: {
@@ -692,6 +692,10 @@ export const errorHandlerStrings = defineMessages({
   [BackendErrorLabel.INVALID_CONVERSATION_PASSWORD]: {
     defaultMessage: 'Password is incorrect, please try again.',
     id: 'BackendErrorLabel.INVALID_CONVERSATION_PASSWORD',
+  },
+  howToLogIn: {
+    defaultMessage: 'Find out how to log in',
+    id: 'LabeledError.howToLogIn',
   },
   learnMore: {
     defaultMessage: 'Learn more',
