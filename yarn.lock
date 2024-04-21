@@ -14353,9 +14353,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-redux@npm:9.1.0":
-  version: 9.1.0
-  resolution: "react-redux@npm:9.1.0"
+"react-redux@npm:9.1.1":
+  version: 9.1.1
+  resolution: "react-redux@npm:9.1.1"
   dependencies:
     "@types/use-sync-external-store": "npm:^0.0.3"
     use-sync-external-store: "npm:^1.0.0"
@@ -14371,7 +14371,7 @@ __metadata:
       optional: true
     redux:
       optional: true
-  checksum: 10/e2e5fe1c6965aedf3a80d7d5252ccbe6f231448cc1010ce19036fe8965f996cbafa2f81cacab77e54e75d6a14caa40540b8907459ef36af26b65c14f1bf89d80
+  checksum: 10/eecc5cf0d9f9dec30634b23c912535eb1314d135f426a6108cd1532d52f14f699834f7cb07bcccffa1369ee26f7b43020dc9b41c4486c09bd6f98d7279be07bc
   languageName: node
   linkType: hard
 
@@ -17414,7 +17414,7 @@ __metadata:
     react-dom: "npm:18.2.0"
     react-error-boundary: "npm:4.0.13"
     react-intl: "npm:6.6.5"
-    react-redux: "npm:9.1.0"
+    react-redux: "npm:9.1.1"
     react-router: "npm:6.22.3"
     react-router-dom: "npm:6.22.3"
     react-transition-group: "npm:4.4.5"
