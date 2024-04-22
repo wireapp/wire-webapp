@@ -35,7 +35,6 @@ import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
 import {TitleBar} from 'Components/TitleBar';
 import {CallState} from 'src/script/calling/CallState';
 import {Config} from 'src/script/Config';
-import {CONVERSATION_READONLY_STATE} from 'src/script/conversation/ConversationRepository';
 import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {allowsAllFiles, getFileExtensionOrName, hasAllowedExtension} from 'Util/FileTypeUtil';
@@ -104,19 +103,14 @@ export const Conversation = ({
     'isFileSharingSendingEnabled',
   ]);
 
-  const {
-    is1to1,
-    isRequest,
-    readOnlyState,
-    display_name: displayName,
-  } = useKoSubscribableChildren(activeConversation!, ['is1to1', 'isRequest', 'display_name', 'readOnlyState']);
-
-  const showReadOnlyConversationMessage =
-    readOnlyState !== null &&
-    [
-      CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_OTHER_UNSUPPORTED_MLS,
-      CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_SELF_UNSUPPORTED_MLS,
-    ].includes(readOnlyState);
+  const {is1to1, isRequest, isReadOnlyConversation} = useKoSubscribableChildren(activeConversation!, [
+    'is1to1',
+    'isRequest',
+    'readOnlyState',
+    'participating_user_ets',
+    'connection',
+    'isReadOnlyConversation',
+  ]);
 
   const inTeam = teamState.isInTeam(selfUser);
 
@@ -487,15 +481,15 @@ export const Conversation = ({
             callActions={mainViewModel.calling.callActions}
             openRightSidebar={openRightSidebar}
             isRightSidebarOpen={isRightSidebarOpen}
-            isReadOnlyConversation={showReadOnlyConversationMessage}
+            isReadOnlyConversation={isReadOnlyConversation}
           />
 
           {activeCalls.map(call => {
-            const conversation = conversationState.findConversation(call.conversationId);
+            const {conversation} = call;
             const callingViewModel = mainViewModel.calling;
             const callingRepository = callingViewModel.callingRepository;
 
-            if (!conversation || !smBreakpoint) {
+            if (!smBreakpoint) {
               return null;
             }
 
@@ -506,8 +500,6 @@ export const Conversation = ({
                   call={call}
                   callActions={callingViewModel.callActions}
                   callingRepository={callingRepository}
-                  conversation={conversation}
-                  multitasking={callingViewModel.multitasking}
                   pushToTalkKey={callingViewModel.propertiesRepository.getPreference(
                     PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY,
                   )}
@@ -539,14 +531,9 @@ export const Conversation = ({
             setMsgElementsFocusable={setMsgElementsFocusable}
             isRightSidebarOpen={isRightSidebarOpen}
           />
-
           {isConversationLoaded &&
-            (showReadOnlyConversationMessage ? (
-              <ReadOnlyConversationMessage
-                state={readOnlyState}
-                handleMLSUpdate={reloadApp}
-                displayName={displayName}
-              />
+            (isReadOnlyConversation ? (
+              <ReadOnlyConversationMessage reloadApp={reloadApp} conversation={activeConversation} />
             ) : (
               <InputBar
                 key={activeConversation?.id}

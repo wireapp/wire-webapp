@@ -153,6 +153,47 @@ describe('UserActions', () => {
     });
   });
 
+  it('generates actions for another user profile that I have blocked', () => {
+    const user = new User('');
+    const connection = new ConnectionEntity();
+
+    user.connection(connection);
+    user.teamId = 'teamId';
+
+    const selfUser = new User('');
+    selfUser.teamId = 'teamId2';
+
+    jest.spyOn(user, 'isAvailable').mockImplementation(ko.pureComputed(() => true));
+    const conversation = new Conversation();
+    conversation.type(CONVERSATION_TYPE.ONE_TO_ONE);
+    conversation.connection(connection);
+
+    jest.spyOn(conversation, 'participating_user_ids').mockImplementation(ko.observableArray([new User()]));
+    user.connection()?.status(ConnectionStatus.BLOCKED);
+    connection.userId = user.qualifiedId;
+
+    conversationState.conversations.push(conversation);
+
+    const conversationRoleRepository: Partial<ConversationRoleRepository> = {canRemoveParticipants: () => false};
+
+    const props = {
+      actionsViewModel,
+      conversation,
+      conversationRoleRepository: conversationRoleRepository as ConversationRoleRepository,
+      isSelfActivated: true,
+      onAction: noop,
+      selfUser,
+      user,
+    };
+
+    const {queryByTestId} = render(<UserActions {...props} />);
+
+    const allActions = getAllActions(queryByTestId);
+    expect(allActions).toHaveLength(1);
+
+    expect(queryByTestId(ActionIdentifier[Actions.UNBLOCK])).not.toBeNull();
+  });
+
   it("shows start conversation if there's no existing conversation between two users from the same team", () => {
     const user = new User('');
 

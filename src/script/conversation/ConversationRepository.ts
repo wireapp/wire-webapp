@@ -26,7 +26,11 @@ import {
   MessageSendingStatus,
   RemoteConversations,
 } from '@wireapp/api-client/lib/conversation';
-import {MemberLeaveReason, ConversationReceiptModeUpdateData} from '@wireapp/api-client/lib/conversation/data';
+import {
+  MemberLeaveReason,
+  ConversationReceiptModeUpdateData,
+  RECEIPT_MODE,
+} from '@wireapp/api-client/lib/conversation/data';
 import {CONVERSATION_TYPING} from '@wireapp/api-client/lib/conversation/data/ConversationTypingData';
 import {
   ConversationCreateEvent,
@@ -173,6 +177,11 @@ interface GetInitialised1To1ConversationOptions {
   isLiveUpdate?: boolean;
   shouldRefreshUser?: boolean;
 }
+
+type ConversaitonWithServiceParams = {
+  serviceId: string;
+  providerId: string;
+};
 
 export class ConversationRepository {
   private isBlockingNotificationHandling: boolean;
@@ -1306,7 +1315,9 @@ export class ConversationRepository {
     const connection = user.connection();
     if (connection) {
       this.logger.log(`There's a connection with user ${userId.id}, getting a 1:1 conversation for the connection`);
-      return this.get1to1ConversationForConnection(connection, options);
+      const conversation = await this.get1to1ConversationForConnection(connection, options);
+      // In case we got a conversation back, we make sure the participating user entities are up to date
+      return conversation ? this.updateParticipatingUserEntities(conversation) : null;
     }
 
     const {protocol, isMLSSupportedByTheOtherUser, isProteusSupportedByTheOtherUser} =
@@ -1939,6 +1950,12 @@ export class ConversationRepository {
       return conversation;
     }
 
+    // If it is a 1:1 conversaiton with a bot/service, just open a conversation.
+    if (otherUser.isService) {
+      this.logger.warn(`User ${otherUserId.id} is a service, opening proteus conversation`);
+      return conversation;
+    }
+
     this.logger.info(
       `Initialising 1:1 conversation ${conversation.id} of type ${conversation.type()} with user ${otherUserId.id}`,
     );
@@ -2376,6 +2393,46 @@ export class ConversationRepository {
   }
 
   /**
+   * Add service to conversation.
+   *
+   * @param serviceId serviceId ID of the service
+   * @param providerId providerId ID of the provider
+   * @returns Resolves when conversation with the integration was created
+   */
+  async create1to1ConversationWithService({
+    providerId,
+    serviceId,
+  }: ConversaitonWithServiceParams): Promise<Conversation> {
+    try {
+      const conversationEntity = await this.createGroupConversation([], undefined, ACCESS_STATE.TEAM.GUESTS_SERVICES);
+
+      if (!conversationEntity) {
+        throw new ConversationError(
+          ConversationError.TYPE.CONVERSATION_NOT_FOUND,
+          ConversationError.MESSAGE.CONVERSATION_NOT_FOUND,
+        );
+      }
+
+      try {
+        await this.addService(conversationEntity, {providerId, serviceId});
+        return conversationEntity;
+      } catch (error) {
+        // If we fail to add the service to the newly created conversation, we should delete the conversation
+        await this.deleteConversation(conversationEntity);
+        throw error;
+      }
+    } catch (error) {
+      PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
+        text: {
+          message: t('modalIntegrationUnavailableMessage'),
+          title: t('modalIntegrationUnavailableHeadline'),
+        },
+      });
+      throw error;
+    }
+  }
+
+  /**
    * Add a service to an existing conversation.
    *
    * @param conversationEntity Conversation to add service to
@@ -2383,20 +2440,39 @@ export class ConversationRepository {
    * @param serviceId ID of service
    * @returns Resolves when service was added
    */
-  addService(conversationEntity: Conversation, providerId: string, serviceId: string) {
-    return this.conversationService
-      .postBots(conversationEntity.id, providerId, serviceId)
-      .then((response: any) => {
-        const event = response?.event;
-        if (event) {
-          const logMessage = `Successfully added service to conversation '${conversationEntity.display_name()}'`;
-          this.logger.debug(logMessage, response);
-          return this.eventRepository.injectEvent(response.event, EventRepository.SOURCE.BACKEND_RESPONSE);
-        }
+  private async addService(conversationEntity: Conversation, {providerId, serviceId}: ConversaitonWithServiceParams) {
+    return this.conversationService.postBots(conversationEntity.id, providerId, serviceId).then((response: any) => {
+      const event = response?.event;
+      if (event) {
+        const logMessage = `Successfully added service to conversation '${conversationEntity.display_name()}'`;
+        this.logger.debug(logMessage, response);
+        return this.eventRepository.injectEvent(response.event, EventRepository.SOURCE.BACKEND_RESPONSE);
+      }
 
-        return event;
-      })
-      .catch(error => this.handleAddToConversationError(error, conversationEntity, [{domain: '', id: serviceId}]));
+      return event;
+    });
+  }
+
+  /**
+   * Add a service to an existing conversation.
+   *
+   * @param conversationEntity Conversation to add service to
+   * @param providerId ID of service provider
+   * @param serviceId ID of service
+   * @returns Resolves when service was added
+   */
+  public async addServiceToExistingConversation(
+    conversationEntity: Conversation,
+    {providerId, serviceId}: ConversaitonWithServiceParams,
+  ) {
+    try {
+      await this.addService(conversationEntity, {providerId, serviceId});
+    } catch (error) {
+      if (isBackendError(error)) {
+        return this.handleAddToConversationError(error, conversationEntity, [{domain: '', id: serviceId}]);
+      }
+      throw error;
+    }
   }
 
   private deleteConnectionRequestConversation = async (userId: QualifiedId) => {
@@ -4197,11 +4273,11 @@ export class ConversationRepository {
 
   expectReadReceipt(conversationEntity: Conversation): boolean {
     if (conversationEntity.is1to1()) {
-      return !!this.propertyRepository.receiptMode();
+      return this.propertyRepository.receiptMode() === RECEIPT_MODE.ON;
     }
 
     if (conversationEntity.teamId && conversationEntity.isGroup()) {
-      return !!conversationEntity.receiptMode();
+      return conversationEntity.receiptMode() === RECEIPT_MODE.ON;
     }
 
     return false;

@@ -290,6 +290,11 @@ export class DebugUtil {
     });
   }
 
+  // Used by QA to trigger a focus event on the app (in order to trigger the update of the team feature-config)
+  simulateAppToForeground() {
+    window.dispatchEvent(new FocusEvent('focus'));
+  }
+
   setE2EICertificateTtl(ttl: number) {
     E2EIHandler.getInstance().certificateTtl = ttl;
   }
@@ -416,7 +421,7 @@ export class DebugUtil {
     if (!activeCall) {
       throw new Error('no active call found');
     }
-    return this.callingRepository.getStats(activeCall.conversationId);
+    return this.callingRepository.getStats(activeCall.conversation.qualifiedId);
   }
 
   /** Used by QA test automation. */

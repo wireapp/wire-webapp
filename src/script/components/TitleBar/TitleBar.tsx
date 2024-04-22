@@ -128,7 +128,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
 
   const hasCall = useMemo(() => {
     const hasEntities = !!joinedCall;
-    return hasEntities && matchQualifiedIds(conversation.qualifiedId, joinedCall.conversationId);
+    return hasEntities && matchQualifiedIds(conversation.qualifiedId, joinedCall.conversation.qualifiedId);
   }, [conversation, joinedCall]);
 
   const showCallControls = ConversationFilter.showCallControls(conversation, hasCall);

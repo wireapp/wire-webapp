@@ -604,7 +604,6 @@ export class MessageRepository {
   private async sendAssetRemotedata(conversation: Conversation, file: Blob, messageId: string, asImage: boolean) {
     const retention = this.assetRepository.getAssetRetention(this.userState.self(), conversation);
     const options = {
-      expectsReadConfirmation: this.expectReadReceipt(conversation),
       legalHoldStatus: conversation.legalHoldStatus(),
       public: true,
       retention,
@@ -614,10 +613,23 @@ export class MessageRepository {
     );
 
     const metadata = asImage ? ((await buildMetadata(file)) as ImageMetadata) : undefined;
+    const commonMessageData = {
+      asset: asset,
+      expectsReadConfirmation: this.expectReadReceipt(conversation),
+    };
     const assetMessage = metadata
-      ? MessageBuilder.buildImageMessage({asset: asset, image: metadata}, messageId)
+      ? MessageBuilder.buildImageMessage(
+          {
+            ...commonMessageData,
+            image: metadata,
+          },
+          messageId,
+        )
       : MessageBuilder.buildFileDataMessage(
-          {asset: asset, file: {data: Buffer.from(await file.arrayBuffer())}},
+          {
+            ...commonMessageData,
+            file: {data: Buffer.from(await file.arrayBuffer())},
+          },
           messageId,
         );
     return this.sendAndInjectMessage(assetMessage, conversation, {enableEphemeral: true, syncTimestamp: false});
