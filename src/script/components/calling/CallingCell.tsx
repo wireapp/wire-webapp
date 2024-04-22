@@ -578,7 +578,6 @@ const CallingCell: React.FC<CallingCellProps> = ({
                     aria-label={!isGroup && showAlert ? call1To1StartedAlert : t('videoCallOverlayHangUp')}
                     type="button"
                     data-uie-name="do-call-controls-call-decline"
-                    style={{background: 'red'}}
                   >
                     <Icon.Hangup className="small-icon" style={{maxWidth: 17}} />
                   </button>
