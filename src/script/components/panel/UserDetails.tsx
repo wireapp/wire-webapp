@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect} from 'react';
+import {useEffect, CSSProperties} from 'react';
 
 import {amplify} from 'amplify';
 import {ErrorBoundary} from 'react-error-boundary';
@@ -44,11 +44,11 @@ interface UserDetailsProps {
   isGroupAdmin?: boolean;
   isVerified?: boolean;
   participant: User;
-  avatarStyles?: React.CSSProperties;
+  avatarStyles?: CSSProperties;
   teamState?: TeamState;
 }
 
-const UserDetailsComponent: React.FC<UserDetailsProps> = ({
+const UserDetailsComponent = ({
   badge,
   participant,
   groupId,
@@ -56,10 +56,8 @@ const UserDetailsComponent: React.FC<UserDetailsProps> = ({
   avatarStyles,
   classifiedDomains,
   teamState = container.resolve(TeamState),
-}) => {
+}: UserDetailsProps) => {
   const user = useKoSubscribableChildren(participant, [
-    'isGuest',
-    'isBlocked',
     'isDirectGuest',
     'isTemporaryGuest',
     'expirationText',
@@ -137,7 +135,7 @@ const UserDetailsComponent: React.FC<UserDetailsProps> = ({
   );
 };
 
-export const UserDetails: React.FC<UserDetailsProps> = props => {
+export const UserDetails = (props: UserDetailsProps) => {
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
       <UserDetailsComponent {...props} />
