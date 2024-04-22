@@ -59,7 +59,7 @@ export const DetachedWindow = ({children, url = '', name, onClose, width = 600, 
     );
 
     if (!newWindow) {
-      return;
+      return () => {};
     }
 
     copyStyles(document, newWindow.document);
