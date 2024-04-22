@@ -148,11 +148,11 @@ const LoginComponent = ({
   }, []);
 
   useEffect(() => {
-    // Redirect to prefilled SSO login if default SSO code is set on backend
-    if (defaultSSOCode) {
+    // Redirect to prefilled SSO login if default SSO code is set on backend unless we're following the guest link flow
+    if (defaultSSOCode && !embedded) {
       navigate(`${ROUTE.SSO}/${defaultSSOCode}`);
     }
-  }, [defaultSSOCode, navigate]);
+  }, [defaultSSOCode, embedded, navigate]);
 
   useEffect(() => {
     const queryConversationCode = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_CODE) || null;
