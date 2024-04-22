@@ -235,9 +235,9 @@ export class UserRepository extends TypedEventEmitter<Events> {
     const {found, failed} = await this.fetchRawUsers(usersToFetch, selfUser.domain);
 
     const userWithAvailability = found.map(user => {
-      const availability = incompleteUsers
-        .concat(nonQualifiedUsers)
-        .find(incompleteUser => incompleteUser.id === user.id);
+      const availability = [...localUsers, ...incompleteUsers, ...nonQualifiedUsers].find(
+        userRecord => userRecord.id === user.id,
+      );
 
       if (availability) {
         return {availability: availability.availability, ...user};
