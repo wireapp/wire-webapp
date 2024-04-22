@@ -53,7 +53,6 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({listViewModel, selfUser, isAct
       {[ListState.CONVERSATIONS, ListState.START_UI, ListState.PREFERENCES, ListState.ARCHIVE].includes(listState) && (
         <Conversations
           selfUser={selfUser}
-          listState={listState}
           listViewModel={listViewModel}
           searchRepository={repositories.search}
           teamRepository={repositories.team}

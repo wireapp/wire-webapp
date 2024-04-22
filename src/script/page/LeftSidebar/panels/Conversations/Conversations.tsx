@@ -102,7 +102,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   userState = container.resolve(UserState),
   selfUser,
 }) => {
-  const {isOpen: isSideBarOpen, toggleIsOpen: toggleSidebarIsOpen} = useSidebarStore();
+  const {isOpen: isSideBarOpen, toggleIsOpen: toggleSidebarIsOpen, setIsOpen: setIsSidebarOpen} = useSidebarStore();
   const [conversationsFilter, setConversationsFilter] = useState<string>('');
   const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
   const {classifiedDomains, isTeam} = useKoSubscribableChildren(teamState, ['classifiedDomains', 'isTeam']);
@@ -146,14 +146,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   ].includes(currentTab);
 
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
-  const {
-    isOpen: isFolderOpen,
-    openFolder,
-    closeFolder,
-    expandedFolder,
-    isFoldersTabOpen,
-    toggleFoldersTab,
-  } = useFolderState();
+  const {openFolder, closeFolder, expandedFolder, isFoldersTabOpen, toggleFoldersTab} = useFolderState();
   const {currentFocus, handleKeyDown, resetConversationFocus} = useConversationFocus(conversations);
   const {conversations: currentTabConversations, searchInputPlaceholder} = getTabConversations({
     currentTab,
@@ -182,6 +175,10 @@ const Conversations: React.FC<ConversationsProps> = ({
   const mdBreakpoint = useMatchMedia('(max-width: 1000px)');
 
   useEffect(() => {
+    setIsSidebarOpen(!mdBreakpoint);
+  }, [mdBreakpoint, setIsSidebarOpen]);
+
+  useEffect(() => {
     if (activeConversation && !conversationState.isVisible(activeConversation)) {
       // If the active conversation is not visible, switch to the recent view
       listViewModel.contentViewModel.loadPreviousContent();
@@ -193,12 +190,7 @@ const Conversations: React.FC<ConversationsProps> = ({
       return () => {};
     }
 
-    const conversationLabels = conversationLabelRepository.getConversationLabelIds(activeConversation);
     amplify.subscribe(WebAppEvents.CONTENT.EXPAND_FOLDER, openFolder);
-
-    if (!conversationLabels.some(isFolderOpen)) {
-      openFolder(conversationLabels[0]);
-    }
 
     return () => {
       amplify.unsubscribe(WebAppEvents.CONTENT.EXPAND_FOLDER, openFolder);
@@ -224,7 +216,7 @@ const Conversations: React.FC<ConversationsProps> = ({
 
     if (nextTab === SidebarTabs.ARCHIVES) {
       // will eventually load missing events from the db
-      conversationRepository.updateArchivedConversations();
+      void conversationRepository.updateArchivedConversations();
     }
 
     if (nextTab !== SidebarTabs.PREFERENCES) {
@@ -257,7 +249,7 @@ const Conversations: React.FC<ConversationsProps> = ({
 
   const sidebar = (
     <nav className="conversations-sidebar">
-      <FadingScrollbar className="conversations-sidebar-items" data-is-collapsed={!isSideBarOpen || mdBreakpoint}>
+      <FadingScrollbar className="conversations-sidebar-items" data-is-collapsed={!isSideBarOpen}>
         <UserDetails
           user={selfUser}
           groupId={conversationState.selfMLSConversation()?.groupId}
