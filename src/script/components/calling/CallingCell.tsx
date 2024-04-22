@@ -412,6 +412,16 @@ const CallingCell: React.FC<CallingCellProps> = ({
             </div>
 
             <div className="conversation-list-cell-right">
+              {isOngoing && (
+                <button className="call-ui__button" onClick={toggleDetachedWindow}>
+                  {isDetachedWindow ? (
+                    <Icon.Chevron className="small-icon" />
+                  ) : (
+                    <Icon.Fullscreen className="small-icon" />
+                  )}
+                </button>
+              )}
+
               {(isConnecting || isOngoing) && (
                 <button
                   className="call-ui__button call-ui__button--red"
@@ -532,14 +542,6 @@ const CallingCell: React.FC<CallingCellProps> = ({
                       </button>
                     </li>
                   )}
-
-                  <button className="call-ui__button" onClick={toggleDetachedWindow}>
-                    {isDetachedWindow ? (
-                      <Icon.Chevron className="small-icon" />
-                    ) : (
-                      <Icon.Fullscreen className="small-icon" />
-                    )}
-                  </button>
                 </>
               )}
             </ul>
