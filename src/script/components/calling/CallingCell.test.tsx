@@ -45,7 +45,7 @@ jest.mock('Components/utils/InViewport', () => ({
 
 const createCall = (state: CALL_STATE, selfUser = new User(createUuid()), selfClientId = createUuid()) => {
   const selfParticipant = new Participant(selfUser, selfClientId);
-  const call = new Call({domain: '', id: ''}, {domain: '', id: ''}, 0, selfParticipant, CALL_TYPE.NORMAL, {
+  const call = new Call({domain: '', id: ''}, new Conversation('', ''), 0, selfParticipant, CALL_TYPE.NORMAL, {
     currentAvailableDeviceId: {
       audiooutput: ko.pureComputed(() => 'test'),
     },
@@ -73,7 +73,6 @@ const createProps = async () => {
     conversation,
     hasAccessToCamera: true,
     isSelfVerified: true,
-    multitasking: {isMinimized: ko.observable(false)},
     teamState: mockTeamState,
     videoGrid: {grid: [], thumbnail: undefined},
   } as CallingCellProps;

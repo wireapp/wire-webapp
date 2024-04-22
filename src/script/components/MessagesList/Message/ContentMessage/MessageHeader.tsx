@@ -21,6 +21,7 @@ import {Tooltip} from '@wireapp/react-ui-kit';
 
 import {AVATAR_SIZE, Avatar} from 'Components/Avatar';
 import {Icon} from 'Components/Icon';
+import {UserBlockedBadge} from 'Components/UserBlockedBadge/UserBlockedBadge';
 import {UserName} from 'Components/UserName';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {DeleteMessage} from 'src/script/entity/message/DeleteMessage';
@@ -85,7 +86,7 @@ export function MessageHeader({
   children,
 }: MessageHeaderParams) {
   const {user: sender} = useKoSubscribableChildren(message, ['user']);
-  const {isAvailable} = useKoSubscribableChildren(sender, ['isAvailable']);
+  const {isAvailable, isBlocked} = useKoSubscribableChildren(sender, ['isAvailable', 'isBlocked']);
 
   return (
     <div className="message-header">
@@ -107,6 +108,12 @@ export function MessageHeader({
         >
           <UserName user={sender} />
         </h4>
+
+        {isBlocked && (
+          <span css={{marginLeft: 4}}>
+            <UserBlockedBadge />
+          </span>
+        )}
 
         {!noBadges && <BadgeSection sender={sender} />}
 

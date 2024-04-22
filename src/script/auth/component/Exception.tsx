@@ -21,7 +21,7 @@ import {Fragment} from 'react';
 
 import {FormattedMessage} from 'react-intl';
 
-import {ErrorMessage} from '@wireapp/react-ui-kit';
+import {ErrorMessage, Link} from '@wireapp/react-ui-kit';
 
 import {Config} from '../../Config';
 import {errorHandlerStrings, validationErrorStrings} from '../../strings';
@@ -50,9 +50,14 @@ const Exception = ({errors = []}: ExceptionProps) => {
                 values={{
                   minPasswordLength: Config.getConfig().MINIMUM_PASSWORD_LENGTH,
                   supportEmailExistsLink: (
-                    <a target="_blank" rel="noopener noreferrer" href={Config.getConfig().URL.SUPPORT.EMAIL_EXISTS}>
+                    <Link targetBlank href={Config.getConfig().URL.SUPPORT.EMAIL_EXISTS}>
                       <FormattedMessage {...errorHandlerStrings.learnMore} />
-                    </a>
+                    </Link>
+                  ),
+                  supportKeychainLink: (
+                    <Link targetBlank href={Config.getConfig().URL.SUPPORT.SYSTEM_KEYCHAIN_ACCESS}>
+                      <FormattedMessage {...errorHandlerStrings.howToLogIn} />
+                    </Link>
                   ),
                 }}
               />

@@ -17,13 +17,14 @@
  *
  */
 
-import {FC, KeyboardEvent as ReactKeyboardEvent, useEffect, useRef, useState} from 'react';
+import {KeyboardEvent as ReactKeyboardEvent, useEffect, useRef, useState} from 'react';
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {ZoomableImage} from 'Components/ZoomableImage';
 import {User} from 'src/script/entity/User';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -53,14 +54,14 @@ interface DetailViewModalProps {
   selfUser: User;
 }
 
-const DetailViewModal: FC<DetailViewModalProps> = ({
+export const DetailViewModal = ({
   assetRepository,
   conversationRepository,
   messageRepository,
   currentMessageEntity,
   onClose,
   selfUser,
-}) => {
+}: DetailViewModalProps) => {
   const currentMessageEntityId = useRef<string>(currentMessageEntity.id);
 
   const [conversationEntity, setConversationEntity] = useState<Conversation | null>(null);
@@ -241,11 +242,14 @@ const DetailViewModal: FC<DetailViewModalProps> = ({
   }, []);
 
   const modalId = 'detail-view';
+
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent): void => {
       preventFocusOutside(event, modalId);
     };
+
     document.addEventListener('keydown', onKeyDown);
+
     return () => {
       document.removeEventListener('keydown', onKeyDown);
     };
@@ -265,9 +269,8 @@ const DetailViewModal: FC<DetailViewModalProps> = ({
             className="detail-view-main button-reset-default"
             onKeyDown={handleOnClosePress}
             aria-label={t('accessibility.conversationDetailsCloseLabel')}
-            onClick={onCloseClick}
           >
-            <img className="detail-view-image" src={imageSrc} data-uie-name="status-picture" alt="" />
+            <ZoomableImage key={currentMessageEntityId.current} src={imageSrc} data-uie-name="status-picture" />
           </button>
 
           <DetailViewModalFooter
@@ -283,7 +286,5 @@ const DetailViewModal: FC<DetailViewModalProps> = ({
     </div>
   );
 };
-
-export {DetailViewModal};
 
 export const showDetailViewModal = renderElement<DetailViewModalProps>(DetailViewModal);

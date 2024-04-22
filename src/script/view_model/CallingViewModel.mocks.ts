@@ -17,7 +17,6 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
@@ -28,6 +27,7 @@ import {CallingViewModel} from './CallingViewModel';
 import {Call} from '../calling/Call';
 import {CallingRepository} from '../calling/CallingRepository';
 import {CallState} from '../calling/CallState';
+import {Conversation} from '../entity/Conversation';
 import {Core} from '../service/CoreSingleton';
 
 export const mockCallingRepository = {
@@ -46,9 +46,8 @@ export const mockCallingRepository = {
 
 export const callState = new CallState();
 
-export function buildCall(conversationId: QualifiedId, convType = CONV_TYPE.ONEONONE) {
-  const qualifiedId = typeof conversationId === 'string' ? {id: conversationId, domain: ''} : conversationId;
-  return new Call({id: 'user1', domain: ''}, qualifiedId, convType, {} as any, CALL_TYPE.NORMAL, {
+export function buildCall(conversation: Conversation, convType = CONV_TYPE.ONEONONE) {
+  return new Call({id: 'user1', domain: ''}, conversation, convType, {} as any, CALL_TYPE.NORMAL, {
     currentAvailableDeviceId: {audiooutput: ko.observable()},
   } as any);
 }
@@ -64,10 +63,8 @@ export function buildCallingViewModel() {
     {} as any,
     {} as any,
     {} as any,
-    {} as any,
     undefined,
     callState,
-    undefined,
   );
 
   return [callingViewModel, {core: mockCore}] as const;

@@ -158,15 +158,8 @@ export class ConnectionRepository {
    * @param nextConversationEntity Conversation to be switched to
    * @returns Promise that resolves when the user was blocked
    */
-  public async blockUser(
-    userEntity: User,
-    hideConversation: boolean = false,
-    nextConversationEntity?: Conversation,
-  ): Promise<void> {
+  public async blockUser(userEntity: User): Promise<void> {
     await this.updateStatus(userEntity, ConnectionStatus.BLOCKED);
-    if (hideConversation) {
-      amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversationEntity, {});
-    }
   }
 
   /**

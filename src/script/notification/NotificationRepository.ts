@@ -39,7 +39,7 @@ import {PermissionState} from './PermissionState';
 import {AssetRepository} from '../assets/AssetRepository';
 import {AudioRepository} from '../audio/AudioRepository';
 import {AudioType} from '../audio/AudioType';
-import {CallState} from '../calling/CallState';
+import {CallingViewMode, CallState} from '../calling/CallState';
 import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
 import type {ConnectionEntity} from '../connection/ConnectionEntity';
 import {ConversationEphemeralHandler} from '../conversation/ConversationEphemeralHandler';
@@ -64,15 +64,6 @@ import {PermissionType} from '../permission/PermissionType';
 import {UserState} from '../user/UserState';
 import {Warnings} from '../view_model/WarningsContainer';
 
-export interface Multitasking {
-  isMinimized: ko.Observable<boolean>;
-}
-
-interface ContentViewModelState {
-  multitasking: Multitasking;
-  state: ContentState | null;
-}
-
 type NotificationData = {conversationId?: QualifiedId; messageId?: string; messageType: string};
 interface NotificationContent {
   /** Notification options */
@@ -95,7 +86,6 @@ interface WebappNotifications extends Notification {
  * @see http://www.w3.org/TR/notifications
  */
 export class NotificationRepository {
-  private contentViewModelState: ContentViewModelState;
   private readonly conversationRepository: ConversationRepository;
   private readonly logger: Logger;
   private readonly notifications: WebappNotifications[];
@@ -136,10 +126,6 @@ export class NotificationRepository {
     this.assetRepository = container.resolve(AssetRepository);
     this.conversationRepository = conversationRepository;
     this.permissionRepository = permissionRepository;
-    this.contentViewModelState = {
-      multitasking: {isMinimized: (() => false) as ko.Observable<boolean>},
-      state: null,
-    };
 
     this.logger = getLogger('NotificationRepository');
 
@@ -155,10 +141,6 @@ export class NotificationRepository {
     });
 
     this.permissionState = this.permissionRepository.permissionState[PermissionType.NOTIFICATIONS];
-  }
-
-  setContentViewModelStates(state: ContentState, multitasking: {isMinimized: ko.Observable<boolean>}): void {
-    this.contentViewModelState = {multitasking, state};
   }
 
   subscribeToEvents(): void {
@@ -835,7 +817,8 @@ export class NotificationRepository {
       : false;
     const {contentState} = useAppState.getState();
     const inConversationView = contentState === ContentState.CONVERSATION;
-    const inMaximizedCall = !!this.callState.joinedCall() && !this.contentViewModelState.multitasking.isMinimized();
+    const inMaximizedCall =
+      !!this.callState.joinedCall() && this.callState.viewMode() === CallingViewMode.FULL_SCREEN_GRID;
 
     const activeConversation = document.hasFocus() && inConversationView && inActiveConversation && !inMaximizedCall;
     const messageFromSelf = messageEntity.user().isMe;
@@ -884,7 +867,7 @@ export class NotificationRepository {
     notification.onclick = () => {
       amplify.publish(WebAppEvents.NOTIFICATION.CLICK);
       window.focus();
-      this.contentViewModelState.multitasking.isMinimized(true);
+      this.callState.viewMode(CallingViewMode.MINIMIZED);
       notificationContent.trigger();
 
       this.logger.info(`Notification for ${messageInfo} in '${conversationId?.id || conversationId}' closed by click.`);

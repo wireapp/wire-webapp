@@ -100,6 +100,8 @@ function buildConversationRepository() {
     deleteConversation: () => {},
     deleteConversationFromDb: () => {},
     wipeMLSCapableConversation: () => {},
+    postBots: () => {},
+    saveConversationStateInDb: () => {},
   } as ConversationService;
   const messageRepository = {setClientMismatchHandler: () => {}} as unknown as MessageRepository;
   // @ts-ignore
@@ -234,7 +236,7 @@ describe('ConversationRepository', () => {
       });
     });
 
-    it('should not contain a blocked conversations', () => {
+    it('should contain blocked conversations', () => {
       const blocked_conversation_et = _generateConversation({
         type: CONVERSATION_TYPE.ONE_TO_ONE,
         status: ConnectionStatus.BLOCKED,
@@ -253,7 +255,7 @@ describe('ConversationRepository', () => {
             blocked_conversation_et,
             testFactory.conversation_repository['conversationState'].filteredConversations,
           ),
-        ).toBeUndefined();
+        ).toEqual(blocked_conversation_et);
       });
     });
 
@@ -376,6 +378,37 @@ describe('ConversationRepository', () => {
       const conversationEntity = await conversationRepository.init1to1Conversation(proteus1to1Conversation, true);
       expect(conversationEntity).toEqual(proteus1to1Conversation);
       expect(conversationRepository['conversationService'].getMLS1to1Conversation).not.toHaveBeenCalled();
+    });
+
+    it('just returns a proteus conversation with a bot/service', async () => {
+      const conversationRepository = testFactory.conversation_repository!;
+      const userRepository = testFactory.user_repository!;
+
+      const otherUserId = {id: 'f718410c-1733-479d-bd80-af03f38416', domain: 'test-domain'};
+      const otherUser = new User(otherUserId.id, otherUserId.domain);
+      otherUser.isService = true;
+      otherUser.supportedProtocols([ConversationProtocol.PROTEUS]);
+
+      userRepository['userState'].users.push(otherUser);
+
+      const selfUserId = {id: '109da9ca-a417-47a870-9ffbe924b2d1', domain: 'test-domain'};
+      const selfUser = new User(selfUserId.id, selfUserId.domain);
+      selfUser.supportedProtocols([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]);
+      jest.spyOn(conversationRepository['userState'], 'self').mockReturnValueOnce(selfUser);
+
+      const proteus1to1Conversation = _generateConversation({
+        type: CONVERSATION_TYPE.REGULAR,
+        protocol: ConversationProtocol.PROTEUS,
+        overwites: {team_id: 'teamId'},
+      });
+
+      proteus1to1Conversation.participating_user_ids([otherUserId]);
+      proteus1to1Conversation.participating_user_ets([otherUser]);
+
+      jest.spyOn(conversationRepository['conversationService'], 'getMLS1to1Conversation');
+
+      const conversationEntity = await conversationRepository.init1to1Conversation(proteus1to1Conversation, true);
+      expect(conversationEntity).toEqual(proteus1to1Conversation);
     });
   });
 
@@ -1084,6 +1117,56 @@ describe('ConversationRepository', () => {
       await waitFor(() => {
         expect(conversationRepository.getInitialised1To1Conversation).not.toHaveBeenCalled();
       });
+    });
+  });
+
+  describe('create1to1ConversationWithService', () => {
+    it('creates a 1:1 conversation with a service', async () => {
+      const [conversationRepository, {conversationService}] = buildConversationRepository();
+
+      const serviceId = 'service-id';
+      const providerId = 'provider-id';
+
+      const createdConversation = new Conversation('id', 'domain');
+
+      const memberJoinEvent: ConversationMemberJoinEvent = {
+        conversation: conversation_et.id,
+        data: {
+          user_ids: ['9028624e-bfef-490a-ba61-01683f5ccc83'],
+        },
+        from: 'd5a39ffb-6ce3-4cc8-9048-0e15d031b4c5',
+        time: '2015-04-27T11:42:31.475Z',
+        type: CONVERSATION_EVENT.MEMBER_JOIN,
+      };
+
+      jest.spyOn(conversationRepository, 'createGroupConversation').mockResolvedValueOnce(createdConversation);
+      jest.spyOn(conversationService, 'postBots').mockResolvedValueOnce(memberJoinEvent);
+
+      await conversationRepository.create1to1ConversationWithService({providerId, serviceId});
+
+      expect(conversationRepository.createGroupConversation).toHaveBeenCalled();
+    });
+
+    it('deletes the conversation when adding a service failed', async () => {
+      const [conversationRepository, {teamState, conversationService}] = buildConversationRepository();
+
+      const serviceId = 'service-id';
+      const providerId = 'provider-id';
+
+      const teamId = createUuid();
+
+      teamState.team({id: teamId} as any);
+
+      const createdConversation = new Conversation('id', 'domain');
+
+      jest.spyOn(conversationRepository, 'createGroupConversation').mockResolvedValueOnce(createdConversation);
+      jest.spyOn(conversationService, 'postBots').mockRejectedValueOnce(new Error(''));
+
+      await expect(async () => {
+        await conversationRepository.create1to1ConversationWithService({providerId, serviceId});
+        expect(conversationRepository.createGroupConversation).toHaveBeenCalled();
+        expect(conversationRepository.deleteConversation).toHaveBeenCalledWith(createdConversation);
+      }).rejects.toThrow();
     });
   });
 

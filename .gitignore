@@ -1,5 +1,3 @@
-!/.idea/codeStyleSettings.xml
-!/.idea/modules.xml
 .env
 .env.defaults
 .DS_Store
@@ -23,4 +21,3 @@ yarn-error.log
 !.yarn/plugins
 !.yarn/releases
 !.yarn/sdks
-!.yarn/versions

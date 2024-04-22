@@ -29,6 +29,7 @@ import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {ErrorFallback} from 'Components/ErrorFallback';
 import {Icon} from 'Components/Icon';
 import {UserClassifiedBar} from 'Components/input/ClassifiedBar';
+import {UserBlockedBadge} from 'Components/UserBlockedBadge/UserBlockedBadge';
 import {UserInfo} from 'Components/UserInfo';
 import {UserVerificationBadges} from 'Components/VerificationBadge';
 import {TeamState} from 'src/script/team/TeamState';
@@ -62,6 +63,7 @@ const UserDetailsComponent = ({
     'isTemporaryGuest',
     'expirationText',
     'isAvailable',
+    'isBlocked',
   ]);
 
   useEffect(() => {
@@ -102,6 +104,12 @@ const UserDetailsComponent = ({
         <div className="panel-participant__label panel-participant__label--external" data-uie-name="status-external">
           <Icon.External />
           <span>{badge}</span>
+        </div>
+      )}
+
+      {user.isBlocked && (
+        <div css={{[':not(:last-child)']: {marginBottom: 8}}}>
+          <UserBlockedBadge />
         </div>
       )}
 
