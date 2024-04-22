@@ -48,6 +48,7 @@ export interface UserAvatarProps extends React.HTMLProps<HTMLDivElement> {
   ) => void;
   participant: User;
   state: STATE;
+  showAvailabilityState?: boolean;
 }
 
 export const shouldShowBadge = (size: AVATAR_SIZE, state: STATE): boolean => {
@@ -64,7 +65,7 @@ const getIconSize = (size: AVATAR_SIZE): string => {
   return '16px';
 };
 
-export const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
+export const UserAvatar = ({
   participant,
   avatarSize,
   avatarAlt = '',
@@ -73,8 +74,9 @@ export const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
   isResponsive = false,
   state,
   onAvatarInteraction,
+  showAvailabilityState = true,
   ...props
-}) => {
+}: UserAvatarProps) => {
   const isImageGrey = !noFilter && [STATE.BLOCKED, STATE.IGNORED, STATE.PENDING, STATE.UNKNOWN].includes(state);
   const isBlocked = state === STATE.BLOCKED;
   const backgroundColor = state === STATE.UNKNOWN ? COLOR.GRAY : undefined;
@@ -125,7 +127,7 @@ export const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
 
       {(!isImageGrey || isBlocked) && <AvatarBorder isTransparent={!isBlocked} />}
 
-      {typeof availability === 'number' && availability !== AvailabilityType.Type.NONE && (
+      {showAvailabilityState && typeof availability === 'number' && availability !== AvailabilityType.Type.NONE && (
         <div css={AvailabilityWrapper}>
           <AvailabilityIcon availability={availability} />
         </div>

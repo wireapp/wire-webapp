@@ -21,7 +21,6 @@ import {useEffect, CSSProperties} from 'react';
 
 import {amplify} from 'amplify';
 import {ErrorBoundary} from 'react-error-boundary';
-import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
@@ -32,7 +31,6 @@ import {UserClassifiedBar} from 'Components/input/ClassifiedBar';
 import {UserBlockedBadge} from 'Components/UserBlockedBadge/UserBlockedBadge';
 import {UserInfo} from 'Components/UserInfo';
 import {UserVerificationBadges} from 'Components/VerificationBadge';
-import {TeamState} from 'src/script/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -46,7 +44,6 @@ interface UserDetailsProps {
   isVerified?: boolean;
   participant: User;
   avatarStyles?: CSSProperties;
-  teamState?: TeamState;
 }
 
 const UserDetailsComponent = ({
@@ -56,7 +53,6 @@ const UserDetailsComponent = ({
   isGroupAdmin,
   avatarStyles,
   classifiedDomains,
-  teamState = container.resolve(TeamState),
 }: UserDetailsProps) => {
   const user = useKoSubscribableChildren(participant, [
     'isDirectGuest',
@@ -93,6 +89,7 @@ const UserDetailsComponent = ({
         avatarSize={AVATAR_SIZE.X_LARGE}
         data-uie-name="status-profile-picture"
         style={avatarStyles}
+        showAvailabilityState={false}
       />
 
       {badge && (

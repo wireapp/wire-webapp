@@ -79,6 +79,7 @@ export interface AvatarProps extends HTMLProps<HTMLDivElement> {
   noFilter?: boolean;
   isResponsive?: boolean;
   onAvatarClick?: (participant: User | ServiceEntity) => void;
+  showAvailabilityState?: boolean;
 }
 
 const Avatar = ({
