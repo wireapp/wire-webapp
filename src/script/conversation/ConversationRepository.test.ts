@@ -100,6 +100,8 @@ function buildConversationRepository() {
     deleteConversation: () => {},
     deleteConversationFromDb: () => {},
     wipeMLSCapableConversation: () => {},
+    postBots: () => {},
+    saveConversationStateInDb: () => {},
   } as ConversationService;
   const messageRepository = {setClientMismatchHandler: () => {}} as unknown as MessageRepository;
   // @ts-ignore
@@ -1115,6 +1117,56 @@ describe('ConversationRepository', () => {
       await waitFor(() => {
         expect(conversationRepository.getInitialised1To1Conversation).not.toHaveBeenCalled();
       });
+    });
+  });
+
+  describe('create1to1ConversationWithService', () => {
+    it('creates a 1:1 conversation with a service', async () => {
+      const [conversationRepository, {conversationService}] = buildConversationRepository();
+
+      const serviceId = 'service-id';
+      const providerId = 'provider-id';
+
+      const createdConversation = new Conversation('id', 'domain');
+
+      const memberJoinEvent: ConversationMemberJoinEvent = {
+        conversation: conversation_et.id,
+        data: {
+          user_ids: ['9028624e-bfef-490a-ba61-01683f5ccc83'],
+        },
+        from: 'd5a39ffb-6ce3-4cc8-9048-0e15d031b4c5',
+        time: '2015-04-27T11:42:31.475Z',
+        type: CONVERSATION_EVENT.MEMBER_JOIN,
+      };
+
+      jest.spyOn(conversationRepository, 'createGroupConversation').mockResolvedValueOnce(createdConversation);
+      jest.spyOn(conversationService, 'postBots').mockResolvedValueOnce(memberJoinEvent);
+
+      await conversationRepository.create1to1ConversationWithService({providerId, serviceId});
+
+      expect(conversationRepository.createGroupConversation).toHaveBeenCalled();
+    });
+
+    it('deletes the conversation when adding a service failed', async () => {
+      const [conversationRepository, {teamState, conversationService}] = buildConversationRepository();
+
+      const serviceId = 'service-id';
+      const providerId = 'provider-id';
+
+      const teamId = createUuid();
+
+      teamState.team({id: teamId} as any);
+
+      const createdConversation = new Conversation('id', 'domain');
+
+      jest.spyOn(conversationRepository, 'createGroupConversation').mockResolvedValueOnce(createdConversation);
+      jest.spyOn(conversationService, 'postBots').mockRejectedValueOnce(new Error(''));
+
+      await expect(async () => {
+        await conversationRepository.create1to1ConversationWithService({providerId, serviceId});
+        expect(conversationRepository.createGroupConversation).toHaveBeenCalled();
+        expect(conversationRepository.deleteConversation).toHaveBeenCalledWith(createdConversation);
+      }).rejects.toThrow();
     });
   });
 

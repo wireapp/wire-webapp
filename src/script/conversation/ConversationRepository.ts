@@ -178,6 +178,11 @@ interface GetInitialised1To1ConversationOptions {
   shouldRefreshUser?: boolean;
 }
 
+type ConversaitonWithServiceParams = {
+  serviceId: string;
+  providerId: string;
+};
+
 export class ConversationRepository {
   private isBlockingNotificationHandling: boolean;
   private readonly ephemeralHandler: ConversationEphemeralHandler;
@@ -2388,6 +2393,46 @@ export class ConversationRepository {
   }
 
   /**
+   * Add service to conversation.
+   *
+   * @param serviceId serviceId ID of the service
+   * @param providerId providerId ID of the provider
+   * @returns Resolves when conversation with the integration was created
+   */
+  async create1to1ConversationWithService({
+    providerId,
+    serviceId,
+  }: ConversaitonWithServiceParams): Promise<Conversation> {
+    try {
+      const conversationEntity = await this.createGroupConversation([], undefined, ACCESS_STATE.TEAM.GUESTS_SERVICES);
+
+      if (!conversationEntity) {
+        throw new ConversationError(
+          ConversationError.TYPE.CONVERSATION_NOT_FOUND,
+          ConversationError.MESSAGE.CONVERSATION_NOT_FOUND,
+        );
+      }
+
+      try {
+        await this.addService(conversationEntity, {providerId, serviceId});
+        return conversationEntity;
+      } catch (error) {
+        // If we fail to add the service to the newly created conversation, we should delete the conversation
+        await this.deleteConversation(conversationEntity);
+        throw error;
+      }
+    } catch (error) {
+      PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
+        text: {
+          message: t('modalIntegrationUnavailableMessage'),
+          title: t('modalIntegrationUnavailableHeadline'),
+        },
+      });
+      throw error;
+    }
+  }
+
+  /**
    * Add a service to an existing conversation.
    *
    * @param conversationEntity Conversation to add service to
@@ -2395,20 +2440,39 @@ export class ConversationRepository {
    * @param serviceId ID of service
    * @returns Resolves when service was added
    */
-  addService(conversationEntity: Conversation, providerId: string, serviceId: string) {
-    return this.conversationService
-      .postBots(conversationEntity.id, providerId, serviceId)
-      .then((response: any) => {
-        const event = response?.event;
-        if (event) {
-          const logMessage = `Successfully added service to conversation '${conversationEntity.display_name()}'`;
-          this.logger.debug(logMessage, response);
-          return this.eventRepository.injectEvent(response.event, EventRepository.SOURCE.BACKEND_RESPONSE);
-        }
+  private async addService(conversationEntity: Conversation, {providerId, serviceId}: ConversaitonWithServiceParams) {
+    return this.conversationService.postBots(conversationEntity.id, providerId, serviceId).then((response: any) => {
+      const event = response?.event;
+      if (event) {
+        const logMessage = `Successfully added service to conversation '${conversationEntity.display_name()}'`;
+        this.logger.debug(logMessage, response);
+        return this.eventRepository.injectEvent(response.event, EventRepository.SOURCE.BACKEND_RESPONSE);
+      }
 
-        return event;
-      })
-      .catch(error => this.handleAddToConversationError(error, conversationEntity, [{domain: '', id: serviceId}]));
+      return event;
+    });
+  }
+
+  /**
+   * Add a service to an existing conversation.
+   *
+   * @param conversationEntity Conversation to add service to
+   * @param providerId ID of service provider
+   * @param serviceId ID of service
+   * @returns Resolves when service was added
+   */
+  public async addServiceToExistingConversation(
+    conversationEntity: Conversation,
+    {providerId, serviceId}: ConversaitonWithServiceParams,
+  ) {
+    try {
+      await this.addService(conversationEntity, {providerId, serviceId});
+    } catch (error) {
+      if (isBackendError(error)) {
+        return this.handleAddToConversationError(error, conversationEntity, [{domain: '', id: serviceId}]);
+      }
+      throw error;
+    }
   }
 
   private deleteConnectionRequestConversation = async (userId: QualifiedId) => {
