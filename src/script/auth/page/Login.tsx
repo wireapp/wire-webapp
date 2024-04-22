@@ -123,6 +123,9 @@ const LoginComponent = ({
 
   const features = Config.getConfig().FEATURE;
 
+  const showBackButton =
+    !embedded && (features.ENABLE_DOMAIN_DISCOVERY || features.ENABLE_SSO || features.ENABLE_ACCOUNT_REGISTRATION);
+
   const [showEntropyForm, setShowEntropyForm] = useState(false);
   const isEntropyRequired = features.ENABLE_EXTRA_CLIENT_ENTROPY;
   const onEntropyGenerated = useRef<((entropy: Uint8Array) => void) | undefined>();
@@ -350,12 +353,11 @@ const LoginComponent = ({
 
   return (
     <Page>
-      {!embedded &&
-        (features.ENABLE_DOMAIN_DISCOVERY || features.ENABLE_SSO || features.ENABLE_ACCOUNT_REGISTRATION) && (
-          <IsMobile>
-            <div style={{margin: 16}}>{backArrow}</div>
-          </IsMobile>
-        )}
+      {showBackButton && (
+        <IsMobile>
+          <div style={{margin: 16}}>{backArrow}</div>
+        </IsMobile>
+      )}
       {isEntropyRequired && showEntropyForm ? (
         <EntropyContainer onSetEntropy={storeEntropy} />
       ) : (
@@ -378,9 +380,7 @@ const LoginComponent = ({
             {!embedded && (
               <IsMobile not>
                 <Column style={{display: 'flex'}}>
-                  {(features.ENABLE_DOMAIN_DISCOVERY ||
-                    features.ENABLE_SSO ||
-                    features.ENABLE_ACCOUNT_REGISTRATION) && <div style={{margin: 'auto'}}>{backArrow}</div>}
+                  {showBackButton && <div style={{margin: 'auto'}}>{backArrow}</div>}
                 </Column>
               </IsMobile>
             )}
