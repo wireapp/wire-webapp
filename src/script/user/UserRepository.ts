@@ -196,6 +196,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
    * @param selfUser the user currently logged in (will be excluded from fetch)
    * @param connections the connection to other users
    * @param conversations the conversation the user is part of (used to compute extra users that are part of those conversations but not directly connected to the user)
+   * @param extraUsers the users that should be loaded additionally
    */
   async loadUsers(
     selfUser: User,
@@ -217,7 +218,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
 
     const dbUsers = await this.userService.loadUserFromDb();
     /* prior to April 2023, we were only storing the availability in the DB, we need to refetch those users */
-    const [localUsers, incompleteUsers] = partition(dbUsers, user => !!user.qualified_id);
+    const [localUsers] = partition(dbUsers, user => !!user.qualified_id);
 
     // We can remove users that are not linked to any "known users" from the local database.
     // Known users are the users that are part of the conversations or the connections (or some extra users)
@@ -235,9 +236,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
     const {found, failed} = await this.fetchRawUsers(usersToFetch, selfUser.domain);
 
     const userWithAvailability = found.map(user => {
-      const availability = [...localUsers, ...incompleteUsers, ...nonQualifiedUsers].find(
-        userRecord => userRecord.id === user.id,
-      );
+      const availability = [...dbUsers, ...nonQualifiedUsers].find(userRecord => userRecord.id === user.id);
 
       if (availability) {
         return {availability: availability.availability, ...user};
