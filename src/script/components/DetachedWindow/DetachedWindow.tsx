@@ -64,7 +64,6 @@ export const DetachedWindow = ({children, url = '', name, onClose, width = 600, 
 
     copyStyles(document, newWindow.document);
     newWindow.document.title = window.document.title;
-    newWindow.document.body.className = window.document.body.className;
 
     newWindow.addEventListener('beforeunload', onClose);
     window.addEventListener('beforeunload', onClose);
@@ -88,8 +87,15 @@ export const DetachedWindow = ({children, url = '', name, onClose, width = 600, 
       );
 };
 
+/**
+ *  Copy styles from one document to another - link, style elements and body element class names.
+ * @param source the source document object
+ * @param target the target document object
+ */
 const copyStyles = (source: Document, target: Document) => {
   source.head.querySelectorAll('link, style').forEach(htmlElement => {
     target.head.appendChild(htmlElement.cloneNode(true));
   });
+
+  target.body.className = source.body.className;
 };
