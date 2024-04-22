@@ -85,7 +85,7 @@
   "LOGOUT_REASON.SESSION_EXPIRED": "Sie wurden abgemeldet, da Ihre Session abgelaufen ist.{newline}Bitte melden Sie sich erneut an.",
   "LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE": "Nicht genug Speicherplatz",
   "LabeledError.GENERAL_ERRORS.SYSTEM_KEYCHAIN_ACCESS": "Wire can’t access your system's safe storage. {supportKeychainLink}",
-  "LabeledError.howToLogIn": "Find out how to log in",
+  "LabeledError.howToLogIn": "Erfahren Sie, wie Sie sich anmelden können",
   "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
   "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "Geben Sie einen Namen mit mindestens 2 Zeichen ein",
   "ValidationError.FIELD.NAME.VALUE_MISSING": "Geben Sie einen Namen mit mindestens 2 Zeichen ein",
