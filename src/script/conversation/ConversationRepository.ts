@@ -178,6 +178,11 @@ interface GetInitialised1To1ConversationOptions {
   shouldRefreshUser?: boolean;
 }
 
+type ConversaitonWithServiceParams = {
+  serviceId: string;
+  providerId: string;
+};
+
 export class ConversationRepository {
   private isBlockingNotificationHandling: boolean;
   private readonly ephemeralHandler: ConversationEphemeralHandler;
@@ -2397,10 +2402,7 @@ export class ConversationRepository {
   async create1to1ConversationWithService({
     providerId,
     serviceId,
-  }: {
-    providerId: string;
-    serviceId: string;
-  }): Promise<Conversation> {
+  }: ConversaitonWithServiceParams): Promise<Conversation> {
     try {
       const conversationEntity = await this.createGroupConversation([], undefined, ACCESS_STATE.TEAM.GUESTS_SERVICES);
 
@@ -2438,10 +2440,7 @@ export class ConversationRepository {
    * @param serviceId ID of service
    * @returns Resolves when service was added
    */
-  private async addService(
-    conversationEntity: Conversation,
-    {providerId, serviceId}: {providerId: string; serviceId: string},
-  ) {
+  private async addService(conversationEntity: Conversation, {providerId, serviceId}: ConversaitonWithServiceParams) {
     return this.conversationService.postBots(conversationEntity.id, providerId, serviceId).then((response: any) => {
       const event = response?.event;
       if (event) {
@@ -2464,7 +2463,7 @@ export class ConversationRepository {
    */
   public async addServiceToExistingConversation(
     conversationEntity: Conversation,
-    {providerId, serviceId}: {providerId: string; serviceId: string},
+    {providerId, serviceId}: ConversaitonWithServiceParams,
   ) {
     try {
       await this.addService(conversationEntity, {providerId, serviceId});
