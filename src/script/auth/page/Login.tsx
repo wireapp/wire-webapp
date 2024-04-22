@@ -32,6 +32,7 @@ import {Runtime, UrlUtil} from '@wireapp/commons';
 import {
   ArrowIcon,
   Button,
+  ButtonVariant,
   Checkbox,
   CheckboxLabel,
   CodeInput,
@@ -61,7 +62,7 @@ import {EntropyContainer} from './EntropyContainer';
 import {Page} from './Page';
 
 import {Config} from '../../Config';
-import {loginStrings, verifyStrings} from '../../strings';
+import {indexStrings, loginStrings, verifyStrings} from '../../strings';
 import {AppAlreadyOpen} from '../component/AppAlreadyOpen';
 import {Exception} from '../component/Exception';
 import {JoinGuestLinkPasswordModal} from '../component/JoinGuestLinkPasswordModal';
@@ -478,6 +479,17 @@ const LoginComponent = ({
                       >
                         {_(loginStrings.phoneLogin)}
                       </RouterLink>
+                    )}
+                    {embedded && (features.ENABLE_DOMAIN_DISCOVERY || features.ENABLE_SSO) && (
+                      <Button
+                        type="button"
+                        variant={ButtonVariant.SECONDARY}
+                        onClick={() => navigate(`${ROUTE.SSO}/${defaultSSOCode ?? ''}`)}
+                        style={{marginTop: '16px'}}
+                        data-uie-name="go-sso-login"
+                      >
+                        {_(features.ENABLE_DOMAIN_DISCOVERY ? indexStrings.enterprise : indexStrings.ssoLogin)}
+                      </Button>
                     )}
                   </>
                 )}
