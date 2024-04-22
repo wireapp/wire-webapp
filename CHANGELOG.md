@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [26.13.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@26.12.0...@wireapp/api-client@26.13.0) (2024-04-22)
+
+### Features
+
+* Add method to subscribe to wire pro plans ([#6167](https://github.com/wireapp/wire-web-packages/issues/6167)) ([7533d38](https://github.com/wireapp/wire-web-packages/commit/7533d381b3e489ec7f3d5b36cafed309f8d4aaf7))
+
 # [26.12.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@26.11.4...@wireapp/api-client@26.12.0) (2024-04-03)
 
 ### Features
