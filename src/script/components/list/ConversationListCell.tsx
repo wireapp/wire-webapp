@@ -71,7 +71,6 @@ const ConversationListCell = ({
   const {
     isGroup,
     is1to1,
-    selfUser,
     participating_user_ets: users,
     display_name: displayName,
     removed_from_conversation: removedFromConversation,
@@ -81,7 +80,6 @@ const ConversationListCell = ({
   } = useKoSubscribableChildren(conversation, [
     'isGroup',
     'is1to1',
-    'selfUser',
     'participating_user_ets',
     'display_name',
     'removed_from_conversation',
@@ -195,8 +193,6 @@ const ConversationListCell = ({
                 className="conversation-list-cell-availability"
                 user={conversation.firstUserEntity()!}
                 theme={isActive}
-                dataUieName="status-availability-item"
-                showAvailability={is1to1 && !!selfUser?.teamId}
               />
             ) : (
               <span className={cx('conversation-list-cell-name', {'conversation-list-cell-name--active': isActive})}>

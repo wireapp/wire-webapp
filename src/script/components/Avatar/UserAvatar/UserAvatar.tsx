@@ -39,7 +39,6 @@ import {AvatarWrapper} from '../AvatarWrapper';
 
 export interface UserAvatarProps extends React.HTMLProps<HTMLDivElement> {
   avatarSize: AVATAR_SIZE;
-  availability?: AvailabilityType.Type;
   avatarAlt?: string;
   noBadge?: boolean;
   noFilter?: boolean;
@@ -58,7 +57,6 @@ export const shouldShowBadge = (size: AVATAR_SIZE, state: STATE): boolean => {
 };
 
 export const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
-  availability,
   participant,
   avatarSize,
   avatarAlt = '',
@@ -73,16 +71,19 @@ export const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
   const backgroundColor = state === STATE.UNKNOWN ? COLOR.GRAY : undefined;
   const name = useUserName(participant);
   const {
+    availability,
     mediumPictureResource,
     previewPictureResource,
     accent_color: accentColor,
     initials,
   } = useKoSubscribableChildren(participant, [
+    'availability',
     'mediumPictureResource',
     'previewPictureResource',
     'accent_color',
     'initials',
   ]);
+
   const avatarImgAlt = avatarAlt ? avatarAlt : `${t('userProfileImageAlt')} ${name}`;
 
   return (

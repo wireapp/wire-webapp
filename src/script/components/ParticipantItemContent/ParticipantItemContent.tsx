@@ -31,7 +31,6 @@ import {
   contentInfoText,
   selfIndicator,
   userName,
-  userAvailability,
   ellipsis,
   nameWrapper,
   chevronIcon,
@@ -73,13 +72,7 @@ export const ParticipantItemContent = ({
       <div css={contentText}>
         <div css={nameWrapper}>
           {!isService ? (
-            <UserInfo
-              user={participant}
-              css={[userName, userAvailability, ellipsis]}
-              dataUieName="status-name"
-              selfString={selfString}
-              showAvailability={showAvailabilityState && selfInTeam}
-            >
+            <UserInfo user={participant} css={[userName, ellipsis]} selfString={selfString}>
               <UserVerificationBadges user={participant} groupId={groupId} />
             </UserInfo>
           ) : (

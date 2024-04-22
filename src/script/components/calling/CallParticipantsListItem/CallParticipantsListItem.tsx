@@ -103,7 +103,6 @@ export const CallParticipantsListItem = ({
         <CallParticipantItemContent
           isAudioEstablished={isAudioEstablished}
           user={user}
-          selfInTeam={selfInTeam}
           isSelf={isSelf}
           showContextMenu={showContextMenu}
           onDropdownClick={event => onContextMenu?.(event as unknown as React.MouseEvent<HTMLDivElement>)}

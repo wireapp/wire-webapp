@@ -19,14 +19,22 @@
 
 import {CSSObject} from '@emotion/react';
 
+import {Availability as AvailabilityProp} from '@wireapp/protocol-messaging';
+
 import {CSS_SQUARE} from 'Util/CSSMixin';
 
-export const iconStyles: CSSObject = {
-  ...CSS_SQUARE(8),
-  fill: 'currentColor',
-  stroke: 'currentColor',
-  borderRadius: '50%',
+const availabilityStateColors: Partial<Record<AvailabilityProp.Type, string>> = {
+  [AvailabilityProp.Type.AVAILABLE]: 'var(--green-500)',
+  [AvailabilityProp.Type.AWAY]: 'var(--red-500)',
+  [AvailabilityProp.Type.BUSY]: 'var(--amber-500)',
 };
+
+export const iconStyles = (availabilityState: AvailabilityProp.Type): CSSObject => ({
+  ...CSS_SQUARE(8),
+  fill: availabilityStateColors[availabilityState],
+  stroke: availabilityStateColors[availabilityState],
+  borderRadius: '50%',
+});
 
 export const AvailabilityIcon: CSSObject = {
   background: 'var(--white)',

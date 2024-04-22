@@ -41,19 +41,17 @@ type UserDetailsProps = {
 
 const UserDetailsComponent = ({user, isTeam = false, groupId, isSideBarOpen = false}: UserDetailsProps) => {
   const {
-    availability,
     name: userName,
     username: userHandle,
     isOnLegalHold,
     hasPendingLegalHold,
-  } = useKoSubscribableChildren(user, ['availability', 'hasPendingLegalHold', 'isOnLegalHold', 'name', 'username']);
+  } = useKoSubscribableChildren(user, ['hasPendingLegalHold', 'isOnLegalHold', 'name', 'username']);
 
   const showLegalHold = isOnLegalHold || hasPendingLegalHold;
 
   return (
     <div css={styles.wrapper(isSideBarOpen)}>
       <Avatar
-        availability={availability}
         className="see-through user-details-avatar"
         participant={user}
         avatarSize={isSideBarOpen ? AVATAR_SIZE.MEDIUM : AVATAR_SIZE.SMALL}
@@ -61,7 +59,7 @@ const UserDetailsComponent = ({user, isTeam = false, groupId, isSideBarOpen = fa
       />
 
       <div css={styles.userDetailsWrapper(isSideBarOpen)}>
-        {!isTeam ? (
+        {isTeam ? (
           <>
             <div css={styles.userDetails} data-uie-name="status-availability">
               <button

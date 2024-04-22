@@ -26,17 +26,31 @@ import {Icon} from 'Components/Icon';
 import * as styles from './Availability.styles';
 
 const availabilityIconBaseProps = {
-  className: 'availability-state-icon',
-  css: styles.iconStyles,
   'data-uie-name': 'status-availability-icon',
 };
 
 const availabilityIconRenderer: Record<AvailabilityProp.Type, ReactNode> = {
   [AvailabilityProp.Type.AVAILABLE]: (
-    <Icon.AvailabilityAvailable {...availabilityIconBaseProps} data-uie-value="available" />
+    <Icon.AvailabilityAvailable
+      {...availabilityIconBaseProps}
+      css={styles.iconStyles(AvailabilityProp.Type.AVAILABLE)}
+      data-uie-value="available"
+    />
   ),
-  [AvailabilityProp.Type.AWAY]: <Icon.AvailabilityAway {...availabilityIconBaseProps} data-uie-value="away" />,
-  [AvailabilityProp.Type.BUSY]: <Icon.AvailabilityBusy {...availabilityIconBaseProps} data-uie-value="busy" />,
+  [AvailabilityProp.Type.AWAY]: (
+    <Icon.AvailabilityAway
+      {...availabilityIconBaseProps}
+      css={styles.iconStyles(AvailabilityProp.Type.AWAY)}
+      data-uie-value="away"
+    />
+  ),
+  [AvailabilityProp.Type.BUSY]: (
+    <Icon.AvailabilityBusy
+      {...availabilityIconBaseProps}
+      css={styles.iconStyles(AvailabilityProp.Type.BUSY)}
+      data-uie-value="busy"
+    />
+  ),
   [AvailabilityProp.Type.NONE]: null,
 };
 
