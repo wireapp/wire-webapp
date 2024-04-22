@@ -120,8 +120,10 @@ const LoginComponent = ({
 
   const isOauth = UrlUtil.hasURLParameter(QUERY_KEY.SCOPE, window.location.hash);
 
+  const features = Config.getConfig().FEATURE;
+
   const [showEntropyForm, setShowEntropyForm] = useState(false);
-  const isEntropyRequired = Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY;
+  const isEntropyRequired = features.ENABLE_EXTRA_CLIENT_ENTROPY;
   const onEntropyGenerated = useRef<((entropy: Uint8Array) => void) | undefined>();
   const entropy = useRef<Uint8Array | undefined>();
 
@@ -348,9 +350,7 @@ const LoginComponent = ({
   return (
     <Page>
       {!embedded &&
-        (Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY ||
-          Config.getConfig().FEATURE.ENABLE_SSO ||
-          Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION) && (
+        (features.ENABLE_DOMAIN_DISCOVERY || features.ENABLE_SSO || features.ENABLE_ACCOUNT_REGISTRATION) && (
           <IsMobile>
             <div style={{margin: 16}}>{backArrow}</div>
           </IsMobile>
@@ -377,11 +377,9 @@ const LoginComponent = ({
             {!embedded && (
               <IsMobile not>
                 <Column style={{display: 'flex'}}>
-                  {(Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY ||
-                    Config.getConfig().FEATURE.ENABLE_SSO ||
-                    Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION) && (
-                    <div style={{margin: 'auto'}}>{backArrow}</div>
-                  )}
+                  {(features.ENABLE_DOMAIN_DISCOVERY ||
+                    features.ENABLE_SSO ||
+                    features.ENABLE_ACCOUNT_REGISTRATION) && <div style={{margin: 'auto'}}>{backArrow}</div>}
                 </Column>
               </IsMobile>
             )}
@@ -471,7 +469,7 @@ const LoginComponent = ({
                     >
                       {_(loginStrings.forgotPassword)}
                     </Link>
-                    {!embedded && Config.getConfig().FEATURE.ENABLE_PHONE_LOGIN && (
+                    {!embedded && features.ENABLE_PHONE_LOGIN && (
                       <RouterLink
                         variant={LinkVariant.PRIMARY}
                         style={{paddingTop: '12px', textAlign: 'center'}}
