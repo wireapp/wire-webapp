@@ -20,6 +20,7 @@
 import {memo} from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+import cx from 'classnames';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
@@ -32,12 +33,30 @@ import * as styles from './UserDetails.styles';
 import {User} from '../../../entity/User';
 import {AvailabilityContextMenu} from '../../../ui/AvailabilityContextMenu';
 
-type UserDetailsProps = {
+interface AvailabilityStateButtonWrapperProps {
+  children: React.ReactElement;
+  isTeam: boolean;
+}
+
+const AvailabilityStateButtonWrapper = ({children, isTeam = false}: AvailabilityStateButtonWrapperProps) => {
+  return isTeam ? (
+    <button
+      onClick={event => AvailabilityContextMenu.show(event.nativeEvent, 'left-list-availability-menu')}
+      className="button-reset-default user-details-avatar"
+    >
+      {children}
+    </button>
+  ) : (
+    children
+  );
+};
+
+interface UserDetailsProps {
   user: User;
   groupId?: string;
   isTeam?: boolean;
   isSideBarOpen?: boolean;
-};
+}
 
 const UserDetailsComponent = ({user, isTeam = false, groupId, isSideBarOpen = false}: UserDetailsProps) => {
   const {
@@ -51,12 +70,14 @@ const UserDetailsComponent = ({user, isTeam = false, groupId, isSideBarOpen = fa
 
   return (
     <div css={styles.wrapper(isSideBarOpen)}>
-      <Avatar
-        className="see-through user-details-avatar"
-        participant={user}
-        avatarSize={isSideBarOpen ? AVATAR_SIZE.MEDIUM : AVATAR_SIZE.SMALL}
-        avatarAlt={t('selfProfileImageAlt')}
-      />
+      <AvailabilityStateButtonWrapper isTeam={isTeam}>
+        <Avatar
+          className={cx('see-through', {'user-details-avatar': isTeam})}
+          participant={user}
+          avatarSize={AVATAR_SIZE.MEDIUM}
+          avatarAlt={t('selfProfileImageAlt')}
+        />
+      </AvailabilityStateButtonWrapper>
 
       <div css={styles.userDetailsWrapper(isSideBarOpen)}>
         {isTeam ? (

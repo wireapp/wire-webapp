@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect} from 'react';
+import {useEffect, CSSProperties} from 'react';
 
 import {amplify} from 'amplify';
 import {ErrorBoundary} from 'react-error-boundary';
@@ -44,11 +44,11 @@ interface UserDetailsProps {
   isGroupAdmin?: boolean;
   isVerified?: boolean;
   participant: User;
-  avatarStyles?: React.CSSProperties;
+  avatarStyles?: CSSProperties;
   teamState?: TeamState;
 }
 
-const UserDetailsComponent: React.FC<UserDetailsProps> = ({
+const UserDetailsComponent = ({
   badge,
   participant,
   groupId,
@@ -56,9 +56,8 @@ const UserDetailsComponent: React.FC<UserDetailsProps> = ({
   avatarStyles,
   classifiedDomains,
   teamState = container.resolve(TeamState),
-}) => {
+}: UserDetailsProps) => {
   const user = useKoSubscribableChildren(participant, [
-    'isGuest',
     'isDirectGuest',
     'isTemporaryGuest',
     'expirationText',
@@ -73,12 +72,7 @@ const UserDetailsComponent: React.FC<UserDetailsProps> = ({
   return (
     <div className="panel-participant">
       <div className="panel-participant__head">
-        <UserInfo
-          className="panel-participant__head__name"
-          user={participant}
-          dataUieName="status-name"
-          showAvailability={teamState.isInTeam(participant)}
-        >
+        <UserInfo className="panel-participant__head__name" user={participant} dataUieName="status-name">
           <UserVerificationBadges user={participant} groupId={groupId} />
         </UserInfo>
       </div>
@@ -136,7 +130,7 @@ const UserDetailsComponent: React.FC<UserDetailsProps> = ({
   );
 };
 
-export const UserDetails: React.FC<UserDetailsProps> = props => {
+export const UserDetails = (props: UserDetailsProps) => {
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
       <UserDetailsComponent {...props} />

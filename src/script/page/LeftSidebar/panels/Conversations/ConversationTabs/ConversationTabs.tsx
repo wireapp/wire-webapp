@@ -101,7 +101,6 @@ export const ConversationTabs = ({
       unreadConversations: totalUnreadConversations,
     },
     {
-      hideTab: archivedConversations.length === 0,
       type: SidebarTabs.ARCHIVES,
       title: t('tooltipConversationsArchived', archivedConversations.length),
       label: t('conversationFooterArchive'),
@@ -122,10 +121,6 @@ export const ConversationTabs = ({
         <div className="conversations-sidebar-title">{t('videoCallOverlayConversations')}</div>
 
         {conversationTabs.map((conversationTab, index) => {
-          if (conversationTab.hideTab) {
-            return null;
-          }
-
           if (conversationTab.type === SidebarTabs.FOLDER) {
             return (
               <ConversationFolderTab

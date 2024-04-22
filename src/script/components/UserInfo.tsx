@@ -32,6 +32,7 @@ import {User} from '../entity/User';
 interface UserInfoProps {
   user: User;
   className?: string;
+  dataUieName: string;
   selfString?: string;
   title?: string;
   onClick?: (event: React.MouseEvent | React.KeyboardEvent) => void;
@@ -45,7 +46,16 @@ const buttonCommonStyles: CSSObject = {
   textTransform: 'uppercase',
 };
 
-export const UserInfo = ({user, className, selfString, title, theme = false, onClick, children}: UserInfoProps) => {
+export const UserInfo = ({
+  user,
+  className,
+  dataUieName,
+  selfString,
+  title,
+  theme = false,
+  onClick,
+  children,
+}: UserInfoProps) => {
   const {name} = useKoSubscribableChildren(user, ['name']);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
@@ -66,7 +76,7 @@ export const UserInfo = ({user, className, selfString, title, theme = false, onC
   };
 
   const content = (
-    <span css={{alignItems: 'center', display: 'flex', overflow: 'hidden'}}>
+    <span data-uie-name={dataUieName} css={{alignItems: 'center', display: 'flex', overflow: 'hidden'}}>
       <span
         className="conversation-list-cell-name"
         css={{userSelect: 'none'}}
