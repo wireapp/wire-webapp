@@ -68,6 +68,7 @@ interface AnsweringControlsProps {
   callState?: CallState;
   classifiedDomains?: string[];
   isTemporaryUser?: boolean;
+  setMaximizedParticipant?: (participant: Participant | null) => void;
 }
 
 export type CallingCellProps = VideoCallProps & AnsweringControlsProps;
@@ -84,6 +85,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
   isSelfVerified,
   callingRepository,
   pushToTalkKey,
+  setMaximizedParticipant,
   teamState = container.resolve(TeamState),
   callState = container.resolve(CallState),
 }) => {
@@ -221,7 +223,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
 
   const handleMaximizeKeydown = useCallback(
     (event: React.KeyboardEvent<HTMLInputElement>) => {
-      if (!isOngoing) {
+      if (!isOngoing || isDetachedWindow) {
         return;
       }
       if (isSpaceOrEnterKey(event.key)) {
@@ -232,7 +234,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
   );
 
   const handleMaximizeClick = useCallback(() => {
-    if (!isOngoing) {
+    if (!isOngoing || isDetachedWindow) {
       return;
     }
     callState.viewMode(CallingViewMode.FULL_SCREEN_GRID);
@@ -439,9 +441,10 @@ const CallingCell: React.FC<CallingCellProps> = ({
                 minimized
                 maximizedParticipant={maximizedParticipant}
                 selfParticipant={selfParticipant}
+                setMaximizedParticipant={setMaximizedParticipant}
               />
 
-              {isOngoing && (
+              {isOngoing && !isDetachedWindow && (
                 <div className="group-video__minimized-wrapper__overlay" data-uie-name="do-maximize-call">
                   <Icon.Fullscreen />
                 </div>

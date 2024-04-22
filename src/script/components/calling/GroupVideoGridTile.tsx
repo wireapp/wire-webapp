@@ -149,6 +149,7 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
           <Video
             autoPlay
             playsInline
+            muted // This is needed to keep playing the video when detached to a new window
             srcObject={videoStream}
             className="group-video-grid__element-video"
             css={{

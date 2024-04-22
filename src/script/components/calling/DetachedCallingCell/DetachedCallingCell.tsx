@@ -63,7 +63,7 @@ export const DetachedCallingCell = ({
   }
 
   return (
-    <DetachedWindow name="popout" width={290} height={290} onClose={closeDetachedWindow}>
+    <DetachedWindow name="WIRE_PICTURE_IN_PICTURE_CALL" width={290} height={290} onClose={closeDetachedWindow}>
       <CallingCell
         classifiedDomains={classifiedDomains}
         call={activeCall}
@@ -73,6 +73,7 @@ export const DetachedCallingCell = ({
         isFullUi
         hasAccessToCamera={hasAccessToCamera}
         isSelfVerified={selfUser.is_verified()}
+        setMaximizedParticipant={participant => activeCall.maximizedParticipant(participant)}
       />
     </DetachedWindow>
   );

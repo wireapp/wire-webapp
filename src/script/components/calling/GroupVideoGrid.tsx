@@ -164,6 +164,7 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
             className="group-video__thumbnail-video"
             autoPlay
             playsInline
+            muted // This is needed to keep playing the video when detached to a new window
             data-uie-name="self-video-thumbnail"
             css={{
               transform: thumbnail.hasActiveVideo && !thumbnail.sharesScreen ? 'rotateY(180deg)' : 'initial',
