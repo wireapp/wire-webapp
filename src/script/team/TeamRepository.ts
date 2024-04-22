@@ -277,7 +277,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
         break;
       }
       case TEAM_EVENT.MEMBER_LEAVE: {
-        this.onMemberLeave(eventJson);
+        await this.onMemberLeave(eventJson);
         break;
       }
       case TEAM_EVENT.FEATURE_CONFIG_UPDATE: {
@@ -387,7 +387,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     await this.updateFeatureConfig();
   };
 
-  private onMemberLeave(eventJson: TeamMemberLeaveEvent): void {
+  private async onMemberLeave(eventJson: TeamMemberLeaveEvent) {
     const {
       data: {user: userId},
       team: teamId,
