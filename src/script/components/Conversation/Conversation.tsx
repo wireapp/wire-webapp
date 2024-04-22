@@ -19,10 +19,12 @@
 
 import {UIEvent, useCallback, useState} from 'react';
 
+import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {useMatchMedia} from '@wireapp/react-ui-kit';
+import {useMatchMedia, IconButton, ChevronIcon} from '@wireapp/react-ui-kit';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {CallingCell} from 'Components/calling/CallingCell';
 import {DropFileArea} from 'Components/DropFileArea';
@@ -460,6 +462,12 @@ export const Conversation = ({
     [addReadReceiptToBatch, repositories.conversation, repositories.integration, updateConversationLastRead],
   );
 
+  const onGoToLastMessage = () => {
+    activeConversation?.release();
+    amplify.publish(WebAppEvents.CONVERSATION.SHOW, activeConversation);
+    // content.showConversation(activeConversation, {exposeMessage: activeConversation?.lastDeliveredMessage()});
+  };
+
   return (
     <DropFileArea
       onFileDropped={checkFileSharingPermission(uploadDroppedFiles)}
@@ -531,6 +539,22 @@ export const Conversation = ({
             setMsgElementsFocusable={setMsgElementsFocusable}
             isRightSidebarOpen={isRightSidebarOpen}
           />
+
+          {(!activeConversation.hasLastReceivedMessageLoaded() || true) && (
+            <IconButton
+              onClick={onGoToLastMessage}
+              css={{
+                position: 'absolute',
+                bottom: '90px',
+                right: '50px',
+                height: '40px',
+                borderRadius: '100%',
+              }}
+            >
+              <ChevronIcon css={{rotate: '90deg', height: 16, width: 16, path: {fill: '#0667C8'}}} />
+            </IconButton>
+          )}
+
           {isConversationLoaded &&
             (isReadOnlyConversation ? (
               <ReadOnlyConversationMessage reloadApp={reloadApp} conversation={activeConversation} />

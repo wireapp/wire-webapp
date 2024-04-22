@@ -168,7 +168,7 @@ export const MessagesList: FC<MessagesListParams> = ({
     scrollHeight.current = newScrollHeight;
   }, [messagesContainer?.parentElement, loaded, filteredMessages, selfUser?.id]);
 
-  // Listen to resizes of the the content element (if it's resized it means something has changed in the message list, link a link preview was generated)
+  // Listen to resizes of the content element (if it's resized it means something has changed in the message list, link a link preview was generated)
   useResizeObserver(syncScrollPosition, messagesContainer);
   // Also listen to the scrolling container resizes (when the window resizes or the inputBar changes)
   useResizeObserver(syncScrollPosition, messagesContainer?.parentElement);
