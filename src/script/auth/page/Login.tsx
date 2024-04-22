@@ -121,13 +121,17 @@ const LoginComponent = ({
 
   const isOauth = UrlUtil.hasURLParameter(QUERY_KEY.SCOPE, window.location.hash);
 
-  const features = Config.getConfig().FEATURE;
+  const {
+    ENABLE_ACCOUNT_REGISTRATION: isAccountRegistrationEnabled,
+    ENABLE_DOMAIN_DISCOVERY: isDomainDiscoveryEnabled,
+    ENABLE_EXTRA_CLIENT_ENTROPY: isEntropyRequired,
+    ENABLE_PHONE_LOGIN: isPhoneLoginEnabled,
+    ENABLE_SSO: isSSOEnabled,
+  } = Config.getConfig().FEATURE;
 
-  const showBackButton =
-    !embedded && (features.ENABLE_DOMAIN_DISCOVERY || features.ENABLE_SSO || features.ENABLE_ACCOUNT_REGISTRATION);
+  const showBackButton = !embedded && (isDomainDiscoveryEnabled || isSSOEnabled || isAccountRegistrationEnabled);
 
   const [showEntropyForm, setShowEntropyForm] = useState(false);
-  const isEntropyRequired = features.ENABLE_EXTRA_CLIENT_ENTROPY;
   const onEntropyGenerated = useRef<((entropy: Uint8Array) => void) | undefined>();
   const entropy = useRef<Uint8Array | undefined>();
 
@@ -470,7 +474,7 @@ const LoginComponent = ({
                     >
                       {_(loginStrings.forgotPassword)}
                     </Link>
-                    {!embedded && features.ENABLE_PHONE_LOGIN && (
+                    {!embedded && isPhoneLoginEnabled && (
                       <RouterLink
                         variant={LinkVariant.PRIMARY}
                         style={{paddingTop: '12px', textAlign: 'center'}}
@@ -480,7 +484,7 @@ const LoginComponent = ({
                         {_(loginStrings.phoneLogin)}
                       </RouterLink>
                     )}
-                    {embedded && (features.ENABLE_DOMAIN_DISCOVERY || features.ENABLE_SSO) && (
+                    {embedded && (isDomainDiscoveryEnabled || isSSOEnabled) && (
                       <Button
                         type="button"
                         variant={ButtonVariant.SECONDARY}
@@ -488,7 +492,7 @@ const LoginComponent = ({
                         style={{marginTop: '16px'}}
                         data-uie-name="go-sso-login"
                       >
-                        {_(features.ENABLE_DOMAIN_DISCOVERY ? indexStrings.enterprise : indexStrings.ssoLogin)}
+                        {_(isDomainDiscoveryEnabled ? indexStrings.enterprise : indexStrings.ssoLogin)}
                       </Button>
                     )}
                   </>
