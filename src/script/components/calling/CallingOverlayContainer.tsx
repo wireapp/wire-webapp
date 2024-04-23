@@ -35,8 +35,6 @@ import {CallingViewMode, CallState, MuteState} from '../../calling/CallState';
 import {LEAVE_CALL_REASON} from '../../calling/enum/LeaveCallReason';
 import {Participant} from '../../calling/Participant';
 import {useVideoGrid} from '../../calling/videoGridHandler';
-import {ConversationState} from '../../conversation/ConversationState';
-import {ElectronDesktopCapturerSource} from '../../media/MediaDevicesHandler';
 import {MediaRepository} from '../../media/MediaRepository';
 import {CallViewTab} from '../../view_model/CallingViewModel';
 
@@ -44,16 +42,16 @@ export interface CallingContainerProps {
   readonly callingRepository: CallingRepository;
   readonly mediaRepository: MediaRepository;
   readonly callState?: CallState;
-  readonly conversationState?: ConversationState;
+  readonly toggleScreenshare: (call: Call) => void;
 }
 
 const CallingContainer: React.FC<CallingContainerProps> = ({
   mediaRepository,
   callingRepository,
   callState = container.resolve(CallState),
-  conversationState = container.resolve(ConversationState),
+  toggleScreenshare,
 }) => {
-  const {streamHandler: mediaStreamHandler, devicesHandler: mediaDevicesHandler} = mediaRepository;
+  const {devicesHandler: mediaDevicesHandler} = mediaRepository;
   const {viewMode} = useKoSubscribableChildren(callState, ['viewMode']);
   const isMinimized = viewMode === CallingViewMode.MINIMIZED;
 
@@ -129,38 +127,6 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
   const toggleCamera = (call: Call) => callingRepository.toggleCamera(call);
 
   const toggleMute = (call: Call, muteState: boolean) => callingRepository.muteCall(call, muteState);
-
-  const toggleScreenshare = async (call: Call): Promise<void> => {
-    if (call.getSelfParticipant().sharesScreen()) {
-      return callingRepository.toggleScreenshare(call);
-    }
-    const showScreenSelection = (): Promise<void> => {
-      return new Promise(resolve => {
-        callingRepository.onChooseScreen = (deviceId: string): void => {
-          mediaDevicesHandler.currentDeviceId.screeninput(deviceId);
-          callState.selectableScreens([]);
-          callState.selectableWindows([]);
-          resolve();
-        };
-        mediaDevicesHandler.getScreenSources().then((sources: ElectronDesktopCapturerSource[]) => {
-          if (sources.length === 1) {
-            return callingRepository.onChooseScreen(sources[0].id);
-          }
-          callState.selectableScreens(sources.filter(source => source.id.startsWith('screen')));
-          callState.selectableWindows(sources.filter(source => source.id.startsWith('window')));
-        });
-      });
-    };
-
-    mediaStreamHandler.selectScreenToShare(showScreenSelection).then(() => {
-      const isAudioCall = [CALL_TYPE.NORMAL, CALL_TYPE.FORCED_AUDIO].includes(call.initialType);
-      const isFullScreenVideoCall = call.initialType === CALL_TYPE.VIDEO && !isMinimized;
-      if (isAudioCall || isFullScreenVideoCall) {
-        callState.viewMode(CallingViewMode.MINIMIZED);
-      }
-      return callingRepository.toggleScreenshare(call);
-    });
-  };
 
   const conversation = joinedCall?.conversation;
 
