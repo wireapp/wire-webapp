@@ -19,6 +19,8 @@
 
 import React, {MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent} from 'react';
 
+import {container} from 'tsyringe';
+
 import {Availability as AvailabilityType} from '@wireapp/protocol-messaging';
 import {COLOR} from '@wireapp/react-ui-kit';
 
@@ -28,6 +30,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {User} from '../../../entity/User';
+import {TeamState} from '../../../team/TeamState';
 import {AVATAR_SIZE, STATE} from '../Avatar';
 import {AvatarBackground} from '../AvatarBackground';
 import {AvatarBadge} from '../AvatarBadge';
@@ -48,6 +51,7 @@ export interface UserAvatarProps extends React.HTMLProps<HTMLDivElement> {
   participant: User;
   state: STATE;
   hideAvailabilityStatus?: boolean;
+  teamState?: TeamState;
 }
 
 export const shouldShowBadge = (size: AVATAR_SIZE, state: STATE): boolean => {
@@ -74,6 +78,7 @@ export const UserAvatar = ({
   state,
   onAvatarInteraction,
   hideAvailabilityStatus = false,
+  teamState = container.resolve(TeamState),
   ...props
 }: UserAvatarProps) => {
   const isImageGrey = !noFilter && [STATE.BLOCKED, STATE.IGNORED, STATE.PENDING, STATE.UNKNOWN].includes(state);
@@ -86,19 +91,18 @@ export const UserAvatar = ({
     previewPictureResource,
     accent_color: accentColor,
     initials,
-    isTeamMember,
   } = useKoSubscribableChildren(participant, [
     'availability',
     'mediumPictureResource',
     'previewPictureResource',
     'accent_color',
     'initials',
-    'isTeamMember',
   ]);
 
   const avatarImgAlt = avatarAlt ? avatarAlt : `${t('userProfileImageAlt')} ${name}`;
 
   const hasAvailabilityState = typeof availability === 'number' && availability !== AvailabilityType.Type.NONE;
+  const inTeam = teamState.isInTeam(participant);
 
   return (
     <AvatarWrapper
@@ -130,7 +134,7 @@ export const UserAvatar = ({
 
       {(!isImageGrey || isBlocked) && <AvatarBorder isTransparent={!isBlocked} />}
 
-      {isTeamMember && !hideAvailabilityStatus && hasAvailabilityState && (
+      {inTeam && !hideAvailabilityStatus && hasAvailabilityState && (
         <AvailabilityIcon availability={availability} avatarSize={avatarSize} />
       )}
     </AvatarWrapper>
