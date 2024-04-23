@@ -98,4 +98,5 @@ const copyStyles = (source: Document, target: Document) => {
   });
 
   target.body.className = source.body.className;
+  target.body.style.height = '100%';
 };

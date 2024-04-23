@@ -174,7 +174,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
   const isOutgoingVideoCall = isOutgoing && selfSharesCamera;
   const isVideoUnsupported = !selfSharesCamera && !conversation?.supportsVideoCall(call.isConference);
   const disableVideoButton = isOutgoingVideoCall || isVideoUnsupported;
-  const disableScreenButton = !callingRepository.supportsScreenSharing || isDetachedWindow;
+  const disableScreenButton = !callingRepository.supportsScreenSharing;
 
   const [showParticipants, setShowParticipants] = useState(false);
   const isModerator = selfUser && roles[selfUser.id] === DefaultConversationRoleName.WIRE_ADMIN;
@@ -534,7 +534,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
                         data-uie-value={selfSharesScreen ? 'active' : 'inactive'}
                         data-uie-enabled={disableScreenButton ? 'false' : 'true'}
                         title={t('videoCallOverlayShareScreen')}
-                        disabled={disableScreenButton}
+                        disabled={disableScreenButton || isDetachedWindow}
                       >
                         {selfSharesScreen ? (
                           <Icon.Screenshare className="small-icon" />
