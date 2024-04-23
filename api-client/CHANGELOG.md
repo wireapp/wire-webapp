@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [26.14.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@26.13.0...@wireapp/api-client@26.14.0) (2024-04-23)
+
+### Features
+
+* Add method to delete current customer card ([2f81486](https://github.com/wireapp/wire-web-packages/commit/2f81486f820e32ed932e3d1bd4e93233861a13ab))
+
 # [26.13.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@26.12.0...@wireapp/api-client@26.13.0) (2024-04-22)
 
 ### Features
