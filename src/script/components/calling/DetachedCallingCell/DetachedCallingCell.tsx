@@ -39,6 +39,15 @@ interface DetachedCallingCellProps {
   userState?: UserState;
 }
 
+//TODO: This is a temporary solution for PoC to enable detached calling cell feature
+let isDetachedCallEnabled = false;
+export const DetachedCallingCellFeature = {
+  set: (shouldEnable: boolean) => {
+    isDetachedCallEnabled = shouldEnable;
+  },
+  get: () => isDetachedCallEnabled,
+};
+
 export const DetachedCallingCell = ({
   callActions,
   callingRepository,

@@ -37,6 +37,7 @@ import keyboardjs from 'keyboardjs';
 import {$createTextNode, $getRoot, LexicalEditor} from 'lexical';
 import {container} from 'tsyringe';
 
+import {DetachedCallingCellFeature} from 'Components/calling/DetachedCallingCell';
 import {getLogger, Logger} from 'Util/Logger';
 
 import {KEY} from './KeyboardUtil';
@@ -205,6 +206,10 @@ export class DebugUtil {
 
   async enablePushToTalk(key: string | null = KEY.SPACE) {
     this.propertiesRepository.savePreference(PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY, key);
+  }
+
+  async enableDetachedCallFeature(shouldEnable: boolean = true) {
+    return DetachedCallingCellFeature.set(shouldEnable);
   }
 
   /** Used by QA test automation. */

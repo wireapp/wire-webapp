@@ -33,7 +33,6 @@ import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Icon} from 'Components/Icon';
 import {ConversationClassifiedBar} from 'Components/input/ClassifiedBar';
-import {Config} from 'src/script/Config';
 import {usePushToTalk} from 'src/script/hooks/usePushToTalk/usePushToTalk';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -42,6 +41,7 @@ import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
 import {CallParticipantsListItem} from './CallParticipantsListItem';
+import {DetachedCallingCellFeature} from './DetachedCallingCell';
 
 import type {Call} from '../../calling/Call';
 import type {CallingRepository} from '../../calling/CallingRepository';
@@ -413,7 +413,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
             </div>
 
             <div className="conversation-list-cell-right">
-              {isOngoing && Config.getConfig().FEATURE.ENABLE_PIP_CALL && (
+              {isOngoing && DetachedCallingCellFeature.get() && (
                 <button className="call-ui__button" onClick={toggleDetachedWindow}>
                   {isDetachedWindow ? (
                     <Icon.Close className="small-icon" />
