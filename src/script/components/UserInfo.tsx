@@ -30,15 +30,14 @@ import {UserName} from './UserName';
 
 import {User} from '../entity/User';
 
-interface AvailabilityStateProps {
+interface UserInfoProps {
   user: User;
   className?: string;
-  dataUieName: string;
+  dataUieName?: string;
   selfString?: string;
   title?: string;
   onClick?: (event: React.MouseEvent | React.KeyboardEvent) => void;
-  theme?: boolean;
-  showAvailability?: boolean;
+  isActive?: boolean;
   children?: React.ReactNode;
 }
 
@@ -54,10 +53,10 @@ export const UserInfo = ({
   dataUieName,
   selfString,
   title,
-  theme = false,
+  isActive = false,
   onClick,
   children,
-}: AvailabilityStateProps) => {
+}: UserInfoProps) => {
   const {name} = useKoSubscribableChildren(user, ['name']);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
@@ -80,14 +79,16 @@ export const UserInfo = ({
   const content = (
     <span data-uie-name={dataUieName} css={{alignItems: 'center', display: 'flex', overflow: 'hidden'}}>
       <span
-        className={cx('availability-state-label', {'availability-state-label--active': theme})}
+        className={cx('conversation-list-cell-name', {'conversation-list-cell-name--active': isActive})}
         css={{userSelect: 'none'}}
         data-uie-name="status-label"
         title={title || name}
       >
         <UserName user={user} />
       </span>
+
       {selfString && <span css={selfIndicator}>{selfString}</span>}
+
       {children}
     </span>
   );
@@ -95,9 +96,8 @@ export const UserInfo = ({
   const wrappedContent = onClick ? (
     <button
       type="button"
-      className="availability-state-label"
       css={
-        theme
+        isActive
           ? {...buttonCommonStyles, color: 'var(--accent-color)', userSelect: 'none'}
           : {...buttonCommonStyles, userSelect: 'none'}
       }
@@ -105,6 +105,7 @@ export const UserInfo = ({
       onClick={onClick}
       onKeyDown={handleKeyDown}
     >
+      <span>search me</span>
       {content}
     </button>
   ) : (
@@ -112,7 +113,7 @@ export const UserInfo = ({
   );
 
   if (className) {
-    return <span className={`availability-state ${className}`}>{wrappedContent}</span>;
+    return <span className={className}>{wrappedContent}</span>;
   }
 
   return wrappedContent;

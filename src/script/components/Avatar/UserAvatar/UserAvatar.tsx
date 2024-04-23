@@ -19,16 +19,18 @@
 
 import React, {MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent} from 'react';
 
+import {container} from 'tsyringe';
+
 import {Availability as AvailabilityType} from '@wireapp/protocol-messaging';
 import {COLOR} from '@wireapp/react-ui-kit';
 
 import {AvailabilityIcon} from 'Components/AvailabilityIcon';
-import {AvailabilityWrapper} from 'Components/Avatar/UserAvatar/UserAvatar.styles';
 import {useUserName} from 'Components/UserName';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {User} from '../../../entity/User';
+import {TeamState} from '../../../team/TeamState';
 import {AVATAR_SIZE, STATE} from '../Avatar';
 import {AvatarBackground} from '../AvatarBackground';
 import {AvatarBadge} from '../AvatarBadge';
@@ -39,7 +41,6 @@ import {AvatarWrapper} from '../AvatarWrapper';
 
 export interface UserAvatarProps extends React.HTMLProps<HTMLDivElement> {
   avatarSize: AVATAR_SIZE;
-  availability?: AvailabilityType.Type;
   avatarAlt?: string;
   noBadge?: boolean;
   noFilter?: boolean;
@@ -49,6 +50,8 @@ export interface UserAvatarProps extends React.HTMLProps<HTMLDivElement> {
   ) => void;
   participant: User;
   state: STATE;
+  hideAvailabilityStatus?: boolean;
+  teamState?: TeamState;
 }
 
 export const shouldShowBadge = (size: AVATAR_SIZE, state: STATE): boolean => {
@@ -65,8 +68,7 @@ const getIconSize = (size: AVATAR_SIZE): string => {
   return '16px';
 };
 
-export const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
-  availability,
+export const UserAvatar = ({
   participant,
   avatarSize,
   avatarAlt = '',
@@ -75,24 +77,32 @@ export const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
   isResponsive = false,
   state,
   onAvatarInteraction,
+  hideAvailabilityStatus = false,
+  teamState = container.resolve(TeamState),
   ...props
-}) => {
+}: UserAvatarProps) => {
   const isImageGrey = !noFilter && [STATE.BLOCKED, STATE.IGNORED, STATE.PENDING, STATE.UNKNOWN].includes(state);
   const isBlocked = state === STATE.BLOCKED;
   const backgroundColor = state === STATE.UNKNOWN ? COLOR.GRAY : undefined;
   const name = useUserName(participant);
   const {
+    availability,
     mediumPictureResource,
     previewPictureResource,
     accent_color: accentColor,
     initials,
   } = useKoSubscribableChildren(participant, [
+    'availability',
     'mediumPictureResource',
     'previewPictureResource',
     'accent_color',
     'initials',
   ]);
+
   const avatarImgAlt = avatarAlt ? avatarAlt : `${t('userProfileImageAlt')} ${name}`;
+
+  const hasAvailabilityState = typeof availability === 'number' && availability !== AvailabilityType.Type.NONE;
+  const inTeam = teamState.isInTeam(participant);
 
   return (
     <AvatarWrapper
@@ -124,10 +134,8 @@ export const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
 
       {(!isImageGrey || isBlocked) && <AvatarBorder isTransparent={!isBlocked} />}
 
-      {typeof availability === 'number' && availability !== AvailabilityType.Type.NONE && (
-        <div css={AvailabilityWrapper}>
-          <AvailabilityIcon availability={availability} />
-        </div>
+      {inTeam && !hideAvailabilityStatus && hasAvailabilityState && (
+        <AvailabilityIcon availability={availability} avatarSize={avatarSize} />
       )}
     </AvatarWrapper>
   );

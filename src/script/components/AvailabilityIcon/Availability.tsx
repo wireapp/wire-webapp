@@ -21,29 +21,47 @@ import {ReactNode} from 'react';
 
 import {Availability as AvailabilityProp} from '@wireapp/protocol-messaging';
 
+import {AVATAR_SIZE} from 'Components/Avatar';
 import {Icon} from 'Components/Icon';
 
 import * as styles from './Availability.styles';
 
 const availabilityIconBaseProps = {
-  className: 'availability-state-icon',
-  css: styles.iconStyles,
   'data-uie-name': 'status-availability-icon',
 };
 
-const availabilityIconRenderer: Record<AvailabilityProp.Type, ReactNode> = {
-  [AvailabilityProp.Type.AVAILABLE]: (
-    <Icon.AvailabilityAvailable {...availabilityIconBaseProps} data-uie-value="available" />
+const availabilityIconRenderer: Record<AvailabilityProp.Type, (avatarSize: AVATAR_SIZE) => ReactNode> = {
+  [AvailabilityProp.Type.AVAILABLE]: avatarSize => (
+    <Icon.AvailabilityAvailable
+      {...availabilityIconBaseProps}
+      css={styles.iconStyles(AvailabilityProp.Type.AVAILABLE, avatarSize)}
+      data-uie-value="available"
+    />
   ),
-  [AvailabilityProp.Type.AWAY]: <Icon.AvailabilityAway {...availabilityIconBaseProps} data-uie-value="away" />,
-  [AvailabilityProp.Type.BUSY]: <Icon.AvailabilityBusy {...availabilityIconBaseProps} data-uie-value="busy" />,
-  [AvailabilityProp.Type.NONE]: null,
+  [AvailabilityProp.Type.AWAY]: avatarSize => (
+    <Icon.AvailabilityAway
+      {...availabilityIconBaseProps}
+      css={styles.iconStyles(AvailabilityProp.Type.AWAY, avatarSize)}
+      data-uie-value="away"
+    />
+  ),
+  [AvailabilityProp.Type.BUSY]: avatarSize => (
+    <Icon.AvailabilityBusy
+      {...availabilityIconBaseProps}
+      css={styles.iconStyles(AvailabilityProp.Type.BUSY, avatarSize)}
+      data-uie-value="busy"
+    />
+  ),
+  [AvailabilityProp.Type.NONE]: () => null,
 };
 
 interface AvailabilityIconProps {
   availability: AvailabilityProp.Type;
+  avatarSize: AVATAR_SIZE;
 }
 
-export const AvailabilityIcon = ({availability}: AvailabilityIconProps) => (
-  <div css={styles.AvailabilityIcon}>{availabilityIconRenderer[availability]}</div>
+export const AvailabilityIcon = ({availability, avatarSize}: AvailabilityIconProps) => (
+  <div css={styles.AvailabilityIcon} data-uie-name="status-availability" data-uie-value={availability}>
+    {availabilityIconRenderer[availability](avatarSize)}
+  </div>
 );

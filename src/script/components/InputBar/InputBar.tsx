@@ -569,7 +569,12 @@ export const InputBar = ({
           <>
             <div className="controls-left">
               {!!textValue.length && (
-                <Avatar className="cursor-default" participant={selfUser} avatarSize={AVATAR_SIZE.X_SMALL} />
+                <Avatar
+                  className="cursor-default"
+                  participant={selfUser}
+                  avatarSize={AVATAR_SIZE.X_SMALL}
+                  hideAvailabilityStatus
+                />
               )}
             </div>
 

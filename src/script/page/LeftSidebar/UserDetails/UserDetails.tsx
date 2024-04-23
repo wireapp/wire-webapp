@@ -33,13 +33,13 @@ import * as styles from './UserDetails.styles';
 import {User} from '../../../entity/User';
 import {AvailabilityContextMenu} from '../../../ui/AvailabilityContextMenu';
 
-interface AvailiabilityStateButtonWrapperProps {
+interface AvailabilityStateButtonWrapperProps {
   children: React.ReactElement;
   isTeam: boolean;
 }
 
-const AvailiabilityStateButtonWrapper = ({children, isTeam = false}: AvailiabilityStateButtonWrapperProps) => {
-  return !isTeam ? (
+const AvailabilityStateButtonWrapper = ({children, isTeam = false}: AvailabilityStateButtonWrapperProps) => {
+  return isTeam ? (
     <button
       onClick={event => AvailabilityContextMenu.show(event.nativeEvent, 'left-list-availability-menu')}
       className="button-reset-default user-details-avatar"
@@ -60,29 +60,27 @@ interface UserDetailsProps {
 
 const UserDetailsComponent = ({user, isTeam = false, groupId, isSideBarOpen = false}: UserDetailsProps) => {
   const {
-    availability,
     name: userName,
     username: userHandle,
     isOnLegalHold,
     hasPendingLegalHold,
-  } = useKoSubscribableChildren(user, ['availability', 'hasPendingLegalHold', 'isOnLegalHold', 'name', 'username']);
+  } = useKoSubscribableChildren(user, ['hasPendingLegalHold', 'isOnLegalHold', 'name', 'username']);
 
   const showLegalHold = isOnLegalHold || hasPendingLegalHold;
 
   return (
     <div css={styles.wrapper(isSideBarOpen)}>
-      <AvailiabilityStateButtonWrapper isTeam={isTeam}>
+      <AvailabilityStateButtonWrapper isTeam={isTeam}>
         <Avatar
-          availability={availability}
           className={cx('see-through', {'user-details-avatar': isTeam})}
           participant={user}
           avatarSize={AVATAR_SIZE.MEDIUM}
           avatarAlt={t('selfProfileImageAlt')}
         />
-      </AvailiabilityStateButtonWrapper>
+      </AvailabilityStateButtonWrapper>
 
       <div css={styles.userDetailsWrapper(isSideBarOpen)}>
-        {!isTeam ? (
+        {isTeam ? (
           <>
             <div css={styles.userDetails} data-uie-name="status-availability">
               <button

@@ -603,7 +603,6 @@ const CallingCell: React.FC<CallingCellProps> = ({
                         <CallParticipantsListItem
                           key={participant.clientId}
                           callParticipant={participant}
-                          selfInTeam={selfUser && teamState.isInTeam(selfUser)}
                           isSelfVerified={isSelfVerified}
                           showContextMenu={!!isModerator}
                           onContextMenu={event => getParticipantContext(event, participant)}

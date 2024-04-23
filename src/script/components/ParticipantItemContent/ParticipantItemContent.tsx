@@ -34,7 +34,6 @@ import {
   contentInfoText,
   selfIndicator,
   userName,
-  userAvailability,
   ellipsis,
   nameWrapper,
   chevronIcon,
@@ -46,13 +45,11 @@ export interface ParticipantItemContentProps {
   /** the conversation context in which we are displaying the user (will enable e2ei verification badges) */
   groupId?: string;
   participant: User | ServiceEntity;
-  selfInTeam?: boolean;
   shortDescription?: string;
   selfString?: string;
   hasUsernameInfo?: boolean;
   showArrow?: boolean;
   onDropdownClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
-  showAvailabilityState?: boolean;
   isProteusVerified?: boolean;
   isMLSVerified?: boolean;
 }
@@ -62,12 +59,10 @@ const servicePlaceholder = {isBlocked: ko.observable(false)};
 export const ParticipantItemContent = ({
   groupId,
   participant,
-  selfInTeam = false,
   shortDescription = '',
   selfString = '',
   hasUsernameInfo = false,
   showArrow = false,
-  showAvailabilityState = false,
 }: ParticipantItemContentProps) => {
   const {name} = useKoSubscribableChildren(participant, ['name']);
 
@@ -80,13 +75,7 @@ export const ParticipantItemContent = ({
       <div css={contentText}>
         <div css={nameWrapper}>
           {!isService ? (
-            <UserInfo
-              user={participant}
-              css={[userName, userAvailability, ellipsis]}
-              dataUieName="status-name"
-              selfString={selfString}
-              showAvailability={showAvailabilityState && selfInTeam}
-            >
+            <UserInfo user={participant} css={[userName, ellipsis]} selfString={selfString} dataUieName="status-name">
               <UserVerificationBadges user={participant} groupId={groupId} />
               {isBlocked && (
                 <span css={{marginLeft: 4}}>
