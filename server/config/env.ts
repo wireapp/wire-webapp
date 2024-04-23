@@ -80,6 +80,9 @@ export type Env = {
   /** will enable the MLS protocol */
   FEATURE_ENABLE_MLS?: string;
 
+  /** will enable the Picture In Picture calling view */
+  FEATURE_ENABLE_PIP_CALL?: string;
+
   FEATURE_USE_CORE_CRYPTO?: string;
 
   FEATURE_MLS_CONFIG_KEYING_MATERIAL_UPDATE_THRESHOLD?: string;

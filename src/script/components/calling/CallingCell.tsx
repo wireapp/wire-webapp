@@ -33,6 +33,7 @@ import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Icon} from 'Components/Icon';
 import {ConversationClassifiedBar} from 'Components/input/ClassifiedBar';
+import {Config} from 'src/script/Config';
 import {usePushToTalk} from 'src/script/hooks/usePushToTalk/usePushToTalk';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -412,7 +413,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
             </div>
 
             <div className="conversation-list-cell-right">
-              {isOngoing && (
+              {isOngoing && Config.getConfig().FEATURE.ENABLE_PIP_CALL && (
                 <button className="call-ui__button" onClick={toggleDetachedWindow}>
                   {isDetachedWindow ? (
                     <Icon.Close className="small-icon" />
