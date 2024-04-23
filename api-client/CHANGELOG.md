@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [26.14.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@26.14.0...@wireapp/api-client@26.14.1) (2024-04-23)
+
+### Bug Fixes
+
+* **api-client:** Use correct http method to subscribe to plan ([f3970e2](https://github.com/wireapp/wire-web-packages/commit/f3970e2b5f9c47a3ef86358e59b824c74aa139fa))
+
 # [26.14.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@26.13.0...@wireapp/api-client@26.14.0) (2024-04-23)
 
 ### Features
