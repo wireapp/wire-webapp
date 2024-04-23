@@ -26,19 +26,18 @@
 .preferences-titlebar {
   .heading-h3;
   .flex-center;
-
   position: relative;
   width: 100%;
   min-height: var(--content-title-bar-height);
   padding: 0;
+  border-bottom: 1px solid var(--border-color);
   margin: 0;
-  background-color: var(--sidebar-bg);
-  color: @black;
-}
 
-body.theme-dark {
-  .preferences-titlebar {
-    color: @white;
+  background-color: var(--app-bg);
+  color: var(--black);
+
+  body.theme-dark & {
+    color: var(--white);
   }
 }
 
@@ -68,21 +67,19 @@ body.theme-dark {
 
 .preferences-detail {
   margin-top: 10px;
-  font-size: @font-size-small;
+  font-size: var(--font-size-small);
 
   &-intended {
     margin-left: 30px;
   }
-}
 
-body.theme-dark {
-  .preferences-detail {
-    color: @gray-20;
+  body.theme-dark & {
+    color: var(--gray-20);
   }
 }
 
 .preferences-detail-bold {
-  font-weight: @font-weight-bold;
+  font-weight: var(--font-weight-bold);
 }
 
 .preferences-detail-emoji {
@@ -95,7 +92,7 @@ body.theme-dark {
   .heading-h4;
   margin-bottom: 16px;
   color: var(--background);
-  line-height: @line-height-sm;
+  line-height: var(--line-height-sm);
 }
 
 .preferences-hint {
@@ -107,7 +104,7 @@ body.theme-dark {
 }
 
 .preferences-info {
-  line-height: @line-height-lg;
+  line-height: var(--line-height-lg);
 }
 
 .preferences-link {
@@ -115,10 +112,10 @@ body.theme-dark {
 
   display: inline-block;
   margin-bottom: 10px;
-  color: @black;
+  color: var(--black);
   cursor: pointer;
-  font-size: @font-size-base;
-  line-height: @line-height-lg;
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-lg);
 
   &:hover {
     .accent-text;
@@ -128,7 +125,7 @@ body.theme-dark {
 
 body.theme-dark {
   .preferences-link {
-    color: @white;
+    color: var(--white);
 
     &:hover {
       .accent-text;
@@ -163,17 +160,17 @@ body.theme-dark {
 }
 
 .preferences-option-icon {
-  height: @line-height-sm;
+  height: var(--line-height-sm);
   padding-right: 18px;
   margin: 0;
-  font-size: @font-size-sm;
-  line-height: @line-height-sm;
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-sm);
 
   div,
   svg {
     display: inline;
-    width: @line-height-sm;
-    height: @line-height-sm;
+    width: var(--line-height-sm);
+    height: var(--line-height-sm);
 
     path {
       fill: currentColor;
@@ -183,9 +180,9 @@ body.theme-dark {
 
 .preferences-option-label {
   display: inline;
-  height: @line-height-sm;
+  height: var(--line-height-sm);
   cursor: pointer;
-  line-height: @line-height-sm;
+  line-height: var(--line-height-sm);
 }
 
 .preferences-section {
@@ -212,7 +209,7 @@ body.theme-dark {
   height: 1px;
   border: 0;
   margin: 22px 0 22px;
-  background: @gray-50;
+  background: var(--gray-50);
 }
 
 .preferences-about-list {

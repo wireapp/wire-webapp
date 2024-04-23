@@ -72,7 +72,7 @@ const UserDetailsComponent = ({user, isTeam = false, groupId, isSideBarOpen = fa
     <div css={styles.wrapper(isSideBarOpen)}>
       <AvailabilityStateButtonWrapper isTeam={isTeam}>
         <Avatar
-          className={cx('see-through', {'user-details-avatar': isTeam})}
+          className={cx('see-through', {'user-details-avatar': !isTeam})}
           participant={user}
           avatarSize={AVATAR_SIZE.MEDIUM}
           avatarAlt={t('selfProfileImageAlt')}
