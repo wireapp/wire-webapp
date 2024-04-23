@@ -42,7 +42,6 @@ export interface CallParticipantsListItemProps {
   callParticipant: Participant;
   showContextMenu: boolean;
   onContextMenu: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
-  selfInTeam?: boolean;
   isSelfVerified?: boolean;
   isLast?: boolean;
 }
@@ -50,7 +49,6 @@ export interface CallParticipantsListItemProps {
 export const CallParticipantsListItem = ({
   callParticipant,
   isSelfVerified = false,
-  selfInTeam,
   showContextMenu,
   onContextMenu,
   isLast = false,

@@ -89,7 +89,7 @@ describe('CallParticipantsListItem', () => {
     });
 
     const {getByTestId, getByText} = render(
-      <CallParticipantsListItem showContextMenu onContextMenu={jest.fn()} callParticipant={participant} selfInTeam />,
+      <CallParticipantsListItem showContextMenu onContextMenu={jest.fn()} callParticipant={participant} />,
     );
 
     expect(getByText(participantName)).toBeDefined();

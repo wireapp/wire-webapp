@@ -145,6 +145,7 @@ export const ConnectRequests = ({
                 avatarSize={AVATAR_SIZE.X_LARGE}
                 noBadge
                 noFilter
+                hideAvailabilityStatus
               />
 
               <UnverifiedUserWarning />

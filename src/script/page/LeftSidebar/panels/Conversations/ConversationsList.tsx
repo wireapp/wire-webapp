@@ -170,9 +170,7 @@ export const ConversationsList = ({
         >
           <div className="conversation-list-cell-left">
             {connectRequests.length === 1 ? (
-              <div className="avatar-halo">
-                <Avatar participant={connectRequests[0]} avatarSize={AVATAR_SIZE.SMALL} />
-              </div>
+              <Avatar participant={connectRequests[0]} avatarSize={AVATAR_SIZE.SMALL} />
             ) : (
               <GroupAvatar users={connectRequests} />
             )}

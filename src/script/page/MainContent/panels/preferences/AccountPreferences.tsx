@@ -149,7 +149,7 @@ export const AccountPreferences = ({
               selfUser={selfUser}
               isActivatedAccount={isActivatedAccount}
               userRepository={userRepository}
-              showAvailabilityState={false}
+              hideAvailabilityStatus
             />
           </ErrorBoundary>
         </div>

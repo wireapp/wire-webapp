@@ -21,6 +21,7 @@ import {CSSObject} from '@emotion/react';
 
 import {Availability as AvailabilityProp} from '@wireapp/protocol-messaging';
 
+import {AVATAR_SIZE} from 'Components/Avatar';
 import {CSS_SQUARE} from 'Util/CSSMixin';
 
 const availabilityStateColors: Partial<Record<AvailabilityProp.Type, string>> = {
@@ -29,18 +30,31 @@ const availabilityStateColors: Partial<Record<AvailabilityProp.Type, string>> = 
   [AvailabilityProp.Type.BUSY]: 'var(--amber-500)',
 };
 
-export const iconStyles = (availabilityState: AvailabilityProp.Type): CSSObject => ({
-  ...CSS_SQUARE(8),
-  fill: availabilityStateColors[availabilityState],
-  stroke: availabilityStateColors[availabilityState],
-  borderRadius: '50%',
+const getSquareIconSize = (): Partial<Record<AVATAR_SIZE, number>> => ({
+  [AVATAR_SIZE.X_SMALL]: 6,
+  [AVATAR_SIZE.SMALL]: 7,
+  [AVATAR_SIZE.MEDIUM]: 10,
+  [AVATAR_SIZE.LARGE]: 12,
 });
 
+export const iconStyles = (availabilityState: AvailabilityProp.Type, avatarSize: AVATAR_SIZE): CSSObject => {
+  const squareIconSize = getSquareIconSize();
+
+  return {
+    ...CSS_SQUARE(squareIconSize?.[avatarSize] || 8),
+    fill: availabilityStateColors[availabilityState],
+    stroke: availabilityStateColors[availabilityState],
+    borderRadius: '50%',
+  };
+};
+
 export const AvailabilityIcon: CSSObject = {
-  background: 'var(--white)',
+  background: 'var(--app-bg)',
+  border: '2px solid var(--app-bg)',
   borderRadius: '50%',
-  height: '12px',
-  width: '12px',
   display: 'grid',
   placeContent: 'center',
+  position: 'absolute',
+  bottom: '-2px',
+  right: '-2px',
 };

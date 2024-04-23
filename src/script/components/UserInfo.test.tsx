@@ -64,7 +64,7 @@ describe('UserInfo', () => {
 
   it('does not show availability icon if param is false', async () => {
     user.availability(Availability.Type.AVAILABLE);
-    const {queryByTestId} = render(<UserInfo {...defaultProps} showAvailability={false} />);
+    const {queryByTestId} = render(<UserInfo {...defaultProps} />);
 
     const statusAvailabilityIcon = queryByTestId('status-availability-icon');
     expect(statusAvailabilityIcon).toBeNull();

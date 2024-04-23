@@ -45,13 +45,11 @@ export interface ParticipantItemContentProps {
   /** the conversation context in which we are displaying the user (will enable e2ei verification badges) */
   groupId?: string;
   participant: User | ServiceEntity;
-  selfInTeam?: boolean;
   shortDescription?: string;
   selfString?: string;
   hasUsernameInfo?: boolean;
   showArrow?: boolean;
   onDropdownClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
-  showAvailabilityState?: boolean;
   isProteusVerified?: boolean;
   isMLSVerified?: boolean;
 }
@@ -61,12 +59,10 @@ const servicePlaceholder = {isBlocked: ko.observable(false)};
 export const ParticipantItemContent = ({
   groupId,
   participant,
-  selfInTeam = false,
   shortDescription = '',
   selfString = '',
   hasUsernameInfo = false,
   showArrow = false,
-  showAvailabilityState = false,
 }: ParticipantItemContentProps) => {
   const {name} = useKoSubscribableChildren(participant, ['name']);
 

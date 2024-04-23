@@ -196,6 +196,7 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
             <Avatar
               avatarSize={minimized ? AVATAR_SIZE.SMALL : AVATAR_SIZE.MEDIUM}
               participant={selfParticipant.user}
+              hideAvailabilityStatus
             />
           </div>
         </GroupVideoThumbnailWrapper>

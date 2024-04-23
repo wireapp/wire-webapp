@@ -59,8 +59,7 @@ export class TeamState {
   readonly teamSize: ko.PureComputed<number>;
 
   constructor(private readonly userState = container.resolve(UserState)) {
-    // this.isTeam = ko.pureComputed(() => !!this.team()?.id);
-    this.isTeam = ko.pureComputed(() => true);
+    this.isTeam = ko.pureComputed(() => !!this.team()?.id);
     this.isTeamDeleted = ko.observable(false);
 
     /** Note: this does not include the self user */

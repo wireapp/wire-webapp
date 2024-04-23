@@ -183,11 +183,7 @@ const ConversationListCell = ({
           >
             {isGroup && <GroupAvatar className="conversation-list-cell-avatar-arrow" users={users} />}
 
-            {!isGroup && !!users.length && (
-              <div className="avatar-halo">
-                <Avatar participant={users[0]} avatarSize={AVATAR_SIZE.SMALL} />
-              </div>
-            )}
+            {!isGroup && !!users.length && <Avatar participant={users[0]} avatarSize={AVATAR_SIZE.SMALL} />}
           </div>
 
           <div className="conversation-list-cell-center">
@@ -195,8 +191,7 @@ const ConversationListCell = ({
               <UserInfo
                 className="conversation-list-cell-availability"
                 user={conversation.firstUserEntity()!}
-                theme={isActive}
-                dataUieName="status-availability-item"
+                isActive={isActive}
               >
                 {isConversationWithBlockedUser && <UserBlockedBadge />}
               </UserInfo>
@@ -206,14 +201,16 @@ const ConversationListCell = ({
               </span>
             )}
 
-            <span
-              className={cx('conversation-list-cell-description', {
-                'conversation-list-cell-description--active': isActive,
-              })}
-              data-uie-name="secondary-line"
-            >
-              {cellState.description}
-            </span>
+            {cellState.description && (
+              <span
+                className={cx('conversation-list-cell-description', {
+                  'conversation-list-cell-description--active': isActive,
+                })}
+                data-uie-name="secondary-line"
+              >
+                {cellState.description}
+              </span>
+            )}
           </div>
         </div>
 

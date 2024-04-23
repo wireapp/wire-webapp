@@ -20,6 +20,7 @@
 import React from 'react';
 
 import {CSSObject} from '@emotion/react';
+import cx from 'classnames';
 
 import {selfIndicator} from 'Components/ParticipantItemContent/ParticipantItem.styles';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -32,11 +33,11 @@ import {User} from '../entity/User';
 interface UserInfoProps {
   user: User;
   className?: string;
-  dataUieName: string;
+  dataUieName?: string;
   selfString?: string;
   title?: string;
   onClick?: (event: React.MouseEvent | React.KeyboardEvent) => void;
-  theme?: boolean;
+  isActive?: boolean;
   children?: React.ReactNode;
 }
 
@@ -52,7 +53,7 @@ export const UserInfo = ({
   dataUieName,
   selfString,
   title,
-  theme = false,
+  isActive = false,
   onClick,
   children,
 }: UserInfoProps) => {
@@ -78,7 +79,7 @@ export const UserInfo = ({
   const content = (
     <span data-uie-name={dataUieName} css={{alignItems: 'center', display: 'flex', overflow: 'hidden'}}>
       <span
-        className="conversation-list-cell-name"
+        className={cx('conversation-list-cell-name', {'conversation-list-cell-name--active': isActive})}
         css={{userSelect: 'none'}}
         data-uie-name="status-label"
         title={title || name}
@@ -96,7 +97,7 @@ export const UserInfo = ({
     <button
       type="button"
       css={
-        theme
+        isActive
           ? {...buttonCommonStyles, color: 'var(--accent-color)', userSelect: 'none'}
           : {...buttonCommonStyles, userSelect: 'none'}
       }

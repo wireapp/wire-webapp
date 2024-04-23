@@ -89,7 +89,7 @@ const UserDetailsComponent = ({
         avatarSize={AVATAR_SIZE.X_LARGE}
         data-uie-name="status-profile-picture"
         style={avatarStyles}
-        showAvailabilityState={false}
+        hideAvailabilityStatus
       />
 
       {badge && (

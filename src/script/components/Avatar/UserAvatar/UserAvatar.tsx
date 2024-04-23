@@ -23,7 +23,6 @@ import {Availability as AvailabilityType} from '@wireapp/protocol-messaging';
 import {COLOR} from '@wireapp/react-ui-kit';
 
 import {AvailabilityIcon} from 'Components/AvailabilityIcon';
-import {AvailabilityWrapper} from 'Components/Avatar/UserAvatar/UserAvatar.styles';
 import {useUserName} from 'Components/UserName';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -48,7 +47,7 @@ export interface UserAvatarProps extends React.HTMLProps<HTMLDivElement> {
   ) => void;
   participant: User;
   state: STATE;
-  showAvailabilityState?: boolean;
+  hideAvailabilityStatus?: boolean;
 }
 
 export const shouldShowBadge = (size: AVATAR_SIZE, state: STATE): boolean => {
@@ -74,7 +73,7 @@ export const UserAvatar = ({
   isResponsive = false,
   state,
   onAvatarInteraction,
-  showAvailabilityState = true,
+  hideAvailabilityStatus = false,
   ...props
 }: UserAvatarProps) => {
   const isImageGrey = !noFilter && [STATE.BLOCKED, STATE.IGNORED, STATE.PENDING, STATE.UNKNOWN].includes(state);
@@ -87,15 +86,19 @@ export const UserAvatar = ({
     previewPictureResource,
     accent_color: accentColor,
     initials,
+    isTeamMember,
   } = useKoSubscribableChildren(participant, [
     'availability',
     'mediumPictureResource',
     'previewPictureResource',
     'accent_color',
     'initials',
+    'isTeamMember',
   ]);
 
   const avatarImgAlt = avatarAlt ? avatarAlt : `${t('userProfileImageAlt')} ${name}`;
+
+  const hasAvailabilityState = typeof availability === 'number' && availability !== AvailabilityType.Type.NONE;
 
   return (
     <AvatarWrapper
@@ -127,10 +130,8 @@ export const UserAvatar = ({
 
       {(!isImageGrey || isBlocked) && <AvatarBorder isTransparent={!isBlocked} />}
 
-      {showAvailabilityState && typeof availability === 'number' && availability !== AvailabilityType.Type.NONE && (
-        <div css={AvailabilityWrapper}>
-          <AvailabilityIcon availability={availability} />
-        </div>
+      {isTeamMember && !hideAvailabilityStatus && hasAvailabilityState && (
+        <AvailabilityIcon availability={availability} avatarSize={avatarSize} />
       )}
     </AvatarWrapper>
   );

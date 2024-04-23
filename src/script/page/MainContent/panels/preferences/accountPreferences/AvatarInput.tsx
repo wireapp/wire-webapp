@@ -40,7 +40,7 @@ interface AvatarInputProps {
   isActivatedAccount: boolean;
   selfUser: User;
   userRepository: UserRepository;
-  showAvailabilityState?: boolean;
+  hideAvailabilityStatus?: boolean;
 }
 
 const FILE_TYPES = ['image/bmp', 'image/jpeg', 'image/jpg', 'image/png', '.jpg-large'];
@@ -50,7 +50,7 @@ export const AvatarInput = ({
   selfUser,
   isActivatedAccount,
   userRepository,
-  showAvailabilityState = false,
+  hideAvailabilityStatus = false,
 }: AvatarInputProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState<boolean>(false);
@@ -141,7 +141,7 @@ export const AvatarInput = ({
           participant={selfUser}
           avatarSize={AVATAR_SIZE.X_LARGE}
           avatarAlt={t('selfProfileImageAlt')}
-          showAvailabilityState={showAvailabilityState}
+          hideAvailabilityStatus={hideAvailabilityStatus}
         />
 
         <FileInput
