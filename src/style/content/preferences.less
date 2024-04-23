@@ -34,11 +34,7 @@
   margin: 0;
 
   background-color: var(--app-bg);
-  color: var(--black);
-
-  body.theme-dark & {
-    color: var(--white);
-  }
+  color: var(--main-color);
 }
 
 .preferences-content {
@@ -112,7 +108,7 @@
 
   display: inline-block;
   margin-bottom: 10px;
-  color: var(--black);
+  color: var(--main-color);
   cursor: pointer;
   font-size: var(--font-size-base);
   line-height: var(--line-height-lg);
@@ -120,17 +116,6 @@
   &:hover {
     .accent-text;
     text-decoration: underline;
-  }
-}
-
-body.theme-dark {
-  .preferences-link {
-    color: var(--white);
-
-    &:hover {
-      .accent-text;
-      text-decoration: underline;
-    }
   }
 }
 
