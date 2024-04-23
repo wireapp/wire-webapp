@@ -92,6 +92,16 @@ export class BillingAPI {
     return response.data;
   }
 
+  public async deleteCard(teamId: string): Promise<CardData> {
+    const config: AxiosRequestConfig = {
+      method: 'delete',
+      url: `${BillingAPI.URL.TEAMS}/${teamId}/${BillingAPI.URL.BILLING}/${BillingAPI.URL.CARD}`,
+    };
+
+    const response = await this.client.sendJSON<CardData>(config);
+    return response.data;
+  }
+
   public async getCard(teamId: string): Promise<CardData> {
     const config: AxiosRequestConfig = {
       method: 'get',
@@ -137,9 +147,9 @@ export class BillingAPI {
     return response.data;
   }
 
-  public async subscribe(teamId: string, planId: string, paymentMethod: string) {
+  public async subscribe(teamId: string, planId: string) {
     const config: AxiosRequestConfig = {
-      data: {planId, paymentMethod},
+      data: {planId},
       method: 'post',
       url: `${BillingAPI.URL.TEAMS}/${teamId}/${BillingAPI.URL.BILLING}/subscription`,
     };
