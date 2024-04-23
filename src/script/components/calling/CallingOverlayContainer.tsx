@@ -54,6 +54,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
   const {devicesHandler: mediaDevicesHandler} = mediaRepository;
   const {viewMode} = useKoSubscribableChildren(callState, ['viewMode']);
   const isFullScreenGrid = viewMode === CallingViewMode.FULL_SCREEN_GRID;
+  const isDetachedWindow = viewMode === CallingViewMode.DETACHED_WINDOW;
 
   const {activeCallViewTab, joinedCall, selectableScreens, selectableWindows, isChoosingScreen} =
     useKoSubscribableChildren(callState, [
@@ -130,7 +131,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
 
   const conversation = joinedCall?.conversation;
 
-  if (!joinedCall || !conversation || conversation.removed_from_conversation()) {
+  if (isDetachedWindow || !joinedCall || !conversation || conversation.removed_from_conversation()) {
     return null;
   }
 
