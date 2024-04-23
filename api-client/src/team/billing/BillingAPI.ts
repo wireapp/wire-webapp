@@ -150,7 +150,7 @@ export class BillingAPI {
   public async subscribe(teamId: string, planId: string) {
     const config: AxiosRequestConfig = {
       data: {planId},
-      method: 'post',
+      method: 'put',
       url: `${BillingAPI.URL.TEAMS}/${teamId}/${BillingAPI.URL.BILLING}/subscription`,
     };
 
