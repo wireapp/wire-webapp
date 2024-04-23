@@ -234,7 +234,9 @@ export class App {
     repositories.connection = new ConnectionRepository(new ConnectionService(), repositories.user);
     repositories.event = new EventRepository(this.service.event, this.service.notification, serverTimeHandler);
     repositories.search = new SearchRepository(repositories.user);
-    repositories.team = new TeamRepository(repositories.user, repositories.asset);
+    repositories.team = new TeamRepository(repositories.user, repositories.asset, () =>
+      this.logout(SIGN_OUT_REASON.ACCOUNT_DELETED, true),
+    );
 
     repositories.message = new MessageRepository(
       /*
@@ -689,7 +691,7 @@ export class App {
    * @param signOutReason Cause for logout
    * @param clearData Keep data in database
    */
-  private readonly logout = (signOutReason: SIGN_OUT_REASON, clearData: boolean): Promise<void> | void => {
+  private readonly logout = async (signOutReason: SIGN_OUT_REASON, clearData: boolean) => {
     if (this.isLoggingOut) {
       // Avoid triggering another logout flow if we currently are logging out.
       // This could happen if we trigger the logout flow while the user token is already invalid.
