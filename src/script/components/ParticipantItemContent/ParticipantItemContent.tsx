@@ -75,7 +75,7 @@ export const ParticipantItemContent = ({
       <div css={contentText}>
         <div css={nameWrapper}>
           {!isService ? (
-            <UserInfo user={participant} css={[userName, ellipsis]} selfString={selfString}>
+            <UserInfo user={participant} css={[userName, ellipsis]} selfString={selfString} dataUieName="status-name">
               <UserVerificationBadges user={participant} groupId={groupId} />
               {isBlocked && (
                 <span css={{marginLeft: 4}}>
