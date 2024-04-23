@@ -188,11 +188,7 @@ const ConversationListCell = ({
 
           <div className="conversation-list-cell-center">
             {is1to1 ? (
-              <UserInfo
-                className="conversation-list-cell-availability"
-                user={conversation.firstUserEntity()!}
-                isActive={isActive}
-              >
+              <UserInfo user={conversation.firstUserEntity()!} isActive={isActive}>
                 {isConversationWithBlockedUser && <UserBlockedBadge />}
               </UserInfo>
             ) : (
