@@ -57,7 +57,7 @@ export const CallParticipantItemContent = ({
     <div css={wrapper}>
       <div css={contentText}>
         <div css={nameWrapper(isAudioEstablished)}>
-          <UserInfo user={user} css={[ellipsis]} />
+          <UserInfo user={user} css={[ellipsis]} dataUieName="status-name" />
 
           {isSelf && <div css={selfIndicator}>{selfString}</div>}
         </div>
