@@ -35,7 +35,6 @@ import {CallingViewMode, CallState, MuteState} from '../../calling/CallState';
 import {LEAVE_CALL_REASON} from '../../calling/enum/LeaveCallReason';
 import {Participant} from '../../calling/Participant';
 import {useVideoGrid} from '../../calling/videoGridHandler';
-import {ConversationState} from '../../conversation/ConversationState';
 import {ElectronDesktopCapturerSource} from '../../media/MediaDevicesHandler';
 import {MediaRepository} from '../../media/MediaRepository';
 import {CallViewTab} from '../../view_model/CallingViewModel';
@@ -44,14 +43,12 @@ export interface CallingContainerProps {
   readonly callingRepository: CallingRepository;
   readonly mediaRepository: MediaRepository;
   readonly callState?: CallState;
-  readonly conversationState?: ConversationState;
 }
 
 const CallingContainer: React.FC<CallingContainerProps> = ({
   mediaRepository,
   callingRepository,
   callState = container.resolve(CallState),
-  conversationState = container.resolve(ConversationState),
 }) => {
   const {streamHandler: mediaStreamHandler, devicesHandler: mediaDevicesHandler} = mediaRepository;
   const {viewMode} = useKoSubscribableChildren(callState, ['viewMode']);
