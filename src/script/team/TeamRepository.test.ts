@@ -49,8 +49,9 @@ function buildConnectionRepository() {
   const userRepository = {} as UserRepository;
   const assetRepository = {} as AssetRepository;
   const teamService = new TeamService({} as any);
+  const onMemberDeleted = jest.fn();
   return [
-    new TeamRepository(userRepository, assetRepository, teamService, userState, teamState),
+    new TeamRepository(userRepository, assetRepository, onMemberDeleted, teamService, userState, teamState),
     {userState, teamState, userRepository, assetRepository, teamService},
   ] as const;
 }
