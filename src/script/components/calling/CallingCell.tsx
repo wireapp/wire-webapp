@@ -41,7 +41,7 @@ import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
 import {CallParticipantsListItem} from './CallParticipantsListItem';
-import {DetachedCallingCellFeature} from './DetachedCallingCell';
+import {useDetachedCallingFeatureState} from './DetachedCallingCell/DetachedCallingFeature.state';
 
 import type {Call} from '../../calling/Call';
 import type {CallingRepository} from '../../calling/CallingRepository';
@@ -322,6 +322,8 @@ const CallingCell: React.FC<CallingCellProps> = ({
     }
   };
 
+  const isDetachedCallingFeatureEnabled = useDetachedCallingFeatureState(state => state.isEnabled);
+
   return (
     <div style={{height: isDetachedWindow ? '100%' : 'unset'}}>
       {isIncoming && (
@@ -413,7 +415,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
             </div>
 
             <div className="conversation-list-cell-right">
-              {isOngoing && DetachedCallingCellFeature.get() && (
+              {isOngoing && isDetachedCallingFeatureEnabled && (
                 <button className="call-ui__button" onClick={toggleDetachedWindow}>
                   {isDetachedWindow ? (
                     <Icon.Close className="small-icon" />
