@@ -155,7 +155,7 @@ jobs:
 
           helm package ./charts/webapp
 
-          helm s3 push webapp-*.tgz charts-webapp
+          helm s3 push --relative webapp-*.tgz charts-webapp
 
       # generates a mapping between branches/tag to wire-build branches
       - name: Define target branches in wireapp/wire-builds to bump
@@ -163,16 +163,15 @@ jobs:
         id: output_target_branches
         with:
           key: '${{github.ref}}'
-          # TODO add production and staging once wire-builds has those branches
-          #
-          # "production": {
-          #  "targets": "[\"TDB\"]"
-          # },
+          # TODO  Add staging if we ever use a wire-builds as a source for staging (we use k8s)
           # "staging": {
           #   "targets": "[\"TBD\"]"
           # },
           map: |
             {
+              "production": {
+                "targets": "[\"main\"]"
+              },
               "dev": {
                 "targets": "[\"dev\"]"
               },
@@ -213,6 +212,7 @@ jobs:
           git config --global user.name "Zebot"
 
           for retry in $(seq 3); do
+            set +e
             (
             set -e
 
@@ -238,69 +238,19 @@ jobs:
             git commit -m "Bump webapp to $chart_version"
             git push origin "${{ matrix.target_branch }}"
 
-            ) && break
+            )
+            if [ $? -eq 0 ]; then
+              echo "pushing to wire-builds succeeded"
+              break
+            else
+              echo "pushing to wire-builds FAILED (in retry $retry)"
+            fi
+            set -e
           done
           if (( $? != 0 )); then
               echo "Retrying didn't help. Failing the step."
               exit 1
           fi
-
-  #FUTUREWORK: Remove this job once production builds are based on wireapp/wire-builds
-  update_helm_chart:
-    name: 'Bump Helm chart in wire-server'
-    runs-on: ubuntu-latest
-    needs: build
-
-    steps:
-      - name: Check whether this is a production release
-        id: release-info-file
-        shell: bash
-        run: |
-          image_tag="${{needs.build.outputs.image_tag}}"
-          echo "image_tag: $image_tag"
-          if [[ "$image_tag" == *"production"* ]]; then
-             echo '::set-output name=exists::true'
-             echo "::set-output name=releaseInfo::$(cat ${ARTIFACT_LOCAL_PATH})"
-          fi
-
-      - name: Checking out 'wire-server'
-        uses: actions/checkout@v4
-        if: ${{ steps.release-info-file.outputs.exists == 'true' }}
-        with:
-          repository: 'wireapp/wire-server'
-          fetch-depth: 1
-
-      - name: Changing Helm value of the webapp chart
-        id: change-helm-value
-        if: ${{ steps.release-info-file.outputs.exists == 'true' }}
-        shell: bash
-        run: |
-          sed --in-place --expression="s/  tag: .*/  tag: \"${{needs.build.outputs.image_tag}}\"/" ./charts/webapp/values.yaml
-          git add ./charts/webapp/values.yaml
-          echo "Upgrade webapp version to ${{needs.build.outputs.image_tag}}" > ./changelog.d/0-release-notes/webapp-upgrade
-          git add ./changelog.d/0-release-notes/webapp-upgrade
-          echo "::set-output name=releaseUrl::${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/releases/tag/${{needs.build.outputs.release_name}}"
-
-      - name: Creating Pull Request
-        id: create-pr
-        if: ${{ steps.release-info-file.outputs.exists == 'true' }}
-        uses: peter-evans/create-pull-request@v6
-        with:
-          draft: false
-          token: ${{ secrets.ZEBOT_GH_TOKEN }}
-          author: 'Zebot <zebot@users.noreply.github.com>'
-          branch: charts-update-webapp-image-tag-${{ github.run_number }}
-          commit-message: 'chore: [charts] Update webapp version'
-          title: 'Update webapp version in Helm chart [skip ci]'
-          body: |
-            Image tag: `${{needs.build.outputs.image_tag}}`
-            Release: [`${{needs.build.outputs.release_name}}`](${{ steps.change-helm-value.outputs.releaseUrl }})
-
-      - name: Printing Pull Request URL
-        if: ${{ steps.release-info-file.outputs.exists == 'true' }}
-        shell: bash
-        run: |
-          echo "PR: ${{ steps.create-pr.outputs.pull-request-url }}"
 
   set_deployment_targets:
     name: 'Set deployment targets'
