@@ -290,20 +290,19 @@ const Conversations: React.FC<ConversationsProps> = ({
         const callingRepository = callingViewModel.callingRepository;
 
         return (
-          conversation && (
+          conversation &&
+          !isCallWindowDetached && (
             <div className="calling-cell" key={conversation.id}>
-              {!isCallWindowDetached && (
-                <CallingCell
-                  classifiedDomains={classifiedDomains}
-                  call={call}
-                  callActions={callingViewModel.callActions}
-                  callingRepository={callingRepository}
-                  pushToTalkKey={propertiesRepository.getPreference(PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY)}
-                  isFullUi
-                  hasAccessToCamera={callingViewModel.hasAccessToCamera()}
-                  isSelfVerified={selfUser.is_verified()}
-                />
-              )}
+              <CallingCell
+                classifiedDomains={classifiedDomains}
+                call={call}
+                callActions={callingViewModel.callActions}
+                callingRepository={callingRepository}
+                pushToTalkKey={propertiesRepository.getPreference(PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY)}
+                isFullUi
+                hasAccessToCamera={callingViewModel.hasAccessToCamera()}
+                isSelfVerified={selfUser.is_verified()}
+              />
             </div>
           )
         );

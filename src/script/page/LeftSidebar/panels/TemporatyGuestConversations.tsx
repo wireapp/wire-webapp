@@ -81,8 +81,8 @@ const TemporaryGuestConversations: React.FC<TemporaryGuestConversations> = ({
       {activeCalls.map(call => {
         const {conversation} = call;
         return (
-          <div key={conversation.id} className="calling-cell">
-            {!isCallWindowDetached && (
+          !isCallWindowDetached && (
+            <div key={conversation.id} className="calling-cell">
               <CallingCell
                 data-uie-name="item-call"
                 data-uie-uid={conversation.id}
@@ -98,8 +98,8 @@ const TemporaryGuestConversations: React.FC<TemporaryGuestConversations> = ({
                   PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY,
                 )}
               />
-            )}
-          </div>
+            </div>
+          )
         );
       })}
       <div className="temporary-guest__content">
