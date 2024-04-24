@@ -212,6 +212,7 @@ jobs:
           git config --global user.name "Zebot"
 
           for retry in $(seq 3); do
+            set +e
             (
             set -e
 
@@ -237,7 +238,14 @@ jobs:
             git commit -m "Bump webapp to $chart_version"
             git push origin "${{ matrix.target_branch }}"
 
-            ) && break
+            )
+            if [ $? -eq 0 ]; then
+              echo "pushing to wire-builds succeeded"
+              break
+            else
+              echo "pushing to wire-builds FAILED (in retry $retry)"
+            fi
+            set -e
           done
           if (( $? != 0 )); then
               echo "Retrying didn't help. Failing the step."
