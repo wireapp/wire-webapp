@@ -322,7 +322,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
     }
   };
 
-  const isDetachedCallingFeatureEnabled = useDetachedCallingFeatureState(state => state.isEnabled);
+  const isDetachedCallingFeatureEnabled = useDetachedCallingFeatureState(state => state.isSupported());
 
   return (
     <div style={{height: isDetachedWindow ? '100%' : 'unset'}}>
