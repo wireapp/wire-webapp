@@ -325,7 +325,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
   const isDetachedCallingFeatureEnabled = useDetachedCallingFeatureState(state => state.isSupported());
 
   return (
-    <div style={{height: isDetachedWindow ? '100%' : 'unset'}}>
+    <div css={{height: isDetachedWindow ? '100%' : 'auto'}}>
       {isIncoming && (
         <p role="alert" className="visually-hidden">
           {t('callConversationAcceptOrDecline', conversationName)}
@@ -338,7 +338,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
           data-uie-name="item-call"
           data-uie-id={conversation.id}
           data-uie-value={conversation.display_name()}
-          style={{height: isDetachedWindow ? '100%' : 'unset'}}
+          css={{height: isDetachedWindow ? '100%' : 'unset'}}
         >
           {muteState === MuteState.REMOTE_MUTED && isFullUi && (
             <div className="conversation-list-calling-cell__info-bar">{t('muteStateRemoteMute')}</div>
@@ -441,13 +441,13 @@ const CallingCell: React.FC<CallingCellProps> = ({
 
           {(isOngoing || selfHasActiveVideo) && !isFullScreenGrid && !!videoGrid?.grid?.length && isFullUi ? (
             <div
+              css={{flex: isDetachedWindow ? 1 : 'unset'}}
               className="group-video__minimized-wrapper"
               onClick={handleMaximizeClick}
               onKeyDown={handleMaximizeKeydown}
               role="button"
               tabIndex={TabIndex.FOCUSABLE}
               aria-label={t('callMaximizeLabel')}
-              style={{flex: isDetachedWindow ? 1 : 'unset'}}
             >
               <GroupVideoGrid
                 grid={activeCallViewTab === CallViewTab.ALL ? videoGrid : {grid: activeSpeakers, thumbnail: null}}

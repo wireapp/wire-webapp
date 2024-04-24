@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useState} from 'react';
+import {useEffect, useMemo} from 'react';
 
 import {createPortal} from 'react-dom';
 
@@ -37,12 +37,10 @@ interface DetachedWindowProps {
 }
 
 export const DetachedWindow = ({children, url = '', name, onClose, width = 600, height = 600}: DetachedWindowProps) => {
-  const [newWindow, setNewWindow] = useState<Window | null>(null);
-
-  useEffect(() => {
+  const newWindow = useMemo(() => {
     const {top, left} = calculateChildWindowPosition(height, width);
 
-    const newWindow = window.open(
+    return window.open(
       url,
       name,
       `
@@ -57,25 +55,26 @@ export const DetachedWindow = ({children, url = '', name, onClose, width = 600, 
         toolbar=no,
       `,
     );
+  }, [height, name, url, width]);
 
+  useEffect(() => {
     if (!newWindow) {
       return () => {};
     }
 
-    copyStyles(document, newWindow.document);
+    setTimeout(() => copyStyles(window.document, newWindow.document), 0);
+
     newWindow.document.title = window.document.title;
 
     newWindow.addEventListener('beforeunload', onClose);
     window.addEventListener('beforeunload', onClose);
-
-    setNewWindow(newWindow);
 
     return () => {
       newWindow.close();
       newWindow.removeEventListener('beforeunload', onClose);
       window.removeEventListener('beforeunload', onClose);
     };
-  }, [height, name, url, width, onClose]);
+  }, [height, name, url, width, onClose, newWindow]);
 
   return !newWindow
     ? null
