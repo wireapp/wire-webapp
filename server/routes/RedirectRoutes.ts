@@ -43,10 +43,6 @@ export const RedirectRoutes = (config: ServerConfig, clientConfig: ClientConfig)
     }
     const userAgent = req.header('User-Agent');
     const parseResult = BrowserUtil.parseUserAgent(userAgent);
-    if (!parseResult) {
-      return res.redirect(HTTP_STATUS.MOVED_TEMPORARILY, `${clientConfig.URL.WEBSITE_BASE}/unsupported/`);
-    }
-
     return res.json(parseResult);
   }),
   router.get('/test/agent/?', (req, res) => {

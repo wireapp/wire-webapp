@@ -18,11 +18,12 @@
     <meta property="og:image" content="<%= OPEN_GRAPH_IMAGE_URL %>" />
 
     <title><%= BRAND_NAME %></title>
+
+    <script src="./min/checkBrowser.js?<%= VERSION %>"></script>
   </head>
 
   <body>
     <main id="wire-app"></main>
-
     <script src="./config.js?<%= VERSION %>"></script>
     <script src="./min/dexie.js?<%= VERSION %>"></script>
     <script src="./min/vendor.js?<%= VERSION %>"></script>

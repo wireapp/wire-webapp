@@ -129,3 +129,4 @@ const mapStateToProps = (state: RootState) => ({
 });
 
 export const UnsupportedBrowser = connect(mapStateToProps)(UnsupportedBrowserComponent);
+UnsupportedBrowser.displayName = 'UnsupportedBrowserHoc';

@@ -37,7 +37,6 @@ import {InternalErrorRoute, NotFoundRoute} from './routes/error/ErrorRoutes';
 import {GoogleWebmasterRoute} from './routes/googlewebmaster/GoogleWebmasterRoute';
 import {RedirectRoutes} from './routes/RedirectRoutes';
 import {Root} from './routes/Root';
-import * as BrowserUtil from './util/BrowserUtil';
 import {replaceHostnameInObject} from './util/hostnameReplacer';
 
 class Server {
@@ -188,16 +187,13 @@ class Server {
         req.path.startsWith('/join') ||
         req.path.startsWith('/auth') ||
         req.path.startsWith('/google') ||
+        req.path.startsWith('/unsupported') ||
         req.path.startsWith('/apple-app-site-association');
 
       if (ignoredPath) {
         return next();
       }
 
-      const userAgent = req.header('User-Agent');
-      if (!BrowserUtil.isSupportedBrowser(userAgent)) {
-        return res.redirect(HTTP_STATUS.MOVED_TEMPORARILY, '/auth/');
-      }
       return next();
     });
   }
