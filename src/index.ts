@@ -25,3 +25,5 @@ export * as cryptography from './cryptography/';
 export * as util from './util';
 export * as MessageBuilder from './conversation/message/MessageBuilder';
 export * as errors from './errors';
+
+export {Ciphersuite} from '@wireapp/core-crypto';

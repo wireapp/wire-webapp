@@ -52,7 +52,7 @@ import {getQueueLength, pauseMessageSending, resumeMessageSending} from './conve
 import {SubconversationService} from './conversation/SubconversationService/SubconversationService';
 import {GiphyService} from './giphy/';
 import {LinkPreviewService} from './linkPreview';
-import {MLSService} from './messagingProtocols/mls';
+import {InitClientOptions, MLSService} from './messagingProtocols/mls';
 import {
   pauseRejoiningMLSConversations,
   queueConversationRejoin,
@@ -112,7 +112,7 @@ interface AccountOptions {
   nbPrekeys: number;
 
   /**
-   * Config for MLS and proteus devices. Will fallback to the old cryptobox logic if not provided
+   * Config for coreCrypto in case it supposed to be used. Will fallback to the old cryptobox logic if not provided
    */
   coreCryptoConfig?: CoreCryptoConfig;
 }
@@ -136,7 +136,6 @@ export class Account extends TypedEventEmitter<Events> {
   private readonly apiClient: APIClient;
   private readonly logger: logdown.Logger;
   private readonly coreCryptoConfig?: CoreCryptoConfig;
-  private readonly isMlsEnabled: () => Promise<boolean>;
   /** this is the client the consumer is currently using. Will be set as soon as `initClient` is called and will be rest upon logout */
   private currentClient?: RegisteredClient;
   private storeEngine?: CRUDEngine;
@@ -177,7 +176,6 @@ export class Account extends TypedEventEmitter<Events> {
     this.apiClient = apiClient;
     this.backendFeatures = this.apiClient.backendFeatures;
     this.coreCryptoConfig = options.coreCryptoConfig;
-    this.isMlsEnabled = async () => !!this.coreCryptoConfig?.mls && (await this.apiClient.supportsMLS());
     this.recurringTaskScheduler = new RecurringTaskScheduler({
       get: async key => {
         const task = await this.db?.get('recurringTasks', key);
@@ -322,7 +320,6 @@ export class Account extends TypedEventEmitter<Events> {
 
     const context = await this.apiClient.login(loginData);
     await this.initServices(context);
-
     return context;
   }
 
@@ -359,7 +356,7 @@ export class Account extends TypedEventEmitter<Events> {
    *
    * @returns The local existing client or undefined if the client does not exist or is not valid (non existing on backend)
    */
-  public async initClient(client: RegisteredClient, willEnrollE2ei: boolean = false) {
+  public async initClient(client: RegisteredClient, mlsConfig?: InitClientOptions) {
     if (!this.service || !this.apiClient.context || !this.storeEngine) {
       throw new Error('Services are not set.');
     }
@@ -370,8 +367,11 @@ export class Account extends TypedEventEmitter<Events> {
 
     await this.service.proteus.initClient(this.storeEngine, this.apiClient.context);
     if (this.service.mls) {
+      if (!mlsConfig) {
+        throw new Error('trying to init MLS without config. Please provide a config to initClient method.');
+      }
       const {userId, domain = ''} = this.apiClient.context;
-      await this.service.mls.initClient({id: userId, domain}, client, willEnrollE2ei);
+      await this.service.mls.initClient({id: userId, domain}, client, mlsConfig);
       // initialize schedulers for pending mls proposals once client is initialized
       await this.service.mls.initialisePendingProposalsTasks();
 
@@ -424,7 +424,7 @@ export class Account extends TypedEventEmitter<Events> {
     this.coreCallbacks = coreCallbacks;
   }
 
-  public async initServices(context: Context): Promise<void> {
+  private async initServices(context: Context): Promise<void> {
     const encryptedStoreName = this.generateEncryptedDbName(context);
     this.encryptedDb = this.options.systemCrypto
       ? await createCustomEncryptedStore(encryptedStoreName, this.options.systemCrypto)
@@ -448,16 +448,8 @@ export class Account extends TypedEventEmitter<Events> {
 
     const clientService = new ClientService(this.apiClient, proteusService, this.storeEngine);
 
-    if (clientType === CryptoClientType.CORE_CRYPTO && (await this.isMlsEnabled())) {
-      mlsService = new MLSService(
-        this.apiClient,
-        cryptoClient.getNativeClient(),
-        this.db,
-        this.recurringTaskScheduler,
-        {
-          ...this.coreCryptoConfig?.mls,
-        },
-      );
+    if (clientType === CryptoClientType.CORE_CRYPTO && (await this.apiClient.supportsMLS())) {
+      mlsService = new MLSService(this.apiClient, cryptoClient.getNativeClient(), this.db, this.recurringTaskScheduler);
 
       e2eServiceExternal = new E2EIServiceExternal(
         cryptoClient.getNativeClient(),

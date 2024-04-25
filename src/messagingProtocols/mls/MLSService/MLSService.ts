@@ -45,7 +45,7 @@ import {PriorityQueue} from '@wireapp/priority-queue';
 
 import {ClientMLSError, ClientMLSErrorLabel} from './ClientMLSError';
 import {isCoreCryptoMLSConversationAlreadyExistsError, shouldMLSDecryptionErrorBeIgnored} from './CoreCryptoMLSError';
-import {MLSServiceConfig, NewCrlDistributionPointsPayload, UploadCommitOptions} from './MLSService.types';
+import {NewCrlDistributionPointsPayload, UploadCommitOptions} from './MLSService.types';
 
 import {AddUsersFailure, AddUsersFailureReasons, KeyPackageClaimUser} from '../../../conversation';
 import {sendMessage} from '../../../conversation/message/messageSender';
@@ -66,23 +66,35 @@ import {
 import {ClientId, HandlePendingProposalsParams} from '../types';
 import {generateMLSDeviceId} from '../utils/MLSId';
 
+type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
+
+interface MLSConfig {
+  /** List of ciphersuites that could be used for MLS */
+  ciphersuites: Ciphersuite[];
+  /** preferred ciphersuite to use */
+  defaultCiphersuite: Ciphersuite;
+  /**
+   * (milliseconds) period of time between automatic updates of the keying material (30 days by default)
+   */
+  keyingMaterialUpdateThreshold: number;
+  /**
+   * number of key packages client should upload to the server (100 by default)
+   */
+  nbKeyPackages: number;
+}
+export type InitClientOptions = Optional<MLSConfig, 'keyingMaterialUpdateThreshold' | 'nbKeyPackages'> & {
+  skipInitIdentity?: boolean;
+};
+
 //@todo: this function is temporary, we wait for the update from core-crypto side
 //they are returning regular array instead of Uint8Array for commit and welcome messages
 export const optionalToUint8Array = (array: Uint8Array | []): Uint8Array => {
   return Array.isArray(array) ? Uint8Array.from(array) : array;
 };
 
-interface LocalMLSServiceConfig extends MLSServiceConfig {
-  /**
-   * minimum number of key packages client should have available (configured to half of nbKeyPackages)
-   */
-  minRequiredNumberOfAvailableKeyPackages: number;
-}
-
-const defaultConfig: MLSServiceConfig = {
+const defaultConfig = {
   keyingMaterialUpdateThreshold: 1000 * 60 * 60 * 24 * 30, //30 days
   nbKeyPackages: 100,
-  cipherSuite: Ciphersuite.MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519,
 };
 
 type Events = {
@@ -91,7 +103,7 @@ type Events = {
 };
 export class MLSService extends TypedEventEmitter<Events> {
   logger = logdown('@wireapp/core/MLSService');
-  config: LocalMLSServiceConfig;
+  private _config?: MLSConfig;
   private readonly textEncoder = new TextEncoder();
   private readonly textDecoder = new TextDecoder();
   private readonly conflictBackoffQueue = new PriorityQueue({
@@ -106,19 +118,19 @@ export class MLSService extends TypedEventEmitter<Events> {
     private readonly coreCryptoClient: CoreCrypto,
     private readonly coreDatabase: CoreDatabase,
     private readonly recurringTaskScheduler: RecurringTaskScheduler,
-    {
-      keyingMaterialUpdateThreshold = defaultConfig.keyingMaterialUpdateThreshold,
-      nbKeyPackages = defaultConfig.nbKeyPackages,
-      cipherSuite = defaultConfig.cipherSuite,
-    }: Partial<MLSServiceConfig>,
   ) {
     super();
-    this.config = {
-      keyingMaterialUpdateThreshold,
-      nbKeyPackages,
-      cipherSuite,
-      minRequiredNumberOfAvailableKeyPackages: Math.floor(nbKeyPackages / 2),
-    };
+  }
+
+  get config() {
+    if (!this._config) {
+      throw new Error('mls config is not set, did you forget to call initClient?');
+    }
+    return this._config;
+  }
+
+  private get minRequiredKeyPackages() {
+    return Math.floor(this.config.nbKeyPackages / 2);
   }
 
   /**
@@ -127,10 +139,18 @@ export class MLSService extends TypedEventEmitter<Events> {
    * @param client id of the client to initialize
    * @param skipInitIdentity avoid registering the client's identity to the backend (needed for e2eidentity as the identity will be uploaded and signed only when enrollment is successful)
    */
-  public async initClient(userId: QualifiedId, client: RegisteredClient, skipInitIdentity = false) {
+  public async initClient(
+    userId: QualifiedId,
+    client: RegisteredClient,
+    {skipInitIdentity, ...mlsConfig}: InitClientOptions,
+  ) {
+    this._config = {
+      ...mlsConfig,
+      ...defaultConfig,
+    };
     await this.coreCryptoClient.mlsInit(
       generateMLSDeviceId(userId, client.id),
-      [this.config.cipherSuite],
+      this.config.ciphersuites,
       this.config.nbKeyPackages,
     );
 
@@ -141,8 +161,7 @@ export class MLSService extends TypedEventEmitter<Events> {
       userAuthorize: async () => true,
     });
 
-    const isFreshMLSSelfClient =
-      typeof client.mls_public_keys.ed25519 !== 'string' || client.mls_public_keys.ed25519.length === 0;
+    const isFreshMLSSelfClient = !this.isInitializedMLSClient(client);
     const shouldinitIdentity = !(isFreshMLSSelfClient && skipInitIdentity);
 
     if (shouldinitIdentity) {
@@ -156,8 +175,14 @@ export class MLSService extends TypedEventEmitter<Events> {
     }
   }
 
+  /**
+   * returns true if the client has a valid MLS identity in regard of the default ciphersuite set
+   * @param client the client to check
+   */
+  public isInitializedMLSClient = (client: RegisteredClient) => isMLSDevice(client, this.config.defaultCiphersuite);
+
   private async getCredentialType() {
-    return (await this.coreCryptoClient.e2eiIsEnabled(this.config.cipherSuite))
+    return (await this.coreCryptoClient.e2eiIsEnabled(this.config.defaultCiphersuite))
       ? CredentialType.X509
       : CredentialType.Basic;
   }
@@ -269,7 +294,7 @@ export class MLSService extends TypedEventEmitter<Events> {
           const keys = await this.apiClient.api.client.claimMLSKeyPackages(
             id,
             domain,
-            numberToHex(this.config.cipherSuite),
+            numberToHex(this.config.defaultCiphersuite),
             skipOwnClientId,
           );
 
@@ -447,7 +472,7 @@ export class MLSService extends TypedEventEmitter<Events> {
 
     const configuration: ConversationConfiguration = {
       externalSenders,
-      ciphersuite: this.config.cipherSuite,
+      ciphersuite: this.config.defaultCiphersuite,
     };
 
     const credentialType = await this.getCredentialType();
@@ -624,12 +649,12 @@ export class MLSService extends TypedEventEmitter<Events> {
 
   public async clientValidKeypackagesCount(): Promise<number> {
     const credentialType = await this.getCredentialType();
-    return this.coreCryptoClient.clientValidKeypackagesCount(this.config.cipherSuite, credentialType);
+    return this.coreCryptoClient.clientValidKeypackagesCount(this.config.defaultCiphersuite, credentialType);
   }
 
   public async clientKeypackages(amountRequested: number): Promise<Uint8Array[]> {
     const credentialType = await this.getCredentialType();
-    return this.coreCryptoClient.clientKeypackages(this.config.cipherSuite, credentialType, amountRequested);
+    return this.coreCryptoClient.clientKeypackages(this.config.defaultCiphersuite, credentialType, amountRequested);
   }
 
   /**
@@ -719,7 +744,7 @@ export class MLSService extends TypedEventEmitter<Events> {
   private async verifyLocalMLSKeyPackagesAmount(clientId: string) {
     const keyPackagesCount = await this.clientValidKeypackagesCount();
 
-    if (keyPackagesCount <= this.config.minRequiredNumberOfAvailableKeyPackages) {
+    if (keyPackagesCount <= this.minRequiredKeyPackages) {
       return this.verifyRemoteMLSKeyPackagesAmount(clientId);
     }
   }
@@ -728,7 +753,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     const backendKeyPackagesCount = await this.getRemoteMLSKeyPackageCount(clientId);
 
     // If we have enough keys uploaded on backend, there's no need to upload more.
-    if (backendKeyPackagesCount > this.config.minRequiredNumberOfAvailableKeyPackages) {
+    if (backendKeyPackagesCount > this.minRequiredKeyPackages) {
       return;
     }
 
@@ -737,7 +762,7 @@ export class MLSService extends TypedEventEmitter<Events> {
   }
 
   private async getRemoteMLSKeyPackageCount(clientId: string) {
-    return this.apiClient.api.client.getMLSKeyPackageCount(clientId, numberToHex(this.config.cipherSuite));
+    return this.apiClient.api.client.getMLSKeyPackageCount(clientId, numberToHex(this.config.defaultCiphersuite));
   }
 
   /**
@@ -749,7 +774,7 @@ export class MLSService extends TypedEventEmitter<Events> {
   private async uploadMLSPublicKeys(client: RegisteredClient) {
     // If we've already updated a client with its public key, there's no need to do it again.
     const credentialType = await this.getCredentialType();
-    const publicKey = await this.coreCryptoClient.clientPublicKey(this.config.cipherSuite, credentialType);
+    const publicKey = await this.coreCryptoClient.clientPublicKey(this.config.defaultCiphersuite, credentialType);
     return this.apiClient.api.client.putClient(client.id, {
       mls_public_keys: {ed25519: btoa(Converter.arrayBufferViewToBaselineString(publicKey))},
     });
@@ -946,7 +971,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     certificateTtl: number,
     getOAuthToken: getTokenCallback,
   ): Promise<void> {
-    const isCertificateRenewal = await this.coreCryptoClient.e2eiIsEnabled(this.config.cipherSuite);
+    const isCertificateRenewal = await this.coreCryptoClient.e2eiIsEnabled(this.config.defaultCiphersuite);
     const e2eiServiceInternal = new E2EIServiceInternal(
       this.coreDatabase,
       this.coreCryptoClient,
@@ -960,7 +985,7 @@ export class MLSService extends TypedEventEmitter<Events> {
 
     this.dispatchNewCrlDistributionPoints(rotateBundle);
     // upload the clients public keys
-    if (!isMLSDevice(client)) {
+    if (!this.isInitializedMLSClient(client)) {
       // we only upload public keys for the initial certification process if the device is not already a registered MLS device.
       await this.uploadMLSPublicKeys(client);
     }

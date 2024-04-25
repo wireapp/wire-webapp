@@ -48,7 +48,7 @@ const MOCK_BACKEND = {
 async function createAccount(): Promise<{account: Account; apiClient: APIClient}> {
   const apiClient = new APIClient({urls: MOCK_BACKEND});
   const account = new Account(apiClient);
-  await account.initServices({
+  await account['initServices']({
     clientType: ClientType.TEMPORARY,
     userId: '',
   });
@@ -173,7 +173,7 @@ describe('Account', () => {
     it('initializes the Protocol buffers', async () => {
       const account = new Account();
 
-      await account.initServices({clientType: ClientType.TEMPORARY, userId: ''});
+      await account['initServices']({clientType: ClientType.TEMPORARY, userId: ''});
 
       expect(account.service!.conversation).toBeDefined();
 
@@ -191,7 +191,7 @@ describe('Account', () => {
       const apiClient = new APIClient({urls: MOCK_BACKEND});
       const account = new Account(apiClient);
 
-      await account.initServices({clientType: ClientType.TEMPORARY, userId: ''});
+      await account['initServices']({clientType: ClientType.TEMPORARY, userId: ''});
       const {clientType, userId} = await account.login({
         clientType: ClientType.TEMPORARY,
         email: 'hello@example.com',
@@ -207,7 +207,7 @@ describe('Account', () => {
       const account = new Account(apiClient);
       let backendError;
 
-      await account.initServices({clientType: ClientType.TEMPORARY, userId: ''});
+      await account['initServices']({clientType: ClientType.TEMPORARY, userId: ''});
 
       try {
         await account.login({
