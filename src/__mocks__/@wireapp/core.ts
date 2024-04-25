@@ -108,3 +108,5 @@ export class Account extends EventEmitter {
 export const util = {
   TaskScheduler,
 };
+
+export {Ciphersuite} from '@wireapp/core-crypto';

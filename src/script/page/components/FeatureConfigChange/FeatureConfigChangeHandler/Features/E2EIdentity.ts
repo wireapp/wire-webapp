@@ -20,7 +20,6 @@
 import {FeatureStatus, FEATURE_KEY, FeatureList} from '@wireapp/api-client/lib/team';
 
 import {E2EIHandler} from 'src/script/E2EIdentity';
-import {Logger} from 'Util/Logger';
 import {supportsMLS} from 'Util/util';
 
 import {hasE2EIVerificationExpiration, hasMLSDefaultProtocol} from '../../../../../guards/Protocol';
@@ -53,7 +52,7 @@ export const getE2EIConfig = (config: FeatureList): FeatureList[FEATURE_KEY.MLSE
   return e2eiConfig;
 };
 
-export const configureE2EI = (logger: Logger, config: FeatureList): undefined | Promise<E2EIHandler> => {
+export const configureE2EI = (config: FeatureList): undefined | Promise<E2EIHandler> => {
   // Either get the current E2EIdentity handler instance or create a new one
   const e2eiConfig = getE2EIConfig(config);
   if (!e2eiConfig) {

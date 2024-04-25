@@ -41,12 +41,7 @@ export class Core extends Account {
 
   constructor(apiClient = container.resolve(APIClient)) {
     const {
-      FEATURE: {
-        USE_CORE_CRYPTO,
-        MLS_CONFIG_DEFAULT_CIPHERSUITE,
-        MLS_CONFIG_KEYING_MATERIAL_UPDATE_THRESHOLD,
-        ENABLE_ENCRYPTION_AT_REST,
-      },
+      FEATURE: {USE_CORE_CRYPTO, ENABLE_ENCRYPTION_AT_REST},
     } = Config.getConfig();
 
     const enableCoreCrypto = supportsMLS() || USE_CORE_CRYPTO;
@@ -64,17 +59,7 @@ export class Core extends Account {
        * When in a browser context, then this systemCrypto will be undefined and the key generator will then use it's internal encryption system
        */
       systemCrypto: window.systemCrypto ? wrapSystemCrypto(window.systemCrypto) : undefined,
-      coreCryptoConfig: enableCoreCrypto
-        ? {
-            wasmFilePath: '/min/core-crypto.wasm',
-            mls: supportsMLS()
-              ? {
-                  keyingMaterialUpdateThreshold: MLS_CONFIG_KEYING_MATERIAL_UPDATE_THRESHOLD,
-                  cipherSuite: MLS_CONFIG_DEFAULT_CIPHERSUITE,
-                }
-              : undefined,
-          }
-        : undefined,
+      coreCryptoConfig: enableCoreCrypto ? {wasmFilePath: '/min/core-crypto.wasm'} : undefined,
 
       nbPrekeys: 100,
     });
