@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.0.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@26.14.1...@wireapp/api-client@27.0.0) (2024-04-25)
+
+### Features
+
+* Allow consumer to configure mls ciphersuite when client is init ([#6168](https://github.com/wireapp/wire-web-packages/issues/6168)) ([161b6fa](https://github.com/wireapp/wire-web-packages/commit/161b6fa662b219067b268caf48f928d2cae86dc0))
+
+### BREAKING CHANGES
+
+* the MLS config has to be passed down to the `initClient` method (and not at `Account` construction time)
+
 ## [26.14.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@26.14.0...@wireapp/api-client@26.14.1) (2024-04-23)
 
 ### Bug Fixes
