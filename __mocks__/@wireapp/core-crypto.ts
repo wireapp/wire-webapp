@@ -32,6 +32,7 @@ export enum Ciphersuite {
 
 export enum CredentialType {
   Basic = 1,
+  X509 = 2,
 }
 
 export enum GroupInfoEncryptionType {
