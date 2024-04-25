@@ -330,11 +330,14 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     // Clear the e2e identity progress
     await this.coreE2EIService.clearAllProgress();
 
-    return new Promise<void>(resolve => {
+    // A fresh MLS client should be forced to enrol.
+    const shouldHideSnooze = (await isFreshMLSSelfClient()) || !snoozable;
+
+    return new Promise<void>(async resolve => {
       const {modalOptions, modalType} = getModalOptions({
         type: ModalType.ERROR,
         hideClose: true,
-        hideSecondary: !snoozable,
+        hideSecondary: shouldHideSnooze,
         primaryActionFn: async () => {
           await this.enroll(snoozable);
           resolve();
