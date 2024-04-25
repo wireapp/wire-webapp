@@ -46,13 +46,26 @@ type Events = {
   crlChanged: {domain: string};
 };
 
-// TODO coreCrypto types are wrong here. They return a string (the key of the enum) instead of the enum value
+//TODO: coreCrypto types are wrong here. They return a string (the key of the enum) instead of the enum value
 function fixDeviceStatus(value: any): DeviceStatus {
   const fixedValue = DeviceStatus[value];
   if (!fixedValue) {
     throw new Error(`Invalid device status: ${value}`);
   }
   return fixedValue as unknown as DeviceStatus;
+}
+
+//TODO: coreCrypto types are wrong here. They return a string (the key of the enum) instead of the enum value
+function fixCredentialType(value: any): CredentialType {
+  if (typeof value === 'number') {
+    return value;
+  }
+
+  const fixedValue = CredentialType[value];
+  if (!fixedValue) {
+    throw new Error(`Invalid credentialType value: ${value}`);
+  }
+  return fixedValue as unknown as CredentialType;
 }
 
 // TODO coreCrypto types are wrong here. They return a string (the key of the enum) instead of the enum value
@@ -155,6 +168,7 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
       const identities = (userIdentities.get(userId.id) || []).map(identity => ({
         ...identity,
         status: fixDeviceStatus(identity.status),
+        credentialType: fixCredentialType(identity.credentialType),
         deviceId: parseFullQualifiedClientId(identity.clientId).client,
         qualifiedUserId: userId,
       }));
@@ -202,6 +216,7 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
     return deviceIdentities.map(identity => ({
       ...identity,
       deviceId: parseFullQualifiedClientId(identity.clientId).client,
+      credentialType: fixCredentialType(identity.credentialType),
       qualifiedUserId: userClientsMap[identity.clientId],
     }));
   }
