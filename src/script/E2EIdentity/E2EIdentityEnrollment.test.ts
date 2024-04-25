@@ -38,18 +38,20 @@ import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 
 jest.mock('./OIDCService', () => {
+  const mockedUserData = {
+    id_token: 'ID_TOKEN',
+    access_token: 'ACCESS_TOKEN',
+    refresh_token: 'REFRESH_TOKEN  ',
+    token_type: 'auth',
+    profile: 'sub',
+  };
   return {
     // Mock the OIDCService class
     OIDCService: jest.fn().mockImplementation(() => ({
-      handleSilentAuthentication: jest.fn().mockResolvedValue({
-        id_token: 'ID_TOKEN',
-        access_token: 'ACCESS_TOKEN',
-        refresh_token: 'REFRESH_TOKEN  ',
-        token_type: 'auth',
-        profile: 'sub',
-      }),
+      handleSilentAuthentication: jest.fn().mockResolvedValue(mockedUserData),
       clearProgress: jest.fn(),
       handleAuthentication: jest.fn().mockResolvedValue({}),
+      getUser: jest.fn().mockResolvedValue(mockedUserData),
       // ... other methods of OIDCService
     })),
     getOIDCServiceInstance: jest.fn(), // if needed
