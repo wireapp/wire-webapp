@@ -4098,12 +4098,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:20.12.7, @types/node@npm:>=13.7.0":
-  version: 20.12.7
-  resolution: "@types/node@npm:20.12.7"
+"@types/node@npm:*, @types/node@npm:>=13.7.0":
+  version: 20.12.5
+  resolution: "@types/node@npm:20.12.5"
   dependencies:
     undici-types: "npm:~5.26.4"
-  checksum: 10/b4a28a3b593a9bdca5650880b6a9acef46911d58cf7cfa57268f048e9a7157a7c3196421b96cea576850ddb732e3b54bc982c8eb5e1e5ef0635d4424c2fce801
+  checksum: 10/7b647ea6679016e4e58e1aa439c46b610230ffcbe19173911fbf1d1fa329ec6fd1eeba4e3e2d8743206d3b00d5a0cad75f1c90189e1d1ec057eb48df1a1dd747
   languageName: node
   linkType: hard
 
@@ -4111,6 +4111,15 @@ __metadata:
   version: 16.9.1
   resolution: "@types/node@npm:16.9.1"
   checksum: 10/c144c007a42b3fbdea10dbb814b86d541197dfabcdc8b11e437ae984fd34dbac06e12b2b3a6a1d5453a8f877a505d3c269274c485cfc310ce14893094134a1d1
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:20.12.7":
+  version: 20.12.7
+  resolution: "@types/node@npm:20.12.7"
+  dependencies:
+    undici-types: "npm:~5.26.4"
+  checksum: 10/b4a28a3b593a9bdca5650880b6a9acef46911d58cf7cfa57268f048e9a7157a7c3196421b96cea576850ddb732e3b54bc982c8eb5e1e5ef0635d4424c2fce801
   languageName: node
   linkType: hard
 
@@ -4685,9 +4694,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^26.12.0":
-  version: 26.12.0
-  resolution: "@wireapp/api-client@npm:26.12.0"
+"@wireapp/api-client@npm:^27.0.0":
+  version: 27.0.0
+  resolution: "@wireapp/api-client@npm:27.0.0"
   dependencies:
     "@wireapp/commons": "npm:^5.2.7"
     "@wireapp/priority-queue": "npm:^2.1.5"
@@ -4701,8 +4710,8 @@ __metadata:
     spark-md5: "npm:3.0.2"
     tough-cookie: "npm:4.1.3"
     ws: "npm:8.16.0"
-    zod: "npm:3.22.4"
-  checksum: 10/db6a3b927abc9774013685239bda5c18561e38a7a33e6f1d41dc1fff16dfc470b67dfa07a968f3c8dffb67d5d52a426ccca9832a629e44fc4ca4b41b69bbffa9
+    zod: "npm:3.22.5"
+  checksum: 10/96fb3d5502b734d6b1199079370c7e52503aafd0eedac336bcb4a3a2d06d1956cce12f9782a97f5c25bfb5d6e342132bba229b7fe28e1b96d1c6bfbe21854319
   languageName: node
   linkType: hard
 
@@ -4749,20 +4758,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core-crypto@npm:1.0.0-rc.55":
-  version: 1.0.0-rc.55
-  resolution: "@wireapp/core-crypto@npm:1.0.0-rc.55"
-  checksum: 10/1b80f592f8adbbba2bd49527dec2a107ab364587891fd0fd8404b8ace7bd810499ef83cafa36395851b9005f70915ebd4d9378b888e8be0e21f3ba575d0a024c
+"@wireapp/core-crypto@npm:1.0.0-rc.56":
+  version: 1.0.0-rc.56
+  resolution: "@wireapp/core-crypto@npm:1.0.0-rc.56"
+  checksum: 10/ca370526818b957c7c9393faec42f6593b19bba47500bc62ce708720bb32759594bc37cd6f1c16aebd4b4fefcb435e1cac30b574c4baed7efe285f0a8fda6de8
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:45.3.4":
-  version: 45.3.4
-  resolution: "@wireapp/core@npm:45.3.4"
+"@wireapp/core@npm:46.0.0":
+  version: 46.0.0
+  resolution: "@wireapp/core@npm:46.0.0"
   dependencies:
-    "@wireapp/api-client": "npm:^26.12.0"
+    "@wireapp/api-client": "npm:^27.0.0"
     "@wireapp/commons": "npm:^5.2.7"
-    "@wireapp/core-crypto": "npm:1.0.0-rc.55"
+    "@wireapp/core-crypto": "npm:1.0.0-rc.56"
     "@wireapp/cryptobox": "npm:12.8.0"
     "@wireapp/priority-queue": "npm:^2.1.5"
     "@wireapp/promise-queue": "npm:^2.3.2"
@@ -4777,8 +4786,8 @@ __metadata:
     logdown: "npm:3.3.1"
     long: "npm:^5.2.0"
     uuidjs: "npm:4.2.13"
-    zod: "npm:3.22.4"
-  checksum: 10/da75dc2897b463c12bbf06ebb327292c653d7faa62fe1165634582ffa20b2f7f1c68719309c701456e0f42b6a28d2a991abd6579e71bcb3c307699d32e6c8af7
+    zod: "npm:3.22.5"
+  checksum: 10/006b04628c795b2adc31f454ec38cbce6552738598687c8a6f69d2477cbcf2003d7a9d0d0e7bfbe57d6744eecf835babdf1cbde2e633f15f51e86e890e77350c
   languageName: node
   linkType: hard
 
@@ -17353,7 +17362,7 @@ __metadata:
     "@wireapp/avs": "npm:9.6.12"
     "@wireapp/commons": "npm:5.2.7"
     "@wireapp/copy-config": "npm:2.2.0"
-    "@wireapp/core": "npm:45.3.4"
+    "@wireapp/core": "npm:46.0.0"
     "@wireapp/eslint-config": "npm:3.0.7"
     "@wireapp/prettier-config": "npm:0.6.4"
     "@wireapp/react-ui-kit": "npm:9.17.1"
@@ -17947,10 +17956,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zod@npm:3.22.4":
-  version: 3.22.4
-  resolution: "zod@npm:3.22.4"
-  checksum: 10/73622ca36a916f785cf528fe612a884b3e0f183dbe6b33365a7d0fc92abdbedf7804c5e2bd8df0a278e1472106d46674281397a3dd800fa9031dc3429758c6ac
+"zod@npm:3.22.5":
+  version: 3.22.5
+  resolution: "zod@npm:3.22.5"
+  checksum: 10/a60c1b55c4cc824a5d0432ee29d93b087b5d8a1bd2d0f4cd6e7ffe5b602da9cab2f2c27b1ae6c96d88d9f778cc933cead70e08b7944a98893576c61dca5e0c74
   languageName: node
   linkType: hard
 
