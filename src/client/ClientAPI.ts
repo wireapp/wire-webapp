@@ -38,6 +38,10 @@ export type ClaimedKeyPackages = {
 };
 
 export enum MLSPublicKeyAlgorithmKeys {
+  P256 = 'p256',
+  P384 = 'p384',
+  P521 = 'p521',
+  ED448 = 'ed448',
   ED25519 = 'ed25519',
 }
 export type MLSPublicKeyRecord = Partial<Record<MLSPublicKeyAlgorithmKeys, string>>;
