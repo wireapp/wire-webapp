@@ -19,8 +19,6 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {MLSServiceConfig} from './MLSService/MLSService.types';
-
 export type ClientId = string;
 
 export type SecretCrypto = {
@@ -54,7 +52,4 @@ export interface CoreCryptoConfig {
    * It, thus, needs to know where, on the server, the file can be found
    */
   wasmFilePath: string;
-
-  /** If set will create an MLS capable device from the current device */
-  mls?: Partial<MLSServiceConfig>;
 }

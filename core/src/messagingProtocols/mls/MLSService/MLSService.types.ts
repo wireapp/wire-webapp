@@ -17,7 +17,7 @@
  *
  */
 
-import type {Ciphersuite, CommitBundle} from '@wireapp/core-crypto';
+import type {CommitBundle} from '@wireapp/core-crypto';
 
 export interface UploadCommitOptions {
   /**
@@ -29,21 +29,6 @@ export interface UploadCommitOptions {
    * Is the current commitBundle an external commit.
    */
   isExternalCommit?: boolean;
-}
-
-export interface MLSServiceConfig {
-  /**
-   * (milliseconds) period of time between automatic updates of the keying material (30 days by default)
-   */
-  keyingMaterialUpdateThreshold: number;
-  /**
-   * number of key packages client should upload to the server (100 by default)
-   */
-  nbKeyPackages: number;
-  /**
-   * default ciphersuite to use for MLS (MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519 = 1 by default)
-   */
-  cipherSuite: Ciphersuite;
 }
 
 export type NewCrlDistributionPointsPayload = {crlNewDistributionPoints?: string[] | undefined};

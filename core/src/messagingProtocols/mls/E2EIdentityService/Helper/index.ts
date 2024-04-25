@@ -17,7 +17,9 @@
  *
  */
 
-import {RegisteredClient} from '@wireapp/api-client/lib/client';
+import {MLSPublicKeyAlgorithmKeys, RegisteredClient} from '@wireapp/api-client/lib/client';
+
+import {Ciphersuite} from '@wireapp/core-crypto';
 
 import {ClientIdStringType, constructFullyQualifiedClientId} from '../../../../util/fullyQualifiedClientIdUtils';
 
@@ -39,7 +41,24 @@ export const getE2EIClientId = (clientId: string, userId: string, userDomain: st
   };
 };
 
-export const isMLSDevice = ({mls_public_keys}: RegisteredClient) =>
-  typeof mls_public_keys.ed25519 === 'string' && mls_public_keys.ed25519.length > 0;
+/**
+ * depending on the ciphersuite used, the signature algorithm used is different. We need to keep a mapping of the ciphersuite to the signature algorithm
+ */
+const ciphersuiteSignatureAlgorithmMap: Record<Ciphersuite, MLSPublicKeyAlgorithmKeys> = {
+  [Ciphersuite.MLS_128_DHKEMP256_AES128GCM_SHA256_P256]: MLSPublicKeyAlgorithmKeys.P256,
+  [Ciphersuite.MLS_256_DHKEMP384_AES256GCM_SHA384_P384]: MLSPublicKeyAlgorithmKeys.P384,
+  [Ciphersuite.MLS_256_DHKEMP521_AES256GCM_SHA512_P521]: MLSPublicKeyAlgorithmKeys.P521,
+  [Ciphersuite.MLS_256_DHKEMX448_AES256GCM_SHA512_Ed448]: MLSPublicKeyAlgorithmKeys.ED448,
+  [Ciphersuite.MLS_256_DHKEMX448_CHACHA20POLY1305_SHA512_Ed448]: MLSPublicKeyAlgorithmKeys.ED448,
+  [Ciphersuite.MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519]: MLSPublicKeyAlgorithmKeys.ED25519,
+  [Ciphersuite.MLS_128_DHKEMX25519_CHACHA20POLY1305_SHA256_Ed25519]: MLSPublicKeyAlgorithmKeys.ED25519,
+  [Ciphersuite.MLS_128_X25519KYBER768DRAFT00_AES128GCM_SHA256_Ed25519]: MLSPublicKeyAlgorithmKeys.ED25519,
+};
+
+export const isMLSDevice = ({mls_public_keys}: RegisteredClient, ciphersuite: Ciphersuite) => {
+  const signatureAlogrithm = ciphersuiteSignatureAlgorithmMap[ciphersuite];
+  const signature = mls_public_keys[signatureAlogrithm];
+  return typeof signature === 'string' && signature.length > 0;
+};
 
 export const isResponseStatusValid = (status: string | undefined) => status && status === 'valid';

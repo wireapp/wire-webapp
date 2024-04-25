@@ -25,7 +25,7 @@ import {TypedEventEmitter} from '@wireapp/commons';
 import {CoreCrypto, E2eiConversationState, WireIdentity, DeviceStatus, CredentialType} from '@wireapp/core-crypto';
 
 import {AcmeService} from './Connection';
-import {getE2EIClientId, isMLSDevice} from './Helper';
+import {getE2EIClientId} from './Helper';
 import {createE2EIEnrollmentStorage} from './Storage/E2EIStorage';
 
 import {ClientService} from '../../../client';
@@ -99,7 +99,7 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
   }
 
   public isE2EIEnabled(): Promise<boolean> {
-    return this.coreCryptoClient.e2eiIsEnabled(this.mlsService.config.cipherSuite);
+    return this.coreCryptoClient.e2eiIsEnabled(this.mlsService.config.defaultCiphersuite);
   }
 
   public async getAllGroupUsersIdentities(
@@ -208,10 +208,7 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
 
   public async isFreshMLSSelfClient(): Promise<boolean> {
     const client = await this.clientService.loadClient();
-    if (!client) {
-      return true;
-    }
-    return !isMLSDevice(client);
+    return !client || !this.mlsService.isInitializedMLSClient(client);
   }
 
   private async registerLocalCertificateRoot(acmeService: AcmeService): Promise<string> {
