@@ -46,37 +46,6 @@ type Events = {
   crlChanged: {domain: string};
 };
 
-//TODO: coreCrypto types are wrong here. They return a string (the key of the enum) instead of the enum value
-function fixDeviceStatus(value: any): DeviceStatus {
-  const fixedValue = DeviceStatus[value];
-  if (!fixedValue) {
-    throw new Error(`Invalid device status: ${value}`);
-  }
-  return fixedValue as unknown as DeviceStatus;
-}
-
-//TODO: coreCrypto types are wrong here. They return a string (the key of the enum) instead of the enum value
-function fixCredentialType(value: any): CredentialType {
-  if (typeof value === 'number') {
-    return value;
-  }
-
-  const fixedValue = CredentialType[value];
-  if (!fixedValue) {
-    throw new Error(`Invalid credentialType value: ${value}`);
-  }
-  return fixedValue as unknown as CredentialType;
-}
-
-// TODO coreCrypto types are wrong here. They return a string (the key of the enum) instead of the enum value
-function fixConversationState(value: any): E2eiConversationState {
-  const fixedValue = E2eiConversationState[value];
-  if (!fixedValue) {
-    throw new Error(`Invalid conversation status: ${value}`);
-  }
-  return fixedValue as unknown as E2eiConversationState;
-}
-
 // This export is meant to be accessible from the outside (e.g the Webapp / UI)
 export class E2EIServiceExternal extends TypedEventEmitter<Events> {
   private _acmeService?: AcmeService;
@@ -107,8 +76,7 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
   }
 
   public async getConversationState(conversationId: Uint8Array): Promise<E2eiConversationState> {
-    const state = await this.coreCryptoClient.e2eiConversationState(conversationId);
-    return fixConversationState(state);
+    return this.coreCryptoClient.e2eiConversationState(conversationId);
   }
 
   public isE2EIEnabled(): Promise<boolean> {
@@ -167,8 +135,6 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
     for (const userId of userIds) {
       const identities = (userIdentities.get(userId.id) || []).map(identity => ({
         ...identity,
-        status: fixDeviceStatus(identity.status),
-        credentialType: fixCredentialType(identity.credentialType),
         deviceId: parseFullQualifiedClientId(identity.clientId).client,
         qualifiedUserId: userId,
       }));
@@ -216,7 +182,7 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
     return deviceIdentities.map(identity => ({
       ...identity,
       deviceId: parseFullQualifiedClientId(identity.clientId).client,
-      credentialType: fixCredentialType(identity.credentialType),
+      credentialType: identity.credentialType,
       qualifiedUserId: userClientsMap[identity.clientId],
     }));
   }
