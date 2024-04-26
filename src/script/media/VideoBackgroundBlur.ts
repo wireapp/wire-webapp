@@ -95,7 +95,7 @@ function blendImagesBasedOnMask(
   const length = mask.length;
   for (let i = 0; i < length; i++) {
     const baseIndex = i * 4;
-    if (mask[i] > 0.5) {
+    if (mask[i] <= 0.5) {
       originalPixels[baseIndex] = blurredPixels[baseIndex];
       originalPixels[baseIndex + 1] = blurredPixels[baseIndex + 1];
       originalPixels[baseIndex + 2] = blurredPixels[baseIndex + 2];
@@ -111,7 +111,7 @@ export async function initImageSegmenter(): Promise<ImageSegmenter> {
   const video = await FilesetResolver.forVisionTasks('./mediapipe/wasm');
   imageSegmenter = await ImageSegmenter.createFromOptions(video, {
     baseOptions: {
-      modelAssetPath: './assets/mediapipe-models/image_segmenter/selfie_multiclass_256x256.tflite',
+      modelAssetPath: './assets/mediapipe-models/selfie_segmenter.tflite',
       delegate: 'GPU',
     },
     runningMode: 'VIDEO',
