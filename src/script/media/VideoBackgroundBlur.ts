@@ -20,7 +20,26 @@
 import {ImageSegmenter, FilesetResolver, ImageSegmenterResult} from '@mediapipe/tasks-vision';
 import * as StackBlur from 'stackblur-canvas';
 
-const FRAMERATE = 60;
+enum SEGMENTATION_MODEL {
+  QUALITY = './assets/mediapipe-models/selfie_multiclass_256x256.tflite',
+  PERFORMANCE = './assets/mediapipe-models/selfie_segmenter.tflite',
+}
+enum BLUR_QUALITY {
+  LOW = 30,
+  MEDIUM = 60,
+  HIGH = 90,
+}
+enum FRAMERATE {
+  LOW = 30,
+  HIGH = 60,
+}
+
+const QualitySettings = {
+  segmentationModel: SEGMENTATION_MODEL.QUALITY,
+  blurQuality: BLUR_QUALITY.MEDIUM,
+  framerate: FRAMERATE.HIGH,
+};
+
 // Create a video element to display the webcam feed
 const videoEl = document.createElement('video');
 // Create a canvas element to apply the blur effect
@@ -34,12 +53,6 @@ const videoTracks = {
   video: null as MediaStreamTrack[] | null,
   audio: null as MediaStreamTrack[] | null,
 };
-
-enum SEGMENTATION_MODEL {
-  QUALITY = './assets/mediapipe-models/selfie_multiclass_256x256.tflite',
-  PERFORMANCE = './assets/mediapipe-models/selfie_segmenter.tflite',
-}
-const segmentationModel = SEGMENTATION_MODEL.QUALITY;
 
 // Store the ImageSegmenter instance
 let imageSegmenter: ImageSegmenter | undefined;
@@ -89,7 +102,7 @@ function applyBlurToImageData(imageData: ImageData): ImageData {
     0,
     imageData.width,
     imageData.height,
-    70,
+    QualitySettings.blurQuality,
   );
 }
 
@@ -102,7 +115,7 @@ function blendImagesBasedOnMask(
   for (let i = 0; i < length; i++) {
     const baseIndex = i * 4;
     let check = mask[i] <= 0.5;
-    if (segmentationModel === SEGMENTATION_MODEL.QUALITY) {
+    if (QualitySettings.segmentationModel === SEGMENTATION_MODEL.QUALITY) {
       check = mask[i] >= 0.5;
     }
     if (check) {
@@ -121,7 +134,7 @@ export async function initImageSegmenter(): Promise<ImageSegmenter> {
   const video = await FilesetResolver.forVisionTasks('./mediapipe/wasm');
   imageSegmenter = await ImageSegmenter.createFromOptions(video, {
     baseOptions: {
-      modelAssetPath: segmentationModel,
+      modelAssetPath: QualitySettings.segmentationModel,
       delegate: 'GPU',
     },
     runningMode: 'VIDEO',
@@ -155,7 +168,9 @@ export async function applyBlur(mediaStream: MediaStream): Promise<MediaStream> 
 
   return new Promise(resolve => {
     videoEl.onplay = () => {
-      resolve(new MediaStream([...videoTracks.audio!, canvasEl.captureStream(FRAMERATE).getVideoTracks()[0]]));
+      resolve(
+        new MediaStream([...videoTracks.audio!, canvasEl.captureStream(QualitySettings.framerate).getVideoTracks()[0]]),
+      );
     };
   });
 }
