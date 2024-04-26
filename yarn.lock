@@ -3389,6 +3389,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@mediapipe/tasks-vision@npm:^0.10.12":
+  version: 0.10.12
+  resolution: "@mediapipe/tasks-vision@npm:0.10.12"
+  checksum: 10/ebf75a39e323411b276329ccfed3a57cb58dd280cc836e947c78e77a8e821ce2ca94454af1246eb2219e08f76980556aa69d52f42db608d670c07e7466bf4bea
+  languageName: node
+  linkType: hard
+
 "@nodelib/fs.scandir@npm:2.1.5":
   version: 2.1.5
   resolution: "@nodelib/fs.scandir@npm:2.1.5"
@@ -15508,6 +15515,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"stackblur-canvas@npm:^2.7.0":
+  version: 2.7.0
+  resolution: "stackblur-canvas@npm:2.7.0"
+  checksum: 10/ad20aa886f5141c69b682cb8dd88ee04822f7dfa9f566d0657cf8fa43f5dd69122fe42dbc7071d44f655da89784756d34705b12d03f1c1f928325a55c698ab51
+  languageName: node
+  linkType: hard
+
 "stream-combiner@npm:~0.0.4":
   version: 0.0.4
   resolution: "stream-combiner@npm:0.0.4"
@@ -17314,6 +17328,7 @@ __metadata:
     "@koush/wrtc": "npm:0.5.3"
     "@lexical/history": "npm:0.14.3"
     "@lexical/react": "npm:0.14.3"
+    "@mediapipe/tasks-vision": "npm:^0.10.12"
     "@testing-library/react": "npm:15.0.2"
     "@types/dexie-batch": "npm:0.4.7"
     "@types/eslint": "npm:8.56.5"
@@ -17426,6 +17441,7 @@ __metadata:
     simple-git: "npm:3.24.0"
     sinon: "npm:17.0.1"
     speakingurl: "npm:14.0.1"
+    stackblur-canvas: "npm:^2.7.0"
     style-loader: "npm:4.0.0"
     stylelint: "npm:16.3.1"
     stylelint-config-idiomatic-order: "npm:10.0.0"

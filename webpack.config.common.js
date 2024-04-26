@@ -146,8 +146,14 @@ module.exports = {
           from: '*.wasm',
           to: `${dist}/min/core-crypto.wasm`,
         },
+        {
+          context: 'node_modules/@mediapipe/tasks-vision/wasm',
+          from: '*',
+          to: `${dist}/mediapipe/wasm`,
+        },
         // copying all static resources (audio, images, fonts...)
         {from: 'resource', to: dist},
+        {from: `${SRC_PATH}/assets`, to: `${dist}/assets`},
       ],
     }),
     new webpack.IgnorePlugin({resourceRegExp: /.*\.wasm/}),
