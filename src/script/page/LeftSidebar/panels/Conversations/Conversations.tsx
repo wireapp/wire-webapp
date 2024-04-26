@@ -298,6 +298,7 @@ const Conversations: React.FC<ConversationsProps> = ({
 
   return (
     <div className="conversations-wrapper">
+      <div css={isSideBarOpen && mdBreakpoint && {minWidth: '64px'}} />
       <ListWrapper
         id="conversations"
         headerElement={
