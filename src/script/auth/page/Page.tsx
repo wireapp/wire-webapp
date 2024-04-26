@@ -23,7 +23,7 @@ import {TeamData} from '@wireapp/api-client/lib/team';
 import {connect} from 'react-redux';
 import {Navigate} from 'react-router-dom';
 
-import {UnsupportedBrowser} from '../component/UnsupportedBrowser';
+import {HasToUseDesktop} from '../component/HasToUseDesktop';
 import {RootState} from '../module/reducer';
 import {RegistrationDataState} from '../module/reducer/authReducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
@@ -61,7 +61,7 @@ const PageComponent = ({
   ) {
     return <Navigate to={redirects[currentFlow] || ROUTE.INDEX} replace />;
   }
-  return <UnsupportedBrowser>{children}</UnsupportedBrowser>;
+  return <HasToUseDesktop>{children}</HasToUseDesktop>;
 };
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;

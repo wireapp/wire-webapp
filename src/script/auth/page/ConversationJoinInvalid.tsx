@@ -25,7 +25,7 @@ import {ContainerXS, H2, Text} from '@wireapp/react-ui-kit';
 
 import {Config} from '../../Config';
 import {conversationJoinStrings} from '../../strings';
-import {UnsupportedBrowser} from '../component/UnsupportedBrowser';
+import {HasToUseDesktop} from '../component/HasToUseDesktop';
 import {WirelessContainer} from '../component/WirelessContainer';
 
 type Props = React.HTMLProps<HTMLDivElement>;
@@ -33,7 +33,7 @@ type Props = React.HTMLProps<HTMLDivElement>;
 const ConversationJoinInvalid = ({}: Props) => {
   const {formatMessage: _} = useIntl();
   return (
-    <UnsupportedBrowser isTemporaryGuest>
+    <HasToUseDesktop isTemporaryGuest>
       <WirelessContainer>
         <ContainerXS style={{margin: 'auto 0'}}>
           <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} data-uie-name="status-invalid-headline">
@@ -49,14 +49,14 @@ const ConversationJoinInvalid = ({}: Props) => {
           </Text>
         </ContainerXS>
       </WirelessContainer>
-    </UnsupportedBrowser>
+    </HasToUseDesktop>
   );
 };
 
 const ConversationJoinFull = ({}: Props) => {
   const {formatMessage: _} = useIntl();
   return (
-    <UnsupportedBrowser isTemporaryGuest>
+    <HasToUseDesktop isTemporaryGuest>
       <WirelessContainer>
         <ContainerXS style={{margin: 'auto 0'}}>
           <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} data-uie-name="status-full-headline">
@@ -67,7 +67,7 @@ const ConversationJoinFull = ({}: Props) => {
           </Text>
         </ContainerXS>
       </WirelessContainer>
-    </UnsupportedBrowser>
+    </HasToUseDesktop>
   );
 };
 

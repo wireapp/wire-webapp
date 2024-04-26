@@ -25,7 +25,6 @@ import type {ConversationActions} from './ConversationActionCreator';
 import type {InvitationActions} from './InvitationActionCreator';
 import type {LanguageActions} from './LanguageActionCreator';
 import type {LocalStorageActions} from './LocalStorageActionCreator';
-import type {RuntimeActions} from './RuntimeActionCreator';
 import type {SelfActions} from './SelfActionCreator';
 import type {UserActions} from './UserActionCreator';
 
@@ -40,7 +39,6 @@ export type AppActions =
   | InvitationActions
   | LanguageActions
   | LocalStorageActions
-  | RuntimeActions
   | SelfActions
   | UserActions;
 
@@ -50,6 +48,5 @@ export * from './ConversationActionCreator';
 export * from './InvitationActionCreator';
 export * from './LanguageActionCreator';
 export * from './LocalStorageActionCreator';
-export * from './RuntimeActionCreator';
 export * from './SelfActionCreator';
 export * from './UserActionCreator';

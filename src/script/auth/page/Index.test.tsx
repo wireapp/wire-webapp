@@ -49,17 +49,7 @@ describe('when visiting the index page', () => {
     } as any);
   });
   it('shows the logo', () => {
-    const {getByTestId} = mountComponent(
-      <Index />,
-      mockStoreFactory()({
-        ...initialRootState,
-        runtimeState: {
-          hasCookieSupport: true,
-          hasIndexedDbSupport: true,
-          isSupportedBrowser: true,
-        },
-      }),
-    );
+    const {getByTestId} = mountComponent(<Index />, mockStoreFactory()(initialRootState));
 
     const logo = getByTestId('ui-wire-logo');
     expect(logo).not.toBeNull();
@@ -78,11 +68,6 @@ describe('when visiting the index page', () => {
             default_sso_code: defaultSSOCode,
           },
         },
-        runtimeState: {
-          hasCookieSupport: true,
-          hasIndexedDbSupport: true,
-          isSupportedBrowser: true,
-        },
       }),
     );
 
@@ -90,17 +75,7 @@ describe('when visiting the index page', () => {
   });
 
   it('shows the welcome text with default backend name', () => {
-    const {getByTestId} = mountComponent(
-      <Index />,
-      mockStoreFactory()({
-        ...initialRootState,
-        runtimeState: {
-          hasCookieSupport: true,
-          hasIndexedDbSupport: true,
-          isSupportedBrowser: true,
-        },
-      }),
-    );
+    const {getByTestId} = mountComponent(<Index />, mockStoreFactory()(initialRootState));
 
     const welcomeText = getByTestId('welcome-text');
     expect(welcomeText.innerHTML).toContain(Config.getConfig().BACKEND_NAME);
@@ -114,17 +89,7 @@ describe('when visiting the index page', () => {
         ENABLE_ACCOUNT_REGISTRATION: true,
       },
     });
-    const {getByTestId} = mountComponent(
-      <Index />,
-      mockStoreFactory()({
-        ...initialRootState,
-        runtimeState: {
-          hasCookieSupport: true,
-          hasIndexedDbSupport: true,
-          isSupportedBrowser: true,
-        },
-      }),
-    );
+    const {getByTestId} = mountComponent(<Index />, mockStoreFactory()(initialRootState));
 
     const welcomeText = getByTestId('welcome-text');
 
@@ -134,17 +99,7 @@ describe('when visiting the index page', () => {
   it('navigates to login page when clicking login button', async () => {
     const historyPushSpy = spyOn(history, 'pushState');
 
-    const {getByTestId} = mountComponent(
-      <Index />,
-      mockStoreFactory()({
-        ...initialRootState,
-        runtimeState: {
-          hasCookieSupport: true,
-          hasIndexedDbSupport: true,
-          isSupportedBrowser: true,
-        },
-      }),
-    );
+    const {getByTestId} = mountComponent(<Index />, mockStoreFactory()(initialRootState));
 
     const loginButton = getByTestId('go-login');
     act(() => {
@@ -166,17 +121,7 @@ describe('when visiting the index page', () => {
 
     const historyPushSpy = spyOn(history, 'pushState');
 
-    const {getByTestId} = mountComponent(
-      <Index />,
-      mockStoreFactory()({
-        ...initialRootState,
-        runtimeState: {
-          hasCookieSupport: true,
-          hasIndexedDbSupport: true,
-          isSupportedBrowser: true,
-        },
-      }),
-    );
+    const {getByTestId} = mountComponent(<Index />, mockStoreFactory()(initialRootState));
 
     const ssoLogin = getByTestId('go-sso-login');
     expect(ssoLogin).not.toBeNull();
@@ -199,17 +144,7 @@ describe('when visiting the index page', () => {
     });
 
     it('does not show create account button', () => {
-      const {queryByTestId} = mountComponent(
-        <Index />,
-        mockStoreFactory()({
-          ...initialRootState,
-          runtimeState: {
-            hasCookieSupport: true,
-            hasIndexedDbSupport: true,
-            isSupportedBrowser: true,
-          },
-        }),
-      );
+      const {queryByTestId} = mountComponent(<Index />, mockStoreFactory()(initialRootState));
 
       const createAccountButton = queryByTestId('go-set-account-type');
       expect(createAccountButton).toBeNull();
@@ -228,17 +163,7 @@ describe('when visiting the index page', () => {
     it('show create account button and navigates to account type selection on click', async () => {
       const historyPushSpy = spyOn(history, 'pushState');
 
-      const {getByTestId} = mountComponent(
-        <Index />,
-        mockStoreFactory()({
-          ...initialRootState,
-          runtimeState: {
-            hasCookieSupport: true,
-            hasIndexedDbSupport: true,
-            isSupportedBrowser: true,
-          },
-        }),
-      );
+      const {getByTestId} = mountComponent(<Index />, mockStoreFactory()(initialRootState));
 
       const createAccount = getByTestId('go-set-account-type');
       expect(createAccount).not.toBeNull();
@@ -267,17 +192,7 @@ describe('when visiting the index page', () => {
     });
 
     it('does not show SSO login button', () => {
-      const {queryByTestId} = mountComponent(
-        <Index />,
-        mockStoreFactory()({
-          ...initialRootState,
-          runtimeState: {
-            hasCookieSupport: true,
-            hasIndexedDbSupport: true,
-            isSupportedBrowser: true,
-          },
-        }),
-      );
+      const {queryByTestId} = mountComponent(<Index />, mockStoreFactory()(initialRootState));
 
       expect(queryByTestId('go-sso-login')).toBeNull();
     });
@@ -295,17 +210,7 @@ describe('when visiting the index page', () => {
     });
 
     it('navigates directly to email login', async () => {
-      mountComponent(
-        <Index />,
-        mockStoreFactory()({
-          ...initialRootState,
-          runtimeState: {
-            hasCookieSupport: true,
-            hasIndexedDbSupport: true,
-            isSupportedBrowser: true,
-          },
-        }),
-      );
+      mountComponent(<Index />, mockStoreFactory()(initialRootState));
 
       expect(Navigate).toHaveBeenCalledWith({to: ROUTE.LOGIN}, {});
     });

@@ -32,17 +32,7 @@ import {mountComponent} from '../util/test/TestUtil';
 
 describe('CheckPassword', () => {
   it('has disabled submit button as long as there is no input', () => {
-    const {getByTestId} = mountComponent(
-      <CheckPassword />,
-      mockStoreFactory()({
-        ...initialRootState,
-        runtimeState: {
-          hasCookieSupport: true,
-          hasIndexedDbSupport: true,
-          isSupportedBrowser: true,
-        },
-      }),
-    );
+    const {getByTestId} = mountComponent(<CheckPassword />, mockStoreFactory()(initialRootState));
 
     const loginButton = getByTestId('do-sign-in') as HTMLButtonElement;
     const passwordInput = getByTestId('enter-password');
@@ -59,17 +49,7 @@ describe('CheckPassword', () => {
 
     spyOn(actionRoot.authAction, 'doLogin').and.returnValue(() => Promise.resolve());
 
-    const {getByTestId} = mountComponent(
-      <CheckPassword />,
-      mockStoreFactory()({
-        ...initialRootState,
-        runtimeState: {
-          hasCookieSupport: true,
-          hasIndexedDbSupport: true,
-          isSupportedBrowser: true,
-        },
-      }),
-    );
+    const {getByTestId} = mountComponent(<CheckPassword />, mockStoreFactory()(initialRootState));
     const loginButton = getByTestId('do-sign-in') as HTMLButtonElement;
     const passwordInput = getByTestId('enter-password');
     fireEvent.change(passwordInput, {target: {value: 'e'}});
@@ -90,17 +70,7 @@ describe('CheckPassword', () => {
     const error = new BackendError('', BackendErrorLabel.INVALID_CREDENTIALS, HTTP_STATUS.NOT_FOUND);
     spyOn(actionRoot.authAction, 'doLogin').and.returnValue(() => Promise.reject(error));
 
-    const {getByTestId} = mountComponent(
-      <CheckPassword />,
-      mockStoreFactory()({
-        ...initialRootState,
-        runtimeState: {
-          hasCookieSupport: true,
-          hasIndexedDbSupport: true,
-          isSupportedBrowser: true,
-        },
-      }),
-    );
+    const {getByTestId} = mountComponent(<CheckPassword />, mockStoreFactory()(initialRootState));
 
     const passwordInput = getByTestId('enter-password');
     const loginButton = getByTestId('do-sign-in') as HTMLButtonElement;
@@ -129,17 +99,7 @@ describe('CheckPassword', () => {
     const error = new BackendError('', BackendErrorLabel.TOO_MANY_CLIENTS, HTTP_STATUS.NOT_FOUND);
     spyOn(actionRoot.authAction, 'doLogin').and.returnValue(() => Promise.reject(error));
 
-    const {getByTestId} = mountComponent(
-      <CheckPassword />,
-      mockStoreFactory()({
-        ...initialRootState,
-        runtimeState: {
-          hasCookieSupport: true,
-          hasIndexedDbSupport: true,
-          isSupportedBrowser: true,
-        },
-      }),
-    );
+    const {getByTestId} = mountComponent(<CheckPassword />, mockStoreFactory()(initialRootState));
 
     const passwordInput = getByTestId('enter-password');
     const loginButton = getByTestId('do-sign-in') as HTMLButtonElement;

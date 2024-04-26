@@ -17,51 +17,118 @@
  *
  */
 
-const isBrowserSupported = () => {
-  return (
-    'Promise' in window &&
-    'allSettled' in Promise &&
-    'Symbol' in window &&
-    'replace' in Symbol &&
-    'WeakMap' in window &&
-    'assign' in Object &&
-    'entries' in Object &&
-    'values' in Object &&
-    'getOwnPropertyDescriptors' in Object &&
-    'fromEntries' in Object &&
-    'assign' in Object &&
-    'URL' in window &&
-    'toJSON' in URL.prototype &&
-    'URLSearchParams' in window &&
-    Array.prototype[Symbol.iterator] &&
-    'includes' in Array.prototype &&
-    'reduce' in Array.prototype &&
-    'sort' in Array.prototype &&
-    'flatMap' in Array.prototype &&
-    NodeList.prototype[Symbol.iterator] &&
-    'forEach' in NodeList.prototype &&
-    HTMLCollection.prototype[Symbol.iterator] &&
-    DOMTokenList.prototype[Symbol.iterator] &&
-    'forEach' in DOMTokenList.prototype &&
-    'fill' in Int8Array.prototype &&
-    'set' in Int8Array.prototype &&
-    'sort' in Int8Array.prototype &&
-    'replace' in String.prototype &&
-    'search' in String.prototype &&
-    'split' in String.prototype &&
-    'includes' in String.prototype &&
-    'match' in String.prototype &&
-    'trim' in String.prototype &&
-    'split' in String.prototype &&
-    'endsWith' in String.prototype &&
-    'replaceAll' in String.prototype &&
-    'sticky' in RegExp.prototype &&
-    'toString' in RegExp &&
-    parseFloat('1.23') === 1.23 &&
-    (1.23456789).toFixed(2) === '1.23' &&
-    'RTCPeerConnection' in window
-  );
-};
+import {QUERY_KEY} from '../auth/route';
+
+const isMobile = (): boolean => 'ontouchstart' in window || !!navigator.maxTouchPoints;
+
+const isOauth = (): boolean => location?.hash?.includes(QUERY_KEY.SCOPE) ?? false;
+
+const supportsCookies = (): boolean => navigator.cookieEnabled;
+/* return new Promise((resolve, reject) => {
+     switch (navigator.cookieEnabled) {
+       case true:
+         return resolve();
+       case false:
+         return reject(new Error());
+       default:
+         Cookies.set(cookieName, 'yes');
+         if (Cookies.get(cookieName)) {
+           Cookies.remove(cookieName);
+           return resolve();
+         }
+         return reject(new Error());
+     }
+   });*/
+
+const supportsIndexDB = (): boolean => 'indexedDB' in window;
+/*{
+    let supportIndexedDb;
+    try {
+      supportIndexedDb = !!window.indexedDB;
+    } catch (error) {
+      supportIndexedDb = false;
+    }
+    if (!supportIndexedDb) {
+      return Promise.reject(new Error('IndexedDB not supported'));
+    }
+
+    if (Runtime.isFirefox()) {
+      let dbOpenRequest: IDBOpenDBRequest;
+
+      try {
+        dbOpenRequest = window.indexedDB.open('test');
+      } catch (error) {
+        return Promise.reject(new Error('Error initializing IndexedDB'));
+      }
+
+      return new Promise((resolve, reject) => {
+        const connectionTimeout = setTimeout(
+          () => reject(new Error('Error opening IndexedDB (response timeout)')),
+          10000,
+        );
+        dbOpenRequest.onerror = event => {
+          clearTimeout(connectionTimeout);
+          if (dbOpenRequest.error) {
+            event.preventDefault();
+            return reject(new Error('Error opening IndexedDB'));
+          }
+          return undefined;
+        };
+        dbOpenRequest.onsuccess = event => {
+          clearTimeout(connectionTimeout);
+          resolve();
+        };
+      });
+    }
+
+    return Promise.resolve();
+  };*/
+
+const isBrowserSupported = (): boolean =>
+  (!isMobile() || isOauth()) &&
+  supportsIndexDB() &&
+  supportsCookies() &&
+  'Promise' in window &&
+  'allSettled' in Promise &&
+  'Symbol' in window &&
+  'replace' in Symbol &&
+  'WeakMap' in window &&
+  'assign' in Object &&
+  'entries' in Object &&
+  'values' in Object &&
+  'getOwnPropertyDescriptors' in Object &&
+  'fromEntries' in Object &&
+  'assign' in Object &&
+  'URL' in window &&
+  'toJSON' in URL.prototype &&
+  'URLSearchParams' in window &&
+  Array.prototype[Symbol.iterator] &&
+  'includes' in Array.prototype &&
+  'reduce' in Array.prototype &&
+  'sort' in Array.prototype &&
+  'flatMap' in Array.prototype &&
+  NodeList.prototype[Symbol.iterator] &&
+  'forEach' in NodeList.prototype &&
+  HTMLCollection.prototype[Symbol.iterator] &&
+  DOMTokenList.prototype[Symbol.iterator] &&
+  'forEach' in DOMTokenList.prototype &&
+  'fill' in Int8Array.prototype &&
+  'set' in Int8Array.prototype &&
+  'sort' in Int8Array.prototype &&
+  'replace' in String.prototype &&
+  'search' in String.prototype &&
+  'split' in String.prototype &&
+  'includes' in String.prototype &&
+  'match' in String.prototype &&
+  'trim' in String.prototype &&
+  'split' in String.prototype &&
+  'endsWith' in String.prototype &&
+  'replaceAll' in String.prototype &&
+  'sticky' in RegExp.prototype &&
+  'toString' in RegExp &&
+  parseFloat('1.23') === 1.23 &&
+  (1.23456789).toFixed(2) === '1.23' &&
+  'RTCPeerConnection' in window;
 
 if (!isBrowserSupported()) {
   location.href = '/unsupported/';
