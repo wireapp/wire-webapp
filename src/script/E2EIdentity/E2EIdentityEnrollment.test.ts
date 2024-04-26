@@ -151,6 +151,19 @@ describe('E2EIHandler', () => {
 
   it('continues in progress enrollment', async () => {
     jest.spyOn(coreMock.service!.e2eIdentity!, 'isEnrollmentInProgress').mockResolvedValue(true);
+
+    // mock window search params (code, session_state, state)
+    const searchParams = new URLSearchParams();
+    searchParams.append('code', 'CODE');
+    searchParams.append('session_state', 'SESSION_STATE');
+    searchParams.append('state', 'STATE');
+
+    Object.defineProperty(window, 'location', {
+      value: {
+        search: searchParams.toString(),
+      },
+    });
+
     const enrollPromise = E2EIHandler.getInstance().initialize(params);
     await waitFor(() => {
       expect(modalMock).toHaveBeenCalledWith(
