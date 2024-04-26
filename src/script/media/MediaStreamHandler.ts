@@ -25,7 +25,7 @@ import {MediaConstraintsHandler, ScreensharingMethods} from './MediaConstraintsH
 import {MEDIA_STREAM_ERROR} from './MediaStreamError';
 import {MEDIA_STREAM_ERROR_TYPES} from './MediaStreamErrorTypes';
 import {MediaType} from './MediaType';
-import {applyBlur, cleanupBlur, initImageSegmenter} from './VideoBackgroundBlur';
+import {applyBlur, cleanupBlur} from './VideoBackgroundBlur';
 
 import {MediaError} from '../error/MediaError';
 import {NoAudioInputError} from '../error/NoAudioInputError';
@@ -59,8 +59,6 @@ export class MediaStreamHandler {
     } else if (Runtime.isFirefox()) {
       this.screensharingMethod = ScreensharingMethods.USER_MEDIA;
     }
-
-    initImageSegmenter();
   }
 
   async requestMediaStream(audio: boolean, video: boolean, screen: boolean, isGroup: boolean): Promise<MediaStream> {

@@ -35,6 +35,12 @@ const videoTracks = {
   audio: null as MediaStreamTrack[] | null,
 };
 
+enum SEGMENTATION_MODEL {
+  QUALITY = './assets/mediapipe-models/selfie_multiclass_256x256.tflite',
+  PERFORMANCE = './assets/mediapipe-models/selfie_segmenter.tflite',
+}
+const segmentationModel = SEGMENTATION_MODEL.QUALITY;
+
 // Store the ImageSegmenter instance
 let imageSegmenter: ImageSegmenter | undefined;
 // Store the animation frame ID
@@ -83,7 +89,7 @@ function applyBlurToImageData(imageData: ImageData): ImageData {
     0,
     imageData.width,
     imageData.height,
-    15,
+    70,
   );
 }
 
@@ -95,7 +101,11 @@ function blendImagesBasedOnMask(
   const length = mask.length;
   for (let i = 0; i < length; i++) {
     const baseIndex = i * 4;
-    if (mask[i] <= 0.5) {
+    let check = mask[i] <= 0.5;
+    if (segmentationModel === SEGMENTATION_MODEL.QUALITY) {
+      check = mask[i] >= 0.5;
+    }
+    if (check) {
       originalPixels[baseIndex] = blurredPixels[baseIndex];
       originalPixels[baseIndex + 1] = blurredPixels[baseIndex + 1];
       originalPixels[baseIndex + 2] = blurredPixels[baseIndex + 2];
@@ -111,7 +121,7 @@ export async function initImageSegmenter(): Promise<ImageSegmenter> {
   const video = await FilesetResolver.forVisionTasks('./mediapipe/wasm');
   imageSegmenter = await ImageSegmenter.createFromOptions(video, {
     baseOptions: {
-      modelAssetPath: './assets/mediapipe-models/selfie_segmenter.tflite',
+      modelAssetPath: segmentationModel,
       delegate: 'GPU',
     },
     runningMode: 'VIDEO',
@@ -122,6 +132,8 @@ export async function initImageSegmenter(): Promise<ImageSegmenter> {
 }
 
 export async function applyBlur(mediaStream: MediaStream): Promise<MediaStream> {
+  await initImageSegmenter();
+
   videoTracks.video = mediaStream.getVideoTracks();
   videoTracks.audio = mediaStream.getAudioTracks();
 
@@ -175,4 +187,8 @@ export function cleanupBlur() {
   if (window.cancelAnimationFrame) {
     window.cancelAnimationFrame(predictWebcamAnimationFrameId);
   }
+
+  // Release the ImageSegmenter
+  imageSegmenter?.close();
+  imageSegmenter = undefined;
 }
