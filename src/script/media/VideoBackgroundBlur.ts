@@ -161,11 +161,15 @@ export function cleanupBlur() {
     ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
   }
 
-  // Optionally reset the dimensions if they are stored globally
+  // Reset the dimensions
   videoDimensions.width = 0;
   videoDimensions.height = 0;
   canvasEl.width = 0;
   canvasEl.height = 0;
+
+  // Reset the video tracks
+  videoTracks.video = null;
+  videoTracks.audio = null;
 
   // Cancel any ongoing animation frames
   if (window.cancelAnimationFrame) {
