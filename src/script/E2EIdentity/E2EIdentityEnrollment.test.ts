@@ -162,6 +162,7 @@ describe('E2EIHandler', () => {
       value: {
         search: searchParams.toString(),
       },
+      writable: true,
     });
 
     const enrollPromise = E2EIHandler.getInstance().initialize(params);
@@ -171,6 +172,42 @@ describe('E2EIHandler', () => {
         expect.objectContaining({text: expect.objectContaining({title: 'acme.inProgress.headline'})}),
       );
     });
+
+    await waitFor(() => {
+      expect(modalMock).toHaveBeenCalledWith(
+        PrimaryModalType.ACKNOWLEDGE,
+        expect.objectContaining({text: expect.objectContaining({title: 'acme.done.headline'})}),
+      );
+    });
+
+    // Trigger the user clicking the OK button after successful enrollment
+    modalMock.mock.lastCall?.[1].primaryAction?.action?.();
+
+    return enrollPromise;
+  });
+
+  it('starts from scratch if returned to app without auth params', async () => {
+    jest.spyOn(coreMock.service!.e2eIdentity!, 'isEnrollmentInProgress').mockResolvedValue(true);
+
+    // mock window search params (code, session_state, state)
+    Object.defineProperty(window, 'location', {
+      value: {
+        search: '',
+      },
+      writable: true,
+    });
+
+    const enrollPromise = E2EIHandler.getInstance().initialize(params);
+
+    await waitFor(() => {
+      expect(modalMock).toHaveBeenCalledWith(
+        PrimaryModalType.ACKNOWLEDGE,
+        expect.objectContaining({text: expect.objectContaining({title: 'acme.settingsChanged.headline.alt'})}),
+      );
+    });
+
+    // Trigger the user clicking the get certificate button
+    modalMock.mock.lastCall?.[1].primaryAction?.action?.();
 
     await waitFor(() => {
       expect(modalMock).toHaveBeenCalledWith(
