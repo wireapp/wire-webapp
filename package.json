@@ -43,7 +43,7 @@
     "react-helmet": "6.1.0",
     "react-hot-loader": "4.13.1",
     "react-styleguidist": "13.1.2",
-    "react-test-renderer": "18.2.0",
+    "react-test-renderer": "18.3.1",
     "rimraf": "^3.0.2",
     "typescript": "^5.0.4",
     "webpack": "^5.74.0"
