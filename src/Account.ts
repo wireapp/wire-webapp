@@ -366,10 +366,7 @@ export class Account extends TypedEventEmitter<Events> {
     await this.apiClient.transport.http.associateClientWithSession(client.id);
 
     await this.service.proteus.initClient(this.storeEngine, this.apiClient.context);
-    if (this.service.mls) {
-      if (!mlsConfig) {
-        throw new Error('trying to init MLS without config. Please provide a config to initClient method.');
-      }
+    if (this.service.mls && mlsConfig) {
       const {userId, domain = ''} = this.apiClient.context;
       await this.service.mls.initClient({id: userId, domain}, client, mlsConfig);
       // initialize schedulers for pending mls proposals once client is initialized
