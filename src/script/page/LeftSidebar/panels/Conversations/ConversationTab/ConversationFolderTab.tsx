@@ -23,11 +23,10 @@ import {Config} from 'src/script/Config';
 import {createLabel} from 'src/script/conversation/ConversationLabelRepository';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {Conversation} from 'src/script/entity/Conversation';
-import {useFolderState, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/state';
+import {SidebarTabs, useFolderState, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/state';
 import {ContextMenuEntry, showContextMenu} from 'src/script/ui/ContextMenu';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
-
-import {SidebarTabs} from '../Conversations';
 
 interface ConversationFolderTabProps {
   title: string;
@@ -62,10 +61,11 @@ export const ConversationFolderTab = ({
     onChangeTab(type, folderId);
   }
 
-  const folders = conversationLabelRepository
-    .getLabels()
+  const {labels} = useKoSubscribableChildren(conversationLabelRepository, ['labels']);
+
+  const folders = labels
     .map(label => createLabel(label.name, conversationLabelRepository.getLabelConversations(label), label.id))
-    .filter(({conversations}) => !!conversations().length);
+    .filter(({conversations, name}) => !!conversations().length && !!name);
 
   function openFoldersContextMenu(event: React.MouseEvent<HTMLButtonElement>) {
     const entries: ContextMenuEntry[] = folders.map(folder => ({

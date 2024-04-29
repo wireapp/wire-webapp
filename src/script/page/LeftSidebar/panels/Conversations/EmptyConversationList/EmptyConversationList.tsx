@@ -22,12 +22,12 @@ import {amplify} from 'amplify';
 import {Button, ButtonVariant, Link, LinkVariant} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/state';
 import {t} from 'Util/LocalizerUtil';
 
 import {button, paragraph, seperator, wrapper} from './EmptyConversationList.styles';
 
 import {Config} from '../../../../../Config';
-import {SidebarTabs} from '../Conversations';
 
 interface EmptyConversationListProps {
   currentTab: SidebarTabs;

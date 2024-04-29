@@ -23,6 +23,7 @@ import ko from 'knockout';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/state';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {TypedEventTarget} from 'Util/TypedEventTarget';
@@ -219,8 +220,12 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
 
   readonly removeConversationFromLabel = (label: ConversationLabel, removeConversation: Conversation): void => {
     label.conversations(label.conversations().filter(conversation => conversation !== removeConversation));
+    // Add conversations in a folder are deleted so folder must be deleted too
     if (!label.conversations().length) {
       this.labels.remove(label);
+      // switch sidebar to recent tabs
+      const {setCurrentTab} = useSidebarStore.getState();
+      setCurrentTab(SidebarTabs.RECENT);
     }
     this.saveLabels();
   };
