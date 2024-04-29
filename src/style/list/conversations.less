@@ -220,6 +220,7 @@
   }
 
   &--text-wrapper {
+    position: relative;
     display: flex;
     align-items: center;
     gap: 12px;
@@ -256,13 +257,22 @@
 }
 
 .conversations-sidebar-btn--badge {
-  padding: 1px 6px;
-  border: 1px solid var(--app-bg-secondary);
-  border-radius: 5px;
-  background: var(--red-500);
-  color: var(--app-bg-secondary);
+  position: absolute;
+  top: -3px;
+  left: 10px;
+  width: 6px;
+  height: 6px;
+  box-sizing: content-box;
+  border: 2px solid var(--app-bg-secondary);
+  border-radius: 6px;
+  background: var(--accent-color-500);
   font-size: @font-size-small;
   font-weight: @font-weight-semibold;
+
+  &.active {
+    border: 2px solid var(--accent-color-500);
+    background: var(--app-bg-secondary);
+  }
 }
 
 .conversations-sidebar-btn {
