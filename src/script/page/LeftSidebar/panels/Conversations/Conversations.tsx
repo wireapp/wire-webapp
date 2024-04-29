@@ -46,7 +46,7 @@ import {getTabConversations} from './helpers';
 import {SidebarTabs, useFolderState, useSidebarStore} from './state';
 
 import {CallState} from '../../../../calling/CallState';
-import {createLabel, DefaultLabelIds} from '../../../../conversation/ConversationLabelRepository';
+import {createLabel} from '../../../../conversation/ConversationLabelRepository';
 import {ConversationRepository} from '../../../../conversation/ConversationRepository';
 import {ConversationState} from '../../../../conversation/ConversationState';
 import {User} from '../../../../entity/User';
@@ -187,7 +187,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   }, [activeConversation]);
 
   useEffect(() => {
-    const openFavorites = () => openFolder(DefaultLabelIds.Favorites);
+    const openFavorites = () => changeTab(SidebarTabs.FAVORITES);
     conversationLabelRepository.addEventListener('conversation-favorited', openFavorites);
     return () => {
       conversationLabelRepository.removeEventListener('conversation-favorited', openFavorites);
