@@ -32,16 +32,15 @@ interface DetachedWindowProps {
   width?: number;
   height?: number;
   onClose: () => void;
-  url?: string;
   name: string;
 }
 
-export const DetachedWindow = ({children, url = '', name, onClose, width = 600, height = 600}: DetachedWindowProps) => {
+export const DetachedWindow = ({children, name, onClose, width = 600, height = 600}: DetachedWindowProps) => {
   const newWindow = useMemo(() => {
     const {top, left} = calculateChildWindowPosition(height, width);
 
     return window.open(
-      url,
+      '',
       name,
       `
         width=${width}
@@ -55,13 +54,14 @@ export const DetachedWindow = ({children, url = '', name, onClose, width = 600, 
         toolbar=no,
       `,
     );
-  }, [height, name, url, width]);
+  }, [height, name, width]);
 
   useEffect(() => {
     if (!newWindow) {
       return () => {};
     }
 
+    //New window is not opened on the same domain (it's about:blank), so we cannot use any of the dom loaded events to copy the styles.
     setTimeout(() => copyStyles(window.document, newWindow.document), 0);
 
     newWindow.document.title = window.document.title;
@@ -74,7 +74,7 @@ export const DetachedWindow = ({children, url = '', name, onClose, width = 600, 
       newWindow.removeEventListener('beforeunload', onClose);
       window.removeEventListener('beforeunload', onClose);
     };
-  }, [height, name, url, width, onClose, newWindow]);
+  }, [height, name, width, onClose, newWindow]);
 
   return !newWindow
     ? null
