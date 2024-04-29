@@ -225,7 +225,7 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
 
   readonly removeConversationFromLabel = (label: ConversationLabel, removeConversation: Conversation): void => {
     label.conversations(label.conversations().filter(conversation => conversation !== removeConversation));
-    // Add conversations in a folder are deleted so folder must be deleted too
+    // Delete folder if it no longer contains any conversation
     if (!label.conversations().length) {
       this.labels.remove(label);
       // switch sidebar to recent tabs
