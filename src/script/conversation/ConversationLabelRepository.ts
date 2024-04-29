@@ -183,6 +183,11 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
       favoriteLabel.conversations(
         favoriteLabel.conversations().filter(conversation => conversation !== removedConversation),
       );
+      // trigger a rerender on sidebar to remove the conversation from favorites
+      const {currentTab, setCurrentTab} = useSidebarStore.getState();
+      if (currentTab === SidebarTabs.FAVORITES) {
+        setCurrentTab(SidebarTabs.FAVORITES);
+      }
     }
     this.saveLabels();
   };
