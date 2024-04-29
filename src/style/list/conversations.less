@@ -175,12 +175,13 @@
     flex-direction: column;
     align-items: start;
     justify-content: center;
-    padding-left: 1.5rem;
+    padding: 0 0.5rem;
     gap: 4px;
   }
 
   &--item {
     .button-reset-default;
+    position: relative;
     display: flex;
     width: 100%;
     height: 28px;
@@ -188,11 +189,18 @@
     align-items: center;
     justify-content: space-between;
     padding: 6px 8px 6px 12px;
+    padding-left: 1.5rem;
     border-radius: 8px;
 
     cursor: pointer;
     font-size: 12px;
     font-weight: 400;
+
+    .conversations-sidebar-btn--badge {
+      top: 8px;
+      left: 8px;
+    }
+
     &:hover {
       background-color: var(--app-bg-secondary);
     }

@@ -156,7 +156,7 @@ export const ConversationFolderTab = ({
                 onClick={() => toggleFolder(folder.id)}
               >
                 <span>{folder.name}</span>
-                {!!unreadCount && <span className="conversations-sidebar-btn--badge">{unreadCount}</span>}
+                {!!unreadCount && <span className={cx('conversations-sidebar-btn--badge', {active: isActive})} />}
               </button>
             );
           })}
