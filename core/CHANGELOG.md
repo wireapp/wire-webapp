@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [46.0.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.0.2...@wireapp/core@46.0.3) (2024-04-29)
+
+### Bug Fixes
+
+* Do not throw error when initClient is called without MLS config ([#6183](https://github.com/wireapp/wire-web-packages/issues/6183)) ([f11a19b](https://github.com/wireapp/wire-web-packages/commit/f11a19b3b6d187bf37cb40966150e32b6bc43474))
+
 ## [46.0.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.0.1...@wireapp/core@46.0.2) (2024-04-26)
 
 **Note:** Version bump only for package @wireapp/core
