@@ -19,6 +19,7 @@
 
 import {LowPrecisionTaskScheduler} from '@wireapp/core/lib/util/LowPrecisionTaskScheduler';
 import {amplify} from 'amplify';
+import {SigninResponse} from 'oidc-client-ts';
 import {container} from 'tsyringe';
 
 import {TypedEventEmitter} from '@wireapp/commons';
@@ -160,11 +161,9 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   public wasJustRedirected() {
     const searchParams = new URLSearchParams(window.location.search);
 
-    const hasState = searchParams.has('state');
-    const hasSessionState = searchParams.has('session_state');
-    const hasCode = searchParams.has('code');
+    const {state, session_state, code} = new SigninResponse(searchParams);
 
-    return hasState && hasSessionState && hasCode;
+    return !!state && !!session_state && !!code;
   }
 
   /**
