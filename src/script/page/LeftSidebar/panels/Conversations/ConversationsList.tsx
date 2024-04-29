@@ -28,12 +28,11 @@ import {ConversationListCell} from 'Components/list/ConversationListCell';
 import {Call} from 'src/script/calling/Call';
 import {ConversationLabel, ConversationLabelRepository} from 'src/script/conversation/ConversationLabelRepository';
 import {User} from 'src/script/entity/User';
+import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/state';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown, isKeyboardEvent} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
-
-import {SidebarTabs} from './Conversations';
 
 import {CallState} from '../../../../calling/CallState';
 import {ConversationRepository} from '../../../../conversation/ConversationRepository';

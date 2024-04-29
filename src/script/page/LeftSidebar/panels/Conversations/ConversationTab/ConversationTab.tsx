@@ -19,7 +19,7 @@
 
 import cx from 'classnames';
 
-import {SidebarTabs} from '../Conversations';
+import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/state';
 
 interface ConversationTabProps {
   title: string;
@@ -58,10 +58,9 @@ export const ConversationTab = ({
     >
       <span className="conversations-sidebar-btn--text-wrapper">
         {Icon}
+        {unreadConversations > 0 && <span className={cx('conversations-sidebar-btn--badge', {active: isActive})} />}
         <span className="conversations-sidebar-btn--text">{label || title}</span>
       </span>
-
-      {unreadConversations > 0 && <span className="conversations-sidebar-btn--badge">{unreadConversations}</span>}
     </button>
   );
 };

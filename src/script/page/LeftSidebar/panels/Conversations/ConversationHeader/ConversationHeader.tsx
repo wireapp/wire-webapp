@@ -24,6 +24,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Icon} from 'Components/Icon';
 import {ConversationLabel} from 'src/script/conversation/ConversationLabelRepository';
+import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/state';
 import {t} from 'Util/LocalizerUtil';
 
 import {
@@ -38,7 +39,6 @@ import {
 
 import {User} from '../../../../../entity/User';
 import {generatePermissionHelpers} from '../../../../../user/UserPermission';
-import {SidebarTabs} from '../Conversations';
 
 interface ConversationHeaderProps {
   currentTab: SidebarTabs;

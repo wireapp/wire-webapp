@@ -43,10 +43,10 @@ import {ConversationsList} from './ConversationsList';
 import {ConversationTabs} from './ConversationTabs';
 import {EmptyConversationList} from './EmptyConversationList';
 import {getTabConversations} from './helpers';
-import {useFolderState, useSidebarStore} from './state';
+import {SidebarTabs, useFolderState, useSidebarStore} from './state';
 
 import {CallState} from '../../../../calling/CallState';
-import {createLabel, DefaultLabelIds} from '../../../../conversation/ConversationLabelRepository';
+import {createLabel} from '../../../../conversation/ConversationLabelRepository';
 import {ConversationRepository} from '../../../../conversation/ConversationRepository';
 import {ConversationState} from '../../../../conversation/ConversationState';
 import {User} from '../../../../entity/User';
@@ -76,17 +76,6 @@ type ConversationsProps = {
   userRepository: UserRepository;
 };
 
-export enum SidebarTabs {
-  RECENT,
-  FOLDER,
-  FAVORITES,
-  GROUPS,
-  DIRECTS,
-  ARCHIVES,
-  CONNECT,
-  PREFERENCES,
-}
-
 const Conversations: React.FC<ConversationsProps> = ({
   integrationRepository,
   searchRepository,
@@ -102,7 +91,13 @@ const Conversations: React.FC<ConversationsProps> = ({
   userState = container.resolve(UserState),
   selfUser,
 }) => {
-  const {isOpen: isSideBarOpen, toggleIsOpen: toggleSidebarIsOpen, setIsOpen: setIsSidebarOpen} = useSidebarStore();
+  const {
+    isOpen: isSideBarOpen,
+    toggleIsOpen: toggleSidebarIsOpen,
+    setIsOpen: setIsSidebarOpen,
+    currentTab,
+    setCurrentTab,
+  } = useSidebarStore();
   const [conversationsFilter, setConversationsFilter] = useState<string>('');
   const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
   const {classifiedDomains, isTeam} = useKoSubscribableChildren(teamState, ['classifiedDomains', 'isTeam']);
@@ -126,12 +121,6 @@ const Conversations: React.FC<ConversationsProps> = ({
 
   const {conversationLabelRepository} = conversationRepository;
   const favoriteConversations = conversationLabelRepository.getFavorites(conversations);
-
-  const initialTab = propertiesRepository.getPreference(PROPERTIES_TYPE.INTERFACE.VIEW_FOLDERS)
-    ? SidebarTabs.FOLDER
-    : SidebarTabs.RECENT;
-
-  const [currentTab, setCurrentTab] = useState<SidebarTabs>(initialTab);
 
   const isFolderTab = currentTab === SidebarTabs.FOLDER;
   const isPreferences = currentTab === SidebarTabs.PREFERENCES;
@@ -198,7 +187,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   }, [activeConversation]);
 
   useEffect(() => {
-    const openFavorites = () => openFolder(DefaultLabelIds.Favorites);
+    const openFavorites = () => changeTab(SidebarTabs.FAVORITES);
     conversationLabelRepository.addEventListener('conversation-favorited', openFavorites);
     return () => {
       conversationLabelRepository.removeEventListener('conversation-favorited', openFavorites);

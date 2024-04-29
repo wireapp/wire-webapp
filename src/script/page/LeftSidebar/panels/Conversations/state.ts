@@ -57,13 +57,30 @@ const useFolderState = create<FolderState>((set, get) => ({
     }),
 }));
 
+export enum SidebarTabs {
+  RECENT,
+  FOLDER,
+  FAVORITES,
+  GROUPS,
+  DIRECTS,
+  ARCHIVES,
+  CONNECT,
+  PREFERENCES,
+}
+
 export interface SidebarStore {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
   toggleIsOpen: () => void;
+  currentTab: SidebarTabs;
+  setCurrentTab: (tab: SidebarTabs) => void;
 }
 
 const useSidebarStore = create<SidebarStore>((set, get) => ({
+  currentTab: SidebarTabs.RECENT,
+  setCurrentTab: (tab: SidebarTabs) => {
+    set({currentTab: tab});
+  },
   isOpen: true,
   setIsOpen: isOpen => set({isOpen}),
   toggleIsOpen: () => set({isOpen: !get().isOpen}),

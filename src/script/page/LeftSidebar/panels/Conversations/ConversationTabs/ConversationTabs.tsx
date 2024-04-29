@@ -22,13 +22,13 @@ import {ChevronIcon, GroupIcon, InfoIcon, StarIcon} from '@wireapp/react-ui-kit'
 import {Icon} from 'Components/Icon';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {ConversationFolderTab} from 'src/script/page/LeftSidebar/panels/Conversations/ConversationTab/ConversationFolderTab';
+import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/state';
 import {t} from 'Util/LocalizerUtil';
 
 import {Config} from '../../../../../Config';
 import {Conversation} from '../../../../../entity/Conversation';
 import {Shortcut} from '../../../../../ui/Shortcut';
 import {ShortcutType} from '../../../../../ui/ShortcutType';
-import {SidebarTabs} from '../Conversations';
 import {ConversationTab} from '../ConversationTab';
 
 interface ConversationTabsProps {
