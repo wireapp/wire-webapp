@@ -1503,14 +1503,6 @@ export class ConversationRepository {
     }
   };
 
-  private readonly updateConversationReadOnlyState = async (
-    conversationEntity: Conversation,
-    conversationReadOnlyState: CONVERSATION_READONLY_STATE | null,
-  ) => {
-    conversationEntity.readOnlyState(conversationReadOnlyState);
-    await this.saveConversationStateInDb(conversationEntity);
-  };
-
   private readonly getProtocolFor1to1Conversation = async (
     otherUserId: QualifiedId,
     shouldRefreshUser = false,
@@ -1857,16 +1849,13 @@ export class ConversationRepository {
     // If proteus is not supported by the other user we have to mark conversation as readonly
     if (!doesOtherUserSupportProteus) {
       await this.blacklistConversation(proteusConversationId);
-      await this.updateConversationReadOnlyState(
-        proteusConversation,
-        CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_SELF_UNSUPPORTED_MLS,
-      );
+      proteusConversation.readOnlyState(CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_SELF_UNSUPPORTED_MLS);
       return proteusConversation;
     }
 
     // If proteus is supported by the other user, we just return a proteus conversation and remove readonly state from it.
     await this.removeConversationFromBlacklist(proteusConversationId);
-    await this.updateConversationReadOnlyState(proteusConversation, null);
+    await proteusConversation.readOnlyState(null);
     return proteusConversation;
   };
 
