@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [46.0.5](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.0.4...@wireapp/core@46.0.5) (2024-04-30)
+
+### Bug Fixes
+
+* Correctly detect if current device is MLS capable ([#6185](https://github.com/wireapp/wire-web-packages/issues/6185)) ([d44c18f](https://github.com/wireapp/wire-web-packages/commit/d44c18fdfb0e357721be3aa8110408c8805ee72e))
+
 ## [46.0.4](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.0.3...@wireapp/core@46.0.4) (2024-04-30)
 
 ### Bug Fixes
