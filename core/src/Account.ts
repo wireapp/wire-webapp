@@ -255,7 +255,7 @@ export class Account extends TypedEventEmitter<Events> {
       throw new Error('Client has not been initialized - please login first');
     }
 
-    if (!this.service?.mls || !this.service?.e2eIdentity) {
+    if (!this.service?.mls?.isEnabled || !this.service?.e2eIdentity) {
       throw new Error('MLS not initialized, unable to enroll E2EI');
     }
 
@@ -529,6 +529,13 @@ export class Account extends TypedEventEmitter<Events> {
   }
 
   /**
+   * return true if the current user has a MLS device that is initialized and ready to use
+   */
+  public get hasMLSDevice(): boolean {
+    return !!this.service?.mls?.isEnabled;
+  }
+
+  /**
    * Will download and handle the notification stream since last stored notification id.
    * Once the notification stream has been handled from backend, will then connect to the websocket and start listening to incoming events
    *
@@ -620,7 +627,7 @@ export class Account extends TypedEventEmitter<Events> {
     });
 
     const handleMissedNotifications = async (notificationId: string) => {
-      if (this.service?.mls) {
+      if (this.hasMLSDevice) {
         queueConversationRejoin('all-conversations', () =>
           this.service!.conversation.handleConversationsEpochMismatch(),
         );
