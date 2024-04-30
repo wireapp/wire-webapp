@@ -122,6 +122,13 @@ export class MLSService extends TypedEventEmitter<Events> {
     super();
   }
 
+  /**
+   * return true if the MLS service if configured and ready to be used
+   */
+  get isEnabled() {
+    return !!this._config;
+  }
+
   get config() {
     if (!this._config) {
       throw new Error('mls config is not set, did you forget to call initClient?');
