@@ -55,8 +55,12 @@ const ciphersuiteSignatureAlgorithmMap: Record<Ciphersuite, MLSPublicKeyAlgorith
   [Ciphersuite.MLS_128_X25519KYBER768DRAFT00_AES128GCM_SHA256_Ed25519]: MLSPublicKeyAlgorithmKeys.ED25519,
 };
 
+export const getSignatureAlgorithmForCiphersuite = (ciphersuite: Ciphersuite): MLSPublicKeyAlgorithmKeys => {
+  return ciphersuiteSignatureAlgorithmMap[ciphersuite];
+};
+
 export const isMLSDevice = ({mls_public_keys}: RegisteredClient, ciphersuite: Ciphersuite) => {
-  const signatureAlogrithm = ciphersuiteSignatureAlgorithmMap[ciphersuite];
+  const signatureAlogrithm = getSignatureAlgorithmForCiphersuite(ciphersuite);
   const signature = mls_public_keys[signatureAlogrithm];
   return typeof signature === 'string' && signature.length > 0;
 };

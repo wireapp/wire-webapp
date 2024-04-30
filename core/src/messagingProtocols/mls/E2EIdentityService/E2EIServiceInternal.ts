@@ -60,7 +60,7 @@ export class E2EIServiceInternal {
    * @param getOAuthToken function called when the process needs an oauth token
    * @param refresh should the process refresh the current certificate or get a new one
    */
-  public async generateCertificate(getOAuthToken: getTokenCallback, refresh: boolean) {
+  public async generateCertificate(getOAuthToken: getTokenCallback, refresh: boolean, ciphersuite: Ciphersuite) {
     const stashedEnrollmentData = await this.enrollmentStorage.getPendingEnrollmentData();
 
     if (stashedEnrollmentData) {
@@ -73,7 +73,7 @@ export class E2EIServiceInternal {
     }
 
     // We first get the challenges needed to validate the user identity
-    const identity = await this.initIdentity(refresh);
+    const identity = await this.initIdentity(refresh, ciphersuite);
     const enrollmentChallenges = await this.getEnrollmentChallenges(identity);
     const {keyauth, oidcChallenge} = enrollmentChallenges.authorization;
     const challengeData = {challenge: oidcChallenge, keyAuth: keyauth};
@@ -102,11 +102,8 @@ export class E2EIServiceInternal {
 
   // ############ Internal Functions ############
 
-  private async initIdentity(hasActiveCertificate: boolean) {
+  private async initIdentity(hasActiveCertificate: boolean, ciphersuite: Ciphersuite) {
     const {user} = this.initialData;
-
-    // How long the issued certificate should be maximal valid
-    const ciphersuite = Ciphersuite.MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519;
 
     return hasActiveCertificate
       ? this.coreCryptoClient.e2eiNewRotateEnrollment(

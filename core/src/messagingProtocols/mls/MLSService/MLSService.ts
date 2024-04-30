@@ -56,7 +56,7 @@ import {RecurringTaskScheduler} from '../../../util/RecurringTaskScheduler';
 import {TaskScheduler} from '../../../util/TaskScheduler';
 import {User} from '../E2EIdentityService';
 import {E2EIServiceInternal, getTokenCallback} from '../E2EIdentityService/E2EIServiceInternal';
-import {isMLSDevice} from '../E2EIdentityService/Helper';
+import {getSignatureAlgorithmForCiphersuite, isMLSDevice} from '../E2EIdentityService/Helper';
 import {handleMLSMessageAdd, handleMLSWelcomeMessage} from '../EventHandler/events';
 import {
   deleteMLSMessagesQueue,
@@ -776,7 +776,11 @@ export class MLSService extends TypedEventEmitter<Events> {
     const credentialType = await this.getCredentialType();
     const publicKey = await this.coreCryptoClient.clientPublicKey(this.config.defaultCiphersuite, credentialType);
     return this.apiClient.api.client.putClient(client.id, {
-      mls_public_keys: {ed25519: btoa(Converter.arrayBufferViewToBaselineString(publicKey))},
+      mls_public_keys: {
+        [getSignatureAlgorithmForCiphersuite(this.config.defaultCiphersuite)]: btoa(
+          Converter.arrayBufferViewToBaselineString(publicKey),
+        ),
+      },
     });
   }
 
@@ -981,7 +985,11 @@ export class MLSService extends TypedEventEmitter<Events> {
       {user, clientId: client.id, discoveryUrl},
     );
 
-    const rotateBundle = await e2eiServiceInternal.generateCertificate(getOAuthToken, isCertificateRenewal);
+    const rotateBundle = await e2eiServiceInternal.generateCertificate(
+      getOAuthToken,
+      isCertificateRenewal,
+      this.config.defaultCiphersuite,
+    );
 
     this.dispatchNewCrlDistributionPoints(rotateBundle);
     // upload the clients public keys
