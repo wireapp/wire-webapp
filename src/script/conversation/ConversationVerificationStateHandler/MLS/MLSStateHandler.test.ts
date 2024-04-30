@@ -33,7 +33,7 @@ import {ConversationVerificationState} from '../../ConversationVerificationState
 
 describe('MLSConversationVerificationStateHandler', () => {
   const conversationState = new ConversationState();
-  let core = new Core();
+  let core: Core;
   const groupId = 'AAEAAKA0LuGtiU7NjqqlZIE2dQUAZWxuYS53aXJlLmxpbms=';
   const conversation = new Conversation(createUuid(), '', ConversationProtocol.MLS);
   conversationState.conversations.push(conversation);
@@ -61,6 +61,20 @@ describe('MLSConversationVerificationStateHandler', () => {
 
   it('should do nothing if e2eIdentity service is not available', () => {
     core.service!.e2eIdentity = undefined;
+
+    new MLSConversationVerificationStateHandler(
+      'domain',
+      () => {},
+      async () => {},
+      conversationState,
+      core,
+    );
+
+    expect(core.service?.mls?.on).not.toHaveBeenCalled();
+  });
+
+  it('should do nothing if the user does not have an mls device', () => {
+    jest.spyOn(core, 'hasMLSDevice', 'get').mockReturnValue(false);
 
     new MLSConversationVerificationStateHandler(
       'domain',

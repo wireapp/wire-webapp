@@ -57,7 +57,7 @@ export class MLSConversationVerificationStateHandler {
     private readonly core: Core,
   ) {
     this.logger = getLogger('MLSConversationVerificationStateHandler');
-    // We need to check if the core service is available and if the e2eIdentity is available
+    // We need to check if the core account has a valid MLS device and that e2ei is enabled
     if (!this.core.hasMLSDevice || !this.core.service?.e2eIdentity) {
       return;
     }
