@@ -74,8 +74,6 @@ export const ROUTE = {
   CONVERSATION_JOIN: '/join-conversation',
   CONVERSATION_JOIN_INVALID: '/join-conversation-invalid',
   CREATE_ACCOUNT: '/createaccount',
-  CREATE_TEAM: '/createteam',
-  CREATE_TEAM_ACCOUNT: '/createteamaccount',
   CUSTOM_ENV_REDIRECT: '/custom-env-redirect',
   HISTORY_INFO: '/historyinfo',
   INDEX: '/',

@@ -33,7 +33,6 @@ import {CheckPassword} from './CheckPassword';
 import {ClientManager} from './ClientManager';
 import {ConversationJoin} from './ConversationJoin';
 import {ConversationJoinInvalid} from './ConversationJoinInvalid';
-import {CreateAccount} from './CreateAccount';
 import {CreatePersonalAccount} from './CreatePersonalAccount';
 import {CustomEnvironmentRedirect} from './CustomEnvironmentRedirect';
 import {HistoryInfo} from './HistoryInfo';
@@ -48,7 +47,6 @@ import {SetEntropyPage} from './SetEntropyPage';
 import {SetHandle} from './SetHandle';
 import {SetPassword} from './SetPassword';
 import {SingleSignOn} from './SingleSignOn';
-import {TeamName} from './TeamName';
 import {VerifyEmailCode} from './VerifyEmailCode';
 import {VerifyEmailLink} from './VerifyEmailLink';
 import {VerifyPhoneCode} from './VerifyPhoneCode';
@@ -161,9 +159,6 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
               <Route path={ROUTE.CLIENTS} element={<ProtectedClientManager />} />
               <Route path={ROUTE.CONVERSATION_JOIN_INVALID} element={<ConversationJoinInvalid />} />
               <Route path={ROUTE.CONVERSATION_JOIN} element={<ConversationJoin />} />
-              {Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
-                <Route path={ROUTE.CREATE_TEAM} element={<TeamName />} />
-              )}
               <Route path={ROUTE.HISTORY_INFO} element={<ProtectedHistoryInfo />} />
               <Route path={ROUTE.INITIAL_INVITE} element={<ProtectedInitialInvite />} />
               <Route path={`${ROUTE.AUTHORIZE}`} element={<ProtectedOAuthPermissions />} />
@@ -230,9 +225,6 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
               )}
               {Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
                 <Route path={ROUTE.CREATE_ACCOUNT} element={<CreatePersonalAccount />} />
-              )}
-              {Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
-                <Route path={ROUTE.CREATE_TEAM_ACCOUNT} element={<CreateAccount />} />
               )}
               <Route path="*" element={<Navigate to={ROUTE.INDEX} replace />} />
             </Routes>
