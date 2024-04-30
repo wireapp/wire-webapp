@@ -40,7 +40,7 @@ import {getLogger, Logger} from 'Util/Logger';
 import {includesString} from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {appendParameter} from 'Util/UrlUtil';
-import {checkIndexedDb, supportsMLS} from 'Util/util';
+import {checkIndexedDb} from 'Util/util';
 
 import '../../style/default.less';
 import {AssetRepository} from '../assets/AssetRepository';
@@ -445,7 +445,7 @@ export class App {
       // We load all the users the self user is connected with
       await userRepository.loadUsers(selfUser, connections, conversations, teamMembers);
 
-      if (supportsMLS()) {
+      if (this.core.hasMLSDevice) {
         //if mls is supported, we need to initialize the callbacks (they are used when decrypting messages)
         conversationRepository.initMLSConversationRecoveredListener();
         conversationRepository.registerMLSConversationVerificationStateHandler(
@@ -474,7 +474,7 @@ export class App {
 
       await conversationRepository.init1To1Conversations(connections, conversations);
 
-      if (supportsMLS()) {
+      if (this.core.hasMLSDevice) {
         //add the potential `self` and `team` conversations
         await initialiseSelfAndTeamConversations(conversations, selfUser, clientEntity.id, this.core);
 
