@@ -17,119 +17,86 @@
  *
  */
 
-import {QUERY_KEY} from '../auth/route';
+import Cookies from 'js-cookie';
 
-const isMobile = (): boolean => 'ontouchstart' in window || !!navigator.maxTouchPoints;
+import {QUERY_KEY} from '../auth/route';
 
 const isOauth = (): boolean => location?.hash?.includes(QUERY_KEY.SCOPE) ?? false;
 
-const supportsCookies = (): boolean => navigator.cookieEnabled;
-/* return new Promise((resolve, reject) => {
-     switch (navigator.cookieEnabled) {
-       case true:
-         return resolve();
-       case false:
-         return reject(new Error());
-       default:
-         Cookies.set(cookieName, 'yes');
-         if (Cookies.get(cookieName)) {
-           Cookies.remove(cookieName);
-           return resolve();
-         }
-         return reject(new Error());
-     }
-   });*/
+const cookieName = 'cookie_supported_test_wire_cookiename';
 
-const supportsIndexDB = (): boolean => 'indexedDB' in window;
-/*{
-    let supportIndexedDb;
-    try {
-      supportIndexedDb = !!window.indexedDB;
-    } catch (error) {
-      supportIndexedDb = false;
+const supportsCookies = (): Promise<boolean> =>
+  new Promise<boolean>((resolve, _reject) => {
+    switch (navigator.cookieEnabled) {
+      case true:
+        resolve(true);
+        break;
+      case false:
+        resolve(false);
+        break;
+      default:
+        Cookies.set(cookieName, 'yes');
+        if (Cookies.get(cookieName)) {
+          Cookies.remove(cookieName);
+          resolve(true);
+        } else {
+          resolve(false);
+        }
     }
-    if (!supportIndexedDb) {
-      return Promise.reject(new Error('IndexedDB not supported'));
-    }
+  });
 
-    if (Runtime.isFirefox()) {
-      let dbOpenRequest: IDBOpenDBRequest;
+const supportsIndexDB = (): Promise<boolean> =>
+  new Promise<boolean>((resolve, _reject) => {
+    if (!('indexedDB' in window)) {
+      resolve(false);
+    } else {
+      if (navigator.userAgent.toLowerCase().indexOf('firefox') !== -1) {
+        let dbOpenRequest: IDBOpenDBRequest;
 
-      try {
-        dbOpenRequest = window.indexedDB.open('test');
-      } catch (error) {
-        return Promise.reject(new Error('Error initializing IndexedDB'));
-      }
+        try {
+          dbOpenRequest = window.indexedDB.open('test');
+        } catch (error) {
+          return resolve(false);
+        }
 
-      return new Promise((resolve, reject) => {
-        const connectionTimeout = setTimeout(
-          () => reject(new Error('Error opening IndexedDB (response timeout)')),
-          10000,
-        );
+        const connectionTimeout = setTimeout(() => resolve(false), 10000);
         dbOpenRequest.onerror = event => {
           clearTimeout(connectionTimeout);
           if (dbOpenRequest.error) {
             event.preventDefault();
-            return reject(new Error('Error opening IndexedDB'));
+            return resolve(false);
           }
           return undefined;
         };
         dbOpenRequest.onsuccess = event => {
           clearTimeout(connectionTimeout);
-          resolve();
+          resolve(true);
         };
-      });
+      }
+      resolve(true);
     }
+  }).catch(() => false);
 
-    return Promise.resolve();
-  };*/
+const checkBrowser = (): void => {
+  if (isOauth()) {
+    return;
+  }
+  if (!('RTCPeerConnection' in window)) {
+    location.href = '/unsupported/';
+  }
+  supportsIndexDB()
+    .then(resDB => {
+      if (resDB) {
+        return supportsCookies();
+      }
+      return resDB;
+    })
+    .catch(() => false)
+    .then(res => {
+      if (!res) {
+        location.href = '/unsupported/';
+      }
+    });
+};
 
-const isBrowserSupported = (): boolean =>
-  (!isMobile() || isOauth()) &&
-  supportsIndexDB() &&
-  supportsCookies() &&
-  'Promise' in window &&
-  'allSettled' in Promise &&
-  'Symbol' in window &&
-  'replace' in Symbol &&
-  'WeakMap' in window &&
-  'assign' in Object &&
-  'entries' in Object &&
-  'values' in Object &&
-  'getOwnPropertyDescriptors' in Object &&
-  'fromEntries' in Object &&
-  'assign' in Object &&
-  'URL' in window &&
-  'toJSON' in URL.prototype &&
-  'URLSearchParams' in window &&
-  Array.prototype[Symbol.iterator] &&
-  'includes' in Array.prototype &&
-  'reduce' in Array.prototype &&
-  'sort' in Array.prototype &&
-  'flatMap' in Array.prototype &&
-  NodeList.prototype[Symbol.iterator] &&
-  'forEach' in NodeList.prototype &&
-  HTMLCollection.prototype[Symbol.iterator] &&
-  DOMTokenList.prototype[Symbol.iterator] &&
-  'forEach' in DOMTokenList.prototype &&
-  'fill' in Int8Array.prototype &&
-  'set' in Int8Array.prototype &&
-  'sort' in Int8Array.prototype &&
-  'replace' in String.prototype &&
-  'search' in String.prototype &&
-  'split' in String.prototype &&
-  'includes' in String.prototype &&
-  'match' in String.prototype &&
-  'trim' in String.prototype &&
-  'split' in String.prototype &&
-  'endsWith' in String.prototype &&
-  'replaceAll' in String.prototype &&
-  'sticky' in RegExp.prototype &&
-  'toString' in RegExp &&
-  parseFloat('1.23') === 1.23 &&
-  (1.23456789).toFixed(2) === '1.23' &&
-  'RTCPeerConnection' in window;
-
-if (!isBrowserSupported()) {
-  location.href = '/unsupported/';
-}
+checkBrowser();

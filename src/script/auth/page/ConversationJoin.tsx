@@ -40,7 +40,6 @@ import {Page} from './Page';
 import {Config} from '../../Config';
 import {conversationJoinStrings} from '../../strings';
 import {AppAlreadyOpen} from '../component/AppAlreadyOpen';
-import {HasToUseDesktop} from '../component/HasToUseDesktop';
 import {JoinGuestLinkPasswordModal} from '../component/JoinGuestLinkPasswordModal';
 import {WirelessContainer} from '../component/WirelessContainer';
 import {EXTERNAL_ROUTE} from '../externalRoute';
@@ -251,7 +250,7 @@ const ConversationJoinComponent = ({
   }
 
   return (
-    <HasToUseDesktop isTemporaryGuest>
+    <>
       {isJoinGuestLinkPasswordModalOpen && (
         <JoinGuestLinkPasswordModal
           onClose={() => {
@@ -308,7 +307,7 @@ const ConversationJoinComponent = ({
           </Column>
         </Columns>
       </WirelessContainer>
-    </HasToUseDesktop>
+    </>
   );
 };
 

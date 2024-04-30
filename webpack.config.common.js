@@ -150,7 +150,8 @@ module.exports = {
           to: `${dist}/min/core-crypto.wasm`,
         },
         // copying all static resources (audio, images, fonts...)
-        {from: 'resource', to: dist},
+        {from: 'src/page/browser.js', to: dist},
+        {from: 'resource', to: path.resolve(dist, 'browser.js')},
       ],
     }),
     new webpack.IgnorePlugin({resourceRegExp: /.*\.wasm/}),
