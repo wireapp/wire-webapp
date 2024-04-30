@@ -58,12 +58,12 @@ export class MLSConversationVerificationStateHandler {
   ) {
     this.logger = getLogger('MLSConversationVerificationStateHandler');
     // We need to check if the core service is available and if the e2eIdentity is available
-    if (!this.core.service?.mls || !this.core.service?.e2eIdentity) {
+    if (!this.core.hasMLSDevice || !this.core.service?.e2eIdentity) {
       return;
     }
 
     // We hook into the newEpoch event of the MLS service to check if the conversation needs to be verified or degraded
-    this.core.service.mls.on('newEpoch', this.onEpochChanged);
+    this.core.service?.mls?.on('newEpoch', this.onEpochChanged);
     this.core.service.e2eIdentity.on('crlChanged', ({domain}) => this.handleNewRevocationList(domain));
   }
 
