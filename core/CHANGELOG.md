@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [46.0.4](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.0.3...@wireapp/core@46.0.4) (2024-04-30)
+
+### Bug Fixes
+
+* Pass the correct ciphersuite when starting the e2ei enrollment process ([#6184](https://github.com/wireapp/wire-web-packages/issues/6184)) ([edbb67f](https://github.com/wireapp/wire-web-packages/commit/edbb67feca6d46b4e6a175f9703fb9115715b56b))
+
 ## [46.0.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.0.2...@wireapp/core@46.0.3) (2024-04-29)
 
 ### Bug Fixes
