@@ -60,6 +60,7 @@ const supportsIndexDB = (): Promise<boolean> =>
     if (!('indexedDB' in window)) {
       resolve(false);
     } else {
+      // some versions of FF don't allow access to IndexDB in the private mode
       if (navigator.userAgent.toLowerCase().indexOf('firefox') !== -1) {
         let dbOpenRequest: IDBOpenDBRequest;
 

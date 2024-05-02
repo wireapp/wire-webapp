@@ -34,7 +34,7 @@ const srcScript = path.resolve(SRC_PATH, 'script');
 
 const HOME_TEMPLATE_PATH = path.resolve(SRC_PATH, 'page/index.ejs');
 const AUTH_TEMPLATE_PATH = path.resolve(SRC_PATH, 'page/auth.ejs');
-const UNSUPPORTED_TEMPLATE_PATH = path.resolve(SRC_PATH, 'page/browser.ejs');
+const UNSUPPORTED_TEMPLATE_PATH = path.resolve(SRC_PATH, 'page/unsupported.ejs');
 
 const {clientConfig, serverConfig} = require(path.resolve(DIST_PATH, 'config/index.js'));
 
@@ -150,7 +150,8 @@ module.exports = {
           to: `${dist}/min/core-crypto.wasm`,
         },
         // copying all static resources (audio, images, fonts...)
-        {from: 'src/page/browser.js', to: dist},
+        {from: 'resource', to: dist},
+        {from: 'src/page/basicBrowserFeatureCheck.js', to: `${dist}/min/`},
       ],
     }),
     new webpack.IgnorePlugin({resourceRegExp: /.*\.wasm/}),

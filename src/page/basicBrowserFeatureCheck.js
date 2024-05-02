@@ -24,8 +24,8 @@
  * wraps any compiled JS with additional code, which can already break in the oldest
  * browsers (for instance, `globalThis`).
  *
- * The more advanced browser support check (like IndexDB and oAuth exception), is done
- * in `src/script/browser/CheckBrowser.ts`
+ * The more advanced browser support check, that can be done after the oAuth exception (like IndexDB, RTC, cookies),
+ * is done in `src/script/browser/CheckBrowser.ts`
  *
  */
 
