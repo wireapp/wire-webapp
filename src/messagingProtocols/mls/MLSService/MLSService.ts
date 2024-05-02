@@ -474,7 +474,14 @@ export class MLSService extends TypedEventEmitter<Events> {
       externalSenders = [await this.coreCryptoClient.getExternalSender(parentGroupIdBytes)];
     } else {
       const mlsKeys = (await this.apiClient.api.client.getPublicKeys()).removal;
-      externalSenders = Object.values(mlsKeys).map((key: string) => Decoder.fromBase64(key).asBytes);
+      const ciphersuiteSignature = getSignatureAlgorithmForCiphersuite(this.config.defaultCiphersuite);
+      const removalKeyForSignature = mlsKeys[ciphersuiteSignature];
+      if (!removalKeyForSignature) {
+        throw new Error(
+          `Cannot create conversation: No backend removal key found for the signature ${ciphersuiteSignature}`,
+        );
+      }
+      externalSenders = [Decoder.fromBase64(removalKeyForSignature).asBytes];
     }
 
     const configuration: ConversationConfiguration = {

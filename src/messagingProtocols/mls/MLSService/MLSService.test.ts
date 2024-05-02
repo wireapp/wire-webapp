@@ -299,12 +299,12 @@ describe('MLSService', () => {
 
     it.each([
       [Ciphersuite.MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519, 'ed25519'],
-      [Ciphersuite.MLS_128_DHKEMP256_AES128GCM_SHA256_P256, 'p256'],
+      [Ciphersuite.MLS_128_DHKEMP256_AES128GCM_SHA256_P256, 'ecdsa_secp256r1_sha256'],
       [Ciphersuite.MLS_128_DHKEMX25519_CHACHA20POLY1305_SHA256_Ed25519, 'ed25519'],
       [Ciphersuite.MLS_256_DHKEMX448_AES256GCM_SHA512_Ed448, 'ed448'],
-      [Ciphersuite.MLS_256_DHKEMP521_AES256GCM_SHA512_P521, 'p521'],
+      [Ciphersuite.MLS_256_DHKEMP521_AES256GCM_SHA512_P521, 'ecdsa_secp521r1_sha512'],
       [Ciphersuite.MLS_256_DHKEMX448_CHACHA20POLY1305_SHA512_Ed448, 'ed448'],
-      [Ciphersuite.MLS_256_DHKEMP384_AES256GCM_SHA384_P384, 'p384'],
+      [Ciphersuite.MLS_256_DHKEMP384_AES256GCM_SHA384_P384, 'ecdsa_secp384r1_sha384'],
       [Ciphersuite.MLS_128_X25519KYBER768DRAFT00_AES128GCM_SHA256_Ed25519, 'ed25519'],
     ])(
       'returns true if there is a signature corresponding to the ciphersuite used (%d, %s)',
