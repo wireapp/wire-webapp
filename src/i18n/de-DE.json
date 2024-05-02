@@ -725,7 +725,7 @@
   "guestLinkDisabled": "Erstellen von Gäste-Links ist in Ihrem Team nicht erlaubt.",
   "guestLinkDisabledByOtherTeam": "Sie können in dieser Unterhaltung keinen Gäste-Link generieren, da sie von jemandem aus einem anderen Team erstellt wurde und dieses Team keine Gäste-Links verwenden darf.",
   "guestLinkPasswordModal.conversationPasswordProtected": "Diese Unterhaltung ist passwortgeschützt.",
-  "guestLinkPasswordModal.description": "Please enter the password you have received with the access link for this conversation.",
+  "guestLinkPasswordModal.description": "Bitte geben Sie das Passwort ein, das Sie mit dem Zugangslink für diese Unterhaltung erhalten haben.",
   "guestLinkPasswordModal.headline": "{conversationName} Passwort eingeben",
   "guestLinkPasswordModal.headlineDefault": "Passwort eingeben",
   "guestLinkPasswordModal.joinConversation": "Unterhaltung beitreten",
