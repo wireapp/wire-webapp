@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2024 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,6 +14,20 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+/*
+ * This file gets compiled and injected separately into the auth and root
+ * index.html, to not include any advanced (possibly not supported by
+ * browser) JS.
+ * Since we are using `sourceMap` for both development and production, `webpack`
+ * wraps this compiled JS onto its code, which can already break in the oldest
+ * browsers.
+ * For this reason, we have all primitive feature detections in a separate static JS
+ * file, `src/page/browser.js`, that doesn't get compiled by webpack.
+ * We need to keep this file as TS in the codebase and not merge with the static JS,
+ * to have the possibility to use config values and constants
  *
  */
 

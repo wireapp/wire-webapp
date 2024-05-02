@@ -1,3 +1,34 @@
+/*
+ * Wire
+ * Copyright (C) 2024 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+/*
+ * This file cannot be converted to TS!
+ *
+ * Since we are using `sourceMap` for both development and production, `webpack`
+ * wraps any compiled JS with additional code, which can already break in the oldest
+ * browsers (for instance, `globalThis`).
+ *
+ * The more advanced browser support check (like IndexDB and oAuth exception), is done
+ * in `src/script/browser/CheckBrowser.ts`
+ *
+ */
+
 function isMinimumSupported() {
   return (
     'globalThis' in window &&
