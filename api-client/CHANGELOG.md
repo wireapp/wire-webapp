@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [27.0.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.0.1...@wireapp/api-client@27.0.2) (2024-05-02)
+
+### Bug Fixes
+
+* address incorrect signature identifiers ([#6186](https://github.com/wireapp/wire-web-packages/issues/6186)) ([011666c](https://github.com/wireapp/wire-web-packages/commit/011666c05e0e7bcc2997d45a58011ec9864f4fea))
+
 ## [27.0.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.0.0...@wireapp/api-client@27.0.1) (2024-04-29)
 
 **Note:** Version bump only for package @wireapp/api-client
