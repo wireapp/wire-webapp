@@ -37,27 +37,23 @@ import {QUERY_KEY} from '../auth/route';
 
 const isOauth = (): boolean => location?.hash?.includes(QUERY_KEY.SCOPE) ?? false;
 
-const cookieName = 'cookie_supported_test_wire_cookiename';
+const cookieName = 'cookie_supported_test_wire_cookie_name';
 
-const supportsCookies = (): Promise<boolean> =>
-  new Promise<boolean>((resolve, _reject) => {
-    switch (navigator.cookieEnabled) {
-      case true:
-        resolve(true);
-        break;
-      case false:
-        resolve(false);
-        break;
-      default:
-        Cookies.set(cookieName, 'yes');
-        if (Cookies.get(cookieName)) {
-          Cookies.remove(cookieName);
-          resolve(true);
-        } else {
-          resolve(false);
-        }
-    }
-  });
+const supportsCookies = (): boolean => {
+  switch (navigator.cookieEnabled) {
+    case true:
+      return true;
+    case false:
+      return false;
+    default:
+      Cookies.set(cookieName, 'yes');
+      if (Cookies.get(cookieName)) {
+        Cookies.remove(cookieName);
+        return true;
+      }
+      return false;
+  }
+};
 
 const supportsIndexDB = (): Promise<boolean> =>
   new Promise<boolean>((resolve, _reject) => {
@@ -82,29 +78,24 @@ const supportsIndexDB = (): Promise<boolean> =>
           }
           return undefined;
         };
-        dbOpenRequest.onsuccess = event => {
+        dbOpenRequest.onsuccess = _event => {
           clearTimeout(connectionTimeout);
           resolve(true);
         };
       }
       resolve(true);
     }
-  }).catch(() => false);
+  });
 
 const checkBrowser = (): void => {
   if (isOauth()) {
     return;
   }
-  if (!('RTCPeerConnection' in window)) {
+  if (!('RTCPeerConnection' in window) || !supportsCookies()) {
     location.href = '/unsupported/';
+    return;
   }
   supportsIndexDB()
-    .then(resDB => {
-      if (resDB) {
-        return supportsCookies();
-      }
-      return resDB;
-    })
     .catch(() => false)
     .then(res => {
       if (!res) {

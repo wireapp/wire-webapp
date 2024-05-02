@@ -151,7 +151,6 @@ module.exports = {
         },
         // copying all static resources (audio, images, fonts...)
         {from: 'src/page/browser.js', to: dist},
-        {from: 'resource', to: path.resolve(dist, 'browser.js')},
       ],
     }),
     new webpack.IgnorePlugin({resourceRegExp: /.*\.wasm/}),
