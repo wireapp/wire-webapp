@@ -45,9 +45,9 @@ export const getE2EIClientId = (clientId: string, userId: string, userDomain: st
  * depending on the ciphersuite used, the signature algorithm used is different. We need to keep a mapping of the ciphersuite to the signature algorithm
  */
 const ciphersuiteSignatureAlgorithmMap: Record<Ciphersuite, MLSPublicKeyAlgorithmKeys> = {
-  [Ciphersuite.MLS_128_DHKEMP256_AES128GCM_SHA256_P256]: MLSPublicKeyAlgorithmKeys.P256,
-  [Ciphersuite.MLS_256_DHKEMP384_AES256GCM_SHA384_P384]: MLSPublicKeyAlgorithmKeys.P384,
-  [Ciphersuite.MLS_256_DHKEMP521_AES256GCM_SHA512_P521]: MLSPublicKeyAlgorithmKeys.P521,
+  [Ciphersuite.MLS_128_DHKEMP256_AES128GCM_SHA256_P256]: MLSPublicKeyAlgorithmKeys.ECDSA_SECP256R1_SHA256,
+  [Ciphersuite.MLS_256_DHKEMP384_AES256GCM_SHA384_P384]: MLSPublicKeyAlgorithmKeys.ECDSA_SECP384R1_SHA384,
+  [Ciphersuite.MLS_256_DHKEMP521_AES256GCM_SHA512_P521]: MLSPublicKeyAlgorithmKeys.ECDSA_SECP521R1_SHA512,
   [Ciphersuite.MLS_256_DHKEMX448_AES256GCM_SHA512_Ed448]: MLSPublicKeyAlgorithmKeys.ED448,
   [Ciphersuite.MLS_256_DHKEMX448_CHACHA20POLY1305_SHA512_Ed448]: MLSPublicKeyAlgorithmKeys.ED448,
   [Ciphersuite.MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519]: MLSPublicKeyAlgorithmKeys.ED25519,

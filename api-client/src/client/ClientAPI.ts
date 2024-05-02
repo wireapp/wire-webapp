@@ -38,9 +38,9 @@ export type ClaimedKeyPackages = {
 };
 
 export enum MLSPublicKeyAlgorithmKeys {
-  P256 = 'p256',
-  P384 = 'p384',
-  P521 = 'p521',
+  ECDSA_SECP256R1_SHA256 = 'ecdsa_secp256r1_sha256',
+  ECDSA_SECP384R1_SHA384 = 'ecdsa_secp384r1_sha384',
+  ECDSA_SECP521R1_SHA512 = 'ecdsa_secp521r1_sha512',
   ED448 = 'ed448',
   ED25519 = 'ed25519',
 }

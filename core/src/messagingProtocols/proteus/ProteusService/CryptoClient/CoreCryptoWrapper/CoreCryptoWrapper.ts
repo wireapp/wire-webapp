@@ -62,7 +62,6 @@ export async function buildClient(
     databaseName: coreCryptoDbName,
     key: Encoder.toBase64(key.key).asString,
     wasmFilePath,
-    ciphersuites: [],
   });
   return new CoreCryptoWrapper(coreCrypto, {nbPrekeys, onNewPrekeys, onWipe: key.deleteKey});
 }
