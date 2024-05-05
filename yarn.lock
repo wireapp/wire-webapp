@@ -4062,17 +4062,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@testing-library/react@npm:15.0.5":
-  version: 15.0.5
-  resolution: "@testing-library/react@npm:15.0.5"
+"@testing-library/react@npm:15.0.6":
+  version: 15.0.6
+  resolution: "@testing-library/react@npm:15.0.6"
   dependencies:
     "@babel/runtime": "npm:^7.12.5"
     "@testing-library/dom": "npm:^10.0.0"
     "@types/react-dom": "npm:^18.0.0"
   peerDependencies:
+    "@types/react": ^18.0.0
     react: ^18.0.0
     react-dom: ^18.0.0
-  checksum: 10/27b938ddcdd6b4a98d4564460899f36ae3f69ad749e25389424c1c1d0adf40adeb1387dd29303c0f83b33e2f7ce7133253e0491c4b22af8cb340f631901dbe62
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+  checksum: 10/04f63fc8e1d32ca9ce387df87abbdbe1d1e8bd7343d305a3d4662e60133453a4a39f5b0e1653efbfe9516750ca559c27a9ace4740f4c3e24a49270acaf93084d
   languageName: node
   linkType: hard
 
@@ -17690,7 +17694,7 @@ __metadata:
     "@koush/wrtc": "npm:0.5.3"
     "@lexical/history": "npm:0.14.5"
     "@lexical/react": "npm:0.14.5"
-    "@testing-library/react": "npm:15.0.5"
+    "@testing-library/react": "npm:15.0.6"
     "@types/dexie-batch": "npm:0.4.7"
     "@types/eslint": "npm:8.56.5"
     "@types/fs-extra": "npm:11.0.4"
