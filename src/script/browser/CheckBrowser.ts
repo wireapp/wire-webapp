@@ -91,6 +91,11 @@ const supportsIndexDB = (): Promise<boolean> =>
   });
 
 const checkBrowser = (): void => {
+  if (!supportsCookies()) {
+    location.href = '/unsupported/';
+    console.error("This browser doesn't support cookies to run the Wire app!");
+    return;
+  }
   if (isOauth()) {
     // eslint-disable-next-line no-console
     console.log('This browser is valid to handle oAuth scenario.');
@@ -99,11 +104,6 @@ const checkBrowser = (): void => {
   if (!('RTCPeerConnection' in window)) {
     location.href = '/unsupported/';
     console.error("This browser doesn't support RTCto run the Wire app!");
-    return;
-  }
-  if (!supportsCookies()) {
-    location.href = '/unsupported/';
-    console.error("This browser doesn't support cookies to run the Wire app!");
     return;
   }
   supportsIndexDB()
