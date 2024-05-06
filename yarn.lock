@@ -4693,9 +4693,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^27.0.2":
-  version: 27.0.2
-  resolution: "@wireapp/api-client@npm:27.0.2"
+"@wireapp/api-client@npm:^27.0.3":
+  version: 27.0.3
+  resolution: "@wireapp/api-client@npm:27.0.3"
   dependencies:
     "@wireapp/commons": ^5.2.7
     "@wireapp/priority-queue": ^2.1.5
@@ -4707,10 +4707,10 @@ __metadata:
     pako: 2.1.0
     reconnecting-websocket: 4.4.0
     spark-md5: 3.0.2
-    tough-cookie: 4.1.3
+    tough-cookie: 4.1.4
     ws: 8.17.0
-    zod: 3.23.4
-  checksum: a86d6200ab8cec065f5725d7d9d72a876d77e16ad2eec15e085e5a061e8c26180205b99762364611e62b58a223ef2c80c71e1eec16cb7d69979a232964bd9916
+    zod: 3.23.6
+  checksum: cc3ca138c2b4159c7ce7914fc0facbe36768434be5a36f3a7935edc06252c16f4bb5697bb32b79ac5e84834eccf6ae512e23892a088146e107baa3861cc40d7f
   languageName: node
   linkType: hard
 
@@ -4763,11 +4763,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:46.0.6":
-  version: 46.0.6
-  resolution: "@wireapp/core@npm:46.0.6"
+"@wireapp/core@npm:46.0.7":
+  version: 46.0.7
+  resolution: "@wireapp/core@npm:46.0.7"
   dependencies:
-    "@wireapp/api-client": ^27.0.2
+    "@wireapp/api-client": ^27.0.3
     "@wireapp/commons": ^5.2.7
     "@wireapp/core-crypto": 1.0.0-rc.59
     "@wireapp/cryptobox": 12.8.0
@@ -4784,8 +4784,8 @@ __metadata:
     logdown: 3.3.1
     long: ^5.2.0
     uuidjs: 4.2.13
-    zod: 3.23.4
-  checksum: d5f5d1a7d673a2d6f5a93c277d735de63e096f17014722fc03030ab3c6751f9b583aacfb38f5075f37d6982c07ab596ac92aea64ad9606ee693be1d24827016b
+    zod: 3.23.6
+  checksum: 756332e7e1ed1c04b40cbc1abaf6523e6ceb1cae8ad8195b2973ca8b1b3e2ad4a723c86fcee9917878b06a44ee2dc5863fc8689cddbd98f915a67ffcc8877e47
   languageName: node
   linkType: hard
 
@@ -16370,7 +16370,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tough-cookie@npm:4.1.3, tough-cookie@npm:^4.1.2":
+"tough-cookie@npm:4.1.4":
+  version: 4.1.4
+  resolution: "tough-cookie@npm:4.1.4"
+  dependencies:
+    psl: ^1.1.33
+    punycode: ^2.1.1
+    universalify: ^0.2.0
+    url-parse: ^1.5.3
+  checksum: 5815059f014c31179a303c673f753f7899a6fce94ac93712c88ea5f3c26e0c042b5f0c7a599a00f8e0feeca4615dba75c3dffc54f3c1a489978aa8205e09307c
+  languageName: node
+  linkType: hard
+
+"tough-cookie@npm:^4.1.2":
   version: 4.1.3
   resolution: "tough-cookie@npm:4.1.3"
   dependencies:
@@ -17457,7 +17469,7 @@ __metadata:
     "@wireapp/avs": 9.6.12
     "@wireapp/commons": 5.2.7
     "@wireapp/copy-config": 2.1.14
-    "@wireapp/core": 46.0.6
+    "@wireapp/core": 46.0.7
     "@wireapp/eslint-config": 3.0.5
     "@wireapp/prettier-config": 0.6.3
     "@wireapp/react-ui-kit": 9.16.4
@@ -18070,10 +18082,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zod@npm:3.23.4":
-  version: 3.23.4
-  resolution: "zod@npm:3.23.4"
-  checksum: 58f6e298c51d9ae01a1b1a1692ac7f00774b466d9a287a1ff8d61ff1fbe0ae9b0f050ae1cf1a8f71e4c6ccd0333a3cc340f339360fab5f5046cc954d10525a54
+"zod@npm:3.23.6":
+  version: 3.23.6
+  resolution: "zod@npm:3.23.6"
+  checksum: f534119e2a54e86bf77e5c6ff630ef4ec50b87dd9d9faf66dc7a663a489d37130b716ebd836cdd9d7fc6e124a1accdc0d53f388243a236c10e632dcc945eaa27
   languageName: node
   linkType: hard
 
