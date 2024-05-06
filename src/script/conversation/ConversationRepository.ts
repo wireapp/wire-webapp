@@ -45,6 +45,7 @@ import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import type {BackendError} from '@wireapp/api-client/lib/http/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {MLSCreateConversationResponse} from '@wireapp/core/lib/conversation';
+import {ClientMLSError, ClientMLSErrorLabel} from '@wireapp/core/lib/messagingProtocols/mls';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {container} from 'tsyringe';
@@ -167,11 +168,13 @@ type IncomingEvent = ConversationEvent | ClientConversationEvent;
 export enum CONVERSATION_READONLY_STATE {
   READONLY_ONE_TO_ONE_SELF_UNSUPPORTED_MLS = 'READONLY_ONE_TO_ONE_SELF_UNSUPPORTED_MLS',
   READONLY_ONE_TO_ONE_OTHER_UNSUPPORTED_MLS = 'READONLY_ONE_TO_ONE_OTHER_UNSUPPORTED_MLS',
+  READONLY_ONE_TO_ONE_NO_KEY_PACKAGES = 'READONLY_ONE_TO_ONE_NO_KEY_PACKAGES',
 }
 
 interface GetInitialised1To1ConversationOptions {
   isLiveUpdate?: boolean;
   shouldRefreshUser?: boolean;
+  mls?: {allowUnestablished?: boolean};
 }
 
 export class ConversationRepository {
@@ -1325,7 +1328,11 @@ export class ConversationRepository {
        * We have to add a delay to make sure the welcome message is not wasted, in case the self client would establish mls group themselves before receiving the welcome.
        */
       const shouldDelayMLSGroupEstablishment = options.isLiveUpdate && isMLSSupportedByTheOtherUser;
-      return this.initMLS1to1Conversation(userId, isMLSSupportedByTheOtherUser, shouldDelayMLSGroupEstablishment);
+      return this.initMLS1to1Conversation(userId, {
+        isMLSSupportedByTheOtherUser,
+        shouldDelayGroupEstablishment: shouldDelayMLSGroupEstablishment,
+        allowUnestablished: options.mls?.allowUnestablished,
+      });
     }
 
     // There's no connection so it's a proteus conversation with a team member
@@ -1740,8 +1747,11 @@ export class ConversationRepository {
    */
   private readonly initMLS1to1Conversation = async (
     otherUserId: QualifiedId,
-    isMLSSupportedByTheOtherUser: boolean,
-    shouldDelayGroupEstablishment = false,
+    {
+      isMLSSupportedByTheOtherUser,
+      shouldDelayGroupEstablishment = false,
+      allowUnestablished = true,
+    }: {isMLSSupportedByTheOtherUser: boolean; shouldDelayGroupEstablishment?: boolean; allowUnestablished?: boolean},
   ): Promise<MLSConversation> => {
     // When receiving some live updates via websocket, e.g. after connection request is accepted, both sides (users) of connection will react to conversation status update event.
     // We want to reduce the possibility of two users trying to establish an MLS group at the same time.
@@ -1800,11 +1810,24 @@ export class ConversationRepository {
       throw new Error('Self user is not available!');
     }
 
-    const initialisedMLSConversation = await this.establishMLS1to1Conversation(mlsConversation, otherUserId);
+    let initialisedMLSConversation: MLSConversation = mlsConversation;
+
+    try {
+      initialisedMLSConversation = await this.establishMLS1to1Conversation(mlsConversation, otherUserId);
+      initialisedMLSConversation.readOnlyState(null);
+    } catch (error) {
+      this.logger.warn(`Failed to establish MLS 1:1 conversation with user ${otherUserId.id}`, error);
+      if (!allowUnestablished) {
+        throw error;
+      }
+
+      if (error instanceof ClientMLSError && error.label === ClientMLSErrorLabel.NO_KEY_PACKAGES_AVAILABLE) {
+        initialisedMLSConversation.readOnlyState(CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_NO_KEY_PACKAGES);
+      }
+    }
 
     // If mls is supported by the other user, we can establish the group and remove readonly state from the conversation.
-    initialisedMLSConversation.readOnlyState(null);
-    await this.update1To1ConversationParticipants(mlsConversation, otherUserId);
+    await this.update1To1ConversationParticipants(initialisedMLSConversation, otherUserId);
     await this.saveConversation(initialisedMLSConversation);
 
     if (shouldOpenMLS1to1Conversation) {
@@ -1964,11 +1987,10 @@ export class ConversationRepository {
         `Connection with user ${otherUserId.id} is accepted, using protocol ${protocol} for 1:1 conversation`,
       );
       if (protocol === ConversationProtocol.MLS || localMLSConversation) {
-        return this.initMLS1to1Conversation(
-          otherUserId,
+        return this.initMLS1to1Conversation(otherUserId, {
           isMLSSupportedByTheOtherUser,
-          shouldDelayMLSGroupEstablishment,
-        );
+          shouldDelayGroupEstablishment: shouldDelayMLSGroupEstablishment,
+        });
       }
 
       if (protocol === ConversationProtocol.PROTEUS) {
@@ -1985,7 +2007,10 @@ export class ConversationRepository {
       this.logger.log(
         `Connection with user ${otherUserId.id} is not accepted, using already known MLS 1:1 conversation ${localMLSConversation.id}`,
       );
-      return this.initMLS1to1Conversation(otherUserId, isMLSSupportedByTheOtherUser, shouldDelayMLSGroupEstablishment);
+      return this.initMLS1to1Conversation(otherUserId, {
+        isMLSSupportedByTheOtherUser,
+        shouldDelayGroupEstablishment: shouldDelayMLSGroupEstablishment,
+      });
     }
 
     this.logger.log(
