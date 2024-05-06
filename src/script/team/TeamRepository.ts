@@ -160,14 +160,17 @@ export class TeamRepository extends TypedEventEmitter<Events> {
   }
 
   private readonly scheduleTeamRefresh = (): void => {
-    window.setInterval(async () => {
+    const updateTeam = async () => {
       try {
         await this.getTeam();
         await this.updateFeatureConfig();
       } catch (error) {
         this.logger.error(error);
       }
-    }, TIME_IN_MILLIS.SECOND * 30);
+    };
+    // We want to poll the latest team data every time the app is focused and every day
+    window.addEventListener('focus', updateTeam);
+    window.setInterval(updateTeam, TIME_IN_MILLIS.DAY);
   };
 
   private async getInitialTeamMembers(teamId: string): Promise<TeamMemberEntity[]> {
