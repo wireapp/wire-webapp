@@ -87,6 +87,12 @@ export const ReadOnlyConversationMessage: FC<ReadOnlyConversationMessageProps> =
             </>
           </ReadOnlyConversationMessageBase>
         );
+      case CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_NO_KEY_PACKAGES:
+        return (
+          <ReadOnlyConversationMessageBase>
+            <span>{t('otherUserNoAvailableKeyPackages')}</span>
+          </ReadOnlyConversationMessageBase>
+        );
     }
   }
 

@@ -91,4 +91,14 @@ describe('ReadOnlyConversationMessage', () => {
 
     expect(reloadAppMock).toHaveBeenCalled();
   });
+
+  it("renders a conversation with a user that don't have any key pakages available", () => {
+    const conversation = generateConversation(CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_NO_KEY_PACKAGES, true);
+
+    const {getByText} = render(
+      withTheme(<ReadOnlyConversationMessage reloadApp={() => {}} conversation={conversation} />),
+    );
+
+    expect(getByText('otherUserNoAvailableKeyPackages')).toBeDefined();
+  });
 });
