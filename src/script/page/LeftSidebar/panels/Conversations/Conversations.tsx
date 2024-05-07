@@ -39,6 +39,7 @@ import {UserRepository} from 'src/script/user/UserRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {ConversationHeader} from './ConversationHeader';
+import {conversationsSpacerStyles, conversationsSidebarStyles} from './Conversations.styles';
 import {ConversationsList} from './ConversationsList';
 import {ConversationTabs} from './ConversationTabs';
 import {EmptyConversationList} from './EmptyConversationList';
@@ -237,7 +238,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   }
 
   const sidebar = (
-    <nav className="conversations-sidebar" css={isSideBarOpen && mdBreakpoint && {position: 'fixed', zIndex: '1000'}}>
+    <nav className="conversations-sidebar" css={conversationsSidebarStyles(mdBreakpoint)}>
       <FadingScrollbar className="conversations-sidebar-items" data-is-collapsed={!isSideBarOpen}>
         <UserDetails
           user={selfUser}
@@ -298,7 +299,7 @@ const Conversations: React.FC<ConversationsProps> = ({
 
   return (
     <div className="conversations-wrapper">
-      <div css={isSideBarOpen && mdBreakpoint && {minWidth: '64px'}} />
+      <div className="conversations-sidebar-spacer" css={conversationsSpacerStyles(mdBreakpoint)} />
       <ListWrapper
         id="conversations"
         headerElement={
