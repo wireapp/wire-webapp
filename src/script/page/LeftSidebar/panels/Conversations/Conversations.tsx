@@ -39,6 +39,7 @@ import {UserRepository} from 'src/script/user/UserRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {ConversationHeader} from './ConversationHeader';
+import {conversationsSpacerStyles, conversationsSidebarStyles} from './Conversations.styles';
 import {ConversationsList} from './ConversationsList';
 import {ConversationTabs} from './ConversationTabs';
 import {EmptyConversationList} from './EmptyConversationList';
@@ -237,7 +238,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   }
 
   const sidebar = (
-    <nav className="conversations-sidebar">
+    <nav className="conversations-sidebar" css={conversationsSidebarStyles(mdBreakpoint)}>
       <FadingScrollbar className="conversations-sidebar-items" data-is-collapsed={!isSideBarOpen}>
         <UserDetails
           user={selfUser}
@@ -259,17 +260,15 @@ const Conversations: React.FC<ConversationsProps> = ({
         />
       </FadingScrollbar>
 
-      {!mdBreakpoint && (
-        <button
-          type="button"
-          role="tab"
-          className="conversations-sidebar-handle"
-          data-is-collapsed={!isSideBarOpen || mdBreakpoint}
-          onClick={toggleSidebar}
-        >
-          <ChevronIcon width={12} height={12} />
-        </button>
-      )}
+      <button
+        type="button"
+        role="tab"
+        className="conversations-sidebar-handle"
+        data-is-collapsed={!isSideBarOpen}
+        onClick={toggleSidebar}
+      >
+        <ChevronIcon width={12} height={12} />
+      </button>
     </nav>
   );
 
@@ -300,6 +299,7 @@ const Conversations: React.FC<ConversationsProps> = ({
 
   return (
     <div className="conversations-wrapper">
+      <div className="conversations-sidebar-spacer" css={conversationsSpacerStyles(mdBreakpoint)} />
       <ListWrapper
         id="conversations"
         headerElement={
