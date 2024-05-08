@@ -562,6 +562,8 @@
   "conversationVoiceChannelDeactivate": " called",
   "conversationVoiceChannelDeactivateYou": " called",
   "conversationWithBlockedUser": "You blocked this user",
+  "conversationWithBlockedUserMessage": "The link to this group conversation is no longer valid or leads to a conversation with someone you blocked.",
+  "conversationWithBlockedUserTitle": "Conversation not reachable",
   "conversationYesterday": "Yesterday",
   "conversationYouAccusative": "you",
   "conversationYouDative": "you",
