@@ -734,9 +734,9 @@ describe('Conversation', () => {
 
       conversation_et.release();
 
-      expect(conversation_et.messages().length).toBe(2);
+      expect(conversation_et.messages().length).toBe(1);
       expect(conversation_et.messages()).toEqual([incomingMessage]);
-      expect(conversation_et.unreadState().allEvents.length).toBe(2);
+      expect(conversation_et.unreadState().allEvents.length).toBe(1);
     });
 
     it('should release messages if conversation has no unread messages', () => {
