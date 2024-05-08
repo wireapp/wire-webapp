@@ -284,7 +284,6 @@ const RightSidebar: FC<RightSidebarProps> = ({
               onBack={onBackClick}
               onClose={closePanel}
               serviceEntity={serviceEntity}
-              userEntity={userServiceEntity}
               selfUser={selfUser}
               isAddMode={isAddMode}
             />

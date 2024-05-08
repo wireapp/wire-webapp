@@ -233,7 +233,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       const serviceEntity = await integrationRepository.getServiceFromUser(entity);
 
       if (serviceEntity) {
-        togglePanel(PanelState.GROUP_PARTICIPANT_SERVICE, {...serviceEntity, id: entity.id});
+        togglePanel(PanelState.GROUP_PARTICIPANT_SERVICE, serviceEntity);
       }
     };
 
