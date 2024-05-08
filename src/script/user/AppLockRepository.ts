@@ -20,6 +20,9 @@
 import sodium from 'libsodium-wrappers';
 import {container, singleton} from 'tsyringe';
 
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {t} from 'Util/LocalizerUtil';
+
 import {AppLockState} from './AppLockState';
 import {UserState} from './UserState';
 
@@ -73,12 +76,31 @@ export class AppLockRepository {
   };
 
   setEnabled = (enabled: boolean) => {
+    const disableFeature = () => {
+      this.appLockState.isActivatedInPreferences(false);
+      window.localStorage.removeItem(this.getEnabledStorageKey());
+    };
     if (enabled) {
       window.localStorage.setItem(this.getEnabledStorageKey(), 'true');
+      this.appLockState.isActivatedInPreferences(true);
+    } else if (this.appLockState.hasPassphrase()) {
+      // If the user has set a passphrase we want to ask confirmation before disabling the feature
+      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
+        primaryAction: {
+          action: disableFeature,
+          text: t('AppLockDisableTurnOff'),
+        },
+        secondaryAction: {
+          text: t('AppLockDisableCancel'),
+        },
+        text: {
+          title: t('ApplockDisableHeadline'),
+          message: t('AppLockDisableInfo'),
+        },
+      });
     } else {
-      window.localStorage.removeItem(this.getEnabledStorageKey());
+      disableFeature();
     }
-    this.appLockState.isActivatedInPreferences(enabled);
   };
 
   setCode = async (code: string): Promise<void> => {

@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2023 Wire Swiss GmbH
+ * Copyright (C) 2024 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,21 +17,32 @@
  *
  */
 
-import {WireIdentity} from '@wireapp/core/lib/messagingProtocols/mls';
+import {css} from '@emotion/react';
 
-import {MLSStatuses} from './E2EIdentityVerification';
+export const baseMarkerStyle = css`
+  height: 48px;
+  padding-top: 8px; // TODO margin top is not working because of collapsing margins
+  margin-bottom: 16px;
+  line-height: 2.5rem;
+  user-select: none;
 
-type CoreStatus = WireIdentity['status'];
-
-export const mapMLSStatus = (status?: CoreStatus) => {
-  const statusMap: Record<any, MLSStatuses> = {
-    Valid: MLSStatuses.VALID,
-    Expired: MLSStatuses.EXPIRED,
-    Revoked: MLSStatuses.REVOKED,
-  };
-
-  if (!status) {
-    return MLSStatuses.NOT_DOWNLOADED;
+  .message-header-icon {
+    max-height: 40px;
   }
-  return statusMap[status];
-};
+
+  .message-header-label {
+    border-bottom: 1px dotted var(--foreground-fade-24);
+  }
+
+  .message-unread-dot {
+    background-color: var(--accent-color);
+  }
+`;
+
+export const dayMarkerStyle = css`
+  border-bottom: 1px solid var(--foreground-fade-24);
+
+  .message-header-label {
+    border: 0;
+  }
+`;

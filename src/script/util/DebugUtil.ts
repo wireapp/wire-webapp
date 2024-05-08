@@ -32,6 +32,7 @@ import {FeatureStatus} from '@wireapp/api-client/lib/team/feature/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {DatabaseKeys} from '@wireapp/core/lib/notification/NotificationDatabaseRepository';
 import Dexie from 'dexie';
+import jquery from 'jquery';
 import keyboardjs from 'keyboardjs';
 import {$createTextNode, $getRoot, LexicalEditor} from 'lexical';
 import {container} from 'tsyringe';
@@ -50,6 +51,7 @@ import {ConversationRepository} from '../conversation/ConversationRepository';
 import {isMLSCapableConversation} from '../conversation/ConversationSelectors';
 import {ConversationState} from '../conversation/ConversationState';
 import type {MessageRepository} from '../conversation/MessageRepository';
+import {E2EIHandler} from '../E2EIdentity';
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 import {EventRepository} from '../event/EventRepository';
@@ -72,7 +74,7 @@ export class DebugUtil {
   private readonly eventRepository: EventRepository;
   private readonly storageRepository: StorageRepository;
   private readonly messageRepository: MessageRepository;
-  public readonly $: JQueryStatic;
+  public readonly $ = jquery;
   /** Used by QA test automation. */
   public readonly userRepository: UserRepository;
   /** Used by QA test automation. */
@@ -88,7 +90,6 @@ export class DebugUtil {
     private readonly core = container.resolve(Core),
     private readonly apiClient = container.resolve(APIClient),
   ) {
-    this.$ = $;
     this.Dexie = Dexie;
 
     const {calling, client, connection, conversation, event, user, storage, message} = repositories;
@@ -275,8 +276,18 @@ export class DebugUtil {
     lexicalEditor.update(() => {
       const root = $getRoot().getLastChild()!;
       const textNode = $createTextNode(text);
-      root.append(textNode);
+      // the "as any" can be removed when this issue is fixed https://github.com/facebook/lexical/issues/5502
+      (root as any).append(textNode);
     });
+  }
+
+  // Used by QA to trigger a focus event on the app (in order to trigger the update of the team feature-config)
+  simulateAppToForeground() {
+    window.dispatchEvent(new FocusEvent('focus'));
+  }
+
+  setE2EICertificateTtl(ttl: number) {
+    E2EIHandler.getInstance().certificateTtl = ttl;
   }
 
   /**

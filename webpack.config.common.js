@@ -131,11 +131,7 @@ module.exports = {
   },
   plugins: [
     new webpack.ProvidePlugin({
-      $: 'jquery',
       Buffer: ['buffer', 'Buffer'],
-      _: 'underscore',
-      jQuery: 'jquery',
-      ko: 'knockout',
     }),
     new WorkboxPlugin.InjectManifest({
       maximumFileSizeToCacheInBytes: process.env.NODE_ENV !== 'production' ? 10 * 1024 * 1024 : undefined,

@@ -74,6 +74,8 @@ export const UserSearchableList: React.FC<UserListProps> = ({
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [remoteTeamMembers, setRemoteTeamMembers] = useState<User[]>([]);
 
+  const filteredSelectedUsers = selectedUsers ? searchRepository.searchUserInSet(filter, selectedUsers) : undefined;
+
   const selfInTeam = teamState.isInTeam(selfUser);
 
   /**
@@ -108,6 +110,7 @@ export const UserSearchableList: React.FC<UserListProps> = ({
           teamRepository.isSelfConnectedTo(user.id) ||
           user.username() === normalizedQuery,
       );
+
     if (normalizedQuery !== '' && selfInTeam && allowRemoteSearch) {
       fetchMembersFromBackend(filter, results);
     }
@@ -160,7 +163,7 @@ export const UserSearchableList: React.FC<UserListProps> = ({
         <UserList
           {...userListProps}
           users={userList}
-          selectedUsers={selectedUsers}
+          selectedUsers={filteredSelectedUsers}
           highlightedUsers={highlightedUsers}
           onSelectUser={toggleUserSelection}
           selfUser={selfUser}

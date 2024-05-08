@@ -46,8 +46,9 @@ describe('message', () => {
       contextMenu: {entries: ko.observable([])},
       conversation: new Conversation(),
       findMessage: jest.fn(),
-      isMessageFocused: true,
+      isFocused: true,
       isLastDeliveredMessage: false,
+      hideHeader: false,
       message,
       onClickAvatar: jest.fn(),
       onClickButton: jest.fn(),
@@ -61,7 +62,6 @@ describe('message', () => {
       onClickDetails: jest.fn(),
       onClickTimestamp: jest.fn(),
       onRetry: jest.fn(),
-      previousMessage: undefined,
       selfId: {domain: '', id: createUuid()},
       isMsgElementsFocusable: true,
     };

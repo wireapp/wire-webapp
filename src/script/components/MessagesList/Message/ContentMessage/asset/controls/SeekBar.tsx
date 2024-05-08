@@ -28,7 +28,7 @@ export interface SeekBarProps extends React.HTMLProps<HTMLDivElement> {
   dark?: boolean;
   ['data-uie-name']?: string;
   disabled?: boolean;
-  mediaElement: HTMLMediaElement;
+  mediaElement: HTMLAudioElement;
   isFocusable?: boolean;
 }
 

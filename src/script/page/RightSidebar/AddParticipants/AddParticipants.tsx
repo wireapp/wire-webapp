@@ -189,6 +189,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
         onClose={onClose}
         title={headerText}
         titleDataUieName="status-people-selected"
+        shouldFocusFirstButton={false}
       />
 
       <div className="panel__content panel__content--fill">
@@ -196,7 +197,6 @@ const AddParticipants: FC<AddParticipantsProps> = ({
           input={searchInput}
           setInput={onSearchInput}
           selectedUsers={selectedContacts}
-          setSelectedUsers={setSelectedContacts}
           placeholder={t('addParticipantsSearchPlaceholder')}
         />
 

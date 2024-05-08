@@ -22,12 +22,14 @@ import type {
   TeamConversationDeleteEvent,
   TeamDeleteEvent,
   TeamEvent,
+  TeamFeatureConfigurationUpdateEvent,
   TeamMemberLeaveEvent,
 } from '@wireapp/api-client/lib/event';
 import {TEAM_EVENT} from '@wireapp/api-client/lib/event/TeamEvent';
 import {FeatureStatus, FeatureList} from '@wireapp/api-client/lib/team/feature/';
 import type {PermissionsData} from '@wireapp/api-client/lib/team/member/PermissionsData';
 import type {TeamData} from '@wireapp/api-client/lib/team/team/TeamData';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
@@ -119,13 +121,14 @@ export class TeamRepository extends TypedEventEmitter<Events> {
    * @param teamId the Id of the team to init
    * @param contacts all the contacts the self user has, team members will be deduced from it.
    */
-  async initTeam(teamId?: string): Promise<{team: TeamEntity | undefined; features: FeatureList}> {
-    // async initTeam(teamId?: string): Promise<{members: QualifiedId[]; features: FeatureList}> {
+  async initTeam(
+    teamId?: string,
+  ): Promise<{team: TeamEntity | undefined; features: FeatureList; members: QualifiedId[]}> {
     const team = await this.getTeam();
     // get the fresh feature config from backend
     const {newFeatureList} = await this.updateFeatureConfig();
     if (!teamId) {
-      return {team: undefined, features: {}};
+      return {team: undefined, features: {}, members: []};
     }
     // Subscribe to team members change and update the user role and guest status
     this.teamState.teamMembers.subscribe(members => {
@@ -138,8 +141,9 @@ export class TeamRepository extends TypedEventEmitter<Events> {
       });
     });
 
+    const members = await this.loadInitialTeamMembers(teamId);
     this.scheduleTeamRefresh();
-    return {team, features: newFeatureList};
+    return {team, features: newFeatureList, members};
   }
 
   private async updateFeatureConfig(): Promise<{newFeatureList: FeatureList; prevFeatureList?: FeatureList}> {
@@ -157,15 +161,39 @@ export class TeamRepository extends TypedEventEmitter<Events> {
   }
 
   private readonly scheduleTeamRefresh = (): void => {
-    window.setInterval(async () => {
+    const updateTeam = async () => {
       try {
         await this.getTeam();
         await this.updateFeatureConfig();
       } catch (error) {
         this.logger.error(error);
       }
-    }, TIME_IN_MILLIS.SECOND * 30);
+    };
+    // We want to poll the latest team data every time the app is focused and every day
+    window.addEventListener('focus', updateTeam);
+    window.setInterval(updateTeam, TIME_IN_MILLIS.DAY);
   };
+
+  private async getInitialTeamMembers(teamId: string): Promise<TeamMemberEntity[]> {
+    const {members} = await this.teamService.getAllTeamMembers(teamId);
+    return this.teamMapper.mapMembers(members);
+  }
+
+  /**
+   * will load the first 2000 team members in order to fill the initial state of the team
+   * This way a new user won't end up with an empty list of team members
+   * @param teamId
+   */
+  private async loadInitialTeamMembers(teamId: string): Promise<QualifiedId[]> {
+    const teamMembers = await this.getInitialTeamMembers(teamId);
+    this.teamState.memberRoles({});
+    this.teamState.memberInviters({});
+
+    this.updateMemberRoles(teamMembers);
+    return teamMembers
+      .filter(({userId}) => userId !== this.userState.self().id)
+      .map(memberEntity => ({domain: this.teamState.teamDomain() ?? '', id: memberEntity.userId}));
+  }
 
   async getTeam(): Promise<TeamEntity> {
     const teamId = this.userState.self().teamId;
@@ -205,7 +233,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     const teamUsers = users.filter(user => user.teamId === selfTeamId);
     const newTeamMembers = teamUsers.filter(user => !knownMemberIds.includes(user.id));
     const newTeamMemberIds = newTeamMembers.map(({id}) => id);
-    await this.updateTeamMembersByIds(this.teamState.team(), newTeamMemberIds, true);
+    await this.updateTeamMembersByIds(selfTeamId, newTeamMemberIds, true);
   };
 
   async filterExternals(users: User[]): Promise<User[]> {
@@ -250,6 +278,10 @@ export class TeamRepository extends TypedEventEmitter<Events> {
       }
       case TEAM_EVENT.MEMBER_LEAVE: {
         this.onMemberLeave(eventJson);
+        break;
+      }
+      case TEAM_EVENT.FEATURE_CONFIG_UPDATE: {
+        await this.onFeatureConfigUpdate(eventJson, source);
         break;
       }
       case TEAM_EVENT.CONVERSATION_CREATE:
@@ -301,12 +333,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     }
   }
 
-  async updateTeamMembersByIds(teamEntity: TeamEntity, memberIds: string[] = [], append = false): Promise<void> {
-    const teamId = teamEntity.id;
-    if (!teamId) {
-      return;
-    }
-
+  async updateTeamMembersByIds(teamId: string, memberIds: string[] = [], append = false): Promise<void> {
     const members = await this.teamService.getTeamMembersByIds(teamId, memberIds);
     const mappedMembers = this.teamMapper.mapMembers(members);
     const selfId = this.userState.self().id;
@@ -347,6 +374,19 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     if (shouldFetchConfig) {
       await this.updateFeatureConfig();
     }
+  };
+
+  private readonly onFeatureConfigUpdate = async (
+    event: TeamFeatureConfigurationUpdateEvent,
+    source: EventSource,
+  ): Promise<void> => {
+    if (source !== EventSource.WEBSOCKET) {
+      // Ignore notification stream events
+      return;
+    }
+
+    // When we receive a `feature-config.update` event, we will refetch the entire feature config
+    await this.updateFeatureConfig();
   };
 
   private onMemberLeave(eventJson: TeamMemberLeaveEvent): void {

@@ -19,22 +19,17 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {DeviceIdentity} from '@wireapp/core/lib/messagingProtocols/mls';
+import {StringifiedQualifiedId, stringifyQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 import {container} from 'tsyringe';
 
 import {Core} from 'src/script/service/CoreSingleton';
 import {base64ToArray} from 'Util/util';
 
-import {mapMLSStatus} from './certificateDetails';
+import {mapMLSStatus, MLSStatuses} from './mlsStatus';
 
 import {ConversationState} from '../conversation/ConversationState';
 
-export enum MLSStatuses {
-  VALID = 'valid',
-  NOT_DOWNLOADED = 'not_downloaded',
-  EXPIRED = 'expired',
-  EXPIRES_SOON = 'expires_soon',
-  REVOKED = 'revoked',
-}
+export {MLSStatuses};
 
 export type WireIdentity = Omit<DeviceIdentity, 'status'> & {
   status: MLSStatuses;
@@ -48,12 +43,22 @@ export function getE2EIdentityService() {
   return e2eIdentityService;
 }
 
-function mapUserIdentities(userVerifications: Map<string, DeviceIdentity[]>): Map<string, WireIdentity[]> {
-  const mappedUsers = new Map<string, WireIdentity[]>();
+export function getCoreConversationService() {
+  const conversationService = container.resolve(Core).service?.conversation;
+  if (!conversationService) {
+    throw new Error('Conversation service not available');
+  }
+  return conversationService;
+}
 
-  for (const [userId, identities] of userVerifications.entries()) {
+function mapUserIdentities(
+  userVerifications: Map<StringifiedQualifiedId, DeviceIdentity[]>,
+): Map<StringifiedQualifiedId, WireIdentity[]> {
+  const mappedUsers = new Map<StringifiedQualifiedId, WireIdentity[]>();
+
+  for (const [stringifiedQualifiedId, identities] of userVerifications.entries()) {
     mappedUsers.set(
-      userId,
+      stringifiedQualifiedId,
       identities.map(identity => ({...identity, status: mapMLSStatus(identity.status)})),
     );
   }
@@ -63,12 +68,12 @@ function mapUserIdentities(userVerifications: Map<string, DeviceIdentity[]>): Ma
 
 export async function getUsersIdentities(groupId: string, userIds: QualifiedId[]) {
   const userVerifications = await getE2EIdentityService().getUsersIdentities(groupId, userIds);
-  return mapUserIdentities(userVerifications);
+  return userVerifications && mapUserIdentities(userVerifications);
 }
 
 export async function getAllGroupUsersIdentities(groupId: string) {
   const userVerifications = await getE2EIdentityService().getAllGroupUsersIdentities(groupId);
-  return mapUserIdentities(userVerifications);
+  return userVerifications && mapUserIdentities(userVerifications);
 }
 
 export async function getConversationVerificationState(groupId: string) {
@@ -78,15 +83,30 @@ export async function getConversationVerificationState(groupId: string) {
 /**
  * Checks if E2EI has active certificate.
  */
-const fetchSelfDeviceIdentity = async (): Promise<WireIdentity | undefined> => {
+const getSelfDeviceIdentity = async (): Promise<WireIdentity | undefined> => {
   const conversationState = container.resolve(ConversationState);
-  const selfMLSConversation = conversationState.getSelfMLSConversation();
-  const userIdentities = await getAllGroupUsersIdentities(selfMLSConversation.groupId);
-  const currentClientId = selfMLSConversation.selfUser()?.localClient?.id;
-  const userId = selfMLSConversation.selfUser()?.id;
+
+  // Try to get the self MLS conversation from the conversation state
+  // If the conversation state is not available, try to get the self MLS conversation from backend
+  const selfMLSConversationGroupId =
+    conversationState.selfMLSConversation()?.groupId ??
+    (await getCoreConversationService().getMLSSelfConversation()).group_id;
+
+  const userIdentities = await getAllGroupUsersIdentities(selfMLSConversationGroupId);
+
+  if (!userIdentities) {
+    return undefined;
+  }
+
+  const core = container.resolve(Core);
+
+  const currentClientId = core.clientId;
+  const userId = {id: core.userId, domain: core.backendFeatures.domain};
 
   if (userId && currentClientId) {
-    const identity = userIdentities.get(userId)?.find(identity => identity.deviceId === currentClientId);
+    const identity = userIdentities
+      .get(stringifyQualifiedId(userId))
+      ?.find(identity => identity.deviceId === currentClientId);
     return identity;
   }
   return undefined;
@@ -98,7 +118,7 @@ export async function hasActiveCertificate(): Promise<boolean> {
 }
 
 export async function getActiveWireIdentity(): Promise<WireIdentity | undefined> {
-  const selfDeviceIdentity = await fetchSelfDeviceIdentity();
+  const selfDeviceIdentity = await getSelfDeviceIdentity();
 
   if (!selfDeviceIdentity) {
     return undefined;

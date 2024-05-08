@@ -85,6 +85,20 @@
   }
 }
 
+.content-message {
+  &:has(.message-header) {
+    padding-top: 6px;
+  }
+}
+
+.system-message {
+  padding-block: 8px;
+
+  &:has(.message-timestamp) + .system-message {
+    padding-top: 0;
+  }
+}
+
 @keyframes marked-animation {
   to {
     background-color: inherit;
@@ -92,6 +106,8 @@
 }
 
 .content-message-wrapper {
+  padding-block: 6px;
+
   &:hover,
   &:focus-visible {
     background-color: #fff;
@@ -124,8 +140,6 @@
   position: relative;
   display: flex;
   width: 100%;
-  padding-top: 6px;
-  margin-bottom: 2px;
   line-height: @avatar-diameter-xs;
 
   & > .message-body-actions {
@@ -135,12 +149,17 @@
   + .message-services-warning {
     margin-left: 72px;
   }
+
+  + .message-body .message-asset {
+    padding-top: 6px;
+  }
 }
 
 .message-header-icon {
   .flex-center;
-  width: @conversation-message-sender-width;
+  width: var(--conversation-message-sender-width);
   max-height: @avatar-diameter-xs;
+  flex-shrink: 0;
 
   align-self: center;
   color: var(--background);
@@ -164,6 +183,7 @@
 
   &--verification {
     display: inline;
+    flex: 1;
   }
 
   a {
@@ -244,55 +264,6 @@
   height: 16px;
 }
 
-// MESSAGE - TIMESTAMP
-.message-timestamp {
-  height: 48px;
-  padding-top: 8px; // TODO margin top is not working because of collapsing margins
-  border-bottom: 1px solid @separator-color;
-  margin-bottom: 16px;
-  line-height: 2.5rem;
-  user-select: none;
-
-  .message-header-icon {
-    max-height: 40px;
-  }
-
-  .message-unread-dot {
-    .dot-md;
-    background-color: var(--accent-color);
-  }
-
-  &:not(.message-timestamp-unread) {
-    .message-unread-dot {
-      display: none;
-    }
-  }
-
-  &:not(.message-timestamp-day) {
-    border: 0;
-
-    .message-header-label {
-      border-bottom: 1px dotted @separator-color;
-    }
-  }
-
-  time[data-timestamp-type='normal'] {
-    display: block;
-  }
-  time[data-timestamp-type='day'] {
-    display: none;
-  }
-}
-
-.message-timestamp-day {
-  time[data-timestamp-type='normal'] {
-    display: none;
-  }
-  time[data-timestamp-type='day'] {
-    display: block;
-  }
-}
-
 .message-wrapper {
   outline-offset: -0.1rem;
 }
@@ -304,20 +275,16 @@
 // MESSAGE - BODY
 .message-body {
   position: relative;
-  display: flex;
-  max-width: @conversation-max-width;
-  justify-content: space-between;
-  padding-left: @conversation-message-sender-width;
-  padding-block: 4px;
+  padding-right: 40px;
+  padding-left: var(--conversation-message-sender-width);
 
-  &-content {
-    width: 100%;
-    max-width: calc(@conversation-max-width - var(--conversation-message-sender-width));
-    height: fit-content;
+  .text:has(> .iframe-container) {
+    margin-right: 0;
+  }
 
-    .text:has(> .iframe-container) {
-      margin-right: 0;
-    }
+  &:not(&.message-quoted):has(.message-quote__text--full pre) {
+    display: flex;
+    flex-wrap: wrap;
   }
 
   .text {
@@ -326,7 +293,6 @@
 
     display: inline;
     min-width: 0;
-    margin-right: 12px;
     line-height: @line-height-lg;
     white-space: pre-wrap;
     word-wrap: break-word;
@@ -382,7 +348,6 @@
 .image-asset {
   position: relative;
   display: flex;
-  max-width: var(--conversation-message-asset-width);
   cursor: pointer;
 
   &--no-image {
@@ -394,16 +359,11 @@
     fill: white;
   }
 
-  .image-element {
-    position: relative;
-    max-width: 100%;
-    max-height: 80vh;
-
-    &.image-ephemeral {
-      cursor: default;
-      opacity: 0;
-    }
+  .image-ephemeral {
+    cursor: default;
+    opacity: 0;
   }
+
   .asset-loader {
     position: absolute;
     z-index: 1;
@@ -562,7 +522,7 @@
 .message-group-creation-header,
 .message-member-footer {
   padding-top: 16px;
-  margin-left: 54px;
+  margin-left: var(--conversation-message-sender-width);
   font-size: @font-size-small;
   font-weight: @font-weight-regular;
 }
@@ -721,8 +681,9 @@
 // MESSAGE SPACING
 .message-asset {
   display: flex;
+  flex-basis: 100%;
   align-items: flex-start;
-  margin-bottom: 4px;
+  padding-block: 6px;
 }
 
 .message-call,

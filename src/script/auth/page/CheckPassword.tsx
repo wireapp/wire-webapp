@@ -106,6 +106,7 @@ const CheckPasswordComponent = ({
         }
         case BackendErrorLabel.INVALID_CREDENTIALS:
         case LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE:
+        case LabeledError.GENERAL_ERRORS.SYSTEM_KEYCHAIN_ACCESS:
         case BackendErrorLabel.BAD_REQUEST: {
           setError(error);
           return;

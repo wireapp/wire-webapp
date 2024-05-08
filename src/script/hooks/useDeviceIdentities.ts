@@ -20,6 +20,7 @@
 import {useCallback, useEffect, useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {stringifyQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 
 import {E2EIHandler, getUsersIdentities, MLSStatuses, WireIdentity} from '../E2EIdentity';
 
@@ -30,9 +31,14 @@ export const useUserIdentity = (userId: QualifiedId, groupId?: string, updateAft
     if (!E2EIHandler.getInstance().isE2EIEnabled() || !groupId) {
       return;
     }
-    const userIdentities = await getUsersIdentities(groupId, [userId]);
-    setDeviceIdentities(userIdentities.get(userId.id) ?? []);
-  }, [userId.id, groupId]);
+
+    const qualifiedId: QualifiedId = {id: userId.id, domain: userId.domain};
+    const userIdentities = await getUsersIdentities(groupId, [qualifiedId]);
+    setDeviceIdentities(userIdentities?.get(stringifyQualifiedId(qualifiedId)) ?? undefined);
+    /**
+     * Dont check the userId directly, as it is a object that changes on every render, will cause infinite loop
+     */
+  }, [userId.id, userId.domain, groupId]);
 
   useEffect(() => {
     void refreshDeviceIdentities();
@@ -42,9 +48,9 @@ export const useUserIdentity = (userId: QualifiedId, groupId?: string, updateAft
     if (!updateAfterEnrollment) {
       return () => {};
     }
-    E2EIHandler.getInstance().on('identityUpdated', refreshDeviceIdentities);
+    E2EIHandler.getInstance().on('deviceStatusUpdated', refreshDeviceIdentities);
     return () => {
-      E2EIHandler.getInstance().off('identityUpdated', refreshDeviceIdentities);
+      E2EIHandler.getInstance().off('deviceStatusUpdated', refreshDeviceIdentities);
     };
   }, [refreshDeviceIdentities, updateAfterEnrollment]);
 
@@ -55,7 +61,7 @@ export const useUserIdentity = (userId: QualifiedId, groupId?: string, updateAft
       ? undefined
       : deviceIdentities.length > 0 && deviceIdentities.every(identity => identity.status === MLSStatuses.VALID)
         ? MLSStatuses.VALID
-        : MLSStatuses.NOT_DOWNLOADED,
+        : MLSStatuses.NOT_ACTIVATED,
 
     getDeviceIdentity:
       deviceIdentities !== undefined

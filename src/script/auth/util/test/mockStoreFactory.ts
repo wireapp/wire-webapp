@@ -18,7 +18,7 @@
  */
 
 import configureStore from 'redux-mock-store';
-import thunk from 'redux-thunk';
+import {withExtraArgument} from 'redux-thunk';
 
 import {APIClient} from '@wireapp/api-client';
 import type {TypeUtil} from '@wireapp/commons';
@@ -65,12 +65,12 @@ export const mockStoreFactory = (
     (core as any).apiClient = apiClient;
   }
   return configureStore<TypeUtil.RecursivePartial<RootState>, ThunkDispatch>([
-    thunk.withExtraArgument({
+    withExtraArgument({
       actions,
       apiClient,
       core,
       getConfig: getConfig || defaultGetConfig,
       localStorage,
-    }),
+    }) as any,
   ]);
 };

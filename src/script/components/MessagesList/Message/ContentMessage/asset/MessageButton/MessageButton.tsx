@@ -17,15 +17,13 @@
  *
  */
 
-import React from 'react';
-
 import classNames from 'classnames';
 
 import {Icon} from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {noop} from 'Util/util';
 
-import type {CompositeMessage} from '../../../../../entity/message/CompositeMessage';
+import type {CompositeMessage} from '../../../../../../entity/message/CompositeMessage';
 
 export interface MessageButtonProps {
   id: string;
@@ -34,7 +32,7 @@ export interface MessageButtonProps {
   onClick?: () => void;
 }
 
-const MessageButton: React.FC<MessageButtonProps> = ({id, label, message, onClick = noop}) => {
+export const MessageButton = ({id, label, message, onClick = noop}: MessageButtonProps) => {
   const {errorButtonId, errorMessage, selectedButtonId, waitingButtonId} = useKoSubscribableChildren(message, [
     'errorButtonId',
     'errorMessage',
@@ -60,6 +58,7 @@ const MessageButton: React.FC<MessageButtonProps> = ({id, label, message, onClic
         data-uie-waiting={isWaiting}
       >
         <span>{label}</span>
+
         <div
           className={classNames('message-button__waiting-overlay', {
             'message-button__waiting-overlay--visible': isWaiting,
@@ -68,6 +67,7 @@ const MessageButton: React.FC<MessageButtonProps> = ({id, label, message, onClic
           <Icon.Loading data-uie-name="message-button-loading-icon" />
         </div>
       </button>
+
       {hasError && errorMessage && (
         <div className="message-button__error" data-uie-name="message-button-error">
           {errorMessage}
@@ -76,5 +76,3 @@ const MessageButton: React.FC<MessageButtonProps> = ({id, label, message, onClic
     </>
   );
 };
-
-export {MessageButton};

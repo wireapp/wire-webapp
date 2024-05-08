@@ -19,26 +19,42 @@
 
 .message-button {
   position: relative;
+  display: block;
   overflow: hidden;
   width: 100%;
-  max-width: 287px;
-  padding: 16px;
-  border: 1px solid @w-red;
+  max-width: 400px;
+  padding: 12px;
+
+  border: 1px solid var(--border-color);
   border-radius: 6px;
+
   margin-top: 8px;
-  background-color: transparent;
-  color: @w-red;
-  font-size: @font-size-xs;
-  font-weight: @font-weight-bold;
-  line-height: 1.45;
+
+  background-color: var(--app-bg);
+  color: var(--main-color);
+  font-size: 1rem;
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--font-size-lg);
   outline: none;
-  text-align: start;
-  text-transform: uppercase;
+  text-align: center;
   transition: all 0.1s linear;
 
+  &:focus,
+  &:hover {
+    border-color: var(--button-primary-active-border);
+    color: var(--accent-color);
+  }
+
   &--selected {
-    background-color: @w-red;
-    color: white;
+    border-color: var(--button-primary-active-border);
+    background-color: var(--button-primary-active-bg);
+    color: var(--accent-color);
+
+    &:focus,
+    &:hover {
+      border-color: var(--accent-color);
+      background-color: var(--button-primary-active-bg);
+    }
   }
 
   &__waiting-overlay {
@@ -59,11 +75,10 @@
       opacity 0.2s ease-in-out;
 
     svg {
-      fill: @w-red;
+      fill: var(--accent-color);
     }
 
     &--visible {
-      background-color: var(--app-bg);
       opacity: 0.9;
       transform: translateX(0);
       transition: all 0.2s ease-in-out;
@@ -73,7 +88,5 @@
   &__error {
     margin-top: 4px;
     color: @w-red;
-    font-size: @font-size-xs;
-    font-weight: @font-weight-regular;
   }
 }

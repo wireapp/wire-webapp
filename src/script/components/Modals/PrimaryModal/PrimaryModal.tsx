@@ -425,6 +425,7 @@ export const PrimaryModalComponent: FC = () => {
                   </label>
 
                   <input
+                    ref={ref => ref?.focus()}
                     maxLength={64}
                     className="modal__input"
                     id="modal-input"

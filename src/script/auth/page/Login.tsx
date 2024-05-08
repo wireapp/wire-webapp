@@ -25,7 +25,6 @@ import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api
 import {StatusCodes} from 'http-status-codes';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
-import {Navigate} from 'react-router';
 import {useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
 
@@ -64,6 +63,7 @@ import {Page} from './Page';
 import {Config} from '../../Config';
 import {loginStrings, verifyStrings} from '../../strings';
 import {AppAlreadyOpen} from '../component/AppAlreadyOpen';
+import {Exception} from '../component/Exception';
 import {JoinGuestLinkPasswordModal} from '../component/JoinGuestLinkPasswordModal';
 import {LoginForm} from '../component/LoginForm';
 import {RouterLink} from '../component/RouterLink';
@@ -111,7 +111,6 @@ const LoginComponent = ({
   const [conversationKey, setConversationKey] = useState<string | null>(null);
   const [conversationSubmitData, setConversationSubmitData] = useState<Partial<LoginData> | null>(null);
   const [isLinkPasswordModalOpen, setIsLinkPasswordModalOpen] = useState<boolean>(false);
-  const [isValidLink, setIsValidLink] = useState(true);
   const [validationErrors, setValidationErrors] = useState<Error[]>([]);
 
   const [twoFactorSubmitError, setTwoFactorSubmitError] = useState<string | Error>('');
@@ -163,14 +162,11 @@ const LoginComponent = ({
     if (keyAndCodeExistent) {
       setConversationCode(queryConversationCode);
       setConversationKey(queryConversationKey);
-      setIsValidLink(true);
       doCheckConversationCode(queryConversationKey, queryConversationCode).catch(error => {
         logger.warn('Invalid conversation code', error);
-        setIsValidLink(false);
       });
       doGetConversationInfoByCode(queryConversationKey, queryConversationCode).catch(error => {
         logger.warn('Failed to fetch conversation info', error);
-        setIsValidLink(false);
       });
     }
   }, []);
@@ -234,6 +230,7 @@ const LoginComponent = ({
           await doLoginAndJoin(login, conversationKey, conversationCode, undefined, getEntropy, conversationPassword);
         } catch (error) {
           if (isBackendError(error) && error.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD) {
+            await resetAuthError();
             setConversationSubmitData(formLoginData);
             setIsLinkPasswordModalOpen(true);
             return;
@@ -288,7 +285,8 @@ const LoginComponent = ({
           }
           case BackendErrorLabel.INVALID_CREDENTIALS:
           case BackendErrorLabel.ACCOUNT_SUSPENDED:
-          case LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE: {
+          case LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE:
+          case LabeledError.GENERAL_ERRORS.SYSTEM_KEYCHAIN_ACCESS: {
             break;
           }
           default: {
@@ -361,7 +359,6 @@ const LoginComponent = ({
         <EntropyContainer onSetEntropy={storeEntropy} />
       ) : (
         <Container centerText verticalCenter style={{width: '100%'}}>
-          {!isValidLink && <Navigate to={ROUTE.CONVERSATION_JOIN_INVALID} replace />}
           {!embedded && <AppAlreadyOpen />}
           {isLinkPasswordModalOpen && (
             <JoinGuestLinkPasswordModal
@@ -442,7 +439,7 @@ const LoginComponent = ({
                         {validationErrors.length ? (
                           parseValidationErrors(validationErrors)
                         ) : authError ? (
-                          parseError(authError)
+                          <Exception errors={[authError]} />
                         ) : (
                           <div style={{marginTop: '4px'}}>&nbsp;</div>
                         )}

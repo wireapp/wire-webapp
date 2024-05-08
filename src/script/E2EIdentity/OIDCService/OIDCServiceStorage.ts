@@ -26,9 +26,6 @@ const OIDCServiceStore = {
   get: {
     targetURL: () => localStorage.getItem(TargetURLKey),
   },
-  has: {
-    targetURL: () => localStorage.getItem(TargetURLKey) !== null,
-  },
   clear: {
     targetURL: () => localStorage.removeItem(TargetURLKey),
     all: () => {

@@ -24,7 +24,7 @@ import {
   ConversationOtrMessageAddEvent,
 } from '@wireapp/api-client/lib/event';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
-import {AddUsersFailureReasons} from '@wireapp/core/lib/conversation';
+import {AddUsersFailure} from '@wireapp/core/lib/conversation';
 import {ReactionType} from '@wireapp/core/lib/conversation/ReactionType';
 import {DecryptionError} from '@wireapp/core/lib/errors/DecryptionError';
 
@@ -218,14 +218,7 @@ export type CallingTimeoutEvent = ConversationEvent<
   CONVERSATION.CALL_TIME_OUT,
   {reason: AVS_REASON.NOONE_JOINED | AVS_REASON.EVERYONE_LEFT}
 >;
-export type FailedToAddUsersMessageEvent = ConversationEvent<
-  CONVERSATION.FAILED_TO_ADD_USERS,
-  {
-    qualifiedIds: QualifiedId[];
-    reason: AddUsersFailureReasons;
-    backends: string[];
-  }
->;
+export type FailedToAddUsersMessageEvent = ConversationEvent<CONVERSATION.FAILED_TO_ADD_USERS, AddUsersFailure[]>;
 
 export interface ErrorEvent
   extends ConversationEvent<CONVERSATION.UNABLE_TO_DECRYPT | CONVERSATION.INCOMING_MESSAGE_TOO_BIG> {
@@ -373,17 +366,13 @@ export const EventBuilder = {
   },
 
   buildFailedToAddUsersEvent(
-    failedToAdd: {users: QualifiedId[]; reason: AddUsersFailureReasons; backends: string[]},
+    failedToAdd: AddUsersFailure[],
     conversation: Conversation,
     userId: string,
   ): FailedToAddUsersMessageEvent {
     return {
       ...buildQualifiedId(conversation),
-      data: {
-        qualifiedIds: failedToAdd.users,
-        reason: failedToAdd.reason,
-        backends: failedToAdd.backends,
-      },
+      data: failedToAdd,
       from: userId,
       id: createUuid(),
       time: conversation.getNextIsoDate(),

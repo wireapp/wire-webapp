@@ -112,7 +112,7 @@ export const DeviceDetails = ({
 
   return (
     <div className={cx('participant-devices__header', {'participant-devices__header--padding': !noPadding})}>
-      {deviceIdentity && <MLSDeviceDetails identity={deviceIdentity} />}
+      {deviceIdentity && <MLSDeviceDetails identity={deviceIdentity} isSelfUser={user.isMe} />}
 
       <div className="device-proteus-details">
         <h3 className="device-details-title paragraph-body-3">{t('participantDevicesProteusDeviceVerification')}</h3>

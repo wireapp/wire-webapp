@@ -162,6 +162,7 @@ export class AudioRepository {
           this.logger.error(`Failed to play sound '${audioId}': ${error.message}`);
           throw error;
         }
+        break;
 
       case AUDIO_PLAY_PERMISSION.DISALLOWED_BY_MUTE_STATE:
         this.logger.debug(`Playing '${audioId}' was disallowed by mute state`);

@@ -20,35 +20,31 @@
 import {useCallback, useEffect, useState} from 'react';
 
 import {CallingRepository} from '../calling/CallingRepository';
-import {E2EIHandler, EnrollmentConfig, WireIdentity} from '../E2EIdentity';
-import {shouldEnableSoftLock} from '../E2EIdentity/SnoozableTimer/delay';
+import {E2EIHandler, E2EIDeviceStatus} from '../E2EIdentity';
 import {NotificationRepository} from '../notification/NotificationRepository';
 
 export function useAppSoftLock(callingRepository: CallingRepository, notificationRepository: NotificationRepository) {
   const [softLockEnabled, setSoftLockEnabled] = useState(false);
 
-  const handleSoftLockActivation = useCallback(
-    async ({enrollmentConfig, identity}: {enrollmentConfig: EnrollmentConfig; identity?: WireIdentity}) => {
-      const isSoftLockEnabled = await shouldEnableSoftLock(enrollmentConfig, identity);
-
-      setSoftLockEnabled(isSoftLockEnabled);
-      callingRepository.setSoftLock(isSoftLockEnabled);
-      notificationRepository.setSoftLock(isSoftLockEnabled);
+  const handleDeviceStatusChange = useCallback(
+    ({status}: {status: E2EIDeviceStatus}) => {
+      // If the identity was updated we can unlock the app
+      const shouldLock = status === 'locked';
+      setSoftLockEnabled(shouldLock);
+      callingRepository.setSoftLock(shouldLock);
+      notificationRepository.setSoftLock(shouldLock);
     },
     [callingRepository, notificationRepository],
   );
 
   useEffect(() => {
     const e2eiHandler = E2EIHandler.getInstance();
-    if (!e2eiHandler.isE2EIEnabled()) {
-      return () => {};
-    }
 
-    e2eiHandler.on('identityUpdated', handleSoftLockActivation);
+    e2eiHandler.on('deviceStatusUpdated', handleDeviceStatusChange);
     return () => {
-      e2eiHandler.off('identityUpdated', handleSoftLockActivation);
+      e2eiHandler.off('deviceStatusUpdated', handleDeviceStatusChange);
     };
-  }, [handleSoftLockActivation]);
+  }, [handleDeviceStatusChange]);
 
   return {softLockEnabled};
 }

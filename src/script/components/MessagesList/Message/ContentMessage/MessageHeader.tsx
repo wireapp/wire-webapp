@@ -17,6 +17,8 @@
  *
  */
 
+import {Tooltip} from '@wireapp/react-ui-kit';
+
 import {AVATAR_SIZE, Avatar} from 'Components/Avatar';
 import {Icon} from 'Components/Icon';
 import {UserName} from 'Components/UserName';
@@ -49,33 +51,25 @@ function BadgeSection({sender}: {sender: User}) {
       )}
 
       {sender.isExternal() && (
-        <span
-          className="message-header-icon-external with-tooltip with-tooltip--external"
-          data-tooltip={t('rolePartner')}
-          data-uie-name="sender-external"
-        >
+        <Tooltip body={t('rolePartner')} data-uie-name="sender-external" className="message-header-icon-external">
           <Icon.External />
-        </span>
+        </Tooltip>
       )}
 
       {sender.isFederated && (
-        <span
-          className="message-header-icon-guest with-tooltip with-tooltip--external"
-          data-tooltip={sender.handle}
-          data-uie-name="sender-federated"
-        >
+        <Tooltip className="message-header-icon-guest" body={sender.handle} data-uie-name="sender-federated">
           <Icon.Federation />
-        </span>
+        </Tooltip>
       )}
 
       {sender.isDirectGuest() && !sender.isFederated && (
-        <span
-          className="message-header-icon-guest with-tooltip with-tooltip--external"
-          data-tooltip={t('conversationGuestIndicator')}
+        <Tooltip
+          className="message-header-icon-guest"
+          body={t('conversationGuestIndicator')}
           data-uie-name="sender-guest"
         >
           <Icon.Guest />
-        </span>
+        </Tooltip>
       )}
     </>
   );

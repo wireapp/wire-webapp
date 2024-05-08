@@ -34,6 +34,7 @@ import type {EventRecord} from '../../../storage';
 import {CONVERSATION} from '../../Client';
 import {EventMiddleware, IncomingEvent} from '../../EventProcessor';
 import {EventService} from '../../EventService';
+import {EventSource} from '../../EventSource';
 import {eventShouldBeStored} from '../../EventTypeHandling';
 
 export class EventStorageMiddleware implements EventMiddleware {
@@ -43,7 +44,7 @@ export class EventStorageMiddleware implements EventMiddleware {
     private readonly conversationState: ConversationState = container.resolve(ConversationState),
   ) {}
 
-  async processEvent(event: IncomingEvent) {
+  async processEvent(event: IncomingEvent, source: EventSource) {
     const shouldSaveEvent = eventShouldBeStored(event);
     if (!shouldSaveEvent) {
       return event;
@@ -57,7 +58,7 @@ export class EventStorageMiddleware implements EventMiddleware {
     const duplicateEvent = eventId ? await this.eventService.loadEvent(event.conversation, eventId) : undefined;
 
     // We first validate that the event is valid
-    this.validateEvent(event, duplicateEvent);
+    this.validateEvent(event, source, duplicateEvent);
     // Then ask the different handlers which DB operations to perform
     const operation = await this.getDbOperation(event, duplicateEvent);
     // And finally execute the operation
@@ -79,10 +80,10 @@ export class EventStorageMiddleware implements EventMiddleware {
     return {type: 'insert', event};
   }
 
-  private validateEvent(event: HandledEvents, duplicateEvent?: EventRecord) {
-    if (event.type === CONVERSATION_EVENT.MEMBER_LEAVE) {
+  private validateEvent(event: HandledEvents, source: EventSource, duplicateEvent?: EventRecord) {
+    if (event.type === CONVERSATION_EVENT.MEMBER_LEAVE && source !== EventSource.NOTIFICATION_STREAM) {
       /*
-        When we receive a `member-leave` event,
+        When we receive a `member-leave` event that is not from the notification stream
         we should check that the user is actually still part of the
         conversation before forwarding the event. If the user is already not part
         of the conversation, then we can throw a validation error
@@ -101,7 +102,7 @@ export class EventStorageMiddleware implements EventMiddleware {
 
       const usersNotPartofConversation = qualifiedUserIds.reduce((acc, qualifiedUserId) => {
         const isDeleted = conversation
-          .getAllUserEntities()
+          .allUserEntities()
           .find(user => matchQualifiedIds(user.qualifiedId, qualifiedUserId))?.isDeleted;
 
         const isParticipant = UserFilter.isParticipant(conversation, qualifiedUserId);

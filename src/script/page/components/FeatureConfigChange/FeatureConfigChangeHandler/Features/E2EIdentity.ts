@@ -19,14 +19,17 @@
 
 import {FeatureStatus, FEATURE_KEY, FeatureList} from '@wireapp/api-client/lib/team';
 
-import {Config} from 'src/script/Config';
 import {E2EIHandler} from 'src/script/E2EIdentity';
 import {Logger} from 'Util/Logger';
 import {supportsMLS} from 'Util/util';
 
 import {hasE2EIVerificationExpiration, hasMLSDefaultProtocol} from '../../../../../guards/Protocol';
 
-export const configureE2EI = (logger: Logger, config: FeatureList): undefined | Promise<E2EIHandler> => {
+export const getE2EIConfig = (config: FeatureList): FeatureList[FEATURE_KEY.MLSE2EID] | undefined => {
+  if (!supportsMLS()) {
+    return undefined;
+  }
+
   const e2eiConfig = config[FEATURE_KEY.MLSE2EID];
   const mlsConfig = config[FEATURE_KEY.MLS];
   // Check if MLS or MLS E2EIdentity feature is existent
@@ -34,28 +37,30 @@ export const configureE2EI = (logger: Logger, config: FeatureList): undefined | 
     return undefined;
   }
 
-  if (!supportsMLS() && Config.getConfig().FEATURE.ENABLE_E2EI) {
+  // Check if E2EIdentity feature is enabled
+  if (e2eiConfig?.status !== FeatureStatus.ENABLED) {
     return undefined;
   }
 
-  // Check if E2EIdentity feature is enabled
-  if (e2eiConfig?.status === FeatureStatus.ENABLED) {
-    // Check if MLS feature is enabled
-    if (mlsConfig?.status !== FeatureStatus.ENABLED) {
-      logger.info('Warning: E2EIdentity feature enabled but MLS feature is not active');
-      return undefined;
-    }
-    // Check if E2EIdentity feature has a server discoveryUrl
-    if (!e2eiConfig.config || !e2eiConfig.config.acmeDiscoveryUrl || e2eiConfig.config.acmeDiscoveryUrl.length <= 0) {
-      logger.info('Warning: E2EIdentity feature enabled but no discoveryUrl provided');
-      return undefined;
-    }
-
-    // Either get the current E2EIdentity handler instance or create a new one
-    return E2EIHandler.getInstance().initialize({
-      discoveryUrl: e2eiConfig.config.acmeDiscoveryUrl!,
-      gracePeriodInSeconds: e2eiConfig.config.verificationExpiration,
-    });
+  // Check if MLS feature is enabled
+  if (mlsConfig?.status !== FeatureStatus.ENABLED) {
+    return undefined;
   }
-  return undefined;
+  // Check if E2EIdentity feature has a server discoveryUrl
+  if (!e2eiConfig.config || !e2eiConfig.config.acmeDiscoveryUrl || e2eiConfig.config.acmeDiscoveryUrl.length <= 0) {
+    return undefined;
+  }
+  return e2eiConfig;
+};
+
+export const configureE2EI = (logger: Logger, config: FeatureList): undefined | Promise<E2EIHandler> => {
+  // Either get the current E2EIdentity handler instance or create a new one
+  const e2eiConfig = getE2EIConfig(config);
+  if (!e2eiConfig) {
+    return undefined;
+  }
+  return E2EIHandler.getInstance().initialize({
+    discoveryUrl: e2eiConfig.config.acmeDiscoveryUrl!,
+    gracePeriodInSeconds: e2eiConfig.config.verificationExpiration,
+  });
 };

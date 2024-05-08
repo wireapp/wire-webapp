@@ -59,7 +59,6 @@ import {ConnectionService} from '../connection/ConnectionService';
 import {ConversationRepository} from '../conversation/ConversationRepository';
 import {ConversationService} from '../conversation/ConversationService';
 import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
-import {registerMLSConversationVerificationStateHandler} from '../conversation/ConversationVerificationStateHandler';
 import {OnConversationE2EIVerificationStateChange} from '../conversation/ConversationVerificationStateHandler/shared';
 import {EventBuilder} from '../conversation/EventBuilder';
 import {MessageRepository} from '../conversation/MessageRepository';
@@ -82,7 +81,7 @@ import {ServiceMiddleware} from '../event/preprocessor/ServiceMiddleware';
 import {FederationEventProcessor} from '../event/processor/FederationEventProcessor';
 import {GiphyRepository} from '../extension/GiphyRepository';
 import {GiphyService} from '../extension/GiphyService';
-import {getWebsiteUrl} from '../externalRoute';
+import {externalUrl} from '../externalRoute';
 import {IntegrationRepository} from '../integration/IntegrationRepository';
 import {IntegrationService} from '../integration/IntegrationService';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
@@ -91,7 +90,11 @@ import {initMLSGroupConversations, initialiseSelfAndTeamConversations} from '../
 import {joinConversationsAfterMigrationFinalisation} from '../mls/MLSMigration/migrationFinaliser';
 import {NotificationRepository} from '../notification/NotificationRepository';
 import {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
-import {configureE2EI} from '../page/components/FeatureConfigChange/FeatureConfigChangeHandler/Features/E2EIdentity';
+import {configureDownloadPath} from '../page/components/FeatureConfigChange/FeatureConfigChangeHandler/Features/downloadPath';
+import {
+  configureE2EI,
+  getE2EIConfig,
+} from '../page/components/FeatureConfigChange/FeatureConfigChangeHandler/Features/E2EIdentity';
 import {PermissionRepository} from '../permission/PermissionRepository';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {PropertiesService} from '../properties/PropertiesService';
@@ -376,11 +379,6 @@ export class App {
         this.logger.error(`Error when initializing core: "${errorMessage}"`, error);
         throw new AccessTokenError(AccessTokenError.TYPE.REQUEST_FORBIDDEN, 'Session has expired');
       }
-      const localClient = await this.core.initClient();
-      if (!localClient) {
-        throw new ClientError(CLIENT_ERROR_TYPE.NO_VALID_CLIENT, 'Client has been deleted on backend');
-      }
-
       this.core.on(CoreEvents.NEW_SESSION, ({userId, clientId}) => {
         const newClient = {class: ClientClassification.UNKNOWN, id: clientId};
         userRepository.addClientToUser(userId, newClient, true);
@@ -388,15 +386,16 @@ export class App {
 
       const selfUser = await this.initiateSelfUser();
 
-      const {features: teamFeatures, team} = await teamRepository.initTeam(selfUser.teamId);
-      const e2eiHandler = await configureE2EI(this.logger, teamFeatures);
-      if (e2eiHandler) {
-        /* We first try to do the initial enrollment (if the user has not yet enrolled)
-         * We need to enroll before anything else (in particular joining MLS conversations)
-         * Until the user is enrolled, we need to pause loading the app
-         */
-        await e2eiHandler.attemptEnrollment();
+      const {features: teamFeatures, members: teamMembers} = await teamRepository.initTeam(selfUser.teamId);
+      const willEnrollE2ei = getE2EIConfig(teamFeatures) !== undefined;
+      const localClient = await this.core.getLocalClient();
+      if (!localClient) {
+        throw new ClientError(CLIENT_ERROR_TYPE.NO_VALID_CLIENT, 'Client has been deleted on backend');
       }
+      await this.core.initClient(localClient, willEnrollE2ei);
+
+      const e2eiHandler = await configureE2EI(this.logger, teamFeatures);
+      configureDownloadPath(teamFeatures);
 
       this.core.configureCoreCallbacks({
         groupIdFromConversationId: async conversationId => {
@@ -442,23 +441,16 @@ export class App {
 
       telemetry.addStatistic(AppInitStatisticsValue.CONNECTIONS, connections.length, 50);
 
-      const conversations = await conversationRepository.loadConversations();
+      const conversations = await conversationRepository.loadConversations(connections);
 
       // We load all the users the self user is connected with
-      const contacts = await userRepository.loadUsers(selfUser, connections, conversations);
-
-      if (team) {
-        // If we are in the context of team, we load the team members metadata (user roles)
-        await teamRepository.updateTeamMembersByIds(
-          team,
-          contacts.filter(user => user.teamId === team.id).map(({id}) => id),
-        );
-      }
+      await userRepository.loadUsers(selfUser, connections, conversations, teamMembers);
 
       if (supportsMLS()) {
         //if mls is supported, we need to initialize the callbacks (they are used when decrypting messages)
         conversationRepository.initMLSConversationRecoveredListener();
-        registerMLSConversationVerificationStateHandler(
+        conversationRepository.registerMLSConversationVerificationStateHandler(
+          selfUser.qualifiedId.domain,
           this.updateConversationE2EIVerificationState,
           this.showClientCertificateRevokedWarning,
         );
@@ -537,16 +529,9 @@ export class App {
       callingRepository.setReady();
       telemetry.timeStep(AppInitTimingsStep.APP_LOADED);
 
-      this.logger.info(`App loaded in ${Date.now() - startTime}ms`);
+      await e2eiHandler?.startTimers();
+      this.logger.info(`App version ${Environment.version()} loaded in ${Date.now() - startTime}ms`);
 
-      if (e2eiHandler) {
-        // At the end of the process (once conversations are loaded and joined), we can check if we need to renew the user's certificate
-        try {
-          await e2eiHandler.attemptRenewal();
-        } catch (error) {
-          this.logger.error('Failed to renew user certificate: ', error);
-        }
-      }
       return selfUser;
     } catch (error) {
       if (error instanceof BaseError) {
@@ -837,7 +822,7 @@ export class App {
     const isLeavingGuestRoom = isTemporaryGuestReason && this.repository.user['userState'].self()?.isTemporaryGuest();
 
     if (isLeavingGuestRoom) {
-      const websiteUrl = getWebsiteUrl();
+      const websiteUrl = externalUrl.website;
 
       if (websiteUrl) {
         return window.location.replace(websiteUrl);

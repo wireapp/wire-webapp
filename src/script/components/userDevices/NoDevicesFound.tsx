@@ -26,7 +26,7 @@ import {t} from 'Util/LocalizerUtil';
 
 import {Config} from '../../Config';
 import type {User} from '../../entity/User';
-import {getPrivacyPolicyUrl} from '../../externalRoute';
+import {externalUrl} from '../../externalRoute';
 
 interface NoDevicesFoundProps {
   noPadding: boolean;
@@ -48,7 +48,7 @@ const NoDevicesFound: React.FC<NoDevicesFoundProps> = ({user, noPadding}) => {
       </p>
       <a
         className="participant-devices__link accent-text"
-        href={getPrivacyPolicyUrl()}
+        href={externalUrl.privacyPolicy}
         rel="nofollow noopener noreferrer"
         target="_blank"
       >

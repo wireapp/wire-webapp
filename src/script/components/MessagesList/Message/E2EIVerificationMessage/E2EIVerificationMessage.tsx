@@ -92,14 +92,6 @@ export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificatio
     }
   };
 
-  const updateCertificate = async () => {
-    try {
-      await E2EIHandler.getInstance().attemptRenewal();
-    } catch (error) {
-      logger.error('Failed to renew user certificate: ', error);
-    }
-  };
-
   return (
     <div className="message-header">
       <div css={MessageIcon}>
@@ -135,7 +127,7 @@ export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificatio
               {t('conversation.E2EISelfUserCertificateExpired')}
 
               <LinkText
-                onClick={updateCertificate}
+                onClick={getCertificate}
                 dataUieName="update-certificate"
                 label={t('conversation.E2EIUpdateCertificate')}
               />

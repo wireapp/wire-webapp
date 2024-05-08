@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2023 Wire Swiss GmbH
+ * Copyright (C) 2024 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,16 +17,4 @@
  *
  */
 
-import * as x509 from '@peculiar/x509';
-
-export const getCertificateDetails = (certificate: string) => {
-  const currentDate = new Date();
-  const parsedCertificate = new x509.X509Certificate(certificate);
-  const timeRemainingMS = new Date(parsedCertificate.notAfter).getTime() - currentDate.getTime();
-  const certificateCreationTime = parsedCertificate?.notBefore.getTime();
-
-  return {
-    timeRemainingMS,
-    certificateCreationTime,
-  };
-};
+export * from './Image';
