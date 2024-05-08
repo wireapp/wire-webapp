@@ -1309,6 +1309,7 @@ export class ConversationRepository {
       isLiveUpdate: false,
       shouldRefreshUser: false,
     },
+    knownConversationId?: QualifiedId,
   ): Promise<Conversation | null> {
     const user = await this.userRepository.getUserById(userId);
 
@@ -1337,7 +1338,7 @@ export class ConversationRepository {
       return this.initMLS1to1Conversation(userId, isMLSSupportedByTheOtherUser, shouldDelayMLSGroupEstablishment);
     }
 
-    const proteusConversation = await this.getOrCreateProteus1To1Conversation(user);
+    const proteusConversation = await this.getOrCreateProteus1To1Conversation(user, knownConversationId);
 
     if (!proteusConversation) {
       return null;
@@ -1352,34 +1353,18 @@ export class ConversationRepository {
    * @param userEntity User entity for whom to get the conversation
    * @returns Resolves with the conversation with requested user (if in the current team or there's an existing connection with this user), otherwise `null`
    */
-  private async getOrCreateProteus1To1Conversation(userEntity: User): Promise<Conversation | null> {
+  private async getOrCreateProteus1To1Conversation(
+    userEntity: User,
+    knownConversationId?: QualifiedId,
+  ): Promise<Conversation | null> {
     const selfUser = this.userState.self();
     const inCurrentTeam = selfUser && selfUser.teamId && userEntity.teamId === selfUser.teamId;
 
     if (inCurrentTeam) {
-      return this.getOrCreateProteusTeam1to1Conversation(userEntity);
+      return this.getOrCreateProteusTeam1to1Conversation(userEntity, knownConversationId);
     }
 
-    const userConnection = userEntity.connection();
-
-    if (!userConnection) {
-      return null;
-    }
-
-    const conversationId = userConnection.conversationId;
-    try {
-      const conversationEntity = await this.getConversationById(conversationId);
-      conversationEntity.connection(userConnection);
-      await this.updateParticipatingUserEntities(conversationEntity);
-      return conversationEntity;
-    } catch (error) {
-      const isConversationNotFound =
-        error instanceof ConversationError && error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;
-      if (!isConversationNotFound) {
-        throw error;
-      }
-      return null;
-    }
+    return null;
   }
 
   /**
@@ -1387,7 +1372,16 @@ export class ConversationRepository {
    * @param userEntity User entity for whom to get the conversation
    * @returns Resolves with the conversation with requested user
    */
-  private async getOrCreateProteusTeam1to1Conversation(userEntity: User): Promise<Conversation> {
+  private async getOrCreateProteusTeam1to1Conversation(
+    userEntity: User,
+    conversationId?: QualifiedId,
+  ): Promise<Conversation> {
+    const exactConversation = conversationId && this.conversationState.findConversation(conversationId);
+
+    if (exactConversation) {
+      return exactConversation;
+    }
+
     const matchingConversationEntity = this.conversationState.conversations().find(conversationEntity => {
       if (!conversationEntity.is1to1()) {
         // Disregard conversations that are not 1:1
@@ -1961,7 +1955,7 @@ export class ConversationRepository {
     );
 
     try {
-      return await this.getInitialised1To1Conversation(otherUserId, {shouldRefreshUser});
+      return await this.getInitialised1To1Conversation(otherUserId, {shouldRefreshUser}, conversation.qualifiedId);
     } catch {}
 
     return conversation;
