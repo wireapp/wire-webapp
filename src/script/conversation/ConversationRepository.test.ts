@@ -30,6 +30,7 @@ import {
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
 import {ConversationCreateEvent, ConversationMemberJoinEvent, CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
+import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
@@ -1538,6 +1539,60 @@ describe('ConversationRepository', () => {
 
       expect(conversationRepo.loadMissingConversations).toHaveBeenCalled();
       expect(conversationRepo['refreshAllConversationsUnavailableParticipants']).toHaveBeenCalled();
+    });
+  });
+
+  describe('deleteConversation', () => {
+    it('should delete conversation on backend and locally', async () => {
+      const conversationRepository = await testFactory.exposeConversationActors();
+      const teamId = createUuid();
+
+      spyOn(conversationRepository['teamState'], 'team').and.returnValue({id: teamId} as any);
+
+      const conversation = _generateConversation({protocol: ConversationProtocol.PROTEUS});
+      conversationRepository['conversationState'].conversations.push(conversation);
+
+      jest.spyOn(conversationRepository['conversationService'], 'deleteConversation');
+      jest.spyOn(conversationRepository['conversationService'], 'deleteConversationFromDb');
+
+      await conversationRepository.deleteConversation(conversation);
+
+      expect(conversationRepository['conversationService'].deleteConversation).toHaveBeenCalledWith(
+        teamId,
+        conversation.id,
+      );
+
+      expect(conversationRepository['conversationState'].conversations()).toEqual([]);
+      expect(conversationRepository['conversationService'].deleteConversationFromDb).toHaveBeenCalledWith(
+        conversation.id,
+      );
+    });
+
+    it('should still delete conversation locally if it is deleted on backend already', async () => {
+      const conversationRepository = await testFactory.exposeConversationActors();
+      const teamId = createUuid();
+
+      spyOn(conversationRepository['teamState'], 'team').and.returnValue({id: teamId} as any);
+
+      const conversation = _generateConversation({protocol: ConversationProtocol.PROTEUS});
+      conversationRepository['conversationState'].conversations.push(conversation);
+
+      jest
+        .spyOn(conversationRepository['conversationService'], 'deleteConversation')
+        .mockRejectedValueOnce(new BackendError('Conversation not found', BackendErrorLabel.NO_CONVERSATION));
+      jest.spyOn(conversationRepository['conversationService'], 'deleteConversationFromDb');
+
+      await conversationRepository.deleteConversation(conversation);
+
+      expect(conversationRepository['conversationService'].deleteConversation).toHaveBeenCalledWith(
+        teamId,
+        conversation.id,
+      );
+
+      expect(conversationRepository['conversationState'].conversations()).toEqual([]);
+      expect(conversationRepository['conversationService'].deleteConversationFromDb).toHaveBeenCalledWith(
+        conversation.id,
+      );
     });
   });
 });
