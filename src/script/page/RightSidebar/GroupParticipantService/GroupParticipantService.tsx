@@ -27,7 +27,6 @@ import {ServiceDetails} from 'Components/panel/ServiceDetails';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
-import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import {Conversation} from '../../../entity/Conversation';
 import {User} from '../../../entity/User';
@@ -46,7 +45,6 @@ interface GroupParticipantServiceProps {
   onBack: () => void;
   onClose: () => void;
   serviceEntity: ServiceEntity;
-  userEntity: User;
   selfUser: User;
   isAddMode?: boolean;
 }
@@ -60,29 +58,28 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
   onBack,
   onClose,
   serviceEntity,
-  userEntity,
   selfUser,
   isAddMode = false,
 }) => {
   const {
     inTeam,
     isActiveParticipant,
-    participating_user_ids: participatingUserIds,
-  } = useKoSubscribableChildren(activeConversation, ['inTeam', 'isActiveParticipant', 'participating_user_ids']);
+    participating_user_ets: participatingUserEts,
+  } = useKoSubscribableChildren(activeConversation, ['inTeam', 'isActiveParticipant', 'participating_user_ets']);
   const {teamRole} = useKoSubscribableChildren(selfUser, ['teamRole']);
 
   const {canChatWithServices} = generatePermissionHelpers(teamRole);
 
-  const selectedInConversation = participatingUserIds.some(user => matchQualifiedIds(userEntity, user));
+  const serviceUser = participatingUserEts.find(user => user.serviceId === serviceEntity.id);
 
-  const showActions = isActiveParticipant && selectedInConversation && inTeam;
+  const showActions = isActiveParticipant && serviceUser && inTeam;
 
   const onOpen = () => {
     actionsViewModel.open1to1ConversationWithService(serviceEntity);
   };
 
-  const onRemove = () => {
-    actionsViewModel.removeFromConversation(activeConversation, userEntity);
+  const onRemove = (user: User) => {
+    actionsViewModel.removeFromConversation(activeConversation, user);
     onBack();
   };
 
@@ -125,8 +122,8 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
             tabIndex={TabIndex.FOCUSABLE}
             className="panel__action-item"
             data-uie-name="do-remove"
-            onClick={onRemove}
-            onKeyDown={event => handleKeyDown(event, onRemove)}
+            onClick={() => onRemove(serviceUser)}
+            onKeyDown={event => handleKeyDown(event, () => onRemove(serviceUser))}
           >
             <span className="panel__action-item__icon">
               <Icon.Minus />
