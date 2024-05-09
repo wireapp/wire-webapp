@@ -612,6 +612,7 @@ export class Conversation {
    * If there are any incoming messages, they will be moved to the regular messages.
    */
   release(): void {
+    // If there are no unread messages, we can remove all messages from memory (we will keep the unread messages)
     if (!this.unreadState().allEvents.length) {
       this.removeMessages();
       this.hasAdditionalMessages(true);
