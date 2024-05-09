@@ -1301,6 +1301,7 @@ export class ConversationRepository {
    * @param userEntity User entity for whom to get the conversation
    * @param isLiveUpdate Whether the conversation is being initialised because of a live update (e.g. some websocket event)
    * @param shouldRefreshUser Whether the user should be refetched from backend before getting the conversation
+   * @param knownConversationId Known conversation ID - if provided, we will try to find the conversation with this exact ID (needed for proteus 1:1 conversation with a team member)
    * @returns Resolves with the initialised 1:1 conversation with requested user
    */
   public async getInitialised1To1Conversation(
@@ -1338,45 +1339,34 @@ export class ConversationRepository {
       return this.initMLS1to1Conversation(userId, isMLSSupportedByTheOtherUser, shouldDelayMLSGroupEstablishment);
     }
 
-    const proteusConversation = await this.getOrCreateProteus1To1Conversation(user, knownConversationId);
+    // There's no connection so it's a proteus conversation with a team member
+    const selfUser = this.userState.self();
+    const inCurrentTeam = selfUser && selfUser.teamId && user.teamId === selfUser.teamId;
 
-    if (!proteusConversation) {
+    if (!inCurrentTeam) {
+      // It's not possible to create a 1:1 conversation with a user from another team without a connection
       return null;
     }
+
+    const proteusConversation = await this.getOrCreateProteusTeam1to1Conversation(user, knownConversationId);
 
     return this.initProteus1to1Conversation(proteusConversation.qualifiedId, isProteusSupportedByTheOtherUser);
   }
 
   /**
-   * Get or create a proteus 1:1 conversation with a user.
-   * If a conversation does not exist, but user is in the current team, or there's a connection with this user, proteus 1:1 conversation will be created and saved.
+   * Get or create a proteus 1:1 conversation with a team member. If a conversation does not exist, it will be created.
+   * This is a legacy type of 1:1 conversation, which really is a group conversation with only two members.
+   * Due to some bug in the past, it's possible that there are multiple proteus 1:1 conversations with the same user,
+   * so we have to make sure we get the right one (with the knownConversationId parameter)
    * @param userEntity User entity for whom to get the conversation
-   * @returns Resolves with the conversation with requested user (if in the current team or there's an existing connection with this user), otherwise `null`
-   */
-  private async getOrCreateProteus1To1Conversation(
-    userEntity: User,
-    knownConversationId?: QualifiedId,
-  ): Promise<Conversation | null> {
-    const selfUser = this.userState.self();
-    const inCurrentTeam = selfUser && selfUser.teamId && userEntity.teamId === selfUser.teamId;
-
-    if (inCurrentTeam) {
-      return this.getOrCreateProteusTeam1to1Conversation(userEntity, knownConversationId);
-    }
-
-    return null;
-  }
-
-  /**
-   * Get or create a proteus team 1to1 conversation with a user. If a conversation does not exist, it will be created.
-   * @param userEntity User entity for whom to get the conversation
+   * @param knownConversationId Known conversation ID - if provided, we will try to find the conversation with this exact ID
    * @returns Resolves with the conversation with requested user
    */
   private async getOrCreateProteusTeam1to1Conversation(
     userEntity: User,
-    conversationId?: QualifiedId,
+    knownConversationId?: QualifiedId,
   ): Promise<Conversation> {
-    const exactConversation = conversationId && this.conversationState.findConversation(conversationId);
+    const exactConversation = knownConversationId && this.conversationState.findConversation(knownConversationId);
 
     if (exactConversation) {
       return exactConversation;
