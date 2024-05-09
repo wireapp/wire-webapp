@@ -619,6 +619,7 @@ export class Conversation {
 
     if (this.incomingMessages().length) {
       this.messages_unordered.push(...this.incomingMessages());
+      this.incomingMessages.removeAll();
     }
   }
 
