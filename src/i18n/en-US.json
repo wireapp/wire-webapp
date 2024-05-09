@@ -583,6 +583,8 @@
   "conversationYouNominative": "you",
   "conversationYouRemovedMissingLegalHoldConsent": "[bold]You[/bold] were removed from this conversation because legal hold has been activated. [link]Learn more[/link]",
   "conversationsAllArchived": "Everything archived",
+  "conversationsNothingArchived": "Nothing archived yet 👻",
+  "conversationsNothingArchivedTip": "To keep your conversation list tidy, move unused conversations here. You can always unarchive those later.",
   "conversationsConnectionRequestMany": "{{number}} people waiting",
   "conversationsConnectionRequestOne": "1 person waiting",
   "conversationsContacts": "Contacts",
