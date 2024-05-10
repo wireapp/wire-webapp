@@ -1631,7 +1631,7 @@ export class ConversationRepository {
 
     await Promise.allSettled(
       proteusConversations.map(proteusConversation =>
-        this.eventService.moveEventsToConversation(proteusConversation.id, mlsConversation.id),
+        this.eventService.moveEventsToConversation(proteusConversation.qualifiedId, mlsConversation.qualifiedId),
       ),
     );
 

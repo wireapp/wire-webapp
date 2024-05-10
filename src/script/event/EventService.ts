@@ -18,6 +18,7 @@
  */
 
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
+import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import type {Dexie} from 'dexie';
 import {container} from 'tsyringe';
 
@@ -478,14 +479,15 @@ export class EventService {
    * @param conversationId - conversation id from which events should be moved
    * @param newConversationId - conversation id to which events should be moved
    */
-  public async moveEventsToConversation(conversationId: string, newConversationId: string) {
+  public async moveEventsToConversation(conversationId: QualifiedId, newConversationId: QualifiedId) {
     const eventsToSkip = [CLIENT_CONVERSATION_EVENT.ONE2ONE_CREATION];
 
-    const events = await this.loadAllConversationEvents(conversationId, eventsToSkip);
+    const events = await this.loadAllConversationEvents(conversationId.id, eventsToSkip);
 
     const eventsToMove = events.map(event => ({
       ...event,
-      conversation: newConversationId,
+      conversation: newConversationId.id,
+      qualified_conversation: newConversationId,
     }));
 
     return Promise.all(
