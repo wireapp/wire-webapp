@@ -585,8 +585,8 @@ describe('ConversationRepository', () => {
       const conversationEntity = await conversationRepository.getInitialised1To1Conversation(otherUser.qualifiedId);
 
       expect(conversationRepository['eventService'].moveEventsToConversation).toHaveBeenCalledWith(
-        proteus1to1Conversation.id,
-        mls1to1Conversation.id,
+        proteus1to1Conversation.qualifiedId,
+        mls1to1Conversation.qualifiedId,
       );
 
       expect(conversationEntity?.serialize()).toEqual(mls1to1Conversation.serialize());
