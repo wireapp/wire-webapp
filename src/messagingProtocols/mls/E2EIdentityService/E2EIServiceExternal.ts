@@ -60,9 +60,6 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
   ) {
     super();
     this.enrollmentStorage = createE2EIEnrollmentStorage(coreDatabase);
-    mlsService.on('newCrlDistributionPoints', distributionPoints =>
-      this.handleNewCrlDistributionPoints(distributionPoints),
-    );
   }
 
   // If we have a handle in the local storage, we are in the enrollment process (this handle is saved before oauth redirect)
@@ -207,6 +204,11 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
    */
   public async initialize(discoveryUrl: string): Promise<void> {
     this._acmeService = new AcmeService(discoveryUrl);
+
+    this.mlsService.on('newCrlDistributionPoints', distributionPoints =>
+      this.handleNewCrlDistributionPoints(distributionPoints),
+    );
+
     await this.registerServerCertificates();
     await this.initialiseCrlDistributionTimers();
   }
