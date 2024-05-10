@@ -126,7 +126,7 @@ export const MessagesList: FC<MessagesListParams> = ({
 
   const groupedMessages = groupMessagesBySenderAndTime(filteredMessages, conversationLastReadTimestamp.current);
 
-  const [messagesContainer, setMessageContainer] = useState<HTMLDivElement | null>(null);
+  const [messagesContainer, setMessagesContainer] = useState<HTMLDivElement | null>(null);
 
   const shouldShowInvitePeople = isActiveParticipant && inTeam && (isGuestRoom || isGuestAndServicesRoom);
 
@@ -252,7 +252,7 @@ export const MessagesList: FC<MessagesListParams> = ({
       className={cx('message-list', {'is-right-panel-open': isRightSidebarOpen})}
       tabIndex={TabIndex.UNFOCUSABLE}
     >
-      <div ref={setMessageContainer} className={cx('messages', {'flex-center': verticallyCenterMessage()})}>
+      <div ref={setMessagesContainer} className={cx('messages', {'flex-center': verticallyCenterMessage()})}>
         {groupedMessages.flatMap(group => {
           if (isMarker(group)) {
             return (

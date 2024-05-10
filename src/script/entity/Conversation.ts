@@ -423,6 +423,7 @@ export class Conversation {
         return message_a.timestamp() - message_b.timestamp();
       }),
     );
+
     this.lastDeliveredMessage = ko.pureComputed(() => this.getLastDeliveredMessage());
 
     this.incomingMessages = ko.observableArray();

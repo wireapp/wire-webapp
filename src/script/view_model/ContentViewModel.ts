@@ -239,7 +239,7 @@ export class ContentViewModel {
       exposeMessage: exposeMessageEntity,
       openFirstSelfMention = false,
       openNotificationSettings = false,
-    } = options;
+    } = options || {};
 
     if (!conversation) {
       return this.handleMissingConversation();
