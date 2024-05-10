@@ -69,6 +69,7 @@ export interface MessageParams extends MessageActions {
   };
   messageRepository: MessageRepository;
   onVisible?: () => void;
+  onVisibilityChange?: (isVisible: boolean) => void;
   selfId: QualifiedId;
   shouldShowInvitePeople: boolean;
   teamState?: TeamState;
@@ -88,6 +89,7 @@ export const Message: React.FC<MessageParams & {scrollTo?: ScrollToElement}> = p
     isHighlighted,
     hideHeader,
     onVisible,
+    onVisibilityChange,
     scrollTo,
     isFocused,
     handleFocus,
@@ -154,7 +156,13 @@ export const Message: React.FC<MessageParams & {scrollTo?: ScrollToElement}> = p
   );
 
   const wrappedContent = onVisible ? (
-    <InViewport requireFullyInView allowBiggerThanViewport checkOverlay onVisible={onVisible}>
+    <InViewport
+      requireFullyInView
+      allowBiggerThanViewport
+      checkOverlay
+      onVisible={onVisible}
+      onVisibilityChange={onVisibilityChange}
+    >
       {content}
     </InViewport>
   ) : (

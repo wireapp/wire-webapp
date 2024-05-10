@@ -21,15 +21,17 @@ import {UIEvent, useCallback, useState} from 'react';
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
+import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import {useMatchMedia, IconButton, ChevronIcon} from '@wireapp/react-ui-kit';
+import {useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {CallingCell} from 'Components/calling/CallingCell';
 import {DropFileArea} from 'Components/DropFileArea';
 import {Giphy} from 'Components/Giphy';
 import {InputBar} from 'Components/InputBar';
+import {LastMessageVisibilityTracker, MessageVisibility} from 'Components/LastMessageVisibilityTracker';
 import {MessagesList} from 'Components/MessagesList';
 import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
@@ -119,6 +121,8 @@ export const Conversation = ({
   const isCallWindowDetached = viewMode === CallingViewMode.DETACHED_WINDOW;
 
   const [isMsgElementsFocusable, setMsgElementsFocusable] = useState(true);
+
+  const messageVisibility: ko.Observable<MessageVisibility> = ko.observable();
 
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
   const smBreakpoint = useMatchMedia('max-width: 640px');
@@ -398,9 +402,14 @@ export const Conversation = ({
     }
   };
 
+  const visibleInViewportCallback = useCallback((isVisible: boolean, messageEntity: Message) => {
+    messageVisibility({isVisible, message: messageEntity});
+  }, []);
+
   const getInViewportCallback = useCallback(
     (conversationEntity: ConversationEntity, messageEntity: Message) => {
       const messageTimestamp = messageEntity.timestamp();
+
       const callbacks: Function[] = [];
 
       if (!messageEntity.isEphemeral()) {
@@ -463,9 +472,15 @@ export const Conversation = ({
   );
 
   const onGoToLastMessage = () => {
-    activeConversation?.release();
-    amplify.publish(WebAppEvents.CONVERSATION.SHOW, activeConversation);
-    // content.showConversation(activeConversation, {exposeMessage: activeConversation?.lastDeliveredMessage()});
+    activeConversation?.setTimestamp(
+      activeConversation?.last_server_timestamp(),
+      ConversationEntity.TIMESTAMP_TYPE.LAST_READ,
+    );
+    if (!activeConversation?.hasLastReceivedMessageLoaded()) {
+      activeConversation?.release();
+      amplify.publish(WebAppEvents.CONVERSATION.SHOW, activeConversation, {});
+    }
+    // scroll
   };
 
   return (
@@ -534,26 +549,27 @@ export const Conversation = ({
             onClickMessage={handleClickOnMessage}
             onLoading={loading => setIsConversationLoaded(!loading)}
             getVisibleCallback={getInViewportCallback}
+            getVisibleEachTimeCallback={(isVisible, _conversationEntity, messageEntity) =>
+              visibleInViewportCallback(isVisible, messageEntity)
+            }
             isLastReceivedMessage={isLastReceivedMessage}
             isMsgElementsFocusable={isMsgElementsFocusable}
             setMsgElementsFocusable={setMsgElementsFocusable}
             isRightSidebarOpen={isRightSidebarOpen}
           />
 
-          {(!activeConversation.hasLastReceivedMessageLoaded() || true) && (
-            <IconButton
-              onClick={onGoToLastMessage}
-              css={{
-                position: 'absolute',
-                bottom: '90px',
-                right: '50px',
-                height: '40px',
-                borderRadius: '100%',
-              }}
-            >
-              <ChevronIcon css={{rotate: '90deg', height: 16, width: 16, path: {fill: '#0667C8'}}} />
-            </IconButton>
-          )}
+          <LastMessageVisibilityTracker
+            onGoToLastMessage={onGoToLastMessage}
+            conversation={activeConversation}
+            messageVisibility={messageVisibility}
+            css={{
+              position: 'absolute',
+              bottom: '90px',
+              right: '50px',
+              height: '40px',
+              borderRadius: '100%',
+            }}
+          />
 
           {isConversationLoaded &&
             (isReadOnlyConversation ? (
