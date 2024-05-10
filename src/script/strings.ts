@@ -375,50 +375,6 @@ export const joinGuestLinkPasswordModalStrings = defineMessages({
   },
 });
 
-export const unsupportedStrings = defineMessages({
-  desktopOnlyMessage: {
-    defaultMessage: 'Please use {brandName} on your desktop app instead.',
-    id: 'unsupported.desktopOnlyMessage',
-  },
-  headlineBrowser: {
-    defaultMessage: 'This browser is not supported.',
-    id: 'unsupported.headlineBrowser',
-  },
-  headlineCookies: {
-    defaultMessage: 'Enable cookies',
-    id: 'unsupported.headlineCookies',
-  },
-  headlineIndexedDb: {
-    defaultMessage: 'Your browser is in private mode',
-    id: 'unsupported.headlineIndexedDb',
-  },
-  subheadBrowser: {
-    defaultMessage:
-      'Download the latest version of <strong>Google Chrome, Mozilla Firefox, Opera</strong> or <strong>Microsoft Edge.</strong>',
-    id: 'unsupported.subheadBrowser',
-  },
-  subheadCookies: {
-    defaultMessage: 'Enable cookies to log in to {brandName}.',
-    id: 'unsupported.subheadCookies',
-  },
-  subheadIndexedDb: {
-    defaultMessage:
-      '{brandName} needs access to local storage to display your messages. Local storage is not available in private mode.',
-    id: 'unsupported.subheadIndexedDb',
-  },
-});
-
-export const unsupportedJoinStrings = defineMessages({
-  unsupportedJoinHeadline: {
-    defaultMessage: 'You have been invited to join a conversation in {brandName}',
-    id: 'conversationJoin.unsupportedJoinHeadline',
-  },
-  unsupportedJoinMobileSubhead: {
-    defaultMessage: 'Open this link on your computer.',
-    id: 'conversationJoin.unsupportedJoinMobileSubhead',
-  },
-});
-
 export const conversationJoinStrings = defineMessages({
   existentAccountJoinWithoutLink: {
     defaultMessage: 'Join the conversation',
