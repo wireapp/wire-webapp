@@ -5157,9 +5157,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^27.0.2":
-  version: 27.0.2
-  resolution: "@wireapp/api-client@npm:27.0.2"
+"@wireapp/api-client@npm:^27.0.3":
+  version: 27.0.3
+  resolution: "@wireapp/api-client@npm:27.0.3"
   dependencies:
     "@wireapp/commons": "npm:^5.2.7"
     "@wireapp/priority-queue": "npm:^2.1.5"
@@ -5171,10 +5171,10 @@ __metadata:
     pako: "npm:2.1.0"
     reconnecting-websocket: "npm:4.4.0"
     spark-md5: "npm:3.0.2"
-    tough-cookie: "npm:4.1.3"
+    tough-cookie: "npm:4.1.4"
     ws: "npm:8.17.0"
-    zod: "npm:3.23.4"
-  checksum: 10/7e0c51471a384035864221bf79020e049020b47587373f9f07b98c06ec58ddd37baa2859e09f6f94b0d09cef14435df5ec7f27bca3d4f7e812cf7293448b1d66
+    zod: "npm:3.23.6"
+  checksum: 10/7aa00c73aeacabda7a4d6ab2ff7188059e67d8682f41690a54e5d8b576ed98b4628d758f279e6354d7703208b37fd163398016ede6f998c342c1e3d7d6512550
   languageName: node
   linkType: hard
 
@@ -5221,20 +5221,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core-crypto@npm:1.0.0-rc.59":
-  version: 1.0.0-rc.59
-  resolution: "@wireapp/core-crypto@npm:1.0.0-rc.59"
-  checksum: 10/a5ff200a6d9ae6d6a569a51bd72389c5236db821bcc5bde8a96a9f76e5ade0b63399fb2ed637ac271a7f0b5c6a9f272d1b5b9fbbc32620273a4a61a1b1ab8faf
+"@wireapp/core-crypto@npm:1.0.0-rc.60":
+  version: 1.0.0-rc.60
+  resolution: "@wireapp/core-crypto@npm:1.0.0-rc.60"
+  checksum: 10/a43c02e27dc6df4ef9a82e91b029d1587e8a39a91164247a5c3fd02a057276dcc16ad783b1f54f5660668407d4ca3c87a53cfcc26ff5efffcc5de11cb423842e
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:46.0.6":
-  version: 46.0.6
-  resolution: "@wireapp/core@npm:46.0.6"
+"@wireapp/core@npm:46.0.9":
+  version: 46.0.9
+  resolution: "@wireapp/core@npm:46.0.9"
   dependencies:
-    "@wireapp/api-client": "npm:^27.0.2"
+    "@wireapp/api-client": "npm:^27.0.3"
     "@wireapp/commons": "npm:^5.2.7"
-    "@wireapp/core-crypto": "npm:1.0.0-rc.59"
+    "@wireapp/core-crypto": "npm:1.0.0-rc.60"
     "@wireapp/cryptobox": "npm:12.8.0"
     "@wireapp/priority-queue": "npm:^2.1.5"
     "@wireapp/promise-queue": "npm:^2.3.2"
@@ -5249,8 +5249,8 @@ __metadata:
     logdown: "npm:3.3.1"
     long: "npm:^5.2.0"
     uuidjs: "npm:4.2.13"
-    zod: "npm:3.23.4"
-  checksum: 10/c6e4191a0deaf44dad95831a37dac4414ce8fab81efb98224ee8d2bc99b7386ed09b24965f7a2b1432796c14fb64a5a35de3bbe2022ba3c0b64dd8b114cf18a1
+    zod: "npm:3.23.6"
+  checksum: 10/5a54d15705fb71e342e8df04858caac44c6ddc309c49bf71986f8fd0aae55487683bdf55d39cd137c22d62ec83b624afdde11d4afc1b86b732a1f171edee77b5
   languageName: node
   linkType: hard
 
@@ -16731,7 +16731,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tough-cookie@npm:4.1.3, tough-cookie@npm:^4.1.2":
+"tough-cookie@npm:4.1.4":
+  version: 4.1.4
+  resolution: "tough-cookie@npm:4.1.4"
+  dependencies:
+    psl: "npm:^1.1.33"
+    punycode: "npm:^2.1.1"
+    universalify: "npm:^0.2.0"
+    url-parse: "npm:^1.5.3"
+  checksum: 10/75663f4e2cd085f16af0b217e4218772adf0617fb3227171102618a54ce0187a164e505d61f773ed7d65988f8ff8a8f935d381f87da981752c1171b076b4afac
+  languageName: node
+  linkType: hard
+
+"tough-cookie@npm:^4.1.2":
   version: 4.1.3
   resolution: "tough-cookie@npm:4.1.3"
   dependencies:
@@ -17816,7 +17828,7 @@ __metadata:
     "@wireapp/avs": "npm:9.6.12"
     "@wireapp/commons": "npm:5.2.7"
     "@wireapp/copy-config": "npm:2.2.0"
-    "@wireapp/core": "npm:46.0.6"
+    "@wireapp/core": "npm:46.0.9"
     "@wireapp/eslint-config": "npm:3.0.7"
     "@wireapp/prettier-config": "npm:0.6.4"
     "@wireapp/react-ui-kit": "npm:9.17.4"
@@ -18425,10 +18437,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zod@npm:3.23.4":
-  version: 3.23.4
-  resolution: "zod@npm:3.23.4"
-  checksum: 10/29117ce59f16af155d9a3aab024d18e858e55b4b51c1f848772516ec6f019e617a0cdaf4c6e20f15154360a9f4c160056aba34502ec68072c8f0af31dfd653d6
+"zod@npm:3.23.6":
+  version: 3.23.6
+  resolution: "zod@npm:3.23.6"
+  checksum: 10/a3b0ea904f0615c67ef01ab3abc4e917d3bb87d46fc39515bcb68e59450b54f175dc9d29ddc7e13217dd456099729afa0b76609db135ca158e3ccebcac6153d9
   languageName: node
   linkType: hard
 
