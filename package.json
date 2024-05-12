@@ -52,7 +52,7 @@
     "switch-path": "1.2.0",
     "tsyringe": "4.8.0",
     "underscore": "1.13.6",
-    "uuidjs": "4.2.13",
+    "uuidjs": "4.2.14",
     "webrtc-adapter": "9.0.1",
     "zustand": "4.5.2"
   },

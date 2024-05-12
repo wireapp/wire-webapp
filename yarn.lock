@@ -17314,6 +17314,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"uuidjs@npm:4.2.14":
+  version: 4.2.14
+  resolution: "uuidjs@npm:4.2.14"
+  bin:
+    uuidjs: bin/cli.js
+  checksum: 10/83f2d275e8c2e97387a764d1dfda5dea90e7404a397270da51ce4cc515ac212c6c3aa630ac123342af830bcd979251e1c91670fa44be2ffcc5e42cb15dcba3bf
+  languageName: node
+  linkType: hard
+
 "v8-compile-cache-lib@npm:^3.0.1":
   version: 3.0.1
   resolution: "v8-compile-cache-lib@npm:3.0.1"
@@ -17929,7 +17938,7 @@ __metadata:
     tsyringe: "npm:4.8.0"
     typescript: "npm:5.4.5"
     underscore: "npm:1.13.6"
-    uuidjs: "npm:4.2.13"
+    uuidjs: "npm:4.2.14"
     webpack: "npm:5.91.0"
     webpack-cli: "npm:5.1.4"
     webpack-dev-middleware: "npm:7.2.1"
