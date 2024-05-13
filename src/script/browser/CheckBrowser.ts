@@ -97,8 +97,6 @@ const checkBrowser = (): void => {
     return;
   }
   if (isOauth()) {
-    // eslint-disable-next-line no-console
-    console.log('This browser is valid to handle oAuth scenario.');
     return;
   }
   if (!('RTCPeerConnection' in window)) {
