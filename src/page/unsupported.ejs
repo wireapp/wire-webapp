@@ -92,6 +92,10 @@
         transition: all 0.24s;
       }
 
+      strong {
+        font-weight: 800;
+      }
+
       .content {
         display: flex;
         flex-direction: column;
@@ -130,24 +134,25 @@
                 </header>
                 <main style="flex: 1 1 0; padding-left: 8px; width: 100%;">
                     <div class="textContent">
-                        <h2 data-uie-name="element-unsupported-headline">This browser is not supported.</h2>
+                        <h2 data-uie-name="element-unsupported-headline">Wire doesn't support this browser</h2>
                         <h3 data-uie-name="element-unsupported-general">
-                            Download the latest version of
-                            <strong style="font-weight: 800;">Google Chrome, Mozilla Firefox </strong>
-                            or
-                            <strong style="font-weight: 800;">Microsoft Edge.</strong>
+                            To use Wire for web, download the latest version of <strong>Google Chrome, Mozilla Firefox</strong>,
+                            or <strong>Microsoft Edge</strong>.
+                        </h3>
+                        <h3 data-uie-name="element-unsupported-settings">
+
                         </h3>
                         <h3 data-uie-name="element-unsupported-support-link">
-                            For more details see
                             <a rel="noopener noreferrer" target="_blank" style="font-size: 1rem;"
                                href="https://support.wire.com/hc/en-us/articles/202960551-What-do-I-need-to-use-Wire"
-                            >here</a>.
+                            >Learn more about Wire’s system requirements</a>
                         </h3>
                     </div>
                 </main>
 
                 <footer>
-                    <a style="text-transform: uppercase; text-decoration: none;" rel="noopener noreferrer" href="https://wire.com">
+                    <a style="text-transform: uppercase; text-decoration: none;" rel="noopener noreferrer"
+                       href="https://wire.com">
                         wire.com
                     </a>
                     <span> · © Wire Swiss GmbH</span>

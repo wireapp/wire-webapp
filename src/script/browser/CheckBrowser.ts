@@ -58,42 +58,50 @@ const supportsCookies = (): boolean => {
 const supportsIndexDB = (): Promise<boolean> =>
   new Promise<boolean>((resolve, _reject) => {
     if (!('indexedDB' in window)) {
-      resolve(false);
-    } else {
-      // some versions of FF don't allow access to IndexDB in the private mode
-      if (navigator.userAgent.toLowerCase().indexOf('firefox') !== -1) {
-        let dbOpenRequest: IDBOpenDBRequest;
-
-        try {
-          dbOpenRequest = window.indexedDB.open('test');
-        } catch (error) {
-          return resolve(false);
-        }
-
-        const connectionTimeout = setTimeout(() => resolve(false), 10000);
-        dbOpenRequest.onerror = event => {
-          clearTimeout(connectionTimeout);
-          if (dbOpenRequest.error) {
-            event.preventDefault();
-            return resolve(false);
-          }
-          return undefined;
-        };
-        dbOpenRequest.onsuccess = _event => {
-          clearTimeout(connectionTimeout);
-          resolve(true);
-        };
-      }
-      resolve(true);
+      return resolve(false);
     }
+
+    if (navigator.userAgent.toLowerCase().indexOf('firefox') === -1) {
+      return resolve(true);
+    }
+
+    // some versions of FF don't allow access to IndexDB in the private mode
+    let dbOpenRequest: IDBOpenDBRequest;
+
+    try {
+      dbOpenRequest = window.indexedDB.open('test');
+    } catch (error) {
+      return resolve(false);
+    }
+
+    const connectionTimeout = setTimeout(() => resolve(false), 10000);
+
+    dbOpenRequest.onerror = event => {
+      clearTimeout(connectionTimeout);
+      if (dbOpenRequest.error) {
+        event.preventDefault();
+        return resolve(false);
+      }
+    };
+
+    dbOpenRequest.onsuccess = _event => {
+      clearTimeout(connectionTimeout);
+      return resolve(true);
+    };
   });
 
 const checkBrowser = (): void => {
+  if (!supportsCookies()) {
+    location.href = '/unsupported/';
+    console.error("This browser doesn't support cookies to run the Wire app!");
+    return;
+  }
   if (isOauth()) {
     return;
   }
-  if (!('RTCPeerConnection' in window) || !supportsCookies()) {
+  if (!('RTCPeerConnection' in window)) {
     location.href = '/unsupported/';
+    console.error("This browser doesn't support RTC to run the Wire app!");
     return;
   }
   supportsIndexDB()
@@ -101,6 +109,7 @@ const checkBrowser = (): void => {
     .then(res => {
       if (!res) {
         location.href = '/unsupported/';
+        console.error("This browser doesn't support IndexDB to run the Wire app!");
       }
     });
 };
