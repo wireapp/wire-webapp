@@ -306,6 +306,46 @@ describe('ConversationRepository', () => {
       expect(conversationEntity).toEqual(proteus1to1Conversation);
       expect(conversationRepository['conversationService'].getMLS1to1Conversation).not.toHaveBeenCalled();
     });
+
+    it('returns a selected proteus 1:1 conversation with a team member even if there are multiple conversations with the same user', async () => {
+      const conversationRepository = testFactory.conversation_repository!;
+
+      const teamId = 'teamId';
+      const domain = 'test-domain';
+
+      const otherUserId = {id: 'f718411c-3833-479d-bd80-af03f38416', domain};
+      const otherUser = new User(otherUserId.id, otherUserId.domain);
+      otherUser.teamId = teamId;
+
+      otherUser.supportedProtocols([ConversationProtocol.PROTEUS]);
+
+      conversationRepository['userState'].users.push(otherUser);
+
+      const selfUserId = {id: '109da91a-a495-47a870-9ffbe924b2d1', domain};
+      const selfUser = new User(selfUserId.id, selfUserId.domain);
+      selfUser.teamId = teamId;
+      selfUser.supportedProtocols([ConversationProtocol.PROTEUS]);
+      jest.spyOn(conversationRepository['userState'], 'self').mockReturnValue(selfUser);
+
+      const proteus1to1Conversation = _generateConversation({
+        type: CONVERSATION_TYPE.ONE_TO_ONE,
+        protocol: ConversationProtocol.PROTEUS,
+        users: [otherUser],
+        overwites: {team_id: teamId, domain},
+      });
+
+      const proteus1to1Conversation2 = _generateConversation({
+        type: CONVERSATION_TYPE.ONE_TO_ONE,
+        protocol: ConversationProtocol.PROTEUS,
+        users: [otherUser],
+        overwites: {team_id: teamId, domain},
+      });
+
+      conversationRepository['conversationState'].conversations.push(proteus1to1Conversation, proteus1to1Conversation2);
+
+      const conversationEntity = await conversationRepository.init1to1Conversation(proteus1to1Conversation2, true);
+      expect(conversationEntity).toEqual(proteus1to1Conversation2);
+    });
   });
 
   describe('getInitialised1To1Conversation', () => {
