@@ -101,7 +101,7 @@ const checkBrowser = (): void => {
   }
   if (!('RTCPeerConnection' in window)) {
     location.href = '/unsupported/';
-    console.error("This browser doesn't support RTCto run the Wire app!");
+    console.error("This browser doesn't support RTC to run the Wire app!");
     return;
   }
   supportsIndexDB()
