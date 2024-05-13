@@ -1821,15 +1821,15 @@ export class ConversationRepository {
 
     const initialisedMLSConversation = await this.establishMLS1to1Conversation(mlsConversation, otherUserId);
 
-    if (shouldOpenMLS1to1Conversation) {
-      // If proteus conversation was previously active conversaiton, we want to make mls 1:1 conversation active.
-      amplify.publish(WebAppEvents.CONVERSATION.SHOW, initialisedMLSConversation, {});
-    }
-
     // If mls is supported by the other user, we can establish the group and remove readonly state from the conversation.
     initialisedMLSConversation.readOnlyState(null);
     await this.update1To1ConversationParticipants(mlsConversation, otherUserId);
     await this.saveConversation(initialisedMLSConversation);
+
+    if (shouldOpenMLS1to1Conversation) {
+      // If proteus conversation was previously active conversaiton, we want to make mls 1:1 conversation active.
+      amplify.publish(WebAppEvents.CONVERSATION.SHOW, initialisedMLSConversation, {});
+    }
     return initialisedMLSConversation;
   };
 
