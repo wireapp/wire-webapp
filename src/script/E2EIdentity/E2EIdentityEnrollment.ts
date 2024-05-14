@@ -142,16 +142,18 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
     await this.coreE2EIService.initialize(discoveryUrl);
 
+    const isFreshClient = await isFreshMLSSelfClient();
+
     if (await this.coreE2EIService.isEnrollmentInProgress()) {
       // If we have an enrollment in progress, we can just finish it (meaning we are coming back from an idp redirect)
       if (this.wasJustRedirected()) {
-        await this.enroll();
+        await this.enroll(!isFreshClient);
       } else {
         // If we have an enrollment in progress but we are not coming back from an idp redirect, we need to clear the progress and start over
         await this.coreE2EIService.clearAllProgress();
         await this.startEnrollment(ModalType.ENROLL, false);
       }
-    } else if (await isFreshMLSSelfClient()) {
+    } else if (isFreshClient) {
       // When the user logs in to a new device in an environment that has e2ei enabled, they should be forced to enroll
       await this.startEnrollment(ModalType.ENROLL, false);
     }
