@@ -33,6 +33,7 @@ type RightSidebarParams = {
   entity: PanelEntity | null;
   showReactions?: boolean;
   highlighted?: User[];
+  isAddMode?: boolean;
 };
 
 type AppMainState = {
@@ -49,6 +50,7 @@ type AppMainState = {
     highlightedUsers: RightSidebarParams['highlighted'];
     history: PanelState[];
     showReactions: RightSidebarParams['showReactions'];
+    isAddMode: RightSidebarParams['isAddMode'];
     lastViewedMessageDetailsEntity: Message | null;
     updateEntity: (entity: RightSidebarParams['entity']) => void;
   };
@@ -99,6 +101,7 @@ const useAppMainState = create<AppMainState>((set, get) => ({
             highlightedUsers: params?.highlighted || [],
             history: [...replacedNewState, panel],
             showReactions: !!params?.showReactions,
+            isAddMode: !!params?.isAddMode,
           },
         };
       });

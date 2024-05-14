@@ -114,7 +114,6 @@ const RightSidebar: FC<RightSidebarProps> = ({
   const conversationState = container.resolve(ConversationState);
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
 
-  const [isAddMode, setIsAddMode] = useState<boolean>(false);
   const [animatePanelToLeft, setAnimatePanelToLeft] = useState<boolean>(true);
 
   const {rightSidebar} = useAppMainState.getState();
@@ -130,10 +129,9 @@ const RightSidebar: FC<RightSidebarProps> = ({
 
   const closePanel = () => rightSidebar.close();
 
-  const togglePanel = (newState: PanelState, entity: PanelEntity | null, addMode: boolean = false) => {
+  const togglePanel = (newState: PanelState, entity: PanelEntity | null, isAddMode: boolean = false) => {
     setAnimatePanelToLeft(true);
-    rightSidebar.goTo(newState, {entity});
-    setIsAddMode(addMode);
+    rightSidebar.goTo(newState, {entity, isAddMode});
   };
 
   const onBackClick = (entity: PanelEntity | null = activeConversation || null) => {
@@ -285,7 +283,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
               onClose={closePanel}
               serviceEntity={serviceEntity}
               selfUser={selfUser}
-              isAddMode={isAddMode}
+              isAddMode={rightSidebar.isAddMode}
             />
           )}
 
