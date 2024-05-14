@@ -114,6 +114,7 @@ const useAppMainState = create<AppMainState>((set, get) => ({
     highlightedUsers: [],
     history: [],
     showReactions: false,
+    isAddMode: false,
     updateEntity: (entity: RightSidebarParams['entity']) =>
       set(state => ({...state, rightSidebar: {...state.rightSidebar, entity}})),
   },
