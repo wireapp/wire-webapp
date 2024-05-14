@@ -23,6 +23,7 @@ import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
+import {Icon} from 'Components/Icon';
 import {filterMessages} from 'Components/MessagesList/utils/messagesFilter';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {MessageRepository} from 'src/script/conversation/MessageRepository';
@@ -70,6 +71,7 @@ interface MessagesListParams {
   isMsgElementsFocusable: boolean;
   setMsgElementsFocusable: (isMsgElementsFocusable: boolean) => void;
   isRightSidebarOpen?: boolean;
+  resetMessageList: () => void;
 }
 
 export const MessagesList: FC<MessagesListParams> = ({
@@ -93,6 +95,7 @@ export const MessagesList: FC<MessagesListParams> = ({
   isMsgElementsFocusable,
   setMsgElementsFocusable,
   isRightSidebarOpen = false,
+  resetMessageList,
 }) => {
   const {
     messages: allMessages,
@@ -252,8 +255,9 @@ export const MessagesList: FC<MessagesListParams> = ({
       className={cx('message-list', {'is-right-panel-open': isRightSidebarOpen})}
       tabIndex={TabIndex.UNFOCUSABLE}
     >
+      <ResetButton conversation={conversation} resetMessageList={resetMessageList} />
       <div ref={setMessageContainer} className={cx('messages', {'flex-center': verticallyCenterMessage()})}>
-        {groupedMessages.flatMap(group => {
+        {groupedMessages.flatMap((group, groupIndex) => {
           if (isMarker(group)) {
             return (
               <MarkerComponent key={`${group.type}-${group.timestamp}`} scrollTo={scrollToElement} marker={group} />
@@ -261,10 +265,24 @@ export const MessagesList: FC<MessagesListParams> = ({
           }
           const {messages, firstMessageTimestamp} = group;
 
-          return messages.map(message => {
+          return messages.map((message, messageIndex) => {
             const isLastDeliveredMessage = lastDeliveredMessage?.id === message.id;
 
-            const visibleCallback = getVisibleCallback(conversation, message);
+            const isLastLoadedMessage =
+              groupIndex === groupedMessages.length - 1 && messageIndex === messages.length - 1;
+
+            const isLastMessage = isLastLoadedMessage && isLastReceivedMessage(message, conversation);
+
+            const visibleCallback = () => {
+              getVisibleCallback(conversation, message)?.();
+              if (isLastMessage) {
+                conversation.isLastMessageVisible(true);
+              }
+            };
+
+            const lastMessageInvisibleCallback = isLastMessage
+              ? () => conversation.isLastMessageVisible(false)
+              : undefined;
 
             const key = `${message.id || 'message'}-${message.timestamp()}`;
 
@@ -275,6 +293,7 @@ export const MessagesList: FC<MessagesListParams> = ({
               <Message
                 key={key}
                 onVisible={visibleCallback}
+                onVisibilityLost={lastMessageInvisibleCallback}
                 message={message}
                 hideHeader={message.timestamp() !== firstMessageTimestamp}
                 messageActions={messageActions}
@@ -318,5 +337,28 @@ export const MessagesList: FC<MessagesListParams> = ({
         })}
       </div>
     </FadingScrollbar>
+  );
+};
+
+const ResetButton = ({conversation, resetMessageList}: {conversation: Conversation; resetMessageList: () => void}) => {
+  const {isLastMessageVisible, hasAdditionalMessages} = useKoSubscribableChildren(conversation, [
+    'isLastMessageVisible',
+    'hasAdditionalMessages',
+  ]);
+
+  //eslint-disable-next-line no-console
+  console.log('patryk', {isLastMessageVisible, hasAdditionalMessages});
+
+  if (isLastMessageVisible) {
+    return null;
+  }
+
+  return (
+    <button
+      css={{position: 'fixed', zIndex: 100, bottom: 100, right: 100, width: 50, height: 50}}
+      onClick={resetMessageList}
+    >
+      <Icon.Chevron />
+    </button>
   );
 };

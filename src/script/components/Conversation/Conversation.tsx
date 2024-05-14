@@ -461,7 +461,7 @@ export const Conversation = ({
     [addReadReceiptToBatch, repositories.conversation, repositories.integration, updateConversationLastRead],
   );
 
-  const [messagesListRerenderKey, rerenderMessagesList] = useComponentRerenderKey('messages-list');
+  const [messagesListRerenderKey, resetMessageList] = useComponentRerenderKey('messages-list');
 
   return (
     <DropFileArea
@@ -534,31 +534,29 @@ export const Conversation = ({
             isMsgElementsFocusable={isMsgElementsFocusable}
             setMsgElementsFocusable={setMsgElementsFocusable}
             isRightSidebarOpen={isRightSidebarOpen}
+            resetMessageList={resetMessageList}
           />
           {isConversationLoaded &&
             (isReadOnlyConversation ? (
               <ReadOnlyConversationMessage reloadApp={reloadApp} conversation={activeConversation} />
             ) : (
-              <>
-                <InputBar
-                  key={activeConversation?.id}
-                  conversation={activeConversation}
-                  conversationRepository={repositories.conversation}
-                  eventRepository={repositories.event}
-                  messageRepository={repositories.message}
-                  openGiphy={openGiphy}
-                  propertiesRepository={repositories.properties}
-                  searchRepository={repositories.search}
-                  storageRepository={repositories.storage}
-                  teamState={teamState}
-                  selfUser={selfUser}
-                  onShiftTab={() => setMsgElementsFocusable(false)}
-                  uploadDroppedFiles={uploadDroppedFiles}
-                  uploadImages={uploadImages}
-                  uploadFiles={uploadFiles}
-                />
-                <button onClick={rerenderMessagesList}>reset</button>
-              </>
+              <InputBar
+                key={activeConversation?.id}
+                conversation={activeConversation}
+                conversationRepository={repositories.conversation}
+                eventRepository={repositories.event}
+                messageRepository={repositories.message}
+                openGiphy={openGiphy}
+                propertiesRepository={repositories.properties}
+                searchRepository={repositories.search}
+                storageRepository={repositories.storage}
+                teamState={teamState}
+                selfUser={selfUser}
+                onShiftTab={() => setMsgElementsFocusable(false)}
+                uploadDroppedFiles={uploadDroppedFiles}
+                uploadImages={uploadImages}
+                uploadFiles={uploadFiles}
+              />
             ))}
 
           <div className="conversation-loading">
