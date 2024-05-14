@@ -254,11 +254,7 @@ export const Conversation = ({
 
     const serviceEntity = userEntity.isService && (await repositories.integration.getServiceFromUser(userEntity));
 
-    if (serviceEntity) {
-      openRightSidebar(panelId, {entity: serviceEntity}, true);
-    } else {
-      openRightSidebar(panelId, {entity: userEntity}, true);
-    }
+    openRightSidebar(panelId, {entity: serviceEntity || userEntity}, true);
   };
 
   const showParticipants = (participants: User[]) => {
