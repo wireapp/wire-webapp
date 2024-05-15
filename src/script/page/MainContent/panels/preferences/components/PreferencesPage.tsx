@@ -25,6 +25,8 @@ import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {RootContext} from 'src/script/page/RootProvider';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 
+import {buttonsStyle, contentStyle, wrapperStyle} from './PreferencesPage.styles';
+
 interface PreferencesPageProps {
   children: React.ReactNode;
   title: string;
@@ -42,13 +44,13 @@ const PreferencesPage: FC<PreferencesPageProps> = ({title, children}) => {
   const goHome = () => root?.content.loadPreviousContent();
 
   return (
-    <div role="tabpanel" aria-labelledby={title} style={{display: 'flex', flexDirection: 'column', height: '100vh'}}>
+    <div role="tabpanel" aria-labelledby={title} css={wrapperStyle}>
       <div className="preferences-titlebar">
         {smBreakpoint && isCentralColumn && (
           <IconButton
             variant={IconButtonVariant.SECONDARY}
             className="conversation-title-bar-icon icon-back"
-            css={{marginBottom: 0}}
+            css={buttonsStyle}
             onClick={() => setCurrentView(ViewType.LEFT_SIDEBAR)}
           />
         )}
@@ -57,12 +59,14 @@ const PreferencesPage: FC<PreferencesPageProps> = ({title, children}) => {
           <IconButton
             variant={IconButtonVariant.SECONDARY}
             className="conversation-title-bar-icon icon-close"
-            css={{marginBottom: 0}}
+            css={buttonsStyle}
             onClick={goHome}
           />
         )}
       </div>
-      <FadingScrollbar className="preferences-content">{children}</FadingScrollbar>
+      <FadingScrollbar className="preferences-content" css={contentStyle}>
+        {children}
+      </FadingScrollbar>
     </div>
   );
 };
