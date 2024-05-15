@@ -90,7 +90,14 @@ export const ReadOnlyConversationMessage: FC<ReadOnlyConversationMessageProps> =
       case CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_NO_KEY_PACKAGES:
         return (
           <ReadOnlyConversationMessageBase>
-            <span>{t('otherUserNoAvailableKeyPackages')}</span>
+            <span>
+              {replaceReactComponents(t('otherUserNoAvailableKeyPackages'), [
+                {
+                  exactMatch: '{{participantName}}',
+                  render: () => <strong>{user.name()}</strong>,
+                },
+              ])}
+            </span>
           </ReadOnlyConversationMessageBase>
         );
     }

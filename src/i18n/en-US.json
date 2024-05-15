@@ -1167,7 +1167,7 @@
   "ongoingGroupVideoCall": "Ongoing video conference call with {{conversationName}}, your camera is {{cameraStatus}}.",
   "ongoingVideoCall": "Ongoing video call with {{conversationName}}, your camera is {{cameraStatus}}.",
   "otherUserNotSupportMLSMsg": "You can't communicate with {{participantName}} anymore, as you two now use different protocols. When {{participantName}} gets an update, you can call and send messages and files again.",
-  "otherUserNoAvailableKeyPackages": "This user has no available keys.",
+  "otherUserNoAvailableKeyPackages": "You can't communicate with {{participantName}} at the moment. When {{participantName}} logs in again, you can call and send messages and files again.",
   "participantDevicesDetailHeadline": "Verify that this matches the fingerprint shown on [bold]{{user}}’s device[/bold].",
   "participantDevicesDetailHowTo": "How do I do that?",
   "participantDevicesDetailResetSession": "Reset session",
