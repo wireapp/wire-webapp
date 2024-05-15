@@ -147,6 +147,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     if (await this.coreE2EIService.isEnrollmentInProgress()) {
       // If we have an enrollment in progress, we can just finish it (meaning we are coming back from an idp redirect)
       if (this.wasJustRedirected()) {
+        // We should not allow to snooze the enorollment if the client is still fresh and the user is coming back from an idp redirect
         await this.enroll(!isFreshClient);
       } else {
         // If we have an enrollment in progress but we are not coming back from an idp redirect, we need to clear the progress and start over
