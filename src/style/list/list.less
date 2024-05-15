@@ -48,9 +48,8 @@
 }
 
 .left-list-header-preferences {
-  display: grid;
+  display: flex;
   min-height: var(--content-title-bar-height);
-  place-content: center;
 }
 
 body.theme-dark {
@@ -62,13 +61,11 @@ body.theme-dark {
 .left-list-header-text {
   .ellipsis-nowrap;
   .heading-h3;
+  .text;
   display: inline-block;
   width: 100%;
 
   align-self: center;
-  grid-column: 2 / span 2;
-  justify-self: center;
-  text-align: center;
 }
 
 .left-list-header-close-button {
