@@ -35,6 +35,15 @@ export const contentStyle: CSSObject = {
   height: '100%',
   padding: '32px 32px 32px 72px',
   overflowX: 'hidden',
+
+  // Rely on viewport media queries if container queries are not supported by the browser
+  '@media (max-width: 768px)': {
+    padding: '40px',
+  },
+  '@media (max-width: 480px)': {
+    padding: '20px',
+  },
+  // Container queries are supported by recent browsers and allow a more flexible responsive design
   '@container (max-width: 768px)': {
     padding: '40px',
   },
