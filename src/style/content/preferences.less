@@ -37,26 +37,6 @@
   color: var(--main-color);
 }
 
-.preferences-content {
-  width: 100%;
-  min-width: var(--preferences-width);
-  height: 100%;
-  padding: 32px 32px 32px 72px;
-  overflow-x: hidden;
-
-  @media (max-width: @screen-md-min) {
-    padding: 40px;
-  }
-
-  @media (max-width: @screen-sm) {
-    padding: 20px;
-  }
-
-  input {
-    color: var(--background);
-  }
-}
-
 .preferences-button {
   margin-top: 8px;
 }
@@ -172,7 +152,7 @@
 
 .preferences-section {
   display: flex;
-  width: var(--preferences-width);
+  max-width: var(--preferences-width);
   flex-direction: column;
   align-items: flex-start;
   padding: 0;
@@ -190,7 +170,7 @@
 }
 
 .preferences-separator {
-  width: var(--preferences-width);
+  max-width: var(--preferences-width);
   height: 1px;
   border: 0;
   margin: 22px 0 22px;
@@ -207,7 +187,7 @@
 }
 
 .preferences-wrapper {
-  width: var(--preferences-width);
+  max-width: var(--preferences-width);
 
   .buttons-group {
     justify-content: center;
