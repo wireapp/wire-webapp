@@ -222,6 +222,85 @@ describe('E2EIHandler', () => {
     return enrollPromise;
   });
 
+  it('shows the error modal without the snooze option after enrollment failed and the client is fresh', async () => {
+    jest.spyOn(coreMock.service!.e2eIdentity!, 'isFreshMLSSelfClient').mockResolvedValue(true);
+    jest.spyOn(coreMock.service!.e2eIdentity!, 'isEnrollmentInProgress').mockResolvedValue(true);
+    jest.spyOn(coreMock, 'enrollE2EI').mockRejectedValue(new Error('OIDC Error'));
+
+    const handler = E2EIHandler.getInstance();
+
+    // mock window search params (code, session_state, state)
+    const searchParams = new URLSearchParams();
+    searchParams.append('code', 'CODE');
+    searchParams.append('session_state', 'SESSION_STATE');
+    searchParams.append('state', 'STATE');
+
+    Object.defineProperty(window, 'location', {
+      value: {
+        search: searchParams.toString(),
+      },
+      writable: true,
+    });
+
+    const enrollPromise = handler.initialize(params);
+
+    await waitFor(() => {
+      expect(modalMock).toHaveBeenCalledWith(
+        PrimaryModalType.ACKNOWLEDGE,
+        expect.objectContaining({text: expect.objectContaining({title: 'acme.error.headline'})}),
+      );
+      expect(modalMock).not.toHaveBeenCalledWith(
+        PrimaryModalType.CONFIRM,
+        expect.objectContaining({secondaryAction: expect.objectContaining({text: 'acme.error.button.secondary'})}),
+      );
+    });
+
+    jest.spyOn(handler, 'enroll').mockImplementation(() => Promise.resolve());
+
+    modalMock.mock.lastCall?.[1].primaryAction?.action?.();
+
+    return enrollPromise;
+  });
+
+  it('shows the error modal with the snooze option after enrollment failed and the client is an e2ei client already', async () => {
+    jest.spyOn(coreMock.service!.e2eIdentity!, 'isFreshMLSSelfClient').mockResolvedValue(false);
+    jest.spyOn(coreMock.service!.e2eIdentity!, 'isEnrollmentInProgress').mockResolvedValue(true);
+    jest.spyOn(coreMock, 'enrollE2EI').mockRejectedValue(new Error('OIDC Error'));
+
+    const handler = E2EIHandler.getInstance();
+
+    // mock window search params (code, session_state, state)
+    const searchParams = new URLSearchParams();
+    searchParams.append('code', 'CODE');
+    searchParams.append('session_state', 'SESSION_STATE');
+    searchParams.append('state', 'STATE');
+
+    Object.defineProperty(window, 'location', {
+      value: {
+        search: searchParams.toString(),
+      },
+      writable: true,
+    });
+
+    const enrollPromise = handler.initialize(params);
+
+    await waitFor(() => {
+      expect(modalMock).toHaveBeenCalledWith(
+        PrimaryModalType.CONFIRM,
+        expect.objectContaining({
+          text: expect.objectContaining({title: 'acme.error.headline'}),
+          secondaryAction: expect.objectContaining({text: 'acme.error.button.secondary'}),
+        }),
+      );
+    });
+
+    jest.spyOn(handler, 'enroll').mockImplementation(() => Promise.resolve());
+
+    modalMock.mock.lastCall?.[1].primaryAction?.action?.();
+
+    return enrollPromise;
+  });
+
   it('registers a renew timer when device is enrolled', async () => {
     const conversationState = container.resolve(ConversationState);
     jest.spyOn(conversationState, 'getSelfMLSConversation').mockReturnValue(new Conversation() as any);
