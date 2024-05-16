@@ -1171,7 +1171,7 @@
   "ongoingGroupAudioCall": "Laufende Telefonkonferenz mit {{conversationName}}.",
   "ongoingGroupVideoCall": "Laufende Videokonferenz mit {{conversationName}}, Ihre Kamera ist {{cameraStatus}}.",
   "ongoingVideoCall": "Laufender Videoanruf mit {{conversationName}}, Ihre Kamera ist {{cameraStatus}}.",
-  "otherUserNoAvailableKeyPackages": "You can't communicate with {{participantName}} at the moment. When {{participantName}} logs in again, you can call and send messages and files again.",
+  "otherUserNoAvailableKeyPackages": "Sie können momentan nicht mit {{participantName}} kommunizieren. Wenn {{participantName}} sich erneut anmeldet, können Sie wieder anrufen sowie Nachrichten und Dateien senden.",
   "otherUserNotSupportMLSMsg": "Sie können nicht mehr mit {{participantName}} kommunizieren, da Sie beide jetzt unterschiedliche Protokolle verwenden. Wenn {{participantName}} ein Update erhält, können Sie wieder anrufen sowie Nachrichten und Dateien senden.",
   "participantDevicesDetailHeadline": "Überprüfen Sie, ob dieser Fingerabdruck mit dem auf [bold]{{user}}s Gerät[/bold] übereinstimmt.",
   "participantDevicesDetailHowTo": "Wie mache ich das?",
