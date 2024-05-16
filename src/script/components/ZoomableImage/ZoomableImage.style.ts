@@ -19,18 +19,9 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const imageStyle = (isZoomEnabled: boolean): CSSObject => {
-  return {
-    cursor: isZoomEnabled ? 'zoom-out !important' : 'default',
-    ...(isZoomEnabled
-      ? {
-          transition: 'transform 0.3s linear',
-          willChange: 'transform',
-        }
-      : {
-          maxWidth: '100%',
-          height: '100%',
-          objectFit: 'scale-down',
-        }),
-  };
+export const imageStyle: CSSObject = {
+  userSelect: 'none',
+  flexShrink: 0,
+  maxWidth: 'none',
+  height: 'auto',
 };

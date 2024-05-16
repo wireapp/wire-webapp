@@ -17,112 +17,155 @@
  *
  */
 
-import React, {HTMLProps, useState} from 'react';
+import React, {HTMLProps, useRef, useState} from 'react';
 
 import {imageStyle} from './ZoomableImage.style';
 
-function checkIfCanZoomImage(element: HTMLImageElement) {
-  if (element.naturalWidth <= element.width && element.naturalHeight <= element.height) {
-    return false;
-  }
+type Offset = {
+  x: number;
+  y: number;
+};
 
-  return element.naturalWidth !== element.offsetWidth || element.naturalHeight !== element.offsetHeight;
+const DEFAULT_OFFSET = {x: 0, y: 0};
+function calculateZoomRatio(parentWidth: number, parentHeight: number, naturalWidth: number, naturalHeight: number) {
+  const widthRatio = parentWidth / naturalWidth;
+  const heightRatio = parentHeight / naturalHeight;
+  return Math.min(widthRatio, heightRatio);
 }
 
 type ZoomableImageProps = HTMLProps<HTMLImageElement>;
 
 export const ZoomableImage = (props: ZoomableImageProps) => {
-  const [isZoomEnabled, setIsZoomEnabled] = useState<boolean>(false);
-  const [maxOffset, setMaxOffset] = useState({x: 0, y: 0});
+  const draggingRef = useRef(false);
 
-  const onButtonClick = (event: React.MouseEvent<HTMLImageElement>) => {
+  const imgRef = useRef<HTMLImageElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+
+  const [isZoomEnabled, setIsZoomEnabled] = useState<boolean>(false);
+  const [imageZoomRatio, setImageZoomRatio] = useState(1);
+
+  const [zoomScale, setZoomScale] = useState(1);
+  const [translateOffset, setTranslateOffset] = useState<Offset>(DEFAULT_OFFSET);
+  const [startOffset, setStartOffset] = useState<Offset>(DEFAULT_OFFSET);
+
+  const handleMouseClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    event.stopPropagation();
+
     const element = event.target as HTMLImageElement;
 
-    if (!checkIfCanZoomImage(element)) {
-      setIsZoomEnabled(false);
+    setIsZoomEnabled(prevState => !prevState);
+    setZoomScale(prevScale => (prevScale === imageZoomRatio ? 1 : imageZoomRatio));
 
-      if (isZoomEnabled) {
-        element.style.width = ``;
-        element.style.height = ``;
-        element.style.transform = ``;
+    requestAnimationFrame(() => {
+      element.style.transition = 'transform 0.2s';
+    });
+
+    setTimeout(() => {
+      element.style.transition = '';
+    }, 200);
+
+    if (isZoomEnabled) {
+      setStartOffset(DEFAULT_OFFSET);
+      setTranslateOffset(DEFAULT_OFFSET);
+    }
+  };
+
+  const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (isZoomEnabled) {
+      draggingRef.current = true;
+    }
+
+    setStartOffset({x: event.clientX - translateOffset.x, y: event.clientY - translateOffset.y});
+    event.preventDefault();
+  };
+
+  const handleMouseUp = (event: React.MouseEvent<HTMLDivElement>) => {
+    const element = event.target as HTMLImageElement;
+
+    requestAnimationFrame(() => {
+      element.style.cursor = isZoomEnabled ? 'zoom-in' : 'zoom-out';
+    });
+
+    if (isZoomEnabled) {
+      event.preventDefault();
+      draggingRef.current = false;
+    }
+  };
+
+  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (isZoomEnabled && draggingRef.current) {
+      if (!containerRef.current || !imgRef.current) {
         return;
       }
 
-      return;
-    }
-
-    const {naturalWidth, naturalHeight, offsetWidth, offsetHeight, parentElement} = element;
-    const {clientX, clientY} = event;
-
-    setIsZoomEnabled(prevState => !prevState);
-
-    element.style.width = `${naturalWidth}px`;
-    element.style.height = `${naturalHeight}px`;
-
-    const {left, top} = element.getBoundingClientRect();
-
-    const parentElementHeight = parentElement?.offsetHeight || offsetHeight;
-    const imageCenterX = naturalWidth / 2;
-    const imageCenterY = naturalHeight / 2;
-
-    const deltaX = clientX - left;
-    const deltaY = clientY - top;
-
-    const isImageNaturalHeightLargerThanHeight = element.naturalHeight >= element.height;
-    const isImageNaturalWidthLargerThanWidth = element.naturalWidth > element.width;
-
-    const maxXOffset = isImageNaturalWidthLargerThanWidth ? ((naturalWidth - offsetWidth) / 2 / naturalWidth) * 100 : 0;
-    const calculatedYOffset = ((naturalHeight - parentElementHeight) / 2 / naturalHeight) * 100;
-    const maxYOffset = isImageNaturalHeightLargerThanHeight ? (calculatedYOffset >= 0 ? calculatedYOffset : 0) : 0;
-
-    setMaxOffset({x: maxXOffset, y: maxYOffset});
-
-    const xOffset = Math.min(Math.max(((deltaX - imageCenterX) / naturalWidth) * 100, -maxXOffset), maxXOffset);
-    const yOffset = Math.min(Math.max(((deltaY - imageCenterY) / naturalHeight) * 100, -maxYOffset), maxYOffset);
-
-    element.style.transform = `translate(${-xOffset}%, ${-yOffset}%)`;
-  };
-
-  const handleMouseMove = (event: React.MouseEvent<HTMLImageElement>) => {
-    if (isZoomEnabled) {
       const element = event.target as HTMLImageElement;
 
-      const {naturalWidth, naturalHeight} = element;
-      const {left, top} = element.getBoundingClientRect();
+      requestAnimationFrame(() => {
+        element.style.cursor = 'grabbing';
+      });
 
-      const mouseX = event.clientX - left;
-      const mouseY = event.clientY - top;
-      const centerX = naturalWidth / 2;
-      const centerY = naturalHeight / 2;
+      const containerRect = containerRef.current.getBoundingClientRect();
 
-      const {x: maxXOffset, y: maxYOffset} = maxOffset;
+      const scaledWidth = imgRef.current.naturalWidth * zoomScale;
+      const scaledHeight = imgRef.current.naturalHeight * zoomScale;
 
-      const xOffset = Math.min(Math.max(((mouseX - centerX) / naturalWidth) * 100, -maxXOffset), maxXOffset);
-      const yOffset = Math.min(Math.max(((mouseY - centerY) / naturalHeight) * 100, -maxYOffset), maxYOffset);
+      const minX = (containerRect.width - scaledWidth) / 2;
+      const minY = (containerRect.height - scaledHeight) / 2;
 
-      element.style.transform = `translate(${-xOffset}%, ${-yOffset}%)`;
+      setTranslateOffset({
+        x: Math.max(minX, Math.min(event.clientX - startOffset.x, -minX)),
+        y: Math.max(minY, Math.min(event.clientY - startOffset.y, -minY)),
+      });
+      event.preventDefault();
     }
   };
 
   return (
-    // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-noninteractive-element-interactions,jsx-a11y/alt-text
-    <img
-      {...props}
-      css={imageStyle(isZoomEnabled)}
-      onClick={onButtonClick}
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions
+    <div
+      css={{width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center'}}
+      onClick={handleMouseClick}
+      onMouseDown={handleMouseDown}
+      onMouseUp={handleMouseUp}
       onMouseMove={handleMouseMove}
-      onLoad={event => {
-        const element = event.target as HTMLImageElement;
+      ref={containerRef}
+    >
+      <img
+        {...props}
+        alt={props.alt}
+        ref={imgRef}
+        css={imageStyle}
+        style={{
+          transform: `translate3d(${translateOffset.x}px, ${translateOffset.y}px, 0) scale(${zoomScale}, ${zoomScale})`,
+          transition: 'transform 0.2s',
+        }}
+        onLoad={event => {
+          const element = event.target as HTMLImageElement;
+          const parentElement = element.parentElement;
 
-        const isImageWidthTooLarge = element.naturalWidth > element.offsetWidth;
-        const isImageHeightTooLarge = element.naturalHeight > element.offsetHeight;
+          if (!parentElement) {
+            return;
+          }
 
-        if (!isImageHeightTooLarge && !isImageWidthTooLarge) {
-          return;
-        }
+          const {offsetWidth: parentOffsetWidth, offsetHeight: parentOffsetHeight} = parentElement;
+          const zoomRatio = calculateZoomRatio(
+            parentOffsetWidth,
+            parentOffsetHeight,
+            element.naturalWidth,
+            element.naturalHeight,
+          );
 
-        element.style.cursor = checkIfCanZoomImage(element) ? 'zoom-in' : '';
-      }}
-    />
+          const imageScale = zoomRatio > 1 ? 1 : zoomRatio;
+          element.style.transform = `translate3d(0px, 0px, 0px) scale(${imageScale}, ${imageScale})`;
+          setImageZoomRatio(imageScale);
+          setZoomScale(imageScale);
+
+          element.width = element.naturalWidth;
+          element.height = element.naturalHeight;
+
+          element.style.cursor = zoomRatio < 1 ? 'zoom-in' : '';
+        }}
+      />
+    </div>
   );
 };
