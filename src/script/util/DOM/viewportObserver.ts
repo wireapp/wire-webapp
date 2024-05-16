@@ -23,14 +23,15 @@ const observedElements = new Map<
     allowBiggerThanViewport?: boolean;
     requireFullyInView?: boolean;
     onVisible?: Function;
-    onChange?: (isVisible: boolean, isIntersecting?: boolean) => void;
+    onVisibilityChange?: (isVisible: boolean, isPartiallyVisible: boolean) => void;
   }
 >();
 const tolerance = 0.8;
 
 const onIntersect: IntersectionObserverCallback = entries => {
   entries.forEach(({intersectionRatio, isIntersecting, target: element, rootBounds}) => {
-    const {onVisible, onChange, requireFullyInView, allowBiggerThanViewport} = observedElements.get(element) || {};
+    const {onVisible, onVisibilityChange, requireFullyInView, allowBiggerThanViewport} =
+      observedElements.get(element) || {};
     const isFullyInView = intersectionRatio >= tolerance;
 
     const isBiggerThanRoot = () => {
@@ -43,8 +44,8 @@ const onIntersect: IntersectionObserverCallback = entries => {
 
     const isVisible = isIntersecting && (!requireFullyInView || isFullyInView || isBiggerThanRoot());
 
-    if (onChange) {
-      onChange(!!isVisible, isIntersecting);
+    if (onVisibilityChange) {
+      onVisibilityChange(!!isVisible, isIntersecting);
     } else if (isVisible) {
       removeElement(element);
       return onVisible?.();
@@ -80,18 +81,22 @@ const onElementInViewport = (
  * Will track an element and trigger the callback whenever the intersecting state changes
  *
  * @param element the element to observe
- * @param onChange the callback to call when the element intersects or not
+ * @param onVisibilityChange the callback to call when the element intersects or not
  * @param requireFullyInView should the element be fully in view
  * @param allowBiggerThanViewport should fire when element is bigger than viewport
  */
 const trackElement = (
   element: HTMLElement,
-  onChange: (isVisible: boolean, isInterseting?: boolean) => void,
+  onVisibilityChange: (isVisible: boolean, isPartiallyVisible: boolean) => void,
   requireFullyInView = false,
   allowBiggerThanViewport = false,
 ): void => {
   if (element) {
-    observedElements.set(element, {allowBiggerThanViewport, onChange, requireFullyInView});
+    observedElements.set(element, {
+      allowBiggerThanViewport,
+      onVisibilityChange,
+      requireFullyInView,
+    });
     return observer.observe(element);
   }
 };
