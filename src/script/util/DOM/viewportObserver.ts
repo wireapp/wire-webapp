@@ -23,7 +23,7 @@ const observedElements = new Map<
     allowBiggerThanViewport?: boolean;
     requireFullyInView?: boolean;
     onVisible?: Function;
-    onChange?: (isVisible: boolean) => void;
+    onChange?: (isVisible: boolean, isIntersecting?: boolean) => void;
   }
 >();
 const tolerance = 0.8;
@@ -44,7 +44,7 @@ const onIntersect: IntersectionObserverCallback = entries => {
     const isVisible = isIntersecting && (!requireFullyInView || isFullyInView || isBiggerThanRoot());
 
     if (onChange) {
-      onChange(!!isVisible);
+      onChange(!!isVisible, isIntersecting);
     } else if (isVisible) {
       removeElement(element);
       return onVisible?.();
@@ -86,7 +86,7 @@ const onElementInViewport = (
  */
 const trackElement = (
   element: HTMLElement,
-  onChange: (isVisible: boolean) => void,
+  onChange: (isVisible: boolean, isInterseting?: boolean) => void,
   requireFullyInView = false,
   allowBiggerThanViewport = false,
 ): void => {
