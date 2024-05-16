@@ -1171,6 +1171,7 @@
   "ongoingGroupAudioCall": "Ongoing conference call with {{conversationName}}.",
   "ongoingGroupVideoCall": "Ongoing video conference call with {{conversationName}}, your camera is {{cameraStatus}}.",
   "ongoingVideoCall": "Ongoing video call with {{conversationName}}, your camera is {{cameraStatus}}.",
+  "otherUserNoAvailableKeyPackages": "You can't communicate with {{participantName}} at the moment. When {{participantName}} logs in again, you can call and send messages and files again.",
   "otherUserNotSupportMLSMsg": "You can't communicate with {{participantName}} anymore, as you two now use different protocols. When {{participantName}} gets an update, you can call and send messages and files again.",
   "participantDevicesDetailHeadline": "सत्यापित करें कि यह [bold]{{user}} के यंत्र[/bold] पर दिखाए गए फिंगरप्रिंट से मेल खाता है|",
   "participantDevicesDetailHowTo": "कैसे मैं वह करूं?",

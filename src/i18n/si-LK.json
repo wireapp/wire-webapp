@@ -1171,6 +1171,7 @@
   "ongoingGroupAudioCall": "{{conversationName}} සමඟ පවතින සම්මන්ත්‍රණ ඇමතුම.",
   "ongoingGroupVideoCall": "{{conversationName}} සමඟ පවතින දෘශ්‍ය සම්මන්ත්‍රණ ඇමතුම, ඔබගේ රූගතය {{cameraStatus}} වේ.",
   "ongoingVideoCall": "{{conversationName}} සමඟ පවතින දෘශ්‍ය ඇමතුම, ඔබගේ රූගතය {{cameraStatus}} වේ.",
+  "otherUserNoAvailableKeyPackages": "You can't communicate with {{participantName}} at the moment. When {{participantName}} logs in again, you can call and send messages and files again.",
   "otherUserNotSupportMLSMsg": "ඔබ දෙදෙනා වෙනස් කෙටුම්පත් භාවිතා කරන බැවින්, ඔබට තවදුරටත් {{participantName}} සමඟ සන්නිවේදනය කිරීමට නොහැකිය. {{participantName}} වෙත යාවත්කාලයක් ලැබුණ විට, ඔබට ඇමතීමට, පණිවිඩ සහ ගොනු යැවීමට හැකිය.",
   "participantDevicesDetailHeadline": "මෙය [bold]{{user}}ගේ උපාංගයේ[/bold] පෙන්වන ඇඟිලි සටහනට ගැළපෙනවා දැයි බලන්න.",
   "participantDevicesDetailHowTo": "එය කරන්නේ කොහොමද?",
