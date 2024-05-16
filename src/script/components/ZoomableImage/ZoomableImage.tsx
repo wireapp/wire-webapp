@@ -17,7 +17,7 @@
  *
  */
 
-import React, {HTMLProps, useRef, useState} from 'react';
+import React, {HTMLProps, RefObject, useRef, useState} from 'react';
 
 import {imageStyle} from './ZoomableImage.style';
 
@@ -26,18 +26,47 @@ type Offset = {
   y: number;
 };
 
-const DEFAULT_OFFSET = {x: 0, y: 0};
+const DEFAULT_OFFSET: Offset = {x: 0, y: 0};
+
 function calculateZoomRatio(parentWidth: number, parentHeight: number, naturalWidth: number, naturalHeight: number) {
   const widthRatio = parentWidth / naturalWidth;
   const heightRatio = parentHeight / naturalHeight;
   return Math.min(widthRatio, heightRatio);
 }
 
+function calculateMaxOffset(
+  containerRef: RefObject<HTMLDivElement>,
+  imgRef: RefObject<HTMLImageElement>,
+  zoomScale: number,
+) {
+  if (!containerRef.current || !imgRef.current) {
+    return {
+      minX: 0,
+      maxX: 0,
+      minY: 0,
+      maxY: 0,
+    };
+  }
+
+  const containerRect = containerRef.current.getBoundingClientRect();
+
+  const scaledWidth = imgRef.current.naturalWidth * zoomScale;
+  const scaledHeight = imgRef.current.naturalHeight * zoomScale;
+
+  const maxXOffset = (containerRect.width - scaledWidth) / 2;
+  const maxYOffset = (containerRect.height - scaledHeight) / 2;
+
+  return {
+    minX: maxXOffset,
+    maxX: -maxXOffset,
+    minY: maxYOffset,
+    maxY: -maxYOffset,
+  };
+}
+
 type ZoomableImageProps = HTMLProps<HTMLImageElement>;
 
 export const ZoomableImage = (props: ZoomableImageProps) => {
-  const draggingRef = useRef(false);
-
   const imgRef = useRef<HTMLImageElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -48,76 +77,82 @@ export const ZoomableImage = (props: ZoomableImageProps) => {
   const [translateOffset, setTranslateOffset] = useState<Offset>(DEFAULT_OFFSET);
   const [startOffset, setStartOffset] = useState<Offset>(DEFAULT_OFFSET);
 
-  const handleMouseClick = (event: React.MouseEvent<HTMLDivElement>) => {
-    event.stopPropagation();
+  const [isMouseDown, setIsMouseDown] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
 
+  const handleMouseClick = (event: React.MouseEvent<HTMLDivElement>) => {
     const element = event.target as HTMLImageElement;
+
+    if (isDragging) {
+      setIsDragging(false);
+      return;
+    }
 
     setIsZoomEnabled(prevState => !prevState);
     setZoomScale(prevScale => (prevScale === imageZoomRatio ? 1 : imageZoomRatio));
 
     requestAnimationFrame(() => {
       element.style.transition = 'transform 0.2s';
-    });
-
-    setTimeout(() => {
-      element.style.transition = '';
-    }, 200);
-
-    if (isZoomEnabled) {
-      setStartOffset(DEFAULT_OFFSET);
-      setTranslateOffset(DEFAULT_OFFSET);
-    }
-  };
-
-  const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
-    if (isZoomEnabled) {
-      draggingRef.current = true;
-    }
-
-    setStartOffset({x: event.clientX - translateOffset.x, y: event.clientY - translateOffset.y});
-    event.preventDefault();
-  };
-
-  const handleMouseUp = (event: React.MouseEvent<HTMLDivElement>) => {
-    const element = event.target as HTMLImageElement;
-
-    requestAnimationFrame(() => {
       element.style.cursor = isZoomEnabled ? 'zoom-in' : 'zoom-out';
     });
 
     if (isZoomEnabled) {
-      event.preventDefault();
-      draggingRef.current = false;
+      setStartOffset(DEFAULT_OFFSET);
+      setTranslateOffset(DEFAULT_OFFSET);
+      setIsDragging(false);
     }
   };
 
-  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
-    if (isZoomEnabled && draggingRef.current) {
-      if (!containerRef.current || !imgRef.current) {
-        return;
-      }
+  const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
+    event.preventDefault();
 
-      const element = event.target as HTMLImageElement;
-
-      requestAnimationFrame(() => {
-        element.style.cursor = 'grabbing';
-      });
-
-      const containerRect = containerRef.current.getBoundingClientRect();
-
-      const scaledWidth = imgRef.current.naturalWidth * zoomScale;
-      const scaledHeight = imgRef.current.naturalHeight * zoomScale;
-
-      const minX = (containerRect.width - scaledWidth) / 2;
-      const minY = (containerRect.height - scaledHeight) / 2;
-
-      setTranslateOffset({
-        x: Math.max(minX, Math.min(event.clientX - startOffset.x, -minX)),
-        y: Math.max(minY, Math.min(event.clientY - startOffset.y, -minY)),
-      });
-      event.preventDefault();
+    if (isZoomEnabled) {
+      setIsMouseDown(true);
     }
+
+    setStartOffset({
+      x: event.clientX - translateOffset.x,
+      y: event.clientY - translateOffset.y,
+    });
+  };
+
+  const handleMouseUp = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (!isZoomEnabled && !isMouseDown) {
+      return;
+    }
+
+    setIsMouseDown(false);
+    const element = event.target as HTMLImageElement;
+    requestAnimationFrame(() => {
+      element.style.cursor = 'zoom-out';
+    });
+  };
+
+  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (!isZoomEnabled || !isMouseDown || !containerRef.current || !imgRef.current) {
+      return;
+    }
+
+    setIsDragging(true);
+
+    const element = event.target as HTMLImageElement;
+
+    if (element.style.transition) {
+      element.style.transition = '';
+    }
+
+    requestAnimationFrame(() => {
+      element.style.cursor = 'grabbing';
+    });
+
+    const {minX, maxX, minY, maxY} = calculateMaxOffset(containerRef, imgRef, zoomScale);
+
+    setTranslateOffset({
+      x: Math.max(minX, Math.min(event.clientX - startOffset.x, maxX)),
+      y: Math.max(minY, Math.min(event.clientY - startOffset.y, maxY)),
+    });
+
+    event.preventDefault();
   };
 
   return (
