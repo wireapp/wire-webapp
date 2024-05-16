@@ -1171,6 +1171,7 @@
   "ongoingGroupAudioCall": "Ongoing conference call with {{conversationName}}.",
   "ongoingGroupVideoCall": "Ongoing video conference call with {{conversationName}}, your camera is {{cameraStatus}}.",
   "ongoingVideoCall": "Ongoing video call with {{conversationName}}, your camera is {{cameraStatus}}.",
+  "otherUserNoAvailableKeyPackages": "You can't communicate with {{participantName}} at the moment. When {{participantName}} logs in again, you can call and send messages and files again.",
   "otherUserNotSupportMLSMsg": "You can't communicate with {{participantName}} anymore, as you two now use different protocols. When {{participantName}} gets an update, you can call and send messages and files again.",
   "participantDevicesDetailHeadline": "Verifica que esta coincida con la huella digital que se muestra en el [bold]dispositivo de {{user}}’s[/bold].",
   "participantDevicesDetailHowTo": "¿Cómo lo hago?",
