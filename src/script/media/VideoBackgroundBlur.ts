@@ -54,6 +54,12 @@ const videoTracks = {
   audio: null as MediaStreamTrack[] | null,
 };
 
+// Calculate the FPS interval
+const fpsInterval = 1000 / QualitySettings.framerate;
+let then = Date.now();
+let now = then;
+let elapsed = 0;
+
 // Store the ImageSegmenter instance
 let imageSegmenter: ImageSegmenter | undefined;
 // Store the animation frame ID
@@ -66,12 +72,21 @@ async function predictWebcam() {
     return;
   }
 
-  ctx.drawImage(videoEl, 0, 0, videoDimensions.width, videoDimensions.height);
-  const startTimeMs = performance.now();
-  try {
-    imageSegmenter?.segmentForVideo(videoEl, startTimeMs, processSegmentationResult);
-  } catch (error) {
-    console.error('Failed to segment video', error);
+  now = Date.now();
+  elapsed = now - then;
+
+  // If enough time has elapsed, draw the video frame and segment it
+  if (elapsed > fpsInterval) {
+    then = now - (elapsed % fpsInterval);
+
+    ctx.drawImage(videoEl, 0, 0, videoDimensions.width, videoDimensions.height);
+    const startTimeMs = performance.now();
+
+    try {
+      imageSegmenter?.segmentForVideo(videoEl, startTimeMs, processSegmentationResult);
+    } catch (error) {
+      console.error('Failed to segment video', error);
+    }
   }
 }
 
