@@ -174,18 +174,24 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
    * @returns the delay under which the next enrollment/renewal modal will be prompted
    */
   public async startTimers() {
-    // We store the first time the user was prompted with the enrollment modal
-    const storedE2eActivatedAt = this.enrollmentStore.get.e2eiActivatedAt();
-    const e2eActivatedAt = storedE2eActivatedAt || Date.now();
-    this.enrollmentStore.store.e2eiActivatedAt(e2eActivatedAt);
+    // Get the time when the user was first prompted with the enrollment modal
+    let storedE2eActivatedAt = this.enrollmentStore.get.e2eiActivatedAt();
+    // Check if the user has never been prompted with the enrollment modal, default store value is 0
+    const isFirstActivation = storedE2eActivatedAt === 0;
+    // If the user has never been prompted with the enrollment modal, we store the current time as the first activation time
+    if (isFirstActivation) {
+      storedE2eActivatedAt = Date.now();
+      this.enrollmentStore.store.e2eiActivatedAt(storedE2eActivatedAt);
+    }
 
     const timerKey = 'enrollmentTimer';
     const identity = await getActiveWireIdentity();
 
     const {firingDate: computedFiringDate, isSnoozable} = getEnrollmentTimer(
       identity,
-      e2eActivatedAt,
+      storedE2eActivatedAt,
       this.config.gracePeriodInMs,
+      isFirstActivation,
     );
 
     const task = async () => {

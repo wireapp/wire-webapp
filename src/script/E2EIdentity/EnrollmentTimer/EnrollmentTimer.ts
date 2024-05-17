@@ -91,6 +91,7 @@ export function getEnrollmentTimer(
   identity: WireIdentity | undefined,
   e2eiActivatedAt: number,
   teamGracePeriodDuration: number,
+  isFirstActivation: boolean = false,
 ) {
   if (identity?.status === MLSStatuses.EXPIRED) {
     return {isSnoozable: false, firingDate: Date.now()};
@@ -98,6 +99,11 @@ export function getEnrollmentTimer(
 
   const deadline = getGracePeriod(identity, e2eiActivatedAt, teamGracePeriodDuration);
   const nextTick = getNextTick(deadline);
+
+  // For the first activation, we want to trigger the timer immediately
+  if (isFirstActivation) {
+    return {isSnoozable: nextTick > 0, firingDate: Date.now()};
+  }
 
   // When logging in to a old device that doesn't have an identity yet, we trigger an enrollment timer
   return {isSnoozable: nextTick > 0, firingDate: Date.now() + nextTick};
