@@ -20,11 +20,8 @@
 import {useEffect, useRef, useState} from 'react';
 
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
-import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {partition} from 'underscore';
-
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Icon} from 'Components/Icon';
 import {UserList, UserlistMode} from 'Components/UserList';
@@ -52,8 +49,6 @@ import {UserState} from '../../../../user/UserState';
 export type SearchResultsData = {contacts: User[]; groups: Conversation[]; others: User[]};
 
 interface PeopleTabProps {
-  canCreateGroupConversation: boolean;
-  canCreateGuestRoom: boolean;
   canInviteTeamMembers: boolean;
   canSearchUnconnectedUsers: boolean;
   conversationRepository: ConversationRepository;
@@ -83,8 +78,6 @@ export const PeopleTab = ({
   selfUser,
   canInviteTeamMembers,
   canSearchUnconnectedUsers,
-  canCreateGroupConversation,
-  canCreateGuestRoom,
   conversationState,
   searchRepository,
   conversationRepository,
@@ -258,40 +251,6 @@ export const PeopleTab = ({
                 >
                   <span className="left-column-icon icon-envelope"></span>
                   <span className="column-center">{t('searchMemberInvite')}</span>
-                </button>
-              </li>
-            )}
-            {canCreateGroupConversation && (
-              <li className="left-list-item">
-                <button
-                  className="left-list-item-button"
-                  type="button"
-                  onClick={() => amplify.publish(WebAppEvents.CONVERSATION.CREATE_GROUP, 'start_ui')}
-                  data-uie-name="go-create-group"
-                >
-                  <span className="left-column-icon">
-                    <Icon.Group />
-                  </span>
-                  <span className="column-center">{t('searchCreateGroup')}</span>
-                </button>
-              </li>
-            )}
-            {canCreateGuestRoom && (
-              <li className="left-list-item">
-                <button
-                  className="left-list-item-button"
-                  type="button"
-                  onClick={() =>
-                    conversationRepository.createGuestRoom().then(conversation => {
-                      amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversation, {});
-                    })
-                  }
-                  data-uie-name="do-create-guest-room"
-                >
-                  <span className="left-column-icon">
-                    <Icon.Guest />
-                  </span>
-                  <span className="column-center">{t('searchCreateGuestRoom')}</span>
                 </button>
               </li>
             )}

@@ -80,14 +80,8 @@ const StartUI: React.FC<StartUIProps> = ({
   selfUser,
 }) => {
   const brandName = Config.getConfig().BRAND_NAME;
-  const {
-    canInviteTeamMembers,
-    canSearchUnconnectedUsers,
-    canManageServices,
-    canChatWithServices,
-    canCreateGuestRoom,
-    canCreateGroupConversation,
-  } = generatePermissionHelpers(selfUser.teamRole());
+  const {canInviteTeamMembers, canSearchUnconnectedUsers, canManageServices, canChatWithServices} =
+    generatePermissionHelpers(selfUser.teamRole());
 
   useEffect(() => {
     void conversationRepository.loadMissingConversations();
@@ -205,8 +199,6 @@ const StartUI: React.FC<StartUIProps> = ({
           searchRepository={searchRepository}
           conversationRepository={conversationRepository}
           canInviteTeamMembers={canInviteTeamMembers()}
-          canCreateGroupConversation={canCreateGroupConversation()}
-          canCreateGuestRoom={canCreateGuestRoom()}
           userRepository={userRepository}
           onClickContact={openContact}
           onClickConversation={openConversation}
