@@ -8,8 +8,8 @@
   ],
   "main": "lib/index",
   "devDependencies": {
-    "@types/rimraf": "^3.0.2",
-    "rimraf": "^3.0.2",
+    "@types/rimraf": "4.0.5",
+    "rimraf": "5.0.7",
     "typescript": "^5.0.4"
   },
   "scripts": {

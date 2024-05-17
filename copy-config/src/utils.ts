@@ -21,7 +21,7 @@ import axios from 'axios';
 import copy from 'copy';
 import {ensureDir, remove, readFile, writeFile, createWriteStream} from 'fs-extra';
 import JSZip from 'jszip';
-import rimraf from 'rimraf';
+import {rimraf} from 'rimraf';
 import File from 'vinyl';
 
 import {exec} from 'child_process';
@@ -87,5 +87,5 @@ export async function extractAsync(zipFile: string, destination: string): Promis
 }
 
 export const isFile = (path: string) => /\w\.\w+$/.test(path);
-export const rimrafAsync = promisify(rimraf);
+export const rimrafAsync = rimraf;
 export const execAsync = promisify(exec);
