@@ -5,7 +5,7 @@
     "@emotion/react": "11.11.4",
     "@lexical/history": "0.15.0",
     "@lexical/react": "0.15.0",
-    "@wireapp/avs": "9.6.12",
+    "@wireapp/avs": "9.7.12",
     "@wireapp/commons": "5.2.7",
     "@wireapp/core": "46.0.9",
     "@wireapp/react-ui-kit": "9.17.4",
