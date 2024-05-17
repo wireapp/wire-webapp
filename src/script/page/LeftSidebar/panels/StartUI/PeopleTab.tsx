@@ -49,8 +49,6 @@ import {UserState} from '../../../../user/UserState';
 export type SearchResultsData = {contacts: User[]; groups: Conversation[]; others: User[]};
 
 interface PeopleTabProps {
-  canCreateGroupConversation: boolean;
-  canCreateGuestRoom: boolean;
   canInviteTeamMembers: boolean;
   canSearchUnconnectedUsers: boolean;
   conversationRepository: ConversationRepository;
@@ -80,8 +78,6 @@ export const PeopleTab = ({
   selfUser,
   canInviteTeamMembers,
   canSearchUnconnectedUsers,
-  canCreateGroupConversation,
-  canCreateGuestRoom,
   conversationState,
   searchRepository,
   conversationRepository,
