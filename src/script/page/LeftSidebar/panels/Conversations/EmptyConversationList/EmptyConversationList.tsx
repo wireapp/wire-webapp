@@ -25,7 +25,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/state';
 import {t} from 'Util/LocalizerUtil';
 
-import {button, paragraph, seperator, wrapper} from './EmptyConversationList.styles';
+import {button, paragraph, paragraphBold, paragraphGray, seperator, wrapper} from './EmptyConversationList.styles';
 
 import {Config} from '../../../../../Config';
 
@@ -130,7 +130,14 @@ export const EmptyConversationList = ({currentTab, onChangeTab, searchValue = ''
     return (
       <div css={wrapper}>
         <div>
-          <p css={paragraph}>{searchValue ? t('searchConversationsNoResult') : t('conversationsAllArchived')}</p>
+          {searchValue && <p css={paragraph}>{t('searchConversationsNoResult')}</p>}
+
+          {!searchValue && (
+            <div>
+              <p css={paragraphBold}>{t('conversationsNothingArchived')}</p>
+              <p css={paragraphGray}>{t('conversationsNothingArchivedTip')}</p>
+            </div>
+          )}
         </div>
       </div>
     );

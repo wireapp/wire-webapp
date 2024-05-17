@@ -37,6 +37,17 @@ export const paragraph: CSSObject = {
   letterSpacing: '0.05px',
 };
 
+export const paragraphBold: CSSObject = {
+  ...paragraph,
+  fontWeight: 'var(--font-weight-semibold)',
+};
+
+export const paragraphGray: CSSObject = {
+  ...paragraph,
+  fontWeight: 'var(--font-weight-regular)',
+  color: 'var(--text-input-label)',
+};
+
 export const seperator: CSSObject = {
   display: 'block',
   margin: '4px 0',
