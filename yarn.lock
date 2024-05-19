@@ -2647,14 +2647,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@formatjs/cli@npm:6.2.10":
-  version: 6.2.10
-  resolution: "@formatjs/cli@npm:6.2.10"
+"@formatjs/cli@npm:6.2.12":
+  version: 6.2.12
+  resolution: "@formatjs/cli@npm:6.2.12"
   peerDependencies:
     "@glimmer/env": ^0.1.7
-    "@glimmer/reference": ^0.91.1
-    "@glimmer/syntax": ^0.91.1
-    "@glimmer/validator": ^0.91.1
+    "@glimmer/reference": ^0.91.1 || ^0.92.0
+    "@glimmer/syntax": ^0.92.0
+    "@glimmer/validator": ^0.92.0
     "@vue/compiler-core": ^3.4.0
     content-tag: ^2.0.1
     ember-template-recast: ^6.1.4
@@ -2678,7 +2678,7 @@ __metadata:
       optional: true
   bin:
     formatjs: bin/formatjs
-  checksum: 10/a4a0828364a68f0347f076125b358cbb891058c136a8e7239ad53749d9bd7da7c093ddc9831e225d37d535733c6206e1cf38a4aa7016953227b6c671d1bf8598
+  checksum: 10/468123112ddd3c26ae2c11cead5ab684b1c7712c841c976e42cc3d9ab7aa10fa6ea02208b2beeaabfd3872fab16a10fa44eb3e9d611c716f7d80dfaf6f420962
   languageName: node
   linkType: hard
 
@@ -17814,7 +17814,7 @@ __metadata:
     "@emotion/eslint-plugin": "npm:11.11.0"
     "@emotion/react": "npm:11.11.4"
     "@faker-js/faker": "npm:8.4.1"
-    "@formatjs/cli": "npm:6.2.10"
+    "@formatjs/cli": "npm:6.2.12"
     "@koush/wrtc": "npm:0.5.3"
     "@lexical/history": "npm:0.15.0"
     "@lexical/react": "npm:0.15.0"
