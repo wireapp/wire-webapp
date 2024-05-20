@@ -87,7 +87,10 @@ const InViewport: React.FC<InViewportParams & React.HTMLProps<HTMLDivElement>> =
         triggerCallbackIfVisible();
       });
     }
-    return () => releaseTrackers();
+    return () => {
+      onVisibilityLost?.();
+      releaseTrackers();
+    };
   }, [allowBiggerThanViewport, requireFullyInView, checkOverlay, onVisible, onVisibilityLost]);
 
   return (
