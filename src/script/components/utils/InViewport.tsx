@@ -24,7 +24,7 @@ import {viewportObserver} from 'Util/DOM/viewportObserver';
 
 interface InViewportParams {
   onVisible: () => void;
-  onNotVisible?: () => void;
+  onVisibilityLost?: () => void;
   requireFullyInView?: boolean;
   allowBiggerThanViewport?: boolean;
   /** Will check if the element is overlayed by something else. Can be used to be sure the user could actually see the element. Should not be used to do lazy loading as the overlayObserver has quite a long debounce time */
@@ -34,7 +34,7 @@ interface InViewportParams {
 const InViewport: React.FC<InViewportParams & React.HTMLProps<HTMLDivElement>> = ({
   children,
   onVisible,
-  onNotVisible,
+  onVisibilityLost,
   requireFullyInView = false,
   checkOverlay = false,
   allowBiggerThanViewport = false,
@@ -61,7 +61,7 @@ const InViewport: React.FC<InViewportParams & React.HTMLProps<HTMLDivElement>> =
       if (inViewport && visible) {
         onVisible();
 
-        if (!onNotVisible) {
+        if (!onVisibilityLost) {
           releaseTrackers();
         }
       }
@@ -73,9 +73,9 @@ const InViewport: React.FC<InViewportParams & React.HTMLProps<HTMLDivElement>> =
         inViewport = isInViewport;
         triggerCallbackIfVisible();
 
-        // If the element is not intersecting at all, we can trigger the onNotVisible callback
+        // If the element is not intersecting at all, we can trigger the onVisibilityLost callback
         if (!isPartiallyVisible) {
-          onNotVisible?.();
+          onVisibilityLost?.();
         }
       },
       requireFullyInView,
@@ -88,7 +88,7 @@ const InViewport: React.FC<InViewportParams & React.HTMLProps<HTMLDivElement>> =
       });
     }
     return () => releaseTrackers();
-  }, [allowBiggerThanViewport, requireFullyInView, checkOverlay, onVisible, onNotVisible]);
+  }, [allowBiggerThanViewport, requireFullyInView, checkOverlay, onVisible, onVisibilityLost]);
 
   return (
     <div ref={domNode} {...props} css={{minHeight: '1px'}}>
