@@ -67,7 +67,6 @@ import {TeamState} from '../../team/TeamState';
 import {ElementType, MessageDetails} from '../MessagesList/Message/ContentMessage/asset/TextMessageRenderer';
 
 interface ConversationProps {
-  readonly initialMessage?: Message;
   readonly teamState: TeamState;
   selfUser: User;
   openRightSidebar: (panelState: PanelState, params: RightSidebarParams, compareEntityId?: boolean) => void;
@@ -78,7 +77,6 @@ interface ConversationProps {
 const CONFIG = Config.getConfig();
 
 export const Conversation = ({
-  initialMessage,
   teamState,
   selfUser,
   openRightSidebar,
@@ -514,7 +512,6 @@ export const Conversation = ({
           <MessagesList
             conversation={activeConversation}
             selfUser={selfUser}
-            initialMessage={initialMessage}
             conversationRepository={conversationRepository}
             messageRepository={repositories.message}
             messageActions={mainViewModel.actions}

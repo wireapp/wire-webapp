@@ -71,7 +71,6 @@ export class ContentViewModel {
   mainViewModel: MainViewModel;
   previousConversation?: Conversation;
   userRepository: UserRepository;
-  initialMessage?: Message;
 
   get isFederated() {
     return this.mainViewModel.isFederated;
@@ -135,7 +134,7 @@ export class ContentViewModel {
   }
 
   private changeConversation(conversationEntity: Conversation, messageEntity?: Message): void {
-    this.initialMessage = messageEntity;
+    conversationEntity.initialMessage(messageEntity);
     this.conversationState.activeConversation(conversationEntity);
   }
 
