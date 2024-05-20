@@ -103,7 +103,7 @@ const MainContent: FC<MainContentProps> = ({
     return null;
   }
   const {content: contentViewModel} = mainViewModel;
-  const {initialMessage, isFederated, repositories, switchContent} = contentViewModel;
+  const {isFederated, repositories, switchContent} = contentViewModel;
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
@@ -236,7 +236,6 @@ const MainContent: FC<MainContentProps> = ({
 
             {contentState === ContentState.CONVERSATION && (
               <Conversation
-                initialMessage={initialMessage}
                 teamState={teamState}
                 selfUser={selfUser}
                 isRightSidebarOpen={isRightSidebarOpen}

@@ -153,6 +153,7 @@ export class Conversation {
   public readonly messages_unordered: ko.ObservableArray<Message>;
   /** Sorted messages that are ready to be displayed in the conversation */
   public readonly messages: ko.PureComputed<Message[]>;
+  public readonly initialMessage: ko.Observable<Message | undefined>;
   public readonly messageTimer: ko.PureComputed<number>;
   public readonly name: ko.Observable<string>;
   public readonly notificationState: ko.PureComputed<number>;
@@ -300,6 +301,7 @@ export class Conversation {
     this.last_read_timestamp = ko.observable(0);
     this.last_server_timestamp = ko.observable(0);
     this.mutedTimestamp = ko.observable(0);
+    this.initialMessage = ko.observable();
 
     this.readOnlyState = ko.observable<CONVERSATION_READONLY_STATE | null>(null);
 

@@ -44,7 +44,6 @@ const getDefaultParams = (): React.ComponentProps<typeof MessagesList> => {
       updateParticipatingUserEntities: jest.fn(),
     } as any,
     getVisibleCallback: jest.fn(),
-    initialMessage: undefined,
     invitePeople: jest.fn(),
     isLastReceivedMessage: jest.fn(),
     messageActions: {
