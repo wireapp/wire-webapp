@@ -25,3 +25,11 @@ export const imageStyle: CSSObject = {
   maxWidth: 'none',
   height: 'auto',
 };
+
+export const containerStyle: CSSObject = {
+  width: '100%',
+  height: '100%',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+};

@@ -19,7 +19,7 @@
 
 import React, {HTMLProps, RefObject, useEffect, useRef, useState} from 'react';
 
-import {imageStyle} from './ZoomableImage.style';
+import {containerStyle, imageStyle} from './ZoomableImage.style';
 
 type Offset = {
   x: number;
@@ -216,7 +216,7 @@ export const ZoomableImage = (props: ZoomableImageProps) => {
     // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions
     <div
       ref={containerRef}
-      css={{width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center'}}
+      css={containerStyle}
       onClick={handleMouseClick}
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
