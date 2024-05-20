@@ -461,7 +461,12 @@ export const Conversation = ({
     [addReadReceiptToBatch, repositories.conversation, repositories.integration, updateConversationLastRead],
   );
 
-  const [messagesListRerenderKey, resetMessageList] = useComponentRerenderKey('messages-list');
+  const [messagesListRerenderKey, rerenderMessageList] = useComponentRerenderKey('messages-list');
+
+  const resetMessageList = () => {
+    activeConversation?.initialMessage(undefined);
+    rerenderMessageList();
+  };
 
   return (
     <DropFileArea

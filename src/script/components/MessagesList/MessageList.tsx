@@ -341,13 +341,7 @@ export const MessagesList: FC<MessagesListParams> = ({
 };
 
 const ResetButton = ({conversation, resetMessageList}: {conversation: Conversation; resetMessageList: () => void}) => {
-  const {isLastMessageVisible, hasAdditionalMessages} = useKoSubscribableChildren(conversation, [
-    'isLastMessageVisible',
-    'hasAdditionalMessages',
-  ]);
-
-  //eslint-disable-next-line no-console
-  console.log('patryk', {isLastMessageVisible, hasAdditionalMessages});
+  const {isLastMessageVisible} = useKoSubscribableChildren(conversation, ['isLastMessageVisible']);
 
   if (isLastMessageVisible) {
     return null;
