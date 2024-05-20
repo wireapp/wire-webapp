@@ -88,6 +88,7 @@ const InViewport: React.FC<InViewportParams & React.HTMLProps<HTMLDivElement>> =
       });
     }
     return () => {
+      // If the element is unmounted, we can trigger the onVisibilityLost callback and release the trackers
       onVisibilityLost?.();
       releaseTrackers();
     };
