@@ -139,12 +139,15 @@ export const ZoomableImage = (props: ZoomableImageProps) => {
     if (!canZoomImage && !isZoomEnabled) {
       return;
     }
+    const element = event.target;
+
+    if (!isHTMLImageElement(element)) {
+      return;
+    }
 
     if (isZoomEnabled) {
       mouseDownRef.current = true;
     }
-
-    const element = event.target as HTMLImageElement;
 
     requestAnimationFrame(() => {
       element.style.transition = 'transform 0.2s';
@@ -163,9 +166,14 @@ export const ZoomableImage = (props: ZoomableImageProps) => {
       return;
     }
 
+    const element = event.target;
+
+    if (!isHTMLImageElement(element)) {
+      return;
+    }
+
     mouseDownRef.current = false;
 
-    const element = event.target as HTMLImageElement;
     requestAnimationFrame(() => {
       element.style.cursor = 'zoom-out';
     });
@@ -176,9 +184,13 @@ export const ZoomableImage = (props: ZoomableImageProps) => {
       return;
     }
 
-    draggingRef.current = true;
+    const element = event.target;
 
-    const element = event.target as HTMLImageElement;
+    if (!isHTMLImageElement(element)) {
+      return;
+    }
+
+    draggingRef.current = true;
 
     if (element.style.transition) {
       element.style.transition = '';
@@ -234,7 +246,12 @@ export const ZoomableImage = (props: ZoomableImageProps) => {
           transform: `translate3d(${translateOffset.x}px, ${translateOffset.y}px, 0) scale(${zoomScale}, ${zoomScale})`,
         }}
         onLoad={event => {
-          const element = event.target as HTMLImageElement;
+          const element = event.target;
+
+          if (!isHTMLImageElement(element)) {
+            return;
+          }
+
           const zoomRatio = calculateZoomRatio(element);
           const imageScale = zoomRatio > 1 ? 1 : zoomRatio;
           setImageRatio(imageScale);
