@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [46.0.10](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.0.9...@wireapp/core@46.0.10) (2024-05-21)
+
+### Bug Fixes
+
+* Replace `uuidjs` with `uuid` WPB-7240 ([#6221](https://github.com/wireapp/wire-web-packages/issues/6221)) ([d51550d](https://github.com/wireapp/wire-web-packages/commit/d51550da1306a39c681934fcdbd81d7553352eae))
+
 ## [46.0.9](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@46.0.8...@wireapp/core@46.0.9) (2024-05-10)
 
 **Note:** Version bump only for package @wireapp/core
