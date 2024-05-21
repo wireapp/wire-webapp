@@ -29,7 +29,7 @@ import {ReconnectingWebsocket} from '@wireapp/api-client/lib/tcp/ReconnectingWeb
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {WS} from 'jest-websocket-mock';
 import nock, {cleanAll} from 'nock';
-import {genV4} from 'uuidjs';
+import {v4 as uuidv4} from 'uuid';
 
 import {APIClient} from '@wireapp/api-client';
 import {AccentColor, ValidationUtil} from '@wireapp/commons';
@@ -263,7 +263,7 @@ describe('Account', () => {
 
     const mockNotifications = (size: number) => {
       const notifications = Array.from(new Array(size)).map(() => ({
-        id: genV4().toString(),
+        id: uuidv4(),
         payload: [{}] as BackendEvent[],
       }));
       jest.spyOn(dependencies.apiClient.api.notification, 'getAllNotifications').mockResolvedValue({notifications});
@@ -369,7 +369,7 @@ describe('Account', () => {
               expect(onEvent).not.toHaveBeenCalledWith(expect.any(Object), NotificationSource.WEBSOCKET);
 
               onEvent.mockReset();
-              server.send(JSON.stringify({id: genV4().toString(), payload: [{}]}));
+              server.send(JSON.stringify({id: uuidv4(), payload: [{}]}));
               await waitFor(() => expect(onEvent).toHaveBeenCalledTimes(1));
               expect(onEvent).not.toHaveBeenCalledWith(expect.any(Object), NotificationSource.NOTIFICATION_STREAM);
               expect(onEvent).toHaveBeenCalledWith(expect.any(Object), NotificationSource.WEBSOCKET);
@@ -394,7 +394,7 @@ describe('Account', () => {
                 case ConnectionState.PROCESSING_NOTIFICATIONS:
                   // sending a message as soon as the notificaiton stream starts to process
                   // This message should only be forwarded once the notification stream is fully processed
-                  server.send(JSON.stringify({id: genV4().toString(), payload: [{}]}));
+                  server.send(JSON.stringify({id: uuidv4(), payload: [{}]}));
                   break;
                 case ConnectionState.LIVE:
                   expect(onNotificationStreamProgress).toHaveBeenCalledTimes(nbNotifications);
@@ -432,7 +432,7 @@ describe('Account', () => {
                 case ConnectionState.PROCESSING_NOTIFICATIONS:
                   // sending a message as soon as the notificaiton stream starts to process
                   // This message should only be forwarded once the notification stream is fully processed
-                  server.send(JSON.stringify({id: genV4().toString(), payload: [{}]}));
+                  server.send(JSON.stringify({id: uuidv4(), payload: [{}]}));
                   break;
                 case ConnectionState.LIVE:
                   reject(new Error());
