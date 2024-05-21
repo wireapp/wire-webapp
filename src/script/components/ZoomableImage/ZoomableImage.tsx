@@ -21,6 +21,8 @@ import React, {HTMLProps, RefObject, useEffect, useRef, useState} from 'react';
 
 import {containerStyle, imageStyle} from './ZoomableImage.style';
 
+import {isHTMLImageElement} from '../../guards/HTMLElement';
+
 type Offset = {
   x: number;
   y: number;
@@ -54,12 +56,9 @@ function calculateMaxOffset(containerRef: RefObject<HTMLDivElement>, imgRef: Ref
 
   const containerRect = containerRef.current.getBoundingClientRect();
 
-  const maxXOffset = (containerRect.width - imgRef.current.naturalWidth) / 2;
-  const maxYOffset = (containerRect.height - imgRef.current.naturalHeight) / 2;
-
   return {
-    maxXOffset: maxXOffset,
-    maxYOffset: maxYOffset,
+    maxXOffset: (containerRect.width - imgRef.current.naturalWidth) / 2,
+    maxYOffset: (containerRect.height - imgRef.current.naturalHeight) / 2,
   };
 }
 
@@ -82,7 +81,11 @@ export const ZoomableImage = (props: ZoomableImageProps) => {
   const zoomScale = isZoomEnabled ? 1 : imageRatio;
 
   const handleMouseClick = (event: React.MouseEvent<HTMLDivElement>) => {
-    const element = event.target as HTMLImageElement;
+    const element = event.target;
+
+    if (!isHTMLImageElement(element)) {
+      return;
+    }
 
     if (!canZoomImage && !isZoomEnabled) {
       return;
