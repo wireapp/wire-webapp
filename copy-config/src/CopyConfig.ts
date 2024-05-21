@@ -152,7 +152,8 @@ export class CopyConfig {
 
     // Info: "fs.copy" creates all sub-folders which are needed along the way:
     // see https://github.com/jprichardson/node-fs-extra/blob/7.0.1/lib/copy/copy.js#L43
-    await fs.copy(source, destination, {filter, overwrite: true, recursive: true});
+    // by default, fs.copy() copies folders recursively
+    await fs.copy(source, destination, {filter, overwrite: true});
 
     return [destination];
   }

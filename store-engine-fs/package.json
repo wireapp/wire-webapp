@@ -11,12 +11,12 @@
     "@wireapp/store-engine": "5.x.x"
   },
   "dependencies": {
-    "fs-extra": "11.1.0"
+    "fs-extra": "11.2.0"
   },
   "devDependencies": {
     "@swc/core": "^1.3.10",
     "@swc/jest": "^0.2.23",
-    "@types/fs-extra": "9.0.13",
+    "@types/fs-extra": "11.0.4",
     "@types/jest": "^29.2.0",
     "@types/node": "^20.1.0",
     "@types/rimraf": "4.0.5",
