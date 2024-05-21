@@ -17,112 +17,250 @@
  *
  */
 
-import React, {HTMLProps, useState} from 'react';
+import React, {HTMLProps, RefObject, useEffect, useRef, useState} from 'react';
 
-import {imageStyle} from './ZoomableImage.style';
+import {containerStyle, imageStyle} from './ZoomableImage.style';
 
-function checkIfCanZoomImage(element: HTMLImageElement) {
-  if (element.naturalWidth <= element.width && element.naturalHeight <= element.height) {
-    return false;
+import {isHTMLImageElement} from '../../guards/HTMLElement';
+
+type Offset = {
+  x: number;
+  y: number;
+};
+
+const DEFAULT_OFFSET: Offset = {x: 0, y: 0};
+
+function calculateZoomRatio(element: HTMLImageElement) {
+  const parentElement = element.parentElement;
+
+  if (!parentElement) {
+    return 1;
   }
 
-  return element.naturalWidth !== element.offsetWidth || element.naturalHeight !== element.offsetHeight;
+  const {offsetWidth: parentOffsetWidth, offsetHeight: parentOffsetHeight} = parentElement;
+  const {naturalWidth, naturalHeight} = element;
+
+  const widthRatio = parentOffsetWidth / naturalWidth;
+  const heightRatio = parentOffsetHeight / naturalHeight;
+  return Math.min(widthRatio, heightRatio);
+}
+
+// if we will add more image zooming, we need to pass 2 props, for check if is image is zoomed and imageScale
+function calculateMaxOffset(containerRef: RefObject<HTMLDivElement>, imgRef: RefObject<HTMLImageElement>) {
+  if (!containerRef.current || !imgRef.current) {
+    return {
+      maxXOffset: 0,
+      maxYOffset: 0,
+    };
+  }
+
+  const containerRect = containerRef.current.getBoundingClientRect();
+
+  return {
+    maxXOffset: (containerRect.width - imgRef.current.naturalWidth) / 2,
+    maxYOffset: (containerRect.height - imgRef.current.naturalHeight) / 2,
+  };
 }
 
 type ZoomableImageProps = HTMLProps<HTMLImageElement>;
 
 export const ZoomableImage = (props: ZoomableImageProps) => {
+  const imageRef = useRef<HTMLImageElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [imageRatio, setImageRatio] = useState(1);
+
+  const draggingRef = useRef(false);
+  const mouseDownRef = useRef(false);
+
   const [isZoomEnabled, setIsZoomEnabled] = useState<boolean>(false);
-  const [maxOffset, setMaxOffset] = useState({x: 0, y: 0});
 
-  const onButtonClick = (event: React.MouseEvent<HTMLImageElement>) => {
-    const element = event.target as HTMLImageElement;
+  const [translateOffset, setTranslateOffset] = useState<Offset>(DEFAULT_OFFSET);
+  const [startOffset, setStartOffset] = useState<Offset>(DEFAULT_OFFSET);
 
-    if (!checkIfCanZoomImage(element)) {
-      setIsZoomEnabled(false);
+  const canZoomImage = imageRatio !== 1;
+  const zoomScale = isZoomEnabled ? 1 : imageRatio;
 
-      if (isZoomEnabled) {
-        element.style.width = ``;
-        element.style.height = ``;
-        element.style.transform = ``;
-        return;
-      }
+  const handleMouseClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    const element = event.target;
 
+    if (!isHTMLImageElement(element)) {
       return;
     }
 
-    const {naturalWidth, naturalHeight, offsetWidth, offsetHeight, parentElement} = element;
-    const {clientX, clientY} = event;
+    if (!canZoomImage && !isZoomEnabled) {
+      return;
+    }
+
+    if (draggingRef.current) {
+      draggingRef.current = false;
+      return;
+    }
+
+    if (isZoomEnabled) {
+      setStartOffset(DEFAULT_OFFSET);
+      setTranslateOffset(DEFAULT_OFFSET);
+      draggingRef.current = false;
+
+      setTimeout(() => {
+        requestAnimationFrame(() => {
+          element.style.transition = '';
+        });
+      }, 300);
+    }
+
+    if (!draggingRef.current && !isZoomEnabled) {
+      if (!imageRef.current) {
+        return;
+      }
+
+      requestAnimationFrame(() => {
+        element.style.transition = 'transform 0.2s';
+        element.style.cursor = isZoomEnabled ? 'zoom-in' : 'zoom-out';
+      });
+
+      const {maxXOffset, maxYOffset} = calculateMaxOffset(containerRef, imageRef);
+
+      const imageRect = imageRef.current.getBoundingClientRect();
+      const imageCenterY = imageRef.current.naturalHeight / 2;
+      const imageCenterX = imageRef.current.naturalWidth / 2;
+      const currentPosX = (event.clientX - imageRect.left) / imageRatio - imageCenterX;
+      const currentPosY = (event.clientY - imageRect.top) / imageRatio - imageCenterY;
+
+      setTranslateOffset({
+        x: Math.max(maxXOffset, Math.min(-currentPosX, -maxXOffset)),
+        y: Math.max(maxYOffset, Math.min(-currentPosY, -maxYOffset)),
+      });
+    }
 
     setIsZoomEnabled(prevState => !prevState);
-
-    element.style.width = `${naturalWidth}px`;
-    element.style.height = `${naturalHeight}px`;
-
-    const {left, top} = element.getBoundingClientRect();
-
-    const parentElementHeight = parentElement?.offsetHeight || offsetHeight;
-    const imageCenterX = naturalWidth / 2;
-    const imageCenterY = naturalHeight / 2;
-
-    const deltaX = clientX - left;
-    const deltaY = clientY - top;
-
-    const isImageNaturalHeightLargerThanHeight = element.naturalHeight >= element.height;
-    const isImageNaturalWidthLargerThanWidth = element.naturalWidth > element.width;
-
-    const maxXOffset = isImageNaturalWidthLargerThanWidth ? ((naturalWidth - offsetWidth) / 2 / naturalWidth) * 100 : 0;
-    const calculatedYOffset = ((naturalHeight - parentElementHeight) / 2 / naturalHeight) * 100;
-    const maxYOffset = isImageNaturalHeightLargerThanHeight ? (calculatedYOffset >= 0 ? calculatedYOffset : 0) : 0;
-
-    setMaxOffset({x: maxXOffset, y: maxYOffset});
-
-    const xOffset = Math.min(Math.max(((deltaX - imageCenterX) / naturalWidth) * 100, -maxXOffset), maxXOffset);
-    const yOffset = Math.min(Math.max(((deltaY - imageCenterY) / naturalHeight) * 100, -maxYOffset), maxYOffset);
-
-    element.style.transform = `translate(${-xOffset}%, ${-yOffset}%)`;
   };
 
-  const handleMouseMove = (event: React.MouseEvent<HTMLImageElement>) => {
-    if (isZoomEnabled) {
-      const element = event.target as HTMLImageElement;
-
-      const {naturalWidth, naturalHeight} = element;
-      const {left, top} = element.getBoundingClientRect();
-
-      const mouseX = event.clientX - left;
-      const mouseY = event.clientY - top;
-      const centerX = naturalWidth / 2;
-      const centerY = naturalHeight / 2;
-
-      const {x: maxXOffset, y: maxYOffset} = maxOffset;
-
-      const xOffset = Math.min(Math.max(((mouseX - centerX) / naturalWidth) * 100, -maxXOffset), maxXOffset);
-      const yOffset = Math.min(Math.max(((mouseY - centerY) / naturalHeight) * 100, -maxYOffset), maxYOffset);
-
-      element.style.transform = `translate(${-xOffset}%, ${-yOffset}%)`;
+  const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (!canZoomImage && !isZoomEnabled) {
+      return;
     }
+    const element = event.target;
+
+    if (!isHTMLImageElement(element)) {
+      return;
+    }
+
+    if (isZoomEnabled) {
+      mouseDownRef.current = true;
+    }
+
+    requestAnimationFrame(() => {
+      element.style.transition = 'transform 0.2s';
+    });
+
+    setStartOffset({
+      x: event.clientX - translateOffset.x,
+      y: event.clientY - translateOffset.y,
+    });
+
+    event.preventDefault();
   };
+
+  const handleMouseUp = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (!isZoomEnabled && !mouseDownRef.current) {
+      return;
+    }
+
+    const element = event.target;
+
+    if (!isHTMLImageElement(element)) {
+      return;
+    }
+
+    mouseDownRef.current = false;
+
+    requestAnimationFrame(() => {
+      element.style.cursor = 'zoom-out';
+    });
+  };
+
+  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (!isZoomEnabled || !mouseDownRef.current || !containerRef.current || !imageRef.current) {
+      return;
+    }
+
+    const element = event.target;
+
+    if (!isHTMLImageElement(element)) {
+      return;
+    }
+
+    draggingRef.current = true;
+
+    if (element.style.transition) {
+      element.style.transition = '';
+    }
+
+    requestAnimationFrame(() => {
+      element.style.cursor = 'grabbing';
+    });
+
+    const {maxXOffset, maxYOffset} = calculateMaxOffset(containerRef, imageRef);
+
+    setTranslateOffset({
+      x: Math.max(maxXOffset, Math.min(event.clientX - startOffset.x, -maxXOffset)),
+      y: Math.max(maxYOffset, Math.min(event.clientY - startOffset.y, -maxYOffset)),
+    });
+
+    event.preventDefault();
+  };
+
+  const updateZoomRatio = () => {
+    if (!imageRef.current) {
+      return;
+    }
+
+    const zoomRatio = calculateZoomRatio(imageRef.current);
+    setImageRatio(zoomRatio > 1 ? 1 : zoomRatio);
+  };
+
+  useEffect(() => {
+    window.addEventListener('resize', updateZoomRatio);
+
+    return () => {
+      window.removeEventListener('resize', updateZoomRatio);
+    };
+  }, []);
 
   return (
-    // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-noninteractive-element-interactions,jsx-a11y/alt-text
-    <img
-      {...props}
-      css={imageStyle(isZoomEnabled)}
-      onClick={onButtonClick}
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions
+    <div
+      ref={containerRef}
+      css={containerStyle}
+      onClick={handleMouseClick}
+      onMouseDown={handleMouseDown}
+      onMouseUp={handleMouseUp}
       onMouseMove={handleMouseMove}
-      onLoad={event => {
-        const element = event.target as HTMLImageElement;
+    >
+      <img
+        {...props}
+        alt={props.alt}
+        ref={imageRef}
+        css={imageStyle}
+        style={{
+          transform: `translate3d(${translateOffset.x}px, ${translateOffset.y}px, 0) scale(${zoomScale}, ${zoomScale})`,
+        }}
+        onLoad={event => {
+          const element = event.target;
 
-        const isImageWidthTooLarge = element.naturalWidth > element.offsetWidth;
-        const isImageHeightTooLarge = element.naturalHeight > element.offsetHeight;
+          if (!isHTMLImageElement(element)) {
+            return;
+          }
 
-        if (!isImageHeightTooLarge && !isImageWidthTooLarge) {
-          return;
-        }
+          const zoomRatio = calculateZoomRatio(element);
+          const imageScale = zoomRatio > 1 ? 1 : zoomRatio;
+          setImageRatio(imageScale);
 
-        element.style.cursor = checkIfCanZoomImage(element) ? 'zoom-in' : '';
-      }}
-    />
+          element.width = element.naturalWidth;
+          element.height = element.naturalHeight;
+          element.style.cursor = zoomRatio < 1 ? 'zoom-in' : '';
+        }}
+      />
+    </div>
   );
 };

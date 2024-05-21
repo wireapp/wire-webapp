@@ -17,19 +17,4 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
-
-export const imageStyle: CSSObject = {
-  userSelect: 'none',
-  flexShrink: 0,
-  maxWidth: 'none',
-  height: 'auto',
-};
-
-export const containerStyle: CSSObject = {
-  width: '100%',
-  height: '100%',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-};
+export const isHTMLImageElement = (element: any): element is HTMLImageElement => element.nodeName === 'IMG';
