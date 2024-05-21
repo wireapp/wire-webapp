@@ -18,7 +18,7 @@
  */
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {genV4} from 'uuidjs';
+import {v4 as uuidv4} from 'uuid';
 
 import {
   IComposite,
@@ -65,7 +65,7 @@ import {GenericMessageType} from '../GenericMessageType';
 import {MessageToProtoMapper} from '../message/MessageToProtoMapper';
 
 export function createId() {
-  return genV4().toString();
+  return uuidv4();
 }
 
 export function buildButtonActionMessage(payloadBundle: ButtonActionMessage['content']): GenericMessage {

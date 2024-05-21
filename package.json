@@ -27,7 +27,7 @@
     "idb": "8.0.0",
     "logdown": "3.3.1",
     "long": "^5.2.0",
-    "uuidjs": "4.2.13",
+    "uuid": "9.0.1",
     "zod": "3.23.8"
   },
   "devDependencies": {
@@ -38,6 +38,7 @@
     "@types/long": "^5.0.0",
     "@types/rimraf": "4.0.5",
     "@types/tough-cookie": "4.0.5",
+    "@types/uuid": "9.0.8",
     "commander": "12.1.0",
     "cross-env": "7.0.3",
     "dotenv-defaults": "5.0.2",

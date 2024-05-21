@@ -18,10 +18,10 @@
  */
 
 import {faker} from '@faker-js/faker';
-import {genV4} from 'uuidjs';
+import {v4 as uuidv4} from 'uuid';
 
 export function getUUID(): string {
-  return genV4().toString();
+  return uuidv4();
 }
 
 export function getUrlParameter(url: string, parameter: string): string | string[] | null {
