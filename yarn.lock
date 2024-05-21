@@ -4775,6 +4775,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/uuid@npm:9.0.8":
+  version: 9.0.8
+  resolution: "@types/uuid@npm:9.0.8"
+  checksum: 10/b8c60b7ba8250356b5088302583d1704a4e1a13558d143c549c408bf8920535602ffc12394ede77f8a8083511b023704bc66d1345792714002bfa261b17c5275
+  languageName: node
+  linkType: hard
+
 "@types/webpack-env@npm:1.18.5":
   version: 1.18.5
   resolution: "@types/webpack-env@npm:1.18.5"
@@ -17308,21 +17315,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"uuid@npm:9.0.1":
+  version: 9.0.1
+  resolution: "uuid@npm:9.0.1"
+  bin:
+    uuid: dist/bin/uuid
+  checksum: 10/9d0b6adb72b736e36f2b1b53da0d559125ba3e39d913b6072f6f033e0c87835b414f0836b45bcfaf2bdf698f92297fea1c3cc19b0b258bc182c9c43cc0fab9f2
+  languageName: node
+  linkType: hard
+
 "uuidjs@npm:4.2.13":
   version: 4.2.13
   resolution: "uuidjs@npm:4.2.13"
   bin:
     uuidjs: bin/cli.js
   checksum: 10/edda550739903376f6d3a565869fb39647f70ed80aba3f2d2c3eff5badf5a03035fad48f848bf4e16c72941d4cf8ef314c511ba25e3b0980d4d5792d5ef5cc74
-  languageName: node
-  linkType: hard
-
-"uuidjs@npm:4.2.14":
-  version: 4.2.14
-  resolution: "uuidjs@npm:4.2.14"
-  bin:
-    uuidjs: bin/cli.js
-  checksum: 10/83f2d275e8c2e97387a764d1dfda5dea90e7404a397270da51ce4cc515ac212c6c3aa630ac123342af830bcd979251e1c91670fa44be2ffcc5e42cb15dcba3bf
   languageName: node
   linkType: hard
 
@@ -17842,6 +17849,7 @@ __metadata:
     "@types/sinon": "npm:17.0.3"
     "@types/speakingurl": "npm:13.0.6"
     "@types/underscore": "npm:1.11.15"
+    "@types/uuid": "npm:9.0.8"
     "@types/webpack-env": "npm:1.18.5"
     "@wireapp/avs": "npm:9.7.12"
     "@wireapp/commons": "npm:5.2.7"
@@ -17941,7 +17949,7 @@ __metadata:
     tsyringe: "npm:4.8.0"
     typescript: "npm:5.4.5"
     underscore: "npm:1.13.6"
-    uuidjs: "npm:4.2.14"
+    uuid: "npm:9.0.1"
     webpack: "npm:5.91.0"
     webpack-cli: "npm:5.1.4"
     webpack-dev-middleware: "npm:7.2.1"
