@@ -52,7 +52,7 @@
     "switch-path": "1.2.0",
     "tsyringe": "4.8.0",
     "underscore": "1.13.6",
-    "uuidjs": "4.2.14",
+    "uuid": "9.0.1",
     "webrtc-adapter": "9.0.1",
     "zustand": "4.5.2"
   },
@@ -90,6 +90,7 @@
     "@types/sinon": "17.0.3",
     "@types/speakingurl": "13.0.6",
     "@types/underscore": "1.11.15",
+    "@types/uuid": "9.0.8",
     "@types/webpack-env": "1.18.5",
     "@wireapp/copy-config": "2.2.0",
     "@wireapp/eslint-config": "3.0.7",
