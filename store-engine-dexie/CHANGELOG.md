@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.1.10](https://github.com/wireapp/wire-web-packages/compare/@wireapp/store-engine-dexie@2.1.9...@wireapp/store-engine-dexie@2.1.10) (2024-05-21)
+
+### Bug Fixes
+
+* Replace `uuidjs` with `uuid` WPB-7240 ([#6221](https://github.com/wireapp/wire-web-packages/issues/6221)) ([d51550d](https://github.com/wireapp/wire-web-packages/commit/d51550da1306a39c681934fcdbd81d7553352eae))
+
 ## [2.1.9](https://github.com/wireapp/wire-web-packages/compare/@wireapp/store-engine-dexie@2.1.8...@wireapp/store-engine-dexie@2.1.9) (2024-03-27)
 
 ### Bug Fixes
