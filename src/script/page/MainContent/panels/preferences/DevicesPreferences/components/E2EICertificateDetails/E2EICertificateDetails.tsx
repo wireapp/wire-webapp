@@ -17,6 +17,7 @@
  *
  */
 
+import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
@@ -36,11 +37,19 @@ interface E2EICertificateDetailsProps {
   isCurrentDevice?: boolean;
 }
 
+const getCertificateState = (identity?: WireIdentity) => {
+  if (!identity || identity.credentialType === CredentialType.Basic) {
+    return MLSStatuses.NOT_ACTIVATED;
+  }
+
+  return identity.status;
+};
+
 export const E2EICertificateDetails = ({identity, isCurrentDevice}: E2EICertificateDetailsProps) => {
   const certificate = identity?.x509Identity?.certificate;
   const showModal = useCertificateDetailsModal(certificate ?? '');
 
-  const certificateState = identity?.status ?? MLSStatuses.NOT_ACTIVATED;
+  const certificateState = getCertificateState(identity);
   const isNotActivated = certificateState === MLSStatuses.NOT_ACTIVATED;
   const isValid = certificateState === MLSStatuses.VALID;
   const hasCertificate = !!certificate && Boolean(certificate.length);
