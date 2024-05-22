@@ -30,6 +30,22 @@ describe('e2ei delays', () => {
     jest.setSystemTime(1709050878009);
   });
 
+  it('should return an immediate delay at feature activation', () => {
+    const delay = getEnrollmentTimer(
+      {
+        x509Identity: {
+          certificate: ' ',
+          notAfter: (Date.now() + TimeInMillis.MINUTE * 10) / 1000,
+        },
+      } as any,
+      Date.now(),
+      TimeInMillis.DAY * 30,
+      true,
+    );
+
+    expect(delay).toEqual({firingDate: Date.now(), isSnoozable: true});
+  });
+
   it('should return an immediate delay if the identity is expired', () => {
     const delay = getEnrollmentTimer({status: MLSStatuses.EXPIRED} as any, Date.now(), gracePeriod);
 
