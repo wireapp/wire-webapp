@@ -26,7 +26,7 @@ import {MLSStatuses, WireIdentity} from 'src/script/E2EIdentity';
 import {E2EICertificateDetails} from './E2EICertificateDetails';
 
 describe('E2EICertificateDetails', () => {
-  const generateIdentity = (status: MLSStatuses): WireIdentity => ({
+  const generateIdentity = (status: MLSStatuses, credentialType = CredentialType.X509): WireIdentity => ({
     status,
     x509Identity: {
       certificate: 'certificate',
@@ -37,7 +37,7 @@ describe('E2EICertificateDetails', () => {
       notAfter: BigInt(0),
       serialNumber: '',
     },
-    credentialType: CredentialType.Basic,
+    credentialType,
     deviceId: '',
     clientId: '',
     thumbprint: '',
@@ -49,6 +49,15 @@ describe('E2EICertificateDetails', () => {
 
   it('is e2ei identity not downloaded', async () => {
     const {getByTestId} = render(withTheme(<E2EICertificateDetails />));
+
+    const E2EIdentityStatus = getByTestId('e2ei-identity-status');
+    expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.NOT_ACTIVATED);
+  });
+
+  it('is e2ei identity not downloaded for basic MLS device', async () => {
+    const identity = generateIdentity(MLSStatuses.VALID, CredentialType.Basic);
+
+    const {getByTestId} = render(withTheme(<E2EICertificateDetails identity={identity} />));
 
     const E2EIdentityStatus = getByTestId('e2ei-identity-status');
     expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.NOT_ACTIVATED);
