@@ -152,7 +152,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       } else {
         // If we have an enrollment in progress but we are not coming back from an idp redirect, we need to clear the progress and start over
         await this.coreE2EIService.clearAllProgress();
-        await this.startEnrollment(ModalType.ENROLL, !isFreshClient);
+        await this.startEnrollment(ModalType.ENROLL, false);
       }
     } else if (isFreshClient) {
       // When the user logs in to a new device in an environment that has e2ei enabled, they should be forced to enroll
@@ -174,24 +174,18 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
    * @returns the delay under which the next enrollment/renewal modal will be prompted
    */
   public async startTimers() {
-    // Get the time when the user was first prompted with the enrollment modal
-    let storedE2eActivatedAt = this.enrollmentStore.get.e2eiActivatedAt();
-    // Check if the user has never been prompted with the enrollment modal, default store value is 0
-    const isFirstActivation = storedE2eActivatedAt === 0;
-    // If the user has never been prompted with the enrollment modal, we store the current time as the first activation time
-    if (isFirstActivation) {
-      storedE2eActivatedAt = Date.now();
-      this.enrollmentStore.store.e2eiActivatedAt(storedE2eActivatedAt);
-    }
+    // We store the first time the user was prompted with the enrollment modal
+    const storedE2eActivatedAt = this.enrollmentStore.get.e2eiActivatedAt();
+    const e2eActivatedAt = storedE2eActivatedAt || Date.now();
+    this.enrollmentStore.store.e2eiActivatedAt(e2eActivatedAt);
 
     const timerKey = 'enrollmentTimer';
     const identity = await getActiveWireIdentity();
 
     const {firingDate: computedFiringDate, isSnoozable} = getEnrollmentTimer(
       identity,
-      storedE2eActivatedAt,
+      e2eActivatedAt,
       this.config.gracePeriodInMs,
-      isFirstActivation,
     );
 
     const task = async () => {
