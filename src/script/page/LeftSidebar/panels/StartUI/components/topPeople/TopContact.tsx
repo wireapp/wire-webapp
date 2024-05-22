@@ -40,8 +40,8 @@ const TopContact: React.FC<TopContactProps> = ({assetRepository, user, clickOnUs
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>();
 
   useEffect(() => {
-    const subscription = connection.status.subscribe(newStatus => setConnectionStatus(newStatus));
-    return () => subscription.dispose();
+    const subscription = connection?.status.subscribe(newStatus => setConnectionStatus(newStatus));
+    return () => subscription?.dispose();
   }, [connection]);
 
   return (
