@@ -60,6 +60,28 @@ function wait(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+const generateWireIdentity = (
+  selfClientId: string,
+  credentialType: CredentialType = CredentialType.X509,
+  status: e2EIdentityVerification.MLSStatuses = e2EIdentityVerification.MLSStatuses.NOT_ACTIVATED,
+) => ({
+  x509Identity: {
+    certificate: '',
+    displayName: 'John Doe',
+    domain: 'domain',
+    handle: 'johndoe',
+    notAfter: BigInt(0),
+    notBefore: BigInt(0),
+    serialNumber: '',
+  },
+  thumbprint: '',
+  credentialType,
+  status,
+  clientId: selfClientId,
+  deviceId: selfClientId,
+  qualifiedUserId: {id: 'userId', domain: 'domain'},
+});
+
 const modalMock = jest.spyOn(PrimaryModal, 'show');
 
 describe('E2EIHandler', () => {
@@ -325,6 +347,26 @@ describe('E2EIHandler', () => {
 
   describe('startTimers()', () => {
     describe('should start enrollment for existing devices', () => {
+      it('with a basic credential type', async () => {
+        jest.spyOn(coreMock.service!.e2eIdentity!, 'isEnrollmentInProgress').mockResolvedValue(false);
+        jest.spyOn(coreMock.service!.e2eIdentity!, 'isFreshMLSSelfClient').mockResolvedValue(false);
+        jest
+          .spyOn(e2EIdentityVerification, 'getActiveWireIdentity')
+          .mockResolvedValue(
+            generateWireIdentity(selfClientId, CredentialType.Basic, e2EIdentityVerification.MLSStatuses.VALID),
+          );
+
+        const instance = await E2EIHandler.getInstance().initialize(params);
+
+        const taskSchedulerMock = jest.spyOn(LowPrecisionTaskScheduler, 'addTask');
+        const primaryModalMock = jest.spyOn(PrimaryModal, 'show');
+
+        await instance.startTimers();
+
+        expect(taskSchedulerMock).not.toHaveBeenCalled();
+        expect(primaryModalMock).toHaveBeenCalled();
+      });
+
       it('without existing WireIdentity', async () => {
         jest.spyOn(coreMock.service!.e2eIdentity!, 'isEnrollmentInProgress').mockResolvedValue(false);
         jest.spyOn(coreMock.service!.e2eIdentity!, 'isFreshMLSSelfClient').mockResolvedValue(false);
@@ -344,23 +386,9 @@ describe('E2EIHandler', () => {
       it('with pristine WireIdentity', async () => {
         jest.spyOn(coreMock.service!.e2eIdentity!, 'isEnrollmentInProgress').mockResolvedValue(false);
         jest.spyOn(coreMock.service!.e2eIdentity!, 'isFreshMLSSelfClient').mockResolvedValue(false);
-        jest.spyOn(e2EIdentityVerification, 'getActiveWireIdentity').mockResolvedValue({
-          x509Identity: {
-            certificate: '',
-            displayName: 'John Doe',
-            domain: 'domain',
-            handle: 'johndoe',
-            notAfter: BigInt(0),
-            notBefore: BigInt(0),
-            serialNumber: '',
-          },
-          thumbprint: '',
-          credentialType: CredentialType.X509,
-          status: e2EIdentityVerification.MLSStatuses.NOT_ACTIVATED,
-          clientId: selfClientId,
-          deviceId: selfClientId,
-          qualifiedUserId: {id: 'userId', domain: 'domain'},
-        });
+        jest
+          .spyOn(e2EIdentityVerification, 'getActiveWireIdentity')
+          .mockResolvedValue(generateWireIdentity(selfClientId, CredentialType.X509));
 
         const instance = await E2EIHandler.getInstance().initialize(params);
 
