@@ -17,7 +17,7 @@
  *
  */
 
-import {ChevronIcon, GroupIcon, InfoIcon, StarIcon} from '@wireapp/react-ui-kit';
+import {ChevronIcon, GroupIcon, InfoIcon, MessageIcon, StarIcon} from '@wireapp/react-ui-kit';
 
 import {Icon} from 'Components/Icon';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
@@ -69,7 +69,7 @@ export const ConversationTabs = ({
       type: SidebarTabs.RECENT,
       title: t('conversationViewTooltip'),
       dataUieName: 'go-recent-view',
-      Icon: <Icon.ConversationsOutline />,
+      Icon: <MessageIcon />,
       unreadConversations: unreadConversations.length,
     },
     {
