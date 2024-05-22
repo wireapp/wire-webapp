@@ -17,6 +17,7 @@
  *
  */
 
+import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
 import {LowPrecisionTaskScheduler} from '@wireapp/core/lib/util/LowPrecisionTaskScheduler';
 import {amplify} from 'amplify';
 import {SigninResponse} from 'oidc-client-ts';
@@ -196,7 +197,10 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     const firingDate = this.enrollmentStore.get.timer() || computedFiringDate;
     this.enrollmentStore.store.timer(firingDate);
 
-    const isFirstE2EIActivation = !storedE2eActivatedAt && (!identity || identity.status === MLSStatuses.NOT_ACTIVATED);
+    const isNotActivated = identity?.status === MLSStatuses.NOT_ACTIVATED;
+    const isBasicDevice = identity?.credentialType === CredentialType.Basic;
+
+    const isFirstE2EIActivation = !storedE2eActivatedAt && (!identity || isNotActivated || isBasicDevice);
     if (isFirstE2EIActivation || firingDate <= Date.now()) {
       // We want to automatically trigger the enrollment modal if it's a devices in team that just activated e2eidentity
       // Or if the timer is supposed to fire now
