@@ -57,8 +57,12 @@ function calculateMaxOffset(containerRef: RefObject<HTMLDivElement>, imgRef: Ref
   const containerRect = containerRef.current.getBoundingClientRect();
 
   return {
-    maxXOffset: (containerRect.width - imgRef.current.naturalWidth) / 2,
-    maxYOffset: (containerRect.height - imgRef.current.naturalHeight) / 2,
+    maxXOffset:
+      imgRef.current.naturalWidth >= containerRect.width ? (containerRect.width - imgRef.current.naturalWidth) / 2 : 0,
+    maxYOffset:
+      imgRef.current.naturalHeight >= containerRect.height
+        ? (containerRect.height - imgRef.current.naturalHeight) / 2
+        : 0,
   };
 }
 
@@ -108,15 +112,15 @@ export const ZoomableImage = (props: ZoomableImageProps) => {
       }, 300);
     }
 
+    requestAnimationFrame(() => {
+      element.style.transition = 'transform 0.2s';
+      element.style.cursor = isZoomEnabled ? 'zoom-in' : 'zoom-out';
+    });
+
     if (!draggingRef.current && !isZoomEnabled) {
       if (!imageRef.current) {
         return;
       }
-
-      requestAnimationFrame(() => {
-        element.style.transition = 'transform 0.2s';
-        element.style.cursor = isZoomEnabled ? 'zoom-in' : 'zoom-out';
-      });
 
       const {maxXOffset, maxYOffset} = calculateMaxOffset(containerRef, imageRef);
 
