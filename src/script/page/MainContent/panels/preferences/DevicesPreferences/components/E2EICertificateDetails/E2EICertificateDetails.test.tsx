@@ -71,46 +71,62 @@ describe('E2EICertificateDetails', () => {
     await handler.initialize({discoveryUrl: '', gracePeriodInSeconds: 100});
   });
 
-  it('is e2ei identity not downloaded', async () => {
-    const {getByTestId} = render(withTheme(<E2EICertificateDetails />));
+  describe('idicates the state of the e2ei identity', () => {
+    it('is e2ei identity not downloaded', async () => {
+      const {getByTestId} = render(withTheme(<E2EICertificateDetails />));
 
-    const E2EIdentityStatus = getByTestId('e2ei-identity-status');
-    expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.NOT_ACTIVATED);
+      const E2EIdentityStatus = getByTestId('e2ei-identity-status');
+      expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.NOT_ACTIVATED);
+    });
+
+    it('is e2ei identity not downloaded for basic MLS device', async () => {
+      const identity = generateIdentity(MLSStatuses.VALID, CredentialType.Basic);
+
+      const {getByTestId} = render(withTheme(<E2EICertificateDetails identity={identity} />));
+
+      const E2EIdentityStatus = getByTestId('e2ei-identity-status');
+      expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.NOT_ACTIVATED);
+    });
+
+    it('is e2ei identity expired', async () => {
+      const identity = generateIdentity(MLSStatuses.EXPIRED);
+
+      const {getByTestId} = render(withTheme(<E2EICertificateDetails identity={identity} />));
+
+      const E2EIdentityStatus = getByTestId('e2ei-identity-status');
+      expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.EXPIRED);
+    });
+
+    it('is e2ei identity revoked', async () => {
+      const identity = generateIdentity(MLSStatuses.REVOKED);
+
+      const {getByTestId} = render(withTheme(<E2EICertificateDetails identity={identity} />));
+
+      const E2EIdentityStatus = getByTestId('e2ei-identity-status');
+      expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.REVOKED);
+    });
+
+    it('is e2ei identity verified', async () => {
+      const identity = generateIdentity(MLSStatuses.VALID);
+
+      const {getByTestId} = render(withTheme(<E2EICertificateDetails identity={identity} />));
+
+      const E2EIdentityStatus = getByTestId('e2ei-identity-status');
+      expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.VALID);
+    });
   });
 
-  it('is e2ei identity not downloaded for basic MLS device', async () => {
-    const identity = generateIdentity(MLSStatuses.VALID, CredentialType.Basic);
+  describe('shows the update certificate button for the current device', () => {
+    it.each([MLSStatuses.EXPIRED, MLSStatuses.NOT_ACTIVATED])(
+      'for expired or not downloaded certificate',
+      async status => {
+        const identity = generateIdentity(status);
 
-    const {getByTestId} = render(withTheme(<E2EICertificateDetails identity={identity} />));
+        const {getByText} = render(withTheme(<E2EICertificateDetails identity={identity} isCurrentDevice />));
 
-    const E2EIdentityStatus = getByTestId('e2ei-identity-status');
-    expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.NOT_ACTIVATED);
-  });
-
-  it('is e2ei identity expired', async () => {
-    const identity = generateIdentity(MLSStatuses.EXPIRED);
-
-    const {getByTestId} = render(withTheme(<E2EICertificateDetails identity={identity} />));
-
-    const E2EIdentityStatus = getByTestId('e2ei-identity-status');
-    expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.EXPIRED);
-  });
-
-  it('is e2ei identity revoked', async () => {
-    const identity = generateIdentity(MLSStatuses.REVOKED);
-
-    const {getByTestId} = render(withTheme(<E2EICertificateDetails identity={identity} />));
-
-    const E2EIdentityStatus = getByTestId('e2ei-identity-status');
-    expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.REVOKED);
-  });
-
-  it('is e2ei identity verified', async () => {
-    const identity = generateIdentity(MLSStatuses.VALID);
-
-    const {getByTestId} = render(withTheme(<E2EICertificateDetails identity={identity} />));
-
-    const E2EIdentityStatus = getByTestId('e2ei-identity-status');
-    expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.VALID);
+        const E2EIdentityStatus = getByText('E2EI.updateCertificate');
+        expect(E2EIdentityStatus).toBeDefined();
+      },
+    );
   });
 });
