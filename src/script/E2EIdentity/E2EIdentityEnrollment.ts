@@ -360,7 +360,9 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
         },
         secondaryActionFn: async () => {
           const delay = await this.startTimers();
-          this.showSnoozeConfirmationModal(delay);
+          if (delay > 0) {
+            this.showSnoozeConfirmationModal(delay);
+          }
           resolve();
         },
         extraParams: {
@@ -385,7 +387,9 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
         },
         secondaryActionFn: async () => {
           const delay = await this.startTimers();
-          this.showSnoozeConfirmationModal(delay);
+          if (delay > 0) {
+            this.showSnoozeConfirmationModal(delay);
+          }
           resolve();
         },
         extraParams: {
