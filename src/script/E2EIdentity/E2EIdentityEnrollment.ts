@@ -17,6 +17,7 @@
  *
  */
 
+import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
 import {LowPrecisionTaskScheduler} from '@wireapp/core/lib/util/LowPrecisionTaskScheduler';
 import {amplify} from 'amplify';
 import {SigninResponse} from 'oidc-client-ts';
@@ -174,24 +175,18 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
    * @returns the delay under which the next enrollment/renewal modal will be prompted
    */
   public async startTimers() {
-    // Get the time when the user was first prompted with the enrollment modal
-    let storedE2eActivatedAt = this.enrollmentStore.get.e2eiActivatedAt();
-    // Check if the user has never been prompted with the enrollment modal, default store value is 0
-    const isFirstActivation = storedE2eActivatedAt === 0;
-    // If the user has never been prompted with the enrollment modal, we store the current time as the first activation time
-    if (isFirstActivation) {
-      storedE2eActivatedAt = Date.now();
-      this.enrollmentStore.store.e2eiActivatedAt(storedE2eActivatedAt);
-    }
+    // We store the first time the user was prompted with the enrollment modal
+    const storedE2eActivatedAt = this.enrollmentStore.get.e2eiActivatedAt();
+    const e2eActivatedAt = storedE2eActivatedAt || Date.now();
+    this.enrollmentStore.store.e2eiActivatedAt(e2eActivatedAt);
 
     const timerKey = 'enrollmentTimer';
     const identity = await getActiveWireIdentity();
 
     const {firingDate: computedFiringDate, isSnoozable} = getEnrollmentTimer(
       identity,
-      storedE2eActivatedAt,
+      e2eActivatedAt,
       this.config.gracePeriodInMs,
-      isFirstActivation,
     );
 
     const task = async () => {
@@ -202,7 +197,10 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     const firingDate = this.enrollmentStore.get.timer() || computedFiringDate;
     this.enrollmentStore.store.timer(firingDate);
 
-    const isFirstE2EIActivation = !storedE2eActivatedAt && (!identity || identity.status === MLSStatuses.NOT_ACTIVATED);
+    const isNotActivated = identity?.status === MLSStatuses.NOT_ACTIVATED;
+    const isBasicDevice = identity?.credentialType === CredentialType.Basic;
+
+    const isFirstE2EIActivation = !storedE2eActivatedAt && (!identity || isNotActivated || isBasicDevice);
     if (isFirstE2EIActivation || firingDate <= Date.now()) {
       // We want to automatically trigger the enrollment modal if it's a devices in team that just activated e2eidentity
       // Or if the timer is supposed to fire now
