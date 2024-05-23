@@ -21,18 +21,18 @@ import React, {MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEven
 
 import {css} from '@emotion/react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
-import {GroupAvatar, Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {ConversationListCell} from 'Components/list/ConversationListCell';
 import {Call} from 'src/script/calling/Call';
 import {ConversationLabel, ConversationLabelRepository} from 'src/script/conversation/ConversationLabelRepository';
 import {User} from 'src/script/entity/User';
 import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/state';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {handleKeyDown, isKeyboardEvent} from 'Util/KeyboardUtil';
+import {isKeyboardEvent} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
+
+import {ConnectionRequests} from './ConnectionRequests';
 
 import {CallState} from '../../../../calling/CallState';
 import {ConversationRepository} from '../../../../conversation/ConversationRepository';
@@ -157,53 +157,16 @@ export const ConversationsList = ({
 
   const uieName = isFolderView ? 'folder-view' : 'recent-view';
 
-  const connectionText =
-    connectRequests.length > 1
-      ? t('conversationsConnectionRequestMany', connectRequests.length)
-      : t('conversationsConnectionRequestOne');
-
-  const connectionRequests =
-    connectRequests.length === 0 ? null : (
-      <li tabIndex={TabIndex.UNFOCUSABLE}>
-        <div
-          role="button"
-          tabIndex={TabIndex.FOCUSABLE}
-          className={`conversation-list-cell ${isShowingConnectionRequests ? 'conversation-list-cell-active' : ''}`}
-          onClick={onConnectionRequestClick}
-          onKeyDown={event => handleKeyDown(event, onConnectionRequestClick)}
-        >
-          <div className="conversation-list-cell-left">
-            {connectRequests.length === 1 ? (
-              <Avatar participant={connectRequests[0]} avatarSize={AVATAR_SIZE.SMALL} />
-            ) : (
-              <GroupAvatar users={connectRequests} />
-            )}
-          </div>
-
-          <div className="conversation-list-cell-center">
-            <span
-              className={`conversation-list-cell-name ${isShowingConnectionRequests ? 'accent-text' : ''}`}
-              data-uie-name="item-pending-requests"
-            >
-              {connectionText}
-            </span>
-          </div>
-
-          <div className="conversation-list-cell-right">
-            <span
-              className="conversation-list-cell-badge cell-badge-dark icon-pending"
-              data-uie-name="status-pending"
-            />
-          </div>
-        </div>
-      </li>
-    );
   return (
     <>
       <h2 className="visually-hidden">{t(isFolderView ? 'folderViewTooltip' : 'conversationViewTooltip')}</h2>
 
       <ul css={css({margin: 0, paddingLeft: 0})} data-uie-name={uieName}>
-        {connectionRequests}
+        <ConnectionRequests
+          connectionRequests={connectRequests}
+          onConnectionRequestClick={onConnectionRequestClick}
+          isShowingConnectionRequests={isShowingConnectionRequests}
+        />
         {getConversationView()}
       </ul>
     </>
