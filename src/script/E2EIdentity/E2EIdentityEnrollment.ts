@@ -188,19 +188,11 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     const timerKey = 'enrollmentTimer';
     const identity = await getActiveWireIdentity();
 
-    const {firingDate: computedFiringDate, isSnoozable} = getEnrollmentTimer(
-      identity,
-      e2eActivatedAt,
-      this.config.gracePeriodInMs,
-    );
+    const {firingDate, isSnoozable} = getEnrollmentTimer(identity, e2eActivatedAt, this.config.gracePeriodInMs);
 
     const task = async () => {
-      this.enrollmentStore.clear.timer();
       await this.processEnrollmentUponExpiry(isSnoozable);
     };
-
-    const firingDate = this.enrollmentStore.get.timer() || computedFiringDate;
-    this.enrollmentStore.store.timer(firingDate);
 
     const isNotActivated = identity?.status === MLSStatuses.NOT_ACTIVATED;
     const isBasicDevice = identity?.credentialType === CredentialType.Basic;

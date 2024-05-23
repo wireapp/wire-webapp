@@ -24,7 +24,7 @@ import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {VerificationBadges} from 'Components/VerificationBadge';
 import {E2EIHandler, MLSStatuses, WireIdentity} from 'src/script/E2EIdentity';
-import {useIsSelfWithinGracePeriod} from 'src/script/hooks/useDeviceIdentities';
+import {useIsSelfWithinGracePeriod} from 'src/script/hooks/useIsSelfWithinGracePeriod';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 

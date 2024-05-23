@@ -106,7 +106,6 @@ describe('E2EIHandler', () => {
     const enrollmentStore = getEnrollmentStore(user.qualifiedId, selfClientId);
 
     enrollmentStore.clear.deviceCreatedAt();
-    enrollmentStore.clear.timer();
 
     // Mock the Config to enable e2eIdentity
     (util.supportsMLS as jest.Mock).mockReturnValue(true);
