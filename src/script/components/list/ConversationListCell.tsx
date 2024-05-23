@@ -185,11 +185,7 @@ const ConversationListCell = ({
           >
             {isGroup && <GroupAvatar className="conversation-list-cell-avatar-arrow" users={users} />}
 
-            {!isGroup && !!users.length && (
-              <div className="avatar-halo">
-                <Avatar participant={users[0]} avatarSize={AVATAR_SIZE.SMALL} />
-              </div>
-            )}
+            {!isGroup && !!users.length && <Avatar participant={users[0]} avatarSize={AVATAR_SIZE.SMALL} />}
           </div>
 
           <div className="conversation-list-cell-center">
