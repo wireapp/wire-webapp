@@ -18,33 +18,57 @@
  */
 
 import {render} from '@testing-library/react';
+import {CONVERSATION_TYPE, MLSConversation} from '@wireapp/api-client/lib/conversation';
 import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
+import {container} from 'tsyringe';
 
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {MLSStatuses, WireIdentity} from 'src/script/E2EIdentity';
+import {E2EIHandler, MLSStatuses, WireIdentity} from 'src/script/E2EIdentity';
+import {User} from 'src/script/entity/User';
+import {Core} from 'src/script/service/CoreSingleton';
+import {UserState} from 'src/script/user/UserState';
+import {generateAPIConversation} from 'test/helper/ConversationGenerator';
 
 import {E2EICertificateDetails} from './E2EICertificateDetails';
 
+const generateIdentity = (status: MLSStatuses, credentialType = CredentialType.X509): WireIdentity => ({
+  status,
+  x509Identity: {
+    certificate: 'certificate',
+    displayName: '',
+    domain: '',
+    handle: '',
+    notBefore: BigInt(0),
+    notAfter: BigInt(0),
+    serialNumber: '',
+  },
+  credentialType,
+  deviceId: '',
+  clientId: '',
+  thumbprint: '',
+  qualifiedUserId: {
+    domain: '',
+    id: '',
+  },
+});
+
+const core = container.resolve(Core);
+
 describe('E2EICertificateDetails', () => {
-  const generateIdentity = (status: MLSStatuses, credentialType = CredentialType.X509): WireIdentity => ({
-    status,
-    x509Identity: {
-      certificate: 'certificate',
-      displayName: '',
-      domain: '',
-      handle: '',
-      notBefore: BigInt(0),
-      notAfter: BigInt(0),
-      serialNumber: '',
-    },
-    credentialType,
-    deviceId: '',
-    clientId: '',
-    thumbprint: '',
-    qualifiedUserId: {
-      domain: '',
-      id: '',
-    },
+  beforeAll(async () => {
+    jest.spyOn(core.service?.conversation!, 'getMLSSelfConversation').mockResolvedValue(
+      generateAPIConversation({
+        id: {id: 'id', domain: 'domain'},
+        type: CONVERSATION_TYPE.ONE_TO_ONE,
+        overwites: {group_id: 'groupId'},
+      }) as MLSConversation,
+    );
+
+    const selfUser = new User('id', 'domain');
+    container.resolve(UserState).self(selfUser);
+
+    const handler = E2EIHandler.getInstance();
+    await handler.initialize({discoveryUrl: '', gracePeriodInSeconds: 100});
   });
 
   it('is e2ei identity not downloaded', async () => {
