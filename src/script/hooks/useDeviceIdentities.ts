@@ -22,6 +22,8 @@ import {useCallback, useEffect, useState} from 'react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {stringifyQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+
 import {E2EIHandler, getUsersIdentities, MLSStatuses, WireIdentity} from '../E2EIdentity';
 
 export const useUserIdentity = (userId: QualifiedId, groupId?: string, updateAfterEnrollment?: boolean) => {
@@ -70,4 +72,20 @@ export const useUserIdentity = (userId: QualifiedId, groupId?: string, updateAft
           }
         : undefined,
   };
+};
+
+export const useIsSelfWithinGracePeriod = () => {
+  const [isGracePeriod, setIsGracePeriod] = useState<boolean>(false);
+
+  const refreshGracePeriod = useCallback(async () => {
+    return E2EIHandler.getInstance().isWithinGracePeriod().then(setIsGracePeriod);
+  }, []);
+
+  useEffect(() => {
+    void refreshGracePeriod();
+
+    setTimeout(refreshGracePeriod, TIME_IN_MILLIS.SECOND);
+  }, [refreshGracePeriod]);
+
+  return isGracePeriod;
 };
