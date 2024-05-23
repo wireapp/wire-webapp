@@ -24,6 +24,7 @@ import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {VerificationBadges} from 'Components/VerificationBadge';
 import {E2EIHandler, MLSStatuses, WireIdentity} from 'src/script/E2EIdentity';
+import {useIsSelfWithinGracePeriod} from 'src/script/hooks/useDeviceIdentities';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 
@@ -53,6 +54,10 @@ export const E2EICertificateDetails = ({identity, isCurrentDevice}: E2EICertific
   const isNotActivated = certificateState === MLSStatuses.NOT_ACTIVATED;
   const isValid = certificateState === MLSStatuses.VALID;
   const hasCertificate = !!certificate && Boolean(certificate.length);
+
+  const isSelfWithinGracePeriod = useIsSelfWithinGracePeriod();
+
+  const isRenewable = certificate && isValid && isSelfWithinGracePeriod;
 
   const getCertificate = async () => {
     try {
@@ -102,7 +107,7 @@ export const E2EICertificateDetails = ({identity, isCurrentDevice}: E2EICertific
               </Button>
             )}
 
-            {certificate && !isValid && (
+            {((certificate && !isValid) || isRenewable) && (
               <Button
                 variant={ButtonVariant.TERTIARY}
                 onClick={getCertificate}

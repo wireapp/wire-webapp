@@ -102,3 +102,12 @@ export function getEnrollmentTimer(
   // When logging in to a old device that doesn't have an identity yet, we trigger an enrollment timer
   return {isSnoozable: nextTick > 0, firingDate: Date.now() + nextTick};
 }
+
+export function isWithinGracePeriod(
+  identity: WireIdentity | undefined,
+  e2eiActivatedAt: number,
+  teamGracePeriodDuration: number,
+) {
+  const deadline = getGracePeriod(identity, e2eiActivatedAt, teamGracePeriodDuration);
+  return Date.now() >= deadline.start && Date.now() <= deadline.end;
+}

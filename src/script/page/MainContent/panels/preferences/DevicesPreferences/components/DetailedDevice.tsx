@@ -42,6 +42,7 @@ export const DetailedDevice: React.FC<DeviceProps> = ({
   isProteusVerified,
 }) => {
   const getIdentity = getDeviceIdentity ? () => getDeviceIdentity(device.id) : undefined;
+
   return (
     <>
       <h3 className="preferences-devices-model preferences-devices-model-name" data-uie-name="device-model">
