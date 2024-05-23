@@ -33,7 +33,6 @@ import {safeWindowOpen} from 'Util/SanitizationUtil';
 import {sortByPriority} from 'Util/StringUtil';
 import {isBackendError} from 'Util/TypePredicateUtil';
 
-import {GroupList} from './components/GroupList';
 import {TopPeople} from './components/TopPeople';
 
 import {ConversationRepository} from '../../../../conversation/ConversationRepository';
@@ -46,7 +45,7 @@ import {TeamRepository} from '../../../../team/TeamRepository';
 import {TeamState} from '../../../../team/TeamState';
 import {UserState} from '../../../../user/UserState';
 
-export type SearchResultsData = {contacts: User[]; groups: Conversation[]; others: User[]};
+export type SearchResultsData = {contacts: User[]; others: User[]};
 
 interface PeopleTabProps {
   canInviteTeamMembers: boolean;
@@ -118,9 +117,9 @@ export const PeopleTab = ({
     return contacts.filter(user => user.isAvailable());
   };
 
-  const [results, setResults] = useState<SearchResultsData>({contacts: getLocalUsers(), groups: [], others: []});
+  const [results, setResults] = useState<SearchResultsData>({contacts: getLocalUsers(), others: []});
   const searchOnFederatedDomain = () => '';
-  const hasResults = results.contacts.length + results.groups.length + results.others.length > 0;
+  const hasResults = results.contacts.length + results.others.length > 0;
 
   const manageTeamUrl = getManageTeamUrl('client_landing');
 
@@ -163,9 +162,9 @@ export const PeopleTab = ({
   useDebounce(
     async () => {
       setHasFederationError(false);
-      const {query, isHandleQuery} = searchRepository.normalizeQuery(searchQuery);
+      const {query} = searchRepository.normalizeQuery(searchQuery);
       if (!query) {
-        setResults({contacts: getLocalUsers(), groups: [], others: []});
+        setResults({contacts: getLocalUsers(), others: []});
         onSearchResults(undefined);
         return;
       }
@@ -181,7 +180,6 @@ export const PeopleTab = ({
 
       const localSearchResults: SearchResultsData = {
         contacts: filteredResults,
-        groups: conversationRepository.getGroupsByName(query, isHandleQuery),
         others: [],
       };
       setResults(localSearchResults);
@@ -313,18 +311,6 @@ export const PeopleTab = ({
                 users={results.contacts}
                 selfUser={selfUser}
               />
-            </div>
-          </div>
-        )}
-        {results.groups.length > 0 && (
-          <div className="start-ui-groups">
-            {isTeam ? (
-              <h3 className="start-ui-list-header">{t('searchTeamGroups')}</h3>
-            ) : (
-              <h3 className="start-ui-list-header">{t('searchGroups')}</h3>
-            )}
-            <div className="group-list">
-              <GroupList groups={results.groups} click={onClickConversation} />
             </div>
           </div>
         )}
