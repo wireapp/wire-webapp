@@ -149,7 +149,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       // If we have an enrollment in progress, we can just finish it (meaning we are coming back from an idp redirect)
       if (this.wasJustRedirected()) {
         // We should not allow to snooze the enorollment if the client is still fresh and the user is coming back from an idp redirect
-        await this.enroll(!isFreshClient);
+        await this.enroll({snoozable: !isFreshClient});
       } else {
         // If we have an enrollment in progress but we are not coming back from an idp redirect, we need to clear the progress and start over
         await this.coreE2EIService.clearAllProgress();
@@ -267,7 +267,11 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     return oidcService.getUser();
   }
 
-  public async enroll(snoozable: boolean = true) {
+  public async enroll({snoozable = true, resetTimers = false}: {snoozable?: boolean; resetTimers?: boolean} = {}) {
+    if (resetTimers) {
+      this.enrollmentStore.clear.timer();
+    }
+
     try {
       // Notify user about E2EI enrolment in progress
       const isCertificateRenewal = await hasActiveCertificate();
@@ -363,7 +367,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
         hideClose: true,
         hideSecondary: !snoozable,
         primaryActionFn: async () => {
-          await this.enroll(snoozable);
+          await this.enroll({snoozable});
           resolve();
         },
         secondaryActionFn: async () => {
@@ -390,7 +394,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       const {modalOptions, modalType: determinedModalType} = getModalOptions({
         hideSecondary: !snoozable,
         primaryActionFn: async () => {
-          await this.enroll(snoozable);
+          await this.enroll({snoozable});
           resolve();
         },
         secondaryActionFn: async () => {
