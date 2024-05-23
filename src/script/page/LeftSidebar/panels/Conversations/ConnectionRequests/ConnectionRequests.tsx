@@ -40,7 +40,7 @@ export const ConnectionRequests = ({
   const connectionRequestsCount = connectionRequests.length;
 
   if (connectionRequestsCount === 0) {
-    return;
+    return null;
   }
 
   const connectionText =
