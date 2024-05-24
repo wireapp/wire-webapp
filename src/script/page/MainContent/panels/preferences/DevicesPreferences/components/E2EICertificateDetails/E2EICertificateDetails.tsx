@@ -17,14 +17,13 @@
  *
  */
 
-import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {VerificationBadges} from 'Components/VerificationBadge';
 import {E2EIHandler, MLSStatuses, WireIdentity} from 'src/script/E2EIdentity';
-import {useIsSelfWithinGracePeriod} from 'src/script/hooks/useDeviceIdentities';
+import {useCertificateStatus} from 'src/script/hooks/useCertificateStatus';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 
@@ -38,26 +37,15 @@ interface E2EICertificateDetailsProps {
   isCurrentDevice?: boolean;
 }
 
-const getCertificateState = (identity?: WireIdentity) => {
-  if (!identity || identity.credentialType === CredentialType.Basic) {
-    return MLSStatuses.NOT_ACTIVATED;
-  }
-
-  return identity.status;
-};
-
 export const E2EICertificateDetails = ({identity, isCurrentDevice}: E2EICertificateDetailsProps) => {
-  const certificate = identity?.x509Identity?.certificate;
+  const [certificate, status] = useCertificateStatus(identity);
+
+  const isActivated = status !== MLSStatuses.NOT_ACTIVATED;
+
+  const isValid = status === MLSStatuses.VALID;
+  const expiresSoon = status === MLSStatuses.EXPIRES_SOON;
+
   const showModal = useCertificateDetailsModal(certificate ?? '');
-
-  const certificateState = getCertificateState(identity);
-  const isNotActivated = certificateState === MLSStatuses.NOT_ACTIVATED;
-  const isValid = certificateState === MLSStatuses.VALID;
-  const hasCertificate = !!certificate && Boolean(certificate.length);
-
-  const isSelfWithinGracePeriod = useIsSelfWithinGracePeriod();
-
-  const isRenewable = certificate && isValid && isSelfWithinGracePeriod;
 
   const getCertificate = async () => {
     try {
@@ -71,17 +59,17 @@ export const E2EICertificateDetails = ({identity, isCurrentDevice}: E2EICertific
     <div css={styles.container}>
       <h5 css={styles.title}>{t('E2EI.certificateTitle')}</h5>
 
-      <div data-uie-name="e2ei-identity-status" data-uie-value={certificateState} css={styles.e2eiStatusContainer}>
+      <div data-uie-name="e2ei-identity-status" data-uie-value={status} css={styles.e2eiStatusContainer}>
         <p className="label-1">
           <span>{t('E2EI.status')}</span>
-          <strong css={styles.e2eiStatus(certificateState)}>{t(`E2EI.${certificateState}`)}</strong>
+          <strong css={styles.e2eiStatus(status)}>{t(`E2EI.${status}`)}</strong>
         </p>
 
-        <VerificationBadges MLSStatus={certificateState} context="device" />
+        <VerificationBadges MLSStatus={status} context="device" />
       </div>
 
       <div css={styles.buttonsGroup}>
-        {!isNotActivated && hasCertificate && (
+        {isActivated && certificate && (
           <Button
             variant={ButtonVariant.TERTIARY}
             onClick={showModal}
@@ -95,7 +83,7 @@ export const E2EICertificateDetails = ({identity, isCurrentDevice}: E2EICertific
 
         {isCurrentDevice && (
           <>
-            {isNotActivated && (
+            {!isActivated && (
               <Button
                 variant={ButtonVariant.TERTIARY}
                 onClick={getCertificate}
@@ -107,7 +95,7 @@ export const E2EICertificateDetails = ({identity, isCurrentDevice}: E2EICertific
               </Button>
             )}
 
-            {((certificate && !isValid) || isRenewable) && (
+            {(!isValid || expiresSoon) && (
               <Button
                 variant={ButtonVariant.TERTIARY}
                 onClick={getCertificate}
