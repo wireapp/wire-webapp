@@ -25,22 +25,6 @@ import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {E2EIHandler, MLSStatuses, WireIdentity} from '../E2EIdentity';
 
-export const useIsSelfWithinGracePeriod = () => {
-  const [isGracePeriod, setIsGracePeriod] = useState<boolean>(false);
-
-  const refreshGracePeriod = useCallback(async () => {
-    return E2EIHandler.getInstance().hasGracePeriodStarted().then(setIsGracePeriod);
-  }, []);
-
-  useEffect(() => {
-    void refreshGracePeriod();
-
-    setTimeout(refreshGracePeriod, TIME_IN_MILLIS.SECOND);
-  }, [refreshGracePeriod]);
-
-  return isGracePeriod;
-};
-
 const getCertificateStatus = (identity?: WireIdentity, isSelfWithinGracePeriod: boolean = false) => {
   if (!identity || identity.credentialType === CredentialType.Basic) {
     return MLSStatuses.NOT_ACTIVATED;

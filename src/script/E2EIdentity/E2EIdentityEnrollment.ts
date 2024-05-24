@@ -194,7 +194,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       this.config.gracePeriodInMs,
     );
 
-    const task = async () => {
+    const task = async (isSnoozable: boolean) => {
       this.enrollmentStore.clear.timer();
       await this.processEnrollmentUponExpiry(isSnoozable);
     };
@@ -209,11 +209,14 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     if (isFirstE2EIActivation || firingDate <= Date.now()) {
       // We want to automatically trigger the enrollment modal if it's a devices in team that just activated e2eidentity
       // Or if the timer is supposed to fire now
-      void task();
+      void task(isSnoozable);
     } else {
       LowPrecisionTaskScheduler.addTask({
         key: timerKey,
-        task,
+        task: () => {
+          const {isSnoozable} = getEnrollmentTimer(identity, e2eActivatedAt, this.config.gracePeriodInMs);
+          return task(isSnoozable);
+        },
         firingDate: firingDate,
         intervalDelay: TIME_IN_MILLIS.SECOND * 10,
       });
