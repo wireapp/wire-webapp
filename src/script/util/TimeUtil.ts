@@ -318,7 +318,11 @@ export const formatDelayTime = (delayTimeInMS: number): string => {
   } else if (delayTimeInMS >= TIME_IN_MILLIS.HOUR) {
     const hours = Math.floor(delayTimeInMS / TIME_IN_MILLIS.HOUR);
     return `${hours} ${t(`ephemeralUnitsHour${hours === 1 ? '' : 's'}`)}`;
+  } else if (delayTimeInMS >= TIME_IN_MILLIS.MINUTE) {
+    const minutes = Math.floor(delayTimeInMS / TIME_IN_MILLIS.MINUTE);
+    return `${minutes} ${t(`ephemeralUnitsMinute${minutes === 1 ? '' : 's'}`)}`;
   }
-  const minutes = Math.floor(delayTimeInMS / TIME_IN_MILLIS.MINUTE);
-  return `${minutes} ${t(`ephemeralUnitsMinute${minutes === 1 ? '' : 's'}`)}`;
+
+  const seconds = Math.floor(delayTimeInMS / TIME_IN_MILLIS.SECOND);
+  return `${seconds} ${t(`ephemeralUnitsSecond${seconds === 1 ? '' : 's'}`)}`;
 };
