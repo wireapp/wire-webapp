@@ -95,7 +95,7 @@ export const E2EICertificateDetails = ({identity, isCurrentDevice}: E2EICertific
               </Button>
             )}
 
-            {(!isValid || expiresSoon) && (
+            {((isActivated && !isValid) || expiresSoon) && (
               <Button
                 variant={ButtonVariant.TERTIARY}
                 onClick={getCertificate}
