@@ -40,7 +40,7 @@ import {
   MLSStatuses,
 } from './E2EIdentityVerification';
 import {getEnrollmentStore} from './Enrollment.store';
-import {getEnrollmentTimer, isWithinGracePeriod} from './EnrollmentTimer';
+import {getEnrollmentTimer, hasGracePeriodStarted} from './EnrollmentTimer';
 import {getModalOptions, ModalType} from './Modals';
 import {OIDCService} from './OIDCService';
 import {OIDCServiceStore} from './OIDCService/OIDCServiceStorage';
@@ -170,9 +170,9 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     return !!state && !!session_state && !!code;
   }
 
-  public async isWithinGracePeriod(): Promise<boolean> {
+  public async hasGracePeriodStarted(): Promise<boolean> {
     const identity = await getActiveWireIdentity();
-    return isWithinGracePeriod(identity, this.enrollmentStore.get.e2eiActivatedAt(), this.config.gracePeriodInMs);
+    return hasGracePeriodStarted(identity, this.enrollmentStore.get.e2eiActivatedAt(), this.config.gracePeriodInMs);
   }
 
   /**

@@ -29,7 +29,7 @@ export const useIsSelfWithinGracePeriod = () => {
   const [isGracePeriod, setIsGracePeriod] = useState<boolean>(false);
 
   const refreshGracePeriod = useCallback(async () => {
-    return E2EIHandler.getInstance().isWithinGracePeriod().then(setIsGracePeriod);
+    return E2EIHandler.getInstance().hasGracePeriodStarted().then(setIsGracePeriod);
   }, []);
 
   useEffect(() => {
@@ -73,8 +73,8 @@ export const useCertificateStatus = (
     const identityCertificate = identity?.x509Identity?.certificate;
     const certificate = !!identityCertificate && Boolean(identityCertificate.length) ? identityCertificate : null;
 
-    const isSelfWithinGracePeriod = isCurrentDevice ? await E2EIHandler.getInstance().isWithinGracePeriod() : false;
-    const status = getCertificateStatus(identity, isSelfWithinGracePeriod);
+    const hasGracePeriodStarted = isCurrentDevice ? await E2EIHandler.getInstance().hasGracePeriodStarted() : false;
+    const status = getCertificateStatus(identity, hasGracePeriodStarted);
 
     setCertificateStatus(prev => {
       if (prev[0] === certificate && prev[1] === status) {
@@ -90,7 +90,9 @@ export const useCertificateStatus = (
 
     // Refresh the certificate status every second if the device is the current device
     if (isCurrentDevice) {
-      const tid = setInterval(refreshCertificateStatus, TIME_IN_MILLIS.SECOND);
+      const tid = setInterval(() => {
+        void refreshCertificateStatus();
+      }, TIME_IN_MILLIS.SECOND);
 
       return () => {
         clearTimeout(tid);
