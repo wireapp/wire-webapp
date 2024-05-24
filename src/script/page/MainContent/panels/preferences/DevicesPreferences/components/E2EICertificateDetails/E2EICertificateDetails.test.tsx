@@ -128,6 +128,20 @@ describe('E2EICertificateDetails', () => {
       });
     });
 
+    it('for certificate that expires soon', async () => {
+      const identity = generateIdentity(MLSStatuses.VALID);
+
+      const instance = E2EIHandler.getInstance();
+      jest.spyOn(instance, 'hasGracePeriodStartedForSelfClient').mockResolvedValue(true);
+
+      const {getByText} = render(withTheme(<E2EICertificateDetails identity={identity} isCurrentDevice />));
+
+      await waitFor(() => {
+        const E2EIdentityStatus = getByText('E2EI.updateCertificate');
+        expect(E2EIdentityStatus).toBeDefined();
+      });
+    });
+
     it('for not downloaded certificate', async () => {
       const identity = generateIdentity(MLSStatuses.NOT_ACTIVATED);
 
