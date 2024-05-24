@@ -57,7 +57,9 @@ export const useCertificateStatus = (
     const identityCertificate = identity?.x509Identity?.certificate;
     const certificate = !!identityCertificate && Boolean(identityCertificate.length) ? identityCertificate : null;
 
-    const hasGracePeriodStarted = isCurrentDevice ? await E2EIHandler.getInstance().hasGracePeriodStarted() : false;
+    const hasGracePeriodStarted = isCurrentDevice
+      ? await E2EIHandler.getInstance().hasGracePeriodStartedForSelfClient()
+      : false;
     const status = getCertificateStatus(identity, hasGracePeriodStarted);
 
     setCertificateStatus(prev => {

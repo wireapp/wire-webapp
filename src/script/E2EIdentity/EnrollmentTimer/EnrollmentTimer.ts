@@ -103,7 +103,7 @@ export function getEnrollmentTimer(
   return {isSnoozable: nextTick > 0, firingDate: Date.now() + nextTick};
 }
 
-export function hasGracePeriodStarted(
+export function hasGracePeriodStartedForSelfClient(
   identity: WireIdentity | undefined,
   e2eiActivatedAt: number,
   teamGracePeriodDuration: number,
