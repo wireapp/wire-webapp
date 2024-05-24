@@ -38,7 +38,7 @@ interface E2EICertificateDetailsProps {
 }
 
 export const E2EICertificateDetails = ({identity, isCurrentDevice}: E2EICertificateDetailsProps) => {
-  const [certificate, status] = useCertificateStatus(identity);
+  const [certificate, status] = useCertificateStatus(identity, isCurrentDevice);
 
   const isActivated = status !== MLSStatuses.NOT_ACTIVATED;
 

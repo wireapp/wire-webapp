@@ -76,7 +76,13 @@ export const useCertificateStatus = (
     const isSelfWithinGracePeriod = isCurrentDevice ? await E2EIHandler.getInstance().isWithinGracePeriod() : false;
     const status = getCertificateStatus(identity, isSelfWithinGracePeriod);
 
-    setCertificateStatus([certificate, status]);
+    setCertificateStatus(prev => {
+      if (prev[0] === certificate && prev[1] === status) {
+        return prev;
+      }
+
+      return [certificate, status];
+    });
   }, [identity, isCurrentDevice]);
 
   useEffect(() => {
@@ -84,7 +90,7 @@ export const useCertificateStatus = (
 
     // Refresh the certificate status every second if the device is the current device
     if (isCurrentDevice) {
-      const tid = setTimeout(refreshCertificateStatus, TIME_IN_MILLIS.SECOND);
+      const tid = setInterval(refreshCertificateStatus, TIME_IN_MILLIS.SECOND);
 
       return () => {
         clearTimeout(tid);
