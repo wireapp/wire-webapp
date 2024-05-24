@@ -17,7 +17,7 @@
  *
  */
 
-import {render} from '@testing-library/react';
+import {render, waitFor} from '@testing-library/react';
 import {CONVERSATION_TYPE, MLSConversation} from '@wireapp/api-client/lib/conversation';
 import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
 import {container} from 'tsyringe';
@@ -117,16 +117,24 @@ describe('E2EICertificateDetails', () => {
   });
 
   describe('shows the update certificate button for the current device', () => {
-    it.each([MLSStatuses.EXPIRED, MLSStatuses.NOT_ACTIVATED])(
-      'for expired or not downloaded certificate',
-      async status => {
-        const identity = generateIdentity(status);
+    it('for expired certificate', async () => {
+      const identity = generateIdentity(MLSStatuses.EXPIRED);
 
-        const {getByText} = render(withTheme(<E2EICertificateDetails identity={identity} isCurrentDevice />));
+      const {getByText} = render(withTheme(<E2EICertificateDetails identity={identity} isCurrentDevice />));
 
+      await waitFor(() => {
         const E2EIdentityStatus = getByText('E2EI.updateCertificate');
         expect(E2EIdentityStatus).toBeDefined();
-      },
-    );
+      });
+    });
+
+    it('for not downloaded certificate', async () => {
+      const identity = generateIdentity(MLSStatuses.NOT_ACTIVATED);
+
+      const {getByText} = render(withTheme(<E2EICertificateDetails identity={identity} isCurrentDevice />));
+
+      const E2EIdentityStatus = getByText('E2EI.getCertificate');
+      expect(E2EIdentityStatus).toBeDefined();
+    });
   });
 });
