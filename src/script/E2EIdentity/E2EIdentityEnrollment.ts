@@ -40,7 +40,7 @@ import {
   MLSStatuses,
 } from './E2EIdentityVerification';
 import {getEnrollmentStore} from './Enrollment.store';
-import {getEnrollmentTimer} from './EnrollmentTimer';
+import {getEnrollmentTimer, hasGracePeriodStartedForSelfClient} from './EnrollmentTimer';
 import {getModalOptions, ModalType} from './Modals';
 import {OIDCService} from './OIDCService';
 import {OIDCServiceStore} from './OIDCService/OIDCServiceStorage';
@@ -149,7 +149,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       // If we have an enrollment in progress, we can just finish it (meaning we are coming back from an idp redirect)
       if (this.wasJustRedirected()) {
         // We should not allow to snooze the enorollment if the client is still fresh and the user is coming back from an idp redirect
-        await this.enroll(!isFreshClient);
+        await this.enroll({snoozable: !isFreshClient});
       } else {
         // If we have an enrollment in progress but we are not coming back from an idp redirect, we need to clear the progress and start over
         await this.coreE2EIService.clearAllProgress();
@@ -168,6 +168,15 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     const {state, session_state, code} = new SigninResponse(searchParams);
 
     return !!state && !!session_state && !!code;
+  }
+
+  public async hasGracePeriodStartedForSelfClient(): Promise<boolean> {
+    const identity = await getActiveWireIdentity();
+    return hasGracePeriodStartedForSelfClient(
+      identity,
+      this.enrollmentStore.get.e2eiActivatedAt(),
+      this.config.gracePeriodInMs,
+    );
   }
 
   /**
@@ -189,7 +198,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       this.config.gracePeriodInMs,
     );
 
-    const task = async () => {
+    const task = async (isSnoozable: boolean) => {
       this.enrollmentStore.clear.timer();
       await this.processEnrollmentUponExpiry(isSnoozable);
     };
@@ -204,11 +213,14 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     if (isFirstE2EIActivation || firingDate <= Date.now()) {
       // We want to automatically trigger the enrollment modal if it's a devices in team that just activated e2eidentity
       // Or if the timer is supposed to fire now
-      void task();
+      void task(isSnoozable);
     } else {
       LowPrecisionTaskScheduler.addTask({
         key: timerKey,
-        task,
+        task: () => {
+          const {isSnoozable} = getEnrollmentTimer(identity, e2eActivatedAt, this.config.gracePeriodInMs);
+          return task(isSnoozable);
+        },
         firingDate: firingDate,
         intervalDelay: TIME_IN_MILLIS.SECOND * 10,
       });
@@ -262,7 +274,11 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     return oidcService.getUser();
   }
 
-  public async enroll(snoozable: boolean = true) {
+  public async enroll({snoozable = true, resetTimers = false}: {snoozable?: boolean; resetTimers?: boolean} = {}) {
+    if (resetTimers) {
+      this.enrollmentStore.clear.timer();
+    }
+
     try {
       // Notify user about E2EI enrolment in progress
       const isCertificateRenewal = await hasActiveCertificate();
@@ -358,12 +374,14 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
         hideClose: true,
         hideSecondary: !snoozable,
         primaryActionFn: async () => {
-          await this.enroll(snoozable);
+          await this.enroll({snoozable});
           resolve();
         },
         secondaryActionFn: async () => {
           const delay = await this.startTimers();
-          this.showSnoozeConfirmationModal(delay);
+          if (delay > 0) {
+            this.showSnoozeConfirmationModal(delay);
+          }
           resolve();
         },
         extraParams: {
@@ -383,12 +401,14 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       const {modalOptions, modalType: determinedModalType} = getModalOptions({
         hideSecondary: !snoozable,
         primaryActionFn: async () => {
-          await this.enroll(snoozable);
+          await this.enroll({snoozable});
           resolve();
         },
         secondaryActionFn: async () => {
           const delay = await this.startTimers();
-          this.showSnoozeConfirmationModal(delay);
+          if (delay > 0) {
+            this.showSnoozeConfirmationModal(delay);
+          }
           resolve();
         },
         extraParams: {
