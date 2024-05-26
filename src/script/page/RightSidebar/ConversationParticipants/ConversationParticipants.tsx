@@ -93,12 +93,14 @@ const ConversationParticipants: FC<ConversationParticipantsProps> = ({
       />
 
       <div className="panel__content conversation-participants__content">
-        <SearchInput
-          input={searchInput}
-          setInput={setSearchInput}
-          placeholder={t('conversationParticipantsSearchPlaceholder')}
-          forceDark
-        />
+        <div style={{padding: '0 12px'}}>
+          <SearchInput
+            input={searchInput}
+            setInput={setSearchInput}
+            placeholder={t('conversationParticipantsSearchPlaceholder')}
+            forceDark
+          />
+        </div>
 
         <FadingScrollbar className="conversation-participants__list panel__content">
           <UserSearchableList

@@ -53,7 +53,6 @@ type StartUIProps = {
   integrationRepository: IntegrationRepository;
   isFederated: boolean;
   mainViewModel: MainViewModel;
-  onClose: () => void;
   searchRepository: SearchRepository;
   teamRepository: TeamRepository;
   selfUser: User;
@@ -68,7 +67,6 @@ const enum Tabs {
 }
 
 const StartUI: React.FC<StartUIProps> = ({
-  onClose,
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
   conversationState = container.resolve(ConversationState),
@@ -82,14 +80,8 @@ const StartUI: React.FC<StartUIProps> = ({
   selfUser,
 }) => {
   const brandName = Config.getConfig().BRAND_NAME;
-  const {
-    canInviteTeamMembers,
-    canSearchUnconnectedUsers,
-    canManageServices,
-    canChatWithServices,
-    canCreateGuestRoom,
-    canCreateGroupConversation,
-  } = generatePermissionHelpers(selfUser.teamRole());
+  const {canInviteTeamMembers, canSearchUnconnectedUsers, canManageServices, canChatWithServices} =
+    generatePermissionHelpers(selfUser.teamRole());
 
   useEffect(() => {
     void conversationRepository.loadMissingConversations();
@@ -97,7 +89,6 @@ const StartUI: React.FC<StartUIProps> = ({
 
   const actions = mainViewModel.actions;
   const isTeam = teamState.isTeam();
-  const teamName = teamState.teamName();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState(Tabs.PEOPLE);
@@ -148,7 +139,6 @@ const StartUI: React.FC<StartUIProps> = ({
 
   const openConversation = async (conversation: Conversation): Promise<void> => {
     await actions.openGroupConversation(conversation);
-    onClose();
   };
 
   const before = (
@@ -209,8 +199,6 @@ const StartUI: React.FC<StartUIProps> = ({
           searchRepository={searchRepository}
           conversationRepository={conversationRepository}
           canInviteTeamMembers={canInviteTeamMembers()}
-          canCreateGroupConversation={canCreateGroupConversation()}
-          canCreateGuestRoom={canCreateGuestRoom()}
           userRepository={userRepository}
           onClickContact={openContact}
           onClickConversation={openConversation}
@@ -237,11 +225,10 @@ const StartUI: React.FC<StartUIProps> = ({
   return (
     <ListWrapper
       id="start-ui"
-      header={teamName}
       headerUieName="status-team-name-search"
-      onClose={onClose}
       before={before}
       footer={footer}
+      hasHeader={false}
     >
       {content}
     </ListWrapper>

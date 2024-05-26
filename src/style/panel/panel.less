@@ -367,15 +367,15 @@
 
   &__header {
     display: flex;
-    height: @content-title-bar-height;
-    min-height: @content-title-bar-height;
+    height: var(--content-title-bar-height);
+    min-height: var(--content-title-bar-height);
     align-items: center;
     justify-content: space-between;
 
     & > .icon-button {
       display: flex;
-      width: @content-title-bar-height;
-      height: @content-title-bar-height;
+      width: var(--content-title-bar-height);
+      height: var(--content-title-bar-height);
       justify-content: center;
     }
 
@@ -387,18 +387,6 @@
         .focus-outline;
         .focus-offset;
         .focus-border-radius;
-      }
-
-      &:first-child {
-        flex-grow: 1;
-        margin-left: @content-title-bar-height;
-        text-align: center;
-      }
-
-      &:last-child {
-        flex-grow: 1;
-        margin-right: @content-title-bar-height;
-        text-align: center;
       }
     }
 

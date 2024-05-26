@@ -17,7 +17,7 @@
  *
  */
 
-import React, {ReactElement} from 'react';
+import React, {ReactElement, ReactNode} from 'react';
 
 import {css} from '@emotion/react';
 import {throttle} from 'underscore';
@@ -41,27 +41,30 @@ const style = css`
   height: 100%;
   overflow-y: overlay;
   position: relative;
-  width: 100%;
 `;
 
 interface LeftListWrapperProps {
   /** A react element that will be inserted after the header but before the list */
   before?: ReactElement;
   children: React.ReactNode;
+  sidebar?: React.ReactNode;
   footer?: ReactElement;
   header?: string;
-  headerElement?: ReactElement;
+  headerElement?: ReactNode;
   headerUieName?: string;
   id: string;
   onClose?: () => void;
+  hasHeader?: boolean;
 }
 
 const ListWrapper = ({
   id,
   header,
+  sidebar,
   headerElement,
   onClose,
   children,
+  hasHeader = true,
   footer,
   before,
   headerUieName,
@@ -87,42 +90,47 @@ const ListWrapper = ({
   }
 
   return (
-    <div id={id} className={`left-list-${id} ${id}`} css={style}>
-      <header className={`left-list-header left-list-header-${id}`}>
-        {headerElement ? (
-          headerElement
-        ) : (
-          <>
-            <h2 className="left-list-header-text" data-uie-name={headerUieName}>
-              {header}
-            </h2>
+    <>
+      {sidebar}
+      <div id={id} className={`left-list-${id} ${id}`} css={style}>
+        {hasHeader && (
+          <header className={`left-list-header left-list-header-${id}`}>
+            {headerElement || (
+              <>
+                <h2 className="left-list-header-text" data-uie-name={headerUieName}>
+                  {header}
+                </h2>
 
-            <button
-              type="button"
-              className="left-list-header-close-button button-icon-large"
-              onClick={onClose}
-              title={t('tooltipSearchClose')}
-              data-uie-name={`do-close-${id}`}
-            >
-              <Icon.Close />
-            </button>
-          </>
+                {onClose && (
+                  <button
+                    type="button"
+                    className="left-list-header-close-button button-icon-large"
+                    onClick={onClose}
+                    title={t('tooltipSearchClose')}
+                    data-uie-name={`do-close-${id}`}
+                  >
+                    <Icon.Close />
+                  </button>
+                )}
+              </>
+            )}
+          </header>
         )}
-      </header>
 
-      {before ?? null}
+        {before ?? null}
 
-      <FadingScrollbar
-        role="list"
-        aria-label={t('accessibility.conversation.sectionLabel')}
-        css={scrollStyle}
-        ref={initBorderedScroll}
-      >
-        {children}
-      </FadingScrollbar>
+        <FadingScrollbar
+          role="list"
+          aria-label={t('accessibility.conversation.sectionLabel')}
+          css={scrollStyle}
+          ref={initBorderedScroll}
+        >
+          {children}
+        </FadingScrollbar>
 
-      {footer ?? null}
-    </div>
+        {footer ?? null}
+      </div>
+    </>
   );
 };
 

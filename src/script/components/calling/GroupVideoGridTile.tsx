@@ -174,7 +174,11 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
             width: '100%',
           }}
         >
-          <Avatar avatarSize={minimized ? AVATAR_SIZE.MEDIUM : AVATAR_SIZE.LARGE} participant={participant?.user} />
+          <Avatar
+            avatarSize={minimized ? AVATAR_SIZE.MEDIUM : AVATAR_SIZE.LARGE}
+            participant={participant?.user}
+            hideAvailabilityStatus
+          />
         </div>
       )}
 

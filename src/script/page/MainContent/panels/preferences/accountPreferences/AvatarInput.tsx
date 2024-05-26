@@ -17,7 +17,7 @@
  *
  */
 
-import {useState, useRef, FC} from 'react';
+import {useState, useRef} from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
@@ -40,12 +40,18 @@ interface AvatarInputProps {
   isActivatedAccount: boolean;
   selfUser: User;
   userRepository: UserRepository;
+  hideAvailabilityStatus?: boolean;
 }
 
 const FILE_TYPES = ['image/bmp', 'image/jpeg', 'image/jpg', 'image/png', '.jpg-large'];
 const logger = getLogger('AvatarInput');
 
-const AvatarInput: FC<AvatarInputProps> = ({selfUser, isActivatedAccount, userRepository}) => {
+export const AvatarInput = ({
+  selfUser,
+  isActivatedAccount,
+  userRepository,
+  hideAvailabilityStatus = false,
+}: AvatarInputProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState<boolean>(false);
 
@@ -135,7 +141,9 @@ const AvatarInput: FC<AvatarInputProps> = ({selfUser, isActivatedAccount, userRe
           participant={selfUser}
           avatarSize={AVATAR_SIZE.X_LARGE}
           avatarAlt={t('selfProfileImageAlt')}
+          hideAvailabilityStatus={hideAvailabilityStatus}
         />
+
         <FileInput
           disabled={isUploading}
           ref={inputRef}
@@ -150,5 +158,3 @@ const AvatarInput: FC<AvatarInputProps> = ({selfUser, isActivatedAccount, userRe
     </div>
   );
 };
-
-export {AvatarInput};
