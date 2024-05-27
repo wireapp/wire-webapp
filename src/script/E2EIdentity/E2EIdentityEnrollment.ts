@@ -181,6 +181,10 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
   /**
    * Will initiate the timer that will regularly prompt the user to enroll (or to renew the certificate if it is about to expire)
+   * - If the client is a brand new device (never logged in before) and the feature is enabled, the timer will start immediately, and the user will be forced to enroll
+   * - If the client is an existing MLS device, and the E2EI feature was just activated, the timer will start immediately (but the grace period will be respected)
+   * - If the client has already enrolled, but the cert is about to expire, they will be reminded to renew the certificate during the grace period
+   * - If the client has already enrolled, and the cert has already expired, they will be forced to enroll
    * @returns the delay under which the next enrollment/renewal modal will be prompted
    */
   public async startTimers() {
