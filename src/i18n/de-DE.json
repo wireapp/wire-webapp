@@ -581,7 +581,7 @@
   "conversationsPopoverNoCustomFolders": "Keine eigenen Ordner",
   "conversationsPopoverNotificationSettings": "Benachrichtigungen",
   "conversationsPopoverNotify": "Benachrichtigen",
-  "conversationsPopoverRemoveFrom": "Aus \"{{name}}\" entfernen",
+  "conversationsPopoverRemoveFrom": "Remove from",
   "conversationsPopoverSilence": "Stummschalten",
   "conversationsPopoverUnarchive": "Reaktivieren",
   "conversationsPopoverUnblock": "Freigeben",

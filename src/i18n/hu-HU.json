@@ -581,7 +581,7 @@
   "conversationsPopoverNoCustomFolders": "Nincsenek egyedi mappák",
   "conversationsPopoverNotificationSettings": "Notifications",
   "conversationsPopoverNotify": "Némítás feloldása",
-  "conversationsPopoverRemoveFrom": "Remove from \"{{name}}\"",
+  "conversationsPopoverRemoveFrom": "Remove from",
   "conversationsPopoverSilence": "Némítás",
   "conversationsPopoverUnarchive": "Archiválás visszavonása",
   "conversationsPopoverUnblock": "Unblock",

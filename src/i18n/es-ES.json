@@ -581,7 +581,7 @@
   "conversationsPopoverNoCustomFolders": "No custom folders",
   "conversationsPopoverNotificationSettings": "Notifications",
   "conversationsPopoverNotify": "Sonido",
-  "conversationsPopoverRemoveFrom": "Remove from \"{{name}}\"",
+  "conversationsPopoverRemoveFrom": "Remove from",
   "conversationsPopoverSilence": "Silenciar",
   "conversationsPopoverUnarchive": "Desarchivar",
   "conversationsPopoverUnblock": "Unblock",
