@@ -45,7 +45,7 @@ jobs:
       - name: Test
         run: |
           set -o pipefail
-          yarn test:all --stream -- --verbose --coverage --coverage_reporters=lcov 2>&1 | tee ./unit-tests.log
+          yarn test --coverage --coverage_reporters=lcov 2>&1 | tee ./unit-tests.log
 
       - name: Print environment variables
         run: |
