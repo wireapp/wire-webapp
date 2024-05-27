@@ -42,9 +42,6 @@ jobs:
       - name: Install JS dependencies
         run: yarn --immutable
 
-      - name: Build
-        run: yarn dist
-
       - name: Test
         run: |
           set -o pipefail
