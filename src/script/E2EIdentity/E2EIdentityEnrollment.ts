@@ -181,6 +181,10 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
   /**
    * Will initiate the timer that will regularly prompt the user to enroll (or to renew the certificate if it is about to expire)
+   * - If the client is a brand new device (never logged in before) and the feature is enabled, the timer will start immediately, and the user will be forced to enroll
+   * - If the client is an existing MLS device, and the E2EI feature was just activated, the timer will start immediately (but the grace period will be respected)
+   * - If the client has already enrolled, but the cert is about to expire, they will be reminded to renew the certificate during the grace period
+   * - If the client has already enrolled, and the cert has already expired, they will be forced to enroll
    * @returns the delay under which the next enrollment/renewal modal will be prompted
    */
   public async startTimers() {
@@ -192,6 +196,10 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     const timerKey = 'enrollmentTimer';
     const identity = await getActiveWireIdentity();
 
+    const isNotActivated = identity?.status === MLSStatuses.NOT_ACTIVATED;
+    const isBasicDevice = identity?.credentialType === CredentialType.Basic;
+    const isFirstE2EIActivation = !storedE2eActivatedAt && (!identity || isNotActivated || isBasicDevice);
+
     const {firingDate: computedFiringDate, isSnoozable} = getEnrollmentTimer(
       identity,
       e2eActivatedAt,
@@ -199,18 +207,14 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     );
 
     const task = async (isSnoozable: boolean) => {
-      this.enrollmentStore.clear.timer();
-      await this.processEnrollmentUponExpiry(isSnoozable);
+      await this.processEnrollmentUponExpiry(isSnoozable, () => this.enrollmentStore.clear.timer());
     };
 
-    const firingDate = this.enrollmentStore.get.timer() || computedFiringDate;
+    const storedFiringDate = this.enrollmentStore.get.timer();
+    const firingDate = isFirstE2EIActivation ? Date.now() : storedFiringDate || computedFiringDate;
     this.enrollmentStore.store.timer(firingDate);
 
-    const isNotActivated = identity?.status === MLSStatuses.NOT_ACTIVATED;
-    const isBasicDevice = identity?.credentialType === CredentialType.Basic;
-
-    const isFirstE2EIActivation = !storedE2eActivatedAt && (!identity || isNotActivated || isBasicDevice);
-    if (isFirstE2EIActivation || firingDate <= Date.now()) {
+    if (firingDate <= Date.now()) {
       // We want to automatically trigger the enrollment modal if it's a devices in team that just activated e2eidentity
       // Or if the timer is supposed to fire now
       void task(isSnoozable);
@@ -228,11 +232,11 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     return firingDate - Date.now();
   }
 
-  private async processEnrollmentUponExpiry(snoozable: boolean) {
+  private async processEnrollmentUponExpiry(snoozable: boolean, onUserAction: () => void) {
     const hasCertificate = await hasActiveCertificate();
     const enrollmentType = hasCertificate ? ModalType.CERTIFICATE_RENEWAL : ModalType.ENROLL;
     this.emit('deviceStatusUpdated', {status: snoozable ? 'valid' : 'locked'});
-    await this.startEnrollment(enrollmentType, snoozable);
+    await this.startEnrollment(enrollmentType, snoozable, onUserAction);
   }
 
   /**
@@ -396,15 +400,18 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   private async startEnrollment(
     modalType: ModalType.ENROLL | ModalType.CERTIFICATE_RENEWAL,
     snoozable: boolean,
+    onUserAction?: () => void,
   ): Promise<void> {
     return new Promise<void>(resolve => {
       const {modalOptions, modalType: determinedModalType} = getModalOptions({
         hideSecondary: !snoozable,
         primaryActionFn: async () => {
+          onUserAction?.();
           await this.enroll({snoozable});
           resolve();
         },
         secondaryActionFn: async () => {
+          onUserAction?.();
           const delay = await this.startTimers();
           if (delay > 0) {
             this.showSnoozeConfirmationModal(delay);
