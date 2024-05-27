@@ -581,7 +581,7 @@
   "conversationsPopoverNoCustomFolders": "No custom folders",
   "conversationsPopoverNotificationSettings": "Notifications",
   "conversationsPopoverNotify": "Ενεργή ένταση",
-  "conversationsPopoverRemoveFrom": "Remove from \"{{name}}\"",
+  "conversationsPopoverRemoveFrom": "Remove from",
   "conversationsPopoverSilence": "Σίγαση",
   "conversationsPopoverUnarchive": "Αναίρεση αρχειοθέτησης",
   "conversationsPopoverUnblock": "Unblock",

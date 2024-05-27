@@ -581,7 +581,7 @@
   "conversationsPopoverNoCustomFolders": "No custom folders",
   "conversationsPopoverNotificationSettings": "Notifications",
   "conversationsPopoverNotify": "Zapnout zvuk",
-  "conversationsPopoverRemoveFrom": "Remove from \"{{name}}\"",
+  "conversationsPopoverRemoveFrom": "Remove from",
   "conversationsPopoverSilence": "Ztlumit",
   "conversationsPopoverUnarchive": "Obnovit",
   "conversationsPopoverUnblock": "Unblock",

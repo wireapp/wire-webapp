@@ -581,7 +581,7 @@
   "conversationsPopoverNoCustomFolders": "Нет пользовательских папок",
   "conversationsPopoverNotificationSettings": "Уведомления",
   "conversationsPopoverNotify": "Включить уведомления",
-  "conversationsPopoverRemoveFrom": "Удалить из \"{{name}}\"",
+  "conversationsPopoverRemoveFrom": "Remove from",
   "conversationsPopoverSilence": "Отключить уведомления",
   "conversationsPopoverUnarchive": "Разархивировать",
   "conversationsPopoverUnblock": "Разблокировать",
