@@ -346,6 +346,38 @@ describe('E2EIHandler', () => {
   });
 
   describe('startTimers()', () => {
+    it('should reset the timer after user interaction with modal', async () => {
+      jest.spyOn(coreMock.service!.e2eIdentity!, 'isEnrollmentInProgress').mockResolvedValue(false);
+      jest.spyOn(coreMock.service!.e2eIdentity!, 'isFreshMLSSelfClient').mockResolvedValue(false);
+      jest
+        .spyOn(e2EIdentityVerification, 'getActiveWireIdentity')
+        .mockResolvedValue(
+          generateWireIdentity(selfClientId, CredentialType.Basic, e2EIdentityVerification.MLSStatuses.VALID),
+        );
+
+      const instance = await E2EIHandler.getInstance().initialize(params);
+      await instance.startTimers();
+
+      const enrollmentStore = getEnrollmentStore(user.qualifiedId, selfClientId);
+
+      const mockedFireDate = Date.now() + 1000;
+
+      enrollmentStore.store.timer(mockedFireDate);
+      jest.spyOn(enrollmentStore.clear, 'timer');
+
+      expect(enrollmentStore.get.timer()).toEqual(mockedFireDate);
+
+      const secondaryActions = modalMock.mock.calls[0][1].secondaryAction;
+      const action = Array.isArray(secondaryActions) ? secondaryActions[0].action : secondaryActions?.action;
+      await action?.();
+
+      await waitFor(() => {
+        expect(enrollmentStore.get.timer()).not.toEqual(mockedFireDate);
+      });
+
+      return instance;
+    });
+
     describe('should start enrollment for existing devices', () => {
       it('with a basic credential type', async () => {
         jest.spyOn(coreMock.service!.e2eIdentity!, 'isEnrollmentInProgress').mockResolvedValue(false);
