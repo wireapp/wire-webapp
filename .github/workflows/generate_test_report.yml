@@ -1,0 +1,61 @@
+name: Generate test reports
+
+on:
+  workflow_dispatch:
+    inputs:
+      commit:
+        description: 'Commit SHA'
+        required: true
+        type: string
+
+jobs:
+  generate_test_report:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.1.6
+        with:
+          ref: ${{ inputs.commit }}
+
+      - name: Set TITLE
+        env:
+          PR_TITLE: ${{github.event.pull_request.title || env.COMMIT_MESSAGE}}
+        run: echo "TITLE=$PR_TITLE" >> $GITHUB_ENV
+
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.12.1
+        with:
+          access_token: ${{github.token}}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+          cache: 'yarn'
+
+      - name: Authenticate git clone
+        env:
+          GH_TOKEN: ${{secrets.OTTO_THE_BOT_GH_TOKEN}}
+        run: echo -e "machine github.com\n  login ${GH_TOKEN}" > ~/.netrc
+
+      - name: Install JS dependencies
+        run: yarn --immutable
+
+      - name: Build
+        run: yarn dist
+
+      - name: Test
+        run: |
+          set -o pipefail
+          yarn test:all --stream -- --verbose --coverage --coverage_reporters=lcov 2>&1 | tee ./unit-tests.log
+
+      - name: Print environment variables
+        run: |
+          echo -e "COMMIT SHA = ${{ inputs.commit }}" >> ./unit-tests.log
+
+      - name: Save test coverage results
+        uses: actions/upload-artifact@v4
+        with:
+          name: code-coverage-report
+          path: ./unit-tests.log
