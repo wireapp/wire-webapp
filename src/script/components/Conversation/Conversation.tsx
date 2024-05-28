@@ -21,7 +21,6 @@ import {UIEvent, useCallback, useState} from 'react';
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
-import ko from 'knockout';
 import {container} from 'tsyringe';
 
 import {useMatchMedia} from '@wireapp/react-ui-kit';
@@ -31,7 +30,7 @@ import {CallingCell} from 'Components/calling/CallingCell';
 import {DropFileArea} from 'Components/DropFileArea';
 import {Giphy} from 'Components/Giphy';
 import {InputBar} from 'Components/InputBar';
-import {LastMessageVisibilityTracker, MessageVisibility} from 'Components/LastMessageVisibilityTracker';
+import {LastMessageVisibilityTracker} from 'Components/LastMessageVisibilityTracker';
 import {MessagesList} from 'Components/MessagesList';
 import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
@@ -39,6 +38,7 @@ import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
 import {TitleBar} from 'Components/TitleBar';
 import {CallingViewMode, CallState} from 'src/script/calling/CallState';
 import {Config} from 'src/script/Config';
+import {useComponentRerenderKey} from 'src/script/hooks/useComponentRerenderKey';
 import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {allowsAllFiles, getFileExtensionOrName, hasAllowedExtension} from 'Util/FileTypeUtil';
@@ -122,7 +122,7 @@ export const Conversation = ({
 
   const [isMsgElementsFocusable, setMsgElementsFocusable] = useState(true);
 
-  const messageVisibility: ko.Observable<MessageVisibility> = ko.observable();
+  const [messagesListRerenderKey, rerenderMessageList] = useComponentRerenderKey('messages-list');
 
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
   const smBreakpoint = useMatchMedia('max-width: 640px');
@@ -402,10 +402,6 @@ export const Conversation = ({
     }
   };
 
-  const visibleInViewportCallback = useCallback((isVisible: boolean, messageEntity: Message) => {
-    messageVisibility({isVisible, message: messageEntity});
-  }, []);
-
   const getInViewportCallback = useCallback(
     (conversationEntity: ConversationEntity, messageEntity: Message) => {
       const messageTimestamp = messageEntity.timestamp();
@@ -476,11 +472,13 @@ export const Conversation = ({
       activeConversation?.last_server_timestamp(),
       ConversationEntity.TIMESTAMP_TYPE.LAST_READ,
     );
+    activeConversation?.initialMessage(undefined);
     if (!activeConversation?.hasLastReceivedMessageLoaded()) {
       activeConversation?.release();
       amplify.publish(WebAppEvents.CONVERSATION.SHOW, activeConversation, {});
+    } else {
+      rerenderMessageList();
     }
-    // scroll
   };
 
   return (
@@ -533,6 +531,7 @@ export const Conversation = ({
           })}
 
           <MessagesList
+            key={messagesListRerenderKey}
             conversation={activeConversation}
             selfUser={selfUser}
             conversationRepository={conversationRepository}
@@ -549,9 +548,6 @@ export const Conversation = ({
             onClickMessage={handleClickOnMessage}
             onLoading={loading => setIsConversationLoaded(!loading)}
             getVisibleCallback={getInViewportCallback}
-            getVisibleEachTimeCallback={(isVisible, _conversationEntity, messageEntity) =>
-              visibleInViewportCallback(isVisible, messageEntity)
-            }
             isLastReceivedMessage={isLastReceivedMessage}
             isMsgElementsFocusable={isMsgElementsFocusable}
             setMsgElementsFocusable={setMsgElementsFocusable}
@@ -561,11 +557,10 @@ export const Conversation = ({
           <LastMessageVisibilityTracker
             onGoToLastMessage={onGoToLastMessage}
             conversation={activeConversation}
-            messageVisibility={messageVisibility}
             css={{
               position: 'absolute',
-              bottom: '90px',
-              right: '50px',
+              bottom: '56px',
+              right: '10px',
               height: '40px',
               borderRadius: '100%',
             }}
