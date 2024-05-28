@@ -20,8 +20,9 @@
 import React from 'react';
 
 import {act, render} from '@testing-library/react';
-import ko from 'knockout';
+import {observable} from 'knockout';
 
+import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {User} from 'src/script/entity/User';
 import {ListState} from 'src/script/page/useAppState';
 import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
@@ -34,27 +35,36 @@ describe('Conversations', () => {
       conversationLabelRepository: {
         addEventListener: jest.fn(),
         removeEventListener: jest.fn(),
+        getFavorites: jest.fn().mockReturnValue([]),
+        getLabels: jest.fn().mockReturnValue([]),
+        getLabelConversations: jest.fn().mockReturnValue([]),
+        labels: [],
       },
     } as any,
     listViewModel: {
+      switchList: jest.fn(),
       contentViewModel: {
         loadPreviousContent: jest.fn(),
+        switchContent: jest.fn(),
       },
     } as any,
-    preferenceNotificationRepository: {notifications: ko.observable([])} as any,
+    preferenceNotificationRepository: {notifications: observable([])} as any,
     propertiesRepository: {getPreference: jest.fn(), savePreference: jest.fn()} as any,
     selfUser: new User(),
-    switchList: jest.fn(),
+    integrationRepository: {integrations: observable([])} as any,
+    searchRepository: {search: jest.fn()} as any,
+    teamRepository: {getTeam: jest.fn()} as any,
+    userRepository: {users: observable([])} as any,
   };
 
   it('Opens preferences when clicked', () => {
-    const {getByTitle} = render(<Conversations {...defaultParams} />);
-    const openPrefButton = getByTitle('tooltipConversationsPreferences');
+    const {getByTitle} = render(withTheme(<Conversations {...defaultParams} />));
+    const openPrefButton = getByTitle('preferencesHeadline');
     act(() => {
       openPrefButton.click();
     });
 
-    expect(defaultParams.switchList).toHaveBeenCalledWith(ListState.PREFERENCES);
+    expect(defaultParams.listViewModel.switchList).toHaveBeenCalledWith(ListState.PREFERENCES);
   });
 
   it('Switches between folder and list view and save view state', () => {
