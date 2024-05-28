@@ -23,6 +23,7 @@ import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
+import {isLastReceivedMessage} from 'Components/LastMessageVisibilityTracker';
 import {filterMessages} from 'Components/MessagesList/utils/messagesFilter';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {MessageRepository} from 'src/script/conversation/MessageRepository';
@@ -43,7 +44,7 @@ import {ScrollToElement} from './Message/types';
 import {groupMessagesBySenderAndTime, isMarker} from './utils/messagesGroup';
 import {updateScroll, FocusedElement} from './utils/scrollUpdater';
 
-import {Conversation as ConversationEntity, Conversation} from '../../entity/Conversation';
+import {Conversation} from '../../entity/Conversation';
 import {isContentMessage} from '../../guards/Message';
 
 interface MessagesListParams {
@@ -66,7 +67,6 @@ interface MessagesListParams {
   showMessageReactions: (message: MessageEntity, showReactions?: boolean) => void;
   showParticipants: (users: User[]) => void;
   showUserDetails: (user: User | ServiceEntity) => void;
-  isLastReceivedMessage: (messageEntity: MessageEntity, conversationEntity: ConversationEntity) => boolean;
   isMsgElementsFocusable: boolean;
   setMsgElementsFocusable: (isMsgElementsFocusable: boolean) => void;
   isRightSidebarOpen?: boolean;
@@ -89,7 +89,6 @@ export const MessagesList: FC<MessagesListParams> = ({
   invitePeople,
   messageActions,
   onLoading,
-  isLastReceivedMessage,
   isMsgElementsFocusable,
   setMsgElementsFocusable,
   isRightSidebarOpen = false,
@@ -253,7 +252,7 @@ export const MessagesList: FC<MessagesListParams> = ({
       tabIndex={TabIndex.UNFOCUSABLE}
     >
       <div ref={setMessagesContainer} className={cx('messages', {'flex-center': verticallyCenterMessage()})}>
-        {groupedMessages.flatMap(group => {
+        {groupedMessages.flatMap((group, groupIndex) => {
           if (isMarker(group)) {
             return (
               <MarkerComponent key={`${group.type}-${group.timestamp}`} scrollTo={scrollToElement} marker={group} />
@@ -261,10 +260,23 @@ export const MessagesList: FC<MessagesListParams> = ({
           }
           const {messages, firstMessageTimestamp} = group;
 
-          return messages.map(message => {
+          return messages.map((message, messageIndex) => {
             const isLastDeliveredMessage = lastDeliveredMessage?.id === message.id;
+            const isLastLoadedMessage =
+              groupIndex === groupedMessages.length - 1 && messageIndex === messages.length - 1;
 
-            const visibleCallback = getVisibleCallback(conversation, message);
+            const isLastMessage = isLastLoadedMessage && isLastReceivedMessage(message, conversation);
+
+            const visibleCallback = () => {
+              getVisibleCallback(conversation, message)?.();
+              if (isLastMessage) {
+                conversation.isLastMessageVisible(true);
+              }
+            };
+
+            const lastMessageInvisibleCallback = isLastMessage
+              ? () => conversation.isLastMessageVisible(false)
+              : undefined;
 
             const key = `${message.id || 'message'}-${message.timestamp()}`;
 
@@ -275,6 +287,7 @@ export const MessagesList: FC<MessagesListParams> = ({
               <Message
                 key={key}
                 onVisible={visibleCallback}
+                onVisibilityLost={lastMessageInvisibleCallback}
                 message={message}
                 hideHeader={message.timestamp() !== firstMessageTimestamp}
                 messageActions={messageActions}

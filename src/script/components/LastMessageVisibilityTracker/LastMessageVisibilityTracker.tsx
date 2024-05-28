@@ -17,57 +17,41 @@
  *
  */
 
-import {HTMLProps, useState, FC, useEffect} from 'react';
-
-import ko from 'knockout';
+import {HTMLProps, FC} from 'react';
 
 import {ChevronIcon, IconButton} from '@wireapp/react-ui-kit';
 
-import {Conversation as ConversationEntity} from '../../entity/Conversation';
-import {Message} from '../../entity/message/Message';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
-export interface MessageVisibility {
-  message: Message;
-  isVisible: boolean;
-}
+import {Conversation as ConversationEntity} from '../../entity/Conversation';
+import {Message as MessageEntity} from '../../entity/message/Message';
 
 export interface LastMessageVisibilityTrackerProps extends HTMLProps<HTMLElement> {
   onGoToLastMessage: () => void;
-  messageVisibility: ko.Observable<MessageVisibility>;
   conversation: ConversationEntity;
 }
 
-// conversation.last_event_timestamp doesn't contain system messages
-const lastMessageId = (conversation: ConversationEntity): string => {
-  if (!conversation.hasLastReceivedMessageLoaded() || (conversation.messages()?.length || 0) === 0) {
-    return '';
-  }
-  return conversation.messages()[conversation.messages().length - 1].id;
+export const isLastReceivedMessage = (
+  messageEntity: MessageEntity,
+  conversationEntity: ConversationEntity,
+): boolean => {
+  const messagesLength = conversationEntity.messages()?.length || 0;
+  return (
+    !!messageEntity.timestamp() &&
+    conversationEntity.hasLastReceivedMessageLoaded() &&
+    !!messagesLength &&
+    conversationEntity.messages()[messagesLength - 1].id === messageEntity.id
+  );
 };
 
 export const LastMessageVisibilityTracker: FC<LastMessageVisibilityTrackerProps> = ({
   onGoToLastMessage,
-  messageVisibility,
   conversation,
   ...rest
 }: LastMessageVisibilityTrackerProps) => {
-  const [lastMessageShown, setLastMessageShown] = useState<boolean>(false);
+  const {isLastMessageVisible} = useKoSubscribableChildren(conversation, ['isLastMessageVisible']);
 
-  useEffect(() => {
-    const subscription = messageVisibility.subscribe(({message, isVisible}: MessageVisibility) => {
-      if (!conversation.hasLastReceivedMessageLoaded()) {
-        setLastMessageShown(false);
-      } else if (message.id === lastMessageId(conversation)) {
-        setLastMessageShown(isVisible);
-      }
-    });
-
-    return () => {
-      subscription.dispose();
-    };
-  }, []);
-
-  if (lastMessageShown) {
+  if (isLastMessageVisible) {
     return null;
   }
 
