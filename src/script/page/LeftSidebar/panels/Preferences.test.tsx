@@ -45,7 +45,7 @@ describe('Preferences', () => {
     jest.spyOn(Runtime, 'isDesktopApp').mockReturnValue(true);
     jest.spyOn(Runtime, 'isSupportingLegacyCalling').mockReturnValue(true);
     const {queryByText} = render(<Preferences {...defaultParams} />);
-    // expect(queryByText('preferencesAV')).not.toBeNull();
+    expect(queryByText('preferencesAV')).not.toBeNull();
     expect(queryByText('preferencesAbout')).toBeNull();
   });
 
