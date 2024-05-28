@@ -25,7 +25,6 @@ import {observable} from 'knockout';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {User} from 'src/script/entity/User';
 import {ListState} from 'src/script/page/useAppState';
-import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
 
 import {Conversations} from './';
 
@@ -65,28 +64,5 @@ describe('Conversations', () => {
     });
 
     expect(defaultParams.listViewModel.switchList).toHaveBeenCalledWith(ListState.PREFERENCES);
-  });
-
-  it('Switches between folder and list view and save view state', () => {
-    const {getByTitle} = render(<Conversations {...defaultParams} />);
-    const switchToFolder = getByTitle('folderViewTooltip');
-    act(() => {
-      switchToFolder.click();
-    });
-
-    expect(defaultParams.propertiesRepository.savePreference).toHaveBeenCalledWith(
-      PROPERTIES_TYPE.INTERFACE.VIEW_FOLDERS,
-      true,
-    );
-
-    const switchToList = getByTitle('conversationViewTooltip');
-    act(() => {
-      switchToList.click();
-    });
-
-    expect(defaultParams.propertiesRepository.savePreference).toHaveBeenCalledWith(
-      PROPERTIES_TYPE.INTERFACE.VIEW_FOLDERS,
-      false,
-    );
   });
 });

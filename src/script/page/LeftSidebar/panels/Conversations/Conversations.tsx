@@ -125,7 +125,6 @@ const Conversations: React.FC<ConversationsProps> = ({
   const {conversationLabelRepository} = conversationRepository;
   const favoriteConversations = conversationLabelRepository.getFavorites(conversations);
 
-  const isFolderTab = currentTab === SidebarTabs.FOLDER;
   const isPreferences = currentTab === SidebarTabs.PREFERENCES;
 
   const showSearchInput = [
@@ -196,10 +195,6 @@ const Conversations: React.FC<ConversationsProps> = ({
       conversationLabelRepository.removeEventListener('conversation-favorited', openFavorites);
     };
   }, []);
-
-  useEffect(() => {
-    propertiesRepository.savePreference(PROPERTIES_TYPE.INTERFACE.VIEW_FOLDERS, isFolderTab);
-  }, [isFolderTab]);
 
   function changeTab(nextTab: SidebarTabs, folderId?: string) {
     if (!folderId) {
