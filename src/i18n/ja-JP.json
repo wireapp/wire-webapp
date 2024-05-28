@@ -581,7 +581,7 @@
   "conversationsPopoverNoCustomFolders": "カスタムフォルダなし",
   "conversationsPopoverNotificationSettings": "Notifications",
   "conversationsPopoverNotify": "会話をミュート解除",
-  "conversationsPopoverRemoveFrom": "Remove from",
+  "conversationsPopoverRemoveFrom": "Remove from \"{{name}}\"",
   "conversationsPopoverSilence": "ミュート",
   "conversationsPopoverUnarchive": "アーカイブを解除",
   "conversationsPopoverUnblock": "Unblock",

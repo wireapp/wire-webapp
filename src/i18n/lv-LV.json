@@ -581,7 +581,7 @@
   "conversationsPopoverNoCustomFolders": "No custom folders",
   "conversationsPopoverNotificationSettings": "Notifications",
   "conversationsPopoverNotify": "Ieslēgt Skaņu",
-  "conversationsPopoverRemoveFrom": "Remove from",
+  "conversationsPopoverRemoveFrom": "Remove from \"{{name}}\"",
   "conversationsPopoverSilence": "Izslēgt Skaņu",
   "conversationsPopoverUnarchive": "Atarhivēt",
   "conversationsPopoverUnblock": "Unblock",

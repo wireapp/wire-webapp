@@ -581,7 +581,7 @@
   "conversationsPopoverNoCustomFolders": "Aucun dossier personnalisé",
   "conversationsPopoverNotificationSettings": "Notifications",
   "conversationsPopoverNotify": "Activer le micro",
-  "conversationsPopoverRemoveFrom": "Remove from",
+  "conversationsPopoverRemoveFrom": "Remove from \"{{name}}\"",
   "conversationsPopoverSilence": "Mettre en sourdine",
   "conversationsPopoverUnarchive": "Restaurer",
   "conversationsPopoverUnblock": "Unblock",
