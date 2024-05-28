@@ -581,7 +581,7 @@
   "conversationsPopoverNoCustomFolders": "No custom folders",
   "conversationsPopoverNotificationSettings": "Notifications",
   "conversationsPopoverNotify": "Įjungti susirašinėjimo pranešimus",
-  "conversationsPopoverRemoveFrom": "Remove from",
+  "conversationsPopoverRemoveFrom": "Remove from \"{{name}}\"",
   "conversationsPopoverSilence": "Išjungti susirašinėjimo pranešimus",
   "conversationsPopoverUnarchive": "Išimti susirašinėjimą iš archyvo",
   "conversationsPopoverUnblock": "Unblock",

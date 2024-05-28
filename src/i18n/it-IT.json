@@ -581,7 +581,7 @@
   "conversationsPopoverNoCustomFolders": "No custom folders",
   "conversationsPopoverNotificationSettings": "Notifications",
   "conversationsPopoverNotify": "Riattiva audio",
-  "conversationsPopoverRemoveFrom": "Remove from",
+  "conversationsPopoverRemoveFrom": "Remove from \"{{name}}\"",
   "conversationsPopoverSilence": "Silenzia",
   "conversationsPopoverUnarchive": "Disarchivia",
   "conversationsPopoverUnblock": "Unblock",

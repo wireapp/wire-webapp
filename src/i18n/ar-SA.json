@@ -581,7 +581,7 @@
   "conversationsPopoverNoCustomFolders": "No custom folders",
   "conversationsPopoverNotificationSettings": "Notifications",
   "conversationsPopoverNotify": "ألغِ كتم المحادثة",
-  "conversationsPopoverRemoveFrom": "Remove from",
+  "conversationsPopoverRemoveFrom": "Remove from \"{{name}}\"",
   "conversationsPopoverSilence": "اكتم المحادثة",
   "conversationsPopoverUnarchive": "ألغِ أرشفة المحادثة",
   "conversationsPopoverUnblock": "Unblock",

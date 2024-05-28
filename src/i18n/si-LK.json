@@ -581,7 +581,7 @@
   "conversationsPopoverNoCustomFolders": "අභිරුචි බහාලුම් නැත",
   "conversationsPopoverNotificationSettings": "දැනුම්දීම්",
   "conversationsPopoverNotify": "නොනිහඬ",
-  "conversationsPopoverRemoveFrom": "Remove from",
+  "conversationsPopoverRemoveFrom": "Remove from \"{{name}}\"",
   "conversationsPopoverSilence": "නිහඬ",
   "conversationsPopoverUnarchive": "අසංරක්‍ෂණය",
   "conversationsPopoverUnblock": "අනවහිර",

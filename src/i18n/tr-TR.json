@@ -581,7 +581,7 @@
   "conversationsPopoverNoCustomFolders": "No custom folders",
   "conversationsPopoverNotificationSettings": "Notifications",
   "conversationsPopoverNotify": "Susturmayı Aç",
-  "conversationsPopoverRemoveFrom": "Remove from",
+  "conversationsPopoverRemoveFrom": "Remove from \"{{name}}\"",
   "conversationsPopoverSilence": "Sustur",
   "conversationsPopoverUnarchive": "Arşivden Çıkar",
   "conversationsPopoverUnblock": "Unblock",

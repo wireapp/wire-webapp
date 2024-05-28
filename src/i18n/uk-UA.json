@@ -581,7 +581,7 @@
   "conversationsPopoverNoCustomFolders": "Власні теки відсутні",
   "conversationsPopoverNotificationSettings": "Notifications",
   "conversationsPopoverNotify": "Увімк. звук",
-  "conversationsPopoverRemoveFrom": "Remove from",
+  "conversationsPopoverRemoveFrom": "Remove from \"{{name}}\"",
   "conversationsPopoverSilence": "Вимк. звук",
   "conversationsPopoverUnarchive": "Розархівувати",
   "conversationsPopoverUnblock": "Unblock",

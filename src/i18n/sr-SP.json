@@ -581,7 +581,7 @@
   "conversationsPopoverNoCustomFolders": "Нема прилагођених фасцикли",
   "conversationsPopoverNotificationSettings": "Notifications",
   "conversationsPopoverNotify": "Чујно",
-  "conversationsPopoverRemoveFrom": "Remove from",
+  "conversationsPopoverRemoveFrom": "Remove from \"{{name}}\"",
   "conversationsPopoverSilence": "Нечујно",
   "conversationsPopoverUnarchive": "Деархивирај",
   "conversationsPopoverUnblock": "Unblock",
