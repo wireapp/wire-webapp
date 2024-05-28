@@ -374,7 +374,7 @@ export class ListViewModel {
       if (customLabel) {
         entries.push({
           click: () => conversationLabelRepository.removeConversationFromLabel(customLabel, conversationEntity),
-          label: `${t('conversationsPopoverRemoveFrom')} ${customLabel.name}`,
+          label: t('conversationsPopoverRemoveFrom', customLabel.name),
         });
       }
 
