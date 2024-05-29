@@ -19,11 +19,14 @@
 
 import {render} from '@testing-library/react';
 
+import {Availability} from '@wireapp/protocol-messaging';
+
+import {TeamState} from 'src/script/team/TeamState';
+
 import {UserAvatar} from './UserAvatar';
 
 import {User} from '../../../entity/User';
 import {AVATAR_SIZE, STATE} from '../Avatar';
-jest.mock('../../auth/util/SVGProvider');
 
 describe('UserAvatar', () => {
   it('shows participant initials if no avatar is defined', async () => {
@@ -100,5 +103,74 @@ describe('UserAvatar', () => {
     const badgeIcon = getByTestId('element-avatar-user-badge-icon');
 
     expect(badgeIcon.getAttribute('data-uie-value')).toEqual(STATE.PENDING);
+  });
+  it('renders available icon', async () => {
+    const participant = new User('id');
+
+    const props = {
+      avatarSize: AVATAR_SIZE.LARGE,
+      participant: participant,
+      state: STATE.NONE,
+      teamState: {isInTeam: () => true} as unknown as TeamState,
+    };
+
+    participant.availability(Availability.Type.AVAILABLE);
+    const {getByTestId} = render(<UserAvatar {...props} />);
+
+    const statusAvailabilityIcon = getByTestId('status-availability-icon');
+    expect(statusAvailabilityIcon.getAttribute('data-uie-value')).toEqual('available');
+  });
+
+  it('renders away icon', async () => {
+    const participant = new User('id');
+
+    const props = {
+      avatarSize: AVATAR_SIZE.LARGE,
+      participant: participant,
+      state: STATE.NONE,
+      teamState: {isInTeam: () => true} as unknown as TeamState,
+    };
+
+    participant.availability(Availability.Type.AWAY);
+
+    const {getByTestId} = render(<UserAvatar {...props} />);
+
+    const statusAvailabilityIcon = getByTestId('status-availability-icon');
+    expect(statusAvailabilityIcon.getAttribute('data-uie-value')).toEqual('away');
+  });
+
+  it('renders busy icon', async () => {
+    const participant = new User('id');
+
+    const props = {
+      avatarSize: AVATAR_SIZE.LARGE,
+      participant: participant,
+      state: STATE.NONE,
+      teamState: {isInTeam: () => true} as unknown as TeamState,
+    };
+
+    participant.availability(Availability.Type.BUSY);
+
+    const {getByTestId} = render(<UserAvatar {...props} />);
+
+    const statusAvailabilityIcon = getByTestId('status-availability-icon');
+    expect(statusAvailabilityIcon.getAttribute('data-uie-value')).toEqual('busy');
+  });
+
+  it('does not show availability icon if param is false', async () => {
+    const participant = new User('id');
+
+    const props = {
+      avatarSize: AVATAR_SIZE.LARGE,
+      participant: participant,
+      state: STATE.NONE,
+      teamState: {isInTeam: () => true} as unknown as TeamState,
+    };
+
+    participant.availability(Availability.Type.AVAILABLE);
+    const {queryByTestId} = render(<UserAvatar {...props} hideAvailabilityStatus={true} />);
+
+    const statusAvailabilityIcon = queryByTestId('status-availability-icon');
+    expect(statusAvailabilityIcon).toBeNull();
   });
 });
