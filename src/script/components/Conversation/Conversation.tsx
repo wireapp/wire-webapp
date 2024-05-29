@@ -49,7 +49,7 @@ import {ReadOnlyConversationMessage} from './ReadOnlyConversationMessage';
 import {checkFileSharingPermission} from './utils/checkFileSharingPermission';
 
 import {ConversationState} from '../../conversation/ConversationState';
-import {Conversation as ConversationEntity} from '../../entity/Conversation';
+import {Conversation as ConversationEntity, isLastReceivedMessage} from '../../entity/Conversation';
 import {ContentMessage} from '../../entity/message/ContentMessage';
 import {DecryptErrorMessage} from '../../entity/message/DecryptErrorMessage';
 import {MemberMessage} from '../../entity/message/MemberMessage';
@@ -379,10 +379,6 @@ export const Conversation = ({
       messageListLogger.warn('Error while trying to reset session', error);
       resetProgress();
     }
-  };
-
-  const isLastReceivedMessage = (messageEntity: Message, conversationEntity: ConversationEntity): boolean => {
-    return !!messageEntity.timestamp() && messageEntity.timestamp() >= conversationEntity.last_event_timestamp();
   };
 
   const updateConversationLastRead = (conversationEntity: ConversationEntity, messageEntity: Message): void => {
