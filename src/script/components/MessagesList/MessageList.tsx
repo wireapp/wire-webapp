@@ -23,7 +23,6 @@ import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
-import {isLastReceivedMessage} from 'Components/LastMessageVisibilityTracker';
 import {filterMessages} from 'Components/MessagesList/utils/messagesFilter';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {MessageRepository} from 'src/script/conversation/MessageRepository';
@@ -44,7 +43,7 @@ import {ScrollToElement} from './Message/types';
 import {groupMessagesBySenderAndTime, isMarker} from './utils/messagesGroup';
 import {updateScroll, FocusedElement} from './utils/scrollUpdater';
 
-import {Conversation} from '../../entity/Conversation';
+import {Conversation, isLastReceivedMessage} from '../../entity/Conversation';
 import {isContentMessage} from '../../guards/Message';
 
 interface MessagesListParams {
@@ -265,7 +264,7 @@ export const MessagesList: FC<MessagesListParams> = ({
             const isLastLoadedMessage =
               groupIndex === groupedMessages.length - 1 && messageIndex === messages.length - 1;
 
-            const isLastMessage = isLastLoadedMessage && isLastReceivedMessage(message, conversation);
+            const isLastMessage = isLastLoadedMessage && conversation.hasLastReceivedMessageLoaded();
 
             const visibleCallback = () => {
               getVisibleCallback(conversation, message)?.();

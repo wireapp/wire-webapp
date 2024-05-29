@@ -17,20 +17,19 @@
  *
  */
 
-import {UIEvent, useCallback, useState} from 'react';
+import {FC, HTMLProps, UIEvent, useCallback, useState} from 'react';
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {useMatchMedia} from '@wireapp/react-ui-kit';
+import {ChevronIcon, IconButton, useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {CallingCell} from 'Components/calling/CallingCell';
 import {DropFileArea} from 'Components/DropFileArea';
 import {Giphy} from 'Components/Giphy';
 import {InputBar} from 'Components/InputBar';
-import {LastMessageVisibilityTracker} from 'Components/LastMessageVisibilityTracker';
 import {MessagesList} from 'Components/MessagesList';
 import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
@@ -53,7 +52,7 @@ import {ReadOnlyConversationMessage} from './ReadOnlyConversationMessage';
 import {checkFileSharingPermission} from './utils/checkFileSharingPermission';
 
 import {ConversationState} from '../../conversation/ConversationState';
-import {Conversation as ConversationEntity} from '../../entity/Conversation';
+import {Conversation as ConversationEntity, isLastReceivedMessage} from '../../entity/Conversation';
 import {ContentMessage} from '../../entity/message/ContentMessage';
 import {DecryptErrorMessage} from '../../entity/message/DecryptErrorMessage';
 import {MemberMessage} from '../../entity/message/MemberMessage';
@@ -388,16 +387,13 @@ export const Conversation = ({
     }
   };
 
-  const isLastReceivedMessage = (messageEntity: Message, conversationEntity: ConversationEntity): boolean => {
-    return !!messageEntity.timestamp() && messageEntity.timestamp() >= conversationEntity.last_event_timestamp();
-  };
-
-  const updateConversationLastRead = (conversationEntity: ConversationEntity, messageEntity: Message): void => {
+  const updateConversationLastRead = (conversationEntity: ConversationEntity, messageEntity?: Message): void => {
     const conversationLastRead = conversationEntity.last_read_timestamp();
     const lastKnownTimestamp = conversationEntity.getLastKnownTimestamp(repositories.serverTime.toServerTimestamp());
     const needsUpdate = conversationLastRead < lastKnownTimestamp;
 
-    if (needsUpdate && isLastReceivedMessage(messageEntity, conversationEntity)) {
+    // if no message provided it means we need to jump to the last message
+    if (needsUpdate && (!messageEntity || isLastReceivedMessage(messageEntity, conversationEntity))) {
       conversationEntity.setTimestamp(lastKnownTimestamp, ConversationEntity.TIMESTAMP_TYPE.LAST_READ);
       repositories.message.markAsRead(conversationEntity);
     }
@@ -469,16 +465,15 @@ export const Conversation = ({
   );
 
   const onGoToLastMessage = () => {
-    activeConversation?.setTimestamp(
-      activeConversation?.last_server_timestamp(),
-      ConversationEntity.TIMESTAMP_TYPE.LAST_READ,
-    );
-    activeConversation?.initialMessage(undefined);
-    if (!activeConversation?.hasLastReceivedMessageLoaded()) {
-      activeConversation?.release();
-      amplify.publish(WebAppEvents.CONVERSATION.SHOW, activeConversation, {});
-    } else {
-      rerenderMessageList();
+    if (activeConversation) {
+      activeConversation.initialMessage(undefined);
+      if (!activeConversation.hasLastReceivedMessageLoaded()) {
+        updateConversationLastRead(activeConversation);
+        activeConversation.release();
+        amplify.publish(WebAppEvents.CONVERSATION.SHOW, activeConversation, {});
+      } else {
+        rerenderMessageList();
+      }
     }
   };
 
@@ -549,13 +544,12 @@ export const Conversation = ({
             onClickMessage={handleClickOnMessage}
             onLoading={loading => setIsConversationLoaded(!loading)}
             getVisibleCallback={getInViewportCallback}
-            isLastReceivedMessage={isLastReceivedMessage}
             isMsgElementsFocusable={isMsgElementsFocusable}
             setMsgElementsFocusable={setMsgElementsFocusable}
             isRightSidebarOpen={isRightSidebarOpen}
           />
 
-          <LastMessageVisibilityTracker
+          <JumpToLastMessageButton
             onGoToLastMessage={onGoToLastMessage}
             conversation={activeConversation}
             css={{
@@ -600,5 +594,28 @@ export const Conversation = ({
         <Giphy giphyRepository={repositories.giphy} inputValue={inputValue} onClose={closeGiphy} />
       )}
     </DropFileArea>
+  );
+};
+
+interface JumpToLastMessageButtonProps extends HTMLProps<HTMLElement> {
+  onGoToLastMessage: () => void;
+  conversation: ConversationEntity;
+}
+
+export const JumpToLastMessageButton: FC<JumpToLastMessageButtonProps> = ({
+  onGoToLastMessage,
+  conversation,
+  ...rest
+}: JumpToLastMessageButtonProps) => {
+  const {isLastMessageVisible} = useKoSubscribableChildren(conversation, ['isLastMessageVisible']);
+
+  if (isLastMessageVisible) {
+    return null;
+  }
+
+  return (
+    <IconButton data-uie-name="jump-to-last-message-button" onClick={onGoToLastMessage}>
+      <ChevronIcon css={{rotate: '90deg', height: 16, width: 16, path: {fill: '#0667C8'}}} />
+    </IconButton>
   );
 };

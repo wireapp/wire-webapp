@@ -45,7 +45,6 @@ const getDefaultParams = (): React.ComponentProps<typeof MessagesList> => {
     } as any,
     getVisibleCallback: jest.fn(),
     invitePeople: jest.fn(),
-    isLastReceivedMessage: jest.fn(),
     messageActions: {
       deleteMessage: jest.fn(),
       deleteMessageEveryone: jest.fn(),
