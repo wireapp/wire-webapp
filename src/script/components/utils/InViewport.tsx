@@ -50,6 +50,10 @@ const InViewport: React.FC<InViewportParams & React.HTMLProps<HTMLDivElement>> =
 
     let inViewport = false;
     let visible = !checkOverlay;
+
+    let onVisibleTriggered = false;
+    let onVisibilityLostTriggered = false;
+
     const releaseTrackers = () => {
       if (checkOverlay) {
         overlayedObserver.removeElement(element);
@@ -59,7 +63,11 @@ const InViewport: React.FC<InViewportParams & React.HTMLProps<HTMLDivElement>> =
 
     const triggerCallbackIfVisible = () => {
       if (inViewport && visible) {
-        onVisible();
+        if (!onVisibleTriggered) {
+          onVisible();
+          onVisibleTriggered = true;
+          onVisibilityLostTriggered = false;
+        }
 
         if (!onVisibilityLost) {
           releaseTrackers();
@@ -75,7 +83,11 @@ const InViewport: React.FC<InViewportParams & React.HTMLProps<HTMLDivElement>> =
 
         // If the element is not intersecting at all, we can trigger the onVisibilityLost callback
         if (!isPartiallyVisible) {
-          onVisibilityLost?.();
+          if (!onVisibilityLostTriggered) {
+            onVisibilityLost?.();
+            onVisibleTriggered = false;
+            onVisibilityLostTriggered = true;
+          }
         }
       },
       requireFullyInView,
