@@ -126,6 +126,7 @@ export const Conversation = ({
 
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
   const smBreakpoint = useMatchMedia('max-width: 640px');
+  const mdBreakpoint = useMatchMedia('max-width: 768px');
 
   const {addReadReceiptToBatch} = useReadReceiptSender(repositories.message);
 
@@ -559,7 +560,7 @@ export const Conversation = ({
             conversation={activeConversation}
             css={{
               position: 'absolute',
-              bottom: '56px',
+              bottom: mdBreakpoint ? '100px' : '56px',
               right: '10px',
               height: '40px',
               borderRadius: '100%',
