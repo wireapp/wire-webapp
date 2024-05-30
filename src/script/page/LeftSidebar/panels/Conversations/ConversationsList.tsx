@@ -54,6 +54,7 @@ interface ConversationsListProps {
   conversationLabelRepository: ConversationLabelRepository;
   currentTab: SidebarTabs;
   currentFocus: string;
+  conversationsFilter: string;
   currentFolder?: ConversationLabel;
   resetConversationFocus: () => void;
   handleArrowKeyDown: (index: number) => (e: React.KeyboardEvent) => void;
@@ -61,6 +62,7 @@ interface ConversationsListProps {
 
 export const ConversationsList = ({
   conversations,
+  conversationsFilter,
   listViewModel,
   currentTab,
   connectRequests,
@@ -134,6 +136,9 @@ export const ConversationsList = ({
         <>
           {currentFolder
             ?.conversations()
+            .filter((conversation: Conversation) =>
+              conversation.display_name().toLowerCase().includes(conversationsFilter.toLowerCase()),
+            )
             .map((conversation, index) => (
               <ConversationListCell key={conversation.id} {...getCommonConversationCellProps(conversation, index)} />
             ))}
