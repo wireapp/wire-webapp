@@ -11,5 +11,4 @@
 *.ttf binary
 *.woff binary
 *.woff2 binary
-*.tflite binary
-*.tflite filter=lfs diff=lfs merge=lfs -text lockable
+*.tflite filter=lfs diff=lfs merge=lfs -text
