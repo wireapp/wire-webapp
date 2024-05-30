@@ -19,13 +19,16 @@
 
 import {FC, HTMLProps} from 'react';
 
+// eslint-disable-next-line import/no-unresolved
+import {WithConditionalCSSProp} from '@emotion/react/types/jsx-namespace';
+
 import {ChevronIcon, IconButton} from '@wireapp/react-ui-kit';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {Conversation as ConversationEntity} from '../../entity/Conversation';
 
-export interface JumpToLastMessageButtonProps extends HTMLProps<HTMLElement> {
+export interface JumpToLastMessageButtonProps extends WithConditionalCSSProp<HTMLProps<HTMLElement>> {
   onGoToLastMessage: () => void;
   conversation: ConversationEntity;
 }
@@ -33,6 +36,7 @@ export interface JumpToLastMessageButtonProps extends HTMLProps<HTMLElement> {
 export const JumpToLastMessageButton: FC<JumpToLastMessageButtonProps> = ({
   onGoToLastMessage,
   conversation,
+  ...rest
 }: JumpToLastMessageButtonProps) => {
   const {isLastMessageVisible} = useKoSubscribableChildren(conversation, ['isLastMessageVisible']);
 
@@ -41,7 +45,12 @@ export const JumpToLastMessageButton: FC<JumpToLastMessageButtonProps> = ({
   }
 
   return (
-    <IconButton data-uie-name="jump-to-last-message-button" onClick={onGoToLastMessage}>
+    <IconButton
+      data-uie-name="jump-to-last-message-button"
+      onClick={onGoToLastMessage}
+      css={{borderRadius: '100%'}}
+      {...rest}
+    >
       <ChevronIcon css={{rotate: '90deg', height: 16, width: 16, path: {fill: '#0667C8'}}} />
     </IconButton>
   );

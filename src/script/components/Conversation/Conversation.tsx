@@ -122,6 +122,7 @@ export const Conversation = ({
 
   const [isMsgElementsFocusable, setMsgElementsFocusable] = useState(true);
 
+  // by changing the key of MessageList we can enforce it to re-render
   const [messagesListRerenderKey, rerenderMessageList] = useComponentRerenderKey('messages-list');
 
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
@@ -465,14 +466,17 @@ export const Conversation = ({
     [addReadReceiptToBatch, repositories.conversation, repositories.integration, updateConversationLastRead],
   );
 
-  const onGoToLastMessage = () => {
+  const jumpToLastMessage = () => {
     if (activeConversation) {
+      // clean up anything like search result
       activeConversation.initialMessage(undefined);
+      // if there are unloaded messages, the conversation should be marked as read and reloaded
       if (!activeConversation.hasLastReceivedMessageLoaded()) {
         updateConversationLastRead(activeConversation);
         activeConversation.release();
         amplify.publish(WebAppEvents.CONVERSATION.SHOW, activeConversation, {});
       } else {
+        // else we just need to scroll down, by re-rendering MessageList
         rerenderMessageList();
       }
     }
@@ -551,14 +555,13 @@ export const Conversation = ({
           />
 
           <JumpToLastMessageButton
-            onGoToLastMessage={onGoToLastMessage}
+            onGoToLastMessage={jumpToLastMessage}
             conversation={activeConversation}
             css={{
               position: 'absolute',
               bottom: mdBreakpoint ? '100px' : '56px',
               right: '10px',
               height: '40px',
-              borderRadius: '100%',
             }}
           />
 
