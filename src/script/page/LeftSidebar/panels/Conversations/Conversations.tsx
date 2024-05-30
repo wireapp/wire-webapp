@@ -348,6 +348,7 @@ const Conversations: React.FC<ConversationsProps> = ({
 
             {showSearchInput && (
               <ConversationsList
+                conversationsFilter={conversationsFilter}
                 currentFolder={currentFolder}
                 conversationLabelRepository={conversationLabelRepository}
                 callState={callState}

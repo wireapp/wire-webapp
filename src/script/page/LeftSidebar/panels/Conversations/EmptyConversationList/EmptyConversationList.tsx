@@ -63,7 +63,7 @@ export const EmptyConversationList = ({currentTab, onChangeTab, searchValue = ''
             data-uie-name="go-create-group"
             css={button}
           >
-            {t('conversationCreateNewGroup')}
+            {t('conversationStartNewConversation')}
           </Button>
         </div>
       </div>
