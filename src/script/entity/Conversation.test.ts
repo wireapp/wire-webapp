@@ -729,14 +729,14 @@ describe('Conversation', () => {
       conversation_et.last_event_timestamp(third_timestamp);
       conversation_et.addMessage(incomingMessage);
 
-      expect(conversation_et.messages().length).toBe(1);
+      expect(conversation_et.messages()).toEqual([message_et]);
       expect(conversation_et.unreadState().allEvents.length).toBe(2);
 
       conversation_et.release();
 
-      expect(conversation_et.messages().length).toBe(1);
-      expect(conversation_et.messages()).toEqual([incomingMessage]);
-      expect(conversation_et.unreadState().allEvents.length).toBe(1);
+      // Incoming message should be moved to regular messages
+      expect(conversation_et.messages()).toEqual([message_et, incomingMessage]);
+      expect(conversation_et.unreadState().allEvents.length).toBe(2);
     });
 
     it('should release messages if conversation has no unread messages', () => {

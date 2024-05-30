@@ -22,8 +22,7 @@ import {withExtraArgument} from 'redux-thunk';
 
 import {LOGGER_NAMESPACE} from 'Util/Logger';
 
-import {runtimeAction} from './module/action/RuntimeAction';
-import {ThunkDispatch, reducers} from './module/reducer';
+import {reducers} from './module/reducer';
 
 const reduxLogdown = require('redux-logdown');
 
@@ -37,11 +36,6 @@ const configureStore = (thunkArguments: object = {}) => {
       });
     }
   }
-
-  const dispatch: ThunkDispatch = store.dispatch;
-  dispatch(runtimeAction.checkIndexedDbSupport());
-  dispatch(runtimeAction.checkCookieSupport());
-  dispatch(runtimeAction.checkSupportedBrowser());
 
   return store;
 };

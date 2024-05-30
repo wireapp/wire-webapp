@@ -38,7 +38,7 @@ import {t} from 'Util/LocalizerUtil';
 import {ConversationsList} from './ConversationsList';
 import {useFolderState} from './state';
 
-import {CallState} from '../../../../calling/CallState';
+import {CallingViewMode, CallState} from '../../../../calling/CallState';
 import {DefaultLabelIds} from '../../../../conversation/ConversationLabelRepository';
 import {ConversationRepository} from '../../../../conversation/ConversationRepository';
 import {ConversationState} from '../../../../conversation/ConversationState';
@@ -99,7 +99,9 @@ const Conversations: React.FC<ConversationsProps> = ({
     'visibleConversations',
   ]);
   const {notifications} = useKoSubscribableChildren(preferenceNotificationRepository, ['notifications']);
-  const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
+  const {activeCalls, viewMode} = useKoSubscribableChildren(callState, ['activeCalls', 'viewMode']);
+
+  const isCallWindowDetached = viewMode === CallingViewMode.DETACHED_WINDOW;
 
   const initialViewStyle = propertiesRepository.getPreference(PROPERTIES_TYPE.INTERFACE.VIEW_FOLDERS)
     ? ConversationViewStyle.FOLDER
@@ -288,18 +290,21 @@ const Conversations: React.FC<ConversationsProps> = ({
         const callingRepository = callingViewModel.callingRepository;
 
         return (
-          <div className="calling-cell" key={conversation.id}>
-            <CallingCell
-              classifiedDomains={classifiedDomains}
-              call={call}
-              callActions={callingViewModel.callActions}
-              callingRepository={callingRepository}
-              pushToTalkKey={propertiesRepository.getPreference(PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY)}
-              isFullUi
-              hasAccessToCamera={callingViewModel.hasAccessToCamera()}
-              isSelfVerified={selfUser.is_verified()}
-            />
-          </div>
+          conversation &&
+          !isCallWindowDetached && (
+            <div className="calling-cell" key={conversation.id}>
+              <CallingCell
+                classifiedDomains={classifiedDomains}
+                call={call}
+                callActions={callingViewModel.callActions}
+                callingRepository={callingRepository}
+                pushToTalkKey={propertiesRepository.getPreference(PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY)}
+                isFullUi
+                hasAccessToCamera={callingViewModel.hasAccessToCamera()}
+                isSelfVerified={selfUser.is_verified()}
+              />
+            </div>
+          )
         );
       })}
     </>

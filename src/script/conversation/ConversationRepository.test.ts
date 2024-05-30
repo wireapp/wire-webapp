@@ -41,6 +41,7 @@ import {
 } from '@wireapp/api-client/lib/event/';
 import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {ClientMLSError, ClientMLSErrorLabel} from '@wireapp/core/lib/messagingProtocols/mls';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import ko from 'knockout';
@@ -100,6 +101,8 @@ function buildConversationRepository() {
     deleteConversation: () => {},
     deleteConversationFromDb: () => {},
     wipeMLSCapableConversation: () => {},
+    postBots: () => {},
+    saveConversationStateInDb: () => {},
   } as ConversationService;
   const messageRepository = {setClientMismatchHandler: () => {}} as unknown as MessageRepository;
   // @ts-ignore
@@ -376,6 +379,46 @@ describe('ConversationRepository', () => {
       const conversationEntity = await conversationRepository.init1to1Conversation(proteus1to1Conversation, true);
       expect(conversationEntity).toEqual(proteus1to1Conversation);
       expect(conversationRepository['conversationService'].getMLS1to1Conversation).not.toHaveBeenCalled();
+    });
+
+    it('returns a selected proteus 1:1 conversation with a team member even if there are multiple conversations with the same user', async () => {
+      const conversationRepository = testFactory.conversation_repository!;
+
+      const teamId = 'teamId';
+      const domain = 'test-domain';
+
+      const otherUserId = {id: 'f718411c-3833-479d-bd80-af03f38416', domain};
+      const otherUser = new User(otherUserId.id, otherUserId.domain);
+      otherUser.teamId = teamId;
+
+      otherUser.supportedProtocols([ConversationProtocol.PROTEUS]);
+
+      conversationRepository['userState'].users.push(otherUser);
+
+      const selfUserId = {id: '109da91a-a495-47a870-9ffbe924b2d1', domain};
+      const selfUser = new User(selfUserId.id, selfUserId.domain);
+      selfUser.teamId = teamId;
+      selfUser.supportedProtocols([ConversationProtocol.PROTEUS]);
+      jest.spyOn(conversationRepository['userState'], 'self').mockReturnValue(selfUser);
+
+      const proteus1to1Conversation = _generateConversation({
+        type: CONVERSATION_TYPE.ONE_TO_ONE,
+        protocol: ConversationProtocol.PROTEUS,
+        users: [otherUser],
+        overwites: {team_id: teamId, domain},
+      });
+
+      const proteus1to1Conversation2 = _generateConversation({
+        type: CONVERSATION_TYPE.ONE_TO_ONE,
+        protocol: ConversationProtocol.PROTEUS,
+        users: [otherUser],
+        overwites: {team_id: teamId, domain},
+      });
+
+      conversationRepository['conversationState'].conversations.push(proteus1to1Conversation, proteus1to1Conversation2);
+
+      const conversationEntity = await conversationRepository.init1to1Conversation(proteus1to1Conversation2, true);
+      expect(conversationEntity).toEqual(proteus1to1Conversation2);
     });
 
     it('just returns a proteus conversation with a bot/service', async () => {
@@ -687,8 +730,8 @@ describe('ConversationRepository', () => {
       const conversationEntity = await conversationRepository.getInitialised1To1Conversation(otherUser.qualifiedId);
 
       expect(conversationRepository['eventService'].moveEventsToConversation).toHaveBeenCalledWith(
-        proteus1to1Conversation.id,
-        mls1to1Conversation.id,
+        proteus1to1Conversation.qualifiedId,
+        mls1to1Conversation.qualifiedId,
       );
 
       expect(conversationEntity?.serialize()).toEqual(mls1to1Conversation.serialize());
@@ -977,6 +1020,55 @@ describe('ConversationRepository', () => {
       );
     });
 
+    it('marks mls 1:1 conversation as read-only if both users support mls but the other user has no keys available', async () => {
+      const conversationRepository = testFactory.conversation_repository!;
+      const userRepository = testFactory.user_repository!;
+
+      const otherUserId = {id: 'a718410c-3833-479d-bd80-a5df03f38414', domain: 'test-domain'};
+      const otherUser = new User(otherUserId.id, otherUserId.domain);
+      otherUser.supportedProtocols([ConversationProtocol.MLS]);
+      userRepository['userState'].users.push(otherUser);
+
+      const selfUserId = {id: '1a9da9ca-a495-47a8-ac70-9ffbe924b2d0', domain: 'test-domain'};
+      const selfUser = new User(selfUserId.id, selfUserId.domain);
+      selfUser.supportedProtocols([ConversationProtocol.MLS]);
+      jest.spyOn(conversationRepository['userState'], 'self').mockReturnValue(selfUser);
+
+      const mls1to1ConversationResponse = generateAPIConversation({
+        id: {id: '0aab891e-ccf1-4dba-9d74-bacec64b5b1e', domain: 'test-domain'},
+        type: CONVERSATION_TYPE.ONE_TO_ONE,
+        protocol: ConversationProtocol.MLS,
+        overwites: {group_id: 'groupId'},
+      }) as BackendMLSConversation;
+
+      const noKeysError = new ClientMLSError(ClientMLSErrorLabel.NO_KEY_PACKAGES_AVAILABLE);
+
+      jest
+        .spyOn(container.resolve(Core).service!.conversation, 'establishMLS1to1Conversation')
+        .mockRejectedValueOnce(noKeysError);
+
+      const [mls1to1Conversation] = conversationRepository.mapConversations([mls1to1ConversationResponse]);
+
+      const connection = new ConnectionEntity();
+      connection.conversationId = mls1to1Conversation.qualifiedId;
+      connection.userId = otherUserId;
+      otherUser.connection(connection);
+      mls1to1Conversation.connection(connection);
+
+      conversationRepository['conversationState'].conversations.push(mls1to1Conversation);
+
+      jest
+        .spyOn(conversationRepository['conversationService'], 'isMLSGroupEstablishedLocally')
+        .mockResolvedValueOnce(false);
+
+      const conversationEntity = await conversationRepository.getInitialised1To1Conversation(otherUser.qualifiedId);
+
+      expect(conversationEntity?.serialize()).toEqual(mls1to1Conversation.serialize());
+      expect(conversationEntity?.readOnlyState()).toEqual(
+        CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_NO_KEY_PACKAGES,
+      );
+    });
+
     it('deos not mark mls 1:1 conversation as read-only if the other user does not support mls but mls 1:1 was already established', async () => {
       const conversationRepository = testFactory.conversation_repository!;
       const userRepository = testFactory.user_repository!;
@@ -1115,6 +1207,56 @@ describe('ConversationRepository', () => {
       await waitFor(() => {
         expect(conversationRepository.getInitialised1To1Conversation).not.toHaveBeenCalled();
       });
+    });
+  });
+
+  describe('create1to1ConversationWithService', () => {
+    it('creates a 1:1 conversation with a service', async () => {
+      const [conversationRepository, {conversationService}] = buildConversationRepository();
+
+      const serviceId = 'service-id';
+      const providerId = 'provider-id';
+
+      const createdConversation = new Conversation('id', 'domain');
+
+      const memberJoinEvent: ConversationMemberJoinEvent = {
+        conversation: conversation_et.id,
+        data: {
+          user_ids: ['9028624e-bfef-490a-ba61-01683f5ccc83'],
+        },
+        from: 'd5a39ffb-6ce3-4cc8-9048-0e15d031b4c5',
+        time: '2015-04-27T11:42:31.475Z',
+        type: CONVERSATION_EVENT.MEMBER_JOIN,
+      };
+
+      jest.spyOn(conversationRepository, 'createGroupConversation').mockResolvedValueOnce(createdConversation);
+      jest.spyOn(conversationService, 'postBots').mockResolvedValueOnce(memberJoinEvent);
+
+      await conversationRepository.create1to1ConversationWithService({providerId, serviceId});
+
+      expect(conversationRepository.createGroupConversation).toHaveBeenCalled();
+    });
+
+    it('deletes the conversation when adding a service failed', async () => {
+      const [conversationRepository, {teamState, conversationService}] = buildConversationRepository();
+
+      const serviceId = 'service-id';
+      const providerId = 'provider-id';
+
+      const teamId = createUuid();
+
+      teamState.team({id: teamId} as any);
+
+      const createdConversation = new Conversation('id', 'domain');
+
+      jest.spyOn(conversationRepository, 'createGroupConversation').mockResolvedValueOnce(createdConversation);
+      jest.spyOn(conversationService, 'postBots').mockRejectedValueOnce(new Error(''));
+
+      await expect(async () => {
+        await conversationRepository.create1to1ConversationWithService({providerId, serviceId});
+        expect(conversationRepository.createGroupConversation).toHaveBeenCalled();
+        expect(conversationRepository.deleteConversation).toHaveBeenCalledWith(createdConversation);
+      }).rejects.toThrow();
     });
   });
 

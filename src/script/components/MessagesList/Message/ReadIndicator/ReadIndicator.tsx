@@ -43,10 +43,6 @@ export const ReadIndicator = ({
 }: ReadIndicatorProps) => {
   const {readReceipts} = useKoSubscribableChildren(message, ['readReceipts']);
 
-  if (!message.expectsReadConfirmation) {
-    return null;
-  }
-
   if (is1to1Conversation) {
     const readReceiptText = readReceipts.length ? formatTimeShort(readReceipts[0].time) : '';
     const showDeliveredMessage = isLastDeliveredMessage && readReceiptText === '';

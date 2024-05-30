@@ -31,6 +31,9 @@ export class Account extends EventEmitter {
     cancelTask: jest.fn(),
   };
 
+  get hasMLSDevice() {
+    return true;
+  }
   configureMLSCallbacks = jest.fn();
   enrollE2EI = jest.fn();
   service = {
@@ -108,3 +111,5 @@ export class Account extends EventEmitter {
 export const util = {
   TaskScheduler,
 };
+
+export {Ciphersuite} from '@wireapp/core-crypto';

@@ -24,6 +24,7 @@ import {viewportObserver} from 'Util/DOM/viewportObserver';
 
 interface InViewportParams {
   onVisible: () => void;
+  onVisibilityLost?: () => void;
   requireFullyInView?: boolean;
   allowBiggerThanViewport?: boolean;
   /** Will check if the element is overlayed by something else. Can be used to be sure the user could actually see the element. Should not be used to do lazy loading as the overlayObserver has quite a long debounce time */
@@ -33,6 +34,7 @@ interface InViewportParams {
 const InViewport: React.FC<InViewportParams & React.HTMLProps<HTMLDivElement>> = ({
   children,
   onVisible,
+  onVisibilityLost,
   requireFullyInView = false,
   checkOverlay = false,
   allowBiggerThanViewport = false,
@@ -48,6 +50,10 @@ const InViewport: React.FC<InViewportParams & React.HTMLProps<HTMLDivElement>> =
 
     let inViewport = false;
     let visible = !checkOverlay;
+
+    let onVisibleTriggered = false;
+    let onVisibilityLostTriggered = false;
+
     const releaseTrackers = () => {
       if (checkOverlay) {
         overlayedObserver.removeElement(element);
@@ -57,16 +63,32 @@ const InViewport: React.FC<InViewportParams & React.HTMLProps<HTMLDivElement>> =
 
     const triggerCallbackIfVisible = () => {
       if (inViewport && visible) {
-        onVisible();
-        releaseTrackers();
+        if (!onVisibleTriggered) {
+          onVisible();
+          onVisibleTriggered = true;
+          onVisibilityLostTriggered = false;
+        }
+
+        if (!onVisibilityLost) {
+          releaseTrackers();
+        }
       }
     };
 
     viewportObserver.trackElement(
       element,
-      (isInViewport: boolean) => {
+      (isInViewport: boolean, isPartiallyVisible: boolean) => {
         inViewport = isInViewport;
         triggerCallbackIfVisible();
+
+        // If the element is not intersecting at all, we can trigger the onVisibilityLost callback
+        if (!isPartiallyVisible) {
+          if (!onVisibilityLostTriggered) {
+            onVisibilityLost?.();
+            onVisibleTriggered = false;
+            onVisibilityLostTriggered = true;
+          }
+        }
       },
       requireFullyInView,
       allowBiggerThanViewport,
@@ -77,8 +99,12 @@ const InViewport: React.FC<InViewportParams & React.HTMLProps<HTMLDivElement>> =
         triggerCallbackIfVisible();
       });
     }
-    return () => releaseTrackers();
-  }, [allowBiggerThanViewport, requireFullyInView, checkOverlay, onVisible]);
+    return () => {
+      // If the element is unmounted, we can trigger the onVisibilityLost callback and release the trackers
+      onVisibilityLost?.();
+      releaseTrackers();
+    };
+  }, [allowBiggerThanViewport, requireFullyInView, checkOverlay, onVisible, onVisibilityLost]);
 
   return (
     <div ref={domNode} {...props} css={{minHeight: '1px'}}>

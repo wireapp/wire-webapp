@@ -101,4 +101,14 @@ describe('ReadOnlyConversationMessage', () => {
 
     expect(getByText('conversationWithBlockedUser')).toBeDefined();
   });
+
+  it("renders a conversation with a user that don't have any key pakages available", () => {
+    const conversation = generateConversation(CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_NO_KEY_PACKAGES, false);
+
+    const {getByText} = render(
+      withTheme(<ReadOnlyConversationMessage reloadApp={() => {}} conversation={conversation} />),
+    );
+
+    expect(getByText('otherUserNoAvailableKeyPackages')).toBeDefined();
+  });
 });

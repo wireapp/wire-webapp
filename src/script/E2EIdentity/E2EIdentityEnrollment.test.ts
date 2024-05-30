@@ -60,6 +60,28 @@ function wait(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+const generateWireIdentity = (
+  selfClientId: string,
+  credentialType: CredentialType = CredentialType.X509,
+  status: e2EIdentityVerification.MLSStatuses = e2EIdentityVerification.MLSStatuses.NOT_ACTIVATED,
+) => ({
+  x509Identity: {
+    certificate: '',
+    displayName: 'John Doe',
+    domain: 'domain',
+    handle: 'johndoe',
+    notAfter: BigInt(0),
+    notBefore: BigInt(0),
+    serialNumber: '',
+  },
+  thumbprint: '',
+  credentialType,
+  status,
+  clientId: selfClientId,
+  deviceId: selfClientId,
+  qualifiedUserId: {id: 'userId', domain: 'domain'},
+});
+
 const modalMock = jest.spyOn(PrimaryModal, 'show');
 
 describe('E2EIHandler', () => {
@@ -151,6 +173,20 @@ describe('E2EIHandler', () => {
 
   it('continues in progress enrollment', async () => {
     jest.spyOn(coreMock.service!.e2eIdentity!, 'isEnrollmentInProgress').mockResolvedValue(true);
+
+    // mock window search params (code, session_state, state)
+    const searchParams = new URLSearchParams();
+    searchParams.append('code', 'CODE');
+    searchParams.append('session_state', 'SESSION_STATE');
+    searchParams.append('state', 'STATE');
+
+    Object.defineProperty(window, 'location', {
+      value: {
+        search: searchParams.toString(),
+      },
+      writable: true,
+    });
+
     const enrollPromise = E2EIHandler.getInstance().initialize(params);
     await waitFor(() => {
       expect(modalMock).toHaveBeenCalledWith(
@@ -167,6 +203,121 @@ describe('E2EIHandler', () => {
     });
 
     // Trigger the user clicking the OK button after successful enrollment
+    modalMock.mock.lastCall?.[1].primaryAction?.action?.();
+
+    return enrollPromise;
+  });
+
+  it('starts from scratch if returned to app without auth params', async () => {
+    jest.spyOn(coreMock.service!.e2eIdentity!, 'isEnrollmentInProgress').mockResolvedValue(true);
+
+    // mock window search params (code, session_state, state)
+    Object.defineProperty(window, 'location', {
+      value: {
+        search: '',
+      },
+      writable: true,
+    });
+
+    const enrollPromise = E2EIHandler.getInstance().initialize(params);
+
+    await waitFor(() => {
+      expect(modalMock).toHaveBeenCalledWith(
+        PrimaryModalType.ACKNOWLEDGE,
+        expect.objectContaining({text: expect.objectContaining({title: 'acme.settingsChanged.headline.alt'})}),
+      );
+    });
+
+    // Trigger the user clicking the get certificate button
+    modalMock.mock.lastCall?.[1].primaryAction?.action?.();
+
+    await waitFor(() => {
+      expect(modalMock).toHaveBeenCalledWith(
+        PrimaryModalType.ACKNOWLEDGE,
+        expect.objectContaining({text: expect.objectContaining({title: 'acme.done.headline'})}),
+      );
+    });
+
+    // Trigger the user clicking the OK button after successful enrollment
+    modalMock.mock.lastCall?.[1].primaryAction?.action?.();
+
+    return enrollPromise;
+  });
+
+  it('shows the error modal without the snooze option after enrollment failed and the client is fresh', async () => {
+    jest.spyOn(coreMock.service!.e2eIdentity!, 'isFreshMLSSelfClient').mockResolvedValue(true);
+    jest.spyOn(coreMock.service!.e2eIdentity!, 'isEnrollmentInProgress').mockResolvedValue(true);
+    jest.spyOn(coreMock, 'enrollE2EI').mockRejectedValue(new Error('OIDC Error'));
+
+    const handler = E2EIHandler.getInstance();
+
+    // mock window search params (code, session_state, state)
+    const searchParams = new URLSearchParams();
+    searchParams.append('code', 'CODE');
+    searchParams.append('session_state', 'SESSION_STATE');
+    searchParams.append('state', 'STATE');
+
+    Object.defineProperty(window, 'location', {
+      value: {
+        search: searchParams.toString(),
+      },
+      writable: true,
+    });
+
+    const enrollPromise = handler.initialize(params);
+
+    await waitFor(() => {
+      expect(modalMock).toHaveBeenCalledWith(
+        PrimaryModalType.ACKNOWLEDGE,
+        expect.objectContaining({text: expect.objectContaining({title: 'acme.error.headline'})}),
+      );
+      expect(modalMock).not.toHaveBeenCalledWith(
+        PrimaryModalType.CONFIRM,
+        expect.objectContaining({secondaryAction: expect.objectContaining({text: 'acme.error.button.secondary'})}),
+      );
+    });
+
+    jest.spyOn(handler, 'enroll').mockImplementation(() => Promise.resolve());
+
+    modalMock.mock.lastCall?.[1].primaryAction?.action?.();
+
+    return enrollPromise;
+  });
+
+  it('shows the error modal with the snooze option after enrollment failed and the client is an e2ei client already', async () => {
+    jest.spyOn(coreMock.service!.e2eIdentity!, 'isFreshMLSSelfClient').mockResolvedValue(false);
+    jest.spyOn(coreMock.service!.e2eIdentity!, 'isEnrollmentInProgress').mockResolvedValue(true);
+    jest.spyOn(coreMock, 'enrollE2EI').mockRejectedValue(new Error('OIDC Error'));
+
+    const handler = E2EIHandler.getInstance();
+
+    // mock window search params (code, session_state, state)
+    const searchParams = new URLSearchParams();
+    searchParams.append('code', 'CODE');
+    searchParams.append('session_state', 'SESSION_STATE');
+    searchParams.append('state', 'STATE');
+
+    Object.defineProperty(window, 'location', {
+      value: {
+        search: searchParams.toString(),
+      },
+      writable: true,
+    });
+
+    const enrollPromise = handler.initialize(params);
+
+    await waitFor(() => {
+      expect(modalMock).toHaveBeenCalledWith(
+        PrimaryModalType.CONFIRM,
+        expect.objectContaining({
+          text: expect.objectContaining({title: 'acme.error.headline'}),
+          secondaryAction: expect.objectContaining({text: 'acme.error.button.secondary'}),
+        }),
+      );
+    });
+
+    jest.spyOn(handler, 'enroll').mockImplementation(() => Promise.resolve());
+
     modalMock.mock.lastCall?.[1].primaryAction?.action?.();
 
     return enrollPromise;
@@ -195,7 +346,59 @@ describe('E2EIHandler', () => {
   });
 
   describe('startTimers()', () => {
+    it('should reset the timer after user interaction with modal', async () => {
+      jest.spyOn(coreMock.service!.e2eIdentity!, 'isEnrollmentInProgress').mockResolvedValue(false);
+      jest.spyOn(coreMock.service!.e2eIdentity!, 'isFreshMLSSelfClient').mockResolvedValue(false);
+      jest
+        .spyOn(e2EIdentityVerification, 'getActiveWireIdentity')
+        .mockResolvedValue(
+          generateWireIdentity(selfClientId, CredentialType.Basic, e2EIdentityVerification.MLSStatuses.VALID),
+        );
+
+      const instance = await E2EIHandler.getInstance().initialize(params);
+      await instance.startTimers();
+
+      const enrollmentStore = getEnrollmentStore(user.qualifiedId, selfClientId);
+
+      const mockedFireDate = Date.now() + 1000;
+
+      enrollmentStore.store.timer(mockedFireDate);
+      jest.spyOn(enrollmentStore.clear, 'timer');
+
+      expect(enrollmentStore.get.timer()).toEqual(mockedFireDate);
+
+      const secondaryActions = modalMock.mock.calls[0][1].secondaryAction;
+      const action = Array.isArray(secondaryActions) ? secondaryActions[0].action : secondaryActions?.action;
+      await action?.();
+
+      await waitFor(() => {
+        expect(enrollmentStore.get.timer()).not.toEqual(mockedFireDate);
+      });
+
+      return instance;
+    });
+
     describe('should start enrollment for existing devices', () => {
+      it('with a basic credential type', async () => {
+        jest.spyOn(coreMock.service!.e2eIdentity!, 'isEnrollmentInProgress').mockResolvedValue(false);
+        jest.spyOn(coreMock.service!.e2eIdentity!, 'isFreshMLSSelfClient').mockResolvedValue(false);
+        jest
+          .spyOn(e2EIdentityVerification, 'getActiveWireIdentity')
+          .mockResolvedValue(
+            generateWireIdentity(selfClientId, CredentialType.Basic, e2EIdentityVerification.MLSStatuses.VALID),
+          );
+
+        const instance = await E2EIHandler.getInstance().initialize(params);
+
+        const taskSchedulerMock = jest.spyOn(LowPrecisionTaskScheduler, 'addTask');
+        const primaryModalMock = jest.spyOn(PrimaryModal, 'show');
+
+        await instance.startTimers();
+
+        expect(taskSchedulerMock).not.toHaveBeenCalled();
+        expect(primaryModalMock).toHaveBeenCalled();
+      });
+
       it('without existing WireIdentity', async () => {
         jest.spyOn(coreMock.service!.e2eIdentity!, 'isEnrollmentInProgress').mockResolvedValue(false);
         jest.spyOn(coreMock.service!.e2eIdentity!, 'isFreshMLSSelfClient').mockResolvedValue(false);
@@ -215,23 +418,9 @@ describe('E2EIHandler', () => {
       it('with pristine WireIdentity', async () => {
         jest.spyOn(coreMock.service!.e2eIdentity!, 'isEnrollmentInProgress').mockResolvedValue(false);
         jest.spyOn(coreMock.service!.e2eIdentity!, 'isFreshMLSSelfClient').mockResolvedValue(false);
-        jest.spyOn(e2EIdentityVerification, 'getActiveWireIdentity').mockResolvedValue({
-          x509Identity: {
-            certificate: '',
-            displayName: 'John Doe',
-            domain: 'domain',
-            handle: 'johndoe',
-            notAfter: BigInt(0),
-            notBefore: BigInt(0),
-            serialNumber: '',
-          },
-          thumbprint: '',
-          credentialType: CredentialType.X509,
-          status: e2EIdentityVerification.MLSStatuses.NOT_ACTIVATED,
-          clientId: selfClientId,
-          deviceId: selfClientId,
-          qualifiedUserId: {id: 'userId', domain: 'domain'},
-        });
+        jest
+          .spyOn(e2EIdentityVerification, 'getActiveWireIdentity')
+          .mockResolvedValue(generateWireIdentity(selfClientId, CredentialType.X509));
 
         const instance = await E2EIHandler.getInstance().initialize(params);
 

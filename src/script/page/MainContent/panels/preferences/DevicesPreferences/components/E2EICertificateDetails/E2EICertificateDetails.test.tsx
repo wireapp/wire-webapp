@@ -17,67 +17,138 @@
  *
  */
 
-import {render} from '@testing-library/react';
+import {render, waitFor} from '@testing-library/react';
+import {CONVERSATION_TYPE, MLSConversation} from '@wireapp/api-client/lib/conversation';
 import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
+import {container} from 'tsyringe';
 
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {MLSStatuses, WireIdentity} from 'src/script/E2EIdentity';
+import {E2EIHandler, MLSStatuses, WireIdentity} from 'src/script/E2EIdentity';
+import {User} from 'src/script/entity/User';
+import {Core} from 'src/script/service/CoreSingleton';
+import {UserState} from 'src/script/user/UserState';
+import {generateAPIConversation} from 'test/helper/ConversationGenerator';
 
 import {E2EICertificateDetails} from './E2EICertificateDetails';
 
+const generateIdentity = (status: MLSStatuses, credentialType = CredentialType.X509): WireIdentity => ({
+  status,
+  x509Identity: {
+    certificate: 'certificate',
+    displayName: '',
+    domain: '',
+    handle: '',
+    notBefore: BigInt(0),
+    notAfter: BigInt(0),
+    serialNumber: '',
+  },
+  credentialType,
+  deviceId: '',
+  clientId: '',
+  thumbprint: '',
+  qualifiedUserId: {
+    domain: '',
+    id: '',
+  },
+});
+
+const core = container.resolve(Core);
+
 describe('E2EICertificateDetails', () => {
-  const generateIdentity = (status: MLSStatuses): WireIdentity => ({
-    status,
-    x509Identity: {
-      certificate: 'certificate',
-      displayName: '',
-      domain: '',
-      handle: '',
-      notBefore: BigInt(0),
-      notAfter: BigInt(0),
-      serialNumber: '',
-    },
-    credentialType: CredentialType.Basic,
-    deviceId: '',
-    clientId: '',
-    thumbprint: '',
-    qualifiedUserId: {
-      domain: '',
-      id: '',
-    },
+  beforeAll(async () => {
+    jest.spyOn(core.service?.conversation!, 'getMLSSelfConversation').mockResolvedValue(
+      generateAPIConversation({
+        id: {id: 'id', domain: 'domain'},
+        type: CONVERSATION_TYPE.ONE_TO_ONE,
+        overwites: {group_id: 'groupId'},
+      }) as MLSConversation,
+    );
+
+    const selfUser = new User('id', 'domain');
+    container.resolve(UserState).self(selfUser);
+
+    const handler = E2EIHandler.getInstance();
+    await handler.initialize({discoveryUrl: '', gracePeriodInSeconds: 100});
   });
 
-  it('is e2ei identity not downloaded', async () => {
-    const {getByTestId} = render(withTheme(<E2EICertificateDetails />));
+  describe('idicates the state of the e2ei identity', () => {
+    it('is e2ei identity not downloaded', async () => {
+      const {getByTestId} = render(withTheme(<E2EICertificateDetails />));
 
-    const E2EIdentityStatus = getByTestId('e2ei-identity-status');
-    expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.NOT_ACTIVATED);
+      const E2EIdentityStatus = getByTestId('e2ei-identity-status');
+      expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.NOT_ACTIVATED);
+    });
+
+    it('is e2ei identity not downloaded for basic MLS device', async () => {
+      const identity = generateIdentity(MLSStatuses.VALID, CredentialType.Basic);
+
+      const {getByTestId} = render(withTheme(<E2EICertificateDetails identity={identity} />));
+
+      const E2EIdentityStatus = getByTestId('e2ei-identity-status');
+      expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.NOT_ACTIVATED);
+    });
+
+    it('is e2ei identity expired', async () => {
+      const identity = generateIdentity(MLSStatuses.EXPIRED);
+
+      const {getByTestId} = render(withTheme(<E2EICertificateDetails identity={identity} />));
+
+      const E2EIdentityStatus = getByTestId('e2ei-identity-status');
+      expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.EXPIRED);
+    });
+
+    it('is e2ei identity revoked', async () => {
+      const identity = generateIdentity(MLSStatuses.REVOKED);
+
+      const {getByTestId} = render(withTheme(<E2EICertificateDetails identity={identity} />));
+
+      const E2EIdentityStatus = getByTestId('e2ei-identity-status');
+      expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.REVOKED);
+    });
+
+    it('is e2ei identity verified', async () => {
+      const identity = generateIdentity(MLSStatuses.VALID);
+
+      const {getByTestId} = render(withTheme(<E2EICertificateDetails identity={identity} />));
+
+      const E2EIdentityStatus = getByTestId('e2ei-identity-status');
+      expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.VALID);
+    });
   });
 
-  it('is e2ei identity expired', async () => {
-    const identity = generateIdentity(MLSStatuses.EXPIRED);
+  describe('shows the update certificate button for the current device', () => {
+    it('for expired certificate', async () => {
+      const identity = generateIdentity(MLSStatuses.EXPIRED);
 
-    const {getByTestId} = render(withTheme(<E2EICertificateDetails identity={identity} />));
+      const {getByText} = render(withTheme(<E2EICertificateDetails identity={identity} isCurrentDevice />));
 
-    const E2EIdentityStatus = getByTestId('e2ei-identity-status');
-    expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.EXPIRED);
-  });
+      await waitFor(() => {
+        const E2EIdentityStatus = getByText('E2EI.updateCertificate');
+        expect(E2EIdentityStatus).toBeDefined();
+      });
+    });
 
-  it('is e2ei identity revoked', async () => {
-    const identity = generateIdentity(MLSStatuses.REVOKED);
+    it('for certificate that expires soon', async () => {
+      const identity = generateIdentity(MLSStatuses.VALID);
 
-    const {getByTestId} = render(withTheme(<E2EICertificateDetails identity={identity} />));
+      const instance = E2EIHandler.getInstance();
+      jest.spyOn(instance, 'hasGracePeriodStartedForSelfClient').mockResolvedValue(true);
 
-    const E2EIdentityStatus = getByTestId('e2ei-identity-status');
-    expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.REVOKED);
-  });
+      const {getByText} = render(withTheme(<E2EICertificateDetails identity={identity} isCurrentDevice />));
 
-  it('is e2ei identity verified', async () => {
-    const identity = generateIdentity(MLSStatuses.VALID);
+      await waitFor(() => {
+        const E2EIdentityStatus = getByText('E2EI.updateCertificate');
+        expect(E2EIdentityStatus).toBeDefined();
+      });
+    });
 
-    const {getByTestId} = render(withTheme(<E2EICertificateDetails identity={identity} />));
+    it('for not downloaded certificate', async () => {
+      const identity = generateIdentity(MLSStatuses.NOT_ACTIVATED);
 
-    const E2EIdentityStatus = getByTestId('e2ei-identity-status');
-    expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.VALID);
+      const {getByText} = render(withTheme(<E2EICertificateDetails identity={identity} isCurrentDevice />));
+
+      const E2EIdentityStatus = getByText('E2EI.getCertificate');
+      expect(E2EIdentityStatus).toBeDefined();
+    });
   });
 });

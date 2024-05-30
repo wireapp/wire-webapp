@@ -33,7 +33,7 @@ import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
 import {TitleBar} from 'Components/TitleBar';
-import {CallState} from 'src/script/calling/CallState';
+import {CallingViewMode, CallState} from 'src/script/calling/CallState';
 import {Config} from 'src/script/Config';
 import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -67,7 +67,6 @@ import {TeamState} from '../../team/TeamState';
 import {ElementType, MessageDetails} from '../MessagesList/Message/ContentMessage/asset/TextMessageRenderer';
 
 interface ConversationProps {
-  readonly initialMessage?: Message;
   readonly teamState: TeamState;
   selfUser: User;
   openRightSidebar: (panelState: PanelState, params: RightSidebarParams, compareEntityId?: boolean) => void;
@@ -78,7 +77,6 @@ interface ConversationProps {
 const CONFIG = Config.getConfig();
 
 export const Conversation = ({
-  initialMessage,
   teamState,
   selfUser,
   openRightSidebar,
@@ -114,7 +112,10 @@ export const Conversation = ({
 
   const inTeam = teamState.isInTeam(selfUser);
 
-  const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
+  const {activeCalls, viewMode} = useKoSubscribableChildren(callState, ['activeCalls', 'viewMode']);
+
+  const isCallWindowDetached = viewMode === CallingViewMode.DETACHED_WINDOW;
+
   const [isMsgElementsFocusable, setMsgElementsFocusable] = useState(true);
 
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
@@ -251,11 +252,7 @@ export const Conversation = ({
 
     const serviceEntity = userEntity.isService && (await repositories.integration.getServiceFromUser(userEntity));
 
-    if (serviceEntity) {
-      openRightSidebar(panelId, {entity: {...serviceEntity, id: userEntity.id}}, true);
-    } else {
-      openRightSidebar(panelId, {entity: userEntity}, true);
-    }
+    openRightSidebar(panelId, {entity: serviceEntity || userEntity}, true);
   };
 
   const showParticipants = (participants: User[]) => {
@@ -493,6 +490,10 @@ export const Conversation = ({
               return null;
             }
 
+            if (isCallWindowDetached) {
+              return null;
+            }
+
             return (
               <div className="calling-cell" key={conversation.id}>
                 <CallingCell
@@ -511,7 +512,6 @@ export const Conversation = ({
           <MessagesList
             conversation={activeConversation}
             selfUser={selfUser}
-            initialMessage={initialMessage}
             conversationRepository={conversationRepository}
             messageRepository={repositories.message}
             messageActions={mainViewModel.actions}
