@@ -48,11 +48,6 @@ describe('when entering account data', () => {
               password: '',
             },
           },
-          runtimeState: {
-            hasCookieSupport: true,
-            hasIndexedDbSupport: true,
-            isSupportedBrowser: true,
-          },
         }),
       );
 
@@ -77,11 +72,6 @@ describe('when entering account data', () => {
               termsAccepted: true,
             },
           },
-          runtimeState: {
-            hasCookieSupport: true,
-            hasIndexedDbSupport: true,
-            isSupportedBrowser: true,
-          },
         }),
       );
 
@@ -105,11 +95,6 @@ describe('when entering account data', () => {
               password: 'Ab1!Ab1!Ab1!Ab1!Ab1!',
               termsAccepted: true,
             },
-          },
-          runtimeState: {
-            hasCookieSupport: true,
-            hasIndexedDbSupport: true,
-            isSupportedBrowser: true,
           },
         }),
       );
@@ -140,11 +125,6 @@ describe('when entering account data', () => {
               password: 'Ab1!Ab1!Ab1!Ab1!Ab1!',
               termsAccepted: true,
             },
-          },
-          runtimeState: {
-            hasCookieSupport: true,
-            hasIndexedDbSupport: true,
-            isSupportedBrowser: true,
           },
         }),
       );

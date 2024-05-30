@@ -46,17 +46,7 @@ describe('CustomEnvironmentRedirect', () => {
     const originalURLSearchParams = window.URLSearchParams;
     window.URLSearchParams = createMockedURLSearchParams(expectedHost);
     spyOn(actionRoot.navigationAction, 'doNavigate').and.returnValue(() => {});
-    mountComponent(
-      <CustomEnvironmentRedirect />,
-      mockStoreFactory()({
-        ...initialRootState,
-        runtimeState: {
-          hasCookieSupport: true,
-          hasIndexedDbSupport: true,
-          isSupportedBrowser: true,
-        },
-      }),
-    );
+    mountComponent(<CustomEnvironmentRedirect />, mockStoreFactory()(initialRootState));
 
     act(() => {
       jest.advanceTimersByTime(1000);

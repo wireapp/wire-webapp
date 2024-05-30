@@ -41,7 +41,6 @@ import {Config} from '../../Config';
 import {conversationJoinStrings} from '../../strings';
 import {AppAlreadyOpen} from '../component/AppAlreadyOpen';
 import {JoinGuestLinkPasswordModal} from '../component/JoinGuestLinkPasswordModal';
-import {UnsupportedBrowser} from '../component/UnsupportedBrowser';
 import {WirelessContainer} from '../component/WirelessContainer';
 import {EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot as ROOT_ACTIONS} from '../module/action';
@@ -251,7 +250,7 @@ const ConversationJoinComponent = ({
   }
 
   return (
-    <UnsupportedBrowser isTemporaryGuest>
+    <>
       {isJoinGuestLinkPasswordModalOpen && (
         <JoinGuestLinkPasswordModal
           onClose={() => {
@@ -308,7 +307,7 @@ const ConversationJoinComponent = ({
           </Column>
         </Columns>
       </WirelessContainer>
-    </UnsupportedBrowser>
+    </>
   );
 };
 

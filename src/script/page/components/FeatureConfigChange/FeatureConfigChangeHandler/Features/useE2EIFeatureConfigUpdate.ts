@@ -26,11 +26,8 @@ import {
   detectTeamFeatureUpdate,
 } from 'src/script/team/TeamFeatureConfigChangeDetector/TeamFeatureConfigChangeDetector';
 import {TeamRepository} from 'src/script/team/TeamRepository';
-import {getLogger} from 'Util/Logger';
 
 import {configureE2EI} from './E2EIdentity';
-
-const logger = getLogger('useE2EIFeatureConfigUpdate');
 
 const onConfigUpdate = async (configUpdate: {
   prevFeatureList?: FeatureList | undefined;
@@ -39,7 +36,7 @@ const onConfigUpdate = async (configUpdate: {
   const {type} = detectTeamFeatureUpdate(configUpdate, FEATURE_KEY.MLSE2EID);
 
   if (type !== FeatureUpdateType.UNCHANGED) {
-    const client = await configureE2EI(logger, configUpdate.newFeatureList);
+    const client = await configureE2EI(configUpdate.newFeatureList);
     await client?.startTimers();
   }
 };

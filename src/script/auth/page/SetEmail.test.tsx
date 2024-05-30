@@ -36,17 +36,7 @@ const errorMessageId = 'error-message';
 
 describe('SetEmail', () => {
   it('has disabled submit button as long as there is no input', async () => {
-    const {getByTestId} = mountComponent(
-      <SetEmail />,
-      mockStoreFactory()({
-        ...initialRootState,
-        runtimeState: {
-          hasCookieSupport: true,
-          hasIndexedDbSupport: true,
-          isSupportedBrowser: true,
-        },
-      }),
-    );
+    const {getByTestId} = mountComponent(<SetEmail />, mockStoreFactory()(initialRootState));
 
     await waitFor(() => getByTestId(emailInputId));
     const emailInput = getByTestId(emailInputId);
@@ -59,17 +49,7 @@ describe('SetEmail', () => {
   });
 
   it('handles invalid email', async () => {
-    const {getByTestId, container} = mountComponent(
-      <SetEmail />,
-      mockStoreFactory()({
-        ...initialRootState,
-        runtimeState: {
-          hasCookieSupport: true,
-          hasIndexedDbSupport: true,
-          isSupportedBrowser: true,
-        },
-      }),
-    );
+    const {getByTestId, container} = mountComponent(<SetEmail />, mockStoreFactory()(initialRootState));
 
     await waitFor(() => getByTestId(emailInputId));
     const emailInput = getByTestId(emailInputId);
@@ -90,17 +70,7 @@ describe('SetEmail', () => {
 
     const email = 'e@e.com';
 
-    const {getByTestId} = mountComponent(
-      <SetEmail />,
-      mockStoreFactory()({
-        ...initialRootState,
-        runtimeState: {
-          hasCookieSupport: true,
-          hasIndexedDbSupport: true,
-          isSupportedBrowser: true,
-        },
-      }),
-    );
+    const {getByTestId} = mountComponent(<SetEmail />, mockStoreFactory()(initialRootState));
 
     await waitFor(() => getByTestId(emailInputId));
     const emailInput = getByTestId(emailInputId);

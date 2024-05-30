@@ -375,50 +375,6 @@ export const joinGuestLinkPasswordModalStrings = defineMessages({
   },
 });
 
-export const unsupportedStrings = defineMessages({
-  desktopOnlyMessage: {
-    defaultMessage: 'Please use {brandName} on your desktop app instead.',
-    id: 'unsupported.desktopOnlyMessage',
-  },
-  headlineBrowser: {
-    defaultMessage: 'This browser is not supported.',
-    id: 'unsupported.headlineBrowser',
-  },
-  headlineCookies: {
-    defaultMessage: 'Enable cookies',
-    id: 'unsupported.headlineCookies',
-  },
-  headlineIndexedDb: {
-    defaultMessage: 'Your browser is in private mode',
-    id: 'unsupported.headlineIndexedDb',
-  },
-  subheadBrowser: {
-    defaultMessage:
-      'Download the latest version of <strong>Google Chrome, Mozilla Firefox, Opera</strong> or <strong>Microsoft Edge.</strong>',
-    id: 'unsupported.subheadBrowser',
-  },
-  subheadCookies: {
-    defaultMessage: 'Enable cookies to log in to {brandName}.',
-    id: 'unsupported.subheadCookies',
-  },
-  subheadIndexedDb: {
-    defaultMessage:
-      '{brandName} needs access to local storage to display your messages. Local storage is not available in private mode.',
-    id: 'unsupported.subheadIndexedDb',
-  },
-});
-
-export const unsupportedJoinStrings = defineMessages({
-  unsupportedJoinHeadline: {
-    defaultMessage: 'You have been invited to join a conversation in {brandName}',
-    id: 'conversationJoin.unsupportedJoinHeadline',
-  },
-  unsupportedJoinMobileSubhead: {
-    defaultMessage: 'Open this link on your computer.',
-    id: 'conversationJoin.unsupportedJoinMobileSubhead',
-  },
-});
-
 export const conversationJoinStrings = defineMessages({
   existentAccountJoinWithoutLink: {
     defaultMessage: 'Join the conversation',
@@ -682,7 +638,7 @@ export const errorHandlerStrings = defineMessages({
     id: 'LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE',
   },
   [LabeledError.GENERAL_ERRORS.SYSTEM_KEYCHAIN_ACCESS]: {
-    defaultMessage: 'Wire could not access your system safe storage. {supportKeychainLink}',
+    defaultMessage: "Wire can’t access your system's safe storage. {supportKeychainLink}",
     id: 'LabeledError.GENERAL_ERRORS.SYSTEM_KEYCHAIN_ACCESS',
   },
   [BackendErrorLabel.CUSTOM_BACKEND_NOT_FOUND]: {
@@ -692,6 +648,10 @@ export const errorHandlerStrings = defineMessages({
   [BackendErrorLabel.INVALID_CONVERSATION_PASSWORD]: {
     defaultMessage: 'Password is incorrect, please try again.',
     id: 'BackendErrorLabel.INVALID_CONVERSATION_PASSWORD',
+  },
+  howToLogIn: {
+    defaultMessage: 'Find out how to log in',
+    id: 'LabeledError.howToLogIn',
   },
   learnMore: {
     defaultMessage: 'Learn more',

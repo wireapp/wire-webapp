@@ -56,7 +56,7 @@ const Exception = ({errors = []}: ExceptionProps) => {
                   ),
                   supportKeychainLink: (
                     <Link targetBlank href={Config.getConfig().URL.SUPPORT.SYSTEM_KEYCHAIN_ACCESS}>
-                      <FormattedMessage {...errorHandlerStrings.learnMore} />
+                      <FormattedMessage {...errorHandlerStrings.howToLogIn} />
                     </Link>
                   ),
                 }}

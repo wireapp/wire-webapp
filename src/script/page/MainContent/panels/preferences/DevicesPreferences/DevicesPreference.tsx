@@ -61,7 +61,11 @@ export const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
   const [localFingerprint, setLocalFingerprint] = useState('');
 
   const {devices} = useKoSubscribableChildren(selfUser, ['devices']);
-  const {getDeviceIdentity} = useUserIdentity(selfUser.qualifiedId, conversationState.selfMLSConversation()?.groupId);
+  const {getDeviceIdentity} = useUserIdentity(
+    selfUser.qualifiedId,
+    conversationState.selfMLSConversation()?.groupId,
+    true,
+  );
   const currentClient = clientState.currentClient;
 
   const isSSO = selfUser.isNoPasswordSSO;

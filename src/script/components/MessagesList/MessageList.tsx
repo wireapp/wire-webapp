@@ -51,7 +51,6 @@ interface MessagesListParams {
   conversation: Conversation;
   conversationRepository: ConversationRepository;
   getVisibleCallback: (conversationEntity: Conversation, messageEntity: MessageEntity) => (() => void) | undefined;
-  initialMessage?: MessageEntity;
   invitePeople: (convesation: Conversation) => void;
   messageActions: {
     deleteMessage: (conversation: Conversation, message: MessageEntity) => void;
@@ -75,7 +74,6 @@ interface MessagesListParams {
 
 export const MessagesList: FC<MessagesListParams> = ({
   conversation,
-  initialMessage,
   selfUser,
   conversationRepository,
   messageRepository,
@@ -105,6 +103,7 @@ export const MessagesList: FC<MessagesListParams> = ({
     inTeam,
     isLoadingMessages,
     hasAdditionalMessages,
+    initialMessage,
   } = useKoSubscribableChildren(conversation, [
     'inTeam',
     'isActiveParticipant',
@@ -114,6 +113,7 @@ export const MessagesList: FC<MessagesListParams> = ({
     'isGuestAndServicesRoom',
     'isLoadingMessages',
     'hasAdditionalMessages',
+    'initialMessage',
   ]);
 
   const messageListRef = useRef<HTMLDivElement | null>(null);

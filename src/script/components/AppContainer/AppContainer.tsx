@@ -24,6 +24,7 @@ import {container} from 'tsyringe';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
+import {DetachedCallingCell} from 'Components/calling/DetachedCallingCell';
 import {PrimaryModalComponent} from 'Components/Modals/PrimaryModal/PrimaryModal';
 import {SIGN_OUT_REASON} from 'src/script/auth/SignOutReason';
 import {useAppSoftLock} from 'src/script/hooks/useAppSoftLock';
@@ -98,6 +99,13 @@ export const AppContainer: FC<AppProps> = ({config, clientType}) => {
       <StyledApp themeId={THEME_ID.DEFAULT} css={{backgroundColor: 'unset', height: '100%'}}>
         <PrimaryModalComponent />
       </StyledApp>
+
+      <DetachedCallingCell
+        callActions={mainView.calling.callActions}
+        callingRepository={app.repository.calling}
+        pushToTalkKey={repositories.properties.getPreference(PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY)}
+        hasAccessToCamera={mainView.calling.hasAccessToCamera()}
+      />
     </>
   );
 };
