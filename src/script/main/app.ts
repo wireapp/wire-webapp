@@ -40,7 +40,7 @@ import {getLogger, Logger} from 'Util/Logger';
 import {includesString} from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {appendParameter} from 'Util/UrlUtil';
-import {checkIndexedDb, supportsMLS} from 'Util/util';
+import {checkIndexedDb} from 'Util/util';
 
 import '../../style/default.less';
 import {AssetRepository} from '../assets/AssetRepository';
@@ -53,6 +53,7 @@ import {BackupService} from '../backup/BackupService';
 import {CacheRepository} from '../cache/CacheRepository';
 import {CallingRepository} from '../calling/CallingRepository';
 import {ClientRepository, ClientService} from '../client';
+import {getClientMLSConfig} from '../client/clientMLSConfig';
 import {Configuration} from '../Config';
 import {ConnectionRepository} from '../connection/ConnectionRepository';
 import {ConnectionService} from '../connection/ConnectionService';
@@ -91,10 +92,7 @@ import {joinConversationsAfterMigrationFinalisation} from '../mls/MLSMigration/m
 import {NotificationRepository} from '../notification/NotificationRepository';
 import {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
 import {configureDownloadPath} from '../page/components/FeatureConfigChange/FeatureConfigChangeHandler/Features/downloadPath';
-import {
-  configureE2EI,
-  getE2EIConfig,
-} from '../page/components/FeatureConfigChange/FeatureConfigChangeHandler/Features/E2EIdentity';
+import {configureE2EI} from '../page/components/FeatureConfigChange/FeatureConfigChangeHandler/Features/E2EIdentity';
 import {PermissionRepository} from '../permission/PermissionRepository';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {PropertiesService} from '../properties/PropertiesService';
@@ -388,15 +386,14 @@ export class App {
 
       const selfUser = await this.initiateSelfUser();
 
-      const {features: teamFeatures, members: teamMembers} = await teamRepository.initTeam(selfUser.teamId);
-      const willEnrollE2ei = getE2EIConfig(teamFeatures) !== undefined;
       const localClient = await this.core.getLocalClient();
       if (!localClient) {
         throw new ClientError(CLIENT_ERROR_TYPE.NO_VALID_CLIENT, 'Client has been deleted on backend');
       }
-      await this.core.initClient(localClient, willEnrollE2ei);
+      const {features: teamFeatures, members: teamMembers} = await teamRepository.initTeam(selfUser.teamId);
+      await this.core.initClient(localClient, getClientMLSConfig(teamFeatures));
 
-      const e2eiHandler = await configureE2EI(this.logger, teamFeatures);
+      const e2eiHandler = await configureE2EI(teamFeatures);
       configureDownloadPath(teamFeatures);
 
       this.core.configureCoreCallbacks({
@@ -448,7 +445,7 @@ export class App {
       // We load all the users the self user is connected with
       await userRepository.loadUsers(selfUser, connections, conversations, teamMembers);
 
-      if (supportsMLS()) {
+      if (this.core.hasMLSDevice) {
         //if mls is supported, we need to initialize the callbacks (they are used when decrypting messages)
         conversationRepository.initMLSConversationRecoveredListener();
         conversationRepository.registerMLSConversationVerificationStateHandler(
@@ -477,7 +474,7 @@ export class App {
 
       await conversationRepository.init1To1Conversations(connections, conversations);
 
-      if (supportsMLS()) {
+      if (this.core.hasMLSDevice) {
         //add the potential `self` and `team` conversations
         await initialiseSelfAndTeamConversations(conversations, selfUser, clientEntity.id, this.core);
 

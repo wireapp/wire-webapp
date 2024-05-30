@@ -330,7 +330,10 @@ export class ActionsViewModel {
   };
 
   getOrCreate1to1Conversation = async (userEntity: User): Promise<Conversation> => {
-    const conversationEntity = await this.conversationRepository.getInitialised1To1Conversation(userEntity.qualifiedId);
+    const conversationEntity = await this.conversationRepository.getInitialised1To1Conversation(
+      userEntity.qualifiedId,
+      {mls: {allowUnestablished: false}},
+    );
     if (conversationEntity) {
       return conversationEntity;
     }

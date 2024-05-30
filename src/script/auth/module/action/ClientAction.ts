@@ -22,7 +22,7 @@ import {ClientInfo} from '@wireapp/core/lib/client/';
 
 import {Runtime} from '@wireapp/commons';
 
-import {getE2EIConfig} from 'src/script/page/components/FeatureConfigChange/FeatureConfigChangeHandler/Features/E2EIdentity';
+import {getClientMLSConfig} from 'src/script/client/clientMLSConfig';
 
 import {ClientActionCreator} from './creator/';
 
@@ -64,9 +64,6 @@ export class ClientAction {
     entropyData?: Uint8Array,
   ): ThunkAction => {
     return async (dispatch, getState, {core, actions: {clientAction}}) => {
-      const teamConfig = (await core.service?.team.getTeamFeatureConfig()) ?? {};
-      const hasE2EIEnabled = !!getE2EIConfig(teamConfig);
-
       const localClient = await core.getLocalClient();
 
       const creationStatus = localClient
@@ -80,7 +77,8 @@ export class ClientAction {
             ),
           };
 
-      await core.initClient(creationStatus.client, hasE2EIEnabled);
+      const teamConfig = (await core.service?.team.getTeamFeatureConfig()) ?? {};
+      await core.initClient(creationStatus.client, getClientMLSConfig(teamConfig));
       dispatch(ClientActionCreator.successfulInitializeClient(creationStatus));
     };
   };

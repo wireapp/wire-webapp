@@ -265,7 +265,11 @@ export const AppMain: FC<AppMainProps> = ({
           {!locked && (
             <>
               <FeatureConfigChangeNotifier selfUserId={selfUser.id} teamState={teamState} />
-              <CallingContainer callingRepository={repositories.calling} mediaRepository={repositories.media} />
+              <CallingContainer
+                callingRepository={repositories.calling}
+                mediaRepository={repositories.media}
+                toggleScreenshare={mainView.calling.callActions.toggleScreenshare}
+              />
 
               <LegalHoldModal
                 selfUser={selfUser}

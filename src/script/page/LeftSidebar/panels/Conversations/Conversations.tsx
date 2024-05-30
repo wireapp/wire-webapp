@@ -46,7 +46,7 @@ import {EmptyConversationList} from './EmptyConversationList';
 import {getTabConversations} from './helpers';
 import {SidebarTabs, useFolderState, useSidebarStore} from './state';
 
-import {CallState} from '../../../../calling/CallState';
+import {CallingViewMode, CallState} from '../../../../calling/CallState';
 import {createLabel} from '../../../../conversation/ConversationLabelRepository';
 import {ConversationRepository} from '../../../../conversation/ConversationRepository';
 import {ConversationState} from '../../../../conversation/ConversationState';
@@ -100,7 +100,6 @@ const Conversations: React.FC<ConversationsProps> = ({
     setCurrentTab,
   } = useSidebarStore();
   const [conversationsFilter, setConversationsFilter] = useState<string>('');
-  const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
   const {classifiedDomains, isTeam} = useKoSubscribableChildren(teamState, ['classifiedDomains', 'isTeam']);
   const {connectRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
 
@@ -119,6 +118,9 @@ const Conversations: React.FC<ConversationsProps> = ({
     'unreadConversations',
     'visibleConversations',
   ]);
+  const {activeCalls, viewMode} = useKoSubscribableChildren(callState, ['activeCalls', 'viewMode']);
+
+  const isCallWindowDetached = viewMode === CallingViewMode.DETACHED_WINDOW;
 
   const {conversationLabelRepository} = conversationRepository;
   const favoriteConversations = conversationLabelRepository.getFavorites(conversations);
@@ -280,18 +282,21 @@ const Conversations: React.FC<ConversationsProps> = ({
         const {callingRepository} = callingViewModel;
 
         return (
-          <div className="calling-cell" key={conversation.id}>
-            <CallingCell
-              classifiedDomains={classifiedDomains}
-              call={call}
-              callActions={callingViewModel.callActions}
-              callingRepository={callingRepository}
-              pushToTalkKey={propertiesRepository.getPreference(PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY)}
-              isFullUi
-              hasAccessToCamera={callingViewModel.hasAccessToCamera()}
-              isSelfVerified={selfUser.is_verified()}
-            />
-          </div>
+          conversation &&
+          !isCallWindowDetached && (
+            <div className="calling-cell" key={conversation.id}>
+              <CallingCell
+                classifiedDomains={classifiedDomains}
+                call={call}
+                callActions={callingViewModel.callActions}
+                callingRepository={callingRepository}
+                pushToTalkKey={propertiesRepository.getPreference(PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY)}
+                isFullUi
+                hasAccessToCamera={callingViewModel.hasAccessToCamera()}
+                isSelfVerified={selfUser.is_verified()}
+              />
+            </div>
+          )
         );
       })}
     </>

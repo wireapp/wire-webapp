@@ -509,7 +509,8 @@ const testEventServiceClass = (testedServiceName, className) => {
     });
 
     describe('loadAllConversationEvents', () => {
-      const conversationId = 'conversation-id';
+      const conversationId = {id: 'conversation-id', domain: 'conversation-domain'};
+      const otherConversationId = {id: 'other-conversation-id', domain: 'other-conversation-domain'};
 
       afterEach(() => {
         testFactory.storage_service.clearStores();
@@ -520,13 +521,15 @@ const testEventServiceClass = (testedServiceName, className) => {
         const numberOfOtherConversationEvents = 1;
 
         const conversationEvents = Array.from({length: numberOfConversationEvents}, () => ({
-          conversation: conversationId,
+          conversation: conversationId.id,
+          qualified_conversation: conversationId,
           id: createUuid(),
           time: '2016-08-04T13:27:55.182Z',
         }));
 
         const otherConversationEvents = Array.from({length: numberOfOtherConversationEvents}, () => ({
-          conversation: 'other-conversation-id',
+          conversation: otherConversationId.id,
+          qualified_conversation: otherConversationId,
           id: createUuid(),
           time: '2016-08-04T13:27:55.182Z',
         }));
@@ -537,7 +540,7 @@ const testEventServiceClass = (testedServiceName, className) => {
 
         const eventService = testFactory[testedServiceName];
 
-        const foundConversationEvents = await eventService.loadAllConversationEvents(conversationId);
+        const foundConversationEvents = await eventService.loadAllConversationEvents(conversationId.id);
 
         expect(foundConversationEvents.length).toBe(numberOfConversationEvents);
       });
@@ -548,13 +551,15 @@ const testEventServiceClass = (testedServiceName, className) => {
         const numberOfEventsToSkip = 2;
 
         const conversationEvents = Array.from({length: numberOfConversationEvents}, () => ({
-          conversation: conversationId,
+          conversation: conversationId.id,
+          qualified_conversation: conversationId,
           id: createUuid(),
           time: '2016-08-04T13:27:55.182Z',
         }));
 
         const conversationEventsToSkip = Array.from({length: numberOfEventsToSkip}, () => ({
-          conversation: conversationId,
+          conversation: conversationId.id,
+          qualified_conversation: conversationId,
           id: createUuid(),
           time: '2016-08-04T13:27:55.182Z',
           type: skipTypes[0],
@@ -566,15 +571,15 @@ const testEventServiceClass = (testedServiceName, className) => {
 
         const eventService = testFactory[testedServiceName];
 
-        const foundConversationEvents = await eventService.loadAllConversationEvents(conversationId, skipTypes);
+        const foundConversationEvents = await eventService.loadAllConversationEvents(conversationId.id, skipTypes);
 
         expect(foundConversationEvents.length).toBe(numberOfConversationEvents);
       });
     });
 
     describe('moveEventsToConversation', () => {
-      const oldConversationId = 'old-conversation-id';
-      const newConversationId = 'new-conversation-id';
+      const oldConversationId = {id: 'old-conversation-id', domain: 'old-conversation-domain'};
+      const newConversationId = {id: 'new-conversation-id', domain: 'new-conversation-domain'};
 
       afterEach(() => {
         testFactory.storage_service.clearStores();
@@ -584,7 +589,8 @@ const testEventServiceClass = (testedServiceName, className) => {
         const numberOfConversationEvents = 3;
 
         const conversationEvents = Array.from({length: numberOfConversationEvents}, () => ({
-          conversation: oldConversationId,
+          conversation: oldConversationId.id,
+          qualified_conversation: oldConversationId,
           id: createUuid(),
           time: '2016-08-04T13:27:55.182Z',
         }));
@@ -595,15 +601,15 @@ const testEventServiceClass = (testedServiceName, className) => {
 
         const eventService = testFactory[testedServiceName];
 
-        const loadedOldConversationEvents = await eventService.loadAllConversationEvents(oldConversationId);
-        const loadedNewConversationEvents = await eventService.loadAllConversationEvents(newConversationId);
+        const loadedOldConversationEvents = await eventService.loadAllConversationEvents(oldConversationId.id);
+        const loadedNewConversationEvents = await eventService.loadAllConversationEvents(newConversationId.id);
         expect(loadedOldConversationEvents.length).toBe(numberOfConversationEvents);
         expect(loadedNewConversationEvents.length).toBe(0);
 
         await eventService.moveEventsToConversation(oldConversationId, newConversationId);
 
-        const loadedOldConversationEventsAfterMove = await eventService.loadAllConversationEvents(oldConversationId);
-        const loadedNewConversationEventsAfterMove = await eventService.loadAllConversationEvents(newConversationId);
+        const loadedOldConversationEventsAfterMove = await eventService.loadAllConversationEvents(oldConversationId.id);
+        const loadedNewConversationEventsAfterMove = await eventService.loadAllConversationEvents(newConversationId.id);
         expect(loadedOldConversationEventsAfterMove.length).toBe(0);
         expect(loadedNewConversationEventsAfterMove.length).toBe(numberOfConversationEvents);
       });

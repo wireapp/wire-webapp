@@ -35,17 +35,7 @@ const loginButtonId = 'do-sign-in-phone';
 
 describe('PhoneLogin', () => {
   it('has disabled submit button as long as one input is empty', () => {
-    const {getByTestId} = mountComponent(
-      <PhoneLogin />,
-      mockStoreFactory()({
-        ...initialRootState,
-        runtimeState: {
-          hasCookieSupport: true,
-          hasIndexedDbSupport: true,
-          isSupportedBrowser: true,
-        },
-      }),
-    );
+    const {getByTestId} = mountComponent(<PhoneLogin />, mockStoreFactory()(initialRootState));
 
     const phoneInput = getByTestId(phoneInputId);
     const loginButton = getByTestId(loginButtonId) as HTMLButtonElement;
@@ -57,17 +47,7 @@ describe('PhoneLogin', () => {
   });
 
   it('has an option to navigate back', async () => {
-    const {getByTestId} = mountComponent(
-      <PhoneLogin />,
-      mockStoreFactory()({
-        ...initialRootState,
-        runtimeState: {
-          hasCookieSupport: true,
-          hasIndexedDbSupport: true,
-          isSupportedBrowser: true,
-        },
-      }),
-    );
+    const {getByTestId} = mountComponent(<PhoneLogin />, mockStoreFactory()(initialRootState));
 
     const backButton = getByTestId(backButtonId) as HTMLAnchorElement;
     expect(backButton.href).toContain(ROUTE.LOGIN);
@@ -78,17 +58,7 @@ describe('PhoneLogin', () => {
 
     spyOn(actionRoot.authAction, 'doSendPhoneLoginCode').and.returnValue(() => Promise.resolve());
 
-    const {getByTestId} = mountComponent(
-      <PhoneLogin />,
-      mockStoreFactory()({
-        ...initialRootState,
-        runtimeState: {
-          hasCookieSupport: true,
-          hasIndexedDbSupport: true,
-          isSupportedBrowser: true,
-        },
-      }),
-    );
+    const {getByTestId} = mountComponent(<PhoneLogin />, mockStoreFactory()(initialRootState));
 
     const phoneInput = getByTestId(phoneInputId);
     const countryCodeInput = getByTestId(countryCodeInputId);
@@ -117,17 +87,7 @@ describe('PhoneLogin', () => {
     const error: any = new PasswordExistsError('test error') as any;
     spyOn(actionRoot.authAction, 'doSendPhoneLoginCode').and.returnValue(() => Promise.reject(error));
 
-    const {getByTestId} = mountComponent(
-      <PhoneLogin />,
-      mockStoreFactory()({
-        ...initialRootState,
-        runtimeState: {
-          hasCookieSupport: true,
-          hasIndexedDbSupport: true,
-          isSupportedBrowser: true,
-        },
-      }),
-    );
+    const {getByTestId} = mountComponent(<PhoneLogin />, mockStoreFactory()(initialRootState));
 
     const phoneInput = getByTestId(phoneInputId);
     const countryCodeInput = getByTestId(countryCodeInputId);

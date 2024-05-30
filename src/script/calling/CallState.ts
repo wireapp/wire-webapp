@@ -41,6 +41,7 @@ export enum MuteState {
 export enum CallingViewMode {
   FULL_SCREEN_GRID = 'full-screen-grid',
   MINIMIZED = 'minimized',
+  DETACHED_WINDOW = 'detached-window',
 }
 
 @singleton()

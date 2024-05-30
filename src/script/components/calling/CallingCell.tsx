@@ -41,6 +41,7 @@ import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
 import {CallParticipantsListItem} from './CallParticipantsListItem';
+import {useDetachedCallingFeatureState} from './DetachedCallingCell/DetachedCallingFeature.state';
 
 import type {Call} from '../../calling/Call';
 import type {CallingRepository} from '../../calling/CallingRepository';
@@ -68,6 +69,7 @@ interface AnsweringControlsProps {
   callState?: CallState;
   classifiedDomains?: string[];
   isTemporaryUser?: boolean;
+  setMaximizedParticipant?: (participant: Participant | null) => void;
 }
 
 export type CallingCellProps = VideoCallProps & AnsweringControlsProps;
@@ -84,6 +86,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
   isSelfVerified,
   callingRepository,
   pushToTalkKey,
+  setMaximizedParticipant,
   teamState = container.resolve(TeamState),
   callState = container.resolve(CallState),
 }) => {
@@ -116,7 +119,8 @@ const CallingCell: React.FC<CallingCellProps> = ({
   ]);
 
   const {viewMode} = useKoSubscribableChildren(callState, ['viewMode']);
-  const isMinimized = viewMode === CallingViewMode.MINIMIZED;
+  const isFullScreenGrid = viewMode === CallingViewMode.FULL_SCREEN_GRID;
+  const isDetachedWindow = viewMode === CallingViewMode.DETACHED_WINDOW;
 
   const {isVideoCallingEnabled} = useKoSubscribableChildren(teamState, ['isVideoCallingEnabled']);
 
@@ -220,7 +224,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
 
   const handleMaximizeKeydown = useCallback(
     (event: React.KeyboardEvent<HTMLInputElement>) => {
-      if (!isOngoing) {
+      if (!isOngoing || isDetachedWindow) {
         return;
       }
       if (isSpaceOrEnterKey(event.key)) {
@@ -231,7 +235,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
   );
 
   const handleMaximizeClick = useCallback(() => {
-    if (!isOngoing) {
+    if (!isOngoing || isDetachedWindow) {
       return;
     }
     callState.viewMode(CallingViewMode.FULL_SCREEN_GRID);
@@ -310,8 +314,18 @@ const CallingCell: React.FC<CallingCellProps> = ({
   const callStartedAlert = isGroup ? callGroupStartedAlert : call1To1StartedAlert;
   const ongoingCallAlert = isGroup ? onGoingGroupCallAlert : onGoingCallAlert;
 
+  const toggleDetachedWindow = () => {
+    if (isDetachedWindow) {
+      callState.viewMode(CallingViewMode.MINIMIZED);
+    } else {
+      callState.viewMode(CallingViewMode.DETACHED_WINDOW);
+    }
+  };
+
+  const isDetachedCallingFeatureEnabled = useDetachedCallingFeatureState(state => state.isSupported());
+
   return (
-    <div className="conversation-calling-cell">
+    <div css={{height: isDetachedWindow ? '100%' : 'auto'}}>
       {isIncoming && (
         <p role="alert" className="visually-hidden">
           {t('callConversationAcceptOrDecline', conversationName)}
@@ -324,6 +338,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
           data-uie-name="item-call"
           data-uie-id={conversation.id}
           data-uie-value={conversation.display_name()}
+          css={{height: isDetachedWindow ? '100%' : 'unset'}}
         >
           {muteState === MuteState.REMOTE_MUTED && isFullUi && (
             <div className="conversation-list-calling-cell__info-bar">{t('muteStateRemoteMute')}</div>
@@ -360,6 +375,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
                   )}
                 </div>
               )}
+
               <h2
                 className={cx('conversation-list-cell-center ', {
                   'conversation-list-cell-center-no-left': isTemporaryUser,
@@ -399,6 +415,16 @@ const CallingCell: React.FC<CallingCellProps> = ({
             </div>
 
             <div className="conversation-list-cell-right">
+              {isOngoing && isDetachedCallingFeatureEnabled && (
+                <button className="call-ui__button" onClick={toggleDetachedWindow}>
+                  {isDetachedWindow ? (
+                    <Icon.Close className="small-icon" />
+                  ) : (
+                    <Icon.Fullscreen className="small-icon" />
+                  )}
+                </button>
+              )}
+
               {(isConnecting || isOngoing) && (
                 <button
                   className="call-ui__button call-ui__button--red"
@@ -413,8 +439,9 @@ const CallingCell: React.FC<CallingCellProps> = ({
             </div>
           </div>
 
-          {(isOngoing || selfHasActiveVideo) && isMinimized && !!videoGrid?.grid?.length && isFullUi ? (
+          {(isOngoing || selfHasActiveVideo) && !isFullScreenGrid && !!videoGrid?.grid?.length && isFullUi ? (
             <div
+              css={{flex: isDetachedWindow ? 1 : 'unset'}}
               className="group-video__minimized-wrapper"
               onClick={handleMaximizeClick}
               onKeyDown={handleMaximizeKeydown}
@@ -427,8 +454,10 @@ const CallingCell: React.FC<CallingCellProps> = ({
                 minimized
                 maximizedParticipant={maximizedParticipant}
                 selfParticipant={selfParticipant}
+                setMaximizedParticipant={setMaximizedParticipant}
               />
-              {isOngoing && (
+
+              {isOngoing && !isDetachedWindow && (
                 <div className="group-video__minimized-wrapper__overlay" data-uie-name="do-maximize-call">
                   <Icon.Fullscreen />
                 </div>
@@ -507,6 +536,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
                         data-uie-value={selfSharesScreen ? 'active' : 'inactive'}
                         data-uie-enabled={disableScreenButton ? 'false' : 'true'}
                         title={t('videoCallOverlayShareScreen')}
+                        disabled={disableScreenButton || isDetachedWindow}
                       >
                         {selfSharesScreen ? (
                           <Icon.Screenshare className="small-icon" />
@@ -527,6 +557,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
                     className={cx('call-ui__button call-ui__button--participants', {
                       'call-ui__button--active': showParticipants,
                     })}
+                    disabled={isDetachedWindow}
                     onClick={() => setShowParticipants(prevState => !prevState)}
                     type="button"
                     data-uie-name="do-toggle-participants"
