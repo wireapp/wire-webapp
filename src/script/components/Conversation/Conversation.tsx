@@ -17,16 +17,17 @@
  *
  */
 
-import {FC, HTMLProps, UIEvent, useCallback, useState} from 'react';
+import {UIEvent, useCallback, useState} from 'react';
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {ChevronIcon, IconButton, useMatchMedia} from '@wireapp/react-ui-kit';
+import {useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {CallingCell} from 'Components/calling/CallingCell';
+import {JumpToLastMessageButton} from 'Components/Conversation/JumpToLastMessageButton';
 import {DropFileArea} from 'Components/DropFileArea';
 import {Giphy} from 'Components/Giphy';
 import {InputBar} from 'Components/InputBar';
@@ -594,28 +595,5 @@ export const Conversation = ({
         <Giphy giphyRepository={repositories.giphy} inputValue={inputValue} onClose={closeGiphy} />
       )}
     </DropFileArea>
-  );
-};
-
-interface JumpToLastMessageButtonProps extends HTMLProps<HTMLElement> {
-  onGoToLastMessage: () => void;
-  conversation: ConversationEntity;
-}
-
-export const JumpToLastMessageButton: FC<JumpToLastMessageButtonProps> = ({
-  onGoToLastMessage,
-  conversation,
-  ...rest
-}: JumpToLastMessageButtonProps) => {
-  const {isLastMessageVisible} = useKoSubscribableChildren(conversation, ['isLastMessageVisible']);
-
-  if (isLastMessageVisible) {
-    return null;
-  }
-
-  return (
-    <IconButton data-uie-name="jump-to-last-message-button" onClick={onGoToLastMessage}>
-      <ChevronIcon css={{rotate: '90deg', height: 16, width: 16, path: {fill: '#0667C8'}}} />
-    </IconButton>
   );
 };
