@@ -44,6 +44,7 @@ import {FederationStopMessage} from './FederationStopMessage';
 import {FileTypeRestrictedMessage} from './FileTypeRestrictedMessage';
 import {LegalHoldMessage} from './LegalHoldMessage';
 import {MemberMessage} from './MemberMessage';
+import {MessageParams} from './Message';
 import {MissedMessage} from './MissedMessage';
 import {PingMessage} from './PingMessage';
 import {SystemMessage} from './SystemMessage';
@@ -54,8 +55,6 @@ import {Conversation} from '../../../entity/Conversation';
 import {CompositeMessage} from '../../../entity/message/CompositeMessage';
 import {TeamState} from '../../../team/TeamState';
 import {ContextMenuEntry} from '../../../ui/ContextMenu';
-
-import {MessageParams} from './index';
 
 const isOutgoingQuote = (quoteEntity: QuoteEntity): quoteEntity is OutgoingQuote => {
   return quoteEntity.hash !== undefined;
