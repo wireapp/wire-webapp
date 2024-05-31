@@ -110,44 +110,6 @@ const PreferenceItem: React.FC<{
   );
 };
 
-const isDesktop = Runtime.isDesktopApp();
-const supportsCalling = Runtime.isSupportingLegacyCalling();
-
-const preferencesItems = [
-  {
-    IconComponent: Icon.Profile,
-    id: ContentState.PREFERENCES_ACCOUNT,
-    label: t('preferencesAccount'),
-    uieName: 'go-account',
-  },
-  {
-    IconComponent: Icon.Devices,
-    id: ContentState.PREFERENCES_DEVICES,
-    label: t('preferencesDevices'),
-    uieName: 'go-devices',
-  },
-  {
-    IconComponent: Icon.Options,
-    id: ContentState.PREFERENCES_OPTIONS,
-    label: t('preferencesOptions'),
-    uieName: 'go-options',
-  },
-  {
-    IconComponent: Icon.Av,
-    hidden: !supportsCalling,
-    id: ContentState.PREFERENCES_AV,
-    label: t('preferencesAV'),
-    uieName: 'go-audio-video',
-  },
-  {
-    IconComponent: Icon.About,
-    hidden: isDesktop,
-    id: ContentState.PREFERENCES_ABOUT,
-    label: t('preferencesAbout'),
-    uieName: 'go-about',
-  },
-];
-
 const Preferences: React.FC<PreferencesProps> = ({
   teamRepository,
   preferenceNotificationRepository,
@@ -167,6 +129,44 @@ const Preferences: React.FC<PreferencesProps> = ({
         .forEach(({type, notification}) => showNotification(type, notification));
     }
   }, [contentState, preferenceNotificationRepository]);
+
+  const isDesktop = Runtime.isDesktopApp();
+  const supportsCalling = Runtime.isSupportingLegacyCalling();
+
+  const preferencesItems = [
+    {
+      IconComponent: Icon.Profile,
+      id: ContentState.PREFERENCES_ACCOUNT,
+      label: t('preferencesAccount'),
+      uieName: 'go-account',
+    },
+    {
+      IconComponent: Icon.Devices,
+      id: ContentState.PREFERENCES_DEVICES,
+      label: t('preferencesDevices'),
+      uieName: 'go-devices',
+    },
+    {
+      IconComponent: Icon.Options,
+      id: ContentState.PREFERENCES_OPTIONS,
+      label: t('preferencesOptions'),
+      uieName: 'go-options',
+    },
+    {
+      IconComponent: Icon.Av,
+      hidden: !supportsCalling,
+      id: ContentState.PREFERENCES_AV,
+      label: t('preferencesAV'),
+      uieName: 'go-audio-video',
+    },
+    {
+      IconComponent: Icon.About,
+      hidden: isDesktop,
+      id: ContentState.PREFERENCES_ABOUT,
+      label: t('preferencesAbout'),
+      uieName: 'go-about',
+    },
+  ];
 
   return (
     <ListWrapper id="preferences" header={t('preferencesHeadline')}>
