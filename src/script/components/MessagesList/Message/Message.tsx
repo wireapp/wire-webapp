@@ -97,7 +97,6 @@ export const Message = (props: MessageParams & {scrollTo?: ScrollToElement}) => 
   } = props;
 
   const messageElementRef = useRef<HTMLDivElement>(null);
-  // const messageRef = useRef<HTMLDivElement>(null);
 
   const {status, ephemeral_expires} = useKoSubscribableChildren(message, ['status', 'ephemeral_expires']);
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isFocused);
