@@ -97,12 +97,9 @@ const StartUI: React.FC<StartUIProps> = ({
 
   const openFirstConversation = async (): Promise<void> => {
     if (peopleSearchResults.current) {
-      const {contacts, groups} = peopleSearchResults.current;
+      const {contacts} = peopleSearchResults.current;
       if (contacts.length > 0) {
         return openContact(contacts[0]);
-      }
-      if (groups.length > 0) {
-        return openConversation(groups[0]);
       }
     }
   };
