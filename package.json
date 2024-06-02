@@ -60,7 +60,7 @@
     "@babel/core": "7.24.6",
     "@babel/plugin-proposal-decorators": "7.24.1",
     "@babel/preset-env": "7.24.6",
-    "@babel/preset-react": "7.24.1",
+    "@babel/preset-react": "7.24.6",
     "@babel/preset-typescript": "7.24.6",
     "@emotion/eslint-plugin": "11.11.0",
     "@faker-js/faker": "8.4.1",
