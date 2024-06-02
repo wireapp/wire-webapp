@@ -759,16 +759,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/plugin-proposal-decorators@npm:7.24.1":
-  version: 7.24.1
-  resolution: "@babel/plugin-proposal-decorators@npm:7.24.1"
+"@babel/plugin-proposal-decorators@npm:7.24.6":
+  version: 7.24.6
+  resolution: "@babel/plugin-proposal-decorators@npm:7.24.6"
   dependencies:
-    "@babel/helper-create-class-features-plugin": "npm:^7.24.1"
-    "@babel/helper-plugin-utils": "npm:^7.24.0"
-    "@babel/plugin-syntax-decorators": "npm:^7.24.1"
+    "@babel/helper-create-class-features-plugin": "npm:^7.24.6"
+    "@babel/helper-plugin-utils": "npm:^7.24.6"
+    "@babel/plugin-syntax-decorators": "npm:^7.24.6"
   peerDependencies:
     "@babel/core": ^7.0.0-0
-  checksum: 10/cbc489ae3ebe5216a4d764a6d155591282e819b6b7436c4cffbb8f123515a1db9cc2f84259c36d558f896e8ff8526ebd28d3563fabb04347ae1964c476b44b9f
+  checksum: 10/82e8853e9e8a463d52aaea16fd8203df71af97974788f479b1484f2a7ef1ceb2244b3c36ff968bcac3cf0a6693906778ca328836f8d3414d685e4228ecdf1852
   languageName: node
   linkType: hard
 
@@ -825,14 +825,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/plugin-syntax-decorators@npm:^7.24.1":
-  version: 7.24.1
-  resolution: "@babel/plugin-syntax-decorators@npm:7.24.1"
+"@babel/plugin-syntax-decorators@npm:^7.24.6":
+  version: 7.24.6
+  resolution: "@babel/plugin-syntax-decorators@npm:7.24.6"
   dependencies:
-    "@babel/helper-plugin-utils": "npm:^7.24.0"
+    "@babel/helper-plugin-utils": "npm:^7.24.6"
   peerDependencies:
     "@babel/core": ^7.0.0-0
-  checksum: 10/6e70d64b6ce6843dd388740eef032c5a013b6b873e3a6ccdb41f342b91b49d4dac1ce5daac32f588c66815047ce00bab0785a8a45d724e6dce9f49bff01fb24e
+  checksum: 10/0f4be727760cef4663ebe51a1f6c1659da1a0bb85a41745ba4ca1550d56239e055e0e475ec7559a4c71575db7ac668d205149cce52b442bed84c44338c15a23b
   languageName: node
   linkType: hard
 
@@ -18569,7 +18569,7 @@ __metadata:
   resolution: "wire-webapp@workspace:."
   dependencies:
     "@babel/core": "npm:7.24.6"
-    "@babel/plugin-proposal-decorators": "npm:7.24.1"
+    "@babel/plugin-proposal-decorators": "npm:7.24.6"
     "@babel/preset-env": "npm:7.24.6"
     "@babel/preset-react": "npm:7.24.1"
     "@babel/preset-typescript": "npm:7.24.6"
