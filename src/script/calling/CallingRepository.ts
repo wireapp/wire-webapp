@@ -274,6 +274,7 @@ export class CallingRepository {
     const videoFeed = selfParticipant.videoStream();
     if (videoFeed) {
       const blurredVideoStream = await applyBlur(videoFeed);
+      selfParticipant.stopVideoBlur = blurredVideoStream.release;
       this.changeMediaSource(blurredVideoStream.stream, MediaType.VIDEO, false);
     }
   }

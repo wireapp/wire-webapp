@@ -175,11 +175,10 @@ export async function applyBlur(mediaStream: MediaStream): Promise<{stream: Medi
   return new Promise(resolve => {
     videoEl.onplay = () => {
       const stopBlurProcess = startBlurProcess(segmenter, ctx, videoEl, videoDimensions);
+      const videoStream = canvasEl.captureStream(QualitySettings.framerate).getVideoTracks()[0];
+      const blurredMediaStream = new MediaStream([...mediaStream.getAudioTracks(), videoStream]);
       resolve({
-        stream: new MediaStream([
-          ...mediaStream.getAudioTracks(),
-          canvasEl.captureStream(QualitySettings.framerate).getVideoTracks()[0],
-        ]),
+        stream: blurredMediaStream,
         release: () => {
           stopBlurProcess();
           stopVideo(videoEl);

@@ -45,6 +45,7 @@ export class Participant {
   // Audio
   public audioStream: ko.Observable<MediaStream | undefined>;
   public isMuted: ko.Observable<boolean>;
+  public stopVideoBlur = () => {};
 
   constructor(
     public user: User,
@@ -105,6 +106,7 @@ export class Participant {
 
   releaseVideoStream(stopTracks: boolean): void {
     this.releaseStream(this.videoStream(), stopTracks);
+    this.stopVideoBlur?.();
     this.videoStream(undefined);
   }
 
