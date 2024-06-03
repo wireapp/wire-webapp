@@ -17,7 +17,7 @@
  *
  */
 
-import {useMemo, useState, useEffect} from 'react';
+import {useMemo, useState, useEffect, useCallback, useRef} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import cx from 'classnames';
@@ -47,6 +47,7 @@ import {ContextMenuEntry} from '../../../../ui/ContextMenu';
 import {EphemeralTimer} from '../EphemeralTimer';
 import {MessageTime} from '../MessageTime';
 import {useMessageFocusedTabIndex} from '../util';
+
 export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetSession'> {
   contextMenu: {entries: ko.Subscribable<ContextMenuEntry[]>};
   conversation: Conversation;
@@ -86,6 +87,7 @@ export const ContentMessageComponent = ({
   onClickReaction,
   onClickDetails,
 }: ContentMessageProps) => {
+  const messageRef = useRef<HTMLDivElement | null>(null);
   // check if current message is focused and its elements focusable
   const msgFocusState = useMemo(() => isMsgElementsFocusable && isFocused, [isMsgElementsFocusable, isFocused]);
   const messageFocusedTabIndex = useMessageFocusedTabIndex(msgFocusState);
@@ -125,6 +127,7 @@ export const ContentMessageComponent = ({
 
   const [isActionMenuVisible, setActionMenuVisibility] = useState(false);
   const isMenuOpen = useMessageActionsState(state => state.isMenuOpen);
+
   useEffect(() => {
     setActionMenuVisibility(isFocused || msgFocusState);
   }, [msgFocusState, isFocused]);
@@ -132,6 +135,8 @@ export const ContentMessageComponent = ({
   const isConversationReadonly = conversation.readOnlyState() !== null;
 
   const contentMessageWrapperRef = (element: HTMLDivElement | null) => {
+    messageRef.current = element;
+
     setTimeout(() => {
       if (element?.parentElement?.querySelector(':hover') === element) {
         // Trigger the action menu in case the component is rendered with the mouse already hovering over it
@@ -147,6 +152,26 @@ export const ContentMessageComponent = ({
   const isImageMessage = !!asset?.isImage();
 
   const isAssetMessage = isFileMessage || isAudioMessage || isVideoMessage || isImageMessage;
+
+  const handleOutsideClick = useCallback((event: Event) => {
+    if (!messageRef.current) {
+      return;
+    }
+
+    event.preventDefault();
+
+    if (!messageRef.current.contains(event.target as Node)) {
+      setActionMenuVisibility(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener('click', handleOutsideClick);
+
+    return () => {
+      window.removeEventListener('click', handleOutsideClick);
+    };
+  }, [handleOutsideClick]);
 
   return (
     <div
