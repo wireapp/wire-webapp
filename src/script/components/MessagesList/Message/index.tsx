@@ -61,7 +61,7 @@ export interface MessageParams extends MessageActions {
   isLastDeliveredMessage: boolean;
   isSelfTemporaryGuest: boolean;
   message: BaseMessage;
-  /** whether the message should display the user avatar and userName before the actual content */
+  /** whether the message should display the user avatar and user name before the actual content */
   hideHeader: boolean;
   messageActions: {
     deleteMessage: (conversation: Conversation, message: BaseMessage) => void;
@@ -76,13 +76,13 @@ export interface MessageParams extends MessageActions {
   isFocused: boolean;
   /** will visually highlight the message when it's being loaded */
   isHighlighted: boolean;
-  handleFocus: (id?: string) => void;
+  handleFocus: (id: string) => void;
   handleArrowKeyDown: (e: React.KeyboardEvent) => void;
   isMsgElementsFocusable: boolean;
   setMsgElementsFocusable: (isMsgElementsFocusable: boolean) => void;
 }
 
-export const Message = (props: MessageParams & {scrollTo?: ScrollToElement}) => {
+export const Message: React.FC<MessageParams & {scrollTo?: ScrollToElement}> = props => {
   const {
     message,
     isHighlighted,
@@ -95,9 +95,8 @@ export const Message = (props: MessageParams & {scrollTo?: ScrollToElement}) => 
     isMsgElementsFocusable,
     setMsgElementsFocusable,
   } = props;
-
   const messageElementRef = useRef<HTMLDivElement>(null);
-
+  const messageRef = useRef<HTMLDivElement>(null);
   const {status, ephemeral_expires} = useKoSubscribableChildren(message, ['status', 'ephemeral_expires']);
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isFocused);
 
@@ -105,7 +104,6 @@ export const Message = (props: MessageParams & {scrollTo?: ScrollToElement}) => 
     if (!messageElementRef.current) {
       return;
     }
-
     if (isHighlighted) {
       scrollTo?.({center: true, element: messageElementRef.current});
       // for reply message, focus on the original message when original message link is clicked for keyboard users
@@ -116,7 +114,7 @@ export const Message = (props: MessageParams & {scrollTo?: ScrollToElement}) => 
   const handleDivKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     // when a message is focused set its elements focusable
     if (!event.shiftKey && isTabKey(event)) {
-      if (!messageElementRef.current) {
+      if (!messageRef.current) {
         return;
       }
       setMsgElementsFocusable(true);
@@ -132,21 +130,21 @@ export const Message = (props: MessageParams & {scrollTo?: ScrollToElement}) => 
   useEffect(() => {
     // Move element into view when it is focused
     if (isFocused) {
-      messageElementRef.current?.focus();
+      messageRef.current?.focus();
     }
   }, [isFocused]);
 
-  // set message elements focus for non-content type messages
-  // some non-content type message has interactive element like invite people for member message
+  // set message elements focus for non content type mesages
+  // some non content type message has interactive element like invite people for member message
   useEffect(() => {
-    if (!messageElementRef.current || message.isContent()) {
+    if (!messageRef.current || message.isContent()) {
       return;
     }
-    const interactiveMsgElements = getAllFocusableElements(messageElementRef.current);
+    const interactiveMsgElements = getAllFocusableElements(messageRef.current);
     setElementsTabIndex(interactiveMsgElements, isMsgElementsFocusable && isFocused);
   }, [isFocused, isMsgElementsFocusable, message]);
 
-  const messageContent = (
+  const content = (
     <MessageWrapper
       {...props}
       hideHeader={hideHeader}
@@ -155,32 +153,40 @@ export const Message = (props: MessageParams & {scrollTo?: ScrollToElement}) => 
     />
   );
 
+  const wrappedContent = onVisible ? (
+    <InViewport requireFullyInView allowBiggerThanViewport checkOverlay onVisible={onVisible}>
+      {content}
+    </InViewport>
+  ) : (
+    content
+  );
+
   return (
-    /*eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions*/
     <div
-      ref={messageElementRef}
       className={cx('message', {
         'message-marked': isHighlighted,
         'content-message': message.isContent(),
         'system-message': !message.isContent(),
       })}
-      role="list"
-      tabIndex={messageFocusedTabIndex}
+      ref={messageElementRef}
       data-uie-uid={message.id}
       data-uie-value={message.super_type}
       data-uie-expired-status={ephemeral_expires}
       data-uie-send-status={status}
       data-uie-name="item-message"
-      onKeyDown={handleDivKeyDown}
-      onClick={() => handleFocus(message.id)}
+      role="list"
     >
-      {onVisible ? (
-        <InViewport requireFullyInView allowBiggerThanViewport checkOverlay onVisible={onVisible}>
-          {messageContent}
-        </InViewport>
-      ) : (
-        messageContent
-      )}
+      {/*eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions*/}
+      <div
+        tabIndex={messageFocusedTabIndex}
+        ref={messageRef}
+        role="listitem"
+        onKeyDown={handleDivKeyDown}
+        onClick={() => handleFocus(message.id)}
+        className="message-wrapper"
+      >
+        {wrappedContent}
+      </div>
     </div>
   );
 };
