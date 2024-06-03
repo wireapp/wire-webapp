@@ -17,10 +17,15 @@
  *
  */
 
-import React, {FC, useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react';
+import React, {FC, HTMLProps, useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+import {amplify} from 'amplify';
 import cx from 'classnames';
+import {debounce} from 'underscore';
+
+import {ChevronIcon, IconButton, useMatchMedia} from '@wireapp/react-ui-kit';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {filterMessages} from 'Components/MessagesList/utils/messagesFilter';
@@ -69,6 +74,7 @@ interface MessagesListParams {
   isMsgElementsFocusable: boolean;
   setMsgElementsFocusable: (isMsgElementsFocusable: boolean) => void;
   isRightSidebarOpen?: boolean;
+  updateConversationLastRead: (conversation: Conversation) => void;
 }
 
 export const MessagesList: FC<MessagesListParams> = ({
@@ -91,6 +97,7 @@ export const MessagesList: FC<MessagesListParams> = ({
   isMsgElementsFocusable,
   setMsgElementsFocusable,
   isRightSidebarOpen = false,
+  updateConversationLastRead,
 }) => {
   const {
     messages: allMessages,
@@ -243,92 +250,160 @@ export const MessagesList: FC<MessagesListParams> = ({
     syncScrollPosition();
   };
 
+  const jumpToLastMessage = () => {
+    if (conversation) {
+      // clean up anything like search result
+      conversation.initialMessage(undefined);
+      // if there are unloaded messages, the conversation should be marked as read and reloaded
+      if (!conversation.hasLastReceivedMessageLoaded()) {
+        updateConversationLastRead(conversation);
+        conversation.release();
+        amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversation, {});
+      } else {
+        // else we just need to scroll down
+        messageListRef.current?.scrollTo?.({behavior: 'smooth', top: messageListRef.current.scrollHeight});
+      }
+    }
+  };
+
   return (
-    <FadingScrollbar
-      ref={messageListRef}
-      id="message-list"
-      className={cx('message-list', {'is-right-panel-open': isRightSidebarOpen})}
-      tabIndex={TabIndex.UNFOCUSABLE}
-    >
-      <div ref={setMessagesContainer} className={cx('messages', {'flex-center': verticallyCenterMessage()})}>
-        {groupedMessages.flatMap((group, groupIndex) => {
-          if (isMarker(group)) {
-            return (
-              <MarkerComponent key={`${group.type}-${group.timestamp}`} scrollTo={scrollToElement} marker={group} />
-            );
-          }
-          const {messages, firstMessageTimestamp} = group;
+    <>
+      <FadingScrollbar
+        ref={messageListRef}
+        id="message-list"
+        className={cx('message-list', {'is-right-panel-open': isRightSidebarOpen})}
+        tabIndex={TabIndex.UNFOCUSABLE}
+      >
+        <div ref={setMessagesContainer} className={cx('messages', {'flex-center': verticallyCenterMessage()})}>
+          {groupedMessages.flatMap((group, groupIndex) => {
+            if (isMarker(group)) {
+              return (
+                <MarkerComponent key={`${group.type}-${group.timestamp}`} scrollTo={scrollToElement} marker={group} />
+              );
+            }
+            const {messages, firstMessageTimestamp} = group;
 
-          return messages.map((message, messageIndex) => {
-            const isLastDeliveredMessage = lastDeliveredMessage?.id === message.id;
-            const isLastLoadedMessage =
-              groupIndex === groupedMessages.length - 1 && messageIndex === messages.length - 1;
+            return messages.map((message, messageIndex) => {
+              const isLastDeliveredMessage = lastDeliveredMessage?.id === message.id;
+              const isLastLoadedMessage =
+                groupIndex === groupedMessages.length - 1 && messageIndex === messages.length - 1;
 
-            const isLastMessage = isLastLoadedMessage && conversation.hasLastReceivedMessageLoaded();
+              const isLastMessage = isLastLoadedMessage && conversation.hasLastReceivedMessageLoaded();
 
-            const visibleCallback = () => {
-              getVisibleCallback(conversation, message)?.();
-              if (isLastMessage) {
-                conversation.isLastMessageVisible(true);
-              }
-            };
+              const visibleCallback = () => {
+                getVisibleCallback(conversation, message)?.();
+                if (isLastMessage) {
+                  conversation.isLastMessageVisible(true);
+                }
+              };
 
-            const lastMessageInvisibleCallback = isLastMessage
-              ? () => conversation.isLastMessageVisible(false)
-              : undefined;
-
-            const key = `${message.id || 'message'}-${message.timestamp()}`;
-
-            const isHighlighted = !!highlightedMessage && highlightedMessage === message.id;
-            const isFocused = !!focusedId && focusedId === message.id;
-
-            return (
-              <Message
-                key={key}
-                onVisible={visibleCallback}
-                onVisibilityLost={lastMessageInvisibleCallback}
-                message={message}
-                hideHeader={message.timestamp() !== firstMessageTimestamp}
-                messageActions={messageActions}
-                conversation={conversation}
-                hasReadReceiptsTurnedOn={conversationRepository.expectReadReceipt(conversation)}
-                isLastDeliveredMessage={isLastDeliveredMessage}
-                isHighlighted={isHighlighted}
-                scrollTo={scrollToElement}
-                isSelfTemporaryGuest={selfUser.isTemporaryGuest()}
-                messageRepository={messageRepository}
-                onClickAvatar={showUserDetails}
-                onClickCancelRequest={cancelConnectionRequest}
-                onClickImage={showImageDetails}
-                onClickInvitePeople={() => invitePeople(conversation)}
-                onClickReactionDetails={message => showMessageReactions(message, true)}
-                onClickMessage={onClickMessage}
-                onClickParticipants={showParticipants}
-                onClickDetails={message => showMessageDetails(message)}
-                onClickResetSession={resetSession}
-                onClickTimestamp={async function (messageId: string) {
-                  setHighlightedMessage(messageId);
-                  setTimeout(() => setHighlightedMessage(undefined), 5000);
-                  const messageIsLoaded = conversation.getMessage(messageId);
-
-                  if (!messageIsLoaded) {
-                    const messageEntity = await messageRepository.getMessageInConversationById(conversation, messageId);
-                    conversation.removeMessages();
-                    conversationRepository.getMessagesWithOffset(conversation, messageEntity);
+              const lastMessageInvisibleCallback = isLastMessage
+                ? () => {
+                    conversation.isLastMessageVisible(false);
                   }
-                }}
-                selfId={selfUser.qualifiedId}
-                shouldShowInvitePeople={shouldShowInvitePeople}
-                isFocused={isFocused}
-                handleFocus={setFocusedId}
-                handleArrowKeyDown={handleKeyDown}
-                isMsgElementsFocusable={isMsgElementsFocusable}
-                setMsgElementsFocusable={setMsgElementsFocusable}
-              />
-            );
-          });
-        })}
-      </div>
-    </FadingScrollbar>
+                : undefined;
+
+              const key = `${message.id || 'message'}-${message.timestamp()}`;
+
+              const isHighlighted = !!highlightedMessage && highlightedMessage === message.id;
+              const isFocused = !!focusedId && focusedId === message.id;
+
+              return (
+                <Message
+                  key={key}
+                  onVisible={visibleCallback}
+                  onVisibilityLost={lastMessageInvisibleCallback}
+                  message={message}
+                  hideHeader={message.timestamp() !== firstMessageTimestamp}
+                  messageActions={messageActions}
+                  conversation={conversation}
+                  hasReadReceiptsTurnedOn={conversationRepository.expectReadReceipt(conversation)}
+                  isLastDeliveredMessage={isLastDeliveredMessage}
+                  isHighlighted={isHighlighted}
+                  scrollTo={scrollToElement}
+                  isSelfTemporaryGuest={selfUser.isTemporaryGuest()}
+                  messageRepository={messageRepository}
+                  onClickAvatar={showUserDetails}
+                  onClickCancelRequest={cancelConnectionRequest}
+                  onClickImage={showImageDetails}
+                  onClickInvitePeople={() => invitePeople(conversation)}
+                  onClickReactionDetails={message => showMessageReactions(message, true)}
+                  onClickMessage={onClickMessage}
+                  onClickParticipants={showParticipants}
+                  onClickDetails={message => showMessageDetails(message)}
+                  onClickResetSession={resetSession}
+                  onClickTimestamp={async function (messageId: string) {
+                    setHighlightedMessage(messageId);
+                    setTimeout(() => setHighlightedMessage(undefined), 5000);
+                    const messageIsLoaded = conversation.getMessage(messageId);
+
+                    if (!messageIsLoaded) {
+                      const messageEntity = await messageRepository.getMessageInConversationById(
+                        conversation,
+                        messageId,
+                      );
+                      conversation.removeMessages();
+                      conversationRepository.getMessagesWithOffset(conversation, messageEntity);
+                    }
+                  }}
+                  selfId={selfUser.qualifiedId}
+                  shouldShowInvitePeople={shouldShowInvitePeople}
+                  isFocused={isFocused}
+                  handleFocus={setFocusedId}
+                  handleArrowKeyDown={handleKeyDown}
+                  isMsgElementsFocusable={isMsgElementsFocusable}
+                  setMsgElementsFocusable={setMsgElementsFocusable}
+                />
+              );
+            });
+          })}
+        </div>
+      </FadingScrollbar>
+      <JumpToLastMessageButton onGoToLastMessage={jumpToLastMessage} conversation={conversation} />
+    </>
+  );
+};
+
+export interface JumpToLastMessageButtonProps extends HTMLProps<HTMLElement> {
+  onGoToLastMessage: () => void;
+  conversation: Conversation;
+}
+
+export const JumpToLastMessageButton: FC<JumpToLastMessageButtonProps> = ({
+  onGoToLastMessage,
+  conversation,
+}: JumpToLastMessageButtonProps) => {
+  // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
+  const mdBreakpoint = useMatchMedia('max-width: 768px');
+
+  const [isLastMessageVisible, setIsLastMessageVisible] = useState(true);
+
+  useEffect(() => {
+    const subscription = conversation.isLastMessageVisible.subscribe(
+      debounce(value => {
+        setIsLastMessageVisible(value);
+      }, 100),
+    );
+    return () => subscription.dispose();
+  }, [conversation]);
+
+  if (isLastMessageVisible) {
+    return null;
+  }
+
+  return (
+    <IconButton
+      data-uie-name="jump-to-last-message-button"
+      onClick={onGoToLastMessage}
+      css={{
+        position: 'absolute',
+        bottom: mdBreakpoint ? '100px' : '56px',
+        right: '10px',
+        height: '40px',
+        borderRadius: '100%',
+      }}
+    >
+      <ChevronIcon css={{rotate: '90deg', height: 16, width: 16, path: {fill: '#0667C8'}}} />
+    </IconButton>
   );
 };

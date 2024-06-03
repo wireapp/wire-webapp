@@ -19,15 +19,12 @@
 
 import {UIEvent, useCallback, useState} from 'react';
 
-import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
 import {useMatchMedia} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {CallingCell} from 'Components/calling/CallingCell';
-import {JumpToLastMessageButton} from 'Components/Conversation/JumpToLastMessageButton';
 import {DropFileArea} from 'Components/DropFileArea';
 import {Giphy} from 'Components/Giphy';
 import {InputBar} from 'Components/InputBar';
@@ -38,7 +35,6 @@ import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
 import {TitleBar} from 'Components/TitleBar';
 import {CallingViewMode, CallState} from 'src/script/calling/CallState';
 import {Config} from 'src/script/Config';
-import {useComponentRerenderKey} from 'src/script/hooks/useComponentRerenderKey';
 import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {allowsAllFiles, getFileExtensionOrName, hasAllowedExtension} from 'Util/FileTypeUtil';
@@ -122,12 +118,8 @@ export const Conversation = ({
 
   const [isMsgElementsFocusable, setMsgElementsFocusable] = useState(true);
 
-  // by changing the key of MessageList we can enforce it to re-render
-  const [messagesListRerenderKey, rerenderMessageList] = useComponentRerenderKey('messages-list');
-
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
   const smBreakpoint = useMatchMedia('max-width: 640px');
-  const mdBreakpoint = useMatchMedia('max-width: 768px');
 
   const {addReadReceiptToBatch} = useReadReceiptSender(repositories.message);
 
@@ -466,22 +458,6 @@ export const Conversation = ({
     [addReadReceiptToBatch, repositories.conversation, repositories.integration, updateConversationLastRead],
   );
 
-  const jumpToLastMessage = () => {
-    if (activeConversation) {
-      // clean up anything like search result
-      activeConversation.initialMessage(undefined);
-      // if there are unloaded messages, the conversation should be marked as read and reloaded
-      if (!activeConversation.hasLastReceivedMessageLoaded()) {
-        updateConversationLastRead(activeConversation);
-        activeConversation.release();
-        amplify.publish(WebAppEvents.CONVERSATION.SHOW, activeConversation, {});
-      } else {
-        // else we just need to scroll down, by re-rendering MessageList
-        rerenderMessageList();
-      }
-    }
-  };
-
   return (
     <DropFileArea
       onFileDropped={checkFileSharingPermission(uploadDroppedFiles)}
@@ -532,7 +508,6 @@ export const Conversation = ({
           })}
 
           <MessagesList
-            key={messagesListRerenderKey}
             conversation={activeConversation}
             selfUser={selfUser}
             conversationRepository={conversationRepository}
@@ -552,17 +527,7 @@ export const Conversation = ({
             isMsgElementsFocusable={isMsgElementsFocusable}
             setMsgElementsFocusable={setMsgElementsFocusable}
             isRightSidebarOpen={isRightSidebarOpen}
-          />
-
-          <JumpToLastMessageButton
-            onGoToLastMessage={jumpToLastMessage}
-            conversation={activeConversation}
-            css={{
-              position: 'absolute',
-              bottom: mdBreakpoint ? '100px' : '56px',
-              right: '10px',
-              height: '40px',
-            }}
+            updateConversationLastRead={updateConversationLastRead}
           />
 
           {isConversationLoaded &&

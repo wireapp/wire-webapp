@@ -25,6 +25,7 @@ import {viewportObserver} from 'Util/DOM/viewportObserver';
 interface InViewportParams {
   onVisible: () => void;
   onVisibilityLost?: () => void;
+  callVisibilityLostOnUnmount?: boolean;
   requireFullyInView?: boolean;
   allowBiggerThanViewport?: boolean;
   /** Will check if the element is overlayed by something else. Can be used to be sure the user could actually see the element. Should not be used to do lazy loading as the overlayObserver has quite a long debounce time */
@@ -38,6 +39,7 @@ const InViewport: React.FC<InViewportParams & React.HTMLProps<HTMLDivElement>> =
   requireFullyInView = false,
   checkOverlay = false,
   allowBiggerThanViewport = false,
+  callVisibilityLostOnUnmount = false,
   ...props
 }) => {
   const domNode = useRef<HTMLDivElement>(null);
@@ -101,7 +103,9 @@ const InViewport: React.FC<InViewportParams & React.HTMLProps<HTMLDivElement>> =
     }
     return () => {
       // If the element is unmounted, we can trigger the onVisibilityLost callback and release the trackers
-      onVisibilityLost?.();
+      if (callVisibilityLostOnUnmount) {
+        onVisibilityLost?.();
+      }
       releaseTrackers();
     };
   }, [allowBiggerThanViewport, requireFullyInView, checkOverlay, onVisible, onVisibilityLost]);
