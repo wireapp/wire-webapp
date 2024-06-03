@@ -40,33 +40,21 @@ const QualitySettings = {
   framerate: FRAMERATE.HIGH,
 };
 
-// Create a video element to display the webcam feed
-const videoEl = document.createElement('video');
-// Create a canvas element to apply the blur effect
-const canvasEl = document.createElement('canvas');
-// Get the 2D context of the canvas
-const ctx = canvasEl.getContext('2d', {willReadFrequently: true});
-// Store the video dimensions
-const videoDimensions = {width: 0, height: 0};
-
 // Calculate the FPS interval
 const fpsInterval = 1000 / QualitySettings.framerate;
 let then = Date.now();
 let now = then;
 let elapsed = 0;
 
-// Store the ImageSegmenter instance
-let imageSegmenter: ImageSegmenter | undefined;
-// Store the animation frame ID
-let predictWebcamAnimationFrameId: number;
+let rafId: number;
 
 // Function to predict the webcam feed processed by the ImageSegmenter
-async function predictWebcam() {
-  if (!ctx || !videoEl.srcObject) {
-    console.error('Context or video source not ready');
-    return;
-  }
-
+function startBlurProcess(
+  segmenter: ImageSegmenter,
+  ctx: CanvasRenderingContext2D,
+  videoEl: HTMLVideoElement,
+  videoDimensions: {width: number; height: number},
+) {
   now = Date.now();
   elapsed = now - then;
 
@@ -78,31 +66,41 @@ async function predictWebcam() {
     const startTimeMs = performance.now();
 
     try {
-      imageSegmenter?.segmentForVideo(videoEl, startTimeMs, processSegmentationResult);
+      segmenter.segmentForVideo(videoEl, startTimeMs, result =>
+        processSegmentationResult(result, ctx, videoEl, videoDimensions),
+      );
     } catch (error) {
       console.error('Failed to segment video', error);
     }
+    rafId = window.requestAnimationFrame(() => startBlurProcess(segmenter, ctx, videoEl, videoDimensions));
   }
+  return () => {
+    window.cancelAnimationFrame(rafId);
+  };
 }
 
 // Function to process the segmentation result and apply the blur effect
-async function processSegmentationResult(result: ImageSegmenterResult) {
-  if (!ctx || !videoEl.srcObject) {
+async function processSegmentationResult(
+  result: ImageSegmenterResult,
+  canvasContext: CanvasRenderingContext2D,
+  videoEl: HTMLVideoElement,
+  videoDimensions: {width: number; height: number},
+) {
+  if (!canvasContext || !videoEl.srcObject) {
     console.error('Context or video source not ready');
     return;
   }
   const {width, height} = videoDimensions;
-  const originalImageData = ctx.getImageData(0, 0, width, height);
+  const originalImageData = canvasContext.getImageData(0, 0, width, height);
   const blurredImageData = applyBlurToImageData(originalImageData);
 
   const mask = result.confidenceMasks?.[0]?.getAsFloat32Array();
   if (mask) {
     blendImagesBasedOnMask(originalImageData.data, blurredImageData.data, mask);
-    ctx.putImageData(new ImageData(originalImageData.data, width, height), 0, 0);
+    canvasContext.putImageData(new ImageData(originalImageData.data, width, height), 0, 0);
   } else {
     console.error('No mask data available.');
   }
-  predictWebcamAnimationFrameId = window.requestAnimationFrame(predictWebcam);
 }
 
 function applyBlurToImageData(imageData: ImageData): ImageData {
@@ -137,12 +135,9 @@ function blendImagesBasedOnMask(
   }
 }
 
-async function initImageSegmenter(): Promise<ImageSegmenter> {
-  if (imageSegmenter) {
-    return imageSegmenter;
-  }
+async function createSegmenter(): Promise<ImageSegmenter> {
   const video = await FilesetResolver.forVisionTasks('./mediapipe/wasm');
-  imageSegmenter = await ImageSegmenter.createFromOptions(video, {
+  return ImageSegmenter.createFromOptions(video, {
     baseOptions: {
       modelAssetPath: QualitySettings.segmentationModel,
       delegate: 'GPU',
@@ -151,11 +146,19 @@ async function initImageSegmenter(): Promise<ImageSegmenter> {
     outputCategoryMask: false,
     outputConfidenceMasks: true,
   });
-  return imageSegmenter;
 }
 
-export async function applyBlur(mediaStream: MediaStream): Promise<MediaStream> {
-  await initImageSegmenter();
+export async function applyBlur(mediaStream: MediaStream): Promise<{stream: MediaStream; release: () => void}> {
+  // Create a video element to display the webcam feed
+  const videoEl = document.createElement('video');
+  // Create a canvas element to apply the blur effect
+  const canvasEl = document.createElement('canvas');
+  // Get the 2D context of the canvas
+  const ctx = canvasEl.getContext('2d', {willReadFrequently: true})!;
+  // Store the video dimensions
+  const videoDimensions = {width: 0, height: 0};
+
+  const segmenter = await createSegmenter();
 
   const videoStream = new MediaStream(mediaStream.getVideoTracks());
   videoEl.srcObject = videoStream;
@@ -166,49 +169,32 @@ export async function applyBlur(mediaStream: MediaStream): Promise<MediaStream> 
     canvasEl.width = videoDimensions.width;
     canvasEl.height = videoDimensions.height;
 
-    videoEl
-      .play()
-      .then(predictWebcam)
-      .catch(error => console.error('Error playing the video: ', error));
+    videoEl.play().catch(error => console.error('Error playing the video: ', error));
   };
 
   return new Promise(resolve => {
     videoEl.onplay = () => {
-      resolve(
-        new MediaStream([
+      const stopBlurProcess = startBlurProcess(segmenter, ctx, videoEl, videoDimensions);
+      resolve({
+        stream: new MediaStream([
           ...mediaStream.getAudioTracks(),
           canvasEl.captureStream(QualitySettings.framerate).getVideoTracks()[0],
         ]),
-      );
+        release: () => {
+          stopBlurProcess();
+          stopVideo(videoEl);
+          segmenter.close();
+        },
+      });
     };
   });
 }
 
-export function cleanupBlur() {
+export function stopVideo(videoEl: HTMLVideoElement) {
   // Check if the video element is playing and if so, stop it.
   if (!videoEl.paused && !videoEl.ended) {
     videoEl.pause();
     videoEl.srcObject = null; // Disconnect the media stream
     videoEl.load(); // Reset the video element
   }
-
-  // Clear the canvas
-  if (ctx) {
-    ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
-  }
-
-  // Reset the dimensions
-  videoDimensions.width = 0;
-  videoDimensions.height = 0;
-  canvasEl.width = 0;
-  canvasEl.height = 0;
-
-  // Cancel any ongoing animation frames
-  if (window.cancelAnimationFrame) {
-    window.cancelAnimationFrame(predictWebcamAnimationFrameId);
-  }
-
-  // Release the ImageSegmenter
-  imageSegmenter?.close();
-  imageSegmenter = undefined;
 }

@@ -82,6 +82,7 @@ import {EventSource} from '../event/EventSource';
 import type {MediaDevicesHandler} from '../media/MediaDevicesHandler';
 import type {MediaStreamHandler} from '../media/MediaStreamHandler';
 import {MediaType} from '../media/MediaType';
+import {applyBlur} from '../media/VideoBackgroundBlur';
 import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
 import {TeamState} from '../team/TeamState';
@@ -263,6 +264,19 @@ export class CallingRepository {
       this.callState.cbrEncoding(vbrEnabled ? 0 : 1);
     }
   };
+
+  public async blurVideo() {
+    const activeCall = this.callState.joinedCall();
+    if (!activeCall) {
+      return;
+    }
+    const selfParticipant = activeCall.getSelfParticipant();
+    const videoFeed = selfParticipant.videoStream();
+    if (videoFeed) {
+      const blurredVideoStream = await applyBlur(videoFeed);
+      this.changeMediaSource(blurredVideoStream.stream, MediaType.VIDEO, false);
+    }
+  }
 
   getStats(conversationId: QualifiedId) {
     return this.wCall?.getStats(this.serializeQualifiedId(conversationId));
@@ -1132,10 +1146,7 @@ export class CallingRepository {
     this.avsVersion = version;
   };
 
-  private getMediaStream(
-    {audio = false, camera = false, screen = false}: MediaStreamQuery,
-    isGroup: boolean,
-  ): Promise<MediaStream> {
+  private getMediaStream({audio = false, camera = false, screen = false}: MediaStreamQuery, isGroup: boolean) {
     return this.mediaStreamHandler.requestMediaStream(audio, camera, screen, isGroup);
   }
 
@@ -1167,14 +1178,14 @@ export class CallingRepository {
     }
   }
 
-  public async refreshVideoInput(): Promise<MediaStream | void> {
+  public async refreshVideoInput() {
     const stream = await this.mediaStreamHandler.requestMediaStream(false, true, false, false);
     this.stopMediaSource(MediaType.VIDEO);
     const clonedMediaStream = this.changeMediaSource(stream, MediaType.VIDEO);
     return clonedMediaStream;
   }
 
-  public async refreshAudioInput(): Promise<MediaStream> {
+  public async refreshAudioInput() {
     const stream = await this.mediaStreamHandler.requestMediaStream(true, false, false, false);
     this.stopMediaSource(MediaType.AUDIO);
     this.changeMediaSource(stream, MediaType.AUDIO);
@@ -1212,6 +1223,7 @@ export class CallingRepository {
   public changeMediaSource(
     mediaStream: MediaStream,
     mediaType: MediaType,
+    killOriginal: boolean = true,
     call = this.callState.joinedCall(),
   ): MediaStream | void {
     if (!call) {
@@ -1223,7 +1235,7 @@ export class CallingRepository {
     if (mediaType === MediaType.AUDIO) {
       const audioTracks = mediaStream.getAudioTracks().map(track => track.clone());
       if (audioTracks.length > 0) {
-        selfParticipant.setAudioStream(new MediaStream(audioTracks), true);
+        selfParticipant.setAudioStream(new MediaStream(audioTracks), killOriginal);
         this.wCall?.replaceTrack(this.serializeQualifiedId(conversation.qualifiedId), audioTracks[0]);
       }
     }
@@ -1233,7 +1245,7 @@ export class CallingRepository {
       const videoTracks = mediaStream.getVideoTracks().map(track => track.clone());
       if (videoTracks.length > 0) {
         const clonedMediaStream = new MediaStream(videoTracks);
-        selfParticipant.setVideoStream(clonedMediaStream, true);
+        selfParticipant.setVideoStream(clonedMediaStream, killOriginal);
         this.wCall?.replaceTrack(this.serializeQualifiedId(conversation.qualifiedId), videoTracks[0]);
         // Remove the previous video stream
         this.mediaStreamHandler.releaseTracksFromStream(mediaStream);

@@ -118,7 +118,7 @@ export class Participant {
     this.releaseAudioStream();
   }
 
-  private releaseStream(mediaStream: MediaStream, stopTracks: boolean): void {
+  private releaseStream(mediaStream: MediaStream | undefined, stopTracks: boolean): void {
     if (!mediaStream) {
       return;
     }

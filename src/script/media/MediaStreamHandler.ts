@@ -25,7 +25,6 @@ import {MediaConstraintsHandler, ScreensharingMethods} from './MediaConstraintsH
 import {MEDIA_STREAM_ERROR} from './MediaStreamError';
 import {MEDIA_STREAM_ERROR_TYPES} from './MediaStreamErrorTypes';
 import {MediaType} from './MediaType';
-import {applyBlur, cleanupBlur} from './VideoBackgroundBlur';
 
 import {MediaError} from '../error/MediaError';
 import {NoAudioInputError} from '../error/NoAudioInputError';
@@ -61,15 +60,10 @@ export class MediaStreamHandler {
     }
   }
 
-  async requestMediaStream(audio: boolean, video: boolean, screen: boolean, isGroup: boolean): Promise<MediaStream> {
+  requestMediaStream(audio: boolean, video: boolean, screen: boolean, isGroup: boolean): Promise<MediaStream> {
     const hasPermission = this.hasPermissionToAccess(audio, video);
     try {
-      const stream = await this.getMediaStream(audio, video, screen, isGroup, hasPermission);
-      if (video) {
-        cleanupBlur();
-        return await applyBlur(stream);
-      }
-      return stream;
+      return this.getMediaStream(audio, video, screen, isGroup, hasPermission);
     } catch (error) {
       const isPermissionDenied = error.type === PermissionError.TYPE.DENIED;
       throw isPermissionDenied
