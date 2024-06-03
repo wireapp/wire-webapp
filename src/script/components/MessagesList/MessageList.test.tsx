@@ -64,6 +64,7 @@ const getDefaultParams = (): React.ComponentProps<typeof MessagesList> => {
     isMsgElementsFocusable: true,
     setMsgElementsFocusable: jest.fn(),
     showMessageReactions: jest.fn(),
+    updateConversationLastRead: jest.fn(),
   };
 };
 
