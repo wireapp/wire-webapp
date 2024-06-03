@@ -209,6 +209,11 @@ export const MessagesList: FC<MessagesListParams> = ({
       setTimeout(() => {
         setLoaded(true);
         onLoading(false);
+        // if new conversation is loaded but there are unread messages, previous conversation
+        // last message visibility might not be cleaned as this conversation last message is not loaded yet
+        if (!conversation.hasLastReceivedMessageLoaded()) {
+          conversation.isLastMessageVisible(false);
+        }
       }, 10);
     });
     return () => conversation.release();
@@ -253,14 +258,19 @@ export const MessagesList: FC<MessagesListParams> = ({
   const jumpToLastMessage = () => {
     if (conversation) {
       // clean up anything like search result
-      conversation.initialMessage(undefined);
+      setHighlightedMessage(undefined);
+      focusedElement.current = null;
       // if there are unloaded messages, the conversation should be marked as read and reloaded
       if (!conversation.hasLastReceivedMessageLoaded()) {
         updateConversationLastRead(conversation);
         conversation.release();
         amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversation, {});
+      } else if (conversation.initialMessage()) {
+        // if there was a search result, conversation should be reloaded (as not all messages in last batch are usually
+        // loaded when showing search result), then scrollUpdater will do the job in the right moment after reload
+        conversation.initialMessage(undefined);
       } else {
-        // else we just need to scroll down
+        // we just need to scroll down
         messageListRef.current?.scrollTo?.({behavior: 'smooth', top: messageListRef.current.scrollHeight});
       }
     }
@@ -376,15 +386,17 @@ export const JumpToLastMessageButton: FC<JumpToLastMessageButtonProps> = ({
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
   const mdBreakpoint = useMatchMedia('max-width: 768px');
 
-  const [isLastMessageVisible, setIsLastMessageVisible] = useState(true);
+  const [isLastMessageVisible, setIsLastMessageVisible] = useState(conversation.isLastMessageVisible());
 
   useEffect(() => {
     const subscription = conversation.isLastMessageVisible.subscribe(
       debounce(value => {
         setIsLastMessageVisible(value);
-      }, 100),
+      }, 200),
     );
-    return () => subscription.dispose();
+    return () => {
+      subscription.dispose();
+    };
   }, [conversation]);
 
   if (isLastMessageVisible) {

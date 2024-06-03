@@ -61,6 +61,9 @@ export function updateScroll(
   } else if (lastMessage && lastMessage.status() === StatusType.SENDING && lastMessage.user().id === selfUserId) {
     // The self user just sent a message, we scroll straight to the bottom
     container.scrollTo?.({behavior: 'smooth', top: container.scrollHeight});
+  } else {
+    // jump to last message was called
+    container.scrollTo?.({behavior: 'smooth', top: container.scrollHeight});
   }
   return container.scrollHeight;
 }
