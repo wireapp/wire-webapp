@@ -125,8 +125,8 @@ export class MediaStreamHandler {
     const mediaStreamTracks = this.getMediaTracks(mediaStream, mediaType);
 
     mediaStreamTracks.forEach((mediaStreamTrack: MediaStreamTrack) => {
-      mediaStream.removeTrack(mediaStreamTrack);
       mediaStreamTrack.stop();
+      mediaStream.removeTrack(mediaStreamTrack);
       this.logger.info(`Stopped MediaStreamTrack ID '${mediaStreamTrack.id}' of kind '${mediaStreamTrack.kind}'`);
     });
   }

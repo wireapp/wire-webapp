@@ -36,7 +36,7 @@ enum FRAMERATE {
 
 const QualitySettings = {
   segmentationModel: SEGMENTATION_MODEL.QUALITY,
-  blurQuality: BLUR_QUALITY.MEDIUM,
+  blurQuality: BLUR_QUALITY.LOW,
   framerate: FRAMERATE.HIGH,
 };
 
@@ -48,11 +48,6 @@ const canvasEl = document.createElement('canvas');
 const ctx = canvasEl.getContext('2d', {willReadFrequently: true});
 // Store the video dimensions
 const videoDimensions = {width: 0, height: 0};
-// Store tracks of the video stream
-const videoTracks = {
-  video: null as MediaStreamTrack[] | null,
-  audio: null as MediaStreamTrack[] | null,
-};
 
 // Calculate the FPS interval
 const fpsInterval = 1000 / QualitySettings.framerate;
@@ -111,7 +106,7 @@ async function processSegmentationResult(result: ImageSegmenterResult) {
 }
 
 function applyBlurToImageData(imageData: ImageData): ImageData {
-  return StackBlur.imageDataRGBA(
+  return StackBlur.imageDataRGB(
     new ImageData(new Uint8ClampedArray(imageData.data), imageData.width, imageData.height),
     0,
     0,
@@ -142,7 +137,7 @@ function blendImagesBasedOnMask(
   }
 }
 
-export async function initImageSegmenter(): Promise<ImageSegmenter> {
+async function initImageSegmenter(): Promise<ImageSegmenter> {
   if (imageSegmenter) {
     return imageSegmenter;
   }
@@ -162,10 +157,8 @@ export async function initImageSegmenter(): Promise<ImageSegmenter> {
 export async function applyBlur(mediaStream: MediaStream): Promise<MediaStream> {
   await initImageSegmenter();
 
-  videoTracks.video = mediaStream.getVideoTracks();
-  videoTracks.audio = mediaStream.getAudioTracks();
-
-  videoEl.srcObject = new MediaStream(videoTracks.video);
+  const videoStream = new MediaStream(mediaStream.getVideoTracks());
+  videoEl.srcObject = videoStream;
   videoEl.onloadedmetadata = () => {
     // Ensure metadata is loaded to get video dimensions
     videoDimensions.width = videoEl.videoWidth || 1240;
@@ -175,16 +168,17 @@ export async function applyBlur(mediaStream: MediaStream): Promise<MediaStream> 
 
     videoEl
       .play()
-      .then(() => {
-        predictWebcam();
-      })
+      .then(predictWebcam)
       .catch(error => console.error('Error playing the video: ', error));
   };
 
   return new Promise(resolve => {
     videoEl.onplay = () => {
       resolve(
-        new MediaStream([...videoTracks.audio!, canvasEl.captureStream(QualitySettings.framerate).getVideoTracks()[0]]),
+        new MediaStream([
+          ...mediaStream.getAudioTracks(),
+          canvasEl.captureStream(QualitySettings.framerate).getVideoTracks()[0],
+        ]),
       );
     };
   });
@@ -208,10 +202,6 @@ export function cleanupBlur() {
   videoDimensions.height = 0;
   canvasEl.width = 0;
   canvasEl.height = 0;
-
-  // Reset the video tracks
-  videoTracks.video = null;
-  videoTracks.audio = null;
 
   // Cancel any ongoing animation frames
   if (window.cancelAnimationFrame) {
