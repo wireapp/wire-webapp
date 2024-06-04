@@ -349,7 +349,7 @@ describe('ConversationRepository', () => {
     });
   });
 
-  describe('getInitialised1To1Conversation', () => {
+  describe('resolve1To1Conversation', () => {
     beforeEach(() => {
       testFactory.conversation_repository['conversationState'].conversations([]);
       testFactory.conversation_repository['userState'].users([]);
@@ -419,7 +419,7 @@ describe('ConversationRepository', () => {
 
       jest.spyOn(conversationRepository['userState'], 'self').mockReturnValue(selfUser);
 
-      const conversationEntity = await conversationRepository.getInitialised1To1Conversation(userEntity.qualifiedId);
+      const conversationEntity = await conversationRepository.resolve1To1Conversation(userEntity.qualifiedId);
 
       expect(conversationEntity).toBe(newConversationEntity);
     });
@@ -457,7 +457,7 @@ describe('ConversationRepository', () => {
         .spyOn(conversationRepository['conversationService'], 'getConversationById')
         .mockResolvedValueOnce(proteus1to1ConversationResponse);
 
-      const conversationEntity = await conversationRepository.getInitialised1To1Conversation(otherUser.qualifiedId);
+      const conversationEntity = await conversationRepository.resolve1To1Conversation(otherUser.qualifiedId);
 
       expect(conversationEntity?.serialize()).toEqual(proteus1to1Conversation.serialize());
       expect(conversationEntity?.readOnlyState()).toEqual(null);
@@ -497,7 +497,7 @@ describe('ConversationRepository', () => {
         .spyOn(conversationRepository['conversationService'], 'getConversationById')
         .mockResolvedValueOnce(proteus1to1ConversationResponse);
 
-      const conversationEntity = await conversationRepository.getInitialised1To1Conversation(otherUser.qualifiedId);
+      const conversationEntity = await conversationRepository.resolve1To1Conversation(otherUser.qualifiedId);
 
       expect(conversationEntity?.readOnlyState()).toEqual(
         CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_SELF_UNSUPPORTED_MLS,
@@ -538,7 +538,7 @@ describe('ConversationRepository', () => {
         .spyOn(conversationRepository['conversationService'], 'isMLSGroupEstablishedLocally')
         .mockResolvedValueOnce(true);
 
-      const conversationEntity = await conversationRepository.getInitialised1To1Conversation(otherUser.qualifiedId);
+      const conversationEntity = await conversationRepository.resolve1To1Conversation(otherUser.qualifiedId);
 
       expect(conversationEntity?.serialize()).toEqual(mls1to1Conversation.serialize());
     });
@@ -623,7 +623,7 @@ describe('ConversationRepository', () => {
       jest.spyOn(conversationRepository['conversationService'], 'blacklistConversation');
       jest.spyOn(conversationRepository['eventRepository'], 'injectEvent').mockResolvedValueOnce(undefined);
 
-      const conversationEntity = await conversationRepository.getInitialised1To1Conversation(otherUser.qualifiedId);
+      const conversationEntity = await conversationRepository.resolve1To1Conversation(otherUser.qualifiedId);
 
       expect(conversationRepository['eventService'].moveEventsToConversation).toHaveBeenCalledWith(
         proteus1to1Conversation.qualifiedId,
@@ -707,7 +707,7 @@ describe('ConversationRepository', () => {
 
       const [mls1to1Conversation] = conversationRepository.mapConversations([establishedMls1to1ConversationResponse]);
 
-      const conversationEntity = await conversationRepository.getInitialised1To1Conversation(otherUser.qualifiedId);
+      const conversationEntity = await conversationRepository.resolve1To1Conversation(otherUser.qualifiedId);
 
       expect(container.resolve(Core).service!.conversation.establishMLS1to1Conversation).toHaveBeenCalledWith(
         mockedGroupId,
@@ -773,7 +773,7 @@ describe('ConversationRepository', () => {
       selfUser.supportedProtocols([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]);
       jest.spyOn(conversationRepository['userState'], 'self').mockReturnValueOnce(selfUser);
 
-      await conversationRepository.getInitialised1To1Conversation(otherUser.qualifiedId);
+      await conversationRepository.resolve1To1Conversation(otherUser.qualifiedId);
 
       expect(container.resolve(Core).service!.conversation.establishMLS1to1Conversation).toHaveBeenCalled();
     });
@@ -827,7 +827,7 @@ describe('ConversationRepository', () => {
         .spyOn(conversationRepository['conversationService'], 'isMLSGroupEstablishedLocally')
         .mockResolvedValueOnce(false);
 
-      const conversationEntity = await conversationRepository.getInitialised1To1Conversation(otherUser.qualifiedId);
+      const conversationEntity = await conversationRepository.resolve1To1Conversation(otherUser.qualifiedId);
 
       expect(conversationEntity?.serialize()).toEqual(mls1to1Conversation.serialize());
       expect(container.resolve(Core).service!.conversation.establishMLS1to1Conversation).toHaveBeenCalled();
@@ -868,7 +868,7 @@ describe('ConversationRepository', () => {
         .spyOn(conversationRepository['conversationService'], 'isMLSGroupEstablishedLocally')
         .mockResolvedValueOnce(true);
 
-      const conversationEntity = await conversationRepository.getInitialised1To1Conversation(otherUser.qualifiedId);
+      const conversationEntity = await conversationRepository.resolve1To1Conversation(otherUser.qualifiedId);
 
       expect(conversationEntity?.serialize()).toEqual(mls1to1Conversation.serialize());
     });
@@ -908,7 +908,7 @@ describe('ConversationRepository', () => {
         .spyOn(conversationRepository['conversationService'], 'isMLSGroupEstablishedLocally')
         .mockResolvedValueOnce(false);
 
-      const conversationEntity = await conversationRepository.getInitialised1To1Conversation(otherUser.qualifiedId);
+      const conversationEntity = await conversationRepository.resolve1To1Conversation(otherUser.qualifiedId);
 
       expect(conversationEntity?.serialize()).toEqual(mls1to1Conversation.serialize());
       expect(conversationEntity?.readOnlyState()).toEqual(
@@ -957,7 +957,7 @@ describe('ConversationRepository', () => {
         .spyOn(conversationRepository['conversationService'], 'isMLSGroupEstablishedLocally')
         .mockResolvedValueOnce(false);
 
-      const conversationEntity = await conversationRepository.getInitialised1To1Conversation(otherUser.qualifiedId);
+      const conversationEntity = await conversationRepository.resolve1To1Conversation(otherUser.qualifiedId);
 
       expect(conversationEntity?.serialize()).toEqual(mls1to1Conversation.serialize());
       expect(conversationEntity?.readOnlyState()).toEqual(
@@ -1000,7 +1000,7 @@ describe('ConversationRepository', () => {
         .spyOn(conversationRepository['conversationService'], 'isMLSGroupEstablishedLocally')
         .mockResolvedValueOnce(true);
 
-      const conversationEntity = await conversationRepository.getInitialised1To1Conversation(otherUser.qualifiedId);
+      const conversationEntity = await conversationRepository.resolve1To1Conversation(otherUser.qualifiedId);
 
       expect(conversationEntity?.serialize()).toEqual(mls1to1Conversation.serialize());
       expect(conversationEntity?.readOnlyState()).toEqual(null);
@@ -1070,7 +1070,7 @@ describe('ConversationRepository', () => {
         configurable: true,
       });
 
-      jest.spyOn(conversationRepository, 'getInitialised1To1Conversation');
+      jest.spyOn(conversationRepository, 'resolve1To1Conversation');
 
       userRepository.emit('supportedProtocolsUpdated', {
         user: otherUser,
@@ -1078,7 +1078,7 @@ describe('ConversationRepository', () => {
       });
 
       await waitFor(() => {
-        expect(conversationRepository.getInitialised1To1Conversation).toHaveBeenCalledWith(otherUser.qualifiedId, {
+        expect(conversationRepository.resolve1To1Conversation).toHaveBeenCalledWith(otherUser.qualifiedId, {
           isLiveUpdate: true,
         });
       });
@@ -1091,7 +1091,7 @@ describe('ConversationRepository', () => {
       const otherUserId = {id: 'f718410c-3833-479d-bd80-a5df03f38414', domain: 'test-domain'};
       const otherUser = new User(otherUserId.id, otherUserId.domain);
 
-      jest.spyOn(conversationRepository, 'getInitialised1To1Conversation');
+      jest.spyOn(conversationRepository, 'resolve1To1Conversation');
 
       conversationRepository['conversationState'].conversations([]);
 
@@ -1101,7 +1101,7 @@ describe('ConversationRepository', () => {
       });
 
       await waitFor(() => {
-        expect(conversationRepository.getInitialised1To1Conversation).not.toHaveBeenCalled();
+        expect(conversationRepository.resolve1To1Conversation).not.toHaveBeenCalled();
       });
     });
   });
