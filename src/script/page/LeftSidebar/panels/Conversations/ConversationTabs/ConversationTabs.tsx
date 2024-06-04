@@ -146,7 +146,9 @@ export const ConversationTabs = ({
           );
         })}
 
-        <div className="conversations-sidebar-title">{t('conversationFooterContacts')}</div>
+        <div className="conversations-sidebar-title" css={{marginBlock: '32px 0'}}>
+          {t('conversationFooterContacts')}
+        </div>
 
         <ConversationTab
           title={t('searchConnect', Shortcut.getShortcutTooltip(ShortcutType.START))}

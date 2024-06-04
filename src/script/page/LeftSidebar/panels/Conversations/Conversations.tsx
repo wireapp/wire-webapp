@@ -22,7 +22,7 @@ import React, {useEffect, useState} from 'react';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
-import {ChevronIcon, useMatchMedia} from '@wireapp/react-ui-kit';
+import {ChevronIcon, IconButton, useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {CallingCell} from 'Components/calling/CallingCell';
@@ -39,7 +39,12 @@ import {UserRepository} from 'src/script/user/UserRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {ConversationHeader} from './ConversationHeader';
-import {conversationsSpacerStyles, conversationsSidebarStyles} from './Conversations.styles';
+import {
+  conversationsSpacerStyles,
+  conversationsSidebarStyles,
+  conversationsSidebarHandleStyles,
+  conversationsSidebarHandleIconStyles,
+} from './Conversations.styles';
 import {ConversationsList} from './ConversationsList';
 import {ConversationTabs} from './ConversationTabs';
 import {EmptyConversationList} from './EmptyConversationList';
@@ -257,15 +262,13 @@ const Conversations: React.FC<ConversationsProps> = ({
         />
       </FadingScrollbar>
 
-      <button
-        type="button"
-        role="tab"
+      <IconButton
+        css={conversationsSidebarHandleStyles(isSideBarOpen)}
         className="conversations-sidebar-handle"
-        data-is-collapsed={!isSideBarOpen}
         onClick={toggleSidebar}
       >
-        <ChevronIcon width={12} height={12} />
-      </button>
+        <ChevronIcon css={conversationsSidebarHandleIconStyles} />
+      </IconButton>
     </nav>
   );
 
