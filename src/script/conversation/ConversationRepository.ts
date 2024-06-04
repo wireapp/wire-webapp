@@ -171,7 +171,7 @@ export enum CONVERSATION_READONLY_STATE {
   READONLY_ONE_TO_ONE_NO_KEY_PACKAGES = 'READONLY_ONE_TO_ONE_NO_KEY_PACKAGES',
 }
 
-interface GetInitialised1To1ConversationOptions {
+interface Resolve1To1ConversationOptions {
   isLiveUpdate?: boolean;
   shouldRefreshUser?: boolean;
   mls?: {allowUnestablished?: boolean};
@@ -1041,7 +1041,7 @@ export class ConversationRepository {
    * Update conversation with a user you just unblocked
    */
   private readonly onUnblockUser = async (user_et: User): Promise<void> => {
-    const conversationEntity = await this.getInitialised1To1Conversation(user_et.qualifiedId);
+    const conversationEntity = await this.resolve1To1Conversation(user_et.qualifiedId);
     if (conversationEntity) {
       conversationEntity.status(ConversationStatus.CURRENT_MEMBER);
     }
@@ -1298,9 +1298,9 @@ export class ConversationRepository {
    * @param knownConversationId Known conversation ID - if provided, we will try to find the conversation with this exact ID (needed for proteus 1:1 conversation with a team member)
    * @returns Resolves with the initialised 1:1 conversation with requested user
    */
-  public async getInitialised1To1Conversation(
+  public async resolve1To1Conversation(
     userId: QualifiedId,
-    options: GetInitialised1To1ConversationOptions = {
+    options: Resolve1To1ConversationOptions = {
       isLiveUpdate: false,
       shouldRefreshUser: false,
     },
@@ -1942,7 +1942,7 @@ export class ConversationRepository {
     );
 
     try {
-      return await this.getInitialised1To1Conversation(otherUserId, {shouldRefreshUser}, conversation.qualifiedId);
+      return await this.resolve1To1Conversation(otherUserId, {shouldRefreshUser}, conversation.qualifiedId);
     } catch {}
 
     return conversation;
@@ -1950,7 +1950,7 @@ export class ConversationRepository {
 
   private readonly get1to1ConversationForConnection = async (
     connection: ConnectionEntity,
-    options: GetInitialised1To1ConversationOptions = {
+    options: Resolve1To1ConversationOptions = {
       isLiveUpdate: false,
       shouldRefreshUser: false,
     },
@@ -2037,7 +2037,7 @@ export class ConversationRepository {
   ): Promise<Conversation | undefined> => {
     try {
       const userId = connectionEntity.userId;
-      const conversation = await this.getInitialised1To1Conversation(userId, {
+      const conversation = await this.resolve1To1Conversation(userId, {
         isLiveUpdate: source === EventSource.WEBSOCKET,
       });
 
@@ -2095,7 +2095,7 @@ export class ConversationRepository {
       return;
     }
 
-    await this.getInitialised1To1Conversation(user.qualifiedId, {isLiveUpdate: true});
+    await this.resolve1To1Conversation(user.qualifiedId, {isLiveUpdate: true});
   };
 
   /**
@@ -3543,6 +3543,15 @@ export class ConversationRepository {
       });
     }
 
+    const is1to1Conversation = conversationEntity.is1to1() || conversationEntity.isRequest();
+
+    if (is1to1Conversation) {
+      const otherUserId = conversationEntity.participating_user_ids()[0];
+      if (otherUserId) {
+        await this.resolve1To1Conversation(otherUserId, {isLiveUpdate: true});
+      }
+    }
+
     // Self user is a creator of the event
     const isFromSelf = eventJson.from === this.userState.self().id;
 
@@ -3947,7 +3956,7 @@ export class ConversationRepository {
       return;
     }
 
-    await this.getInitialised1To1Conversation(otherUserId, {isLiveUpdate: true});
+    await this.resolve1To1Conversation(otherUserId);
   }
 
   /**
