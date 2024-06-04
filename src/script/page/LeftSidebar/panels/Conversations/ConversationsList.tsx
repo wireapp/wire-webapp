@@ -159,7 +159,7 @@ export const ConversationsList = ({
     <>
       <h2 className="visually-hidden">{t('conversationViewTooltip')}</h2>
 
-      <ul css={css({margin: 0, paddingLeft: 0})} data-uie-name={'conversation-view'}>
+      <ul css={css({margin: 0, paddingLeft: 0})} data-uie-name="conversation-view">
         <ConnectionRequests
           connectionRequests={connectRequests}
           onConnectionRequestClick={onConnectionRequestClick}
