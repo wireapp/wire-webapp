@@ -26,6 +26,7 @@ import {debounce} from 'underscore';
 import {ChevronIcon, IconButton, useMatchMedia} from '@wireapp/react-ui-kit';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
+import {jumpToLastMessageButtonStyles} from 'Components/MessagesList/MessageList.styles';
 import {filterMessages} from 'Components/MessagesList/utils/messagesFilter';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {MessageRepository} from 'src/script/conversation/MessageRepository';
@@ -400,13 +401,7 @@ export const JumpToLastMessageButton: FC<JumpToLastMessageButtonProps> = ({
     <IconButton
       data-uie-name="jump-to-last-message-button"
       onClick={onGoToLastMessage}
-      css={{
-        position: 'absolute',
-        bottom: mdBreakpoint ? '100px' : '56px',
-        right: '10px',
-        height: '40px',
-        borderRadius: '100%',
-      }}
+      css={jumpToLastMessageButtonStyles(mdBreakpoint)}
     >
       <ChevronIcon css={{rotate: '90deg', height: 16, width: 16, path: {fill: '#0667C8'}}} />
     </IconButton>
