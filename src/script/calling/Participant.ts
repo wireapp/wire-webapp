@@ -45,6 +45,7 @@ export class Participant {
   // Audio
   public audioStream: ko.Observable<MediaStream | undefined>;
   public isMuted: ko.Observable<boolean>;
+  /** when self participant has video blur enabled we need to kill it once the call has ended */
   public stopVideoBlur = () => {};
 
   constructor(

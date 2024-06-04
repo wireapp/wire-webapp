@@ -18,16 +18,16 @@
  */
 
 import {ImageSegmenter, FilesetResolver, ImageSegmenterResult} from '@mediapipe/tasks-vision';
-import * as StackBlur from 'stackblur-canvas';
+import {imageDataRGB} from 'stackblur-canvas';
 
 enum SEGMENTATION_MODEL {
   QUALITY = './assets/mediapipe-models/selfie_multiclass_256x256.tflite',
   PERFORMANCE = './assets/mediapipe-models/selfie_segmenter.tflite',
 }
 enum BLUR_QUALITY {
-  LOW = 30,
-  MEDIUM = 60,
-  HIGH = 90,
+  LOW = 10,
+  MEDIUM = 20,
+  HIGH = 30,
 }
 enum FRAMERATE {
   LOW = 30,
@@ -53,7 +53,7 @@ function startBlurProcess(
   segmenter: ImageSegmenter,
   ctx: CanvasRenderingContext2D,
   videoEl: HTMLVideoElement,
-  videoDimensions: {width: number; height: number},
+  {width, height}: {width: number; height: number},
 ) {
   now = Date.now();
   elapsed = now - then;
@@ -62,17 +62,19 @@ function startBlurProcess(
   if (elapsed > fpsInterval) {
     then = now - (elapsed % fpsInterval);
 
-    ctx.drawImage(videoEl, 0, 0, videoDimensions.width, videoDimensions.height);
+    ctx.drawImage(videoEl, 0, 0, width, height);
     const startTimeMs = performance.now();
 
     try {
-      segmenter.segmentForVideo(videoEl, startTimeMs, result =>
-        processSegmentationResult(result, ctx, videoEl, videoDimensions),
-      );
+      segmenter.segmentForVideo(videoEl, startTimeMs, result => {
+        const imageData = ctx.getImageData(0, 0, width, height);
+        const blurredImage = blurBackground(result, imageData);
+        ctx.putImageData(blurredImage, 0, 0);
+      });
     } catch (error) {
       console.error('Failed to segment video', error);
     }
-    rafId = window.requestAnimationFrame(() => startBlurProcess(segmenter, ctx, videoEl, videoDimensions));
+    rafId = window.requestAnimationFrame(() => startBlurProcess(segmenter, ctx, videoEl, {width, height}));
   }
   return () => {
     window.cancelAnimationFrame(rafId);
@@ -80,31 +82,20 @@ function startBlurProcess(
 }
 
 // Function to process the segmentation result and apply the blur effect
-async function processSegmentationResult(
-  result: ImageSegmenterResult,
-  canvasContext: CanvasRenderingContext2D,
-  videoEl: HTMLVideoElement,
-  videoDimensions: {width: number; height: number},
-) {
-  if (!canvasContext || !videoEl.srcObject) {
-    console.error('Context or video source not ready');
-    return;
-  }
-  const {width, height} = videoDimensions;
-  const originalImageData = canvasContext.getImageData(0, 0, width, height);
-  const blurredImageData = applyBlurToImageData(originalImageData);
+function blurBackground(result: ImageSegmenterResult, imageData: ImageData) {
+  const blurredImageData = blurImage(imageData);
 
   const mask = result.confidenceMasks?.[0]?.getAsFloat32Array();
   if (mask) {
-    blendImagesBasedOnMask(originalImageData.data, blurredImageData.data, mask);
-    canvasContext.putImageData(new ImageData(originalImageData.data, width, height), 0, 0);
+    blendImagesBasedOnMask(imageData.data, blurredImageData.data, mask);
   } else {
     console.error('No mask data available.');
   }
+  return imageData;
 }
 
-function applyBlurToImageData(imageData: ImageData): ImageData {
-  return StackBlur.imageDataRGB(
+function blurImage(imageData: ImageData): ImageData {
+  return imageDataRGB(
     new ImageData(new Uint8ClampedArray(imageData.data), imageData.width, imageData.height),
     0,
     0,
