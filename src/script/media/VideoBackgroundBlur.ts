@@ -18,16 +18,12 @@
  */
 
 import {ImageSegmenter, FilesetResolver, ImageSegmenterResult} from '@mediapipe/tasks-vision';
-import {imageDataRGB} from 'stackblur-canvas';
+
+import {blur, prepareWebglContext} from './Blurrer';
 
 enum SEGMENTATION_MODEL {
   QUALITY = './assets/mediapipe-models/selfie_multiclass_256x256.tflite',
   PERFORMANCE = './assets/mediapipe-models/selfie_segmenter.tflite',
-}
-enum BLUR_QUALITY {
-  LOW = 10,
-  MEDIUM = 20,
-  HIGH = 30,
 }
 enum FRAMERATE {
   LOW = 30,
@@ -35,8 +31,7 @@ enum FRAMERATE {
 }
 
 const QualitySettings = {
-  segmentationModel: SEGMENTATION_MODEL.QUALITY,
-  blurQuality: BLUR_QUALITY.MEDIUM,
+  segmentationModel: SEGMENTATION_MODEL.PERFORMANCE,
   framerate: FRAMERATE.HIGH,
 };
 
@@ -51,7 +46,7 @@ let rafId: number;
 // Function to predict the webcam feed processed by the ImageSegmenter
 function startBlurProcess(
   segmenter: ImageSegmenter,
-  ctx: CanvasRenderingContext2D,
+  webGlContext: WebGLRenderingContext,
   videoEl: HTMLVideoElement,
   {width, height}: {width: number; height: number},
 ) {
@@ -62,47 +57,47 @@ function startBlurProcess(
   if (elapsed > fpsInterval) {
     then = now - (elapsed % fpsInterval);
 
-    ctx.drawImage(videoEl, 0, 0, width, height);
+    //ctx.drawImage(videoEl, 0, 0, width, height);
     const startTimeMs = performance.now();
 
     try {
       segmenter.segmentForVideo(videoEl, startTimeMs, result => {
-        const imageData = ctx.getImageData(0, 0, width, height);
-        const blurredImage = blurBackground(result, imageData);
-        ctx.putImageData(blurredImage, 0, 0);
+        blurBackground(result, videoEl, webGlContext, {width, height});
+        result.close();
       });
     } catch (error) {
       console.error('Failed to segment video', error);
     }
-    rafId = window.requestAnimationFrame(() => startBlurProcess(segmenter, ctx, videoEl, {width, height}));
   }
+  rafId = window.requestAnimationFrame(() => startBlurProcess(segmenter, webGlContext, videoEl, {width, height}));
   return () => {
     window.cancelAnimationFrame(rafId);
   };
 }
 
 // Function to process the segmentation result and apply the blur effect
-function blurBackground(result: ImageSegmenterResult, imageData: ImageData) {
-  const blurredImageData = blurImage(imageData);
-
+function blurBackground(
+  result: ImageSegmenterResult,
+  imageData: HTMLVideoElement,
+  webGlContext: WebGLRenderingContext,
+  {width, height}: {width: number; height: number},
+) {
   const mask = result.confidenceMasks?.[0]?.getAsFloat32Array();
-  if (mask) {
-    blendImagesBasedOnMask(imageData.data, blurredImageData.data, mask);
-  } else {
+  if (!mask) {
     console.error('No mask data available.');
+    return;
   }
-  return imageData;
-}
+  blur(imageData, webGlContext, mask, {width, height})!;
+  result.close();
+  return;
+  const blurredImage = new Uint8ClampedArray(pixels);
 
-function blurImage({data, width, height}: ImageData): ImageData {
-  return imageDataRGB(
-    new ImageData(new Uint8ClampedArray(data), width, height),
-    0,
-    0,
-    width,
-    height,
-    QualitySettings.blurQuality,
-  );
+  if (mask) {
+    blendImagesBasedOnMask(imageData.data, blurredImage, mask);
+  } else {
+  }
+  //const {data, width, height} = imageData;
+  return new ImageData(data, width, height);
 }
 
 function blendImagesBasedOnMask(
@@ -140,13 +135,15 @@ async function createSegmenter(): Promise<ImageSegmenter> {
   });
 }
 
+/**
+ * Will create a new MediaStream that will both segment each frame and apply a blur effect to the background.
+ * @param originalStream  the stream that contains the video that needs background blur
+ * @returns a promise that resolves to an object containing the new MediaStream and a release function to stop the blur process
+ */
 export async function applyBlur(originalStream: MediaStream): Promise<{stream: MediaStream; release: () => void}> {
   // Create a video element to display the webcam feed
   const videoEl = document.createElement('video');
-  // Create a canvas element to apply the blur effect
-  const canvasEl = document.createElement('canvas');
-  // Get the 2D context of the canvas
-  const ctx = canvasEl.getContext('2d', {willReadFrequently: true})!;
+  // Create a canvas element that will be to draw the blurred frames
   // Store the video dimensions
   const videoDimensions = {width: 0, height: 0};
 
@@ -157,16 +154,18 @@ export async function applyBlur(originalStream: MediaStream): Promise<{stream: M
     // Ensure metadata is loaded to get video dimensions
     videoDimensions.width = videoEl.videoWidth || 1240;
     videoDimensions.height = videoEl.videoHeight || 720;
-    canvasEl.width = videoDimensions.width;
-    canvasEl.height = videoDimensions.height;
-
     videoEl.play().catch(error => console.error('Error playing the video: ', error));
   };
 
   return new Promise(resolve => {
     videoEl.onplay = () => {
-      const stopBlurProcess = startBlurProcess(segmenter, ctx, videoEl, videoDimensions);
-      const videoStream = canvasEl.captureStream(QualitySettings.framerate).getVideoTracks()[0];
+      const glContext = document.createElement('canvas');
+      glContext.height = videoDimensions.height;
+      glContext.width = videoDimensions.width;
+      const gl = prepareWebglContext(glContext, videoDimensions.width * videoDimensions.height);
+
+      const stopBlurProcess = startBlurProcess(segmenter, gl, videoEl, videoDimensions);
+      const videoStream = glContext.captureStream(QualitySettings.framerate).getVideoTracks()[0];
       const blurredMediaStream = new MediaStream([videoStream]);
       resolve({
         stream: blurredMediaStream,
