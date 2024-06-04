@@ -35,8 +35,8 @@ enum FRAMERATE {
 }
 
 const QualitySettings = {
-  segmentationModel: SEGMENTATION_MODEL.PERFORMANCE,
-  blurQuality: BLUR_QUALITY.LOW,
+  segmentationModel: SEGMENTATION_MODEL.QUALITY,
+  blurQuality: BLUR_QUALITY.MEDIUM,
   framerate: FRAMERATE.HIGH,
 };
 
