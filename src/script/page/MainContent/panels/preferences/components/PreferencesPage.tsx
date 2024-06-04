@@ -17,15 +17,14 @@
  *
  */
 
-import {useContext, FC} from 'react';
+import {FC} from 'react';
 
 import {IconButton, IconButtonVariant, useMatchMedia} from '@wireapp/react-ui-kit';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
-import {RootContext} from 'src/script/page/RootProvider';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 
-import {buttonsStyle, contentStyle, wrapperStyle} from './PreferencesPage.styles';
+import {buttonsStyle, contentStyle, titleStyle, wrapperStyle} from './PreferencesPage.styles';
 
 interface PreferencesPageProps {
   children: React.ReactNode;
@@ -39,10 +38,6 @@ const PreferencesPage: FC<PreferencesPageProps> = ({title, children}) => {
   const {currentView, setCurrentView} = useAppMainState(state => state.responsiveView);
   const isCentralColumn = currentView == ViewType.CENTRAL_COLUMN;
 
-  const root = useContext(RootContext);
-
-  const goHome = () => root?.content.loadPreviousContent();
-
   return (
     <div role="tabpanel" aria-labelledby={title} css={wrapperStyle}>
       <div className="preferences-titlebar">
@@ -54,15 +49,9 @@ const PreferencesPage: FC<PreferencesPageProps> = ({title, children}) => {
             onClick={() => setCurrentView(ViewType.LEFT_SIDEBAR)}
           />
         )}
-        <h2 className="preferences-titlebar">{title}</h2>
-        {smBreakpoint && isCentralColumn && (
-          <IconButton
-            variant={IconButtonVariant.SECONDARY}
-            className="conversation-title-bar-icon icon-close"
-            css={buttonsStyle}
-            onClick={goHome}
-          />
-        )}
+        <h2 className="preferences-titlebar" css={titleStyle(smBreakpoint && isCentralColumn)}>
+          {title}
+        </h2>
       </div>
       <FadingScrollbar className="preferences-content" css={contentStyle}>
         {children}
