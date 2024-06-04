@@ -37,6 +37,18 @@
 // MESSAGE
 .message {
   position: relative;
+  outline-offset: -0.1rem;
+
+  &.content-message {
+    &:hover,
+    &:focus-visible {
+      background-color: #fff;
+
+      body.theme-dark & {
+        background-color: var(--gray-90);
+      }
+    }
+  }
 
   & * {
     .accent-selection;
@@ -87,7 +99,7 @@
 
 .content-message {
   &:has(.message-header) {
-    padding-top: 6px;
+    margint-top: 6px;
   }
 }
 
@@ -107,15 +119,6 @@
 
 .content-message-wrapper {
   padding-block: 6px;
-
-  &:hover,
-  &:focus-visible {
-    background-color: #fff;
-
-    body.theme-dark & {
-      background-color: var(--gray-90);
-    }
-  }
 }
 
 .message-marked {
@@ -262,10 +265,6 @@
 .message-header-icon-external svg {
   width: 16px;
   height: 16px;
-}
-
-.message-wrapper {
-  outline-offset: -0.1rem;
 }
 
 .message-mention {

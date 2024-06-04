@@ -17,7 +17,7 @@
  *
  */
 
-import {useMemo, useState, useEffect} from 'react';
+import {useMemo, useState, useEffect, useCallback, useRef} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import cx from 'classnames';
@@ -86,6 +86,8 @@ export const ContentMessageComponent = ({
   onClickReaction,
   onClickDetails,
 }: ContentMessageProps) => {
+  const messageRef = useRef<HTMLDivElement | null>(null);
+
   // check if current message is focused and its elements focusable
   const msgFocusState = useMemo(() => isMsgElementsFocusable && isFocused, [isMsgElementsFocusable, isFocused]);
   const messageFocusedTabIndex = useMessageFocusedTabIndex(msgFocusState);
@@ -132,6 +134,8 @@ export const ContentMessageComponent = ({
   const isConversationReadonly = conversation.readOnlyState() !== null;
 
   const contentMessageWrapperRef = (element: HTMLDivElement | null) => {
+    messageRef.current = element;
+
     setTimeout(() => {
       if (element?.parentElement?.querySelector(':hover') === element) {
         // Trigger the action menu in case the component is rendered with the mouse already hovering over it
@@ -147,6 +151,23 @@ export const ContentMessageComponent = ({
   const isImageMessage = !!asset?.isImage();
 
   const isAssetMessage = isFileMessage || isAudioMessage || isVideoMessage || isImageMessage;
+
+  const handleOutsideClick = useCallback(
+    (event: Event) => {
+      if (messageRef.current && !messageRef.current.contains(event.target as Node) && isFocused) {
+        setActionMenuVisibility(false);
+      }
+    },
+    [isFocused],
+  );
+
+  useEffect(() => {
+    window.addEventListener('click', handleOutsideClick);
+
+    return () => {
+      window.removeEventListener('click', handleOutsideClick);
+    };
+  }, [handleOutsideClick]);
 
   return (
     <div
