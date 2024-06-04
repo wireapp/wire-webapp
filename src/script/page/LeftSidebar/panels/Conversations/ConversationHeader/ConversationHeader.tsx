@@ -75,9 +75,9 @@ export const ConversationHeader = ({
   return (
     <>
       <div css={header}>
-        <span css={label}>
+        <h2 css={label} data-uie-name="conversation-list-header-title">
           {isFolderView && currentFolder ? currentFolder.name : conversationsHeaderTitle[currentTab]}
-        </span>
+        </h2>
 
         {currentTab !== SidebarTabs.ARCHIVES && canCreateGroupConversation() && (
           <Button
@@ -107,6 +107,7 @@ export const ConversationHeader = ({
           inputCSS={searchInputStyles}
           wrapperCSS={searchInputWrapperStyles}
           placeholder={searchInputPlaceholder}
+          data-uie-name="search-conversations"
         />
       )}
     </>

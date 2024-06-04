@@ -94,7 +94,7 @@ const ListWrapper = ({
       {sidebar}
       <div id={id} className={`left-list-${id} ${id}`} css={style}>
         {hasHeader && (
-          <header className={`left-list-header left-list-header-${id}`}>
+          <header className={`left-list-header left-list-header-${id}`} data-uie-name="conversation-list-header">
             {headerElement || (
               <>
                 <h2 className="left-list-header-text" data-uie-name={headerUieName}>

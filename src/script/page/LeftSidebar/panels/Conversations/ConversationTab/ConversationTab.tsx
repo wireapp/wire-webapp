@@ -58,7 +58,9 @@ export const ConversationTab = ({
     >
       <span className="conversations-sidebar-btn--text-wrapper">
         {Icon}
-        {unreadConversations > 0 && <span className={cx('conversations-sidebar-btn--badge', {active: isActive})} />}
+        {unreadConversations > 0 && (
+          <span className={cx('conversations-sidebar-btn--badge', {active: isActive})} data-uie-name="unread-badge" />
+        )}
         <span className="conversations-sidebar-btn--text">{label || title}</span>
       </span>
     </button>

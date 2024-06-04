@@ -169,7 +169,7 @@ const Preferences: React.FC<PreferencesProps> = ({
   ];
 
   return (
-    <ListWrapper id="preferences" header={t('preferencesHeadline')}>
+    <ListWrapper id="preferences" header={t('preferencesHeadline')} headerUieName="preferences-header-title">
       <ul
         role="tablist"
         aria-label={t('tooltipPreferencesTabs')}
