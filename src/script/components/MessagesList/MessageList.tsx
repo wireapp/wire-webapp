@@ -20,12 +20,10 @@
 import React, {FC, HTMLProps, useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
-import {amplify} from 'amplify';
 import cx from 'classnames';
 import {debounce} from 'underscore';
 
 import {ChevronIcon, IconButton, useMatchMedia} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {filterMessages} from 'Components/MessagesList/utils/messagesFilter';
@@ -257,12 +255,13 @@ export const MessagesList: FC<MessagesListParams> = ({
     if (conversation) {
       // clean up anything like search result
       setHighlightedMessage(undefined);
+      conversation.initialMessage(undefined);
       focusedElement.current = null;
       // if there are unloaded messages, the conversation should be marked as read and reloaded
       if (!conversation.hasLastReceivedMessageLoaded()) {
         updateConversationLastRead(conversation);
         conversation.release();
-        amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversation, {});
+        loadConversation(conversation);
       } else {
         // we just need to scroll down
         messageListRef.current?.scrollTo?.({behavior: 'smooth', top: messageListRef.current.scrollHeight});
