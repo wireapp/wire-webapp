@@ -1749,6 +1749,8 @@ describe('ConversationRepository', () => {
           Promise.resolve(true),
         );
 
+        conversation_et = _generateConversation();
+
         memberJoinEvent = {
           conversation: conversation_et.id,
           data: {
@@ -1843,10 +1845,27 @@ describe('ConversationRepository', () => {
 
       it('should ignore member-join event when joining a 1to1 conversation', () => {
         const selfUser = generateUser();
+        const conversation = _generateConversation({
+          id: {id: 'one2one-id', domain: 'one2one-domain'},
+          type: CONVERSATION_TYPE.ONE_TO_ONE,
+        });
+
+        const memberJoinEvent = {
+          conversation: conversation.id,
+          data: {
+            user_ids: [selfUser.id],
+          },
+          from: selfUser.id,
+          time: '2015-04-27T11:42:31.475Z',
+          type: CONVERSATION_EVENT.MEMBER_JOIN,
+        } as ConversationMemberJoinEvent;
+
         const conversationRepo = testFactory.conversation_repository!;
+        conversationRepo['conversationState'].conversations.push(conversation);
+
         // conversation has a corresponding pending connection
         const connectionEntity = new ConnectionEntity();
-        connectionEntity.conversationId = conversation_et.qualifiedId;
+        connectionEntity.conversationId = conversation.qualifiedId;
         connectionEntity.userId = {domain: '', id: ''};
         connectionEntity.status(ConnectionStatus.PENDING);
         testFactory.connection_repository!.addConnectionEntity(connectionEntity);
