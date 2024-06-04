@@ -275,7 +275,7 @@ export class CallingRepository {
     if (videoFeed) {
       const blurredVideoStream = await applyBlur(videoFeed);
       selfParticipant.stopVideoBlur = blurredVideoStream.release;
-      this.changeMediaSource(blurredVideoStream.stream, MediaType.VIDEO, false);
+      this.changeMediaSource(blurredVideoStream.stream, MediaType.VIDEO);
     }
   }
 
@@ -1224,7 +1224,6 @@ export class CallingRepository {
   public changeMediaSource(
     mediaStream: MediaStream,
     mediaType: MediaType,
-    killOriginal: boolean = true,
     call = this.callState.joinedCall(),
   ): MediaStream | void {
     if (!call) {
@@ -1236,7 +1235,7 @@ export class CallingRepository {
     if (mediaType === MediaType.AUDIO) {
       const audioTracks = mediaStream.getAudioTracks().map(track => track.clone());
       if (audioTracks.length > 0) {
-        selfParticipant.setAudioStream(new MediaStream(audioTracks), killOriginal);
+        selfParticipant.setAudioStream(new MediaStream(audioTracks), true);
         this.wCall?.replaceTrack(this.serializeQualifiedId(conversation.qualifiedId), audioTracks[0]);
       }
     }
@@ -1246,7 +1245,7 @@ export class CallingRepository {
       const videoTracks = mediaStream.getVideoTracks().map(track => track.clone());
       if (videoTracks.length > 0) {
         const clonedMediaStream = new MediaStream(videoTracks);
-        selfParticipant.setVideoStream(clonedMediaStream, killOriginal);
+        selfParticipant.setVideoStream(clonedMediaStream, true);
         this.wCall?.replaceTrack(this.serializeQualifiedId(conversation.qualifiedId), videoTracks[0]);
         // Remove the previous video stream
         this.mediaStreamHandler.releaseTracksFromStream(mediaStream);

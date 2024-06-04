@@ -35,7 +35,7 @@ enum FRAMERATE {
 }
 
 const QualitySettings = {
-  segmentationModel: SEGMENTATION_MODEL.QUALITY,
+  segmentationModel: SEGMENTATION_MODEL.PERFORMANCE,
   blurQuality: BLUR_QUALITY.LOW,
   framerate: FRAMERATE.HIGH,
 };
@@ -160,8 +160,7 @@ export async function applyBlur(originalStream: MediaStream): Promise<{stream: M
 
   const segmenter = await createSegmenter();
 
-  const videoStream = new MediaStream(originalStream.getVideoTracks());
-  videoEl.srcObject = videoStream;
+  videoEl.srcObject = originalStream.clone();
   videoEl.onloadedmetadata = () => {
     // Ensure metadata is loaded to get video dimensions
     videoDimensions.width = videoEl.videoWidth || 1240;
@@ -176,7 +175,7 @@ export async function applyBlur(originalStream: MediaStream): Promise<{stream: M
     videoEl.onplay = () => {
       const stopBlurProcess = startBlurProcess(segmenter, ctx, videoEl, videoDimensions);
       const videoStream = canvasEl.captureStream(QualitySettings.framerate).getVideoTracks()[0];
-      const blurredMediaStream = new MediaStream([...originalStream.getAudioTracks(), videoStream]);
+      const blurredMediaStream = new MediaStream([videoStream]);
       resolve({
         stream: blurredMediaStream,
         release: () => {
@@ -184,8 +183,10 @@ export async function applyBlur(originalStream: MediaStream): Promise<{stream: M
           stopVideo(videoEl);
           segmenter.close();
           // Make sure we release the original stream (to free the camera for example)
-          originalStream.getTracks().forEach(track => track.stop());
-          blurredMediaStream.getTracks().forEach(track => track.stop());
+          originalStream.getTracks().forEach(track => {
+            track.stop();
+            originalStream.removeTrack(track);
+          });
         },
       });
     };
