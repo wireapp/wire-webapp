@@ -1843,7 +1843,7 @@ describe('ConversationRepository', () => {
         },
       );
 
-      it('should ignore member-join event when joining a 1to1 conversation', () => {
+      it('should ignore member-join event when accepting a 1to1 conversation', () => {
         const selfUser = generateUser();
         const conversation = _generateConversation({
           id: {id: 'one2one-id', domain: 'one2one-domain'},
