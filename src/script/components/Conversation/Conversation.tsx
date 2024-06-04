@@ -37,6 +37,7 @@ import {CallingViewMode, CallState} from 'src/script/calling/CallState';
 import {Config} from 'src/script/Config';
 import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {isLastReceivedMessage} from 'Util/conversationMessages';
 import {allowsAllFiles, getFileExtensionOrName, hasAllowedExtension} from 'Util/FileTypeUtil';
 import {isHittingUploadLimit} from 'Util/isHittingUploadLimit';
 import {t} from 'Util/LocalizerUtil';
@@ -49,7 +50,7 @@ import {ReadOnlyConversationMessage} from './ReadOnlyConversationMessage';
 import {checkFileSharingPermission} from './utils/checkFileSharingPermission';
 
 import {ConversationState} from '../../conversation/ConversationState';
-import {Conversation as ConversationEntity, isLastReceivedMessage} from '../../entity/Conversation';
+import {Conversation as ConversationEntity} from '../../entity/Conversation';
 import {ContentMessage} from '../../entity/message/ContentMessage';
 import {DecryptErrorMessage} from '../../entity/message/DecryptErrorMessage';
 import {MemberMessage} from '../../entity/message/MemberMessage';

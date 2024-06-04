@@ -30,3 +30,12 @@ export const jumpToLastMessageButtonStyles: CSSObject = {
     bottom: '100px',
   },
 };
+
+export const jumpToLastMessageChevronStyles: CSSObject = {
+  rotate: '90deg',
+  height: 16,
+  width: 16,
+  path: {
+    fill: 'var(--accent-color)',
+  },
+};

@@ -19,7 +19,7 @@
 
 import {render} from '@testing-library/react';
 
-import {JumpToLastMessageButton} from 'Components/MessagesList/MessageList';
+import {JumpToLastMessageButton} from 'Components/MessagesList/JumpToLastMessageButton';
 
 import {generateConversation} from '../../../../test/helper/ConversationGenerator';
 import {withTheme} from '../../auth/util/test/TestUtil';

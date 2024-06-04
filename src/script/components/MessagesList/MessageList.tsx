@@ -17,16 +17,13 @@
  *
  */
 
-import React, {FC, HTMLProps, useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react';
+import React, {FC, useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
-import {debounce} from 'underscore';
-
-import {ChevronIcon, IconButton} from '@wireapp/react-ui-kit';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
-import {jumpToLastMessageButtonStyles} from 'Components/MessagesList/MessageList.styles';
+import {JumpToLastMessageButton} from 'Components/MessagesList/JumpToLastMessageButton';
 import {filterMessages} from 'Components/MessagesList/utils/messagesFilter';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {MessageRepository} from 'src/script/conversation/MessageRepository';
@@ -38,6 +35,7 @@ import {User} from 'src/script/entity/User';
 import {useRoveFocus} from 'src/script/hooks/useRoveFocus';
 import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {isLastReceivedMessage} from 'Util/conversationMessages';
 import {onHitTopOrBottom} from 'Util/DOM/onHitTopOrBottom';
 import {useResizeObserver} from 'Util/DOM/resizeObserver';
 
@@ -47,7 +45,7 @@ import {ScrollToElement} from './Message/types';
 import {groupMessagesBySenderAndTime, isMarker} from './utils/messagesGroup';
 import {updateScroll, FocusedElement} from './utils/scrollUpdater';
 
-import {Conversation, isLastReceivedMessage} from '../../entity/Conversation';
+import {Conversation} from '../../entity/Conversation';
 import {isContentMessage} from '../../guards/Message';
 
 interface MessagesListParams {
@@ -365,39 +363,5 @@ export const MessagesList: FC<MessagesListParams> = ({
       </FadingScrollbar>
       <JumpToLastMessageButton onGoToLastMessage={jumpToLastMessage} conversation={conversation} />
     </>
-  );
-};
-
-export interface JumpToLastMessageButtonProps extends HTMLProps<HTMLElement> {
-  onGoToLastMessage: () => void;
-  conversation: Conversation;
-}
-
-export const JumpToLastMessageButton = ({onGoToLastMessage, conversation}: JumpToLastMessageButtonProps) => {
-  const [isLastMessageVisible, setIsLastMessageVisible] = useState(conversation.isLastMessageVisible());
-
-  useEffect(() => {
-    const subscription = conversation.isLastMessageVisible.subscribe(
-      debounce(value => {
-        setIsLastMessageVisible(value);
-      }, 200),
-    );
-    return () => {
-      subscription.dispose();
-    };
-  }, [conversation]);
-
-  if (isLastMessageVisible) {
-    return null;
-  }
-
-  return (
-    <IconButton
-      data-uie-name="jump-to-last-message-button"
-      onClick={onGoToLastMessage}
-      css={jumpToLastMessageButtonStyles}
-    >
-      <ChevronIcon css={{rotate: '90deg', height: 16, width: 16, path: {fill: 'var(--accent-color)'}}} />
-    </IconButton>
   );
 };

@@ -82,10 +82,6 @@ enum TIMESTAMP_TYPE {
   MUTED = 'mutedTimestamp',
 }
 
-export const isLastReceivedMessage = (messageEntity: Message, conversationEntity: Conversation): boolean => {
-  return messageEntity.timestamp() >= conversationEntity.last_event_timestamp();
-};
-
 export class Conversation {
   private readonly teamState: TeamState;
   public readonly archivedState: ko.Observable<boolean>;
