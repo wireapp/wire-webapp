@@ -23,7 +23,7 @@ import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
 import {debounce} from 'underscore';
 
-import {ChevronIcon, IconButton, useMatchMedia} from '@wireapp/react-ui-kit';
+import {ChevronIcon, IconButton} from '@wireapp/react-ui-kit';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {jumpToLastMessageButtonStyles} from 'Components/MessagesList/MessageList.styles';
@@ -373,13 +373,7 @@ export interface JumpToLastMessageButtonProps extends HTMLProps<HTMLElement> {
   conversation: Conversation;
 }
 
-export const JumpToLastMessageButton: FC<JumpToLastMessageButtonProps> = ({
-  onGoToLastMessage,
-  conversation,
-}: JumpToLastMessageButtonProps) => {
-  // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
-  const mdBreakpoint = useMatchMedia('max-width: 768px');
-
+export const JumpToLastMessageButton = ({onGoToLastMessage, conversation}: JumpToLastMessageButtonProps) => {
   const [isLastMessageVisible, setIsLastMessageVisible] = useState(conversation.isLastMessageVisible());
 
   useEffect(() => {
@@ -401,9 +395,9 @@ export const JumpToLastMessageButton: FC<JumpToLastMessageButtonProps> = ({
     <IconButton
       data-uie-name="jump-to-last-message-button"
       onClick={onGoToLastMessage}
-      css={jumpToLastMessageButtonStyles(mdBreakpoint)}
+      css={jumpToLastMessageButtonStyles}
     >
-      <ChevronIcon css={{rotate: '90deg', height: 16, width: 16, path: {fill: '#0667C8'}}} />
+      <ChevronIcon css={{rotate: '90deg', height: 16, width: 16, path: {fill: 'var(--accent-color)'}}} />
     </IconButton>
   );
 };
