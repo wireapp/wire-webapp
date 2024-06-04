@@ -148,7 +148,7 @@ async function createSegmenter(): Promise<ImageSegmenter> {
   });
 }
 
-export async function applyBlur(mediaStream: MediaStream): Promise<{stream: MediaStream; release: () => void}> {
+export async function applyBlur(originalStream: MediaStream): Promise<{stream: MediaStream; release: () => void}> {
   // Create a video element to display the webcam feed
   const videoEl = document.createElement('video');
   // Create a canvas element to apply the blur effect
@@ -160,7 +160,7 @@ export async function applyBlur(mediaStream: MediaStream): Promise<{stream: Medi
 
   const segmenter = await createSegmenter();
 
-  const videoStream = new MediaStream(mediaStream.getVideoTracks());
+  const videoStream = new MediaStream(originalStream.getVideoTracks());
   videoEl.srcObject = videoStream;
   videoEl.onloadedmetadata = () => {
     // Ensure metadata is loaded to get video dimensions
@@ -176,13 +176,16 @@ export async function applyBlur(mediaStream: MediaStream): Promise<{stream: Medi
     videoEl.onplay = () => {
       const stopBlurProcess = startBlurProcess(segmenter, ctx, videoEl, videoDimensions);
       const videoStream = canvasEl.captureStream(QualitySettings.framerate).getVideoTracks()[0];
-      const blurredMediaStream = new MediaStream([...mediaStream.getAudioTracks(), videoStream]);
+      const blurredMediaStream = new MediaStream([...originalStream.getAudioTracks(), videoStream]);
       resolve({
         stream: blurredMediaStream,
         release: () => {
           stopBlurProcess();
           stopVideo(videoEl);
           segmenter.close();
+          // Make sure we release the original stream (to free the camera for example)
+          originalStream.getTracks().forEach(track => track.stop());
+          blurredMediaStream.getTracks().forEach(track => track.stop());
         },
       });
     };
