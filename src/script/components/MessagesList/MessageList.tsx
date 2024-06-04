@@ -108,7 +108,6 @@ export const MessagesList: FC<MessagesListParams> = ({
     inTeam,
     isLoadingMessages,
     hasAdditionalMessages,
-    initialMessage,
   } = useKoSubscribableChildren(conversation, [
     'inTeam',
     'isActiveParticipant',
@@ -118,12 +117,11 @@ export const MessagesList: FC<MessagesListParams> = ({
     'isGuestAndServicesRoom',
     'isLoadingMessages',
     'hasAdditionalMessages',
-    'initialMessage',
   ]);
 
   const messageListRef = useRef<HTMLDivElement | null>(null);
   const [loaded, setLoaded] = useState(false);
-  const [highlightedMessage, setHighlightedMessage] = useState<string | undefined>(initialMessage?.id);
+  const [highlightedMessage, setHighlightedMessage] = useState<string | undefined>(conversation.initialMessage()?.id);
   const conversationLastReadTimestamp = useRef(conversation.last_read_timestamp());
 
   const filteredMessages = filterMessages(allMessages);
@@ -205,7 +203,7 @@ export const MessagesList: FC<MessagesListParams> = ({
     onLoading(true);
     setLoaded(false);
     conversationLastReadTimestamp.current = conversation.last_read_timestamp();
-    loadConversation(conversation, initialMessage).then(() => {
+    loadConversation(conversation, conversation.initialMessage()).then(() => {
       setTimeout(() => {
         setLoaded(true);
         onLoading(false);
@@ -217,7 +215,7 @@ export const MessagesList: FC<MessagesListParams> = ({
       }, 10);
     });
     return () => conversation.release();
-  }, [conversation, initialMessage]);
+  }, [conversation]);
 
   useLayoutEffect(() => {
     if (loaded && messageListRef.current) {
@@ -258,17 +256,13 @@ export const MessagesList: FC<MessagesListParams> = ({
   const jumpToLastMessage = () => {
     if (conversation) {
       // clean up anything like search result
-      setHighlightedMessage(undefined);
+      //setHighlightedMessage(undefined);
       focusedElement.current = null;
       // if there are unloaded messages, the conversation should be marked as read and reloaded
       if (!conversation.hasLastReceivedMessageLoaded()) {
         updateConversationLastRead(conversation);
         conversation.release();
         amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversation, {});
-      } else if (conversation.initialMessage()) {
-        // if there was a search result, conversation should be reloaded (as not all messages in last batch are usually
-        // loaded when showing search result), then scrollUpdater will do the job in the right moment after reload
-        conversation.initialMessage(undefined);
       } else {
         // we just need to scroll down
         messageListRef.current?.scrollTo?.({behavior: 'smooth', top: messageListRef.current.scrollHeight});
