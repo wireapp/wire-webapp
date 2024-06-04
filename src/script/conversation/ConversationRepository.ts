@@ -3956,7 +3956,7 @@ export class ConversationRepository {
       return;
     }
 
-    await this.resolve1To1Conversation(otherUserId, {isLiveUpdate: true});
+    await this.resolve1To1Conversation(otherUserId);
   }
 
   /**
