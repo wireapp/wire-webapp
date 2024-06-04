@@ -1877,6 +1877,54 @@ describe('ConversationRepository', () => {
           expect(conversationRepo.updateParticipatingUserEntities).not.toHaveBeenCalled();
         });
       });
+
+      it('should resolve 1:1 conversation on member-join event', () => {
+        const selfUser = generateUser();
+        const conversation = _generateConversation({
+          id: {id: 'one2one2-id', domain: 'one2one2-domain'},
+          type: CONVERSATION_TYPE.ONE_TO_ONE,
+        });
+
+        const otherUser = generateUser();
+
+        conversation.participating_user_ids.push(otherUser.qualifiedId);
+
+        const memberJoinEvent = {
+          conversation: conversation.id,
+          data: {
+            user_ids: [selfUser.id],
+          },
+          from: selfUser.id,
+          time: '2015-04-27T11:42:31.475Z',
+          type: CONVERSATION_EVENT.MEMBER_JOIN,
+        } as ConversationMemberJoinEvent;
+
+        const conversationRepo = testFactory.conversation_repository!;
+        const userRepo = testFactory.user_repository!;
+        conversationRepo['conversationState'].conversations.push(conversation);
+
+        jest.spyOn(conversationRepo, 'resolve1To1Conversation').mockResolvedValueOnce(conversation);
+
+        jest
+          .spyOn(conversationRepo['conversationService'], 'getConversationById')
+          .mockResolvedValue(generateAPIConversation({}));
+
+        jest.spyOn(userRepo, 'getUserById').mockResolvedValue(selfUser);
+
+        const connectionEntity = new ConnectionEntity();
+        connectionEntity.conversationId = conversation.qualifiedId;
+        connectionEntity.userId = otherUser.qualifiedId;
+        connectionEntity.status(ConnectionStatus.SENT);
+        testFactory.connection_repository!.addConnectionEntity(connectionEntity);
+
+        spyOn(conversationRepo!['userState'], 'self').and.returnValue(selfUser);
+
+        return conversationRepo['handleConversationEvent'](memberJoinEvent).then(() => {
+          expect(conversationRepo['onMemberJoin']).toHaveBeenCalled();
+          expect(conversationRepo.updateParticipatingUserEntities).toHaveBeenCalled();
+          expect(conversationRepo.resolve1To1Conversation).toHaveBeenCalled();
+        });
+      });
     });
 
     describe('conversation.message-delete', () => {
