@@ -3543,6 +3543,15 @@ export class ConversationRepository {
       });
     }
 
+    const is1to1Conversation = conversationEntity.is1to1() || conversationEntity.isRequest();
+
+    if (is1to1Conversation) {
+      const otherUserId = conversationEntity.participating_user_ids()[0];
+      if (otherUserId) {
+        await this.resolve1To1Conversation(otherUserId, {isLiveUpdate: true});
+      }
+    }
+
     // Self user is a creator of the event
     const isFromSelf = eventJson.from === this.userState.self().id;
 
