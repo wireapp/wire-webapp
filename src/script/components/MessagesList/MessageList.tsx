@@ -256,7 +256,7 @@ export const MessagesList: FC<MessagesListParams> = ({
   const jumpToLastMessage = () => {
     if (conversation) {
       // clean up anything like search result
-      //setHighlightedMessage(undefined);
+      setHighlightedMessage(undefined);
       focusedElement.current = null;
       // if there are unloaded messages, the conversation should be marked as read and reloaded
       if (!conversation.hasLastReceivedMessageLoaded()) {
