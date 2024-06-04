@@ -581,7 +581,7 @@
   "conversationsPopoverNoCustomFolders": "无自定义文件夹",
   "conversationsPopoverNotificationSettings": "Notifications",
   "conversationsPopoverNotify": "取消静音对话",
-  "conversationsPopoverRemoveFrom": "从 \"{{name}} “移除\n",
+  "conversationsPopoverRemoveFrom": "Remove from \"{{name}}\"",
   "conversationsPopoverSilence": "静音对话",
   "conversationsPopoverUnarchive": "对话存档？",
   "conversationsPopoverUnblock": "Unblock",

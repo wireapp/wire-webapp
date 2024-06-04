@@ -19,6 +19,9 @@
 
 import {useEffect, useMemo} from 'react';
 
+import createCache from '@emotion/cache';
+import {CacheProvider} from '@emotion/react';
+import weakMemoize from '@emotion/weak-memoize';
 import {createPortal} from 'react-dom';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
@@ -34,6 +37,11 @@ interface DetachedWindowProps {
   onClose: () => void;
   name: string;
 }
+
+const memoizedCreateCacheWithContainer = weakMemoize((container: HTMLHeadElement) => {
+  const newCache = createCache({container, key: 'detached-window'});
+  return newCache;
+});
 
 export const DetachedWindow = ({children, name, onClose, width = 600, height = 600}: DetachedWindowProps) => {
   const newWindow = useMemo(() => {
@@ -79,9 +87,11 @@ export const DetachedWindow = ({children, name, onClose, width = 600, height = 6
   return !newWindow
     ? null
     : createPortal(
-        <StyledApp id="detached-window" themeId={THEME_ID.DEFAULT} style={{height: '100%'}}>
-          {children}
-        </StyledApp>,
+        <CacheProvider value={memoizedCreateCacheWithContainer(newWindow.document.head)}>
+          <StyledApp id="detached-window" themeId={THEME_ID.DEFAULT} style={{height: '100%'}}>
+            {children}
+          </StyledApp>
+        </CacheProvider>,
         newWindow.document.body,
       );
 };

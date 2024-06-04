@@ -17,7 +17,7 @@
  *
  */
 
-import {FeatureStatus, FEATURE_KEY, FeatureList} from '@wireapp/api-client/lib/team';
+import {FEATURE_KEY, FeatureList} from '@wireapp/api-client/lib/team';
 
 import {supportsMLS} from 'Util/util';
 
@@ -25,6 +25,5 @@ export const getMLSConfig = (config: FeatureList): FeatureList[FEATURE_KEY.MLS] 
   if (!supportsMLS()) {
     return undefined;
   }
-  const mlsConfig = config[FEATURE_KEY.MLS];
-  return mlsConfig?.status !== FeatureStatus.ENABLED ? undefined : mlsConfig;
+  return config[FEATURE_KEY.MLS];
 };

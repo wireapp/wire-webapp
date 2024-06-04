@@ -581,7 +581,7 @@
   "conversationsPopoverNoCustomFolders": "Sem pastas personalizadas",
   "conversationsPopoverNotificationSettings": "Notificações",
   "conversationsPopoverNotify": "Notificar",
-  "conversationsPopoverRemoveFrom": "Remover de \"{{name}}\"",
+  "conversationsPopoverRemoveFrom": "Remove from \"{{name}}\"",
   "conversationsPopoverSilence": "Não notificar",
   "conversationsPopoverUnarchive": "Desarquivar",
   "conversationsPopoverUnblock": "Unblock",
