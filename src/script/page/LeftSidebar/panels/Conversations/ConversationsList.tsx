@@ -155,13 +155,11 @@ export const ConversationsList = ({
     );
   };
 
-  const uieName = isFolderView ? 'folder-view' : 'recent-view';
-
   return (
     <>
-      <h2 className="visually-hidden">{t(isFolderView ? 'folderViewTooltip' : 'conversationViewTooltip')}</h2>
+      <h2 className="visually-hidden">{t('conversationViewTooltip')}</h2>
 
-      <ul css={css({margin: 0, paddingLeft: 0})} data-uie-name={uieName}>
+      <ul css={css({margin: 0, paddingLeft: 0})} data-uie-name="conversation-view">
         <ConnectionRequests
           connectionRequests={connectRequests}
           onConnectionRequestClick={onConnectionRequestClick}

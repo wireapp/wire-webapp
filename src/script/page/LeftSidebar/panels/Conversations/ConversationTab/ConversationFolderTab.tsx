@@ -131,7 +131,7 @@ export const ConversationFolderTab = ({
         </span>
       </button>
       <div className={cx('conversations-sidebar-folders', {active: isFoldersTabOpen})}>
-        <div className="conversations-sidebar-folders--inner-wrapper">
+        <div className="conversations-sidebar-folders--inner-wrapper" data-uie-name="folder-list">
           {folders.length === 0 && (
             <div className="conversations-sidebar-folders--empty">
               {t('conversationFoldersEmptyText')}

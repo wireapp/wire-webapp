@@ -31,6 +31,7 @@ export const header: CSSObject = {
 export const label: CSSObject = {
   color: 'var(--main-color)',
   fontWeight: 'var(--font-weight-semibold)',
+  fontSize: 'var(--font-size-base)',
   paddingBlock: '8px',
 };
 
