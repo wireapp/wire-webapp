@@ -178,6 +178,9 @@ jobs:
               "q1-2024": {
                 "targets": "[\"q1-2024\"]"
               }
+              "new-navigation: {
+                "targets": "[\"new-navigation\"]"
+              }
             }
           export_to: log,output
 
