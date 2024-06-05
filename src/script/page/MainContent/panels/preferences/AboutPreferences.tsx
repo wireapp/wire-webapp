@@ -111,6 +111,7 @@ const AboutPreferences: React.FC<AboutPreferencesProps> = ({selfUser, teamState 
       )}
       <PreferencesSection hasSeparator>
         <p className="preferences-detail">{t('preferencesAboutVersion', config.VERSION)}</p>
+        <p className="preferences-detail">{t('preferencesAboutAVSVersion', config.AVS_VERSION)}</p>
         <p className="preferences-detail">{t('preferencesAboutCopyright')}</p>
       </PreferencesSection>
     </PreferencesPage>
