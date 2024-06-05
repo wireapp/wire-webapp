@@ -47,7 +47,7 @@ export const EmptyConversationList = ({currentTab, onChangeTab, searchValue = ''
     </Button>
   );
 
-  if (currentTab === SidebarTabs.RECENT) {
+  if (currentTab === SidebarTabs.RECENT || currentTab === SidebarTabs.FOLDER) {
     return (
       <div css={wrapper}>
         <div>
