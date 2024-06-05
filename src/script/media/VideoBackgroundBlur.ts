@@ -94,13 +94,13 @@ function blurBackground(result: ImageSegmenterResult, imageData: ImageData) {
   return imageData;
 }
 
-function blurImage(imageData: ImageData): ImageData {
+function blurImage({data, width, height}: ImageData): ImageData {
   return imageDataRGB(
-    new ImageData(new Uint8ClampedArray(imageData.data), imageData.width, imageData.height),
+    new ImageData(new Uint8ClampedArray(data), width, height),
     0,
     0,
-    imageData.width,
-    imageData.height,
+    width,
+    height,
     QualitySettings.blurQuality,
   );
 }
@@ -113,11 +113,12 @@ function blendImagesBasedOnMask(
   const length = mask.length;
   for (let i = 0; i < length; i++) {
     const baseIndex = i * 4;
-    let check = mask[i] <= 0.5;
-    if (QualitySettings.segmentationModel === SEGMENTATION_MODEL.QUALITY) {
-      check = mask[i] >= 0.5;
-    }
-    if (check) {
+    const qualityThreshold = 0.5;
+    const useBlurredPixel =
+      QualitySettings.segmentationModel === SEGMENTATION_MODEL.QUALITY
+        ? mask[i] >= qualityThreshold
+        : mask[i] <= qualityThreshold;
+    if (useBlurredPixel) {
       originalPixels[baseIndex] = blurredPixels[baseIndex];
       originalPixels[baseIndex + 1] = blurredPixels[baseIndex + 1];
       originalPixels[baseIndex + 2] = blurredPixels[baseIndex + 2];
