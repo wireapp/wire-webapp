@@ -2,7 +2,7 @@ name: Publish
 
 on:
   push:
-    branches: [master, dev, release/*]
+    branches: [master, dev, release/*, new-navigation]
     tags:
       - '*q1-2024*'
       - '*staging*'
@@ -177,9 +177,6 @@ jobs:
               },
               "q1-2024": {
                 "targets": "[\"q1-2024\"]"
-              }
-              "new-navigation: {
-                "targets": "[\"new-navigation\"]"
               }
             }
           export_to: log,output
