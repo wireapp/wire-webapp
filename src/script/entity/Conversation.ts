@@ -163,6 +163,7 @@ export class Conversation {
   public readonly receiptMode: ko.Observable<RECEIPT_MODE>;
   public readonly removed_from_conversation: ko.PureComputed<boolean>;
   public readonly roles: ko.Observable<Record<string, string>>;
+  public readonly isLastMessageVisible: ko.Observable<boolean>;
   public readonly selfUser: ko.Observable<User | undefined>;
   public readonly servicesCount: ko.PureComputed<number>;
   public readonly showNotificationsEverything: ko.PureComputed<boolean>;
@@ -206,6 +207,7 @@ export class Conversation {
     this.teamId = undefined;
     this.type = ko.observable();
 
+    this.isLastMessageVisible = ko.observable(true);
     this.isLoadingMessages = ko.observable(false);
     this.isTextInputReady = ko.observable(false);
 
@@ -423,6 +425,7 @@ export class Conversation {
         return message_a.timestamp() - message_b.timestamp();
       }),
     );
+
     this.lastDeliveredMessage = ko.pureComputed(() => this.getLastDeliveredMessage());
 
     this.incomingMessages = ko.observableArray();
