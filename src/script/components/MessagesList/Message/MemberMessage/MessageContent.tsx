@@ -93,23 +93,23 @@ function getContent(message: MemberMessageEntity) {
         }
 
         return exceedsMaxVisibleUsers
-          ? t('conversationCreateWithMore', {count: hiddenUsersCount.toString(), users: dativeUsers})
-          : t('conversationCreateWith', dativeUsers);
+          ? t('conversationCreateWithMore', {count: hiddenUsersCount.toString(), users: dativeUsers}, {}, true)
+          : t('conversationCreateWith', dativeUsers, {}, true);
       }
 
       if (actor.isMe) {
         return exceedsMaxVisibleUsers
-          ? t('conversationCreatedYouMore', {count: hiddenUsersCount.toString(), users: dativeUsers})
-          : t('conversationCreatedYou', dativeUsers);
+          ? t('conversationCreatedYouMore', {count: hiddenUsersCount.toString(), users: dativeUsers}, {}, true)
+          : t('conversationCreatedYou', dativeUsers, {}, true);
       }
 
       return exceedsMaxVisibleUsers
-        ? t('conversationCreatedMore', {count: hiddenUsersCount.toString(), name, users: dativeUsers})
-        : t('conversationCreated', {name, users: dativeUsers});
+        ? t('conversationCreatedMore', {count: hiddenUsersCount.toString(), name, users: dativeUsers}, {}, true)
+        : t('conversationCreated', {name, users: dativeUsers}, {}, true);
     }
 
     case SystemMessageType.CONVERSATION_RESUME: {
-      return t('conversationResume', generateNames(targetedUsers, Declension.DATIVE, false));
+      return t('conversationResume', generateNames(targetedUsers, Declension.DATIVE, false), {}, true);
     }
 
     default:
@@ -122,17 +122,22 @@ function getContent(message: MemberMessageEntity) {
       if (senderJoined) {
         return message.user().isMe
           ? t('conversationMemberJoinedSelfYou')
-          : t('conversationMemberJoinedSelf', message.senderName());
+          : t('conversationMemberJoinedSelf', message.senderName(), {}, true);
       }
 
       if (message.user().isMe) {
         return exceedsMaxVisibleUsers
-          ? t('conversationMemberJoinedYouMore', {count: hiddenUsersCount.toString(), users: accusativeUsers})
-          : t('conversationMemberJoinedYou', accusativeUsers);
+          ? t('conversationMemberJoinedYouMore', {count: hiddenUsersCount.toString(), users: accusativeUsers}, {}, true)
+          : t('conversationMemberJoinedYou', accusativeUsers, {}, true);
       }
       return exceedsMaxVisibleUsers
-        ? t('conversationMemberJoinedMore', {count: hiddenUsersCount.toString(), name, users: accusativeUsers})
-        : t('conversationMemberJoined', {name, users: accusativeUsers});
+        ? t(
+            'conversationMemberJoinedMore',
+            {count: hiddenUsersCount.toString(), name, users: accusativeUsers},
+            {},
+            true,
+          )
+        : t('conversationMemberJoined', {name, users: accusativeUsers}, {}, true);
     }
 
     case CONVERSATION_EVENT.MEMBER_LEAVE: {
@@ -158,6 +163,7 @@ function getContent(message: MemberMessageEntity) {
               users,
             },
             replaceLinkLegalHold,
+            true,
           );
         }
         return t('conversationMultipleMembersRemovedMissingLegalHoldConsent', users, replaceLinkLegalHold);
@@ -169,20 +175,20 @@ function getContent(message: MemberMessageEntity) {
 
       const senderLeft = matchQualifiedIds(message.otherUser(), actor);
       if (senderLeft) {
-        return message.user().isMe ? t('conversationMemberLeftYou') : t('conversationMemberLeft', name);
+        return message.user().isMe ? t('conversationMemberLeftYou') : t('conversationMemberLeft', name, {}, true);
       }
 
       const allUsers = generateNames(targetedUsers);
       if (!actor.id) {
-        return t('conversationMemberWereRemoved', allUsers);
+        return t('conversationMemberWereRemoved', allUsers, {}, true);
       }
       return actor.isMe
-        ? t('conversationMemberRemovedYou', allUsers)
-        : t('conversationMemberRemoved', {name, users: allUsers});
+        ? t('conversationMemberRemovedYou', allUsers, {}, true)
+        : t('conversationMemberRemoved', {name, users: allUsers}, {}, true);
     }
 
     case ClientEvent.CONVERSATION.TEAM_MEMBER_LEAVE: {
-      return t('conversationTeamLeft', name);
+      return t('conversationTeamLeft', name, {}, true);
     }
 
     default:
