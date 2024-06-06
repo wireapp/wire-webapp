@@ -1198,6 +1198,7 @@
   "preferencesAVTemporaryDisclaimer": "අමුත්තන්ට දෘශ්‍ය සම්මන්ත්‍රණ ඇරඹීමට නොහැකිය. ඔබ සම්මන්ත්‍රණයකට සම්බන්ධ වන්නේ නම් භාවිතයට රූගතයක් තෝරන්න.",
   "preferencesAVTryAgain": "නැවත",
   "preferencesAbout": "පිළිබඳව",
+  "preferencesAboutAVSVersion": "AVS version {{version}}",
   "preferencesAboutCopyright": "© වයර් ස්විස් ජී.එම්.බී.එච්.",
   "preferencesAboutPrivacyPolicy": "රහස්‍යතා ප්‍රතිපත්තිය",
   "preferencesAboutSupport": "සහාය",

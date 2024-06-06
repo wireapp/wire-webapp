@@ -1198,6 +1198,7 @@
   "preferencesAVTemporaryDisclaimer": "Konuklar video konferans başlatamaz. Birine katılırsanız kullanılacak kamerayı seçin.",
   "preferencesAVTryAgain": "Tekrar Deneyin",
   "preferencesAbout": "Hakkında",
+  "preferencesAboutAVSVersion": "AVS version {{version}}",
   "preferencesAboutCopyright": "© Wire Swiss GmbH",
   "preferencesAboutPrivacyPolicy": "Gizlilik Politikası",
   "preferencesAboutSupport": "Destek",
