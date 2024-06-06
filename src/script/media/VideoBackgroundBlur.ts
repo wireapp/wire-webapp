@@ -17,7 +17,7 @@
  *
  */
 
-import {ImageSegmenter, FilesetResolver, ImageSegmenterResult} from '@mediapipe/tasks-vision';
+import {ImageSegmenter, FilesetResolver} from '@mediapipe/tasks-vision';
 
 import {blur, prepareWebglContext} from './Blurrer';
 
@@ -62,7 +62,7 @@ function startBlurProcess(
 
     try {
       segmenter.segmentForVideo(videoEl, startTimeMs, result => {
-        blurBackground(result, videoEl, webGlContext, {width, height});
+        blur(result, videoEl, webGlContext, {width, height});
         result.close();
       });
     } catch (error) {
@@ -75,29 +75,14 @@ function startBlurProcess(
   };
 }
 
-// Function to process the segmentation result and apply the blur effect
-function blurBackground(
-  result: ImageSegmenterResult,
-  imageData: HTMLVideoElement,
-  webGlContext: WebGLRenderingContext,
-  {width, height}: {width: number; height: number},
-) {
-  const mask = result.confidenceMasks?.[0]?.getAsFloat32Array();
-  if (!mask) {
-    console.error('No mask data available.');
-    return;
-  }
-  blur(imageData, webGlContext, mask, {width, height})!;
-  result.close();
-}
-
-async function createSegmenter(): Promise<ImageSegmenter> {
+async function createSegmenter(canvas: HTMLCanvasElement): Promise<ImageSegmenter> {
   const video = await FilesetResolver.forVisionTasks('./mediapipe/wasm');
   return ImageSegmenter.createFromOptions(video, {
     baseOptions: {
       modelAssetPath: QualitySettings.segmentationModel,
       delegate: 'GPU',
     },
+    //canvas,
     runningMode: 'VIDEO',
     outputCategoryMask: false,
     outputConfidenceMasks: true,
@@ -116,8 +101,6 @@ export async function applyBlur(originalStream: MediaStream): Promise<{stream: M
   // Store the video dimensions
   const videoDimensions = {width: 0, height: 0};
 
-  const segmenter = await createSegmenter();
-
   videoEl.srcObject = originalStream.clone();
   videoEl.onloadedmetadata = () => {
     // Ensure metadata is loaded to get video dimensions
@@ -127,10 +110,18 @@ export async function applyBlur(originalStream: MediaStream): Promise<{stream: M
   };
 
   return new Promise(resolve => {
-    videoEl.onplay = () => {
+    videoEl.onplay = async () => {
       const glContext = document.createElement('canvas');
       glContext.height = videoDimensions.height;
       glContext.width = videoDimensions.width;
+
+      glContext.style.position = 'absolute';
+      glContext.style.top = '0';
+      glContext.style.left = '0';
+      glContext.style.zIndex = '100000';
+      document.body.appendChild(glContext);
+
+      const segmenter = await createSegmenter(glContext);
       const gl = prepareWebglContext(glContext);
 
       const stopBlurProcess = startBlurProcess(segmenter, gl, videoEl, videoDimensions);

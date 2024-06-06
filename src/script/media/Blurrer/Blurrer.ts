@@ -17,6 +17,7 @@
  *
  */
 
+import {ImageSegmenterResult} from '@mediapipe/tasks-vision';
 import {createProgramFromSources} from 'webgl-utils.js';
 
 import fragmentShader from './fragmentShader.glsl';
@@ -33,7 +34,7 @@ const kernels = {
 let program: any;
 
 export function prepareWebglContext(canvas: HTMLCanvasElement) {
-  const gl = canvas.getContext('webgl');
+  const gl = canvas.getContext('webgl2');
   if (!gl) {
     throw new Error('WebGL not supported');
   }
@@ -42,18 +43,11 @@ export function prepareWebglContext(canvas: HTMLCanvasElement) {
 }
 
 export function blur(
+  segmentationResults: ImageSegmenterResult,
   videoElement: HTMLVideoElement,
   gl: WebGLRenderingContext,
-  segmentationMask: Float32Array,
   {width, height}: {width: number; height: number},
 ) {
-  const computeKernelWeight = (kernel: number[]) => {
-    const weight = kernel.reduce((prev, curr) => {
-      return prev + curr;
-    });
-    return weight <= 0 ? 1 : weight;
-  };
-
   // look up where the vertex data needs to go.
   const positionLocation = gl.getAttribLocation(program, 'a_position');
   const texcoordLocation = gl.getAttribLocation(program, 'a_texCoord');
@@ -79,17 +73,17 @@ export function blur(
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, videoElement);
 
   // create 2 textures and attach them to framebuffers.
-  const textures = [];
-  const framebuffers = [];
+  const textures: WebGLTexture[] = [];
+  const framebuffers: WebGLFramebuffer[] = [];
   for (let ii = 0; ii < 2; ++ii) {
-    const texture = createAndSetupTexture(gl);
+    const texture = createAndSetupTexture(gl)!;
     textures.push(texture);
 
     // make the texture the same size as the image
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, width, height, 0, gl.RGB, gl.UNSIGNED_BYTE, null);
 
     // Create a framebuffer
-    const fbo = gl.createFramebuffer();
+    const fbo = gl.createFramebuffer()!;
     framebuffers.push(fbo);
     gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
 
@@ -102,39 +96,11 @@ export function blur(
   const textureSizeLocation = gl.getUniformLocation(program, 'u_textureSize');
   const kernelLocation = gl.getUniformLocation(program, 'u_kernel[0]');
   const kernelWeightLocation = gl.getUniformLocation(program, 'u_kernelWeight');
-  const segmentationMaskLocation = gl.getUniformLocation(program, 'u_segmentationMask[0]');
   const flipYLocation = gl.getUniformLocation(program, 'u_flipY');
 
-  /*
-  const maskTexture = createAndSetupTexture(gl);
-  const maskLocation = gl.getUniformLocation(program, 'u_mask');
-  gl.bindTexture(gl.TEXTURE_2D, maskTexture);
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, width, height, 0, gl.RGB, gl.FLOAT, new Uint8Array([1, 1, 1, 1, 1, 1, 1, 1]));
-  gl.uniform1i(maskLocation, 0);
-  */
+  //const maskLocation = gl.getUniformLocation(program, 'u_mask');
 
   drawEffects();
-  return;
-
-  const pixels = new Uint8Array(videoElement.width * videoElement.height * 4);
-  gl.readPixels(0, 0, videoElement.width, videoElement.height, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
-
-  // WebGL pixels are inverted compared to 2D pixels, so we have to flip
-  // the resulting rows. Adapted from https://stackoverflow.com/a/41973289
-
-  //const width = gl.drawingBufferWidth;
-  //const height = gl.drawingBufferHeight;
-  const halfHeight = Math.floor(height / 2);
-  const tmpRow = new Uint8Array(width * 4);
-  for (let y = 0; y < halfHeight; y++) {
-    const topOffset = y * width * 4;
-    const bottomOffset = (height - y - 1) * width * 4;
-    tmpRow.set(pixels.subarray(topOffset, topOffset + width * 4));
-    pixels.copyWithin(topOffset, bottomOffset, bottomOffset + width * 4);
-    pixels.set(tmpRow, bottomOffset);
-  }
-
-  return pixels;
 
   function drawEffects() {
     // Clear the canvas
@@ -143,6 +109,13 @@ export function blur(
 
     // Tell it to use our program (pair of shaders)
     gl.useProgram(program);
+
+    /*
+    const segmentationMask = segmentationResults.confidenceMasks[0].getAsWebGLTexture();
+    gl.activeTexture(gl.TEXTURE3);
+    gl.bindTexture(gl.TEXTURE_2D, segmentationMask);
+    gl.uniform1i(maskLocation, 3);
+    */
 
     // Turn on the position attribute
     gl.enableVertexAttribArray(positionLocation);
@@ -211,7 +184,6 @@ export function blur(
     // set the kernel and it's weight
     gl.uniform1fv(kernelLocation, kernels[name]);
     gl.uniform1f(kernelWeightLocation, computeKernelWeight(kernels[name]));
-    gl.uniform1fv(segmentationMaskLocation, segmentationMask);
 
     // Draw the rectangle.
     const primitiveType = gl.TRIANGLES;
@@ -240,4 +212,11 @@ function setRectangle(gl, x, y, width, height) {
   const y1 = y;
   const y2 = y + height;
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([x1, y1, x2, y1, x1, y2, x1, y2, x2, y1, x2, y2]), gl.STATIC_DRAW);
+}
+
+function computeKernelWeight(kernel: number[]) {
+  const weight = kernel.reduce((prev, curr) => {
+    return prev + curr;
+  });
+  return weight <= 0 ? 1 : weight;
 }
