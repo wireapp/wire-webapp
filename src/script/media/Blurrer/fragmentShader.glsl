@@ -14,7 +14,7 @@ varying vec2 v_texCoord;
 
 void main() {
     vec2 onePixel = vec2(1.0, 1.0) / u_textureSize;
-    if (false) {
+    if (texture2D(u_mask, v_texCoord).r == 1.0) {
         gl_FragColor = texture2D(u_image, v_texCoord);
     } else {
         vec4 colorSum =

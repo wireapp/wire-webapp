@@ -123,11 +123,6 @@ export function blur(
     // Tell it to use our program (pair of shaders)
     gl.useProgram(program);
 
-    //const segmentationMask = segmentationResults.confidenceMasks[0].getAsWebGLTexture();
-    //gl.activeTexture(gl.TEXTURE1);
-    //gl.bindTexture(gl.TEXTURE_2D, segmentationMask);
-    //gl.uniform1i(locations.mask, 1);
-
     // Turn on the position attribute
     gl.enableVertexAttribArray(locations.position);
 
@@ -145,6 +140,11 @@ export function blur(
     // Turn on the texcoord attribute
     gl.enableVertexAttribArray(locations.texcoord);
 
+    const segmentationMask = segmentationResults.confidenceMasks[0].getAsWebGLTexture();
+    gl.activeTexture(gl.TEXTURE1);
+    gl.bindTexture(gl.TEXTURE_2D, segmentationMask);
+    gl.uniform1i(locations.mask, 1);
+
     // bind the texcoord buffer.
     gl.bindBuffer(gl.ARRAY_BUFFER, buffers.textcoord);
 
@@ -154,6 +154,7 @@ export function blur(
     gl.uniform2f(locations.textureSize, width, height);
 
     // start with the original image
+    gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, originalImageTexture);
 
     // don't y flip images while drawing to the textures
