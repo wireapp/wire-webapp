@@ -82,6 +82,10 @@ module.exports = {
         test: /\.svg$/,
       },
       {
+        loader: 'raw-loader',
+        test: /\.glsl$/,
+      },
+      {
         test: /\.less$/i,
         use: [
           'style-loader',

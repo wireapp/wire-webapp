@@ -89,37 +89,6 @@ function blurBackground(
   }
   blur(imageData, webGlContext, mask, {width, height})!;
   result.close();
-  return;
-  const blurredImage = new Uint8ClampedArray(pixels);
-
-  if (mask) {
-    blendImagesBasedOnMask(imageData.data, blurredImage, mask);
-  } else {
-  }
-  //const {data, width, height} = imageData;
-  return new ImageData(data, width, height);
-}
-
-function blendImagesBasedOnMask(
-  originalPixels: Uint8ClampedArray,
-  blurredPixels: Uint8ClampedArray,
-  mask: Float32Array,
-) {
-  const length = mask.length;
-  for (let i = 0; i < length; i++) {
-    const baseIndex = i * 4;
-    const qualityThreshold = 0.5;
-    const useBlurredPixel =
-      QualitySettings.segmentationModel === SEGMENTATION_MODEL.QUALITY
-        ? mask[i] >= qualityThreshold
-        : mask[i] <= qualityThreshold;
-    if (useBlurredPixel) {
-      originalPixels[baseIndex] = blurredPixels[baseIndex];
-      originalPixels[baseIndex + 1] = blurredPixels[baseIndex + 1];
-      originalPixels[baseIndex + 2] = blurredPixels[baseIndex + 2];
-      originalPixels[baseIndex + 3] = blurredPixels[baseIndex + 3];
-    }
-  }
 }
 
 async function createSegmenter(): Promise<ImageSegmenter> {
@@ -162,7 +131,7 @@ export async function applyBlur(originalStream: MediaStream): Promise<{stream: M
       const glContext = document.createElement('canvas');
       glContext.height = videoDimensions.height;
       glContext.width = videoDimensions.width;
-      const gl = prepareWebglContext(glContext, videoDimensions.width * videoDimensions.height);
+      const gl = prepareWebglContext(glContext);
 
       const stopBlurProcess = startBlurProcess(segmenter, gl, videoEl, videoDimensions);
       const videoStream = glContext.captureStream(QualitySettings.framerate).getVideoTracks()[0];
