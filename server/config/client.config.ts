@@ -21,7 +21,7 @@ import {ConfigGeneratorParams} from './config.types';
 import {Env} from './env';
 
 export function generateConfig(params: ConfigGeneratorParams, env: Env) {
-  const {urls, version, env: nodeEnv} = params;
+  const {urls, version, env: nodeEnv, dependencies} = params;
   return {
     APP_BASE: urls.base,
     ANALYTICS_API_KEY: env.ANALYTICS_API_KEY,
@@ -118,6 +118,7 @@ export function generateConfig(params: ConfigGeneratorParams, env: Env) {
       WHATS_NEW: env.URL_WHATS_NEW,
     },
     VERSION: version,
+    AVS_VERSION: dependencies.avs,
     WEBSITE_LABEL: env.WEBSITE_LABEL,
   } as const;
 }

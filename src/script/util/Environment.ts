@@ -49,6 +49,7 @@ interface Environment {
     isProduction: typeof isProduction;
   };
   version: (showWrapperVersion?: boolean) => string;
+  avsVersion: () => string;
 }
 
 export const Environment: Environment = {
@@ -67,4 +68,5 @@ export const Environment: Environment = {
     const showElectronVersion = electronVersion && showWrapperVersion;
     return showElectronVersion ? electronVersion : Config.getConfig().VERSION;
   },
+  avsVersion: (): string => Config.getConfig().AVS_VERSION,
 };
