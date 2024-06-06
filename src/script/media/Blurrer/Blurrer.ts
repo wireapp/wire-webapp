@@ -33,12 +33,41 @@ const kernels = {
 
 let program: any;
 
-export function prepareWebglContext(canvas: HTMLCanvasElement) {
+let locations: any;
+let buffers: any;
+
+export function prepareWebglContext(canvas: HTMLCanvasElement, {width, height}: {width: number; height: number}) {
   const gl = canvas.getContext('webgl2');
   if (!gl) {
     throw new Error('WebGL not supported');
   }
   program = createProgramFromSources(gl, [vertexShader, fragmentShader]);
+  locations = {
+    position: gl.getAttribLocation(program, 'a_position'),
+    texcoord: gl.getAttribLocation(program, 'a_texCoord'),
+
+    resolution: gl.getUniformLocation(program, 'u_resolution'),
+    textureSize: gl.getUniformLocation(program, 'u_textureSize'),
+    kernel: gl.getUniformLocation(program, 'u_kernel[0]'),
+    kernelWeight: gl.getUniformLocation(program, 'u_kernelWeight'),
+    flipY: gl.getUniformLocation(program, 'u_flipY'),
+  };
+
+  // Create a buffer to put three 2d clip space points in
+  buffers = {position: gl.createBuffer(), textcoord: gl.createBuffer()};
+  // Bind it to ARRAY_BUFFER (think of it as ARRAY_BUFFER = positionBuffer)
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position);
+  // Set a rectangle the same size as the image.
+  setRectangle(gl, 0, 0, width, height);
+
+  // provide texture coordinates for the rectangle.
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffers.textcoord);
+  gl.bufferData(
+    gl.ARRAY_BUFFER,
+    new Float32Array([0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0]),
+    gl.STATIC_DRAW,
+  );
+
   return gl;
 }
 
@@ -48,26 +77,6 @@ export function blur(
   gl: WebGLRenderingContext,
   {width, height}: {width: number; height: number},
 ) {
-  // look up where the vertex data needs to go.
-  const positionLocation = gl.getAttribLocation(program, 'a_position');
-  const texcoordLocation = gl.getAttribLocation(program, 'a_texCoord');
-
-  // Create a buffer to put three 2d clip space points in
-  const positionBuffer = gl.createBuffer();
-  // Bind it to ARRAY_BUFFER (think of it as ARRAY_BUFFER = positionBuffer)
-  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-  // Set a rectangle the same size as the image.
-  setRectangle(gl, 0, 0, width, height);
-
-  // provide texture coordinates for the rectangle.
-  const texcoordBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, texcoordBuffer);
-  gl.bufferData(
-    gl.ARRAY_BUFFER,
-    new Float32Array([0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0]),
-    gl.STATIC_DRAW,
-  );
-
   // Create a texture and put the image in it.
   const originalImageTexture = createAndSetupTexture(gl);
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, videoElement);
@@ -91,13 +100,6 @@ export function blur(
     gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
   }
 
-  // lookup uniforms
-  const resolutionLocation = gl.getUniformLocation(program, 'u_resolution');
-  const textureSizeLocation = gl.getUniformLocation(program, 'u_textureSize');
-  const kernelLocation = gl.getUniformLocation(program, 'u_kernel[0]');
-  const kernelWeightLocation = gl.getUniformLocation(program, 'u_kernelWeight');
-  const flipYLocation = gl.getUniformLocation(program, 'u_flipY');
-
   //const maskLocation = gl.getUniformLocation(program, 'u_mask');
 
   drawEffects();
@@ -118,10 +120,10 @@ export function blur(
     */
 
     // Turn on the position attribute
-    gl.enableVertexAttribArray(positionLocation);
+    gl.enableVertexAttribArray(locations.position);
 
     // Bind the position buffer.
-    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position);
 
     // Tell the position attribute how to get data out of positionBuffer (ARRAY_BUFFER)
     const size = 2; // 2 components per iteration
@@ -129,52 +131,50 @@ export function blur(
     const normalize = false; // don't normalize the data
     const stride = 0; // 0 = move forward size * sizeof(type) each iteration to get the next position
     const offset = 0; // start at the beginning of the buffer
-    gl.vertexAttribPointer(positionLocation, size, type, normalize, stride, offset);
+    gl.vertexAttribPointer(locations.position, size, type, normalize, stride, offset);
 
     // Turn on the texcoord attribute
-    gl.enableVertexAttribArray(texcoordLocation);
+    gl.enableVertexAttribArray(locations.texcoord);
 
     // bind the texcoord buffer.
-    gl.bindBuffer(gl.ARRAY_BUFFER, texcoordBuffer);
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.textcoord);
 
-    gl.vertexAttribPointer(texcoordLocation, size, type, normalize, stride, offset);
+    gl.vertexAttribPointer(locations.texcoord, size, type, normalize, stride, offset);
 
     // set the size of the image
-    gl.uniform2f(textureSizeLocation, width, height);
+    gl.uniform2f(locations.textureSize, width, height);
 
     // start with the original image
     gl.bindTexture(gl.TEXTURE_2D, originalImageTexture);
 
     // don't y flip images while drawing to the textures
-    gl.uniform1f(flipYLocation, 1);
+    gl.uniform1f(locations.flipY, 1);
 
     // loop through each effect we want to apply.
-    let count = 0;
     for (let ii = 0; ii < 100; ++ii) {
       // Setup to draw into one of the framebuffers.
-      setFramebuffer(framebuffers[count % 2], width, height);
+      setFramebuffer(framebuffers[ii % 2], width, height);
 
       drawWithKernel('gaussianBlur');
 
       // for the next draw, use the texture we just rendered to.
-      gl.bindTexture(gl.TEXTURE_2D, textures[count % 2]);
-
-      // increment count so we use the other texture next time.
-      ++count;
+      gl.bindTexture(gl.TEXTURE_2D, textures[ii % 2]);
     }
 
     // finally draw the result to the canvas.
-    gl.uniform1f(flipYLocation, -1); // need to y flip for canvas
+    gl.uniform1f(locations.flipY, -1); // need to y flip for canvas
     setFramebuffer(null, width, height);
+    gl.clearColor(0, 0, 1, 1);
+    gl.clear(gl.COLOR_BUFFER_BIT);
     drawWithKernel('normal');
   }
 
-  function setFramebuffer(fbo, width, height) {
+  function setFramebuffer(fbo: WebGLFramebuffer | null, width: number, height: number) {
     // make this the framebuffer we are rendering to.
     gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
 
     // Tell the shader the resolution of the framebuffer.
-    gl.uniform2f(resolutionLocation, width, height);
+    gl.uniform2f(locations.resolution, width, height);
 
     // Tell webgl the viewport setting needed for framebuffer.
     gl.viewport(0, 0, width, height);
@@ -182,8 +182,8 @@ export function blur(
 
   function drawWithKernel(name: keyof typeof kernels) {
     // set the kernel and it's weight
-    gl.uniform1fv(kernelLocation, kernels[name]);
-    gl.uniform1f(kernelWeightLocation, computeKernelWeight(kernels[name]));
+    gl.uniform1fv(locations.kernel, kernels[name]);
+    gl.uniform1f(locations.kernelWeight, computeKernelWeight(kernels[name]));
 
     // Draw the rectangle.
     const primitiveType = gl.TRIANGLES;
@@ -206,7 +206,7 @@ function createAndSetupTexture(gl: WebGLRenderingContext) {
   return texture;
 }
 
-function setRectangle(gl, x, y, width, height) {
+function setRectangle(gl: WebGL2RenderingContext, x: number, y: number, width: number, height: number) {
   const x1 = x;
   const x2 = x + width;
   const y1 = y;

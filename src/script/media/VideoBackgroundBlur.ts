@@ -122,7 +122,7 @@ export async function applyBlur(originalStream: MediaStream): Promise<{stream: M
       document.body.appendChild(glContext);
 
       const segmenter = await createSegmenter(glContext);
-      const gl = prepareWebglContext(glContext);
+      const gl = prepareWebglContext(glContext, videoDimensions);
 
       const stopBlurProcess = startBlurProcess(segmenter, gl, videoEl, videoDimensions);
       const videoStream = glContext.captureStream(QualitySettings.framerate).getVideoTracks()[0];
