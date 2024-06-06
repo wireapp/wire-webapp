@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.17.6](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.17.5...@wireapp/react-ui-kit@9.17.6) (2024-06-06)
+
+### Bug Fixes
+
+* remove hardcoded fill color for CircleCloseIcon ([#6264](https://github.com/wireapp/wire-web-packages/issues/6264)) ([8d1381f](https://github.com/wireapp/wire-web-packages/commit/8d1381f4a1cdfcf82b2a12c00426b230b487e317))
+
 ## [9.17.5](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.17.4...@wireapp/react-ui-kit@9.17.5) (2024-05-21)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
