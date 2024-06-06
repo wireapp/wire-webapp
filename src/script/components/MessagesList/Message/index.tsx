@@ -69,6 +69,7 @@ export interface MessageParams extends MessageActions {
   };
   messageRepository: MessageRepository;
   onVisible?: () => void;
+  onVisibilityLost?: () => void;
   selfId: QualifiedId;
   shouldShowInvitePeople: boolean;
   teamState?: TeamState;
@@ -88,6 +89,7 @@ export const Message = (props: MessageParams & {scrollTo?: ScrollToElement}) => 
     isHighlighted,
     hideHeader,
     onVisible,
+    onVisibilityLost,
     scrollTo,
     isFocused,
     handleFocus,
@@ -172,7 +174,13 @@ export const Message = (props: MessageParams & {scrollTo?: ScrollToElement}) => 
       onClick={() => handleFocus(message.id)}
     >
       {onVisible ? (
-        <InViewport requireFullyInView allowBiggerThanViewport checkOverlay onVisible={onVisible}>
+        <InViewport
+          requireFullyInView
+          allowBiggerThanViewport
+          checkOverlay
+          onVisible={onVisible}
+          onVisibilityLost={onVisibilityLost}
+        >
           {messageContent}
         </InViewport>
       ) : (

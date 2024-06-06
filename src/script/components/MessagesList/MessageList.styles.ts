@@ -17,13 +17,25 @@
  *
  */
 
-import {FEATURE_KEY, FeatureList} from '@wireapp/api-client/lib/team';
+import {CSSObject} from '@emotion/react';
 
-import {supportsMLS} from 'Util/util';
+export const jumpToLastMessageButtonStyles: CSSObject = {
+  position: 'absolute',
+  right: '10px',
+  height: '40px',
+  borderRadius: '100%',
+  bottom: '56px',
 
-export const getMLSConfig = (config: FeatureList): FeatureList[FEATURE_KEY.MLS] | undefined => {
-  if (!supportsMLS()) {
-    return undefined;
-  }
-  return config[FEATURE_KEY.MLS];
+  '@media (max-width: 768px)': {
+    bottom: '100px',
+  },
+};
+
+export const jumpToLastMessageChevronStyles: CSSObject = {
+  rotate: '90deg',
+  height: 16,
+  width: 16,
+  path: {
+    fill: 'var(--accent-color)',
+  },
 };

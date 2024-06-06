@@ -56,8 +56,8 @@ interface ShowConversationOptions {
 }
 
 interface ShowConversationOverload {
-  (conversation: Conversation | undefined, options: ShowConversationOptions): Promise<void>;
-  (conversationId: QualifiedId, options: ShowConversationOptions): Promise<void>;
+  (conversation: Conversation | undefined, options?: ShowConversationOptions): Promise<void>;
+  (conversationId: QualifiedId, options?: ShowConversationOptions): Promise<void>;
 }
 
 export class ContentViewModel {
@@ -92,7 +92,7 @@ export class ContentViewModel {
 
     const showMostRecentConversation = () => {
       const mostRecentConversation = this.conversationState.getMostRecentConversation();
-      this.showConversation(mostRecentConversation, {});
+      this.showConversation(mostRecentConversation);
     };
 
     this.userState.connectRequests.subscribe(requests => {
@@ -233,13 +233,13 @@ export class ContentViewModel {
    */
   readonly showConversation: ShowConversationOverload = async (
     conversation: Conversation | QualifiedId | undefined,
-    options: ShowConversationOptions,
+    options?: ShowConversationOptions,
   ) => {
     const {
       exposeMessage: exposeMessageEntity,
       openFirstSelfMention = false,
       openNotificationSettings = false,
-    } = options;
+    } = options || {};
 
     if (!conversation) {
       return this.handleMissingConversation();
