@@ -48,6 +48,7 @@ interface ConversationHeaderProps {
   setSearchValue: (searchValue: string) => void;
   searchInputPlaceholder: string;
   currentFolder?: ConversationLabel;
+  setIsConversationFilterFocused: (isFocused: boolean) => void;
 }
 
 export const ConversationHeader = ({
@@ -58,6 +59,7 @@ export const ConversationHeader = ({
   setSearchValue,
   currentFolder,
   searchInputPlaceholder,
+  setIsConversationFilterFocused,
 }: ConversationHeaderProps) => {
   const {canCreateGroupConversation} = generatePermissionHelpers(selfUser.teamRole());
   const isFolderView = currentTab === SidebarTabs.FOLDER;
@@ -97,6 +99,8 @@ export const ConversationHeader = ({
         <Input
           className="label-1"
           value={searchValue}
+          onFocus={() => setIsConversationFilterFocused(true)}
+          onBlur={() => setIsConversationFilterFocused(false)}
           onChange={event => setSearchValue(event.currentTarget.value)}
           startContent={<SearchIcon width={14} height={14} css={searchIconStyles} />}
           endContent={

@@ -105,6 +105,7 @@ const Conversations: React.FC<ConversationsProps> = ({
     setCurrentTab,
   } = useSidebarStore();
   const [conversationsFilter, setConversationsFilter] = useState<string>('');
+  const [isConversationFilterFocused, setIsConversationFilterFocused] = useState(false);
   const {classifiedDomains, isTeam} = useKoSubscribableChildren(teamState, ['classifiedDomains', 'isTeam']);
   const {connectRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
 
@@ -144,6 +145,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
   const {openFolder, closeFolder, expandedFolder, isFoldersTabOpen, toggleFoldersTab} = useFolderState();
   const {currentFocus, handleKeyDown, resetConversationFocus} = useConversationFocus(conversations);
+
   const {conversations: currentTabConversations, searchInputPlaceholder} = getTabConversations({
     currentTab,
     conversations,
@@ -201,6 +203,8 @@ const Conversations: React.FC<ConversationsProps> = ({
     };
   }, []);
 
+  const clearConversationFilter = () => setConversationsFilter('');
+
   function changeTab(nextTab: SidebarTabs, folderId?: string) {
     if (!folderId) {
       closeFolder();
@@ -215,7 +219,7 @@ const Conversations: React.FC<ConversationsProps> = ({
       onExitPreferences();
     }
 
-    setConversationsFilter('');
+    clearConversationFilter();
     setCurrentTab(nextTab);
   }
 
@@ -314,6 +318,7 @@ const Conversations: React.FC<ConversationsProps> = ({
             searchValue={conversationsFilter}
             setSearchValue={setConversationsFilter}
             searchInputPlaceholder={searchInputPlaceholder}
+            setIsConversationFilterFocused={setIsConversationFilterFocused}
           />
         }
         hasHeader={!isPreferences}
@@ -364,6 +369,8 @@ const Conversations: React.FC<ConversationsProps> = ({
                 conversations={currentTabConversations}
                 conversationRepository={conversationRepository}
                 resetConversationFocus={resetConversationFocus}
+                clearSearchFilter={clearConversationFilter}
+                isConversationFilterFocused={isConversationFilterFocused}
               />
             )}
           </>

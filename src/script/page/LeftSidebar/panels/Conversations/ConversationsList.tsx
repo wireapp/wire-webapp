@@ -58,6 +58,8 @@ interface ConversationsListProps {
   currentFolder?: ConversationLabel;
   resetConversationFocus: () => void;
   handleArrowKeyDown: (index: number) => (e: React.KeyboardEvent) => void;
+  clearSearchFilter: () => void;
+  isConversationFilterFocused: boolean;
 }
 
 export const ConversationsList = ({
@@ -72,6 +74,8 @@ export const ConversationsList = ({
   currentFolder,
   resetConversationFocus,
   handleArrowKeyDown,
+  clearSearchFilter,
+  isConversationFilterFocused,
 }: ConversationsListProps) => {
   const contentState = useAppState(state => state.contentState);
 
@@ -110,7 +114,7 @@ export const ConversationsList = ({
   };
 
   const getCommonConversationCellProps = (conversation: Conversation, index: number) => ({
-    isFocused: currentFocus === conversation.id,
+    isFocused: !isConversationFilterFocused && currentFocus === conversation.id,
     handleArrowKeyDown: handleArrowKeyDown(index),
     resetConversationFocus: resetConversationFocus,
     dataUieName: 'item-conversation',
@@ -121,6 +125,8 @@ export const ConversationsList = ({
       } else {
         createNavigate(generateConversationUrl(conversation.qualifiedId))(event);
       }
+
+      clearSearchFilter();
     },
     isSelected: isActiveConversation,
     onJoinCall: answerCall,
