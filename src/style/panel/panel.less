@@ -388,6 +388,18 @@
         .focus-offset;
         .focus-border-radius;
       }
+
+      &:first-child {
+        flex-grow: 1;
+        margin-left: var(--content-title-bar-height);
+        text-align: center;
+      }
+
+      &:last-child {
+        flex-grow: 1;
+        margin-right: var(--content-title-bar-height);
+        text-align: center;
+      }
     }
 
     &--reverse {
