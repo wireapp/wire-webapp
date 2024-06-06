@@ -1200,6 +1200,7 @@
   "preferencesAboutSupportWebsite": "Support website",
   "preferencesAboutTermsOfUse": "Terms of use",
   "preferencesAboutVersion": "Version {{version}}",
+  "preferencesAboutAVSVersion": "AVS version {{version}}",
   "preferencesAboutWebsite": "{{brandName}} website",
   "preferencesAccount": "Account",
   "preferencesAccountAccentColor": "Set a profile color",
