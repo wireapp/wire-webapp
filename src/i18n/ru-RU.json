@@ -1198,6 +1198,7 @@
   "preferencesAVTemporaryDisclaimer": "Гости не могут начинать групповые видеозвонки. Выберите камеру, которая будет использоваться если вы к ним присоединитесь.",
   "preferencesAVTryAgain": "Повторить попытку",
   "preferencesAbout": "О программе",
+  "preferencesAboutAVSVersion": "AVS version {{version}}",
   "preferencesAboutCopyright": "© Wire Swiss GmbH",
   "preferencesAboutPrivacyPolicy": "Политика конфиденциальности",
   "preferencesAboutSupport": "Поддержка",

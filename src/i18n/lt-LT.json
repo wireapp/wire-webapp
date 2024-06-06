@@ -1198,6 +1198,7 @@
   "preferencesAVTemporaryDisclaimer": "Svečiai negali pradėti vaizdo konferencijų. Pasirinkite norimą kamerą jei prisijungiate.",
   "preferencesAVTryAgain": "Bandykite dar kartą",
   "preferencesAbout": "Apie",
+  "preferencesAboutAVSVersion": "AVS version {{version}}",
   "preferencesAboutCopyright": "© Wire Swiss GmbH",
   "preferencesAboutPrivacyPolicy": "Privatumo politika",
   "preferencesAboutSupport": "Palaikymas",

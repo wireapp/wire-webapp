@@ -1198,6 +1198,7 @@
   "preferencesAVTemporaryDisclaimer": "ゲストはビデオ通話を開始できません。参加する場合は、使用するカメラを選択します。",
   "preferencesAVTryAgain": "再試行",
   "preferencesAbout": "概要",
+  "preferencesAboutAVSVersion": "AVS version {{version}}",
   "preferencesAboutCopyright": "© Wire Swiss GmbH",
   "preferencesAboutPrivacyPolicy": "プライバシー ポリシー",
   "preferencesAboutSupport": "サポート",
