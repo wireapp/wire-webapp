@@ -18,12 +18,15 @@
  */
 
 import {ImageSegmenterResult} from '@mediapipe/tasks-vision';
+// @ts-ignore
 import {createProgramFromSources} from 'webgl-utils.js';
 
+// @ts-ignore
 import fragmentShader from './fragmentShader.glsl';
+// @ts-ignore
 import vertexShader from './vertexShader.glsl';
 
-let program: any;
+let program: WebGLProgram;
 
 let locations: {
   position: number;
@@ -41,6 +44,7 @@ export function prepareWebglContext(canvas: HTMLCanvasElement, {width, height}: 
   if (!gl) {
     throw new Error('WebGL not supported');
   }
+
   program = createProgramFromSources(gl, [vertexShader, fragmentShader]);
   locations = {
     position: gl.getAttribLocation(program, 'a_position'),
