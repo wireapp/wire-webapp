@@ -33,7 +33,17 @@ const kernels = {
 
 let program: any;
 
-let locations: any;
+let locations: {
+  position: number;
+  texcoord: number;
+
+  resolution: WebGLUniformLocation | null;
+  textureSize: WebGLUniformLocation | null;
+  kernel: WebGLUniformLocation | null;
+  kernelWeight: WebGLUniformLocation | null;
+  flipY: WebGLUniformLocation | null;
+  mask: WebGLUniformLocation | null;
+};
 let buffers: any;
 
 export function prepareWebglContext(canvas: HTMLCanvasElement, {width, height}: {width: number; height: number}) {
@@ -51,6 +61,7 @@ export function prepareWebglContext(canvas: HTMLCanvasElement, {width, height}: 
     kernel: gl.getUniformLocation(program, 'u_kernel[0]'),
     kernelWeight: gl.getUniformLocation(program, 'u_kernelWeight'),
     flipY: gl.getUniformLocation(program, 'u_flipY'),
+    mask: gl.getUniformLocation(program, 'u_mask'),
   };
 
   // Create a buffer to put three 2d clip space points in
@@ -78,6 +89,7 @@ export function blur(
   {width, height}: {width: number; height: number},
 ) {
   // Create a texture and put the image in it.
+  gl.activeTexture(gl.TEXTURE0);
   const originalImageTexture = createAndSetupTexture(gl);
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, videoElement);
 
@@ -100,24 +112,21 @@ export function blur(
     gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
   }
 
-  //const maskLocation = gl.getUniformLocation(program, 'u_mask');
-
   drawEffects();
 
   function drawEffects() {
     // Clear the canvas
+    gl.viewport(0, 0, width, height);
     gl.clearColor(0, 0, 0, 0);
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     // Tell it to use our program (pair of shaders)
     gl.useProgram(program);
 
-    /*
-    const segmentationMask = segmentationResults.confidenceMasks[0].getAsWebGLTexture();
-    gl.activeTexture(gl.TEXTURE3);
-    gl.bindTexture(gl.TEXTURE_2D, segmentationMask);
-    gl.uniform1i(maskLocation, 3);
-    */
+    //const segmentationMask = segmentationResults.confidenceMasks[0].getAsWebGLTexture();
+    //gl.activeTexture(gl.TEXTURE1);
+    //gl.bindTexture(gl.TEXTURE_2D, segmentationMask);
+    //gl.uniform1i(locations.mask, 1);
 
     // Turn on the position attribute
     gl.enableVertexAttribArray(locations.position);

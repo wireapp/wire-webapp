@@ -82,7 +82,7 @@ async function createSegmenter(canvas: HTMLCanvasElement): Promise<ImageSegmente
       modelAssetPath: QualitySettings.segmentationModel,
       delegate: 'GPU',
     },
-    //canvas,
+    canvas,
     runningMode: 'VIDEO',
     outputCategoryMask: false,
     outputConfidenceMasks: true,
@@ -115,14 +115,8 @@ export async function applyBlur(originalStream: MediaStream): Promise<{stream: M
       glContext.height = videoDimensions.height;
       glContext.width = videoDimensions.width;
 
-      glContext.style.position = 'absolute';
-      glContext.style.top = '0';
-      glContext.style.left = '0';
-      glContext.style.zIndex = '100000';
-      document.body.appendChild(glContext);
-
-      const segmenter = await createSegmenter(glContext);
       const gl = prepareWebglContext(glContext, videoDimensions);
+      const segmenter = await createSegmenter(glContext);
 
       const stopBlurProcess = startBlurProcess(segmenter, gl, videoEl, videoDimensions);
       const videoStream = glContext.captureStream(QualitySettings.framerate).getVideoTracks()[0];
