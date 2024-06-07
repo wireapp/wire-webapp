@@ -118,7 +118,7 @@ export const EmojiPill = ({
   ]);
 
   return (
-    emojiCount && (
+    !!emojiCount && (
       <Tooltip
         body={
           <div css={messageReactionButtonTooltip}>
