@@ -95,6 +95,13 @@ const Config = {
   getConfig: () => {
     return config;
   },
+  getDesktopConfig: () => {
+    if (!Runtime.isDesktopApp) {
+      return undefined;
+    }
+
+    return window.desktopAppConfig;
+  },
 };
 
 export {Config};

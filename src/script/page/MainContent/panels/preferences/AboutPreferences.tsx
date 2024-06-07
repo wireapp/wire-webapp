@@ -41,6 +41,7 @@ interface AboutPreferencesProps {
 const AboutPreferences: React.FC<AboutPreferencesProps> = ({selfUser, teamState = container.resolve(TeamState)}) => {
   const inTeam = teamState.isInTeam(selfUser);
   const config = Config.getConfig();
+  const desktopConfig = Config.getDesktopConfig();
   const websiteUrl = URL.WEBSITE;
   const privacyPolicyUrl = getPrivacyPolicyUrl();
 
@@ -110,7 +111,12 @@ const AboutPreferences: React.FC<AboutPreferencesProps> = ({selfUser, teamState 
         </PreferencesSection>
       )}
       <PreferencesSection hasSeparator>
-        <p className="preferences-detail">{t('preferencesAboutVersion', config.VERSION)}</p>
+        {desktopConfig && (
+          <p className="preferences-detail">{t('preferencesAboutDesktopVersion', desktopConfig.version)}</p>
+        )}
+        <p className="preferences-detail">
+          {t('preferencesAboutVersion', {brandName: config.BRAND_NAME, version: config.VERSION})}
+        </p>
         <p className="preferences-detail">{t('preferencesAboutAVSVersion', config.AVS_VERSION)}</p>
         <p className="preferences-detail">{t('preferencesAboutCopyright')}</p>
       </PreferencesSection>
