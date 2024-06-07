@@ -20,6 +20,8 @@
 import {Runtime} from '@wireapp/commons';
 
 import {createUuid} from 'Util/uuid';
+
+import packageJson from '../../package.json';
 const env = window.wire.env;
 
 export const ACCENT_ID = {
@@ -83,6 +85,8 @@ const config = {
     clientToken: env.DATADOG_CLIENT_TOKEN,
     applicationId: env.DATADOG_APPLICATION_ID,
   },
+
+  AVS_VERSION: packageJson.dependencies['@wireapp/avs'],
 } as const;
 
 export type Configuration = typeof config;
