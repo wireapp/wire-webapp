@@ -27,12 +27,7 @@ import {Env} from './env';
 import {generateConfig as generateServerConfig} from './server.config';
 
 const versionData = readFileSync(path.resolve(__dirname, './version.json'), 'utf8');
-const packageJsonData = readFileSync(path.resolve(__dirname, '../../../package.json'), 'utf8');
-
 const version = versionData ? JSON.parse(versionData) : {version: 'unknown', commit: 'unknown'};
-const packageJson = packageJsonData ? JSON.parse(packageJsonData) : null;
-
-const readDependencyVersion = (name: string): string => packageJson?.dependencies?.[name] || 'unknown';
 
 const env = dotenv.load({
   includeProcessEnv: true,
@@ -62,9 +57,6 @@ function generateUrls() {
 const commonConfig = {
   commit: version.commit,
   version: version.version,
-  dependencies: {
-    avs: readDependencyVersion('@wireapp/avs'),
-  },
   env: env.NODE_ENV || 'production',
   urls: generateUrls(),
 };
