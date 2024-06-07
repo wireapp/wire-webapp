@@ -26,7 +26,4 @@ export type ConfigGeneratorParams = {
   };
   commit: string;
   version: string;
-  dependencies: {
-    avs: string;
-  };
 };
