@@ -1198,6 +1198,7 @@
   "preferencesAVTemporaryDisclaimer": "Gosti ne mogu pokrenuti video konferencije. Odaberite kameru za korištenje ukoliko se pridružite istoj.",
   "preferencesAVTryAgain": "Pokušajte ponovno",
   "preferencesAbout": "O programu",
+  "preferencesAboutAVSVersion": "AVS version {{version}}",
   "preferencesAboutCopyright": "© Wire Swiss GmbH",
   "preferencesAboutPrivacyPolicy": "Pravilnik o zaštiti privatnosti",
   "preferencesAboutSupport": "Podrška",

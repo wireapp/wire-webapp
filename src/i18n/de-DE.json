@@ -1198,6 +1198,7 @@
   "preferencesAVTemporaryDisclaimer": "Gäste können Videokonferenzen nicht selbst starten. Wählen Sie die Kamera aus, die bei der Teilnahme verwendet werden soll.",
   "preferencesAVTryAgain": "Erneut versuchen",
   "preferencesAbout": "Über Wire",
+  "preferencesAboutAVSVersion": "AVS-Version {{version}}",
   "preferencesAboutCopyright": "© Wire Swiss GmbH",
   "preferencesAboutPrivacyPolicy": "Datenschutzrichtlinie",
   "preferencesAboutSupport": "Support",

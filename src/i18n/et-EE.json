@@ -1198,6 +1198,7 @@
   "preferencesAVTemporaryDisclaimer": "Külalised ei saa alustada videokonverentse. Vali kasutatav kaamera, kui liitud mõnega.",
   "preferencesAVTryAgain": "Proovi uuesti",
   "preferencesAbout": "Teave",
+  "preferencesAboutAVSVersion": "AVS version {{version}}",
   "preferencesAboutCopyright": "© Wire Swiss GmbH",
   "preferencesAboutPrivacyPolicy": "Privaatsuspoliitika",
   "preferencesAboutSupport": "Klienditugi",

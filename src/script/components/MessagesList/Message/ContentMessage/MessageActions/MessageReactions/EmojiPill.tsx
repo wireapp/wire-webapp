@@ -118,47 +118,49 @@ export const EmojiPill = ({
   ]);
 
   return (
-    <Tooltip
-      body={
-        <div css={messageReactionButtonTooltip}>
-          <EmojiChar styles={messageReactionButtonTooltipImage} emoji={emoji} />
-          <p css={messageReactionButtonTooltipText}>
-            {content}{' '}
-            {emojiCount > 1
-              ? t('conversationLikesCaptionReactedPlural', {emojiName})
-              : t('conversationLikesCaptionReactedSingular', {emojiName})}
-          </p>
-        </div>
-      }
-    >
-      <button
-        css={{...messageReactionButton, ...getReactionsButtonCSS(isActive, isRemovedFromConversation)}}
-        aria-label={
-          emojiCount > 1
-            ? t('accessibility.messageReactionDetailsPlural', {emojiCount: emojiCount.toString(), emojiName})
-            : t('accessibility.messageReactionDetailsSingular', {emojiCount: emojiCount.toString(), emojiName})
+    !!emojiCount && (
+      <Tooltip
+        body={
+          <div css={messageReactionButtonTooltip}>
+            <EmojiChar styles={messageReactionButtonTooltipImage} emoji={emoji} />
+            <p css={messageReactionButtonTooltipText}>
+              {content}{' '}
+              {emojiCount > 1
+                ? t('conversationLikesCaptionReactedPlural', {emojiName})
+                : t('conversationLikesCaptionReactedSingular', {emojiName})}
+            </p>
+          </div>
         }
-        title={emojiName}
-        aria-pressed={isActive}
-        type="button"
-        tabIndex={messageFocusedTabIndex}
-        className="button-reset-default"
-        data-uie-name="emoji-pill"
-        onClick={() => {
-          handleReactionClick(emoji);
-        }}
-        onKeyDown={event => {
-          // is last reaction then on tab key press it should hide the reaction menu
-          if (index === emojiListCount - 1) {
-            if (!event.shiftKey && isTabKey(event)) {
-              onLastReactionKeyEvent();
-            }
-          }
-        }}
       >
-        <EmojiChar emoji={emoji} />
-        <span css={messageReactionCount(isActive)}>{emojiCount}</span>
-      </button>
-    </Tooltip>
+        <button
+          css={{...messageReactionButton, ...getReactionsButtonCSS(isActive, isRemovedFromConversation)}}
+          aria-label={
+            emojiCount > 1
+              ? t('accessibility.messageReactionDetailsPlural', {emojiCount: emojiCount.toString(), emojiName})
+              : t('accessibility.messageReactionDetailsSingular', {emojiCount: emojiCount.toString(), emojiName})
+          }
+          title={emojiName}
+          aria-pressed={isActive}
+          type="button"
+          tabIndex={messageFocusedTabIndex}
+          className="button-reset-default"
+          data-uie-name="emoji-pill"
+          onClick={() => {
+            handleReactionClick(emoji);
+          }}
+          onKeyDown={event => {
+            // is last reaction then on tab key press it should hide the reaction menu
+            if (index === emojiListCount - 1) {
+              if (!event.shiftKey && isTabKey(event)) {
+                onLastReactionKeyEvent();
+              }
+            }
+          }}
+        >
+          <EmojiChar emoji={emoji} />
+          <span css={messageReactionCount(isActive)}>{emojiCount}</span>
+        </button>
+      </Tooltip>
+    )
   );
 };

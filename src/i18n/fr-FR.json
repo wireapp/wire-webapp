@@ -1198,6 +1198,7 @@
   "preferencesAVTemporaryDisclaimer": "Les invités ne peuvent pas démarrer de vidéoconférences. Sélectionnez la caméra à utiliser si vous en rejoignez une.",
   "preferencesAVTryAgain": "Réessayez",
   "preferencesAbout": "À propos",
+  "preferencesAboutAVSVersion": "AVS version {{version}}",
   "preferencesAboutCopyright": "© Wire Swiss GmbH",
   "preferencesAboutPrivacyPolicy": "Politique de confidentialité",
   "preferencesAboutSupport": "Assistance",
