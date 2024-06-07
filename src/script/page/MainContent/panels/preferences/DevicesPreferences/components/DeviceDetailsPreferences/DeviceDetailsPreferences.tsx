@@ -28,6 +28,7 @@ import {t} from 'Util/LocalizerUtil';
 
 import {Config} from '../../../../../../../Config';
 import {MotionDuration} from '../../../../../../../motion/MotionDuration';
+import {contentStyle} from '../../../components/PreferencesPage.styles';
 import {DetailedDevice} from '../DetailedDevice';
 
 interface DevicesPreferencesProps {
@@ -79,7 +80,7 @@ export const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
     >
       <h2 className="preferences-titlebar">{t('preferencesDeviceDetails')}</h2>
 
-      <div className="preferences-content">
+      <div className="preferences-content" css={contentStyle}>
         <fieldset className="preferences-section">
           <legend className="preferences-devices-details">
             <button
