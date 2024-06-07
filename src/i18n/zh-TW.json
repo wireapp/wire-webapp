@@ -1198,6 +1198,7 @@
   "preferencesAVTemporaryDisclaimer": "Guests can’t start video conferences. Select the camera to use if you join one.",
   "preferencesAVTryAgain": "Try Again",
   "preferencesAbout": "關於",
+  "preferencesAboutAVSVersion": "AVS version {{version}}",
   "preferencesAboutCopyright": "© Wire Swiss GmbH",
   "preferencesAboutPrivacyPolicy": "隱私權政策",
   "preferencesAboutSupport": "支援",

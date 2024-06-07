@@ -1198,6 +1198,7 @@
   "preferencesAVTemporaryDisclaimer": "Гості не можуть розпочинати відеоконференції. Оберіть, яку з камер ви хотіли б використовувати при підключенні до відеоконференції.",
   "preferencesAVTryAgain": "Спробувати ще раз",
   "preferencesAbout": "Про програму",
+  "preferencesAboutAVSVersion": "AVS version {{version}}",
   "preferencesAboutCopyright": "© Wire Swiss GmbH",
   "preferencesAboutPrivacyPolicy": "Політика конфіденційності",
   "preferencesAboutSupport": "Підтримка",
