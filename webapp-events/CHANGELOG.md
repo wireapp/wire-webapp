@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.22.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.21.1...@wireapp/webapp-events@0.22.0) (2024-06-10)
+
+### Features
+
+* **webapp-events:** add search shortcut ([#6288](https://github.com/wireapp/wire-web-packages/issues/6288)) ([ef84080](https://github.com/wireapp/wire-web-packages/commit/ef84080e389b3fac2bbc43955ba8a66efb08922d))
+
 ## [0.21.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.21.0...@wireapp/webapp-events@0.21.1) (2024-05-21)
 
 **Note:** Version bump only for package @wireapp/webapp-events
