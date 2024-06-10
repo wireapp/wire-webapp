@@ -19,7 +19,7 @@
 
 import {ImageSegmenter, FilesetResolver} from '@mediapipe/tasks-vision';
 
-import {blur, prepareWebglContext} from './Blurrer';
+import {blur, initShaderProgram} from './Blurrer';
 
 enum SEGMENTATION_MODEL {
   QUALITY = './assets/mediapipe-models/selfie_multiclass_256x256.tflite',
@@ -57,7 +57,6 @@ function startBlurProcess(
   if (elapsed > fpsInterval) {
     then = now - (elapsed % fpsInterval);
 
-    //ctx.drawImage(videoEl, 0, 0, width, height);
     const startTimeMs = performance.now();
 
     try {
@@ -115,7 +114,7 @@ export async function applyBlur(originalStream: MediaStream): Promise<{stream: M
       glContext.height = videoDimensions.height;
       glContext.width = videoDimensions.width;
 
-      const gl = prepareWebglContext(glContext, videoDimensions);
+      const gl = initShaderProgram(glContext, videoDimensions);
       const segmenter = await createSegmenter(glContext);
 
       const stopBlurProcess = startBlurProcess(segmenter, gl, videoEl, videoDimensions);

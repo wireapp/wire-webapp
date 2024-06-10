@@ -12,6 +12,8 @@ varying vec2 v_texCoord;
 
 void main() {
     vec2 onePixel = vec2(1.0, 1.0) / u_textureSize;
+    // FIXME currently we choose either the pixel of the original image or we blur it.
+    // This creates a rather rough transition. We need to find a way to smooth the edges and avoid pixelated transitions.
     if (texture2D(u_mask, v_texCoord).r == 1.0) {
         gl_FragColor = texture2D(u_image, v_texCoord);
     } else {

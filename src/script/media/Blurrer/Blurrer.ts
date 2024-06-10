@@ -28,17 +28,21 @@ import vertexShader from './vertexShader.glsl';
 
 let program: WebGLProgram;
 
+// Locations of all the values we want to pass from javascript to the shaders
 let locations: {
   position: number;
   texcoord: number;
 
+  /* the resolution of the image */
   resolution: WebGLUniformLocation | null;
+  /* the size of the texture */
   textureSize: WebGLUniformLocation | null;
+  /* the mask to apply computed from the segmentation */
   mask: WebGLUniformLocation | null;
 };
-let buffers: any;
+let buffers: {position: WebGLBuffer | null; textcoord: WebGLBuffer | null};
 
-export function prepareWebglContext(canvas: HTMLCanvasElement, {width, height}: {width: number; height: number}) {
+export function initShaderProgram(canvas: HTMLCanvasElement, {width, height}: {width: number; height: number}) {
   const gl = canvas.getContext('webgl2');
   if (!gl) {
     throw new Error('WebGL not supported');
@@ -78,11 +82,6 @@ export function blur(
   gl: WebGLRenderingContext,
   {width, height}: {width: number; height: number},
 ) {
-  // Create a texture and put the image in it.
-  gl.activeTexture(gl.TEXTURE0);
-  const originalImageTexture = createAndSetupTexture(gl);
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, videoElement);
-
   // Clear the canvas
   gl.viewport(0, 0, width, height);
   gl.clearColor(0, 0, 0, 0);
@@ -91,12 +90,9 @@ export function blur(
   // Tell it to use our program (pair of shaders)
   gl.useProgram(program);
 
-  // Turn on the position attribute
-  gl.enableVertexAttribArray(locations.position);
-
   // Bind the position buffer.
+  gl.enableVertexAttribArray(locations.position);
   gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position);
-
   // Tell the position attribute how to get data out of positionBuffer (ARRAY_BUFFER)
   const size = 2; // 2 components per iteration
   const type = gl.FLOAT; // the data is 32bit floats
@@ -105,37 +101,30 @@ export function blur(
   const offset = 0; // start at the beginning of the buffer
   gl.vertexAttribPointer(locations.position, size, type, normalize, stride, offset);
 
-  // Turn on the texcoord attribute
-  gl.enableVertexAttribArray(locations.texcoord);
-
-  // Assiging the segmentation mask to the mask uniform (so that it's accessible to the shader)
-  const segmentationMask = segmentationResults.confidenceMasks[0].getAsWebGLTexture();
-  gl.activeTexture(gl.TEXTURE1);
-  gl.bindTexture(gl.TEXTURE_2D, segmentationMask);
-  gl.uniform1i(locations.mask, 1);
-
   // bind the texcoord buffer.
+  gl.enableVertexAttribArray(locations.texcoord);
   gl.bindBuffer(gl.ARRAY_BUFFER, buffers.textcoord);
-
   gl.vertexAttribPointer(locations.texcoord, size, type, normalize, stride, offset);
 
   // set the size of the image
   gl.uniform2f(locations.textureSize, width, height);
 
   // start with the original image
+  // Create a texture and put the image in it.
+  const originalImageTexture = createAndSetupTexture(gl);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, videoElement);
   gl.activeTexture(gl.TEXTURE0);
   gl.bindTexture(gl.TEXTURE_2D, originalImageTexture);
 
-  setFramebuffer(gl, null, width, height);
-  draw(gl);
-}
+  // Assiging the segmentation mask to the mask uniform (so that it's accessible to the shader)
+  const segmentationMask = segmentationResults.confidenceMasks?.[0].getAsWebGLTexture() ?? null;
+  gl.activeTexture(gl.TEXTURE1);
+  gl.bindTexture(gl.TEXTURE_2D, segmentationMask);
+  gl.uniform1i(locations.mask, 1);
 
-function draw(gl: WebGLRenderingContext) {
-  // Draw the rectangle.
-  const primitiveType = gl.TRIANGLES;
-  const offset = 0;
-  const count = 6;
-  gl.drawArrays(primitiveType, offset, count);
+  setFramebuffer(gl, null, width, height);
+
+  gl.drawArrays(gl.TRIANGLES, 0, 6 /* we draw a rectangle with 2 triangles (so 6 points) */);
 }
 
 function setFramebuffer(gl: WebGLRenderingContext, fbo: WebGLFramebuffer | null, width: number, height: number) {
