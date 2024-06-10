@@ -19,6 +19,7 @@
 
 import cx from 'classnames';
 
+import {DeliveredIndicator} from 'Components/MessagesList/Message/DeliveredIndicator/DeliveredIndicator';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {ReadReceiptStatus} from './ReadReceiptStatus';
@@ -38,29 +39,28 @@ const PingMessage = ({message, is1to1Conversation, isLastDeliveredMessage}: Ping
   );
 
   return (
-    <div className="message-header" data-uie-name="element-message-ping">
-      <div className="message-header-icon">
-        <div className={`icon-ping ${get_icon_classes}`} />
-      </div>
-      <div
-        className={cx('message-header-label', {
-          'ephemeral-message-obfuscated': isObfuscated,
-        })}
-        title={ephemeral_caption}
-        data-uie-name="element-message-ping-text"
-      >
-        <p className="message-header-label__multiline">
-          <span className="message-header-sender-name">{unsafeSenderName}</span>
-          <span className="ellipsis">{caption}</span>
-        </p>
+    <>
+      <div className="message-header" data-uie-name="element-message-ping">
+        <div className="message-header-icon">
+          <div className={`icon-ping ${get_icon_classes}`} />
+        </div>
+        <div
+          className={cx('message-header-label', {
+            'ephemeral-message-obfuscated': isObfuscated,
+          })}
+          title={ephemeral_caption}
+          data-uie-name="element-message-ping-text"
+        >
+          <p className="message-header-label__multiline">
+            <span className="message-header-sender-name">{unsafeSenderName}</span>
+            <span className="ellipsis">{caption}</span>
+          </p>
 
-        <ReadReceiptStatus
-          message={message}
-          is1to1Conversation={is1to1Conversation}
-          isLastDeliveredMessage={isLastDeliveredMessage}
-        />
+          <ReadReceiptStatus message={message} is1to1Conversation={is1to1Conversation} />
+        </div>
       </div>
-    </div>
+      <DeliveredIndicator isLastDeliveredMessage={isLastDeliveredMessage} />
+    </>
   );
 };
 
