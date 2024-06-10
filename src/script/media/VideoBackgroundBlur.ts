@@ -60,10 +60,9 @@ function startBlurProcess(
     const startTimeMs = performance.now();
 
     try {
-      segmenter.segmentForVideo(videoEl, startTimeMs, result => {
-        blurBackground(result, videoEl, webGlContext, videoDimensions);
-        result.close();
-      });
+      segmenter.segmentForVideo(videoEl, startTimeMs, result =>
+        blurBackground(result, videoEl, webGlContext, videoDimensions),
+      );
     } catch (error) {
       console.error('Failed to segment video', error);
     }
