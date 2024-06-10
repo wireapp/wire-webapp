@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [27.0.7](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.0.6...@wireapp/api-client@27.0.7) (2024-06-10)
+
+### Bug Fixes
+
+* **api-client:** socket reconnect after coming back from sleep ([#6287](https://github.com/wireapp/wire-web-packages/issues/6287)) ([12a113a](https://github.com/wireapp/wire-web-packages/commit/12a113ad5c30069d9388614de6738466d80b5e5c))
+
 ## [27.0.6](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@27.0.5...@wireapp/api-client@27.0.6) (2024-06-10)
 
 **Note:** Version bump only for package @wireapp/api-client
