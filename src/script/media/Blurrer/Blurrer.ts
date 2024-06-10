@@ -34,7 +34,6 @@ let locations: {
 
   resolution: WebGLUniformLocation | null;
   textureSize: WebGLUniformLocation | null;
-  flipY: WebGLUniformLocation | null;
   mask: WebGLUniformLocation | null;
 };
 let buffers: any;
@@ -52,7 +51,6 @@ export function prepareWebglContext(canvas: HTMLCanvasElement, {width, height}: 
 
     resolution: gl.getUniformLocation(program, 'u_resolution'),
     textureSize: gl.getUniformLocation(program, 'u_textureSize'),
-    flipY: gl.getUniformLocation(program, 'u_flipY'),
     mask: gl.getUniformLocation(program, 'u_mask'),
   };
 
@@ -128,8 +126,6 @@ export function blur(
   gl.activeTexture(gl.TEXTURE0);
   gl.bindTexture(gl.TEXTURE_2D, originalImageTexture);
 
-  // finally draw the result to the canvas.
-  gl.uniform1f(locations.flipY, -1); // need to y flip for canvas
   setFramebuffer(gl, null, width, height);
   draw(gl);
 }
