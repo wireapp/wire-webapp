@@ -19,7 +19,7 @@
 
 import {ImageSegmenter, FilesetResolver} from '@mediapipe/tasks-vision';
 
-import {VideoDimensions, blur, initShaderProgram} from './Blurrer';
+import {VideoDimensions, blur, initShaderProgram} from './BackgroundBlurrer';
 
 enum SEGMENTATION_MODEL {
   QUALITY = './assets/mediapipe-models/selfie_multiclass_256x256.tflite',

@@ -30,7 +30,7 @@ export type VideoDimensions = {width: number; height: number};
 
 let program: WebGLProgram;
 
-// Locations of all the values we want to pass from javascript to the shaders
+/** Locations of all the values we want to pass from javascript to the shaders */
 let locations: {
   position: number;
   texcoord: number;
@@ -42,7 +42,10 @@ let locations: {
   /* the mask to apply computed from the segmentation */
   mask: WebGLUniformLocation | null;
 };
-let buffers: {position: WebGLBuffer | null; textcoord: WebGLBuffer | null};
+let buffers: {
+  position: WebGLBuffer | null;
+  textcoord: WebGLBuffer | null;
+};
 
 /**
  * Will:
@@ -78,6 +81,7 @@ export function initShaderProgram(canvas: HTMLCanvasElement, {width, height}: Vi
   gl.bindBuffer(gl.ARRAY_BUFFER, buffers.textcoord);
   gl.bufferData(
     gl.ARRAY_BUFFER,
+    // This represents the 6 points of the 2 triangles reprensenting the restangle we want to paint
     new Float32Array([0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0]),
     gl.STATIC_DRAW,
   );
