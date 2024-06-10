@@ -222,6 +222,7 @@ export const WebAppEvents = {
     SILENCE: 'wire.webapp.shortcut.silence', // todo: deprecated - remove when user base of wrappers version >= 3.4 is
     // large enough
     START: 'wire.webapp.shortcut.start',
+    SEARCH: 'wire.webapp.shortcut.search',
   },
   SIGN_OUT: 'wire.webapp.logout',
   STORAGE: {
