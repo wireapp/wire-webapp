@@ -1,3 +1,5 @@
+#define BLUR_QUALITY 8 //The higher the value, the more blur. Must be an even number.
+
 precision mediump float;
 
 // our texture
@@ -18,11 +20,11 @@ void main() {
         gl_FragColor = texture2D(u_image, v_texCoord);
     } else {
         vec4 colorSum;
-        for (int i = -8; i < 8; i++) {
-            for (int j = -8; j < 8; j++) {
+        for (int i = -BLUR_QUALITY; i < BLUR_QUALITY; i++) {
+            for (int j = -BLUR_QUALITY; j < BLUR_QUALITY; j++) {
                 colorSum += texture2D(u_image, v_texCoord + onePixel * vec2(i, j));
             }
         }
-        gl_FragColor = vec4((colorSum / 256.0).rgb, 1);
+        gl_FragColor = vec4((colorSum / (float(BLUR_QUALITY) * float(BLUR_QUALITY) * 4.0)).rgb, 1);
     }
 }
