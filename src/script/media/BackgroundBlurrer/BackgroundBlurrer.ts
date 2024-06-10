@@ -97,7 +97,7 @@ export function initShaderProgram(canvas: HTMLCanvasElement, {width, height}: Vi
  * @param gl the webgl context
  * @param param3 the width and height of the video
  */
-export function blur(
+export function blurBackground(
   segmentationResults: ImageSegmenterResult,
   videoElement: HTMLVideoElement,
   gl: WebGLRenderingContext,

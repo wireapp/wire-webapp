@@ -19,7 +19,7 @@
 
 import {ImageSegmenter, FilesetResolver} from '@mediapipe/tasks-vision';
 
-import {VideoDimensions, blur, initShaderProgram} from './BackgroundBlurrer';
+import {VideoDimensions, blurBackground, initShaderProgram} from './BackgroundBlurrer';
 
 enum SEGMENTATION_MODEL {
   QUALITY = './assets/mediapipe-models/selfie_multiclass_256x256.tflite',
@@ -61,7 +61,7 @@ function startBlurProcess(
 
     try {
       segmenter.segmentForVideo(videoEl, startTimeMs, result => {
-        blur(result, videoEl, webGlContext, videoDimensions);
+        blurBackground(result, videoEl, webGlContext, videoDimensions);
         result.close();
       });
     } catch (error) {
@@ -90,17 +90,18 @@ async function createSegmenter(canvas: HTMLCanvasElement): Promise<ImageSegmente
 
 /**
  * Will create a new MediaStream that will both segment each frame and apply a blur effect to the background.
- * @param originalStream  the stream that contains the video that needs background blur
+ * @param originalStream the stream that contains the video that needs background blur
  * @returns a promise that resolves to an object containing the new MediaStream and a release function to stop the blur process
  */
-export async function applyBlur(originalStream: MediaStream): Promise<{stream: MediaStream; release: () => void}> {
+export async function applyBlur(stream: MediaStream): Promise<{stream: MediaStream; release: () => void}> {
   // Create a video element to display the webcam feed
   const videoEl = document.createElement('video');
   // Create a canvas element that will be to draw the blurred frames
   // Store the video dimensions
   const videoDimensions = {width: 0, height: 0};
 
-  videoEl.srcObject = originalStream.clone();
+  const originalStream = stream.clone();
+  videoEl.srcObject = originalStream;
   videoEl.onloadedmetadata = () => {
     // Ensure metadata is loaded to get video dimensions
     videoDimensions.width = videoEl.videoWidth || 1240;
