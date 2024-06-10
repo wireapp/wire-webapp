@@ -182,9 +182,9 @@ export class WebSocketClient extends EventEmitter {
     }
   }
 
-  public disconnect(reason?: string, keepClosed = true): void {
+  public disconnect(reason?: string): void {
     if (this.socket) {
-      this.socket.disconnect(reason, keepClosed);
+      this.socket.disconnect(reason);
     }
   }
 
