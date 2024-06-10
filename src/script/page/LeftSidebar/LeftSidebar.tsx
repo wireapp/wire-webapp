@@ -24,6 +24,8 @@ import cx from 'classnames';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/state';
+
 import {Conversations} from './panels/Conversations';
 import {TemporaryGuestConversations} from './panels/TemporatyGuestConversations';
 
@@ -44,8 +46,17 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({listViewModel, selfUser, isAct
 
   const switchList = (list: ListState) => listViewModel.switchList(list);
 
+  const {setCurrentTab} = useSidebarStore();
+
   useEffect(() => {
-    amplify.subscribe(WebAppEvents.SHORTCUT.START, () => switchList(ListState.START_UI));
+    amplify.subscribe(WebAppEvents.SHORTCUT.START, () => {
+      amplify.publish(WebAppEvents.CONVERSATION.CREATE_GROUP, 'conversation_details');
+    });
+
+    amplify.subscribe(WebAppEvents.SHORTCUT.SEARCH, () => {
+      setCurrentTab(SidebarTabs.RECENT);
+      switchList(ListState.START_UI);
+    });
   }, []);
 
   return (
