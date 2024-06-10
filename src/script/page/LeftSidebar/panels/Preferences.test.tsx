@@ -44,12 +44,12 @@ describe('Preferences', () => {
     expect(queryByText('preferencesAV')).toBeNull();
   });
 
-  it('renders the about section in a web app', () => {
+  it('renders the about section in a desktop app', () => {
     jest.spyOn(Runtime, 'isDesktopApp').mockReturnValue(true);
     jest.spyOn(Runtime, 'isSupportingLegacyCalling').mockReturnValue(false);
     const {queryByText} = render(<Preferences {...defaultParams} />);
     expect(queryByText('preferencesAV')).toBeNull();
-    expect(queryByText('preferencesAbout')).toBeNull();
+    expect(queryByText('preferencesAbout')).not.toBeNull();
   });
 
   it('renders the a/v section in a desktop app', () => {
