@@ -24,6 +24,7 @@ import {TimeUtil} from '@wireapp/commons';
 
 import * as buffer from '../shims/node/buffer';
 import {WebSocketNode} from '../shims/node/websocket';
+import {onBackFromSleep} from '../utils/BackFromSleepHandler';
 
 export enum CloseEventCode {
   NORMAL_CLOSURE = 1000,
@@ -82,6 +83,22 @@ export class ReconnectingWebsocket {
     }
 
     this.hasUnansweredPing = false;
+
+    /**
+     * According to https://developer.mozilla.org/en-US/docs/Web/API/Navigator/onLine, navigator.onLine attribute and 'online' and 'offline' events are not reliable enough (especially when it's truthy).
+     * We won't receive the 'offline' event when the system goes to sleep (e.g. closing the lid of a laptop).
+     * In this case navigator.onLine will still return true, but the WebSocket connection could be closed.
+     * To handle this, we need a custom approach to detect when the system goes to sleep and when it wakes up.
+     * **/
+    onBackFromSleep({
+      callback: () => {
+        if (this.socket) {
+          this.logger.debug('Back from sleep, reconnecting WebSocket');
+          this.socket?.reconnect();
+        }
+      },
+      isDisconnected: () => this.getState() === WEBSOCKET_STATE.CLOSED,
+    });
   }
 
   private readonly internalOnError = (error: ErrorEvent) => {
@@ -173,16 +190,10 @@ export class ReconnectingWebsocket {
     return this.socket ? this.socket.readyState : WEBSOCKET_STATE.CLOSED;
   }
 
-  public disconnect(reason = 'Closed by client', keepClosed = true): void {
+  public disconnect(reason = 'Closed by client'): void {
     if (this.socket) {
       this.logger.info(`Disconnecting from WebSocket (reason: "${reason}")`);
-      // TODO: 'any' can be removed once this issue is resolved:
-      // https://github.com/pladaria/reconnecting-websocket/issues/44
-      (this.socket as any).close(CloseEventCode.NORMAL_CLOSURE, reason, {
-        delay: 0,
-        fastClose: true,
-        keepClosed,
-      });
+      this.socket.close(CloseEventCode.NORMAL_CLOSURE, reason);
     }
   }
 
