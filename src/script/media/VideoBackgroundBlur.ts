@@ -19,7 +19,7 @@
 
 import {ImageSegmenter, FilesetResolver} from '@mediapipe/tasks-vision';
 
-import {blur, initShaderProgram} from './Blurrer';
+import {VideoDimensions, blur, initShaderProgram} from './Blurrer';
 
 enum SEGMENTATION_MODEL {
   QUALITY = './assets/mediapipe-models/selfie_multiclass_256x256.tflite',
@@ -48,7 +48,7 @@ function startBlurProcess(
   segmenter: ImageSegmenter,
   webGlContext: WebGLRenderingContext,
   videoEl: HTMLVideoElement,
-  {width, height}: {width: number; height: number},
+  videoDimensions: VideoDimensions,
 ) {
   now = Date.now();
   elapsed = now - then;
@@ -61,14 +61,14 @@ function startBlurProcess(
 
     try {
       segmenter.segmentForVideo(videoEl, startTimeMs, result => {
-        blur(result, videoEl, webGlContext, {width, height});
+        blur(result, videoEl, webGlContext, videoDimensions);
         result.close();
       });
     } catch (error) {
       console.error('Failed to segment video', error);
     }
   }
-  rafId = window.requestAnimationFrame(() => startBlurProcess(segmenter, webGlContext, videoEl, {width, height}));
+  rafId = window.requestAnimationFrame(() => startBlurProcess(segmenter, webGlContext, videoEl, videoDimensions));
   return () => {
     window.cancelAnimationFrame(rafId);
   };

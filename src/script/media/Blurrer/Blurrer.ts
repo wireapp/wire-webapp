@@ -26,6 +26,8 @@ import fragmentShader from './fragmentShader.glsl';
 // @ts-ignore
 import vertexShader from './vertexShader.glsl';
 
+export type VideoDimensions = {width: number; height: number};
+
 let program: WebGLProgram;
 
 // Locations of all the values we want to pass from javascript to the shaders
@@ -42,7 +44,14 @@ let locations: {
 };
 let buffers: {position: WebGLBuffer | null; textcoord: WebGLBuffer | null};
 
-export function initShaderProgram(canvas: HTMLCanvasElement, {width, height}: {width: number; height: number}) {
+/**
+ * Will:
+ *  - setup the shader program for the webgl context
+ *  - setup all the variable locations that we want to send from javascript to the shaders
+ * @param canvas the canvas in which to init the webgl context
+ * @param dimension the dimensions (width, height) of the video that we want to blur
+ */
+export function initShaderProgram(canvas: HTMLCanvasElement, {width, height}: VideoDimensions) {
   const gl = canvas.getContext('webgl2');
   if (!gl) {
     throw new Error('WebGL not supported');
@@ -76,11 +85,19 @@ export function initShaderProgram(canvas: HTMLCanvasElement, {width, height}: {w
   return gl;
 }
 
+/**
+ * Will blur a single frame of the given video.
+ * It will apply the segmentation mask on the area of the image we do not want to blur
+ * @param segmentationResults results from the segmentation
+ * @param videoElement the video element that plays the video we want to blur
+ * @param gl the webgl context
+ * @param param3 the width and height of the video
+ */
 export function blur(
   segmentationResults: ImageSegmenterResult,
   videoElement: HTMLVideoElement,
   gl: WebGLRenderingContext,
-  {width, height}: {width: number; height: number},
+  {width, height}: VideoDimensions,
 ) {
   // Clear the canvas
   gl.viewport(0, 0, width, height);
