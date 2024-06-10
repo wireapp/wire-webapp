@@ -1199,7 +1199,7 @@
   "preferencesAboutSupportContact": "Contact Support",
   "preferencesAboutSupportWebsite": "Support website",
   "preferencesAboutTermsOfUse": "Terms of use",
-  "preferencesAboutVersion": "{{brandName}} for Web version {{version}}",
+  "preferencesAboutVersion": "{{brandName}} for web version {{version}}",
   "preferencesAboutDesktopVersion": "Desktop version {{version}}",
   "preferencesAboutAVSVersion": "AVS version {{version}}",
   "preferencesAboutWebsite": "{{brandName}} website",
