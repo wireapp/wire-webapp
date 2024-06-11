@@ -327,7 +327,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
         accountInfo.availability = this.userState.self().availability();
       }
 
-      this.logger.log('Publishing account info', accountInfo);
+      this.logger.log('Publishing account info', JSON.stringify(accountInfo));
       amplify.publish(WebAppEvents.TEAM.INFO, accountInfo);
       return accountInfo;
     }
@@ -430,7 +430,10 @@ export class TeamRepository extends TypedEventEmitter<Events> {
   }
 
   private onUnhandled(eventJson: TeamEvent): void {
-    this.logger.log(`Received '${eventJson.type}' event from backend which is not yet handled`, eventJson);
+    this.logger.log(
+      `Received '${eventJson.type}' event from backend which is not yet handled`,
+      JSON.stringify(eventJson),
+    );
   }
 
   public getTeamSupportedProtocols(): ConversationProtocol[] {
