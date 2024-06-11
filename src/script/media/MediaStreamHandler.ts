@@ -60,10 +60,10 @@ export class MediaStreamHandler {
     }
   }
 
-  async requestMediaStream(audio: boolean, video: boolean, screen: boolean, isGroup: boolean): Promise<MediaStream> {
+  requestMediaStream(audio: boolean, video: boolean, screen: boolean, isGroup: boolean): Promise<MediaStream> {
     const hasPermission = this.hasPermissionToAccess(audio, video);
     try {
-      return await this.getMediaStream(audio, video, screen, isGroup, hasPermission);
+      return this.getMediaStream(audio, video, screen, isGroup, hasPermission);
     } catch (error) {
       const isPermissionDenied = error.type === PermissionError.TYPE.DENIED;
       throw isPermissionDenied
@@ -119,8 +119,8 @@ export class MediaStreamHandler {
     const mediaStreamTracks = this.getMediaTracks(mediaStream, mediaType);
 
     mediaStreamTracks.forEach((mediaStreamTrack: MediaStreamTrack) => {
-      mediaStream.removeTrack(mediaStreamTrack);
       mediaStreamTrack.stop();
+      mediaStream.removeTrack(mediaStreamTrack);
       this.logger.info(`Stopped MediaStreamTrack ID '${mediaStreamTrack.id}' of kind '${mediaStreamTrack.kind}'`);
     });
   }
