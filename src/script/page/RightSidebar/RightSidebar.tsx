@@ -215,6 +215,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
 
           {currentState === PanelState.GROUP_PARTICIPANT_USER && userEntity && (
             <GroupParticipantUser
+              key={userEntity.id}
               onBack={onBackClick}
               onClose={closePanel}
               goToRoot={goToRoot}

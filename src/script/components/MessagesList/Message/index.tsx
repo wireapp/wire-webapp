@@ -69,6 +69,7 @@ export interface MessageParams extends MessageActions {
   };
   messageRepository: MessageRepository;
   onVisible?: () => void;
+  onVisibilityLost?: () => void;
   selfId: QualifiedId;
   shouldShowInvitePeople: boolean;
   teamState?: TeamState;
@@ -82,12 +83,13 @@ export interface MessageParams extends MessageActions {
   setMsgElementsFocusable: (isMsgElementsFocusable: boolean) => void;
 }
 
-export const Message: React.FC<MessageParams & {scrollTo?: ScrollToElement}> = props => {
+export const Message = (props: MessageParams & {scrollTo?: ScrollToElement}) => {
   const {
     message,
     isHighlighted,
     hideHeader,
     onVisible,
+    onVisibilityLost,
     scrollTo,
     isFocused,
     handleFocus,
@@ -96,7 +98,6 @@ export const Message: React.FC<MessageParams & {scrollTo?: ScrollToElement}> = p
     setMsgElementsFocusable,
   } = props;
   const messageElementRef = useRef<HTMLDivElement>(null);
-  const messageRef = useRef<HTMLDivElement>(null);
   const {status, ephemeral_expires} = useKoSubscribableChildren(message, ['status', 'ephemeral_expires']);
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isFocused);
 
@@ -114,7 +115,7 @@ export const Message: React.FC<MessageParams & {scrollTo?: ScrollToElement}> = p
   const handleDivKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     // when a message is focused set its elements focusable
     if (!event.shiftKey && isTabKey(event)) {
-      if (!messageRef.current) {
+      if (!messageElementRef.current) {
         return;
       }
       setMsgElementsFocusable(true);
@@ -130,21 +131,21 @@ export const Message: React.FC<MessageParams & {scrollTo?: ScrollToElement}> = p
   useEffect(() => {
     // Move element into view when it is focused
     if (isFocused) {
-      messageRef.current?.focus();
+      messageElementRef.current?.focus();
     }
   }, [isFocused]);
 
   // set message elements focus for non content type mesages
   // some non content type message has interactive element like invite people for member message
   useEffect(() => {
-    if (!messageRef.current || message.isContent()) {
+    if (!messageElementRef.current || message.isContent()) {
       return;
     }
-    const interactiveMsgElements = getAllFocusableElements(messageRef.current);
+    const interactiveMsgElements = getAllFocusableElements(messageElementRef.current);
     setElementsTabIndex(interactiveMsgElements, isMsgElementsFocusable && isFocused);
   }, [isFocused, isMsgElementsFocusable, message]);
 
-  const content = (
+  const messageContent = (
     <MessageWrapper
       {...props}
       hideHeader={hideHeader}
@@ -153,15 +154,8 @@ export const Message: React.FC<MessageParams & {scrollTo?: ScrollToElement}> = p
     />
   );
 
-  const wrappedContent = onVisible ? (
-    <InViewport requireFullyInView allowBiggerThanViewport checkOverlay onVisible={onVisible}>
-      {content}
-    </InViewport>
-  ) : (
-    content
-  );
-
   return (
+    /*eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions*/
     <div
       className={cx('message', {
         'message-marked': isHighlighted,
@@ -175,18 +169,23 @@ export const Message: React.FC<MessageParams & {scrollTo?: ScrollToElement}> = p
       data-uie-send-status={status}
       data-uie-name="item-message"
       role="list"
+      tabIndex={messageFocusedTabIndex}
+      onKeyDown={handleDivKeyDown}
+      onClick={() => handleFocus(message.id)}
     >
-      {/*eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions*/}
-      <div
-        tabIndex={messageFocusedTabIndex}
-        ref={messageRef}
-        role="listitem"
-        onKeyDown={handleDivKeyDown}
-        onClick={() => handleFocus(message.id)}
-        className="message-wrapper"
-      >
-        {wrappedContent}
-      </div>
+      {onVisible ? (
+        <InViewport
+          requireFullyInView
+          allowBiggerThanViewport
+          checkOverlay
+          onVisible={onVisible}
+          onVisibilityLost={onVisibilityLost}
+        >
+          {messageContent}
+        </InViewport>
+      ) : (
+        messageContent
+      )}
     </div>
   );
 };

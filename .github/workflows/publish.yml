@@ -2,7 +2,7 @@ name: Publish
 
 on:
   push:
-    branches: [master, dev, release/*]
+    branches: [master, dev, release/*, new-navigation]
     tags:
       - '*q1-2024*'
       - '*staging*'
@@ -268,10 +268,13 @@ jobs:
           map: |
             {
               "dev": {
-                "targets": "[\"wire-webapp-dev-al2\", \"wire-webapp-edge-al2\" ]"
+                "targets": "[\"wire-webapp-dev-al2\"]"
               },
               "master": {
                 "targets": "[\"wire-webapp-master-al2\"]"
+              },
+              "new-navigation": {
+                "targets": "[\"wire-webapp-edge-al2\"]"
               },
               "production": {
                 "targets": "[\"wire-webapp-prod-al2\"]"

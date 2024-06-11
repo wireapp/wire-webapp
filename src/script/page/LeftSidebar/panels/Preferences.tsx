@@ -127,7 +127,6 @@ const Preferences: React.FC<PreferencesProps> = ({
     teamRepository.getTeam();
   }, [teamRepository]);
 
-  const isDesktop = Runtime.isDesktopApp();
   const supportsCalling = Runtime.isSupportingLegacyCalling();
 
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
@@ -179,7 +178,6 @@ const Preferences: React.FC<PreferencesProps> = ({
     },
     {
       IconComponent: Icon.About,
-      hidden: isDesktop,
       id: ContentState.PREFERENCES_ABOUT,
       label: t('preferencesAbout'),
       uieName: 'go-about',
