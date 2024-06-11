@@ -188,6 +188,10 @@ export class DebugUtil {
     );
   }
 
+  enableCameraBlur() {
+    return this.callingRepository.blurVideo();
+  }
+
   reconnectWebSocket({dryRun} = {dryRun: false}) {
     return this.eventRepository.connectWebSocket(this.core, () => {}, dryRun);
   }
