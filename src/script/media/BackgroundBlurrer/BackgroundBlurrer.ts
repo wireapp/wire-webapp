@@ -81,7 +81,7 @@ export function initShaderProgram(canvas: HTMLCanvasElement, {width, height}: Vi
   gl.bindBuffer(gl.ARRAY_BUFFER, buffers.textcoord);
   gl.bufferData(
     gl.ARRAY_BUFFER,
-    // This represents the 6 points of the 2 triangles reprensenting the restangle we want to paint
+    // This represents the 6 points of the 2 triangles reprensenting the rectangle we want to paint
     new Float32Array([0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0]),
     gl.STATIC_DRAW,
   );
@@ -138,7 +138,7 @@ export function blurBackground(
   gl.bindTexture(gl.TEXTURE_2D, originalImageTexture);
 
   // Assiging the segmentation mask to the mask uniform (so that it's accessible to the shader)
-  const segmentationMask = segmentationResults.confidenceMasks?.[0].getAsWebGLTexture() ?? null;
+  const segmentationMask = segmentationResults.confidenceMasks?.[0]?.getAsWebGLTexture() ?? null;
   gl.activeTexture(gl.TEXTURE1);
   gl.bindTexture(gl.TEXTURE_2D, segmentationMask);
   gl.uniform1i(locations.mask, 1);
