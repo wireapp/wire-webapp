@@ -33,6 +33,7 @@ export const ReadReceiptText: CSSObject = {
   display: 'inline-flex',
   alignItems: 'center',
   verticalAlign: 'text-bottom',
+  whiteSpace: 'nowrap',
 };
 
 export const ReadIndicatorStyles = (showIconOnly = false): CSSObject => ({
