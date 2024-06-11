@@ -130,7 +130,6 @@ const Preferences: React.FC<PreferencesProps> = ({
     }
   }, [contentState, preferenceNotificationRepository]);
 
-  const isDesktop = Runtime.isDesktopApp();
   const supportsCalling = Runtime.isSupportingLegacyCalling();
 
   const preferencesItems = [
@@ -161,7 +160,6 @@ const Preferences: React.FC<PreferencesProps> = ({
     },
     {
       IconComponent: Icon.About,
-      hidden: isDesktop,
       id: ContentState.PREFERENCES_ABOUT,
       label: t('preferencesAbout'),
       uieName: 'go-about',
