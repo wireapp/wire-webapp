@@ -22,7 +22,7 @@ import {ImageSegmenter, FilesetResolver} from '@mediapipe/tasks-vision';
 import {VideoDimensions, blurBackground, initShaderProgram} from './BackgroundBlurrer';
 
 enum SEGMENTATION_MODEL {
-  QUALITY = './assets/mediapipe-models/selfie_multiclass_256x256.tflite',
+  // Other models are available and could be tested later on (https://github.com/google-ai-edge/mediapipe/blob/master/docs/solutions/models.md#selfie-segmentation), this one is optimized for performance and yeild rather good results for our MVP
   PERFORMANCE = './assets/mediapipe-models/selfie_segmenter.tflite',
 }
 enum FRAMERATE {

@@ -16780,13 +16780,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"stackblur-canvas@npm:^2.7.0":
-  version: 2.7.0
-  resolution: "stackblur-canvas@npm:2.7.0"
-  checksum: 10/ad20aa886f5141c69b682cb8dd88ee04822f7dfa9f566d0657cf8fa43f5dd69122fe42dbc7071d44f655da89784756d34705b12d03f1c1f928325a55c698ab51
-  languageName: node
-  linkType: hard
-
 "stream-combiner@npm:~0.0.4":
   version: 0.0.4
   resolution: "stream-combiner@npm:0.0.4"
@@ -18741,7 +18734,6 @@ __metadata:
     simple-git: "npm:3.24.0"
     sinon: "npm:18.0.0"
     speakingurl: "npm:14.0.1"
-    stackblur-canvas: "npm:^2.7.0"
     style-loader: "npm:4.0.0"
     stylelint: "npm:16.6.1"
     stylelint-config-idiomatic-order: "npm:10.0.0"
