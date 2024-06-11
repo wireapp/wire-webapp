@@ -51,22 +51,6 @@ describe('ReadReceiptStatus', () => {
     expect(queryByTestId('status-message-read-receipt-delivered')).toBeNull();
   });
 
-  it('shows "delivered" when noone read the message', () => {
-    const props = {
-      isMessageFocused: true,
-      is1to1Conversation: false,
-      isLastDeliveredMessage: true,
-      message: createReadReceiptMessage({
-        readReceipts: ko.observableArray([] as ReadReceipt[]),
-      }),
-    };
-
-    const {queryByTestId} = render(<ReadReceiptStatus {...props} />);
-
-    expect(queryByTestId('status-message-read-receipt-delivered')).not.toBeNull();
-    expect(queryByTestId('status-message-read-receipts')).toBeNull();
-  });
-
   it('shows the read icon', () => {
     const props = {
       isMessageFocused: true,

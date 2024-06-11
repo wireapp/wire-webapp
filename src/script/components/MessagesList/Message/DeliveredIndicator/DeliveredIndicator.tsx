@@ -38,7 +38,7 @@ const DeliveredIndicatorComponent: ForwardRefRenderFunction<HTMLDivElement, Deli
     <div css={DeliveryIndicatorContainerStyles(height)} ref={ref}>
       <span
         css={DeliveredIndicatorStyles(isLastDeliveredMessage)}
-        data-uie-name="status-message-read-receipt-delivered"
+        data-uie-name={isLastDeliveredMessage ? 'status-message-read-receipt-delivered' : undefined}
       >
         {t('conversationMessageDelivered')}
       </span>
