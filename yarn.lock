@@ -15553,7 +15553,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"raw-loader@npm:^4.0.2":
+"raw-loader@npm:4.0.2":
   version: 4.0.2
   resolution: "raw-loader@npm:4.0.2"
   dependencies:
@@ -18724,7 +18724,7 @@ __metadata:
     postcss-preset-env: "npm:9.5.14"
     postcss-scss: "npm:4.0.9"
     prettier: "npm:3.3.0"
-    raw-loader: "npm:^4.0.2"
+    raw-loader: "npm:4.0.2"
     react: "npm:18.2.0"
     react-dom: "npm:18.2.0"
     react-error-boundary: "npm:4.0.13"
