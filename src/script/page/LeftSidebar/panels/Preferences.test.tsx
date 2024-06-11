@@ -46,7 +46,7 @@ describe('Preferences', () => {
     jest.spyOn(Runtime, 'isSupportingLegacyCalling').mockReturnValue(true);
     const {queryByText} = render(<Preferences {...defaultParams} />);
     expect(queryByText('preferencesAV')).not.toBeNull();
-    expect(queryByText('preferencesAbout')).toBeNull();
+    expect(queryByText('preferencesAbout')).not.toBeNull();
   });
 
   it('renders the about section in a web app', () => {
