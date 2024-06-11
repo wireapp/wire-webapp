@@ -17,7 +17,7 @@
  *
  */
 
-import sodium from 'libsodium-wrappers-sumo';
+import sodium from 'libsodium-wrappers';
 
 export interface DecodedHeader {
   format: string;

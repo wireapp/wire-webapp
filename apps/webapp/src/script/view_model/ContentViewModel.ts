@@ -56,8 +56,8 @@ interface ShowConversationOptions {
 }
 
 interface ShowConversationOverload {
-  (conversation: Conversation | undefined, options: ShowConversationOptions): Promise<void>;
-  (conversationId: QualifiedId, options: ShowConversationOptions): Promise<void>;
+  (conversation: Conversation | undefined, options?: ShowConversationOptions): Promise<void>;
+  (conversationId: QualifiedId, options?: ShowConversationOptions): Promise<void>;
 }
 
 export class ContentViewModel {
@@ -71,7 +71,6 @@ export class ContentViewModel {
   mainViewModel: MainViewModel;
   previousConversation?: Conversation;
   userRepository: UserRepository;
-  initialMessage?: Message;
 
   get isFederated() {
     return this.mainViewModel.isFederated;
@@ -93,7 +92,7 @@ export class ContentViewModel {
 
     const showMostRecentConversation = () => {
       const mostRecentConversation = this.conversationState.getMostRecentConversation();
-      this.showConversation(mostRecentConversation, {});
+      this.showConversation(mostRecentConversation);
     };
 
     this.userState.connectRequests.subscribe(requests => {
@@ -135,7 +134,7 @@ export class ContentViewModel {
   }
 
   private changeConversation(conversationEntity: Conversation, messageEntity?: Message): void {
-    this.initialMessage = messageEntity;
+    conversationEntity.initialMessage(messageEntity);
     this.conversationState.activeConversation(conversationEntity);
   }
 
@@ -219,25 +218,8 @@ export class ContentViewModel {
     );
   }
 
-  private showConversationWithBlockedUserErrorModal(): void {
-    PrimaryModal.show(
-      PrimaryModal.type.ACKNOWLEDGE,
-      {
-        text: {
-          message: t('conversationWithBlockedUserMessage'),
-          title: t('conversationWithBlockedUserTitle'),
-        },
-      },
-      undefined,
-    );
-  }
-
   private isConversationNotFoundError(error: any): boolean {
     return error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;
-  }
-
-  private isConversationWithBlockedUserError(error: any): boolean {
-    return error.type === ConversationError.TYPE.CONVERSATION_WITH_BLOCKED_USER;
   }
 
   /**
@@ -251,13 +233,13 @@ export class ContentViewModel {
    */
   readonly showConversation: ShowConversationOverload = async (
     conversation: Conversation | QualifiedId | undefined,
-    options: ShowConversationOptions,
+    options?: ShowConversationOptions,
   ) => {
     const {
       exposeMessage: exposeMessageEntity,
       openFirstSelfMention = false,
       openNotificationSettings = false,
-    } = options;
+    } = options || {};
 
     if (!conversation) {
       return this.handleMissingConversation();
@@ -265,21 +247,12 @@ export class ContentViewModel {
 
     try {
       const conversationEntity = await this.getConversationEntity(conversation);
-      const isConnectionBlocked = conversationEntity?.connection()?.isBlocked();
 
       if (!conversationEntity) {
         this.closeRightSidebar();
         throw new ConversationError(
           ConversationError.TYPE.CONVERSATION_NOT_FOUND,
           ConversationError.MESSAGE.CONVERSATION_NOT_FOUND,
-        );
-      }
-
-      if (isConnectionBlocked) {
-        this.closeRightSidebar();
-        throw new ConversationError(
-          ConversationError.TYPE.CONVERSATION_WITH_BLOCKED_USER,
-          ConversationError.MESSAGE.CONVERSATION_WITH_BLOCKED_USER,
         );
       }
 
@@ -303,10 +276,6 @@ export class ContentViewModel {
     } catch (error: any) {
       if (this.isConversationNotFoundError(error)) {
         return this.showConversationNotFoundErrorModal();
-      }
-
-      if (this.isConversationWithBlockedUserError(error)) {
-        return this.showConversationWithBlockedUserErrorModal();
       }
 
       throw error;

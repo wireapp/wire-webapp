@@ -47,7 +47,6 @@ import type {Message} from './message/Message';
 import {PingMessage} from './message/PingMessage';
 import type {User} from './User';
 
-import type {Call} from '../calling/Call';
 import {ClientRepository} from '../client';
 import {Config} from '../Config';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
@@ -89,6 +88,8 @@ export class Conversation {
   public readonly readOnlyState: ko.Observable<CONVERSATION_READONLY_STATE | null>;
   private readonly incomingMessages: ko.ObservableArray<Message>;
   public readonly isProteusTeam1to1: ko.PureComputed<boolean>;
+  public readonly isConversationWithBlockedUser: ko.PureComputed<boolean>;
+  public readonly isReadOnlyConversation: ko.PureComputed<boolean>;
   public readonly last_server_timestamp: ko.Observable<number>;
   private readonly logger: Logger;
   public readonly mutedState: ko.Observable<number>;
@@ -101,7 +102,6 @@ export class Conversation {
   public readonly accessCodeHasPassword: ko.Observable<boolean | undefined>;
   public readonly accessState: ko.Observable<ACCESS_STATE>;
   public readonly archivedTimestamp: ko.Observable<number>;
-  public readonly call: ko.Observable<Call | null>;
   public readonly cleared_timestamp: ko.Observable<number>;
   public readonly connection: ko.Observable<ConnectionEntity | null>;
   // TODO(Federation): Currently the 'creator' just refers to a user id but it has to become a qualified id
@@ -153,6 +153,7 @@ export class Conversation {
   public readonly messages_unordered: ko.ObservableArray<Message>;
   /** Sorted messages that are ready to be displayed in the conversation */
   public readonly messages: ko.PureComputed<Message[]>;
+  public readonly initialMessage: ko.Observable<Message | undefined>;
   public readonly messageTimer: ko.PureComputed<number>;
   public readonly name: ko.Observable<string>;
   public readonly notificationState: ko.PureComputed<number>;
@@ -162,6 +163,7 @@ export class Conversation {
   public readonly receiptMode: ko.Observable<RECEIPT_MODE>;
   public readonly removed_from_conversation: ko.PureComputed<boolean>;
   public readonly roles: ko.Observable<Record<string, string>>;
+  public readonly isLastMessageVisible: ko.Observable<boolean>;
   public readonly selfUser: ko.Observable<User | undefined>;
   public readonly servicesCount: ko.PureComputed<number>;
   public readonly showNotificationsEverything: ko.PureComputed<boolean>;
@@ -205,6 +207,7 @@ export class Conversation {
     this.teamId = undefined;
     this.type = ko.observable();
 
+    this.isLastMessageVisible = ko.observable(true);
     this.isLoadingMessages = ko.observable(false);
     this.isTextInputReady = ko.observable(false);
 
@@ -243,6 +246,13 @@ export class Conversation {
         otherMembersLength: this.participating_user_ids().length,
       }),
     );
+
+    this.isConversationWithBlockedUser = ko.pureComputed(() => !!this.connection()?.isBlocked());
+
+    this.isReadOnlyConversation = ko.pureComputed(
+      () => this.isConversationWithBlockedUser() || this.readOnlyState() !== null,
+    );
+
     this.isGroup = ko.pureComputed(() => {
       const isGroupConversation = this.type() === CONVERSATION_TYPE.REGULAR;
       return isGroupConversation && !this.isProteusTeam1to1();
@@ -293,8 +303,7 @@ export class Conversation {
     this.last_read_timestamp = ko.observable(0);
     this.last_server_timestamp = ko.observable(0);
     this.mutedTimestamp = ko.observable(0);
-
-    this.call = ko.observable(null);
+    this.initialMessage = ko.observable();
 
     this.readOnlyState = ko.observable<CONVERSATION_READONLY_STATE | null>(null);
 
@@ -416,6 +425,7 @@ export class Conversation {
         return message_a.timestamp() - message_b.timestamp();
       }),
     );
+
     this.lastDeliveredMessage = ko.pureComputed(() => this.getLastDeliveredMessage());
 
     this.incomingMessages = ko.observableArray();
@@ -607,9 +617,9 @@ export class Conversation {
    * If there are any incoming messages, they will be moved to the regular messages.
    */
   release(): void {
-    this.messages_unordered.removeAll();
-
+    // If there are no unread messages, we can remove all messages from memory (we will keep the unread messages)
     if (!this.unreadState().allEvents.length) {
+      this.removeMessages();
       this.hasAdditionalMessages(true);
     }
 

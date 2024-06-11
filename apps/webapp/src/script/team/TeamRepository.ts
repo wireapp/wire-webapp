@@ -50,7 +50,6 @@ import {TeamService} from './TeamService';
 import {TeamState} from './TeamState';
 
 import {AssetRepository} from '../assets/AssetRepository';
-import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {User} from '../entity/User';
 import {EventSource} from '../event/EventSource';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
@@ -87,6 +86,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
   constructor(
     userRepository: UserRepository,
     assetRepository: AssetRepository,
+    private readonly onMemberDetete: () => Promise<void>,
     readonly teamService: TeamService = new TeamService(),
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
@@ -161,14 +161,17 @@ export class TeamRepository extends TypedEventEmitter<Events> {
   }
 
   private readonly scheduleTeamRefresh = (): void => {
-    window.setInterval(async () => {
+    const updateTeam = async () => {
       try {
         await this.getTeam();
         await this.updateFeatureConfig();
       } catch (error) {
         this.logger.error(error);
       }
-    }, TIME_IN_MILLIS.SECOND * 30);
+    };
+    // We want to poll the latest team data every time the app is focused and every day
+    window.addEventListener('focus', updateTeam);
+    window.setInterval(updateTeam, TIME_IN_MILLIS.DAY);
   };
 
   private async getInitialTeamMembers(teamId: string): Promise<TeamMemberEntity[]> {
@@ -270,11 +273,11 @@ export class TeamRepository extends TypedEventEmitter<Events> {
         break;
       }
       case TEAM_EVENT.DELETE: {
-        this.onDelete(eventJson);
+        await this.onDelete(eventJson);
         break;
       }
       case TEAM_EVENT.MEMBER_LEAVE: {
-        this.onMemberLeave(eventJson);
+        await this.onMemberLeave(eventJson);
         break;
       }
       case TEAM_EVENT.FEATURE_CONFIG_UPDATE: {
@@ -348,13 +351,11 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     return this.teamService.getTeamById(teamId);
   }
 
-  private onDelete(eventJson: TeamDeleteEvent | TeamMemberLeaveEvent): void {
+  private async onDelete(eventJson: TeamDeleteEvent | TeamMemberLeaveEvent) {
     const {team: teamId} = eventJson;
     if (this.teamState.isTeam() && this.teamState.team().id === teamId) {
       this.teamState.isTeamDeleted(true);
-      window.setTimeout(() => {
-        amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.ACCOUNT_DELETED, true);
-      }, 50);
+      await this.onMemberDetete();
     }
   }
 
@@ -386,7 +387,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     await this.updateFeatureConfig();
   };
 
-  private onMemberLeave(eventJson: TeamMemberLeaveEvent): void {
+  private async onMemberLeave(eventJson: TeamMemberLeaveEvent) {
     const {
       data: {user: userId},
       team: teamId,

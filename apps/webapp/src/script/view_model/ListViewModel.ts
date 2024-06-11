@@ -374,7 +374,7 @@ export class ListViewModel {
       if (customLabel) {
         entries.push({
           click: () => conversationLabelRepository.removeConversationFromLabel(customLabel, conversationEntity),
-          label: t('conversationsPopoverRemoveFrom', customLabel.name),
+          label: t('conversationsPopoverRemoveFrom', customLabel.name, {}, true),
         });
       }
 
@@ -416,11 +416,17 @@ export class ListViewModel {
     if (!conversationEntity.isGroup()) {
       const userEntity = conversationEntity.firstUserEntity();
       const canBlock = userEntity && (userEntity.isConnected() || userEntity.isRequest());
+      const canUnblock = userEntity && userEntity.isBlocked();
 
       if (canBlock) {
         entries.push({
           click: () => this.clickToBlock(conversationEntity),
           label: t('conversationsPopoverBlock'),
+        });
+      } else if (canUnblock) {
+        entries.push({
+          click: () => this.clickToUnblock(conversationEntity),
+          label: t('conversationsPopoverUnblock'),
         });
       }
     }
@@ -443,9 +449,20 @@ export class ListViewModel {
 
   clickToBlock = async (conversationEntity: Conversation): Promise<void> => {
     const userEntity = conversationEntity.firstUserEntity();
-    const hideConversation = this.shouldHideConversation(conversationEntity);
-    const nextConversationEntity = this.conversationRepository.getNextConversation(conversationEntity);
-    await this.actionsViewModel.blockUser(userEntity, hideConversation, nextConversationEntity);
+
+    if (!userEntity) {
+      return;
+    }
+
+    await this.actionsViewModel.blockUser(userEntity);
+  };
+
+  clickToUnblock = async (conversationEntity: Conversation): Promise<void> => {
+    const userEntity = conversationEntity.firstUserEntity();
+    if (!userEntity) {
+      return;
+    }
+    await this.actionsViewModel.unblockUser(userEntity);
   };
 
   readonly clickToCancelRequest = (conversationEntity: Conversation): void => {

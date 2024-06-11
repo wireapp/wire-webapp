@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2024 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,15 +17,19 @@
  *
  */
 
+import {create} from 'zustand';
+
 import {Runtime} from '@wireapp/commons';
 
-import {Config} from '../../../Config';
-import type {RootState} from '../reducer';
+type DetachedCallingFeatureState = {
+  isEnabled: boolean;
+  isSupported: () => boolean;
+  toggle: (shouldEnable: boolean) => void;
+};
 
-export const isChecking = (state: RootState) =>
-  state.runtimeState.isCheckingIndexedDb || state.runtimeState.isCheckingCookie;
-export const hasIndexedDbSupport = (state: RootState) => state.runtimeState.hasIndexedDbSupport;
-export const hasCookieSupport = (state: RootState) => state.runtimeState.hasCookieSupport;
-export const isSupportedBrowser = (state: RootState) => state.runtimeState.isSupportedBrowser;
-export const hasToUseDesktopApplication = (state: RootState) =>
-  Config.getConfig().FEATURE.ENABLE_ENFORCE_DESKTOP_APPLICATION_ONLY && !Runtime.isDesktopApp();
+//TODO: This is a temporary solution for PoC to enable detached calling cell feature
+export const useDetachedCallingFeatureState = create<DetachedCallingFeatureState>((set, get) => ({
+  isEnabled: false,
+  isSupported: () => !Runtime.isDesktopApp() && get().isEnabled,
+  toggle: shouldOpen => set({isEnabled: shouldOpen}),
+}));

@@ -58,7 +58,7 @@ describe('SelfRepository', () => {
       [[ConversationProtocol.PROTEUS], [ConversationProtocol.PROTEUS, ConversationProtocol.MLS]],
       [[ConversationProtocol.PROTEUS, ConversationProtocol.MLS], [ConversationProtocol.PROTEUS]],
       [[ConversationProtocol.PROTEUS], [ConversationProtocol.MLS]],
-    ])('Updates the list of supported protocols (from %s to %s)', async (initialProtocols, evaluatedProtocols) => {
+    ])('Updates the list of supported protocols', async (initialProtocols, evaluatedProtocols) => {
       const selfRepository = await testFactory.exposeSelfActors();
 
       const selfUser = selfRepository['userState'].self()!;

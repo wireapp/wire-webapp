@@ -17,7 +17,7 @@
  *
  */
 
-import {useMemo, useState, useEffect} from 'react';
+import {useMemo, useState, useEffect, useRef} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import cx from 'classnames';
@@ -42,6 +42,7 @@ import {CompleteFailureToSendWarning, PartialFailureToSendWarning} from './Warni
 
 import {MessageActions} from '..';
 import type {FileAsset as FileAssetType} from '../../../../entity/message/FileAsset';
+import {useClickOutside} from '../../../../hooks/useClickOutside';
 import {EphemeralStatusType} from '../../../../message/EphemeralStatusType';
 import {ContextMenuEntry} from '../../../../ui/ContextMenu';
 import {EphemeralTimer} from '../EphemeralTimer';
@@ -86,6 +87,8 @@ export const ContentMessageComponent = ({
   onClickReaction,
   onClickDetails,
 }: ContentMessageProps) => {
+  const messageRef = useRef<HTMLDivElement | null>(null);
+
   // check if current message is focused and its elements focusable
   const msgFocusState = useMemo(() => isMsgElementsFocusable && isFocused, [isMsgElementsFocusable, isFocused]);
   const messageFocusedTabIndex = useMessageFocusedTabIndex(msgFocusState);
@@ -132,6 +135,8 @@ export const ContentMessageComponent = ({
   const isConversationReadonly = conversation.readOnlyState() !== null;
 
   const contentMessageWrapperRef = (element: HTMLDivElement | null) => {
+    messageRef.current = element;
+
     setTimeout(() => {
       if (element?.parentElement?.querySelector(':hover') === element) {
         // Trigger the action menu in case the component is rendered with the mouse already hovering over it
@@ -147,6 +152,15 @@ export const ContentMessageComponent = ({
   const isImageMessage = !!asset?.isImage();
 
   const isAssetMessage = isFileMessage || isAudioMessage || isVideoMessage || isImageMessage;
+
+  const hideActionMenuVisibility = () => {
+    if (isFocused) {
+      setActionMenuVisibility(false);
+    }
+  };
+
+  // Closing another ActionMenu on outside click
+  useClickOutside(messageRef, hideActionMenuVisibility);
 
   return (
     <div

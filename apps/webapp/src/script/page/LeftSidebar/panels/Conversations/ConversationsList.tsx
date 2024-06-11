@@ -22,15 +22,15 @@ import React from 'react';
 import {css} from '@emotion/react';
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
-import {GroupAvatar, Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {ConversationListCell} from 'Components/list/ConversationListCell';
 import {Call} from 'src/script/calling/Call';
 import {User} from 'src/script/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {handleKeyDown, isKeyboardEvent} from 'Util/KeyboardUtil';
+import {isKeyboardEvent} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
+import {ConnectionRequests} from './ConnectionRequests';
 import {ConversationViewStyle} from './Conversations';
 import {GroupedConversations} from './GroupedConversations';
 
@@ -82,7 +82,7 @@ export const ConversationsList = ({
 
   const hasJoinableCall = (conversation: Conversation) => {
     const call = joinableCalls.find((callInstance: Call) =>
-      matchQualifiedIds(callInstance.conversationId, conversation.qualifiedId),
+      matchQualifiedIds(callInstance.conversation.qualifiedId, conversation.qualifiedId),
     );
     if (!call) {
       return false;
@@ -97,100 +97,58 @@ export const ConversationsList = ({
     listViewModel.contentViewModel.switchContent(ContentState.CONNECTION_REQUESTS);
   };
 
-  const conversationView =
-    viewStyle === ConversationViewStyle.RECENT ? (
-      <>
-        {conversations.map((conversation, index) => {
-          return (
-            <ConversationListCell
-              key={conversation.id}
-              isFocused={currentFocus === conversation.id}
-              handleArrowKeyDown={handleArrowKeyDown(index)}
-              resetConversationFocus={resetConversationFocus}
-              dataUieName="item-conversation"
-              conversation={conversation}
-              onClick={event => {
-                if (isKeyboardEvent(event)) {
-                  createNavigateKeyboard(generateConversationUrl(conversation.qualifiedId), true)(event);
-                } else {
-                  createNavigate(generateConversationUrl(conversation.qualifiedId))(event);
-                }
-              }}
-              isSelected={isActiveConversation}
-              onJoinCall={answerCall}
-              rightClick={openContextMenu}
-              showJoinButton={hasJoinableCall(conversation)}
-            />
-          );
-        })}
-      </>
-    ) : (
-      <li tabIndex={TabIndex.UNFOCUSABLE}>
-        <GroupedConversations
-          callState={callState}
-          conversationRepository={conversationRepository}
-          conversationState={conversationState}
-          hasJoinableCall={hasJoinableCall}
-          isSelectedConversation={isActiveConversation}
-          listViewModel={listViewModel}
-          onJoinCall={answerCall}
-        />
-      </li>
-    );
-
   const isFolderView = viewStyle === ConversationViewStyle.FOLDER;
-  const uieName = isFolderView ? 'folder-view' : 'recent-view';
 
-  const connectionText =
-    connectRequests.length > 1
-      ? t('conversationsConnectionRequestMany', connectRequests.length)
-      : t('conversationsConnectionRequestOne');
-
-  const connectionRequests =
-    connectRequests.length === 0 ? null : (
-      <li tabIndex={TabIndex.UNFOCUSABLE}>
-        <div
-          role="button"
-          tabIndex={TabIndex.FOCUSABLE}
-          className={`conversation-list-cell ${isShowingConnectionRequests ? 'conversation-list-cell-active' : ''}`}
-          onClick={onConnectionRequestClick}
-          onKeyDown={event => handleKeyDown(event, onConnectionRequestClick)}
-        >
-          <div className="conversation-list-cell-left">
-            {connectRequests.length === 1 ? (
-              <div className="avatar-halo">
-                <Avatar participant={connectRequests[0]} avatarSize={AVATAR_SIZE.SMALL} />
-              </div>
-            ) : (
-              <GroupAvatar users={connectRequests} />
-            )}
-          </div>
-
-          <div className="conversation-list-cell-center">
-            <span
-              className={`conversation-list-cell-name ${isShowingConnectionRequests ? 'accent-text' : ''}`}
-              data-uie-name="item-pending-requests"
-            >
-              {connectionText}
-            </span>
-          </div>
-
-          <div className="conversation-list-cell-right">
-            <span
-              className="conversation-list-cell-badge cell-badge-dark icon-pending"
-              data-uie-name="status-pending"
-            />
-          </div>
-        </div>
-      </li>
-    );
   return (
     <>
       <h2 className="visually-hidden">{t(isFolderView ? 'folderViewTooltip' : 'conversationViewTooltip')}</h2>
 
-      <ul css={css({margin: 0, paddingLeft: 0})} data-uie-name={uieName}>
-        {connectionRequests}
-        {conversationView}
+      <ul css={css({margin: 0, paddingLeft: 0})} data-uie-name={isFolderView ? 'folder-view' : 'recent-view'}>
+        <ConnectionRequests
+          connectionRequests={connectRequests}
+          onConnectionRequestClick={onConnectionRequestClick}
+          isShowingConnectionRequests={isShowingConnectionRequests}
+        />
+
+        {viewStyle === ConversationViewStyle.RECENT ? (
+          <>
+            {conversations.map((conversation, index) => {
+              return (
+                <ConversationListCell
+                  key={conversation.id}
+                  isFocused={currentFocus === conversation.id}
+                  handleArrowKeyDown={handleArrowKeyDown(index)}
+                  resetConversationFocus={resetConversationFocus}
+                  dataUieName="item-conversation"
+                  conversation={conversation}
+                  onClick={event => {
+                    if (isKeyboardEvent(event)) {
+                      createNavigateKeyboard(generateConversationUrl(conversation.qualifiedId), true)(event);
+                    } else {
+                      createNavigate(generateConversationUrl(conversation.qualifiedId))(event);
+                    }
+                  }}
+                  isSelected={isActiveConversation}
+                  onJoinCall={answerCall}
+                  rightClick={openContextMenu}
+                  showJoinButton={hasJoinableCall(conversation)}
+                />
+              );
+            })}
+          </>
+        ) : (
+          <li tabIndex={TabIndex.UNFOCUSABLE}>
+            <GroupedConversations
+              callState={callState}
+              conversationRepository={conversationRepository}
+              conversationState={conversationState}
+              hasJoinableCall={hasJoinableCall}
+              isSelectedConversation={isActiveConversation}
+              listViewModel={listViewModel}
+              onJoinCall={answerCall}
+            />
+          </li>
+        )}
       </ul>
     </>
   );

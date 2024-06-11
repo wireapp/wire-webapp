@@ -32,6 +32,7 @@ import {Runtime, UrlUtil} from '@wireapp/commons';
 import {
   ArrowIcon,
   Button,
+  ButtonVariant,
   Checkbox,
   CheckboxLabel,
   CodeInput,
@@ -61,8 +62,9 @@ import {EntropyContainer} from './EntropyContainer';
 import {Page} from './Page';
 
 import {Config} from '../../Config';
-import {loginStrings, verifyStrings} from '../../strings';
+import {indexStrings, loginStrings, verifyStrings} from '../../strings';
 import {AppAlreadyOpen} from '../component/AppAlreadyOpen';
+import {Exception} from '../component/Exception';
 import {JoinGuestLinkPasswordModal} from '../component/JoinGuestLinkPasswordModal';
 import {LoginForm} from '../component/LoginForm';
 import {RouterLink} from '../component/RouterLink';
@@ -119,8 +121,17 @@ const LoginComponent = ({
 
   const isOauth = UrlUtil.hasURLParameter(QUERY_KEY.SCOPE, window.location.hash);
 
+  const {
+    ENABLE_ACCOUNT_REGISTRATION: isAccountRegistrationEnabled,
+    ENABLE_DOMAIN_DISCOVERY: isDomainDiscoveryEnabled,
+    ENABLE_EXTRA_CLIENT_ENTROPY: isEntropyRequired,
+    ENABLE_PHONE_LOGIN: isPhoneLoginEnabled,
+    ENABLE_SSO: isSSOEnabled,
+  } = Config.getConfig().FEATURE;
+
+  const showBackButton = !embedded && (isDomainDiscoveryEnabled || isSSOEnabled || isAccountRegistrationEnabled);
+
   const [showEntropyForm, setShowEntropyForm] = useState(false);
-  const isEntropyRequired = Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY;
   const onEntropyGenerated = useRef<((entropy: Uint8Array) => void) | undefined>();
   const entropy = useRef<Uint8Array | undefined>();
 
@@ -147,11 +158,11 @@ const LoginComponent = ({
   }, []);
 
   useEffect(() => {
-    // Redirect to prefilled SSO login if default SSO code is set on backend
-    if (defaultSSOCode) {
+    // Redirect to prefilled SSO login if default SSO code is set on backend unless we're following the guest link flow
+    if (defaultSSOCode && !embedded) {
       navigate(`${ROUTE.SSO}/${defaultSSOCode}`);
     }
-  }, [defaultSSOCode, navigate]);
+  }, [defaultSSOCode, embedded, navigate]);
 
   useEffect(() => {
     const queryConversationCode = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_CODE) || null;
@@ -284,7 +295,8 @@ const LoginComponent = ({
           }
           case BackendErrorLabel.INVALID_CREDENTIALS:
           case BackendErrorLabel.ACCOUNT_SUSPENDED:
-          case LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE: {
+          case LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE:
+          case LabeledError.GENERAL_ERRORS.SYSTEM_KEYCHAIN_ACCESS: {
             break;
           }
           default: {
@@ -345,14 +357,11 @@ const LoginComponent = ({
 
   return (
     <Page>
-      {!embedded &&
-        (Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY ||
-          Config.getConfig().FEATURE.ENABLE_SSO ||
-          Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION) && (
-          <IsMobile>
-            <div style={{margin: 16}}>{backArrow}</div>
-          </IsMobile>
-        )}
+      {showBackButton && (
+        <IsMobile>
+          <div style={{margin: 16}}>{backArrow}</div>
+        </IsMobile>
+      )}
       {isEntropyRequired && showEntropyForm ? (
         <EntropyContainer onSetEntropy={storeEntropy} />
       ) : (
@@ -375,11 +384,7 @@ const LoginComponent = ({
             {!embedded && (
               <IsMobile not>
                 <Column style={{display: 'flex'}}>
-                  {(Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY ||
-                    Config.getConfig().FEATURE.ENABLE_SSO ||
-                    Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION) && (
-                    <div style={{margin: 'auto'}}>{backArrow}</div>
-                  )}
+                  {showBackButton && <div style={{margin: 'auto'}}>{backArrow}</div>}
                 </Column>
               </IsMobile>
             )}
@@ -437,7 +442,7 @@ const LoginComponent = ({
                         {validationErrors.length ? (
                           parseValidationErrors(validationErrors)
                         ) : authError ? (
-                          parseError(authError)
+                          <Exception errors={[authError]} />
                         ) : (
                           <div style={{marginTop: '4px'}}>&nbsp;</div>
                         )}
@@ -469,7 +474,7 @@ const LoginComponent = ({
                     >
                       {_(loginStrings.forgotPassword)}
                     </Link>
-                    {!embedded && Config.getConfig().FEATURE.ENABLE_PHONE_LOGIN && (
+                    {!embedded && isPhoneLoginEnabled && (
                       <RouterLink
                         variant={LinkVariant.PRIMARY}
                         style={{paddingTop: '12px', textAlign: 'center'}}
@@ -478,6 +483,17 @@ const LoginComponent = ({
                       >
                         {_(loginStrings.phoneLogin)}
                       </RouterLink>
+                    )}
+                    {embedded && (isDomainDiscoveryEnabled || isSSOEnabled) && (
+                      <Button
+                        type="button"
+                        variant={ButtonVariant.SECONDARY}
+                        onClick={() => navigate(`${ROUTE.SSO}/${defaultSSOCode ?? ''}`)}
+                        style={{marginTop: '16px'}}
+                        data-uie-name="go-sso-login"
+                      >
+                        {_(isDomainDiscoveryEnabled ? indexStrings.enterprise : indexStrings.ssoLogin)}
+                      </Button>
                     )}
                   </>
                 )}

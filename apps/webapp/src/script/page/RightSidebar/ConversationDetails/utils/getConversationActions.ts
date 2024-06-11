@@ -99,10 +99,19 @@ const getConversationActions = (
     {
       condition: isSingleUser && (userEntity?.isConnected() || userEntity?.isRequest()),
       item: {
-        click: () => actionsViewModel.blockUser(userEntity, true, getNextConversation()),
+        click: () => actionsViewModel.blockUser(userEntity),
         icon: 'block-icon',
         identifier: 'do-block',
         label: t('conversationDetailsActionBlock'),
+      },
+    },
+    {
+      condition: isSingleUser && userEntity?.isBlocked(),
+      item: {
+        click: () => actionsViewModel.unblockUser(userEntity),
+        icon: 'block-icon',
+        identifier: 'do-unblock',
+        label: t('conversationDetailsActionUnblock'),
       },
     },
     {

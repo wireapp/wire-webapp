@@ -33,11 +33,11 @@ import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
 import {TitleBar} from 'Components/TitleBar';
-import {CallState} from 'src/script/calling/CallState';
+import {CallingViewMode, CallState} from 'src/script/calling/CallState';
 import {Config} from 'src/script/Config';
-import {CONVERSATION_READONLY_STATE} from 'src/script/conversation/ConversationRepository';
 import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {isLastReceivedMessage} from 'Util/conversationMessages';
 import {allowsAllFiles, getFileExtensionOrName, hasAllowedExtension} from 'Util/FileTypeUtil';
 import {isHittingUploadLimit} from 'Util/isHittingUploadLimit';
 import {t} from 'Util/LocalizerUtil';
@@ -68,7 +68,6 @@ import {TeamState} from '../../team/TeamState';
 import {ElementType, MessageDetails} from '../MessagesList/Message/ContentMessage/asset/TextMessageRenderer';
 
 interface ConversationProps {
-  readonly initialMessage?: Message;
   readonly teamState: TeamState;
   selfUser: User;
   openRightSidebar: (panelState: PanelState, params: RightSidebarParams, compareEntityId?: boolean) => void;
@@ -79,7 +78,6 @@ interface ConversationProps {
 const CONFIG = Config.getConfig();
 
 export const Conversation = ({
-  initialMessage,
   teamState,
   selfUser,
   openRightSidebar,
@@ -104,23 +102,21 @@ export const Conversation = ({
     'isFileSharingSendingEnabled',
   ]);
 
-  const {
-    is1to1,
-    isRequest,
-    readOnlyState,
-    display_name: displayName,
-  } = useKoSubscribableChildren(activeConversation!, ['is1to1', 'isRequest', 'display_name', 'readOnlyState']);
-
-  const showReadOnlyConversationMessage =
-    readOnlyState !== null &&
-    [
-      CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_OTHER_UNSUPPORTED_MLS,
-      CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_SELF_UNSUPPORTED_MLS,
-    ].includes(readOnlyState);
+  const {is1to1, isRequest, isReadOnlyConversation} = useKoSubscribableChildren(activeConversation!, [
+    'is1to1',
+    'isRequest',
+    'readOnlyState',
+    'participating_user_ets',
+    'connection',
+    'isReadOnlyConversation',
+  ]);
 
   const inTeam = teamState.isInTeam(selfUser);
 
-  const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
+  const {activeCalls, viewMode} = useKoSubscribableChildren(callState, ['activeCalls', 'viewMode']);
+
+  const isCallWindowDetached = viewMode === CallingViewMode.DETACHED_WINDOW;
+
   const [isMsgElementsFocusable, setMsgElementsFocusable] = useState(true);
 
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
@@ -257,11 +253,7 @@ export const Conversation = ({
 
     const serviceEntity = userEntity.isService && (await repositories.integration.getServiceFromUser(userEntity));
 
-    if (serviceEntity) {
-      openRightSidebar(panelId, {entity: {...serviceEntity, id: userEntity.id}}, true);
-    } else {
-      openRightSidebar(panelId, {entity: userEntity}, true);
-    }
+    openRightSidebar(panelId, {entity: serviceEntity || userEntity}, true);
   };
 
   const showParticipants = (participants: User[]) => {
@@ -390,16 +382,13 @@ export const Conversation = ({
     }
   };
 
-  const isLastReceivedMessage = (messageEntity: Message, conversationEntity: ConversationEntity): boolean => {
-    return !!messageEntity.timestamp() && messageEntity.timestamp() >= conversationEntity.last_event_timestamp();
-  };
-
-  const updateConversationLastRead = (conversationEntity: ConversationEntity, messageEntity: Message): void => {
+  const updateConversationLastRead = (conversationEntity: ConversationEntity, messageEntity?: Message): void => {
     const conversationLastRead = conversationEntity.last_read_timestamp();
     const lastKnownTimestamp = conversationEntity.getLastKnownTimestamp(repositories.serverTime.toServerTimestamp());
     const needsUpdate = conversationLastRead < lastKnownTimestamp;
 
-    if (needsUpdate && isLastReceivedMessage(messageEntity, conversationEntity)) {
+    // if no message provided it means we need to jump to the last message
+    if (needsUpdate && (!messageEntity || isLastReceivedMessage(messageEntity, conversationEntity))) {
       conversationEntity.setTimestamp(lastKnownTimestamp, ConversationEntity.TIMESTAMP_TYPE.LAST_READ);
       repositories.message.markAsRead(conversationEntity);
     }
@@ -408,6 +397,7 @@ export const Conversation = ({
   const getInViewportCallback = useCallback(
     (conversationEntity: ConversationEntity, messageEntity: Message) => {
       const messageTimestamp = messageEntity.timestamp();
+
       const callbacks: Function[] = [];
 
       if (!messageEntity.isEphemeral()) {
@@ -487,15 +477,19 @@ export const Conversation = ({
             callActions={mainViewModel.calling.callActions}
             openRightSidebar={openRightSidebar}
             isRightSidebarOpen={isRightSidebarOpen}
-            isReadOnlyConversation={showReadOnlyConversationMessage}
+            isReadOnlyConversation={isReadOnlyConversation}
           />
 
           {activeCalls.map(call => {
-            const conversation = conversationState.findConversation(call.conversationId);
+            const {conversation} = call;
             const callingViewModel = mainViewModel.calling;
             const callingRepository = callingViewModel.callingRepository;
 
-            if (!conversation || !smBreakpoint) {
+            if (!smBreakpoint) {
+              return null;
+            }
+
+            if (isCallWindowDetached) {
               return null;
             }
 
@@ -506,8 +500,6 @@ export const Conversation = ({
                   call={call}
                   callActions={callingViewModel.callActions}
                   callingRepository={callingRepository}
-                  conversation={conversation}
-                  multitasking={callingViewModel.multitasking}
                   pushToTalkKey={callingViewModel.propertiesRepository.getPreference(
                     PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY,
                   )}
@@ -519,7 +511,6 @@ export const Conversation = ({
           <MessagesList
             conversation={activeConversation}
             selfUser={selfUser}
-            initialMessage={initialMessage}
             conversationRepository={conversationRepository}
             messageRepository={repositories.message}
             messageActions={mainViewModel.actions}
@@ -534,19 +525,15 @@ export const Conversation = ({
             onClickMessage={handleClickOnMessage}
             onLoading={loading => setIsConversationLoaded(!loading)}
             getVisibleCallback={getInViewportCallback}
-            isLastReceivedMessage={isLastReceivedMessage}
             isMsgElementsFocusable={isMsgElementsFocusable}
             setMsgElementsFocusable={setMsgElementsFocusable}
             isRightSidebarOpen={isRightSidebarOpen}
+            updateConversationLastRead={updateConversationLastRead}
           />
 
           {isConversationLoaded &&
-            (showReadOnlyConversationMessage ? (
-              <ReadOnlyConversationMessage
-                state={readOnlyState}
-                handleMLSUpdate={reloadApp}
-                displayName={displayName}
-              />
+            (isReadOnlyConversation ? (
+              <ReadOnlyConversationMessage reloadApp={reloadApp} conversation={activeConversation} />
             ) : (
               <InputBar
                 key={activeConversation?.id}

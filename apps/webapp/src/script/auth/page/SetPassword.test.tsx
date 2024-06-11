@@ -33,17 +33,7 @@ const errorMessageId = 'error-message';
 
 describe('SetPassword', () => {
   it('has disabled submit button as long as there is no input', () => {
-    const {getByTestId} = mountComponent(
-      <SetPassword />,
-      mockStoreFactory()({
-        ...initialRootState,
-        runtimeState: {
-          hasCookieSupport: true,
-          hasIndexedDbSupport: true,
-          isSupportedBrowser: true,
-        },
-      }),
-    );
+    const {getByTestId} = mountComponent(<SetPassword />, mockStoreFactory()(initialRootState));
 
     const passwordInput = getByTestId(passwordInputId);
     const setPasswordButton = getByTestId(setPasswordButtonId) as HTMLButtonElement;
@@ -55,17 +45,7 @@ describe('SetPassword', () => {
   });
 
   it('handles invalid password', async () => {
-    const {getByTestId, container} = mountComponent(
-      <SetPassword />,
-      mockStoreFactory()({
-        ...initialRootState,
-        runtimeState: {
-          hasCookieSupport: true,
-          hasIndexedDbSupport: true,
-          isSupportedBrowser: true,
-        },
-      }),
-    );
+    const {getByTestId, container} = mountComponent(<SetPassword />, mockStoreFactory()(initialRootState));
 
     const passwordInput = getByTestId(passwordInputId);
 

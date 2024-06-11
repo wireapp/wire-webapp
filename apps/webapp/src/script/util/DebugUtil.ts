@@ -37,6 +37,7 @@ import keyboardjs from 'keyboardjs';
 import {$createTextNode, $getRoot, LexicalEditor} from 'lexical';
 import {container} from 'tsyringe';
 
+import {useDetachedCallingFeatureState} from 'Components/calling/DetachedCallingCell/DetachedCallingFeature.state';
 import {getLogger, Logger} from 'Util/Logger';
 
 import {KEY} from './KeyboardUtil';
@@ -207,6 +208,10 @@ export class DebugUtil {
     this.propertiesRepository.savePreference(PROPERTIES_TYPE.CALL.PUSH_TO_TALK_KEY, key);
   }
 
+  async toggleDetachedCallFeature(shouldEnable: boolean = true) {
+    return useDetachedCallingFeatureState.getState().toggle(shouldEnable);
+  }
+
   /** Used by QA test automation. */
   blockAllConnections(): Promise<void[]> {
     const blockUsers = this.userState.users().map(userEntity => this.connectionRepository.blockUser(userEntity));
@@ -288,6 +293,11 @@ export class DebugUtil {
       // the "as any" can be removed when this issue is fixed https://github.com/facebook/lexical/issues/5502
       (root as any).append(textNode);
     });
+  }
+
+  // Used by QA to trigger a focus event on the app (in order to trigger the update of the team feature-config)
+  simulateAppToForeground() {
+    window.dispatchEvent(new FocusEvent('focus'));
   }
 
   setE2EICertificateTtl(ttl: number) {
@@ -416,7 +426,7 @@ export class DebugUtil {
     if (!activeCall) {
       throw new Error('no active call found');
     }
-    return this.callingRepository.getStats(activeCall.conversationId);
+    return this.callingRepository.getStats(activeCall.conversation.qualifiedId);
   }
 
   /** Used by QA test automation. */
