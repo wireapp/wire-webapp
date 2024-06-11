@@ -12,9 +12,10 @@ jobs:
     steps:
       - name: Make title semantic
         run: |
-          TITLE="${{github.event.pull_request.title}}"
+          TITLE="$PR_TITLE"
           SEMANTIC_TITLE="${TITLE/AUTO: /}"
           echo "renaming pr to: $SEMANTIC_TITLE"
           gh pr edit ${{github.event.pull_request.html_url}} --title "$SEMANTIC_TITLE"
         env:
           GH_TOKEN: ${{secrets.OTTO_THE_BOT_GH_TOKEN}}
+          PR_TITLE: ${{github.event.pull_request.title}}

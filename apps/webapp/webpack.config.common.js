@@ -31,10 +31,12 @@ const ROOT_NODE_MODULES = require.resolve('webpack').replace(/node_modules\/webp
 
 const dist = path.resolve(DIST_PATH, 'static');
 const auth = path.resolve(SRC_PATH, 'script/auth');
+const checkBrowser = path.resolve(SRC_PATH, 'script/browser');
 const srcScript = path.resolve(SRC_PATH, 'script');
 
 const HOME_TEMPLATE_PATH = path.resolve(SRC_PATH, 'page/index.ejs');
 const AUTH_TEMPLATE_PATH = path.resolve(SRC_PATH, 'page/auth.ejs');
+const UNSUPPORTED_TEMPLATE_PATH = path.resolve(SRC_PATH, 'page/unsupported.ejs');
 
 const {clientConfig, serverConfig} = require(path.resolve(DIST_PATH, 'config/index.js'));
 
@@ -59,6 +61,7 @@ module.exports = {
   entry: {
     app: path.resolve(srcScript, 'main/index.tsx'),
     auth: path.resolve(auth, 'main.tsx'),
+    checkBrowser: path.resolve(checkBrowser, 'CheckBrowser.ts'),
   },
   externals: {
     'fs-extra': '{}',
@@ -150,6 +153,7 @@ module.exports = {
         },
         // copying all static resources (audio, images, fonts...)
         {from: 'resource', to: dist},
+        {from: 'src/page/basicBrowserFeatureCheck.js', to: `${dist}/min/`},
       ],
     }),
     new webpack.IgnorePlugin({resourceRegExp: /.*\.wasm/}),
@@ -163,6 +167,12 @@ module.exports = {
       inject: false,
       filename: 'auth/index.html',
       template: AUTH_TEMPLATE_PATH,
+      templateParameters,
+    }),
+    new HtmlWebpackPlugin({
+      inject: false,
+      filename: 'unsupported/index.html',
+      template: UNSUPPORTED_TEMPLATE_PATH,
       templateParameters,
     }),
   ],

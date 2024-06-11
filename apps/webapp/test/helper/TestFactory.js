@@ -208,6 +208,7 @@ export class TestFactory {
     this.team_repository = new TeamRepository(
       this.user_repository,
       this.assetRepository,
+      () => Promise.resolve(),
       this.team_service,
       this.user_repository['userState'],
       new TeamState(this.user_repository['userState']),
