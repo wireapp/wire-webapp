@@ -19,24 +19,20 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const DeliveryIndicatorContainerStyles = (height?: number): CSSObject => ({
-  display: 'flex',
+export const DeliveryIndicatorStyles = (visible: boolean): CSSObject => ({
   boxSizing: 'border-box',
-  justifyContent: 'center',
-  alignItems: 'center',
   position: 'absolute',
   top: 0,
   right: 0,
+  transform: 'translateX(100%)',
   overflow: 'unset',
-  padding: '0 24px 0 16px',
-  height: height ? `${height}px` : 'min-content',
-});
-
-export const DeliveredIndicatorStyles = (isLastDeliveredMessage: boolean): CSSObject => ({
+  padding: '7px 24px 7px 16px',
   color: 'var(--content-message-timestamp)',
   fontSize: 'var(--font-size-small)',
   fontWeight: 'var(--font-weight-regular)',
+  lineHeight: 'var(--line-height-sm)',
   wordWrap: 'normal',
+  whiteSpace: 'normal',
   width: 'min-content',
-  visibility: isLastDeliveredMessage ? 'unset' : 'hidden',
+  visibility: visible ? 'unset' : 'hidden',
 });

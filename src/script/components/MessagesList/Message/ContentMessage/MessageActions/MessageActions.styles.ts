@@ -25,20 +25,20 @@ export const messageActionsGroup: CSSObject = {
   padding: '2px',
 };
 
-export const messageBodyActions: CSSObject = {
+export const messageBodyActions = (rightMarginWidth: number): CSSObject => ({
   display: 'inline-flex',
   alignItems: 'center',
   minHeight: '32px',
   minWidth: '40px',
   position: 'absolute',
-  right: '16px',
+  right: `${16 - rightMarginWidth}px`,
   top: '-34px',
   userSelect: 'none',
   '@media (max-width: @screen-md-min)': {
     height: '45px',
     flexDirection: 'column',
   },
-};
+});
 
 export const messageActionsMenuButton = (isReactable = true): CSSObject => {
   const defaultStyle: CSSObject = {

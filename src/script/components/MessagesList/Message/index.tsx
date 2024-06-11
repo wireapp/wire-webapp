@@ -81,6 +81,7 @@ export interface MessageParams extends MessageActions {
   handleArrowKeyDown: (e: React.KeyboardEvent) => void;
   isMsgElementsFocusable: boolean;
   setMsgElementsFocusable: (isMsgElementsFocusable: boolean) => void;
+  rightMarginWidth: number;
 }
 
 export const Message = (props: MessageParams & {scrollTo?: ScrollToElement}) => {
@@ -96,6 +97,7 @@ export const Message = (props: MessageParams & {scrollTo?: ScrollToElement}) => 
     handleArrowKeyDown,
     isMsgElementsFocusable,
     setMsgElementsFocusable,
+    rightMarginWidth,
   } = props;
   const messageElementRef = useRef<HTMLDivElement>(null);
   const {status, ephemeral_expires} = useKoSubscribableChildren(message, ['status', 'ephemeral_expires']);
@@ -151,6 +153,7 @@ export const Message = (props: MessageParams & {scrollTo?: ScrollToElement}) => 
       hideHeader={hideHeader}
       isFocused={isFocused}
       isMsgElementsFocusable={isMsgElementsFocusable}
+      rightMarginWidth={rightMarginWidth}
     />
   );
 

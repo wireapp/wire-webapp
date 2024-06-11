@@ -26,6 +26,7 @@ import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {DeliveredIndicator} from 'Components/MessagesList/Message/DeliveredIndicator/DeliveredIndicator';
 import {E2EIVerificationMessage} from 'Components/MessagesList/Message/E2EIVerificationMessage';
 import {OutgoingQuote} from 'src/script/conversation/MessageRepository';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
@@ -85,6 +86,7 @@ export const MessageWrapper: React.FC<MessageParams> = ({
   messageActions,
   teamState = container.resolve(TeamState),
   isMsgElementsFocusable,
+  rightMarginWidth,
 }) => {
   const findMessage = async (conversation: Conversation, messageId: string) => {
     const event =
@@ -180,31 +182,35 @@ export const MessageWrapper: React.FC<MessageParams> = ({
     }
     return void messageRepository.toggleReaction(conversation, message, reaction, selfId);
   };
+
   if (message.isContent()) {
     return (
-      <ContentMessageComponent
-        message={message}
-        findMessage={findMessage}
-        conversation={conversation}
-        hideHeader={hideHeader}
-        selfId={selfId}
-        isLastDeliveredMessage={isLastDeliveredMessage}
-        onClickMessage={onClickMessage}
-        onClickTimestamp={onClickTimestamp}
-        onClickReactionDetails={onClickReactionDetails}
-        onClickButton={clickButton}
-        onClickAvatar={onClickAvatar}
-        contextMenu={{entries: contextMenuEntries}}
-        onClickCancelRequest={onClickCancelRequest}
-        onClickImage={onClickImage}
-        onClickInvitePeople={onClickInvitePeople}
-        onClickParticipants={onClickParticipants}
-        onClickDetails={onClickDetails}
-        onRetry={onRetry}
-        isFocused={isFocused}
-        isMsgElementsFocusable={isMsgElementsFocusable}
-        onClickReaction={handleReactionClick}
-      />
+      <>
+        <ContentMessageComponent
+          message={message}
+          findMessage={findMessage}
+          conversation={conversation}
+          hideHeader={hideHeader}
+          selfId={selfId}
+          onClickMessage={onClickMessage}
+          onClickTimestamp={onClickTimestamp}
+          onClickReactionDetails={onClickReactionDetails}
+          onClickButton={clickButton}
+          onClickAvatar={onClickAvatar}
+          contextMenu={{entries: contextMenuEntries}}
+          onClickCancelRequest={onClickCancelRequest}
+          onClickImage={onClickImage}
+          onClickInvitePeople={onClickInvitePeople}
+          onClickParticipants={onClickParticipants}
+          onClickDetails={onClickDetails}
+          onRetry={onRetry}
+          isFocused={isFocused}
+          isMsgElementsFocusable={isMsgElementsFocusable}
+          onClickReaction={handleReactionClick}
+          rightMarginWidth={rightMarginWidth}
+        />
+        {isLastDeliveredMessage && <DeliveredIndicator isLastDeliveredMessage={isLastDeliveredMessage} />}
+      </>
     );
   }
   if (message.isUnableToDecrypt()) {
@@ -254,11 +260,10 @@ export const MessageWrapper: React.FC<MessageParams> = ({
   }
   if (message.isPing()) {
     return (
-      <PingMessage
-        message={message}
-        is1to1Conversation={conversation.is1to1()}
-        isLastDeliveredMessage={isLastDeliveredMessage}
-      />
+      <>
+        <PingMessage message={message} is1to1Conversation={conversation.is1to1()} />
+        {isLastDeliveredMessage && <DeliveredIndicator isLastDeliveredMessage={isLastDeliveredMessage} />}
+      </>
     );
   }
   if (message.isFileTypeRestricted()) {

@@ -19,29 +19,24 @@
 
 import {forwardRef, ForwardRefRenderFunction} from 'react';
 
-import {
-  DeliveredIndicatorStyles,
-  DeliveryIndicatorContainerStyles,
-} from 'Components/MessagesList/Message/DeliveredIndicator/DeliveredIndicator.styles';
+import {DeliveryIndicatorStyles} from 'Components/MessagesList/Message/DeliveredIndicator/DeliveredIndicator.styles';
 import {t} from 'Util/LocalizerUtil';
 
 export interface DeliveredIndicatorProps {
-  height?: number;
   isLastDeliveredMessage: boolean;
 }
 
 const DeliveredIndicatorComponent: ForwardRefRenderFunction<HTMLDivElement, DeliveredIndicatorProps> = (
-  {height, isLastDeliveredMessage},
+  {isLastDeliveredMessage},
   ref,
 ) => {
   return (
-    <div css={DeliveryIndicatorContainerStyles(height)} ref={ref}>
-      <span
-        css={DeliveredIndicatorStyles(isLastDeliveredMessage)}
-        data-uie-name={isLastDeliveredMessage ? 'status-message-read-receipt-delivered' : undefined}
-      >
-        {t('conversationMessageDelivered')}
-      </span>
+    <div
+      css={DeliveryIndicatorStyles(isLastDeliveredMessage)}
+      data-uie-name={isLastDeliveredMessage ? 'status-message-read-receipt-delivered' : undefined}
+      ref={ref}
+    >
+      {t('conversationMessageDelivered')}
     </div>
   );
 };

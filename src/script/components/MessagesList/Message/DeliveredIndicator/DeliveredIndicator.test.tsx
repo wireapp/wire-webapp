@@ -26,13 +26,13 @@ describe('DeliveredIndicator', () => {
     expect(DeliveredIndicator.displayName).toBe('DeliveredIndicator');
   });
 
-  it('shows "delivered" when it is the last delivered message, no height provided', () => {
+  it('shows "delivered" when it is the last delivered message', () => {
     const {getByTestId} = render(<DeliveredIndicator isLastDeliveredMessage />);
 
     expect(getByTestId('status-message-read-receipt-delivered')).toBeTruthy();
   });
 
-  it('hides "delivered" when it is not the last delivered message, height provided', () => {
+  it('hides "delivered" when it is not the last delivered message', () => {
     const {queryByTestId} = render(<DeliveredIndicator isLastDeliveredMessage={false} />);
 
     expect(queryByTestId('status-message-read-receipt-delivered')).toBeNull();
