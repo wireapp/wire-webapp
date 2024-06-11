@@ -17,6 +17,8 @@
  *
  */
 
+import {useEffect, useRef} from 'react';
+
 import {amplify} from 'amplify';
 
 import {Button, ButtonVariant, CircleCloseIcon, Input, SearchIcon} from '@wireapp/react-ui-kit';
@@ -64,6 +66,8 @@ export const ConversationHeader = ({
   const {canCreateGroupConversation} = generatePermissionHelpers(selfUser.teamRole());
   const isFolderView = currentTab === SidebarTabs.FOLDER;
 
+  const inputRef = useRef<HTMLInputElement | null>(null);
+
   const conversationsHeaderTitle: Partial<Record<SidebarTabs, string>> = {
     [SidebarTabs.RECENT]: t('conversationViewAllConversations'),
     [SidebarTabs.FAVORITES]: t('conversationLabelFavorites'),
@@ -73,6 +77,12 @@ export const ConversationHeader = ({
     [SidebarTabs.ARCHIVES]: t('conversationFooterArchive'),
     [SidebarTabs.CONNECT]: t('searchConnect'),
   };
+
+  useEffect(() => {
+    amplify.subscribe(WebAppEvents.SHORTCUT.SEARCH, () => {
+      inputRef?.current?.focus();
+    });
+  }, []);
 
   return (
     <>
@@ -97,6 +107,7 @@ export const ConversationHeader = ({
 
       {showSearchInput && (
         <Input
+          ref={inputRef}
           className="label-1"
           value={searchValue}
           onFocus={() => setIsConversationFilterFocused(true)}
