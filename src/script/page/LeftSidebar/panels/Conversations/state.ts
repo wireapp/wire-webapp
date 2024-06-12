@@ -109,9 +109,9 @@ const useSidebarStore = create<SidebarStore>()(
       },
     }),
     {
-      name: 'sidebar-store', // name of the item in the storage (must be unique)
-      storage: createJSONStorage(() => localStorage), // (optional) by default, 'localStorage' is used
-      partialize: state => ({openStatus: state.openStatus}), // persist openStatus
+      name: 'sidebar-store',
+      storage: createJSONStorage(() => localStorage),
+      partialize: state => ({openStatus: state.openStatus}),
     },
   ),
 );
