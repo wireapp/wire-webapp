@@ -272,7 +272,7 @@ export class MediaDevicesHandler {
 
     try {
       this.removeAllDevices();
-      const mediaDevices = await navigator.mediaDevices.enumerateDevices();
+      const mediaDevices = await this.enumerateMediaDevices();
 
       if (!mediaDevices) {
         throw new Error('No media devices found');
@@ -340,6 +340,23 @@ export class MediaDevicesHandler {
     this.logger.info(`Detected '${screenSources.length}' sources for screen sharing from Electron`);
     this.availableDevices.screeninput(screenSources);
     return screenSources;
+  }
+
+  /**
+   * Enumerates all known Media Devices Infos of a System.
+   * @returns All enumerated MediaDeviceInfos
+   */
+  private async enumerateMediaDevices(): Promise<MediaDeviceInfo[]> {
+    // On Firefox, the device labels obtained from ```navigator.mediaDevices.enumerateDevices()``` will also be set to
+    // the blank string in the case where there is no more active MediaStream, even though the application has been
+    // previously temporarily authorized to access the devices by calling ```navigator.mediaDevices.getUserMedia()```.
+    const mediaPromise = navigator.mediaDevices.getUserMedia({audio: true, video: false});
+    return mediaPromise.then(stream => {
+      return navigator.mediaDevices.enumerateDevices().then(devices => {
+        stream?.getTracks().forEach(track => track.stop());
+        return devices;
+      });
+    });
   }
 
   /**
