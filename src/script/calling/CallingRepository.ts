@@ -265,18 +265,25 @@ export class CallingRepository {
     }
   };
 
-  public async blurVideo() {
+  public async switchVideoBackgroundBlur(enable: boolean): Promise<void> {
     const activeCall = this.callState.joinedCall();
     if (!activeCall) {
       return;
     }
     const selfParticipant = activeCall.getSelfParticipant();
+    selfParticipant.releaseBlurredVideoStream();
     const videoFeed = selfParticipant.videoStream();
-    if (videoFeed) {
-      const blurredVideoStream = await applyBlur(videoFeed);
-      selfParticipant.stopVideoBlur = blurredVideoStream.release;
-      this.changeMediaSource(blurredVideoStream.stream, MediaType.VIDEO);
+    if (!videoFeed) {
+      return;
     }
+    let newVideoFeed = videoFeed;
+    if (enable) {
+      const blurredVideoStream = await applyBlur(videoFeed);
+      // Keep a reference to the blurred stream in order to release it when the blur is disabled
+      selfParticipant.blurredVideoStream(blurredVideoStream);
+      newVideoFeed = blurredVideoStream.stream;
+    }
+    this.changeMediaSource(newVideoFeed, MediaType.VIDEO, false);
   }
 
   getStats(conversationId: QualifiedId) {
@@ -1224,6 +1231,7 @@ export class CallingRepository {
   public changeMediaSource(
     mediaStream: MediaStream,
     mediaType: MediaType,
+    updateSelfParticipant: boolean = true,
     call = this.callState.joinedCall(),
   ): MediaStream | void {
     if (!call) {
@@ -1242,14 +1250,14 @@ export class CallingRepository {
 
     // Don't update video input (coming from A/V preferences) when screensharing is activated
     if (mediaType === MediaType.VIDEO && selfParticipant.sharesCamera() && !selfParticipant.sharesScreen()) {
-      const videoTracks = mediaStream.getVideoTracks().map(track => track.clone());
+      const videoTracks = mediaStream.getVideoTracks();
       if (videoTracks.length > 0) {
-        const clonedMediaStream = new MediaStream(videoTracks);
-        selfParticipant.setVideoStream(clonedMediaStream, true);
         this.wCall?.replaceTrack(this.serializeQualifiedId(conversation.qualifiedId), videoTracks[0]);
         // Remove the previous video stream
-        this.mediaStreamHandler.releaseTracksFromStream(mediaStream);
-        return clonedMediaStream;
+        if (updateSelfParticipant) {
+          selfParticipant.setVideoStream(mediaStream, true);
+        }
+        return mediaStream;
       }
     }
   }

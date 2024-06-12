@@ -99,8 +99,7 @@ export async function applyBlur(stream: MediaStream): Promise<{stream: MediaStre
   // Store the video dimensions
   const videoDimensions = {width: 0, height: 0};
 
-  const originalStream = stream.clone();
-  videoEl.srcObject = originalStream;
+  videoEl.srcObject = stream;
   videoEl.onloadedmetadata = () => {
     // Ensure metadata is loaded to get video dimensions
     videoDimensions.width = videoEl.videoWidth || 1240;
@@ -120,24 +119,20 @@ export async function applyBlur(stream: MediaStream): Promise<{stream: MediaStre
       const stopBlurProcess = startBlurProcess(segmenter, gl, videoEl, videoDimensions);
       const videoStream = glContext.captureStream(QualitySettings.framerate).getVideoTracks()[0];
       const blurredMediaStream = new MediaStream([videoStream]);
+
       resolve({
         stream: blurredMediaStream,
         release: () => {
           stopBlurProcess();
           stopVideo(videoEl);
           segmenter.close();
-          // Make sure we release the original stream (to free the camera for example)
-          originalStream.getTracks().forEach(track => {
-            track.stop();
-            originalStream.removeTrack(track);
-          });
         },
       });
     };
   });
 }
 
-export function stopVideo(videoEl: HTMLVideoElement) {
+function stopVideo(videoEl: HTMLVideoElement) {
   // Check if the video element is playing and if so, stop it.
   if (!videoEl.paused && !videoEl.ended) {
     videoEl.pause();
