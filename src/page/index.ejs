@@ -21,14 +21,63 @@
 
     <script src="./min/basicBrowserFeatureCheck.js?<%= VERSION %>"></script>
     <script src="./min/checkBrowser.js?<%= VERSION %>"></script>
+
+    <style>
+      body {
+        margin: 0;
+      }
+
+      #loader-root {
+        align-items: center;
+        background-color: #fafafa;
+        color: #676b71;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        justify-content: center;
+        position: absolute;
+        width: 100%;
+      }
+
+      .loading-spinner {
+        width: 48px;
+        height: 48px;
+        border: 5px solid #676b71;
+        border-bottom-color: transparent;
+        border-radius: 50%;
+        display: inline-block;
+        box-sizing: border-box;
+        animation: rotation 1s linear infinite;
+      }
+
+      #loading-message {
+        margin-top: 32px;
+      }
+
+      @keyframes rotation {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
   </head>
 
   <body>
+    <div id="loader-root">
+        <div class="loading-spinner"></div>
+        <div id="loading-message">Downloading application...</div>
+        <div id="additional-message"></div>
+    </div>
     <main id="wire-app"></main>
+
+    <script src="./min/loader.js?<%= VERSION %>"></script>
     <script src="./config.js?<%= VERSION %>"></script>
     <script src="./min/dexie.js?<%= VERSION %>"></script>
     <script src="./min/vendor.js?<%= VERSION %>"></script>
     <script src="./min/runtime.js?<%= VERSION %>"></script>
-    <script src="./min/app.js?<%= VERSION %>"></script>
+    <script src="./min/app.js?<%= VERSION %>" id="appScript"></script>
   </body>
 </html>

@@ -152,6 +152,7 @@ module.exports = {
         // copying all static resources (audio, images, fonts...)
         {from: 'resource', to: dist},
         {from: 'src/page/basicBrowserFeatureCheck.js', to: `${dist}/min/`},
+        {from: 'src/page/loader.js', to: `${dist}/min/`},
       ],
     }),
     new webpack.IgnorePlugin({resourceRegExp: /.*\.wasm/}),
