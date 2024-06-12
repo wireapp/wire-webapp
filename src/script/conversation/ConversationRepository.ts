@@ -1438,7 +1438,9 @@ export class ConversationRepository {
    *
    * @param event Custom event containing join key/code
    */
-  private readonly onConversationJoin = async (event: {detail: {code: string; key: string; domain?: string}}) => {
+  private readonly onConversationJoin = async (event: {
+    detail: {code: string; key: string; domain?: string | null};
+  }) => {
     const {key, code, domain} = event.detail;
 
     const showNoConversationModal = () => {
@@ -1458,7 +1460,10 @@ export class ConversationRepository {
         name: conversationName,
         has_password: hasPassword,
       } = await this.conversationService.getConversationJoin(key, code);
-      const knownConversation = this.conversationState.findConversation({domain: null, id: conversationId});
+      const knownConversation = this.conversationState.findConversation({
+        domain: domain ?? this.userState.self()?.domain ?? 'wire.com',
+        id: conversationId,
+      });
       if (knownConversation?.status() === ConversationStatus.CURRENT_MEMBER) {
         amplify.publish(WebAppEvents.CONVERSATION.SHOW, knownConversation, {});
         return;
@@ -1470,7 +1475,7 @@ export class ConversationRepository {
             try {
               const response = await this.conversationService.postConversationJoin(key, code, password);
               const conversationEntity = await this.getConversationById({
-                domain: domain ?? this.userState.self().domain,
+                domain: domain ?? this.userState.self()?.domain ?? 'wire.com',
                 id: conversationId,
               });
               if (response) {
