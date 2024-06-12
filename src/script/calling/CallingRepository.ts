@@ -265,17 +265,26 @@ export class CallingRepository {
     }
   };
 
-  public async blurVideo() {
+  public async switchVideoBackgroundBlur(enable: boolean): Promise<void> {
     const activeCall = this.callState.joinedCall();
     if (!activeCall) {
       return;
     }
     const selfParticipant = activeCall.getSelfParticipant();
+    if (selfParticipant.blurredVideoStream) {
+      selfParticipant.releaseBlurredVideoStream();
+    }
     const videoFeed = selfParticipant.videoStream();
-    if (videoFeed) {
+    if (!videoFeed) {
+      return;
+    }
+    if (enable) {
       const blurredVideoStream = await applyBlur(videoFeed);
-      selfParticipant.stopVideoBlur = blurredVideoStream.release;
+      // Keep a reference to the blurred stream in order to release it when the blur is disabled
+      selfParticipant.blurredVideoStream = blurredVideoStream;
       this.changeMediaSource(blurredVideoStream.stream, MediaType.VIDEO);
+    } else {
+      this.changeMediaSource(videoFeed, MediaType.VIDEO);
     }
   }
 

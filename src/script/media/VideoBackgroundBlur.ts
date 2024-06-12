@@ -120,6 +120,7 @@ export async function applyBlur(stream: MediaStream): Promise<{stream: MediaStre
       const stopBlurProcess = startBlurProcess(segmenter, gl, videoEl, videoDimensions);
       const videoStream = glContext.captureStream(QualitySettings.framerate).getVideoTracks()[0];
       const blurredMediaStream = new MediaStream([videoStream]);
+
       resolve({
         stream: blurredMediaStream,
         release: () => {
@@ -137,7 +138,7 @@ export async function applyBlur(stream: MediaStream): Promise<{stream: MediaStre
   });
 }
 
-export function stopVideo(videoEl: HTMLVideoElement) {
+function stopVideo(videoEl: HTMLVideoElement) {
   // Check if the video element is playing and if so, stop it.
   if (!videoEl.paused && !videoEl.ended) {
     videoEl.pause();
