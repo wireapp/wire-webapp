@@ -1181,7 +1181,7 @@
   "participantDevicesHeader": "Zariadenia",
   "participantDevicesHeadline": "{{brandName}} dáva každému zariadeniu jedinečný identifikátor. Porovnajte ich s {{user}} a overte Vaše rozhovory.",
   "participantDevicesLearnMore": "Zistiť viac",
-  "participantDevicesOutdatedClientMessage": "{{user}} používa staršiu verziu {{brandName}}. Žiadne zariadenia sa tu nezobrazujú.",
+  "participantDevicesNoClients": "{{user}} has no devices attached to their account and won’t get your messages or calls at the moment.",
   "participantDevicesProteusDeviceVerification": "Proteus Device Verification",
   "participantDevicesProteusKeyFingerprint": "Proteus Key Fingerprint",
   "participantDevicesSelfAllDevices": "Zobraziť všetky moje zariadenia",

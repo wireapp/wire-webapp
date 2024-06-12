@@ -1181,7 +1181,7 @@
   "participantDevicesHeader": "Enheder",
   "participantDevicesHeadline": "{{brandName}} giver hver enhed et unikt fingeraftryk. Sammenlign dem med {{user}} og bekræft din samtale.",
   "participantDevicesLearnMore": "Lær mere",
-  "participantDevicesOutdatedClientMessage": "{{user}} bruger en gammel version af {{brandName}}. Ingen enheder er vist her.",
+  "participantDevicesNoClients": "{{user}} has no devices attached to their account and won’t get your messages or calls at the moment.",
   "participantDevicesProteusDeviceVerification": "Proteus Device Verification",
   "participantDevicesProteusKeyFingerprint": "Proteus Key Fingerprint",
   "participantDevicesSelfAllDevices": "Vis alle mine enheder",

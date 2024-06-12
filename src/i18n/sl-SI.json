@@ -1181,7 +1181,7 @@
   "participantDevicesHeader": "Naprave",
   "participantDevicesHeadline": "{{brandName}} dodeli vsaki napravi edinstven prstni odtis. Primerjajte jih z {{user}} in preverite vaš pogovor.",
   "participantDevicesLearnMore": "Nauči se več",
-  "participantDevicesOutdatedClientMessage": "{{user}} uporablja starejšo različico {{brandName}}. Nobenih naprav tukaj ni prikazano.",
+  "participantDevicesNoClients": "{{user}} has no devices attached to their account and won’t get your messages or calls at the moment.",
   "participantDevicesProteusDeviceVerification": "Proteus Device Verification",
   "participantDevicesProteusKeyFingerprint": "Proteus Key Fingerprint",
   "participantDevicesSelfAllDevices": "Prikaži vse moje naprave",

@@ -1181,7 +1181,7 @@
   "participantDevicesHeader": "उपकरण",
   "participantDevicesHeadline": "{{brandName}} प्रत्येक यन्त्र को एक अद्वितीय फिंगरप्रिंट देता है| उनकी तुलना {{user}} के साथ करें और अपनी बातचीत को सत्यापित करें।",
   "participantDevicesLearnMore": "Learn more",
-  "participantDevicesOutdatedClientMessage": "{{user}} {{brandName}} का एक पुराना रूपांतर का इस्तेमाल कर रहे है| कोई डिवाइस नहीं दिखाया जा रहा हैं यहां पे|",
+  "participantDevicesNoClients": "{{user}} has no devices attached to their account and won’t get your messages or calls at the moment.",
   "participantDevicesProteusDeviceVerification": "Proteus Device Verification",
   "participantDevicesProteusKeyFingerprint": "Proteus Key Fingerprint",
   "participantDevicesSelfAllDevices": "मेरे सभी उपकरणों को दिखाएं",
