@@ -248,7 +248,7 @@ const Conversations: React.FC<ConversationsProps> = ({
 
   const sidebar = (
     <nav className="conversations-sidebar" css={conversationsSidebarStyles(mdBreakpoint)}>
-      <FadingScrollbar className="conversations-sidebar-items" data-is-collapsed={!isSideBarOpen}>
+      <FadingScrollbar className="conversations-sidebar-items" data-is-collapsed={!isSideBarOpen(sideBarOpenStatus)}>
         <UserDetails
           user={selfUser}
           groupId={conversationState.selfMLSConversation()?.groupId}
