@@ -63,7 +63,7 @@ const hideWarning = (type = getVisibleWarning()) => {
 const showWarning = (type: TYPE, info?: {name: string}) => {
   const {setName, addWarning} = useWarningsState.getState();
   const visibleWarning = getVisibleWarning();
-  const connectivityTypes = [TYPE.CONNECTIVITY_RECONNECT, TYPE.NO_INTERNET];
+  const connectivityTypes = [TYPE.CONNECTIVITY_RECONNECT, TYPE.NO_INTERNET, TYPE.SLOW_CONNECTION];
   const isConnectivityWarning = connectivityTypes.includes(type);
   const visibleWarningIsLifecycleUpdate = visibleWarning === TYPE.LIFECYCLE_UPDATE;
   if (isConnectivityWarning && !visibleWarningIsLifecycleUpdate) {

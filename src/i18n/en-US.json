@@ -1547,6 +1547,7 @@
   "warningCallUpgradeBrowser": "To call, please update Google Chrome.",
   "warningConnectivityConnectionLost": "Trying to connect. {{brandName}} may not be able to deliver messages.",
   "warningConnectivityNoInternet": "No Internet. You won’t be able to send or receive messages.",
+  "warningConnectivitySlowConnection": "Slow connection. Message sending or receiving may be delayed.",
   "warningLearnMore": "Learn more",
   "warningLifecycleUpdate": "A new version of {{brandName}} is available.",
   "warningLifecycleUpdateLink": "Update now",

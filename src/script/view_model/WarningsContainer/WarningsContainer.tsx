@@ -301,6 +301,12 @@ const WarningsContainer: React.FC<WarningProps> = ({onRefresh}) => {
       {visibleWarning === type.CONNECTIVITY_RECOVERY && (
         <div data-uie-name="connectivity-recovery" className="warning-bar warning-bar-progress" />
       )}
+      {visibleWarning === type.SLOW_CONNECTION && (
+        <div data-uie-name="no-internet" className="warning-bar warning-bar-connection">
+          <div className="warning-bar-message">{t('warningConnectivitySlowConnection')}</div>
+          {closeButton}
+        </div>
+      )}
       {visibleWarning === type.NO_INTERNET && (
         <div data-uie-name="no-internet" className="warning-bar warning-bar-connection">
           <div className="warning-bar-message">{t('warningConnectivityNoInternet')}</div>
