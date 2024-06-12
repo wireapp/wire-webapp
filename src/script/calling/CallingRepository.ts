@@ -1250,7 +1250,7 @@ export class CallingRepository {
 
     // Don't update video input (coming from A/V preferences) when screensharing is activated
     if (mediaType === MediaType.VIDEO && selfParticipant.sharesCamera() && !selfParticipant.sharesScreen()) {
-      const videoTracks = mediaStream.getVideoTracks().map(track => track.clone());
+      const videoTracks = mediaStream.getVideoTracks();
       if (videoTracks.length > 0) {
         this.wCall?.replaceTrack(this.serializeQualifiedId(conversation.qualifiedId), videoTracks[0]);
         // Remove the previous video stream
