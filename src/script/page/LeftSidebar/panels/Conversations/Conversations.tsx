@@ -49,7 +49,7 @@ import {ConversationsList} from './ConversationsList';
 import {ConversationTabs} from './ConversationTabs';
 import {EmptyConversationList} from './EmptyConversationList';
 import {getTabConversations} from './helpers';
-import {SidebarTabs, useFolderState, useSidebarStore} from './state';
+import {SidebarOpenStatus, SidebarTabs, useFolderState, useSidebarStore} from './state';
 
 import {CallingViewMode, CallState} from '../../../../calling/CallState';
 import {createLabel} from '../../../../conversation/ConversationLabelRepository';
@@ -98,10 +98,11 @@ const Conversations: React.FC<ConversationsProps> = ({
   selfUser,
 }) => {
   const {
-    isOpen: isSideBarOpen,
-    toggleIsOpen: toggleSidebarIsOpen,
-    setIsOpen: setIsSidebarOpen,
     currentTab,
+    isOpen: isSideBarOpen,
+    openStatus: sideBarOpenStatus,
+    setOpenStatus: setSidebarOpenStatus,
+    toggleOpenStatus: toggleSidebarIsOpen,
     setCurrentTab,
   } = useSidebarStore();
   const [conversationsFilter, setConversationsFilter] = useState<string>('');
@@ -173,8 +174,10 @@ const Conversations: React.FC<ConversationsProps> = ({
   const mdBreakpoint = useMatchMedia('(max-width: 1000px)');
 
   useEffect(() => {
-    setIsSidebarOpen(!mdBreakpoint);
-  }, [mdBreakpoint, setIsSidebarOpen]);
+    if (sideBarOpenStatus !== SidebarOpenStatus.MANUAL_OPEN && sideBarOpenStatus !== SidebarOpenStatus.MANUAL_CLOSED) {
+      setSidebarOpenStatus(mdBreakpoint ? SidebarOpenStatus.CLOSED : SidebarOpenStatus.OPEN);
+    }
+  }, [mdBreakpoint, setSidebarOpenStatus, sideBarOpenStatus]);
 
   useEffect(() => {
     if (activeConversation && !conversationState.isVisible(activeConversation)) {
@@ -250,7 +253,7 @@ const Conversations: React.FC<ConversationsProps> = ({
           user={selfUser}
           groupId={conversationState.selfMLSConversation()?.groupId}
           isTeam={isTeam}
-          isSideBarOpen={isSideBarOpen}
+          isSideBarOpen={isSideBarOpen(sideBarOpenStatus)}
         />
 
         <ConversationTabs
@@ -267,7 +270,7 @@ const Conversations: React.FC<ConversationsProps> = ({
       </FadingScrollbar>
 
       <IconButton
-        css={conversationsSidebarHandleStyles(isSideBarOpen)}
+        css={conversationsSidebarHandleStyles(isSideBarOpen(sideBarOpenStatus))}
         className="conversations-sidebar-handle"
         onClick={toggleSidebar}
       >

@@ -18,6 +18,7 @@
  */
 
 import {create} from 'zustand';
+import {persist, createJSONStorage} from 'zustand/middleware';
 
 type FolderState = {
   expandedFolder: string;
@@ -68,22 +69,51 @@ export enum SidebarTabs {
   PREFERENCES,
 }
 
+export const SidebarOpenStatus = {
+  OPEN: 'OPEN',
+  CLOSED: 'CLOSED',
+  MANUAL_OPEN: 'MANUAL_OPEN',
+  MANUAL_CLOSED: 'MANUAL_CLOSED',
+} as const;
+
+export type SidebarOpenStatus = (typeof SidebarOpenStatus)[keyof typeof SidebarOpenStatus];
+
 export interface SidebarStore {
-  isOpen: boolean;
-  setIsOpen: (isOpen: boolean) => void;
-  toggleIsOpen: () => void;
+  openStatus: SidebarOpenStatus;
+  setOpenStatus: (status: SidebarOpenStatus) => void;
+  toggleOpenStatus: () => void;
   currentTab: SidebarTabs;
+  isOpen: (openStatus: SidebarOpenStatus) => boolean;
   setCurrentTab: (tab: SidebarTabs) => void;
 }
 
-const useSidebarStore = create<SidebarStore>((set, get) => ({
-  currentTab: SidebarTabs.RECENT,
-  setCurrentTab: (tab: SidebarTabs) => {
-    set({currentTab: tab});
-  },
-  isOpen: true,
-  setIsOpen: isOpen => set({isOpen}),
-  toggleIsOpen: () => set({isOpen: !get().isOpen}),
-}));
+const useSidebarStore = create<SidebarStore>()(
+  persist(
+    (set, get) => ({
+      currentTab: SidebarTabs.RECENT,
+      setCurrentTab: (tab: SidebarTabs) => {
+        set({currentTab: tab});
+      },
+      openStatus: SidebarOpenStatus.CLOSED,
+      setOpenStatus: status => set({openStatus: status}),
+      isOpen: (openStatus: SidebarOpenStatus) => {
+        return openStatus === SidebarOpenStatus.MANUAL_OPEN || openStatus === SidebarOpenStatus.OPEN;
+      },
+      toggleOpenStatus: () => {
+        const currentStatus = get().openStatus;
+        const newStatus =
+          currentStatus === SidebarOpenStatus.MANUAL_OPEN || currentStatus === SidebarOpenStatus.OPEN
+            ? SidebarOpenStatus.MANUAL_CLOSED
+            : SidebarOpenStatus.MANUAL_OPEN;
+        set({openStatus: newStatus});
+      },
+    }),
+    {
+      name: 'sidebar-store', // name of the item in the storage (must be unique)
+      storage: createJSONStorage(() => localStorage), // (optional) by default, 'localStorage' is used
+      partialize: state => ({openStatus: state.openStatus}), // persist openStatus
+    },
+  ),
+);
 
 export {useFolderState, useSidebarStore};

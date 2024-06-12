@@ -23,7 +23,12 @@ import {Config} from 'src/script/Config';
 import {createLabel} from 'src/script/conversation/ConversationLabelRepository';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {Conversation} from 'src/script/entity/Conversation';
-import {SidebarTabs, useFolderState, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/state';
+import {
+  SidebarOpenStatus,
+  SidebarTabs,
+  useFolderState,
+  useSidebarStore,
+} from 'src/script/page/LeftSidebar/panels/Conversations/state';
 import {ContextMenuEntry, showContextMenu} from 'src/script/ui/ContextMenu';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -52,7 +57,7 @@ export const ConversationFolderTab = ({
   unreadConversations = [],
   dataUieName,
 }: ConversationFolderTabProps) => {
-  const {isOpen: isSidebarOpen, setIsOpen: setIsSidebarOpen} = useSidebarStore();
+  const {isOpen: isSidebarOpen, openStatus: sideBarOpenStatus, setOpenStatus: setSideBarOpenStatus} = useSidebarStore();
   const {openFolder, isFoldersTabOpen, toggleFoldersTab, expandedFolder} = useFolderState();
   const {conversationLabelRepository} = conversationRepository;
 
@@ -86,13 +91,13 @@ export const ConversationFolderTab = ({
   }
 
   function handleToggleFoldersTab(event: React.MouseEvent<HTMLButtonElement>) {
-    if (isSidebarOpen) {
+    if (isSidebarOpen(sideBarOpenStatus)) {
       toggleFoldersTab();
       return;
     }
 
     if (folders.length === 0) {
-      setIsSidebarOpen(true);
+      setSideBarOpenStatus(SidebarOpenStatus.OPEN);
       return;
     }
 
