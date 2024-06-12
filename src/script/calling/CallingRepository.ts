@@ -271,21 +271,19 @@ export class CallingRepository {
       return;
     }
     const selfParticipant = activeCall.getSelfParticipant();
-    if (selfParticipant.blurredVideoStream) {
-      selfParticipant.releaseBlurredVideoStream();
-    }
+    selfParticipant.releaseBlurredVideoStream();
     const videoFeed = selfParticipant.videoStream();
     if (!videoFeed) {
       return;
     }
+    let newVideoFeed = videoFeed;
     if (enable) {
       const blurredVideoStream = await applyBlur(videoFeed);
       // Keep a reference to the blurred stream in order to release it when the blur is disabled
-      selfParticipant.blurredVideoStream = blurredVideoStream;
-      this.changeMediaSource(blurredVideoStream.stream, MediaType.VIDEO);
-    } else {
-      this.changeMediaSource(videoFeed, MediaType.VIDEO);
+      selfParticipant.blurredVideoStream(blurredVideoStream);
+      newVideoFeed = blurredVideoStream.stream;
     }
+    this.changeMediaSource(newVideoFeed, MediaType.VIDEO, false);
   }
 
   getStats(conversationId: QualifiedId) {
@@ -1233,6 +1231,7 @@ export class CallingRepository {
   public changeMediaSource(
     mediaStream: MediaStream,
     mediaType: MediaType,
+    updateSelfParticipant: boolean = true,
     call = this.callState.joinedCall(),
   ): MediaStream | void {
     if (!call) {
@@ -1253,12 +1252,12 @@ export class CallingRepository {
     if (mediaType === MediaType.VIDEO && selfParticipant.sharesCamera() && !selfParticipant.sharesScreen()) {
       const videoTracks = mediaStream.getVideoTracks().map(track => track.clone());
       if (videoTracks.length > 0) {
-        const clonedMediaStream = new MediaStream(videoTracks);
-        selfParticipant.setVideoStream(clonedMediaStream, true);
         this.wCall?.replaceTrack(this.serializeQualifiedId(conversation.qualifiedId), videoTracks[0]);
         // Remove the previous video stream
-        this.mediaStreamHandler.releaseTracksFromStream(mediaStream);
-        return clonedMediaStream;
+        if (updateSelfParticipant) {
+          selfParticipant.setVideoStream(mediaStream, true);
+        }
+        return mediaStream;
       }
     }
   }
