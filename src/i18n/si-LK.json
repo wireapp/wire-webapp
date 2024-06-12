@@ -1181,7 +1181,7 @@
   "participantDevicesHeader": "උපාංග",
   "participantDevicesHeadline": "{{brandName}} සෑම උපාංගයකටම අනන්‍ය ඇඟිලි සටහනක් ලබා දෙයි. ඒවා {{user}} සමඟ සැසඳීමෙන් සංවාදය සත්‍යාපනය කරගන්න.",
   "participantDevicesLearnMore": "තව දැනගන්න",
-  "participantDevicesOutdatedClientMessage": "{{user}} පරණ {{brandName}} අනුවාදයක් භාවිතා කරයි. මෙහි උපාංග කිසිවක් නොපෙන්වයි.",
+  "participantDevicesNoClients": "{{user}} has no devices attached to their account and won’t get your messages or calls at the moment.",
   "participantDevicesProteusDeviceVerification": "ප්‍රෝටියස් උපාංගයේ විස්තර",
   "participantDevicesProteusKeyFingerprint": "ප්‍රෝටියස් යතුරේ ඇඟිලි සටහන",
   "participantDevicesSelfAllDevices": "මාගේ සියලුම උපාංග පෙන්වන්න",

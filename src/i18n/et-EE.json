@@ -1181,7 +1181,7 @@
   "participantDevicesHeader": "Seadmed",
   "participantDevicesHeadline": "{{brandName}} annab igale seadmele unikaalse sõrmejälje. Võrdle neid kasutajaga {{user}} ja kinnita oma vestlus.",
   "participantDevicesLearnMore": "Loe lähemalt",
-  "participantDevicesOutdatedClientMessage": "{{user}} kasutab vana {{brandName}}’i versiooni. Seadmete kohta puudub info.",
+  "participantDevicesNoClients": "{{user}} has no devices attached to their account and won’t get your messages or calls at the moment.",
   "participantDevicesProteusDeviceVerification": "Proteus Device Verification",
   "participantDevicesProteusKeyFingerprint": "Proteus Key Fingerprint",
   "participantDevicesSelfAllDevices": "Näita kõiki mu seadmeid",

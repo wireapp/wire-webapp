@@ -1181,7 +1181,7 @@
   "participantDevicesHeader": "Appareils",
   "participantDevicesHeadline": "{{brandName}} donne à chaque appareil une empreinte numérique unique. Comparez-les avec {{user}} pour vérifier votre conversation.",
   "participantDevicesLearnMore": "En savoir plus",
-  "participantDevicesOutdatedClientMessage": "{{user}} utilise une ancienne version de {{brandName}}. Aucun appareil n’est affiché ici.",
+  "participantDevicesNoClients": "{{user}} has no devices attached to their account and won’t get your messages or calls at the moment.",
   "participantDevicesProteusDeviceVerification": "Proteus Device Verification",
   "participantDevicesProteusKeyFingerprint": "Proteus Key Fingerprint",
   "participantDevicesSelfAllDevices": "Afficher tous mes appareils",

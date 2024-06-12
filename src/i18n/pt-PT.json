@@ -1181,7 +1181,7 @@
   "participantDevicesHeader": "Dispositivos",
   "participantDevicesHeadline": "O {{brandName}} gera em cada dispositivo uma impressão digital única. Compare-os com {{user}} e verifique a sua conversa.",
   "participantDevicesLearnMore": "Saber mais",
-  "participantDevicesOutdatedClientMessage": "{{user}} está a usar uma versão antiga do {{brandName}}. Os dispositivos não são mostrados aqui.",
+  "participantDevicesNoClients": "{{user}} has no devices attached to their account and won’t get your messages or calls at the moment.",
   "participantDevicesProteusDeviceVerification": "Proteus Device Verification",
   "participantDevicesProteusKeyFingerprint": "Proteus Key Fingerprint",
   "participantDevicesSelfAllDevices": "Mostrar todos os meus dispositivos",
