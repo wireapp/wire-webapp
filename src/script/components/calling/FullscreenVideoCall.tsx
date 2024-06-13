@@ -218,6 +218,8 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     label: t('videoCallbackgroundBlurHeadline'),
     options: [
       {
+        // Blurring is not possible if webgl context is not available
+        isDisabled: !document.createElement('canvas').getContext('webgl2'),
         label: t('videoCallbackgroundBlur'),
         value: BlurredBackgroundStatus.ON,
         dataUieName: 'blur',
