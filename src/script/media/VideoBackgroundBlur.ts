@@ -74,7 +74,7 @@ function startBlurProcess(
 }
 
 async function createSegmenter(canvas: HTMLCanvasElement): Promise<ImageSegmenter> {
-  const video = await FilesetResolver.forVisionTasks('./mediapipe/wasm');
+  const video = await FilesetResolver.forVisionTasks('/min/mediapipe/wasm');
   return ImageSegmenter.createFromOptions(video, {
     baseOptions: {
       modelAssetPath: QualitySettings.segmentationModel,

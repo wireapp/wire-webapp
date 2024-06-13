@@ -156,7 +156,7 @@ module.exports = {
         {
           context: 'node_modules/@mediapipe/tasks-vision/wasm',
           from: '*',
-          to: `${dist}/mediapipe/wasm`,
+          to: `${dist}/min/mediapipe/wasm`,
         },
         // copying all static resources (audio, images, fonts...)
         {from: 'resource', to: dist},
