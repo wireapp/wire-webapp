@@ -27,6 +27,7 @@ import {
   jumpToLastMessageButtonStyles,
   jumpToLastMessageChevronStyles,
 } from 'Components/MessagesList/MessageList.styles';
+import {t} from 'Util/LocalizerUtil';
 
 import {Conversation} from '../../entity/Conversation';
 
@@ -55,6 +56,7 @@ export const JumpToLastMessageButton = ({onGoToLastMessage, conversation}: JumpT
 
   return (
     <IconButton
+      aria-label={t('jumpToLastMessage')}
       data-uie-name="jump-to-last-message-button"
       onClick={onGoToLastMessage}
       css={jumpToLastMessageButtonStyles}
