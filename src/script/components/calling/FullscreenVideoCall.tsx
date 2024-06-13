@@ -70,7 +70,6 @@ export interface FullscreenVideoCallProps {
   conversation: Conversation;
   isChoosingScreen: boolean;
   isMuted: boolean;
-  hasBlurredBackground: boolean;
   leave: (call: Call) => void;
   maximizedParticipant: Participant | null;
   mediaDevicesHandler: MediaDevicesHandler;
@@ -95,7 +94,6 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   conversation,
   isChoosingScreen,
   isMuted,
-  hasBlurredBackground,
   muteState,
   mediaDevicesHandler,
   videoGrid,
@@ -120,6 +118,9 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     'sharesScreen',
     'sharesCamera',
   ]);
+
+  const {blurredVideoStream} = useKoSubscribableChildren(selfParticipant, ['blurredVideoStream']);
+  const hasBlurredBackground = !!blurredVideoStream;
 
   const {
     activeSpeakers,
