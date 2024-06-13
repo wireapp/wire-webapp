@@ -82,6 +82,10 @@ module.exports = {
         test: /\.svg$/,
       },
       {
+        loader: 'raw-loader',
+        test: /\.glsl$/,
+      },
+      {
         test: /\.less$/i,
         use: [
           'style-loader',
@@ -149,8 +153,14 @@ module.exports = {
           from: '*.wasm',
           to: `${dist}/min/core-crypto.wasm`,
         },
+        {
+          context: 'node_modules/@mediapipe/tasks-vision/wasm',
+          from: '*',
+          to: `${dist}/min/mediapipe/wasm`,
+        },
         // copying all static resources (audio, images, fonts...)
         {from: 'resource', to: dist},
+        {from: `assets`, to: `${dist}/assets`},
         {from: 'src/page/basicBrowserFeatureCheck.js', to: `${dist}/min/`},
       ],
     }),

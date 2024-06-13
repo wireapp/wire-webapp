@@ -82,6 +82,7 @@ import {EventSource} from '../event/EventSource';
 import type {MediaDevicesHandler} from '../media/MediaDevicesHandler';
 import type {MediaStreamHandler} from '../media/MediaStreamHandler';
 import {MediaType} from '../media/MediaType';
+import {applyBlur} from '../media/VideoBackgroundBlur';
 import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
 import {TeamState} from '../team/TeamState';
@@ -263,6 +264,27 @@ export class CallingRepository {
       this.callState.cbrEncoding(vbrEnabled ? 0 : 1);
     }
   };
+
+  public async switchVideoBackgroundBlur(enable: boolean): Promise<void> {
+    const activeCall = this.callState.joinedCall();
+    if (!activeCall) {
+      return;
+    }
+    const selfParticipant = activeCall.getSelfParticipant();
+    selfParticipant.releaseBlurredVideoStream();
+    const videoFeed = selfParticipant.videoStream();
+    if (!videoFeed) {
+      return;
+    }
+    let newVideoFeed = videoFeed;
+    if (enable) {
+      const blurredVideoStream = await applyBlur(videoFeed);
+      // Keep a reference to the blurred stream in order to release it when the blur is disabled
+      selfParticipant.blurredVideoStream(blurredVideoStream);
+      newVideoFeed = blurredVideoStream.stream;
+    }
+    this.changeMediaSource(newVideoFeed, MediaType.VIDEO, false);
+  }
 
   getStats(conversationId: QualifiedId) {
     return this.wCall?.getStats(this.serializeQualifiedId(conversationId));
@@ -1132,10 +1154,7 @@ export class CallingRepository {
     this.avsVersion = version;
   };
 
-  private getMediaStream(
-    {audio = false, camera = false, screen = false}: MediaStreamQuery,
-    isGroup: boolean,
-  ): Promise<MediaStream> {
+  private getMediaStream({audio = false, camera = false, screen = false}: MediaStreamQuery, isGroup: boolean) {
     return this.mediaStreamHandler.requestMediaStream(audio, camera, screen, isGroup);
   }
 
@@ -1167,14 +1186,14 @@ export class CallingRepository {
     }
   }
 
-  public async refreshVideoInput(): Promise<MediaStream | void> {
+  public async refreshVideoInput() {
     const stream = await this.mediaStreamHandler.requestMediaStream(false, true, false, false);
     this.stopMediaSource(MediaType.VIDEO);
     const clonedMediaStream = this.changeMediaSource(stream, MediaType.VIDEO);
     return clonedMediaStream;
   }
 
-  public async refreshAudioInput(): Promise<MediaStream> {
+  public async refreshAudioInput() {
     const stream = await this.mediaStreamHandler.requestMediaStream(true, false, false, false);
     this.stopMediaSource(MediaType.AUDIO);
     this.changeMediaSource(stream, MediaType.AUDIO);
@@ -1212,6 +1231,7 @@ export class CallingRepository {
   public changeMediaSource(
     mediaStream: MediaStream,
     mediaType: MediaType,
+    updateSelfParticipant: boolean = true,
     call = this.callState.joinedCall(),
   ): MediaStream | void {
     if (!call) {
@@ -1230,14 +1250,14 @@ export class CallingRepository {
 
     // Don't update video input (coming from A/V preferences) when screensharing is activated
     if (mediaType === MediaType.VIDEO && selfParticipant.sharesCamera() && !selfParticipant.sharesScreen()) {
-      const videoTracks = mediaStream.getVideoTracks().map(track => track.clone());
+      const videoTracks = mediaStream.getVideoTracks();
       if (videoTracks.length > 0) {
-        const clonedMediaStream = new MediaStream(videoTracks);
-        selfParticipant.setVideoStream(clonedMediaStream, true);
         this.wCall?.replaceTrack(this.serializeQualifiedId(conversation.qualifiedId), videoTracks[0]);
         // Remove the previous video stream
-        this.mediaStreamHandler.releaseTracksFromStream(mediaStream);
-        return clonedMediaStream;
+        if (updateSelfParticipant) {
+          selfParticipant.setVideoStream(mediaStream, true);
+        }
+        return mediaStream;
       }
     }
   }

@@ -83,7 +83,12 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
   maximizedParticipant,
   setMaximizedParticipant,
 }) => {
-  const thumbnail = useKoSubscribableChildren(grid.thumbnail, ['hasActiveVideo', 'sharesScreen', 'videoStream']);
+  const thumbnail = useKoSubscribableChildren(grid.thumbnail!, [
+    'hasActiveVideo',
+    'sharesScreen',
+    'videoStream',
+    'blurredVideoStream',
+  ]);
 
   const [rowsAndColumns, setRowsAndColumns] = useState<RowsAndColumns>(calculateRowsAndColumns(grid?.grid.length));
 
@@ -173,7 +178,7 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
             css={{
               transform: thumbnail.hasActiveVideo && !thumbnail.sharesScreen ? 'rotateY(180deg)' : 'initial',
             }}
-            srcObject={thumbnail.videoStream}
+            srcObject={thumbnail.blurredVideoStream?.stream ?? thumbnail.videoStream}
           />
           {selfIsMuted && !minimized && (
             <span className="group-video-grid__element__label__icon" data-uie-name="status-call-audio-muted">

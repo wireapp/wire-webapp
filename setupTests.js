@@ -68,5 +68,12 @@ window.z = {userPermission: {}};
 window.URL.createObjectURL = jest.fn();
 window.URL.revokeObjectURL = jest.fn();
 
+Object.defineProperty(document, 'elementFromPoint', {
+  writable: true,
+  value: jest.fn().mockImplementation((x, y) => {
+    return null;
+  }),
+});
+
 const testLib = require('@testing-library/react');
 testLib.configure({testIdAttribute: 'data-uie-name'});

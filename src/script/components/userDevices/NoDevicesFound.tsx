@@ -24,9 +24,7 @@ import cx from 'classnames';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import {Config} from '../../Config';
 import type {User} from '../../entity/User';
-import {externalUrl} from '../../externalRoute';
 
 interface NoDevicesFoundProps {
   noPadding: boolean;
@@ -40,20 +38,11 @@ const NoDevicesFound: React.FC<NoDevicesFoundProps> = ({user, noPadding}) => {
     <div className={cx('participant-devices__header', {'participant-devices__header--padding': !noPadding})}>
       <p className="participant-devices__text-block panel__info-text" data-uie-name="status-devices-headline">
         {user
-          ? t('participantDevicesOutdatedClientMessage', {
-              brandName: Config.getConfig().BRAND_NAME,
+          ? t('participantDevicesNoClients', {
               user: userName,
             })
           : ''}
       </p>
-      <a
-        className="participant-devices__link accent-text"
-        href={externalUrl.privacyPolicy}
-        rel="nofollow noopener noreferrer"
-        target="_blank"
-      >
-        {t('participantDevicesLearnMore')}
-      </a>
     </div>
   );
 };

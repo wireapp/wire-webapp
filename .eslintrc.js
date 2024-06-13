@@ -13,6 +13,7 @@ module.exports = {
     'docs/',
     'bin/',
     '**/node_modules/',
+    'assets/',
     'resource/',
     'server/bin/',
     'server/dist/',

@@ -169,6 +169,7 @@ class Server {
     this.app.use('/proto', express.static(path.join(__dirname, 'static/proto')));
     this.app.use('/style', express.static(path.join(__dirname, 'static/style')));
     this.app.use('/worker', express.static(path.join(__dirname, 'static/worker')));
+    this.app.use('/assets', express.static(path.join(__dirname, 'static/assets')));
 
     this.app.get('/favicon.ico', (_req, res) => res.sendFile(path.join(__dirname, 'static/image/favicon.ico')));
     if (!this.config.DEVELOPMENT) {
