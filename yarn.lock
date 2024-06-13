@@ -4167,14 +4167,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/mdurl@npm:*":
-  version: 1.0.3
-  resolution: "@types/mdurl@npm:1.0.3"
-  checksum: 10/5bbed4f0eb9f60040fa26be77aa2158ca468b6423876cec0d2043e7f8298e83b8e5b95fb66056327b02d747c4d376aed16c11ff3fdc4cb3dca327a6931a71f18
-  languageName: node
-  linkType: hard
-
-"@types/mdurl@npm:^2":
+"@types/mdurl@npm:*, @types/mdurl@npm:^2":
   version: 2.0.0
   resolution: "@types/mdurl@npm:2.0.0"
   checksum: 10/78746e96c655ceed63db06382da466fd52c7e9dc54d60b12973dfdd110cae06b9439c4b90e17bb8d4461109184b3ea9f3e9f96b3e4bf4aa9fe18b6ac35f283c8
@@ -7246,10 +7239,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dexie@npm:4.0.4, dexie@npm:>3.2.0":
-  version: 4.0.4
-  resolution: "dexie@npm:4.0.4"
-  checksum: 10/36b55ae77a504ca879017524a51bca2e0355777678a5c25b114408faaf4190398bca752afb22e4ffe80b61d3430f134763942786e59bef8b0aad1e3cd7fb4122
+"dexie@npm:4.0.7, dexie@npm:>3.2.0":
+  version: 4.0.7
+  resolution: "dexie@npm:4.0.7"
+  checksum: 10/e95facd65d4cc1dd450a104d0b94b81c3a5fb5be559ab68e93af1af4df435639b41850727594aaa4d4e50239abf8626f79c03423a0d3dabf1391e311580e7400
   languageName: node
   linkType: hard
 
@@ -17460,7 +17453,7 @@ __metadata:
     css-loader: "npm:7.1.2"
     cssnano: "npm:7.0.2"
     date-fns: "npm:3.6.0"
-    dexie: "npm:4.0.4"
+    dexie: "npm:4.0.7"
     dexie-batch: "npm:0.4.3"
     dexie-encrypted: "npm:2.0.0"
     dotenv: "npm:16.4.5"
