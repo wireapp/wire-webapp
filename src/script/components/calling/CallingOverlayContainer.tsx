@@ -17,7 +17,7 @@
  *
  */
 
-import React, {Fragment, useEffect} from 'react';
+import React, {Fragment, useEffect, useState} from 'react';
 
 import {container} from 'tsyringe';
 
@@ -70,6 +70,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
     state: currentCallState,
     muteState,
   } = useKoSubscribableChildren(joinedCall!, ['maximizedParticipant', 'state', 'muteState']);
+  const [hasBlurredBackground, setHasBlurredBackground] = useState(false);
 
   const isMuted = muteState !== MuteState.NOT_MUTED;
 
@@ -149,11 +150,15 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
           mediaDevicesHandler={mediaDevicesHandler}
           isMuted={isMuted}
           muteState={muteState}
+          hasBlurredBackground={hasBlurredBackground}
           isChoosingScreen={isChoosingScreen}
           switchCameraInput={switchCameraInput}
           switchMicrophoneInput={switchMicrophoneInput}
           switchSpeakerOutput={switchSpeakerOutput}
-          switchBlurredBackground={status => callingRepository.switchVideoBackgroundBlur(status)}
+          switchBlurredBackground={status => {
+            setHasBlurredBackground(status);
+            callingRepository.switchVideoBackgroundBlur(status);
+          }}
           setMaximizedParticipant={setMaximizedParticipant}
           setActiveCallViewTab={setActiveCallViewTab}
           toggleMute={toggleMute}
