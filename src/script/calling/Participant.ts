@@ -33,6 +33,7 @@ export class Participant {
   // Video
   public videoState: ko.Observable<VIDEO_STATE>;
   public videoStream: ko.Observable<MediaStream | undefined>;
+  public blurredVideoStream = ko.observable<{stream: MediaStream; release: () => void} | undefined>(undefined);
   public hasActiveVideo: ko.PureComputed<boolean>;
   public hasPausedVideo: ko.PureComputed<boolean>;
   public sharesScreen: ko.PureComputed<boolean>;
@@ -74,6 +75,11 @@ export class Participant {
     this.isAudioEstablished = ko.observable(false);
   }
 
+  public releaseBlurredVideoStream(): void {
+    this.blurredVideoStream()?.release();
+    this.blurredVideoStream(undefined);
+  }
+
   readonly doesMatchIds = (userId: QualifiedId, clientId: ClientId): boolean =>
     matchQualifiedIds(userId, this.user.qualifiedId) && clientId === this.clientId;
 
@@ -105,6 +111,7 @@ export class Participant {
 
   releaseVideoStream(stopTracks: boolean): void {
     this.releaseStream(this.videoStream(), stopTracks);
+    this.releaseBlurredVideoStream();
     this.videoStream(undefined);
   }
 
@@ -118,7 +125,7 @@ export class Participant {
     this.releaseAudioStream();
   }
 
-  private releaseStream(mediaStream: MediaStream, stopTracks: boolean): void {
+  private releaseStream(mediaStream: MediaStream | undefined, stopTracks: boolean): void {
     if (!mediaStream) {
       return;
     }

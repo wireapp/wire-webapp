@@ -153,6 +153,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
           switchCameraInput={switchCameraInput}
           switchMicrophoneInput={switchMicrophoneInput}
           switchSpeakerOutput={switchSpeakerOutput}
+          switchBlurredBackground={status => callingRepository.switchVideoBackgroundBlur(status)}
           setMaximizedParticipant={setMaximizedParticipant}
           setActiveCallViewTab={setActiveCallViewTab}
           toggleMute={toggleMute}

@@ -159,7 +159,7 @@ export const AppMain: FC<AppMainProps> = ({
     configureRoutes({
       '/': showMostRecentConversation,
       '/conversation/:conversationId(/:domain)': (conversationId: string, domain: string = apiContext.domain ?? '') =>
-        mainView.content.showConversation({id: conversationId, domain}, {}),
+        mainView.content.showConversation({id: conversationId, domain}),
       '/preferences/about': () => mainView.list.openPreferencesAbout(),
       '/preferences/account': () => mainView.list.openPreferencesAccount(),
       '/preferences/av': () => mainView.list.openPreferencesAudioVideo(),

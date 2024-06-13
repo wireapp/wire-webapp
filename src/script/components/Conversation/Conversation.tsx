@@ -37,6 +37,7 @@ import {CallingViewMode, CallState} from 'src/script/calling/CallState';
 import {Config} from 'src/script/Config';
 import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {isLastReceivedMessage} from 'Util/conversationMessages';
 import {allowsAllFiles, getFileExtensionOrName, hasAllowedExtension} from 'Util/FileTypeUtil';
 import {isHittingUploadLimit} from 'Util/isHittingUploadLimit';
 import {t} from 'Util/LocalizerUtil';
@@ -381,16 +382,13 @@ export const Conversation = ({
     }
   };
 
-  const isLastReceivedMessage = (messageEntity: Message, conversationEntity: ConversationEntity): boolean => {
-    return !!messageEntity.timestamp() && messageEntity.timestamp() >= conversationEntity.last_event_timestamp();
-  };
-
-  const updateConversationLastRead = (conversationEntity: ConversationEntity, messageEntity: Message): void => {
+  const updateConversationLastRead = (conversationEntity: ConversationEntity, messageEntity?: Message): void => {
     const conversationLastRead = conversationEntity.last_read_timestamp();
     const lastKnownTimestamp = conversationEntity.getLastKnownTimestamp(repositories.serverTime.toServerTimestamp());
     const needsUpdate = conversationLastRead < lastKnownTimestamp;
 
-    if (needsUpdate && isLastReceivedMessage(messageEntity, conversationEntity)) {
+    // if no message provided it means we need to jump to the last message
+    if (needsUpdate && (!messageEntity || isLastReceivedMessage(messageEntity, conversationEntity))) {
       conversationEntity.setTimestamp(lastKnownTimestamp, ConversationEntity.TIMESTAMP_TYPE.LAST_READ);
       repositories.message.markAsRead(conversationEntity);
     }
@@ -399,6 +397,7 @@ export const Conversation = ({
   const getInViewportCallback = useCallback(
     (conversationEntity: ConversationEntity, messageEntity: Message) => {
       const messageTimestamp = messageEntity.timestamp();
+
       const callbacks: Function[] = [];
 
       if (!messageEntity.isEphemeral()) {
@@ -526,11 +525,12 @@ export const Conversation = ({
             onClickMessage={handleClickOnMessage}
             onLoading={loading => setIsConversationLoaded(!loading)}
             getVisibleCallback={getInViewportCallback}
-            isLastReceivedMessage={isLastReceivedMessage}
             isMsgElementsFocusable={isMsgElementsFocusable}
             setMsgElementsFocusable={setMsgElementsFocusable}
             isRightSidebarOpen={isRightSidebarOpen}
+            updateConversationLastRead={updateConversationLastRead}
           />
+
           {isConversationLoaded &&
             (isReadOnlyConversation ? (
               <ReadOnlyConversationMessage reloadApp={reloadApp} conversation={activeConversation} />
