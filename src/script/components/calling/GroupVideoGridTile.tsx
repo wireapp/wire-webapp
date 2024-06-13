@@ -69,10 +69,15 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
   isMaximized,
   onTileDoubleClick,
 }) => {
-  const {isMuted, videoState, videoStream, isActivelySpeaking, isAudioEstablished} = useKoSubscribableChildren(
-    participant,
-    ['isMuted', 'videoStream', 'isActivelySpeaking', 'videoState', 'isAudioEstablished'],
-  );
+  const {isMuted, videoState, videoStream, blurredVideoStream, isActivelySpeaking, isAudioEstablished} =
+    useKoSubscribableChildren(participant, [
+      'isMuted',
+      'videoStream',
+      'blurredVideoStream',
+      'isActivelySpeaking',
+      'videoState',
+      'isAudioEstablished',
+    ]);
   const {name} = useKoSubscribableChildren(participant?.user, ['name']);
 
   const sharesScreen = videoState === VIDEO_STATE.SCREENSHARE;
@@ -154,7 +159,7 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
                see https://developer.mozilla.org/en-US/docs/Web/Media/Autoplay_guide.
             */
             muted
-            srcObject={videoStream}
+            srcObject={blurredVideoStream?.stream ?? videoStream}
             className="group-video-grid__element-video"
             css={{
               objectFit: isMaximized || sharesScreen ? 'contain' : 'cover',
