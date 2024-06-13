@@ -61,8 +61,10 @@ const getSubconversationResponse = ({
   };
 };
 
-const buildSubconversationService = async () => {
+const buildSubconversationService = async (isFederated = false) => {
   const apiClient = new APIClient({urls: APIClient.BACKEND.STAGING});
+  apiClient.backendFeatures.isFederated = isFederated;
+
   const mlsService = {
     conversationExists: jest.fn(),
     wipeConversation: jest.fn(),
@@ -383,8 +385,8 @@ describe('SubconversationService', () => {
       expect(response).toEqual(null);
     });
 
-    it('returns epoch info and advances epoch number', async () => {
-      const [subconversationService, {mlsService}] = await buildSubconversationService();
+    it.each([true, false])('returns epoch info and advances epoch number', async (isFederated: boolean) => {
+      const [subconversationService, {mlsService}] = await buildSubconversationService(isFederated);
 
       const parentConversationId = {id: 'parentConversationId', domain: 'domain'};
       const parentConversationGroupId = 'parentConversationGroupId';
@@ -437,8 +439,8 @@ describe('SubconversationService', () => {
         epoch: mockedEpoch,
         keyLength: 32,
         members: [
-          {clientid: 'clientId1', in_subconv: true, userid: 'userId1@domain'},
-          {clientid: 'clientId2', in_subconv: false, userid: 'userId2@domain'},
+          {clientid: 'clientId1', in_subconv: true, userid: isFederated ? 'userId1@domain' : 'userId1'},
+          {clientid: 'clientId2', in_subconv: false, userid: isFederated ? 'userId2@domain' : 'userId2'},
         ],
         secretKey: mockedSecretKey,
       };
