@@ -36,7 +36,7 @@ type Events = {
 };
 
 export interface SubconversationEpochInfoMember {
-  userid: `${string}@${string}`;
+  userid: string;
   clientid: string;
   in_subconv: boolean;
 }
@@ -330,7 +330,9 @@ export class SubconversationService extends TypedEventEmitter<Events> {
       );
 
       return {
-        userid: `${parentMember.userId}@${parentMember.domain}`,
+        userid: this.apiClient.backendFeatures.isFederated
+          ? `${parentMember.userId}@${parentMember.domain}`
+          : parentMember.userId,
         clientid: parentMember.clientId,
         in_subconv: isSubconversationMember,
       };
