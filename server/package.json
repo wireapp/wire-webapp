@@ -36,7 +36,7 @@
     "typescript": "5.4.5"
   },
   "engines": {
-    "node": ">= 18.16.0"
+    "node": ">= 20.14.0"
   },
   "scripts": {
     "build": "yarn clean && tsc && yarn generate-version-file && yarn copy-assets",
