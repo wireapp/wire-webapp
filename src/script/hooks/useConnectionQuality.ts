@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2022 Wire Swiss GmbH
+ * Copyright (C) 2024 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,26 +17,24 @@
  *
  */
 
-import {amplify} from 'amplify';
+import {useEffect, useState} from 'react';
 
-import {WireModule} from './Wire.types';
+import {getConnectionQualityHander} from 'Util/ConnectionQualityHandler';
 
-interface Connection {
-  // See https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation/effectiveType
-  effectiveType: 'slow-2g' | '2g' | '3g' | '4g';
-  addEventListener: (type: 'change', listener: () => void) => void;
-  removeEventListener: (type: 'change', listener: () => void) => void;
-}
+export const useConnectionQuality = () => {
+  const [isSlow, setIsSlow] = useState(false);
 
-declare global {
-  interface Window {
-    wire: WireModule;
-    amplify: amplify.Static;
-    z: any;
-  }
+  useEffect(() => {
+    const connectionQualityHandler = getConnectionQualityHander();
 
-  interface Navigator {
-    // TODO: Remove once the type is available in TS native types
-    connection?: Connection;
-  }
-}
+    if (!connectionQualityHandler) {
+      return () => {};
+    }
+
+    const unsubscribe = connectionQualityHandler.subscribe(setIsSlow);
+
+    return unsubscribe;
+  }, []);
+
+  return {isSlow};
+};
