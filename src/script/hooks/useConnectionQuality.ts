@@ -28,7 +28,7 @@ export const useConnectionQuality = () => {
     const connectionQualityHandler = getConnectionQualityHander();
 
     if (!connectionQualityHandler) {
-      return;
+      return () => {};
     }
 
     const unsubscribe = connectionQualityHandler.subscribe(setIsSlow);
