@@ -1,8 +1,8 @@
-const additionalMessage = document.getElementById('additional-message');
+const loadingMessage = document.getElementById('loading-message');
 const HALF_MINUTE_IN_MS = 30000;
 
 setTimeout(() => {
-  if (additionalMessage) {
-    additionalMessage.innerHTML = 'It takes longer than expected, please check your internet connection...';
+  if (loadingMessage) {
+    loadingMessage.classList.add('visible');
   }
 }, HALF_MINUTE_IN_MS);

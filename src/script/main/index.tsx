@@ -63,10 +63,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const removeLoaderRoot = () => {
     const loaderRoot = document.getElementById('loader-root');
+    const loaderStyles = document.getElementById('loader-styles');
 
-    if (loaderRoot) {
-      loaderRoot.parentNode?.removeChild(loaderRoot);
-    }
+    loaderRoot?.parentNode?.removeChild(loaderRoot);
+    loaderStyles?.parentNode?.removeChild(loaderStyles);
   };
 
   createRoot(appContainer).render(
