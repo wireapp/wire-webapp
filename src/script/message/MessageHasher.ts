@@ -28,7 +28,7 @@ import {LegacyEventRecord} from '../storage/record/EventRecord';
  * @returns Promise with hashed string bytes
  */
 const createSha256Hash = async (bytes: number[]): Promise<ArrayBuffer> => {
-  const buffer = new Uint8Array(bytes).buffer;
+  const buffer = new Uint8Array(bytes);
   return window.crypto.subtle.digest('SHA-256', buffer);
 };
 
