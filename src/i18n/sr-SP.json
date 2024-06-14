@@ -811,6 +811,7 @@
   "inviteMessageNoEmail": "Ја сам на Вајеру. Посети get.wire.com да се повежемо.",
   "inviteMetaKeyMac": "Cmd",
   "inviteMetaKeyPc": "Ctrl",
+  "jumpToLastMessage": "Scroll to the end of this conversation",
   "legalHoldActivated": "Овај разговор је под законским задржавањем",
   "legalHoldActivatedLearnMore": "Сазнајте више",
   "legalHoldDeactivated": "Законски задржавање је деактивирано за овај разговор",

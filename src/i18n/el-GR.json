@@ -811,6 +811,7 @@
   "inviteMessageNoEmail": "Είμαι στο {{brandName}}.Επισκέψου την ιστοσελίδα get.wire.com για να συνδεθείς μαζί μου.",
   "inviteMetaKeyMac": "Cmd",
   "inviteMetaKeyPc": "Ctrl",
+  "jumpToLastMessage": "Scroll to the end of this conversation",
   "legalHoldActivated": "This conversation is under legal hold",
   "legalHoldActivatedLearnMore": "Learn more",
   "legalHoldDeactivated": "Legal hold deactivated for this conversation",

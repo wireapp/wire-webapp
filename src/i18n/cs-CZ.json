@@ -811,6 +811,7 @@
   "inviteMessageNoEmail": "Jsem k zastižení na síti {{brandName}}. K navázání kontaktu navštivte https://get.wire.com.",
   "inviteMetaKeyMac": "Cmd",
   "inviteMetaKeyPc": "Ctrl",
+  "jumpToLastMessage": "Scroll to the end of this conversation",
   "legalHoldActivated": "This conversation is under legal hold",
   "legalHoldActivatedLearnMore": "Learn more",
   "legalHoldDeactivated": "Legal hold deactivated for this conversation",

@@ -811,6 +811,7 @@
   "inviteMessageNoEmail": "Fent vagyok a {{brandName}}-ön. Látogass el a get.wire.com weboldalra és lépj kapcsolatba velem.",
   "inviteMetaKeyMac": "Cmd",
   "inviteMetaKeyPc": "Ctrl",
+  "jumpToLastMessage": "Scroll to the end of this conversation",
   "legalHoldActivated": "This conversation is under legal hold",
   "legalHoldActivatedLearnMore": "További információ",
   "legalHoldDeactivated": "Legal hold deactivated for this conversation",

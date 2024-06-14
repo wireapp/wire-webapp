@@ -811,6 +811,7 @@
   "inviteMessageNoEmail": "I’m on {{brandName}}. Visit get.wire.com to connect with me.",
   "inviteMetaKeyMac": "Cmd",
   "inviteMetaKeyPc": "Ctrl",
+  "jumpToLastMessage": "Scroll to the end of this conversation",
   "legalHoldActivated": "This conversation is under legal hold",
   "legalHoldActivatedLearnMore": "Learn more",
   "legalHoldDeactivated": "Legal hold deactivated for this conversation",
@@ -1541,6 +1542,5 @@
   "wireLinux": "{{brandName}} for Linux",
   "wireMacos": "{{brandName}} for macOS",
   "wireWindows": "{{brandName}} for Windows",
-  "wire_for_web": "{{brandName}} for Web",
-  "jumpToLastMessage": "Scroll to the end of this conversation"
+  "wire_for_web": "{{brandName}} for Web"
 }

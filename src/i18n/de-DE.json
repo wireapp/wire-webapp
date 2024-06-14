@@ -811,6 +811,7 @@
   "inviteMessageNoEmail": "Ich benutze {{brandName}}. Auf get.wire.com klicken, um mich als Kontakt hinzuzufügen.",
   "inviteMetaKeyMac": "Cmd",
   "inviteMetaKeyPc": "Strg",
+  "jumpToLastMessage": "Scroll to the end of this conversation",
   "legalHoldActivated": "Diese Unterhaltung unterliegt der gesetzlichen Aufbewahrung",
   "legalHoldActivatedLearnMore": "Mehr erfahren",
   "legalHoldDeactivated": "Die gesetzliche Aufbewahrung wurde für diese Unterhaltung deaktiviert",
