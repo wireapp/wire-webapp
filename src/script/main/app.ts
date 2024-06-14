@@ -32,7 +32,6 @@ import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {getConnectionQualityHander} from 'Util/ConnectionQualityHandler/ConnectionQualityHandler';
 import {initializeDataDog} from 'Util/DataDog';
 import {DebugUtil} from 'Util/DebugUtil';
 import {Environment} from 'Util/Environment';
@@ -495,14 +494,6 @@ export class App {
             this.logger.error(`Failed when initialising mls conversation with id ${id}, error: `, error),
         });
       }
-
-      getConnectionQualityHander()?.subscribe(isSlow => {
-        if (isSlow) {
-          Warnings.showWarning(Warnings.TYPE.SLOW_CONNECTION);
-        } else {
-          Warnings.hideWarning(Warnings.TYPE.SLOW_CONNECTION);
-        }
-      });
 
       telemetry.timeStep(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
       telemetry.addStatistic(AppInitStatisticsValue.NOTIFICATIONS, totalNotifications, 100);

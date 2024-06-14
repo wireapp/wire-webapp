@@ -31,7 +31,6 @@ import {container} from 'tsyringe';
 import {Account, ConnectionState, ProcessedEventPayload} from '@wireapp/core';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {getConnectionQualityHander} from 'Util/ConnectionQualityHandler/ConnectionQualityHandler';
 import {getLogger, Logger} from 'Util/Logger';
 import {queue} from 'Util/PromiseQueue';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -153,14 +152,6 @@ export class EventRepository {
         Warnings.hideWarning(Warnings.TYPE.NO_INTERNET);
         Warnings.hideWarning(Warnings.TYPE.CONNECTIVITY_RECONNECT);
         Warnings.hideWarning(Warnings.TYPE.CONNECTIVITY_RECOVERY);
-
-        getConnectionQualityHander()?.refresh(isSlow => {
-          if (isSlow) {
-            Warnings.showWarning(Warnings.TYPE.SLOW_CONNECTION);
-          } else {
-            Warnings.hideWarning(Warnings.TYPE.SLOW_CONNECTION);
-          }
-        });
       }
     }
   };
