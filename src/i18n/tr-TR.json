@@ -811,6 +811,7 @@
   "inviteMessageNoEmail": "{{brandName}}’dayım. get.wire.com ’u ziyaret ederek bana bağlanabilirsin.",
   "inviteMetaKeyMac": "Cmd",
   "inviteMetaKeyPc": "Ctrl",
+  "jumpToLastMessage": "Scroll to the end of this conversation",
   "legalHoldActivated": "Bu konuşma yasal tutuluyor",
   "legalHoldActivatedLearnMore": "Daha fazla bilgi",
   "legalHoldDeactivated": "Bu konuşma için yasal bekletme özelliği devre dışı bırakıldı",
