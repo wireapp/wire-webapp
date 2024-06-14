@@ -100,10 +100,8 @@ const ListWrapper = ({
           <header className={`left-list-header left-list-header-${id}`} data-uie-name="conversation-list-header">
             {isSlow && (
               <p className="slow-connection-indicator">
-                <span className="slow-connection-indicator-text">
-                  <Icon.Network className="slow-connection-indicator-icon" />
-                  {t('internetConnectionSlow')}
-                </span>
+                <Icon.Network />
+                <span>{t('internetConnectionSlow')}</span>
               </p>
             )}
             {headerElement || (
