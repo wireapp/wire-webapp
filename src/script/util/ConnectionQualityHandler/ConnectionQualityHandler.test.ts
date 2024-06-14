@@ -50,7 +50,7 @@ describe('ConnectionQualityListener', () => {
     expect(typeof handler!.subscribe).toBe('function');
   });
 
-  it.each(['slow-2g', '2g'])('should detect slow connections correctly', (quality: string) => {
+  it.each(['slow-2g', '2g', '3g'])('should detect slow connections correctly', (quality: string) => {
     mockConnection.effectiveType = quality;
     const handler = getConnectionQualityHander();
     const callback = jest.fn();
