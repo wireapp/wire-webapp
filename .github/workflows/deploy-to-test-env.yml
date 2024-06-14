@@ -13,6 +13,9 @@ on:
           - wire-webapp-dev
           - wire-webapp-staging
           - wire-webapp-prod
+          - wire-webapp-qa
+          - wire-webapp-mls
+          - wire-webapp-edge
 
 concurrency:
   group: ci-${{ github.ref }}
