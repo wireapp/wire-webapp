@@ -26,7 +26,7 @@ const logger = getLogger('ConnectionQualityListener');
 type ConnectionAPIType = NonNullable<typeof window.navigator.connection>;
 type EffectiveConnectionType = ConnectionAPIType['effectiveType'];
 
-const slowConnectionTypes: EffectiveConnectionType[] = ['slow-2g', '2g'];
+const slowConnectionTypes: EffectiveConnectionType[] = ['slow-2g', '2g', '3g'];
 
 interface ConnectionQualityHandler {
   refresh: (callback: (isSlow: boolean) => void) => void;
