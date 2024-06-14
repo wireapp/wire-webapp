@@ -24,6 +24,7 @@ import {throttle} from 'underscore';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Icon} from 'Components/Icon';
+import {useConnectionQuality} from 'src/script/hooks/useConnectionQuality';
 import {t} from 'Util/LocalizerUtil';
 import {isScrollable, isScrolledBottom, isScrolledTop} from 'Util/scroll-helpers';
 
@@ -89,12 +90,22 @@ const ListWrapper = ({
     element.addEventListener('scroll', () => calculateBorders(element));
   }
 
+  const {isSlow} = useConnectionQuality();
+
   return (
     <>
       {sidebar}
       <div id={id} className={`left-list-${id} ${id}`} css={style}>
         {hasHeader && (
           <header className={`left-list-header left-list-header-${id}`} data-uie-name="conversation-list-header">
+            {isSlow && (
+              <p className="slow-connection-indicator">
+                <span className="slow-connection-indicator-text">
+                  <Icon.Network className="slow-connection-indicator-icon" />
+                  {t('internetConnectionSlow')}
+                </span>
+              </p>
+            )}
             {headerElement || (
               <>
                 <h2 className="left-list-header-text" data-uie-name={headerUieName}>

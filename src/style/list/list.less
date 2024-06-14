@@ -72,6 +72,31 @@ body.theme-dark {
   .button-reset-default;
 }
 
+.slow-connection-indicator {
+  padding: 4px 0px 4px 0px;
+  border-radius: 24px;
+  margin-top: 8px;
+  background-color: var(--gray-30);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-semibold);
+}
+
+.slow-connection-indicator-text {
+  position: relative;
+  display: block;
+  width: fit-content;
+  margin: 0 auto;
+}
+
+.slow-connection-indicator-icon {
+  position: absolute;
+  top: 50%;
+  right: calc(100% + 8px);
+  width: 16px;
+  height: 14px;
+  transform: translateY(-50%);
+}
+
 .left-list-center {
   position: relative;
   flex: 1 1 auto;

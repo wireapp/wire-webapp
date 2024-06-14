@@ -816,6 +816,7 @@
   "initReceivedUserData": "Checking for new messages",
   "initUpdatedFromNotifications": "Almost done - Enjoy {{brandName}}",
   "initValidatedClient": "Fetching your connections and conversations",
+  "internetConnectionSlow": "Slow internet connection",
   "invite.emailPlaceholder": "colleague@email.com",
   "invite.headline": "Build your team",
   "invite.nextButton": "Next",
