@@ -17,6 +17,8 @@
  *
  */
 
+import {useEffect, useState} from 'react';
+
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 
 import {getLogger} from 'Util/Logger';
@@ -76,4 +78,22 @@ export const getConnectionQualityHander = (): ConnectionQualityHandler | null =>
     refresh: (callback: (isSlow: boolean) => void) => onChange(callback),
     subscribe,
   };
+};
+
+export const useConnectionQuality = () => {
+  const [isSlow, setIsSlow] = useState(false);
+
+  useEffect(() => {
+    const connectionQualityHandler = getConnectionQualityHander();
+
+    if (!connectionQualityHandler) {
+      return;
+    }
+
+    const unsubscribe = connectionQualityHandler.subscribe(setIsSlow);
+
+    return unsubscribe;
+  }, []);
+
+  return {isSlow};
 };
