@@ -138,7 +138,7 @@
     "raw-loader": "4.0.2",
     "redux-mock-store": "1.5.4",
     "seedrandom": "3.0.5",
-    "simple-git": "3.24.0",
+    "simple-git": "3.25.0",
     "sinon": "18.0.0",
     "style-loader": "4.0.0",
     "stylelint": "16.6.1",
