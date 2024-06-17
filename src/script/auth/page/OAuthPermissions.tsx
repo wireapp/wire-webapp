@@ -43,7 +43,7 @@ import {
 import {Icon} from 'Components/Icon';
 import {AssetRemoteData} from 'src/script/assets/AssetRemoteData';
 import {AssetRepository} from 'src/script/assets/AssetRepository';
-import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
+import {handleEscDown, handleKeyDown} from 'Util/KeyboardUtil';
 import {loadDataUrl} from 'Util/util';
 
 import {
@@ -213,11 +213,7 @@ const OAuthPermissionsComponent = ({
                 type="button"
                 onClick={onCancel}
                 data-uie-name="do-oauth-cancel"
-                onKeyDown={(event: React.KeyboardEvent) => {
-                  if (event.key === KEY.ESC) {
-                    onCancel();
-                  }
-                }}
+                onKeyDown={event => handleEscDown(event, onCancel)}
               >
                 {_(oauthStrings.cancel)}
               </Button>

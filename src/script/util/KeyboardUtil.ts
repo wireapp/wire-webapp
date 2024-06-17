@@ -99,8 +99,8 @@ export const handleEnterDown = (event: ReactKeyboardEvent<HTMLElement> | Keyboar
   }
 };
 
-export const handleEscDown = (event: ReactKeyboardEvent<HTMLElement> | KeyboardEvent, callback: () => void): void => {
-  if (event.key === KEY.ESC) {
+export const handleEscDown = (event: ReactKeyboardEvent<Element> | KeyboardEvent, callback: () => void): void => {
+  if (event?.key === KEY.ESC) {
     callback();
   }
 };
