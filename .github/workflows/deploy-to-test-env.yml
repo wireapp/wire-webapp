@@ -9,8 +9,6 @@ on:
         type: choice
         options:
           - wire-webapp-main
-          - wire-webapp-staging
-          - wire-webapp-prod
           - wire-webapp-qa
           - wire-webapp-mls
 
