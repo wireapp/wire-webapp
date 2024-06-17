@@ -122,7 +122,7 @@ export const AppMain: FC<AppMainProps> = ({
   const smBreakpoint = useMatchMedia('max-width: 720px');
 
   const {currentView} = useAppMainState(state => state.responsiveView);
-  const isLeftSidebarVisible = currentView == ViewType.LEFT_SIDEBAR;
+  const isLeftSidebarVisible = currentView == ViewType.MOBILE_LEFT_SIDEBAR;
 
   const initializeApp = async () => {
     const showMostRecentConversation = () => {

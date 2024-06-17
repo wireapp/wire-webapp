@@ -36,7 +36,7 @@ const PreferencesPage: FC<PreferencesPageProps> = ({title, children}) => {
   const smBreakpoint = useMatchMedia('max-width: 720px');
 
   const {currentView, setCurrentView} = useAppMainState(state => state.responsiveView);
-  const isCentralColumn = currentView == ViewType.CENTRAL_COLUMN;
+  const isCentralColumn = currentView == ViewType.MOBILE_CENTRAL_COLUMN;
 
   return (
     <div role="tabpanel" aria-labelledby={title} css={wrapperStyle}>
@@ -46,7 +46,7 @@ const PreferencesPage: FC<PreferencesPageProps> = ({title, children}) => {
             variant={IconButtonVariant.SECONDARY}
             className="conversation-title-bar-icon icon-back"
             css={buttonsStyle}
-            onClick={() => setCurrentView(ViewType.LEFT_SIDEBAR)}
+            onClick={() => setCurrentView(ViewType.MOBILE_LEFT_SIDEBAR)}
           />
         )}
         <h2 className="preferences-titlebar" css={titleStyle(smBreakpoint && isCentralColumn)}>

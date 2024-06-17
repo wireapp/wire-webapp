@@ -149,7 +149,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
   const {setCurrentView: setView} = useAppMainState(state => state.responsiveView);
 
   const setLeftSidebar = () => {
-    setView(ViewType.LEFT_SIDEBAR);
+    setView(ViewType.MOBILE_LEFT_SIDEBAR);
     closeRightSidebar();
   };
 

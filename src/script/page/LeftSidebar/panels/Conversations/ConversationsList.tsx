@@ -109,7 +109,7 @@ export const ConversationsList = ({
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
 
   const onConnectionRequestClick = () => {
-    setCurrentView(ViewType.CENTRAL_COLUMN);
+    setCurrentView(ViewType.MOBILE_CENTRAL_COLUMN);
     listViewModel.contentViewModel.switchContent(ContentState.CONNECTION_REQUESTS);
   };
 

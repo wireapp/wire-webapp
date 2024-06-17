@@ -118,7 +118,7 @@ export const ConnectRequests = ({
                 variant={IconButtonVariant.SECONDARY}
                 className="connect-requests-icon-back icon-back"
                 css={{marginBottom: 0}}
-                onClick={() => setCurrentView(ViewType.LEFT_SIDEBAR)}
+                onClick={() => setCurrentView(ViewType.MOBILE_LEFT_SIDEBAR)}
               />
             </div>
           )}
