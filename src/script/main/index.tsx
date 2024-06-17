@@ -61,17 +61,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     return doRedirect(SIGN_OUT_REASON.NOT_SIGNED_IN);
   }
 
-  const removeLoaderRoot = () => {
-    const loaderRoot = document.getElementById('loader-root');
-    const loaderStyles = document.getElementById('loader-styles');
-
-    loaderRoot?.parentNode?.removeChild(loaderRoot);
-    loaderStyles?.parentNode?.removeChild(loaderStyles);
-  };
-
   createRoot(appContainer).render(
     <AppContainer config={config} clientType={shouldPersist ? ClientType.PERMANENT : ClientType.TEMPORARY} />,
   );
-
-  removeLoaderRoot();
 });
