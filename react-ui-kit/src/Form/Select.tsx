@@ -58,6 +58,7 @@ interface SelectProps<IsMulti extends boolean, Group extends GroupBase<Option>>
   markInvalid?: boolean;
   required?: boolean;
   isMulti?: IsMulti;
+  isSearchable?: boolean;
 }
 
 export const Select = <IsMulti extends boolean = false, Group extends GroupBase<Option> = GroupBase<Option>>({
@@ -72,6 +73,7 @@ export const Select = <IsMulti extends boolean = false, Group extends GroupBase<
   wrapperCSS = {},
   markInvalid = false,
   required = false,
+  isSearchable = false,
   ...props
 }: SelectProps<IsMulti, Group>) => {
   const theme = useTheme();
@@ -111,7 +113,7 @@ export const Select = <IsMulti extends boolean = false, Group extends GroupBase<
         tabIndex={TabIndex.UNFOCUSABLE}
         isDisabled={disabled}
         hideSelectedOptions={false}
-        isSearchable={false}
+        isSearchable={isSearchable}
         isClearable={false}
         closeMenuOnSelect={!isMulti}
         isMulti={isMulti}

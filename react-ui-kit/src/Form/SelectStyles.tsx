@@ -121,7 +121,7 @@ export const customStyles = (theme: Theme, markInvalid = false) => ({
     borderRadius: 12,
     paddingBottom: 0,
     paddingTop: 0,
-    maxHeight: 'fit-content',
+    maxHeight: 400,
   }),
   option: (provided, {isMulti, isDisabled, isFocused, isSelected, options, data}) => ({
     ...provided,
