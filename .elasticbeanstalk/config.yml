@@ -1,6 +1,6 @@
 branch-defaults:
   dev:
-    environment: wire-webapp-dev-al2
+    environment: wire-webapp-dev
   master:
     environment: wire-webapp-master-al2
 deploy:

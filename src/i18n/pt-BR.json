@@ -811,6 +811,7 @@
   "inviteMessageNoEmail": "Estou no {{brandName}}. Visite get.wire.com para se conectar comigo.",
   "inviteMetaKeyMac": "Cmd",
   "inviteMetaKeyPc": "Ctrl",
+  "jumpToLastMessage": "Scroll to the end of this conversation",
   "legalHoldActivated": "Esta conversa está sob Retenção Legal",
   "legalHoldActivatedLearnMore": "Saiba mais",
   "legalHoldDeactivated": "A Retenção Legal esta desativada para está conversa",
