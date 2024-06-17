@@ -119,6 +119,9 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     'sharesCamera',
   ]);
 
+  const {blurredVideoStream} = useKoSubscribableChildren(selfParticipant, ['blurredVideoStream']);
+  const hasBlurredBackground = !!blurredVideoStream;
+
   const {
     activeSpeakers,
     currentPage,
@@ -147,7 +150,6 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     MediaDeviceType.AUDIO_INPUT,
     MediaDeviceType.AUDIO_OUTPUT,
   ]);
-  const [hasBlurredBackground, setHasBlurredBackground] = useState(false);
   const [audioOptionsOpen, setAudioOptionsOpen] = useState(false);
   const [videoOptionsOpen, setVideoOptionsOpen] = useState(false);
   const minimize = () => callState.viewMode(CallingViewMode.MINIMIZED);
@@ -262,10 +264,8 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   const updateVideoOptions = (selectedOption: string | BlurredBackgroundStatus) => {
     const camera = videoOptions[0].options.find(item => item.value === selectedOption) ?? selectedVideoOptions[0];
     if (selectedOption === BlurredBackgroundStatus.ON) {
-      setHasBlurredBackground(true);
       switchBlurredBackground(true);
     } else if (selectedOption === BlurredBackgroundStatus.OFF) {
-      setHasBlurredBackground(false);
       switchBlurredBackground(false);
     } else {
       switchCameraInput(camera.id);

@@ -26,7 +26,7 @@ export const isServiceEntity = (entity: PanelEntity): entity is ServiceEntity =>
 };
 
 export const isUserEntity = (entity: PanelEntity): entity is User => {
-  return !isServiceEntity(entity);
+  return !isServiceEntity(entity) && entity instanceof User;
 };
 
 export const isUserServiceEntity = (entity: PanelEntity): entity is User => {
