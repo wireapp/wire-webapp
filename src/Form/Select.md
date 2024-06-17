@@ -132,5 +132,34 @@ const [isOpen, setIsOpen] = React.useState(false);
       />
     </Column>
   </Columns>
+
+  <Columns>
+    <Column>Select with many items</Column>
+
+    <Column>
+      <Select
+        label="Many items select"
+        required
+        id="manyItemsSelect"
+        options={[...selectOptions, ...selectOptions, ...selectOptions, ...selectOptions]}
+        dataUieName="required-select"
+      />
+    </Column>
+  </Columns>
+
+  <Columns>
+    <Column>Searcheable Select</Column>
+
+    <Column>
+      <Select
+        label="Searchable select"
+        required
+        id="searchableSelect"
+        options={[...selectOptions]}
+        dataUieName="required-select"
+        isSearchable
+      />
+    </Column>
+  </Columns>
 </Container>;
 ```
