@@ -27,7 +27,7 @@ import {AnyAction, Dispatch} from 'redux';
 import {ValidationUtil} from '@wireapp/commons';
 import {Button, Checkbox, CheckboxLabel, Form, Input, Small} from '@wireapp/react-ui-kit';
 
-import {KEY} from 'Util/KeyboardUtil';
+import {handleEnterDown} from 'Util/KeyboardUtil';
 import {getLogger} from 'Util/Logger';
 
 import {Exception} from './Exception';
@@ -170,11 +170,7 @@ const AccountFormComponent = ({account, ...props}: Props & ConnectedProps & Disp
           value={registrationData.name}
           autoComplete="section-create-team username"
           placeholder={_(accountFormStrings.namePlaceholder)}
-          onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
-            if (event.key === KEY.ENTER) {
-              inputs.email.current?.focus();
-            }
-          }}
+          onKeyDown={event => handleEnterDown(event, () => inputs.email.current?.focus())}
           maxLength={64}
           minLength={2}
           pattern=".{2,64}"
@@ -199,11 +195,7 @@ const AccountFormComponent = ({account, ...props}: Props & ConnectedProps & Disp
               ? accountFormStrings.emailPersonalPlaceholder
               : accountFormStrings.emailTeamPlaceholder,
           )}
-          onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
-            if (event.key === KEY.ENTER) {
-              inputs.password.current?.focus();
-            }
-          }}
+          onKeyDown={event => handleEnterDown(event, () => inputs.password.current?.focus())}
           maxLength={128}
           type="email"
           required
