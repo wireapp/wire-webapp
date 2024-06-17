@@ -126,10 +126,10 @@ export class ContentViewModel {
 
     if (hideSidebar) {
       if (sidebar) {
-        sidebar.style.visibility = 'hidden';
+        sidebar.style.display = 'none';
       }
     } else if (sidebar) {
-      sidebar.style.visibility = '';
+      sidebar.style.display = '';
     }
   }
 
