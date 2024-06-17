@@ -17,7 +17,6 @@
  *
  */
 
-const loadingMessage = document.getElementById('loading-message');
 const HALF_MINUTE_IN_MS = 30000;
 
 const translations = {
@@ -28,14 +27,18 @@ const translations = {
 const userLang = navigator.language;
 
 setTimeout(() => {
-  if (loadingMessage) {
-    // TODO: If there will be more translations, we have to change this functionality..
-    if (userLang.startsWith('de')) {
-      loadingMessage.innerHTML = translations['de'];
-    } else {
-      loadingMessage.innerHTML = translations['en'];
-    }
+  const loadingMessage = document.getElementById('loading-message');
 
-    loadingMessage.classList.add('visible');
+  if (!loadingMessage) {
+    return;
   }
+
+  // TODO: If there will be more translations, we have to change this functionality..
+  if (userLang.startsWith('de')) {
+    loadingMessage.innerHTML = translations['de'];
+  } else {
+    loadingMessage.innerHTML = translations['en'];
+  }
+
+  loadingMessage.classList.add('visible');
 }, HALF_MINUTE_IN_MS);
