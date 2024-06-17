@@ -54,6 +54,10 @@ type AppMainState = {
     lastViewedMessageDetailsEntity: Message | null;
     updateEntity: (entity: RightSidebarParams['entity']) => void;
   };
+  leftSidebar: {
+    isHidden: boolean;
+    toggle: (shouldHide: boolean) => void;
+  };
 };
 
 const useAppMainState = create<AppMainState>((set, get) => ({
@@ -117,6 +121,11 @@ const useAppMainState = create<AppMainState>((set, get) => ({
     isAddMode: false,
     updateEntity: (entity: RightSidebarParams['entity']) =>
       set(state => ({...state, rightSidebar: {...state.rightSidebar, entity}})),
+  },
+  leftSidebar: {
+    isHidden: false,
+    toggle: (shouldHide: boolean) =>
+      set(state => ({...state, leftSidebar: {...state.leftSidebar, isHidden: shouldHide}})),
   },
 }));
 
