@@ -56,7 +56,7 @@ type AppMainState = {
   };
   leftSidebar: {
     isHidden: boolean;
-    toggle: (shouldHide: boolean) => void;
+    hide: (shouldHide: boolean) => void;
   };
 };
 
@@ -124,7 +124,7 @@ const useAppMainState = create<AppMainState>((set, get) => ({
   },
   leftSidebar: {
     isHidden: false,
-    toggle: (shouldHide: boolean) =>
+    hide: (shouldHide: boolean) =>
       set(state => ({...state, leftSidebar: {...state.leftSidebar, isHidden: shouldHide}})),
   },
 }));
