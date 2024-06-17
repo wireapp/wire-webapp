@@ -79,11 +79,16 @@ body.theme-dark {
   padding: 4px 0px 4px 0px;
   border-radius: 24px;
   margin-top: 8px;
-  background-color: var(--gray-30);
-  color: var(--black);
+  background-color: var(--sidebar-bg);
+  color: var(--main-color);
   font-size: var(--font-size-small);
   font-weight: var(--font-weight-semibold);
   gap: 8px;
+}
+
+.slow-connection-indicator svg,
+.slow-connection-indicator svg * {
+  fill: var(--main-color);
 }
 
 .left-list-center {
