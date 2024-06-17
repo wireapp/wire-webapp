@@ -226,14 +226,14 @@ const Conversations: React.FC<ConversationsProps> = ({
   const switchList = listViewModel.switchList;
 
   const onExitPreferences = () => {
-    setCurrentView(ViewType.LEFT_SIDEBAR);
+    setCurrentView(ViewType.MOBILE_LEFT_SIDEBAR);
     switchList(ListState.CONVERSATIONS);
     listViewModel.contentViewModel.switchContent(ContentState.CONVERSATION);
   };
 
   function onClickPreferences(itemId: ContentState) {
     switchList(ListState.PREFERENCES);
-    setCurrentView(ViewType.CENTRAL_COLUMN);
+    setCurrentView(ViewType.MOBILE_CENTRAL_COLUMN);
     listViewModel.contentViewModel.switchContent(itemId);
 
     setTimeout(() => {

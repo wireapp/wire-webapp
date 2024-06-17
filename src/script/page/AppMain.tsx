@@ -119,10 +119,12 @@ export const AppMain: FC<AppMainProps> = ({
   };
 
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
-  const smBreakpoint = useMatchMedia('max-width: 720px');
-
+  const isMobileView = useMatchMedia('max-width: 720px');
   const {currentView} = useAppMainState(state => state.responsiveView);
-  const isLeftSidebarVisible = currentView == ViewType.LEFT_SIDEBAR;
+  const {isHidden: isLeftSidebarHidden} = useAppMainState(state => state.leftSidebar);
+
+  const isMobileLeftSidebarView = currentView == ViewType.MOBILE_LEFT_SIDEBAR;
+  const isMobileCentralColumnView = currentView == ViewType.MOBILE_CENTRAL_COLUMN;
 
   const initializeApp = async () => {
     const showMostRecentConversation = () => {
@@ -214,6 +216,9 @@ export const AppMain: FC<AppMainProps> = ({
 
   useE2EIFeatureConfigUpdate(repositories.team);
 
+  const showLeftSidebar = (isMobileView && isMobileLeftSidebarView) || (!isMobileView && !isLeftSidebarHidden);
+  const showMainContent = !isMobileView || isMobileCentralColumnView;
+
   return (
     <StyledApp
       themeId={THEME_ID.DEFAULT}
@@ -227,7 +232,7 @@ export const AppMain: FC<AppMainProps> = ({
         <ErrorBoundary FallbackComponent={ErrorFallback}>
           {!locked && (
             <div id="app" className="app">
-              {(!smBreakpoint || isLeftSidebarVisible) && (
+              {showLeftSidebar && (
                 <LeftSidebar
                   listViewModel={mainView.list}
                   selfUser={selfUser}
@@ -235,7 +240,7 @@ export const AppMain: FC<AppMainProps> = ({
                 />
               )}
 
-              {(!smBreakpoint || !isLeftSidebarVisible) && (
+              {showMainContent && (
                 <MainContent
                   selfUser={selfUser}
                   isRightSidebarOpen={!!currentState}
