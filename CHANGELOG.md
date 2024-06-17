@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.17.8](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.17.7...@wireapp/react-ui-kit@9.17.8) (2024-06-17)
+
+### Bug Fixes
+
+* **ui:select:** make searchable and fix scroll behaviour ([#6303](https://github.com/wireapp/wire-web-packages/issues/6303)) ([2914431](https://github.com/wireapp/wire-web-packages/commit/2914431587e540e89c794849e2c9799c9d5905ea))
+
 ## [9.17.7](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.17.6...@wireapp/react-ui-kit@9.17.7) (2024-06-10)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
