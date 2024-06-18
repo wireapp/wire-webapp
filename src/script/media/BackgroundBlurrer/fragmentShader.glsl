@@ -1,4 +1,4 @@
-#define BLUR_QUALITY 8 //The higher the value, the more blur. Must be an even number.
+#define BLUR_QUALITY 14 //The higher the value, the more blur. Must be an even number.
 #define SMOOTH 3 // This will create a smooth transition between the blurred and the clear part (the higher the value, the smoother)
 
 precision mediump float;

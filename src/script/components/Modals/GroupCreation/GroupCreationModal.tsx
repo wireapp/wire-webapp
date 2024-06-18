@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useContext, useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useContext, useEffect, useMemo, useState} from 'react';
 
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/ConversationReceiptModeUpdateData';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
@@ -40,7 +40,7 @@ import {UserSearchableList} from 'Components/UserSearchableList';
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from 'src/script/router/routerBindings';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {handleEnterDown, isKeyboardEvent, offEscKey, onEscKey} from 'Util/KeyboardUtil';
+import {handleEnterDown, handleEscDown, isKeyboardEvent} from 'Util/KeyboardUtil';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
@@ -135,8 +135,6 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
     setSelectedProtocol(protocolOptions.find(protocol => protocol.value === selectedProtocol.value)!);
   }, [defaultProtocol]);
 
-  const onEscape = () => setIsShown(false);
-
   const stateIsPreferences = groupCreationState === GroupCreationModalState.PREFERENCES;
   const stateIsParticipants = groupCreationState === GroupCreationModalState.PARTICIPANTS;
   const isServicesRoom = accessState === ACCESS_STATE.TEAM.SERVICES;
@@ -162,13 +160,16 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
 
   const filteredContacts = contacts.filter(user => user.isAvailable());
 
-  useEffect(() => {
-    if (stateIsPreferences) {
-      onEscKey(onEscape);
-      return;
-    }
-    offEscKey(onEscape);
-  }, [stateIsPreferences]);
+  const handleEscape = useCallback(
+    (event: React.KeyboardEvent<HTMLElement> | KeyboardEvent): void => {
+      handleEscDown(event, () => {
+        if (stateIsPreferences) {
+          setIsShown(false);
+        }
+      });
+    },
+    [setIsShown, stateIsPreferences],
+  );
 
   useEffect(() => {
     let timerId: number;
@@ -325,6 +326,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
       isShown={isShown}
       onClosed={onClose}
       data-uie-name="group-creation-label"
+      onKeyDown={stateIsPreferences ? handleEscape : undefined}
     >
       <div className="modal__header modal__header--list">
         {stateIsParticipants && (

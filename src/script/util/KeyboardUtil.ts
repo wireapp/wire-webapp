@@ -83,28 +83,9 @@ export const isRemovalAction = (key: string): boolean => removalKeys.includes(ke
 
 export const isSpaceOrEnterKey = (key: string): boolean => key === KEY.SPACE || key === KEY.ENTER;
 
-type KeyboardHandler = (event: KeyboardEvent) => void;
-
-const escKeyHandlers: KeyboardHandler[] = [];
-
-document.addEventListener('keydown', event => {
-  if (event.key === 'Escape') {
-    escKeyHandlers.forEach(handler => handler(event));
-  }
-});
-
-export const onEscKey = (handler: KeyboardHandler) => escKeyHandlers.push(handler);
-
-export const offEscKey = (handler: KeyboardHandler) => {
-  const index = escKeyHandlers.indexOf(handler);
-  if (index >= 0) {
-    escKeyHandlers.splice(index, 1);
-  }
-};
-
 export const handleKeyDown = (
-  event: React.KeyboardEvent<Element> | KeyboardEvent,
-  callback: (event?: React.KeyboardEvent<Element> | KeyboardEvent) => void,
+  event: ReactKeyboardEvent<Element> | KeyboardEvent,
+  callback: (event?: ReactKeyboardEvent<Element> | KeyboardEvent) => void,
 ) => {
   if (event.key === KEY.ENTER || event.key === KEY.SPACE) {
     callback(event);
@@ -112,11 +93,16 @@ export const handleKeyDown = (
   return true;
 };
 
-export const handleEnterDown = (event: React.KeyboardEvent<HTMLElement> | KeyboardEvent, callback: () => void) => {
+export const handleEnterDown = (event: ReactKeyboardEvent<HTMLElement> | KeyboardEvent, callback: () => void): void => {
   if (event.key === KEY.ENTER) {
     callback();
   }
-  return true;
+};
+
+export const handleEscDown = (event: ReactKeyboardEvent<Element> | KeyboardEvent, callback: () => void): void => {
+  if (event?.key === KEY.ESC) {
+    callback();
+  }
 };
 
 /**

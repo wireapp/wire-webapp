@@ -27,7 +27,7 @@ import {AnyAction, Dispatch} from 'redux';
 
 import {Button, ContainerXS, H1, Link, Paragraph} from '@wireapp/react-ui-kit';
 
-import {KEY} from 'Util/KeyboardUtil';
+import {handleEnterDown} from 'Util/KeyboardUtil';
 
 import {Page} from './Page';
 
@@ -93,11 +93,7 @@ const HistoryInfoComponent = ({
           type="button"
           onClick={onContinue}
           data-uie-name="do-history-confirm"
-          onKeyDown={(event: React.KeyboardEvent) => {
-            if (event.key === KEY.ENTER) {
-              onContinue();
-            }
-          }}
+          onKeyDown={event => handleEnterDown(event, onContinue)}
         >
           {_(historyInfoStrings.ok)}
         </Button>

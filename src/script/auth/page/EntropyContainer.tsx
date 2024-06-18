@@ -23,7 +23,7 @@ import {useIntl} from 'react-intl';
 
 import {Button, CheckRoundIcon, ContainerSM, H1, Muted, Text} from '@wireapp/react-ui-kit';
 
-import {KEY} from 'Util/KeyboardUtil';
+import {handleEnterDown} from 'Util/KeyboardUtil';
 
 import {setEntropyStrings} from '../../strings';
 import {EntropyData} from '../../util/Entropy';
@@ -78,11 +78,7 @@ const EntropyContainer = ({onSetEntropy, containerSize = 400}: Props) => {
             css={{width: '70%'}}
             onClick={() => forwardEntropy(entropy.entropyData)}
             data-uie-name="do-entropy-confirm"
-            onKeyDown={(event: React.KeyboardEvent) => {
-              if (event.key === KEY.ENTER) {
-                forwardEntropy(entropy.entropyData);
-              }
-            }}
+            onKeyDown={event => handleEnterDown(event, () => forwardEntropy(entropy.entropyData))}
           >
             {_(setEntropyStrings.continue)}
           </Button>

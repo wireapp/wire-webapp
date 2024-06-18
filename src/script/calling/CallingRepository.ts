@@ -82,7 +82,6 @@ import {EventSource} from '../event/EventSource';
 import type {MediaDevicesHandler} from '../media/MediaDevicesHandler';
 import type {MediaStreamHandler} from '../media/MediaStreamHandler';
 import {MediaType} from '../media/MediaType';
-import {applyBlur} from '../media/VideoBackgroundBlur';
 import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
 import {TeamState} from '../team/TeamState';
@@ -131,6 +130,7 @@ export class CallingRepository {
   private readonly acceptVersionWarning: (conversationId: QualifiedId) => void;
   private readonly callLog: string[];
   private readonly logger: Logger;
+  private enableBackgroundBlur = false;
   private avsVersion: number = 0;
   private incomingCallCallback: (call: Call) => void;
   private isReady: boolean = false;
@@ -276,13 +276,8 @@ export class CallingRepository {
     if (!videoFeed) {
       return;
     }
-    let newVideoFeed = videoFeed;
-    if (enable) {
-      const blurredVideoStream = await applyBlur(videoFeed);
-      // Keep a reference to the blurred stream in order to release it when the blur is disabled
-      selfParticipant.blurredVideoStream(blurredVideoStream);
-      newVideoFeed = blurredVideoStream.stream;
-    }
+    this.enableBackgroundBlur = enable;
+    const newVideoFeed = enable ? ((await selfParticipant.setBlurredBackground(true)) as MediaStream) : videoFeed;
     this.changeMediaSource(newVideoFeed, MediaType.VIDEO, false);
   }
 
@@ -530,10 +525,12 @@ export class CallingRepository {
   private async warmupMediaStreams(call: Call, audio: boolean, camera: boolean): Promise<boolean> {
     // if it's a video call we query the video user media in order to display the video preview
     try {
+      const selfParticipant = call.getSelfParticipant();
       camera = this.teamState.isVideoCallingEnabled() ? camera : false;
       const mediaStream = await this.getMediaStream({audio, camera}, call.isGroupOrConference);
       if (call.state() !== CALL_STATE.NONE) {
-        call.getSelfParticipant().updateMediaStream(mediaStream, true);
+        selfParticipant.updateMediaStream(mediaStream, true);
+        await selfParticipant.setBlurredBackground(this.enableBackgroundBlur);
         if (camera) {
           call.getSelfParticipant().videoState(VIDEO_STATE.STARTED);
         }
@@ -1780,8 +1777,9 @@ export class CallingRepository {
         }
         const mediaStream = await this.getMediaStream(missingStreams, call.isGroupOrConference);
         this.mediaStreamQuery = undefined;
-        const newStream = selfParticipant.updateMediaStream(mediaStream, true);
-        return newStream;
+        selfParticipant.updateMediaStream(mediaStream, true);
+        await selfParticipant.setBlurredBackground(this.enableBackgroundBlur);
+        return selfParticipant.getMediaStream();
       } catch (error) {
         this.mediaStreamQuery = undefined;
         this.logger.warn('Could not get mediaStream for call', error);

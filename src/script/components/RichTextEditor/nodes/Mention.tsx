@@ -83,12 +83,12 @@ export const Mention = (props: MentionComponentProps) => {
       const selectedNode = rangeSelection?.getNodes().length === 1 && rangeSelection?.getNodes()[0];
       if (selectedNode) {
         const isCurrentNode = nodeKey === selectedNode?.getKey();
-        if (event.key === 'Backspace') {
+        if (event.key === KEY.BACKSPACE) {
           // When backspace is hit, we want to select the mention if the cursor is right after it
           const isNextNode =
             selectedNode?.getPreviousSibling()?.getKey() === nodeKey && rangeSelection?.focus.offset === 0;
           shouldSelectNode = isCurrentNode || isNextNode;
-        } else if (event.key === 'Delete') {
+        } else if (event.key === KEY.DELETE) {
           // When backspace is hit, we want to select the mention if the cursor is right before it
           const isNextNode =
             selectedNode?.getNextSibling()?.getKey() === nodeKey &&
