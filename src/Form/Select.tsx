@@ -59,6 +59,7 @@ interface SelectProps<IsMulti extends boolean, Group extends GroupBase<Option>>
   required?: boolean;
   isMulti?: IsMulti;
   isSearchable?: boolean;
+  overlayMenu?: boolean;
 }
 
 export const Select = <IsMulti extends boolean = false, Group extends GroupBase<Option> = GroupBase<Option>>({
@@ -74,6 +75,7 @@ export const Select = <IsMulti extends boolean = false, Group extends GroupBase<
   markInvalid = false,
   required = false,
   isSearchable = false,
+  overlayMenu = true,
   ...props
 }: SelectProps<IsMulti, Group>) => {
   const theme = useTheme();
@@ -101,7 +103,13 @@ export const Select = <IsMulti extends boolean = false, Group extends GroupBase<
 
       <ReactSelect
         id={id}
-        styles={customStyles(theme as Theme, markInvalid) as StylesConfig}
+        styles={
+          customStyles({
+            theme: theme as Theme,
+            markInvalid,
+            menuPosition: overlayMenu ? 'absolute' : 'relative',
+          }) as StylesConfig
+        }
         components={{
           SelectContainer,
           DropdownIndicator,
