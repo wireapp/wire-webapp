@@ -69,49 +69,35 @@ export enum SidebarTabs {
   PREFERENCES,
 }
 
-export const SidebarOpenStatus = {
+export const SidebarStatus = {
   OPEN: 'OPEN',
   CLOSED: 'CLOSED',
-  MANUAL_OPEN: 'MANUAL_OPEN',
-  MANUAL_CLOSED: 'MANUAL_CLOSED',
+  AUTO: 'AUTO',
 } as const;
 
-export type SidebarOpenStatus = (typeof SidebarOpenStatus)[keyof typeof SidebarOpenStatus];
+export type SidebarStatus = (typeof SidebarStatus)[keyof typeof SidebarStatus];
 
 export interface SidebarStore {
-  openStatus: SidebarOpenStatus;
-  setOpenStatus: (status: SidebarOpenStatus) => void;
-  toggleOpenStatus: () => void;
+  status: SidebarStatus;
+  setStatus: (status: SidebarStatus) => void;
   currentTab: SidebarTabs;
-  isOpen: (openStatus: SidebarOpenStatus) => boolean;
   setCurrentTab: (tab: SidebarTabs) => void;
 }
 
 const useSidebarStore = create<SidebarStore>()(
   persist(
-    (set, get) => ({
+    set => ({
       currentTab: SidebarTabs.RECENT,
       setCurrentTab: (tab: SidebarTabs) => {
         set({currentTab: tab});
       },
-      openStatus: SidebarOpenStatus.CLOSED,
-      setOpenStatus: status => set({openStatus: status}),
-      isOpen: (openStatus: SidebarOpenStatus) => {
-        return openStatus === SidebarOpenStatus.MANUAL_OPEN || openStatus === SidebarOpenStatus.OPEN;
-      },
-      toggleOpenStatus: () => {
-        const currentStatus = get().openStatus;
-        const newStatus =
-          currentStatus === SidebarOpenStatus.MANUAL_OPEN || currentStatus === SidebarOpenStatus.OPEN
-            ? SidebarOpenStatus.MANUAL_CLOSED
-            : SidebarOpenStatus.MANUAL_OPEN;
-        set({openStatus: newStatus});
-      },
+      status: SidebarStatus.CLOSED,
+      setStatus: status => set({status: status}),
     }),
     {
       name: 'sidebar-store',
       storage: createJSONStorage(() => localStorage),
-      partialize: state => ({openStatus: state.openStatus}),
+      partialize: state => ({status: state.status}),
     },
   ),
 );

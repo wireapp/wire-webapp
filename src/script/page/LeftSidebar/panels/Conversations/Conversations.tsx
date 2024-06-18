@@ -49,7 +49,7 @@ import {ConversationsList} from './ConversationsList';
 import {ConversationTabs} from './ConversationTabs';
 import {EmptyConversationList} from './EmptyConversationList';
 import {getTabConversations} from './helpers';
-import {SidebarOpenStatus, SidebarTabs, useFolderState, useSidebarStore} from './state';
+import {SidebarStatus, SidebarTabs, useFolderState, useSidebarStore} from './state';
 
 import {CallingViewMode, CallState} from '../../../../calling/CallState';
 import {createLabel} from '../../../../conversation/ConversationLabelRepository';
@@ -97,14 +97,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   userState = container.resolve(UserState),
   selfUser,
 }) => {
-  const {
-    currentTab,
-    isOpen: isSideBarOpen,
-    openStatus: sideBarOpenStatus,
-    setOpenStatus: setSidebarOpenStatus,
-    toggleOpenStatus: toggleSidebarIsOpen,
-    setCurrentTab,
-  } = useSidebarStore();
+  const {currentTab, status: sidebarStatus, setStatus: setSidebarStatus, setCurrentTab} = useSidebarStore();
   const [conversationsFilter, setConversationsFilter] = useState<string>('');
   const [isConversationFilterFocused, setIsConversationFilterFocused] = useState(false);
   const {classifiedDomains, isTeam} = useKoSubscribableChildren(teamState, ['classifiedDomains', 'isTeam']);
@@ -147,6 +140,9 @@ const Conversations: React.FC<ConversationsProps> = ({
   const {openFolder, closeFolder, expandedFolder, isFoldersTabOpen, toggleFoldersTab} = useFolderState();
   const {currentFocus, handleKeyDown, resetConversationFocus} = useConversationFocus(conversations);
 
+  const mdBreakpoint = useMatchMedia('(max-width: 1000px)');
+  const isSideBarOpen = sidebarStatus === SidebarStatus.AUTO ? mdBreakpoint : sidebarStatus === SidebarStatus.OPEN;
+
   const {conversations: currentTabConversations, searchInputPlaceholder} = getTabConversations({
     currentTab,
     conversations,
@@ -166,18 +162,11 @@ const Conversations: React.FC<ConversationsProps> = ({
     if (isFoldersTabOpen) {
       toggleFoldersTab();
     }
-    toggleSidebarIsOpen();
+
+    setSidebarStatus(isSideBarOpen ? SidebarStatus.CLOSED : SidebarStatus.OPEN);
   }
 
   const hasNoConversations = conversations.length + connectRequests.length === 0;
-
-  const mdBreakpoint = useMatchMedia('(max-width: 1000px)');
-
-  useEffect(() => {
-    if (sideBarOpenStatus !== SidebarOpenStatus.MANUAL_OPEN && sideBarOpenStatus !== SidebarOpenStatus.MANUAL_CLOSED) {
-      setSidebarOpenStatus(mdBreakpoint ? SidebarOpenStatus.CLOSED : SidebarOpenStatus.OPEN);
-    }
-  }, [mdBreakpoint, setSidebarOpenStatus, sideBarOpenStatus]);
 
   useEffect(() => {
     if (activeConversation && !conversationState.isVisible(activeConversation)) {
@@ -248,12 +237,12 @@ const Conversations: React.FC<ConversationsProps> = ({
 
   const sidebar = (
     <nav className="conversations-sidebar" css={conversationsSidebarStyles(mdBreakpoint)}>
-      <FadingScrollbar className="conversations-sidebar-items" data-is-collapsed={!isSideBarOpen(sideBarOpenStatus)}>
+      <FadingScrollbar className="conversations-sidebar-items" data-is-collapsed={!isSideBarOpen}>
         <UserDetails
           user={selfUser}
           groupId={conversationState.selfMLSConversation()?.groupId}
           isTeam={isTeam}
-          isSideBarOpen={isSideBarOpen(sideBarOpenStatus)}
+          isSideBarOpen={isSideBarOpen}
         />
 
         <ConversationTabs
@@ -270,7 +259,7 @@ const Conversations: React.FC<ConversationsProps> = ({
       </FadingScrollbar>
 
       <IconButton
-        css={conversationsSidebarHandleStyles(isSideBarOpen(sideBarOpenStatus))}
+        css={conversationsSidebarHandleStyles(isSideBarOpen)}
         className="conversations-sidebar-handle"
         onClick={toggleSidebar}
       >
