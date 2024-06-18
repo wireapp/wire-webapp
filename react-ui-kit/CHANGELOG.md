@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.17.9](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.17.8...@wireapp/react-ui-kit@9.17.9) (2024-06-18)
+
+### Bug Fixes
+
+* **select:** make menu position adjustable ([#6305](https://github.com/wireapp/wire-web-packages/issues/6305)) ([72fc348](https://github.com/wireapp/wire-web-packages/commit/72fc3485496562dca99d5cecbc468ad199f23053))
+
 ## [9.17.8](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.17.7...@wireapp/react-ui-kit@9.17.8) (2024-06-17)
 
 ### Bug Fixes
