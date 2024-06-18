@@ -18,13 +18,14 @@
  */
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import ko from 'knockout';
+import ko, {observable, pureComputed, computed} from 'knockout';
 
 import {VIDEO_STATE} from '@wireapp/avs';
 
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import {User} from '../entity/User';
+import {applyBlur} from '../media/VideoBackgroundBlur';
 
 export type UserId = string;
 export type ClientId = string;
@@ -33,7 +34,8 @@ export class Participant {
   // Video
   public videoState: ko.Observable<VIDEO_STATE>;
   public videoStream: ko.Observable<MediaStream | undefined>;
-  public blurredVideoStream = ko.observable<{stream: MediaStream; release: () => void} | undefined>(undefined);
+  public blurredVideoStream = observable<{stream: MediaStream; release: () => void} | undefined>();
+  public isBlurred = observable(false);
   public hasActiveVideo: ko.PureComputed<boolean>;
   public hasPausedVideo: ko.PureComputed<boolean>;
   public sharesScreen: ko.PureComputed<boolean>;
@@ -51,33 +53,44 @@ export class Participant {
     public user: User,
     public clientId: ClientId,
   ) {
-    this.videoState = ko.observable(VIDEO_STATE.STOPPED);
-    this.hasActiveVideo = ko.pureComputed(() => {
+    this.videoState = observable(VIDEO_STATE.STOPPED);
+    this.hasActiveVideo = pureComputed(() => {
       return (this.sharesCamera() || this.sharesScreen()) && !!this.videoStream();
     });
-    this.sharesScreen = ko.pureComputed(() => {
+    this.sharesScreen = pureComputed(() => {
       return this.videoState() === VIDEO_STATE.SCREENSHARE;
     });
-    this.sharesCamera = ko.pureComputed(() => {
+    this.sharesCamera = pureComputed(() => {
       return [VIDEO_STATE.STARTED, VIDEO_STATE.PAUSED].includes(this.videoState());
     });
-    this.hasPausedVideo = ko.pureComputed(() => {
+    this.hasPausedVideo = pureComputed(() => {
       return this.videoState() === VIDEO_STATE.PAUSED;
     });
-    this.videoStream = ko.observable();
-    this.audioStream = ko.observable();
-    this.isActivelySpeaking = ko.observable(false);
-    this.startedScreenSharingAt = ko.observable();
-    this.isMuted = ko.observable(false);
-    this.isSendingVideo = ko.pureComputed(() => {
+    this.videoStream = observable();
+    this.audioStream = observable();
+    this.isActivelySpeaking = observable(false);
+    this.startedScreenSharingAt = observable();
+    this.isMuted = observable(false);
+    this.isSendingVideo = pureComputed(() => {
       return this.videoState() !== VIDEO_STATE.STOPPED;
     });
-    this.isAudioEstablished = ko.observable(false);
+    this.isAudioEstablished = observable(false);
+    computed(async () => {});
   }
 
   public releaseBlurredVideoStream(): void {
     this.blurredVideoStream()?.release();
     this.blurredVideoStream(undefined);
+  }
+
+  public async setBlurredBackground(isBlurred: boolean) {
+    const originalVideoStream = this.videoStream();
+    if (isBlurred && originalVideoStream) {
+      this.blurredVideoStream(await applyBlur(originalVideoStream));
+    } else {
+      this.releaseBlurredVideoStream();
+    }
+    return this.blurredVideoStream()?.stream;
   }
 
   readonly doesMatchIds = (userId: QualifiedId, clientId: ClientId): boolean =>
@@ -89,6 +102,7 @@ export class Participant {
   }
 
   setVideoStream(videoStream: MediaStream, stopTracks: boolean): void {
+    this.releaseBlurredVideoStream();
     this.releaseStream(this.videoStream(), stopTracks);
     this.videoStream(videoStream);
   }
@@ -104,8 +118,9 @@ export class Participant {
   }
 
   getMediaStream(): MediaStream {
-    const audioTracks: MediaStreamTrack[] = this.audioStream() ? this.audioStream().getTracks() : [];
-    const videoTracks: MediaStreamTrack[] = this.videoStream() ? this.videoStream().getTracks() : [];
+    const audioTracks: MediaStreamTrack[] = this.audioStream()?.getTracks() ?? [];
+    const videoTracks: MediaStreamTrack[] =
+      this.blurredVideoStream()?.stream.getTracks() ?? this.videoStream()?.getTracks() ?? [];
     return new MediaStream(audioTracks.concat(videoTracks));
   }
 
