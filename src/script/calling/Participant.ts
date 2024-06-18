@@ -18,7 +18,7 @@
  */
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import ko, {observable, pureComputed, computed} from 'knockout';
+import ko, {observable, pureComputed} from 'knockout';
 
 import {VIDEO_STATE} from '@wireapp/avs';
 
@@ -32,28 +32,26 @@ export type ClientId = string;
 
 export class Participant {
   // Video
-  public videoState: ko.Observable<VIDEO_STATE>;
-  public videoStream: ko.Observable<MediaStream | undefined>;
-  public blurredVideoStream = observable<{stream: MediaStream; release: () => void} | undefined>();
-  public isBlurred = observable(false);
-  public hasActiveVideo: ko.PureComputed<boolean>;
-  public hasPausedVideo: ko.PureComputed<boolean>;
-  public sharesScreen: ko.PureComputed<boolean>;
-  public sharesCamera: ko.PureComputed<boolean>;
-  public startedScreenSharingAt: ko.Observable<number>;
-  public isActivelySpeaking: ko.Observable<boolean>;
-  public isSendingVideo: ko.PureComputed<boolean>;
-  public isAudioEstablished: ko.Observable<boolean>;
+  public readonly videoState = observable(VIDEO_STATE.STOPPED);
+  public readonly videoStream = observable<MediaStream | undefined>();
+  public readonly blurredVideoStream = observable<{stream: MediaStream; release: () => void} | undefined>();
+  public readonly hasActiveVideo: ko.PureComputed<boolean>;
+  public readonly hasPausedVideo: ko.PureComputed<boolean>;
+  public readonly sharesScreen: ko.PureComputed<boolean>;
+  public readonly sharesCamera: ko.PureComputed<boolean>;
+  public readonly startedScreenSharingAt = observable<number | undefined>();
+  public readonly isActivelySpeaking = observable(false);
+  public readonly isSendingVideo: ko.PureComputed<boolean>;
+  public readonly isAudioEstablished = observable(false);
 
   // Audio
-  public audioStream: ko.Observable<MediaStream | undefined>;
-  public isMuted: ko.Observable<boolean>;
+  public readonly audioStream = observable<MediaStream | undefined>();
+  public readonly isMuted = observable(false);
 
   constructor(
-    public user: User,
-    public clientId: ClientId,
+    public readonly user: User,
+    public readonly clientId: ClientId,
   ) {
-    this.videoState = observable(VIDEO_STATE.STOPPED);
     this.hasActiveVideo = pureComputed(() => {
       return (this.sharesCamera() || this.sharesScreen()) && !!this.videoStream();
     });
@@ -66,16 +64,9 @@ export class Participant {
     this.hasPausedVideo = pureComputed(() => {
       return this.videoState() === VIDEO_STATE.PAUSED;
     });
-    this.videoStream = observable();
-    this.audioStream = observable();
-    this.isActivelySpeaking = observable(false);
-    this.startedScreenSharingAt = observable();
-    this.isMuted = observable(false);
     this.isSendingVideo = pureComputed(() => {
       return this.videoState() !== VIDEO_STATE.STOPPED;
     });
-    this.isAudioEstablished = observable(false);
-    computed(async () => {});
   }
 
   public releaseBlurredVideoStream(): void {
