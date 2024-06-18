@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useRef} from 'react';
+import {KeyboardEvent, useEffect, useRef} from 'react';
 
 import {amplify} from 'amplify';
 
@@ -84,6 +84,12 @@ export const ConversationHeader = ({
     });
   }, []);
 
+  function onKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+    if (event.key === 'Escape') {
+      setSearchValue('');
+    }
+  }
+
   return (
     <>
       <div css={header}>
@@ -107,6 +113,7 @@ export const ConversationHeader = ({
 
       {showSearchInput && (
         <Input
+          onKeyDown={onKeyDown}
           ref={inputRef}
           className="label-1"
           value={searchValue}
