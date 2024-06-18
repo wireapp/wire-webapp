@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import React, {KeyboardEvent as ReactKeyBoardEvent, useEffect, useState} from 'react';
 
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
@@ -60,6 +60,8 @@ import {useConversationFocus} from '../../../../hooks/useConversationFocus';
 import {PreferenceNotificationRepository} from '../../../../notification/PreferenceNotificationRepository';
 import {PropertiesRepository} from '../../../../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../../../../properties/PropertiesType';
+import {generateConversationUrl} from '../../../../router/routeGenerator';
+import {createNavigateKeyboard} from '../../../../router/routerBindings';
 import {TeamState} from '../../../../team/TeamState';
 import {UserState} from '../../../../user/UserState';
 import {ListViewModel} from '../../../../view_model/ListViewModel';
@@ -304,6 +306,15 @@ const Conversations: React.FC<ConversationsProps> = ({
     </>
   );
 
+  const handleEnterSearchClick = (event: ReactKeyBoardEvent<HTMLDivElement>) => {
+    const firstFoundConversation = currentTabConversations?.[0];
+
+    if (firstFoundConversation) {
+      createNavigateKeyboard(generateConversationUrl(firstFoundConversation.qualifiedId), true)(event);
+      setConversationsFilter('');
+    }
+  };
+
   return (
     <div className="conversations-wrapper">
       <div className="conversations-sidebar-spacer" css={conversationsSpacerStyles(mdBreakpoint)} />
@@ -319,6 +330,7 @@ const Conversations: React.FC<ConversationsProps> = ({
             setSearchValue={setConversationsFilter}
             searchInputPlaceholder={searchInputPlaceholder}
             setIsConversationFilterFocused={setIsConversationFilterFocused}
+            onSearchEnterClick={handleEnterSearchClick}
           />
         }
         hasHeader={!isPreferences}

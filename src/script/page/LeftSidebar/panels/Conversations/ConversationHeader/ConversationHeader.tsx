@@ -27,6 +27,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {Icon} from 'Components/Icon';
 import {ConversationLabel} from 'src/script/conversation/ConversationLabelRepository';
 import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/state';
+import {handleEnterDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {
@@ -51,6 +52,7 @@ interface ConversationHeaderProps {
   searchInputPlaceholder: string;
   currentFolder?: ConversationLabel;
   setIsConversationFilterFocused: (isFocused: boolean) => void;
+  onSearchEnterClick: (event: KeyboardEvent<HTMLInputElement>) => void;
 }
 
 export const ConversationHeader = ({
@@ -62,6 +64,7 @@ export const ConversationHeader = ({
   currentFolder,
   searchInputPlaceholder,
   setIsConversationFilterFocused,
+  onSearchEnterClick,
 }: ConversationHeaderProps) => {
   const {canCreateGroupConversation} = generatePermissionHelpers(selfUser.teamRole());
   const isFolderView = currentTab === SidebarTabs.FOLDER;
@@ -84,11 +87,16 @@ export const ConversationHeader = ({
     });
   }, []);
 
-  function onKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+  const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Escape') {
       setSearchValue('');
     }
-  }
+
+    handleEnterDown(event, () => {
+      onSearchEnterClick(event);
+      setIsConversationFilterFocused(false);
+    });
+  };
 
   return (
     <>
