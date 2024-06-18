@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useRef} from 'react';
+import {KeyboardEvent, useEffect, useRef} from 'react';
 
 import {amplify} from 'amplify';
 
@@ -82,21 +82,13 @@ export const ConversationHeader = ({
     amplify.subscribe(WebAppEvents.SHORTCUT.SEARCH, () => {
       inputRef?.current?.focus();
     });
+  }, []);
 
-    const input = inputRef.current;
-
-    function onKeyDown(event: KeyboardEvent) {
-      if (event.key === 'Escape') {
-        setSearchValue('');
-      }
+  function onKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+    if (event.key === 'Escape') {
+      setSearchValue('');
     }
-
-    input?.addEventListener('keydown', onKeyDown);
-
-    return () => {
-      input?.removeEventListener('keydown', onKeyDown);
-    };
-  }, [setSearchValue]);
+  }
 
   return (
     <>
@@ -121,6 +113,7 @@ export const ConversationHeader = ({
 
       {showSearchInput && (
         <Input
+          onKeyDown={onKeyDown}
           ref={inputRef}
           className="label-1"
           value={searchValue}
