@@ -18,66 +18,70 @@
  */
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import ko from 'knockout';
+import ko, {observable, pureComputed} from 'knockout';
 
 import {VIDEO_STATE} from '@wireapp/avs';
 
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import {User} from '../entity/User';
+import {applyBlur} from '../media/VideoBackgroundBlur';
 
 export type UserId = string;
 export type ClientId = string;
 
 export class Participant {
   // Video
-  public videoState: ko.Observable<VIDEO_STATE>;
-  public videoStream: ko.Observable<MediaStream | undefined>;
-  public blurredVideoStream = ko.observable<{stream: MediaStream; release: () => void} | undefined>(undefined);
-  public hasActiveVideo: ko.PureComputed<boolean>;
-  public hasPausedVideo: ko.PureComputed<boolean>;
-  public sharesScreen: ko.PureComputed<boolean>;
-  public sharesCamera: ko.PureComputed<boolean>;
-  public startedScreenSharingAt: ko.Observable<number>;
-  public isActivelySpeaking: ko.Observable<boolean>;
-  public isSendingVideo: ko.PureComputed<boolean>;
-  public isAudioEstablished: ko.Observable<boolean>;
+  public readonly videoState = observable(VIDEO_STATE.STOPPED);
+  public readonly videoStream = observable<MediaStream | undefined>();
+  public readonly blurredVideoStream = observable<{stream: MediaStream; release: () => void} | undefined>();
+  public readonly hasActiveVideo: ko.PureComputed<boolean>;
+  public readonly hasPausedVideo: ko.PureComputed<boolean>;
+  public readonly sharesScreen: ko.PureComputed<boolean>;
+  public readonly sharesCamera: ko.PureComputed<boolean>;
+  public readonly startedScreenSharingAt = observable<number>(0);
+  public readonly isActivelySpeaking = observable(false);
+  public readonly isSendingVideo: ko.PureComputed<boolean>;
+  public readonly isAudioEstablished = observable(false);
 
   // Audio
-  public audioStream: ko.Observable<MediaStream | undefined>;
-  public isMuted: ko.Observable<boolean>;
+  public readonly audioStream = observable<MediaStream | undefined>();
+  public readonly isMuted = observable(false);
 
   constructor(
-    public user: User,
-    public clientId: ClientId,
+    public readonly user: User,
+    public readonly clientId: ClientId,
   ) {
-    this.videoState = ko.observable(VIDEO_STATE.STOPPED);
-    this.hasActiveVideo = ko.pureComputed(() => {
+    this.hasActiveVideo = pureComputed(() => {
       return (this.sharesCamera() || this.sharesScreen()) && !!this.videoStream();
     });
-    this.sharesScreen = ko.pureComputed(() => {
+    this.sharesScreen = pureComputed(() => {
       return this.videoState() === VIDEO_STATE.SCREENSHARE;
     });
-    this.sharesCamera = ko.pureComputed(() => {
+    this.sharesCamera = pureComputed(() => {
       return [VIDEO_STATE.STARTED, VIDEO_STATE.PAUSED].includes(this.videoState());
     });
-    this.hasPausedVideo = ko.pureComputed(() => {
+    this.hasPausedVideo = pureComputed(() => {
       return this.videoState() === VIDEO_STATE.PAUSED;
     });
-    this.videoStream = ko.observable();
-    this.audioStream = ko.observable();
-    this.isActivelySpeaking = ko.observable(false);
-    this.startedScreenSharingAt = ko.observable();
-    this.isMuted = ko.observable(false);
-    this.isSendingVideo = ko.pureComputed(() => {
+    this.isSendingVideo = pureComputed(() => {
       return this.videoState() !== VIDEO_STATE.STOPPED;
     });
-    this.isAudioEstablished = ko.observable(false);
   }
 
   public releaseBlurredVideoStream(): void {
     this.blurredVideoStream()?.release();
     this.blurredVideoStream(undefined);
+  }
+
+  public async setBlurredBackground(isBlurred: boolean) {
+    const originalVideoStream = this.videoStream();
+    if (isBlurred && originalVideoStream) {
+      this.blurredVideoStream(await applyBlur(originalVideoStream));
+    } else {
+      this.releaseBlurredVideoStream();
+    }
+    return this.blurredVideoStream()?.stream;
   }
 
   readonly doesMatchIds = (userId: QualifiedId, clientId: ClientId): boolean =>
@@ -89,6 +93,7 @@ export class Participant {
   }
 
   setVideoStream(videoStream: MediaStream, stopTracks: boolean): void {
+    this.releaseBlurredVideoStream();
     this.releaseStream(this.videoStream(), stopTracks);
     this.videoStream(videoStream);
   }
@@ -104,8 +109,9 @@ export class Participant {
   }
 
   getMediaStream(): MediaStream {
-    const audioTracks: MediaStreamTrack[] = this.audioStream() ? this.audioStream().getTracks() : [];
-    const videoTracks: MediaStreamTrack[] = this.videoStream() ? this.videoStream().getTracks() : [];
+    const audioTracks: MediaStreamTrack[] = this.audioStream()?.getTracks() ?? [];
+    const videoTracks: MediaStreamTrack[] =
+      this.blurredVideoStream()?.stream.getTracks() ?? this.videoStream()?.getTracks() ?? [];
     return new MediaStream(audioTracks.concat(videoTracks));
   }
 

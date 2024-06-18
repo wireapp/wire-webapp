@@ -32,7 +32,7 @@ enum FRAMERATE {
 
 const QualitySettings = {
   segmentationModel: SEGMENTATION_MODEL.PERFORMANCE,
-  framerate: FRAMERATE.HIGH,
+  framerate: FRAMERATE.LOW,
 };
 
 // Calculate the FPS interval
