@@ -33,6 +33,9 @@ export const label: CSSObject = {
   fontWeight: 'var(--font-weight-semibold)',
   fontSize: 'var(--font-size-base)',
   paddingBlock: '8px',
+  textOverflow: 'ellipsis',
+  overflow: 'hidden',
+  whiteSpace: 'nowrap',
 };
 
 export const button: CSSObject = {

@@ -19,11 +19,18 @@
 
 import cx from 'classnames';
 
+import {useMatchMedia} from '@wireapp/react-ui-kit';
+
 import {Config} from 'src/script/Config';
 import {createLabel} from 'src/script/conversation/ConversationLabelRepository';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {Conversation} from 'src/script/entity/Conversation';
-import {SidebarTabs, useFolderState, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/state';
+import {
+  SidebarStatus,
+  SidebarTabs,
+  useFolderState,
+  useSidebarStore,
+} from 'src/script/page/LeftSidebar/panels/Conversations/state';
 import {ContextMenuEntry, showContextMenu} from 'src/script/ui/ContextMenu';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -52,9 +59,11 @@ export const ConversationFolderTab = ({
   unreadConversations = [],
   dataUieName,
 }: ConversationFolderTabProps) => {
-  const {isOpen: isSidebarOpen, setIsOpen: setIsSidebarOpen} = useSidebarStore();
+  const {status: sidebarStatus, setStatus: setSidebarStatus} = useSidebarStore();
   const {openFolder, isFoldersTabOpen, toggleFoldersTab, expandedFolder} = useFolderState();
   const {conversationLabelRepository} = conversationRepository;
+  const mdBreakpoint = useMatchMedia('(max-width: 1000px)');
+  const isSideBarOpen = sidebarStatus === SidebarStatus.AUTO ? mdBreakpoint : sidebarStatus === SidebarStatus.OPEN;
 
   function toggleFolder(folderId: string) {
     openFolder(folderId);
@@ -86,13 +95,13 @@ export const ConversationFolderTab = ({
   }
 
   function handleToggleFoldersTab(event: React.MouseEvent<HTMLButtonElement>) {
-    if (isSidebarOpen) {
+    if (isSideBarOpen) {
       toggleFoldersTab();
       return;
     }
 
     if (folders.length === 0) {
-      setIsSidebarOpen(true);
+      setSidebarStatus(SidebarStatus.OPEN);
       return;
     }
 

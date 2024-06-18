@@ -49,7 +49,7 @@ import {ConversationsList} from './ConversationsList';
 import {ConversationTabs} from './ConversationTabs';
 import {EmptyConversationList} from './EmptyConversationList';
 import {getTabConversations} from './helpers';
-import {SidebarTabs, useFolderState, useSidebarStore} from './state';
+import {SidebarStatus, SidebarTabs, useFolderState, useSidebarStore} from './state';
 
 import {CallingViewMode, CallState} from '../../../../calling/CallState';
 import {createLabel} from '../../../../conversation/ConversationLabelRepository';
@@ -99,13 +99,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   userState = container.resolve(UserState),
   selfUser,
 }) => {
-  const {
-    isOpen: isSideBarOpen,
-    toggleIsOpen: toggleSidebarIsOpen,
-    setIsOpen: setIsSidebarOpen,
-    currentTab,
-    setCurrentTab,
-  } = useSidebarStore();
+  const {currentTab, status: sidebarStatus, setStatus: setSidebarStatus, setCurrentTab} = useSidebarStore();
   const [conversationsFilter, setConversationsFilter] = useState<string>('');
   const [isConversationFilterFocused, setIsConversationFilterFocused] = useState(false);
   const {classifiedDomains, isTeam} = useKoSubscribableChildren(teamState, ['classifiedDomains', 'isTeam']);
@@ -148,6 +142,9 @@ const Conversations: React.FC<ConversationsProps> = ({
   const {openFolder, closeFolder, expandedFolder, isFoldersTabOpen, toggleFoldersTab} = useFolderState();
   const {currentFocus, handleKeyDown, resetConversationFocus} = useConversationFocus(conversations);
 
+  const mdBreakpoint = useMatchMedia('(max-width: 1000px)');
+  const isSideBarOpen = sidebarStatus === SidebarStatus.AUTO ? mdBreakpoint : sidebarStatus === SidebarStatus.OPEN;
+
   const {conversations: currentTabConversations, searchInputPlaceholder} = getTabConversations({
     currentTab,
     conversations,
@@ -167,16 +164,11 @@ const Conversations: React.FC<ConversationsProps> = ({
     if (isFoldersTabOpen) {
       toggleFoldersTab();
     }
-    toggleSidebarIsOpen();
+
+    setSidebarStatus(isSideBarOpen ? SidebarStatus.CLOSED : SidebarStatus.OPEN);
   }
 
   const hasNoConversations = conversations.length + connectRequests.length === 0;
-
-  const mdBreakpoint = useMatchMedia('(max-width: 1000px)');
-
-  useEffect(() => {
-    setIsSidebarOpen(!mdBreakpoint);
-  }, [mdBreakpoint, setIsSidebarOpen]);
 
   useEffect(() => {
     if (activeConversation && !conversationState.isVisible(activeConversation)) {
