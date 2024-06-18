@@ -130,6 +130,7 @@ export class CallingRepository {
   private readonly acceptVersionWarning: (conversationId: QualifiedId) => void;
   private readonly callLog: string[];
   private readonly logger: Logger;
+  private isBlurred = localStorage.getItem('isBlurred') === 'true';
   private avsVersion: number = 0;
   private incomingCallCallback: (call: Call) => void;
   private isReady: boolean = false;
@@ -275,6 +276,8 @@ export class CallingRepository {
     if (!videoFeed) {
       return;
     }
+    this.isBlurred = enable;
+    localStorage.setItem('isBlurred', enable.toString());
     const newVideoFeed = enable ? ((await selfParticipant.setBlurredBackground(true)) as MediaStream) : videoFeed;
     this.changeMediaSource(newVideoFeed, MediaType.VIDEO, false);
   }
@@ -528,7 +531,7 @@ export class CallingRepository {
       const mediaStream = await this.getMediaStream({audio, camera}, call.isGroupOrConference);
       if (call.state() !== CALL_STATE.NONE) {
         selfParticipant.updateMediaStream(mediaStream, true);
-        await selfParticipant.setBlurredBackground(true);
+        await selfParticipant.setBlurredBackground(this.isBlurred);
         if (camera) {
           call.getSelfParticipant().videoState(VIDEO_STATE.STARTED);
         }
@@ -1775,9 +1778,9 @@ export class CallingRepository {
         }
         const mediaStream = await this.getMediaStream(missingStreams, call.isGroupOrConference);
         this.mediaStreamQuery = undefined;
-        const updatedMediaStream = selfParticipant.updateMediaStream(mediaStream, true);
-        await selfParticipant.setBlurredBackground(true);
-        return updatedMediaStream;
+        selfParticipant.updateMediaStream(mediaStream, true);
+        await selfParticipant.setBlurredBackground(this.isBlurred);
+        return selfParticipant.getMediaStream();
       } catch (error) {
         this.mediaStreamQuery = undefined;
         this.logger.warn('Could not get mediaStream for call', error);
