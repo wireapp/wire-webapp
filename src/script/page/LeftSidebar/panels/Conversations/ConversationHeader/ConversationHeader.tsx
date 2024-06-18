@@ -82,7 +82,21 @@ export const ConversationHeader = ({
     amplify.subscribe(WebAppEvents.SHORTCUT.SEARCH, () => {
       inputRef?.current?.focus();
     });
-  }, []);
+
+    const input = inputRef.current;
+
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        setSearchValue('');
+      }
+    }
+
+    input?.addEventListener('keydown', onKeyDown);
+
+    return () => {
+      input?.removeEventListener('keydown', onKeyDown);
+    };
+  }, [setSearchValue]);
 
   return (
     <>
