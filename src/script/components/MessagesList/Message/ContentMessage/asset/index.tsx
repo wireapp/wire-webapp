@@ -54,7 +54,6 @@ interface ContentAssetProps {
   selfId: QualifiedId;
   isMessageFocused: boolean;
   is1to1Conversation: boolean;
-  isLastDeliveredMessage: boolean;
   onClickDetails: () => void;
 }
 
@@ -67,7 +66,6 @@ const ContentAsset = ({
   onClickButton,
   isMessageFocused,
   is1to1Conversation,
-  isLastDeliveredMessage,
   onClickDetails,
 }: ContentAssetProps) => {
   const {isObfuscated, status} = useKoSubscribableChildren(message, ['isObfuscated', 'status']);
@@ -96,12 +94,7 @@ const ContentAsset = ({
           )}
 
           {shouldRenderText && (
-            <ReadIndicator
-              message={message}
-              is1to1Conversation={is1to1Conversation}
-              isLastDeliveredMessage={isLastDeliveredMessage}
-              onClick={onClickDetails}
-            />
+            <ReadIndicator message={message} is1to1Conversation={is1to1Conversation} onClick={onClickDetails} />
           )}
 
           {previews.map(() => (
@@ -109,12 +102,7 @@ const ContentAsset = ({
               <LinkPreviewAsset message={message} isFocusable={isMessageFocused} />
 
               {!shouldRenderText && (
-                <ReadIndicator
-                  message={message}
-                  is1to1Conversation={is1to1Conversation}
-                  isLastDeliveredMessage={isLastDeliveredMessage}
-                  onClick={onClickDetails}
-                />
+                <ReadIndicator message={message} is1to1Conversation={is1to1Conversation} onClick={onClickDetails} />
               )}
             </div>
           ))}

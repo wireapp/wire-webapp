@@ -48,6 +48,7 @@ import {ContextMenuEntry} from '../../../../ui/ContextMenu';
 import {EphemeralTimer} from '../EphemeralTimer';
 import {MessageTime} from '../MessageTime';
 import {useMessageFocusedTabIndex} from '../util';
+
 export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetSession'> {
   contextMenu: {entries: ko.Subscribable<ContextMenuEntry[]>};
   conversation: Conversation;
@@ -57,7 +58,6 @@ export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetS
   hideHeader: boolean;
   hasMarker?: boolean;
   isFocused: boolean;
-  isLastDeliveredMessage: boolean;
   message: ContentMessage;
   onClickButton: (message: CompositeMessage, buttonId: string) => void;
   onRetry: (message: ContentMessage) => void;
@@ -65,6 +65,7 @@ export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetS
   selfId: QualifiedId;
   isMsgElementsFocusable: boolean;
   onClickReaction: (emoji: string) => void;
+  rightMarginWidth: number;
 }
 
 export const ContentMessageComponent = ({
@@ -74,7 +75,6 @@ export const ContentMessageComponent = ({
   selfId,
   hideHeader,
   isFocused,
-  isLastDeliveredMessage,
   contextMenu,
   onClickAvatar,
   onClickImage,
@@ -86,6 +86,7 @@ export const ContentMessageComponent = ({
   isMsgElementsFocusable,
   onClickReaction,
   onClickDetails,
+  rightMarginWidth,
 }: ContentMessageProps) => {
   const messageRef = useRef<HTMLDivElement | null>(null);
 
@@ -235,18 +236,12 @@ export const ContentMessageComponent = ({
             onClickMessage={onClickMessage}
             isMessageFocused={msgFocusState}
             is1to1Conversation={conversation.is1to1()}
-            isLastDeliveredMessage={isLastDeliveredMessage}
             onClickDetails={() => onClickDetails(message)}
           />
         ))}
 
         {isAssetMessage && (
-          <ReadIndicator
-            message={message}
-            is1to1Conversation={conversation.is1to1()}
-            isLastDeliveredMessage={isLastDeliveredMessage}
-            onClick={onClickDetails}
-          />
+          <ReadIndicator message={message} is1to1Conversation={conversation.is1to1()} onClick={onClickDetails} />
         )}
 
         {!isConversationReadonly && isActionMenuVisible && (
@@ -259,6 +254,7 @@ export const ContentMessageComponent = ({
             handleReactionClick={onClickReaction}
             reactionsTotalCount={reactions.length}
             isRemovedFromConversation={conversation.removed_from_conversation()}
+            rightMarginWidth={rightMarginWidth}
           />
         )}
       </div>

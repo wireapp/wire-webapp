@@ -47,7 +47,6 @@ describe('message', () => {
       conversation: new Conversation(),
       findMessage: jest.fn(),
       isFocused: true,
-      isLastDeliveredMessage: false,
       hideHeader: false,
       message,
       onClickAvatar: jest.fn(),
@@ -64,6 +63,7 @@ describe('message', () => {
       onRetry: jest.fn(),
       selfId: {domain: '', id: createUuid()},
       isMsgElementsFocusable: true,
+      rightMarginWidth: 10,
     };
   });
 

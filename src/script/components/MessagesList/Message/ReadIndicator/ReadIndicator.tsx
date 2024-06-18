@@ -19,7 +19,6 @@
 
 import {Icon} from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
 import {formatTimeShort} from 'Util/TimeUtil';
 
 import {ReadIndicatorContainer, ReadIndicatorStyles, ReadReceiptText} from './ReadIndicator.styles';
@@ -29,7 +28,6 @@ import {Message} from '../../../../entity/message/Message';
 interface ReadIndicatorProps {
   message: Message;
   is1to1Conversation?: boolean;
-  isLastDeliveredMessage?: boolean;
   showIconOnly?: boolean;
   onClick?: (message: Message) => void;
 }
@@ -37,7 +35,6 @@ interface ReadIndicatorProps {
 export const ReadIndicator = ({
   message,
   is1to1Conversation = false,
-  isLastDeliveredMessage = false,
   showIconOnly = false,
   onClick,
 }: ReadIndicatorProps) => {
@@ -45,15 +42,10 @@ export const ReadIndicator = ({
 
   if (is1to1Conversation) {
     const readReceiptText = readReceipts.length ? formatTimeShort(readReceipts[0].time) : '';
-    const showDeliveredMessage = isLastDeliveredMessage && readReceiptText === '';
 
     return (
       <div css={ReadIndicatorContainer} className="read-indicator-wrapper">
         <span css={ReadIndicatorStyles(showIconOnly)} data-uie-name="status-message-read-receipts">
-          {showDeliveredMessage && (
-            <span data-uie-name="status-message-read-receipt-delivered">{t('conversationMessageDelivered')}</span>
-          )}
-
           {showIconOnly && readReceiptText && <Icon.Read />}
 
           {!showIconOnly && !!readReceiptText && (

@@ -34,6 +34,7 @@ const defaultProps: MessageActionsMenuProps = {
   handleReactionClick: jest.fn(),
   reactionsTotalCount: 0,
   isRemovedFromConversation: false,
+  rightMarginWidth: 10,
 };
 
 describe('MessageActions', () => {

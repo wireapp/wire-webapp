@@ -22,7 +22,7 @@ import ko from 'knockout';
 
 import {PingMessage as PingMessageEntity} from 'src/script/entity/message/PingMessage';
 
-import {PingMessage} from './PingMessage';
+import {PingMessage, PingMessageProps} from './PingMessage';
 
 import {ReadReceipt} from '../../../storage';
 
@@ -42,10 +42,8 @@ describe('PingMessage', () => {
     const caption = 'caption';
     const sender = 'sender';
 
-    const props = {
-      isMessageFocused: true,
+    const props: PingMessageProps = {
       is1to1Conversation: false,
-      isLastDeliveredMessage: false,
       message: createPingMessage({
         caption: ko.pureComputed(() => 'caption'),
         unsafeSenderName: ko.pureComputed(() => 'sender'),

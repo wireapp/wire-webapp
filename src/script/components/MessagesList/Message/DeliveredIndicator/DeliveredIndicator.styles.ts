@@ -19,46 +19,20 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const ReadIndicatorContainer: CSSObject = {
-  display: 'inline-block',
-  marginLeft: '12px',
-  lineHeight: 1,
-
-  '.message-asset &': {
-    marginLeft: '12px',
-  },
-};
-
-export const ReadReceiptText: CSSObject = {
-  display: 'inline-flex',
-  alignItems: 'center',
-  verticalAlign: 'text-bottom',
-  whiteSpace: 'nowrap',
-};
-
-export const ReadIndicatorStyles = (showIconOnly = false): CSSObject => ({
+export const DeliveryIndicatorStyles = (visible: boolean): CSSObject => ({
+  boxSizing: 'border-box',
+  position: 'absolute',
+  top: 0,
+  right: 0,
+  transform: 'translateX(100%)',
+  overflow: 'unset',
+  padding: '7px 24px 7px 16px',
   color: 'var(--content-message-timestamp)',
   fontSize: 'var(--font-size-small)',
   fontWeight: 'var(--font-weight-regular)',
   lineHeight: 'var(--line-height-sm)',
-
-  svg: {
-    width: '10px',
-    minHeight: '10px',
-    marginRight: '4px',
-    fill: 'currentColor',
-  },
-
-  ...(showIconOnly && {
-    display: 'flex',
-    alignItems: 'center',
-    marginLeft: '8px',
-  }),
-
-  ...(!showIconOnly && {
-    opacity: 0,
-    '.message:hover &': {
-      opacity: '1',
-    },
-  }),
+  wordWrap: 'normal',
+  whiteSpace: 'normal',
+  width: 'min-content',
+  visibility: visible ? 'unset' : 'hidden',
 });

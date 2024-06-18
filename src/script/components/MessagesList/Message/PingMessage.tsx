@@ -28,10 +28,9 @@ import {PingMessage as PingMessageEntity} from '../../../entity/message/PingMess
 export interface PingMessageProps {
   message: PingMessageEntity;
   is1to1Conversation: boolean;
-  isLastDeliveredMessage: boolean;
 }
 
-const PingMessage = ({message, is1to1Conversation, isLastDeliveredMessage}: PingMessageProps) => {
+const PingMessage = ({message, is1to1Conversation}: PingMessageProps) => {
   const {unsafeSenderName, caption, ephemeral_caption, isObfuscated, get_icon_classes} = useKoSubscribableChildren(
     message,
     ['unsafeSenderName', 'caption', 'ephemeral_caption', 'isObfuscated', 'get_icon_classes'],
@@ -54,11 +53,7 @@ const PingMessage = ({message, is1to1Conversation, isLastDeliveredMessage}: Ping
           <span className="ellipsis">{caption}</span>
         </p>
 
-        <ReadReceiptStatus
-          message={message}
-          is1to1Conversation={is1to1Conversation}
-          isLastDeliveredMessage={isLastDeliveredMessage}
-        />
+        <ReadReceiptStatus message={message} is1to1Conversation={is1to1Conversation} />
       </div>
     </div>
   );

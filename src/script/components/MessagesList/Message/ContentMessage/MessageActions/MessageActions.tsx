@@ -63,6 +63,7 @@ export interface MessageActionsMenuProps {
   handleReactionClick: (emoji: string) => void;
   reactionsTotalCount: number;
   isRemovedFromConversation: boolean;
+  rightMarginWidth: number;
 }
 
 const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
@@ -74,6 +75,7 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
   handleReactionClick,
   reactionsTotalCount,
   isRemovedFromConversation,
+  rightMarginWidth,
 }) => {
   const {entries: menuEntries} = useKoSubscribableChildren(contextMenu, ['entries']);
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
@@ -163,7 +165,7 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
     }
   });
   return (
-    <div css={{...messageBodyActions, ...messageReactionTop}} ref={wrapperRef}>
+    <div css={{...messageBodyActions(rightMarginWidth), ...messageReactionTop}} ref={wrapperRef}>
       <div
         css={messageActionsGroup}
         role="group"

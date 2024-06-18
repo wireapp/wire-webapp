@@ -24,6 +24,7 @@ import cx from 'classnames';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {JumpToLastMessageButton} from 'Components/MessagesList/JumpToLastMessageButton';
+import {DeliveredIndicator} from 'Components/MessagesList/Message/DeliveredIndicator/DeliveredIndicator';
 import {filterMessages} from 'Components/MessagesList/utils/messagesFilter';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {MessageRepository} from 'src/script/conversation/MessageRepository';
@@ -120,6 +121,8 @@ export const MessagesList: FC<MessagesListParams> = ({
   const [loaded, setLoaded] = useState(false);
   const [highlightedMessage, setHighlightedMessage] = useState<string | undefined>(conversation.initialMessage()?.id);
   const conversationLastReadTimestamp = useRef(conversation.last_read_timestamp());
+
+  const [rightMarginWidth, setRightMarginWidth] = useState<number>(0);
 
   const filteredMessages = filterMessages(allMessages);
   const filteredMessagesLength = filteredMessages.length;
@@ -268,15 +271,26 @@ export const MessagesList: FC<MessagesListParams> = ({
     }
   };
 
+  const setDeliveredIndicatorWidth = (element: HTMLDivElement) => {
+    if (element?.offsetWidth > 0) {
+      setRightMarginWidth(element?.offsetWidth);
+    }
+  };
+
   return (
     <>
+      {rightMarginWidth === 0 && <DeliveredIndicator ref={setDeliveredIndicatorWidth} isLastDeliveredMessage={false} />}
       <FadingScrollbar
         ref={messageListRef}
         id="message-list"
         className={cx('message-list', {'is-right-panel-open': isRightSidebarOpen})}
         tabIndex={TabIndex.UNFOCUSABLE}
       >
-        <div ref={setMessagesContainer} className={cx('messages', {'flex-center': verticallyCenterMessage()})}>
+        <div
+          ref={setMessagesContainer}
+          className={cx('messages', {'flex-center': verticallyCenterMessage()})}
+          css={{marginRight: `${rightMarginWidth}px`}}
+        >
           {groupedMessages.flatMap((group, groupIndex) => {
             if (isMarker(group)) {
               return (
@@ -355,6 +369,7 @@ export const MessagesList: FC<MessagesListParams> = ({
                   handleArrowKeyDown={handleKeyDown}
                   isMsgElementsFocusable={isMsgElementsFocusable}
                   setMsgElementsFocusable={setMsgElementsFocusable}
+                  rightMarginWidth={rightMarginWidth}
                 />
               );
             });
