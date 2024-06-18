@@ -22,7 +22,12 @@ import {isGroup} from './SelectComponents';
 
 import {Theme} from '../Layout';
 
-export const customStyles = (theme: Theme, markInvalid = false) => ({
+interface CustomStylesParams {
+  theme: Theme;
+  markInvalid?: boolean;
+  menuPosition?: 'absolute' | 'relative';
+}
+export const customStyles = ({theme, markInvalid = false, menuPosition = 'absolute'}: CustomStylesParams) => ({
   indicatorSeparator: () => ({
     display: 'none',
   }),
@@ -34,6 +39,29 @@ export const customStyles = (theme: Theme, markInvalid = false) => ({
     const isSelectDisabled = selectProps.isDisabled;
 
     return {
+      '& > div > div[class$="-Control"]': {
+        ...inputStyle(theme, {disabled: isSelectDisabled, markInvalid}),
+        borderRadius: 12,
+        minHeight: 48,
+        ...(isDisabled && {
+          backgroundColor: theme.Input.backgroundColorDisabled,
+          color: theme.Select.disabledColor,
+          cursor: 'default',
+        }),
+        ...(markInvalid && {
+          boxShadow: `0 0 0 1px ${theme.general.dangerColor}`,
+        }),
+        ...(menuIsOpen && {
+          boxShadow: `0 0 0 1px ${theme.general.primaryColor}`,
+          '&:hover': {
+            boxShadow: `0 0 0 1px ${theme.general.primaryColor}`,
+          },
+        }),
+        cursor: !isSelectDisabled && 'pointer',
+        '&:focus:visible, active': {
+          boxShadow: !isSelectDisabled && `0 0 0 1px ${theme.general.primaryColor}`,
+        },
+      },
       '& > div': isGroup(options)
         ? {
             display: 'inline',
@@ -41,7 +69,6 @@ export const customStyles = (theme: Theme, markInvalid = false) => ({
             top: '-10px',
           }
         : {
-            ...inputStyle(theme, {disabled: isSelectDisabled, markInvalid}),
             padding: 0,
             height: 'auto',
             minHeight: '48px',
@@ -50,24 +77,6 @@ export const customStyles = (theme: Theme, markInvalid = false) => ({
               textShadow: '0 0 0 #000',
             },
             position: 'relative',
-            ...(isDisabled && {
-              backgroundColor: theme.Input.backgroundColorDisabled,
-              color: theme.Select.disabledColor,
-              cursor: 'default',
-            }),
-            ...(markInvalid && {
-              boxShadow: `0 0 0 1px ${theme.general.dangerColor}`,
-            }),
-            ...(menuIsOpen && {
-              boxShadow: `0 0 0 1px ${theme.general.primaryColor}`,
-              '&:hover': {
-                boxShadow: `0 0 0 1px ${theme.general.primaryColor}`,
-              },
-            }),
-            cursor: !isSelectDisabled && 'pointer',
-            '&:focus:visible, active': {
-              boxShadow: !isSelectDisabled && `0 0 0 1px ${theme.general.primaryColor}`,
-            },
           },
     };
   },
@@ -112,13 +121,14 @@ export const customStyles = (theme: Theme, markInvalid = false) => ({
     marginBottom: 0,
     marginTop: 4,
     overflowY: 'overlay',
+    position: menuPosition,
     ...(isGroup(options) && {
       minWidth: '400px',
     }),
   }),
   menuList: provided => ({
     ...provided,
-    borderRadius: 12,
+    borderRadius: 0,
     paddingBottom: 0,
     paddingTop: 0,
     maxHeight: 400,
@@ -196,14 +206,14 @@ export const customStyles = (theme: Theme, markInvalid = false) => ({
     }),
     ...(!isGroup(options) && {
       '&:first-of-type': {
-        borderRadius: '12px 12px 0 0',
+        borderRadius: '0',
       },
     }),
     ...(isGroup(options) && {
       textAlign: 'left',
     }),
     '&:last-of-type': {
-      ...(!isGroup(options) && {borderRadius: '0 0 12px 12px'}),
+      ...(!isGroup(options) && {borderRadius: '0'}),
       ...(isGroup(options) &&
         !options[options.length - 1].options.includes(data) && {
           borderBottom: `1px solid ${theme.Select.borderColor}`,
