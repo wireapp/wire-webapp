@@ -8,7 +8,7 @@
 /keys
 /package-lock.json
 /resource
-/src/generated
+/src/script/generated
 /temp
 CHANGELOG.md
 node_modules
