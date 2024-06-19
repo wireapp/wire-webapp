@@ -23,6 +23,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import cx from 'classnames';
 import ko from 'knockout';
 
+import {Icon} from 'Components/Icon';
 import {ReadIndicator} from 'Components/MessagesList/Message/ReadIndicator';
 import {Conversation} from 'src/script/entity/Conversation';
 import {CompositeMessage} from 'src/script/entity/message/CompositeMessage';
@@ -31,8 +32,11 @@ import {useRelativeTimestamp} from 'src/script/hooks/useRelativeTimestamp';
 import {StatusType} from 'src/script/message/StatusType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getMessageAriaLabel} from 'Util/conversationMessages';
+import {t} from 'Util/LocalizerUtil';
+import {checkIsMessageDelivered} from 'Util/util';
 
 import {ContentAsset} from './asset';
+import {deliveredMessageIndicator, messageBodyWrapper} from './ContentMessage.styles';
 import {MessageActionsMenu} from './MessageActions/MessageActions';
 import {useMessageActionsState} from './MessageActions/MessageActions.state';
 import {MessageReactionsList} from './MessageActions/MessageReactions/MessageReactionsList';
@@ -48,6 +52,7 @@ import {ContextMenuEntry} from '../../../../ui/ContextMenu';
 import {EphemeralTimer} from '../EphemeralTimer';
 import {MessageTime} from '../MessageTime';
 import {useMessageFocusedTabIndex} from '../util';
+
 export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetSession'> {
   contextMenu: {entries: ko.Subscribable<ContextMenuEntry[]>};
   conversation: Conversation;
@@ -104,6 +109,7 @@ export const ContentMessageComponent = ({
     status,
     quote,
     isObfuscated,
+    readReceipts,
   } = useKoSubscribableChildren(message, [
     'senderName',
     'timestamp',
@@ -116,6 +122,7 @@ export const ContentMessageComponent = ({
     'status',
     'quote',
     'isObfuscated',
+    'readReceipts',
   ]);
 
   const timeAgo = useRelativeTimestamp(message.timestamp());
@@ -159,6 +166,8 @@ export const ContentMessageComponent = ({
     }
   };
 
+  const showDeliveredMessageIcon = checkIsMessageDelivered(isLastDeliveredMessage, readReceipts);
+
   // Closing another ActionMenu on outside click
   useClickOutside(messageRef, hideActionMenuVisibility);
 
@@ -194,73 +203,77 @@ export const ContentMessageComponent = ({
         </MessageHeader>
       )}
 
-      <div
-        className={cx('message-body', {
-          'message-asset': isAssetMessage,
-          'message-quoted': !!quote,
-          'ephemeral-asset-expired': isObfuscated && isAssetMessage,
-          'icon-file': isObfuscated && isFileMessage,
-          'icon-movie': isObfuscated && isVideoMessage,
-        })}
-        {...(ephemeralCaption && {title: ephemeralCaption})}
-      >
-        {ephemeral_status === EphemeralStatusType.ACTIVE && (
-          <div className="message-ephemeral-timer">
-            <EphemeralTimer message={message} />
-          </div>
-        )}
+      <div css={messageBodyWrapper}>
+        <div
+          className={cx('message-body', {
+            'message-asset': isAssetMessage,
+            'message-quoted': !!quote,
+            'ephemeral-asset-expired': isObfuscated && isAssetMessage,
+            'icon-file': isObfuscated && isFileMessage,
+            'icon-movie': isObfuscated && isVideoMessage,
+          })}
+          {...(ephemeralCaption && {title: ephemeralCaption})}
+        >
+          {ephemeral_status === EphemeralStatusType.ACTIVE && (
+            <div className="message-ephemeral-timer">
+              <EphemeralTimer message={message} />
+            </div>
+          )}
 
-        {quote && (
-          <Quote
-            conversation={conversation}
-            quote={quote}
-            selfId={selfId}
-            findMessage={findMessage}
-            showDetail={onClickImage}
-            focusMessage={onClickTimestamp}
-            handleClickOnMessage={onClickMessage}
-            showUserDetails={onClickAvatar}
-            isMessageFocused={msgFocusState}
-          />
-        )}
+          {quote && (
+            <Quote
+              conversation={conversation}
+              quote={quote}
+              selfId={selfId}
+              findMessage={findMessage}
+              showDetail={onClickImage}
+              focusMessage={onClickTimestamp}
+              handleClickOnMessage={onClickMessage}
+              showUserDetails={onClickAvatar}
+              isMessageFocused={msgFocusState}
+            />
+          )}
 
-        {assets.map(asset => (
-          <ContentAsset
-            key={asset.type}
-            asset={asset}
-            message={message}
-            selfId={selfId}
-            onClickButton={onClickButton}
-            onClickImage={onClickImage}
-            onClickMessage={onClickMessage}
-            isMessageFocused={msgFocusState}
-            is1to1Conversation={conversation.is1to1()}
-            isLastDeliveredMessage={isLastDeliveredMessage}
-            onClickDetails={() => onClickDetails(message)}
-          />
-        ))}
+          {assets.map(asset => (
+            <ContentAsset
+              key={asset.type}
+              asset={asset}
+              message={message}
+              selfId={selfId}
+              onClickButton={onClickButton}
+              onClickImage={onClickImage}
+              onClickMessage={onClickMessage}
+              isMessageFocused={msgFocusState}
+              is1to1Conversation={conversation.is1to1()}
+              onClickDetails={() => onClickDetails(message)}
+            />
+          ))}
 
-        {isAssetMessage && (
-          <ReadIndicator
-            message={message}
-            is1to1Conversation={conversation.is1to1()}
-            isLastDeliveredMessage={isLastDeliveredMessage}
-            onClick={onClickDetails}
-          />
-        )}
+          {isAssetMessage && (
+            <ReadIndicator message={message} is1to1Conversation={conversation.is1to1()} onClick={onClickDetails} />
+          )}
 
-        {!isConversationReadonly && isActionMenuVisible && (
-          <MessageActionsMenu
-            isMsgWithHeader={!hideHeader}
-            message={message}
-            handleActionMenuVisibility={setActionMenuVisibility}
-            contextMenu={contextMenu}
-            isMessageFocused={msgFocusState}
-            handleReactionClick={onClickReaction}
-            reactionsTotalCount={reactions.length}
-            isRemovedFromConversation={conversation.removed_from_conversation()}
-          />
-        )}
+          {!isConversationReadonly && isActionMenuVisible && (
+            <MessageActionsMenu
+              isMsgWithHeader={!hideHeader}
+              message={message}
+              handleActionMenuVisibility={setActionMenuVisibility}
+              contextMenu={contextMenu}
+              isMessageFocused={msgFocusState}
+              handleReactionClick={onClickReaction}
+              reactionsTotalCount={reactions.length}
+              isRemovedFromConversation={conversation.removed_from_conversation()}
+            />
+          )}
+        </div>
+
+        <div css={deliveredMessageIndicator}>
+          {showDeliveredMessageIcon && (
+            <div data-uie-name="status-message-read-receipt-delivered" title={t('conversationMessageDelivered')}>
+              <Icon.OutlineCheck />
+            </div>
+          )}
+        </div>
       </div>
 
       {[StatusType.FAILED, StatusType.FEDERATION_ERROR].includes(status) && (
