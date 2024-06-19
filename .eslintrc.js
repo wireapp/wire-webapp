@@ -21,6 +21,7 @@ module.exports = {
     'src/ext/',
     'src/script/localization/**/webapp*.js',
     'src/worker/',
+    'src/generated/',
     '*.js',
   ],
   parserOptions: {

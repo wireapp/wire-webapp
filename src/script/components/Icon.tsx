@@ -19,21 +19,29 @@
 
 import React from 'react';
 
-import {getAllSVGs} from 'Util/SVGProvider';
+import {SVGIconFileName, getAllSVGs} from 'Util/SVGProvider';
+
+type RemoveSuffix<S extends string, Suffix extends string> = S extends `${infer P}${Suffix}` ? P : S;
+
+type PascalCase<S extends string> = S extends `${infer F}-${infer R}`
+  ? `${Capitalize<F>}${PascalCase<Capitalize<R>>}`
+  : Capitalize<S>;
+
+type PascalCaseIconName = PascalCase<RemoveSuffix<SVGIconFileName, '-icon'>>;
 
 type IconProps = React.SVGProps<SVGSVGElement>;
 
-type IconList = Record<string, React.FC<IconProps>>;
+type IconList = Record<PascalCaseIconName, React.FC<IconProps>>;
 
 interface NamedIconProps extends IconProps {
-  name: string;
+  name: SVGIconFileName;
 }
 
-const normalizeIconName = (name: string) =>
+const normalizeIconName = (name: SVGIconFileName): PascalCaseIconName =>
   name
     .replace(/-icon$/, '')
     .replace(/\b\w/g, found => found.toUpperCase())
-    .replace(/-/g, '');
+    .replace(/-/g, '') as PascalCaseIconName;
 
 const createSvgComponent = (svg: HTMLElement, displayName: string): React.FC<IconProps> => {
   const SVGComponent: React.FC<IconProps> = oProps => {
@@ -57,10 +65,21 @@ const createSvgComponent = (svg: HTMLElement, displayName: string): React.FC<Ico
   return SVGComponent;
 };
 
-const icons = Object.entries(getAllSVGs()).reduce<IconList>((list, [key, svg]) => {
-  const name = normalizeIconName(key);
-  return Object.assign(list, {[name]: createSvgComponent(svg.documentElement, `Icon.${name}`)});
-}, {});
+type Entries<T> = {
+  [K in keyof T]: [K, T[K]];
+}[keyof T][];
+
+function typedEntries<T extends {}>(obj: T): Entries<T> {
+  return Object.entries(obj) as Entries<T>;
+}
+
+const icons = typedEntries(getAllSVGs()).reduce<IconList>(
+  (list, [key, svg]) => {
+    const name = normalizeIconName(key);
+    return Object.assign(list, {[name]: createSvgComponent(svg.documentElement, `Icon.${name}`)});
+  },
+  {} as Record<PascalCaseIconName, React.FC<IconProps>>,
+);
 
 const IconComponent: React.FC<NamedIconProps> = ({name, ...props}) => {
   const componentName = normalizeIconName(name);

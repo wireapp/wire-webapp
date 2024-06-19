@@ -17,20 +17,27 @@
  *
  */
 
-const fileList = require.context('Resource/image/icon', true, /.+\.svg$/);
-export type SVGProvider = {[index: string]: Document};
+import {iconFileNames} from '../../generated/iconFileNames';
 
-const svgs: SVGProvider = {};
+type ElementType<T extends ReadonlyArray<unknown>> = T extends ReadonlyArray<infer ElementType> ? ElementType : never;
+type SVGFileNameWithExtension = ElementType<typeof iconFileNames>;
+
+export type SVGIconFileName = SVGFileNameWithExtension extends `${infer Name}.svg` ? Name : never;
+export type SVGProvider = Record<SVGIconFileName, Document>;
 
 const parser = new DOMParser();
-fileList.keys().forEach(iconFileName => {
-  const iconPath = iconFileName.replace(/^\.\//, '');
-  const iconName = iconFileName.substring(iconFileName.lastIndexOf('/') + 1).replace(/\.svg$/i, '');
-  const svgString = require(`Resource/image/icon/${iconPath}`);
-  svgs[iconName] = parser.parseFromString(svgString, 'image/svg+xml');
-});
+
+const createSVGs = (fileNames: typeof iconFileNames): SVGProvider => {
+  return fileNames.reduce((acc, iconFileName) => {
+    const iconName = iconFileName.substring(iconFileName.lastIndexOf('/') + 1).replace(/\.svg$/i, '');
+    const svgString = require(`Resource/image/icon/${iconFileName}`);
+    return {...acc, [iconName]: parser.parseFromString(svgString, 'image/svg+xml')};
+  }, {} as SVGProvider);
+};
+
+const svgs = createSVGs(iconFileNames);
 
 const getAllSVGs = () => svgs;
-const getSVG = (iconName: string) => svgs[iconName];
+const getSVG = (iconName: SVGIconFileName) => svgs[iconName];
 
 export {getAllSVGs, getSVG};
