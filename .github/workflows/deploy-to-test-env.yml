@@ -28,8 +28,10 @@ jobs:
     steps:
       - name: Print environment variables
         run: |
-          echo -e "branch = ${{github.ref_name}}"
-          echo -e "env = ${{inputs.env}}"
+          echo -e "branch = ${GITHUB_REF_NAME}"
+          echo -e "env = ${ENV}"
+        env:
+          ENV: ${{ inputs.env }}
 
       - name: Checkout
         uses: actions/checkout@v4
