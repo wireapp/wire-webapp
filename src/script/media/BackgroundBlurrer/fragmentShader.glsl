@@ -30,7 +30,7 @@ void main() {
         }
     }
     blend = blend / pow(float((SMOOTH) * 2), 2.0);
-    //blend = texture2D(u_mask, v_texCoord).r == 1.0 ? 1.0 : 0.0;
+    //blend = texture2D(u_mask, v_texCoord).r;
     vec4 clearPixel = texture2D(u_image, v_texCoord);
     gl_FragColor = mix(blurredPixel, clearPixel, blend);
 }
